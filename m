@@ -2,118 +2,102 @@ Return-Path: <SRS0=hXcz=7S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AB62C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 10:30:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DF8EC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 10:32:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 86FDE2074B
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 10:30:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1798D2074B
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 10:32:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="nqFRuoKt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86FDE2074B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="frcI9FZw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1798D2074B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57614 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59834 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jh9cM-0007zX-KS
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 06:30:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44976)
+	id 1jh9dt-0000eF-Ck
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 06:32:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44986)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jh9VV-0004ND-5E; Fri, 05 Jun 2020 06:23:25 -0400
-Received: from mail-eopbgr50107.outbound.protection.outlook.com
- ([40.107.5.107]:2162 helo=EUR03-VE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jh9VR-0006Y5-W4; Fri, 05 Jun 2020 06:23:23 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=nHAXoiCX+je+EBJr3udTvwrME7B42pCsWgD5oGBf1TiIrxq8dzKPmrm7a30dHESkEGc80nWTjtFqGDI4Q9El2doUw3eNMNIZCwQXa91UaliHMVFHQwqo8VeGIM0lyb+yHZzTVmhzDaXEZ0qInr2fjnLlw4789cbevH+ZzvKPrZ0CwnEa171IZ4FYQ/lvmnAbKqPMHKUgT3Ta1lltLTSSKOF3KCdyXD+umaH4jwrTpk9jk0BES3XaA13DqqycQbIU10yNP/QqPdxlWU3nD1HEluyYAMkiXJU0eyXMlAMvoHHkaa0A+bCy25K826cRD1HOO9jBo4syZJagYNPGzdpgug==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ZDaXT4ODm2eOiH6dnni6GLRV8w7NOH0CNTm4n9yj04s=;
- b=UwhEXgyOGLIhiHweRDXy9ydRCmE14G4OgPJdNGRND0jLJ5SoElQGv2l9oSfx/MnucRpMr/SGBvUZJnmQS6uCrsI+QO04/XilhAYEHtAjLFHuV+P7Ct5ijNEG1UfpKuOwD1FhZAjjhE4NbclI0Q+t8kgPosWVaq5MTRp/5S/Ycgr38i197XY/7M+knUS3w6IRxle3d71k7mOl8hwbLnym3r8lVdGgsc8U403Qg6/ppudMHtG2Mi+v+jIVKpo4DuRstEPaYhMCYyPlx9YDTCvoLbgRpHnAvf88Zt5P4QT1J9CRKLkXUZc+fNOHB8mEoT5T91LfCfuxpbAzBoHhY+KxRg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ZDaXT4ODm2eOiH6dnni6GLRV8w7NOH0CNTm4n9yj04s=;
- b=nqFRuoKtkxDhUh4jnNcPkKGf90bLbE8ACWtv6S303DbOA6ICbFoddCy4S0hs1uACiynp9dPYuQEW6K74fYxWHyEveS4TfG/F6M7nhUvgzke5PKFJJKSxHJE85S4VfUqnuEcsoxsPWPPSsY2Atb2tEXkUOjA2sadKIBHHn89Wn1I=
-Received: from AM6PR08MB4070.eurprd08.prod.outlook.com (2603:10a6:20b:a3::25)
- by AM6PR08MB4898.eurprd08.prod.outlook.com (2603:10a6:20b:cd::23)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3066.18; Fri, 5 Jun
- 2020 10:23:17 +0000
-Received: from AM6PR08MB4070.eurprd08.prod.outlook.com
- ([fe80::2122:8358:546a:adae]) by AM6PR08MB4070.eurprd08.prod.outlook.com
- ([fe80::2122:8358:546a:adae%3]) with mapi id 15.20.3066.022; Fri, 5 Jun 2020
- 10:23:17 +0000
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Subject: Re: [PATCH v4 01/12] qcow2.py: python style fixes
-Thread-Topic: [PATCH v4 01/12] qcow2.py: python style fixes
-Thread-Index: AQHWOpdtGVePcrUOpU6Bf+AJz84ie6jJ0Tam
-Date: Fri, 5 Jun 2020 10:23:17 +0000
-Message-ID: <AM6PR08MB4070E4169E7B3F27C24FF6EDF4860@AM6PR08MB4070.eurprd08.prod.outlook.com>
-References: <20200604174135.11042-1-vsementsov@virtuozzo.com>,
- <20200604174135.11042-2-vsementsov@virtuozzo.com>
-In-Reply-To: <20200604174135.11042-2-vsementsov@virtuozzo.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: virtuozzo.com; dkim=none (message not signed)
- header.d=none;virtuozzo.com; dmarc=none action=none
- header.from=virtuozzo.com;
-x-originating-ip: [109.252.114.191]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: ebccbf50-cf34-47c1-270c-08d8093a769d
-x-ms-traffictypediagnostic: AM6PR08MB4898:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <AM6PR08MB48985ED35D0ECB71FC77A2AAF4860@AM6PR08MB4898.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:3276;
-x-forefront-prvs: 0425A67DEF
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 1OhYQgs38jpc0al0OQ8uMFKywyAJ1M5W7/rn+dn1zS+ZDYi2OVJ8j9mAKNq43IsGl2GOKBjUqdw7rbTGwfQzJPXiy+1rLkFDYkzrcP/Tuyy+a7RToTo9H0ynyTfgQFRX4PglZfUFBlKMp84q61H9DZHu/feQUJ82rMInk7Yo7A5x4ExamTybPTbiLoIY1Y7KYF/07Sz0nxQUuftQTbcLL1VC3RItomGFQv+apcoSUm8FLe8k7xShgtG0OtyEQaBoAByQR1vSy2klOxjGZgknOIcUsYKbrZ3hVRAONkneHLjuXGusystm2uEa5XfZ2eKSlzqs6B1KgIUSgQ8VXc17lw==
-x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM6PR08MB4070.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(376002)(39840400004)(366004)(396003)(346002)(136003)(66556008)(9686003)(7696005)(107886003)(6506007)(4326008)(5660300002)(26005)(186003)(53546011)(71200400001)(55016002)(316002)(33656002)(66446008)(44832011)(76116006)(54906003)(91956017)(66946007)(52536014)(64756008)(8936002)(478600001)(86362001)(83380400001)(2906002)(66476007)(8676002)(110136005);
- DIR:OUT; SFP:1102; 
-x-ms-exchange-antispam-messagedata: wUyi80N0/OFg5HkF/K+dU+jjhQSk6ESAltFG8y1HZC++snwdW5CLeOnqS6VlZcJmivnahujmlAifJy1aG++t8HNQCunk8THEb/lhjTGXeOfvatZkaJB4diGktJI3Ie/N07SmRx1s3ollxchOB0Ct5zCRiEutk7UZCfX5Vp2h/AomHd20wjBhvAXBdJMsEjfrql5fCTA2+SAO105dHfRSIr/plzOXItJ3nmOBi2Y1xtYPYe2SRXVE79dWm6hf1QYsEdlvyKd8LRQacQxyoo8z8J95m0bUvOMLLaVzQNJrFgFykhu+IPxY7YyTVowpW+tlcx+S1E3uyIFbO9g9Utez5t7wgk3LreaTw2rrTPXBYOrp7JYXhqUp9+xH4UUFPucgNn3FllC9VrRjnodsBNM8nYx3DrRlkpMBcF5FIOTx4pFkjqq2dhgJOdgSlJYVStqP6OCpBhwXVc8JocVl+TLs+8Ga8I3s/d1aFIfrW3oFE7sCRSMWi3my5JXtB4QFz9dQ
-Content-Type: multipart/alternative;
- boundary="_000_AM6PR08MB4070E4169E7B3F27C24FF6EDF4860AM6PR08MB4070eurp_"
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jh9VW-0004Tf-0g
+ for qemu-devel@nongnu.org; Fri, 05 Jun 2020 06:23:26 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44248
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jh9VT-0006ZZ-Th
+ for qemu-devel@nongnu.org; Fri, 05 Jun 2020 06:23:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591352603;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Gw1xw+LMpEmzRwp28aIuZw9IW5+ls2uZgRvm0cZFybM=;
+ b=frcI9FZwI+VQieHx7pWpMN+K9IrE3s9rTCHVTnXwNHtw5bw2Y9iSAWnc5DfCJvu8bULvme
+ 7+03SpK3IxQ4EABzJ8MdUEsNXY6r0ORPzVTdDCyYTRfQujeoqEepAbZAT35IX05hTz1/XP
+ oVx3WUp1hrXXy0dJf70JWNu1e07wkzw=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-134-xe56vpd0ONW8d0jHvz_18w-1; Fri, 05 Jun 2020 06:23:21 -0400
+X-MC-Unique: xe56vpd0ONW8d0jHvz_18w-1
+Received: by mail-wr1-f70.google.com with SMTP id j16so3564878wre.22
+ for <qemu-devel@nongnu.org>; Fri, 05 Jun 2020 03:23:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=Gw1xw+LMpEmzRwp28aIuZw9IW5+ls2uZgRvm0cZFybM=;
+ b=Gk9PTY+UR+y+fzGznDUfQenHVdlteOnUHwXaKhAZN3j214Rn6B7qEbjyemidoz5ktE
+ Rh99EoKkk7J7FoGc3uMXyDWywXKtLAj73kSRYNNN0tMTdn64SCTilZr9StrZ9hanrSWY
+ +2nGsz+/wbjXNow75WeMWd5YnlwOWaiCxq4AyEAnKeAgvni3k2GRJ62iWovkWL9Y2mo1
+ xvkmGNY5bn+jjU3pZVoqQk/npXD09Vxy+aFR5ntDrq3gye3+dMVtv/heot/KSSYmjD9z
+ zvAcQZ0wJUkphDMNfHGf8zsUDqs0jDp/fCMSn3kpn06fGqZk4J5k1eSky0/Trfyd8N+C
+ t6iQ==
+X-Gm-Message-State: AOAM532fivpTjwy5zzUVDV47UiRzTXkTnbmySZADKQm8g78RrdB6brSd
+ VLgNMrsJLt+ffCND14uQ/a1ItbQXc9LltgziYM4bEJZ5GFcX1X7c5GPhBBjsfvgPw8mVNgaxkql
+ Pa2gyS7tQECyfj9Y=
+X-Received: by 2002:a5d:4245:: with SMTP id s5mr8916871wrr.6.1591352600292;
+ Fri, 05 Jun 2020 03:23:20 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxHl4l4ZA1cP1cNZ19vVlA/aHSUlfwTwzKv0NYQRaZ9rTd/r32G0Q6YN8HBj8LQEbgJuaMZ5g==
+X-Received: by 2002:a5d:4245:: with SMTP id s5mr8916856wrr.6.1591352600113;
+ Fri, 05 Jun 2020 03:23:20 -0700 (PDT)
+Received: from localhost.localdomain
+ (181.red-88-10-103.dynamicip.rima-tde.net. [88.10.103.181])
+ by smtp.gmail.com with ESMTPSA id 138sm11300924wma.23.2020.06.05.03.23.19
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 05 Jun 2020 03:23:19 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 10/11] hw/sd/sdcard: Display offset in read/write_data()
+ trace events
+Date: Fri,  5 Jun 2020 12:22:29 +0200
+Message-Id: <20200605102230.21493-11-philmd@redhat.com>
+X-Mailer: git-send-email 2.21.3
+In-Reply-To: <20200605102230.21493-1-philmd@redhat.com>
+References: <20200605102230.21493-1-philmd@redhat.com>
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ebccbf50-cf34-47c1-270c-08d8093a769d
-X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Jun 2020 10:23:17.4839 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: CBdc+QpEVJ23Pef3Q9deDJzfKJh92AoxVUpkZZTEtcPgHQKYShvfYTgQIwgQMp9zcn8DD0JTRxd1qAMaqdVf0DCk3wpDaPJMNivkW+V/fjo=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4898
-Received-SPF: pass client-ip=40.107.5.107;
- envelope-from=andrey.shinkevich@virtuozzo.com;
- helo=EUR03-VE1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/05 06:23:18
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8;
+	text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/05 03:27:26
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, HTML_MESSAGE=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -127,91 +111,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "mreitz@redhat.com" <mreitz@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---_000_AM6PR08MB4070E4169E7B3F27C24FF6EDF4860AM6PR08MB4070eurp_
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Having 'base address' and 'relative offset' displayed
+separately is more helpful than the absolute address.
 
-________________________________
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Sent: Thursday, June 4, 2020 8:41 PM
-To: qemu-block@nongnu.org <qemu-block@nongnu.org>
-Cc: qemu-devel@nongnu.org <qemu-devel@nongnu.org>; mreitz@redhat.com <mreit=
-z@redhat.com>; kwolf@redhat.com <kwolf@redhat.com>; eblake@redhat.com <ebla=
-ke@redhat.com>; Denis Lunev <den@virtuozzo.com>; Vladimir Sementsov-Ogievsk=
-iy <vsementsov@virtuozzo.com>; Andrey Shinkevich <andrey.shinkevich@virtuoz=
-zo.com>
-Subject: [PATCH v4 01/12] qcow2.py: python style fixes
-
-Fix flake8 complains. Leave the only chunk of lines over 79 characters:
-initialization of cmds variable. Leave it for another day, when it
-should be refactored to utilize argparse instead of hand-written
-parsing.
-
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- tests/qemu-iotests/qcow2.py | 92 +++++++++++++++++++++----------------
- 1 file changed, 53 insertions(+), 39 deletions(-)
+ hw/sd/sd.c         | 8 ++++----
+ hw/sd/trace-events | 4 ++--
+ 2 files changed, 6 insertions(+), 6 deletions(-)
 
---_000_AM6PR08MB4070E4169E7B3F27C24FF6EDF4860AM6PR08MB4070eurp_
-Content-Type: text/html; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+diff --git a/hw/sd/sd.c b/hw/sd/sd.c
+index fad34ab184..a1b25ed36f 100644
+--- a/hw/sd/sd.c
++++ b/hw/sd/sd.c
+@@ -1824,8 +1824,8 @@ void sd_write_data(SDState *sd, uint8_t value)
+         return;
+ 
+     trace_sdcard_write_data(sd->proto_name,
+-                            sd_current_cmd_name(sd),
+-                            sd->current_cmd, value);
++                            sd_current_cmd_name(sd), sd->current_cmd,
++                            sd->data_start, sd->data_offset, value);
+     switch (sd->current_cmd) {
+     case 24:	/* CMD24:  WRITE_SINGLE_BLOCK */
+         sd->data[sd->data_offset ++] = value;
+@@ -1978,8 +1978,8 @@ uint8_t sd_read_data(SDState *sd)
+     io_len = (sd->ocr & (1 << 30)) ? 512 : sd->blk_len;
+ 
+     trace_sdcard_read_data(sd->proto_name,
+-                           sd_current_cmd_name(sd),
+-                           sd->current_cmd, io_len);
++                           sd_current_cmd_name(sd), sd->current_cmd,
++                           sd->data_start, sd->data_offset, io_len);
+     switch (sd->current_cmd) {
+     case 6:	/* CMD6:   SWITCH_FUNCTION */
+         ret = sd->data[sd->data_offset ++];
+diff --git a/hw/sd/trace-events b/hw/sd/trace-events
+index f892c05867..1529ad4c6d 100644
+--- a/hw/sd/trace-events
++++ b/hw/sd/trace-events
+@@ -51,8 +51,8 @@ sdcard_lock(void) ""
+ sdcard_unlock(void) ""
+ sdcard_read_block(uint64_t addr, uint32_t len) "addr 0x%" PRIx64 " size 0x%x"
+ sdcard_write_block(uint64_t addr, uint32_t len) "addr 0x%" PRIx64 " size 0x%x"
+-sdcard_write_data(const char *proto, const char *cmd_desc, uint8_t cmd, uint8_t value) "%s %20s/ CMD%02d value 0x%02x"
+-sdcard_read_data(const char *proto, const char *cmd_desc, uint8_t cmd, size_t length) "%s %20s/ CMD%02d len %zu"
++sdcard_write_data(const char *proto, const char *cmd_desc, uint8_t cmd, uint64_t address, uint32_t offset, uint8_t value) "%s %20s/ CMD%02d addr 0x%" PRIx64 " ofs 0x%" PRIx32 " val 0x%02x"
++sdcard_read_data(const char *proto, const char *cmd_desc, uint8_t cmd, uint64_t address, uint32_t offset, size_t length) "%s %20s/ CMD%02d addr 0x%" PRIx64 " ofs 0x%" PRIx32 " len %zu"
+ sdcard_set_voltage(uint16_t millivolts) "%u mV"
+ 
+ # milkymist-memcard.c
+-- 
+2.21.3
 
-<html>
-<head>
-<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Diso-8859-=
-1">
-</head>
-<body>
-<div><span style=3D"color: rgb(33, 33, 33); font-family: &quot;Segoe UI Wes=
-tEuropean&quot;, &quot;Segoe UI&quot;, Helvetica, Arial, sans-serif; font-s=
-ize: 14.6667px; font-style: normal; font-variant-ligatures: normal; font-va=
-riant-caps: normal; font-weight: 400;">Reviewed-by: Andrey
- Shinkevich &lt;andrey.shinkevich@virtuozzo.com&gt;</span><br>
-</div>
-<div><br>
-</div>
-<hr style=3D"display:inline-block;width:98%" tabindex=3D"-1">
-<div id=3D"divRplyFwdMsg" dir=3D"ltr"><font face=3D"Calibri, sans-serif" st=
-yle=3D"font-size:11pt" color=3D"#000000"><b>From:</b> Vladimir Sementsov-Og=
-ievskiy &lt;vsementsov@virtuozzo.com&gt;<br>
-<b>Sent:</b> Thursday, June 4, 2020 8:41 PM<br>
-<b>To:</b> qemu-block@nongnu.org &lt;qemu-block@nongnu.org&gt;<br>
-<b>Cc:</b> qemu-devel@nongnu.org &lt;qemu-devel@nongnu.org&gt;; mreitz@redh=
-at.com &lt;mreitz@redhat.com&gt;; kwolf@redhat.com &lt;kwolf@redhat.com&gt;=
-; eblake@redhat.com &lt;eblake@redhat.com&gt;; Denis Lunev &lt;den@virtuozz=
-o.com&gt;; Vladimir Sementsov-Ogievskiy &lt;vsementsov@virtuozzo.com&gt;;
- Andrey Shinkevich &lt;andrey.shinkevich@virtuozzo.com&gt;<br>
-<b>Subject:</b> [PATCH v4 01/12] qcow2.py: python style fixes</font>
-<div>&nbsp;</div>
-</div>
-<div class=3D"BodyFragment"><font size=3D"2"><span style=3D"font-size:11pt;=
-">
-<div class=3D"PlainText">Fix flake8 complains. Leave the only chunk of line=
-s over 79 characters:<br>
-initialization of cmds variable. Leave it for another day, when it<br>
-should be refactored to utilize argparse instead of hand-written<br>
-parsing.<br>
-<br>
-Signed-off-by: Vladimir Sementsov-Ogievskiy &lt;vsementsov@virtuozzo.com&gt=
-;<br>
----<br>
-&nbsp;tests/qemu-iotests/qcow2.py | 92 &#43;&#43;&#43;&#43;&#43;&#43;&#43;&=
-#43;&#43;&#43;&#43;&#43;&#43;&#43;&#43;&#43;&#43;&#43;&#43;&#43;&#43;------=
-----------<br>
-&nbsp;1 file changed, 53 insertions(&#43;), 39 deletions(-)<br>
-</div>
-</span></font></div>
-</body>
-</html>
-
---_000_AM6PR08MB4070E4169E7B3F27C24FF6EDF4860AM6PR08MB4070eurp_--
 
