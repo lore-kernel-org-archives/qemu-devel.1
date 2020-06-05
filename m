@@ -7,80 +7,81 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18C98C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 01:37:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54E12C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 01:37:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DA40D2074B
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 01:37:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1D5F22074B
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 01:37:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="l+B8P5LT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA40D2074B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="lbBPH+Ro"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D5F22074B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38656 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39758 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jh1II-0005ch-26
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 21:37:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55660)
+	id 1jh1Ih-00064K-7X
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 21:37:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55680)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=4185f83b6=alistair.francis@wdc.com>)
- id 1jh1BR-0002DB-5o; Thu, 04 Jun 2020 21:30:09 -0400
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:2775)
+ id 1jh1BW-0002Pm-KG; Thu, 04 Jun 2020 21:30:14 -0400
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:22008)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=4185f83b6=alistair.francis@wdc.com>)
- id 1jh1BP-00009b-V2; Thu, 04 Jun 2020 21:30:08 -0400
+ id 1jh1BV-00009e-8t; Thu, 04 Jun 2020 21:30:14 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1591320608; x=1622856608;
+ t=1591320615; x=1622856615;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=aYDJIv52R35pGo+x383MSKsJbltgkUkvhSmP0kHofFc=;
- b=l+B8P5LTqixeNLbXMeXX2p/07inxo2pUqYRTxvsaySN+xHB8csC1Jed3
- 1TDRWY7sYsx7JoEFrU9+MFws4I9VAIXoR/yMzFmY7XfRdw+I+f/OZX35E
- ObNp2PX4mQ1n714YDk9+q4aMfszz5cibnDg8ZLCWsnOIKEJZyhhGT15RO
- bYKpKBibATBvvssVv6kwCb8kp4YNQHRHdWoonaiLYU0TLZGoY1vUKBt15
- W1lC3AvzZ8qs7hhHUypN5Ddky75rQyOWGCCgbuI5TY+FyFv+CZ7RCIPsp
- MlXZ0px0p9Rv1gtMAhky4uHq+R+XntV6B/NYf0K94M0yPEN/CCYYlsMCs w==;
-IronPort-SDR: yPX10IfgeYGMXbFvchT9MHVCXyOpdvFgj1V3yOQ0SLo0hk34W6zdLivDYTHVdQCmqX9oGtMkah
- IpLUe0jNS6ZsuhGxwBPslnRivxgGMUtmV2Viw1gFEcidmWIiWA//xauvbRxZHuDO153WsvnGI3
- NnSkyxULoDz3eAq6WEso3rEQBJBUFLTN3J5EylrGWwFyfV7yaHKRlTEYimyoqhYog7NrSz4DGr
- Be5yy2dcq6+GAh+Zf7uaHnOaWDEf7pVED+DsfQnN/QrEMX8lWzH8IOeg8wTplSYt6ZVeMQG0Y3
- 6YM=
-X-IronPort-AV: E=Sophos;i="5.73,474,1583164800"; d="scan'208";a="143573571"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com)
- ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 05 Jun 2020 09:29:55 +0800
-IronPort-SDR: ngo/fv0omU5qYEBAa9V/uP6oXfChWE8dVYUekGCLdlEtGB5TcuFBoP7WbgvL1wAP1Sm6W4vbq1
- +XJfGRhtFUUaAT1U9zm35vckNG7L7rTYA=
+ bh=rdQnbcwS1/XJv+bEImsb5HDjS91lveEuU4nRdEE6UGk=;
+ b=lbBPH+RoUmIp/BbrAsLIHmy8xW0qDOOfCT2VpjY/nR1K6KGX8UhERpF+
+ qA27HQwze8cEaaZAJahZcBcQBcnwMMAotZyHP8Kv29Qc4SXPaFNeAAyim
+ sddfrQLhe7QSU+8qVg/a+aR2reSe/kQ5LcycaLdk9y10T7SkvU9uu6tAx
+ 4GX7f0PO4ObDFzsbeVX5RUmxZ8eo0Q7bX54EOVR32hfk6llraYtCbC4uH
+ iKUmZEyf2abYVjglMDr0Dmd+ufgXVB70qfEsHfROFqXOy/VLs8VswlgVF
+ SheDaKy8DOoDqbUgHATGCc1ufUWYdzBVGp8SCHOsqVC47rhH9yRDqhOLN A==;
+IronPort-SDR: 0JzEWWcOQvQaKVsWQo6CZMW7bsr1/RYwRs4uCI3gKcoBA63AVNwayd/wSusY8sveE7BXm4+RNL
+ i2FpoujxxX2JUZNPqZ2ieC/yeiFLqH9U+J9EnkH1LIfxxA34mnDxAg5TduxGOoVmbWVdwFuW5t
+ ESWbZBDAC6DL1Bho9basFLDlJIEbUwwOR0l3jaALNposBZ52ayiIGj3qH7GgKbN0lwYYpHfiMh
+ SN0JGMNNAH/+KvTYoq5Yqc7EiQ3wxN6BTHogBzANVPvyA+zNVlFwBQi9Lnaln7PBPcbEzktrzb
+ wdo=
+X-IronPort-AV: E=Sophos;i="5.73,474,1583164800"; d="scan'208";a="242127066"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com)
+ ([199.255.45.14])
+ by ob1.hgst.iphmx.com with ESMTP; 05 Jun 2020 09:30:13 +0800
+IronPort-SDR: kLvBds1cA23u3y5XzyAySW37NidfwNpe1xdWI5z2uak8LUPqnzNLhGgFQDUkUnYIgh5q0/Pt8Q
+ mhDNNh5cq8SWxHkaI2u+3qii07A3OxBfo=
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
- by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 04 Jun 2020 18:18:57 -0700
-IronPort-SDR: bMRr1iGQjM8DTr2o/ujSmT1pV/Vka5u59ewaKUNG6ykIf9H4n6qyHsRvPet0MajoDBxFhCsBd7
- 0eO0n3l9u+bA==
+ by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 04 Jun 2020 18:19:48 -0700
+IronPort-SDR: bF94EztjTptEXSs7uPY+z+wSkb9Wl6EVTdfMtQGyRmhRryAWRixOQUaKdmFyA2Cg3+U8YM3Bak
+ Z762Wlwplouw==
 WDCIronportException: Internal
 Received: from cnf006056.ad.shared (HELO risc6-mainframe.hgst.com)
  ([10.86.57.233])
- by uls-op-cesaip01.wdc.com with ESMTP; 04 Jun 2020 18:29:55 -0700
+ by uls-op-cesaip01.wdc.com with ESMTP; 04 Jun 2020 18:30:12 -0700
 From: Alistair Francis <alistair.francis@wdc.com>
 To: qemu-devel@nongnu.org,
 	qemu-riscv@nongnu.org
-Subject: [PATCH v2 09/17] target/riscv: Convert MSTATUS MTL to GVA
-Date: Thu,  4 Jun 2020 18:21:07 -0700
-Message-Id: <c4bd44f93615c74cfacfd94815ed7a47700640b4.1591319882.git.alistair@alistair23.me>
+Subject: [PATCH v2 15/17] target/riscv: Support the v0.6 Hypervisor extension
+ CRSs
+Date: Thu,  4 Jun 2020 18:21:24 -0700
+Message-Id: <5dbe9e7536efbd41f775fc3c189c49b39b83f724.1591319882.git.alistair@alistair23.me>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <cover.1591319882.git.alistair@alistair23.me>
 References: <cover.1591319882.git.alistair@alistair23.me>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.71.153.141;
+Received-SPF: pass client-ip=68.232.143.124;
  envelope-from=prvs=4185f83b6=alistair.francis@wdc.com;
- helo=esa3.hgst.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 21:29:41
+ helo=esa2.hgst.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 21:30:00
 X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
 X-Spam_score_int: -43
 X-Spam_score: -4.4
@@ -109,110 +110,110 @@ Sender: "Qemu-devel"
 
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- target/riscv/cpu_bits.h   |  5 +++--
- target/riscv/cpu_helper.c | 20 ++++++++++++++++----
- target/riscv/csr.c        |  6 +++---
- 3 files changed, 22 insertions(+), 9 deletions(-)
+ target/riscv/cpu_bits.h |  3 +++
+ target/riscv/csr.c      | 40 ++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 43 insertions(+)
 
 diff --git a/target/riscv/cpu_bits.h b/target/riscv/cpu_bits.h
-index bb4ee3fc35..028e268faa 100644
+index 8a145e0a32..690f327828 100644
 --- a/target/riscv/cpu_bits.h
 +++ b/target/riscv/cpu_bits.h
-@@ -364,10 +364,10 @@
- #define MSTATUS_TW          0x20000000 /* since: priv-1.10 */
- #define MSTATUS_TSR         0x40000000 /* since: priv-1.10 */
- #if defined(TARGET_RISCV64)
--#define MSTATUS_MTL         0x4000000000ULL
-+#define MSTATUS_GVA         0x4000000000ULL
- #define MSTATUS_MPV         0x8000000000ULL
- #elif defined(TARGET_RISCV32)
--#define MSTATUS_MTL         0x00000040
-+#define MSTATUS_GVA         0x00000040
- #define MSTATUS_MPV         0x00000080
- #endif
- 
-@@ -429,6 +429,7 @@
- #define HSTATUS_VTVM         0x00100000
- #define HSTATUS_VTSR         0x00400000
- #define HSTATUS_HU           0x00000200
-+#define HSTATUS_GVA          0x00000040
- 
- #define HSTATUS32_WPRI       0xFF8FF87E
- #define HSTATUS64_WPRI       0xFFFFFFFFFF8FF87EULL
-diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-index 1521c14b72..3b1a2f75ca 100644
---- a/target/riscv/cpu_helper.c
-+++ b/target/riscv/cpu_helper.c
-@@ -892,6 +892,15 @@ void riscv_cpu_do_interrupt(CPUState *cs)
-         if (riscv_has_ext(env, RVH)) {
-             target_ulong hdeleg = async ? env->hideleg : env->hedeleg;
- 
-+            if (riscv_cpu_virt_enabled(env) && tval) {
-+                /*
-+                 * If we are writing a guest virtual address to stval, set
-+                 * this to 1. If we are trapping to VS we will set this to 0
-+                 * later.
-+                 */
-+                env->hstatus = set_field(env->hstatus, HSTATUS_GVA, 1);
-+            }
-+
-             if (riscv_cpu_virt_enabled(env) && ((hdeleg >> cause) & 1) &&
-                 !force_hs_execp) {
-                 /*
-@@ -902,6 +911,7 @@ void riscv_cpu_do_interrupt(CPUState *cs)
-                     cause == IRQ_VS_EXT)
-                     cause = cause - 1;
-                 /* Trap to VS mode */
-+                env->hstatus = set_field(env->hstatus, HSTATUS_GVA, 0);
-             } else if (riscv_cpu_virt_enabled(env)) {
-                 /* Trap into HS mode, from virt */
-                 riscv_cpu_swap_hypervisor_regs(env);
-@@ -950,13 +960,15 @@ void riscv_cpu_do_interrupt(CPUState *cs)
- #ifdef TARGET_RISCV32
-             env->mstatush = set_field(env->mstatush, MSTATUS_MPV,
-                                        riscv_cpu_virt_enabled(env));
--            env->mstatush = set_field(env->mstatush, MSTATUS_MTL,
--                                       riscv_cpu_force_hs_excep_enabled(env));
-+            if (riscv_cpu_virt_enabled(env) && tval) {
-+                env->mstatush = set_field(env->mstatush, MSTATUS_GVA, 1);
-+            }
- #else
-             env->mstatus = set_field(env->mstatus, MSTATUS_MPV,
-                                       riscv_cpu_virt_enabled(env));
--            env->mstatus = set_field(env->mstatus, MSTATUS_MTL,
--                                      riscv_cpu_force_hs_excep_enabled(env));
-+            if (riscv_cpu_virt_enabled(env) && tval) {
-+                env->mstatus = set_field(env->mstatus, MSTATUS_GVA, 1);
-+            }
- #endif
- 
-             mtval2 = env->guest_phys_fault_addr;
+@@ -182,9 +182,12 @@
+ #define CSR_HIDELEG         0x603
+ #define CSR_HIE             0x604
+ #define CSR_HCOUNTEREN      0x606
++#define CSR_HGEIE           0x607
+ #define CSR_HTVAL           0x643
++#define CSR_HVIP            0x645
+ #define CSR_HIP             0x644
+ #define CSR_HTINST          0x64A
++#define CSR_HGEIP           0xE12
+ #define CSR_HGATP           0x680
+ #define CSR_HTIMEDELTA      0x605
+ #define CSR_HTIMEDELTAH     0x615
 diff --git a/target/riscv/csr.c b/target/riscv/csr.c
-index 53665b0985..69a3c8379c 100644
+index 5b64539efb..9990a0dd09 100644
 --- a/target/riscv/csr.c
 +++ b/target/riscv/csr.c
-@@ -335,10 +335,10 @@ static int write_mstatus(CPURISCVState *env, int csrno, target_ulong val)
-         MSTATUS_TW;
- #if defined(TARGET_RISCV64)
-     /*
--     * RV32: MPV and MTL are not in mstatus. The current plan is to
-+     * RV32: MPV and GVA are not in mstatus. The current plan is to
-      * add them to mstatush. For now, we just don't support it.
-      */
--    mask |= MSTATUS_MTL | MSTATUS_MPV;
-+    mask |= MSTATUS_MPV | MSTATUS_GVA;
- #endif
+@@ -815,12 +815,25 @@ static int write_hideleg(CPURISCVState *env, int csrno, target_ulong val)
+     return 0;
+ }
  
-     mstatus = (mstatus & ~mask) | (val & mask);
-@@ -364,7 +364,7 @@ static int write_mstatush(CPURISCVState *env, int csrno, target_ulong val)
-         tlb_flush(env_cpu(env));
-     }
++static int rmw_hvip(CPURISCVState *env, int csrno, target_ulong *ret_value,
++                   target_ulong new_value, target_ulong write_mask)
++{
++    int ret = rmw_mip(env, 0, ret_value, new_value,
++                      write_mask & hip_writable_mask);
++
++    *ret_value &= hip_writable_mask;
++
++    return ret;
++}
++
+ static int rmw_hip(CPURISCVState *env, int csrno, target_ulong *ret_value,
+                    target_ulong new_value, target_ulong write_mask)
+ {
+     int ret = rmw_mip(env, 0, ret_value, new_value,
+                       write_mask & hip_writable_mask);
  
--    val &= MSTATUS_MPV | MSTATUS_MTL;
-+    val &= MSTATUS_MPV | MSTATUS_GVA;
++    *ret_value &= hip_writable_mask;
++
+     return ret;
+ }
  
-     env->mstatush = val;
+@@ -848,6 +861,18 @@ static int write_hcounteren(CPURISCVState *env, int csrno, target_ulong val)
+     return 0;
+ }
  
++static int read_hgeie(CPURISCVState *env, int csrno, target_ulong *val)
++{
++    qemu_log_mask(LOG_UNIMP, "No support for a non-zero GEILEN.");
++    return 0;
++}
++
++static int write_hgeie(CPURISCVState *env, int csrno, target_ulong val)
++{
++    qemu_log_mask(LOG_UNIMP, "No support for a non-zero GEILEN.");
++    return 0;
++}
++
+ static int read_htval(CPURISCVState *env, int csrno, target_ulong *val)
+ {
+     *val = env->htval;
+@@ -871,6 +896,18 @@ static int write_htinst(CPURISCVState *env, int csrno, target_ulong val)
+     return 0;
+ }
+ 
++static int read_hgeip(CPURISCVState *env, int csrno, target_ulong *val)
++{
++    qemu_log_mask(LOG_UNIMP, "No support for a non-zero GEILEN.");
++    return 0;
++}
++
++static int write_hgeip(CPURISCVState *env, int csrno, target_ulong val)
++{
++    qemu_log_mask(LOG_UNIMP, "No support for a non-zero GEILEN.");
++    return 0;
++}
++
+ static int read_hgatp(CPURISCVState *env, int csrno, target_ulong *val)
+ {
+     *val = env->hgatp;
+@@ -1268,11 +1305,14 @@ static riscv_csr_operations csr_ops[CSR_TABLE_SIZE] = {
+     [CSR_HSTATUS] =             { hmode,   read_hstatus,     write_hstatus    },
+     [CSR_HEDELEG] =             { hmode,   read_hedeleg,     write_hedeleg    },
+     [CSR_HIDELEG] =             { hmode,   read_hideleg,     write_hideleg    },
++    [CSR_HVIP] =                { hmode,   NULL,     NULL,     rmw_hvip       },
+     [CSR_HIP] =                 { hmode,   NULL,     NULL,     rmw_hip        },
+     [CSR_HIE] =                 { hmode,   read_hie,         write_hie        },
+     [CSR_HCOUNTEREN] =          { hmode,   read_hcounteren,  write_hcounteren },
++    [CSR_HGEIE] =               { hmode,   read_hgeie,       write_hgeie      },
+     [CSR_HTVAL] =               { hmode,   read_htval,       write_htval      },
+     [CSR_HTINST] =              { hmode,   read_htinst,      write_htinst     },
++    [CSR_HGEIP] =               { hmode,   read_hgeip,       write_hgeip      },
+     [CSR_HGATP] =               { hmode,   read_hgatp,       write_hgatp      },
+     [CSR_HTIMEDELTA] =          { hmode,   read_htimedelta,  write_htimedelta },
+ #if defined(TARGET_RISCV32)
 -- 
 2.26.2
 
