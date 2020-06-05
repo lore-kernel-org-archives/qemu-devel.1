@@ -2,107 +2,84 @@ Return-Path: <SRS0=hXcz=7S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DF8EC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 10:32:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A1EBC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 10:33:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1798D2074B
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 10:32:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="frcI9FZw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1798D2074B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E2B462074B
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 10:33:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2B462074B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59834 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34244 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jh9dt-0000eF-Ck
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 06:32:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44986)
+	id 1jh9fU-0001tm-4i
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 06:33:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46072)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jh9VW-0004Tf-0g
- for qemu-devel@nongnu.org; Fri, 05 Jun 2020 06:23:26 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44248
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jh9VT-0006ZZ-Th
- for qemu-devel@nongnu.org; Fri, 05 Jun 2020 06:23:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591352603;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Gw1xw+LMpEmzRwp28aIuZw9IW5+ls2uZgRvm0cZFybM=;
- b=frcI9FZwI+VQieHx7pWpMN+K9IrE3s9rTCHVTnXwNHtw5bw2Y9iSAWnc5DfCJvu8bULvme
- 7+03SpK3IxQ4EABzJ8MdUEsNXY6r0ORPzVTdDCyYTRfQujeoqEepAbZAT35IX05hTz1/XP
- oVx3WUp1hrXXy0dJf70JWNu1e07wkzw=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-134-xe56vpd0ONW8d0jHvz_18w-1; Fri, 05 Jun 2020 06:23:21 -0400
-X-MC-Unique: xe56vpd0ONW8d0jHvz_18w-1
-Received: by mail-wr1-f70.google.com with SMTP id j16so3564878wre.22
- for <qemu-devel@nongnu.org>; Fri, 05 Jun 2020 03:23:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=Gw1xw+LMpEmzRwp28aIuZw9IW5+ls2uZgRvm0cZFybM=;
- b=Gk9PTY+UR+y+fzGznDUfQenHVdlteOnUHwXaKhAZN3j214Rn6B7qEbjyemidoz5ktE
- Rh99EoKkk7J7FoGc3uMXyDWywXKtLAj73kSRYNNN0tMTdn64SCTilZr9StrZ9hanrSWY
- +2nGsz+/wbjXNow75WeMWd5YnlwOWaiCxq4AyEAnKeAgvni3k2GRJ62iWovkWL9Y2mo1
- xvkmGNY5bn+jjU3pZVoqQk/npXD09Vxy+aFR5ntDrq3gye3+dMVtv/heot/KSSYmjD9z
- zvAcQZ0wJUkphDMNfHGf8zsUDqs0jDp/fCMSn3kpn06fGqZk4J5k1eSky0/Trfyd8N+C
- t6iQ==
-X-Gm-Message-State: AOAM532fivpTjwy5zzUVDV47UiRzTXkTnbmySZADKQm8g78RrdB6brSd
- VLgNMrsJLt+ffCND14uQ/a1ItbQXc9LltgziYM4bEJZ5GFcX1X7c5GPhBBjsfvgPw8mVNgaxkql
- Pa2gyS7tQECyfj9Y=
-X-Received: by 2002:a5d:4245:: with SMTP id s5mr8916871wrr.6.1591352600292;
- Fri, 05 Jun 2020 03:23:20 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxHl4l4ZA1cP1cNZ19vVlA/aHSUlfwTwzKv0NYQRaZ9rTd/r32G0Q6YN8HBj8LQEbgJuaMZ5g==
-X-Received: by 2002:a5d:4245:: with SMTP id s5mr8916856wrr.6.1591352600113;
- Fri, 05 Jun 2020 03:23:20 -0700 (PDT)
-Received: from localhost.localdomain
- (181.red-88-10-103.dynamicip.rima-tde.net. [88.10.103.181])
- by smtp.gmail.com with ESMTPSA id 138sm11300924wma.23.2020.06.05.03.23.19
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 05 Jun 2020 03:23:19 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 10/11] hw/sd/sdcard: Display offset in read/write_data()
- trace events
-Date: Fri,  5 Jun 2020 12:22:29 +0200
-Message-Id: <20200605102230.21493-11-philmd@redhat.com>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200605102230.21493-1-philmd@redhat.com>
-References: <20200605102230.21493-1-philmd@redhat.com>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jh9cf-0008VZ-H8
+ for qemu-devel@nongnu.org; Fri, 05 Jun 2020 06:30:49 -0400
+Received: from indium.canonical.com ([91.189.90.7]:59006)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jh9cd-00087K-T5
+ for qemu-devel@nongnu.org; Fri, 05 Jun 2020 06:30:49 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jh9cc-0007Eq-0V
+ for <qemu-devel@nongnu.org>; Fri, 05 Jun 2020 10:30:46 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 01FDD2E80E7
+ for <qemu-devel@nongnu.org>; Fri,  5 Jun 2020 10:30:46 +0000 (UTC)
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8;
-	text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/05 03:27:26
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 05 Jun 2020 10:24:59 -0000
+From: =?utf-8?q?Alex_Benn=C3=A9e?= <1880225@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=In Progress; importance=Undecided;
+ assignee=alex.bennee@linaro.org; 
+X-Launchpad-Bug-Tags: arm testcase
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: ajbennee aleksandar-markovic
+X-Launchpad-Bug-Reporter: Aleksandar Markovic (aleksandar-markovic)
+X-Launchpad-Bug-Modifier: =?utf-8?q?Alex_Benn=C3=A9e_=28ajbennee=29?=
+References: <159017301531.7966.9120113243897778171.malonedeb@gac.canonical.com>
+ <87tuzp4zhx.fsf@linaro.org>
+Message-ID: <87k10l4xok.fsf@linaro.org>
+Subject: [Bug 1880225] Re: [PATCH v1 2/3] linux-user: deal with address wrap
+ for ARM_COMMPAGE on 32 bit
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="ef9fc486e875d54078fa61cf91e898b895125d89";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: bed74dea52b3f87d6acfe9e57561dacb841c7296
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/05 04:10:55
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -111,66 +88,248 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- qemu-block@nongnu.org
+Reply-To: Bug 1880225 <1880225@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Message-ID: <20200605102459.JvmSILQ9cS2nZ1sXv7xpNF-YNM57-6I2W3FCXrBXyjc@z>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
 
-Having 'base address' and 'relative offset' displayed
-separately is more helpful than the absolute address.
+> Richard Henderson <richard.henderson@linaro.org> writes:
+>
+>> On 5/27/20 3:05 AM, Alex Benn=C3=A9e wrote:
+>>> @@ -2145,7 +2145,7 @@ static uintptr_t pgd_find_hole_fallback(uintptr_t=
+ guest_size, uintptr_t brk, lon
+>>>  =
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- hw/sd/sd.c         | 8 ++++----
- hw/sd/trace-events | 4 ++--
- 2 files changed, 6 insertions(+), 6 deletions(-)
+>>>  /* Return value for guest_base, or -1 if no hole found. */
+>>>  static uintptr_t pgb_find_hole(uintptr_t guest_loaddr, uintptr_t guest=
+_size,
+>>> -                               long align)
+>>> +                               long align, uintptr_t offset)
+>>>  {
+>>>      GSList *maps, *iter;
+>>>      uintptr_t this_start, this_end, next_start, brk;
+>>> @@ -2171,7 +2171,7 @@ static uintptr_t pgb_find_hole(uintptr_t guest_lo=
+addr, uintptr_t guest_size,
+>>>  =
 
-diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-index fad34ab184..a1b25ed36f 100644
---- a/hw/sd/sd.c
-+++ b/hw/sd/sd.c
-@@ -1824,8 +1824,8 @@ void sd_write_data(SDState *sd, uint8_t value)
-         return;
- 
-     trace_sdcard_write_data(sd->proto_name,
--                            sd_current_cmd_name(sd),
--                            sd->current_cmd, value);
-+                            sd_current_cmd_name(sd), sd->current_cmd,
-+                            sd->data_start, sd->data_offset, value);
-     switch (sd->current_cmd) {
-     case 24:	/* CMD24:  WRITE_SINGLE_BLOCK */
-         sd->data[sd->data_offset ++] = value;
-@@ -1978,8 +1978,8 @@ uint8_t sd_read_data(SDState *sd)
-     io_len = (sd->ocr & (1 << 30)) ? 512 : sd->blk_len;
- 
-     trace_sdcard_read_data(sd->proto_name,
--                           sd_current_cmd_name(sd),
--                           sd->current_cmd, io_len);
-+                           sd_current_cmd_name(sd), sd->current_cmd,
-+                           sd->data_start, sd->data_offset, io_len);
-     switch (sd->current_cmd) {
-     case 6:	/* CMD6:   SWITCH_FUNCTION */
-         ret = sd->data[sd->data_offset ++];
-diff --git a/hw/sd/trace-events b/hw/sd/trace-events
-index f892c05867..1529ad4c6d 100644
---- a/hw/sd/trace-events
-+++ b/hw/sd/trace-events
-@@ -51,8 +51,8 @@ sdcard_lock(void) ""
- sdcard_unlock(void) ""
- sdcard_read_block(uint64_t addr, uint32_t len) "addr 0x%" PRIx64 " size 0x%x"
- sdcard_write_block(uint64_t addr, uint32_t len) "addr 0x%" PRIx64 " size 0x%x"
--sdcard_write_data(const char *proto, const char *cmd_desc, uint8_t cmd, uint8_t value) "%s %20s/ CMD%02d value 0x%02x"
--sdcard_read_data(const char *proto, const char *cmd_desc, uint8_t cmd, size_t length) "%s %20s/ CMD%02d len %zu"
-+sdcard_write_data(const char *proto, const char *cmd_desc, uint8_t cmd, uint64_t address, uint32_t offset, uint8_t value) "%s %20s/ CMD%02d addr 0x%" PRIx64 " ofs 0x%" PRIx32 " val 0x%02x"
-+sdcard_read_data(const char *proto, const char *cmd_desc, uint8_t cmd, uint64_t address, uint32_t offset, size_t length) "%s %20s/ CMD%02d addr 0x%" PRIx64 " ofs 0x%" PRIx32 " len %zu"
- sdcard_set_voltage(uint16_t millivolts) "%u mV"
- 
- # milkymist-memcard.c
--- 
-2.21.3
+>>>          this_end =3D ((MapInfo *)iter->data)->start;
+>>>          next_start =3D ((MapInfo *)iter->data)->end;
+>>> -        align_start =3D ROUND_UP(this_start, align);
+>>> +        align_start =3D ROUND_UP(this_start + offset, align);
+>>>  =
 
+>>>          /* Skip holes that are too small. */
+>>
+>> I suppose offset is supposed to mean we start from -offset?
+>
+> Well guest_base will start higher meaning we have space for the
+> commpage beneath it.
+>
+>> You didn't update
+>> pgb_find_hole_fallback.
+>
+> Fixed.
+>
+>>
+>>> -            loaddr =3D ARM_COMMPAGE & -align;
+>>> +            offset =3D (128 * KiB);
+>>
+>> Why 128K?  Surely this should be an expression against ARM_COMMPAGE.
+>
+> In theory:
+>
+>             offset =3D -(ARM_COMMPAGE & -align);
+>
+> should do the trick but I found it failed every now and again.
+> Frustratingly putting printfs in made it go away so in frustration I
+> just upped the offset until it stopped happening.
+>
+> I do kinda wish rr worked on i386 :-/
+
+Ahh all I needed was a MAP_FIXED for init_commpage
+
+-- =
+
+Alex Benn=C3=A9e
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1880225
+
+Title:
+  Emulation of some arm programs fail with "Assertion `have_guest_base'
+  failed."
+
+Status in QEMU:
+  In Progress
+
+Bug description:
+  This issue is observer with QEMU ToT, checked out around May 15th (but
+  I believe it is present in current master too), and wasn't present in
+  QEMU v5.0.0.
+
+  I am using 32-bit Intel(R) Pentium(R) M processor 1.73GHz host.
+
+  Arm cross-compiler is a standard cross-compiler that comes with
+  Debian-based distributions, and gcc version is:
+
+  $ arm-linux-gnueabi-gcc --version
+  arm-linux-gnueabi-gcc (Debian 8.3.0-2) 8.3.0
+
+  Compile this program with cross compiler:
+
+  $ arm-linux-gnueabi-gcc -O2 -static toupper_string.c -o
+  toupper_string-arm
+
+  Emulation with QEMU v5.0.0 is correct, and gives expected output:
+
+  $ ~/Build/qemu-5.0.0/build-gcc/arm-linux-user/qemu-arm ./toupper_string-a=
+rm
+  CONTROL RESULT: (toupper_string)
+   nwlrbbmqbhcdarz owkkyhiddqscdxr jmowfrxsjybldbe fsarcbynecdyggx xpklorel=
+lnmpapq
+   NWLRBBMQBHCDARZ OWKKYHIDDQSCDXR JMOWFRXSJYBLDBE FSARCBYNECDYGGX XPKLOREL=
+LNMPAPQ
+
+  While, in case of QEMU master it fails:
+
+  $ ~/Build/qemu-master/build-gcc/arm-linux-user/qemu-arm ./toupper_string-=
+arm
+  qemu-arm: /home/rtrk/Build/qemu-master/linux-user/elfload.c:2294: probe_g=
+uest_base: Assertion `have_guest_base' failed.
+  Aborted
+
+  There are many other programs that exibit the same behavior. The
+  failure is arm-sprecific.
+
+  =
+
+  -----------------------------------------------------
+
+  source code: (let's call this file toupper_string.c) (similar file is
+  also in attachment)
+
+  =
+
+  #include <stdlib.h>
+  #include <string.h>
+  #include <stdio.h>
+  #include <unistd.h>
+
+  =
+
+  #define MAX_STRING_LENGHT              15
+  #define NUMBER_OF_RANDOM_STRINGS       100
+  #define DEFAULT_NUMBER_OF_REPETITIONS  30000
+  #define MAX_NUMBER_OF_REPETITIONS      1000000000
+  #define NUMBER_OF_CONTROL_PRINT_ITEMS  5
+
+  /* Structure for keeping an array of strings */
+  struct StringStruct {
+      char chars[MAX_STRING_LENGHT + 1];
+  };
+
+  /**
+   * Sets characters of the given string to random small letters a-z.
+   * @param s String to get random characters.
+   * @len Length of the input string.
+   */
+  static void gen_random_string(char *chars, const int len)
+  {
+      static const char letters[] =3D "abcdefghijklmnopqrstuvwxyz";
+
+      for (size_t i =3D 0; i < len; i++) {
+          chars[i] =3D letters[rand() % (sizeof(letters) - 1)];
+      }
+      chars[len] =3D 0;
+  }
+
+  void main (int argc, char* argv[])
+  {
+      struct StringStruct random_strings[NUMBER_OF_RANDOM_STRINGS];
+      struct StringStruct strings_to_be_uppercased[NUMBER_OF_RANDOM_STRINGS=
+];
+      int32_t number_of_repetitions =3D DEFAULT_NUMBER_OF_REPETITIONS;
+      int32_t option;
+
+      /* Parse command line options */
+      while ((option =3D getopt(argc, argv, "n:")) !=3D -1) {
+          if (option =3D=3D 'n') {
+              int32_t user_number_of_repetitions =3D atoi(optarg);
+              /* Check if the value is a negative number */
+              if (user_number_of_repetitions < 1) {
+                  fprintf(stderr, "Error ... Value for option '-n' cannot b=
+e a "
+                                  "negative number.\n");
+                  exit(EXIT_FAILURE);
+              }
+              /* Check if the value is a string or zero */
+              if (user_number_of_repetitions =3D=3D 0) {
+                  fprintf(stderr, "Error ... Invalid value for option '-n'.=
+\n");
+                  exit(EXIT_FAILURE);
+              }
+              /* Check if the value is too large */
+              if (user_number_of_repetitions > MAX_NUMBER_OF_REPETITIONS) {
+                  fprintf(stderr, "Error ... Value for option '-n' cannot b=
+e "
+                                  "more than %d.\n", MAX_NUMBER_OF_REPETITI=
+ONS);
+                  exit(EXIT_FAILURE);
+              }
+              number_of_repetitions =3D user_number_of_repetitions;
+          } else {
+              exit(EXIT_FAILURE);
+          }
+      }
+
+      /* Create an array of strings with random content */
+      srand(1);
+      for (size_t i =3D 0; i < NUMBER_OF_RANDOM_STRINGS; i++) {
+          gen_random_string(random_strings[i].chars, MAX_STRING_LENGHT);
+      }
+
+      /* Perform uppercasing of a set of random strings multiple times */
+      for (size_t j =3D 0; j < number_of_repetitions; j++) {
+          /* Copy initial set of random strings to the set to be uppercased=
+ */
+          memcpy(strings_to_be_uppercased, random_strings,
+                 NUMBER_OF_RANDOM_STRINGS * (MAX_STRING_LENGHT + 1));
+          /* Do actual changing case to uppercase */
+          for (size_t i =3D 0; i < NUMBER_OF_RANDOM_STRINGS; i++) {
+              int k =3D 0;
+    =
+
+              while (strings_to_be_uppercased[i].chars[k]) { =
+
+                  char ch =3D strings_to_be_uppercased[i].chars[k] - 32; =
+
+                  memcpy((void *)strings_to_be_uppercased[i].chars + k,
+                         &ch, 1);
+                  k++; =
+
+              } =
+
+          }
+      }
+
+      /* Control printing */
+      printf("CONTROL RESULT: (toupper_string)\n");
+      for (size_t i =3D 0; i < NUMBER_OF_CONTROL_PRINT_ITEMS; i++) {
+          printf(" %s", random_strings[i].chars);
+      }
+      printf("\n");
+      for (size_t i =3D 0; i < NUMBER_OF_CONTROL_PRINT_ITEMS; i++) {
+          printf(" %s", strings_to_be_uppercased[i].chars);
+      }
+      printf("\n");
+  }
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1880225/+subscriptions
 
