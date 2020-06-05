@@ -7,78 +7,79 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F047DC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 04:20:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D754BC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 04:21:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B9DC4206E6
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 04:20:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A2A65206E6
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 04:21:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GVjk9AlO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9DC4206E6
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="A0tjNfKG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2A65206E6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52478 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58150 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jh3qa-0002wc-SI
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 00:20:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39564)
+	id 1jh3rh-0005F5-Qi
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 00:21:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39486)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jh3nk-0004ha-E0
- for qemu-devel@nongnu.org; Fri, 05 Jun 2020 00:17:53 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:37554)
+ id 1jh3nd-0004Nt-4h
+ for qemu-devel@nongnu.org; Fri, 05 Jun 2020 00:17:45 -0400
+Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:38083)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jh3nj-0000lf-MB
- for qemu-devel@nongnu.org; Fri, 05 Jun 2020 00:17:52 -0400
-Received: by mail-pf1-x443.google.com with SMTP id j1so4152821pfe.4
- for <qemu-devel@nongnu.org>; Thu, 04 Jun 2020 21:17:51 -0700 (PDT)
+ id 1jh3nc-0000k4-BQ
+ for qemu-devel@nongnu.org; Fri, 05 Jun 2020 00:17:44 -0400
+Received: by mail-pj1-x1042.google.com with SMTP id d6so2180032pjs.3
+ for <qemu-devel@nongnu.org>; Thu, 04 Jun 2020 21:17:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=OzYHxasinbK12hHGjXt3IY3GTdvR0p0In8jS7714bjc=;
- b=GVjk9AlOfDA0AZJUKWECc3CSMsveyiA9UBLqrsI9qYIAP5YcDDgPKCt1+Vgy6YKY6Z
- Fv1/jsK7UcR4d9GPSIJyCQO4UCp2N4d6hOxX0wAfvRLa6JQ4wOvblIVTvWF8UGilXXAA
- 0pjwRpf19EidPalvapvrOUklORbg/MmOQQt2jP6Xh1jIUvQEVXCwdx0evxQqXQus3nsV
- LP6uuSic/UITigTWMufeWl+7k1JSJOZPHx0xj9Avkfd5/tTFf/sSdRZJaIDF0riPuhTk
- KyQNKvx8W8GKpIC5FwG6sIBJ4+eifZzXx40EXeF5jT/Fn5viBvZVqX1kBeWYM13RVhcs
- Wevg==
+ bh=mHdkZW2BtXgCCzUvavDtufJgojf9AzZZHlwJyJIkodU=;
+ b=A0tjNfKG6o69Lfe9DGoQRD5xlUXCVE3IYgfK4e7eSVqCxRoJeP+FDG4Ufc9QSEhVVN
+ BF/fnDWIPQEWhfJL9VG1bGcmgvAPP0TQw77ZOtbFm+wtuv7aXUZBO6lj57lqJYT5QWCd
+ AXEk+pKZC7KjL+U2FUX2+94bO8y0VSwCJOBbDmBseywpQpO3XiZ8oZdvWXiWB6eyaGwB
+ QcFjTHP1k10npcJwNwG/iwZC+LKii0S0hw5JzdbJA868koVF6GHvpIjMnngR02Hvqo0m
+ wXZnY3XLVzepBIpLclJvUWZFB1FtB4z8cJa0lrx9UxKHPCcgbBBPjEtK9Wq1jV4vYJkQ
+ Weug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=OzYHxasinbK12hHGjXt3IY3GTdvR0p0In8jS7714bjc=;
- b=N4f9KneHnRt3xA6VxygjhdThoe3oakSv4WzZIhXNoKMHEXdHknC3QcP8bXlTCry5rn
- lH+DvVPB1f2qJhYavJdF1WOW6w6YACoERzEuhBbnZjt1xnyeInGFDovoOVZP/fcWY7rF
- /QGRn0HMyyZvFQ00qWxVg33v/LZoAK5J+63G3oUiIEpooFQKuPWSv1DfAybWhwocXdds
- EUpHsvMw4COQazPbbgXOHCqHrIkMCUd+yTulxBqb0aUwGC7CtBBEBpkOZ2MTP5Os9XhF
- yiByC4XSYLa0JWNSARvBHVt8GBsMwMyNFirR3YQu7B9rNdc1FnW6BhIP0rYkx3oIqCWj
- cj8w==
-X-Gm-Message-State: AOAM532YOqLmPML2W6TYSKVsfyEh4vyoZHTFZ26ohqRq0dV6Y5NW9Tz7
- rU0d9/GUkdNuqHIi28wMzhvd5eMGnTQ=
-X-Google-Smtp-Source: ABdhPJwoZl4kXIFIUzS4JICf1Nr069Ii8sMEWHiLmCCZSm1NX2qAWOHAZFrsXrDCCs5jXPho7JPHeA==
-X-Received: by 2002:a63:c5a:: with SMTP id 26mr7460938pgm.270.1591330669986;
- Thu, 04 Jun 2020 21:17:49 -0700 (PDT)
+ bh=mHdkZW2BtXgCCzUvavDtufJgojf9AzZZHlwJyJIkodU=;
+ b=WEEcpnByuKF7RGAGU3ypbZc1KAyHCTFBulrvhqR1bb/LEGJAbV3eS/XAULd9Bkgczm
+ C+d1hx6MIfBesu+92qFj3QC5eUb6oTjRv4Qg0vNeOeSPsETACvMW3KLvmW06ttRlh8k4
+ UIIKkIxvRdMRO3WYUK80s6B5BqMM6jcrqKMszsbC1exaNJKjkDlldQKjR+Rq5MHoc21P
+ /xKTgUn+suQSNjpnwPKsUQaFWjFge+76iEOBd7g9vEhphZ4tLMsfvC3vSH5vtCR3muuk
+ v/y7b6jYCQqesLVNKkeZDt0GPupjEOo5VzPL8sXoXzIROnF7CGVTiuu5w05CwV/wor6B
+ 3kbg==
+X-Gm-Message-State: AOAM5338i/08oNkW6F4HPjojcSPEJYOUJ5VsUxzbvUXafay5MhHcvb/L
+ n1leRAmw8F3rmmEU9J3hLoYORem888A=
+X-Google-Smtp-Source: ABdhPJwctokSJwMErfDPEYCtZO4AWVtcyE3yWYzmPyIPu/maWAYpnSJICjtLbuzfwB1NE1SFh5yFMg==
+X-Received: by 2002:a17:90b:605:: with SMTP id
+ gb5mr699334pjb.167.1591330662669; 
+ Thu, 04 Jun 2020 21:17:42 -0700 (PDT)
 Received: from localhost.localdomain (174-21-143-238.tukw.qwest.net.
  [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id h15sm5440902pgl.12.2020.06.04.21.17.48
+ by smtp.gmail.com with ESMTPSA id h15sm5440902pgl.12.2020.06.04.21.17.41
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 04 Jun 2020 21:17:49 -0700 (PDT)
+ Thu, 04 Jun 2020 21:17:42 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 12/17] linux-user/aarch64: Pass syndrome to EXC_*_ABORT
-Date: Thu,  4 Jun 2020 21:17:28 -0700
-Message-Id: <20200605041733.415188-13-richard.henderson@linaro.org>
+Subject: [PATCH v2 06/17] linux-user: Do not use guest_addr_valid for h2g_valid
+Date: Thu,  4 Jun 2020 21:17:22 -0700
+Message-Id: <20200605041733.415188-7-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200605041733.415188-1-richard.henderson@linaro.org>
 References: <20200605041733.415188-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::443;
- envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x443.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1042;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1042.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -105,113 +106,43 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-A proper syndrome is required to fill in the proper si_code.
-Use page_get_flags to determine permission vs translation
-for user-only.
+This is the only use of guest_addr_valid that does not begin
+with a guest address, but a host address being transformed to
+a guest address.
+
+We will shortly adjust guest_addr_valid to handle guest memory
+tags, and the host address should not be subjected to that.
+
+Move h2g_valid adjacent to the other h2g macros.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/aarch64/cpu_loop.c | 23 ++++++++++++++++++++---
- target/arm/tlb_helper.c       | 27 +++++++++++++++++++++------
- 2 files changed, 41 insertions(+), 9 deletions(-)
+ include/exec/cpu_ldst.h | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/linux-user/aarch64/cpu_loop.c b/linux-user/aarch64/cpu_loop.c
-index 3cca637bb9..ce56e15be2 100644
---- a/linux-user/aarch64/cpu_loop.c
-+++ b/linux-user/aarch64/cpu_loop.c
-@@ -75,7 +75,7 @@
- void cpu_loop(CPUARMState *env)
+diff --git a/include/exec/cpu_ldst.h b/include/exec/cpu_ldst.h
+index c14a48f65e..3930362e20 100644
+--- a/include/exec/cpu_ldst.h
++++ b/include/exec/cpu_ldst.h
+@@ -77,15 +77,16 @@ typedef uint64_t abi_ptr;
+ #else
+ #define guest_addr_valid(x) ((x) <= GUEST_ADDR_MAX)
+ #endif
+-#define h2g_valid(x) guest_addr_valid((unsigned long)(x) - guest_base)
+ 
+ static inline int guest_range_valid(unsigned long start, unsigned long len)
  {
-     CPUState *cs = env_cpu(env);
--    int trapnr;
-+    int trapnr, ec, fsc;
-     abi_long ret;
-     target_siginfo_t info;
- 
-@@ -116,9 +116,26 @@ void cpu_loop(CPUARMState *env)
-         case EXCP_DATA_ABORT:
-             info.si_signo = TARGET_SIGSEGV;
-             info.si_errno = 0;
--            /* XXX: check env->error_code */
--            info.si_code = TARGET_SEGV_MAPERR;
-             info._sifields._sigfault._addr = env->exception.vaddress;
-+
-+            /* We should only arrive here with EC in {DATAABORT, INSNABORT}. */
-+            ec = extract32(env->exception.syndrome, 26, 6);
-+            assert(ec == 0x24 || ec == 0x20);
-+
-+            /* Both EC have the same format for FSC, or close enough. */
-+            fsc = extract32(env->exception.syndrome, 0, 6);
-+            switch (fsc) {
-+            case 0x04 ... 0x07: /* Translation fault, level {0-3} */
-+                info.si_code = TARGET_SEGV_MAPERR;
-+                break;
-+            case 0x09 ... 0x0b: /* Access flag fault, level {1-3} */
-+            case 0x0d ... 0x0f: /* Permission fault, level {1-3} */
-+                info.si_code = TARGET_SEGV_ACCERR;
-+                break;
-+            default:
-+                g_assert_not_reached();
-+            }
-+
-             queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-             break;
-         case EXCP_UNALIGNED:
-diff --git a/target/arm/tlb_helper.c b/target/arm/tlb_helper.c
-index d4e6d37f4f..35d84ac24f 100644
---- a/target/arm/tlb_helper.c
-+++ b/target/arm/tlb_helper.c
-@@ -10,8 +10,6 @@
- #include "internals.h"
- #include "exec/exec-all.h"
- 
--#if !defined(CONFIG_USER_ONLY)
--
- static inline uint32_t merge_syn_data_abort(uint32_t template_syn,
-                                             unsigned int target_el,
-                                             bool same_el, bool ea,
-@@ -51,6 +49,8 @@ static inline uint32_t merge_syn_data_abort(uint32_t template_syn,
-     return syn;
+     return len - 1 <= GUEST_ADDR_MAX && start <= GUEST_ADDR_MAX - len + 1;
  }
  
-+#if !defined(CONFIG_USER_ONLY)
++#define h2g_valid(x)  ((uintptr_t)(x) - guest_base <= GUEST_ADDR_MAX)
 +
- static void QEMU_NORETURN arm_deliver_fault(ARMCPU *cpu, vaddr addr,
-                                             MMUAccessType access_type,
-                                             int mmu_idx, ARMMMUFaultInfo *fi)
-@@ -138,13 +138,28 @@ bool arm_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-     ARMCPU *cpu = ARM_CPU(cs);
+ #define h2g_nocheck(x) ({ \
+-    unsigned long __ret = (unsigned long)(x) - guest_base; \
++    uintptr_t __ret = (uintptr_t)(x) - guest_base; \
+     (abi_ptr)__ret; \
+ })
  
- #ifdef CONFIG_USER_ONLY
-+    int flags, fsc, exc;
-+    unsigned syn;
-+
-     cpu->env.exception.vaddress = address;
--    if (access_type == MMU_INST_FETCH) {
--        cs->exception_index = EXCP_PREFETCH_ABORT;
-+
-+    flags = page_get_flags(useronly_clean_ptr(address));
-+    if (flags & PAGE_VALID) {
-+        fsc = 0xf; /* permission fault, level 3 */
-     } else {
--        cs->exception_index = EXCP_DATA_ABORT;
-+        fsc = 0x7; /* translation fault, level 3 */
-     }
--    cpu_loop_exit_restore(cs, retaddr);
-+
-+    cpu_restore_state(cs, retaddr, true);
-+    if (access_type == MMU_INST_FETCH) {
-+        exc = EXCP_PREFETCH_ABORT;
-+        syn = syn_insn_abort(0, 0, 0, fsc);
-+    } else {
-+        exc = EXCP_DATA_ABORT;
-+        syn = merge_syn_data_abort(cpu->env.exception.syndrome, 1, 0, 0, 0,
-+                                   access_type == MMU_DATA_STORE, fsc);
-+    }
-+    raise_exception(&cpu->env, exc, syn, 1);
- #else
-     hwaddr phys_addr;
-     target_ulong page_size;
 -- 
 2.25.1
 
