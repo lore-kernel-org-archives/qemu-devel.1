@@ -2,102 +2,90 @@ Return-Path: <SRS0=hXcz=7S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDDCAC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 07:41:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C8A4C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 07:41:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AA08A207D3
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 07:41:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3C3E2207D3
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 07:41:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JbODm1hT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA08A207D3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="idqqTTfz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C3E2207D3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52200 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53000 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jh6yO-0003Kf-VX
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 03:41:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54706)
+	id 1jh6yi-0003em-Cn
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 03:41:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54722)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jh6xX-0001jD-5u
- for qemu-devel@nongnu.org; Fri, 05 Jun 2020 03:40:11 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32157
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jh6xV-0004v6-GG
- for qemu-devel@nongnu.org; Fri, 05 Jun 2020 03:40:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591342808;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=IUsnVeQ0+evM91jOln2H7E8Gqf85iDyOxRzdS5TrXzA=;
- b=JbODm1hTgIPjYDjVEA4A1uO/mrhRDKAeHHPZ5aqmqE9svaI2gnFxjvA21axhv/dRf7ReeS
- XMU1Z0FJAgJ6TdTq/ZeGb7Cs2j6sKpxG4kmMQwWnG4mNNBjdb5ouxOl0Meoox57t+xm5+z
- l3cTZwqNBNEMfU20/RheRXqBVsHeKfE=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-398-ClkaJsAoMrCZ_UfBtwGmwg-1; Fri, 05 Jun 2020 03:40:07 -0400
-X-MC-Unique: ClkaJsAoMrCZ_UfBtwGmwg-1
-Received: by mail-wr1-f72.google.com with SMTP id i6so1819850wrr.23
- for <qemu-devel@nongnu.org>; Fri, 05 Jun 2020 00:40:07 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
+ id 1jh6xe-0001vm-18; Fri, 05 Jun 2020 03:40:18 -0400
+Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:34745)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
+ id 1jh6xd-0004xn-5r; Fri, 05 Jun 2020 03:40:17 -0400
+Received: by mail-pj1-x1044.google.com with SMTP id a45so3041215pje.1;
+ Fri, 05 Jun 2020 00:40:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id;
+ bh=shiRMUuC2o0b1TUW8PBBAGKRr+19l1AXYEpWIH2oeak=;
+ b=idqqTTfzqQokeNEm+wGEgRQDQWNFavI14mdb8x6+BFj4pKAdRfrvSpqIKRvb0Qonw/
+ 2OvfpRGFttQyKGjqSEvhRFO06olrUuXgnIo+dMm+DWxq7OKq0STmg9q6+QSY6x5aGJ0K
+ Sk876hakPiMbDdUNe6n0uv7U/zq6T5+bvyZBflU+U4QOeoBa4l0xv19NEWkABh0rcaI5
+ WYngzXaFCWR5PvGMUn237+ZiUnNjKBhkzR9C5mUzOBVivHHiioDo/Cf2n9Zbmx2lB1Bm
+ nRk5Rn6y49A8G+xRXYaPkBZNweuWcu7DODmeIg/5jAaHtxkuv0bL6eut5kbQnAAft+QV
+ c5Ug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=IUsnVeQ0+evM91jOln2H7E8Gqf85iDyOxRzdS5TrXzA=;
- b=AWZmP0922k5zdxlSLdSkKEjgK7OCeHNNi5D4p0zgfd+QqFt5vs3I233KR3cX9dGPGd
- 4yuFjyR8gb2XvNl6qHKsItjH7T/fkyajK4ctxayPLacUw2AnwgwWnEG7cXuDGVdsZ6Hc
- ZPI89fb/9ZgG24xM+ADIX8XLrSDC9zEcnxJQG4phNis7wdLQMtoG0qH9dhcbolQJW5c4
- L2yMaMDscsPrPVTEWNG026poo7rgaVJY7/lZoY0Kxg8etORZwTFhUgTwvzMR9Tme4hKT
- 4BjVVSBxD9FiRcI7WWivxqEOPNDl10m0TQCEPGNpfazjcq5tEzYU1fXazLbgeMAJX5l4
- 37gQ==
-X-Gm-Message-State: AOAM5331kJBSO3dcus2RBeb/sCuixG/Z2/18xtvAbGPxh/vHS2vBeWuW
- mBubmSGwHdGuEeoYHgA9dluOuiSXYRF4aYlNYf7Ibzu71i1KUA+sezY3CZ3y/eQ2Xxgx6olvc8y
- nNu0/WQOE0IF7JAQ=
-X-Received: by 2002:a1c:49:: with SMTP id 70mr1264458wma.184.1591342806008;
- Fri, 05 Jun 2020 00:40:06 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJywjsjHCArYCXcd7C+BsUh6EYyl4kGluBrgjSgK/LTnFovF2p3rba3FkAYKfrREBm2wHutZkg==
-X-Received: by 2002:a1c:49:: with SMTP id 70mr1264445wma.184.1591342805850;
- Fri, 05 Jun 2020 00:40:05 -0700 (PDT)
-Received: from localhost.localdomain
- (181.red-88-10-103.dynamicip.rima-tde.net. [88.10.103.181])
- by smtp.gmail.com with ESMTPSA id i74sm11214750wri.49.2020.06.05.00.40.04
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 05 Jun 2020 00:40:05 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v5 02/11] MAINTAINERS: Add an 'overall' entry for accelerators
-Date: Fri,  5 Jun 2020 09:39:44 +0200
-Message-Id: <20200605073953.19268-3-philmd@redhat.com>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200605073953.19268-1-philmd@redhat.com>
-References: <20200605073953.19268-1-philmd@redhat.com>
-MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8;
-	text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/05 03:27:26
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+ h=x-gm-message-state:from:to:cc:subject:date:message-id;
+ bh=shiRMUuC2o0b1TUW8PBBAGKRr+19l1AXYEpWIH2oeak=;
+ b=kJvGAJKA0Uj15hoOpsB+iN6Z48BnDc3hvhiVEdoOo1Q4CER60pw9Og41S9ZUgagZ8K
+ A4cb5eCI+MHfOSs4fH263eACy470swikhErxvFPDWXQdL1AVdytn5qH+4JqWQBjWTZrA
+ tx/MOeEW5NuttGabCZ66RtCEavSTFP/irBpTASgJHfGJ3UGHzU573ZGqNWcEP25eP5BV
+ 2r4T3zsBD3KvNibNK5o6r30Mg1STvZrANzDmikLiIfG5g0I539p4C4hLUqHj995HO7mv
+ lPVgGp8DjeWxRYe2bOj0WmzH6ykzX3ma5TVa8nr1lgOUF5VRP6V1M6znRXeLfhQc1d0C
+ 1ELQ==
+X-Gm-Message-State: AOAM532D3tMBc6RszVxrE69KNrPZRuz9I7gG03W02F5Qwy55ZpoBiODE
+ NOxEVZreV2eanv2ii6d7AZo=
+X-Google-Smtp-Source: ABdhPJyXCAQQ/UVbqmgXfj04Piczl5b74JYzdfivvVvd0uCLgl48H1HbxNcly7SHr9ZZb6cuJnMn2A==
+X-Received: by 2002:a17:90a:ad87:: with SMTP id
+ s7mr1552825pjq.225.1591342815074; 
+ Fri, 05 Jun 2020 00:40:15 -0700 (PDT)
+Received: from localhost.localdomain (unknown-224-80.windriver.com.
+ [147.11.224.80])
+ by smtp.gmail.com with ESMTPSA id y23sm7446619pje.3.2020.06.05.00.40.14
+ (version=TLS1 cipher=AES128-SHA bits=128/128);
+ Fri, 05 Jun 2020 00:40:14 -0700 (PDT)
+From: Bin Meng <bmeng.cn@gmail.com>
+To: Alistair Francis <Alistair.Francis@wdc.com>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Palmer Dabbelt <palmerdabbelt@google.com>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>, qemu-devel@nongnu.org,
+ qemu-riscv@nongnu.org
+Subject: [PATCH 1/4] riscv: Generalize CPU init routine for the base CPU
+Date: Fri,  5 Jun 2020 00:38:24 -0700
+Message-Id: <1591342707-9729-1-git-send-email-bmeng.cn@gmail.com>
+X-Mailer: git-send-email 1.7.1
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1044;
+ envelope-from=bmeng.cn@gmail.com; helo=mail-pj1-x1044.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -110,47 +98,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Bin Meng <bin.meng@windriver.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+From: Bin Meng <bin.meng@windriver.com>
 
-v2: Cover accel/accel.c & accel/Makefile.objs (thuth)
----
- MAINTAINERS | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+There is no need to have two functions that have exactly the same
+codes for 32-bit and 64-bit base CPUs.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 948790b433..f725c12161 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -415,6 +415,17 @@ S: Supported
- F: target/i386/kvm.c
- F: scripts/kvm/vmxcap
+Signed-off-by: Bin Meng <bin.meng@windriver.com>
+---
+
+ target/riscv/cpu.c | 18 +++++-------------
+ 1 file changed, 5 insertions(+), 13 deletions(-)
+
+diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+index 9007a25..d38d829 100644
+--- a/target/riscv/cpu.c
++++ b/target/riscv/cpu.c
+@@ -126,9 +126,7 @@ static void riscv_any_cpu_init(Object *obj)
+     set_resetvec(env, DEFAULT_RSTVEC);
+ }
  
-+Guest CPU Cores (other accelerators)
-+------------------------------------
-+Overall
-+M: Richard Henderson <rth@twiddle.net>
-+R: Paolo Bonzini <pbonzini@redhat.com>
-+S: Maintained
-+F: include/sysemu/accel.h
-+F: accel/accel.c
-+F: accel/Makefile.objs
-+F: accel/stubs/Makefile.objs
+-#if defined(TARGET_RISCV32)
+-
+-static void riscv_base32_cpu_init(Object *obj)
++static void riscv_base_cpu_init(Object *obj)
+ {
+     CPURISCVState *env = &RISCV_CPU(obj)->env;
+     /* We set this in the realise function */
+@@ -136,6 +134,8 @@ static void riscv_base32_cpu_init(Object *obj)
+     set_resetvec(env, DEFAULT_RSTVEC);
+ }
+ 
++#if defined(TARGET_RISCV32)
 +
- X86 HVF CPUs
- M: Roman Bolshakov <r.bolshakov@yadro.com>
- S: Maintained
+ static void rv32gcsu_priv1_10_0_cpu_init(Object *obj)
+ {
+     CPURISCVState *env = &RISCV_CPU(obj)->env;
+@@ -173,14 +173,6 @@ static void rv32imafcu_nommu_cpu_init(Object *obj)
+ 
+ #elif defined(TARGET_RISCV64)
+ 
+-static void riscv_base64_cpu_init(Object *obj)
+-{
+-    CPURISCVState *env = &RISCV_CPU(obj)->env;
+-    /* We set this in the realise function */
+-    set_misa(env, 0);
+-    set_resetvec(env, DEFAULT_RSTVEC);
+-}
+-
+ static void rv64gcsu_priv1_10_0_cpu_init(Object *obj)
+ {
+     CPURISCVState *env = &RISCV_CPU(obj)->env;
+@@ -601,13 +593,13 @@ static const TypeInfo riscv_cpu_type_infos[] = {
+     },
+     DEFINE_CPU(TYPE_RISCV_CPU_ANY,              riscv_any_cpu_init),
+ #if defined(TARGET_RISCV32)
+-    DEFINE_CPU(TYPE_RISCV_CPU_BASE32,           riscv_base32_cpu_init),
++    DEFINE_CPU(TYPE_RISCV_CPU_BASE32,           riscv_base_cpu_init),
+     DEFINE_CPU(TYPE_RISCV_CPU_IBEX,             rv32imcu_nommu_cpu_init),
+     DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_E31,       rv32imacu_nommu_cpu_init),
+     DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_E34,       rv32imafcu_nommu_cpu_init),
+     DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_U34,       rv32gcsu_priv1_10_0_cpu_init),
+ #elif defined(TARGET_RISCV64)
+-    DEFINE_CPU(TYPE_RISCV_CPU_BASE64,           riscv_base64_cpu_init),
++    DEFINE_CPU(TYPE_RISCV_CPU_BASE64,           riscv_base_cpu_init),
+     DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_E51,       rv64imacu_nommu_cpu_init),
+     DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_U54,       rv64gcsu_priv1_10_0_cpu_init),
+ #endif
 -- 
-2.21.3
+2.7.4
 
 
