@@ -6,63 +6,62 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEDB5C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 11:50:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D323C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 11:50:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A73DE2063A
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 11:50:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A73DE2063A
+	by mail.kernel.org (Postfix) with ESMTPS id 510452063A
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 11:50:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 510452063A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41226 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41434 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jhArr-0005GA-Tk
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 07:50:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54814)
+	id 1jhArt-0005L8-I8
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 07:50:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54836)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jhAoh-0008EO-AC
- for qemu-devel@nongnu.org; Fri, 05 Jun 2020 07:47:19 -0400
-Received: from mout.kundenserver.de ([217.72.192.74]:47031)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jhAoi-0008Gm-Gf
+ for qemu-devel@nongnu.org; Fri, 05 Jun 2020 07:47:20 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:42897)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jhAoc-0006hs-6t
- for qemu-devel@nongnu.org; Fri, 05 Jun 2020 07:47:16 -0400
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jhAoh-0006iw-1K
+ for qemu-devel@nongnu.org; Fri, 05 Jun 2020 07:47:20 -0400
 Received: from localhost.localdomain ([82.252.135.106]) by
  mrelayeu.kundenserver.de (mreue106 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1N9M1q-1iw2E70Wd2-015Mnb; Fri, 05 Jun 2020 13:47:03 +0200
+ id 1N4Q4m-1izu7J2HVm-011VBZ; Fri, 05 Jun 2020 13:47:07 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 03/19] linux-user: Add support for /proc/cpuinfo on hppa
- platform
-Date: Fri,  5 Jun 2020 13:46:44 +0200
-Message-Id: <20200605114700.1052050-4-laurent@vivier.eu>
+Subject: [PULL 05/19] linux-user/mmap.c: fix integer underflow in target_mremap
+Date: Fri,  5 Jun 2020 13:46:46 +0200
+Message-Id: <20200605114700.1052050-6-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200605114700.1052050-1-laurent@vivier.eu>
 References: <20200605114700.1052050-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:6FKR7BFmLWvONieLKooI/cFR3vSkQZjLovPt6wp+OvviqGHwlwg
- mxipksbbzyxPoxGkJ9oJV3UZ3xOgh1K+GhlJdSbho2Id4JZr9bcCzGvMN+NK+WfF7qA1Dkq
- rQJ6XEWPJUtQfb0HvF1SCGfVrbCNrJvLmHgJs4m5zjhzteevdSKVPKEizlHlcQEm3vOC0JM
- ZfipMMOtIAdRpj5ibDs1w==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:yYrgXEeJ9NI=:9tMpixFJ2/l3b+fM3lay8L
- JOovTyrm+c0HbhiVAv4/nzGO8jnH0UMmd+pMCC3liovQqrig/OrLYbMlSshYKbq/80Mtw8fHm
- 3N4iZCM2SngmpOmTm+l9IpaiA4qvK2oQ4H8pM2RwIG7xV/7yCQUwCuqEjfqKsjkK2NaLXUjMH
- Q2mVxbnCAc2hItcVHBenxm5AZpmrmCjPrf81NovZeU0J93H2tUr4gzpe4bZRpoCkHhXUNK/FV
- Iv2A/khK2LiRIxLq426qWSmjTikrUJkQpkV5cJJG5ThAZHQzBD/VxSmdrSNgPzQyZS3LlxSt+
- to+RVJq9WNtWwZ77jS4pOiQ/4W1DPVWzZ4FDX1UYJTu4waW+PJnI4UjP1NvSa2jt+FU+MyjDg
- JkH8DbOy6sAMj/DcLY9veL4uxNRul6QTpx6IUbnL/TiWxItU/ivotuXKIJSGsgSH7rUN/3wlU
- GADgG20/CbW8rAU++PwsO1KCxXUg2fOhJmJCmD9SEoThRfNVvu5OBdXb/CPAa0iAawVLb5j2n
- kbTVhFLOavko9k+TL0ovUckEa3IMQAHs2Uy4+5TZ8XxkAcBJCqmOQykyVyRgHOSwXykhm5klB
- SHOfMiYFKut7soDDO93RKpHDd0C6V/4XCVCPScbotGmYdYwkbPs/PwS5XCwbk8T1NfaDFkEXC
- Ys6r0ePcjm/QplPMQR6fPcVE1++hUD3bOV7sIxPbF4sv9O1IYI7b37hNV38ujr2V/eDDRQWh2
- F1wOtDIB5UDsHm5N/MxLXeUZxWioiHcXobDDlTUcfv36CzbaSJBAvUeyhQhChYdbCnbekEQ3o
- ioMeZqZrW2eo4cQ8Hbv0HiqM8McyaItEkFWeDzfz+0b4CRHXsEKh5rZ4rRBvexZuZG39V8s
-Received-SPF: none client-ip=217.72.192.74; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:ga9jgcQO+kjdoOyWdWYM+CF0HEBsS0q9SxmybE2WV2mpG8z0Tnm
+ q7tH18xVoj77aWbFCpvPmbqpzpdbGBGFAm8DLE4u9slcTmhh6qu0ZP+sjDF6wMEDTbI3iqR
+ YSnhwKzuEJvGBVpH1WAvGvJjsPbdQr6/ujR7xxGuz8+3D5k1WAz6Pq7C4aXX6eY2a2hp4mJ
+ S3u3CPE7r5XjVyvw5FD5A==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:CYjl3Us4nIw=:8d2MiDOkbv1i/MkGhLxav3
+ xeubtyWPGDyJmTnOAd1vP56SaWK4HRq0oB4Wh2h4qQ9zF/1iQUDXDKlu6v8ZkXafHV4CeVpYe
+ 0jgIzAswb+fd1xsIV6kxV6Dzvl4ogwJxbVu5mR3r0rfylAZBq5ImS2DIYx+6xEBZ2/V/kZuDf
+ xbQoGj5aLVzCdkMlWtJcngc3fMHTSb2+eSzOj7dFp5kBtNT9NfEYZ3Cd5A9xJELldmx+oBLvC
+ nc1+OPdQpFEMtnjpY59GByG0LGs9wPQfm/V22FmbnK97i+G5wUR040PugWK8mVe/W/3zxLXEX
+ 5L0aYGZqnmceV6QdLj62FSXbNnp/Gk0zAnbS9fBXMpRYWjBv8qn/DYzgGauzlxS+ABcQ8pe2U
+ ueDOh8mQGbN/VZpFPEUZxpOlPBh+R/PMqgL/pBPdgC59UIoh5UyZu6UxrFLVS1VplHTOJrnx2
+ A1af3+PvwfCesQ3fZWYlHv+p8J3Efk4EQCtdCYm5gj61g7nQhAyuhfPlLCMphmv/JhHcVRLqc
+ VcxrLVWJvd6YknK+MJ3zK4WXonvIb+mJHBsBhVbo4jTCggGEhFi0PTXkWm6cUFceqqHhvx56G
+ jpOCiYg2zZHx0U7zDZuF6PDuLapaFKhsX/sus5u3eXX4lEQstnnxwfNkInClw+eS2s/eeEqyQ
+ GVzkzmTdCR0oVwPUgpQMgvw2ckInTRUbt4cnYZKGMjH7Wgfg6JS+K3NrCP5wLQrAsGu/XT2jN
+ 27uqFKMGQduHh4OEQK3jR+vYWCCZkvB46X31Pyz7tJmkydE11JQq2suMvUkmND8uPfeew30/v
+ 1xg5WllMrvzVRrAy0wSqgT+LadkKt+MiM7YZG4rk4waMTXGJ4IqVXczj065HxsVE1HPUf4L
+Received-SPF: none client-ip=217.72.192.75; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/05 07:47:11
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/05 07:47:15
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
@@ -81,59 +80,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Helge Deller <deller@gmx.de>, Riku Voipio <riku.voipio@iki.fi>,
- Richard Henderson <richard.henderson@linaro.org>,
+Cc: Riku Voipio <riku.voipio@iki.fi>, Jonathan Marler <johnnymarler@gmail.com>,
  Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Helge Deller <deller@gmx.de>
+From: Jonathan Marler <johnnymarler@gmail.com>
 
-Provide our own /proc/cpuinfo file for the hppa (parisc) platform.
+Fixes: https://bugs.launchpad.net/bugs/1876373
 
-Signed-off-by: Helge Deller <deller@gmx.de>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20200424210648.GA26715@ls3530.fritz.box>
-[lv: s/an/our/]
+This code path in mmap occurs when a page size is decreased with mremap.  When a section of pages is shrunk, qemu calls mmap_reserve on the pages that were released.  However, it has the diff operation reversed, subtracting the larger old_size from the smaller new_size.  Instead, it should be subtracting the smaller new_size from the larger old_size.  You can also see in the previous line of the change that this mmap_reserve call only occurs when old_size > new_size.
+
+Bug: https://bugs.launchpad.net/qemu/+bug/1876373
+Signed-off-by: Jonathan Marler <johnnymarler@gmail.com>
+Reviewded-by: Laurent Vivier <laurent@vivier.eu>
+Message-Id: <20200502161225.14346-1-johnnymarler@gmail.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/syscall.c | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
+ linux-user/mmap.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index fd5c4f1d73e6..63c40c48e31f 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -7438,6 +7438,18 @@ static int open_cpuinfo(void *cpu_env, int fd)
- }
- #endif
- 
-+#if defined(TARGET_HPPA)
-+static int open_cpuinfo(void *cpu_env, int fd)
-+{
-+    dprintf(fd, "cpu family\t: PA-RISC 1.1e\n");
-+    dprintf(fd, "cpu\t\t: PA7300LC (PCX-L2)\n");
-+    dprintf(fd, "capabilities\t: os32\n");
-+    dprintf(fd, "model\t\t: 9000/778/B160L\n");
-+    dprintf(fd, "model name\t: Merlin L2 160 QEMU (9000/778/B160L)\n");
-+    return 0;
-+}
-+#endif
-+
- #if defined(TARGET_M68K)
- static int open_hardware(void *cpu_env, int fd)
- {
-@@ -7462,7 +7474,7 @@ static int do_openat(void *cpu_env, int dirfd, const char *pathname, int flags,
- #if defined(HOST_WORDS_BIGENDIAN) != defined(TARGET_WORDS_BIGENDIAN)
-         { "/proc/net/route", open_net_route, is_proc },
- #endif
--#if defined(TARGET_SPARC)
-+#if defined(TARGET_SPARC) || defined(TARGET_HPPA)
-         { "/proc/cpuinfo", open_cpuinfo, is_proc },
- #endif
- #if defined(TARGET_M68K)
+diff --git a/linux-user/mmap.c b/linux-user/mmap.c
+index e37803379747..caab62909eb1 100644
+--- a/linux-user/mmap.c
++++ b/linux-user/mmap.c
+@@ -708,7 +708,7 @@ abi_long target_mremap(abi_ulong old_addr, abi_ulong old_size,
+         if (prot == 0) {
+             host_addr = mremap(g2h(old_addr), old_size, new_size, flags);
+             if (host_addr != MAP_FAILED && reserved_va && old_size > new_size) {
+-                mmap_reserve(old_addr + old_size, new_size - old_size);
++                mmap_reserve(old_addr + old_size, old_size - new_size);
+             }
+         } else {
+             errno = ENOMEM;
 -- 
 2.26.2
 
