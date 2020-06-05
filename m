@@ -2,89 +2,91 @@ Return-Path: <SRS0=hXcz=7S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F4FCC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 08:24:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57E9CC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 08:25:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 16AC32074B
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 08:24:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 239D2206A2
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 08:25:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CI4TGom5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16AC32074B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=dme-org.20150623.gappssmtp.com header.i=@dme-org.20150623.gappssmtp.com header.b="BCsq+x6g"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 239D2206A2
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=dme.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53348 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56540 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jh7ed-0006QZ-CL
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 04:24:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60764)
+	id 1jh7fK-0007mM-Dd
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 04:25:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60860)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1jh7dw-0005Yq-Cb
- for qemu-devel@nongnu.org; Fri, 05 Jun 2020 04:24:00 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:55102
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1jh7du-0006mI-Q4
- for qemu-devel@nongnu.org; Fri, 05 Jun 2020 04:23:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591345437;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=JbH9DclmICh+BO3JYUSVx7K+K2CwA4HXD76aZFrgSrM=;
- b=CI4TGom5qGi+fKwL/zK5xwWdUtszLMbmmaIaM9kmNPpT5bSq97PUtfUgjVtWLsJMAAwS6/
- F2FUPzG28LK4EiAv+8oWT16gyj7TmnLhxBtVaZSqxlmV3pYKYH05bhxTbOM+G+Ym7N1VgC
- X4ROetGxK6iG6hK23pycYc1/sd9dgg4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-407-iRkMdvQXOZyQdIByEXNjJw-1; Fri, 05 Jun 2020 04:23:55 -0400
-X-MC-Unique: iRkMdvQXOZyQdIByEXNjJw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 42493835B41;
- Fri,  5 Jun 2020 08:23:54 +0000 (UTC)
-Received: from localhost (unknown [10.40.208.51])
- by smtp.corp.redhat.com (Postfix) with ESMTP id AE01D10016E8;
- Fri,  5 Jun 2020 08:23:46 +0000 (UTC)
-Date: Fri, 5 Jun 2020 10:23:45 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: "Verma, Vishal L" <vishal.l.verma@intel.com>
-Subject: Re: [PATCH v4 2/3] hw/acpi/nvdimm: add a helper to augment SRAT
- generation
-Message-ID: <20200605102345.52b2008a@redhat.com>
-In-Reply-To: <73b11cd452acffc18f7083f1ea7e5ca22cade31f.camel@intel.com>
-References: <20200528223437.12568-1-vishal.l.verma@intel.com>
- <20200528223437.12568-3-vishal.l.verma@intel.com>
- <20200604123326.38f7a368@redhat.com>
- <73b11cd452acffc18f7083f1ea7e5ca22cade31f.camel@intel.com>
+ (Exim 4.90_1) (envelope-from <dme@dme.org>) id 1jh7ed-0006hc-Nl
+ for qemu-devel@nongnu.org; Fri, 05 Jun 2020 04:24:43 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:40339)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <dme@dme.org>) id 1jh7ec-0006qZ-OS
+ for qemu-devel@nongnu.org; Fri, 05 Jun 2020 04:24:43 -0400
+Received: by mail-wm1-x342.google.com with SMTP id r15so8183837wmh.5
+ for <qemu-devel@nongnu.org>; Fri, 05 Jun 2020 01:24:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=dme-org.20150623.gappssmtp.com; s=20150623;
+ h=to:cc:subject:in-reply-to:references:from:date:message-id
+ :mime-version; bh=woE/tUAWGDnjVuiERgjRjVK5NV+0gJ6Br7LgTFzA6aA=;
+ b=BCsq+x6gvQ+7/5lOo8Vs0ap5A9po4zzwN7AlZW2mqcEWdKjN0TKBeWy2I4YTIEi35R
+ JdUDIq++tKrKxubZjQLk/TNiFXPVGyc3Sbs8XmJqFpyn0o+49lVkbZ+JPjxAOPMiBE8O
+ oTuOwlXp+qoLNg50EbbMi9mS8WftUnmpVFAhHd3D4iD4BUWqvayBKSQuA7hJHtjSEGva
+ jSconKAFqbh1InkHuT4IfZIWoRakVL/MWx6jHctQNpwBT0vBGvQIZFzpkoZNZLsGFfad
+ 5cQ1MXpGteYOpGDIo0MIRqWdvMi+qbDBZlIfynmGS+e0uggCw+yaWgbi1wQVsZw6n4IF
+ 8RTg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:to:cc:subject:in-reply-to:references:from:date
+ :message-id:mime-version;
+ bh=woE/tUAWGDnjVuiERgjRjVK5NV+0gJ6Br7LgTFzA6aA=;
+ b=rBsZJRPSrGtDlyVKF4+jeRSvU+tXo5J/52faFSMDb4cVr5el+GVy0P7x1RqhtrWtgG
+ rghSCusU0rw9m9b3+dElEVV9QDaSgxiuZfpHNAElbB7H5I7R79rh2s+9qt6ZQwLLlMHt
+ 3NEWv+c/6m6mKej65D9V710aOOHM6atcj+taT8bz5tKE7I7M9I6SQ6uoyPzCI5i1cucL
+ CpaghrUaT00bN8DUQooh9gFm1Xoht7uj3hnGeFGJ/R/+UA7ZtqEzN1SXIoXvb8mjrR89
+ ZFKsk5EVOaAT6e2bDfVxDaVTdGCSJiXgV/eznBDYiYnOd/qvM+Qa6pnfL0xpcVf+pi70
+ AAlw==
+X-Gm-Message-State: AOAM532NnFMYrm88cMG2xwW8PBYgh2vAaOdMQ2aSeYEHGFXmzExvErT1
+ 9M0GhU+kIufRY80ZwXsm2aLFy5y9QYi2Wxw/
+X-Google-Smtp-Source: ABdhPJzJHVWNJ0Fu9Qr4sTcVfIx5yllSwPwt+1OHhVyFAnlw2E2upqUBm3GRmQXDE8WRdd+gdFBEow==
+X-Received: by 2002:a05:600c:1:: with SMTP id g1mr1486412wmc.142.1591345480452; 
+ Fri, 05 Jun 2020 01:24:40 -0700 (PDT)
+Received: from disaster-area.hh.sledj.net (disaster-area.hh.sledj.net.
+ [2001:8b0:bb71:7140:64::1])
+ by smtp.gmail.com with ESMTPSA id i74sm11368563wri.49.2020.06.05.01.24.39
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 05 Jun 2020 01:24:39 -0700 (PDT)
+Received: from localhost (disaster-area.hh.sledj.net [local])
+ by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id 22df01d5;
+ Fri, 5 Jun 2020 08:24:38 +0000 (UTC)
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Subject: Re: [PATCH v4] osdep: Make MIN/MAX evaluate arguments only once
+In-Reply-To: <20200604215236.2798244-1-eblake@redhat.com>
+References: <20200604215236.2798244-1-eblake@redhat.com>
+X-HGTTG: heart-of-gold
+From: David Edmondson <dme@dme.org>
+Date: Fri, 05 Jun 2020 09:24:38 +0100
+Message-ID: <m2eeqtapix.fsf@dme.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=imammedo@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/05 03:40:54
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain
+Received-SPF: neutral client-ip=2a00:1450:4864:20::342;
+ envelope-from=dme@dme.org; helo=mail-wm1-x342.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -10
+X-Spam_score: -1.1
+X-Spam_bar: -
+X-Spam_report: (-1.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_NEUTRAL=0.779,
+ UNPARSEABLE_RELAY=0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,129 +99,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "lvivier@redhat.com" <lvivier@redhat.com>,
- "thuth@redhat.com" <thuth@redhat.com>,
- "xiaoguangrong.eric@gmail.com" <xiaoguangrong.eric@gmail.com>,
- "mst@redhat.com" <mst@redhat.com>, "Liu, Jingqi" <jingqi.liu@intel.com>,
- "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "ehabkost@redhat.com" <ehabkost@redhat.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>, "Williams,
- Dan J" <dan.j.williams@intel.com>, "rth@twiddle.net" <rth@twiddle.net>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ "open list:Block layer core" <qemu-block@nongnu.org>, quintela@redhat.com,
+ crosthwaite.peter@gmail.com, dgilbert@redhat.com, f4bug@amsat.org,
+ kraxel@redhat.com, dirty.ice.hu@gmail.com, pbonzini@redhat.com,
+ Max Reitz <mreitz@redhat.com>, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 5 Jun 2020 00:54:28 +0000
-"Verma, Vishal L" <vishal.l.verma@intel.com> wrote:
+On Thursday, 2020-06-04 at 16:52:36 -05, Eric Blake wrote:
 
-> On Thu, 2020-06-04 at 12:33 +0200, Igor Mammedov wrote:
-> > On Thu, 28 May 2020 16:34:36 -0600
-> > Vishal Verma <vishal.l.verma@intel.com> wrote:
-> >   
-> > > NVDIMMs can belong to their own proximity domains, as described by the
-> > > NFIT. In such cases, the SRAT needs to have Memory Affinity structures
-> > > in the SRAT for these NVDIMMs, otherwise Linux doesn't populate node
-> > > data structures properly during NUMA initialization. See the following
-> > > for an example failure case.
-> > > 
-> > > https://lore.kernel.org/linux-nvdimm/20200416225438.15208-1-vishal.l.verma@intel.com/
-> > > 
-> > > Introduce a new helper, nvdimm_build_srat(), and call it for both the
-> > > i386 and arm versions of 'build_srat()' to augment the SRAT with
-> > > memory affinity information for NVDIMMs.
-> > > 
-> > > The relevant command line options to exercise this are below. Nodes 0-1
-> > > contain CPUs and regular memory, and nodes 2-3 are the NVDIMM address
-> > > space.
-> > > 
-> > >   -numa node,nodeid=0,mem=2048M,
-> > >   -numa node,nodeid=1,mem=2048M,  
-> > 
-> > pls note that 'mem' is about to be disabled for new machine types in favor of memdev
-> > so this CLI won't work.
-> > It would be nice to update commit message with memdev variant of CLI  
-> 
-> I saw the warnings printed - I did try to use memdevs, but it didn't
-> quite work with my use case. I'm supplying mem=0 for the pmem/nvdimm
-> devices that I want to give a specific numa node, but not give them any
-> more regular memory aside from the nvdimm itself (see nodes 4 and 5
-> below). And for some reason I couldn't do that with memdevs.
-it should work since 4.1
+>  /* Minimum function that returns zero only iff both values are zero.
 
-here is example 
-qemu-system-x86_64 -object memory-backend-ram,id=mem0,size=1G -m 1G \
- -numa node,memdev=mem0 -numa node -monitor stdio
+Not your change, but "only" is unnecessary here (or iff -> if).
 
-QEMU 5.0.50 monitor - type 'help' for more information
-(qemu) VNC server running on ::1:5900
-info numa
-2 nodes
-node 0 cpus: 0
-node 0 size: 1024 MB
-node 0 plugged: 0 MB
-node 1 cpus:
-node 1 size: 0 MB
-node 1 plugged: 0 MB
-(qemu)
-> 
-> Here is the full command line I'm using for example. I'd appreciate any
-> pointers on converting over to memdevs fully.
-> 
->    qemu-system-x86_64 
->    -machine pc,accel=kvm,nvdimm, 
->    -m 8192M,slots=4,maxmem=40960M 
->    -smp 8,sockets=2,cores=2,threads=2 
->    -enable-kvm 
->    -display none 
->    -nographic 
->    -drive file=root.img,format=raw,media=disk 
->    -kernel ./mkosi.extra/boot/vmlinuz-5.7.0-00001-g87ad963bac23 
->    -initrd mkosi.extra/boot/initramfs-5.7.0-00001-g87ad963bac23.img 
->    -append selinux=0 audit=0 console=tty0 console=ttyS0 root=/dev/sda2 ignore_loglevel rw 
->    -device e1000,netdev=net0 
->    -netdev user,id=net0,hostfwd=tcp::10022-:22 
->    -snapshot 
->    -numa node,nodeid=0,mem=2048M, 
->    -numa cpu,node-id=0,socket-id=0 
->    -numa node,nodeid=1,mem=2048M, 
->    -numa cpu,node-id=1,socket-id=1 
->    -numa node,nodeid=2,mem=2048M, 
->    -numa node,nodeid=3,mem=2048M, 
->    -numa node,nodeid=4,mem=0, 
->    -object memory-backend-file,id=nvmem0,share,mem-path=nvdimm-0,size=16384M,align=1G 
->    -device nvdimm,memdev=nvmem0,id=nv0,label-size=2M,node=4 
->    -numa node,nodeid=5,mem=0, 
->    -object memory-backend-file,id=nvmem1,share,mem-path=nvdimm-1,size=16384M,align=1G 
->    -device nvdimm,memdev=nvmem1,id=nv1,label-size=2M,node=5 
-> 
-> >   
-> > >   -numa node,nodeid=2,mem=0,
-> > >   -object memory-backend-file,id=nvmem0,share,mem-path=nvdimm-0,size=16384M,align=128M
-> > >   -device nvdimm,memdev=nvmem0,id=nv0,label-size=2M,node=2
-> > >   -numa node,nodeid=3,mem=0,
-> > >   -object memory-backend-file,id=nvmem1,share,mem-path=nvdimm-1,size=16384M,align=128M
-> > >   -device nvdimm,memdev=nvmem1,id=nv1,label-size=2M,node=3
-> > > 
-> > > Cc: Jingqi Liu <jingqi.liu@intel.com>
-> > > Cc: Michael S. Tsirkin <mst@redhat.com>
-> > > Reviewed-by: Jingqi Liu <jingqi.liu@intel.com>
-> > > Signed-off-by: Vishal Verma <vishal.l.verma@intel.com>  
-> > 
-> > Reviewed-by: Igor Mammedov <imammedo@redhat.com>  
-> 
-> Thanks for the review Igor - I'm pretty unfamiliar with qemu development
-> - what are the next steps? Is there a certain maintainer/tree I could
-> watch for the inclusion of this?
-> 
-> >   
-> > > ---
-> > >  hw/acpi/nvdimm.c         | 23 +++++++++++++++++++++++
-> > >  hw/arm/virt-acpi-build.c |  4 ++++
-> > >  hw/i386/acpi-build.c     |  5 +++++
-> > >  include/hw/mem/nvdimm.h  |  1 +
-> > >  4 files changed, 33 insertions(+)
-> > > 
-> > >   
-
+dme.
+-- 
+But uh oh, I love her because, she moves in her own way.
 
