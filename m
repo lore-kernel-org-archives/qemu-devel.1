@@ -2,84 +2,88 @@ Return-Path: <SRS0=hXcz=7S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19458C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 17:45:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1615DC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 17:47:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D93D1207ED
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 17:45:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D28CB207D8
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 17:47:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fUUR/juA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D93D1207ED
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="x1VFvqyT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D28CB207D8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59092 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32990 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jhGPO-0000X0-6v
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 13:45:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48194)
+	id 1jhGR2-0001dl-2Z
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 13:47:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49042)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1jhGHy-00040d-B0
- for qemu-devel@nongnu.org; Fri, 05 Jun 2020 13:37:54 -0400
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:45776)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jhGPH-0000fS-Ff
+ for qemu-devel@nongnu.org; Fri, 05 Jun 2020 13:45:27 -0400
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:44638)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1jhGHx-000410-37
- for qemu-devel@nongnu.org; Fri, 05 Jun 2020 13:37:53 -0400
-Received: by mail-pg1-x541.google.com with SMTP id n23so5483253pgb.12
- for <qemu-devel@nongnu.org>; Fri, 05 Jun 2020 10:37:52 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jhGPF-0005oM-Dq
+ for qemu-devel@nongnu.org; Fri, 05 Jun 2020 13:45:27 -0400
+Received: by mail-pl1-x643.google.com with SMTP id bh7so3979861plb.11
+ for <qemu-devel@nongnu.org>; Fri, 05 Jun 2020 10:45:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=AXPq7Uy8g5ifp8uMXZd1qJX2wag4BCDXppVYNXcf0Dw=;
- b=fUUR/juA87kUvzkHOXidkERsoZztFGGDQkhWhPKRV96NnsT1KWLuW7SB88q4l8ESuS
- Wshv1Dsy3x8ozU0I3fSn927FlGcc6CdgUbhY4zZrQQiglAxtJPbg+5RiASX4w2/6gbvc
- d0n3ErHBBHBvQUNTjoVRRsU60K8SHrnds1WR9eVY5VNT0/Q345Ra7zTEtE9dVQRzWPHG
- GIfKg4eRDwE3UHyDUrbrD6yk9XyG5OdTTmZJeUceP7vkJpCwd2r1XhzE5eHqUmgnJdhn
- nMuFtdyJQvfB83yDSJOslDY/lSXSp5sE7ZzI8Hj/8BXghikh6eux9Y9DjyduwlSLpwP7
- k5FA==
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=fGMDhJbBlN1Bl9emP+Ss5jMSTecA4OVxD1vFXgajnUI=;
+ b=x1VFvqyT0IjkAwuU87JKaFJnRKyJgfRLrYBmLEzpb0GaesZ8Y9b0cp96JDZZHuDUET
+ ffU9xehAnfzJYMtEaXorhGd+Oo6NNp6u4E4HVr3LqCRRV5rluuNH6Apso9hMlphx+rnn
+ lb4Lv2BWM5Ux9n0zMmAfMZNru3pjeEu/Uny45tO3tat6ekkRcvviwbLxEBkraV7D4dyB
+ sMZuSTwVBH9ncsN2V7NHov4cshM8jZjrFnJEPFYuKwmD57pABlTT1sMRXGeZMuq206qV
+ /2ttP4PxzBU7qiiafPOaaMaVwIYJSlpmV9/TDhqFLQ88lZIdqmx1UP/D2mxUqDh7vQZ4
+ lLcQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=AXPq7Uy8g5ifp8uMXZd1qJX2wag4BCDXppVYNXcf0Dw=;
- b=XAAWASD84R2utapT2l/g5R3EW+FsXvAOkr94HPMLfgZeW1sQJxYIcM+DAWQvnNlpLs
- ZBBER60f0IHDB2wW0cCdJoXtkWJo/VvMKx7QOz7TZ2u3a4vy/3N2OouLSGAR6slmjOa5
- eTiLa0NhbgmWokpBGWjmg7C4She1I1upyrIwZpQ/E9PpXJyqwX/YWbCAod7H5wH2hl7w
- fTCvwJGI30HJzbHx8IZ/4mbf/DGKS/n7MSFr9wfCa2jW6LJdv443BD9OxNF/Z+GpYIgF
- XPcvrh+ole3NMbAnIcN41pe120UShL78944shjO2G2Sv6sh3vR5FpwABq8fx/1blB+9s
- Lf9A==
-X-Gm-Message-State: AOAM5330cXVjx3rQkowyQmIlRBTI8rIaYKqxjIs6x+IBziDmikq46gyU
- kZHxvEOur+sfhdP+ooyjXPF3CyQlLthJUw==
-X-Google-Smtp-Source: ABdhPJyGCuCwwNwHK978hztXGXybTaUfoyjA0JOCR9swtv/cKQ1QVZRWX9spz1l17gix52GSvGYJqQ==
-X-Received: by 2002:a65:568d:: with SMTP id v13mr10411924pgs.436.1591378671434; 
- Fri, 05 Jun 2020 10:37:51 -0700 (PDT)
-Received: from Rfoley-MA01.hsd1.ma.comcast.net
- (c-73-47-162-176.hsd1.ma.comcast.net. [73.47.162.176])
- by smtp.gmail.com with ESMTPSA id a19sm188307pfd.165.2020.06.05.10.37.49
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 05 Jun 2020 10:37:50 -0700 (PDT)
-From: Robert Foley <robert.foley@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 09/13] tests/docker: Added docker build support for TSan.
-Date: Fri,  5 Jun 2020 13:34:18 -0400
-Message-Id: <20200605173422.1490-10-robert.foley@linaro.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200605173422.1490-1-robert.foley@linaro.org>
-References: <20200605173422.1490-1-robert.foley@linaro.org>
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=fGMDhJbBlN1Bl9emP+Ss5jMSTecA4OVxD1vFXgajnUI=;
+ b=cDid0YH2hCg8zs+ERUNWm+4YUWjyJOC6b/yjad8ihF7huYH95GPy4//WFQnfKY9cRE
+ edOK+sxvxyJBE6uJurrnnAToqjJKg/P4iOxCnMkzAZxZRoqGE+erCAMQDls4fGWOVoVv
+ R3C591TVfnOFtAiYkSRZn3tzerSjPVDSV+prltt5CgCfGCEqruAzAZbovFOUhQATAaz2
+ 9rqB1D55jFJbHv4/P6LDpH3uGcD+lOv0Me7Ebju5c0VEYhekSA7Fyiej+IzDnl+O6L2D
+ NZxFILwpE6q4iV7hHV93fF/zyClFiJewW0MLlaSF72Iue5K8h+7Zseoy2TgB39LQq9fv
+ E/pw==
+X-Gm-Message-State: AOAM530QGASFEASI9IGk4E6d8VyuSXD622JWDL76smeFAyoNWr8hJnjd
+ lbcAu5LOck8umKzQEfT73wWoOmIjfUc=
+X-Google-Smtp-Source: ABdhPJxmvVEdpWXr2cSHC7cuSFYq9Jh22IKfKOZnQ39UpWc+0kTwIrShoM/65vBh58zVVI9vI1178Q==
+X-Received: by 2002:a17:90a:376e:: with SMTP id
+ u101mr4287848pjb.126.1591379122706; 
+ Fri, 05 Jun 2020 10:45:22 -0700 (PDT)
+Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
+ by smtp.gmail.com with ESMTPSA id w192sm205466pff.126.2020.06.05.10.45.21
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 05 Jun 2020 10:45:21 -0700 (PDT)
+Subject: Re: [PATCH] configure: Disable -Wtautological-type-limit-compare
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+References: <20200604034513.75103-1-richard.henderson@linaro.org>
+ <87bllx4igz.fsf@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <535cf85f-96d7-0e98-c69e-c09b976bc251@linaro.org>
+Date: Fri, 5 Jun 2020 10:45:19 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <87bllx4igz.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::541;
- envelope-from=robert.foley@linaro.org; helo=mail-pg1-x541.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::643;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x643.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -101,196 +105,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, robert.foley@linaro.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, cota@braap.org,
- peter.puhov@linaro.org, alex.bennee@linaro.org
+Cc: thuth@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Added a new docker for ubuntu 20.04.
-This docker has support for Thread Sanitizer
-including one patch we need in one of the header files.
-https://github.com/llvm/llvm-project/commit/a72dc86cd
+On 6/5/20 8:53 AM, Alex Bennée wrote:
+> 
+> Richard Henderson <richard.henderson@linaro.org> writes:
+> 
+>> Clang 10 enables this by default with -Wtype-limit.
+>>
+>> All of the instances flagged by this Werror so far have been
+>> cases in which we really do want the compiler to optimize away
+>> the test completely.  Disabling the warning will avoid having
+>> to add ifdefs to work around this.
+>>
+>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>> ---
+>>  configure | 2 ++
+>>  1 file changed, 2 insertions(+)
+>>
+>> diff --git a/configure b/configure
+>> index f087d2bcd1..693f01327f 100755
+>> --- a/configure
+>> +++ b/configure
+>> @@ -2009,6 +2009,8 @@ gcc_flags="-Wno-missing-include-dirs -Wempty-body -Wnested-externs $gcc_flags"
+>>  gcc_flags="-Wendif-labels -Wno-shift-negative-value $gcc_flags"
+>>  gcc_flags="-Wno-initializer-overrides -Wexpansion-to-defined $gcc_flags"
+>>  gcc_flags="-Wno-string-plus-int -Wno-typedef-redefinition $gcc_flags"
+>> +gcc_flags="$gcc_flags -Wno-tautological-type-limit-compare"
+>> +
+> 
+> nit: the pattern is reversed compared to the previous lines (foo $gcc_flags)
 
-This command will build with tsan enabled:
-make docker-test-tsan-ubuntu2004 
+Not a nit.  The -Wno- must follow -Wtype-limit, or -Wtype-limit will turn it
+back on.
 
-Also added the TSAN suppresion file to disable certain
-cases of TSAN warnings.
 
-Cc: Fam Zheng <fam@euphon.net>
-Cc: Philippe Mathieu-Daudé <philmd@redhat.com>
-Signed-off-by: Robert Foley <robert.foley@linaro.org>
----
- tests/docker/dockerfiles/ubuntu2004.docker | 65 ++++++++++++++++++++++
- tests/docker/test-tsan                     | 44 +++++++++++++++
- tests/tsan/blacklist.tsan                  | 10 ++++
- tests/tsan/suppressions.tsan               | 14 +++++
- 4 files changed, 133 insertions(+)
- create mode 100644 tests/docker/dockerfiles/ubuntu2004.docker
- create mode 100755 tests/docker/test-tsan
- create mode 100644 tests/tsan/blacklist.tsan
- create mode 100644 tests/tsan/suppressions.tsan
+r~
 
-diff --git a/tests/docker/dockerfiles/ubuntu2004.docker b/tests/docker/dockerfiles/ubuntu2004.docker
-new file mode 100644
-index 0000000000..6050ce7e8a
---- /dev/null
-+++ b/tests/docker/dockerfiles/ubuntu2004.docker
-@@ -0,0 +1,65 @@
-+FROM ubuntu:20.04
-+ENV PACKAGES flex bison \
-+    ccache \
-+    clang-10\
-+    gcc \
-+    gettext \
-+    git \
-+    glusterfs-common \
-+    libaio-dev \
-+    libattr1-dev \
-+    libbrlapi-dev \
-+    libbz2-dev \
-+    libcacard-dev \
-+    libcap-ng-dev \
-+    libcurl4-gnutls-dev \
-+    libdrm-dev \
-+    libepoxy-dev \
-+    libfdt-dev \
-+    libgbm-dev \
-+    libgtk-3-dev \
-+    libibverbs-dev \
-+    libiscsi-dev \
-+    libjemalloc-dev \
-+    libjpeg-turbo8-dev \
-+    liblzo2-dev \
-+    libncurses5-dev \
-+    libncursesw5-dev \
-+    libnfs-dev \
-+    libnss3-dev \
-+    libnuma-dev \
-+    libpixman-1-dev \
-+    librados-dev \
-+    librbd-dev \
-+    librdmacm-dev \
-+    libsasl2-dev \
-+    libsdl2-dev \
-+    libseccomp-dev \
-+    libsnappy-dev \
-+    libspice-protocol-dev \
-+    libspice-server-dev \
-+    libssh-dev \
-+    libusb-1.0-0-dev \
-+    libusbredirhost-dev \
-+    libvdeplug-dev \
-+    libvte-2.91-dev \
-+    libxen-dev \
-+    libzstd-dev \
-+    make \
-+    python3-yaml \
-+    python3-sphinx \
-+    sparse \
-+    texinfo \
-+    xfslibs-dev\
-+    vim
-+RUN apt-get update && \
-+    DEBIAN_FRONTEND=noninteractive apt-get -y install $PACKAGES
-+RUN dpkg -l $PACKAGES | sort > /packages.txt
-+ENV FEATURES clang tsan pyyaml sdl2
-+
-+# https://bugs.launchpad.net/qemu/+bug/1838763
-+ENV QEMU_CONFIGURE_OPTS --disable-libssh
-+
-+# Apply patch https://reviews.llvm.org/D75820
-+# This is required for TSan in clang-10 to compile with QEMU.
-+RUN sed -i 's/^const/static const/g' /usr/lib/llvm-10/lib/clang/10.0.0/include/sanitizer/tsan_interface.h
-diff --git a/tests/docker/test-tsan b/tests/docker/test-tsan
-new file mode 100755
-index 0000000000..eb40ac45b7
---- /dev/null
-+++ b/tests/docker/test-tsan
-@@ -0,0 +1,44 @@
-+#!/bin/bash -e
-+#
-+# This test will use TSan as part of a build and a make check.
-+#
-+# Copyright (c) 2020 Linaro
-+# Copyright (c) 2016 Red Hat Inc.
-+#
-+# Authors:
-+#  Robert Foley <robert.foley@linaro.org>
-+#  Originally based on test-quick from Fam Zheng <famz@redhat.com>
-+#
-+# This work is licensed under the terms of the GNU GPL, version 2
-+# or (at your option) any later version. See the COPYING file in
-+# the top-level directory.
-+
-+. common.rc
-+
-+setup_tsan()
-+{
-+    requires clang tsan
-+    tsan_log_dir="/tmp/qemu-test/build/tsan"
-+    mkdir -p $tsan_log_dir > /dev/null || true
-+    EXTRA_CONFIGURE_OPTS="${EXTRA_CONFIGURE_OPTS} --enable-tsan \
-+                          --cc=clang-10 --cxx=clang++-10 \
-+                          --disable-werror --extra-cflags=-O0"
-+    # detect deadlocks is false currently simply because
-+    # TSan crashes immediately with deadlock detector enabled.
-+    # We have maxed out the history size to get the best chance of finding
-+    # warnings during testing.
-+    # Note, to get TSan to fail on warning, use exitcode=66 below.
-+    tsan_opts="suppressions=/tmp/qemu-test/src/tests/tsan/suppressions.tsan\
-+               detect_deadlocks=false history_size=7\
-+               halt_on_error=0 exitcode=0 verbose=5\
-+               log_path=$tsan_log_dir/tsan_warning"
-+    export TSAN_OPTIONS="$tsan_opts"
-+}
-+
-+cd "$BUILD_DIR"
-+
-+TARGET_LIST=${TARGET_LIST:-$DEF_TARGET_LIST} \
-+setup_tsan
-+build_qemu
-+check_qemu
-+install_qemu
-diff --git a/tests/tsan/blacklist.tsan b/tests/tsan/blacklist.tsan
-new file mode 100644
-index 0000000000..75e444f5dc
---- /dev/null
-+++ b/tests/tsan/blacklist.tsan
-@@ -0,0 +1,10 @@
-+# This is an example blacklist.
-+# To enable use of the blacklist add this to configure:
-+# "--extra-cflags=-fsanitize-blacklist=<src path>/tests/tsan/blacklist.tsan"
-+# The eventual goal would be to fix these warnings.
-+
-+# TSan is not happy about setting/getting of dirty bits,
-+# for example, cpu_physical_memory_set_dirty_range,
-+# and cpu_physical_memory_get_dirty.
-+src:bitops.c
-+src:bitmap.c
-diff --git a/tests/tsan/suppressions.tsan b/tests/tsan/suppressions.tsan
-new file mode 100644
-index 0000000000..73414b9ebd
---- /dev/null
-+++ b/tests/tsan/suppressions.tsan
-@@ -0,0 +1,14 @@
-+# This is the set of runtime suppressions of TSan warnings.
-+# The goal would be to have here only items we do not
-+# plan to fix, and to explain why for each item.
-+
-+# TSan reports a double lock on RECURSIVE mutexes.
-+# Since the recursive lock is intentional, we choose to ignore it.
-+mutex:aio_context_acquire
-+mutex:pthread_mutex_lock
-+
-+# TSan reports a race betwen pthread_mutex_init() and
-+# pthread_mutex_lock().  Since this is outside of QEMU,
-+# we choose to ignore it.
-+race:pthread_mutex_init
-+race:pthread_mutex_lock
--- 
-2.17.1
+> 
+> I had exactly the same patch in my local tree but it wasn't enough for
+> clang-9 which I was using for a sanitiser build. I ended up
+> having to apply --disable-werrror to the configuration.
+> 
+> Anyway:
+> 
+> Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+> 
 
 
