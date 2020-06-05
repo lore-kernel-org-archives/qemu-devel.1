@@ -2,85 +2,87 @@ Return-Path: <SRS0=hXcz=7S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D622FC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 14:51:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4ABE3C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 14:55:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9B8F1206A2
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 14:51:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 16D2C2065C
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 14:55:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qWQMGCwZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B8F1206A2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LlS/jAVw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16D2C2065C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53726 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58708 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jhDgX-0008Lc-Rm
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 10:51:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50048)
+	id 1jhDkl-0002LM-Bb
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 10:55:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50552)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jhDfa-0007gY-SQ
- for qemu-devel@nongnu.org; Fri, 05 Jun 2020 10:50:06 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:45666)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jhDfZ-0005sV-Kz
- for qemu-devel@nongnu.org; Fri, 05 Jun 2020 10:50:06 -0400
-Received: by mail-ot1-x341.google.com with SMTP id m2so7779469otr.12
- for <qemu-devel@nongnu.org>; Fri, 05 Jun 2020 07:50:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=JDCA0K4XBTkPfG5Tn//wBpkNB82Cg03QNPI1nDXfSEY=;
- b=qWQMGCwZNxoluBGNf9Ow4LsK3nnkWqO66YvOSrEUkNT3ypOIusrSvvpiqi1knwscht
- HntrhrZI8lLUitY3f3CqdZuW6xOuZqwdRKj0KPJpOGwB72o7b2EbHvCyZnqUL+SjsNTN
- RZDjPg4Pj7f3soySHLlK71DOmBbuUiAHPAyCpFikxPcfSA9KM2MpVRrVa/q2yURwJjGu
- yQovb8jVEdrh3wXkdLUdReUx3rFPmg61L5yPGpn5nLL2k5x2YDgKJFXZSR5PdBRdPSd3
- UNPedbELYoSD7xLCgzR37NRQ1DTFVVwoOrYDQ67P1n7hfs53Piy6CLjKbthARhZkKlPj
- iEYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=JDCA0K4XBTkPfG5Tn//wBpkNB82Cg03QNPI1nDXfSEY=;
- b=uKaKTGD47+6mikCwlXG3TQb9hKS4BQa6HMoVpdnsZN/LVeCJM8l6fvd+zt7a8wUO+j
- 7wgVt+yNadpbGngMku9T1A6md9HkqWWhQMEf+dZ+fnV8k2pTVWlmwi8pv1R7oBaZ08E6
- vxqpHf2S1V4pWOH6hl2h2FB/yA0aPOAK/P+3HwVwGvIRV6xK2mJ5F5Xk8eo9gtim6bG3
- tYwRLZVCQaEf1BjhoCu5fThWjmPxt4K6l1FoL2RESjRwjCTrB0QzBKfF4y/dkAwuQboa
- oM9iBfkNHJdNWP4N3RtQv87uXmQBp6czTFVYH06lUZobcELsGemCLAi5wu6YMjIhPxNO
- HINQ==
-X-Gm-Message-State: AOAM532pHT947mXOTnirKtfQMhb1+jPTs9ZPoeC99lbULeIxlgKnWYTy
- adk8jCBX/rDXCyKDTkpYHNa7VpiMi69HvAz6J43DnA==
-X-Google-Smtp-Source: ABdhPJzLxP1lXUFeWqr/EZvOmUzkFlSg7zlezdiJES2rZaif6oc1ypiw8CGwEMFHR3xBC7KdT0fo7ZKlxZkYQxA5iNI=
-X-Received: by 2002:a9d:b82:: with SMTP id 2mr7502622oth.221.1591368604178;
- Fri, 05 Jun 2020 07:50:04 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1jhDkA-0001nm-Fs
+ for qemu-devel@nongnu.org; Fri, 05 Jun 2020 10:54:50 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:29215
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1jhDk9-000751-FY
+ for qemu-devel@nongnu.org; Fri, 05 Jun 2020 10:54:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591368887;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=NqmHOySC3GGp/NHkKCTGcOCLaGaUhK7dFDeBKmK3QvI=;
+ b=LlS/jAVwvZEr+rv27YEX+Lvmk1VyH97O0ELAoJouQj/Sf1hwr8yA74vmGtJSp2rKar/OcZ
+ 2177NyRsgh2u1k8hmH2YIpdZLda5a0zc8lg6sfWu060UuZ2VGPItmOLyzgVbf3HD6hkyva
+ GJ77FJlHLKO2j0iLnVS6Ek4wL8kt3TA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-484-DwvqNppUOAuBkiO6dVogMQ-1; Fri, 05 Jun 2020 10:54:46 -0400
+X-MC-Unique: DwvqNppUOAuBkiO6dVogMQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E50E380B713;
+ Fri,  5 Jun 2020 14:54:44 +0000 (UTC)
+Received: from localhost (unknown [10.40.208.51])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3CAC66292E;
+ Fri,  5 Jun 2020 14:54:33 +0000 (UTC)
+Date: Fri, 5 Jun 2020 16:54:32 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Eric Auger <eric.auger@redhat.com>
+Subject: Re: [RFC 2/6] tests/acpi: Add void tables for Q35/TPM-TIS
+ bios-tables-test
+Message-ID: <20200605165432.30e65cc0@redhat.com>
+In-Reply-To: <20200601102113.1207-3-eric.auger@redhat.com>
+References: <20200601102113.1207-1-eric.auger@redhat.com>
+ <20200601102113.1207-3-eric.auger@redhat.com>
 MIME-Version: 1.0
-References: <20200529180005.169036-1-jcd@tribudubois.net>
-In-Reply-To: <20200529180005.169036-1-jcd@tribudubois.net>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 5 Jun 2020 15:49:53 +0100
-Message-ID: <CAFEAcA9Q9f4ocZSrgXK8DRz8ro1Yv4bRbTmpWw_wtoqyUO9K7w@mail.gmail.com>
-Subject: Re: [PATCH] hw/misc/imx6ul_ccm.c: Implement non writable bits in CCM
- registers
-To: Jean-Christophe Dubois <jcd@tribudubois.net>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::341;
- envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x341.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=imammedo@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/05 03:35:49
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,82 +95,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, Peter Chubb <peter.chubb@nicta.com.au>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: peter.maydell@linaro.org, drjones@redhat.com, mst@redhat.com,
+ philmd@redhat.com, qemu-devel@nongnu.org, shannon.zhaosl@gmail.com,
+ qemu-arm@nongnu.org, marcandre.lureau@redhat.com, eric.auger.pro@gmail.com,
+ lersek@redhat.com, ardb@kernel.org, stefanb@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 29 May 2020 at 19:00, Jean-Christophe Dubois
-<jcd@tribudubois.net> wrote:
->
-> Some bits of the CCM registers are non writable.
->
-> This was left undone in the initial commit (all bits of registers were
-> writable).
->
-> This patch add the required code to protect non writable bits.
->
-> Signed-off-by: Jean-Christophe Dubois <jcd@tribudubois.net>
->  static uint64_t imx6ul_analog_read(void *opaque, hwaddr offset, unsigned size)
-> @@ -737,7 +790,8 @@ static void imx6ul_analog_write(void *opaque, hwaddr offset, uint64_t value,
->           * the REG_NAME register. So we change the value of the
->           * REG_NAME register, setting bits passed in the value.
->           */
-> -        s->analog[index - 1] |= value;
-> +        s->analog[index - 1] = s->analog[index - 1] |
-> +                               (value & ~analog_mask[index - 1]);
+On Mon,  1 Jun 2020 12:21:09 +0200
+Eric Auger <eric.auger@redhat.com> wrote:
 
-Not sure why you didn't retain the use of the |= operator here?
+> Add placeholders for TPM and DSDT reference tables for
+> Q35 TPM-TIS tests.
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
->          break;
->      case CCM_ANALOG_PLL_ARM_CLR:
->      case CCM_ANALOG_PLL_USB1_CLR:
-> @@ -762,7 +816,8 @@ static void imx6ul_analog_write(void *opaque, hwaddr offset, uint64_t value,
->           * the REG_NAME register. So we change the value of the
->           * REG_NAME register, unsetting bits passed in the value.
->           */
-> -        s->analog[index - 2] &= ~value;
-> +        s->analog[index - 2] = s->analog[index - 2] &
-> +                               ~(value & ~analog_mask[index - 2]);
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
-Similarly here with &=.
+> ---
+>  tests/data/acpi/q35/DSDT.tis | Bin
+>  tests/data/acpi/q35/TPM2.tis | Bin
+>  2 files changed, 0 insertions(+), 0 deletions(-)
+>  create mode 100644 tests/data/acpi/q35/DSDT.tis
+>  create mode 100644 tests/data/acpi/q35/TPM2.tis
+> 
+> diff --git a/tests/data/acpi/q35/DSDT.tis b/tests/data/acpi/q35/DSDT.tis
+> new file mode 100644
+> index 0000000000000000000000000000000000000000..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
+> diff --git a/tests/data/acpi/q35/TPM2.tis b/tests/data/acpi/q35/TPM2.tis
+> new file mode 100644
+> index 0000000000000000000000000000000000000000..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
 
->          break;
->      case CCM_ANALOG_PLL_ARM_TOG:
->      case CCM_ANALOG_PLL_USB1_TOG:
-> @@ -787,14 +842,14 @@ static void imx6ul_analog_write(void *opaque, hwaddr offset, uint64_t value,
->           * the REG_NAME register. So we change the value of the
->           * REG_NAME register, toggling bits passed in the value.
->           */
-> -        s->analog[index - 3] ^= value;
-> +        s->analog[index - 3] = (s->analog[index - 3] &
-> +                                analog_mask[index - 3]) |
-> +                               ((value ^ s->analog[index - 3]) &
-> +                                ~analog_mask[index - 3]);
-
-I think this does the right thing (toggle bits which are set in
-value as long as they're not read-only), but isn't this a simpler
-way to write it?
-
-     s->analog[index - 3] ^= (value & ~analog_mask[index - 3]);
-
-That is, we toggle the bits that are set in 'value' and not set
-in the mask of read-only bits.
-
->          break;
->      default:
-> -        /*
-> -         * We will do a better implementation later. In particular some bits
-> -         * cannot be written to.
-> -         */
-> -        s->analog[index] = value;
-> +        s->analog[index] = (s->analog[index] & analog_mask[index]) |
-> +                           (value & ~analog_mask[index]);
->          break;
->      }
->  }
-
-thanks
--- PMM
 
