@@ -2,84 +2,89 @@ Return-Path: <SRS0=hXcz=7S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A1EBC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 10:33:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC408C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 10:46:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E2B462074B
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 10:33:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2B462074B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id B77142075B
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 10:46:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JvP6qJzL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B77142075B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34244 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40924 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jh9fU-0001tm-4i
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 06:33:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46072)
+	id 1jh9s7-0006LJ-WB
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 06:46:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47224)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jh9cf-0008VZ-H8
- for qemu-devel@nongnu.org; Fri, 05 Jun 2020 06:30:49 -0400
-Received: from indium.canonical.com ([91.189.90.7]:59006)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jh9cd-00087K-T5
- for qemu-devel@nongnu.org; Fri, 05 Jun 2020 06:30:49 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jh9cc-0007Eq-0V
- for <qemu-devel@nongnu.org>; Fri, 05 Jun 2020 10:30:46 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 01FDD2E80E7
- for <qemu-devel@nongnu.org>; Fri,  5 Jun 2020 10:30:46 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jh9rJ-0005jX-Lt
+ for qemu-devel@nongnu.org; Fri, 05 Jun 2020 06:45:57 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:41807
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jh9rH-0002dv-IZ
+ for qemu-devel@nongnu.org; Fri, 05 Jun 2020 06:45:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591353954;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=7hLX+smFqjRmInxpv6d4VgabW9wxZU/3OZ9hKNSHEAM=;
+ b=JvP6qJzLZjY4klJAUuq+oMrhnw0TxELDGTG+MqGzgVGx53mb9+xrXYCYQ0HtsdPi4gyxXZ
+ zhX5C4t23s4Quiyqb2HW9K6dzPl4hahUH5NDYLHij4tq+YCargOoG0Noy43kIleo3KUYrJ
+ DADE+QQJo6gEsF9QlXkLormg1yuKJBQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-89-jjy1j_gmMnG9cF878LPTDA-1; Fri, 05 Jun 2020 06:45:52 -0400
+X-MC-Unique: jjy1j_gmMnG9cF878LPTDA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 38E8619057BA;
+ Fri,  5 Jun 2020 10:45:50 +0000 (UTC)
+Received: from gondolin (ovpn-113-2.ams2.redhat.com [10.36.113.2])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 453B95C661;
+ Fri,  5 Jun 2020 10:45:38 +0000 (UTC)
+Date: Fri, 5 Jun 2020 12:45:35 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: [RFC v2 18/18] guest memory protection: Alter virtio default
+ properties for protected guests
+Message-ID: <20200605124535.12e8c96e.cohuck@redhat.com>
+In-Reply-To: <20200521034304.340040-19-david@gibson.dropbear.id.au>
+References: <20200521034304.340040-1-david@gibson.dropbear.id.au>
+ <20200521034304.340040-19-david@gibson.dropbear.id.au>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 05 Jun 2020 10:24:59 -0000
-From: =?utf-8?q?Alex_Benn=C3=A9e?= <1880225@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=In Progress; importance=Undecided;
- assignee=alex.bennee@linaro.org; 
-X-Launchpad-Bug-Tags: arm testcase
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ajbennee aleksandar-markovic
-X-Launchpad-Bug-Reporter: Aleksandar Markovic (aleksandar-markovic)
-X-Launchpad-Bug-Modifier: =?utf-8?q?Alex_Benn=C3=A9e_=28ajbennee=29?=
-References: <159017301531.7966.9120113243897778171.malonedeb@gac.canonical.com>
- <87tuzp4zhx.fsf@linaro.org>
-Message-ID: <87k10l4xok.fsf@linaro.org>
-Subject: [Bug 1880225] Re: [PATCH v1 2/3] linux-user: deal with address wrap
- for ARM_COMMPAGE on 32 bit
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="ef9fc486e875d54078fa61cf91e898b895125d89";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: bed74dea52b3f87d6acfe9e57561dacb841c7296
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/05 04:10:55
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=cohuck@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/05 03:40:54
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -88,248 +93,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1880225 <1880225@bugs.launchpad.net>
+Cc: pair@us.ibm.com, brijesh.singh@amd.com, frankja@linux.ibm.com,
+ kvm@vger.kernel.org, "Michael
+ S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ Eduardo Habkost <ehabkost@redhat.com>, dgilbert@redhat.com,
+ Halil Pasic <pasic@linux.ibm.com>, qemu-ppc@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>, mdroth@linux.vnet.ibm.com,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20200605102459.JvmSILQ9cS2nZ1sXv7xpNF-YNM57-6I2W3FCXrBXyjc@z>
 
-Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
+On Thu, 21 May 2020 13:43:04 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-> Richard Henderson <richard.henderson@linaro.org> writes:
->
->> On 5/27/20 3:05 AM, Alex Benn=C3=A9e wrote:
->>> @@ -2145,7 +2145,7 @@ static uintptr_t pgd_find_hole_fallback(uintptr_t=
- guest_size, uintptr_t brk, lon
->>>  =
+> The default behaviour for virtio devices is not to use the platforms normal
+> DMA paths, but instead to use the fact that it's running in a hypervisor
+> to directly access guest memory.  That doesn't work if the guest's memory
+> is protected from hypervisor access, such as with AMD's SEV or POWER's PEF.
+> 
+> So, if a guest memory protection mechanism is enabled, then apply the
+> iommu_platform=on option so it will go through normal DMA mechanisms.
+> Those will presumably have some way of marking memory as shared with the
+> hypervisor or hardware so that DMA will work.
 
->>>  /* Return value for guest_base, or -1 if no hole found. */
->>>  static uintptr_t pgb_find_hole(uintptr_t guest_loaddr, uintptr_t guest=
-_size,
->>> -                               long align)
->>> +                               long align, uintptr_t offset)
->>>  {
->>>      GSList *maps, *iter;
->>>      uintptr_t this_start, this_end, next_start, brk;
->>> @@ -2171,7 +2171,7 @@ static uintptr_t pgb_find_hole(uintptr_t guest_lo=
-addr, uintptr_t guest_size,
->>>  =
+cc: Halil, who had been looking at the interaction of virtio-ccw
+devices and s390 protected virt.
 
->>>          this_end =3D ((MapInfo *)iter->data)->start;
->>>          next_start =3D ((MapInfo *)iter->data)->end;
->>> -        align_start =3D ROUND_UP(this_start, align);
->>> +        align_start =3D ROUND_UP(this_start + offset, align);
->>>  =
+(IIRC, we wanted to try with a on/off/auto property for virtio-ccw?)
 
->>>          /* Skip holes that are too small. */
->>
->> I suppose offset is supposed to mean we start from -offset?
->
-> Well guest_base will start higher meaning we have space for the
-> commpage beneath it.
->
->> You didn't update
->> pgb_find_hole_fallback.
->
-> Fixed.
->
->>
->>> -            loaddr =3D ARM_COMMPAGE & -align;
->>> +            offset =3D (128 * KiB);
->>
->> Why 128K?  Surely this should be an expression against ARM_COMMPAGE.
->
-> In theory:
->
->             offset =3D -(ARM_COMMPAGE & -align);
->
-> should do the trick but I found it failed every now and again.
-> Frustratingly putting printfs in made it go away so in frustration I
-> just upped the offset until it stopped happening.
->
-> I do kinda wish rr worked on i386 :-/
+> 
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
+>  hw/core/machine.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+> 
+> diff --git a/hw/core/machine.c b/hw/core/machine.c
+> index 88d699bceb..cb6580954e 100644
+> --- a/hw/core/machine.c
+> +++ b/hw/core/machine.c
+> @@ -28,6 +28,8 @@
+>  #include "hw/mem/nvdimm.h"
+>  #include "migration/vmstate.h"
+>  #include "exec/guest-memory-protection.h"
+> +#include "hw/virtio/virtio.h"
+> +#include "hw/virtio/virtio-pci.h"
+>  
+>  GlobalProperty hw_compat_5_0[] = {};
+>  const size_t hw_compat_5_0_len = G_N_ELEMENTS(hw_compat_5_0);
+> @@ -1159,6 +1161,15 @@ void machine_run_board_init(MachineState *machine)
+>           * areas.
+>           */
+>          machine_set_mem_merge(OBJECT(machine), false, &error_abort);
+> +
+> +        /*
+> +         * Virtio devices can't count on directly accessing guest
+> +         * memory, so they need iommu_platform=on to use normal DMA
+> +         * mechanisms.  That requires disabling legacy virtio support
+> +         * for virtio pci devices
+> +         */
+> +        object_register_sugar_prop(TYPE_VIRTIO_PCI, "disable-legacy", "on");
+> +        object_register_sugar_prop(TYPE_VIRTIO_DEVICE, "iommu_platform", "on");
+>      }
+>  
+>      machine_class->init(machine);
 
-Ahh all I needed was a MAP_FIXED for init_commpage
-
--- =
-
-Alex Benn=C3=A9e
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1880225
-
-Title:
-  Emulation of some arm programs fail with "Assertion `have_guest_base'
-  failed."
-
-Status in QEMU:
-  In Progress
-
-Bug description:
-  This issue is observer with QEMU ToT, checked out around May 15th (but
-  I believe it is present in current master too), and wasn't present in
-  QEMU v5.0.0.
-
-  I am using 32-bit Intel(R) Pentium(R) M processor 1.73GHz host.
-
-  Arm cross-compiler is a standard cross-compiler that comes with
-  Debian-based distributions, and gcc version is:
-
-  $ arm-linux-gnueabi-gcc --version
-  arm-linux-gnueabi-gcc (Debian 8.3.0-2) 8.3.0
-
-  Compile this program with cross compiler:
-
-  $ arm-linux-gnueabi-gcc -O2 -static toupper_string.c -o
-  toupper_string-arm
-
-  Emulation with QEMU v5.0.0 is correct, and gives expected output:
-
-  $ ~/Build/qemu-5.0.0/build-gcc/arm-linux-user/qemu-arm ./toupper_string-a=
-rm
-  CONTROL RESULT: (toupper_string)
-   nwlrbbmqbhcdarz owkkyhiddqscdxr jmowfrxsjybldbe fsarcbynecdyggx xpklorel=
-lnmpapq
-   NWLRBBMQBHCDARZ OWKKYHIDDQSCDXR JMOWFRXSJYBLDBE FSARCBYNECDYGGX XPKLOREL=
-LNMPAPQ
-
-  While, in case of QEMU master it fails:
-
-  $ ~/Build/qemu-master/build-gcc/arm-linux-user/qemu-arm ./toupper_string-=
-arm
-  qemu-arm: /home/rtrk/Build/qemu-master/linux-user/elfload.c:2294: probe_g=
-uest_base: Assertion `have_guest_base' failed.
-  Aborted
-
-  There are many other programs that exibit the same behavior. The
-  failure is arm-sprecific.
-
-  =
-
-  -----------------------------------------------------
-
-  source code: (let's call this file toupper_string.c) (similar file is
-  also in attachment)
-
-  =
-
-  #include <stdlib.h>
-  #include <string.h>
-  #include <stdio.h>
-  #include <unistd.h>
-
-  =
-
-  #define MAX_STRING_LENGHT              15
-  #define NUMBER_OF_RANDOM_STRINGS       100
-  #define DEFAULT_NUMBER_OF_REPETITIONS  30000
-  #define MAX_NUMBER_OF_REPETITIONS      1000000000
-  #define NUMBER_OF_CONTROL_PRINT_ITEMS  5
-
-  /* Structure for keeping an array of strings */
-  struct StringStruct {
-      char chars[MAX_STRING_LENGHT + 1];
-  };
-
-  /**
-   * Sets characters of the given string to random small letters a-z.
-   * @param s String to get random characters.
-   * @len Length of the input string.
-   */
-  static void gen_random_string(char *chars, const int len)
-  {
-      static const char letters[] =3D "abcdefghijklmnopqrstuvwxyz";
-
-      for (size_t i =3D 0; i < len; i++) {
-          chars[i] =3D letters[rand() % (sizeof(letters) - 1)];
-      }
-      chars[len] =3D 0;
-  }
-
-  void main (int argc, char* argv[])
-  {
-      struct StringStruct random_strings[NUMBER_OF_RANDOM_STRINGS];
-      struct StringStruct strings_to_be_uppercased[NUMBER_OF_RANDOM_STRINGS=
-];
-      int32_t number_of_repetitions =3D DEFAULT_NUMBER_OF_REPETITIONS;
-      int32_t option;
-
-      /* Parse command line options */
-      while ((option =3D getopt(argc, argv, "n:")) !=3D -1) {
-          if (option =3D=3D 'n') {
-              int32_t user_number_of_repetitions =3D atoi(optarg);
-              /* Check if the value is a negative number */
-              if (user_number_of_repetitions < 1) {
-                  fprintf(stderr, "Error ... Value for option '-n' cannot b=
-e a "
-                                  "negative number.\n");
-                  exit(EXIT_FAILURE);
-              }
-              /* Check if the value is a string or zero */
-              if (user_number_of_repetitions =3D=3D 0) {
-                  fprintf(stderr, "Error ... Invalid value for option '-n'.=
-\n");
-                  exit(EXIT_FAILURE);
-              }
-              /* Check if the value is too large */
-              if (user_number_of_repetitions > MAX_NUMBER_OF_REPETITIONS) {
-                  fprintf(stderr, "Error ... Value for option '-n' cannot b=
-e "
-                                  "more than %d.\n", MAX_NUMBER_OF_REPETITI=
-ONS);
-                  exit(EXIT_FAILURE);
-              }
-              number_of_repetitions =3D user_number_of_repetitions;
-          } else {
-              exit(EXIT_FAILURE);
-          }
-      }
-
-      /* Create an array of strings with random content */
-      srand(1);
-      for (size_t i =3D 0; i < NUMBER_OF_RANDOM_STRINGS; i++) {
-          gen_random_string(random_strings[i].chars, MAX_STRING_LENGHT);
-      }
-
-      /* Perform uppercasing of a set of random strings multiple times */
-      for (size_t j =3D 0; j < number_of_repetitions; j++) {
-          /* Copy initial set of random strings to the set to be uppercased=
- */
-          memcpy(strings_to_be_uppercased, random_strings,
-                 NUMBER_OF_RANDOM_STRINGS * (MAX_STRING_LENGHT + 1));
-          /* Do actual changing case to uppercase */
-          for (size_t i =3D 0; i < NUMBER_OF_RANDOM_STRINGS; i++) {
-              int k =3D 0;
-    =
-
-              while (strings_to_be_uppercased[i].chars[k]) { =
-
-                  char ch =3D strings_to_be_uppercased[i].chars[k] - 32; =
-
-                  memcpy((void *)strings_to_be_uppercased[i].chars + k,
-                         &ch, 1);
-                  k++; =
-
-              } =
-
-          }
-      }
-
-      /* Control printing */
-      printf("CONTROL RESULT: (toupper_string)\n");
-      for (size_t i =3D 0; i < NUMBER_OF_CONTROL_PRINT_ITEMS; i++) {
-          printf(" %s", random_strings[i].chars);
-      }
-      printf("\n");
-      for (size_t i =3D 0; i < NUMBER_OF_CONTROL_PRINT_ITEMS; i++) {
-          printf(" %s", strings_to_be_uppercased[i].chars);
-      }
-      printf("\n");
-  }
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1880225/+subscriptions
 
