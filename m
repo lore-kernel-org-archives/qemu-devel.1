@@ -2,72 +2,86 @@ Return-Path: <SRS0=hXcz=7S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4015C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 14:15:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76717C433E1
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 14:19:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8A285206A2
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 14:15:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A285206A2
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 46199208B6
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 14:19:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hvoyLSAI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46199208B6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59092 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35994 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jhD7f-0000Qa-RR
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 10:15:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45904)
+	id 1jhDBh-00033o-EO
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 10:19:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46338)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jhD6u-0008DQ-9d; Fri, 05 Jun 2020 10:14:16 -0400
-Resent-Date: Fri, 05 Jun 2020 10:14:16 -0400
-Resent-Message-Id: <E1jhD6u-0008DQ-9d@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21720)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jhDAl-0002QN-Is
+ for qemu-devel@nongnu.org; Fri, 05 Jun 2020 10:18:15 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44340
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jhD6s-0006bE-OP; Fri, 05 Jun 2020 10:14:16 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1591366441; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=ByAsovTp0sIXwPVjT8a9VTIKTpxtOMUkHTYqrWr29W6icQCICDGEKnH7cpXHrsdNJUHGOoSGSQLqti/aG7aWafyuRvSh6BMzMOJ+vx7C6+6m7P2yDvEkGx7gHlIsL6HIFM0ijuU3DzM9U1DV2AA2Eh0UvBlfbCj7VrjCSIi335Y=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1591366441;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=PEcq/qA4lKV8IOXBJ8uL1BgX4pIo7M+Vczsb1aeYqNw=; 
- b=TRFDPfQfO4QpO9hANCpOtXXUUEcCheKJ51Q0tWWfkLoLfjyoRt63XPXUxbCAAfqf98kZDUE3Jq32yYMqdKwnkP2toxSd2JkQ02A0ZViaNWecKKrC/3aBEwfE923V2ESo2NfWcQ6D9RBQcJyvCk7QhYTKm8lvsfP0OEluGHqb6+A=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1591366439029203.00485576784683;
- Fri, 5 Jun 2020 07:13:59 -0700 (PDT)
-Message-ID: <159136643739.19958.13985958610010649749@45ef0f9c86ae>
-In-Reply-To: <20200605121342.534811-1-imammedo@redhat.com>
-Subject: Re: [PATCH v2] numa: forbid '-numa node,
- mem' for 5.1 and newer machine types
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jhDAk-0007Fi-U1
+ for qemu-devel@nongnu.org; Fri, 05 Jun 2020 10:18:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591366694;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=xtE8xC5ULETdc3BCEJwkWRw/hYF2JYwSR9w4Tbb07vA=;
+ b=hvoyLSAIBkc6v7OlQ1kmgNEW5ghVvhUB2Vg00aMAFL2pl4XilTE428kQMD4FSFETzCqfxZ
+ PHjXOtVUsZYz2mzBcfEXi7Lk5D8xoGbN6KEbZ8ZOM9Up9XIoHsjdt8P68JzjAPDt2qUkmI
+ a4It8p2QSU9jBha374WQj4D6AmbCUPM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-463-6t3sK9N2PHO4pJwEV6UT5w-1; Fri, 05 Jun 2020 10:18:10 -0400
+X-MC-Unique: 6t3sK9N2PHO4pJwEV6UT5w-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 39B47A0C02;
+ Fri,  5 Jun 2020 14:18:09 +0000 (UTC)
+Received: from gondolin (ovpn-113-2.ams2.redhat.com [10.36.113.2])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 44FB160C1C;
+ Fri,  5 Jun 2020 14:18:04 +0000 (UTC)
+Date: Fri, 5 Jun 2020 16:18:01 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v2 0/7] exec/cpu: Cleanups around "exec/hwaddr.h"
+ (reserved to system-mode)
+Message-ID: <20200605161801.4bba0d0e.cohuck@redhat.com>
+In-Reply-To: <525ebf16-1265-e403-54b6-e1168d84e4f4@redhat.com>
+References: <20200526172427.17460-1-f4bug@amsat.org>
+ <525ebf16-1265-e403-54b6-e1168d84e4f4@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: imammedo@redhat.com
-Date: Fri, 5 Jun 2020 07:13:59 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/05 10:11:01
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=cohuck@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/05 03:07:04
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -80,59 +94,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, ehabkost@redhat.com, mst@redhat.com,
- libvir-list@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
- qemu-ppc@nongnu.org, pbonzini@redhat.com, rth@twiddle.net,
- david@gibson.dropbear.id.au
+Cc: David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org,
+ Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org, Roman Bolshakov <r.bolshakov@yadro.com>,
+ qemu-ppc@nongnu.org, Richard Henderson <rth@twiddle.net>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDYwNTEyMTM0Mi41MzQ4
-MTEtMS1pbWFtbWVkb0ByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUg
-ZG9ja2VyLW1pbmd3QGZlZG9yYSBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBj
-b21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFs
-bGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NS
-SVBUIEJFR0lOID09PQojISAvYmluL2Jhc2gKZXhwb3J0IEFSQ0g9eDg2XzY0Cm1ha2UgZG9ja2Vy
-LWltYWdlLWZlZG9yYSBWPTEgTkVUV09SSz0xCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1taW5nd0Bm
-ZWRvcmEgSj0xNCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCiAgQ0MgICAgICBo
-dy9kaXNwbGF5L2VkaWQtZ2VuZXJhdGUubwogIENDICAgICAgYmxvY2tkZXYubwoKV2FybmluZywg
-dHJlYXRlZCBhcyBlcnJvcjoKL3RtcC9xZW11LXRlc3Qvc3JjL2RvY3Mvc3lzdGVtL2RlcHJlY2F0
-ZWQucnN0OjUwNzpUaXRsZSB1bmRlcmxpbmUgdG9vIHNob3J0LgoKYGAtbnVtYSBub2RlLG1lbT1g
-YFwgKnNpemUqIChyZW1vdmVkIGluIDUuMSkKLS0tCiAgQ0MgICAgICBqb2ItcW1wLm8KICBDQyAg
-ICAgIG9zLXdpbjMyLm8KCldhcm5pbmcsIHRyZWF0ZWQgYXMgZXJyb3I6Ci90bXAvcWVtdS10ZXN0
-L3NyYy9kb2NzL3N5c3RlbS9kZXByZWNhdGVkLnJzdDo1MDc6VGl0bGUgdW5kZXJsaW5lIHRvbyBz
-aG9ydC4KCmBgLW51bWEgbm9kZSxtZW09YGBcICpzaXplKiAocmVtb3ZlZCBpbiA1LjEpCi0tLQog
-IENDICAgICAgcWFwaS9xYXBpLWNvbW1hbmRzLWNyeXB0by5vCiAgQ0MgICAgICBxYXBpL3FhcGkt
-Y29tbWFuZHMtaW50cm9zcGVjdC5vCiAgQ0MgICAgICBxYXBpL3FhcGktY29tbWFuZHMtam9iLm8K
-bWFrZTogKioqIFtNYWtlZmlsZToxMTE0OiAuZG9jc19zeXN0ZW1fcWVtdS4xX2RvY3Nfc3lzdGVt
-X3FlbXUtYmxvY2stZHJpdmVycy43X2RvY3Nfc3lzdGVtX3FlbXUtY3B1LW1vZGVscy43LnNlbnRp
-bmVsLl0gRXJyb3IgMgptYWtlOiAqKiogRGVsZXRpbmcgZmlsZSAnLmRvY3Nfc3lzdGVtX3FlbXUu
-MV9kb2NzX3N5c3RlbV9xZW11LWJsb2NrLWRyaXZlcnMuN19kb2NzX3N5c3RlbV9xZW11LWNwdS1t
-b2RlbHMuNy5zZW50aW5lbC4nCm1ha2U6ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMu
-Li4uCm1ha2U6ICoqKiBbTWFrZWZpbGU6MTEwMzogZG9jcy9zeXN0ZW0vaW5kZXguaHRtbF0gRXJy
-b3IgMgpUcmFjZWJhY2sgKG1vc3QgcmVjZW50IGNhbGwgbGFzdCk6CiAgRmlsZSAiLi90ZXN0cy9k
-b2NrZXIvZG9ja2VyLnB5IiwgbGluZSA2NjUsIGluIDxtb2R1bGU+CiAgICBzeXMuZXhpdChtYWlu
-KCkpCi0tLQogICAgcmFpc2UgQ2FsbGVkUHJvY2Vzc0Vycm9yKHJldGNvZGUsIGNtZCkKc3VicHJv
-Y2Vzcy5DYWxsZWRQcm9jZXNzRXJyb3I6IENvbW1hbmQgJ1snc3VkbycsICctbicsICdkb2NrZXIn
-LCAncnVuJywgJy0tbGFiZWwnLCAnY29tLnFlbXUuaW5zdGFuY2UudXVpZD03NGVmODVmZDQ5YWY0
-NjY5OTlkOGRlMjQzOGNjMDE3NycsICctdScsICcxMDAzJywgJy0tc2VjdXJpdHktb3B0JywgJ3Nl
-Y2NvbXA9dW5jb25maW5lZCcsICctLXJtJywgJy1lJywgJ1RBUkdFVF9MSVNUPScsICctZScsICdF
-WFRSQV9DT05GSUdVUkVfT1BUUz0nLCAnLWUnLCAnVj0nLCAnLWUnLCAnSj0xNCcsICctZScsICdE
-RUJVRz0nLCAnLWUnLCAnU0hPV19FTlY9JywgJy1lJywgJ0NDQUNIRV9ESVI9L3Zhci90bXAvY2Nh
-Y2hlJywgJy12JywgJy9ob21lL3BhdGNoZXcyLy5jYWNoZS9xZW11LWRvY2tlci1jY2FjaGU6L3Zh
-ci90bXAvY2NhY2hlOnonLCAnLXYnLCAnL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLW1sazJo
-amxlL3NyYy9kb2NrZXItc3JjLjIwMjAtMDYtMDUtMTAuMTEuMzUuMjUyNjA6L3Zhci90bXAvcWVt
-dTp6LHJvJywgJ3FlbXU6ZmVkb3JhJywgJy92YXIvdG1wL3FlbXUvcnVuJywgJ3Rlc3QtbWluZ3cn
-XScgcmV0dXJuZWQgbm9uLXplcm8gZXhpdCBzdGF0dXMgMi4KZmlsdGVyPS0tZmlsdGVyPWxhYmVs
-PWNvbS5xZW11Lmluc3RhbmNlLnV1aWQ9NzRlZjg1ZmQ0OWFmNDY2OTk5ZDhkZTI0MzhjYzAxNzcK
-bWFrZVsxXTogKioqIFtkb2NrZXItcnVuXSBFcnJvciAxCm1ha2VbMV06IExlYXZpbmcgZGlyZWN0
-b3J5IGAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtbWxrMmhqbGUvc3JjJwptYWtlOiAqKiog
-W2RvY2tlci1ydW4tdGVzdC1taW5nd0BmZWRvcmFdIEVycm9yIDIKCnJlYWwgICAgMm0yMi45NDBz
-CnVzZXIgICAgMG04LjAwMnMKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9w
-YXRjaGV3Lm9yZy9sb2dzLzIwMjAwNjA1MTIxMzQyLjUzNDgxMS0xLWltYW1tZWRvQHJlZGhhdC5j
-b20vdGVzdGluZy5kb2NrZXItbWluZ3dAZmVkb3JhLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBn
-ZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10u
-ClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On Thu, 4 Jun 2020 20:11:38 +0200
+Paolo Bonzini <pbonzini@redhat.com> wrote:
+
+> On 26/05/20 19:24, Philippe Mathieu-Daud=C3=A9 wrote:
+> > The 'hwaddr' type declared in "exec/hwaddr.h" is meant for
+> > system-mode emulation only.
+> > This series is a preparatory cleanup to allow later poisoning
+> > it in user-mode code.
+> >=20
+> > Missing review: patche 7
+> > - target/s390x: Restrict system-mode declarations
+> >=20
+> > Maybe PPC/S390X maintainers can take their patches and let
+> > the rest to Paolo, or he can take all the series. They are
+> > not dependents.
+> >=20
+> > Since v1:
+> > - Do not poison hwaddr type
+> > - Addressed Cornelia & David review comments
+> > - Added R-b/A-b
+> >=20
+> > $ git backport-diff -u v1
+> > Key:
+> > [----] : patches are identical
+> > [####] : number of functional differences between upstream/downstream p=
+atch
+> > [down] : patch is downstream-only
+> > The flags [FC] indicate (F)unctional and (C)ontextual differences, resp=
+ectively
+> >=20
+> > 001/7:[----] [--] 'sysemu/accel: Restrict machine methods to system-mod=
+e'
+> > 002/7:[----] [--] 'sysemu/tcg: Only declare tcg_allowed when TCG is ava=
+ilable'
+> > 003/7:[----] [--] 'sysemu/hvf: Only declare hvf_allowed when HVF is ava=
+ilable'
+> > 004/7:[----] [--] 'target/ppc: Restrict PPCVirtualHypervisorClass to sy=
+stem-mode'
+> > 005/7:[----] [--] 'target/s390x: Only compile decode_basedisp() on syst=
+em-mode'
+> > 006/7:[0002] [FC] 'target/s390x/helper: Clean ifdef'ry'
+> > 007/7:[0005] [FC] 'target/s390x: Restrict system-mode declarations'
+> >=20
+> > Supersedes: <20200509130910.26335-1-f4bug@amsat.org>
+> >=20
+> > Philippe Mathieu-Daud=C3=A9 (7):
+> >   sysemu/accel: Restrict machine methods to system-mode
+> >   sysemu/tcg: Only declare tcg_allowed when TCG is available
+> >   sysemu/hvf: Only declare hvf_allowed when HVF is available
+> >   target/ppc: Restrict PPCVirtualHypervisorClass to system-mode
+> >   target/s390x: Only compile decode_basedisp() on system-mode
+> >   target/s390x/helper: Clean ifdef'ry
+> >   target/s390x: Restrict system-mode declarations
+> >=20
+> >  include/sysemu/accel.h          |  2 ++
+> >  include/sysemu/hvf.h            |  6 +++---
+> >  include/sysemu/tcg.h            |  2 +-
+> >  target/ppc/cpu.h                |  4 ++--
+> >  target/ppc/kvm_ppc.h            | 22 +++++++++++-----------
+> >  target/s390x/internal.h         | 16 +++++++++++-----
+> >  target/ppc/translate_init.inc.c |  4 ++++
+> >  target/s390x/helper.c           |  5 -----
+> >  8 files changed, 34 insertions(+), 27 deletions(-)
+> >  =20
+>=20
+> Queued all, thanks.
+
+So, I guess I should unqueue patch 5-7 from s390-next again?
+
+>=20
+> Paolo
+>=20
+
 
