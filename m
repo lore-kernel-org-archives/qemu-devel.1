@@ -6,64 +6,63 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDB4AC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 11:56:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A93BC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 11:56:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C642320659
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 11:56:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C642320659
+	by mail.kernel.org (Postfix) with ESMTPS id E443B20659
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 11:56:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E443B20659
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40490 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42178 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jhAx9-0008VA-0e
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 07:56:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54860)
+	id 1jhAxT-0000kx-6r
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 07:56:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54894)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jhAok-0008Jt-MY
- for qemu-devel@nongnu.org; Fri, 05 Jun 2020 07:47:24 -0400
-Received: from mout.kundenserver.de ([212.227.17.13]:58457)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jhAop-0008QG-LW
+ for qemu-devel@nongnu.org; Fri, 05 Jun 2020 07:47:33 -0400
+Received: from mout.kundenserver.de ([217.72.192.73]:51925)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jhAoj-0006ld-Bo
- for qemu-devel@nongnu.org; Fri, 05 Jun 2020 07:47:22 -0400
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jhAoo-0006n3-P3
+ for qemu-devel@nongnu.org; Fri, 05 Jun 2020 07:47:27 -0400
 Received: from localhost.localdomain ([82.252.135.106]) by
  mrelayeu.kundenserver.de (mreue106 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1MnItm-1jHyx51YLE-00jHXv; Fri, 05 Jun 2020 13:47:15 +0200
+ id 1MwPjf-1irxjw3h4v-00sOFW; Fri, 05 Jun 2020 13:47:14 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 17/19] target/s390x: Restrict CpuClass::get_crash_info() to
- system-mode
-Date: Fri,  5 Jun 2020 13:46:58 +0200
-Message-Id: <20200605114700.1052050-18-laurent@vivier.eu>
+Subject: [PULL 15/19] arch_init: Remove unused 'qapi-commands-misc.h' include
+Date: Fri,  5 Jun 2020 13:46:56 +0200
+Message-Id: <20200605114700.1052050-16-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200605114700.1052050-1-laurent@vivier.eu>
 References: <20200605114700.1052050-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:j05KdHmdCVgMP8p1kUx62yWEaDCFPR+YNFkE+3yH5fYYGyLFBAR
- HuogOPZIKXX3g+D0Wlq9waEj1N2YUVqHUqMAXVhaxzOArWVe2FZh1V1yfQbRwuVimYNRF9Y
- NMLlDc2SlL4lossZ55UO1ML4y5gd5hzXl4yvV1KEMg36OQ0ObDvwXbtzSjqABfXmReiowV4
- fcoIOoUePNLSFiu/vg8Og==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:JB7nqQ54VMU=:tZXkYWHTfvlaC6e6UErCXs
- WaAeDdUtNvcHjUP5rF7Pu1AMUgP5oZyJaeVWza9DZtEfP4PGFkspv1PzVwOKyqYaq7qTNWbS7
- GBSoaBKc9N4jzgLdgARXwPvY6lR/Ir/iss1jkadnQKzlMWrCvq9Pg5jbuERn+Wb4ZV6L4cVhX
- nBb8oOv1Mg0nSgg+4XmXRJSzIkVSvASG+zLL/hWBbo/cR6riYQaNpvuhvztrGaeinlMDaxh3g
- QnJNShwQ4XTIW/HvXQhFRW4DFqnb1gEp4I6oU0h2X8gcACnvhzWzqKzZvvSxigmO83o6SCFAV
- s+9/uZ6IzbId/U6lCO21HcTQSGi3VEUKtPsQFYCuD+rwkxXn8ELG2ZDvVuc0+TI5GJaMGPAhv
- hSMW8e7p0NaNiOGXTouAA1QEhdvnGZhuMxRcicWuitrxpnKAuiyr2xWh4hCaHygt93C3oVODe
- NguJlJbKeCQWe3DhShEHZLPXEqtnalLykDy8yrKw7jhL5p5lpudLiRr8TKgpwnVQVUj+H6aon
- 7QN0YKfI+2uapIX+qadYbb4BBBdfZwl5MyKhcTyPd7pRDy8BA1NgpQWYBFzpadkFBxHmeHZv3
- Q5+URJqQYI9fid23QWXpDwxiumu8VWKrf/gbCQm1rG2L7SzbFApdeAXK4+LR/A/qilLl2VhC6
- +81n0Cwzi+KXc7HWMvSERYOHAN8zAbTPLcYvw2Kf6nlLNyKeIiQsICxu0wHn7ptc1lIPz4/Jk
- OSV+Ozkj3sOJAGaW2Wk77haUaywQScCtJXdOnltbSZpemhlgx5vffl/Lp1xXBwFZWFuePxtdZ
- uw22/3/+qn4+o0NWbE77n3qyB75E7gib+R2hm+i2ScTTMqskKkwnDgiaocP5/WDE9DPGg7K
-Received-SPF: none client-ip=212.227.17.13; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:q7m76VL6Z1ABHzLX5U2AnBtPkTr5HEvLjtuX/ahHDj7T70wcjvc
+ Va4A10cEFQxtWFsZKFx7ZmsdjOw7/EcRKBQLPPs9Ll+a554whW/mmyCVyNhlxGM1jjS4uRV
+ IegJnzXQ+vRdysYBPmPZ9/fCcoSIzTc/NfVRl11rb3k9Muj61QG9jKQdcset7kcmtqvVJPM
+ lRqpuPAQ73UORNFytC4Vw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:YxWxEstQVpc=:J3CVIuToeBPHcQ5lDXBDVz
+ g3tKoDiC31FUa0WIbwp35coh6tkQmySQAk/E/e6pcGxpB4djf8E+MDnvaLVsygN0UZu4HQyBK
+ SXY3WMBM+Ow+FMz6OtmTwdWRQfpA1zg7S+UIo+pDRWSpK6JYmX/yUSeEwXz45/WKv0L4P37b5
+ +Be1/Bkom/oRWfLiqZzhL0m5I/q8glZeYd0eOD2fozDrPg6GAhWI4xMWD01BthHfTWnHLKcx9
+ k6eVdskmdrNgGn3ZVK40VXTNr0uk5P4dxuU4obHP6zAS7FLaUFQFS5TVIhPGVppjZHutle3kL
+ BSJN/QtIo5oiZG5K/gpzG9iAovw0FVY2xVayRTcbIpdbfynwWN+h1mCglwgwRw5utEfW3rA+V
+ kH7FZAOB9tRdovoJiRfsvZ2VDv+9ZTQAWeLlKPOtZE2MEZ+Ra5UJbX9Ofmva9THFNh9wwBgQ3
+ M+swiwtqSu4/tLY23k3E7yCoDUTHRu4V8eYMhkJev7qmwCVtsTgP9hcGmpv40DPeZZpAK/cjY
+ AXixCHb0lSpq8oSxgJkH3ww2FU+EyecjFTWJbzzaSMOrOR0c1HuX4RQsF6cM7/sD1AevpWC8l
+ QJk+Fsqo2ZvyFZVF3o6qNN554dJrTyfNHvfuqLHdHuxK5cOto9hTjAvL9onkzKRzQtTiEEwpv
+ q4r9ed5YR9Fb3W/WP0xITncGECpPkLZMNswV3JLJK+t/l73S4cC5DaG1wtLRVYHedPnteKPR1
+ c2xHsqKgLQ/Zt6E9B5YaiyfNlxkZ7BkDjat2hbHAC7+ttHyQO53/z8z+ZmMOfj6g5cC+nSODh
+ K9OsCy0j9RatiJmLsro9qSpfPA+xfDLzBOsJe4zK+MMUw4SC9T/YTyjI2TiFx9B+Xk0bBCd
+Received-SPF: none client-ip=217.72.192.73; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/05 07:47:20
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/05 07:27:03
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
@@ -82,93 +81,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
+Cc: Alistair Francis <alistair.francis@wdc.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
  Riku Voipio <riku.voipio@iki.fi>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Laurent Vivier <laurent@vivier.eu>, Cornelia Huck <cohuck@redhat.com>
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
+Commit ffaee83bcb2 moved qmp_query_target but forgot to remove
+this include.
+
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 Tested-by: Laurent Vivier <laurent@vivier.eu>
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20200522172510.25784-12-philmd@redhat.com>
+Message-Id: <20200522172510.25784-10-philmd@redhat.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- target/s390x/cpu.c | 12 +++++-------
- 1 file changed, 5 insertions(+), 7 deletions(-)
+ arch_init.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-index ca50b7045198..08eb674d22b4 100644
---- a/target/s390x/cpu.c
-+++ b/target/s390x/cpu.c
-@@ -247,6 +247,7 @@ out:
-     error_propagate(errp, err);
- }
- 
-+#if !defined(CONFIG_USER_ONLY)
- static GuestPanicInformation *s390_cpu_get_crash_info(CPUState *cs)
- {
-     GuestPanicInformation *panic_info;
-@@ -256,11 +257,7 @@ static GuestPanicInformation *s390_cpu_get_crash_info(CPUState *cs)
-     panic_info = g_malloc0(sizeof(GuestPanicInformation));
- 
-     panic_info->type = GUEST_PANIC_INFORMATION_TYPE_S390;
--#if !defined(CONFIG_USER_ONLY)
-     panic_info->u.s390.core = cpu->env.core_id;
--#else
--    panic_info->u.s390.core = 0; /* sane default for non system emulation */
--#endif
-     panic_info->u.s390.psw_mask = cpu->env.psw.mask;
-     panic_info->u.s390.psw_addr = cpu->env.psw.addr;
-     panic_info->u.s390.reason = cpu->env.crash_reason;
-@@ -286,6 +283,7 @@ static void s390_cpu_get_crash_info_qom(Object *obj, Visitor *v,
-                                      errp);
-     qapi_free_GuestPanicInformation(panic_info);
- }
-+#endif
- 
- static void s390_cpu_initfn(Object *obj)
- {
-@@ -295,16 +293,16 @@ static void s390_cpu_initfn(Object *obj)
-     cpu_set_cpustate_pointers(cpu);
-     cs->halted = 1;
-     cs->exception_index = EXCP_HLT;
-+#if !defined(CONFIG_USER_ONLY)
-     object_property_add(obj, "crash-information", "GuestPanicInformation",
-                         s390_cpu_get_crash_info_qom, NULL, NULL, NULL);
--    s390_cpu_model_register_props(obj);
--#if !defined(CONFIG_USER_ONLY)
-     cpu->env.tod_timer =
-         timer_new_ns(QEMU_CLOCK_VIRTUAL, s390x_tod_timer, cpu);
-     cpu->env.cpu_timer =
-         timer_new_ns(QEMU_CLOCK_VIRTUAL, s390x_cpu_timer, cpu);
-     s390_cpu_set_state(S390_CPU_STATE_STOPPED, cpu);
- #endif
-+    s390_cpu_model_register_props(obj);
- }
- 
- static void s390_cpu_finalize(Object *obj)
-@@ -488,13 +486,13 @@ static void s390_cpu_class_init(ObjectClass *oc, void *data)
-     cc->do_interrupt = s390_cpu_do_interrupt;
- #endif
-     cc->dump_state = s390_cpu_dump_state;
--    cc->get_crash_info = s390_cpu_get_crash_info;
-     cc->set_pc = s390_cpu_set_pc;
-     cc->gdb_read_register = s390_cpu_gdb_read_register;
-     cc->gdb_write_register = s390_cpu_gdb_write_register;
- #ifndef CONFIG_USER_ONLY
-     cc->get_phys_page_debug = s390_cpu_get_phys_page_debug;
-     cc->vmsd = &vmstate_s390_cpu;
-+    cc->get_crash_info = s390_cpu_get_crash_info;
-     cc->write_elf64_note = s390_cpu_write_elf64_note;
- #ifdef CONFIG_TCG
-     cc->cpu_exec_interrupt = s390_cpu_exec_interrupt;
+diff --git a/arch_init.c b/arch_init.c
+index d9eb0ec1dd03..8afea4748bad 100644
+--- a/arch_init.c
++++ b/arch_init.c
+@@ -27,7 +27,6 @@
+ #include "sysemu/arch_init.h"
+ #include "hw/pci/pci.h"
+ #include "hw/audio/soundhw.h"
+-#include "qapi/qapi-commands-misc.h"
+ #include "qapi/error.h"
+ #include "qemu/config-file.h"
+ #include "qemu/error-report.h"
 -- 
 2.26.2
 
