@@ -2,96 +2,95 @@ Return-Path: <SRS0=hXcz=7S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04A1DC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 17:55:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98E96C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 17:57:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C397E2065C
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 17:55:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 63EC42074B
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 17:57:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="I49mYqsf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C397E2065C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YOFyqatr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63EC42074B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53172 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56096 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jhGYx-00024Z-3t
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 13:55:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50058)
+	id 1jhGas-0003Un-Lx
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 13:57:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50338)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jhGY6-0001ND-Hi
- for qemu-devel@nongnu.org; Fri, 05 Jun 2020 13:54:34 -0400
-Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:54317)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jhGZq-0002jm-6g
+ for qemu-devel@nongnu.org; Fri, 05 Jun 2020 13:56:22 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:53091)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jhGY5-0007IR-PW
- for qemu-devel@nongnu.org; Fri, 05 Jun 2020 13:54:34 -0400
-Received: by mail-pj1-x1044.google.com with SMTP id nm22so2979247pjb.4
- for <qemu-devel@nongnu.org>; Fri, 05 Jun 2020 10:54:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jhGZn-0007oC-M2
+ for qemu-devel@nongnu.org; Fri, 05 Jun 2020 13:56:21 -0400
+Received: by mail-wm1-x341.google.com with SMTP id r9so9210124wmh.2
+ for <qemu-devel@nongnu.org>; Fri, 05 Jun 2020 10:56:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=1fWWlCHxNNamvAiXSBO3D0fMPSUezKve2Rs84fD+14E=;
- b=I49mYqsfbYRms3npymGakgoXyzsggxYsHn1VPSM1PFoJUMcNFnD5kdIRTk5pK/5TJO
- /1tzZ81Fa6NJXiOeFf9XatRbc486nXc/0gqUJBElP3O4NkS/3WH/k/Suj7FSBwoLXOHu
- 727cF6WBXZHOCV7kOPzoZ3D1N9MTY8C3r5HJkZ8p1+AYr0W/WrxbrLd6bhhYXLJtJHDb
- //x4JLnIAKVrPL5As4eNbMMB+S538ProX2L3xu+zQkQ+lsn2FhvLtjrP9OHPalHF1B2E
- UF4LER/b2yKNHcUtvQdRvaVfWaxNek7lta/wumYD2za5Rl39ouks9IqWWWb2V032zP9g
- e7Jw==
+ bh=hA2bb/ztpfia+e4bKF7OYX05131KiAfowRYEFh4yCqU=;
+ b=YOFyqatrpl7ZgZB9vWDny5EmISvmyghZ+Unniuu+sc2KgvM+o82MwIMXmSjkCAMBVK
+ AqC+QfKOK0sET6AES3pt4GpqIIIwN+g8VI1FBNRF6qj8tHd9NdlevcgSQslsMWJvRrN6
+ dOMEF0949LT2QCa+1GzJn97A/CMN06NOiuHubWKmj8yDCFio55HZw9klw3KDSpm2g17n
+ NgV1zqJtg0Wn2gL1VLQNeWLwu8E1XJKQRoVMKlbDAg90wyt/+UEmgsu8thp8T3+uniI3
+ S37z6fQ8w8jHlE4oThkmJu+I81BN4LRQG6TF4vt3KK/kbGGwcWslwx+q+NcdxmjlRzw2
+ 6MLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=1fWWlCHxNNamvAiXSBO3D0fMPSUezKve2Rs84fD+14E=;
- b=TOwfq3gzUHcKpu0Bycr8bJChzXk40k4l8U/yLYBwkSybvhdK/vnSyC9yYcQvSZ5h2z
- irU1xL65CEqZvenOPdFj2vZkhdIU/Jm4E/xS+/ti8IN7lF6W2pmerM5n88BfDfoSrbsm
- Hf1CWTvBvGhVO90X2Wfz5x6RKQO/VdfZpgWMSxwqDpbUOc/oiPiB3PtAHaH4OF8SEx+G
- LzzqM22qfvuLSuDL3vx159mmJvTGkJcGop69T2rST23p1FofdKza1DeSV/DELwvgAkLp
- J+gOP57Mk1RJaMIml6VTWieAZnTLmJ7r3aEJ1SwHe293Y2ZKct3KJQi2Dqc0vkSh2b6p
- y2RQ==
-X-Gm-Message-State: AOAM532YSk+TY1jADu+gxi+dzz9BYzslRcZK0+CyYFjJIdMulHjHRd2m
- 4632QREs7I7MyvmLjroePLiBOQ==
-X-Google-Smtp-Source: ABdhPJyYHCrN/kXy0dUyNRObLQuvzqXZ5ZZaFsTmtDkOikIRiqy5f3+vULrp03LYh6lovschyHw3CA==
-X-Received: by 2002:a17:902:7281:: with SMTP id
- d1mr11231627pll.78.1591379672173; 
- Fri, 05 Jun 2020 10:54:32 -0700 (PDT)
-Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id 12sm249593pfb.3.2020.06.05.10.54.30
+ bh=hA2bb/ztpfia+e4bKF7OYX05131KiAfowRYEFh4yCqU=;
+ b=hYdJPNorBdM0ouk5QAGYGlDE6QMOJD3T53NzgQaoRFozdll3ayeNwEbP/T1QXH7I7S
+ k66VkEj622MOhILrfb4lQtpEr74j/AYVzmKQP1Zr/VzrozGFw0Ze9Su6yRJbr+ouRs3A
+ luGcJUCIGdO/JewTRaYtpB6O9cVWQyditXC4vecAjWEq3dHwBoCol10JOZme+Grl4oIE
+ fC7C3Ntu3fUo+h0bSWpX39ryX1aNFot1c68mgsslhh9e5n9BijNOZVQYpdHhZK8JfuiA
+ FZ3supnF2UMdp5yqX44CqK5XQfbTSde7vk56Im+YwF6P5F7PCbIICzfB6ArAgeG7xIef
+ XlWw==
+X-Gm-Message-State: AOAM532oZhB0YvL3O62C4uSdd2DtuilU5rHf2A5iH+rYhWAnO01TODuX
+ 3IkWblhxayc48RBNfFOkdYQ=
+X-Google-Smtp-Source: ABdhPJzjSjiHhGYXK6SViTELfp4YlYyoRkG3aCzsvekDNLhY9rxZKPKgpQUKPbT250Bu6REy88/OOw==
+X-Received: by 2002:a1c:a943:: with SMTP id s64mr3765714wme.103.1591379777374; 
+ Fri, 05 Jun 2020 10:56:17 -0700 (PDT)
+Received: from [192.168.1.43] (181.red-88-10-103.dynamicip.rima-tde.net.
+ [88.10.103.181])
+ by smtp.gmail.com with ESMTPSA id q1sm11692848wmc.15.2020.06.05.10.56.16
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 05 Jun 2020 10:54:31 -0700 (PDT)
-Subject: Re: [PATCH v2 04/17] target/riscv: Implement checks for hfence
-To: Alistair Francis <alistair.francis@wdc.com>, qemu-devel@nongnu.org,
- qemu-riscv@nongnu.org
-References: <cover.1591319882.git.alistair@alistair23.me>
- <c78f245c8d1629f1bce1387ba623a0215767f804.1591319882.git.alistair@alistair23.me>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <b714c7ba-802b-142f-6795-9c0227d3a462@linaro.org>
-Date: Fri, 5 Jun 2020 10:54:29 -0700
+ Fri, 05 Jun 2020 10:56:16 -0700 (PDT)
+Subject: Re: [PATCH] fuzz: add oss-fuzz build.sh script
+To: Alexander Bulekov <alxndr@bu.edu>, qemu-devel@nongnu.org
+References: <20200605174036.4527-1-alxndr@bu.edu>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <83f59cb5-2282-aeba-5116-a3e18be101a7@amsat.org>
+Date: Fri, 5 Jun 2020 19:56:15 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <c78f245c8d1629f1bce1387ba623a0215767f804.1591319882.git.alistair@alistair23.me>
+In-Reply-To: <20200605174036.4527-1-alxndr@bu.edu>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1044;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1044.google.com
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+X-Spam_score_int: -16
+X-Spam_score: -1.7
+X-Spam_bar: -
+X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
@@ -106,26 +105,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: palmer@dabbelt.com, anup.pate@wdc.com, alistair23@gmail.com
+Cc: darren.kenny@oracle.com, bsd@redhat.com, stefanha@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/4/20 6:20 PM, Alistair Francis wrote:
-> Call the helper_hyp_tlb_flush() function on hfence instructions which
-> will generate an illegal insruction execption if we don't have
-> permission to flush the Hypervisor level TLBs.
+On 6/5/20 7:40 PM, Alexander Bulekov wrote:
+> It is neater to keep this in the QEMU repo, since any change that
+> requires an update to the oss-fuzz build configuration, can make the
+> necessary changes in the same series.
 > 
-> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> Suggested-by: Philippe Mathieu-Daude <f4bug@amsat.org>
+
+'Philippe Mathieu-Daudé' ;)
+
+> Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
 > ---
->  target/riscv/helper.h                   |  5 ++++
->  target/riscv/insn_trans/trans_rvh.inc.c | 32 +++++--------------------
->  target/riscv/op_helper.c                | 13 ++++++++++
->  3 files changed, 24 insertions(+), 26 deletions(-)
+>  scripts/oss-fuzz/build.sh | 47 +++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 47 insertions(+)
+>  create mode 100755 scripts/oss-fuzz/build.sh
+> 
+> diff --git a/scripts/oss-fuzz/build.sh b/scripts/oss-fuzz/build.sh
+> new file mode 100755
+> index 0000000000..7be6dcce4c
+> --- /dev/null
+> +++ b/scripts/oss-fuzz/build.sh
+> @@ -0,0 +1,47 @@
+> +#!/bin/sh
+> +#
+> +# Update syscall_nr.h files from linux headers asm-generic/unistd.h
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Hmmm?
 
+> +#
+> +# This code is licensed under the GPL version 2 or later.  See
+> +# the COPYING file in the top-level directory.
+> +#
+> +
+> +# build project
 
-r~
+Please mention this file use consumed by
+https://github.com/google/oss-fuzz/.../projects/qemu/Dockerfile
 
+> +# e.g.
+> +# ./autogen.sh
+> +# ./configure
+> +# make -j$(nproc) all
+> +
+> +# build fuzzers
+> +# e.g.
+> +# $CXX $CXXFLAGS -std=c++11 -Iinclude \
+> +#     /path/to/name_of_fuzzer.cc -o $OUT/name_of_fuzzer \
+> +#     $LIB_FUZZING_ENGINE /path/to/library.a
+> +
+> +mkdir -p $OUT/lib/              # Shared libraries
+
+Maybe rename OUT -> DEST_DIR?
+
+> +
+> +# Build once to get the list of dynamic lib paths, and copy them over
+> +./configure --datadir="./data/" --disable-werror --cc="$CC" --cxx="$CXX" \
+> +    --extra-cflags="$CFLAGS -U __OPTIMIZE__ "
+
+So we use an in-tree build.
+
+Still we could set some SRCDIR=./
+
+> +make CONFIG_FUZZ=y CFLAGS="$LIB_FUZZING_ENGINE" -j$(nproc) i386-softmmu/fuzz
+> +
+> +for i in $(ldd ./i386-softmmu/qemu-fuzz-i386  | cut -f3 -d' '); do 
+> +    cp $i $OUT/lib/
+> +done
+> +rm ./i386-softmmu/qemu-fuzz-i386
+> +
+> +# Build a second time to build the final binary with correct rpath
+> +./configure --datadir="./data/" --disable-werror --cc="$CC" --cxx="$CXX" \
+> +    --extra-cflags="$CFLAGS -U __OPTIMIZE__" \
+> +    --extra-ldflags="-Wl,-rpath,'\$\$ORIGIN/lib'"
+> +make CONFIG_FUZZ=y CFLAGS="$LIB_FUZZING_ENGINE" -j$(nproc) i386-softmmu/fuzz
+> +
+> +# Copy over the datadir
+> +cp  -r ./pc-bios/ $OUT/pc-bios
+
+"make install-datadir"?
+
+> +
+> +# Copy over the qemu-fuzz-i386, naming it according to each available fuzz
+> +# target (See 05509c8e6d fuzz: select fuzz target using executable name)
+> +for target in $(./i386-softmmu/qemu-fuzz-i386 | awk '$1 ~ /\*/  {print $2}');
+> +do
+> +    cp ./i386-softmmu/qemu-fuzz-i386 $OUT/qemu-fuzz-i386-target-$target
+
+There seems to be an extra 'target'.
+
+> +done
+> 
+
+Or "make install", not sure.
 
