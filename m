@@ -2,113 +2,81 @@ Return-Path: <SRS0=hXcz=7S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78BBDC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 12:12:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63105C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 12:14:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 41DA9206A2
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 12:12:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2AD2C206A2
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 12:14:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NL4K1QIu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41DA9206A2
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Cm7/4nWf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2AD2C206A2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56312 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60572 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jhBCu-0008D1-FL
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 08:12:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57742)
+	id 1jhBFB-0001e5-D5
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 08:14:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58040)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jhBCH-0007j8-6Q
- for qemu-devel@nongnu.org; Fri, 05 Jun 2020 08:11:41 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:52725
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1jhBEV-0000p1-JP
+ for qemu-devel@nongnu.org; Fri, 05 Jun 2020 08:13:59 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:22664
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jhBCF-0004RY-O1
- for qemu-devel@nongnu.org; Fri, 05 Jun 2020 08:11:40 -0400
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1jhBEU-0004rD-Ic
+ for qemu-devel@nongnu.org; Fri, 05 Jun 2020 08:13:59 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591359092;
+ s=mimecast20190719; t=1591359237;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=wz74qyR+o+A9u9JGyYFeyuo5nk30JUAB7aom/WbBwgs=;
- b=NL4K1QIu2K2Za3hiSEyU00+iC9pXN4IhdvpeX0hYGp51CKCtfp9vvrSJrR8bqiJNf4jSpf
- jZX1bPdifFpn/46PPWDAO5i6zSe/SW+M/ha5ngh1EqJ/dIjEFi+gmHFRkI1CNqFYtC1BFg
- HekZ7oYn/g6hkBbqzIda13IgKJybtM4=
+ to:to:cc:cc:content-type:content-type;
+ bh=SvGA44pfFz2/boo8SntBpQIHo+GR9B9PLMFVHmmUnW4=;
+ b=Cm7/4nWf6H0uKXd8bHQm3XSM6bST9bz/aHH/vCCeSk2mg2Tmm9qNHXvruPeCFubvF7XjD4
+ e8B4fzyYW3Q2FPHa9xHqk9RPQyqu0PvkHWYkzAZzSeoxt1ap7L04/wl69FeWf6jEBdtLCo
+ D88pd9hi4Nadpg72e/4X6G6slvF9okc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-22--nkTc_vNMDWivkbqYfAhCQ-1; Fri, 05 Jun 2020 08:11:27 -0400
-X-MC-Unique: -nkTc_vNMDWivkbqYfAhCQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-31-3pS72EwQNSOyNOA7HFawaA-1; Fri, 05 Jun 2020 08:13:54 -0400
+X-MC-Unique: 3pS72EwQNSOyNOA7HFawaA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B333D100CCCA;
- Fri,  5 Jun 2020 12:11:26 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-114-76.ams2.redhat.com
- [10.36.114.76])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7E9E37CCFB;
- Fri,  5 Jun 2020 12:11:24 +0000 (UTC)
-Subject: Re: [PATCH for-5.1] qcow2: Don't open images with a backing file and
- the data-file-raw bit
-To: Kevin Wolf <kwolf@redhat.com>
-References: <20200415190207.21118-1-berto@igalia.com>
- <b0202150-5a43-18d5-3716-b758ab7e5824@redhat.com>
- <20200605111431.GI5869@linux.fritz.box>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <89f29fa3-d5e4-fd9f-5d51-0b2ffce82ade@redhat.com>
-Date: Fri, 5 Jun 2020 14:11:21 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
-MIME-Version: 1.0
-In-Reply-To: <20200605111431.GI5869@linux.fritz.box>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A5E9C83DE70;
+ Fri,  5 Jun 2020 12:13:52 +0000 (UTC)
+Received: from dell-r430-03.lab.eng.brq.redhat.com
+ (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4AD385C5FA;
+ Fri,  5 Jun 2020 12:13:44 +0000 (UTC)
+From: Igor Mammedov <imammedo@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2] numa: forbid '-numa node,
+ mem' for 5.1 and newer machine types
+Date: Fri,  5 Jun 2020 08:13:42 -0400
+Message-Id: <20200605121342.534811-1-imammedo@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="YAmF7bevsdq0LwKqCClIj3K2LEF2mOZ74"
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=mreitz@redhat.com;
+Content-Type: text/plain; charset=US-ASCII
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=imammedo@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/05 03:27:26
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/05 03:07:04
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -122,168 +90,218 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org,
- qemu-block@nongnu.org
+Cc: peter.maydell@linaro.org, ehabkost@redhat.com, mst@redhat.com,
+ libvir-list@redhat.com, qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
+ pbonzini@redhat.com, david@gibson.dropbear.id.au, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---YAmF7bevsdq0LwKqCClIj3K2LEF2mOZ74
-Content-Type: multipart/mixed; boundary="8YpTImgcIeIOP0If6Lq9a4IKrKGo35vJR"
+Deprecation period is run out and it's a time to flip the switch
+introduced by cd5ff8333a.  Disable legacy option for new machine
+types (since 5.1) and amend documentation.
 
---8YpTImgcIeIOP0If6Lq9a4IKrKGo35vJR
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+'-numa node,memdev' shall be used instead of disabled option
+with new machine types.
 
-On 05.06.20 13:14, Kevin Wolf wrote:
-> Am 03.06.2020 um 15:53 hat Max Reitz geschrieben:
->> On 15.04.20 21:02, Alberto Garcia wrote:
->>> Although we cannot create these images with qemu-img it is still
->>> possible to do it using an external tool. QEMU should refuse to open
->>> them until the data-file-raw bit is cleared with 'qemu-img check'.
->>>
->>> Signed-off-by: Alberto Garcia <berto@igalia.com>
->>> ---
->>>  block/qcow2.c              | 39 ++++++++++++++++++++++++++++++++++++++
->>>  tests/qemu-iotests/244     | 13 +++++++++++++
->>>  tests/qemu-iotests/244.out | 14 ++++++++++++++
->>>  3 files changed, 66 insertions(+)
->>
->> Sorry for the long delay. :/
->>
->> The patch itself looks good, but I=E2=80=99m not sure whether it is exte=
-nsive
->> enough.  Let me just jump straight to the problem:
->>
->> $ ./qemu-img create -f qcow2 \
->>     -o data_file=3Dfoo.qcow2.raw,data_file_raw=3Don \
->>     foo.qcow2 64M
->> (Create some file empty foo.qcow2 with external data file that=E2=80=99s=
- raw)
->>
->> $ ./qemu-img create -f qcow2 backing.qcow2 64M
->> $ ./qemu-io -c 'write -P 42 0 64M' backing.qcow2
->> (Create some file filled with 42s)
->>
->> $ ./qemu-img compare foo.qcow2 foo.qcow2.raw
->> Images are identical.
->> (As expected, foo.qcow2 is identical to its raw data file)
->>
->> $ ./qemu-img compare --image-opts \
->>     file.filename=3Dfoo.qcow2,backing.file.filename=3Dbacking.qcow2 \
->>     file.filename=3Dfoo.qcow2.raw
->> Content mismatch at offset 0!
->> (Oops.)
->>
->> So when the user manually gives a backing file without one having been
->> given by the image file, we run into the same problem.  Now I=E2=80=99m =
-not
->> quite sure what the problem is here.  We could make this patch more
->> extensive and also forbid this case.
->=20
-> I guess what we should really be checking is that bs->backing is NULL
-> after the node is fully opened. The challenging part is that the backing
-> child isn't managed by the block driver, but by the generic block layer,
-> and .brv_open() comes first. So we don't really have a place to check
-> this. (And there is also the case that the image is originally opened
-> with BDRV_O_NO_BACKING and the later bdrv_open_backing_file().)
->=20
->> But I think there actually shouldn=E2=80=99t be a problem.  The qcow2 dr=
-iver
->> shouldn=E2=80=99t fall back to a backing file for raw external data file=
-s.  But
->> how exactly should that be implemented?  I think the correct way would
->> be to preallocate all metadata whenever data_file_raw=3Don =E2=80=93 the=
- qcow2
->> spec doesn=E2=80=99t say to ignore the metadata with data_file_raw=3Don,=
- it just
->> says that the data read from the qcow2 file must match that read from
->> the external data file.
->> (I seem to remember I proposed this before, but I don=E2=80=99t know exa=
-ctly...)
->=20
-> I don't find preallocation convincing, mostly for two reasons.
->=20
-> First is, old images or images created by another program could miss the
-> preallocation, but we still shouldn't access the backing file.
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Michal Privoznik <mprivozn@redhat.com>
+---
+v1:
+ - rebased on top of current master
+ - move compat mode from 4.2 to 5.0
+v2:
+ - move deprection text to recently removed section
+ - pick up reviewed-bys
 
-I=E2=80=99d take this patch anyway (because its motivation is just that oth=
-er
-programs might produce invalid images), and then not worry about the
-case where we get an image produced by such another program (including
-older versions of qemu) for which the user overrides the backing file at
-runtime.
+CC: peter.maydell@linaro.org
+CC: ehabkost@redhat.com
+CC: marcel.apfelbaum@gmail.com
+CC: mst@redhat.com
+CC: pbonzini@redhat.com
+CC: rth@twiddle.net
+CC: david@gibson.dropbear.id.au
+CC: libvir-list@redhat.com
+CC: qemu-arm@nongnu.org
+CC: qemu-ppc@nongnu.org
+CC: eblake@redhat.com
+---
+ docs/system/deprecated.rst | 37 ++++++++++++++++++++-----------------
+ hw/arm/virt.c              |  2 +-
+ hw/core/numa.c             |  6 ++++++
+ hw/i386/pc.c               |  1 -
+ hw/i386/pc_piix.c          |  1 +
+ hw/i386/pc_q35.c           |  1 +
+ hw/ppc/spapr.c             |  2 +-
+ qemu-options.hx            |  9 +++++----
+ 8 files changed, 35 insertions(+), 24 deletions(-)
 
-> The other one is that discard breaks preallocation,
-
-The preallocation is about ensuring that there are no
-fall-through-to-backing holes in the image.  Discarding doesn=E2=80=99t cha=
-nge that.
-
-> so we would also
-> have to make sure to have a special case in every operation that could
-> end up discarding clusters (and to add it to every future operation we
-> might add).
->=20
-> It just sounds very brittle.
->=20
->> (In contrast, I don=E2=80=99t think it would be correct to just treat
->> unallocated clusters as zero whenever data_file_raw=3Don.)
->>
->> What do you think?  Should we force preallocation with data_file_raw=3Do=
-n,
->> and then just take this patch, even though it still lets users give
->> backing files to a qcow2 file at runtime without error?  (Except the
->> backing file wouldn=E2=80=99t have an effect, then.)
->=20
-> Honestly, maybe passing a backing file at runtime to an image that
-> doesn't logically have one is just a case of "then don't do that".
-
-Perhaps.
-
-But seeing I wondered whether I didn=E2=80=99t already propose this at some
-point, there is another reason for preallocation:
-
-https://lists.nongnu.org/archive/html/qemu-block/2020-02/msg00644.html
-https://lists.nongnu.org/archive/html/qemu-block/2020-04/msg00329.html
-
-All in all, I think data_file_raw should be interpretable as =E2=80=9CYou d=
-on=E2=80=99t
-have to look at any metadata to know which data to read or write=E2=80=9D.
-(Maybe I=E2=80=99m wrong about that.)
-Without any preallocation of metadata structure, it looks to me like we
-break that promise.
-
-(Yes, we could also force-zero the external data file during creation,
-and blame users who put a backing file on images that don=E2=80=99t have on=
-e =E2=80=93
-both of which are not unreasonable!  But we could also just preallocate
-the metadata.)
-
-Max
-
-
---8YpTImgcIeIOP0If6Lq9a4IKrKGo35vJR--
-
---YAmF7bevsdq0LwKqCClIj3K2LEF2mOZ74
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl7aNmkACgkQ9AfbAGHV
-z0DcEQf/eLkzfkiPRjYEcisfQJbB2RoGf5QYfpZ1NBc4jJrkBGrGxaNxv9OWdQnF
-WlE4fxFMbiBAuprlB6MH4XAn01vHr4ztq0zdaseFhVZi21t5kaCiwUkJZOL8MC7M
-hWZiBp8muJY/B1Tu0rVU7fXToW1p3uu9izdg7bRd7uVQrnIHEqxmERs+dDkVSr7Z
-HsQoD07oebGsFFUGeUWqw9/5dRXGn9v7Pvg8egj1bUL5oN1dzt/ZgbeKZApxqu3j
-WJkMQ9G1uOwOeAuqgcNWA3Cvu9nGwgtjrnFRyTvwOKkKsADH5NJ27tNw020pZNDz
-u0dP0A/sYX4Xe7UF5EqhzrfXBTHZnA==
-=c4Nf
------END PGP SIGNATURE-----
-
---YAmF7bevsdq0LwKqCClIj3K2LEF2mOZ74--
+diff --git a/docs/system/deprecated.rst b/docs/system/deprecated.rst
+index f0061f94aa..6f717e4a1d 100644
+--- a/docs/system/deprecated.rst
++++ b/docs/system/deprecated.rst
+@@ -101,23 +101,6 @@ error in the future.
+ The ``-realtime mlock=on|off`` argument has been replaced by the
+ ``-overcommit mem-lock=on|off`` argument.
+ 
+-``-numa node,mem=``\ *size* (since 4.1)
+-'''''''''''''''''''''''''''''''''''''''
+-
+-The parameter ``mem`` of ``-numa node`` is used to assign a part of
+-guest RAM to a NUMA node. But when using it, it's impossible to manage specified
+-RAM chunk on the host side (like bind it to a host node, setting bind policy, ...),
+-so guest end-ups with the fake NUMA configuration with suboptiomal performance.
+-However since 2014 there is an alternative way to assign RAM to a NUMA node
+-using parameter ``memdev``, which does the same as ``mem`` and adds
+-means to actualy manage node RAM on the host side. Use parameter ``memdev``
+-with *memory-backend-ram* backend as an replacement for parameter ``mem``
+-to achieve the same fake NUMA effect or a properly configured
+-*memory-backend-file* backend to actually benefit from NUMA configuration.
+-In future new machine versions will not accept the option but it will still
+-work with old machine types. User can check QAPI schema to see if the legacy
+-option is supported by looking at MachineInfo::numa-mem-supported property.
+-
+ ``-numa`` node (without memory specified) (since 4.1)
+ '''''''''''''''''''''''''''''''''''''''''''''''''''''
+ 
+@@ -512,3 +495,23 @@ long starting at 1MiB, the old command::
+ can be rewritten as::
+ 
+   qemu-nbd -t --image-opts driver=raw,offset=1M,size=100M,file.driver=qcow2,file.file.driver=file,file.file.filename=file.qcow2
++
++Command line options
++--------------------
++
++``-numa node,mem=``\ *size* (removed in 5.1)
++'''''''''''''''''''''''''''''''''''''''
++
++The parameter ``mem`` of ``-numa node`` is used to assign a part of
++guest RAM to a NUMA node. But when using it, it's impossible to manage specified
++RAM chunk on the host side (like bind it to a host node, setting bind policy, ...),
++so guest end-ups with the fake NUMA configuration with suboptiomal performance.
++However since 2014 there is an alternative way to assign RAM to a NUMA node
++using parameter ``memdev``, which does the same as ``mem`` and adds
++means to actualy manage node RAM on the host side. Use parameter ``memdev``
++with *memory-backend-ram* backend as an replacement for parameter ``mem``
++to achieve the same fake NUMA effect or a properly configured
++*memory-backend-file* backend to actually benefit from NUMA configuration.
++In future new machine versions will not accept the option but it will still
++work with old machine types. User can check QAPI schema to see if the legacy
++option is supported by looking at MachineInfo::numa-mem-supported property.
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 37462a6f78..063d4703f7 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -2262,7 +2262,6 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
+     hc->pre_plug = virt_machine_device_pre_plug_cb;
+     hc->plug = virt_machine_device_plug_cb;
+     hc->unplug_request = virt_machine_device_unplug_request_cb;
+-    mc->numa_mem_supported = true;
+     mc->nvdimm_supported = true;
+     mc->auto_enable_numa_with_memhp = true;
+     mc->default_ram_id = "mach-virt.ram";
+@@ -2375,6 +2374,7 @@ DEFINE_VIRT_MACHINE_AS_LATEST(5, 1)
+ static void virt_machine_5_0_options(MachineClass *mc)
+ {
+     virt_machine_5_1_options(mc);
++    mc->numa_mem_supported = true;
+ }
+ DEFINE_VIRT_MACHINE(5, 0)
+ 
+diff --git a/hw/core/numa.c b/hw/core/numa.c
+index 316bc50d75..05be412e59 100644
+--- a/hw/core/numa.c
++++ b/hw/core/numa.c
+@@ -117,6 +117,12 @@ static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
+     }
+ 
+     if (node->has_mem) {
++        if (!mc->numa_mem_supported) {
++            error_setg(errp, "Parameter -numa node,mem is not supported by this"
++                      " machine type. Use -numa node,memdev instead");
++            return;
++        }
++
+         numa_info[nodenr].node_mem = node->mem;
+         if (!qtest_enabled()) {
+             warn_report("Parameter -numa node,mem is deprecated,"
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 2128f3d6fe..a86136069c 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1960,7 +1960,6 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
+     hc->unplug = pc_machine_device_unplug_cb;
+     mc->default_cpu_type = TARGET_DEFAULT_CPU_TYPE;
+     mc->nvdimm_supported = true;
+-    mc->numa_mem_supported = true;
+     mc->default_ram_id = "pc.ram";
+ 
+     object_class_property_add(oc, PC_MACHINE_DEVMEM_REGION_SIZE, "int",
+diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+index f66e1d73ce..8955436efa 100644
+--- a/hw/i386/pc_piix.c
++++ b/hw/i386/pc_piix.c
+@@ -438,6 +438,7 @@ static void pc_i440fx_5_0_machine_options(MachineClass *m)
+     pc_i440fx_5_1_machine_options(m);
+     m->alias = NULL;
+     m->is_default = false;
++    m->numa_mem_supported = true;
+     compat_props_add(m->compat_props, hw_compat_5_0, hw_compat_5_0_len);
+     compat_props_add(m->compat_props, pc_compat_5_0, pc_compat_5_0_len);
+ }
+diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+index 4ba8ac8774..af6b32adb7 100644
+--- a/hw/i386/pc_q35.c
++++ b/hw/i386/pc_q35.c
+@@ -366,6 +366,7 @@ static void pc_q35_5_0_machine_options(MachineClass *m)
+ {
+     pc_q35_5_1_machine_options(m);
+     m->alias = NULL;
++    m->numa_mem_supported = true;
+     compat_props_add(m->compat_props, hw_compat_5_0, hw_compat_5_0_len);
+     compat_props_add(m->compat_props, pc_compat_5_0, pc_compat_5_0_len);
+ }
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 3b1a5ed865..210d61d1b3 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -4511,7 +4511,6 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
+      * in which LMBs are represented and hot-added
+      */
+     mc->numa_mem_align_shift = 28;
+-    mc->numa_mem_supported = true;
+     mc->auto_enable_numa = true;
+ 
+     smc->default_caps.caps[SPAPR_CAP_HTM] = SPAPR_CAP_OFF;
+@@ -4599,6 +4598,7 @@ static void spapr_machine_5_0_class_options(MachineClass *mc)
+ {
+     spapr_machine_5_1_class_options(mc);
+     compat_props_add(mc->compat_props, hw_compat_5_0, hw_compat_5_0_len);
++    mc->numa_mem_supported = true;
+ }
+ 
+ DEFINE_SPAPR_MACHINE(5_0, "5.0", false);
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 93bde2bbc8..196f468786 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -239,10 +239,11 @@ SRST
+         -numa node,nodeid=0 -numa node,nodeid=1 \
+         -numa cpu,node-id=0,socket-id=0 -numa cpu,node-id=1,socket-id=1
+ 
+-    '\ ``mem``\ ' assigns a given RAM amount to a node. '\ ``memdev``\ '
+-    assigns RAM from a given memory backend device to a node. If
+-    '\ ``mem``\ ' and '\ ``memdev``\ ' are omitted in all nodes, RAM is
+-    split equally between them.
++    Legacy '\ ``mem``\ ' assigns a given RAM amount to a node (not supported
++    for 5.1 and newer machine types). '\ ``memdev``\ ' assigns RAM from
++    a given memory backend device to a node. If '\ ``mem``\ ' and
++    '\ ``memdev``\ ' are omitted in all nodes, RAM is split equally between them.
++
+ 
+     '\ ``mem``\ ' and '\ ``memdev``\ ' are mutually exclusive.
+     Furthermore, if one node uses '\ ``memdev``\ ', all of them have to
+-- 
+2.18.4
 
 
