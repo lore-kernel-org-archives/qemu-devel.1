@@ -7,81 +7,81 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52AE5C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 01:35:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D456C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 01:35:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E115420663
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 01:35:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1BB4520663
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 01:35:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="M/Q5BgY4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E115420663
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Ahq6G8Ow"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BB4520663
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57924 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58166 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jh1GX-0001mh-TK
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 21:35:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55634)
+	id 1jh1Gb-0001sp-9k
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 21:35:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55690)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=4185f83b6=alistair.francis@wdc.com>)
- id 1jh1BP-00028u-AF; Thu, 04 Jun 2020 21:30:07 -0400
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:2768)
+ id 1jh1BZ-0002Xk-OD; Thu, 04 Jun 2020 21:30:17 -0400
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:22008)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=4185f83b6=alistair.francis@wdc.com>)
- id 1jh1BN-00009O-W8; Thu, 04 Jun 2020 21:30:06 -0400
+ id 1jh1BY-00009e-3L; Thu, 04 Jun 2020 21:30:17 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1591320606; x=1622856606;
+ t=1591320617; x=1622856617;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=veOH8KddxewBAO1ktp2wI9Ku5cmFe6g9CSOLpuML7tQ=;
- b=M/Q5BgY4x1a9B5IbkTr9okiBInKuZ7uBp78/lEi+QP0mJsuGb06teAjJ
- ijANkLplnrEL0rFOY+VY6fhIUhcT2gZiMhekeA24hbG1foEqfpvOrzFgN
- vYAKWJrX9y6T6d0zht5Lm6Cj4ILPiN0VHYeLDmB06ZwnFedddC6VWqJTu
- NerybhYQXMk85sdcQWRApALUajRcVqpux7ihzgum9xlSMAVWNr/MZkCUw
- Iz5oXz9z0iiYtwKe0U3QxShijA4BLFm7gHuHEOfspVWIXI9bfK68nTuWC
- /wEaSwlTRZJmv07Q22UZPhXuis/8kaXsPWFqg6+0nPwyuNXKWsoIJF6ge Q==;
-IronPort-SDR: 1YyF/+xMDRij6uu8gfKBCDehyMpsRXc3+GDTa1shLsfy/EsT2Uz1Sxdy+tmJyHR6fRJR8Beihw
- yeEcCVEw5FlnB8tW6OPn7/ppHtUBrWgjhbcDdbNUuUZzs/JAYyr/HGQLg0Zul6mfbrvFUt6ExI
- qfwHnYz5VqgxBS5NGqpVqnwb6x8SOrh58gnagEBQRP6AWfVyRpA01v+QhSjPlkyDb59icCrB1q
- zvvGz8kr4M5WIDBsLGT1+fRqfNP3qmLBli59ihrPfsymhtTFxhSpdOBmENb/SOpihi5DQzDtv8
- pBQ=
-X-IronPort-AV: E=Sophos;i="5.73,474,1583164800"; d="scan'208";a="143573564"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com)
- ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 05 Jun 2020 09:29:50 +0800
-IronPort-SDR: /tjDAdRgErrpNwtknTD/6RUkLdIB/4yiUNoJS+FtHLgErj3oslEjg6nCrc/YrikqKa+bo+hmGV
- W3RSDEcdMBWrDhuFqf7niQPVRg5ZBX7O8=
+ bh=cXuY4R2iUhKB0c3QoY7e2kDEz+l0l5YvpJtrzSp+Dmo=;
+ b=Ahq6G8OwcE+DjhnA0UHjxawxAQD2THqjp3RXgPKEQ+uM86nF/9uXx8h2
+ jhkGZHJ2uaeeMAppivW7gR9JQy73VQ+ybcWr6k7kdSWFOa/TW9h5hVhr7
+ Zxjk9fzsNBlpKEVTQcn6a0kxbNgje/YvcLDxsngwkDgRcUy65QMMV3K2K
+ dLOgb4jPsFgeAVzG+BmJsBgdZB+MBZzcZkhbQln3TBBe1wMcYHWtK0rXM
+ VlXJMM0Y5gSLlHfVlZ31BPbwrfvS3qFOA11VNDpTFjMMlr+h5N+3esNPj
+ OEUuuMcZ5Z7samOeH0ZRPXZTGhynY13RDgUM5mGVFvfDNwWi7qjkuTqIG w==;
+IronPort-SDR: yJhNQEm1APh4Tqzx90lqFUUVKRSKPLRgLbaKrOOiOUvvHDyJRXacUq5GJQLRF/s3TcmjSSSRGj
+ 7J7m8cd4XBq1fPRZzbYf+sJzUO1+NjE9BggjU5q4t8nV/TzhaPrJ5OSBAkZ3Dbek54EogHZAkb
+ vGMO/eF89wdWLFAGpzjE/mcmlO769OqhPk83kOCym3/ks7VW/SBEh3AAb7mh5RZHxaM1PaFz9V
+ 9Rk3928gVAmsEwapcVoUYAkM+l9IPrg/7umMlFAV7Q4tb1OzvXc4OdZOGuas0KIHZwdqsk3Et9
+ rqk=
+X-IronPort-AV: E=Sophos;i="5.73,474,1583164800"; d="scan'208";a="242127071"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com)
+ ([199.255.45.14])
+ by ob1.hgst.iphmx.com with ESMTP; 05 Jun 2020 09:30:17 +0800
+IronPort-SDR: N2nRLyvfz4dqizsYgN7Q7rVCwGCNtBINMOlmrXavUxMuUCRTxfK//PO/7V3YZ3VLbfa8Io9oam
+ 2iJQVcOwTlfZaBZFaMWhTBCO69hqYRdlw=
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
- by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 04 Jun 2020 18:18:52 -0700
-IronPort-SDR: Ke3c3Tz71RjJOKu+buhGh2Mx2CJk4uOoMjsYP+kfoFIcjbd6YmRPSqBHwSMQbc0NFykgsPCMxG
- XE0PEMzqUfvg==
+ by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 04 Jun 2020 18:19:50 -0700
+IronPort-SDR: 5NSR7Cz/Tq5FBjEijCh2GBmxmFurVGGKJ5gynlyQDbAce7c44dkJ7FGajbUTJ2QG37Gl0Bn+rq
+ YpifhsXL2MLA==
 WDCIronportException: Internal
 Received: from cnf006056.ad.shared (HELO risc6-mainframe.hgst.com)
  ([10.86.57.233])
- by uls-op-cesaip02.wdc.com with ESMTP; 04 Jun 2020 18:29:49 -0700
+ by uls-op-cesaip02.wdc.com with ESMTP; 04 Jun 2020 18:30:14 -0700
 From: Alistair Francis <alistair.francis@wdc.com>
 To: qemu-devel@nongnu.org,
 	qemu-riscv@nongnu.org
-Subject: [PATCH v2 07/17] target/riscv: Do two-stage lookups on hlv/hlvx/hsv
- instructions
-Date: Thu,  4 Jun 2020 18:21:01 -0700
-Message-Id: <edff0b5882e168aa9411fb54b7409386dd20a561.1591319882.git.alistair@alistair23.me>
+Subject: [PATCH v2 16/17] target/riscv: Return the exception from invalid CSR
+ accesses
+Date: Thu,  4 Jun 2020 18:21:27 -0700
+Message-Id: <d616a44645811854db7ada768c179ad8f2532158.1591319882.git.alistair@alistair23.me>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <cover.1591319882.git.alistair@alistair23.me>
 References: <cover.1591319882.git.alistair@alistair23.me>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.71.153.141;
+Received-SPF: pass client-ip=68.232.143.124;
  envelope-from=prvs=4185f83b6=alistair.francis@wdc.com;
- helo=esa3.hgst.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 21:29:41
+ helo=esa2.hgst.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 21:30:00
 X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
 X-Spam_score_int: -43
 X-Spam_score: -4.4
@@ -108,106 +108,265 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+When performing a CSR access let's return a negative exception value on
+an error instead of -1. This will allow us to specify the exception in
+future patches.
+
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- target/riscv/cpu_helper.c | 54 +++++++++++++++------------------------
- 1 file changed, 21 insertions(+), 33 deletions(-)
+ target/riscv/csr.c       | 46 ++++++++++++++++++++--------------------
+ target/riscv/op_helper.c | 18 ++++++++++------
+ 2 files changed, 35 insertions(+), 29 deletions(-)
 
-diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-index 68abccc993..1521c14b72 100644
---- a/target/riscv/cpu_helper.c
-+++ b/target/riscv/cpu_helper.c
-@@ -340,22 +340,13 @@ static int get_physical_address(CPURISCVState *env, hwaddr *physical,
-      * was called. Background registers will be used if the guest has
-      * forced a two stage translation to be on (in HS or M mode).
-      */
-+    if (riscv_cpu_two_stage_lookup(env) && access_type != MMU_INST_FETCH) {
-+        use_background = true;
-+    }
-+
-     if (mode == PRV_M && access_type != MMU_INST_FETCH) {
-         if (get_field(env->mstatus, MSTATUS_MPRV)) {
-             mode = get_field(env->mstatus, MSTATUS_MPP);
--
--            if (riscv_has_ext(env, RVH) &&
--                MSTATUS_MPV_ISSET(env)) {
--                use_background = true;
--            }
--        }
--    }
--
--    if (mode == PRV_S && access_type != MMU_INST_FETCH &&
--        riscv_has_ext(env, RVH) && !riscv_cpu_virt_enabled(env)) {
--        if (get_field(env->hstatus, HSTATUS_SPRV)) {
--            mode = get_field(env->mstatus, SSTATUS_SPP);
--            use_background = true;
+diff --git a/target/riscv/csr.c b/target/riscv/csr.c
+index 9990a0dd09..0c53438605 100644
+--- a/target/riscv/csr.c
++++ b/target/riscv/csr.c
+@@ -47,7 +47,7 @@ static int fs(CPURISCVState *env, int csrno)
+ {
+ #if !defined(CONFIG_USER_ONLY)
+     if (!env->debugger && !riscv_cpu_fp_enabled(env)) {
+-        return -1;
++        return -RISCV_EXCP_ILLEGAL_INST;
+     }
+ #endif
+     return 0;
+@@ -61,7 +61,7 @@ static int ctr(CPURISCVState *env, int csrno)
+ 
+     if (!cpu->cfg.ext_counters) {
+         /* The Counters extensions is not enabled */
+-        return -1;
++        return -RISCV_EXCP_ILLEGAL_INST;
+     }
+ #endif
+     return 0;
+@@ -89,7 +89,7 @@ static int hmode(CPURISCVState *env, int csrno)
          }
      }
  
-@@ -705,8 +696,6 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-     hwaddr pa = 0;
-     int prot, prot2;
-     bool pmp_violation = false;
--    bool m_mode_two_stage = false;
--    bool hs_mode_two_stage = false;
-     bool first_stage_error = true;
-     int ret = TRANSLATE_FAIL;
-     int mode = mmu_idx;
-@@ -716,30 +705,21 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-     qemu_log_mask(CPU_LOG_MMU, "%s ad %" VADDR_PRIx " rw %d mmu_idx %d\n",
-                   __func__, address, access_type, mmu_idx);
+-    return -1;
++    return -RISCV_EXCP_ILLEGAL_INST;
+ }
  
--    /*
--     * Determine if we are in M mode and MPRV is set or in HS mode and SPRV is
--     * set and we want to access a virtulisation address.
--     */
--    if (riscv_has_ext(env, RVH)) {
--        m_mode_two_stage = env->priv == PRV_M &&
--                           access_type != MMU_INST_FETCH &&
--                           get_field(env->mstatus, MSTATUS_MPRV) &&
--                           MSTATUS_MPV_ISSET(env);
--
--        hs_mode_two_stage = env->priv == PRV_S &&
--                            !riscv_cpu_virt_enabled(env) &&
--                            access_type != MMU_INST_FETCH &&
--                            get_field(env->hstatus, HSTATUS_SPRV) &&
--                            get_field(env->hstatus, HSTATUS_SPV);
--    }
--
-     if (mode == PRV_M && access_type != MMU_INST_FETCH) {
-         if (get_field(env->mstatus, MSTATUS_MPRV)) {
-             mode = get_field(env->mstatus, MSTATUS_MPP);
-         }
+ static int pmp(CPURISCVState *env, int csrno)
+@@ -103,7 +103,7 @@ static int read_fflags(CPURISCVState *env, int csrno, target_ulong *val)
+ {
+ #if !defined(CONFIG_USER_ONLY)
+     if (!env->debugger && !riscv_cpu_fp_enabled(env)) {
+-        return -1;
++        return -RISCV_EXCP_ILLEGAL_INST;
+     }
+ #endif
+     *val = riscv_cpu_get_fflags(env);
+@@ -114,7 +114,7 @@ static int write_fflags(CPURISCVState *env, int csrno, target_ulong val)
+ {
+ #if !defined(CONFIG_USER_ONLY)
+     if (!env->debugger && !riscv_cpu_fp_enabled(env)) {
+-        return -1;
++        return -RISCV_EXCP_ILLEGAL_INST;
+     }
+     env->mstatus |= MSTATUS_FS;
+ #endif
+@@ -126,7 +126,7 @@ static int read_frm(CPURISCVState *env, int csrno, target_ulong *val)
+ {
+ #if !defined(CONFIG_USER_ONLY)
+     if (!env->debugger && !riscv_cpu_fp_enabled(env)) {
+-        return -1;
++        return -RISCV_EXCP_ILLEGAL_INST;
+     }
+ #endif
+     *val = env->frm;
+@@ -137,7 +137,7 @@ static int write_frm(CPURISCVState *env, int csrno, target_ulong val)
+ {
+ #if !defined(CONFIG_USER_ONLY)
+     if (!env->debugger && !riscv_cpu_fp_enabled(env)) {
+-        return -1;
++        return -RISCV_EXCP_ILLEGAL_INST;
+     }
+     env->mstatus |= MSTATUS_FS;
+ #endif
+@@ -149,7 +149,7 @@ static int read_fcsr(CPURISCVState *env, int csrno, target_ulong *val)
+ {
+ #if !defined(CONFIG_USER_ONLY)
+     if (!env->debugger && !riscv_cpu_fp_enabled(env)) {
+-        return -1;
++        return -RISCV_EXCP_ILLEGAL_INST;
+     }
+ #endif
+     *val = (riscv_cpu_get_fflags(env) << FSR_AEXC_SHIFT)
+@@ -161,7 +161,7 @@ static int write_fcsr(CPURISCVState *env, int csrno, target_ulong val)
+ {
+ #if !defined(CONFIG_USER_ONLY)
+     if (!env->debugger && !riscv_cpu_fp_enabled(env)) {
+-        return -1;
++        return -RISCV_EXCP_ILLEGAL_INST;
+     }
+     env->mstatus |= MSTATUS_FS;
+ #endif
+@@ -223,7 +223,7 @@ static int read_time(CPURISCVState *env, int csrno, target_ulong *val)
+     uint64_t delta = riscv_cpu_virt_enabled(env) ? env->htimedelta : 0;
+ 
+     if (!env->rdtime_fn) {
+-        return -1;
++        return -RISCV_EXCP_ILLEGAL_INST;
      }
  
--    if (riscv_cpu_virt_enabled(env) || m_mode_two_stage || hs_mode_two_stage) {
-+    if (riscv_has_ext(env, RVH) && env->priv == PRV_M &&
-+        access_type != MMU_INST_FETCH &&
-+        get_field(env->mstatus, MSTATUS_MPRV) &&
-+        MSTATUS_MPV_ISSET(env)) {
-+        riscv_cpu_set_two_stage_lookup(env, true);
-+    }
-+
-+    if (riscv_cpu_virt_enabled(env) ||
-+        (riscv_cpu_two_stage_lookup(env) && access_type != MMU_INST_FETCH)) {
-         /* Two stage lookup */
-         ret = get_physical_address(env, &pa, &prot, address, access_type,
-                                    mmu_idx, true, true);
-@@ -791,6 +771,14 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-                       __func__, address, ret, pa, prot);
+     *val = env->rdtime_fn() + delta;
+@@ -236,7 +236,7 @@ static int read_timeh(CPURISCVState *env, int csrno, target_ulong *val)
+     uint64_t delta = riscv_cpu_virt_enabled(env) ? env->htimedelta : 0;
+ 
+     if (!env->rdtime_fn) {
+-        return -1;
++        return -RISCV_EXCP_ILLEGAL_INST;
      }
  
-+    /* We did the two stage lookup based on MPRV, unset the lookup */
-+    if (riscv_has_ext(env, RVH) && env->priv == PRV_M &&
-+        access_type != MMU_INST_FETCH &&
-+        get_field(env->mstatus, MSTATUS_MPRV) &&
-+        MSTATUS_MPV_ISSET(env)) {
-+        riscv_cpu_set_two_stage_lookup(env, false);
-+    }
+     *val = (env->rdtime_fn() + delta) >> 32;
+@@ -502,7 +502,7 @@ static int write_mcounteren(CPURISCVState *env, int csrno, target_ulong val)
+ static int read_mscounteren(CPURISCVState *env, int csrno, target_ulong *val)
+ {
+     if (env->priv_ver < PRIV_VERSION_1_11_0) {
+-        return -1;
++        return -RISCV_EXCP_ILLEGAL_INST;
+     }
+     *val = env->mcounteren;
+     return 0;
+@@ -512,7 +512,7 @@ static int read_mscounteren(CPURISCVState *env, int csrno, target_ulong *val)
+ static int write_mscounteren(CPURISCVState *env, int csrno, target_ulong val)
+ {
+     if (env->priv_ver < PRIV_VERSION_1_11_0) {
+-        return -1;
++        return -RISCV_EXCP_ILLEGAL_INST;
+     }
+     env->mcounteren = val;
+     return 0;
+@@ -736,7 +736,7 @@ static int read_satp(CPURISCVState *env, int csrno, target_ulong *val)
+     }
+ 
+     if (env->priv == PRV_S && get_field(env->mstatus, MSTATUS_TVM)) {
+-        return -1;
++        return -RISCV_EXCP_ILLEGAL_INST;
+     } else {
+         *val = env->satp;
+     }
+@@ -753,7 +753,7 @@ static int write_satp(CPURISCVState *env, int csrno, target_ulong val)
+         ((val ^ env->satp) & (SATP_MODE | SATP_ASID | SATP_PPN)))
+     {
+         if (env->priv == PRV_S && get_field(env->mstatus, MSTATUS_TVM)) {
+-            return -1;
++            return -RISCV_EXCP_ILLEGAL_INST;
+         } else {
+             if((val ^ env->satp) & SATP_ASID) {
+                 tlb_flush(env_cpu(env));
+@@ -923,7 +923,7 @@ static int write_hgatp(CPURISCVState *env, int csrno, target_ulong val)
+ static int read_htimedelta(CPURISCVState *env, int csrno, target_ulong *val)
+ {
+     if (!env->rdtime_fn) {
+-        return -1;
++        return -RISCV_EXCP_ILLEGAL_INST;
+     }
+ 
+ #if defined(TARGET_RISCV32)
+@@ -937,7 +937,7 @@ static int read_htimedelta(CPURISCVState *env, int csrno, target_ulong *val)
+ static int write_htimedelta(CPURISCVState *env, int csrno, target_ulong val)
+ {
+     if (!env->rdtime_fn) {
+-        return -1;
++        return -RISCV_EXCP_ILLEGAL_INST;
+     }
+ 
+ #if defined(TARGET_RISCV32)
+@@ -952,7 +952,7 @@ static int write_htimedelta(CPURISCVState *env, int csrno, target_ulong val)
+ static int read_htimedeltah(CPURISCVState *env, int csrno, target_ulong *val)
+ {
+     if (!env->rdtime_fn) {
+-        return -1;
++        return -RISCV_EXCP_ILLEGAL_INST;
+     }
+ 
+     *val = env->htimedelta >> 32;
+@@ -962,7 +962,7 @@ static int read_htimedeltah(CPURISCVState *env, int csrno, target_ulong *val)
+ static int write_htimedeltah(CPURISCVState *env, int csrno, target_ulong val)
+ {
+     if (!env->rdtime_fn) {
+-        return -1;
++        return -RISCV_EXCP_ILLEGAL_INST;
+     }
+ 
+     env->htimedelta = deposit64(env->htimedelta, 32, 32, (uint64_t)val);
+@@ -1160,18 +1160,18 @@ int riscv_csrrw(CPURISCVState *env, int csrno, target_ulong *ret_value,
+ 
+     if ((write_mask && read_only) ||
+         (!env->debugger && (effective_priv < get_field(csrno, 0x300)))) {
+-        return -1;
++        return -RISCV_EXCP_ILLEGAL_INST;
+     }
+ #endif
+ 
+     /* ensure the CSR extension is enabled. */
+     if (!cpu->cfg.ext_icsr) {
+-        return -1;
++        return -RISCV_EXCP_ILLEGAL_INST;
+     }
+ 
+     /* check predicate */
+     if (!csr_ops[csrno].predicate || csr_ops[csrno].predicate(env, csrno) < 0) {
+-        return -1;
++        return -RISCV_EXCP_ILLEGAL_INST;
+     }
+ 
+     /* execute combined read/write operation if it exists */
+@@ -1181,7 +1181,7 @@ int riscv_csrrw(CPURISCVState *env, int csrno, target_ulong *ret_value,
+ 
+     /* if no accessor exists then return failure */
+     if (!csr_ops[csrno].read) {
+-        return -1;
++        return -RISCV_EXCP_ILLEGAL_INST;
+     }
+ 
+     /* read old value */
+diff --git a/target/riscv/op_helper.c b/target/riscv/op_helper.c
+index efc2d854eb..80d632777b 100644
+--- a/target/riscv/op_helper.c
++++ b/target/riscv/op_helper.c
+@@ -43,8 +43,10 @@ target_ulong helper_csrrw(CPURISCVState *env, target_ulong src,
+         target_ulong csr)
+ {
+     target_ulong val = 0;
+-    if (riscv_csrrw(env, csr, &val, src, -1) < 0) {
+-        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++    int ret = riscv_csrrw(env, csr, &val, src, -1);
 +
-     if (riscv_feature(env, RISCV_FEATURE_PMP) &&
-         (ret == TRANSLATE_SUCCESS) &&
-         !pmp_hart_has_privs(env, pa, size, 1 << access_type, mode)) {
++    if (ret < 0) {
++        riscv_raise_exception(env, -ret, GETPC());
+     }
+     return val;
+ }
+@@ -53,8 +55,10 @@ target_ulong helper_csrrs(CPURISCVState *env, target_ulong src,
+         target_ulong csr, target_ulong rs1_pass)
+ {
+     target_ulong val = 0;
+-    if (riscv_csrrw(env, csr, &val, -1, rs1_pass ? src : 0) < 0) {
+-        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++    int ret = riscv_csrrw(env, csr, &val, -1, rs1_pass ? src : 0);
++
++    if (ret < 0) {
++        riscv_raise_exception(env, -ret, GETPC());
+     }
+     return val;
+ }
+@@ -63,8 +67,10 @@ target_ulong helper_csrrc(CPURISCVState *env, target_ulong src,
+         target_ulong csr, target_ulong rs1_pass)
+ {
+     target_ulong val = 0;
+-    if (riscv_csrrw(env, csr, &val, 0, rs1_pass ? src : 0) < 0) {
+-        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++    int ret = riscv_csrrw(env, csr, &val, 0, rs1_pass ? src : 0);
++
++    if (ret < 0) {
++        riscv_raise_exception(env, -ret, GETPC());
+     }
+     return val;
+ }
 -- 
 2.26.2
 
