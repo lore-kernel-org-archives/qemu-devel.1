@@ -4,82 +4,82 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EBE9C433E1
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 17:38:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF492C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 17:38:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F11AA206DB
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 17:38:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9AEFE206DB
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 17:38:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IqfJ0B/6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F11AA206DB
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lw2/Uwd8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9AEFE206DB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58616 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33384 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jhGIZ-000529-7H
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 13:38:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48138)
+	id 1jhGIz-0006Qd-Sp
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 13:38:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48156)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1jhGHh-0003Jb-S4
- for qemu-devel@nongnu.org; Fri, 05 Jun 2020 13:37:37 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:34899)
+ id 1jhGHm-0003WP-Ef
+ for qemu-devel@nongnu.org; Fri, 05 Jun 2020 13:37:42 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:43332)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1jhGHg-0003q0-Qn
- for qemu-devel@nongnu.org; Fri, 05 Jun 2020 13:37:37 -0400
-Received: by mail-pf1-x443.google.com with SMTP id h185so5290034pfg.2
- for <qemu-devel@nongnu.org>; Fri, 05 Jun 2020 10:37:36 -0700 (PDT)
+ id 1jhGHl-0003rQ-CT
+ for qemu-devel@nongnu.org; Fri, 05 Jun 2020 13:37:42 -0400
+Received: by mail-pf1-x444.google.com with SMTP id 23so4392891pfw.10
+ for <qemu-devel@nongnu.org>; Fri, 05 Jun 2020 10:37:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=QonKzFLvxHetjYHv0eko5X68Tto6P2i1o+bAUOOMVq8=;
- b=IqfJ0B/6o/HB9WrnAdz0DzKWhSIhvU3L3BtJurcDXQWusz3uv1YGZvnKy6Rs3X+nWg
- 5XXLGHGguFT97AAbAjokOTflLlO8dBghVl/0KYD2FAsii+0MG5mJmbWUU1iqkkANWH6K
- b5Huid8G04XSqnLaybnwT7+/cqUnhzOJste3Ud3rYr+k1h0sL0mxN2juY8D7p9zzlniG
- /ebMO5NcoumH2H5cwQwHGKreFd4l9wrzaW8mEz1qQLUeZ9kgBm8dDZTV+jpJnfAxhfDw
- PIQEJ+8ILMnHve/9wjDAkQP8dkg2LGOmxki/mXRV3+eo6+tO1NUrXUWVu8oqOuGLanjL
- 4M+w==
+ bh=KA74qkYRKvEU3ng1kAP13z7yTrox0/WpEe+h4sJiZmM=;
+ b=lw2/Uwd8ZHKoaA5GuN/k3mU2SK9d8Uf+vZNl7PC/3t1lUu8jbQOB4SXaIsVyzWmdan
+ GRPftAlfazcikKZGh4gBeGVRrXrDcw0v9el+qXwSJeajvb9FIm7dLDOJvpJ1oIcOYWgY
+ 5cA+a1cW4kWnp70n1UW0TdbAgwiLFMdAE9yS707VIXCmt2/us8ldRUelEyEeUOaRTcEU
+ H5IiqTnAS0kjIBxhrALY8oAq3EBgvo3zHARtPauxyCW9y+FVzqqjrefoATCSU/3qnDgH
+ tSM/0q1X4P0qVv6Js/wuuDrZRj+OG4ruI6mndCoFbHIUhl/p20t6OWzyeze6QC5C37Tf
+ RisQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=QonKzFLvxHetjYHv0eko5X68Tto6P2i1o+bAUOOMVq8=;
- b=JAoG+8fpzJrNde8xQJNhgsrGHr9zSgIenUUp43UDT2aHr8sKmqBLKTpQ8kpxPihDXo
- gWI/1iMTUXM9Va6lzkK2ahDTuNzHF2M+00E/M7Ju0xjfPQ5U1ErwMioBzA1hEOTMri/T
- 8wDxlFqtcKlkpKwB3l+/KiNynlFyCtEhwfXIsQwlb+UZZiZ7WEpl67hFI2enUOa7Po10
- z3mjIUgrqgXBtZOOaD8bj3TVZhjxv6AVDN0I/gzjFaw09o3qE2Xd6/AEyCa13Kt/or65
- FYZa5ubSM5QDAIHkw8kQrzsxhRLAmNDFZJTDHOJlRQmga4spjU3NQsrkSHugM6NoMpCX
- E+0g==
-X-Gm-Message-State: AOAM533mlCb0T8+m1XBlvyA8zAeQR7PcLC5vE5Cnc6OFLLGFFGnxTOYH
- nrN1//d522eqvSD8jgVQZuypMXrPPF3J+Q==
-X-Google-Smtp-Source: ABdhPJw+se9W1WtXmKMZGAHlKna5uJVtR1KGit6G2Og/A2azeWskc6mjc5fG5yMhAuUsBP7/FkDPfg==
-X-Received: by 2002:aa7:868b:: with SMTP id d11mr10304598pfo.52.1591378655149; 
- Fri, 05 Jun 2020 10:37:35 -0700 (PDT)
+ bh=KA74qkYRKvEU3ng1kAP13z7yTrox0/WpEe+h4sJiZmM=;
+ b=JLzUZFNR4ODuhgfyb3CuAESpCsQRIpsJ9L30ASNF7tjrCrSjAH9vLdjfhytyL+aSDZ
+ 43mmRlqA3QlpYdQqFL+vbxyk3Sm6mNDyg8hbp8nAwH95SxSOJmC8cDYzyy3Zaz6yNChy
+ 9sF2eJk71/JX4aHqMtQ2/Bh9bSasd6OCW03c0sJgOwozsSAvb64Xbc1JgQ99Im87V73L
+ NQluhtJRE/brsx25L1XBjYU8FLUSCohOjUiWyvVoiYPKO1r8esoRysUc7wr8kNdydpsu
+ sIInAz7PiiLyl5CvbaD8Mf3FhLpSHoummpa4Cah3/3VZE7O+Drk4y7M3IUA8gtMxHeY7
+ SUXQ==
+X-Gm-Message-State: AOAM532ETORFXidpqNQa7AgcBbNp0gBQqwL5/m+rV5Uio/oFrZ5ZNii2
+ QSXpCjba0TJ6+NObZVpG4z1e36FFHX2JgA==
+X-Google-Smtp-Source: ABdhPJxA2O96zZ55IsBV3APgiv6CPJKSRMFbChmryneh1OAD2OWU7gaiafd8gWr/JnA4dGsHV0HObg==
+X-Received: by 2002:a63:fc4a:: with SMTP id r10mr10624014pgk.417.1591378659877; 
+ Fri, 05 Jun 2020 10:37:39 -0700 (PDT)
 Received: from Rfoley-MA01.hsd1.ma.comcast.net
  (c-73-47-162-176.hsd1.ma.comcast.net. [73.47.162.176])
- by smtp.gmail.com with ESMTPSA id a19sm188307pfd.165.2020.06.05.10.37.32
+ by smtp.gmail.com with ESMTPSA id a19sm188307pfd.165.2020.06.05.10.37.37
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 05 Jun 2020 10:37:34 -0700 (PDT)
+ Fri, 05 Jun 2020 10:37:38 -0700 (PDT)
 From: Robert Foley <robert.foley@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 02/13] cpu: convert queued work to a QSIMPLEQ
-Date: Fri,  5 Jun 2020 13:34:11 -0400
-Message-Id: <20200605173422.1490-3-robert.foley@linaro.org>
+Subject: [PATCH v2 04/13] cputlb: destroy CPUTLB with tlb_destroy
+Date: Fri,  5 Jun 2020 13:34:13 -0400
+Message-Id: <20200605173422.1490-5-robert.foley@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200605173422.1490-1-robert.foley@linaro.org>
 References: <20200605173422.1490-1-robert.foley@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::443;
- envelope-from=robert.foley@linaro.org; helo=mail-pf1-x443.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::444;
+ envelope-from=robert.foley@linaro.org; helo=mail-pf1-x444.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -101,8 +101,8 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: robert.foley@linaro.org, Eduardo Habkost <ehabkost@redhat.com>,
- cota@braap.org, Paolo Bonzini <pbonzini@redhat.com>, peter.puhov@linaro.org,
+Cc: robert.foley@linaro.org, cota@braap.org,
+ Paolo Bonzini <pbonzini@redhat.com>, peter.puhov@linaro.org,
  alex.bennee@linaro.org, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
@@ -110,146 +110,82 @@ Sender: "Qemu-devel"
 
 From: "Emilio G. Cota" <cota@braap.org>
 
-We convert queued work to a QSIMPLEQ, instead of
-open-coding it.
+I was after adding qemu_spin_destroy calls, but while at
+it I noticed that we are leaking some memory.
 
-While at it, make sure that all accesses to the list are
-performed while holding the list's lock.
-
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 Signed-off-by: Robert Foley <robert.foley@linaro.org>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- cpus-common.c         | 25 ++++++++-----------------
- cpus.c                | 14 ++++++++++++--
- hw/core/cpu.c         |  1 +
- include/hw/core/cpu.h |  6 +++---
- 4 files changed, 24 insertions(+), 22 deletions(-)
+ accel/tcg/cputlb.c      | 15 +++++++++++++++
+ exec.c                  |  1 +
+ include/exec/exec-all.h |  8 ++++++++
+ 3 files changed, 24 insertions(+)
 
-diff --git a/cpus-common.c b/cpus-common.c
-index 70a9d12981..8f5512b3d7 100644
---- a/cpus-common.c
-+++ b/cpus-common.c
-@@ -97,7 +97,7 @@ void cpu_list_remove(CPUState *cpu)
- }
- 
- struct qemu_work_item {
--    struct qemu_work_item *next;
-+    QSIMPLEQ_ENTRY(qemu_work_item) node;
-     run_on_cpu_func func;
-     run_on_cpu_data data;
-     bool free, exclusive, done;
-@@ -106,13 +106,7 @@ struct qemu_work_item {
- static void queue_work_on_cpu(CPUState *cpu, struct qemu_work_item *wi)
- {
-     qemu_mutex_lock(&cpu->work_mutex);
--    if (cpu->queued_work_first == NULL) {
--        cpu->queued_work_first = wi;
--    } else {
--        cpu->queued_work_last->next = wi;
--    }
--    cpu->queued_work_last = wi;
--    wi->next = NULL;
-+    QSIMPLEQ_INSERT_TAIL(&cpu->work_list, wi, node);
-     wi->done = false;
-     qemu_mutex_unlock(&cpu->work_mutex);
- 
-@@ -306,17 +300,14 @@ void process_queued_cpu_work(CPUState *cpu)
- {
-     struct qemu_work_item *wi;
- 
--    if (cpu->queued_work_first == NULL) {
-+    qemu_mutex_lock(&cpu->work_mutex);
-+    if (QSIMPLEQ_EMPTY(&cpu->work_list)) {
-+        qemu_mutex_unlock(&cpu->work_mutex);
-         return;
+diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
+index eb2cf9de5e..1e815357c7 100644
+--- a/accel/tcg/cputlb.c
++++ b/accel/tcg/cputlb.c
+@@ -270,6 +270,21 @@ void tlb_init(CPUState *cpu)
      }
--
--    qemu_mutex_lock(&cpu->work_mutex);
--    while (cpu->queued_work_first != NULL) {
--        wi = cpu->queued_work_first;
--        cpu->queued_work_first = wi->next;
--        if (!cpu->queued_work_first) {
--            cpu->queued_work_last = NULL;
--        }
-+    while (!QSIMPLEQ_EMPTY(&cpu->work_list)) {
-+        wi = QSIMPLEQ_FIRST(&cpu->work_list);
-+        QSIMPLEQ_REMOVE_HEAD(&cpu->work_list, node);
-         qemu_mutex_unlock(&cpu->work_mutex);
-         if (wi->exclusive) {
-             /* Running work items outside the BQL avoids the following deadlock:
-diff --git a/cpus.c b/cpus.c
-index 5670c96bcf..af44027549 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -97,9 +97,19 @@ bool cpu_is_stopped(CPUState *cpu)
-     return cpu->stopped || !runstate_is_running();
  }
  
-+static inline bool cpu_work_list_empty(CPUState *cpu)
++void tlb_destroy(CPUState *cpu)
 +{
-+    bool ret;
++    CPUArchState *env = cpu->env_ptr;
++    int i;
 +
-+    qemu_mutex_lock(&cpu->work_mutex);
-+    ret = QSIMPLEQ_EMPTY(&cpu->work_list);
-+    qemu_mutex_unlock(&cpu->work_mutex);
-+    return ret;
++    qemu_spin_destroy(&env_tlb(env)->c.lock);
++    for (i = 0; i < NB_MMU_MODES; i++) {
++        CPUTLBDesc *desc = &env_tlb(env)->d[i];
++        CPUTLBDescFast *fast = &env_tlb(env)->f[i];
++
++        g_free(fast->table);
++        g_free(desc->iotlb);
++    }
 +}
 +
- static bool cpu_thread_is_idle(CPUState *cpu)
+ /* flush_all_helper: run fn across all cpus
+  *
+  * If the wait flag is set then the src cpu's helper will be queued as
+diff --git a/exec.c b/exec.c
+index 5162f0d12f..da3d60b034 100644
+--- a/exec.c
++++ b/exec.c
+@@ -892,6 +892,7 @@ void cpu_exec_unrealizefn(CPUState *cpu)
  {
--    if (cpu->stop || cpu->queued_work_first) {
-+    if (cpu->stop || !cpu_work_list_empty(cpu)) {
-         return false;
-     }
-     if (cpu_is_stopped(cpu)) {
-@@ -1498,7 +1508,7 @@ static void *qemu_tcg_rr_cpu_thread_fn(void *arg)
-             cpu = first_cpu;
-         }
+     CPUClass *cc = CPU_GET_CLASS(cpu);
  
--        while (cpu && !cpu->queued_work_first && !cpu->exit_request) {
-+        while (cpu && cpu_work_list_empty(cpu) && !cpu->exit_request) {
++    tlb_destroy(cpu);
+     cpu_list_remove(cpu);
  
-             atomic_mb_set(&tcg_current_rr_cpu, cpu);
-             current_cpu = cpu;
-diff --git a/hw/core/cpu.c b/hw/core/cpu.c
-index 5284d384fb..77703d62b7 100644
---- a/hw/core/cpu.c
-+++ b/hw/core/cpu.c
-@@ -368,6 +368,7 @@ static void cpu_common_initfn(Object *obj)
-     cpu->nr_threads = 1;
- 
-     qemu_mutex_init(&cpu->work_mutex);
-+    QSIMPLEQ_INIT(&cpu->work_list);
-     QTAILQ_INIT(&cpu->breakpoints);
-     QTAILQ_INIT(&cpu->watchpoints);
- 
-diff --git a/include/hw/core/cpu.h b/include/hw/core/cpu.h
-index 07f7698155..d78ff1d165 100644
---- a/include/hw/core/cpu.h
-+++ b/include/hw/core/cpu.h
-@@ -331,8 +331,8 @@ struct qemu_work_item;
-  * @opaque: User data.
-  * @mem_io_pc: Host Program Counter at which the memory was accessed.
-  * @kvm_fd: vCPU file descriptor for KVM.
-- * @work_mutex: Lock to prevent multiple access to queued_work_*.
-- * @queued_work_first: First asynchronous work pending.
-+ * @work_mutex: Lock to prevent multiple access to @work_list.
-+ * @work_list: List of pending asynchronous work.
-  * @trace_dstate_delayed: Delayed changes to trace_dstate (includes all changes
-  *                        to @trace_dstate).
-  * @trace_dstate: Dynamic tracing state of events for this vCPU (bitmask).
-@@ -376,7 +376,7 @@ struct CPUState {
-     sigjmp_buf jmp_env;
- 
-     QemuMutex work_mutex;
--    struct qemu_work_item *queued_work_first, *queued_work_last;
-+    QSIMPLEQ_HEAD(, qemu_work_item) work_list;
- 
-     CPUAddressSpace *cpu_ases;
-     int num_ases;
+     if (cc->vmsd != NULL) {
+diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
+index 8792bea07a..3cf88272df 100644
+--- a/include/exec/exec-all.h
++++ b/include/exec/exec-all.h
+@@ -124,6 +124,11 @@ void cpu_address_space_init(CPUState *cpu, int asidx,
+  * @cpu: CPU whose TLB should be initialized
+  */
+ void tlb_init(CPUState *cpu);
++/**
++ * tlb_destroy - destroy a CPU's TLB
++ * @cpu: CPU whose TLB should be destroyed
++ */
++void tlb_destroy(CPUState *cpu);
+ /**
+  * tlb_flush_page:
+  * @cpu: CPU whose TLB should be flushed
+@@ -284,6 +289,9 @@ void tlb_set_page(CPUState *cpu, target_ulong vaddr,
+ static inline void tlb_init(CPUState *cpu)
+ {
+ }
++static inline void tlb_destroy(CPUState *cpu)
++{
++}
+ static inline void tlb_flush_page(CPUState *cpu, target_ulong addr)
+ {
+ }
 -- 
 2.17.1
 
