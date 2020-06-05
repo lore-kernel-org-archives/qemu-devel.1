@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D754BC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 04:21:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A231C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 04:22:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A2A65206E6
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 04:21:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C8296206E6
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 04:22:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="A0tjNfKG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2A65206E6
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ENhlwBTP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8296206E6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58150 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59198 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jh3rh-0005F5-Qi
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 00:21:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39486)
+	id 1jh3rt-0005ey-42
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 00:22:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39526)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jh3nd-0004Nt-4h
- for qemu-devel@nongnu.org; Fri, 05 Jun 2020 00:17:45 -0400
-Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:38083)
+ id 1jh3ng-0004YU-Nu
+ for qemu-devel@nongnu.org; Fri, 05 Jun 2020 00:17:48 -0400
+Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:50428)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jh3nc-0000k4-BQ
- for qemu-devel@nongnu.org; Fri, 05 Jun 2020 00:17:44 -0400
-Received: by mail-pj1-x1042.google.com with SMTP id d6so2180032pjs.3
- for <qemu-devel@nongnu.org>; Thu, 04 Jun 2020 21:17:43 -0700 (PDT)
+ id 1jh3nf-0000kw-PO
+ for qemu-devel@nongnu.org; Fri, 05 Jun 2020 00:17:48 -0400
+Received: by mail-pj1-x1042.google.com with SMTP id jz3so2057014pjb.0
+ for <qemu-devel@nongnu.org>; Thu, 04 Jun 2020 21:17:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=mHdkZW2BtXgCCzUvavDtufJgojf9AzZZHlwJyJIkodU=;
- b=A0tjNfKG6o69Lfe9DGoQRD5xlUXCVE3IYgfK4e7eSVqCxRoJeP+FDG4Ufc9QSEhVVN
- BF/fnDWIPQEWhfJL9VG1bGcmgvAPP0TQw77ZOtbFm+wtuv7aXUZBO6lj57lqJYT5QWCd
- AXEk+pKZC7KjL+U2FUX2+94bO8y0VSwCJOBbDmBseywpQpO3XiZ8oZdvWXiWB6eyaGwB
- QcFjTHP1k10npcJwNwG/iwZC+LKii0S0hw5JzdbJA868koVF6GHvpIjMnngR02Hvqo0m
- wXZnY3XLVzepBIpLclJvUWZFB1FtB4z8cJa0lrx9UxKHPCcgbBBPjEtK9Wq1jV4vYJkQ
- Weug==
+ bh=icu8Xm8+iq0LFQnztaWvz0M6KFnN5WeXG+dX4xSgCB0=;
+ b=ENhlwBTPAICF2kxkscsFd9h5uKG0+SgIUId49kIUuFpcoHB9bONUg3CxMO1dsSB13F
+ d2beu93TTZp5rDNJbnIFfRNo5WpId2QtnU1gtjkcSGreHEBDx03NNxhfpfpD7Aw9WUOM
+ I5H3llmqRMkcLPI9DDBXaokQbBzQOXaceOEBGr0sp8jln2RB/AK16wSYZhX8giaYAO9T
+ ujVEK7YDtkI+mUn1+RYmfsPCaaqCFY8wnEDEVPSi9/NPdBpxec6F//uKhssfBGPTyrRJ
+ 4B1lWzXixcWNuQmT2YcvKcERPaOYi/XDuBMTFXtTyveW8YbOnFFfHMh+0Aqneb/XZOPm
+ bphQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=mHdkZW2BtXgCCzUvavDtufJgojf9AzZZHlwJyJIkodU=;
- b=WEEcpnByuKF7RGAGU3ypbZc1KAyHCTFBulrvhqR1bb/LEGJAbV3eS/XAULd9Bkgczm
- C+d1hx6MIfBesu+92qFj3QC5eUb6oTjRv4Qg0vNeOeSPsETACvMW3KLvmW06ttRlh8k4
- UIIKkIxvRdMRO3WYUK80s6B5BqMM6jcrqKMszsbC1exaNJKjkDlldQKjR+Rq5MHoc21P
- /xKTgUn+suQSNjpnwPKsUQaFWjFge+76iEOBd7g9vEhphZ4tLMsfvC3vSH5vtCR3muuk
- v/y7b6jYCQqesLVNKkeZDt0GPupjEOo5VzPL8sXoXzIROnF7CGVTiuu5w05CwV/wor6B
- 3kbg==
-X-Gm-Message-State: AOAM5338i/08oNkW6F4HPjojcSPEJYOUJ5VsUxzbvUXafay5MhHcvb/L
- n1leRAmw8F3rmmEU9J3hLoYORem888A=
-X-Google-Smtp-Source: ABdhPJwctokSJwMErfDPEYCtZO4AWVtcyE3yWYzmPyIPu/maWAYpnSJICjtLbuzfwB1NE1SFh5yFMg==
-X-Received: by 2002:a17:90b:605:: with SMTP id
- gb5mr699334pjb.167.1591330662669; 
- Thu, 04 Jun 2020 21:17:42 -0700 (PDT)
+ bh=icu8Xm8+iq0LFQnztaWvz0M6KFnN5WeXG+dX4xSgCB0=;
+ b=S/jhcwY9J5Bp9zFpcLPdTZJrPCMYT0GsuCgxpaEA0hYjKu9ABTb4Bm58lzkEOJDEwx
+ 5ujIUCFjZ3bUcyOwFKfN4wHhIcnTdbHCLMByQVmjYsE3UV/MYMi6cHdn5ttBrjX5EMdM
+ 00jaMJekeKmqQkmQNPLVjS8oQy1l8rHobCekApEPqrBjQgz8v29t1ks7/Z+3fjnm/ufG
+ wQGztxXHEXV+12hILLtFbuh7iI1fE5COlaVL8h99veLyN8ETBWRrcwIbWcQTf2/0QffT
+ 6lAhYFoFjvTDW490w/JDW2SdY3Fp7BR0YS5e+yDg48Kl8EeML52zb/mUfDZa3bm6TN9k
+ 8P9w==
+X-Gm-Message-State: AOAM533UsJhNcIX7ClPkakUHw/5/LOk0uDv1xD4IBwPR1WGEqNI9v8cW
+ Nb37XBM8zwfX61crxL7VYluHiWLTIUw=
+X-Google-Smtp-Source: ABdhPJx8ml2qgvN53/sQuOFKl3ajEDeK3rLf3hymF8RR20lvSJn253hHmsa1ufVJis1OY863HtLqsQ==
+X-Received: by 2002:a17:902:7d8a:: with SMTP id
+ a10mr7643821plm.116.1591330666007; 
+ Thu, 04 Jun 2020 21:17:46 -0700 (PDT)
 Received: from localhost.localdomain (174-21-143-238.tukw.qwest.net.
  [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id h15sm5440902pgl.12.2020.06.04.21.17.41
+ by smtp.gmail.com with ESMTPSA id h15sm5440902pgl.12.2020.06.04.21.17.44
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 04 Jun 2020 21:17:42 -0700 (PDT)
+ Thu, 04 Jun 2020 21:17:45 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 06/17] linux-user: Do not use guest_addr_valid for h2g_valid
-Date: Thu,  4 Jun 2020 21:17:22 -0700
-Message-Id: <20200605041733.415188-7-richard.henderson@linaro.org>
+Subject: [PATCH v2 09/17] linux-user/aarch64: Implement PR_TAGGED_ADDR_ENABLE
+Date: Thu,  4 Jun 2020 21:17:25 -0700
+Message-Id: <20200605041733.415188-10-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200605041733.415188-1-richard.henderson@linaro.org>
 References: <20200605041733.415188-1-richard.henderson@linaro.org>
@@ -106,43 +106,63 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is the only use of guest_addr_valid that does not begin
-with a guest address, but a host address being transformed to
-a guest address.
-
-We will shortly adjust guest_addr_valid to handle guest memory
-tags, and the host address should not be subjected to that.
-
-Move h2g_valid adjacent to the other h2g macros.
+This is the prctl bit that controls whether syscalls accept tagged
+addresses.  See Documentation/arm64/tagged-address-abi.rst in the
+linux kernel.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- include/exec/cpu_ldst.h | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ linux-user/aarch64/target_syscall.h |  4 ++++
+ linux-user/syscall.c                | 23 +++++++++++++++++++++++
+ 2 files changed, 27 insertions(+)
 
-diff --git a/include/exec/cpu_ldst.h b/include/exec/cpu_ldst.h
-index c14a48f65e..3930362e20 100644
---- a/include/exec/cpu_ldst.h
-+++ b/include/exec/cpu_ldst.h
-@@ -77,15 +77,16 @@ typedef uint64_t abi_ptr;
- #else
- #define guest_addr_valid(x) ((x) <= GUEST_ADDR_MAX)
- #endif
--#define h2g_valid(x) guest_addr_valid((unsigned long)(x) - guest_base)
+diff --git a/linux-user/aarch64/target_syscall.h b/linux-user/aarch64/target_syscall.h
+index 995e475c73..5fb0bf4a5d 100644
+--- a/linux-user/aarch64/target_syscall.h
++++ b/linux-user/aarch64/target_syscall.h
+@@ -29,4 +29,8 @@ struct target_pt_regs {
+ # define TARGET_PR_PAC_APDBKEY   (1 << 3)
+ # define TARGET_PR_PAC_APGAKEY   (1 << 4)
  
- static inline int guest_range_valid(unsigned long start, unsigned long len)
- {
-     return len - 1 <= GUEST_ADDR_MAX && start <= GUEST_ADDR_MAX - len + 1;
- }
- 
-+#define h2g_valid(x)  ((uintptr_t)(x) - guest_base <= GUEST_ADDR_MAX)
++#define TARGET_PR_SET_TAGGED_ADDR_CTRL 55
++#define TARGET_PR_GET_TAGGED_ADDR_CTRL 56
++# define TARGET_PR_TAGGED_ADDR_ENABLE  (1UL << 0)
 +
- #define h2g_nocheck(x) ({ \
--    unsigned long __ret = (unsigned long)(x) - guest_base; \
-+    uintptr_t __ret = (uintptr_t)(x) - guest_base; \
-     (abi_ptr)__ret; \
- })
- 
+ #endif /* AARCH64_TARGET_SYSCALL_H */
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index d190fb1122..e4da53c5b3 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -10460,6 +10460,29 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+                 }
+             }
+             return -TARGET_EINVAL;
++        case TARGET_PR_SET_TAGGED_ADDR_CTRL:
++            {
++                abi_ulong valid_mask = TARGET_PR_TAGGED_ADDR_ENABLE;
++
++                if ((arg2 & ~valid_mask) || arg3 || arg4 || arg5) {
++                    return -TARGET_EINVAL;
++                }
++                untagged_addr_mask = (arg2 & TARGET_PR_TAGGED_ADDR_ENABLE
++                                      ? MAKE_64BIT_MASK(0, 56) : -1);
++                return 0;
++            }
++        case TARGET_PR_GET_TAGGED_ADDR_CTRL:
++            {
++                abi_long ret = 0;
++
++                if (arg2 || arg3 || arg4 || arg5) {
++                    return -TARGET_EINVAL;
++                }
++                if (~untagged_addr_mask != 0) {
++                    ret |= TARGET_PR_TAGGED_ADDR_ENABLE;
++                }
++                return ret;
++            }
+ #endif /* AARCH64 */
+         case PR_GET_SECCOMP:
+         case PR_SET_SECCOMP:
 -- 
 2.25.1
 
