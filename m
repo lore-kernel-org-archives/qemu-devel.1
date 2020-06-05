@@ -2,85 +2,85 @@ Return-Path: <SRS0=hXcz=7S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E5B1C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 16:59:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 847A8C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 16:59:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 489EF2077D
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 16:59:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 502172077D
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 16:59:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dhPPWnv8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 489EF2077D
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zKXigGze"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 502172077D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35690 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37804 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jhFgU-0003b7-Ew
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 12:59:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40614)
+	id 1jhFgt-0004YS-Im
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 12:59:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40610)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jhFYE-00021W-47
- for qemu-devel@nongnu.org; Fri, 05 Jun 2020 12:50:38 -0400
-Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:37699)
+ id 1jhFYD-0001z0-4N
+ for qemu-devel@nongnu.org; Fri, 05 Jun 2020 12:50:37 -0400
+Received: from mail-wm1-x32a.google.com ([2a00:1450:4864:20::32a]:54295)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jhFYC-0001hz-Pc
- for qemu-devel@nongnu.org; Fri, 05 Jun 2020 12:50:37 -0400
-Received: by mail-wm1-x336.google.com with SMTP id y20so2052247wmi.2
- for <qemu-devel@nongnu.org>; Fri, 05 Jun 2020 09:50:36 -0700 (PDT)
+ id 1jhFYB-0001ho-PW
+ for qemu-devel@nongnu.org; Fri, 05 Jun 2020 12:50:36 -0400
+Received: by mail-wm1-x32a.google.com with SMTP id g10so9049880wmh.4
+ for <qemu-devel@nongnu.org>; Fri, 05 Jun 2020 09:50:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=TElvLw1zy+iE9k3jlMsYboQ92jOMtwZTIdWUQibLhGM=;
- b=dhPPWnv8e8pK2Phb+HH+ZvxVSyQsUCCbJBcpsD9dL3zxCxpPRLXZd6ZqPocTWKE7Za
- eAlm2itKYDcmT6dmVkEZsTwesT5MaEDBgy7NZUy0jw6XmQsLVc88N2kzYRAWaQOW3YsO
- RBP0gaAp0Tjz5h8xqgDJNeGwvGCZfyWOGmwlHXZAF3MoKbUn6J0eHQ06pZD3oW/SOC2k
- 9Jrwgd3zlwFZ2H0Q/zq3GJqtgiKlVRXedFh/c7JKr76dEQAJuCnHGLzu3TD3s/gNc26p
- 4Kmi/wy1ve5NnOftRNozWhFPuEt45E8vmUyN6vzKEpRoonuZifkyu95PAHDAXdL9mF90
- jHyA==
+ bh=h+cs/dbYYlYfUunXToQM41Sl4OQe3x5+V7cpaaBqUqY=;
+ b=zKXigGzen5s1E8x3VuW4NFFYrXoAlOorXwdFBSFrtkdrQfNV7FvYkAQc6hDdT6M3gU
+ 9JrVj+bT67AIBvs8AewJTYq8ejUij0QJmaUltGPWBQeNl1rKztBt6QKLv0wIKajtAktN
+ UpyMA97HZIS/hFopp6wWtIDupnraT1zjIGgffRSOPKgkatbbhOIFhq8sncOfxIR7ajLU
+ ChTA8N10RchqDNK6t+iF5P6xhjK9dVaSCfNxYj4eEsO1nm/ZUE/ACNRUy2AvRENBUTkt
+ IESlMOaQUERTxcYdBleuawKmrkrsanDA5nhdFKtRVmaTv/TZ13vqqMyNuG7kb9ltsdLs
+ PUVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=TElvLw1zy+iE9k3jlMsYboQ92jOMtwZTIdWUQibLhGM=;
- b=FK9mctUWQcr4wOe90E8g5QhGXaKRA+IOFmB72Mcbj8P37b8ZgIKsaHS519xLXSnhtR
- ynt2445kbbRjgemkTxcDjTnKYAtLiE+MYB6vpEssTDeDFd1xWicSIVnWfCT6XrkmfqxC
- 0sOT1qvZxl4gNoxqjB/WpyK9830VCJ4LD+N/EwkdTBPXYeSOk+1N5MDPSNcLWNTBLqT2
- S5Sy2ehdwVcURk5vCOtNRzLG6xhcGmGrJ8rvv5uw+hAiZbbWd9ZFqyY8Q9km790unrop
- uHNOq0mlpW2eDwNCpqbaaB78xt+WJTwDb6A7mcPa5+JbDbhwpwmdvyz+VQVa2UONmeCf
- bDtQ==
-X-Gm-Message-State: AOAM530yjLYA2diMnddmBOQRQWF0zoCQlp1ysBOwvus4YYzqlFZA0EEw
- T/ItN1QHbxDopHck+b+Ew0PP0aNKXt4f+g==
-X-Google-Smtp-Source: ABdhPJwCG27J0i6ftfo/y8ziyxhyMSObW9xGt0vDMxrX23hoikwBmzzKV83x6lWDogFBLJasipoOZg==
-X-Received: by 2002:a05:600c:4152:: with SMTP id
- h18mr3763402wmm.189.1591375834929; 
- Fri, 05 Jun 2020 09:50:34 -0700 (PDT)
+ bh=h+cs/dbYYlYfUunXToQM41Sl4OQe3x5+V7cpaaBqUqY=;
+ b=uB+cDB0/piIe38GnJqmzMTzcTmGt56DXYYNu1LZalwwBt3Znw4r632PyXX2x3oSNbe
+ Uefovfoy6MV2ewKHZp/GszzQYSC6cmF9gNxhowmFG4s4w7PfbES4DySD7jNc3piA5QVT
+ 8NlNmICzLQQsId0iHjuQ9pS1gceLGpxJfMwz5/OJzh3uBUVT6jTBxomlwm5kK+1b0NwN
+ 9HKR0dJ1GIA78pUJXHWl004z0Qgz5h1DVb9O3E/qtVQU5DsHw/BxdNVOwffpr14rerH0
+ 9C4qpZ5jbKlfywlLK3lJKDjb2GkknAg8Q53qBzo2HLU9bfnGCppRpqbyPPvUFuV9nw66
+ fZjA==
+X-Gm-Message-State: AOAM532oRDpvnCuvrLU6JwpOLc05EYEQpjuPpMo+ukPAbx3UWogPj9K4
+ ZCCzQ26Gbvgmtc42u0l6IFeUqVjpTVLjNw==
+X-Google-Smtp-Source: ABdhPJysSySWxEurnI84mnJjeRHsbERNIiFVl7NnAuR1VCz1aeEcO8ypl/tE+K2+8HQzrsv9HBaMkQ==
+X-Received: by 2002:a05:600c:24c:: with SMTP id
+ 12mr3738479wmj.28.1591375831055; 
+ Fri, 05 Jun 2020 09:50:31 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id c140sm12272724wmd.18.2020.06.05.09.50.33
+ by smtp.gmail.com with ESMTPSA id c140sm12272724wmd.18.2020.06.05.09.50.30
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 05 Jun 2020 09:50:34 -0700 (PDT)
+ Fri, 05 Jun 2020 09:50:30 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 23/29] target/arm: Convert Neon VSRA, VSRI, VRSHR,
- VRSRA 2-reg-shift insns to decodetree
-Date: Fri,  5 Jun 2020 17:50:01 +0100
-Message-Id: <20200605165007.12095-24-peter.maydell@linaro.org>
+Subject: [PULL 19/29] wire in the dwc-hsotg (dwc2) USB host controller
+ emulation
+Date: Fri,  5 Jun 2020 17:49:57 +0100
+Message-Id: <20200605165007.12095-20-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200605165007.12095-1-peter.maydell@linaro.org>
 References: <20200605165007.12095-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::336;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x336.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::32a;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x32a.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -106,153 +106,86 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Convert the VSRA, VSRI, VRSHR, VRSRA 2-reg-shift insns to decodetree.
-(These are the last instructions in the group that are vectorized;
-the rest all require looping over each element.)
+From: Paul Zimmerman <pauldzim@gmail.com>
 
+Wire the dwc-hsotg (dwc2) emulation into Qemu
+
+Signed-off-by: Paul Zimmerman <pauldzim@gmail.com>
+Reviewed-by: Philippe Mathieu-Daude <f4bug@amsat.org>
+Message-id: 20200520235349.21215-7-pauldzim@gmail.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20200522145520.6778-4-peter.maydell@linaro.org
 ---
- target/arm/neon-dp.decode       | 35 ++++++++++++++++++++++
- target/arm/translate-neon.inc.c |  7 +++++
- target/arm/translate.c          | 52 +++------------------------------
- 3 files changed, 46 insertions(+), 48 deletions(-)
+ include/hw/arm/bcm2835_peripherals.h |  3 ++-
+ hw/arm/bcm2835_peripherals.c         | 21 ++++++++++++++++++++-
+ 2 files changed, 22 insertions(+), 2 deletions(-)
 
-diff --git a/target/arm/neon-dp.decode b/target/arm/neon-dp.decode
-index 1b877cc68f6..659cf139303 100644
---- a/target/arm/neon-dp.decode
-+++ b/target/arm/neon-dp.decode
-@@ -242,6 +242,41 @@ VSHR_U_2sh       1111 001 1 1 . ...... .... 0000 . . . 1 .... @2reg_shr_s
- VSHR_U_2sh       1111 001 1 1 . ...... .... 0000 . . . 1 .... @2reg_shr_h
- VSHR_U_2sh       1111 001 1 1 . ...... .... 0000 . . . 1 .... @2reg_shr_b
+diff --git a/include/hw/arm/bcm2835_peripherals.h b/include/hw/arm/bcm2835_peripherals.h
+index 7a7a8f61414..48a0ad16335 100644
+--- a/include/hw/arm/bcm2835_peripherals.h
++++ b/include/hw/arm/bcm2835_peripherals.h
+@@ -27,6 +27,7 @@
+ #include "hw/sd/bcm2835_sdhost.h"
+ #include "hw/gpio/bcm2835_gpio.h"
+ #include "hw/timer/bcm2835_systmr.h"
++#include "hw/usb/hcd-dwc2.h"
+ #include "hw/misc/unimp.h"
  
-+VSRA_S_2sh       1111 001 0 1 . ...... .... 0001 . . . 1 .... @2reg_shr_d
-+VSRA_S_2sh       1111 001 0 1 . ...... .... 0001 . . . 1 .... @2reg_shr_s
-+VSRA_S_2sh       1111 001 0 1 . ...... .... 0001 . . . 1 .... @2reg_shr_h
-+VSRA_S_2sh       1111 001 0 1 . ...... .... 0001 . . . 1 .... @2reg_shr_b
-+
-+VSRA_U_2sh       1111 001 1 1 . ...... .... 0001 . . . 1 .... @2reg_shr_d
-+VSRA_U_2sh       1111 001 1 1 . ...... .... 0001 . . . 1 .... @2reg_shr_s
-+VSRA_U_2sh       1111 001 1 1 . ...... .... 0001 . . . 1 .... @2reg_shr_h
-+VSRA_U_2sh       1111 001 1 1 . ...... .... 0001 . . . 1 .... @2reg_shr_b
-+
-+VRSHR_S_2sh      1111 001 0 1 . ...... .... 0010 . . . 1 .... @2reg_shr_d
-+VRSHR_S_2sh      1111 001 0 1 . ...... .... 0010 . . . 1 .... @2reg_shr_s
-+VRSHR_S_2sh      1111 001 0 1 . ...... .... 0010 . . . 1 .... @2reg_shr_h
-+VRSHR_S_2sh      1111 001 0 1 . ...... .... 0010 . . . 1 .... @2reg_shr_b
-+
-+VRSHR_U_2sh      1111 001 1 1 . ...... .... 0010 . . . 1 .... @2reg_shr_d
-+VRSHR_U_2sh      1111 001 1 1 . ...... .... 0010 . . . 1 .... @2reg_shr_s
-+VRSHR_U_2sh      1111 001 1 1 . ...... .... 0010 . . . 1 .... @2reg_shr_h
-+VRSHR_U_2sh      1111 001 1 1 . ...... .... 0010 . . . 1 .... @2reg_shr_b
-+
-+VRSRA_S_2sh      1111 001 0 1 . ...... .... 0011 . . . 1 .... @2reg_shr_d
-+VRSRA_S_2sh      1111 001 0 1 . ...... .... 0011 . . . 1 .... @2reg_shr_s
-+VRSRA_S_2sh      1111 001 0 1 . ...... .... 0011 . . . 1 .... @2reg_shr_h
-+VRSRA_S_2sh      1111 001 0 1 . ...... .... 0011 . . . 1 .... @2reg_shr_b
-+
-+VRSRA_U_2sh      1111 001 1 1 . ...... .... 0011 . . . 1 .... @2reg_shr_d
-+VRSRA_U_2sh      1111 001 1 1 . ...... .... 0011 . . . 1 .... @2reg_shr_s
-+VRSRA_U_2sh      1111 001 1 1 . ...... .... 0011 . . . 1 .... @2reg_shr_h
-+VRSRA_U_2sh      1111 001 1 1 . ...... .... 0011 . . . 1 .... @2reg_shr_b
-+
-+VSRI_2sh         1111 001 1 1 . ...... .... 0100 . . . 1 .... @2reg_shr_d
-+VSRI_2sh         1111 001 1 1 . ...... .... 0100 . . . 1 .... @2reg_shr_s
-+VSRI_2sh         1111 001 1 1 . ...... .... 0100 . . . 1 .... @2reg_shr_h
-+VSRI_2sh         1111 001 1 1 . ...... .... 0100 . . . 1 .... @2reg_shr_b
-+
- VSHL_2sh         1111 001 0 1 . ...... .... 0101 . . . 1 .... @2reg_shl_d
- VSHL_2sh         1111 001 0 1 . ...... .... 0101 . . . 1 .... @2reg_shl_s
- VSHL_2sh         1111 001 0 1 . ...... .... 0101 . . . 1 .... @2reg_shl_h
-diff --git a/target/arm/translate-neon.inc.c b/target/arm/translate-neon.inc.c
-index 8693b9aa99d..28688000594 100644
---- a/target/arm/translate-neon.inc.c
-+++ b/target/arm/translate-neon.inc.c
-@@ -1258,6 +1258,13 @@ static bool do_vector_2sh(DisasContext *s, arg_2reg_shift *a, GVecGen2iFn *fn)
+ #define TYPE_BCM2835_PERIPHERALS "bcm2835-peripherals"
+@@ -67,7 +68,7 @@ typedef struct BCM2835PeripheralState {
+     UnimplementedDeviceState ave0;
+     UnimplementedDeviceState bscsl;
+     UnimplementedDeviceState smi;
+-    UnimplementedDeviceState dwc2;
++    DWC2State dwc2;
+     UnimplementedDeviceState sdramc;
+ } BCM2835PeripheralState;
  
- DO_2SH(VSHL, tcg_gen_gvec_shli)
- DO_2SH(VSLI, gen_gvec_sli)
-+DO_2SH(VSRI, gen_gvec_sri)
-+DO_2SH(VSRA_S, gen_gvec_ssra)
-+DO_2SH(VSRA_U, gen_gvec_usra)
-+DO_2SH(VRSHR_S, gen_gvec_srshr)
-+DO_2SH(VRSHR_U, gen_gvec_urshr)
-+DO_2SH(VRSRA_S, gen_gvec_srsra)
-+DO_2SH(VRSRA_U, gen_gvec_ursra)
+diff --git a/hw/arm/bcm2835_peripherals.c b/hw/arm/bcm2835_peripherals.c
+index b3e0495040d..cca5b5ad04f 100644
+--- a/hw/arm/bcm2835_peripherals.c
++++ b/hw/arm/bcm2835_peripherals.c
+@@ -129,6 +129,13 @@ static void bcm2835_peripherals_init(Object *obj)
+     /* Mphi */
+     sysbus_init_child_obj(obj, "mphi", &s->mphi, sizeof(s->mphi),
+                           TYPE_BCM2835_MPHI);
++
++    /* DWC2 */
++    sysbus_init_child_obj(obj, "dwc2", &s->dwc2, sizeof(s->dwc2),
++                          TYPE_DWC2_USB);
++
++    object_property_add_const_link(OBJECT(&s->dwc2), "dma-mr",
++                                   OBJECT(&s->gpu_bus_mr));
+ }
  
- static bool trans_VSHR_S_2sh(DisasContext *s, arg_2reg_shift *a)
- {
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 4acc94e3cbc..2d08c644839 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -5297,6 +5297,10 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
+ static void bcm2835_peripherals_realize(DeviceState *dev, Error **errp)
+@@ -377,6 +384,19 @@ static void bcm2835_peripherals_realize(DeviceState *dev, Error **errp)
+         qdev_get_gpio_in_named(DEVICE(&s->ic), BCM2835_IC_GPU_IRQ,
+                                INTERRUPT_HOSTPORT));
  
-             switch (op) {
-             case 0: /* VSHR */
-+            case 1: /* VSRA */
-+            case 2: /* VRSHR */
-+            case 3: /* VRSRA */
-+            case 4: /* VSRI */
-             case 5: /* VSHL, VSLI */
-                 return 1; /* handled by decodetree */
-             default:
-@@ -5330,54 +5334,6 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-                     shift = shift - (1 << (size + 3));
-                 }
++    /* DWC2 */
++    object_property_set_bool(OBJECT(&s->dwc2), true, "realized", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
++
++    memory_region_add_subregion(&s->peri_mr, USB_OTG_OFFSET,
++                sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->dwc2), 0));
++    sysbus_connect_irq(SYS_BUS_DEVICE(&s->dwc2), 0,
++        qdev_get_gpio_in_named(DEVICE(&s->ic), BCM2835_IC_GPU_IRQ,
++                               INTERRUPT_USB));
++
+     create_unimp(s, &s->armtmr, "bcm2835-sp804", ARMCTRL_TIMER0_1_OFFSET, 0x40);
+     create_unimp(s, &s->cprman, "bcm2835-cprman", CPRMAN_OFFSET, 0x1000);
+     create_unimp(s, &s->a2w, "bcm2835-a2w", A2W_OFFSET, 0x1000);
+@@ -390,7 +410,6 @@ static void bcm2835_peripherals_realize(DeviceState *dev, Error **errp)
+     create_unimp(s, &s->otp, "bcm2835-otp", OTP_OFFSET, 0x80);
+     create_unimp(s, &s->dbus, "bcm2835-dbus", DBUS_OFFSET, 0x8000);
+     create_unimp(s, &s->ave0, "bcm2835-ave0", AVE0_OFFSET, 0x8000);
+-    create_unimp(s, &s->dwc2, "dwc-usb2", USB_OTG_OFFSET, 0x1000);
+     create_unimp(s, &s->sdramc, "bcm2835-sdramc", SDRAMC_OFFSET, 0x100);
+ }
  
--                switch (op) {
--                case 1:  /* VSRA */
--                    /* Right shift comes here negative.  */
--                    shift = -shift;
--                    if (u) {
--                        gen_gvec_usra(size, rd_ofs, rm_ofs, shift,
--                                      vec_size, vec_size);
--                    } else {
--                        gen_gvec_ssra(size, rd_ofs, rm_ofs, shift,
--                                      vec_size, vec_size);
--                    }
--                    return 0;
--
--                case 2: /* VRSHR */
--                    /* Right shift comes here negative.  */
--                    shift = -shift;
--                    if (u) {
--                        gen_gvec_urshr(size, rd_ofs, rm_ofs, shift,
--                                       vec_size, vec_size);
--                    } else {
--                        gen_gvec_srshr(size, rd_ofs, rm_ofs, shift,
--                                       vec_size, vec_size);
--                    }
--                    return 0;
--
--                case 3: /* VRSRA */
--                    /* Right shift comes here negative.  */
--                    shift = -shift;
--                    if (u) {
--                        gen_gvec_ursra(size, rd_ofs, rm_ofs, shift,
--                                       vec_size, vec_size);
--                    } else {
--                        gen_gvec_srsra(size, rd_ofs, rm_ofs, shift,
--                                       vec_size, vec_size);
--                    }
--                    return 0;
--
--                case 4: /* VSRI */
--                    if (!u) {
--                        return 1;
--                    }
--                    /* Right shift comes here negative.  */
--                    shift = -shift;
--                    gen_gvec_sri(size, rd_ofs, rm_ofs, shift,
--                                 vec_size, vec_size);
--                    return 0;
--                }
--
-                 if (size == 3) {
-                     count = q + 1;
-                 } else {
 -- 
 2.20.1
 
