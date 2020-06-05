@@ -2,80 +2,76 @@ Return-Path: <SRS0=hXcz=7S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AEDAC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 01:30:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A3E0C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 01:30:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2CB612067B
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 01:30:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E82B82067B
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 01:30:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="G1r61BlH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2CB612067B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="M6y1tygO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E82B82067B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40226 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40196 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jh1Br-0002aC-Jk
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 21:30:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55574)
+	id 1jh1C1-0002Zc-6A
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 21:30:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55572)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=4185f83b6=alistair.francis@wdc.com>)
- id 1jh1Au-0000sF-Sq; Thu, 04 Jun 2020 21:29:36 -0400
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:56242)
+ id 1jh1Av-0000sD-3e; Thu, 04 Jun 2020 21:29:37 -0400
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:56239)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=4185f83b6=alistair.francis@wdc.com>)
- id 1jh1At-0008Vw-MV; Thu, 04 Jun 2020 21:29:36 -0400
+ id 1jh1At-0008Vi-3H; Thu, 04 Jun 2020 21:29:36 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
  t=1591320576; x=1622856576;
- h=from:to:cc:subject:date:message-id:in-reply-to:
- references:mime-version:content-transfer-encoding;
- bh=TlTFn5A9/iW5WPtFBqmtDPppcRtWzpovJLC7itAoYUo=;
- b=G1r61BlHr/N3AOJCNrVjrRhpmvOV74BglZL/yfYjkXkX2z4AJCdLoE3h
- xif2aiI2YMPV3loXr7xXzgOr4wOIemiHxnzF08ye7382ej+9aIWDBx91y
- zGsvSyjyu1Q8T3gj52ts06Fb8dBR3Yr9BfNRgNmzKWcgFoddv/bDVHoqN
- Bacsuxo4YDawMERA5e50Ypn1sBHzZln1yuWtq8DPNdgaIoQkCKfc9X2SD
- rz/UCM3GpMWr6QrOfQXNCGjWSNDXrokkKK2GmyKrdoPDSQt7UhT1FifjZ
- UPqqf3xZz6AYCfpkmpq2VfoxQDM0kKo3/C0VsuiHyr0AdWlUMIV6J+OD3 w==;
-IronPort-SDR: zN6siZNowIBT3BV1vPOqIn5zTrsG20Rnc0DpKs1Ceu0BSENN9Tz9zp2TtisvFW+i2NzQi4b45/
- gqLESCJAJHyP4nwxfPUYXjOE5NckvoqWJ4YqFDXKG9xRi/P0m8Iz8IJy7cWVcAtV9VgWYo8sWq
- fwfrsVqqHG0GZyNdupvb9T+4Vpf+lMIi/pM3wmFvni7Sx43qAvAIAVJKmJsjpv26aK0LzN+PZ+
- b7D09pC/1L2CY53Zq8Ejs//68ENEZc3a2LZm2cMWen9pOhKpzqlISZvU4Rbiu46n8oMBtCIp8S
- R20=
-X-IronPort-AV: E=Sophos;i="5.73,474,1583164800"; d="scan'208";a="139561707"
+ h=from:to:cc:subject:date:message-id:mime-version:
+ content-transfer-encoding;
+ bh=IgtHnvrWU4YfhDphmhZfm1yvpcoHDs5Gh7DArAKK17g=;
+ b=M6y1tygOVQRpJ6MqW86lVlv29bgi10ihNlELze5W9TmtFpUJg+VbBoSD
+ NLSPegy8NrA2yZiJyLskALj9SeXIuY0RVNgZfniuu+vg1QtCjVzuNGua/
+ V2lEcUlG4RaEFFT700L3dKjyX0UglgR3Zm36qhWV47wyJ3mbj34CK2s/n
+ CGfttJVqp6VtM5JN0jn0od7DvbcDVEDMfBZnwvDATQ7fbxc+YVWioROBw
+ +cjm2hQ5Y8a2mDSTvG3bECuOJxeR6Ean66+ImvdbdiQtLUrI5F1ytu0zM
+ 9NrMGrsW+oNFE8jblzd6F07Ffm7JDRlbjkY19DVZE5tzsDioST5NzPko5 w==;
+IronPort-SDR: 7vas3P+FuPuDL6espBYyI+1e1tBfQsrHIOy8ri+KEuqHo9HXiIRMigEwLBMEL/xCVACk21R87z
+ xsk8dZAqeSWYvV7Qc+LdCyXvbHlQWqmCfBL1FkADWRaRon8Es7G1ElhR3Rf92L7b8dy46Mi1ao
+ 6a42uaEQEAf1pw2A6E5canKAwF7ONN1+2FZeTMmB5bsH4Q1w2QZNfwDM6pIn+BLXlpAAg74UZG
+ AnH4Z+waXK3xNhWO8L7RhF88t9wjRKibkbSw9Z2ZNj5cCG1HDog+dND7qhNqAfsApGBxgF2lJJ
+ rEM=
+X-IronPort-AV: E=Sophos;i="5.73,474,1583164800"; d="scan'208";a="139561706"
 Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com)
  ([199.255.45.14])
- by ob1.hgst.iphmx.com with ESMTP; 05 Jun 2020 09:29:34 +0800
-IronPort-SDR: vUoBS3FFE9QHHGxxwR0o6sTk+m2IXyR88/UtGLL4caDeOraUl/8LD20Vh2KL2rbwX6ePwj/DAD
- bK3cjGo8AqOv0YsoiX/sZAnG+u7OsAZu8=
+ by ob1.hgst.iphmx.com with ESMTP; 05 Jun 2020 09:29:31 +0800
+IronPort-SDR: HWI1x0nrR963ruZWia//Sslqsc8jOI8xIZiKl+8LPERnQu5sRwahWPVN+xUERnTq7WhKvLv9iP
+ pg2EpvT/aRzOMChCOQ9d1IhW7aKe1NnjA=
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 04 Jun 2020 18:19:08 -0700
-IronPort-SDR: hP1RvipYIbL4t06gCtJSSiR5qh9Nft3hbBcw01Y/8UM1JAPXZ7lIbhWMOeVzjYNul0n9iZ6l4j
- ryURQ1b4HhdQ==
+ 04 Jun 2020 18:19:06 -0700
+IronPort-SDR: tWb75yk9iw0OSWwvGHklT3AsPGuwXhPkry1SXi3u/0AlIaFg3Y2p/CUOipQ/9roOQT2wM59nNK
+ vHWKn4rn7ssQ==
 WDCIronportException: Internal
 Received: from cnf006056.ad.shared (HELO risc6-mainframe.hgst.com)
  ([10.86.57.233])
- by uls-op-cesaip01.wdc.com with ESMTP; 04 Jun 2020 18:29:33 -0700
+ by uls-op-cesaip01.wdc.com with ESMTP; 04 Jun 2020 18:29:30 -0700
 From: Alistair Francis <alistair.francis@wdc.com>
 To: qemu-devel@nongnu.org,
 	qemu-riscv@nongnu.org
-Subject: [PATCH v2 01/17] target/riscv: Set access as data_load when
- validating stage-2 PTEs
-Date: Thu,  4 Jun 2020 18:20:45 -0700
-Message-Id: <5556f87b6d71a61f5e9113873d91132e08ac6b2f.1591319882.git.alistair@alistair23.me>
+Subject: [PATCH v2 00/17]  RISC-V: Update the Hypervisor spec to v0.6.1
+Date: Thu,  4 Jun 2020 18:20:42 -0700
+Message-Id: <cover.1591319882.git.alistair@alistair23.me>
 X-Mailer: git-send-email 2.26.2
-In-Reply-To: <cover.1591319882.git.alistair@alistair23.me>
-References: <cover.1591319882.git.alistair@alistair23.me>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=216.71.153.144;
@@ -108,24 +104,58 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
----
- target/riscv/cpu_helper.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+From: Alistair Francis <alistair@alistair23.me>
 
-diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-index 62fe1ecc8f..eda7057663 100644
---- a/target/riscv/cpu_helper.c
-+++ b/target/riscv/cpu_helper.c
-@@ -435,7 +435,7 @@ restart:
-             hwaddr vbase;
- 
-             /* Do the second stage translation on the base PTE address. */
--            get_physical_address(env, &vbase, &vbase_prot, base, access_type,
-+            get_physical_address(env, &vbase, &vbase_prot, base, MMU_DATA_LOAD,
-                                  mmu_idx, false, true);
- 
-             pte_addr = vbase + idx * ptesize;
+This series updates the experimental QEMU RISC-V Hypervisor spec to the
+v0.6.1 draft implementation.
+
+THis includes support for the new 2-stage lookup instructions and the new
+CSRs.
+
+It also includes the new 0.6.1 support for the virtual instruction
+fault.
+
+This was tested by running 32-bit and 64-bit Xvisor on QEMU and starting
+Linux guests.
+
+v2:
+ - Update to v0.6.1
+
+
+
+Alistair Francis (17):
+  target/riscv: Set access as data_load when validating stage-2 PTEs
+  target/riscv: Report errors validating 2nd-stage PTEs
+  target/riscv: Move the hfence instructions to the rvh decode
+  target/riscv: Implement checks for hfence
+  target/riscv: Allow setting a two-stage lookup in the virt status
+  target/riscv: Allow generating hlv/hlvx/hsv instructions
+  target/riscv: Do two-stage lookups on hlv/hlvx/hsv instructions
+  target/riscv: Don't allow guest to write to htinst
+  target/riscv: Convert MSTATUS MTL to GVA
+  target/riscv: Fix the interrupt cause code
+  target/riscv: Update the Hypervisor trap return/entry
+  target/riscv: Update the CSRs to the v0.6 Hyp extension
+  target/riscv: Only support a single VSXL length
+  target/riscv: Only support little endian guests
+  target/riscv: Support the v0.6 Hypervisor extension CRSs
+  target/riscv: Return the exception from invalid CSR accesses
+  target/riscv: Support the Virtual Instruction fault
+
+ target/riscv/cpu.h                            |   2 +
+ target/riscv/cpu_bits.h                       |  25 +-
+ target/riscv/helper.h                         |   9 +
+ target/riscv/insn32-64.decode                 |   5 +
+ target/riscv/insn32.decode                    |  19 +-
+ target/riscv/cpu_helper.c                     | 114 +++---
+ target/riscv/csr.c                            | 171 ++++++--
+ .../riscv/insn_trans/trans_privileged.inc.c   |  38 --
+ target/riscv/insn_trans/trans_rvh.inc.c       | 377 ++++++++++++++++++
+ target/riscv/op_helper.c                      | 189 ++++++++-
+ target/riscv/translate.c                      |  11 +-
+ 11 files changed, 815 insertions(+), 145 deletions(-)
+ create mode 100644 target/riscv/insn_trans/trans_rvh.inc.c
+
 -- 
 2.26.2
 
