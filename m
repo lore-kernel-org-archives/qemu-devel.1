@@ -2,117 +2,92 @@ Return-Path: <SRS0=hXcz=7S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA085C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 17:44:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19458C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 17:45:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A58B7207D8
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 17:44:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D93D1207ED
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 17:45:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=bushare.onmicrosoft.com header.i=@bushare.onmicrosoft.com header.b="0ghwoCEN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A58B7207D8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fUUR/juA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D93D1207ED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56176 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59092 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jhGOP-0007kG-UX
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 13:44:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48564)
+	id 1jhGPO-0000X0-6v
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 13:45:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48194)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1jhGKz-00037b-6z
- for qemu-devel@nongnu.org; Fri, 05 Jun 2020 13:41:03 -0400
-Received: from mail-mw2nam10on2122.outbound.protection.outlook.com
- ([40.107.94.122]:14561 helo=NAM10-MW2-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1jhGKw-00058I-GB
- for qemu-devel@nongnu.org; Fri, 05 Jun 2020 13:41:00 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=OgtJpafNfaZmsKIi5z3fzF00H4Afps1QnfPzmEVZPl2C+3IGRQc+goeAQGZBUr4SNJcP0xkbN+nEApQQG8PMiBMWOH6nWtZKj4fzirph707mEI3aKzbG58biFG8YA2IK7b3YqBVYAoyTroZX5ZyMCxpe5JmvD9aCSl4aleyF0p7vMGvfiyyRDz+odNgNhyptClTGbIYYOczswtyD9kLL8lHe8/bZKpM7eS6pAusCVyB/GjXrwd+v0hQz0VRBvhIGZs7UnMSoTl0vFjCephZ+Y9gPYHbnJQbZMjp6ViKqk7HQ6R3XTAAfZQVzZ2BsxoDhhwdZezphzJ9xi7GzUFFnbQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1VYswxgY+ak3lu5XH1yrLgaTA3w/NWFh+jihOSSZkMo=;
- b=Mql2958NVC+G2pjSKyb1wit6olts1J0oJa2F3/oOHcBfuu6S1O3dsWdPs1nYnnSlGOyMUh3m0v5/JnQ1D69BMStioukFgL87k6lTY8AIwTvDj7balNe2NzfXlU8+UJksKcUbqO9joIR9ew9bI74Bz0HkjspcN2sjUcMoT265a+SFAig4WWqiL4As/3tn2tO+vOfgkR08oQUyax/AsUh3XhXiXzIMrOGxNWTwszybflKehkOrKpTPutU6agRpaGr7JpvyT7fSkjsT6rjiWImg9TDyV2hziEEiSrajcSQKNzUZgBkin59NipkWf+5hIJ4h6+l1Rg8eIFvxC4yOqIhbyw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=bu.edu; dmarc=pass action=none header.from=bu.edu; dkim=pass
- header.d=bu.edu; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=bushare.onmicrosoft.com; s=selector2-bushare-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1VYswxgY+ak3lu5XH1yrLgaTA3w/NWFh+jihOSSZkMo=;
- b=0ghwoCENWydxXIxmccKQFJ4lxQDsdjcSLNvNIqF2OeIT/shN6Im95w3Qo28LP3vuYrEIRcE6FIlgSb16jdVbmnk+YY3xQXHkv5Yz+L9XUOF5NRq2Tn8d1k7bMTq2kmZ/Gy3oTBoKRt16ezGsXFG+q2qfc86CckUthgTtThQjAkY=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=bu.edu;
-Received: from SN6PR03MB3871.namprd03.prod.outlook.com (2603:10b6:805:6d::32)
- by SN6PR03MB4448.namprd03.prod.outlook.com (2603:10b6:805:f7::23)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3066.20; Fri, 5 Jun
- 2020 17:40:54 +0000
-Received: from SN6PR03MB3871.namprd03.prod.outlook.com
- ([fe80::8ce:29a6:77be:c35b]) by SN6PR03MB3871.namprd03.prod.outlook.com
- ([fe80::8ce:29a6:77be:c35b%7]) with mapi id 15.20.3066.018; Fri, 5 Jun 2020
- 17:40:54 +0000
-From: Alexander Bulekov <alxndr@bu.edu>
+ (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
+ id 1jhGHy-00040d-B0
+ for qemu-devel@nongnu.org; Fri, 05 Jun 2020 13:37:54 -0400
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:45776)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
+ id 1jhGHx-000410-37
+ for qemu-devel@nongnu.org; Fri, 05 Jun 2020 13:37:53 -0400
+Received: by mail-pg1-x541.google.com with SMTP id n23so5483253pgb.12
+ for <qemu-devel@nongnu.org>; Fri, 05 Jun 2020 10:37:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=AXPq7Uy8g5ifp8uMXZd1qJX2wag4BCDXppVYNXcf0Dw=;
+ b=fUUR/juA87kUvzkHOXidkERsoZztFGGDQkhWhPKRV96NnsT1KWLuW7SB88q4l8ESuS
+ Wshv1Dsy3x8ozU0I3fSn927FlGcc6CdgUbhY4zZrQQiglAxtJPbg+5RiASX4w2/6gbvc
+ d0n3ErHBBHBvQUNTjoVRRsU60K8SHrnds1WR9eVY5VNT0/Q345Ra7zTEtE9dVQRzWPHG
+ GIfKg4eRDwE3UHyDUrbrD6yk9XyG5OdTTmZJeUceP7vkJpCwd2r1XhzE5eHqUmgnJdhn
+ nMuFtdyJQvfB83yDSJOslDY/lSXSp5sE7ZzI8Hj/8BXghikh6eux9Y9DjyduwlSLpwP7
+ k5FA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=AXPq7Uy8g5ifp8uMXZd1qJX2wag4BCDXppVYNXcf0Dw=;
+ b=XAAWASD84R2utapT2l/g5R3EW+FsXvAOkr94HPMLfgZeW1sQJxYIcM+DAWQvnNlpLs
+ ZBBER60f0IHDB2wW0cCdJoXtkWJo/VvMKx7QOz7TZ2u3a4vy/3N2OouLSGAR6slmjOa5
+ eTiLa0NhbgmWokpBGWjmg7C4She1I1upyrIwZpQ/E9PpXJyqwX/YWbCAod7H5wH2hl7w
+ fTCvwJGI30HJzbHx8IZ/4mbf/DGKS/n7MSFr9wfCa2jW6LJdv443BD9OxNF/Z+GpYIgF
+ XPcvrh+ole3NMbAnIcN41pe120UShL78944shjO2G2Sv6sh3vR5FpwABq8fx/1blB+9s
+ Lf9A==
+X-Gm-Message-State: AOAM5330cXVjx3rQkowyQmIlRBTI8rIaYKqxjIs6x+IBziDmikq46gyU
+ kZHxvEOur+sfhdP+ooyjXPF3CyQlLthJUw==
+X-Google-Smtp-Source: ABdhPJyGCuCwwNwHK978hztXGXybTaUfoyjA0JOCR9swtv/cKQ1QVZRWX9spz1l17gix52GSvGYJqQ==
+X-Received: by 2002:a65:568d:: with SMTP id v13mr10411924pgs.436.1591378671434; 
+ Fri, 05 Jun 2020 10:37:51 -0700 (PDT)
+Received: from Rfoley-MA01.hsd1.ma.comcast.net
+ (c-73-47-162-176.hsd1.ma.comcast.net. [73.47.162.176])
+ by smtp.gmail.com with ESMTPSA id a19sm188307pfd.165.2020.06.05.10.37.49
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 05 Jun 2020 10:37:50 -0700 (PDT)
+From: Robert Foley <robert.foley@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH] fuzz: add oss-fuzz build.sh script
-Date: Fri,  5 Jun 2020 13:40:36 -0400
-Message-Id: <20200605174036.4527-1-alxndr@bu.edu>
-X-Mailer: git-send-email 2.26.2
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: BL0PR02CA0025.namprd02.prod.outlook.com
- (2603:10b6:207:3c::38) To SN6PR03MB3871.namprd03.prod.outlook.com
- (2603:10b6:805:6d::32)
+Subject: [PATCH v2 09/13] tests/docker: Added docker build support for TSan.
+Date: Fri,  5 Jun 2020 13:34:18 -0400
+Message-Id: <20200605173422.1490-10-robert.foley@linaro.org>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200605173422.1490-1-robert.foley@linaro.org>
+References: <20200605173422.1490-1-robert.foley@linaro.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mozz.bu.edu (128.197.127.33) by
- BL0PR02CA0025.namprd02.prod.outlook.com (2603:10b6:207:3c::38) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3066.18 via Frontend Transport; Fri, 5 Jun 2020 17:40:54 +0000
-X-Mailer: git-send-email 2.26.2
-X-Originating-IP: [128.197.127.33]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 7ee907e1-816d-48ac-e4cf-08d809779909
-X-MS-TrafficTypeDiagnostic: SN6PR03MB4448:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SN6PR03MB444824B5D9ED775DB46EA2CFBA860@SN6PR03MB4448.namprd03.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:6430;
-X-Forefront-PRVS: 0425A67DEF
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: pC+v4EszfzJgx6v0yiFrFPXxA7AKU8yB5w2RTX+9V2g6wPMERWfwxfzkq6vfMZlGdrLGaVRRuiAffhzkiSm/SZA/W4bNKqUn0GTfHtneHMG4UlvyldY/OyJuIgwiDoXSp/1zIu8NB790wH3G7JU2xxzDMV3AOHCjzVOIZq6ebN5Co7kaonQUi+psFUdx0br4HRductRDM1eYmv3CeluHlB4zUHkOfgrX96WCvJqcsbzi4b4oZkUGNllXXq1amo5W6Gm63IuGx1FxtQcYWaViW5TWQhM9uzUSKl7O6O2dNBKphfCmC/sAM4emqJyIIopdkydm6qBetVnIJ0ptV0W23A==
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:SN6PR03MB3871.namprd03.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(39860400002)(366004)(376002)(396003)(136003)(346002)(6486002)(52116002)(7696005)(8936002)(26005)(186003)(16526019)(86362001)(8676002)(478600001)(316002)(786003)(75432002)(36756003)(2906002)(6666004)(4326008)(66556008)(66476007)(6916009)(83380400001)(66946007)(5660300002)(1076003)(2616005)(956004);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: q5w2apowNbzFP+zWtNk7UgYWfuZOWFpxtwyILh9MBHaEiECdE5vTbjR3pG2lCfskodidnuquBt05mgkv6jPJq0nL1/ZXkXcB6UzBU/wO72M9QBCPHlSeNMzFvsOwgIbihoqbAxksKzVSSJrIviXBPSlLhaX1YCUydpqRdNzXiBkf0pGwQ41pg8otTHGsQNLz4omehKX0d+qT3s1KftpMc/QiMqkVQltYLMNXeibuBv7JXeR1imM1yWIQTNvzynBxLK8N6/yeRsDKkatS8iWqQvMMaANaV3vAP55o96xGCUxtl59Y9tec3DHJdm7sAlAiqn+EzBCZX/avIUK0bDzGpi5Jl25KD5GSUHwDREyUXoL+EDXJUm7k31MBRkAydS5fDoVfU1XUMjOHiua7pSoJ0wFsS5yfqCvxyt4t4/aafwE+qPqeUCPus6YdbiuqtkQCF62/kE/5s/OpfLSrmxAMAVzW/NhqU/jcZVpKkd+EIVk=
-X-OriginatorOrg: bu.edu
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7ee907e1-816d-48ac-e4cf-08d809779909
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jun 2020 17:40:54.7804 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: d57d32cc-c121-488f-b07b-dfe705680c71
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: lv+LjEexMCgHJwqfGFi75Lr/BAcLfRI+wOKegQaY4GWNH1EYpFzz0N3uX2rJPwNR
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR03MB4448
-Received-SPF: pass client-ip=40.107.94.122; envelope-from=alxndr@bu.edu;
- helo=NAM10-MW2-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/05 13:40:56
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, HK_RANDOM_ENVFROM=0.001,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::541;
+ envelope-from=robert.foley@linaro.org; helo=mail-pg1-x541.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -126,77 +101,196 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: darren.kenny@oracle.com, bsd@redhat.com, f4bug@amsat.org,
- stefanha@redhat.com, Alexander Bulekov <alxndr@bu.edu>
+Cc: Fam Zheng <fam@euphon.net>, robert.foley@linaro.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, cota@braap.org,
+ peter.puhov@linaro.org, alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It is neater to keep this in the QEMU repo, since any change that
-requires an update to the oss-fuzz build configuration, can make the
-necessary changes in the same series.
+Added a new docker for ubuntu 20.04.
+This docker has support for Thread Sanitizer
+including one patch we need in one of the header files.
+https://github.com/llvm/llvm-project/commit/a72dc86cd
 
-Suggested-by: Philippe Mathieu-Daude <f4bug@amsat.org>
-Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
+This command will build with tsan enabled:
+make docker-test-tsan-ubuntu2004 
+
+Also added the TSAN suppresion file to disable certain
+cases of TSAN warnings.
+
+Cc: Fam Zheng <fam@euphon.net>
+Cc: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Robert Foley <robert.foley@linaro.org>
 ---
- scripts/oss-fuzz/build.sh | 47 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 47 insertions(+)
- create mode 100755 scripts/oss-fuzz/build.sh
+ tests/docker/dockerfiles/ubuntu2004.docker | 65 ++++++++++++++++++++++
+ tests/docker/test-tsan                     | 44 +++++++++++++++
+ tests/tsan/blacklist.tsan                  | 10 ++++
+ tests/tsan/suppressions.tsan               | 14 +++++
+ 4 files changed, 133 insertions(+)
+ create mode 100644 tests/docker/dockerfiles/ubuntu2004.docker
+ create mode 100755 tests/docker/test-tsan
+ create mode 100644 tests/tsan/blacklist.tsan
+ create mode 100644 tests/tsan/suppressions.tsan
 
-diff --git a/scripts/oss-fuzz/build.sh b/scripts/oss-fuzz/build.sh
-new file mode 100755
-index 0000000000..7be6dcce4c
+diff --git a/tests/docker/dockerfiles/ubuntu2004.docker b/tests/docker/dockerfiles/ubuntu2004.docker
+new file mode 100644
+index 0000000000..6050ce7e8a
 --- /dev/null
-+++ b/scripts/oss-fuzz/build.sh
-@@ -0,0 +1,47 @@
-+#!/bin/sh
++++ b/tests/docker/dockerfiles/ubuntu2004.docker
+@@ -0,0 +1,65 @@
++FROM ubuntu:20.04
++ENV PACKAGES flex bison \
++    ccache \
++    clang-10\
++    gcc \
++    gettext \
++    git \
++    glusterfs-common \
++    libaio-dev \
++    libattr1-dev \
++    libbrlapi-dev \
++    libbz2-dev \
++    libcacard-dev \
++    libcap-ng-dev \
++    libcurl4-gnutls-dev \
++    libdrm-dev \
++    libepoxy-dev \
++    libfdt-dev \
++    libgbm-dev \
++    libgtk-3-dev \
++    libibverbs-dev \
++    libiscsi-dev \
++    libjemalloc-dev \
++    libjpeg-turbo8-dev \
++    liblzo2-dev \
++    libncurses5-dev \
++    libncursesw5-dev \
++    libnfs-dev \
++    libnss3-dev \
++    libnuma-dev \
++    libpixman-1-dev \
++    librados-dev \
++    librbd-dev \
++    librdmacm-dev \
++    libsasl2-dev \
++    libsdl2-dev \
++    libseccomp-dev \
++    libsnappy-dev \
++    libspice-protocol-dev \
++    libspice-server-dev \
++    libssh-dev \
++    libusb-1.0-0-dev \
++    libusbredirhost-dev \
++    libvdeplug-dev \
++    libvte-2.91-dev \
++    libxen-dev \
++    libzstd-dev \
++    make \
++    python3-yaml \
++    python3-sphinx \
++    sparse \
++    texinfo \
++    xfslibs-dev\
++    vim
++RUN apt-get update && \
++    DEBIAN_FRONTEND=noninteractive apt-get -y install $PACKAGES
++RUN dpkg -l $PACKAGES | sort > /packages.txt
++ENV FEATURES clang tsan pyyaml sdl2
++
++# https://bugs.launchpad.net/qemu/+bug/1838763
++ENV QEMU_CONFIGURE_OPTS --disable-libssh
++
++# Apply patch https://reviews.llvm.org/D75820
++# This is required for TSan in clang-10 to compile with QEMU.
++RUN sed -i 's/^const/static const/g' /usr/lib/llvm-10/lib/clang/10.0.0/include/sanitizer/tsan_interface.h
+diff --git a/tests/docker/test-tsan b/tests/docker/test-tsan
+new file mode 100755
+index 0000000000..eb40ac45b7
+--- /dev/null
++++ b/tests/docker/test-tsan
+@@ -0,0 +1,44 @@
++#!/bin/bash -e
 +#
-+# Update syscall_nr.h files from linux headers asm-generic/unistd.h
++# This test will use TSan as part of a build and a make check.
 +#
-+# This code is licensed under the GPL version 2 or later.  See
-+# the COPYING file in the top-level directory.
++# Copyright (c) 2020 Linaro
++# Copyright (c) 2016 Red Hat Inc.
 +#
++# Authors:
++#  Robert Foley <robert.foley@linaro.org>
++#  Originally based on test-quick from Fam Zheng <famz@redhat.com>
++#
++# This work is licensed under the terms of the GNU GPL, version 2
++# or (at your option) any later version. See the COPYING file in
++# the top-level directory.
 +
-+# build project
-+# e.g.
-+# ./autogen.sh
-+# ./configure
-+# make -j$(nproc) all
++. common.rc
 +
-+# build fuzzers
-+# e.g.
-+# $CXX $CXXFLAGS -std=c++11 -Iinclude \
-+#     /path/to/name_of_fuzzer.cc -o $OUT/name_of_fuzzer \
-+#     $LIB_FUZZING_ENGINE /path/to/library.a
++setup_tsan()
++{
++    requires clang tsan
++    tsan_log_dir="/tmp/qemu-test/build/tsan"
++    mkdir -p $tsan_log_dir > /dev/null || true
++    EXTRA_CONFIGURE_OPTS="${EXTRA_CONFIGURE_OPTS} --enable-tsan \
++                          --cc=clang-10 --cxx=clang++-10 \
++                          --disable-werror --extra-cflags=-O0"
++    # detect deadlocks is false currently simply because
++    # TSan crashes immediately with deadlock detector enabled.
++    # We have maxed out the history size to get the best chance of finding
++    # warnings during testing.
++    # Note, to get TSan to fail on warning, use exitcode=66 below.
++    tsan_opts="suppressions=/tmp/qemu-test/src/tests/tsan/suppressions.tsan\
++               detect_deadlocks=false history_size=7\
++               halt_on_error=0 exitcode=0 verbose=5\
++               log_path=$tsan_log_dir/tsan_warning"
++    export TSAN_OPTIONS="$tsan_opts"
++}
 +
-+mkdir -p $OUT/lib/              # Shared libraries
++cd "$BUILD_DIR"
 +
-+# Build once to get the list of dynamic lib paths, and copy them over
-+./configure --datadir="./data/" --disable-werror --cc="$CC" --cxx="$CXX" \
-+    --extra-cflags="$CFLAGS -U __OPTIMIZE__ "
-+make CONFIG_FUZZ=y CFLAGS="$LIB_FUZZING_ENGINE" -j$(nproc) i386-softmmu/fuzz
++TARGET_LIST=${TARGET_LIST:-$DEF_TARGET_LIST} \
++setup_tsan
++build_qemu
++check_qemu
++install_qemu
+diff --git a/tests/tsan/blacklist.tsan b/tests/tsan/blacklist.tsan
+new file mode 100644
+index 0000000000..75e444f5dc
+--- /dev/null
++++ b/tests/tsan/blacklist.tsan
+@@ -0,0 +1,10 @@
++# This is an example blacklist.
++# To enable use of the blacklist add this to configure:
++# "--extra-cflags=-fsanitize-blacklist=<src path>/tests/tsan/blacklist.tsan"
++# The eventual goal would be to fix these warnings.
 +
-+for i in $(ldd ./i386-softmmu/qemu-fuzz-i386  | cut -f3 -d' '); do 
-+    cp $i $OUT/lib/
-+done
-+rm ./i386-softmmu/qemu-fuzz-i386
++# TSan is not happy about setting/getting of dirty bits,
++# for example, cpu_physical_memory_set_dirty_range,
++# and cpu_physical_memory_get_dirty.
++src:bitops.c
++src:bitmap.c
+diff --git a/tests/tsan/suppressions.tsan b/tests/tsan/suppressions.tsan
+new file mode 100644
+index 0000000000..73414b9ebd
+--- /dev/null
++++ b/tests/tsan/suppressions.tsan
+@@ -0,0 +1,14 @@
++# This is the set of runtime suppressions of TSan warnings.
++# The goal would be to have here only items we do not
++# plan to fix, and to explain why for each item.
 +
-+# Build a second time to build the final binary with correct rpath
-+./configure --datadir="./data/" --disable-werror --cc="$CC" --cxx="$CXX" \
-+    --extra-cflags="$CFLAGS -U __OPTIMIZE__" \
-+    --extra-ldflags="-Wl,-rpath,'\$\$ORIGIN/lib'"
-+make CONFIG_FUZZ=y CFLAGS="$LIB_FUZZING_ENGINE" -j$(nproc) i386-softmmu/fuzz
++# TSan reports a double lock on RECURSIVE mutexes.
++# Since the recursive lock is intentional, we choose to ignore it.
++mutex:aio_context_acquire
++mutex:pthread_mutex_lock
 +
-+# Copy over the datadir
-+cp  -r ./pc-bios/ $OUT/pc-bios
-+
-+# Copy over the qemu-fuzz-i386, naming it according to each available fuzz
-+# target (See 05509c8e6d fuzz: select fuzz target using executable name)
-+for target in $(./i386-softmmu/qemu-fuzz-i386 | awk '$1 ~ /\*/  {print $2}');
-+do
-+    cp ./i386-softmmu/qemu-fuzz-i386 $OUT/qemu-fuzz-i386-target-$target
-+done
++# TSan reports a race betwen pthread_mutex_init() and
++# pthread_mutex_lock().  Since this is outside of QEMU,
++# we choose to ignore it.
++race:pthread_mutex_init
++race:pthread_mutex_lock
 -- 
-2.26.2
+2.17.1
 
 
