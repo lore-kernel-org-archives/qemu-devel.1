@@ -2,81 +2,74 @@ Return-Path: <SRS0=hXcz=7S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34772C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 02:51:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 768CDC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 02:51:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0370520738
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 02:51:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0370520738
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 4A25320738
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 02:51:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A25320738
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39942 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41362 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jh2Ry-0000Hx-AO
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 22:51:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60736)
+	id 1jh2SI-0000wI-IF
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 22:51:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60770)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jh2RM-00089d-My
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 22:50:40 -0400
-Received: from indium.canonical.com ([91.189.90.7]:51564)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jh2RL-0000mD-4G
- for qemu-devel@nongnu.org; Thu, 04 Jun 2020 22:50:40 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jh2RJ-0008QN-7y
- for <qemu-devel@nongnu.org>; Fri, 05 Jun 2020 02:50:37 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 200F42E810A
- for <qemu-devel@nongnu.org>; Fri,  5 Jun 2020 02:50:37 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jh2Re-0008Qp-8S; Thu, 04 Jun 2020 22:50:58 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:59775)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jh2Rb-0000se-TP; Thu, 04 Jun 2020 22:50:57 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.04444096|-1; CH=green;
+ DM=|CONTINUE|false|;
+ DS=CONTINUE|ham_regular_dialog|0.196904-0.0113071-0.791789;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e02c03294; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=7; RT=7; SR=0; TI=SMTPD_---.HiMOiST_1591325446; 
+Received: from 30.225.208.46(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.HiMOiST_1591325446)
+ by smtp.aliyun-inc.com(10.147.41.138);
+ Fri, 05 Jun 2020 10:50:47 +0800
+Subject: Re: [PATCH v8 30/62] target/riscv: Update fp_status when float
+ rounding mode changes
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
+ qemu-riscv@nongnu.org
+References: <20200521094413.10425-1-zhiwei_liu@c-sky.com>
+ <20200521094413.10425-31-zhiwei_liu@c-sky.com>
+ <7cb2aa5d-833a-8544-dadc-5aabba06ecd2@linaro.org>
+ <ca1e71cd-c290-5fb9-e9bf-026c73e06560@c-sky.com>
+ <7ec3d397-bf9a-07f5-3014-4acf47a4fd6e@linaro.org>
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Message-ID: <ba7ef161-8bc6-516f-b5a7-8133e3a89998@c-sky.com>
+Date: Fri, 5 Jun 2020 10:50:46 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 05 Jun 2020 02:42:02 -0000
-From: Hajin Jang <1882123@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: arm armhf debian regression
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: joveler
-X-Launchpad-Bug-Reporter: Hajin Jang (joveler)
-X-Launchpad-Bug-Modifier: Hajin Jang (joveler)
-References: <159129432300.4081.5698403082350753204.malonedeb@soybean.canonical.com>
-Message-Id: <159132492227.32129.479510864500615671.malone@gac.canonical.com>
-Subject: [Bug 1882123] Re: ARM cpu emulation regression on QEMU 4.2.0
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="ef9fc486e875d54078fa61cf91e898b895125d89";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: b321d22c878adc6b904aeb8a3ef06a40c19b69c7
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 22:50:37
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <7ec3d397-bf9a-07f5-3014-4acf47a4fd6e@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Received-SPF: none client-ip=121.197.200.217;
+ envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 22:19:39
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9,
+ UNPARSEABLE_RELAY=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,107 +78,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1882123 <1882123@bugs.launchpad.net>
+Cc: palmer@dabbelt.com, wenmeng_zhang@c-sky.com, alistair.francis@wdc.com,
+ wxy194768@alibaba-inc.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I have tested 4.2.0 release candidate versions to pinpoint which commit
-caused the regression.
 
-- 4.2.0-rc2: Same with 4.2.0, dotnet command crashes with SEHException.
-- 4.2.0-rc0, 4.2.0-rc1: Launching dotnet command with any argument crashes =
-with illegal hardware instruction message.
 
-$ dotnet build
-[1]    658 illegal hardware instruction  dotnet build
-$ dotnet --version
-[1]    689 illegal hardware instruction  dotnet --version
+On 2020/6/5 4:15, Richard Henderson wrote:
+> On 6/2/20 10:46 PM, LIU Zhiwei wrote:
+>> I think you are right.  Maybe I should transmit frm to ctx->frm, and check
+>> ctx->frm in vector fp ops.
+>>
+>> We can set ctx->frm = env->frm instead of ctx->frm = -1 in
+>> riscv_tr_init_disas_context.
+>> And  remove the sentence ctx->frm = rm; from gen_set_rm.
+>>
+>> Is it right?
+> If we record frm in tb_flags, then we also have to reset
+> env->fp_status.rounding_mode for scalar fp insns which encode a rm != 7.
+> Depending on the exact mix of fp insns, that could result in more changes to
+> rounding_mode than we do presently.  This is something that you'd want to look
+> at closely to make sure you're not making scalar code worse.
+Hi Richard,
 
-So the issue is affected by some commits pushed between 4.1.0 ~
-4.2.0-rc0 and 4.2.0-rc1 ~ 4.2.0-rc2 period.
+I don't think so. It will occupy  three bits in tb_flags.
+Another reason is the scalar float codes have fixed rounding mode. The 
+frm field in tb_flags is useless without vector extension.
 
--- =
+If we really have to put it in the tb_flags,  one bit INVALID_FRM is 
+enough. The scalar code will still be the same.
+The vector code will check the INVALID_FRM.
+> I think the easiest solution in the short term is to have the translation of
+> any fp vector insn call gen_set_rm(ctx, 7), so that we are certain to install
+> frm as rounding_mode.  This will happen at most once per translation block,
+> assuming no scalar insns that would also require changes to rounding_mode.
+Yes.  Only some csr insns can change the rounding mode. And they will 
+exit the tb immediately.
+So no scalar insns will require changes within a translation block.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1882123
+I think there is a error in gen_set_rm
 
-Title:
-  ARM cpu emulation regression on QEMU 4.2.0
+static void gen_set_rm(DisasContext *ctx, int rm)
+{
+     TCGv_i32 t0;
 
-Status in QEMU:
-  New
+     if (ctx->frm == rm) {
+         return;
+     }
+     ctx->frm = rm;
+     t0 = tcg_const_i32(rm);
+     gen_helper_set_rounding_mode(cpu_env, t0);
+     tcg_temp_free_i32(t0);
+}
 
-Bug description:
-  [*] Summary
+I don't know why  updating ctx->frm in this function.
+>
+> You can work with the risc-v folk to examine frm handling more generally
+> separate from this vector work.
+OK. I will send a separate RFC patch to handle frm. Then merge it to the 
+vector patch set.
 
-  Latest QEMU has an ARM CPU emulation regression.
-  Regression is reproducible by building any C# project with .NET Core SDK =
-3.1.300 on Debian 10 armhf guest OS.
+Best Regards,
+Zhiwei
+>
+> r~
 
-  Releases affected: QEMU 4.2.0, 5.0.0
-  Releases not affected: QEMU 4.1.0, QEMU 4.1.1
-
-  [*] Detail
-
-  .NET Core SDK 3.1 fails to run on Debian 10 emulated by qemu-system-
-  arm.
-
-  I occasionally test my C# projects on the virtual armhf/arm64 system
-  emulated by QEMU. MSBuild, a build engine of the .NET Core SDK,
-  crashes on QEMU 4.2.0 or later. The crash only happens when MSBuild
-  tries to do any JIT compiling (dotnet build / dotnet test).
-
-  I attached the MSBuild crash logs. MSBuild always crashes with
-  SEHException, which means it tried to call C binary from .NET binary.
-
-  I think the ARM CPU emulation regression happened between QEMU 4.1.1 ~
-  4.2.0. The issue affects QEMU 4.2.0 and 5.0.0. QEMU 4.1.0, 4.1.1, and
-  real Raspberry Pi 2 are not affected by this issue, and .NET Core SDK
-  works completely fine.
-
-  [*] Environment
-
-  [Host OS]
-  Distribution: Linux Mint 19.3 amd64
-  CPU: AMD Ryzen 5 3600
-  Kernel: Ubuntu 5.3.0-51-generic
-
-  [QEMU Guest OS]
-  Distribution: Debian 10 Buster armhf
-  Kernel: Debian 4.19.0-9-armmp-lpae
-  .NET Core SDK: 3.1.300
-
-  [Raspberry Pi 2]
-  Distribution: Raspberry Pi OS Buster armhf
-  Kernel: 4.19.118-v7+
-
-  [Tested C# Projects]
-  This is a list of C# projects I have tested on QEMU and RPI2.
-  - https://github.com/ied206/Joveler.DynLoader
-  - https://github.com/ied206/Joveler.Compression
-  - https://github.com/ied206/ManagedWimLib
-
-  [QEMU Launch Arguments]
-  qemu-system-arm \
-  =C2=A0=C2=A0=C2=A0=C2=A0-smp 3 -M virt -m 4096 \
-  =C2=A0=C2=A0=C2=A0=C2=A0-kernel vmlinuz-4.19.0-9-armmp-lpae \
-  =C2=A0=C2=A0=C2=A0=C2=A0-initrd initrd.img-4.19.0-9-armmp-lpae \
-  =C2=A0=C2=A0=C2=A0=C2=A0-append "root=3D/dev/vda2" \
-  =C2=A0=C2=A0=C2=A0=C2=A0-drive if=3Dnone,file=3Ddebian_arm.qcow2,format=
-=3Dqcow2,id=3Dhd \
-  =C2=A0=C2=A0=C2=A0=C2=A0-device virtio-blk-device,drive=3Dhd \
-  =C2=A0=C2=A0=C2=A0=C2=A0-netdev user,id=3Dmynet,hostfwd=3Dtcp::<PORT>-:22=
- \
-  =C2=A0=C2=A0=C2=A0=C2=A0-device virtio-net-device,netdev=3Dmynet \
-  =C2=A0=C2=A0=C2=A0=C2=A0-device virtio-rng-device
-
-  [QEMU Configure Arguments]
-  ./configure --enable-spice --enable-gtk --enable-vnc-jpeg --enable-vnc-pn=
-g --enable-avx2 --enable-libusb --enable-opengl --enable-virglrenderer --en=
-able-kvm --enable-system --enable-modules --audio-drv-list=3Dpa
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1882123/+subscriptions
 
