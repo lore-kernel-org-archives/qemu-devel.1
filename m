@@ -2,86 +2,85 @@ Return-Path: <SRS0=hXcz=7S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60C08C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 14:46:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D622FC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 14:51:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2BBED206DB
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 14:46:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9B8F1206A2
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 14:51:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UwfqoeeN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BBED206DB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qWQMGCwZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B8F1206A2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51098 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53726 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jhDcF-0006bV-Dn
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 10:46:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49570)
+	id 1jhDgX-0008Lc-Rm
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 10:51:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50048)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1jhDbI-0005an-Q6
- for qemu-devel@nongnu.org; Fri, 05 Jun 2020 10:45:42 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24438
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1jhDbG-0004oX-EV
- for qemu-devel@nongnu.org; Fri, 05 Jun 2020 10:45:40 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591368337;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=P/A3bdeYECLA7EBrRatwpB1cRern/h6cMD2fjxdYBW0=;
- b=UwfqoeeNIrvlCh0HgJfh4yvXWIZNZL/7dF1vxJ7jI3RU7gSoETEBMoRQKnYeV7ACL2SfZj
- YSfI/8a8zbNdBZvt36XDzi09s1fYHz2EhZAPhSRC4DjDOoPt0RTB2t+OMTQYRvbkdOTG8G
- p8ddfh6fz3aik8SuNeYvFrjoB0PDaKQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-155-gFMCwqKnMOuefTsfJpt_QQ-1; Fri, 05 Jun 2020 10:45:34 -0400
-X-MC-Unique: gFMCwqKnMOuefTsfJpt_QQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C2364108BD11;
- Fri,  5 Jun 2020 14:45:32 +0000 (UTC)
-Received: from localhost (unknown [10.40.208.51])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5F7117B5F3;
- Fri,  5 Jun 2020 14:45:19 +0000 (UTC)
-Date: Fri, 5 Jun 2020 16:45:17 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH v3 4/4] arm/acpi: Add the TPM2.0 device under the DSDT
-Message-ID: <20200605164517.25e6521c@redhat.com>
-In-Reply-To: <20200601095737.32671-5-eric.auger@redhat.com>
-References: <20200601095737.32671-1-eric.auger@redhat.com>
- <20200601095737.32671-5-eric.auger@redhat.com>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jhDfa-0007gY-SQ
+ for qemu-devel@nongnu.org; Fri, 05 Jun 2020 10:50:06 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:45666)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jhDfZ-0005sV-Kz
+ for qemu-devel@nongnu.org; Fri, 05 Jun 2020 10:50:06 -0400
+Received: by mail-ot1-x341.google.com with SMTP id m2so7779469otr.12
+ for <qemu-devel@nongnu.org>; Fri, 05 Jun 2020 07:50:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=JDCA0K4XBTkPfG5Tn//wBpkNB82Cg03QNPI1nDXfSEY=;
+ b=qWQMGCwZNxoluBGNf9Ow4LsK3nnkWqO66YvOSrEUkNT3ypOIusrSvvpiqi1knwscht
+ HntrhrZI8lLUitY3f3CqdZuW6xOuZqwdRKj0KPJpOGwB72o7b2EbHvCyZnqUL+SjsNTN
+ RZDjPg4Pj7f3soySHLlK71DOmBbuUiAHPAyCpFikxPcfSA9KM2MpVRrVa/q2yURwJjGu
+ yQovb8jVEdrh3wXkdLUdReUx3rFPmg61L5yPGpn5nLL2k5x2YDgKJFXZSR5PdBRdPSd3
+ UNPedbELYoSD7xLCgzR37NRQ1DTFVVwoOrYDQ67P1n7hfs53Piy6CLjKbthARhZkKlPj
+ iEYQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=JDCA0K4XBTkPfG5Tn//wBpkNB82Cg03QNPI1nDXfSEY=;
+ b=uKaKTGD47+6mikCwlXG3TQb9hKS4BQa6HMoVpdnsZN/LVeCJM8l6fvd+zt7a8wUO+j
+ 7wgVt+yNadpbGngMku9T1A6md9HkqWWhQMEf+dZ+fnV8k2pTVWlmwi8pv1R7oBaZ08E6
+ vxqpHf2S1V4pWOH6hl2h2FB/yA0aPOAK/P+3HwVwGvIRV6xK2mJ5F5Xk8eo9gtim6bG3
+ tYwRLZVCQaEf1BjhoCu5fThWjmPxt4K6l1FoL2RESjRwjCTrB0QzBKfF4y/dkAwuQboa
+ oM9iBfkNHJdNWP4N3RtQv87uXmQBp6czTFVYH06lUZobcELsGemCLAi5wu6YMjIhPxNO
+ HINQ==
+X-Gm-Message-State: AOAM532pHT947mXOTnirKtfQMhb1+jPTs9ZPoeC99lbULeIxlgKnWYTy
+ adk8jCBX/rDXCyKDTkpYHNa7VpiMi69HvAz6J43DnA==
+X-Google-Smtp-Source: ABdhPJzLxP1lXUFeWqr/EZvOmUzkFlSg7zlezdiJES2rZaif6oc1ypiw8CGwEMFHR3xBC7KdT0fo7ZKlxZkYQxA5iNI=
+X-Received: by 2002:a9d:b82:: with SMTP id 2mr7502622oth.221.1591368604178;
+ Fri, 05 Jun 2020 07:50:04 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=imammedo@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/05 03:07:04
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+References: <20200529180005.169036-1-jcd@tribudubois.net>
+In-Reply-To: <20200529180005.169036-1-jcd@tribudubois.net>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 5 Jun 2020 15:49:53 +0100
+Message-ID: <CAFEAcA9Q9f4ocZSrgXK8DRz8ro1Yv4bRbTmpWw_wtoqyUO9K7w@mail.gmail.com>
+Subject: Re: [PATCH] hw/misc/imx6ul_ccm.c: Implement non writable bits in CCM
+ registers
+To: Jean-Christophe Dubois <jcd@tribudubois.net>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::341;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x341.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,99 +93,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, drjones@redhat.com, philmd@redhat.com,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org, marcandre.lureau@redhat.com,
- eric.auger.pro@gmail.com, lersek@redhat.com, ardb@kernel.org,
- stefanb@linux.ibm.com
+Cc: qemu-arm <qemu-arm@nongnu.org>, Peter Chubb <peter.chubb@nicta.com.au>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon,  1 Jun 2020 11:57:37 +0200
-Eric Auger <eric.auger@redhat.com> wrote:
+On Fri, 29 May 2020 at 19:00, Jean-Christophe Dubois
+<jcd@tribudubois.net> wrote:
+>
+> Some bits of the CCM registers are non writable.
+>
+> This was left undone in the initial commit (all bits of registers were
+> writable).
+>
+> This patch add the required code to protect non writable bits.
+>
+> Signed-off-by: Jean-Christophe Dubois <jcd@tribudubois.net>
+>  static uint64_t imx6ul_analog_read(void *opaque, hwaddr offset, unsigned size)
+> @@ -737,7 +790,8 @@ static void imx6ul_analog_write(void *opaque, hwaddr offset, uint64_t value,
+>           * the REG_NAME register. So we change the value of the
+>           * REG_NAME register, setting bits passed in the value.
+>           */
+> -        s->analog[index - 1] |= value;
+> +        s->analog[index - 1] = s->analog[index - 1] |
+> +                               (value & ~analog_mask[index - 1]);
 
-> In case it is dynamically instantiated, add the TPM 2.0 device object
-> under the DSDT table in the ACPI namespace. Its HID is MSFT0101
-> while its current resource settings (CRS) property is initialized
-> with the guest physical address and MMIO size of the device.
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> Reviewed-by: Stefan Berger <stefanb@linux.ibm.com>
-> 
-> ---
-> 
-> v2 -> v3:
-> - use SYS_BUS_DEVICE() instead of
->   (SysBusDevice *)object_dynamic_cast(OBJECT())
-> 
-> v1 -> v2:
-> - use memory_region_size
-> - fix mingw compilation issue by casting to uint32_t
-> - added Stefan's R-b
-> ---
->  hw/arm/virt-acpi-build.c | 32 ++++++++++++++++++++++++++++++++
->  1 file changed, 32 insertions(+)
-> 
-> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> index 6d152ab481..05a3028500 100644
-> --- a/hw/arm/virt-acpi-build.c
-> +++ b/hw/arm/virt-acpi-build.c
-> @@ -46,6 +46,7 @@
->  #include "hw/pci/pci.h"
->  #include "hw/arm/virt.h"
->  #include "hw/mem/nvdimm.h"
-> +#include "hw/platform-bus.h"
->  #include "sysemu/numa.h"
->  #include "sysemu/reset.h"
->  #include "sysemu/tpm.h"
-> @@ -364,6 +365,36 @@ static void acpi_dsdt_add_power_button(Aml *scope)
->      aml_append(scope, dev);
->  }
->  
-> +static void acpi_dsdt_add_tpm(Aml *scope, VirtMachineState *vms)
-> +{
-> +    hwaddr pbus_base = vms->memmap[VIRT_PLATFORM_BUS].base;
-> +    PlatformBusDevice *pbus = PLATFORM_BUS_DEVICE(vms->platform_bus_dev);
-> +    MemoryRegion *sbdev_mr;
-> +    SysBusDevice *sbdev;
-> +    hwaddr tpm_base;
-> +
-> +    sbdev = SYS_BUS_DEVICE(tpm_find());
-> +
-> +    tpm_base = platform_bus_get_mmio_addr(pbus, sbdev, 0);
-> +    assert(tpm_base != -1);
-> +
-> +    tpm_base += pbus_base;
-> +
-> +    sbdev_mr = sysbus_mmio_get_region(sbdev, 0);
-> +
-> +    Aml *dev = aml_device("TPM0");
-> +    aml_append(dev, aml_name_decl("_HID", aml_string("MSFT0101")));
-> +    aml_append(dev, aml_name_decl("_UID", aml_int(0)));
-> +
-> +    Aml *crs = aml_resource_template();
-> +    aml_append(crs,
-> +               aml_memory32_fixed(tpm_base,
-> +                                  (uint32_t)memory_region_size(sbdev_mr),
-> +                                  AML_READ_WRITE));
-> +    aml_append(dev, aml_name_decl("_CRS", crs));
-> +    aml_append(scope, dev);
-> +}
-> +
->  static void
->  build_iort(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
->  {
-> @@ -758,6 +789,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+Not sure why you didn't retain the use of the |= operator here?
+
+>          break;
+>      case CCM_ANALOG_PLL_ARM_CLR:
+>      case CCM_ANALOG_PLL_USB1_CLR:
+> @@ -762,7 +816,8 @@ static void imx6ul_analog_write(void *opaque, hwaddr offset, uint64_t value,
+>           * the REG_NAME register. So we change the value of the
+>           * REG_NAME register, unsetting bits passed in the value.
+>           */
+> -        s->analog[index - 2] &= ~value;
+> +        s->analog[index - 2] = s->analog[index - 2] &
+> +                               ~(value & ~analog_mask[index - 2]);
+
+Similarly here with &=.
+
+>          break;
+>      case CCM_ANALOG_PLL_ARM_TOG:
+>      case CCM_ANALOG_PLL_USB1_TOG:
+> @@ -787,14 +842,14 @@ static void imx6ul_analog_write(void *opaque, hwaddr offset, uint64_t value,
+>           * the REG_NAME register. So we change the value of the
+>           * REG_NAME register, toggling bits passed in the value.
+>           */
+> -        s->analog[index - 3] ^= value;
+> +        s->analog[index - 3] = (s->analog[index - 3] &
+> +                                analog_mask[index - 3]) |
+> +                               ((value ^ s->analog[index - 3]) &
+> +                                ~analog_mask[index - 3]);
+
+I think this does the right thing (toggle bits which are set in
+value as long as they're not read-only), but isn't this a simpler
+way to write it?
+
+     s->analog[index - 3] ^= (value & ~analog_mask[index - 3]);
+
+That is, we toggle the bits that are set in 'value' and not set
+in the mask of read-only bits.
+
+>          break;
+>      default:
+> -        /*
+> -         * We will do a better implementation later. In particular some bits
+> -         * cannot be written to.
+> -         */
+> -        s->analog[index] = value;
+> +        s->analog[index] = (s->analog[index] & analog_mask[index]) |
+> +                           (value & ~analog_mask[index]);
+>          break;
 >      }
->  
->      acpi_dsdt_add_power_button(scope);
-> +    acpi_dsdt_add_tpm(scope, vms);
-shouldn't be this guarded by check if TPM device is present?
+>  }
 
-perhaps pass found here tpm to acpi_dsdt_add_tpm() as an argument
-
->  
->      aml_append(dsdt, scope);
->  
-
+thanks
+-- PMM
 
