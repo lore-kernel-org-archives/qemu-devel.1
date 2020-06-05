@@ -2,79 +2,121 @@ Return-Path: <SRS0=hXcz=7S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66E0EC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 14:25:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8FEAC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 14:27:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 364D72063A
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 14:25:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8325920659
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 14:27:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TsQD1mNH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 364D72063A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z/rqXRv+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8325920659
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46956 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50592 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jhDHq-000857-I7
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 10:25:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47174)
+	id 1jhDJI-0001JX-RP
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 10:27:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47392)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1jhDGv-0007Cx-Sy
- for qemu-devel@nongnu.org; Fri, 05 Jun 2020 10:24:37 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:56213
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jhDId-0000Xd-IX
+ for qemu-devel@nongnu.org; Fri, 05 Jun 2020 10:26:23 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41034
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1jhDGu-0000Uh-Og
- for qemu-devel@nongnu.org; Fri, 05 Jun 2020 10:24:37 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jhDIc-0001Ao-Ku
+ for qemu-devel@nongnu.org; Fri, 05 Jun 2020 10:26:23 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591367075;
+ s=mimecast20190719; t=1591367181;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=EIoeKzcvR1ihbrU9BSAyQRwVMeqNeuleWlAOknvpIKA=;
- b=TsQD1mNHbPuyUveB/u2PeVJh7vtUdzI62BcKmjtfGjTOYmy92C8yLKV+VCerFl0iQa3VwT
- b7hGUomTe1YMWQhTaqAbNoDPIRNFFacuUWlU8iutyl/ZcpN8kaUAQuFej7oTIi0OP3Q3h7
- 12ms4hbliKnL7bi4ikJEYU2BDs4PLFE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-457-pS6mNctmMwqjmMAc1ScyDA-1; Fri, 05 Jun 2020 10:24:32 -0400
-X-MC-Unique: pS6mNctmMwqjmMAc1ScyDA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8AF61100CCD6;
- Fri,  5 Jun 2020 14:24:13 +0000 (UTC)
-Received: from localhost (unknown [10.40.208.51])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6AD1A5FC1B;
- Fri,  5 Jun 2020 14:24:00 +0000 (UTC)
-Date: Fri, 5 Jun 2020 16:23:57 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH v3 1/4] acpi: Convert build_tpm2() to build_append* API
-Message-ID: <20200605162357.407dff93@redhat.com>
-In-Reply-To: <20200601095737.32671-2-eric.auger@redhat.com>
-References: <20200601095737.32671-1-eric.auger@redhat.com>
- <20200601095737.32671-2-eric.auger@redhat.com>
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=27WuZTL7NnEN3Ju65h/8x51tlzjKghgjHXh6xlX5Hlk=;
+ b=Z/rqXRv+hvMgXVXmrvJ0UYLbln8/pWpqq1Hy6NGvPmCaI+9AldZRAQoFOFHOGqNArEgBxc
+ TLuBX5YYHeK5YNpubC9Zmo0yWyAKiyaj0d1DTy/NRHvWUiRFztlPCoHRaKnfNrtXgZmex6
+ R+N6twYuV83HWgG38VsB2oEjn2jh+/U=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-418-9Fp0PeJTM321pUbpP1S3rQ-1; Fri, 05 Jun 2020 10:26:19 -0400
+X-MC-Unique: 9Fp0PeJTM321pUbpP1S3rQ-1
+Received: by mail-wr1-f72.google.com with SMTP id p9so3845475wrx.10
+ for <qemu-devel@nongnu.org>; Fri, 05 Jun 2020 07:26:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=27WuZTL7NnEN3Ju65h/8x51tlzjKghgjHXh6xlX5Hlk=;
+ b=FPusx0E7FfDG3K7BfliFL6dBjhn+w+Y+eRJ8orDEd45XuysWOWJ9TSZOlvuXgr+feq
+ ecaVO1lrvkSrqObgAZK4tSCYNY74hyFs1aTI8+1Tli5IaILRmxMoxlCzJz1PsZd6yGiq
+ mbpc5w8fDk0X6BQ/cUP6bAAagwLvsLdLEKHEP7I6J/6DM/sIoMVzG1gQzvr9+/00vlsv
+ HJbSFwyKQAImUl1WrfIylHTv9+QP+HuqJpNZmEkVowTZLJz/JxMf34NGG8CuQW3Zvyvn
+ Tdh5GNWrfwEJmBG+Vd/Jy2vb0zHgWXtaMbNJttFa6Q2xPEYFWrnThxHwAVQTYB4N68ZX
+ gDtA==
+X-Gm-Message-State: AOAM5318iRloc3a+d7rlMF3ruIP8JONu7N3LIqm0GI29hGjywyITFT1b
+ E9C0MuwR5+b7A4xZD8Og6kmn496czWXHNCZHPCTNDBPsknRGoaBDFNaqZKZaBqfLC0c3mPnlPsM
+ Xdx2L9zd2mRsR48g=
+X-Received: by 2002:a1c:b7d5:: with SMTP id h204mr2996688wmf.100.1591367178610; 
+ Fri, 05 Jun 2020 07:26:18 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzxBTvZBjzTXTNsAhVcGitLE+Q2HKSRV9rLyCR3N98yTMzpgIGG5c0HcLFR447V7Bsuem/eJw==
+X-Received: by 2002:a1c:b7d5:: with SMTP id h204mr2996650wmf.100.1591367178243; 
+ Fri, 05 Jun 2020 07:26:18 -0700 (PDT)
+Received: from [192.168.1.43] (181.red-88-10-103.dynamicip.rima-tde.net.
+ [88.10.103.181])
+ by smtp.gmail.com with ESMTPSA id y14sm1269531wma.25.2020.06.05.07.26.16
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 05 Jun 2020 07:26:17 -0700 (PDT)
+Subject: Re: [PATCH] block: Remove trailing newline in format used by
+ error_report API
+To: Markus Armbruster <armbru@redhat.com>
+References: <20200228123637.15160-1-philmd@redhat.com>
+ <8736auipnb.fsf@dusky.pond.sub.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <fd516cf1-72bc-63db-84f0-d2f2c5cbad7a@redhat.com>
+Date: Fri, 5 Jun 2020 16:26:16 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <8736auipnb.fsf@dusky.pond.sub.org>
+Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=imammedo@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/05 03:40:54
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/05 03:27:26
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -95,111 +137,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, drjones@redhat.com, philmd@redhat.com,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org, marcandre.lureau@redhat.com,
- eric.auger.pro@gmail.com, lersek@redhat.com, ardb@kernel.org,
- stefanb@linux.ibm.com
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ qemu-trivial@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon,  1 Jun 2020 11:57:34 +0200
-Eric Auger <eric.auger@redhat.com> wrote:
-
-> In preparation of its move to the generic acpi code,
-> let's convert build_tpm2() to use build_append API. This
-> latter now is prefered in place of direct ACPI struct field
-> settings with manual endianness conversion.
->
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> ---
->  hw/i386/acpi-build.c | 28 +++++++++++++++++++---------
->  1 file changed, 19 insertions(+), 9 deletions(-)
+On 2/28/20 6:32 PM, Markus Armbruster wrote:
+> Philippe Mathieu-Daudé <philmd@redhat.com> writes:
 > 
-> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> index b5669d6c65..f0d35d7b17 100644
-> --- a/hw/i386/acpi-build.c
-> +++ b/hw/i386/acpi-build.c
-> @@ -2298,30 +2298,40 @@ build_tpm_tcpa(GArray *table_data, BIOSLinker *linker, GArray *tcpalog)
->  static void
->  build_tpm2(GArray *table_data, BIOSLinker *linker, GArray *tcpalog)
->  {
-> -    Acpi20TPM2 *tpm2_ptr = acpi_data_push(table_data, sizeof *tpm2_ptr);
-> +    Acpi20TPM2 *tpm2_ptr = acpi_data_push(table_data, sizeof(AcpiTableHeader));
+>> The error_report API doesn't want trailing newline characters.
+>> Remove it, to avoid and error when moving the code around:
+>>
+>>   ERROR: Error messages should not contain newlines
+> 
+> Commit 312fd5f2909 has a Coccinelle script.  It should be committed and
+> re-run.
+> 
+>> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>> ---
+>>  block.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/block.c b/block.c
+>> index 1bdb9c679d..e466d15914 100644
+>> --- a/block.c
+>> +++ b/block.c
+>> @@ -5994,7 +5994,7 @@ void bdrv_img_create(const char *filename, const char *fmt,
+>            bs = bdrv_open(full_backing, NULL, backing_options, back_flags,
+>                           &local_err);
+>            g_free(full_backing);
+>            if (!bs && size != -1) {
+>>              /* Couldn't open BS, but we have a size, so it's nonfatal */
+>>              warn_reportf_err(local_err,
+>>                              "Could not verify backing image. "
+>> -                            "This may become an error in future versions.\n");
+>> +                            "This may become an error in future versions.");
+>>              local_err = NULL;
+>>          } else if (!bs) {
+>>              /* Couldn't open bs, do not have size */
+> 
+> warn_reportf_err() is a convenience function to error_prepend(),
+> warn_report() and free @local_err.
 
->      unsigned log_addr_size = sizeof(tpm2_ptr->log_area_start_address);
->      unsigned log_addr_offset =
->          (char *)&tpm2_ptr->log_area_start_address - table_data->data;
+OK now I see.
 
-Is this the reason why you've kept Acpi20TPM2 around?
+Why warn_reportf_err() doesn't take a 'Error **err' instead, to set err
+to NULL after freeing *err?
 
-
-> +    uint8_t start_method_params[12] = {};
->  
-> -    tpm2_ptr->platform_class = cpu_to_le16(TPM2_ACPI_CLASS_CLIENT);
-> +    /* platform class */
-pls verbatim filed names from spec in comments
-
-> +    build_append_int_noprefix(table_data, TPM2_ACPI_CLASS_CLIENT, 2);
-> +    /* reserved */
-> +    build_append_int_noprefix(table_data, 0, 2);
->      if (TPM_IS_TIS_ISA(tpm_find())) {
-> -        tpm2_ptr->control_area_address = cpu_to_le64(0);
-> -        tpm2_ptr->start_method = cpu_to_le32(TPM2_START_METHOD_MMIO);
-> +        /* address of control area */
-> +        build_append_int_noprefix(table_data, 0, 8);
-> +        /* start method */
-> +        build_append_int_noprefix(table_data, TPM2_START_METHOD_MMIO, 4);
->      } else if (TPM_IS_CRB(tpm_find())) {
-> -        tpm2_ptr->control_area_address = cpu_to_le64(TPM_CRB_ADDR_CTRL);
-> -        tpm2_ptr->start_method = cpu_to_le32(TPM2_START_METHOD_CRB);
-
-missing field name comments
-
-> +        build_append_int_noprefix(table_data, TPM_CRB_ADDR_CTRL, 8);
-> +        build_append_int_noprefix(table_data, TPM2_START_METHOD_CRB, 4);
->      } else {
->          g_warn_if_reached();
->      }
-
-considering fields are the same I'd also restructure above as
-    if () {
-       control_area_address = 
-       start_method =
-    ...
-    }
-    /* address of control area */
-    build_append_int_noprefix(table_data, control_area_address, 8);
-    /* start method */
-    build_append_int_noprefix(table_data, start_method, 4); 
-
-which is bit easier to read 
-    
->  
-> -    tpm2_ptr->log_area_minimum_length =
-> -        cpu_to_le32(TPM_LOG_AREA_MINIMUM_SIZE);
-> +    /* platform specific parameters */
-> +    g_array_append_vals(table_data, &start_method_params, 12);
->  
-> -    acpi_data_push(tcpalog, le32_to_cpu(tpm2_ptr->log_area_minimum_length));
-> +    /* log area minimum length */
-> +    build_append_int_noprefix(table_data, TPM_LOG_AREA_MINIMUM_SIZE, 4);
-> +
-> +    acpi_data_push(tcpalog, TPM_LOG_AREA_MINIMUM_SIZE);
->      bios_linker_loader_alloc(linker, ACPI_BUILD_TPMLOG_FILE, tcpalog, 1,
->                               false);
-
-I suggest to drop Acpi20TPM2 with pointer math above and use approach similar
-to build_ghes_v2/address_offset, i.e. get actual offest here:
-
-      log_addr_offset = table_data->len
-
-and s/log_addr_size/8/
-
->      /* log area start address to be filled by Guest linker */
-> +    build_append_int_noprefix(table_data, 0, 8);
->      bios_linker_loader_add_pointer(linker, ACPI_BUILD_TABLE_FILE,
->                                     log_addr_offset, log_addr_size,
->                                     ACPI_BUILD_TPMLOG_FILE, 0);
+> 
+> When @local_err holds a message like "pants on fire", the code before
+> the patch prints something like
+> 
+>     qemu-system-x86_64: warning: Could not verify backing image. This may become an error in future versions.
+>     pants on fire
+> 
+> The patch "improves" it to
+> 
+>     qemu-system-x86_64: warning: Could not verify backing image. This may become an error in future versions.pants on fire
+> 
+> General advice: this misuse of warn_reportf_err() is an excusable
+> mistake, but when you *test* the error path, you can't *not* see that
+> the actual message is crap.  Test your errors!
+> 
+> Actual improvement:
+> 
+>                warn_reportf_err(local_err, "Could not verify backing image: ");
+>                error_printf("This may become an error in future versions.\n");
+> 
+> This should print
+> 
+>     qemu-system-x86_64: warning: Could not verify backing image: pants on fire
+>     This may become an error in future versions.
+> 
 
 
