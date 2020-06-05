@@ -7,80 +7,80 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C69C3C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 01:32:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 220D6C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 01:33:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 906772067B
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 01:32:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D0ABB2067B
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 01:33:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="cRP/mAGv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 906772067B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="CvZLMjrb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0ABB2067B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48872 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49480 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jh1EA-0006Py-GR
-	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 21:32:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55582)
+	id 1jh1EI-0006f9-WC
+	for qemu-devel@archiver.kernel.org; Thu, 04 Jun 2020 21:33:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55616)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=4185f83b6=alistair.francis@wdc.com>)
- id 1jh1Aw-0000sb-0m; Thu, 04 Jun 2020 21:29:38 -0400
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:56239)
+ id 1jh1BM-00021G-3g; Thu, 04 Jun 2020 21:30:04 -0400
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:22002)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=4185f83b6=alistair.francis@wdc.com>)
- id 1jh1Av-0008Vi-7D; Thu, 04 Jun 2020 21:29:37 -0400
+ id 1jh1BK-00006w-OE; Thu, 04 Jun 2020 21:30:03 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1591320578; x=1622856578;
+ t=1591320625; x=1622856625;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=5lJn9g7UHpK0u+FPdhj/bWuKg6TrI44UV+9vDM6Jp54=;
- b=cRP/mAGvCeDGqdJRQnu/fkA2bQLBCn9ZQOMOrWOOeFmAFIwp4IhgCDOD
- ErJUD26invDJUdirE6cVow8hW1CLJaVzMbwHuWktjT5asBRra3Fdyqkj/
- 2rznPYcvtbapnEbz45Y5EJkVhcTyepBXJQd+O2578tj+MZzGbywo8JN9+
- jWeb/AMG7nCWahJNUtmPp3XitYxhokuJbAYmkUoIUJd0IijW8fykuQ0cp
- XhsYrPtrXfk5PVFKXAyIsgELP6J49Lrq6zGYRmRRkbxU0/xZ2cyOMd2sz
- CaFLmufhzY7mRJBFOn90NxOQfOqA9V1dyS5ASvp+4SysGmPY6BTN/Gim3 A==;
-IronPort-SDR: q/5bYReafcfJUk9T+L0wEYonklAHzIsb4T3a7Fe+Q8J/CLXsiEEHeJj6FIjEIWmz9wDyX1wQHI
- gEz/XcSBCY5aF/choIKT/aAW7EqtzB+h8ZdrKbEaWq5fIXZullYiHjllvkYj5lGizZyVkVHLpC
- wD4wg1Az2p9nKXXs44ixykNC2Lw9yC2rnls0uI0G62B572tathZ3TlvRYZ5HbkU3LyoP13fTxD
- o0u6EIEKbLVGKQyLZ1Fz6U3Fwk+zruSsrCZeKGXt4go8sV8LEFHc36F4F0lVcb6Y9zjLrVb5ec
- QDA=
-X-IronPort-AV: E=Sophos;i="5.73,474,1583164800"; d="scan'208";a="139561712"
+ bh=OiW+dN6bg3FYJIQSoK9bOQDaMsfREUhCimoZT/7SlwE=;
+ b=CvZLMjrbj/DI3djOr3ELaZNv4IYnoou/4H6TnV42Sk0pACNV/cXNv7jc
+ KuI7AW7VE88FV+Bfc8IDo7yAtbwggmRDgjpHgJluuU8dHBR56BRfuZMnb
+ sfTjuJE59c2DRD6TNOTU9xp3haTYF10OAp0aZnKpKhOMNCF/a62PvleCI
+ HEiNVKkObrPoAWFumcOZB4rjJjiGW1OlIpEVhaRPjqrVBmuBcYrDMxqt+
+ UYRfXvitZNFyg1J//XRNYcFsF8JRLlSP3XLFeb6w6h7BwtIwvi6t3ZFl9
+ P8Gu3ZOZM48r0tq9cVGETUv0lVXukOI0omRk2i7KsPqnWZNyfX+AkF13e Q==;
+IronPort-SDR: FEiRbid7u96kpcS1G+z0S4/9RD1GX7h5jwmbxSAk47JlTUgylSBT1w7G3iRcGkpoGQDsqa8YGN
+ Uw/9I7gbgQKYW/oyEpGoQ2QHPQROZJ44v2om/5c5eILB0IgV00crSpvuEM2/PsbLkIlBVriITa
+ TU01Fw9anGrYZJ/gRXwOAXS8WTFzwQR6WCsMG+CJ5fN3tt3TWQx4eyTjFT3Tg0LqVE8iNr4whI
+ /5GodZyNs+RTUff7HkjVMjiVLTdk5lTMJqlH04snsflx4JSxDsmRvRh9uaVOKBv3xWkgRaUftf
+ Eys=
+X-IronPort-AV: E=Sophos;i="5.73,474,1583164800"; d="scan'208";a="242127046"
 Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com)
  ([199.255.45.14])
- by ob1.hgst.iphmx.com with ESMTP; 05 Jun 2020 09:29:36 +0800
-IronPort-SDR: jHYY0yIg+IerpoTZPCyFZb3U7xuMCK7h84Wc03VVWAs/d5muvKuY7cRxEGgzfQoheGLK1j/20k
- xdeYCMJJfPajPZkmEKh7PjWZZmx+Qpe5s=
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+ by ob1.hgst.iphmx.com with ESMTP; 05 Jun 2020 09:30:21 +0800
+IronPort-SDR: NFztixPKOs6KPoL+W5CXNCEBrowMnx33e+nojknBGSXLgST32feDkcJVXGoVJXUW7A3Gg+j2Ol
+ AAHL/u0In/cpGdwxS1USpwxRSUNBk9Zxw=
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 04 Jun 2020 18:19:11 -0700
-IronPort-SDR: V4SIdune2AVVbfJ7jTNxjAz77QpELlLI9+wVpYXqu3sdf4K/9NB2P4HuuMEjxpQQeWsOk4J3zH
- IgU92be07YjQ==
+ 04 Jun 2020 18:19:36 -0700
+IronPort-SDR: BQ98O/PFVyKR+9CAx42dRm54oark5HjehLHBMxaouKb7KHWyiTpmaJ8lVASibY3EMHwkqCqx8j
+ D0K8cm42PK8g==
 WDCIronportException: Internal
 Received: from cnf006056.ad.shared (HELO risc6-mainframe.hgst.com)
  ([10.86.57.233])
- by uls-op-cesaip01.wdc.com with ESMTP; 04 Jun 2020 18:29:36 -0700
+ by uls-op-cesaip02.wdc.com with ESMTP; 04 Jun 2020 18:30:00 -0700
 From: Alistair Francis <alistair.francis@wdc.com>
 To: qemu-devel@nongnu.org,
 	qemu-riscv@nongnu.org
-Subject: [PATCH v2 02/17] target/riscv: Report errors validating 2nd-stage PTEs
-Date: Thu,  4 Jun 2020 18:20:47 -0700
-Message-Id: <e8f3f03935697c721a5bb3e720d57e78e53ffe19.1591319882.git.alistair@alistair23.me>
+Subject: [PATCH v2 11/17] target/riscv: Update the Hypervisor trap return/entry
+Date: Thu,  4 Jun 2020 18:21:12 -0700
+Message-Id: <04e964562dcef49f0f54f28f8ea2cfa386fba8f3.1591319882.git.alistair@alistair23.me>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <cover.1591319882.git.alistair@alistair23.me>
 References: <cover.1591319882.git.alistair@alistair23.me>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.71.153.144;
+Received-SPF: pass client-ip=68.232.143.124;
  envelope-from=prvs=4185f83b6=alistair.francis@wdc.com;
- helo=esa5.hgst.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 21:29:30
+ helo=esa2.hgst.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/04 21:30:00
 X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
 X-Spam_score_int: -43
 X-Spam_score: -4.4
@@ -109,29 +109,90 @@ Sender: "Qemu-devel"
 
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- target/riscv/cpu_helper.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ target/riscv/cpu_bits.h   |  1 +
+ target/riscv/cpu_helper.c |  8 +-------
+ target/riscv/op_helper.c  |  8 ++------
+ target/riscv/translate.c  | 10 ----------
+ 4 files changed, 4 insertions(+), 23 deletions(-)
 
+diff --git a/target/riscv/cpu_bits.h b/target/riscv/cpu_bits.h
+index 028e268faa..6b97c27711 100644
+--- a/target/riscv/cpu_bits.h
++++ b/target/riscv/cpu_bits.h
+@@ -430,6 +430,7 @@
+ #define HSTATUS_VTSR         0x00400000
+ #define HSTATUS_HU           0x00000200
+ #define HSTATUS_GVA          0x00000040
++#define HSTATUS_SPVP         0x00000100
+ 
+ #define HSTATUS32_WPRI       0xFF8FF87E
+ #define HSTATUS64_WPRI       0xFFFFFFFFFF8FF87EULL
 diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-index eda7057663..75d2ae3434 100644
+index 4ea39d5641..c4085e5870 100644
 --- a/target/riscv/cpu_helper.c
 +++ b/target/riscv/cpu_helper.c
-@@ -435,8 +435,13 @@ restart:
-             hwaddr vbase;
+@@ -916,9 +916,7 @@ void riscv_cpu_do_interrupt(CPUState *cs)
+             } else if (riscv_cpu_virt_enabled(env)) {
+                 /* Trap into HS mode, from virt */
+                 riscv_cpu_swap_hypervisor_regs(env);
+-                env->hstatus = set_field(env->hstatus, HSTATUS_SP2V,
+-                                         get_field(env->hstatus, HSTATUS_SPV));
+-                env->hstatus = set_field(env->hstatus, HSTATUS_SP2P,
++                env->hstatus = set_field(env->hstatus, HSTATUS_SPVP,
+                                          get_field(env->mstatus, SSTATUS_SPP));
+                 env->hstatus = set_field(env->hstatus, HSTATUS_SPV,
+                                          riscv_cpu_virt_enabled(env));
+@@ -929,10 +927,6 @@ void riscv_cpu_do_interrupt(CPUState *cs)
+                 riscv_cpu_set_force_hs_excep(env, 0);
+             } else {
+                 /* Trap into HS mode */
+-                env->hstatus = set_field(env->hstatus, HSTATUS_SP2V,
+-                                         get_field(env->hstatus, HSTATUS_SPV));
+-                env->hstatus = set_field(env->hstatus, HSTATUS_SP2P,
+-                                         get_field(env->mstatus, SSTATUS_SPP));
+                 env->hstatus = set_field(env->hstatus, HSTATUS_SPV,
+                                          riscv_cpu_virt_enabled(env));
  
-             /* Do the second stage translation on the base PTE address. */
--            get_physical_address(env, &vbase, &vbase_prot, base, MMU_DATA_LOAD,
--                                 mmu_idx, false, true);
-+            int vbase_ret = get_physical_address(env, &vbase, &vbase_prot,
-+                                                 base, MMU_DATA_LOAD,
-+                                                 mmu_idx, false, true);
-+
-+            if (vbase_ret != TRANSLATE_SUCCESS) {
-+                return vbase_ret;
-+            }
+diff --git a/target/riscv/op_helper.c b/target/riscv/op_helper.c
+index e0053699cc..efc2d854eb 100644
+--- a/target/riscv/op_helper.c
++++ b/target/riscv/op_helper.c
+@@ -97,12 +97,8 @@ target_ulong helper_sret(CPURISCVState *env, target_ulong cpu_pc_deb)
+         prev_priv = get_field(mstatus, MSTATUS_SPP);
+         prev_virt = get_field(hstatus, HSTATUS_SPV);
  
-             pte_addr = vbase + idx * ptesize;
-         } else {
+-        hstatus = set_field(hstatus, HSTATUS_SPV,
+-                                 get_field(hstatus, HSTATUS_SP2V));
+-        mstatus = set_field(mstatus, MSTATUS_SPP,
+-                            get_field(hstatus, HSTATUS_SP2P));
+-        hstatus = set_field(hstatus, HSTATUS_SP2V, 0);
+-        hstatus = set_field(hstatus, HSTATUS_SP2P, 0);
++        hstatus = set_field(hstatus, HSTATUS_SPV, 0);
++        mstatus = set_field(mstatus, MSTATUS_SPP, 0);
+         mstatus = set_field(mstatus, SSTATUS_SIE,
+                             get_field(mstatus, SSTATUS_SPIE));
+         mstatus = set_field(mstatus, SSTATUS_SPIE, 1);
+diff --git a/target/riscv/translate.c b/target/riscv/translate.c
+index ce71ca7a92..1d973b62e9 100644
+--- a/target/riscv/translate.c
++++ b/target/riscv/translate.c
+@@ -754,16 +754,6 @@ static void riscv_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
+ #if !defined(CONFIG_USER_ONLY)
+     if (riscv_has_ext(env, RVH)) {
+         ctx->virt_enabled = riscv_cpu_virt_enabled(env);
+-        if (env->priv_ver == PRV_M &&
+-            get_field(env->mstatus, MSTATUS_MPRV) &&
+-            MSTATUS_MPV_ISSET(env)) {
+-            ctx->virt_enabled = true;
+-        } else if (env->priv == PRV_S &&
+-                   !riscv_cpu_virt_enabled(env) &&
+-                   get_field(env->hstatus, HSTATUS_SPRV) &&
+-                   get_field(env->hstatus, HSTATUS_SPV)) {
+-            ctx->virt_enabled = true;
+-        }
+     } else {
+         ctx->virt_enabled = false;
+     }
 -- 
 2.26.2
 
