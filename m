@@ -7,79 +7,80 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C99CC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 04:18:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D5AFC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 04:18:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 497BB207D3
-	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 04:18:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 27701207D3
+	for <qemu-devel@archiver.kernel.org>; Fri,  5 Jun 2020 04:18:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Vik2TrY3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 497BB207D3
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wIWshM2E"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27701207D3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40070 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40804 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jh3oa-000676-Jk
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 00:18:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39444)
+	id 1jh3oh-0006P0-AI
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 00:18:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39428)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jh3nZ-0004Ct-G6
- for qemu-devel@nongnu.org; Fri, 05 Jun 2020 00:17:41 -0400
-Received: from mail-pl1-x630.google.com ([2607:f8b0:4864:20::630]:35313)
+ id 1jh3nX-00049g-L4
+ for qemu-devel@nongnu.org; Fri, 05 Jun 2020 00:17:39 -0400
+Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:33628)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jh3nY-0000jE-QU
- for qemu-devel@nongnu.org; Fri, 05 Jun 2020 00:17:41 -0400
-Received: by mail-pl1-x630.google.com with SMTP id q16so3121335plr.2
- for <qemu-devel@nongnu.org>; Thu, 04 Jun 2020 21:17:40 -0700 (PDT)
+ id 1jh3nW-0000hd-97
+ for qemu-devel@nongnu.org; Fri, 05 Jun 2020 00:17:39 -0400
+Received: by mail-pj1-x1043.google.com with SMTP id b7so2858060pju.0
+ for <qemu-devel@nongnu.org>; Thu, 04 Jun 2020 21:17:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=ZRhkmFyLy+CEyb6J1D7iziceaKpzHBPMdBM2JQyWlqQ=;
- b=Vik2TrY3sbDhCQs1uBFALhsFBWnCSqhMTMGUe8vIHSiasqnFFjmoYlnOhCNyvtquBC
- 6juohJ7GcuV4bxqiP07vD8fDhV2lTtf0Kcma4nHAB2TsSnD9FdskV68LR7tZmRTlf7s4
- coy0I9HR1cslWBpgA6D2J3CXk9KmceJI2BqdsQgA77T6hLP+LWhaheywD+RmQhyZVu1v
- HuadP5c0poLmf++YdVB6aogMIa9HI5MKsjqCj3AjqI18afaKUE4KgOt5WXK68M0egpD8
- JODNzDJMG9ZDB11/1StKL6Ay/wnEH9RIgQUZAMbaENF1NWZ995nrvZQ2juvAQtSspVc4
- uCCg==
+ bh=afqYJRs0BdUykWHYLxRC5+OCKgvwuuB1J/PoMsnkMLE=;
+ b=wIWshM2EpGYLAAiKmopR5JOwhnbU+IQ4C7bWf0uxoIXdg2ql5/sDM1P/2CKTNyOqeH
+ 5whdNrOC3htm0ppzpk2UtRR6Y1dHlCT74NRaWWl1c3nqwgFr1G23kFa+dnV9SYdYWTjB
+ XpGcuQIpLPphA1Fco4Pk8BJw17dtAd1vjIjp6I9vxyAyOSXkv+UoqCoZBWdAnTgKaa/z
+ nYLUCUU3ZfMKNiZCTjqKTdPix6hQrMuW3P2pqtfm+ZtuvSypY2FDFmpcP+HMouSC0quD
+ GXxOvJayZqW9TyKUY0E9RkUdw5W0wjTgpuwFrYcPtFVZbDTD7WPMQBMwPVEjixD+qfap
+ fqqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=ZRhkmFyLy+CEyb6J1D7iziceaKpzHBPMdBM2JQyWlqQ=;
- b=Fjc9NYrmSIOgfMM6PnMtq5ndImetSFw+/3CREPRhBsY49ATmZJm2P82djQCB7w2aVN
- 3ansqDIpX5ZOJG6+fx8oXx/Pbc1A6/z58Myp7EDVeTdMwv+OHCioYfhErwelRSaegaaN
- /b5jLjhSUpxWeXPmUg84RzgD3WpDVpe4oB366DFOh4OmqYvUix3BVRYjgJwxNoaFTIvi
- 0muSDJ/1MCpi+MgpakWNp5KgRk1KDHzsdl6X/cVHIH/PE46bT32R9Y+qHlR96WSovPmt
- 0rQSNnEP3kQaInFSg8wM+Yk75ENIpneKZzRTvyNyZ8vKEqPT4xN6AX6kxF+v0CsJANdk
- 4giA==
-X-Gm-Message-State: AOAM531VlNeNmCRR2xIXhhwsQNXQcl7EzJJsGa7VMhJQex/yQmZVzjhi
- P5rFG8GeNTOZzWGGEaBwWdTQQgKN9Gc=
-X-Google-Smtp-Source: ABdhPJyli7hHRAflUuzYSn+oNzwISJOrnmSwDDnh6TBBuYBLrsBTHl4raY1YQ00q0Bt/lKIIll4Jwg==
-X-Received: by 2002:a17:902:9889:: with SMTP id
- s9mr7367283plp.299.1591330659134; 
- Thu, 04 Jun 2020 21:17:39 -0700 (PDT)
+ bh=afqYJRs0BdUykWHYLxRC5+OCKgvwuuB1J/PoMsnkMLE=;
+ b=NOvIRhJZ1DUhc4U4MMexE3Y1dOmkAEmfgKlnLM9Nm3iGH1lP/BNiawREcWdeDlT2ln
+ 4353UgkZM5dwXlVPf35TvdS2Y0Q0Um6JtbAJa20RZy1zEErie4jKhx8X3UPLbBweboUp
+ Ct9R4L6z6wFpVN/jiwKTlaimpi9mvT++ZRlxE0GVNJAmD62cPC/cBu3eNQOmKUl6W7AB
+ FaILqEkQqnlnpiGawWF3Fv/J1rkQrgg/QPp9DpHeQyelfF4geglahUUwEU/4VJZ3cHWr
+ CxyYP+8UfqGbYav6OwfIwkNlLPss04w55s/FZLmARuKGYd9y225Bq7rc5PEk1KPUXZ4V
+ 7bZg==
+X-Gm-Message-State: AOAM5334ohkEpVkDN+r7sDj40X5uLt2yGAFbFfvHuK+3PziukcCcB1dP
+ EMQ1XwVOQu5iyAV7h4jAj9kcpWYuRwc=
+X-Google-Smtp-Source: ABdhPJx4/yaP8MhRVKkw+hvtmKLS0OReHZ7PrDtVomzw66GwfD11zybexOQTX5+qafD9a892S7l6pg==
+X-Received: by 2002:a17:90a:2306:: with SMTP id
+ f6mr752232pje.231.1591330656597; 
+ Thu, 04 Jun 2020 21:17:36 -0700 (PDT)
 Received: from localhost.localdomain (174-21-143-238.tukw.qwest.net.
  [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id h15sm5440902pgl.12.2020.06.04.21.17.38
+ by smtp.gmail.com with ESMTPSA id h15sm5440902pgl.12.2020.06.04.21.17.35
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 04 Jun 2020 21:17:38 -0700 (PDT)
+ Thu, 04 Jun 2020 21:17:35 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 03/17] linux-user: Check for overflow in access_ok
-Date: Thu,  4 Jun 2020 21:17:19 -0700
-Message-Id: <20200605041733.415188-4-richard.henderson@linaro.org>
+Subject: [PATCH v2 01/17] tcg: Introduce target-specific page data for
+ user-only
+Date: Thu,  4 Jun 2020 21:17:17 -0700
+Message-Id: <20200605041733.415188-2-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200605041733.415188-1-richard.henderson@linaro.org>
 References: <20200605041733.415188-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::630;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x630.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1043;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1043.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -106,42 +107,164 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Verify that addr + size - 1 does not wrap around.
+This data can be allocated by page_alloc_target_data() and
+released by page_set_flags(start, end, prot | PAGE_RESET).
+
+This data will be used to hold tag memory for AArch64 MTE.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/qemu.h | 17 ++++++++++++-----
- 1 file changed, 12 insertions(+), 5 deletions(-)
+ include/exec/cpu-all.h    | 20 ++++++++++++++------
+ accel/tcg/translate-all.c | 28 ++++++++++++++++++++++++++++
+ linux-user/mmap.c         |  5 ++++-
+ linux-user/syscall.c      |  4 ++--
+ 4 files changed, 48 insertions(+), 9 deletions(-)
 
-diff --git a/linux-user/qemu.h b/linux-user/qemu.h
-index d36b18b678..2bf35e66ac 100644
---- a/linux-user/qemu.h
-+++ b/linux-user/qemu.h
-@@ -467,12 +467,19 @@ extern unsigned long guest_stack_size;
- #define VERIFY_READ 0
- #define VERIFY_WRITE 1 /* implies read access */
+diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
+index 2bd023d692..e5f564fa1f 100644
+--- a/include/exec/cpu-all.h
++++ b/include/exec/cpu-all.h
+@@ -266,15 +266,21 @@ extern intptr_t qemu_host_page_mask;
+ #define PAGE_EXEC      0x0004
+ #define PAGE_BITS      (PAGE_READ | PAGE_WRITE | PAGE_EXEC)
+ #define PAGE_VALID     0x0008
+-/* original state of the write flag (used when tracking self-modifying
+-   code */
++/*
++ * Original state of the write flag (used when tracking self-modifying code)
++ */
+ #define PAGE_WRITE_ORG 0x0010
+-/* Invalidate the TLB entry immediately, helpful for s390x
+- * Low-Address-Protection. Used with PAGE_WRITE in tlb_set_page_with_attrs() */
+-#define PAGE_WRITE_INV 0x0040
++/*
++ * Invalidate the TLB entry immediately, helpful for s390x
++ * Low-Address-Protection. Used with PAGE_WRITE in tlb_set_page_with_attrs()
++ */
++#define PAGE_WRITE_INV 0x0020
++/* For use with page_set_flags: page is being replaced; target_data cleared. */
++#define PAGE_RESET     0x0040
++
+ #if defined(CONFIG_BSD) && defined(CONFIG_USER_ONLY)
+ /* FIXME: Code that sets/uses this is broken and needs to go away.  */
+-#define PAGE_RESERVED  0x0020
++#define PAGE_RESERVED  0x0100
+ #endif
+ /* Target-specific bits that will be used via page_get_flags().  */
+ #define PAGE_TARGET_1  0x0080
+@@ -289,6 +295,8 @@ int walk_memory_regions(void *, walk_memory_regions_fn);
+ int page_get_flags(target_ulong address);
+ void page_set_flags(target_ulong start, target_ulong end, int flags);
+ int page_check_range(target_ulong start, target_ulong len, int flags);
++void *page_get_target_data(target_ulong address);
++void *page_alloc_target_data(target_ulong address, size_t size);
+ #endif
  
--static inline int access_ok(int type, abi_ulong addr, abi_ulong size)
-+static inline bool access_ok(int type, abi_ulong addr, abi_ulong size)
+ CPUArchState *cpu_copy(CPUArchState *env);
+diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+index 42ce1dfcff..a65bc1d4c2 100644
+--- a/accel/tcg/translate-all.c
++++ b/accel/tcg/translate-all.c
+@@ -111,6 +111,7 @@ typedef struct PageDesc {
+     unsigned int code_write_count;
+ #else
+     unsigned long flags;
++    void *target_data;
+ #endif
+ #ifndef CONFIG_USER_ONLY
+     QemuSpin lock;
+@@ -2525,6 +2526,7 @@ int page_get_flags(target_ulong address)
+ void page_set_flags(target_ulong start, target_ulong end, int flags)
  {
--    return guest_addr_valid(addr) &&
--           (size == 0 || guest_addr_valid(addr + size - 1)) &&
--           page_check_range((target_ulong)addr, size,
--                            (type == VERIFY_READ) ? PAGE_READ : (PAGE_READ | PAGE_WRITE)) == 0;
-+    if (!guest_addr_valid(addr)) {
-+        return false;
-+    }
-+    if (size != 0 &&
-+        (addr + size - 1 < addr ||
-+         !guest_addr_valid(addr + size - 1))) {
-+        return false;
-+    }
-+    return page_check_range((target_ulong)addr, size,
-+                            (type == VERIFY_READ) ? PAGE_READ :
-+                            (PAGE_READ | PAGE_WRITE)) == 0;
+     target_ulong addr, len;
++    bool reset_target_data;
+ 
+     /* This function should never be called with addresses outside the
+        guest address space.  If this assert fires, it probably indicates
+@@ -2539,6 +2541,8 @@ void page_set_flags(target_ulong start, target_ulong end, int flags)
+     if (flags & PAGE_WRITE) {
+         flags |= PAGE_WRITE_ORG;
+     }
++    reset_target_data = !(flags & PAGE_VALID) || (flags & PAGE_RESET);
++    flags &= ~PAGE_RESET;
+ 
+     for (addr = start, len = end - start;
+          len != 0;
+@@ -2552,10 +2556,34 @@ void page_set_flags(target_ulong start, target_ulong end, int flags)
+             p->first_tb) {
+             tb_invalidate_phys_page(addr, 0);
+         }
++        if (reset_target_data && p->target_data) {
++            g_free(p->target_data);
++            p->target_data = NULL;
++        }
+         p->flags = flags;
+     }
  }
  
- /* NOTE __get_user and __put_user use host pointers and don't check access.
++void *page_get_target_data(target_ulong address)
++{
++    PageDesc *p = page_find(address >> TARGET_PAGE_BITS);
++    return p ? p->target_data : NULL;
++}
++
++void *page_alloc_target_data(target_ulong address, size_t size)
++{
++    PageDesc *p = page_find(address >> TARGET_PAGE_BITS);
++    void *ret = NULL;
++
++    if (p) {
++        ret = p->target_data;
++        if (!ret && (p->flags & PAGE_VALID)) {
++            p->target_data = ret = g_malloc0(size);
++        }
++    }
++    return ret;
++}
++
+ int page_check_range(target_ulong start, target_ulong len, int flags)
+ {
+     PageDesc *p;
+diff --git a/linux-user/mmap.c b/linux-user/mmap.c
+index 40f03e3174..f9832609b0 100644
+--- a/linux-user/mmap.c
++++ b/linux-user/mmap.c
+@@ -599,6 +599,7 @@ abi_long target_mmap(abi_ulong start, abi_ulong len, int target_prot,
+         }
+     }
+  the_end1:
++    page_flags |= PAGE_RESET;
+     page_set_flags(start, start + len, page_flags);
+  the_end:
+     trace_target_mmap_complete(start);
+@@ -787,9 +788,11 @@ abi_long target_mremap(abi_ulong old_addr, abi_ulong old_size,
+         new_addr = -1;
+     } else {
+         new_addr = h2g(host_addr);
++        /* FIXME: Move page flags and target_data for each page.  */
+         prot = page_get_flags(old_addr);
+         page_set_flags(old_addr, old_addr + old_size, 0);
+-        page_set_flags(new_addr, new_addr + new_size, prot | PAGE_VALID);
++        page_set_flags(new_addr, new_addr + new_size,
++                       prot | PAGE_VALID | PAGE_RESET);
+     }
+     tb_invalidate_phys_range(new_addr, new_addr + new_size);
+     mmap_unlock();
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 7f6700c54e..d190fb1122 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -4315,8 +4315,8 @@ static inline abi_ulong do_shmat(CPUArchState *cpu_env,
+     raddr=h2g((unsigned long)host_raddr);
+ 
+     page_set_flags(raddr, raddr + shm_info.shm_segsz,
+-                   PAGE_VALID | PAGE_READ |
+-                   ((shmflg & SHM_RDONLY)? 0 : PAGE_WRITE));
++                   PAGE_VALID | PAGE_RESET | PAGE_READ |
++                   (shmflg & SHM_RDONLY ? 0 : PAGE_WRITE));
+ 
+     for (i = 0; i < N_SHM_REGIONS; i++) {
+         if (!shm_regions[i].in_use) {
 -- 
 2.25.1
 
