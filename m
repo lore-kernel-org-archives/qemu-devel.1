@@ -2,95 +2,81 @@ Return-Path: <SRS0=faK4=7T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=no
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8808BC433DF
-	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jun 2020 10:07:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91AC4C433DF
+	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jun 2020 10:56:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4B2DC206DC
-	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jun 2020 10:07:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="E1UbGvV6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B2DC206DC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTPS id 66D832073E
+	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jun 2020 10:56:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 66D832073E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52318 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43240 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jhVjP-0006zN-Io
-	for qemu-devel@archiver.kernel.org; Sat, 06 Jun 2020 06:07:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51410)
+	id 1jhWVQ-0002vS-Kf
+	for qemu-devel@archiver.kernel.org; Sat, 06 Jun 2020 06:56:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56110)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from
- <3q2rbXgYKCuoeMYQUPSaaSXQ.OaYcQYg-PQhQXZaZSZg.adS@flex--sameid.bounces.google.com>)
- id 1jhViq-0006Zl-2N
- for qemu-devel@nongnu.org; Sat, 06 Jun 2020 06:06:40 -0400
-Received: from mail-qt1-x84a.google.com ([2607:f8b0:4864:20::84a]:55126)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jhWUO-0002BG-EW
+ for qemu-devel@nongnu.org; Sat, 06 Jun 2020 06:55:48 -0400
+Received: from indium.canonical.com ([91.189.90.7]:56084)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from
- <3q2rbXgYKCuoeMYQUPSaaSXQ.OaYcQYg-PQhQXZaZSZg.adS@flex--sameid.bounces.google.com>)
- id 1jhVip-0001Ch-6K
- for qemu-devel@nongnu.org; Sat, 06 Jun 2020 06:06:39 -0400
-Received: by mail-qt1-x84a.google.com with SMTP id u26so10860861qtj.21
- for <qemu-devel@nongnu.org>; Sat, 06 Jun 2020 03:06:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=SJF0uEjYNQkzF8wPTCq68VSh6VbSoGFPM81EwD3Amec=;
- b=E1UbGvV69zaBEgg9UyXoYy88D8O7vOxOK4EgCwu0+IMNYg8fs3mNzuH1h9vZ8fncge
- pziX2aWtAHXwpojeFaMX/y991qaaykBWmW9DHCAdyEwso7ndjNwh2sVt8l1OHWpH8m+k
- d5eijP9kZuiJtDU/h7bdRgNu5KvaO9D6FJ+wNTGzFDRYW/wehSHAWVZ2NR5706EQcwij
- oPiRosfC8mhpMUsBDQaGABNa5Uk1yYplJE83IA7SJGoNC/oyHA5dMb1SSx9MqDGfqAvJ
- TLvZ0E3PZWtQc6T2Za7rgbJn+D8EQk8apvPiqIxajQCu4O0LSYtuHQpVY1CXe46IbeSX
- uNwA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:in-reply-to:message-id:mime-version
- :references:subject:from:to:cc;
- bh=SJF0uEjYNQkzF8wPTCq68VSh6VbSoGFPM81EwD3Amec=;
- b=ryYbSiIPzx/sqVJjHia4MaylGkrU8WYltqLnAANi0jG5PgdfZg09uirGga6RA1Q9iC
- MTKMABRkGuUkdPR+RzvMQoEsqSsTiGZ2gBnVQXDlPIfv1YkwtahGvjSNv7AZ8HlnZ32D
- 2G1c9QfXYM+PgssHWXLMO5Y2XKkLMFVDcDcPwwY6qQnCoB9uqalSLIf+DP68eDh58uX0
- ewJYDJ2iFJ5ZnQfnUH1OwYGcExCHkwJgIOT+mc+GAVxoGi95QBL/LDcTG9C1ZIwztc4+
- qkK1+JTI+Ojsm0WaYbEiDCD282fusXZq7DzqyBnvU5uzXpPh//MS4d6Lh2bKGBxPTECC
- TYaQ==
-X-Gm-Message-State: AOAM532t/llpNYSCiA/Gx2J8aajz6uGsNilsaQJVHovJnmUpgjl1pT+L
- Yftc2bgIpwZLOxR4SjML+9YN2G1kUX8=
-X-Google-Smtp-Source: ABdhPJyfGNw1vTzCLeC/EjBKzGx03YuoKLmi0x3pMmOGXFQaK7Q0BayOo1+9wMZSTlsBJfA79xmB6bGqwEk=
-X-Received: by 2002:ad4:54ee:: with SMTP id k14mr1374643qvx.9.1591437995858;
- Sat, 06 Jun 2020 03:06:35 -0700 (PDT)
-Date: Sat,  6 Jun 2020 13:06:32 +0300
-In-Reply-To: <20200528101039.24600-7-thuth@redhat.com>
-Message-Id: <20200606100632.26442-1-sameid@google.com>
-Mime-Version: 1.0
-References: <20200528101039.24600-7-thuth@redhat.com>
-X-Mailer: git-send-email 2.27.0.278.ge193c7cf3a9-goog
-Subject: gitlab-ci: Do not use the standard container images from gitlab
-From: Sam Eiderman <sameid@google.com>
-To: thuth@redhat.com
-Cc: alex.bennee@linaro.org, crosa@redhat.com, peter.maydell@linaro.org, 
- philmd@redhat.com, qemu-devel@nongnu.org, wainersm@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::84a;
- envelope-from=3q2rbXgYKCuoeMYQUPSaaSXQ.OaYcQYg-PQhQXZaZSZg.adS@flex--sameid.bounces.google.com;
- helo=mail-qt1-x84a.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -95
-X-Spam_score: -9.6
-X-Spam_bar: ---------
-X-Spam_report: (-9.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- USER_IN_DEF_DKIM_WL=-7.5 autolearn=_AUTOLEARN
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jhWUN-0001dE-3t
+ for qemu-devel@nongnu.org; Sat, 06 Jun 2020 06:55:48 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jhWUK-0005lL-5z
+ for <qemu-devel@nongnu.org>; Sat, 06 Jun 2020 10:55:44 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 2C42C2E80E7
+ for <qemu-devel@nongnu.org>; Sat,  6 Jun 2020 10:55:44 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 06 Jun 2020 10:50:30 -0000
+From: marshell <1882350@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: ide-hd
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: winndows
+X-Launchpad-Bug-Reporter: marshell (winndows)
+X-Launchpad-Bug-Modifier: marshell (winndows)
+Message-Id: <159144063074.3735.15991486640962003601.malonedeb@soybean.canonical.com>
+Subject: [Bug 1882350] [NEW] it always create sdx device when I configure ide
+ device with hdx name
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="ef9fc486e875d54078fa61cf91e898b895125d89";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 08171f5e7b2782fd7862ab22993a7fd74a54e3c5
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/06 06:55:44
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -99,31 +85,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: Bug 1882350 <1882350@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Public bug reported:
 
-Hi,
+I have configured 2 ide disks with name starting with hd, but when the
+vm boots up, it shows disks whose name starting with sd.
 
-I am using debian 10 container to compile qemu too.
+1. ide disks in vm xml:
 
-I think that what happens here is that
+    <disk type=3D'file' device=3D'disk'>
+      <driver name=3D'qemu' type=3D'raw'/>
+      <source file=3D'/data3_raw.qcow2'/>
+      <target dev=3D'hdc' bus=3D'ide'/>
+    </disk>
+    <disk type=3D'file' device=3D'disk'>
+      <driver name=3D'qemu' type=3D'qcow2'/>
+      <source file=3D'/data2.qcow2'/>
+      <target dev=3D'hdb' bus=3D'ide'/>
+    </disk>
 
-  /usr/include/linux/swab.h
 
-Uses BITS_PER_LONG instead of __BITS_PER_LONG which is actually defined before
-in qemu at:
+2. in VM:
 
-  include/qemu/bitops.h:#define BITS_PER_LONG           (sizeof (unsigned long) * BITS_PER_BYTE)
+sda            8:0    0    2G  0 disk
+sdb            8:16   0    1G  0 disk
 
-which injects this definition into the linux swab.h header.
 
-By changing BITS_PER_LONG to __BITS_PER_LONG in the linux headers, I managed to
-successfully compile qemu.
+3. from vm.log:
 
-A different approach would be to move the linux header includes
-(#include <linux/cdrom.h>) in file-posix.c above all other includes - which in
-some way makes more sense (since we probaly don't want qemu defines to control
-linux headers) but it requires a more complex refactoring.
+le=3D/data2.qcow2,format=3Dqcow2,if=3Dnone,id=3Ddrive-ide0-0-1 -device ide-
+hd,bus=3Dide.0,unit=3D1,drive=3Ddrive-ide0-0-1,id=3Dide0-0-1 -drive
+file=3D/data3_raw.qcow2,format=3Draw,if=3Dnone,id=3Ddrive-ide0-1-0 -device =
+ide-
+hd,bus=3Dide.1,unit=3D0,drive=3Ddrive-ide0-1-0,id=3Dide0-1-0 -netdev t
+
+
+4. rpm info: (I got the same issue on 2 diff envs)
+(1) env1
+qemu-kvm-1.5.3-105
+libvirt-3.2.0-14.el7
+(2) env2
+libvirt-5.9.0-1.el8
+qemu-4.1.0-1.el8
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+
+** Tags: ide-hd
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1882350
+
+Title:
+  it always create sdx device when I configure ide device with hdx name
+
+Status in QEMU:
+  New
+
+Bug description:
+  I have configured 2 ide disks with name starting with hd, but when the
+  vm boots up, it shows disks whose name starting with sd.
+
+  1. ide disks in vm xml:
+
+      <disk type=3D'file' device=3D'disk'>
+        <driver name=3D'qemu' type=3D'raw'/>
+        <source file=3D'/data3_raw.qcow2'/>
+        <target dev=3D'hdc' bus=3D'ide'/>
+      </disk>
+      <disk type=3D'file' device=3D'disk'>
+        <driver name=3D'qemu' type=3D'qcow2'/>
+        <source file=3D'/data2.qcow2'/>
+        <target dev=3D'hdb' bus=3D'ide'/>
+      </disk>
+
+  =
+
+  2. in VM:
+
+  sda            8:0    0    2G  0 disk
+  sdb            8:16   0    1G  0 disk
+
+  =
+
+  3. from vm.log:
+
+  le=3D/data2.qcow2,format=3Dqcow2,if=3Dnone,id=3Ddrive-ide0-0-1 -device id=
+e-
+  hd,bus=3Dide.0,unit=3D1,drive=3Ddrive-ide0-0-1,id=3Dide0-0-1 -drive
+  file=3D/data3_raw.qcow2,format=3Draw,if=3Dnone,id=3Ddrive-ide0-1-0 -device
+  ide-hd,bus=3Dide.1,unit=3D0,drive=3Ddrive-ide0-1-0,id=3Dide0-1-0 -netdev t
+
+  =
+
+  4. rpm info: (I got the same issue on 2 diff envs)
+  (1) env1
+  qemu-kvm-1.5.3-105
+  libvirt-3.2.0-14.el7
+  (2) env2
+  libvirt-5.9.0-1.el8
+  qemu-4.1.0-1.el8
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1882350/+subscriptions
 
