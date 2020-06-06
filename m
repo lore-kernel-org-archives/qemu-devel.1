@@ -2,68 +2,75 @@ Return-Path: <SRS0=faK4=7T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 276F4C433E0
-	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jun 2020 00:11:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18668C433E0
+	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jun 2020 03:06:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E3189206DB
-	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jun 2020 00:11:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3189206DB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id D96FC206DC
+	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jun 2020 03:06:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D96FC206DC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51948 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46112 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jhMR0-0000i3-8n
-	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 20:11:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42724)
+	id 1jhP9v-0006bP-95
+	for qemu-devel@archiver.kernel.org; Fri, 05 Jun 2020 23:06:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56120)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vishal.l.verma@intel.com>)
- id 1jhMOw-0005gc-AC
- for qemu-devel@nongnu.org; Fri, 05 Jun 2020 20:09:30 -0400
-Received: from mga02.intel.com ([134.134.136.20]:45990)
+ (Exim 4.90_1) (envelope-from <robert.hu@linux.intel.com>)
+ id 1jhP9N-00069w-9B
+ for qemu-devel@nongnu.org; Fri, 05 Jun 2020 23:05:37 -0400
+Received: from mga06.intel.com ([134.134.136.31]:36159)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vishal.l.verma@intel.com>)
- id 1jhMOv-0006IW-48
- for qemu-devel@nongnu.org; Fri, 05 Jun 2020 20:09:30 -0400
-IronPort-SDR: yeCAwfBTXvFQ+B5Ifs31+UQaITEW7fMnQvXLYAjwcysdpYPocrc/j1RjHZNmtWqKx1sNOMLZN4
- noGjvR0nPoww==
+ (Exim 4.90_1) (envelope-from <robert.hu@linux.intel.com>)
+ id 1jhP9L-0003n2-PM
+ for qemu-devel@nongnu.org; Fri, 05 Jun 2020 23:05:36 -0400
+IronPort-SDR: 9dUO8Z+3IuRfrjrjnTdkBJZWfzkDvEwIt9XPRNXWwmTnSyqm0Ky4aMarv4KmxBTwS8A6ku1JKN
+ 02tGSoRPSLcA==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
- by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 05 Jun 2020 17:09:22 -0700
-IronPort-SDR: 1YXrsLj0BX3XCIhfJUBRR5NzZyVU3orkGcLs4UQ6EC5kokvfSRPGxSaPLozJSvmE2tHxJXveD5
- s7YBa6ly/66w==
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+ by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 05 Jun 2020 20:05:26 -0700
+IronPort-SDR: ayQmhGKml0x/yYf93fner/r/3ij0ngYoUi15gxwO2mrxhlLpy0btyy57DxwiCQ6J8GjT18+eP/
+ hgmRUjyNOfjw==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,478,1583222400"; d="scan'208";a="294853326"
-Received: from vverma7-mobl4.lm.intel.com ([10.254.185.105])
- by fmsmga004.fm.intel.com with ESMTP; 05 Jun 2020 17:09:21 -0700
-From: Vishal Verma <vishal.l.verma@intel.com>
-To: <qemu-devel@nongnu.org>
-Subject: [PATCH v5 3/3] tests/acpi: update expected SRAT files
-Date: Fri,  5 Jun 2020 18:09:11 -0600
-Message-Id: <20200606000911.9896-4-vishal.l.verma@intel.com>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200606000911.9896-1-vishal.l.verma@intel.com>
-References: <20200606000911.9896-1-vishal.l.verma@intel.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=134.134.136.20;
- envelope-from=vishal.l.verma@intel.com; helo=mga02.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/05 20:09:20
+X-IronPort-AV: E=Sophos;i="5.73,478,1583222400"; d="scan'208";a="305262982"
+Received: from sqa-gate.sh.intel.com (HELO robert-ivt.tsp.org)
+ ([10.239.48.212])
+ by fmsmga002.fm.intel.com with ESMTP; 05 Jun 2020 20:05:24 -0700
+Message-ID: <0c3bf5755ed819941c5afe62418042c0a114d3cf.camel@linux.intel.com>
+Subject: Re: [PATCH 1/2] Introduce (x86) CPU model deprecation API
+From: Robert Hoo <robert.hu@linux.intel.com>
+To: Eric Blake <eblake@redhat.com>, pbonzini@redhat.com, rth@twiddle.net, 
+ ehabkost@redhat.com, armbru@redhat.com
+Date: Sat, 06 Jun 2020 11:05:23 +0800
+In-Reply-To: <26e46d40-2e87-9427-40fd-6278caf30546@redhat.com>
+References: <1591184823-140846-1-git-send-email-robert.hu@linux.intel.com>
+ <70e5d2d1-8bd0-5582-4f8f-066824a7d263@redhat.com>
+ <f4ea936819b698c88773ec69cf9d535fb7c32a4a.camel@linux.intel.com>
+ <c0c1643d-ff3c-919b-7684-dac14f0d5229@redhat.com>
+ <f43f253883e448edbf4cc4e7d685cbf66256f743.camel@linux.intel.com>
+ <26e46d40-2e87-9427-40fd-6278caf30546@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-8.el7) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Received-SPF: none client-ip=134.134.136.31;
+ envelope-from=robert.hu@linux.intel.com; helo=mga06.intel.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/05 23:05:27
 X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
 X-Spam_score_int: -41
 X-Spam_score: -4.2
 X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9,
+ RCVD_IN_DNSWL_MED=-2.3 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -76,210 +83,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, jingqi.liu@intel.com,
- Dave Hansen <dave.hansen@linux.intel.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Vishal Verma <vishal.l.verma@intel.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Dan Williams <dan.j.williams@intel.com>, Richard Henderson <rth@twiddle.net>
+Cc: robert.hu@intel.com, xiaoyao.li@intel.com, qemu-devel@nongnu.org,
+ chenyi.qiang@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Update expected SRAT files for the change to account for NVDIMM NUMA
-nodes in the SRAT.
+On Fri, 2020-06-05 at 08:47 -0500, Eric Blake wrote:
+> On 6/4/20 9:47 PM, Robert Hoo wrote:
+> > On Thu, 2020-06-04 at 06:59 -0500, Eric Blake wrote:
+> > > On 6/4/20 3:07 AM, Robert Hoo wrote:
+> > > 
+> > > > > > +++ b/qapi/machine-target.json
+> > > > > > @@ -309,7 +309,8 @@
+> > > > > >                 'static': 'bool',
+> > > > > >                 '*unavailable-features': [ 'str' ],
+> > > > > >                 'typename': 'str',
+> > > > > > -            '*alias-of' : 'str' },
+> > > > > > +            '*alias-of' : 'str',
+> > > > > > +            'deprecated' : 'bool' },
+> > > > > 
+> > > > > Missing documentation of the new member.  Should it be
+> > > > > optional
+> > > > > (present
+> > > > > only when true)?
+> > > > 
+> > > > Which document do you mean?
+> > 
+> > Thanks Eric:)
+> > 
+> > > 
+> > > A few lines earlier is '@alias-of: ...'; you'll need to add a
+> > > similar
+> > > line for '@deprecated', mentioning it is '(since 5.1)'.
+> > > 
+> > > > How to make it optional?
+> > 
+> > How about not making it optional? refer to Machineinfo::deprecated.
+> 
+> Always providing it doesn't hurt.  If there is precedence for not
+> making 
+> it optional, mentioning that precedence in the commit message can't
+> hurt.
 
-AML diffs:
-
-tests/data/acpi/pc/SRAT.dimmpxm:
---- /tmp/asl-3P2IL0.dsl	2020-05-28 15:11:02.326439263 -0600
-+++ /tmp/asl-1N4IL0.dsl	2020-05-28 15:11:02.325439280 -0600
-@@ -3,7 +3,7 @@
-  * AML/ASL+ Disassembler version 20190509 (64-bit version)
-  * Copyright (c) 2000 - 2019 Intel Corporation
-  *
-- * Disassembly of tests/data/acpi/pc/SRAT.dimmpxm, Thu May 28 15:11:02 2020
-+ * Disassembly of /tmp/aml-4D4IL0, Thu May 28 15:11:02 2020
-  *
-  * ACPI Data Table [SRAT]
-  *
-@@ -13,7 +13,7 @@
- [000h 0000   4]                    Signature : "SRAT"    [System Resource Affinity Table]
- [004h 0004   4]                 Table Length : 00000188
- [008h 0008   1]                     Revision : 01
--[009h 0009   1]                     Checksum : 80
-+[009h 0009   1]                     Checksum : 68
- [00Ah 0010   6]                       Oem ID : "BOCHS "
- [010h 0016   8]                 Oem Table ID : "BXPCSRAT"
- [018h 0024   4]                 Oem Revision : 00000001
-@@ -140,15 +140,15 @@
- [138h 0312   1]                Subtable Type : 01 [Memory Affinity]
- [139h 0313   1]                       Length : 28
-
--[13Ah 0314   4]             Proximity Domain : 00000000
-+[13Ah 0314   4]             Proximity Domain : 00000002
- [13Eh 0318   2]                    Reserved1 : 0000
--[140h 0320   8]                 Base Address : 0000000000000000
--[148h 0328   8]               Address Length : 0000000000000000
-+[140h 0320   8]                 Base Address : 0000000108000000
-+[148h 0328   8]               Address Length : 0000000008000000
- [150h 0336   4]                    Reserved2 : 00000000
--[154h 0340   4]        Flags (decoded below) : 00000000
--                                     Enabled : 0
-+[154h 0340   4]        Flags (decoded below) : 00000005
-+                                     Enabled : 1
-                                Hot Pluggable : 0
--                                Non-Volatile : 0
-+                                Non-Volatile : 1
- [158h 0344   8]                    Reserved3 : 0000000000000000
-
- [160h 0352   1]                Subtable Type : 01 [Memory Affinity]
-
-tests/data/acpi/q35/SRAT.dimmpxm:
---- /tmp/asl-HW2LL0.dsl	2020-05-28 15:11:05.446384514 -0600
-+++ /tmp/asl-8MYLL0.dsl	2020-05-28 15:11:05.445384532 -0600
-@@ -3,7 +3,7 @@
-  * AML/ASL+ Disassembler version 20190509 (64-bit version)
-  * Copyright (c) 2000 - 2019 Intel Corporation
-  *
-- * Disassembly of tests/data/acpi/q35/SRAT.dimmpxm, Thu May 28 15:11:05 2020
-+ * Disassembly of /tmp/aml-2CYLL0, Thu May 28 15:11:05 2020
-  *
-  * ACPI Data Table [SRAT]
-  *
-@@ -13,7 +13,7 @@
- [000h 0000   4]                    Signature : "SRAT"    [System Resource Affinity Table]
- [004h 0004   4]                 Table Length : 00000188
- [008h 0008   1]                     Revision : 01
--[009h 0009   1]                     Checksum : 80
-+[009h 0009   1]                     Checksum : 68
- [00Ah 0010   6]                       Oem ID : "BOCHS "
- [010h 0016   8]                 Oem Table ID : "BXPCSRAT"
- [018h 0024   4]                 Oem Revision : 00000001
-@@ -140,15 +140,15 @@
- [138h 0312   1]                Subtable Type : 01 [Memory Affinity]
- [139h 0313   1]                       Length : 28
-
--[13Ah 0314   4]             Proximity Domain : 00000000
-+[13Ah 0314   4]             Proximity Domain : 00000002
- [13Eh 0318   2]                    Reserved1 : 0000
--[140h 0320   8]                 Base Address : 0000000000000000
--[148h 0328   8]               Address Length : 0000000000000000
-+[140h 0320   8]                 Base Address : 0000000108000000
-+[148h 0328   8]               Address Length : 0000000008000000
- [150h 0336   4]                    Reserved2 : 00000000
--[154h 0340   4]        Flags (decoded below) : 00000000
--                                     Enabled : 0
-+[154h 0340   4]        Flags (decoded below) : 00000005
-+                                     Enabled : 1
-                                Hot Pluggable : 0
--                                Non-Volatile : 0
-+                                Non-Volatile : 1
- [158h 0344   8]                    Reserved3 : 0000000000000000
-
- [160h 0352   1]                Subtable Type : 01 [Memory Affinity]
-
-tests/data/acpi/virt/SRAT.memhp:
---- /tmp/asl-E32WL0.dsl	2020-05-28 15:19:56.976095582 -0600
-+++ /tmp/asl-Y69WL0.dsl	2020-05-28 15:19:56.974095617 -0600
-@@ -3,7 +3,7 @@
-  * AML/ASL+ Disassembler version 20190509 (64-bit version)
-  * Copyright (c) 2000 - 2019 Intel Corporation
-  *
-- * Disassembly of tests/data/acpi/virt/SRAT.memhp, Thu May 28 15:19:56 2020
-+ * Disassembly of /tmp/aml-2CCXL0, Thu May 28 15:19:56 2020
-  *
-  * ACPI Data Table [SRAT]
-  *
-@@ -11,9 +11,9 @@
-  */
-
- [000h 0000   4]                    Signature : "SRAT"    [System Resource Affinity Table]
--[004h 0004   4]                 Table Length : 000000BA
-+[004h 0004   4]                 Table Length : 000000E2
- [008h 0008   1]                     Revision : 03
--[009h 0009   1]                     Checksum : 43
-+[009h 0009   1]                     Checksum : 5C
- [00Ah 0010   6]                       Oem ID : "BOCHS "
- [010h 0016   8]                 Oem Table ID : "BXPCSRAT"
- [018h 0024   4]                 Oem Revision : 00000001
-@@ -65,18 +65,32 @@
-
- [094h 0148   4]             Proximity Domain : 00000001
- [098h 0152   2]                    Reserved1 : 0000
--[09Ah 0154   8]                 Base Address : 0000000080000000
--[0A2h 0162   8]               Address Length : 00000000F0000000
-+[09Ah 0154   8]                 Base Address : 0000000088000000
-+[0A2h 0162   8]               Address Length : 0000000008000000
- [0AAh 0170   4]                    Reserved2 : 00000000
--[0AEh 0174   4]        Flags (decoded below) : 00000003
-+[0AEh 0174   4]        Flags (decoded below) : 00000005
-+                                     Enabled : 1
-+                               Hot Pluggable : 0
-+                                Non-Volatile : 1
-+[0B2h 0178   8]                    Reserved3 : 0000000000000000
-+
-+[0BAh 0186   1]                Subtable Type : 01 [Memory Affinity]
-+[0BBh 0187   1]                       Length : 28
-+
-+[0BCh 0188   4]             Proximity Domain : 00000001
-+[0C0h 0192   2]                    Reserved1 : 0000
-+[0C2h 0194   8]                 Base Address : 0000000080000000
-+[0CAh 0202   8]               Address Length : 00000000F0000000
-+[0D2h 0210   4]                    Reserved2 : 00000000
-+[0D6h 0214   4]        Flags (decoded below) : 00000003
-                                      Enabled : 1
-                                Hot Pluggable : 1
-                                 Non-Volatile : 0
--[0B2h 0178   8]                    Reserved3 : 0000000000000000
-+[0DAh 0218   8]                    Reserved3 : 0000000000000000
-
-Signed-off-by: Vishal Verma <vishal.l.verma@intel.com>
----
- tests/data/acpi/pc/SRAT.dimmpxm             | Bin 392 -> 392 bytes
- tests/data/acpi/q35/SRAT.dimmpxm            | Bin 392 -> 392 bytes
- tests/data/acpi/virt/SRAT.memhp             | Bin 186 -> 226 bytes
- tests/qtest/bios-tables-test-allowed-diff.h |   3 ---
- 4 files changed, 3 deletions(-)
-
-diff --git a/tests/data/acpi/pc/SRAT.dimmpxm b/tests/data/acpi/pc/SRAT.dimmpxm
-index f5c0267ea24bb404b6b4e687390140378fbdc3f1..5a13c61b9041c6045c29643bf93a111fb1c0c76a 100644
-GIT binary patch
-delta 51
-scmeBR?qKE$4ss0XU}Rum%-G0fz$nec00kUCF%aN@Pz(&LlS3Je0lmQmhyVZp
-
-delta 51
-icmeBR?qKE$4ss0XU}RumY}m+Uz$ndt8%z#mGzI{_tp$hx
-
-diff --git a/tests/data/acpi/q35/SRAT.dimmpxm b/tests/data/acpi/q35/SRAT.dimmpxm
-index f5c0267ea24bb404b6b4e687390140378fbdc3f1..5a13c61b9041c6045c29643bf93a111fb1c0c76a 100644
-GIT binary patch
-delta 51
-scmeBR?qKE$4ss0XU}Rum%-G0fz$nec00kUCF%aN@Pz(&LlS3Je0lmQmhyVZp
-
-delta 51
-icmeBR?qKE$4ss0XU}RumY}m+Uz$ndt8%z#mGzI{_tp$hx
-
-diff --git a/tests/data/acpi/virt/SRAT.memhp b/tests/data/acpi/virt/SRAT.memhp
-index 1b57db2072e7f7e2085c4a427aa31c7383851b71..9a35adb40c6f7cd822e5af37abba8aad033617cb 100644
-GIT binary patch
-delta 43
-rcmdnR_=u4!ILI;N5d#AQbIe4p$wD1K76@=aC<X@BiSc3+=gI;A(y0ha
-
-delta 21
-dcmaFFxQmf1ILI+%7Xt$Wv-3o*$rF#t0suzv27~|r
-
-diff --git a/tests/qtest/bios-tables-test-allowed-diff.h b/tests/qtest/bios-tables-test-allowed-diff.h
-index e8f2766a63..dfb8523c8b 100644
---- a/tests/qtest/bios-tables-test-allowed-diff.h
-+++ b/tests/qtest/bios-tables-test-allowed-diff.h
-@@ -1,4 +1 @@
- /* List of comma-separated changed AML files to ignore */
--"tests/data/acpi/pc/SRAT.dimmpxm",
--"tests/data/acpi/q35/SRAT.dimmpxm",
--"tests/data/acpi/virt/SRAT.memhp",
--- 
-2.26.2
+No specific precedence. Just feel a little weird that adding an
+additional boolean, just for judging another boolean should present or
+not. esp. given that Machineinfo::deprecated is not optional.
+> 
 
 
