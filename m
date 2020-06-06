@@ -2,93 +2,96 @@ Return-Path: <SRS0=faK4=7T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D35B6C433E0
-	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jun 2020 11:50:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9772C433E0
+	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jun 2020 12:03:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9B807206DC
-	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jun 2020 11:50:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 75403206DC
+	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jun 2020 12:03:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JF1V8xAY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B807206DC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mrd0D6sp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 75403206DC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33552 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38588 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jhXLB-0006Cx-Tq
-	for qemu-devel@archiver.kernel.org; Sat, 06 Jun 2020 07:50:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60634)
+	id 1jhXXj-0000xF-FU
+	for qemu-devel@archiver.kernel.org; Sat, 06 Jun 2020 08:03:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33624)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jhXKc-0005nZ-9c
- for qemu-devel@nongnu.org; Sat, 06 Jun 2020 07:49:46 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:43642)
+ (Exim 4.90_1) (envelope-from <marek.vasut@gmail.com>)
+ id 1jhXWh-0000VE-So
+ for qemu-devel@nongnu.org; Sat, 06 Jun 2020 08:02:15 -0400
+Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:44007)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jhXKa-0001gS-RD
- for qemu-devel@nongnu.org; Sat, 06 Jun 2020 07:49:45 -0400
-Received: by mail-wr1-x442.google.com with SMTP id l10so12316488wrr.10
- for <qemu-devel@nongnu.org>; Sat, 06 Jun 2020 04:49:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=gGECAUBpfMkymYZB9gndEHtcjUSEnIGTa6Qhkk1SPxQ=;
- b=JF1V8xAYaq+yhMOvYr8J3PVhkEd6/LTYsal0qwINrt+2fOyNALfmx50RBFbJYxKxTJ
- Zk1d7ylrJE1aGxaVMvUmW5mUNBGohvwvzMTIKs6P9BCjgw3kEbU9LIhQ6XsYjfsXh0iK
- f5yj1yM6fKWHT5YHSvicMR1DkZW3ThSs8OtML/Z50O/e4+R6EKmP/IS/2PXYkYsPTOv/
- PjKoqu6JTXCtmIIrbeficQ68pjUTn2tm6+G8LSmvm4vrUoyCVuhUlgZjHbhaGahsDlm6
- LK/WOT/DDrQ3Sd0CpXJ8r3aMZHpqybiInj5/Lu5yXo38GFjB/fKCjCdqJziDPVeQ+39l
- lJPA==
+ (Exim 4.90_1) (envelope-from <marek.vasut@gmail.com>)
+ id 1jhXWg-0004N1-PL
+ for qemu-devel@nongnu.org; Sat, 06 Jun 2020 08:02:15 -0400
+Received: by mail-ed1-x544.google.com with SMTP id g9so9525260edw.10
+ for <qemu-devel@nongnu.org>; Sat, 06 Jun 2020 05:02:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=subject:from:to:cc:references:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=hVF6bfOQKVQHb+FfEXZWRyYZagtDNpg0Iw1gAoc+2lM=;
+ b=Mrd0D6spNkJfkbNOZhWfEB8b0P4phTTjJJkrpAgNcfcZGiMlcRue8vf7qyF7/XHol5
+ 2GokcX2EtEjIOQf1brRsc7lFXV30UOIVFYbd5yaPdDLL5rS6SSJymvFgN4deRwvN2/Na
+ 0PeQhMzUcvYIPY5GlQ5nAJSL2S2IUYSS5FQZ4dAIgatBwUWTUwVxqw8NhXqBOpFMgsFO
+ ur/5gZcoIBm/TUBDRyq6D7itZkVmVRGeqeLUDo8MwNfKoQGKbaDV/4hS7a8/JvvYrCcD
+ C+QHX8wYcsKQc5uYT69kX6kNqqs3ncYD1dh6Sd1qj2ZCQc14KIArZ0XZDEoeoo4JKqVk
+ 6IUA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=gGECAUBpfMkymYZB9gndEHtcjUSEnIGTa6Qhkk1SPxQ=;
- b=cKk24ePkEpcn3Nl0HSqV8XwN/1UPh/Popiv9GhW37fyvG3gjHbU6ZRGLPcLsfox6Zg
- CDPbYwriXPBRfKqEfYIu9Tex5eUpI6f3XhCkWMR9R5mZM3r4/mU0sClMZt0pe8zIbcQl
- R7nYmjfMCO5yunk//AaSCivN5+dsU8ETGHA7bgwgvncVwVvR1Vws+e+22gAFu1DpLmzc
- nUmzLZT0fZfHUN1x2yU5uGVMigypv2uXTLuavD97HbwBNCifBWN3GrqdZTQzFidSC+vB
- Bu1lP2sWBDyMkFm1Ot+2qc0NNgODhX+Fs/HypwfvWNJgioE0Q9+u3himK+QX/cgf+TL5
- kHcA==
-X-Gm-Message-State: AOAM531dqBMLvt1BWRh4iuSLVMR7hZFsvqMD6nmeWdR95/v3ScCZnFCs
- T1QNGpwgHVJhbKhMARMUR6SGmQ==
-X-Google-Smtp-Source: ABdhPJzkSjYEY3EshRbPngT/hrPrAg48ndPYpZpOnnhFxWbRecz2jOMe4givz1U6yvCVj+tMTL21Ng==
-X-Received: by 2002:adf:9507:: with SMTP id 7mr14067295wrs.63.1591444183067;
- Sat, 06 Jun 2020 04:49:43 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id c65sm15586108wme.8.2020.06.06.04.49.41
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 06 Jun 2020 04:49:41 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 156E91FF7E;
- Sat,  6 Jun 2020 12:49:41 +0100 (BST)
-References: <20200528101039.24600-7-thuth@redhat.com>
- <20200606100632.26442-1-sameid@google.com>
-User-agent: mu4e 1.5.1; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Sam Eiderman <sameid@google.com>
-Subject: Re: gitlab-ci: Do not use the standard container images from gitlab
-In-reply-to: <20200606100632.26442-1-sameid@google.com>
-Date: Sat, 06 Jun 2020 12:49:40 +0100
-Message-ID: <87mu5gct2j.fsf@linaro.org>
+ h=x-gm-message-state:subject:from:to:cc:references:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=hVF6bfOQKVQHb+FfEXZWRyYZagtDNpg0Iw1gAoc+2lM=;
+ b=DusAgpN1kE05B5AOzIYLMpiQwzlVFMC/u1nlA0yyeg4izmHAM2i7RoTngOt8BLNps6
+ 2qVeMkG0BMZjZUgU6M6bC4SgKtEi410PnDBunUidFPHdGMNO6CimzDdKekwliaIibCLo
+ 1SkqfFHc3m7Z/zmwnnK3vlLM8wLc/O/A7OT0Q7BoWWNbfDPyvHA3BHWEL9vzMOuuPLDY
+ xOJSyqvvUOTiVgOpreUKa6pdn+rfn5uHLrenXaWtanE+gvyGJVS6IsDgog2EfKnmHiAL
+ 0uBnx5s3EGWIDPH/rbT/5P4UIG/hTqwDfmEiL9cQqJ6kV5YCWneilIMpIVz5krt7rzfW
+ FD5Q==
+X-Gm-Message-State: AOAM53230JqAXuqH/R93qPxsEX9cS9BFFrWzL0RBXxdkP7BFB27ZtWIm
+ 0x0Ch5mJuJBFzGOPDvckP9k=
+X-Google-Smtp-Source: ABdhPJxqnzGmB1kXFVMLOx/iWmxPrXtT6I+QfXlTH4CeimxPZX1nAp3DjPrEwMwrOmVUzgpwaiIPPw==
+X-Received: by 2002:a05:6402:228d:: with SMTP id
+ cw13mr14376952edb.150.1591444932506; 
+ Sat, 06 Jun 2020 05:02:12 -0700 (PDT)
+Received: from [192.168.1.4] (ip-86-49-35-8.net.upcbroadband.cz. [86.49.35.8])
+ by smtp.gmail.com with ESMTPSA id
+ a8sm7056290edb.29.2020.06.06.05.02.11
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sat, 06 Jun 2020 05:02:11 -0700 (PDT)
+Subject: Re: [PATCH] net: tulip: Set PCI revision to match dec21143
+From: Marek Vasut <marek.vasut@gmail.com>
+To: qemu-devel@nongnu.org
+References: <20200418002552.343480-1-marek.vasut+renesas@gmail.com>
+Message-ID: <1b3ba4cf-d18a-08f8-b1b7-742434511c3f@gmail.com>
+Date: Sat, 6 Jun 2020 14:02:11 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
+In-Reply-To: <20200418002552.343480-1-marek.vasut+renesas@gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x442.google.com
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::544;
+ envelope-from=marek.vasut@gmail.com; helo=mail-ed1-x544.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
@@ -103,50 +106,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, thuth@redhat.com, qemu-devel@nongnu.org,
- wainersm@redhat.com, crosa@redhat.com, philmd@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ Sven Schnelle <svens@stackframe.org>, Prasad J Pandit <pjp@fedoraproject.org>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 4/18/20 2:25 AM, Marek Vasut wrote:
+> The tulip driver claims to emulate dec21143 and it does not emulate dec21142.
+> The dec21142 and dec21143 can be discerned by the PCI revision register,
+> where dec21142 reports value < 0x20 and dec21143 value >= 0x20. E.g. the
+> U-Boot 'tulip' driver also only supports dec21143 and verifies that the
+> PCI revision ID is >= 0x20, otherwise refuses to operate such a card.
+> 
+> This patch sets the PCI revision ID to 0x20 to match the dec21143 and
+> thus also permits e.g. U-Boot to work with the tulip emulation.
+> 
+> Fixes: 34ea023d4b95 ("net: add tulip (dec21143) driver")
+> Signed-off-by: Marek Vasut <marek.vasut+renesas@gmail.com>
+> Cc: Marc-André Lureau <marcandre.lureau@redhat.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: Prasad J Pandit <pjp@fedoraproject.org>
+> Cc: Sven Schnelle <svens@stackframe.org>
 
-Sam Eiderman <sameid@google.com> writes:
-
-> Hi,
->
-> I am using debian 10 container to compile qemu too.
->
-> I think that what happens here is that
->
->   /usr/include/linux/swab.h
->
-> Uses BITS_PER_LONG instead of __BITS_PER_LONG which is actually defined b=
-efore
-> in qemu at:
-
-That is indeed the error - we are just waiting for Debian to update
-linux-libc-dev with the fix to the kernel headers:
-
-  https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=3D960271
-
->
->   include/qemu/bitops.h:#define BITS_PER_LONG           (sizeof (unsigned=
- long) * BITS_PER_BYTE)
->
-> which injects this definition into the linux swab.h header.
->
-> By changing BITS_PER_LONG to __BITS_PER_LONG in the linux headers, I mana=
-ged to
-> successfully compile qemu.
->
-> A different approach would be to move the linux header includes
-> (#include <linux/cdrom.h>) in file-posix.c above all other includes - whi=
-ch in
-> some way makes more sense (since we probaly don't want qemu defines to co=
-ntrol
-> linux headers) but it requires a more complex refactoring.
-
-
---=20
-Alex Benn=C3=A9e
+Bump, any news on this ? This is a bugfix.
 
