@@ -6,63 +6,63 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07F9AC433DF
-	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jun 2020 13:20:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0608BC433E0
+	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jun 2020 13:21:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D17EE206DC
-	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jun 2020 13:20:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D17EE206DC
+	by mail.kernel.org (Postfix) with ESMTPS id C7E30206DC
+	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jun 2020 13:21:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7E30206DC
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42682 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48170 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jhYkR-00041O-0m
-	for qemu-devel@archiver.kernel.org; Sat, 06 Jun 2020 09:20:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39034)
+	id 1jhYlH-0006KU-0f
+	for qemu-devel@archiver.kernel.org; Sat, 06 Jun 2020 09:21:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39022)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jhYgR-00073k-P8
- for qemu-devel@nongnu.org; Sat, 06 Jun 2020 09:16:23 -0400
-Received: from mout.kundenserver.de ([212.227.126.131]:57961)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jhYgQ-00070J-6t
+ for qemu-devel@nongnu.org; Sat, 06 Jun 2020 09:16:22 -0400
+Received: from mout.kundenserver.de ([212.227.126.133]:48845)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jhYgQ-0007ed-IG
- for qemu-devel@nongnu.org; Sat, 06 Jun 2020 09:16:23 -0400
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jhYgP-0007eU-62
+ for qemu-devel@nongnu.org; Sat, 06 Jun 2020 09:16:21 -0400
 Received: from localhost.localdomain ([82.252.135.106]) by
  mrelayeu.kundenserver.de (mreue010 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1MTR6K-1jXlao0imS-00ThkI; Sat, 06 Jun 2020 15:16:18 +0200
+ id 1MfHUx-1j0mrw23lz-00gsdJ; Sat, 06 Jun 2020 15:16:11 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 11/19] util/Makefile: Reduce the user-mode object list
-Date: Sat,  6 Jun 2020 15:15:59 +0200
-Message-Id: <20200606131607.1250819-12-laurent@vivier.eu>
+Subject: [PULL v2 03/19] linux-user: Add support for /proc/cpuinfo on hppa
+ platform
+Date: Sat,  6 Jun 2020 15:15:51 +0200
+Message-Id: <20200606131607.1250819-4-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200606131607.1250819-1-laurent@vivier.eu>
 References: <20200606131607.1250819-1-laurent@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:V/aHWdl8UrH1CJeMgwlpTbN0wkVZ+UCwr3JP6jfUPF5McYYjZLa
- ZkS/Of53EfF45tIMdSgqJDrzgu6AIaO50vSzXMMq5eTTObuMb8EL4ARK8YEKZkNSn1aWxgS
- hv/tz0IBsimmYdUFw4yCVCorcit7Uvd3OevSMDJHIcYdaOkcjtglPab2omQdx2HWuKRTui9
- R5AZrmGn7YZ/BEDG5iw7Q==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:V3qAw+i81rw=:nXcFhrLgti038HofC0CRSv
- lJrGW8fSzNzDJvIbLWPLOFtjrdNByxK1R6Ty4nfiEnAR8KMzFS9fk1Hu/v6g//iriuafkQNHk
- 30LBVd5c9RvPFLwrA0BfcYQpN7pt29K+t267hCZ0Whwf1nGHO3Yn1UHXHRxPG8Mm9chZEcY9f
- 3r7DMVlgKGhebK0y7fKk8/gLkf2M6Y9kRLqNx0G3ZeNHO5o5/KmYeWvMbU/NUA78AioftiaYc
- RzP/OKcP7UJ7nnWRxy4oCVNJKv4Ezb5CeakTD+/Btaz7i+ojW1qy/PYf33ErCYLL29a0MAmNF
- iKYNExKizpCb3UOwBfntqQwcGFyf6c3KnJH/u5RUs6CXYJX/hVFtnnaXvbV6a0+L5ND+JaW0t
- i5sT+zkEU6UUt0lcXT9QCD+3WQ1aTeUP+VypyCiHPKJtpcG7qxUgXhXGrwBlM+J4g2zkRLho0
- KI+oM9PKxogTM/ECVUd6u8uVmTa4XjkCchnKwKmthrGgzBUv+HUwdHJUOBVBbmV+x5KdZpMPQ
- t/i2QPOw3PbHCBLjTxxO/nwZ/E/Nt/JPAZND7krWPH1KaYW4UBHhr5aEHCi+6+X34W8BzEBnj
- 6XGb2rTKITq6wNuwOQp2jP1ShRrNmogYehm6/lzt8/lT0/LWa841RJImSdjq4JGb5QUmz652q
- Emxdn5LMyysdBAtJ3iz8q8Oq2xQOf5j5yVi/767ef76MjsrCwM1X4sGCoSweqGM1O9mBpG7tN
- g8NiF6HPLNtlgQokfx9R+YBfWSsWRzVEl2m+BPke6tSQw3dqAtv2LtKExj4vgex6VjS0xvTCF
- lj/coY2MpesTWbkp3TvqPzlIm3vMUhGbEOO1ZwHb8zdjxrlTGlpSfDGcUBGc3BRAl+qzvQy
-Received-SPF: none client-ip=212.227.126.131; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:THmXRfsdvAcLBP+SJvjaIxid7FGcXSr0p2Uioo8O0+LTnWtXtvR
+ +PVpOh46cLnhT92dMtSzSrBrldXsbvfSFk7/SRV1GUSOYzotxVHW69HtEV6MinsYBu7oacG
+ DBUqMgnQFcQgSE12DL16kmH/TkmDbd4P7MqjKpWEiCV7fqV6GH9cYGVZy1KOcPd+L/1mR1E
+ gqIytfY0ipIWb+G/6Wyow==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:KTNSjse3MWc=:tZvT6K5ehiDUlfiy/Q4P+c
+ X1YUAzEonyAZmLMC2US0foWrdd6dQTZPfkAHv/3yBJuZ4vukHAc5rQMLxVW/IwRSVb4v6acDT
+ uqDOLG4DfA2Uo2Igdplaig1kd5mwYQoB0sj208LRlOgaWvp35OfzE7QaxLPWrbWKdoV8jZry0
+ BmUmkHo/FZP89oMiwfcd3//BUK2Ywo8n5NMakytS09+71Khg2a+A27qaIC075t+o9nuNhDIMI
+ xuugcknkpSeACIeH5YBaiNd4eYiDPVV8FhhLz5adYDCXGkzLpvUZ2JQ8p1NqkPmR1FYcg2pfT
+ YQBUZicPafDNOYGL1huV8+8aU9tBFlmErZuc4Wm6PRwlZER7b1Zcck0G2Ww/NAJSMv6zF+56i
+ eMyidArlm6RA0r1wMcE8/y1DQ5QgMonbNR79tTuUnp54CfBHWI3I2qIrz3ijz5pb1JwZlCt2V
+ yySaJQ+4zC1yG5Mk8+y+HSo+moWPHGhw5PyprjE1CQ5J+OMk4IlmjUTlRjz0avCpoiBBTzKMo
+ DA+/cJK7dU/tSWFACoFWcuJ+Y1I5RBmjxCOvcH/qZSULdnWNUZbP05Zys6nnpCVn5BH4bKmuo
+ O0/zT+8encLMJkXSWEIcifPFlK08r77G3F3Dxvkt+Hb7TH7feBQFgVmlM2KShWcq2in9ggdri
+ wuS5+1IR88/IMhTTmJ7oABHvJm93geQuhqQb8QYIFR3pOZZN6Q+YptReuhYi+5R/IieZxgzk8
+ xef0jGIKnZciSPRTqNzqdtHOuYNFTFo4W30xku8fo6D6pEoZLWx+ehrxSDP2gTvYGr0BxpHwf
+ X3sONpiaiGCau0Ti+UibV/tfEj8cnkeS7wOI5f1r3bDewNcZfk2R6eUXHYicSWqTD3ZCZnN
+Received-SPF: none client-ip=212.227.126.133; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/06 09:16:17
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/06 09:16:19
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
@@ -81,125 +81,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- Riku Voipio <riku.voipio@iki.fi>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+Cc: Helge Deller <deller@gmx.de>, Riku Voipio <riku.voipio@iki.fi>,
+ Richard Henderson <richard.henderson@linaro.org>,
  Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+From: Helge Deller <deller@gmx.de>
 
-These objects are not required when configured with --disable-system.
+Provide our own /proc/cpuinfo file for the hppa (parisc) platform.
 
+Signed-off-by: Helge Deller <deller@gmx.de>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Tested-by: Laurent Vivier <laurent@vivier.eu>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20200522172510.25784-6-philmd@redhat.com>
+Message-Id: <20200424210648.GA26715@ls3530.fritz.box>
+[lv: s/an/our/ and add TARGET_HPPA to guard is_proc()]
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- util/Makefile.objs | 59 +++++++++++++++++++++++++++++-----------------
- 1 file changed, 38 insertions(+), 21 deletions(-)
+ linux-user/syscall.c | 16 ++++++++++++++--
+ 1 file changed, 14 insertions(+), 2 deletions(-)
 
-diff --git a/util/Makefile.objs b/util/Makefile.objs
-index fe339c2636ba..cc5e37177afd 100644
---- a/util/Makefile.objs
-+++ b/util/Makefile.objs
-@@ -1,8 +1,4 @@
- util-obj-y = osdep.o cutils.o unicode.o qemu-timer-common.o
--util-obj-y += bufferiszero.o
--util-obj-y += lockcnt.o
--util-obj-y += aiocb.o async.o aio-wait.o thread-pool.o qemu-timer.o
--util-obj-y += main-loop.o
- util-obj-$(call lnot,$(CONFIG_ATOMIC64)) += atomic64.o
- util-obj-$(CONFIG_POSIX) += aio-posix.o
- util-obj-$(CONFIG_POSIX) += fdmon-poll.o
-@@ -21,31 +17,20 @@ util-obj-$(CONFIG_WIN32) += oslib-win32.o
- util-obj-$(CONFIG_WIN32) += qemu-thread-win32.o
- util-obj-y += envlist.o path.o module.o
- util-obj-y += host-utils.o
--util-obj-y += bitmap.o bitops.o hbitmap.o
-+util-obj-y += bitmap.o bitops.o
- util-obj-y += fifo8.o
--util-obj-y += nvdimm-utils.o
- util-obj-y += cacheinfo.o
- util-obj-y += error.o qemu-error.o
- util-obj-y += qemu-print.o
- util-obj-y += id.o
--util-obj-y += iov.o qemu-config.o qemu-sockets.o uri.o notify.o
-+util-obj-y += qemu-config.o notify.o
- util-obj-y += qemu-option.o qemu-progress.o
- util-obj-y += keyval.o
--util-obj-y += hexdump.o
- util-obj-y += crc32c.o
- util-obj-y += uuid.o
--util-obj-y += throttle.o
- util-obj-y += getauxval.o
--util-obj-y += readline.o
- util-obj-y += rcu.o
- util-obj-$(CONFIG_MEMBARRIER) += sys_membarrier.o
--util-obj-y += qemu-coroutine.o qemu-coroutine-lock.o qemu-coroutine-io.o
--util-obj-y += qemu-coroutine-sleep.o
--util-obj-y += qemu-co-shared-resource.o
--util-obj-y += coroutine-$(CONFIG_COROUTINE_BACKEND).o
--util-obj-y += buffer.o
--util-obj-y += timed-average.o
--util-obj-y += base64.o
- util-obj-y += log.o
- util-obj-y += pagesize.o
- util-obj-y += qdist.o
-@@ -54,13 +39,45 @@ util-obj-y += qsp.o
- util-obj-y += range.o
- util-obj-y += stats64.o
- util-obj-y += systemd.o
--util-obj-y += iova-tree.o
--util-obj-$(CONFIG_INOTIFY1) += filemonitor-inotify.o
--util-obj-$(call lnot,$(CONFIG_INOTIFY1)) += filemonitor-stub.o
--util-obj-$(CONFIG_LINUX) += vfio-helpers.o
- util-obj-$(CONFIG_POSIX) += drm.o
- util-obj-y += guest-random.o
- util-obj-$(CONFIG_GIO) += dbus.o
- dbus.o-cflags = $(GIO_CFLAGS)
- dbus.o-libs = $(GIO_LIBS)
- util-obj-$(CONFIG_USER_ONLY) += selfmap.o
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index fd5c4f1d73e6..9ac3af20c176 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -7378,7 +7378,7 @@ static int is_proc_myself(const char *filename, const char *entry)
+ }
+ 
+ #if defined(HOST_WORDS_BIGENDIAN) != defined(TARGET_WORDS_BIGENDIAN) || \
+-    defined(TARGET_SPARC) || defined(TARGET_M68K)
++    defined(TARGET_SPARC) || defined(TARGET_M68K) || defined(TARGET_HPPA)
+ static int is_proc(const char *filename, const char *entry)
+ {
+     return strcmp(filename, entry) == 0;
+@@ -7438,6 +7438,18 @@ static int open_cpuinfo(void *cpu_env, int fd)
+ }
+ #endif
+ 
++#if defined(TARGET_HPPA)
++static int open_cpuinfo(void *cpu_env, int fd)
++{
++    dprintf(fd, "cpu family\t: PA-RISC 1.1e\n");
++    dprintf(fd, "cpu\t\t: PA7300LC (PCX-L2)\n");
++    dprintf(fd, "capabilities\t: os32\n");
++    dprintf(fd, "model\t\t: 9000/778/B160L\n");
++    dprintf(fd, "model name\t: Merlin L2 160 QEMU (9000/778/B160L)\n");
++    return 0;
++}
++#endif
 +
-+#######################################################################
-+# code used by both qemu system emulation and qemu-img
-+
-+ifeq ($(call lor,$(CONFIG_SOFTMMU),$(CONFIG_TOOLS)),y)
-+
-+util-obj-y += aio-wait.o
-+util-obj-y += aiocb.o
-+util-obj-y += async.o
-+util-obj-y += base64.o
-+util-obj-y += buffer.o
-+util-obj-y += bufferiszero.o
-+util-obj-y += coroutine-$(CONFIG_COROUTINE_BACKEND).o
-+util-obj-y += hexdump.o
-+util-obj-y += lockcnt.o
-+util-obj-y += iov.o
-+util-obj-y += iova-tree.o
-+util-obj-y += hbitmap.o
-+util-obj-y += main-loop.o
-+util-obj-y += nvdimm-utils.o
-+util-obj-y += qemu-coroutine.o qemu-coroutine-lock.o qemu-coroutine-io.o
-+util-obj-y += qemu-coroutine-sleep.o
-+util-obj-y += qemu-co-shared-resource.o
-+util-obj-y += qemu-sockets.o
-+util-obj-y += qemu-timer.o
-+util-obj-y += thread-pool.o
-+util-obj-y += throttle.o
-+util-obj-y += timed-average.o
-+util-obj-y += uri.o
-+
-+util-obj-$(CONFIG_LINUX) += vfio-helpers.o
-+util-obj-$(CONFIG_INOTIFY1) += filemonitor-inotify.o
-+util-obj-$(call lnot,$(CONFIG_INOTIFY1)) += filemonitor-stub.o
-+util-obj-$(CONFIG_BLOCK) += readline.o
-+
-+endif # CONFIG_SOFTMMU || CONFIG_TOOLS
+ #if defined(TARGET_M68K)
+ static int open_hardware(void *cpu_env, int fd)
+ {
+@@ -7462,7 +7474,7 @@ static int do_openat(void *cpu_env, int dirfd, const char *pathname, int flags,
+ #if defined(HOST_WORDS_BIGENDIAN) != defined(TARGET_WORDS_BIGENDIAN)
+         { "/proc/net/route", open_net_route, is_proc },
+ #endif
+-#if defined(TARGET_SPARC)
++#if defined(TARGET_SPARC) || defined(TARGET_HPPA)
+         { "/proc/cpuinfo", open_cpuinfo, is_proc },
+ #endif
+ #if defined(TARGET_M68K)
 -- 
 2.26.2
 
