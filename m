@@ -6,62 +6,63 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFFCCC433E1
-	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jun 2020 13:23:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C719C433DF
+	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jun 2020 13:23:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C543C206DC
-	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jun 2020 13:23:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C543C206DC
+	by mail.kernel.org (Postfix) with ESMTPS id 416E6206DC
+	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jun 2020 13:23:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 416E6206DC
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56770 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58120 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jhYmz-0001Nd-0D
-	for qemu-devel@archiver.kernel.org; Sat, 06 Jun 2020 09:23:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39038)
+	id 1jhYnA-0001w3-Fb
+	for qemu-devel@archiver.kernel.org; Sat, 06 Jun 2020 09:23:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39056)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jhYgT-00078Z-Lb
- for qemu-devel@nongnu.org; Sat, 06 Jun 2020 09:16:25 -0400
-Received: from mout.kundenserver.de ([212.227.126.187]:50593)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jhYgX-0007I2-Pn
+ for qemu-devel@nongnu.org; Sat, 06 Jun 2020 09:16:29 -0400
+Received: from mout.kundenserver.de ([212.227.126.133]:40297)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jhYgR-0007es-ET
- for qemu-devel@nongnu.org; Sat, 06 Jun 2020 09:16:25 -0400
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jhYgW-0007fa-51
+ for qemu-devel@nongnu.org; Sat, 06 Jun 2020 09:16:29 -0400
 Received: from localhost.localdomain ([82.252.135.106]) by
  mrelayeu.kundenserver.de (mreue010 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1MUY5o-1jYrXC2vMu-00QPQM; Sat, 06 Jun 2020 15:16:14 +0200
+ id 1MQuwR-1jLsZS2Jnz-00NzMn; Sat, 06 Jun 2020 15:16:17 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 06/19] linux-user: implement OFD locks
-Date: Sat,  6 Jun 2020 15:15:54 +0200
-Message-Id: <20200606131607.1250819-7-laurent@vivier.eu>
+Subject: [PULL v2 10/19] tests/Makefile: Restrict some softmmu-only tests
+Date: Sat,  6 Jun 2020 15:15:58 +0200
+Message-Id: <20200606131607.1250819-11-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200606131607.1250819-1-laurent@vivier.eu>
 References: <20200606131607.1250819-1-laurent@vivier.eu>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:BYn4zGr7uIuxM6JoSVqH3Eo2qGskmQRusG6ttdwoYfnGF9DvBR5
- 99j/xqQmlMjUNOvbX2no6gMQM8Dy7VNUOCHvNuzxVVAnZAm2fn7AlWwtqacX9SSRJZ1lXsi
- GDE4K4Lzg5f1tAOwftaKiUxRMiq0YPZ3X5EBLwuWm1x+k1Zbmb76aQ2AT0k1cUalB/a7Rr6
- eOWC0liWaHDuiHl2lPgtA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:7r44l3UW59g=:ZQeHtNmVezgTQbv65jocmK
- jVxPcEpMHcOlx2vDveBjV4numjLEZW+VDGtqdNOIPfxFna6HNudSoQf9hFp/Urlp6VCX0sABr
- gBiVhFPzKk9rKvYpUF3cv1NBVAXMoYUIzmoyw8f95e6U7PVtIrdC8IEPvI9T5jdDxWojmONBR
- S83yiPxJbrxXuIFU4D1KUV1ziZJ+gPBK6BAtvuFa3Qb6hSXCHBJS2MA8QGdGpPOVFgFdQc2yB
- XHT1agQlhXXKRjcBP5rdDa4fJTvFw3d6J0hSYG7FvCSmkn36PuDyWpHjHZdsHFo84tSCvs0a7
- pgqOLt+BxPJf9XTEOXAtvKCXB5W1zoxtiwLh2yrJ+1Cr82RoiTFfaP00WeiReKGABLkD96MRj
- sO38g3OUYbWytnhqYv/8rG+WaxIKvn1ZysmyPZqTygfdrbOtJhBXMXzImCqAnPwxU+B4yMz+u
- B6IU7g2UVCIygb38RVdtQ8kkEOcx2XRmvuY/bVKA025MstR0MSPobjooDY1xuLgALgHb9LW3q
- gY0V5BZByn4fZNfPDS4A1qNkKlhVGjI0PG50MBHjmQ7+w+QJHn/a4U/xAy1OeMpiiV1Yk/MUm
- q2Aj/XJO9ZRz/TMhrYCySgZFSod7PbsjAMe1lWsE3IE6+gJxNPKqGlwgZQVR0EONpggQ20WAr
- 07YnAg0tuf4jaZ5dzTPxgXEA1hFH0q+bNDp+A/iPGNkO/hl9FCQKOYI17ElVk8ThCDpKQFj8I
- XU5n7t2jZmlKjeMwZbtcLS8dUkfqqm2bVyOQhUXiAwgeTYnKZ3RdvVKcfH7+FVYVtzHEbf3pc
- JLXIxK1LWnKqs6J43RtMEtIIZY+6i2ONeoScELMG0AVPxJJ5e2OXi0p62/GbaCtyX6+LQVF
-Received-SPF: none client-ip=212.227.126.187; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:0d77vywlXSIr/QyK74MUzi8ToVKmhLC91J+32C5XTUekvll3ZnY
+ n4KIQqOzfZb/hQCuyDH4QDHgq6EnuRbFGQOAjJwHq/jA1ibmruZXit+15Y6wz4sG2XRGgbG
+ 6ggo9duWg3NaqgfRNJVGAvjXopkn+ya1CipC2QNlmcWT+pb4qfIbVPuCEZIda6rw6VQ6VGz
+ Eb8vWSLrP1/BzKwOJMf9g==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:G1gy5rMAdeI=:PyGoKuG280zSjCpy4kbZ6w
+ gMfIeqQv5Z7kFcUZCR+Ch0A8bvxACYY5ZUKCyiyiXHCf2vqpoEuFv2p3rKPCcJfl282phCie6
+ iL/A/9ke8bfqXIeJzUJcM99PtZ/OVBRA9fgdPcoyxvby6klPz2n2WkehZcmpIIFAah9eRhysi
+ 6fQsT17N+KnE6BOSJLeOZoYvJ5Yja8/gDrvZcKeqUizGQuiRlCODxtv935nPH7KfOXa+v50/d
+ 9VCbp/Ic+3QDIKPJlMfFv1XlWqzs60BTuf9ySzw2UrpN0clAobzDPSZfJPAo5O5r6kAe9GRPE
+ MZyWRLWwFLac+ZMecPn9DdtKADp6MhRSzcIZtr7NfZkrJegAnEnTfb+JeOzaBpU5R2vzqWpeN
+ nbp7+A3FKhbyqhMFoB/HcznSEvgQYJvZEeecjtA6MCg7pxWGq/70C2vA8e1jTiNlfxxrEiTzg
+ ZZKEX7dDM5AmyTjl8zTVBuzYNfCQVDLAZfrP1dCqWyUp5df3oH0wBnHr4Cf4giCi9AlEF6IwA
+ AZtXqx6anq9CfBV07/3rI2BmwBsFd00ggdVTSIYAjJNmziC6F+o3dfmR5WxOuDiRZ46BmInwi
+ VUFgcjqRwCGK4Yycpw7CrVB7hgP5saUlqDPU35BD6gu5lSS0dDw9UEeK/Fj3Q9I+JZkk0Tdid
+ Sk9SoHxZ5lbXU68aqwiusWpXlf4xcn72ZT4MSdwYGSnFwO4sSUsSGhoXGH8eyaeuE7Ug+D4dd
+ MygUdAh95I97NRdd/nRhPNtXiTEDY7oWaSB71cPiil+n/mMfvPZ2ok07TXWzDswfDl8a3H35F
+ dTm7IsgIAB6roQZWecpNmy+TC48hi5M7X79sFv4ulCJh53TXPmjimfNEal6pIZpF+hhXg+Y
+Received-SPF: none client-ip=212.227.126.133; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/06 09:16:17
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/06 09:16:19
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
@@ -80,69 +81,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andreas Schwab <schwab@suse.de>, Riku Voipio <riku.voipio@iki.fi>,
+Cc: Richard Henderson <richard.henderson@linaro.org>,
+ Riku Voipio <riku.voipio@iki.fi>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Andreas Schwab <schwab@suse.de>
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Signed-off-by: Andreas Schwab <schwab@suse.de>
+In the next commit we are going to remove some objects from the
+util-obj-y variable (objects which are not used by user-mode,
+when configured with --disable-system).
+Then some system-mode tests are going to fail, due to the missing
+objects:
+
+  $ make check-unit -k
+    LINK    tests/test-iov
+  /usr/bin/ld: tests/test-iov.o: in function `iov_from_buf':
+  include/qemu/iov.h:49: undefined reference to `iov_from_buf_full'
+  make: *** [rules.mak:124: tests/test-iov] Error 1
+    LINK    tests/test-timed-average
+  /usr/bin/ld: tests/test-timed-average.o: in function `account':
+  tests/test-timed-average.c:27: undefined reference to `timed_average_account'
+  make: *** [rules.mak:124: tests/test-timed-average] Error 1
+    LINK    tests/test-util-filemonitor
+  /usr/bin/ld: tests/test-util-filemonitor.o: in function `qemu_file_monitor_test_event_loop':
+  tests/test-util-filemonitor.c:83: undefined reference to `main_loop_wait'
+  make: *** [rules.mak:124: tests/test-util-filemonitor] Error 1
+    LINK    tests/test-util-sockets
+  /usr/bin/ld: tests/test-util-sockets.o: in function `test_socket_fd_pass_name_good':
+  tests/test-util-sockets.c:91: undefined reference to `socket_connect'
+  make: *** [rules.mak:124: tests/test-util-sockets] Error 1
+    LINK    tests/test-base64
+  /usr/bin/ld: tests/test-base64.o: in function `test_base64_good':
+  tests/test-base64.c:35: undefined reference to `qbase64_decode'
+  collect2: error: ld returned 1 exit status
+  make: *** [rules.mak:124: tests/test-base64] Error 1
+    LINK    tests/test-bufferiszero
+  /usr/bin/ld: tests/test-bufferiszero.o: in function `test_1':
+  tests/test-bufferiszero.c:31: undefined reference to `buffer_is_zero'
+  make: *** [rules.mak:124: tests/test-bufferiszero] Error 1
+  make: Target 'check-unit' not remade because of errors.
+
+Instead, restrict these tests to system-mode, by using the
+$(CONFIG_SOFTMMU) variable.
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Tested-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <mvm7dx0cun3.fsf@suse.de>
+Tested-by: Laurent Vivier <laurent@vivier.eu>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <20200522172510.25784-5-philmd@redhat.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/generic/fcntl.h | 4 ++++
- linux-user/syscall.c       | 6 ++++++
- 2 files changed, 10 insertions(+)
+ tests/Makefile.include | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/linux-user/generic/fcntl.h b/linux-user/generic/fcntl.h
-index 9f727d4df2c8..c85c5b9fed65 100644
---- a/linux-user/generic/fcntl.h
-+++ b/linux-user/generic/fcntl.h
-@@ -99,6 +99,10 @@
- #define TARGET_F_SETLKW64      14
- #endif
- 
-+#define TARGET_F_OFD_GETLK     36
-+#define TARGET_F_OFD_SETLK     37
-+#define TARGET_F_OFD_SETLKW    38
-+
- #ifndef TARGET_F_SETOWN_EX
- #define TARGET_F_SETOWN_EX     15
- #define TARGET_F_GETOWN_EX     16
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 9ac3af20c176..2d8125fa53c6 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -6098,6 +6098,9 @@ static int target_to_host_fcntl_cmd(int cmd)
-     case TARGET_F_SETFD:
-     case TARGET_F_GETFL:
-     case TARGET_F_SETFL:
-+    case TARGET_F_OFD_GETLK:
-+    case TARGET_F_OFD_SETLK:
-+    case TARGET_F_OFD_SETLKW:
-         ret = cmd;
-         break;
-     case TARGET_F_GETLK:
-@@ -6383,6 +6386,7 @@ static abi_long do_fcntl(int fd, int cmd, abi_ulong arg)
-         break;
- 
-     case TARGET_F_GETLK64:
-+    case TARGET_F_OFD_GETLK:
-         ret = copy_from_user_flock64(&fl64, arg);
-         if (ret) {
-             return ret;
-@@ -6394,6 +6398,8 @@ static abi_long do_fcntl(int fd, int cmd, abi_ulong arg)
-         break;
-     case TARGET_F_SETLK64:
-     case TARGET_F_SETLKW64:
-+    case TARGET_F_OFD_SETLK:
-+    case TARGET_F_OFD_SETLKW:
-         ret = copy_from_user_flock64(&fl64, arg);
-         if (ret) {
-             return ret;
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 6bc3d1096bc9..0cb58aad2685 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -66,14 +66,14 @@ check-unit-y += tests/check-qlit$(EXESUF)
+ check-unit-y += tests/test-qobject-output-visitor$(EXESUF)
+ check-unit-y += tests/test-clone-visitor$(EXESUF)
+ check-unit-y += tests/test-qobject-input-visitor$(EXESUF)
+-check-unit-y += tests/test-qmp-cmds$(EXESUF)
++check-unit-$(CONFIG_SOFTMMU) += tests/test-qmp-cmds$(EXESUF)
+ check-unit-y += tests/test-string-input-visitor$(EXESUF)
+ check-unit-y += tests/test-string-output-visitor$(EXESUF)
+ check-unit-y += tests/test-qmp-event$(EXESUF)
+ check-unit-y += tests/test-opts-visitor$(EXESUF)
+ check-unit-$(CONFIG_BLOCK) += tests/test-coroutine$(EXESUF)
+ check-unit-y += tests/test-visitor-serialization$(EXESUF)
+-check-unit-y += tests/test-iov$(EXESUF)
++check-unit-$(CONFIG_SOFTMMU) += tests/test-iov$(EXESUF)
+ check-unit-y += tests/test-bitmap$(EXESUF)
+ check-unit-$(CONFIG_BLOCK) += tests/test-aio$(EXESUF)
+ check-unit-$(CONFIG_BLOCK) += tests/test-aio-multithread$(EXESUF)
+@@ -108,7 +108,7 @@ check-unit-y += tests/test-qht$(EXESUF)
+ check-unit-y += tests/test-qht-par$(EXESUF)
+ check-unit-y += tests/test-bitops$(EXESUF)
+ check-unit-y += tests/test-bitcnt$(EXESUF)
+-check-unit-y += tests/test-qdev-global-props$(EXESUF)
++check-unit-$(CONFIG_SOFTMMU) += tests/test-qdev-global-props$(EXESUF)
+ check-unit-y += tests/check-qom-interface$(EXESUF)
+ check-unit-y += tests/check-qom-proplist$(EXESUF)
+ check-unit-y += tests/test-qemu-opts$(EXESUF)
+@@ -126,9 +126,9 @@ check-unit-$(call land,$(CONFIG_BLOCK),$(CONFIG_GNUTLS)) += tests/test-crypto-tl
+ ifneq (,$(findstring qemu-ga,$(TOOLS)))
+ check-unit-$(call land,$(CONFIG_LINUX),$(CONFIG_VIRTIO_SERIAL)) += tests/test-qga$(EXESUF)
+ endif
+-check-unit-y += tests/test-timed-average$(EXESUF)
+-check-unit-$(CONFIG_INOTIFY1) += tests/test-util-filemonitor$(EXESUF)
+-check-unit-y += tests/test-util-sockets$(EXESUF)
++check-unit-$(CONFIG_SOFTMMU) += tests/test-timed-average$(EXESUF)
++check-unit-$(call land,$(CONFIG_SOFTMMU),$(CONFIG_INOTIFY1)) += tests/test-util-filemonitor$(EXESUF)
++check-unit-$(CONFIG_SOFTMMU) += tests/test-util-sockets$(EXESUF)
+ check-unit-$(CONFIG_BLOCK) += tests/test-authz-simple$(EXESUF)
+ check-unit-$(CONFIG_BLOCK) += tests/test-authz-list$(EXESUF)
+ check-unit-$(CONFIG_BLOCK) += tests/test-authz-listfile$(EXESUF)
+@@ -139,7 +139,7 @@ check-unit-$(CONFIG_BLOCK) += tests/test-io-channel-file$(EXESUF)
+ check-unit-$(call land,$(CONFIG_BLOCK),$(CONFIG_GNUTLS)) += tests/test-io-channel-tls$(EXESUF)
+ check-unit-$(CONFIG_BLOCK) += tests/test-io-channel-command$(EXESUF)
+ check-unit-$(CONFIG_BLOCK) += tests/test-io-channel-buffer$(EXESUF)
+-check-unit-y += tests/test-base64$(EXESUF)
++check-unit-$(CONFIG_SOFTMMU) += tests/test-base64$(EXESUF)
+ check-unit-$(call land,$(CONFIG_BLOCK),$(if $(CONFIG_NETTLE),y,$(CONFIG_GCRYPT))) += tests/test-crypto-pbkdf$(EXESUF)
+ check-unit-$(CONFIG_BLOCK) += tests/test-crypto-ivgen$(EXESUF)
+ check-unit-$(CONFIG_BLOCK)  += tests/test-crypto-afsplit$(EXESUF)
+@@ -147,7 +147,7 @@ check-unit-$(call land,$(CONFIG_BLOCK),$(CONFIG_QEMU_PRIVATE_XTS)) += tests/test
+ check-unit-$(CONFIG_BLOCK)  += tests/test-crypto-block$(EXESUF)
+ check-unit-y += tests/test-logging$(EXESUF)
+ check-unit-$(call land,$(CONFIG_BLOCK),$(CONFIG_REPLICATION)) += tests/test-replication$(EXESUF)
+-check-unit-y += tests/test-bufferiszero$(EXESUF)
++check-unit-$(CONFIG_SOFTMMU) += tests/test-bufferiszero$(EXESUF)
+ check-unit-y += tests/test-uuid$(EXESUF)
+ check-unit-y += tests/ptimer-test$(EXESUF)
+ check-unit-y += tests/test-qapi-util$(EXESUF)
 -- 
 2.26.2
 
