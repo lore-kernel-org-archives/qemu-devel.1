@@ -6,62 +6,62 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D9DAC433DF
-	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jun 2020 13:27:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70241C433DF
+	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jun 2020 13:28:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 43974206DC
-	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jun 2020 13:27:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43974206DC
+	by mail.kernel.org (Postfix) with ESMTPS id 43D16206DC
+	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jun 2020 13:28:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43D16206DC
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51738 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54156 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jhYrD-0002XJ-Hv
-	for qemu-devel@archiver.kernel.org; Sat, 06 Jun 2020 09:27:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39102)
+	id 1jhYs6-0003Zd-Ib
+	for qemu-devel@archiver.kernel.org; Sat, 06 Jun 2020 09:28:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39092)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jhYgf-0007Qj-9W
- for qemu-devel@nongnu.org; Sat, 06 Jun 2020 09:16:37 -0400
-Received: from mout.kundenserver.de ([212.227.126.131]:58377)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jhYgd-0007Nd-Tp
+ for qemu-devel@nongnu.org; Sat, 06 Jun 2020 09:16:35 -0400
+Received: from mout.kundenserver.de ([212.227.126.187]:35329)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jhYgb-0007gK-UX
- for qemu-devel@nongnu.org; Sat, 06 Jun 2020 09:16:36 -0400
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jhYgb-0007fs-T3
+ for qemu-devel@nongnu.org; Sat, 06 Jun 2020 09:16:35 -0400
 Received: from localhost.localdomain ([82.252.135.106]) by
  mrelayeu.kundenserver.de (mreue010 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1M9nlN-1jdxeY1SJJ-005uWB; Sat, 06 Jun 2020 15:16:19 +0200
+ id 1MmUcL-1jGmVF3wzB-00iUPH; Sat, 06 Jun 2020 15:16:17 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 13/19] target/riscv/cpu: Restrict CPU migration to
- system-mode
-Date: Sat,  6 Jun 2020 15:16:01 +0200
-Message-Id: <20200606131607.1250819-14-laurent@vivier.eu>
+Subject: [PULL v2 09/19] tests/Makefile: Only display TCG-related tests when
+ TCG is available
+Date: Sat,  6 Jun 2020 15:15:57 +0200
+Message-Id: <20200606131607.1250819-10-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200606131607.1250819-1-laurent@vivier.eu>
 References: <20200606131607.1250819-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:9UhZ8rF6x9qroVqlPvbwJysM18+fds1WlEyFZVqCr530QxMHIFq
- Gxj0XISe5+D5T1vvli5wQYsVCJ0g2jz3Zgzuy8HQN/X1ZCGOqtW4i+yQd07+8zLwAUr7lIO
- u817uGTbdj3l1ptg3EcWy/kzs8b1y7RbjvJXqfhw3JVuMkvGh+HgxbriaHdNkF2QJ3x5Cei
- goOi3SWwLJQIyV8zb/dhA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:5RhwfZ8yzgc=:EoEsZ34bgV1AgVlsWga0zT
- st9WbcEeIot9eAmBUQNq/V5OC4JoLpeoiSyzjqOX4f+g2p1S6i7N0CW63ANOE70cB55PgohUs
- nk/m/8dfesHUz/fsF/EKkZLD3XF+1tbRlU7XqZHRanVqmVLn5xroqeqyjxAF98RGOSYNW1pja
- wyLiH9nlVeVBY9H6XQa7xT1zcnx/fq17FCOUwtERb0Q8VnwHLE3SDSdvgs/jOI3RItZBCkLkO
- Ku2VZ8pQULbGEcLYxvnoFnqHufABr4dbRkTbdz8ZUuqXhT6p/bkVx/HmBRZ2m0J0d3B3K4w/r
- tYf2kaTpZoe6XS6NzgxpaRY/60HO79ZF5/eZr6uI/SPGcqjqAfx1/hoT+gY2PckQU3f4i2GV1
- nx3enDZqTz/2U0DaPFM6dl5F5RL0lD3DVmW6kbJNgPM4uMkFKNYia1UDNRw/A1UMFikLtOD4i
- h0/x7PwIB/8eeh6gln9It86XxUU5AY7Qwsl+SuvbWPunhJLufLaerDVjXuQTowl53PWNUxcja
- t4y1wJNlDVb7xB9vbq0uvB6gg9PE2AzKZsQRUrAeSHDGUp8ReydcKqUlTn09M8uYNsbsYkyTA
- PmyYZ52V5x6ytvHYixJa91irZNTvhO1BPWdTxbJTj0CerJa1KCf/+nhsgaOm4TH28Wo65jvjL
- 8yFf2hJ8UbRSnfkK60c4IVTMVv4coW7f5Sy4uUx7IzayHi7pO2B+wWaSOWiZzC46mvIwVyWi2
- q1TIDES+vmpY+rhoZjHlcsqryKS0scaHFnPrxLVCzgOx6XMJpxG0KaQFK4vSKjn7WNolYKrAM
- X/ZcXTC0bkDPA5199uLBppPc5gzNWFVIchAH+JiLj3t0Sck3dlzW0JT4IzVLk4Ku8Hai/R7
-Received-SPF: none client-ip=212.227.126.131; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:2CwXTbYR6vH8kFpUc7gS93fA+cfHFpzObB0sirNk3bTcC9GMQ6c
+ qdGNZ8W4vdClWcq562PneQZb0b4LH5jO0QenObAluog5+pcTWYlABJpHFTVXKoBwUAio8qh
+ 39Y8dAiduaiSX5Ng3QaTkdwjcANw+ahIT908h1pcPkR9nBfV2FDZH6mamfeByvFuwTr1eW7
+ 9VSm1RwAA7syT8Xt6rbrQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:pM38J6YeDW4=:XVA/q7ucK/yu/WH+dM2GCq
+ OKXTz/FC7c9LpKi34WMF7ywbSMHTxYyZtXfqiA5XCWrK+jE7yvQcyXRiw4/2hVi58WLTINVW6
+ n0wurbwfuQBcKo29pBhdXUXMt30g28XoVyIidwxa9HjEvyqUXtQF0sksi14HEmXM/XGqDDfus
+ VYxptAn3AXMayfKZ32qIkPk2UiOWIPgnfiIQFUsmYPnd93gwS9hqsWEWKYALUZO6O3FWYFcKE
+ F4cJ/2sz6El+C1kCjLCcJJ86J+oKno3TR3xeEWfG1xwvYVGRftPjrMsn58MSCan+C3Bv8xaR+
+ Xaf3ydR6pCLHbDGo3xH5bmmuIFJpupWBL/7yb5aUVnr1W981K5DxJND05EFVrEhIebp2RimaQ
+ IVPYvy41+3yfXs/LJ+3ploXHUrUth7ZX+DGHshzwjZJ+tiHPLX47oLk88tLxK/rtr9yO1O+1o
+ WNL9leBqcMxSZ4JOiTsdgFiEf8E44VWPSr7i0pR6zD1S9VcCNalyMzuD0taemf0FetDHBXpNK
+ KnQhsAdm0N+n3p2V074AcwGZb4tO2Zyqk+MKlcboD5z2S6rbD2evUKUThHEaqWlu9AGCPT5Jj
+ 8mC1xMWYqKbaTunpginXnU7818dGnoqseoEoUhQvH6NRvXLOd32zrfQWIWq7CuMYURKDXMQm7
+ 5Jl7ujpRYcCMHzzYwF+VGfLVKhglDhvscSs/m9/mDqlyvfY9nBzJjoZyJQ3LQNcBiIUbSIz1a
+ vmQ7psQi1mWHO24ltt/Vd7z89jU9qTPwgkJ/3eIn0uZ31ulAgv1WL8nSMvriM+0BIgBvlrjGL
+ utEgWc9QKKruk7GicTSczVtS/ztXYfw0eN33aZTrnhtjg89unLQ3DNezlMH2EuDeS2aSGB8
+Received-SPF: none client-ip=212.227.126.187; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/06 09:16:17
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
@@ -98,45 +98,27 @@ Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 Tested-by: Laurent Vivier <laurent@vivier.eu>
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20200522172510.25784-8-philmd@redhat.com>
+Message-Id: <20200522172510.25784-4-philmd@redhat.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- target/riscv/cpu.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ tests/Makefile.include | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-index 059d71f2c715..6c78337858ad 100644
---- a/target/riscv/cpu.c
-+++ b/target/riscv/cpu.c
-@@ -485,10 +485,12 @@ static void riscv_cpu_init(Object *obj)
-     cpu_set_cpustate_pointers(cpu);
- }
- 
-+#ifndef CONFIG_USER_ONLY
- static const VMStateDescription vmstate_riscv_cpu = {
-     .name = "cpu",
-     .unmigratable = 1,
- };
-+#endif
- 
- static Property riscv_cpu_properties[] = {
-     DEFINE_PROP_BOOL("i", RISCVCPU, cfg.ext_i, true),
-@@ -544,13 +546,13 @@ static void riscv_cpu_class_init(ObjectClass *c, void *data)
-     cc->do_transaction_failed = riscv_cpu_do_transaction_failed;
-     cc->do_unaligned_access = riscv_cpu_do_unaligned_access;
-     cc->get_phys_page_debug = riscv_cpu_get_phys_page_debug;
-+    /* For now, mark unmigratable: */
-+    cc->vmsd = &vmstate_riscv_cpu;
- #endif
- #ifdef CONFIG_TCG
-     cc->tcg_initialize = riscv_translate_init;
-     cc->tlb_fill = riscv_cpu_tlb_fill;
- #endif
--    /* For now, mark unmigratable: */
--    cc->vmsd = &vmstate_riscv_cpu;
-     device_class_set_props(dc, riscv_cpu_properties);
- }
- 
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 03a74b60f6b2..6bc3d1096bc9 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -12,8 +12,10 @@ check-help:
+ 	@echo " $(MAKE) check-speed          Run qobject speed tests"
+ 	@echo " $(MAKE) check-qapi-schema    Run QAPI schema tests"
+ 	@echo " $(MAKE) check-block          Run block tests"
++ifeq ($(CONFIG_TCG),y)
+ 	@echo " $(MAKE) check-tcg            Run TCG tests"
+ 	@echo " $(MAKE) check-softfloat      Run FPU emulation tests"
++endif
+ 	@echo " $(MAKE) check-acceptance     Run all acceptance (functional) tests"
+ 	@echo
+ 	@echo " $(MAKE) check-report.tap     Generates an aggregated TAP test report"
 -- 
 2.26.2
 
