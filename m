@@ -7,63 +7,64 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB077C433DF
-	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jun 2020 08:21:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E145C433E0
+	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jun 2020 08:22:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6DA56207D0
-	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jun 2020 08:21:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 09969207D0
+	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jun 2020 08:22:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="SY6sg6Bc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DA56207D0
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="duKsxyVs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09969207D0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51706 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54770 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jhU4y-0000SY-MV
-	for qemu-devel@archiver.kernel.org; Sat, 06 Jun 2020 04:21:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43652)
+	id 1jhU5f-0001iX-As
+	for qemu-devel@archiver.kernel.org; Sat, 06 Jun 2020 04:22:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43622)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jhU2O-0003Kv-Q2; Sat, 06 Jun 2020 04:18:44 -0400
-Received: from mail-db8eur05on2120.outbound.protection.outlook.com
- ([40.107.20.120]:7488 helo=EUR05-DB8-obe.outbound.protection.outlook.com)
+ id 1jhU2I-0003Bt-BG; Sat, 06 Jun 2020 04:18:38 -0400
+Received: from mail-eopbgr80098.outbound.protection.outlook.com
+ ([40.107.8.98]:10318 helo=EUR04-VI1-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jhU2N-0000Zf-TK; Sat, 06 Jun 2020 04:18:44 -0400
+ id 1jhU2G-0000aF-BT; Sat, 06 Jun 2020 04:18:38 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=XUelm02PkAQpJXA0Nw7jacyxtzHCga8P2bCux602j5DfUy3v6gUhvPwBpb/f166wBx9fIbbPzuIKuvQ1fTBIVZqtW+B2IHQmrFURNElxd6F7k0HS4d1DDc+zAUOEoyKvry68PEc8Md7k0/jkhC5KYu8/KR/+sy9rUgxPsqxdkJjkU8SuJuNi0CiHyDoEHxN7uWrKNRBhdRCnvU3u9DcVGrXwfOtXFKS42kQ8GQioad/mMjEvER/runay/doIwq/sJsCYFdsperJqaxjnZ/R9zwCZpd5d/r/whTvxFmU7sa5vtBdfObyvF6PPKNQKO+klBFGMs6MnVrXXxC84GqJWeg==
+ b=cUabfLkwJ5UnNo1fHMFqYjbSzRHQHqYUizX8/fy3RFKhPFLcCbR8n332eUc4p/j4XP0b1G0TA+LmczwAq/9cSJ1jBc2Lbvcr+IOVZsufFVahKClXYCcjOLEYVKTKJ84sW1UFCVq3qmygOaC5yVuYj4au9IQQgLXBJuA9uoXzinL/dQDb4hjCz/KKeReLAO2vTkWZdI27wUxU5Bf+3HtOyKlC2RB2FryQf+h4VL+qZqDrRZnAv+VrZ8btnjQFe9r6Z9hAd4UezqXIN5W0TuIIFKvy9BsJWw56JixplCfuWkhGsFdcNLf87Abjj1A1JUJn+oi1NGhzpgq6AmFVN8PIwA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dYdQPZ6ZDUQvSjgesCMJB1IHyF6PBVFhoX0n22pLP8I=;
- b=js+hOAR63CqhL8LAWPCR2bseU96lyxbhQ7x+NAazmzFghEOKCCnSHtvxNyh3dTKCqqW6hyiIWBBDqF5/SuLiWaA6JJA+pYUOu5jdV4vMpUSRNIV9ViRzmKhou7dFhXsgp3PZ3TuMTUDj7Ag82l7BnWY8r5LbA7Q1Akw2LIRgJ3Ld3/nmIZQNsPOl3vCXkA52UnacOYWbzTVzGY2UU2HbXoEgNkvCDb4mlkZE5iw+flLT+qpSD/9v4i8xO4CWAlSA9Y779YCDn+Fh5y1B8xNOI8TrCK0fmPERs04MVKZloBJoNMPDP6xxsgbPhzwC1WsNjl2vZKNQv9I77MNVLEzDRg==
+ bh=IV4F9tAzUXiVlUUcHYbuqDvhLaZpidtclIHPB9Hhq78=;
+ b=SmUFBqbeL1zwxenE2Ytrz+7Hazr9KfDPWVbz9i77BYx6C9bF5LfddWFQdTznh4kqk//eKZ+3Ykx1VLVbwznaDcQao0or6MilemnjMgTeOU2wvbPicYPcw0XCYZm/MIRrMS4SC8IV0ub46F2kaNnwNk0Fhrt5UbUF1oQQyIV8BXxzfX1ACCGY/3cy3T57xyHodg6kqbP5Y/pD7HdvnxmxsQYCfNJ9eQwJBH4OZmJVuNNcYd21rilcdyjjSyi9P7SlLoRJEmV9TGrk5YfmAdevocVPGL10InsTZ8PSlZmZwDOVqfbw2qJh1fD79HlYAKdWKaqOwG6p7b8U3TPwA2aHDg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
  header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dYdQPZ6ZDUQvSjgesCMJB1IHyF6PBVFhoX0n22pLP8I=;
- b=SY6sg6BcDIlBV9R2oj3Nl5zd8VWy8KjUexeRNbBEAZ9mZFJ7qlulT06ryXekKgR3fN3aNTZ8GRNAC3btAJFNS5BoRCbFcHsBCVhWcI9ZwlcZhdwr/Nt2uWuOq6dqg7UslMSDXo8S+1NS9mmxD2QJYu8T+Trn8feAajGp6/wtSA4=
+ bh=IV4F9tAzUXiVlUUcHYbuqDvhLaZpidtclIHPB9Hhq78=;
+ b=duKsxyVs2+6Cjh2PdRpPR9+zYbmyLGDjx87cVThfcdOj9UrRGMZFjqWn2t3mIHi42G+bX8dOfsH+LdakEovQtQEEf67nVqG/uYW26HtFAEcw2+01AnQMZ01jHUJ8t9ZEmTKsiBcgQMXIURzipu/jrgeqqdZc3RPxZyEkLQyRJe0=
 Authentication-Results: nongnu.org; dkim=none (message not signed)
  header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
 Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
  by AM7PR08MB5480.eurprd08.prod.outlook.com (2603:10a6:20b:de::11)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3066.18; Sat, 6 Jun
- 2020 08:18:29 +0000
+ 2020 08:18:25 +0000
 Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
  ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
  ([fe80::a408:2f0f:bc6c:d312%3]) with mapi id 15.20.3066.023; Sat, 6 Jun 2020
- 08:18:29 +0000
+ 08:18:25 +0000
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v5 09/13] qcow2_format.py: add field-formatting class
-Date: Sat,  6 Jun 2020 11:18:02 +0300
-Message-Id: <20200606081806.23897-10-vsementsov@virtuozzo.com>
+Subject: [PATCH v5 03/13] qcow2.py: move qcow2 format classes to separate
+ module
+Date: Sat,  6 Jun 2020 11:17:56 +0300
+Message-Id: <20200606081806.23897-4-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20200606081806.23897-1-vsementsov@virtuozzo.com>
 References: <20200606081806.23897-1-vsementsov@virtuozzo.com>
@@ -77,37 +78,37 @@ X-MS-Exchange-MessageSentRepresentingType: 1
 Received: from kvm.sw.ru (185.215.60.130) by
  FR2P281CA0036.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10:14::23) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3066.18 via Frontend Transport; Sat, 6 Jun 2020 08:18:28 +0000
+ 15.20.3066.18 via Frontend Transport; Sat, 6 Jun 2020 08:18:24 +0000
 X-Mailer: git-send-email 2.21.0
 X-Originating-IP: [185.215.60.130]
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: eca96768-f7df-4540-6b1e-08d809f231a5
+X-MS-Office365-Filtering-Correlation-Id: 7430039f-c416-483d-99ac-08d809f22f07
 X-MS-TrafficTypeDiagnostic: AM7PR08MB5480:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM7PR08MB54802F12797894EDAEDA21BBC1870@AM7PR08MB5480.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:2958;
+X-Microsoft-Antispam-PRVS: <AM7PR08MB54806A47B2EC2D848FD4CC8DC1870@AM7PR08MB5480.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:3276;
 X-Forefront-PRVS: 04267075BD
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 5Oy+mrVlxiAoj5NjT++8+fj0+wSn6MtAQvGjTNXnmHN+0Mb1m6WnaXZv2C9FrNy9/f5RTurBu1AIXHWGZBjBjbRRCvF81zQsuCGNFnNZZ36mikZRPQ2wervS7isx73GRgZceZrXfPwCZafkhYIZPT6FgQqTsQ3GPDI2Gwa4r1r5ANE23o/XzcmnV5YYY9zhHpHGWo2Xcw5mB3TRwV88nUQJXVOfTyG15TbxtNVptfQeqogfrTXmWYlc/bWOFsgv0+IZw6ahPC/ziZEjg4jq/zVEdU17Ew/yZn9vXZ9qpGWRCkmd77zHPrqvC+TIY+2FKJrYXxrc4nOC+40O7wne4IQ==
+X-Microsoft-Antispam-Message-Info: AI/qc1JdRTH99tHQk5j60U/DLfiygqoPf636rJEy7mxhYjyGdA5Y5LKqqWYYAgMg8dFvab/c4OvC2nNsbFmkGxSETGpriCyjS9hmXkHA/4mpqJ3e+gvvL4LeZ9vNCFP0bnOQrbCLByfVRFYEn+WOUEfVv0rlWCo8jb1uWbYwtJtlTauUnWNpzQLgjx2wo2fGji3enTktyece+wYx93YGr54N0pB+PjDzwis8+qc5NxHVsXqtBiuIvM0nHFO1FoGi+SX9s/DVpt1w6PlT4JBVvVYByO1+8ptnvoZfWPWOhhqBIavFQxBY9s7qxrYdteBNJFSyMqKyM+8bfzmNheoD9/t0w7/0CQL6fc/v2rWoBPRYKSB2SVCzLIWAYKARTdm4Mz8+GEBwQkFDL2iT64wFvj70l9Uzi6Bw5P5SSRBVUhSmgalXYC/aHVq7c1PcCMSpwH2nF4BNErLZlNtgQAoDcg==
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
  SFTY:;
- SFS:(4636009)(136003)(366004)(39830400003)(376002)(346002)(396003)(107886003)(1076003)(4326008)(2906002)(36756003)(6512007)(66946007)(66556008)(66476007)(6486002)(5660300002)(83380400001)(478600001)(86362001)(2616005)(956004)(316002)(26005)(6506007)(52116002)(6666004)(8936002)(6916009)(16526019)(186003)(8676002);
+ SFS:(4636009)(136003)(366004)(39830400003)(376002)(346002)(396003)(107886003)(1076003)(4326008)(2906002)(36756003)(6512007)(66946007)(66556008)(66476007)(6486002)(5660300002)(83380400001)(478600001)(86362001)(2616005)(956004)(316002)(26005)(6506007)(52116002)(6666004)(8936002)(6916009)(16526019)(186003)(8676002)(2004002);
  DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: oYpR/agEmUvwhNnBpnOEaGIOz5wuQyte4TOn43pHnpWylsudndY3srWNI1H3qyDBsdGq0HjAXz8DC1U0MuPItR4eO0kZWMDQmkuWpmd/vq/G7V8cnfg5fe+iytiyoZn53bI93B6pSG0KxX4FVpL3C/NmOXgFQIVr//2OcVfGxrCEZY5WfuSAs2p8U6tIdZS1VfZ6lDSJsQ7ydBEPaY/aI/1XI6nIsOpRGKQ6Aom8ksZPmY5/5PMqBFOhlBiS7wVtIall3+qnOd0Q8881aAoU1l81FvtvhDVy63rzo9tcJwZLXBong4jKpmaldhk+Ca3wzidsVAYdHkv9WNNwDhdYIJh89IMJ9nyzCEyI56wgj6nxyyzkklf4A33gBPYmIhyqrQl0kSR4V+bqowjjqLQfmW/siftMiegBtQPFXouqxMZxB/0NWIoFt7kv2Q6ZkbhEqYOeL36zU8UuArA0i1F8hwMZEW+nYPxuhIlaZJrOS0I=
+X-MS-Exchange-AntiSpam-MessageData: o8T6JlnbAkjE3uPJ6e2yYauFtu19jyM68FYL6HdHWR0iB9C7GfSXY+Sl0O4pk4Jzld0C2pAPZVz6harZsnBJ9kWCFF0jG+g4Rq2dcLCHH0AajrwVNoAIcrHwfatEKm+wiCMs3XbqB6C6SGwfUzBAbl7fRQcy7ACj9RXYz2plWOvgT1kxUCOQCbiz+W3tmWaOsIlbrztAqNXJhszkUfTrthERxZEu3ba4d5Ax2pZgeAH4x8/7ETv1cwI10YvGpPNK4EnJrzOuWk6/gA7dzWhMJpCBjcXs2BNEXzcNNqIllRUYj2a7Mp2kfcQee0E/+t/OqnluVUnuSvl6Mc+hPKXRsv5ZTiiLaqUUlQsazpulga77N7clz3XWIfD5ON7ZktOxDsAcleE9r6JfdFpXDAj4938Z4CzvMowjIOvSaz5fgpJ+KBv8IJQIrDt1t6hJLy+ZnZV7jlVnKGnYdacIVePxGa1mKpLC8GlLuZq3Y+2XYmEcqiF2HZiI4cdlg0bzdFcX
 X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: eca96768-f7df-4540-6b1e-08d809f231a5
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jun 2020 08:18:29.3869 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7430039f-c416-483d-99ac-08d809f22f07
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jun 2020 08:18:25.0480 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: nUEomgbhrkxrZ0U9lnrQMOfysxZJ1eoY8zNZzChOU2SVVYEDs9xsiAt9h/MUzcALju4gx02omqDCGxsX34mF66eCQs9un25bonoBTNXd2dc=
+X-MS-Exchange-CrossTenant-UserPrincipalName: 10nQry46uRZxoHXNh9OUYU6L4jCR+UhkLuR6MGnq/zwZESWWeGgcztaE6f/1xl1xzvkOZnQCsvQR9E99uyIZ7UrOkOoRvG2yEs1dvgsiVqg=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5480
-Received-SPF: pass client-ip=40.107.20.120;
+Received-SPF: pass client-ip=40.107.8.98;
  envelope-from=vsementsov@virtuozzo.com;
- helo=EUR05-DB8-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/06 04:18:29
+ helo=EUR04-VI1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/06 04:18:34
 X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
 X-Spam_score_int: -27
 X-Spam_score: -2.8
@@ -135,49 +136,155 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Allow formatter class in structure definition instead of hacking with
-'mask'. This will simplify further introduction of new formatters.
+We are going to enhance qcow2 format parsing by adding more structure
+classes. Let's split format parsing from utility code.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 ---
- tests/qemu-iotests/qcow2_format.py | 35 +++++++++++++++++++++---------
- 1 file changed, 25 insertions(+), 10 deletions(-)
+ tests/qemu-iotests/qcow2.py        | 160 +-------------------------
+ tests/qemu-iotests/qcow2_format.py | 173 +++++++++++++++++++++++++++++
+ 2 files changed, 177 insertions(+), 156 deletions(-)
+ create mode 100644 tests/qemu-iotests/qcow2_format.py
 
-diff --git a/tests/qemu-iotests/qcow2_format.py b/tests/qemu-iotests/qcow2_format.py
-index 898d388b8a..74a82f9263 100644
---- a/tests/qemu-iotests/qcow2_format.py
-+++ b/tests/qemu-iotests/qcow2_format.py
-@@ -20,6 +20,25 @@ import struct
- import string
+diff --git a/tests/qemu-iotests/qcow2.py b/tests/qemu-iotests/qcow2.py
+index 2da434a013..e968869ea6 100755
+--- a/tests/qemu-iotests/qcow2.py
++++ b/tests/qemu-iotests/qcow2.py
+@@ -17,163 +17,11 @@
+ #
  
- 
-+class Qcow2Field:
-+
-+    def __init__(self, value):
-+        self.value = value
-+
-+    def __str__(self):
-+        return str(self.value)
-+
-+
-+class Flags64(Qcow2Field):
-+
-+    def __str__(self):
-+        bits = []
-+        for bit in range(64):
-+            if self.value & (1 << bit):
-+                bits.append(bit)
-+        return str(bits)
-+
-+
- class Qcow2StructMeta(type):
- 
-     # Mapping from c types to python struct format
-@@ -70,14 +89,10 @@ class Qcow2Struct(metaclass=Qcow2StructMeta):
-     def dump(self):
-         for f in self.fields:
-             value = self.__dict__[f[2]]
+ import sys
+-import struct
+-import string
+-
+-
+-class QcowHeaderExtension:
+-
+-    def __init__(self, magic, length, data):
+-        if length % 8 != 0:
+-            padding = 8 - (length % 8)
+-            data += b"\0" * padding
+-
+-        self.magic = magic
+-        self.length = length
+-        self.data = data
+-
+-    @classmethod
+-    def create(cls, magic, data):
+-        return QcowHeaderExtension(magic, len(data), data)
+-
+-
+-class QcowHeader:
+-
+-    uint32_t = 'I'
+-    uint64_t = 'Q'
+-
+-    fields = [
+-        # Version 2 header fields
+-        [uint32_t, '%#x',  'magic'],
+-        [uint32_t, '%d',   'version'],
+-        [uint64_t, '%#x',  'backing_file_offset'],
+-        [uint32_t, '%#x',  'backing_file_size'],
+-        [uint32_t, '%d',   'cluster_bits'],
+-        [uint64_t, '%d',   'size'],
+-        [uint32_t, '%d',   'crypt_method'],
+-        [uint32_t, '%d',   'l1_size'],
+-        [uint64_t, '%#x',  'l1_table_offset'],
+-        [uint64_t, '%#x',  'refcount_table_offset'],
+-        [uint32_t, '%d',   'refcount_table_clusters'],
+-        [uint32_t, '%d',   'nb_snapshots'],
+-        [uint64_t, '%#x',  'snapshot_offset'],
+-
+-        # Version 3 header fields
+-        [uint64_t, 'mask', 'incompatible_features'],
+-        [uint64_t, 'mask', 'compatible_features'],
+-        [uint64_t, 'mask', 'autoclear_features'],
+-        [uint32_t, '%d',   'refcount_order'],
+-        [uint32_t, '%d',   'header_length'],
+-    ]
+-
+-    fmt = '>' + ''.join(field[0] for field in fields)
+-
+-    def __init__(self, fd):
+-
+-        buf_size = struct.calcsize(QcowHeader.fmt)
+-
+-        fd.seek(0)
+-        buf = fd.read(buf_size)
+-
+-        header = struct.unpack(QcowHeader.fmt, buf)
+-        self.__dict__ = dict((field[2], header[i])
+-                             for i, field in enumerate(QcowHeader.fields))
+-
+-        self.set_defaults()
+-        self.cluster_size = 1 << self.cluster_bits
+-
+-        fd.seek(self.header_length)
+-        self.load_extensions(fd)
+-
+-        if self.backing_file_offset:
+-            fd.seek(self.backing_file_offset)
+-            self.backing_file = fd.read(self.backing_file_size)
+-        else:
+-            self.backing_file = None
+-
+-    def set_defaults(self):
+-        if self.version == 2:
+-            self.incompatible_features = 0
+-            self.compatible_features = 0
+-            self.autoclear_features = 0
+-            self.refcount_order = 4
+-            self.header_length = 72
+-
+-    def load_extensions(self, fd):
+-        self.extensions = []
+-
+-        if self.backing_file_offset != 0:
+-            end = min(self.cluster_size, self.backing_file_offset)
+-        else:
+-            end = self.cluster_size
+-
+-        while fd.tell() < end:
+-            (magic, length) = struct.unpack('>II', fd.read(8))
+-            if magic == 0:
+-                break
+-            else:
+-                padded = (length + 7) & ~7
+-                data = fd.read(padded)
+-                self.extensions.append(QcowHeaderExtension(magic, length,
+-                                                           data))
+-
+-    def update_extensions(self, fd):
+-
+-        fd.seek(self.header_length)
+-        extensions = self.extensions
+-        extensions.append(QcowHeaderExtension(0, 0, b""))
+-        for ex in extensions:
+-            buf = struct.pack('>II', ex.magic, ex.length)
+-            fd.write(buf)
+-            fd.write(ex.data)
+-
+-        if self.backing_file is not None:
+-            self.backing_file_offset = fd.tell()
+-            fd.write(self.backing_file)
+-
+-        if fd.tell() > self.cluster_size:
+-            raise Exception("I think I just broke the image...")
+-
+-    def update(self, fd):
+-        header_bytes = self.header_length
+-
+-        self.update_extensions(fd)
+-
+-        fd.seek(0)
+-        header = tuple(self.__dict__[f] for t, p, f in QcowHeader.fields)
+-        buf = struct.pack(QcowHeader.fmt, *header)
+-        buf = buf[0:header_bytes-1]
+-        fd.write(buf)
+-
+-    def dump(self):
+-        for f in QcowHeader.fields:
+-            value = self.__dict__[f[2]]
 -            if f[1] == 'mask':
 -                bits = []
 -                for bit in range(64):
@@ -185,26 +292,211 @@ index 898d388b8a..74a82f9263 100644
 -                        bits.append(bit)
 -                value_str = str(bits)
 -            else:
-+            if isinstance(f[1], str):
-                 value_str = f[1].format(value)
+-                value_str = f[1] % value
+-
+-            print("%-25s" % f[2], value_str)
+-        print("")
+-
+-    def dump_extensions(self):
+-        for ex in self.extensions:
+-
+-            data = ex.data[:ex.length]
+-            if all(c in string.printable.encode('ascii') for c in data):
+-                data = "'%s'" % data.decode('ascii')
+-            else:
+-                data = "<binary>"
+ 
+-            print("Header extension:")
+-            print("%-25s %#x" % ("magic", ex.magic))
+-            print("%-25s %d" % ("length", ex.length))
+-            print("%-25s %s" % ("data", data))
+-            print("")
++from qcow2_format import (
++    QcowHeader,
++    QcowHeaderExtension
++)
+ 
+ 
+ def cmd_dump_header(fd):
+diff --git a/tests/qemu-iotests/qcow2_format.py b/tests/qemu-iotests/qcow2_format.py
+new file mode 100644
+index 0000000000..0e517c1bbc
+--- /dev/null
++++ b/tests/qemu-iotests/qcow2_format.py
+@@ -0,0 +1,173 @@
++# Library for manipulations with qcow2 image
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
++
++import struct
++import string
++
++
++class QcowHeaderExtension:
++
++    def __init__(self, magic, length, data):
++        if length % 8 != 0:
++            padding = 8 - (length % 8)
++            data += b"\0" * padding
++
++        self.magic = magic
++        self.length = length
++        self.data = data
++
++    @classmethod
++    def create(cls, magic, data):
++        return QcowHeaderExtension(magic, len(data), data)
++
++
++class QcowHeader:
++
++    uint32_t = 'I'
++    uint64_t = 'Q'
++
++    fields = [
++        # Version 2 header fields
++        [uint32_t, '%#x',  'magic'],
++        [uint32_t, '%d',   'version'],
++        [uint64_t, '%#x',  'backing_file_offset'],
++        [uint32_t, '%#x',  'backing_file_size'],
++        [uint32_t, '%d',   'cluster_bits'],
++        [uint64_t, '%d',   'size'],
++        [uint32_t, '%d',   'crypt_method'],
++        [uint32_t, '%d',   'l1_size'],
++        [uint64_t, '%#x',  'l1_table_offset'],
++        [uint64_t, '%#x',  'refcount_table_offset'],
++        [uint32_t, '%d',   'refcount_table_clusters'],
++        [uint32_t, '%d',   'nb_snapshots'],
++        [uint64_t, '%#x',  'snapshot_offset'],
++
++        # Version 3 header fields
++        [uint64_t, 'mask', 'incompatible_features'],
++        [uint64_t, 'mask', 'compatible_features'],
++        [uint64_t, 'mask', 'autoclear_features'],
++        [uint32_t, '%d',   'refcount_order'],
++        [uint32_t, '%d',   'header_length'],
++    ]
++
++    fmt = '>' + ''.join(field[0] for field in fields)
++
++    def __init__(self, fd):
++
++        buf_size = struct.calcsize(QcowHeader.fmt)
++
++        fd.seek(0)
++        buf = fd.read(buf_size)
++
++        header = struct.unpack(QcowHeader.fmt, buf)
++        self.__dict__ = dict((field[2], header[i])
++                             for i, field in enumerate(QcowHeader.fields))
++
++        self.set_defaults()
++        self.cluster_size = 1 << self.cluster_bits
++
++        fd.seek(self.header_length)
++        self.load_extensions(fd)
++
++        if self.backing_file_offset:
++            fd.seek(self.backing_file_offset)
++            self.backing_file = fd.read(self.backing_file_size)
++        else:
++            self.backing_file = None
++
++    def set_defaults(self):
++        if self.version == 2:
++            self.incompatible_features = 0
++            self.compatible_features = 0
++            self.autoclear_features = 0
++            self.refcount_order = 4
++            self.header_length = 72
++
++    def load_extensions(self, fd):
++        self.extensions = []
++
++        if self.backing_file_offset != 0:
++            end = min(self.cluster_size, self.backing_file_offset)
++        else:
++            end = self.cluster_size
++
++        while fd.tell() < end:
++            (magic, length) = struct.unpack('>II', fd.read(8))
++            if magic == 0:
++                break
 +            else:
-+                value_str = str(f[1](value))
- 
-             print('{:<25} {}'.format(f[2], value_str))
- 
-@@ -117,9 +132,9 @@ class QcowHeader(Qcow2Struct):
-         ('u64', '{:#x}', 'snapshot_offset'),
- 
-         # Version 3 header fields
--        ('u64', 'mask', 'incompatible_features'),
--        ('u64', 'mask', 'compatible_features'),
--        ('u64', 'mask', 'autoclear_features'),
-+        ('u64', Flags64, 'incompatible_features'),
-+        ('u64', Flags64, 'compatible_features'),
-+        ('u64', Flags64, 'autoclear_features'),
-         ('u32', '{}', 'refcount_order'),
-         ('u32', '{}', 'header_length'),
-     )
++                padded = (length + 7) & ~7
++                data = fd.read(padded)
++                self.extensions.append(QcowHeaderExtension(magic, length,
++                                                           data))
++
++    def update_extensions(self, fd):
++
++        fd.seek(self.header_length)
++        extensions = self.extensions
++        extensions.append(QcowHeaderExtension(0, 0, b""))
++        for ex in extensions:
++            buf = struct.pack('>II', ex.magic, ex.length)
++            fd.write(buf)
++            fd.write(ex.data)
++
++        if self.backing_file is not None:
++            self.backing_file_offset = fd.tell()
++            fd.write(self.backing_file)
++
++        if fd.tell() > self.cluster_size:
++            raise Exception("I think I just broke the image...")
++
++    def update(self, fd):
++        header_bytes = self.header_length
++
++        self.update_extensions(fd)
++
++        fd.seek(0)
++        header = tuple(self.__dict__[f] for t, p, f in QcowHeader.fields)
++        buf = struct.pack(QcowHeader.fmt, *header)
++        buf = buf[0:header_bytes-1]
++        fd.write(buf)
++
++    def dump(self):
++        for f in QcowHeader.fields:
++            value = self.__dict__[f[2]]
++            if f[1] == 'mask':
++                bits = []
++                for bit in range(64):
++                    if value & (1 << bit):
++                        bits.append(bit)
++                value_str = str(bits)
++            else:
++                value_str = f[1] % value
++
++            print("%-25s" % f[2], value_str)
++        print("")
++
++    def dump_extensions(self):
++        for ex in self.extensions:
++
++            data = ex.data[:ex.length]
++            if all(c in string.printable.encode('ascii') for c in data):
++                data = "'%s'" % data.decode('ascii')
++            else:
++                data = "<binary>"
++
++            print("Header extension:")
++            print("%-25s %#x" % ("magic", ex.magic))
++            print("%-25s %d" % ("length", ex.length))
++            print("%-25s %s" % ("data", data))
++            print("")
 -- 
 2.21.0
 
