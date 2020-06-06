@@ -7,64 +7,64 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C63D4C433DF
-	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jun 2020 08:24:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7380BC433E0
+	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jun 2020 08:24:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8FF64207D0
-	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jun 2020 08:24:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 276C1207F9
+	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jun 2020 08:24:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="bnOD2L/D"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FF64207D0
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="RWTrPjMt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 276C1207F9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36178 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36662 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jhU8E-0005e9-Qi
-	for qemu-devel@archiver.kernel.org; Sat, 06 Jun 2020 04:24:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43636)
+	id 1jhU8L-0005rS-Fp
+	for qemu-devel@archiver.kernel.org; Sat, 06 Jun 2020 04:24:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43670)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jhU2L-0003GH-0G; Sat, 06 Jun 2020 04:18:41 -0400
-Received: from mail-db8eur05on2120.outbound.protection.outlook.com
- ([40.107.20.120]:7488 helo=EUR05-DB8-obe.outbound.protection.outlook.com)
+ id 1jhU2R-0003SK-8W; Sat, 06 Jun 2020 04:18:47 -0400
+Received: from mail-eopbgr80098.outbound.protection.outlook.com
+ ([40.107.8.98]:10318 helo=EUR04-VI1-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jhU2J-0000Zf-NW; Sat, 06 Jun 2020 04:18:40 -0400
+ id 1jhU2Q-0000aF-2K; Sat, 06 Jun 2020 04:18:46 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Cu8YYEQpwKBAik5L1XX6qe3t+CBYttk0WX/oe5IU4HnknBQBA54qwkciOcE9xzKiK977A1WWi/uhu2icqVRVQhY293zb/5WXVwnBUktX55tiLkSp36rCoYEK4aBL7yqo1d0xH0XUGGwNff0rxJEd/CbN7GmUBnxVKMssHJhUJCWpLUiETTgH+/Y5C+nHQhHUsnHRKkj0ujKmVDluclNhDfUd0DYfpWYCA6M+X/9l6yOaF8hblqva0BP1GLpKIxMrgzpmDeN/zJnKrxkDUFq3FLzMY/iloE263I9PXimQn1bIGWIVm5+9G8adkUqQcc9ELf4gZZEJrEiM8hGoh8i/YA==
+ b=PMI/g0iAc7BhgiLS2r5J5e+h0GIMua49hZyDF+pU4ADwP2C9w8fqcFqvTUa+CekRki3ZYa/R8lhtjiR87G+e12T6Ey4ZPf/GbjV6hy+6xGiePnds/aQTgCBajYGpduNYklxG1MQPgh7pfW7ky1BqRykCJBw3SL6wxrYnl1Tm+1zGrXze3pHd6pyhvxrM1NiOfF6yfz7DUvPmedrlCxnOnLxgV0t1CHyRfnl8sE/XtVylgX4CyiQNwYzSfxNeCgWa9PHqiYSmO/DemyTieAyhoxztwR15Zwmim0ax2xhMr6p468L7jBZOtMIPrVE/uqfPdnJ39IlQ+nXEIG+nY/oNuA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=07M5mSe0ynU1SWeUTUqfG3L6vjoa1fNC2Z6hlBZsuJQ=;
- b=ClfLOaiMBEXT+SRdm3ONpR51+kCwLLGkqEaVlpRAbcgasS/ljhsfQYc7D7qu3uvZPqtZoCurhCUYZ0CkyfwpjInzFE+9moh0F5UYCNnlycg1rEwFn13J+bJlIX7KhDyMPUERBlInRiSuRZedHhphJafuD93f9graIaLV8BeBGSkqNljyPVDenJquOlTVY9DrXHwDo1IcB0lEcWH0B5V6TB4FEmyF7c61FlgF5Fy4OIiX796oZjdpvgBdkP7+r4wxbHK/V+ZlOJZvZjY5YJhn0y+cbXyxi5KlWKD/ZkNEp7f4gCM8Kg21nSXYohfQdKmHw9LCX4lqQTFWl2htY0y2tA==
+ bh=nFqwTS+IEIF8fiGePnW8TJ+NGVw52lopBfxN1fYrXtY=;
+ b=WAo0+cscZZN7vIThmlqUmHi/BUZXWoefy1/VLctC3OHpra8wgl+/oqLLzFj97HnTLiwE00cUSmRBgDuNxBPpgmfYe5DmXHa37kzIabARe5NzvG9sU/GdnozKds2ts3KnBQYXeGhQ8tuohkXUuHp7+mgmE6zFp6oclFr7B4ZMJZ2gsmNEza7REKsNV8vUzSeFv12rUWDp8uUOnN3At4PIF3J1jTCkhtxBBuWJPlxYtlmhGvhcwIiq49NFot6sfgpO5D7CyAWLeNzg97yM3HfZG18UM/x5lg45+LQ5D5pjHTKg3d3CKxulI3WhdZB2AYP6y43hMUVA/MnZA1Envlb6bw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
  header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=07M5mSe0ynU1SWeUTUqfG3L6vjoa1fNC2Z6hlBZsuJQ=;
- b=bnOD2L/DzcG2Si0mYIPL5DABlKwcyVyb6J7z1IXeldmFmpWZw898ZQipJjAGfNrBt1e48lhmXr9BjhdV/avVOkqaGG8mqotIqN7sZR3Mxg/Ftf49wMK1kCySO/qaCkJM+3hlF6yQfTeC0DuXDKnR//hSM+K6D0LzlJDzwtWydtY=
+ bh=nFqwTS+IEIF8fiGePnW8TJ+NGVw52lopBfxN1fYrXtY=;
+ b=RWTrPjMtyb40GxybQ30vdg0X6LULDcDFBzpxTAW/2nMMgkPpalSnpG7lXWo4boAhelaEJMO6C8myTqBrxptxDxLnxPqnVOEkY4nD7B2O0+Q4twZkMCLOFT7pqAEb2yjLejmUT6x+UzTOsmMORH/K3m7N21hKrJz4gTiMvMY00k8=
 Authentication-Results: nongnu.org; dkim=none (message not signed)
  header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
 Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
  by AM7PR08MB5480.eurprd08.prod.outlook.com (2603:10a6:20b:de::11)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3066.18; Sat, 6 Jun
- 2020 08:18:28 +0000
+ 2020 08:18:31 +0000
 Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
  ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
  ([fe80::a408:2f0f:bc6c:d312%3]) with mapi id 15.20.3066.023; Sat, 6 Jun 2020
- 08:18:28 +0000
+ 08:18:31 +0000
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v5 07/13] qcow2_format.py: use strings to specify c-type of
- struct fields
-Date: Sat,  6 Jun 2020 11:18:00 +0300
-Message-Id: <20200606081806.23897-8-vsementsov@virtuozzo.com>
+Subject: [PATCH v5 12/13] qcow2: QcowHeaderExtension print names for extension
+ magics
+Date: Sat,  6 Jun 2020 11:18:05 +0300
+Message-Id: <20200606081806.23897-13-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20200606081806.23897-1-vsementsov@virtuozzo.com>
 References: <20200606081806.23897-1-vsementsov@virtuozzo.com>
@@ -78,37 +78,37 @@ X-MS-Exchange-MessageSentRepresentingType: 1
 Received: from kvm.sw.ru (185.215.60.130) by
  FR2P281CA0036.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10:14::23) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3066.18 via Frontend Transport; Sat, 6 Jun 2020 08:18:27 +0000
+ 15.20.3066.18 via Frontend Transport; Sat, 6 Jun 2020 08:18:30 +0000
 X-Mailer: git-send-email 2.21.0
 X-Originating-IP: [185.215.60.130]
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 4d1072a1-b7db-4bdb-bdb0-08d809f230c9
+X-MS-Office365-Filtering-Correlation-Id: b5c304ed-e996-42f6-b49e-08d809f232e8
 X-MS-TrafficTypeDiagnostic: AM7PR08MB5480:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM7PR08MB5480DA394758175C3B161179C1870@AM7PR08MB5480.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
+X-Microsoft-Antispam-PRVS: <AM7PR08MB5480561AE2C35930FA12CF2CC1870@AM7PR08MB5480.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:88;
 X-Forefront-PRVS: 04267075BD
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: +B9I6ndMHt2xJ9zkyeuC5c1wMi+J56liQSy4fDbrT51Y9IlbdFxSIQQoZaYa7aqJ4oCfVcLW+RE9pqDs/hCeInr4VdhbWcwNDynskEDzypEOguqt1wTKgRZMjRV3a9WTHJMakgOAZRRJjyu3S1XOJdVFYuVFrjNDN8wa1sPLELu5MqYbBCr96Ps9wLpv+NTthXoTw/SyHoM+cvKXNEdESTQUyNTgnm6hxBrtysYNOUS3hbZUYcxcoIyhSSjOF6tYNbRIKsoNpJ8z6m9vCilo6/pCd9pxtGwmZm4gFIjo0YdBmX6N9Lm+VhT2oR0C+ph0k/JnUPNwqMVNbYkGtR/jlg==
+X-Microsoft-Antispam-Message-Info: QbQnHcp6xwnny4mGS1oZ4eOP3JfQSHix0PEomjoo0XKPfOxJU0RMCIh03c2sslCWZmzNsG6avMnHVD6FlrGsqq8keDoit5b2WTaHbWKbaFS91KET8Sa1t/aMxdKXNRj1HkOf7z8q2qb9n69g23CixPdcmKtdh8VZx+VGyWLEoxG4HCa5YR4xG5gTLCS3TBwzYW/Ety4vPHLrDdYJ2O+RGEsW1MyoNfunomrLPfIS8N51ozIZ4vjUzsaSsXCFmrdUvVC4JMdU2qBvU7GBdzUGA1zYVXNyPSq2J1bbhyCS7rRI+D4P3ZRZJGgJ1aKIeqMnLelaq2GeapHwwiSw/147bw==
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
  SFTY:;
  SFS:(4636009)(136003)(366004)(39830400003)(376002)(346002)(396003)(107886003)(1076003)(4326008)(2906002)(36756003)(6512007)(66946007)(66556008)(66476007)(6486002)(5660300002)(83380400001)(478600001)(86362001)(2616005)(956004)(316002)(26005)(6506007)(52116002)(6666004)(8936002)(6916009)(16526019)(186003)(8676002);
  DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: HKZT4PHTyDmN6JqOiAfnzMuw0Vo2l9lFVa6fI0JrTctbirsf2HeFPOggHwNsABvvkWpHYQCFeL5EmQFRGI1gtIxxrR55Nr4J1yZxVF8U9nHnAR5cRRAWoJlF6dB+S5a3Zt1fRULipC/uJ1YPatgcx2UBawMrKTaSis6nN9R0+zcYdei27EymS2xMUj+uDGv66SWUJLO9IKzL0Cp2X9b8b/mXeUz12TxYa7T+LMKkPTOs0FZzJoyEBh4By1zCUd+y8jm3OdbOJ0KwfVTAIz3NEg9YmaFT9NP/NBdvmU7DbaBqjji4HmHYCCy2b1X+AiWHedyi7W7Y1WCA2H+Q9DbomkxdWrG+pZdiKiub0nAZgQbXbWdn4PjYRmcZVAT/h8TwomYHF4WT6+eps0iD8cVsAoimDw/qmGICATx4TibcYJG8lq1cMcuwIPCDCrVviYKsyQEvj54GStf3U4Bd5QDwAVoo7bx+uPdTaVtejGh5mwg=
+X-MS-Exchange-AntiSpam-MessageData: bghchejYWGjT0CnbTyPdVVHjQQeMLg8VLCC5cDmYkf2L0l7mAvW4Eio5P7watjGShTfzeaMjX4Za9zmGteY1PEFUj13TtYVrbspnwFZtUwDGwRmBxu3xAuEwymWP92o17f5sDFfP8oK4u50nNdV7ILzn8rmUXtpW7Do7MMAQmZYhO7ElS4R3IK+bPgF9QE/HrN56mr05A0Yf3oLiOlTUFhqrW4QMpGw/BFNThWtWFrA0FPO2VWYcGW0BZR1cE9+1nHmyNs9VMpOvRc/F4YHc1Uk6R5O/ZFFjikbxkOcfmLFrBhX6qmr+X49awTw7kExg2Ze8HJcsfFpGsu/2Be1MGFHtA3xkw3FXo8u3GYf+0dDBGJnCtDIvgQIG+2APDQlPZyMianeZZmsq/0VSHDTMUxQlRlvD6vPrg9H+Mo4cZcScCjWYCjnry9LePoZm+DjhEdd+rDdOjZD8D0ODMbT/BgsZ/E40d2OuQoNTIRmJfZY=
 X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4d1072a1-b7db-4bdb-bdb0-08d809f230c9
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jun 2020 08:18:27.9452 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: b5c304ed-e996-42f6-b49e-08d809f232e8
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jun 2020 08:18:31.5395 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 5D/drCMNMIUIpjARLI1WbYtBBit/1Ua5u5N2DC7Lrx/Z8TogMOWS25Yzq0sfpSict/7BXjU1ARcwZZROr24Duz8Ex85vqkXrv1zRt9EHLO0=
+X-MS-Exchange-CrossTenant-UserPrincipalName: 66OMLWeIpEg75X9Uzu21Ko4wG2+chWP/9/wFIJfGnbUneehMLsYZ+7hTvY3wxLFFG07dKKfL7n6jt4HWesFSgAEI8OgfiPQssO/K4iEO2Ak=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5480
-Received-SPF: pass client-ip=40.107.20.120;
+Received-SPF: pass client-ip=40.107.8.98;
  envelope-from=vsementsov@virtuozzo.com;
- helo=EUR05-DB8-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/06 04:18:29
+ helo=EUR04-VI1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/06 04:18:34
 X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
 X-Spam_score_int: -27
 X-Spam_score: -2.8
@@ -136,89 +136,228 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We are going to move field-parsing to super-class, this will be simpler
-with simple string specifiers instead of variables.
-
-For some reason, python doesn't allow the definition of ctypes variable
-in the class alongside fields: it would not be available then for use
-by the 'for' operator. Don't worry: ctypes will be moved to metaclass
-soon.
-
+Suggested-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 ---
- tests/qemu-iotests/qcow2_format.py | 50 +++++++++++++++++-------------
- 1 file changed, 28 insertions(+), 22 deletions(-)
+ tests/qemu-iotests/031.out         | 22 +++++++++++-----------
+ tests/qemu-iotests/036.out         |  4 ++--
+ tests/qemu-iotests/061.out         | 14 +++++++-------
+ tests/qemu-iotests/qcow2_format.py | 17 ++++++++++++++++-
+ 4 files changed, 36 insertions(+), 21 deletions(-)
 
+diff --git a/tests/qemu-iotests/031.out b/tests/qemu-iotests/031.out
+index 5a4beda6a2..4b21d6a9ba 100644
+--- a/tests/qemu-iotests/031.out
++++ b/tests/qemu-iotests/031.out
+@@ -25,7 +25,7 @@ refcount_order            4
+ header_length             72
+ 
+ Header extension:
+-magic                     0x12345678
++magic                     0x12345678 (<unknown>)
+ length                    31
+ data                      'This is a test header extension'
+ 
+@@ -53,7 +53,7 @@ refcount_order            4
+ header_length             72
+ 
+ Header extension:
+-magic                     0x12345678
++magic                     0x12345678 (<unknown>)
+ length                    31
+ data                      'This is a test header extension'
+ 
+@@ -81,12 +81,12 @@ refcount_order            4
+ header_length             72
+ 
+ Header extension:
+-magic                     0xe2792aca
++magic                     0xe2792aca (Backing format)
+ length                    11
+ data                      'host_device'
+ 
+ Header extension:
+-magic                     0x12345678
++magic                     0x12345678 (<unknown>)
+ length                    31
+ data                      'This is a test header extension'
+ 
+@@ -116,12 +116,12 @@ refcount_order            4
+ header_length             112
+ 
+ Header extension:
+-magic                     0x6803f857
++magic                     0x6803f857 (Feature table)
+ length                    336
+ data                      <binary>
+ 
+ Header extension:
+-magic                     0x12345678
++magic                     0x12345678 (<unknown>)
+ length                    31
+ data                      'This is a test header extension'
+ 
+@@ -149,12 +149,12 @@ refcount_order            4
+ header_length             112
+ 
+ Header extension:
+-magic                     0x6803f857
++magic                     0x6803f857 (Feature table)
+ length                    336
+ data                      <binary>
+ 
+ Header extension:
+-magic                     0x12345678
++magic                     0x12345678 (<unknown>)
+ length                    31
+ data                      'This is a test header extension'
+ 
+@@ -182,17 +182,17 @@ refcount_order            4
+ header_length             112
+ 
+ Header extension:
+-magic                     0xe2792aca
++magic                     0xe2792aca (Backing format)
+ length                    11
+ data                      'host_device'
+ 
+ Header extension:
+-magic                     0x6803f857
++magic                     0x6803f857 (Feature table)
+ length                    336
+ data                      <binary>
+ 
+ Header extension:
+-magic                     0x12345678
++magic                     0x12345678 (<unknown>)
+ length                    31
+ data                      'This is a test header extension'
+ 
+diff --git a/tests/qemu-iotests/036.out b/tests/qemu-iotests/036.out
+index e409acf60e..a9bed828e5 100644
+--- a/tests/qemu-iotests/036.out
++++ b/tests/qemu-iotests/036.out
+@@ -25,7 +25,7 @@ incompatible_features     []
+ compatible_features       []
+ autoclear_features        [63]
+ Header extension:
+-magic                     0x6803f857
++magic                     0x6803f857 (Feature table)
+ length                    336
+ data                      <binary>
+ 
+@@ -37,7 +37,7 @@ incompatible_features     []
+ compatible_features       []
+ autoclear_features        []
+ Header extension:
+-magic                     0x6803f857
++magic                     0x6803f857 (Feature table)
+ length                    336
+ data                      <binary>
+ 
+diff --git a/tests/qemu-iotests/061.out b/tests/qemu-iotests/061.out
+index a51ad1b5ba..2f03cf045c 100644
+--- a/tests/qemu-iotests/061.out
++++ b/tests/qemu-iotests/061.out
+@@ -25,7 +25,7 @@ refcount_order            4
+ header_length             112
+ 
+ Header extension:
+-magic                     0x6803f857
++magic                     0x6803f857 (Feature table)
+ length                    336
+ data                      <binary>
+ 
+@@ -83,7 +83,7 @@ refcount_order            4
+ header_length             112
+ 
+ Header extension:
+-magic                     0x6803f857
++magic                     0x6803f857 (Feature table)
+ length                    336
+ data                      <binary>
+ 
+@@ -139,7 +139,7 @@ refcount_order            4
+ header_length             112
+ 
+ Header extension:
+-magic                     0x6803f857
++magic                     0x6803f857 (Feature table)
+ length                    336
+ data                      <binary>
+ 
+@@ -194,7 +194,7 @@ refcount_order            4
+ header_length             112
+ 
+ Header extension:
+-magic                     0x6803f857
++magic                     0x6803f857 (Feature table)
+ length                    336
+ data                      <binary>
+ 
+@@ -263,7 +263,7 @@ refcount_order            4
+ header_length             112
+ 
+ Header extension:
+-magic                     0x6803f857
++magic                     0x6803f857 (Feature table)
+ length                    336
+ data                      <binary>
+ 
+@@ -325,7 +325,7 @@ refcount_order            4
+ header_length             112
+ 
+ Header extension:
+-magic                     0x6803f857
++magic                     0x6803f857 (Feature table)
+ length                    336
+ data                      <binary>
+ 
+@@ -354,7 +354,7 @@ refcount_order            4
+ header_length             112
+ 
+ Header extension:
+-magic                     0x6803f857
++magic                     0x6803f857 (Feature table)
+ length                    336
+ data                      <binary>
+ 
 diff --git a/tests/qemu-iotests/qcow2_format.py b/tests/qemu-iotests/qcow2_format.py
-index da66df3408..28f2bfa63b 100644
+index 32371e42da..40b5bf467b 100644
 --- a/tests/qemu-iotests/qcow2_format.py
 +++ b/tests/qemu-iotests/qcow2_format.py
-@@ -34,36 +34,42 @@ class QcowHeaderExtension:
-         return QcowHeaderExtension(magic, len(data), data)
+@@ -39,6 +39,12 @@ class Flags64(Qcow2Field):
+         return str(bits)
  
  
--class QcowHeader:
-+# Mapping from c types to python struct format
-+ctypes = {
-+    'u8': 'B',
-+    'u16': 'H',
-+    'u32': 'I',
-+    'u64': 'Q'
-+}
++class Enum(Qcow2Field):
 +
++    def __str__(self):
++        return f'{self.value:#x} ({self.mapping.get(self.value, "<unknown>")})'
++
++
+ class Qcow2StructMeta(type):
  
--    uint32_t = 'I'
--    uint64_t = 'Q'
-+class QcowHeader:
+     # Mapping from c types to python struct format
+@@ -99,8 +105,17 @@ class Qcow2Struct(metaclass=Qcow2StructMeta):
  
+ class QcowHeaderExtension(Qcow2Struct):
+ 
++    class Magic(Enum):
++        mapping = {
++            0xe2792aca: 'Backing format',
++            0x6803f857: 'Feature table',
++            0x0537be77: 'Crypto header',
++            0x23852875: 'Bitmaps',
++            0x44415441: 'Data file'
++        }
++
      fields = (
-         # Version 2 header fields
--        (uint32_t, '{:#x}', 'magic'),
--        (uint32_t, '{}', 'version'),
--        (uint64_t, '{:#x}', 'backing_file_offset'),
--        (uint32_t, '{:#x}', 'backing_file_size'),
--        (uint32_t, '{}', 'cluster_bits'),
--        (uint64_t, '{}', 'size'),
--        (uint32_t, '{}', 'crypt_method'),
--        (uint32_t, '{}', 'l1_size'),
--        (uint64_t, '{:#x}', 'l1_table_offset'),
--        (uint64_t, '{:#x}', 'refcount_table_offset'),
--        (uint32_t, '{}', 'refcount_table_clusters'),
--        (uint32_t, '{}', 'nb_snapshots'),
--        (uint64_t, '{:#x}', 'snapshot_offset'),
-+        ('u32', '{:#x}', 'magic'),
-+        ('u32', '{}', 'version'),
-+        ('u64', '{:#x}', 'backing_file_offset'),
-+        ('u32', '{:#x}', 'backing_file_size'),
-+        ('u32', '{}', 'cluster_bits'),
-+        ('u64', '{}', 'size'),
-+        ('u32', '{}', 'crypt_method'),
-+        ('u32', '{}', 'l1_size'),
-+        ('u64', '{:#x}', 'l1_table_offset'),
-+        ('u64', '{:#x}', 'refcount_table_offset'),
-+        ('u32', '{}', 'refcount_table_clusters'),
-+        ('u32', '{}', 'nb_snapshots'),
-+        ('u64', '{:#x}', 'snapshot_offset'),
- 
-         # Version 3 header fields
--        (uint64_t, 'mask', 'incompatible_features'),
--        (uint64_t, 'mask', 'compatible_features'),
--        (uint64_t, 'mask', 'autoclear_features'),
--        (uint32_t, '{}', 'refcount_order'),
--        (uint32_t, '{}', 'header_length'),
-+        ('u64', 'mask', 'incompatible_features'),
-+        ('u64', 'mask', 'compatible_features'),
-+        ('u64', 'mask', 'autoclear_features'),
-+        ('u32', '{}', 'refcount_order'),
-+        ('u32', '{}', 'header_length'),
-     )
- 
--    fmt = '>' + ''.join(field[0] for field in fields)
-+    fmt = '>' + ''.join(ctypes[f[0]] for f in fields)
- 
-     def __init__(self, fd):
- 
+-        ('u32', '{:#x}', 'magic'),
++        ('u32', Magic, 'magic'),
+         ('u32', '{}', 'length')
+         # length bytes of data follows
+         # then padding to next multiply of 8
 -- 
 2.21.0
 
