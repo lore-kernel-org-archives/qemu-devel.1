@@ -6,41 +6,41 @@ X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10968C433DF
-	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jun 2020 19:31:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 415EEC433E0
+	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jun 2020 19:32:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DAC642067B
-	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jun 2020 19:31:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DAC642067B
+	by mail.kernel.org (Postfix) with ESMTPS id 103F02067B
+	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jun 2020 19:32:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 103F02067B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55422 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58024 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jheXY-0006EG-67
-	for qemu-devel@archiver.kernel.org; Sat, 06 Jun 2020 15:31:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41280)
+	id 1jheYp-0007OQ-AW
+	for qemu-devel@archiver.kernel.org; Sat, 06 Jun 2020 15:32:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41284)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jheP8-0007QJ-Ie
+ id 1jheP8-0007QV-MF
  for qemu-devel@nongnu.org; Sat, 06 Jun 2020 15:22:54 -0400
-Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:30178)
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:30184)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jheP6-0006Gy-Mq
+ id 1jheP7-0006Gz-AV
  for qemu-devel@nongnu.org; Sat, 06 Jun 2020 15:22:54 -0400
 Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id EFEFE748DD0;
- Sat,  6 Jun 2020 21:22:42 +0200 (CEST)
+ by localhost (Postfix) with SMTP id 02789748DD1;
+ Sat,  6 Jun 2020 21:22:43 +0200 (CEST)
 Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id 773C7746333; Sat,  6 Jun 2020 21:22:42 +0200 (CEST)
-Message-Id: <acb431de2d9c7a497d54a548dfc7592eb2b9fe1c.1591471056.git.balaton@eik.bme.hu>
+ id 7DBD2746331; Sat,  6 Jun 2020 21:22:42 +0200 (CEST)
+Message-Id: <7a818701887a77af17995aa062b37f92ffc3d2eb.1591471056.git.balaton@eik.bme.hu>
 In-Reply-To: <cover.1591471056.git.balaton@eik.bme.hu>
 References: <cover.1591471056.git.balaton@eik.bme.hu>
 From: BALATON Zoltan <balaton@eik.bme.hu>
-Subject: [PATCH 1/4] sm501: Fix bounds checks
+Subject: [PATCH 2/4] sm501: Drop unneded variable
 Date: Sat, 06 Jun 2020 21:17:36 +0200
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -75,41 +75,42 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We don't need to add width to pitch when calculating last point, that
-would reject valid ops within the card's local_mem.
+We don't need a separate variable to keep track if we allocated memory
+that needs to be freed as we can test the pointer itself.
 
-Fixes: b15a22bbcbe6a78dc3d88fe3134985e4cdd87de4
 Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 ---
- hw/display/sm501.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ hw/display/sm501.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
 diff --git a/hw/display/sm501.c b/hw/display/sm501.c
-index edd8d24a76..5ae320ddc3 100644
+index 5ae320ddc3..85d54b598f 100644
 --- a/hw/display/sm501.c
 +++ b/hw/display/sm501.c
-@@ -723,8 +723,8 @@ static void sm501_2d_operation(SM501State *s)
-         dst_y -= height - 1;
-     }
+@@ -796,13 +796,12 @@ static void sm501_2d_operation(SM501State *s)
+             de = db + width + height * (width + dst_pitch);
+             if (rtl && ((db >= sb && db <= se) || (de >= sb && de <= se))) {
+                 /* regions may overlap: copy via temporary */
+-                int free_buf = 0, llb = width * (1 << format);
++                int llb = width * (1 << format);
+                 int tmp_stride = DIV_ROUND_UP(llb, sizeof(uint32_t));
+                 uint32_t *tmp = tmp_buf;
  
--    if (dst_base >= get_local_mem_size(s) || dst_base +
--        (dst_x + width + (dst_y + height) * (dst_pitch + width)) *
-+    if (dst_base >= get_local_mem_size(s) ||
-+        dst_base + (dst_x + width + (dst_y + height) * dst_pitch) *
-         (1 << format) >= get_local_mem_size(s)) {
-         qemu_log_mask(LOG_GUEST_ERROR, "sm501: 2D op dest is outside vram.\n");
-         return;
-@@ -749,8 +749,8 @@ static void sm501_2d_operation(SM501State *s)
-             src_y -= height - 1;
-         }
- 
--        if (src_base >= get_local_mem_size(s) || src_base +
--            (src_x + width + (src_y + height) * (src_pitch + width)) *
-+        if (src_base >= get_local_mem_size(s) ||
-+            src_base + (src_x + width + (src_y + height) * src_pitch) *
-             (1 << format) >= get_local_mem_size(s)) {
-             qemu_log_mask(LOG_GUEST_ERROR,
-                           "sm501: 2D op src is outside vram.\n");
+                 if (tmp_stride * sizeof(uint32_t) * height > sizeof(tmp_buf)) {
+                     tmp = g_malloc(tmp_stride * sizeof(uint32_t) * height);
+-                    free_buf = 1;
+                 }
+                 pixman_blt((uint32_t *)&s->local_mem[src_base], tmp,
+                            src_pitch * (1 << format) / sizeof(uint32_t),
+@@ -813,7 +812,7 @@ static void sm501_2d_operation(SM501State *s)
+                            dst_pitch * (1 << format) / sizeof(uint32_t),
+                            8 * (1 << format), 8 * (1 << format),
+                            0, 0, dst_x, dst_y, width, height);
+-                if (free_buf) {
++                if (tmp != tmp_buf) {
+                     g_free(tmp);
+                 }
+             } else {
 -- 
 2.21.3
 
