@@ -2,98 +2,92 @@ Return-Path: <SRS0=faK4=7T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9772C433E0
-	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jun 2020 12:03:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE47CC433DF
+	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jun 2020 12:39:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 75403206DC
-	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jun 2020 12:03:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A1509206DC
+	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jun 2020 12:39:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mrd0D6sp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 75403206DC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="k8omzr/o"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1509206DC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38588 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46900 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jhXXj-0000xF-FU
-	for qemu-devel@archiver.kernel.org; Sat, 06 Jun 2020 08:03:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33624)
+	id 1jhY71-0007bY-Sw
+	for qemu-devel@archiver.kernel.org; Sat, 06 Jun 2020 08:39:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36064)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <marek.vasut@gmail.com>)
- id 1jhXWh-0000VE-So
- for qemu-devel@nongnu.org; Sat, 06 Jun 2020 08:02:15 -0400
-Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:44007)
+ (Exim 4.90_1) (envelope-from <sameid@google.com>) id 1jhY5v-00075q-DT
+ for qemu-devel@nongnu.org; Sat, 06 Jun 2020 08:38:39 -0400
+Received: from mail-qv1-xf44.google.com ([2607:f8b0:4864:20::f44]:35487)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <marek.vasut@gmail.com>)
- id 1jhXWg-0004N1-PL
- for qemu-devel@nongnu.org; Sat, 06 Jun 2020 08:02:15 -0400
-Received: by mail-ed1-x544.google.com with SMTP id g9so9525260edw.10
- for <qemu-devel@nongnu.org>; Sat, 06 Jun 2020 05:02:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=subject:from:to:cc:references:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=hVF6bfOQKVQHb+FfEXZWRyYZagtDNpg0Iw1gAoc+2lM=;
- b=Mrd0D6spNkJfkbNOZhWfEB8b0P4phTTjJJkrpAgNcfcZGiMlcRue8vf7qyF7/XHol5
- 2GokcX2EtEjIOQf1brRsc7lFXV30UOIVFYbd5yaPdDLL5rS6SSJymvFgN4deRwvN2/Na
- 0PeQhMzUcvYIPY5GlQ5nAJSL2S2IUYSS5FQZ4dAIgatBwUWTUwVxqw8NhXqBOpFMgsFO
- ur/5gZcoIBm/TUBDRyq6D7itZkVmVRGeqeLUDo8MwNfKoQGKbaDV/4hS7a8/JvvYrCcD
- C+QHX8wYcsKQc5uYT69kX6kNqqs3ncYD1dh6Sd1qj2ZCQc14KIArZ0XZDEoeoo4JKqVk
- 6IUA==
+ (Exim 4.90_1) (envelope-from <sameid@google.com>) id 1jhY5u-0001CR-0G
+ for qemu-devel@nongnu.org; Sat, 06 Jun 2020 08:38:39 -0400
+Received: by mail-qv1-xf44.google.com with SMTP id j7so6118988qvp.2
+ for <qemu-devel@nongnu.org>; Sat, 06 Jun 2020 05:38:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=PFstviHirXSBopAWpw5abR/A0+6XMKUCKhz/PuENjnI=;
+ b=k8omzr/o25WO1GL8CVqNKtRZMxs7eYNAkcDADs2HsNgP1SJw9saOEencoRh+gHCQr9
+ zQIGZwmF/KEgRAk1IjNUsjR7dzKTjpGW6+DkhVCpeVj8taq1IzcKbsYWhzCbpin5AmJY
+ 7Hz2S09+YA0MGNlYAP7jOZ3SPR1TUt6uphGEf70H+LMtMd8AzpgzAGQD0iUdLWLqHDBU
+ 7Rj0fxZmr1ikwlQDu8IaVo8BasvGUOuzqti0xuBvVLXnV2hCidcC/VJWNddbcDQKmfbC
+ 1XlCM9Db1ZYKifY1B+KEpnvrH4rvLxoFCGZwGS/bYsQi1dO0SwdySqx5wAeUmOZ3A+XE
+ y9rQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:from:to:cc:references:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=hVF6bfOQKVQHb+FfEXZWRyYZagtDNpg0Iw1gAoc+2lM=;
- b=DusAgpN1kE05B5AOzIYLMpiQwzlVFMC/u1nlA0yyeg4izmHAM2i7RoTngOt8BLNps6
- 2qVeMkG0BMZjZUgU6M6bC4SgKtEi410PnDBunUidFPHdGMNO6CimzDdKekwliaIibCLo
- 1SkqfFHc3m7Z/zmwnnK3vlLM8wLc/O/A7OT0Q7BoWWNbfDPyvHA3BHWEL9vzMOuuPLDY
- xOJSyqvvUOTiVgOpreUKa6pdn+rfn5uHLrenXaWtanE+gvyGJVS6IsDgog2EfKnmHiAL
- 0uBnx5s3EGWIDPH/rbT/5P4UIG/hTqwDfmEiL9cQqJ6kV5YCWneilIMpIVz5krt7rzfW
- FD5Q==
-X-Gm-Message-State: AOAM53230JqAXuqH/R93qPxsEX9cS9BFFrWzL0RBXxdkP7BFB27ZtWIm
- 0x0Ch5mJuJBFzGOPDvckP9k=
-X-Google-Smtp-Source: ABdhPJxqnzGmB1kXFVMLOx/iWmxPrXtT6I+QfXlTH4CeimxPZX1nAp3DjPrEwMwrOmVUzgpwaiIPPw==
-X-Received: by 2002:a05:6402:228d:: with SMTP id
- cw13mr14376952edb.150.1591444932506; 
- Sat, 06 Jun 2020 05:02:12 -0700 (PDT)
-Received: from [192.168.1.4] (ip-86-49-35-8.net.upcbroadband.cz. [86.49.35.8])
- by smtp.gmail.com with ESMTPSA id
- a8sm7056290edb.29.2020.06.06.05.02.11
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 06 Jun 2020 05:02:11 -0700 (PDT)
-Subject: Re: [PATCH] net: tulip: Set PCI revision to match dec21143
-From: Marek Vasut <marek.vasut@gmail.com>
-To: qemu-devel@nongnu.org
-References: <20200418002552.343480-1-marek.vasut+renesas@gmail.com>
-Message-ID: <1b3ba4cf-d18a-08f8-b1b7-742434511c3f@gmail.com>
-Date: Sat, 6 Jun 2020 14:02:11 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=PFstviHirXSBopAWpw5abR/A0+6XMKUCKhz/PuENjnI=;
+ b=mUngez2XBsZ4nAmQTmApr9iU+AAvOo3XTjqRDQEGbszxklOQ0YsdytqY5K6b8aFL+r
+ 29M6RXG4nIIRlmmZrYNOT+JjVpvnG/0R7HN7cKNdratejr0NO9P55zIoGH7ys9vI0m1T
+ n/P7aSjts0aNHsD3j7dQ/h767bEtJLyOPNJYw5lXPMXjxAbmr24QtjnjexqB3s6OEgqa
+ S3b0H9RzIO6dz1t23QDTxS1tQ+DHJKZO0/6lpDexgE368Se3t52uNmycaJ3AQ1FgPNqj
+ Vg5nHvIvJPBQjdlmRq6/H+HIPgGdO9yAgOx7KSBOljwh0ZkS3m7cAGdQZ8qfJ8m41Ic5
+ U0yQ==
+X-Gm-Message-State: AOAM530SaUI7qiu8OepBO5dhzPBwtIqbVNJjBDUyQYFlRYn9mRk5mHaQ
+ CqieLoO7gAPsMAPn3wd54gO1eoR15gqYr/ypYTDiWQ==
+X-Google-Smtp-Source: ABdhPJyLqsMGQrq6zf0EEi5T6ZKOS7DvcqJquTPn1WTraoZRpTecPXpGZj39J58BafAbC7SEfBBWfgfaoAm8fk4YSLE=
+X-Received: by 2002:ad4:556b:: with SMTP id w11mr13835394qvy.171.1591447115187; 
+ Sat, 06 Jun 2020 05:38:35 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200418002552.343480-1-marek.vasut+renesas@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::544;
- envelope-from=marek.vasut@gmail.com; helo=mail-ed1-x544.google.com
+References: <20200528101039.24600-7-thuth@redhat.com>
+ <20200606100632.26442-1-sameid@google.com>
+ <87mu5gct2j.fsf@linaro.org>
+In-Reply-To: <87mu5gct2j.fsf@linaro.org>
+From: Sam Eiderman <sameid@google.com>
+Date: Sat, 6 Jun 2020 15:38:24 +0300
+Message-ID: <CAFr6bUnBLLdBK3Pxohynp6vp7qykbb_tNwq5-V6zu8B-vUUb+w@mail.gmail.com>
+Subject: Re: gitlab-ci: Do not use the standard container images from gitlab
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: Thomas Huth <thuth@redhat.com>, crosa@redhat.com, 
+ Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, 
+ qemu-devel@nongnu.org, wainersm@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::f44;
+ envelope-from=sameid@google.com; helo=mail-qv1-xf44.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_score_int: -175
+X-Spam_score: -17.6
+X-Spam_bar: -----------------
+X-Spam_report: (-17.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ ENV_AND_HDR_SPF_MATCH=-0.5, RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001, USER_IN_DEF_DKIM_WL=-7.5,
+ USER_IN_DEF_SPF_WL=-7.5 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -106,31 +100,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Sven Schnelle <svens@stackframe.org>, Prasad J Pandit <pjp@fedoraproject.org>,
- Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/18/20 2:25 AM, Marek Vasut wrote:
-> The tulip driver claims to emulate dec21143 and it does not emulate dec21142.
-> The dec21142 and dec21143 can be discerned by the PCI revision register,
-> where dec21142 reports value < 0x20 and dec21143 value >= 0x20. E.g. the
-> U-Boot 'tulip' driver also only supports dec21143 and verifies that the
-> PCI revision ID is >= 0x20, otherwise refuses to operate such a card.
-> 
-> This patch sets the PCI revision ID to 0x20 to match the dec21143 and
-> thus also permits e.g. U-Boot to work with the tulip emulation.
-> 
-> Fixes: 34ea023d4b95 ("net: add tulip (dec21143) driver")
-> Signed-off-by: Marek Vasut <marek.vasut+renesas@gmail.com>
-> Cc: Marc-André Lureau <marcandre.lureau@redhat.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Cc: Prasad J Pandit <pjp@fedoraproject.org>
-> Cc: Sven Schnelle <svens@stackframe.org>
+Thanks for the link
 
-Bump, any news on this ? This is a bugfix.
+I do believe that the correct approach for me is to rename
+BITS_PER_LONG to __BITS_PER_LONG (I just added a sed command in my
+Dockerfile) and move on with my particular usage, however I am just
+wondering whether dropping debian10/ubuntu20 in the official qemu ci/
+pipeline until it's fixed is the correct approach instead of keep
+failing it until the error resolves, in a way we want to always know
+on which OSs the compilation fails for visibility, no?
+
+Thanks again!
+
+
+On Sat, Jun 6, 2020 at 2:49 PM Alex Benn=C3=A9e <alex.bennee@linaro.org> wr=
+ote:
+>
+>
+> Sam Eiderman <sameid@google.com> writes:
+>
+> > Hi,
+> >
+> > I am using debian 10 container to compile qemu too.
+> >
+> > I think that what happens here is that
+> >
+> >   /usr/include/linux/swab.h
+> >
+> > Uses BITS_PER_LONG instead of __BITS_PER_LONG which is actually defined=
+ before
+> > in qemu at:
+>
+> That is indeed the error - we are just waiting for Debian to update
+> linux-libc-dev with the fix to the kernel headers:
+>
+>   https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=3D960271
+>
+> >
+> >   include/qemu/bitops.h:#define BITS_PER_LONG           (sizeof (unsign=
+ed long) * BITS_PER_BYTE)
+> >
+> > which injects this definition into the linux swab.h header.
+> >
+> > By changing BITS_PER_LONG to __BITS_PER_LONG in the linux headers, I ma=
+naged to
+> > successfully compile qemu.
+> >
+> > A different approach would be to move the linux header includes
+> > (#include <linux/cdrom.h>) in file-posix.c above all other includes - w=
+hich in
+> > some way makes more sense (since we probaly don't want qemu defines to =
+control
+> > linux headers) but it requires a more complex refactoring.
+>
+>
+> --
+> Alex Benn=C3=A9e
 
