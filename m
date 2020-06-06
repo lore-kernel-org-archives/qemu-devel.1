@@ -2,99 +2,91 @@ Return-Path: <SRS0=faK4=7T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98ADAC433DF
-	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jun 2020 19:18:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78F63C433DF
+	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jun 2020 19:22:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6434B2053B
-	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jun 2020 19:18:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3C8032067B
+	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jun 2020 19:22:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RhzKT+d7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6434B2053B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="JSiLbTTI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C8032067B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59354 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36998 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jheKQ-0003gw-Nr
-	for qemu-devel@archiver.kernel.org; Sat, 06 Jun 2020 15:18:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40374)
+	id 1jheOP-0006R8-9k
+	for qemu-devel@archiver.kernel.org; Sat, 06 Jun 2020 15:22:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40696)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jheIh-0001ub-2H
- for qemu-devel@nongnu.org; Sat, 06 Jun 2020 15:16:15 -0400
-Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:39931)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jheIg-0005Im-81
- for qemu-devel@nongnu.org; Sat, 06 Jun 2020 15:16:14 -0400
-Received: by mail-pj1-x1041.google.com with SMTP id h95so4252007pje.4
- for <qemu-devel@nongnu.org>; Sat, 06 Jun 2020 12:16:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:references:from:message-id:date:user-agent:mime-version
- :in-reply-to:content-language:content-transfer-encoding;
- bh=NqJPQYE8AhKk57fEDe2SRR2597Zx4WalSrSESB9S/DA=;
- b=RhzKT+d7/V0Z9jw+HO3t2uwkaI0eKab7zhUQzAxMvCN8vtarkbBlEYEVG2x5NtQ+ZA
- OsFy0JRJVBFYgjVTv6br6drANNdOvrfSkHxcAqJdX5WubkwwGbvxyHKNRXlKMdVeiZYe
- 2e2Yl/oOcUS2LnJymdusF5GTyyD36daeyhxtsxZzZL5025xFsT0Au6oUc2ikS9Ex0Bdy
- LlWMiQ48BtmG+P/bWGfyDup5weBvcpBcOr3BFwStXkXnyV0p2rMh8VLsxmBLQfb8GfJ3
- b3BU4WUUYjM9pSv7Ge26uPcHaopfrgUSI2HlU1HBd221GgVksjw5A+VmNMsuZBTqHURS
- IXjQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=NqJPQYE8AhKk57fEDe2SRR2597Zx4WalSrSESB9S/DA=;
- b=DhVqkWyTfqVrqHcheq01LRUTM66cM7vQR25h8PGBfCd+Yq4rWAfF+oWnzoKrZ0OOY7
- UsGqlmNF/9tCjU4YW6cPT3rhTROvkMMwBD1cFcGcZFKtfXXPcdv8ojAwU80xqkjNYBcP
- fwCsb8Xbs2cruzs4Tr7ul03Ld/StEoU+ISAx6+jkrY+YkkPdXvXliM7xcU18TviyWCGX
- zAU5mQBlIDeS8unpRfEjWN8+URPlfShtHK6/6jaoTpxeCb6EuP2+fgNqM78GvxIWfKn/
- JXXb94wofNrpk0Qk4RhziF6lMe75Wu+iqm3QCm1hZJr5Sx/g5Zz/8xG6xe5SQV/gYF8h
- 5zew==
-X-Gm-Message-State: AOAM5323gZ/dA9TJGvwgT2mt8q8g4ITX5QUUjkFM+RSeB8qtCEhYZOLl
- ttL7QXd8Eo1vaOZ+rR4AuVoeKQ==
-X-Google-Smtp-Source: ABdhPJzwCwg7iV67pRS7OrD0cg79PFXngqHnGnvpdsEv/FRJMT9JS7O4qRrdtFaO5P+Zi+qNQPJnCQ==
-X-Received: by 2002:a17:90a:f688:: with SMTP id
- cl8mr9522129pjb.166.1591470972798; 
- Sat, 06 Jun 2020 12:16:12 -0700 (PDT)
-Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id x1sm2832316pfn.76.2020.06.06.12.16.11
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 06 Jun 2020 12:16:12 -0700 (PDT)
-Subject: Re: [PATCH 6/7] target/i386: reimplement fprem1 using floatx80
- operations
-To: Joseph Myers <joseph@codesourcery.com>, qemu-devel@nongnu.org,
- aurelien@aurel32.net, peter.maydell@linaro.org, alex.bennee@linaro.org,
- laurent@vivier.eu, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com
-References: <alpine.DEB.2.21.2006051857110.13777@digraph.polyomino.org.uk>
- <alpine.DEB.2.21.2006051901480.13777@digraph.polyomino.org.uk>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <07f1b77f-29dc-6698-3337-24392349d0c8@linaro.org>
-Date: Sat, 6 Jun 2020 12:16:10 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
+ id 1jheKf-00049p-SE
+ for qemu-devel@nongnu.org; Sat, 06 Jun 2020 15:18:17 -0400
+Received: from mout.web.de ([217.72.192.78]:37843)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
+ id 1jheKe-0005ZK-Ta
+ for qemu-devel@nongnu.org; Sat, 06 Jun 2020 15:18:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
+ s=dbaedf251592; t=1591471063;
+ bh=b5CLc7E0ETNwdxt6ukjNQqIWYxcIdK2wDTmbp7UeqFo=;
+ h=X-UI-Sender-Class:Date:From:To:Cc:Subject;
+ b=JSiLbTTIDm7WLNqXiO5kfVh1bP+nYtZmYMIqfQ1HTvo5wxPMwYgrNPb4XusnYlTTY
+ D9U0+zWx8f1h2/mXnTyAodAQEQL9aeJ0nfYilP+0FrxZbqCSzKqNcvda3cU/MGYv4P
+ uy5WOXanOU8PYiOSeIcYSxj/ur7eTi55CoZgUJcc=
+X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
+Received: from luklap ([87.123.206.73]) by smtp.web.de (mrweb105
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 1Mm9Va-1jH4wp0pWK-00iDZ3; Sat, 06
+ Jun 2020 21:17:43 +0200
+Date: Sat, 6 Jun 2020 21:17:32 +0200
+From: Lukas Straub <lukasstraub2@web.de>
+To: qemu-devel <qemu-devel@nongnu.org>
+Subject: [PATCH v2 0/7] colo: Introduce resource agent and test suite/CI
+Message-ID: <cover.1591456338.git.lukasstraub2@web.de>
 MIME-Version: 1.0
-In-Reply-To: <alpine.DEB.2.21.2006051901480.13777@digraph.polyomino.org.uk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1041;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1041.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+Content-Type: multipart/signed; boundary="Sig_/+fhpLNQ1ii_a.pX8CXQEElE";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+X-Provags-ID: V03:K1:IxtM9lrTmdoHj4BOAxjBDh+MMf1wDSkNthzYH7jQAgxGQWMmjVw
+ LvOk93QfcNcWMpskJ1avm6NZqXTTIwSgVt4qJ6uGVQYWGxPF9XycyKY+LPOj6ZaLpD3N086
+ jv7+YAR/9HCbC+MnBefIVy/kUvjFK5b6a34Tfr3qP4s3ciY3W3XG2dOVF/D8+VGm6cxq3UH
+ NVZjnCP8E0DxNnOXCdSQQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:EOBM1qmJ4Pc=:IznEOlOpJN4szU5QIcXWUL
+ 56jfIjjjIPPAiKBkcRAxU3shKDYBc1odtP20UKcZyaJTnZPsfduLNUbLzb7cPM3TBf+G+D+9m
+ koI0X5X9Tfx8Zb8aJcGahXqy7j9UwYAgq+9f0mqlEAOrRnuLgFQhJTQwTobEqMF9w6l/SGHTl
+ iFg0Frb55L7M//cw7PbUEILNH3WaNltOJxJTqsHBDKddncN4icRsANHjyf5jkxrD7TJPSUW3k
+ TAm+BIW19dKY7vVylhSFw4YCAPbscWGo2n2dSeIwpfjAA0WW8fYxJrOEbSjR0gBNlPY04ZhLN
+ SDnxuEvf2h3OuYeCptkHWLj7JYWNlCPpZ6JcyI9w7R5fa1+K7JdAUQIybDKskPur5NzE4kjT+
+ xrTaxIYZWBavWbXr5vYy/iMsHOIBmDJmp/VJxTK/PR8K3VA/tua+kHhhPL5MHsJqfmn0NymjX
+ 1Xk5zBoGyBniDB3YWa4gMrSGfE1rTYQVt24I5BxfzUt5j+8A42o3uITgKfTUcuLBm5bznVqYJ
+ Q64NCOdt0uuY8fS8P/gHPWLh7b/Ci2MCQmz+B8cE0DGc7ZUszLzeJt2rkXfxaIVRCQ/3XULCM
+ yeUExJBmxn1gZhZhic2nGozmzMgathNiV11L74fsuBHazD0Q+PO3i/5VkHZISi27y78gTOfBb
+ D0teJxDNPCydV0cnTnsU2le646GZCe1BQubGJUVpWwmVckGCJnZ3YG+NgMibB+smgHPbk0Qwn
+ oROXY3FkkQP1jra7nrR6IKWziVvbTXQs4oX5V5gLWFOnr48nODn34yGzi8X7Bt25XJvG2bxFp
+ 7vYtughz6cbQrL4SfMohoSQFsu1eoEsLM381uvDbRMgL61x/kPPrII5Mq3v3wITUro+zJLA+3
+ ijcG8DKFG3CM/ioLuOftT/xgUjA+AJwZUwQXdkOenuo45vsbeCCH6ra2bI/oetc8FER5vvfqI
+ rbS1xnN//uhWq7PglilGp9OkSsGrka8r2BiKyMDDqltOav9LvTGIU45skbVoM/9tbzPPkHw7C
+ QLw8HV+9OmrGz0fVQHcihHXOwwqlkY6A6O7WjDpd0BF4HkN8lW9YmbfKpE+8fT32aPDmllGIY
+ 3X2uRv0b5F3+nHQKym/6KGvRSEEFziyPo/Cr6J1nDqaMXIwzDqRVSR0iwLeO9cnR7mUroBj0j
+ 7CYZy3I/XNMRNUwZdZ2uy2eCWqw/v3JpPaC1UaSdpeBT8z08lvIg573DTN97A58MDhtX3zLwu
+ vr0Z5nsbH1/o2fd1H
+Received-SPF: pass client-ip=217.72.192.78; envelope-from=lukasstraub2@web.de;
+ helo=mout.web.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/06 15:18:15
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -24
+X-Spam_score: -2.5
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-Spam_report: (-2.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -108,25 +100,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Zhang Chen <chen.zhang@intel.com>,
+ Cleber Rosa <crosa@redhat.com>,
+ Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/5/20 12:02 PM, Joseph Myers wrote:
-> The x87 fprem1 emulation is currently based around conversion to
-> double, which is inherently unsuitable for a good emulation of any
-> floatx80 operation.  Reimplement using the soft-float floatx80
-> remainder operations.
-> 
-> Signed-off-by: Joseph Myers <joseph@codesourcery.com>
-> ---
->  target/i386/fpu_helper.c | 96 +++++++++++++++++++---------------------
->  1 file changed, 45 insertions(+), 51 deletions(-)
+--Sig_/+fhpLNQ1ii_a.pX8CXQEElE
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Hello Everyone,
+So here is v2. Patch 1 can already be merged independently of the others.
 
-I would merge patch 7 into this one; I don't see value in keeping them separate.
+Regards,
+Lukas Straub
+
+Changes:
+v2:
+ -use new yank api
+ -drop disk_size parameter
+ -introduce pick_qemu_util function and use it
+
+Overview:
+
+Hello Everyone,
+These patches introduce a resource agent for fully automatic management of =
+colo
+and a test suite building upon the resource agent to extensively test colo.
+
+Test suite features:
+-Tests failover with peer crashing and hanging and failover during checkpoi=
+nt
+-Tests network using ssh and iperf3
+-Quick test requires no special configuration
+-Network test for testing colo-compare
+-Stress test: failover all the time with network load
+
+Resource agent features:
+-Fully automatic management of colo
+-Handles many failures: hanging/crashing qemu, replication error, disk erro=
+r, ...
+-Recovers from hanging qemu by using the "yank" oob command
+-Tracks which node has up-to-date data
+-Works well in clusters with more than 2 nodes
+
+Run times on my laptop:
+Quick test: 200s
+Network test: 800s (tagged as slow)
+Stress test: 1300s (tagged as slow)
+
+The test suite needs access to a network bridge to properly test the networ=
+k,
+so some parameters need to be given to the test run. See
+tests/acceptance/colo.py for more information.
+
+I wonder how this integrates in existing CI infrastructure. Is there a comm=
+on
+CI for qemu where this can run or does every subsystem have to run their own
+CI?
+
+Regards,
+Lukas Straub
 
 
-r~
+Lukas Straub (7):
+  block/quorum.c: stable children names
+  avocado_qemu: Introduce pick_qemu_util to pick qemu utility binaries
+  boot_linux.py: Use pick_qemu_util
+  colo: Introduce resource agent
+  colo: Introduce high-level test suite
+  configure,Makefile: Install colo resource-agent
+  MAINTAINERS: Add myself as maintainer for COLO resource agent
+
+ MAINTAINERS                               |    6 +
+ Makefile                                  |    5 +
+ block/quorum.c                            |   20 +-
+ configure                                 |   10 +
+ scripts/colo-resource-agent/colo          | 1466 +++++++++++++++++++++
+ scripts/colo-resource-agent/crm_master    |   44 +
+ scripts/colo-resource-agent/crm_resource  |   12 +
+ tests/acceptance/avocado_qemu/__init__.py |   15 +
+ tests/acceptance/boot_linux.py            |   11 +-
+ tests/acceptance/colo.py                  |  677 ++++++++++
+ 10 files changed, 2251 insertions(+), 15 deletions(-)
+ create mode 100755 scripts/colo-resource-agent/colo
+ create mode 100755 scripts/colo-resource-agent/crm_master
+ create mode 100755 scripts/colo-resource-agent/crm_resource
+ create mode 100644 tests/acceptance/colo.py
+
+--
+2.20.1
+
+--Sig_/+fhpLNQ1ii_a.pX8CXQEElE
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl7b68wACgkQNasLKJxd
+sljzPA//ajofgsk+X808DLBslGh1tQb6/eNTeuunQeKD4aa+exP9J+N8uaxQHy8F
+LXgJD5oBaQN0Yw9WvmcyiuiGgZLfFZHb0Z7q1h7gqAgs9xD8vQZUfvQWwKQz6xMl
+ClMcDYYIjRcXcw50BElg9GIzO+PRmvf8DmgPiOsYEpAlqrOeTGR5AiAUNsGkJMMG
+06Fl/hN5WSHTU0bvPYrndUu3umR+tYvsoqZqnh09dCUVq+rDAHB1BEBhXys3U5sm
+HuTW6Zww+H8RVqR+RnTT/Zvxf10Vm9Hsleype4w4IawfgpG+WgnQ49BUj0kiZLXA
+NsZ+bJz2edWuLMA7geHiVMp9YGTm6CTfKK8RHdepGUKjoRrdiNOqadFEFst9K4jJ
+FUxdek2QdsAt9QRxvYzXJqlFjNKr6l6oyNcxQcahn2GW5BeZkg9b63DaqqWMGPjU
+3t7kTTxgdZrSSc9HzpkrEfZn/qHwEV5Jhr8uEhRJDdLX/s89jKaGAtLLNU/teG0q
+Pk9uplMq4OqNLdIW/n+6fkx0niIN94wzMPDkv52GMmWYS+RSETTWBKnMCiZzqJfe
+tv76SnJUsruYw0ainbN9pLmr+3ghQO/1ahAAM/TBUCmEo4zraetdOK0+QYX0FGa6
+s1M4XOr0fvYuvNat00oQkzyxS5vBmTnS1E2fQBsxbd/TzXd3pUg=
+=t6Qz
+-----END PGP SIGNATURE-----
+
+--Sig_/+fhpLNQ1ii_a.pX8CXQEElE--
 
