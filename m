@@ -2,117 +2,67 @@ Return-Path: <SRS0=faK4=7T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF3CBC433DF
-	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jun 2020 08:34:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 398A9C433DF
+	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jun 2020 08:47:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B40CC207D0
-	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jun 2020 08:34:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 016C3207F9
+	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jun 2020 08:47:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="wXcmoiBJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B40CC207D0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="YpAscJI4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 016C3207F9
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44424 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51258 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jhUHV-0001I7-27
-	for qemu-devel@archiver.kernel.org; Sat, 06 Jun 2020 04:34:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44840)
+	id 1jhUUP-0005Lg-Gl
+	for qemu-devel@archiver.kernel.org; Sat, 06 Jun 2020 04:47:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45620)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jhUGj-0000mO-1c; Sat, 06 Jun 2020 04:33:33 -0400
-Received: from mail-eopbgr70132.outbound.protection.outlook.com
- ([40.107.7.132]:33142 helo=EUR04-HE1-obe.outbound.protection.outlook.com)
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1jhUSs-0003hF-ES; Sat, 06 Jun 2020 04:46:06 -0400
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:46375 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jhUGg-00032q-M0; Sat, 06 Jun 2020 04:33:31 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=nDn7qHfXfkRvFqoeP2nVaT2LpO8iL1FWRycahr72A++MxEDELa1rixVN5QuWvB23WL3+yxW5jftAYzdiTkPmEejcPMpvNdRm0YXLm8KZCsCGg3OiCLb2wLHwR+jU3iyarz0/gAB3fu72HrCzyPLJ8O1sRdy1Zs22UN4n6vOFEL9dwxFGB7YyGe8F244NeLX6dv3q9R3iMVsQbkuW5wL6IFKIAmuES/t/s7NlOBekm4CFZHS5np+INuQPdsin0tH5knidzQC/7ECf6W4NI9wI2iv9qE+2ywv9uHjvYglkT/vhljmxG7sbH9UvYJswCKvEjTCUskxOhBcs6T+VV0PtxA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0KLx3IYZglnf8DFSVzWTGSx9hGu/9Tpkghsr1XZmQhs=;
- b=H8dUcSdWEQllh6tEOVwwvaSsDnilBVWL9tr8pxFgZPqx/CMU2x/O5mph2dqpU1BBWFz3MEls2h+UKtbgwUk1W7rEoW7eQ1X47/igGy14xv5hCtdaS09rGYHu7BdMqe+2gN9C1oH+t3YgbOyq5BQmHVSKntLa0pB+9rtJTeRj/zzfMvxmZMzHU5rOSoqCxoAxe+/VnB792brbqDSDSIPir9eHxv6KIpJyu7f8kNX9PfOrPuiwrpxgwEPubeFFpTK7fUK/3mr5cI/Q+EyKgfarNtKiL8/lGqVA55A/t5uYJNRB/TAR3ciB10UdZoI7Ittn8vm61B4JsoOUjwHm6r70IQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0KLx3IYZglnf8DFSVzWTGSx9hGu/9Tpkghsr1XZmQhs=;
- b=wXcmoiBJ7Ki5BPypQMO94c0SJoTr8JLA9khLOxVFXAWVGUgu+HXq5uklJHp9+EZl8YDNQepYR2ZSdrpRaJ7HMI99Lh/8mmXqDLVuWNPrca5QSwn+gJtYgPqcVrGcRTQW8KVtbhSKP4tTSY0Dki6CXcVW1MObG/U+3C8dKcNYfKw=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM7PR08MB5480.eurprd08.prod.outlook.com (2603:10a6:20b:de::11)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3066.18; Sat, 6 Jun
- 2020 08:18:22 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::a408:2f0f:bc6c:d312%3]) with mapi id 15.20.3066.023; Sat, 6 Jun 2020
- 08:18:22 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH v5 00/13] iotests: Dump QCOW2 dirty bitmaps metadata
-Date: Sat,  6 Jun 2020 11:17:53 +0300
-Message-Id: <20200606081806.23897-1-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.21.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: FR2P281CA0036.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:14::23) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1jhUSp-0005F3-Op; Sat, 06 Jun 2020 04:46:06 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 49fClj0HNYz9sSf; Sat,  6 Jun 2020 18:45:52 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1591433153;
+ bh=Sd1rxSYGaP/J1oZ2u/d2cFpFgkmQrMVEQoAFgYu76HU=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=YpAscJI43jEHPiq4ciauynv+Q5emKXaXV6ZFjtWi3vePEyjmZOZ/g5tYnNO/Kg88p
+ D/jhV+qnPMCZtin2mFPEfIPL/5RRyAtY96iVVWkDZIgz5IWrtmH+UlJ397hGAE8/oy
+ P35K7WaCEn+hhFeknkNhuXahEMd223UntiqSxOto=
+Date: Sat, 6 Jun 2020 18:45:45 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Greg Kurz <groug@kaod.org>
+Subject: Re: [RFC v2 00/18] Refactor configuration of guest memory protection
+Message-ID: <20200606084545.GM228651@umbus.fritz.box>
+References: <20200521034304.340040-1-david@gibson.dropbear.id.au>
+ <87tuzr5ts5.fsf@morokweng.localdomain>
+ <20200604064414.GI228651@umbus.fritz.box>
+ <20200604105228.2cb311d3@kaod.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from kvm.sw.ru (185.215.60.130) by
- FR2P281CA0036.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10:14::23) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3066.18 via Frontend Transport; Sat, 6 Jun 2020 08:18:22 +0000
-X-Mailer: git-send-email 2.21.0
-X-Originating-IP: [185.215.60.130]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 68196d7f-c47d-4fd7-cac7-08d809f22db6
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5480:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM7PR08MB54800FD0E8E2DBBC5790A2E0C1870@AM7PR08MB5480.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:72;
-X-Forefront-PRVS: 04267075BD
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: skdAXjRM1Kbrdas1JyCXU/Y2mXQD/zyPPeP3D065oz88yzmeN+b/FnoiHZLpcvczZE7i5XNz+kOa9c4+8QpW1kZeOQGvpFAI9hnP4wCavubRs58Bo2N3aCA3S6mYsRrICE2EUuzz8zAku2GvOz/A+VcWeAt6vURmn6R4Nx8Oa9CTfefsw5xIBvv5er2UGfxsPalNc018t0iNZRdXeNx/G8pCqGn8+5M4xmNn4lKfgW6MVkAQMRagokDzNTqMr7xaDvph9vQ2r7N1QIoZ223scEfWYlXX83uXDOZugU4wF6JRAG2Lahyn77SeUDFIKIiUHy0Ffq05T9HI7bhEDZ02272CwP/w5vulFyVk/ZD8S16HpK6ckW8PXo8jQlFHK/qbWDxOYrUw6mY0bRUNMW/0+GttOsuCYJYHa6WfVqKFey/jQ0RtAQbrTiYKUyozZDcZj6iZfmFGqWIJd5BlKrR93g==
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(136003)(366004)(39830400003)(376002)(346002)(396003)(107886003)(1076003)(4326008)(2906002)(36756003)(6512007)(966005)(66946007)(66556008)(66476007)(6486002)(5660300002)(83380400001)(478600001)(86362001)(2616005)(956004)(316002)(26005)(6506007)(52116002)(6666004)(8936002)(6916009)(16526019)(186003)(8676002)(14143004);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: ye3Q8tGtBCb4nDwdjt7LxUJMcEJERr/MHkQ+H9iMPSupIN2n5b2duJ41ngqqSsarkmZBVyO5eG1QkZ7OTGIjO24f98X2yK8J8UUNHnWf+gVxnmwJPqiaZGCBmNQnneRtMMEtFlSNenMdmMlkSL4D4H1T175Lc/PwVf59kQOf/C/QXeNbVqETw3w7TaVi4VYpjaaV820aCEZSQo2saUqnPkm201o2D12E7UykWwrsetNGhmgiVraN8zhbx7eq7VtRoEytFGDUsbWCj3D/thL2cU+ZMbO5ddbTSgZ6KCaPWl+P+aqna1QoYDD8EutEGDLhx12rWkI4Nwzyy5Eu+BEI5lJCE8qQBIM05DcwWdrgCIU0r8g0lagYB5x/bihGAof2FQMtxhX6Cbl5bCMtyFkenGPX3DUeuaXWx3CITefbmAoeyXSt4Kz5wPgJuNZgtVbXO75D0VLdejLhZM7RiyD6UqZk6EB3PbrgG9GbFWY6ZCGSaXD6yr7SEjFifoHkKevX
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 68196d7f-c47d-4fd7-cac7-08d809f22db6
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jun 2020 08:18:22.8128 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: DotxdXsGOkvJgRqMVx5TdeDDzmbYzTqdKfWzNirxG5E+gvV5jeUqC88NU6CA8uabxwdzs2iYWY+nLr0glDYLkRpBs+ioQI6s9oTT8oPP0A8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5480
-Received-SPF: pass client-ip=40.107.7.132;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR04-HE1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/06 04:33:27
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
-X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="egxrhndXibJAPJ54"
+Content-Disposition: inline
+In-Reply-To: <20200604105228.2cb311d3@kaod.org>
+Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
+ helo=ozlabs.org
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
  SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
@@ -127,74 +77,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, qemu-devel@nongnu.org,
- mreitz@redhat.com, andrey.shinkevich@virtuozzo.com, den@openvz.org
+Cc: pair@us.ibm.com, brijesh.singh@amd.com, frankja@linux.ibm.com,
+ kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, cohuck@redhat.com,
+ qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
+ dgilbert@redhat.com, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ mdroth@linux.vnet.ibm.com, Thiago Jung Bauermann <bauerman@linux.ibm.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi all!
 
-Here is my suggestion to substitute only first three patches :) of
-Andrey's [PATCH v3 0/6] iotests: Dump QCOW2 dirty bitmaps metadata
+--egxrhndXibJAPJ54
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-v5:
-01: - typo in commit message
-    - fix over-79 lines
-02: new, specify GPL license
-03: specify GPL license
-04-06: add Andrey's r-b
-07: - grammar in commit message
-    - add Andrey's r-b
-08: - add copyright
-    - note u8 and u16 in a comment
-    - add doc for __init__ of Qcow2Struct
-    - add Andrey's r-b
-09-10: add Andrey's r-b
-11: - note about current fd position in __init__ doc of
-      QcowHeaderExtension
-    - add Andrey's r-b
-12: - keep magic in hex
-    - use lower-case for magic constants
-13: add Andrey's r-b
+On Thu, Jun 04, 2020 at 11:08:21AM +0200, Greg Kurz wrote:
+> On Thu, 4 Jun 2020 16:44:14 +1000
+> David Gibson <david@gibson.dropbear.id.au> wrote:
+>=20
+> > On Thu, Jun 04, 2020 at 01:39:22AM -0300, Thiago Jung Bauermann wrote:
+> > >=20
+> > > Hello David,
+> > >=20
+> > > David Gibson <david@gibson.dropbear.id.au> writes:
+> > >=20
+> > > > A number of hardware platforms are implementing mechanisms whereby =
+the
+> > > > hypervisor does not have unfettered access to guest memory, in order
+> > > > to mitigate the security impact of a compromised hypervisor.
+> > > >
+> > > > AMD's SEV implements this with in-cpu memory encryption, and Intel =
+has
+> > > > its own memory encryption mechanism.  POWER has an upcoming mechani=
+sm
+> > > > to accomplish this in a different way, using a new memory protection
+> > > > level plus a small trusted ultravisor.  s390 also has a protected
+> > > > execution environment.
+> > > >
+> > > > The current code (committed or draft) for these features has each
+> > > > platform's version configured entirely differently.  That doesn't s=
+eem
+> > > > ideal for users, or particularly for management layers.
+> > > >
+> > > > AMD SEV introduces a notionally generic machine option
+> > > > "machine-encryption", but it doesn't actually cover any cases other
+> > > > than SEV.
+> > > >
+> > > > This series is a proposal to at least partially unify configuration
+> > > > for these mechanisms, by renaming and generalizing AMD's
+> > > > "memory-encryption" property.  It is replaced by a
+> > > > "guest-memory-protection" property pointing to a platform specific
+> > > > object which configures and manages the specific details.
+> > > >
+> > > > For now this series covers just AMD SEV and POWER PEF.  I'm hoping =
+it
+> > >=20
+> > > Thank you very much for this series! Using a machine property is a ni=
+ce
+> > > way of configuring this.
+> > >=20
+> > > >From an end-user perspective, `-M pseries,guest-memory-protection` in
+> > > the command line already expresses everything that QEMU needs to know,
+> > > so having to add `-object pef-guest,id=3Dpef0` seems a bit redundant.=
+ Is
+> > > it possible to make QEMU create the pef-guest object behind the scenes
+> > > when the guest-memory-protection property is specified?
+> > >=20
+> > > Regardless, I was able to successfuly launch POWER PEF guests using
+> > > these patches:
+> > >=20
+> > > Tested-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
+> > >=20
+> > > > can be extended to cover the Intel and s390 mechanisms as well,
+> > > > though.
+> > > >
+> > > > Note: I'm using the term "guest memory protection" throughout to re=
+fer
+> > > > to mechanisms like this.  I don't particular like the term, it's bo=
+th
+> > > > long and not really precise.  If someone can think of a succinct way
+> > > > of saying "a means of protecting guest memory from a possibly
+> > > > compromised hypervisor", I'd be grateful for the suggestion.
+> > >=20
+> > > Is "opaque guest memory" any better? It's slightly shorter, and sligh=
+tly
+> > > more precise about what the main characteristic this guest property c=
+onveys.
+> >=20
+> > That's not a bad one, but for now I'm going with "host trust
+> > limitation", since this might end up covering things other than just
+> > memory protection.
+>=20
+> Any idea what these other things might be ? It seems a bit hard to
+> decide of a proper name without a broader picture at this point.
 
-Tags up-refactor-qcow2.py-v4 and up-refactor-qcow2.py-v4 may be found
-here: https://src.openvz.org/users/vsementsov/repos/qemu/browse
-(git remote: https://src.openvz.org/scm/~vsementsov/qemu.git)
+Well, at the very least there needs to be protection of the guest's
+register state from the hypervisor (which may be indirectly implied by
+protection of memory).
 
-Plan for continuation:
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-- add type hints
-- support compression_type field
-- dump more about bitmaps
+--egxrhndXibJAPJ54
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Vladimir Sementsov-Ogievskiy (13):
-  qcow2.py: python style fixes
-  qcow2.py: add licensing blurb
-  qcow2.py: move qcow2 format classes to separate module
-  qcow2_format.py: drop new line printing at end of dump()
-  qcow2_format.py: use tuples instead of lists for fields
-  qcow2_format.py: use modern string formatting
-  qcow2_format.py: use strings to specify c-type of struct fields
-  qcow2_format.py: separate generic functionality of structure classes
-  qcow2_format.py: add field-formatting class
-  qcow2_format.py: QcowHeaderExtension: add dump method
-  qcow2_format: refactor QcowHeaderExtension as a subclass of
-    Qcow2Struct
-  qcow2: QcowHeaderExtension print names for extension magics
-  qcow2_format.py: dump bitmaps header extension
+-----BEGIN PGP SIGNATURE-----
 
- tests/qemu-iotests/031.out         |  22 +--
- tests/qemu-iotests/036.out         |   4 +-
- tests/qemu-iotests/061.out         |  14 +-
- tests/qemu-iotests/291             |   4 +
- tests/qemu-iotests/291.out         |  33 ++++
- tests/qemu-iotests/qcow2.py        | 218 +++++-----------------
- tests/qemu-iotests/qcow2_format.py | 286 +++++++++++++++++++++++++++++
- 7 files changed, 393 insertions(+), 188 deletions(-)
- create mode 100644 tests/qemu-iotests/qcow2_format.py
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl7bV7kACgkQbDjKyiDZ
+s5LoOhAAzTkZg8vVkil2pKGjEcyQt9TxyqYc5VBTeUAd9jKS7wsD/03CgiFRu4iG
+fHf+0q0ric0CCUFs8U82v5mvAOZrcAmzGu1JgpPxa7qXWk/TBrd94jvTUgcX5lb9
+yJ4Mv5xLlFwaorVYywkKYP0Ry1VrQWQ0DbZ6T9wFTvjC49C0+quWb1IBJgyXR25j
+QZZV6RPGkW5WsEd/ixLXzNkU4DPIJlb8t+3RLe8EWCMZ1hExqTmHqsYMhzUJ3/or
+/DIyoLhrSyTQdIqIpgwH9BWJIK8/zpijho2wuVxzlh4EfGM6qLTVTapF1tW3OQBl
+QlPyYCl7wIOc0to+AuJgZgecm4f0m2JQdHj9h/hCrVgZr6SdLzfsCnhxnA1JaCkV
+j2cpyqNSeMcPr8ZHRAwsPZ4+DeP+fs1MBR/6cIzna8x1FUUekQP3xpHvAxYRjRUr
+iQ+i2BTf775684gk80bdbVf2JmhNt0DAdoSPtDQG0mkeDDNnvVexTeHY+DE7T0O4
+vjU8mjmhuWFnncOc2K6UpqE0iARBstto1QLgOdKM9jsPw2GzGyrNrbilDZrBciHY
+nvllZdfQlY9Rx8VTD625iMTSm/jKoEqu7VxeiyeyraZyqnBzTvIF7DWwJKRT8g+r
+75Uk6ebYh7TYPvKQOSa8bn4uqM2CYZJyu0LP73rQNIiJuoKGOyM=
+=0hIP
+-----END PGP SIGNATURE-----
 
--- 
-2.21.0
-
+--egxrhndXibJAPJ54--
 
