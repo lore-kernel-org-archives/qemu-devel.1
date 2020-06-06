@@ -2,72 +2,83 @@ Return-Path: <SRS0=faK4=7T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 528F5C433DF
-	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jun 2020 08:47:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61C96C433DF
+	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jun 2020 09:04:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1B6D4207F9
-	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jun 2020 08:47:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2B47120663
+	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jun 2020 09:04:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="AZlhhrLE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B6D4207F9
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LoB161Ck"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B47120663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51904 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60552 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jhUUY-0005ed-CQ
-	for qemu-devel@archiver.kernel.org; Sat, 06 Jun 2020 04:47:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45622)
+	id 1jhUkZ-00029f-Ci
+	for qemu-devel@archiver.kernel.org; Sat, 06 Jun 2020 05:04:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46766)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jhUSs-0003hN-PY; Sat, 06 Jun 2020 04:46:06 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:49283 helo=ozlabs.org)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jhUSq-0005F5-1X; Sat, 06 Jun 2020 04:46:06 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 49fClh3xm1z9sSc; Sat,  6 Jun 2020 18:45:52 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1591433152;
- bh=YoMdeniGBGn7TbfMONb8QyzbR+59Cq/gi2fKNL7nRBk=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=AZlhhrLEwdJSBK46arLMA0LpVtzngJJQ+Doq0U1Fz+A7y0PoSsylrPH7nEDkieKkS
- y3uxYbQKR17t4YdoDzNNzdl9JRYH8pTZAwX6Au9pB/spDiAkViWQ1uagufCwB643Zz
- skLebW6XgA2iVdVLqTKfWkzkKJTJDj5RyXFDCxjI=
-Date: Sat, 6 Jun 2020 18:24:58 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Thiago Jung Bauermann <bauerman@linux.ibm.com>
-Subject: Re: [RFC v2 00/18] Refactor configuration of guest memory protection
-Message-ID: <20200606082458.GK228651@umbus.fritz.box>
-References: <20200521034304.340040-1-david@gibson.dropbear.id.au>
- <87tuzr5ts5.fsf@morokweng.localdomain>
- <20200604062124.GG228651@umbus.fritz.box>
- <87r1uu1opr.fsf@morokweng.localdomain>
- <dc56f533-f095-c0c0-0fc6-d4c5af5e51a7@redhat.com>
- <87pnae1k99.fsf@morokweng.localdomain>
- <ec71a816-b9e6-6f06-def6-73eb5164b0cc@redhat.com>
- <87sgf9i8sy.fsf@morokweng.localdomain>
+ (Exim 4.90_1) (envelope-from <erik.lucas.smit@gmail.com>)
+ id 1jhUk1-0001eg-Es; Sat, 06 Jun 2020 05:03:49 -0400
+Received: from mail-oo1-xc42.google.com ([2607:f8b0:4864:20::c42]:33743)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <erik.lucas.smit@gmail.com>)
+ id 1jhUjz-0007mJ-1y; Sat, 06 Jun 2020 05:03:49 -0400
+Received: by mail-oo1-xc42.google.com with SMTP id v1so2508520ooh.0;
+ Sat, 06 Jun 2020 02:03:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:from:date:message-id:subject:to;
+ bh=aJSIM0Z9sIJMF9VtNRIinXv3BNbJBl+t4C0Ved9wjUM=;
+ b=LoB161Ckl5eZl+tD68AZB0uVF7VT36yVt9KAbcALvcj9seH+XY2cFkg3m492RKwM9k
+ XQViZUPcg2XuDlS+597g2o3maRzs892Ig7F0oWDmjZbSk6h4eN6qoPAUbdv+uPm4xNtu
+ boKrk1IvaiFf5nQ0WAUorvmkLCcEoDHt4nXSw0bOOf8i/m25rHpJ2tOC16mN+6Se8PMX
+ zX8Ta53vYwpPhHxv0go4bqcpvj1m67dcqdA67RkmSzvpcqd2ekE5xPEbQ67fJatckw8b
+ /0pOqhqEvXIL6/hXkfHYZjbMuhqElOw5N0G4vr/ajeXIW4N4d4sWuRWASd1zgx1C1ETv
+ RY3A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+ bh=aJSIM0Z9sIJMF9VtNRIinXv3BNbJBl+t4C0Ved9wjUM=;
+ b=ApegGi5JRdUOoHJdH6J5B00PNWtl/RfuLPLTtYUX7iYRU8/Tjx94j4pex2IYorDj3g
+ IL8yJBpbd50cxEl0L+wm9smwhM1oCcAG0LEfciIGhbOnWMNfhCezutX0W9DAAB6KFEVD
+ AX6MGhNRrMNTDMx4l7M70Q+xVswLRrnE4LJujkhjbIa+B7Ves1S/q6qbm+R/YHSHCZdn
+ pv7yLGyDt9IjDhC5k32CrPPXc4NMltDJ32T5wErGTE12kUze29sYN/EmDbH916+b4IYe
+ aSDcO3WBjBSBe/Y4DRB5QyE0KIqApgFsHdmCBqIGtWyBULaTfZPEm9/kq14bTjoNJqDQ
+ Dtlg==
+X-Gm-Message-State: AOAM530HhJUecduRtVPdiNj/89BAyVHbu1yLkUfJ8toIhazPPs6SNSBB
+ YyoRaPrQ/S1eUN9rCIT31fnHGzZ4ThBIbp2NNJ8=
+X-Google-Smtp-Source: ABdhPJzyxgqF6ExuOdkrtDA1K5q4sXqb7MFZ/q3V/OQOlS7kDFBdOQUDsAqlPqMTWio2fMYkBCfQjTcxLqMfPjWIIAg=
+X-Received: by 2002:a4a:5744:: with SMTP id u65mr10748812ooa.1.1591434224736; 
+ Sat, 06 Jun 2020 02:03:44 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="Cy+5HEalSgyXkpVS"
-Content-Disposition: inline
-In-Reply-To: <87sgf9i8sy.fsf@morokweng.localdomain>
-Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
- helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/06 04:45:54
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+From: Erik Smit <erik.lucas.smit@gmail.com>
+Date: Sat, 6 Jun 2020 11:03:34 +0200
+Message-ID: <CA+MHfovYq1UAQQ341MnyGas7ScskWyjR=QE0D-RS7+zxF2mtsw@mail.gmail.com>
+Subject: [PATCH v2] Implement configurable descriptor size in ftgmac100
+To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, 
+ Peter Maydell <peter.maydell@linaro.org>, Andrew Jeffery <andrew@aj.id.au>, 
+ Joel Stanley <joel@jms.id.au>, Jason Wang <jasowang@redhat.com>,
+ qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::c42;
+ envelope-from=erik.lucas.smit@gmail.com; helo=mail-oo1-xc42.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -81,88 +92,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pair@us.ibm.com, brijesh.singh@amd.com, frankja@linux.ibm.com,
- kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, cohuck@redhat.com,
- dgilbert@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
- mdroth@linux.vnet.ibm.com, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+The hardware supports configurable descriptor sizes, configured in the DBLAC
+register.
 
---Cy+5HEalSgyXkpVS
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Most drivers use the default 4 word descriptor, which is currently hardcoded,
+but Aspeed SDK configures 8 words to store extra data.
 
-On Fri, Jun 05, 2020 at 05:01:07PM -0300, Thiago Jung Bauermann wrote:
->=20
-> Paolo Bonzini <pbonzini@redhat.com> writes:
->=20
-> > On 05/06/20 01:30, Thiago Jung Bauermann wrote:
-> >> Paolo Bonzini <pbonzini@redhat.com> writes:
-> >>> On 04/06/20 23:54, Thiago Jung Bauermann wrote:
-> >>>> QEMU could always create a PEF object, and if the command line defin=
-es
-> >>>> one, it will correspond to it. And if the command line doesn't defin=
-e one,
-> >>>> then it would also work because the PEF object is already there.
-> >>>
-> >>> How would you start a non-protected VM?
-> >>> Currently it's the "-machine"
-> >>> property that decides that, and the argument requires an id
-> >>> corresponding to "-object".
-> >>
-> >> If there's only one object, there's no need to specify its id.
-> >
-> > This answers my question.  However, the property is defined for all
-> > machines (it's in the "machine" class), so if it takes the id for one
-> > machine it does so for all of them.
->=20
-> I don't understand much about QEMU internals, so perhaps it's not
-> practical to implement but from an end-user perspective I think this
-> logic can apply to all architectures (since my understanding is that all
-> of them use only one object): make the id optional. If it's not
-> specified, then there must be only one object, and the property will
-> implicitly refer to it.
->=20
-> Then, if an architecture doesn't need to specify parameters at object
-> creation time, it can be implicitly created and the user doesn't have to
-> worry about this detail.
+---
+The implementation of the driver in Supermicro BMC SMT_X11_158 adds 4 extra
+word entries:
+https://github.com/ya-mouse/openwrt-linux-aspeed/blob/master/drivers/net/ftgmac100_26.h#L387-L391
 
-Seems overly complicated to me.  We could just have it always take an
-ID, but for platforms with no extra configuration make the
-pre-fabricated object available under a well-known name.
+And sets DBLAC to 0x44f97:
+https://github.com/ya-mouse/openwrt-linux-aspeed/blob/master/drivers/net/ftgmac100_26.c#L449
 
-That's essentially the same as the way you can add a device to the
-"pci.0" bus without having to instantiate and name that bus yourself.
+There's not a lot of public documentation on this hardware, but the
+current linux driver shows the meaning of these registers:
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+https://github.com/torvalds/linux/blob/master/drivers/net/ethernet/faraday/ftgmac100.c#L280-L281
 
---Cy+5HEalSgyXkpVS
-Content-Type: application/pgp-signature; name="signature.asc"
+        iowrite32(FTGMAC100_DBLAC_RXDES_SIZE(2) |   /* 2*8 bytes RX descs */
+                  FTGMAC100_DBLAC_TXDES_SIZE(2) |   /* 2*8 bytes TX descs */
 
------BEGIN PGP SIGNATURE-----
+Without this patch, networking in SMT_X11_158 fails after the first packet.
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl7bUtcACgkQbDjKyiDZ
-s5KGWRAAx4ggMFCRE7+DfjUQOmDiAMZxpB19AEh1v3ohIYHDxx88pn0seVlvJqIx
-ujGOc891w1XcGHuw3Umye5OOB1KM+qgYFvMlBYkqj7IrRIcU87P8bVb8WKWuCSJc
-txUd2CYUHHWJpI8TRdKw/BzkflOF9NTQA51SFEzupj4mTpGDwnN9ZygS2Lxv+WbG
-CNz5MyU1fP5GA3hKBDhp6HN1CK0SPk85DPx4gRCSE7mj5BDA7kElB+dCwvvvAl18
-bD0UrVkpaENCNXLbPYTTRydi0OSF6NP6TWQ449dBHsjcOVOXhlwK+X5QtNYtFVzg
-k5xYV4Rluu4JsgNO3fZIleFcZn1145FWpEokUPwqnCVRPW84zeRI5AhHu8dTEL+v
-hgy/9cYZjPFWLBI8YPtdZxshUCFRHL0nNmPabxyO0xmg+kYaHuTasdS+nJMPSU/k
-c3hGWBCsEIGE19akQDCyd1/oFumZJyqZXPlDLoHMS4+lQSP8o30q8TZAKGGFr+2B
-FtjRYKIKltfAsapyXzHAIkEXy59anPnDMcFAG/xNh3P0WePC1p+CAjohfKK9oYG6
-TunO7a27yInF7NowUhfcAmtTyRyEXS57A0XVmrfLeW3gdsn+J+ts+H8PeM2Kb4vP
-ATwzQEghKh235o5aAQygw7QNi94VbS1mPHWa/kLnVHvxmFmKxcY=
-=1I5c
------END PGP SIGNATURE-----
+changes since previous version:
 
---Cy+5HEalSgyXkpVS--
+- moved "* 8" into {R,T}XDES_SIZE macro
+- removed the RXFIFO and RX_THR_EN defines as they're AST2400-only and not used
+- test setting of DBLAC register for validness
+
+Signed-off-by: Erik Smit <erik.lucas.smit@gmail.com>
+---
+ hw/net/ftgmac100.c | 26 ++++++++++++++++++++++++--
+ 1 file changed, 24 insertions(+), 2 deletions(-)
+
+diff --git a/hw/net/ftgmac100.c b/hw/net/ftgmac100.c
+index 25ebee7ec2..83058497c4 100644
+--- a/hw/net/ftgmac100.c
++++ b/hw/net/ftgmac100.c
+@@ -79,6 +79,16 @@
+ #define FTGMAC100_APTC_TXPOLL_CNT(x)        (((x) >> 8) & 0xf)
+ #define FTGMAC100_APTC_TXPOLL_TIME_SEL      (1 << 12)
+
++/*
++ * DMA burst length and arbitration control register
++ */
++#define FTGMAC100_DBLAC_RXBURST_SIZE(x)     (((x) >> 8) & 0x3)
++#define FTGMAC100_DBLAC_TXBURST_SIZE(x)     (((x) >> 10) & 0x3)
++#define FTGMAC100_DBLAC_RXDES_SIZE(x)       ((((x) >> 12) & 0xf) * 8)
++#define FTGMAC100_DBLAC_TXDES_SIZE(x)       ((((x) >> 16) & 0xf) * 8)
++#define FTGMAC100_DBLAC_IFG_CNT(x)          (((x) >> 20) & 0x7)
++#define FTGMAC100_DBLAC_IFG_INC             (1 << 23)
++
+ /*
+  * PHY control register
+  */
+@@ -553,7 +563,7 @@ static void ftgmac100_do_tx(FTGMAC100State *s,
+uint32_t tx_ring,
+         if (bd.des0 & s->txdes0_edotr) {
+             addr = tx_ring;
+         } else {
+-            addr += sizeof(FTGMAC100Desc);
++            addr += (FTGMAC100_DBLAC_TXDES_SIZE(s->dblac));
+         }
+     }
+
+@@ -800,6 +810,18 @@ static void ftgmac100_write(void *opaque, hwaddr addr,
+         s->phydata = value & 0xffff;
+         break;
+     case FTGMAC100_DBLAC: /* DMA Burst Length and Arbitration Control */
++        if (FTGMAC100_DBLAC_TXDES_SIZE(s->dblac) < sizeof(FTGMAC100Desc)) {
++            qemu_log_mask(LOG_GUEST_ERROR,
++                          "%s: transmit descriptor too small : %d bytes\n",
++                          __func__, FTGMAC100_DBLAC_TXDES_SIZE(s->dblac));
++            break;
++        }
++        if (FTGMAC100_DBLAC_RXDES_SIZE(s->dblac) < sizeof(FTGMAC100Desc)) {
++            qemu_log_mask(LOG_GUEST_ERROR,
++                          "%s: receive descriptor too small : %d bytes\n",
++                          __func__, FTGMAC100_DBLAC_RXDES_SIZE(s->dblac));
++            break;
++        }
+         s->dblac = value;
+         break;
+     case FTGMAC100_REVR:  /* Feature Register */
+@@ -982,7 +1004,7 @@ static ssize_t ftgmac100_receive(NetClientState
+*nc, const uint8_t *buf,
+         if (bd.des0 & s->rxdes0_edorr) {
+             addr = s->rx_ring;
+         } else {
+-            addr += sizeof(FTGMAC100Desc);
++            addr += (FTGMAC100_DBLAC_RXDES_SIZE(s->dblac));
+         }
+     }
+     s->rx_descriptor = addr;
+--
+2.25.1
 
