@@ -2,72 +2,92 @@ Return-Path: <SRS0=Pynu=7U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BFA9C433E0
-	for <qemu-devel@archiver.kernel.org>; Sun,  7 Jun 2020 20:29:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4050C433DF
+	for <qemu-devel@archiver.kernel.org>; Sun,  7 Jun 2020 21:12:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 333592075A
-	for <qemu-devel@archiver.kernel.org>; Sun,  7 Jun 2020 20:29:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 333592075A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 765592067B
+	for <qemu-devel@archiver.kernel.org>; Sun,  7 Jun 2020 21:12:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iGzwlNnP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 765592067B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38112 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52378 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ji1vM-00005s-EL
-	for qemu-devel@archiver.kernel.org; Sun, 07 Jun 2020 16:29:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36464)
+	id 1ji2aF-0001mN-Mp
+	for qemu-devel@archiver.kernel.org; Sun, 07 Jun 2020 17:11:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42848)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1ji1ul-000877-0x
- for qemu-devel@nongnu.org; Sun, 07 Jun 2020 16:29:07 -0400
-Resent-Date: Sun, 07 Jun 2020 16:29:07 -0400
-Resent-Message-Id: <E1ji1ul-000877-0x@lists.gnu.org>
-Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21396)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1ji1uj-0004S3-9J
- for qemu-devel@nongnu.org; Sun, 07 Jun 2020 16:29:06 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1591561734; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=N3n1qvIsVBtA1YzIE8p/okniOrKP66YFOD0/BEk0e7nwVeZiJ7Rv26HE5X8i8PBc09XgSWC1qecCMYNVmVNKb6TxkdcaUUHFv3/EGXYsx+DPf7WN1xdxWwCe3MjNU8cAcUSSMLF2Bp85TasJBNzetKrBREb0QyBQ7oKwq1Rnna0=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1591561734;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=qRdFUxSHFHXU4iRObLjXvxEMIrEYfv5I29mNlI21U50=; 
- b=kCytcutdxSysZGPZZyYpVZKAQCwNFpzLPKyoZRYXl5hk39WMSGMdDZDh2/V5gIYEp1uzQonYm6fEN4Lgzp+B6FooKQrPEBtHrYDGvm42Wn2XgEGq0E+xu1HFuONPZFH2seM3aBdKy7jl7dZ0pu1ctFl2Ewbv06omSgVyFPNa394=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1591561732734477.5287253190629;
- Sun, 7 Jun 2020 13:28:52 -0700 (PDT)
-Message-ID: <159156173139.32466.16783549689356647947@45ef0f9c86ae>
-In-Reply-To: <1591559185-31287-1-git-send-email-aleksandar.qemu.devel@gmail.com>
-Subject: Re: [PULL 00/21] MIPS queue for June 7th, 2020
+ (Exim 4.90_1) (envelope-from <agrecascino123@gmail.com>)
+ id 1ji2ZU-0001L7-RH
+ for qemu-devel@nongnu.org; Sun, 07 Jun 2020 17:11:12 -0400
+Received: from mail-qt1-x844.google.com ([2607:f8b0:4864:20::844]:46612)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <agrecascino123@gmail.com>)
+ id 1ji2ZS-0005UZ-PZ
+ for qemu-devel@nongnu.org; Sun, 07 Jun 2020 17:11:12 -0400
+Received: by mail-qt1-x844.google.com with SMTP id g18so13145752qtu.13
+ for <qemu-devel@nongnu.org>; Sun, 07 Jun 2020 14:11:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=KHf+Vmi8xc/vMhM+B7yEwcWlFM+npGXMYwLWVfs1t7Q=;
+ b=iGzwlNnPJUpGogtMzBc1MR8Y8s2Kc3il/wUr4AzWTh9x8oKjhYr5hCHnFKMxFOKzKS
+ P+Fd9ppYiawzVtpYhdkPDOKtkUjbgg5AOC8AGwhP84ZJGAAtrDDsYBBr57Xbb05VdI4O
+ 4wB/JRVWme7YsDzg4EXZJOfR5ZampqAvXgFkU18mlwyfmAzw8ou3RbmrVtgTbdGV7wgl
+ byYo1Gw/AQO56K3Gep1ScvilmNwLdPgczFTAOSGtzhKBg13Hu7nuYyDviULW5gMi49eV
+ deXIEDuGByIiEEm3B5b9bkrz+wmtlQf/ZYtkJr8SP7kYLFX6TDH1KTwYGhCLbg1kdGWE
+ JvPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=KHf+Vmi8xc/vMhM+B7yEwcWlFM+npGXMYwLWVfs1t7Q=;
+ b=WTleyd+Xge9ptFQwYab4b+DANUgtLAKYAN886rpKP1iLT+0B+jUqT7n+bHD4h15vnX
+ j19Hcco9Gbt9j3yS699S6uYP0hor5t5ePQ40A5fLEzLrH9QGtACpjNjIvVsL28R17vHb
+ FbGMBzQ/eZw/4JT5FUemqbVrXYKy9+oKQ1jj4i4ZA2ZrGUE3UNsTdvwSXoegEUFMjHR5
+ 78tHuqRKY9lkEAzbyuyWUFea6mCduFJdSkqAE2sA52SeSXMyfy9y1QU+OJndIk0BTqCG
+ 0rdZe9sTp3ub2ce4keso6I3EZ2+NsG9WDDdjDH/lLJhsPxAA42ygFwPrgPDmC+JW8qDJ
+ XrTQ==
+X-Gm-Message-State: AOAM530JgImBjI8HpyM6RJ47IkRZ5hZzsw+SVKrZ7RucIh5HrwhU+DTN
+ CiwQL2gsaHDXisfe+X7bUiH11dsT
+X-Google-Smtp-Source: ABdhPJxiDC7zw4F/j7itnGxnqCRRX4aoCqSCtCsM1SQFljg4eHeS0WcszQwxxZUbUcI+PDa4dz48Gw==
+X-Received: by 2002:ac8:dd:: with SMTP id d29mr20890944qtg.392.1591564267860; 
+ Sun, 07 Jun 2020 14:11:07 -0700 (PDT)
+Received: from localhost.localdomain
+ ([2600:1700:3c90:1b60:40e2:cfda:b7a4:16f3])
+ by smtp.gmail.com with ESMTPSA id p16sm5337599qkg.63.2020.06.07.14.11.06
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sun, 07 Jun 2020 14:11:06 -0700 (PDT)
+From: agrecascino123@gmail.com
+To: qemu-devel@nongnu.org
+Subject: [PATCH v5] tcg: Sanitize shift constants on ppc64le so that shift
+ operations with large constants don't generate invalid instructions.
+Date: Sun,  7 Jun 2020 17:10:59 -0400
+Message-Id: <20200607211100.22858-1-agrecascino123@gmail.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: aleksandar.qemu.devel@gmail.com
-Date: Sun, 7 Jun 2020 13:28:52 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o53.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/07 16:29:01
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::844;
+ envelope-from=agrecascino123@gmail.com; helo=mail-qt1-x844.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
 X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -81,64 +101,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, aleksandar.qemu.devel@gmail.com,
- qemu-devel@nongnu.org
+Cc: "Catherine A. Frederick" <chocola@animebitch.es>, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTkxNTU5MTg1LTMxMjg3LTEt
-Z2l0LXNlbmQtZW1haWwtYWxla3NhbmRhci5xZW11LmRldmVsQGdtYWlsLmNvbS8KCgoKSGksCgpU
-aGlzIHNlcmllcyBmYWlsZWQgdGhlIGRvY2tlci1xdWlja0BjZW50b3M3IGJ1aWxkIHRlc3QuIFBs
-ZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElm
-IHlvdSBoYXZlIERvY2tlciBpbnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0
-CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCm1ha2UgZG9j
-a2VyLWltYWdlLWNlbnRvczcgVj0xIE5FVFdPUks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtcXVp
-Y2tAY2VudG9zNyBTSE9XX0VOVj0xIEo9MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQg
-PT09CgotLS0gL3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzL3FlbXUtaW90ZXN0cy8wNDAub3V0ICAg
-ICAgIDIwMjAtMDYtMDcgMTk6NTY6MzkuMDAwMDAwMDAwICswMDAwCisrKyAvdG1wL3FlbXUtdGVz
-dC9idWlsZC90ZXN0cy9xZW11LWlvdGVzdHMvMDQwLm91dC5iYWQgMjAyMC0wNi0wNyAyMDoyMToz
-NC44MDMyNTQ5MjkgKzAwMDAKQEAgLTEsMyArMSw1IEBACitXQVJOSU5HOnFlbXUubWFjaGluZTpx
-ZW11IHJlY2VpdmVkIHNpZ25hbCA5OiAvdG1wL3FlbXUtdGVzdC9idWlsZC90ZXN0cy9xZW11LWlv
-dGVzdHMvLi4vLi4veDg2XzY0LXNvZnRtbXUvcWVtdS1zeXN0ZW0teDg2XzY0IC1kaXNwbGF5IG5v
-bmUgLXZnYSBub25lIC1jaGFyZGV2IHNvY2tldCxpZD1tb24scGF0aD0vdG1wL3RtcC5HNXRGTTZx
-U3htL3FlbXUtMjA2NjQtbW9uaXRvci5zb2NrIC1tb24gY2hhcmRldj1tb24sbW9kZT1jb250cm9s
-IC1xdGVzdCB1bml4OnBhdGg9L3RtcC90bXAuRzV0Rk02cVN4bS9xZW11LTIwNjY0LXF0ZXN0LnNv
-Y2sgLWFjY2VsIHF0ZXN0IC1ub2RlZmF1bHRzIC1kaXNwbGF5IG5vbmUgLWFjY2VsIHF0ZXN0CitX
-QVJOSU5HOnFlbXUubWFjaGluZTpxZW11IHJlY2VpdmVkIHNpZ25hbCA5OiAvdG1wL3FlbXUtdGVz
-dC9idWlsZC90ZXN0cy9xZW11LWlvdGVzdHMvLi4vLi4veDg2XzY0LXNvZnRtbXUvcWVtdS1zeXN0
-ZW0teDg2XzY0IC1kaXNwbGF5IG5vbmUgLXZnYSBub25lIC1jaGFyZGV2IHNvY2tldCxpZD1tb24s
-cGF0aD0vdG1wL3RtcC5HNXRGTTZxU3htL3FlbXUtMjA2NjQtbW9uaXRvci5zb2NrIC1tb24gY2hh
-cmRldj1tb24sbW9kZT1jb250cm9sIC1xdGVzdCB1bml4OnBhdGg9L3RtcC90bXAuRzV0Rk02cVN4
-bS9xZW11LTIwNjY0LXF0ZXN0LnNvY2sgLWFjY2VsIHF0ZXN0IC1ub2RlZmF1bHRzIC1kaXNwbGF5
-IG5vbmUgLWFjY2VsIHF0ZXN0CiAuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4u
-Li4uLi4uLi4uLi4uLi4uLi4uLi4uLgogLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQogUmFuIDU5IHRlc3RzCi0tLQpO
-b3QgcnVuOiAyNTkKRmFpbHVyZXM6IDA0MApGYWlsZWQgMSBvZiAxMTkgaW90ZXN0cwptYWtlOiAq
-KiogW2NoZWNrLXRlc3RzL2NoZWNrLWJsb2NrLnNoXSBFcnJvciAxClRyYWNlYmFjayAobW9zdCBy
-ZWNlbnQgY2FsbCBsYXN0KToKICBGaWxlICIuL3Rlc3RzL2RvY2tlci9kb2NrZXIucHkiLCBsaW5l
-IDY2NSwgaW4gPG1vZHVsZT4KICAgIHN5cy5leGl0KG1haW4oKSkKLS0tCiAgICByYWlzZSBDYWxs
-ZWRQcm9jZXNzRXJyb3IocmV0Y29kZSwgY21kKQpzdWJwcm9jZXNzLkNhbGxlZFByb2Nlc3NFcnJv
-cjogQ29tbWFuZCAnWydzdWRvJywgJy1uJywgJ2RvY2tlcicsICdydW4nLCAnLS1sYWJlbCcsICdj
-b20ucWVtdS5pbnN0YW5jZS51dWlkPWY3NzBjODg3ZjU4MjQxMDNhNGJmOWViMWNiNDY2NWQyJywg
-Jy11JywgJzEwMDEnLCAnLS1zZWN1cml0eS1vcHQnLCAnc2VjY29tcD11bmNvbmZpbmVkJywgJy0t
-cm0nLCAnLWUnLCAnVEFSR0VUX0xJU1Q9JywgJy1lJywgJ0VYVFJBX0NPTkZJR1VSRV9PUFRTPScs
-ICctZScsICdWPScsICctZScsICdKPTE0JywgJy1lJywgJ0RFQlVHPScsICctZScsICdTSE9XX0VO
-Vj0xJywgJy1lJywgJ0NDQUNIRV9ESVI9L3Zhci90bXAvY2NhY2hlJywgJy12JywgJy9ob21lL3Bh
-dGNoZXcvLmNhY2hlL3FlbXUtZG9ja2VyLWNjYWNoZTovdmFyL3RtcC9jY2FjaGU6eicsICctdics
-ICcvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtNGU3aGhxbHAvc3JjL2RvY2tlci1zcmMuMjAy
-MC0wNi0wNy0xNi4xMy4zNy4zMjc2NDovdmFyL3RtcC9xZW11Onoscm8nLCAncWVtdTpjZW50b3M3
-JywgJy92YXIvdG1wL3FlbXUvcnVuJywgJ3Rlc3QtcXVpY2snXScgcmV0dXJuZWQgbm9uLXplcm8g
-ZXhpdCBzdGF0dXMgMi4KZmlsdGVyPS0tZmlsdGVyPWxhYmVsPWNvbS5xZW11Lmluc3RhbmNlLnV1
-aWQ9Zjc3MGM4ODdmNTgyNDEwM2E0YmY5ZWIxY2I0NjY1ZDIKbWFrZVsxXTogKioqIFtkb2NrZXIt
-cnVuXSBFcnJvciAxCm1ha2VbMV06IExlYXZpbmcgZGlyZWN0b3J5IGAvdmFyL3RtcC9wYXRjaGV3
-LXRlc3Rlci10bXAtNGU3aGhxbHAvc3JjJwptYWtlOiAqKiogW2RvY2tlci1ydW4tdGVzdC1xdWlj
-a0BjZW50b3M3XSBFcnJvciAyCgpyZWFsICAgIDE1bTE0LjkzN3MKdXNlciAgICAwbTkuNTAzcwoK
-ClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMTU5
-MTU1OTE4NS0zMTI4Ny0xLWdpdC1zZW5kLWVtYWlsLWFsZWtzYW5kYXIucWVtdS5kZXZlbEBnbWFp
-bC5jb20vdGVzdGluZy5kb2NrZXItcXVpY2tAY2VudG9zNy8/dHlwZT1tZXNzYWdlLgotLS0KRW1h
-aWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9y
-Zy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNv
-bQ==
+From: "Catherine A. Frederick" <chocola@animebitch.es>
+
+Signed-off-by: Catherine A. Frederick <chocola@animebitch.es>
+---
+Okay, I removed the bad "fix" on sar_i64, and the asserts in the various functions. 
+Crossing my fingers here.
+
+ tcg/ppc/tcg-target.inc.c | 34 +++++++++++++++++++++++++++++-----
+ 1 file changed, 29 insertions(+), 5 deletions(-)
+
+diff --git a/tcg/ppc/tcg-target.inc.c b/tcg/ppc/tcg-target.inc.c
+index 7da67086c6..5cb1556912 100644
+--- a/tcg/ppc/tcg-target.inc.c
++++ b/tcg/ppc/tcg-target.inc.c
+@@ -2610,21 +2610,33 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc, const TCGArg *args,
+ 
+     case INDEX_op_shl_i32:
+         if (const_args[2]) {
+-            tcg_out_shli32(s, args[0], args[1], args[2]);
++            /*
++             * Limit shift immediate to prevent illegal instruction
++             * from bitmask corruption
++             */
++            tcg_out_shli32(s, args[0], args[1], args[2] & 31);
+         } else {
+             tcg_out32(s, SLW | SAB(args[1], args[0], args[2]));
+         }
+         break;
+     case INDEX_op_shr_i32:
+         if (const_args[2]) {
+-            tcg_out_shri32(s, args[0], args[1], args[2]);
++            /*
++             * Both use RLWINM, which has a 5 bit field for the
++             * shift mask.
++             */
++            tcg_out_shri32(s, args[0], args[1], args[2] & 31);
+         } else {
+             tcg_out32(s, SRW | SAB(args[1], args[0], args[2]));
+         }
+         break;
+     case INDEX_op_sar_i32:
+         if (const_args[2]) {
+-            tcg_out32(s, SRAWI | RS(args[1]) | RA(args[0]) | SH(args[2]));
++            /*
++             * SRAWI has a 5 bit sized field for the shift mask
++             * as well.
++             */
++            tcg_out32(s, SRAWI | RS(args[1]) | RA(args[0]) | SH(args[2] & 31));
+         } else {
+             tcg_out32(s, SRAW | SAB(args[1], args[0], args[2]));
+         }
+@@ -2696,20 +2708,32 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc, const TCGArg *args,
+ 
+     case INDEX_op_shl_i64:
+         if (const_args[2]) {
+-            tcg_out_shli64(s, args[0], args[1], args[2]);
++            /*
++             * Limit shift immediate to prevent illegal instruction from
++             * from bitmask corruption
++             */
++            tcg_out_shli64(s, args[0], args[1], args[2] & 63);
+         } else {
+             tcg_out32(s, SLD | SAB(args[1], args[0], args[2]));
+         }
+         break;
+     case INDEX_op_shr_i64:
+         if (const_args[2]) {
+-            tcg_out_shri64(s, args[0], args[1], args[2]);
++            /*
++             * Same applies here, as both RLDICL, and RLDICR have a
++             * 6 bit large mask for the shift value
++             */
++            tcg_out_shri64(s, args[0], args[1], args[2] & 63);
+         } else {
+             tcg_out32(s, SRD | SAB(args[1], args[0], args[2]));
+         }
+         break;
+     case INDEX_op_sar_i64:
+         if (const_args[2]) {
++            /*
++             * Already done here, as it's a split field, and
++             * somebody noticed it would have overflowed.
++             */
+             int sh = SH(args[2] & 0x1f) | (((args[2] >> 5) & 1) << 1);
+             tcg_out32(s, SRADI | RA(args[0]) | RS(args[1]) | sh);
+         } else {
+-- 
+2.26.2
+
 
