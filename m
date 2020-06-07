@@ -2,89 +2,92 @@ Return-Path: <SRS0=Pynu=7U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-13.3 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0411BC433E0
-	for <qemu-devel@archiver.kernel.org>; Sun,  7 Jun 2020 06:56:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11097C433E0
+	for <qemu-devel@archiver.kernel.org>; Sun,  7 Jun 2020 07:04:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C26B22065C
-	for <qemu-devel@archiver.kernel.org>; Sun,  7 Jun 2020 06:56:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B7F152065C
+	for <qemu-devel@archiver.kernel.org>; Sun,  7 Jun 2020 07:04:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E3eIZ3Vn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C26B22065C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wTrmkGth"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7F152065C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39482 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43956 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jhpDw-0008Gn-1v
-	for qemu-devel@archiver.kernel.org; Sun, 07 Jun 2020 02:56:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53558)
+	id 1jhpMC-0002jr-31
+	for qemu-devel@archiver.kernel.org; Sun, 07 Jun 2020 03:04:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55002)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jhpDE-0007P9-H4
- for qemu-devel@nongnu.org; Sun, 07 Jun 2020 02:55:20 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:53735
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jhpDD-00041z-5O
- for qemu-devel@nongnu.org; Sun, 07 Jun 2020 02:55:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591512917;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=6Wl1295Iuw8D9zbWj7u9ezJOVGmPby/nmBhpDJ9KVU0=;
- b=E3eIZ3Vnepod/ajTlhp4gC/+HFu4b+ZG+WRgngz7c4yiLkKjFiZ0GPr4RQsv5yyJBwhmlh
- nrUsYs+w/xWOCp7vr3Wt8Dy7YLX2rldVOqRt5FMJ3ukKlRVdCzLBCn+g5qechEPPh+Dye4
- cnDrzNNGZvMawO/4Tpz0P7IY3gGMmz8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-466-WL2wV3ygO1ikLpztVQ3LcQ-1; Sun, 07 Jun 2020 02:55:16 -0400
-X-MC-Unique: WL2wV3ygO1ikLpztVQ3LcQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 28F55107ACCD;
- Sun,  7 Jun 2020 06:55:15 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-22.ams2.redhat.com [10.36.112.22])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7C5AA385;
- Sun,  7 Jun 2020 06:55:14 +0000 (UTC)
-Subject: Re: [PATCH v1 00/14] various fixes for next PR (testing, vhost,
- guest_base fixes)
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
-References: <20200605154929.26910-1-alex.bennee@linaro.org>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <f6d93916-b950-4688-3826-5c4de4cc033d@redhat.com>
-Date: Sun, 7 Jun 2020 08:55:12 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (Exim 4.90_1) (envelope-from <sameid@google.com>) id 1jhpLV-0002A8-Jp
+ for qemu-devel@nongnu.org; Sun, 07 Jun 2020 03:03:53 -0400
+Received: from mail-qt1-x842.google.com ([2607:f8b0:4864:20::842]:43791)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <sameid@google.com>) id 1jhpLU-0005qT-2D
+ for qemu-devel@nongnu.org; Sun, 07 Jun 2020 03:03:53 -0400
+Received: by mail-qt1-x842.google.com with SMTP id j32so12213035qte.10
+ for <qemu-devel@nongnu.org>; Sun, 07 Jun 2020 00:03:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=FFzBLOI/JFMCOGOf8dosvehUCuveAJId2AtdDz723z4=;
+ b=wTrmkGthkALH3ja5kLQxPrmFn3wnKEdmv8ttf0pOSbkSv5nszJ7wuKD9SFQ58wfRz+
+ Ugpa7xxOgiKcJmoDwhxZr1Mw0jxaTJtJdqDVSzlhV+7TZ88eprN0u2UgmoYgdJ5S8pjx
+ PNgS/cgqky9izX/v63cKF1rM1NocnsUkFIiTnhId4YeIwkU2ZQlJzhRiupCCHpbL3aB3
+ gvRnvBZ2FOFglhDODDT0ImSk1J/xxv6RXSlLl++1tiQTB9Ky69ZkLmrVHvhRB5iDc3yR
+ exOw4wXBAJn4c/olds6k7ms3o7++JndanuTctupqedytXH5QvWYCgR2ElBpF/uotyNI2
+ 8KNw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=FFzBLOI/JFMCOGOf8dosvehUCuveAJId2AtdDz723z4=;
+ b=MyuT/pfzQRorxOcKAQSYbOtkp/L8mGXLxJgiG8Z+FOtUiTZ7xrRL+RO+GisvZjIbJz
+ v77bVCEpfMloACfdLsgD+GVkBOlusmh11Yk6qWrCZ4322FnA5MhdZSUU8Say5IxwUJJ+
+ gq/PYvM+MZJ06mEqjhVFHiwOqaXZdhdeyrdRn3xL0IbGtMKBAGWI1neuYJ4XD6gpnYJ+
+ ont2PKuuEDsRmPr6GK3H+k301COx93Wu/h8CxooXaYuU7bIMUah8R6vbQLJhd4j5ZPez
+ 3dafnaI9KLH5JryfhA6BrS1ODclu0jBGfC6RJWusCcUbyIwLkE+RKV+roiWvNF62NQHi
+ 7kgg==
+X-Gm-Message-State: AOAM531D4F9f6FEgGg9dyTBy0oxi9zACumYcXOz9SrFjdBxkVAzqRw9z
+ 0Xc0Dg7fEScN7+Wvyzb9FSbKR0TMD3+2Dx1lO2xFBg==
+X-Google-Smtp-Source: ABdhPJwJJl205+T2C+Jyh4lVn3kfq/vPzuq3+aQUQgFn6VlaHVqZ0wLiSSMHL69LcMRQW5HDPm5EPvC0yioEoKyU6Nw=
+X-Received: by 2002:aed:2252:: with SMTP id o18mr18490176qtc.258.1591513430519; 
+ Sun, 07 Jun 2020 00:03:50 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200605154929.26910-1-alex.bennee@linaro.org>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/07 02:36:46
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+References: <20200528101039.24600-7-thuth@redhat.com>
+ <20200606100632.26442-1-sameid@google.com>
+ <87mu5gct2j.fsf@linaro.org>
+ <CAFr6bUnBLLdBK3Pxohynp6vp7qykbb_tNwq5-V6zu8B-vUUb+w@mail.gmail.com>
+ <451d6048-8688-d51d-d94d-72e29238d514@redhat.com>
+In-Reply-To: <451d6048-8688-d51d-d94d-72e29238d514@redhat.com>
+From: Sam Eiderman <sameid@google.com>
+Date: Sun, 7 Jun 2020 10:03:39 +0300
+Message-ID: <CAFr6bUk2W0z41V5oN7qTiP9qJcsBrtf-yskA8U7RTBjNXmaq7g@mail.gmail.com>
+Subject: Re: gitlab-ci: Do not use the standard container images from gitlab
+To: Thomas Huth <thuth@redhat.com>
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, crosa@redhat.com, 
+ Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, 
+ qemu-devel@nongnu.org, wainersm@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::842;
+ envelope-from=sameid@google.com; helo=mail-qt1-x842.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -175
+X-Spam_score: -17.6
+X-Spam_bar: -----------------
+X-Spam_report: (-17.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ ENV_AND_HDR_SPF_MATCH=-0.5, RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001, USER_IN_DEF_DKIM_WL=-7.5,
+ USER_IN_DEF_SPF_WL=-7.5 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,60 +104,53 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 05/06/2020 17.49, Alex Bennée wrote:
-> Hi,
-> 
-> These are all the patches I've currently got which are ready for a
-> pull request next week. I've included some patches which are destined
-> to go in via other trees so I can keep the testing green on the CI.
-> 
-> In summary:
-> 
->  Some simple plugin cleanups (the reset remain in plugins/next)
->  Reliability fixes for travis/shippable
->  iotest 194 fix (going in via block tree?)
->  docker updates (ubuntu and tricore fix)
->  vhost-user and TCG fix
->  more linux-user guest_base fixes
-> 
-> I'll certainly include the testing stuff in my PR but if others are
-> happy for me to include bits touching their areas then shout and I'll
-> include them in the PR.
-> 
-> The following need review:
-> 
->  - linux-user: detect overflow of MAP_FIXED mmap
->  - linux-user: deal with address wrap for ARM_COMMPAGE on 32 bit
->  - linux-user: provide fallback pgd_find_hole for bare chroots
->  - tests/docker: fix pre-requisite for debian-tricore-cross
->  - hw/virtio/vhost: re-factor vhost-section and allow DIRTY_MEMORY_CODE
->  - .shippable: temporaily disable some cross builds
->  - exec: flush the whole TLB if a watchpoint crosses a page boundary
-> 
-> Alex Bennée (10):
->   tests/plugin: correctly honour io_count
->   exec: flush the whole TLB if a watchpoint crosses a page boundary
->   .travis.yml: allow failure for unreliable hosts
->   .shippable: temporaily disable some cross builds
->   tests/docker: fix pre-requisite for debian-tricore-cross
->   hw/virtio/vhost: re-factor vhost-section and allow DIRTY_MEMORY_CODE
->   linux-user: provide fallback pgd_find_hole for bare chroots
->   linux-user: deal with address wrap for ARM_COMMPAGE on 32 bit
->   tests/tcg: add simple commpage test case
->   linux-user: detect overflow of MAP_FIXED mmap
-> 
-> Emilio G. Cota (1):
->   qemu-plugin.h: add missing include <stddef.h> to define size_t
-> 
-> Paolo Bonzini (1):
->   docker: update Ubuntu to 20.04
-> 
-> Philippe Mathieu-Daudé (1):
->   scripts/clean-includes: Mark 'qemu/qemu-plugin.h' as special header
+I see, thanks for the clarification.
 
-What about Philippe's "tests: Remove unused bison/flex packages" v2
-patch series from May 15th? I think you could include it here, too.
+However sometimes builds usually do tend to work on Ubuntu but fail to
+work on Debian since it's not always a 1-1 (as in this case) - so you
+might want to consider to keep testing Debian together with Ubuntu.
 
- Thomas
+Regarding the Ubuntu 20 problem - have you tried "export
+DEBIAN_FRONTEND=noninteractive"? didn't see it in the logs
 
+Sam
+
+
+On Sun, Jun 7, 2020 at 8:39 AM Thomas Huth <thuth@redhat.com> wrote:
+>
+> On 06/06/2020 14.38, Sam Eiderman wrote:
+> > Thanks for the link
+> >
+> > I do believe that the correct approach for me is to rename
+> > BITS_PER_LONG to __BITS_PER_LONG (I just added a sed command in my
+> > Dockerfile) and move on with my particular usage, however I am just
+> > wondering whether dropping debian10/ubuntu20 in the official qemu ci/
+> > pipeline until it's fixed is the correct approach instead of keep
+> > failing it until the error resolves, in a way we want to always know
+> > on which OSs the compilation fails for visibility, no?
+>
+>  Hi,
+>
+> that bug was only one reason to move the pipelines to another OS. The
+> other reason is that we are already extensively testing various Ubuntu
+> (and thus Debian-based) versions in the Travis CI - but did not test any
+> RPM-based distros in the CI yet. Since Travis is bound to Ubuntu, we can
+> not test Fedora/CentOS there, thus the Gitlab CI pipelines have now been
+> moved to RPM-based distros (except for the "build-user" pipeline which
+> is still using Debian, and the "build-system1" which is now using Ubuntu
+> 19.04 instead, so I think we still have a good mix there).
+>
+> Note that the problem with Ubuntu 20.04 is also something completely
+> different: It hangs in an interactive prompt during update and waits for
+> user input, so that the pipelines finally times out:
+>
+>  https://gitlab.com/huth/qemu/-/jobs/584573287#L800
+>
+> If you know a work-around for that, we can move the build-system1
+> pipeline from 19.04 to 20.04 ... or if Debian gets finally fixed, we can
+> also move that pipeline back to Debian. I'm fine either way, as long as
+> the pipelines do not fail due to non-QEMU bugs in the distros.
+>
+>  Thomas
+>
 
