@@ -2,78 +2,85 @@ Return-Path: <SRS0=Pynu=7U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62282C433DF
-	for <qemu-devel@archiver.kernel.org>; Sun,  7 Jun 2020 19:49:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 595AFC433DF
+	for <qemu-devel@archiver.kernel.org>; Sun,  7 Jun 2020 19:49:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1CA662067B
-	for <qemu-devel@archiver.kernel.org>; Sun,  7 Jun 2020 19:49:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 25FB72067B
+	for <qemu-devel@archiver.kernel.org>; Sun,  7 Jun 2020 19:49:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JMEb/p8Q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CA662067B
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i4mhadx6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25FB72067B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59402 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59666 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ji1Hy-0005Z9-9m
-	for qemu-devel@archiver.kernel.org; Sun, 07 Jun 2020 15:49:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59818)
+	id 1ji1I1-0005fh-BR
+	for qemu-devel@archiver.kernel.org; Sun, 07 Jun 2020 15:49:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59826)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1ji1FV-0003oP-EN
- for qemu-devel@nongnu.org; Sun, 07 Jun 2020 15:46:29 -0400
-Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:34517)
+ id 1ji1FX-0003ow-6p
+ for qemu-devel@nongnu.org; Sun, 07 Jun 2020 15:46:31 -0400
+Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:38448)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1ji1FU-0004kP-Ck
- for qemu-devel@nongnu.org; Sun, 07 Jun 2020 15:46:29 -0400
-Received: by mail-wr1-x432.google.com with SMTP id r7so15171085wro.1
+ id 1ji1FV-0004kc-Bw
+ for qemu-devel@nongnu.org; Sun, 07 Jun 2020 15:46:30 -0400
+Received: by mail-wr1-x430.google.com with SMTP id e1so15169553wrt.5
  for <qemu-devel@nongnu.org>; Sun, 07 Jun 2020 12:46:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id;
- bh=kMOqrCKRdUKY+RqgLSNCHXhXWR/YTTo3Wqwst1bRs1M=;
- b=JMEb/p8Q6Hm/wqELl7dS68TV86p3TwpBtqvfgA7ZgQXylQuiKzyAD31a4659BEuY/c
- 4uVf9MOiQA1WIlm8lZSwJy1BHJXDkynZ7m/Y7fFYGfdCZVFK5PvflKqb+d9XCX2IyYX4
- m2EhVLKogUR6UeLRx5mbLnSdLdCktNFisludRe/TwvcDLD9GVMCEvG5cRmSg+gZ8eoyL
- OIDtGzcjRoQcZNyvHlkL562tHK+3ZJmQvHej0UuesX6x+YAhP3ptVhR4W0n+w5WvSjPi
- R7uMBgeAxdFcz9TL2omCZkOatYfztF/Ghu93GyjqlR4EWQVPfSP8qU4ycvF4pmP5izcC
- p6KA==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=vpjGR3SSo/dqO1sryzCVOBY48tat7koG6WnUT5kfYuU=;
+ b=i4mhadx6/ynf7Kw3aBFKur7jf99VeoAanafiHFDGydNTQJUxMN+S394xTsylnxhabq
+ B/FWSWqEJeveQU/gZ0aWp9+Hw62NRy/24/irF3XJjscOCXJatitxaj8LnD/vUvZVODq4
+ Ss6yeSKZQtlHBpw84ra86lcsj3SVIJiPM+rfvO9CtiVwYacM/MG8MTtxR3KQNMU2eZZ3
+ rx/2T9+ciPf0NmZ4j2mjPmqfdAUzTA6U3tStEfY0yUm7NSMVBFiHg2JdHhK5cNNCQNGt
+ u6KgbYLBQyTRTKJzBbX/So0kS8iLbxWAdUQXkBXjcDQvyPAikoEY7hmGli9sUt+Bfv14
+ kKjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id;
- bh=kMOqrCKRdUKY+RqgLSNCHXhXWR/YTTo3Wqwst1bRs1M=;
- b=OotdgO09dwBtD/GQg8WdkjZZu2w9TIQELJ52Ar2msaF2AKUaenWxwDlI+flVpDQF7r
- ArcFDbhG0EgOBpLRkSwBIPaLIQtHtGz6wOLYQorUF1mkWFeWc0BKzmGxVb33+wBUGNx6
- BW01nYnUmoD756RibqG9VamvaPYQy79y2BCwWgwAmNvePzTrriGvQCZv9E8O1AAPuzzc
- AN2Gf0kPrhMZKtnL2JKMVL9jX5oVgGmUQptEgUy3cAlqX8cwDZR24HIbpCLCxBUQwexU
- 2wk3kydO0JHv1AiktJhGu0Y21f2Mgnjot+mZZKmPTPHGN0a0dMsk0bVMPTKiAZvn0vwO
- ygHQ==
-X-Gm-Message-State: AOAM533vTQTtPAwskbm5tDKGhrl53/3bGj+RSeKg4oJ70R/WqT0SBw/o
- RhLIHlvRsPiCLZ0VhnJqQ9awWkp6
-X-Google-Smtp-Source: ABdhPJwvrHeIAQ/665A9GJM7GamIJ68H1etjiqSft6E5KHpNG9s/DWt3JcIh3pb+EJmHcuBOWCj0tA==
-X-Received: by 2002:a5d:55c2:: with SMTP id i2mr20231154wrw.225.1591559186476; 
- Sun, 07 Jun 2020 12:46:26 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=vpjGR3SSo/dqO1sryzCVOBY48tat7koG6WnUT5kfYuU=;
+ b=izJQmArqzW1xvkqCJklB3hhvua5wwy9hckK0sqxwxnTB0wD7dn/W/xehe94GSzcZeh
+ Pond5bNifIYZwhqVXBAfRscmZPoOzxt3oLomhfvphGDLNhucVCNrCa/Tg9JlCyrt8ZIT
+ XqSMn5/TRfjDCqSPMCwanZ7IUQBHhcOKL/RPR0l4mHtv2cedSVJMkYfn1YJL1Hy7GbRU
+ EU0S0CWO28TaEwkiTkDdmSfEczq+HIq8P0cxkxWtI8+xIseY0IMiSfxCccO/iYSvbZ0G
+ 5kztGUiTjqfRlZ0EqlMbXBTvcnuA+lihrbSg8x/AjO99kf0OgpUb8+2Lj/GmoIItkMKJ
+ LlsA==
+X-Gm-Message-State: AOAM530obX4Wu99S08xvh9XI19nsRcd4B7AnIJt8SsekQv1jP6OHOrzn
+ SIWykrmICCqc3fJ66qhiXKqaPfE3
+X-Google-Smtp-Source: ABdhPJy2CNGcRZpcxASVtmMo/y0s0naN5WFeYhXJG4p3QeJgwikw/6w6EFs1TBlkXDnaw0p8N1dF3A==
+X-Received: by 2002:adf:ea90:: with SMTP id s16mr19956415wrm.299.1591559188013; 
+ Sun, 07 Jun 2020 12:46:28 -0700 (PDT)
 Received: from rtrkw774-lin.syrmia.com ([46.240.135.226])
- by smtp.gmail.com with ESMTPSA id u130sm21091339wmg.32.2020.06.07.12.46.25
+ by smtp.gmail.com with ESMTPSA id u130sm21091339wmg.32.2020.06.07.12.46.27
  (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Sun, 07 Jun 2020 12:46:26 -0700 (PDT)
+ Sun, 07 Jun 2020 12:46:27 -0700 (PDT)
 From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
 To: qemu-devel@nongnu.org,
 	peter.maydell@linaro.org
-Subject: [PULL 00/21] MIPS queue for June 7th, 2020
-Date: Sun,  7 Jun 2020 21:46:04 +0200
-Message-Id: <1591559185-31287-1-git-send-email-aleksandar.qemu.devel@gmail.com>
+Subject: [PULL 02/21] mailmap: Change email address of Stefan Brankovic
+Date: Sun,  7 Jun 2020 21:46:06 +0200
+Message-Id: <1591559185-31287-3-git-send-email-aleksandar.qemu.devel@gmail.com>
 X-Mailer: git-send-email 2.7.4
-Received-SPF: pass client-ip=2a00:1450:4864:20::432;
- envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wr1-x432.google.com
+In-Reply-To: <1591559185-31287-1-git-send-email-aleksandar.qemu.devel@gmail.com>
+References: <1591559185-31287-1-git-send-email-aleksandar.qemu.devel@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::430;
+ envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wr1-x430.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -100,82 +107,29 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit 175198ad91d8bac540159705873b4ffe4fb94eab:
+Stefan Brankovic wants to use his new email address for his future
+work in QEMU.
 
-  Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20200605' into staging (2020-06-05 17:45:59 +0100)
+CC: Stefan Brankovic <stefan.brankovic@syrmia.com>
+Signed-off-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Reviewed-by: Stefan Brankovic <stefan.brankovic@syrmia.com>
+Message-Id: <20200602085215.12585-3-aleksandar.qemu.devel@gmail.com>
+---
+ .mailmap | 1 +
+ 1 file changed, 1 insertion(+)
 
-are available in the git repository at:
-
-  https://github.com/AMarkovic/qemu tags/mips-queue-june-07-2020
-
-for you to fetch changes up to ffbd8a88e8872d61fa5622a0075eddbe71951067:
-
-  target/mips: Enable hardware page table walker and CMGCR features for P5600 (2020-06-07 21:34:14 +0200)
-
-----------------------------------------------------------------
-
-MIPS queue for June 7th, 2020
-
-Highlights:
-
-  - Registring change of email address for two contributors
-  - Cleanup and improvements of FPU helpers
-  - Enabling some features of P5600
-  - Adding two Loongson-3A CPU definitions
-  - Moving futher towards Loongson-3A KVM support
-  - Two checkpatch warnings are known and should be ignored
-
-----------------------------------------------------------------
-
-
-Aleksandar Markovic (18):
-  mailmap: Change email address of Filip Bozuta
-  mailmap: Change email address of Stefan Brankovic
-  target/mips: fpu: Demacro ADD.<D|S|PS>
-  target/mips: fpu: Demacro SUB.<D|S|PS>
-  target/mips: fpu: Demacro MUL.<D|S|PS>
-  target/mips: fpu: Demacro DIV.<D|S|PS>
-  target/mips: fpu: Remove now unused macro FLOAT_BINOP
-  target/mips: fpu: Demacro MADD.<D|S|PS>
-  target/mips: fpu: Demacro MSUB.<D|S|PS>
-  target/mips: fpu: Demacro NMADD.<D|S|PS>
-  target/mips: fpu: Demacro NMSUB.<D|S|PS>
-  target/mips: fpu: Remove now unused UNFUSED_FMA and FLOAT_FMA macros
-  target/mips: fpu: Demacro CLASS.<D|S>
-  target/mips: fpu: Remove now unused FLOAT_CLASS macro
-  target/mips: fpu: Demacro RINT.<D|S>
-  target/mips: fpu: Remove now unused FLOAT_RINT macro
-  target/mips: fpu: Name better paired-single variables
-  target/mips: fpu: Refactor conversion from ieee to mips exception
-    flags
-
-Andrea Oliveri (1):
-  target/mips: Enable hardware page table walker and CMGCR features for
-    P5600
-
-Huacai Chen (2):
-  hw/mips: Implement the kvm_type() hook in MachineClass
-  target/mips: Add Loongson-3 CPU definition
-
- include/hw/mips/mips.h                      |   3 +
- target/mips/cpu.h                           |  32 +-
- target/mips/internal.h                      |   3 +-
- target/mips/mips-defs.h                     |  45 +-
- hw/core/null-machine.c                      |   4 +
- hw/mips/common.c                            |  55 +++
- target/mips/fpu_helper.c                    | 658 +++++++++++++++++++---------
- target/mips/{lmi_helper.c => lmmi_helper.c} |   0
- target/mips/msa_helper.c                    |  77 ++--
- target/mips/translate.c                     |   2 +
- target/mips/translate_init.inc.c            |  95 +++-
- .mailmap                                    |   2 +
- hw/core/Makefile.objs                       |   2 +-
- hw/mips/Makefile.objs                       |   2 +-
- target/mips/Makefile.objs                   |   2 +-
- 15 files changed, 722 insertions(+), 260 deletions(-)
- create mode 100644 hw/mips/common.c
- rename target/mips/{lmi_helper.c => lmmi_helper.c} (100%)
-
+diff --git a/.mailmap b/.mailmap
+index 9f2a3a5..84f3659 100644
+--- a/.mailmap
++++ b/.mailmap
+@@ -52,6 +52,7 @@ Paul Burton <pburton@wavecomp.com> <paul.burton@mips.com>
+ Paul Burton <pburton@wavecomp.com> <paul.burton@imgtec.com>
+ Paul Burton <pburton@wavecomp.com> <paul@archlinuxmips.org>
+ Philippe Mathieu-Daudé <philmd@redhat.com> <f4bug@amsat.org>
++Stefan Brankovic <stefan.brankovic@syrmia.com> <stefan.brankovic@rt-rk.com.com>
+ Yongbok Kim <yongbok.kim@mips.com> <yongbok.kim@imgtec.com>
+ 
+ # Also list preferred name forms where people have changed their
 -- 
 2.7.4
 
