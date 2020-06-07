@@ -1,102 +1,90 @@
-Return-Path: <SRS0=faK4=7T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=Pynu=7U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-10.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30B17C433DF
-	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jun 2020 20:22:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6239C433DF
+	for <qemu-devel@archiver.kernel.org>; Sun,  7 Jun 2020 00:33:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EF68B2067B
-	for <qemu-devel@archiver.kernel.org>; Sat,  6 Jun 2020 20:22:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 708942065C
+	for <qemu-devel@archiver.kernel.org>; Sun,  7 Jun 2020 00:33:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hs0BuDV7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF68B2067B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="t+55B2Eo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 708942065C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42992 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52470 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jhfKm-00035h-5q
-	for qemu-devel@archiver.kernel.org; Sat, 06 Jun 2020 16:22:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47794)
+	id 1jhjFg-0002u0-M1
+	for qemu-devel@archiver.kernel.org; Sat, 06 Jun 2020 20:33:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40920)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jhfK1-0002TQ-3p
- for qemu-devel@nongnu.org; Sat, 06 Jun 2020 16:21:41 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40244
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jhfJz-0000YI-N0
- for qemu-devel@nongnu.org; Sat, 06 Jun 2020 16:21:40 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591474898;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=o4jqwUMVsfsSvwCMKervPyctKjmw5vEX56fqpclyMnA=;
- b=Hs0BuDV7J94R/R/Z5TPQQjiP/lZA8FWNhCF94XsGVd7eCDAUBfzrW3V4cQqJVIvW0mIvI3
- rfHW4Ql9vUbgXDKQk0Qzx59BD/elJpO3Kp10eBcuHBDBnseJoN2U8VjOFQFgfUisq13OIv
- qZFJyB20anH85pewvJahRzpR6CmsQoM=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-385-1MjYjaCsPluoDOUCyoY8mA-1; Sat, 06 Jun 2020 16:21:36 -0400
-X-MC-Unique: 1MjYjaCsPluoDOUCyoY8mA-1
-Received: by mail-wr1-f70.google.com with SMTP id t5so5341815wro.20
- for <qemu-devel@nongnu.org>; Sat, 06 Jun 2020 13:21:36 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
+ id 1jhjF0-0002Ul-Ri
+ for qemu-devel@nongnu.org; Sat, 06 Jun 2020 20:32:46 -0400
+Received: from mail-wm1-x32c.google.com ([2a00:1450:4864:20::32c]:56317)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
+ id 1jhjEz-0007h9-Tg
+ for qemu-devel@nongnu.org; Sat, 06 Jun 2020 20:32:46 -0400
+Received: by mail-wm1-x32c.google.com with SMTP id c71so11897608wmd.5
+ for <qemu-devel@nongnu.org>; Sat, 06 Jun 2020 17:32:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=pIMp/wD1dZ3Y4BpT5Tc0jS52N1iDYA+vxjf4Xjfs1M4=;
+ b=t+55B2Eo+fblsYSxREX2joXk99xF197xzSJPkyVnFdlAmuWly81sc6ASNt1eH+KsxS
+ NyyqeekOymzJE6sCcnM5HRhtlVJd5XH6ADrldZ4o1bFidmdrSYPRX1OOLlCrR9KDFIHt
+ 0nGGaniCqeSIDBOX0CbFZO0BhmzSRO2soLsomG0EjeHeTaZ0yrx9JwuZxMDMmg++W3qA
+ myEtT3Azr13tO1aXoJunZZMrUjjIUddQrPnnh209nOEGClnR8YO818dcoieCTQSWQR3D
+ 6Fnu/6AHQFRCN4bAV+aZpDYBJBhDMaMMuD+ALrg+fg6e/6fzIndpeXuGtf2wptCAJ0Y+
+ xQ8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=o4jqwUMVsfsSvwCMKervPyctKjmw5vEX56fqpclyMnA=;
- b=iEY/cPAtGf5llyKplOs5U00u35X0DlzYuHaxC/6YU4fxlO052ptcIyFnrJOp7j78MT
- 3Qxi64iWlyLOldhgC/4yY9eshSMyNHeq4gVEAT7bXi+0B+cemenXhbr3MYANEd0zoym3
- CblVO7819TEfc8wjkzsgsM8CXL+32AbGpjAET3ma7qDZHLOIhPyTXG6TZuMeAewqRnAZ
- EGqc4bXgUGLE+40XEicwT9lf2TC2rXrlC1iJlqpA3Iao/MTUw6z4sUIdSQBQ3rirqFnE
- NnOx6biayZMeSXjMQv/0VRo2FBX3KrPSnaFm7/5CH/cpftFdCs5bZvrCoSk/kLjRjyWu
- dUXg==
-X-Gm-Message-State: AOAM531KslkXvXrY0zxw4QcF5TMg5t4jR8oQowmB4HQlxhyR+Ipgz6Ln
- qyUGOeheg+iYEvukJNgcN0U46vymCVMoFLagp27vp3NDWz0CIrNdnDfuZ8KbotOyQMvtU7/IBJS
- G8iULGmTvqcnjkAQ=
-X-Received: by 2002:a1c:ab07:: with SMTP id u7mr8676877wme.130.1591474895393; 
- Sat, 06 Jun 2020 13:21:35 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxD8oca7c9F3z/cHyLGoqmFQRETj0bXMVLckH6LgfSMPy8x0Bsfwmowbutieyi6uCszvoqWhA==
-X-Received: by 2002:a1c:ab07:: with SMTP id u7mr8676852wme.130.1591474894974; 
- Sat, 06 Jun 2020 13:21:34 -0700 (PDT)
-Received: from redhat.com (bzq-109-64-41-91.red.bezeqint.net. [109.64.41.91])
- by smtp.gmail.com with ESMTPSA id
- t189sm16775933wma.4.2020.06.06.13.21.33
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 06 Jun 2020 13:21:34 -0700 (PDT)
-Date: Sat, 6 Jun 2020 16:21:31 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [RFC v2 18/18] guest memory protection: Alter virtio default
- properties for protected guests
-Message-ID: <20200606162014-mutt-send-email-mst@kernel.org>
-References: <20200521034304.340040-1-david@gibson.dropbear.id.au>
- <20200521034304.340040-19-david@gibson.dropbear.id.au>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=pIMp/wD1dZ3Y4BpT5Tc0jS52N1iDYA+vxjf4Xjfs1M4=;
+ b=LGo7zC/8HYeCCxvegHHO0zN2YI93VDEz9K2HeMQhxh8FyiOGqyDAs9FtNh1VrkxwB0
+ koDk/6yHbzn/iZnmFfhypOARal3Gq/WSSQoIHaI9UvzWDZrKyfY1Qg2zoxhxdsqDOs3A
+ UQ9MtOj40/LflPE9gjGpatAFzJ3oCZ24U00pEeuwg8RcdMZrdaNSg+Y5DXMiaGC0yEgb
+ D+sbjWJ3KEcPqKnW26KeS0RUSW0NfLBy9jSK/jzKshaONZ53ypFwxVBymp1+hLung/xM
+ tSEGa/o94ypiMI/NTmqKZ2s0CP6bAIfnKTmxiDC2psMBKzle2xsj27UgaH6bxqeWXPp5
+ o8sw==
+X-Gm-Message-State: AOAM531SAoN18EpozlKtnOvniL9CvHR3lqNn3xgHOsFyKcFxDO6q/C8/
+ JvRT22DnnbjHeLbD48/LMKNmd6eFfth5CVeaYo0=
+X-Google-Smtp-Source: ABdhPJz9YFCB9uMom0L1rWGcN2IQccR4BuHMKnyJOA/H2NC1+troZYUeBZhLubhk7j5GbaD7K2ipggnbt6EP573xiyU=
+X-Received: by 2002:a7b:c3c6:: with SMTP id t6mr9092262wmj.159.1591489963876; 
+ Sat, 06 Jun 2020 17:32:43 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200521034304.340040-19-david@gibson.dropbear.id.au>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=mst@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/06 16:21:38
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+References: <20200606131517.1250346-1-laurent@vivier.eu>
+ <d76cc8d8-98c3-fee4-4b10-b271bd6bb37e@vivier.eu>
+In-Reply-To: <d76cc8d8-98c3-fee4-4b10-b271bd6bb37e@vivier.eu>
+From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Date: Sun, 7 Jun 2020 02:32:31 +0200
+Message-ID: <CAHiYmc4JJwK=Ax6VsGpzpxxAjqZrjNS8n0_qQybPYCQmJ02EsA@mail.gmail.com>
+Subject: Re: [PULL v2 00/19] Linux user for 5.1 patches
+To: Laurent Vivier <laurent@vivier.eu>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::32c;
+ envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wm1-x32c.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -109,66 +97,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pair@us.ibm.com, brijesh.singh@amd.com, frankja@linux.ibm.com,
- kvm@vger.kernel.org, cohuck@redhat.com, qemu-devel@nongnu.org,
- Eduardo Habkost <ehabkost@redhat.com>, dgilbert@redhat.com,
- qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- mdroth@linux.vnet.ibm.com, Richard Henderson <rth@twiddle.net>
+Cc: Riku Voipio <riku.voipio@iki.fi>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, May 21, 2020 at 01:43:04PM +1000, David Gibson wrote:
-> The default behaviour for virtio devices is not to use the platforms normal
-> DMA paths, but instead to use the fact that it's running in a hypervisor
-> to directly access guest memory.  That doesn't work if the guest's memory
-> is protected from hypervisor access, such as with AMD's SEV or POWER's PEF.
-> 
-> So, if a guest memory protection mechanism is enabled, then apply the
-> iommu_platform=on option so it will go through normal DMA mechanisms.
-> Those will presumably have some way of marking memory as shared with the
-> hypervisor or hardware so that DMA will work.
-> 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
->  hw/core/machine.c | 11 +++++++++++
->  1 file changed, 11 insertions(+)
-> 
-> diff --git a/hw/core/machine.c b/hw/core/machine.c
-> index 88d699bceb..cb6580954e 100644
-> --- a/hw/core/machine.c
-> +++ b/hw/core/machine.c
-> @@ -28,6 +28,8 @@
->  #include "hw/mem/nvdimm.h"
->  #include "migration/vmstate.h"
->  #include "exec/guest-memory-protection.h"
-> +#include "hw/virtio/virtio.h"
-> +#include "hw/virtio/virtio-pci.h"
->  
->  GlobalProperty hw_compat_5_0[] = {};
->  const size_t hw_compat_5_0_len = G_N_ELEMENTS(hw_compat_5_0);
-> @@ -1159,6 +1161,15 @@ void machine_run_board_init(MachineState *machine)
->           * areas.
->           */
->          machine_set_mem_merge(OBJECT(machine), false, &error_abort);
-> +
-> +        /*
-> +         * Virtio devices can't count on directly accessing guest
-> +         * memory, so they need iommu_platform=on to use normal DMA
-> +         * mechanisms.  That requires disabling legacy virtio support
-> +         * for virtio pci devices
-> +         */
-> +        object_register_sugar_prop(TYPE_VIRTIO_PCI, "disable-legacy", "on");
-> +        object_register_sugar_prop(TYPE_VIRTIO_DEVICE, "iommu_platform", "on");
->      }
->  
+=D1=81=D1=83=D0=B1, 6. =D1=98=D1=83=D0=BD 2020. =D1=83 15:24 Laurent Vivier=
+ <laurent@vivier.eu> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=
+=BE/=D0=BB=D0=B0:
+>
+> Le 06/06/2020 =C3=A0 15:14, Laurent Vivier a =C3=A9crit :
+> > The following changes since commit ddc760832fa8cf5e93b9d9e6e854a5114ac6=
+3510:
+> >
+> >   Merge remote-tracking branch 'remotes/gkurz/tags/9p-next-2020-05-26' =
+into s=3D
+> > taging (2020-05-26 14:05:53 +0100)
+> >
+> > are available in the Git repository at:
+> >
+> >   git://github.com/vivier/qemu.git tags/linux-user-for-5.1-pull-request
+> >
+> > for you to fetch changes up to 95722b27845b972250a7d4f93b693b01e2a0c3a1=
+:
+> >
+> >   stubs: Restrict ui/win32-kbd-hook to system-mode (2020-06-05 21:23:22=
+ +0200)
+> >
+> > ----------------------------------------------------------------
+> > linux-user pull request 20200605-v2
+> >
+> > Implement F_OFD_ fcntl() command, /proc/cpuinfo for hppa
+> > Fix socket(), prnctl() error codes, underflow in target_mremap,
+> >     epoll_create() strace, oldumount for alpha
+> > User-mode build dependencies improvement
+> >
+> > ----------------------------------------------------------------
+> >
+> > Andreas Schwab (1):
+> >   linux-user: implement OFD locks
+> >
+> > Helge Deller (2):
+> >   linux-user: return target error codes for socket() and prctl()
+> >   linux-user: Add support for /proc/cpuinfo on hppa platform
+> >
+> > Jonathan Marler (1):
+> >   linux-user/mmap.c: fix integer underflow in target_mremap
+> >
+> > Laurent Vivier (1):
+> >   linux-user, alpha: fix oldumount syscall
+> >
+> > Philippe Mathieu-Daud=3DC3=3DA9 (13):
+> >   Makefile: Only build virtiofsd if system-mode is enabled
+> >   configure: Avoid building TCG when not needed
+> >   tests/Makefile: Only display TCG-related tests when TCG is available
+> >   tests/Makefile: Restrict some softmmu-only tests
+> >   util/Makefile: Reduce the user-mode object list
+> >   stubs/Makefile: Reduce the user-mode object list
+> >   target/riscv/cpu: Restrict CPU migration to system-mode
+> >   exec: Assert CPU migration is not used on user-only build
+> >   arch_init: Remove unused 'qapi-commands-misc.h' include
+> >   target/i386: Restrict CpuClass::get_crash_info() to system-mode
+> >   target/s390x: Restrict CpuClass::get_crash_info() to system-mode
+> >   hw/core: Restrict CpuClass::get_crash_info() to system-mode
+> >   stubs: Restrict ui/win32-kbd-hook to system-mode
+> >
+> > Sergei Trofimovich (1):
+> >   linux-user/strace.list: fix epoll_create{,1} -strace output
+> >
+> >  Makefile                   |  2 +-
+> >  arch_init.c                |  1 -
+> >  configure                  |  4 +++
+> >  exec.c                     |  4 ++-
+> >  hw/core/cpu.c              |  2 ++
+> >  include/hw/core/cpu.h      |  7 ++++-
+> >  linux-user/generic/fcntl.h |  4 +++
+> >  linux-user/mmap.c          |  2 +-
+> >  linux-user/strace.list     |  4 +--
+> >  linux-user/syscall.c       | 33 +++++++++++++++++----
+> >  stubs/Makefile.objs        | 52 +++++++++++++++++++--------------
+> >  target/i386/cpu.c          |  6 +++-
+> >  target/riscv/cpu.c         |  6 ++--
+> >  target/s390x/cpu.c         | 12 ++++----
+> >  tests/Makefile.include     | 18 ++++++------
+> >  util/Makefile.objs         | 59 ++++++++++++++++++++++++--------------
+> >  16 files changed, 143 insertions(+), 73 deletions(-)
+> >
+> > --=3D20
+> > 2.26.2
+> >
+>
+> It has failed again on the PATCH 4/19. I think there is a problem with
+> one of the cc. I re-sent the series again and it has worked this time.
+>
 
-I think it's a reasonable way to address this overall.
-As Cornelia has commented, addressing ccw as well as cases where user has
-specified the property manually could be worth-while.
+A similar problem happened to me once. I was getting a list of cc
+addresses via get_maintainers.pl, and copying and pasting the
+output in terminal. The problem of incomplete git send-email. in
+my case, did not stop until I manually entered all email addresses
+rather than copy/paste them. Still do not know what was the root
+cause.
 
->      machine_class->init(machine);
-> -- 
-> 2.26.2
+Aleksandar
 
+> Thanks,
+> Laurent
+>
 
