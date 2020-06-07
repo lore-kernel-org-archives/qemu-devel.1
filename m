@@ -2,91 +2,96 @@ Return-Path: <SRS0=Pynu=7U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4050C433DF
-	for <qemu-devel@archiver.kernel.org>; Sun,  7 Jun 2020 21:12:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F60FC433DF
+	for <qemu-devel@archiver.kernel.org>; Sun,  7 Jun 2020 22:18:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 765592067B
-	for <qemu-devel@archiver.kernel.org>; Sun,  7 Jun 2020 21:12:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 29D2C2073B
+	for <qemu-devel@archiver.kernel.org>; Sun,  7 Jun 2020 22:18:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iGzwlNnP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 765592067B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h8w2r6h0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29D2C2073B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52378 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42292 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ji2aF-0001mN-Mp
-	for qemu-devel@archiver.kernel.org; Sun, 07 Jun 2020 17:11:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42848)
+	id 1ji3cf-00056G-La
+	for qemu-devel@archiver.kernel.org; Sun, 07 Jun 2020 18:18:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47806)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <agrecascino123@gmail.com>)
- id 1ji2ZU-0001L7-RH
- for qemu-devel@nongnu.org; Sun, 07 Jun 2020 17:11:12 -0400
-Received: from mail-qt1-x844.google.com ([2607:f8b0:4864:20::844]:46612)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1ji3bQ-0004DM-BX
+ for qemu-devel@nongnu.org; Sun, 07 Jun 2020 18:17:16 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:54586)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <agrecascino123@gmail.com>)
- id 1ji2ZS-0005UZ-PZ
- for qemu-devel@nongnu.org; Sun, 07 Jun 2020 17:11:12 -0400
-Received: by mail-qt1-x844.google.com with SMTP id g18so13145752qtu.13
- for <qemu-devel@nongnu.org>; Sun, 07 Jun 2020 14:11:08 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1ji3bP-0007pe-4V
+ for qemu-devel@nongnu.org; Sun, 07 Jun 2020 18:17:16 -0400
+Received: by mail-wm1-x342.google.com with SMTP id g10so13522956wmh.4
+ for <qemu-devel@nongnu.org>; Sun, 07 Jun 2020 15:17:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=KHf+Vmi8xc/vMhM+B7yEwcWlFM+npGXMYwLWVfs1t7Q=;
- b=iGzwlNnPJUpGogtMzBc1MR8Y8s2Kc3il/wUr4AzWTh9x8oKjhYr5hCHnFKMxFOKzKS
- P+Fd9ppYiawzVtpYhdkPDOKtkUjbgg5AOC8AGwhP84ZJGAAtrDDsYBBr57Xbb05VdI4O
- 4wB/JRVWme7YsDzg4EXZJOfR5ZampqAvXgFkU18mlwyfmAzw8ou3RbmrVtgTbdGV7wgl
- byYo1Gw/AQO56K3Gep1ScvilmNwLdPgczFTAOSGtzhKBg13Hu7nuYyDviULW5gMi49eV
- deXIEDuGByIiEEm3B5b9bkrz+wmtlQf/ZYtkJr8SP7kYLFX6TDH1KTwYGhCLbg1kdGWE
- JvPA==
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=dhAoQWd9q7mQwrIw9bX6sg077JGQFpVoRyJHO4h4AA0=;
+ b=h8w2r6h0StQfeJVpLsunKBh5GbLO4MVAHyMMKMnODkg94/LOytnG6x0mrTBLuftG6B
+ 0u/Kq9C7uT11U+H2RsOo3/TH70kxjlhUbF6lHM75HMPY+v4LupUBgEhTUITvXvWnxKnB
+ iPI281k/DSl6L3T6tC5t8j/KVbeDMUIcSkxN60S1qLPLXoSm/+rib1oIck8b+yO8O4xr
+ ymBj/2tITgfG4tITNEvfcr1byOTZY0z9x0lcLZmsi1u6Ta4vpZPC0Q4ez6TzJPDxcCD6
+ Z+INuXuPKaSssyuXAfybrRRLkmX6OTGDdV2FLudEJpzuKXu384CwbmZqcdSzqEiwkBJ8
+ tpoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=KHf+Vmi8xc/vMhM+B7yEwcWlFM+npGXMYwLWVfs1t7Q=;
- b=WTleyd+Xge9ptFQwYab4b+DANUgtLAKYAN886rpKP1iLT+0B+jUqT7n+bHD4h15vnX
- j19Hcco9Gbt9j3yS699S6uYP0hor5t5ePQ40A5fLEzLrH9QGtACpjNjIvVsL28R17vHb
- FbGMBzQ/eZw/4JT5FUemqbVrXYKy9+oKQ1jj4i4ZA2ZrGUE3UNsTdvwSXoegEUFMjHR5
- 78tHuqRKY9lkEAzbyuyWUFea6mCduFJdSkqAE2sA52SeSXMyfy9y1QU+OJndIk0BTqCG
- 0rdZe9sTp3ub2ce4keso6I3EZ2+NsG9WDDdjDH/lLJhsPxAA42ygFwPrgPDmC+JW8qDJ
- XrTQ==
-X-Gm-Message-State: AOAM530JgImBjI8HpyM6RJ47IkRZ5hZzsw+SVKrZ7RucIh5HrwhU+DTN
- CiwQL2gsaHDXisfe+X7bUiH11dsT
-X-Google-Smtp-Source: ABdhPJxiDC7zw4F/j7itnGxnqCRRX4aoCqSCtCsM1SQFljg4eHeS0WcszQwxxZUbUcI+PDa4dz48Gw==
-X-Received: by 2002:ac8:dd:: with SMTP id d29mr20890944qtg.392.1591564267860; 
- Sun, 07 Jun 2020 14:11:07 -0700 (PDT)
-Received: from localhost.localdomain
- ([2600:1700:3c90:1b60:40e2:cfda:b7a4:16f3])
- by smtp.gmail.com with ESMTPSA id p16sm5337599qkg.63.2020.06.07.14.11.06
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 07 Jun 2020 14:11:06 -0700 (PDT)
-From: agrecascino123@gmail.com
-To: qemu-devel@nongnu.org
-Subject: [PATCH v5] tcg: Sanitize shift constants on ppc64le so that shift
- operations with large constants don't generate invalid instructions.
-Date: Sun,  7 Jun 2020 17:10:59 -0400
-Message-Id: <20200607211100.22858-1-agrecascino123@gmail.com>
-X-Mailer: git-send-email 2.26.2
+ bh=dhAoQWd9q7mQwrIw9bX6sg077JGQFpVoRyJHO4h4AA0=;
+ b=R28NN5JZYPSosLox8lrmmSOEAam+iS2UcwXihOIqAvZ+QiEVDmaAY8EuFy2+rdydEX
+ MpIVu2dsdHSVwjKiyEkezITZClk7oBL8ynccNfi3BGYHfXWtJXC9ay4/YRFtwFIxRt07
+ szZoRRY+6ACPEvJBUWRJGA2/82m+TQdDO0ZP//fxra9vRG+Ar1RkIVLWCc3P9T4S4sg7
+ 3Jralbp9bE7yj35y98s3xA5k29I+C22e2Fr6lNmUGmo6xcG4ewxVVQwcyUmdLcQ6qhod
+ v6OcClEn93vMAcUH+B98GddxF+xKa2BlbED3HY0pK/Guu37Kv0WYN+X0/jujjgftQJMb
+ B8XQ==
+X-Gm-Message-State: AOAM5320AJj4JBsh1OTCdiU5D0zvTdwCz2TOflTFdv9dETcZ7ZEOJ1Cz
+ QgAyeKWSGB/Lbee29NNBOkQ=
+X-Google-Smtp-Source: ABdhPJxJPg5ZhN6LbooNRHCaU3H1QfpjiDGWik9KwVIgjk0LaCILouR2ifRKeMZBhglLlaBFFNp9uQ==
+X-Received: by 2002:a7b:ca47:: with SMTP id m7mr13092739wml.173.1591568233123; 
+ Sun, 07 Jun 2020 15:17:13 -0700 (PDT)
+Received: from [192.168.1.43] (181.red-88-10-103.dynamicip.rima-tde.net.
+ [88.10.103.181])
+ by smtp.gmail.com with ESMTPSA id j4sm21384717wma.7.2020.06.07.15.17.11
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sun, 07 Jun 2020 15:17:12 -0700 (PDT)
+Subject: Re: [PATCH] net: tulip: Set PCI revision to match dec21143
+To: Marek Vasut <marek.vasut@gmail.com>, qemu-devel@nongnu.org,
+ Sven Schnelle <svens@stackframe.org>
+References: <20200418002552.343480-1-marek.vasut+renesas@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <203b5328-b473-119c-4122-8f775f390ad0@amsat.org>
+Date: Mon, 8 Jun 2020 00:17:11 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
+In-Reply-To: <20200418002552.343480-1-marek.vasut+renesas@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::844;
- envelope-from=agrecascino123@gmail.com; helo=mail-qt1-x844.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::342;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x342.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
+X-Spam_score_int: -16
+X-Spam_score: -1.7
 X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
@@ -101,98 +106,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Catherine A. Frederick" <chocola@animebitch.es>, rth@twiddle.net
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Marek Vasut <marek.vasut+renesas@gmail.com>,
+ Prasad J Pandit <pjp@fedoraproject.org>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Catherine A. Frederick" <chocola@animebitch.es>
+Hi Sven, could you review thiw one-line patch?
 
-Signed-off-by: Catherine A. Frederick <chocola@animebitch.es>
----
-Okay, I removed the bad "fix" on sar_i64, and the asserts in the various functions. 
-Crossing my fingers here.
-
- tcg/ppc/tcg-target.inc.c | 34 +++++++++++++++++++++++++++++-----
- 1 file changed, 29 insertions(+), 5 deletions(-)
-
-diff --git a/tcg/ppc/tcg-target.inc.c b/tcg/ppc/tcg-target.inc.c
-index 7da67086c6..5cb1556912 100644
---- a/tcg/ppc/tcg-target.inc.c
-+++ b/tcg/ppc/tcg-target.inc.c
-@@ -2610,21 +2610,33 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc, const TCGArg *args,
- 
-     case INDEX_op_shl_i32:
-         if (const_args[2]) {
--            tcg_out_shli32(s, args[0], args[1], args[2]);
-+            /*
-+             * Limit shift immediate to prevent illegal instruction
-+             * from bitmask corruption
-+             */
-+            tcg_out_shli32(s, args[0], args[1], args[2] & 31);
-         } else {
-             tcg_out32(s, SLW | SAB(args[1], args[0], args[2]));
-         }
-         break;
-     case INDEX_op_shr_i32:
-         if (const_args[2]) {
--            tcg_out_shri32(s, args[0], args[1], args[2]);
-+            /*
-+             * Both use RLWINM, which has a 5 bit field for the
-+             * shift mask.
-+             */
-+            tcg_out_shri32(s, args[0], args[1], args[2] & 31);
-         } else {
-             tcg_out32(s, SRW | SAB(args[1], args[0], args[2]));
-         }
-         break;
-     case INDEX_op_sar_i32:
-         if (const_args[2]) {
--            tcg_out32(s, SRAWI | RS(args[1]) | RA(args[0]) | SH(args[2]));
-+            /*
-+             * SRAWI has a 5 bit sized field for the shift mask
-+             * as well.
-+             */
-+            tcg_out32(s, SRAWI | RS(args[1]) | RA(args[0]) | SH(args[2] & 31));
-         } else {
-             tcg_out32(s, SRAW | SAB(args[1], args[0], args[2]));
-         }
-@@ -2696,20 +2708,32 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc, const TCGArg *args,
- 
-     case INDEX_op_shl_i64:
-         if (const_args[2]) {
--            tcg_out_shli64(s, args[0], args[1], args[2]);
-+            /*
-+             * Limit shift immediate to prevent illegal instruction from
-+             * from bitmask corruption
-+             */
-+            tcg_out_shli64(s, args[0], args[1], args[2] & 63);
-         } else {
-             tcg_out32(s, SLD | SAB(args[1], args[0], args[2]));
-         }
-         break;
-     case INDEX_op_shr_i64:
-         if (const_args[2]) {
--            tcg_out_shri64(s, args[0], args[1], args[2]);
-+            /*
-+             * Same applies here, as both RLDICL, and RLDICR have a
-+             * 6 bit large mask for the shift value
-+             */
-+            tcg_out_shri64(s, args[0], args[1], args[2] & 63);
-         } else {
-             tcg_out32(s, SRD | SAB(args[1], args[0], args[2]));
-         }
-         break;
-     case INDEX_op_sar_i64:
-         if (const_args[2]) {
-+            /*
-+             * Already done here, as it's a split field, and
-+             * somebody noticed it would have overflowed.
-+             */
-             int sh = SH(args[2] & 0x1f) | (((args[2] >> 5) & 1) << 1);
-             tcg_out32(s, SRADI | RA(args[0]) | RS(args[1]) | sh);
-         } else {
--- 
-2.26.2
+On 4/18/20 2:25 AM, Marek Vasut wrote:
+> The tulip driver claims to emulate dec21143 and it does not emulate dec21142.
+> The dec21142 and dec21143 can be discerned by the PCI revision register,
+> where dec21142 reports value < 0x20 and dec21143 value >= 0x20. E.g. the
+> U-Boot 'tulip' driver also only supports dec21143 and verifies that the
+> PCI revision ID is >= 0x20, otherwise refuses to operate such a card.
+> 
+> This patch sets the PCI revision ID to 0x20 to match the dec21143 and
+> thus also permits e.g. U-Boot to work with the tulip emulation.
+> 
+> Fixes: 34ea023d4b95 ("net: add tulip (dec21143) driver")
+> Signed-off-by: Marek Vasut <marek.vasut+renesas@gmail.com>
+> Cc: Marc-André Lureau <marcandre.lureau@redhat.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: Prasad J Pandit <pjp@fedoraproject.org>
+> Cc: Sven Schnelle <svens@stackframe.org>
+> ---
+>  hw/net/tulip.c | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/hw/net/tulip.c b/hw/net/tulip.c
+> index 1295f51d07..ffb6c2479a 100644
+> --- a/hw/net/tulip.c
+> +++ b/hw/net/tulip.c
+> @@ -962,6 +962,8 @@ static void pci_tulip_realize(PCIDevice *pci_dev, Error **errp)
+>  
+>      pci_conf = s->dev.config;
+>      pci_conf[PCI_INTERRUPT_PIN] = 1; /* interrupt pin A */
+> +    /* Anything with revision < 0x20 is DC21142, anything >= 0x20 is DC21143 */
+> +    pci_conf[PCI_REVISION_ID] = 0x20;
+>  
+>      s->eeprom = eeprom93xx_new(&pci_dev->qdev, 64);
+>      tulip_fill_eeprom(s);
+> 
 
 
