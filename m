@@ -2,87 +2,69 @@ Return-Path: <SRS0=zEF8=7V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5377EC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 09:53:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE8B7C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 09:54:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 19464206A4
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 09:53:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 93EF0206A4
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 09:54:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="u+Xg5ksc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19464206A4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="bZWIYQaP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93EF0206A4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55834 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58574 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jiETW-0007ta-DO
-	for qemu-devel@archiver.kernel.org; Mon, 08 Jun 2020 05:53:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50224)
+	id 1jiEUc-0000bb-TO
+	for qemu-devel@archiver.kernel.org; Mon, 08 Jun 2020 05:54:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51194)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jiEHo-0007aK-J9
- for qemu-devel@nongnu.org; Mon, 08 Jun 2020 05:41:44 -0400
-Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:33271)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jiEHk-0002NX-0Y
- for qemu-devel@nongnu.org; Mon, 08 Jun 2020 05:41:44 -0400
-Received: by mail-wr1-x42e.google.com with SMTP id l11so16648733wru.0
- for <qemu-devel@nongnu.org>; Mon, 08 Jun 2020 02:41:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=qnNEavQ1EUeAgIJNVEgFBp92MTwLoTDdtGhC7GxpY6g=;
- b=u+Xg5kscSi8BJQ2EIGpHaoJXYZbX1eV/Xxxk3sokJNTAPZlKkhMcJgrSr58K5fiowm
- gdI6FSpP6mRSbtRNTU4WU6zLhgsdFtuBeYiEr7/DrkNPT1RNRAz9U1GeIYGzOyN7I5YS
- 51S19irx9wthwSNp0lrywgNM7fU1W1EjO56SIg/YzmNB3eITGmUyUQG9Ae5xPyQqISZf
- OgsVVubUL31dWp9Nspq8E1kVzWynLIiAcV0nVD4i3nu9QeAlQNyinxNn6mqm3nHFXIfc
- sFXo+xZuuxZdIQhaMK92kI8ZAMe/ldelt0srtXH2r9bnB8qPV+kd+dmZSlkf947sDQZZ
- UuQA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=qnNEavQ1EUeAgIJNVEgFBp92MTwLoTDdtGhC7GxpY6g=;
- b=EikpBMRJ7mxeIdOl4/zZUqOJY9GU75jriHKUz5a2P+GgA0KvRDsyZBV1UIFsZH+s5u
- zYDuBGE81Cl+sLChZ8/Uk+2BsGwzCPdNVbf3XCZkXzLWtUFWJEpUtkkalGmEgZ/QbXRE
- tTu4Y+E46hnbrGB3Slo1Se0FZ/IjIrYp5R7gKuf933z3utd+Df9t2SmW0BWeLEMizkmh
- lOwBmhyrOXhmacC57spibqEr+c3JASbYWARKCNa9x0k2zD1yVOwFPXc4CSw3aosmFNL2
- LH7lF61uJiIUpHXLJNMu7FSVqVzHlHZ9++ws4FQfsCriBQGhHY6g4aRC2RVeKq57rSWu
- 2J3w==
-X-Gm-Message-State: AOAM533/YceSycZHVhATpDclnGDNL5hMYvtfS2GQAdb/NeEmrzTf6TZi
- y1IS5EDpB0qlmS9NCM9vGHcSHBIOVXwPImtau+yOVDDx
-X-Google-Smtp-Source: ABdhPJznTdxvCq2Rl4hn8di31gw2VGu7ESiu5o/ffqwTFieKJnmz7NX28oTTKO52IbUxsPRlIRZf4elmKjq6HkEws48=
-X-Received: by 2002:a5d:4385:: with SMTP id i5mr22105070wrq.420.1591609297677; 
- Mon, 08 Jun 2020 02:41:37 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1jiES8-0006TA-4r
+ for qemu-devel@nongnu.org; Mon, 08 Jun 2020 05:52:24 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:44877 helo=ozlabs.org)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1jiES5-00045y-Iv
+ for qemu-devel@nongnu.org; Mon, 08 Jun 2020 05:52:23 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 49gT7G5pWyz9sRR; Mon,  8 Jun 2020 19:52:10 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1591609930;
+ bh=3nftKjTSlR6yZLalgH0AP5LAfLkOWB0e+gKJpPTMjwI=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=bZWIYQaPiNTpUl0mmDFKfUJxvf4N6kbg3/pwKtLlbkWhlELKdde7bQ/7XEhhhDiPF
+ ZlHb5Ly41otFxY7mmzjd05khBfRSxLdjtQv9nh4j736GOH5xdWIGRKq9Z3YbF6l07g
+ XKdPgXhDa53viKzqqXKLdC8XSGmipxwW1f7lToyw=
+Date: Mon, 8 Jun 2020 19:52:00 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH v5 0/2] Makefile: libfdt: build only the strict necessary
+Message-ID: <20200608095200.GC494336@umbus.fritz.box>
+References: <20200518160319.18861-1-cfontana@suse.de>
+ <1f70e2fb-a1f4-29af-c9e6-38b178fa26ca@suse.de>
+ <9f1d9711-c87d-f554-2718-f69b3babbf54@redhat.com>
 MIME-Version: 1.0
-References: <1591559185-31287-1-git-send-email-aleksandar.qemu.devel@gmail.com>
- <159156173139.32466.16783549689356647947@45ef0f9c86ae>
-In-Reply-To: <159156173139.32466.16783549689356647947@45ef0f9c86ae>
-From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Date: Mon, 8 Jun 2020 11:41:25 +0200
-Message-ID: <CAHiYmc7YcqL0kTgUVts6rgcEghLyfGfVKP5Mf9H_HM=ZpJd5Tw@mail.gmail.com>
-Subject: Re: [PULL 00/21] MIPS queue for June 7th, 2020
-To: QEMU Developers <qemu-devel@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::42e;
- envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wr1-x42e.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="f0KYrhQ4vYSV2aJu"
+Content-Disposition: inline
+In-Reply-To: <9f1d9711-c87d-f554-2718-f69b3babbf54@redhat.com>
+Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
+ helo=ozlabs.org
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/08 05:52:11
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,95 +78,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
+ Philippe Mathieu-Daude <philmd@redhat.com>, Laurent Vivier <laurent@vivier.eu>,
+ Markus Armbruster <armbru@redhat.com>, Claudio Fontana <cfontana@suse.de>,
+ David Gibson <dgibson@redhat.com>, Alex Bennee <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-=D0=BD=D0=B5=D0=B4, 7. =D1=98=D1=83=D0=BD 2020. =D1=83 22:29 <no-reply@patc=
-hew.org> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=
-=B0:
->
-> Patchew URL: https://patchew.org/QEMU/1591559185-31287-1-git-send-email-a=
-leksandar.qemu.devel@gmail.com/
->
->
->
-> Hi,
->
-> This series failed the docker-quick@centos7 build test. Please find the t=
-esting commands and
-> their output below. If you have Docker installed, you can probably reprod=
-uce it
-> locally.
->
 
-I took a look at logs, my conclusion is that the failure is either
-test or test environment issue.
+--f0KYrhQ4vYSV2aJu
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-There is no, even remote, logical connection between changes in this
-pull request and any reported failures.
+On Sun, Jun 07, 2020 at 08:53:52AM +0200, Thomas Huth wrote:
+>  Hi David,
+>=20
+> could you maybe take this through your ppc tree?
 
-Thanks,
-Aleksandar
+Sounds reasonable, but this version doesn't seem to apply any more.
 
-> =3D=3D=3D TEST SCRIPT BEGIN =3D=3D=3D
-> #!/bin/bash
-> make docker-image-centos7 V=3D1 NETWORK=3D1
-> time make docker-test-quick@centos7 SHOW_ENV=3D1 J=3D14 NETWORK=3D1
-> =3D=3D=3D TEST SCRIPT END =3D=3D=3D
->
-> --- /tmp/qemu-test/src/tests/qemu-iotests/040.out       2020-06-07 19:56:=
-39.000000000 +0000
-> +++ /tmp/qemu-test/build/tests/qemu-iotests/040.out.bad 2020-06-07 20:21:=
-34.803254929 +0000
-> @@ -1,3 +1,5 @@
-> +WARNING:qemu.machine:qemu received signal 9: /tmp/qemu-test/build/tests/=
-qemu-iotests/../../x86_64-softmmu/qemu-system-x86_64 -display none -vga non=
-e -chardev socket,id=3Dmon,path=3D/tmp/tmp.G5tFM6qSxm/qemu-20664-monitor.so=
-ck -mon chardev=3Dmon,mode=3Dcontrol -qtest unix:path=3D/tmp/tmp.G5tFM6qSxm=
-/qemu-20664-qtest.sock -accel qtest -nodefaults -display none -accel qtest
-> +WARNING:qemu.machine:qemu received signal 9: /tmp/qemu-test/build/tests/=
-qemu-iotests/../../x86_64-softmmu/qemu-system-x86_64 -display none -vga non=
-e -chardev socket,id=3Dmon,path=3D/tmp/tmp.G5tFM6qSxm/qemu-20664-monitor.so=
-ck -mon chardev=3Dmon,mode=3Dcontrol -qtest unix:path=3D/tmp/tmp.G5tFM6qSxm=
-/qemu-20664-qtest.sock -accel qtest -nodefaults -display none -accel qtest
->  ...........................................................
->  ----------------------------------------------------------------------
->  Ran 59 tests
-> ---
-> Not run: 259
-> Failures: 040
-> Failed 1 of 119 iotests
-> make: *** [check-tests/check-block.sh] Error 1
-> Traceback (most recent call last):
->   File "./tests/docker/docker.py", line 665, in <module>
->     sys.exit(main())
-> ---
->     raise CalledProcessError(retcode, cmd)
-> subprocess.CalledProcessError: Command '['sudo', '-n', 'docker', 'run', '=
---label', 'com.qemu.instance.uuid=3Df770c887f5824103a4bf9eb1cb4665d2', '-u'=
-, '1001', '--security-opt', 'seccomp=3Dunconfined', '--rm', '-e', 'TARGET_L=
-IST=3D', '-e', 'EXTRA_CONFIGURE_OPTS=3D', '-e', 'V=3D', '-e', 'J=3D14', '-e=
-', 'DEBUG=3D', '-e', 'SHOW_ENV=3D1', '-e', 'CCACHE_DIR=3D/var/tmp/ccache', =
-'-v', '/home/patchew/.cache/qemu-docker-ccache:/var/tmp/ccache:z', '-v', '/=
-var/tmp/patchew-tester-tmp-4e7hhqlp/src/docker-src.2020-06-07-16.13.37.3276=
-4:/var/tmp/qemu:z,ro', 'qemu:centos7', '/var/tmp/qemu/run', 'test-quick']' =
-returned non-zero exit status 2.
-> filter=3D--filter=3Dlabel=3Dcom.qemu.instance.uuid=3Df770c887f5824103a4bf=
-9eb1cb4665d2
-> make[1]: *** [docker-run] Error 1
-> make[1]: Leaving directory `/var/tmp/patchew-tester-tmp-4e7hhqlp/src'
-> make: *** [docker-run-test-quick@centos7] Error 2
->
-> real    15m14.937s
-> user    0m9.503s
->
->
-> The full log is available at
-> http://patchew.org/logs/1591559185-31287-1-git-send-email-aleksandar.qemu=
-.devel@gmail.com/testing.docker-quick@centos7/?type=3Dmessage.
-> ---
-> Email generated automatically by Patchew [https://patchew.org/].
-> Please send your feedback to patchew-devel@redhat.com
+>=20
+>  Thanks,
+>   Thomas
+>=20
+>=20
+> On 01/06/2020 13.28, Claudio Fontana wrote:
+> > Hello all,
+> >=20
+> > is this queued somewhere?
+> >=20
+> > Thanks,
+> >=20
+> > Claudio
+> >=20
+> > On 5/18/20 6:03 PM, Claudio Fontana wrote:
+> >> v4 -> v5:
+> >>
+> >> * include the dtc submodule update commit in the 1/2 patch
+> >>
+> >> v3 -> v4: NB! only useful when updating to latest dtc (not in QEMU yet)
+> >>
+> >> * changed the approach to leverage new upstream dtc Makefile,
+> >>   needs dtc submodule update to include upstream dtc commit
+> >>   85e5d839847af54efab170f2b1331b2a6421e647.
+> >>
+> >> * LIBFDT_srcdir does not exist anymore in upstream dtc: it is also
+> >>   not used anymore.
+> >>
+> >> * LIBFDT_lib: need to avoid building libfdt.so at least for now, so pa=
+ss as
+> >>   empty to avoid building the .so. This is to avoid breaking existing
+> >>   trees with objects already compiled without -fPIC.
+> >>
+> >> * clean: no need to make dtc clean target, every artifact is captured =
+by
+> >>   global clean rule
+> >>
+> >> v2 -> v3:
+> >>
+> >> * changed into a 2 patch series; in the second patch we remove the old
+> >>   compatibility gunks that were meant for removal some time after 4.1.
+> >>
+> >> * renamed the libfdt PHONY rule to dtc/all, with the intent to make
+> >>   existing working trees forward and backward compatible across the ch=
+ange.
+> >>
+> >> v1 -> v2:
+> >>
+> >> * fix error generated when running UNCHECKED_GOALS without prior confi=
+gure,
+> >>   for example during make docker-image-fedora. Without configure, DSOS=
+UF is
+> >>   empty, and the module pattern rule in rules.mak that uses this varia=
+ble
+> >>   can match too much; provide a default in the Makefile to avoid it.
+> >>
+> >> * only attempt to build the archive when there is a non-empty list of =
+objects.
+> >>   This could be done in general for the %.a: pattern in rules.mak, but=
+ maybe
+> >>   there are valid reasons to build an empty .a?
+> >>
+> >> * removed some intermediate variables that did not add much value
+> >>   (LIBFDT_srcdir, LIBFDT_archive)
+> >>
+> >> Tested locally with 3 VPATH configurations (no-, VPATH, VPATH in src s=
+ubdir),
+> >> and with docker-image-fedora, docker-test-debug@fedora that failed bef=
+ore.
+> >>
+> >> Claudio Fontana (2):
+> >>   Makefile: libfdt: build only the strict necessary
+> >>   Makefile: remove old compatibility gunks
+> >>
+> >>  Makefile  | 32 ++++++++++++++++----------------
+> >>  configure |  6 +-----
+> >>  rules.mak |  2 ++
+> >>  3 files changed, 19 insertions(+), 21 deletions(-)
+> >>
+> >=20
+> >=20
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--f0KYrhQ4vYSV2aJu
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl7eCj0ACgkQbDjKyiDZ
+s5JUmRAAuVA0C3Yz4eDm5Vpxmer/FK+SgCE2mwNQOkS30m0VZCEWwg2dgBRW/AG7
+7yZntaMW0+6COOZ94xommRqg8X28muJGmZ0bt5dqZoJc499iUIeLNObidZYsyPKV
+vh+uElv0EKN9xLctPyGDq4kRuBB2T2bXKgkUHqaanE2IKppFSK1dmhqaVLUpME0B
+YicWeU9QVC4xtmAXIlzSTK16P7HoDqAgDcI+U1kRW8Z8jqPWgtdXbQ7LDudeNcA+
+Rq5Vd9+xRWnOD0wsbAzcC3iLJRamoR/9xuLJ5iht384JWd/3w7jWVxoqEav5sRw+
+hjz9DDzLuRqPkhhG3R7sRqyJRBHoBwHHqb/cAd6JWeIv8p4Ga0cprueosqBHJ2Al
+KoC0choBvE+QGejT0DxJX33/UhWbQrt7BnvN8F1/8u/BQ0hYTf+wCAwMaoDOR14Q
+EPzDK6iAXz/HWesL+FNy/Y5F7XEKHIHcM8BIkaSxpt9xAEjjp8Gtj9cYeRa7fZ1B
+ZpLibXcmPo7N8A9rJtJ5YO4GSOYaOQ8l3fIPyj3MH8Q5YT21li2+jxWJvMVTRNSv
+bwnUcBwM9QqeMBBOov7evTz1z9To2q4KJm/94SK8qDoOL7lPb1Babi1dsythyolm
+93E79ufL97kHZdRNF3RvuomFMzwfFZHtVE2SLdgcWt4FJFrHxXs=
+=6dIy
+-----END PGP SIGNATURE-----
+
+--f0KYrhQ4vYSV2aJu--
 
