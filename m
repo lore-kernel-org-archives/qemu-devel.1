@@ -7,78 +7,77 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08B5CC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 16:09:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BC61C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 16:10:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C49AB206D5
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 16:09:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 098472063A
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 16:10:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MdDPcJAF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C49AB206D5
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KuLTfay+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 098472063A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40028 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40874 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jiKLS-0007wv-SS
-	for qemu-devel@archiver.kernel.org; Mon, 08 Jun 2020 12:09:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37752)
+	id 1jiKLa-0008Lo-67
+	for qemu-devel@archiver.kernel.org; Mon, 08 Jun 2020 12:10:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37728)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jiKDS-0006G6-FN
- for qemu-devel@nongnu.org; Mon, 08 Jun 2020 12:01:38 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49004
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jiKDM-0006BW-Oh
+ for qemu-devel@nongnu.org; Mon, 08 Jun 2020 12:01:33 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:51270
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jiKDR-0007hL-3E
- for qemu-devel@nongnu.org; Mon, 08 Jun 2020 12:01:37 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jiKDK-0007gU-OI
+ for qemu-devel@nongnu.org; Mon, 08 Jun 2020 12:01:32 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591632096;
+ s=mimecast20190719; t=1591632090;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=2ORhV1sd4nU6DWHF34s88hmmcxuNYxVDeCG6mbf27fE=;
- b=MdDPcJAFIjqZRCmjdj3PIFwb4RY9dFKGR/xHWnGaJcK/nETgZbJVM/IgCXCUSvLBT/IFTA
- Ae8nMVWkndzisfxE+Q9wfvpmS+0HPIYZyXuzUcvyFy51teT+IgwL4KikpiIo1+kvjRlSGL
- hc0qNyztSFAibz9ic6Ak0hJuYc68xu8=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-500-RN1x7W_qNsq2R4TcQI3rNQ-1; Mon, 08 Jun 2020 12:01:34 -0400
-X-MC-Unique: RN1x7W_qNsq2R4TcQI3rNQ-1
-Received: by mail-wm1-f69.google.com with SMTP id r1so4902wmh.7
- for <qemu-devel@nongnu.org>; Mon, 08 Jun 2020 09:01:34 -0700 (PDT)
+ bh=P++PpnzVmXXtn3Xqf4XIHbmL4uqsh2R3Dd1pfn2k/GY=;
+ b=KuLTfay+BjUA9tm25il0dVm1obY2X+WoFOeRz4dL/tw/N+nLrrfdHiWh0+RHp5r+xgIJIt
+ zdtGAp8UaVSWVevhmHB3N3V21ASJGWIo2xTXpmmGljkthpWIra3S/Wvh34rygklxtq2hS3
+ MmbgampXCMaaOT/W60SmlaHJTIwg9HY=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-41-Ra9YO6-CPda8hilkVXDkaw-1; Mon, 08 Jun 2020 12:01:28 -0400
+X-MC-Unique: Ra9YO6-CPda8hilkVXDkaw-1
+Received: by mail-wr1-f72.google.com with SMTP id l18so7395750wrm.0
+ for <qemu-devel@nongnu.org>; Mon, 08 Jun 2020 09:01:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=2ORhV1sd4nU6DWHF34s88hmmcxuNYxVDeCG6mbf27fE=;
- b=QLkKfQ59Oc7IRvLtgM/THDUc11Bj2092OpTr45NyGXLcBSYDsj0BxAQEFLVpPDLRY2
- wVLc2PjSQE5moWQPlKv2WyCS6MADTLY72p0VFrgUQyNk41cQeDAHp1sSsGsGGiT4k+Z9
- 29tuSVxGraZ3xWkmuZdQ/ozM47S4MFMV4210RaLqQzU7tEK71Y4IlvSkBeG9+O5FoejL
- gz93razzQcfc6ul3wvjGBAkzVe0ErmmHTJ3XAg+RqVamCG5wzA25d6ERm3SEEnp9BC8Q
- nGP9QBbkUa4ALFcgqEqWfXK1gNTqxpzDfGC6+fVHsJ+/w9C11bDyEubFrg1NNpQ2hrWs
- lrhA==
-X-Gm-Message-State: AOAM5313jQYqWZtk8lIDLRPLrcYfG5vZIP8KFgq2M3SndklUYYiZKtYJ
- 2Dd9nLBlk27mz2r4EMtYWEpWG1yGg4hrO5Id3ylWICbwo7FXt74n3BbKuEj5EENOV/3+4C8rYQe
- HbPB4mCpAPQh851w=
-X-Received: by 2002:a5d:6a4b:: with SMTP id t11mr23943707wrw.404.1591632092834; 
- Mon, 08 Jun 2020 09:01:32 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzX3WHm4bb0lVL0OqrCVvYAl9aSgd4/p4YzE7wN3r2SHFS1TTcIn2CmgHMd0vmMkRzt+4NE2w==
-X-Received: by 2002:a5d:6a4b:: with SMTP id t11mr23943661wrw.404.1591632092491; 
- Mon, 08 Jun 2020 09:01:32 -0700 (PDT)
+ bh=P++PpnzVmXXtn3Xqf4XIHbmL4uqsh2R3Dd1pfn2k/GY=;
+ b=IAjNr0lSOOA3hs4Ek1UKHqcaXUml7/xOmq5RYWKLJXdqRpChE+2YyIJkeJuH9OPKlr
+ G/R5oxqNntJ469a9lvJ1lxJmfe97yRNfAXKbv+xE9K2DlfWyJ8ekpeuk9mGSH9mS+Mmx
+ gFWsCPPYrA3FIfasoyTWoFhOlUaI/Ygm7XKstlf66IeCb22ibsfHtWnfIwzcj4MNHJNU
+ wiGfDy5/FzKDv5Nj73dLpS5F74Gaq9KHG7ls4S/PKhhiofbCQfnZqb1NZ859epYtbkqn
+ D1QOy2In3GVLXy36EsJ1WbfGLfkvfXAFjOTRJByGMC2snR5zuvGmAEBFXiUfurUp7reZ
+ f4+Q==
+X-Gm-Message-State: AOAM531as60Nj6cuPFXkW3R+pbXuWQf+8IoA1YUNYQ5U/+PTrlvA2RQC
+ JRAiv/vCf62kFirXbaK5E2jdFRfDR7b2d1FQHnnUGVSYWNHM8Qd+CJP19P+KshjnF9cQx0AABhh
+ BSvr+Alg01qEImYw=
+X-Received: by 2002:a1c:f007:: with SMTP id a7mr27131wmb.103.1591632087257;
+ Mon, 08 Jun 2020 09:01:27 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzi6QGEqKJNT1xfJrXVN1hFb5ZVsGqmEk2sV/P9tBTDLMUlN7hRgEWpk7m+66ilMFrnYarGkA==
+X-Received: by 2002:a1c:f007:: with SMTP id a7mr27088wmb.103.1591632086930;
+ Mon, 08 Jun 2020 09:01:26 -0700 (PDT)
 Received: from localhost.localdomain
  (181.red-88-10-103.dynamicip.rima-tde.net. [88.10.103.181])
- by smtp.gmail.com with ESMTPSA id a3sm122524wrp.91.2020.06.08.09.01.30
+ by smtp.gmail.com with ESMTPSA id o9sm7066wmh.37.2020.06.08.09.01.25
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 08 Jun 2020 09:01:31 -0700 (PDT)
+ Mon, 08 Jun 2020 09:01:26 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC PATCH 08/35] hw/display/blizzard: Emit warning when old code is
- used
-Date: Mon,  8 Jun 2020 18:00:17 +0200
-Message-Id: <20200608160044.15531-9-philmd@redhat.com>
+Subject: [RFC PATCH 07/35] hw/char/parallel: Emit warning when old code is used
+Date: Mon,  8 Jun 2020 18:00:16 +0200
+Message-Id: <20200608160044.15531-8-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200608160044.15531-1-philmd@redhat.com>
 References: <20200608160044.15531-1-philmd@redhat.com>
@@ -88,9 +87,9 @@ X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8;
 	text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/08 01:05:50
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/08 05:40:44
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -141,30 +140,30 @@ This code hasn't been QOM'ified yet. Warn the user.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- hw/display/blizzard.c | 3 +++
+ hw/char/parallel.c | 3 +++
  1 file changed, 3 insertions(+)
 
-diff --git a/hw/display/blizzard.c b/hw/display/blizzard.c
-index 105241577d..74557b152b 100644
---- a/hw/display/blizzard.c
-+++ b/hw/display/blizzard.c
-@@ -23,6 +23,7 @@
- #include "ui/console.h"
- #include "hw/display/blizzard.h"
- #include "ui/pixel_ops.h"
+diff --git a/hw/char/parallel.c b/hw/char/parallel.c
+index 8dd67d1375..0ee577d420 100644
+--- a/hw/char/parallel.c
++++ b/hw/char/parallel.c
+@@ -35,6 +35,7 @@
+ #include "hw/char/parallel.h"
+ #include "sysemu/reset.h"
+ #include "sysemu/sysemu.h"
 +#include "hw/qdev-deprecated.h"
+ #include "trace.h"
  
- typedef void (*blizzard_fn_t)(uint8_t *, const uint8_t *, unsigned int);
- 
-@@ -1010,6 +1011,8 @@ void *s1d13745_init(qemu_irq gpio_int)
-     BlizzardState *s = (BlizzardState *) g_malloc0(sizeof(*s));
-     DisplaySurface *surface;
+ //#define DEBUG_PARALLEL
+@@ -601,6 +602,8 @@ bool parallel_mm_init(MemoryRegion *address_space,
+ {
+     ParallelState *s;
  
 +    qdev_warn_deprecated_function_used();
 +
-     s->fb = g_malloc(0x180000);
- 
-     s->con = graphic_console_init(NULL, 0, &blizzard_ops, s);
+     s = g_malloc0(sizeof(ParallelState));
+     s->irq = irq;
+     qemu_chr_fe_init(&s->chr, chr, &error_abort);
 -- 
 2.21.3
 
