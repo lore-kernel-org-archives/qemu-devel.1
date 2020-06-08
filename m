@@ -2,95 +2,95 @@ Return-Path: <SRS0=zEF8=7V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37C05C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 13:57:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1095C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 14:03:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F0FF1206C3
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 13:57:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BBC5C206C3
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 14:03:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MXZzFchO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0FF1206C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SV6f0XK5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BBC5C206C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50510 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57708 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jiIGt-0004vQ-5Z
-	for qemu-devel@archiver.kernel.org; Mon, 08 Jun 2020 09:57:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50598)
+	id 1jiIMz-00087V-2O
+	for qemu-devel@archiver.kernel.org; Mon, 08 Jun 2020 10:03:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51330)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jiIG3-00044s-Hn
- for qemu-devel@nongnu.org; Mon, 08 Jun 2020 09:56:11 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:39685)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jiILw-0007bz-LN; Mon, 08 Jun 2020 10:02:16 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:44460)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jiIG1-0000lq-DF
- for qemu-devel@nongnu.org; Mon, 08 Jun 2020 09:56:10 -0400
-Received: by mail-wm1-x341.google.com with SMTP id k26so16643741wmi.4
- for <qemu-devel@nongnu.org>; Mon, 08 Jun 2020 06:56:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=p7vgMZP4zOiIY2EXziZ+vo8sNpds//7+4Wh0cABhF1I=;
- b=MXZzFchO+IBcJ4FpOIigLgAwBar9/EH8EZ/7BoSUbKm/z2sojqaa7JLyyL6QIl3hJa
- jmp1RBxGmMhWDYl9ViyKn7yGPWHwNnslUHC1ZhpNtp/owY+gCm8irYeLNi9JX4kt3r1e
- GgTyJ86W27NusZZDn/Ia3lGS3/cXcWp1KfD8f8itDUp45lRN9j/rcQY/z6L/x8Tq31h2
- FzgFqlfkuJRPbFnSvEB8ALPldlGeUAX8xY/FsRIvafdNP1BusJgdQ1z9ElW55/4fjDf2
- dg4i7fGnVNHhX5POnxJpSktF+s4gEB48DW3iN4OB4FJHVi84mCgV/dvVEW/Er8T25vyV
- LKCw==
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jiILv-0001qC-P3; Mon, 08 Jun 2020 10:02:16 -0400
+Received: by mail-wr1-x443.google.com with SMTP id y17so17509546wrn.11;
+ Mon, 08 Jun 2020 07:02:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=nq2xanGLh6ZPYCzponIHSk7Z+mN3fH6xJlvcIRxXB9U=;
+ b=SV6f0XK55Y/JXu0hm28pUCkigZ6ZDSX9yxPA95gCM6iAzKR/LGn/GUcVNfsGG0c9tL
+ Jw2iLgiouCTKSJQGOkTJHLYA2r9O1L5tz0MiILGcNhCDlpvIDwcR1b1zjogup89n1FoX
+ HaimsmexFkcdVXhwmZM2n0OUz38vNfY3QkNcO6QKNMNiQTudq+yl96n1fS2j1qNPpvgA
+ xj2sqEOqXraw/WdSMbUBdgr5411SN8Lt4fj/47ZLfrWWMpGOrRy6IBlY7vwKTd1aGOv+
+ IqvbMmiiaKXfJVgMIl2s4jRwzRmd4BLZPvBEEHHHmaWe0prMfZ/fRwUPWvSlb2N6ZWkT
+ 6EgA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=p7vgMZP4zOiIY2EXziZ+vo8sNpds//7+4Wh0cABhF1I=;
- b=tjB/72BIFjWeyOp7jUrxGil+8/ANOfoVz+GQEoXIj05YkRpPFNcjE/dZexfg6Awa8P
- QG4YR8XDXZvdBy0dPDIh31+dfjRj/+YyNK+xaQXGoI9IOslCRPze7+HjWW/WupO+nvQS
- e1km+DI2r5JdrdBSeJkZ0ZNxnh8plbKPKR2Ok4k4VdbXlw7toG7kJu2UiSME/v1f3RZu
- xyGzCohT4M8tgFykDHp+JegTfszSC2dhyVtZ6NIE44UVkM/i066yY6Z970igV6CAM+pC
- IsJ4+A2NIvYu28yWmeH//OX9kJYq4ODoHoG2Z4PDwx8E7NdhDdeKd5JrB/yS7zVJw3Hb
- uU3w==
-X-Gm-Message-State: AOAM532C3RRM9llXLKZmx2aHFqe3WRfQaGDlFfx+4ddUZCDF5f2NSni9
- 6wNfc2/kQbVpt8ByOGYo4BrOyg==
-X-Google-Smtp-Source: ABdhPJw0KPltmkpizbZd5tsIH0ZMDm5JtSlBqjCED0/ciWobCkvxzFjiDS2tZoreUN0f+UzpIhLYWw==
-X-Received: by 2002:a1c:b443:: with SMTP id d64mr15934946wmf.157.1591624567945; 
- Mon, 08 Jun 2020 06:56:07 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id 67sm5590817wrk.49.2020.06.08.06.56.06
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 08 Jun 2020 06:56:06 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id F28891FF7E;
- Mon,  8 Jun 2020 14:56:05 +0100 (BST)
-References: <20200605173422.1490-1-robert.foley@linaro.org>
- <20200605173422.1490-10-robert.foley@linaro.org>
-User-agent: mu4e 1.5.2; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Robert Foley <robert.foley@linaro.org>
-Subject: Re: [PATCH v2 09/13] tests/docker: Added docker build support for
- TSan.
-In-reply-to: <20200605173422.1490-10-robert.foley@linaro.org>
-Date: Mon, 08 Jun 2020 14:56:05 +0100
-Message-ID: <874krl7jbe.fsf@linaro.org>
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=nq2xanGLh6ZPYCzponIHSk7Z+mN3fH6xJlvcIRxXB9U=;
+ b=UT7TFRgoMwMO7OKYldNuXraR+JE5LhPJv8YWaCXK0posbX/CD9XWK0w8HO9w8xSHqK
+ QFve9WEqMzLRMUawMdzKSnBZUYIfkkHqhAyNht5hz6eztJPguqkaBITzyzgoUIYpQOP6
+ uZGx61oNkhKJLNvt3XkecwbO8BB3bgUzvAswyhLyhpqu46XAXFoJs/GK/Q+rLmnGwzQw
+ voAtCmbI7ll1G1djFzFlS1jl+zQXCc6Djw/Vq1+CRNATrIaA0XYLIpcIkLFyE/a1sv0Y
+ 8kAzttQvmuqcWqBbfoa6DTtmsaf6azAv+010t+mGK4vTlfDiE9Cp/fz6lLjreZA57aa1
+ aDuw==
+X-Gm-Message-State: AOAM5338Ii41q4C5dlsU4E2vT5/yzMXlvNjp9gOT+OJKUFQjArYs7n8b
+ GbYhE6qPRmMbTpYYIivO0mE=
+X-Google-Smtp-Source: ABdhPJwZaj72h1OxdD0wBZa2hfso0K7VS0EPnmpcVctDAh1y2UcE1mIVGeVbOGyAoOrZfbworEt1Wg==
+X-Received: by 2002:a5d:5585:: with SMTP id i5mr23430380wrv.112.1591624933001; 
+ Mon, 08 Jun 2020 07:02:13 -0700 (PDT)
+Received: from [192.168.1.38] (181.red-88-10-103.dynamicip.rima-tde.net.
+ [88.10.103.181])
+ by smtp.gmail.com with ESMTPSA id q13sm23018034wrn.84.2020.06.08.07.02.11
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 08 Jun 2020 07:02:11 -0700 (PDT)
+Subject: Re: [PATCH v2 06/24] armv7m: Delete unused "ARM,bitband-memory"
+ devices
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20200528110444.20456-1-armbru@redhat.com>
+ <20200528110444.20456-7-armbru@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <435ddac3-29f8-9f0a-6fa3-c369bcfd005c@amsat.org>
+Date: Mon, 8 Jun 2020 16:02:10 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
+In-Reply-To: <20200528110444.20456-7-armbru@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::341;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x341.google.com
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+X-Spam_score_int: -16
+X-Spam_score: -1.7
+X-Spam_bar: -
+X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
@@ -105,33 +105,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, peter.puhov@linaro.org, cota@braap.org,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, qemu-arm@nongnu.org, berrange@redhat.com,
+ ehabkost@redhat.com, Peter Maydell <peter.maydell@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 5/28/20 1:04 PM, Markus Armbruster wrote:
+> These devices are optional, and enabled by property "enable-bitband".
+> armv7m_instance_init() creates them unconditionally, because the
+> property has not been set then.  armv7m_realize() realizes them only
+> when the property is true.  Works, although it leaves unrealized
+> devices hanging around in the QOM composition tree.  Affects machines
+> microbit, mps2-an505, mps2-an521, musca-a, and musca-b1.
+> 
+> Delete the unused devices by making armv7m_realize() unparent them.
+> Visible in "info qom-tree"; here's the change for microbit:
+> 
+>      /machine (microbit-machine)
+>        /microbit.twi (microbit.i2c)
+>          /microbit.twi[0] (qemu:memory-region)
+>        /nrf51 (nrf51-soc)
+>          /armv6m (armv7m)
+>            /armv7m-container[0] (qemu:memory-region)
+>     -      /bitband[0] (ARM,bitband-memory)
+>     -        /bitband[0] (qemu:memory-region)
+>     -      /bitband[1] (ARM,bitband-memory)
+>     -        /bitband[0] (qemu:memory-region)
+>            /cpu (cortex-m0-arm-cpu)
+> 
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: qemu-arm@nongnu.org
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
-Robert Foley <robert.foley@linaro.org> writes:
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-> Added a new docker for ubuntu 20.04.
-> This docker has support for Thread Sanitizer
-> including one patch we need in one of the header files.
-> https://github.com/llvm/llvm-project/commit/a72dc86cd
->
-> This command will build with tsan enabled:
-> make docker-test-tsan-ubuntu2004=20
->
-> Also added the TSAN suppresion file to disable certain
-> cases of TSAN warnings.
->
-> Cc: Fam Zheng <fam@euphon.net>
-> Cc: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Signed-off-by: Robert Foley <robert.foley@linaro.org>
+> ---
+>  hw/arm/armv7m.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/arm/armv7m.c b/hw/arm/armv7m.c
+> index 7da57f56d3..f930619f53 100644
+> --- a/hw/arm/armv7m.c
+> +++ b/hw/arm/armv7m.c
+> @@ -245,8 +245,8 @@ static void armv7m_realize(DeviceState *dev, Error **errp)
+>      memory_region_add_subregion(&s->container, 0xe000e000,
+>                                  sysbus_mmio_get_region(sbd, 0));
+>  
+> -    if (s->enable_bitband) {
+> -        for (i = 0; i < ARRAY_SIZE(s->bitband); i++) {
+> +    for (i = 0; i < ARRAY_SIZE(s->bitband); i++) {
+> +        if (s->enable_bitband) {
+>              Object *obj = OBJECT(&s->bitband[i]);
+>              SysBusDevice *sbd = SYS_BUS_DEVICE(&s->bitband[i]);
+>  
+> @@ -265,6 +265,8 @@ static void armv7m_realize(DeviceState *dev, Error **errp)
+>  
+>              memory_region_add_subregion(&s->container, bitband_output_addr[i],
+>                                          sysbus_mmio_get_region(sbd, 0));
+> +        } else {
+> +            object_unparent(OBJECT(&s->bitband[i]));
+>          }
+>      }
+>  }
+> 
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
---=20
-Alex Benn=C3=A9e
 
