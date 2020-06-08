@@ -2,78 +2,92 @@ Return-Path: <SRS0=zEF8=7V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCDEAC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 11:42:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 738EFC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 11:44:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 891652074B
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 11:42:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3B7D32074B
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 11:44:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HWJ17nel"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 891652074B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=nuviainc-com.20150623.gappssmtp.com header.i=@nuviainc-com.20150623.gappssmtp.com header.b="xL+R7nqn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B7D32074B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nuviainc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34788 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40214 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jiGAe-0001sb-QU
-	for qemu-devel@archiver.kernel.org; Mon, 08 Jun 2020 07:42:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33584)
+	id 1jiGCA-000479-Hl
+	for qemu-devel@archiver.kernel.org; Mon, 08 Jun 2020 07:44:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33540)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jiG9C-0000AK-Sv
- for qemu-devel@nongnu.org; Mon, 08 Jun 2020 07:40:58 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30264
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jiG9B-0003jy-7n
- for qemu-devel@nongnu.org; Mon, 08 Jun 2020 07:40:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591616455;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type;
- bh=DyzvOCPihzQYQjCuD5MQ7+V/b+JSPZS8On1IUN+oCtQ=;
- b=HWJ17nelFff1cAjkgLt2QEhTp630OqgfNGd49z3ey0HwxSgRsfZeCKvHopmD1nKL2qmnt7
- LIY8OyTq9dntA2Avbr3DMEqZx8Hqk3qXfPZrkQqtSQi8Yzqu/Eewov7k3F+R69hensT3Zz
- MPB/QOdt5lNhJsMZevSY+irUbFkNMgQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-384-6dEjBNi_NEix6U6JezszMQ-1; Mon, 08 Jun 2020 07:40:54 -0400
-X-MC-Unique: 6dEjBNi_NEix6U6JezszMQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 32583801504;
- Mon,  8 Jun 2020 11:40:53 +0000 (UTC)
-Received: from thuth.com (ovpn-112-119.ams2.redhat.com [10.36.112.119])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 88BE610013D4;
- Mon,  8 Jun 2020 11:40:51 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
-Subject: [PATCH] travis.yml: Test also the other targets on s390x
-Date: Mon,  8 Jun 2020 13:40:49 +0200
-Message-Id: <20200608114049.4693-1-thuth@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=thuth@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/08 01:05:50
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ (Exim 4.90_1) (envelope-from <leif@nuviainc.com>) id 1jiG8q-00089H-5t
+ for qemu-devel@nongnu.org; Mon, 08 Jun 2020 07:40:36 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:38596)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <leif@nuviainc.com>) id 1jiG8p-0003dC-4e
+ for qemu-devel@nongnu.org; Mon, 08 Jun 2020 07:40:35 -0400
+Received: by mail-wr1-x444.google.com with SMTP id e1so17038965wrt.5
+ for <qemu-devel@nongnu.org>; Mon, 08 Jun 2020 04:40:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=nuviainc-com.20150623.gappssmtp.com; s=20150623;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=r1862+GaCeD5wjtcdsVBrJdgJrDEKBNZHNQ90XZwnrY=;
+ b=xL+R7nqnPTn/XmS1NNzKgIxtOkDDz4dJJViyl137ms4PuuS1x+jwT+qYCzLwpuVmkh
+ w87WTK5XyCQmQDoMxJE1gq+JJ74iTkJjf+rMKoHyOXXwW2xgYUrr486S3XQ8fKeUGPnO
+ YzJ5BXLLxLy5eHuv0XKiUnmMKKN7xQOvhblxV4CWXzRxwPqDGhaG1xGsqeWdbpbApRRA
+ +/hpl/WCuMQ5HyuGd9qfm+AwWm47a3iZUGOIH8lYbRj4/r+sJXM0iO6054yNkUd0Lvhz
+ DEjqubtxD165ZEt0l6BvupxQ4m481ZrO4S3JJK99K8omRFg/CRwtDrCQssM9eiPln5Ru
+ HUfQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=r1862+GaCeD5wjtcdsVBrJdgJrDEKBNZHNQ90XZwnrY=;
+ b=Yk20tZHrQPW8Lboc0JuMwWOP56VDtceAsPvDZpDj/zMoLzQVZsYObLOjg8XpALYi7z
+ YfxzJyyLy7nGTvMHpaRXC/E+CSzs4gSN4ClwVoss0Gpzsm2k9G2SD3Gi3/Bp12EnF/+M
+ 1nZRNLkVWqWmXT+G5SuVpIQaAAsAnT4i1XbhDvL20KnkWvH1p89SMVMaUlkeF6qzm0Z9
+ qk98eu1vnY/vdRMhUXAz8XHAC0Goz6EyF9S/UGScu8+EZd7S87+puHxdVxiOLkZ3P6d6
+ GGleHuQjAl+JI7JQwAd84Iw0QkIPZudgVH3iPsFiQBP7V1kI2z/fvYpthWsoLToup46l
+ I3lA==
+X-Gm-Message-State: AOAM530v9jwYOCcHnZVnS82w11wzt53hTtjWuh50QJ/2mm4wekB2ZupT
+ JbE0jpp918Kt0RwbMRxvM/fLou98HYNeej0sciFI+uTHNOKF/Gvlbwd/9eeuUmVUzvv94+JZOHa
+ x3vw4SXcN43KXlnFymnuFgoG2BFFFWiIRD1pb8N/ugW2uUPkyJ5+AYldA7h3A2fT0
+X-Google-Smtp-Source: ABdhPJxTEBq4LZ7/2n16NwtEvJrSIRfstjgLkoL67I6PwvF+70dg08ykyAsGpMkStBub8lEYkhli6g==
+X-Received: by 2002:a05:6000:1c7:: with SMTP id
+ t7mr22944357wrx.14.1591616433083; 
+ Mon, 08 Jun 2020 04:40:33 -0700 (PDT)
+Received: from vanye.hemma.eciton.net
+ (cpc92302-cmbg19-2-0-cust304.5-4.cable.virginm.net. [82.1.209.49])
+ by smtp.gmail.com with ESMTPSA id y5sm24225932wrs.63.2020.06.08.04.40.32
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 08 Jun 2020 04:40:32 -0700 (PDT)
+From: Leif Lindholm <leif@nuviainc.com>
+To: QEMU Developers <qemu-devel@nongnu.org>
+Subject: [RFC PATCH 3/3] target/arm: use cortex...common_init for cpu64 max
+Date: Mon,  8 Jun 2020 12:40:28 +0100
+Message-Id: <20200608114028.25345-4-leif@nuviainc.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200608114028.25345-1-leif@nuviainc.com>
+References: <20200608114028.25345-1-leif@nuviainc.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=leif@nuviainc.com; helo=mail-wr1-x444.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -86,73 +100,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, qemu-s390x@nongnu.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>,
+ qemu-arm@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-s390x is our only big endian host in our CI, so building and testing QEMU
-there is quite valuable. Thus let's also test the other targets with
-additional jobs (also using different sets of pre-installed libraries to
-get a better coverage of the things that we test).
+Drop the call to aarch64_a57_initfn from aarch64_max_initfn, replacing it
+with calls to aarch64_cpu_common_init and cortex_a72_a57_a53_common_init.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
+Cache and GIC configuration is now set directly, using aarch64_a72_initfn
+as a template.
+Set cpu->dtb_compatible to "qemu,aarch64-max".
+
+This has the following effects apart from the ones mentioned above:
+- kvm_target will no longer be explicitly initialized for cpu max in tcg
+  mode.
+- id_mmfr0 will now be set to an architecturally permitted value.
+- define_arm_cp_regs() is no longer called, since those registers are
+  implementation defined and specific to the supported cortex-a
+  processors.
+
+Signed-off-by: Leif Lindholm <leif@nuviainc.com>
 ---
- .travis.yml | 39 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 39 insertions(+)
+ target/arm/cpu64.c | 24 +++++++++++++++---------
+ 1 file changed, 15 insertions(+), 9 deletions(-)
 
-diff --git a/.travis.yml b/.travis.yml
-index 564be50a3c..41e97fb050 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -504,6 +504,45 @@ jobs:
-               $(exit $BUILD_RC);
-           fi
+diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+index 9927c1f75d..452efe78bf 100644
+--- a/target/arm/cpu64.c
++++ b/target/arm/cpu64.c
+@@ -561,26 +561,20 @@ static void aarch64_max_initfn(Object *obj)
+     } else {
+         uint64_t t;
+         uint32_t u;
+-        aarch64_a57_initfn(obj);
  
-+    - name: "[s390x] GCC (other-softmmu)"
-+      arch: s390x
-+      dist: bionic
-+      addons:
-+        apt_packages:
-+          - libaio-dev
-+          - libattr1-dev
-+          - libcap-ng-dev
-+          - libgnutls28-dev
-+          - libiscsi-dev
-+          - liblttng-ust-dev
-+          - liblzo2-dev
-+          - libncurses-dev
-+          - libnfs-dev
-+          - libnss3-dev
-+          - libpixman-1-dev
-+          - libsdl2-dev
-+          - libsdl2-image-dev
-+          - libseccomp-dev
-+          - libsnappy-dev
-+          - libzstd-dev
-+          - nettle-dev
-+          - xfslibs-dev
-+          # Tests dependencies
-+          - genisoimage
-+      env:
-+        - CONFIG="--disable-containers --audio-drv-list=sdl --disable-user
-+                  --target-list-exclude=${MAIN_SOFTMMU_TARGETS}"
++        cpu->dtb_compatible = "qemu,aarch64-max";
+         /*
+          * Reset MIDR so the guest doesn't mistake our 'max' CPU type for a real
+          * one and try to apply errata workarounds or use impdef features we
+          * don't provide.
+          * An IMPLEMENTER field of 0 means "reserved for software use";
+-         * ARCHITECTURE must be 0xf indicating "v7 or later, check ID registers
+-         * to see which features are present";
+          * the VARIANT, PARTNUM and REVISION fields are all implementation
+          * defined and we choose to define PARTNUM just in case guest
+          * code needs to distinguish this QEMU CPU from other software
+          * implementations, though this shouldn't be needed.
+          */
+-        t = FIELD_DP64(0, MIDR_EL1, IMPLEMENTER, 0);
+-        t = FIELD_DP64(t, MIDR_EL1, ARCHITECTURE, 0xf);
+-        t = FIELD_DP64(t, MIDR_EL1, PARTNUM, 'Q');
+-        t = FIELD_DP64(t, MIDR_EL1, VARIANT, 0);
+-        t = FIELD_DP64(t, MIDR_EL1, REVISION, 0);
+-        cpu->midr = t;
++        aarch64_cpu_common_init(obj, 0, 'Q', 0, 0);
++        cortex_a72_a57_a53_common_init(cpu);
+ 
+         t = cpu->isar.id_aa64isar0;
+         t = FIELD_DP64(t, ID_AA64ISAR0, AES, 2); /* AES + PMULL */
+@@ -680,12 +674,24 @@ static void aarch64_max_initfn(Object *obj)
+          * and enabling SVE in system mode is more useful in the short term.
+          */
+ 
++        cpu->reset_fpsid = 0x41034080;
++        cpu->clidr = 0x0a200023;
++        cpu->ccsidr[0] = 0x701fe00a; /* 32KB L1 dcache */
++        cpu->ccsidr[1] = 0x201fe012; /* 48KB L1 icache */
++        cpu->ccsidr[2] = 0x707fe07a; /* 1MB L2 cache */
++        cpu->gic_num_lrs = 4;
++        cpu->gic_vpribits = 5;
++        cpu->gic_vprebits = 5;
 +
-+    - name: "[s390x] GCC (user)"
-+      arch: s390x
-+      dist: bionic
-+      addons:
-+        apt_packages:
-+          - libgcrypt20-dev
-+          - libgnutls28-dev
-+      env:
-+        - CONFIG="--disable-containers --disable-system"
-+
-     - name: "[s390x] Clang (disable-tcg)"
-       arch: s390x
-       dist: bionic
+ #ifdef CONFIG_USER_ONLY
+         /* For usermode -cpu max we can use a larger and more efficient DCZ
+          * blocksize since we don't have to follow what the hardware does.
+          */
+         cpu->ctr = 0x80038003; /* 32 byte I and D cacheline size, VIPT icache */
+         cpu->dcz_blocksize = 7; /*  512 bytes */
++#else
++        cpu->ctr = 0x8444c004;
++        cpu->dcz_blocksize = 4; /* 64 bytes */
+ #endif
+     }
+ 
 -- 
-2.18.1
+2.20.1
 
 
