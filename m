@@ -7,77 +7,80 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40498C433E0
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 840D5C433E1
 	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 16:26:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0A29C206C3
+	by mail.kernel.org (Postfix) with ESMTPS id 51A61206C3
 	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 16:26:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ggYah4Bj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A29C206C3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O+2xDPsP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51A61206C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37990 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38058 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jiKb5-0005qe-6V
+	id 1jiKb5-0005sF-Gi
 	for qemu-devel@archiver.kernel.org; Mon, 08 Jun 2020 12:26:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38368)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38266)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jiKFc-0007pz-FR
- for qemu-devel@nongnu.org; Mon, 08 Jun 2020 12:03:52 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:34769
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jiKFJ-0007SB-2E
+ for qemu-devel@nongnu.org; Mon, 08 Jun 2020 12:03:33 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:53610
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jiKFb-0008EC-GG
- for qemu-devel@nongnu.org; Mon, 08 Jun 2020 12:03:52 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jiKFG-0008AO-Gf
+ for qemu-devel@nongnu.org; Mon, 08 Jun 2020 12:03:31 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591632230;
+ s=mimecast20190719; t=1591632201;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=+WkHvAzEi0wEkdKvuBuPydWDbkpdF7QxEn1l5oochA0=;
- b=ggYah4BjkLQsunB9rp+MfwY5gv3DcUQBfajT1gu/2/u/A+9kAT7mi9xeF7Fh1OAHJ3KEO1
- 0/g5Po27om5DUMVVidYXdO+hS/Z3JCjif5oHHF4E23dKnIXNpnYUZ8p1QoaexsF9OxfNXu
- x8QtJz4eTRf+ui3jHfwcp8X5e4Tq50I=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-44-iYEr0ercM76rX7aK5RxrOg-1; Mon, 08 Jun 2020 12:03:48 -0400
-X-MC-Unique: iYEr0ercM76rX7aK5RxrOg-1
-Received: by mail-wr1-f72.google.com with SMTP id o1so7300976wrm.17
- for <qemu-devel@nongnu.org>; Mon, 08 Jun 2020 09:03:48 -0700 (PDT)
+ bh=J738BQqBvhpMt3eJFPP/lmrii93ELO7mMMfmrV28FMw=;
+ b=O+2xDPsPJH1jiXin8V8D0SXVvB/V0YB5Tyh/FbitQfqIr9Y+KMe6lcW0pwpKcteAPVonF9
+ qGOuMcRtZ/AzgkUi1C8StCUvlusTtGqkHBGffu1yZQf9EKrIlPFm4jjQCn3VQgvPMOK7X4
+ nvWazC4pCzVgcrXCLSZF2rp0hQ6Cmvg=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-149-g7CCi_N7NGSTYj8JEToMxQ-1; Mon, 08 Jun 2020 12:03:19 -0400
+X-MC-Unique: g7CCi_N7NGSTYj8JEToMxQ-1
+Received: by mail-wm1-f72.google.com with SMTP id y15so13925wmi.0
+ for <qemu-devel@nongnu.org>; Mon, 08 Jun 2020 09:03:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=+WkHvAzEi0wEkdKvuBuPydWDbkpdF7QxEn1l5oochA0=;
- b=iKcucyYzA8rqCYpnG6HFWVIseWgAhITBuGvXUupJlWi6IifV0QVMBB/XL+92H3MeZu
- yQ5SxLiTQCPHhhzpg32M1R6j0xPJeKonrjTTO+RcE3kTS4bwcB0OMRi5SM6/cBli/QGj
- qv1EkRfy0OhOUR8GAAC8EmIkZPxdVUsdznSTZodzO4BxLMhzp5/QtYVzkRd1QZ0+mOzE
- 2pzVxlVACJa5DgPQuqj9lw0KkBWIicxx+6C43F9l1uuxeaRHgNi0TyLodJoG+TIxT8IH
- mz4MNa44uFGUVToVU6oWw2F+le41BPVPutaRQxmlcJAGtWphcbS/1XNG+HFGalN2P4Ki
- JQ3Q==
-X-Gm-Message-State: AOAM530MHp1N9TtEmS7toU/Q7SQYVcAwzpiEMO2O+yb8EZfKsUQVQ8Io
- pZJrmvMLmt8R6oA4TRWr7jd8NEqlzc68Me67RWsBrEq3ioaUH2rvYvf3gl7oikMlSNxIounFkBo
- t13nMKJJVXSuFt+c=
-X-Received: by 2002:a5d:49c5:: with SMTP id t5mr24893751wrs.18.1591632227119; 
- Mon, 08 Jun 2020 09:03:47 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzrpgU9KBovh6Bb8PslmNvBRv90nOw1Va1g7BnyPuxlNkUnSsxx5Z+mEp10XtU+59c/IEfXNQ==
-X-Received: by 2002:a5d:49c5:: with SMTP id t5mr24893708wrs.18.1591632226912; 
- Mon, 08 Jun 2020 09:03:46 -0700 (PDT)
+ bh=J738BQqBvhpMt3eJFPP/lmrii93ELO7mMMfmrV28FMw=;
+ b=T41OFDKKJKnCpmjZYe4WlHbehetqxPRhNxj556uSGIaju3Tb79oxcQPPMwEVeohweM
+ QC+JWyofHNpSXCieKLTqv1wcyP56Izw0T4U0aRcrP6U9ZV0DQaaLEd2/kGw3PN59/kRe
+ tewFRksbezymFuRhvvJ4Ck+AuVPVqSWgDl4bscD5WSyAobtBtMmRqnDCoS3qIBV7zzUn
+ gc9E0Wh+65OitZVbi8ZZf6/FXL+HozQCr7oCGiTg1Etzs505IU4hO4prb0xjnfQgfAo1
+ WG5NzKOtgCKZmWp/40o5z6sZ6BKbY08f+4wBrIA5cO35GAzpefNEm9ToGawO4qcMPGiQ
+ TjiQ==
+X-Gm-Message-State: AOAM5322GzqAao1Eq0afzgZUfz2a2Lg/DxaU1UJEmrCFluPi+fB2ovVU
+ H0HxzJfafYqANYWkplJWtWwMwcE8AFwTRNkS950V950gFxxnX1c7ZJB5nPK8rWwVkiyqG8JLEg8
+ 6tdRWYnljVeFkvLw=
+X-Received: by 2002:a05:600c:4410:: with SMTP id
+ u16mr73274wmn.88.1591632196837; 
+ Mon, 08 Jun 2020 09:03:16 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz3xkvh2Vk+4PYCBSKCv2fZwGK7MNY+4FcnyFPW+oUbVotWO8gdASoKL+nfN+0YxJIIGJ7I2g==
+X-Received: by 2002:a05:600c:4410:: with SMTP id
+ u16mr73234wmn.88.1591632196640; 
+ Mon, 08 Jun 2020 09:03:16 -0700 (PDT)
 Received: from localhost.localdomain
  (181.red-88-10-103.dynamicip.rima-tde.net. [88.10.103.181])
- by smtp.gmail.com with ESMTPSA id s8sm181183wrg.50.2020.06.08.09.03.45
+ by smtp.gmail.com with ESMTPSA id l17sm32396wmi.16.2020.06.08.09.03.14
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 08 Jun 2020 09:03:46 -0700 (PDT)
+ Mon, 08 Jun 2020 09:03:16 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC PATCH 31/35] hw/sh4: Emit warning when old code is used
-Date: Mon,  8 Jun 2020 18:00:40 +0200
-Message-Id: <20200608160044.15531-32-philmd@redhat.com>
+Subject: [RFC PATCH 26/35] hw/openrisc/cputimer: Emit warning when old code is
+ used
+Date: Mon,  8 Jun 2020 18:00:35 +0200
+Message-Id: <20200608160044.15531-27-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200608160044.15531-1-philmd@redhat.com>
 References: <20200608160044.15531-1-philmd@redhat.com>
@@ -87,16 +90,17 @@ X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8;
 	text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/08 11:58:00
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/08 05:40:44
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -139,135 +143,30 @@ This code hasn't been QOM'ified yet. Warn the user.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- hw/char/sh_serial.c | 3 +++
- hw/intc/sh_intc.c   | 3 +++
- hw/sh4/r2d.c        | 3 +++
- hw/sh4/sh7750.c     | 4 ++++
- hw/timer/sh_timer.c | 5 +++++
- 5 files changed, 18 insertions(+)
+ hw/openrisc/cputimer.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/hw/char/sh_serial.c b/hw/char/sh_serial.c
-index 167f4d8cb9..9366a23dd2 100644
---- a/hw/char/sh_serial.c
-+++ b/hw/char/sh_serial.c
-@@ -31,6 +31,7 @@
- #include "chardev/char-fe.h"
- #include "qapi/error.h"
- #include "qemu/timer.h"
-+#include "hw/qdev-deprecated.h"
- 
- //#define DEBUG_SERIAL
- 
-@@ -382,6 +383,8 @@ void sh_serial_init(MemoryRegion *sysmem,
- {
-     sh_serial_state *s;
- 
-+    qdev_warn_deprecated_function_used();
-+
-     s = g_malloc0(sizeof(sh_serial_state));
- 
-     s->feat = feat;
-diff --git a/hw/intc/sh_intc.c b/hw/intc/sh_intc.c
-index 72a55e32dd..c90fbf47bb 100644
---- a/hw/intc/sh_intc.c
-+++ b/hw/intc/sh_intc.c
-@@ -13,6 +13,7 @@
- #include "hw/sh4/sh_intc.h"
- #include "hw/irq.h"
- #include "hw/sh4/sh.h"
-+#include "hw/qdev-deprecated.h"
- 
- //#define DEBUG_INTC
- //#define DEBUG_INTC_SOURCES
-@@ -444,6 +445,8 @@ int sh_intc_init(MemoryRegion *sysmem,
- {
-     unsigned int i, j;
- 
-+    qdev_warn_deprecated_function_used();
-+
-     desc->pending = 0;
-     desc->nr_sources = nr_sources;
-     desc->mask_regs = mask_regs;
-diff --git a/hw/sh4/r2d.c b/hw/sh4/r2d.c
-index 72bb5285cc..22bbbe7d3c 100644
---- a/hw/sh4/r2d.c
-+++ b/hw/sh4/r2d.c
-@@ -43,6 +43,7 @@
- #include "hw/usb.h"
- #include "hw/block/flash.h"
- #include "exec/address-spaces.h"
-+#include "hw/qdev-deprecated.h"
- 
- #define FLASH_BASE 0x00000000
- #define FLASH_SIZE (16 * MiB)
-@@ -187,6 +188,8 @@ static qemu_irq *r2d_fpga_init(MemoryRegion *sysmem,
- {
-     r2d_fpga_t *s;
- 
-+    qdev_warn_deprecated_function_used();
-+
-     s = g_malloc0(sizeof(r2d_fpga_t));
- 
-     s->irl = irl;
-diff --git a/hw/sh4/sh7750.c b/hw/sh4/sh7750.c
-index d660714443..379822e0c2 100644
---- a/hw/sh4/sh7750.c
-+++ b/hw/sh4/sh7750.c
-@@ -32,6 +32,7 @@
- #include "hw/sh4/sh_intc.h"
+diff --git a/hw/openrisc/cputimer.c b/hw/openrisc/cputimer.c
+index 93268815d8..60f2c9667f 100644
+--- a/hw/openrisc/cputimer.c
++++ b/hw/openrisc/cputimer.c
+@@ -22,6 +22,7 @@
  #include "cpu.h"
- #include "exec/exec-all.h"
-+#include "hw/qdev-deprecated.h"
- 
- #define NB_DEVICES 4
- 
-@@ -756,6 +757,8 @@ SH7750State *sh7750_init(SuperHCPU *cpu, MemoryRegion *sysmem)
- {
-     SH7750State *s;
- 
-+    qdev_warn_deprecated_function_used();
-+
-     s = g_malloc0(sizeof(SH7750State));
-     s->cpu = cpu;
-     s->periph_freq = 60000000;	/* 60MHz */
-@@ -866,6 +869,7 @@ SH7750State *sh7750_init(SuperHCPU *cpu, MemoryRegion *sysmem)
- 
- qemu_irq sh7750_irl(SH7750State *s)
- {
-+    qdev_warn_deprecated_function_used();
-     sh_intc_toggle_source(sh_intc_source(&s->intc, IRL), 1, 0); /* enable */
-     return qemu_allocate_irq(sh_intc_set_irl, sh_intc_source(&s->intc, IRL), 0);
- }
-diff --git a/hw/timer/sh_timer.c b/hw/timer/sh_timer.c
-index 13c4051808..d5e33507b0 100644
---- a/hw/timer/sh_timer.c
-+++ b/hw/timer/sh_timer.c
-@@ -14,6 +14,7 @@
- #include "hw/sh4/sh.h"
+ #include "migration/vmstate.h"
  #include "qemu/timer.h"
- #include "hw/ptimer.h"
 +#include "hw/qdev-deprecated.h"
  
- //#define DEBUG_TIMER
+ #define TIMER_PERIOD 50 /* 50 ns period for 20 MHz timer */
  
-@@ -199,6 +200,8 @@ static void *sh_timer_init(uint32_t freq, int feat, qemu_irq irq)
+@@ -135,6 +136,8 @@ static const VMStateDescription vmstate_or1k_timer = {
+ 
+ void cpu_openrisc_clock_init(OpenRISCCPU *cpu)
  {
-     sh_timer_state *s;
- 
 +    qdev_warn_deprecated_function_used();
 +
-     s = (sh_timer_state *)g_malloc0(sizeof(sh_timer_state));
-     s->freq = freq;
-     s->feat = feat;
-@@ -319,6 +322,8 @@ void tmu012_init(MemoryRegion *sysmem, hwaddr base,
-     tmu012_state *s;
-     int timer_feat = (feat & TMU012_FEAT_EXTCLK) ? TIMER_FEAT_EXTCLK : 0;
+     cpu->env.timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, &openrisc_timer_cb, cpu);
+     cpu->env.ttmr = 0x00000000;
  
-+    qdev_warn_deprecated_function_used();
-+
-     s = (tmu012_state *)g_malloc0(sizeof(tmu012_state));
-     s->feat = feat;
-     s->timer[0] = sh_timer_init(freq, timer_feat, ch0_irq);
 -- 
 2.21.3
 
