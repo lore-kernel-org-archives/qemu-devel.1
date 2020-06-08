@@ -2,98 +2,57 @@ Return-Path: <SRS0=zEF8=7V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BEE5C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 13:34:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D672C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 13:36:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E8DFE2072F
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 13:34:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H/G8Z78I"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8DFE2072F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 634B4206C3
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 13:36:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 634B4206C3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=tribudubois.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60542 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35402 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jiHv1-0004Fc-8b
-	for qemu-devel@archiver.kernel.org; Mon, 08 Jun 2020 09:34:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48958)
+	id 1jiHwm-0005ee-Ll
+	for qemu-devel@archiver.kernel.org; Mon, 08 Jun 2020 09:36:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49118)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jiHtr-0003Qs-Vy
- for qemu-devel@nongnu.org; Mon, 08 Jun 2020 09:33:15 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:24538
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jiHtq-0005sO-Ev
- for qemu-devel@nongnu.org; Mon, 08 Jun 2020 09:33:15 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591623193;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=jy3UQ9TwolgMzcs+mF+EHL8I0EaYgGjLeRsKkZIF4Go=;
- b=H/G8Z78IKWPNV7iFcjGRZocLlnMvtlCTI9kghA/U4vRsIlbc4c3A9OtOu+V90Ypu66VUMx
- hgdy8uU6CXF7Ma+LxIolu/xKdzi8LL+f+jJrPpiqk2WkcirhvuwkwXTKSkN9sFhNDec8zy
- WQ/NjWvIdxH8QsUdv0vWthEUjr7rRug=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-36-9Yx-z0cXMiqCIA0F31Mj4A-1; Mon, 08 Jun 2020 09:33:12 -0400
-X-MC-Unique: 9Yx-z0cXMiqCIA0F31Mj4A-1
-Received: by mail-wm1-f69.google.com with SMTP id s15so5245154wmc.8
- for <qemu-devel@nongnu.org>; Mon, 08 Jun 2020 06:33:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=jy3UQ9TwolgMzcs+mF+EHL8I0EaYgGjLeRsKkZIF4Go=;
- b=gabSd8ZosbNErxrPoB+AYTk4kF5SEHYUg0mAWIegz5bCB+gskfeiNY70hjJQ0yKPtR
- TGE0X4/JQFQQCJebuWBfD4NkLvmb0ZwmxlECUjsmgMLQaQnkx2pNkFyEi7d8hHmaiSXE
- tl6RsqpTI+613QXKWAim+JzFTWvlg0BMRuFWHE8j+MEav2xT28K6wWu9fN4i0cUOXfSi
- N8bbzomQtjoBbMaexI/n9647X/+2/pJphfJzAHA+NoBDhh0S8Kgp3uGQU8ZGFMR6Rkqk
- DLETRb20OaTsxas0Tz4/ck53K6G6UKOPNHOh3j8BtYEASCoJ8IXLVtJFg5jGp3y/Zzyz
- JKpA==
-X-Gm-Message-State: AOAM533r+n7DWg9kIoDIlRK4/knX1BFthVlol/6ODJqEPOZOcgkQNXgC
- JwSLT44fWZZSOlj37yfOjcd22XcIfcSBOxfim+SakKm600viiRAGxDQnx1ONz+RDkzPmEc62IaJ
- aprJrxv4MuShPM8Q=
-X-Received: by 2002:a7b:c18a:: with SMTP id y10mr17443039wmi.73.1591623190889; 
- Mon, 08 Jun 2020 06:33:10 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz9bnbokhnVLN46q9sCb6V6ovAK9n5BS2Myq9eEvkQEpQdDlMBW6QLuyUv0QuXRGF4o3ryjhA==
-X-Received: by 2002:a7b:c18a:: with SMTP id y10mr17443008wmi.73.1591623190701; 
- Mon, 08 Jun 2020 06:33:10 -0700 (PDT)
-Received: from redhat.com (bzq-109-64-41-91.red.bezeqint.net. [109.64.41.91])
- by smtp.gmail.com with ESMTPSA id
- 88sm25269941wre.45.2020.06.08.06.33.09
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 08 Jun 2020 06:33:10 -0700 (PDT)
-Date: Mon, 8 Jun 2020 09:33:07 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Subject: Re: [PATCH v3 4/4] microvm: move virtio base to 0xfeb00000
-Message-ID: <20200608093247-mutt-send-email-mst@kernel.org>
-References: <20200529073957.8018-1-kraxel@redhat.com>
- <20200529073957.8018-5-kraxel@redhat.com>
+ (Exim 4.90_1) (envelope-from <jcd@tribudubois.net>)
+ id 1jiHvu-00051e-7w; Mon, 08 Jun 2020 09:35:22 -0400
+Received: from relay7-d.mail.gandi.net ([217.70.183.200]:47037)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <jcd@tribudubois.net>)
+ id 1jiHvs-0006FR-Ak; Mon, 08 Jun 2020 09:35:21 -0400
+X-Originating-IP: 82.252.130.88
+Received: from localhost.localdomain (lns-bzn-59-82-252-130-88.adsl.proxad.net
+ [82.252.130.88]) (Authenticated sender: jcd@tribudubois.net)
+ by relay7-d.mail.gandi.net (Postfix) with ESMTPSA id C367320015;
+ Mon,  8 Jun 2020 13:35:11 +0000 (UTC)
+From: Jean-Christophe Dubois <jcd@tribudubois.net>
+To: qemu-arm@nongnu.org
+Subject: [PATCH v2] hw/misc/imx6ul_ccm: Implement non writable bits in CCM
+ registers
+Date: Mon,  8 Jun 2020 15:35:08 +0200
+Message-Id: <20200608133508.550046-1-jcd@tribudubois.net>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-In-Reply-To: <20200529073957.8018-5-kraxel@redhat.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=mst@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/08 01:20:45
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=217.70.183.200; envelope-from=jcd@tribudubois.net;
+ helo=relay7-d.mail.gandi.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/08 09:35:14
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -25
+X-Spam_score: -2.6
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -106,44 +65,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefano Stabellini <sstabellini@kernel.org>,
- Eduardo Habkost <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
- Paul Durrant <paul@xen.org>, qemu-devel@nongnu.org, imammedo@redhat.com,
- xen-devel@lists.xenproject.org, Anthony Perard <anthony.perard@citrix.com>,
- Paolo Bonzini <pbonzini@redhat.com>, philmd@redhat.com,
- Richard Henderson <rth@twiddle.net>
+Cc: peter.maydell@linaro.org, peter.chubb@nicta.com.au, qemu-devel@nongnu.org,
+ Jean-Christophe Dubois <jcd@tribudubois.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, May 29, 2020 at 09:39:57AM +0200, Gerd Hoffmann wrote:
-> Place virtio-mmio devices near the other mmio regions,
-> next ioapic is at @ 0xfec00000.
-> 
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  include/hw/i386/microvm.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/include/hw/i386/microvm.h b/include/hw/i386/microvm.h
-> index ba68d1f22bb3..fd34b78e0d2a 100644
-> --- a/include/hw/i386/microvm.h
-> +++ b/include/hw/i386/microvm.h
-> @@ -26,7 +26,7 @@
->  #include "hw/i386/x86.h"
->  
->  /* Platform virtio definitions */
-> -#define VIRTIO_MMIO_BASE      0xc0000000
-> +#define VIRTIO_MMIO_BASE      0xfeb00000
->  #define VIRTIO_IRQ_BASE       5
->  #define VIRTIO_NUM_TRANSPORTS 8
->  #define VIRTIO_CMDLINE_MAXLEN 64
+Some bits of the CCM registers are non writable.
 
-OK, and let's hope we don't need to move it again.
+This was left undone in the initial commit (all bits of registers were
+writable).
 
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+This patch adds the required code to protect the non writable bits.
 
-> -- 
-> 2.18.4
+Signed-off-by: Jean-Christophe Dubois <jcd@tribudubois.net>
+---
+
+ v2: simplify code after feedback on the first patch.
+
+ hw/misc/imx6ul_ccm.c | 76 ++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 63 insertions(+), 13 deletions(-)
+
+diff --git a/hw/misc/imx6ul_ccm.c b/hw/misc/imx6ul_ccm.c
+index a2fc1d0364a..5e0661dacf7 100644
+--- a/hw/misc/imx6ul_ccm.c
++++ b/hw/misc/imx6ul_ccm.c
+@@ -19,6 +19,62 @@
+ 
+ #include "trace.h"
+ 
++static const uint32_t ccm_mask[CCM_MAX] = {
++    [CCM_CCR] = 0xf01fef80,
++    [CCM_CCDR] = 0xfffeffff,
++    [CCM_CSR] = 0xffffffff,
++    [CCM_CCSR] = 0xfffffef2,
++    [CCM_CACRR] = 0xfffffff8,
++    [CCM_CBCDR] = 0xc1f8e000,
++    [CCM_CBCMR] = 0xfc03cfff,
++    [CCM_CSCMR1] = 0x80700000,
++    [CCM_CSCMR2] = 0xe01ff003,
++    [CCM_CSCDR1] = 0xfe00c780,
++    [CCM_CS1CDR] = 0xfe00fe00,
++    [CCM_CS2CDR] = 0xf8007000,
++    [CCM_CDCDR] = 0xf00fffff,
++    [CCM_CHSCCDR] = 0xfffc01ff,
++    [CCM_CSCDR2] = 0xfe0001ff,
++    [CCM_CSCDR3] = 0xffffc1ff,
++    [CCM_CDHIPR] = 0xffffffff,
++    [CCM_CTOR] = 0x00000000,
++    [CCM_CLPCR] = 0xf39ff01c,
++    [CCM_CISR] = 0xfb85ffbe,
++    [CCM_CIMR] = 0xfb85ffbf,
++    [CCM_CCOSR] = 0xfe00fe00,
++    [CCM_CGPR] = 0xfffc3fea,
++    [CCM_CCGR0] = 0x00000000,
++    [CCM_CCGR1] = 0x00000000,
++    [CCM_CCGR2] = 0x00000000,
++    [CCM_CCGR3] = 0x00000000,
++    [CCM_CCGR4] = 0x00000000,
++    [CCM_CCGR5] = 0x00000000,
++    [CCM_CCGR6] = 0x00000000,
++    [CCM_CMEOR] = 0xafffff1f,
++};
++
++static const uint32_t analog_mask[CCM_ANALOG_MAX] = {
++    [CCM_ANALOG_PLL_ARM] = 0xfff60f80,
++    [CCM_ANALOG_PLL_USB1] = 0xfffe0fbc,
++    [CCM_ANALOG_PLL_USB2] = 0xfffe0fbc,
++    [CCM_ANALOG_PLL_SYS] = 0xfffa0ffe,
++    [CCM_ANALOG_PLL_SYS_SS] = 0x00000000,
++    [CCM_ANALOG_PLL_SYS_NUM] = 0xc0000000,
++    [CCM_ANALOG_PLL_SYS_DENOM] = 0xc0000000,
++    [CCM_ANALOG_PLL_AUDIO] = 0xffe20f80,
++    [CCM_ANALOG_PLL_AUDIO_NUM] = 0xc0000000,
++    [CCM_ANALOG_PLL_AUDIO_DENOM] = 0xc0000000,
++    [CCM_ANALOG_PLL_VIDEO] = 0xffe20f80,
++    [CCM_ANALOG_PLL_VIDEO_NUM] = 0xc0000000,
++    [CCM_ANALOG_PLL_VIDEO_DENOM] = 0xc0000000,
++    [CCM_ANALOG_PLL_ENET] = 0xffc20ff0,
++    [CCM_ANALOG_PFD_480] = 0x40404040,
++    [CCM_ANALOG_PFD_528] = 0x40404040,
++    [PMU_MISC0] = 0x01fe8306,
++    [PMU_MISC1] = 0x07fcede0,
++    [PMU_MISC2] = 0x005f5f5f,
++};
++
+ static const char *imx6ul_ccm_reg_name(uint32_t reg)
+ {
+     static char unknown[20];
+@@ -596,11 +652,8 @@ static void imx6ul_ccm_write(void *opaque, hwaddr offset, uint64_t value,
+ 
+     trace_ccm_write_reg(imx6ul_ccm_reg_name(index), (uint32_t)value);
+ 
+-    /*
+-     * We will do a better implementation later. In particular some bits
+-     * cannot be written to.
+-     */
+-    s->ccm[index] = (uint32_t)value;
++    s->ccm[index] = (s->ccm[index] & ccm_mask[index]) |
++                           ((uint32_t)value & ~ccm_mask[index]);
+ }
+ 
+ static uint64_t imx6ul_analog_read(void *opaque, hwaddr offset, unsigned size)
+@@ -737,7 +790,7 @@ static void imx6ul_analog_write(void *opaque, hwaddr offset, uint64_t value,
+          * the REG_NAME register. So we change the value of the
+          * REG_NAME register, setting bits passed in the value.
+          */
+-        s->analog[index - 1] |= value;
++        s->analog[index - 1] |= (value & ~analog_mask[index - 1]);
+         break;
+     case CCM_ANALOG_PLL_ARM_CLR:
+     case CCM_ANALOG_PLL_USB1_CLR:
+@@ -762,7 +815,7 @@ static void imx6ul_analog_write(void *opaque, hwaddr offset, uint64_t value,
+          * the REG_NAME register. So we change the value of the
+          * REG_NAME register, unsetting bits passed in the value.
+          */
+-        s->analog[index - 2] &= ~value;
++        s->analog[index - 2] &= ~(value & ~analog_mask[index - 2]);
+         break;
+     case CCM_ANALOG_PLL_ARM_TOG:
+     case CCM_ANALOG_PLL_USB1_TOG:
+@@ -787,14 +840,11 @@ static void imx6ul_analog_write(void *opaque, hwaddr offset, uint64_t value,
+          * the REG_NAME register. So we change the value of the
+          * REG_NAME register, toggling bits passed in the value.
+          */
+-        s->analog[index - 3] ^= value;
++        s->analog[index - 3] ^= (value & ~analog_mask[index - 3]);
+         break;
+     default:
+-        /*
+-         * We will do a better implementation later. In particular some bits
+-         * cannot be written to.
+-         */
+-        s->analog[index] = value;
++        s->analog[index] = (s->analog[index] & analog_mask[index]) |
++                           (value & ~analog_mask[index]);
+         break;
+     }
+ }
+-- 
+2.25.1
 
 
