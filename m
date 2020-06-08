@@ -4,74 +4,105 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6FF3C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 17:06:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4F82C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 17:06:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7B1A2206C3
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 17:06:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B1A2206C3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=codesourcery.com
+	by mail.kernel.org (Postfix) with ESMTPS id 69C3E206C3
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 17:06:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69C3E206C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37530 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39216 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jiLDy-0007Aw-ME
-	for qemu-devel@archiver.kernel.org; Mon, 08 Jun 2020 13:06:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46160)
+	id 1jiLEX-0007ub-Nf
+	for qemu-devel@archiver.kernel.org; Mon, 08 Jun 2020 13:06:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47738)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <joseph_myers@mentor.com>)
- id 1jiL6W-00077p-C6
- for qemu-devel@nongnu.org; Mon, 08 Jun 2020 12:58:32 -0400
-Received: from esa1.mentor.iphmx.com ([68.232.129.153]:48779)
+ (Exim 4.90_1) (envelope-from <pasic@linux.ibm.com>)
+ id 1jiLDd-0006zg-C6; Mon, 08 Jun 2020 13:05:53 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:22914)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <joseph_myers@mentor.com>)
- id 1jiL6U-0001dy-Oj
- for qemu-devel@nongnu.org; Mon, 08 Jun 2020 12:58:32 -0400
-IronPort-SDR: JRVnId0x6zgtSZmxeTfmum1hEz6nDKfzoyjXqMxExNHwgG4Oyg9x5sPUECSAYK6DOYCbtr2Kwn
- f8TRHgsy5JmTf1xEMES6yG/GpWku+OCq1p+Ki3GFOD/gC9lxwR5dEJQKgdHJ1kM/xY4zSSuKdD
- UJgMIWTA3og1iX0GuRULI2psBkURfECljL+T4yhnPNBwEkHG7gtcWk2p47dilRyIuxmb1R8Yjo
- OFOZcvPDKiAhGHx4vUsa3+WKz/fkyxQNrQBczo9/fgpd58TDS4O6GLkBJr4/Oe9YdGbo6nynY3
- r3s=
-X-IronPort-AV: E=Sophos;i="5.73,487,1583222400"; d="scan'208";a="51690378"
-Received: from orw-gwy-02-in.mentorg.com ([192.94.38.167])
- by esa1.mentor.iphmx.com with ESMTP; 08 Jun 2020 08:58:29 -0800
-IronPort-SDR: Q2sJPuVBdSjIhnG12ydreMFqNJUZUnfWr0u4XzRXnsLZaBJbu+ZQQ2JK1jMx2Bl4q8zmfJl2GV
- XiwB73losVr5kOQocHu7N7zYxy7qlbrzezjpCJx6Z+FMMz/otUSZPVm2jqoRhcJG8DSz1z5WG1
- +AwJ7RszjnarGrBsQYjoSJWiWCpslpR55gbRNw8uAiulRyHf8kYcfjXjXZeHMzsd7Qe8tTPD4T
- Xg7FHqa7N5RS5o1qAcFpClGxXhAckTlQiFNQ+OzHe8wlK9YFhJeWc3Vf49L8qGuVGZ244WLTm5
- 1Xw=
-Date: Mon, 8 Jun 2020 16:58:23 +0000
-From: Joseph Myers <joseph@codesourcery.com>
-X-X-Sender: jsm28@digraph.polyomino.org.uk
-To: <qemu-devel@nongnu.org>, <aurelien@aurel32.net>,
- <peter.maydell@linaro.org>, <alex.bennee@linaro.org>, <laurent@vivier.eu>,
- <pbonzini@redhat.com>, <rth@twiddle.net>, <ehabkost@redhat.com>
-Subject: [PATCH v2 6/6] target/i386: reimplement fprem, fprem1 using floatx80
- operations
-In-Reply-To: <alpine.DEB.2.21.2006081653080.23637@digraph.polyomino.org.uk>
-Message-ID: <alpine.DEB.2.21.2006081657200.23637@digraph.polyomino.org.uk>
-References: <alpine.DEB.2.21.2006081653080.23637@digraph.polyomino.org.uk>
-User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
+ (Exim 4.90_1) (envelope-from <pasic@linux.ibm.com>)
+ id 1jiLDb-0003IU-Oj; Mon, 08 Jun 2020 13:05:53 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 058GY2wr004901; Mon, 8 Jun 2020 13:05:44 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 31g5fc60u9-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 08 Jun 2020 13:05:36 -0400
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 058GYwJF014171;
+ Mon, 8 Jun 2020 13:05:21 -0400
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com
+ [169.51.49.98])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 31g5fc5xdk-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 08 Jun 2020 13:05:21 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+ by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 058GtB99014036;
+ Mon, 8 Jun 2020 17:00:51 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com
+ (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+ by ppma03ams.nl.ibm.com with ESMTP id 31g2s7vcc5-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 08 Jun 2020 17:00:51 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com
+ (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+ by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 058H0mF563438920
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 8 Jun 2020 17:00:48 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 607B9A405F;
+ Mon,  8 Jun 2020 17:00:48 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id B2B51A4065;
+ Mon,  8 Jun 2020 17:00:47 +0000 (GMT)
+Received: from oc2783563651 (unknown [9.145.151.111])
+ by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Mon,  8 Jun 2020 17:00:47 +0000 (GMT)
+Date: Mon, 8 Jun 2020 19:00:45 +0200
+From: Halil Pasic <pasic@linux.ibm.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Subject: Re: [PATCH v2 1/1] virtio-ccw: auto-manage VIRTIO_F_IOMMU_PLATFORM
+ if PV
+Message-ID: <20200608190045.319dd68b.pasic@linux.ibm.com>
+In-Reply-To: <20200608181428.3c6f127c.cohuck@redhat.com>
+References: <20200514221155.32079-1-pasic@linux.ibm.com>
+ <20200520121507-mutt-send-email-mst@kernel.org>
+ <20200606013217.2cffa3ed.pasic@linux.ibm.com>
+ <20200608181428.3c6f127c.cohuck@redhat.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-X-Originating-IP: [137.202.0.90]
-X-ClientProxiedBy: SVR-IES-MBX-04.mgc.mentorg.com (139.181.222.4) To
- svr-ies-mbx-02.mgc.mentorg.com (139.181.222.2)
-Received-SPF: pass client-ip=68.232.129.153;
- envelope-from=joseph_myers@mentor.com; helo=esa1.mentor.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/08 12:51:54
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -39
-X-Spam_score: -4.0
-X-Spam_bar: ----
-X-Spam_report: (-4.0 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_MED=-2.3,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
+ definitions=2020-06-08_14:2020-06-08,
+ 2020-06-08 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ adultscore=0 clxscore=1015
+ priorityscore=1501 mlxscore=0 spamscore=0 mlxlogscore=999 malwarescore=0
+ lowpriorityscore=0 suspectscore=2 phishscore=0 cotscore=-2147483648
+ bulkscore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2004280000 definitions=main-2006080117
+Received-SPF: pass client-ip=148.163.156.1; envelope-from=pasic@linux.ibm.com;
+ helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/08 11:10:17
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -25
+X-Spam_score: -2.6
+X-Spam_bar: --
+X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, KHOP_DYNAMIC=0.001,
+ RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -84,203 +115,283 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Thomas Huth <thuth@redhat.com>, Boris Fiuczynski <fiuczy@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, David Hildenbrand <david@redhat.com>,
+ qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>,
+ qemu-s390x@nongnu.org, David Gibson <david@gibson.dropbear.id.au>,
+ Viktor Mihajlovski <mihajlov@linux.ibm.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The x87 fprem and fprem1 emulation is currently based around
-conversion to double, which is inherently unsuitable for a good
-emulation of any floatx80 operation.  Reimplement using the soft-float
-floatx80 remainder operations.
+[..]
+> > Let me list some pros and cons (compared to the previous patch):
+> > 
+> > PRO:
+> > * Thanks to on/off/auto we don't override what the user specified. From 
+> > user interface perspective preferable. I usually hate software that
+> > thinks its than me and can do the opposite I tell it.
+> 
+> Agreed.
+> 
+> > 
+> > CON:
+> > * It is more code: "4 files changed, 37 insertions(+), 2 deletions(-)"
+> >   against "3 files changed, 17 insertions(+)"
+> > * Unlike the previous one, this one is not fool-proof! The user can
+> >   still specify access_platform=off to lets say a hotplug device, and
+> >   bring down the guest. We could however fence such stuff with an error
+> >   message. Would be even more code though.
+> 
+> I think trying to hotplug such a device to a guest running in protected
+> mode should simply fail (and not crash anything.)
 
-Signed-off-by: Joseph Myers <joseph@codesourcery.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/i386/fpu_helper.c | 156 ++++++++++++---------------------------
- 1 file changed, 48 insertions(+), 108 deletions(-)
+Yes, if on/off/auto with a similar semantics like here is the path
+we are going to walk, I will definitely have to throw in some code that
+fails the hotplug of such devices.
 
-diff --git a/target/i386/fpu_helper.c b/target/i386/fpu_helper.c
-index 8ef5b463ea..0e531e3821 100644
---- a/target/i386/fpu_helper.c
-+++ b/target/i386/fpu_helper.c
-@@ -934,124 +934,64 @@ void helper_fxtract(CPUX86State *env)
-     merge_exception_flags(env, old_flags);
- }
- 
--void helper_fprem1(CPUX86State *env)
-+static void helper_fprem_common(CPUX86State *env, bool mod)
- {
--    double st0, st1, dblq, fpsrcop, fptemp;
--    CPU_LDoubleU fpsrcop1, fptemp1;
--    int expdif;
--    signed long long int q;
--
--    st0 = floatx80_to_double(env, ST0);
--    st1 = floatx80_to_double(env, ST1);
--
--    if (isinf(st0) || isnan(st0) || isnan(st1) || (st1 == 0.0)) {
--        ST0 = double_to_floatx80(env, 0.0 / 0.0); /* NaN */
--        env->fpus &= ~0x4700; /* (C3,C2,C1,C0) <-- 0000 */
--        return;
--    }
--
--    fpsrcop = st0;
--    fptemp = st1;
--    fpsrcop1.d = ST0;
--    fptemp1.d = ST1;
--    expdif = EXPD(fpsrcop1) - EXPD(fptemp1);
--
--    if (expdif < 0) {
--        /* optimisation? taken from the AMD docs */
--        env->fpus &= ~0x4700; /* (C3,C2,C1,C0) <-- 0000 */
--        /* ST0 is unchanged */
--        return;
--    }
-+    uint8_t old_flags = save_exception_flags(env);
-+    uint64_t quotient;
-+    CPU_LDoubleU temp0, temp1;
-+    int exp0, exp1, expdiff;
- 
--    if (expdif < 53) {
--        dblq = fpsrcop / fptemp;
--        /* round dblq towards nearest integer */
--        dblq = rint(dblq);
--        st0 = fpsrcop - fptemp * dblq;
-+    temp0.d = ST0;
-+    temp1.d = ST1;
-+    exp0 = EXPD(temp0);
-+    exp1 = EXPD(temp1);
- 
--        /* convert dblq to q by truncating towards zero */
--        if (dblq < 0.0) {
--            q = (signed long long int)(-dblq);
-+    env->fpus &= ~0x4700; /* (C3,C2,C1,C0) <-- 0000 */
-+    if (floatx80_is_zero(ST0) || floatx80_is_zero(ST1) ||
-+        exp0 == 0x7fff || exp1 == 0x7fff ||
-+        floatx80_invalid_encoding(ST0) || floatx80_invalid_encoding(ST1)) {
-+        ST0 = floatx80_modrem(ST0, ST1, mod, &quotient, &env->fp_status);
-+    } else {
-+        if (exp0 == 0) {
-+            exp0 = 1 - clz64(temp0.l.lower);
-+        }
-+        if (exp1 == 0) {
-+            exp1 = 1 - clz64(temp1.l.lower);
-+        }
-+        expdiff = exp0 - exp1;
-+        if (expdiff < 64) {
-+            ST0 = floatx80_modrem(ST0, ST1, mod, &quotient, &env->fp_status);
-+            env->fpus |= (quotient & 0x4) << (8 - 2);  /* (C0) <-- q2 */
-+            env->fpus |= (quotient & 0x2) << (14 - 1); /* (C3) <-- q1 */
-+            env->fpus |= (quotient & 0x1) << (9 - 0);  /* (C1) <-- q0 */
-         } else {
--            q = (signed long long int)dblq;
-+            /*
-+             * Partial remainder.  This choice of how many bits to
-+             * process at once is specified in AMD instruction set
-+             * manuals, and empirically is followed by Intel
-+             * processors as well; it ensures that the final remainder
-+             * operation in a loop does produce the correct low three
-+             * bits of the quotient.  AMD manuals specify that the
-+             * flags other than C2 are cleared, and empirically Intel
-+             * processors clear them as well.
-+             */
-+            int n = 32 + (expdiff % 32);
-+            temp1.d = floatx80_scalbn(temp1.d, expdiff - n, &env->fp_status);
-+            ST0 = floatx80_mod(ST0, temp1.d, &env->fp_status);
-+            env->fpus |= 0x400;  /* C2 <-- 1 */
-         }
--
--        env->fpus &= ~0x4700; /* (C3,C2,C1,C0) <-- 0000 */
--        /* (C0,C3,C1) <-- (q2,q1,q0) */
--        env->fpus |= (q & 0x4) << (8 - 2);  /* (C0) <-- q2 */
--        env->fpus |= (q & 0x2) << (14 - 1); /* (C3) <-- q1 */
--        env->fpus |= (q & 0x1) << (9 - 0);  /* (C1) <-- q0 */
--    } else {
--        env->fpus |= 0x400;  /* C2 <-- 1 */
--        fptemp = pow(2.0, expdif - 50);
--        fpsrcop = (st0 / st1) / fptemp;
--        /* fpsrcop = integer obtained by chopping */
--        fpsrcop = (fpsrcop < 0.0) ?
--                  -(floor(fabs(fpsrcop))) : floor(fpsrcop);
--        st0 -= (st1 * fpsrcop * fptemp);
-     }
--    ST0 = double_to_floatx80(env, st0);
-+    merge_exception_flags(env, old_flags);
- }
- 
--void helper_fprem(CPUX86State *env)
-+void helper_fprem1(CPUX86State *env)
- {
--    double st0, st1, dblq, fpsrcop, fptemp;
--    CPU_LDoubleU fpsrcop1, fptemp1;
--    int expdif;
--    signed long long int q;
--
--    st0 = floatx80_to_double(env, ST0);
--    st1 = floatx80_to_double(env, ST1);
--
--    if (isinf(st0) || isnan(st0) || isnan(st1) || (st1 == 0.0)) {
--        ST0 = double_to_floatx80(env, 0.0 / 0.0); /* NaN */
--        env->fpus &= ~0x4700; /* (C3,C2,C1,C0) <-- 0000 */
--        return;
--    }
--
--    fpsrcop = st0;
--    fptemp = st1;
--    fpsrcop1.d = ST0;
--    fptemp1.d = ST1;
--    expdif = EXPD(fpsrcop1) - EXPD(fptemp1);
--
--    if (expdif < 0) {
--        /* optimisation? taken from the AMD docs */
--        env->fpus &= ~0x4700; /* (C3,C2,C1,C0) <-- 0000 */
--        /* ST0 is unchanged */
--        return;
--    }
--
--    if (expdif < 53) {
--        dblq = fpsrcop / fptemp; /* ST0 / ST1 */
--        /* round dblq towards zero */
--        dblq = (dblq < 0.0) ? ceil(dblq) : floor(dblq);
--        st0 = fpsrcop - fptemp * dblq; /* fpsrcop is ST0 */
--
--        /* convert dblq to q by truncating towards zero */
--        if (dblq < 0.0) {
--            q = (signed long long int)(-dblq);
--        } else {
--            q = (signed long long int)dblq;
--        }
--
--        env->fpus &= ~0x4700; /* (C3,C2,C1,C0) <-- 0000 */
--        /* (C0,C3,C1) <-- (q2,q1,q0) */
--        env->fpus |= (q & 0x4) << (8 - 2);  /* (C0) <-- q2 */
--        env->fpus |= (q & 0x2) << (14 - 1); /* (C3) <-- q1 */
--        env->fpus |= (q & 0x1) << (9 - 0);  /* (C1) <-- q0 */
--    } else {
--        int N = 32 + (expdif % 32); /* as per AMD docs */
-+    helper_fprem_common(env, false);
-+}
- 
--        env->fpus |= 0x400;  /* C2 <-- 1 */
--        fptemp = pow(2.0, (double)(expdif - N));
--        fpsrcop = (st0 / st1) / fptemp;
--        /* fpsrcop = integer obtained by chopping */
--        fpsrcop = (fpsrcop < 0.0) ?
--                  -(floor(fabs(fpsrcop))) : floor(fpsrcop);
--        st0 -= (st1 * fpsrcop * fptemp);
--    }
--    ST0 = double_to_floatx80(env, st0);
-+void helper_fprem(CPUX86State *env)
-+{
-+    helper_fprem_common(env, true);
- }
- 
- void helper_fyl2xp1(CPUX86State *env)
--- 
-2.17.1
+> 
+> > * As far as I can tell 'auto' was used to pick a value on initialization
+> >   time. This is a novel, and possibly dodgy use in a sense that the value
+> >   of the property may change during the lifetime of the VM.
+> 
+> You mean that we start the vm once with support for prot virt, and
+> later without?
+
+No, this patch does not care if VM supports prot virt or not, it only
+cares about the mode we are running in (prot virt or not). That is, I
+still might add F_ACCESS_PLATFORM when the VM gets transitioned to a
+prot virt VM. And this is something other uses of OnOffAuto don't seem
+to do. 
+
+> 
+> > * We may need to do something about libvirt.
+> 
+> I'm also not 100% sure about migration... would it make sense to
+> discuss all of this in the context of the cross-arch patchset? It seems
+> power has similar issues.
+> 
+
+I'm going to definitely have a good look at that. What I think special
+about s390 is that F_ACCESS_PLATFORM is hurting us because all IO needs
+to go through ZONE_DMA (this is a problem of the implementation that
+stemming form a limitation of the DMA API, upstream didn't let me
+fix it). 
+
+> > 
+> > Further improvements are possible and probably necessary if we want
+> > to go down this path. But I would like to verify that first.
+> > 
+> > ----------------------------8<---------------------------------
+> > From: Halil Pasic <pasic@linux.ibm.com>
+> > Date: Wed, 26 Feb 2020 16:48:21 +0100
+> > Subject: [PATCH v2.5 1/1] virtio-ccw: auto-manage VIRTIO_F_IOMMU_PLATFORM if PV
+> > 
+> > The virtio specification tells that the device is to present
+> > VIRTIO_F_ACCESS_PLATFORM (a.k.a. VIRTIO_F_IOMMU_PLATFORM) when the
+> > device "can only access certain memory addresses with said access
+> > specified and/or granted by the platform". This is the case for a
+> > protected VMs, as the device can access only memory addresses that are
+> > in pages that are currently shared (only the guest can share/unsare its
+> > pages).
+> > 
+> > No VM, however, starts out as a protected VM, but some VMs may be
+> > converted to protected VMs if the guest decides so.
+> > 
+> > Making the end user explicitly manage the VIRTIO_F_ACCESS_PLATFORM via
+> > the property iommu_on is a minor disaster. Since the correctness of the
+> > paravirtualized virtio devices depends (and thus in a sense the
+> > correctness of the hypervisor) it, then the hypervisor should have the
+> > last word about whether VIRTIO_F_ACCESS_PLATFORM is to be presented or
+> > not.
+> > 
+> > Currently presenting a PV guest with a (paravirtualized) virtio-ccw
+> > device has catastrophic consequences for the VM (after the hypervisors
+> > access to protected memory). This is especially grave in case of device
+> > hotplug (because in this case the guest is more likely to be in the
+> > middle of something important).
+> 
+> You mean for virtio-ccw devices that don't have iommu_on, right? 
+> 
+> 
+
+Right, I'm missing the most important words.
+
+> > 
+> > Let us add the ability to manage the VIRTIO_F_ACCESS_PLATFORM virtio
+> > feature automatically. This is accomplished  by turning the property
+> > into an 'on/off/auto' property, and for virtio-ccw devices if auto
+> > was specified forcing its value before  we start the protected VM. If
+> > the VM should cease to be protected, the original value is restored.
+> > 
+> > Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
+> > ---
+> >  hw/s390x/s390-virtio-ccw.c |  2 ++
+> >  hw/s390x/virtio-ccw.c      | 14 ++++++++++++++
+> >  hw/virtio/virtio.c         | 19 +++++++++++++++++++
+> >  include/hw/virtio/virtio.h |  4 ++--
+> >  4 files changed, 37 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+> > index f660070d22..705e6b153a 100644
+> > --- a/hw/s390x/s390-virtio-ccw.c
+> > +++ b/hw/s390x/s390-virtio-ccw.c
+> > @@ -330,6 +330,7 @@ static void s390_machine_unprotect(S390CcwMachineState *ms)
+> >      migrate_del_blocker(pv_mig_blocker);
+> >      error_free_or_abort(&pv_mig_blocker);
+> >      qemu_balloon_inhibit(false);
+> > +    subsystem_reset();
+> >  }
+> >  
+> >  static int s390_machine_protect(S390CcwMachineState *ms)
+> > @@ -382,6 +383,7 @@ static int s390_machine_protect(S390CcwMachineState *ms)
+> >      if (rc) {
+> >          goto out_err;
+> >      }
+> > +    subsystem_reset();
+> >      return rc;
+> >  
+> >  out_err:
+> > diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
+> > index 64f928fc7d..2bb29b57aa 100644
+> > --- a/hw/s390x/virtio-ccw.c
+> > +++ b/hw/s390x/virtio-ccw.c
+> > @@ -874,6 +874,20 @@ static void virtio_ccw_reset(DeviceState *d)
+> >      VirtioCcwDevice *dev = VIRTIO_CCW_DEVICE(d);
+> >      VirtIODevice *vdev = virtio_bus_get_device(&dev->bus);
+> >      VirtIOCCWDeviceClass *vdc = VIRTIO_CCW_DEVICE_GET_CLASS(dev);
+> > +    S390CcwMachineState *ms = S390_CCW_MACHINE(qdev_get_machine());
+> > +
+> > +    /*
+> > +     * An attempt to use a paravirt device without VIRTIO_F_IOMMU_PLATFORM
+> > +     * in PV, has catastrophic consequences for the VM. Let's force
+> > +     * VIRTIO_F_IOMMU_PLATFORM not already specified.
+> > +     */
+> > +    if (vdev->access_platform_auto && ms->pv) {
+> > +        virtio_add_feature(&vdev->host_features, VIRTIO_F_IOMMU_PLATFORM);
+> > +        vdev->access_platform = ON_OFF_AUTO_ON;
+> > +    } else if (vdev->access_platform_auto) {
+> > +        virtio_clear_feature(&vdev->host_features, VIRTIO_F_IOMMU_PLATFORM);
+> > +        vdev->access_platform = ON_OFF_AUTO_OFF;
+> > +    }
+> 
+> If the consequences are so dire, we really should disallow adding a
+> device of IOMMU_PLATFORM off if pv is on.
+
+I totally agree. My previous patch didn't have the problem because there
+we just forced what we need.
+
+> 
+> (Can we disallow transition to pv if it is off? Maybe with the machine
+> property approach from the cross-arch patchset?)
+
+No we can't disallow transition because for hotplug that already
+happened.
+
+I can't say anything about the cross-arch patchset. Will come back to you
+once I'm smarter.
+
+> 
+> >  
+> >      virtio_ccw_reset_virtio(dev, vdev);
+> >      if (vdc->parent_reset) {
+> > diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+> > index b6c8ef5bc0..f6bd271f14 100644
+> > --- a/hw/virtio/virtio.c
+> > +++ b/hw/virtio/virtio.c
+> > @@ -3232,7 +3232,11 @@ void virtio_instance_init_common(Object *proxy_obj, void *data,
+> >  
+> >      object_initialize_child(proxy_obj, "virtio-backend", vdev, vdev_size,
+> >                              vdev_name, &error_abort, NULL);
+> > +    object_property_add_alias(OBJECT(vdev), "iommu_platform",
+> > +                              OBJECT(vdev), "access_platform", &error_abort);
+> >      qdev_alias_all_properties(vdev, proxy_obj);
+> > +    object_property_add_alias(proxy_obj, "iommu_platform",
+> > +                              OBJECT(vdev), "access_platform", &error_abort);
+> >  }
+> >  
+> >  void virtio_init(VirtIODevice *vdev, const char *name,
+> > @@ -3626,6 +3630,19 @@ static void virtio_device_realize(DeviceState *dev, Error **errp)
+> >          return;
+> >      }
+> >  
+> > +    switch (vdev->access_platform) {
+> > +    case ON_OFF_AUTO_ON:
+> > +        virtio_add_feature(&vdev->host_features, VIRTIO_F_IOMMU_PLATFORM);
+> > +        break;
+> > +    case ON_OFF_AUTO_AUTO:
+> > +        /* transport code can mange access_platform */
+> > +        vdev->access_platform_auto = true;
+> 
+> Can we really make that transport-specific? While ccw implies s390, pci
+> might be a variety of architectures.
+> 
+
+Right, this is more about the machine than the transport. I was thinking
+of a machine hook, but decided to discuss the more basic stuff first
+(i.e. is it OK to change the property after stuff is realized).
+
+This would already fix the most pressing issue which is virtio-ccw. I
+didn't even bother checking if virtio-pci works with PV out of the box,
+or if something needs to be done there. My bet is that it does not work.
+
+> > +        break;
+> > +    case ON_OFF_AUTO_OFF: /*fall through*/
+> > +    default:
+> > +        vdev->access_platform_auto = false;
+> > +    }
+> > +
+> >      vdev->listener.commit = virtio_memory_listener_commit;
+> >      memory_listener_register(&vdev->listener, vdev->dma_as);
+> >  }
+> > @@ -3681,6 +3698,8 @@ static Property virtio_properties[] = {
+> >      DEFINE_VIRTIO_COMMON_FEATURES(VirtIODevice, host_features),
+> >      DEFINE_PROP_BOOL("use-started", VirtIODevice, use_started, true),
+> >      DEFINE_PROP_BOOL("use-disabled-flag", VirtIODevice, use_disabled_flag, true),
+> > +    DEFINE_PROP_ON_OFF_AUTO("access_platform", VirtIODevice, access_platform,
+> > +                            ON_OFF_AUTO_AUTO),
+> >      DEFINE_PROP_END_OF_LIST(),
+> >  };
+> >  
+> > diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
+> > index b69d517496..b77e1545b4 100644
+> > --- a/include/hw/virtio/virtio.h
+> > +++ b/include/hw/virtio/virtio.h
+> > @@ -110,6 +110,8 @@ struct VirtIODevice
+> >      uint8_t device_endian;
+> >      bool use_guest_notifier_mask;
+> >      AddressSpace *dma_as;
+> > +    OnOffAuto access_platform;
+> > +    bool access_platform_auto;
+> >      QLIST_HEAD(, VirtQueue) *vector_queues;
+> >  };
+> >  
+> > @@ -289,8 +291,6 @@ typedef struct VirtIORNGConf VirtIORNGConf;
+> >                        VIRTIO_F_NOTIFY_ON_EMPTY, true), \
+> >      DEFINE_PROP_BIT64("any_layout", _state, _field, \
+> >                        VIRTIO_F_ANY_LAYOUT, true), \
+> > -    DEFINE_PROP_BIT64("iommu_platform", _state, _field, \
+> > -                      VIRTIO_F_IOMMU_PLATFORM, false), \
+> 
+> I'm wondering about migration compat.
+
+Should be fine, I have the alias for that. But if this is the
+path we are taking I will definitely test it.
+
+Thanks for having a look and for all the good questions!
+
+Regards,
+Halil 
 
 
--- 
-Joseph S. Myers
-joseph@codesourcery.com
+> 
+> >      DEFINE_PROP_BIT64("packed", _state, _field, \
+> >                        VIRTIO_F_RING_PACKED, false)
+> >  
+> > 
+> > base-commit: 0ffd3d64bd1bb8b84950e52159a0062fdab34628
+> 
+
 
