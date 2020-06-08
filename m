@@ -7,77 +7,77 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05138C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 16:30:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C78AC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 16:31:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C54FF2053B
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 16:30:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 24C532053B
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 16:31:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eTeBdDQG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C54FF2053B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YnH0xSE1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24C532053B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55906 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56954 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jiKfM-0004mh-0Q
-	for qemu-devel@archiver.kernel.org; Mon, 08 Jun 2020 12:30:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38330)
+	id 1jiKfs-0005EY-78
+	for qemu-devel@archiver.kernel.org; Mon, 08 Jun 2020 12:31:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38472)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jiKFU-0007d8-BB
- for qemu-devel@nongnu.org; Mon, 08 Jun 2020 12:03:44 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:58429
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jiKG8-0008FG-Kl
+ for qemu-devel@nongnu.org; Mon, 08 Jun 2020 12:04:24 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24265
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jiKFT-0008Cp-Di
- for qemu-devel@nongnu.org; Mon, 08 Jun 2020 12:03:43 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jiKG7-0008JD-NN
+ for qemu-devel@nongnu.org; Mon, 08 Jun 2020 12:04:24 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591632222;
+ s=mimecast20190719; t=1591632263;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=tavsnBMcjbLYqmKTQpJNbu5aW+OtaIuHgP5ZHfhD4y8=;
- b=eTeBdDQGsa/LrE8sj2CQmX8iur7HQNbShZc9uFuZB6fKePQ+t8HJVOwGuaIuvTpbBhJJ2Y
- K6RUOPfwiOQg4/ejuFu790JwzHBIGwcW2sSsLhrL8MgfIs/A2Smp/udig9f+s0fOIdpJHe
- EEcZYWXHIJOa5WCpsOaqrV92W6clB2c=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-174-5fB6McBdN9uIieCNyw0Jfg-1; Mon, 08 Jun 2020 12:03:41 -0400
-X-MC-Unique: 5fB6McBdN9uIieCNyw0Jfg-1
-Received: by mail-wr1-f71.google.com with SMTP id e1so7369427wrm.3
- for <qemu-devel@nongnu.org>; Mon, 08 Jun 2020 09:03:41 -0700 (PDT)
+ bh=6eEd/TZ2fHyvBWvIJ4C8+kCwxjhDxL4elOTIEe035mA=;
+ b=YnH0xSE1dlj3foedbN47Wu/S7008E6Zt0Pfq7GJMjOF/unBG9L1oLkA5ow7kUSCLig7Imq
+ Je/V7Fs166NbMGu70YTJUkyf5qRIuiUxPXboR40E9o7j638sS1U3cN7naey+SVbKNazrpW
+ aO1MB33X2qAK4XdsRvdAgXz3x/eiA60=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-149-3B4hgxiDMpW1P8Giea8Kow-1; Mon, 08 Jun 2020 12:04:11 -0400
+X-MC-Unique: 3B4hgxiDMpW1P8Giea8Kow-1
+Received: by mail-wr1-f70.google.com with SMTP id w16so7329168wru.18
+ for <qemu-devel@nongnu.org>; Mon, 08 Jun 2020 09:04:11 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=tavsnBMcjbLYqmKTQpJNbu5aW+OtaIuHgP5ZHfhD4y8=;
- b=mEwL42ZuhMksccCUi6EX4qarxnECuXyPuLYYUKCAgw1zTZtkS84F55Kqbj4ugu+7ou
- 37kfcP3gffc5n7D+sl2V5NELGfyKYa2N4CUmt7G7QIX4I8F9B3RVUmutwnZaZgpP+7Qj
- O1FWYydqPNe9eWHVFpxIECswk6iHOrOPrQAA2sHXKnDtiEVMpo+OeXtIyoExJqn6B4H8
- v6rVROj6VlsiB1cMgw73sFvZvs6AVA2FIJzZovliPsApDIg06p/zuBQF+lBBrzs9+vCg
- fHrwAeF9vaST8KcEFT6Zw6QTCnj5u7cii4AzpuVkiBChDqv3TalrpD/vlFxRzaxI+upj
- A+UA==
-X-Gm-Message-State: AOAM533UUfklZWeZ1bM1i/lyOTntqV7k0Ns5ka1nX3/3SnUDf1CPdGq8
- cJp17IYZSvuR7IONlMlS1vNEFMfh6itbWJPPrVksIc+Rnui/cciD53RRQUB0lFtqCagFURvDhd/
- IgfeFlMfLD00kl0M=
-X-Received: by 2002:a7b:cd04:: with SMTP id f4mr73343wmj.118.1591632216919;
- Mon, 08 Jun 2020 09:03:36 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy1E2OUT8wjgYne61y8m5ATBeXEAgbFH/vhvj6PwSHzmhBdaDf8vJ9I14Vkb0SP4ZL7hYVwYg==
-X-Received: by 2002:a7b:cd04:: with SMTP id f4mr73214wmj.118.1591632215737;
- Mon, 08 Jun 2020 09:03:35 -0700 (PDT)
+ bh=6eEd/TZ2fHyvBWvIJ4C8+kCwxjhDxL4elOTIEe035mA=;
+ b=uF1klyEcpOP+daQqg6PuU0nys3Kcy6cYiiBGfQeAMNaGDxBpvFnj3q+34v6ZKTGumS
+ cIObZ7Y9u1hH4mJ+Sa7zOFan1TExc/jrR8XpsCxZhYAdva8dibkMUyyPX8xwGLOyFTSo
+ HBRdTSJJOd+B9n4hQkbko3E4KxK9wdEQTCak96YGlSbfoo2mRDyXUrsl833JmEu+55GZ
+ lDx6YJlVQz8Tlk5i8fy2bG598MqnPwaXe5PyWpyAP7PjE7Q6v1h2S0u+yf/uf8AnQ2Wb
+ ULxHnygH70MuHXiT9FSQGIKcngWGVpt/D0w27m+BvmfFkpA+rm1SHcE77QIhFQanM2bZ
+ N5zw==
+X-Gm-Message-State: AOAM5320eoYeZrNXPQ+J1kzBdDsfB/H5SxRX3P12LJQ3OC0JXYd2sAHl
+ 0+cThAV4axQW/U197rfh0M6FsxDozoNzmvtMYn0NMRcwrq/svdCc/jy5rceyY1aHPBXhmwRkS7P
+ o+viJyKt4nlgXTgc=
+X-Received: by 2002:a1c:bb05:: with SMTP id l5mr29002wmf.141.1591632250055;
+ Mon, 08 Jun 2020 09:04:10 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxwleTjEs6m/0F9WTXFTKcyesoS9BhM/fhVRhaP0ZaaZMgPHfTC+huUmGRS6bDSqa1xeeej4Q==
+X-Received: by 2002:a1c:bb05:: with SMTP id l5mr28952wmf.141.1591632249790;
+ Mon, 08 Jun 2020 09:04:09 -0700 (PDT)
 Received: from localhost.localdomain
  (181.red-88-10-103.dynamicip.rima-tde.net. [88.10.103.181])
- by smtp.gmail.com with ESMTPSA id l17sm200565wrq.17.2020.06.08.09.03.33
+ by smtp.gmail.com with ESMTPSA id j16sm243025wre.21.2020.06.08.09.04.08
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 08 Jun 2020 09:03:35 -0700 (PDT)
+ Mon, 08 Jun 2020 09:04:09 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC PATCH 29/35] hw/ppc/ppc_booke: Emit warning when old code is used
-Date: Mon,  8 Jun 2020 18:00:38 +0200
-Message-Id: <20200608160044.15531-30-philmd@redhat.com>
+Subject: [RFC PATCH 35/35] hw/xtensa/xtfpga: Emit warning when old code is used
+Date: Mon,  8 Jun 2020 18:00:44 +0200
+Message-Id: <20200608160044.15531-36-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200608160044.15531-1-philmd@redhat.com>
 References: <20200608160044.15531-1-philmd@redhat.com>
@@ -87,16 +87,17 @@ X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8;
 	text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/08 11:58:00
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/08 05:40:56
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -139,31 +140,30 @@ This code hasn't been QOM'ified yet. Warn the user.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- hw/ppc/ppc_booke.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ hw/xtensa/xtfpga.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/hw/ppc/ppc_booke.c b/hw/ppc/ppc_booke.c
-index 652a21b806..a9e5e68578 100644
---- a/hw/ppc/ppc_booke.c
-+++ b/hw/ppc/ppc_booke.c
-@@ -31,7 +31,7 @@
- #include "qemu/log.h"
- #include "hw/loader.h"
- #include "kvm_ppc.h"
--
+diff --git a/hw/xtensa/xtfpga.c b/hw/xtensa/xtfpga.c
+index 60ccc74f5f..a3c82dc81a 100644
+--- a/hw/xtensa/xtfpga.c
++++ b/hw/xtensa/xtfpga.c
+@@ -50,6 +50,7 @@
+ #include "xtensa_memory.h"
+ #include "hw/xtensa/mx_pic.h"
+ #include "migration/vmstate.h"
 +#include "hw/qdev-deprecated.h"
  
- /* Timer Control Register */
- 
-@@ -338,6 +338,8 @@ void ppc_booke_timers_init(PowerPCCPU *cpu, uint32_t freq, uint32_t flags)
-     booke_timer_t *booke_timer;
-     int ret = 0;
+ typedef struct XtfpgaFlashDesc {
+     hwaddr base;
+@@ -129,6 +130,8 @@ static XtfpgaFpgaState *xtfpga_fpga_init(MemoryRegion *address_space,
+ {
+     XtfpgaFpgaState *s = g_malloc(sizeof(XtfpgaFpgaState));
  
 +    qdev_warn_deprecated_function_used();
 +
-     tb_env      = g_malloc0(sizeof(ppc_tb_t));
-     booke_timer = g_malloc0(sizeof(booke_timer_t));
- 
+     memory_region_init_io(&s->iomem, NULL, &xtfpga_fpga_ops, s,
+                           "xtfpga.fpga", 0x10000);
+     memory_region_add_subregion(address_space, base, &s->iomem);
 -- 
 2.21.3
 
