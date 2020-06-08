@@ -2,72 +2,91 @@ Return-Path: <SRS0=zEF8=7V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24D33C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 02:40:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 003C2C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 03:45:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EB9DE2067B
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 02:40:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB9DE2067B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id B73902067B
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 03:45:57 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=braap-org.20150623.gappssmtp.com header.i=@braap-org.20150623.gappssmtp.com header.b="RZ1n6B+G"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B73902067B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=braap.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40632 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32918 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ji7hn-0006nr-2O
-	for qemu-devel@archiver.kernel.org; Sun, 07 Jun 2020 22:40:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34314)
+	id 1ji8jU-0004eE-UZ
+	for qemu-devel@archiver.kernel.org; Sun, 07 Jun 2020 23:45:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44144)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1ji7h8-0006GI-Vq; Sun, 07 Jun 2020 22:39:27 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:44422)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1ji7h6-0007Vg-RS; Sun, 07 Jun 2020 22:39:26 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.08822978|-1; CH=green;
- DM=|CONTINUE|false|;
- DS=CONTINUE|ham_regular_dialog|0.343959-0.00357344-0.652468;
- FP=0|0|0|0|0|-1|-1|-1; HT=e02c03310; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=7; RT=7; SR=0; TI=SMTPD_---.HjSZAfY_1591583952; 
-Received: from 30.225.208.60(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.HjSZAfY_1591583952)
- by smtp.aliyun-inc.com(10.147.41.121);
- Mon, 08 Jun 2020 10:39:12 +0800
-Subject: Re: [PATCH v8 30/62] target/riscv: Update fp_status when float
- rounding mode changes
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- qemu-riscv@nongnu.org
-References: <20200521094413.10425-1-zhiwei_liu@c-sky.com>
- <20200521094413.10425-31-zhiwei_liu@c-sky.com>
- <7cb2aa5d-833a-8544-dadc-5aabba06ecd2@linaro.org>
- <ca1e71cd-c290-5fb9-e9bf-026c73e06560@c-sky.com>
- <7ec3d397-bf9a-07f5-3014-4acf47a4fd6e@linaro.org>
- <ba7ef161-8bc6-516f-b5a7-8133e3a89998@c-sky.com>
- <dd721c20-fc04-49b8-0c5a-1b4761105461@linaro.org>
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Message-ID: <8b1d3fb0-479a-9fa9-99cd-b71e0da275cc@c-sky.com>
-Date: Mon, 8 Jun 2020 10:39:12 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ (Exim 4.90_1) (envelope-from <cota@braap.org>) id 1ji8ii-0004ET-TB
+ for qemu-devel@nongnu.org; Sun, 07 Jun 2020 23:45:08 -0400
+Received: from mail-qt1-x844.google.com ([2607:f8b0:4864:20::844]:33889)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <cota@braap.org>) id 1ji8ih-0004qS-MO
+ for qemu-devel@nongnu.org; Sun, 07 Jun 2020 23:45:08 -0400
+Received: by mail-qt1-x844.google.com with SMTP id u17so13673779qtq.1
+ for <qemu-devel@nongnu.org>; Sun, 07 Jun 2020 20:45:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=braap-org.20150623.gappssmtp.com; s=20150623;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:content-transfer-encoding:in-reply-to;
+ bh=ADCUJpRsuyLh40yqMa6Ol1jH/fROV5NMgYmOL3F24ds=;
+ b=RZ1n6B+GKFfkEON0ZA1H2VRNTiSNq0nTwgLfEzyadpF3Z2+WuizoC/RbrPMtKIcWx5
+ 3TVm3Eb72Q2GoIis7JPXxVt35tOoOTTVr8wYyrs8TVL1reCnp1OXXmOBoQBf0DAolthN
+ Ko1PsOO8Bak9+GxEs05t7Q2mmGowz1NXEWbL4f+yZDUvVYyNse+ylU9D1VQ5yUcxvsfx
+ kZ3c9kRCZFvWpyOed3/O4xB+kmdXH8scbBFO1V+wSm5SSY0CMTHPqA9zV/tFVFMYT/Uf
+ 9IPEZ4qShxRM/S9atppp0jB2ijecNLQYnC/bg+xhuMJnlR+QwWwPKnF3cjkoKXIwWCWE
+ i23A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=ADCUJpRsuyLh40yqMa6Ol1jH/fROV5NMgYmOL3F24ds=;
+ b=s06Hvm0OXtFP0aoFZzUnheaGQ51YRQIfCde/mCG8E1MDsIobFy6PLL/Fjocuu+ajyk
+ rPSWvfYjR3jUWfXRimyqOx1BusQsPYudS029G78kGSGBbEu+4hWlrenMQuLimQqiOpZt
+ JfGz+Cw5+yPGnAgw0aUyPTCKza8s++NjW5OennxJMT09SgpqtnjEOe2mDrbrPY/0Fkh3
+ LLzmNl4dUjb182f7jvV5q5jiPUNfAKBm0ub1PFJrp3o9OxNV8lMcx/OQOEvcGnGge7Th
+ DzCvsvjk2tre7zwrKfgtQNI7lW9IH1rdQlcsQA9h5W64OFV2LPQ5306yOpnhSdgnTGfD
+ UuMQ==
+X-Gm-Message-State: AOAM532g532IxM+mD8Ffqsj4XPQaUC5buDRd3xRJo4pIV70cV0IoU3kS
+ MI05PvdswgZ2HEeTcoIBjrQ82A==
+X-Google-Smtp-Source: ABdhPJxVIp8DEi/Qw50227K+p7iNmyF1WFJqkbP/zDCBGGOCABU/NVqVrXQuHrWVdUXwv83vMT13oQ==
+X-Received: by 2002:aed:246c:: with SMTP id s41mr13127959qtc.376.1591587906004; 
+ Sun, 07 Jun 2020 20:45:06 -0700 (PDT)
+Received: from localhost ([70.19.54.161])
+ by smtp.gmail.com with ESMTPSA id k10sm5863680qkh.47.2020.06.07.20.45.05
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sun, 07 Jun 2020 20:45:05 -0700 (PDT)
+Date: Sun, 7 Jun 2020 23:45:04 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Subject: Re: [PATCH v1 7/9] plugins: add API to return a name for a IO device
+Message-ID: <20200608034504.GA3619843@sff>
+References: <20200602154624.4460-1-alex.bennee@linaro.org>
+ <20200602154624.4460-8-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <dd721c20-fc04-49b8-0c5a-1b4761105461@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Received-SPF: none client-ip=121.197.200.217;
- envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/07 22:02:43
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
+In-Reply-To: <20200602154624.4460-8-alex.bennee@linaro.org>
+Received-SPF: softfail client-ip=2607:f8b0:4864:20::844;
+ envelope-from=cota@braap.org; helo=mail-qt1-x844.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -11
+X-Spam_score: -1.2
 X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9,
- UNPARSEABLE_RELAY=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-1.2 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_SOFTFAIL=0.665,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -80,54 +99,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: palmer@dabbelt.com, wenmeng_zhang@c-sky.com, alistair.francis@wdc.com,
- wxy194768@alibaba-inc.com
+Cc: robert.foley@linaro.org, qemu-devel@nongnu.org, robhenry@microsoft.com,
+ aaron@os.amperecomputing.com, kuhn.chenqun@huawei.com, peter.puhov@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Tue, Jun 02, 2020 at 16:46:22 +0100, Alex Benn�e wrote:
+> This may well end up being anonymous but it should always be unique.
+> 
+> Signed-off-by: Alex Benn�e <alex.bennee@linaro.org>
+> ---
+>  include/qemu/qemu-plugin.h |  5 +++++
+>  plugins/api.c              | 18 ++++++++++++++++++
+>  2 files changed, 23 insertions(+)
+> 
+> diff --git a/include/qemu/qemu-plugin.h b/include/qemu/qemu-plugin.h
+> index bab8b0d4b3a..43c6a9e857f 100644
+> --- a/include/qemu/qemu-plugin.h
+> +++ b/include/qemu/qemu-plugin.h
+> @@ -335,6 +335,11 @@ struct qemu_plugin_hwaddr *qemu_plugin_get_hwaddr(qemu_plugin_meminfo_t info,
+>  bool qemu_plugin_hwaddr_is_io(const struct qemu_plugin_hwaddr *haddr);
+>  uint64_t qemu_plugin_hwaddr_device_offset(const struct qemu_plugin_hwaddr *haddr);
+>  
+> +/*
+> + * Returns a string representing the device. Plugin must free() it
+> + */
+> +char * qemu_plugin_hwaddr_device_name(const struct qemu_plugin_hwaddr *haddr);
+> +
+>  typedef void
+>  (*qemu_plugin_vcpu_mem_cb_t)(unsigned int vcpu_index,
+>                               qemu_plugin_meminfo_t info, uint64_t vaddr,
+> diff --git a/plugins/api.c b/plugins/api.c
+> index bbdc5a4eb46..3c73de8c1c2 100644
+> --- a/plugins/api.c
+> +++ b/plugins/api.c
+> @@ -303,6 +303,24 @@ uint64_t qemu_plugin_hwaddr_device_offset(const struct qemu_plugin_hwaddr *haddr
+>      return 0;
+>  }
+>  
+> +char * qemu_plugin_hwaddr_device_name(const struct qemu_plugin_hwaddr *haddr)
+> +{
+> +#ifdef CONFIG_SOFTMMU
+> +    if (haddr && haddr->is_io) {
+> +        MemoryRegionSection *mrs = haddr->v.io.section;
+> +        if (!mrs->mr->name) {
+> +            return g_strdup_printf("anon%08lx", 0xffffffff & (uintptr_t) mrs->mr);
+> +        } else {
+> +            return g_strdup(mrs->mr->name);
+> +        }
+> +    } else {
+> +        return g_strdup("RAM");
+> +    }
+> +#else
+> +    return g_strdup("Invalid");
+> +#endif
+> +}
 
+I'd rather use asprintf(3) and strdup(3) here, so that plugins don't
+have to worry about glib, and on the QEMU side we don't have to worry
+about plugins calling free() instead of g_free().
 
-On 2020/6/5 11:30, Richard Henderson wrote:
-> On 6/4/20 7:50 PM, LIU Zhiwei wrote:
->> So no scalar insns will require changes within a translation block.
-> Not true -- scalar insns can encode rm into the instruction.
->
->> I think there is a error in gen_set_rm
->>
->> static void gen_set_rm(DisasContext *ctx, int rm)
->> {
->>      TCGv_i32 t0;
->>
->>      if (ctx->frm == rm) {
->>          return;
->>      }
->>      ctx->frm = rm;
->>      t0 = tcg_const_i32(rm);
->>      gen_helper_set_rounding_mode(cpu_env, t0);
->>      tcg_temp_free_i32(t0);
->> }
->>
->> I don't know why  updating ctx->frm in this function.
-> This is a cache of the current rm, as most recently stored in
-> env->fp_status.rounding_mode.
->
-> So if we have
->
-> 	fadd.s  ft0, ft0, ft0, rtz
-> 	fadd.s  ft0, ft0, ft0, rtz
-> 	fadd.s  ft0, ft0, ft0, rtz
->
-> we will only switch to round_to_zero once.
-Get it, thanks.
+Or given that this doesn't look perf-critical, perhaps an easier way out
+is to wrap the above with:
 
-Maybe I should only gen_set_rm(ctx, 7) for each vector float insn.
-And the csr write method for frm or fcsr will not change.
+char *g_str = above();
+char *ret = strdup(g_str);
+g_free(g_str);
+return ret;
 
-So I will remove this patch in the next patch set.
+Not sure we should NULL-check ret, since I don't know whether
+mrs->mr->name is guaranteed to be non-NULL.
 
-Zhiwei
->
-> r~
-
+Thanks,
+		Emilio
 
