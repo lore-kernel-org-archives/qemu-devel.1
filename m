@@ -2,83 +2,78 @@ Return-Path: <SRS0=zEF8=7V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_SBL,
+	URIBL_SBL_A,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B6F7C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 06:33:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 044DEC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 06:37:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5F809204EF
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 06:33:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F809204EF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id C97322076A
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 06:37:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C97322076A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48582 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51052 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jiBLC-0004dI-MA
-	for qemu-devel@archiver.kernel.org; Mon, 08 Jun 2020 02:33:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33846)
+	id 1jiBPV-0005ze-4C
+	for qemu-devel@archiver.kernel.org; Mon, 08 Jun 2020 02:37:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34224)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jiBJM-0003aI-Cl
- for qemu-devel@nongnu.org; Mon, 08 Jun 2020 02:31:08 -0400
-Received: from indium.canonical.com ([91.189.90.7]:37050)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jiBJL-00070M-7W
- for qemu-devel@nongnu.org; Mon, 08 Jun 2020 02:31:08 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jiBJ8-0007ZX-Qu
- for <qemu-devel@nongnu.org>; Mon, 08 Jun 2020 06:30:54 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id C16702E810B
- for <qemu-devel@nongnu.org>; Mon,  8 Jun 2020 06:30:54 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jiBOV-0005SF-FQ
+ for qemu-devel@nongnu.org; Mon, 08 Jun 2020 02:36:27 -0400
+Received: from 9.mo178.mail-out.ovh.net ([46.105.75.45]:39103)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jiBOU-0007kW-3z
+ for qemu-devel@nongnu.org; Mon, 08 Jun 2020 02:36:27 -0400
+Received: from player792.ha.ovh.net (unknown [10.110.208.22])
+ by mo178.mail-out.ovh.net (Postfix) with ESMTP id B8EB2A549D
+ for <qemu-devel@nongnu.org>; Mon,  8 Jun 2020 08:36:16 +0200 (CEST)
+Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
+ (Authenticated sender: clg@kaod.org)
+ by player792.ha.ovh.net (Postfix) with ESMTPSA id 03BDB13295EF0;
+ Mon,  8 Jun 2020 06:36:04 +0000 (UTC)
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-97G00203d79891-3c8a-49e0-99b8-92ae81f1c957,B6B0473EF73D0859AD85419D5DB97E88249038E4)
+ smtp.auth=clg@kaod.org
+Subject: Re: [PATCH v2] Implement configurable descriptor size in ftgmac100
+To: Erik Smit <erik.lucas.smit@gmail.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Andrew Jeffery <andrew@aj.id.au>,
+ Joel Stanley <joel@jms.id.au>, Jason Wang <jasowang@redhat.com>,
+ qemu-arm@nongnu.org, qemu-devel@nongnu.org
+References: <CA+MHfovYq1UAQQ341MnyGas7ScskWyjR=QE0D-RS7+zxF2mtsw@mail.gmail.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <97e4c124-0b3c-18cd-a0f3-3b1a7c831ca6@kaod.org>
+Date: Mon, 8 Jun 2020 08:36:04 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 08 Jun 2020 06:25:23 -0000
-From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1874073@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: mliska philmd pmaydell
-X-Launchpad-Bug-Reporter: Martin Liska (mliska)
-X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
- =?utf-8?q?=29?=
-References: <158747496330.1952.6391008472811579405.malonedeb@chaenomeles.canonical.com>
-Message-Id: <159159752412.32570.11753367384456496983.launchpad@gac.canonical.com>
-Subject: [Bug 1874073] Re: openrisc_sim.c:87:42: error: 'cpu_irqs[0]' may be
- used uninitialized in this function [-Werror=maybe-uninitialized]
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="ef9fc486e875d54078fa61cf91e898b895125d89";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 885c87c46f3338f306c4e3658fb328294f507927
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/08 02:30:56
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <CA+MHfovYq1UAQQ341MnyGas7ScskWyjR=QE0D-RS7+zxF2mtsw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Ovh-Tracer-Id: 15879692286817962816
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedrudehtddgudduudcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgsehtkeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepkefhtedufeffvedvleejgeeghedvgeeuieeufeejueeltddugeduhedvveelgfehnecuffhomhgrihhnpehgihhthhhusgdrtghomhenucfkpheptddrtddrtddrtddpkedvrdeigedrvdehtddrudejtdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejledvrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
+Received-SPF: pass client-ip=46.105.75.45; envelope-from=clg@kaod.org;
+ helo=9.mo178.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/08 02:36:17
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -1
+X-Spam_score: -0.2
+X-Spam_bar: /
+X-Spam_report: (-0.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001, URIBL_SBL=1.623, URIBL_SBL_A=0.1 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -87,42 +82,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1874073 <1874073@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Changed in: qemu
-       Status: New =3D> Confirmed
+On 6/6/20 11:03 AM, Erik Smit wrote:
+> The hardware supports configurable descriptor sizes, configured in the DBLAC
+> register.
+> 
+> Most drivers use the default 4 word descriptor, which is currently hardcoded,
+> but Aspeed SDK configures 8 words to store extra data.
+> 
+> ---
+> The implementation of the driver in Supermicro BMC SMT_X11_158 adds 4 extra
+> word entries:
+> https://github.com/ya-mouse/openwrt-linux-aspeed/blob/master/drivers/net/ftgmac100_26.h#L387-L391
+> 
+> And sets DBLAC to 0x44f97:
+> https://github.com/ya-mouse/openwrt-linux-aspeed/blob/master/drivers/net/ftgmac100_26.c#L449
+> 
+> There's not a lot of public documentation on this hardware, but the
+> current linux driver shows the meaning of these registers:
+> 
+> https://github.com/torvalds/linux/blob/master/drivers/net/ethernet/faraday/ftgmac100.c#L280-L281
+> 
+>         iowrite32(FTGMAC100_DBLAC_RXDES_SIZE(2) |   /* 2*8 bytes RX descs */
+>                   FTGMAC100_DBLAC_TXDES_SIZE(2) |   /* 2*8 bytes TX descs */
+> 
+> Without this patch, networking in SMT_X11_158 fails after the first packet.
+> 
+> changes since previous version:
+> 
+> - moved "* 8" into {R,T}XDES_SIZE macro
+> - removed the RXFIFO and RX_THR_EN defines as they're AST2400-only and not used
+> - test setting of DBLAC register for validness
+> 
+> Signed-off-by: Erik Smit <erik.lucas.smit@gmail.com>
 
--- =
+We don't need the parenthesis around FTGMAC100_DBLAC_RXDES_SIZE(). Anyhow,
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1874073
+Reviewed-by: Cédric Le Goater <clg@kaod.org>
 
-Title:
-  openrisc_sim.c:87:42: error: 'cpu_irqs[0]' may be used uninitialized
-  in this function [-Werror=3Dmaybe-uninitialized]
+Thanks,
 
-Status in QEMU:
-  Confirmed
+C. 
 
-Bug description:
-  I see the warning since gcc10:
+> ---
+>  hw/net/ftgmac100.c | 26 ++++++++++++++++++++++++--
+>  1 file changed, 24 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/net/ftgmac100.c b/hw/net/ftgmac100.c
+> index 25ebee7ec2..83058497c4 100644
+> --- a/hw/net/ftgmac100.c
+> +++ b/hw/net/ftgmac100.c
+> @@ -79,6 +79,16 @@
+>  #define FTGMAC100_APTC_TXPOLL_CNT(x)        (((x) >> 8) & 0xf)
+>  #define FTGMAC100_APTC_TXPOLL_TIME_SEL      (1 << 12)
+> 
+> +/*
+> + * DMA burst length and arbitration control register
+> + */
+> +#define FTGMAC100_DBLAC_RXBURST_SIZE(x)     (((x) >> 8) & 0x3)
+> +#define FTGMAC100_DBLAC_TXBURST_SIZE(x)     (((x) >> 10) & 0x3)
+> +#define FTGMAC100_DBLAC_RXDES_SIZE(x)       ((((x) >> 12) & 0xf) * 8)
+> +#define FTGMAC100_DBLAC_TXDES_SIZE(x)       ((((x) >> 16) & 0xf) * 8)
+> +#define FTGMAC100_DBLAC_IFG_CNT(x)          (((x) >> 20) & 0x7)
+> +#define FTGMAC100_DBLAC_IFG_INC             (1 << 23)
+> +
+>  /*
+>   * PHY control register
+>   */
+> @@ -553,7 +563,7 @@ static void ftgmac100_do_tx(FTGMAC100State *s,
+> uint32_t tx_ring,
+>          if (bd.des0 & s->txdes0_edotr) {
+>              addr = tx_ring;
+>          } else {
+> -            addr += sizeof(FTGMAC100Desc);
+> +            addr += (FTGMAC100_DBLAC_TXDES_SIZE(s->dblac));
+>          }
+>      }
+> 
+> @@ -800,6 +810,18 @@ static void ftgmac100_write(void *opaque, hwaddr addr,
+>          s->phydata = value & 0xffff;
+>          break;
+>      case FTGMAC100_DBLAC: /* DMA Burst Length and Arbitration Control */
+> +        if (FTGMAC100_DBLAC_TXDES_SIZE(s->dblac) < sizeof(FTGMAC100Desc)) {
+> +            qemu_log_mask(LOG_GUEST_ERROR,
+> +                          "%s: transmit descriptor too small : %d bytes\n",
+> +                          __func__, FTGMAC100_DBLAC_TXDES_SIZE(s->dblac));
+> +            break;
+> +        }
+> +        if (FTGMAC100_DBLAC_RXDES_SIZE(s->dblac) < sizeof(FTGMAC100Desc)) {
+> +            qemu_log_mask(LOG_GUEST_ERROR,
+> +                          "%s: receive descriptor too small : %d bytes\n",
+> +                          __func__, FTGMAC100_DBLAC_RXDES_SIZE(s->dblac));
+> +            break;
+> +        }
+>          s->dblac = value;
+>          break;
+>      case FTGMAC100_REVR:  /* Feature Register */
+> @@ -982,7 +1004,7 @@ static ssize_t ftgmac100_receive(NetClientState
+> *nc, const uint8_t *buf,
+>          if (bd.des0 & s->rxdes0_edorr) {
+>              addr = s->rx_ring;
+>          } else {
+> -            addr += sizeof(FTGMAC100Desc);
+> +            addr += (FTGMAC100_DBLAC_RXDES_SIZE(s->dblac));
+>          }
+>      }
+>      s->rx_descriptor = addr;
+> --
+> 2.25.1
+> 
 
-  static void openrisc_sim_init(MachineState *machine):
-  ...
-      qemu_irq *cpu_irqs[2];
-  ...
-
-  =
-
-      serial_mm_init(get_system_memory(), 0x90000000, 0, serial_irq,
-                     115200, serial_hd(0), DEVICE_NATIVE_ENDIAN);
-
-  I would initialize cpu_irqs[2] with {}.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1874073/+subscriptions
 
