@@ -2,85 +2,85 @@ Return-Path: <SRS0=zEF8=7V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43AEEC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 06:21:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39993C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 06:23:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 085B22067B
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 06:21:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 041E62067B
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 06:23:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W5BJSS6A"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 085B22067B
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OInCAmHB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 041E62067B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41756 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44242 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jiB9Y-00017X-AY
-	for qemu-devel@archiver.kernel.org; Mon, 08 Jun 2020 02:21:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33176)
+	id 1jiBBp-0002CZ-B5
+	for qemu-devel@archiver.kernel.org; Mon, 08 Jun 2020 02:23:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33234)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jiB8k-0000cZ-0P
- for qemu-devel@nongnu.org; Mon, 08 Jun 2020 02:20:10 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33328
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jiBAw-0001eS-VF
+ for qemu-devel@nongnu.org; Mon, 08 Jun 2020 02:22:26 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:48457
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jiB8h-0005EY-La
- for qemu-devel@nongnu.org; Mon, 08 Jun 2020 02:20:09 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jiBAu-0005Wc-Tx
+ for qemu-devel@nongnu.org; Mon, 08 Jun 2020 02:22:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591597206;
+ s=mimecast20190719; t=1591597343;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=vuNjSdJ4AKQ0VPIlzNhOOB7JWlpQrVYjrBHlvt/3Ypo=;
- b=W5BJSS6ALAfv05WV46zEauq0fE03goauZq/9nofKuWWlSQ3JYMUHv2KX5WailLg9rvoeIz
- uFDczGS8tzVHD9XYgP3pGvJBuyjz8U4N9kGxZQG/EfxiAEhYZPezFeV+mM5g2A1HZ1Vol4
- hRZWQIlyqKSARr2hSJPMl3vn6xN5jX8=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-480-UcmAQorIPjmRCYmbxJZLUw-1; Mon, 08 Jun 2020 02:20:04 -0400
-X-MC-Unique: UcmAQorIPjmRCYmbxJZLUw-1
-Received: by mail-wr1-f72.google.com with SMTP id t5so6705859wro.20
- for <qemu-devel@nongnu.org>; Sun, 07 Jun 2020 23:20:04 -0700 (PDT)
+ bh=ykvfrJWLvSkklWC8KZJenQj60ZoIuXiEDTc376mlX3s=;
+ b=OInCAmHBHRXykwaUvXYRnSQM0jxHgs573AOTZKzJjZR0vyDmMEH9HSOYZ/s3pRfafRqktV
+ VI0P71wLNW87D1pNdxrYjC2ytWREgtZoto6rm16Hz5/BWZrgD0jrOQLWMTIX4c7hSd2M6r
+ Gw0nrnQqDp8+U3RuME7qgqWedH1HJZU=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-193-bv4fYBRHMnqXgxMfCmB-_g-1; Mon, 08 Jun 2020 02:22:20 -0400
+X-MC-Unique: bv4fYBRHMnqXgxMfCmB-_g-1
+Received: by mail-wm1-f71.google.com with SMTP id p24so1159007wma.4
+ for <qemu-devel@nongnu.org>; Sun, 07 Jun 2020 23:22:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=vuNjSdJ4AKQ0VPIlzNhOOB7JWlpQrVYjrBHlvt/3Ypo=;
- b=kXGpUAE50L9FHS85ABgaiZNNv+igk/5LmYNR8S50FctNecIX+8lfWDQXHXOH3YPWYL
- LYVXfEYF4bV4L6H+13lV4GezD+s2YRrdRN159CzXo8YPqrZXuxkWPwr/iGpg3g02q9Dg
- cChV+lWv3M8hhKAGMgHwxbwnTZevaC5+d/vwhBVMLhYlPCCZ5o0iXB31A1koVV5Tq0vy
- l8/8MtK+CI0FtJ5zctM5xS4gQYzyL02cLvh2b29E72HPbHsU0x20zMEeP431wHnnCxZU
- GVsi3knGdSW0jHs2WKxMczaicbKI4+u41sQ9qKRKKa6DBk4U0Ni6KxD4tKVUO4ZlSEoT
- Zw0A==
-X-Gm-Message-State: AOAM531R8AzqL25+RoQ5sBXnmyCRqH6QcngWSPwZrTghgHLPfZq1c0fE
- 9jlidsboAentVzPkf25tklzxqNYXLo4vN12fC9evROaGkv9CHbFdkd7i+C9isCI4mDd4IwUpX9z
- ek88h6pgHjImoseU=
-X-Received: by 2002:a1c:6884:: with SMTP id
- d126mr14826169wmc.121.1591597203151; 
- Sun, 07 Jun 2020 23:20:03 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwNiLob97fQboV6Ogg2s4tCDVcYDmSnqNvhO4qeu3yUd7btaZMeKYB3fVOPXRTmAAkyXsAmSg==
-X-Received: by 2002:a1c:6884:: with SMTP id
- d126mr14826149wmc.121.1591597202923; 
- Sun, 07 Jun 2020 23:20:02 -0700 (PDT)
+ bh=ykvfrJWLvSkklWC8KZJenQj60ZoIuXiEDTc376mlX3s=;
+ b=CdWm/FAR/4GF+8WDNwHTTaiQMxVW/tOTY9W1SYI3VUvDM7wGA78vkEq1RAkcmwpuVf
+ HJBNLF8hF9xMOom9BAlKUlGMkP9i/uwsMyYA4OEYHWAQ/A+CWNlCbLZMsRoI7YK8uxGT
+ we/u76WNYiAqq03CWXucMwVqtDBvmPxEcZdpW1T1rTYg014c13MLN6WQoaeCK4PDnn5J
+ jcwqjIHyI/RIHxWyaC6wvP/SRCU3V9EtVgCoqaRl16q9aY6kKSH848l9s9ROxhm+56/c
+ sqalWrOtQ0uKuHpJdAjbwcweRBv2j8isbYJw+LhoTQNugTTN2bDwJaoj+DEE/dXXnsG2
+ +CMA==
+X-Gm-Message-State: AOAM532tD51CwpW/h80Beka/ELp9MUl8hdc4b42Tp/g4DpV93MxWnF+M
+ 0f+e1vi2YiQea5eXKFRzBhYBg61eF34NjKeY8n1v3luB6vXY4ZMEq8WQPbklf2W97qpiRe6d2Wt
+ 7LhIc84H7ZYdXnDA=
+X-Received: by 2002:adf:e84c:: with SMTP id d12mr21371669wrn.284.1591597338786; 
+ Sun, 07 Jun 2020 23:22:18 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyRNy2K8xbNbtA6/wgD7Zj13GNcR6pGcSNoXJHn8p2olUpIn34zrUnCWczAqTbo1sztr7tFdw==
+X-Received: by 2002:adf:e84c:: with SMTP id d12mr21371648wrn.284.1591597338597; 
+ Sun, 07 Jun 2020 23:22:18 -0700 (PDT)
 Received: from [192.168.1.43] (181.red-88-10-103.dynamicip.rima-tde.net.
  [88.10.103.181])
- by smtp.gmail.com with ESMTPSA id 23sm21841864wmo.18.2020.06.07.23.20.01
+ by smtp.gmail.com with ESMTPSA id a15sm23312362wra.86.2020.06.07.23.22.17
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sun, 07 Jun 2020 23:20:02 -0700 (PDT)
-Subject: Re: [PATCH v1 7/9] plugins: add API to return a name for a IO device
-To: "Emilio G. Cota" <cota@braap.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
- <alex.bennee@linaro.org>
-References: <20200602154624.4460-1-alex.bennee@linaro.org>
- <20200602154624.4460-8-alex.bennee@linaro.org> <20200608034504.GA3619843@sff>
+ Sun, 07 Jun 2020 23:22:18 -0700 (PDT)
+Subject: Re: [PATCH] or1k: Fix compilation hiccup
+To: Markus Armbruster <armbru@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>
+References: <20200526185132.1652355-1-eblake@redhat.com>
+ <m1d06msod9.fsf@redhat.com>
+ <CAFEAcA9Huery0AeUFsLVrcK4bUGibg1f-m8gMuMiJgnr+Hj7CA@mail.gmail.com>
+ <87eeqx9alv.fsf@dusky.pond.sub.org> <873676ksbb.fsf@dusky.pond.sub.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
@@ -105,20 +105,20 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <12dd5c71-01c9-3d7f-7299-80eb928c7f2e@redhat.com>
-Date: Mon, 8 Jun 2020 08:20:01 +0200
+Message-ID: <09123e95-b1c1-be7b-1aa8-f68f99417b28@redhat.com>
+Date: Mon, 8 Jun 2020 08:22:17 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200608034504.GA3619843@sff>
+In-Reply-To: <873676ksbb.fsf@dusky.pond.sub.org>
 Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/08 01:05:50
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/08 00:45:23
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -139,88 +139,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: robert.foley@linaro.org, qemu-devel@nongnu.org, robhenry@microsoft.com,
- aaron@os.amperecomputing.com, peter.puhov@linaro.org, kuhn.chenqun@huawei.com
+Cc: Christophe de Dinechin <dinechin@redhat.com>,
+ QEMU Trivial <qemu-trivial@nongnu.org>, Stafford Horne <shorne@gmail.com>,
+ Jia Liu <proljc@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/8/20 5:45 AM, Emilio G. Cota wrote:
-> On Tue, Jun 02, 2020 at 16:46:22 +0100, Alex BennÃƒÂ©e wrote:
->> This may well end up being anonymous but it should always be unique.
+On 6/8/20 8:03 AM, Markus Armbruster wrote:
+> Markus Armbruster <armbru@redhat.com> writes:
+> 
+>> Peter Maydell <peter.maydell@linaro.org> writes:
 >>
->> Signed-off-by: Alex BennÃƒÂ©e <alex.bennee@linaro.org>
->> ---
->>  include/qemu/qemu-plugin.h |  5 +++++
->>  plugins/api.c              | 18 ++++++++++++++++++
->>  2 files changed, 23 insertions(+)
+>>> On Fri, 29 May 2020 at 17:23, Christophe de Dinechin
+>>> <dinechin@redhat.com> wrote:
+>>>> On 2020-05-26 at 20:51 CEST, Eric Blake wrote...
+>>>>> diff --git a/hw/openrisc/openrisc_sim.c b/hw/openrisc/openrisc_sim.c
+>>>>> index d08ce6181199..95011a8015b4 100644
+>>>>> --- a/hw/openrisc/openrisc_sim.c
+>>>>> +++ b/hw/openrisc/openrisc_sim.c
+>>>>> @@ -129,7 +129,7 @@ static void openrisc_sim_init(MachineState *machine)
+>>>>>      const char *kernel_filename = machine->kernel_filename;
+>>>>>      OpenRISCCPU *cpu = NULL;
+>>>>>      MemoryRegion *ram;
+>>>>> -    qemu_irq *cpu_irqs[2];
+>>>>> +    qemu_irq *cpu_irqs[2] = {};
+>>>>
+>>>> Why is the value [2] correct here? The loop that initializes loops over
+>>>> machine->smp.cpus. Is it always less than 2 on this machine?
+>>>
+>>> Yes: openrisc_sim_machine_init() sets mc->max_cpus = 2.
+>>> My suggestion of adding an assert() is essentially telling the
+>>> compiler that indeed smp_cpus must always be in the range [1,2],
+>>> which we can tell but it can't.
 >>
->> diff --git a/include/qemu/qemu-plugin.h b/include/qemu/qemu-plugin.h
->> index bab8b0d4b3a..43c6a9e857f 100644
->> --- a/include/qemu/qemu-plugin.h
->> +++ b/include/qemu/qemu-plugin.h
->> @@ -335,6 +335,11 @@ struct qemu_plugin_hwaddr *qemu_plugin_get_hwaddr(qemu_plugin_meminfo_t info,
->>  bool qemu_plugin_hwaddr_is_io(const struct qemu_plugin_hwaddr *haddr);
->>  uint64_t qemu_plugin_hwaddr_device_offset(const struct qemu_plugin_hwaddr *haddr);
->>  
->> +/*
->> + * Returns a string representing the device. Plugin must free() it
->> + */
->> +char * qemu_plugin_hwaddr_device_name(const struct qemu_plugin_hwaddr *haddr);
->> +
->>  typedef void
->>  (*qemu_plugin_vcpu_mem_cb_t)(unsigned int vcpu_index,
->>                               qemu_plugin_meminfo_t info, uint64_t vaddr,
->> diff --git a/plugins/api.c b/plugins/api.c
->> index bbdc5a4eb46..3c73de8c1c2 100644
->> --- a/plugins/api.c
->> +++ b/plugins/api.c
->> @@ -303,6 +303,24 @@ uint64_t qemu_plugin_hwaddr_device_offset(const struct qemu_plugin_hwaddr *haddr
->>      return 0;
->>  }
->>  
->> +char * qemu_plugin_hwaddr_device_name(const struct qemu_plugin_hwaddr *haddr)
->> +{
->> +#ifdef CONFIG_SOFTMMU
->> +    if (haddr && haddr->is_io) {
->> +        MemoryRegionSection *mrs = haddr->v.io.section;
->> +        if (!mrs->mr->name) {
->> +            return g_strdup_printf("anon%08lx", 0xffffffff & (uintptr_t) mrs->mr);
->> +        } else {
->> +            return g_strdup(mrs->mr->name);
->> +        }
->> +    } else {
->> +        return g_strdup("RAM");
->> +    }
->> +#else
->> +    return g_strdup("Invalid");
->> +#endif
->> +}
+>> Do we have a proper patch for this on the list?
 > 
-> I'd rather use asprintf(3) and strdup(3) here, so that plugins don't
-> have to worry about glib, and on the QEMU side we don't have to worry
-> about plugins calling free() instead of g_free().
+> Apparently not.
+> 
+> Philippe did try Peter's suggestion, found it works, but then posted it
+> only to Launchpad.  Philippe, please post to the list, so we can finally
+> get this fixed.
 
-It might make sense, but it should be documented in
-include/qemu/qemu-plugin.h or docs/devel/tcg-plugins.rst.
-
-> 
-> Or given that this doesn't look perf-critical, perhaps an easier way out
-> is to wrap the above with:
-> 
-> char *g_str = above();
-> char *ret = strdup(g_str);
-> g_free(g_str);
-
-free() ;)
-
-> return ret;
-> 
-> Not sure we should NULL-check ret, since I don't know whether
-> mrs->mr->name is guaranteed to be non-NULL.
-> 
-> Thanks,
-> 		Emilio
-> 
+Sorry since it was Eric finding, I didn't understood I had to post it.
+Will do.
 
 
