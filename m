@@ -6,83 +6,83 @@ X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53DACC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 10:14:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CB9EC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 10:15:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1A2B4206D5
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 10:14:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 41ED0206D5
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 10:15:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zqM+ZMRK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A2B4206D5
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NpNnhrhG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41ED0206D5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52090 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54252 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jiEnA-0002WM-9r
-	for qemu-devel@archiver.kernel.org; Mon, 08 Jun 2020 06:14:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53036)
+	id 1jiEo2-0003Q1-HZ
+	for qemu-devel@archiver.kernel.org; Mon, 08 Jun 2020 06:15:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53096)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jiEmQ-00026b-2K
- for qemu-devel@nongnu.org; Mon, 08 Jun 2020 06:13:22 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:36133)
+ id 1jiEmy-0002XY-RH
+ for qemu-devel@nongnu.org; Mon, 08 Jun 2020 06:13:56 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:33257)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jiEmP-0007AH-69
- for qemu-devel@nongnu.org; Mon, 08 Jun 2020 06:13:21 -0400
-Received: by mail-wr1-x442.google.com with SMTP id q11so16759236wrp.3
- for <qemu-devel@nongnu.org>; Mon, 08 Jun 2020 03:13:20 -0700 (PDT)
+ id 1jiEmx-0007EF-DO
+ for qemu-devel@nongnu.org; Mon, 08 Jun 2020 06:13:56 -0400
+Received: by mail-wr1-x441.google.com with SMTP id l11so16758632wru.0
+ for <qemu-devel@nongnu.org>; Mon, 08 Jun 2020 03:13:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=references:user-agent:from:to:cc:subject:in-reply-to:date
  :message-id:mime-version:content-transfer-encoding;
- bh=fW7q0jweIpBYOGPpiFpouf6s6An+tHgfZHXEBKJ1nK0=;
- b=zqM+ZMRKNSaqmMZklQOvEjEXaqjdpZRALfi7PDCv3SAZqKB+4vzj1VdVT+d+dmN3V6
- BW7vo6Rh6eZrSldjBQX958le8dATSwuCzLrDbXjdDHa5EVChPNSKxBcThAsOHf+WSdAg
- e1lljdjmnwRrHm+gSki28ZjJt10zqqupibdG/69+nkvaCBdUn9K60VZff1TANJbRxYsV
- OLP82wjjMORngyAzvU4t6GrZYH4tpquurlIGCUtHg8T3iaDj5dWJLpIzFIMLUFm3c0iW
- Hc89SMnip53+/lQ352xb2qSsoJVTslvRJxbOk9+nx1SvUJ+axN29qeomBlt4Gzpn9ZG9
- +Vfw==
+ bh=BeI2+wMWGQAJVo6hmb+Ukjf82e/io7AaJut4Bx0xTXI=;
+ b=NpNnhrhGi8/Q06xuvo/2gr9JHRAK8wq0/U07BILrjmL4lBcigEBD5GMNbVm4xEfZ5U
+ AggPN5siqa7apjjpWRNzcB0w7kxQ76DHNAVDDfIpREa+7DvUI21j9p2ePVEp6OIWpLaJ
+ lFmLnK9ZpEXFb5nqiI2JvGaZNWa1lCmUVFe7fV0pCxg2Tfrxh5U3+SHdLvyC7HvxIDBz
+ ZnZats8S9Iw6Qfro3hR3+OkqTVYjgjEipAfxHvCREPyhYVewuGB33IqfBRTt20DnxFmS
+ VwJ5MVts72+nqKltFXrpdrmMjSDZnLxtvTY4/jtqBFP6WCwbVW2TDbnr6P5bNWKDoVnn
+ xH8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:references:user-agent:from:to:cc:subject
  :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=fW7q0jweIpBYOGPpiFpouf6s6An+tHgfZHXEBKJ1nK0=;
- b=WdNV806ryyvVhXyzGOwidOIovVPOrTKtne/3M4NuOM3ekHGVW72KiI7exotOeby1Bv
- +j4ZFC8F5R1pG8Vg64IIngOfyS/4HD08UVgvgphpdZ3VJ9nHnZbRLCxZ1J5KC7pnnEQb
- RVv4ayfUTwGfmXCHuiwR/Wq8CvB+OTIFCFFtUZ1tDF/ikRn8KXNqyH59DQWQdbXR+go/
- uNTmQl/1MU2++MhfmN4Wy8CefT1qVIyrAHyElrzANaHN4YB6x6pcAuSegwAnbu076oIi
- EkmP5RdhcBYTRj3TVdZg3qjqNxR/O7vwe5Zk2BxwfNAzC3ktUra8n+owGRclBfUGbmdr
- Kt6w==
-X-Gm-Message-State: AOAM530CZ37aM+Yq+jlM0LQup10hJkRjrAUK+iBMHby/wywruDcoOdjI
- Xh1qFMaiCmNlPs5R8qHeacrF/w==
-X-Google-Smtp-Source: ABdhPJz85hWLw1nxT1UJFhQqsTFXuh2ni7uqPNAU+Qhco2tWik5ctr/dPoaKKTYo0dtQR4Tzcd327g==
-X-Received: by 2002:adf:dd06:: with SMTP id a6mr23391095wrm.142.1591611199668; 
- Mon, 08 Jun 2020 03:13:19 -0700 (PDT)
+ bh=BeI2+wMWGQAJVo6hmb+Ukjf82e/io7AaJut4Bx0xTXI=;
+ b=kvX5L/Rcgoz8jdp8O4uSROC2QbpniO3yhVtLlLlViefdRmufal5mYe/Wz5goslDdJk
+ e0rmva2GO6QjCmezFVzGA4MjNsPaxrlh3NH5rJS1lGn+uihE8eucLbZONtteNHHgHrYK
+ AWFCvzQK1TWxeaLMo+4sH3I7APQLeWsBFoAt9Eyzbcou7zXjsvlawWh0YnO9JmHhPvoA
+ OU7ipFoh+uJekSlShzRQMJKN1NPJ80xk5B4SXc74Q0bBkb6+t2u95MGO38bFz2TYbSmp
+ UsS0vPr3Fw25ZBxu4qBUbYK9PlLZT7gn8sdD/Qpx02rYDyYH3umX1E0/FHuGFaRomjTZ
+ bYAA==
+X-Gm-Message-State: AOAM532to7Jt8WLzEoZp6MNwSghzu016uD+Obit8xiLcYckfT2odGJKT
+ RCr3MpBl+qd2UTEYxViwVL0NXNneAIg=
+X-Google-Smtp-Source: ABdhPJzIota8plVrII6RDNH/Mgfm8Y/f5agqOh7obb6KZkp0m5zQ+aYprxcqBclNP0pcscmm9rE3oA==
+X-Received: by 2002:a5d:6802:: with SMTP id w2mr22907107wru.68.1591611233839; 
+ Mon, 08 Jun 2020 03:13:53 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id v7sm22592112wme.46.2020.06.08.03.13.18
+ by smtp.gmail.com with ESMTPSA id w15sm22005982wmk.30.2020.06.08.03.13.52
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 08 Jun 2020 03:13:18 -0700 (PDT)
+ Mon, 08 Jun 2020 03:13:52 -0700 (PDT)
 Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id AC1041FF7E;
- Mon,  8 Jun 2020 11:13:17 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id 285D31FF7E;
+ Mon,  8 Jun 2020 11:13:52 +0100 (BST)
 References: <20200605093256.30351-1-philmd@redhat.com>
- <20200605093256.30351-8-philmd@redhat.com>
+ <20200605093256.30351-9-philmd@redhat.com>
 User-agent: mu4e 1.5.2; emacs 28.0.50
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH v6 07/11] Makefile: Write MINIKCONF variables as one
- entry per line
-In-reply-to: <20200605093256.30351-8-philmd@redhat.com>
-Date: Mon, 08 Jun 2020 11:13:17 +0100
-Message-ID: <87lfkx7tmq.fsf@linaro.org>
+Subject: Re: [PATCH v6 08/11] accel/Kconfig: Extract accel selectors into
+ their own config
+In-reply-to: <20200605093256.30351-9-philmd@redhat.com>
+Date: Mon, 08 Jun 2020 11:13:52 +0100
+Message-ID: <87img17tlr.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x442.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x441.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -114,9 +114,8 @@ Sender: "Qemu-devel"
 
 Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-> Having one entry per line helps reviews/refactors. As we are
-> going to modify the MINIKCONF variables, split them now to
-> ease further review.
+> Move the accel selectors from the global Kconfig.host to their
+> own Kconfig file.
 >
 > Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
