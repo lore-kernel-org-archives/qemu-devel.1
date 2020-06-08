@@ -7,79 +7,77 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3472FC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 16:12:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85B82C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 16:13:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F15E42063A
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 16:12:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 509AB2063A
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 16:13:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N2DdErRq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F15E42063A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O2MGImje"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 509AB2063A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49744 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51338 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jiKOM-0003mv-5t
-	for qemu-devel@archiver.kernel.org; Mon, 08 Jun 2020 12:12:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37790)
+	id 1jiKOs-0004T2-Ij
+	for qemu-devel@archiver.kernel.org; Mon, 08 Jun 2020 12:13:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37932)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jiKDY-0006Me-GM
- for qemu-devel@nongnu.org; Mon, 08 Jun 2020 12:01:44 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:58106
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jiKDt-0006a3-Hp
+ for qemu-devel@nongnu.org; Mon, 08 Jun 2020 12:02:06 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:46263
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jiKDW-0007iQ-73
- for qemu-devel@nongnu.org; Mon, 08 Jun 2020 12:01:44 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jiKDs-0007nk-LX
+ for qemu-devel@nongnu.org; Mon, 08 Jun 2020 12:02:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591632101;
+ s=mimecast20190719; t=1591632122;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=gxT4B45O1zWyFYki8IWzx+7CIdrw2K/5FRLdU4/GP/s=;
- b=N2DdErRqsyskEuGnIL6IIOra+szxgFTHezrH3k0nylRDWuV5ophAD6etCKcTawrsz+1NAp
- GZg3tyFIeLDnBXR5q6xZgD9JXWkA9kASGqE/FAzhtm4i5fxoyVhuZABTJwOglFafAz6Z97
- +HVomMRl/DPlD9V7hNYGcjleYUuGI7g=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-294-QXGE1p6cP7WUbxeVuzq7zA-1; Mon, 08 Jun 2020 12:01:39 -0400
-X-MC-Unique: QXGE1p6cP7WUbxeVuzq7zA-1
-Received: by mail-wr1-f69.google.com with SMTP id z10so7390314wrs.2
- for <qemu-devel@nongnu.org>; Mon, 08 Jun 2020 09:01:39 -0700 (PDT)
+ bh=O7Ly94SWL+SMdJ3uuRJWrIP/iOhgME/DwBVu03IUalo=;
+ b=O2MGImjetCECL2wa5Ku6+hnAon5vqvZVJiWJtvQvQndbqtu1eve1uSgbc2YvuKeJ8QFLaZ
+ eEYYHC8dEeeWYfqwrbwm2Q0Can2GKhL7CbN6BSc5mQ4m+qF08lFA5+JVD/HMNxFdujQFeX
+ 7OUT0+aUM3dGPBSNzjqZInXW9lfQ1R4=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-14-AMnnR6waPGu6eYyo5BR4YQ-1; Mon, 08 Jun 2020 12:01:13 -0400
+X-MC-Unique: AMnnR6waPGu6eYyo5BR4YQ-1
+Received: by mail-wm1-f70.google.com with SMTP id t145so10272wmt.2
+ for <qemu-devel@nongnu.org>; Mon, 08 Jun 2020 09:01:13 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=gxT4B45O1zWyFYki8IWzx+7CIdrw2K/5FRLdU4/GP/s=;
- b=K2GkBnyuKu2I5HKGA15nrqa1ZIOnSwJfccyuS8irv6Lk47n2RfV2mKFA9ngcsllDCD
- C8tQAXAhESVW5Rve1VZZ019/zbbzSo8uVhF0nlxzGhMNTHpCp5Q7pKVN34n6vC3zyhah
- ikXdJLNXLAGHojjk+/AcVuQhtiRCpvH6FszRMG3nwGOFz3J+DN6RcCsgOSLhu2wiaIsY
- 8FGjyyjIFrcxmel5uC5lGAp6t7Bt1q04tSGkZGdJbtynPpkinJr6RsC+dpJsK7cTudlU
- o2wT5uzYWOfSp0K3D+hbU64/+6FVG2BzD5o4sAOE0NXnkUJgEFa5vK6UBnFmg8/j0qqi
- CHNA==
-X-Gm-Message-State: AOAM533AdPMChQBRKpgm+S0h68jyi8/CcNdbjdmo29Aso0OR4qS6lRwy
- 4eG0eTN+xkKI/Jk0RppTpD1dWs/WP9uykPVjziWKwVbhogPD37KWckUgXLMjEsBv/kkrC/i7Z8o
- KfOrDmvFYVCrEUXY=
-X-Received: by 2002:a05:600c:2215:: with SMTP id
- z21mr76250wml.48.1591632098181; 
- Mon, 08 Jun 2020 09:01:38 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxecWPcyOuK8uF9ReCv2dq+PoGEfPzfu+FZfYV8n2WgE2MmJ6zu0OPEpglwHYV7Ppo9rtY/wQ==
-X-Received: by 2002:a05:600c:2215:: with SMTP id
- z21mr76223wml.48.1591632098001; 
- Mon, 08 Jun 2020 09:01:38 -0700 (PDT)
+ bh=O7Ly94SWL+SMdJ3uuRJWrIP/iOhgME/DwBVu03IUalo=;
+ b=PBj+qbZu5LbUfs3cDa46aKuWChuVFyeDwlyGdOOaIpF9xFEMN16R7ZxNvivkP5+U4L
+ Wet/ephx5qMtBKI5VujqmYs+GTbpvaEQIgydsJxMToYJ82qo0LcPMdawTzHLGTpapFDE
+ 1Nrd+n6Z9WoSb/eRgi5gobqSU/AnEwoFYzCFhSXvh75MnDuC4PcD3hMrr+htT66Nv+Sg
+ jU5hRloyxudlaGtZKBYFSXghvBTV7BydOuvVfWmfrrDbohthgZEkcoHvjwdxKhCVt5V6
+ 8YYZLTkoMvbsdegQsqyYfEX8j4qJkHhBx2FZcrLaFqCPfn1S1jJrEt6aN+tHefua27kS
+ gTmw==
+X-Gm-Message-State: AOAM530Wr3lxOkFWOjHVyXBIXAgVAixvY93ttGSw9/solm7U4/804oII
+ A7A1fvCXViXHJ+R4oGKE9oJU7QySZdCKwDMqzmpKPSS7m/wHBRhbf+RngLMxxwDIgpuhCDrkzGH
+ xBjRQ5SJouPHmrP0=
+X-Received: by 2002:a5d:6acf:: with SMTP id u15mr25749806wrw.277.1591632070235; 
+ Mon, 08 Jun 2020 09:01:10 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzcPzEmUfH07HRp9H1Y3tf4BoKsOaXn7cpLkhpXaJ1S6O0iNu0DeeV5KKJL41RODtirsARieQ==
+X-Received: by 2002:a5d:6acf:: with SMTP id u15mr25749771wrw.277.1591632069976; 
+ Mon, 08 Jun 2020 09:01:09 -0700 (PDT)
 Received: from localhost.localdomain
  (181.red-88-10-103.dynamicip.rima-tde.net. [88.10.103.181])
- by smtp.gmail.com with ESMTPSA id g3sm188327wrb.46.2020.06.08.09.01.36
+ by smtp.gmail.com with ESMTPSA id e12sm163622wro.52.2020.06.08.09.01.08
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 08 Jun 2020 09:01:37 -0700 (PDT)
+ Mon, 08 Jun 2020 09:01:09 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC PATCH 09/35] hw/display/ramfb: Emit warning when old code is used
-Date: Mon,  8 Jun 2020 18:00:18 +0200
-Message-Id: <20200608160044.15531-10-philmd@redhat.com>
+Subject: [RFC PATCH 04/35] hw/arm/pxa2xx: Emit warning when old code is used
+Date: Mon,  8 Jun 2020 18:00:13 +0200
+Message-Id: <20200608160044.15531-5-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200608160044.15531-1-philmd@redhat.com>
 References: <20200608160044.15531-1-philmd@redhat.com>
@@ -141,30 +139,74 @@ This code hasn't been QOM'ified yet. Warn the user.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- hw/display/ramfb.c | 3 +++
- 1 file changed, 3 insertions(+)
+ hw/arm/pxa2xx.c          | 3 +++
+ hw/display/pxa2xx_lcd.c  | 3 +++
+ hw/input/pxa2xx_keypad.c | 3 +++
+ 3 files changed, 9 insertions(+)
 
-diff --git a/hw/display/ramfb.c b/hw/display/ramfb.c
-index 79b9754a58..a4a427e5c7 100644
---- a/hw/display/ramfb.c
-+++ b/hw/display/ramfb.c
-@@ -18,6 +18,7 @@
- #include "hw/display/bochs-vbe.h" /* for limits */
- #include "ui/console.h"
- #include "sysemu/reset.h"
+diff --git a/hw/arm/pxa2xx.c b/hw/arm/pxa2xx.c
+index e649f8930c..483003d161 100644
+--- a/hw/arm/pxa2xx.c
++++ b/hw/arm/pxa2xx.c
+@@ -27,6 +27,7 @@
+ #include "sysemu/qtest.h"
+ #include "qemu/cutils.h"
+ #include "qemu/log.h"
 +#include "hw/qdev-deprecated.h"
  
- struct QEMU_PACKED RAMFBCfg {
-     uint64_t addr;
-@@ -120,6 +121,8 @@ RAMFBState *ramfb_setup(Error **errp)
-     FWCfgState *fw_cfg = fw_cfg_find();
-     RAMFBState *s;
+ static struct {
+     hwaddr io_base;
+@@ -1768,6 +1769,8 @@ static PXA2xxI2SState *pxa2xx_i2s_init(MemoryRegion *sysmem,
+ {
+     PXA2xxI2SState *s = g_new0(PXA2xxI2SState, 1);
  
 +    qdev_warn_deprecated_function_used();
 +
-     if (!fw_cfg || !fw_cfg->dma_enabled) {
-         error_setg(errp, "ramfb device requires fw_cfg with DMA");
-         return NULL;
+     s->irq = irq;
+     s->rx_dma = rx_dma;
+     s->tx_dma = tx_dma;
+diff --git a/hw/display/pxa2xx_lcd.c b/hw/display/pxa2xx_lcd.c
+index ff90104b80..cf6241ff21 100644
+--- a/hw/display/pxa2xx_lcd.c
++++ b/hw/display/pxa2xx_lcd.c
+@@ -20,6 +20,7 @@
+ /* FIXME: For graphic_rotate. Should probably be done in common code.  */
+ #include "sysemu/sysemu.h"
+ #include "framebuffer.h"
++#include "hw/qdev-deprecated.h"
+ 
+ struct DMAChannel {
+     uint32_t branch;
+@@ -1011,6 +1012,8 @@ PXA2xxLCDState *pxa2xx_lcdc_init(MemoryRegion *sysmem,
+     PXA2xxLCDState *s;
+     DisplaySurface *surface;
+ 
++    qdev_warn_deprecated_function_used();
++
+     s = (PXA2xxLCDState *) g_malloc0(sizeof(PXA2xxLCDState));
+     s->invalidated = 1;
+     s->irq = irq;
+diff --git a/hw/input/pxa2xx_keypad.c b/hw/input/pxa2xx_keypad.c
+index 62aa6f6b15..6de1e9e4bb 100644
+--- a/hw/input/pxa2xx_keypad.c
++++ b/hw/input/pxa2xx_keypad.c
+@@ -17,6 +17,7 @@
+ #include "migration/vmstate.h"
+ #include "hw/arm/pxa.h"
+ #include "ui/console.h"
++#include "hw/qdev-deprecated.h"
+ 
+ /*
+  * Keypad
+@@ -316,6 +317,8 @@ PXA2xxKeyPadState *pxa27x_keypad_init(MemoryRegion *sysmem,
+ {
+     PXA2xxKeyPadState *s;
+ 
++    qdev_warn_deprecated_function_used();
++
+     s = (PXA2xxKeyPadState *) g_malloc0(sizeof(PXA2xxKeyPadState));
+     s->irq = irq;
+ 
 -- 
 2.21.3
 
