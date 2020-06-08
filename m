@@ -2,89 +2,91 @@ Return-Path: <SRS0=zEF8=7V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6623FC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 11:27:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7A45C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 11:42:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2EFEF206C3
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 11:27:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 827DC2074B
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 11:42:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="STwoOuBe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2EFEF206C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (2048-bit key) header.d=nuviainc-com.20150623.gappssmtp.com header.i=@nuviainc-com.20150623.gappssmtp.com header.b="INroFdEc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 827DC2074B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nuviainc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47472 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33930 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jiFwb-00035Z-CL
-	for qemu-devel@archiver.kernel.org; Mon, 08 Jun 2020 07:27:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60768)
+	id 1jiGAR-0001XH-KZ
+	for qemu-devel@archiver.kernel.org; Mon, 08 Jun 2020 07:42:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33542)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <atar4qemu@gmail.com>)
- id 1jiFvt-0002gg-Ac
- for qemu-devel@nongnu.org; Mon, 08 Jun 2020 07:27:13 -0400
-Received: from mail-io1-xd43.google.com ([2607:f8b0:4864:20::d43]:33013)
+ (Exim 4.90_1) (envelope-from <leif@nuviainc.com>) id 1jiG8q-0008A0-N5
+ for qemu-devel@nongnu.org; Mon, 08 Jun 2020 07:40:36 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:34832)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <atar4qemu@gmail.com>)
- id 1jiFvs-0001fS-0D
- for qemu-devel@nongnu.org; Mon, 08 Jun 2020 07:27:13 -0400
-Received: by mail-io1-xd43.google.com with SMTP id i25so3514403iog.0
- for <qemu-devel@nongnu.org>; Mon, 08 Jun 2020 04:27:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=Ah/8RB6SgcPuiDEw51PCIh9msebiFUAfSfEqHnvQ5+U=;
- b=STwoOuBeTb+MyClhzcSSrgjX3IwS7AtqzV0lLrt8+HSkzk5GDhe259DqEThK6D/ap1
- cZm4IKl6FnJ/gojnYScq8jeK0hFU7MI8EnWE+VsuZLR7f0GKwgWW+FnT2FrcbefzScKp
- Z+UWLYTtxbZCQdAMrX10RMBF1fZTEBZm5Jr1AtMyy7sgN2IdtQxUjOwUFNqTZf+Yt9pk
- mqxsqV/m/adokm0UB/+6kAMajUlidBjNVG16hTymjbt1NrocvNmqWeT5s7zdutaAkkj2
- TyVtHHAoQKAQLGcDSED1x3njPg2jHZmGxJIcY1hheABHRmMPa/LyR4wvIwFp5OwgQxye
- 3pbQ==
+ (Exim 4.90_1) (envelope-from <leif@nuviainc.com>) id 1jiG8o-0003cp-2P
+ for qemu-devel@nongnu.org; Mon, 08 Jun 2020 07:40:36 -0400
+Received: by mail-wr1-x443.google.com with SMTP id x14so17035828wrp.2
+ for <qemu-devel@nongnu.org>; Mon, 08 Jun 2020 04:40:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=nuviainc-com.20150623.gappssmtp.com; s=20150623;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=SqEHPj5/7yKmZbglnKx9kFc1Hk0EXHLh/szKX1ymrZA=;
+ b=INroFdEcYSUiR+dSMOLntZ8DopUYVrXYTxuQE+FcN2BIhZgqb05AT2fSp6XiSHPdr9
+ GynAPqOJj8L2DgsVGaSST4WYF5XzuyD38hvnJ7aVQd6qrUF29E8h1lOwgdk/FYyrCdxS
+ 6PuIsoXJJ55ShroWq2gHIVZuQcHtOJ9w6YrTcN2nPZYNNE1cHnd4KVdXkEj7X2p0TpST
+ LpqnIK5XxeSsITXOSOBx1rx+tywnNSa2Jp8+PEMzEbRMT8W7tt8NtyMrRENXSnjqBgyf
+ VV8T77J26P3D8bhkThD4Imy8fsZRZ6JdcynuAcE/6TWETiM010/bZNbtGCOmpHWGiQio
+ rG/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=Ah/8RB6SgcPuiDEw51PCIh9msebiFUAfSfEqHnvQ5+U=;
- b=CSgy+b4crSSYb+fTTx7TmPhPVyJLiWbjF/O9zvGsTwyWjuKsjaffx8ep5h4+Y18xVF
- nlV0g5Fk+i4z1dTGfbO4cOI6qJP+fCdoDmbl5n5tX06g8PHP0QwBIJlrlXlEawyPXpqj
- xFovNo8aG+NMOwgMqYu4PAoRf3qHD4EJ4WHwTqxs4pFeh3Ib3dJT5sBqEpgxI1i8VPmw
- oiksxd9wQ+RUhBQDcHxM49mC1qCglCnjes844n0sbTzAjkkLaW1RdKigIeM517xwvIVI
- 4VK+C/JXFlH94/Yc2g2l6hZ3n0O15IBYJWhWGEkZ8eMFkpX8E5JWwTVpUDNctJrouuR+
- QXHQ==
-X-Gm-Message-State: AOAM531DepFmpIVyyek2IrEspCcytorhDavyh0waJeJSpOO3lUXCvd6r
- 33v+PB9U+qeifRW1YrWHh9y8mZE9wWbzcUblnvw=
-X-Google-Smtp-Source: ABdhPJxQoAgLRN85X7Tj/QclWsGM2d7yyBaI4Vo/YeWMGKBNvoUuCSwB5jURI0lCvB5T0G+QZGVPxw8MYbAKa/QF11Y=
-X-Received: by 2002:a02:ce38:: with SMTP id v24mr21788529jar.137.1591615630430; 
- Mon, 08 Jun 2020 04:27:10 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=SqEHPj5/7yKmZbglnKx9kFc1Hk0EXHLh/szKX1ymrZA=;
+ b=lC+4te841sXh+iF9AcI9WP3IkR5EYacRTKhMWFSRB4mRQM/Jd2AMWAp0Fr8imeUXyo
+ qDtW6ORib4jb8QZRX4U5aup+T0lo3q7NC2cPJPyKirxRURC1KQ/McjEvBz4QaGFN5aYw
+ qCFlYGOBSytNp7AOEy7J82zGz3YhmpaVc7Whzpluwxr/jp1Rw0ZyZWdUdrAF8BqW+q13
+ 1kdffYdFyJK6ZCVSn+ZpSpeGVzrSUFJ3efIALHyr9MjX6NlcFMBRMAS/qLmbUWhFbIMp
+ XOBfkOTeM1+Uh4hWHWA50L6w7Osiu9m4+5TTNd6yoh5eOfipQt9zz12gKUxI/rP+Q65M
+ JHrQ==
+X-Gm-Message-State: AOAM530qoocB3I9M0yYHYWI7VbDSSppjbv3ADsVtjXyWg7sjh/rso3eK
+ ffRMPd+vseymt62wzKi+fgSNms4zinROXadPZNyuA/yBz3ZdHtQ6ml/nD4ioKWkhMXoXuZ/ykQ2
+ 2ufcvtxwuTimVpxtakbdo/hnAtGtZYet5AOtXUJUBhgrqW4CG1Gb8URYZeptgzkUy
+X-Google-Smtp-Source: ABdhPJxqRpqtIh+E2hxCOptwRaOcE3opQgJr1WxGGeNxJ8B3EeVZd/YcE+5edkmwCFyd+sHvlCoqtA==
+X-Received: by 2002:adf:fd4f:: with SMTP id h15mr22724826wrs.397.1591616432096; 
+ Mon, 08 Jun 2020 04:40:32 -0700 (PDT)
+Received: from vanye.hemma.eciton.net
+ (cpc92302-cmbg19-2-0-cust304.5-4.cable.virginm.net. [82.1.209.49])
+ by smtp.gmail.com with ESMTPSA id y5sm24225932wrs.63.2020.06.08.04.40.31
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 08 Jun 2020 04:40:31 -0700 (PDT)
+From: Leif Lindholm <leif@nuviainc.com>
+To: QEMU Developers <qemu-devel@nongnu.org>
+Subject: [RFC PATCH 2/3] target/arm: move cpu64 cortex processor common init
+ settings to function
+Date: Mon,  8 Jun 2020 12:40:27 +0100
+Message-Id: <20200608114028.25345-3-leif@nuviainc.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200608114028.25345-1-leif@nuviainc.com>
+References: <20200608114028.25345-1-leif@nuviainc.com>
 MIME-Version: 1.0
-References: <20200510152840.13558-1-f4bug@amsat.org>
- <2906ea36-d6c4-f05b-3242-d9380986d48c@redhat.com>
- <CAHiYmc7Jwbvhapj9tXv=2=6ydD9mB=tm6O4SOUameWkRQGE1Qg@mail.gmail.com>
- <78738412-c682-6079-5238-88d96339235c@amsat.org>
-In-Reply-To: <78738412-c682-6079-5238-88d96339235c@amsat.org>
-From: Artyom Tarasenko <atar4qemu@gmail.com>
-Date: Mon, 8 Jun 2020 13:26:59 +0200
-Message-ID: <CACXAS8DtVy8uySz3aNoLC5qEY51dih=uHhWM1rSa3Fod3gANfw@mail.gmail.com>
-Subject: Re: [PATCH 0/7] hw/misc/empty_slot: Spring cleaning
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::d43;
- envelope-from=atar4qemu@gmail.com; helo=mail-io1-xd43.google.com
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=leif@nuviainc.com; helo=mail-wr1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -98,110 +100,180 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>,
+ qemu-arm@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, May 24, 2020 at 10:21 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
-rg> wrote:
->
-> On 5/24/20 9:37 PM, Aleksandar Markovic wrote:
-> > =D0=BD=D0=B5=D0=B4, 24. =D0=BC=D0=B0=D1=98 2020. =D1=83 18:58 Philippe =
-Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> > =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
-> >>
-> >> ping?
-> >>
-> >
-> > I agree with all of your patches, they absolutely make sense to me,
-> > but I would like to know Peter's opinion on such treatment of empty
-> > slots.
-> >
-> > I am going to give r-bs and integrate mips patches as soon as Peter
-> > OKs the general approach. So, Peter, is Philippe's approach to empty
-> > slots fine?
->
-> Thanks Aleksandar for looking at this series.
->
-> I expect a neutral opinion from Peter.
->
-> What would be helpful is feedback from Artyom, since it authored this
-> device.
->
-> Artyom, do you mind Acking the series?
+Move the id register initializations identical between the platforms in
+this file into a standalone helper function, and change the cpu-specific
 
-Thanks for asking and sorry for the delay. My mailer played a bad trick on =
-me.
-The patches definitely make sense:
+The value of mmfr0 set for a57 and a53 violates the ARM architecture
+reference manual, but matches the values set in actual hardware r1p0 a57
+and r0p4 a53. The function sets the architectually correct value, and the
+a57/a53 init functions override it after the fact.
 
-Acked-by: Artyom Tarasenko <atar4qemu@gmail.com>
+Signed-off-by: Leif Lindholm <leif@nuviainc.com>
+---
+ target/arm/cpu64.c | 107 ++++++++++++++-------------------------------
+ 1 file changed, 34 insertions(+), 73 deletions(-)
 
+diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+index 79786e034f..9927c1f75d 100644
+--- a/target/arm/cpu64.c
++++ b/target/arm/cpu64.c
+@@ -88,6 +88,35 @@ static const ARMCPRegInfo cortex_a72_a57_a53_cp_reginfo[] = {
+     REGINFO_SENTINEL
+ };
+ 
++static void cortex_a72_a57_a53_common_init(ARMCPU *cpu)
++{
++    cpu->revidr = 0x00000000;
++    cpu->isar.mvfr0 = 0x10110222;
++    cpu->isar.mvfr1 = 0x12111111;
++    cpu->isar.mvfr2 = 0x00000043;
++    cpu->reset_sctlr = 0x00c50838;
++    cpu->id_pfr0 = 0x00000131;
++    cpu->id_pfr1 = 0x00011011;
++    cpu->isar.id_dfr0 = 0x03010066;
++    cpu->id_afr0 = 0x00000000;
++    cpu->isar.id_mmfr0 = 0x10201105;
++    cpu->isar.id_mmfr1 = 0x40000000;
++    cpu->isar.id_mmfr2 = 0x01260000;
++    cpu->isar.id_mmfr3 = 0x02102211;
++    cpu->isar.id_isar0 = 0x02101110;
++    cpu->isar.id_isar1 = 0x13112111;
++    cpu->isar.id_isar2 = 0x21232042;
++    cpu->isar.id_isar3 = 0x01112131;
++    cpu->isar.id_isar4 = 0x00011142;
++    cpu->isar.id_isar5 = 0x00011121;
++    cpu->isar.id_isar6 = 0;
++    cpu->isar.id_aa64pfr0 = 0x00002222;
++    cpu->isar.id_aa64dfr0 = 0x10305106;
++    cpu->isar.id_aa64isar0 = 0x00011120;
++    cpu->isar.id_aa64mmfr0 = 0x00001124;
++    cpu->isar.dbgdidr = 0x3516d000;
++}
++
+ void aarch64_cpu_common_init(Object *obj, uint8_t impl, uint16_t part,
+                              uint8_t var, uint8_t rev)
+ {
+@@ -116,36 +145,13 @@ static void aarch64_a57_initfn(Object *obj)
+     ARMCPU *cpu = ARM_CPU(obj);
+ 
+     aarch64_cpu_common_init(obj, MIDR_IMPLEMENTER_ARM, 0xd07, 1, 0);
++    cortex_a72_a57_a53_common_init(cpu);
+ 
+     cpu->dtb_compatible = "arm,cortex-a57";
+     cpu->kvm_target = QEMU_KVM_ARM_TARGET_CORTEX_A57;
+-    cpu->revidr = 0x00000000;
+     cpu->reset_fpsid = 0x41034070;
+-    cpu->isar.mvfr0 = 0x10110222;
+-    cpu->isar.mvfr1 = 0x12111111;
+-    cpu->isar.mvfr2 = 0x00000043;
+     cpu->ctr = 0x8444c004;
+-    cpu->reset_sctlr = 0x00c50838;
+-    cpu->id_pfr0 = 0x00000131;
+-    cpu->id_pfr1 = 0x00011011;
+-    cpu->isar.id_dfr0 = 0x03010066;
+-    cpu->id_afr0 = 0x00000000;
+-    cpu->isar.id_mmfr0 = 0x10101105;
+-    cpu->isar.id_mmfr1 = 0x40000000;
+-    cpu->isar.id_mmfr2 = 0x01260000;
+-    cpu->isar.id_mmfr3 = 0x02102211;
+-    cpu->isar.id_isar0 = 0x02101110;
+-    cpu->isar.id_isar1 = 0x13112111;
+-    cpu->isar.id_isar2 = 0x21232042;
+-    cpu->isar.id_isar3 = 0x01112131;
+-    cpu->isar.id_isar4 = 0x00011142;
+-    cpu->isar.id_isar5 = 0x00011121;
+-    cpu->isar.id_isar6 = 0;
+-    cpu->isar.id_aa64pfr0 = 0x00002222;
+-    cpu->isar.id_aa64dfr0 = 0x10305106;
+-    cpu->isar.id_aa64isar0 = 0x00011120;
+-    cpu->isar.id_aa64mmfr0 = 0x00001124;
+-    cpu->isar.dbgdidr = 0x3516d000;
++    cpu->isar.id_mmfr0 = 0x10101105; /* Match documented value for r1p0 */
+     cpu->clidr = 0x0a200023;
+     cpu->ccsidr[0] = 0x701fe00a; /* 32KB L1 dcache */
+     cpu->ccsidr[1] = 0x201fe012; /* 48KB L1 icache */
+@@ -162,36 +168,14 @@ static void aarch64_a53_initfn(Object *obj)
+     ARMCPU *cpu = ARM_CPU(obj);
+ 
+     aarch64_cpu_common_init(obj, MIDR_IMPLEMENTER_ARM, 0xd03, 0, 4);
++    cortex_a72_a57_a53_common_init(cpu);
+ 
+     cpu->dtb_compatible = "arm,cortex-a53";
+     cpu->kvm_target = QEMU_KVM_ARM_TARGET_CORTEX_A53;
+-    cpu->revidr = 0x00000000;
+     cpu->reset_fpsid = 0x41034070;
+-    cpu->isar.mvfr0 = 0x10110222;
+-    cpu->isar.mvfr1 = 0x12111111;
+-    cpu->isar.mvfr2 = 0x00000043;
+     cpu->ctr = 0x84448004; /* L1Ip = VIPT */
+-    cpu->reset_sctlr = 0x00c50838;
+-    cpu->id_pfr0 = 0x00000131;
+-    cpu->id_pfr1 = 0x00011011;
+-    cpu->isar.id_dfr0 = 0x03010066;
+-    cpu->id_afr0 = 0x00000000;
+-    cpu->isar.id_mmfr0 = 0x10101105;
+-    cpu->isar.id_mmfr1 = 0x40000000;
+-    cpu->isar.id_mmfr2 = 0x01260000;
+-    cpu->isar.id_mmfr3 = 0x02102211;
+-    cpu->isar.id_isar0 = 0x02101110;
+-    cpu->isar.id_isar1 = 0x13112111;
+-    cpu->isar.id_isar2 = 0x21232042;
+-    cpu->isar.id_isar3 = 0x01112131;
+-    cpu->isar.id_isar4 = 0x00011142;
+-    cpu->isar.id_isar5 = 0x00011121;
+-    cpu->isar.id_isar6 = 0;
+-    cpu->isar.id_aa64pfr0 = 0x00002222;
+-    cpu->isar.id_aa64dfr0 = 0x10305106;
+-    cpu->isar.id_aa64isar0 = 0x00011120;
++    cpu->isar.id_mmfr0 = 0x10101105; /* Match documented value for r0p4 */
+     cpu->isar.id_aa64mmfr0 = 0x00001122; /* 40 bit physical addr */
+-    cpu->isar.dbgdidr = 0x3516d000;
+     cpu->clidr = 0x0a200023;
+     cpu->ccsidr[0] = 0x700fe01a; /* 32KB L1 dcache */
+     cpu->ccsidr[1] = 0x201fe00a; /* 32KB L1 icache */
+@@ -208,34 +192,11 @@ static void aarch64_a72_initfn(Object *obj)
+     ARMCPU *cpu = ARM_CPU(obj);
+ 
+     aarch64_cpu_common_init(obj, MIDR_IMPLEMENTER_ARM, 0xd08, 0, 3);
++    cortex_a72_a57_a53_common_init(cpu);
+ 
+     cpu->dtb_compatible = "arm,cortex-a72";
+-    cpu->revidr = 0x00000000;
+     cpu->reset_fpsid = 0x41034080;
+-    cpu->isar.mvfr0 = 0x10110222;
+-    cpu->isar.mvfr1 = 0x12111111;
+-    cpu->isar.mvfr2 = 0x00000043;
+     cpu->ctr = 0x8444c004;
+-    cpu->reset_sctlr = 0x00c50838;
+-    cpu->id_pfr0 = 0x00000131;
+-    cpu->id_pfr1 = 0x00011011;
+-    cpu->isar.id_dfr0 = 0x03010066;
+-    cpu->id_afr0 = 0x00000000;
+-    cpu->isar.id_mmfr0 = 0x10201105;
+-    cpu->isar.id_mmfr1 = 0x40000000;
+-    cpu->isar.id_mmfr2 = 0x01260000;
+-    cpu->isar.id_mmfr3 = 0x02102211;
+-    cpu->isar.id_isar0 = 0x02101110;
+-    cpu->isar.id_isar1 = 0x13112111;
+-    cpu->isar.id_isar2 = 0x21232042;
+-    cpu->isar.id_isar3 = 0x01112131;
+-    cpu->isar.id_isar4 = 0x00011142;
+-    cpu->isar.id_isar5 = 0x00011121;
+-    cpu->isar.id_aa64pfr0 = 0x00002222;
+-    cpu->isar.id_aa64dfr0 = 0x10305106;
+-    cpu->isar.id_aa64isar0 = 0x00011120;
+-    cpu->isar.id_aa64mmfr0 = 0x00001124;
+-    cpu->isar.dbgdidr = 0x3516d000;
+     cpu->clidr = 0x0a200023;
+     cpu->ccsidr[0] = 0x701fe00a; /* 32KB L1 dcache */
+     cpu->ccsidr[1] = 0x201fe012; /* 48KB L1 icache */
+-- 
+2.20.1
 
-
-> Thanks,
->
-> Phil.
->
-> >
-> > Aleksandar
-> >
-> >> On 5/10/20 5:28 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> >>> New Spring, new opportunity to clean this device :)
-> >>> (v1 was in 2018, v2 in 2019).
-> >>>
-> >>> - lower device priority
-> >>> - follow qdev model and use properties
-> >>> - convert to trace events
-> >>> - describe with slot name
-> >>> - move under hw/misc/ and cover in MAINTAINERS
-> >>>
-> >>> Peter, I hope you are OK adding it wit UNIMP device,
-> >>> as both are very similar, and don't have much activity.
-> >>>
-> >>> Only MIPS/SPARC32 targets use this device.
-> >>>
-> >>> v2: https://www.mail-archive.com/qemu-devel@nongnu.org/msg626498.html
-> >>> v1: https://www.mail-archive.com/qemu-devel@nongnu.org/msg564060.html
-> >>>
-> >>> Philippe Mathieu-Daud=C3=A9 (7):
-> >>>   hw/sparc/sun4m: Use UnimplementedDevice for I/O devices
-> >>>   hw/misc/empty_slot: Lower address space priority
-> >>>   hw/misc/empty_slot: Convert 'size' field as qdev property
-> >>>   hw/misc/empty_slot: Add a 'name' qdev property
-> >>>   hw/misc/empty_slot: Convert debug printf() to trace event
-> >>>   hw/misc/empty_slot: Move the 'hw/misc' and cover in MAINTAINERS
-> >>>   hw/misc/empty_slot: Name the slots when created
-> >>>
-> >>>  include/hw/empty_slot.h        |  9 -------
-> >>>  include/hw/misc/empty_slot.h   | 19 ++++++++++++++
-> >>>  hw/mips/mips_malta.c           |  4 +--
-> >>>  hw/{core =3D> misc}/empty_slot.c | 47 +++++++++++++++++++-----------=
-----
-> >>>  hw/sparc/sun4m.c               | 23 +++++++++++------
-> >>>  MAINTAINERS                    |  4 ++-
-> >>>  hw/core/Makefile.objs          |  1 -
-> >>>  hw/misc/Makefile.objs          |  1 +
-> >>>  hw/misc/trace-events           |  4 +++
-> >>>  9 files changed, 70 insertions(+), 42 deletions(-)
-> >>>  delete mode 100644 include/hw/empty_slot.h
-> >>>  create mode 100644 include/hw/misc/empty_slot.h
-> >>>  rename hw/{core =3D> misc}/empty_slot.c (66%)
-> >>>
-> >>
-> >
->
-
-
---
-Regards,
-Artyom Tarasenko
-
-SPARC and PPC PReP under qemu blog: http://tyom.blogspot.com/search/label/q=
-emu
 
