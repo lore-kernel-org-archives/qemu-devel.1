@@ -4,95 +4,101 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5A78C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 16:54:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 012A0C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 16:55:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7F16A2053B
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 16:54:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A9DF72053B
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 16:55:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iX+T92qA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F16A2053B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JRL5dic/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9DF72053B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58524 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60640 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jiL2L-0008Az-Od
-	for qemu-devel@archiver.kernel.org; Mon, 08 Jun 2020 12:54:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43988)
+	id 1jiL36-0000f7-TD
+	for qemu-devel@archiver.kernel.org; Mon, 08 Jun 2020 12:55:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44904)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jiKvK-0006tj-Do
- for qemu-devel@nongnu.org; Mon, 08 Jun 2020 12:46:58 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:40743)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jiKvJ-0007sJ-5c
- for qemu-devel@nongnu.org; Mon, 08 Jun 2020 12:46:57 -0400
-Received: by mail-wm1-x342.google.com with SMTP id r15so183559wmh.5
- for <qemu-devel@nongnu.org>; Mon, 08 Jun 2020 09:46:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=ukTo7SPGJsbWUaktAMaguRvwu02zy+paMfdYZwiolxU=;
- b=iX+T92qAf5iXlo0ZFGocOB3jV8YhKETenU0zhkw0VlIigcY0oKR7JuXDZ1QNH3iGZK
- ZYNha+cjpwhj4McnzV0A6cMckBsO1Nm6YWj9+on09wJjXl8grTVtUjpMlrIIfM2JO/m8
- Hd46IHO9cyvXCljD8TDI/zMhRuCQK3QGRXM/W53QN3rbHri42go9A1Jjx0ShSWOR/eLj
- bYsKTG2hTma+DiQiemye1z8xudlRjO5o1C9RE1ApC4wLD1KVTpCpMKvGAl6FShFl7Eat
- rG+aPKOapwGDA6hFGjGKq6oMqHne8yF/vKVRDkLV1VTayOwu+EHLv2rwWFb4gc29HRFB
- No3Q==
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jiL29-0008AJ-J3
+ for qemu-devel@nongnu.org; Mon, 08 Jun 2020 12:54:01 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:60235
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jiL27-0000b7-Ek
+ for qemu-devel@nongnu.org; Mon, 08 Jun 2020 12:54:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591635238;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=GNj2VgwnjMvSL2gIsdslUTzECsTdNSPZSk6fXVMsWJQ=;
+ b=JRL5dic/9EYlsex4X2iK/QjoSKFQ9KvBUh/faVvh8uw06mEufM2wxUHlnWgUddkIfmL7Fb
+ lu9oAFeukTd85KmrxRPI8RBkCByGEA7lxOjnjUUDE7Q1ZMlZb8yEKvjFF208YXhMhiwErm
+ nKg/6P6DCLH97SXZAIVwn2PMDhz8+4w=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-200-CDKO7ODjPLyOlS8Nt7KxLg-1; Mon, 08 Jun 2020 12:53:56 -0400
+X-MC-Unique: CDKO7ODjPLyOlS8Nt7KxLg-1
+Received: by mail-wr1-f70.google.com with SMTP id h6so7452797wrx.4
+ for <qemu-devel@nongnu.org>; Mon, 08 Jun 2020 09:53:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=ukTo7SPGJsbWUaktAMaguRvwu02zy+paMfdYZwiolxU=;
- b=HBFZr3yLfdn54WtgdYl7IWI/F5zkFUwS4QtuAcSuRX6mR+6ZlZ9Mxef2Y0uo9ZVuXf
- FpCLi5GBD1sNCNBhhpm0XONhNWVz9xUx0tKmqaZCH/xepxAO7sSAyDY4GpAFXs6JwUaz
- atZ0qahmvuKeRNRTKdbWDw/La9gbYw9/0+JO8/J1enaLhHLpoO3018YPqUTGcye3+st8
- NXPs4vxPkmtDk0w1eRcUKFsAdRQp+Q4iEzQCdFvtbiM/sN9zEpmu/g4+evPdhBYWXsPn
- SkadTcXgYVlluZMaQbyxf1RlxqeMORKb9twJru/H4W8EGnKDQsrLsU8499vqpdqiBlGP
- j7hw==
-X-Gm-Message-State: AOAM530rqUaEJVKQWH/J6PR8zPBMRZfI/wwgQD0+TP6L6rsKT2t8Goj9
- LJWXp3nRjufHtDfFYAIDPBq9wg==
-X-Google-Smtp-Source: ABdhPJw+JEtwHDFLL9dHzB6eEg3a5Tfcx1mRT4UyZrhFqX84rmo6CVDvIK5GHGWjnOnz7ehyNcnO6A==
-X-Received: by 2002:a05:600c:287:: with SMTP id 7mr222137wmk.91.1591634814850; 
- Mon, 08 Jun 2020 09:46:54 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id b18sm248767wrn.88.2020.06.08.09.46.52
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=GNj2VgwnjMvSL2gIsdslUTzECsTdNSPZSk6fXVMsWJQ=;
+ b=BThxDT9HmqfnRfs6echPwMQOi5VM0h2QjyxwJy8gzBgQzeC/1UD4CJU25RUl+rzl/S
+ Y2SZgpePC2XVc/X2Y8P5JRLryGeEQxPSqU9GCMYPtTsqAobOLEsEnh6IjmnRRcsvLF9y
+ 0KDOl4Es0V8/Zxu5bl2/vpzRKDEnpCBwy5HLpCk1grPzKfUXTwL0PDWgBIjswpNdJpaE
+ vQJQLGizPFWjYy2zTDSNyTL/Yckf+2oVTdw+ZCpBHxsvinki83xqrU1KANsdmEsqWeIK
+ YgMxrJvYUE/3cmXWXoWfH7q0Z94BLeLw4j2qcz3BYmFNDz1gh6y1LQmwWw2u73CLha81
+ swjA==
+X-Gm-Message-State: AOAM5337bAgERWfNad/4eWhbEWCFsRv5A2DqSRWTwcuk3evytUQwwdYU
+ ZcCCSIaMhRbaDxdkOK/HGsiedT4KXmLiFldYYrwcB4+i14/eFFR1s7Zm5eOIiBrbP2bH52EsoF2
+ 3//1RTxO6fhxbvuk=
+X-Received: by 2002:a05:600c:21c2:: with SMTP id
+ x2mr249210wmj.33.1591635234542; 
+ Mon, 08 Jun 2020 09:53:54 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzHDhntm1qLNLScMtBw5pG66cXadC7jyU4Ax43CasCp2yUoaJzDnheR2wlSm6NyTexr11rNnw==
+X-Received: by 2002:a05:600c:21c2:: with SMTP id
+ x2mr249185wmj.33.1591635234174; 
+ Mon, 08 Jun 2020 09:53:54 -0700 (PDT)
+Received: from redhat.com (bzq-109-64-41-91.red.bezeqint.net. [109.64.41.91])
+ by smtp.gmail.com with ESMTPSA id
+ t8sm116961wmi.46.2020.06.08.09.53.52
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 08 Jun 2020 09:46:52 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 30A0B1FF7E;
- Mon,  8 Jun 2020 17:46:52 +0100 (BST)
-References: <alpine.DEB.2.21.2006051857110.13777@digraph.polyomino.org.uk>
- <alpine.DEB.2.21.2006051901480.13777@digraph.polyomino.org.uk>
-User-agent: mu4e 1.5.2; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Joseph Myers <joseph@codesourcery.com>
-Subject: Re: [PATCH 6/7] target/i386: reimplement fprem1 using floatx80
- operations
-In-reply-to: <alpine.DEB.2.21.2006051901480.13777@digraph.polyomino.org.uk>
-Date: Mon, 08 Jun 2020 17:46:52 +0100
-Message-ID: <87a71d5wub.fsf@linaro.org>
+ Mon, 08 Jun 2020 09:53:53 -0700 (PDT)
+Date: Mon, 8 Jun 2020 12:53:50 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Halil Pasic <pasic@linux.ibm.com>
+Subject: Re: [PATCH v2 1/1] virtio-ccw: auto-manage VIRTIO_F_IOMMU_PLATFORM
+ if PV
+Message-ID: <20200608125207-mutt-send-email-mst@kernel.org>
+References: <20200514221155.32079-1-pasic@linux.ibm.com>
+ <20200520121507-mutt-send-email-mst@kernel.org>
+ <20200606013217.2cffa3ed.pasic@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::342;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x342.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+In-Reply-To: <20200606013217.2cffa3ed.pasic@linux.ibm.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=mst@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/08 01:05:50
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,90 +111,249 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, ehabkost@redhat.com, qemu-devel@nongnu.org,
- laurent@vivier.eu, pbonzini@redhat.com, aurelien@aurel32.net, rth@twiddle.net
+Cc: Thomas Huth <thuth@redhat.com>, Boris Fiuczynski <fiuczy@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>,
+ David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>,
+ qemu-s390x@nongnu.org, Viktor Mihajlovski <mihajlov@linux.ibm.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Sat, Jun 06, 2020 at 01:32:17AM +0200, Halil Pasic wrote:
+> On Wed, 20 May 2020 12:23:24 -0400
+> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> 
+> > On Fri, May 15, 2020 at 12:11:55AM +0200, Halil Pasic wrote:
+> > > The virtio specification tells that the device is to present
+> > > VIRTIO_F_ACCESS_PLATFORM (a.k.a. VIRTIO_F_IOMMU_PLATFORM) when the
+> > > device "can only access certain memory addresses with said access
+> > > specified and/or granted by the platform". This is the case for a
+> > > protected VMs, as the device can access only memory addresses that are
+> > > in pages that are currently shared (only the guest can share/unsare its
+> > > pages).
+> > > 
+> > > No VM, however, starts out as a protected VM, but some VMs may be
+> > > converted to protected VMs if the guest decides so.
+> > > 
+> > > Making the end user explicitly manage the VIRTIO_F_ACCESS_PLATFORM via
+> > > the property iommu_on is a minor disaster. Since the correctness of the
+> > > paravirtualized virtio devices depends (and thus in a sense the
+> > > correctness of the hypervisor) it, then the hypervisor should have the
+> > > last word about whether VIRTIO_F_ACCESS_PLATFORM is to be presented or
+> > > not.
+> > 
+> > So, how about this: switch iommu to on/off/auto.  Add a property with a
+> > reasonable name "allow protected"?  If set allow switch to protected
+> > memory and also set iommu auto to on by default.  If not set then don't.
+> > 
+> > This will come handy for other things like migrating to hosts without
+> > protected memory support.
+> > 
+> > 
+> > Also, virtio now calls this PLATFORM_ACCESS, maybe we should rename
+> > the property (keeping old one around for compat)?
+> > I feel this will address lots of complaints ...
+> > 
+> 
+> I'm not sure I've entirely understood your proposal, but I tried to
+> do something in that direction. 
+> 
+> Short summary of the changes: 
+> * added new property "access_platform" as on/off/auto (default auto)
+> * added alias "iommu_platform" for compatibility
+> * rewrote this patch to on/off/auto so that we only do the override when
+>   user specified auto 
+> 
+> Let me list some pros and cons (compared to the previous patch):
+> 
+> PRO:
+> * Thanks to on/off/auto we don't override what the user specified. From 
+> user interface perspective preferable. I usually hate software that
+> thinks its than me and can do the opposite I tell it.
+> 
+> CON:
+> * It is more code: "4 files changed, 37 insertions(+), 2 deletions(-)"
+>   against "3 files changed, 17 insertions(+)"
+> * Unlike the previous one, this one is not fool-proof! The user can
+>   still specify access_platform=off to lets say a hotplug device, and
+>   bring down the guest. We could however fence such stuff with an error
+>   message. Would be even more code though.
+> * As far as I can tell 'auto' was used to pick a value on initialization
+>   time. This is a novel, and possibly dodgy use in a sense that the value
+>   of the property may change during the lifetime of the VM.
+> * We may need to do something about libvirt.
+> 
+> Further improvements are possible and probably necessary if we want
+> to go down this path. But I would like to verify that first.
 
-Joseph Myers <joseph@codesourcery.com> writes:
+I think it should be even simpler. If switching to protected
+VM is *allowed* by host then auto should mean on.
+No changes of features across reset necessary.
 
-> The x87 fprem1 emulation is currently based around conversion to
-> double, which is inherently unsuitable for a good emulation of any
-> floatx80 operation.  Reimplement using the soft-float floatx80
-> remainder operations.
->
-> Signed-off-by: Joseph Myers <joseph@codesourcery.com>
+
+
+> ----------------------------8<---------------------------------
+> From: Halil Pasic <pasic@linux.ibm.com>
+> Date: Wed, 26 Feb 2020 16:48:21 +0100
+> Subject: [PATCH v2.5 1/1] virtio-ccw: auto-manage VIRTIO_F_IOMMU_PLATFORM if PV
+> 
+> The virtio specification tells that the device is to present
+> VIRTIO_F_ACCESS_PLATFORM (a.k.a. VIRTIO_F_IOMMU_PLATFORM) when the
+> device "can only access certain memory addresses with said access
+> specified and/or granted by the platform". This is the case for a
+> protected VMs, as the device can access only memory addresses that are
+> in pages that are currently shared (only the guest can share/unsare its
+> pages).
+> 
+> No VM, however, starts out as a protected VM, but some VMs may be
+> converted to protected VMs if the guest decides so.
+> 
+> Making the end user explicitly manage the VIRTIO_F_ACCESS_PLATFORM via
+> the property iommu_on is a minor disaster. Since the correctness of the
+> paravirtualized virtio devices depends (and thus in a sense the
+> correctness of the hypervisor) it, then the hypervisor should have the
+> last word about whether VIRTIO_F_ACCESS_PLATFORM is to be presented or
+> not.
+> 
+> Currently presenting a PV guest with a (paravirtualized) virtio-ccw
+> device has catastrophic consequences for the VM (after the hypervisors
+> access to protected memory). This is especially grave in case of device
+> hotplug (because in this case the guest is more likely to be in the
+> middle of something important).
+> 
+> Let us add the ability to manage the VIRTIO_F_ACCESS_PLATFORM virtio
+> feature automatically. This is accomplished  by turning the property
+> into an 'on/off/auto' property, and for virtio-ccw devices if auto
+> was specified forcing its value before  we start the protected VM. If
+> the VM should cease to be protected, the original value is restored.
+> 
+> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
 > ---
->  target/i386/fpu_helper.c | 96 +++++++++++++++++++---------------------
->  1 file changed, 45 insertions(+), 51 deletions(-)
->
-> diff --git a/target/i386/fpu_helper.c b/target/i386/fpu_helper.c
-> index 8ef5b463ea..bab35e00a0 100644
-> --- a/target/i386/fpu_helper.c
-> +++ b/target/i386/fpu_helper.c
-> @@ -934,63 +934,57 @@ void helper_fxtract(CPUX86State *env)
->      merge_exception_flags(env, old_flags);
+>  hw/s390x/s390-virtio-ccw.c |  2 ++
+>  hw/s390x/virtio-ccw.c      | 14 ++++++++++++++
+>  hw/virtio/virtio.c         | 19 +++++++++++++++++++
+>  include/hw/virtio/virtio.h |  4 ++--
+>  4 files changed, 37 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+> index f660070d22..705e6b153a 100644
+> --- a/hw/s390x/s390-virtio-ccw.c
+> +++ b/hw/s390x/s390-virtio-ccw.c
+> @@ -330,6 +330,7 @@ static void s390_machine_unprotect(S390CcwMachineState *ms)
+>      migrate_del_blocker(pv_mig_blocker);
+>      error_free_or_abort(&pv_mig_blocker);
+>      qemu_balloon_inhibit(false);
+> +    subsystem_reset();
 >  }
->=20=20
-> -void helper_fprem1(CPUX86State *env)
-> +static void helper_fprem_common(CPUX86State *env, bool mod)
->  {
-> -    double st0, st1, dblq, fpsrcop, fptemp;
-> -    CPU_LDoubleU fpsrcop1, fptemp1;
-> -    int expdif;
-> -    signed long long int q;
-> -
-> -    st0 =3D floatx80_to_double(env, ST0);
-> -    st1 =3D floatx80_to_double(env, ST1);
-> -
-> -    if (isinf(st0) || isnan(st0) || isnan(st1) || (st1 =3D=3D 0.0)) {
-> -        ST0 =3D double_to_floatx80(env, 0.0 / 0.0); /* NaN */
-> -        env->fpus &=3D ~0x4700; /* (C3,C2,C1,C0) <-- 0000 */
-> -        return;
-> -    }
-> -
-> -    fpsrcop =3D st0;
-> -    fptemp =3D st1;
-> -    fpsrcop1.d =3D ST0;
-> -    fptemp1.d =3D ST1;
-> -    expdif =3D EXPD(fpsrcop1) - EXPD(fptemp1);
-> -
-> -    if (expdif < 0) {
-> -        /* optimisation? taken from the AMD docs */
-> -        env->fpus &=3D ~0x4700; /* (C3,C2,C1,C0) <-- 0000 */
-> -        /* ST0 is unchanged */
-> -        return;
-> -    }
-> +    uint8_t old_flags =3D save_exception_flags(env);
+>  
+>  static int s390_machine_protect(S390CcwMachineState *ms)
+> @@ -382,6 +383,7 @@ static int s390_machine_protect(S390CcwMachineState *ms)
+>      if (rc) {
+>          goto out_err;
+>      }
+> +    subsystem_reset();
+>      return rc;
+>  
+>  out_err:
+> diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
+> index 64f928fc7d..2bb29b57aa 100644
+> --- a/hw/s390x/virtio-ccw.c
+> +++ b/hw/s390x/virtio-ccw.c
+> @@ -874,6 +874,20 @@ static void virtio_ccw_reset(DeviceState *d)
+>      VirtioCcwDevice *dev = VIRTIO_CCW_DEVICE(d);
+>      VirtIODevice *vdev = virtio_bus_get_device(&dev->bus);
+>      VirtIOCCWDeviceClass *vdc = VIRTIO_CCW_DEVICE_GET_CLASS(dev);
+> +    S390CcwMachineState *ms = S390_CCW_MACHINE(qdev_get_machine());
+> +
+> +    /*
+> +     * An attempt to use a paravirt device without VIRTIO_F_IOMMU_PLATFORM
+> +     * in PV, has catastrophic consequences for the VM. Let's force
+> +     * VIRTIO_F_IOMMU_PLATFORM not already specified.
+> +     */
+> +    if (vdev->access_platform_auto && ms->pv) {
+> +        virtio_add_feature(&vdev->host_features, VIRTIO_F_IOMMU_PLATFORM);
+> +        vdev->access_platform = ON_OFF_AUTO_ON;
+> +    } else if (vdev->access_platform_auto) {
+> +        virtio_clear_feature(&vdev->host_features, VIRTIO_F_IOMMU_PLATFORM);
+> +        vdev->access_platform = ON_OFF_AUTO_OFF;
+> +    }
+>  
+>      virtio_ccw_reset_virtio(dev, vdev);
+>      if (vdc->parent_reset) {
+> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+> index b6c8ef5bc0..f6bd271f14 100644
+> --- a/hw/virtio/virtio.c
+> +++ b/hw/virtio/virtio.c
+> @@ -3232,7 +3232,11 @@ void virtio_instance_init_common(Object *proxy_obj, void *data,
+>  
+>      object_initialize_child(proxy_obj, "virtio-backend", vdev, vdev_size,
+>                              vdev_name, &error_abort, NULL);
+> +    object_property_add_alias(OBJECT(vdev), "iommu_platform",
+> +                              OBJECT(vdev), "access_platform", &error_abort);
+>      qdev_alias_all_properties(vdev, proxy_obj);
+> +    object_property_add_alias(proxy_obj, "iommu_platform",
+> +                              OBJECT(vdev), "access_platform", &error_abort);
+>  }
+>  
+>  void virtio_init(VirtIODevice *vdev, const char *name,
+> @@ -3626,6 +3630,19 @@ static void virtio_device_realize(DeviceState *dev, Error **errp)
+>          return;
+>      }
+>  
+> +    switch (vdev->access_platform) {
+> +    case ON_OFF_AUTO_ON:
+> +        virtio_add_feature(&vdev->host_features, VIRTIO_F_IOMMU_PLATFORM);
+> +        break;
+> +    case ON_OFF_AUTO_AUTO:
+> +        /* transport code can mange access_platform */
+> +        vdev->access_platform_auto = true;
+> +        break;
+> +    case ON_OFF_AUTO_OFF: /*fall through*/
+> +    default:
+> +        vdev->access_platform_auto = false;
+> +    }
+> +
+>      vdev->listener.commit = virtio_memory_listener_commit;
+>      memory_listener_register(&vdev->listener, vdev->dma_as);
+>  }
+> @@ -3681,6 +3698,8 @@ static Property virtio_properties[] = {
+>      DEFINE_VIRTIO_COMMON_FEATURES(VirtIODevice, host_features),
+>      DEFINE_PROP_BOOL("use-started", VirtIODevice, use_started, true),
+>      DEFINE_PROP_BOOL("use-disabled-flag", VirtIODevice, use_disabled_flag, true),
+> +    DEFINE_PROP_ON_OFF_AUTO("access_platform", VirtIODevice, access_platform,
+> +                            ON_OFF_AUTO_AUTO),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+>  
+> diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
+> index b69d517496..b77e1545b4 100644
+> --- a/include/hw/virtio/virtio.h
+> +++ b/include/hw/virtio/virtio.h
+> @@ -110,6 +110,8 @@ struct VirtIODevice
+>      uint8_t device_endian;
+>      bool use_guest_notifier_mask;
+>      AddressSpace *dma_as;
+> +    OnOffAuto access_platform;
+> +    bool access_platform_auto;
+>      QLIST_HEAD(, VirtQueue) *vector_queues;
+>  };
+>  
+> @@ -289,8 +291,6 @@ typedef struct VirtIORNGConf VirtIORNGConf;
+>                        VIRTIO_F_NOTIFY_ON_EMPTY, true), \
+>      DEFINE_PROP_BIT64("any_layout", _state, _field, \
+>                        VIRTIO_F_ANY_LAYOUT, true), \
+> -    DEFINE_PROP_BIT64("iommu_platform", _state, _field, \
+> -                      VIRTIO_F_IOMMU_PLATFORM, false), \
+>      DEFINE_PROP_BIT64("packed", _state, _field, \
+>                        VIRTIO_F_RING_PACKED, false)
+>  
+> 
+> base-commit: 0ffd3d64bd1bb8b84950e52159a0062fdab34628
+> -- 
+> 2.17.1
+> 
+> 
 
-Hmm where did this come from:
-
-/home/alex/lsrc/qemu.git/target/i386/fpu_helper.c: In function =E2=80=98hel=
-per_fprem_common=E2=80=99:
-/home/alex/lsrc/qemu.git/target/i386/fpu_helper.c:784:25: error: implicit d=
-eclaration of function =E2=80=98save_exception_flags=E2=80=99; did you mean=
- =E2=80=98raise_exception_ra=E2=80=99? [-Werror=3Dimplicit-function-declara=
-tion]
-     uint8_t old_flags =3D save_exception_flags(env);
-                         ^~~~~~~~~~~~~~~~~~~~
-                         raise_exception_ra
-/home/alex/lsrc/qemu.git/target/i386/fpu_helper.c:784:25: error: nested ext=
-ern declaration of =E2=80=98save_exception_flags=E2=80=99 [-Werror=3Dnested=
--externs]
-/home/alex/lsrc/qemu.git/target/i386/fpu_helper.c:827:5: error: implicit de=
-claration of function =E2=80=98merge_exception_flags=E2=80=99; did you mean=
- =E2=80=98get_float_exception_flags=E2=80=99? [-Werror=3Dimplicit-function-=
-declaration]
-     merge_exception_flags(env, old_flags);
-     ^~~~~~~~~~~~~~~~~~~~~
-     get_float_exception_flags
-/home/alex/lsrc/qemu.git/target/i386/fpu_helper.c:827:5: error: nested exte=
-rn declaration of =E2=80=98merge_exception_flags=E2=80=99 [-Werror=3Dnested=
--externs]
-cc1: all warnings being treated as errors
-
---=20
-Alex Benn=C3=A9e
 
