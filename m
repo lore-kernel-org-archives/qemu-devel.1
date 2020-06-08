@@ -7,77 +7,77 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CAC16C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 16:27:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AE2AC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 16:28:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D5C1206C3
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 16:27:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 42674206C3
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 16:28:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i0gWMupY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D5C1206C3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SceyYhmr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42674206C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43742 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47164 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jiKcB-00089F-Lg
-	for qemu-devel@archiver.kernel.org; Mon, 08 Jun 2020 12:27:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38388)
+	id 1jiKcy-00019D-E6
+	for qemu-devel@archiver.kernel.org; Mon, 08 Jun 2020 12:28:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38310)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jiKFi-0007sh-4y
- for qemu-devel@nongnu.org; Mon, 08 Jun 2020 12:03:58 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:38935
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jiKFR-0007Xn-Ld
+ for qemu-devel@nongnu.org; Mon, 08 Jun 2020 12:03:41 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23332
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jiKFg-0008Ep-Tp
- for qemu-devel@nongnu.org; Mon, 08 Jun 2020 12:03:57 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jiKFQ-0008CA-GY
+ for qemu-devel@nongnu.org; Mon, 08 Jun 2020 12:03:41 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591632235;
+ s=mimecast20190719; t=1591632218;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=qfeQjgHHg6Ez9waCGJmOrJzAr/zUBGXbuFUiyuF/Rfo=;
- b=i0gWMupYQnQaFUEqTKaVJBfEe2HNXu7+J/baMmXCmjt4r32d3aYvlLPLRjroSb/5hxImAc
- uC3PbyJL9Znc/AfU8nlK8C59RGAgTKM1qMcX+L4K9FxhXkQhXrh66avYo1etStY+pgnPup
- Oq+k1H8cr0en46mXrLNzlbEfZfcry30=
+ bh=nCf98bap8NX9iIcnvvB/aw+3vfPbNUjO6+kAZbeXlU0=;
+ b=SceyYhmrsGkUumqeAlAXOWAPo+WNBwrSIKrJEKhFbZHH4JHvHUTC0bkFgGXUfxPHQEtr0J
+ duNF2fAcye36FDzckTJGEVeDh5XzWMYUBgLGbeAYypjXoEYUkA5Z/bZQzRRrChlDPm7DA3
+ RGMn+C7a6wlMzGrGF65uUkO298s1E7A=
 Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
  [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-410-omOvy007O2mnpedbBdcMAg-1; Mon, 08 Jun 2020 12:03:54 -0400
-X-MC-Unique: omOvy007O2mnpedbBdcMAg-1
-Received: by mail-wr1-f70.google.com with SMTP id z10so7393026wrs.2
- for <qemu-devel@nongnu.org>; Mon, 08 Jun 2020 09:03:54 -0700 (PDT)
+ us-mta-393-ZzDsOi0QNhWkBv6tFHG-uw-1; Mon, 08 Jun 2020 12:03:31 -0400
+X-MC-Unique: ZzDsOi0QNhWkBv6tFHG-uw-1
+Received: by mail-wr1-f70.google.com with SMTP id p10so7361553wrn.19
+ for <qemu-devel@nongnu.org>; Mon, 08 Jun 2020 09:03:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=qfeQjgHHg6Ez9waCGJmOrJzAr/zUBGXbuFUiyuF/Rfo=;
- b=mBq3gTe1K0Hz6TRMBWU4RVNbzjGzThk7CgjG/ugivCiXFXNMUmkXYY+M8URh625rJS
- gin6nx5I5hw4TEbxTX02AGTry4OzOCsffqkyKPQePB5CoCEY/iFaExR8hBINTlFNhp9g
- MlMpMkkkcB5Hihp76EjH0KKXFvG71o4QNtghPfFARWZsrBwC/ev55VmCNcnBgfLj5MXc
- q/HsSBAwKV0uIZubagf1Q5dfwTfhDfgTL7wmZerlXZXIkfoa7CYfJHParbOPUO6aiDK0
- m5rvYCY0E5oZnFLXNsfkFvenXVOy+PVeS9hFZb6h/AfHmISx627tDcfmgg1H85rEe6Ir
- 7hng==
-X-Gm-Message-State: AOAM533AlRsIlmbYjd51KTN85WdSEm5C4PEFx6PRWHGPdknzFLTGO4sW
- INw0JNoEij/zfFVFzX06LSmWy55gvumxP05uu80kiJfCn0RZ7xL9JXJv3z4MZV1PvJuNWsB7zF+
- FRfqf/8A7PX57JyM=
-X-Received: by 2002:a7b:cd04:: with SMTP id f4mr54318wmj.3.1591632232864;
- Mon, 08 Jun 2020 09:03:52 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxLcq9fw++IqBSfctMa2VnenePzSclzDPUX9srn5OE/PiQtrx427TCsmbU35rGSbrlanE52/A==
-X-Received: by 2002:a7b:cd04:: with SMTP id f4mr54282wmj.3.1591632232663;
- Mon, 08 Jun 2020 09:03:52 -0700 (PDT)
+ bh=nCf98bap8NX9iIcnvvB/aw+3vfPbNUjO6+kAZbeXlU0=;
+ b=E75mJYw7RnoU8B8tosDkYBLIgOwAP/kYJpTKX9OyJh1wArVcviovxrDNsHGe+YcbE0
+ Vqj8lHRrtJdyac0yuIhdfYCbunaMgKvRZfB6DgFUVcUXa0UuEZlaDVSnSAXdcfpBKq7X
+ KNY9RHQv81oStQBQkG7NrBzovugyucgU7bRrVK0plcsXmMwGTaPlaVm7doqVFeObGBu9
+ vyB2vKwoZPQqmM764ZWZ9prslLiRtcPTz+RsGjSWkzERWLERg5QP/gsYUjo0akjGJsiE
+ BDlFwOwm87SOk+KQ/ij9uNIbtJ0cKGqlrJgIXXHakeChSGITsPdkRs8aXe7OeJ4DFxMG
+ HexA==
+X-Gm-Message-State: AOAM532KBgEUxCEdUacmQjEv5KvX6fTY7VJiynpGRfgxhFSgMFYtKsws
+ +C4X2S+UG8uAb9xW2rXjIdaRd62f06iUwd81uHqX1MWMFejnuaUNOiWI80Ix4ZAxZBUU28IeDxP
+ gT8aJ3aiyGNXNT9Y=
+X-Received: by 2002:adf:a41a:: with SMTP id d26mr25031329wra.324.1591632210362; 
+ Mon, 08 Jun 2020 09:03:30 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxnZLr9C0tJY5bkNMLswKxTqLiEkka8PUdpib6I0kPKfuiid5c8nSc5Z6uKzVsdfUes5d8k3w==
+X-Received: by 2002:adf:a41a:: with SMTP id d26mr25031279wra.324.1591632210107; 
+ Mon, 08 Jun 2020 09:03:30 -0700 (PDT)
 Received: from localhost.localdomain
  (181.red-88-10-103.dynamicip.rima-tde.net. [88.10.103.181])
- by smtp.gmail.com with ESMTPSA id q4sm4466wma.47.2020.06.08.09.03.50
+ by smtp.gmail.com with ESMTPSA id n204sm42276wma.5.2020.06.08.09.03.28
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 08 Jun 2020 09:03:52 -0700 (PDT)
+ Mon, 08 Jun 2020 09:03:29 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC PATCH 32/35] hw/riscv: Emit warning when old code is used
-Date: Mon,  8 Jun 2020 18:00:41 +0200
-Message-Id: <20200608160044.15531-33-philmd@redhat.com>
+Subject: [RFC PATCH 28/35] hw/ppc/ppc4xx: Emit warning when old code is used
+Date: Mon,  8 Jun 2020 18:00:37 +0200
+Message-Id: <20200608160044.15531-29-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200608160044.15531-1-philmd@redhat.com>
 References: <20200608160044.15531-1-philmd@redhat.com>
@@ -87,16 +87,17 @@ X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8;
 	text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/08 11:58:00
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/08 05:40:56
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -139,54 +140,182 @@ This code hasn't been QOM'ified yet. Warn the user.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- hw/riscv/riscv_htif.c  | 4 ++++
- hw/riscv/sifive_uart.c | 4 ++++
- 2 files changed, 8 insertions(+)
+ hw/ppc/ppc405_boards.c |  5 +++++
+ hw/ppc/ppc405_uc.c     | 21 +++++++++++++++++++++
+ hw/ppc/ppc4xx_devs.c   |  7 +++++++
+ 3 files changed, 33 insertions(+)
 
-diff --git a/hw/riscv/riscv_htif.c b/hw/riscv/riscv_htif.c
-index ca87a5cf9f..bd080dbefb 100644
---- a/hw/riscv/riscv_htif.c
-+++ b/hw/riscv/riscv_htif.c
-@@ -30,6 +30,7 @@
- #include "hw/riscv/riscv_htif.h"
- #include "qemu/timer.h"
+diff --git a/hw/ppc/ppc405_boards.c b/hw/ppc/ppc405_boards.c
+index 6198ec1035..eb1216b5f0 100644
+--- a/hw/ppc/ppc405_boards.c
++++ b/hw/ppc/ppc405_boards.c
+@@ -41,6 +41,7 @@
+ #include "hw/loader.h"
+ #include "exec/address-spaces.h"
+ #include "qemu/cutils.h"
++#include "hw/qdev-deprecated.h"
+ 
+ #define BIOS_FILENAME "ppc405_rom.bin"
+ #define BIOS_SIZE (2 * MiB)
+@@ -129,6 +130,8 @@ static void ref405ep_fpga_init(MemoryRegion *sysmem, uint32_t base)
+     ref405ep_fpga_t *fpga;
+     MemoryRegion *fpga_memory = g_new(MemoryRegion, 1);
+ 
++    qdev_warn_deprecated_function_used();
++
+     fpga = g_malloc0(sizeof(ref405ep_fpga_t));
+     memory_region_init_io(fpga_memory, NULL, &ref405ep_fpga_ops, fpga,
+                           "fpga", 0x00000100);
+@@ -408,6 +411,8 @@ static void taihu_cpld_init(MemoryRegion *sysmem, uint32_t base)
+     taihu_cpld_t *cpld;
+     MemoryRegion *cpld_memory = g_new(MemoryRegion, 1);
+ 
++    qdev_warn_deprecated_function_used();
++
+     cpld = g_malloc0(sizeof(taihu_cpld_t));
+     memory_region_init_io(cpld_memory, NULL, &taihu_cpld_ops, cpld, "cpld", 0x100);
+     memory_region_add_subregion(sysmem, base, cpld_memory);
+diff --git a/hw/ppc/ppc405_uc.c b/hw/ppc/ppc405_uc.c
+index 381720aced..160604c62e 100644
+--- a/hw/ppc/ppc405_uc.c
++++ b/hw/ppc/ppc405_uc.c
+@@ -36,6 +36,7 @@
+ #include "sysemu/sysemu.h"
+ #include "qemu/log.h"
+ #include "exec/address-spaces.h"
++#include "hw/qdev-deprecated.h"
+ 
+ //#define DEBUG_OPBA
+ //#define DEBUG_SDRAM
+@@ -182,6 +183,8 @@ void ppc4xx_plb_init(CPUPPCState *env)
+ {
+     ppc4xx_plb_t *plb;
+ 
++    qdev_warn_deprecated_function_used();
++
+     plb = g_malloc0(sizeof(ppc4xx_plb_t));
+     ppc_dcr_register(env, PLB3A0_ACR, plb, &dcr_read_plb, &dcr_write_plb);
+     ppc_dcr_register(env, PLB4A0_ACR, plb, &dcr_read_plb, &dcr_write_plb);
+@@ -267,6 +270,8 @@ static void ppc4xx_pob_init(CPUPPCState *env)
+ {
+     ppc4xx_pob_t *pob;
+ 
++    qdev_warn_deprecated_function_used();
++
+     pob = g_malloc0(sizeof(ppc4xx_pob_t));
+     ppc_dcr_register(env, POB0_BEAR, pob, &dcr_read_pob, &dcr_write_pob);
+     ppc_dcr_register(env, POB0_BESR0, pob, &dcr_read_pob, &dcr_write_pob);
+@@ -351,6 +356,8 @@ static void ppc4xx_opba_init(hwaddr base)
+ {
+     ppc4xx_opba_t *opba;
+ 
++    qdev_warn_deprecated_function_used();
++
+     opba = g_malloc0(sizeof(ppc4xx_opba_t));
+ #ifdef DEBUG_OPBA
+     printf("%s: offset " TARGET_FMT_plx "\n", __func__, base);
+@@ -549,6 +556,8 @@ void ppc405_ebc_init(CPUPPCState *env)
+ {
+     ppc4xx_ebc_t *ebc;
+ 
++    qdev_warn_deprecated_function_used();
++
+     ebc = g_malloc0(sizeof(ppc4xx_ebc_t));
+     qemu_register_reset(&ebc_reset, ebc);
+     ppc_dcr_register(env, EBC0_CFGADDR,
+@@ -632,6 +641,8 @@ static void ppc405_dma_init(CPUPPCState *env, qemu_irq irqs[4])
+ {
+     ppc405_dma_t *dma;
+ 
++    qdev_warn_deprecated_function_used();
++
+     dma = g_malloc0(sizeof(ppc405_dma_t));
+     memcpy(dma->irqs, irqs, 4 * sizeof(qemu_irq));
+     qemu_register_reset(&ppc405_dma_reset, dma);
+@@ -735,6 +746,8 @@ static void ppc405_gpio_init(hwaddr base)
+ {
+     ppc405_gpio_t *gpio;
+ 
++    qdev_warn_deprecated_function_used();
++
+     gpio = g_malloc0(sizeof(ppc405_gpio_t));
+ #ifdef DEBUG_GPIO
+     printf("%s: offset " TARGET_FMT_plx "\n", __func__, base);
+@@ -897,6 +910,8 @@ static void ppc405_ocm_init(CPUPPCState *env)
+ {
+     ppc405_ocm_t *ocm;
+ 
++    qdev_warn_deprecated_function_used();
++
+     ocm = g_malloc0(sizeof(ppc405_ocm_t));
+     /* XXX: Size is 4096 or 0x04000000 */
+     memory_region_init_ram(&ocm->isarc_ram, NULL, "ppc405.ocm", 4 * KiB,
+@@ -1142,6 +1157,8 @@ static void ppc4xx_gpt_init(hwaddr base, qemu_irq irqs[5])
+     ppc4xx_gpt_t *gpt;
+     int i;
+ 
++    qdev_warn_deprecated_function_used();
++
+     gpt = g_malloc0(sizeof(ppc4xx_gpt_t));
+     for (i = 0; i < 5; i++) {
+         gpt->irqs[i] = irqs[i];
+@@ -1410,6 +1427,8 @@ static void ppc405cr_cpc_init (CPUPPCState *env, clk_setup_t clk_setup[7],
+ {
+     ppc405cr_cpc_t *cpc;
+ 
++    qdev_warn_deprecated_function_used();
++
+     cpc = g_malloc0(sizeof(ppc405cr_cpc_t));
+     memcpy(cpc->clk_setup, clk_setup,
+            PPC405CR_CLK_NB * sizeof(clk_setup_t));
+@@ -1755,6 +1774,8 @@ static void ppc405ep_cpc_init (CPUPPCState *env, clk_setup_t clk_setup[8],
+ {
+     ppc405ep_cpc_t *cpc;
+ 
++    qdev_warn_deprecated_function_used();
++
+     cpc = g_malloc0(sizeof(ppc405ep_cpc_t));
+     memcpy(cpc->clk_setup, clk_setup,
+            PPC405EP_CLK_NB * sizeof(clk_setup_t));
+diff --git a/hw/ppc/ppc4xx_devs.c b/hw/ppc/ppc4xx_devs.c
+index f1651e04d9..b09d7ab5c6 100644
+--- a/hw/ppc/ppc4xx_devs.c
++++ b/hw/ppc/ppc4xx_devs.c
+@@ -33,6 +33,7 @@
+ #include "qemu/log.h"
+ #include "exec/address-spaces.h"
  #include "qemu/error-report.h"
 +#include "hw/qdev-deprecated.h"
  
- #define RISCV_DEBUG_HTIF 0
- #define HTIF_DEBUG(fmt, ...)                                                   \
-@@ -238,6 +239,9 @@ HTIFState *htif_mm_init(MemoryRegion *address_space, MemoryRegion *main_mem,
-     uint64_t fromhost_offset = fromhost_addr - base;
+ /*#define DEBUG_UIC*/
  
-     HTIFState *s = g_malloc0(sizeof(HTIFState));
-+
+@@ -303,6 +304,8 @@ qemu_irq *ppcuic_init (CPUPPCState *env, qemu_irq *irqs,
+     ppcuic_t *uic;
+     int i;
+ 
 +    qdev_warn_deprecated_function_used();
 +
-     s->address_space = address_space;
-     s->main_mem = main_mem;
-     s->main_mem_ram_ptr = memory_region_get_ram_ptr(main_mem);
-diff --git a/hw/riscv/sifive_uart.c b/hw/riscv/sifive_uart.c
-index 9350482662..1a5890d5f7 100644
---- a/hw/riscv/sifive_uart.c
-+++ b/hw/riscv/sifive_uart.c
-@@ -25,6 +25,7 @@
- #include "hw/hw.h"
- #include "hw/irq.h"
- #include "hw/riscv/sifive_uart.h"
-+#include "hw/qdev-deprecated.h"
- 
- /*
-  * Not yet implemented:
-@@ -183,6 +184,9 @@ SiFiveUARTState *sifive_uart_create(MemoryRegion *address_space, hwaddr base,
-     Chardev *chr, qemu_irq irq)
+     uic = g_malloc0(sizeof(ppcuic_t));
+     uic->dcr_base = dcr_base;
+     uic->irqs = irqs;
+@@ -647,6 +650,8 @@ void ppc4xx_sdram_init (CPUPPCState *env, qemu_irq irq, int nbanks,
  {
-     SiFiveUARTState *s = g_malloc0(sizeof(SiFiveUARTState));
-+
+     ppc4xx_sdram_t *sdram;
+ 
 +    qdev_warn_deprecated_function_used();
 +
-     s->irq = irq;
-     qemu_chr_fe_init(&s->chr, chr, &error_abort);
-     qemu_chr_fe_set_handlers(&s->chr, uart_can_rx, uart_rx, uart_event,
+     sdram = g_malloc0(sizeof(ppc4xx_sdram_t));
+     sdram->irq = irq;
+     sdram->nbanks = nbanks;
+@@ -908,6 +913,8 @@ void ppc4xx_mal_init(CPUPPCState *env, uint8_t txcnum, uint8_t rxcnum,
+     ppc4xx_mal_t *mal;
+     int i;
+ 
++    qdev_warn_deprecated_function_used();
++
+     assert(txcnum <= 32 && rxcnum <= 32);
+     mal = g_malloc0(sizeof(*mal));
+     mal->txcnum = txcnum;
 -- 
 2.21.3
 
