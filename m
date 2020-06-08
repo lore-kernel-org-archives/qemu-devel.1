@@ -8,74 +8,73 @@ X-Spam-Status: No, score=-1.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C23A5C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 09:26:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F04D4C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 09:28:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8E7BB20760
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 09:26:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B9837206A4
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 09:28:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Rcp6sIqV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E7BB20760
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qMWT1xnQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9837206A4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52350 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55040 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jiE3W-0006sy-RP
-	for qemu-devel@archiver.kernel.org; Mon, 08 Jun 2020 05:26:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48038)
+	id 1jiE55-00088U-1D
+	for qemu-devel@archiver.kernel.org; Mon, 08 Jun 2020 05:28:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48204)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jcmvbkbc@gmail.com>)
- id 1jiE2l-0006Sk-C3; Mon, 08 Jun 2020 05:26:11 -0400
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:40946)
+ id 1jiE4M-0007V1-0F; Mon, 08 Jun 2020 05:27:50 -0400
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:37661)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <jcmvbkbc@gmail.com>)
- id 1jiE2k-0008Bn-Of; Mon, 08 Jun 2020 05:26:11 -0400
-Received: by mail-pl1-x644.google.com with SMTP id t16so6425974plo.7;
- Mon, 08 Jun 2020 02:26:09 -0700 (PDT)
+ id 1jiE4L-0008T5-D2; Mon, 08 Jun 2020 05:27:49 -0400
+Received: by mail-pf1-x443.google.com with SMTP id j1so8124945pfe.4;
+ Mon, 08 Jun 2020 02:27:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=/66CzN83XjT6UKheMQseDyISQ3oxqXewkdQNbT+2JuM=;
- b=Rcp6sIqV45tkkRXtsa1NQNnrvPISXYcsdoSa8MelQ22EWQIzun3WjSTit5YZMziWtj
- Rfp1ozb7kwwzj2dAV/5jt50Sehx45JpO87XtMs6NC28j+UeDCMIxmMkJwmifbHibgFOF
- XL136e6LbuT8xL7lvhFp6K/gg781VQ5x4OA7dLKYHEqT+fs71Ht7+0TRdkr7XI84H5No
- cwhBwTcKnntEGRO57mQcip7+OkrIn072ltEYOHS9SF5me0XmZBKvCtegU2ry+4rH/Itn
- lxIFE7LSzrGJqnSNeZK2pQTXpG66l9mj+Uf+hSPbJSGB0UsI2lryZd3I78kut83NWWrk
- kTfA==
+ bh=vV4fZGfYJ4eRcrwexfDLpAIPwReEjEGNDhORSq39EoI=;
+ b=qMWT1xnQ2Ek/d41+2Oz6s6dzsjc1ad/1p0J7SirAtaGVYjAZwfWwWl+KFuZSOMLs3O
+ 8vnDROaCY7hmqFFMoaP8enBCN5s0tRiYaMaKTBBqrJ4AEwxnzSnasDADXokjcVdHl3xZ
+ FDMa8MP9yf1FztKItmwGS5g0GrNOdVW5mjrwB0vgIcHipLossp6kfZy6BDQ6lW3b15XA
+ WHiaKEJbg2cirM1D0Nz1lK50lP7uiV73eUs+zvyDSMDYVeL0xIlsURki5IKmop3HcsQC
+ 2w/79gOFepdCo+QebRKcI6OvuzdZ+Tk1fADaSrGHMORya6pR3Pvw2Iz1y9UNrjngVED/
+ W3qA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=/66CzN83XjT6UKheMQseDyISQ3oxqXewkdQNbT+2JuM=;
- b=GHZfK22rTrzaLCf4R4Iw1fvbcNIxPTvCQDH4ySHcj6GTeW+bQpgYNU/dZ9echxfjIF
- QY/a/FChvSrgUWTJEw4DGlqtfjB9wB/gFddcU9GDlfWI4+J152s+CRa3LPEDaESSGV5C
- fGW86xVDGDrXR7VJMP77bTobkfvBFI6GmaINNpy2o0C2wL9jX075w8OQKKLYIOi+ugPC
- gF8632vCuvDOuQopO0M0hCoQkuHLhClArz/Lr0tBYzY/2ZuKGHAfS6wR6jF7oIYqGF4F
- F4+U/jlZbr8Ou/bmicnR09DxB8xGkrCkcfdhHp9pfnE7pDleaHGOSVr6VLsUdmYln0eK
- 8eog==
-X-Gm-Message-State: AOAM531g2M58HS9r3H7kYz0G/18xYBfu3kK10g/B1wGdOxkI1loHu1fr
- IjrcFR1+l6R/EFgMQ/v6CoSJRmRRAgfCqTMm1Y4=
-X-Google-Smtp-Source: ABdhPJxPCMdxhzqCXOoZltxeiE2rn3B21lz+7h6n5hJOXWw2aXzN/ovKIR1g2ftTZAU4sn+uhQkOOwQ6PIv3au3Wmk0=
-X-Received: by 2002:a17:90b:3755:: with SMTP id
- ne21mr3217865pjb.7.1591608368634; 
- Mon, 08 Jun 2020 02:26:08 -0700 (PDT)
+ bh=vV4fZGfYJ4eRcrwexfDLpAIPwReEjEGNDhORSq39EoI=;
+ b=m+EiDhm28F+U6j3Q+OFP60P3sLBD0M/NeGdnj5zMoEF1p/ht1FrFhQuVtqW8EoZ90q
+ Qb9bUEJemRdkXFqTFHHX5U4a2zIItskyM43mv8rdhbCOXedkgDLNjp1pL1RdtIpxHBBB
+ KdlWxTW7PdG3odZ6841+1QdVRVoRHX4koVaiY76IAqTv9YFmpaJ1Xiq+D4u+CrYNdPv3
+ c5KbrpYHN5qFLM4mKfK2y+GEiiuIqJAlMXHMA+TGgP35qt2E1HnTZl0ulkwHkxT2FhpI
+ M7+iMb6A9a8GFxJWGhlkpH8lWTMYQPOdexM6a8cbEh2jrCcnomAakU6Pv7TmSYZ6+sFZ
+ JVyg==
+X-Gm-Message-State: AOAM531V6uf/W4qGVAjRPqc7ywVGMn9NdHyfx6v4JnBDmkRLCkTHuMsi
+ 4e6X2RvNAP92p0YgirSRGYASx+DiG8yE4WCTV5o=
+X-Google-Smtp-Source: ABdhPJxZdVvHKBP5SKFgOE+u46iVSD2aT941cvuMRffRZsa6epwruTrkE6TEliqEa+iVAfj56FlPnRHHqwPZhZzXSOw=
+X-Received: by 2002:a62:3645:: with SMTP id d66mr7504745pfa.275.1591608467635; 
+ Mon, 08 Jun 2020 02:27:47 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200608091508.19838-1-f4bug@amsat.org>
- <20200608091508.19838-2-f4bug@amsat.org>
-In-Reply-To: <20200608091508.19838-2-f4bug@amsat.org>
+ <20200608091508.19838-3-f4bug@amsat.org>
+In-Reply-To: <20200608091508.19838-3-f4bug@amsat.org>
 From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Mon, 8 Jun 2020 02:25:57 -0700
-Message-ID: <CAMo8BfKyP8YFqgfT1QfJJQO0rdYOMNjwpq5_OCJr1cMhmPhomQ@mail.gmail.com>
-Subject: Re: [PATCH 1/2] hw/net/opencores_eth: Use definitions instead of
- magic values
+Date: Mon, 8 Jun 2020 02:27:36 -0700
+Message-ID: <CAMo8BfLJrrAM9EL80SF36qLTO0Kut8ODOuDN5kC1LoVNjBKEYA@mail.gmail.com>
+Subject: Re: [PATCH 2/2] hw/net/opencores_eth: Remove unnecessary address
+ masking
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::644;
- envelope-from=jcmvbkbc@gmail.com; helo=mail-pl1-x644.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::443;
+ envelope-from=jcmvbkbc@gmail.com; helo=mail-pf1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -15
@@ -107,13 +106,22 @@ Sender: "Qemu-devel"
 On Mon, Jun 8, 2020 at 2:15 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org=
 > wrote:
 >
-> Use definitions from "hw/net/mii.h".
-> This also helps when using git-grep.
+> The memory region is limited to 1 KiB, so the address is
+> garantied to be in that range. No need to mask.
+>
+>   711 static const MemoryRegionOps open_eth_desc_ops =3D {
+>   712     .read =3D open_eth_desc_read,
+>   713     .write =3D open_eth_desc_write,
+>   714 };
+>   ...
+>   725     memory_region_init_io(&s->desc_io, OBJECT(dev),
+>   725                           &open_eth_desc_ops, s,
+>   726                           "open_eth.desc", 0x400);
 >
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 > ---
->  hw/net/opencores_eth.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  hw/net/opencores_eth.c | 2 --
+>  1 file changed, 2 deletions(-)
 
 Acked-by: Max Filippov <jcmvbkbc@gmail.com>
 
