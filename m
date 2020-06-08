@@ -7,77 +7,77 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45793C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 16:28:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AE72C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 16:30:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 100D92053B
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 16:28:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CAD2F2053B
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 16:30:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ivqz1jTq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 100D92053B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="azhV8+nq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAD2F2053B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49482 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54934 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jiKdb-00026s-5n
-	for qemu-devel@archiver.kernel.org; Mon, 08 Jun 2020 12:28:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38202)
+	id 1jiKf1-0004LZ-Sj
+	for qemu-devel@archiver.kernel.org; Mon, 08 Jun 2020 12:30:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38440)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jiKEw-0007Fz-IO
- for qemu-devel@nongnu.org; Mon, 08 Jun 2020 12:03:10 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54811
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jiKFx-00089T-Gm
+ for qemu-devel@nongnu.org; Mon, 08 Jun 2020 12:04:14 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40496
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jiKEv-000850-08
- for qemu-devel@nongnu.org; Mon, 08 Jun 2020 12:03:10 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jiKFv-0008HS-I5
+ for qemu-devel@nongnu.org; Mon, 08 Jun 2020 12:04:13 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591632188;
+ s=mimecast20190719; t=1591632248;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=RKgZ6rumXDcRDPMbmvtvFrKHcFm+r1xyGKVfqjvJc6Q=;
- b=ivqz1jTqv9IYrY1gIvp+b1sKDNB+kOzgs93N3bb1vrDkgfIVpGisduxtBL8csfDWmf81DB
- DBy2UIeGK45kCykB1TMREe2yH6246FCbWAYFOhvESbYWWeePCmy6/f2/MuXh0O8SABkRHE
- zt5ycnjB14ikafjtF+YFlPo9XVTs5Ig=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-255-zb57yCbWO2a-QijHm9dYRQ-1; Mon, 08 Jun 2020 12:03:06 -0400
-X-MC-Unique: zb57yCbWO2a-QijHm9dYRQ-1
-Received: by mail-wr1-f69.google.com with SMTP id c14so7303985wrw.11
- for <qemu-devel@nongnu.org>; Mon, 08 Jun 2020 09:03:06 -0700 (PDT)
+ bh=1YHmjQuhKrVQhVboVAQhCqKWsJQjJvIRsihRuyQB5QA=;
+ b=azhV8+nqZYNRIe//txgnsYcjhvqFe0DrKoRN3XRLcd4Bu7j+iY1CuUiPAi3iYPirOu5/K9
+ N9SD1gAVlfUPYR4xzCASlWjQk+c6NQjJ0Q8KvzrELdABD8pppSvxt+hQx2zy/WGtGkGoKG
+ 2QMnMBz5eCm0z/v3z4UTp4XrmEaSSGs=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-223-wnrGQVfTNj6WDQDpS-M9ig-1; Mon, 08 Jun 2020 12:04:06 -0400
+X-MC-Unique: wnrGQVfTNj6WDQDpS-M9ig-1
+Received: by mail-wm1-f70.google.com with SMTP id j128so8670wmj.6
+ for <qemu-devel@nongnu.org>; Mon, 08 Jun 2020 09:04:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=RKgZ6rumXDcRDPMbmvtvFrKHcFm+r1xyGKVfqjvJc6Q=;
- b=mGDasqiErwki8nmFHCMbSQowpghvZGLN44lJrPMQm9vzgQMU3OKFzNw1aSNZ+5iL5A
- iwQ1obLq0TuqkXHYzv+LIx4dXoeRBt/4yjKCRXegS9ps91wndDDK/lSfdUVwN4XM+zmc
- +xKcycdf0RhLV58PyIy8Ze6h/VBpFoF9eyfq8bQ/awt2qAgaj6e2CBdY1YbzN86MVh0F
- oGhzFhwDJhPUDupgE+qVqWUdQBJmToy7EzDYRPAeuSZLH5WgPBMCpe6OLTTlAJ7wNTL+
- 5PTQMRCjl8u/6EaYnTFZMLrb1pWRqAAwgX4SQckx1nRvG1NezZAX2q5uD26SvuzdC9aG
- mjjg==
-X-Gm-Message-State: AOAM53184rCM70q2/Rmf/tEH+Sk9gImQIbSDtwJgrtvs1utGmPnFcQHZ
- ha7XRdE2KEPzS+3KO8VTQSb5pL3PpYzsLji9XcU9juMGesf3MtGcG7G8OOmH+v6yvyt8Py7zvns
- ZY8D9NZnVWWAfOpY=
-X-Received: by 2002:a1c:a906:: with SMTP id s6mr21517wme.171.1591632185577;
- Mon, 08 Jun 2020 09:03:05 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzU3FFzPx8GJONXk2lb2PRS9hlQzh1ioPeLu4txPuU4I7Pa7KejCTY0NavLN6WE+tDOlF/rwQ==
-X-Received: by 2002:a1c:a906:: with SMTP id s6mr21489wme.171.1591632185399;
- Mon, 08 Jun 2020 09:03:05 -0700 (PDT)
+ bh=1YHmjQuhKrVQhVboVAQhCqKWsJQjJvIRsihRuyQB5QA=;
+ b=EURwtq6qyTvg4EIGOeW0sBnaHPlcvRGCc7Ir3MUR8s5cELj/kLPTnSCVL+QFw1zAKl
+ j1f2Vk7kmw28x4vQf+l6z8gyB+WgJMg4MLDbe70MnKzMohQka/RsZ8BaOeovsYGDAXho
+ MlA18r3kbeFAdX3EVa9y/icKvEsAqQggBZiOtH8RlxSKb9IPuQ+k/zKK/PPXMNDqT7cf
+ Vzx/+UIvbNq9sw94mG9e7dV4N0DCV9Qh9rtJNGCWhmBk2TiLhgqrpUet0kqfagV5OEb0
+ dGQSUkLNQDP3MWKgy+B6W+FF2+s9EvWsrc1z1TT3SlhabLXZYraXdlNlS5PLYErLh3n5
+ 70mQ==
+X-Gm-Message-State: AOAM530fT0iQ7Y/G/verma058gxWUPv1Z7WLeYjGL0DO4eWndkdiQAf5
+ 5faz7d7h/7ncufGCpjza9MUOxCyquAexqNdPboR4FDjG8ABZZ3mjh+OIwqgINB687g8dKtL4yM7
+ oxoLaOtmV8Cmzz88=
+X-Received: by 2002:adf:e68a:: with SMTP id r10mr23902508wrm.384.1591632244560; 
+ Mon, 08 Jun 2020 09:04:04 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyU7/QCokRt2M0EtovQUdkQHNPZYj9jN1RqUTvUD0f6M2vtgvgHtmb2W1P0W/noN9Fx2nTHYQ==
+X-Received: by 2002:adf:e68a:: with SMTP id r10mr23902460wrm.384.1591632244335; 
+ Mon, 08 Jun 2020 09:04:04 -0700 (PDT)
 Received: from localhost.localdomain
  (181.red-88-10-103.dynamicip.rima-tde.net. [88.10.103.181])
- by smtp.gmail.com with ESMTPSA id g25sm30434wmh.18.2020.06.08.09.03.03
+ by smtp.gmail.com with ESMTPSA id k17sm177411wrl.54.2020.06.08.09.04.02
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 08 Jun 2020 09:03:04 -0700 (PDT)
+ Mon, 08 Jun 2020 09:04:03 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC PATCH 24/35] hw/misc/cbus: Emit warning when old code is used
-Date: Mon,  8 Jun 2020 18:00:33 +0200
-Message-Id: <20200608160044.15531-25-philmd@redhat.com>
+Subject: [RFC PATCH 34/35] hw/usb/hcd-musb: Emit warning when old code is used
+Date: Mon,  8 Jun 2020 18:00:43 +0200
+Message-Id: <20200608160044.15531-35-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200608160044.15531-1-philmd@redhat.com>
 References: <20200608160044.15531-1-philmd@redhat.com>
@@ -140,30 +140,30 @@ This code hasn't been QOM'ified yet. Warn the user.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- hw/misc/cbus.c | 3 +++
+ hw/usb/hcd-musb.c | 3 +++
  1 file changed, 3 insertions(+)
 
-diff --git a/hw/misc/cbus.c b/hw/misc/cbus.c
-index 3c3721ad2d..24e197684f 100644
---- a/hw/misc/cbus.c
-+++ b/hw/misc/cbus.c
+diff --git a/hw/usb/hcd-musb.c b/hw/usb/hcd-musb.c
+index c29fbef6fc..9b3cf1ca8f 100644
+--- a/hw/usb/hcd-musb.c
++++ b/hw/usb/hcd-musb.c
 @@ -25,6 +25,7 @@
+ #include "hw/usb.h"
  #include "hw/irq.h"
- #include "hw/misc/cbus.h"
- #include "sysemu/runstate.h"
+ #include "hw/hw.h"
 +#include "hw/qdev-deprecated.h"
  
- //#define DEBUG
- 
-@@ -135,6 +136,8 @@ CBus *cbus_init(qemu_irq dat)
- {
-     CBusPriv *s = (CBusPriv *) g_malloc0(sizeof(*s));
+ /* Common USB registers */
+ #define MUSB_HDRC_FADDR		0x00	/* 8-bit */
+@@ -377,6 +378,8 @@ struct MUSBState *musb_init(DeviceState *parent_device, int gpio_base)
+     MUSBState *s = g_malloc0(sizeof(*s));
+     int i;
  
 +    qdev_warn_deprecated_function_used();
 +
-     s->dat_out = dat;
-     s->cbus.clk = qemu_allocate_irq(cbus_clk, s, 0);
-     s->cbus.dat = qemu_allocate_irq(cbus_dat, s, 0);
+     for (i = 0; i < musb_irq_max; i++) {
+         s->irqs[i] = qdev_get_gpio_in(parent_device, gpio_base + i);
+     }
 -- 
 2.21.3
 
