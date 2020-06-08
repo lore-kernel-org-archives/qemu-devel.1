@@ -2,93 +2,86 @@ Return-Path: <SRS0=zEF8=7V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D27DC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 16:35:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94D5AC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 16:35:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6B92C2053B
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 16:35:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6010A2053B
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 16:35:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X7vMC+Hx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B92C2053B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kS58IrIM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6010A2053B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47358 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47706 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jiKkb-0004nB-Jm
-	for qemu-devel@archiver.kernel.org; Mon, 08 Jun 2020 12:35:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39474)
+	id 1jiKkd-0004wB-LM
+	for qemu-devel@archiver.kernel.org; Mon, 08 Jun 2020 12:35:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39404)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <atar4qemu@gmail.com>)
- id 1jiKQO-0007so-Af; Mon, 08 Jun 2020 12:15:00 -0400
-Received: from mail-il1-x144.google.com ([2607:f8b0:4864:20::144]:35596)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jiKPz-00070x-C9
+ for qemu-devel@nongnu.org; Mon, 08 Jun 2020 12:14:35 -0400
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:39136)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <atar4qemu@gmail.com>)
- id 1jiKQ9-00023J-QF; Mon, 08 Jun 2020 12:14:59 -0400
-Received: by mail-il1-x144.google.com with SMTP id l6so17362743ilo.2;
- Mon, 08 Jun 2020 09:14:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jiKPy-00022A-1L
+ for qemu-devel@nongnu.org; Mon, 08 Jun 2020 12:14:34 -0400
+Received: by mail-oi1-x244.google.com with SMTP id d67so15807656oig.6
+ for <qemu-devel@nongnu.org>; Mon, 08 Jun 2020 09:14:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=V6LhXVUzdTPvGQewx4yDmhRKTL+/eIB/as3rkKXCUqs=;
- b=X7vMC+HxrOcEYok6nYcScK1eCAOjDYE1W6ZjjO6VLb27cGHKnsahXN6I/9GGL0j2Wy
- 84l2wSsXuZwy0gX+DsgblBZ/mmKxcB7n61B4WlyCs6bD14zeVGnVmkBFP5nrkzyQxqwz
- jOn42KDEQw4cxxoXhd58RoMQyjT5PCL9EcfJBtBddoi3JKHexDJSRbDXqu8CS2O6981q
- glQf3eSlNokhFZL/tVN2mURZNV5ENxAcUuMr7oTk0Xuaa1FaQY1Kz9tFdCMfRwS1uX+t
- jV4v7+ho0jzEvWQ+jAvi6p7YPBwc6K9EdQLLPexsA8IP1AZe4WDWr5frX2bS//FeH9GA
- g8Yg==
+ bh=/+4QjpT+tPPNmlVcx3DdQ4kyskVFCMtysHbcHTNYe74=;
+ b=kS58IrIM5lez6Lj5rtZnhJPFBV+K9srHQMqeFSm7Z+xDcxy5VB1+sG7mD7OgAU3Xlc
+ pqtBn6vqhsdiy+5UWO9tA5v94lie87F6qtEtU8Oox/I3ezGt7DNwpHBQTSE1GTX+xmXw
+ k3pbE1MrKcyt2zqAeLEsEhQOPlnINXANgWN9+eUAWrJHhjMAubtk/mMoq4Yz4NnaAb+E
+ qok7pIPLclNsBFO2iEIhsEcGPn4rTChUJWZlcplpcZ+BJti3DUIyDl7hvfGaH3LbrDMV
+ sQ7C65a11jICToH03NJRuGZhykKF9IAflFSwaOXhWoK0BC8Ws5uLBhYv++PjUzYGuCna
+ Iofw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=V6LhXVUzdTPvGQewx4yDmhRKTL+/eIB/as3rkKXCUqs=;
- b=B5nOpH6aawnmosqsqDaX1dA92ovDZql5CXvtaPH16iKw+STAMK2JMaI2TXNQFgg3Zl
- SoIGrhaKFVSX4WOJrWh4WEms9o3IAGIZ1CQMbdAuDUqs5ZDGpyXbjClrzpw+ZyLbRhM0
- ygLDKKHFsIaAoKtfSTvcvcqLdRH9O/ASa8OxH5StwH7gxXgeQYqWSrEvmbM4zrQihfpY
- lFUKGlsKHcBSVFnMbz5in1ZWaJuKubximt8CB0j2BF8iR0FjXOrj6+beBnrauNvJEjJp
- f87Cqrf83f+jqoUBusMMmBcsDVnVEhwgDXvUGud7H4saJbDm05z8xylw7d5y37uF5htu
- yUig==
-X-Gm-Message-State: AOAM531aLI80dCC6lVR46J1v2RhnGfyk8wB+l8ciT48z/kN6Fu4DlULe
- OepM71YMXUNo0n33HJFWEtXQUei3L/ttInPJ3AA=
-X-Google-Smtp-Source: ABdhPJyc6eJuGXKyL6nEvYcJLnglJ2gO2yuexwjLvtnstyMNdOc2FO9GJ8LDoiZSaOuM0tY+098yARMvJXUIGfLqaic=
-X-Received: by 2002:a92:5b99:: with SMTP id c25mr22790499ilg.42.1591632884286; 
- Mon, 08 Jun 2020 09:14:44 -0700 (PDT)
+ bh=/+4QjpT+tPPNmlVcx3DdQ4kyskVFCMtysHbcHTNYe74=;
+ b=RTjKlMcRbMZjX7uwgsU//gqkZoaYTaf6nMjcgek8Owk4Gauh3CsvgZQ+2QJBsGZ/v0
+ sTgOVYdCQBbwnZ55CIJxQ9mIjytiqEKppO6stkowTdsU8O2zGuuMAL4A4BEu7KAVshy3
+ J7okjkBbkmG0GirYqZsjUflVUalQt9WHU4ydSAgUuKpBSmDW4nBAPTheVm9rbDeRuXo8
+ AGQSqDnj0W6pb4Z6lYvwI6imJKYHQ50U+GJ+pqb/+gXlmyboxcytAC0pSNhqcTUjGbCJ
+ cwOHSZUTh40TJcwVoRO1Yl9V8nBvbkA/hAzSl7oya7ayEUNclmaiG8sRx+8RU4tTLvKt
+ yO2Q==
+X-Gm-Message-State: AOAM5308JMKx1CDjjD6XF+XqaRYXiG594P8NMYLlymPzyvdBfbNcj155
+ F1bmQdzVE9Pb42r+ndy58azCKWFoyyG3x99U15XlVA==
+X-Google-Smtp-Source: ABdhPJxY837bRoD3+f6ZcPgGbh8vCM84Cl4LR/XbymbYhKCUqj4k8XH49NE9YAo4JBnuJUGXAVD6K2cFlG42HGdNVeI=
+X-Received: by 2002:aca:568c:: with SMTP id k134mr107477oib.48.1591632872829; 
+ Mon, 08 Jun 2020 09:14:32 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200331105048.27989-1-f4bug@amsat.org>
- <81737d76-06c6-4c83-1287-b0d14db4ce2f@amsat.org>
- <989bf2f5-0e23-f9c3-e9e1-0bd8c03f3231@adacore.com>
- <1b7a4c63-5a31-6efe-d807-7092e3ee0ffb@amsat.org>
- <230dbf6b-120a-f1f0-d48d-9fa4a04e05cd@adacore.com>
- <23588fda-b95b-45a9-b788-e846d26a3bc3@amsat.org>
- <7f673b61-7565-f79a-0ec6-043c44d1df77@amsat.org>
- <08b73f34-4cab-1133-e5e5-5b1e9fc7b5d0@adacore.com>
- <344c9260-e448-feea-3b37-7860dd09cd8a@amsat.org>
- <56e92e1c-6f89-5359-53bc-57c529743d5e@amsat.org>
-In-Reply-To: <56e92e1c-6f89-5359-53bc-57c529743d5e@amsat.org>
-From: Artyom Tarasenko <atar4qemu@gmail.com>
-Date: Mon, 8 Jun 2020 18:14:32 +0200
-Message-ID: <CACXAS8BJ7wfgAoe1WDSBkHXfsxymM3+a2GsZ28q_W-eq5fM0Vg@mail.gmail.com>
-Subject: Re: [PATCH 0/7] hw/sparc/leon3: Few fixes and disable HelenOS test
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+References: <20200608160044.15531-1-philmd@redhat.com>
+In-Reply-To: <20200608160044.15531-1-philmd@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 8 Jun 2020 17:14:21 +0100
+Message-ID: <CAFEAcA_Ni8=mvyfG=9Aa=ym-ae9HpP8J8B0ekm8=SN2WgZ6_vA@mail.gmail.com>
+Subject: Re: [RFC PATCH 00/35] hw/qdev: Warn when using pre-qdev/QOM devices
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::144;
- envelope-from=atar4qemu@gmail.com; helo=mail-il1-x144.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::244;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x244.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,159 +94,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- QEMU Trivial <qemu-trivial@nongnu.org>,
+Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
  Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- qemu-devel <qemu-devel@nongnu.org>, Fabien Chouteau <chouteau@adacore.com>,
- KONRAD Frederic <frederic.konrad@adacore.com>,
- Fred Konrad <konrad@adacore.com>, Jiri Gaisler <jiri@gaisler.se>,
- Richard Henderson <rth@twiddle.net>
+ QEMU Developers <qemu-devel@nongnu.org>, Max Filippov <jcmvbkbc@gmail.com>,
+ Alistair Francis <Alistair.Francis@wdc.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Stefano Stabellini <sstabellini@kernel.org>, Paul Durrant <paul@xen.org>,
+ Magnus Damm <magnus.damm@gmail.com>, Markus Armbruster <armbru@redhat.com>,
+ Anthony Perard <anthony.perard@citrix.com>,
+ =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>, qemu-arm <qemu-arm@nongnu.org>,
+ "open list:X86" <xen-devel@lists.xenproject.org>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>, Stafford Horne <shorne@gmail.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>, Richard Henderson <rth@twiddle.net>,
+ "Daniel P . Berrange" <berrange@redhat.com>, Thomas Huth <huth@tuxfamily.org>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Michael Walle <michael@walle.cc>, qemu-ppc <qemu-ppc@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jun 8, 2020 at 5:20 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org=
+On Mon, 8 Jun 2020 at 17:00, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com=
 > wrote:
 >
-> On 5/26/20 11:50 AM, Philippe Mathieu-Daud=C3=A9 wrote:
-> > On 5/25/20 1:02 PM, Fred Konrad wrote:
-> >> Sorry Philippe I missed that.
-> >>
-> >> Would be happy to do a PR if needed but:
-> >>   * I never did that.
-> >>   * Looking at https://wiki.qemu.org/Contribute/SubmitAPullRequest, I
-> >> don't have
-> >>     the signed GPG key either.
-> >
-> > Thanks Fred for following this series.
-> >
-> > I am not insisting for you to do the pull request, I was waiting for
-> > Artyom (sparc32) and Mark (sparc64) who usually handle the pull request=
-s.
-> >
-> > Artyom seems busy lately.
->
-> Artyom, if you agree I can send a pullreq with this series and the
-> empty_slot one.
->
+> Based on today's IRC chat, this is a trivial RFC series
+> to anotate pre-qdev/QOM devices so developers using them
+> without knowing they are not QOM'ified yet can realize
+> it and convert them if they have time.
 
-Yes, please.
-Artyom
+What mechanism did you use for identifying non-QOM devices?
 
-> >
-> > Mark, do you plan to send a hw/sparc* pull request soon? Do you prefer =
-I
-> > ask to trivial@ for this series?
-> >
-> > FYI there is another sparc32 candidate patch:
-> > https://www.mail-archive.com/qemu-devel@nongnu.org/msg701850.html
-> >
-> > Regards,
-> >
-> > Phil.
-> >
-> >>
-> >> Cheers,
-> >> Fred
-> >>
-> >> Le 5/23/20 =C3=A0 7:26 PM, Philippe Mathieu-Daud=C3=A9 a =C3=A9crit :
-> >>> ping?
-> >>>
-> >>> On 5/11/20 9:03 AM, Philippe Mathieu-Daud=C3=A9 wrote:
-> >>>> On 4/14/20 12:00 PM, KONRAD Frederic wrote:
-> >>>>> Le 4/13/20 =C3=A0 11:07 PM, Philippe Mathieu-Daud=C3=A9 a =C3=A9cri=
-t :
-> >>>>>> [Cc'ing Peter]
-> >>>>>>
-> >>>>>> On 4/13/20 12:12 PM, KONRAD Frederic wrote:
-> >>>>>>> Le 4/11/20 =C3=A0 7:30 PM, Philippe Mathieu-Daud=C3=A9 a =C3=A9cr=
-it :
-> >>>>>>>> On 3/31/20 12:50 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> >>>>>>>>> Philippe Mathieu-Daud=C3=A9 (7):
-> >>>>>>>>>      hw/misc/grlib_ahb_apb_pnp: Avoid crash when writing to AHB=
- PnP
-> >>>>>>>>>        registers
-> >>>>>>>>>      hw/misc/grlib_ahb_apb_pnp: Fix AHB PnP 8-bit accesses
-> >>>>>>>>
-> >>>>>>>> Ping ^^^ for 5.0?
-> >>>>>>>
-> >>>>>>> Hi Philippe,
-> >>>>>>>
-> >>>>>>> You already have my rb tag for those one, and IMHO they should be
-> >>>>>>> good
-> >>>>>>> candidate
-> >>>>>>> for 5.0 (if it's not too late).
-> >>>>>>
-> >>>>>> Yes, thanks for the reviews. I see Mark Cave-Ayland merged this fi=
-le
-> >>>>>> first, but you are listed as maintainer :) I was hoping you could
-> >>>>>> send a
-> >>>>>> pull request.
-> >>>>>
-> >>>>> Yes that's usually Mark who take the patches, sorry I didn't get it=
-.
-> >>>>
-> >>>> No worries. As there are other sparc64 patches on the list, maybe Ma=
-rk
-> >>>> will prepare a pull request now.
-> >>>>
-> >>>>>
-> >>>>>>
-> >>>>>> $ scripts/get_maintainer.pl -f hw/misc/grlib_ahb_apb_pnp.c
-> >>>>>> Fabien Chouteau <chouteau@adacore.com> (maintainer:Leon3)
-> >>>>>> KONRAD Frederic <frederic.konrad@adacore.com> (maintainer:Leon3)
-> >>>>>> qemu-devel@nongnu.org (open list:All patches CC here)
-> >>>>>>
-> >>>>>
-> >>>>>> This is a bug but not 'security critical', so it might wait 5.1 an=
-d go
-> >>>>>> via qemu-trivial tree.
-> >>>>>
-> >>>>> Well let's do that then if you're ok.
-> >>>>
-> >>>> OK, then ping? :)
-> >>>>
-> >>>>>
-> >>>>> Best Regards,
-> >>>>> Fred
-> >>>>>
-> >>>>>>
-> >>>>>> Regards,
-> >>>>>>
-> >>>>>> Phil.
-> >>>>>>
-> >>>>>>>
-> >>>>>>> Cheers,
-> >>>>>>> Fred
-> >>>>>>>
-> >>>>>>>>
-> >>>>>>>>>      hw/misc/grlib_ahb_apb_pnp: Add trace events on read access=
-es
-> >>>>>>>>>      hw/timer/grlib_gptimer: Display frequency in decimal
-> >>>>>>>>>      target/sparc/int32_helper: Remove DEBUG_PCALL definition
-> >>>>>>>>>      target/sparc/int32_helper: Extract and use excp_name_str()
-> >>>>>>>>>
-> >>>>>>>>>     hw/misc/grlib_ahb_apb_pnp.c             | 24
-> >>>>>>>>> ++++++++++++++++++++++--
-> >>>>>>>>>     target/sparc/int32_helper.c             | 23
-> >>>>>>>>> ++++++++++++-----------
-> >>>>>>>>>     hw/misc/trace-events                    |  4 ++++
-> >>>>>>>>>     hw/timer/trace-events                   |  2 +-
-> >>>>>>>>>     tests/acceptance/machine_sparc_leon3.py |  4 ++++
-> >>>>>>>>>     5 files changed, 43 insertions(+), 14 deletions(-)
-> >>>>>>>>>
-> >>>>>>>
-> >>>>>
-> >>>>
-> >>
-> >
-
-
-
---=20
-Regards,
-Artyom Tarasenko
-
-SPARC and PPC PReP under qemu blog: http://tyom.blogspot.com/search/label/q=
-emu
+thanks
+-- PMM
 
