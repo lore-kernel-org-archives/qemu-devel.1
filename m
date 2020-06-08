@@ -2,90 +2,91 @@ Return-Path: <SRS0=zEF8=7V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81A8BC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 19:32:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D23D9C433E1
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 19:34:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 485D320760
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 19:32:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9B16920760
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 19:34:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dOhhi4O2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 485D320760
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Eevd0LK6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B16920760
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49500 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51706 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jiNVS-0002Yb-I3
-	for qemu-devel@archiver.kernel.org; Mon, 08 Jun 2020 15:32:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35094)
+	id 1jiNX4-0003YN-Tu
+	for qemu-devel@archiver.kernel.org; Mon, 08 Jun 2020 15:34:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35186)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <atar4qemu@gmail.com>)
- id 1jiNU0-000270-Bq
- for qemu-devel@nongnu.org; Mon, 08 Jun 2020 15:30:56 -0400
-Received: from mail-io1-xd44.google.com ([2607:f8b0:4864:20::d44]:35781)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <atar4qemu@gmail.com>)
- id 1jiNTz-00020e-HY
- for qemu-devel@nongnu.org; Mon, 08 Jun 2020 15:30:56 -0400
-Received: by mail-io1-xd44.google.com with SMTP id s18so20106000ioe.2
- for <qemu-devel@nongnu.org>; Mon, 08 Jun 2020 12:30:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=9PoKUaOH7RtpGUdbKrnaj7grruo5W3hOkAboAai4o6o=;
- b=dOhhi4O2FAyNe+Ql1ZG6uEAsHS8JcUpL4V+0pkUVsUVS3Rf4ZccCpnr7y3DWOl1bT1
- KVyP6c/IkOEARE1gUQ9IEH8wDb7jnl9uQCMD5WYqq2MSjR993UeYLtohyd0Z+lLGHzZc
- keU0rXSMRd+21gWz3U5nyW3s5DwDny/OAshwIho3/uJDJqkVbkwoqIW0WC7PtxT8U4d0
- Gc0uTl0b0u8XLgjnRjQWJkkHXh/hEGRTljMOgJGc3gPg/1hnfyhivvElr+X3gBmrj1tE
- vyP/k4VzVU3C07oyGaDpl94IjuMoExAQ5ZtrML8eT149e7evd5uqAP4u3RG/tAubQ6HM
- YcNg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=9PoKUaOH7RtpGUdbKrnaj7grruo5W3hOkAboAai4o6o=;
- b=VoMUHWLUto/248UoJ3U+eeHLGoTqo+wje1fBdNpA9G3Fk7Y0vyOiummFnRiA0EGG+j
- cXIRoqW/yoWR44Qa2hlx4UgCJbSvyWLcdkbGC82cW72bJhUOmELYi6IewjiNivtA33sX
- MFeZ1HY03BqWma2J3wt8OI+vSFFTZ/LEf0UtOIrNQ+S4ih5o3R/NRMCaGyxQuCx9Lxoq
- OyGGb6xP8T2tRkmbe6J+rqr8bFTJIGJptJ+y7QOOVRg4dZNqcB6H7VKP1FutQYxKtz2+
- IHmnNN7fjSjAzjVjczAHjwEmi1guItln4i1mSMfBJJdJgVhfZA2r0P/D7KpIyB0mN2Md
- 4mFg==
-X-Gm-Message-State: AOAM531GbZITbT76mLNRRCcOcTPyQgvGhG4EABaacZZ4ChuF4samHdhf
- Sx62ryy4bPa3yHiRkEzsxEo2BgA0Okgf6YJAmOs=
-X-Google-Smtp-Source: ABdhPJzsa10YkpsNDj9O5qZgN1OYw2zsR446+A4JiJ4cdDdphOlXf7VFc2Ecz5qZ0yoWlwXZeONP5hBmqGvevcywvBI=
-X-Received: by 2002:a6b:740b:: with SMTP id s11mr21065327iog.10.1591644654442; 
- Mon, 08 Jun 2020 12:30:54 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jiNVG-0002dO-Cv
+ for qemu-devel@nongnu.org; Mon, 08 Jun 2020 15:32:17 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:24351
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jiNVE-0002Gh-TH
+ for qemu-devel@nongnu.org; Mon, 08 Jun 2020 15:32:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591644730;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=dZ+gIEfrVZuxD3Rumc95y3mwFvxZewbIxyrArW8Amos=;
+ b=Eevd0LK6BEsLvETQKNOCa9tJxgQ7ybpHJHtFmE3z7hWNQGTX6XDUIGGMMpHf3aewM2Bapp
+ Tve7PtJdBW0DXiH8fyYFnTNrQICCotkuj9HgNeTzNivKbkSNReVzoQHJu8Ex66+o3Mc9Y0
+ vahqLPsjKljXRghR9n1zvUCduCt03wY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-251-epLY38VuMHyX1LuFlE7HYw-1; Mon, 08 Jun 2020 15:32:09 -0400
+X-MC-Unique: epLY38VuMHyX1LuFlE7HYw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3362F107ACF4;
+ Mon,  8 Jun 2020 19:32:08 +0000 (UTC)
+Received: from [10.3.113.22] (ovpn-113-22.phx2.redhat.com [10.3.113.22])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A7E2D7BFE3;
+ Mon,  8 Jun 2020 19:32:07 +0000 (UTC)
+Subject: Re: [PATCH v6 5/5] iotests: Add test 291 to for qemu-img bitmap
+ coverage
+To: Kevin Wolf <kwolf@redhat.com>
+References: <20200521192137.1120211-1-eblake@redhat.com>
+ <20200521192137.1120211-6-eblake@redhat.com>
+ <20200608191704.GJ6419@linux.fritz.box>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <18425890-f6ee-3b98-a307-850c8c0ec4d0@redhat.com>
+Date: Mon, 8 Jun 2020 14:32:07 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-References: <20200608172144.20461-1-f4bug@amsat.org>
- <20200608172144.20461-2-f4bug@amsat.org>
- <696e124e-c709-7f7c-fdd0-d3d42db0ebb6@adacore.com>
-In-Reply-To: <696e124e-c709-7f7c-fdd0-d3d42db0ebb6@adacore.com>
-From: Artyom Tarasenko <atar4qemu@gmail.com>
-Date: Mon, 8 Jun 2020 21:30:43 +0200
-Message-ID: <CACXAS8DNHw7K=qwpeqO2US1gPrE6_hFEwPw9=kBxLExBEObsFQ@mail.gmail.com>
-Subject: Re: [PATCH 1/3] hw/sparc/leon3: Map the UART device unconditionally
-To: Fred Konrad <konrad@adacore.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::d44;
- envelope-from=atar4qemu@gmail.com; helo=mail-io1-xd44.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+In-Reply-To: <20200608191704.GJ6419@linux.fritz.box>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/08 05:40:44
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,73 +99,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
- Fabien Chouteau <chouteau@adacore.com>, qemu-devel <qemu-devel@nongnu.org>
+Cc: nsoffer@redhat.com, vsementsov@virtuozzo.com, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jun 8, 2020 at 7:28 PM Fred Konrad <konrad@adacore.com> wrote:
->
->
->
-> Le 6/8/20 =C3=A0 7:21 PM, Philippe Mathieu-Daud=C3=A9 a =C3=A9crit :
-> > The UART is present on the chipset regardless there is a
-> > character device connected to it. Map it unconditionally.
-> >
-> > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> > ---
-> >   hw/sparc/leon3.c | 18 ++++++++----------
-> >   1 file changed, 8 insertions(+), 10 deletions(-)
-> >
-> > diff --git a/hw/sparc/leon3.c b/hw/sparc/leon3.c
-> > index 8f024dab7b..cc55117dec 100644
-> > --- a/hw/sparc/leon3.c
-> > +++ b/hw/sparc/leon3.c
-> > @@ -339,16 +339,14 @@ static void leon3_generic_hw_init(MachineState *m=
-achine)
-> >                               0, LEON3_TIMER_IRQ, GRLIB_APBIO_AREA);
-> >
-> >       /* Allocate uart */
-> > -    if (serial_hd(0)) {
-> > -        dev =3D qdev_create(NULL, TYPE_GRLIB_APB_UART);
-> > -        qdev_prop_set_chr(dev, "chrdev", serial_hd(0));
-> > -        qdev_init_nofail(dev);
-> > -        sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, LEON3_UART_OFFSET);
-> > -        sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, cpu_irqs[LEON3_UART=
-_IRQ]);
-> > -        grlib_apb_pnp_add_entry(apb_pnp, LEON3_UART_OFFSET, 0xFFF,
-> > -                                GRLIB_VENDOR_GAISLER, GRLIB_APBUART_DE=
-V, 1,
-> > -                                LEON3_UART_IRQ, GRLIB_APBIO_AREA);
-> > -    }
-> > +    dev =3D qdev_create(NULL, TYPE_GRLIB_APB_UART);
-> > +    qdev_prop_set_chr(dev, "chrdev", serial_hd(0));
-> > +    qdev_init_nofail(dev);
-> > +    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, LEON3_UART_OFFSET);
-> > +    sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, cpu_irqs[LEON3_UART_IRQ=
-]);
-> > +    grlib_apb_pnp_add_entry(apb_pnp, LEON3_UART_OFFSET, 0xFFF,
-> > +                            GRLIB_VENDOR_GAISLER, GRLIB_APBUART_DEV, 1=
-,
-> > +                            LEON3_UART_IRQ, GRLIB_APBIO_AREA);
-> >   }
-> >
-> >   static void leon3_generic_machine_init(MachineClass *mc)
-> >
->
-> Reviewed-by: KONRAD Frederic <frederic.konrad@adacore.com>
+On 6/8/20 2:17 PM, Kevin Wolf wrote:
+> Am 21.05.2020 um 21:21 hat Eric Blake geschrieben:
+>> Add a new test covering the 'qemu-img bitmap' subcommand, as well as
+>> 'qemu-img convert --bitmaps', both added in recent patches.
+>>
+>> Signed-off-by: Eric Blake <eblake@redhat.com>
+>> Reviewed-by: Max Reitz <mreitz@redhat.com>
+>> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> 
+> This one fails for me. We need to filter out "disk size" because it
+> depends on the filesystem.
 
-Acked-by: Artyom Tarasenko <atar4qemu@gmail.com>
+Will fix. Thanks for the heads up.
 
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
-
-
---
-Regards,
-Artyom Tarasenko
-
-SPARC and PPC PReP under qemu blog: http://tyom.blogspot.com/search/label/q=
-emu
 
