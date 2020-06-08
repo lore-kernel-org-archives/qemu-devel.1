@@ -2,85 +2,85 @@ Return-Path: <SRS0=zEF8=7V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40EE9C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 14:27:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68CF7C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 14:27:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0C5172053B
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 14:27:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 325BE2053B
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 14:27:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f5K+RYPu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C5172053B
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DtTyFaKA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 325BE2053B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55532 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57978 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jiIkH-0006Eh-AN
-	for qemu-devel@archiver.kernel.org; Mon, 08 Jun 2020 10:27:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53516)
+	id 1jiIkk-0007D8-FH
+	for qemu-devel@archiver.kernel.org; Mon, 08 Jun 2020 10:27:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53510)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1jiIbg-0001Mz-Qp; Mon, 08 Jun 2020 10:18:32 -0400
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:34444)
+ id 1jiIbf-0001Lt-Nt; Mon, 08 Jun 2020 10:18:31 -0400
+Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:55761)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1jiIbf-0004W5-Oa; Mon, 08 Jun 2020 10:18:32 -0400
-Received: by mail-pl1-x641.google.com with SMTP id n9so6731101plk.1;
+ id 1jiIbe-0004Vt-Sd; Mon, 08 Jun 2020 10:18:31 -0400
+Received: by mail-pj1-x1041.google.com with SMTP id ne5so3346343pjb.5;
  Mon, 08 Jun 2020 07:18:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=ahVicGXm+tC5Wu9Y9B8W3IdHq6HS3ZueVU615K0isTk=;
- b=f5K+RYPuJPBNr8klVYgtNsaR5gObqjTrjLiuNYfwLtTmwRSUqZkCEc+XIRDQVVzzMK
- J8p5y7h2ZYV3LqzTfuVW+8tRs14Z2pflKdIqjjGiUm23quyKDCsnx6fg3wCAq/++SN5l
- pH+6GRm4b3n38l5Nag7XixIvgHjdqZw7l+TmlefLcUEo2H5Q7Dv4D28cvTIkv3gvrckm
- nq12dDsJuccrEdDrgJpkLnzO/lRR2XiLTvg3vaMnjs563YpXf+co5WPShhc/8h6u5Zhs
- bMtq342giEWCe1FiajqAFW/YMDP5G5HNWu0oM8o7610/4bPF+yjD2eHFsQc74nrR/VUB
- +gug==
+ bh=b5zym9cztP0wVFAPAsyVGx/rfgOEvJsGGKKcdqXM6z4=;
+ b=DtTyFaKADqu8XPfj0kuUWgG4QH+kdmG4nuOmsScGoVdLEG4CsRi+YHsR7/yX9mq0Ig
+ 8UMj4qtjB2ricB9vCMrLYNf0yBC0dtE5LOMGNc54Hvy1wjEBhpW6B7oC9u6lzRXI13un
+ KHBVMCUhZTr4nlDi3/vqNNpxWnmAkPddeAkidDUMJR+iV6pExSMR64D+lQuYhp9esPCi
+ K/GKWXCHeDToS2WpLo2ELavPR4kFBg4UVR1w3I77g99JZXnGl90KZqkGjnnzWgGRRM1D
+ W0quJXY65GiuhkRi10jBi/tooOtvUGkfrqN6Bo8NakM7kDvT93ORWfI63InG6UayFJ9R
+ DeDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=ahVicGXm+tC5Wu9Y9B8W3IdHq6HS3ZueVU615K0isTk=;
- b=P2adCPfUazVNutt8Z8oGpIUgmP6J24mPz0qJOple1U3KK7ACc7bINRO8fB44Ln53mv
- CFaUBTvrkXXChG8J3CIMoCOWFToFPdss1ovPg99S7XoMjHT4xc4b8kyxynRQ5403dSIP
- FktFVjZz/tbP+E7pPNMTKtFX8WBg5F2GPHJP+HWlrvC1OgBEJCcUeLXxK4hT7edpqPAo
- cu2dqQoblmwgMJVuLoe1dj6LUrxOTKvk8Tup91Vjt0SaU1JTBFH7sdIxQdW2Ru7XIkPH
- DDX0cWt8ufudpJlHw06i2FSxCfH7t5R86cvo8KqAj1fVXJmooPKp4Ft3agnd7qASIyKU
- RDhw==
-X-Gm-Message-State: AOAM532eBopCvkeLVR2pkb1uyZOyNKGQXn//k8JhzJK1t6kqJunLOZLQ
- YPBz/9Vv6Lnkwk7A2hxYJDs=
-X-Google-Smtp-Source: ABdhPJxXDYtmWS6SqoOsFRdEKX0nkJRXaAh1OPZ8oyK1gPVLkq6F7h8HOr+kVjCPbNu5lAM8OpyaXA==
-X-Received: by 2002:a17:90b:3005:: with SMTP id
- hg5mr16838257pjb.215.1591625910171; 
- Mon, 08 Jun 2020 07:18:30 -0700 (PDT)
+ bh=b5zym9cztP0wVFAPAsyVGx/rfgOEvJsGGKKcdqXM6z4=;
+ b=hYUPUk9BqknCvs0eOGji0fR6miEoBwMQU7J91VRmVOMNM3xhRISrnJBUEvcvqAN2JP
+ I5ftGndlYCwlSSvyxtSs6OsCdnSTwFn9G1XDfYlBRkQAhPsJN7XVqYJ3gVE3yYv9SA4/
+ zbOot0nLvXcVywL0yZ4byqUEtVGCTKXbC/shn533MRi/uzi1SKKBTXlQTilWdwAmUfjI
+ YxjCGsew0j6JDrGluKr8r4kGgcC7MopXHDoTEXOCRCt8D9Goo1GGqLYi/DcctW/DLaYI
+ P/S65ZoToS/7p12D5TDDKmLGNVKW8TzxSgvr9a2I477rrRVvHdcTjT4zDztNdTM9oy0D
+ NeWA==
+X-Gm-Message-State: AOAM530hxk1vMvvq0fe1FuA3I0s/wsAWnWmcoI9deXCkDGl5TU1CBnIG
+ B5wfjOmWxLPEytCt40uHCNE=
+X-Google-Smtp-Source: ABdhPJyiZNy0p5P1zSsdnj127z0w0b76y6FYU83pPRxH+hBDLe2BLFTXnRFzw01862TZofMLQkavZQ==
+X-Received: by 2002:a17:90a:e506:: with SMTP id
+ t6mr1039908pjy.35.1591625909280; 
+ Mon, 08 Jun 2020 07:18:29 -0700 (PDT)
 Received: from localhost.localdomain (unknown-224-80.windriver.com.
  [147.11.224.80])
- by smtp.gmail.com with ESMTPSA id b19sm7292575pft.74.2020.06.08.07.18.29
+ by smtp.gmail.com with ESMTPSA id b19sm7292575pft.74.2020.06.08.07.18.28
  (version=TLS1 cipher=AES128-SHA bits=128/128);
- Mon, 08 Jun 2020 07:18:29 -0700 (PDT)
+ Mon, 08 Jun 2020 07:18:28 -0700 (PDT)
 From: Bin Meng <bmeng.cn@gmail.com>
 To: Alistair Francis <Alistair.Francis@wdc.com>,
  Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
  Palmer Dabbelt <palmerdabbelt@google.com>,
  Sagar Karandikar <sagark@eecs.berkeley.edu>, qemu-devel@nongnu.org,
  qemu-riscv@nongnu.org
-Subject: [PATCH 12/15] hw/riscv: sifive: Change SiFive E/U CPU reset vector to
- 0x1004
-Date: Mon,  8 Jun 2020 07:17:41 -0700
-Message-Id: <1591625864-31494-13-git-send-email-bmeng.cn@gmail.com>
+Subject: [PATCH 11/15] hw/riscv: sifive_u: Add a new property msel for MSEL
+ pin state
+Date: Mon,  8 Jun 2020 07:17:40 -0700
+Message-Id: <1591625864-31494-12-git-send-email-bmeng.cn@gmail.com>
 X-Mailer: git-send-email 1.7.1
 In-Reply-To: <1591625864-31494-1-git-send-email-bmeng.cn@gmail.com>
 References: <1591625864-31494-1-git-send-email-bmeng.cn@gmail.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::641;
- envelope-from=bmeng.cn@gmail.com; helo=mail-pl1-x641.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1041;
+ envelope-from=bmeng.cn@gmail.com; helo=mail-pj1-x1041.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -109,83 +109,48 @@ Sender: "Qemu-devel"
 
 From: Bin Meng <bin.meng@windriver.com>
 
-Per the SiFive manual, all E/U series CPU cores' reset vector is
-at 0x1004. Update our codes to match the hardware.
+On SiFive FU540 SoC, the value stored at physical address 0x1000
+stores the MSEL pin state that is used to control the next boot
+location that ROM codes jump to.
+
+Add a new property msel to sifive_u machine for this.
 
 Signed-off-by: Bin Meng <bin.meng@windriver.com>
 ---
 
- hw/riscv/sifive_e.c | 8 +++++---
- hw/riscv/sifive_u.c | 6 +++---
- target/riscv/cpu.c  | 4 ++--
- 3 files changed, 10 insertions(+), 8 deletions(-)
+ hw/riscv/sifive_u.c         | 7 +++++++
+ include/hw/riscv/sifive_u.h | 1 +
+ 2 files changed, 8 insertions(+)
 
-diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
-index 8fab152..f05cabd 100644
---- a/hw/riscv/sifive_e.c
-+++ b/hw/riscv/sifive_e.c
-@@ -98,9 +98,11 @@ static void sifive_e_machine_init(MachineState *machine)
-         memmap[SIFIVE_E_DTIM].base, main_mem);
- 
-     /* Mask ROM reset vector */
--    uint32_t reset_vec[2] = {
--        0x204002b7,        /* 0x1000: lui     t0,0x20400 */
--        0x00028067,        /* 0x1004: jr      t0 */
-+    uint32_t reset_vec[4] = {
-+        0x00000000,
-+        0x204002b7,        /* 0x1004: lui     t0,0x20400 */
-+        0x00028067,        /* 0x1008: jr      t0 */
-+        0x00000000,
-     };
- 
-     /* copy in the reset vector in little_endian byte order */
 diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-index aaa5adb..0a86ffc 100644
+index 07e2ba0..aaa5adb 100644
 --- a/hw/riscv/sifive_u.c
 +++ b/hw/riscv/sifive_u.c
-@@ -433,18 +433,18 @@ static void sifive_u_machine_init(MachineState *machine)
+@@ -507,6 +507,13 @@ static void sifive_u_machine_instance_init(Object *obj)
+                                     "Set on to tell QEMU's ROM to jump to "
+                                     "flash. Otherwise QEMU will jump to DRAM");
  
-     /* reset vector */
-     uint32_t reset_vec[8] = {
-+        0x00000000,
-         0x00000297,                    /* 1:  auipc  t0, %pcrel_hi(dtb) */
--        0x02028593,                    /*     addi   a1, t0, %pcrel_lo(1b) */
-+        0x01c28593,                    /*     addi   a1, t0, %pcrel_lo(1b) */
-         0xf1402573,                    /*     csrr   a0, mhartid  */
- #if defined(TARGET_RISCV32)
-         0x0182a283,                    /*     lw     t0, 24(t0) */
- #elif defined(TARGET_RISCV64)
--        0x0182b283,                    /*     ld     t0, 24(t0) */
-+        0x0182e283,                    /*     lwu    t0, 24(t0) */
- #endif
-         0x00028067,                    /*     jr     t0 */
-         0x00000000,
-         start_addr,                    /* start: .dword */
--        0x00000000,
-                                        /* dtb: */
-     };
++    s->msel = 0;
++    object_property_add(obj, "msel", "uint32",
++                        sifive_u_machine_get_uint32_prop,
++                        sifive_u_machine_set_uint32_prop, NULL, &s->msel);
++    object_property_set_description(obj, "msel",
++                                    "Mode Select (MSEL[3:0]) pin state");
++
+     s->serial = OTP_SERIAL;
+     object_property_add(obj, "serial", "uint32",
+                         sifive_u_machine_get_uint32_prop,
+diff --git a/include/hw/riscv/sifive_u.h b/include/hw/riscv/sifive_u.h
+index dcf7f3b..d82cfe0 100644
+--- a/include/hw/riscv/sifive_u.h
++++ b/include/hw/riscv/sifive_u.h
+@@ -63,6 +63,7 @@ typedef struct SiFiveUState {
+     int fdt_size;
  
-diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-index 5060534..1944ad6 100644
---- a/target/riscv/cpu.c
-+++ b/target/riscv/cpu.c
-@@ -139,7 +139,7 @@ static void rvnn_gcsu_priv1_10_0_cpu_init(Object *obj)
-     CPURISCVState *env = &RISCV_CPU(obj)->env;
-     set_misa(env, RVXLEN | RVI | RVM | RVA | RVF | RVD | RVC | RVS | RVU);
-     set_priv_version(env, PRIV_VERSION_1_10_0);
--    set_resetvec(env, DEFAULT_RSTVEC);
-+    set_resetvec(env, 0x1004);
- }
- 
- static void rvnn_imacu_nommu_cpu_init(Object *obj)
-@@ -147,7 +147,7 @@ static void rvnn_imacu_nommu_cpu_init(Object *obj)
-     CPURISCVState *env = &RISCV_CPU(obj)->env;
-     set_misa(env, RVXLEN | RVI | RVM | RVA | RVC | RVU);
-     set_priv_version(env, PRIV_VERSION_1_10_0);
--    set_resetvec(env, DEFAULT_RSTVEC);
-+    set_resetvec(env, 0x1004);
-     qdev_prop_set_bit(DEVICE(obj), "mmu", false);
- }
+     bool start_in_flash;
++    uint32_t msel;
+     uint32_t serial;
+ } SiFiveUState;
  
 -- 
 2.7.4
