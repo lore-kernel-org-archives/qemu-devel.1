@@ -2,74 +2,81 @@ Return-Path: <SRS0=zEF8=7V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A51CAC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 19:01:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6905FC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 19:09:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7684620823
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 19:01:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7684620823
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 2E49B2068D
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 19:09:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ux+YWV24"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E49B2068D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55174 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33050 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jiN1r-0007kE-RV
-	for qemu-devel@archiver.kernel.org; Mon, 08 Jun 2020 15:01:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60284)
+	id 1jiN9b-0002b3-DZ
+	for qemu-devel@archiver.kernel.org; Mon, 08 Jun 2020 15:09:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32888)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jiMzv-00071d-GP
- for qemu-devel@nongnu.org; Mon, 08 Jun 2020 14:59:51 -0400
-Resent-Date: Mon, 08 Jun 2020 14:59:51 -0400
-Resent-Message-Id: <E1jiMzv-00071d-GP@lists.gnu.org>
-Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21346)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jiN8P-0001w8-2P
+ for qemu-devel@nongnu.org; Mon, 08 Jun 2020 15:08:37 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:31620
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jiMzt-0005G4-CF
- for qemu-devel@nongnu.org; Mon, 08 Jun 2020 14:59:50 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1591642781; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=F6fR3nZgQKX/P6gMMUniZ44FgbANpYUF8nXVFW8+XsOBmITKVOTobkD6LAn9or9edaxl1+ACn4dhMT8EUsuO0I522JpWtzMSKgT3CyozhBR2qDdDLPTxOaNOTo/T3MSqwobt6wttMRB+8nFIHSVNNDzu8+VdXaEm009Jbu20nPw=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1591642781;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=hXGdMDeOc7qyoGA1VdMtel3tgsWxIj2HJnt+x2uzU4k=; 
- b=VYXmIp0M/JXNBoRnWfA9Ltek4nvbWq/sO+jG+9W8093w3J2/r1FG6DNpDcmVw52Q9AlY0ko5SCsAjejXPMh+mmMOsp8SAJYtmrY4Bqrdw6v/PTZmkVXMBbb62AXJbF7uKOhE79QOLu8UG/y9Fk6Rr9aRQD6c3VObMIjDIvlcyWs=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1591642779327754.3172302658085;
- Mon, 8 Jun 2020 11:59:39 -0700 (PDT)
-Message-ID: <159164277821.7663.13445087503598606993@45ef0f9c86ae>
-In-Reply-To: <20200608164357.25065-1-filip.bozuta@syrmia.com>
-Subject: Re: [PATCH v2 0/6] Add strace support for printing arguments of
- selected syscalls
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jiN8K-0006uU-CP
+ for qemu-devel@nongnu.org; Mon, 08 Jun 2020 15:08:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591643311;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=/u8us0VlqZQNTOvw0CeO2ZZNWirMI7O38faQs3enp0o=;
+ b=Ux+YWV24BxwNYjyImSgheb7R87d/78gtP8/EPi7t5dkUl9nPBn1BtzO1Up9FypFX2gx+Ns
+ uCFnV7Hjbm3idPQa8CVVF/1MlNaIFCeBMpAwbc61OBs+dJ3Byuqj6Aod2trGIs7voHNVYT
+ aJsc33st02IniDYljSqTWDZNTR4lu/Y=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-350-Z4CKihK4PlS0DILgfuCtgg-1; Mon, 08 Jun 2020 15:08:29 -0400
+X-MC-Unique: Z4CKihK4PlS0DILgfuCtgg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 56BC518B6389;
+ Mon,  8 Jun 2020 19:08:28 +0000 (UTC)
+Received: from blue.redhat.com (ovpn-113-22.phx2.redhat.com [10.3.113.22])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E150E5D9F7;
+ Mon,  8 Jun 2020 19:08:25 +0000 (UTC)
+From: Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] qcow2: Tweak comments on
+ qcow2_get_persistent_dirty_bitmap_size
+Date: Mon,  8 Jun 2020 14:08:21 -0500
+Message-Id: <20200608190821.3293867-1-eblake@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: filip.bozuta@syrmia.com
-Date: Mon, 8 Jun 2020 11:59:39 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o53.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/08 14:59:45
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/08 11:58:00
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -82,57 +89,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: qemu-devel@nongnu.org, laurent@vivier.eu
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ John Snow <jsnow@redhat.com>, "open list:qcow2" <qemu-block@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDYwODE2NDM1Ny4yNTA2
-NS0xLWZpbGlwLmJvenV0YUBzeXJtaWEuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRv
-IGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1v
-cmUgaW5mb3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDIwMDYwODE2NDM1Ny4yNTA2NS0xLWZpbGlw
-LmJvenV0YUBzeXJtaWEuY29tClN1YmplY3Q6IFtQQVRDSCB2MiAwLzZdIEFkZCBzdHJhY2Ugc3Vw
-cG9ydCBmb3IgcHJpbnRpbmcgYXJndW1lbnRzIG9mIHNlbGVjdGVkIHN5c2NhbGxzClR5cGU6IHNl
-cmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNl
-IGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFt
-ZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcg
-LS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwg
-LS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCkZyb20gaHR0cHM6Ly9n
-aXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNo
-ZXcvMjAyMDA2MDgxNjQzNTcuMjUwNjUtMS1maWxpcC5ib3p1dGFAc3lybWlhLmNvbSAtPiBwYXRj
-aGV3LzIwMjAwNjA4MTY0MzU3LjI1MDY1LTEtZmlsaXAuYm96dXRhQHN5cm1pYS5jb20KU3dpdGNo
-ZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwozMjBmODc0IGxpbnV4LXVzZXI6IEFkZCBzdHJhY2Ug
-c3VwcG9ydCBmb3IgcHJpbnRpbmcgYXJndW1lbnRzIG9mIGZhbGxvY2F0ZSgpCmE0ZGY0YjggbGlu
-dXgtdXNlcjogQWRkIHN0cmFjZSBzdXBwb3J0IGZvciBwcmludGluZyBhcmd1bWVudHMgb2YgY2hv
-d24oKS9sY2hvd24oKQoyYTVhNzRkIGxpbnV4LXVzZXI6IEFkZCBzdHJhY2Ugc3VwcG9ydCBmb3Ig
-cHJpbnRpbmcgYXJndW1lbnRzIG9mIGxzZWVrKCkKZWJjODFjYiBsaW51eC11c2VyOiBBZGQgc3Ry
-YWNlIHN1cHBvcnQgZm9yIHByaW50aW5nIGFyZ3VtZW50IG9mIHN5c2NhbGxzIHVzZWQgZm9yIGV4
-dGVuZGVkIGF0dHJpYnV0ZXMKNTk1ZGM5NiBsaW51eC11c2VyOiBBZGQgc3RyYWNlIHN1cHBvcnQg
-Zm9yIGEgZ3JvdXAgb2Ygc3lzY2FsbHMKYjUzZjliOSBsaW51eC11c2VyOiBFeHRlbmQgc3RyYWNl
-IHN1cHBvcnQgdG8gZW5hYmxlIGFyZ3VtZW50IHByaW50aW5nIGFmdGVyIHN5c2NhbGwgZXhlY3V0
-aW9uCgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzYgQ2hlY2tpbmcgY29tbWl0IGI1M2Y5YjkxMzIx
-MyAobGludXgtdXNlcjogRXh0ZW5kIHN0cmFjZSBzdXBwb3J0IHRvIGVuYWJsZSBhcmd1bWVudCBw
-cmludGluZyBhZnRlciBzeXNjYWxsIGV4ZWN1dGlvbikKMi82IENoZWNraW5nIGNvbW1pdCA1OTVk
-Yzk2NjJkYTYgKGxpbnV4LXVzZXI6IEFkZCBzdHJhY2Ugc3VwcG9ydCBmb3IgYSBncm91cCBvZiBz
-eXNjYWxscykKMy82IENoZWNraW5nIGNvbW1pdCBlYmM4MWNiMWQ2ODQgKGxpbnV4LXVzZXI6IEFk
-ZCBzdHJhY2Ugc3VwcG9ydCBmb3IgcHJpbnRpbmcgYXJndW1lbnQgb2Ygc3lzY2FsbHMgdXNlZCBm
-b3IgZXh0ZW5kZWQgYXR0cmlidXRlcykKNC82IENoZWNraW5nIGNvbW1pdCAyYTVhNzRkMWM2Mjkg
-KGxpbnV4LXVzZXI6IEFkZCBzdHJhY2Ugc3VwcG9ydCBmb3IgcHJpbnRpbmcgYXJndW1lbnRzIG9m
-IGxzZWVrKCkpCjUvNiBDaGVja2luZyBjb21taXQgYTRkZjRiODVhZTg3IChsaW51eC11c2VyOiBB
-ZGQgc3RyYWNlIHN1cHBvcnQgZm9yIHByaW50aW5nIGFyZ3VtZW50cyBvZiBjaG93bigpL2xjaG93
-bigpKQo2LzYgQ2hlY2tpbmcgY29tbWl0IDMyMGY4NzQxZWNlNCAobGludXgtdXNlcjogQWRkIHN0
-cmFjZSBzdXBwb3J0IGZvciBwcmludGluZyBhcmd1bWVudHMgb2YgZmFsbG9jYXRlKCkpCkVSUk9S
-OiBzdG9yYWdlIGNsYXNzIHNob3VsZCBiZSBhdCB0aGUgYmVnaW5uaW5nIG9mIHRoZSBkZWNsYXJh
-dGlvbgojNjk6IEZJTEU6IGxpbnV4LXVzZXIvc3RyYWNlLmM6MTE0NzoKK1VOVVNFRCBzdGF0aWMg
-c3RydWN0IGZsYWdzIGZhbGxvY19mbGFnc1tdID0gewoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5p
-bmdzLCAxMDQgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNi82IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxl
-YXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyBy
-ZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5F
-UlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAx
-CgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8y
-MDIwMDYwODE2NDM1Ny4yNTA2NS0xLWZpbGlwLmJvenV0YUBzeXJtaWEuY29tL3Rlc3RpbmcuY2hl
-Y2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkg
-YnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRi
-YWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+For now, we don't have persistent bitmaps in any other formats, but
+that might not be true in the future.  Make it obvious that our
+incoming parameter is not necessarily a qcow2 image, and therefore is
+limited to just the bdrv_dirty_bitmap_* API calls (rather than probing
+into qcow2 internals).
+
+Suggested-by: Kevin Wolf <kwolf@redhat.com>
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
+ block/qcow2-bitmap.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
+index 7bf12502da8c..1f38806ca6ea 100644
+--- a/block/qcow2-bitmap.c
++++ b/block/qcow2-bitmap.c
+@@ -1757,19 +1757,20 @@ bool qcow2_supports_persistent_dirty_bitmap(BlockDriverState *bs)
+ }
+
+ /*
+- * Compute the space required for bitmaps in @bs.
++ * Compute the space required to copy bitmaps from @in_bs.
+  *
+  * The computation is based as if copying to a new image with the
+- * given @cluster_size, which may differ from the cluster size in @bs.
++ * given @cluster_size, which may differ from the cluster size in
++ * @in_bs; in fact, @in_bs might be something other than qcow2.
+  */
+-uint64_t qcow2_get_persistent_dirty_bitmap_size(BlockDriverState *bs,
++uint64_t qcow2_get_persistent_dirty_bitmap_size(BlockDriverState *in_bs,
+                                                 uint32_t cluster_size)
+ {
+     uint64_t bitmaps_size = 0;
+     BdrvDirtyBitmap *bm;
+     size_t bitmap_dir_size = 0;
+
+-    FOR_EACH_DIRTY_BITMAP(bs, bm) {
++    FOR_EACH_DIRTY_BITMAP(in_bs, bm) {
+         if (bdrv_dirty_bitmap_get_persistence(bm)) {
+             const char *name = bdrv_dirty_bitmap_name(bm);
+             uint32_t granularity = bdrv_dirty_bitmap_granularity(bm);
+-- 
+2.27.0
+
 
