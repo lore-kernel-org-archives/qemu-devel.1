@@ -2,119 +2,89 @@ Return-Path: <SRS0=zEF8=7V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20462C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 20:34:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 709E6C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 20:53:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DA2D42074B
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 20:34:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 37C1220659
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 20:53:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="S3IwZQPd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA2D42074B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a20z5yov"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37C1220659
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39938 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49196 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jiOTl-0001fV-5S
-	for qemu-devel@archiver.kernel.org; Mon, 08 Jun 2020 16:34:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41764)
+	id 1jiOmD-0006rT-Dq
+	for qemu-devel@archiver.kernel.org; Mon, 08 Jun 2020 16:53:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43640)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <Babu.Moger@amd.com>)
- id 1jiOSu-0001BX-7r
- for qemu-devel@nongnu.org; Mon, 08 Jun 2020 16:33:52 -0400
-Received: from mail-bn8nam11on2055.outbound.protection.outlook.com
- ([40.107.236.55]:6034 helo=NAM11-BN8-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <Babu.Moger@amd.com>)
- id 1jiOSs-0003eh-OY
- for qemu-devel@nongnu.org; Mon, 08 Jun 2020 16:33:51 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=etSuQ0yNFZWj1Semb7vBvLVCAYhZ3kMGS9tPzJpZN0U3+xq+13tT85BoWsWD92s4MrmkCsvNo3tAtwBncD4jWu75zggIiT47xe7m45/aDhmObtjIR0o/FkqdsvECK5gdcIF0yzLixt5yqliOWK590Z7VWfRcob8gNUyVbTn4uybxi7ItjoEe7rBuWleO1xXhLWKh9Ghr1TLGnIs9qHBAh4O6iLnhpR2RLj/q5HHbRIZSzBGCzcIhEkQ+kROBUhbRPle1ANxvI1XCeYZVXWTqoRO8KjlizGRkFO6+Rv2PkfTaoxcWSe7TUxB6GbcZeA0OFUNHZ13bp11NrCaJUv79cg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LRAEjfjZ2Y2ag3aCGWfxHEIQI9Rg/dKws4LAl8pH4P0=;
- b=UKJ1ZfCiV2dZy5esKOgNBKu5CANx7MAZHCYODy9o1nvCRG+17LFZ3QMush/VdItIcSJjtwdZYfZn6f0FS+B7nylMYS4iDkdZQdMmlQxQHs3xZDFF04aDirUgUscH1A4N6KTwSzsvrZuLWSlBnmrLUJVKmwcwhc9IiKTfAQa2NEHiZ9WVdfkgq3C46XUnEcka4D33Vh5seF95qmeMkj8qCHANBfzs2PIADrXXhpW0IUHmcJRfZclL3NbycyL3IZPR3rjAkUzHLYNhoOW0PDbLoB3cBjVyDSv8+UAS3l1HG7zEyxf+q97w1m0/VsBzM99gGEXKbuNSktWvsmygryzBEw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LRAEjfjZ2Y2ag3aCGWfxHEIQI9Rg/dKws4LAl8pH4P0=;
- b=S3IwZQPd15qFxbtOzfpMudKHxr6p6dRULF/g84Ex0AHDdzuFbQWEUmh8FOZjwAiVIFnnCW9Do/yyoMi9rRUyRruWCKD+OOKmjXS6itAm2G0BayXOsftwKmoKfW7qdp130Tqx0qF87L9ScXGjXdgLJNCf4UKfWdslo+jc+OAdM20=
-Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
-Received: from SN1PR12MB2560.namprd12.prod.outlook.com (2603:10b6:802:26::19)
- by SN1PR12MB2573.namprd12.prod.outlook.com (2603:10b6:802:2b::21)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3066.18; Mon, 8 Jun
- 2020 20:18:45 +0000
-Received: from SN1PR12MB2560.namprd12.prod.outlook.com
- ([fe80::2102:cc6b:b2db:4c2]) by SN1PR12MB2560.namprd12.prod.outlook.com
- ([fe80::2102:cc6b:b2db:4c2%3]) with mapi id 15.20.3066.023; Mon, 8 Jun 2020
- 20:18:45 +0000
-Subject: [PATCH 0/2] Fix couple of issues with AMD topology
-From: Babu Moger <babu.moger@amd.com>
-To: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mst@redhat.com, 
- marcel.apfelbaum@gmail.com
-Date: Mon, 08 Jun 2020 15:18:43 -0500
-Message-ID: <159164739269.20543.3074052993891532749.stgit@naples-babu.amd.com>
-User-Agent: StGit/unknown-version
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DM5PR10CA0024.namprd10.prod.outlook.com (2603:10b6:4:2::34)
- To SN1PR12MB2560.namprd12.prod.outlook.com
- (2603:10b6:802:26::19)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jiOl7-0006Im-Rb
+ for qemu-devel@nongnu.org; Mon, 08 Jun 2020 16:52:41 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:46760
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jiOl5-0006hb-Fq
+ for qemu-devel@nongnu.org; Mon, 08 Jun 2020 16:52:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591649558;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=2ShSmqpPdjOwGT2Jg4seDbNP1GYXOnI+2q3F11WHisU=;
+ b=a20z5yovwXMJA+qFqA2PhKh3DQOShtmrJivmhvn6Fe8Yj5QbTW/0/pMqahznn8qX+KzBv3
+ A9U/+qqrlWj+NIXpWg7iIFCkmZfcRcuNn7Cml3CIl+hl1BlmrbaJ8DZWsP3aqm8eSwHuFq
+ nOKLqI0TBpRWQ++lJ2CEgQlZuOvw3FU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-219-bvj4LtpKMd2U4_AiChlvNQ-1; Mon, 08 Jun 2020 16:52:34 -0400
+X-MC-Unique: bvj4LtpKMd2U4_AiChlvNQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 364C6BFC1;
+ Mon,  8 Jun 2020 20:52:33 +0000 (UTC)
+Received: from [10.3.113.22] (ovpn-113-22.phx2.redhat.com [10.3.113.22])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 47D0E78FA9;
+ Mon,  8 Jun 2020 20:52:32 +0000 (UTC)
+Subject: Re: [PATCH v5 01/13] qcow2.py: python style fixes
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20200606081806.23897-1-vsementsov@virtuozzo.com>
+ <20200606081806.23897-2-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <90c13ff3-9951-a3d7-9b76-4fbc4ce1182a@redhat.com>
+Date: Mon, 8 Jun 2020 15:52:31 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from naples-babu.amd.com (165.204.78.2) by
- DM5PR10CA0024.namprd10.prod.outlook.com (2603:10b6:4:2::34) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3066.19 via Frontend Transport; Mon, 8 Jun 2020 20:18:44 +0000
-X-Originating-IP: [165.204.78.2]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 67fbfd4a-6231-45d7-cde4-08d80be924e6
-X-MS-TrafficTypeDiagnostic: SN1PR12MB2573:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SN1PR12MB2573AEB5C151C62308049F2295850@SN1PR12MB2573.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:5516;
-X-Forefront-PRVS: 042857DBB5
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 7cBe/48R79EVS6rJ7r1dw4D88Cw8Wt5Fg3RIwJ/l5crf9m40KDqjk5r5tY2gXd4qyw0dXowVlih5K5fnJeWqEf7Mdp0/dSm6+FfApxGJuVu53B13XmzHXsITPC+2iq4rmhEtH6phXdpG8ucEfSenHot5dJLlYWd5qpr+ilMOHjUGr4TKZYx83VzlkkF76UAnr0GFCqwSYiB+dpx54PutfZoDVXqpfCGKjgnBP3L+0J2hANvYeS9bXsxGaZ7IELQ9n3UdN9EviPGporr4wKXynGmUqHbjy0skLS1lQUq2Zjx9Y/OSEQGUNjwQIrm4dskwiUu4B5iq7GwVfCYd+Q0W0CxMdfqtT/HEC/6qYIXIPZTPTVw9t/FF+PbI1wPdso2H1V+FYZD1WAvji+aHMyAU1g==
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:SN1PR12MB2560.namprd12.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(346002)(396003)(136003)(39860400002)(376002)(366004)(956004)(66556008)(26005)(8936002)(5660300002)(478600001)(4744005)(66476007)(52116002)(103116003)(4326008)(86362001)(8676002)(7696005)(44832011)(83380400001)(966005)(2906002)(16526019)(186003)(55016002)(66946007)(316002);
- DIR:OUT; SFP:1101; 
-X-MS-Exchange-AntiSpam-MessageData: aCTG8bmkx80Zr8YHj2awj7l7GczlvYEmgHqpqJrM1XygEETqbKdFESfGVj3Prj3jkdX9DBfhgDRsBz0HvFKe97nlCj0gxTqGXzdyT6SdkWDIW6Svu+Abk8hzswwMOlnHzBUmJ6C1b9s/RHyQFFvlSemkIQBLvESgwd2k7WYI6hC14RTkmpjpWY0xUTotPd+4kS0wClP655zlpXHmuBQOBstqywltTR2dZtMvSOTcMxgF3qE9mFar/1YDaBJEpzoMz4wGuZSsLPR4xSDekyJrPWt1Nx1coOb2oQhn16Edr0j9b2AC1A8bWGxt3pY5+o9yFjELIBP8oZO/4YsO/KbPk0tPXMM6w1t1yW7vD2naphuQb68DzPbBG48Clq0wu6LKv6L8e+tisJA/p8R3IlUqxoKdQdC0Cu2JRvw5QF2q4sKAkPGUjadE480b6e0pEUIQkyE2KVliNd4EQdQpVp784LmwTge+ZunGQCnN1Fod1Pw=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 67fbfd4a-6231-45d7-cde4-08d80be924e6
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jun 2020 20:18:44.8985 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: vyfh4P6FZwMUtR+2iJDf3Qf+6UYl87lv5CNfF9x5hPkZk5vgUT1Bqmds3qm6N1R7
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2573
-Received-SPF: none client-ip=40.107.236.55; envelope-from=Babu.Moger@amd.com;
- helo=NAM11-BN8-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/08 16:33:49
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, MSGID_FROM_MTA_HEADER=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200606081806.23897-2-vsementsov@virtuozzo.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/08 05:40:44
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -127,30 +97,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, den@openvz.org, andrey.shinkevich@virtuozzo.com,
+ qemu-devel@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This series fixes couple of issues with recent topology related code.
-1. Fix uninitialized memory with -device and CPU hotplug
-2. Simplify CPUID_8000_001E to generalize the support for higher
-   number of cores and nodes
+On 6/6/20 3:17 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Fix flake8 complaints. Leave the only chunk of lines over 79 characters:
 
-Here are the threads discussing the issue.
-https://lore.kernel.org/qemu-devel/20200602175212.GH577771@habkost.net/
-https://lore.kernel.org/qemu-devel/20200602175212.GH577771@habkost.net/
----
+Stale sentence since you fixed that; on my Fedora 32 machine, with 
+flake8 3.7.7, this patch silences all warnings.
 
-Babu Moger (2):
-      hw/386: Fix uninitialized memory with -device and CPU hotplug
-      i386: Simplify CPUID_8000_001E for AMD
+> initialization of cmds variable. Leave it for another day, when it
+> should be refactored to utilize argparse instead of hand-written
+> parsing.
+> 
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>   tests/qemu-iotests/qcow2.py | 95 ++++++++++++++++++++++---------------
+>   1 file changed, 56 insertions(+), 39 deletions(-)
 
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Tested-by: Eric Blake <eblake@redhat.com>
 
- hw/i386/pc.c               |    2 +
- include/hw/i386/topology.h |   11 ++++++
- target/i386/cpu.c          |   78 +++++++++++++++++++++-----------------------
- 3 files changed, 50 insertions(+), 41 deletions(-)
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
---
 
