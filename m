@@ -2,87 +2,86 @@ Return-Path: <SRS0=zEF8=7V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 938A1C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 10:11:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D0F5C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 10:11:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5F0EF206D5
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 10:11:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2910F206D5
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 10:11:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mUwcGGuR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F0EF206D5
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kyKTDdAj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2910F206D5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48312 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49268 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jiEkX-0000rn-JK
-	for qemu-devel@archiver.kernel.org; Mon, 08 Jun 2020 06:11:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52802)
+	id 1jiEko-0001FN-FA
+	for qemu-devel@archiver.kernel.org; Mon, 08 Jun 2020 06:11:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52830)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jiEjl-0000C8-5A
- for qemu-devel@nongnu.org; Mon, 08 Jun 2020 06:10:37 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:34582)
+ id 1jiEk0-0000Nh-Cf
+ for qemu-devel@nongnu.org; Mon, 08 Jun 2020 06:10:52 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:37333)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jiEjj-0006pN-Th
- for qemu-devel@nongnu.org; Mon, 08 Jun 2020 06:10:36 -0400
-Received: by mail-wm1-x344.google.com with SMTP id u26so13917110wmn.1
- for <qemu-devel@nongnu.org>; Mon, 08 Jun 2020 03:10:35 -0700 (PDT)
+ id 1jiEjz-0006qj-Hq
+ for qemu-devel@nongnu.org; Mon, 08 Jun 2020 06:10:52 -0400
+Received: by mail-wm1-x341.google.com with SMTP id y20so8164823wmi.2
+ for <qemu-devel@nongnu.org>; Mon, 08 Jun 2020 03:10:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=references:user-agent:from:to:cc:subject:in-reply-to:date
  :message-id:mime-version:content-transfer-encoding;
- bh=CFLkkRe5R78zISyMfQx2iwT6rlTWBW7gfv/cT5N0YcQ=;
- b=mUwcGGuRlnX6y98hTxSP8GEdcHZX195Sq7EwqSbMOdWHuLKQ4vhaJ93b1xPwo7LjYQ
- sVfzAJ9zlEIxqpDIZZu158jiS+IrW3Bv/QT7QEZvBTYCRatstoYJcTnEm8TLJRGOjwT+
- 1/B4JDhOQFj7ZTt/hUpg3rPMHt+SKCn6ZOZrusy6csm+PKvG//8D8SQkpvbtyxK/T6hT
- nl1eP0xphQR8FK7EgYF7Q+fQXInFEygewM7iwXEVZils6kD8Jel8rgmv3HNscTS+Bjex
- 0AXN5/sK+eDWONBro3Qyck+EuuNjzRVXeZKj38B6HLGxIjfpPlbnm1s3KbEvXR5TB/V2
- BsaQ==
+ bh=awpi/2nm/ig8o95FaaURWEmTZOnOilwQ5zsR94AtALI=;
+ b=kyKTDdAjEFMI+Kg1/egIjPjI99LTHpFrU/5TT6jQ0wq8Y9Gx0MZfIearRm5r071eJg
+ b1vFUjQhbKJBPGWvfi/rFFV+N5J/YkHHSbjac2mVoMq8DZbgT9tsoS7RV7uZbicIIJ6q
+ c4xbippWW5VyZXexNU3Ib7Ishn2/GrJo9gCF59kOfoJ6Vhkvfc94bnd8zzoO3PnYKI2X
+ o0KSBuMwVJu831JyBWMU9vG1UL1St4mh6PH8imGbRiCyusPRZMiixcEoXm8gIpxsLsTQ
+ YMAZF9A1ntsCscERmTIhdc3q/VH33q2l6YV9qIw+Nn4FKMnO2Em0Y52lP8nWkJ1766pg
+ wHAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:references:user-agent:from:to:cc:subject
  :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=CFLkkRe5R78zISyMfQx2iwT6rlTWBW7gfv/cT5N0YcQ=;
- b=clgjzNp+vcK+P51RjHQr/KPEnckKKLzskwR/XmsYCcffAgxO2IOS3+PUY4ubw2S8/S
- TvzNGf8Xirdoq67tHICEF5rYQyUZMpnZDRKfMuc8T20YP8Pqq8ysovylz/vVx2ZpWtNH
- 3N6bcxcqu0VKQCUGCKi19q5pgxAg638hLpCrb/x5VYxcuMMt72S5ZQabjRaBRPmx2nSI
- g1tBzNVVx/vlgnIE/9fCydkDePKKw4M1hTwxmOc2cyttTycjOjTzeM0jM7SBnniBU3tQ
- NWIvR3IqEtlNo02wSpXe99US5fwv/gUC9DFkZmbGtr34CzsUqs/XO7PGibnIVFBHkZuR
- Wgeg==
-X-Gm-Message-State: AOAM530EsIRcW+SG5Re6Nryx3yYmIYWh/14kloBXN3bnnQwy2eK29xEH
- t05Bmz0x8p7KotHMJ1v1B1AGDRjX3a0=
-X-Google-Smtp-Source: ABdhPJy83EDaTwyXmYVNjQ0OkwjlwF9Oyz1IOwlixj+xkUulYzzt9VYIPeEb2K3wV6q5rBOfOVoTqA==
-X-Received: by 2002:a05:600c:645:: with SMTP id
- p5mr15227258wmm.156.1591611030159; 
- Mon, 08 Jun 2020 03:10:30 -0700 (PDT)
+ bh=awpi/2nm/ig8o95FaaURWEmTZOnOilwQ5zsR94AtALI=;
+ b=OCQ9bvBqD17eK2JAGO7PF3GWvbyNXEpbQcYmNY4XafiSDZU7dDiDyMvkdhG/AT8Oeq
+ C/olx43kjA35dEUcz8j5BRoAVt/wiDXV4Pc8pWYJWvAqs673J6Hwt3BJPHGmOdwekKH2
+ QtdF0wlDge6zR4Pf6PwT08YPf5B3Xfzmyvm/Pu1e1Q72LSolSO0tzfNOORUS5uA3e1wt
+ qw2ESNJORKoDBf6hRXYHB6ybYLFvrAeYSC2ax7nl8Co2rG7/UzHcrmXf8Oftn0LpFUjl
+ kI5no+ut8dVWYeX3wHgoKgmqoHiztWhyOIiyxGxywlZAXV6nVKbFz2GKCp0YwQWjj3eT
+ gR5Q==
+X-Gm-Message-State: AOAM532JxnII91BOisAjkR8gDh2LrkGIZNA0vbxwjnh8EjdRT/D0wVFa
+ r4BkycLW9fggMileBJ+Or5h5RPH33TY=
+X-Google-Smtp-Source: ABdhPJyFvawY8tx89xrIU7u6+EnvJYqwNx2yBBzY/XXZDYSPPRlO9PvbPk2b+erV7/Zvi+BXEb2vCQ==
+X-Received: by 2002:a1c:8107:: with SMTP id c7mr15696005wmd.20.1591611049449; 
+ Mon, 08 Jun 2020 03:10:49 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id c16sm8360096wml.45.2020.06.08.03.10.28
+ by smtp.gmail.com with ESMTPSA id d2sm23039413wrs.95.2020.06.08.03.10.48
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 08 Jun 2020 03:10:28 -0700 (PDT)
+ Mon, 08 Jun 2020 03:10:48 -0700 (PDT)
 Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 2FE9F1FF7E;
- Mon,  8 Jun 2020 11:10:28 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id 9BF7D1FF7E;
+ Mon,  8 Jun 2020 11:10:47 +0100 (BST)
 References: <20200605093256.30351-1-philmd@redhat.com>
- <20200605093256.30351-6-philmd@redhat.com>
+ <20200605093256.30351-7-philmd@redhat.com>
 User-agent: mu4e 1.5.2; emacs 28.0.50
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH v6 05/11] rules.mak: Add base-arch() rule
-In-reply-to: <20200605093256.30351-6-philmd@redhat.com>
-Date: Mon, 08 Jun 2020 11:10:28 +0100
-Message-ID: <87r1up7trf.fsf@linaro.org>
+Subject: Re: [PATCH v6 06/11] Makefile: Remove dangerous EOL trailing backslash
+In-reply-to: <20200605093256.30351-7-philmd@redhat.com>
+Date: Mon, 08 Jun 2020 11:10:47 +0100
+Message-ID: <87o8pt7tqw.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::344;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x344.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x341.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -104,7 +103,8 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Alistair Francis <alistair.francis@wdc.com>, qemu-devel@nongnu.org,
  Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
@@ -113,68 +113,16 @@ Sender: "Qemu-devel"
 
 Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-> Add a rule to return the base architecture for a QEMU target.
+> One might get caught trying to understand unexpected Makefile
+> behavior. Trailing backslash can help to split very long lines,
+> but are rather dangerous when nothing follow. Preserve other
+> developers debugging time by removing this one.
 >
-> The current list of TARGET_BASE_ARCH is:
->
->   $ git grep  TARGET_BASE_ARCH configure
->   configure:7785:TARGET_BASE_ARCH=3D""
->   configure:7795:    TARGET_BASE_ARCH=3Di386
->   configure:7813:    TARGET_BASE_ARCH=3Darm
->   configure:7846:    TARGET_BASE_ARCH=3Dmips
->   configure:7854:    TARGET_BASE_ARCH=3Dmips
->   configure:7864:    TARGET_BASE_ARCH=3Dopenrisc
->   configure:7871:    TARGET_BASE_ARCH=3Dppc
->   configure:7879:    TARGET_BASE_ARCH=3Dppc
->   configure:7887:    TARGET_BASE_ARCH=3Dppc
->   configure:7894:    TARGET_BASE_ARCH=3Driscv
->   configure:7900:    TARGET_BASE_ARCH=3Driscv
->   configure:7920:    TARGET_BASE_ARCH=3Dsparc
->   configure:7925:    TARGET_BASE_ARCH=3Dsparc
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-This seems backwards. We encode the base architecture in configure.sh
-because this is where we can make such distinctions. We then:
-
-  echo "TARGET_BASE_ARCH=3D$TARGET_BASE_ARCH" >> $config_target_mak
-
-Precisely so the make system can know what it is for any given target.
-So:
-
-> +# base-arch
-> +# Usage: $(call base-arch, target)
-> +#
-> +# @target: the target architecture.
-> +#
-> +# This macro will return the base architecture for a target.
-> +#
-> +# As example, $(call base-arch, aarch64) returns 'arm'.
-> +base-arch =3D $(strip \
-> +		$(if $(call startwith,aarch64,$1),arm,\
-> +		  $(if $(call startwith,arm,$1),arm,\
-> +		    $(if $(call startwith,microblaze,$1),microblaze,\
-> +		      $(if $(call startwith,mips,$1),mips,\
-> +		        $(if $(call startwith,ppc,$1),ppc,\
-> +		          $(if $(call startwith,riscv,$1),riscv,\
-> +		            $(if $(call startwith,sh4,$1),sh4,\
-> +		              $(if $(call startwith,sparc,$1),sparc,\
-> +		                $(if $(call startwith,xtensa,$1),xtensa,\
-> +		                  $(if $(call strequal,x86_64,$1),i386,\
-> +		                    $1\
-> +		                   )\
-> +		                 )\
-> +		               )\
-> +		             )\
-> +		           )\
-> +		         )\
-> +		       )\
-> +		     )\
-> +		   )\
-> +		 )\
-> +		)
-
-Seems like a replication of information already calculated in configure
-and prone to breakage if we add a new one (or come up with some franken
-architecture at a later date).
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
 --=20
 Alex Benn=C3=A9e
