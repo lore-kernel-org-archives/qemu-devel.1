@@ -6,54 +6,54 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2CB6C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 17:03:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6FF3C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 17:06:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 973022053B
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 17:03:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 973022053B
+	by mail.kernel.org (Postfix) with ESMTPS id 7B1A2206C3
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 17:06:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B1A2206C3
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=codesourcery.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58974 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37530 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jiLB9-0004FF-NF
-	for qemu-devel@archiver.kernel.org; Mon, 08 Jun 2020 13:03:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45944)
+	id 1jiLDy-0007Aw-ME
+	for qemu-devel@archiver.kernel.org; Mon, 08 Jun 2020 13:06:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46160)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <joseph_myers@mentor.com>)
- id 1jiL5R-0004sP-DY
- for qemu-devel@nongnu.org; Mon, 08 Jun 2020 12:57:25 -0400
-Received: from esa4.mentor.iphmx.com ([68.232.137.252]:9046)
+ id 1jiL6W-00077p-C6
+ for qemu-devel@nongnu.org; Mon, 08 Jun 2020 12:58:32 -0400
+Received: from esa1.mentor.iphmx.com ([68.232.129.153]:48779)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <joseph_myers@mentor.com>)
- id 1jiL5Q-0001VG-6K
- for qemu-devel@nongnu.org; Mon, 08 Jun 2020 12:57:25 -0400
-IronPort-SDR: L4DFM5pBJVnOB5D7ux5GBWd1sfxK9BQH5qL2ZPXOUbi4Xn45Z3U+ABpXPs72FSnohYBVblpSvZ
- b3r/wuigSkgehlKVJ3vZjH18QKypIYAvUxGIAxDq4qAbKw4htqlMw2IxDg8c8pWTosN5LxsqXj
- zwWkSu2kyVO8uD2uDwtXVI0eJ4h/ujOCYs0fQqHOlrW5nFFx6n4oh7SrVGajornb8et66+r/zh
- Yjxkzo7sH3Pqc88nr1uAm/UHR9x0gG+PIz0voFsXKxeiY/1/ezDVq/HOjr2xl2ZVJ/j5ViKZyV
- nuo=
-X-IronPort-AV: E=Sophos;i="5.73,487,1583222400"; d="scan'208";a="49689901"
+ id 1jiL6U-0001dy-Oj
+ for qemu-devel@nongnu.org; Mon, 08 Jun 2020 12:58:32 -0400
+IronPort-SDR: JRVnId0x6zgtSZmxeTfmum1hEz6nDKfzoyjXqMxExNHwgG4Oyg9x5sPUECSAYK6DOYCbtr2Kwn
+ f8TRHgsy5JmTf1xEMES6yG/GpWku+OCq1p+Ki3GFOD/gC9lxwR5dEJQKgdHJ1kM/xY4zSSuKdD
+ UJgMIWTA3og1iX0GuRULI2psBkURfECljL+T4yhnPNBwEkHG7gtcWk2p47dilRyIuxmb1R8Yjo
+ OFOZcvPDKiAhGHx4vUsa3+WKz/fkyxQNrQBczo9/fgpd58TDS4O6GLkBJr4/Oe9YdGbo6nynY3
+ r3s=
+X-IronPort-AV: E=Sophos;i="5.73,487,1583222400"; d="scan'208";a="51690378"
 Received: from orw-gwy-02-in.mentorg.com ([192.94.38.167])
- by esa4.mentor.iphmx.com with ESMTP; 08 Jun 2020 08:57:22 -0800
-IronPort-SDR: jke4R6POX1Lkh23iXyL1UHrNr7WeIOj7VOuSqAsu+rgZJhvPd1lKb1T9K/IzZkt/4N+3x8dY2K
- lGdRYAWTqol/lQe+lawd4N1QEsW9XuEeYUhMl4FIMekqMwSrWzpi+jqHEygtt1jIzpTDangcBH
- s9n/SME9uOQMrjM6vHAeQMVDaftvTu6Ly8giqpg0ifaFKV6vIxSUpUAslsGGwVKPB+Y0LBlBRL
- dMtaUIOXJq1TFj6Yrgd4UXIG96MPiWXAyAKb8IMeWftQte//hhR9WXcuDKKxbWfpy+a9GlIbaU
- WO8=
-Date: Mon, 8 Jun 2020 16:57:16 +0000
+ by esa1.mentor.iphmx.com with ESMTP; 08 Jun 2020 08:58:29 -0800
+IronPort-SDR: Q2sJPuVBdSjIhnG12ydreMFqNJUZUnfWr0u4XzRXnsLZaBJbu+ZQQ2JK1jMx2Bl4q8zmfJl2GV
+ XiwB73losVr5kOQocHu7N7zYxy7qlbrzezjpCJx6Z+FMMz/otUSZPVm2jqoRhcJG8DSz1z5WG1
+ +AwJ7RszjnarGrBsQYjoSJWiWCpslpR55gbRNw8uAiulRyHf8kYcfjXjXZeHMzsd7Qe8tTPD4T
+ Xg7FHqa7N5RS5o1qAcFpClGxXhAckTlQiFNQ+OzHe8wlK9YFhJeWc3Vf49L8qGuVGZ244WLTm5
+ 1Xw=
+Date: Mon, 8 Jun 2020 16:58:23 +0000
 From: Joseph Myers <joseph@codesourcery.com>
 X-X-Sender: jsm28@digraph.polyomino.org.uk
 To: <qemu-devel@nongnu.org>, <aurelien@aurel32.net>,
  <peter.maydell@linaro.org>, <alex.bennee@linaro.org>, <laurent@vivier.eu>,
  <pbonzini@redhat.com>, <rth@twiddle.net>, <ehabkost@redhat.com>
-Subject: [PATCH v2 5/6] softfloat: return low bits of quotient from
- floatx80_modrem
+Subject: [PATCH v2 6/6] target/i386: reimplement fprem, fprem1 using floatx80
+ operations
 In-Reply-To: <alpine.DEB.2.21.2006081653080.23637@digraph.polyomino.org.uk>
-Message-ID: <alpine.DEB.2.21.2006081656500.23637@digraph.polyomino.org.uk>
+Message-ID: <alpine.DEB.2.21.2006081657200.23637@digraph.polyomino.org.uk>
 References: <alpine.DEB.2.21.2006081653080.23637@digraph.polyomino.org.uk>
 User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
 MIME-Version: 1.0
@@ -61,9 +61,9 @@ Content-Type: text/plain; charset="US-ASCII"
 X-Originating-IP: [137.202.0.90]
 X-ClientProxiedBy: SVR-IES-MBX-04.mgc.mentorg.com (139.181.222.4) To
  svr-ies-mbx-02.mgc.mentorg.com (139.181.222.2)
-Received-SPF: pass client-ip=68.232.137.252;
- envelope-from=joseph_myers@mentor.com; helo=esa4.mentor.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/08 12:55:19
+Received-SPF: pass client-ip=68.232.129.153;
+ envelope-from=joseph_myers@mentor.com; helo=esa1.mentor.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/08 12:51:54
 X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
 X-Spam_score_int: -39
 X-Spam_score: -4.0
@@ -88,125 +88,194 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Both x87 and m68k need the low parts of the quotient for their
-remainder operations.  Arrange for floatx80_modrem to track those bits
-and return them via a pointer.
-
-The architectures using float32_rem and float64_rem do not appear to
-need this information, so the *_rem interface is left unchanged and
-the information returned only from floatx80_modrem.  The logic used to
-determine the low 7 bits of the quotient for m68k
-(target/m68k/fpu_helper.c:make_quotient) appears completely bogus (it
-looks at the result of converting the remainder to integer, the
-quotient having been discarded by that point); this patch does not
-change that, but the m68k maintainers may wish to do so.
+The x87 fprem and fprem1 emulation is currently based around
+conversion to double, which is inherently unsuitable for a good
+emulation of any floatx80 operation.  Reimplement using the soft-float
+floatx80 remainder operations.
 
 Signed-off-by: Joseph Myers <joseph@codesourcery.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- fpu/softfloat.c         | 23 ++++++++++++++++++-----
- include/fpu/softfloat.h |  3 ++-
- 2 files changed, 20 insertions(+), 6 deletions(-)
+ target/i386/fpu_helper.c | 156 ++++++++++++---------------------------
+ 1 file changed, 48 insertions(+), 108 deletions(-)
 
-diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index 1552241b5e..72f45b0103 100644
---- a/fpu/softfloat.c
-+++ b/fpu/softfloat.c
-@@ -5684,10 +5684,11 @@ floatx80 floatx80_div(floatx80 a, floatx80 b, float_status *status)
- | `a' with respect to the corresponding value `b'.  The operation is performed
- | according to the IEC/IEEE Standard for Binary Floating-Point Arithmetic,
- | if 'mod' is false; if 'mod' is true, return the remainder based on truncating
--| the quotient toward zero instead.
-+| the quotient toward zero instead.  '*quotient' is set to the low 64 bits of
-+| the absolute value of the integer quotient.
- *----------------------------------------------------------------------------*/
+diff --git a/target/i386/fpu_helper.c b/target/i386/fpu_helper.c
+index 8ef5b463ea..0e531e3821 100644
+--- a/target/i386/fpu_helper.c
++++ b/target/i386/fpu_helper.c
+@@ -934,124 +934,64 @@ void helper_fxtract(CPUX86State *env)
+     merge_exception_flags(env, old_flags);
+ }
  
--floatx80 floatx80_modrem(floatx80 a, floatx80 b, bool mod,
-+floatx80 floatx80_modrem(floatx80 a, floatx80 b, bool mod, uint64_t *quotient,
-                          float_status *status)
+-void helper_fprem1(CPUX86State *env)
++static void helper_fprem_common(CPUX86State *env, bool mod)
  {
-     bool aSign, zSign;
-@@ -5695,6 +5696,7 @@ floatx80 floatx80_modrem(floatx80 a, floatx80 b, bool mod,
-     uint64_t aSig0, aSig1, bSig;
-     uint64_t q, term0, term1, alternateASig0, alternateASig1;
+-    double st0, st1, dblq, fpsrcop, fptemp;
+-    CPU_LDoubleU fpsrcop1, fptemp1;
+-    int expdif;
+-    signed long long int q;
+-
+-    st0 = floatx80_to_double(env, ST0);
+-    st1 = floatx80_to_double(env, ST1);
+-
+-    if (isinf(st0) || isnan(st0) || isnan(st1) || (st1 == 0.0)) {
+-        ST0 = double_to_floatx80(env, 0.0 / 0.0); /* NaN */
+-        env->fpus &= ~0x4700; /* (C3,C2,C1,C0) <-- 0000 */
+-        return;
+-    }
+-
+-    fpsrcop = st0;
+-    fptemp = st1;
+-    fpsrcop1.d = ST0;
+-    fptemp1.d = ST1;
+-    expdif = EXPD(fpsrcop1) - EXPD(fptemp1);
+-
+-    if (expdif < 0) {
+-        /* optimisation? taken from the AMD docs */
+-        env->fpus &= ~0x4700; /* (C3,C2,C1,C0) <-- 0000 */
+-        /* ST0 is unchanged */
+-        return;
+-    }
++    uint8_t old_flags = save_exception_flags(env);
++    uint64_t quotient;
++    CPU_LDoubleU temp0, temp1;
++    int exp0, exp1, expdiff;
  
-+    *quotient = 0;
-     if (floatx80_invalid_encoding(a) || floatx80_invalid_encoding(b)) {
-         float_raise(float_flag_invalid, status);
-         return floatx80_default_nan(status);
-@@ -5753,7 +5755,7 @@ floatx80 floatx80_modrem(floatx80 a, floatx80 b, bool mod,
-         shift128Right( aSig0, 0, 1, &aSig0, &aSig1 );
-         expDiff = 0;
-     }
--    q = ( bSig <= aSig0 );
-+    *quotient = q = ( bSig <= aSig0 );
-     if ( q ) aSig0 -= bSig;
-     expDiff -= 64;
-     while ( 0 < expDiff ) {
-@@ -5763,6 +5765,8 @@ floatx80 floatx80_modrem(floatx80 a, floatx80 b, bool mod,
-         sub128( aSig0, aSig1, term0, term1, &aSig0, &aSig1 );
-         shortShift128Left( aSig0, aSig1, 62, &aSig0, &aSig1 );
-         expDiff -= 62;
-+        *quotient <<= 62;
-+        *quotient += q;
-     }
-     expDiff += 64;
-     if ( 0 < expDiff ) {
-@@ -5776,6 +5780,12 @@ floatx80 floatx80_modrem(floatx80 a, floatx80 b, bool mod,
-             ++q;
-             sub128( aSig0, aSig1, term0, term1, &aSig0, &aSig1 );
-         }
-+        if (expDiff < 64) {
-+            *quotient <<= expDiff;
-+        } else {
-+            *quotient = 0;
+-    if (expdif < 53) {
+-        dblq = fpsrcop / fptemp;
+-        /* round dblq towards nearest integer */
+-        dblq = rint(dblq);
+-        st0 = fpsrcop - fptemp * dblq;
++    temp0.d = ST0;
++    temp1.d = ST1;
++    exp0 = EXPD(temp0);
++    exp1 = EXPD(temp1);
+ 
+-        /* convert dblq to q by truncating towards zero */
+-        if (dblq < 0.0) {
+-            q = (signed long long int)(-dblq);
++    env->fpus &= ~0x4700; /* (C3,C2,C1,C0) <-- 0000 */
++    if (floatx80_is_zero(ST0) || floatx80_is_zero(ST1) ||
++        exp0 == 0x7fff || exp1 == 0x7fff ||
++        floatx80_invalid_encoding(ST0) || floatx80_invalid_encoding(ST1)) {
++        ST0 = floatx80_modrem(ST0, ST1, mod, &quotient, &env->fp_status);
++    } else {
++        if (exp0 == 0) {
++            exp0 = 1 - clz64(temp0.l.lower);
 +        }
-+        *quotient += q;
-     }
-     else {
-         term1 = 0;
-@@ -5790,6 +5800,7 @@ floatx80 floatx80_modrem(floatx80 a, floatx80 b, bool mod,
-             aSig0 = alternateASig0;
-             aSig1 = alternateASig1;
-             zSign = ! zSign;
-+            ++*quotient;
++        if (exp1 == 0) {
++            exp1 = 1 - clz64(temp1.l.lower);
++        }
++        expdiff = exp0 - exp1;
++        if (expdiff < 64) {
++            ST0 = floatx80_modrem(ST0, ST1, mod, &quotient, &env->fp_status);
++            env->fpus |= (quotient & 0x4) << (8 - 2);  /* (C0) <-- q2 */
++            env->fpus |= (quotient & 0x2) << (14 - 1); /* (C3) <-- q1 */
++            env->fpus |= (quotient & 0x1) << (9 - 0);  /* (C1) <-- q0 */
+         } else {
+-            q = (signed long long int)dblq;
++            /*
++             * Partial remainder.  This choice of how many bits to
++             * process at once is specified in AMD instruction set
++             * manuals, and empirically is followed by Intel
++             * processors as well; it ensures that the final remainder
++             * operation in a loop does produce the correct low three
++             * bits of the quotient.  AMD manuals specify that the
++             * flags other than C2 are cleared, and empirically Intel
++             * processors clear them as well.
++             */
++            int n = 32 + (expdiff % 32);
++            temp1.d = floatx80_scalbn(temp1.d, expdiff - n, &env->fp_status);
++            ST0 = floatx80_mod(ST0, temp1.d, &env->fp_status);
++            env->fpus |= 0x400;  /* C2 <-- 1 */
          }
+-
+-        env->fpus &= ~0x4700; /* (C3,C2,C1,C0) <-- 0000 */
+-        /* (C0,C3,C1) <-- (q2,q1,q0) */
+-        env->fpus |= (q & 0x4) << (8 - 2);  /* (C0) <-- q2 */
+-        env->fpus |= (q & 0x2) << (14 - 1); /* (C3) <-- q1 */
+-        env->fpus |= (q & 0x1) << (9 - 0);  /* (C1) <-- q0 */
+-    } else {
+-        env->fpus |= 0x400;  /* C2 <-- 1 */
+-        fptemp = pow(2.0, expdif - 50);
+-        fpsrcop = (st0 / st1) / fptemp;
+-        /* fpsrcop = integer obtained by chopping */
+-        fpsrcop = (fpsrcop < 0.0) ?
+-                  -(floor(fabs(fpsrcop))) : floor(fpsrcop);
+-        st0 -= (st1 * fpsrcop * fptemp);
      }
-     return
-@@ -5806,7 +5817,8 @@ floatx80 floatx80_modrem(floatx80 a, floatx80 b, bool mod,
- 
- floatx80 floatx80_rem(floatx80 a, floatx80 b, float_status *status)
- {
--    return floatx80_modrem(a, b, false, status);
-+    uint64_t quotient;
-+    return floatx80_modrem(a, b, false, &quotient, status);
+-    ST0 = double_to_floatx80(env, st0);
++    merge_exception_flags(env, old_flags);
  }
  
- /*----------------------------------------------------------------------------
-@@ -5817,7 +5829,8 @@ floatx80 floatx80_rem(floatx80 a, floatx80 b, float_status *status)
- 
- floatx80 floatx80_mod(floatx80 a, floatx80 b, float_status *status)
+-void helper_fprem(CPUX86State *env)
++void helper_fprem1(CPUX86State *env)
  {
--    return floatx80_modrem(a, b, true, status);
-+    uint64_t quotient;
-+    return floatx80_modrem(a, b, true, &quotient, status);
+-    double st0, st1, dblq, fpsrcop, fptemp;
+-    CPU_LDoubleU fpsrcop1, fptemp1;
+-    int expdif;
+-    signed long long int q;
+-
+-    st0 = floatx80_to_double(env, ST0);
+-    st1 = floatx80_to_double(env, ST1);
+-
+-    if (isinf(st0) || isnan(st0) || isnan(st1) || (st1 == 0.0)) {
+-        ST0 = double_to_floatx80(env, 0.0 / 0.0); /* NaN */
+-        env->fpus &= ~0x4700; /* (C3,C2,C1,C0) <-- 0000 */
+-        return;
+-    }
+-
+-    fpsrcop = st0;
+-    fptemp = st1;
+-    fpsrcop1.d = ST0;
+-    fptemp1.d = ST1;
+-    expdif = EXPD(fpsrcop1) - EXPD(fptemp1);
+-
+-    if (expdif < 0) {
+-        /* optimisation? taken from the AMD docs */
+-        env->fpus &= ~0x4700; /* (C3,C2,C1,C0) <-- 0000 */
+-        /* ST0 is unchanged */
+-        return;
+-    }
+-
+-    if (expdif < 53) {
+-        dblq = fpsrcop / fptemp; /* ST0 / ST1 */
+-        /* round dblq towards zero */
+-        dblq = (dblq < 0.0) ? ceil(dblq) : floor(dblq);
+-        st0 = fpsrcop - fptemp * dblq; /* fpsrcop is ST0 */
+-
+-        /* convert dblq to q by truncating towards zero */
+-        if (dblq < 0.0) {
+-            q = (signed long long int)(-dblq);
+-        } else {
+-            q = (signed long long int)dblq;
+-        }
+-
+-        env->fpus &= ~0x4700; /* (C3,C2,C1,C0) <-- 0000 */
+-        /* (C0,C3,C1) <-- (q2,q1,q0) */
+-        env->fpus |= (q & 0x4) << (8 - 2);  /* (C0) <-- q2 */
+-        env->fpus |= (q & 0x2) << (14 - 1); /* (C3) <-- q1 */
+-        env->fpus |= (q & 0x1) << (9 - 0);  /* (C1) <-- q0 */
+-    } else {
+-        int N = 32 + (expdif % 32); /* as per AMD docs */
++    helper_fprem_common(env, false);
++}
+ 
+-        env->fpus |= 0x400;  /* C2 <-- 1 */
+-        fptemp = pow(2.0, (double)(expdif - N));
+-        fpsrcop = (st0 / st1) / fptemp;
+-        /* fpsrcop = integer obtained by chopping */
+-        fpsrcop = (fpsrcop < 0.0) ?
+-                  -(floor(fabs(fpsrcop))) : floor(fpsrcop);
+-        st0 -= (st1 * fpsrcop * fptemp);
+-    }
+-    ST0 = double_to_floatx80(env, st0);
++void helper_fprem(CPUX86State *env)
++{
++    helper_fprem_common(env, true);
  }
  
- /*----------------------------------------------------------------------------
-diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
-index bff6934d09..ff4e2605b1 100644
---- a/include/fpu/softfloat.h
-+++ b/include/fpu/softfloat.h
-@@ -687,7 +687,8 @@ floatx80 floatx80_add(floatx80, floatx80, float_status *status);
- floatx80 floatx80_sub(floatx80, floatx80, float_status *status);
- floatx80 floatx80_mul(floatx80, floatx80, float_status *status);
- floatx80 floatx80_div(floatx80, floatx80, float_status *status);
--floatx80 floatx80_modrem(floatx80, floatx80, bool, float_status *status);
-+floatx80 floatx80_modrem(floatx80, floatx80, bool, uint64_t *,
-+                         float_status *status);
- floatx80 floatx80_mod(floatx80, floatx80, float_status *status);
- floatx80 floatx80_rem(floatx80, floatx80, float_status *status);
- floatx80 floatx80_sqrt(floatx80, float_status *status);
+ void helper_fyl2xp1(CPUX86State *env)
 -- 
 2.17.1
 
