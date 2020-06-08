@@ -2,97 +2,104 @@ Return-Path: <SRS0=zEF8=7V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F6E6C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 14:18:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74C7AC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 14:18:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 279902076C
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 14:18:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 402982076C
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 14:18:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vn/bUxQ1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 279902076C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O1jxZEs7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 402982076C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49712 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51682 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jiIbH-0000ST-Bu
-	for qemu-devel@archiver.kernel.org; Mon, 08 Jun 2020 10:18:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53196)
+	id 1jiIbz-0001NK-CH
+	for qemu-devel@archiver.kernel.org; Mon, 08 Jun 2020 10:18:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53168)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jiIZg-0007mR-0e; Mon, 08 Jun 2020 10:16:28 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:50987)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jiIZc-0004Je-4q; Mon, 08 Jun 2020 10:16:25 -0400
-Received: by mail-wm1-x343.google.com with SMTP id l17so4311099wmj.0;
- Mon, 08 Jun 2020 07:16:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=nQPhz2+YJjCsPg8otnfDg7HceVgU+CdwJ3mFw2gnVCc=;
- b=Vn/bUxQ1xcQV7tS97fTg/0mPAIS8m/t/cEt9qQDqBg0wdQ8y0k/yPu9IVfuW26Xr43
- wpPjxjhfUWNWGr2jMTO/aZjVm8AFrFNhiT+QETES4XwJuKueJVlQYezCqWLlDuRT0+O4
- uHAueateN6Lc6H1rIC5p3TfEsoverMQ3cuqoHZu0MAQ1qAbANRzz962TIA6VzFnms/25
- gpSBm40EarVvNjmWJqGWYvbWIqKgRUrfwSQyU4Y5/cL25Vf9ftekfKFDXEMGtqfqkbHq
- WNM9BjSwTfhIhbN+7zCeRf+XVLlFITkIhR3IeTkYcJVTnjD74B8dGF8dnl+cv/SP/Kdk
- uNHA==
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jiIZP-0007fp-Vk
+ for qemu-devel@nongnu.org; Mon, 08 Jun 2020 10:16:13 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:60002
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jiIZP-0004Ir-6J
+ for qemu-devel@nongnu.org; Mon, 08 Jun 2020 10:16:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591625769;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=naE/KBqSLqVR0OFsSAmkm2Q+4eefA4nokgtoyr4TRgQ=;
+ b=O1jxZEs7QzrXSj0e52JUe5HWgnzzg/Cuk3epjDG7Ct1jEgVY/PYwwAiN1usoxVK3dG4Npo
+ j9oibXZrQB7J4ozV0SmJScmXc9Uet42F2YOaUxqqZtx9agflbAvfE6ZlZZ6uJ/sAIeFMb6
+ f6sHfxLhyhgCPPGRTHmTwrwj5RXfiaI=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-202-X8zhOEURMjmGeSs6U3ThAA-1; Mon, 08 Jun 2020 10:16:07 -0400
+X-MC-Unique: X8zhOEURMjmGeSs6U3ThAA-1
+Received: by mail-wr1-f70.google.com with SMTP id s7so7236030wrm.16
+ for <qemu-devel@nongnu.org>; Mon, 08 Jun 2020 07:16:07 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=nQPhz2+YJjCsPg8otnfDg7HceVgU+CdwJ3mFw2gnVCc=;
- b=qCkx4j0m9cbmX9bhnm4Pz7VqF59OWoW9ij2QLbjuXmqzSav5SwHcuguXS71qQxYjpz
- hOYIC7DmEt1IOylzgcAlCCUbDDm119tSYqrRYnRfZTfFyRHAKtduQ7AyhNYt2mk01J+S
- vX/fOeum4fT1JsO/YeCaqAXwXNqLxLCY0fR8EHFs+YjNatpFuz9LysGJh5OrtWdGzJII
- 5tqO9AEFk5vh0flSbE9hKvMVH4ca3H3NX9P6Q5Dk79BeUNp2o38Zcf8xUWHHGMFT1kUM
- S7NH6Tv2b7ywNosjc0HxNyotbeBiFO/rGuA+8jHHsLT/sY+hQtflPuXJlpPU8VcREVUR
- U4vw==
-X-Gm-Message-State: AOAM530mftspJ7TKFaEiuw5qZvwd2Zlby8hfM0s1NJPE9Iw3td2sMmbP
- L9KcqSrimueK82UYCvQukKc=
-X-Google-Smtp-Source: ABdhPJwYlF0vPvTKeSACta2NaIpybHaUAKaUZEfn+Bi0azkkozPM8pvCZMkO93JHE3xtFSijqtS6XA==
-X-Received: by 2002:a1c:a74f:: with SMTP id q76mr17742538wme.65.1591625782334; 
- Mon, 08 Jun 2020 07:16:22 -0700 (PDT)
-Received: from [192.168.1.38] (181.red-88-10-103.dynamicip.rima-tde.net.
- [88.10.103.181])
- by smtp.gmail.com with ESMTPSA id q8sm5290542wmq.1.2020.06.08.07.16.20
+ bh=naE/KBqSLqVR0OFsSAmkm2Q+4eefA4nokgtoyr4TRgQ=;
+ b=q5ktAtlTOhm/cH3iNJX90UR6rvWVNBkb4tYqBqcCBPqvmpGOShaBil6ZVKy0G9Dze6
+ 30rYH9FSfLl/6LBoNs3XIwBZSXM8XenbxXK35VTQvHnY1Ro1GP3jqkkLYCauHQGyUp/I
+ CCN7pInuI11JvURpFQ8bAFzj1YJ7S3dSiwQ+DqVAQOmv2TJ9cHPJBHuJPnbn3twihozP
+ 6H852KBcm/TDs02rnSvcRpazo1M9tF7qmvWqXSpuUePhGVHvU8FdmgPTK7AKcWH1jpbQ
+ 1SA4ZYe2i1ltSVpZT72HHHVTIg/yxCZHW8wZU3z0UEGpWlhbryCaXpny9MXOAaOTFHM3
+ wg7w==
+X-Gm-Message-State: AOAM531YlZLeKzwIYpGzpPTebdS3Xf++WtV1Mfmk3mYFMLLflBghDNGY
+ 4XDN4eKm2LFv/QM99pGGvDZRU5HnkB13H/a/Y9NNSBlo1pZcSKTTJnzxM+CMZ/j5oI4AZbB1hQR
+ 6hV+ux6DSOpJIEZg=
+X-Received: by 2002:a1c:bc42:: with SMTP id m63mr16993695wmf.11.1591625766378; 
+ Mon, 08 Jun 2020 07:16:06 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJysaIilnzg7MWcIex4IhturJCQfgPb2y1b1d1ibkcytuTmBOyJx3H6ettfU37zc2MNJQUR30Q==
+X-Received: by 2002:a1c:bc42:: with SMTP id m63mr16993672wmf.11.1591625766133; 
+ Mon, 08 Jun 2020 07:16:06 -0700 (PDT)
+Received: from [192.168.178.58] ([151.30.87.23])
+ by smtp.gmail.com with ESMTPSA id r2sm24452168wrg.68.2020.06.08.07.16.05
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 08 Jun 2020 07:16:21 -0700 (PDT)
-Subject: Re: [PATCH v2 02/24] display/xlnx_dp: Fix to realize "i2c-ddc" and
- "aux-to-i2c-bridge"
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20200528110444.20456-1-armbru@redhat.com>
- <20200528110444.20456-3-armbru@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <a64bd91c-58b5-1438-a401-5d6c04441c67@amsat.org>
-Date: Mon, 8 Jun 2020 16:16:20 +0200
+ Mon, 08 Jun 2020 07:16:05 -0700 (PDT)
+Subject: Re: [PATCH v1] hmp: Make json format optional for qom-set
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+References: <20200608140650.91517-1-david@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <652a6692-2ba4-94b0-503d-9cea876c859c@redhat.com>
+Date: Mon, 8 Jun 2020 16:16:04 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200528110444.20456-3-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200608140650.91517-1-david@redhat.com>
 Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -16
-X-Spam_score: -1.7
-X-Spam_bar: -
-X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/08 01:05:50
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,71 +112,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>,
- Peter Maydell <peter.maydell@linaro.org>, berrange@redhat.com,
- ehabkost@redhat.com, Alistair Francis <alistair@alistair23.me>,
- qemu-arm@nongnu.org, Alistair Francis <alistair.francis@wdc.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, pbonzini@redhat.com,
- KONRAD Frederic <fred.konrad@greensocs.com>
+Cc: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/28/20 1:04 PM, Markus Armbruster wrote:
-> xlnx_dp_init() creates these two devices, but they're never realized.
-> Affects machine xlnx-zcu102.
-> 
-> In theory, a device becomes real only on realize.  In practice, the
-> transition from unreal to real is a fuzzy one.  The work to make a
-> device real can be spread between realize methods (fine),
-> instance_init methods (wrong), and board code wiring up the device
-> (fine as long as it effectively happens on realize).  Depending on
-> what exactly is done where, a device can work even when we neglect to
-> realize it.
-> 
-> These two appear to work.  Nevertheless, it's a clear misuse of the
-> interface.  Even when it works today (more or less by chance), it can
-> break tomorrow.
-> 
-> Fix by realizing them in xlnx_dp_realize().
-> 
-> Fixes: 58ac482a66de09a7590f705e53fc6a3fb8a055e8
-> Cc: KONRAD Frederic <fred.konrad@greensocs.com>
-> Cc: Alistair Francis <alistair@alistair23.me>
-> Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Cc: qemu-arm@nongnu.org
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-> ---
->  hw/display/xlnx_dp.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/hw/display/xlnx_dp.c b/hw/display/xlnx_dp.c
-> index 3e5fb44e06..bdc229a51e 100644
-> --- a/hw/display/xlnx_dp.c
-> +++ b/hw/display/xlnx_dp.c
-> @@ -1264,9 +1264,13 @@ static void xlnx_dp_realize(DeviceState *dev, Error **errp)
->      DisplaySurface *surface;
->      struct audsettings as;
->  
-> +    qdev_init_nofail(DEVICE(s->aux_bus->bridge));
+On 08/06/20 16:06, David Hildenbrand wrote:
+>      {
+>          .name       = "qom-set",
+> -        .args_type  = "path:s,property:s,value:S",
+> -        .params     = "path property value",
+> -        .help       = "set QOM property",
+> +        .args_type  = "json:-j,path:s,property:s,value:s",
 
-Eh??? Why not realize the bridge in aux_init_bus()?
+I think this should remain an uppercase "S", so that it grabs the rest
+of the input rather than stop at the first space.
 
-> +
->      qdev_init_nofail(DEVICE(s->dpcd));
->      aux_map_slave(AUX_SLAVE(s->dpcd), 0x0000);
->  
-> +    qdev_init_nofail(DEVICE(s->edid));
+Paolo
 
-This one is OK.
-
-> +
->      s->console = graphic_console_init(dev, 0, &xlnx_dp_gfx_ops, s);
->      surface = qemu_console_surface(s->console);
->      xlnx_dpdma_set_host_data_location(s->dpdma, DP_GRAPHIC_DMA_CHANNEL,
-> 
+> +        .params     = "[-j] path property value",
+> +        .help       = "set QOM property.\n\t\t\t"
+> +                      "-j: the property is specified in json format.",
+>          .cmd        = hmp_qom_set,
+>          .flags      = "p",
+>      },
+> diff --git a/qom/qom-hmp-cmds.c b/qom/qom-hmp-cmds.c
 
 
