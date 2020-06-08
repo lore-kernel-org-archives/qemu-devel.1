@@ -7,80 +7,77 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 840D5C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 16:26:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D851BC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 16:26:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 51A61206C3
-	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 16:26:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A798F20774
+	for <qemu-devel@archiver.kernel.org>; Mon,  8 Jun 2020 16:26:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O+2xDPsP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51A61206C3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QQEcU9q0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A798F20774
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38058 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40994 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jiKb5-0005sF-Gi
-	for qemu-devel@archiver.kernel.org; Mon, 08 Jun 2020 12:26:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38266)
+	id 1jiKbe-00073h-Sf
+	for qemu-devel@archiver.kernel.org; Mon, 08 Jun 2020 12:26:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38154)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jiKFJ-0007SB-2E
- for qemu-devel@nongnu.org; Mon, 08 Jun 2020 12:03:33 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:53610
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jiKEk-00078u-1X
+ for qemu-devel@nongnu.org; Mon, 08 Jun 2020 12:02:58 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:32053
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jiKFG-0008AO-Gf
- for qemu-devel@nongnu.org; Mon, 08 Jun 2020 12:03:31 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jiKEi-0007vb-FO
+ for qemu-devel@nongnu.org; Mon, 08 Jun 2020 12:02:57 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591632201;
+ s=mimecast20190719; t=1591632172;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=J738BQqBvhpMt3eJFPP/lmrii93ELO7mMMfmrV28FMw=;
- b=O+2xDPsPJH1jiXin8V8D0SXVvB/V0YB5Tyh/FbitQfqIr9Y+KMe6lcW0pwpKcteAPVonF9
- qGOuMcRtZ/AzgkUi1C8StCUvlusTtGqkHBGffu1yZQf9EKrIlPFm4jjQCn3VQgvPMOK7X4
- nvWazC4pCzVgcrXCLSZF2rp0hQ6Cmvg=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-149-g7CCi_N7NGSTYj8JEToMxQ-1; Mon, 08 Jun 2020 12:03:19 -0400
-X-MC-Unique: g7CCi_N7NGSTYj8JEToMxQ-1
-Received: by mail-wm1-f72.google.com with SMTP id y15so13925wmi.0
- for <qemu-devel@nongnu.org>; Mon, 08 Jun 2020 09:03:19 -0700 (PDT)
+ bh=7Lcxf8cj+CxLJSf8aQEjLTWyUhOWt7SwLOi9PO4gCM4=;
+ b=QQEcU9q05KiObLyNzcPOjqLxTuyITcFRNrwUzKbmyY8RyBAhlEqpsIgZ/yRYSRqEsHswAH
+ u0eqYwf4DRfNv0xHwPzP683YC2PF7oGeqQvPFj3rDkW5pmUpWgrE7Qbu0eDSdnPVFTS2Oq
+ XvRW+nSy4hdGHCtvBXLuOs9/E+j68WU=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-98-eh51a96WM7SIC5BX2WPqjw-1; Mon, 08 Jun 2020 12:02:46 -0400
+X-MC-Unique: eh51a96WM7SIC5BX2WPqjw-1
+Received: by mail-wr1-f69.google.com with SMTP id s17so7305989wrt.7
+ for <qemu-devel@nongnu.org>; Mon, 08 Jun 2020 09:02:46 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=J738BQqBvhpMt3eJFPP/lmrii93ELO7mMMfmrV28FMw=;
- b=T41OFDKKJKnCpmjZYe4WlHbehetqxPRhNxj556uSGIaju3Tb79oxcQPPMwEVeohweM
- QC+JWyofHNpSXCieKLTqv1wcyP56Izw0T4U0aRcrP6U9ZV0DQaaLEd2/kGw3PN59/kRe
- tewFRksbezymFuRhvvJ4Ck+AuVPVqSWgDl4bscD5WSyAobtBtMmRqnDCoS3qIBV7zzUn
- gc9E0Wh+65OitZVbi8ZZf6/FXL+HozQCr7oCGiTg1Etzs505IU4hO4prb0xjnfQgfAo1
- WG5NzKOtgCKZmWp/40o5z6sZ6BKbY08f+4wBrIA5cO35GAzpefNEm9ToGawO4qcMPGiQ
- TjiQ==
-X-Gm-Message-State: AOAM5322GzqAao1Eq0afzgZUfz2a2Lg/DxaU1UJEmrCFluPi+fB2ovVU
- H0HxzJfafYqANYWkplJWtWwMwcE8AFwTRNkS950V950gFxxnX1c7ZJB5nPK8rWwVkiyqG8JLEg8
- 6tdRWYnljVeFkvLw=
-X-Received: by 2002:a05:600c:4410:: with SMTP id
- u16mr73274wmn.88.1591632196837; 
- Mon, 08 Jun 2020 09:03:16 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz3xkvh2Vk+4PYCBSKCv2fZwGK7MNY+4FcnyFPW+oUbVotWO8gdASoKL+nfN+0YxJIIGJ7I2g==
-X-Received: by 2002:a05:600c:4410:: with SMTP id
- u16mr73234wmn.88.1591632196640; 
- Mon, 08 Jun 2020 09:03:16 -0700 (PDT)
+ bh=7Lcxf8cj+CxLJSf8aQEjLTWyUhOWt7SwLOi9PO4gCM4=;
+ b=kVgjUNs4Uc9AFhlEhGAwIqhMguW8LdWR5Y7a1XLPFuMapIor7cZNCiXnKvN8AtT5QS
+ wV5kG35WeMOmEAdhZWZ8f9kqnTR08CzaxF/f945QQntO9yFH35Mku31FVeqx8LIoX1jW
+ JBZFDexAFeTzPRpRJaeAzDof3wRGf0PV2f/SfdcF276xLtcPga/EhmnljA/UuehRUm/o
+ 7VOsQb8HvIoOlZ9N/HbNbCUqqTix5pYPSR9HkuH2tWgW9eiZR4DBVkN11gkN/nRfnKH9
+ lV0RK8ASrXOz5hNBMvHoL8QcxHq0SH4sy0vJYgMSipLQv+mbsUVEHoaPSuSIoqg9UURA
+ Z8aA==
+X-Gm-Message-State: AOAM533BzhLrc4AiI6hwM0huBjhLD9hgXOTufcYekjRSexCV8PAhn1tF
+ hLlib4VHj1TIobWO6/Nqr4jaoeKWnhFap5Qrf5OIKfDHH5sWZ9cUP0l+vV05H1H8YsKNsL7YGpa
+ 9tZFvBI39YFngCAQ=
+X-Received: by 2002:a1c:6056:: with SMTP id u83mr60178wmb.138.1591632161698;
+ Mon, 08 Jun 2020 09:02:41 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJztIcOuKmMAnKpEQL/s7NO4XNCQYfWj4X6mQCPh85ejUPn/olQa6U5W1zctaCPlsras+JjNJA==
+X-Received: by 2002:a1c:6056:: with SMTP id u83mr60154wmb.138.1591632161497;
+ Mon, 08 Jun 2020 09:02:41 -0700 (PDT)
 Received: from localhost.localdomain
  (181.red-88-10-103.dynamicip.rima-tde.net. [88.10.103.181])
- by smtp.gmail.com with ESMTPSA id l17sm32396wmi.16.2020.06.08.09.03.14
+ by smtp.gmail.com with ESMTPSA id a81sm19165wmd.25.2020.06.08.09.02.39
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 08 Jun 2020 09:03:16 -0700 (PDT)
+ Mon, 08 Jun 2020 09:02:40 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC PATCH 26/35] hw/openrisc/cputimer: Emit warning when old code is
- used
-Date: Mon,  8 Jun 2020 18:00:35 +0200
-Message-Id: <20200608160044.15531-27-philmd@redhat.com>
+Subject: [RFC PATCH 20/35] hw/intc/i8259: Emit warning when old code is used
+Date: Mon,  8 Jun 2020 18:00:29 +0200
+Message-Id: <20200608160044.15531-21-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200608160044.15531-1-philmd@redhat.com>
 References: <20200608160044.15531-1-philmd@redhat.com>
@@ -90,17 +87,16 @@ X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8;
 	text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/08 05:40:44
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/08 11:58:00
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -143,30 +139,30 @@ This code hasn't been QOM'ified yet. Warn the user.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- hw/openrisc/cputimer.c | 3 +++
+ hw/intc/i8259.c | 3 +++
  1 file changed, 3 insertions(+)
 
-diff --git a/hw/openrisc/cputimer.c b/hw/openrisc/cputimer.c
-index 93268815d8..60f2c9667f 100644
---- a/hw/openrisc/cputimer.c
-+++ b/hw/openrisc/cputimer.c
-@@ -22,6 +22,7 @@
- #include "cpu.h"
- #include "migration/vmstate.h"
- #include "qemu/timer.h"
+diff --git a/hw/intc/i8259.c b/hw/intc/i8259.c
+index 51b27f6a34..9d9609cdab 100644
+--- a/hw/intc/i8259.c
++++ b/hw/intc/i8259.c
+@@ -30,6 +30,7 @@
+ #include "qemu/log.h"
+ #include "hw/isa/i8259_internal.h"
+ #include "trace.h"
 +#include "hw/qdev-deprecated.h"
  
- #define TIMER_PERIOD 50 /* 50 ns period for 20 MHz timer */
+ /* debug PIC */
+ //#define DEBUG_PIC
+@@ -414,6 +415,8 @@ qemu_irq *i8259_init(ISABus *bus, qemu_irq parent_irq)
+     ISADevice *isadev;
+     int i;
  
-@@ -135,6 +136,8 @@ static const VMStateDescription vmstate_or1k_timer = {
- 
- void cpu_openrisc_clock_init(OpenRISCCPU *cpu)
- {
 +    qdev_warn_deprecated_function_used();
 +
-     cpu->env.timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, &openrisc_timer_cb, cpu);
-     cpu->env.ttmr = 0x00000000;
+     irq_set = g_new0(qemu_irq, ISA_NUM_IRQS);
  
+     isadev = i8259_init_chip(TYPE_I8259, bus, true);
 -- 
 2.21.3
 
