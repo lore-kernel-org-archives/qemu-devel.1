@@ -2,82 +2,108 @@ Return-Path: <SRS0=hUBF=7W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB185C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 18:14:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46F74C433E1
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 18:14:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 934662068D
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 18:14:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 934662068D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 1AEAE2068D
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 18:14:26 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a6KNlPld"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1AEAE2068D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42064 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42674 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jiilN-0002M4-Pl
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 14:14:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34116)
+	id 1jiilV-0002eN-Bi
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 14:14:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34134)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jiii0-0006ju-Ro
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 14:10:49 -0400
-Received: from indium.canonical.com ([91.189.90.7]:57870)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jiihz-0003aC-9F
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 14:10:48 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jiihx-0007ju-30
- for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 18:10:45 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 0FFFD2E802E
- for <qemu-devel@nongnu.org>; Tue,  9 Jun 2020 18:10:45 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jiii8-0006ub-0A
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 14:10:56 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:29140
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jiii6-0003dH-So
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 14:10:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591726253;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=PRO3RJ8//ad3L7+cHhE1QpBAJL4ZvonlG7wq8Uwk88o=;
+ b=a6KNlPldJfdGnnzjZVQjioXpx/8lFzLxEGT+RqLRekgmTVJoSXjDfmsjTj4hgVrNwmU9kZ
+ O+zQQkJ4McFjxA7ZwTfR/2T1AE0k8xIPO0I20shTQtEXKPykFjfUEjV5NRxVS2LKmMbcU1
+ W8hTVL2DD9t83AyUwQRz0us+8j1G1Jw=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-287-f6KzA5MvNkuBofg74l1zxg-1; Tue, 09 Jun 2020 14:10:52 -0400
+X-MC-Unique: f6KzA5MvNkuBofg74l1zxg-1
+Received: by mail-wr1-f71.google.com with SMTP id n6so8944830wrv.6
+ for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 11:10:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=/sHXkGI8UwucoG4Qfr/gDTd9nQ+9Mczx7ITEFMiWIZ4=;
+ b=IA+n1obCimrtiUEahVw0f1Hznlbxk1cu6AThOqQ8/wNc85NoMQG27trpEMxpG6yy4y
+ B9XAO3yU8TACmjC9YzwU2hhKR7RzYX5gWg2KEQVg7WiAW2ZgPRT83IXepMtB1PNV+A4o
+ wQ077NmhDdMT/yvm7cAex3o7JX0rm8wCLXblzi0gvG4KX16J7tgwt3M5MR3jiJMp1IU1
+ 6zBECwl+0UJHx1/9sE9tZ9/AeFajs930NTI1vuI5Aur+2jsb1eDaxnTkgHZy4bAOwXFD
+ x4IGXh3lYZWGZFXp4uiMjPfSuin9P8D8DEbMXE3HmBzkkyogHyhNK0KCSZHccSBytjCN
+ d74g==
+X-Gm-Message-State: AOAM533pRH+hZ2Pdnv9w7PeWtyz+fPxBEuawXu/aaDWyWzB2QXQMq1aB
+ mU9NRwoDU2Gjp0ZTUI/KxKqqW6mE5Aa1B7vabuGTIeHJy+wxxhViZiLVHFBDlmSUmmz27pF0ZiO
+ Ek3K5Koi45fRH/I0=
+X-Received: by 2002:adf:fe07:: with SMTP id n7mr5646339wrr.240.1591726251185; 
+ Tue, 09 Jun 2020 11:10:51 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJztMpaI1fKtcn5pGvvUdkMUsmXIRBqnEBBchG48hBjwn8Wcw+LY7OAXmpt9ITPAUnGeWD0rog==
+X-Received: by 2002:adf:fe07:: with SMTP id n7mr5646317wrr.240.1591726250950; 
+ Tue, 09 Jun 2020 11:10:50 -0700 (PDT)
+Received: from redhat.com (bzq-79-181-55-232.red.bezeqint.net. [79.181.55.232])
+ by smtp.gmail.com with ESMTPSA id u13sm3587091wmm.6.2020.06.09.11.10.49
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 09 Jun 2020 11:10:50 -0700 (PDT)
+Date: Tue, 9 Jun 2020 14:10:48 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: [PULL 3/9] tests/migration: Reduce autoconverge initial bandwidth
+Message-ID: <20200609141005-mutt-send-email-mst@kernel.org>
+References: <20200325131632.311034-1-dgilbert@redhat.com>
+ <20200325131632.311034-4-dgilbert@redhat.com>
+ <20200609123323-mutt-send-email-mst@kernel.org>
+ <20200609170017.GD2841@work-vm>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 09 Jun 2020 18:00:51 -0000
-From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1882817@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: philmd theartlav
-X-Launchpad-Bug-Reporter: Artyom (theartlav)
-X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
- =?utf-8?q?=29?=
-References: <159172265471.31406.7196816329603804386.malonedeb@gac.canonical.com>
-Message-ID: <8f0267bf-1020-a3eb-e205-8727aa535e14@redhat.com>
-Subject: Re: [Bug 1882817] [NEW] Segfault in audio_pcm_sw_write with audio
- over VNC
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="ef9fc486e875d54078fa61cf91e898b895125d89";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: a292390a48afed270a067ad5cd98cdcfa92a4037
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 10:15:37
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200609170017.GD2841@work-vm>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=mst@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/08 23:42:34
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -86,124 +112,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1882817 <1882817@bugs.launchpad.net>
+Cc: vsementsov@virtuozzo.com, maozhongyi@cmss.chinamobile.com,
+ pannengyuan@huawei.com, qemu-devel@nongnu.org, imammedo@redhat.com,
+ philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20200609180051.ZC1uKpaAEfFvFIzzF1bu6CB4dkqaOe8PPWIcPWLKPxc@z>
 
-On 6/9/20 7:10 PM, Artyom wrote:
-> Public bug reported:
-> =
+On Tue, Jun 09, 2020 at 06:00:17PM +0100, Dr. David Alan Gilbert wrote:
+> * Michael S. Tsirkin (mst@redhat.com) wrote:
+> > On Wed, Mar 25, 2020 at 01:16:26PM +0000, Dr. David Alan Gilbert (git) wrote:
+> > > From: Philippe Mathieu-DaudÃ© <philmd@redhat.com>
+> > > 
+> > > When using max-bandwidth=~100Mb/s, this test fails on Travis-CI
+> > > s390x when configured with --disable-tcg:
+> > > 
+> > >   $ make check-qtest
+> > >     TEST    check-qtest-s390x: tests/qtest/boot-serial-test
+> > >   qemu-system-s390x: -accel tcg: invalid accelerator tcg
+> > >   qemu-system-s390x: falling back to KVM
+> > >     TEST    check-qtest-s390x: tests/qtest/pxe-test
+> > >     TEST    check-qtest-s390x: tests/qtest/test-netfilter
+> > >     TEST    check-qtest-s390x: tests/qtest/test-filter-mirror
+> > >     TEST    check-qtest-s390x: tests/qtest/test-filter-redirector
+> > >     TEST    check-qtest-s390x: tests/qtest/drive_del-test
+> > >     TEST    check-qtest-s390x: tests/qtest/device-plug-test
+> > >     TEST    check-qtest-s390x: tests/qtest/virtio-ccw-test
+> > >     TEST    check-qtest-s390x: tests/qtest/cpu-plug-test
+> > >     TEST    check-qtest-s390x: tests/qtest/migration-test
+> > >   **
+> > >   ERROR:tests/qtest/migration-test.c:1229:test_migrate_auto_converge: 'got_stop' should be FALSE
+> > >   ERROR - Bail out! ERROR:tests/qtest/migration-test.c:1229:test_migrate_auto_converge: 'got_stop' should be FALSE
+> > >   make: *** [tests/Makefile.include:633: check-qtest-s390x] Error 1
+> > > 
+> > > Per David Gilbert, "it could just be the writing is slow on s390
+> > > and the migration thread fast; in which case the autocomplete
+> > > wouldn't be needed. Perhaps we just need to reduce the bandwidth
+> > > limit."
+> > > 
+> > > Tuning the threshold by reducing the initial bandwidth makes the
+> > > autoconverge test pass.
+> > > 
+> > > Suggested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > > Signed-off-by: Philippe Mathieu-DaudÃ© <philmd@redhat.com>
+> > > Message-Id: <20200323184015.11565-1-philmd@redhat.com>
+> > > Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > > Tested-by: Alex BennÃ©e <alex.bennee@linaro.org>
+> > > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > 
+> > 
+> > This slows make check down significantly for me, it stays
+> > at the migration test for minutes.
+> 
+> Is this on the s390x version or all of them?
 
-> QEMU 5.0.0, built with ./configure --target-list=3Dx86_64-softmmu
-> --enable-debug --disable-strip --disable-docs --disable-sdl
-> =
+x86 slows down for me.
 
-> Running on a headless host (Ryzen 3600), Arch Linux, 64bit latest.
-> Guest is also Arch Linux, 64bit.
-> =
+> > I'm carrying a revert at top of my tree for now but I'd rather
+> > not need that.
+> > 
+> > 
+> > This seems like a fragile way to test things anyway.
+> > What happens if someone slows writing even more
+> > e.g. because it's running in a container or a VM?
+> > 
+> > How about detecting that migration finished too early
+> > and slowing it down until autocomplete triggers?
+> 
+> THe problem is you can't rely on any form of consistency in a heavily
+> contended container, so the fact that it took n-seconds to migrate at
+> this attempt means very little about what the next attempt will take.
+> 
+> Dave
 
-> Started with qemu-system-x86_64 -vnc 0.0.0.0:0 -enable-kvm -m 4096 -cpu h=
-ost -smp cores=3D2,threads=3D1,sockets=3D1 -machine q35 -vga std -device
->  ich9-ahci,id=3Dahci -drive file=3Dvm0.qcow2,format=3Dqcow2,if=3Dnone,id=
-=3Ddsk0 -device ide-hd,drive=3Ddsk0,bus=3Dahci.0 -soundhw hda
-> =
+What I'm saying is try migrating quickly. If it's too quick
+try again ...
 
-> So, a headless VM is running on a server and is being connected to over
-> VNC. The virtual sound card is detected and speaker test is running
-> inside the VM. So far so good.
-> =
+> > 
+> > 
+> > > ---
+> > >  tests/qtest/migration-test.c | 2 +-
+> > >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > > 
+> > > diff --git a/tests/qtest/migration-test.c b/tests/qtest/migration-test.c
+> > > index 3d6cc83b88..2568c9529c 100644
+> > > --- a/tests/qtest/migration-test.c
+> > > +++ b/tests/qtest/migration-test.c
+> > > @@ -1211,7 +1211,7 @@ static void test_migrate_auto_converge(void)
+> > >       * without throttling.
+> > >       */
+> > >      migrate_set_parameter_int(from, "downtime-limit", 1);
+> > > -    migrate_set_parameter_int(from, "max-bandwidth", 100000000); /* ~100Mb/s */
+> > > +    migrate_set_parameter_int(from, "max-bandwidth", 1000000); /* ~1Mb/s */
+> > >  
+> > >      /* To check remaining size after precopy */
+> > >      migrate_set_capability(from, "pause-before-switchover", true);
+> > > -- 
+> > > 2.25.1
+> > > 
+> > > 
+> > 
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
-> Then, i tell the VNC client to enable audio (QEMU Audio Client Message,
-> 255,1,0). QEMU responds with a "stream is about to start" message (QEMU
-> Audio Server Message, 255,1,1) and then promptly crashes without sending
-> anything else.
-> =
-
-> Running it in GDB produces a crash at audio/audio.c:739
-> =
-
-> Thread 1 "qemu-system-x86" received signal SIGSEGV, Segmentation fault.
-> audio_pcm_sw_write (sw=3D0x5555575bbf30, buf=3D0x0, size=3D1628) at audio=
-/audio.c:739
-> 739             if (!sw->hw->pcm_ops->volume_out) {
-
-Isn't it the one fixed by
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg705896.html?
-
-> =
-
-> The exact sequence of events does not matter - i can enable sound before
-> playing anything, and then it would say nothing and keep working, but
-> crash with the same message once anything sound-playing is launched in
-> the VM.
-> =
-
-> Using different soundhw or adding various audiodev options does not seem
-> to affect anything.
-> =
-
-> I can't quite figure out if the QEMU Audio VNC extension is supposed to
-> work at all or not, but it would be handy to me if it is.
-> =
-
-> ** Affects: qemu
->      Importance: Undecided
->          Status: New
->
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1882817
-
-Title:
-  Segfault in audio_pcm_sw_write with audio over VNC
-
-Status in QEMU:
-  New
-
-Bug description:
-  QEMU 5.0.0, built with ./configure --target-list=3Dx86_64-softmmu
-  --enable-debug --disable-strip --disable-docs --disable-sdl
-
-  Running on a headless host (Ryzen 3600), Arch Linux, 64bit latest.
-  Guest is also Arch Linux, 64bit.
-
-  Started with qemu-system-x86_64 -vnc 0.0.0.0:0 -enable-kvm -m 4096 -cpu h=
-ost -smp cores=3D2,threads=3D1,sockets=3D1 -machine q35 -vga std -device
-   ich9-ahci,id=3Dahci -drive file=3Dvm0.qcow2,format=3Dqcow2,if=3Dnone,id=
-=3Ddsk0 -device ide-hd,drive=3Ddsk0,bus=3Dahci.0 -soundhw hda
-
-  So, a headless VM is running on a server and is being connected to
-  over VNC. The virtual sound card is detected and speaker test is
-  running inside the VM. So far so good.
-
-  Then, i tell the VNC client to enable audio (QEMU Audio Client
-  Message, 255,1,0). QEMU responds with a "stream is about to start"
-  message (QEMU Audio Server Message, 255,1,1) and then promptly crashes
-  without sending anything else.
-
-  Running it in GDB produces a crash at audio/audio.c:739
-
-  Thread 1 "qemu-system-x86" received signal SIGSEGV, Segmentation fault.
-  audio_pcm_sw_write (sw=3D0x5555575bbf30, buf=3D0x0, size=3D1628) at audio=
-/audio.c:739
-  739             if (!sw->hw->pcm_ops->volume_out) {
-
-  The exact sequence of events does not matter - i can enable sound
-  before playing anything, and then it would say nothing and keep
-  working, but crash with the same message once anything sound-playing
-  is launched in the VM.
-
-  Using different soundhw or adding various audiodev options does not
-  seem to affect anything.
-
-  I can't quite figure out if the QEMU Audio VNC extension is supposed
-  to work at all or not, but it would be handy to me if it is.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1882817/+subscriptions
 
