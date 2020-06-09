@@ -2,131 +2,121 @@ Return-Path: <SRS0=hUBF=7W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AFDEC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 14:22:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3926EC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 14:23:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 174EB20774
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 14:22:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E815320774
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 14:23:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Rjn17yGg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 174EB20774
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="n2EPKhtp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E815320774
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39902 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41202 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jif9P-0001Cg-8k
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 10:22:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55572)
+	id 1jif9r-0001j5-0l
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 10:23:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54708)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jif7v-0007uC-6o
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 10:21:19 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:47565
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jif7t-0000XE-96
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 10:21:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591712475;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=mKn89GE4yhBVAiE11TJdbe2i5inOVS2QTjmPTgDJ69s=;
- b=Rjn17yGguO1b9L/FmNyWWmyZcnqjaEGVgaq4933tyoZP7GWIdxv61iHBAr8zvtMuBBO52g
- MrtzQRzo6P2N5iZ1YicmITY/OmH32OoLo6NCdZv8RRrvfWRPJy5lxL2N9K/nZbfKRLcj+F
- CIpmP+AnVAdrJBLdzE40pEVnRzA9bMM=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-270-P5eu0ez7NU2Hi3nBCFjsuQ-1; Tue, 09 Jun 2020 10:21:11 -0400
-X-MC-Unique: P5eu0ez7NU2Hi3nBCFjsuQ-1
-Received: by mail-wm1-f71.google.com with SMTP id v24so760705wmh.3
- for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 07:21:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=mKn89GE4yhBVAiE11TJdbe2i5inOVS2QTjmPTgDJ69s=;
- b=ab0N7Cmsn3tleEIlBs6wYJSn7N7OT6YFGxo3/GCXawiwnDKevDH9hFvJZq7AWFdoN5
- FCpisynYp8cZR1wQw+PB6YBt+gDUQ7cRDuG5nCA+YxKw7hO1DSJ3oa4RV0I0V1DIzqho
- uxU/hbS0W7Fj7EXwIytO+43zwJ50zarJyUY8FFX5ofbIA7c5cRf8+a9NTvWfyDIl4Txt
- fjM9d5v/kLIsE6byLR2+HX89us74QdGLOTw6Fgfl45jyUevmpeLoTXaDctu1WPOvYvXD
- jvxYFyNpHRrcmvevjgBUva2gyiH0Vvy3yQ+Ou3r7BXWILyOt0KUFwfggFtR8tOqEDJn1
- p6ew==
-X-Gm-Message-State: AOAM530RjzzhuapchniIt5I/krQuQ5ilasxgQ+Nlb9TlISu9iXQo179c
- 1iF1uamDA/3BZc/FILaEaHJq+r2pxeLmqLaA8QldScXELwLmYrsLPPMTjiKBsF1DibOU8ragUmA
- M5UETUIQTlPijhlY=
-X-Received: by 2002:adf:f389:: with SMTP id m9mr4483916wro.195.1591712470764; 
- Tue, 09 Jun 2020 07:21:10 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxVSbQF2Okg6IZQv8DAmCHaZ1KMAa/+F0HdbTOCecz1JLAkgSyXikD/mTwnw2Q5EztnLZDanQ==
-X-Received: by 2002:adf:f389:: with SMTP id m9mr4483889wro.195.1591712470441; 
- Tue, 09 Jun 2020 07:21:10 -0700 (PDT)
-Received: from [192.168.1.38] (181.red-88-10-103.dynamicip.rima-tde.net.
- [88.10.103.181])
- by smtp.gmail.com with ESMTPSA id l1sm3989652wrb.31.2020.06.09.07.21.09
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 09 Jun 2020 07:21:09 -0700 (PDT)
-Subject: Re: [PATCH v5 06/11] riscv: Initial commit of OpenTitan machine
-To: Damien Hedde <damien.hedde@greensocs.com>,
- Alistair Francis <alistair.francis@wdc.com>, qemu-devel@nongnu.org,
- qemu-riscv@nongnu.org
-References: <cover.1590704015.git.alistair.francis@wdc.com>
- <0ab3cecbe801f9e14ad1a5447d02483b9008fdbb.1590704015.git.alistair.francis@wdc.com>
- <c3d7b26b-c55d-8ec5-3ee3-f197693b4378@greensocs.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <7bb1bc10-e986-dcbc-630d-99660517c11b@redhat.com>
-Date: Tue, 9 Jun 2020 16:21:09 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jif0r-0006vf-Gx; Tue, 09 Jun 2020 10:14:01 -0400
+Received: from mail-am6eur05on2133.outbound.protection.outlook.com
+ ([40.107.22.133]:27969 helo=EUR05-AM6-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jif0q-0007gx-0Y; Tue, 09 Jun 2020 10:14:01 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=K+urYbJB8V4je8x1nVtfsClZT3e0q4ImGZYhwUqFs/YdDdo4vem/GjbNqrz/VCtVCvb46NYdqQeqmp8qQDdIejN4rW01gMkoC4JTCkkT6mQNLcoeM1L9LiZBswDy4IwhXhrdDuuy8ONvhzZgR4880cU13kJQFou/zdYeIvWS3nor+z1fc9MJsTyTeVxdoRCmSeJDColbu4t72/xSGgl9RdlBYJq7jttqidvAdGNFNxcqqtDKArAKcdt+840PXzGx5kOJ0guYQOFcX+7N6wGtPyvEkugIdcNBJNo3gMHSGlQFa1XUUhNlgIKwnCPu1pxtgeFS2IpzIZtbdwI9Eah0kg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=P+d3F4A0xFO02lJNWxruw6tLeIUskt33CWkhSv3cj6Q=;
+ b=ggK+EKRV8jqv+k7XZLYd5q2a6ucpzd7xgQwWi4biLuMX0QdBJqq0Q0illz1PE1DArZy8+1TeOGmjnp8HY8eOyMsa4NFSLOT/nrIT2ha6tJAiVYW5KE3bBVShXCPUMtQqbStGEZZscFrDmcUKcApHqqpKsxJmExjLjsoMm5403IizXn2dzE/GPIJy7UATbXWGEa5tcYbc9n0+Zoeilk6hscGFXM1u8HjoqxQ54X/1uOEIxZuFa4BGsZcp7t9ptz27tes3XvJm4llDv0+tZyPM4Wq1az9ZDL1+7nah6EC2wAKldoqbrjNElNGFBOiird1ZarCvf6bcntbbkFIcqkwsqg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=P+d3F4A0xFO02lJNWxruw6tLeIUskt33CWkhSv3cj6Q=;
+ b=n2EPKhtpPlQKm/G3O1AfLBSZijhjyGNjBHu6VA9sBU9A1NIFVVSdgl5JnRJAS/qIDFEaGSzyf28hRdxDSVX51eEZ7BCgzQS+QgZSJ0aARTApv7Mrv0kAUf3458fM+2fUeNrADw1VGNFvcI8wVG6HTCvSO4kzSI1upkkryz4puXI=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3066.18; Tue, 9 Jun
+ 2020 14:13:52 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312%3]) with mapi id 15.20.3066.023; Tue, 9 Jun 2020
+ 14:13:52 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: qemu-block@nongnu.org
+Subject: [PATCH v6 6/7] block: drop bdrv_prwv
+Date: Tue,  9 Jun 2020 17:13:28 +0300
+Message-Id: <20200609141329.3945-7-vsementsov@virtuozzo.com>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20200609141329.3945-1-vsementsov@virtuozzo.com>
+References: <20200609141329.3945-1-vsementsov@virtuozzo.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: FRYP281CA0002.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10::12)
+ To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
-In-Reply-To: <c3d7b26b-c55d-8ec5-3ee3-f197693b4378@greensocs.com>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 02:41:53
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from localhost.localdomain (185.215.60.180) by
+ FRYP281CA0002.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10::12) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3066.20 via Frontend Transport; Tue, 9 Jun 2020 14:13:51 +0000
+X-Mailer: git-send-email 2.21.0
+X-Originating-IP: [185.215.60.180]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 717670a4-2523-459f-0885-08d80c7f568a
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5494:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM7PR08MB54942D54751AB6604E5422BEC1820@AM7PR08MB5494.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:1051;
+X-Forefront-PRVS: 042957ACD7
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: W8beSRdC6HsZa/9HEB/B8Kt+AqDb6gKdl+8r2JxzzB5jC9AUdYw58OvFLC6S7tpDMvkTurAzz+Gv7MJJCj1EY+VffT9biSVbBWQPf9PwJ70mxo+/9VFW/S7Ss2V+RaK8jdSoRwdXwJFRxBL9ac0LFCRpRriqf3UhNEM8oHjKtOMr2NQ8s83qNlr7igVF89zzoPUBaiFfdWryMamSe3QkG3t76CfbL1D9CTlf03zzdiu9DBUhiJJnpinANBXaM2Ary5kDfLrIlUSVGV+pg0L5M/WSYiZ4iX9b0rILh25uZ+G8csm+xKSTnLu+a9FoFGNYjHr8uR7Nsuq2zAdZELKdY0ZTt9jQaX9oLkqBMv3PetfWaADV9BuuHTnOi1X3Sy2N
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(366004)(376002)(136003)(396003)(39850400004)(346002)(2906002)(6512007)(8676002)(83380400001)(6506007)(16526019)(186003)(26005)(6486002)(478600001)(36756003)(69590400007)(6666004)(8936002)(52116002)(6916009)(66476007)(66946007)(5660300002)(66556008)(1076003)(86362001)(4326008)(2616005)(316002)(107886003)(956004);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: 9f1w7xYRVrptUME9JJNTIxIS8GFUFktEmjr7wUTrT4UEFFrvMQDjKi+HoSOdgsWKGGNw8TWk0WrQsbpEhj3xSLirCYShegvVW7qiUn0RoGynoKH3WoSIEaxTSs1q0OrcqLLuYnIehO+aBY5PDMPhWwh2cgNkMKXJ9nmuMy8wuLdClA2wX3Vu2kVFi6OXD9RHGsaHx4K51HaRkOmYMLAWNR+rewAH8fUvO66RJO3RPqxDkNsQGxjBz5aTpcQWAFNRenOBKUsX7w9ZVrkhCtz8v/ZxeqYs8MkhHVF6KaQ11K5viYKgb9WnIad+N/i18uobAkTJTKwJvIYtGpFiIls4FeLIFnSy/L+FNTMTGzpJYHKCwdPBa9Rjf8zlYMCVyJuyFqUt20OzIyw6rSOHo2NIn09rMnlrLtSm2xyzSikSTZ4WDhB1tXTmcDfMayJDQv6Lh+uV0t+1573I7eTMcwr/ZNO/UwT4ObUS7ymBjD5dpRw=
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 717670a4-2523-459f-0885-08d80c7f568a
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jun 2020 14:13:52.6615 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: AAY4dcROqw/zCJyhazbIVLd7+o+pqiHC57tF1yc0H+na4icaktVkf0Uhiv7qCZflu/qA5c4tM1yKbCv5WlTwodGbMGiLNWmBwBKAu6sh4RI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5494
+Received-SPF: pass client-ip=40.107.22.133;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR05-AM6-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 10:13:47
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -139,54 +129,184 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alistair23@gmail.com, bmeng.cn@gmail.com, palmer@dabbelt.com
+Cc: fam@euphon.net, kwolf@redhat.com, vsementsov@virtuozzo.com,
+ ehabkost@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com,
+ stefanha@redhat.com, crosa@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/9/20 3:48 PM, Damien Hedde wrote:
-> 
-> Hi Alistair,
-> 
-> On 5/29/20 12:14 AM, Alistair Francis wrote:
->> This adds a barebone OpenTitan machine to QEMU.
->>
->> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
->> Reviewed-by: Bin Meng <bin.meng@windriver.com>
->> ---
-> 
->> diff --git a/include/hw/riscv/opentitan.h b/include/hw/riscv/opentitan.h
->> new file mode 100644
->> index 0000000000..a4b6499444
->> --- /dev/null
->> +++ b/include/hw/riscv/opentitan.h
->> @@ -0,0 +1,68 @@
-> 
-> [...]
-> 
->> +
->> +static const struct MemmapEntry {
->> +    hwaddr base;
->> +    hwaddr size;
->> +} ibex_memmap[] = {
->> +    [IBEX_ROM] =            {  0x00008000,   0xc000 },
-> 
-> Shouldn't the ROM size be 0x4000 (which make the end of rom at 0xc000) ?
-> 
-> Not sure if that's exactly this platform you are modeling but the
-> following doc says the ROM size is 16kB (0x4000):
-> https://github.com/lowRISC/opentitan/blob/master/hw/top_earlgrey/doc/_index.md
+Now that we are not maintaining boilerplate code for coroutine
+wrappers, there is no more sense in keeping the extra indirection layer
+of bdrv_prwv().  Let's drop it and instead generate pure bdrv_preadv()
+and bdrv_pwritev().
 
-Good catch. This is why I prefer the IEC notation:
+Currently, bdrv_pwritev() and bdrv_preadv() are returning bytes on
+success, auto generated functions will instead return zero, as their
+_co_ prototype. Still, it's simple to make the conversion safe: the
+only external user of bdrv_pwritev() is test-bdrv-drain, and it is
+comfortable enough with bdrv_co_pwritev() instead. So prototypes are
+moved to local block/coroutines.h. Next, the only internal use is
+bdrv_pread() and bdrv_pwrite(), which are modified to return bytes on
+success.
 
-    [IBEX_ROM] =            {  0x00008000,   16 * KiB },
+Of course, it would be great to convert bdrv_pread() and bdrv_pwrite()
+to return 0 on success. But this requires audit (and probably
+conversion) of all their users, let's leave it for another day
+refactoring.
 
-You can then verify the mapping running 'info mtree' in the monitor.
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+---
+ block/coroutines.h      | 10 ++++-----
+ include/block/block.h   |  2 --
+ block/io.c              | 49 ++++++++---------------------------------
+ tests/test-bdrv-drain.c |  2 +-
+ 4 files changed, 15 insertions(+), 48 deletions(-)
 
-> 
-> --
-> Damien
-> 
-> 
+diff --git a/block/coroutines.h b/block/coroutines.h
+index 145a2d2645..56c0be6f8f 100644
+--- a/block/coroutines.h
++++ b/block/coroutines.h
+@@ -32,12 +32,12 @@ int coroutine_fn bdrv_co_check(BlockDriverState *bs,
+                                BdrvCheckResult *res, BdrvCheckMode fix);
+ int coroutine_fn bdrv_co_invalidate_cache(BlockDriverState *bs, Error **errp);
+ 
+-int coroutine_fn
+-bdrv_co_prwv(BdrvChild *child, int64_t offset, QEMUIOVector *qiov,
+-             bool is_write, BdrvRequestFlags flags);
+ int generated_co_wrapper
+-bdrv_prwv(BdrvChild *child, int64_t offset, QEMUIOVector *qiov,
+-          bool is_write, BdrvRequestFlags flags);
++bdrv_preadv(BdrvChild *child, int64_t offset, unsigned int bytes,
++            QEMUIOVector *qiov, BdrvRequestFlags flags);
++int generated_co_wrapper
++bdrv_pwritev(BdrvChild *child, int64_t offset, unsigned int bytes,
++             QEMUIOVector *qiov, BdrvRequestFlags flags);
+ 
+ int coroutine_fn
+ bdrv_co_common_block_status_above(BlockDriverState *bs,
+diff --git a/include/block/block.h b/include/block/block.h
+index 46c8b7816e..dadb6e796f 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -379,9 +379,7 @@ int bdrv_pwrite_zeroes(BdrvChild *child, int64_t offset,
+                        int bytes, BdrvRequestFlags flags);
+ int bdrv_make_zero(BdrvChild *child, BdrvRequestFlags flags);
+ int bdrv_pread(BdrvChild *child, int64_t offset, void *buf, int bytes);
+-int bdrv_preadv(BdrvChild *child, int64_t offset, QEMUIOVector *qiov);
+ int bdrv_pwrite(BdrvChild *child, int64_t offset, const void *buf, int bytes);
+-int bdrv_pwritev(BdrvChild *child, int64_t offset, QEMUIOVector *qiov);
+ int bdrv_pwrite_sync(BdrvChild *child, int64_t offset,
+                      const void *buf, int count);
+ /*
+diff --git a/block/io.c b/block/io.c
+index 36fbf9e1fa..3060c7e6ed 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -890,23 +890,11 @@ static int bdrv_check_byte_request(BlockDriverState *bs, int64_t offset,
+     return 0;
+ }
+ 
+-int coroutine_fn bdrv_co_prwv(BdrvChild *child, int64_t offset,
+-                              QEMUIOVector *qiov, bool is_write,
+-                              BdrvRequestFlags flags)
+-{
+-    if (is_write) {
+-        return bdrv_co_pwritev(child, offset, qiov->size, qiov, flags);
+-    } else {
+-        return bdrv_co_preadv(child, offset, qiov->size, qiov, flags);
+-    }
+-}
+-
+ int bdrv_pwrite_zeroes(BdrvChild *child, int64_t offset,
+                        int bytes, BdrvRequestFlags flags)
+ {
+-    QEMUIOVector qiov = QEMU_IOVEC_INIT_BUF(qiov, NULL, bytes);
+-
+-    return bdrv_prwv(child, offset, &qiov, true, BDRV_REQ_ZERO_WRITE | flags);
++    return bdrv_pwritev(child, offset, bytes, NULL,
++                        BDRV_REQ_ZERO_WRITE | flags);
+ }
+ 
+ /*
+@@ -950,41 +938,19 @@ int bdrv_make_zero(BdrvChild *child, BdrvRequestFlags flags)
+     }
+ }
+ 
+-/* return < 0 if error. See bdrv_pwrite() for the return codes */
+-int bdrv_preadv(BdrvChild *child, int64_t offset, QEMUIOVector *qiov)
+-{
+-    int ret;
+-
+-    ret = bdrv_prwv(child, offset, qiov, false, 0);
+-    if (ret < 0) {
+-        return ret;
+-    }
+-
+-    return qiov->size;
+-}
+-
+ /* See bdrv_pwrite() for the return codes */
+ int bdrv_pread(BdrvChild *child, int64_t offset, void *buf, int bytes)
+ {
++    int ret;
+     QEMUIOVector qiov = QEMU_IOVEC_INIT_BUF(qiov, buf, bytes);
+ 
+     if (bytes < 0) {
+         return -EINVAL;
+     }
+ 
+-    return bdrv_preadv(child, offset, &qiov);
+-}
+-
+-int bdrv_pwritev(BdrvChild *child, int64_t offset, QEMUIOVector *qiov)
+-{
+-    int ret;
++    ret = bdrv_preadv(child, offset, bytes, &qiov,  0);
+ 
+-    ret = bdrv_prwv(child, offset, qiov, true, 0);
+-    if (ret < 0) {
+-        return ret;
+-    }
+-
+-    return qiov->size;
++    return ret < 0 ? ret : bytes;
+ }
+ 
+ /* Return no. of bytes on success or < 0 on error. Important errors are:
+@@ -995,13 +961,16 @@ int bdrv_pwritev(BdrvChild *child, int64_t offset, QEMUIOVector *qiov)
+ */
+ int bdrv_pwrite(BdrvChild *child, int64_t offset, const void *buf, int bytes)
+ {
++    int ret;
+     QEMUIOVector qiov = QEMU_IOVEC_INIT_BUF(qiov, buf, bytes);
+ 
+     if (bytes < 0) {
+         return -EINVAL;
+     }
+ 
+-    return bdrv_pwritev(child, offset, &qiov);
++    ret = bdrv_pwritev(child, offset, bytes, &qiov, 0);
++
++    return ret < 0 ? ret : bytes;
+ }
+ 
+ /*
+diff --git a/tests/test-bdrv-drain.c b/tests/test-bdrv-drain.c
+index 1107271840..1595bbc92e 100644
+--- a/tests/test-bdrv-drain.c
++++ b/tests/test-bdrv-drain.c
+@@ -1872,7 +1872,7 @@ static int coroutine_fn bdrv_replace_test_co_preadv(BlockDriverState *bs,
+         }
+         s->io_co = NULL;
+ 
+-        ret = bdrv_preadv(bs->backing, offset, qiov);
++        ret = bdrv_co_preadv(bs->backing, offset, bytes, qiov, 0);
+         s->has_read = true;
+ 
+         /* Wake up drain_co if it runs */
+-- 
+2.21.0
 
 
