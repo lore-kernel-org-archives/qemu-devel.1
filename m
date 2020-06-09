@@ -7,69 +7,69 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCD14C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 12:43:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89BB9C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 12:44:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8471E207C3
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 12:43:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4DB68207C3
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 12:44:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hBijAd/4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8471E207C3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rvbccWKE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DB68207C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33100 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34888 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jidb8-00049j-Nh
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 08:43:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42964)
+	id 1jidbj-0004u9-Hv
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 08:43:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42980)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jidSj-0000Im-4F; Tue, 09 Jun 2020 08:34:41 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:35981)
+ id 1jidSl-0000Kh-Cx; Tue, 09 Jun 2020 08:34:47 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:37768)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jidSY-00074L-Sc; Tue, 09 Jun 2020 08:34:40 -0400
-Received: by mail-wr1-x443.google.com with SMTP id q11so21138761wrp.3;
- Tue, 09 Jun 2020 05:34:29 -0700 (PDT)
+ id 1jidSe-00074q-JD; Tue, 09 Jun 2020 08:34:43 -0400
+Received: by mail-wm1-x342.google.com with SMTP id y20so2978780wmi.2;
+ Tue, 09 Jun 2020 05:34:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=0srfxT0e6nUZFR6Iq4rRmoV3V4fYm5JRcQS2tAU0vxw=;
- b=hBijAd/46i+x7ednlZBvGseJgaQjQRWhOSbsj0oI54n58nUqF2S530xr6+XpaaxarS
- bSRcSx05lnubiKRWMMivA6eVzr33/6btMppdsbdwV9SPavLLyhXN71v5RWvJAcucMmKc
- 1JzVJPalhJpkCLJwOJiRDoBvdWFZvnQuakM4NMjR39SX/ElSpjiYe1IL4BEemcUwbLup
- y7iyJO+d+cyBOyRjPKKbyGnOxiEJMYBP9tfT+C1S6rGmDhL5u3V+s/MDnY5i49TzERzx
- J/bYy6WCr/rWVGTVD+tSLOjvb67sphqTZyHta0/KKfmVjktOPuJVSSOoycQ0RofsWmHP
- 0+cw==
+ bh=oEq0TkRWvRrnUcFx8Wkpo5gILqhLeSIEML9csKX17G0=;
+ b=rvbccWKE3d+cDt/172b58PZ+gdd6E5JYTEQHgPimsvA4PwpQO8r7Vn5HvhUgvBM3bQ
+ 4ppf/EBX3LqRCPMX335r4gQGV2286aKt+eFZbris7I1K+cPLsAseuUVGyx/rWMtiicvn
+ AaZ8gMHJgypjDvqEcVuOtVFWCKNAiXI6/n7z28Yro48n4bJ6bQ2vPjbMGMcL09QJhSEC
+ pXF+N/TfnG7N9JWLku0mUUQnDtDAMWSO6I1RM/YRFi9mlDukxQdr5OAEdY+D51yDaske
+ iiNeNp4ZP7vtNV8MXw2lvThYup9RqB3Tr87jMtT8KJRVokfYzHv/JBjB555AcGAQpOUg
+ 6ltw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=0srfxT0e6nUZFR6Iq4rRmoV3V4fYm5JRcQS2tAU0vxw=;
- b=nfq7/2pFUQvEYUbopx331ppKuebGJiil9Sv1XmEUlKskwHzf/OrvXAkHmz1Ek2SFoh
- Z/EzFO/qU10gc5smHvEirnjEMAoPgiDtvABgA1wRTrbLfvpIk5+0Y6/IC41E/PIxCB2a
- xMFWO1ezsTs2oILB0phf/2BpSoQMGCbh1KF5k+/NMlHBkt4YXZ+UUV+PkHLgnidAzDzF
- ILVuuCTQVs28rE0EW7knrwF6nsUe1BGuK0DPBY/t5cEcBaiblJ0oIYCZaWw5st8r0chJ
- KGmq2zXkt+XzSMQVcyO97Wp1nMbQD2wcmLz8eFWp7moDaEspRnm9hifCQsRHL/8JNadK
- n4XQ==
-X-Gm-Message-State: AOAM531Cg7J98a9ZZ2dAeGcNeBj5+x/bSCiDfyQmBDZPNwWz/2EhS0GQ
- Dd4W14/2SSFpZAWbRo3IpPETW5Um
-X-Google-Smtp-Source: ABdhPJy2WD9lDZkba//FSINYDayYvNVeUe+164Bn2+TAEAIOvjAyUjhRfNiYc3sWKed+xofFa7t8kQ==
-X-Received: by 2002:a5d:4c87:: with SMTP id z7mr4167824wrs.100.1591706068136; 
- Tue, 09 Jun 2020 05:34:28 -0700 (PDT)
+ bh=oEq0TkRWvRrnUcFx8Wkpo5gILqhLeSIEML9csKX17G0=;
+ b=OJWGL8wURDEJlpuhSXVys44gZ2069JTuSCdi/6TK0FGQ0VkXzuvCikKIe73LZ26lKf
+ bDf7xshINlw9c+GXfcCILNSyvPKknyrVb2OCNZYIre3exjB8U1x/3dSObK1QyEh4tJbl
+ B+6W2Xzb4jzYyQ0ccAvN0A7GanRJIKKhl6/B6m01ATzNSLGZJOlevJeCq+hW2UecS5gW
+ ypWzTvyzwnW5mJyFPf2et1p1dhTTtUNp3si7JVYIiariu5OmokcG+GEl/fllJOlTW9QM
+ 1Z0a5pjW45IgmJqMIMjX2ylXDYQo/zMhMY/RE8F+q29GsWtTaSa9M0TlHVgvgbAPuHPp
+ t/MA==
+X-Gm-Message-State: AOAM533l1s08hpTzu6AI1adZ03ym4okRi+Xy41fOz4R9TfKjXiEOMycj
+ CHoJHp0/NVCRp33D4dmyg8iguzU3
+X-Google-Smtp-Source: ABdhPJzzwVjGOsXWe6jd7iSJe6Bqhpi5WsewuOtGikzvGcXBTE5aBzkGHFSoHWpK7L6kpgBWD9d2bw==
+X-Received: by 2002:a05:600c:287:: with SMTP id 7mr4013337wmk.91.1591706072771; 
+ Tue, 09 Jun 2020 05:34:32 -0700 (PDT)
 Received: from localhost.localdomain
  (181.red-88-10-103.dynamicip.rima-tde.net. [88.10.103.181])
- by smtp.gmail.com with ESMTPSA id c81sm2920931wmd.42.2020.06.09.05.34.27
+ by smtp.gmail.com with ESMTPSA id c81sm2920931wmd.42.2020.06.09.05.34.31
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 09 Jun 2020 05:34:27 -0700 (PDT)
+ Tue, 09 Jun 2020 05:34:32 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [RFC PATCH 1/5] hw/misc: Add a LED device
-Date: Tue,  9 Jun 2020 14:34:21 +0200
-Message-Id: <20200609123425.6921-2-f4bug@amsat.org>
+Subject: [RFC PATCH 5/5] hw/arm/tosa: Use LED device for the Bluetooth led
+Date: Tue,  9 Jun 2020 14:34:25 +0200
+Message-Id: <20200609123425.6921-6-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200609123425.6921-1-f4bug@amsat.org>
 References: <20200609123425.6921-1-f4bug@amsat.org>
@@ -77,8 +77,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::342;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x342.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -113,197 +113,63 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-A LED device can be connected to a GPIO output.
-
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- include/hw/misc/led.h | 30 ++++++++++++++++
- hw/misc/led.c         | 84 +++++++++++++++++++++++++++++++++++++++++++
- MAINTAINERS           |  6 ++++
- hw/misc/Kconfig       |  3 ++
- hw/misc/Makefile.objs |  1 +
- hw/misc/trace-events  |  3 ++
- 6 files changed, 127 insertions(+)
- create mode 100644 include/hw/misc/led.h
- create mode 100644 hw/misc/led.c
+ hw/arm/tosa.c  | 7 +++----
+ hw/arm/Kconfig | 1 +
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/include/hw/misc/led.h b/include/hw/misc/led.h
-new file mode 100644
-index 0000000000..427ca1418e
---- /dev/null
-+++ b/include/hw/misc/led.h
-@@ -0,0 +1,30 @@
-+/*
-+ * QEMU single LED device
-+ *
-+ * Copyright (C) 2020 Philippe Mathieu-Daudé <f4bug@amsat.org>
-+ *
-+ * SPDX-License-Identifier: GPL-2.0-or-later
-+ */
-+#ifndef HW_MISC_LED_H
-+#define HW_MISC_LED_H
-+
-+#include "hw/qdev-core.h"
-+#include "hw/sysbus.h" /* FIXME remove */
-+
-+#define TYPE_LED "led"
-+#define LED(obj) OBJECT_CHECK(LEDState, (obj), TYPE_LED)
-+
-+typedef struct LEDState {
-+    /* Private */
-+    SysBusDevice parent_obj; /* FIXME DeviceState */
-+    /* Public */
-+
-+    qemu_irq irq;
-+    uint8_t current_state;
-+
-+    /* Properties */
-+    char *name;
-+    uint8_t reset_state; /* TODO [GPIO_ACTIVE_LOW, GPIO_ACTIVE_HIGH] */
-+} LEDState;
-+
-+#endif /* HW_MISC_LED_H */
-diff --git a/hw/misc/led.c b/hw/misc/led.c
-new file mode 100644
-index 0000000000..dc61b11017
---- /dev/null
-+++ b/hw/misc/led.c
-@@ -0,0 +1,84 @@
-+/*
-+ * QEMU single LED device
-+ *
-+ * Copyright (C) 2020 Philippe Mathieu-Daudé <f4bug@amsat.org>
-+ *
-+ * SPDX-License-Identifier: GPL-2.0-or-later
-+ */
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "hw/qdev-properties.h"
+diff --git a/hw/arm/tosa.c b/hw/arm/tosa.c
+index 5dee2d76c6..86d7e0283a 100644
+--- a/hw/arm/tosa.c
++++ b/hw/arm/tosa.c
+@@ -24,6 +24,7 @@
+ #include "hw/irq.h"
+ #include "hw/ssi/ssi.h"
+ #include "hw/sysbus.h"
 +#include "hw/misc/led.h"
-+#include "hw/irq.h"
-+#include "migration/vmstate.h"
-+#include "trace.h"
-+
-+static void led_set(void *opaque, int line, int new_state)
-+{
-+    LEDState *s = LED(opaque);
-+
-+    trace_led_set(s->name, s->current_state, new_state);
-+
-+    s->current_state = new_state;
-+}
-+
-+static void led_reset(DeviceState *dev)
-+{
-+    LEDState *s = LED(dev);
-+
-+    s->current_state = s->reset_state;
-+}
-+
-+static const VMStateDescription vmstate_led = {
-+    .name = TYPE_LED,
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT8(reset_state, LEDState),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static void led_realize(DeviceState *dev, Error **errp)
-+{
-+    LEDState *s = LED(dev);
-+
-+    if (s->name == NULL) {
-+        error_setg(errp, "property 'name' not specified");
-+        return;
-+    }
-+
-+    qdev_init_gpio_in(DEVICE(s), led_set, 1);
-+}
-+
-+static Property led_properties[] = {
-+    DEFINE_PROP_STRING("name", LEDState, name),
-+    DEFINE_PROP_UINT8("reset_state", LEDState, reset_state, 0),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void led_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->desc = "LED";
-+    dc->vmsd = &vmstate_led;
-+    dc->reset = led_reset;
-+    dc->realize = led_realize;
-+    set_bit(DEVICE_CATEGORY_DISPLAY, dc->categories);
-+    device_class_set_props(dc, led_properties);
-+}
-+
-+static const TypeInfo led_info = {
-+    .name = TYPE_LED,
-+    .parent = TYPE_SYS_BUS_DEVICE, /* FIXME TYPE_DEVICE */
-+    .instance_size = sizeof(LEDState),
-+    .class_init = led_class_init
-+};
-+
-+static void led_register_types(void)
-+{
-+    type_register_static(&led_info);
-+}
-+
-+type_init(led_register_types)
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 6e7890ce82..f873f0b94a 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1864,6 +1864,12 @@ S: Maintained
- F: include/hw/misc/unimp.h
- F: hw/misc/unimp.c
+ #include "exec/address-spaces.h"
  
-+LED
-+M: Philippe Mathieu-Daudé <f4bug@amsat.org>
-+S: Maintained
-+F: include/hw/misc/led.h
-+F: hw/misc/led.c
-+
- Standard VGA
- M: Gerd Hoffmann <kraxel@redhat.com>
- S: Maintained
-diff --git a/hw/misc/Kconfig b/hw/misc/Kconfig
-index bdd77d8020..f60dce694d 100644
---- a/hw/misc/Kconfig
-+++ b/hw/misc/Kconfig
-@@ -126,6 +126,9 @@ config AUX
- config UNIMP
+ #define TOSA_RAM    0x04000000
+@@ -68,9 +69,6 @@ static void tosa_microdrive_attach(PXA2xxState *cpu)
+ static void tosa_out_switch(void *opaque, int line, int level)
+ {
+     switch (line) {
+-        case 0:
+-            fprintf(stderr, "blue LED %s.\n", level ? "on" : "off");
+-            break;
+         case 1:
+             fprintf(stderr, "green LED %s.\n", level ? "on" : "off");
+             break;
+@@ -119,7 +117,6 @@ static void tosa_gpio_setup(PXA2xxState *cpu,
+                         qdev_get_gpio_in(cpu->gpio, TOSA_GPIO_JC_CF_IRQ),
+                         NULL);
+ 
+-    qdev_connect_gpio_out(scp1, TOSA_GPIO_BT_LED, outsignals[0]);
+     qdev_connect_gpio_out(scp1, TOSA_GPIO_NOTE_LED, outsignals[1]);
+     qdev_connect_gpio_out(scp1, TOSA_GPIO_CHRG_ERR_LED, outsignals[2]);
+     qdev_connect_gpio_out(scp1, TOSA_GPIO_WLAN_LED, outsignals[3]);
+@@ -234,6 +231,8 @@ static void tosa_init(MachineState *machine)
+ 
+     scp0 = sysbus_create_simple("scoop", 0x08800000, NULL);
+     scp1 = sysbus_create_simple("scoop", 0x14800040, NULL);
++    create_led_by_gpio_id(OBJECT(machine), DEVICE(scp1),
++                          TOSA_GPIO_BT_LED, "blue LED");
+ 
+     tosa_gpio_setup(mpu, scp0, scp1, tmio);
+ 
+diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
+index 2afaa7c8e9..009336cac8 100644
+--- a/hw/arm/Kconfig
++++ b/hw/arm/Kconfig
+@@ -150,6 +150,7 @@ config TOSA
+     select ZAURUS  # scoop
+     select MICRODRIVE
+     select PXA2XX
++    select LED
+ 
+ config SPITZ
      bool
- 
-+config LED
-+    bool
-+
- config MAC_VIA
-     bool
-     select MOS6522
-diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-index 60a9d80b74..aae07033f9 100644
---- a/hw/misc/Makefile.objs
-+++ b/hw/misc/Makefile.objs
-@@ -90,3 +90,4 @@ common-obj-$(CONFIG_NRF51_SOC) += nrf51_rng.o
- obj-$(CONFIG_MAC_VIA) += mac_via.o
- 
- common-obj-$(CONFIG_GRLIB) += grlib_ahb_apb_pnp.o
-+common-obj-$(CONFIG_LED) += led.o
-diff --git a/hw/misc/trace-events b/hw/misc/trace-events
-index a5862b2bed..55d7143f23 100644
---- a/hw/misc/trace-events
-+++ b/hw/misc/trace-events
-@@ -198,3 +198,6 @@ via1_rtc_cmd_pram_read(int addr, int value) "addr=%u value=0x%02x"
- via1_rtc_cmd_pram_write(int addr, int value) "addr=%u value=0x%02x"
- via1_rtc_cmd_pram_sect_read(int sector, int offset, int addr, int value) "sector=%u offset=%u addr=%d value=0x%02x"
- via1_rtc_cmd_pram_sect_write(int sector, int offset, int addr, int value) "sector=%u offset=%u addr=%d value=0x%02x"
-+
-+# led.c
-+led_set(const char *name, uint8_t old_state, uint8_t new_state) "led name:'%s' state %d -> %d"
 -- 
 2.21.3
 
