@@ -2,72 +2,73 @@ Return-Path: <SRS0=hUBF=7W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7220BC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 16:57:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3E4BC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 16:58:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3D6ED20760
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 16:57:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BC1D02074B
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 16:58:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g9ESzSQO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D6ED20760
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UDSnvyM7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC1D02074B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42526 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46324 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jihZI-0005J3-FZ
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 12:57:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48786)
+	id 1jihaM-0006tK-0S
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 12:58:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48852)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jihHs-00049z-I2
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 12:39:48 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:22347
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jihHy-0004Dj-2N
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 12:39:50 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:29963
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jihHq-0003Cf-4u
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 12:39:43 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jihHr-0003DF-PT
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 12:39:49 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591720781;
+ s=mimecast20190719; t=1591720782;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=3C2RbCfz3YEiAEf5pDJ1VAjz3PUufLSTMx7KPyTCxS0=;
- b=g9ESzSQO7kLXhblXo5en1QUZoiYT9Jn4F84RdtLufraRb9FZ07IDssqh6ISEUrKTKEgamb
- bg0nZcOzWaZ0fHSyU53ZXJWlN/OEo5/J7mnpmK0606cgAZ4W2vfmXIH+mdJU8J93FiFBpS
- bmqC68+O6p8qy+QQN8g9PZvA+iB62Is=
+ bh=O2EGvII9a8ywZHb8DbNUNZcnLOkq1u0F6R3GEOVtRlg=;
+ b=UDSnvyM7EynJWnw0zErDfij5DMJEXbz8jQ7RnE/5Lak6FuefNTHTcctjtfV7apYTMJTqXz
+ fO8wCbZ1tqaTnjkPec2dRqliAd6o8bW2DRW25u5fQUdk07sk7SqNBcKPc01vkgVYJ1X4ur
+ n9bzfnYPbZvJ4RDdId+2j8m/bSta7tk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-215-JO-oQ181MvGgm27ZNoh0QQ-1; Tue, 09 Jun 2020 12:39:37 -0400
-X-MC-Unique: JO-oQ181MvGgm27ZNoh0QQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-255-ajkrB96XOkWZBz9WWEks5A-1; Tue, 09 Jun 2020 12:39:40 -0400
+X-MC-Unique: ajkrB96XOkWZBz9WWEks5A-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8028318FE860;
- Tue,  9 Jun 2020 16:39:36 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DDDB68014D4
+ for <qemu-devel@nongnu.org>; Tue,  9 Jun 2020 16:39:39 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
  [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AD1035D9E4;
- Tue,  9 Jun 2020 16:39:33 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id AFDD389295;
+ Tue,  9 Jun 2020 16:39:39 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 3B30C11385C4; Tue,  9 Jun 2020 18:39:32 +0200 (CEST)
+ id 48A721138474; Tue,  9 Jun 2020 18:39:33 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 02/39] Revert "hw/prep: realize the PCI root bus as part of
- the prep init"
-Date: Tue,  9 Jun 2020 18:38:55 +0200
-Message-Id: <20200609163932.1566209-3-armbru@redhat.com>
+Subject: [PATCH v3 30/39] qdev: qdev_create(), qdev_try_create() are now unused,
+ drop
+Date: Tue,  9 Jun 2020 18:39:23 +0200
+Message-Id: <20200609163932.1566209-31-armbru@redhat.com>
 In-Reply-To: <20200609163932.1566209-1-armbru@redhat.com>
 References: <20200609163932.1566209-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
@@ -95,39 +96,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This reverts commit 685f9a3428f625f580af0123aa95f4838d86cac3.
-
-Realizing a device automatically realizes its buses, in
-device_set_realized().  Realizing them in realize methods is
-redundant, unless the methods themselves require them to be realized
-early.  raven_pcihost_realizefn() doesn't.  Drop the redundant bus
-realization.
-
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Cc: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/pci-host/prep.c | 1 -
- 1 file changed, 1 deletion(-)
+ include/hw/qdev-core.h |  2 --
+ hw/core/qdev.c         | 48 ------------------------------------------
+ hw/core/sysbus.c       |  1 -
+ migration/migration.c  |  2 +-
+ 4 files changed, 1 insertion(+), 52 deletions(-)
 
-diff --git a/hw/pci-host/prep.c b/hw/pci-host/prep.c
-index 1a02e9a670..c821ef889d 100644
---- a/hw/pci-host/prep.c
-+++ b/hw/pci-host/prep.c
-@@ -268,7 +268,6 @@ static void raven_pcihost_realizefn(DeviceState *d, Error **errp)
-     memory_region_add_subregion(address_space_mem, 0xbffffff0, &s->pci_intack);
+diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+index be6f7c4736..ef6137b6a8 100644
+--- a/include/hw/qdev-core.h
++++ b/include/hw/qdev-core.h
+@@ -320,8 +320,6 @@ compat_props_add(GPtrArray *arr,
  
-     /* TODO Remove once realize propagates to child devices. */
--    object_property_set_bool(OBJECT(&s->pci_bus), true, "realized", errp);
-     object_property_set_bool(OBJECT(&s->pci_dev), true, "realized", errp);
+ /*** Board API.  This should go away once we have a machine config file.  ***/
+ 
+-DeviceState *qdev_create(BusState *bus, const char *name);
+-DeviceState *qdev_try_create(BusState *bus, const char *name);
+ DeviceState *qdev_new(const char *name);
+ DeviceState *qdev_try_new(const char *name);
+ void qdev_init_nofail(DeviceState *dev);
+diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+index 4768244f31..a1fdebb3aa 100644
+--- a/hw/core/qdev.c
++++ b/hw/core/qdev.c
+@@ -128,54 +128,6 @@ void qdev_set_parent_bus(DeviceState *dev, BusState *bus)
+     }
  }
  
+-/* Create a new device.  This only initializes the device state
+-   structure and allows properties to be set.  The device still needs
+-   to be realized.  See qdev-core.h.  */
+-DeviceState *qdev_create(BusState *bus, const char *name)
+-{
+-    DeviceState *dev;
+-
+-    dev = qdev_try_create(bus, name);
+-    if (!dev) {
+-        if (bus) {
+-            error_report("Unknown device '%s' for bus '%s'", name,
+-                         object_get_typename(OBJECT(bus)));
+-        } else {
+-            error_report("Unknown device '%s' for default sysbus", name);
+-        }
+-        abort();
+-    }
+-
+-    return dev;
+-}
+-
+-DeviceState *qdev_try_create(BusState *bus, const char *type)
+-{
+-    DeviceState *dev;
+-
+-    if (object_class_by_name(type) == NULL) {
+-        return NULL;
+-    }
+-    dev = DEVICE(object_new(type));
+-    if (!dev) {
+-        return NULL;
+-    }
+-
+-    if (!bus) {
+-        /* Assert that the device really is a SysBusDevice before
+-         * we put it onto the sysbus. Non-sysbus devices which aren't
+-         * being put onto a bus should be created with object_new(TYPE_FOO),
+-         * not qdev_create(NULL, TYPE_FOO).
+-         */
+-        g_assert(object_dynamic_cast(OBJECT(dev), TYPE_SYS_BUS_DEVICE));
+-        bus = sysbus_get_default();
+-    }
+-
+-    qdev_set_parent_bus(dev, bus);
+-    object_unref(OBJECT(dev));
+-    return dev;
+-}
+-
+ /*
+  * Create a device on the heap.
+  * A type @name must exist.
+diff --git a/hw/core/sysbus.c b/hw/core/sysbus.c
+index b5db0d179f..7ff1b5f2de 100644
+--- a/hw/core/sysbus.c
++++ b/hw/core/sysbus.c
+@@ -325,7 +325,6 @@ static const TypeInfo sysbus_device_type_info = {
+     .class_init = sysbus_device_class_init,
+ };
+ 
+-/* This is a nasty hack to allow passing a NULL bus to qdev_create.  */
+ static BusState *main_system_bus;
+ 
+ static void main_system_bus_create(void)
+diff --git a/migration/migration.c b/migration/migration.c
+index b63ad91d34..481a590f72 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -3778,7 +3778,7 @@ static const TypeInfo migration_type = {
+     .name = TYPE_MIGRATION,
+     /*
+      * NOTE: TYPE_MIGRATION is not really a device, as the object is
+-     * not created using qdev_create(), it is not attached to the qdev
++     * not created using qdev_new(), it is not attached to the qdev
+      * device tree, and it is never realized.
+      *
+      * TODO: Make this TYPE_OBJECT once QOM provides something like
 -- 
 2.26.2
 
