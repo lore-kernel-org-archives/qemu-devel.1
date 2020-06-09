@@ -4,38 +4,39 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B273C433E3
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 17:46:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D41FAC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 17:47:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E89022081A
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 17:46:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E89022081A
+	by mail.kernel.org (Postfix) with ESMTPS id 6E27E2083E
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 17:47:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E27E2083E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59232 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33322 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jiiKL-00065r-5v
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 13:46:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53906)
+	id 1jiiLb-00076V-EP
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 13:47:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54620)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1jihyN-0000y4-K6; Tue, 09 Jun 2020 13:23:39 -0400
-Received: from mout.kundenserver.de ([212.227.126.133]:42999)
+ id 1jii47-0001mc-6L; Tue, 09 Jun 2020 13:29:35 -0400
+Received: from mout.kundenserver.de ([212.227.126.134]:47189)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1jihyM-0002b2-Ir; Tue, 09 Jun 2020 13:23:39 -0400
+ id 1jii46-0003Wt-28; Tue, 09 Jun 2020 13:29:34 -0400
 Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
  (mreue010 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MEFjJ-1jqA64230f-00AGpo; Tue, 09 Jun 2020 19:23:33 +0200
-Subject: Re: [PATCH v2] hw/vfio/common: Trace in which mode an IOMMU is opened
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ 1MCsgS-1jrXkK0xc0-008tas; Tue, 09 Jun 2020 19:29:08 +0200
+Subject: Re: [PATCH v2 1/8] hw/arm/aspeed: Correct DRAM container region size
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
  qemu-devel@nongnu.org
-References: <20200527155555.6833-1-philmd@redhat.com>
+References: <20200601142930.29408-1-f4bug@amsat.org>
+ <20200601142930.29408-2-f4bug@amsat.org>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -79,41 +80,41 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <b687dd06-490d-dde9-53cc-aa05f38f769e@vivier.eu>
-Date: Tue, 9 Jun 2020 19:23:32 +0200
+Message-ID: <7a9dae30-bb50-f3cc-3806-eaa98d6ec866@vivier.eu>
+Date: Tue, 9 Jun 2020 19:29:04 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200527155555.6833-1-philmd@redhat.com>
+In-Reply-To: <20200601142930.29408-2-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:vOC4ITaWNUpt1bVjt7zdlzwn3lgqIEqvuu9BaD/qFZMQll7fMep
- ho0hjFdyeUJiAq8HrtgzFEgKajvB5cY7eTV4etNaXsc+Eu08+7dTH09YxbJpVehUq1Ij+kL
- BWnIn4AOIzI3DexAl85FqAsziLxFwdYjKTqKxVnaEIa9od+CtKBTunodX+u3srFyYAk6sY1
- 6T9bvJLRA5VNF5fZEVxJw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:g3b054NRtkY=:tVb0Q7lw2g4u8WvgnqTgYS
- SYn0J7F95RWFF7WlRB2pDt2udDukXOfYDZwnyLjsrdhZX7vIc41db73jJZALdjm4fSkIvdsdZ
- +sJoqeTunC9FeVn7XRTceB1pENb8Tod2IoRJQQHxtB0cTXt0YtWM0zAKVTSwjgqmid3KPV8tH
- pMNM+ZzBDD+bkLR2sYiXwZMCfA3kNX0abER3SZ3VKvu56VSJ21UrIulgbFTF8EIhkdQmUvOca
- kj87Kteh+NmvKL2S2DtYINfyUzmzhjfAL0zsd3l6A3gvTCy6ZvDWa1Ss8d0GHZCgKu40Y4wON
- 586iwrLcEy0QsJ8gw3UFaIYSP8yF6lVHWKN//Q5weGDEvh4Cv5Xo2OoHAVBljvWuFDTRCLaeL
- MSejOhxTTvrYwCIk7cyEYCisx/wujCY1c2VPOTAXKL4x03Zj1FoUV5x8B+zCXMWErnKA14u4j
- iIs5BEgHRg85X80vRiY39eYkw9q/37Hf+0CxjiTvXHeJpAT8zE0rxKb2v1OKKsUDflkye7bky
- GKErXOK0K/C0ipmkOT94FnaUP18nS7bVtD2mde/pDMtG7Lg27cxg1lO/HxZh3WlKKw/dhSmK7
- zdzNOr9TE+TgfyCqaCK3WUxVrdqJLYyjfyXHQhlWcJ48VkiU7zegsSnGVCI+DG013FmpyZw3K
- GgpUDCS55BPG/9RfZu5BmJdLvSdohfNMY5+2QkTyVXm1x3Mmfoh6TdRxRKVli0hdI26J4cIUQ
- 7ZmK3cOkcPVFXGSzD4xsU5OjJFVLypVq+P4H/8BFSm9tFkwU7S4gChV5L9QPuZnsxKgOQ03Pd
- kY3U34K1/1Lb2Xr4qsKdBvasQZYW2IFWan+NA76GTYdoKm2dNU7TOljxM6iIGcjbgR9QAQS
-Received-SPF: none client-ip=212.227.126.133; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:IQ1R2+W1xcofpjLKnHoQc1zpzlvROpmk9GiFBZ16z8fVF2OKjf5
+ yYih0NjA8uDqyiWcn06cOU3bQ7PIjPUT7Dz+NDsnGMn4H6NBc713S2MO3vvOZcqtKkNXCUW
+ 1zwwuGkXTzMtsuPmxZqOBIPqP+cCgcNbq1OudAa+xfTiOvMSsWTIWF5VqFVauFuct+6R8Vd
+ hxf7zpZhU7hZ+pOgiSnrQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:CJwt+zB6upI=:26cXy6uCAs2DDGt8+kZhBS
+ hkMO3KuFvCWlTqllFDZl4GcdoZr2/9H1PaZ17wsNzTJzyf36CLBL7dgzkLfFvW6uO7aRj+V2z
+ RjAqOZs4D1LIQZdng9CwVgFMz9qPEmBh8LHEDqokteWQ6Rl0TIscpXlIwDROxt/FuuDqvz3hL
+ EDLfaw02eyuq0BQ+yFbxE3+MCcJC/HhIB86kg7hmH1F6J4rRv5ao7xGPwyrhmeNaLE5b6xVqf
+ Un+kRoRxWXpN/OPZjRTKzf1W6ZcZWXU+uyYlcXJ78W770wrl/Ak0A0p8rQFNNQRoDb3eI8MVI
+ uVy0wTdyuqMj1Oh7VVW8AFVDJ5qHt3zVPuvNU9jdo8RPueDg/+f0uDYOCHInNq6QKNHRJLjvf
+ MaAkV0kdizygMwBpYfJYD8gRR4jS+AYCBkqnlPBsCWYcfaIefLvSYJkngvJmD8/TRbU8p1bTS
+ YvRdqpJjUc7Bdj+KPqfOUTuvwvZ9mSsv87LtcEg4o2M39NQHgWo3XmUgOHKdx2+ZrUvuGUw8F
+ KWeWMAVh9NkJemrN8VUxzn+2pPX+BAStwtsz3tHBw//KJrOcG8BK1WtBkYp0CP+5jvjCJLRDw
+ TThQt0VcSu32RTqJ08K2ucL6RuXg7oyj26IMc6nS/mCbawD8SMpHa2+TEOuxX/BOhe0HMMknH
+ ZqIhO7xtA/+aa7cjhF4otYFC4b/wHJ5Hs+K5E+4QACd7xNJA6R0DJpbPSyaWCnEuWLpVIDtWF
+ hYWA4Boa5PVDKh3MG5rqCdG5FglfPL7JVBDmgZF9I89GmQCihVHO+JQ/6lL36HzTU4vNwbLNm
+ T/hesKtFX2HuKbPeAiyyyn+sEHy2MDzW9RIo1GdJBc8af56Z8t4dxZkmxhYa2w3rRCld97F
+Received-SPF: none client-ip=212.227.126.134; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 12:51:12
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 13:15:05
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
 X-Spam_bar: -
 X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001 autolearn=_AUTOLEARN
+ RCVD_IN_MSPIKE_H2=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -126,79 +127,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Eric Auger <eric.auger@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>, Peter Xu <peterx@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Stefano Stabellini <sstabellini@kernel.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Andrew Jeffery <andrew@aj.id.au>, Helge Deller <deller@gmx.de>,
+ Paul Durrant <paul@xen.org>, qemu-trivial@nongnu.org,
+ =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, qemu-arm@nongnu.org,
+ =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
+ Joel Stanley <joel@jms.id.au>, xen-devel@lists.xenproject.org,
+ Anthony Perard <anthony.perard@citrix.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, qemu-ppc@nongnu.org,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 27/05/2020 à 17:55, Philippe Mathieu-Daudé a écrit :
-> One might want to check which IOMMU version the host kernel
-> provide. Add a trace event to see in which mode we opened
-> our container.
+Le 01/06/2020 à 16:29, Philippe Mathieu-Daudé a écrit :
+> memory_region_set_size() handle the 16 Exabytes limit by
+> special-casing the UINT64_MAX value. This is not a problem
+> for the 32-bit maximum, 4 GiB.
+> By using the UINT32_MAX value, the aspeed-ram-container
+> MemoryRegion ends up missing 1 byte:
 > 
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>  $ qemu-system-arm -M ast2600-evb -S -monitor stdio
+>  (qemu) info mtree
+> 
+>   address-space: aspeed.fmc-ast2600-dma-dram
+>     0000000080000000-000000017ffffffe (prio 0, i/o): aspeed-ram-container
+>       0000000080000000-00000000bfffffff (prio 0, ram): ram
+>       00000000c0000000-ffffffffffffffff (prio 0, i/o): max_ram
+> 
+> Fix by using the correct value. We now have:
+> 
+>   address-space: aspeed.fmc-ast2600-dma-dram
+>     0000000080000000-000000017fffffff (prio 0, i/o): aspeed-ram-container
+>       0000000080000000-00000000bfffffff (prio 0, ram): ram
+>       00000000c0000000-ffffffffffffffff (prio 0, i/o): max_ram
+> 
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 > ---
-> v2: Only display string description (Eric)
+>  hw/arm/aspeed.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> Supersedes: <20200526173542.28710-1-philmd@redhat.com>
-> ---
->  hw/vfio/common.c     | 19 ++++++++++++++-----
->  hw/vfio/trace-events |  1 +
->  2 files changed, 15 insertions(+), 5 deletions(-)
-> 
-> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-> index 0b3593b3c0..f24450472e 100644
-> --- a/hw/vfio/common.c
-> +++ b/hw/vfio/common.c
-> @@ -1157,15 +1157,24 @@ static void vfio_put_address_space(VFIOAddressSpace *space)
->  static int vfio_get_iommu_type(VFIOContainer *container,
->                                 Error **errp)
->  {
-> -    int iommu_types[] = { VFIO_TYPE1v2_IOMMU, VFIO_TYPE1_IOMMU,
-> -                          VFIO_SPAPR_TCE_v2_IOMMU, VFIO_SPAPR_TCE_IOMMU };
-> +    static const struct {
-> +        int type;
-> +        const char *name;
-> +    } iommu[] = {
-> +        {VFIO_TYPE1v2_IOMMU, "Type1 (v2)"},
-> +        {VFIO_TYPE1_IOMMU, "Type1 (v1)"},
-> +        {VFIO_SPAPR_TCE_v2_IOMMU, "sPAPR TCE (v2)"},
-> +        {VFIO_SPAPR_TCE_IOMMU, "sPAPR TCE (v1)"}
-> +    };
->      int i;
+> diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
+> index 2c23297edf..62344ac6a3 100644
+> --- a/hw/arm/aspeed.c
+> +++ b/hw/arm/aspeed.c
+> @@ -262,7 +262,7 @@ static void aspeed_machine_init(MachineState *machine)
+>      bmc = g_new0(AspeedBoardState, 1);
 >  
-> -    for (i = 0; i < ARRAY_SIZE(iommu_types); i++) {
-> -        if (ioctl(container->fd, VFIO_CHECK_EXTENSION, iommu_types[i])) {
-> -            return iommu_types[i];
-> +    for (i = 0; i < ARRAY_SIZE(iommu); i++) {
-> +        if (ioctl(container->fd, VFIO_CHECK_EXTENSION, iommu[i].type)) {
-> +            trace_vfio_get_iommu_type(iommu[i].name);
-> +            return iommu[i].type;
->          }
->      }
-> +    trace_vfio_get_iommu_type("Not available or not supported");
->      error_setg(errp, "No available IOMMU models");
->      return -EINVAL;
->  }
-> diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
-> index b1ef55a33f..d3f1e48618 100644
-> --- a/hw/vfio/trace-events
-> +++ b/hw/vfio/trace-events
-> @@ -115,6 +115,7 @@ vfio_region_sparse_mmap_header(const char *name, int index, int nr_areas) "Devic
->  vfio_region_sparse_mmap_entry(int i, unsigned long start, unsigned long end) "sparse entry %d [0x%lx - 0x%lx]"
->  vfio_get_dev_region(const char *name, int index, uint32_t type, uint32_t subtype) "%s index %d, %08x/%0x8"
->  vfio_dma_unmap_overflow_workaround(void) ""
-> +vfio_get_iommu_type(const char *type) "IOMMU type: %s"
+>      memory_region_init(&bmc->ram_container, NULL, "aspeed-ram-container",
+> -                       UINT32_MAX);
+> +                       4 * GiB);
+>      memory_region_add_subregion(&bmc->ram_container, 0, machine->ram);
 >  
->  # platform.c
->  vfio_platform_base_device_init(char *name, int groupid) "%s belongs to group #%d"
+>      object_initialize_child(OBJECT(machine), "soc", &bmc->soc,
 > 
 
 Applied to my trivial-patches branch.
 
 Thanks,
 Laurent
+
 
