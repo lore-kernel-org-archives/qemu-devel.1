@@ -2,77 +2,77 @@ Return-Path: <SRS0=hUBF=7W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A731BC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 15:07:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11A2CC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 15:15:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7601620734
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 15:07:37 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=posteo.de header.i=@posteo.de header.b="gMxitNaq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7601620734
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=posteo.de
+	by mail.kernel.org (Postfix) with ESMTPS id D988D2074B
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 15:15:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D988D2074B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=winhong.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43252 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47318 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jifqi-0003Zz-Jp
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 11:07:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33436)
+	id 1jifyD-00067e-5h
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 11:15:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34672)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurens.nikolaisen@posteo.de>)
- id 1jifpL-0002at-9W
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 11:06:11 -0400
-Received: from mout02.posteo.de ([185.67.36.66]:55359)
+ (Exim 4.90_1) (envelope-from <yili@winhong.com>)
+ id 1jifxS-0005hz-Kg; Tue, 09 Jun 2020 11:14:34 -0400
+Received: from regular1.263xmail.com ([211.150.70.205]:38276)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurens.nikolaisen@posteo.de>)
- id 1jifpJ-0000jJ-3m
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 11:06:10 -0400
-Received: from submission (posteo.de [89.146.220.130]) 
- by mout02.posteo.de (Postfix) with ESMTPS id 972CC2400FE
- for <qemu-devel@nongnu.org>; Tue,  9 Jun 2020 17:06:06 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=posteo.de; s=2017;
- t=1591715166; bh=kQXlKQD+5T740RFcahTosnPycM7JbWdKiGeuxB94ikc=;
- h=Date:From:To:Cc:Subject:From;
- b=gMxitNaqt1e4p8Y5ucHQ2nVjLmXjLvGczpLQ0vetngXvUkEdN9mfrixwqDLB0jXy6
- 5EjvWKzhlgib/KnUjFYHU9S5pvpJjbXgT0XJUj9KVfKsb4JAjUS3rfRdjEAWJjaipk
- iBTSOdDTfGxmrFo17InMWRsKlTzS2G3VM7Ml5oyPU9B+BXjz/bNuzvb/NToUhVZKDz
- 99lQfFtCwKuuUFpnE3Cv0YYub0r84GodhvBQvJ6yBuQQwnR4o6fGuonHIGv+IiaDZa
- +59zl7p37huMGn3kt0XT+cWr3ZOLYKGqIc1KHTcO6ZN6PBtXBnPt19REpD80q133IR
- 8LrM1xBy3AFYA==
-Received: from customer (localhost [127.0.0.1])
- by submission (posteo.de) with ESMTPSA id 49hD320Pptz6tmS;
- Tue,  9 Jun 2020 17:06:06 +0200 (CEST)
+ (Exim 4.90_1) (envelope-from <yili@winhong.com>)
+ id 1jifxO-0002VJ-JM; Tue, 09 Jun 2020 11:14:33 -0400
+Received: from localhost (unknown [192.168.167.209])
+ by regular1.263xmail.com (Postfix) with ESMTP id 32D7556A;
+ Tue,  9 Jun 2020 23:14:15 +0800 (CST)
+X-MAIL-GRAY: 0
+X-MAIL-DELIVERY: 1
+X-ADDR-CHECKED4: 1
+X-ANTISPAM-LEVEL: 2
+X-SKE-CHECKED: 1
+X-ABS-CHECKED: 1
+Received: from localhost.localdomain (unknown [14.18.236.69])
+ by smtp.263.net (postfix) whith ESMTP id
+ P4798T139788605179648S1591715648790469_; 
+ Tue, 09 Jun 2020 23:14:14 +0800 (CST)
+X-IP-DOMAINF: 1
+X-UNIQUE-TAG: <df1445036e9d6cfd9b13638a2d4cbeaa>
+X-RL-SENDER: yili@winhong.com
+X-SENDER: yili@winhong.com
+X-LOGIN-NAME: yili@winhong.com
+X-FST-TO: dillaman@redhat.com
+X-SENDER-IP: 14.18.236.69
+X-ATTACHMENT-NUM: 0
+X-DNS-TYPE: 0
+X-System-Flag: 0
+From: Yi Li <yili@winhong.com>
+To: dillaman@redhat.com
+Subject: [PATCH v2] rbd: Use RBD fast-diff for querying actual allocation
+Date: Tue,  9 Jun 2020 23:13:50 +0800
+Message-Id: <20200609151350.3681640-1-yili@winhong.com>
+X-Mailer: git-send-email 2.25.3
+In-Reply-To: <CAJfdMYCS7SJ66K2F7a9qyKyP9f1Tmbe9N7qvshNe6jAZZtpWBg@mail.gmail.com>
+References: <CAJfdMYCS7SJ66K2F7a9qyKyP9f1Tmbe9N7qvshNe6jAZZtpWBg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 09 Jun 2020 17:06:05 +0200
-From: laurens.nikolaisen@posteo.de
-To: =?UTF-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@gmail.com>
-Subject: Re: Using QXL & Spice with Windows Host & QEMU
-In-Reply-To: <CAJ+F1CKJbOJBOxpd2guyU_iuqoVYNGJWRAinGWXoPT_hqjBgSg@mail.gmail.com>
-References: <ba26c2d65cda15b581c1a7cc7274d1b2@posteo.de>
- <CAJ+F1CKJbOJBOxpd2guyU_iuqoVYNGJWRAinGWXoPT_hqjBgSg@mail.gmail.com>
-Message-ID: <2951d126288fc96bc68fa8f56984839b@posteo.de>
-X-Sender: laurens.nikolaisen@posteo.de
-User-Agent: Posteo Webmail
-Received-SPF: pass client-ip=185.67.36.66;
- envelope-from=laurens.nikolaisen@posteo.de; helo=mout02.posteo.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 11:06:07
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -43
-X-Spam_score: -4.4
-X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=211.150.70.205; envelope-from=yili@winhong.com;
+ helo=regular1.263xmail.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 11:14:20
+X-ACL-Warn: Detected OS   = ???
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -85,39 +85,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU <qemu-devel@nongnu.org>,
- Qemu-devel <qemu-devel-bounces+laurens.nikolaisen=posteo.de@nongnu.org>,
- Frediano Ziglio <fziglio@redhat.com>
+Cc: kwolf@redhat.com, yilikernel@gmail.com, qemu-block@nongnu.org,
+ qemu-devel@nongnu.org, mreitz@redhat.com, yili@winhong.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Marc-Andr=C3=A9,
+Since Ceph version Infernalis (9.2.0) the new fast-diff mechanism
+of RBD allows for querying actual rbd image usage.
 
-I did take notice of Fredianos answer. Since he redirected me to you=20
-guys, I wanted to make sure my intention to get kvm running on Windows=20
-could be possible in general. I did download the binaries from [0] which=20
-is linked to from qemu.org.
+Prior to this version there was no easy and fast way to query how
+much allocation a RBD image had inside a Ceph cluster.
 
-I did enable:
--vga qxl -device virtio-serial-pci -spice port=3D5930,disable-ticketing=20
--device virtserialport,chardev=3Dspicechannel0,name=3Dcom.redhat.spice.0=20
--chardev spicevmc,id=3Dspicechannel0,name=3Dvdagent
-=2E.. on the Windows host in the Qemu, but then I get the mentioned error=
-=20
-of KVM not being available. It just seems like kvm-support has not been=20
-compiled into my binaries. Do you have any build guide for Windows? I'd=20
-like to test a little further. Maybe we could get some useful=20
-information as well that I could file some bug reports if I find any=20
-bugs.
+To use the fast-diff feature it needs to be enabled per RBD image
+and is only supported by Ceph cluster running version Infernalis
+(9.2.0) or newer.
 
-Usually I do use Linux (especially Linux Hosts) only. Since I'm foreced=20
-to use a Windows Mashine for some of my work I'd love to get Qemu up and=20
-running there (insteadt of VirtualBox, Hyper-V etc.).
+The fast-diff feature disabled or fast-diff map is marked as invalid,
+qemu-img will report an allocation identical to the image capacity.
 
-Cheers,
-Laurens
+'qemu-img info rbd:cepharm/liyi-rbd' might output for example:
 
-[0]
-https://qemu.weilnetz.de/w64/
+  image: json:{"driver": "raw", "file": {"pool": "cepharm",
+  "image": "liyi-rbd", "driver": "rbd"}}
+  file format: raw
+  virtual size: 20 GiB (21474836480 bytes)
+  disk size: 0 B
+  cluster_size: 4194304
+
+Newly created rbds will have the fast-diff feature enabled.
+
+Signed-off-by: Yi Li <yili@winhong.com>
+---
+ block/rbd.c | 103 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 103 insertions(+)
+
+diff --git a/block/rbd.c b/block/rbd.c
+index 617553b022..c1e68ff7e9 100644
+--- a/block/rbd.c
++++ b/block/rbd.c
+@@ -1107,6 +1107,108 @@ static int64_t qemu_rbd_getlength(BlockDriverState *bs)
+     return info.size;
+ }
+ 
++#if LIBRBD_VERSION_CODE > 265
++static int disk_usage_callback(uint64_t offset, size_t len, int exists,
++                               void *arg)
++{
++  uint64_t *used_size = (uint64_t *)(arg);
++  if (exists) {
++    (*used_size) += len;
++  }
++  return 0;
++}
++
++static int qemu_rbd_getflags(rbd_image_t image, uint64_t *flags)
++{
++    int r;
++
++    r = rbd_get_flags(image, flags);
++    if (r < 0) {
++        return r;
++    }
++    return 0;
++}
++
++static bool qemu_rbd_use_fastdiff(uint64_t features, uint64_t flags)
++{
++    return (((features & RBD_FEATURE_FAST_DIFF) != 0ULL) &&
++            ((flags & RBD_FLAG_FAST_DIFF_INVALID) == 0ULL));
++}
++
++static int qemu_rbd_set_allocation(rbd_image_t image,
++                                   rbd_image_info_t *info,
++                                   uint64_t *used_size)
++{
++    int r;
++    /*
++     * RBD image fast-diff feature enabled
++     * Querying for actual allocation.
++     */
++    r = rbd_diff_iterate2(image, NULL, 0, info->size, 0, 1,
++                          &disk_usage_callback,
++                          used_size);
++    if (r < 0) {
++        return r;
++    }
++    return 0;
++}
++
++#else
++static int qemu_rbd_getflags(rbd_image_t image G_GNUC_UNUSED, uint64_t *flags)
++{
++    *flags = 0;
++    return 0;
++}
++
++static bool qemu_rbd_use_fastdiff(uint64_t features G_GNUC_UNUSED,
++                                  uint64_t feature_flags G_GNUC_UNUSED)
++{
++    return false;
++}
++
++static int qemu_rbd_set_allocation(rbd_image_t image G_GNUC_UNUSED,
++                                   rbd_image_info_t *info _GNUC_UNUSED,
++                                   uint64_t *used_size _GNUC_UNUSED)
++{
++    return 0;
++}
++#endif
++
++static int64_t qemu_rbd_allocated_file_size(BlockDriverState *bs)
++{
++    BDRVRBDState *s = bs->opaque;
++    rbd_image_info_t info;
++    int r;
++    uint64_t used_size = 0;
++    uint64_t features = 0;
++    uint64_t flags = 0;
++
++    r = rbd_stat(s->image, &info, sizeof(info));
++    if (r < 0) {
++        return r;
++    }
++
++    r = rbd_get_features(s->image, &features);
++    if (r < 0) {
++        return r;
++    }
++
++    r = qemu_rbd_getflags(s->image, &flags);
++    if (r < 0) {
++        return r;
++    }
++
++    if (qemu_rbd_use_fastdiff(features, flags)) {
++        r = qemu_rbd_set_allocation(s->image, &info, &used_size);
++        if (r < 0) {
++            return r;
++        }
++    } else {
++        used_size = info.size;
++    }
++    return used_size;
++}
++
+ static int coroutine_fn qemu_rbd_co_truncate(BlockDriverState *bs,
+                                              int64_t offset,
+                                              bool exact,
+@@ -1316,6 +1418,7 @@ static BlockDriver bdrv_rbd = {
+     .bdrv_get_info          = qemu_rbd_getinfo,
+     .create_opts            = &qemu_rbd_create_opts,
+     .bdrv_getlength         = qemu_rbd_getlength,
++    .bdrv_get_allocated_file_size = qemu_rbd_allocated_file_size,
+     .bdrv_co_truncate       = qemu_rbd_co_truncate,
+     .protocol_name          = "rbd",
+ 
+-- 
+2.25.3
+
+
+
 
