@@ -2,86 +2,118 @@ Return-Path: <SRS0=hUBF=7W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MIME_BASE64_TEXT,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28D45C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 17:24:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7707FC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 17:25:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E883820774
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 17:24:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BlDORSuM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E883820774
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4B52520774
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 17:25:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B52520774
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49934 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52360 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jihzS-0002Vx-6i
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 13:24:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51776)
+	id 1jii0F-0003aY-Ed
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 13:25:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50268)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1jihec-0004Kc-NB
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 13:03:14 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30875
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1jiheb-0007aQ-NT
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 13:03:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591722192;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=TkQ44PTxX2eS9NNAe6MLYdIuw4/KeDlhn5YNPr177VY=;
- b=BlDORSuMGV844JKEHfmxUuxqv+iUJUJuhur3pMBtARCGlm8C+aZnQEKlVdAEg3G/d64rn3
- XGvjWABKlgPcj20YvS0crSWwAzp2prQMjjhoZQ5jcdXnRXTY4WUHv2zfd9wRNfTlgn6V5G
- bG2kohnJd1jtS6zvs//RKp03KVN70oc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-294-9LnoJ3V8PnSPE46RUhlCJA-1; Tue, 09 Jun 2020 13:03:11 -0400
-X-MC-Unique: 9LnoJ3V8PnSPE46RUhlCJA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D433A107ACF4;
- Tue,  9 Jun 2020 17:03:09 +0000 (UTC)
-Received: from localhost (ovpn-115-52.ams2.redhat.com [10.36.115.52])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 83D8F5D9E4;
- Tue,  9 Jun 2020 17:02:58 +0000 (UTC)
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 3/7] docs: document non-net VHOST_USER_GET_FEATURES behavior
-Date: Tue,  9 Jun 2020 18:02:14 +0100
-Message-Id: <20200609170218.246468-4-stefanha@redhat.com>
-In-Reply-To: <20200609170218.246468-1-stefanha@redhat.com>
-References: <20200609170218.246468-1-stefanha@redhat.com>
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
+ id 1jihT2-0003HT-EG; Tue, 09 Jun 2020 12:51:16 -0400
+Received: from mout.kundenserver.de ([212.227.126.133]:52783)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
+ id 1jihT0-0005da-NR; Tue, 09 Jun 2020 12:51:15 -0400
+Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
+ (mreue010 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MpUEO-1jAOpd3CAu-00puBV; Tue, 09 Jun 2020 18:51:09 +0200
+Subject: Re: [PATCH] net: Do not include a newline in the id of -nic devices
+To: Thomas Huth <thuth@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20200518074352.23125-1-thuth@redhat.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <149a6716-f5ea-831d-e3a0-733c322f7482@vivier.eu>
+Date: Tue, 9 Jun 2020 18:51:08 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: base64
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=stefanha@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 02:44:16
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -3
-X-Spam_score: -0.4
-X-Spam_bar: /
-X-Spam_report: (-0.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MIME_BASE64_TEXT=1.741, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200518074352.23125-1-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:X6vE5zD6C2w1Froi7jzuOl1uhMZ7Azl8G5nsEm4VEbeufi7hEic
+ 6xXOj8AnlzueAXQ6y5h+WccotCQ9hsTNHKDj1LjdkaJNDZubWVExuxuKLA3IG4nrwSqacaZ
+ embSI39zNZv6l2PtU8uYq2Jo79SW0NLhwdcJMLUvGV1HpJN6HDlp+3Dx4pF4nDZ6oZ7amHE
+ 9OKTNRq+9DB1M23hiw/7Q==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:Qq7b/7qgXNg=:Oj6iKpqvANguio6AQFazQk
+ j0sC/uQ+PoUtosAr6p7O//HdRzwGbcUp40xrRP2hII+LC1VqbBzLjOG1hDZiWjxNR+Z/td6FK
+ oGUNK8JiUe5xIYKTxTMAmho4Ktic6Id4gK4PbUr7Fs9lcHI1Vt6xmsiJKynuo7Xt1E1SQJfqa
+ Yu9spZaBKprda1zhoJ3tmn/tBOLhKbW40h+6iGrQkUIW5GFIdLb3yrj+q+GPMFchMyC9LopT8
+ 6hQ5hKB4bkkiDQN6m46tIXZZrGnC93mfxQ7tqgeI60e60Eo0anO/m+oku8HNnnVbjQ7muiwdY
+ LZlSnmj+NH75Y25hxy0hYusuIVAYr8cucC6cWPtMCpJ+jnI/HUzWrYJIMzZkCxNjrpkj4igEk
+ rn+je81pUTE2G9fLikC8l8vGlLxz+nWJKn8fdyH6Tnx8svi0YiKvYXXZrw3cwWBGTdUR5xOYz
+ hB4dffMoECGm3b2DRrvMo4849jzQZBAGwCecgSX9csxVu127rEXNgV48G/x49Q3vj5rbOihDO
+ pRAJAvY/6yvnZ9Vwu9/pJjqeiXMglxijoVbxMNf6Heaj+YzqJywGlxBPGaywQ+sg9+iHA3hJc
+ rIkRbasw2f4b9wuaxzWdue2ENnGDtyHlbP7R4l7ixejKJYT3E9HFGeFHB8SbM34xcZWjCR/1V
+ RRR1UisvcvAzEPakJMOOkLETxflHjuh5nLNR7yAsDrYu4H++Y02nvskdDobk5w7PINfQN51ox
+ f0OtQLf13QoEPqnwfQlDBf5X/1PwgATCW7dzZhVXJng89h+YvYFIi40nX0/MhDg4LTownyTIY
+ 8X2Snm1C1RU/dQlJp9On3xGU/cbwBCfFrwkRZkrmsH/+f5eNl3U+nRl+hXlPbpiuk07VbxV
+Received-SPF: none client-ip=212.227.126.133; envelope-from=laurent@vivier.eu;
+ helo=mout.kundenserver.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 12:51:12
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,59 +126,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
- Laurent Vivier <lvivier@redhat.com>, jasowang@redhat.com, cohuck@redhat.com,
- Stefan Hajnoczi <stefanha@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Raphael Norwitz <raphael.norwitz@nutanix.com>,
- Ben Walker <benjamin.walker@intel.com>,
- "Gonglei \(Arei\)" <arei.gonglei@huawei.com>,
- Gerd Hoffmann <kraxel@redhat.com>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Sebastien Boeuf <sebastien.boeuf@intel.com>
+Cc: qemu-trivial@nongnu.org, qemu-stable@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UUVNVSBlbmFibGVkIHNldmVyYWwgZmVhdHVyZSBiaXRzIGZvciBub24tbmV0IGRldmljZXMgd2l0
-aG91dCBhbGxvd2luZwp0aGUgZGV2aWNlIGJhY2tlbmQgdG8gY29udHJvbCB0aGVtLiBUaGlzIG9u
-bHkgd29ya3Mgd2hlbiB0aGUgZGV2aWNlCmJhY2tlbmQgaW1wbGVtZW50cyBzdXBwb3J0IGZvciB0
-aG9zZSBmZWF0dXJlcy4gSXQgd29uJ3Qgd29yayBmb3IgbmV3CmZlYXR1cmVzIGxpa2UgdGhlIHBh
-Y2tlZCB2aXJ0cXVldWUgbGF5b3V0LCB3aGVyZSBwcm9wZXIgZmVhdHVyZQpuZWdvdGlhdGlvbiB3
-aWxsIGJlIG5lZWRlZC4KCkRvY3VtZW50IHRoZSBsZWdhY3kgYmVoYXZpb3IgYW5kIHNwZWNpZnkg
-dGhhdCBkZXZpY2UgYmFja2VuZHMgbXVzdApyZXBvcnQgZmVhdHVyZXMgc28gdGhhdCB3ZSBjYW4g
-YXZvaWQgcHJvYmxlbXMgaW4gdGhlIGZ1dHVyZS4KCkNjOiBCZW4gV2Fsa2VyIDxiZW5qYW1pbi53
-YWxrZXJAaW50ZWwuY29tPgpDYzogU2ViYXN0aWVuIEJvZXVmIDxzZWJhc3RpZW4uYm9ldWZAaW50
-ZWwuY29tPgpTaWduZWQtb2ZmLWJ5OiBTdGVmYW4gSGFqbm9jemkgPHN0ZWZhbmhhQHJlZGhhdC5j
-b20+Ci0tLQpDQ2luZyBTUERLIGFuZCBjbG91ZC1oeXBlcnZpc29yIGZvbGtzIGluIGNhc2UgdGhl
-eSBhcmUgYWZmZWN0ZWQuIERQREsKaXNuJ3QgYWZmZWN0ZWQgc2luY2Ugdmhvc3QtdXNlci1uZXQg
-cGVyZm9ybXMgZnVsbCBmZWF0dXJlIG5lZ290aWF0aW9uLgotLS0KIGRvY3MvaW50ZXJvcC92aG9z
-dC11c2VyLnJzdCB8IDIxICsrKysrKysrKysrKysrKysrKysrKwogMSBmaWxlIGNoYW5nZWQsIDIx
-IGluc2VydGlvbnMoKykKCmRpZmYgLS1naXQgYS9kb2NzL2ludGVyb3Avdmhvc3QtdXNlci5yc3Qg
-Yi9kb2NzL2ludGVyb3Avdmhvc3QtdXNlci5yc3QKaW5kZXggM2IxYjY2MDJjNy4uZGZhZGVlNDEx
-ZCAxMDA2NDQKLS0tIGEvZG9jcy9pbnRlcm9wL3Zob3N0LXVzZXIucnN0CisrKyBiL2RvY3MvaW50
-ZXJvcC92aG9zdC11c2VyLnJzdApAQCAtMjkwLDYgKzI5MCwyNyBAQCBiaXQgd2FzIGRlZGljYXRl
-ZCBmb3IgdGhpcyBwdXJwb3NlOjoKIAogICAjZGVmaW5lIFZIT1NUX1VTRVJfRl9QUk9UT0NPTF9G
-RUFUVVJFUyAzMAogCitGZWF0dXJlIG5lZ290aWF0aW9uCistLS0tLS0tLS0tLS0tLS0tLS0tCitU
-aGUgbWFzdGVyIGZldGNoZXMgZmVhdHVyZXMgZnJvbSB0aGUgYmFja2VuZCB1c2luZyB0aGUKK2Bg
-VkhPU1RfVVNFUl9HRVRfRkVBVFVSRVNgYCBtZXNzYWdlLiBUaGUgZmVhdHVyZSBiaXRzIGNvcnJl
-c3BvbmQgdG8gdGhvc2UgZnJvbQordGhlIHZpcnRpbyBzcGVjaWZpY2F0aW9uLCBWSE9TVF9GX0xP
-R19BTEwgKDI2KSwgYW5kCitgYFZIT1NUX1VTRVJfRl9QUk9UT0NPTF9GRUFUVVJFU2BgICgzMCku
-CisKK0JhY2tlbmRzIG11c3QgcmVwb3J0IGFsbCBzdXBwb3J0ZWQgZmVhdHVyZSBiaXRzLiBJZiBh
-IGZlYXR1cmUgYml0IGlzIHNldCB0aGVuCit0aGUgbWFzdGVyIG1heSBzZXQgaXQgaW4gdGhlIGBg
-VkhPU1RfVVNFUl9TRVRfRkVBVFVSRVNgYCBtZXNzYWdlLiBJZiBhIGZlYXR1cmUKK2JpdCBpcyBj
-bGVhcmVkIHRoZW4gdGhlIG1hc3RlciBtdXN0IG5vdCBzZXQgaXQgaW4gdGhlCitgYFZIT1NUX1VT
-RVJfU0VUX0ZFQVRVUkVTYGAgbWVzc2FnZS4KKworRm9yIGRldmljZXMgb3RoZXIgdGhhbiB0aGUg
-bmV0d29ya2luZyBkZXZpY2UsIG1hc3RlcnMgbWF5IGFzc3VtZSB0aGUgZm9sbG93aW5nCitmZWF0
-dXJlIGJpdHMgYXJlIGFsd2F5cyBzZXQgaW4gYGBWSE9TVF9VU0VSX0dFVF9GRUFUVVJFU2BgIGZv
-ciBjb21wYXRpYmlsaXR5Cit3aXRoIGxlZ2FjeSBiYWNrZW5kIGltcGxlbWVudGF0aW9ucyB0aGF0
-IGRvIG5vdCByZXBvcnQgdGhlbSBjb3JyZWN0bHk6CisqIGBgVklSVElPX0ZfUklOR19JTkRJUkVD
-VF9ERVNDYGAKKyogYGBWSVJUSU9fRl9SSU5HX0VWRU5UX0lEWGBgCisqIGBgVklSVElPX0ZfVkVS
-U0lPTl8xYGAKKyogYGBWSVJUSU9fRl9OT1RJRllfT05fRU1QVFlgYAorKiBgYFZJUlRJT19GX0FO
-WV9MQVlPVVRgYAorCiBTdGFydGluZyBhbmQgc3RvcHBpbmcgcmluZ3MKIC0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLQogCi0tIAoyLjI2LjIKCg==
+Le 18/05/2020 à 09:43, Thomas Huth a écrit :
+> The '\n' sneaked in by accident here, an "id" string should really
+> not contain a newline character at the end.
+> 
+> Fixes: 78cd6f7bf6b ('net: Add a new convenience option "--nic" ...')
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  net/net.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/net/net.c b/net/net.c
+> index 38778e831d..cbeeeadff8 100644
+> --- a/net/net.c
+> +++ b/net/net.c
+> @@ -1506,7 +1506,7 @@ static int net_param_nic(void *dummy, QemuOpts *opts, Error **errp)
+>      /* Create an ID if the user did not specify one */
+>      nd_id = g_strdup(qemu_opts_id(opts));
+>      if (!nd_id) {
+> -        nd_id = g_strdup_printf("__org.qemu.nic%i\n", idx);
+> +        nd_id = g_strdup_printf("__org.qemu.nic%i", idx);
+>          qemu_opts_set_id(opts, nd_id);
+>      }
+>  
+> 
 
+
+Applied to my trivial-patches branch.
+
+Thanks,
+Laurent
 
