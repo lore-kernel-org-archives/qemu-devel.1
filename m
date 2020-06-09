@@ -6,68 +6,69 @@ X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB557C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 01:40:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B884CC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 01:43:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 93D7220774
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 01:40:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 80C4220774
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 01:43:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=jms.id.au header.i=@jms.id.au header.b="nJ/15e2m"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93D7220774
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=jms.id.au header.i=@jms.id.au header.b="hWMWcBYy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80C4220774
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=jms.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42506 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48610 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jiTFn-0005ri-Pe
-	for qemu-devel@archiver.kernel.org; Mon, 08 Jun 2020 21:40:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40060)
+	id 1jiTIn-0000C2-MB
+	for qemu-devel@archiver.kernel.org; Mon, 08 Jun 2020 21:43:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39996)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <joel.stan@gmail.com>)
- id 1jiTCI-0003gd-BI; Mon, 08 Jun 2020 21:37:02 -0400
-Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:44010)
+ id 1jiTBl-00034l-9V; Mon, 08 Jun 2020 21:36:29 -0400
+Received: from mail-ej1-x642.google.com ([2a00:1450:4864:20::642]:43188)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <joel.stan@gmail.com>)
- id 1jiTCG-000098-Ka; Mon, 08 Jun 2020 21:37:02 -0400
-Received: by mail-ed1-x543.google.com with SMTP id d15so2508718edm.10;
- Mon, 08 Jun 2020 18:36:59 -0700 (PDT)
+ id 1jiTBk-00006z-Lj; Mon, 08 Jun 2020 21:36:29 -0400
+Received: by mail-ej1-x642.google.com with SMTP id l12so16704694ejn.10;
+ Mon, 08 Jun 2020 18:36:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jms.id.au; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=JchWu3Nmpi3YL/W95vchMtR9JFZKQQTDuwnTA2bm/mI=;
- b=nJ/15e2mfWjXcC3thZV28PgfbUsNdP/02imftTMICW8kD52ZzFkI8sPKZkSuhKJEp1
- g8m3YorPUgFEy6Pcvb35JpPl4bwzNbhA6u3oNun1oa8REgaV0jUFysOoo2RAYCppLId4
- 3qkZDMdeNQ7TjoyIrmDnB25J2fwlvC7hJe9ms=
+ :cc; bh=KhvhSmf6bHsXItz7ZSJvhp4Th42f2tl5qO1RgZS7OsY=;
+ b=hWMWcBYy1DVfhC97tNo3P90gaAxEIrsttTfKaP3L/ZdUzUgxlxbPCy/9nk1Ur8bksm
+ aDVZ/zYlOMqfavhO6lQMPKb6itQpeuGqWM8N1Dyuvg4YwvyTlCkM/UAkDMU2VCTVb5aQ
+ jP1GA3J0yDPQMGSIFyrNDZWTvNBh/XJa+RLrc=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=JchWu3Nmpi3YL/W95vchMtR9JFZKQQTDuwnTA2bm/mI=;
- b=sYYc1n/FAun/Vocz8SbO95xuyCcLxqc9LnFbYoTQvcZ+4ZNXd3zgICZgCKFlkp9JiC
- mUzI7lx8xysDXuQcrmlvmaSMlckUdSZkFUqskiSH49ZfRNmIeRHU8fWMbARlPVQjd/j7
- BQEwVE9no8dSBS+H2kRPY6MKLbGUSZ9zK01wAKJDjplkoN04dJU2e5RHmfr5UYPE5kbK
- WPEAY00Zd6oYizyR4x5LHSG2z9bM5jAbIJ57+D9ejdkICi+mP0FgsZfPOzokAPyWMR3Z
- uBA/5BcXVtWwWKR7sOi6ckGdjzSZgayVZWPbpT8AwrivsUbLDJiCYEi6YgGFfsl6m8K6
- 9W5A==
-X-Gm-Message-State: AOAM533U+eIc0Z7IbJzMj/FWGPICi3gXW97fxG7es84LOKmotHu5MNqP
- pPv+noo4enmAUknB/R/lnE6qxHXKLGTXEw4o4/Q=
-X-Google-Smtp-Source: ABdhPJy+e5qfIX84ib9plVC02PzZTkCnjbfDg5bPgHLpH6EcVyDvDNH9/y0jJ4sk6ONbS75s+oK0xTOx6mSDz2EOkQo=
-X-Received: by 2002:a05:6402:1750:: with SMTP id
- v16mr25353204edx.137.1591666618876; 
- Mon, 08 Jun 2020 18:36:58 -0700 (PDT)
+ bh=KhvhSmf6bHsXItz7ZSJvhp4Th42f2tl5qO1RgZS7OsY=;
+ b=gD4SitNoZSfzTTejr3gjJqId78QkUa+M+VNFPuXnikjQ5n/nhqGQbU4W5z0+bV6B3o
+ M3A8vPLq+cK/+TXtJ7C8DFBtXbE74VPCG7xw9fW59cof5YUhkuMFIArFSiq++i5JwerY
+ cr4sbp7X38nrGsYrcma/ATAqVUHm4tseP/YiZL93vqyTt8HKdZu0CQFYYXbMUBmnIYEB
+ md0/un0fGiFYrn2vdBoTLcCM/HGVcl30mHUuX2rQi4ZOHv9XlGAtvuC7MQxjPNQfgW3r
+ 3dVvByt1ul+1M0fYFj3KPaK59ZPDhRB0+mggsFHk0WXhLDba7JWHD49N/5Pig9MI/K17
+ x2oA==
+X-Gm-Message-State: AOAM530MjlTrH7jTXxVFUr4UIa6a1e4hCH57tdcfh8AoILQfdBZcDiNL
+ T82YfbZlvTzAELKIFlB/Avu19OMPgDkjfoPuQDC1LGdP
+X-Google-Smtp-Source: ABdhPJxoXXRF43u2mZ/Yga6tUfXgWdi/Pic6NbHHSbqHSLnVcs/08qVhfsJv2G5aKAN+vYZkdN82+N4ku+OMipcALqA=
+X-Received: by 2002:a17:906:fcb7:: with SMTP id
+ qw23mr21981896ejb.229.1591666586645; 
+ Mon, 08 Jun 2020 18:36:26 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200521192133.127559-1-hskinnemoen@google.com>
- <20200521192133.127559-7-hskinnemoen@google.com>
-In-Reply-To: <20200521192133.127559-7-hskinnemoen@google.com>
+ <20200521192133.127559-3-hskinnemoen@google.com>
+In-Reply-To: <20200521192133.127559-3-hskinnemoen@google.com>
 From: Joel Stanley <joel@jms.id.au>
-Date: Tue, 9 Jun 2020 01:36:47 +0000
-Message-ID: <CACPK8XeidP3PzyJcqvP3m8xjiH40r08x9MPsEaEvjLy2CLOzCA@mail.gmail.com>
-Subject: Re: [PATCH 6/6] hw/arm: Add two NPCM7xx-based machines
+Date: Tue, 9 Jun 2020 01:36:14 +0000
+Message-ID: <CACPK8XcYNmBYb+OXKZP1sSHqC-1pTN4=S+B7TdOapYkmEC18SA@mail.gmail.com>
+Subject: Re: [PATCH 2/6] hw/misc: Add NPCM7xx System Global Control Registers
+ device model
 To: Havard Skinnemoen <hskinnemoen@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::543;
- envelope-from=joel.stan@gmail.com; helo=mail-ed1-x543.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::642;
+ envelope-from=joel.stan@gmail.com; helo=mail-ej1-x642.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -97,25 +98,21 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 21 May 2020 at 20:39, Havard Skinnemoen <hskinnemoen@google.com> wrote:
+On Thu, 21 May 2020 at 20:40, Havard Skinnemoen <hskinnemoen@google.com> wrote:
 >
-> This adds two new machines:
+> Implement a device model for the System Global Control Registers in the
+> NPCM730 and NPCM750 BMC SoCs.
 >
->   - npcm750-evb: Nuvoton NPCM750 Evaluation Board.
->   - quanta-gsj: A board with a NPCM730 chip.
-
-You could note that these are the two boards supported by OpenBMC.
-
-> They rely on the NPCM7xx SoC device to do the heavy lifting. They are
-> almost completely identical at the moment, apart from the SoC type,
-> which currently only changes the reset contents of one register
-> (GCR.MDLR), but they might grow apart a bit more as more functionality
-> is added.
+> This is primarily used to enable SMP boot (the boot ROM spins reading
+> the SCRPAD register); other registers are best effort for now.
 >
-> Both machines can boot the Linux kernel into /bin/sh.
+> The reset values of the MDLR and PWRON registers are determined by the
+> SoC variant (730 vs 750) and board straps respectively.
 >
 > Reviewed-by: Tyrone Ting <kfting@nuvoton.com>
 > Signed-off-by: Havard Skinnemoen <hskinnemoen@google.com>
+
+This looks similar to the aspeed scu model :)
 
 Reviewed-by: Joel Stanley <joel@jms.id.au>
 
