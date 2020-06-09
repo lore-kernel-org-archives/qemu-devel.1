@@ -6,68 +6,68 @@ X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0150CC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 01:40:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB557C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 01:40:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B886E20774
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 01:40:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 93D7220774
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 01:40:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=jms.id.au header.i=@jms.id.au header.b="JcCXgKYn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B886E20774
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=jms.id.au header.i=@jms.id.au header.b="nJ/15e2m"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93D7220774
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=jms.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42002 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42506 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jiTFD-0005er-Qk
-	for qemu-devel@archiver.kernel.org; Mon, 08 Jun 2020 21:40:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40030)
+	id 1jiTFn-0005ri-Pe
+	for qemu-devel@archiver.kernel.org; Mon, 08 Jun 2020 21:40:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40060)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <joel.stan@gmail.com>)
- id 1jiTC3-0003N9-LG; Mon, 08 Jun 2020 21:36:47 -0400
-Received: from mail-ej1-x643.google.com ([2a00:1450:4864:20::643]:35270)
+ id 1jiTCI-0003gd-BI; Mon, 08 Jun 2020 21:37:02 -0400
+Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:44010)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <joel.stan@gmail.com>)
- id 1jiTC0-000083-Rp; Mon, 08 Jun 2020 21:36:47 -0400
-Received: by mail-ej1-x643.google.com with SMTP id y13so20510403eju.2;
- Mon, 08 Jun 2020 18:36:44 -0700 (PDT)
+ id 1jiTCG-000098-Ka; Mon, 08 Jun 2020 21:37:02 -0400
+Received: by mail-ed1-x543.google.com with SMTP id d15so2508718edm.10;
+ Mon, 08 Jun 2020 18:36:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jms.id.au; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=gbaZwH2bHvRyjZRBOP0HUILH6bq/z3GX0RlSS2sdQcI=;
- b=JcCXgKYn+8U/OAMRidspyGkvTPosEVAgQCPlDaHyv8tsiLJcKDvZEf65RemlPkr2SM
- IobehETUn/14DN+hOTrl8cl16p+gKgstYpJq+fuuSB3hWKKzIt2ytnMHcuFEaWN/Yzx5
- izMHUWR4co0FnuzJWmHgCoq8NFmBTNaC6wTy8=
+ :cc; bh=JchWu3Nmpi3YL/W95vchMtR9JFZKQQTDuwnTA2bm/mI=;
+ b=nJ/15e2mfWjXcC3thZV28PgfbUsNdP/02imftTMICW8kD52ZzFkI8sPKZkSuhKJEp1
+ g8m3YorPUgFEy6Pcvb35JpPl4bwzNbhA6u3oNun1oa8REgaV0jUFysOoo2RAYCppLId4
+ 3qkZDMdeNQ7TjoyIrmDnB25J2fwlvC7hJe9ms=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=gbaZwH2bHvRyjZRBOP0HUILH6bq/z3GX0RlSS2sdQcI=;
- b=BBJVXHvHqKT584KqSLdUvh2xkMqIVxGPpXTiykU3w+SlitVwKX/5SzKai8OrrU1UZj
- 0RjMNxDt3b6EU8K+QxxNyLNbTpQfTDe+9r0gi7kPJ63Ar/zVlJF5I4PoQ8sfJijr+IGK
- 8DYMw2PCtU1sHigTcUa8MiFlvFOwifia0HEPaTjeSQBNioERPxGdRVdb6LfsNJqx1bzt
- YbVFrluqGZ2++brO7WH1hyF7NxkSCewTwfDtQY/u4BJGl7PO36KX/1UC1hIqXCmSt65S
- QFC/RXcJ/euZuw1oHWCL5du8damGdCrlYOEf3JAX5cQLYtof5wtmzyEHNVb2JrnxslcK
- xVRQ==
-X-Gm-Message-State: AOAM532CG3rfTOtIAjgHnnq0bW0jXp/Z4M8PbZNQT+G3Cc7XnBERJgPA
- ITwN6nLsK1AANdPk+tGSP1apsEmjnIaJa70oJrXNlaSo
-X-Google-Smtp-Source: ABdhPJzcyGtkKqa+iXxQ7kmGXRdYaflDo0fZIGgS5bFV6D8YFJhjqXeTt4oDrRp4rE25csT7lNEnk6i4U5MdAvaSxdo=
-X-Received: by 2002:a17:906:1d55:: with SMTP id
- o21mr22657304ejh.491.1591666603149; 
- Mon, 08 Jun 2020 18:36:43 -0700 (PDT)
+ bh=JchWu3Nmpi3YL/W95vchMtR9JFZKQQTDuwnTA2bm/mI=;
+ b=sYYc1n/FAun/Vocz8SbO95xuyCcLxqc9LnFbYoTQvcZ+4ZNXd3zgICZgCKFlkp9JiC
+ mUzI7lx8xysDXuQcrmlvmaSMlckUdSZkFUqskiSH49ZfRNmIeRHU8fWMbARlPVQjd/j7
+ BQEwVE9no8dSBS+H2kRPY6MKLbGUSZ9zK01wAKJDjplkoN04dJU2e5RHmfr5UYPE5kbK
+ WPEAY00Zd6oYizyR4x5LHSG2z9bM5jAbIJ57+D9ejdkICi+mP0FgsZfPOzokAPyWMR3Z
+ uBA/5BcXVtWwWKR7sOi6ckGdjzSZgayVZWPbpT8AwrivsUbLDJiCYEi6YgGFfsl6m8K6
+ 9W5A==
+X-Gm-Message-State: AOAM533U+eIc0Z7IbJzMj/FWGPICi3gXW97fxG7es84LOKmotHu5MNqP
+ pPv+noo4enmAUknB/R/lnE6qxHXKLGTXEw4o4/Q=
+X-Google-Smtp-Source: ABdhPJy+e5qfIX84ib9plVC02PzZTkCnjbfDg5bPgHLpH6EcVyDvDNH9/y0jJ4sk6ONbS75s+oK0xTOx6mSDz2EOkQo=
+X-Received: by 2002:a05:6402:1750:: with SMTP id
+ v16mr25353204edx.137.1591666618876; 
+ Mon, 08 Jun 2020 18:36:58 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200521192133.127559-1-hskinnemoen@google.com>
- <20200521192133.127559-5-hskinnemoen@google.com>
-In-Reply-To: <20200521192133.127559-5-hskinnemoen@google.com>
+ <20200521192133.127559-7-hskinnemoen@google.com>
+In-Reply-To: <20200521192133.127559-7-hskinnemoen@google.com>
 From: Joel Stanley <joel@jms.id.au>
-Date: Tue, 9 Jun 2020 01:36:30 +0000
-Message-ID: <CACPK8XeJMf6VZv0eGGKSuM11sN5m7jBr=fLgS8+-mMrCgZ20cw@mail.gmail.com>
-Subject: Re: [PATCH 4/6] hw/timer: Add NPCM7xx Timer device model
+Date: Tue, 9 Jun 2020 01:36:47 +0000
+Message-ID: <CACPK8XeidP3PzyJcqvP3m8xjiH40r08x9MPsEaEvjLy2CLOzCA@mail.gmail.com>
+Subject: Re: [PATCH 6/6] hw/arm: Add two NPCM7xx-based machines
 To: Havard Skinnemoen <hskinnemoen@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::643;
- envelope-from=joel.stan@gmail.com; helo=mail-ej1-x643.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::543;
+ envelope-from=joel.stan@gmail.com; helo=mail-ed1-x543.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -97,19 +97,22 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 21 May 2020 at 20:38, Havard Skinnemoen <hskinnemoen@google.com> wrote:
+On Thu, 21 May 2020 at 20:39, Havard Skinnemoen <hskinnemoen@google.com> wrote:
 >
-> The NPCM730 and NPCM750 SoCs have three timer modules each holding five
-> timers and some shared registers (e.g. interrupt status).
+> This adds two new machines:
 >
-> Each timer runs at 25 MHz divided by a prescaler, and counts down from a
-> configurable initial value to zero. When zero is reached, the interrupt
-> flag for the timer is set, and the timer is disabled (one-shot mode) or
-> reloaded from its initial value (periodic mode).
+>   - npcm750-evb: Nuvoton NPCM750 Evaluation Board.
+>   - quanta-gsj: A board with a NPCM730 chip.
+
+You could note that these are the two boards supported by OpenBMC.
+
+> They rely on the NPCM7xx SoC device to do the heavy lifting. They are
+> almost completely identical at the moment, apart from the SoC type,
+> which currently only changes the reset contents of one register
+> (GCR.MDLR), but they might grow apart a bit more as more functionality
+> is added.
 >
-> This implementation is sufficient to boot a Linux kernel configured for
-> NPCM750. Note that the kernel does not seem to actually turn on the
-> interrupts.
+> Both machines can boot the Linux kernel into /bin/sh.
 >
 > Reviewed-by: Tyrone Ting <kfting@nuvoton.com>
 > Signed-off-by: Havard Skinnemoen <hskinnemoen@google.com>
