@@ -2,124 +2,74 @@ Return-Path: <SRS0=hUBF=7W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2F95C433E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 07:27:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 615ADC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 07:32:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7FF1C207ED
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 07:27:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="ie8GbWc+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FF1C207ED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 31A0B207C3
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 07:32:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31A0B207C3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=winhong.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41492 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45522 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jiYfb-0001gE-QQ
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 03:27:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39900)
+	id 1jiYkB-0003jN-Ci
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 03:32:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40228)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jiYei-0000YP-Az; Tue, 09 Jun 2020 03:26:44 -0400
-Received: from mail-eopbgr80090.outbound.protection.outlook.com
- ([40.107.8.90]:44099 helo=EUR04-VI1-obe.outbound.protection.outlook.com)
+ (Exim 4.90_1) (envelope-from <yili@winhong.com>) id 1jiYil-0002vr-TQ
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 03:30:56 -0400
+Received: from regular1.263xmail.com ([211.150.70.202]:58308)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jiYeg-0006Yt-3n; Tue, 09 Jun 2020 03:26:43 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=kj1PRLqz2UoZPsSIM3jOZAZh6l0WGE7i8qxJXbRev9FqTOPWMp67gTAJ29VsO0KZCmZt3UDlCVgjeF68L63wjBsWoct3hplI8phTI50GkVYUdDAYG00oTyh10cUE6gQzOadNU3/T8hXyBEtetzYLYJgLFaHt6M605dUVL570cC/jnn4kmf7UHHkgyulXG+uDqWWu949dOhHUvv+edFLql23WguehpO1KaC8l4hfnd3VrjJdI9ePvaon+5wUpYVPEK/VvGyGtE/r2gNgjrPI7vZQ/l22LxiXusbe5Hj7dqn40lagV5V+WuAIWoxCsVlftXiwaJnmnkpPNQlNDZpECJQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=i6Nw6zUarHvHx/WX6pDEicADEBVhL6mNma3CLcRFAhk=;
- b=kUMhhwH13kC8lsjzP5aQc+JSpNuQcD5Xzf3DtQs1UaxphZ73ohr0bUBAiTBuCUgpWLzu33G1T7sVENW1KJ97mtA5s04AaF83HjxojY9ijE3KuzPFk8dETAXeY5J2f61enBKceazk+SaOVJcfuH/t9iL2HLFzsWyH/7w6wCy+uCF4XtSSYlFW1nt9vNNjBDnqIYS68yKzIdVb17naDPH8Gpb/JYLi/Nd84sm5UiyRYjY76VNXcC31o9E8BlCwMn+PxuRC+LI/Szww750ppR0TQVl/WDfSnTWPNkKLQZleU/x9fvXQVxZoy7P/a7yrus+Qj2YzOiv0VNakYMruojmLZw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=i6Nw6zUarHvHx/WX6pDEicADEBVhL6mNma3CLcRFAhk=;
- b=ie8GbWc+GXr0vVQJ9wMuxkPWYZArdsGODbfcuHX1dDxv4TySA8KnpxxEHjwhY2ClDUi6zN8hpz7rosvbfRcnnKqmvBuqH7LJhZog6Ovm3mZpWZChEQq5YEYomdIxgpCX9o0GOK57oklaxpQldGRVhrUNP6PmsXCTU8w3LXPaL0k=
-Authentication-Results: virtuozzo.com; dkim=none (message not signed)
- header.d=none;virtuozzo.com; dmarc=none action=none
- header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM7PR08MB5447.eurprd08.prod.outlook.com (2603:10a6:20b:10b::18)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3066.20; Tue, 9 Jun
- 2020 07:11:37 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::a408:2f0f:bc6c:d312%3]) with mapi id 15.20.3066.023; Tue, 9 Jun 2020
- 07:11:37 +0000
-Subject: Re: [PATCH v5 13/13] qcow2_format.py: dump bitmaps header extension
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-References: <20200606081806.23897-1-vsementsov@virtuozzo.com>
- <20200606081806.23897-14-vsementsov@virtuozzo.com>
- <f14ae085-6328-a96f-f9ab-fa35a0537a3b@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <8fd46a36-6c81-fe09-0680-db1e3b1f33ff@virtuozzo.com>
-Date: Tue, 9 Jun 2020 10:11:35 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.1
-In-Reply-To: <f14ae085-6328-a96f-f9ab-fa35a0537a3b@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: AM0PR06CA0136.eurprd06.prod.outlook.com
- (2603:10a6:208:ab::41) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (Exim 4.90_1) (envelope-from <yili@winhong.com>) id 1jiYig-0007E9-Lh
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 03:30:54 -0400
+Received: from localhost (unknown [192.168.167.8])
+ by regular1.263xmail.com (Postfix) with ESMTP id 7E82C43E
+ for <qemu-devel@nongnu.org>; Tue,  9 Jun 2020 15:30:32 +0800 (CST)
+X-MAIL-GRAY: 0
+X-MAIL-DELIVERY: 1
+X-ADDR-CHECKED4: 1
+X-ANTISPAM-LEVEL: 2
+X-SKE-CHECKED: 1
+X-ABS-CHECKED: 1
+Received: from localhost.localdomain (unknown [14.18.236.69])
+ by smtp.263.net (postfix) whith ESMTP id
+ P14513T140696163952384S1591687825745897_; 
+ Tue, 09 Jun 2020 15:30:32 +0800 (CST)
+X-IP-DOMAINF: 1
+X-UNIQUE-TAG: <248b8a305ae9aee3f8b1cdd569821f8e>
+X-RL-SENDER: yili@winhong.com
+X-SENDER: yili@winhong.com
+X-LOGIN-NAME: yili@winhong.com
+X-FST-TO: qemu-devel@nongnu.org
+X-SENDER-IP: 14.18.236.69
+X-ATTACHMENT-NUM: 0
+X-DNS-TYPE: 0
+X-System-Flag: 0
+From: Yi Li <yili@winhong.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] rbd: Use RBD fast-diff for querying actual allocation
+Date: Tue,  9 Jun 2020 15:30:01 +0800
+Message-Id: <20200609073001.3668811-1-yili@winhong.com>
+X-Mailer: git-send-email 2.25.3
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.2] (185.215.60.180) by
- AM0PR06CA0136.eurprd06.prod.outlook.com (2603:10a6:208:ab::41) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3066.18 via Frontend Transport; Tue, 9 Jun 2020 07:11:37 +0000
-X-Originating-IP: [185.215.60.180]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 86de45a2-490e-438d-0c85-08d80c4459b6
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5447:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM7PR08MB5447633301C353865C8A375BC1820@AM7PR08MB5447.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:2803;
-X-Forefront-PRVS: 042957ACD7
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: uMbkuTW3mjuuiZ3XIiZ5spR56gRrR6zFjS/ITHqNJ0Caxn88JkT9TZKFCfyc5xMMLND48dEftXHu74iWfs6Bs/6SaBEcxo7aA3NEi7CbrA6M7mj/GR+iEWWmu05A80lGCfXyh3Z1IWPT2uAkiySzNa1m3ZNkdbVatiOuikkmJNDdi4PAFkYxZQViFqGxOZlwUP775QZDry15HvblT3a/nh9X0jnctEECDTo6nQTrWKvzZrwe037Kqy6FeialA7Zg4BLs2xlJdIXI+lQjb5J7zcA2DK3Nr4X4rca9yc016OvXYcQihrMwcsSnfEYHpOZpeNKWATIEWL0naBxTK2CZ/4Dmxdvzv7xtsNW7vLyaopS1bXWbEDyAHi8vw2suUZBjgZDc1QI462Cd7jlRDjAKKEMo6MaNeaYIDAJqeBDuSuFP6F097U/p54ybqt3HuJmWz61xPYmDph+BQ1zJI5L/FQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(346002)(39840400004)(396003)(376002)(366004)(136003)(16576012)(186003)(16526019)(4326008)(8676002)(8936002)(107886003)(83380400001)(31686004)(478600001)(86362001)(5660300002)(31696002)(66946007)(26005)(316002)(36756003)(966005)(6486002)(66476007)(53546011)(2906002)(956004)(2616005)(66556008)(52116002)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: Hq947+CMTEdnYPXmDKf3Jb09jiUfJI+Wcpf7S6isFcqDbt5QHMCO+kZ7UF6XagG589cEZfRuJZxBsi8KMAob4WUL3vab2SaRctd8+27KIS4C5yyBrGkcx9FQGBF6MZhrP5tVicyYXNJ87w3zqQtXslcBB6Vqi2L1URP7YQioMFtZS8JCng2A4L6NnXkMsKfv3qMFqSy75/Lk9J3WgrbUzHboWwx6RpXFkX7XzqN22T1GIgA98MaENtT1f4S/xCJ8hwEphAN6zNe8vrZYOWywS+ppzA6IaUNVnn9qYd9Zf78veONuWYDycWdLWjTMUkG/8kgPOovymz7qDocQGgyB2uGyLs89J24j7x9mjMIwSu/5pOlL0UykHHnwkH9ureRa4Qpj5Ir205zdhiEo6NzImYR8eCwO4mErVQcamETvTabJnydOJAVgXbtwYo/V7D1RurXGauf6kgVClOsQsgKLURcsQz8qNiVlopUvRLEbvRT3jX0e7mUp91wpjDcQEfbH
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 86de45a2-490e-438d-0c85-08d80c4459b6
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jun 2020 07:11:37.6940 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 4PdwFTHa3YXfuA4dSVjWKNCgUAoIO2shoerioOU8R1aHh4Eh+MtL0pwPMoTBc1Qx/sqNGp6+XuY4qohGMSMs/PbREKqbKkoD4GL6+YUSvIY=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5447
-Received-SPF: pass client-ip=40.107.8.90;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR04-VI1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 03:26:40
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
-X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=211.150.70.202; envelope-from=yili@winhong.com;
+ helo=regular1.263xmail.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 03:30:36
+X-ACL-Warn: Detected OS   = ???
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -133,42 +83,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, den@openvz.org, andrey.shinkevich@virtuozzo.com,
- qemu-devel@nongnu.org, mreitz@redhat.com
+Cc: yilikernel@gmail.com, yili@winhong.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-09.06.2020 01:00, Eric Blake wrote:
-> On 6/6/20 3:18 AM, Vladimir Sementsov-Ogievskiy wrote:
->> Add class for bitmap extension and dump its fields. Further work is to
->> dump bitmap directory.
->>
->> Test new functionality inside 291 iotest.
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
->> ---
-> 
->> @@ -88,6 +90,8 @@ $QEMU_IMG bitmap --merge tmp -f $IMGFMT "$TEST_IMG" b0
->>   $QEMU_IMG bitmap --remove --image-opts \
->>       driver=$IMGFMT,file.driver=file,file.filename="$TEST_IMG" tmp
->>   $QEMU_IMG info "$TEST_IMG" | _filter_img_info --format-specific
->> +echo "Check resulting qcow2 header extensions:"
->> +$PYTHON qcow2.py "$TEST_IMG" dump-header-exts
-> 
-> Context conflict with my pending patch to resolve an issue reported by Kevin:
-> 
-> https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg02057.html
-> 
-> but that is easy enough to resolve.
-> 
-> I'll be queuing this series through my bitmaps tree, hopefully with a pull request on Tuesday.
-> 
+Since Ceph version Infernalis (9.2.0) the new fast-diff mechanism
+of RBD allows for querying actual rbd image usage.
 
-Great! Thanks!
+Prior to this version there was no easy and fast way to query how
+much allocation a RBD image had inside a Ceph cluster.
 
+To use the fast-diff feature it needs to be enabled per RBD image
+and is only supported by Ceph cluster running version Infernalis
+(9.2.0) or newer.
+
+Without the fast-diff feature enabled qemu-img will report an allocation
+identical to the image capacity.
+
+'qemu-img info rbd:cepharm/liyi-rbd' might output for example:
+
+  image: json:{"driver": "raw", "file": {"pool": "cepharm",
+  "image": "liyi-rbd", "driver": "rbd"}}
+  file format: raw
+  virtual size: 20 GiB (21474836480 bytes)
+  disk size: 0 B
+  cluster_size: 4194304
+
+Newly created rbds will have the fast-diff feature enabled.
+
+Signed-off-by: Yi Li <yili@winhong.com>
+---
+ block/rbd.c | 60 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 60 insertions(+)
+
+diff --git a/block/rbd.c b/block/rbd.c
+index 617553b022..f231653f7b 100644
+--- a/block/rbd.c
++++ b/block/rbd.c
+@@ -1107,6 +1107,65 @@ static int64_t qemu_rbd_getlength(BlockDriverState *bs)
+     return info.size;
+ }
+ 
++#if LIBRBD_VERSION_CODE > 265
++static int disk_usage_callback(uint64_t offset, size_t len, int exists,
++                               void *arg)
++{
++  uint64_t *used_size = (uint64_t *)(arg);
++  if (exists) {
++    (*used_size) += len;
++  }
++  return 0;
++}
++#endif
++
++static int64_t qemu_rbd_allocated_file_size(BlockDriverState *bs)
++{
++    BDRVRBDState *s = bs->opaque;
++    rbd_image_info_t info;
++    int r;
++    uint64_t used_size = 0;
++    uint64_t features = 0;
++
++    r = rbd_stat(s->image, &info, sizeof(info));
++    if (r < 0) {
++        return r;
++    }
++
++    r = rbd_get_features(s->image, &features);
++    if (r < 0) {
++        return r;
++    }
++
++   /*
++    * rbd_diff_iterate2() is available in versions above Ceph 0.94 (Hammer)
++    * It uses a object map inside Ceph which is faster than rbd_diff_iterate()
++    * which iterates all objects.
++    * LIBRBD_VERSION_CODE for Ceph 0.94 is 265. In 266 and upwards diff_iterate2
++    * is available
++    */
++#if LIBRBD_VERSION_CODE > 265
++    if (features & RBD_FEATURE_FAST_DIFF) {
++
++        /*
++         * RBD image fast-diff feature enabled
++         * Querying for actual allocation.
++         */
++        r = rbd_diff_iterate2(s->image, NULL, 0, info.size, 0, 1,
++                              &disk_usage_callback,
++                              &used_size);
++        if (r < 0) {
++            return r;
++        }
++    } else {
++        used_size = info.size;
++    }
++#else
++    used_size = info.size;
++#endif
++    return used_size;
++}
++
+ static int coroutine_fn qemu_rbd_co_truncate(BlockDriverState *bs,
+                                              int64_t offset,
+                                              bool exact,
+@@ -1316,6 +1375,7 @@ static BlockDriver bdrv_rbd = {
+     .bdrv_get_info          = qemu_rbd_getinfo,
+     .create_opts            = &qemu_rbd_create_opts,
+     .bdrv_getlength         = qemu_rbd_getlength,
++    .bdrv_get_allocated_file_size = qemu_rbd_allocated_file_size,
+     .bdrv_co_truncate       = qemu_rbd_co_truncate,
+     .protocol_name          = "rbd",
+ 
 -- 
-Best regards,
-Vladimir
+2.25.3
+
+
+
 
