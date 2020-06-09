@@ -2,68 +2,69 @@ Return-Path: <SRS0=hUBF=7W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F908C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 10:52:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E85C7C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 10:54:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EB6E52078D
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 10:52:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB6E52078D
+	by mail.kernel.org (Postfix) with ESMTPS id AC032207C3
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 10:54:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC032207C3
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47790 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50166 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jibs5-0001I6-56
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 06:52:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60024)
+	id 1jibtK-0002I2-0c
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 06:54:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60040)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jibqB-0007gv-Vk
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 06:50:48 -0400
-Received: from indium.canonical.com ([91.189.90.7]:51456)
+ id 1jibqM-0007yv-Rh
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 06:50:58 -0400
+Received: from indium.canonical.com ([91.189.90.7]:52192)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jibqA-0006HK-1Z
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 06:50:47 -0400
+ id 1jibqL-0006KC-Bn
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 06:50:58 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jibq7-0007ZP-4p
- for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 10:50:43 +0000
+ id 1jibqK-0007sw-0m
+ for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 10:50:56 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 233E22E8053
- for <qemu-devel@nongnu.org>; Tue,  9 Jun 2020 10:50:43 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id CF11E2E810C
+ for <qemu-devel@nongnu.org>; Tue,  9 Jun 2020 10:50:55 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 09 Jun 2020 10:42:45 -0000
-From: "Vladislav K. Valtchev" <1882671@bugs.launchpad.net>
+Date: Tue, 09 Jun 2020 10:38:03 -0000
+From: =?utf-8?q?Alex_Benn=C3=A9e?= <1880225@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
- status=New; importance=Undecided; assignee=None; 
+X-Launchpad-Bug: product=qemu; status=In Progress; importance=Undecided;
+ assignee=alex.bennee@linaro.org; 
+X-Launchpad-Bug-Tags: arm testcase
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: vvaltchev
-X-Launchpad-Bug-Reporter: Vladislav K. Valtchev (vvaltchev)
-X-Launchpad-Bug-Modifier: Vladislav K. Valtchev (vvaltchev)
-Message-Id: <159169936514.32294.8785049859239547612.malonedeb@gac.canonical.com>
-Subject: [Bug 1882671] [NEW] qemu-system-x86_64 (ver 4.2) stuck at boot with
- OVMF bios
+X-Launchpad-Bug-Commenters: ajbennee aleksandar-markovic
+X-Launchpad-Bug-Reporter: Aleksandar Markovic (aleksandar-markovic)
+X-Launchpad-Bug-Modifier: =?utf-8?q?Alex_Benn=C3=A9e_=28ajbennee=29?=
+References: <159017301531.7966.9120113243897778171.malonedeb@gac.canonical.com>
+Message-ID: <20200609103809.23443-12-alex.bennee@linaro.org>
+Subject: [Bug 1880225] [PULL 11/17] linux-user: deal with address wrap for
+ ARM_COMMPAGE on 32 bit
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="ef9fc486e875d54078fa61cf91e898b895125d89";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 1b79396fbf515530254a415b7bc9091c87255528
+X-Launchpad-Hash: bd8e0c4a046306a8282f5cf8614ef8ee7fc2c5b0
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 06:50:43
@@ -86,184 +87,349 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1882671 <1882671@bugs.launchpad.net>
+Reply-To: Bug 1880225 <1880225@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Message-ID: <20200609103803.YSe-mZrHzpUB5y-WlcOXUt2GNV6qZNEdAow0orApOf8@z>
 
-Public bug reported:
+We rely on the pointer to wrap when accessing the high address of the
+COMMPAGE so it lands somewhere reasonable. However on 32 bit hosts we
+cannot afford just to map the entire 4gb address range. The old mmap
+trial and error code handled this by just checking we could map both
+the guest_base and the computed COMMPAGE address.
 
-The version of QEMU (4.2.0) packaged for Ubuntu 20.04 hangs indefinitely
-at boot if an OVMF bios is used. This happens ONLY with qemu-system-
-x86_64. qemu-system-i386 works fine with the latest ia32 OVMF bios.
+We can't just manipulate loadaddr to get what we want so we introduce
+an offset which pgb_find_hole can apply when looking for a gap for
+guest_base that ensures there is space left to map the COMMPAGE
+afterwards.
 
-NOTE[1]: the same identical OVMF bios works fine on QEMU 2.x packaged with =
-Ubuntu 18.04.
-NOTE[2]: reproducing the fatal bug requires *no* operating system:
+This is arguably a little inefficient for the one 32 bit
+value (kuser_helper_version) we need to keep there given all the
+actual code entries are picked up during the translation phase.
 
-   qemu-system-x86_64 -bios OVMF-pure-efi.fd
+Fixes: ee94743034b
+Bug: https://bugs.launchpad.net/qemu/+bug/1880225
+Cc: Bug 1880225 <1880225@bugs.launchpad.net>
+Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Tested-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Message-Id: <20200605154929.26910-13-alex.bennee@linaro.org>
 
-On its window QEMU gets stuck at the very first stage:
-   "Guest has not initialized the display (yet)."
+diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+index 475d243f3bd..b5cb21384a1 100644
+--- a/linux-user/elfload.c
++++ b/linux-user/elfload.c
+@@ -389,7 +389,7 @@ static bool init_guest_commpage(void)
+ {
+     void *want =3D g2h(ARM_COMMPAGE & -qemu_host_page_size);
+     void *addr =3D mmap(want, qemu_host_page_size, PROT_READ | PROT_WRITE,
+-                      MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
++                      MAP_ANONYMOUS | MAP_PRIVATE | MAP_FIXED, -1, 0);
+ =
 
-NOTE[3]: QEMU gets stuck no matter if KVM is used or not.
+     if (addr =3D=3D MAP_FAILED) {
+         perror("Allocating guest commpage");
+@@ -2113,7 +2113,8 @@ static void pgb_have_guest_base(const char *image_nam=
+e, abi_ulong guest_loaddr,
+  * only dumbly iterate up the host address space seeing if the
+  * allocation would work.
+  */
+-static uintptr_t pgd_find_hole_fallback(uintptr_t guest_size, uintptr_t br=
+k, long align)
++static uintptr_t pgd_find_hole_fallback(uintptr_t guest_size, uintptr_t br=
+k,
++                                        long align, uintptr_t offset)
+ {
+     uintptr_t base;
+ =
 
-NOTE[4]: By adding the `-d int` option it is possible to observe that
-QEMU is, apparently, stuck in an endless loop of interrupts. For the
-first few seconds, registers' values vary quickly, but at some point
-they reach a final value, while the interrupt counter increments:
+@@ -2123,7 +2124,7 @@ static uintptr_t pgd_find_hole_fallback(uintptr_t gue=
+st_size, uintptr_t brk, lon
+     while (true) {
+         uintptr_t align_start, end;
+         align_start =3D ROUND_UP(base, align);
+-        end =3D align_start + guest_size;
++        end =3D align_start + guest_size + offset;
+ =
 
-  2568: v=3D68 e=3D0000 i=3D0 cpl=3D0 IP=3D0038:0000000007f1d225 pc=3D00000=
-00007f1d225 SP=3D0030:0000000007f0c8d0 env->regs[R_EAX]=3D0000000000000000
-RAX=3D0000000000000000 RBX=3D0000000007f0c920 RCX=3D0000000000000000 RDX=3D=
-0000000000000001
-RSI=3D0000000006d18798 RDI=3D0000000000008664 RBP=3D0000000000000000 RSP=3D=
-0000000007f0c8d0
-R8 =3D0000000000000001 R9 =3D0000000000000089 R10=3D0000000000000000 R11=3D=
-0000000007f2c987
-R12=3D0000000000000000 R13=3D0000000000000000 R14=3D0000000007087901 R15=3D=
-0000000000000000
-RIP=3D0000000007f1d225 RFL=3D00000246 [---Z-P-] CPL=3D0 II=3D0 A20=3D1 SMM=
-=3D0 HLT=3D0
-ES =3D0030 0000000000000000 ffffffff 00cf9300 DPL=3D0 DS   [-WA]
-CS =3D0038 0000000000000000 ffffffff 00af9a00 DPL=3D0 CS64 [-R-]
-SS =3D0030 0000000000000000 ffffffff 00cf9300 DPL=3D0 DS   [-WA]
-DS =3D0030 0000000000000000 ffffffff 00cf9300 DPL=3D0 DS   [-WA]
-FS =3D0030 0000000000000000 ffffffff 00cf9300 DPL=3D0 DS   [-WA]
-GS =3D0030 0000000000000000 ffffffff 00cf9300 DPL=3D0 DS   [-WA]
-LDT=3D0000 0000000000000000 0000ffff 00008200 DPL=3D0 LDT
-TR =3D0000 0000000000000000 0000ffff 00008b00 DPL=3D0 TSS64-busy
-GDT=3D     00000000079eea98 00000047
-IDT=3D     000000000758f018 00000fff
-CR0=3D80010033 CR2=3D0000000000000000 CR3=3D0000000007c01000 CR4=3D00000668
-DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=3D=
-0000000000000000 =
+         /* if brk is anywhere in the range give ourselves some room to gro=
+w. */
+         if (align_start <=3D brk && brk < end) {
+@@ -2138,7 +2139,7 @@ static uintptr_t pgd_find_hole_fallback(uintptr_t gue=
+st_size, uintptr_t brk, lon
+                                      PROT_NONE, flags, -1, 0);
+             if (mmap_start !=3D MAP_FAILED) {
+                 munmap((void *) align_start, guest_size);
+-                return (uintptr_t) mmap_start;
++                return (uintptr_t) mmap_start + offset;
+             }
+             base +=3D qemu_host_page_size;
+         }
+@@ -2147,7 +2148,7 @@ static uintptr_t pgd_find_hole_fallback(uintptr_t gue=
+st_size, uintptr_t brk, lon
+ =
 
-DR6=3D00000000ffff0ff0 DR7=3D0000000000000400
-CCS=3D0000000000000044 CCD=3D0000000000000000 CCO=3DEFLAGS  =
+ /* Return value for guest_base, or -1 if no hole found. */
+ static uintptr_t pgb_find_hole(uintptr_t guest_loaddr, uintptr_t guest_siz=
+e,
+-                               long align)
++                               long align, uintptr_t offset)
+ {
+     GSList *maps, *iter;
+     uintptr_t this_start, this_end, next_start, brk;
+@@ -2161,7 +2162,7 @@ static uintptr_t pgb_find_hole(uintptr_t guest_loaddr=
+, uintptr_t guest_size,
+     brk =3D (uintptr_t)sbrk(0);
+ =
 
-EFER=3D0000000000000d00
+     if (!maps) {
+-        return pgd_find_hole_fallback(guest_size, brk, align);
++        return pgd_find_hole_fallback(guest_size, brk, align, offset);
+     }
+ =
 
+     /* The first hole is before the first map entry. */
+@@ -2173,7 +2174,7 @@ static uintptr_t pgb_find_hole(uintptr_t guest_loaddr=
+, uintptr_t guest_size,
+ =
 
-NOTE[5]: Just to better help the investigation of the bug, I'd like to rema=
-rk that the issue is NOT caused by an endless loop of triple-faults. I trie=
-d with -d cpu_reset and there is NO such loop. No triple fault whatsoever.
+         this_end =3D ((MapInfo *)iter->data)->start;
+         next_start =3D ((MapInfo *)iter->data)->end;
+-        align_start =3D ROUND_UP(this_start, align);
++        align_start =3D ROUND_UP(this_start + offset, align);
+ =
 
-NOTE[6]: The OVMF version used for the test has been downloaded from:
-https://www.kraxel.org/repos/jenkins/edk2/edk2.git-ovmf-x64-0-20200515.1398=
-.g6ff7c838d0.noarch.rpm
+         /* Skip holes that are too small. */
+         if (align_start >=3D this_end) {
+@@ -2223,6 +2224,7 @@ static void pgb_static(const char *image_name, abi_ul=
+ong orig_loaddr,
+ {
+     uintptr_t loaddr =3D orig_loaddr;
+     uintptr_t hiaddr =3D orig_hiaddr;
++    uintptr_t offset =3D 0;
+     uintptr_t addr;
+ =
 
-but the issue is the same with older OVMF versions as well.
+     if (hiaddr !=3D orig_hiaddr) {
+@@ -2236,18 +2238,19 @@ static void pgb_static(const char *image_name, abi_=
+ulong orig_loaddr,
+     if (ARM_COMMPAGE) {
+         /*
+          * Extend the allocation to include the commpage.
+-         * For a 64-bit host, this is just 4GiB; for a 32-bit host,
+-         * the address arithmetic will wrap around, but the difference
+-         * will produce the correct allocation size.
++         * For a 64-bit host, this is just 4GiB; for a 32-bit host we
++         * need to ensure there is space bellow the guest_base so we
++         * can map the commpage in the place needed when the address
++         * arithmetic wraps around.
+          */
+         if (sizeof(uintptr_t) =3D=3D 8 || loaddr >=3D 0x80000000u) {
+-            hiaddr =3D (uintptr_t)4 << 30;
++            hiaddr =3D (uintptr_t) 4 << 30;
+         } else {
+-            loaddr =3D ARM_COMMPAGE & -align;
++            offset =3D -(ARM_COMMPAGE & -align);
+         }
+     }
+ =
 
+-    addr =3D pgb_find_hole(loaddr, hiaddr - loaddr, align);
++    addr =3D pgb_find_hole(loaddr, hiaddr - loaddr, align, offset);
+     if (addr =3D=3D -1) {
+         /*
+          * If ARM_COMMPAGE, there *might* be a non-consecutive allocation
+@@ -2282,7 +2285,7 @@ static void pgb_dynamic(const char *image_name, long =
+align)
+          * just above that, and maximises the positive guest addresses.
+          */
+         commpage =3D ARM_COMMPAGE & -align;
+-        addr =3D pgb_find_hole(commpage, -commpage, align);
++        addr =3D pgb_find_hole(commpage, -commpage, align, 0);
+         assert(addr !=3D -1);
+         guest_base =3D addr;
+     }
+-- =
 
-Please take a look at it, as the bug is NOT a corner case. QEMU 4.2.0 canno=
-t boot with an UEFI firmware (OVMF) while virtualizing a x86_64 machine AT =
-ALL.
-
-Thank you very much,
-Vladislav K. Valtchev
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-** Affects: qemu (Ubuntu)
-     Importance: Undecided
-         Status: New
-
-** Also affects: qemu (Ubuntu)
-   Importance: Undecided
-       Status: New
+2.20.1
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1882671
+https://bugs.launchpad.net/bugs/1880225
 
 Title:
-  qemu-system-x86_64 (ver 4.2) stuck at boot with OVMF bios
+  Emulation of some arm programs fail with "Assertion `have_guest_base'
+  failed."
 
 Status in QEMU:
-  New
-Status in qemu package in Ubuntu:
-  New
+  In Progress
 
 Bug description:
-  The version of QEMU (4.2.0) packaged for Ubuntu 20.04 hangs
-  indefinitely at boot if an OVMF bios is used. This happens ONLY with
-  qemu-system-x86_64. qemu-system-i386 works fine with the latest ia32
-  OVMF bios.
+  This issue is observer with QEMU ToT, checked out around May 15th (but
+  I believe it is present in current master too), and wasn't present in
+  QEMU v5.0.0.
 
-  NOTE[1]: the same identical OVMF bios works fine on QEMU 2.x packaged wit=
-h Ubuntu 18.04.
-  NOTE[2]: reproducing the fatal bug requires *no* operating system:
+  I am using 32-bit Intel(R) Pentium(R) M processor 1.73GHz host.
 
-     qemu-system-x86_64 -bios OVMF-pure-efi.fd
+  Arm cross-compiler is a standard cross-compiler that comes with
+  Debian-based distributions, and gcc version is:
 
-  On its window QEMU gets stuck at the very first stage:
-     "Guest has not initialized the display (yet)."
+  $ arm-linux-gnueabi-gcc --version
+  arm-linux-gnueabi-gcc (Debian 8.3.0-2) 8.3.0
 
-  NOTE[3]: QEMU gets stuck no matter if KVM is used or not.
+  Compile this program with cross compiler:
 
-  NOTE[4]: By adding the `-d int` option it is possible to observe that
-  QEMU is, apparently, stuck in an endless loop of interrupts. For the
-  first few seconds, registers' values vary quickly, but at some point
-  they reach a final value, while the interrupt counter increments:
+  $ arm-linux-gnueabi-gcc -O2 -static toupper_string.c -o
+  toupper_string-arm
 
-    2568: v=3D68 e=3D0000 i=3D0 cpl=3D0 IP=3D0038:0000000007f1d225 pc=3D000=
-0000007f1d225 SP=3D0030:0000000007f0c8d0 env->regs[R_EAX]=3D0000000000000000
-  RAX=3D0000000000000000 RBX=3D0000000007f0c920 RCX=3D0000000000000000 RDX=
-=3D0000000000000001
-  RSI=3D0000000006d18798 RDI=3D0000000000008664 RBP=3D0000000000000000 RSP=
-=3D0000000007f0c8d0
-  R8 =3D0000000000000001 R9 =3D0000000000000089 R10=3D0000000000000000 R11=
-=3D0000000007f2c987
-  R12=3D0000000000000000 R13=3D0000000000000000 R14=3D0000000007087901 R15=
-=3D0000000000000000
-  RIP=3D0000000007f1d225 RFL=3D00000246 [---Z-P-] CPL=3D0 II=3D0 A20=3D1 SM=
-M=3D0 HLT=3D0
-  ES =3D0030 0000000000000000 ffffffff 00cf9300 DPL=3D0 DS   [-WA]
-  CS =3D0038 0000000000000000 ffffffff 00af9a00 DPL=3D0 CS64 [-R-]
-  SS =3D0030 0000000000000000 ffffffff 00cf9300 DPL=3D0 DS   [-WA]
-  DS =3D0030 0000000000000000 ffffffff 00cf9300 DPL=3D0 DS   [-WA]
-  FS =3D0030 0000000000000000 ffffffff 00cf9300 DPL=3D0 DS   [-WA]
-  GS =3D0030 0000000000000000 ffffffff 00cf9300 DPL=3D0 DS   [-WA]
-  LDT=3D0000 0000000000000000 0000ffff 00008200 DPL=3D0 LDT
-  TR =3D0000 0000000000000000 0000ffff 00008b00 DPL=3D0 TSS64-busy
-  GDT=3D     00000000079eea98 00000047
-  IDT=3D     000000000758f018 00000fff
-  CR0=3D80010033 CR2=3D0000000000000000 CR3=3D0000000007c01000 CR4=3D000006=
-68
-  DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=
-=3D0000000000000000 =
+  Emulation with QEMU v5.0.0 is correct, and gives expected output:
 
-  DR6=3D00000000ffff0ff0 DR7=3D0000000000000400
-  CCS=3D0000000000000044 CCD=3D0000000000000000 CCO=3DEFLAGS  =
+  $ ~/Build/qemu-5.0.0/build-gcc/arm-linux-user/qemu-arm ./toupper_string-a=
+rm
+  CONTROL RESULT: (toupper_string)
+   nwlrbbmqbhcdarz owkkyhiddqscdxr jmowfrxsjybldbe fsarcbynecdyggx xpklorel=
+lnmpapq
+   NWLRBBMQBHCDARZ OWKKYHIDDQSCDXR JMOWFRXSJYBLDBE FSARCBYNECDYGGX XPKLOREL=
+LNMPAPQ
 
-  EFER=3D0000000000000d00
+  While, in case of QEMU master it fails:
+
+  $ ~/Build/qemu-master/build-gcc/arm-linux-user/qemu-arm ./toupper_string-=
+arm
+  qemu-arm: /home/rtrk/Build/qemu-master/linux-user/elfload.c:2294: probe_g=
+uest_base: Assertion `have_guest_base' failed.
+  Aborted
+
+  There are many other programs that exibit the same behavior. The
+  failure is arm-sprecific.
 
   =
 
-  NOTE[5]: Just to better help the investigation of the bug, I'd like to re=
-mark that the issue is NOT caused by an endless loop of triple-faults. I tr=
-ied with -d cpu_reset and there is NO such loop. No triple fault whatsoever.
+  -----------------------------------------------------
 
-  NOTE[6]: The OVMF version used for the test has been downloaded from:
-  https://www.kraxel.org/repos/jenkins/edk2/edk2.git-ovmf-x64-0-20200515.13=
-98.g6ff7c838d0.noarch.rpm
-
-  but the issue is the same with older OVMF versions as well.
+  source code: (let's call this file toupper_string.c) (similar file is
+  also in attachment)
 
   =
 
-  Please take a look at it, as the bug is NOT a corner case. QEMU 4.2.0 can=
-not boot with an UEFI firmware (OVMF) while virtualizing a x86_64 machine A=
-T ALL.
+  #include <stdlib.h>
+  #include <string.h>
+  #include <stdio.h>
+  #include <unistd.h>
 
-  Thank you very much,
-  Vladislav K. Valtchev
+  =
+
+  #define MAX_STRING_LENGHT              15
+  #define NUMBER_OF_RANDOM_STRINGS       100
+  #define DEFAULT_NUMBER_OF_REPETITIONS  30000
+  #define MAX_NUMBER_OF_REPETITIONS      1000000000
+  #define NUMBER_OF_CONTROL_PRINT_ITEMS  5
+
+  /* Structure for keeping an array of strings */
+  struct StringStruct {
+      char chars[MAX_STRING_LENGHT + 1];
+  };
+
+  /**
+   * Sets characters of the given string to random small letters a-z.
+   * @param s String to get random characters.
+   * @len Length of the input string.
+   */
+  static void gen_random_string(char *chars, const int len)
+  {
+      static const char letters[] =3D "abcdefghijklmnopqrstuvwxyz";
+
+      for (size_t i =3D 0; i < len; i++) {
+          chars[i] =3D letters[rand() % (sizeof(letters) - 1)];
+      }
+      chars[len] =3D 0;
+  }
+
+  void main (int argc, char* argv[])
+  {
+      struct StringStruct random_strings[NUMBER_OF_RANDOM_STRINGS];
+      struct StringStruct strings_to_be_uppercased[NUMBER_OF_RANDOM_STRINGS=
+];
+      int32_t number_of_repetitions =3D DEFAULT_NUMBER_OF_REPETITIONS;
+      int32_t option;
+
+      /* Parse command line options */
+      while ((option =3D getopt(argc, argv, "n:")) !=3D -1) {
+          if (option =3D=3D 'n') {
+              int32_t user_number_of_repetitions =3D atoi(optarg);
+              /* Check if the value is a negative number */
+              if (user_number_of_repetitions < 1) {
+                  fprintf(stderr, "Error ... Value for option '-n' cannot b=
+e a "
+                                  "negative number.\n");
+                  exit(EXIT_FAILURE);
+              }
+              /* Check if the value is a string or zero */
+              if (user_number_of_repetitions =3D=3D 0) {
+                  fprintf(stderr, "Error ... Invalid value for option '-n'.=
+\n");
+                  exit(EXIT_FAILURE);
+              }
+              /* Check if the value is too large */
+              if (user_number_of_repetitions > MAX_NUMBER_OF_REPETITIONS) {
+                  fprintf(stderr, "Error ... Value for option '-n' cannot b=
+e "
+                                  "more than %d.\n", MAX_NUMBER_OF_REPETITI=
+ONS);
+                  exit(EXIT_FAILURE);
+              }
+              number_of_repetitions =3D user_number_of_repetitions;
+          } else {
+              exit(EXIT_FAILURE);
+          }
+      }
+
+      /* Create an array of strings with random content */
+      srand(1);
+      for (size_t i =3D 0; i < NUMBER_OF_RANDOM_STRINGS; i++) {
+          gen_random_string(random_strings[i].chars, MAX_STRING_LENGHT);
+      }
+
+      /* Perform uppercasing of a set of random strings multiple times */
+      for (size_t j =3D 0; j < number_of_repetitions; j++) {
+          /* Copy initial set of random strings to the set to be uppercased=
+ */
+          memcpy(strings_to_be_uppercased, random_strings,
+                 NUMBER_OF_RANDOM_STRINGS * (MAX_STRING_LENGHT + 1));
+          /* Do actual changing case to uppercase */
+          for (size_t i =3D 0; i < NUMBER_OF_RANDOM_STRINGS; i++) {
+              int k =3D 0;
+    =
+
+              while (strings_to_be_uppercased[i].chars[k]) { =
+
+                  char ch =3D strings_to_be_uppercased[i].chars[k] - 32; =
+
+                  memcpy((void *)strings_to_be_uppercased[i].chars + k,
+                         &ch, 1);
+                  k++; =
+
+              } =
+
+          }
+      }
+
+      /* Control printing */
+      printf("CONTROL RESULT: (toupper_string)\n");
+      for (size_t i =3D 0; i < NUMBER_OF_CONTROL_PRINT_ITEMS; i++) {
+          printf(" %s", random_strings[i].chars);
+      }
+      printf("\n");
+      for (size_t i =3D 0; i < NUMBER_OF_CONTROL_PRINT_ITEMS; i++) {
+          printf(" %s", strings_to_be_uppercased[i].chars);
+      }
+      printf("\n");
+  }
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1882671/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1880225/+subscriptions
 
