@@ -2,121 +2,99 @@ Return-Path: <SRS0=hUBF=7W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBB46C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 14:20:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 351A2C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 14:21:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 832B5206D5
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 14:20:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E7B7B2078D
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 14:21:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="F+2R1YwY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 832B5206D5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cM3WfZU2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E7B7B2078D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32838 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33714 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jif7H-0006dm-Or
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 10:20:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54706)
+	id 1jif7g-00075a-6V
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 10:21:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55294)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jif0r-0006vA-9v; Tue, 09 Jun 2020 10:14:01 -0400
-Received: from mail-am6eur05on2106.outbound.protection.outlook.com
- ([40.107.22.106]:18497 helo=EUR05-AM6-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jif0p-0007hk-LJ; Tue, 09 Jun 2020 10:14:00 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=g1SvM8H+lbjvLv8+a2VkMD8DUjjhs97UBr3gxFIJvudd4dJ1/+veh9Snbu1+XZpAfkw2+LwaLIRIXwFDKlCPkrWTaPVfyw40jHpfbnt2n45/2ZXXl0KRj24T7OHsM3afzTMroULtszHU6QNysiFrrcV7Zsc56TCwj0SHzrHLsAscrQQLia7K29FjnjOUZKDLXckNvyB0Sm/ApDnA3xipZNgVkzG/nXV6RJh3XHz8F4fM6FySpYyX5yTne98reJ/8BL0lQ86liSV8RQcK6hEhJWeA0ATaV0hKUo8TLJfoXumOTkPzGf7cKtRZ7B4zHQA0ODOY+KBnqUlxPHL80m32Jw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=RHNmPReNB/FFQ2Oj7AfM9sIBpQdZfZsnC0Nu7dHRlVk=;
- b=gDGUxpDi4sdteizN4IbtpRT2tSaDlvRVSMKN1aCXvGdepi30f/ytzeBFqf2dg4aRz0QVU1CRST0lP6fCzrdNLCg4mqe54WTaaW+nXMT2t8yT9Ab0+Q1fAjuFBvloPY847sQua6RUTc1dduFJjak7knGaMK+m+LwUjpaFtICUNq/gbEMPWevErV1X5v6y2y7VnHD8E5jHgaQwj0LurKlWZrwGdKjJzp4lrr5/TziUqKwAj53ia8Yhb/e/gNPI4uVm1WWE53QrJ2M5nau3Q3YVecZnVmX7h361TRLM5u7Y4QFHKdJXkplYwjeN7SAfI6iqTUSHeUs7yOF3Ap7k57y7ew==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=RHNmPReNB/FFQ2Oj7AfM9sIBpQdZfZsnC0Nu7dHRlVk=;
- b=F+2R1YwYqy/y12zZ6XfEdBxTdN9qEPu65tqIwwZcLB/UTCxSAtYoZW4B3vrsv8ssS8OpKP/qvS4CeT9WlxyX/sQzKxtBf+3jDSDr9OVZecj99tSowWhuDuhs+0ax1uQN6LBaL+vc+sm43Y42dzsTh2jGx/VG4h4COAGCpFKVB70=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3066.18; Tue, 9 Jun
- 2020 14:13:51 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::a408:2f0f:bc6c:d312%3]) with mapi id 15.20.3066.023; Tue, 9 Jun 2020
- 14:13:51 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH v6 5/7] block: generate coroutine-wrapper code
-Date: Tue,  9 Jun 2020 17:13:27 +0300
-Message-Id: <20200609141329.3945-6-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20200609141329.3945-1-vsementsov@virtuozzo.com>
-References: <20200609141329.3945-1-vsementsov@virtuozzo.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: FRYP281CA0002.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10::12)
- To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jif69-0005Tp-LE
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 10:19:29 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:28081
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jif68-00008J-Cc
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 10:19:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591712367;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=lnSAfuKnJmXdY0VpCSldzjzzHRt5dNWkRuY7Yw1eVAo=;
+ b=cM3WfZU25hXPfZttqFaTvx+n8X4sK+NKf8jdrnGid2txhGc9ajYn7B1LwjdM/odBQIw/a7
+ BXqQIY9VHP2jmkv4XGmQRHRjwjnr45GNbxTs4LM8iwd+zb09MfP+Mgsg/8b9cHmPgJS+ro
+ shSDHtSWdzRBiDyqNkBjw3sUXXxeX8E=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-249-0ecUgO3pOoG3Bvw4tLAglA-1; Tue, 09 Jun 2020 10:19:19 -0400
+X-MC-Unique: 0ecUgO3pOoG3Bvw4tLAglA-1
+Received: by mail-wm1-f72.google.com with SMTP id c4so761414wmd.0
+ for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 07:19:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=lnSAfuKnJmXdY0VpCSldzjzzHRt5dNWkRuY7Yw1eVAo=;
+ b=DSwV2XsSrfhitkFnsrfxyzNctl2ykMLxnkAex9zHXiy5BhhyHzAzSSbiPUN/Hv6JDa
+ 9vdxOt6XJihZE9RJHiRBd1W+z7uXzAHlZ4MfOhD8uKPqpdZ7S2l3MWo4+X/Gd52PvIkb
+ VVAd/ctOh1UHS+20hoVtK7oE/IhxJX8wGs8I0GJfIvjD9ag8MgY0nEEPAXuhdxXqvxq1
+ O/TAunZzn2QzZCClovGse68KZ5P4lxQ6EmZvsnJ8w6VoYBbGRVVw4R7zI2qJoUuy5ktk
+ fq5ELL3DGWXaO2AvG5COtDKi2pWSkNy+rs4z322X/Vhw/Xc/g6+LNPVOjjkFTofTNjjj
+ DkWw==
+X-Gm-Message-State: AOAM530DUMLQz5P5TCVfRW+si7Rxr57+Jp8RrKX4bec1EE3k/g2F5EBV
+ XTgFKywiAfDoj0/Dedh1DyoQOyvQKSc6N9Cdn7MfveqSpaStVqWRESLT5yHvcdoWiTeakxVSxnP
+ niATfOd2AwjKXgnM=
+X-Received: by 2002:a5d:4c87:: with SMTP id z7mr4717835wrs.100.1591712358420; 
+ Tue, 09 Jun 2020 07:19:18 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyeo86hKCUp0mtgXR98iiQ38LowH4pLLLTKhCxH99KW7pLOSf8fABOkUkEOy5Ctj0nZ0Ccz3Q==
+X-Received: by 2002:a5d:4c87:: with SMTP id z7mr4717801wrs.100.1591712358156; 
+ Tue, 09 Jun 2020 07:19:18 -0700 (PDT)
+Received: from redhat.com (bzq-79-181-55-232.red.bezeqint.net. [79.181.55.232])
+ by smtp.gmail.com with ESMTPSA id d16sm3046995wmd.42.2020.06.09.07.19.16
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 09 Jun 2020 07:19:17 -0700 (PDT)
+Date: Tue, 9 Jun 2020 10:19:14 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Vishal Verma <vishal.l.verma@intel.com>
+Subject: Re: [PATCH v5 3/3] tests/acpi: update expected SRAT files
+Message-ID: <20200609101341-mutt-send-email-mst@kernel.org>
+References: <20200606000911.9896-1-vishal.l.verma@intel.com>
+ <20200606000911.9896-4-vishal.l.verma@intel.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from localhost.localdomain (185.215.60.180) by
- FRYP281CA0002.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10::12) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3066.20 via Frontend Transport; Tue, 9 Jun 2020 14:13:50 +0000
-X-Mailer: git-send-email 2.21.0
-X-Originating-IP: [185.215.60.180]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: a12ca7f8-0f76-4b10-09a5-08d80c7f55f8
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5494:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM7PR08MB54943A2C7CED8F50EF2043DCC1820@AM7PR08MB5494.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:79;
-X-Forefront-PRVS: 042957ACD7
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ltCw9Zx6i5MHBrHzghq9bfo/JosovHwY6/O98m/vzvk5TEegpzW36tqBN/RRsnHkFchFuP810guPIFzI2xdUTViTOyUuLAUyULLfKo14DouoZR3J2cok8EHm4k/sBDQ4Dyrs29NMf+wIa0D8HBTh0Eenl7rfWmLKIMeWP549hnU66u01/KWCBTZKyU09XBahTHlk9AW9BOvU3Dl1GcscEiG3u8oLJuYt9k7CjBH5jHhEKuMg/S0AFCKrz7n8c4TZUrAlcM6LyRdKQY2XkGPmCRs2mK6JAOV5oR3ZyKnNBpeVI59pAOJPhZRc0pO3MNhKGoz/j6/No9zaCKXSO1UdXJ0vLong4sFmuhI6cs+QE4eNo4V+00PEA+8YcU4zEpw5
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(366004)(376002)(136003)(396003)(39850400004)(346002)(2906002)(6512007)(8676002)(83380400001)(6506007)(16526019)(186003)(26005)(6486002)(478600001)(36756003)(69590400007)(6666004)(8936002)(52116002)(6916009)(30864003)(66476007)(66946007)(5660300002)(66556008)(1076003)(86362001)(4326008)(2616005)(316002)(107886003)(956004);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: qWkrsavfQt1Mc09PbJvIfUI7jDG9BWuAXctJfhiYZgUyxzIdK7UbDMgQWtIOB4yTJOc5akp+Yt4qSIS8L/aK9VBmLXEXLk9D6pCtZdhrJgMKkhD+eGPNTloOBAegqRFQWbvC0ezjVOoPO/UUIfUVMb3dHKWh+t487ohsm/0dshCKaZKVQ2RtwKERsk4dX/m+xiPLo6mLrndAUV9SlMXECjSn7E2bhs5obcJSYyMLriz4DvgSZ6/RVDj7mvZ7ztj6MT+NzFGpmAGna/t75VsBmPVf9c8mYph/uD56TIhOT3pDuFrCguxv6+a1ooArpaWZBN1LRx2CZkCadwudoawsvMo8rHnDB0RQ2I0ScH4LF1FxOQ+r6WdM2DGWZl8jE0hSngXj9T7hgmOIiUmCqlb10szp0sdsxxXHdlanjiKpWejHLfe/ICcHhuMIi8uPtVahoKXjBCwpiAZWWrNcvFsAnqt/Bq20m2c4Q2tSACs6IG0=
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a12ca7f8-0f76-4b10-09a5-08d80c7f55f8
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jun 2020 14:13:51.7346 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: +5HgQH812Pn7QHxAxDE0fA4nm9V88qn4ujPH+J0tpbZYmRGTVAV/D2nwthHkrVG4mAtdc7c+rqxNl/75LdD195wKRvEtFFnhfL6NW0y7iZA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5494
-Received-SPF: pass client-ip=40.107.22.106;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR05-AM6-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 10:13:55
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+In-Reply-To: <20200606000911.9896-4-vishal.l.verma@intel.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=mst@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 01:38:49
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -129,498 +107,216 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, kwolf@redhat.com, vsementsov@virtuozzo.com,
- ehabkost@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com,
- stefanha@redhat.com, crosa@redhat.com, den@openvz.org
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Xiao Guangrong <xiaoguangrong.eric@gmail.com>, jingqi.liu@intel.com,
+ Dave Hansen <dave.hansen@linux.intel.com>, qemu-devel@nongnu.org,
+ Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>, Dan Williams <dan.j.williams@intel.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Use code generation implemented in previous commit to generated
-coroutine wrappers in block.c and block/io.c
+On Fri, Jun 05, 2020 at 06:09:11PM -0600, Vishal Verma wrote:
+> Update expected SRAT files for the change to account for NVDIMM NUMA
+> nodes in the SRAT.
+> 
+> AML diffs:
+> 
+> tests/data/acpi/pc/SRAT.dimmpxm:
+> --- /tmp/asl-3P2IL0.dsl	2020-05-28 15:11:02.326439263 -0600
+> +++ /tmp/asl-1N4IL0.dsl	2020-05-28 15:11:02.325439280 -0600
+> @@ -3,7 +3,7 @@
+>   * AML/ASL+ Disassembler version 20190509 (64-bit version)
+>   * Copyright (c) 2000 - 2019 Intel Corporation
+>   *
+> - * Disassembly of tests/data/acpi/pc/SRAT.dimmpxm, Thu May 28 15:11:02 2020
+> + * Disassembly of /tmp/aml-4D4IL0, Thu May 28 15:11:02 2020
+>   *
+>   * ACPI Data Table [SRAT]
+>   *
+> @@ -13,7 +13,7 @@
+>  [000h 0000   4]                    Signature : "SRAT"    [System Resource Affinity Table]
+>  [004h 0004   4]                 Table Length : 00000188
+>  [008h 0008   1]                     Revision : 01
+> -[009h 0009   1]                     Checksum : 80
+> +[009h 0009   1]                     Checksum : 68
+>  [00Ah 0010   6]                       Oem ID : "BOCHS "
+>  [010h 0016   8]                 Oem Table ID : "BXPCSRAT"
+>  [018h 0024   4]                 Oem Revision : 00000001
+> @@ -140,15 +140,15 @@
+>  [138h 0312   1]                Subtable Type : 01 [Memory Affinity]
+>  [139h 0313   1]                       Length : 28
+> 
+> -[13Ah 0314   4]             Proximity Domain : 00000000
+> +[13Ah 0314   4]             Proximity Domain : 00000002
+>  [13Eh 0318   2]                    Reserved1 : 0000
+> -[140h 0320   8]                 Base Address : 0000000000000000
+> -[148h 0328   8]               Address Length : 0000000000000000
+> +[140h 0320   8]                 Base Address : 0000000108000000
+> +[148h 0328   8]               Address Length : 0000000008000000
+>  [150h 0336   4]                    Reserved2 : 00000000
+> -[154h 0340   4]        Flags (decoded below) : 00000000
+> -                                     Enabled : 0
+> +[154h 0340   4]        Flags (decoded below) : 00000005
+> +                                     Enabled : 1
+>                                 Hot Pluggable : 0
+> -                                Non-Volatile : 0
+> +                                Non-Volatile : 1
+>  [158h 0344   8]                    Reserved3 : 0000000000000000
+> 
+>  [160h 0352   1]                Subtable Type : 01 [Memory Affinity]
+> 
+> tests/data/acpi/q35/SRAT.dimmpxm:
+> --- /tmp/asl-HW2LL0.dsl	2020-05-28 15:11:05.446384514 -0600
+> +++ /tmp/asl-8MYLL0.dsl	2020-05-28 15:11:05.445384532 -0600
+> @@ -3,7 +3,7 @@
+>   * AML/ASL+ Disassembler version 20190509 (64-bit version)
+>   * Copyright (c) 2000 - 2019 Intel Corporation
+>   *
+> - * Disassembly of tests/data/acpi/q35/SRAT.dimmpxm, Thu May 28 15:11:05 2020
+> + * Disassembly of /tmp/aml-2CYLL0, Thu May 28 15:11:05 2020
+>   *
+>   * ACPI Data Table [SRAT]
+>   *
+> @@ -13,7 +13,7 @@
+>  [000h 0000   4]                    Signature : "SRAT"    [System Resource Affinity Table]
+>  [004h 0004   4]                 Table Length : 00000188
+>  [008h 0008   1]                     Revision : 01
+> -[009h 0009   1]                     Checksum : 80
+> +[009h 0009   1]                     Checksum : 68
+>  [00Ah 0010   6]                       Oem ID : "BOCHS "
+>  [010h 0016   8]                 Oem Table ID : "BXPCSRAT"
+>  [018h 0024   4]                 Oem Revision : 00000001
+> @@ -140,15 +140,15 @@
+>  [138h 0312   1]                Subtable Type : 01 [Memory Affinity]
+>  [139h 0313   1]                       Length : 28
+> 
+> -[13Ah 0314   4]             Proximity Domain : 00000000
+> +[13Ah 0314   4]             Proximity Domain : 00000002
+>  [13Eh 0318   2]                    Reserved1 : 0000
+> -[140h 0320   8]                 Base Address : 0000000000000000
+> -[148h 0328   8]               Address Length : 0000000000000000
+> +[140h 0320   8]                 Base Address : 0000000108000000
+> +[148h 0328   8]               Address Length : 0000000008000000
+>  [150h 0336   4]                    Reserved2 : 00000000
+> -[154h 0340   4]        Flags (decoded below) : 00000000
+> -                                     Enabled : 0
+> +[154h 0340   4]        Flags (decoded below) : 00000005
+> +                                     Enabled : 1
+>                                 Hot Pluggable : 0
+> -                                Non-Volatile : 0
+> +                                Non-Volatile : 1
+>  [158h 0344   8]                    Reserved3 : 0000000000000000
+> 
+>  [160h 0352   1]                Subtable Type : 01 [Memory Affinity]
+> 
+> tests/data/acpi/virt/SRAT.memhp:
+> --- /tmp/asl-E32WL0.dsl	2020-05-28 15:19:56.976095582 -0600
+> +++ /tmp/asl-Y69WL0.dsl	2020-05-28 15:19:56.974095617 -0600
+> @@ -3,7 +3,7 @@
+>   * AML/ASL+ Disassembler version 20190509 (64-bit version)
+>   * Copyright (c) 2000 - 2019 Intel Corporation
+>   *
+> - * Disassembly of tests/data/acpi/virt/SRAT.memhp, Thu May 28 15:19:56 2020
+> + * Disassembly of /tmp/aml-2CCXL0, Thu May 28 15:19:56 2020
+>   *
+>   * ACPI Data Table [SRAT]
+>   *
+> @@ -11,9 +11,9 @@
+>   */
+> 
+>  [000h 0000   4]                    Signature : "SRAT"    [System Resource Affinity Table]
+> -[004h 0004   4]                 Table Length : 000000BA
+> +[004h 0004   4]                 Table Length : 000000E2
+>  [008h 0008   1]                     Revision : 03
+> -[009h 0009   1]                     Checksum : 43
+> +[009h 0009   1]                     Checksum : 5C
+>  [00Ah 0010   6]                       Oem ID : "BOCHS "
+>  [010h 0016   8]                 Oem Table ID : "BXPCSRAT"
+>  [018h 0024   4]                 Oem Revision : 00000001
+> @@ -65,18 +65,32 @@
+> 
+>  [094h 0148   4]             Proximity Domain : 00000001
+>  [098h 0152   2]                    Reserved1 : 0000
+> -[09Ah 0154   8]                 Base Address : 0000000080000000
+> -[0A2h 0162   8]               Address Length : 00000000F0000000
+> +[09Ah 0154   8]                 Base Address : 0000000088000000
+> +[0A2h 0162   8]               Address Length : 0000000008000000
+>  [0AAh 0170   4]                    Reserved2 : 00000000
+> -[0AEh 0174   4]        Flags (decoded below) : 00000003
+> +[0AEh 0174   4]        Flags (decoded below) : 00000005
+> +                                     Enabled : 1
+> +                               Hot Pluggable : 0
+> +                                Non-Volatile : 1
+> +[0B2h 0178   8]                    Reserved3 : 0000000000000000
+> +
+> +[0BAh 0186   1]                Subtable Type : 01 [Memory Affinity]
+> +[0BBh 0187   1]                       Length : 28
+> +
+> +[0BCh 0188   4]             Proximity Domain : 00000001
+> +[0C0h 0192   2]                    Reserved1 : 0000
+> +[0C2h 0194   8]                 Base Address : 0000000080000000
+> +[0CAh 0202   8]               Address Length : 00000000F0000000
+> +[0D2h 0210   4]                    Reserved2 : 00000000
+> +[0D6h 0214   4]        Flags (decoded below) : 00000003
+>                                       Enabled : 1
+>                                 Hot Pluggable : 1
+>                                  Non-Volatile : 0
+> -[0B2h 0178   8]                    Reserved3 : 0000000000000000
+> +[0DAh 0218   8]                    Reserved3 : 0000000000000000
+> 
+> Signed-off-by: Vishal Verma <vishal.l.verma@intel.com>
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- block/coroutines.h    |   7 +-
- include/block/block.h |  17 ++--
- block.c               |  73 ---------------
- block/io.c            | 212 ------------------------------------------
- 4 files changed, 15 insertions(+), 294 deletions(-)
+So I went to apply this and notices that virt tests
+did not seem to run. Igor did you notice this too?
+Anyway, not this patch's fault.
 
-diff --git a/block/coroutines.h b/block/coroutines.h
-index 9ce1730a09..145a2d2645 100644
---- a/block/coroutines.h
-+++ b/block/coroutines.h
-@@ -26,6 +26,7 @@
- #define BLOCK_COROUTINES_INT_H
- 
- #include "block/block_int.h"
-+#include "block/generated-co-wrapper.h"
- 
- int coroutine_fn bdrv_co_check(BlockDriverState *bs,
-                                BdrvCheckResult *res, BdrvCheckMode fix);
-@@ -34,7 +35,7 @@ int coroutine_fn bdrv_co_invalidate_cache(BlockDriverState *bs, Error **errp);
- int coroutine_fn
- bdrv_co_prwv(BdrvChild *child, int64_t offset, QEMUIOVector *qiov,
-              bool is_write, BdrvRequestFlags flags);
--int
-+int generated_co_wrapper
- bdrv_prwv(BdrvChild *child, int64_t offset, QEMUIOVector *qiov,
-           bool is_write, BdrvRequestFlags flags);
- 
-@@ -47,7 +48,7 @@ bdrv_co_common_block_status_above(BlockDriverState *bs,
-                                   int64_t *pnum,
-                                   int64_t *map,
-                                   BlockDriverState **file);
--int
-+int generated_co_wrapper
- bdrv_common_block_status_above(BlockDriverState *bs,
-                                BlockDriverState *base,
-                                bool want_zero,
-@@ -60,7 +61,7 @@ bdrv_common_block_status_above(BlockDriverState *bs,
- int coroutine_fn
- bdrv_co_rw_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos,
-                    bool is_read);
--int
-+int generated_co_wrapper
- bdrv_rw_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos,
-                 bool is_read);
- 
-diff --git a/include/block/block.h b/include/block/block.h
-index 46965a7780..46c8b7816e 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -9,6 +9,7 @@
- #include "block/dirty-bitmap.h"
- #include "block/blockjob.h"
- #include "qemu/hbitmap.h"
-+#include "block/generated-co-wrapper.h"
- 
- /* block.c */
- typedef struct BlockDriver BlockDriver;
-@@ -398,8 +399,9 @@ void bdrv_refresh_filename(BlockDriverState *bs);
- int coroutine_fn bdrv_co_truncate(BdrvChild *child, int64_t offset, bool exact,
-                                   PreallocMode prealloc, BdrvRequestFlags flags,
-                                   Error **errp);
--int bdrv_truncate(BdrvChild *child, int64_t offset, bool exact,
--                  PreallocMode prealloc, BdrvRequestFlags flags, Error **errp);
-+int generated_co_wrapper
-+bdrv_truncate(BdrvChild *child, int64_t offset, bool exact,
-+              PreallocMode prealloc, BdrvRequestFlags flags, Error **errp);
- 
- int64_t bdrv_nb_sectors(BlockDriverState *bs);
- int64_t bdrv_getlength(BlockDriverState *bs);
-@@ -441,7 +443,8 @@ typedef enum {
-     BDRV_FIX_ERRORS   = 2,
- } BdrvCheckMode;
- 
--int bdrv_check(BlockDriverState *bs, BdrvCheckResult *res, BdrvCheckMode fix);
-+int generated_co_wrapper bdrv_check(BlockDriverState *bs, BdrvCheckResult *res,
-+                                    BdrvCheckMode fix);
- 
- /* The units of offset and total_work_size may be chosen arbitrarily by the
-  * block driver; total_work_size may change during the course of the amendment
-@@ -464,12 +467,13 @@ void bdrv_aio_cancel_async(BlockAIOCB *acb);
- int bdrv_co_ioctl(BlockDriverState *bs, int req, void *buf);
- 
- /* Invalidate any cached metadata used by image formats */
--int bdrv_invalidate_cache(BlockDriverState *bs, Error **errp);
-+int generated_co_wrapper bdrv_invalidate_cache(BlockDriverState *bs,
-+                                               Error **errp);
- void bdrv_invalidate_cache_all(Error **errp);
- int bdrv_inactivate_all(void);
- 
- /* Ensure contents are flushed to disk.  */
--int bdrv_flush(BlockDriverState *bs);
-+int generated_co_wrapper bdrv_flush(BlockDriverState *bs);
- int coroutine_fn bdrv_co_flush(BlockDriverState *bs);
- int bdrv_flush_all(void);
- void bdrv_close_all(void);
-@@ -484,7 +488,8 @@ void bdrv_drain_all(void);
-     AIO_WAIT_WHILE(bdrv_get_aio_context(bs_),              \
-                    cond); })
- 
--int bdrv_pdiscard(BdrvChild *child, int64_t offset, int64_t bytes);
-+int generated_co_wrapper bdrv_pdiscard(BdrvChild *child, int64_t offset,
-+                                       int64_t bytes);
- int bdrv_co_pdiscard(BdrvChild *child, int64_t offset, int64_t bytes);
- int bdrv_has_zero_init_1(BlockDriverState *bs);
- int bdrv_has_zero_init(BlockDriverState *bs);
-diff --git a/block.c b/block.c
-index 2ca9267729..3046696f30 100644
---- a/block.c
-+++ b/block.c
-@@ -4640,43 +4640,6 @@ int coroutine_fn bdrv_co_check(BlockDriverState *bs,
-     return bs->drv->bdrv_co_check(bs, res, fix);
- }
- 
--typedef struct CheckCo {
--    BlockDriverState *bs;
--    BdrvCheckResult *res;
--    BdrvCheckMode fix;
--    int ret;
--} CheckCo;
--
--static void coroutine_fn bdrv_check_co_entry(void *opaque)
--{
--    CheckCo *cco = opaque;
--    cco->ret = bdrv_co_check(cco->bs, cco->res, cco->fix);
--    aio_wait_kick();
--}
--
--int bdrv_check(BlockDriverState *bs,
--               BdrvCheckResult *res, BdrvCheckMode fix)
--{
--    Coroutine *co;
--    CheckCo cco = {
--        .bs = bs,
--        .res = res,
--        .ret = -EINPROGRESS,
--        .fix = fix,
--    };
--
--    if (qemu_in_coroutine()) {
--        /* Fast-path if already in coroutine context */
--        bdrv_check_co_entry(&cco);
--    } else {
--        co = qemu_coroutine_create(bdrv_check_co_entry, &cco);
--        bdrv_coroutine_enter(bs, co);
--        BDRV_POLL_WHILE(bs, cco.ret == -EINPROGRESS);
--    }
--
--    return cco.ret;
--}
--
- /*
-  * Return values:
-  * 0        - success
-@@ -5723,42 +5686,6 @@ int coroutine_fn bdrv_co_invalidate_cache(BlockDriverState *bs, Error **errp)
-     return 0;
- }
- 
--typedef struct InvalidateCacheCo {
--    BlockDriverState *bs;
--    Error **errp;
--    bool done;
--    int ret;
--} InvalidateCacheCo;
--
--static void coroutine_fn bdrv_invalidate_cache_co_entry(void *opaque)
--{
--    InvalidateCacheCo *ico = opaque;
--    ico->ret = bdrv_co_invalidate_cache(ico->bs, ico->errp);
--    ico->done = true;
--    aio_wait_kick();
--}
--
--int bdrv_invalidate_cache(BlockDriverState *bs, Error **errp)
--{
--    Coroutine *co;
--    InvalidateCacheCo ico = {
--        .bs = bs,
--        .done = false,
--        .errp = errp
--    };
--
--    if (qemu_in_coroutine()) {
--        /* Fast-path if already in coroutine context */
--        bdrv_invalidate_cache_co_entry(&ico);
--    } else {
--        co = qemu_coroutine_create(bdrv_invalidate_cache_co_entry, &ico);
--        bdrv_coroutine_enter(bs, co);
--        BDRV_POLL_WHILE(bs, !ico.done);
--    }
--
--    return ico.ret;
--}
--
- void bdrv_invalidate_cache_all(Error **errp)
- {
-     BlockDriverState *bs;
-diff --git a/block/io.c b/block/io.c
-index deb9ca8d82..36fbf9e1fa 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -890,50 +890,6 @@ static int bdrv_check_byte_request(BlockDriverState *bs, int64_t offset,
-     return 0;
- }
- 
--typedef int coroutine_fn BdrvRequestEntry(void *opaque);
--typedef struct BdrvRunCo {
--    BdrvRequestEntry *entry;
--    void *opaque;
--    int ret;
--    bool done;
--    Coroutine *co; /* Coroutine, running bdrv_run_co_entry, for debugging */
--} BdrvRunCo;
--
--static void coroutine_fn bdrv_run_co_entry(void *opaque)
--{
--    BdrvRunCo *arg = opaque;
--
--    arg->ret = arg->entry(arg->opaque);
--    arg->done = true;
--    aio_wait_kick();
--}
--
--static int bdrv_run_co(BlockDriverState *bs, BdrvRequestEntry *entry,
--                       void *opaque)
--{
--    if (qemu_in_coroutine()) {
--        /* Fast-path if already in coroutine context */
--        return entry(opaque);
--    } else {
--        BdrvRunCo s = { .entry = entry, .opaque = opaque };
--
--        s.co = qemu_coroutine_create(bdrv_run_co_entry, &s);
--        bdrv_coroutine_enter(bs, s.co);
--
--        BDRV_POLL_WHILE(bs, !s.done);
--
--        return s.ret;
--    }
--}
--
--typedef struct RwCo {
--    BdrvChild *child;
--    int64_t offset;
--    QEMUIOVector *qiov;
--    bool is_write;
--    BdrvRequestFlags flags;
--} RwCo;
--
- int coroutine_fn bdrv_co_prwv(BdrvChild *child, int64_t offset,
-                               QEMUIOVector *qiov, bool is_write,
-                               BdrvRequestFlags flags)
-@@ -945,32 +901,6 @@ int coroutine_fn bdrv_co_prwv(BdrvChild *child, int64_t offset,
-     }
- }
- 
--static int coroutine_fn bdrv_rw_co_entry(void *opaque)
--{
--    RwCo *rwco = opaque;
--
--    return bdrv_co_prwv(rwco->child, rwco->offset, rwco->qiov,
--                        rwco->is_write, rwco->flags);
--}
--
--/*
-- * Process a vectored synchronous request using coroutines
-- */
--int bdrv_prwv(BdrvChild *child, int64_t offset,
--              QEMUIOVector *qiov, bool is_write,
--              BdrvRequestFlags flags)
--{
--    RwCo rwco = {
--        .child = child,
--        .offset = offset,
--        .qiov = qiov,
--        .is_write = is_write,
--        .flags = flags,
--    };
--
--    return bdrv_run_co(child->bs, bdrv_rw_co_entry, &rwco);
--}
--
- int bdrv_pwrite_zeroes(BdrvChild *child, int64_t offset,
-                        int bytes, BdrvRequestFlags flags)
- {
-@@ -2245,18 +2175,6 @@ int bdrv_flush_all(void)
-     return result;
- }
- 
--
--typedef struct BdrvCoBlockStatusData {
--    BlockDriverState *bs;
--    BlockDriverState *base;
--    bool want_zero;
--    int64_t offset;
--    int64_t bytes;
--    int64_t *pnum;
--    int64_t *map;
--    BlockDriverState **file;
--} BdrvCoBlockStatusData;
--
- int coroutine_fn bdrv_co_block_status_from_file(BlockDriverState *bs,
-                                                 bool want_zero,
-                                                 int64_t offset,
-@@ -2508,43 +2426,6 @@ bdrv_co_common_block_status_above(BlockDriverState *bs,
-     return ret;
- }
- 
--/* Coroutine wrapper for bdrv_block_status_above() */
--static int coroutine_fn bdrv_block_status_above_co_entry(void *opaque)
--{
--    BdrvCoBlockStatusData *data = opaque;
--
--    return bdrv_co_common_block_status_above(data->bs, data->base,
--                                             data->want_zero,
--                                             data->offset, data->bytes,
--                                             data->pnum, data->map, data->file);
--}
--
--/*
-- * Synchronous wrapper around bdrv_co_block_status_above().
-- *
-- * See bdrv_co_block_status_above() for details.
-- */
--int bdrv_common_block_status_above(BlockDriverState *bs,
--                                   BlockDriverState *base,
--                                   bool want_zero, int64_t offset,
--                                   int64_t bytes, int64_t *pnum,
--                                   int64_t *map,
--                                   BlockDriverState **file)
--{
--    BdrvCoBlockStatusData data = {
--        .bs = bs,
--        .base = base,
--        .want_zero = want_zero,
--        .offset = offset,
--        .bytes = bytes,
--        .pnum = pnum,
--        .map = map,
--        .file = file,
--    };
--
--    return bdrv_run_co(bs, bdrv_block_status_above_co_entry, &data);
--}
--
- int bdrv_block_status_above(BlockDriverState *bs, BlockDriverState *base,
-                             int64_t offset, int64_t bytes, int64_t *pnum,
-                             int64_t *map, BlockDriverState **file)
-@@ -2638,13 +2519,6 @@ int bdrv_is_allocated_above(BlockDriverState *top,
-     return 0;
- }
- 
--typedef struct BdrvVmstateCo {
--    BlockDriverState    *bs;
--    QEMUIOVector        *qiov;
--    int64_t             pos;
--    bool                is_read;
--} BdrvVmstateCo;
--
- int coroutine_fn
- bdrv_co_rw_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos,
-                    bool is_read)
-@@ -2670,26 +2544,6 @@ bdrv_co_rw_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos,
-     return ret;
- }
- 
--static int coroutine_fn bdrv_co_rw_vmstate_entry(void *opaque)
--{
--    BdrvVmstateCo *co = opaque;
--
--    return bdrv_co_rw_vmstate(co->bs, co->qiov, co->pos, co->is_read);
--}
--
--int bdrv_rw_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos,
--                    bool is_read)
--{
--    BdrvVmstateCo data = {
--        .bs         = bs,
--        .qiov       = qiov,
--        .pos        = pos,
--        .is_read    = is_read,
--    };
--
--    return bdrv_run_co(bs, bdrv_co_rw_vmstate_entry, &data);
--}
--
- int bdrv_save_vmstate(BlockDriverState *bs, const uint8_t *buf,
-                       int64_t pos, int size)
- {
-@@ -2765,11 +2619,6 @@ void bdrv_aio_cancel_async(BlockAIOCB *acb)
- /**************************************************************/
- /* Coroutine block device emulation */
- 
--static int coroutine_fn bdrv_flush_co_entry(void *opaque)
--{
--    return bdrv_co_flush(opaque);
--}
--
- int coroutine_fn bdrv_co_flush(BlockDriverState *bs)
- {
-     int current_gen;
-@@ -2882,24 +2731,6 @@ early_exit:
-     return ret;
- }
- 
--int bdrv_flush(BlockDriverState *bs)
--{
--    return bdrv_run_co(bs, bdrv_flush_co_entry, bs);
--}
--
--typedef struct DiscardCo {
--    BdrvChild *child;
--    int64_t offset;
--    int64_t bytes;
--} DiscardCo;
--
--static int coroutine_fn bdrv_pdiscard_co_entry(void *opaque)
--{
--    DiscardCo *rwco = opaque;
--
--    return bdrv_co_pdiscard(rwco->child, rwco->offset, rwco->bytes);
--}
--
- int coroutine_fn bdrv_co_pdiscard(BdrvChild *child, int64_t offset,
-                                   int64_t bytes)
- {
-@@ -3014,17 +2845,6 @@ out:
-     return ret;
- }
- 
--int bdrv_pdiscard(BdrvChild *child, int64_t offset, int64_t bytes)
--{
--    DiscardCo rwco = {
--        .child = child,
--        .offset = offset,
--        .bytes = bytes,
--    };
--
--    return bdrv_run_co(child->bs, bdrv_pdiscard_co_entry, &rwco);
--}
--
- int bdrv_co_ioctl(BlockDriverState *bs, int req, void *buf)
- {
-     BlockDriver *drv = bs->drv;
-@@ -3422,35 +3242,3 @@ out:
- 
-     return ret;
- }
--
--typedef struct TruncateCo {
--    BdrvChild *child;
--    int64_t offset;
--    bool exact;
--    PreallocMode prealloc;
--    BdrvRequestFlags flags;
--    Error **errp;
--} TruncateCo;
--
--static int coroutine_fn bdrv_truncate_co_entry(void *opaque)
--{
--    TruncateCo *tco = opaque;
--
--    return bdrv_co_truncate(tco->child, tco->offset, tco->exact,
--                            tco->prealloc, tco->flags, tco->errp);
--}
--
--int bdrv_truncate(BdrvChild *child, int64_t offset, bool exact,
--                  PreallocMode prealloc, BdrvRequestFlags flags, Error **errp)
--{
--    TruncateCo tco = {
--        .child      = child,
--        .offset     = offset,
--        .exact      = exact,
--        .prealloc   = prealloc,
--        .flags      = flags,
--        .errp       = errp,
--    };
--
--    return bdrv_run_co(child->bs, bdrv_truncate_co_entry, &tco);
--}
--- 
-2.21.0
+
+> ---
+>  tests/data/acpi/pc/SRAT.dimmpxm             | Bin 392 -> 392 bytes
+>  tests/data/acpi/q35/SRAT.dimmpxm            | Bin 392 -> 392 bytes
+>  tests/data/acpi/virt/SRAT.memhp             | Bin 186 -> 226 bytes
+>  tests/qtest/bios-tables-test-allowed-diff.h |   3 ---
+>  4 files changed, 3 deletions(-)
+> 
+> diff --git a/tests/data/acpi/pc/SRAT.dimmpxm b/tests/data/acpi/pc/SRAT.dimmpxm
+> index f5c0267ea24bb404b6b4e687390140378fbdc3f1..5a13c61b9041c6045c29643bf93a111fb1c0c76a 100644
+> GIT binary patch
+> delta 51
+> scmeBR?qKE$4ss0XU}Rum%-G0fz$nec00kUCF%aN@Pz(&LlS3Je0lmQmhyVZp
+> 
+> delta 51
+> icmeBR?qKE$4ss0XU}RumY}m+Uz$ndt8%z#mGzI{_tp$hx
+> 
+> diff --git a/tests/data/acpi/q35/SRAT.dimmpxm b/tests/data/acpi/q35/SRAT.dimmpxm
+> index f5c0267ea24bb404b6b4e687390140378fbdc3f1..5a13c61b9041c6045c29643bf93a111fb1c0c76a 100644
+> GIT binary patch
+> delta 51
+> scmeBR?qKE$4ss0XU}Rum%-G0fz$nec00kUCF%aN@Pz(&LlS3Je0lmQmhyVZp
+> 
+> delta 51
+> icmeBR?qKE$4ss0XU}RumY}m+Uz$ndt8%z#mGzI{_tp$hx
+> 
+> diff --git a/tests/data/acpi/virt/SRAT.memhp b/tests/data/acpi/virt/SRAT.memhp
+> index 1b57db2072e7f7e2085c4a427aa31c7383851b71..9a35adb40c6f7cd822e5af37abba8aad033617cb 100644
+> GIT binary patch
+> delta 43
+> rcmdnR_=u4!ILI;N5d#AQbIe4p$wD1K76@=aC<X@BiSc3+=gI;A(y0ha
+> 
+> delta 21
+> dcmaFFxQmf1ILI+%7Xt$Wv-3o*$rF#t0suzv27~|r
+> 
+> diff --git a/tests/qtest/bios-tables-test-allowed-diff.h b/tests/qtest/bios-tables-test-allowed-diff.h
+> index e8f2766a63..dfb8523c8b 100644
+> --- a/tests/qtest/bios-tables-test-allowed-diff.h
+> +++ b/tests/qtest/bios-tables-test-allowed-diff.h
+> @@ -1,4 +1 @@
+>  /* List of comma-separated changed AML files to ignore */
+> -"tests/data/acpi/pc/SRAT.dimmpxm",
+> -"tests/data/acpi/q35/SRAT.dimmpxm",
+> -"tests/data/acpi/virt/SRAT.memhp",
+> -- 
+> 2.26.2
 
 
