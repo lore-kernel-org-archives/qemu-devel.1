@@ -2,79 +2,166 @@ Return-Path: <SRS0=hUBF=7W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 127F0C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 21:37:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6296C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 21:56:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D255420734
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 21:37:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D255420734
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 971C4206D5
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 21:56:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QBejbYIT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 971C4206D5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39358 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44366 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jilw2-0005q2-58
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 17:37:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40670)
+	id 1jimEc-0001ko-R3
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 17:56:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43256)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jilvR-0005PY-U1
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 17:36:53 -0400
-Received: from indium.canonical.com ([91.189.90.7]:59414)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jilvQ-0000su-Re
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 17:36:53 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jilvO-00083i-FF
- for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 21:36:50 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 71B972E810D
- for <qemu-devel@nongnu.org>; Tue,  9 Jun 2020 21:36:50 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jimDv-0001EB-7U
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 17:55:59 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38110
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jimDs-0005Fr-4X
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 17:55:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591739753;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=PDfet9mESYjP2s9Rd6wPs07/5Lam8GPEdn7cY4OKgiE=;
+ b=QBejbYIT7VmT87z3T5N+XK/w+Fe6koOH4roCLj0JT3zlnv5PS/nesU2LH6nvdzi+YiEMwl
+ p4JA0CIbxrj9ychUfWajli51Tfh4uK6x/7deLakOsWpUC3lQS33E28ai0wZzLaKFHXOfAx
+ n9f6PJJG0SRM7jMwFGh2Vl1b1rOZ8eI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-33-pNpTmUEQMW6yJFmCjYCa8A-1; Tue, 09 Jun 2020 17:55:50 -0400
+X-MC-Unique: pNpTmUEQMW6yJFmCjYCa8A-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2AD8B800053
+ for <qemu-devel@nongnu.org>; Tue,  9 Jun 2020 21:55:49 +0000 (UTC)
+Received: from [10.10.117.188] (ovpn-117-188.rdu2.redhat.com [10.10.117.188])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0A926100238D;
+ Tue,  9 Jun 2020 21:55:47 +0000 (UTC)
+Subject: Re: [PATCH v3 0/3] python/machine.py: refactor shutdown
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20200604195252.20739-1-jsnow@redhat.com>
+ <8bd27ec8-1bb6-45e2-a43a-7e0229065414@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
+ IYzhgrPEe7ZmPxbCSe4iMykjhwMh5byIHDoPGDU+FsQty2KXuoxto+ZdrP9gymAgmyqdk3aV
+ vzzmCa3cOppcqKvA0Kqr10UeX/z4OMVV390V+DVWUvzXpda45/Sxup57pk+hyY52wxxjIqef
+ rj8u5BN93s5uCVTus0oiVA6W+iXYzTvVDStMFVqnTxSxlpZoH5RGKvmoWV3uutByQyBPHW2U
+ 1Y6n6iEZ9MlP3hcDqlo0S8jeP03HaD4gOqCuqLceWF5+2WyHzNfylpNMFVi+Hp0H/nSDtCvQ
+ ua7j+6Pt7q5rvqgHvRipkDDVsjqwasuNc3wyoHexrBeLU/iJBuDld5iLy+dHXoYMB3HmjMxj
+ 3K5/8XhGrDx6BDFeO3HIpi3u2z1jniB7RtyVEtdupED6lqsDj0oSz9NxaOFZrS3Jf6z/kHIf
+ h42mM9Sx7+s4c07N2LieUxcfqhFTaa/voRibF4cmkBVUhOD1AKXNfhEsTvmcz9NbUchCkcvA
+ T9119CrsxfVsE7bXiGvdXnzyGLXdsoosjzwacKdOrVaDmN3Uy+SHiQXo6TlkSdV0XH2PUxTM
+ LsBFIO9qXO43Ai6J6iPAP/01l8fuZfpJE0/L/c25yyaND7xA3wARAQABtCpKb2huIFNub3cg
+ KEpvaG4gSHVzdG9uKSA8anNub3dAcmVkaGF0LmNvbT6JAlQEEwECAD4CGwMCHgECF4AFCwkI
+ BwMFFQoJCAsFFgIDAQAWIQT665cRoSz0dYEvGPKIqQZNGDVh6wUCXF392gUJC1Xq3gAKCRCI
+ qQZNGDVh6558D/9pM4pu4njX5aT6uUW3vAmbWLF1jfPxiTQgSHAnm9EBMZED/fsvkzj97clo
+ LN7JKmbYZNgJmR01A7flG45V4iOR/249qAfaVuD+ZzZi1R4jFzr13WS+IEdn0hYp9ITndb7R
+ ezW+HGu6/rP2PnfmDnNowgJu6Dp6IUEabq8SXXwGHXZPuMIrsXJxUdKJdGnh1o2u7271yNO7
+ J9PEMuMDsgjsdnaGtv7aQ9CECtXvBleAc06pLW2HU10r5wQyBMZGITemJdBhhdzGmbHAL0M6
+ vKi/bafHRWqfMqOAdDkv3Jg4arl2NCG/uNateR1z5e529+UlB4XVAQT+f5T/YyI65DFTY940
+ il3aZhA8u788jZEPMXmt94u7uPZbEYp7V0jt68SrTaOgO7NaXsboXFjwEa42Ug5lB5d5/Qdp
+ 1AITUv0NJ51kKwhHL1dEagGeloIsGVQILmpS0MLdtitBHqZLsnJkRvtMaxo47giyBlv2ewmq
+ tIGTlVLxHx9xkc9aVepOuiGlZaZB72c9AvZs9rKaAjgU2UfJHlB/Hr4uSk/1EY0IgMv4vnsG
+ 1sA5gvS7A4T4euu0PqHtn2sZEWDrk5RDbw0yIb53JYdXboLFmFXKzVASfKh2ZVeXRBlQQSJi
+ 3PBR1GzzqORlfryby7mkY857xzCI2NkIkD2eq+HhzFTfFOTdGrkCDQRUynn8ARAAwbhP45BE
+ d/zAMBPV2dk2WwIwKRSKULElP3kXpcuiDWYQob3UODUUqClO+3aXVRndaNmZX9WbzGYexVo3
+ 5j+CVBCGr3DlU8AL9pp3KQ3SJihWcDed1LSmUf8tS+10d6mdGxDqgnd/OWU214isvhgWZtZG
+ MM/Xj7cx5pERIiP+jqu7PT1cibcfcEKhPjYdyV1QnLtKNGrTg/UMKaL+qkWBUI/8uBoa0HLs
+ NH63bXsRtNAG8w6qG7iiueYZUIXKc4IHINUguqYQJVdSe+u8b2N5XNhDSEUhdlqFYraJvX6d
+ TjxMTW5lzVG2KjztfErRNSUmu2gezbw1/CV0ztniOKDA7mkQi6UIUDRh4LxRm5mflfKiCyDQ
+ L6P/jxHBxFv+sIgjuLrfNhIC1p3z9rvCh+idAVJgtHtYl8p6GAVrF+4xQV2zZH45tgmHo2+S
+ JsLPjXZtWVsWANpepXnesyabWtNAV4qQB7/SfC77zZwsVX0OOY2Qc+iohmXo8U7DgXVDgl/R
+ /5Qgfnlv0/3rOdMt6ZPy5LJr8D9LJmcP0RvX98jyoBOf06Q9QtEwJsNLCOCo2LKNL71DNjZr
+ nXEwjUH66CXiRXDbDKprt71BiSTitkFhGGU88XCtrp8R9yArXPf4MN+wNYBjfT7K29gWTzxt
+ 9DYQIvEf69oZD5Z5qHYGp031E90AEQEAAYkCPAQYAQIAJgIbDBYhBPrrlxGhLPR1gS8Y8oip
+ Bk0YNWHrBQJcXf3JBQkLVerNAAoJEIipBk0YNWHrU1AP/1FOK2SBGbyhHa5vDHuf47fgLipC
+ e0/h1E0vdSonzlhPxuZoQ47FjzG9uOhqqQG6/PqtWs/FJIyz8aGG4aV+pSA/9Ko3/2ND8MSY
+ ZflWs7Y8Peg08Ro01GTHFITjEUgHpTpHiT6TNcZB5aZNJ8jqCtW5UlqvXXbVeSTmO70ZiVtc
+ vUJbpvSxYmzhFfZWaXIPcNcKWL1rnmnzs67lDhMLdkYVf91aml/XtyMUlfB8Iaejzud9Ht3r
+ C0pA9MG57pLblX7okEshxAC0+tUdY2vANWFeX0mgqRt1GSuG9XM9H/cKP1czfUV/FgaWo/Ya
+ fM4eMhUAlL/y+/AJxxumPhBXftM4yuiktp2JMezoIMJI9fmhjfWDw7+2jVrx9ze1joLakFD1
+ rVAoHxVJ7ORfQ4Ni/qWbQm3T6qQkSMt4N/scNsMczibdTPxU7qtwQwIeFOOc3wEwmJ9Qe3ox
+ TODQ0agXiWVj0OXYCHJ6MxTDswtyTGQW+nUHpKBgHGwUaR6d1kr/LK9+5LpOfRlK9VRfEu7D
+ PGNiRkr8Abp8jHsrBqQWfUS1bAf62bq6XUel0kUCtb7qCq024aOczXYWPFpJFX+nhp4d7NeH
+ Edq+wlC13sBSiSHC7T5yssJ+7JPa2ATLlSKhEvBsLe2TsSTTtFlA0nBclqhfJXzimiuge9qU
+ E40lvMWBuQINBFTKimUBEADDbJ+pQ5M4QBMWkaWImRj7c598xIZ37oKM6rGaSnuB1SVb7YCr
+ Ci2MTwQcrQscA2jm80O8VFqWk+/XsEp62dty47GVwSfdGje/3zv3VTH2KhOCKOq3oPP5ZXWY
+ rz2d2WnTvx++o6lU7HLHDEC3NGLYNLkL1lyVxLhnhvcMxkf1EGA1DboEcMgnJrNB1pGP27ww
+ cSfvdyPGseV+qZZa8kuViDga1oxmnYDxFKMGLxrClqHrRt8geQL1Wj5KFM5hFtGTK4da5lPn
+ wGNd6/CINMeCT2AWZY5ySz7/tSZe5F22vPvVZGoPgQicYWdNc3ap7+7IKP86JNjmec/9RJcz
+ jvrYjJdiqBVldXou72CtDydKVLVSKv8c2wBDJghYZitfYIaL8cTvQfUHRYTfo0n5KKSec8Vo
+ vjDuxmdbOUBA+SkRxqmneP5OxGoZ92VusrwWCjry8HRsNdR+2T+ClDCO6Wpihu4V3CPkQwTy
+ eCuMHPAT0ka5paTwLrnZIxsdfnjUa96T10vzmQgAxpbbiaLvgKJ8+76OPdDnhddyxd2ldYfw
+ RkF5PEGg3mqZnYKNNBtwjvX49SAvgETQvLzQ8IKVgZS0m4z9qHHvtc1BsQnFfe+LJOFjzZr7
+ CrDNJMqk1JTHYsSi2JcN3vY32WMezXSQ0TzeMK4kdnclSQyp/h23GWod5QARAQABiQRbBBgB
+ AgAmAhsCFiEE+uuXEaEs9HWBLxjyiKkGTRg1YesFAlxd/coFCQtV2mQCKcFdIAQZAQIABgUC
+ VMqKZQAKCRB974EGqvw5DiJoEACLmuiRq9ifvOh5DyBFwRS7gvA14DsGQngmC57EzV0EFcfM
+ XVi1jX5OtwUyUe0Az5r6lHyyHDsDsIpLKBlWrYCeLpUhRR3oy181T7UNxvujGFeTkzvLAOo6
+ Hs3b8Wv9ARg+7acRYkQRNY7k0GIJ6YZz149tRyRKAy/vSjsaB9Lt0NOd1wf2EQMKwRVELwJD
+ y0AazGn+0PRP7Bua2YbtxaBmhBBDb2tPpwn8U9xdckB4Vlft9lcWNsC/18Gi9bpjd9FSbdH/
+ sOUI+3ToWYENeoT4IP09wn6EkgWaJS3nAUN/MOycNej2i4Yhy2wDDSKyTAnVkSSSoXk+tK91
+ HfqtokbDanB8daP+K5LgoiWHzjfWzsxA2jKisI4YCGjrYQzTyGOT6P6u6SEeoEx10865B/zc
+ 8/vN50kncdjYz2naacIDEKQNZlnGLsGkpCbfmfdi3Zg4vuWKNdWr0wGUzDUcpqW0y/lUXna+
+ 6uyQShX5e4JD2UPuf9WAQ9HtgSAkaDd4O1I2J41sleePzZOVB3DmYgy+ECRJJ5nw3ihdxpgc
+ y/v3lfcJaqiyCv0PF+K/gSOvwhH7CbVqARmptT7yhhxqFdaYWo2Z2ksuKyoKSRMFCXQY5oac
+ uTmyPIT4STFyUQFeqSCWDum/NFNoSKhmItw2Td+4VSJHShRVbg39KNFPZ7mXYAkQiKkGTRg1
+ YesWJA/+PV3qDUtPNEGwjVvjQqHSbrBy94tu6gJvPHgGPtRDYvxnCaJsmgiC0pGB2KFRsnfl
+ 2zBNBEWF/XwsI081jQE5UO60GKmHTputChLXpVobyuc+lroG2YhknXRBAV969SLnZR4BS/1s
+ Gi046gOXfaKYatve8BiZr5it5Foq3FMPDNgZMit1H9Dk8rkKFfDMRf8EGS/Z+TmyEsIf99H7
+ TH3n7lco8qO81fSFwkh4pvo2kWRFYTC5vsIVQ+GqVUp+W1DZJHxX8LwWuF1AzUt4MUTtNAvy
+ TXl5EgsmoY9mpNNL7ZnW65oG63nEP5KNiybvuQJzXVxR8eqzOh2Mod4nHg3PE7UCd3DvLNsn
+ GXFRo44WyT/G2lArBtjpkut7bDm0i1nENABy2UgS+1QvdmgNu6aEZxdNthwRjUhuuvCCDMA4
+ rCDQYyakH2tJNQgkXkeLodBKF4bHiBbuwj0E39S9wmGgg+q4OTnAO/yhQGknle7a7G5xHBwE
+ i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
+ RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
+ glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
+Message-ID: <4012de28-5837-889a-eda1-b9957cbbbad1@redhat.com>
+Date: Tue, 9 Jun 2020 17:55:47 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 09 Jun 2020 21:20:44 -0000
-From: Rene <1807073@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: dokbua slesru zhuhq
-X-Launchpad-Bug-Reporter: Hongquan Zhu (zhuhq)
-X-Launchpad-Bug-Modifier: Rene (dokbua)
-References: <154406426264.32667.2616897072259419283.malonedeb@chaenomeles.canonical.com>
-Message-Id: <159173764493.31259.9615874501960473780.malone@gac.canonical.com>
-Subject: [Bug 1807073] Re: qemu-guest-agent stop work when fsfreeze
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="ef9fc486e875d54078fa61cf91e898b895125d89";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 7902a10df0e12e72f11f9d993b5bcdac9ea3263c
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 10:15:37
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <8bd27ec8-1bb6-45e2-a43a-7e0229065414@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=jsnow@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 01:38:49
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, T_DKIM_INVALID=0.01, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -83,76 +170,190 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1807073 <1807073@bugs.launchpad.net>
+Cc: kwolf@redhat.com, Markus Armbruster <armbru@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I have a problem with fsfreeze that looks very similar to this, though
-I'm of course not 100% sure it's the same.
 
-When I try to snapshot one server, fsfreeze-freeze hangs, and after
-having timeout'ed the qemu agent has crashed:
 
-# qm guest cmd 105 fsfreeze-status
-thawed
-# qm guest cmd 105 fsfreeze-freeze
-^C  << hangs, having to break out of the command
-# qm guest cmd 105 fsfreeze-status
-QEMU guest agent is not running
-# qm reset 105 --skiplock
-# qm guest cmd 105 fsfreeze-status
-thawed
+On 6/9/20 9:08 AM, Philippe Mathieu-Daudé wrote:
+> Hi John,
+> 
+> On 6/4/20 9:52 PM, John Snow wrote:
+>> v3:
+>>  - Split _post_shutdown refactor into own patch (now 1/3)
+>>  - Re-add sigkill warning squelch (now 3/3)
+>>
+>> NOTE: I re-added the squelch in its own patch for review purposes, but
+>> for the purposes of avoiding temporary breakage, a maintainer may wish
+>> to squash patches 2 and 3 if they are accepted.
+>>
+>> v2: Philippe took patches 1, 3 and 4.
+>>
+>> This is a re-write of what was:
+>> [PATCH RFC 03/32] python//machine.py: remove bare except
+>> [PATCH 2/4] python/machine.py: remove bare except
+>>
+>> It's a bit heavier handed, but it should address some of kwolf's
+>> feedback from the RFC version.
+>>
+>> Applies straight to origin/master, ought to pass pylint and flake8:
+>>
+>>> cd ~/src/qemu/python/qemu
+>>> pylint *.py
+>>> flake8 *.py
+>>
+>> John Snow (3):
+>>   python/machine.py: consolidate _post_shutdown()
+>>   python/machine.py: refactor shutdown
+>>   python/machine.py: re-add sigkill warning suppression
+>>
+>>  python/qemu/machine.py | 100 +++++++++++++++++++++++++++++------------
+>>  1 file changed, 71 insertions(+), 29 deletions(-)
+>>
+> 
+> I'm now seeing this error:
+> 
+> 21:31:58 DEBUG| / # reboot
+> 21:32:01 DEBUG| / # reboot: Restarting system
+> 21:32:01 DEBUG| >>> {'execute': 'quit'}
+> 21:32:01 WARNI| qemu received signal 9; command:
+> "mips-softmmu/qemu-system-mips -display none -vga none -chardev
+> socket,id=mon,path=/tmp/tmp679upvrk/qemu-10292-monitor.sock -mon
+> chardev=mon,mode=control -machine malta -chardev
+> socket,id=console,path=/tmp/tmp679upvrk/qemu-10292-console.sock,server,nowait
+> -serial chardev:console -kernel
+> /tmp/avocado_b3aaagr9/avocado_job_5bj0xe1h/12-tests_acceptance_boot_linux_console.py_BootLinuxConsole.test_mips_malta_cpio/boot/vmlinux-4.5.0-2-4kc-malta
+> -initrd
+> /tmp/avocado_b3aaagr9/avocado_job_5bj0xe1h/12-tests_acceptance_boot_linux_console.py_BootLinuxConsole.test_mips_malta_cpiorootfs.cpio
+> -append printk.time=0 console=ttyS0 console=tty rdinit=/sbin/init
+> noreboot -no-reboot"
+> 21:32:01 ERROR|
+> 21:32:01 ERROR| Reproduced traceback from:
+> /home/travis/build/philmd/qemu/build/tests/venv/lib/python3.6/site-packages/avocado/core/test.py:886
+> 21:32:01 ERROR| Traceback (most recent call last):
+> 21:32:01 ERROR|   File
+> "/home/travis/build/philmd/qemu/build/tests/acceptance/avocado_qemu/__init__.py",
+> line 195, in tearDown
+> 21:32:01 ERROR|     vm.shutdown()
+> 21:32:01 ERROR|   File
+> "/home/travis/build/philmd/qemu/python/qemu/machine.py", line 449, in
+> shutdown
+> 21:32:01 ERROR|     self._do_shutdown(has_quit)
+> 21:32:01 ERROR|   File
+> "/home/travis/build/philmd/qemu/python/qemu/machine.py", line 426, in
+> _do_shutdown
+> 21:32:01 ERROR|     self._soft_shutdown(has_quit, timeout)
+> 21:32:01 ERROR|   File
+> "/home/travis/build/philmd/qemu/python/qemu/machine.py", line 413, in
+> _soft_shutdown
+> 21:32:01 ERROR|     self._qmp.cmd('quit')
+> 21:32:01 ERROR|   File
+> "/home/travis/build/philmd/qemu/python/qemu/qmp.py", line 271, in cmd
+> 21:32:01 ERROR|     return self.cmd_obj(qmp_cmd)
+> 21:32:01 ERROR|   File
+> "/home/travis/build/philmd/qemu/python/qemu/qmp.py", line 249, in cmd_obj
+> 21:32:01 ERROR|     self.__sock.sendall(json.dumps(qmp_cmd).encode('utf-8'))
+> 21:32:01 ERROR| BrokenPipeError: [Errno 32] Broken pipe
+> 21:32:01 ERROR|
+> 21:32:01 DEBUG| DATA (filename=output.expected) => NOT FOUND (data
+> sources: variant, test, file)
+> 21:32:01 DEBUG| DATA (filename=stdout.expected) => NOT FOUND (data
+> sources: variant, test, file)
+> 21:32:01 DEBUG| DATA (filename=stderr.expected) => NOT FOUND (data
+> sources: variant, test, file)
+> 21:32:01 DEBUG| Not logging /var/log/syslog (lack of permissions)
+> 21:32:01 ERROR| ERROR
+> 12-tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_mips_malta_cpio
+> -> TestSetupFail: [Errno 32] Broken pipe
+> 21:32:01 INFO |
+> 
+> https://travis-ci.org/github/philmd/qemu/jobs/696142277#L5329
+> 
 
-Host is Proxmox 5, VM is Centos 7 with Cpanel. This happens every time I
-try to snapshot the server.  Other VM's on the host freeze fine without
-problem.
+Gotcha.
 
-I don't find anything interesting under /var/log. Please let me know if
-there is anything I can do to help debug this problem.
+The problem here is that `test_mips_malta_cpio` in boot_linux_console.py
+does this:
 
--- =
+        self.vm.add_args('-kernel', kernel_path,
+                         '-initrd', initrd_path,
+                         '-append', kernel_command_line,
+                         '-no-reboot')
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1807073
+and then:
 
-Title:
-  qemu-guest-agent stop work when fsfreeze
+exec_command_and_wait_for_pattern(self, 'reboot',
+                         'reboot: Restarting system')
 
-Status in QEMU:
-  New
+and (in avocado_qemu/) __init__.py does this:
 
-Bug description:
-  Create a live snapshot, we should first to fsfreeze the file system. We d=
-o have only one disk mounted to /:
-  Filesystem      Size  Used Avail Use% Mounted on
-  udev             48G     0   48G   0% /dev
-  tmpfs           9.5G  8.7M  9.5G   1% /run
-  /dev/vda1       485G  1.5G  484G   1% /
-  tmpfs            48G     0   48G   0% /dev/shm
-  tmpfs           5.0M     0  5.0M   0% /run/lock
-  tmpfs            48G     0   48G   0% /sys/fs/cgroup
-  tmpfs           9.5G     0  9.5G   0% /run/user/0
+    def tearDown(self):
+        for vm in self._vms.values():
+            vm.shutdown()
 
-  snapshot action is OK, when we restore the snapshot, the file system beca=
-me read-only, and syslog seems stop writing until we fsck /dev/vda1 and mou=
-nt -o rw,remount /:
-  Dec  5 00:39:16 systemd[1]: Started Session 180 of user root.
-  Dec  5 00:45:05 qemu-ga: info: guest-fsfreeze called
-  Dec  5 07:00:45 kernel: [  114.623823] EXT4-fs (vda1): re-mounted. Opts: =
-(null)
 
-  So after snapshoting, wo do fsthaw the file system,  maybe the qga
-  dose not respond or stop work, this action dose not execute
-  successfully and there is no log to show the status of qemu-guest-
-  agent.
 
-  Version:
-  libvirt 1.2.17
-  qemu 2.3.0
-  qemu-guest-agent 2.5
+What's happening here is that we are instructing QEMU to *close* when
+the guest reboots instead of allowing it to reboot. Then, we are issuing
+a reboot command to the guest, which will effectively terminate QEMU as
+well. Finally, we are trying to send a shutdown command to QEMU, but
+QEMU has already gone.
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1807073/+subscriptions
+Now, in the shutdown code, we do make an attempt to catch this:
+
+def is_running(self):
+    """Returns true if the VM is running."""
+    return self._popen is not None and self._popen.poll() is None
+
+But, well, race conditions.
+
+When we make it here:
+
+        if self._qmp is not None:
+            if not has_quit:
+                self._qmp.cmd('quit')
+            self._qmp.close()
+
+We believe we are running and we believe we have an open QMP socket.
+Attempting to engage the socket by sending 'quit' causes the error.
+
+It's a tight window: if quit happens earlier, we send the command
+successfully and everything's OK. If quit happens later, we realize QEMU
+isn't running and proceed to cleanup.
+
+Ultimately:
+
+- Avocado should not try to shut down QEMU twice, but
+- machine.py shouldn't enable the race condition either.
+
+
+
+for my part, how about this:
+
+diff --git a/python/qemu/machine.py b/python/qemu/machine.py
+index 99bcb499878..813f8e477db 100644
+--- a/python/qemu/machine.py
++++ b/python/qemu/machine.py
+@@ -385,7 +385,14 @@ def _soft_shutdown(self, has_quit: bool = False,
+timeout: int = 3) -> None:
+
+         if self._qmp is not None:
+             if not has_quit:
+-                self._qmp.cmd('quit')
++                try:
++                    self._qmp.cmd('quit')
++                except (BrokenPipeError, ConnectionResetError):
++                    # QMP went away just before or just after sending
+'quit'
++                    if not self.is_running():
++                        # "Mission Accomplished"
++                        pass
++                    raise
+             self._qmp.close()
+
+         self._popen.wait(timeout=timeout)
+
 
