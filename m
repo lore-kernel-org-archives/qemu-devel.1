@@ -4,84 +4,83 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42808C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 10:17:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5B64C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 10:28:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 09D1D2078D
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 10:17:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8D367207F9
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 10:28:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UA31YCgN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09D1D2078D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="POeucemb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D367207F9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51146 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55418 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jibKM-0002Pf-Ak
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 06:17:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57292)
+	id 1jibUF-00054k-PK
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 06:28:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58294)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jibJi-0001yu-0y
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 06:17:14 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23847
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1jibTd-0004bU-EK
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 06:27:29 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:45160
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jibJg-00013P-Fa
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 06:17:13 -0400
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1jibTa-0002oh-2u
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 06:27:28 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591697831;
+ s=mimecast20190719; t=1591698444;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=3kr0diAHGiZkx5sVcjzLX57ALpozHuI6negv/a0mFBA=;
- b=UA31YCgNkJRchpx7iNb64Njkxb0X8o2czBRJMk6Z/bv2bBz2LbZVc8gLnXm7VHwYtSbPPS
- Ty+KHEpNye71kQIhPrycH6Gk7kgSPTjtaMKD+X+oGQ5l84RHx+zN3FTSOhiDwXvd28yAkl
- oI84cQPEoOePaIc3u9zYDAWk1oobhCQ=
+ bh=4YJQYefwOc1J5JzaKwpgCXA3KWlCr7bbf14WZd5wEAo=;
+ b=POeucemb2I4QUc36e8tZMJ0QHCnA1TZpwu+9vJS40PsRWw2Kqn4+Xg2b7GaSHFt7ck0REC
+ Cmg+TsBt5kEnMD6ELh0m1LSL2iJvs0aQo/Ul/qWQUrOjlgE9XYzbMxi2wDg7acFF3M0Rx/
+ yKb/wEwVDTpwpWmGz34jxybMeoe9vi8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-377-V3CNbOdPNHu6H7I0haBEHw-1; Tue, 09 Jun 2020 06:17:01 -0400
-X-MC-Unique: V3CNbOdPNHu6H7I0haBEHw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-181-vkqhnXJNOQWGystSpaam2w-1; Tue, 09 Jun 2020 06:27:14 -0400
+X-MC-Unique: vkqhnXJNOQWGystSpaam2w-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9FFA11054F8B;
- Tue,  9 Jun 2020 10:16:59 +0000 (UTC)
-Received: from gondolin (ovpn-113-27.ams2.redhat.com [10.36.113.27])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B9EA6100164C;
- Tue,  9 Jun 2020 10:16:53 +0000 (UTC)
-Date: Tue, 9 Jun 2020 12:16:41 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [RFC v2 18/18] guest memory protection: Alter virtio default
- properties for protected guests
-Message-ID: <20200609121641.5b3ffa48.cohuck@redhat.com>
-In-Reply-To: <20200607030735.GN228651@umbus.fritz.box>
-References: <20200521034304.340040-1-david@gibson.dropbear.id.au>
- <20200521034304.340040-19-david@gibson.dropbear.id.au>
- <20200606162014-mutt-send-email-mst@kernel.org>
- <20200607030735.GN228651@umbus.fritz.box>
-Organization: Red Hat GmbH
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1A30D464;
+ Tue,  9 Jun 2020 10:27:13 +0000 (UTC)
+Received: from localhost (ovpn-115-52.ams2.redhat.com [10.36.115.52])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DBA1B385;
+ Tue,  9 Jun 2020 10:27:09 +0000 (UTC)
+Date: Tue, 9 Jun 2020 11:27:08 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Alexander Bulekov <alxndr@bu.edu>
+Subject: Re: [PATCH v2] fuzz: add oss-fuzz build.sh script
+Message-ID: <20200609102708.GC92564@stefanha-x1.localdomain>
+References: <20200605175028.5626-1-alxndr@bu.edu>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <20200605175028.5626-1-alxndr@bu.edu>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; boundary="Sig_/59YR5Udn9lEsdlpWfEsPJrT";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=cohuck@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 01:38:49
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="NKoe5XOeduwbEQHU"
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=stefanha@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/08 23:42:34
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -95,124 +94,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pair@us.ibm.com, brijesh.singh@amd.com, frankja@linux.ibm.com,
- kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>,
- qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
- dgilbert@redhat.com, Halil Pasic <pasic@linux.ibm.com>, qemu-ppc@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>, mdroth@linux.vnet.ibm.com,
- Richard Henderson <rth@twiddle.net>
+Cc: darren.kenny@oracle.com, bsd@redhat.com, qemu-devel@nongnu.org,
+ f4bug@amsat.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/59YR5Udn9lEsdlpWfEsPJrT
-Content-Type: text/plain; charset=US-ASCII
+--NKoe5XOeduwbEQHU
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, 7 Jun 2020 13:07:35 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
-
-> On Sat, Jun 06, 2020 at 04:21:31PM -0400, Michael S. Tsirkin wrote:
-> > On Thu, May 21, 2020 at 01:43:04PM +1000, David Gibson wrote: =20
-> > > The default behaviour for virtio devices is not to use the platforms =
-normal
-> > > DMA paths, but instead to use the fact that it's running in a hypervi=
-sor
-> > > to directly access guest memory.  That doesn't work if the guest's me=
-mory
-> > > is protected from hypervisor access, such as with AMD's SEV or POWER'=
-s PEF.
-> > >=20
-> > > So, if a guest memory protection mechanism is enabled, then apply the
-> > > iommu_platform=3Don option so it will go through normal DMA mechanism=
-s.
-> > > Those will presumably have some way of marking memory as shared with =
-the
-> > > hypervisor or hardware so that DMA will work.
-> > >=20
-> > > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > > ---
-> > >  hw/core/machine.c | 11 +++++++++++
-> > >  1 file changed, 11 insertions(+)
-> > >=20
-> > > diff --git a/hw/core/machine.c b/hw/core/machine.c
-> > > index 88d699bceb..cb6580954e 100644
-> > > --- a/hw/core/machine.c
-> > > +++ b/hw/core/machine.c
-> > > @@ -28,6 +28,8 @@
-> > >  #include "hw/mem/nvdimm.h"
-> > >  #include "migration/vmstate.h"
-> > >  #include "exec/guest-memory-protection.h"
-> > > +#include "hw/virtio/virtio.h"
-> > > +#include "hw/virtio/virtio-pci.h"
-> > > =20
-> > >  GlobalProperty hw_compat_5_0[] =3D {};
-> > >  const size_t hw_compat_5_0_len =3D G_N_ELEMENTS(hw_compat_5_0);
-> > > @@ -1159,6 +1161,15 @@ void machine_run_board_init(MachineState *mach=
-ine)
-> > >           * areas.
-> > >           */
-> > >          machine_set_mem_merge(OBJECT(machine), false, &error_abort);
-> > > +
-> > > +        /*
-> > > +         * Virtio devices can't count on directly accessing guest
-> > > +         * memory, so they need iommu_platform=3Don to use normal DM=
-A
-> > > +         * mechanisms.  That requires disabling legacy virtio suppor=
-t
-> > > +         * for virtio pci devices
-> > > +         */
-> > > +        object_register_sugar_prop(TYPE_VIRTIO_PCI, "disable-legacy"=
-, "on");
-> > > +        object_register_sugar_prop(TYPE_VIRTIO_DEVICE, "iommu_platfo=
-rm", "on");
-> > >      }
-> > >   =20
-> >=20
-> > I think it's a reasonable way to address this overall.
-> > As Cornelia has commented, addressing ccw as well =20
+On Fri, Jun 05, 2020 at 01:50:28PM -0400, Alexander Bulekov wrote:
+> It is neater to keep this in the QEMU repo, since any change that
+> requires an update to the oss-fuzz build configuration, can make the
+> necessary changes in the same series.
 >=20
-> Sure.  I was assuming somebody who actually knows ccw could do that as
-> a follow up.
-
-FWIW, I think we could simply enable iommu_platform for protected
-guests for ccw; no prereqs like pci's disable-legacy.
-
+> Suggested-by: Philippe Mathieu-Daude <f4bug@amsat.org>
+> Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
+> ---
 >=20
-> > as cases where user has
-> > specified the property manually could be worth-while. =20
+> v2 updates the script header comment.
 >=20
-> I don't really see what's to be done there.  I'm assuming that if the
-> user specifies it, they know what they're doing - particularly with
-> nonstandard guests there are some odd edge cases where those
-> combinations might work, they're just not very likely.
+>  scripts/oss-fuzz/build.sh | 50 +++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 50 insertions(+)
+>  create mode 100755 scripts/oss-fuzz/build.sh
 
-If I understood Halil correctly, devices without iommu_platform
-apparently can crash protected guests on s390. Is that supposed to be a
-"if it breaks, you get to keep the pieces" situation, or do we really
-want to enforce iommu_platform?
+Please add a MAINTAINERS file entry.
 
---Sig_/59YR5Udn9lEsdlpWfEsPJrT
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+> diff --git a/scripts/oss-fuzz/build.sh b/scripts/oss-fuzz/build.sh
+> new file mode 100755
+> index 0000000000..e93d6f2e03
+> --- /dev/null
+> +++ b/scripts/oss-fuzz/build.sh
+> @@ -0,0 +1,50 @@
+> +#!/bin/sh
+> +#
+> +# OSS-Fuzz build script. See:
+> +# https://google.github.io/oss-fuzz/getting-started/new-project-guide/#b=
+uildsh
+> +#
+> +# This code is licensed under the GPL version 2 or later.  See
+> +# the COPYING file in the top-level directory.
+> +#
+> +
+> +# build project
+> +# e.g.
+> +# ./autogen.sh
+> +# ./configure
+> +# make -j$(nproc) all
+> +
+> +# build fuzzers
+> +# e.g.
+> +# $CXX $CXXFLAGS -std=3Dc++11 -Iinclude \
+> +#     /path/to/name_of_fuzzer.cc -o $OUT/name_of_fuzzer \
+> +#     $LIB_FUZZING_ENGINE /path/to/library.a
+> +
+> +mkdir -p $OUT/lib/              # Shared libraries
+> +
+> +# Build once to get the list of dynamic lib paths, and copy them over
+> +./configure --datadir=3D"./data/" --disable-werror --cc=3D"$CC" --cxx=3D=
+"$CXX" \
+> +    --extra-cflags=3D"$CFLAGS -U __OPTIMIZE__ "
+
+If you respin, please extract -U __OPTIMIZE__ into a separate variable
+with a doc comment.
+
+# Explanation for why __OPTIMIZE__ needs to be undefined goes here...
+EXTRA_CFLAGS=3D"$CFLAGS -U __OPTIMIZE__"
+
+This will help others understand why this build flag is needed.
+
+--NKoe5XOeduwbEQHU
+Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEw9DWbcNiT/aowBjO3s9rk8bwL68FAl7fYYkACgkQ3s9rk8bw
-L6+Ogg/8CyUEKbMCFVoEYeE2/cCowf+ZgHo/5pBTjZPrDK4kczqle2Ggjpzan8Li
-suuCWtxUT44MBJYecjUH6NQ9Y26Q/vhKLRKFSOeY/Tgxg2mrt4e+ZiBiZQ1H9XTH
-o0PZeTyHJoUFmzOl2udbSYQ044RjYmxoTSly+oM4NX//JQ/t0fvDUQv3anIV5rkJ
-kqWhfdg5o81FI17v0AoC2WjOkQTVzld+LREOb0OoYx2LtGECaHYnoP9oIAEz0uu0
-iGNXNv1SrLjdayWSbOrUCr1POhiBCW+H0wS7YPvze/UVeCnH3cV41xIN/U8SruNA
-e6/e0bPIm3VOybRTYuvfScc3TZ9m8vdqAKiMF567CF853gZSt27eUB1D8gK+165W
-T1GjxZsDS/ke0YVliysaAm3SGbcYaLXcq7TWl89Cg8ucsYDVWO9sGIZSIQt1MaND
-dC2MdF2gSaFQyoAgMR4nFW9nwwj7ew/sYPAVSPIiJDWXdd+bjG9FLN9SKiqf+2yD
-0owyG4egD8V24nXiaSFdweE6MOWHyQKCg9Q+RYbsN0EGBzzUe8WNr+hEAxiYTRpW
-cib/fWHWG/vK8EuIYj3UxdBVhZR4zbGPGrMeRou64jO9BLz7qwcHzscZGRg69kos
-3BzIYznYFuUodzrHS/pWIDNhJFuGjAsuF9Nwkn7DWaztRI20LeM=
-=axIE
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl7fY/wACgkQnKSrs4Gr
+c8jepQf/f7N9DDkjKqqNK+LDRGarTytiLkzt7t/Czm3/3YZhyNHBZCxdZICYkwJn
+ojUV5IT1wxRrVop5UfETnLHvRpG39g2o0pjI3ezUc42dm2auEKpFM8WTI/ZSZKhT
+7W/attAdW7pgOHwRmqJIC9tdV9XqHUe2LlJaCe6dijFgBEhwMBnH/3i/iL+ZMjwe
+XRzVWcVMMqeI0X9dvH5B6Om3ZC0E52kZmQjtcK+mdf3ml1hlPuSEXRjPoqcXsScb
+D1ISe+CV7NrPRJM1M5347U0x89GZ9SMOLz7/mt9pNhcSto1fbwii9IMARUxHuIY3
+bG64oYEzE4og78DtCpXLm0RYNwq0Dw==
+=Zo7l
 -----END PGP SIGNATURE-----
 
---Sig_/59YR5Udn9lEsdlpWfEsPJrT--
+--NKoe5XOeduwbEQHU--
 
 
