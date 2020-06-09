@@ -4,82 +4,81 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F3C6C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 16:12:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B8C5C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 16:13:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D690C20760
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 16:12:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6221920760
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 16:13:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Wl7jLXba"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D690C20760
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="U0Vi58wM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6221920760
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55100 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56836 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jigr6-00070z-Od
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 12:12:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42748)
+	id 1jigs1-0007rV-J4
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 12:13:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42750)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jighk-0003PN-Nb
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 12:02:24 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:44009)
+ id 1jighl-0003QF-Bq
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 12:02:25 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:51921)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jighj-0003Ri-3S
+ id 1jighk-0003S9-1M
  for qemu-devel@nongnu.org; Tue, 09 Jun 2020 12:02:24 -0400
-Received: by mail-wr1-x443.google.com with SMTP id l10so21906450wrr.10
- for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 09:02:21 -0700 (PDT)
+Received: by mail-wm1-x344.google.com with SMTP id u13so3364317wml.1
+ for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 09:02:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=S5WzoDYbeVcdXuyj3sF0aRlTViUlM9wFEwqSYBzRTDk=;
- b=Wl7jLXbaFHltntG2sRu3d5abw6E3ZYazurZyGEwXA4nWRa8Ydfx2rVOZlbs1+8psv1
- kCWC5Xr8dZIOtp3SHr06ZA2tXHG3fO8+V3I8nYlqTM49rdsqHdkCIMlBeEqARv0q1ZB6
- O5qhdtcGSTmToz2JOz/IaM0e5/Q0ScxP7Fn5f6jp0Lf0LEjVLqb9FXDrGfq+Q9JLM/l9
- rX01RS9vs3kVrJpl236/PYg6nqEDGqjkVnAB3sTYiYVfH9gkbnY0Xt1Y2fjgFdOtYiMm
- wnKWjDLJLtYKN3N2zA0Y6OQRJhe97YIozZGIWY2j0wE7ho2nyXbJLFwNA5nm+19NX1qZ
- MO9A==
+ bh=4BxyhI/HWfoITPOBcBEsWHge5VKsc4W1GIwr7qvVtEk=;
+ b=U0Vi58wMh2szpgpW6gLa5+IUnXLA7WbmBmkIfMdN/VBGeAV7I3zL/mcRDOml4WrHcK
+ cu+Vkhnl5cfNBxoqumm69X1mu6NDjCjykwUHfn1pxcRzvFPuws6x0zA82N4jfVyz+s0g
+ 34t8oaQ21r4hX+7Wzeo4+6DWdRBX/czj10rUz1TJHqt8del95InkmupaltA4ZrDD+wz8
+ G4RWFo1+ypK48C3YEqegU16OFKkhanv3fAHg238x8MYwAS/XmMsxnRTpsi124D8i++ng
+ zyANMIj5xCsxz+Wpa94S9TdWu1eshnLee7K/tLZleGvW2IZBs4xvH97JTpV1xzkGRzJ4
+ lg7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=S5WzoDYbeVcdXuyj3sF0aRlTViUlM9wFEwqSYBzRTDk=;
- b=YxoKS2FnvlTvTbstdlOl7R8lh7gxCoRhpK2msdXLhFdt3kai33yMY/guFxNsvCBXlY
- lduwyihsrk+kcCDsT1vv74YQ0PLFvxnhIQJ2hljqeCyrUciUgeoS5HwPv7vTvvYGHxuZ
- gQfvHgrBFwv0TqttfrLNrKTwNHsmplHf+vo1KcfMi7On6pQ2JTYbK+SiJa5UkCKRQkcA
- m4do9tmqfnq1BOKUcVkiScuqPY/UZU6BcGTY4KnGKIVaOXJDy9U8Bnmz3srs7oLYKL3/
- wsCyRZN/GnZ4H69su0Rmj0dabacKQLtwwzyK2pQ4aMJ7TqrK5ttdRQvbOTqzlHATxVs2
- VIkg==
-X-Gm-Message-State: AOAM531W+qDursgy5TyVtifxXIvfEmiKUwgTng1MjO89rbGuNyig82mQ
- oMExsjrLkz1kXGpPEqCqdrFekQ==
-X-Google-Smtp-Source: ABdhPJxRJ3lqhb+gKu71N1z//53msZj2pp3V46o+Ob1oeCuT01kwQ+fi/AMIHmskm/lTxH3fK/uV3w==
-X-Received: by 2002:a5d:4948:: with SMTP id r8mr5111561wrs.290.1591718540792; 
- Tue, 09 Jun 2020 09:02:20 -0700 (PDT)
+ bh=4BxyhI/HWfoITPOBcBEsWHge5VKsc4W1GIwr7qvVtEk=;
+ b=CwZI7lueaQHm/6RbvfSNITBJYO8H6XA9uLxlRby7vkSy6J9zANtFuNH8hSZlaXmUJJ
+ BqGnjuOL+m8nDkKzQx0nn5d0qrMepKzJ0mIRFw1qZBu+8qjCyyLRRVIKm5fCgp8bqL5y
+ /bq+hYvUCMbTVVr97ysz1shpE/83+NFDaAOsOrUcwdP01pf5EF/4nlBKvrL+vVHh7gkR
+ joU1IoHds+CokjC7MwTYMeNRI5WUScr8ASSYJvL0/NY0ccOayaLffvVid5RpKgOZ9chU
+ zqQqdfh5lzMrebMIUjJlmqyVkra6/b3R9klVTSkUcI7pjXTU8sEogp+SPbJtSGfPZQoH
+ qbCw==
+X-Gm-Message-State: AOAM533WkuGx6boNkS0wIlEoOIlLQUu3c5hZs5TeDpG9jrMzjbVBzvyq
+ rRr1marT82+agWTuA0PfgsQ/9A==
+X-Google-Smtp-Source: ABdhPJzu3HAtqxJ852+lgKj7oRhV4kLkhR5kjc5BgpN6uJRxxgPyQx0SRDYtZ9ceLnMCWhoPTK38yw==
+X-Received: by 2002:a1c:6583:: with SMTP id z125mr4838456wmb.102.1591718542281; 
+ Tue, 09 Jun 2020 09:02:22 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id b81sm3699867wmc.5.2020.06.09.09.02.19
+ by smtp.gmail.com with ESMTPSA id b81sm3699867wmc.5.2020.06.09.09.02.20
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 09 Jun 2020 09:02:20 -0700 (PDT)
+ Tue, 09 Jun 2020 09:02:21 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-arm@nongnu.org,
 	qemu-devel@nongnu.org
-Subject: [PATCH 6/7] target/arm: Convert Neon 3-reg-diff saturating doubling
- multiplies
-Date: Tue,  9 Jun 2020 17:02:08 +0100
-Message-Id: <20200609160209.29960-7-peter.maydell@linaro.org>
+Subject: [PATCH 7/7] target/arm: Convert Neon 3-reg-diff polynomial VMULL
+Date: Tue,  9 Jun 2020 17:02:09 +0100
+Message-Id: <20200609160209.29960-8-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200609160209.29960-1-peter.maydell@linaro.org>
 References: <20200609160209.29960-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x443.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::344;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x344.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -106,207 +105,161 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Convert the Neon 3-reg-diff insns VQDMULL, VQDMLAL and VQDMLSL:
-these are all saturating doubling long multiplies with a possible
-accumulate step.
-
-These are the last insns in the group which use the pass-over-each
-elements loop, so we can delete that code.
+Convert the Neon 3-reg-diff insn polynomial VMULL. This is the last
+insn in this group to be converted.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/neon-dp.decode       |  6 +++
- target/arm/translate-neon.inc.c | 82 +++++++++++++++++++++++++++++++++
- target/arm/translate.c          | 59 ++----------------------
- 3 files changed, 92 insertions(+), 55 deletions(-)
+ target/arm/neon-dp.decode       |  2 ++
+ target/arm/translate-neon.inc.c | 43 +++++++++++++++++++++++
+ target/arm/translate.c          | 60 ++-------------------------------
+ 3 files changed, 48 insertions(+), 57 deletions(-)
 
 diff --git a/target/arm/neon-dp.decode b/target/arm/neon-dp.decode
-index 1da492df146..65ea30d3edf 100644
+index 65ea30d3edf..ed49726abf5 100644
 --- a/target/arm/neon-dp.decode
 +++ b/target/arm/neon-dp.decode
-@@ -454,10 +454,16 @@ Vimm_1r          1111 001 . 1 . 000 ... .... cmode:4 0 . op:1 1 .... @1reg_imm
-     VMLAL_S_3d   1111 001 0 1 . .. .... .... 1000 . 0 . 0 .... @3diff
-     VMLAL_U_3d   1111 001 1 1 . .. .... .... 1000 . 0 . 0 .... @3diff
- 
-+    VQDMLAL_3d   1111 001 0 1 . .. .... .... 1001 . 0 . 0 .... @3diff
-+
-     VMLSL_S_3d   1111 001 0 1 . .. .... .... 1010 . 0 . 0 .... @3diff
-     VMLSL_U_3d   1111 001 1 1 . .. .... .... 1010 . 0 . 0 .... @3diff
- 
-+    VQDMLSL_3d   1111 001 0 1 . .. .... .... 1011 . 0 . 0 .... @3diff
-+
-     VMULL_S_3d   1111 001 0 1 . .. .... .... 1100 . 0 . 0 .... @3diff
+@@ -465,5 +465,7 @@ Vimm_1r          1111 001 . 1 . 000 ... .... cmode:4 0 . op:1 1 .... @1reg_imm
      VMULL_U_3d   1111 001 1 1 . .. .... .... 1100 . 0 . 0 .... @3diff
+ 
+     VQDMULL_3d   1111 001 0 1 . .. .... .... 1101 . 0 . 0 .... @3diff
 +
-+    VQDMULL_3d   1111 001 0 1 . .. .... .... 1101 . 0 . 0 .... @3diff
++    VMULL_P_3d   1111 001 0 1 . .. .... .... 1110 . 0 . 0 .... @3diff
    ]
  }
 diff --git a/target/arm/translate-neon.inc.c b/target/arm/translate-neon.inc.c
-index 00a779c65a0..5965b5ed845 100644
+index 5965b5ed845..7dbbfaaac41 100644
 --- a/target/arm/translate-neon.inc.c
 +++ b/target/arm/translate-neon.inc.c
-@@ -2222,3 +2222,85 @@ DO_VMLAL(VMLAL_S,mull_s,add)
- DO_VMLAL(VMLAL_U,mull_u,add)
- DO_VMLAL(VMLSL_S,mull_s,sub)
- DO_VMLAL(VMLSL_U,mull_u,sub)
+@@ -2304,3 +2304,46 @@ static bool trans_VQDMLSL_3d(DisasContext *s, arg_3diff *a)
+ 
+     return do_long_3d(s, a, opfn[a->size], accfn[a->size]);
+ }
 +
-+static void gen_VQDMULL_16(TCGv_i64 rd, TCGv_i32 rn, TCGv_i32 rm)
++static bool trans_VMULL_P_3d(DisasContext *s, arg_3diff *a)
 +{
-+    gen_helper_neon_mull_s16(rd, rn, rm);
-+    gen_helper_neon_addl_saturate_s32(rd, cpu_env, rd, rd);
-+}
++    gen_helper_gvec_3 *fn_gvec;
 +
-+static void gen_VQDMULL_32(TCGv_i64 rd, TCGv_i32 rn, TCGv_i32 rm)
-+{
-+    gen_mull_s32(rd, rn, rm);
-+    gen_helper_neon_addl_saturate_s64(rd, cpu_env, rd, rd);
-+}
++    if (!arm_dc_feature(s, ARM_FEATURE_NEON)) {
++        return false;
++    }
 +
-+static bool trans_VQDMULL_3d(DisasContext *s, arg_3diff *a)
-+{
-+    NeonGenTwoOpWidenFn *opfn[] = {
-+        NULL,
-+        gen_VQDMULL_16,
-+        gen_VQDMULL_32,
-+        NULL,
-+    };
++    /* UNDEF accesses to D16-D31 if they don't exist. */
++    if (!dc_isar_feature(aa32_simd_r32, s) &&
++        ((a->vd | a->vn | a->vm) & 0x10)) {
++        return false;
++    }
 +
-+    return do_long_3d(s, a, opfn[a->size], NULL);
-+}
++    if (a->vd & 1) {
++        return false;
++    }
 +
-+static void gen_VQDMLAL_acc_16(TCGv_i64 rd, TCGv_i64 rn, TCGv_i64 rm)
-+{
-+    gen_helper_neon_addl_saturate_s32(rd, cpu_env, rn, rm);
-+}
++    switch (a->size) {
++    case 0:
++        fn_gvec = gen_helper_neon_pmull_h;
++        break;
++    case 2:
++        if (!dc_isar_feature(aa32_pmull, s)) {
++            return false;
++        }
++        fn_gvec = gen_helper_gvec_pmull_q;
++        break;
++    default:
++        return false;
++    }
 +
-+static void gen_VQDMLAL_acc_32(TCGv_i64 rd, TCGv_i64 rn, TCGv_i64 rm)
-+{
-+    gen_helper_neon_addl_saturate_s64(rd, cpu_env, rn, rm);
-+}
++    if (!vfp_access_check(s)) {
++        return true;
++    }
 +
-+static bool trans_VQDMLAL_3d(DisasContext *s, arg_3diff *a)
-+{
-+    NeonGenTwoOpWidenFn *opfn[] = {
-+        NULL,
-+        gen_VQDMULL_16,
-+        gen_VQDMULL_32,
-+        NULL,
-+    };
-+    NeonGenTwo64OpFn *accfn[] = {
-+        NULL,
-+        gen_VQDMLAL_acc_16,
-+        gen_VQDMLAL_acc_32,
-+        NULL,
-+    };
-+
-+    return do_long_3d(s, a, opfn[a->size], accfn[a->size]);
-+}
-+
-+static void gen_VQDMLSL_acc_16(TCGv_i64 rd, TCGv_i64 rn, TCGv_i64 rm)
-+{
-+    gen_helper_neon_negl_u32(rm, rm);
-+    gen_helper_neon_addl_saturate_s32(rd, cpu_env, rn, rm);
-+}
-+
-+static void gen_VQDMLSL_acc_32(TCGv_i64 rd, TCGv_i64 rn, TCGv_i64 rm)
-+{
-+    tcg_gen_neg_i64(rm, rm);
-+    gen_helper_neon_addl_saturate_s64(rd, cpu_env, rn, rm);
-+}
-+
-+static bool trans_VQDMLSL_3d(DisasContext *s, arg_3diff *a)
-+{
-+    NeonGenTwoOpWidenFn *opfn[] = {
-+        NULL,
-+        gen_VQDMULL_16,
-+        gen_VQDMULL_32,
-+        NULL,
-+    };
-+    NeonGenTwo64OpFn *accfn[] = {
-+        NULL,
-+        gen_VQDMLSL_acc_16,
-+        gen_VQDMLSL_acc_32,
-+        NULL,
-+    };
-+
-+    return do_long_3d(s, a, opfn[a->size], accfn[a->size]);
++    tcg_gen_gvec_3_ool(neon_reg_offset(a->vd, 0),
++                       neon_reg_offset(a->vn, 0),
++                       neon_reg_offset(a->vm, 0),
++                       16, 16, 0, fn_gvec);
++    return true;
 +}
 diff --git a/target/arm/translate.c b/target/arm/translate.c
-index a2c47d19f21..88e91845c02 100644
+index 88e91845c02..f459fad8646 100644
 --- a/target/arm/translate.c
 +++ b/target/arm/translate.c
-@@ -5247,11 +5247,11 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-                     {0, 0, 0, 7}, /* VSUBHN: handled by decodetree */
-                     {0, 0, 0, 7}, /* VABDL */
-                     {0, 0, 0, 7}, /* VMLAL */
--                    {0, 0, 0, 9}, /* VQDMLAL */
-+                    {0, 0, 0, 7}, /* VQDMLAL */
-                     {0, 0, 0, 7}, /* VMLSL */
--                    {0, 0, 0, 9}, /* VQDMLSL */
-+                    {0, 0, 0, 7}, /* VQDMLSL */
-                     {0, 0, 0, 7}, /* Integer VMULL */
--                    {0, 0, 0, 9}, /* VQDMULL */
-+                    {0, 0, 0, 7}, /* VQDMULL */
-                     {0, 0, 0, 0xa}, /* Polynomial VMULL */
-                     {0, 0, 0, 7}, /* Reserved: always UNDEF */
-                 };
-@@ -5282,58 +5282,7 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-                     }
-                     return 0;
-                 }
+@@ -5181,7 +5181,7 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
+ {
+     int op;
+     int q;
+-    int rd, rn, rm, rd_ofs, rn_ofs, rm_ofs;
++    int rd, rn, rm, rd_ofs, rm_ofs;
+     int size;
+     int pass;
+     int u;
+@@ -5215,7 +5215,6 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
+     size = (insn >> 20) & 3;
+     vec_size = q ? 16 : 8;
+     rd_ofs = neon_reg_offset(rd, 0);
+-    rn_ofs = neon_reg_offset(rn, 0);
+     rm_ofs = neon_reg_offset(rm, 0);
+ 
+     if ((insn & (1 << 23)) == 0) {
+@@ -5228,61 +5227,8 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
+         if (size != 3) {
+             op = (insn >> 8) & 0xf;
+             if ((insn & (1 << 6)) == 0) {
+-                /* Three registers of different lengths.  */
+-                /* undefreq: bit 0 : UNDEF if size == 0
+-                 *           bit 1 : UNDEF if size == 1
+-                 *           bit 2 : UNDEF if size == 2
+-                 *           bit 3 : UNDEF if U == 1
+-                 * Note that [2:0] set implies 'always UNDEF'
+-                 */
+-                int undefreq;
+-                /* prewiden, src1_wide, src2_wide, undefreq */
+-                static const int neon_3reg_wide[16][4] = {
+-                    {0, 0, 0, 7}, /* VADDL: handled by decodetree */
+-                    {0, 0, 0, 7}, /* VADDW: handled by decodetree */
+-                    {0, 0, 0, 7}, /* VSUBL: handled by decodetree */
+-                    {0, 0, 0, 7}, /* VSUBW: handled by decodetree */
+-                    {0, 0, 0, 7}, /* VADDHN: handled by decodetree */
+-                    {0, 0, 0, 7}, /* VABAL */
+-                    {0, 0, 0, 7}, /* VSUBHN: handled by decodetree */
+-                    {0, 0, 0, 7}, /* VABDL */
+-                    {0, 0, 0, 7}, /* VMLAL */
+-                    {0, 0, 0, 7}, /* VQDMLAL */
+-                    {0, 0, 0, 7}, /* VMLSL */
+-                    {0, 0, 0, 7}, /* VQDMLSL */
+-                    {0, 0, 0, 7}, /* Integer VMULL */
+-                    {0, 0, 0, 7}, /* VQDMULL */
+-                    {0, 0, 0, 0xa}, /* Polynomial VMULL */
+-                    {0, 0, 0, 7}, /* Reserved: always UNDEF */
+-                };
 -
--                /* Avoid overlapping operands.  Wide source operands are
--                   always aligned so will never overlap with wide
--                   destinations in problematic ways.  */
--                if (rd == rm) {
--                    tmp = neon_load_reg(rm, 1);
--                    neon_store_scratch(2, tmp);
--                } else if (rd == rn) {
--                    tmp = neon_load_reg(rn, 1);
--                    neon_store_scratch(2, tmp);
+-                undefreq = neon_3reg_wide[op][3];
+-
+-                if ((undefreq & (1 << size)) ||
+-                    ((undefreq & 8) && u)) {
+-                    return 1;
 -                }
--                tmp3 = NULL;
--                for (pass = 0; pass < 2; pass++) {
--                    if (pass == 1 && rd == rn) {
--                        tmp = neon_load_scratch(2);
+-                if (rd & 1) {
+-                    return 1;
+-                }
+-
+-                /* Handle polynomial VMULL in a single pass.  */
+-                if (op == 14) {
+-                    if (size == 0) {
+-                        /* VMULL.P8 */
+-                        tcg_gen_gvec_3_ool(rd_ofs, rn_ofs, rm_ofs, 16, 16,
+-                                           0, gen_helper_neon_pmull_h);
 -                    } else {
--                        tmp = neon_load_reg(rn, pass);
--                    }
--                    if (pass == 1 && rd == rm) {
--                        tmp2 = neon_load_scratch(2);
--                    } else {
--                        tmp2 = neon_load_reg(rm, pass);
--                    }
--                    switch (op) {
--                    case 9: case 11: case 13:
--                        /* VQDMLAL, VQDMLSL, VQDMULL */
--                        gen_neon_mull(cpu_V0, tmp, tmp2, size, u);
--                        break;
--                    default: /* 15 is RESERVED: caught earlier  */
--                        abort();
--                    }
--                    if (op == 13) {
--                        /* VQDMULL */
--                        gen_neon_addl_saturate(cpu_V0, cpu_V0, size);
--                        neon_store_reg64(cpu_V0, rd + pass);
--                    } else {
--                        /* Accumulate.  */
--                        neon_load_reg64(cpu_V1, rd + pass);
--                        switch (op) {
--                        case 9: case 11: /* VQDMLAL, VQDMLSL */
--                            gen_neon_addl_saturate(cpu_V0, cpu_V0, size);
--                            if (op == 11) {
--                                gen_neon_negl(cpu_V0, size);
--                            }
--                            gen_neon_addl_saturate(cpu_V0, cpu_V1, size);
--                            break;
--                        default:
--                            abort();
+-                        /* VMULL.P64 */
+-                        if (!dc_isar_feature(aa32_pmull, s)) {
+-                            return 1;
 -                        }
--                        neon_store_reg64(cpu_V0, rd + pass);
+-                        tcg_gen_gvec_3_ool(rd_ofs, rn_ofs, rm_ofs, 16, 16,
+-                                           0, gen_helper_gvec_pmull_q);
 -                    }
+-                    return 0;
 -                }
-+                abort(); /* all others handled by decodetree */
+-                abort(); /* all others handled by decodetree */
++                /* Three registers of different lengths: handled by decodetree */
++                return 1;
              } else {
                  /* Two registers and a scalar. NB that for ops of this form
                   * the ARM ARM labels bit 24 as Q, but it is in our variable
