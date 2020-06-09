@@ -2,85 +2,104 @@ Return-Path: <SRS0=hUBF=7W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77A61C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 10:08:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29D3AC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 10:12:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3A3AC2078D
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 10:08:23 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="I29SJAF+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A3AC2078D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	by mail.kernel.org (Postfix) with ESMTPS id F1F182078D
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 10:12:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1F182078D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44890 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47310 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jibB8-0007dV-H6
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 06:08:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56332)
+	id 1jibFK-0000Xd-9r
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 06:12:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56702)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <chihmin.chao@sifive.com>)
- id 1jibAW-00077u-3j
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 06:07:44 -0400
-Received: from mail-il1-x141.google.com ([2607:f8b0:4864:20::141]:40597)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <chihmin.chao@sifive.com>)
- id 1jibAU-0007ou-Qb
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 06:07:43 -0400
-Received: by mail-il1-x141.google.com with SMTP id t8so19720311ilm.7
- for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 03:07:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=F2aG56k+a2G508zcUJ3HboIMxYkZy/lIq/5XCAOIFgw=;
- b=I29SJAF+OrTb5PYA5mKDYuynlVj2Ze19CQOMO0QXcgzQY6fKTbrF9tpT/cxxdcSaJA
- Im55D+ZDsBMX0u0+kS4dvG6OY9pplfw13Hmi/BIcChyI4iYB9A25SIyY8mBVznXYHLm0
- S6+CzYbtJlTYxP6DjYsj2aeNfWlOnqp8NhM8SR+5T1YQwDvYMCeroytSLvCMrSZGySQl
- EUIvAT9pOQyJVx8qJjk+Ut1H+TFFOOzOkB/VgzNJ3oOS6HM5ywg8s8YCfN3kpPAfmIh5
- mCMk/IcZbLIxgO/0lqEtwncg0fYcKZXqtIj6Ka8UZuZKYHs9NS62D8R0U/tCuNQDeZwm
- EE9Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=F2aG56k+a2G508zcUJ3HboIMxYkZy/lIq/5XCAOIFgw=;
- b=MXmrQ6pwVAuQi4QmaUJUTAHAnt/3LkHHdN17Of0h0g8yji1wBvepOILzsm1WYnpC9W
- BCrQ7+knSxjOloiY9TkGMcoLJCQ5PJbWry7K+fbb4Zz3pJkkWTVbJj4z+575vo4pRybe
- E1JVPsz5zjaBy4FhNyQw+5EBya2eYeCxxmab31lRZ4gwLMTvUL9WTGFFD03+1FlBSZXQ
- OoMhifKtIZPOPZmQDuDmwzdzmyozGE0scs1GOV/8D9vMnmuO8viHZbjABGCvz8Bi2z7f
- SptU0iA9ATZBvh8ZQvjnkelLc5OXvMfTUcJ1LmUe4pUmjxG4C+g6BwP6sGoogz6Q46ck
- B7rg==
-X-Gm-Message-State: AOAM533tiu3OHd/PSIOAxtx2TLyXjX0jY4AMgzf9OTZiotBU9aBHRda4
- njFAVFMiCXLPhuUu1/3bIIYJLPFzi1sUgRRuROhjig==
-X-Google-Smtp-Source: ABdhPJy9r6yPAS7hDo6N86BPIv51i0vM5vQbTFYwX7yguNC0ZOArA+MGg7ibTOpHZCldlpA8nf88bTcdI0LjYQyoZw0=
-X-Received: by 2002:a92:c812:: with SMTP id v18mr26606776iln.178.1591697260799; 
- Tue, 09 Jun 2020 03:07:40 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <pasic@linux.ibm.com>)
+ id 1jibEj-0008Qy-Ar; Tue, 09 Jun 2020 06:12:05 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:2820)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <pasic@linux.ibm.com>)
+ id 1jibEh-0008U2-V1; Tue, 09 Jun 2020 06:12:04 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 059A1wVu074043; Tue, 9 Jun 2020 06:11:56 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 31huupw61h-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 09 Jun 2020 06:11:56 -0400
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 059A29iP075302;
+ Tue, 9 Jun 2020 06:11:56 -0400
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com
+ [149.81.74.108])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 31huupw60j-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 09 Jun 2020 06:11:55 -0400
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+ by ppma05fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 059AAGCR024323;
+ Tue, 9 Jun 2020 10:11:53 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com
+ (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+ by ppma05fra.de.ibm.com with ESMTP id 31g2s7taq2-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 09 Jun 2020 10:11:53 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com
+ [9.149.105.59])
+ by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 059ABphK61079622
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 9 Jun 2020 10:11:51 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 0C2B5A4053;
+ Tue,  9 Jun 2020 10:11:51 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 57D2EA405B;
+ Tue,  9 Jun 2020 10:11:50 +0000 (GMT)
+Received: from oc2783563651 (unknown [9.145.129.89])
+ by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Tue,  9 Jun 2020 10:11:50 +0000 (GMT)
+Date: Tue, 9 Jun 2020 12:11:05 +0200
+From: Halil Pasic <pasic@linux.ibm.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: [RFC v2 00/18] Refactor configuration of guest memory protection
+Message-ID: <20200609121105.50588db9.pasic@linux.ibm.com>
+In-Reply-To: <20200606084409.GL228651@umbus.fritz.box>
+References: <20200521034304.340040-1-david@gibson.dropbear.id.au>
+ <20200605125505.3fdd7de8.cohuck@redhat.com>
+ <20200606084409.GL228651@umbus.fritz.box>
+Organization: IBM
+X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <20200128003707.17028-1-ianjiang.ict@gmail.com>
- <b14a65dd-b565-77ca-d479-f88e53ca0721@linaro.org>
-In-Reply-To: <b14a65dd-b565-77ca-d479-f88e53ca0721@linaro.org>
-From: Chih-Min Chao <chihmin.chao@sifive.com>
-Date: Tue, 9 Jun 2020 18:07:30 +0800
-Message-ID: <CAEiOBXXOA40F5kdttMby6eAfMGYVT0twZOhkojFK9qRDX1Xchw@mail.gmail.com>
-Subject: Re: [PATCH v2] riscv: Add helper to make NaN-boxing for FP register
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: multipart/alternative; boundary="000000000000d2089a05a7a3e549"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::141;
- envelope-from=chihmin.chao@sifive.com; helo=mail-il1-x141.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+Content-Type: multipart/signed; micalg=pgp-sha1;
+ boundary="Sig_/CoZk+LM8X6kReIB/IhxDgVN"; protocol="application/pgp-signature"
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
+ definitions=2020-06-09_03:2020-06-08,
+ 2020-06-09 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ lowpriorityscore=0
+ malwarescore=0 cotscore=-2147483648 suspectscore=0 mlxscore=0 bulkscore=0
+ impostorscore=0 mlxlogscore=999 phishscore=0 clxscore=1015 spamscore=0
+ priorityscore=1501 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2004280000 definitions=main-2006090072
+Received-SPF: pass client-ip=148.163.156.1; envelope-from=pasic@linux.ibm.com;
+ helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 06:12:02
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -25
+X-Spam_score: -2.6
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, HTML_MESSAGE=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, KHOP_DYNAMIC=0.001,
+ RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -94,78 +113,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>, palmer@dabbelt.com,
- Ian Jiang <ianjiang.ict@gmail.com>
+Cc: pair@us.ibm.com, brijesh.singh@amd.com, frankja@linux.ibm.com,
+ kvm@vger.kernel.org, "Michael
+ S. Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ qemu-devel@nongnu.org, dgilbert@redhat.com, qemu-ppc@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
+ mdroth@linux.vnet.ibm.com, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000d2089a05a7a3e549
-Content-Type: text/plain; charset="UTF-8"
-
-ping ?  Could this be merged ?
-
-
-Chih-Min Chao
-
-
-
-On Wed, Jan 29, 2020 at 3:43 AM Richard Henderson <
-richard.henderson@linaro.org> wrote:
-
-> On 1/27/20 4:37 PM, Ian Jiang wrote:
-> > The function that makes NaN-boxing when a 32-bit value is assigned
-> > to a 64-bit FP register is split out to a helper gen_nanbox_fpr().
-> > Then it is applied in translating of the FLW instruction.
-> >
-> > Signed-off-by: Ian Jiang <ianjiang.ict@gmail.com>
-> > ---
-> >  target/riscv/insn_trans/trans_rvf.inc.c | 17 +++++++++++++++--
-> >  1 file changed, 15 insertions(+), 2 deletions(-)
->
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
->
->
-> r~
->
->
-
---000000000000d2089a05a7a3e549
-Content-Type: text/html; charset="UTF-8"
+--Sig_/CoZk+LM8X6kReIB/IhxDgVN
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
-<div dir=3D"ltr">ping ?=C2=A0 Could this be merged ?<div><br></div><div><br=
- clear=3D"all"><div><div dir=3D"ltr" class=3D"gmail_signature" data-smartma=
-il=3D"gmail_signature"><div dir=3D"ltr"><span style=3D"color:rgb(136,136,13=
-6)">Chih-Min Chao</span><div style=3D"color:rgb(136,136,136)"><br></div></d=
-iv></div></div><br></div></div><br><div class=3D"gmail_quote"><div dir=3D"l=
-tr" class=3D"gmail_attr">On Wed, Jan 29, 2020 at 3:43 AM Richard Henderson =
-&lt;<a href=3D"mailto:richard.henderson@linaro.org">richard.henderson@linar=
-o.org</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"ma=
-rgin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:=
-1ex">On 1/27/20 4:37 PM, Ian Jiang wrote:<br>
-&gt; The function that makes NaN-boxing when a 32-bit value is assigned<br>
-&gt; to a 64-bit FP register is split out to a helper gen_nanbox_fpr().<br>
-&gt; Then it is applied in translating of the FLW instruction.<br>
-&gt; <br>
-&gt; Signed-off-by: Ian Jiang &lt;<a href=3D"mailto:ianjiang.ict@gmail.com"=
- target=3D"_blank">ianjiang.ict@gmail.com</a>&gt;<br>
-&gt; ---<br>
-&gt;=C2=A0 target/riscv/insn_trans/trans_rvf.inc.c | 17 +++++++++++++++--<b=
-r>
-&gt;=C2=A0 1 file changed, 15 insertions(+), 2 deletions(-)<br>
-<br>
-Reviewed-by: Richard Henderson &lt;<a href=3D"mailto:richard.henderson@lina=
-ro.org" target=3D"_blank">richard.henderson@linaro.org</a>&gt;<br>
-<br>
-<br>
-r~<br>
-<br>
-</blockquote></div>
+On Sat, 6 Jun 2020 18:44:09 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
---000000000000d2089a05a7a3e549--
+> On Fri, Jun 05, 2020 at 12:55:05PM +0200, Cornelia Huck wrote:
+> > On Thu, 21 May 2020 13:42:46 +1000
+> > David Gibson <david@gibson.dropbear.id.au> wrote:
+> >=20
+> > > A number of hardware platforms are implementing mechanisms whereby the
+> > > hypervisor does not have unfettered access to guest memory, in order
+> > > to mitigate the security impact of a compromised hypervisor.
+> > >=20
+> > > AMD's SEV implements this with in-cpu memory encryption, and Intel has
+> > > its own memory encryption mechanism.  POWER has an upcoming mechanism
+> > > to accomplish this in a different way, using a new memory protection
+> > > level plus a small trusted ultravisor.  s390 also has a protected
+> > > execution environment.
+> > >=20
+> > > The current code (committed or draft) for these features has each
+> > > platform's version configured entirely differently.  That doesn't seem
+> > > ideal for users, or particularly for management layers.
+> > >=20
+> > > AMD SEV introduces a notionally generic machine option
+> > > "machine-encryption", but it doesn't actually cover any cases other
+> > > than SEV.
+> > >=20
+> > > This series is a proposal to at least partially unify configuration
+> > > for these mechanisms, by renaming and generalizing AMD's
+> > > "memory-encryption" property.  It is replaced by a
+> > > "guest-memory-protection" property pointing to a platform specific
+> > > object which configures and manages the specific details.
+> > >=20
+> > > For now this series covers just AMD SEV and POWER PEF.  I'm hoping it
+> > > can be extended to cover the Intel and s390 mechanisms as well,
+> > > though.
+> >=20
+> > For s390, there's the 'unpack' cpu facility bit, which is indicated iff
+> > the kernel indicates availability of the feature (depending on hardware
+> > support). If that cpu facility is available, a guest can choose to
+> > transition into protected mode. The current state (protected mode or
+> > not) is tracked in the s390 ccw machine.
+> >=20
+> > If I understand the series here correctly (I only did a quick
+> > read-through), the user has to instruct QEMU to make protection
+> > available, via a new machine property that links to an object?
+>=20
+> Correct.  We used to have basically the same model for POWER - the
+> guest just talks to the ultravisor to enter secure mode.  But we
+> realized that model is broken.  You're effectively advertising
+> availability of a guest hardware feature based on host kernel or
+> hardware properties.  That means if you try to migrate from a host
+> with the facility to one without, you won't know there's a problem
+> until too late.
+>=20
+
+Sorry, I don't quite understand the migration problem described here. If
+you have this modeled via a CPU model facility, then you can't migrate
+from a host with the facility to one without, except if the user
+specified CPU model does not include the facility in question. Or am I
+missing something?
+
+Regards,
+Halil
+
+--Sig_/CoZk+LM8X6kReIB/IhxDgVN
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.22 (GNU/Linux)
+
+iQIcBAEBAgAGBQJe32BkAAoJEA0vhuyXGx0A2kUP/3IWsX5UoEZG4KLEc6liNvYl
+HmmJnWiDl2huRI52xTcakzydBggGxi1j1vb8e4s1C2sEL/2uqvbM8Tyi4intDGrb
+Kw86lk66hj11hjQ4ix+Bi5Ow4EBE6RtUbzraFl3fjhxsOlSYQOLwkvGb9gDpkOM2
+9BaHUGaWv6fxNoVZK+poGrHBnb8nGq2n1GhZc2bTalE8urH+/Fp0ufT4sTtE9del
+jhPeR7338e7X44BC6mO1J+8gwiOcgy3EYRhfzfxeSLQr9cg/cRSiZCqZokqt53ok
+c9ATeqAxJwR1/r0lA71nS3HY2s8zjw4GZA0ozKa4Rpac+2NDQVp04NXTktPvkN1c
+y/UBDL5Qq1vQep1Rf+GLQk1Va0ajEkZShubrb6PmKKNidL4WTeJhdP1oKGU9rDUG
+B+z0j2nylbCz9oSiYvh5FuUu4MIiTYQJS31yT85jajsFClIWKLkMWC0JrCvqUP2B
+F8tTb3lI3xU5kHyuC/kA4OSDfI1rPS6gd64zU9VJjH7NlaVbYkYXZG9//PDXOt8z
+/FG/j1l4TlqtPpiWdTKj9XfzsLRg9/+wyGcsX16nUJwhK6bk2yl71zbCVv8/QZ5L
+CMSGx8occBo1lgFw1Q6squxO7EoosSa1KKlx1MdzavIwyqRCRok8d+wPGose/kd7
+pKf6d5b6DYzBjpSdXo40
+=ooSD
+-----END PGP SIGNATURE-----
+
+--Sig_/CoZk+LM8X6kReIB/IhxDgVN--
+
 
