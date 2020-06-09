@@ -7,70 +7,70 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9996FC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 12:38:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24CBEC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 12:40:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 64C09207C3
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 12:38:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E2979207C3
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 12:40:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RyGIOJEv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64C09207C3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DILhWrtS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2979207C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46570 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49910 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jidWW-0006QG-Kt
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 08:38:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41710)
+	id 1jidY2-0007qJ-Qr
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 08:40:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41718)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jidIO-0003X3-GP
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jidIO-0003Xf-LI
  for qemu-devel@nongnu.org; Tue, 09 Jun 2020 08:24:00 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:20906
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:25947
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jidIK-0005Su-F1
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jidII-0005S6-5l
  for qemu-devel@nongnu.org; Tue, 09 Jun 2020 08:24:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591705435;
+ s=mimecast20190719; t=1591705433;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=EIDCMln9RmpF1Ls7UOJGokyRuJGaYDq2TNKmskxzmO0=;
- b=RyGIOJEvkK2ssx/TCT5R2VXMzAYqylUqg4ix+h2hvWWqGThE/VR4jKt9jbfz2Q02Fr/aX3
- YqeH048YeiSHY1MHmxcdbAeWa1l4LDxxNkNKfTVxwqXOhYoI/DTzSJdNI97wbN4QRC+6r3
- x4DIrgFgXAt0kPMlJdgbASzrMyaFv/U=
+ bh=tQGw1L8940XvyRfrxXfxAciE6HkcEZGPQkP01ci34JE=;
+ b=DILhWrtS0M+YZ5TNPXqkgKEv7Vb6mM4VZQN6ZpaMXYrmRgXgaCdLfaCUcf2qK5BmJMTQmT
+ eUK1WmaDt+SnJLYJzHGHuOPtCWxEOWcwcyDfhMeraBBqAjNIMZoFe+mjXLNb8jUCN+BLH6
+ r3U7CwZQ8Bxkn0dKhK3qWAjwwu+SuJ4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-374-TV0zdXHrOgSJMdciF6Wd7Q-1; Tue, 09 Jun 2020 08:23:44 -0400
-X-MC-Unique: TV0zdXHrOgSJMdciF6Wd7Q-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-232-ZlJqcPvPP0eHMKtMH15joA-1; Tue, 09 Jun 2020 08:23:44 -0400
+X-MC-Unique: ZlJqcPvPP0eHMKtMH15joA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 475F680B72E;
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9AF2B1883607;
  Tue,  9 Jun 2020 12:23:43 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
  [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 15F335D9E4;
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6982678FC5;
  Tue,  9 Jun 2020 12:23:43 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id EEA6F1138539; Tue,  9 Jun 2020 14:23:39 +0200 (CEST)
+ id 084AC11384A9; Tue,  9 Jun 2020 14:23:40 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 06/24] armv7m: Delete unused "ARM,bitband-memory" devices
-Date: Tue,  9 Jun 2020 14:23:21 +0200
-Message-Id: <20200609122339.937862-7-armbru@redhat.com>
+Subject: [PATCH v3 10/24] macio: Delete unused "macio-gpio" devices
+Date: Tue,  9 Jun 2020 14:23:25 +0200
+Message-Id: <20200609122339.937862-11-armbru@redhat.com>
 In-Reply-To: <20200609122339.937862-1-armbru@redhat.com>
 References: <20200609122339.937862-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
@@ -95,69 +95,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, berrange@redhat.com,
- ehabkost@redhat.com,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- qemu-arm@nongnu.org, pbonzini@redhat.com
+Cc: berrange@redhat.com, ehabkost@redhat.com,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-ppc@nongnu.org,
+ pbonzini@redhat.com, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-These devices are optional, and enabled by property "enable-bitband".
-armv7m_instance_init() creates them unconditionally, because the
-property has not been set then.  armv7m_realize() realizes them only
-when the property is true.  Works, although it leaves unrealized
-devices hanging around in the QOM composition tree.  Affects machines
-microbit, mps2-an505, mps2-an521, musca-a, and musca-b1.
+These devices go with the "via-pmu" device, which is controlled by
+property "has-pmu".  macio_newworld_init() creates it unconditionally,
+because the property has not been set then.  macio_newworld_realize()
+realizes it only when the property is true.  Works, although it can
+leave an unrealized device hanging around in the QOM composition tree.
+Affects machine mac99 with via=cuda (default).
 
-Delete the unused devices by making armv7m_realize() unparent them.
-Visible in "info qom-tree"; here's the change for microbit:
+Delete the unused device by making macio_newworld_realize() unparent
+it.  Visible in "info qom-tree":
 
-     /machine (microbit-machine)
-       /microbit.twi (microbit.i2c)
-         /microbit.twi[0] (qemu:memory-region)
-       /nrf51 (nrf51-soc)
-         /armv6m (armv7m)
-           /armv7m-container[0] (qemu:memory-region)
-    -      /bitband[0] (ARM,bitband-memory)
-    -        /bitband[0] (qemu:memory-region)
-    -      /bitband[1] (ARM,bitband-memory)
-    -        /bitband[0] (qemu:memory-region)
-           /cpu (cortex-m0-arm-cpu)
+     /machine (mac99-machine)
+       [...]
+       /unattached (container)
+         /device[9] (macio-newworld)
+           [...]
+           /escc-legacy-port[8] (qemu:memory-region)
+           /escc-legacy-port[9] (qemu:memory-region)
+           /escc-legacy[0] (qemu:memory-region)
+    -      /gpio (macio-gpio)
+    -        /gpio[0] (qemu:memory-region)
+           /ide[0] (macio-ide)
+             /ide.0 (IDE)
+             /pmac-ide[0] (qemu:memory-region)
 
-Cc: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm@nongnu.org
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 ---
- hw/arm/armv7m.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ hw/misc/macio/macio.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/hw/arm/armv7m.c b/hw/arm/armv7m.c
-index 7da57f56d3..f930619f53 100644
---- a/hw/arm/armv7m.c
-+++ b/hw/arm/armv7m.c
-@@ -245,8 +245,8 @@ static void armv7m_realize(DeviceState *dev, Error **errp)
-     memory_region_add_subregion(&s->container, 0xe000e000,
-                                 sysbus_mmio_get_region(sbd, 0));
- 
--    if (s->enable_bitband) {
--        for (i = 0; i < ARRAY_SIZE(s->bitband); i++) {
-+    for (i = 0; i < ARRAY_SIZE(s->bitband); i++) {
-+        if (s->enable_bitband) {
-             Object *obj = OBJECT(&s->bitband[i]);
-             SysBusDevice *sbd = SYS_BUS_DEVICE(&s->bitband[i]);
- 
-@@ -265,6 +265,8 @@ static void armv7m_realize(DeviceState *dev, Error **errp)
- 
-             memory_region_add_subregion(&s->container, bitband_output_addr[i],
-                                         sysbus_mmio_get_region(sbd, 0));
-+        } else {
-+            object_unparent(OBJECT(&s->bitband[i]));
-         }
-     }
- }
+diff --git a/hw/misc/macio/macio.c b/hw/misc/macio/macio.c
+index 3779865ab2..b3dddf8be7 100644
+--- a/hw/misc/macio/macio.c
++++ b/hw/misc/macio/macio.c
+@@ -368,6 +368,8 @@ static void macio_newworld_realize(PCIDevice *d, Error **errp)
+         memory_region_add_subregion(&s->bar, 0x16000,
+                                     sysbus_mmio_get_region(sysbus_dev, 0));
+     } else {
++        object_unparent(OBJECT(&ns->gpio));
++
+         /* CUDA */
+         object_initialize_child(OBJECT(s), "cuda", &s->cuda, sizeof(s->cuda),
+                                 TYPE_CUDA, &error_abort, NULL);
 -- 
 2.26.2
 
