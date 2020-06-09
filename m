@@ -7,87 +7,86 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B818AC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 11:06:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7C9BC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 11:07:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8686A207ED
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 11:06:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8548C207ED
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 11:07:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AbGx7in6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8686A207ED
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JtxmvSON"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8548C207ED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60354 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35892 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jic5G-0007li-Om
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 07:06:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33650)
+	id 1jic6a-0000y8-Pu
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 07:07:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33820)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jic4G-0006kd-L0
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 07:05:20 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:32785
+ id 1jic5s-0000M1-Ji
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 07:07:00 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:45349
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jic4E-0000ig-7v
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 07:05:20 -0400
+ id 1jic5r-000113-KR
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 07:07:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591700717;
+ s=mimecast20190719; t=1591700819;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=S4OQhSEiQViO6+Bf5ntoxU/3fnBLGSIOBfTZnNbLbrw=;
- b=AbGx7in6sRZ3b14INbHAPUtJGmz5Ii1j7cP4sRn4nHXj5QluqLWZzW0DDMsHnEMeAjs+i8
- 668mhZPYiI34nF4OCVXLGUP32EqITZ8apuJATGH/C3tad/Hg2GzrAwXfilJw1ZzXOxc0FY
- 2NXIeWBIlAwYXnhstblzZ25kc/ldBvM=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-139-GTS7Qgq6PVi20wDKmlWw2Q-1; Tue, 09 Jun 2020 07:05:14 -0400
-X-MC-Unique: GTS7Qgq6PVi20wDKmlWw2Q-1
-Received: by mail-wr1-f69.google.com with SMTP id w4so8489626wrl.13
- for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 04:05:14 -0700 (PDT)
+ bh=HLtEn6u9uzHwCvd1JnB+QPNLdle/XjOro9YfrFmD+kg=;
+ b=JtxmvSONAsm6XhHv31D6eIqHUVVF/KPH3pV0JakH8lAi3REA4U6NlrDxsYz59Y5f+zRRTv
+ Qrg2mehFAk5eLmR6koKhkSmbpwFkKm+Q7rzBzTtnwWKzZlFGLlqiZNCM9IgRP22c4MnyS8
+ c4XHCKSWTokWVBtBjMPj4lQm/tBGsS4=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-287-r_HTv20bNaOQkC50Gv8vAQ-1; Tue, 09 Jun 2020 07:06:57 -0400
+X-MC-Unique: r_HTv20bNaOQkC50Gv8vAQ-1
+Received: by mail-wm1-f71.google.com with SMTP id r1so599690wmh.7
+ for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 04:06:57 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=S4OQhSEiQViO6+Bf5ntoxU/3fnBLGSIOBfTZnNbLbrw=;
- b=bu6dXDBZeXuj0eVL3kq7KX/PGQhG7ABzODrAiPMXalV/vJsFRN+dDsWO54XETg8GPV
- DV2GAMQAAh6x6e3mzxaFeP711eHOoB+pCVXcvJ1Gc4QcNkBgrp2P2VGm7Q6m2Oe1Cpv4
- c7fGbNA1LPFFZgMfMVgWFw0slDFRL9DWSXZVXVRjXH/DcBTZmZ+9PyjDw297pKjtouzN
- nruuJNGf1l0v6BMfy6IPaY0MzNvsx6jDTG/wOH88ti3PA2emJziZ5vOKQxSYo5eH+BT4
- S0JGSiWcsu20+h1x5KMkK7Z2/6FceT2PJPWADpDVX1c0SSkR0Yj6k/MBhzCXUF1qfP4r
- lv+Q==
-X-Gm-Message-State: AOAM533VKq/tV0LDWsdUSjtO2Q+JoICPxvEECWIrY1Dd0N+wpNJesy0L
- 0wX1DPhCYmFd/yyw+fxB8bCxYDmZw2cKehdgNyNdcCwWAQZcVuaOo7fOiVG0AzCLFwvFrow9OlD
- iIN9raXyLQKGVMSA=
-X-Received: by 2002:adf:ef83:: with SMTP id d3mr3590960wro.145.1591700713616; 
- Tue, 09 Jun 2020 04:05:13 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJypMcVAQwaW/I6vICjH3pnYoVeg7kiHWBRxB9LtVfTU1+Z7wL7jJgUZk4SDqi6hRzq7g/7iig==
-X-Received: by 2002:adf:ef83:: with SMTP id d3mr3590931wro.145.1591700713378; 
- Tue, 09 Jun 2020 04:05:13 -0700 (PDT)
+ bh=HLtEn6u9uzHwCvd1JnB+QPNLdle/XjOro9YfrFmD+kg=;
+ b=WoNCFxf+b5KJQJ8gUw5Kv0omTFK6i0qyRabFAaaz4APRbLNzcnyha55Zgj9IbZ1+BI
+ z6XCyO1Ex1W5RGSP0/qvv6E/amHgLDIRObJdEnbsFgCVASRpPBVwNXeZsaUWQ6W5w2I4
+ s6sNPGSigRYUpESVtFBjs4DsJbezJqMjbVX3YeEUyTxhpfAksVKArM0Uk/5aWggMVrkJ
+ IYBVyc06wLWiImpdWBea1B4ZQr1InL8YFpMG4oA9JZyACHohLX0TWXKMSMwOZKtcyYeb
+ +SkfsiEGd0mdiAA0gCMzBUMd3k+ANwKvwsJEb3sgCI5VBxiOJ+9X/EpfhpCPGMBTRErl
+ IDQA==
+X-Gm-Message-State: AOAM531iuJwPrgRJx/YrBberCtPuqQ8EhWYsg6xVjBWDNnmBy4QOmPTV
+ H1ZI7tDHXKIkMhs04tR+Ap3wvkVO0Ft0K4qMQgvTVK2li0KppUWCnmA7dk0gk+FIyDEfwcfiGV6
+ hieg6RpfU7ep9v4s=
+X-Received: by 2002:adf:e648:: with SMTP id b8mr3979217wrn.386.1591700816413; 
+ Tue, 09 Jun 2020 04:06:56 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxwoEAqomO/pDUWsIe68Vfly9NVZSlhu3lj0ZH+nYvBwJM+baKNFuGqYNGT83VHTTt9pGx/hA==
+X-Received: by 2002:adf:e648:: with SMTP id b8mr3979198wrn.386.1591700816219; 
+ Tue, 09 Jun 2020 04:06:56 -0700 (PDT)
 Received: from [192.168.178.58] ([151.21.172.168])
- by smtp.gmail.com with ESMTPSA id u7sm2957241wrm.23.2020.06.09.04.05.11
+ by smtp.gmail.com with ESMTPSA id q5sm2976228wrm.62.2020.06.09.04.06.54
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 09 Jun 2020 04:05:12 -0700 (PDT)
-Subject: Re: [RFC PATCH 23/35] hw/misc/applesmc: Emit warning when old code is
- used
+ Tue, 09 Jun 2020 04:06:55 -0700 (PDT)
+Subject: Re: [RFC PATCH 18/35] hw/input/ps2: Emit warning when old code is used
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
  qemu-devel@nongnu.org
 References: <20200608160044.15531-1-philmd@redhat.com>
- <20200608160044.15531-24-philmd@redhat.com>
+ <20200608160044.15531-19-philmd@redhat.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ac20d382-3ac3-5c29-8e1e-e3ba1d424138@redhat.com>
-Date: Tue, 9 Jun 2020 13:05:10 +0200
+Message-ID: <f5e33299-a8b0-8530-c8d2-4d130291722c@redhat.com>
+Date: Tue, 9 Jun 2020 13:06:53 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200608160044.15531-24-philmd@redhat.com>
+In-Reply-To: <20200608160044.15531-19-philmd@redhat.com>
 Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
@@ -146,33 +145,44 @@ On 08/06/20 18:00, Philippe Mathieu-Daudé wrote:
 > 
 > Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 > ---
->  hw/misc/applesmc.c | 3 +++
->  1 file changed, 3 insertions(+)
+>  hw/input/ps2.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
 > 
-> diff --git a/hw/misc/applesmc.c b/hw/misc/applesmc.c
-> index 1c4addb201..d63f19038d 100644
-> --- a/hw/misc/applesmc.c
-> +++ b/hw/misc/applesmc.c
-> @@ -36,6 +36,7 @@
->  #include "ui/console.h"
->  #include "qemu/module.h"
->  #include "qemu/timer.h"
+> diff --git a/hw/input/ps2.c b/hw/input/ps2.c
+> index f8746d2f52..0d84061cae 100644
+> --- a/hw/input/ps2.c
+> +++ b/hw/input/ps2.c
+> @@ -30,7 +30,7 @@
+>  #include "ui/input.h"
+>  #include "sysemu/reset.h"
+>  #include "sysemu/runstate.h"
+> -
 > +#include "hw/qdev-deprecated.h"
+>  #include "trace.h"
 >  
->  /* #define DEBUG_SMC */
->  
-> @@ -253,6 +254,8 @@ static void applesmc_add_key(AppleSMCState *s, const char *key,
+>  /* debug PC keyboard */
+> @@ -1136,6 +1136,8 @@ void *ps2_kbd_init(void (*update_irq)(void *, int), void *update_arg)
 >  {
->      struct AppleSMCData *def;
+>      PS2KbdState *s = (PS2KbdState *)g_malloc0(sizeof(PS2KbdState));
 >  
 > +    qdev_warn_deprecated_function_used();
 > +
->      def = g_malloc0(sizeof(struct AppleSMCData));
->      def->key = key;
->      def->len = len;
+>      trace_ps2_kbd_init(s);
+>      s->common.update_irq = update_irq;
+>      s->common.update_arg = update_arg;
+> @@ -1158,6 +1160,8 @@ void *ps2_mouse_init(void (*update_irq)(void *, int), void *update_arg)
+>  {
+>      PS2MouseState *s = (PS2MouseState *)g_malloc0(sizeof(PS2MouseState));
+>  
+> +    qdev_warn_deprecated_function_used();
+> +
+>      trace_ps2_mouse_init(s);
+>      s->common.update_irq = update_irq;
+>      s->common.update_arg = update_arg;
 > 
 
-This one is okay.
+While the keyboard and mouse are not QOM-ified, of the controllers
+(i8042, lasips2, pl050) only lasips2 is not.  I would warn there.
 
 Paolo
 
