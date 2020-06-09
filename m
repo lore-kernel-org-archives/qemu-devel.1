@@ -2,87 +2,89 @@ Return-Path: <SRS0=hUBF=7W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAB4CC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 14:44:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A5F3C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 14:47:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 739EA2072F
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 14:44:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4AED82072F
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 14:47:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SNSpVU9d"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 739EA2072F
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S8PkK5QZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4AED82072F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59956 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34786 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jifUk-0005Ej-M8
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 10:44:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58730)
+	id 1jifXJ-0006bg-Hr
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 10:47:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59008)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jifTd-0004Xz-IS
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 10:43:45 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32874
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jifWI-0006BU-Et
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 10:46:30 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:26000
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jifTc-0004wj-Oe
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 10:43:45 -0400
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jifWH-0005MS-Jr
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 10:46:30 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591713823;
+ s=mimecast20190719; t=1591713989;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=3fz3rhVQB3rJfH5IrHGYULIY3ixX+JVb+HqadK/EtXc=;
- b=SNSpVU9dyCc60tYRKTeTGOy1iYMuwTwTfIT+Eayvoz6VYX2m+Vur5wfEjA1X2Erf30poMK
- eUaWaNsheJQkBmLaEa8rIj+n8qgAbpCGLJyI7RG3v8HnO5yPZjWpFZC3NXiYvGhRNmWhPP
- kMjsU9/+eMvlZByZVoxYUYzM+e4cyRc=
+ bh=ddVBo13rJbPYLZScmOuRArd6DNdVPEKHdtA9qP5PgUU=;
+ b=S8PkK5QZRSw9pALQ4hb8Yc8CUqSClGGZi6VYJIEkn+8pIn7OLpxrlwAV95AMOIyLc6Yi4m
+ n3m3ShHcg1w20zH9ZtHMVMYOlZYLfJTYPDon28vAp5rstBerrqYDR16Wi8oBhvozAttHVO
+ 3zZPtv7afX2lRmDlJy1NQMOf+Ny3DjM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-211-KHY2kwRXPUWeOYm50WwHvQ-1; Tue, 09 Jun 2020 10:43:40 -0400
-X-MC-Unique: KHY2kwRXPUWeOYm50WwHvQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-145-yX5iXfFvMVulsVjD0bQ8yw-1; Tue, 09 Jun 2020 10:46:27 -0400
+X-MC-Unique: yX5iXfFvMVulsVjD0bQ8yw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DF9FF805731;
- Tue,  9 Jun 2020 14:43:38 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CE53410CE781;
+ Tue,  9 Jun 2020 14:46:25 +0000 (UTC)
 Received: from [10.3.113.22] (ovpn-113-22.phx2.redhat.com [10.3.113.22])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CBACF7E596;
- Tue,  9 Jun 2020 14:43:30 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 190738FF60;
+ Tue,  9 Jun 2020 14:46:25 +0000 (UTC)
 Subject: Re: [PATCH] qcow2: Reduce write_zeroes size in handle_alloc_space()
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 References: <20200609140859.142230-1-kwolf@redhat.com>
+ <02e24dca-99da-873d-8425-09a07571e675@virtuozzo.com>
 From: Eric Blake <eblake@redhat.com>
 Organization: Red Hat, Inc.
-Message-ID: <41b529e0-9227-f8a1-b3f7-c874eddef3f6@redhat.com>
-Date: Tue, 9 Jun 2020 09:43:30 -0500
+Message-ID: <042f0b8f-dd51-acc3-8498-ac9a5532df15@redhat.com>
+Date: Tue, 9 Jun 2020 09:46:24 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200609140859.142230-1-kwolf@redhat.com>
+In-Reply-To: <02e24dca-99da-873d-8425-09a07571e675@virtuozzo.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=eblake@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 01:38:49
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/08 23:42:34
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,91 +98,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: anton.nefedov@virtuozzo.com, vsementsov@virtuozzo.com,
+Cc: "Denis V. Lunev" <den@openvz.org>, anton.nefedov@virtuozzo.com,
  qemu-devel@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/9/20 9:08 AM, Kevin Wolf wrote:
-> Since commit c8bb23cbdbe, handle_alloc_space() is called for newly
-> allocated clusters to efficiently initialise the COW areas with zeros if
-> necessary. It skips the whole operation if both start_cow nor end_cow
+On 6/9/20 9:28 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 09.06.2020 17:08, Kevin Wolf wrote:
+>> Since commit c8bb23cbdbe, handle_alloc_space() is called for newly
+>> allocated clusters to efficiently initialise the COW areas with zeros if
+>> necessary. It skips the whole operation if both start_cow nor end_cow
+>> are empty. However, it requests zeroing the whole request size (possibly
+>> multiple megabytes) even if only one end of the request actually needs
+>> this.
+>>
+>> This patch reduces the write_zeroes request size in this case so that we
+>> don't unnecessarily zero-initialise a region that we're going to
+>> overwrite immediately.
+>>
 
-s/nor/and/
-
-> are empty. However, it requests zeroing the whole request size (possibly
-> multiple megabytes) even if only one end of the request actually needs
-> this.
 > 
-> This patch reduces the write_zeroes request size in this case so that we
-> don't unnecessarily zero-initialise a region that we're going to
-> overwrite immediately.
+> Hmm, I'm afraid, that this may make things worse in some cases, as with 
+> one big write-zero request
+> we preallocate data-region in the protocol file, so we have better 
+> locality for the clusters we
+> are going to write. And, in the same time, with BDRV_REQ_NO_FALLBACK 
+> flag write-zero must be
+> fast anyway (especially in comparison with the following write request).
 > 
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->   block/qcow2.c | 16 +++++++++++-----
->   1 file changed, 11 insertions(+), 5 deletions(-)
-> 
-> diff --git a/block/qcow2.c b/block/qcow2.c
-> index 0cd2e6757e..77742877fb 100644
-> --- a/block/qcow2.c
-> +++ b/block/qcow2.c
-> @@ -2403,6 +2403,8 @@ static int handle_alloc_space(BlockDriverState *bs, QCowL2Meta *l2meta)
->       }
->   
->       for (m = l2meta; m != NULL; m = m->next) {
-> +        uint64_t start = m->alloc_offset;
-> +        uint64_t len = m->nb_clusters * s->cluster_size;
->           int ret;
->   
->           if (!m->cow_start.nb_bytes && !m->cow_end.nb_bytes) {
-> @@ -2413,21 +2415,25 @@ static int handle_alloc_space(BlockDriverState *bs, QCowL2Meta *l2meta)
->               continue;
->           }
->   
-> +        if (!m->cow_start.nb_bytes) {
-> +            start += m->cow_end.offset;
-> +            len -= m->cow_end.offset;
+>>           /*
+>>            * instead of writing zero COW buffers,
+>>            * efficiently zero out the whole clusters
+>>            */
+>> -        ret = qcow2_pre_write_overlap_check(bs, 0, m->alloc_offset,
+>> -                                            m->nb_clusters * 
+>> s->cluster_size,
+>> -                                            true);
+>> +        ret = qcow2_pre_write_overlap_check(bs, 0, start, len, true);
+>>           if (ret < 0) {
+>>               return ret;
+>>           }
+>>           BLKDBG_EVENT(bs->file, BLKDBG_CLUSTER_ALLOC_SPACE);
+>> -        ret = bdrv_co_pwrite_zeroes(s->data_file, m->alloc_offset,
+>> -                                    m->nb_clusters * s->cluster_size,
+>> +        ret = bdrv_co_pwrite_zeroes(s->data_file, start, len,
+>>                                       BDRV_REQ_NO_FALLBACK);
 
-So if the head was aligned, we reduce the request to only zero the tail;
-
-> +        } else if (!m->cow_end.nb_bytes) {
-> +            len = m->cow_start.nb_bytes;
-> +        }
-
-and if the tail was aligned, we reduce the request to only zero the head.
-
-But if both ends are needed, the request still covers the entire 
-request, including the clusters in the middle that will be overwritten.
-
-> +
->           /*
->            * instead of writing zero COW buffers,
->            * efficiently zero out the whole clusters
->            */
->   
-> -        ret = qcow2_pre_write_overlap_check(bs, 0, m->alloc_offset,
-> -                                            m->nb_clusters * s->cluster_size,
-> -                                            true);
-> +        ret = qcow2_pre_write_overlap_check(bs, 0, start, len, true);
->           if (ret < 0) {
->               return ret;
->           }
->   
->           BLKDBG_EVENT(bs->file, BLKDBG_CLUSTER_ALLOC_SPACE);
-> -        ret = bdrv_co_pwrite_zeroes(s->data_file, m->alloc_offset,
-> -                                    m->nb_clusters * s->cluster_size,
-> +        ret = bdrv_co_pwrite_zeroes(s->data_file, start, len,
->                                       BDRV_REQ_NO_FALLBACK);
-
-If both head and tail are unaligned and need COW, but lie in different 
-clusters, would we be better off using two separate 
-bdrv_co_pwrite_zeroes() calls?
-
->           if (ret < 0) {
->               if (ret != -ENOTSUP && ret != -EAGAIN) {
-> 
+Good point.  If we weren't using BDRV_REQ_NO_FALLBACK, then avoiding a 
+pre-zero pass over the middle is essential.  But since we are insisting 
+that the pre-zero pass be fast or else immediately fail, the time spent 
+in pre-zeroing should not be a concern.  Do you have benchmark numbers 
+stating otherwise?
 
 -- 
 Eric Blake, Principal Software Engineer
