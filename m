@@ -6,38 +6,37 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36FA4C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 18:01:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61114C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 18:04:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0F358206D5
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 18:01:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F358206D5
+	by mail.kernel.org (Postfix) with ESMTPS id 3C1F5206D5
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 18:04:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C1F5206D5
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49004 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54130 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jiiYj-0000uf-B4
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 14:01:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56316)
+	id 1jiibP-0003FI-H1
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 14:03:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60562)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1jiiIN-0004Cu-UR; Tue, 09 Jun 2020 13:44:19 -0400
-Received: from mout.kundenserver.de ([212.227.126.131]:60693)
+ id 1jiiYT-0001A1-Dm; Tue, 09 Jun 2020 14:00:57 -0400
+Received: from mout.kundenserver.de ([212.227.126.130]:57491)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1jiiIM-000676-JG; Tue, 09 Jun 2020 13:44:19 -0400
+ id 1jiiYR-0001ir-Vk; Tue, 09 Jun 2020 14:00:56 -0400
 Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
- (mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MS1G7-1jWqQq2Qfb-00TTkD; Tue, 09 Jun 2020 19:44:11 +0200
-Subject: Re: [PATCH v2] hw/openrisc/openrisc_sim: Add assertion to silence GCC
- warning
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, =?UTF-8?Q?Martin_Li=c5=a1ka?= <mliska@suse.cz>,
- Eric Blake <eblake@redhat.com>
-References: <20200608160611.16966-1-philmd@redhat.com>
+ (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MV5rK-1jYE9b3JTi-00S3Yi; Tue, 09 Jun 2020 20:00:46 +0200
+Subject: Re: [PATCH v2] hw/vfio/common: Trace in which mode an IOMMU is opened
+To: Alex Williamson <alex.williamson@redhat.com>
+References: <20200527155555.6833-1-philmd@redhat.com>
+ <b687dd06-490d-dde9-53cc-aa05f38f769e@vivier.eu>
+ <20200609113326.100e74fe@w520.home>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -81,36 +80,36 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <667551f6-96fb-19a3-828c-c8d0e1c41fb9@vivier.eu>
-Date: Tue, 9 Jun 2020 19:44:09 +0200
+Message-ID: <96157697-54d8-bd66-8212-67225069efaf@vivier.eu>
+Date: Tue, 9 Jun 2020 20:00:44 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200608160611.16966-1-philmd@redhat.com>
+In-Reply-To: <20200609113326.100e74fe@w520.home>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:p4UhlWuO/+loTvKVdP2kMabRGhQAks7Yjo80KSGBNuF3P0aQMj4
- hZHKyTGQQBjxtA6R/7hTS7MmrKFWhpFysw7koS9W2XkWlaGvL3+tz4WHlaX6ZG2C0OQ5L1K
- NT6199aS8afw3fvqzASfTQjqBpA3xpqkBrCZG9wmU3iFFNwgsvR/nQ8MKFCKOi+EoDh1/Jy
- +8Z9ERqaNoWz1siL7gtiQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:6xyaecFtRjM=:cJqdTp7tm/+qIXEEnIGgL6
- exa6168HMDawvcJwheF4KQF2wAfny6oX3wkgxhXNIBGmjN49VOKZhdttIoKnB66sX1mR8lmO4
- BkGC5nyITiX5oOP1i/7IBO5Ph2o9Tg9ZSSXAJ2UIpo+MKQB6yOFWp0M0wl7shAt3mNQ/ck6CM
- rdg2H3upRVxEr7upKIEgYS8UVsTMEuoIiwWgTEH3DDOvGsE5k02BXglFeDrDDYOdSLna2gy4t
- EvQwHNmjYY6kfoGOS/yAe99bX2MZAChgP9Jwx0LLQ3hKYHIISduEFpdZ0W/W5wv+JTrRQpfvZ
- gNwwBymWa3we8H5Dm2yZPuK4mjXrUPdx/1W9YtfKoKeQgvOTxyUwfY3aSb09tdSeg4ZpAQrby
- gBeMzMV1xCAMraqDZO3+3u8Xsy885bGJc4s6VXAsXMximuw+tKdoKZHJ39yLA3lRZH8pm9jur
- KR6tg8ESqzTgfUetwQhcr6ZsCSr2wUCj7LXwCVD+C/htZvEgxkQOLmwtRXO1FkT7sJImd+bTR
- 9sWph9/fu23p6BFT9n0s/nuaag0FpmjAimfiYS9sdoQdf0lOcMB9saR2C+jaLtAzmyyERw5Al
- 7+tQU2bKEnFX8lR6AGyOaS/DOsS+S3zvubKH3sA4diciQDPkFh67LbYD17A+B7pj/s8On7gZ9
- zXPAWuKm+sNwXb0KXWkpC/lhINqtECGn2DjvmBvxyDrs7mPBdahYEQKTAqyIfmRGES3AoVO1g
- 3Ic7AO/lHQe1bB+OZxRkEMyMAFR1nnrOEBBac5WNOsu/oBH4qjzdpEgiLCRwevaPA2BwtbDuV
- 20+PZIbfhy/AUGgH2ss88TzJTJPPhA/91ORPTE2bc0FN5qXi/yAFkCyWYe4ZLAbGEnt2S+q
-Received-SPF: none client-ip=212.227.126.131; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:Us/mdpKiTsowUFsgrbBBUx4fbsqslKnI5APIKrteeuT75SZqnyJ
+ ynBoNRF0Xy3fmvGm4jqLl9gzI510vSXMaujbcIxQj7U7BpLJzfX2eduH6nCBTFn456uLHUk
+ lGpeDHq+Cc7ukSeX3OKwKU9EYkIxZFnqr2xNuZ8gwi/RoYXKnYHrm7Wj0pHHHnapDU/1gXU
+ VUDAEb62Uc2wEC1kuf2Aw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:8Czjl+PpuvE=:pLE8O2L2Sfkm5lCME3n0JA
+ w9ngtPJ3ua2G0Bo+P5SvKhRvfzQQNfQB+p8ktev3zyQP797nbKuVX+wndnPQGhRcWUFyB09OH
+ FzxGx54ajCe2r3PRo0O73sxdbEuy9Mpk16VBKJg077RUFxinqZ309vKP33eviqYCtjtP4XiJW
+ vlhoc7xA/qKafL+/rSkJ2L2Nml6L8HD2FzYnqGMK/6tSdNPbJE9DvGKPwd+0uGUW4oEYfpmxb
+ eZaJu3ZdeLw8QZ97Xhsfo/MGb7xWdQFs2VO6eGoDXdgoHtHTv+YoaJTYxM4A6ZMrLa8EiAeFA
+ JhhXq3YmU0irA1jSWEbjr1j3dLF1TQHJsdT2ARqwVMitVs4lCZP4Hyf7Td4gulh9MYq9EI3A6
+ Fs4V/2pLY3JKinPQWwtQiKySUfUnlmqsGPeaHJFg4hkB6gU3zy+YBZcKn8jsp+bIEe+xu4Dlw
+ 8+3dsLW8KJHP18n3YHymN8KhWfCxFUx4wML3Wd2w2BsLbJc0j53cf3GNVwN3tRRzWhM+zmEUD
+ JMIAJuGKeeuU4H7J/gOT4o/F6//D86r20C5qYEvGkl6xzBrCoxOE3IH1YbZTXNqUy6i7xOE1+
+ htjc2bybrtu0giSy81/YKsCWdd/yHJ7R6hkorBOPyZgugPsCuyDb10j3ahsQkFakyGty5G9Wp
+ f/20uvwyIxPQ4DWMj8oKOjOeq8nhYf84PI+0atSPKHMMtwa1H0d8PODukITAalHbkMJCZWY00
+ xCqtWdlkgh06deVFWhM8dWv9ezboj87Mip///2iKmT0PzrMFvsM03j077WRtdAaJTGWeKFmWf
+ t5wCTpRXiHrGx9KjfT1ppNNo0cxenERzqq7bCQpTyTvF44AZZU=
+Received-SPF: none client-ip=212.227.126.130; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 12:55:24
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 13:30:42
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
 X-Spam_score_int: -18
 X-Spam_score: -1.9
 X-Spam_bar: -
@@ -128,61 +127,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Jia Liu <proljc@gmail.com>, qemu-trivial@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, 1874073@bugs.launchpad.net,
- Christophe de Dinechin <dinechin@redhat.com>,
- Stafford Horne <shorne@gmail.com>
+Cc: qemu-trivial@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
+ qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>,
+ Eric Auger <eric.auger@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20200609174409.0L6vY2eiednYvdvl9BDsf3o7lDS1jurHH5TYJlFSdUY@z>
 
-Le 08/06/2020 à 18:06, Philippe Mathieu-Daudé a écrit :
-> When compiling with GCC 10 (Fedora 32) using CFLAGS=-O2 we get:
+Le 09/06/2020 à 19:33, Alex Williamson a écrit :
+> On Tue, 9 Jun 2020 19:23:32 +0200
+> Laurent Vivier <laurent@vivier.eu> wrote:
 > 
->     CC      or1k-softmmu/hw/openrisc/openrisc_sim.o
->   hw/openrisc/openrisc_sim.c: In function ‘openrisc_sim_init’:
->   hw/openrisc/openrisc_sim.c:87:42: error: ‘cpu_irqs[0]’ may be used uninitialized in this function [-Werror=maybe-uninitialized]
->      87 |         sysbus_connect_irq(s, i, cpu_irqs[i][irq_pin]);
->         |                                  ~~~~~~~~^~~
+>> Le 27/05/2020 à 17:55, Philippe Mathieu-Daudé a écrit :
+>>> One might want to check which IOMMU version the host kernel
+>>> provide. Add a trace event to see in which mode we opened
+>>> our container.
+>>>
+>>> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+>>> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>>> ---
+>>> v2: Only display string description (Eric)
+>>>
+>>> Supersedes: <20200526173542.28710-1-philmd@redhat.com>
+>>> ---
+>>>  hw/vfio/common.c     | 19 ++++++++++++++-----
+>>>  hw/vfio/trace-events |  1 +
+>>>  2 files changed, 15 insertions(+), 5 deletions(-)
+>>>
+>>> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+>>> index 0b3593b3c0..f24450472e 100644
+>>> --- a/hw/vfio/common.c
+>>> +++ b/hw/vfio/common.c
+>>> @@ -1157,15 +1157,24 @@ static void vfio_put_address_space(VFIOAddressSpace *space)
+>>>  static int vfio_get_iommu_type(VFIOContainer *container,
+>>>                                 Error **errp)
+>>>  {
+>>> -    int iommu_types[] = { VFIO_TYPE1v2_IOMMU, VFIO_TYPE1_IOMMU,
+>>> -                          VFIO_SPAPR_TCE_v2_IOMMU, VFIO_SPAPR_TCE_IOMMU };
+>>> +    static const struct {
+>>> +        int type;
+>>> +        const char *name;
+>>> +    } iommu[] = {
+>>> +        {VFIO_TYPE1v2_IOMMU, "Type1 (v2)"},
+>>> +        {VFIO_TYPE1_IOMMU, "Type1 (v1)"},
+>>> +        {VFIO_SPAPR_TCE_v2_IOMMU, "sPAPR TCE (v2)"},
+>>> +        {VFIO_SPAPR_TCE_IOMMU, "sPAPR TCE (v1)"}
+>>> +    };
+>>>      int i;
+>>>  
+>>> -    for (i = 0; i < ARRAY_SIZE(iommu_types); i++) {
+>>> -        if (ioctl(container->fd, VFIO_CHECK_EXTENSION, iommu_types[i])) {
+>>> -            return iommu_types[i];
+>>> +    for (i = 0; i < ARRAY_SIZE(iommu); i++) {
+>>> +        if (ioctl(container->fd, VFIO_CHECK_EXTENSION, iommu[i].type)) {
+>>> +            trace_vfio_get_iommu_type(iommu[i].name);
+>>> +            return iommu[i].type;
+>>>          }
+>>>      }
+>>> +    trace_vfio_get_iommu_type("Not available or not supported");
+>>>      error_setg(errp, "No available IOMMU models");
+>>>      return -EINVAL;
+>>>  }
+>>> diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
+>>> index b1ef55a33f..d3f1e48618 100644
+>>> --- a/hw/vfio/trace-events
+>>> +++ b/hw/vfio/trace-events
+>>> @@ -115,6 +115,7 @@ vfio_region_sparse_mmap_header(const char *name, int index, int nr_areas) "Devic
+>>>  vfio_region_sparse_mmap_entry(int i, unsigned long start, unsigned long end) "sparse entry %d [0x%lx - 0x%lx]"
+>>>  vfio_get_dev_region(const char *name, int index, uint32_t type, uint32_t subtype) "%s index %d, %08x/%0x8"
+>>>  vfio_dma_unmap_overflow_workaround(void) ""
+>>> +vfio_get_iommu_type(const char *type) "IOMMU type: %s"
+>>>  
+>>>  # platform.c
+>>>  vfio_platform_base_device_init(char *name, int groupid) "%s belongs to group #%d"
+>>>   
+>>
+>> Applied to my trivial-patches branch.
 > 
-> While humans can tell smp_cpus will always be in the [1, 2] range,
-> (openrisc_sim_machine_init sets mc->max_cpus = 2), the compiler
-> can't.
+> I was not actually a fan of this patch:
 > 
-> Add an assertion to give the compiler a hint there's no use of
-> uninitialized data.
-> 
-> Buglink: https://bugs.launchpad.net/qemu/+bug/1874073
-> Reported-by: Martin Liška <mliska@suse.cz>
-> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> Tested-by: Eric Blake <eblake@redhat.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
-> v2: Fixed typo in subject (eblake)
-> Supersedes: <20200608071409.17024-1-philmd@redhat.com>
-> ---
->  hw/openrisc/openrisc_sim.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/hw/openrisc/openrisc_sim.c b/hw/openrisc/openrisc_sim.c
-> index d08ce61811..02f5259e5e 100644
-> --- a/hw/openrisc/openrisc_sim.c
-> +++ b/hw/openrisc/openrisc_sim.c
-> @@ -134,6 +134,7 @@ static void openrisc_sim_init(MachineState *machine)
->      int n;
->      unsigned int smp_cpus = machine->smp.cpus;
->  
-> +    assert(smp_cpus >= 1 && smp_cpus <= 2);
->      for (n = 0; n < smp_cpus; n++) {
->          cpu = OPENRISC_CPU(cpu_create(machine->cpu_type));
->          if (cpu == NULL) {
+> https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg08144.html
+
+I missed it as v1 was not sent to qemu-trivial.
+
+> I don't think the convenience to the trace user to avoid looking up the
+> type string in the header is worth the bloat to the non-trace user to
+> declare these strings in the code.  Thanks,
 > 
 
-Applied to my trivial-patches branch.
+Understood. Removed.
 
 Thanks,
 Laurent
