@@ -2,92 +2,88 @@ Return-Path: <SRS0=hUBF=7W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F319C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 16:30:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 322FBC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 16:32:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5818520734
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 16:30:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F381320774
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 16:32:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jw8PR3y9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5818520734
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rP9R+JOM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F381320774
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38108 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41216 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jih9A-0008PO-Dq
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 12:30:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47074)
+	id 1jihAf-0001Tm-6G
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 12:32:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47448)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jih3t-0000Du-3I
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 12:25:17 -0400
-Received: from mail-pj1-x1030.google.com ([2607:f8b0:4864:20::1030]:36650)
+ (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
+ id 1jih7E-0005v3-Fu
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 12:28:44 -0400
+Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:39461)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jih3r-0000UM-TQ
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 12:25:16 -0400
-Received: by mail-pj1-x1030.google.com with SMTP id q24so1631475pjd.1
- for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 09:25:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=+utQoTLUzPPlGyk84vqSkSI1IEc8oNkKhMpAe11BE/0=;
- b=jw8PR3y9V5Xa/5bOnmXERg83JB6cjNV7kFHAJFLnzvWme9G0vNky5sZt3Fp13J7JTt
- OcOmPN9/j37LxDedFOfKeBtKzGqDAv8FLl6AG8y5KRHwI5vv6qwE54Y+kwDx4l9f2Mw7
- bk06ot5r7NywCoakswwjaygPlKi9gHGk8FUvrGfoTKSlDNCRDF8b6wbGyRtUVOoRqtnv
- GNMTVoc+zIIphz692L1n7iWhsZMxmIxdJkgTPMfv0Gi+gKgNw7XZ7xbr+NUbtZZ1Mp0G
- 2OoQcLA8D+/1IXAv4ArYq6zqpE8Kw1BUzprxuT8xabjfJnR367sivimud9Hw2u+YP1jb
- 8TnQ==
+ (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
+ id 1jih7D-000171-CD
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 12:28:44 -0400
+Received: by mail-wr1-x42c.google.com with SMTP id t18so22032167wru.6
+ for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 09:28:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=GR4eimU9t63Pw1mCFxbwUNXUU4YvTN5YihjHWjA0XDI=;
+ b=rP9R+JOM9hBsPI90mXZwxxnd1UTkAWwSs/sAPHPmvqu3uWrX67D8VlVICpvWufCA4b
+ GXNCBg8Jk6SC4FbqLGhlaKhUCr1x2ULItpIIK/fUVYYnVr0fwsBZBqaq+JcdueD6gJqp
+ t0yeA3M0cvMIJ2DEc79hcqf0kIm3ddW0ywhNYbR049ZmS19AMDlv+Gjylz+1G7KAvfMp
+ TBxowUdTsTLV2Oj4Fd+082+3Ye1/nlC2zTLD1Af7R689kchqLOsUN8T96e7gTZ80DrgA
+ +MlDQN3tK58kcwALNsNF3kzywqarBkwzmNBzvrEPmVQDh+rtOlaYdS6EXZeETovr92QL
+ gluw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=+utQoTLUzPPlGyk84vqSkSI1IEc8oNkKhMpAe11BE/0=;
- b=jiclsF0aRx7JgymGaVCfCcJD09SdU2TzvOABdx7Gm0h7E3m5Wg01DqWMUe348j3J3N
- c7ueiQ0S4/hxnet9D80snuYgcixtLUbyDdxkd1cI5DxusWf0iDtnO4OI628Mje+KHQYD
- WjlAFd1IiJvYI/gmzuzzME4dNWUETD4ILHGlCkR5gBDCwHGOpXWWsje2d7s7bsGuHLs9
- gROq1/7/e+9acn9XqoCOa5/phkkb8ra9OaL90HMUoiCnfr+Y6WOiqqqN9T7NZCOCMQIK
- TQt6eHlXLNKt6KzA0ZVeII0Atarwmg1T0DzPN2DPDqrx0eEugmryu2yblmgaDkURIF3r
- QV3g==
-X-Gm-Message-State: AOAM532fhzc/Ysa9sjqf67I3UU2Vbt0QNfvojHxBHssacU4ICo8BcBzT
- RoVD/FRp2JsB7+iPLcEonFaLGLUJNe0=
-X-Google-Smtp-Source: ABdhPJweCWnTfVydovZvUnqI1fQE9UWElrlIlThsZr6d/oqoGyK9fSUs8QWCvnvtznDEFaRu83/yoA==
-X-Received: by 2002:a17:90a:64cb:: with SMTP id
- i11mr5782251pjm.193.1591719914045; 
- Tue, 09 Jun 2020 09:25:14 -0700 (PDT)
-Received: from localhost.localdomain (174-21-143-238.tukw.qwest.net.
- [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id s188sm7580101pfb.118.2020.06.09.09.25.13
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 09 Jun 2020 09:25:13 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PULL 6/9] decodetree: Implement non-overlapping groups
-Date: Tue,  9 Jun 2020 09:25:01 -0700
-Message-Id: <20200609162504.780080-7-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200609162504.780080-1-richard.henderson@linaro.org>
-References: <20200609162504.780080-1-richard.henderson@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1030;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1030.google.com
+ :references;
+ bh=GR4eimU9t63Pw1mCFxbwUNXUU4YvTN5YihjHWjA0XDI=;
+ b=KKeNHtbePSKK7d1jyL7O6FJmxclzWz79soyjBA5B9MswWvr1nyINc0p6C1T19JEi38
+ 9PNH9IIbO5R8hVpxg8iMdG6OU45bGp+jd6Pq5g8Io8lJWsrJ/n3BqTBUEftSoJNxihHy
+ JFPvZaRy5Js9FBWCk74Mxg3IF0WAsLQ/IHX4+crstz7KSXen+2r5yZy105ZR/DGebkSf
+ bMBSuBK6btJ6jRrgRr3YATMDUKI/2TS3ND92jFeJavkXU95Ino/WHWLZASYu/4ExcKPB
+ WylSv8Emn1eIyQDE+o/J8OEZ/bWzIutyLvKTRE4yfE4nAruQSwjOWvpqXwA+7PLkwNeG
+ jxYw==
+X-Gm-Message-State: AOAM533LSGN0+tVd6vxd1xbdYMvwETPZB5qkUMAz+1I1hTx0TjTwFja/
+ +qu5ywcA+8QNw6vhwUyZpS9l4rGN
+X-Google-Smtp-Source: ABdhPJwqzHiJJnj6SomA9HzcA/dc+yZ0jm3i+3wWu5EU2n4hZ/Sd7mOwrhoU9nVJZpKi33cg1GPXgA==
+X-Received: by 2002:adf:fe8d:: with SMTP id l13mr5216035wrr.282.1591720121886; 
+ Tue, 09 Jun 2020 09:28:41 -0700 (PDT)
+Received: from rtrkw774-lin.syrmia.com ([46.240.135.226])
+ by smtp.gmail.com with ESMTPSA id 23sm3643598wmo.18.2020.06.09.09.28.41
+ (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+ Tue, 09 Jun 2020 09:28:41 -0700 (PDT)
+From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+To: qemu-devel@nongnu.org,
+	peter.maydell@linaro.org
+Subject: [PULL 03/20] target/mips: fpu: Demacro ADD.<D|S|PS>
+Date: Tue,  9 Jun 2020 18:28:21 +0200
+Message-Id: <1591720118-7378-4-git-send-email-aleksandar.qemu.devel@gmail.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1591720118-7378-1-git-send-email-aleksandar.qemu.devel@gmail.com>
+References: <1591720118-7378-1-git-send-email-aleksandar.qemu.devel@gmail.com>
+Received-SPF: pass client-ip=2a00:1450:4864:20::42c;
+ envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wr1-x42c.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
@@ -102,77 +98,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: aleksandar.qemu.devel@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Intended to be nested within overlapping groups.
+This is just a cosmetic change to enable tools like gcov, gdb,
+callgrind, etc. to better display involved source code.
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Suggested-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
+Signed-off-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Message-Id: <20200518200920.17344-2-aleksandar.qemu.devel@gmail.com>
 ---
- scripts/decodetree.py | 18 ++++++++++++++----
- 1 file changed, 14 insertions(+), 4 deletions(-)
+ target/mips/fpu_helper.c | 38 +++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 37 insertions(+), 1 deletion(-)
 
-diff --git a/scripts/decodetree.py b/scripts/decodetree.py
-index 0ba01e049c..7e3b1d1399 100755
---- a/scripts/decodetree.py
-+++ b/scripts/decodetree.py
-@@ -1021,16 +1021,20 @@ def parse_file(f, parent_pat):
-         del toks[0]
+diff --git a/target/mips/fpu_helper.c b/target/mips/fpu_helper.c
+index 5287c86..984f3f4 100644
+--- a/target/mips/fpu_helper.c
++++ b/target/mips/fpu_helper.c
+@@ -1208,12 +1208,48 @@ uint64_t helper_float_ ## name ## _ps(CPUMIPSState *env,           \
+     return ((uint64_t)wth2 << 32) | wt2;                           \
+ }
  
-         # End nesting?
--        if name == '}':
-+        if name == '}' or name == ']':
-             if len(toks) != 0:
-                 error(start_lineno, 'extra tokens after close brace')
-             if len(parent_pat.pats) < 2:
-                 error(lineno, 'less than two patterns within braces')
+-FLOAT_BINOP(add)
+ FLOAT_BINOP(sub)
+ FLOAT_BINOP(mul)
+ FLOAT_BINOP(div)
+ #undef FLOAT_BINOP
  
-+            # Make sure { } and [ ] nest properly.
-+            if (name == '}') != isinstance(parent_pat, IncMultiPattern):
-+                error(lineno, 'mismatched close brace')
++uint64_t helper_float_add_d(CPUMIPSState *env,
++                            uint64_t fdt0, uint64_t fdt1)
++{
++    uint64_t dt2;
 +
-             try:
-                 parent_pat = nesting_pats.pop()
-             except:
--                error(lineno, 'mismatched close brace')
-+                error(lineno, 'extra close brace')
- 
-             nesting -= 2
-             if indent != nesting:
-@@ -1044,11 +1048,14 @@ def parse_file(f, parent_pat):
-             error(start_lineno, 'indentation ', indent, ' != ', nesting)
- 
-         # Start nesting?
--        if name == '{':
-+        if name == '{' or name == '[':
-             if len(toks) != 0:
-                 error(start_lineno, 'extra tokens after open brace')
- 
--            nested_pat = IncMultiPattern(start_lineno)
-+            if name == '{':
-+                nested_pat = IncMultiPattern(start_lineno)
-+            else:
-+                nested_pat = ExcMultiPattern(start_lineno)
-             parent_pat.pats.append(nested_pat)
-             nesting_pats.append(parent_pat)
-             parent_pat = nested_pat
-@@ -1067,6 +1074,9 @@ def parse_file(f, parent_pat):
-         else:
-             parse_generic(start_lineno, parent_pat, name, toks)
-         toks = []
++    dt2 = float64_add(fdt0, fdt1, &env->active_fpu.fp_status);
++    update_fcr31(env, GETPC());
++    return dt2;
++}
 +
-+    if nesting != 0:
-+        error(lineno, 'missing close brace')
- # end parse_file
- 
- 
++uint32_t helper_float_add_s(CPUMIPSState *env,
++                            uint32_t fst0, uint32_t fst1)
++{
++    uint32_t wt2;
++
++    wt2 = float32_sub(fst0, fst1, &env->active_fpu.fp_status);
++    update_fcr31(env, GETPC());
++    return wt2;
++}
++
++uint64_t helper_float_add_ps(CPUMIPSState *env,
++                             uint64_t fdt0, uint64_t fdt1)
++{
++    uint32_t fstl0 = fdt0 & 0XFFFFFFFF;
++    uint32_t fsth0 = fdt0 >> 32;
++    uint32_t fstl1 = fdt1 & 0XFFFFFFFF;
++    uint32_t fsth1 = fdt1 >> 32;
++    uint32_t wtl2;
++    uint32_t wth2;
++
++    wtl2 = float32_add(fstl0, fstl1, &env->active_fpu.fp_status);
++    wth2 = float32_add(fsth0, fsth1, &env->active_fpu.fp_status);
++    update_fcr31(env, GETPC());
++    return ((uint64_t)wth2 << 32) | wtl2;
++}
++
++
+ /* MIPS specific binary operations */
+ uint64_t helper_float_recip2_d(CPUMIPSState *env, uint64_t fdt0, uint64_t fdt2)
+ {
 -- 
-2.25.1
+2.7.4
 
 
