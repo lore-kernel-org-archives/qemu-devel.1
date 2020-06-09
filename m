@@ -7,71 +7,71 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0702C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 07:40:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1856EC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 07:40:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8AF0A2074B
+	by mail.kernel.org (Postfix) with ESMTPS id D67D92074B
 	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 07:40:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="t3HhdleI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8AF0A2074B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OkkIasPx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D67D92074B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48448 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48380 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jiYsI-0008Fv-OZ
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 03:40:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40346)
+	id 1jiYsJ-0008E6-3S
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 03:40:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40326)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jiYkL-0004BE-6p
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 03:32:33 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:37157)
+ id 1jiYkE-00047a-P1
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 03:32:27 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:44761)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jiYkK-0007Xb-7V
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 03:32:32 -0400
-Received: by mail-wr1-x443.google.com with SMTP id x13so20071689wrv.4
- for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 00:32:31 -0700 (PDT)
+ id 1jiYkE-0007X4-0T
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 03:32:26 -0400
+Received: by mail-wr1-x444.google.com with SMTP id y17so20042419wrn.11
+ for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 00:32:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=BKwzKZtrbxU02j73ueEcyHllddh/ol1Dq+AGgYyiyJs=;
- b=t3HhdleIImJBA0xMLGx7YL3FR2NxtWCDWJ1qFSCsxOwINNeOjndksMM5sBWoeLJMxa
- nclJnQ62hikK3rX7dD1QTF+ZFkMhFhTSoPRrgtaM/wcDP2q2PBjXO5Ek+ndYrbK6kkvD
- 5GFxB6bNUSeusPEi97pqCyehrGPUOZQ1ARxzoc2PXEOsZd+5fHTkszm1GujOathvaCvI
- LiN94VIKb0BOtgFOcfCDXZ3YJNZFSFOaZ90RyYM6giEBkiWp+IJffPLQbBY2duUSARdV
- brmehWTQHtBLPO31gsIvKZWhjfv529OTA3DHskxKwTNIdcadfDGC+h5B+ZvAa8UwUd2c
- WITA==
+ bh=7SiSsVqqUtOR4NW9TEB36YXYjOxJiCE5fvC4CDj0Z7M=;
+ b=OkkIasPxUwE1Fr++rG+KrYibi+e+Su1wqh88cWuquIusPPTMw112BDDjOS47EdUBAB
+ Cd/xnjAJflUyYAl5IKP7OT/D+t/0uyhwtiQ3hEa8rQkSruavCioS91kB1xeLd2wP2vS5
+ VSKSrJX+ilNhtSTN1R1XS88gzJgavyl4xthp842L70QyPw84IbvONgAjdS21ESnElo5M
+ LYcONH0SvwBz18x9xSNlFAftTvi+2rH0KN/ZGQJCWDC7pyAZev1u3fQgFlEJR/KoZLZv
+ pdN4KLbye0yR0optY2hxJlGw2fz/FzocbqzQtKCch6WEMwmcrsjSYGLjJGVH8Axj+NdN
+ UgRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=BKwzKZtrbxU02j73ueEcyHllddh/ol1Dq+AGgYyiyJs=;
- b=AH71V84Asrau4JuQfZ0LI23inMzVKIAr5+ddgyIQXDcFqPznm96VCGoPAcl0JUt0rk
- 6PA0IKalya8Ai9Wey595pP/i+5iiwjZ9ub2bbkGdqJb9Q67K3e8nkG89uV7ZsTCOcjKd
- ajCjuXupJ5Yzfc9sRbccg1d6v8nYUzXNz1cOQgCebvQvH3RO5q55kgBEOCyCVQ03bGJp
- iH54wKf03yW0zhhXKVmM5fFesUW4A8V2/u2IzlSpeodkoSw3JAKPPnSS6OHvkgBaUpDT
- FkUlY8CcRKg5naoKvV0D7iAxLuLVsfG6bCE35SIt5ZgrjzcYL8TtFfCGCYeLYNP4Ry1K
- 5wgQ==
-X-Gm-Message-State: AOAM532VKEIR6cU7VA1y69vB34jGtaCV2bBula8O3TcKPXK3t8K5mjvq
- 8ecKqgXi7PO6mdia+m8w3eZ+hST1
-X-Google-Smtp-Source: ABdhPJxPyA+960c94CGmRIQcTTddtKuPFlnmmzmpQNg/tnzGht2WMYg+gQm6RwqVBteTcit9id/7ew==
-X-Received: by 2002:a5d:4e88:: with SMTP id e8mr3022757wru.188.1591687950134; 
- Tue, 09 Jun 2020 00:32:30 -0700 (PDT)
+ bh=7SiSsVqqUtOR4NW9TEB36YXYjOxJiCE5fvC4CDj0Z7M=;
+ b=IGAZsMul7IRVhTlgwYun8V0CFHPZn3EgyE8YaNbsQtG373Mg56mNMDtdfb+9/w/bYy
+ Hi8kMy++tEPMR0VQ8S8ycB9b8m/67lJFzzkQFvi4k/tS+mI22oUi8JWNMZLFmlxn/CMv
+ ZnWqebe+38yuPVq3gZJX60fwVwRUhRUmPiLT6nRQjTM07oSPaQxYqsNVPl/tnPP1DrCh
+ nZRXHZ98GiVhK+H9rgsLwbXdqVSk5H/GfM3HkBw23tp8OeMtrZydyiXj1i5pbDL+E+Fx
+ L3V0EmriyRHvNF0YI/gJ9utz7Y819xKu+t1K3Jl1s9LV7QkzyGK+S0URuavwm8XvntSS
+ N4Qg==
+X-Gm-Message-State: AOAM530m2uLHo6t1wckDgB2Gvq4CHlnw6OTjLZgoAuzHRDryK5IU/TNZ
+ F92np5OnEhW9ma5/hJzkPO/Tg1q3
+X-Google-Smtp-Source: ABdhPJyMzIv1YTU/vR52wY5ROwsN/rjadEnOpJTbZUo//y4GSjsC1RFZfnhL2bFNtk0MIwk7bpzUoQ==
+X-Received: by 2002:a5d:4042:: with SMTP id w2mr2989322wrp.423.1591687944359; 
+ Tue, 09 Jun 2020 00:32:24 -0700 (PDT)
 Received: from localhost.localdomain
  (181.red-88-10-103.dynamicip.rima-tde.net. [88.10.103.181])
- by smtp.gmail.com with ESMTPSA id m3sm2036192wmc.0.2020.06.09.00.32.29
+ by smtp.gmail.com with ESMTPSA id m3sm2036192wmc.0.2020.06.09.00.32.23
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 09 Jun 2020 00:32:29 -0700 (PDT)
+ Tue, 09 Jun 2020 00:32:23 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 12/16] hw/misc/grlib_ahb_apb_pnp: Fix AHB PnP 8-bit accesses
-Date: Tue,  9 Jun 2020 09:32:10 +0200
-Message-Id: <20200609073214.14079-13-f4bug@amsat.org>
+Subject: [PULL 07/16] hw/misc/empty_slot: Name the slots when created
+Date: Tue,  9 Jun 2020 09:32:05 +0200
+Message-Id: <20200609073214.14079-8-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200609073214.14079-1-f4bug@amsat.org>
 References: <20200609073214.14079-1-f4bug@amsat.org>
@@ -79,8 +79,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -116,44 +116,92 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The Plug & Play region of the AHB/APB bridge can be accessed
-by various word size, however the implementation is clearly
-restricted to 32-bit:
-
-  static uint64_t grlib_ahb_pnp_read(void *opaque, hwaddr offset, unsigned size)
-  {
-      AHBPnp *ahb_pnp = GRLIB_AHB_PNP(opaque);
-
-      return ahb_pnp->regs[offset >> 2];
-  }
-
-Similarly to commit 0fbe394a64 with the APB PnP registers,
-set the MemoryRegionOps::impl min/max fields to 32-bit, so
-memory.c::access_with_adjusted_size() can adjust when the
-access is not 32-bit.
+Directly set the slot name when creating the device,
+to display the device name in trace events.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: KONRAD Frederic <frederic.konrad@adacore.com>
-Message-Id: <20200331105048.27989-4-f4bug@amsat.org>
+Acked-by: Artyom Tarasenko <atar4qemu@gmail.com>
+Message-Id: <20200510152840.13558-8-f4bug@amsat.org>
 ---
- hw/misc/grlib_ahb_apb_pnp.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ include/hw/misc/empty_slot.h |  2 +-
+ hw/mips/malta.c              |  2 +-
+ hw/misc/empty_slot.c         |  2 +-
+ hw/sparc/sun4m.c             | 10 +++++++---
+ 4 files changed, 10 insertions(+), 6 deletions(-)
 
-diff --git a/hw/misc/grlib_ahb_apb_pnp.c b/hw/misc/grlib_ahb_apb_pnp.c
-index 72a8764776..d22ed00206 100644
---- a/hw/misc/grlib_ahb_apb_pnp.c
-+++ b/hw/misc/grlib_ahb_apb_pnp.c
-@@ -146,6 +146,10 @@ static const MemoryRegionOps grlib_ahb_pnp_ops = {
-     .read       = grlib_ahb_pnp_read,
-     .write      = grlib_ahb_pnp_write,
-     .endianness = DEVICE_BIG_ENDIAN,
-+    .impl = {
-+        .min_access_size = 4,
-+        .max_access_size = 4,
-+    },
+diff --git a/include/hw/misc/empty_slot.h b/include/hw/misc/empty_slot.h
+index b023bc2d91..dec56e56ae 100644
+--- a/include/hw/misc/empty_slot.h
++++ b/include/hw/misc/empty_slot.h
+@@ -14,6 +14,6 @@
+ 
+ #include "exec/hwaddr.h"
+ 
+-void empty_slot_init(hwaddr addr, uint64_t slot_size);
++void empty_slot_init(const char *name, hwaddr addr, uint64_t slot_size);
+ 
+ #endif
+diff --git a/hw/mips/malta.c b/hw/mips/malta.c
+index c973c76b2a..62063b2305 100644
+--- a/hw/mips/malta.c
++++ b/hw/mips/malta.c
+@@ -1241,7 +1241,7 @@ void mips_malta_init(MachineState *machine)
+      * exception when accessing invalid memory. Create an empty slot to
+      * emulate this feature.
+      */
+-    empty_slot_init(0, 0x20000000);
++    empty_slot_init("GT64120", 0, 0x20000000);
+ 
+     qdev_init_nofail(dev);
+ 
+diff --git a/hw/misc/empty_slot.c b/hw/misc/empty_slot.c
+index 54be085189..b568ae202b 100644
+--- a/hw/misc/empty_slot.c
++++ b/hw/misc/empty_slot.c
+@@ -50,7 +50,7 @@ static const MemoryRegionOps empty_slot_ops = {
+     .endianness = DEVICE_NATIVE_ENDIAN,
  };
  
- static void grlib_ahb_pnp_realize(DeviceState *dev, Error **errp)
+-void empty_slot_init(hwaddr addr, uint64_t slot_size)
++void empty_slot_init(const char *name, hwaddr addr, uint64_t slot_size)
+ {
+     if (slot_size > 0) {
+         /* Only empty slots larger than 0 byte need handling. */
+diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
+index a16e667bee..249f7ba7ea 100644
+--- a/hw/sparc/sun4m.c
++++ b/hw/sparc/sun4m.c
+@@ -884,7 +884,8 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hwdef,
+ 
+     /* models without ECC don't trap when missing ram is accessed */
+     if (!hwdef->ecc_base) {
+-        empty_slot_init(machine->ram_size, hwdef->max_mem - machine->ram_size);
++        empty_slot_init("ecc", machine->ram_size,
++                        hwdef->max_mem - machine->ram_size);
+     }
+ 
+     prom_init(hwdef->slavio_base, bios_name);
+@@ -915,7 +916,8 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hwdef,
+            Software shouldn't use aliased addresses, neither should it crash
+            when does. Using empty_slot instead of aliasing can help with
+            debugging such accesses */
+-        empty_slot_init(hwdef->iommu_pad_base,hwdef->iommu_pad_len);
++        empty_slot_init("iommu.alias",
++                        hwdef->iommu_pad_base, hwdef->iommu_pad_len);
+     }
+ 
+     sparc32_dma_init(hwdef->dma_base,
+@@ -964,7 +966,9 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hwdef,
+     for (i = 0; i < MAX_VSIMMS; i++) {
+         /* vsimm registers probed by OBP */
+         if (hwdef->vsimm[i].reg_base) {
+-            empty_slot_init(hwdef->vsimm[i].reg_base, 0x2000);
++            char *name = g_strdup_printf("vsimm[%d]", i);
++            empty_slot_init(name, hwdef->vsimm[i].reg_base, 0x2000);
++            g_free(name);
+         }
+     }
+ 
 -- 
 2.21.3
 
