@@ -6,35 +6,36 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCCB4C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 17:46:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B273C433E3
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 17:46:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A5E702081A
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 17:46:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5E702081A
+	by mail.kernel.org (Postfix) with ESMTPS id E89022081A
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 17:46:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E89022081A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59064 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59232 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jiiKF-00061m-TY
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 13:46:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54192)
+	id 1jiiKL-00065r-5v
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 13:46:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53906)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1jii0g-0004o4-2Q; Tue, 09 Jun 2020 13:26:02 -0400
-Received: from mout.kundenserver.de ([212.227.126.131]:40265)
+ id 1jihyN-0000y4-K6; Tue, 09 Jun 2020 13:23:39 -0400
+Received: from mout.kundenserver.de ([212.227.126.133]:42999)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1jii0f-0002y2-1L; Tue, 09 Jun 2020 13:26:01 -0400
+ id 1jihyM-0002b2-Ir; Tue, 09 Jun 2020 13:23:39 -0400
 Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
- (mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MUl4z-1jZbL02AYD-00QjmD; Tue, 09 Jun 2020 19:25:55 +0200
-Subject: Re: [PATCH] qemu-img: Fix doc typo for 'bitmap' subcommand
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-References: <20200529144527.1943527-1-eblake@redhat.com>
+ (mreue010 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MEFjJ-1jqA64230f-00AGpo; Tue, 09 Jun 2020 19:23:33 +0200
+Subject: Re: [PATCH v2] hw/vfio/common: Trace in which mode an IOMMU is opened
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20200527155555.6833-1-philmd@redhat.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -78,35 +79,35 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <11d6990d-71aa-5495-217d-f0806c39a811@vivier.eu>
-Date: Tue, 9 Jun 2020 19:25:54 +0200
+Message-ID: <b687dd06-490d-dde9-53cc-aa05f38f769e@vivier.eu>
+Date: Tue, 9 Jun 2020 19:23:32 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200529144527.1943527-1-eblake@redhat.com>
+In-Reply-To: <20200527155555.6833-1-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:eESDsXXbtitpSFvAHFX5Jpn+5sznkW2vdK3H6CmpHePAuCYntMB
- 3D6SxuvJCgS6Wz+5Ksnehzd4M3DstEg0d54+gAvalYoieZr5IbFNcQLJ7pdBKt38TAzZMmX
- sjJM74SqgF9BgfUamh+p5K5ie/pfO3B2M/9UnO74QzaaUffIKm4oj+sWCD3m0AIbqefw79s
- wLR3sNcS7QjI4p6ZEIQwA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:74+CmZhgS94=:xQQu/ao5H/aMRIU+xMzBWr
- zONYgfUrtGw341SD1AXD36WUV9NmM4aiOwCca0BAdgsotLTvy/Ky/d04VxyCLMC3SRjJdn/Cv
- XDbLO/AgPtuVFbufI3ic+NlGDJXakZ8zfYy32WMpsFkvmOrP8IuVicPfl09igNriDUdOK7aAN
- 06otSjLIcDYfomSZGvb70Hh/wtGxMXZnq+o0YsYWIp3VQ1YBiwRzqBMKiHva8/O/o5CVs4cu7
- VUkcHYm79GCB0Bn/h2k0sIUSfkmgTUUhbWkqRN/Y06SYBTOvvGct083bs8AZqJnIp9DezmKD5
- WrMfO5dYvtXSL3ho3ToA8dSmRsGgACKLNf813xABlvgQ6/H7qedvpwVlB5qF4phM0TaPyleTB
- JQRA2XlxspxzjBCldpMnz/LHxUucXDIEWU6KAlclu9pidXYj8nc1TlUXM3GIURO/rWiolKcH6
- OH5CUZOT7PtdyslplWQarPalFNbubeiAjuVes+Xk3LzEq/u6oDrvEZqnPBmFrzUKAed/Rgh3+
- zm4rFnJZ4yBcT1PwKKXqJqM1UwhyXbXdE1ZZqZVaEZ9lXBOHHoDBDi/Ffg2KdveXjWNJktB50
- +ze8fC1D3U9JBUS55G4cu1NgUx/uAw2tnPnyT2nifsMZxeZIZvhnO95jSpFMVgFvk3ddF0jDC
- 10qarRm0pSKdDm+l7PoIfH/5wCIHwuuIm+OvxwnJQ9lcu/7WPewQsz7/9uuyeWLqGyEmZjOki
- IUi8loyDMRfMNiHLlh2dmJ5MIxiDaCMroMVU/cZCBc3y0GK0EtD67P8FZ9i9ZmLExznoTRLOa
- Ji3He+GdFu7q9xXWxyZTCbpm1gBESiqVjbCNC2HUMSCf5+eMWD2jSzjeR77J2S/Y9OUBSwm
-Received-SPF: none client-ip=212.227.126.131; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:vOC4ITaWNUpt1bVjt7zdlzwn3lgqIEqvuu9BaD/qFZMQll7fMep
+ ho0hjFdyeUJiAq8HrtgzFEgKajvB5cY7eTV4etNaXsc+Eu08+7dTH09YxbJpVehUq1Ij+kL
+ BWnIn4AOIzI3DexAl85FqAsziLxFwdYjKTqKxVnaEIa9od+CtKBTunodX+u3srFyYAk6sY1
+ 6T9bvJLRA5VNF5fZEVxJw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:g3b054NRtkY=:tVb0Q7lw2g4u8WvgnqTgYS
+ SYn0J7F95RWFF7WlRB2pDt2udDukXOfYDZwnyLjsrdhZX7vIc41db73jJZALdjm4fSkIvdsdZ
+ +sJoqeTunC9FeVn7XRTceB1pENb8Tod2IoRJQQHxtB0cTXt0YtWM0zAKVTSwjgqmid3KPV8tH
+ pMNM+ZzBDD+bkLR2sYiXwZMCfA3kNX0abER3SZ3VKvu56VSJ21UrIulgbFTF8EIhkdQmUvOca
+ kj87Kteh+NmvKL2S2DtYINfyUzmzhjfAL0zsd3l6A3gvTCy6ZvDWa1Ss8d0GHZCgKu40Y4wON
+ 586iwrLcEy0QsJ8gw3UFaIYSP8yF6lVHWKN//Q5weGDEvh4Cv5Xo2OoHAVBljvWuFDTRCLaeL
+ MSejOhxTTvrYwCIk7cyEYCisx/wujCY1c2VPOTAXKL4x03Zj1FoUV5x8B+zCXMWErnKA14u4j
+ iIs5BEgHRg85X80vRiY39eYkw9q/37Hf+0CxjiTvXHeJpAT8zE0rxKb2v1OKKsUDflkye7bky
+ GKErXOK0K/C0ipmkOT94FnaUP18nS7bVtD2mde/pDMtG7Lg27cxg1lO/HxZh3WlKKw/dhSmK7
+ zdzNOr9TE+TgfyCqaCK3WUxVrdqJLYyjfyXHQhlWcJ48VkiU7zegsSnGVCI+DG013FmpyZw3K
+ GgpUDCS55BPG/9RfZu5BmJdLvSdohfNMY5+2QkTyVXm1x3Mmfoh6TdRxRKVli0hdI26J4cIUQ
+ 7ZmK3cOkcPVFXGSzD4xsU5OjJFVLypVq+P4H/8BFSm9tFkwU7S4gChV5L9QPuZnsxKgOQ03Pd
+ kY3U34K1/1Lb2Xr4qsKdBvasQZYW2IFWan+NA76GTYdoKm2dNU7TOljxM6iIGcjbgR9QAQS
+Received-SPF: none client-ip=212.227.126.133; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 12:55:24
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 12:51:12
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
@@ -125,40 +126,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, vsementsov@virtuozzo.com, jsnow@redhat.com,
- qemu-block@nongnu.org
+Cc: qemu-trivial@nongnu.org, Eric Auger <eric.auger@redhat.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>, Peter Xu <peterx@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 29/05/2020 à 16:45, Eric Blake a écrit :
-> Prefer a consistent naming for the --merge argument.
+Le 27/05/2020 à 17:55, Philippe Mathieu-Daudé a écrit :
+> One might want to check which IOMMU version the host kernel
+> provide. Add a trace event to see in which mode we opened
+> our container.
 > 
-> Fixes: 3b51ab4bf
-> Signed-off-by: Eric Blake <eblake@redhat.com>
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 > ---
+> v2: Only display string description (Eric)
 > 
-> I'm happy for this to go in through my bitmaps queue or through the
-> trivial tree, whichever picks it up first.
+> Supersedes: <20200526173542.28710-1-philmd@redhat.com>
+> ---
+>  hw/vfio/common.c     | 19 ++++++++++++++-----
+>  hw/vfio/trace-events |  1 +
+>  2 files changed, 15 insertions(+), 5 deletions(-)
 > 
->  docs/tools/qemu-img.rst | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> index 0b3593b3c0..f24450472e 100644
+> --- a/hw/vfio/common.c
+> +++ b/hw/vfio/common.c
+> @@ -1157,15 +1157,24 @@ static void vfio_put_address_space(VFIOAddressSpace *space)
+>  static int vfio_get_iommu_type(VFIOContainer *container,
+>                                 Error **errp)
+>  {
+> -    int iommu_types[] = { VFIO_TYPE1v2_IOMMU, VFIO_TYPE1_IOMMU,
+> -                          VFIO_SPAPR_TCE_v2_IOMMU, VFIO_SPAPR_TCE_IOMMU };
+> +    static const struct {
+> +        int type;
+> +        const char *name;
+> +    } iommu[] = {
+> +        {VFIO_TYPE1v2_IOMMU, "Type1 (v2)"},
+> +        {VFIO_TYPE1_IOMMU, "Type1 (v1)"},
+> +        {VFIO_SPAPR_TCE_v2_IOMMU, "sPAPR TCE (v2)"},
+> +        {VFIO_SPAPR_TCE_IOMMU, "sPAPR TCE (v1)"}
+> +    };
+>      int i;
+>  
+> -    for (i = 0; i < ARRAY_SIZE(iommu_types); i++) {
+> -        if (ioctl(container->fd, VFIO_CHECK_EXTENSION, iommu_types[i])) {
+> -            return iommu_types[i];
+> +    for (i = 0; i < ARRAY_SIZE(iommu); i++) {
+> +        if (ioctl(container->fd, VFIO_CHECK_EXTENSION, iommu[i].type)) {
+> +            trace_vfio_get_iommu_type(iommu[i].name);
+> +            return iommu[i].type;
+>          }
+>      }
+> +    trace_vfio_get_iommu_type("Not available or not supported");
+>      error_setg(errp, "No available IOMMU models");
+>      return -EINVAL;
+>  }
+> diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
+> index b1ef55a33f..d3f1e48618 100644
+> --- a/hw/vfio/trace-events
+> +++ b/hw/vfio/trace-events
+> @@ -115,6 +115,7 @@ vfio_region_sparse_mmap_header(const char *name, int index, int nr_areas) "Devic
+>  vfio_region_sparse_mmap_entry(int i, unsigned long start, unsigned long end) "sparse entry %d [0x%lx - 0x%lx]"
+>  vfio_get_dev_region(const char *name, int index, uint32_t type, uint32_t subtype) "%s index %d, %08x/%0x8"
+>  vfio_dma_unmap_overflow_workaround(void) ""
+> +vfio_get_iommu_type(const char *type) "IOMMU type: %s"
+>  
+>  # platform.c
+>  vfio_platform_base_device_init(char *name, int groupid) "%s belongs to group #%d"
 > 
-> diff --git a/docs/tools/qemu-img.rst b/docs/tools/qemu-img.rst
-> index 69cd9a30373a..7f0737488ade 100644
-> --- a/docs/tools/qemu-img.rst
-> +++ b/docs/tools/qemu-img.rst
-> @@ -300,7 +300,7 @@ Command description:
-> 
->    ``--disable`` to change *BITMAP* to stop recording future edits.
-> 
-> -  ``--merge`` to merge the contents of *SOURCE_BITMAP* into *BITMAP*.
-> +  ``--merge`` to merge the contents of the *SOURCE* bitmap into *BITMAP*.
-> 
->    Additional options include ``-g`` which sets a non-default
->    *GRANULARITY* for ``--add``, and ``-b`` and ``-F`` which select an
-> 
-
 
 Applied to my trivial-patches branch.
 
