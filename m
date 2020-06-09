@@ -7,60 +7,61 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F527C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 21:02:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C742C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 21:02:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 285E220734
+	by mail.kernel.org (Postfix) with ESMTPS id EB54920734
 	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 21:02:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Msv7N1Og"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 285E220734
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hQs/iJAD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB54920734
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36852 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36914 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jilNu-0006vT-BP
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 17:02:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36434)
+	id 1jilNv-0006wy-2c
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 17:02:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36422)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jilF1-0001uQ-Sw
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 16:53:03 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:20377
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jilF0-0001rE-Mg
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 16:53:02 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:31418
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jilF0-0005e8-Qq
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 16:53:03 -0400
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jilEy-0005d7-8V
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 16:53:02 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591735981;
+ s=mimecast20190719; t=1591735979;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Vd5iKc9l3vMpfq7EOYBUtsqLeuqfAegPZm3hExgksoQ=;
- b=Msv7N1Ogg9dBGOyaymXMBvgXeGwgT545VVITTZOTcwtPtnNehA40qrx02RAH5edPTxAmsz
- KMP+uvp/0vAIeJB0ikAVOermYj2O3enCNH9pjYc/99JoMc6IUErFESvTcyDGEWc2jx++zQ
- 4EGOT1Vfatxp2AdoYBcInxoM72NBD/s=
+ bh=9PmOd7xwEkBNsPkTefS2k9IpwawVFjlu2IH+kxt7Nxk=;
+ b=hQs/iJADU/3rt8J0dq3LzkiM5HOvZebRC1/7stU+0PMLErXAUiv4b1S4bmdx45BWhyQfFd
+ K3noMCh8QYwspO+Dh1H0b9un62+ySFn+JesjTzN26XSnan4p3FUpUYTPewIabsP2WGZBgd
+ 6bfng9ShTEE7fyDXB5ETOLRFA8ydwf8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-330-R2Q4JwMCNHaOSunymNcBpA-1; Tue, 09 Jun 2020 16:52:57 -0400
-X-MC-Unique: R2Q4JwMCNHaOSunymNcBpA-1
+ us-mta-182-3nvfOYgAMIOH8-ZCVXoV1w-1; Tue, 09 Jun 2020 16:52:53 -0400
+X-MC-Unique: 3nvfOYgAMIOH8-ZCVXoV1w-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BBF898F4E5;
- Tue,  9 Jun 2020 20:52:56 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9B2F719200C2;
+ Tue,  9 Jun 2020 20:52:52 +0000 (UTC)
 Received: from blue.redhat.com (ovpn-113-22.phx2.redhat.com [10.3.113.22])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3FCE860C80;
- Tue,  9 Jun 2020 20:52:56 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1F8B06116D;
+ Tue,  9 Jun 2020 20:52:52 +0000 (UTC)
 From: Eric Blake <eblake@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 14/15] qcow2_format.py: dump bitmaps header extension
-Date: Tue,  9 Jun 2020 15:52:44 -0500
-Message-Id: <20200609205245.3548257-15-eblake@redhat.com>
+Subject: [PULL 08/15] qcow2_format.py: use strings to specify c-type of struct
+ fields
+Date: Tue,  9 Jun 2020 15:52:38 -0500
+Message-Id: <20200609205245.3548257-9-eblake@redhat.com>
 In-Reply-To: <20200609205245.3548257-1-eblake@redhat.com>
 References: <20200609205245.3548257-1-eblake@redhat.com>
 MIME-Version: 1.0
@@ -69,9 +70,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=eblake@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 02:44:16
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 02:41:53
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -103,172 +104,91 @@ Sender: "Qemu-devel"
 
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Add class for bitmap extension and dump its fields. Further work is to
-dump bitmap directory.
+We are going to move field-parsing to super-class, this will be simpler
+with simple string specifiers instead of variables.
 
-Test new functionality inside 291 iotest.
+For some reason, python doesn't allow the definition of ctypes variable
+in the class alongside fields: it would not be available then for use
+by the 'for' operator. Don't worry: ctypes will be moved to metaclass
+soon.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Message-Id: <20200606081806.23897-14-vsementsov@virtuozzo.com>
-[eblake: fix iotest output]
+Message-Id: <20200606081806.23897-8-vsementsov@virtuozzo.com>
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- tests/qemu-iotests/291             |  4 +++
- tests/qemu-iotests/291.out         | 33 +++++++++++++++++++++++
- tests/qemu-iotests/qcow2_format.py | 42 +++++++++++++++++++++++-------
- 3 files changed, 70 insertions(+), 9 deletions(-)
-
-diff --git a/tests/qemu-iotests/291 b/tests/qemu-iotests/291
-index 3ca83b9cd1f7..e0cffc7cb119 100755
---- a/tests/qemu-iotests/291
-+++ b/tests/qemu-iotests/291
-@@ -62,6 +62,8 @@ $QEMU_IO -c 'w 1M 1M' -f $IMGFMT "$TEST_IMG" | _filter_qemu_io
- $QEMU_IMG bitmap --disable -f $IMGFMT "$TEST_IMG" b1
- $QEMU_IMG bitmap --enable -f $IMGFMT "$TEST_IMG" b2
- $QEMU_IO -c 'w 2M 1M' -f $IMGFMT "$TEST_IMG" | _filter_qemu_io
-+echo "Check resulting qcow2 header extensions:"
-+$PYTHON qcow2.py "$TEST_IMG" dump-header-exts
-
- echo
- echo "=== Bitmap preservation not possible to non-qcow2 ==="
-@@ -88,6 +90,8 @@ $QEMU_IMG bitmap --merge tmp -f $IMGFMT "$TEST_IMG" b0
- $QEMU_IMG bitmap --remove --image-opts \
-     driver=$IMGFMT,file.driver=file,file.filename="$TEST_IMG" tmp
- $QEMU_IMG info "$TEST_IMG" | _filter_img_info --format-specific
-+echo "Check resulting qcow2 header extensions:"
-+$PYTHON qcow2.py "$TEST_IMG" dump-header-exts
-
- echo
- echo "=== Check bitmap contents ==="
-diff --git a/tests/qemu-iotests/291.out b/tests/qemu-iotests/291.out
-index 8c62017567e9..ccfcdc5e35ce 100644
---- a/tests/qemu-iotests/291.out
-+++ b/tests/qemu-iotests/291.out
-@@ -14,6 +14,25 @@ wrote 1048576/1048576 bytes at offset 1048576
- 1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- wrote 1048576/1048576 bytes at offset 2097152
- 1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+Check resulting qcow2 header extensions:
-+Header extension:
-+magic                     0xe2792aca (Backing format)
-+length                    5
-+data                      'qcow2'
-+
-+Header extension:
-+magic                     0x6803f857 (Feature table)
-+length                    336
-+data                      <binary>
-+
-+Header extension:
-+magic                     0x23852875 (Bitmaps)
-+length                    24
-+nb_bitmaps                2
-+reserved32                0
-+bitmap_directory_size     0x40
-+bitmap_directory_offset   0x510000
-+
-
- === Bitmap preservation not possible to non-qcow2 ===
-
-@@ -65,6 +84,20 @@ Format specific information:
-             granularity: 65536
-     refcount bits: 16
-     corrupt: false
-+Check resulting qcow2 header extensions:
-+Header extension:
-+magic                     0x6803f857 (Feature table)
-+length                    336
-+data                      <binary>
-+
-+Header extension:
-+magic                     0x23852875 (Bitmaps)
-+length                    24
-+nb_bitmaps                3
-+reserved32                0
-+bitmap_directory_size     0x60
-+bitmap_directory_offset   0x520000
-+
-
- === Check bitmap contents ===
+ tests/qemu-iotests/qcow2_format.py | 50 +++++++++++++++++-------------
+ 1 file changed, 28 insertions(+), 22 deletions(-)
 
 diff --git a/tests/qemu-iotests/qcow2_format.py b/tests/qemu-iotests/qcow2_format.py
-index 40b5bf467b24..0f65fd161d5b 100644
+index da66df340876..28f2bfa63bc7 100644
 --- a/tests/qemu-iotests/qcow2_format.py
 +++ b/tests/qemu-iotests/qcow2_format.py
-@@ -103,6 +103,19 @@ class Qcow2Struct(metaclass=Qcow2StructMeta):
-             print('{:<25} {}'.format(f[2], value_str))
+@@ -34,36 +34,42 @@ class QcowHeaderExtension:
+         return QcowHeaderExtension(magic, len(data), data)
 
 
-+class Qcow2BitmapExt(Qcow2Struct):
-+
-+    fields = (
-+        ('u32', '{}', 'nb_bitmaps'),
-+        ('u32', '{}', 'reserved32'),
-+        ('u64', '{:#x}', 'bitmap_directory_size'),
-+        ('u64', '{:#x}', 'bitmap_directory_offset')
-+    )
-+
-+
-+QCOW2_EXT_MAGIC_BITMAPS = 0x23852875
++# Mapping from c types to python struct format
++ctypes = {
++    'u8': 'B',
++    'u16': 'H',
++    'u32': 'I',
++    'u64': 'Q'
++}
 +
 +
- class QcowHeaderExtension(Qcow2Struct):
+ class QcowHeader:
 
-     class Magic(Enum):
-@@ -110,7 +123,7 @@ class QcowHeaderExtension(Qcow2Struct):
-             0xe2792aca: 'Backing format',
-             0x6803f857: 'Feature table',
-             0x0537be77: 'Crypto header',
--            0x23852875: 'Bitmaps',
-+            QCOW2_EXT_MAGIC_BITMAPS: 'Bitmaps',
-             0x44415441: 'Data file'
-         }
+-    uint32_t = 'I'
+-    uint64_t = 'Q'
+-
+     fields = (
+         # Version 2 header fields
+-        (uint32_t, '{:#x}', 'magic'),
+-        (uint32_t, '{}', 'version'),
+-        (uint64_t, '{:#x}', 'backing_file_offset'),
+-        (uint32_t, '{:#x}', 'backing_file_size'),
+-        (uint32_t, '{}', 'cluster_bits'),
+-        (uint64_t, '{}', 'size'),
+-        (uint32_t, '{}', 'crypt_method'),
+-        (uint32_t, '{}', 'l1_size'),
+-        (uint64_t, '{:#x}', 'l1_table_offset'),
+-        (uint64_t, '{:#x}', 'refcount_table_offset'),
+-        (uint32_t, '{}', 'refcount_table_clusters'),
+-        (uint32_t, '{}', 'nb_snapshots'),
+-        (uint64_t, '{:#x}', 'snapshot_offset'),
++        ('u32', '{:#x}', 'magic'),
++        ('u32', '{}', 'version'),
++        ('u64', '{:#x}', 'backing_file_offset'),
++        ('u32', '{:#x}', 'backing_file_size'),
++        ('u32', '{}', 'cluster_bits'),
++        ('u64', '{}', 'size'),
++        ('u32', '{}', 'crypt_method'),
++        ('u32', '{}', 'l1_size'),
++        ('u64', '{:#x}', 'l1_table_offset'),
++        ('u64', '{:#x}', 'refcount_table_offset'),
++        ('u32', '{}', 'refcount_table_clusters'),
++        ('u32', '{}', 'nb_snapshots'),
++        ('u64', '{:#x}', 'snapshot_offset'),
 
-@@ -130,8 +143,11 @@ class QcowHeaderExtension(Qcow2Struct):
-         This should be somehow refactored and functionality should be moved to
-         superclass (to allow creation of any qcow2 struct), but then, fields
-         of variable length (data here) should be supported in base class
--        somehow. So, it's a TODO. We'll see how to properly refactor this when
--        we have more qcow2 structures.
-+        somehow. Note also, that we probably want to parse different
-+        extensions. Should they be subclasses of this class, or how to do it
-+        better? Should it be something like QAPI union with discriminator field
-+        (magic here). So, it's a TODO. We'll see how to properly refactor this
-+        when we have more qcow2 structures.
-         """
-         if fd is None:
-             assert all(v is not None for v in (magic, length, data))
-@@ -148,15 +164,23 @@ class QcowHeaderExtension(Qcow2Struct):
-             self.data = fd.read(padded)
-             assert self.data is not None
+         # Version 3 header fields
+-        (uint64_t, 'mask', 'incompatible_features'),
+-        (uint64_t, 'mask', 'compatible_features'),
+-        (uint64_t, 'mask', 'autoclear_features'),
+-        (uint32_t, '{}', 'refcount_order'),
+-        (uint32_t, '{}', 'header_length'),
++        ('u64', 'mask', 'incompatible_features'),
++        ('u64', 'mask', 'compatible_features'),
++        ('u64', 'mask', 'autoclear_features'),
++        ('u32', '{}', 'refcount_order'),
++        ('u32', '{}', 'header_length'),
+     )
 
--    def dump(self):
--        data = self.data[:self.length]
--        if all(c in string.printable.encode('ascii') for c in data):
--            data = f"'{ data.decode('ascii') }'"
-+        if self.magic == QCOW2_EXT_MAGIC_BITMAPS:
-+            self.obj = Qcow2BitmapExt(data=self.data)
-         else:
--            data = '<binary>'
-+            self.obj = None
+-    fmt = '>' + ''.join(field[0] for field in fields)
++    fmt = '>' + ''.join(ctypes[f[0]] for f in fields)
 
-+    def dump(self):
-         super().dump()
--        print(f'{"data":<25} {data}')
-+
-+        if self.obj is None:
-+            data = self.data[:self.length]
-+            if all(c in string.printable.encode('ascii') for c in data):
-+                data = f"'{ data.decode('ascii') }'"
-+            else:
-+                data = '<binary>'
-+            print(f'{"data":<25} {data}')
-+        else:
-+            self.obj.dump()
+     def __init__(self, fd):
 
-     @classmethod
-     def create(cls, magic, data):
 -- 
 2.27.0
 
