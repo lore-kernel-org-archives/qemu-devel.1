@@ -2,87 +2,90 @@ Return-Path: <SRS0=hUBF=7W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA0C4C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 16:55:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30A02C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 16:56:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 630262074B
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 16:55:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D7D562074B
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 16:56:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZMtQIPNS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 630262074B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hAeEDz+y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7D562074B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33910 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37628 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jihXD-0001VS-FJ
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 12:55:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48774)
+	id 1jihYD-0003BD-44
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 12:56:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47540)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jihHr-00049O-Jx
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 12:39:43 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:51438
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jihHo-0003C8-SG
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 12:39:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591720779;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=DgG50m3nTLeLMCd7sfe+20WbAmU/pd+auR/2Q6y6Z9E=;
- b=ZMtQIPNSfPtfqNqdi9PO34AxZqy2lXOTlj7mp8gA+brB1dDzAHe3ZZNV1HlWppoUEOeWIw
- E3YT26j5LXxWyfKOMK0qxgyYrCr5RI4FFxOOvt9o//OosBZwpKdDJEGRHq/RR1u9DTxf/G
- 2Xp0hJrbY/L2w4yNtsVkLNYVbr/wvTo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-110-zmQ3ZR2fOfqriAjSDM4yrw-1; Tue, 09 Jun 2020 12:39:37 -0400
-X-MC-Unique: zmQ3ZR2fOfqriAjSDM4yrw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 25EC81800D42
- for <qemu-devel@nongnu.org>; Tue,  9 Jun 2020 16:39:37 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
- [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9EF87768DA;
- Tue,  9 Jun 2020 16:39:36 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 78B0211384A9; Tue,  9 Jun 2020 18:39:32 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 10/39] qdev: Convert uses of qdev_create() manually
-Date: Tue,  9 Jun 2020 18:39:03 +0200
-Message-Id: <20200609163932.1566209-11-armbru@redhat.com>
-In-Reply-To: <20200609163932.1566209-1-armbru@redhat.com>
-References: <20200609163932.1566209-1-armbru@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 02:41:53
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+ (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
+ id 1jih7R-0006L9-Os
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 12:28:57 -0400
+Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:44801)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
+ id 1jih7P-00019O-Dv
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 12:28:57 -0400
+Received: by mail-wr1-x430.google.com with SMTP id y17so22001805wrn.11
+ for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 09:28:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=wv2KqLsKtLWgYn/F47Dsu5RFT4XbMRK8m6vgpFpr7eM=;
+ b=hAeEDz+yjEFxVDWqP/fo4y91j4/JEk+eu2Su7j1t/iY5djZ9N4OTeul1VSFIBaDrKc
+ M+7ggmGsmMZ+gfgAxmKT8bggrDm1QstfNTKjlxsP/QrhCLEangw/Q7+7hy2EQKeDM15u
+ dvw4vei5XfoDueBsUA3H6Wge9fiZ6WhYdnQ75Iy3omVbOIhzvHVlyHnmA11FefJoOhfk
+ SZ5NUJuwr0KVtLAW4OrAyxr8Rg8bbgBy2GcHFi+bRc66N2kw74MfvcV+T6NTpohMsdcj
+ DXEDrfcDERpN43j+C+Ntyjy1WGfD9P8in04ICC5im2wBlFv4KHFp0UtswS3lPWT1WLvX
+ Aq8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=wv2KqLsKtLWgYn/F47Dsu5RFT4XbMRK8m6vgpFpr7eM=;
+ b=Xwrsmm/0Y9ERxvkpjbHKMyR3nd363ln7gEV90L1gbfysYYHhyVghNh0S26lFPAjE0C
+ R1al2uLc0gimjmY3Kc5H8E7SC695XDXlv9r/8D4XSWy+Ir2tA6E9v+w//EB3baD8TD5Z
+ /HZ7Cc5Yx++3tCJ3pGbMjEWCEN8oCnAcY2Iv9m8908aUY0CaU+nstJzWrbEUrI2C276F
+ xYEZPX56HZPbPFW5jY49bdmfB7iScurF2hZxbBqehuGa7N1IgfQD1Tup7C5QC8ijx+tL
+ UbxhfjpriBmYZYBiB6BGmCggmjT3ms+hVRcZdVEaNhf9ac4D7emwZrG4uPPf3LUOpM7L
+ EnUw==
+X-Gm-Message-State: AOAM5336EK+na9VAGY19PTgi+dgr4O8s5LSUbGfN9OzLCL+idtSmw/Te
+ cFi8/IIJMq2Qfo5YPF1GyWhtL3XD
+X-Google-Smtp-Source: ABdhPJx1OlFi4u9uRgY9nZXk/C4zwtZ4e28TZtAnh5z0cDVLcbtCORN1UrTW9IMmbDQpcrKw3gfzbg==
+X-Received: by 2002:adf:f582:: with SMTP id f2mr5833636wro.204.1591720133678; 
+ Tue, 09 Jun 2020 09:28:53 -0700 (PDT)
+Received: from rtrkw774-lin.syrmia.com ([46.240.135.226])
+ by smtp.gmail.com with ESMTPSA id 23sm3643598wmo.18.2020.06.09.09.28.53
+ (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+ Tue, 09 Jun 2020 09:28:53 -0700 (PDT)
+From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+To: qemu-devel@nongnu.org,
+	peter.maydell@linaro.org
+Subject: [PULL 19/20] target/mips: Add Loongson-3 CPU definition
+Date: Tue,  9 Jun 2020 18:28:37 +0200
+Message-Id: <1591720118-7378-20-git-send-email-aleksandar.qemu.devel@gmail.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1591720118-7378-1-git-send-email-aleksandar.qemu.devel@gmail.com>
+References: <1591720118-7378-1-git-send-email-aleksandar.qemu.devel@gmail.com>
+Received-SPF: pass client-ip=2a00:1450:4864:20::430;
+ envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wr1-x430.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,443 +98,312 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: aleksandar.qemu.devel@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Same transformation as in the previous commit.  Manual, because
-convincing Coccinelle to transform these cases is somewhere between
-not worthwhile and infeasible (at least for me).
+From: Huacai Chen <zltjiangshi@gmail.com>
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+Loongson-3 CPU family include Loongson-3A R1/R2/R3/R4 and Loongson-3B
+R1/R2. Loongson-3A R1 is the oldest and its ISA is the smallest, while
+Loongson-3A R4 is the newest and its ISA is almost the superset of all
+others. To reduce complexity, we just define two CPU types:
+
+1) "Loongson-3A1000" CPU which is corresponding to Loongson-3A R1. It is
+   suitable for TCG because Loongson-3A R1 has fewest ASE.
+2) "Loongson-3A4000" CPU which is corresponding to Loongson-3A R4. It is
+   suitable for KVM because Loongson-3A R4 has the VZ ASE.
+
+Loongson-3A has CONFIG6 and CONFIG7, so add their bit-fields as well.
+
+[AM: Rearranged insn_flags, added comments, renamed lmi_helper.c,
+improved commit message, fixed checkpatch warnings]
+
+Signed-off-by: Huacai Chen <chenhc@lemote.com>
+Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
+Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Signed-off-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Message-Id: <1591065557-9174-3-git-send-email-chenhc@lemote.com>
 ---
- hw/arm/highbank.c                   | 26 +++++++++++++-------------
- hw/arm/sbsa-ref.c                   |  4 ++--
- hw/arm/virt.c                       |  4 ++--
- hw/block/xen-block.c                |  4 ++--
- hw/char/serial.c                    |  4 ++--
- hw/display/ati.c                    |  5 ++---
- hw/display/sm501.c                  |  5 ++---
- hw/display/xlnx_dp.c                |  5 +++--
- hw/i386/pc.c                        |  4 ++--
- hw/i386/pc_sysfw.c                  |  4 ++--
- hw/pci-bridge/pci_expander_bridge.c |  4 ++--
- hw/ppc/pnv.c                        |  4 ++--
- hw/riscv/virt.c                     |  4 ++--
- hw/s390x/s390-pci-bus.c             |  4 ++--
- hw/sparc/leon3.c                    |  8 ++++----
- hw/usb/bus.c                        |  8 ++++----
- 16 files changed, 48 insertions(+), 49 deletions(-)
+ target/mips/cpu.h                           | 32 ++++++++++-
+ target/mips/internal.h                      |  2 +
+ target/mips/mips-defs.h                     | 45 ++++++++-------
+ target/mips/{lmi_helper.c => lmmi_helper.c} |  0
+ target/mips/translate.c                     |  2 +
+ target/mips/translate_init.inc.c            | 86 +++++++++++++++++++++++++++++
+ target/mips/Makefile.objs                   |  2 +-
+ 7 files changed, 146 insertions(+), 23 deletions(-)
+ rename target/mips/{lmi_helper.c => lmmi_helper.c} (100%)
 
-diff --git a/hw/arm/highbank.c b/hw/arm/highbank.c
-index ac9de9411e..1bed540011 100644
---- a/hw/arm/highbank.c
-+++ b/hw/arm/highbank.c
-@@ -311,20 +311,20 @@ static void calxeda_init(MachineState *machine, enum cxmachines machine_id)
+diff --git a/target/mips/cpu.h b/target/mips/cpu.h
+index 94d01ea..7cf7f52 100644
+--- a/target/mips/cpu.h
++++ b/target/mips/cpu.h
+@@ -198,8 +198,8 @@ typedef struct mips_def_t mips_def_t;
+  * 3   Config3                             WatchLo3          WatchHi
+  * 4   Config4                             WatchLo4          WatchHi
+  * 5   Config5                             WatchLo5          WatchHi
+- * 6                                       WatchLo6          WatchHi
+- * 7                                       WatchLo7          WatchHi
++ * 6   Config6                             WatchLo6          WatchHi
++ * 7   Config7                             WatchLo7          WatchHi
+  *
+  *
+  *     Register 20       Register 21       Register 22       Register 23
+@@ -940,7 +940,35 @@ struct CPUMIPSState {
+ #define CP0C5_UFR          2
+ #define CP0C5_NFExists     0
+     int32_t CP0_Config6;
++    int32_t CP0_Config6_rw_bitmask;
++#define CP0C6_BPPASS          31
++#define CP0C6_KPOS            24
++#define CP0C6_KE              23
++#define CP0C6_VTLBONLY        22
++#define CP0C6_LASX            21
++#define CP0C6_SSEN            20
++#define CP0C6_DISDRTIME       19
++#define CP0C6_PIXNUEN         18
++#define CP0C6_SCRAND          17
++#define CP0C6_LLEXCEN         16
++#define CP0C6_DISVC           15
++#define CP0C6_VCLRU           14
++#define CP0C6_DCLRU           13
++#define CP0C6_PIXUEN          12
++#define CP0C6_DISBLKLYEN      11
++#define CP0C6_UMEMUALEN       10
++#define CP0C6_SFBEN           8
++#define CP0C6_FLTINT          7
++#define CP0C6_VLTINT          6
++#define CP0C6_DISBTB          5
++#define CP0C6_STPREFCTL       2
++#define CP0C6_INSTPREF        1
++#define CP0C6_DATAPREF        0
+     int32_t CP0_Config7;
++    int64_t CP0_Config7_rw_bitmask;
++#define CP0C7_NAPCGEN       2
++#define CP0C7_UNIMUEN       1
++#define CP0C7_VFPUCGEN      0
+     uint64_t CP0_LLAddr;
+     uint64_t CP0_MAAR[MIPS_MAAR_MAX];
+     int32_t CP0_MAARI;
+diff --git a/target/mips/internal.h b/target/mips/internal.h
+index 684356e..7f159a9 100644
+--- a/target/mips/internal.h
++++ b/target/mips/internal.h
+@@ -36,7 +36,9 @@ struct mips_def_t {
+     int32_t CP0_Config5;
+     int32_t CP0_Config5_rw_bitmask;
+     int32_t CP0_Config6;
++    int32_t CP0_Config6_rw_bitmask;
+     int32_t CP0_Config7;
++    int32_t CP0_Config7_rw_bitmask;
+     target_ulong CP0_LLAddr_rw_bitmask;
+     int CP0_LLAddr_shift;
+     int32_t SYNCI_Step;
+diff --git a/target/mips/mips-defs.h b/target/mips/mips-defs.h
+index a831bb4..0c12910 100644
+--- a/target/mips/mips-defs.h
++++ b/target/mips/mips-defs.h
+@@ -15,7 +15,7 @@
+  * ------------------------------------------------
+  */
+ /*
+- *   bits 0-31: MIPS base instruction sets
++ *   bits 0-23: MIPS base instruction sets
+  */
+ #define ISA_MIPS1         0x0000000000000001ULL
+ #define ISA_MIPS2         0x0000000000000002ULL
+@@ -34,30 +34,33 @@
+ #define ISA_MIPS64R6      0x0000000000004000ULL
+ #define ISA_NANOMIPS32    0x0000000000008000ULL
+ /*
+- *   bits 32-47: MIPS ASEs
++ *   bits 24-39: MIPS ASEs
+  */
+-#define ASE_MIPS16        0x0000000100000000ULL
+-#define ASE_MIPS3D        0x0000000200000000ULL
+-#define ASE_MDMX          0x0000000400000000ULL
+-#define ASE_DSP           0x0000000800000000ULL
+-#define ASE_DSP_R2        0x0000001000000000ULL
+-#define ASE_DSP_R3        0x0000002000000000ULL
+-#define ASE_MT            0x0000004000000000ULL
+-#define ASE_SMARTMIPS     0x0000008000000000ULL
+-#define ASE_MICROMIPS     0x0000010000000000ULL
+-#define ASE_MSA           0x0000020000000000ULL
++#define ASE_MIPS16        0x0000000001000000ULL
++#define ASE_MIPS3D        0x0000000002000000ULL
++#define ASE_MDMX          0x0000000004000000ULL
++#define ASE_DSP           0x0000000008000000ULL
++#define ASE_DSP_R2        0x0000000010000000ULL
++#define ASE_DSP_R3        0x0000000020000000ULL
++#define ASE_MT            0x0000000040000000ULL
++#define ASE_SMARTMIPS     0x0000000080000000ULL
++#define ASE_MICROMIPS     0x0000000100000000ULL
++#define ASE_MSA           0x0000000200000000ULL
+ /*
+- *   bits 48-55: vendor-specific base instruction sets
++ *   bits 40-51: vendor-specific base instruction sets
+  */
+-#define INSN_LOONGSON2E   0x0001000000000000ULL
+-#define INSN_LOONGSON2F   0x0002000000000000ULL
+-#define INSN_VR54XX       0x0004000000000000ULL
+-#define INSN_R5900        0x0008000000000000ULL
++#define INSN_VR54XX       0x0000010000000000ULL
++#define INSN_R5900        0x0000020000000000ULL
++#define INSN_LOONGSON2E   0x0000040000000000ULL
++#define INSN_LOONGSON2F   0x0000080000000000ULL
++#define INSN_LOONGSON3A   0x0000100000000000ULL
+ /*
+- *   bits 56-63: vendor-specific ASEs
++ *   bits 52-63: vendor-specific ASEs
+  */
+-#define ASE_MMI           0x0100000000000000ULL
+-#define ASE_MXU           0x0200000000000000ULL
++#define ASE_MMI           0x0010000000000000ULL
++#define ASE_MXU           0x0020000000000000ULL
++#define ASE_LMMI          0x0040000000000000ULL
++#define ASE_LEXT          0x0080000000000000ULL
  
-     switch (machine_id) {
-     case CALXEDA_HIGHBANK:
--        dev = qdev_create(NULL, "l2x0");
--        qdev_init_nofail(dev);
-+        dev = qdev_new("l2x0");
-+        qdev_realize_and_unref(dev, NULL, &error_fatal);
-         busdev = SYS_BUS_DEVICE(dev);
-         sysbus_mmio_map(busdev, 0, 0xfff12000);
+ /* MIPS CPU defines. */
+ #define CPU_MIPS1       (ISA_MIPS1)
+@@ -94,6 +97,8 @@
+ /* Wave Computing: "nanoMIPS" */
+ #define CPU_NANOMIPS32  (CPU_MIPS32R6 | ISA_NANOMIPS32)
  
--        dev = qdev_create(NULL, TYPE_A9MPCORE_PRIV);
-+        dev = qdev_new(TYPE_A9MPCORE_PRIV);
-         break;
-     case CALXEDA_MIDWAY:
--        dev = qdev_create(NULL, TYPE_A15MPCORE_PRIV);
-+        dev = qdev_new(TYPE_A15MPCORE_PRIV);
-         break;
-     }
-     qdev_prop_set_uint32(dev, "num-cpu", smp_cpus);
-     qdev_prop_set_uint32(dev, "num-irq", NIRQ_GIC);
--    qdev_init_nofail(dev);
-+    qdev_realize_and_unref(dev, NULL, &error_fatal);
-     busdev = SYS_BUS_DEVICE(dev);
-     sysbus_mmio_map(busdev, 0, MPCORE_PERIPHBASE);
-     for (n = 0; n < smp_cpus; n++) {
-@@ -338,17 +338,17 @@ static void calxeda_init(MachineState *machine, enum cxmachines machine_id)
-         pic[n] = qdev_get_gpio_in(dev, n);
-     }
- 
--    dev = qdev_create(NULL, "sp804");
-+    dev = qdev_new("sp804");
-     qdev_prop_set_uint32(dev, "freq0", 150000000);
-     qdev_prop_set_uint32(dev, "freq1", 150000000);
--    qdev_init_nofail(dev);
-+    qdev_realize_and_unref(dev, NULL, &error_fatal);
-     busdev = SYS_BUS_DEVICE(dev);
-     sysbus_mmio_map(busdev, 0, 0xfff34000);
-     sysbus_connect_irq(busdev, 0, pic[18]);
-     pl011_create(0xfff36000, pic[20], serial_hd(0));
- 
--    dev = qdev_create(NULL, TYPE_HIGHBANK_REGISTERS);
--    qdev_init_nofail(dev);
-+    dev = qdev_new(TYPE_HIGHBANK_REGISTERS);
-+    qdev_realize_and_unref(dev, NULL, &error_fatal);
-     busdev = SYS_BUS_DEVICE(dev);
-     sysbus_mmio_map(busdev, 0, 0xfff3c000);
- 
-@@ -363,18 +363,18 @@ static void calxeda_init(MachineState *machine, enum cxmachines machine_id)
- 
-     if (nd_table[0].used) {
-         qemu_check_nic_model(&nd_table[0], "xgmac");
--        dev = qdev_create(NULL, "xgmac");
-+        dev = qdev_new("xgmac");
-         qdev_set_nic_properties(dev, &nd_table[0]);
--        qdev_init_nofail(dev);
-+        qdev_realize_and_unref(dev, NULL, &error_fatal);
-         sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, 0xfff50000);
-         sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic[77]);
-         sysbus_connect_irq(SYS_BUS_DEVICE(dev), 1, pic[78]);
-         sysbus_connect_irq(SYS_BUS_DEVICE(dev), 2, pic[79]);
- 
-         qemu_check_nic_model(&nd_table[1], "xgmac");
--        dev = qdev_create(NULL, "xgmac");
-+        dev = qdev_new("xgmac");
-         qdev_set_nic_properties(dev, &nd_table[1]);
--        qdev_init_nofail(dev);
-+        qdev_realize_and_unref(dev, NULL, &error_fatal);
-         sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, 0xfff51000);
-         sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic[80]);
-         sysbus_connect_irq(SYS_BUS_DEVICE(dev), 1, pic[81]);
-diff --git a/hw/arm/sbsa-ref.c b/hw/arm/sbsa-ref.c
-index d68c5d87af..fe24567333 100644
---- a/hw/arm/sbsa-ref.c
-+++ b/hw/arm/sbsa-ref.c
-@@ -211,7 +211,7 @@ static PFlashCFI01 *sbsa_flash_create1(SBSAMachineState *sms,
-      * Create a single flash device.  We use the same parameters as
-      * the flash devices on the Versatile Express board.
-      */
--    DeviceState *dev = qdev_create(NULL, TYPE_PFLASH_CFI01);
-+    DeviceState *dev = qdev_new(TYPE_PFLASH_CFI01);
- 
-     qdev_prop_set_uint64(dev, "sector-length", SBSA_FLASH_SECTOR_SIZE);
-     qdev_prop_set_uint8(dev, "width", 4);
-@@ -243,7 +243,7 @@ static void sbsa_flash_map1(PFlashCFI01 *flash,
-     assert(QEMU_IS_ALIGNED(size, SBSA_FLASH_SECTOR_SIZE));
-     assert(size / SBSA_FLASH_SECTOR_SIZE <= UINT32_MAX);
-     qdev_prop_set_uint32(dev, "num-blocks", size / SBSA_FLASH_SECTOR_SIZE);
--    qdev_init_nofail(dev);
-+    qdev_realize_and_unref(dev, NULL, &error_fatal);
- 
-     memory_region_add_subregion(sysmem, base,
-                                 sysbus_mmio_get_region(SYS_BUS_DEVICE(dev),
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 154cd24731..ca151435ae 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -948,7 +948,7 @@ static PFlashCFI01 *virt_flash_create1(VirtMachineState *vms,
-      * Create a single flash device.  We use the same parameters as
-      * the flash devices on the Versatile Express board.
-      */
--    DeviceState *dev = qdev_create(NULL, TYPE_PFLASH_CFI01);
-+    DeviceState *dev = qdev_new(TYPE_PFLASH_CFI01);
- 
-     qdev_prop_set_uint64(dev, "sector-length", VIRT_FLASH_SECTOR_SIZE);
-     qdev_prop_set_uint8(dev, "width", 4);
-@@ -980,7 +980,7 @@ static void virt_flash_map1(PFlashCFI01 *flash,
-     assert(QEMU_IS_ALIGNED(size, VIRT_FLASH_SECTOR_SIZE));
-     assert(size / VIRT_FLASH_SECTOR_SIZE <= UINT32_MAX);
-     qdev_prop_set_uint32(dev, "num-blocks", size / VIRT_FLASH_SECTOR_SIZE);
--    qdev_init_nofail(dev);
-+    qdev_realize_and_unref(dev, NULL, &error_fatal);
- 
-     memory_region_add_subregion(sysmem, base,
-                                 sysbus_mmio_get_region(SYS_BUS_DEVICE(dev),
-diff --git a/hw/block/xen-block.c b/hw/block/xen-block.c
-index 570489d6d9..2827c90ac7 100644
---- a/hw/block/xen-block.c
-+++ b/hw/block/xen-block.c
-@@ -937,7 +937,7 @@ static void xen_block_device_create(XenBackendInstance *backend,
-         goto fail;
-     }
- 
--    xendev = XEN_DEVICE(qdev_create(BUS(xenbus), type));
-+    xendev = XEN_DEVICE(qdev_new(type));
-     blockdev = XEN_BLOCK_DEVICE(xendev);
- 
-     object_property_set_str(OBJECT(xendev), vdev, "vdev", &local_err);
-@@ -965,7 +965,7 @@ static void xen_block_device_create(XenBackendInstance *backend,
-     blockdev->iothread = iothread;
-     blockdev->drive = drive;
- 
--    object_property_set_bool(OBJECT(xendev), true, "realized", &local_err);
-+    qdev_realize_and_unref(DEVICE(xendev), BUS(xenbus), &local_err);
-     if (local_err) {
-         error_propagate_prepend(errp, local_err,
-                                 "realization of device %s failed: ",
-diff --git a/hw/char/serial.c b/hw/char/serial.c
-index 7d74694587..a0cab38fb0 100644
---- a/hw/char/serial.c
-+++ b/hw/char/serial.c
-@@ -1127,7 +1127,7 @@ SerialMM *serial_mm_init(MemoryRegion *address_space,
-                          qemu_irq irq, int baudbase,
-                          Chardev *chr, enum device_endian end)
- {
--    SerialMM *smm = SERIAL_MM(qdev_create(NULL, TYPE_SERIAL_MM));
-+    SerialMM *smm = SERIAL_MM(qdev_new(TYPE_SERIAL_MM));
-     MemoryRegion *mr;
- 
-     qdev_prop_set_uint8(DEVICE(smm), "regshift", regshift);
-@@ -1135,7 +1135,7 @@ SerialMM *serial_mm_init(MemoryRegion *address_space,
-     qdev_prop_set_chr(DEVICE(smm), "chardev", chr);
-     qdev_set_legacy_instance_id(DEVICE(smm), base, 2);
-     qdev_prop_set_uint8(DEVICE(smm), "endianness", end);
--    qdev_init_nofail(DEVICE(smm));
-+    qdev_realize_and_unref(DEVICE(smm), NULL, &error_fatal);
- 
-     sysbus_connect_irq(SYS_BUS_DEVICE(smm), 0, irq);
-     mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(smm), 0);
-diff --git a/hw/display/ati.c b/hw/display/ati.c
-index 1d9df92b96..7216f7e08f 100644
---- a/hw/display/ati.c
-+++ b/hw/display/ati.c
-@@ -933,10 +933,9 @@ static void ati_vga_realize(PCIDevice *dev, Error **errp)
-     /* ddc, edid */
-     I2CBus *i2cbus = i2c_init_bus(DEVICE(s), "ati-vga.ddc");
-     bitbang_i2c_init(&s->bbi2c, i2cbus);
--    I2CSlave *i2cddc = I2C_SLAVE(qdev_create(BUS(i2cbus), TYPE_I2CDDC));
-+    I2CSlave *i2cddc = I2C_SLAVE(qdev_new(TYPE_I2CDDC));
-     i2c_set_slave_address(i2cddc, 0x50);
--    object_property_set_bool(OBJECT(i2cddc), true, "realized",
--                             &error_abort);
-+    qdev_realize_and_unref(DEVICE(i2cddc), BUS(i2cbus), &error_abort);
- 
-     /* mmio register space */
-     memory_region_init_io(&s->mm, OBJECT(s), &ati_mm_ops, s,
-diff --git a/hw/display/sm501.c b/hw/display/sm501.c
-index 7ff14fd474..3e62eca3de 100644
---- a/hw/display/sm501.c
-+++ b/hw/display/sm501.c
-@@ -1831,10 +1831,9 @@ static void sm501_init(SM501State *s, DeviceState *dev,
-     /* i2c */
-     s->i2c_bus = i2c_init_bus(dev, "sm501.i2c");
-     /* ddc */
--    I2CDDCState *ddc = I2CDDC(qdev_create(BUS(s->i2c_bus), TYPE_I2CDDC));
-+    I2CDDCState *ddc = I2CDDC(qdev_new(TYPE_I2CDDC));
-     i2c_set_slave_address(I2C_SLAVE(ddc), 0x50);
--    object_property_set_bool(OBJECT(ddc), true, "realized",
--                             &error_abort);
-+    qdev_realize_and_unref(DEVICE(ddc), BUS(s->i2c_bus), &error_abort);
- 
-     /* mmio */
-     memory_region_init(&s->mmio_region, OBJECT(dev), "sm501.mmio", MMIO_SIZE);
-diff --git a/hw/display/xlnx_dp.c b/hw/display/xlnx_dp.c
-index 5210412e55..6e9793584a 100644
---- a/hw/display/xlnx_dp.c
-+++ b/hw/display/xlnx_dp.c
-@@ -1252,7 +1252,7 @@ static void xlnx_dp_init(Object *obj)
-     s->dpcd = DPCD(aux_create_slave(s->aux_bus, "dpcd"));
-     object_property_add_child(OBJECT(s), "dpcd", OBJECT(s->dpcd));
- 
--    s->edid = I2CDDC(qdev_create(BUS(aux_get_i2c_bus(s->aux_bus)), "i2c-ddc"));
-+    s->edid = I2CDDC(qdev_new("i2c-ddc"));
-     i2c_set_slave_address(I2C_SLAVE(s->edid), 0x50);
-     object_property_add_child(OBJECT(s), "edid", OBJECT(s->edid));
- 
-@@ -1271,7 +1271,8 @@ static void xlnx_dp_realize(DeviceState *dev, Error **errp)
-     qdev_init_nofail(DEVICE(s->dpcd));
-     aux_map_slave(AUX_SLAVE(s->dpcd), 0x0000);
- 
--    qdev_init_nofail(DEVICE(s->edid));
-+    qdev_realize_and_unref(DEVICE(s->edid), BUS(aux_get_i2c_bus(s->aux_bus)),
-+                           &error_fatal);
- 
-     s->console = graphic_console_init(dev, 0, &xlnx_dp_gfx_ops, s);
-     surface = qemu_console_surface(s->console);
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index f9d51479b1..b549d0bbfc 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1204,7 +1204,7 @@ void pc_basic_device_init(ISABus *isa_bus, qemu_irq *gsi,
-      * when the HPET wants to take over. Thus we have to disable the latter.
-      */
-     if (!no_hpet && (!kvm_irqchip_in_kernel() || kvm_has_pit_state2())) {
--        hpet = qdev_try_create(NULL, TYPE_HPET);
-+        hpet = qdev_try_new(TYPE_HPET);
-         if (hpet) {
-             /* For pc-piix-*, hpet's intcap is always IRQ2. For pc-q35-1.7
-              * and earlier, use IRQ2 for compat. Otherwise, use IRQ16~23,
-@@ -1215,7 +1215,7 @@ void pc_basic_device_init(ISABus *isa_bus, qemu_irq *gsi,
-             if (!compat) {
-                 qdev_prop_set_uint32(hpet, HPET_INTCAP, hpet_irqs);
-             }
--            qdev_init_nofail(hpet);
-+            qdev_realize_and_unref(hpet, NULL, &error_fatal);
-             sysbus_mmio_map(SYS_BUS_DEVICE(hpet), 0, HPET_BASE);
- 
-             for (i = 0; i < GSI_NUM_PINS; i++) {
-diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
-index b8d8ef59eb..2e414d1934 100644
---- a/hw/i386/pc_sysfw.c
-+++ b/hw/i386/pc_sysfw.c
-@@ -85,7 +85,7 @@ static PFlashCFI01 *pc_pflash_create(PCMachineState *pcms,
-                                      const char *name,
-                                      const char *alias_prop_name)
- {
--    DeviceState *dev = qdev_create(NULL, TYPE_PFLASH_CFI01);
-+    DeviceState *dev = qdev_new(TYPE_PFLASH_CFI01);
- 
-     qdev_prop_set_uint64(dev, "sector-length", FLASH_SECTOR_SIZE);
-     qdev_prop_set_uint8(dev, "width", 1);
-@@ -187,7 +187,7 @@ static void pc_system_flash_map(PCMachineState *pcms,
-         total_size += size;
-         qdev_prop_set_uint32(DEVICE(system_flash), "num-blocks",
-                              size / FLASH_SECTOR_SIZE);
--        qdev_init_nofail(DEVICE(system_flash));
-+        qdev_realize_and_unref(DEVICE(system_flash), NULL, &error_fatal);
-         sysbus_mmio_map(SYS_BUS_DEVICE(system_flash), 0,
-                         0x100000000ULL - total_size);
- 
-diff --git a/hw/pci-bridge/pci_expander_bridge.c b/hw/pci-bridge/pci_expander_bridge.c
-index 5da0d21061..3a395ab2f0 100644
---- a/hw/pci-bridge/pci_expander_bridge.c
-+++ b/hw/pci-bridge/pci_expander_bridge.c
-@@ -236,7 +236,7 @@ static void pxb_dev_realize_common(PCIDevice *dev, bool pcie, Error **errp)
-         bus = pci_root_bus_new(ds, dev_name, NULL, NULL, 0, TYPE_PXB_PCIE_BUS);
-     } else {
-         bus = pci_root_bus_new(ds, "pxb-internal", NULL, NULL, 0, TYPE_PXB_BUS);
--        bds = qdev_create(BUS(bus), "pci-bridge");
-+        bds = qdev_new("pci-bridge");
-         bds->id = dev_name;
-         qdev_prop_set_uint8(bds, PCI_BRIDGE_DEV_PROP_CHASSIS_NR, pxb->bus_nr);
-         qdev_prop_set_bit(bds, PCI_BRIDGE_DEV_PROP_SHPC, false);
-@@ -257,7 +257,7 @@ static void pxb_dev_realize_common(PCIDevice *dev, bool pcie, Error **errp)
- 
-     qdev_realize_and_unref(ds, NULL, &error_fatal);
-     if (bds) {
--        qdev_init_nofail(bds);
-+        qdev_realize_and_unref(bds, &bus->qbus, &error_fatal);
-     }
- 
-     pci_word_test_and_set_mask(dev->config + PCI_STATUS,
-diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index e3b6f0b884..8562af3fe0 100644
---- a/hw/ppc/pnv.c
-+++ b/hw/ppc/pnv.c
-@@ -818,7 +818,7 @@ static void pnv_init(MachineState *machine)
-     pnv->chips = g_new0(PnvChip *, pnv->num_chips);
-     for (i = 0; i < pnv->num_chips; i++) {
-         char chip_name[32];
--        Object *chip = OBJECT(qdev_create(NULL, chip_typename));
-+        Object *chip = OBJECT(qdev_new(chip_typename));
- 
-         pnv->chips[i] = PNV_CHIP(chip);
- 
-@@ -850,7 +850,7 @@ static void pnv_init(MachineState *machine)
-             object_property_set_link(chip, OBJECT(pnv), "xive-fabric",
-                                      &error_abort);
-         }
--        object_property_set_bool(chip, true, "realized", &error_fatal);
-+        qdev_realize_and_unref(DEVICE(chip), NULL, &error_fatal);
-     }
-     g_free(chip_typename);
- 
-diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-index fa88e9118c..4970a085ca 100644
---- a/hw/riscv/virt.c
-+++ b/hw/riscv/virt.c
-@@ -80,7 +80,7 @@ static PFlashCFI01 *virt_flash_create1(RISCVVirtState *s,
-      * Create a single flash device.  We use the same parameters as
-      * the flash devices on the ARM virt board.
-      */
--    DeviceState *dev = qdev_create(NULL, TYPE_PFLASH_CFI01);
-+    DeviceState *dev = qdev_new(TYPE_PFLASH_CFI01);
- 
-     qdev_prop_set_uint64(dev, "sector-length", VIRT_FLASH_SECTOR_SIZE);
-     qdev_prop_set_uint8(dev, "width", 4);
-@@ -114,7 +114,7 @@ static void virt_flash_map1(PFlashCFI01 *flash,
-     assert(QEMU_IS_ALIGNED(size, VIRT_FLASH_SECTOR_SIZE));
-     assert(size / VIRT_FLASH_SECTOR_SIZE <= UINT32_MAX);
-     qdev_prop_set_uint32(dev, "num-blocks", size / VIRT_FLASH_SECTOR_SIZE);
--    qdev_init_nofail(dev);
-+    qdev_realize_and_unref(dev, NULL, &error_fatal);
- 
-     memory_region_add_subregion(sysmem, base,
-                                 sysbus_mmio_get_region(SYS_BUS_DEVICE(dev),
-diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-index 7a4bfb7383..a13978bb37 100644
---- a/hw/s390x/s390-pci-bus.c
-+++ b/hw/s390x/s390-pci-bus.c
-@@ -824,7 +824,7 @@ static S390PCIBusDevice *s390_pci_device_new(S390pciState *s,
-     Error *local_err = NULL;
-     DeviceState *dev;
- 
--    dev = qdev_try_create(BUS(s->bus), TYPE_S390_PCI_DEVICE);
-+    dev = qdev_try_new(TYPE_S390_PCI_DEVICE);
-     if (!dev) {
-         error_setg(errp, "zPCI device could not be created");
-         return NULL;
-@@ -837,7 +837,7 @@ static S390PCIBusDevice *s390_pci_device_new(S390pciState *s,
-                                 "zPCI device could not be created: ");
-         return NULL;
-     }
--    object_property_set_bool(OBJECT(dev), true, "realized", &local_err);
-+    qdev_realize_and_unref(dev, BUS(s->bus), &local_err);
-     if (local_err) {
-         object_unparent(OBJECT(dev));
-         error_propagate_prepend(errp, local_err,
-diff --git a/hw/sparc/leon3.c b/hw/sparc/leon3.c
-index 52c0229574..b1d8f25dcc 100644
---- a/hw/sparc/leon3.c
-+++ b/hw/sparc/leon3.c
-@@ -213,15 +213,15 @@ static void leon3_generic_hw_init(MachineState *machine)
-     reset_info->sp    = LEON3_RAM_OFFSET + ram_size;
-     qemu_register_reset(main_cpu_reset, reset_info);
- 
--    ahb_pnp = GRLIB_AHB_PNP(qdev_create(NULL, TYPE_GRLIB_AHB_PNP));
--    object_property_set_bool(OBJECT(ahb_pnp), true, "realized", &error_fatal);
-+    ahb_pnp = GRLIB_AHB_PNP(qdev_new(TYPE_GRLIB_AHB_PNP));
-+    qdev_realize_and_unref(DEVICE(ahb_pnp), NULL, &error_fatal);
-     sysbus_mmio_map(SYS_BUS_DEVICE(ahb_pnp), 0, LEON3_AHB_PNP_OFFSET);
-     grlib_ahb_pnp_add_entry(ahb_pnp, 0, 0, GRLIB_VENDOR_GAISLER,
-                             GRLIB_LEON3_DEV, GRLIB_AHB_MASTER,
-                             GRLIB_CPU_AREA);
- 
--    apb_pnp = GRLIB_APB_PNP(qdev_create(NULL, TYPE_GRLIB_APB_PNP));
--    object_property_set_bool(OBJECT(apb_pnp), true, "realized", &error_fatal);
-+    apb_pnp = GRLIB_APB_PNP(qdev_new(TYPE_GRLIB_APB_PNP));
-+    qdev_realize_and_unref(DEVICE(apb_pnp), NULL, &error_fatal);
-     sysbus_mmio_map(SYS_BUS_DEVICE(apb_pnp), 0, LEON3_APB_PNP_OFFSET);
-     grlib_ahb_pnp_add_entry(ahb_pnp, LEON3_APB_PNP_OFFSET, 0xFFF,
-                             GRLIB_VENDOR_GAISLER, GRLIB_APBMST_DEV,
-diff --git a/hw/usb/bus.c b/hw/usb/bus.c
-index fa07df98a2..d28eff1b5c 100644
---- a/hw/usb/bus.c
-+++ b/hw/usb/bus.c
-@@ -326,21 +326,21 @@ static USBDevice *usb_try_create_simple(USBBus *bus, const char *name,
-                                         Error **errp)
- {
-     Error *err = NULL;
--    USBDevice *dev;
-+    DeviceState *dev;
- 
--    dev = USB_DEVICE(qdev_try_create(&bus->qbus, name));
-+    dev = qdev_try_new(name);
-     if (!dev) {
-         error_setg(errp, "Failed to create USB device '%s'", name);
-         return NULL;
-     }
--    object_property_set_bool(OBJECT(dev), true, "realized", &err);
-+    qdev_realize_and_unref(dev, &bus->qbus, &err);
-     if (err) {
-         error_propagate_prepend(errp, err,
-                                 "Failed to initialize USB device '%s': ",
-                                 name);
-         return NULL;
-     }
--    return dev;
-+    return USB_DEVICE(dev);
- }
- 
- USBDevice *usb_create_simple(USBBus *bus, const char *name)
++#define CPU_LOONGSON3A  (CPU_MIPS64R2 | INSN_LOONGSON3A)
++
+ /*
+  * Strictly follow the architecture standard:
+  * - Disallow "special" instruction handling for PMON/SPIM.
+diff --git a/target/mips/lmi_helper.c b/target/mips/lmmi_helper.c
+similarity index 100%
+rename from target/mips/lmi_helper.c
+rename to target/mips/lmmi_helper.c
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index 25b595a..2caf4cb 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -31206,7 +31206,9 @@ void cpu_state_reset(CPUMIPSState *env)
+     env->CP0_Config5 = env->cpu_model->CP0_Config5;
+     env->CP0_Config5_rw_bitmask = env->cpu_model->CP0_Config5_rw_bitmask;
+     env->CP0_Config6 = env->cpu_model->CP0_Config6;
++    env->CP0_Config6_rw_bitmask = env->cpu_model->CP0_Config6_rw_bitmask;
+     env->CP0_Config7 = env->cpu_model->CP0_Config7;
++    env->CP0_Config7_rw_bitmask = env->cpu_model->CP0_Config7_rw_bitmask;
+     env->CP0_LLAddr_rw_bitmask = env->cpu_model->CP0_LLAddr_rw_bitmask
+                                  << env->cpu_model->CP0_LLAddr_shift;
+     env->CP0_LLAddr_shift = env->cpu_model->CP0_LLAddr_shift;
+diff --git a/target/mips/translate_init.inc.c b/target/mips/translate_init.inc.c
+index 6d145a9..ffae10d 100644
+--- a/target/mips/translate_init.inc.c
++++ b/target/mips/translate_init.inc.c
+@@ -802,6 +802,92 @@ const mips_def_t mips_defs[] =
+         .mmu_type = MMU_TYPE_R4000,
+     },
+     {
++        .name = "Loongson-3A1000",
++        .CP0_PRid = 0x6305,
++        /* 64KB I-cache and d-cache. 4 way with 32 bit cache line size.  */
++        .CP0_Config0 = MIPS_CONFIG0 | (0x1 << CP0C0_AR) | (0x2 << CP0C0_AT) |
++                       (MMU_TYPE_R4000 << CP0C0_MT),
++        .CP0_Config1 = MIPS_CONFIG1 | (1 << CP0C1_FP) | (63 << CP0C1_MMU) |
++                       (3 << CP0C1_IS) | (4 << CP0C1_IL) | (3 << CP0C1_IA) |
++                       (3 << CP0C1_DS) | (4 << CP0C1_DL) | (3 << CP0C1_DA) |
++                       (1 << CP0C1_PC) | (1 << CP0C1_WR) | (1 << CP0C1_EP),
++        .CP0_Config2 = MIPS_CONFIG2 | (7 << CP0C2_SS) | (4 << CP0C2_SL) |
++                       (3 << CP0C2_SA),
++        .CP0_Config3 = MIPS_CONFIG3 | (1 << CP0C3_LPA),
++        .CP0_LLAddr_rw_bitmask = 0,
++        .SYNCI_Step = 32,
++        .CCRes = 2,
++        .CP0_Status_rw_bitmask = 0x74D8FFFF,
++        .CP0_PageGrain = (1 << CP0PG_ELPA),
++        .CP0_PageGrain_rw_bitmask = (1 << CP0PG_ELPA),
++        .CP1_fcr0 = (0x5 << FCR0_PRID) | (0x1 << FCR0_REV) | (0x1 << FCR0_F64) |
++                    (0x1 << FCR0_PS) | (0x1 << FCR0_L) | (0x1 << FCR0_W) |
++                    (0x1 << FCR0_D) | (0x1 << FCR0_S),
++        .CP1_fcr31 = 0,
++        .CP1_fcr31_rw_bitmask = 0xFF83FFFF,
++        .SEGBITS = 42,
++        .PABITS = 48,
++        .insn_flags = CPU_LOONGSON3A,
++        .mmu_type = MMU_TYPE_R4000,
++    },
++    {
++        .name = "Loongson-3A4000",
++        .CP0_PRid = 0x14C000,
++        /* 64KB I-cache and d-cache. 4 way with 32 bit cache line size.  */
++        .CP0_Config0 = MIPS_CONFIG0 | (0x1 << CP0C0_AR) | (0x2 << CP0C0_AT) |
++                       (MMU_TYPE_R4000 << CP0C0_MT),
++        .CP0_Config1 = MIPS_CONFIG1 | (1 << CP0C1_FP) | (63 << CP0C1_MMU) |
++                       (2 << CP0C1_IS) | (5 << CP0C1_IL) | (3 << CP0C1_IA) |
++                       (2 << CP0C1_DS) | (5 << CP0C1_DL) | (3 << CP0C1_DA) |
++                       (1 << CP0C1_PC) | (1 << CP0C1_WR) | (1 << CP0C1_EP),
++        .CP0_Config2 = MIPS_CONFIG2 | (5 << CP0C2_SS) | (5 << CP0C2_SL) |
++                       (15 << CP0C2_SA),
++        .CP0_Config3 = MIPS_CONFIG3 | (1U << CP0C3_M) | (1 << CP0C3_MSAP) |
++                       (1 << CP0C3_BP) | (1 << CP0C3_BI) | (1 << CP0C3_ULRI) |
++                       (1 << CP0C3_RXI) | (1 << CP0C3_LPA) | (1 << CP0C3_VInt),
++        .CP0_Config4 = MIPS_CONFIG4 | (1U << CP0C4_M) | (2 << CP0C4_IE) |
++                       (1 << CP0C4_AE) | (0x1c << CP0C4_KScrExist),
++        .CP0_Config4_rw_bitmask = 0,
++        .CP0_Config5 = MIPS_CONFIG5 | (1 << CP0C5_CRCP) | (1 << CP0C5_NFExists),
++        .CP0_Config5_rw_bitmask = (1 << CP0C5_K) | (1 << CP0C5_CV) |
++                                  (1 << CP0C5_MSAEn) | (1 << CP0C5_UFE) |
++                                  (1 << CP0C5_FRE) | (1 << CP0C5_SBRI),
++        .CP0_Config6 = (1 << CP0C6_VCLRU) | (1 << CP0C6_DCLRU) |
++                       (1 << CP0C6_SFBEN) | (1 << CP0C6_VLTINT) |
++                       (1 << CP0C6_INSTPREF) | (1 << CP0C6_DATAPREF),
++        .CP0_Config6_rw_bitmask = (1 << CP0C6_BPPASS) | (0x3f << CP0C6_KPOS) |
++                       (1 << CP0C6_KE) | (1 << CP0C6_VTLBONLY) |
++                       (1 << CP0C6_LASX) | (1 << CP0C6_SSEN) |
++                       (1 << CP0C6_DISDRTIME) | (1 << CP0C6_PIXNUEN) |
++                       (1 << CP0C6_SCRAND) | (1 << CP0C6_LLEXCEN) |
++                       (1 << CP0C6_DISVC) | (1 << CP0C6_VCLRU) |
++                       (1 << CP0C6_DCLRU) | (1 << CP0C6_PIXUEN) |
++                       (1 << CP0C6_DISBLKLYEN) | (1 << CP0C6_UMEMUALEN) |
++                       (1 << CP0C6_SFBEN) | (1 << CP0C6_FLTINT) |
++                       (1 << CP0C6_VLTINT) | (1 << CP0C6_DISBTB) |
++                       (3 << CP0C6_STPREFCTL) | (1 << CP0C6_INSTPREF) |
++                       (1 << CP0C6_DATAPREF),
++        .CP0_Config7 = 0,
++        .CP0_Config7_rw_bitmask = (1 << CP0C7_NAPCGEN) | (1 << CP0C7_UNIMUEN) |
++                                  (1 << CP0C7_VFPUCGEN),
++        .CP0_LLAddr_rw_bitmask = 1,
++        .SYNCI_Step = 16,
++        .CCRes = 2,
++        .CP0_Status_rw_bitmask = 0x7DDBFFFF,
++        .CP0_PageGrain = (1 << CP0PG_ELPA),
++        .CP0_PageGrain_rw_bitmask = (1U << CP0PG_RIE) | (1 << CP0PG_XIE) |
++                    (1 << CP0PG_ELPA) | (1 << CP0PG_IEC),
++        .CP1_fcr0 = (0x5 << FCR0_PRID) | (0x1 << FCR0_REV) | (0x1 << FCR0_F64) |
++                    (0x1 << FCR0_PS) | (0x1 << FCR0_L) | (0x1 << FCR0_W) |
++                    (0x1 << FCR0_D) | (0x1 << FCR0_S),
++        .CP1_fcr31 = 0,
++        .CP1_fcr31_rw_bitmask = 0xFF83FFFF,
++        .SEGBITS = 48,
++        .PABITS = 48,
++        .insn_flags = CPU_LOONGSON3A,
++        .mmu_type = MMU_TYPE_R4000,
++    },
++    {
+         /* A generic CPU providing MIPS64 DSP R2 ASE features.
+            FIXME: Eventually this should be replaced by a real CPU model. */
+         .name = "mips64dspr2",
+diff --git a/target/mips/Makefile.objs b/target/mips/Makefile.objs
+index 91eb691..b820b3b 100644
+--- a/target/mips/Makefile.objs
++++ b/target/mips/Makefile.objs
+@@ -1,6 +1,6 @@
+ obj-y += translate.o cpu.o gdbstub.o helper.o
+ obj-y += op_helper.o cp0_helper.o fpu_helper.o
+-obj-y += dsp_helper.o lmi_helper.o msa_helper.o
++obj-y += dsp_helper.o lmmi_helper.o msa_helper.o
+ obj-$(CONFIG_SOFTMMU) += mips-semi.o
+ obj-$(CONFIG_SOFTMMU) += machine.o cp0_timer.o
+ obj-$(CONFIG_KVM) += kvm.o
 -- 
-2.26.2
+2.7.4
 
 
