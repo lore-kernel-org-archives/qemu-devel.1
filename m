@@ -2,77 +2,82 @@ Return-Path: <SRS0=hUBF=7W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98832C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 19:42:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C507C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 19:46:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6DA82206C3
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 19:42:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DA82206C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id D4029206C3
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 19:46:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D4029206C3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40902 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45184 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jik8Y-0006iB-MW
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 15:42:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55342)
+	id 1jikCy-0000Sf-32
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 15:46:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56310)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <sean.j.christopherson@intel.com>)
- id 1jik7s-0006HN-0u; Tue, 09 Jun 2020 15:41:36 -0400
-Received: from mga14.intel.com ([192.55.52.115]:58481)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <sean.j.christopherson@intel.com>)
- id 1jik7q-0008Ge-1t; Tue, 09 Jun 2020 15:41:35 -0400
-IronPort-SDR: ucM/8V6Av/yxpRzu4akGLARy5zjD8O21KESuTx8J54Zh9lSyzaoJeJzppWtS2XuPWeS1lgZ8WM
- 26kJkijVTYpQ==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
- by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 09 Jun 2020 12:41:15 -0700
-IronPort-SDR: fhpdYRU5FgDmU+5o30NEvGCc5e7/YKXxQnuMiuSUD8hh0wChFEOHE5LVXEdfazJB2uHlQbzAxZ
- TYStdIYJL2Eg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,493,1583222400"; d="scan'208";a="349620540"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com)
- ([10.54.74.152])
- by orsmga001.jf.intel.com with ESMTP; 09 Jun 2020 12:41:14 -0700
-Date: Tue, 9 Jun 2020 12:41:14 -0700
-From: Sean Christopherson <sean.j.christopherson@intel.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH v3 00/20] virtio-mem: Paravirtualized memory hot(un)plug
-Message-ID: <20200609194114.GA15818@linux.intel.com>
-References: <20200603144914.41645-1-david@redhat.com>
- <20200609091034-mutt-send-email-mst@kernel.org>
- <08385823-d98f-fd9d-aa9d-bc1bd6747c29@redhat.com>
- <20200609115814-mutt-send-email-mst@kernel.org>
- <20200609161814.GJ2366737@habkost.net>
- <33021b38-cf60-fbfc-1baa-478ee6eed376@redhat.com>
- <20200609144242-mutt-send-email-mst@kernel.org>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jikBo-0008NR-Ib
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 15:45:40 -0400
+Received: from indium.canonical.com ([91.189.90.7]:47896)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jikBn-0000ha-6g
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 15:45:40 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jikBl-0002KG-86
+ for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 19:45:37 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 275162E810A
+ for <qemu-devel@nongnu.org>; Tue,  9 Jun 2020 19:45:37 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200609144242-mutt-send-email-mst@kernel.org>
-User-Agent: Mutt/1.5.24 (2015-08-30)
-Received-SPF: pass client-ip=192.55.52.115;
- envelope-from=sean.j.christopherson@intel.com; helo=mga14.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 15:41:15
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -68
-X-Spam_score: -6.9
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 09 Jun 2020 19:37:54 -0000
+From: Thomas Huth <1882784@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Confirmed; importance=High;
+ assignee=th.huth@posteo.de; 
+X-Launchpad-Bug-Tags: assign igd quirk
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: sshaikh th-huth thecatfelix
+X-Launchpad-Bug-Reporter: Shak (sshaikh)
+X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
+References: <159171166832.31735.6432186230204851906.malonedeb@gac.canonical.com>
+Message-Id: <159173147557.4871.7214609551046522656.launchpad@soybean.canonical.com>
+Subject: [Bug 1882784] Re: Legacy IGD passthrough in QEMU 5 disabled
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="ef9fc486e875d54078fa61cf91e898b895125d89";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 68f2da0b3d63d7880a87eba83f3cc34720d5c1b3
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 10:15:37
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -65
+X-Spam_score: -6.6
 X-Spam_bar: ------
-X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_HI=-5,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -81,86 +86,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org,
- David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org,
- teawater <teawaterz@linux.alibaba.com>, Janosch Frank <frankja@linux.ibm.com>,
- Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Richard Henderson <rth@twiddle.net>, Eric Farman <farman@linux.ibm.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Keith Busch <kbusch@kernel.org>,
- Hailiang Zhang <zhang.zhanghailiang@huawei.com>,
- Tony Krowiak <akrowiak@linux.ibm.com>,
- Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
- Pierre Morel <pmorel@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>,
- qemu-s390x@nongnu.org, Igor Mammedov <imammedo@redhat.com>
+Reply-To: Bug 1882784 <1882784@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jun 09, 2020 at 02:42:59PM -0400, Michael S. Tsirkin wrote:
-> On Tue, Jun 09, 2020 at 08:38:15PM +0200, David Hildenbrand wrote:
-> > On 09.06.20 18:18, Eduardo Habkost wrote:
-> > > On Tue, Jun 09, 2020 at 11:59:04AM -0400, Michael S. Tsirkin wrote:
-> > >> On Tue, Jun 09, 2020 at 03:26:08PM +0200, David Hildenbrand wrote:
-> > >>> On 09.06.20 15:11, Michael S. Tsirkin wrote:
-> > >>>> On Wed, Jun 03, 2020 at 04:48:54PM +0200, David Hildenbrand wrote:
-> > >>>>> This is the very basic, initial version of virtio-mem. More info on
-> > >>>>> virtio-mem in general can be found in the Linux kernel driver v2 posting
-> > >>>>> [1] and in patch #10. The latest Linux driver v4 can be found at [2].
-> > >>>>>
-> > >>>>> This series is based on [3]:
-> > >>>>>     "[PATCH v1] pc: Support coldplugging of virtio-pmem-pci devices on all
-> > >>>>>      buses"
-> > >>>>>
-> > >>>>> The patches can be found at:
-> > >>>>>     https://github.com/davidhildenbrand/qemu.git virtio-mem-v3
-> > >>>>
-> > >>>> So given we tweaked the config space a bit, this needs a respin.
-> > >>>
-> > >>> Yeah, the virtio-mem-v4 branch already contains a fixed-up version. Will
-> > >>> send during the next days.
-> > >>
-> > >> BTW. People don't normally capitalize the letter after ":".
-> > >> So a better subject is
-> > >>   virtio-mem: paravirtualized memory hot(un)plug
-> > > 
-> > > I'm not sure that's still the rule:
-> > > 
-> > > [qemu/(49ee115552...)]$ git log --oneline v4.0.0.. | egrep ': [A-Z]' | wc -l
-> > > 5261
-> > > [qemu/(49ee115552...)]$ git log --oneline v4.0.0.. | egrep ': [a-z]' | wc -l
-> > > 2921
-> > > 
-> > 
-> > Yeah, I switched to this scheme some years ago (I even remember that
-> > some QEMU maintainer recommended it). I decided to just always
-> > capitalize. Not that it should really matter ... :)
-> 
-> Don't mind about qemu but you don't want to do that for Linux.
+** Changed in: qemu
+   Importance: Undecided =3D> High
 
-Heh, depends on who you ask.  The tip tree maintainers (strongly) prefer
-capitalizing the first word after the colon[*], and that naturally
-percolates into a lot of other subsystems, e.g. I follow that pattern for
-KVM so that I don't have to remember to switch when submitting patches
-against a tip branch.
+** Changed in: qemu
+       Status: New =3D> Confirmed
 
+** Changed in: qemu
+     Assignee: (unassigned) =3D> Thomas Huth (th-huth)
 
-+Patch subject
-+^^^^^^^^^^^^^
-+
-+The tip tree preferred format for patch subject prefixes is
-+'subsys/component:', e.g. 'x86/apic:', 'x86/mm/fault:', 'sched/fair:',
-+'genirq/core:'. Please do not use file names or complete file paths as
-+prefix. 'git log path/to/file' should give you a reasonable hint in most
-+cases.
-+
-+The condensed patch description in the subject line should start with a
-+uppercase letter and should be written in imperative tone.
+-- =
 
-[*] https://lkml.kernel.org/r/20181107171149.165693799@linutronix.de
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1882784
 
+Title:
+  Legacy IGD passthrough in QEMU 5 disabled
+
+Status in QEMU:
+  Confirmed
+
+Bug description:
+  Bug with tag v5.0.0, or commit
+  fdd76fecdde1ad444ff4deb7f1c4f7e4a1ef97d6
+
+  As of QEMU 5 Legacy IGD PT is no longer working.
+
+  Host is a Xeon E3-1226 v3 and my method to test is to run the
+  following:
+
+  ./qemu-system-x86_64 \
+    -device 'pci-bridge,id=3Dpci.1,chassis_nr=3D1,bus=3Dpci.0,addr=3D0x1f' \
+    -device 'vfio-pci,host=3D00:02.0,addr=3D02.0' \
+    -L '/usr/share/kvm' \
+    -nographic \
+    -vga none \
+    -nodefaults
+
+  in the hope of seeing a "IGD device 0000:00:02.0 cannot support legacy
+  mode due to existing devices at address 1f.0" error.
+
+  The culprit appears to be this commit:
+
+  https://github.com/qemu/qemu/commit/29d62771c81d8fd244a67c14a1d968c268d3f=
+b19
+
+  Specifically the following block in pci-quirks.c:
+
+  #ifdef CONFIG_VFIO_IGD
+      vfio_probe_igd_bar4_quirk(vdev, nr);
+  #endif
+
+  as the kconfig variable CONFIG_VFIO_IGD doesn't appear to be available
+  outside of makefiles as described here:
+  https://qemu.weilnetz.de/doc/devel/kconfig.html. I can confirm that
+  the igd code is being pulled in as removing this check, as would
+  defining the variable I presume, makes Legacy IGD PT work again (ie I
+  see the expected "existing devices" error).
+
+  I first spotted this in Proxmox, but have confirmed the bug by
+  building QEMU sources.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1882784/+subscriptions
 
