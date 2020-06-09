@@ -2,73 +2,82 @@ Return-Path: <SRS0=hUBF=7W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11CBAC433E1
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 18:14:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB185C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 18:14:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E24EA2068D
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 18:14:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E24EA2068D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 934662068D
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 18:14:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 934662068D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41922 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42064 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jiilL-0002IV-4j
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 14:14:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34102)
+	id 1jiilN-0002M4-Pl
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 14:14:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34116)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrzej.jakowski@linux.intel.com>)
- id 1jiihv-0006ey-Bl; Tue, 09 Jun 2020 14:10:44 -0400
-Received: from mga04.intel.com ([192.55.52.120]:20082)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrzej.jakowski@linux.intel.com>)
- id 1jiihp-0003Tr-EH; Tue, 09 Jun 2020 14:10:42 -0400
-IronPort-SDR: eJCIMOLdfwN7Msojgxz8fBPlwCn6kYgmX42cLre26/MMG96WwHW5JbUey34aSHmK1nCLVMKoi9
- bBKGPmGxftmQ==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
- by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 09 Jun 2020 11:10:31 -0700
-IronPort-SDR: UBuP3uD2GQ8b9BlcIJU8PNNQLtDq+tY33Kdbti8g4cnHVGiA5UmuAWI2kWr/ddWLN4Pg5Oxk7Z
- fTuFYpYshVbA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,492,1583222400"; d="scan'208";a="259883680"
-Received: from unknown (HELO localhost.ch.intel.com) ([10.2.28.117])
- by orsmga007.jf.intel.com with ESMTP; 09 Jun 2020 11:10:30 -0700
-From: Andrzej Jakowski <andrzej.jakowski@linux.intel.com>
-To: kbusch@kernel.org,
-	kwolf@redhat.com,
-	mreitz@redhat.com
-Subject: [PATCH v2 1/2] nvme: indicate CMB support through controller
- capabilities register
-Date: Tue,  9 Jun 2020 11:11:29 -0700
-Message-Id: <20200609181130.20936-2-andrzej.jakowski@linux.intel.com>
-X-Mailer: git-send-email 2.21.1
-In-Reply-To: <20200609181130.20936-1-andrzej.jakowski@linux.intel.com>
-References: <20200609181130.20936-1-andrzej.jakowski@linux.intel.com>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jiii0-0006ju-Ro
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 14:10:49 -0400
+Received: from indium.canonical.com ([91.189.90.7]:57870)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jiihz-0003aC-9F
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 14:10:48 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jiihx-0007ju-30
+ for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 18:10:45 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 0FFFD2E802E
+ for <qemu-devel@nongnu.org>; Tue,  9 Jun 2020 18:10:45 +0000 (UTC)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: none client-ip=192.55.52.120;
- envelope-from=andrzej.jakowski@linux.intel.com; helo=mga04.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 14:10:30
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 09 Jun 2020 18:00:51 -0000
+From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1882817@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: philmd theartlav
+X-Launchpad-Bug-Reporter: Artyom (theartlav)
+X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
+ =?utf-8?q?=29?=
+References: <159172265471.31406.7196816329603804386.malonedeb@gac.canonical.com>
+Message-ID: <8f0267bf-1020-a3eb-e205-8727aa535e14@redhat.com>
+Subject: Re: [Bug 1882817] [NEW] Segfault in audio_pcm_sw_write with audio
+ over VNC
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="ef9fc486e875d54078fa61cf91e898b895125d89";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: a292390a48afed270a067ad5cd98cdcfa92a4037
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 10:15:37
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,77 +86,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Klaus Jensen <k.jensen@samsung.com>,
- Andrzej Jakowski <andrzej.jakowski@linux.intel.com>, qemu-devel@nongnu.org,
- qemu-block@nongnu.org
+Reply-To: Bug 1882817 <1882817@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Message-ID: <20200609180051.ZC1uKpaAEfFvFIzzF1bu6CB4dkqaOe8PPWIcPWLKPxc@z>
 
-This patch sets CMBS bit in controller capabilities register when user
-configures NVMe driver with CMB support, so capabilites are correctly
-reported to guest OS.
+On 6/9/20 7:10 PM, Artyom wrote:
+> Public bug reported:
+> =
 
-Signed-off-by: Andrzej Jakowski <andrzej.jakowski@linux.intel.com>
-Reviewed-by: Klaus Jensen <k.jensen@samsung.com>
----
- hw/block/nvme.c      | 2 +-
- include/block/nvme.h | 6 +++++-
- 2 files changed, 6 insertions(+), 2 deletions(-)
+> QEMU 5.0.0, built with ./configure --target-list=3Dx86_64-softmmu
+> --enable-debug --disable-strip --disable-docs --disable-sdl
+> =
 
-diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 567bce7519..54d4201daa 100644
---- a/hw/block/nvme.c
-+++ b/hw/block/nvme.c
-@@ -1570,6 +1570,7 @@ static void nvme_init_ctrl(NvmeCtrl *n, PCIDevice *pci_dev)
-     NVME_CAP_SET_TO(n->bar.cap, 0xf);
-     NVME_CAP_SET_CSS(n->bar.cap, 1);
-     NVME_CAP_SET_MPSMAX(n->bar.cap, 4);
-+    NVME_CAP_SET_CMBS(n->bar.cap, n->params.cmb_size_mb ? 1 : 0);
- 
-     n->bar.vs = 0x00010200;
-     n->bar.intmc = n->bar.intms = 0;
-@@ -1579,7 +1580,6 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
- {
-     NvmeCtrl *n = NVME(pci_dev);
-     Error *local_err = NULL;
--
-     int i;
- 
-     nvme_check_constraints(n, &local_err);
-diff --git a/include/block/nvme.h b/include/block/nvme.h
-index 1720ee1d51..14cf398dfa 100644
---- a/include/block/nvme.h
-+++ b/include/block/nvme.h
-@@ -35,6 +35,7 @@ enum NvmeCapShift {
-     CAP_MPSMIN_SHIFT   = 48,
-     CAP_MPSMAX_SHIFT   = 52,
-     CAP_PMR_SHIFT      = 56,
-+    CAP_CMB_SHIFT      = 57,
- };
- 
- enum NvmeCapMask {
-@@ -48,6 +49,7 @@ enum NvmeCapMask {
-     CAP_MPSMIN_MASK    = 0xf,
-     CAP_MPSMAX_MASK    = 0xf,
-     CAP_PMR_MASK       = 0x1,
-+    CAP_CMB_MASK       = 0x1,
- };
- 
- #define NVME_CAP_MQES(cap)  (((cap) >> CAP_MQES_SHIFT)   & CAP_MQES_MASK)
-@@ -78,8 +80,10 @@ enum NvmeCapMask {
-                                                            << CAP_MPSMIN_SHIFT)
- #define NVME_CAP_SET_MPSMAX(cap, val) (cap |= (uint64_t)(val & CAP_MPSMAX_MASK)\
-                                                             << CAP_MPSMAX_SHIFT)
--#define NVME_CAP_SET_PMRS(cap, val) (cap |= (uint64_t)(val & CAP_PMR_MASK)\
-+#define NVME_CAP_SET_PMRS(cap, val)   (cap |= (uint64_t)(val & CAP_PMR_MASK)   \
-                                                             << CAP_PMR_SHIFT)
-+#define NVME_CAP_SET_CMBS(cap, val)   (cap |= (uint64_t)(val & CAP_CMB_MASK)   \
-+                                                           << CAP_CMB_SHIFT)
- 
- enum NvmeCcShift {
-     CC_EN_SHIFT     = 0,
--- 
-2.21.1
+> Running on a headless host (Ryzen 3600), Arch Linux, 64bit latest.
+> Guest is also Arch Linux, 64bit.
+> =
 
+> Started with qemu-system-x86_64 -vnc 0.0.0.0:0 -enable-kvm -m 4096 -cpu h=
+ost -smp cores=3D2,threads=3D1,sockets=3D1 -machine q35 -vga std -device
+>  ich9-ahci,id=3Dahci -drive file=3Dvm0.qcow2,format=3Dqcow2,if=3Dnone,id=
+=3Ddsk0 -device ide-hd,drive=3Ddsk0,bus=3Dahci.0 -soundhw hda
+> =
+
+> So, a headless VM is running on a server and is being connected to over
+> VNC. The virtual sound card is detected and speaker test is running
+> inside the VM. So far so good.
+> =
+
+> Then, i tell the VNC client to enable audio (QEMU Audio Client Message,
+> 255,1,0). QEMU responds with a "stream is about to start" message (QEMU
+> Audio Server Message, 255,1,1) and then promptly crashes without sending
+> anything else.
+> =
+
+> Running it in GDB produces a crash at audio/audio.c:739
+> =
+
+> Thread 1 "qemu-system-x86" received signal SIGSEGV, Segmentation fault.
+> audio_pcm_sw_write (sw=3D0x5555575bbf30, buf=3D0x0, size=3D1628) at audio=
+/audio.c:739
+> 739             if (!sw->hw->pcm_ops->volume_out) {
+
+Isn't it the one fixed by
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg705896.html?
+
+> =
+
+> The exact sequence of events does not matter - i can enable sound before
+> playing anything, and then it would say nothing and keep working, but
+> crash with the same message once anything sound-playing is launched in
+> the VM.
+> =
+
+> Using different soundhw or adding various audiodev options does not seem
+> to affect anything.
+> =
+
+> I can't quite figure out if the QEMU Audio VNC extension is supposed to
+> work at all or not, but it would be handy to me if it is.
+> =
+
+> ** Affects: qemu
+>      Importance: Undecided
+>          Status: New
+>
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1882817
+
+Title:
+  Segfault in audio_pcm_sw_write with audio over VNC
+
+Status in QEMU:
+  New
+
+Bug description:
+  QEMU 5.0.0, built with ./configure --target-list=3Dx86_64-softmmu
+  --enable-debug --disable-strip --disable-docs --disable-sdl
+
+  Running on a headless host (Ryzen 3600), Arch Linux, 64bit latest.
+  Guest is also Arch Linux, 64bit.
+
+  Started with qemu-system-x86_64 -vnc 0.0.0.0:0 -enable-kvm -m 4096 -cpu h=
+ost -smp cores=3D2,threads=3D1,sockets=3D1 -machine q35 -vga std -device
+   ich9-ahci,id=3Dahci -drive file=3Dvm0.qcow2,format=3Dqcow2,if=3Dnone,id=
+=3Ddsk0 -device ide-hd,drive=3Ddsk0,bus=3Dahci.0 -soundhw hda
+
+  So, a headless VM is running on a server and is being connected to
+  over VNC. The virtual sound card is detected and speaker test is
+  running inside the VM. So far so good.
+
+  Then, i tell the VNC client to enable audio (QEMU Audio Client
+  Message, 255,1,0). QEMU responds with a "stream is about to start"
+  message (QEMU Audio Server Message, 255,1,1) and then promptly crashes
+  without sending anything else.
+
+  Running it in GDB produces a crash at audio/audio.c:739
+
+  Thread 1 "qemu-system-x86" received signal SIGSEGV, Segmentation fault.
+  audio_pcm_sw_write (sw=3D0x5555575bbf30, buf=3D0x0, size=3D1628) at audio=
+/audio.c:739
+  739             if (!sw->hw->pcm_ops->volume_out) {
+
+  The exact sequence of events does not matter - i can enable sound
+  before playing anything, and then it would say nothing and keep
+  working, but crash with the same message once anything sound-playing
+  is launched in the VM.
+
+  Using different soundhw or adding various audiodev options does not
+  seem to affect anything.
+
+  I can't quite figure out if the QEMU Audio VNC extension is supposed
+  to work at all or not, but it would be handy to me if it is.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1882817/+subscriptions
 
