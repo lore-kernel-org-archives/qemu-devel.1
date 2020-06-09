@@ -2,133 +2,101 @@ Return-Path: <SRS0=hUBF=7W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E67CAC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 15:52:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D76AC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 15:52:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AD0AC2072F
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 15:52:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 24A082072F
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 15:52:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HO2JYXNP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD0AC2072F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lJ7zlLMN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24A082072F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=acm.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39694 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39990 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jigY4-00047S-Us
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 11:52:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40148)
+	id 1jigYA-0004Em-E2
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 11:52:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40080)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jigXH-0003Br-N1
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 11:51:35 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:42440
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jigXF-00018H-FG
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 11:51:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591717891;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=TbBBeOu52tSeuHthXA4IihcpqnqC7Gp5xfrrqKp+zhk=;
- b=HO2JYXNPmy/tR3FZTpf9CN9Hdw8DE0W0hv8wuGFGjLHIerFIhuDAWh0nZqmrb17oOXywYp
- ow2JW+wJzvX6gSI/6FTOv88dsT8rmzIppjIf+j9Gm6msDIREE67L2xw0DcE7MualsuW/mI
- /rzmTai+ryamre19MLNe/ihYwM0eOI8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-129-s_SP6wEVPBeogbKJn3dpbA-1; Tue, 09 Jun 2020 11:51:30 -0400
-X-MC-Unique: s_SP6wEVPBeogbKJn3dpbA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DD32F464;
- Tue,  9 Jun 2020 15:51:27 +0000 (UTC)
-Received: from [10.36.114.103] (ovpn-114-103.ams2.redhat.com [10.36.114.103])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 00AF65D9E5;
- Tue,  9 Jun 2020 15:51:22 +0000 (UTC)
-Subject: Re: [PATCH v1] pc: Support coldplugging of virtio-pmem-pci devices on
- all buses
-To: "Michael S. Tsirkin" <mst@redhat.com>
-References: <20200525084511.51379-1-david@redhat.com>
- <20200609114608-mutt-send-email-mst@kernel.org>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <725c9b77-3b5b-068e-10f9-011a44d66a29@redhat.com>
-Date: Tue, 9 Jun 2020 17:51:22 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ (Exim 4.90_1) (envelope-from <tcminyard@gmail.com>)
+ id 1jigWe-0002hd-MV
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 11:50:56 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:37125)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <tcminyard@gmail.com>)
+ id 1jigWd-00012h-BC
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 11:50:56 -0400
+Received: by mail-oi1-x242.google.com with SMTP id a3so7199632oid.4
+ for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 08:50:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:date:from:to:cc:subject:message-id:reply-to:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to:user-agent;
+ bh=RajArREu1UnINA6Y1HfdHrvLyhVKE9EFkFF48FlUQgI=;
+ b=lJ7zlLMNzzaV3C0ekIoQJm8MfLtCeVYz62sVJSWMVWYJaK09W4a6m4Ubu2AwNfzFJz
+ lhc0YtoABdRhA3kjY7OD4K/8OxoRKEaJu19HWdPFq06k1TLnaX6xw6bKtxuGF6YgFkpn
+ sq0xNvaxwBkOzohQ5ca6A8IECXWovCYgRSKCM7jFuI7B8oYKgkbWyMlDmm2h2Tp5lDEf
+ 5O1FvhmaOTgnAb8rVZdFRpyqBP3DmOu5aVuXSBicTAFpbSG8qkrEz9CKlOdwLGsV8TaB
+ Pet2wBvug54EjMkb2J0pk2o2EeFOvWOveVimeq1mwd3aRpqgmg9DURyVfbhv28F9x790
+ whNQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+ :reply-to:references:mime-version:content-disposition
+ :content-transfer-encoding:in-reply-to:user-agent;
+ bh=RajArREu1UnINA6Y1HfdHrvLyhVKE9EFkFF48FlUQgI=;
+ b=cjxeJuy+N30Hyq08BW+WZ6EFgcLKU9FWlmm2hA4eSuyekJXJC5n0GiD05NObxvbV34
+ nbm0RDv8yfYUpn0MvTlt442HVhJwqyLzmupj/XjNCw/nrUkbDwRtvMSpuz4FeP7pvdh2
+ l98o1JIw3jiUWmsWsswS/4dB+MV8bQ1+kvHXpvh4w4/2/Ix//qrzxB/OLPhCHbpzisHJ
+ 2SqHq2SnWeNvnHEtNAFcsMwH325d5meOPx36c/0oGZPWzM09F0C6kujolDfmJXPOPTsY
+ wzy23rfO7gaxfc2mp56v1n/UBi7ZwRSOtgFpvvLfxPIS+60yu26wnDW/XXC/VJGlNeHb
+ joUw==
+X-Gm-Message-State: AOAM533Oc3JlcVMrobZHs0Y3xKC5KHqTq16Tj4TWcon/vDBDN60IkfIr
+ 0IpXvbTY06QwyJl67QkgXnhVlTE=
+X-Google-Smtp-Source: ABdhPJz3NjhgVznmH7A1GANWWpCOI8nr9g+yjpgmlYeeXpfuuaHXR9d4WotvxfGxTj6M/Z6zYHjIEw==
+X-Received: by 2002:aca:3a08:: with SMTP id h8mr3956284oia.53.1591717852894;
+ Tue, 09 Jun 2020 08:50:52 -0700 (PDT)
+Received: from serve.minyard.net (serve.minyard.net. [2001:470:b8f6:1b::1])
+ by smtp.gmail.com with ESMTPSA id g4sm1975853otp.5.2020.06.09.08.50.51
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 09 Jun 2020 08:50:52 -0700 (PDT)
+Received: from minyard.net (unknown
+ [IPv6:2001:470:b8f6:1b:fc6b:eb5f:1e23:4ea5])
+ by serve.minyard.net (Postfix) with ESMTPSA id 32DCD180050;
+ Tue,  9 Jun 2020 15:50:51 +0000 (UTC)
+Date: Tue, 9 Jun 2020 10:50:50 -0500
+From: Corey Minyard <minyard@acm.org>
+To: Laszlo Ersek <lersek@redhat.com>
+Subject: Re: [PATCH v7 2/5] softmmu/vl: Let -fw_cfg option take a 'gen_id'
+ argument
+Message-ID: <20200609155050.GT2880@minyard.net>
+References: <20200528173141.17495-1-philmd@redhat.com>
+ <20200528173141.17495-3-philmd@redhat.com>
+ <f3f6154e-bbc1-98bd-0f44-77b28c74915f@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200609114608-mutt-send-email-mst@kernel.org>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=david@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/08 23:42:34
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <f3f6154e-bbc1-98bd-0f44-77b28c74915f@redhat.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+Received-SPF: pass client-ip=2607:f8b0:4864:20::242;
+ envelope-from=tcminyard@gmail.com; helo=mail-oi1-x242.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -141,54 +109,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
- Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Vivek Goyal <vgoyal@redhat.com>, Richard Henderson <rth@twiddle.net>
+Reply-To: minyard@acm.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 09.06.20 17:47, Michael S. Tsirkin wrote:
-> On Mon, May 25, 2020 at 10:45:11AM +0200, David Hildenbrand wrote:
->> E.g., with "pc-q35-4.2", trying to coldplug a virtio-pmem-pci devices
->> results in
->>     "virtio-pmem-pci not supported on this bus"
->>
->> Reasons is, that the bus does not support hotplug and, therefore, does
->> not have a hotplug handler. Let's allow coldplugging virtio-pmem devices
->> on such buses. The hotplug order is only relevant for virtio-pmem-pci
->> when the guest is already alive and the device is visible before
->> memory_device_plug() wired up the memory device bits.
->>
->> Hotplug attempts will still fail with:
->>     "Error: Bus 'pcie.0' does not support hotplugging"
->>
->> Hotunplug attempts will still fail with:
->>     "Error: Bus 'pcie.0' does not support hotplugging"
->>
->> Reported-by: Vivek Goyal <vgoyal@redhat.com>
->> Cc: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
->> Cc: Igor Mammedov <imammedo@redhat.com>
->> Cc: Paolo Bonzini <pbonzini@redhat.com>
->> Cc: Richard Henderson <rth@twiddle.net>
->> Cc: Eduardo Habkost <ehabkost@redhat.com>
->> Cc: "Michael S. Tsirkin" <mst@redhat.com>
->> Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
+On Fri, May 29, 2020 at 11:50:24AM +0200, Laszlo Ersek wrote:
+> Gerd, Corey: there's a question for you near the end, please.
 > 
-> I assume you are still debugging Vivek's issues, right?
-> Let me know when you feel it's time to merge this ...
+> On 05/28/20 19:31, Philippe Mathieu-Daudé wrote:
 
-The remain issue is lack of libvirt support. This is good to be merged
-from my point of view.
+snip...
 
-Thanks!
+> 
+> 
+> (3) I've noticed another *potential* issue, from looking at the larger
+> context. I apologize for missing it in v6.
+> 
+> See commit bab47d9a75a3 ("Sort the fw_cfg file list", 2016-04-07). (I'm
+> copying Corey; Gerd is already copied.) From that commit, we have, at
+> the end of this function:
+> 
+>     /* For legacy, keep user files in a specific global order. */
+>     fw_cfg_set_order_override(fw_cfg, FW_CFG_ORDER_OVERRIDE_USER);
+>     fw_cfg_add_file(fw_cfg, name, buf, size);
+>     fw_cfg_reset_order_override(fw_cfg);
+> 
+> This takes effect for "file" and "string", but not for "gen_id". Should
+> we apply it to "gen_id" as well? (Sorry, I really don't understand what
+> commit bab47d9a75a3 is about!)
 
+I can explain the rationale for that change, but I'm not sure of the
+answer to your question.  That changes makes sure that the fw_cfg data
+remains exactly the same even on newer versions of qemu if the machine
+is set the same.  This way you can do migrations to newer qemu versions
+and anything using fw_cfg won't get confused because the data changes.
 
--- 
-Thanks,
+The reason that change was so complex was preserving the order for
+migrating from older versions.
 
-David / dhildenb
+This is only about migration.  I'm not sure what gen_id is, but if it's
+migrated, it better be future proof.
 
+-corey
+
+> 
+> *IF* we want to apply the same logic to "gen_id", then we should
+> *perhaps* do, on the "nonempty_str(gen_id)" branch:
+> 
+>         size_t fw_cfg_size;
+> 
+>         fw_cfg_set_order_override(fw_cfg, FW_CFG_ORDER_OVERRIDE_USER);
+>         fw_cfg_size = fw_cfg_add_from_generator(fw_cfg, name, gen_id, errp);
+>         fw_cfg_reset_order_override(fw_cfg);
+>         return (fw_cfg_size > 0) ? 0 : -1;
+> 
+> I think???
+> 
+> Or maybe even use FW_CFG_ORDER_OVERRIDE_DEVICE rather than
+> FW_CFG_ORDER_OVERRIDE_USER? I don't have the slightest clue.
+> 
+> (I guess if I understood what commit bab47d9a75a3 was about, I'd be less
+> in doubt now. But that commit only hints at "avoid[ing] any future
+> issues of moving the file creation" -- I don't know what those issues
+> were in the first place!)
+> 
+> With (1) optionally fixed, and (2) fixed, I'd be willing to R-b this
+> patch; but I'm really thrown off by (3).
+> 
+> Thanks,
+> Laszlo
+> 
+> 
+> >      } else {
+> >          GError *err = NULL;
+> >          if (!g_file_get_contents(file, &buf, &size, &err)) {
+> >
+> 
 
