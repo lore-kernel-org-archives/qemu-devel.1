@@ -7,82 +7,81 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BEE31C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 10:43:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40585C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 10:43:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 87A02207C3
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 10:43:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 08F5B207C3
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 10:43:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Zf9S30aM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87A02207C3
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="n2KP0W3r"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08F5B207C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49272 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49332 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jibjM-0006be-Rg
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 06:43:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59310)
+	id 1jibjO-0006d4-9w
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 06:43:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59316)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jibeF-0007mK-7n
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 06:38:27 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:37662)
+ id 1jibeG-0007nm-Mv
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 06:38:28 -0400
+Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:42512)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jibeE-0004Pd-3l
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 06:38:26 -0400
-Received: by mail-wm1-x342.google.com with SMTP id y20so2593618wmi.2
- for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 03:38:25 -0700 (PDT)
+ id 1jibeF-0004Pq-TM
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 06:38:28 -0400
+Received: by mail-wr1-x42f.google.com with SMTP id p5so20691611wrw.9
+ for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 03:38:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=YwfLakl/cuGc3cX6E72LnRG3LKOeHT2DnOthsE4iiK0=;
- b=Zf9S30aM3qSl0o79RsehUHHNA9idMphGwXlCnmB4Hf9zb3pXy1ksVZ7T1jDT/2s51M
- 5K4ZbtUQ/DjlUpx4/nCvczupno6WopEQHZhQaD7kpCdDwk5Hj7lZY7YfD2b2gIzTPnIf
- 5fT46IfiZMbAveIMZmT69dGoSiyagBZbanVDHz9AKJxK35vwZr4Nf2Bqk2ebWiQOXaTm
- DvprYuUUhNjUZw3JES0bX6OCL3a/kL1xAFhini8NaSzUK92dyYd5CpF3bheNDAnLSgtD
- Do0itQbjhDl/sXgveWj03iabYVQmMzE9omk25mqXl68sNOdkpTNAfDALYWPrrUP8D5nP
- crPg==
+ bh=k3lF9DeNDfRTjUxYMHbrRJM1lI0Q2JxlrXUIAK9HEcQ=;
+ b=n2KP0W3r1sfXTeyfE1QD0uZ5i0HjG2xf22421NAtgelSeWmMaSfqXvgwdGmehGcILk
+ d+XzzkHJqfGKjDkFggXmR0gWG5BGxBNN7yruzNHg4YStVG+Fp3XkVEw+Tj5gVd+GhcDx
+ /42sxHN7k3qMXsHikfpjPRIGVK2Tla3Mw3A8G8GLlYTQbJKHb2hP6DlTwiUyhjVvdHrQ
+ LimPZVk3gUKSnEImWudbYdSoDOAqqRs2h118j94WJDT4+KrdmV+sSdooII8g4p2ulf5O
+ WCXQoV5IBwL+iRY2M/+W25Q1b3cXSJnRJbH63d1MhCYRdwsbV2Pa/THrpyNyf2g+ANs8
+ W0ow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=YwfLakl/cuGc3cX6E72LnRG3LKOeHT2DnOthsE4iiK0=;
- b=qIMbmX15tMJUVvTixIypmYXe6WVS7UhgXo6oNlp4jX697Rv9bALfqojVIXG7cpWLvg
- B0vOd1Gk2tt7Vyzw3C6D3CHnkd75U8p4Vew5Oo8xAkG2NJntUWOYDpj/NFg01xqU8nVq
- 1SJnqrDb73XW6SuT1OM3i3s295P99gI9Vfc534Vdg6+6yp59vhfA4KscNFgEra/BZTd6
- u7TAr+MGZV85Uy++zGL9tQ9xpxDD1728O3KT3djiUBxc9/DKhfHBWnyGaLIZ0N0QKCmT
- S7RVlZnDdzYwyy93jBEbVw8CI8n1Sh14mXSmCwjll7o6bm17wMuin0S+2W33D/tts5ww
- 2wig==
-X-Gm-Message-State: AOAM531Dhze8LL8mjDyTq8rHwb1jy2Y/ETNeYmBHGxtcSWP2JPZEgvvi
- o1o9M7SBT76nlh3YYaBt6yQIkdbUQpA=
-X-Google-Smtp-Source: ABdhPJyfUmlqPxFhJ8tyXaQmFsxWPaS19+5bvEASPlG3nmgi+JoQqnyF1OM3czSyX4KhbaBGGnWYfw==
-X-Received: by 2002:a1c:7215:: with SMTP id n21mr3303172wmc.10.1591699104628; 
- Tue, 09 Jun 2020 03:38:24 -0700 (PDT)
+ bh=k3lF9DeNDfRTjUxYMHbrRJM1lI0Q2JxlrXUIAK9HEcQ=;
+ b=GhA/hVDFWmfP7UPN7Iphgk7losxKN0tnTCbmsB54rV8k4yxXseKi1Za4X5QeHxjjHx
+ 6OrAcvXP8hHcxWKp8cIydw4zLiWeHG5QzmiAz7b/vrumzjs4F00JzqAgIFdGyACluZV7
+ RGtB+IKc7L5CF35cHloch9igcCPt9tuwH9AWIvnaOyOeQC569wLJbv0nVMkPNN2ju4rC
+ 8oWF5+fv8JMrChi/pMOfZD4QPhwlyWktU8ai+KOQbBDsd6JD6eOXqzwNsX8L56nkq7WL
+ WeqH9pDy98vpHa3B1G0buNa3pB3A4Xq77gD3u9anpgntzUhlNgsSIiqZ9jrsR+qZOk2S
+ 1TLg==
+X-Gm-Message-State: AOAM531CfRPSCZZGbVxorrrLP9hcc6kDI9nzurK5uUuFD5sB07uR2j48
+ iHHgojG2GvCOOnqVR4FXQaQjyA==
+X-Google-Smtp-Source: ABdhPJw+GOGBAuAivyl/zKXfkRTdcEq9CNO3YJM9VGLPf38fT87c7KtyVtrTF3M+Rp2M2Wl6iRlaRQ==
+X-Received: by 2002:adf:dd46:: with SMTP id u6mr3476083wrm.44.1591699105982;
+ Tue, 09 Jun 2020 03:38:25 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id l17sm2978481wrq.17.2020.06.09.03.38.14
+ by smtp.gmail.com with ESMTPSA id b8sm3145375wrs.36.2020.06.09.03.38.13
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
  Tue, 09 Jun 2020 03:38:19 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 84A781FF99;
+ by zen.linaroharston (Postfix) with ESMTP id 35B301FF96;
  Tue,  9 Jun 2020 11:38:11 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: peter.maydell@linaro.org
-Subject: [PULL 10/17] linux-user: provide fallback pgd_find_hole for bare
- chroots
-Date: Tue,  9 Jun 2020 11:38:02 +0100
-Message-Id: <20200609103809.23443-11-alex.bennee@linaro.org>
+Subject: [PULL 08/17] docker: update Ubuntu to 20.04
+Date: Tue,  9 Jun 2020 11:38:00 +0100
+Message-Id: <20200609103809.23443-9-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200609103809.23443-1-alex.bennee@linaro.org>
 References: <20200609103809.23443-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::342;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x342.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::42f;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x42f.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -104,96 +103,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
- Laurent Vivier <laurent@vivier.eu>
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <fam@euphon.net>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When running QEMU out of a chroot environment we may not have access
-to /proc/self/maps. As there is no other "official" way to introspect
-our memory map we need to fall back to the original technique of
-repeatedly trying to mmap an address range until we find one that
-works.
+From: Paolo Bonzini <pbonzini@redhat.com>
 
-Fortunately it's not quite as ugly as the original code given we
-already re-factored the complications of dealing with the
-ARM_COMMPAGE. We do make an attempt to skip over brk() which is about
-the only concrete piece of information we have about the address map
-at this moment.
-
-Fixes: ee9474303
-Reported-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Message-Id: <20200605154929.26910-12-alex.bennee@linaro.org>
+Message-Id: <20200604231716.11354-1-pbonzini@redhat.com>
+Message-Id: <20200605154929.26910-10-alex.bennee@linaro.org>
 
-diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-index ebc663ea0b3..475d243f3bd 100644
---- a/linux-user/elfload.c
-+++ b/linux-user/elfload.c
-@@ -2101,6 +2101,50 @@ static void pgb_have_guest_base(const char *image_name, abi_ulong guest_loaddr,
-     }
- }
+diff --git a/tests/docker/dockerfiles/ubuntu.docker b/tests/docker/dockerfiles/ubuntu.docker
+index eeb3b22bf20..43872417dec 100644
+--- a/tests/docker/dockerfiles/ubuntu.docker
++++ b/tests/docker/dockerfiles/ubuntu.docker
+@@ -9,7 +9,7 @@
+ # system won't pick up that it has changed.
+ #
  
-+/**
-+ * pgd_find_hole_fallback: potential mmap address
-+ * @guest_size: size of available space
-+ * @brk: location of break
-+ * @align: memory alignment
-+ *
-+ * This is a fallback method for finding a hole in the host address
-+ * space if we don't have the benefit of being able to access
-+ * /proc/self/map. It can potentially take a very long time as we can
-+ * only dumbly iterate up the host address space seeing if the
-+ * allocation would work.
-+ */
-+static uintptr_t pgd_find_hole_fallback(uintptr_t guest_size, uintptr_t brk, long align)
-+{
-+    uintptr_t base;
-+
-+    /* Start (aligned) at the bottom and work our way up */
-+    base = ROUND_UP(mmap_min_addr, align);
-+
-+    while (true) {
-+        uintptr_t align_start, end;
-+        align_start = ROUND_UP(base, align);
-+        end = align_start + guest_size;
-+
-+        /* if brk is anywhere in the range give ourselves some room to grow. */
-+        if (align_start <= brk && brk < end) {
-+            base = brk + (16 * MiB);
-+            continue;
-+        } else if (align_start + guest_size < align_start) {
-+            /* we have run out of space */
-+            return -1;
-+        } else {
-+            int flags = MAP_ANONYMOUS | MAP_PRIVATE | MAP_NORESERVE | MAP_FIXED;
-+            void * mmap_start = mmap((void *) align_start, guest_size,
-+                                     PROT_NONE, flags, -1, 0);
-+            if (mmap_start != MAP_FAILED) {
-+                munmap((void *) align_start, guest_size);
-+                return (uintptr_t) mmap_start;
-+            }
-+            base += qemu_host_page_size;
-+        }
-+    }
-+}
-+
- /* Return value for guest_base, or -1 if no hole found. */
- static uintptr_t pgb_find_hole(uintptr_t guest_loaddr, uintptr_t guest_size,
-                                long align)
-@@ -2116,6 +2160,10 @@ static uintptr_t pgb_find_hole(uintptr_t guest_loaddr, uintptr_t guest_size,
-     /* Read brk after we've read the maps, which will malloc. */
-     brk = (uintptr_t)sbrk(0);
- 
-+    if (!maps) {
-+        return pgd_find_hole_fallback(guest_size, brk, align);
-+    }
-+
-     /* The first hole is before the first map entry. */
-     this_start = mmap_min_addr;
- 
+-FROM ubuntu:19.04
++FROM ubuntu:20.04
+ ENV PACKAGES flex bison \
+     ccache \
+     clang \
 -- 
 2.20.1
 
