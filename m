@@ -2,43 +2,45 @@ Return-Path: <SRS0=hUBF=7W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DF37C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 19:08:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4504C433E1
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 19:08:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 227892067B
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 19:08:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 227892067B
+	by mail.kernel.org (Postfix) with ESMTPS id A0D472067B
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 19:08:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0D472067B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35526 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35672 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jijbW-0003Dk-BD
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 15:08:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44592)
+	id 1jijbX-0003HK-Qq
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 15:08:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44684)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1jijXF-0005xi-67; Tue, 09 Jun 2020 15:03:45 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:40178)
+ id 1jijXf-0006OR-82; Tue, 09 Jun 2020 15:04:11 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:40286)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1jijXD-0006eQ-Dc; Tue, 09 Jun 2020 15:03:44 -0400
+ id 1jijXd-0006iU-TD; Tue, 09 Jun 2020 15:04:10 -0400
 Received: from apples.local (80-167-98-190-cable.dk.customer.tdc.net
  [80.167.98.190])
- by charlie.dont.surf (Postfix) with ESMTPSA id 0A619BF533;
- Tue,  9 Jun 2020 19:03:39 +0000 (UTC)
+ by charlie.dont.surf (Postfix) with ESMTPSA id 49AC3BF8E0;
+ Tue,  9 Jun 2020 19:03:47 +0000 (UTC)
 From: Klaus Jensen <its@irrelevant.dk>
 To: qemu-block@nongnu.org
-Subject: [PATCH v7 00/22] nvme: small fixes, refactoring and cleanups
-Date: Tue,  9 Jun 2020 21:03:11 +0200
-Message-Id: <20200609190333.59390-1-its@irrelevant.dk>
+Subject: [PATCH v7 13/22] hw/block/nvme: add namespace helpers
+Date: Tue,  9 Jun 2020 21:03:24 +0200
+Message-Id: <20200609190333.59390-14-its@irrelevant.dk>
 X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20200609190333.59390-1-its@irrelevant.dk>
+References: <20200609190333.59390-1-its@irrelevant.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -75,66 +77,66 @@ Sender: "Qemu-devel"
 
 From: Klaus Jensen <k.jensen@samsung.com>
 
-Hi all,
+Introduce some small helpers to make the next patches easier on the eye.
 
-As per our discussion about how to amend the bug I introduced in
-"hw/block/nvme: allow use of any valid msix vector", this is a respin
-without that patch.
+Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+Reviewed-by: Keith Busch <kbusch@kernel.org>
+Message-Id: <20200514044611.734782-15-its@irrelevant.dk>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ hw/block/nvme.c |  3 +--
+ hw/block/nvme.h | 17 +++++++++++++++++
+ 2 files changed, 18 insertions(+), 2 deletions(-)
 
-Kevin, it applies cleanly on top of your block tree with all current
-hw/block/bnvme patches removed.
-
-
-Changes since v6
-~~~~~~~~~~~~~~~~
-* Dropped the goofed "hw/block/nvme: allow use of any valid msix vector"
-  patch.
-
-* Included Philippe's "hw/block/nvme: Verify msix_vector_use() returned
-  value" patch for posterity.
-
-* Added two patches (requesting reviews):
-
-    1. hw/block/nvme: add msix_qsize parameter
-    2. hw/block/nvme: verify msix_init_exclusive_bar() return value
-
-  Kevin, it's up to you if you want to wait for reviews on these two or
-  just pick up the rest of the series. But let's see if we can get a
-  quick review on them.
-
-
-Klaus Jensen (21):
-  hw/block/nvme: fix pci doorbell size calculation
-  hw/block/nvme: rename trace events to pci_nvme
-  hw/block/nvme: remove superfluous breaks
-  hw/block/nvme: move device parameters to separate struct
-  hw/block/nvme: use constants in identify
-  hw/block/nvme: refactor nvme_addr_read
-  hw/block/nvme: fix pin-based interrupt behavior
-  hw/block/nvme: add max_ioqpairs device parameter
-  hw/block/nvme: remove redundant cmbloc/cmbsz members
-  hw/block/nvme: factor out property/constraint checks
-  hw/block/nvme: factor out device state setup
-  hw/block/nvme: factor out block backend setup
-  hw/block/nvme: add namespace helpers
-  hw/block/nvme: factor out namespace setup
-  hw/block/nvme: factor out pci setup
-  hw/block/nvme: factor out cmb setup
-  hw/block/nvme: factor out pmr setup
-  hw/block/nvme: do cmb/pmr init as part of pci init
-  hw/block/nvme: factor out controller identify setup
-  hw/block/nvme: add msix_qsize parameter
-  hw/block/nvme: verify msix_init_exclusive_bar() return value
-
-Philippe Mathieu-Daudé (1):
-  hw/block/nvme: Verify msix_vector_use() returned value
-
- hw/block/nvme.c       | 576 ++++++++++++++++++++++++------------------
- hw/block/nvme.h       |  34 ++-
- hw/block/trace-events | 180 ++++++-------
- include/block/nvme.h  |   8 +
- 4 files changed, 459 insertions(+), 339 deletions(-)
-
+diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+index 87f1f0d0d1a1..3f3db17231b3 100644
+--- a/hw/block/nvme.c
++++ b/hw/block/nvme.c
+@@ -1573,8 +1573,7 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
+         id_ns->dps = 0;
+         id_ns->lbaf[0].ds = BDRV_SECTOR_BITS;
+         id_ns->ncap  = id_ns->nuse = id_ns->nsze =
+-            cpu_to_le64(n->ns_size >>
+-                id_ns->lbaf[NVME_ID_NS_FLBAS_INDEX(ns->id_ns.flbas)].ds);
++            cpu_to_le64(nvme_ns_nlbas(n, ns));
+     }
+ }
+ 
+diff --git a/hw/block/nvme.h b/hw/block/nvme.h
+index cedc8022dbb3..61dd9b23b81d 100644
+--- a/hw/block/nvme.h
++++ b/hw/block/nvme.h
+@@ -61,6 +61,17 @@ typedef struct NvmeNamespace {
+     NvmeIdNs        id_ns;
+ } NvmeNamespace;
+ 
++static inline NvmeLBAF *nvme_ns_lbaf(NvmeNamespace *ns)
++{
++    NvmeIdNs *id_ns = &ns->id_ns;
++    return &id_ns->lbaf[NVME_ID_NS_FLBAS_INDEX(id_ns->flbas)];
++}
++
++static inline uint8_t nvme_ns_lbads(NvmeNamespace *ns)
++{
++    return nvme_ns_lbaf(ns)->ds;
++}
++
+ #define TYPE_NVME "nvme"
+ #define NVME(obj) \
+         OBJECT_CHECK(NvmeCtrl, (obj), TYPE_NVME)
+@@ -97,4 +108,10 @@ typedef struct NvmeCtrl {
+     NvmeIdCtrl      id_ctrl;
+ } NvmeCtrl;
+ 
++/* calculate the number of LBAs that the namespace can accomodate */
++static inline uint64_t nvme_ns_nlbas(NvmeCtrl *n, NvmeNamespace *ns)
++{
++    return n->ns_size >> nvme_ns_lbads(ns);
++}
++
+ #endif /* HW_NVME_H */
 -- 
 2.27.0
 
