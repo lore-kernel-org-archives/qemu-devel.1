@@ -7,61 +7,60 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77B81C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 20:59:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D024C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 21:01:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4242F20734
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 20:59:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D79E620734
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 21:01:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NrfPwt5B"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4242F20734
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hn2NLAhK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D79E620734
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56468 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34486 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jilLH-0003Cz-Ie
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 16:59:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36390)
+	id 1jilNK-0005xC-5E
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 17:01:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36382)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jilEy-0001nN-Oj
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 16:53:00 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:44726
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jilEz-0001ly-6j
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 16:53:01 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:55821
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jilEx-0005cu-FW
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 16:53:00 -0400
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jilEx-0005ce-2M
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 16:52:59 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
  s=mimecast20190719; t=1591735978;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=xT7Dl2Np4lOx6956wQcDiocA0YR43F2Wm7BjuOHNaGo=;
- b=NrfPwt5BkCmfKj5dTmk2+Got1gQtRDEHzZV7xZ7WiZLZ0iPiG4v0S4EzJt6+3P64hTjKx2
- Z/QQmSaJ29mJ03H96MoaT/oRV/bnjm1mlxUQkpNwTQleN53CUDxZQhgPovxZaVtvhsFuqP
- OdV7Di0bqPwpHUEjvd5KjURMXJWD/dI=
+ bh=SmaP7JFguXSYIUjpk3oKNGUpu9UHziHLNUscAdqJ86Y=;
+ b=Hn2NLAhKINuTW2OLES3ulTnEXydO8QSEC+ORX6Dx4eWjZliP+D139UD5hwdY2XfC2kVnpK
+ 50LgJXD1j+KO1g+77d6wbwWBrbXlMDs9fIbAT9wWHqWFGn09E8cEidMy1HzkNlsvc+XnIP
+ Dr8jl2w8nkwNqyHzoVlvSfv9k6JtyP8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-307-hK0iZE50NXuPlW9nJy6RyA-1; Tue, 09 Jun 2020 16:52:56 -0400
-X-MC-Unique: hK0iZE50NXuPlW9nJy6RyA-1
+ us-mta-152-aLbHigi-P5uHEZcn-u2EEw-1; Tue, 09 Jun 2020 16:52:52 -0400
+X-MC-Unique: aLbHigi-P5uHEZcn-u2EEw-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 554AA8015CE;
- Tue,  9 Jun 2020 20:52:55 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 43B006A2BE;
+ Tue,  9 Jun 2020 20:52:51 +0000 (UTC)
 Received: from blue.redhat.com (ovpn-113-22.phx2.redhat.com [10.3.113.22])
- by smtp.corp.redhat.com (Postfix) with ESMTP id CD94F60C80;
- Tue,  9 Jun 2020 20:52:54 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B8A066116D;
+ Tue,  9 Jun 2020 20:52:50 +0000 (UTC)
 From: Eric Blake <eblake@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 12/15] qcow2_format: refactor QcowHeaderExtension as a subclass
- of Qcow2Struct
-Date: Tue,  9 Jun 2020 15:52:42 -0500
-Message-Id: <20200609205245.3548257-13-eblake@redhat.com>
+Subject: [PULL 06/15] qcow2_format.py: use tuples instead of lists for fields
+Date: Tue,  9 Jun 2020 15:52:36 -0500
+Message-Id: <20200609205245.3548257-7-eblake@redhat.com>
 In-Reply-To: <20200609205245.3548257-1-eblake@redhat.com>
 References: <20200609205245.3548257-1-eblake@redhat.com>
 MIME-Version: 1.0
@@ -70,9 +69,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=eblake@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 16:46:48
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=eblake@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 02:44:16
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -104,99 +103,69 @@ Sender: "Qemu-devel"
 
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Only two fields we can parse by generic code, but that is better than
-nothing. Keep further refactoring of variable-length fields for another
-day.
+No need in lists: it's a constant variable.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Message-Id: <20200606081806.23897-12-vsementsov@virtuozzo.com>
+Message-Id: <20200606081806.23897-6-vsementsov@virtuozzo.com>
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- tests/qemu-iotests/qcow2_format.py | 53 +++++++++++++++++++++---------
- 1 file changed, 37 insertions(+), 16 deletions(-)
+ tests/qemu-iotests/qcow2_format.py | 40 +++++++++++++++---------------
+ 1 file changed, 20 insertions(+), 20 deletions(-)
 
 diff --git a/tests/qemu-iotests/qcow2_format.py b/tests/qemu-iotests/qcow2_format.py
-index d4ad5431b296..32371e42da4e 100644
+index 2b6c9612ae01..e2f08ed69194 100644
 --- a/tests/qemu-iotests/qcow2_format.py
 +++ b/tests/qemu-iotests/qcow2_format.py
-@@ -97,16 +97,41 @@ class Qcow2Struct(metaclass=Qcow2StructMeta):
-             print('{:<25} {}'.format(f[2], value_str))
+@@ -39,29 +39,29 @@ class QcowHeader:
+     uint32_t = 'I'
+     uint64_t = 'Q'
 
-
--class QcowHeaderExtension:
-+class QcowHeaderExtension(Qcow2Struct):
-
--    def __init__(self, magic, length, data):
--        if length % 8 != 0:
--            padding = 8 - (length % 8)
--            data += b'\0' * padding
+-    fields = [
 +    fields = (
-+        ('u32', '{:#x}', 'magic'),
-+        ('u32', '{}', 'length')
-+        # length bytes of data follows
-+        # then padding to next multiply of 8
+         # Version 2 header fields
+-        [uint32_t, '%#x',  'magic'],
+-        [uint32_t, '%d',   'version'],
+-        [uint64_t, '%#x',  'backing_file_offset'],
+-        [uint32_t, '%#x',  'backing_file_size'],
+-        [uint32_t, '%d',   'cluster_bits'],
+-        [uint64_t, '%d',   'size'],
+-        [uint32_t, '%d',   'crypt_method'],
+-        [uint32_t, '%d',   'l1_size'],
+-        [uint64_t, '%#x',  'l1_table_offset'],
+-        [uint64_t, '%#x',  'refcount_table_offset'],
+-        [uint32_t, '%d',   'refcount_table_clusters'],
+-        [uint32_t, '%d',   'nb_snapshots'],
+-        [uint64_t, '%#x',  'snapshot_offset'],
++        (uint32_t, '%#x',  'magic'),
++        (uint32_t, '%d',   'version'),
++        (uint64_t, '%#x',  'backing_file_offset'),
++        (uint32_t, '%#x',  'backing_file_size'),
++        (uint32_t, '%d',   'cluster_bits'),
++        (uint64_t, '%d',   'size'),
++        (uint32_t, '%d',   'crypt_method'),
++        (uint32_t, '%d',   'l1_size'),
++        (uint64_t, '%#x',  'l1_table_offset'),
++        (uint64_t, '%#x',  'refcount_table_offset'),
++        (uint32_t, '%d',   'refcount_table_clusters'),
++        (uint32_t, '%d',   'nb_snapshots'),
++        (uint64_t, '%#x',  'snapshot_offset'),
+
+         # Version 3 header fields
+-        [uint64_t, 'mask', 'incompatible_features'],
+-        [uint64_t, 'mask', 'compatible_features'],
+-        [uint64_t, 'mask', 'autoclear_features'],
+-        [uint32_t, '%d',   'refcount_order'],
+-        [uint32_t, '%d',   'header_length'],
+-    ]
++        (uint64_t, 'mask', 'incompatible_features'),
++        (uint64_t, 'mask', 'compatible_features'),
++        (uint64_t, 'mask', 'autoclear_features'),
++        (uint32_t, '%d',   'refcount_order'),
++        (uint32_t, '%d',   'header_length'),
 +    )
 
--        self.magic = magic
--        self.length = length
--        self.data = data
-+    def __init__(self, magic=None, length=None, data=None, fd=None):
-+        """
-+        Support both loading from fd and creation from user data.
-+        For fd-based creation current position in a file will be used to read
-+        the data.
-+
-+        This should be somehow refactored and functionality should be moved to
-+        superclass (to allow creation of any qcow2 struct), but then, fields
-+        of variable length (data here) should be supported in base class
-+        somehow. So, it's a TODO. We'll see how to properly refactor this when
-+        we have more qcow2 structures.
-+        """
-+        if fd is None:
-+            assert all(v is not None for v in (magic, length, data))
-+            self.magic = magic
-+            self.length = length
-+            if length % 8 != 0:
-+                padding = 8 - (length % 8)
-+                data += b'\0' * padding
-+            self.data = data
-+        else:
-+            assert all(v is None for v in (magic, length, data))
-+            super().__init__(fd=fd)
-+            padded = (self.length + 7) & ~7
-+            self.data = fd.read(padded)
-+            assert self.data is not None
-
-     def dump(self):
-         data = self.data[:self.length]
-@@ -115,8 +140,7 @@ class QcowHeaderExtension:
-         else:
-             data = '<binary>'
-
--        print(f'{"magic":<25} {self.magic:#x}')
--        print(f'{"length":<25} {self.length}')
-+        super().dump()
-         print(f'{"data":<25} {data}')
-
-     @classmethod
-@@ -182,14 +206,11 @@ class QcowHeader(Qcow2Struct):
-             end = self.cluster_size
-
-         while fd.tell() < end:
--            (magic, length) = struct.unpack('>II', fd.read(8))
--            if magic == 0:
-+            ext = QcowHeaderExtension(fd=fd)
-+            if ext.magic == 0:
-                 break
-             else:
--                padded = (length + 7) & ~7
--                data = fd.read(padded)
--                self.extensions.append(QcowHeaderExtension(magic, length,
--                                                           data))
-+                self.extensions.append(ext)
-
-     def update_extensions(self, fd):
+     fmt = '>' + ''.join(field[0] for field in fields)
 
 -- 
 2.27.0
