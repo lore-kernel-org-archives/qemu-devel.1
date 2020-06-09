@@ -2,75 +2,71 @@ Return-Path: <SRS0=hUBF=7W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 615ADC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 07:32:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 250EDC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 07:32:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 31A0B207C3
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 07:32:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31A0B207C3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=winhong.com
+	by mail.kernel.org (Postfix) with ESMTPS id E2E3F207C3
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 07:32:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2E3F207C3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45522 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46574 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jiYkB-0003jN-Ci
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 03:32:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40228)
+	id 1jiYkh-0004FV-30
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 03:32:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40252)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <yili@winhong.com>) id 1jiYil-0002vr-TQ
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 03:30:56 -0400
-Received: from regular1.263xmail.com ([211.150.70.202]:58308)
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jiYj7-00038R-L9
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 03:31:17 -0400
+Received: from 13.mo7.mail-out.ovh.net ([87.98.150.175]:47716)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <yili@winhong.com>) id 1jiYig-0007E9-Lh
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 03:30:54 -0400
-Received: from localhost (unknown [192.168.167.8])
- by regular1.263xmail.com (Postfix) with ESMTP id 7E82C43E
- for <qemu-devel@nongnu.org>; Tue,  9 Jun 2020 15:30:32 +0800 (CST)
-X-MAIL-GRAY: 0
-X-MAIL-DELIVERY: 1
-X-ADDR-CHECKED4: 1
-X-ANTISPAM-LEVEL: 2
-X-SKE-CHECKED: 1
-X-ABS-CHECKED: 1
-Received: from localhost.localdomain (unknown [14.18.236.69])
- by smtp.263.net (postfix) whith ESMTP id
- P14513T140696163952384S1591687825745897_; 
- Tue, 09 Jun 2020 15:30:32 +0800 (CST)
-X-IP-DOMAINF: 1
-X-UNIQUE-TAG: <248b8a305ae9aee3f8b1cdd569821f8e>
-X-RL-SENDER: yili@winhong.com
-X-SENDER: yili@winhong.com
-X-LOGIN-NAME: yili@winhong.com
-X-FST-TO: qemu-devel@nongnu.org
-X-SENDER-IP: 14.18.236.69
-X-ATTACHMENT-NUM: 0
-X-DNS-TYPE: 0
-X-System-Flag: 0
-From: Yi Li <yili@winhong.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] rbd: Use RBD fast-diff for querying actual allocation
-Date: Tue,  9 Jun 2020 15:30:01 +0800
-Message-Id: <20200609073001.3668811-1-yili@winhong.com>
-X-Mailer: git-send-email 2.25.3
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jiYj6-0007R6-Nk
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 03:31:17 -0400
+Received: from player693.ha.ovh.net (unknown [10.110.171.40])
+ by mo7.mail-out.ovh.net (Postfix) with ESMTP id 6B2CC1684CD
+ for <qemu-devel@nongnu.org>; Tue,  9 Jun 2020 09:31:14 +0200 (CEST)
+Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
+ (Authenticated sender: clg@kaod.org)
+ by player693.ha.ovh.net (Postfix) with ESMTPSA id A61BA13235E02;
+ Tue,  9 Jun 2020 07:31:08 +0000 (UTC)
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-98R0026a7e6e3a-5b68-47f5-9b1a-dd91ac6d90a4,2CE69A6D3B62F9BF35ECE14C7D737F520D542DA8)
+ smtp.auth=clg@kaod.org
+Subject: Re: [PATCH 0/6] Add Nuvoton NPCM730/NPCM750 SoCs and two BMC machines
+To: Havard Skinnemoen <hskinnemoen@google.com>, peter.maydell@linaro.org
+References: <20200521192133.127559-1-hskinnemoen@google.com>
+ <CAFQmdRYYhoWu7q350n0vNOE+pesp-UG975v1f1Yjwf9Ao0mjcg@mail.gmail.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <60521645-6e85-cc59-7048-94db9634ad0a@kaod.org>
+Date: Tue, 9 Jun 2020 09:31:08 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
+In-Reply-To: <CAFQmdRYYhoWu7q350n0vNOE+pesp-UG975v1f1Yjwf9Ao0mjcg@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=211.150.70.202; envelope-from=yili@winhong.com;
- helo=regular1.263xmail.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 03:30:36
-X-ACL-Warn: Detected OS   = ???
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 4233946601796635561
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedrudehfedguddvfecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgsehtjeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhephfffgeelfeejudevuedvvdeigeduteetveffhfffudeggfegleeljeeuieefuedvnecukfhppedtrddtrddtrddtpdekvddrieegrddvhedtrddujedtnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrieelfedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
+Received-SPF: pass client-ip=87.98.150.175; envelope-from=clg@kaod.org;
+ helo=13.mo7.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 03:31:14
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
 X-Spam_score_int: -18
 X-Spam_score: -1.9
 X-Spam_bar: -
 X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -83,121 +79,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: yilikernel@gmail.com, yili@winhong.com
+Cc: CS20 KFTing <kfting@nuvoton.com>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org, IS20 Avi Fishman <Avi.Fishman@nuvoton.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since Ceph version Infernalis (9.2.0) the new fast-diff mechanism
-of RBD allows for querying actual rbd image usage.
+On 6/9/20 12:14 AM, Havard Skinnemoen wrote:
+> On Thu, May 21, 2020 at 12:21 PM Havard Skinnemoen <hskinnemoen@google.com <mailto:hskinnemoen@google.com>> wrote:
+> 
+>     This patch series models enough of the Nuvoton NPCM730 and NPCM750 SoCs to boot
+>     a minimal Linux kernel. This includes device models for:
+> 
+> 
+> Does anyone have comments on this series? I'm currently finishing up a second patch series that adds flash support and a few other things so qemu can boot a full OpenBMC flash image built for npcm7xx.
+> 
+> If you prefer, I can combine them both into one series and send it to the list.
 
-Prior to this version there was no easy and fast way to query how
-much allocation a RBD image had inside a Ceph cluster.
+The first series was nicely presented I think, but you can extend it in v2.
+Documentation needs an update in :
 
-To use the fast-diff feature it needs to be enabled per RBD image
-and is only supported by Ceph cluster running version Infernalis
-(9.2.0) or newer.
+  docs/system/target-arm.rst
 
-Without the fast-diff feature enabled qemu-img will report an allocation
-identical to the image capacity.
+Thanks,
 
-'qemu-img info rbd:cepharm/liyi-rbd' might output for example:
-
-  image: json:{"driver": "raw", "file": {"pool": "cepharm",
-  "image": "liyi-rbd", "driver": "rbd"}}
-  file format: raw
-  virtual size: 20 GiB (21474836480 bytes)
-  disk size: 0 B
-  cluster_size: 4194304
-
-Newly created rbds will have the fast-diff feature enabled.
-
-Signed-off-by: Yi Li <yili@winhong.com>
----
- block/rbd.c | 60 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 60 insertions(+)
-
-diff --git a/block/rbd.c b/block/rbd.c
-index 617553b022..f231653f7b 100644
---- a/block/rbd.c
-+++ b/block/rbd.c
-@@ -1107,6 +1107,65 @@ static int64_t qemu_rbd_getlength(BlockDriverState *bs)
-     return info.size;
- }
- 
-+#if LIBRBD_VERSION_CODE > 265
-+static int disk_usage_callback(uint64_t offset, size_t len, int exists,
-+                               void *arg)
-+{
-+  uint64_t *used_size = (uint64_t *)(arg);
-+  if (exists) {
-+    (*used_size) += len;
-+  }
-+  return 0;
-+}
-+#endif
-+
-+static int64_t qemu_rbd_allocated_file_size(BlockDriverState *bs)
-+{
-+    BDRVRBDState *s = bs->opaque;
-+    rbd_image_info_t info;
-+    int r;
-+    uint64_t used_size = 0;
-+    uint64_t features = 0;
-+
-+    r = rbd_stat(s->image, &info, sizeof(info));
-+    if (r < 0) {
-+        return r;
-+    }
-+
-+    r = rbd_get_features(s->image, &features);
-+    if (r < 0) {
-+        return r;
-+    }
-+
-+   /*
-+    * rbd_diff_iterate2() is available in versions above Ceph 0.94 (Hammer)
-+    * It uses a object map inside Ceph which is faster than rbd_diff_iterate()
-+    * which iterates all objects.
-+    * LIBRBD_VERSION_CODE for Ceph 0.94 is 265. In 266 and upwards diff_iterate2
-+    * is available
-+    */
-+#if LIBRBD_VERSION_CODE > 265
-+    if (features & RBD_FEATURE_FAST_DIFF) {
-+
-+        /*
-+         * RBD image fast-diff feature enabled
-+         * Querying for actual allocation.
-+         */
-+        r = rbd_diff_iterate2(s->image, NULL, 0, info.size, 0, 1,
-+                              &disk_usage_callback,
-+                              &used_size);
-+        if (r < 0) {
-+            return r;
-+        }
-+    } else {
-+        used_size = info.size;
-+    }
-+#else
-+    used_size = info.size;
-+#endif
-+    return used_size;
-+}
-+
- static int coroutine_fn qemu_rbd_co_truncate(BlockDriverState *bs,
-                                              int64_t offset,
-                                              bool exact,
-@@ -1316,6 +1375,7 @@ static BlockDriver bdrv_rbd = {
-     .bdrv_get_info          = qemu_rbd_getinfo,
-     .create_opts            = &qemu_rbd_create_opts,
-     .bdrv_getlength         = qemu_rbd_getlength,
-+    .bdrv_get_allocated_file_size = qemu_rbd_allocated_file_size,
-     .bdrv_co_truncate       = qemu_rbd_co_truncate,
-     .protocol_name          = "rbd",
- 
--- 
-2.25.3
-
-
+C.
 
 
