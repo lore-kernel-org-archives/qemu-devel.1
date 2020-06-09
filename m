@@ -2,77 +2,95 @@ Return-Path: <SRS0=hUBF=7W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42F02C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 17:29:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6AFEC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 17:30:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1043C20801
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 17:29:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 944F220691
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 17:30:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WxTLnpi7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1043C20801
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Pzg8cSS6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 944F220691
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38252 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40440 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jii47-0001Di-3F
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 13:29:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51744)
+	id 1jii4q-00028R-Mq
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 13:30:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52250)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1jiheT-00043o-UA
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 13:03:05 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48983
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jihiy-0003AE-It
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 13:07:45 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:50850
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1jiheS-0007Xq-Jd
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 13:03:05 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jihix-0008Rr-0U
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 13:07:44 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591722183;
+ s=mimecast20190719; t=1591722462;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=rAnKvQtas0Df8i94IWZGQbelkFtafrMMwgZzKd+IpYY=;
- b=WxTLnpi7e335hX0Y5l3aS42DSwTRpAYBjagBD91JwvvbHbaH/ZwRxXEmdUgCvAa3L/9VzM
- b1sF5Hczg2tZh8nhcOMepxhFbJPejaq6SGJK4taUmssXk9VtJLDcf4XV6bjd2kdZTYhkvA
- 7Shom+ZbFGmlXxqc9q5DEuxKmtEXyIA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-418-I8TtLYdsONi7m_tEhKieMA-1; Tue, 09 Jun 2020 13:02:58 -0400
-X-MC-Unique: I8TtLYdsONi7m_tEhKieMA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1FDC4107ACCD;
- Tue,  9 Jun 2020 17:02:57 +0000 (UTC)
-Received: from localhost (ovpn-115-52.ams2.redhat.com [10.36.115.52])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 758F560C87;
- Tue,  9 Jun 2020 17:02:45 +0000 (UTC)
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 2/7] libvhost-user: advertise vring features
-Date: Tue,  9 Jun 2020 18:02:13 +0100
-Message-Id: <20200609170218.246468-3-stefanha@redhat.com>
-In-Reply-To: <20200609170218.246468-1-stefanha@redhat.com>
-References: <20200609170218.246468-1-stefanha@redhat.com>
+ bh=mqBM7dJvbQTnHVzVsKdI/Lb4gj8rQlPDWaHou14TEII=;
+ b=Pzg8cSS6+pcb+B/lMDeqh7INYggUD3mkWih+1fvLCs4POruoWhkVulwFQPhPZCgZRll0wv
+ VkiwWdOZ3CyuzQvk4jliI5d1tpdxcYXoxbYlkKpEa3QvcTe2MefYS7A1mlCV0xejvCd5lJ
+ sBTWCxd1/AHDVOdtcocyCHdKwYN6rWs=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-431-tPL6HCHvPrSRSykmlXmi-Q-1; Tue, 09 Jun 2020 13:07:40 -0400
+X-MC-Unique: tPL6HCHvPrSRSykmlXmi-Q-1
+Received: by mail-wm1-f72.google.com with SMTP id t145so906170wmt.2
+ for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 10:07:40 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=mqBM7dJvbQTnHVzVsKdI/Lb4gj8rQlPDWaHou14TEII=;
+ b=TrXO1irSPMe7U138ZC5lnslMYUfVh5GrOgEnlFGEaJIeorrBILAsAULhqV0K73dN0e
+ AcV8CuaPKHWoiaCBRQYfpt3Bm59Q7aSVsonG4EIXrm5jgqMoUriLJnfNnLV+M5c9ClQM
+ znVYK5IJfVHku+ET0RAlPmlI/8/CkqkfuBiqtyr4v8uX/PrC35A7suabLglcm7E+29MO
+ DigYfK2OmlF+vU5sSyl0tI0th6JNJt0yNd9mDTxBa/WlQtFLY0OSU2ht6t4OkoleDmK6
+ hHF69fW1fsbYP2ysz5mZLpEYR1LQ8FnKr83+hoByElRijU8rcbB6jHwPtjqgB5Mik6XR
+ Kfdw==
+X-Gm-Message-State: AOAM530leSbk7AER1UCTWcGX6YyMaSnKgpOuHzFUv1BJ8MHKtAEUq6L2
+ wDNK1JAe32NeRehlky+thdiHTSrYlYKY7V/caBpsMsSGn3w5VqI1CjikyuIyfw1kvJv3aoBTNm+
+ pL1G0TXRqEpvDz+0=
+X-Received: by 2002:adf:e68a:: with SMTP id r10mr5485750wrm.384.1591722459380; 
+ Tue, 09 Jun 2020 10:07:39 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzGlxN6h8eYyH7DxuWkELJ43EeLYvIviHghoFFDpLmPv992hNzdcHMJcYDL7oxvULPx9us7kQ==
+X-Received: by 2002:adf:e68a:: with SMTP id r10mr5485733wrm.384.1591722459176; 
+ Tue, 09 Jun 2020 10:07:39 -0700 (PDT)
+Received: from localhost.localdomain
+ (181.red-88-10-103.dynamicip.rima-tde.net. [88.10.103.181])
+ by smtp.gmail.com with ESMTPSA id c5sm4442033wrb.72.2020.06.09.10.07.38
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 09 Jun 2020 10:07:38 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>,
+	qemu-devel@nongnu.org
+Subject: [PATCH v8 2/5] softmmu/vl: Let -fw_cfg option take a 'gen_id' argument
+Date: Tue,  9 Jun 2020 19:07:24 +0200
+Message-Id: <20200609170727.9977-3-philmd@redhat.com>
+X-Mailer: git-send-email 2.21.3
+In-Reply-To: <20200609170727.9977-1-philmd@redhat.com>
+References: <20200609170727.9977-1-philmd@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=stefanha@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 02:44:16
+Content-Type: text/plain; charset=UTF-8;
+	text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/08 23:42:34
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -93,65 +111,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
- Laurent Vivier <lvivier@redhat.com>, jasowang@redhat.com, cohuck@redhat.com,
- Stefan Hajnoczi <stefanha@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Raphael Norwitz <raphael.norwitz@nutanix.com>,
- "Gonglei \(Arei\)" <arei.gonglei@huawei.com>,
- Gerd Hoffmann <kraxel@redhat.com>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Laszlo Ersek <lersek@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-bGlidmhvc3QtdXNlciBpbXBsZW1lbnRzIHNldmVyYWwgdnJpbmcgZmVhdHVyZXMgd2l0aG91dCBh
-ZHZlcnRpc2luZwp0aGVtLiBUaGVyZSBpcyBubyB3YXkgZm9yIHRoZSB2aG9zdC11c2VyIG1hc3Rl
-ciB0byBkZXRlY3Qgc3VwcG9ydCBmb3IKdGhlc2UgZmVhdHVyZXMuCgpUaGluZ3MgbW9yZSBvciBs
-ZXNzIHdvcmsgdG9kYXkgYmVjYXVzZSBRRU1VIGFzc3VtZXMgdGhlIHZob3N0LXVzZXIKYmFja2Vu
-ZCBhbHdheXMgaW1wbGVtZW50cyBjZXJ0YWluIGZlYXR1cmUgYml0cyBsaWtlClZJUlRJT19SSU5H
-X0ZfRVZFTlRfSURYLiBUaGlzIGlzIG5vdCBkb2N1bWVudGVkIGFueXdoZXJlLgoKVGhpcyBwYXRj
-aCBleHBsaWNpdGx5IGFkdmVydGlzZXMgZmVhdHVyZXMgaW1wbGVtZW50ZWQgaW4gbGlidmhvc3Qt
-dXNlcgpzbyB0aGF0IHRoZSB2aG9zdC11c2VyIG1hc3RlciBkb2VzIG5vdCBuZWVkIHRvIG1ha2Ug
-dW5kb2N1bWVudGVkCmFzc3VtcHRpb25zLgoKRmVhdHVyZSBiaXRzIHRoYXQgbGlidmhvc3QtdXNl
-ciBub3cgYWR2ZXJ0aXNlcyBjYW4gYmUgcmVtb3ZlZCBmcm9tCnZob3N0LXVzZXItYmxrLmMuIERl
-dmljZXMgc2hvdWxkIG5vdCBiZSByZXNwb25zaWJsZSBmb3IgYWR2ZXJ0aXNpbmcKdnJpbmcgZmVh
-dHVyZSBiaXRzLCB0aGF0IGlzIGxpYnZob3N0LXVzZXIncyBqb2IuCgpDYzogSmFzb24gV2FuZyA8
-amFzb3dhbmdAcmVkaGF0LmNvbT4KQ2M6IE1pY2hhZWwgUy4gVHNpcmtpbiA8bXN0QHJlZGhhdC5j
-b20+ClNpZ25lZC1vZmYtYnk6IFN0ZWZhbiBIYWpub2N6aSA8c3RlZmFuaGFAcmVkaGF0LmNvbT4K
-UmV2aWV3ZWQtYnk6IE1hcmMtQW5kcsOpIEx1cmVhdSA8bWFyY2FuZHJlLmx1cmVhdUByZWRoYXQu
-Y29tPgotLS0KSSBoYXZlIHRlc3RlZCBtYWtlIGNoZWNrIGFuZCB2aXJ0aW9mc2QuCi0tLQogY29u
-dHJpYi9saWJ2aG9zdC11c2VyL2xpYnZob3N0LXVzZXIuYyAgIHwgMTAgKysrKysrKysrKwogY29u
-dHJpYi92aG9zdC11c2VyLWJsay92aG9zdC11c2VyLWJsay5jIHwgIDQgKy0tLQogMiBmaWxlcyBj
-aGFuZ2VkLCAxMSBpbnNlcnRpb25zKCspLCAzIGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2Nv
-bnRyaWIvbGlidmhvc3QtdXNlci9saWJ2aG9zdC11c2VyLmMgYi9jb250cmliL2xpYnZob3N0LXVz
-ZXIvbGlidmhvc3QtdXNlci5jCmluZGV4IDNiY2E5OTZjNjIuLmI0Mzg3NGJhMTIgMTAwNjQ0Ci0t
-LSBhL2NvbnRyaWIvbGlidmhvc3QtdXNlci9saWJ2aG9zdC11c2VyLmMKKysrIGIvY29udHJpYi9s
-aWJ2aG9zdC11c2VyL2xpYnZob3N0LXVzZXIuYwpAQCAtNDk1LDYgKzQ5NSwxNiBAQCBzdGF0aWMg
-Ym9vbAogdnVfZ2V0X2ZlYXR1cmVzX2V4ZWMoVnVEZXYgKmRldiwgVmhvc3RVc2VyTXNnICp2bXNn
-KQogewogICAgIHZtc2ctPnBheWxvYWQudTY0ID0KKyAgICAgICAgLyoKKyAgICAgICAgICogVGhl
-IGZvbGxvd2luZyBWSVJUSU8gZmVhdHVyZSBiaXRzIGFyZSBzdXBwb3J0ZWQgYnkgb3VyIHZpcnRx
-dWV1ZQorICAgICAgICAgKiBpbXBsZW1lbnRhdGlvbjoKKyAgICAgICAgICovCisgICAgICAgIDFV
-TEwgPDwgVklSVElPX0ZfTk9USUZZX09OX0VNUFRZIHwKKyAgICAgICAgMVVMTCA8PCBWSVJUSU9f
-UklOR19GX0lORElSRUNUX0RFU0MgfAorICAgICAgICAxVUxMIDw8IFZJUlRJT19SSU5HX0ZfRVZF
-TlRfSURYIHwKKyAgICAgICAgMVVMTCA8PCBWSVJUSU9fRl9WRVJTSU9OXzEgfAorCisgICAgICAg
-IC8qIHZob3N0LXVzZXIgZmVhdHVyZSBiaXRzICovCiAgICAgICAgIDFVTEwgPDwgVkhPU1RfRl9M
-T0dfQUxMIHwKICAgICAgICAgMVVMTCA8PCBWSE9TVF9VU0VSX0ZfUFJPVE9DT0xfRkVBVFVSRVM7
-CiAKZGlmZiAtLWdpdCBhL2NvbnRyaWIvdmhvc3QtdXNlci1ibGsvdmhvc3QtdXNlci1ibGsuYyBi
-L2NvbnRyaWIvdmhvc3QtdXNlci1ibGsvdmhvc3QtdXNlci1ibGsuYwppbmRleCA2ZmQ5MWM3ZTk5
-Li4yNWVjY2QwMmI1IDEwMDY0NAotLS0gYS9jb250cmliL3Zob3N0LXVzZXItYmxrL3Zob3N0LXVz
-ZXItYmxrLmMKKysrIGIvY29udHJpYi92aG9zdC11c2VyLWJsay92aG9zdC11c2VyLWJsay5jCkBA
-IC0zODIsOSArMzgyLDcgQEAgdnViX2dldF9mZWF0dXJlcyhWdURldiAqZGV2KQogICAgICAgICAg
-ICAgICAgMXVsbCA8PCBWSVJUSU9fQkxLX0ZfRElTQ0FSRCB8CiAgICAgICAgICAgICAgICAxdWxs
-IDw8IFZJUlRJT19CTEtfRl9XUklURV9aRVJPRVMgfAogICAgICAgICAgICAgICAgI2VuZGlmCi0g
-ICAgICAgICAgICAgICAxdWxsIDw8IFZJUlRJT19CTEtfRl9DT05GSUdfV0NFIHwKLSAgICAgICAg
-ICAgICAgIDF1bGwgPDwgVklSVElPX0ZfVkVSU0lPTl8xIHwKLSAgICAgICAgICAgICAgIDF1bGwg
-PDwgVkhPU1RfVVNFUl9GX1BST1RPQ09MX0ZFQVRVUkVTOworICAgICAgICAgICAgICAgMXVsbCA8
-PCBWSVJUSU9fQkxLX0ZfQ09ORklHX1dDRTsKIAogICAgIGlmICh2ZGV2X2Jsay0+ZW5hYmxlX3Jv
-KSB7CiAgICAgICAgIGZlYXR1cmVzIHw9IDF1bGwgPDwgVklSVElPX0JMS19GX1JPOwotLSAKMi4y
-Ni4yCgo=
+The 'gen_id' argument refers to a QOM object able to produce
+data consumable by the fw_cfg device. The producer object must
+implement the FW_CFG_DATA_GENERATOR interface.
+
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+---
+v8: addressed Laszlo's comments
+- fixed 2-space indent
+- do not return 0 on failure
+---
+ softmmu/vl.c | 25 +++++++++++++++++--------
+ 1 file changed, 17 insertions(+), 8 deletions(-)
+
+diff --git a/softmmu/vl.c b/softmmu/vl.c
+index 05d1a4cb6b..a9bce2a1b1 100644
+--- a/softmmu/vl.c
++++ b/softmmu/vl.c
+@@ -489,6 +489,11 @@ static QemuOptsList qemu_fw_cfg_opts = {
+             .name = "string",
+             .type = QEMU_OPT_STRING,
+             .help = "Sets content of the blob to be inserted from a string",
++        }, {
++            .name = "gen_id",
++            .type = QEMU_OPT_STRING,
++            .help = "Sets id of the object generating the fw_cfg blob "
++                    "to be inserted",
+         },
+         { /* end of list */ }
+     },
+@@ -2020,7 +2025,7 @@ static int parse_fw_cfg(void *opaque, QemuOpts *opts, Error **errp)
+ {
+     gchar *buf;
+     size_t size;
+-    const char *name, *file, *str;
++    const char *name, *file, *str, *gen_id;
+     FWCfgState *fw_cfg = (FWCfgState *) opaque;
+ 
+     if (fw_cfg == NULL) {
+@@ -2030,14 +2035,13 @@ static int parse_fw_cfg(void *opaque, QemuOpts *opts, Error **errp)
+     name = qemu_opt_get(opts, "name");
+     file = qemu_opt_get(opts, "file");
+     str = qemu_opt_get(opts, "string");
++    gen_id = qemu_opt_get(opts, "gen_id");
+ 
+-    /* we need name and either a file or the content string */
+-    if (!(nonempty_str(name) && (nonempty_str(file) || nonempty_str(str)))) {
+-        error_setg(errp, "invalid argument(s)");
+-        return -1;
+-    }
+-    if (nonempty_str(file) && nonempty_str(str)) {
+-        error_setg(errp, "file and string are mutually exclusive");
++    /* we need the name, and exactly one of: file, content string, gen_id */
++    if (!nonempty_str(name) ||
++        nonempty_str(file) + nonempty_str(str) + nonempty_str(gen_id) != 1) {
++        error_setg(errp, "name, plus exactly one of file,"
++                         " string and gen_id, are needed");
+         return -1;
+     }
+     if (strlen(name) > FW_CFG_MAX_FILE_PATH - 1) {
+@@ -2052,6 +2056,11 @@ static int parse_fw_cfg(void *opaque, QemuOpts *opts, Error **errp)
+     if (nonempty_str(str)) {
+         size = strlen(str); /* NUL terminator NOT included in fw_cfg blob */
+         buf = g_memdup(str, size);
++    } else if (nonempty_str(gen_id)) {
++        size_t fw_cfg_size;
++
++        fw_cfg_size = fw_cfg_add_from_generator(fw_cfg, name, gen_id, errp);
++        return (fw_cfg_size > 0) ? 0 : -1;
+     } else {
+         GError *err = NULL;
+         if (!g_file_get_contents(file, &buf, &size, &err)) {
+-- 
+2.21.3
 
 
