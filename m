@@ -2,73 +2,72 @@ Return-Path: <SRS0=hUBF=7W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03B0EC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 01:39:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75CCCC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 01:39:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B30B520774
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 01:39:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3F1C820774
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 01:39:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=jms.id.au header.i=@jms.id.au header.b="NHn2+CYB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B30B520774
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=jms.id.au header.i=@jms.id.au header.b="mFiX3UJ5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F1C820774
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=jms.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40304 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41618 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jiTEZ-0004vr-Sg
-	for qemu-devel@archiver.kernel.org; Mon, 08 Jun 2020 21:39:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39986)
+	id 1jiTF5-0005V1-Dx
+	for qemu-devel@archiver.kernel.org; Mon, 08 Jun 2020 21:39:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40006)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <joel.stan@gmail.com>)
- id 1jiTBf-00032G-QF; Mon, 08 Jun 2020 21:36:23 -0400
-Received: from mail-ej1-x641.google.com ([2a00:1450:4864:20::641]:40174)
+ id 1jiTBs-0003BA-Bv; Mon, 08 Jun 2020 21:36:36 -0400
+Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:36824)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <joel.stan@gmail.com>)
- id 1jiTBd-00006V-J9; Mon, 08 Jun 2020 21:36:23 -0400
-Received: by mail-ej1-x641.google.com with SMTP id q19so20503310eja.7;
- Mon, 08 Jun 2020 18:36:20 -0700 (PDT)
+ id 1jiTBr-00007X-GV; Mon, 08 Jun 2020 21:36:36 -0400
+Received: by mail-ed1-x542.google.com with SMTP id q13so15022366edi.3;
+ Mon, 08 Jun 2020 18:36:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jms.id.au; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=BbNUu4Jc4lvGb9KgotfafO1lnmYANRJc+h+ReKwcTOg=;
- b=NHn2+CYBg4rakryj+pmovN9rmc3oq5puTOrBEa58Fqvj9lHVJQ+0vWxUtINpYp1WfP
- nGJcvKc/jHIYjwrXvYdW9L0A2DNHfAwJKdxH//RWBnCfPKrXYXRIFrSSqlwu2VR+dMaO
- dXXV65cUxCX3s0ZeCYzkMrR4TV1NUM5PJg1j8=
+ :cc; bh=9aphTkaF/pTaor8lK4sJuIDAPhh8u4H3dPq8RbeFkUs=;
+ b=mFiX3UJ54eu6BnI1/r8+w/I3+LfY4V4759zcTa/LJxNgsrGz3cIf15h4SlEgRUGF5q
+ zJH+PMsA98cjQTYor5EZShsOsoq4BQmNlaqOucl0wEKZUwAbKOvenp3oib5GqRPxeBSc
+ BFvczSOhWwvGwl9nRohOEti7U1TvEB4Jt36rw=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=BbNUu4Jc4lvGb9KgotfafO1lnmYANRJc+h+ReKwcTOg=;
- b=m5PPLAVrW2WMHhONBCcqYpnmZCPHHLoEY8SrUmUmS6xIAZTJi53dANp6+rz+c0Dzn6
- FsRdtyn5ylvBuXXd/XJNru3T5oxSh76kxzQ+9x7xuvRrPiEWt0BCLa3naByiMHHCd0rp
- ExrA6fXar4pK//0zQUx3+EQLsddyAgGZmF6/7WuHB0Ws/3tvxPTin6ihTkQNmAjxTEgA
- Ol71NGzwMLZcNVVW+53JD2U6/lzaoZx/OUc1yuCndSgUGjbkNS7RQ+c+5A4X3x2FaMS5
- 6E6Tl+C6aO8k1z/wcHQvHK6GaXy12ZXQVkOHAiH7YGOxpfZCCacvvFz4yhUNiW7a2xEr
- sTmg==
-X-Gm-Message-State: AOAM530gsNerXoKyPzUO4yciILzRmt0KrjJqhDFbaDHTJiSQ4FJR4WNg
- PgFAaoyQTrMkF9FaC8b1nicpTCvkD00xo+KuOug=
-X-Google-Smtp-Source: ABdhPJyNTXp1/TAPjMfS6B0AD1gLkM3SH59bhAsvrjK+Brw9oud1gXrViXposa6k9vDUYglAj1odcviE6QHIk9oHnVg=
-X-Received: by 2002:a17:906:4350:: with SMTP id
- z16mr22830095ejm.139.1591666578876; 
- Mon, 08 Jun 2020 18:36:18 -0700 (PDT)
+ bh=9aphTkaF/pTaor8lK4sJuIDAPhh8u4H3dPq8RbeFkUs=;
+ b=JcBgt3+PLANont7hH+bFTDG/47SRd6Gm3Dx/0c5XSkWa730+GLmIT28Peqo9ed8ZGM
+ PH2d93KvrVg7OovSlT4axgZIdVEiteLR28ZrIeu+TlAIFYD8CSC6NR1MVRPSNjfSzMrR
+ bpIV9sLanleTcwdwmlKrQ2A2iNsBNOtAuepHA/CJoTt12uFbCxOsiJ9yUt+j54EYyjNY
+ Bv6pSblm7+iO3F9krDbDHlzeKc7Zq72qlWRuIjzxdHu+DFXcAlViW+4fR1edGVC7KV6r
+ qS9bg1QPz9UCTkO64/HjN1T9p4KhrPJGj2nBbygcjKKKjYUQ/o3WWs8A4VK3s0nni9AR
+ a1eQ==
+X-Gm-Message-State: AOAM532gn4b0JnyeZJvDLXSyvz7BErI8HfQ7WCChRYgZfKMaW/liMScE
+ lKRS+/Rlreu73heVxjmwfWEdNqVhGYLErAJAu/Lpt9Lk
+X-Google-Smtp-Source: ABdhPJzyMXi/Dnk+QC6eeJ1LR2Qoc9NmF6htb/odCdy1biO4X4d7DV5Sid3/gbONspMvVq+xsDLFddmBuB1hqo7bfTI=
+X-Received: by 2002:a05:6402:128b:: with SMTP id
+ w11mr18834455edv.377.1591666593791; 
+ Mon, 08 Jun 2020 18:36:33 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200521192133.127559-1-hskinnemoen@google.com>
- <20200521192133.127559-2-hskinnemoen@google.com>
-In-Reply-To: <20200521192133.127559-2-hskinnemoen@google.com>
+ <20200521192133.127559-4-hskinnemoen@google.com>
+In-Reply-To: <20200521192133.127559-4-hskinnemoen@google.com>
 From: Joel Stanley <joel@jms.id.au>
-Date: Tue, 9 Jun 2020 01:36:07 +0000
-Message-ID: <CACPK8Xe4BEXAhgKmxt4YZVm2ggOPZ4hFbyJP-8NxBDa7+NrdCA@mail.gmail.com>
-Subject: Re: [PATCH 1/6] npcm7xx: Add config symbol
+Date: Tue, 9 Jun 2020 01:36:22 +0000
+Message-ID: <CACPK8Xfz2izvKoh-eRK2-=Pm_HpndTR6Op2qUZu_1GmSt2ng4g@mail.gmail.com>
+Subject: Re: [PATCH 3/6] hw/misc: Add NPCM7xx Clock Controller device model
 To: Havard Skinnemoen <hskinnemoen@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::641;
- envelope-from=joel.stan@gmail.com; helo=mail-ej1-x641.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::542;
+ envelope-from=joel.stan@gmail.com; helo=mail-ed1-x542.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -100,53 +99,51 @@ Sender: "Qemu-devel"
 
 On Thu, 21 May 2020 at 20:39, Havard Skinnemoen <hskinnemoen@google.com> wrote:
 >
-> Add a config symbol for the NPCM7xx BMC SoC family that subsequent
-> patches can use in Makefiles.
+> Enough functionality to boot the Linux kernel has been implemented. This
+> includes:
+>
+>   - Correct power-on reset values so the various clock rates can be
+>     accurately calculated.
+>   - Clock enables stick around when written.
+>
+> In addition, a best effort attempt to implement SECCNT and CNTR25M was
+> made even though I don't think the kernel needs them.
 >
 > Reviewed-by: Tyrone Ting <kfting@nuvoton.com>
 > Signed-off-by: Havard Skinnemoen <hskinnemoen@google.com>
 
-Acked-by: Joel Stanley <joel@jms.id.au>
+Reviewed-by: Joel Stanley <joel@jms.id.au>
 
+> +++ b/hw/misc/npcm7xx_clk.c
 
-> ---
->  default-configs/arm-softmmu.mak | 1 +
->  hw/arm/Kconfig                  | 8 ++++++++
->  2 files changed, 9 insertions(+)
->
-> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-> index 8fc09a4a51..9a94ebd0be 100644
-> --- a/default-configs/arm-softmmu.mak
-> +++ b/default-configs/arm-softmmu.mak
-> @@ -27,6 +27,7 @@ CONFIG_GUMSTIX=y
->  CONFIG_SPITZ=y
->  CONFIG_TOSA=y
->  CONFIG_Z2=y
-> +CONFIG_NPCM7XX=y
->  CONFIG_COLLIE=y
->  CONFIG_ASPEED_SOC=y
->  CONFIG_NETDUINO2=y
-> diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-> index 5364172537..47d0a3ca43 100644
-> --- a/hw/arm/Kconfig
-> +++ b/hw/arm/Kconfig
-> @@ -354,6 +354,14 @@ config XLNX_VERSAL
->      select VIRTIO_MMIO
->      select UNIMP
->
-> +config NPCM7XX
-> +    bool
-> +    select A9MPCORE
-> +    select ARM_GIC
-> +    select PL310  # cache controller
-> +    select SERIAL
-> +    select UNIMP
+> +#define PLLCON_LOKI     BIT(31)
+> +#define PLLCON_LOKS     BIT(30)
+> +#define PLLCON_PWDEN    BIT(12)
 > +
->  config FSL_IMX25
->      bool
->      select IMX
-> --
-> 2.27.0.rc0.183.gde8f92d652-goog
->
->
+> +static const uint32_t cold_reset_values[NPCM7XX_CLK_NR_REGS] = {
+
+Can you add a comment to mention where these come from? If it's the
+data sheet, note which version you're using.
+
+
+> +    [NPCM7XX_CLK_CLKEN1]        = 0xffffffff,
+> +    [NPCM7XX_CLK_CLKSEL]        = 0x004aaaaa,
+> +    [NPCM7XX_CLK_CLKDIV1]       = 0x5413f855,
+> +    [NPCM7XX_CLK_PLLCON0]       = 0x00222101 | PLLCON_LOKI,
+> +    [NPCM7XX_CLK_PLLCON1]       = 0x00202101 | PLLCON_LOKI,
+> +    [NPCM7XX_CLK_IPSRST1]       = 0x00001000,
+> +    [NPCM7XX_CLK_IPSRST2]       = 0x80000000,
+> +    [NPCM7XX_CLK_CLKEN2]        = 0xffffffff,
+> +    [NPCM7XX_CLK_CLKDIV2]       = 0xaa4f8f9f,
+> +    [NPCM7XX_CLK_CLKEN3]        = 0xffffffff,
+> +    [NPCM7XX_CLK_IPSRST3]       = 0x03000000,
+> +    [NPCM7XX_CLK_WD0RCR]        = 0xffffffff,
+> +    [NPCM7XX_CLK_WD1RCR]        = 0xffffffff,
+> +    [NPCM7XX_CLK_WD2RCR]        = 0xffffffff,
+> +    [NPCM7XX_CLK_SWRSTC1]       = 0x00000003,
+> +    [NPCM7XX_CLK_PLLCON2]       = 0x00c02105 | PLLCON_LOKI,
+> +    [NPCM7XX_CLK_CORSTC]        = 0x04000003,
+> +    [NPCM7XX_CLK_PLLCONG]       = 0x01228606 | PLLCON_LOKI,
+> +    [NPCM7XX_CLK_AHBCKFI]       = 0x000000c8,
+> +};
 
