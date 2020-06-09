@@ -2,111 +2,80 @@ Return-Path: <SRS0=hUBF=7W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BD4FC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 14:05:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FAD5C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 14:10:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E4967204EA
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 14:05:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4967204EA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 58B2D2064C
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 14:10:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bPjLollD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58B2D2064C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33270 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38300 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jiet0-0002U4-6p
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 10:05:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53778)
+	id 1jiexR-0004lC-B7
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 10:10:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54230)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pmorel@linux.ibm.com>)
- id 1jies1-0001pR-9F; Tue, 09 Jun 2020 10:04:53 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:6706)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pmorel@linux.ibm.com>)
- id 1jierz-00067g-72; Tue, 09 Jun 2020 10:04:52 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 059E3M6B147918; Tue, 9 Jun 2020 10:03:44 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 31j59ueacj-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 09 Jun 2020 10:03:42 -0400
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 059E3SCc148144;
- Tue, 9 Jun 2020 10:03:29 -0400
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com
- [169.51.49.99])
- by mx0a-001b2d01.pphosted.com with ESMTP id 31j59ue9ft-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 09 Jun 2020 10:03:29 -0400
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
- by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 059Downr025496;
- Tue, 9 Jun 2020 14:02:49 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com
- (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
- by ppma04ams.nl.ibm.com with ESMTP id 31g2s7x2qt-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 09 Jun 2020 14:02:49 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
- [9.149.105.58])
- by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 059E2kB79372146
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 9 Jun 2020 14:02:46 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 6D36A4C052;
- Tue,  9 Jun 2020 14:02:46 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id D97034C04E;
- Tue,  9 Jun 2020 14:02:45 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.16.61])
- by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Tue,  9 Jun 2020 14:02:45 +0000 (GMT)
-Subject: Re: [PATCH v2 1/1] virtio-ccw: auto-manage VIRTIO_F_IOMMU_PLATFORM if
- PV
-To: Halil Pasic <pasic@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>
-References: <20200514221155.32079-1-pasic@linux.ibm.com>
- <20200520121507-mutt-send-email-mst@kernel.org>
- <20200606013217.2cffa3ed.pasic@linux.ibm.com>
- <20200608181428.3c6f127c.cohuck@redhat.com>
- <20200608190045.319dd68b.pasic@linux.ibm.com>
- <20200609084402.35d317ec.cohuck@redhat.com>
- <20200609114130.0ca9190b.pasic@linux.ibm.com>
-From: Pierre Morel <pmorel@linux.ibm.com>
-Message-ID: <1d914b70-e30c-ea1f-3356-2fc53b63ce58@linux.ibm.com>
-Date: Tue, 9 Jun 2020 16:02:45 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jiewC-0003bh-Gd
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 10:09:12 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32995
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jiewB-0006ni-QR
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 10:09:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591711750;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=OSRdD0d6Yp4nIUq+zTQOlRcs3Bdzt2jY+nd3Dosbis8=;
+ b=bPjLollDIPpJwik7cLMYJBcZiqMZmBsojl8R+62Ri84OlBrMw8gyI3e0t0DLfmwONCXIio
+ dp1IykRHsgT2dYubN4ctrs4u+IP5EUcVwnxHQfeWqi7LU565CGvxZQ21sqScDLqj/LN9HM
+ bOMk/OTYf+q5ZNkIFucLxcD/EP8o/oE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-457-052ZW6kvPWuqWUfYoRBPUg-1; Tue, 09 Jun 2020 10:09:07 -0400
+X-MC-Unique: 052ZW6kvPWuqWUfYoRBPUg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DBD6018A8223;
+ Tue,  9 Jun 2020 14:09:05 +0000 (UTC)
+Received: from linux.fritz.box.com (ovpn-114-124.ams2.redhat.com
+ [10.36.114.124])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 735F79F77;
+ Tue,  9 Jun 2020 14:09:04 +0000 (UTC)
+From: Kevin Wolf <kwolf@redhat.com>
+To: qemu-block@nongnu.org
+Subject: [PATCH] qcow2: Reduce write_zeroes size in handle_alloc_space()
+Date: Tue,  9 Jun 2020 16:08:59 +0200
+Message-Id: <20200609140859.142230-1-kwolf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200609114130.0ca9190b.pasic@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
- definitions=2020-06-09_06:2020-06-09,
- 2020-06-09 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1011
- lowpriorityscore=0 spamscore=0 impostorscore=0 priorityscore=1501
- malwarescore=0 adultscore=0 mlxscore=0 cotscore=-2147483648 phishscore=0
- mlxlogscore=999 bulkscore=0 suspectscore=0 classifier=spam adjust=0
- reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2006090107
-Received-SPF: pass client-ip=148.163.156.1; envelope-from=pmorel@linux.ibm.com;
- helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 10:03:48
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -25
-X-Spam_score: -2.6
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 01:38:49
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, KHOP_DYNAMIC=0.001,
- RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -120,50 +89,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Boris Fiuczynski <fiuczy@linux.ibm.com>,
- Janosch Frank <frankja@linux.ibm.com>, David Hildenbrand <david@redhat.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, Richard Henderson <rth@twiddle.net>,
- "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Viktor Mihajlovski <mihajlov@linux.ibm.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: kwolf@redhat.com, anton.nefedov@virtuozzo.com, vsementsov@virtuozzo.com,
+ qemu-devel@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Since commit c8bb23cbdbe, handle_alloc_space() is called for newly
+allocated clusters to efficiently initialise the COW areas with zeros if
+necessary. It skips the whole operation if both start_cow nor end_cow
+are empty. However, it requests zeroing the whole request size (possibly
+multiple megabytes) even if only one end of the request actually needs
+this.
 
+This patch reduces the write_zeroes request size in this case so that we
+don't unnecessarily zero-initialise a region that we're going to
+overwrite immediately.
 
-On 2020-06-09 11:41, Halil Pasic wrote:
-> On Tue, 9 Jun 2020 08:44:02 +0200
-> Cornelia Huck <cohuck@redhat.com> wrote:
-> 
->> On Mon, 8 Jun 2020 19:00:45 +0200
->> Halil Pasic <pasic@linux.ibm.com> wrote:
->>
->>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ block/qcow2.c | 16 +++++++++++-----
+ 1 file changed, 11 insertions(+), 5 deletions(-)
 
-...snip...
-
->>
->> I mean, can a virtio devices without IOMMU_PLATFORM act as a transition
->> blocker (i.e. an attempt by a guest to move to pv would fail?)
->>
-> 
-> I don't know. Janosch could answer that, but he is on vacation. Adding
-> Claudio maybe he can answer. My understanding is, that while it might be
-> possible, it is ugly at best. The ability to do a transition is
-> indicated by a CPU model feature. Indicating the feature to the guest and
-> then failing the transition sounds wrong to me.
-
-
-The guest image is encrypted and the transition to PV is done by the 
-stage 3 boot loader, part of the loaded image, before Linux is started.
-At this moment the guest is not aware of the virtio devices.
-
-Regards,
-Pierre
-
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 0cd2e6757e..77742877fb 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -2403,6 +2403,8 @@ static int handle_alloc_space(BlockDriverState *bs, QCowL2Meta *l2meta)
+     }
+ 
+     for (m = l2meta; m != NULL; m = m->next) {
++        uint64_t start = m->alloc_offset;
++        uint64_t len = m->nb_clusters * s->cluster_size;
+         int ret;
+ 
+         if (!m->cow_start.nb_bytes && !m->cow_end.nb_bytes) {
+@@ -2413,21 +2415,25 @@ static int handle_alloc_space(BlockDriverState *bs, QCowL2Meta *l2meta)
+             continue;
+         }
+ 
++        if (!m->cow_start.nb_bytes) {
++            start += m->cow_end.offset;
++            len -= m->cow_end.offset;
++        } else if (!m->cow_end.nb_bytes) {
++            len = m->cow_start.nb_bytes;
++        }
++
+         /*
+          * instead of writing zero COW buffers,
+          * efficiently zero out the whole clusters
+          */
+ 
+-        ret = qcow2_pre_write_overlap_check(bs, 0, m->alloc_offset,
+-                                            m->nb_clusters * s->cluster_size,
+-                                            true);
++        ret = qcow2_pre_write_overlap_check(bs, 0, start, len, true);
+         if (ret < 0) {
+             return ret;
+         }
+ 
+         BLKDBG_EVENT(bs->file, BLKDBG_CLUSTER_ALLOC_SPACE);
+-        ret = bdrv_co_pwrite_zeroes(s->data_file, m->alloc_offset,
+-                                    m->nb_clusters * s->cluster_size,
++        ret = bdrv_co_pwrite_zeroes(s->data_file, start, len,
+                                     BDRV_REQ_NO_FALLBACK);
+         if (ret < 0) {
+             if (ret != -ENOTSUP && ret != -EAGAIN) {
 -- 
-Pierre Morel
-IBM Lab Boeblingen
+2.25.4
+
 
