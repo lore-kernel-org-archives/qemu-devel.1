@@ -4,39 +4,41 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D41FAC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 17:47:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B8D2C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 17:50:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6E27E2083E
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 17:47:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E27E2083E
+	by mail.kernel.org (Postfix) with ESMTPS id 50AAA2081A
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 17:50:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 50AAA2081A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33322 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40602 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jiiLb-00076V-EP
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 13:47:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54620)
+	id 1jiiO1-0001wf-GE
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 13:50:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54876)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1jii47-0001mc-6L; Tue, 09 Jun 2020 13:29:35 -0400
-Received: from mout.kundenserver.de ([212.227.126.134]:47189)
+ id 1jii6q-0005Jx-Vm; Tue, 09 Jun 2020 13:32:24 -0400
+Received: from mout.kundenserver.de ([212.227.126.133]:55425)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1jii46-0003Wt-28; Tue, 09 Jun 2020 13:29:34 -0400
+ id 1jii6o-0003uq-NP; Tue, 09 Jun 2020 13:32:24 -0400
 Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
- (mreue010 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MCsgS-1jrXkK0xc0-008tas; Tue, 09 Jun 2020 19:29:08 +0200
-Subject: Re: [PATCH v2 1/8] hw/arm/aspeed: Correct DRAM container region size
+ (mreue009 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1N5VPe-1itPo10Xxi-016yew; Tue, 09 Jun 2020 19:32:03 +0200
+Subject: Re: [PATCH v2 7/8] hw/i386/xen/xen-hvm: Use the IEC binary prefix
+ definitions
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
  qemu-devel@nongnu.org
 References: <20200601142930.29408-1-f4bug@amsat.org>
- <20200601142930.29408-2-f4bug@amsat.org>
+ <20200601142930.29408-8-f4bug@amsat.org>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -80,35 +82,35 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <7a9dae30-bb50-f3cc-3806-eaa98d6ec866@vivier.eu>
-Date: Tue, 9 Jun 2020 19:29:04 +0200
+Message-ID: <2f517282-a950-7bb0-219b-87c843ba1aa9@vivier.eu>
+Date: Tue, 9 Jun 2020 19:31:59 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200601142930.29408-2-f4bug@amsat.org>
+In-Reply-To: <20200601142930.29408-8-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:IQ1R2+W1xcofpjLKnHoQc1zpzlvROpmk9GiFBZ16z8fVF2OKjf5
- yYih0NjA8uDqyiWcn06cOU3bQ7PIjPUT7Dz+NDsnGMn4H6NBc713S2MO3vvOZcqtKkNXCUW
- 1zwwuGkXTzMtsuPmxZqOBIPqP+cCgcNbq1OudAa+xfTiOvMSsWTIWF5VqFVauFuct+6R8Vd
- hxf7zpZhU7hZ+pOgiSnrQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:CJwt+zB6upI=:26cXy6uCAs2DDGt8+kZhBS
- hkMO3KuFvCWlTqllFDZl4GcdoZr2/9H1PaZ17wsNzTJzyf36CLBL7dgzkLfFvW6uO7aRj+V2z
- RjAqOZs4D1LIQZdng9CwVgFMz9qPEmBh8LHEDqokteWQ6Rl0TIscpXlIwDROxt/FuuDqvz3hL
- EDLfaw02eyuq0BQ+yFbxE3+MCcJC/HhIB86kg7hmH1F6J4rRv5ao7xGPwyrhmeNaLE5b6xVqf
- Un+kRoRxWXpN/OPZjRTKzf1W6ZcZWXU+uyYlcXJ78W770wrl/Ak0A0p8rQFNNQRoDb3eI8MVI
- uVy0wTdyuqMj1Oh7VVW8AFVDJ5qHt3zVPuvNU9jdo8RPueDg/+f0uDYOCHInNq6QKNHRJLjvf
- MaAkV0kdizygMwBpYfJYD8gRR4jS+AYCBkqnlPBsCWYcfaIefLvSYJkngvJmD8/TRbU8p1bTS
- YvRdqpJjUc7Bdj+KPqfOUTuvwvZ9mSsv87LtcEg4o2M39NQHgWo3XmUgOHKdx2+ZrUvuGUw8F
- KWeWMAVh9NkJemrN8VUxzn+2pPX+BAStwtsz3tHBw//KJrOcG8BK1WtBkYp0CP+5jvjCJLRDw
- TThQt0VcSu32RTqJ08K2ucL6RuXg7oyj26IMc6nS/mCbawD8SMpHa2+TEOuxX/BOhe0HMMknH
- ZqIhO7xtA/+aa7cjhF4otYFC4b/wHJ5Hs+K5E+4QACd7xNJA6R0DJpbPSyaWCnEuWLpVIDtWF
- hYWA4Boa5PVDKh3MG5rqCdG5FglfPL7JVBDmgZF9I89GmQCihVHO+JQ/6lL36HzTU4vNwbLNm
- T/hesKtFX2HuKbPeAiyyyn+sEHy2MDzW9RIo1GdJBc8af56Z8t4dxZkmxhYa2w3rRCld97F
-Received-SPF: none client-ip=212.227.126.134; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:iBNPhQQcrpUp/3RAl90FPZv091PWu/WsnYMgxRBZUgS/NpN9E+C
+ hZxv9XQwD3pvXNRszVBmOuyML7xIzkfIjDmnCak7jtmyRhsn3dZ+FABeocxGO22XD30Iug2
+ 2KpzFLsqT51SmDQGOSSyQL3TFg5cjFVrvR2uJ3OvVHP6vvsbqoH3O26u1u96CFJv2nlHiiZ
+ 8JJJhKp1SM7+GZbjvz0wA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:f0xq687f0Ww=:rmoSs+agvYGUQxwmVwBlzG
+ uJ00JCPeTiKSB6VJe8aFIHvejjF1nLIDFIhOy8/BxgRn4tcmimaGGWYuVSsLGimS1zZEYqH7a
+ hS/1q1JknS0LDzIXPDeciGCodKdrcKdkrOlr0Wj0N5jZe0CxFkIoxhEB31xhFd4RF4HBPGnj/
+ K8UCu/c/GcDdAY3iDVi00f8othPJcXVUIMGNX+GMbSGpSFSkhxcDtjtvuanRRS7xTXMsvKPzS
+ EFEeIobGXGwS5glc06/bSZuS480NTXr3coFiJzl3zRlcqTJvoMYkng/VYn3vrHdwnhouzXYxj
+ istZ7dmJpA4v/C7qd1CHIkz4G8+nyTsC+SA+HAhan0L1e4spAw7eOPpWnEumjILHnw9cb/8lH
+ /F3XGTbspZ7C/QtdKiZNRWQJZzu60q3i6oLOvMGKb/X0efRhylsZA5bY4f2PBvde0beFJX715
+ FyhSyZAtMZ3bSCr87PH1vdnB6uS8zBHHx+LVW2vFJjCVHwpIrc1fekNVy1+ydLDOilKQlZInS
+ wWgdSw+9HhAB88V+ZT0ItK/tRG9PiJBkEKoOQciDMFXp+yf0jk6BD8fCsuR7mh/kpNeDuISpl
+ S1v69XMQWtzBhHpJuRHfGYED1mPk/dvosk92PG3yZ7P/+/F5Y/5Hc94J8hly7PjfkqMslaqhW
+ tgIzGvwiMDajz22JOFSR+OafakXMheXLvwbmv9fy2XLkqnBN0uic57Po59R/Ef82WywX85Ift
+ WZ9EcE8/wLb4eOS83UeJS2ZywR5vjabl8J4pt2e8MAX6mQwtJnxpWuzHp053i1phlEMGvjSPv
+ IlkY22vAcvv6v51cXSZcAIYFfEAeBXpnNkpNz1n94K66tKGTvqIBx3+kdVByp/RAREhhqac
+Received-SPF: none client-ip=212.227.126.133; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 13:15:05
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 12:51:12
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
@@ -143,46 +145,35 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Le 01/06/2020 à 16:29, Philippe Mathieu-Daudé a écrit :
-> memory_region_set_size() handle the 16 Exabytes limit by
-> special-casing the UINT64_MAX value. This is not a problem
-> for the 32-bit maximum, 4 GiB.
-> By using the UINT32_MAX value, the aspeed-ram-container
-> MemoryRegion ends up missing 1 byte:
-> 
->  $ qemu-system-arm -M ast2600-evb -S -monitor stdio
->  (qemu) info mtree
-> 
->   address-space: aspeed.fmc-ast2600-dma-dram
->     0000000080000000-000000017ffffffe (prio 0, i/o): aspeed-ram-container
->       0000000080000000-00000000bfffffff (prio 0, ram): ram
->       00000000c0000000-ffffffffffffffff (prio 0, i/o): max_ram
-> 
-> Fix by using the correct value. We now have:
-> 
->   address-space: aspeed.fmc-ast2600-dma-dram
->     0000000080000000-000000017fffffff (prio 0, i/o): aspeed-ram-container
->       0000000080000000-00000000bfffffff (prio 0, ram): ram
->       00000000c0000000-ffffffffffffffff (prio 0, i/o): max_ram
+> IEC binary prefixes ease code review: the unit is explicit.
 > 
 > Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 > Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 > ---
->  hw/arm/aspeed.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  hw/i386/xen/xen-hvm.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 > 
-> diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
-> index 2c23297edf..62344ac6a3 100644
-> --- a/hw/arm/aspeed.c
-> +++ b/hw/arm/aspeed.c
-> @@ -262,7 +262,7 @@ static void aspeed_machine_init(MachineState *machine)
->      bmc = g_new0(AspeedBoardState, 1);
+> diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
+> index 82ece6b9e7..94fe5d65e9 100644
+> --- a/hw/i386/xen/xen-hvm.c
+> +++ b/hw/i386/xen/xen-hvm.c
+> @@ -9,6 +9,7 @@
+>   */
 >  
->      memory_region_init(&bmc->ram_container, NULL, "aspeed-ram-container",
-> -                       UINT32_MAX);
-> +                       4 * GiB);
->      memory_region_add_subregion(&bmc->ram_container, 0, machine->ram);
+>  #include "qemu/osdep.h"
+> +#include "qemu/units.h"
 >  
->      object_initialize_child(OBJECT(machine), "soc", &bmc->soc,
+>  #include "cpu.h"
+>  #include "hw/pci/pci.h"
+> @@ -230,7 +231,7 @@ static void xen_ram_init(PCMachineState *pcms,
+>           * Xen does not allocate the memory continuously, it keeps a
+>           * hole of the size computed above or passed in.
+>           */
+> -        block_len = (1ULL << 32) + x86ms->above_4g_mem_size;
+> +        block_len = (4 * GiB) + x86ms->above_4g_mem_size;
+>      }
+>      memory_region_init_ram(&ram_memory, NULL, "xen.ram", block_len,
+>                             &error_fatal);
 > 
 
 Applied to my trivial-patches branch.
