@@ -7,80 +7,79 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 235C8C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 16:26:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D8B3C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 16:28:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E228020734
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 16:26:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5965420734
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 16:28:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RERi4p32"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E228020734
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SSKioLzg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5965420734
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51242 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58664 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jih5T-00027J-49
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 12:26:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47096)
+	id 1jih7B-0005ER-Bs
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 12:28:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47052)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jih3x-0000LW-L3
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 12:25:21 -0400
-Received: from mail-pj1-x1035.google.com ([2607:f8b0:4864:20::1035]:35838)
+ id 1jih3q-00008q-JC
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 12:25:14 -0400
+Received: from mail-pl1-x631.google.com ([2607:f8b0:4864:20::631]:43848)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jih3w-0000Ux-7d
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 12:25:21 -0400
-Received: by mail-pj1-x1035.google.com with SMTP id i4so1631388pjd.0
- for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 09:25:19 -0700 (PDT)
+ id 1jih3p-0000Ti-Ff
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 12:25:14 -0400
+Received: by mail-pl1-x631.google.com with SMTP id g12so8231369pll.10
+ for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 09:25:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=8qc6oDN4Zl6MEuNRZIzxS7SMNWB7rYpnfgGgJ3Ds2L8=;
- b=RERi4p32fnYEwO1aJGCC2a0euZ7IP0MZUdQPy4PRigx5sz+5KcV9fOV478Cv1hpSIZ
- 5LKnUN1ehm+vBukvD7vYusKn27PGCwRT8WV81XMy5gT2HfQFJUuha0mJgt5GcRpoXIYC
- sxLkPpGhHGEi3iFJqmwTpxjoG1AgtytU/3j61Q+y3UtmkQuTrGSU2M9wC+F/wj4Z3xlo
- vCmTd/QLj+AsdsiUb4gaCRvwFzrQfO+tCfagxGUqcYfta3lQFMzZWqRDfuUsBm9sRo+n
- Wkf21mJhhYSf6212mXXR4qOVWxjefHP7ugVMapYTgbROgtQDNIxRQtv1It3WSaIgBwnQ
- XMfQ==
+ bh=D9iJwfXIlrrZhBoa0zYBpMpQDudGom24uMHOfJzYaos=;
+ b=SSKioLzg15b5lY0y9ok3Z8QBQAD9YoHL+TVOXRhHO6EAK9a7uTrCBthkJJNY4KeM7e
+ pZYIdtEzK8qAec+chAzKSWPEmBEl/0HeSn8rzn+CtZ2OrljPY2b+cKoSMWmY34vYUvnk
+ JUnE52lcSRxaHTsUbtqwbP70d65x2/g7U7gc5xwDAZxRreK0YFbULHxOijW40Uz4oybb
+ IXl4GYHLOz+HwSyUCY1pL06aNeoMc/WfiBcX02qNoqaJNyTDVpXbNSk15TxG3T64I2KG
+ aO1FrZ57E0A6SsG2AvjslfxpFAsdF/Tt/1fAg7MDbbQ33OUnrLefZXQfni5JANA4fNQF
+ Na+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=8qc6oDN4Zl6MEuNRZIzxS7SMNWB7rYpnfgGgJ3Ds2L8=;
- b=O9DT1R3Om3xWGNjAhPGCaknoDEFSXHUaSu5L4pa6di6IeNlLJPNjt7q5Raa8Mx5lVL
- bln2GzQ8UcCeVnm7VlAl1NK+P2C8DPb3ztGcCgZPIug/z1+U35FGDbwQ5muCzYunw2Xw
- mOXAUF9aa1zyH/aogdZmXxrAoPQLzwU8QnBM9Ctb/AfZlsNP+9uzO5e1YtsBc9s2qxCH
- dzSa3K/FyZoh2t2n/qx8zL9cPuBAUy8MtWZBKWzo4j8VIQpw18SgljO5WeAZQVvttj7J
- rXAhcJx0kFvqKofJyGMIAzzQMHV2/grvb9CznpvQ41RLCUvRcvS9tRF/Ci9Re5BvsddP
- aQtg==
-X-Gm-Message-State: AOAM533D9xA2ZbWEJ7gCmryIhUieVjHRXUH8g82SGHbepBQJp0jvK79+
- YkK6yh2a8jkIdDJ3B6LOZRo86exfqno=
-X-Google-Smtp-Source: ABdhPJxlzjqKn7TyQ0aBfPRakieWIytmY/cpLep/rLZlDOshUH5rxuNS7ByOc66J0dOK9Ob8CdsTww==
-X-Received: by 2002:a17:90a:266f:: with SMTP id
- l102mr6133308pje.190.1591719918369; 
- Tue, 09 Jun 2020 09:25:18 -0700 (PDT)
+ bh=D9iJwfXIlrrZhBoa0zYBpMpQDudGom24uMHOfJzYaos=;
+ b=IROX4cCbi8jK5lLW8yHfsT4iUuP/HvzBsW4I4GS5E+YQLzKI+CIRl+igAsX5Vanix4
+ zxWzpW2aqU+1MyucbH+iWvXwmhX00lYREN57RkqMkMRY4HCo4+28xBdj4ysMo3XxQieF
+ iwSsWvdg54LJhZwwMD7d0jnJ6euAeZDxHPZdhrTOMGhSW8KsYwfhp+wgy2Wb2P5TVHpI
+ LR3/8Yr7T+YeRiKWtdxQa/TtfdSpqDieVCEcCfrpaPdQc1SotRFjfSasLXHEhUWri7DF
+ K2GiQwznVRH+edy2BFi4RJ26VvuSa3rddoR7TpV6Ngn/HeL/q7+5f1gyvEJNT7MxJCzh
+ pG0Q==
+X-Gm-Message-State: AOAM5318FgmuKWFqkzmqiQ8uPavd7JA7yw5xgYeHFK4JWqMSLBfiGjtb
+ m6PX/oW8KCu6iPril4TYonZhRY7Al+M=
+X-Google-Smtp-Source: ABdhPJy866nI5xzvLPXeTBeVGR5GU0oLqSMp9L4gc89JGRd2Q7d41Mic9cHor0NitorHAolHXjDb7g==
+X-Received: by 2002:a17:90a:c293:: with SMTP id
+ f19mr5550170pjt.91.1591719911610; 
+ Tue, 09 Jun 2020 09:25:11 -0700 (PDT)
 Received: from localhost.localdomain (174-21-143-238.tukw.qwest.net.
  [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id s188sm7580101pfb.118.2020.06.09.09.25.17
+ by smtp.gmail.com with ESMTPSA id s188sm7580101pfb.118.2020.06.09.09.25.10
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 09 Jun 2020 09:25:17 -0700 (PDT)
+ Tue, 09 Jun 2020 09:25:11 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 9/9] target/arm: Use a non-overlapping group for misc control
-Date: Tue,  9 Jun 2020 09:25:04 -0700
-Message-Id: <20200609162504.780080-10-richard.henderson@linaro.org>
+Subject: [PULL 4/9] decodetree: Allow group covering the entire insn space
+Date: Tue,  9 Jun 2020 09:24:59 -0700
+Message-Id: <20200609162504.780080-5-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200609162504.780080-1-richard.henderson@linaro.org>
 References: <20200609162504.780080-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1035;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1035.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::631;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x631.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -102,41 +101,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The miscellaneous control instructions are mutually exclusive
-within the t32 decode sub-group.
+This is an edge case for sure, but the logic that disallowed
+this case was faulty.  Further, a few fixes scattered about
+can allow this to work.
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/t32.decode | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ ...est1.decode => succ_pattern_group_nest2.decode} |  2 +-
+ scripts/decodetree.py                              | 14 +++++++++++---
+ 2 files changed, 12 insertions(+), 4 deletions(-)
+ rename tests/decode/{err_pattern_group_nest1.decode => succ_pattern_group_nest2.decode} (85%)
 
-diff --git a/target/arm/t32.decode b/target/arm/t32.decode
-index c63082fc9c..c21a988f97 100644
---- a/target/arm/t32.decode
-+++ b/target/arm/t32.decode
-@@ -312,13 +312,13 @@ CLZ              1111 1010 1011 ---- 1111 .... 1000 ....      @rdm
-                  &cps
+diff --git a/tests/decode/err_pattern_group_nest1.decode b/tests/decode/succ_pattern_group_nest2.decode
+similarity index 85%
+rename from tests/decode/err_pattern_group_nest1.decode
+rename to tests/decode/succ_pattern_group_nest2.decode
+index 92e971c3c5..8d5ab4b2d3 100644
+--- a/tests/decode/err_pattern_group_nest1.decode
++++ b/tests/decode/succ_pattern_group_nest2.decode
+@@ -6,7 +6,7 @@
+ %sub3 16:8
+ %sub4 24:8
  
-     # Miscellaneous control
--    {
-+    [
-       CLREX      1111 0011 1011 1111 1000 1111 0010 1111
-       DSB        1111 0011 1011 1111 1000 1111 0100 ----
-       DMB        1111 0011 1011 1111 1000 1111 0101 ----
-       ISB        1111 0011 1011 1111 1000 1111 0110 ----
-       SB         1111 0011 1011 1111 1000 1111 0111 0000
--    }
-+    ]
+-# Groups with no overlap are supposed to fail
++# Group with complete overlap of the two patterns
+ {
+   top  00000000 00000000 00000000 00000000
+   sub4 ........ ........ ........ ........ %sub1 %sub2 %sub3 %sub4
+diff --git a/scripts/decodetree.py b/scripts/decodetree.py
+index ea313bcdea..3307c74c30 100755
+--- a/scripts/decodetree.py
++++ b/scripts/decodetree.py
+@@ -124,6 +124,7 @@ def is_pow2(x):
  
-     # Note that the v7m insn overlaps both the normal and banked insn.
-     {
+ def ctz(x):
+     """Return the number of times 2 factors into X."""
++    assert x != 0
+     r = 0
+     while ((x >> r) & 1) == 0:
+         r += 1
+@@ -131,6 +132,8 @@ def ctz(x):
+ 
+ 
+ def is_contiguous(bits):
++    if bits == 0:
++        return -1
+     shift = ctz(bits)
+     if is_pow2((bits >> shift) + 1):
+         return shift
+@@ -793,9 +796,8 @@ def build_incmulti_pattern(lineno, pats):
+             error(lineno, 'width mismatch in patterns within braces')
+ 
+     repeat = True
+-    while repeat:
+-        if fixedmask == 0:
+-            error(lineno, 'no overlap in patterns within braces')
++    fixedbits = 0
++    while repeat and fixedmask != 0:
+         fixedbits = None
+         for p in pats:
+             thisbits = p.fixedbits & fixedmask
+@@ -978,6 +980,12 @@ def build_tree(pats, outerbits, outermask):
+         innermask &= i.fixedmask
+ 
+     if innermask == 0:
++        # Edge condition: One pattern covers the entire insnmask
++        if len(pats) == 1:
++            t = Tree(outermask, innermask)
++            t.subs.append((0, pats[0]))
++            return t
++
+         text = 'overlapping patterns:'
+         for p in pats:
+             text += '\n' + p.file + ':' + str(p.lineno) + ': ' + str(p)
 -- 
 2.25.1
 
