@@ -7,81 +7,84 @@ X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F6A1C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 23:24:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DE79C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 23:26:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 41EAD2067B
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 23:24:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D1EEB206A4
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 23:26:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VzMpja2B"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41EAD2067B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MKvw84sz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1EEB206A4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37558 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40798 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jinbh-00028N-HP
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 19:24:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54786)
+	id 1jindN-0003Zg-25
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 19:26:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55034)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jinas-0001QL-P3; Tue, 09 Jun 2020 19:23:46 -0400
-Received: from mail-il1-x143.google.com ([2607:f8b0:4864:20::143]:44635)
+ (Exim 4.90_1) (envelope-from <coiby.xu@gmail.com>)
+ id 1jincY-0002lZ-Le; Tue, 09 Jun 2020 19:25:30 -0400
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:42206)
  by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jinar-0007G7-Qn; Tue, 09 Jun 2020 19:23:46 -0400
-Received: by mail-il1-x143.google.com with SMTP id i1so124756ils.11;
- Tue, 09 Jun 2020 16:23:34 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <coiby.xu@gmail.com>)
+ id 1jincX-0007eX-Id; Tue, 09 Jun 2020 19:25:30 -0400
+Received: by mail-pf1-x441.google.com with SMTP id b5so239621pfp.9;
+ Tue, 09 Jun 2020 16:25:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=2xozlEa/iOiEIAWB56dhJk4Va5WuvxQHsknEvWaQjQM=;
- b=VzMpja2BdCmd/sBjK4m2yoL7xOfCW3ER0pEHIFvQrknWtE3D0p1x5H6AV3Rwv87/qi
- nq1fZW+xpk1vlQLEbK7g8Dz5H2FLu1aiLK0NtcFjiyE2Uv1t1SslmWVwoSWqCBtfCiZe
- WEgoZ3Ab0/orOSwwmLzzcWABVzRFdzmi5HgWW4BQPBxHtevwgaqr8KVEzL/zjbymuh+t
- QUPdYlxakLpdK92gYOJEcVO7wuiYYygC1oODQfRemgqXE5VAD0XMXlcb1HKNJhkKC2/Y
- QOr4SOT9rB1SFtXUinO+hhMnsz4Mtn3un/SItF38ZnuM2IstLfYuu9KHOhyyfGi3cH8C
- r/Ag==
+ h=from:date:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=b8SO35WiYUbBURYx7HNC6iiJvixKUGseKY9k9aG7Odw=;
+ b=MKvw84szMo3ljOUtdzPiL6MW5QtjXjX9LXWqbfko2y4O9mDzsXWoMogNMbVFdqZxy8
+ QSnNyOu51kGe/Dcy6TLmHYfWKP3KkzAKhLYNuYtIgizscL3YKHnqXnpeuQGMYJPRspEa
+ 4voLVhbY5+XkpzpvpPUYqCk9sVdDRvbF8XGb0zxgxebrcfzK2VcW8AbbmVlJXbd4grnz
+ cc60WWvdpH5WqOgTCKvTmnVOrgeJWEJVJfJmHWUaE3nFcTArJtC2aSbdKXYkRNtpNdqG
+ jgzmLvEklNAIMstav8bNavg76I9N8Qj6i4qKrnL4MIIPXvcIv1e7P57WXv1KNHm2uqh5
+ 5ELA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=2xozlEa/iOiEIAWB56dhJk4Va5WuvxQHsknEvWaQjQM=;
- b=IOad0Y5r3P42+C4SvrWPBTPFNwXPkZNCDGBmA6FZnsvJhLxZisxL/pU7oatS0UZBDQ
- nEyYMoHnUruvopyRtpe5MiSvXHCMIPQ4f/+TxhefH/vHrfQQG9voOGtRbMSIatFZAveM
- 53F3kEFD8vtSrSjDDNW8B16JIWfT2oaz33/uX/FKgWK4H0Ju8U/XVqBKSEunZ7tdKxAf
- J0ZqLEk9VM+bbRnfdZjLGZluO3DPveEm6i52F+yrq9ZrecMsEsPl91wlMMKhhWKFSQ2G
- +NRS5SstxcQwajsrVmM5WOutXab2EbYOwga4ORTZL6100tKrl1CWiJGelj7TbuRBUfd0
- IiFg==
-X-Gm-Message-State: AOAM531ame+I3ftso+flYUKUn1gqm0k37JAOAAMPzF/kg3jRHebVdfdR
- VzWXVKiMzhHIndynC9n5bY8y3/kbZ0IuV0VX81U=
-X-Google-Smtp-Source: ABdhPJwPEosiFGLCh1Om+iYYOIrm14s+jKGtC6pOIfj1UzMKhM2cbfSu1b3t5Ur8Oqq0A3qusW99WZHwLwnEWSFiFjI=
-X-Received: by 2002:a92:c94b:: with SMTP id i11mr400044ilq.177.1591745013439; 
- Tue, 09 Jun 2020 16:23:33 -0700 (PDT)
+ h=x-gm-message-state:from:date:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=b8SO35WiYUbBURYx7HNC6iiJvixKUGseKY9k9aG7Odw=;
+ b=C3iahSo2KzE7JUTaRqU46Kwaj2OFxxtzdgUWwi6ajCUmO0f0EwGRBN1rsWDneLH9d8
+ 1S7zxXR4v3mSvnm77UFGSztCg3m3z8WJve0LkzAt4054Cl/qBZOMB/V76KvWcxkj5qGR
+ hl8zjlkIa/fy+xdSNxz22YwdLKZAbe7+wkvfoGmUduepPxmcfuNXpxbNr1Ou7Qb1spiC
+ AvzsQZn7r4R9j12G0Y0IkcQhYBs6G7CinlyXhN/BoOHxB2JhfoxiIVwItfe030EcQ/Ds
+ ABNr0znj2vITvRY/MOtBgubQJ2WIziQ286gVI2PCQuBMmCoaI9XCxHGnoZURV0zT2icd
+ w2Yw==
+X-Gm-Message-State: AOAM532y8+/79pGaafa7Q/TbY9xGhigN9c+e6JAcJsJE6R7Sq1BH9gmS
+ bzs9Ynf7pB91nrupB5uo5Sw=
+X-Google-Smtp-Source: ABdhPJza6G4Dz5ZqWXR3AHn+D1nsA++KoTfFIrd56VykM3pzDtOISs1BM8BUx9hP32H7VBwrAdIGMQ==
+X-Received: by 2002:a63:d04b:: with SMTP id s11mr305056pgi.384.1591745116664; 
+ Tue, 09 Jun 2020 16:25:16 -0700 (PDT)
+Received: from localhost ([2001:e42:102:1532:160:16:113:140])
+ by smtp.gmail.com with ESMTPSA id d5sm11055367pfd.124.2020.06.09.16.25.14
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 09 Jun 2020 16:25:16 -0700 (PDT)
+From: Coiby Xu <coiby.xu@gmail.com>
+X-Google-Original-From: Coiby Xu <Coiby.Xu@gmail.com>
+Date: Wed, 10 Jun 2020 07:25:11 +0800
+To: Kevin Wolf <kwolf@redhat.com>
+Subject: Re: [PATCH v2 08/20] qemu-storage-daemon: Add --object option
+Message-ID: <20200609232511.ucfrpj2ftfmbtfwf@r>
+References: <20200224143008.13362-1-kwolf@redhat.com>
+ <20200224143008.13362-9-kwolf@redhat.com>
 MIME-Version: 1.0
-References: <20200609122339.937862-1-armbru@redhat.com>
- <20200609122339.937862-2-armbru@redhat.com>
-In-Reply-To: <20200609122339.937862-2-armbru@redhat.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 9 Jun 2020 16:14:12 -0700
-Message-ID: <CAKmqyKPGBxODrm6vRLAYd_oFbeNsH3U_3qpS4O+w7m-YdgxLuQ@mail.gmail.com>
-Subject: Re: [PATCH v3 01/24] arm/stm32f405: Fix realization of
- "stm32f2xx-adc" devices
-To: Markus Armbruster <armbru@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::143;
- envelope-from=alistair23@gmail.com; helo=mail-il1-x143.google.com
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20200224143008.13362-9-kwolf@redhat.com>
+Received-SPF: pass client-ip=2607:f8b0:4864:20::441;
+ envelope-from=coiby.xu@gmail.com; helo=mail-pf1-x441.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
@@ -96,134 +99,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "Daniel P. Berrange" <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Alistair Francis <alistair@alistair23.me>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, armbru@redhat.com,
+ stefanha@redhat.com, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jun 9, 2020 at 5:24 AM Markus Armbruster <armbru@redhat.com> wrote:
+On Mon, Feb 24, 2020 at 03:29:56PM +0100, Kevin Wolf wrote:
+>Add a command line option to create user-creatable QOM objects.
 >
-> stm32f405_soc_initfn() creates six such devices, but
-> stm32f405_soc_realize() realizes only one.  Affects machine
-> netduinoplus2.
+>Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+>---
+> qemu-storage-daemon.c | 47 +++++++++++++++++++++++++++++++++++++++++++
+> Makefile.objs         |  2 +-
+> qom/Makefile.objs     |  1 +
+> 3 files changed, 49 insertions(+), 1 deletion(-)
 >
-> In theory, a device becomes real only on realize.  In practice, the
-> transition from unreal to real is a fuzzy one.  The work to make a
-> device real can be spread between realize methods (fine),
-> instance_init methods (wrong), and board code wiring up the device
-> (fine as long as it effectively happens on realize).  Depending on
-> what exactly is done where, a device can work even when we neglect
-> to realize it.
+>diff --git a/qemu-storage-daemon.c b/qemu-storage-daemon.c
+>index c30caaf59e..0cd8144c81 100644
+>--- a/qemu-storage-daemon.c
+>+++ b/qemu-storage-daemon.c
+>@@ -33,15 +33,19 @@
+> #include "qapi/error.h"
+> #include "qapi/qapi-visit-block-core.h"
+> #include "qapi/qapi-commands-block-core.h"
+>+#include "qapi/qmp/qdict.h"
+> #include "qapi/qobject-input-visitor.h"
 >
-> The five unrealized devices appear to stay unreal: neither MMIO nor
-> IRQ get wired up.
+> #include "qemu-common.h"
+> #include "qemu-version.h"
+> #include "qemu/config-file.h"
+> #include "qemu/error-report.h"
+>+#include "qemu/help_option.h"
+> #include "qemu/log.h"
+> #include "qemu/main-loop.h"
+> #include "qemu/module.h"
+>+#include "qemu/option.h"
+>+#include "qom/object_interfaces.h"
 >
-> Fix stm32f405_soc_realize() to realize and wire up all six.  Visible
-> in "info qtree":
+> #include "trace/control.h"
 >
->      bus: main-system-bus
->        type System
->        dev: stm32f405-soc, id ""
->          cpu-type =3D "cortex-m4-arm-cpu"
->        dev: stm32f2xx-adc, id ""
->          gpio-out "sysbus-irq" 1
->     -    mmio ffffffffffffffff/00000000000000ff
->     +    mmio 0000000040012000/00000000000000ff
->        dev: stm32f2xx-adc, id ""
->          gpio-out "sysbus-irq" 1
->     -    mmio ffffffffffffffff/00000000000000ff
->     +    mmio 0000000040012100/00000000000000ff
->        dev: stm32f2xx-adc, id ""
->          gpio-out "sysbus-irq" 1
->     -    mmio ffffffffffffffff/00000000000000ff
->     +    mmio 0000000040012200/00000000000000ff
->        dev: stm32f2xx-adc, id ""
->          gpio-out "sysbus-irq" 1
->     -    mmio ffffffffffffffff/00000000000000ff
->     +    mmio 0000000040012300/00000000000000ff
->        dev: stm32f2xx-adc, id ""
->          gpio-out "sysbus-irq" 1
->     -    mmio 0000000040012000/00000000000000ff
->     +    mmio 0000000040012400/00000000000000ff
->        dev: stm32f2xx-adc, id ""
->          gpio-out "sysbus-irq" 1
->     -    mmio ffffffffffffffff/00000000000000ff
->     +    mmio 0000000040012500/00000000000000ff
->        dev: armv7m, id ""
+>@@ -63,12 +67,31 @@ static void help(void)
+> "             [,driver specific parameters...]\n"
+> "                         configure a block backend\n"
+> "\n"
+>+"  --object help          list object types that can be added\n"
+>+"  --object <type>,help   list properties for the given object type\n"
+>+"  --object <type>[,<property>=<value>...]\n"
+>+"                         create a new object of type <type>, setting\n"
+>+"                         properties in the order they are specified. Note\n"
+>+"                         that the 'id' property must be set.\n"
+>+"                         See the qemu(1) man page for documentation of the\n"
+>+"                         objects that can be added.\n"
+>+"\n"
+> QEMU_HELP_BOTTOM "\n",
+>     error_get_progname());
+> }
 >
-> Fixes: 529fc5fd3e18ace8f739afd02dc0953354f39442
-> Cc: Alistair Francis <alistair@alistair23.me>
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Cc: qemu-arm@nongnu.org
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> enum {
+>     OPTION_BLOCKDEV = 256,
+>+    OPTION_OBJECT,
+>+};
+>+
+>+static QemuOptsList qemu_object_opts = {
+>+    .name = "object",
+>+    .implied_opt_name = "qom-type",
+>+    .head = QTAILQ_HEAD_INITIALIZER(qemu_object_opts.head),
+>+    .desc = {
+>+        { }
+>+    },
+> };
+>
+I'm not sure whether qemu-storage-daemon's QMP monitor is supposed to support
+`object-del` or not. If it's yes, we should add `qemu_add_opts(&qemu_object_opts);`,
+otherwise, qemu-storage-daemon will exit with the following error,
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-Alistair
+    Unexpected error in find_list() at util/qemu-config.c:24:
 
-> ---
->  hw/arm/stm32f405_soc.c | 23 +++++++++++++----------
->  1 file changed, 13 insertions(+), 10 deletions(-)
->
-> diff --git a/hw/arm/stm32f405_soc.c b/hw/arm/stm32f405_soc.c
-> index 4f10ce6176..c9a530eecf 100644
-> --- a/hw/arm/stm32f405_soc.c
-> +++ b/hw/arm/stm32f405_soc.c
-> @@ -37,7 +37,8 @@ static const uint32_t usart_addr[] =3D { 0x40011000, 0x=
-40004400, 0x40004800,
->  /* At the moment only Timer 2 to 5 are modelled */
->  static const uint32_t timer_addr[] =3D { 0x40000000, 0x40000400,
->                                         0x40000800, 0x40000C00 };
-> -#define ADC_ADDR                       0x40012000
-> +static const uint32_t adc_addr[] =3D { 0x40012000, 0x40012100, 0x4001220=
-0,
-> +                                     0x40012300, 0x40012400, 0x40012500 =
-};
->  static const uint32_t spi_addr[] =3D   { 0x40013000, 0x40003800, 0x40003=
-C00,
->                                         0x40013400, 0x40015000, 0x4001540=
-0 };
->  #define EXTI_ADDR                      0x40013C00
-> @@ -185,16 +186,18 @@ static void stm32f405_soc_realize(DeviceState *dev_=
-soc, Error **errp)
->      qdev_connect_gpio_out(DEVICE(&s->adc_irqs), 0,
->                            qdev_get_gpio_in(armv7m, ADC_IRQ));
->
-> -    dev =3D DEVICE(&(s->adc[i]));
-> -    object_property_set_bool(OBJECT(&s->adc[i]), true, "realized", &err)=
-;
-> -    if (err !=3D NULL) {
-> -        error_propagate(errp, err);
-> -        return;
-> +    for (i =3D 0; i < STM_NUM_ADCS; i++) {
-> +        dev =3D DEVICE(&(s->adc[i]));
-> +        object_property_set_bool(OBJECT(&s->adc[i]), true, "realized", &=
-err);
-> +        if (err !=3D NULL) {
-> +            error_propagate(errp, err);
-> +            return;
-> +        }
-> +        busdev =3D SYS_BUS_DEVICE(dev);
-> +        sysbus_mmio_map(busdev, 0, adc_addr[i]);
-> +        sysbus_connect_irq(busdev, 0,
-> +                           qdev_get_gpio_in(DEVICE(&s->adc_irqs), i));
->      }
-> -    busdev =3D SYS_BUS_DEVICE(dev);
-> -    sysbus_mmio_map(busdev, 0, ADC_ADDR);
-> -    sysbus_connect_irq(busdev, 0,
-> -                       qdev_get_gpio_in(DEVICE(&s->adc_irqs), i));
->
->      /* SPI devices */
->      for (i =3D 0; i < STM_NUM_SPIS; i++) {
-> --
-> 2.26.2
->
->
+The steps to reproduce this error,
+
+   1. start qemu-storage-daemon
+
+     ./qemu-storage-daemon --object iothread,id=iothread0 --chardev socket,id=qmp,path=abc,server,nowait --monitor chardev=qmp
+
+   2. send object-del command
+
+     echo '{ "execute": "qmp_capabilities" }'\
+             '{ 'object-del', 'arguments': {'id': 'iothread0'} }'\
+             '{ "execute": "quit" } ' | socat - UNIX-CONNECT:abc
 
