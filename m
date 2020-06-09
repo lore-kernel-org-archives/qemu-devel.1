@@ -2,79 +2,95 @@ Return-Path: <SRS0=hUBF=7W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D233C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 19:24:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 393A0C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 19:24:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 48A92206C3
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 19:24:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48A92206C3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 0A36C20734
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 19:24:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MTfIrs8f"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A36C20734
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57292 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57476 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jijrL-00083H-Jc
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 15:24:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46436)
+	id 1jijrP-00087u-AA
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 15:24:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45340)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jijil-0006YU-SV
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 15:15:39 -0400
-Received: from indium.canonical.com ([91.189.90.7]:43880)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jijik-0000aU-3m
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 15:15:39 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jijih-0007hU-P2
- for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 19:15:35 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 975BC2E8109
- for <qemu-devel@nongnu.org>; Tue,  9 Jun 2020 19:15:35 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jijcJ-0005EH-7w
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 15:08:59 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:53393
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jijcI-0007w4-Bw
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 15:08:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591729737;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=w4/r3qBvQ+VqTMLar7mhHOCia2z5SqVcn9h10RZuQEk=;
+ b=MTfIrs8fAHkaYq/uwF8OAX8njQAmgal2RFCrXKbvgX+JI285at22TmkZmd1yP8ZZPaGs2A
+ o2REPe80BZtNpM4V1nJGsWWvswAHTiDS14Zt3sm2pUGtG5Mydn0fqRqXPmA7UJu4/uXZMP
+ Ys/99CUrlfpUFV1RIfaVOwsM01hOU7o=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-274-9KqNBQ32P4KRcXIViF__4w-1; Tue, 09 Jun 2020 15:08:53 -0400
+X-MC-Unique: 9KqNBQ32P4KRcXIViF__4w-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4A4D21007B0B;
+ Tue,  9 Jun 2020 19:08:52 +0000 (UTC)
+Received: from [10.3.113.22] (ovpn-113-22.phx2.redhat.com [10.3.113.22])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id BB0205D9E5;
+ Tue,  9 Jun 2020 19:08:51 +0000 (UTC)
+Subject: Re: [PATCH v5 12/13] qcow2: QcowHeaderExtension print names for
+ extension magics
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20200606081806.23897-1-vsementsov@virtuozzo.com>
+ <20200606081806.23897-13-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <7210f9df-92f5-afd5-3a4b-1341982fef04@redhat.com>
+Date: Tue, 9 Jun 2020 14:08:51 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 09 Jun 2020 19:09:44 -0000
-From: Artyom <1882817@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: philmd theartlav
-X-Launchpad-Bug-Reporter: Artyom (theartlav)
-X-Launchpad-Bug-Modifier: Artyom (theartlav)
-References: <159172265471.31406.7196816329603804386.malonedeb@gac.canonical.com>
-Message-Id: <159172978467.18540.13327410730791204603.malone@chaenomeles.canonical.com>
-Subject: [Bug 1882817] Re: Segfault in audio_pcm_sw_write with audio over VNC
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="ef9fc486e875d54078fa61cf91e898b895125d89";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 2be57943a788206afa47067cfdd0b928dc4acf42
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 10:15:37
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200606081806.23897-13-vsementsov@virtuozzo.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 02:41:53
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -83,65 +99,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1882817 <1882817@bugs.launchpad.net>
+Cc: kwolf@redhat.com, den@openvz.org, andrey.shinkevich@virtuozzo.com,
+ qemu-devel@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Great.
-Can confirm, that patch fixes it.
+On 6/6/20 3:18 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Suggested-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>   tests/qemu-iotests/031.out         | 22 +++++++++++-----------
+>   tests/qemu-iotests/036.out         |  4 ++--
+>   tests/qemu-iotests/061.out         | 14 +++++++-------
+>   tests/qemu-iotests/qcow2_format.py | 17 ++++++++++++++++-
+>   4 files changed, 36 insertions(+), 21 deletions(-)
+> 
 
--- =
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1882817
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
-Title:
-  Segfault in audio_pcm_sw_write with audio over VNC
-
-Status in QEMU:
-  New
-
-Bug description:
-  QEMU 5.0.0, built with ./configure --target-list=3Dx86_64-softmmu
-  --enable-debug --disable-strip --disable-docs --disable-sdl
-
-  Running on a headless host (Ryzen 3600), Arch Linux, 64bit latest.
-  Guest is also Arch Linux, 64bit.
-
-  Started with qemu-system-x86_64 -vnc 0.0.0.0:0 -enable-kvm -m 4096 -cpu h=
-ost -smp cores=3D2,threads=3D1,sockets=3D1 -machine q35 -vga std -device
-   ich9-ahci,id=3Dahci -drive file=3Dvm0.qcow2,format=3Dqcow2,if=3Dnone,id=
-=3Ddsk0 -device ide-hd,drive=3Ddsk0,bus=3Dahci.0 -soundhw hda
-
-  So, a headless VM is running on a server and is being connected to
-  over VNC. The virtual sound card is detected and speaker test is
-  running inside the VM. So far so good.
-
-  Then, i tell the VNC client to enable audio (QEMU Audio Client
-  Message, 255,1,0). QEMU responds with a "stream is about to start"
-  message (QEMU Audio Server Message, 255,1,1) and then promptly crashes
-  without sending anything else.
-
-  Running it in GDB produces a crash at audio/audio.c:739
-
-  Thread 1 "qemu-system-x86" received signal SIGSEGV, Segmentation fault.
-  audio_pcm_sw_write (sw=3D0x5555575bbf30, buf=3D0x0, size=3D1628) at audio=
-/audio.c:739
-  739             if (!sw->hw->pcm_ops->volume_out) {
-
-  The exact sequence of events does not matter - i can enable sound
-  before playing anything, and then it would say nothing and keep
-  working, but crash with the same message once anything sound-playing
-  is launched in the VM.
-
-  Using different soundhw or adding various audiodev options does not
-  seem to affect anything.
-
-  I can't quite figure out if the QEMU Audio VNC extension is supposed
-  to work at all or not, but it would be handy to me if it is.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1882817/+subscriptions
 
