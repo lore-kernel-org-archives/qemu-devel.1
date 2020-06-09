@@ -2,95 +2,130 @@ Return-Path: <SRS0=hUBF=7W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A3D8C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 07:44:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11BC2C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 07:46:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C857A2074B
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 07:44:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C96A12074B
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 07:46:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W36hHERf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C857A2074B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iWVHm/OQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C96A12074B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35956 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39400 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jiYwB-0006M4-4v
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 03:44:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40360)
+	id 1jiYxq-0007qf-4w
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 03:46:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41680)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jiYkN-0004Hf-V9
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 03:32:35 -0400
-Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:39490)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jiYkN-0007YE-4X
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 03:32:35 -0400
-Received: by mail-wr1-x42e.google.com with SMTP id t18so20073094wru.6
- for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 00:32:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=P/mKxtHL0UxIRvwcZTV/zvAsg90s7x/j5V+O3iTow44=;
- b=W36hHERfCfDWWt1sq5dxY5LL6DlTu7P82yLIpAU4SenJ/pocvmhjz98MYSP2sVFoxW
- jufy9jf2tJiq72dPWvkWCUdL/vjyRrxEYKDe2/8/ETxUbQutYfpHnzOjCj/KmXCDVUNZ
- tjz4hYEPwdp1RfF+hMy/Upcw3at0T4ZRmJo4CcK0YHkeeZU1PtozQK164K/LxOJT8NI2
- CZsqD3DLHhGjrsZYmzk2d90Csl7oBZXFhbIyxQRP4eKGWTgeNxdwi+I8gnSyHdnNpQgN
- CRt1wyseVg/c0eRBpqT3sAZQ/kj2E5wbnoR2lkumyukb1QzkMaralkvJVQjLfJBMdl3V
- XIBw==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jiYws-0007DI-1q
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 03:45:30 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:33864
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jiYwq-000175-Pj
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 03:45:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591688727;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=vCuAkp+C+C5abMD6FHAB/y2LMioAmuShj2pFy9CW50E=;
+ b=iWVHm/OQldSpoCMImAS6xIO/vrOKHJrtC7JCbUkSvIFYs6s1j2ZnYyiiAHjD2BF/YrX+RZ
+ Zs5o7RAHFk652xFNrKOpUN3CClLG6TyriHBnKbl8ahahY364JVCQGHLvRepmnWiC8Cf4Bq
+ zaZUY0rVbPI7ngH60sE2i+ojxCt5fZQ=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-242-PICC8AjkPJ2cOAa-St5xkw-1; Tue, 09 Jun 2020 03:45:25 -0400
+X-MC-Unique: PICC8AjkPJ2cOAa-St5xkw-1
+Received: by mail-wm1-f69.google.com with SMTP id 11so373304wmj.6
+ for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 00:45:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=P/mKxtHL0UxIRvwcZTV/zvAsg90s7x/j5V+O3iTow44=;
- b=tZDzY++QT1shf85Bg1BtLMunyVxgRNR5wLBzhNfklndyvewIGERDfaLf+2rSE789RM
- Vx7XZMVgCBqRM8YEhfLwQ4P+QJrgfXbG8zCfy13F3nVvNJviO9D0SUaszZIkq7VDy6sO
- y/0i5WapG0IDdfxWAkkHNbQMNopc0mv/OlNp0SwJKzgeWnnozuTlEwOujMfIpYkWLxNT
- Y44KtN2XKeG4Ko/iFdU5CwmjYSReW+hzYKemRqQkYT65564kL8EoR4ALydTY2vD7HGLx
- XAux4+MtRhKWpcIDqv/h3Tz+V4fn+ZpOWH76mhsSvvByqcArA3YSlekOV7VNhroARf/L
- 2RQg==
-X-Gm-Message-State: AOAM532gxvPjaDyfRlX+iJm9LbaXws1Y5j4ENl2ARG/PRU1XIAWGAOi3
- zE5t4KLIRiuljzWsbTU0YbJPU4Av
-X-Google-Smtp-Source: ABdhPJxV6BT3PE+jmGctOwa//GP20bP8SyRTOlj7B8RaAU9l2+CImuPhKdfotkn9G+eRgNluhJ5bRA==
-X-Received: by 2002:a5d:4bcb:: with SMTP id l11mr3065533wrt.363.1591687953481; 
- Tue, 09 Jun 2020 00:32:33 -0700 (PDT)
-Received: from localhost.localdomain
- (181.red-88-10-103.dynamicip.rima-tde.net. [88.10.103.181])
- by smtp.gmail.com with ESMTPSA id m3sm2036192wmc.0.2020.06.09.00.32.32
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 09 Jun 2020 00:32:32 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [PULL 15/16] target/sparc/int32_helper: Remove DEBUG_PCALL definition
-Date: Tue,  9 Jun 2020 09:32:13 +0200
-Message-Id: <20200609073214.14079-16-f4bug@amsat.org>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200609073214.14079-1-f4bug@amsat.org>
-References: <20200609073214.14079-1-f4bug@amsat.org>
+ h=x-gm-message-state:subject:to:references:from:autocrypt:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=vCuAkp+C+C5abMD6FHAB/y2LMioAmuShj2pFy9CW50E=;
+ b=bClmWekrOSM6mEV8nMebgbPgQyjObV4dvnYHZDq3dAP/r0kZZ8NZY9OvQ1ivCiUCit
+ WNccVUfyKcTyF4ddRlX95JV9YnD5Wf/sT0KLGuQiMKKN+TP9w8ROH6QkVmkln1i3UDm9
+ 4ZFctzrFRtdyh7fzGIzqXTa/bJNxqH5HnQQzvzTB72qx/sd/phYOwp29+s65xclqAmeb
+ veiJh+81uxRrp1mVkGIulpb9CA7k6YzTIVrYk5YJfBVLjC/IJ9pJ/3NpmK9FX9UYmT3Z
+ ZiLX/TvPcvKbA/KAJZrg4rhL8ZKPIvVl0pHVhN5a2A78rSb9pUodkzpwyMbXur7xDMEd
+ EKWg==
+X-Gm-Message-State: AOAM5324CiNFsQYuc9SK5OYzIR9ivjB1YzlP2pEN3Hvk9PnUTilj1MTh
+ d4BSgOsPbxDz7bk0t+x2I/4JHKjxPHLD50o2OStfeCFuu5aXPktgD3HDwx3ND3a7KOIDOG+D6wm
+ tTVjN2cih/pRGwvM=
+X-Received: by 2002:a05:600c:645:: with SMTP id
+ p5mr2594630wmm.156.1591688724265; 
+ Tue, 09 Jun 2020 00:45:24 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzZsoAaE7J+Jx1ymr67JO3axekVqCEbCol/UKkARpYKZbAnzzoUcjG1pxAE/ETIf9/+3sLK7Q==
+X-Received: by 2002:a05:600c:645:: with SMTP id
+ p5mr2594613wmm.156.1591688724082; 
+ Tue, 09 Jun 2020 00:45:24 -0700 (PDT)
+Received: from [192.168.1.38] (181.red-88-10-103.dynamicip.rima-tde.net.
+ [88.10.103.181])
+ by smtp.gmail.com with ESMTPSA id z22sm1974383wmf.9.2020.06.09.00.45.23
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 09 Jun 2020 00:45:23 -0700 (PDT)
+Subject: Re: [PATCH v2 05/58] qdev: Put qdev_new() to use with Coccinelle
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20200529134523.8477-1-armbru@redhat.com>
+ <20200529134523.8477-6-armbru@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <7753f4bb-7627-2fcc-8a42-7fbafff9afb5@redhat.com>
+Date: Tue, 9 Jun 2020 09:45:22 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20200529134523.8477-6-armbru@redhat.com>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::42e;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x42e.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -16
-X-Spam_score: -1.7
-X-Spam_bar: -
-X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 02:41:53
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,68 +138,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- KONRAD Frederic <frederic.konrad@adacore.com>,
- Fabien Chouteau <chouteau@adacore.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Artyom Tarasenko <atar4qemu@gmail.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We define DEBUG_PCALL since b884fc5e (2012-10-06).
-7.5 years later it is safe to assume we can remove it :)
+On 5/29/20 3:44 PM, Markus Armbruster wrote:
+> Let's start simple and put qdev_new() to use.  Coccinelle script:
+> 
+>     @ depends on !(file in "hw/core/qdev.c")@
+>     expression type_name;
+>     @@
+>     -    DEVICE(object_new(type_name))
+>     +    qdev_new(type_name)
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  hw/block/nand.c  | 2 +-
+>  hw/misc/auxbus.c | 2 +-
+>  qdev-monitor.c   | 2 +-
+>  3 files changed, 3 insertions(+), 3 deletions(-)
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: KONRAD Frederic <frederic.konrad@adacore.com>
-Message-Id: <20200331105048.27989-7-f4bug@amsat.org>
----
- target/sparc/int32_helper.c | 5 -----
- 1 file changed, 5 deletions(-)
-
-diff --git a/target/sparc/int32_helper.c b/target/sparc/int32_helper.c
-index 813b47dbb2..c56dd3df18 100644
---- a/target/sparc/int32_helper.c
-+++ b/target/sparc/int32_helper.c
-@@ -23,9 +23,7 @@
- #include "exec/log.h"
- #include "sysemu/runstate.h"
- 
--#define DEBUG_PCALL
- 
--#ifdef DEBUG_PCALL
- static const char * const excp_names[0x80] = {
-     [TT_TFAULT] = "Instruction Access Fault",
-     [TT_ILL_INSN] = "Illegal Instruction",
-@@ -58,7 +56,6 @@ static const char * const excp_names[0x80] = {
-     [TT_DIV_ZERO] = "Division By Zero",
-     [TT_NCP_INSN] = "Coprocessor Disabled",
- };
--#endif
- 
- void sparc_cpu_do_interrupt(CPUState *cs)
- {
-@@ -71,7 +68,6 @@ void sparc_cpu_do_interrupt(CPUState *cs)
-         cpu_get_psr(env);
-     }
- 
--#ifdef DEBUG_PCALL
-     if (qemu_loglevel_mask(CPU_LOG_INT)) {
-         static int count;
-         const char *name;
-@@ -104,7 +100,6 @@ void sparc_cpu_do_interrupt(CPUState *cs)
- #endif
-         count++;
-     }
--#endif
- #if !defined(CONFIG_USER_ONLY)
-     if (env->psret == 0) {
-         if (cs->exception_index == 0x80 &&
--- 
-2.21.3
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
 
