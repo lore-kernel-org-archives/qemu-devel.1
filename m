@@ -6,38 +6,38 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 685E3C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 19:06:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 198A8C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 19:06:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3E35C2067B
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 19:06:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E35C2067B
+	by mail.kernel.org (Postfix) with ESMTPS id EAE542067B
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 19:06:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EAE542067B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54488 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54994 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jijZa-0007ss-Ea
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 15:06:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44596)
+	id 1jijZd-00086I-Vz
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 15:06:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44620)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1jijXF-0005xm-B2; Tue, 09 Jun 2020 15:03:45 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:40188)
+ id 1jijXI-0005zw-8h; Tue, 09 Jun 2020 15:03:48 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:40200)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1jijXD-0006g6-Ez; Tue, 09 Jun 2020 15:03:44 -0400
+ id 1jijXE-0006gs-6K; Tue, 09 Jun 2020 15:03:47 -0400
 Received: from apples.local (80-167-98-190-cable.dk.customer.tdc.net
  [80.167.98.190])
- by charlie.dont.surf (Postfix) with ESMTPSA id AF323BF7E0;
- Tue,  9 Jun 2020 19:03:40 +0000 (UTC)
+ by charlie.dont.surf (Postfix) with ESMTPSA id 5BD8BBF846;
+ Tue,  9 Jun 2020 19:03:42 +0000 (UTC)
 From: Klaus Jensen <its@irrelevant.dk>
 To: qemu-block@nongnu.org
-Subject: [PATCH v7 01/22] hw/block/nvme: fix pci doorbell size calculation
-Date: Tue,  9 Jun 2020 21:03:12 +0200
-Message-Id: <20200609190333.59390-2-its@irrelevant.dk>
+Subject: [PATCH v7 03/22] hw/block/nvme: remove superfluous breaks
+Date: Tue,  9 Jun 2020 21:03:14 +0200
+Message-Id: <20200609190333.59390-4-its@irrelevant.dk>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200609190333.59390-1-its@irrelevant.dk>
 References: <20200609190333.59390-1-its@irrelevant.dk>
@@ -77,56 +77,43 @@ Sender: "Qemu-devel"
 
 From: Klaus Jensen <k.jensen@samsung.com>
 
-The size of the BAR is 0x1000 (main registers) + 8 bytes for each
-queue. Currently, the size of the BAR is calculated like so:
-
-    n->reg_size = pow2ceil(0x1004 + 2 * (n->num_queues + 1) * 4);
-
-Since the 'num_queues' parameter already accounts for the admin queue,
-this should in any case not need to be incremented by one. Also, the
-size should be initialized to (0x1000).
-
-    n->reg_size = pow2ceil(0x1000 + 2 * n->num_queues * 4);
-
-This, with the default value of num_queues (64), we will set aside room
-for 1 admin queue and 63 I/O queues (4 bytes per doorbell, 2 doorbells
-per queue).
+These break statements was left over when commit 3036a626e9ef ("nvme:
+add Get/Set Feature Timestamp support") was merged.
 
 Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Reviewed-by: Keith Busch <kbusch@kernel.org>
-Message-Id: <20200514044611.734782-2-its@irrelevant.dk>
+Message-Id: <20200514044611.734782-4-its@irrelevant.dk>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- hw/block/nvme.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ hw/block/nvme.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
 diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index a21eeca2fbf9..c1476e8b2a60 100644
+index e8f5c5ab829b..0d3f8f345f9a 100644
 --- a/hw/block/nvme.c
 +++ b/hw/block/nvme.c
-@@ -53,6 +53,9 @@
- #include "trace.h"
- #include "nvme.h"
- 
-+#define NVME_REG_SIZE 0x1000
-+#define NVME_DB_SIZE  4
-+
- #define NVME_GUEST_ERR(trace, fmt, ...) \
-     do { \
-         (trace_##trace)(__VA_ARGS__); \
-@@ -1401,7 +1404,9 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
-     pcie_endpoint_cap_init(pci_dev, 0x80);
- 
-     n->num_namespaces = 1;
--    n->reg_size = pow2ceil(0x1004 + 2 * (n->num_queues + 1) * 4);
-+
-+    /* num_queues is really number of pairs, so each has two doorbells */
-+    n->reg_size = pow2ceil(NVME_REG_SIZE + 2 * n->num_queues * NVME_DB_SIZE);
-     n->ns_size = bs_size / (uint64_t)n->num_namespaces;
- 
-     n->namespaces = g_new0(NvmeNamespace, n->num_namespaces);
+@@ -801,7 +801,6 @@ static uint16_t nvme_get_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+         break;
+     case NVME_TIMESTAMP:
+         return nvme_get_feature_timestamp(n, cmd);
+-        break;
+     default:
+         trace_pci_nvme_err_invalid_getfeat(dw10);
+         return NVME_INVALID_FIELD | NVME_DNR;
+@@ -845,11 +844,8 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+         req->cqe.result =
+             cpu_to_le32((n->num_queues - 2) | ((n->num_queues - 2) << 16));
+         break;
+-
+     case NVME_TIMESTAMP:
+         return nvme_set_feature_timestamp(n, cmd);
+-        break;
+-
+     default:
+         trace_pci_nvme_err_invalid_setfeat(dw10);
+         return NVME_INVALID_FIELD | NVME_DNR;
 -- 
 2.27.0
 
