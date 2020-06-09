@@ -2,90 +2,94 @@ Return-Path: <SRS0=hUBF=7W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C6AAC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 16:39:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A8ACC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 16:40:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 07D4720737
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 16:39:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2431920737
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 16:40:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V5V8sKI8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07D4720737
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KXGxiSoW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2431920737
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37168 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38704 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jihHp-0003TN-4d
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 12:39:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47490)
+	id 1jihId-00045w-Ah
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 12:40:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48368)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jih7J-00063z-GG
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 12:28:49 -0400
-Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:38798)
+ (Exim 4.90_1) (envelope-from <hskinnemoen@google.com>)
+ id 1jihEk-0007TX-43
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 12:36:30 -0400
+Received: from mail-vk1-xa43.google.com ([2607:f8b0:4864:20::a43]:40411)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jih7I-00018J-Fg
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 12:28:49 -0400
-Received: by mail-wr1-x42b.google.com with SMTP id e1so22047331wrt.5
- for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 09:28:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=5sXF/az5kQhp13/eu0ouGNik7qqbeKCa9azeT75DNvc=;
- b=V5V8sKI8ddlBRjfnbTEvsCTie2I4pJd17Viy9ynI+kELhMjrRSLPZ/Pwuv2TEjBQLx
- OGkHJAzWE8raUAWvZJz0YHgYkyhUkr6wY0Nnwp+hu0YbgnXXQXPYmf9cJc5T3GHTaBzL
- RXe0kIMJHDGDwGT4+rbhYMuZ4hmsZFwEv0YrCef9WbbpwO64ESFKDqn1Bv+4WI+Yu5p9
- eA1tHEq8Hw5njqgIDDdzeILjPRIuonqANBoFNhNaEGX18e0GaOqnfSqLKJ3HO2ibgoEr
- VRd79asEtc+on4ssWsr5seMIoZFIzA5krSXHVe4szLgeFdCzgRLyM7zyO52w1PBgkR7s
- bGQw==
+ (Exim 4.90_1) (envelope-from <hskinnemoen@google.com>)
+ id 1jihEi-0002R4-QH
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 12:36:29 -0400
+Received: by mail-vk1-xa43.google.com with SMTP id n22so5038432vkm.7
+ for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 09:36:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=FoNMkAIk8t3qqx4O79gujhahy6TuXxWimzCUkwPAVzc=;
+ b=KXGxiSoW5WkLQCjdaMu5wq2EUhK7e6UEDOYxw+oEU02Br07NGIkCJ7Cly6k0U5Mllx
+ iq71MrQa8NHXO2A0KcN9IAsVgJHAgoPFADDwQCYvuCfLN8SgZ7sz6rPZdcq8LUnuQ188
+ DRal8aCCPxVP33fXp8vdhiqV8HMbwMNPQ4QS5R2C0II/3HFppqMtUbNWgNhfygp4+pNn
+ rvhirLmZsUKYm3K26/WPjS16ByzdLqenqVM7NZYlGAJM2kBZQ9om5+6u6EscNvFFRDiN
+ M/LTeN8uobZBhFnlC1w8DdOjXSBugd4yNZo1Y0O4lsqyeTiGrG5aRlBX3hwr72iUnJE3
+ CZkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=5sXF/az5kQhp13/eu0ouGNik7qqbeKCa9azeT75DNvc=;
- b=NVQYcAwVFNB2XLkGDitoJo8U+S6a9PaOgpqXTKJoY6qHkqhms/KWqk67IAIWmGzSpY
- UVLU0mLuue32HGRPfYMoljjEUvAEADW2FktanPNUDW8JS6yrdHYa1ccuWrFupsUW7fnu
- zwcre80ryEvjZXfWa80wGqD/TJNvBmtlqj5xJymCYtRVzD+s0o5PmB2dX3+i//NuiU88
- U5uG3Eq1bSRBF4VsW0YECThyZVOuSqYYeV/uQBr0liHY2gtc7UigV67SnGA96o54h8yC
- bNfmIw/V+ybv9dO5GXI6cEHC0Br+NnqpRY9fflA7CnkQ9KykNv2HEjEf2L0/W/faRIre
- d9xA==
-X-Gm-Message-State: AOAM533O7SbrMfPfk0Pfnq3o4BTWkbOrJ7o29OPdsbTlbjpj+1k9tvNF
- SHHiENCTeSYYzC2ZwBGcJgJ79Pns
-X-Google-Smtp-Source: ABdhPJyqzu+OW3x/6MODy1CsJa9AOxTEi/NHnzcN2o5O9LA9DA7M3kEMhKmsQanLFpA8VNL6lgYuPQ==
-X-Received: by 2002:a5d:4d01:: with SMTP id z1mr5769618wrt.29.1591720126963;
- Tue, 09 Jun 2020 09:28:46 -0700 (PDT)
-Received: from rtrkw774-lin.syrmia.com ([46.240.135.226])
- by smtp.gmail.com with ESMTPSA id 23sm3643598wmo.18.2020.06.09.09.28.46
- (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 09 Jun 2020 09:28:46 -0700 (PDT)
-From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-To: qemu-devel@nongnu.org,
-	peter.maydell@linaro.org
-Subject: [PULL 10/20] target/mips: fpu: Demacro NMADD.<D|S|PS>
-Date: Tue,  9 Jun 2020 18:28:28 +0200
-Message-Id: <1591720118-7378-11-git-send-email-aleksandar.qemu.devel@gmail.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1591720118-7378-1-git-send-email-aleksandar.qemu.devel@gmail.com>
-References: <1591720118-7378-1-git-send-email-aleksandar.qemu.devel@gmail.com>
-Received-SPF: pass client-ip=2a00:1450:4864:20::42b;
- envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wr1-x42b.google.com
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=FoNMkAIk8t3qqx4O79gujhahy6TuXxWimzCUkwPAVzc=;
+ b=dSO9oCE3fYRMsaDNiOeaiH2R4/hli8+RqyM2N/PNizMCQZqP/85PptApv3Zdx9mRQJ
+ 25QbIqkS0DNk8oFMwbyo1Qw2hk28wSkI1o/jljseUgWbmGtSclazdot3XjegEAwq8smn
+ DJi4097ipBDbAWXaF467MYS2lrnrk3NxDjNg1sA7d/n8zCe/x+7J5X9dXUFQqc8ERPlG
+ 89GL36U93qtZskBFY6b/HZmA+y7L4DG1ERimHXHxqhaQPcwv4q4APeZyNc0ZzD3RKkVb
+ Bp9FPUGbg9eXATWQBbFXu2b+ZouKqLsO9E84ViEGMC2khg0ndgrdk9VLr5pFEo6c1lN3
+ 6ToQ==
+X-Gm-Message-State: AOAM531RIb81wYgUS+e/gVFTrdffkk9e0w3TeUGBzz4WlmX7ohCark+c
+ RdrHRxsNyz/jGX9zgo7JgHoko965ElzCHoY5ow5V2Q==
+X-Google-Smtp-Source: ABdhPJxZrKf8DgJ2xH7xVODrffqP18PUEqziT4DNoUg3uenDi3VkGzxzTNbMj+4AqTFiKvOclq8268+VrsArpAYKbLk=
+X-Received: by 2002:a05:6122:130b:: with SMTP id
+ e11mr4392441vkp.20.1591720587331; 
+ Tue, 09 Jun 2020 09:36:27 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200521192133.127559-1-hskinnemoen@google.com>
+ <CAFQmdRYYhoWu7q350n0vNOE+pesp-UG975v1f1Yjwf9Ao0mjcg@mail.gmail.com>
+ <CACPK8XfOtLSVR2u12qEYxB=ggKLD-NeK8BYMW3_uRo8ExnM6Ww@mail.gmail.com>
+In-Reply-To: <CACPK8XfOtLSVR2u12qEYxB=ggKLD-NeK8BYMW3_uRo8ExnM6Ww@mail.gmail.com>
+From: Havard Skinnemoen <hskinnemoen@google.com>
+Date: Tue, 9 Jun 2020 09:36:16 -0700
+Message-ID: <CAFQmdRZoc3VDqKdkwsPzSjt_Pc5vGM+YQFN4y8jAu5VF36S6SQ@mail.gmail.com>
+Subject: Re: [PATCH 0/6] Add Nuvoton NPCM730/NPCM750 SoCs and two BMC machines
+To: Joel Stanley <joel@jms.id.au>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, 
+ QEMU Developers <qemu-devel@nongnu.org>,
+ IS20 Avi Fishman <Avi.Fishman@nuvoton.com>, 
+ CS20 KFTing <kfting@nuvoton.com>,
+ =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
+Content-Type: multipart/alternative; boundary="0000000000003111c905a7a95405"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::a43;
+ envelope-from=hskinnemoen@google.com; helo=mail-vk1-xa43.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_score_int: -175
+X-Spam_score: -17.6
+X-Spam_bar: -----------------
+X-Spam_report: (-17.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ ENV_AND_HDR_SPF_MATCH=-0.5, HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001, USER_IN_DEF_DKIM_WL=-7.5,
+ USER_IN_DEF_SPF_WL=-7.5 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,84 +102,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: aleksandar.qemu.devel@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is just a cosmetic change to enable tools like gcov, gdb,
-callgrind, etc. to better display involved source code.
+--0000000000003111c905a7a95405
+Content-Type: text/plain; charset="UTF-8"
 
-Reviewed-by: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
-Signed-off-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Message-Id: <20200518200920.17344-9-aleksandar.qemu.devel@gmail.com>
----
- target/mips/fpu_helper.c | 44 +++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 43 insertions(+), 1 deletion(-)
+On Mon, Jun 8, 2020 at 6:39 PM Joel Stanley <joel@jms.id.au> wrote:
 
-diff --git a/target/mips/fpu_helper.c b/target/mips/fpu_helper.c
-index e37fc40..d4c065f 100644
---- a/target/mips/fpu_helper.c
-+++ b/target/mips/fpu_helper.c
-@@ -1495,7 +1495,6 @@ uint64_t helper_float_ ## name ## _ps(CPUMIPSState *env,             \
-     update_fcr31(env, GETPC());                                      \
-     return ((uint64_t)fsth0 << 32) | fst0;                           \
- }
--FLOAT_FMA(nmadd, float_muladd_negate_result)
- FLOAT_FMA(nmsub, float_muladd_negate_result | float_muladd_negate_c)
- #undef FLOAT_FMA
- 
-@@ -1577,6 +1576,49 @@ uint64_t helper_float_msub_ps(CPUMIPSState *env, uint64_t fdt0,
-     return ((uint64_t)fsth0 << 32) | fstl0;
- }
- 
-+uint64_t helper_float_nmadd_d(CPUMIPSState *env, uint64_t fst0,
-+                             uint64_t fst1, uint64_t fst2)
-+{
-+    fst0 = float64_mul(fst0, fst1, &env->active_fpu.fp_status);
-+    fst0 = float64_add(fst0, fst2, &env->active_fpu.fp_status);
-+    fst0 = float64_chs(fst0);
-+
-+    update_fcr31(env, GETPC());
-+    return fst0;
-+}
-+
-+uint32_t helper_float_nmadd_s(CPUMIPSState *env, uint32_t fst0,
-+                             uint32_t fst1, uint32_t fst2)
-+{
-+    fst0 = float32_mul(fst0, fst1, &env->active_fpu.fp_status);
-+    fst0 = float32_add(fst0, fst2, &env->active_fpu.fp_status);
-+    fst0 = float32_chs(fst0);
-+
-+    update_fcr31(env, GETPC());
-+    return fst0;
-+}
-+
-+uint64_t helper_float_nmadd_ps(CPUMIPSState *env, uint64_t fdt0,
-+                              uint64_t fdt1, uint64_t fdt2)
-+{
-+    uint32_t fstl0 = fdt0 & 0XFFFFFFFF;
-+    uint32_t fsth0 = fdt0 >> 32;
-+    uint32_t fstl1 = fdt1 & 0XFFFFFFFF;
-+    uint32_t fsth1 = fdt1 >> 32;
-+    uint32_t fstl2 = fdt2 & 0XFFFFFFFF;
-+    uint32_t fsth2 = fdt2 >> 32;
-+
-+    fstl0 = float32_mul(fstl0, fstl1, &env->active_fpu.fp_status);
-+    fstl0 = float32_add(fstl0, fstl2, &env->active_fpu.fp_status);
-+    fstl0 = float32_chs(fstl0);
-+    fsth0 = float32_mul(fsth0, fsth1, &env->active_fpu.fp_status);
-+    fsth0 = float32_add(fsth0, fsth2, &env->active_fpu.fp_status);
-+    fsth0 = float32_chs(fsth0);
-+
-+    update_fcr31(env, GETPC());
-+    return ((uint64_t)fsth0 << 32) | fstl0;
-+}
-+
- 
- #define FLOAT_FMADDSUB(name, bits, muladd_arg)                          \
- uint ## bits ## _t helper_float_ ## name(CPUMIPSState *env,             \
--- 
-2.7.4
+> I had a look and they appear good to me. Note that I'm less in to the
+> gory details of Qemu than some of our other reviewers, so you should
+> seek  a more detailed review from someone else.
+>
+> I look forward further support so I can test the OpenBMC kernel
+> against Nuvoton boards in the same way as the Aspeed ones.
+>
 
+Great to hear that, and thanks for your review. I hope to post an updated
+patchset soon.
+
+Havard
+
+--0000000000003111c905a7a95405
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div dir=3D"ltr">On Mon, Jun 8, 2020 at 6:39 PM Joel Stanl=
+ey &lt;<a href=3D"mailto:joel@jms.id.au" target=3D"_blank" class=3D"cremed"=
+>joel@jms.id.au</a>&gt; wrote:</div><div class=3D"gmail_quote"><blockquote =
+class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px sol=
+id rgb(204,204,204);padding-left:1ex">
+I had a look and they appear good to me. Note that I&#39;m less in to the<b=
+r>
+gory details of Qemu than some of our other reviewers, so you should<br>
+seek=C2=A0 a more detailed review from someone else.<br>
+<br>
+I look forward further support so I can test the OpenBMC kernel<br>
+against Nuvoton boards in the same way as the Aspeed ones.<br></blockquote>=
+<div><br></div><div>Great to hear that, and thanks for your review. I hope =
+to post an updated patchset soon.</div><div><br></div><div>Havard</div></di=
+v></div>
+
+--0000000000003111c905a7a95405--
 
