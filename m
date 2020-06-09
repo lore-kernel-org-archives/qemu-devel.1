@@ -2,107 +2,67 @@ Return-Path: <SRS0=hUBF=7W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7902DC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 18:12:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3D18C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 18:12:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4BFB42068D
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 18:12:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T6XKqEGO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BFB42068D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9EFAE2074B
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 18:12:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EFAE2074B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35518 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35758 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jiijD-00082C-HE
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 14:12:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34062)
+	id 1jiijG-00087t-Pn
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 14:12:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34094)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jiihg-0006ai-J6
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 14:10:28 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:29096
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jiihf-0003Ra-Ou
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 14:10:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591726226;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=81Jnl2YhIy9XT31dGbKxbPeahoC1MbvPHKpzXsvBMnU=;
- b=T6XKqEGO8HSeX/EdojwQ6vLz7inKBl5PgfuOyCTg4Aig9d0O4ghLpFx7lzzG/PEnTwhS2O
- 5doPYIK0msEls0WydYEscqzpMGa/RexsEanAEFkV7PSuqLsMtIMmDqXKmlZfP+zeosOic4
- 0M81wZ8Lab7QyLtCE63hhAONggKHwPs=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-413-gTxJBtYHPyiefBLSsSrKzg-1; Tue, 09 Jun 2020 14:10:25 -0400
-X-MC-Unique: gTxJBtYHPyiefBLSsSrKzg-1
-Received: by mail-wr1-f70.google.com with SMTP id o1so8866342wrm.17
- for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 11:10:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=gJ9NwEkbeqR+ds6kYcvnZNTG1kXNCaz2G3s5mt5k7Ws=;
- b=kGTzSCHFVC2XvDqg155FDeQx6rfTptQAq3Y9hnGgQtvkWMGpBfrLaD26fqnaq9zcfC
- zrps/5RdXEMT+8x6i3OkHDuOP7y1R0iYW6zvrscd+nGToHN5vMDABbU0Bb7KUVCD790I
- VN4MUw8nx7M3AilyJH4QeDzSE9R2akgvAeQO4xZxSeTNrdg3QhzoUm1m7B15DsUD9Fnd
- EfKKgDTqGg3CRmGuovn9Fmcyvw0DQGUPKrPx9pYklnuKL+XEBJYklT6OWNQ+lRRtaEk1
- oBtDcb7KMoyBqK0jOENXQLbTcrBVOcSectaUo+QKumT5LYmhN0CZrKhG70pYHB/73mVI
- v1EQ==
-X-Gm-Message-State: AOAM531dNVmoI7cjOMCJzm3wjrO1/I3Lmfdc6dLM37ll2J03y1urNfZD
- /vaKB0H+/JsImq/T9ewx8oilRwuEhDkQoXu+KAr5RuKBnFxJa6sS+l56OvYUeSqiW5vOCqIhZGg
- FrbiXMdp+gtGlJCA=
-X-Received: by 2002:adf:b697:: with SMTP id j23mr6232451wre.201.1591726164397; 
- Tue, 09 Jun 2020 11:09:24 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy3wIFTJlqJ0Exx4SQw8f1c3OY+n8STBLo2VVethM0M5nn7VlWNSLGx9ufqMA+ERtgIFJp/NA==
-X-Received: by 2002:adf:b697:: with SMTP id j23mr6232429wre.201.1591726164216; 
- Tue, 09 Jun 2020 11:09:24 -0700 (PDT)
-Received: from redhat.com (bzq-79-181-55-232.red.bezeqint.net. [79.181.55.232])
- by smtp.gmail.com with ESMTPSA id o10sm4183793wrq.40.2020.06.09.11.09.22
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 09 Jun 2020 11:09:23 -0700 (PDT)
-Date: Tue, 9 Jun 2020 14:09:21 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Peter Xu <peterx@redhat.com>
-Subject: Re: [PATCH] pci: Display PCI IRQ pin in "info pci"
-Message-ID: <20200609140909-mutt-send-email-mst@kernel.org>
-References: <20200317195908.283800-1-peterx@redhat.com>
- <6beb4b5d-91c6-2536-64ab-18217be71134@redhat.com>
- <20200317201153.GB233068@xz-x1>
- <2847e5da-4cc3-8273-f51f-86b0995943de@redhat.com>
- <20200609114913-mutt-send-email-mst@kernel.org>
- <20200609161328.GB3061@xz-x1>
- <f4faa7cf-1bb3-6381-05e0-64f01eb377cc@redhat.com>
- <20200609175355.GD3061@xz-x1>
+ (Exim 4.90_1) (envelope-from <andrzej.jakowski@linux.intel.com>)
+ id 1jiiht-0006eB-U7; Tue, 09 Jun 2020 14:10:42 -0400
+Received: from mga04.intel.com ([192.55.52.120]:20098)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <andrzej.jakowski@linux.intel.com>)
+ id 1jiihp-0003U7-LM; Tue, 09 Jun 2020 14:10:40 -0400
+IronPort-SDR: IUmlDOUqUNgwXkPnh9HuHfcHGtvacXjVfwbSPspjJ4N0uEYEf8zalClf/xD0fbHsn6aRqphqjr
+ smLfFIEKIR6A==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+ by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 09 Jun 2020 11:10:34 -0700
+IronPort-SDR: kiGlpqVOnM7+aqNXG/DGCc/aWurTjzd+nrdJzkn1p4Yr+pR9qyjPijIudaCAdF3wtJFW/z+RlQ
+ SvOo9vDUOmZw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,492,1583222400"; d="scan'208";a="259883690"
+Received: from unknown (HELO localhost.ch.intel.com) ([10.2.28.117])
+ by orsmga007.jf.intel.com with ESMTP; 09 Jun 2020 11:10:34 -0700
+From: Andrzej Jakowski <andrzej.jakowski@linux.intel.com>
+To: kbusch@kernel.org,
+	kwolf@redhat.com,
+	mreitz@redhat.com
+Subject: [PATCH v2 2/2] nvme: allow cmb and pmr to be enabled on same device
+Date: Tue,  9 Jun 2020 11:11:30 -0700
+Message-Id: <20200609181130.20936-3-andrzej.jakowski@linux.intel.com>
+X-Mailer: git-send-email 2.21.1
+In-Reply-To: <20200609181130.20936-1-andrzej.jakowski@linux.intel.com>
+References: <20200609181130.20936-1-andrzej.jakowski@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20200609175355.GD3061@xz-x1>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
 Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=mst@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 01:38:49
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Received-SPF: none client-ip=192.55.52.120;
+ envelope-from=andrzej.jakowski@linux.intel.com; helo=mga04.intel.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 14:10:30
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9,
+ RCVD_IN_DNSWL_MED=-2.3 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -115,24 +75,281 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- Julia Suvorova <jusual@redhat.com>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Andrzej Jakowski <andrzej.jakowski@linux.intel.com>, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jun 09, 2020 at 01:53:55PM -0400, Peter Xu wrote:
-> On Tue, Jun 09, 2020 at 06:18:15PM +0200, Philippe Mathieu-Daudé wrote:
-> > No problem!
-> 
-> Thanks!
+So far it was not possible to have CMB and PMR emulated on the same
+device, because BAR2 was used exclusively either of PMR or CMB. This
+patch places CMB at BAR4 offset so it not conflicts with MSI-X vectors.
 
-OK so any chance of an ack?
+Signed-off-by: Andrzej Jakowski <andrzej.jakowski@linux.intel.com>
+---
+ hw/block/nvme.c      | 120 ++++++++++++++++++++++++++++---------------
+ hw/block/nvme.h      |   5 +-
+ include/block/nvme.h |   4 +-
+ 3 files changed, 86 insertions(+), 43 deletions(-)
 
-> -- 
-> Peter Xu
+diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+index 54d4201daa..c96ee5678d 100644
+--- a/hw/block/nvme.c
++++ b/hw/block/nvme.c
+@@ -22,12 +22,12 @@
+  *              [pmrdev=<mem_backend_file_id>,] \
+  *              max_ioqpairs=<N[optional]>
+  *
+- * Note cmb_size_mb denotes size of CMB in MB. CMB is assumed to be at
+- * offset 0 in BAR2 and supports only WDS, RDS and SQS for now.
++ * Note cmb_size_mb denotes size of CMB in MB. CMB when configured is assumed
++ * to be resident in BAR4 at certain offset - this is because BAR4 is also
++ * used for storing MSI-X table that is available at offset 0 in BAR4.
+  *
+- * cmb_size_mb= and pmrdev= options are mutually exclusive due to limitation
+- * in available BAR's. cmb_size_mb= will take precedence over pmrdev= when
+- * both provided.
++ * pmrdev is assumed to be resident in BAR2/BAR3. When configured it consumes
++ * whole BAR2/BAR3 exclusively.
+  * Enabling pmr emulation can be achieved by pointing to memory-backend-file.
+  * For example:
+  * -object memory-backend-file,id=<mem_id>,share=on,mem-path=<file_path>, \
+@@ -68,18 +68,19 @@
+ 
+ static void nvme_process_sq(void *opaque);
+ 
+-static bool nvme_addr_is_cmb(NvmeCtrl *n, hwaddr addr)
++static bool nvme_addr_is_cmb(NvmeCtrl *n, hwaddr addr, int size)
+ {
+-    hwaddr low = n->ctrl_mem.addr;
+-    hwaddr hi  = n->ctrl_mem.addr + int128_get64(n->ctrl_mem.size);
++    hwaddr low = n->bar4.addr + n->cmb_offset;
++    hwaddr hi  = low + NVME_CMBSZ_GETSIZE(n->bar.cmbsz);
+ 
+-    return addr >= low && addr < hi;
++    return addr >= low && (addr + size) < hi;
+ }
+ 
+ static void nvme_addr_read(NvmeCtrl *n, hwaddr addr, void *buf, int size)
+ {
+-    if (n->bar.cmbsz && nvme_addr_is_cmb(n, addr)) {
+-        memcpy(buf, (void *)&n->cmbuf[addr - n->ctrl_mem.addr], size);
++    hwaddr cmb_addr = n->bar4.addr + n->cmb_offset;
++    if (n->cmbsz && nvme_addr_is_cmb(n, addr, size)) {
++        memcpy(buf, (void *)&n->cmbuf[addr - cmb_addr], size);
+         return;
+     }
+ 
+@@ -166,17 +167,18 @@ static uint16_t nvme_map_prp(QEMUSGList *qsg, QEMUIOVector *iov, uint64_t prp1,
+                              uint64_t prp2, uint32_t len, NvmeCtrl *n)
+ {
+     hwaddr trans_len = n->page_size - (prp1 % n->page_size);
++    hwaddr cmb_addr = n->bar4.addr + n->cmb_offset;
+     trans_len = MIN(len, trans_len);
+     int num_prps = (len >> n->page_bits) + 1;
+ 
+     if (unlikely(!prp1)) {
+         trace_pci_nvme_err_invalid_prp();
+         return NVME_INVALID_FIELD | NVME_DNR;
+-    } else if (n->bar.cmbsz && prp1 >= n->ctrl_mem.addr &&
+-               prp1 < n->ctrl_mem.addr + int128_get64(n->ctrl_mem.size)) {
++    } else if (n->cmbsz && prp1 >= cmb_addr &&
++               prp1 < cmb_addr + int128_get64(n->bar4.size)) {
+         qsg->nsg = 0;
+         qemu_iovec_init(iov, num_prps);
+-        qemu_iovec_add(iov, (void *)&n->cmbuf[prp1 - n->ctrl_mem.addr], trans_len);
++        qemu_iovec_add(iov, (void *)&n->cmbuf[prp1 - cmb_addr], trans_len);
+     } else {
+         pci_dma_sglist_init(qsg, &n->parent_obj, num_prps);
+         qemu_sglist_add(qsg, prp1, trans_len);
+@@ -221,7 +223,8 @@ static uint16_t nvme_map_prp(QEMUSGList *qsg, QEMUIOVector *iov, uint64_t prp1,
+                 if (qsg->nsg){
+                     qemu_sglist_add(qsg, prp_ent, trans_len);
+                 } else {
+-                    qemu_iovec_add(iov, (void *)&n->cmbuf[prp_ent - n->ctrl_mem.addr], trans_len);
++                    qemu_iovec_add(iov, (void *)&n->cmbuf[prp_ent - cmb_addr],
++                                   trans_len);
+                 }
+                 len -= trans_len;
+                 i++;
+@@ -234,7 +237,8 @@ static uint16_t nvme_map_prp(QEMUSGList *qsg, QEMUIOVector *iov, uint64_t prp1,
+             if (qsg->nsg) {
+                 qemu_sglist_add(qsg, prp2, len);
+             } else {
+-                qemu_iovec_add(iov, (void *)&n->cmbuf[prp2 - n->ctrl_mem.addr], trans_len);
++                qemu_iovec_add(iov, (void *)&n->cmbuf[prp2 - cmb_addr],
++                               trans_len);
+             }
+         }
+     }
+@@ -1359,6 +1363,7 @@ static const MemoryRegionOps nvme_cmb_ops = {
+     },
+ };
+ 
++
+ static void nvme_check_constraints(NvmeCtrl *n, Error **errp)
+ {
+     NvmeParams *params = &n->params;
+@@ -1387,7 +1392,7 @@ static void nvme_check_constraints(NvmeCtrl *n, Error **errp)
+         return;
+     }
+ 
+-    if (!n->params.cmb_size_mb && n->pmrdev) {
++    if (n->pmrdev) {
+         if (host_memory_backend_is_mapped(n->pmrdev)) {
+             char *path = object_get_canonical_path_component(OBJECT(n->pmrdev));
+             error_setg(errp, "can't use already busy memdev: %s", path);
+@@ -1443,33 +1448,66 @@ static void nvme_init_namespace(NvmeCtrl *n, NvmeNamespace *ns, Error **errp)
+     id_ns->nuse = id_ns->ncap;
+ }
+ 
+-static void nvme_init_cmb(NvmeCtrl *n, PCIDevice *pci_dev)
++#define NVME_MSIX_BIR (4)
++static void nvme_bar4_init(PCIDevice *pci_dev)
+ {
+-    NVME_CMBLOC_SET_BIR(n->bar.cmbloc, NVME_CMB_BIR);
+-    NVME_CMBLOC_SET_OFST(n->bar.cmbloc, 0);
+-
+-    NVME_CMBSZ_SET_SQS(n->bar.cmbsz, 1);
+-    NVME_CMBSZ_SET_CQS(n->bar.cmbsz, 0);
+-    NVME_CMBSZ_SET_LISTS(n->bar.cmbsz, 0);
+-    NVME_CMBSZ_SET_RDS(n->bar.cmbsz, 1);
+-    NVME_CMBSZ_SET_WDS(n->bar.cmbsz, 1);
+-    NVME_CMBSZ_SET_SZU(n->bar.cmbsz, 2); /* MBs */
+-    NVME_CMBSZ_SET_SZ(n->bar.cmbsz, n->params.cmb_size_mb);
+-
+-    n->cmbuf = g_malloc0(NVME_CMBSZ_GETSIZE(n->bar.cmbsz));
+-    memory_region_init_io(&n->ctrl_mem, OBJECT(n), &nvme_cmb_ops, n,
+-                          "nvme-cmb", NVME_CMBSZ_GETSIZE(n->bar.cmbsz));
+-    pci_register_bar(pci_dev, NVME_CMBLOC_BIR(n->bar.cmbloc),
++    NvmeCtrl *n = NVME(pci_dev);
++    int status;
++    uint64_t bar_size;
++    uint32_t msix_vectors;
++    uint32_t nvme_pba_offset;
++    uint32_t cmb_size_units;
++
++    msix_vectors = n->params.max_ioqpairs + 1;
++    nvme_pba_offset = PCI_MSIX_ENTRY_SIZE * msix_vectors;
++    bar_size = nvme_pba_offset + QEMU_ALIGN_UP(msix_vectors, 64) / 8;
++
++    if (n->params.cmb_size_mb) {
++        NVME_CMBSZ_SET_SQS(n->bar.cmbsz, 1);
++        NVME_CMBSZ_SET_CQS(n->bar.cmbsz, 0);
++        NVME_CMBSZ_SET_LISTS(n->bar.cmbsz, 0);
++        NVME_CMBSZ_SET_RDS(n->bar.cmbsz, 1);
++        NVME_CMBSZ_SET_WDS(n->bar.cmbsz, 1);
++        NVME_CMBSZ_SET_SZU(n->bar.cmbsz, 2); /* MBs */
++        NVME_CMBSZ_SET_SZ(n->bar.cmbsz, n->params.cmb_size_mb);
++
++        cmb_size_units = NVME_CMBSZ_GETSIZEUNITS(n->bar.cmbsz);
++        n->cmb_offset = QEMU_ALIGN_UP(bar_size, cmb_size_units);
++
++        NVME_CMBLOC_SET_BIR(n->bar.cmbloc, NVME_MSIX_BIR);
++        NVME_CMBLOC_SET_OFST(n->bar.cmbloc, n->cmb_offset / cmb_size_units);
++
++        n->cmbloc = n->bar.cmbloc;
++        n->cmbsz = n->bar.cmbsz;
++
++        n->cmbuf = g_malloc0(NVME_CMBSZ_GETSIZE(n->bar.cmbsz));
++
++        bar_size += n->cmb_offset;
++        bar_size += NVME_CMBSZ_GETSIZE(n->bar.cmbsz);
++    }
++
++    bar_size = pow2ceil(bar_size);
++
++    memory_region_init_io(&n->bar4, OBJECT(n), &nvme_cmb_ops, n,
++                          "nvme-bar4", bar_size);
++
++    status = msix_init(pci_dev, n->params.max_ioqpairs + 1,
++              &n->bar4, NVME_MSIX_BIR, 0,
++              &n->bar4, NVME_MSIX_BIR, nvme_pba_offset,
++              0, NULL);
++
++    if (status) {
++        return;
++    }
++
++    pci_register_bar(pci_dev, NVME_MSIX_BIR,
+                      PCI_BASE_ADDRESS_SPACE_MEMORY |
+                      PCI_BASE_ADDRESS_MEM_TYPE_64 |
+-                     PCI_BASE_ADDRESS_MEM_PREFETCH, &n->ctrl_mem);
++                     PCI_BASE_ADDRESS_MEM_PREFETCH, &n->bar4);
+ }
+ 
+ static void nvme_init_pmr(NvmeCtrl *n, PCIDevice *pci_dev)
+ {
+-    /* Controller Capabilities register */
+-    NVME_CAP_SET_PMRS(n->bar.cap, 1);
+-
+     /* PMR Capabities register */
+     n->bar.pmrcap = 0;
+     NVME_PMRCAP_SET_RDS(n->bar.pmrcap, 0);
+@@ -1527,11 +1565,10 @@ static void nvme_init_pci(NvmeCtrl *n, PCIDevice *pci_dev)
+                           n->reg_size);
+     pci_register_bar(pci_dev, 0, PCI_BASE_ADDRESS_SPACE_MEMORY |
+                      PCI_BASE_ADDRESS_MEM_TYPE_64, &n->iomem);
+-    msix_init_exclusive_bar(pci_dev, n->params.max_ioqpairs + 1, 4, NULL);
+ 
+-    if (n->params.cmb_size_mb) {
+-        nvme_init_cmb(n, pci_dev);
+-    } else if (n->pmrdev) {
++    nvme_bar4_init(pci_dev);
++
++    if (n->pmrdev) {
+         nvme_init_pmr(n, pci_dev);
+     }
+ }
+@@ -1571,6 +1608,7 @@ static void nvme_init_ctrl(NvmeCtrl *n, PCIDevice *pci_dev)
+     NVME_CAP_SET_CSS(n->bar.cap, 1);
+     NVME_CAP_SET_MPSMAX(n->bar.cap, 4);
+     NVME_CAP_SET_CMBS(n->bar.cap, n->params.cmb_size_mb ? 1 : 0);
++    NVME_CAP_SET_PMRS(n->bar.cap, n->pmrdev ? 1 : 0);
+ 
+     n->bar.vs = 0x00010200;
+     n->bar.intmc = n->bar.intms = 0;
+diff --git a/hw/block/nvme.h b/hw/block/nvme.h
+index 61dd9b23b8..de257c361a 100644
+--- a/hw/block/nvme.h
++++ b/hw/block/nvme.h
+@@ -79,7 +79,7 @@ static inline uint8_t nvme_ns_lbads(NvmeNamespace *ns)
+ typedef struct NvmeCtrl {
+     PCIDevice    parent_obj;
+     MemoryRegion iomem;
+-    MemoryRegion ctrl_mem;
++    MemoryRegion bar4;
+     NvmeBar      bar;
+     BlockConf    conf;
+     NvmeParams   params;
+@@ -93,6 +93,9 @@ typedef struct NvmeCtrl {
+     uint32_t    num_namespaces;
+     uint32_t    max_q_ents;
+     uint64_t    ns_size;
++    uint32_t    cmbsz;
++    uint32_t    cmbloc;
++    uint32_t    cmb_offset;
+     uint8_t     *cmbuf;
+     uint32_t    irq_status;
+     uint64_t    host_timestamp;                 /* Timestamp sent by the host */
+diff --git a/include/block/nvme.h b/include/block/nvme.h
+index 14cf398dfa..76d15bdf9f 100644
+--- a/include/block/nvme.h
++++ b/include/block/nvme.h
+@@ -216,9 +216,11 @@ enum NvmeCmbszMask {
+     (cmbsz |= (uint64_t)(val & CMBSZ_SZU_MASK) << CMBSZ_SZU_SHIFT)
+ #define NVME_CMBSZ_SET_SZ(cmbsz, val)    \
+     (cmbsz |= (uint64_t)(val & CMBSZ_SZ_MASK) << CMBSZ_SZ_SHIFT)
++#define NVME_CMBSZ_GETSIZEUNITS(cmbsz) \
++    (1 << (12 + 4 * NVME_CMBSZ_SZU(cmbsz)))
+ 
+ #define NVME_CMBSZ_GETSIZE(cmbsz) \
+-    (NVME_CMBSZ_SZ(cmbsz) * (1 << (12 + 4 * NVME_CMBSZ_SZU(cmbsz))))
++    (NVME_CMBSZ_SZ(cmbsz) * NVME_CMBSZ_GETSIZEUNITS(cmbsz))
+ 
+ enum NvmePmrcapShift {
+     PMRCAP_RDS_SHIFT      = 3,
+-- 
+2.21.1
 
 
