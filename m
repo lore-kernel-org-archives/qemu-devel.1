@@ -2,98 +2,93 @@ Return-Path: <SRS0=hUBF=7W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC401C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 05:17:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48A1FC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 05:39:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 72B0520801
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 05:17:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 10C4820774
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 05:39:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fpCh1YWG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72B0520801
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SKmqx3JT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10C4820774
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45708 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53540 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jiWe3-0005As-L8
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 01:17:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55310)
+	id 1jiWzK-0000wq-Bh
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 01:39:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56640)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jiWcB-0003r4-Qy
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 01:16:00 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:36892)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jiWcB-0002Dd-1d
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 01:15:59 -0400
-Received: by mail-wm1-x342.google.com with SMTP id y20so1721060wmi.2
- for <qemu-devel@nongnu.org>; Mon, 08 Jun 2020 22:15:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=HX/XdRyvdypmXRxobImabXdzT7x1leojbDlrm7TINug=;
- b=fpCh1YWGwz72Z6dR8PEfYq4WOEJsUAvXU84QpFwH3jSxo2A0h2eTfPP2bfmRCP9h3L
- m+BhlZK6Xalh+RfD1NIgyZvCAtz62Q9Snu2jeUY92T47wEd53TqDZdmWqV0rc7ccPyRi
- OeVIy0aFN9k3EkWh95X2DuyQLompzkKgxtUQ33hWWLkPmcKdFveTDqBjQ4915hIzawv8
- aGBgu/HBzk0oy4olqLe2MV7IeMWYC/lZmz6wpGdmv1qX4VRrZzl8sXVK1rd5z6Io2gal
- S08OwJMu17hB1WVGTWEjqUF7BX0WBrcDGaLUREUDZuAH/9vaS1kPtO5VVmGgxOFk3QEY
- M4dA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=HX/XdRyvdypmXRxobImabXdzT7x1leojbDlrm7TINug=;
- b=nK4j54les7n2Ph7cTT1PE1OxSS6qqeGA3kWyDHzYvvDkOgTg1+QBA0vCS0WQBISVdb
- QNLu6sVVcESyVzbOvSov27zj/GnA7OoGt5YHCS1WMtLo6OwxOmgY3+tOXHFogMsYgLK8
- Y+2b3L2sJv6MMd6kKqVDRio3thispWMnkA8FlhfeFWPXj72tzTOUSwPP2BWNjGAdiHlb
- OqSFvfm2BBCpQPBZqIfbVU6mf1HDrWzuRG75CvuaVck0NOQjO4Li0dmKYD1tDxFXar1s
- 6gIcVk49liyWxt4oA0i0vqs0yaXkAa2V7vHX28aBpxu9xcahj3Q/k1qswqL7WY0SWQDk
- im6Q==
-X-Gm-Message-State: AOAM531pokBn1uNV4ivI2RcjQxVJqnCq1Grb03C/P8vQBcZkMeedp0XI
- 7zvovFJhy5TV9u1PRsCJzleO3to+
-X-Google-Smtp-Source: ABdhPJxYjH787X0XR4OpaARMwiVW08rZITLwO9TdnCRLv3IKCwo/ufJ/RaQQg+fY+u/v8txbS7sbVg==
-X-Received: by 2002:a7b:cb93:: with SMTP id m19mr2150398wmi.165.1591679756917; 
- Mon, 08 Jun 2020 22:15:56 -0700 (PDT)
-Received: from [192.168.1.43] (181.red-88-10-103.dynamicip.rima-tde.net.
- [88.10.103.181])
- by smtp.gmail.com with ESMTPSA id d191sm1582280wmd.44.2020.06.08.22.15.55
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 08 Jun 2020 22:15:55 -0700 (PDT)
-Subject: Re: [PATCH v2 21/24] sparc/leon3: Fix to put grlib,* devices on sysbus
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jiWyO-0000QJ-IP
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 01:38:56 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:41242
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jiWyJ-0004xy-Ju
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 01:38:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591681129;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=zLd6REo6AuaVxtRNsHIxpws+xNZTd3m0ZyculHj939k=;
+ b=SKmqx3JTYsGZUcqiwGFYohJWdLS1AmGQP4w+KmaQekOSXMvsj2n4W6lq5GH16cVu/27JF7
+ fMUqzUDrc2dqu11kmPxR5zZpCgaz4V9m3+jZe5LiEbw1mxmDYdJSmZ/kb5BtvkoaxIZllt
+ qIOJGeSuPG/zEZBQJv89uaIX48m86fM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-49-tn8yV2M-MpuBKysTpNcciA-1; Tue, 09 Jun 2020 01:38:45 -0400
+X-MC-Unique: tn8yV2M-MpuBKysTpNcciA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C4E1110082EC;
+ Tue,  9 Jun 2020 05:38:43 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
+ [10.36.112.121])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D087760BF3;
+ Tue,  9 Jun 2020 05:38:42 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 4912411386A6; Tue,  9 Jun 2020 07:38:41 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Subject: Re: [PATCH v2 02/24] display/xlnx_dp: Fix to realize "i2c-ddc" and
+ "aux-to-i2c-bridge"
 References: <20200528110444.20456-1-armbru@redhat.com>
- <20200528110444.20456-22-armbru@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <378a35f0-8d21-a08c-c661-c13d06918249@amsat.org>
-Date: Tue, 9 Jun 2020 07:15:55 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ <20200528110444.20456-3-armbru@redhat.com>
+ <a64bd91c-58b5-1438-a401-5d6c04441c67@amsat.org>
+Date: Tue, 09 Jun 2020 07:38:41 +0200
+In-Reply-To: <a64bd91c-58b5-1438-a401-5d6c04441c67@amsat.org> ("Philippe
+ =?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Mon, 8 Jun 2020 16:16:20
+ +0200")
+Message-ID: <87tuzkssri.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <20200528110444.20456-22-armbru@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::342;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x342.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -16
-X-Spam_score: -1.7
-X-Spam_bar: -
-X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 01:38:49
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -106,63 +101,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com, ehabkost@redhat.com,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Fabien Chouteau <chouteau@adacore.com>,
- KONRAD Frederic <frederic.konrad@adacore.com>, pbonzini@redhat.com,
- Artyom Tarasenko <atar4qemu@gmail.com>
+Cc: "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>,
+ Peter Maydell <peter.maydell@linaro.org>, berrange@redhat.com,
+ ehabkost@redhat.com, Alistair Francis <alistair@alistair23.me>,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org,
+ Alistair Francis <alistair.francis@wdc.com>, pbonzini@redhat.com,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ KONRAD Frederic <fred.konrad@greensocs.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/28/20 1:04 PM, Markus Armbruster wrote:
-> leon3_generic_hw_init() creates a "grlib,ahbpnp" and a "grlib,apbpnp"
-> sysbus device in a way that leaves them unplugged.
-> 
-> Create them the common way that puts them into the main system bus.
-> Affects machine leon3_generic.  Visible in "info qtree":
-> 
->      bus: main-system-bus
->        type System
->     +  dev: grlib,ahbpnp, id ""
->     +    mmio 00000000fffff000/0000000000001000
->     +  dev: grlib,apbpnp, id ""
->     +    mmio 00000000800ff000/0000000000001000
->        dev: grlib,irqmp, id ""
-> 
-> Cc: Fabien Chouteau <chouteau@adacore.com>
-> Cc: KONRAD Frederic <frederic.konrad@adacore.com>
-> Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> Cc: Artyom Tarasenko <atar4qemu@gmail.com>
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> Reviewed-by: KONRAD Frederic <frederic.konrad@adacore.com>
-> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
->  hw/sparc/leon3.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/sparc/leon3.c b/hw/sparc/leon3.c
-> index 8f024dab7b..3facb8c2ae 100644
-> --- a/hw/sparc/leon3.c
-> +++ b/hw/sparc/leon3.c
-> @@ -213,14 +213,14 @@ static void leon3_generic_hw_init(MachineState *machine)
->      reset_info->sp    = LEON3_RAM_OFFSET + ram_size;
->      qemu_register_reset(main_cpu_reset, reset_info);
->  
-> -    ahb_pnp = GRLIB_AHB_PNP(object_new(TYPE_GRLIB_AHB_PNP));
-> +    ahb_pnp = GRLIB_AHB_PNP(qdev_create(NULL, TYPE_GRLIB_AHB_PNP));
->      object_property_set_bool(OBJECT(ahb_pnp), true, "realized", &error_fatal);
->      sysbus_mmio_map(SYS_BUS_DEVICE(ahb_pnp), 0, LEON3_AHB_PNP_OFFSET);
->      grlib_ahb_pnp_add_entry(ahb_pnp, 0, 0, GRLIB_VENDOR_GAISLER,
->                              GRLIB_LEON3_DEV, GRLIB_AHB_MASTER,
->                              GRLIB_CPU_AREA);
->  
-> -    apb_pnp = GRLIB_APB_PNP(object_new(TYPE_GRLIB_APB_PNP));
-> +    apb_pnp = GRLIB_APB_PNP(qdev_create(NULL, TYPE_GRLIB_APB_PNP));
->      object_property_set_bool(OBJECT(apb_pnp), true, "realized", &error_fatal);
->      sysbus_mmio_map(SYS_BUS_DEVICE(apb_pnp), 0, LEON3_APB_PNP_OFFSET);
->      grlib_ahb_pnp_add_entry(ahb_pnp, LEON3_APB_PNP_OFFSET, 0xFFF,
-> 
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
 
-Thanks, patch applied to for the next (temporary) sparc-next pull request.
+> On 5/28/20 1:04 PM, Markus Armbruster wrote:
+>> xlnx_dp_init() creates these two devices, but they're never realized.
+>> Affects machine xlnx-zcu102.
+>>=20
+>> In theory, a device becomes real only on realize.  In practice, the
+>> transition from unreal to real is a fuzzy one.  The work to make a
+>> device real can be spread between realize methods (fine),
+>> instance_init methods (wrong), and board code wiring up the device
+>> (fine as long as it effectively happens on realize).  Depending on
+>> what exactly is done where, a device can work even when we neglect to
+>> realize it.
+>>=20
+>> These two appear to work.  Nevertheless, it's a clear misuse of the
+>> interface.  Even when it works today (more or less by chance), it can
+>> break tomorrow.
+>>=20
+>> Fix by realizing them in xlnx_dp_realize().
+>>=20
+>> Fixes: 58ac482a66de09a7590f705e53fc6a3fb8a055e8
+>> Cc: KONRAD Frederic <fred.konrad@greensocs.com>
+>> Cc: Alistair Francis <alistair@alistair23.me>
+>> Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+>> Cc: Peter Maydell <peter.maydell@linaro.org>
+>> Cc: qemu-arm@nongnu.org
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+>> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+>> ---
+>>  hw/display/xlnx_dp.c | 4 ++++
+>>  1 file changed, 4 insertions(+)
+>>=20
+>> diff --git a/hw/display/xlnx_dp.c b/hw/display/xlnx_dp.c
+>> index 3e5fb44e06..bdc229a51e 100644
+>> --- a/hw/display/xlnx_dp.c
+>> +++ b/hw/display/xlnx_dp.c
+>> @@ -1264,9 +1264,13 @@ static void xlnx_dp_realize(DeviceState *dev, Err=
+or **errp)
+>>      DisplaySurface *surface;
+>>      struct audsettings as;
+>> =20
+>> +    qdev_init_nofail(DEVICE(s->aux_bus->bridge));
+>
+> Eh??? Why not realize the bridge in aux_init_bus()?
+
+Because then aux_init_bus() is no longer "init", but "init and realize".
+Instead: "[PATCH v2 32/58] auxbus: New aux_bus_realize(), pairing with
+aux_bus_init()".  Okay?
+
+>> +
+>>      qdev_init_nofail(DEVICE(s->dpcd));
+>>      aux_map_slave(AUX_SLAVE(s->dpcd), 0x0000);
+>> =20
+>> +    qdev_init_nofail(DEVICE(s->edid));
+>
+> This one is OK.
+>
+>> +
+>>      s->console =3D graphic_console_init(dev, 0, &xlnx_dp_gfx_ops, s);
+>>      surface =3D qemu_console_surface(s->console);
+>>      xlnx_dpdma_set_host_data_location(s->dpdma, DP_GRAPHIC_DMA_CHANNEL,
+>>=20
+
 
