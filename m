@@ -2,83 +2,101 @@ Return-Path: <SRS0=hUBF=7W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD9FDC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 17:54:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3862C433E1
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 17:56:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8361B20774
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 17:54:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8361B20774
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 9CC13206D5
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 17:56:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EJzhe5i+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CC13206D5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56040 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34242 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jiiRz-0000Gy-Cb
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 13:54:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57300)
+	id 1jiiTm-000307-RY
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 13:56:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55942)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jiiOg-0003Uv-D4
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 13:50:50 -0400
-Received: from indium.canonical.com ([91.189.90.7]:51808)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jiiF4-00087r-IQ
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 13:40:54 -0400
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:33074)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jiiOc-0007Aj-BJ
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 13:50:49 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jiiOZ-0003xM-0y
- for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 17:50:43 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id C6E452E810C
- for <qemu-devel@nongnu.org>; Tue,  9 Jun 2020 17:50:42 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jiiF2-0005Rq-TU
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 13:40:54 -0400
+Received: by mail-pf1-x441.google.com with SMTP id b201so10401286pfb.0
+ for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 10:40:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:references:from:message-id:date:user-agent:mime-version
+ :in-reply-to:content-language:content-transfer-encoding;
+ bh=jBasq2HlXfK5voP01gxs0wtnR36LLYRt0XI1AqC9FVc=;
+ b=EJzhe5i+zNgaON/3jcBQK00amcSerEcnunR0dlI7yf3Ou6SrJQUTsbnS5QQzTPvs6T
+ iq5io3DM169jnUKB/G/TGZAgcFjMAoAYhH0J47hIMKxbUQ6Zeqh7bH/1sAOD+OJ6KyMB
+ YyC2GhpnV0NtdsTbxwIdfmdiG+fLLvCGKDcwrTkQTWDgWWfMsHMaWj1fTRg+w/sVHrMM
+ suWFC7SWaAPhFkv4Xln5tiWsML/8ArQmPVaYlrsbmzXvRtfaYbtMshyFSqywg7NGF5Ch
+ JNRGy5EjpYltr6JXK4W/uhdTw1n1IE45jOajKtNnMtWvg5ba22hWYyHbg3mgvJ5tUNFV
+ ZeSw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=jBasq2HlXfK5voP01gxs0wtnR36LLYRt0XI1AqC9FVc=;
+ b=BrA2wMAkB6Chx2HRD4QBbyxBngEa24NO+0Qe3eaT0h1Yrefw5g+D+5kf6s5eaT/8iv
+ U/D+ZlrdhIXckaeXIrNhZ/DLCXf/a6RvXFT2s9halCmyAntxAjJ4wRAXy7HqdYvK8TVM
+ rFex1l9mz5nsDCFZqH7hqo35bXP/XwglWAIAP2hPVwRhxk8pO1GN6A0NEBDQcUOhHhaP
+ VhMQ8TYD1KFUOQBhdhKxaesPqICeqne2UM6Qoq1iE5vfo0WNmITggZ7hScZ/e+otsvl0
+ Xu6CIY5H1KkbBw5CpVoEOOA28UIQiXukci8c4uYjEQ0kxsGbM9Zsvyq0ep+rKCcfDfaj
+ xN0A==
+X-Gm-Message-State: AOAM533Oz+ByXd02J5HBZlA1J1rryCg9pyjIhfMH7M8vWBJRtP6zS/8k
+ jrtdO3AYAWOg6KNpuSLO/2jz3aSL0nE=
+X-Google-Smtp-Source: ABdhPJw406KxQBYpSTWaJx0fUC+QfxuTEmIcri0RykJYbgl5TRxnKT1VtqKs5EyrojICrsjz6NCf5A==
+X-Received: by 2002:a63:40a:: with SMTP id 10mr26045995pge.310.1591724451050; 
+ Tue, 09 Jun 2020 10:40:51 -0700 (PDT)
+Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
+ by smtp.gmail.com with ESMTPSA id d189sm10563666pfc.51.2020.06.09.10.40.50
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 09 Jun 2020 10:40:50 -0700 (PDT)
+Subject: Re: [PATCH 3/7] target/arm: Convert Neon 3-reg-diff narrowing ops to
+ decodetree
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org
+References: <20200609160209.29960-1-peter.maydell@linaro.org>
+ <20200609160209.29960-4-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <0f7e4d90-e5e0-5b76-e801-4bc556036652@linaro.org>
+Date: Tue, 9 Jun 2020 10:40:48 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 09 Jun 2020 17:44:09 -0000
-From: Laurent Vivier <1874073@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
- assignee=philmd@redhat.com; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: eblake laurent-vivier mliska philmd pmaydell
-X-Launchpad-Bug-Reporter: Martin Liska (mliska)
-X-Launchpad-Bug-Modifier: Laurent Vivier (laurent-vivier)
-References: <158747496330.1952.6391008472811579405.malonedeb@chaenomeles.canonical.com>
- <20200608160611.16966-1-philmd@redhat.com>
-Message-Id: <667551f6-96fb-19a3-828c-c8d0e1c41fb9@vivier.eu>
-Subject: [Bug 1874073] Re: [PATCH v2] hw/openrisc/openrisc_sim: Add assertion
- to silence GCC warning
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="ef9fc486e875d54078fa61cf91e898b895125d89";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 5c07896bee7c7960c41382de896f436806a71476
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 10:15:37
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200609160209.29960-4-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::441;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x441.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -87,97 +105,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1874073 <1874073@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 08/06/2020 =C3=A0 18:06, Philippe Mathieu-Daud=C3=A9 a =C3=A9crit=C2=A0:
-> When compiling with GCC 10 (Fedora 32) using CFLAGS=3D-O2 we get:
-> =
+On 6/9/20 9:02 AM, Peter Maydell wrote:
+> +#define DO_NARROW_3D(INSN, OP, NARROWTYPE, EXTOP)                       \
+> +    static bool trans_##INSN##_3d(DisasContext *s, arg_3diff *a)        \
+> +    {                                                                   \
+> +        NeonGenTwo64OpFn *addfn[] = {                                   \
+> +            gen_helper_neon_##OP##l_u16,                                \
+> +            gen_helper_neon_##OP##l_u32,                                \
+> +            tcg_gen_##OP##_i64,                                         \
+> +            NULL,                                                       \
+> +        };                                                              \
+> +        NeonGenNarrowFn *narrowfn[] = {                                 \
+> +            gen_helper_neon_##NARROWTYPE##_high_u8,                     \
+> +            gen_helper_neon_##NARROWTYPE##_high_u16,                    \
+> +            EXTOP,                                                      \
+> +            NULL,                                                       \
+> +        };                                                              \
+> +        return do_narrow_3d(s, a, addfn[a->size], narrowfn[a->size]);   \
+> +    }
 
->     CC      or1k-softmmu/hw/openrisc/openrisc_sim.o
->   hw/openrisc/openrisc_sim.c: In function =E2=80=98openrisc_sim_init=E2=
-=80=99:
->   hw/openrisc/openrisc_sim.c:87:42: error: =E2=80=98cpu_irqs[0]=E2=80=99 =
-may be used uninitialized in this function [-Werror=3Dmaybe-uninitialized]
->      87 |         sysbus_connect_irq(s, i, cpu_irqs[i][irq_pin]);
->         |                                  ~~~~~~~~^~~
-> =
-
-> While humans can tell smp_cpus will always be in the [1, 2] range,
-> (openrisc_sim_machine_init sets mc->max_cpus =3D 2), the compiler
-> can't.
-> =
-
-> Add an assertion to give the compiler a hint there's no use of
-> uninitialized data.
-> =
-
-> Buglink: https://bugs.launchpad.net/qemu/+bug/1874073
-> Reported-by: Martin Li=C5=A1ka <mliska@suse.cz>
-> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> Tested-by: Eric Blake <eblake@redhat.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
-> v2: Fixed typo in subject (eblake)
-> Supersedes: <20200608071409.17024-1-philmd@redhat.com>
-> ---
->  hw/openrisc/openrisc_sim.c | 1 +
->  1 file changed, 1 insertion(+)
-> =
-
-> diff --git a/hw/openrisc/openrisc_sim.c b/hw/openrisc/openrisc_sim.c
-> index d08ce61811..02f5259e5e 100644
-> --- a/hw/openrisc/openrisc_sim.c
-> +++ b/hw/openrisc/openrisc_sim.c
-> @@ -134,6 +134,7 @@ static void openrisc_sim_init(MachineState *machine)
->      int n;
->      unsigned int smp_cpus =3D machine->smp.cpus;
->  =
-
-> +    assert(smp_cpus >=3D 1 && smp_cpus <=3D 2);
->      for (n =3D 0; n < smp_cpus; n++) {
->          cpu =3D OPENRISC_CPU(cpu_create(machine->cpu_type));
->          if (cpu =3D=3D NULL) {
-> =
+Missing const again.  Otherwise,
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
-Applied to my trivial-patches branch.
-
-Thanks,
-Laurent
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1874073
-
-Title:
-  openrisc_sim.c:87:42: error: 'cpu_irqs[0]' may be used uninitialized
-  in this function [-Werror=3Dmaybe-uninitialized]
-
-Status in QEMU:
-  Confirmed
-
-Bug description:
-  I see the warning since gcc10:
-
-  static void openrisc_sim_init(MachineState *machine):
-  ...
-      qemu_irq *cpu_irqs[2];
-  ...
-
-  =
-
-      serial_mm_init(get_system_memory(), 0x90000000, 0, serial_irq,
-                     115200, serial_hd(0), DEVICE_NATIVE_ENDIAN);
-
-  I would initialize cpu_irqs[2] with {}.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1874073/+subscriptions
+r~
 
