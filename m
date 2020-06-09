@@ -2,97 +2,122 @@ Return-Path: <SRS0=hUBF=7W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41B5EC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 14:33:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB817C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 14:33:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0D30220734
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 14:33:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A89EC20734
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 14:33:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BgAVXbc3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D30220734
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="LXH2ECWZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A89EC20734
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40766 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42800 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jifJI-0005Dy-9I
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 10:33:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56844)
+	id 1jifJj-00063I-TD
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 10:33:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56630)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jifFz-0001Eg-Cu
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 10:29:39 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39785
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jifFy-0002Fn-D8
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 10:29:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591712977;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=0USdHpMbKzoYHsGne0Lo5roc61VBs0kn/4rmMW0QFzQ=;
- b=BgAVXbc3X0IIM4uYXsViIviqrJ0T4I3XbXosla4eWzkh9i8B84FX4vIRassY0p566Zi2cU
- g4dMFukDLDz4dUUZb/0ydwIjR5VHZZTMo6BvzTU+Qcq/x2eZ3TAcRaq3O92gVWzMngKWae
- bcrehGZaY3Y7tfZjUZlurT/SfFt3ULg=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-17-3p_YCs7tPiuBpLopkwgcQQ-1; Tue, 09 Jun 2020 10:29:36 -0400
-X-MC-Unique: 3p_YCs7tPiuBpLopkwgcQQ-1
-Received: by mail-wr1-f70.google.com with SMTP id w16so8673232wru.18
- for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 07:29:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=0USdHpMbKzoYHsGne0Lo5roc61VBs0kn/4rmMW0QFzQ=;
- b=gn1Vjo6Cqi/Iw7pNpDGXVvQnzkXFeuJBapvgORFkcE4ysAnrNzq5jYaxQkEoYNuwjM
- ZBUFUVplBepmNGh2iWbIzoNgthGWa/mjzCJgsRO8ylHGSRV6qhw7UfBPu55RCDB9NBlH
- sVV/Fo89fmnAIeWNnzBr7s7CVVNvzfOKQlPIIofzBFiFQrIqWmXsysGVVFqqUrFAo/Iw
- LbxtWVH2AdLLW3frVluUpqU5GUmfdsGumzwdzuPIXLsbzEuuw4+vySEY6rISGKpiTvVY
- TVIWo1cX+hGqflH2Eiq/9o6aZMYLbzC4U5on0vUCip5DNEHFIarIR7itoX+uxl85POtL
- 5gug==
-X-Gm-Message-State: AOAM533zUmM1irlKUTCnxLy1R0rb7J85/fzxyE9Epef6ZFqcXbniAuLP
- QBIMHBz7yPfYlnAVxEJvbj7bg/R5y73KRL5kZVEEHlNJd8Hy8wgjsbQNWBTkzXPfxgVRV8uNQci
- V7tCuw8CKb3rmPdE=
-X-Received: by 2002:a1c:2045:: with SMTP id g66mr4238069wmg.53.1591712974776; 
- Tue, 09 Jun 2020 07:29:34 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxF4/o0d4NSiV0Ybl9/z2Kx5wx+pebyQNKIauHjBKpVstMr31YZMo5PTlG3Xso6oPTbN/gn5A==
-X-Received: by 2002:a1c:2045:: with SMTP id g66mr4238045wmg.53.1591712974525; 
- Tue, 09 Jun 2020 07:29:34 -0700 (PDT)
-Received: from redhat.com (bzq-79-181-55-232.red.bezeqint.net. [79.181.55.232])
- by smtp.gmail.com with ESMTPSA id h12sm3514783wro.80.2020.06.09.07.29.32
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 09 Jun 2020 07:29:33 -0700 (PDT)
-Date: Tue, 9 Jun 2020 10:29:31 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Subject: Re: [PATCH v6 00/16] acpi: i386 tweaks
-Message-ID: <20200609102846-mutt-send-email-mst@kernel.org>
-References: <20200515150421.25479-1-kraxel@redhat.com>
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jifEo-0007qJ-7v; Tue, 09 Jun 2020 10:28:26 -0400
+Received: from mail-eopbgr60092.outbound.protection.outlook.com
+ ([40.107.6.92]:21058 helo=EUR04-DB3-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jifEi-00025M-UY; Tue, 09 Jun 2020 10:28:25 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=nKIx18wTH/0KaRysvGsaYBu8TKS0XfC/8z+7LsvGoIDp3IYXbhYqiQo5lAb2f2y5SmObzSUBq/+TJPi/+Cp8svyzDlHPc83UuGg5sAoA1yh7nvxmS5SPebhn3BzJNmOgrNd3vpCq/jJVOtb1dn7zRK1OsEkfsJhzdr66Cv8tmKHrKDb1DMrzBVoqNe6ttSVqc0rk3/9TW36M8Xq4+bhk3xPHESzbs4Gs7CacSrDd45R2yyAVtKpXard9MFZhlIct+ifPcnjszeprtV5IRMgYDQp20uf7ZZBOMVrALgX3o6/pYuLrBHJFCKieNCINJuImajdulMEKCKCaOEAP8BQdFQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6eOhON44xfYpisK+zkP/jxQP7VLHcJ40uRTcOhoZzds=;
+ b=mS9yCAKny1ndVFIvrCXF0eavfawkco6MrOGc82ke53D7DUNFndWMEvRck5KUtW1HiBjGIIUcI4IAYn4D7DF5ybxBZdksIMFtHJ0gvclbmN1wBzRPNmpW+LhjzG8aTHnW5PqtxmDGuUFPJGX8fyvRV2RWf0kJFvWRFGSz66Tt/d+vPHEgn+/7/aebMxqH4yJwg0WzJCRnt6rpuWOvy+udvpR7ptUo8TjdJtVdpqBVObbfI+0N23ZPMdi0KWB6SYMEfDXnOdoikm0+9ReDBwV0rFp9MLOjE7sIkMB06ixl0YcIoPJ3Z9QDw70ZfUtBKJ78JnrV1QnXjTdyHyVo+ummUg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6eOhON44xfYpisK+zkP/jxQP7VLHcJ40uRTcOhoZzds=;
+ b=LXH2ECWZW3KneOBeBFb0bDs7iNFPDxWGDxArHzT/mv5mltImDA9VdCgV7VUtZqvAAErByNxpa7rvd7lU2LKDStCLRmXrE44gr5g+dPwHjzqODDmQyC+L47STwL138ukfuQWs9pn3QQaSOgx/2iex9YCx4/8DhgDFFsnBk/jHSM8=
+Authentication-Results: openvz.org; dkim=none (message not signed)
+ header.d=none;openvz.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM7PR08MB5461.eurprd08.prod.outlook.com (2603:10a6:20b:10e::9)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3088.18; Tue, 9 Jun
+ 2020 14:28:17 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312%3]) with mapi id 15.20.3066.023; Tue, 9 Jun 2020
+ 14:28:17 +0000
+Subject: Re: [PATCH] qcow2: Reduce write_zeroes size in handle_alloc_space()
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+References: <20200609140859.142230-1-kwolf@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <02e24dca-99da-873d-8425-09a07571e675@virtuozzo.com>
+Date: Tue, 9 Jun 2020 17:28:16 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.1
+In-Reply-To: <20200609140859.142230-1-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: AM3PR07CA0146.eurprd07.prod.outlook.com
+ (2603:10a6:207:8::32) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
-In-Reply-To: <20200515150421.25479-1-kraxel@redhat.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=mst@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 01:38:49
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.180) by
+ AM3PR07CA0146.eurprd07.prod.outlook.com (2603:10a6:207:8::32) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3088.7 via Frontend Transport; Tue, 9 Jun 2020 14:28:17 +0000
+X-Originating-IP: [185.215.60.180]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 22f23449-6db6-4a2e-03bd-08d80c815a32
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5461:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM7PR08MB5461191987E30386B890898DC1820@AM7PR08MB5461.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:159;
+X-Forefront-PRVS: 042957ACD7
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Pp/mjyVdKnipCpbY7lws8L1C83mdBNtGTh8nEAbX5Cj2SUya73MflV/ILwWV/nOHHLDMtSligHoLlCVulaz/seJpcl2v3WBV3ZdqFBDI8OIbYCHUkNOLvutP29+1/sbWIbSCzJtqbYJtXgYG5THuCBAaQkAfGDgAukohSLcfccahHVHhajTUy7EiZ3ugpX4Z0f7tde7lUZveYO3qIOAQcXsKKx71OV2I93coExM7l2K6PGJmg/b4StZqcklhKPQ1lHKlI98hXEX9piiaQrxoN34eh1sWCpbNguJ8L2axMkzJiwXG7l7lYbCPPO8J5QrGrzkNzqzgTtR6jyDXa0k6iVYAM2w8dffrABp0xBwJcqcla00wj3DTcfKx4TquL3pk
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(136003)(376002)(346002)(39840400004)(396003)(366004)(86362001)(5660300002)(26005)(66476007)(66556008)(83380400001)(36756003)(66946007)(31696002)(956004)(478600001)(316002)(2616005)(52116002)(8676002)(31686004)(8936002)(16526019)(2906002)(4326008)(6486002)(16576012)(107886003)(186003)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: U26GVe8ubhVhdsVZKSTekSOwbPQkgbT/eNGTUJHqgAlCsDSgcDZQI+s5ucmRRaEG1jNnIp+VD2bidYw+HY37Ono1GS6tPw7IwvGZEJYx85aS359bUohS9YJPvGkWLNgyHLLVl+qciMx1LEcdeh6agV523lcpjV4G/4tJk6HQFoDwTjHG/bAHE6KbMG14Gye4+6CaTkdd5DZuFDgT7JobAvE7eTA0C0psQl7lwlzEdxoHJyERlprtJp4XCO6DXNz/Yg0PP5uyUrbtPUsXRDIYDyrYldXTnm92zXw5wWYQccC+N5c5DYax5moq/ebiWQ0DsP1pI2uUZBAwPlgjXKLtNSO2bjg6gdT8qBStiG5YAsw/Png/djUEBLqUDcAzg1lWiYW6QXMzTyG3ReucV8Y489zmlR0bnciBis/OMxKcfC5mJKHkm5p+FrflgqPDLN5ByAyojtRhFP2lg6jLCYdmdTt0gQdaeoiVN6C1eitsJ1M=
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 22f23449-6db6-4a2e-03bd-08d80c815a32
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jun 2020 14:28:17.7950 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: m9vaMQRBrJmDfdrmB5N5YgKUS3t11nFJiNV8xGyj36viy6Uw9qaY6FYXwFNui6a0i/OT/XTuqyic8geadz02OxLNhRPa4YR1zePEZ5asGkc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5461
+Received-SPF: pass client-ip=40.107.6.92;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR04-DB3-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 10:28:18
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,92 +130,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- qemu-block@nongnu.org, Igor Mammedov <imammedo@redhat.com>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
- John Snow <jsnow@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: "Denis V. Lunev" <den@openvz.org>, anton.nefedov@virtuozzo.com,
+ qemu-devel@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, May 15, 2020 at 05:04:05PM +0200, Gerd Hoffmann wrote:
-> First batch of microvm patches, some generic acpi stuff.
-> Split the acpi-build.c monster, specifically split the
-> pc and q35 and pci bits into a separate file which we
-> can skip building at some point in the future.
+09.06.2020 17:08, Kevin Wolf wrote:
+> Since commit c8bb23cbdbe, handle_alloc_space() is called for newly
+> allocated clusters to efficiently initialise the COW areas with zeros if
+> necessary. It skips the whole operation if both start_cow nor end_cow
+> are empty. However, it requests zeroing the whole request size (possibly
+> multiple megabytes) even if only one end of the request actually needs
+> this.
+> 
+> This patch reduces the write_zeroes request size in this case so that we
+> don't unnecessarily zero-initialise a region that we're going to
+> overwrite immediately.
+> 
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>   block/qcow2.c | 16 +++++++++++-----
+>   1 file changed, 11 insertions(+), 5 deletions(-)
+> 
+> diff --git a/block/qcow2.c b/block/qcow2.c
+> index 0cd2e6757e..77742877fb 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+> @@ -2403,6 +2403,8 @@ static int handle_alloc_space(BlockDriverState *bs, QCowL2Meta *l2meta)
+>       }
+>   
+>       for (m = l2meta; m != NULL; m = m->next) {
+> +        uint64_t start = m->alloc_offset;
+> +        uint64_t len = m->nb_clusters * s->cluster_size;
+>           int ret;
+>   
+>           if (!m->cow_start.nb_bytes && !m->cow_end.nb_bytes) {
+> @@ -2413,21 +2415,25 @@ static int handle_alloc_space(BlockDriverState *bs, QCowL2Meta *l2meta)
+>               continue;
+>           }
+>   
+> +        if (!m->cow_start.nb_bytes) {
+> +            start += m->cow_end.offset;
+> +            len -= m->cow_end.offset;
+> +        } else if (!m->cow_end.nb_bytes) {
+> +            len = m->cow_start.nb_bytes;
+> +        }
+> +
+
+Hmm, I'm afraid, that this may make things worse in some cases, as with one big write-zero request
+we preallocate data-region in the protocol file, so we have better locality for the clusters we
+are going to write. And, in the same time, with BDRV_REQ_NO_FALLBACK flag write-zero must be
+fast anyway (especially in comparison with the following write request).
+
+>           /*
+>            * instead of writing zero COW buffers,
+>            * efficiently zero out the whole clusters
+>            */
+>   
+> -        ret = qcow2_pre_write_overlap_check(bs, 0, m->alloc_offset,
+> -                                            m->nb_clusters * s->cluster_size,
+> -                                            true);
+> +        ret = qcow2_pre_write_overlap_check(bs, 0, start, len, true);
+>           if (ret < 0) {
+>               return ret;
+>           }
+>   
+>           BLKDBG_EVENT(bs->file, BLKDBG_CLUSTER_ALLOC_SPACE);
+> -        ret = bdrv_co_pwrite_zeroes(s->data_file, m->alloc_offset,
+> -                                    m->nb_clusters * s->cluster_size,
+> +        ret = bdrv_co_pwrite_zeroes(s->data_file, start, len,
+>                                       BDRV_REQ_NO_FALLBACK);
+>           if (ret < 0) {
+>               if (ret != -ENOTSUP && ret != -EAGAIN) {
+> 
 
 
-Applied patch 1-7. Rest all look ok but couldn't apply
-since they seem to be on top of some other cleanups
-which are not upstream. Pls rebased and post and I'll apply.
-
-
-
-> v2 changes: leave acpi-build.c largely as-is, move useful
-> bits to other places to allow them being reused, specifically:
-> 
->  * move isa device generator functions to individual isa devices.
->  * move fw_cfg generator function to fw_cfg.c
-> 
-> v3 changes: fix rtc, support multiple lpt devices.
-> 
-> v4 changes:
->  * drop merged patches.
->  * split rtc crs change to separata patch.
->  * added two cleanup patches.
->  * picked up ack & review tags.
-> 
-> v5 changes:
->  * add comment for rtc crs update.
->  * add even more cleanup patches.
->  * picked up ack & review tags.
-> 
-> v6 changes:
->  * floppy: move cmos_get_fd_drive_type.
->  * picked up ack & review tags.
-> 
-> take care,
->   Gerd
-> 
-> Gerd Hoffmann (16):
->   qtest: allow DSDT acpi table changes
->   acpi: move aml builder code for rtc device
->   acpi: rtc: use a single crs range
->   acpi: serial: don't use _STA method
->   acpi: move aml builder code for serial device
->   acpi: parallel: don't use _STA method
->   acpi: move aml builder code for parallel device
->   acpi: move aml builder code for floppy device
->   floppy: make isa_fdc_get_drive_max_chs static
->   floppy: move cmos_get_fd_drive_type() from pc
->   acpi: move aml builder code for i8042 (kbd+mouse) device
->   acpi: factor out fw_cfg_add_acpi_dsdt()
->   acpi: simplify build_isa_devices_aml()
->   acpi: drop serial/parallel enable bits from dsdt
->   acpi: drop build_piix4_pm()
->   acpi: q35: drop _SB.PCI0.ISA.LPCD opregion.
-> 
->  hw/i386/fw_cfg.h                            |   1 +
->  include/hw/block/fdc.h                      |   3 +-
->  include/hw/i386/pc.h                        |   1 -
->  tests/qtest/bios-tables-test-allowed-diff.h |  17 ++
->  hw/block/fdc.c                              | 111 ++++++-
->  hw/char/parallel.c                          |  22 ++
->  hw/char/serial-isa.c                        |  22 ++
->  hw/i386/acpi-build.c                        | 312 +-------------------
->  hw/i386/fw_cfg.c                            |  28 ++
->  hw/i386/pc.c                                |  25 --
->  hw/input/pckbd.c                            |  31 ++
->  hw/rtc/mc146818rtc.c                        |  24 ++
->  stubs/cmos.c                                |   7 +
->  stubs/Makefile.objs                         |   1 +
->  14 files changed, 269 insertions(+), 336 deletions(-)
->  create mode 100644 stubs/cmos.c
-> 
-> -- 
-> 2.18.4
-
+-- 
+Best regards,
+Vladimir
 
