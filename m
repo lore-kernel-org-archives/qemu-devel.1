@@ -2,85 +2,93 @@ Return-Path: <SRS0=hUBF=7W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6748C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 16:21:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88608C433E3
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 16:26:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7CA712078D
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 16:21:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 50ED820734
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 16:26:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QbHK2GE1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7CA712078D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uExIaGHG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 50ED820734
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43580 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50452 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jih0U-0006tq-OB
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 12:21:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46370)
+	id 1jih57-0001nz-Fb
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 12:26:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47028)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1jigz6-0005Zb-Dk
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 12:20:20 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:33675
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1jigz5-0007Yo-J1
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 12:20:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591719558;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=xIjfaioqmBdVChcuQCpcGGXIjUXo4w4gXfPUySK3fk8=;
- b=QbHK2GE1gnIkXL59cGoVG247P1nlPgbSf8iSUBY3HWGsWzPYuDKJ9UFNtdcfdptfZfnWFd
- 2Y8v35rLMEov8y8a4K9l2CyaVsL8Rg+XTT/oPvdCiWfSI3xhHtqWPCJcMrR/hwnvwvtrlI
- CMTvNmZJNluRZcYS/FTPbjN4ZGkO980=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-485-FOFoOAkGP-mJYruZWnJrDw-1; Tue, 09 Jun 2020 12:19:08 -0400
-X-MC-Unique: FOFoOAkGP-mJYruZWnJrDw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 08210107AFB2;
- Tue,  9 Jun 2020 16:18:56 +0000 (UTC)
-Received: from localhost (ovpn-113-3.phx2.redhat.com [10.3.113.3])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E37958FF9A;
- Tue,  9 Jun 2020 16:18:14 +0000 (UTC)
-Date: Tue, 9 Jun 2020 12:18:14 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH v3 00/20] virtio-mem: Paravirtualized memory hot(un)plug
-Message-ID: <20200609161814.GJ2366737@habkost.net>
-References: <20200603144914.41645-1-david@redhat.com>
- <20200609091034-mutt-send-email-mst@kernel.org>
- <08385823-d98f-fd9d-aa9d-bc1bd6747c29@redhat.com>
- <20200609115814-mutt-send-email-mst@kernel.org>
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jih3o-00006D-5l
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 12:25:12 -0400
+Received: from mail-pg1-x530.google.com ([2607:f8b0:4864:20::530]:37169)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jih3m-0000Sr-VV
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 12:25:11 -0400
+Received: by mail-pg1-x530.google.com with SMTP id d10so10533867pgn.4
+ for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 09:25:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=fuj4+EzL4ACqWfECVnWjXkyBK0NkdZBLVsNebnwCJQ0=;
+ b=uExIaGHGbhx1qtHMuG+SO2cDXVYerh2dCTmlb7xnzDT8+CbIpnNP6ikTa+loHGo/ia
+ MXdkMynralLbTG2Y+sz7NCbY1ZZ1EtTjsNcqHKcJrQmTe0uOpBdUEDSpHWRIbdQLflt4
+ l32i2ZpgpfnhoH9H0TW1BrGFMGEpNnrQaPZVIsmeD+MG/kpr3xVNYdtKxrBAX8EJLerM
+ Oho4pLPMqY2jsIZJVCvG07ADNcvDmyoLZ5/mCuBPbNLw2Btnlslr99rahniRVRJIuAjW
+ 7lcuuSn4yPqgfFJ5BF+rqiLNp+Gt2pbT7a0ZFtGzycVm22FOcxxRszyw9SpQoIGZR45i
+ yK0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=fuj4+EzL4ACqWfECVnWjXkyBK0NkdZBLVsNebnwCJQ0=;
+ b=bEle7ueDJzb1REAhpTSeLoyA0HX642WMsv+fWQs8NBxhAU8dqtM2a8AOS1XriAMI6/
+ imAKeH6OlcVq7nL4rxEjkY3Y52q2CmYafJ55wkj07I5x/GJZYwQ3D/wNFBP2TE1SfPAZ
+ eqDUVdyjGyDURr8CrRhXS7GconqVfCy4nCX3SN8SMUnYYg3/ehAcfAV02lkZUKpLU4k4
+ hDOoT45fDfISzdEQGaFKOKS4LfJCb02AIvjnY7azhFAzq3ac9sDiEw0YZTJikdELqM1I
+ vQFE0PIDIFD7qJsXQXzD3NIKUZpWzlWhsDl/s0yIgpV52/hBthKUFQufaVLJXU/iioia
+ Faow==
+X-Gm-Message-State: AOAM533eOQhRTC8NbxbOYS8Lsqh+b8/HBNjfq155CmVWgOzML/R2Y5qP
+ bMk9Sxx7NlivyhrXn+yWPrL56iVB2yY=
+X-Google-Smtp-Source: ABdhPJzuYmkQJ+CjZGAi4pu2hy3b1bAPjBhj4OdgEuct3F9nFGKljU0Nn77PgVjQJVXp1KR1Dg4bRA==
+X-Received: by 2002:a63:5d19:: with SMTP id r25mr24723423pgb.360.1591719909156; 
+ Tue, 09 Jun 2020 09:25:09 -0700 (PDT)
+Received: from localhost.localdomain (174-21-143-238.tukw.qwest.net.
+ [174.21.143.238])
+ by smtp.gmail.com with ESMTPSA id s188sm7580101pfb.118.2020.06.09.09.25.07
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 09 Jun 2020 09:25:08 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PULL 2/9] decodetree: Rename MultiPattern to IncMultiPattern
+Date: Tue,  9 Jun 2020 09:24:57 -0700
+Message-Id: <20200609162504.780080-3-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200609162504.780080-1-richard.henderson@linaro.org>
+References: <20200609162504.780080-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200609115814-mutt-send-email-mst@kernel.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 01:38:49
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::530;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x530.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,57 +101,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org,
- David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org,
- teawater <teawaterz@linux.alibaba.com>,
- Hailiang Zhang <zhang.zhanghailiang@huawei.com>,
- Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Richard Henderson <rth@twiddle.net>, Eric Farman <farman@linux.ibm.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Keith Busch <kbusch@kernel.org>,
- Janosch Frank <frankja@linux.ibm.com>, Tony Krowiak <akrowiak@linux.ibm.com>,
- Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
- Pierre Morel <pmorel@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>,
- qemu-s390x@nongnu.org, Igor Mammedov <imammedo@redhat.com>
+Cc: peter.maydell@linaro.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jun 09, 2020 at 11:59:04AM -0400, Michael S. Tsirkin wrote:
-> On Tue, Jun 09, 2020 at 03:26:08PM +0200, David Hildenbrand wrote:
-> > On 09.06.20 15:11, Michael S. Tsirkin wrote:
-> > > On Wed, Jun 03, 2020 at 04:48:54PM +0200, David Hildenbrand wrote:
-> > >> This is the very basic, initial version of virtio-mem. More info on
-> > >> virtio-mem in general can be found in the Linux kernel driver v2 posting
-> > >> [1] and in patch #10. The latest Linux driver v4 can be found at [2].
-> > >>
-> > >> This series is based on [3]:
-> > >>     "[PATCH v1] pc: Support coldplugging of virtio-pmem-pci devices on all
-> > >>      buses"
-> > >>
-> > >> The patches can be found at:
-> > >>     https://github.com/davidhildenbrand/qemu.git virtio-mem-v3
-> > > 
-> > > So given we tweaked the config space a bit, this needs a respin.
-> > 
-> > Yeah, the virtio-mem-v4 branch already contains a fixed-up version. Will
-> > send during the next days.
-> 
-> BTW. People don't normally capitalize the letter after ":".
-> So a better subject is
->   virtio-mem: paravirtualized memory hot(un)plug
+Name the current node for "inclusive" multi-pattern, in
+preparation for adding a node for "exclusive" multi-pattern.
 
-I'm not sure that's still the rule:
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ scripts/decodetree.py | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-[qemu/(49ee115552...)]$ git log --oneline v4.0.0.. | egrep ': [A-Z]' | wc -l
-5261
-[qemu/(49ee115552...)]$ git log --oneline v4.0.0.. | egrep ': [a-z]' | wc -l
-2921
-
+diff --git a/scripts/decodetree.py b/scripts/decodetree.py
+index b559db3086..7af6b3056d 100755
+--- a/scripts/decodetree.py
++++ b/scripts/decodetree.py
+@@ -371,7 +371,7 @@ class Pattern(General):
+ # end Pattern
+ 
+ 
+-class MultiPattern(General):
++class IncMultiPattern(General):
+     """Class representing an overlapping set of instruction patterns"""
+ 
+     def __init__(self, lineno, pats, fixb, fixm, udfm, w):
+@@ -410,7 +410,7 @@ class MultiPattern(General):
+                 output(ind, '}\n')
+             else:
+                 p.output_code(i, extracted, p.fixedbits, p.fixedmask)
+-#end MultiPattern
++#end IncMultiPattern
+ 
+ 
+ def parse_field(lineno, name, toks):
+@@ -751,8 +751,8 @@ def parse_generic(lineno, is_format, name, toks):
+                           .format(allbits ^ insnmask))
+ # end parse_general
+ 
+-def build_multi_pattern(lineno, pats):
+-    """Validate the Patterns going into a MultiPattern."""
++def build_incmulti_pattern(lineno, pats):
++    """Validate the Patterns going into a IncMultiPattern."""
+     global patterns
+     global insnmask
+ 
+@@ -792,9 +792,9 @@ def build_multi_pattern(lineno, pats):
+         else:
+             repeat = False
+ 
+-    mp = MultiPattern(lineno, pats, fixedbits, fixedmask, undefmask, width)
++    mp = IncMultiPattern(lineno, pats, fixedbits, fixedmask, undefmask, width)
+     patterns.append(mp)
+-# end build_multi_pattern
++# end build_incmulti_pattern
+ 
+ def parse_file(f):
+     """Parse all of the patterns within a file"""
+@@ -860,7 +860,7 @@ def parse_file(f):
+                 error(start_lineno, 'indentation ', indent, ' != ', nesting)
+             pats = patterns
+             patterns = saved_pats.pop()
+-            build_multi_pattern(lineno, pats)
++            build_incmulti_pattern(lineno, pats)
+             toks = []
+             continue
+ 
 -- 
-Eduardo
+2.25.1
 
 
