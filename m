@@ -6,37 +6,35 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2A77C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 17:45:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCCB4C433E1
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 17:46:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A3F6A207ED
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 17:45:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3F6A207ED
+	by mail.kernel.org (Postfix) with ESMTPS id A5E702081A
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 17:46:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5E702081A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57236 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59064 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jiiJm-00058p-Pk
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 13:45:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55304)
+	id 1jiiKF-00061m-TY
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 13:46:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54192)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1jiiAk-0002o7-EB; Tue, 09 Jun 2020 13:36:26 -0400
-Received: from mout.kundenserver.de ([212.227.126.130]:46917)
+ id 1jii0g-0004o4-2Q; Tue, 09 Jun 2020 13:26:02 -0400
+Received: from mout.kundenserver.de ([212.227.126.131]:40265)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1jiiAh-0004oF-Uc; Tue, 09 Jun 2020 13:36:26 -0400
+ id 1jii0f-0002y2-1L; Tue, 09 Jun 2020 13:26:01 -0400
 Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
- (mreue009 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MLA6k-1jQUn91GOw-00IFqu; Tue, 09 Jun 2020 19:35:57 +0200
-Subject: Re: [PATCH 1/3] target/unicore32: Remove unused headers
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org
-References: <20200603123754.19059-1-f4bug@amsat.org>
- <20200603123754.19059-2-f4bug@amsat.org>
+ (mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MUl4z-1jZbL02AYD-00QjmD; Tue, 09 Jun 2020 19:25:55 +0200
+Subject: Re: [PATCH] qemu-img: Fix doc typo for 'bitmap' subcommand
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+References: <20200529144527.1943527-1-eblake@redhat.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -80,41 +78,41 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <2b6c62d2-4555-69da-5f7d-f9861babbb5b@vivier.eu>
-Date: Tue, 9 Jun 2020 19:35:54 +0200
+Message-ID: <11d6990d-71aa-5495-217d-f0806c39a811@vivier.eu>
+Date: Tue, 9 Jun 2020 19:25:54 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200603123754.19059-2-f4bug@amsat.org>
+In-Reply-To: <20200529144527.1943527-1-eblake@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:i7FGpEHe/DzdnMd67Fdu3ouNUY21HkRD/pL6gDAf+yjK5z1rt4v
- 5JwCXjjYZw66eXIxux/2owMIi+7hn5N2PuQ+viwPxZqFCTEvkbP05JuEa+lY6hUq/UKYKGW
- oFaAAJm/96ODBRGVvGDlSSODylur9n/ogm/wPC/W2Dzmu/96nvQYbruwtqqOZvChX0MW9/W
- NdHpZmqciSiz5yAq+iRcQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:0KojbOiuxwY=:HLAv9BNDmz8Z5d6W4C/yr/
- Pl0jFvgRW5FCya8I59e+q9cvUJ11h9daBQUH+gLlpLt2wHqyyKTuZ7SOjt+lFauy8LIggKeP7
- Hd6Z3xVPfLx23CYA7uc/71Xo1GkNMk1Ha06K+hwhDTB+Xy3wiS1Qpubw1fLJpxvDCA+40k2mq
- 6svPJX0wBvurxBlPBEpXfhfAVO0KfP3B3JzUVCwlGND+pq5kqsRvl+MoTE1f3PpCHgEyY5/HG
- 2Ow1HEGahsOqkKin9w9+CbR0dyXaSKOG6yjoASj2jyxgkH/15yk5iPdzPYp+TeLN04QFsoiFC
- F1vjyqrDH7Rwb7WfQ87VepyszZb37yS7iocpj66DQXSWr3fFe/LJf1Hkjn4Hd1zCtpBj3b/ck
- zh2i7YC5i/qOY+7avKM09f/C80TkZKwpfd8PXT4NMmYt/xKae3vP4qz8cTGBwWKpf0tL0e9Ik
- d/Fk7fG/Ld78VCm/MoPotuxQPcuN9k5qsUGvipUsGe+0zSZ/nwD9dXM8XfZF/LUq04YPdVNuk
- N51z4CUV7vlkfu/iEkKYEx5f+ZVGjiNj/yvr00Pd1lXL4IffvlIbyWvJQ3MB0wSzxul3h9GJp
- 5BncGL0pkeMJGpmlOsfoPjp0pqrVAt7z5BXiQccKKrtLUrtwf1HjATWz5Agu0yzxxD6MmctT4
- JCmGwoGIho+JgHrzH9HKFBg+X75H2wL+ppZvAI8lIawPNV7odv8Kjxl80+2Lg9cosT+pTE8VC
- gdiuCnQtWgwW9T35w34dMZgnvt+IeDZ/gqEc+jqOrCs9Dh5KMlGNSTEWj7M3Pa7Hj9iPVdatB
- qm87jy8aB93FczaTHdgEAeRwbwSfq+pklEiUUzsDbu4ckb+nQo=
-Received-SPF: none client-ip=212.227.126.130; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:eESDsXXbtitpSFvAHFX5Jpn+5sznkW2vdK3H6CmpHePAuCYntMB
+ 3D6SxuvJCgS6Wz+5Ksnehzd4M3DstEg0d54+gAvalYoieZr5IbFNcQLJ7pdBKt38TAzZMmX
+ sjJM74SqgF9BgfUamh+p5K5ie/pfO3B2M/9UnO74QzaaUffIKm4oj+sWCD3m0AIbqefw79s
+ wLR3sNcS7QjI4p6ZEIQwA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:74+CmZhgS94=:xQQu/ao5H/aMRIU+xMzBWr
+ zONYgfUrtGw341SD1AXD36WUV9NmM4aiOwCca0BAdgsotLTvy/Ky/d04VxyCLMC3SRjJdn/Cv
+ XDbLO/AgPtuVFbufI3ic+NlGDJXakZ8zfYy32WMpsFkvmOrP8IuVicPfl09igNriDUdOK7aAN
+ 06otSjLIcDYfomSZGvb70Hh/wtGxMXZnq+o0YsYWIp3VQ1YBiwRzqBMKiHva8/O/o5CVs4cu7
+ VUkcHYm79GCB0Bn/h2k0sIUSfkmgTUUhbWkqRN/Y06SYBTOvvGct083bs8AZqJnIp9DezmKD5
+ WrMfO5dYvtXSL3ho3ToA8dSmRsGgACKLNf813xABlvgQ6/H7qedvpwVlB5qF4phM0TaPyleTB
+ JQRA2XlxspxzjBCldpMnz/LHxUucXDIEWU6KAlclu9pidXYj8nc1TlUXM3GIURO/rWiolKcH6
+ OH5CUZOT7PtdyslplWQarPalFNbubeiAjuVes+Xk3LzEq/u6oDrvEZqnPBmFrzUKAed/Rgh3+
+ zm4rFnJZ4yBcT1PwKKXqJqM1UwhyXbXdE1ZZqZVaEZ9lXBOHHoDBDi/Ffg2KdveXjWNJktB50
+ +ze8fC1D3U9JBUS55G4cu1NgUx/uAw2tnPnyT2nifsMZxeZIZvhnO95jSpFMVgFvk3ddF0jDC
+ 10qarRm0pSKdDm+l7PoIfH/5wCIHwuuIm+OvxwnJQ9lcu/7WPewQsz7/9uuyeWLqGyEmZjOki
+ IUi8loyDMRfMNiHLlh2dmJ5MIxiDaCMroMVU/cZCBc3y0GK0EtD67P8FZ9i9ZmLExznoTRLOa
+ Ji3He+GdFu7q9xXWxyZTCbpm1gBESiqVjbCNC2HUMSCf5+eMWD2jSzjeR77J2S/Y9OUBSwm
+Received-SPF: none client-ip=212.227.126.131; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 13:30:42
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 12:55:24
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
 X-Spam_bar: -
 X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_MSPIKE_H2=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -127,39 +125,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Thomas Huth <thuth@redhat.com>,
- Guan Xuetao <gxt@mprc.pku.edu.cn>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Richard Henderson <rth@twiddle.net>
+Cc: qemu-trivial@nongnu.org, vsementsov@virtuozzo.com, jsnow@redhat.com,
+ qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 03/06/2020 à 14:37, Philippe Mathieu-Daudé a écrit :
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Le 29/05/2020 à 16:45, Eric Blake a écrit :
+> Prefer a consistent naming for the --merge argument.
+> 
+> Fixes: 3b51ab4bf
+> Signed-off-by: Eric Blake <eblake@redhat.com>
 > ---
->  target/unicore32/helper.c | 2 --
->  1 file changed, 2 deletions(-)
 > 
-> diff --git a/target/unicore32/helper.c b/target/unicore32/helper.c
-> index 7d538e2144..53292ae311 100644
-> --- a/target/unicore32/helper.c
-> +++ b/target/unicore32/helper.c
-> @@ -12,9 +12,7 @@
->  #include "qemu/osdep.h"
->  #include "cpu.h"
->  #include "exec/exec-all.h"
-> -#include "exec/gdbstub.h"
->  #include "exec/helper-proto.h"
-> -#include "qemu/host-utils.h"
->  #ifndef CONFIG_USER_ONLY
->  #include "ui/console.h"
->  #endif
+> I'm happy for this to go in through my bitmaps queue or through the
+> trivial tree, whichever picks it up first.
 > 
+>  docs/tools/qemu-img.rst | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/docs/tools/qemu-img.rst b/docs/tools/qemu-img.rst
+> index 69cd9a30373a..7f0737488ade 100644
+> --- a/docs/tools/qemu-img.rst
+> +++ b/docs/tools/qemu-img.rst
+> @@ -300,7 +300,7 @@ Command description:
+> 
+>    ``--disable`` to change *BITMAP* to stop recording future edits.
+> 
+> -  ``--merge`` to merge the contents of *SOURCE_BITMAP* into *BITMAP*.
+> +  ``--merge`` to merge the contents of the *SOURCE* bitmap into *BITMAP*.
+> 
+>    Additional options include ``-g`` which sets a non-default
+>    *GRANULARITY* for ``--add``, and ``-b`` and ``-F`` which select an
+> 
+
 
 Applied to my trivial-patches branch.
 
 Thanks,
 Laurent
-
 
