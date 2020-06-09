@@ -2,90 +2,99 @@ Return-Path: <SRS0=hUBF=7W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78605C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 15:45:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91B9AC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 15:48:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 369042074B
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 15:45:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5BE39206A4
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 15:48:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YCjyKs/P"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 369042074B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZnLBCjyh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BE39206A4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56466 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60388 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jigRD-0007Dp-DZ
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 11:45:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38732)
+	id 1jigUQ-0000jq-I6
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 11:48:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39390)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1jigQB-0006Oq-MF
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 11:44:15 -0400
-Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:38864)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1jigQA-00085i-7D
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 11:44:15 -0400
-Received: by mail-ed1-x543.google.com with SMTP id c35so16786467edf.5
- for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 08:44:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=Z9ZnnGkEcUhiCT3nRIZmEUNcnDyDZGhXhgZzVMAb7SI=;
- b=YCjyKs/P0fMxhkEp582iAFnFBvgfdVNV4jUWb9aJJzrTuz5MTnqQolUse1muIFHsS8
- UKTX+++QwRZA8MDBQWIsxJgNleJRlI18zXDnNVaKxeFcNpIbyIxi3za2ssZp1zzfbeQg
- F4dHUhygzqCu/p0C2wSuw9nzUZUc/dCHYBwVgOkoOuPP0tmHaBXOCkr/S3HWIsfQoKfB
- RyJqsbPjYHUKYAUNOGVPdnfkLxGy/z+h48HDQlEgRgnbfsB0Q5m/I4wlr7vkqzr2ZC+L
- +ZhwaZHgrMf+sR28oaPdJYzVdBDNttjCbqjdgPlQO/oZkkOPs/KNIjLAYa7Ml743mIAh
- tdSg==
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jigTS-0000CK-C5
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 11:47:38 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:42388
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jigTR-0000R7-C2
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 11:47:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591717656;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=/JGW0NnaRfuky2tYatN5aUpny9qByLWJZcC4YZ5tvvs=;
+ b=ZnLBCjyhTQL0vMMbwwzWAmrAkqfcmQ7mm2FypdNb871efB8z6SdXjUXrjzTOAtbTwlv6eh
+ hVEVpUPOwpFkqVOHyfFvwcOTMndrrLVXPT07xpmMphv8OKxISxPBDT9ZUHIlrhcNRH/EKc
+ HrdSqkoGeWuXUBkptIFDNWH7v4Gtz6s=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-388-BlNMACBmM5qGva3XkWsFRw-1; Tue, 09 Jun 2020 11:47:34 -0400
+X-MC-Unique: BlNMACBmM5qGva3XkWsFRw-1
+Received: by mail-wr1-f71.google.com with SMTP id l18so8832633wrm.0
+ for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 08:47:34 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=Z9ZnnGkEcUhiCT3nRIZmEUNcnDyDZGhXhgZzVMAb7SI=;
- b=n6cv24wyoRe66oyWWDaCw1RyFnbVhItyd5oaS954jFOMSqsshZMbVuoSDFRYnviBKU
- TqkkQJqytjw117YlZgHtJ0jCvee073pXPw2XDcumBBomkiOUIGJjuqVHJUl6rYwRZQjI
- 7qGi/Vb0ZDM4XNimQVr4fbsHNHVwL7xpJcLknND+Wm6qZL3WoV1upQ0I++dXd1HOX60N
- /dd6h/f5hf6sSp/xqWr9SvF0dLfCoWhygQE07mEu87h/QhpqnXWlxptLon9/++9DYVnE
- Azz2lDDUcNxtMQ1wUkEIgaGRXh9JF4u5SwdlE55Sg+7qgx2mN934UQTRO1hLleBuSymj
- /uLQ==
-X-Gm-Message-State: AOAM530liXGUzNJ/zTVxGlObMSc/dLxiyfj87pYd0vTaSYWCPepBbYZi
- v3fBBIqPNmlxbxZE24JASvjDBacsNBql3by83cY=
-X-Google-Smtp-Source: ABdhPJxlRpVnpFPtcVaUhxsK5OMEs3RO0FnaE9A048QoKurNiehHD62BmFqcIyR0C5USvmisjp8D/XcIRCGqzsGi2Mg=
-X-Received: by 2002:a50:bb41:: with SMTP id y59mr27057140ede.311.1591717452052; 
- Tue, 09 Jun 2020 08:44:12 -0700 (PDT)
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=/JGW0NnaRfuky2tYatN5aUpny9qByLWJZcC4YZ5tvvs=;
+ b=AqObFoRWAZwvSep69XCB8jHdmSQ8IOtGAeYamckucnv0RHg+pQziOwFn8FrKN+pyDS
+ i+eS8So9JTpxvmS/lFwENOk6TIJk/n9gSuFEjgMRD16AQwYCXOWicCcSBFtG3xQ8qKxg
+ JFoWRj4SPjtlYThTJ4mTugrX+wX2YZBhynioNE0SqIWtC2yE3hfci4IIuR00Ve1eD95q
+ 2tviOZGO/zDmGErKXMGHxWS3vLzCVxxWgUjCVg+a2vbnbP1zIW/O5NtapkiaiYCvnRIH
+ EMOFNiMQVjAuf26z6VLndii4KlW+tc+ymei6zRmC4ngLJ5h2yb6bbMf9fXRws0aQLX3Q
+ F6Pg==
+X-Gm-Message-State: AOAM532niKdE3bCHED7yF5kVL6zUmpev3RPCanjQdMpUQngD1r0jxx6V
+ nWfLMmnKfGg5AXBiyvY6RuMAKM7kxy1ZfWa66ERNAaS/NcBV3dBVGioTOnQHaAr5fvgP7VF+7Eq
+ B44jpgxdpcbCzlCE=
+X-Received: by 2002:adf:c44e:: with SMTP id a14mr4856562wrg.50.1591717653726; 
+ Tue, 09 Jun 2020 08:47:33 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzFQUX9XqJPS+DbyhdpVXvZUPyIWslvX+NTavL4qTYzDxneXAJM6Oix0gNvqbD585/AXWch8A==
+X-Received: by 2002:adf:c44e:: with SMTP id a14mr4856544wrg.50.1591717653507; 
+ Tue, 09 Jun 2020 08:47:33 -0700 (PDT)
+Received: from redhat.com (bzq-79-181-55-232.red.bezeqint.net. [79.181.55.232])
+ by smtp.gmail.com with ESMTPSA id k14sm3783365wrq.97.2020.06.09.08.47.32
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 09 Jun 2020 08:47:33 -0700 (PDT)
+Date: Tue, 9 Jun 2020 11:47:30 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Subject: Re: [PATCH v1] pc: Support coldplugging of virtio-pmem-pci devices
+ on all buses
+Message-ID: <20200609114608-mutt-send-email-mst@kernel.org>
+References: <20200525084511.51379-1-david@redhat.com>
 MIME-Version: 1.0
-References: <1591559185-31287-1-git-send-email-aleksandar.qemu.devel@gmail.com>
- <CAFEAcA-0Y6rFNrsD2SN13eZArCk3Ydvf6kv7OZaQ07fmFdSZZQ@mail.gmail.com>
- <CAHiYmc7NuEROi312sq_veTNjRMAv3ZXbBLJGRwrB+1znktBexg@mail.gmail.com>
-In-Reply-To: <CAHiYmc7NuEROi312sq_veTNjRMAv3ZXbBLJGRwrB+1znktBexg@mail.gmail.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Tue, 9 Jun 2020 17:44:00 +0200
-Message-ID: <CAL1e-=hChB-OpetJWLLXvHWWNgjn2ZGVrJcHB7FTWk45vTFPJQ@mail.gmail.com>
-Subject: Re: [PULL 00/21] MIPS queue for June 7th, 2020
-To: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::543;
- envelope-from=aleksandar.m.mail@gmail.com; helo=mail-ed1-x543.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+In-Reply-To: <20200525084511.51379-1-david@redhat.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=mst@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 02:41:53
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,108 +107,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
+ Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Vivek Goyal <vgoyal@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jun 8, 2020 at 3:17 PM Aleksandar Markovic
-<aleksandar.qemu.devel@gmail.com> wrote:
->
-> =D0=BF=D0=BE=D0=BD, 8. =D1=98=D1=83=D0=BD 2020. =D1=83 15:05 Peter Maydel=
-l <peter.maydell@linaro.org> =D1=98=D0=B5
-> =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
-> >
-> > On Sun, 7 Jun 2020 at 20:46, Aleksandar Markovic
-> > <aleksandar.qemu.devel@gmail.com> wrote:
-> > >
-> > > The following changes since commit 175198ad91d8bac540159705873b4ffe4f=
-b94eab:
-> > >
-> > >   Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20200605' i=
-nto staging (2020-06-05 17:45:59 +0100)
-> > >
-> > > are available in the git repository at:
-> > >
-> > >   https://github.com/AMarkovic/qemu tags/mips-queue-june-07-2020
-> > >
-> > > for you to fetch changes up to ffbd8a88e8872d61fa5622a0075eddbe719510=
-67:
-> > >
-> > >   target/mips: Enable hardware page table walker and CMGCR features f=
-or P5600 (2020-06-07 21:34:14 +0200)
-> > >
-> > > ----------------------------------------------------------------
-> > >
-> > > MIPS queue for June 7th, 2020
-> > >
-> > > Highlights:
-> > >
-> > >   - Registring change of email address for two contributors
-> > >   - Cleanup and improvements of FPU helpers
-> > >   - Enabling some features of P5600
-> > >   - Adding two Loongson-3A CPU definitions
-> > >   - Moving futher towards Loongson-3A KVM support
-> > >   - Two checkpatch warnings are known and should be ignored
-> > >
-> >
-> > Hi; I'm afraid this fails to build on non-Linux hosts
-> > (OSx, BSDs, Windows):
-> >
-> > hw/mips/common.c:21:23: fatal error: linux/kvm.h: No such file or direc=
-tory
-> >
-> > Looking at that file, it also makes the mistake of putting
-> > an include line before osdep.h, which should always be the
-> > first include in a C file.
-> >
-> > The more usual way to arrange this kind of "real implementation
-> > of a function for the compiled-with-KVM case, stub for
-> > the #ifndef CONFIG_KVM case" is to put the real implementation
-> > into a C file that's only built for the CONFIG_KVM case:
-> > obj-$(CONFIG_KVM) +=3D whatever.o
-> > (it may be simplest to just put it in the existing target/mips/kvm.c?)
-> > and then either
-> > (a) provide the non-kvm stub version directly in the .h file
-> > that declares the prototype for the kvm case:
-> > #ifdef CONFIG_KVM
-> > int mips_kvm_type(MachineState *machine, const char *vm_type)
-> > #else
-> > static inline mips_kvm_type(MachineState *machine, const char *vm_type)
-> > {
-> >     return 0;
-> > }
-> > #endif
-> > (b) alternatively put the stub code in a built-for-non-KVM
-> > source file:
-> > obj-$(call lnot,$(CONFIG_KVM)) +=3D kvm-stub.o
-> >
-> > i386, s390x and arm all have examples of this kind of "stub
-> > version plus for-kvm version" function that may be useful
-> > as examples.
-> >
->
-> Thanks for your detailed response and pointers!
->
-> I am going to work with the original contributor on this.
->
-> I am planning, of course, to send another, corrected, pull request,
-> but not sooner than in 5-6 days.
->
+On Mon, May 25, 2020 at 10:45:11AM +0200, David Hildenbrand wrote:
+> E.g., with "pc-q35-4.2", trying to coldplug a virtio-pmem-pci devices
+> results in
+>     "virtio-pmem-pci not supported on this bus"
+> 
+> Reasons is, that the bus does not support hotplug and, therefore, does
+> not have a hotplug handler. Let's allow coldplugging virtio-pmem devices
+> on such buses. The hotplug order is only relevant for virtio-pmem-pci
+> when the guest is already alive and the device is visible before
+> memory_device_plug() wired up the memory device bits.
+> 
+> Hotplug attempts will still fail with:
+>     "Error: Bus 'pcie.0' does not support hotplugging"
+> 
+> Hotunplug attempts will still fail with:
+>     "Error: Bus 'pcie.0' does not support hotplugging"
+> 
+> Reported-by: Vivek Goyal <vgoyal@redhat.com>
+> Cc: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
+> Cc: Igor Mammedov <imammedo@redhat.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Richard Henderson <rth@twiddle.net>
+> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 
-I changed my mind. Since the offending patch is logically independent
-from other patches and vice versa, I am going to send a pull request
-this evening, without it, rather than wait for it to be fixed.
+I assume you are still debugging Vivek's issues, right?
+Let me know when you feel it's time to merge this ...
 
-Truly yours,
+> ---
+>  hw/i386/pc.c | 18 ++++++++++--------
+>  1 file changed, 10 insertions(+), 8 deletions(-)
+> 
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index 2128f3d6fe..c740495eb6 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -1663,13 +1663,13 @@ static void pc_virtio_pmem_pci_pre_plug(HotplugHandler *hotplug_dev,
+>      HotplugHandler *hotplug_dev2 = qdev_get_bus_hotplug_handler(dev);
+>      Error *local_err = NULL;
+>  
+> -    if (!hotplug_dev2) {
+> +    if (!hotplug_dev2 && dev->hotplugged) {
+>          /*
+>           * Without a bus hotplug handler, we cannot control the plug/unplug
+> -         * order. This should never be the case on x86, however better add
+> -         * a safety net.
+> +         * order. We should never reach this point when hotplugging on x86,
+> +         * however, better add a safety net.
+>           */
+> -        error_setg(errp, "virtio-pmem-pci not supported on this bus.");
+> +        error_setg(errp, "virtio-pmem-pci hotplug not supported on this bus.");
+>          return;
+>      }
+>      /*
+> @@ -1678,7 +1678,7 @@ static void pc_virtio_pmem_pci_pre_plug(HotplugHandler *hotplug_dev,
+>       */
+>      memory_device_pre_plug(MEMORY_DEVICE(dev), MACHINE(hotplug_dev), NULL,
+>                             &local_err);
+> -    if (!local_err) {
+> +    if (!local_err && hotplug_dev2) {
+>          hotplug_handler_pre_plug(hotplug_dev2, dev, &local_err);
+>      }
+>      error_propagate(errp, local_err);
+> @@ -1696,9 +1696,11 @@ static void pc_virtio_pmem_pci_plug(HotplugHandler *hotplug_dev,
+>       * device bits.
+>       */
+>      memory_device_plug(MEMORY_DEVICE(dev), MACHINE(hotplug_dev));
+> -    hotplug_handler_plug(hotplug_dev2, dev, &local_err);
+> -    if (local_err) {
+> -        memory_device_unplug(MEMORY_DEVICE(dev), MACHINE(hotplug_dev));
+> +    if (hotplug_dev2) {
+> +        hotplug_handler_plug(hotplug_dev2, dev, &local_err);
+> +        if (local_err) {
+> +            memory_device_unplug(MEMORY_DEVICE(dev), MACHINE(hotplug_dev));
+> +        }
+>      }
+>      error_propagate(errp, local_err);
+>  }
+> -- 
+> 2.25.4
 
-Aleksandar
-
-
-> Aleksandar
->
-> > thanks
-> > -- PMM
->
 
