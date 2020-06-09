@@ -7,81 +7,81 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D43BCC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 10:45:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DFB6C433E1
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 10:46:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9EDD4207C3
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 10:45:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 17A6C207F9
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 10:46:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="L2XPNyqf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EDD4207C3
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="phEzfPyx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17A6C207F9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55106 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56878 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jibl8-0000iW-OL
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 06:45:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59570)
+	id 1jiblt-0001XN-BF
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 06:46:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59284)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jibjY-0007HP-6L
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 06:43:56 -0400
-Received: from mail-wm1-x32a.google.com ([2a00:1450:4864:20::32a]:51474)
+ id 1jibeB-0007dd-0y
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 06:38:23 -0400
+Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:34597)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jibjX-0005DZ-3H
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 06:43:55 -0400
-Received: by mail-wm1-x32a.google.com with SMTP id u13so2351129wml.1
- for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 03:43:54 -0700 (PDT)
+ id 1jibe8-0004OG-Ph
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 06:38:22 -0400
+Received: by mail-wr1-x429.google.com with SMTP id r7so20744667wro.1
+ for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 03:38:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=l8C2CxQk5isX6LgVBcCj8l8vwP2jRtWs9gzBWt30ZL0=;
- b=L2XPNyqf2oO9DHglFSfCvQCs9Mra96UjWRRjHTcrsu4iADUPDR7GwQzy4HhDR0LFV4
- +FfHvM3JT6qQPtvddPt/L2fYRHfcC91c9Uq3VwLBO3qi3Te2vYxLLiFUTkwZw4MU7t5H
- FwzclMaaSTd/kxYYXzp90J3NljU8ITsJxRmUGz41HYK1+/pfIB1ydU4mLjYgaE78qO7b
- uohj57SaWxEeAouYDXVRCdXiQ5OCa+8sCzaYfqPFlFhngtvKq5niMi6mjWU+myhzvWNV
- uZ56sDEOVoa4knpjMJ69vgtlR7tc1IBzQ6gMajACLPpxgNKbLj/7zUvmVSUmIuaHoKR1
- evoA==
+ bh=dy5kY10AJguH6nm5zuGcJziOR+JWiuUYiLstcUD0qZk=;
+ b=phEzfPyxvmh7q9LBG/r3zi1qYqM4mVN+iddKNuIMqPgsX+w+ttuwmme/jiE/F3o61T
+ a1SQxG3SSN7/2gVrCK2Jb/bEnDAlx4fJxDkTkqTB74uu9kVyHMMZWvTJ/nBtU1uYcwIK
+ RN3b51jFtDsRBFzSy9Hc1zcgK21vDlLQZFLzlN3P+DX3inUXcjMJ3xFx5KJlnsS30uG4
+ x02odV7AGwl9++oD4GjF082qiXmUgei6z7nSYfMYh13gqHtL3OGPHph0v7s/pVwN+INv
+ ED9GNtNDGJVjuHHqys5JvHlxiFscq+IqLSEfPayyRvfzGzvq04A+qn+bthgOL5pasnRs
+ MdpA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=l8C2CxQk5isX6LgVBcCj8l8vwP2jRtWs9gzBWt30ZL0=;
- b=Nosy6OiiHQSDou1Vs7RYUdz9hDBQ0ZW71NV0AEjOBmpBkkLPC5ZJhq3zxr0FGMH0Dv
- Va6VGPs835YpUgGWvzICPOjVgXg4kClAttOJg30zPsG7CQ5wkqQui6v6WSjEstpJqtJp
- hqnNhe+a4wgYQFOU46xfTRQ/vymIfkzX0taMBTqGDr6v58To6TmTDAjX2enrc0PycrUJ
- eHSwN9OyBqGn7HaN3MMCKetMWwR+9G5dDnphof4widx+mcuTT38YQFN3Iy6h6lcT4JWC
- a2ippbKodH4nLA14XWfD6MTCuva6DGzk6OWqk6LNRDW/blTsJ9CBbAdiCWiiQkbIzXIu
- J33g==
-X-Gm-Message-State: AOAM531FhQO2Tx6wMDeJYPhOFJ89sjiiGhwWQ/8mOxbXBOvrFxjUq2OI
- ycGN4r6lU0JPhkt/odxdzPEWXA==
-X-Google-Smtp-Source: ABdhPJyWogXUYadrmIYlTOVAmOiWCKvLf98ePUb9bk+eYAnEw0fu6gS+pqIh9UFUVKyW5djW+eF1tA==
-X-Received: by 2002:a1c:8048:: with SMTP id b69mr3221723wmd.169.1591699433292; 
- Tue, 09 Jun 2020 03:43:53 -0700 (PDT)
+ bh=dy5kY10AJguH6nm5zuGcJziOR+JWiuUYiLstcUD0qZk=;
+ b=BS3OuzREALlHcARLxAMzDBmEXcbKmxJX12bTxG//7aKRHp26Jpio+d9Owc2pXgsU6H
+ /YHjMDjg03PmdUZQ22OPHZKo2Kd/vhRGlgjWx5sxm3VmoSx17JV/wyrlTbiFQrfJVsgV
+ qdDWN9BP0G+EfTyVZmO4Fu/VOTK4TfukQmP7vx0DY/d0jnYJQsUYC+v0se+zBsLMdVZY
+ kHn3Hv+JUyWtKrEe4twdfGFS/DHq6ROZSX+AUSpVYP0lozpfgbOICGBLDdU5Ck7DZtPo
+ 0c0u10n4ovck4vRMXmtyiK6aNdrgA3aRjz2Jyk5G7GM8mcdrCduV2k3S6lkVYis0H75E
+ 0M7Q==
+X-Gm-Message-State: AOAM532Jxi9vYMugKfj9ZyDMYZ4whnqUD7knHjacRL78zzF5HZyDp+KY
+ iU5at4PFmRcQzQQV7dMIEXoIMMTvNuI=
+X-Google-Smtp-Source: ABdhPJz3iHK5lkzaenpWXyBjTRzpO64yfh61d8MdJg5fMgpcKHoS5EBvIXmLytB88bJYERy39UQURg==
+X-Received: by 2002:a05:6000:341:: with SMTP id e1mr3712359wre.1.1591699098978; 
+ Tue, 09 Jun 2020 03:38:18 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id u74sm2510677wmu.31.2020.06.09.03.43.51
+ by smtp.gmail.com with ESMTPSA id z206sm2515600wmg.30.2020.06.09.03.38.12
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 09 Jun 2020 03:43:51 -0700 (PDT)
+ Tue, 09 Jun 2020 03:38:13 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 1485A1FF7E;
- Tue,  9 Jun 2020 11:38:12 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id C3C5A1FF91;
+ Tue,  9 Jun 2020 11:38:10 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: peter.maydell@linaro.org
-Subject: [PULL 13/17] linux-user: detect overflow of MAP_FIXED mmap
-Date: Tue,  9 Jun 2020 11:38:05 +0100
-Message-Id: <20200609103809.23443-14-alex.bennee@linaro.org>
+Subject: [PULL 05/17] .travis.yml: allow failure for unreliable hosts
+Date: Tue,  9 Jun 2020 11:37:57 +0100
+Message-Id: <20200609103809.23443-6-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200609103809.23443-1-alex.bennee@linaro.org>
 References: <20200609103809.23443-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::32a;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x32a.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::429;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x429.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -103,39 +103,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>,
+Cc: Fam Zheng <fam@euphon.net>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
- Laurent Vivier <laurent@vivier.eu>
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Relaxing the restrictions on 64 bit guests leads to the user being
-able to attempt to map right at the edge of addressable memory. This
-in turn lead to address overflow tripping the assert in page_set_flags
-when the end address wrapped around.
+They will still run but they won't get in the way of the result.
 
-Detect the wrap earlier and correctly -ENOMEM the guest (in the
-reported case LTP mmap15).
-
-Fixes: 7d8cbbabcb
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reported-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20200605154929.26910-15-alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-Id: <20200605154929.26910-6-alex.bennee@linaro.org>
 
-diff --git a/linux-user/mmap.c b/linux-user/mmap.c
-index caab62909eb..0019447892e 100644
---- a/linux-user/mmap.c
-+++ b/linux-user/mmap.c
-@@ -467,7 +467,7 @@ abi_long target_mmap(abi_ulong start, abi_ulong len, int prot,
-          * It can fail only on 64-bit host with 32-bit target.
-          * On any other target/host host mmap() handles this error correctly.
-          */
--        if (!guest_range_valid(start, len)) {
-+        if (end < start || !guest_range_valid(start, len)) {
-             errno = ENOMEM;
-             goto fail;
-         }
+diff --git a/.travis.yml b/.travis.yml
+index 564be50a3c1..ec6367af1f0 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -429,6 +429,7 @@ jobs:
+       env:
+         - TEST_CMD="make check check-tcg V=1"
+         - CONFIG="--disable-containers --target-list=${MAIN_SOFTMMU_TARGETS}"
++        - UNRELIABLE=true
+ 
+     - name: "[ppc64] GCC check-tcg"
+       arch: ppc64le
+@@ -493,6 +494,7 @@ jobs:
+       env:
+         - TEST_CMD="make check check-tcg V=1"
+         - CONFIG="--disable-containers --target-list=${MAIN_SOFTMMU_TARGETS},s390x-linux-user"
++        - UNRELIABLE=true
+       script:
+         - ( cd ${SRC_DIR} ; git submodule update --init roms/SLOF )
+         - BUILD_RC=0 && make -j${JOBS} || BUILD_RC=$?
+@@ -535,6 +537,7 @@ jobs:
+         - TEST_CMD="make check-unit"
+         - CONFIG="--disable-containers --disable-tcg --enable-kvm
+                   --disable-tools --host-cc=clang --cxx=clang++"
++        - UNRELIABLE=true
+ 
+     # Release builds
+     # The make-release script expect a QEMU version, so our tag must start with a 'v'.
+@@ -556,3 +559,5 @@ jobs:
+         - mkdir -p release-build && cd release-build
+         - ../configure ${BASE_CONFIG} ${CONFIG} || { cat config.log && exit 1; }
+         - make install
++  allow_failures:
++    - env: UNRELIABLE=true
 -- 
 2.20.1
 
