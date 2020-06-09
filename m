@@ -2,87 +2,86 @@ Return-Path: <SRS0=hUBF=7W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_SBL,URIBL_SBL_A autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58D1FC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 13:57:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD819C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 13:58:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 174A720737
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 13:57:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A60CF20737
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 13:58:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jD43VrQL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 174A720737
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MxV7Xtu1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A60CF20737
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50806 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52996 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jieki-00062O-CM
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 09:57:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52894)
+	id 1jielc-0006wl-TD
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 09:58:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52970)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <yilikernel@gmail.com>)
- id 1jiek3-0005KN-SD; Tue, 09 Jun 2020 09:56:39 -0400
-Received: from mail-yb1-xb43.google.com ([2607:f8b0:4864:20::b43]:34072)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <yilikernel@gmail.com>)
- id 1jiek2-0004vh-H1; Tue, 09 Jun 2020 09:56:39 -0400
-Received: by mail-yb1-xb43.google.com with SMTP id a80so11188969ybg.1;
- Tue, 09 Jun 2020 06:56:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=9YMnDdpKsduebgZ2lngAW8BLab3cBligQWUSvmEo8Rw=;
- b=jD43VrQLLxQefnUFmquE826io8nE6qzZgpDeBjVzRCUHBQ6OuS9O6cWlf2LAKENlOF
- 2otv9B1Gjf440UezmGsd6WCWsNM/HqIjIh6BcjFCkhuSmOopv4y/9QY07M0DIieHnfJY
- D9EDZSOYnnOPP/6NhQhD6pNJbPIeAegUNWm8aMhjU4H7z2vPl3tazcuob8OR108Dpjur
- UBYw4Nkss6eHCuiQvU/kVwf0Y37fl2OsSWTQ1CWZ00cyPMTJEFjrM++bukE6CDOxa8Ct
- FHqtR4WN/SN2AoNb1U2abb+JYyhkNThvOy3CU/zafvzv2IO2Zed+YwRPLwpXV7Axby0r
- T6YQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=9YMnDdpKsduebgZ2lngAW8BLab3cBligQWUSvmEo8Rw=;
- b=aZoS6gXsQt9jH4pV/j4j2atMptfIk3DjqoxS6QUaWSbyKU166ZJpHcCckrIqZ6RndY
- 2AbdIEsb7S00ZUnYAb58FiPFWD3l2nWe+gpmyow5leLWdviWkCaErrEXSVCUS7zym3dM
- XcfXuQvlWYCF8kumPf7Kyr/8s2k83xvrqRFkV5/jhJ/OVhnxaT3pa0YMXdnqJ7w+yOYL
- aAMxoHRaXHR3FwACHSKD+bbkT2d9GNMzYBXZuZk2wxvUEXsw0nCFkx5iUeQ8ABbWFOrr
- yAXlM+YXYFnt9/tJO3fuU6kBw04RvVtY1VJtd5Q1OLON4ytWyXuPrQPv8Qd++W/koMGO
- eTUA==
-X-Gm-Message-State: AOAM531yDGYX+Q5wTVJKCfQtf9RHGQbt5BSEeSBnZEp2zUb5BehrPJsQ
- PjzsuFoJY3fl8KODw1Mk8gnRkYFDjQ4skYLtUkU=
-X-Google-Smtp-Source: ABdhPJxU8OW9wk3q0lE9CvdTak+NbPykj/cOiQ0uMSuF1VQk60FLjbkh40Hz0LyGyiqwo0IDfcdCOMKfgX1Sh6tVX9s=
-X-Received: by 2002:a25:c1c5:: with SMTP id r188mr6426893ybf.240.1591710997122; 
- Tue, 09 Jun 2020 06:56:37 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1jiekI-0005bW-Kk
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 09:56:54 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24506
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1jiekG-0004xp-NA
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 09:56:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591711011;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=Rzn3dhP6NSLxsw34+x93NTGA8oMtGsM9DsdxOpb3a9A=;
+ b=MxV7Xtu1tLEXyNJ7M4qTZ/9O+r0Q0ZjJtYHVye4xtyoHaJ1d8Ef2WIew7XPstPW6HznI3i
+ VS++GeWoNXLfZ+dikN6pNReqon4r7v3G0roj1R9IhJboEaFgBU9Ui7WD+cOYlZXSjDVKjn
+ Zosg6o9vcXFk9l57aIeuRwZlGHlIYpw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-219-ZeO0SjQXOqCcqv-fT0DiRw-1; Tue, 09 Jun 2020 09:56:47 -0400
+X-MC-Unique: ZeO0SjQXOqCcqv-fT0DiRw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B1BC418A8223;
+ Tue,  9 Jun 2020 13:56:45 +0000 (UTC)
+Received: from dell-r430-03.lab.eng.brq.redhat.com
+ (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7CF512B4DA;
+ Tue,  9 Jun 2020 13:56:37 +0000 (UTC)
+From: Igor Mammedov <imammedo@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v5] numa: forbid '-numa node,
+ mem' for 5.1 and newer machine types
+Date: Tue,  9 Jun 2020 09:56:35 -0400
+Message-Id: <20200609135635.761587-1-imammedo@redhat.com>
 MIME-Version: 1.0
-Received: by 2002:a5b:3ca:0:0:0:0:0 with HTTP;
- Tue, 9 Jun 2020 06:56:35 -0700 (PDT)
-In-Reply-To: <CA+aFP1C-BvFM+9OTvaLD0aGramXF3+dO3pJiU5xTALTC54YTyQ@mail.gmail.com>
-References: <20200609073001.3668811-1-yili@winhong.com>
- <CA+aFP1C-BvFM+9OTvaLD0aGramXF3+dO3pJiU5xTALTC54YTyQ@mail.gmail.com>
-From: =?UTF-8?B?5p2O5LmJ?= <yilikernel@gmail.com>
-Date: Tue, 9 Jun 2020 21:56:35 +0800
-Message-ID: <CAJfdMYCS7SJ66K2F7a9qyKyP9f1Tmbe9N7qvshNe6jAZZtpWBg@mail.gmail.com>
-Subject: Re: [PATCH] rbd: Use RBD fast-diff for querying actual allocation
-To: dillaman@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::b43;
- envelope-from=yilikernel@gmail.com; helo=mail-yb1-xb43.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -10
-X-Spam_score: -1.1
-X-Spam_bar: -
-X-Spam_report: (-1.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- FROM_EXCESS_BASE64=0.979, RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=imammedo@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 01:38:49
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -3
+X-Spam_score: -0.4
+X-Spam_bar: /
+X-Spam_report: (-0.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001, URIBL_SBL=1.623,
+ URIBL_SBL_A=0.1 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,148 +94,231 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf <kwolf@redhat.com>, =?UTF-8?B?5p2O5LmJ?= <yilikernel@gmail.com>,
- qemu-block <qemu-block@nongnu.org>, qemu-devel@nongnu.org,
- mreitz <mreitz@redhat.com>, Yi Li <yili@winhong.com>
+Cc: peter.maydell@linaro.org, ehabkost@redhat.com,
+ "Michael S . Tsirkin" <mst@redhat.com>, libvir-list@redhat.com,
+ Michal Privoznik <mprivozn@redhat.com>, Greg Kurz <groug@kaod.org>,
+ qemu-arm@nongnu.org, qemu-ppc@nongnu.org, pbonzini@redhat.com,
+ david@gibson.dropbear.id.au, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/9/20, Jason Dillaman <jdillama@redhat.com> wrote:
-> On Tue, Jun 9, 2020 at 3:31 AM Yi Li <yili@winhong.com> wrote:
->>
->> Since Ceph version Infernalis (9.2.0) the new fast-diff mechanism
->> of RBD allows for querying actual rbd image usage.
->>
->> Prior to this version there was no easy and fast way to query how
->> much allocation a RBD image had inside a Ceph cluster.
->>
->> To use the fast-diff feature it needs to be enabled per RBD image
->> and is only supported by Ceph cluster running version Infernalis
->> (9.2.0) or newer.
->>
->> Without the fast-diff feature enabled qemu-img will report an allocation
->> identical to the image capacity.
->>
->> 'qemu-img info rbd:cepharm/liyi-rbd' might output for example:
->>
->>   image: json:{"driver": "raw", "file": {"pool": "cepharm",
->>   "image": "liyi-rbd", "driver": "rbd"}}
->>   file format: raw
->>   virtual size: 20 GiB (21474836480 bytes)
->>   disk size: 0 B
->>   cluster_size: 4194304
->>
->> Newly created rbds will have the fast-diff feature enabled.
->>
->> Signed-off-by: Yi Li <yili@winhong.com>
->> ---
->>  block/rbd.c | 60 +++++++++++++++++++++++++++++++++++++++++++++++++++++
->>  1 file changed, 60 insertions(+)
->>
->> diff --git a/block/rbd.c b/block/rbd.c
->> index 617553b022..f231653f7b 100644
->> --- a/block/rbd.c
->> +++ b/block/rbd.c
->> @@ -1107,6 +1107,65 @@ static int64_t qemu_rbd_getlength(BlockDriverState
->> *bs)
->>      return info.size;
->>  }
->>
->> +#if LIBRBD_VERSION_CODE > 265
->> +static int disk_usage_callback(uint64_t offset, size_t len, int exists,
->> +                               void *arg)
->> +{
->> +  uint64_t *used_size = (uint64_t *)(arg);
->> +  if (exists) {
->> +    (*used_size) += len;
->> +  }
->> +  return 0;
->> +}
->> +#endif
->> +
->> +static int64_t qemu_rbd_allocated_file_size(BlockDriverState *bs)
->> +{
->> +    BDRVRBDState *s = bs->opaque;
->> +    rbd_image_info_t info;
->> +    int r;
->> +    uint64_t used_size = 0;
->> +    uint64_t features = 0;
->> +
->> +    r = rbd_stat(s->image, &info, sizeof(info));
->> +    if (r < 0) {
->> +        return r;
->> +    }
->> +
->> +    r = rbd_get_features(s->image, &features);
->> +    if (r < 0) {
->> +        return r;
->> +    }
->
-> You should probably test the flags to ensure that the
-> RBD_FLAG_FAST_DIFF_INVALID flag is not set [1]. It's potentially very
-> slow and expensive to calculate the disk usage w/o a fast-diff (on
-> large images) since it requires iterating over every possible 4MiB
-> backing data object (by default) to query its actual usage.
->
+Deprecation period is run out and it's a time to flip the switch
+introduced by cd5ff8333a.  Disable legacy option for new machine
+types (since 5.1) and amend documentation.
 
-Thanks for your review and remind me of this issue.
+'-numa node,memdev' shall be used instead of disabled option
+with new machine types.
 
->> +   /*
->> +    * rbd_diff_iterate2() is available in versions above Ceph 0.94
->> (Hammer)
->> +    * It uses a object map inside Ceph which is faster than
->> rbd_diff_iterate()
->> +    * which iterates all objects.
->> +    * LIBRBD_VERSION_CODE for Ceph 0.94 is 265. In 266 and upwards
->> diff_iterate2
->> +    * is available
->> +    */
->> +#if LIBRBD_VERSION_CODE > 265
->> +    if (features & RBD_FEATURE_FAST_DIFF) {
->> +
->> +        /*
->> +         * RBD image fast-diff feature enabled
->> +         * Querying for actual allocation.
->> +         */
->> +        r = rbd_diff_iterate2(s->image, NULL, 0, info.size, 0, 1,
->> +                              &disk_usage_callback,
->> +                              &used_size);
->> +        if (r < 0) {
->> +            return r;
->> +        }
->> +    } else {
->> +        used_size = info.size;
->> +    }
->> +#else
->> +    used_size = info.size;
->> +#endif
->> +    return used_size;
->> +}
->> +
->>  static int coroutine_fn qemu_rbd_co_truncate(BlockDriverState *bs,
->>                                               int64_t offset,
->>                                               bool exact,
->> @@ -1316,6 +1375,7 @@ static BlockDriver bdrv_rbd = {
->>      .bdrv_get_info          = qemu_rbd_getinfo,
->>      .create_opts            = &qemu_rbd_create_opts,
->>      .bdrv_getlength         = qemu_rbd_getlength,
->> +    .bdrv_get_allocated_file_size = qemu_rbd_allocated_file_size,
->>      .bdrv_co_truncate       = qemu_rbd_co_truncate,
->>      .protocol_name          = "rbd",
->>
->> --
->> 2.25.3
->>
->>
->>
->>
->
-> [1]
-> https://github.com/libvirt/libvirt/commit/21deeaf02fdf216b08210fc899579736973ca81d#diff-107c5451015e5980c90048ff615becb8
->
-> --
-> Jason
->
->
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Michal Privoznik <mprivozn@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+---
+v1:
+ - rebased on top of current master
+ - move compat mode from 4.2 to 5.0
+v2:
+ - move deprecation text to recently removed section
+v3:
+ - increase title line length for (deprecated.rst)
+     '``-numa node,mem=``\ *size* (removed in 5.1)'
+v4:
+ - use error_append_hint() for suggesting valid CLI
+v5:
+ - add "\n" at the end of error_append_hint()
+ - fix gramar/spelling in moved deprecation text
+
+CC: peter.maydell@linaro.org
+CC: ehabkost@redhat.com
+CC: marcel.apfelbaum@gmail.com
+CC: mst@redhat.com
+CC: pbonzini@redhat.com
+CC: rth@twiddle.net
+CC: david@gibson.dropbear.id.au
+CC: libvir-list@redhat.com
+CC: qemu-arm@nongnu.org
+CC: qemu-ppc@nongnu.org
+CC: eblake@redhat.com
+CC: groug@kaod.org
+---
+ docs/system/deprecated.rst | 37 ++++++++++++++++++++-----------------
+ hw/arm/virt.c              |  2 +-
+ hw/core/numa.c             |  7 +++++++
+ hw/i386/pc.c               |  1 -
+ hw/i386/pc_piix.c          |  1 +
+ hw/i386/pc_q35.c           |  1 +
+ hw/ppc/spapr.c             |  2 +-
+ qemu-options.hx            |  9 +++++----
+ 8 files changed, 36 insertions(+), 24 deletions(-)
+
+diff --git a/docs/system/deprecated.rst b/docs/system/deprecated.rst
+index 544ece0a45..72666ac764 100644
+--- a/docs/system/deprecated.rst
++++ b/docs/system/deprecated.rst
+@@ -101,23 +101,6 @@ error in the future.
+ The ``-realtime mlock=on|off`` argument has been replaced by the
+ ``-overcommit mem-lock=on|off`` argument.
+ 
+-``-numa node,mem=``\ *size* (since 4.1)
+-'''''''''''''''''''''''''''''''''''''''
+-
+-The parameter ``mem`` of ``-numa node`` is used to assign a part of
+-guest RAM to a NUMA node. But when using it, it's impossible to manage specified
+-RAM chunk on the host side (like bind it to a host node, setting bind policy, ...),
+-so guest end-ups with the fake NUMA configuration with suboptiomal performance.
+-However since 2014 there is an alternative way to assign RAM to a NUMA node
+-using parameter ``memdev``, which does the same as ``mem`` and adds
+-means to actualy manage node RAM on the host side. Use parameter ``memdev``
+-with *memory-backend-ram* backend as an replacement for parameter ``mem``
+-to achieve the same fake NUMA effect or a properly configured
+-*memory-backend-file* backend to actually benefit from NUMA configuration.
+-In future new machine versions will not accept the option but it will still
+-work with old machine types. User can check QAPI schema to see if the legacy
+-option is supported by looking at MachineInfo::numa-mem-supported property.
+-
+ ``-numa`` node (without memory specified) (since 4.1)
+ '''''''''''''''''''''''''''''''''''''''''''''''''''''
+ 
+@@ -516,3 +499,23 @@ long starting at 1MiB, the old command::
+ can be rewritten as::
+ 
+   qemu-nbd -t --image-opts driver=raw,offset=1M,size=100M,file.driver=qcow2,file.file.driver=file,file.file.filename=file.qcow2
++
++Command line options
++--------------------
++
++``-numa node,mem=``\ *size* (removed in 5.1)
++''''''''''''''''''''''''''''''''''''''''''''
++
++The parameter ``mem`` of ``-numa node`` was used to assign a part of
++guest RAM to a NUMA node. But when using it, it's impossible to manage a specified
++RAM chunk on the host side (like bind it to a host node, setting bind policy, ...),
++so the guest ends up with the fake NUMA configuration with suboptiomal performance.
++However since 2014 there is an alternative way to assign RAM to a NUMA node
++using parameter ``memdev``, which does the same as ``mem`` and adds
++means to actually manage node RAM on the host side. Use parameter ``memdev``
++with *memory-backend-ram* backend as replacement for parameter ``mem``
++to achieve the same fake NUMA effect or a properly configured
++*memory-backend-file* backend to actually benefit from NUMA configuration.
++New machine versions (since 5.1) will not accept the option but it will still
++work with old machine types. User can check the QAPI schema to see if the legacy
++option is supported by looking at MachineInfo::numa-mem-supported property.
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 37462a6f78..063d4703f7 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -2262,7 +2262,6 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
+     hc->pre_plug = virt_machine_device_pre_plug_cb;
+     hc->plug = virt_machine_device_plug_cb;
+     hc->unplug_request = virt_machine_device_unplug_request_cb;
+-    mc->numa_mem_supported = true;
+     mc->nvdimm_supported = true;
+     mc->auto_enable_numa_with_memhp = true;
+     mc->default_ram_id = "mach-virt.ram";
+@@ -2375,6 +2374,7 @@ DEFINE_VIRT_MACHINE_AS_LATEST(5, 1)
+ static void virt_machine_5_0_options(MachineClass *mc)
+ {
+     virt_machine_5_1_options(mc);
++    mc->numa_mem_supported = true;
+ }
+ DEFINE_VIRT_MACHINE(5, 0)
+ 
+diff --git a/hw/core/numa.c b/hw/core/numa.c
+index 316bc50d75..a935640962 100644
+--- a/hw/core/numa.c
++++ b/hw/core/numa.c
+@@ -117,6 +117,13 @@ static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
+     }
+ 
+     if (node->has_mem) {
++        if (!mc->numa_mem_supported) {
++            error_setg(errp, "Parameter -numa node,mem is not supported by this"
++                      " machine type");
++            error_append_hint(errp, "Use -numa node,memdev instead\n");
++            return;
++        }
++
+         numa_info[nodenr].node_mem = node->mem;
+         if (!qtest_enabled()) {
+             warn_report("Parameter -numa node,mem is deprecated,"
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 2128f3d6fe..a86136069c 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1960,7 +1960,6 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
+     hc->unplug = pc_machine_device_unplug_cb;
+     mc->default_cpu_type = TARGET_DEFAULT_CPU_TYPE;
+     mc->nvdimm_supported = true;
+-    mc->numa_mem_supported = true;
+     mc->default_ram_id = "pc.ram";
+ 
+     object_class_property_add(oc, PC_MACHINE_DEVMEM_REGION_SIZE, "int",
+diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+index f66e1d73ce..8955436efa 100644
+--- a/hw/i386/pc_piix.c
++++ b/hw/i386/pc_piix.c
+@@ -438,6 +438,7 @@ static void pc_i440fx_5_0_machine_options(MachineClass *m)
+     pc_i440fx_5_1_machine_options(m);
+     m->alias = NULL;
+     m->is_default = false;
++    m->numa_mem_supported = true;
+     compat_props_add(m->compat_props, hw_compat_5_0, hw_compat_5_0_len);
+     compat_props_add(m->compat_props, pc_compat_5_0, pc_compat_5_0_len);
+ }
+diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+index 4ba8ac8774..af6b32adb7 100644
+--- a/hw/i386/pc_q35.c
++++ b/hw/i386/pc_q35.c
+@@ -366,6 +366,7 @@ static void pc_q35_5_0_machine_options(MachineClass *m)
+ {
+     pc_q35_5_1_machine_options(m);
+     m->alias = NULL;
++    m->numa_mem_supported = true;
+     compat_props_add(m->compat_props, hw_compat_5_0, hw_compat_5_0_len);
+     compat_props_add(m->compat_props, pc_compat_5_0, pc_compat_5_0_len);
+ }
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 3b1a5ed865..210d61d1b3 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -4511,7 +4511,6 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
+      * in which LMBs are represented and hot-added
+      */
+     mc->numa_mem_align_shift = 28;
+-    mc->numa_mem_supported = true;
+     mc->auto_enable_numa = true;
+ 
+     smc->default_caps.caps[SPAPR_CAP_HTM] = SPAPR_CAP_OFF;
+@@ -4599,6 +4598,7 @@ static void spapr_machine_5_0_class_options(MachineClass *mc)
+ {
+     spapr_machine_5_1_class_options(mc);
+     compat_props_add(mc->compat_props, hw_compat_5_0, hw_compat_5_0_len);
++    mc->numa_mem_supported = true;
+ }
+ 
+ DEFINE_SPAPR_MACHINE(5_0, "5.0", false);
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 93bde2bbc8..196f468786 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -239,10 +239,11 @@ SRST
+         -numa node,nodeid=0 -numa node,nodeid=1 \
+         -numa cpu,node-id=0,socket-id=0 -numa cpu,node-id=1,socket-id=1
+ 
+-    '\ ``mem``\ ' assigns a given RAM amount to a node. '\ ``memdev``\ '
+-    assigns RAM from a given memory backend device to a node. If
+-    '\ ``mem``\ ' and '\ ``memdev``\ ' are omitted in all nodes, RAM is
+-    split equally between them.
++    Legacy '\ ``mem``\ ' assigns a given RAM amount to a node (not supported
++    for 5.1 and newer machine types). '\ ``memdev``\ ' assigns RAM from
++    a given memory backend device to a node. If '\ ``mem``\ ' and
++    '\ ``memdev``\ ' are omitted in all nodes, RAM is split equally between them.
++
+ 
+     '\ ``mem``\ ' and '\ ``memdev``\ ' are mutually exclusive.
+     Furthermore, if one node uses '\ ``memdev``\ ', all of them have to
+-- 
+2.26.2
+
 
