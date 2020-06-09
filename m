@@ -6,78 +6,92 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A592BC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 16:13:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 377DAC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 16:17:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6B6F220760
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 16:13:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F15E320760
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 16:17:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QRDoi2QD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B6F220760
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NJAS0Ha5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F15E320760
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56956 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36386 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jigs5-0007uj-6i
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 12:13:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43522)
+	id 1jigvu-0003Kv-2B
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 12:17:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44848)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jigla-0007wL-2J
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 12:06:22 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:39578
+ (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1jigsi-0000h3-74
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 12:13:44 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:44615
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jiglY-0004Jm-0c
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 12:06:21 -0400
+ (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1jigsf-0005lc-Di
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 12:13:42 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591718778;
+ s=mimecast20190719; t=1591719219;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=MH2y5hdKyKWamfkscXeCoZyov5Qz8+OiniqspCNJ1sQ=;
- b=QRDoi2QDyji+7ZwUYf9TeW6uIx8/+tMHykc9ZplV8M34HYPitMQfT6q+AthvGHOaKomq8w
- RgQPGQC9zOBChM8fol2eSz/pNpJGcCwH0pp/dOphQHWHKHUHm6OgHkWKCNiehcg9WKu8rh
- 1grUkCHFfRDJze1pOzqAOQHfnglK55Y=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-97-r-NcVRxPM4-YqGtocYqfCw-1; Tue, 09 Jun 2020 12:06:14 -0400
-X-MC-Unique: r-NcVRxPM4-YqGtocYqfCw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 689171883607;
- Tue,  9 Jun 2020 16:06:12 +0000 (UTC)
-Received: from gondolin (ovpn-114-205.ams2.redhat.com [10.36.114.205])
- by smtp.corp.redhat.com (Postfix) with ESMTP id F16765C1C5;
- Tue,  9 Jun 2020 16:06:01 +0000 (UTC)
-Date: Tue, 9 Jun 2020 18:05:59 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Subject: Re: [PATCH v2 1/1] virtio-ccw: auto-manage VIRTIO_F_IOMMU_PLATFORM
- if PV
-Message-ID: <20200609180559.52298647.cohuck@redhat.com>
-In-Reply-To: <20200609174747.4e300818@ibm-vm>
-References: <20200514221155.32079-1-pasic@linux.ibm.com>
- <20200520121507-mutt-send-email-mst@kernel.org>
- <20200606013217.2cffa3ed.pasic@linux.ibm.com>
- <20200608181428.3c6f127c.cohuck@redhat.com>
- <20200608190045.319dd68b.pasic@linux.ibm.com>
- <20200609084402.35d317ec.cohuck@redhat.com>
- <20200609114130.0ca9190b.pasic@linux.ibm.com>
- <20200609174747.4e300818@ibm-vm>
-Organization: Red Hat GmbH
+ bh=GPwOf/4bt1/9O35BGeywpEzk760Tv43YHQl3Y49qU5k=;
+ b=NJAS0Ha5eK5FYYgRm8KbV9FRf9bWpPN8mw2jxaWT1cStTc9SJ5+DpAlxa5B9EhE2uWz2tu
+ w8doqn6eCSdot8Bucq/25bDld4DmHdsnVbojtsKWWVSrqGKOclur1+2cBSycEe0g7ayQ27
+ vNSVNv5CprS7Tp/opuFy+ucqyPTjjRo=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-277-sTd9fg2jO_WCrmZ23-jHoA-1; Tue, 09 Jun 2020 12:13:37 -0400
+X-MC-Unique: sTd9fg2jO_WCrmZ23-jHoA-1
+Received: by mail-qv1-f69.google.com with SMTP id w3so17104464qvl.9
+ for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 09:13:37 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=GPwOf/4bt1/9O35BGeywpEzk760Tv43YHQl3Y49qU5k=;
+ b=W0qxGbImFIr36XY1cMJ7Gq49stjFjY5FmrcXieScKHvmEdoXigmQK32kHTuElMFzJz
+ kq6glsOvx9TNJH0qhiMuMFhnKA2kmb33YbxAK1xgT6pvkvSBK8s/Jk6vtWMCYjN1f/2O
+ 52EWt1C2NEiUkJuhJyw3TpRYH6RLmChq/p8vYcORBbY/m5+PR3QN9Z/pzzybuVZibFts
+ n9zo5O9qTzGcfqUiNRKfmyEmPZNtib2EX66vVFScUFLRBiaF8dqeaAz+uLJx0G4WbJkl
+ MD7WiFle8Y6IVUodj2TPco3l1XTOzryVtOVt3VfZtsUG8BPmn9R1PkTiUQi9KakHm3NF
+ Eu7w==
+X-Gm-Message-State: AOAM532fAa/1E/t0hE85TQdh5t1oBSThYR7wBDT2XRkvqK3FLAawJ5Bl
+ AKlMrvV/0bVdDdqYi1pdLYQjGP/9vXtPxT0gEfgOcl6Gsafz2JHOj0yMEzrTCHEiicG+wz2GrK3
+ x0sOHXT8rpHhhqpo=
+X-Received: by 2002:a05:620a:c0f:: with SMTP id
+ l15mr27340830qki.175.1591719217033; 
+ Tue, 09 Jun 2020 09:13:37 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwAFgHXKG1gxl1ky2XfQ10wqeAa56tMgNJEb/4w6bkjtFNzbyaWKsuy6MQN7U3cgQLpmCGyrA==
+X-Received: by 2002:a05:620a:c0f:: with SMTP id
+ l15mr27340784qki.175.1591719216623; 
+ Tue, 09 Jun 2020 09:13:36 -0700 (PDT)
+Received: from xz-x1 ([2607:9880:19c0:32::2])
+ by smtp.gmail.com with ESMTPSA id 207sm9405944qki.134.2020.06.09.09.13.35
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 09 Jun 2020 09:13:35 -0700 (PDT)
+Date: Tue, 9 Jun 2020 12:13:28 -0400
+From: Peter Xu <peterx@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH] pci: Display PCI IRQ pin in "info pci"
+Message-ID: <20200609161328.GB3061@xz-x1>
+References: <20200317195908.283800-1-peterx@redhat.com>
+ <6beb4b5d-91c6-2536-64ab-18217be71134@redhat.com>
+ <20200317201153.GB233068@xz-x1>
+ <2847e5da-4cc3-8273-f51f-86b0995943de@redhat.com>
+ <20200609114913-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <20200609114913-mutt-send-email-mst@kernel.org>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=cohuck@redhat.com;
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=peterx@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/08 23:42:34
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -100,57 +114,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Boris Fiuczynski <fiuczy@linux.ibm.com>,
- Janosch Frank <frankja@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>,
- David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Viktor Mihajlovski <mihajlov@linux.ibm.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Julia Suvorova <jusual@redhat.com>, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 9 Jun 2020 17:47:47 +0200
-Claudio Imbrenda <imbrenda@linux.ibm.com> wrote:
-
-> On Tue, 9 Jun 2020 11:41:30 +0200
-> Halil Pasic <pasic@linux.ibm.com> wrote:
+On Tue, Jun 09, 2020 at 11:49:49AM -0400, Michael S. Tsirkin wrote:
+> > > > > @@ -417,8 +419,8 @@
+> > > > >    { 'struct': 'PciDeviceInfo',
+> > > > >      'data': {'bus': 'int', 'slot': 'int', 'function': 'int',
+> > > > >               'class_info': 'PciDeviceClass', 'id': 'PciDeviceId',
+> > > > > -           '*irq': 'int', 'qdev_id': 'str', '*pci_bridge': 'PciBridgeInfo',
+> > > > > -           'regions': ['PciMemoryRegion']} }
+> > > > > +           '*irq': 'int', 'irq_pin': 'int', 'qdev_id': 'str',
+> > > > > +           '*pci_bridge': 'PciBridgeInfo', 'regions': ['PciMemoryRegion'] }}
+> > > > 
+> > > > and the pre-existing pci_bridge is indeed the consistency issue.
+> > > 
+> > > Yeh, actually every key in this struct. :)
+> > 
+> > Using 'irq-pin':
+> > Reviewed-by: Philippe Mathieu-DaudÃÂ© <philmd@redhat.com>
 > 
-> [...]
 > 
-> > I don't know. Janosch could answer that, but he is on vacation. Adding
-> > Claudio maybe he can answer. My understanding is, that while it might
-> > be possible, it is ugly at best. The ability to do a transition is
-> > indicated by a CPU model feature. Indicating the feature to the guest
-> > and then failing the transition sounds wrong to me.  
-> 
-> I agree. If the feature is advertised, then it has to work. I don't
-> think we even have an architected way to fail the transition for that
-> reason.
-> 
-> What __could__ be done is to prevent qemu from even starting if an
-> incompatible device is specified together with PV.
+> Peter can you fix and repost pls?
 
-Seems reasonable, if an incompatible device can crash the whole guest.
-Better not even let it start. (And prevent hotplugging it into a
-running guest.)
+I still think irq_pin is better because as I mentioned previously all the
+existing keys are using underscores...  Phil?
 
-> 
-> Another option is to disable PV at the qemu level if an incompatible
-> device is present. This will have the effect that trying to boot a
-> secure guest will fail mysteriously, which is IMHO also not too great.
+Thanks,
 
-Yes, if that is not architected, and no other possible failure code can
-map to that case.
-
-> 
-> do we really have that many incompatible devices?
-
-Which devices are compatible in the end? It seems the only ones that
-are known to be working are virtio-ccw devices with IOMMU_PLATFORM on.
-virtio-pci devices and non-virtio ccw (vfio-ccw, 3270) seem to be out,
-as far as I understand it. What about non-ccw? PCI in general, vfio-ap?
+-- 
+Peter Xu
 
 
