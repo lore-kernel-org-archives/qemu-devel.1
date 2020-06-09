@@ -2,85 +2,81 @@ Return-Path: <SRS0=hUBF=7W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-14.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 279BDC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 20:14:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE96AC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 20:14:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E54D22065C
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 20:14:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 550872065C
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 20:14:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FOMrvHJr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E54D22065C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="meFFanmv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 550872065C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44458 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45280 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jikdk-0005kf-8L
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 16:14:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59294)
+	id 1jikdw-00064s-LB
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 16:14:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59360)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1jikZ7-0007Vb-5J
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 16:09:45 -0400
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:37886)
+ id 1jikZP-000815-Mz
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 16:10:03 -0400
+Received: from mail-pg1-x52c.google.com ([2607:f8b0:4864:20::52c]:39678)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1jikZ6-0005aI-4t
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 16:09:44 -0400
-Received: by mail-pl1-x641.google.com with SMTP id y18so17417plr.4
- for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 13:09:43 -0700 (PDT)
+ id 1jikZO-0005cr-ED
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 16:10:03 -0400
+Received: by mail-pg1-x52c.google.com with SMTP id w20so10766230pga.6
+ for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 13:10:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=mMbQhssouUvEnYpKM8BJ1rWl4q0BOBlTa248+fa3MEA=;
- b=FOMrvHJrOFSJ+/V6jlfepp24K34u2dT1Y3Ao4CiNA7GTTNvDUWqQ9tsJ3FG+TV5De8
- Z/Xlqaa6+3XV237J5yLXl5w7NpAMBzlL5bMrvqWeHeuZoQvjDukKmFQGoUFWF6z2a/ao
- VHMKOhypwPlZSOJKd3oMKdMBxJApD+Jk2eZj0J+e8V22RG4zbzZSmtadWcZqAhGe/wCv
- M9tL1NQ810u6sH5bW0uPrAmd2tJrMdyGCFfUSAsKG9Y9hq6jUM3Aa90dvewsLNTFS5EJ
- tYVquQRJoxJu8cVpHV2J0oUv5/yD3yRUiMTSmtUm4UvxX9LTzsoX3wAhGSiS1tYG+d7q
- OhmQ==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=cHjY5HzznfKw8VbLxbBOVqurhqy9xCUukR85p1gtXTQ=;
+ b=meFFanmvYve6P4U84sZWJmvNJtxvl5Odzkfx3EOOaEY5IqWwcu1Km1m14phH79lK+E
+ siDDwMZyUYpSACzfFDVm51PWeqkaCCEzWEPOtCFWKm3bivPuBYP+zmprenJG6WtDXzaC
+ eVNGbpf1vr2zkfRk8OItepu9IEUQcFqVV7O+cLN4ZeXomi5N3P8asrGpUJpZ1jGOFyQb
+ 8GjgAlYecgyA5wyUlQ3r4OUDaaXZuxyvmPHIvHv2x/98AivNrO6aHm1h1vw36xKxJ7bT
+ MchefeoniBvHVRetRX7wQxSKGs8BnpJ/x45nHcJdXojORQOXuN7bM4s4Gone8VxuV0LH
+ 6Obw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=mMbQhssouUvEnYpKM8BJ1rWl4q0BOBlTa248+fa3MEA=;
- b=J1QniRRkAApzrfaxutYEw9Tjk8pViZ44J0dntoWgmgxJueM9q+qYsfjpkIhJXe3QJN
- J560cie5N2QAVsgSSMGno7Urm+TNalYe7sTiWkHXw9w6iKwDFFS6F5PiXwfVD77MHSaz
- st0HntH8htlQ/49P2du3ghWNyauv+lpfGkYprkQHhYjOGTOAnLCW2jQVTCN/VpZqfLt6
- 4karAjYNkO3X3c07iubhEd298JZ5sq6zF4npLReBRnZAcRtlqvr4uObk9/vL/+LqLSJq
- SpV8noojaIUpOZxpAUobAaOVa/WdHxDlg0u/hXhLL3HEmr5uEJE9Ca5rY63pMxiwGiMq
- oEAw==
-X-Gm-Message-State: AOAM532IPkFuoak0YW4SQaGJEH06uSIEtoSw/AXUt8mRhHoVdAEwWNMK
- lF0xwnWv7iDkARPSt3Nuz3N+6A41YYIWmw==
-X-Google-Smtp-Source: ABdhPJzxlvdrBCnUEM7RPIO3vWT52v7eeiJzh6mCaIf7QVxvfIcuwLWBeWH2CVUQ9Bp1f1X4uyV3zg==
-X-Received: by 2002:a17:90a:df82:: with SMTP id
- p2mr6707823pjv.217.1591733382355; 
- Tue, 09 Jun 2020 13:09:42 -0700 (PDT)
+ :references;
+ bh=cHjY5HzznfKw8VbLxbBOVqurhqy9xCUukR85p1gtXTQ=;
+ b=Fe5aprxNo2W2erFC9UsLro6G/IGjM388VQV0pfqiLxMr0pMKI6OccXR7mPNzVJ92ft
+ i/osxIK22ZAC5W6AbyyfBcc18ezJo+t7pdIzwxjFiijCeknCrU2im64X+lExyyQTwP8u
+ 8g3X9WW4KG9U3VDseBBie6ceIKiTSAFas/Xs+QrInhLWipoC7Nu79f8I8uWm21UFl0Ku
+ 5FSdMeq2yc1kEBCdK//MfEnxgaHdSfG2uRNEsW/nuZVsrbuO27ZIPtunmKlHLOAV+tSw
+ Hav7JxRJoPvV348SjRvq2zbFG8WH1EL5sdsIz89XULgD0Vu9C8vICaVs9jQ3ORct2uXl
+ ZCWA==
+X-Gm-Message-State: AOAM530xr2PqBahfSbj9xyHFacb45J9WpF0OmGYYNevp5EOyPHYlMFdN
+ m0ofy99W46QEs1mm7fLjxaAebDA0SEhjUQ==
+X-Google-Smtp-Source: ABdhPJyTysgoZ3Lbeg8LtOxKKhDI98mw0xurs+9pgRIytjwTseN0pyz7We8x3Kd2vlZamEf6L7oeRQ==
+X-Received: by 2002:aa7:8b56:: with SMTP id i22mr26717403pfd.63.1591733400654; 
+ Tue, 09 Jun 2020 13:10:00 -0700 (PDT)
 Received: from Rfoley-MA01.hsd1.ma.comcast.net
  ([2601:199:4480:60c0:1d09:cef2:3b1f:abce])
- by smtp.gmail.com with ESMTPSA id n19sm10523374pfu.194.2020.06.09.13.09.40
+ by smtp.gmail.com with ESMTPSA id n19sm10523374pfu.194.2020.06.09.13.09.58
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 09 Jun 2020 13:09:41 -0700 (PDT)
+ Tue, 09 Jun 2020 13:09:59 -0700 (PDT)
 From: Robert Foley <robert.foley@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 04/13] cputlb: destroy CPUTLB with tlb_destroy
-Date: Tue,  9 Jun 2020 16:07:29 -0400
-Message-Id: <20200609200738.445-5-robert.foley@linaro.org>
+Subject: [PATCH v3 13/13] tests:  Disable select tests under TSan,
+ which hit TSan issue.
+Date: Tue,  9 Jun 2020 16:07:38 -0400
+Message-Id: <20200609200738.445-14-robert.foley@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200609200738.445-1-robert.foley@linaro.org>
 References: <20200609200738.445-1-robert.foley@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::641;
- envelope-from=robert.foley@linaro.org; helo=mail-pl1-x641.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::52c;
+ envelope-from=robert.foley@linaro.org; helo=mail-pg1-x52c.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -102,91 +98,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: robert.foley@linaro.org, cota@braap.org,
- Paolo Bonzini <pbonzini@redhat.com>, peter.puhov@linaro.org,
- alex.bennee@linaro.org, Richard Henderson <rth@twiddle.net>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ robert.foley@linaro.org, cota@braap.org, Paolo Bonzini <pbonzini@redhat.com>,
+ peter.puhov@linaro.org, alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Emilio G. Cota" <cota@braap.org>
+Disable a few tests under CONFIG_TSAN, which
+run into a known TSan issue that results in a hang.
+https://github.com/google/sanitizers/issues/1116
 
-I was after adding qemu_spin_destroy calls, but while at
-it I noticed that we are leaking some memory.
+The disabled tests under TSan include all the qtests as well as
+the test-char, test-qga, and test-qdev-global-props.
 
-Signed-off-by: Emilio G. Cota <cota@braap.org>
 Signed-off-by: Robert Foley <robert.foley@linaro.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Emilio G. Cota <cota@braap.org>
 ---
- accel/tcg/cputlb.c      | 15 +++++++++++++++
- exec.c                  |  1 +
- include/exec/exec-all.h |  8 ++++++++
- 3 files changed, 24 insertions(+)
+ tests/Makefile.include       | 9 +++++++--
+ tests/qtest/Makefile.include | 7 +++++--
+ 2 files changed, 12 insertions(+), 4 deletions(-)
 
-diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-index eb2cf9de5e..1e815357c7 100644
---- a/accel/tcg/cputlb.c
-+++ b/accel/tcg/cputlb.c
-@@ -270,6 +270,21 @@ void tlb_init(CPUState *cpu)
-     }
- }
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index c2397de8ed..8d82c24d83 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -55,7 +55,6 @@ SYSEMU_TARGET_LIST := $(subst -softmmu.mak,,$(notdir \
  
-+void tlb_destroy(CPUState *cpu)
-+{
-+    CPUArchState *env = cpu->env_ptr;
-+    int i;
-+
-+    qemu_spin_destroy(&env_tlb(env)->c.lock);
-+    for (i = 0; i < NB_MMU_MODES; i++) {
-+        CPUTLBDesc *desc = &env_tlb(env)->d[i];
-+        CPUTLBDescFast *fast = &env_tlb(env)->f[i];
-+
-+        g_free(fast->table);
-+        g_free(desc->iotlb);
-+    }
-+}
-+
- /* flush_all_helper: run fn across all cpus
-  *
-  * If the wait flag is set then the src cpu's helper will be queued as
-diff --git a/exec.c b/exec.c
-index be4be2df3a..79211fb23d 100644
---- a/exec.c
-+++ b/exec.c
-@@ -892,6 +892,7 @@ void cpu_exec_unrealizefn(CPUState *cpu)
- {
-     CPUClass *cc = CPU_GET_CLASS(cpu);
+ check-unit-y += tests/check-qdict$(EXESUF)
+ check-unit-y += tests/check-block-qdict$(EXESUF)
+-check-unit-$(CONFIG_SOFTMMU) += tests/test-char$(EXESUF)
+ check-unit-y += tests/check-qnum$(EXESUF)
+ check-unit-y += tests/check-qstring$(EXESUF)
+ check-unit-y += tests/check-qlist$(EXESUF)
+@@ -108,7 +107,6 @@ check-unit-y += tests/test-qht$(EXESUF)
+ check-unit-y += tests/test-qht-par$(EXESUF)
+ check-unit-y += tests/test-bitops$(EXESUF)
+ check-unit-y += tests/test-bitcnt$(EXESUF)
+-check-unit-$(CONFIG_SOFTMMU) += tests/test-qdev-global-props$(EXESUF)
+ check-unit-y += tests/check-qom-interface$(EXESUF)
+ check-unit-y += tests/check-qom-proplist$(EXESUF)
+ check-unit-y += tests/test-qemu-opts$(EXESUF)
+@@ -123,9 +121,16 @@ check-speed-$(CONFIG_BLOCK) += tests/benchmark-crypto-cipher$(EXESUF)
+ check-unit-$(CONFIG_BLOCK) += tests/test-crypto-secret$(EXESUF)
+ check-unit-$(call land,$(CONFIG_BLOCK),$(CONFIG_GNUTLS)) += tests/test-crypto-tlscredsx509$(EXESUF)
+ check-unit-$(call land,$(CONFIG_BLOCK),$(CONFIG_GNUTLS)) += tests/test-crypto-tlssession$(EXESUF)
++ifndef CONFIG_TSAN
++# Some tests: test-char, test-qdev-global-props, and test-qga,
++# are not runnable under TSan due to a known issue.
++# https://github.com/google/sanitizers/issues/1116
++check-unit-$(CONFIG_SOFTMMU) += tests/test-char$(EXESUF)
++check-unit-$(CONFIG_SOFTMMU) += tests/test-qdev-global-props$(EXESUF)
+ ifneq (,$(findstring qemu-ga,$(TOOLS)))
+ check-unit-$(call land,$(CONFIG_LINUX),$(CONFIG_VIRTIO_SERIAL)) += tests/test-qga$(EXESUF)
+ endif
++endif
+ check-unit-$(CONFIG_SOFTMMU) += tests/test-timed-average$(EXESUF)
+ check-unit-$(call land,$(CONFIG_SOFTMMU),$(CONFIG_INOTIFY1)) += tests/test-util-filemonitor$(EXESUF)
+ check-unit-$(CONFIG_SOFTMMU) += tests/test-util-sockets$(EXESUF)
+diff --git a/tests/qtest/Makefile.include b/tests/qtest/Makefile.include
+index 9e5a51d033..71fd714a2a 100644
+--- a/tests/qtest/Makefile.include
++++ b/tests/qtest/Makefile.include
+@@ -313,12 +313,15 @@ tests/qtest/tpm-tis-device-test$(EXESUF): tests/qtest/tpm-tis-device-test.o test
+ # QTest rules
  
-+    tlb_destroy(cpu);
-     cpu_list_remove(cpu);
+ TARGETS=$(patsubst %-softmmu,%, $(filter %-softmmu,$(TARGET_DIRS)))
++QTEST_TARGETS =
++# The qtests are not runnable (yet) under TSan due to a known issue.
++# https://github.com/google/sanitizers/issues/1116
++ifndef CONFIG_TSAN
+ ifeq ($(CONFIG_POSIX),y)
+ QTEST_TARGETS = $(TARGETS)
+ check-qtest-y=$(foreach TARGET,$(TARGETS), $(check-qtest-$(TARGET)-y:%=tests/qtest/%$(EXESUF)))
+ check-qtest-y += $(check-qtest-generic-y:%=tests/qtest/%$(EXESUF))
+-else
+-QTEST_TARGETS =
++endif
+ endif
  
-     if (cc->vmsd != NULL) {
-diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
-index 8792bea07a..3cf88272df 100644
---- a/include/exec/exec-all.h
-+++ b/include/exec/exec-all.h
-@@ -124,6 +124,11 @@ void cpu_address_space_init(CPUState *cpu, int asidx,
-  * @cpu: CPU whose TLB should be initialized
-  */
- void tlb_init(CPUState *cpu);
-+/**
-+ * tlb_destroy - destroy a CPU's TLB
-+ * @cpu: CPU whose TLB should be destroyed
-+ */
-+void tlb_destroy(CPUState *cpu);
- /**
-  * tlb_flush_page:
-  * @cpu: CPU whose TLB should be flushed
-@@ -284,6 +289,9 @@ void tlb_set_page(CPUState *cpu, target_ulong vaddr,
- static inline void tlb_init(CPUState *cpu)
- {
- }
-+static inline void tlb_destroy(CPUState *cpu)
-+{
-+}
- static inline void tlb_flush_page(CPUState *cpu, target_ulong addr)
- {
- }
+ qtest-obj-y = tests/qtest/libqtest.o $(test-util-obj-y)
 -- 
 2.17.1
 
