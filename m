@@ -7,60 +7,61 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C347C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 20:58:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77B81C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 20:59:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CBBDE20734
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 20:58:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4242F20734
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 20:59:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RqOZjeeq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CBBDE20734
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NrfPwt5B"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4242F20734
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55232 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56468 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jilKi-0002i8-U5
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 16:58:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36424)
+	id 1jilLH-0003Cz-Ie
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 16:59:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36390)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jilF0-0001rY-Q4
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 16:53:02 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31486
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jilEy-0001nN-Oj
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 16:53:00 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:44726
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jilEz-0005dd-J3
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 16:53:02 -0400
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jilEx-0005cu-FW
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 16:53:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591735980;
+ s=mimecast20190719; t=1591735978;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=WEkFixcghBG95mVzHuhBJJZD+q/fjGfb5A7T/Fd/47w=;
- b=RqOZjeeqZYsDCysBBpvu1+bMFzK3Bow1cG1ebKvg5+TLMOOHNqBJOfXpFIuFUmJF1NrqPx
- ie1mUfklq1PcbPuuxTRDfSmwYCaPTSuXe+Wb3i9lde4a9ZrKX7bSifPx55ht0gcLCKcu3m
- 8RO592Q/aNqTprDuWCJLCH6I+Cvu2qE=
+ bh=xT7Dl2Np4lOx6956wQcDiocA0YR43F2Wm7BjuOHNaGo=;
+ b=NrfPwt5BkCmfKj5dTmk2+Got1gQtRDEHzZV7xZ7WiZLZ0iPiG4v0S4EzJt6+3P64hTjKx2
+ Z/QQmSaJ29mJ03H96MoaT/oRV/bnjm1mlxUQkpNwTQleN53CUDxZQhgPovxZaVtvhsFuqP
+ OdV7Di0bqPwpHUEjvd5KjURMXJWD/dI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-84-p1FUhIoYND2-yKKr4R44BQ-1; Tue, 09 Jun 2020 16:52:55 -0400
-X-MC-Unique: p1FUhIoYND2-yKKr4R44BQ-1
+ us-mta-307-hK0iZE50NXuPlW9nJy6RyA-1; Tue, 09 Jun 2020 16:52:56 -0400
+X-MC-Unique: hK0iZE50NXuPlW9nJy6RyA-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A5F8F19200C3;
- Tue,  9 Jun 2020 20:52:54 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 554AA8015CE;
+ Tue,  9 Jun 2020 20:52:55 +0000 (UTC)
 Received: from blue.redhat.com (ovpn-113-22.phx2.redhat.com [10.3.113.22])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 29BB56116D;
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CD94F60C80;
  Tue,  9 Jun 2020 20:52:54 +0000 (UTC)
 From: Eric Blake <eblake@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 11/15] qcow2_format.py: QcowHeaderExtension: add dump method
-Date: Tue,  9 Jun 2020 15:52:41 -0500
-Message-Id: <20200609205245.3548257-12-eblake@redhat.com>
+Subject: [PULL 12/15] qcow2_format: refactor QcowHeaderExtension as a subclass
+ of Qcow2Struct
+Date: Tue,  9 Jun 2020 15:52:42 -0500
+Message-Id: <20200609205245.3548257-13-eblake@redhat.com>
 In-Reply-To: <20200609205245.3548257-1-eblake@redhat.com>
 References: <20200609205245.3548257-1-eblake@redhat.com>
 MIME-Version: 1.0
@@ -69,9 +70,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=eblake@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 02:44:16
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 16:46:48
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -103,56 +104,100 @@ Sender: "Qemu-devel"
 
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Obviously, for-loop body in dump_extensions should be the dump method
-of extension.
+Only two fields we can parse by generic code, but that is better than
+nothing. Keep further refactoring of variable-length fields for another
+day.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Message-Id: <20200606081806.23897-11-vsementsov@virtuozzo.com>
+Message-Id: <20200606081806.23897-12-vsementsov@virtuozzo.com>
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- tests/qemu-iotests/qcow2_format.py | 22 ++++++++++++----------
- 1 file changed, 12 insertions(+), 10 deletions(-)
+ tests/qemu-iotests/qcow2_format.py | 53 +++++++++++++++++++++---------
+ 1 file changed, 37 insertions(+), 16 deletions(-)
 
 diff --git a/tests/qemu-iotests/qcow2_format.py b/tests/qemu-iotests/qcow2_format.py
-index 74a82f9263d4..d4ad5431b296 100644
+index d4ad5431b296..32371e42da4e 100644
 --- a/tests/qemu-iotests/qcow2_format.py
 +++ b/tests/qemu-iotests/qcow2_format.py
-@@ -108,6 +108,17 @@ class QcowHeaderExtension:
-         self.length = length
-         self.data = data
+@@ -97,16 +97,41 @@ class Qcow2Struct(metaclass=Qcow2StructMeta):
+             print('{:<25} {}'.format(f[2], value_str))
 
-+    def dump(self):
-+        data = self.data[:self.length]
-+        if all(c in string.printable.encode('ascii') for c in data):
-+            data = f"'{ data.decode('ascii') }'"
+
+-class QcowHeaderExtension:
++class QcowHeaderExtension(Qcow2Struct):
+
+-    def __init__(self, magic, length, data):
+-        if length % 8 != 0:
+-            padding = 8 - (length % 8)
+-            data += b'\0' * padding
++    fields = (
++        ('u32', '{:#x}', 'magic'),
++        ('u32', '{}', 'length')
++        # length bytes of data follows
++        # then padding to next multiply of 8
++    )
+
+-        self.magic = magic
+-        self.length = length
+-        self.data = data
++    def __init__(self, magic=None, length=None, data=None, fd=None):
++        """
++        Support both loading from fd and creation from user data.
++        For fd-based creation current position in a file will be used to read
++        the data.
++
++        This should be somehow refactored and functionality should be moved to
++        superclass (to allow creation of any qcow2 struct), but then, fields
++        of variable length (data here) should be supported in base class
++        somehow. So, it's a TODO. We'll see how to properly refactor this when
++        we have more qcow2 structures.
++        """
++        if fd is None:
++            assert all(v is not None for v in (magic, length, data))
++            self.magic = magic
++            self.length = length
++            if length % 8 != 0:
++                padding = 8 - (length % 8)
++                data += b'\0' * padding
++            self.data = data
 +        else:
-+            data = '<binary>'
-+
-+        print(f'{"magic":<25} {self.magic:#x}')
-+        print(f'{"length":<25} {self.length}')
-+        print(f'{"data":<25} {data}')
-+
-     @classmethod
-     def create(cls, magic, data):
-         return QcowHeaderExtension(magic, len(data), data)
-@@ -210,15 +221,6 @@ class QcowHeader(Qcow2Struct):
++            assert all(v is None for v in (magic, length, data))
++            super().__init__(fd=fd)
++            padded = (self.length + 7) & ~7
++            self.data = fd.read(padded)
++            assert self.data is not None
 
-     def dump_extensions(self):
-         for ex in self.extensions:
--
--            data = ex.data[:ex.length]
--            if all(c in string.printable.encode('ascii') for c in data):
--                data = f"'{ data.decode('ascii') }'"
--            else:
--                data = '<binary>'
--
-             print('Header extension:')
--            print(f'{"magic":<25} {ex.magic:#x}')
--            print(f'{"length":<25} {ex.length}')
--            print(f'{"data":<25} {data}')
-+            ex.dump()
-             print()
+     def dump(self):
+         data = self.data[:self.length]
+@@ -115,8 +140,7 @@ class QcowHeaderExtension:
+         else:
+             data = '<binary>'
+
+-        print(f'{"magic":<25} {self.magic:#x}')
+-        print(f'{"length":<25} {self.length}')
++        super().dump()
+         print(f'{"data":<25} {data}')
+
+     @classmethod
+@@ -182,14 +206,11 @@ class QcowHeader(Qcow2Struct):
+             end = self.cluster_size
+
+         while fd.tell() < end:
+-            (magic, length) = struct.unpack('>II', fd.read(8))
+-            if magic == 0:
++            ext = QcowHeaderExtension(fd=fd)
++            if ext.magic == 0:
+                 break
+             else:
+-                padded = (length + 7) & ~7
+-                data = fd.read(padded)
+-                self.extensions.append(QcowHeaderExtension(magic, length,
+-                                                           data))
++                self.extensions.append(ext)
+
+     def update_extensions(self, fd):
+
 -- 
 2.27.0
 
