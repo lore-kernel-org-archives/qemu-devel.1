@@ -2,86 +2,93 @@ Return-Path: <SRS0=hUBF=7W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5B64C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 10:28:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7BE2C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 10:39:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D367207F9
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 10:28:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8FAC5207C3
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 10:39:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="POeucemb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D367207F9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kiZKRZ2k"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FAC5207C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55418 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34950 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jibUF-00054k-PK
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 06:28:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58294)
+	id 1jibfP-0000hv-NE
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 06:39:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59246)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1jibTd-0004bU-EK
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 06:27:29 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:45160
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1jibTa-0002oh-2u
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 06:27:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591698444;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=4YJQYefwOc1J5JzaKwpgCXA3KWlCr7bbf14WZd5wEAo=;
- b=POeucemb2I4QUc36e8tZMJ0QHCnA1TZpwu+9vJS40PsRWw2Kqn4+Xg2b7GaSHFt7ck0REC
- Cmg+TsBt5kEnMD6ELh0m1LSL2iJvs0aQo/Ul/qWQUrOjlgE9XYzbMxi2wDg7acFF3M0Rx/
- yKb/wEwVDTpwpWmGz34jxybMeoe9vi8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-181-vkqhnXJNOQWGystSpaam2w-1; Tue, 09 Jun 2020 06:27:14 -0400
-X-MC-Unique: vkqhnXJNOQWGystSpaam2w-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1A30D464;
- Tue,  9 Jun 2020 10:27:13 +0000 (UTC)
-Received: from localhost (ovpn-115-52.ams2.redhat.com [10.36.115.52])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DBA1B385;
- Tue,  9 Jun 2020 10:27:09 +0000 (UTC)
-Date: Tue, 9 Jun 2020 11:27:08 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Alexander Bulekov <alxndr@bu.edu>
-Subject: Re: [PATCH v2] fuzz: add oss-fuzz build.sh script
-Message-ID: <20200609102708.GC92564@stefanha-x1.localdomain>
-References: <20200605175028.5626-1-alxndr@bu.edu>
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jibe3-0007Ze-6I
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 06:38:15 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:38341)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jibe1-0004N2-NF
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 06:38:14 -0400
+Received: by mail-wr1-x441.google.com with SMTP id e1so20735409wrt.5
+ for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 03:38:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=ue+XYO4pQ+xQADc7eWTs2mgiQ9kkm7yM6Dj9MusQ59I=;
+ b=kiZKRZ2k5fqEHB+r7k9W5Sb+eX8XaJXjwrWQFb/xzp4JwBhpa+VqM/B9lZYHxtV9N1
+ IZ+ynS3oUoLIy5crink33VWb/qkhAKQ623zcVOIUmOv3pwPP90TeIBxQWxgB9nTNg1ob
+ 43RdCHjI2puR0ffiIIAEsZnqspacCnyN/CLVBby/S9ycNQVQQru+sWdA4uMRHXK45xol
+ lqXaAMg7NX9lvYANv089FvxdGvxcQ1eXElH+6jYmVOx9HYsa3mclFlsVujoXV0+yydYJ
+ /OG85gzJEwBvnruqls3wrpxx0PZoA2qz/5D5+W9NoDhjN+W6bP19kOZb77kVHpTNFq1D
+ r5Kw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=ue+XYO4pQ+xQADc7eWTs2mgiQ9kkm7yM6Dj9MusQ59I=;
+ b=lBdJjHbyUQzzNU19h4RYA+S104RZmzWk8mbFcuhMjOVbYdj5OkOSXImAqRgSjNsx/n
+ l2dV2GM278yv7zQMiNvYHwRAhULjlUZrmnaN2r5KQAig2jpgxAx22j5KMaVRQnwGrdnd
+ RG4XrQlV2OuNDDqF5cbqJGVdwrdkGqYD0PWH/ohZ/591XEJvTpNQ1zd5qR1zCbwE+2pv
+ zePA+tgKnRg6WrfxWUfTAJVRL9Z79aaiIyKkqeSaRxNDhWwx8O1mgtj0Tzm/6grzyOZA
+ tFfQxST5WimAZy+NJyhhgGMbiDpsqH4cy6sLufPe1WY556wyKFRx1qryFcP8E3wAqVms
+ bmGA==
+X-Gm-Message-State: AOAM532iDpG+n/H3GHEyfolkKoVp6Krcy4gR5ntzuWgpj+Q5CHiz2zcQ
+ ozTa87XZQUd2cbgmNp9f6gEeJA==
+X-Google-Smtp-Source: ABdhPJykE8ZKH+bc+vY9DAOzeIDRz8s6lixLZ8X6wFvrrbQ7m2Ibt+RwtF1uZaNDO5agzsOOIgBUjQ==
+X-Received: by 2002:adf:f003:: with SMTP id j3mr3732733wro.228.1591699091926; 
+ Tue, 09 Jun 2020 03:38:11 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id 5sm3140415wrr.5.2020.06.09.03.38.10
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 09 Jun 2020 03:38:10 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id D4F071FF7E;
+ Tue,  9 Jun 2020 11:38:09 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: peter.maydell@linaro.org
+Subject: [PULL 00/17] testing and misc fixes
+Date: Tue,  9 Jun 2020 11:37:52 +0100
+Message-Id: <20200609103809.23443-1-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20200605175028.5626-1-alxndr@bu.edu>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="NKoe5XOeduwbEQHU"
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=stefanha@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/08 23:42:34
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x441.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,92 +101,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: darren.kenny@oracle.com, bsd@redhat.com, qemu-devel@nongnu.org,
- f4bug@amsat.org
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---NKoe5XOeduwbEQHU
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+The following changes since commit 49ee11555262a256afec592dfed7c5902d5eefd2:
 
-On Fri, Jun 05, 2020 at 01:50:28PM -0400, Alexander Bulekov wrote:
-> It is neater to keep this in the QEMU repo, since any change that
-> requires an update to the oss-fuzz build configuration, can make the
-> necessary changes in the same series.
->=20
-> Suggested-by: Philippe Mathieu-Daude <f4bug@amsat.org>
-> Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
-> ---
->=20
-> v2 updates the script header comment.
->=20
->  scripts/oss-fuzz/build.sh | 50 +++++++++++++++++++++++++++++++++++++++
->  1 file changed, 50 insertions(+)
->  create mode 100755 scripts/oss-fuzz/build.sh
+  Merge remote-tracking branch 'remotes/vivier2/tags/linux-user-for-5.1-pull-request' into staging (2020-06-08 11:04:57 +0100)
 
-Please add a MAINTAINERS file entry.
+are available in the Git repository at:
 
-> diff --git a/scripts/oss-fuzz/build.sh b/scripts/oss-fuzz/build.sh
-> new file mode 100755
-> index 0000000000..e93d6f2e03
-> --- /dev/null
-> +++ b/scripts/oss-fuzz/build.sh
-> @@ -0,0 +1,50 @@
-> +#!/bin/sh
-> +#
-> +# OSS-Fuzz build script. See:
-> +# https://google.github.io/oss-fuzz/getting-started/new-project-guide/#b=
-uildsh
-> +#
-> +# This code is licensed under the GPL version 2 or later.  See
-> +# the COPYING file in the top-level directory.
-> +#
-> +
-> +# build project
-> +# e.g.
-> +# ./autogen.sh
-> +# ./configure
-> +# make -j$(nproc) all
-> +
-> +# build fuzzers
-> +# e.g.
-> +# $CXX $CXXFLAGS -std=3Dc++11 -Iinclude \
-> +#     /path/to/name_of_fuzzer.cc -o $OUT/name_of_fuzzer \
-> +#     $LIB_FUZZING_ENGINE /path/to/library.a
-> +
-> +mkdir -p $OUT/lib/              # Shared libraries
-> +
-> +# Build once to get the list of dynamic lib paths, and copy them over
-> +./configure --datadir=3D"./data/" --disable-werror --cc=3D"$CC" --cxx=3D=
-"$CXX" \
-> +    --extra-cflags=3D"$CFLAGS -U __OPTIMIZE__ "
+  https://github.com/stsquad/qemu.git tags/pull-testing-and-misc-080620-1
 
-If you respin, please extract -U __OPTIMIZE__ into a separate variable
-with a doc comment.
+for you to fetch changes up to a5b04ccd742f6c58a1d305530d9e07ad9731b8e6:
 
-# Explanation for why __OPTIMIZE__ needs to be undefined goes here...
-EXTRA_CFLAGS=3D"$CFLAGS -U __OPTIMIZE__"
+  scripts/coverity-scan: Remove flex/bison packages (2020-06-08 17:04:19 +0100)
 
-This will help others understand why this build flag is needed.
+----------------------------------------------------------------
+Various testing and misc fixes:
 
---NKoe5XOeduwbEQHU
-Content-Type: application/pgp-signature; name="signature.asc"
+  - header cleanups for plugins
+  - support wider watchpoints
+  - tweaks for unreliable and broken CI
+  - docker image fixes and verion bumps
+  - linux-user guest_base fixes
+  - remove flex/bison from various test images
 
------BEGIN PGP SIGNATURE-----
+----------------------------------------------------------------
+Alex Bennée (10):
+      tests/plugin: correctly honour io_count
+      exec: flush the whole TLB if a watchpoint crosses a page boundary
+      .travis.yml: allow failure for unreliable hosts
+      .shippable: temporaily disable some cross builds
+      tests/docker: fix pre-requisite for debian-tricore-cross
+      hw/virtio/vhost: re-factor vhost-section and allow DIRTY_MEMORY_CODE
+      linux-user: provide fallback pgd_find_hole for bare chroots
+      linux-user: deal with address wrap for ARM_COMMPAGE on 32 bit
+      tests/tcg: add simple commpage test case
+      linux-user: detect overflow of MAP_FIXED mmap
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl7fY/wACgkQnKSrs4Gr
-c8jepQf/f7N9DDkjKqqNK+LDRGarTytiLkzt7t/Czm3/3YZhyNHBZCxdZICYkwJn
-ojUV5IT1wxRrVop5UfETnLHvRpG39g2o0pjI3ezUc42dm2auEKpFM8WTI/ZSZKhT
-7W/attAdW7pgOHwRmqJIC9tdV9XqHUe2LlJaCe6dijFgBEhwMBnH/3i/iL+ZMjwe
-XRzVWcVMMqeI0X9dvH5B6Om3ZC0E52kZmQjtcK+mdf3ml1hlPuSEXRjPoqcXsScb
-D1ISe+CV7NrPRJM1M5347U0x89GZ9SMOLz7/mt9pNhcSto1fbwii9IMARUxHuIY3
-bG64oYEzE4og78DtCpXLm0RYNwq0Dw==
-=Zo7l
------END PGP SIGNATURE-----
+Emilio G. Cota (1):
+      qemu-plugin.h: add missing include <stddef.h> to define size_t
 
---NKoe5XOeduwbEQHU--
+Paolo Bonzini (1):
+      docker: update Ubuntu to 20.04
+
+Philippe Mathieu-Daudé (5):
+      scripts/clean-includes: Mark 'qemu/qemu-plugin.h' as special header
+      tests/docker: Remove flex/bison packages
+      tests/vm: Remove flex/bison packages
+      cirrus-ci: Remove flex/bison packages
+      scripts/coverity-scan: Remove flex/bison packages
+
+ include/qemu/qemu-plugin.h                         |  1 +
+ exec.c                                             |  8 ++-
+ hw/virtio/vhost.c                                  | 57 ++++++++++++-----
+ linux-user/elfload.c                               | 71 +++++++++++++++++++---
+ linux-user/mmap.c                                  |  2 +-
+ tests/plugin/mem.c                                 |  2 +-
+ tests/tcg/arm/commpage.c                           | 61 +++++++++++++++++++
+ .cirrus.yml                                        |  2 +-
+ .shippable.yml                                     | 12 ++--
+ .travis.yml                                        |  5 ++
+ hw/virtio/trace-events                             |  3 +-
+ scripts/clean-includes                             |  1 +
+ scripts/coverity-scan/coverity-scan.docker         |  2 -
+ tests/docker/Makefile.include                      |  2 +-
+ tests/docker/dockerfiles/centos7.docker            |  2 -
+ tests/docker/dockerfiles/centos8.docker            |  2 -
+ .../docker/dockerfiles/debian-xtensa-cross.docker  |  2 -
+ tests/docker/dockerfiles/debian10.docker           |  2 -
+ tests/docker/dockerfiles/debian9.docker            |  2 -
+ tests/docker/dockerfiles/fedora.docker             |  2 -
+ tests/docker/dockerfiles/ubuntu.docker             |  4 +-
+ tests/docker/dockerfiles/ubuntu1804.docker         |  2 +-
+ tests/tcg/arm/Makefile.target                      |  2 +
+ tests/vm/fedora                                    |  1 -
+ tests/vm/freebsd                                   |  1 -
+ tests/vm/netbsd                                    |  1 -
+ tests/vm/openbsd                                   |  1 -
+ tests/vm/ubuntu.i386                               |  2 +-
+ 28 files changed, 195 insertions(+), 60 deletions(-)
+ create mode 100644 tests/tcg/arm/commpage.c
+
+-- 
+2.20.1
 
 
