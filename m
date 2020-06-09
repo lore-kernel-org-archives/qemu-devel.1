@@ -2,90 +2,126 @@ Return-Path: <SRS0=hUBF=7W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4ABF6C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 13:08:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80C61C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 13:09:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1A12D20734
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 13:08:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 48C0220734
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 13:09:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hXVwpWqh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A12D20734
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eErqspCy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48C0220734
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41400 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45688 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jidzD-0003bL-8d
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 09:08:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47084)
+	id 1jie0b-0005Mg-Jo
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 09:09:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47188)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <atar4qemu@gmail.com>)
- id 1jidyb-00039O-Py
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 09:07:37 -0400
-Received: from mail-il1-x143.google.com ([2607:f8b0:4864:20::143]:38573)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <atar4qemu@gmail.com>)
- id 1jidya-0004n7-Od
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 09:07:37 -0400
-Received: by mail-il1-x143.google.com with SMTP id b5so20225217iln.5
- for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 06:07:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=pXFTLjYkOP1A0xWhzVRdBZjZMZodMb+7rQNJes+y4zU=;
- b=hXVwpWqhy1l7F5QBWyz66qOo/0vWACpchYZ7c1no1QIuX9b4toYCcHT131T2Wr3NQg
- eDMei9AaZSYIn8htOuTfao/WzIZzXdIZj+HTFQZxulWwC7R+bec/bcwfRWYRnb5LVWrN
- PytKO8vIzBJdomm6pNcWPtFVM6dEpF2tm/ijR/QC920bKmAZHug72c21kVvI6+/cXJaa
- Q+Vda0wtvR7ivqVZe1eY/I7ydFjXd0rd0HMjy4EnwFQXnK2irlxq05YvmZVomFnyC9jc
- NrZXIKYaGVhQu8M6ZtS/4oNwwEWR5F+q/r4ZqiXgi6/vTSHrZGIseyPBIum6Bg0r+Ed7
- 5ouA==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jidzs-0004RF-0r
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 09:08:56 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30226
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jidzq-0004uP-4w
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 09:08:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591708132;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=Se0+q4dY2rAqPs9HNkytIA4ts2DUOjEu+sf89BpgX7E=;
+ b=eErqspCy9rvL4fwcRoCjO6NQ8RqcrvL7ZKuzFYRiZyF6FciNvfQ7OWAZJbn3Q6ySOlkaXz
+ cd+E2K7QenmdAd4ri0lOl/TOT1m3cJqARlsCmnLnCiuntsrQnZkzjI4Q8ecb6FAMdy+QwS
+ vDAZKH2GjmJWCRBdMfPO+cm0LJ4CLnM=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-347-CVxAksr2PN6F_eui1YZnag-1; Tue, 09 Jun 2020 09:08:49 -0400
+X-MC-Unique: CVxAksr2PN6F_eui1YZnag-1
+Received: by mail-wm1-f70.google.com with SMTP id v24so701987wmh.3
+ for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 06:08:49 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=pXFTLjYkOP1A0xWhzVRdBZjZMZodMb+7rQNJes+y4zU=;
- b=JOO0GJDG+A5I74NLWQJFkQpXCkoSabJtB+yoHnj4cb3rpQKVsrKkZ8i5zjPCAvAETv
- PLAavzKt/+NQg8Ko9udEvli1SIqxBdbFnWLZ57um7xn30M4CF61d98btkuySq1iRTLb8
- a9laCVkkAIO7oRSxVEC+frQ8k02HLictq8etXUOcs9/OvxKlTmwr8Uja7Ix46TLI/+yy
- OB6kF94WdkpoOtio2TlfEWSSQm+C7aO/jIbX9iNUyF85nk7RbpMh3/rdUNKb+T/SN9oP
- HkcUyUysJ43tQ4T7+0sGb7KjHhrkOUt/4Skib993RW92e4ULM/v4scjEEaF+HtDItTZa
- G/JQ==
-X-Gm-Message-State: AOAM530gQZoAJQTBP9pZyN6RcSAfRW4ZQNDMk25Y6KRH7gz/gNAXGgIe
- n5nZuJkci1Vp885mZSffmoaEAJy7tlKBkSu5+8Q=
-X-Google-Smtp-Source: ABdhPJxJ797Ho0x36TQp9/mvxon6jsmJ2CEWWxJBLGIHbY62TRoXuobwfX7E1QxhXqYEKjMAZ81pZquZFPgB4EoFtOE=
-X-Received: by 2002:a92:a1c9:: with SMTP id b70mr27447402ill.198.1591708055341; 
- Tue, 09 Jun 2020 06:07:35 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=Se0+q4dY2rAqPs9HNkytIA4ts2DUOjEu+sf89BpgX7E=;
+ b=b29DcQ4Yw+vY0cTKlkrtlP6gRUHP4MYUjRBNsRGUsiQqrUOjN9BdKxLPPbgKH6ZFQy
+ O4RwaN2V1WrqAWIXZyKv5NzqUPhv0JGYXiV6+nUXWjCy7bV8Fz5+ibWFtPYTAJRIM6H/
+ nJkAykzPMkzGe54Sl3TCSOze2S+t24G5vWwtSZGcKUx3lfaVRptdlxo+p+bB4oKy6uVi
+ Nxd1ckF7jwzLGTOAQ/8plh8/o+WWYLAj+6ZcPX7nfhoSQPacTBC6DJx1T3tjxpF7sby3
+ jLiQB2JzCchSxhnNlsiphl1/N/YAoTNGCfDdPN6S/r9loN4hJIoycdQJikJhjQvSQiBk
+ Z93w==
+X-Gm-Message-State: AOAM532RTds1JBxE2AfCX9cKB1vJquRrDSekORYPpgi/ElFkB2c6SFT9
+ yoiYtZ4nD2ncn9F9D6Rsr6FvRIMpts7Ddz8lSNXbgNfZctLfF9kRKldx/QlzC0c+d9NSn/UPpCK
+ Qnoi+g1sGfpGnpUI=
+X-Received: by 2002:adf:f6ce:: with SMTP id y14mr4572814wrp.90.1591708128521; 
+ Tue, 09 Jun 2020 06:08:48 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz8uqE+vIqFkhuO/RKYL+GVpIW8C4k60ZmpdFaoNKGqixCXnAcGZNWoWmVkT+hdIO1aFukB4A==
+X-Received: by 2002:adf:f6ce:: with SMTP id y14mr4572786wrp.90.1591708128249; 
+ Tue, 09 Jun 2020 06:08:48 -0700 (PDT)
+Received: from [192.168.1.38] (181.red-88-10-103.dynamicip.rima-tde.net.
+ [88.10.103.181])
+ by smtp.gmail.com with ESMTPSA id l204sm3011392wmf.19.2020.06.09.06.08.47
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 09 Jun 2020 06:08:47 -0700 (PDT)
+Subject: Re: [PATCH v3 0/3] python/machine.py: refactor shutdown
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
+References: <20200604195252.20739-1-jsnow@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <8bd27ec8-1bb6-45e2-a43a-7e0229065414@redhat.com>
+Date: Tue, 9 Jun 2020 15:08:46 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-References: <20200609122339.937862-1-armbru@redhat.com>
- <20200609122339.937862-22-armbru@redhat.com>
-In-Reply-To: <20200609122339.937862-22-armbru@redhat.com>
-From: Artyom Tarasenko <atar4qemu@gmail.com>
-Date: Tue, 9 Jun 2020 15:07:23 +0200
-Message-ID: <CACXAS8CPhkjs8GDHm0c63C7JFBKtuVMZc9uJRL7Ykmfu42oXQA@mail.gmail.com>
-Subject: Re: [PATCH v3 21/24] sparc/leon3: Fix to put grlib,
- * devices on sysbus
-To: Markus Armbruster <armbru@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::143;
- envelope-from=atar4qemu@gmail.com; helo=mail-il1-x143.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+In-Reply-To: <20200604195252.20739-1-jsnow@redhat.com>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 01:38:49
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,79 +134,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com, Eduardo Habkost <ehabkost@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- qemu-devel <qemu-devel@nongnu.org>, Fabien Chouteau <chouteau@adacore.com>,
- KONRAD Frederic <frederic.konrad@adacore.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: kwolf@redhat.com, Markus Armbruster <armbru@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jun 9, 2020 at 2:23 PM Markus Armbruster <armbru@redhat.com> wrote:
->
-> leon3_generic_hw_init() creates a "grlib,ahbpnp" and a "grlib,apbpnp"
-> sysbus device in a way that leaves them unplugged.
->
-> Create them the common way that puts them into the main system bus.
-> Affects machine leon3_generic.  Visible in "info qtree":
->
->      bus: main-system-bus
->        type System
->     +  dev: grlib,ahbpnp, id ""
->     +    mmio 00000000fffff000/0000000000001000
->     +  dev: grlib,apbpnp, id ""
->     +    mmio 00000000800ff000/0000000000001000
->        dev: grlib,irqmp, id ""
->
-> Cc: Fabien Chouteau <chouteau@adacore.com>
-> Cc: KONRAD Frederic <frederic.konrad@adacore.com>
-> Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> Cc: Artyom Tarasenko <atar4qemu@gmail.com>
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> Reviewed-by: KONRAD Frederic <frederic.konrad@adacore.com>
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Hi John,
 
-Acked-by: Artyom Tarasenko <atar4qemu@gmail.com>
+On 6/4/20 9:52 PM, John Snow wrote:
+> v3:
+>  - Split _post_shutdown refactor into own patch (now 1/3)
+>  - Re-add sigkill warning squelch (now 3/3)
+> 
+> NOTE: I re-added the squelch in its own patch for review purposes, but
+> for the purposes of avoiding temporary breakage, a maintainer may wish
+> to squash patches 2 and 3 if they are accepted.
+> 
+> v2: Philippe took patches 1, 3 and 4.
+> 
+> This is a re-write of what was:
+> [PATCH RFC 03/32] python//machine.py: remove bare except
+> [PATCH 2/4] python/machine.py: remove bare except
+> 
+> It's a bit heavier handed, but it should address some of kwolf's
+> feedback from the RFC version.
+> 
+> Applies straight to origin/master, ought to pass pylint and flake8:
+> 
+>> cd ~/src/qemu/python/qemu
+>> pylint *.py
+>> flake8 *.py
+> 
+> John Snow (3):
+>   python/machine.py: consolidate _post_shutdown()
+>   python/machine.py: refactor shutdown
+>   python/machine.py: re-add sigkill warning suppression
+> 
+>  python/qemu/machine.py | 100 +++++++++++++++++++++++++++++------------
+>  1 file changed, 71 insertions(+), 29 deletions(-)
+> 
 
-> ---
->  hw/sparc/leon3.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/hw/sparc/leon3.c b/hw/sparc/leon3.c
-> index 8f024dab7b..3facb8c2ae 100644
-> --- a/hw/sparc/leon3.c
-> +++ b/hw/sparc/leon3.c
-> @@ -213,14 +213,14 @@ static void leon3_generic_hw_init(MachineState *mac=
-hine)
->      reset_info->sp    =3D LEON3_RAM_OFFSET + ram_size;
->      qemu_register_reset(main_cpu_reset, reset_info);
->
-> -    ahb_pnp =3D GRLIB_AHB_PNP(object_new(TYPE_GRLIB_AHB_PNP));
-> +    ahb_pnp =3D GRLIB_AHB_PNP(qdev_create(NULL, TYPE_GRLIB_AHB_PNP));
->      object_property_set_bool(OBJECT(ahb_pnp), true, "realized", &error_f=
-atal);
->      sysbus_mmio_map(SYS_BUS_DEVICE(ahb_pnp), 0, LEON3_AHB_PNP_OFFSET);
->      grlib_ahb_pnp_add_entry(ahb_pnp, 0, 0, GRLIB_VENDOR_GAISLER,
->                              GRLIB_LEON3_DEV, GRLIB_AHB_MASTER,
->                              GRLIB_CPU_AREA);
->
-> -    apb_pnp =3D GRLIB_APB_PNP(object_new(TYPE_GRLIB_APB_PNP));
-> +    apb_pnp =3D GRLIB_APB_PNP(qdev_create(NULL, TYPE_GRLIB_APB_PNP));
->      object_property_set_bool(OBJECT(apb_pnp), true, "realized", &error_f=
-atal);
->      sysbus_mmio_map(SYS_BUS_DEVICE(apb_pnp), 0, LEON3_APB_PNP_OFFSET);
->      grlib_ahb_pnp_add_entry(ahb_pnp, LEON3_APB_PNP_OFFSET, 0xFFF,
-> --
-> 2.26.2
->
+I'm now seeing this error:
 
+21:31:58 DEBUG| / # reboot
+21:32:01 DEBUG| / # reboot: Restarting system
+21:32:01 DEBUG| >>> {'execute': 'quit'}
+21:32:01 WARNI| qemu received signal 9; command:
+"mips-softmmu/qemu-system-mips -display none -vga none -chardev
+socket,id=mon,path=/tmp/tmp679upvrk/qemu-10292-monitor.sock -mon
+chardev=mon,mode=control -machine malta -chardev
+socket,id=console,path=/tmp/tmp679upvrk/qemu-10292-console.sock,server,nowait
+-serial chardev:console -kernel
+/tmp/avocado_b3aaagr9/avocado_job_5bj0xe1h/12-tests_acceptance_boot_linux_console.py_BootLinuxConsole.test_mips_malta_cpio/boot/vmlinux-4.5.0-2-4kc-malta
+-initrd
+/tmp/avocado_b3aaagr9/avocado_job_5bj0xe1h/12-tests_acceptance_boot_linux_console.py_BootLinuxConsole.test_mips_malta_cpiorootfs.cpio
+-append printk.time=0 console=ttyS0 console=tty rdinit=/sbin/init
+noreboot -no-reboot"
+21:32:01 ERROR|
+21:32:01 ERROR| Reproduced traceback from:
+/home/travis/build/philmd/qemu/build/tests/venv/lib/python3.6/site-packages/avocado/core/test.py:886
+21:32:01 ERROR| Traceback (most recent call last):
+21:32:01 ERROR|   File
+"/home/travis/build/philmd/qemu/build/tests/acceptance/avocado_qemu/__init__.py",
+line 195, in tearDown
+21:32:01 ERROR|     vm.shutdown()
+21:32:01 ERROR|   File
+"/home/travis/build/philmd/qemu/python/qemu/machine.py", line 449, in
+shutdown
+21:32:01 ERROR|     self._do_shutdown(has_quit)
+21:32:01 ERROR|   File
+"/home/travis/build/philmd/qemu/python/qemu/machine.py", line 426, in
+_do_shutdown
+21:32:01 ERROR|     self._soft_shutdown(has_quit, timeout)
+21:32:01 ERROR|   File
+"/home/travis/build/philmd/qemu/python/qemu/machine.py", line 413, in
+_soft_shutdown
+21:32:01 ERROR|     self._qmp.cmd('quit')
+21:32:01 ERROR|   File
+"/home/travis/build/philmd/qemu/python/qemu/qmp.py", line 271, in cmd
+21:32:01 ERROR|     return self.cmd_obj(qmp_cmd)
+21:32:01 ERROR|   File
+"/home/travis/build/philmd/qemu/python/qemu/qmp.py", line 249, in cmd_obj
+21:32:01 ERROR|     self.__sock.sendall(json.dumps(qmp_cmd).encode('utf-8'))
+21:32:01 ERROR| BrokenPipeError: [Errno 32] Broken pipe
+21:32:01 ERROR|
+21:32:01 DEBUG| DATA (filename=output.expected) => NOT FOUND (data
+sources: variant, test, file)
+21:32:01 DEBUG| DATA (filename=stdout.expected) => NOT FOUND (data
+sources: variant, test, file)
+21:32:01 DEBUG| DATA (filename=stderr.expected) => NOT FOUND (data
+sources: variant, test, file)
+21:32:01 DEBUG| Not logging /var/log/syslog (lack of permissions)
+21:32:01 ERROR| ERROR
+12-tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_mips_malta_cpio
+-> TestSetupFail: [Errno 32] Broken pipe
+21:32:01 INFO |
 
---=20
-Regards,
-Artyom Tarasenko
+https://travis-ci.org/github/philmd/qemu/jobs/696142277#L5329
 
-SPARC and PPC PReP under qemu blog: http://tyom.blogspot.com/search/label/q=
-emu
 
