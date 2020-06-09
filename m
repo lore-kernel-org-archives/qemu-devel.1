@@ -1,86 +1,92 @@
 Return-Path: <SRS0=hUBF=7W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: **
-X-Spam-Status: No, score=2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7A7EC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 11:54:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74C0DC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 12:11:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6DC352078C
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 11:54:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3E633206A4
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 12:11:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gkovwpeR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DC352078C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hfhVQjCb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E633206A4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40136 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49036 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jicpu-0003Rm-Nx
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 07:54:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38074)
+	id 1jid6R-0008O2-IF
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 08:11:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40158)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
- id 1jicpK-000318-Rx
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 07:53:58 -0400
-Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:42162)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
- id 1jicpJ-0008Ts-Vz
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 07:53:58 -0400
-Received: by mail-wr1-x42c.google.com with SMTP id p5so20945512wrw.9
- for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 04:53:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=W9rtZMnFfHVqq4WWlnRO3AXWNNYYVG6o/bhND9jW2IA=;
- b=gkovwpeRirxa99WQLXLF+btnS8pQCyAxXWI5ysZ3Sft87zTtUVJetSab5Hl21Iom8A
- BE2xM0x7A3ixeIiv+WcW0AVvzazP3Fm7SK6jB/28/otIOki/S85q6yGyBlzJkzhSgPDz
- NS17o9CZh7U7aH0cqBcFeGfFnDq867feT/FD+gUt9FAUq8sFU6WUp2m4O5JVOtEOGeP2
- MOFTTohJz4oTJmTrAD4mRrgPULPVK996cIrnFN+h9EQuO02xJF9ThcumPlh6toAsqliY
- eeIRCO7emGkn9i96djtqNrlqiV/Y+vkkaHEsRhgln1hE6AVL1vgeAn3iMnjkG4dJDpQf
- R1Ag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=W9rtZMnFfHVqq4WWlnRO3AXWNNYYVG6o/bhND9jW2IA=;
- b=JV3+c9PeIS1D+RNy8KotctZ4CL5bLI7aubyXDxS0zzaaLNGqWzt6WneipsurTCNrNh
- Hh4u5fbdxBRDCHkabwY1TNla/YmpkbrisKvIHWow6984+aOBv4WhTSrE+Xn2t16jcR63
- s1ibdR1mmjKgKHXYTrLXjVZDXgzmQqtcw6e+PL1Go/4jUBNhN2cwlai6UxZNlhHbBcU3
- 9v5t8di/RiajdBAzwzz/I1PN5NOjP1T+ZyvT7FVnkv4CHLO5/IJjG4kDC97ubpN7o7oz
- j08wnGEcwBJLxPjKsXdN7wCePp7dbexp27wpZihGV8hPPCFX34pqVUMKEv1+qkGXY3Y6
- CNIw==
-X-Gm-Message-State: AOAM533Fwn99SC55TFwtzY37VvLrhlLl1WenbiywI0IEmCMAIfcK1ggU
- r4ef45g2k5cfmPRGxdpUvVRqX6MOUqpIPDJ/sEI=
-X-Google-Smtp-Source: ABdhPJwDWHPFG63MGDgqc3cwil/wUcqHH55qWpcJbaRyiU41O92W6HAxQCOtG0nj8gv5ehbhFzcm0WRrLwOOjFdjxhs=
-X-Received: by 2002:adf:fec8:: with SMTP id q8mr4194024wrs.2.1591703635855;
- Tue, 09 Jun 2020 04:53:55 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1jid5Z-0007qY-4g
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 08:10:45 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49361
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1jid5W-0002vi-S8
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 08:10:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591704641;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=EEzIIZ6NuQFKV8NP4srTgJCOaFzz9+Du1cZ9KCaWsms=;
+ b=hfhVQjCbXExQiWHGwUWr+rVgGjZ+cGm8oG/yV//i6VQf8YlrBcZck2XvvxDZTr001OYllv
+ ZvytahYzLjfkEeyZs48pJTpnJc46wEfA4h84FNCJofe5pThWNm8ty4GlgUPbfj0C/x3JUA
+ 4KSFvM1jzV6AoAEDY/mG+3ahEbbIwFM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-436-rA4teudiOia7gVo58wLuiA-1; Tue, 09 Jun 2020 08:10:37 -0400
+X-MC-Unique: rA4teudiOia7gVo58wLuiA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 76A1E107ACF3;
+ Tue,  9 Jun 2020 12:10:36 +0000 (UTC)
+Received: from [10.36.114.197] (ovpn-114-197.ams2.redhat.com [10.36.114.197])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 685C62B4DF;
+ Tue,  9 Jun 2020 12:10:24 +0000 (UTC)
+Subject: Re: [RFC 5/6] bios-tables-test: Add Q35/TPM-TIS test
+To: Igor Mammedov <imammedo@redhat.com>
+References: <20200601102113.1207-1-eric.auger@redhat.com>
+ <20200601102113.1207-6-eric.auger@redhat.com>
+ <20200605171738.31ed9143@redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <44238e79-6eac-041d-5f9d-999a1e86f57c@redhat.com>
+Date: Tue, 9 Jun 2020 14:10:22 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-References: <ba26c2d65cda15b581c1a7cc7274d1b2@posteo.de>
-In-Reply-To: <ba26c2d65cda15b581c1a7cc7274d1b2@posteo.de>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 9 Jun 2020 15:53:43 +0400
-Message-ID: <CAJ+F1CKJbOJBOxpd2guyU_iuqoVYNGJWRAinGWXoPT_hqjBgSg@mail.gmail.com>
-Subject: Re: Using QXL & Spice with Windows Host & QEMU
-To: laurens.nikolaisen@posteo.de
-Content-Type: multipart/alternative; boundary="000000000000cd8cd305a7a561a2"
-Received-SPF: pass client-ip=2a00:1450:4864:20::42c;
- envelope-from=marcandre.lureau@gmail.com; helo=mail-wr1-x42c.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -10
-X-Spam_score: -1.1
-X-Spam_bar: -
-X-Spam_report: (-1.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- FROM_EXCESS_BASE64=0.979, HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200605171738.31ed9143@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.120;
+ envelope-from=eric.auger@redhat.com; helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 02:44:16
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,83 +99,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU <qemu-devel@nongnu.org>, Frediano Ziglio <fziglio@redhat.com>
+Cc: peter.maydell@linaro.org, drjones@redhat.com, mst@redhat.com,
+ philmd@redhat.com, qemu-devel@nongnu.org, shannon.zhaosl@gmail.com,
+ qemu-arm@nongnu.org, marcandre.lureau@redhat.com, eric.auger.pro@gmail.com,
+ lersek@redhat.com, ardb@kernel.org, stefanb@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000cd8cd305a7a561a2
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Hi Igor,
 
-Hi
+On 6/5/20 5:17 PM, Igor Mammedov wrote:
+> On Mon,  1 Jun 2020 12:21:12 +0200
+> Eric Auger <eric.auger@redhat.com> wrote:
+> 
+>> Test tables specific to the TPM-TIS instantiation.
+>> The TPM2 is added in the framework. Also the DSDT
+>> is updated with the TPM. The new function should be
+>> be usable for CRB as well, later one.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>> ---
+>>  tests/qtest/bios-tables-test.c | 60 ++++++++++++++++++++++++++++++++++
+>>  tests/qtest/Makefile.include   |  1 +
+>>  2 files changed, 61 insertions(+)
+>>
+>> diff --git a/tests/qtest/bios-tables-test.c b/tests/qtest/bios-tables-test.c
+>> index c9843829b3..bbba98342c 100644
+>> --- a/tests/qtest/bios-tables-test.c
+>> +++ b/tests/qtest/bios-tables-test.c
+>> @@ -57,6 +57,9 @@
+>>  #include "qemu/bitmap.h"
+>>  #include "acpi-utils.h"
+>>  #include "boot-sector.h"
+>> +#include "tpm-emu.h"
+>> +#include "hw/acpi/tpm.h"
+>> +
+>>  
+>>  #define MACHINE_PC "pc"
+>>  #define MACHINE_Q35 "q35"
+>> @@ -874,6 +877,60 @@ static void test_acpi_piix4_tcg_numamem(void)
+>>      free_test_data(&data);
+>>  }
+>>  
+>> +uint64_t tpm_tis_base_addr;
+>> +
+>> +struct tpm_test_data {
+>> +    const char *machine;
+>> +    const char *tpm_if;
+>> +};
+>> +
+>> +static void test_acpi_tcg_tpm(const void *context)
+>> +{
+> 
+> s/test_acpi_tcg_tpm/test_acpi_q35_tcg_tpm/
+> 
+> I'd try to keep test specific parameter within test function isnstead of pushing it up to main(),
+> drawback would be some code duplication for intializing test data and calling runner
+> but it's trivial and worked well so far. See for example test_acpi_piix4_tcg_bridge/test_acpi_q35_tcg_bridge. I might seem a waste but it's consictent with what we were doing
+> with bios tests.
+OK
+> 
+> 
+>> +    struct tpm_test_data *c = (struct tpm_test_data *)context;
+>> +    gchar *tmp_dir_name = g_strdup_printf("qemu-test_acpi_%s_tcg_%s.XXXXXX",
+>> +                                          c->machine, c->tpm_if);
+>> +    char *tmp_path = g_dir_make_tmp(tmp_dir_name, NULL);
+>> +    TestState test;
+>> +    test_data data;
+>> +    GThread *thread;
+>> +    char *args, *variant = g_strdup_printf(".%s", c->tpm_if);
+> maybe derive tpm_if from '.variant' if it's necessary at all?
+> 
+>> +
+>> +    tpm_tis_base_addr = TPM_TIS_ADDR_BASE;
+> hardcode it here, so in case QEMU regresses, test could notice?
+> 
+>> +
+>> +    module_call_init(MODULE_INIT_QOM);
+> why it's here
+Without it, I get
+/x86_64/acpi/q35/tpm-tis: **
+ERROR:qom/object.c:677:object_new_with_type: assertion failed: (type !=
+NULL)
 
-On Tue, Jun 9, 2020 at 3:30 PM <laurens.nikolaisen@posteo.de> wrote:
+Thanks
 
-> Hello everyone,
->
-> when using Qemu 4.2.0 with a Windows host, qemu-system-x86_64 reports:
-> "QXL VGA not available"
->
-> I used the following Qemu args for testing:
-> qemu-system-x86-x64.exe -accel hax -machine q35 -m 4GB -cdrom
-> xubuntu-20.04-desktop-amd64.iso
->
-> Using either "-vga stdt" or "-vga vmware" works. The performance is just
-> not that good.
->
-> Do I have a chance to get spice & QXL up and running with a Windows 10
-> host and
-> Qemu?
->
+Eric
 
-Frediano gave you an answer on spice-devel (
-https://lists.freedesktop.org/archives/spice-devel/2020-June/051699.html).
+> 
+>> +
+>> +    test.addr = g_new0(SocketAddress, 1);
+>> +    test.addr->type = SOCKET_ADDRESS_TYPE_UNIX;
+>> +    test.addr->u.q_unix.path = g_build_filename(tmp_path, "sock", NULL);
+>> +    g_mutex_init(&test.data_mutex);
+>> +    g_cond_init(&test.data_cond);
+>> +    test.data_cond_signal = false;
+>> +
+>> +    thread = g_thread_new(NULL, tpm_emu_ctrl_thread, &test);
+>> +    tpm_emu_test_wait_cond(&test);
+> perhaps make a separate helper function from this chunk
+> so it could be reused from other TMP test functions.
+> 
+>> +
+>> +    memset(&data, 0, sizeof(data));
+> I'd init fields with initializer, see test_acpi_virt_tcg_numamem()
+> 
+>> +    data.machine = c->machine;
+>> +    data.variant = variant;
+>> +
+>> +    args = g_strdup_printf(
+>> +        " -chardev socket,id=chr,path=%s"
+>> +        " -tpmdev emulator,id=dev,chardev=chr"
+>> +        " -device tpm-%s,tpmdev=dev",
+>> +        test.addr->u.q_unix.path, c->tpm_if);
+>> +
+>> +    test_acpi_one(args, &data);
+>> +
+>> +    g_thread_join(thread);
+>> +    g_unlink(test.addr->u.q_unix.path);
+>> +    qapi_free_SocketAddress(test.addr);
+>> +    g_rmdir(tmp_path);
+>> +    g_free(variant);
+>> +    g_free(tmp_path);
+>> +    g_free(tmp_dir_name);
+>> +    free_test_data(&data);
+>> +}
+>> +
+>>  static void test_acpi_tcg_dimm_pxm(const char *machine)
+>>  {
+>>      test_data data;
+>> @@ -1028,6 +1085,7 @@ int main(int argc, char *argv[])
+>>  {
+>>      const char *arch = qtest_get_arch();
+>>      int ret;
+>> +    struct tpm_test_data tpm_q35_tis = {MACHINE_Q35, "tis"};
+> 
+> I'd hide this within test_acpi_tcg_tpm() as it's done in other test functions
+> 
+>>  
+>>      g_test_init(&argc, &argv, NULL);
+>>  
+>> @@ -1037,6 +1095,8 @@ int main(int argc, char *argv[])
+>>              return ret;
+>>          }
+>>  
+>> +        qtest_add_data_func("acpi/q35/tpm-tis",
+>> +                            &tpm_q35_tis, test_acpi_tcg_tpm);
+>>          qtest_add_func("acpi/piix4", test_acpi_piix4_tcg);
+>>          qtest_add_func("acpi/piix4/bridge", test_acpi_piix4_tcg_bridge);
+>>          qtest_add_func("acpi/q35", test_acpi_q35_tcg);
+>> diff --git a/tests/qtest/Makefile.include b/tests/qtest/Makefile.include
+>> index 9e5a51d033..5023fa413d 100644
+>> --- a/tests/qtest/Makefile.include
+>> +++ b/tests/qtest/Makefile.include
+>> @@ -262,6 +262,7 @@ tests/qtest/hd-geo-test$(EXESUF): tests/qtest/hd-geo-test.o $(libqos-obj-y)
+>>  tests/qtest/boot-order-test$(EXESUF): tests/qtest/boot-order-test.o $(libqos-obj-y)
+>>  tests/qtest/boot-serial-test$(EXESUF): tests/qtest/boot-serial-test.o $(libqos-obj-y)
+>>  tests/qtest/bios-tables-test$(EXESUF): tests/qtest/bios-tables-test.o \
+>> +        tests/qtest/tpm-emu.o $(test-io-obj-y) \
+>>  	tests/qtest/boot-sector.o tests/qtest/acpi-utils.o $(libqos-obj-y)
+>>  tests/qtest/pxe-test$(EXESUF): tests/qtest/pxe-test.o tests/qtest/boot-sector.o $(libqos-obj-y)
+>>  tests/qtest/microbit-test$(EXESUF): tests/qtest/microbit-test.o
+> 
 
-You probably need a recent release of qemu too, and make sure to enable
-spice & qxl. How did you build qemu?
-
-Beware that Spice on Windows hasn't probably been tested much so far, you
-are on the forefront!
-
-
---=20
-Marc-Andr=C3=A9 Lureau
-
---000000000000cd8cd305a7a561a2
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr">Hi<br></div><br><div class=3D"gmail_quote=
-"><div dir=3D"ltr" class=3D"gmail_attr">On Tue, Jun 9, 2020 at 3:30 PM &lt;=
-<a href=3D"mailto:laurens.nikolaisen@posteo.de">laurens.nikolaisen@posteo.d=
-e</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin=
-:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex"=
->Hello everyone,<br>
-<br>
-when using Qemu 4.2.0 with a Windows host, qemu-system-x86_64 reports:<br>
-&quot;QXL VGA not available&quot;<br>
-<br>
-I used the following Qemu args for testing:<br>
-qemu-system-x86-x64.exe -accel hax -machine q35 -m 4GB -cdrom<br>
-xubuntu-20.04-desktop-amd64.iso<br>
-<br>
-Using either &quot;-vga stdt&quot; or &quot;-vga vmware&quot; works. The pe=
-rformance is just<br>
-not that good.<br>
-<br>
-Do I have a chance to get spice &amp; QXL up and running with a Windows 10 =
-<br>
-host and<br>
-Qemu?<br></blockquote><div><br></div><div>Frediano gave you an answer on sp=
-ice-devel (<a href=3D"https://lists.freedesktop.org/archives/spice-devel/20=
-20-June/051699.html">https://lists.freedesktop.org/archives/spice-devel/202=
-0-June/051699.html</a>).</div><div><br></div><div>You probably need a recen=
-t release of qemu too, and make sure to enable spice &amp; qxl. How did you=
- build qemu?</div><div><br></div><div>Beware that Spice on Windows hasn&#39=
-;t probably been tested much so far, you are on the forefront!</div><br cle=
-ar=3D"all"></div><br>-- <br><div dir=3D"ltr" class=3D"gmail_signature">Marc=
--Andr=C3=A9 Lureau<br></div></div>
-
---000000000000cd8cd305a7a561a2--
 
