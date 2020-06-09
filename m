@@ -7,71 +7,71 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB59AC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 07:41:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3BCBC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 07:41:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 85CDA2074B
-	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 07:41:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B23532074B
+	for <qemu-devel@archiver.kernel.org>; Tue,  9 Jun 2020 07:41:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vFbheXaj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85CDA2074B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="r9/htUar"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B23532074B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53136 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53210 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jiYtQ-0001oH-Rg
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 03:41:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40338)
+	id 1jiYtS-0001py-WD
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 03:41:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40356)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jiYkK-00049W-DR
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 03:32:32 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:40390)
+ id 1jiYkM-0004F9-RG
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 03:32:34 -0400
+Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:44821)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jiYkG-0007XM-7q
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 03:32:28 -0400
-Received: by mail-wr1-x441.google.com with SMTP id h5so20074648wrc.7
- for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 00:32:27 -0700 (PDT)
+ id 1jiYkL-0007Xy-Vk
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 03:32:34 -0400
+Received: by mail-wr1-x42c.google.com with SMTP id y17so20042787wrn.11
+ for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 00:32:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=tdQA57lBeQOvfXchna8N/D8Nyo98nJ4cAaaQhD8ORsY=;
- b=vFbheXajUu3sgB8XRH5I1gdvhMlo45aUS6lYEAEMj2oV5YCkTmn3ywN3Z1TkklURiH
- 2La1hJ+pglcsmC/8BRJBSUPnk3k/EUcOdPMRWLA9ev5lCDcHe8Dz+8WIMN3Eu1F8XrYB
- sUL+PugTmnW1ltu3HG8CXAFxhgsM6B8rbckePxW/AYNmPTwlFbCH8EKfxz67d21c5sTN
- 5ofN98W/NH+jZgAW3qr6djfq0MfImOuA7XcGoECBy+GQHbyg3KPvTbUKiOcmeDnrtSJb
- 0WL7oB4uCxgQJW1u3yNjxqOTC9tF4h88BvsBpKQignbavfpfgM9Djh/7mPgekE4F6IPj
- wI5Q==
+ bh=vkDRcgvL+D9VvdrCQbP1oNaPKjBqDOyIV9cIwQ5Bh2E=;
+ b=r9/htUarQjXUCye73m5T4O1iYdrevKTE3fpe8UDL8dg1uK5S2rRIAme+RaK7EKQq/L
+ JFoRZvryJ1LHB3YhR3UdqBmt5cExy6rIaJXDmpbwip7wYIlPWxvBHfevNexU/MpSiVBd
+ nnuEJBjtGw/zYLqyFmf/l4wVngKE2P+lEJ9CzI7kWU7ndqAbM2EgLV5Vc69hfm+lEG3T
+ 9Nv4ExZ9U5PTkc9PI0pgDRsWl5jDO/0VymdBlP50qQEsX6c77VtCDAotyjp8xDE6hTKg
+ Wx3/6IzhcWctjOXsDb8wB7h2LPYx+2Y4s91SS9rl9pRgELu8w6Zco4NPaD+soTQUAjrd
+ lFMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=tdQA57lBeQOvfXchna8N/D8Nyo98nJ4cAaaQhD8ORsY=;
- b=trWbVBuqRlEtCNqBBYBdeT2hCPiQv5IWH7wSkzzwwgQ92yF5VUXLSNpcHlFqymQPoQ
- tp2W0Yg/ygA7pSqI6r6wrJq3m1nqVtjKj0/RemF6u6q84mzuiVGB2/DRgIf4pJei0uye
- 5a779lZz/p5vsXRpDzzLmcjkRbDpOUR+g3HBBfgyeXiTI8dNZgdaDli4PrTii8pEyNnj
- ZYF/a8MrmSO+wYYF/hYqW+K9UK2rE/4Lyxlf/t+88dc3hpeWf7j/+9xJdGVrqbMqNeXS
- L7ADm/zGqjhgx8OBKGuz0ZEQ+FR6yKEWYeAjgOItoxip5qHOpXR9/RgHzADGsXHkVSTX
- xO2A==
-X-Gm-Message-State: AOAM531ICdMzm1Cjef6eZmcEFmLUVdsStQyJZSA0AZq9pPxYYGrONcGI
- 8M0nqRvkUsHu9Ggxr9OyEE376yAn
-X-Google-Smtp-Source: ABdhPJx9ZgRmV+P4rgQIOQvbsA6BXsriqLApJ2rVxWsdNn19aDMpRpJ5YkN5A27oPODJ80nNI1TcKA==
-X-Received: by 2002:a5d:6087:: with SMTP id w7mr3168891wrt.158.1591687946702; 
- Tue, 09 Jun 2020 00:32:26 -0700 (PDT)
+ bh=vkDRcgvL+D9VvdrCQbP1oNaPKjBqDOyIV9cIwQ5Bh2E=;
+ b=VuASum0Pq2cDriHaUW81z3rx9Ja4yndMdOLDmQYiIcZQiy3M431s8y4zTGJNHaywQD
+ QP8hOFxn5bXM47mPQAr4FIgoIEHF7z9j/8dXPxRKlgBiWddO6FEclBkjgwRq5xp82lil
+ nDsCKfgN9NoW0TAHDPshYefrJ5i5P7ENhj5rx9d19OO4iQO7Cv3+gtrwnzQ8SAdo88iU
+ HljWRSnJiIc7xyKbD+zr7S+wG2Ne7ciHAyg7VpX92erBDiokRFc9QyQbWA/Z6INvVmA4
+ PgT99auqmRrxjvwQgiSqnruJ9GLOdnNhbc2S4HidOzZWBHafk5ppW8raDvQiGQHmSDhn
+ qjwQ==
+X-Gm-Message-State: AOAM532Fi/+6azm0Eps5fhfzrjCJndKixoJHxA4T8sEMatW5aQouNpNv
+ hxEIJFTBuIjJwXYZLLLmky8NySmi
+X-Google-Smtp-Source: ABdhPJy1fXTHwxCweDUDKIDIRWTpyljuvVJFozyQX++LgzWAkEKxIE14RFyUJlN+yho2e8MI3thEPg==
+X-Received: by 2002:adf:b348:: with SMTP id k8mr3168408wrd.157.1591687952391; 
+ Tue, 09 Jun 2020 00:32:32 -0700 (PDT)
 Received: from localhost.localdomain
  (181.red-88-10-103.dynamicip.rima-tde.net. [88.10.103.181])
- by smtp.gmail.com with ESMTPSA id m3sm2036192wmc.0.2020.06.09.00.32.25
+ by smtp.gmail.com with ESMTPSA id m3sm2036192wmc.0.2020.06.09.00.32.31
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 09 Jun 2020 00:32:26 -0700 (PDT)
+ Tue, 09 Jun 2020 00:32:31 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 09/16] hw/sparc64/niagara: Map the UART device unconditionally
-Date: Tue,  9 Jun 2020 09:32:07 +0200
-Message-Id: <20200609073214.14079-10-f4bug@amsat.org>
+Subject: [PULL 14/16] hw/timer/grlib_gptimer: Display frequency in decimal
+Date: Tue,  9 Jun 2020 09:32:12 +0200
+Message-Id: <20200609073214.14079-15-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200609073214.14079-1-f4bug@amsat.org>
 References: <20200609073214.14079-1-f4bug@amsat.org>
@@ -79,8 +79,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::42c;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x42c.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -116,33 +116,26 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The UART is present on the machine regardless there is a
-character device connected to it. Map it unconditionally.
-
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Artyom Tarasenko <atar4qemu@gmail.com>
-Message-Id: <20200608172144.20461-4-f4bug@amsat.org>
+Reviewed-by: KONRAD Frederic <frederic.konrad@adacore.com>
+Message-Id: <20200331105048.27989-6-f4bug@amsat.org>
 ---
- hw/sparc64/niagara.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ hw/timer/trace-events | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/sparc64/niagara.c b/hw/sparc64/niagara.c
-index ab5ef8c5b3..148a26890e 100644
---- a/hw/sparc64/niagara.c
-+++ b/hw/sparc64/niagara.c
-@@ -152,10 +152,8 @@ static void niagara_init(MachineState *machine)
-             exit(1);
-         }
-     }
--    if (serial_hd(0)) {
--        serial_mm_init(sysmem, NIAGARA_UART_BASE, 0, NULL, 115200,
--                       serial_hd(0), DEVICE_BIG_ENDIAN);
--    }
-+    serial_mm_init(sysmem, NIAGARA_UART_BASE, 0, NULL,
-+                   115200, serial_hd(0), DEVICE_BIG_ENDIAN);
-     create_unimplemented_device("sun4v-iob", NIAGARA_IOBBASE, NIAGARA_IOBSIZE);
-     sun4v_rtc_init(NIAGARA_RTC_BASE);
- }
+diff --git a/hw/timer/trace-events b/hw/timer/trace-events
+index 80ea197594..866c9f546a 100644
+--- a/hw/timer/trace-events
++++ b/hw/timer/trace-events
+@@ -19,7 +19,7 @@ slavio_timer_mem_writel_invalid(uint64_t addr) "invalid write address 0x%"PRIx64
+ grlib_gptimer_enable(int id, uint32_t count) "timer:%d set count 0x%x and run"
+ grlib_gptimer_disabled(int id, uint32_t config) "timer:%d Timer disable config 0x%x"
+ grlib_gptimer_restart(int id, uint32_t reload) "timer:%d reload val: 0x%x"
+-grlib_gptimer_set_scaler(uint32_t scaler, uint32_t freq) "scaler:0x%x freq: 0x%x"
++grlib_gptimer_set_scaler(uint32_t scaler, uint32_t freq) "scaler:0x%x freq:%uHz"
+ grlib_gptimer_hit(int id) "timer:%d HIT"
+ grlib_gptimer_readl(int id, uint64_t addr, uint32_t val) "timer:%d addr 0x%"PRIx64" 0x%x"
+ grlib_gptimer_writel(int id, uint64_t addr, uint32_t val) "timer:%d addr 0x%"PRIx64" 0x%x"
 -- 
 2.21.3
 
