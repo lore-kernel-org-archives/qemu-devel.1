@@ -2,62 +2,115 @@ Return-Path: <SRS0=wemX=7X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 656A9C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:46:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A9E4C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:48:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3789520734
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:46:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3789520734
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id E079620734
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:48:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E079620734
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55804 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32878 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jj13w-00084R-EC
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 09:46:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58012)
+	id 1jj15h-0001xk-3x
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 09:48:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36448)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jj0mf-0002Ag-V6; Wed, 10 Jun 2020 09:28:50 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:37934)
+ (Exim 4.90_1) (envelope-from <pasic@linux.ibm.com>)
+ id 1jj12A-000772-Vb; Wed, 10 Jun 2020 09:44:50 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50992)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jj0md-0008Q7-Jw; Wed, 10 Jun 2020 09:28:49 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07443479|-1; CH=blue; DM=|OVERLOAD|false|;
- DS=CONTINUE|ham_system_inform|0.0226376-0.00135837-0.976004;
- FP=0|0|0|0|0|-1|-1|-1; HT=e02c03298; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=8; RT=8; SR=0; TI=SMTPD_---.HkbcnLJ_1591795719; 
-Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.HkbcnLJ_1591795719)
- by smtp.aliyun-inc.com(10.147.43.230);
- Wed, 10 Jun 2020 21:28:39 +0800
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-To: qemu-devel@nongnu.org,
-	qemu-riscv@nongnu.org
-Subject: [PATCH v9 55/61] target/riscv: integer extract instruction
-Date: Wed, 10 Jun 2020 19:37:42 +0800
-Message-Id: <20200610113748.4754-56-zhiwei_liu@c-sky.com>
-X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20200610113748.4754-1-zhiwei_liu@c-sky.com>
-References: <20200610113748.4754-1-zhiwei_liu@c-sky.com>
+ (Exim 4.90_1) (envelope-from <pasic@linux.ibm.com>)
+ id 1jj129-0003Nt-9X; Wed, 10 Jun 2020 09:44:50 -0400
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 05ACxCOt064679; Wed, 10 Jun 2020 09:01:43 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 31k00qr287-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 10 Jun 2020 09:01:42 -0400
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05ACxMwF065202;
+ Wed, 10 Jun 2020 09:01:29 -0400
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com
+ [149.81.74.106])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 31k00qr1xn-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 10 Jun 2020 09:01:27 -0400
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+ by ppma04fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05AD0jXR019405;
+ Wed, 10 Jun 2020 13:01:06 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com
+ (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+ by ppma04fra.de.ibm.com with ESMTP id 31g2s7u4ww-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 10 Jun 2020 13:01:06 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
+ [9.149.105.62])
+ by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 05AD13dd1638664
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 10 Jun 2020 13:01:03 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 68499AE056;
+ Wed, 10 Jun 2020 13:01:03 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id B65DCAE05A;
+ Wed, 10 Jun 2020 13:01:02 +0000 (GMT)
+Received: from oc2783563651 (unknown [9.145.127.50])
+ by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Wed, 10 Jun 2020 13:01:02 +0000 (GMT)
+Date: Wed, 10 Jun 2020 15:00:33 +0200
+From: Halil Pasic <pasic@linux.ibm.com>
+To: David Hildenbrand <david@redhat.com>
+Subject: Re: [PATCH v2 1/1] virtio-ccw: auto-manage VIRTIO_F_IOMMU_PLATFORM
+ if PV
+Message-ID: <20200610150033.5608ff95.pasic@linux.ibm.com>
+In-Reply-To: <858e9554-a4c7-6487-121b-ac3eaa209cb7@redhat.com>
+References: <20200606013217.2cffa3ed.pasic@linux.ibm.com>
+ <20200608181428.3c6f127c.cohuck@redhat.com>
+ <20200608190045.319dd68b.pasic@linux.ibm.com>
+ <20200609084402.35d317ec.cohuck@redhat.com>
+ <20200609114130.0ca9190b.pasic@linux.ibm.com>
+ <20200609174747.4e300818@ibm-vm>
+ <20200609182839.7ac80938.pasic@linux.ibm.com>
+ <20200609124155-mutt-send-email-mst@kernel.org>
+ <20200610043118.GF494336@umbus.fritz.box>
+ <4e5d62d8-9bfb-67d5-7398-2079729fd85e@redhat.com>
+ <20200610100756.GO494336@umbus.fritz.box>
+ <858e9554-a4c7-6487-121b-ac3eaa209cb7@redhat.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: none client-ip=121.197.200.217;
- envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/10 07:37:52
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001, UNPARSEABLE_RELAY=0.001 autolearn=_AUTOLEARN
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
+ definitions=2020-06-10_07:2020-06-10,
+ 2020-06-10 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 suspectscore=0
+ cotscore=-2147483648 mlxlogscore=999 clxscore=1015 malwarescore=0
+ impostorscore=0 bulkscore=0 spamscore=0 lowpriorityscore=0 mlxscore=0
+ priorityscore=1501 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2004280000 definitions=main-2006100095
+Received-SPF: pass client-ip=148.163.158.5; envelope-from=pasic@linux.ibm.com;
+ helo=mx0b-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/10 08:25:00
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
+X-Spam_bar: ---
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -70,157 +123,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: richard.henderson@linaro.org, wxy194768@alibaba-inc.com,
- wenmeng_zhang@c-sky.com, Alistair.Francis@wdc.com, palmer@dabbelt.com,
- LIU Zhiwei <zhiwei_liu@c-sky.com>
+Cc: Thomas Huth <thuth@redhat.com>, Boris Fiuczynski <fiuczy@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>, Richard Henderson <rth@twiddle.net>,
+ Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ Viktor Mihajlovski <mihajlov@linux.ibm.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/riscv/insn32.decode              |   1 +
- target/riscv/insn_trans/trans_rvv.inc.c | 116 ++++++++++++++++++++++++
- 2 files changed, 117 insertions(+)
+On Wed, 10 Jun 2020 12:24:14 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index 1231628cb2..26dd0f1b1b 100644
---- a/target/riscv/insn32.decode
-+++ b/target/riscv/insn32.decode
-@@ -561,6 +561,7 @@ vmsif_m         010110 . ..... 00011 010 ..... 1010111 @r2_vm
- vmsof_m         010110 . ..... 00010 010 ..... 1010111 @r2_vm
- viota_m         010110 . ..... 10000 010 ..... 1010111 @r2_vm
- vid_v           010110 . 00000 10001 010 ..... 1010111 @r1_vm
-+vext_x_v        001100 1 ..... ..... 010 ..... 1010111 @r
- 
- vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
- vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
-diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index e73e9dac33..0dedf4983d 100644
---- a/target/riscv/insn_trans/trans_rvv.inc.c
-+++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -2533,3 +2533,119 @@ static bool trans_vid_v(DisasContext *s, arg_vid_v *a)
-     }
-     return false;
- }
-+
-+/*
-+ *** Vector Permutation Instructions
-+ */
-+
-+/* Integer Extract Instruction */
-+
-+static void load_element(TCGv_i64 dest, TCGv_ptr base,
-+                         int ofs, int sew)
-+{
-+    switch (sew) {
-+    case MO_8:
-+        tcg_gen_ld8u_i64(dest, base, ofs);
-+        break;
-+    case MO_16:
-+        tcg_gen_ld16u_i64(dest, base, ofs);
-+        break;
-+    case MO_32:
-+        tcg_gen_ld32u_i64(dest, base, ofs);
-+        break;
-+    case MO_64:
-+        tcg_gen_ld_i64(dest, base, ofs);
-+        break;
-+    default:
-+        g_assert_not_reached();
-+        break;
-+    }
-+}
-+
-+/* offset of the idx element with base regsiter r */
-+static uint32_t endian_ofs(DisasContext *s, int r, int idx)
-+{
-+#ifdef HOST_WORDS_BIGENDIAN
-+    return vreg_ofs(s, r) + ((idx ^ (7 >> s->sew)) << s->sew);
-+#else
-+    return vreg_ofs(s, r) + (idx << s->sew);
-+#endif
-+}
-+
-+/* adjust the index according to the endian */
-+static void endian_adjust(TCGv_i32 ofs, int sew)
-+{
-+#ifdef HOST_WORDS_BIGENDIAN
-+    tcg_gen_xori_i32(ofs, ofs, 7 >> sew);
-+#endif
-+}
-+
-+/* Load idx >= VLMAX ? 0 : vreg[idx] */
-+static void vec_element_loadx(DisasContext *s, TCGv_i64 dest,
-+                              int vreg, TCGv idx, int vlmax)
-+{
-+    TCGv_i32 ofs = tcg_temp_new_i32();
-+    TCGv_ptr base = tcg_temp_new_ptr();
-+    TCGv_i64 t_idx = tcg_temp_new_i64();
-+    TCGv_i64 t_vlmax, t_zero;
-+
-+    /*
-+     * Mask the index to the length so that we do
-+     * not produce an out-of-range load.
-+     */
-+    tcg_gen_trunc_tl_i32(ofs, idx);
-+    tcg_gen_andi_i32(ofs, ofs, vlmax - 1);
-+
-+    /* Convert the index to an offset. */
-+    endian_adjust(ofs, s->sew);
-+    tcg_gen_shli_i32(ofs, ofs, s->sew);
-+
-+    /* Convert the index to a pointer. */
-+    tcg_gen_ext_i32_ptr(base, ofs);
-+    tcg_gen_add_ptr(base, base, cpu_env);
-+
-+    /* Perform the load. */
-+    load_element(dest, base,
-+                 vreg_ofs(s, vreg), s->sew);
-+    tcg_temp_free_ptr(base);
-+    tcg_temp_free_i32(ofs);
-+
-+    /* Flush out-of-range indexing to zero.  */
-+    t_vlmax = tcg_const_i64(vlmax);
-+    t_zero = tcg_const_i64(0);
-+    tcg_gen_extu_tl_i64(t_idx, idx);
-+
-+    tcg_gen_movcond_i64(TCG_COND_LTU, dest, t_idx,
-+                        t_vlmax, dest, t_zero);
-+
-+    tcg_temp_free_i64(t_vlmax);
-+    tcg_temp_free_i64(t_zero);
-+    tcg_temp_free_i64(t_idx);
-+}
-+
-+static void vec_element_loadi(DisasContext *s, TCGv_i64 dest,
-+                              int vreg, int idx)
-+{
-+    load_element(dest, cpu_env, endian_ofs(s, vreg, idx), s->sew);
-+}
-+
-+static bool trans_vext_x_v(DisasContext *s, arg_r *a)
-+{
-+    TCGv_i64 tmp = tcg_temp_new_i64();
-+    TCGv dest = tcg_temp_new();
-+
-+    if (a->rs1 == 0) {
-+        /* Special case vmv.x.s rd, vs2. */
-+        vec_element_loadi(s, tmp, a->rs2, 0);
-+    } else {
-+        /* This instruction ignores LMUL and vector register groups */
-+        int vlmax = s->vlen >> (3 + s->sew);
-+        vec_element_loadx(s, tmp, a->rs2, cpu_gpr[a->rs1], vlmax);
-+    }
-+    tcg_gen_trunc_i64_tl(dest, tmp);
-+    gen_set_gpr(a->rd, dest);
-+
-+    tcg_temp_free(dest);
-+    tcg_temp_free_i64(tmp);
-+    return true;
-+}
--- 
-2.23.0
+> On 10.06.20 12:07, David Gibson wrote:
+> > On Wed, Jun 10, 2020 at 09:22:45AM +0200, David Hildenbrand wrote:
+> >> On 10.06.20 06:31, David Gibson wrote:
+> >>> On Tue, Jun 09, 2020 at 12:44:39PM -0400, Michael S. Tsirkin wrote:
+> >>>> On Tue, Jun 09, 2020 at 06:28:39PM +0200, Halil Pasic wrote:
+> >>>>> On Tue, 9 Jun 2020 17:47:47 +0200
+> >>>>> Claudio Imbrenda <imbrenda@linux.ibm.com> wrote:
+> >>>>>
+> >>>>>> On Tue, 9 Jun 2020 11:41:30 +0200
+> >>>>>> Halil Pasic <pasic@linux.ibm.com> wrote:
+> >>>>>>
+> >>>>>> [...]
+> >>>>>>
+> >>>>>>> I don't know. Janosch could answer that, but he is on vacation. Adding
+> >>>>>>> Claudio maybe he can answer. My understanding is, that while it might
+> >>>>>>> be possible, it is ugly at best. The ability to do a transition is
+> >>>>>>> indicated by a CPU model feature. Indicating the feature to the guest
+> >>>>>>> and then failing the transition sounds wrong to me.
+> >>>>>>
+> >>>>>> I agree. If the feature is advertised, then it has to work. I don't
+> >>>>>> think we even have an architected way to fail the transition for that
+> >>>>>> reason.
+> >>>>>>
+> >>>>>> What __could__ be done is to prevent qemu from even starting if an
+> >>>>>> incompatible device is specified together with PV.
+> >>>>>
+> >>>>> AFAIU, the "specified together with PV" is the problem here. Currently
+> >>>>> we don't "specify PV" but PV is just a capability that is managed by the
+> >>>>> CPU model (like so many other).
+> >>>>
+> >>>> So if we want to keep it user friendly, there could be
+> >>>> protection property with values on/off/auto, and auto
+> >>>> would poke at host capability to figure out whether
+> >>>> it's supported.
+> >>>>
+> >>>> Both virtio and CPU would inherit from that.
+> >>>
+> >>> Right, that's what I have in mind for my 'host-trust-limitation'
+> >>> property (a generalized version of the existing 'memory-encryption'
+> >>> machine option).  My draft patches already set virtio properties
+> >>> accordingly, it should be possible to set (default) cpu properties as
+> >>> well.
+> >>
+> >> No crazy CPU model hacks please (at least speaking for the s390x).
+> > 
+> > Uh... I'm not really sure what you have in mind here.
+> > 
+> 
+> Reading along I got the impression that we want to glue the availability
+> of CPU features to other QEMU cmdline parameters (besides the
+> accelerator). ("to set (default) cpu properties as well"). If we are
+> talking about other CPU properties not expressed as CPU features (e.g.,
+> -cpu X,Y=on ...), then there is no issue.
+> 
+
+I share the concerns broght forward by David.
 
 
