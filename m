@@ -2,93 +2,92 @@ Return-Path: <SRS0=wemX=7X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7402C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 02:33:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A75DDC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 03:23:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7119120734
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 02:33:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7539220737
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 03:23:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=braap-org.20150623.gappssmtp.com header.i=@braap-org.20150623.gappssmtp.com header.b="w1pCcRUb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7119120734
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=braap.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="crPl57Et"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7539220737
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37940 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47004 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jiqY7-0001lP-MW
-	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 22:33:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50656)
+	id 1jirL0-0001yd-Pc
+	for qemu-devel@archiver.kernel.org; Tue, 09 Jun 2020 23:23:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55812)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cota@braap.org>) id 1jiqXX-0001MY-BJ
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 22:32:31 -0400
-Received: from mail-qk1-x742.google.com ([2607:f8b0:4864:20::742]:42655)
- by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <cota@braap.org>) id 1jiqXV-0000LH-VJ
- for qemu-devel@nongnu.org; Tue, 09 Jun 2020 22:32:31 -0400
-Received: by mail-qk1-x742.google.com with SMTP id l17so675318qki.9
- for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 19:32:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=braap-org.20150623.gappssmtp.com; s=20150623;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:content-transfer-encoding:in-reply-to;
- bh=DlsP8MIR2b0GIOCkKR8pQs4MKYr5Wfpo8xVkyJ/JH7I=;
- b=w1pCcRUbFKLnlRvMNlyIa8n/QaL8XcUEGA6hTJY40NT+5EI0ysgh8lqFnan7T3U3L7
- SvlrtfBGNFuE0GKxhfMbVb4Dra1eAuajM2Qnpcb9yM9QjE933UIlMVTN+WIEpyRFkAu9
- OEgl+Y7RWWV1WTZB8ORZHA3EihXOCbo3L9Ky87+Cr4oIZdE/5mIPY3zKW6l2LikKVEmF
- tuw+hev1qPADCMNvxO0prKbsEEoazHzXBb9oP2IjvOO7h2cary5DvMwCxcp2zkRRZBIx
- bDYjMhcdxhzGolTyOhSdCg1YPYHNXJkdeyXEjAtjAYuLCurUowx21vbebuFUNf5mFfOi
- 08cg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=DlsP8MIR2b0GIOCkKR8pQs4MKYr5Wfpo8xVkyJ/JH7I=;
- b=AqMhKy43O44SMxWd8oEuUoiLIuqtuWXrzIr4HnDSQ6uNzQhJ01G4ydGfq//8Fylcpp
- qkHESLseFWn+INVibxNsh2rA3uNcx/Oi5lrH8S5+mGJHcq86UukmEuqXdWs8ge6ngLrG
- 0HFMJEGBpRvlGLGDLHS0YL2lF/7AwjA443C5kxF1ApXuIRwXwCod22hH50Yq2rPvE22K
- bCJnoIaMVknDUFVAVLhDzlLH3N+vTC6vq6XY9OgQoUNCEYpwVx2l0BYSrMlreH3IwtOi
- qH9V9FJNdlWwmgbNNUOzgdW8YcioaORyyflkCYfdA9BRuBzb/aNwqjSk+8cS4V2cYPBD
- 2LtQ==
-X-Gm-Message-State: AOAM533bnbCYZ0h0zZK4sjMFjzgaAC/hQE7QL56tiPR0ANN2685eGwul
- 9HZQwIQJMQrRN9g1G5v1y/dk0A==
-X-Google-Smtp-Source: ABdhPJwA+t70HGrX4P2yTbODQ0QKPhLJ4sjiRzbhbL/7AoHVc770f6gnbJXKkxl181IG53HjIZgMbw==
-X-Received: by 2002:a37:650:: with SMTP id 77mr990397qkg.369.1591756348568;
- Tue, 09 Jun 2020 19:32:28 -0700 (PDT)
-Received: from localhost ([70.19.54.161])
- by smtp.gmail.com with ESMTPSA id n13sm13457747qtb.20.2020.06.09.19.32.27
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 09 Jun 2020 19:32:27 -0700 (PDT)
-Date: Tue, 9 Jun 2020 22:32:27 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Subject: Re: [PATCH v1 7/9] plugins: add API to return a name for a IO device
-Message-ID: <20200610023227.GA3816134@sff>
-References: <20200602154624.4460-1-alex.bennee@linaro.org>
- <20200602154624.4460-8-alex.bennee@linaro.org>
- <20200608034504.GA3619843@sff> <87zh9e6kxy.fsf@linaro.org>
- <20200609040902.GA3724030@sff> <87y2ow4hrx.fsf@linaro.org>
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1jirJl-0001EF-4m
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 23:22:21 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:50380
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1jirJj-0004fk-KU
+ for qemu-devel@nongnu.org; Tue, 09 Jun 2020 23:22:20 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591759335;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=giGNkMug9B13IF80bioDjaMMNFrcJCoFvN4ZnxVNpeA=;
+ b=crPl57EtYfoOCCiELQwuuDtif0r2gGwNYFGtwYkIE6n+/aLwup+ykw8KVWabyUiO2brXFe
+ NBQifz8GfzEPxDxOUlIm2khvKU7bNYLKNpYHy9t1NkewZp0CKUQjMRU+NKAW7n9SNUfntT
+ oYuoWGGAwQ5IvtAMAKBHVMo+QbBXRgI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-125-yBR4QoG0PbSmWlShHbMs6w-1; Tue, 09 Jun 2020 23:22:13 -0400
+X-MC-Unique: yBR4QoG0PbSmWlShHbMs6w-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 19D5C107ACF2;
+ Wed, 10 Jun 2020 03:22:12 +0000 (UTC)
+Received: from [10.72.13.194] (ovpn-13-194.pek2.redhat.com [10.72.13.194])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B621661983;
+ Wed, 10 Jun 2020 03:21:52 +0000 (UTC)
+Subject: Re: [PATCH v2 4/7] vhost: involve device backends in feature
+ negotiation
+To: "Michael S. Tsirkin" <mst@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
+References: <20200609170218.246468-1-stefanha@redhat.com>
+ <20200609170218.246468-5-stefanha@redhat.com>
+ <20200609135007-mutt-send-email-mst@kernel.org>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <37ac3fbb-9a9b-9290-abee-a8603c81925c@redhat.com>
+Date: Wed, 10 Jun 2020 11:21:50 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+In-Reply-To: <20200609135007-mutt-send-email-mst@kernel.org>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <87y2ow4hrx.fsf@linaro.org>
-Received-SPF: softfail client-ip=2607:f8b0:4864:20::742;
- envelope-from=cota@braap.org; helo=mail-qk1-x742.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -11
-X-Spam_score: -1.2
-X-Spam_bar: -
-X-Spam_report: (-1.2 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_SOFTFAIL=0.665 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=jasowang@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 21:17:20
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,20 +100,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: robert.foley@linaro.org, qemu-devel@nongnu.org, robhenry@microsoft.com,
- aaron@os.amperecomputing.com, kuhn.chenqun@huawei.com, peter.puhov@linaro.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ qemu-block@nongnu.org, Laurent Vivier <lvivier@redhat.com>, cohuck@redhat.com,
+ qemu-devel@nongnu.org, Raphael Norwitz <raphael.norwitz@nutanix.com>,
+ "Gonglei \(Arei\)" <arei.gonglei@huawei.com>,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jun 09, 2020 at 12:09:54 +0100, Alex Benn�e wrote:
-> How about a g_intern_string() as a non-freeable const char that can also
-> be treated as canonical?
 
-I like it. Didn't know about g_intern_string (I see it's
-implemented as an append-only hash table protected by a lock).
+On 2020/6/10 上午2:07, Michael S. Tsirkin wrote:
+>> +/*
+>> + * Default vhost_get_features() feature bits for existing device types that do
+>> + * not define their own.
+>> + *
+>> + * This is a workaround for existing device types, do not use this in new vhost
+>> + * device types. Explicitly define a list of feature bits instead.
+>> + *
+>> + * The following feature bits are excluded because libvhost-user device
+>> + * backends did not advertise them for a long time. Therefore we cannot detect
+>> + * their presence. Instead we assume they are always supported by the device
+>> + * backend:
+>> + * VIRTIO_F_NOTIFY_ON_EMPTY
+>> + * VIRTIO_F_ANY_LAYOUT
+>> + * VIRTIO_F_VERSION_1
+>> + * VIRTIO_RING_F_INDIRECT_DESC
+>> + * VIRTIO_RING_F_EVENT_IDX
+> Weird. I remember that it's common for vhost-user not to set
+> VIRTIO_RING_F_INDIRECT_DESC - they have huge queues so
+> don't need it and inline descriptors give them better
+> performance.
+>
+> So what's going on here?
 
-Cheers,
 
-		Emilio
+I guess one reason is to support live migration between vhost-user and 
+vhost-net.
+
+Thanks
+
+
 
