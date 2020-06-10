@@ -2,82 +2,80 @@ Return-Path: <SRS0=wemX=7X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05AABC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 04:49:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1262CC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 04:50:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C1E9720734
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 04:49:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C58BF2072E
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 04:50:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iL4E9pFb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1E9720734
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EyY1cu0+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C58BF2072E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51060 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55584 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jisg6-0004yd-UP
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 00:49:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34110)
+	id 1jishD-0006qi-T2
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 00:50:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34632)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jisL2-0000D9-4o
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 00:27:44 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:58348
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jisNe-00041r-9c
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 00:30:26 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33981
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jisL1-0008J0-9W
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 00:27:43 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jisNc-00005l-92
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 00:30:25 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591763262;
+ s=mimecast20190719; t=1591763403;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=10332xG/Et6G9yDWYNuu/GUK5CzyCJzNTiI8MGCB5RE=;
- b=iL4E9pFb4tQZi7ZWGFdEzANnRhn7FtsZwL8MyjdaX4QQbTrBTpbwwcr1fqhu9/mezDWzkk
- Yyngpgxd1lmfRFrV/5Lf1K6BfPUyYZJGPmcaQZt370UDZk22lp99ivRGydW0ftkJpY+OQa
- gBvkpGeMLRdRM5r6k1ES+DxSlDsD/SQ=
+ bh=tIipyy3cxji7TSg5TkYgKmMY4wP6xoAvP6GDwENCxXs=;
+ b=EyY1cu0+3xIU/NMykOyvbAJGqHqUileY9L19eOfPW2udM6PR2qT1JdU8D+5m0EdzjodsNr
+ f6V89TZogZRTozL5rL1zYk60x+RH6zaBI6Py8ssz5zMX4eIq7os+yfdnehBKOcdBFQz5OM
+ kqTsyb3PjGdI71dbSPJZ+r2/qEUH9tU=
 Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
  [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-442-8y6WvEyrMxibuo3ewRfQwA-1; Wed, 10 Jun 2020 00:27:40 -0400
-X-MC-Unique: 8y6WvEyrMxibuo3ewRfQwA-1
-Received: by mail-wr1-f70.google.com with SMTP id p9so508526wrx.10
- for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 21:27:40 -0700 (PDT)
+ us-mta-71-kBnmDtfCMtexo2fsqYToyQ-1; Wed, 10 Jun 2020 00:26:45 -0400
+X-MC-Unique: kBnmDtfCMtexo2fsqYToyQ-1
+Received: by mail-wr1-f70.google.com with SMTP id e1so514510wrm.3
+ for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 21:26:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=10332xG/Et6G9yDWYNuu/GUK5CzyCJzNTiI8MGCB5RE=;
- b=Uxzl6OggijUXEfY7P8rCX2mPdU8IURROWkpCBASaxDUcqaahf4Alk7gfqMfwmUL1eS
- newO8oVT+SQj3FobgMggDkQJKttdoT7x+y5S4SCnBI5S0ercqUXZTMyYPivT/5GOGvJm
- E/uz77EL86vTYaNi0tLFPf5hLZ6r+stMjGShytXUaRnoqHwYR5sYd0XGR/WGDV3jjInF
- T4KCUZVcvaZQqW2svxWzZnKdLJ6VB+46ZnNTo91Ut9Dc9KNlMQNzp2SY4qTFP8DCsDb4
- eG/+w+JnmROJhBWbq/nhLv9C7Nzqh4LckGbl8EP9OI++mYvqPMRvnrrucqu09WZsHN50
- hShg==
-X-Gm-Message-State: AOAM533Q/KXicAriGaexj85GMNpgxm9LbHg7IK2xro2g0Xygy+Qo2r8s
- s+c677yd6ESfR3akSpiDbMkYqDFkxHk/0SNQsc0jxtejoKu9+S+tg/er0GPjvUAVBZYLWlV+TSO
- AqGAylxEzq92RT4k=
-X-Received: by 2002:a5d:400f:: with SMTP id n15mr1340341wrp.419.1591763259329; 
- Tue, 09 Jun 2020 21:27:39 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxGLRyVGCdR8+ttsTV3QAuPfwNDTqlGm4Mk/ODjO6Ikpf97LPn0/6EUHmxrA2q7LYOXQ68Ekw==
-X-Received: by 2002:a5d:400f:: with SMTP id n15mr1340327wrp.419.1591763259130; 
- Tue, 09 Jun 2020 21:27:39 -0700 (PDT)
+ :mime-version:content-disposition:in-reply-to;
+ bh=tIipyy3cxji7TSg5TkYgKmMY4wP6xoAvP6GDwENCxXs=;
+ b=DLs9JBhue+QOcD7DwYLV24x/f53chwJsbqGbLrMJpjSy17MgOqwx7gYjelx+d7H1OZ
+ CyuMmroiYTCch/EQA9xOsVeli5QihOA/go23Wwxdf0MdYP3QW1gWadWzjJm2TK9IpL59
+ XPj7TRSoMauPgRqYuVvQUbEDRPvTBQWADaKVQ4sQeBsnh7mdzmKSiOcYLoQb2Wd9AGoa
+ jFQajJzebAmyKKZnVpCFY0RFQ+gHjx4kzzrqX4d5CnQQWyF5ikV8VEiVYJgiDvrrtBIG
+ P8G/cwe6OV2PhGm2b/ymvl66h4ej2WirVI/PiVNbMfVe8n1XgUZm4TCoVx+MihVOmFLI
+ pJDw==
+X-Gm-Message-State: AOAM530AUhaLd3mq0BDa3oEezxuXzKFz2FRwwNbJCdVQ1Rsfhe7/ovMA
+ GUV6Esbs0lHnIsxTeJIys+fpjYywNDkxISUKpyOADuBCTVjVEp0+OsKQ9mNuLcR8NnwmIYv3PIL
+ VBGKVtYy1hnyHeng=
+X-Received: by 2002:a5d:49c5:: with SMTP id t5mr1354101wrs.18.1591763204799;
+ Tue, 09 Jun 2020 21:26:44 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwofrngvDI/YxgzblJK8T3STEFk+Ndr9320XBj4cKg4kPHwyASkuvXulyuNgYy8+2ebVQ5AhQ==
+X-Received: by 2002:a5d:49c5:: with SMTP id t5mr1354094wrs.18.1591763204647;
+ Tue, 09 Jun 2020 21:26:44 -0700 (PDT)
 Received: from redhat.com (bzq-79-181-55-232.red.bezeqint.net. [79.181.55.232])
- by smtp.gmail.com with ESMTPSA id l17sm5163022wmi.16.2020.06.09.21.27.38
+ by smtp.gmail.com with ESMTPSA id s8sm6442887wrg.50.2020.06.09.21.26.43
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 09 Jun 2020 21:27:38 -0700 (PDT)
-Date: Wed, 10 Jun 2020 00:27:37 -0400
+ Tue, 09 Jun 2020 21:26:44 -0700 (PDT)
+Date: Wed, 10 Jun 2020 00:26:43 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 29/56] pci: assert configuration access is within bounds
-Message-ID: <20200610042613.1459309-30-mst@redhat.com>
+Subject: [PULL 05/56] qtest: allow DSDT acpi table changes
+Message-ID: <20200610042613.1459309-6-mst@redhat.com>
 References: <20200610042613.1459309-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20200610042613.1459309-1-mst@redhat.com>
@@ -85,11 +83,10 @@ X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
 X-Mutt-Fcc: =sent
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=mst@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=mst@redhat.com;
+ helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 23:51:15
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
@@ -111,53 +108,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Prasad J Pandit <pjp@fedoraproject.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Prasad J Pandit <pjp@fedoraproject.org>
+From: Gerd Hoffmann <kraxel@redhat.com>
 
-While accessing PCI configuration bytes, assert that
-'address + len' is within PCI configuration space.
-
-Generally it is within bounds. This is more of a defensive
-assert, in case a buggy device was to send 'address' which
-may go out of bounds.
-
-Suggested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
-Message-Id: <20200604113525.58898-1-ppandit@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Message-Id: <20200515150421.25479-2-kraxel@redhat.com>
 ---
- hw/pci/pci.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ tests/qtest/bios-tables-test-allowed-diff.h | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
-diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-index 70c66965f5..7bf2ae6d92 100644
---- a/hw/pci/pci.c
-+++ b/hw/pci/pci.c
-@@ -1381,6 +1381,8 @@ uint32_t pci_default_read_config(PCIDevice *d,
- {
-     uint32_t val = 0;
- 
-+    assert(address + len <= pci_config_size(d));
-+
-     if (pci_is_express_downstream_port(d) &&
-         ranges_overlap(address, len, d->exp.exp_cap + PCI_EXP_LNKSTA, 2)) {
-         pcie_sync_bridge_lnk(d);
-@@ -1394,6 +1396,8 @@ void pci_default_write_config(PCIDevice *d, uint32_t addr, uint32_t val_in, int
-     int i, was_irq_disabled = pci_irq_disabled(d);
-     uint32_t val = val_in;
- 
-+    assert(addr + l <= pci_config_size(d));
-+
-     for (i = 0; i < l; val >>= 8, ++i) {
-         uint8_t wmask = d->wmask[addr + i];
-         uint8_t w1cmask = d->w1cmask[addr + i];
+diff --git a/tests/qtest/bios-tables-test-allowed-diff.h b/tests/qtest/bios-tables-test-allowed-diff.h
+index dfb8523c8b..6a052c5044 100644
+--- a/tests/qtest/bios-tables-test-allowed-diff.h
++++ b/tests/qtest/bios-tables-test-allowed-diff.h
+@@ -1 +1,18 @@
+ /* List of comma-separated changed AML files to ignore */
++"tests/data/acpi/pc/DSDT",
++"tests/data/acpi/pc/DSDT.acpihmat",
++"tests/data/acpi/pc/DSDT.bridge",
++"tests/data/acpi/pc/DSDT.cphp",
++"tests/data/acpi/pc/DSDT.dimmpxm",
++"tests/data/acpi/pc/DSDT.ipmikcs",
++"tests/data/acpi/pc/DSDT.memhp",
++"tests/data/acpi/pc/DSDT.numamem",
++"tests/data/acpi/q35/DSDT",
++"tests/data/acpi/q35/DSDT.acpihmat",
++"tests/data/acpi/q35/DSDT.bridge",
++"tests/data/acpi/q35/DSDT.cphp",
++"tests/data/acpi/q35/DSDT.dimmpxm",
++"tests/data/acpi/q35/DSDT.ipmibt",
++"tests/data/acpi/q35/DSDT.memhp",
++"tests/data/acpi/q35/DSDT.mmio64",
++"tests/data/acpi/q35/DSDT.numamem",
 -- 
 MST
 
