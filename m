@@ -7,43 +7,43 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3650C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 12:46:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A2A3C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 12:49:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B767D2072E
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 12:46:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B767D2072E
+	by mail.kernel.org (Postfix) with ESMTPS id 4DA542072E
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 12:49:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DA542072E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42146 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48656 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jj081-0001In-VW
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 08:46:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54234)
+	id 1jj0AM-0004WK-FL
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 08:49:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52528)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jj060-0007gS-8y; Wed, 10 Jun 2020 08:44:44 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:52455)
+ id 1jj01v-0002Se-5V; Wed, 10 Jun 2020 08:40:31 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:54098)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jj05q-0004RS-01; Wed, 10 Jun 2020 08:44:40 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.1871082|-1; CH=blue; DM=|OVERLOAD|false|;
- DS=CONTINUE|ham_system_inform|0.027892-8.54176e-05-0.972023;
- FP=0|0|0|0|0|-1|-1|-1; HT=e02c03295; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=9; RT=8; SR=0; TI=SMTPD_---.HkaO0Yk_1591793064; 
+ id 1jj01t-0003W0-26; Wed, 10 Jun 2020 08:40:30 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07608282|-1; CH=blue; DM=|OVERLOAD|false|;
+ DS=CONTINUE|ham_system_inform|0.0267904-6.01599e-05-0.973149;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e02c03306; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=9; RT=8; SR=0; TI=SMTPD_---.Hkaqo9U_1591792822; 
 Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.HkaO0Yk_1591793064)
- by smtp.aliyun-inc.com(10.147.41.121);
- Wed, 10 Jun 2020 20:44:24 +0800
+ fp:SMTPD_---.Hkaqo9U_1591792822)
+ by smtp.aliyun-inc.com(10.147.43.95); Wed, 10 Jun 2020 20:40:23 +0800
 From: LIU Zhiwei <zhiwei_liu@c-sky.com>
 To: qemu-devel@nongnu.org,
 	qemu-riscv@nongnu.org
-Subject: [PATCH v9 33/61] target/riscv: vector widening floating-point multiply
-Date: Wed, 10 Jun 2020 19:37:20 +0800
-Message-Id: <20200610113748.4754-34-zhiwei_liu@c-sky.com>
+Subject: [PATCH v9 31/61] target/riscv: vector widening floating-point
+ add/subtract instructions
+Date: Wed, 10 Jun 2020 19:37:18 +0800
+Message-Id: <20200610113748.4754-32-zhiwei_liu@c-sky.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20200610113748.4754-1-zhiwei_liu@c-sky.com>
 References: <20200610113748.4754-1-zhiwei_liu@c-sky.com>
@@ -81,80 +81,304 @@ Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- target/riscv/helper.h                   |  5 +++++
- target/riscv/insn32.decode              |  2 ++
- target/riscv/insn_trans/trans_rvv.inc.c |  4 ++++
- target/riscv/vector_helper.c            | 22 ++++++++++++++++++++++
- 4 files changed, 33 insertions(+)
+ target/riscv/helper.h                   |  17 +++
+ target/riscv/insn32.decode              |   8 ++
+ target/riscv/insn_trans/trans_rvv.inc.c | 149 ++++++++++++++++++++++++
+ target/riscv/vector_helper.c            |  83 +++++++++++++
+ 4 files changed, 257 insertions(+)
 
 diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index fa1558179a..5b3340a4af 100644
+index 3031a941c2..73fc7a5a00 100644
 --- a/target/riscv/helper.h
 +++ b/target/riscv/helper.h
-@@ -846,3 +846,8 @@ DEF_HELPER_6(vfdiv_vf_d, void, ptr, ptr, i64, ptr, env, i32)
- DEF_HELPER_6(vfrdiv_vf_h, void, ptr, ptr, i64, ptr, env, i32)
- DEF_HELPER_6(vfrdiv_vf_w, void, ptr, ptr, i64, ptr, env, i32)
- DEF_HELPER_6(vfrdiv_vf_d, void, ptr, ptr, i64, ptr, env, i32)
+@@ -813,3 +813,20 @@ DEF_HELPER_6(vfsub_vf_d, void, ptr, ptr, i64, ptr, env, i32)
+ DEF_HELPER_6(vfrsub_vf_h, void, ptr, ptr, i64, ptr, env, i32)
+ DEF_HELPER_6(vfrsub_vf_w, void, ptr, ptr, i64, ptr, env, i32)
+ DEF_HELPER_6(vfrsub_vf_d, void, ptr, ptr, i64, ptr, env, i32)
 +
-+DEF_HELPER_6(vfwmul_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vfwmul_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vfwmul_vf_h, void, ptr, ptr, i64, ptr, env, i32)
-+DEF_HELPER_6(vfwmul_vf_w, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vfwadd_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vfwadd_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vfwsub_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vfwsub_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vfwadd_wv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vfwadd_wv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vfwsub_wv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vfwsub_wv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vfwadd_vf_h, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vfwadd_vf_w, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vfwsub_vf_h, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vfwsub_vf_w, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vfwadd_wf_h, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vfwadd_wf_w, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vfwsub_wf_h, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vfwsub_wf_w, void, ptr, ptr, i64, ptr, env, i32)
 diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index 16fd938261..1d963f0b8a 100644
+index c8e3f10162..68e9448842 100644
 --- a/target/riscv/insn32.decode
 +++ b/target/riscv/insn32.decode
-@@ -461,6 +461,8 @@ vfmul_vf        100100 . ..... ..... 101 ..... 1010111 @r_vm
- vfdiv_vv        100000 . ..... ..... 001 ..... 1010111 @r_vm
- vfdiv_vf        100000 . ..... ..... 101 ..... 1010111 @r_vm
- vfrdiv_vf       100001 . ..... ..... 101 ..... 1010111 @r_vm
-+vfwmul_vv       111000 . ..... ..... 001 ..... 1010111 @r_vm
-+vfwmul_vf       111000 . ..... ..... 101 ..... 1010111 @r_vm
+@@ -448,6 +448,14 @@ vfadd_vf        000000 . ..... ..... 101 ..... 1010111 @r_vm
+ vfsub_vv        000010 . ..... ..... 001 ..... 1010111 @r_vm
+ vfsub_vf        000010 . ..... ..... 101 ..... 1010111 @r_vm
+ vfrsub_vf       100111 . ..... ..... 101 ..... 1010111 @r_vm
++vfwadd_vv       110000 . ..... ..... 001 ..... 1010111 @r_vm
++vfwadd_vf       110000 . ..... ..... 101 ..... 1010111 @r_vm
++vfwadd_wv       110100 . ..... ..... 001 ..... 1010111 @r_vm
++vfwadd_wf       110100 . ..... ..... 101 ..... 1010111 @r_vm
++vfwsub_vv       110010 . ..... ..... 001 ..... 1010111 @r_vm
++vfwsub_vf       110010 . ..... ..... 101 ..... 1010111 @r_vm
++vfwsub_wv       110110 . ..... ..... 001 ..... 1010111 @r_vm
++vfwsub_wf       110110 . ..... ..... 101 ..... 1010111 @r_vm
  
  vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
  vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
 diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index be60115801..7ff3af0c61 100644
+index 7461e86de8..bee4d4cb76 100644
 --- a/target/riscv/insn_trans/trans_rvv.inc.c
 +++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -2057,3 +2057,7 @@ GEN_OPFVV_TRANS(vfdiv_vv, opfvv_check)
- GEN_OPFVF_TRANS(vfmul_vf,  opfvf_check)
- GEN_OPFVF_TRANS(vfdiv_vf,  opfvf_check)
- GEN_OPFVF_TRANS(vfrdiv_vf,  opfvf_check)
+@@ -1901,3 +1901,152 @@ static bool trans_##NAME(DisasContext *s, arg_rmrr *a)            \
+ GEN_OPFVF_TRANS(vfadd_vf,  opfvf_check)
+ GEN_OPFVF_TRANS(vfsub_vf,  opfvf_check)
+ GEN_OPFVF_TRANS(vfrsub_vf,  opfvf_check)
 +
-+/* Vector Widening Floating-Point Multiply */
-+GEN_OPFVV_WIDEN_TRANS(vfwmul_vv, opfvv_widen_check)
-+GEN_OPFVF_WIDEN_TRANS(vfwmul_vf)
++/* Vector Widening Floating-Point Add/Subtract Instructions */
++static bool opfvv_widen_check(DisasContext *s, arg_rmrr *a)
++{
++    return (vext_check_isa_ill(s) &&
++            vext_check_overlap_mask(s, a->rd, a->vm, true) &&
++            vext_check_reg(s, a->rd, true) &&
++            vext_check_reg(s, a->rs2, false) &&
++            vext_check_reg(s, a->rs1, false) &&
++            vext_check_overlap_group(a->rd, 2 << s->lmul, a->rs2,
++                                     1 << s->lmul) &&
++            vext_check_overlap_group(a->rd, 2 << s->lmul, a->rs1,
++                                     1 << s->lmul) &&
++            (s->lmul < 0x3) && (s->sew < 0x3) && (s->sew != 0));
++}
++
++/* OPFVV with WIDEN */
++#define GEN_OPFVV_WIDEN_TRANS(NAME, CHECK)                       \
++static bool trans_##NAME(DisasContext *s, arg_rmrr *a)           \
++{                                                                \
++    if (CHECK(s, a)) {                                           \
++        uint32_t data = 0;                                       \
++        static gen_helper_gvec_4_ptr * const fns[2] = {          \
++            gen_helper_##NAME##_h, gen_helper_##NAME##_w,        \
++        };                                                       \
++        TCGLabel *over = gen_new_label();                        \
++        gen_set_rm(s, 7);                                        \
++        tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_vl, 0, over);        \
++                                                                 \
++        data = FIELD_DP32(data, VDATA, MLEN, s->mlen);           \
++        data = FIELD_DP32(data, VDATA, VM, a->vm);               \
++        data = FIELD_DP32(data, VDATA, LMUL, s->lmul);           \
++        tcg_gen_gvec_4_ptr(vreg_ofs(s, a->rd), vreg_ofs(s, 0),   \
++                           vreg_ofs(s, a->rs1),                  \
++                           vreg_ofs(s, a->rs2), cpu_env, 0,      \
++                           s->vlen / 8, data, fns[s->sew - 1]);  \
++        gen_set_label(over);                                     \
++        return true;                                             \
++    }                                                            \
++    return false;                                                \
++}
++
++GEN_OPFVV_WIDEN_TRANS(vfwadd_vv, opfvv_widen_check)
++GEN_OPFVV_WIDEN_TRANS(vfwsub_vv, opfvv_widen_check)
++
++static bool opfvf_widen_check(DisasContext *s, arg_rmrr *a)
++{
++    return (vext_check_isa_ill(s) &&
++            vext_check_overlap_mask(s, a->rd, a->vm, true) &&
++            vext_check_reg(s, a->rd, true) &&
++            vext_check_reg(s, a->rs2, false) &&
++            vext_check_overlap_group(a->rd, 2 << s->lmul, a->rs2,
++                                     1 << s->lmul) &&
++            (s->lmul < 0x3) && (s->sew < 0x3) && (s->sew != 0));
++}
++
++/* OPFVF with WIDEN */
++#define GEN_OPFVF_WIDEN_TRANS(NAME)                              \
++static bool trans_##NAME(DisasContext *s, arg_rmrr *a)           \
++{                                                                \
++    if (opfvf_widen_check(s, a)) {                               \
++        uint32_t data = 0;                                       \
++        static gen_helper_opfvf *const fns[2] = {                \
++            gen_helper_##NAME##_h, gen_helper_##NAME##_w,        \
++        };                                                       \
++        gen_set_rm(s, 7);                                        \
++        data = FIELD_DP32(data, VDATA, MLEN, s->mlen);           \
++        data = FIELD_DP32(data, VDATA, VM, a->vm);               \
++        data = FIELD_DP32(data, VDATA, LMUL, s->lmul);           \
++        return opfvf_trans(a->rd, a->rs1, a->rs2, data,          \
++                           fns[s->sew - 1], s);                  \
++    }                                                            \
++    return false;                                                \
++}
++
++GEN_OPFVF_WIDEN_TRANS(vfwadd_vf)
++GEN_OPFVF_WIDEN_TRANS(vfwsub_vf)
++
++static bool opfwv_widen_check(DisasContext *s, arg_rmrr *a)
++{
++    return (vext_check_isa_ill(s) &&
++            vext_check_overlap_mask(s, a->rd, a->vm, true) &&
++            vext_check_reg(s, a->rd, true) &&
++            vext_check_reg(s, a->rs2, true) &&
++            vext_check_reg(s, a->rs1, false) &&
++            vext_check_overlap_group(a->rd, 2 << s->lmul, a->rs1,
++                                     1 << s->lmul) &&
++            (s->lmul < 0x3) && (s->sew < 0x3) && (s->sew != 0));
++}
++
++/* WIDEN OPFVV with WIDEN */
++#define GEN_OPFWV_WIDEN_TRANS(NAME)                                \
++static bool trans_##NAME(DisasContext *s, arg_rmrr *a)             \
++{                                                                  \
++    if (opfwv_widen_check(s, a)) {                                 \
++        uint32_t data = 0;                                         \
++        static gen_helper_gvec_4_ptr * const fns[2] = {            \
++            gen_helper_##NAME##_h, gen_helper_##NAME##_w,          \
++        };                                                         \
++        TCGLabel *over = gen_new_label();                          \
++        gen_set_rm(s, 7);                                          \
++        tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_vl, 0, over);          \
++                                                                   \
++        data = FIELD_DP32(data, VDATA, MLEN, s->mlen);             \
++        data = FIELD_DP32(data, VDATA, VM, a->vm);                 \
++        data = FIELD_DP32(data, VDATA, LMUL, s->lmul);             \
++        tcg_gen_gvec_4_ptr(vreg_ofs(s, a->rd), vreg_ofs(s, 0),     \
++                           vreg_ofs(s, a->rs1),                    \
++                           vreg_ofs(s, a->rs2), cpu_env, 0,        \
++                           s->vlen / 8, data, fns[s->sew - 1]);    \
++        gen_set_label(over);                                       \
++        return true;                                               \
++    }                                                              \
++    return false;                                                  \
++}
++
++GEN_OPFWV_WIDEN_TRANS(vfwadd_wv)
++GEN_OPFWV_WIDEN_TRANS(vfwsub_wv)
++
++static bool opfwf_widen_check(DisasContext *s, arg_rmrr *a)
++{
++    return (vext_check_isa_ill(s) &&
++            vext_check_overlap_mask(s, a->rd, a->vm, true) &&
++            vext_check_reg(s, a->rd, true) &&
++            vext_check_reg(s, a->rs2, true) &&
++            (s->lmul < 0x3) && (s->sew < 0x3) && (s->sew != 0));
++}
++
++/* WIDEN OPFVF with WIDEN */
++#define GEN_OPFWF_WIDEN_TRANS(NAME)                              \
++static bool trans_##NAME(DisasContext *s, arg_rmrr *a)           \
++{                                                                \
++    if (opfwf_widen_check(s, a)) {                               \
++        uint32_t data = 0;                                       \
++        static gen_helper_opfvf *const fns[2] = {                \
++            gen_helper_##NAME##_h, gen_helper_##NAME##_w,        \
++        };                                                       \
++        gen_set_rm(s, 7);                                        \
++        data = FIELD_DP32(data, VDATA, MLEN, s->mlen);           \
++        data = FIELD_DP32(data, VDATA, VM, a->vm);               \
++        data = FIELD_DP32(data, VDATA, LMUL, s->lmul);           \
++        return opfvf_trans(a->rd, a->rs1, a->rs2, data,          \
++                           fns[s->sew - 1], s);                  \
++    }                                                            \
++    return false;                                                \
++}
++
++GEN_OPFWF_WIDEN_TRANS(vfwadd_wf)
++GEN_OPFWF_WIDEN_TRANS(vfwsub_wf)
 diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index ea807ef731..0dd94348e8 100644
+index f8f82008af..b65ef51116 100644
 --- a/target/riscv/vector_helper.c
 +++ b/target/riscv/vector_helper.c
-@@ -3410,3 +3410,25 @@ RVVCALL(OPFVF2, vfrdiv_vf_d, OP_UUU_D, H8, H8, float64_rdiv)
- GEN_VEXT_VF(vfrdiv_vf_h, 2, 2, clearh)
- GEN_VEXT_VF(vfrdiv_vf_w, 4, 4, clearl)
- GEN_VEXT_VF(vfrdiv_vf_d, 8, 8, clearq)
+@@ -3278,3 +3278,86 @@ RVVCALL(OPFVF2, vfrsub_vf_d, OP_UUU_D, H8, H8, float64_rsub)
+ GEN_VEXT_VF(vfrsub_vf_h, 2, 2, clearh)
+ GEN_VEXT_VF(vfrsub_vf_w, 4, 4, clearl)
+ GEN_VEXT_VF(vfrsub_vf_d, 8, 8, clearq)
 +
-+/* Vector Widening Floating-Point Multiply */
-+static uint32_t vfwmul16(uint16_t a, uint16_t b, float_status *s)
++/* Vector Widening Floating-Point Add/Subtract Instructions */
++static uint32_t vfwadd16(uint16_t a, uint16_t b, float_status *s)
 +{
-+    return float32_mul(float16_to_float32(a, true, s),
++    return float32_add(float16_to_float32(a, true, s),
 +            float16_to_float32(b, true, s), s);
 +}
 +
-+static uint64_t vfwmul32(uint32_t a, uint32_t b, float_status *s)
++static uint64_t vfwadd32(uint32_t a, uint32_t b, float_status *s)
 +{
-+    return float64_mul(float32_to_float64(a, s),
++    return float64_add(float32_to_float64(a, s),
 +            float32_to_float64(b, s), s);
 +
 +}
-+RVVCALL(OPFVV2, vfwmul_vv_h, WOP_UUU_H, H4, H2, H2, vfwmul16)
-+RVVCALL(OPFVV2, vfwmul_vv_w, WOP_UUU_W, H8, H4, H4, vfwmul32)
-+GEN_VEXT_VV_ENV(vfwmul_vv_h, 2, 4, clearl)
-+GEN_VEXT_VV_ENV(vfwmul_vv_w, 4, 8, clearq)
-+RVVCALL(OPFVF2, vfwmul_vf_h, WOP_UUU_H, H4, H2, vfwmul16)
-+RVVCALL(OPFVF2, vfwmul_vf_w, WOP_UUU_W, H8, H4, vfwmul32)
-+GEN_VEXT_VF(vfwmul_vf_h, 2, 4, clearl)
-+GEN_VEXT_VF(vfwmul_vf_w, 4, 8, clearq)
++
++RVVCALL(OPFVV2, vfwadd_vv_h, WOP_UUU_H, H4, H2, H2, vfwadd16)
++RVVCALL(OPFVV2, vfwadd_vv_w, WOP_UUU_W, H8, H4, H4, vfwadd32)
++GEN_VEXT_VV_ENV(vfwadd_vv_h, 2, 4, clearl)
++GEN_VEXT_VV_ENV(vfwadd_vv_w, 4, 8, clearq)
++RVVCALL(OPFVF2, vfwadd_vf_h, WOP_UUU_H, H4, H2, vfwadd16)
++RVVCALL(OPFVF2, vfwadd_vf_w, WOP_UUU_W, H8, H4, vfwadd32)
++GEN_VEXT_VF(vfwadd_vf_h, 2, 4, clearl)
++GEN_VEXT_VF(vfwadd_vf_w, 4, 8, clearq)
++
++static uint32_t vfwsub16(uint16_t a, uint16_t b, float_status *s)
++{
++    return float32_sub(float16_to_float32(a, true, s),
++            float16_to_float32(b, true, s), s);
++}
++
++static uint64_t vfwsub32(uint32_t a, uint32_t b, float_status *s)
++{
++    return float64_sub(float32_to_float64(a, s),
++            float32_to_float64(b, s), s);
++
++}
++
++RVVCALL(OPFVV2, vfwsub_vv_h, WOP_UUU_H, H4, H2, H2, vfwsub16)
++RVVCALL(OPFVV2, vfwsub_vv_w, WOP_UUU_W, H8, H4, H4, vfwsub32)
++GEN_VEXT_VV_ENV(vfwsub_vv_h, 2, 4, clearl)
++GEN_VEXT_VV_ENV(vfwsub_vv_w, 4, 8, clearq)
++RVVCALL(OPFVF2, vfwsub_vf_h, WOP_UUU_H, H4, H2, vfwsub16)
++RVVCALL(OPFVF2, vfwsub_vf_w, WOP_UUU_W, H8, H4, vfwsub32)
++GEN_VEXT_VF(vfwsub_vf_h, 2, 4, clearl)
++GEN_VEXT_VF(vfwsub_vf_w, 4, 8, clearq)
++
++static uint32_t vfwaddw16(uint32_t a, uint16_t b, float_status *s)
++{
++    return float32_add(a, float16_to_float32(b, true, s), s);
++}
++
++static uint64_t vfwaddw32(uint64_t a, uint32_t b, float_status *s)
++{
++    return float64_add(a, float32_to_float64(b, s), s);
++}
++
++RVVCALL(OPFVV2, vfwadd_wv_h, WOP_WUUU_H, H4, H2, H2, vfwaddw16)
++RVVCALL(OPFVV2, vfwadd_wv_w, WOP_WUUU_W, H8, H4, H4, vfwaddw32)
++GEN_VEXT_VV_ENV(vfwadd_wv_h, 2, 4, clearl)
++GEN_VEXT_VV_ENV(vfwadd_wv_w, 4, 8, clearq)
++RVVCALL(OPFVF2, vfwadd_wf_h, WOP_WUUU_H, H4, H2, vfwaddw16)
++RVVCALL(OPFVF2, vfwadd_wf_w, WOP_WUUU_W, H8, H4, vfwaddw32)
++GEN_VEXT_VF(vfwadd_wf_h, 2, 4, clearl)
++GEN_VEXT_VF(vfwadd_wf_w, 4, 8, clearq)
++
++static uint32_t vfwsubw16(uint32_t a, uint16_t b, float_status *s)
++{
++    return float32_sub(a, float16_to_float32(b, true, s), s);
++}
++
++static uint64_t vfwsubw32(uint64_t a, uint32_t b, float_status *s)
++{
++    return float64_sub(a, float32_to_float64(b, s), s);
++}
++
++RVVCALL(OPFVV2, vfwsub_wv_h, WOP_WUUU_H, H4, H2, H2, vfwsubw16)
++RVVCALL(OPFVV2, vfwsub_wv_w, WOP_WUUU_W, H8, H4, H4, vfwsubw32)
++GEN_VEXT_VV_ENV(vfwsub_wv_h, 2, 4, clearl)
++GEN_VEXT_VV_ENV(vfwsub_wv_w, 4, 8, clearq)
++RVVCALL(OPFVF2, vfwsub_wf_h, WOP_WUUU_H, H4, H2, vfwsubw16)
++RVVCALL(OPFVF2, vfwsub_wf_w, WOP_WUUU_W, H8, H4, vfwsubw32)
++GEN_VEXT_VF(vfwsub_wf_h, 2, 4, clearl)
++GEN_VEXT_VF(vfwsub_wf_w, 4, 8, clearq)
 -- 
 2.23.0
 
