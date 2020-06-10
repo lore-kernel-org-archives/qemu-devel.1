@@ -2,80 +2,82 @@ Return-Path: <SRS0=wemX=7X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDB0BC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 04:53:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D79DC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 04:54:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 84B9F2072E
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 04:53:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1F99D2072E
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 04:54:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KWTVAKb2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84B9F2072E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RaM8Q0z1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F99D2072E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38288 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44242 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jisjs-0003Ft-Pw
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 00:53:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34164)
+	id 1jislN-0005mu-CJ
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 00:54:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34770)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jisLF-0000mk-Sk
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 00:27:57 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:58030
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jisOI-0004h1-Cw
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 00:31:06 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31265
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jisLE-0008KY-Vp
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 00:27:57 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jisOH-0000gl-3I
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 00:31:06 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591763276;
+ s=mimecast20190719; t=1591763464;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=2NYIzPHnTVGrlqldKcyFGJ1nv5lf4gt4t0AfJyHtJ8o=;
- b=KWTVAKb2E0ve1UY33bYS7S529sA9cHfhFg5jbFwjHAz8lg0SIAQgg/nAxwxqWti1KjwZoe
- MNX1jt+tG9pHb3FXe2lMPQlgz/ti6v7wiOf2GgfLy13B4hELMhkrzFQ2E6j0ZK0goajj9O
- 3r4DQnebOglK9YKq/qoC65X+jmdr87g=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-406-m8VbW_98MX2FcwVkd6YCbw-1; Wed, 10 Jun 2020 00:27:54 -0400
-X-MC-Unique: m8VbW_98MX2FcwVkd6YCbw-1
-Received: by mail-wr1-f70.google.com with SMTP id j16so491625wre.22
- for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 21:27:54 -0700 (PDT)
+ bh=mpMbTsm6mehy6ISo1LlFq8k67fPnsrK8nRjA546c8Mw=;
+ b=RaM8Q0z1FpESSejNi0stSvUcMsp1mQrGtDQB6zT6R+kGRjqVKP3PyVYAXix47Jw+LUjPut
+ 8RIkHBuWAtCDV4VbYU3lFpE5ET2DfkJvKWSqyHCZ2UWp9q67ybobtk2BpWGb4W62PLYXKL
+ qoLS51gdDgi9rOWbo29m3R/risSDATo=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-306-0CexiNW0PuuGbPkb_RlSNA-1; Wed, 10 Jun 2020 00:28:36 -0400
+X-MC-Unique: 0CexiNW0PuuGbPkb_RlSNA-1
+Received: by mail-wr1-f71.google.com with SMTP id n6so513136wrv.6
+ for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 21:28:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=2NYIzPHnTVGrlqldKcyFGJ1nv5lf4gt4t0AfJyHtJ8o=;
- b=cuTm1tWWbJEwqGD231hD1Yrw+zpLjYVF2PaKrGGNU6xy2ORzjVTzNb4IO6+0TQDzZl
- ilbg5IvY1GMP0Mm5FSkN+GbKSvuRC3viCNeQxpuSeroKfLo0cfYR8gQ70/QHKEREl8dS
- XHa2MtK8u6oTyr5k5MGa5kLI9O+NrHx6lBs0WWIvvuUNRLaWj18niXH0B8//pzLYYto0
- yeISIjY+AyKa5fQofb23Zt8tEiH9N3jKGyVV4OnOie6MSIRGmcNo05MyIUx74akvRH7u
- MNVREp7iBzC2fY1v1L1tn78gR6dqfMaOVQMgJCXu3TlHrqkKTGCK9fm5ECgk2KDkeZZ6
- CF0w==
-X-Gm-Message-State: AOAM531RA29lOmE6h73tL2vMnEOVRTDorqFeFep8e9qKt6Jk24m/NsYQ
- Z9VxGV9O8i07o7zoSJoC/cqc2vaxmG69cex4O3uA6MnsKhPMqii8xQk6S5bc5bEHskpVP6VzWc1
- mdOCZJ969A4UsWrY=
-X-Received: by 2002:a5d:4a04:: with SMTP id m4mr1420691wrq.153.1591763273003; 
- Tue, 09 Jun 2020 21:27:53 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyZc8jeOXxopUdkJ1qo/UY+m1QqcYUQj4xgs5kIQURzApNLs95VedY0LOv+9cEzCHcw1Te6qg==
-X-Received: by 2002:a5d:4a04:: with SMTP id m4mr1420669wrq.153.1591763272813; 
- Tue, 09 Jun 2020 21:27:52 -0700 (PDT)
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=mpMbTsm6mehy6ISo1LlFq8k67fPnsrK8nRjA546c8Mw=;
+ b=oSX6+INU80mKeajPWc4s+19yE9uF6UBO1Nbc3Om2Qq6D40g1o7696xvb3dv4QH0xzl
+ rwnDSJ1ulmW6hbsq3NbdLH2pXNTXuojRqV1Wpfyhc8yzuZl0yIO+6wgzF4sO7idcNf/l
+ tUqorX+or6Hbw9VPfD3PLQlYhnPXk8acU4dtecD7ju5LT0de+fGx5sDNkz7PZaCnbwnX
+ u95EUxd8xCkY6fPU48K7kJSsPpJ7g3PNV0vkgMi++y21PU2YS8d1NYpXtQkX88P/6zlI
+ tFT/3ETHXRuEpkUbB9zJgverpCbM/hg9dZYrRqD6byJIxcK88bd30c77uMrAQbFduusg
+ RJyQ==
+X-Gm-Message-State: AOAM531yiwsJgyz1yw3G+/+H1QU3XbPbTS8g2tFKCmjLNDHyF8jzaOQ3
+ fmFUgDYExErxo4wGD31Aj6NKGCcI9TBGNdCdrsNVYUnN7yanCzHtrBSl+2WdT9oXq8by1It4dS5
+ IbWD86dHnrcoChD0=
+X-Received: by 2002:adf:a15c:: with SMTP id r28mr1236556wrr.337.1591763314759; 
+ Tue, 09 Jun 2020 21:28:34 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJydDYMB2bzOQ/aVCRVO6cOR7dg0Yx8FsEun+ZgY7V6amxQuoP4SOmbMpz7kSIn5UfJts3w3bQ==
+X-Received: by 2002:adf:a15c:: with SMTP id r28mr1236537wrr.337.1591763314559; 
+ Tue, 09 Jun 2020 21:28:34 -0700 (PDT)
 Received: from redhat.com (bzq-79-181-55-232.red.bezeqint.net. [79.181.55.232])
- by smtp.gmail.com with ESMTPSA id w17sm6177997wra.71.2020.06.09.21.27.51
+ by smtp.gmail.com with ESMTPSA id u74sm5371491wmu.31.2020.06.09.21.28.33
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 09 Jun 2020 21:27:52 -0700 (PDT)
-Date: Wed, 10 Jun 2020 00:27:50 -0400
+ Tue, 09 Jun 2020 21:28:34 -0700 (PDT)
+Date: Wed, 10 Jun 2020 00:28:32 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 35/56] vhost-user-blk: delay vhost_user_blk_disconnect
-Message-ID: <20200610042613.1459309-36-mst@redhat.com>
+Subject: [PULL 53/56] acpi: madt: skip pci override on pci-less systems.
+Message-ID: <20200610042613.1459309-54-mst@redhat.com>
 References: <20200610042613.1459309-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20200610042613.1459309-1-mst@redhat.com>
@@ -83,10 +85,11 @@ X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
 X-Mutt-Fcc: =sent
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=mst@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=mst@redhat.com;
+ helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 23:51:15
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
@@ -108,97 +111,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Li Feng <fengli@smartx.com>, Raphael Norwitz <raphael.norwitz@nutanix.com>,
- Dima Stepanov <dimastep@yandex-team.ru>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Dima Stepanov <dimastep@yandex-team.ru>
+From: Gerd Hoffmann <kraxel@redhat.com>
 
-A socket write during vhost-user communication may trigger a disconnect
-event, calling vhost_user_blk_disconnect() and clearing all the
-vhost_dev structures holding data that vhost-user functions expect to
-remain valid to roll back initialization correctly. Delay the cleanup to
-keep vhost_dev structure valid.
-There are two possible states to handle:
-1. RUN_STATE_PRELAUNCH: skip bh oneshot call and perform disconnect in
-the caller routine.
-2. RUN_STATE_RUNNING: delay by using bh
+Needed for microvm.
 
-BH changes are based on the similar changes for the vhost-user-net
-device:
-  commit e7c83a885f865128ae3cf1946f8cb538b63cbfba
-  "vhost-user: delay vhost_user_stop"
-
-Signed-off-by: Dima Stepanov <dimastep@yandex-team.ru>
-Message-Id: <69b73b94dcd066065595266c852810e0863a0895.1590396396.git.dimastep@yandex-team.ru>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <20200520132003.9492-8-kraxel@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Li Feng <fengli@smartx.com>
-Reviewed-by: Raphael Norwitz <raphael.norwitz@nutanix.com>
 ---
- hw/block/vhost-user-blk.c | 38 +++++++++++++++++++++++++++++++++++++-
- 1 file changed, 37 insertions(+), 1 deletion(-)
+ hw/i386/acpi-common.h |  3 ++-
+ hw/i386/acpi-build.c  |  2 +-
+ hw/i386/acpi-common.c | 26 +++++++++++++++-----------
+ 3 files changed, 18 insertions(+), 13 deletions(-)
 
-diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
-index 9d8c0b3909..76838e76d3 100644
---- a/hw/block/vhost-user-blk.c
-+++ b/hw/block/vhost-user-blk.c
-@@ -349,6 +349,19 @@ static void vhost_user_blk_disconnect(DeviceState *dev)
-     vhost_dev_cleanup(&s->dev);
+diff --git a/hw/i386/acpi-common.h b/hw/i386/acpi-common.h
+index c30e461f18..9cac18dddf 100644
+--- a/hw/i386/acpi-common.h
++++ b/hw/i386/acpi-common.h
+@@ -9,6 +9,7 @@
+ #define ACPI_BUILD_IOAPIC_ID 0x0
+ 
+ void acpi_build_madt(GArray *table_data, BIOSLinker *linker,
+-                     X86MachineState *x86ms, AcpiDeviceIf *adev);
++                     X86MachineState *x86ms, AcpiDeviceIf *adev,
++                     bool has_pci);
+ 
+ #endif
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index 26c0c8aefa..473cbdfffd 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -2588,7 +2588,7 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
+ 
+     acpi_add_table(table_offsets, tables_blob);
+     acpi_build_madt(tables_blob, tables->linker, x86ms,
+-                    ACPI_DEVICE_IF(pcms->acpi_dev));
++                    ACPI_DEVICE_IF(pcms->acpi_dev), true);
+ 
+     vmgenid_dev = find_vmgenid_dev();
+     if (vmgenid_dev) {
+diff --git a/hw/i386/acpi-common.c b/hw/i386/acpi-common.c
+index 5caca16a0b..ab9b00581a 100644
+--- a/hw/i386/acpi-common.c
++++ b/hw/i386/acpi-common.c
+@@ -72,7 +72,8 @@ void pc_madt_cpu_entry(AcpiDeviceIf *adev, int uid,
  }
  
-+static void vhost_user_blk_event(void *opaque, QEMUChrEvent event);
-+
-+static void vhost_user_blk_chr_closed_bh(void *opaque)
-+{
-+    DeviceState *dev = opaque;
-+    VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-+    VHostUserBlk *s = VHOST_USER_BLK(vdev);
-+
-+    vhost_user_blk_disconnect(dev);
-+    qemu_chr_fe_set_handlers(&s->chardev, NULL, NULL, vhost_user_blk_event,
-+            NULL, opaque, NULL, true);
-+}
-+
- static void vhost_user_blk_event(void *opaque, QEMUChrEvent event)
+ void acpi_build_madt(GArray *table_data, BIOSLinker *linker,
+-                     X86MachineState *x86ms, AcpiDeviceIf *adev)
++                     X86MachineState *x86ms, AcpiDeviceIf *adev,
++                     bool has_pci)
  {
-     DeviceState *dev = opaque;
-@@ -363,7 +376,30 @@ static void vhost_user_blk_event(void *opaque, QEMUChrEvent event)
-         }
-         break;
-     case CHR_EVENT_CLOSED:
--        vhost_user_blk_disconnect(dev);
-+        /*
-+         * A close event may happen during a read/write, but vhost
-+         * code assumes the vhost_dev remains setup, so delay the
-+         * stop & clear. There are two possible paths to hit this
-+         * disconnect event:
-+         * 1. When VM is in the RUN_STATE_PRELAUNCH state. The
-+         * vhost_user_blk_device_realize() is a caller.
-+         * 2. In tha main loop phase after VM start.
-+         *
-+         * For p2 the disconnect event will be delayed. We can't
-+         * do the same for p1, because we are not running the loop
-+         * at this moment. So just skip this step and perform
-+         * disconnect in the caller function.
-+         *
-+         * TODO: maybe it is a good idea to make the same fix
-+         * for other vhost-user devices.
-+         */
-+        if (runstate_is_running()) {
-+            AioContext *ctx = qemu_get_current_aio_context();
+     MachineClass *mc = MACHINE_GET_CLASS(x86ms);
+     const CPUArchIdList *apic_ids = mc->possible_cpu_arch_ids(MACHINE(x86ms));
+@@ -111,18 +112,21 @@ void acpi_build_madt(GArray *table_data, BIOSLinker *linker,
+         intsrcovr->gsi    = cpu_to_le32(2);
+         intsrcovr->flags  = cpu_to_le16(0); /* conforms to bus specifications */
+     }
+-    for (i = 1; i < 16; i++) {
 +
-+            qemu_chr_fe_set_handlers(&s->chardev, NULL, NULL, NULL, NULL,
-+                    NULL, NULL, false);
-+            aio_bh_schedule_oneshot(ctx, vhost_user_blk_chr_closed_bh, opaque);
-+        }
-         break;
-     case CHR_EVENT_BREAK:
-     case CHR_EVENT_MUX_IN:
++    if (has_pci) {
++        for (i = 1; i < 16; i++) {
+ #define ACPI_BUILD_PCI_IRQS ((1<<5) | (1<<9) | (1<<10) | (1<<11))
+-        if (!(ACPI_BUILD_PCI_IRQS & (1 << i))) {
+-            /* No need for a INT source override structure. */
+-            continue;
++            if (!(ACPI_BUILD_PCI_IRQS & (1 << i))) {
++                /* No need for a INT source override structure. */
++                continue;
++            }
++            intsrcovr = acpi_data_push(table_data, sizeof *intsrcovr);
++            intsrcovr->type   = ACPI_APIC_XRUPT_OVERRIDE;
++            intsrcovr->length = sizeof(*intsrcovr);
++            intsrcovr->source = i;
++            intsrcovr->gsi    = cpu_to_le32(i);
++            intsrcovr->flags  = cpu_to_le16(0xd); /* active high, level triggered */
+         }
+-        intsrcovr = acpi_data_push(table_data, sizeof *intsrcovr);
+-        intsrcovr->type   = ACPI_APIC_XRUPT_OVERRIDE;
+-        intsrcovr->length = sizeof(*intsrcovr);
+-        intsrcovr->source = i;
+-        intsrcovr->gsi    = cpu_to_le32(i);
+-        intsrcovr->flags  = cpu_to_le16(0xd); /* active high, level triggered */
+     }
+ 
+     if (x2apic_mode) {
 -- 
 MST
 
