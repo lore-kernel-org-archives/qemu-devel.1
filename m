@@ -6,64 +6,62 @@ X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B8D4C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 07:36:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D96B8C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 07:37:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1F6EC207ED
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 07:36:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F6EC207ED
+	by mail.kernel.org (Postfix) with ESMTPS id ABECD207ED
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 07:37:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ABECD207ED
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44766 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47564 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jivHu-0000Ck-EY
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 03:36:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58304)
+	id 1jivIu-0001OF-WC
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 03:37:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58308)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jivH5-0007lX-4Q
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 03:35:51 -0400
-Received: from indium.canonical.com ([91.189.90.7]:46650)
+ id 1jivH6-0007mb-7f
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 03:35:52 -0400
+Received: from indium.canonical.com ([91.189.90.7]:46836)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jivH4-0001w9-44
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 03:35:50 -0400
+ id 1jivH5-0001xP-ED
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 03:35:51 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jivH0-00013J-DH
- for <qemu-devel@nongnu.org>; Wed, 10 Jun 2020 07:35:46 +0000
+ id 1jivH2-00012t-0K
+ for <qemu-devel@nongnu.org>; Wed, 10 Jun 2020 07:35:48 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 391F52E8110
+ by loganberry.canonical.com (Postfix) with ESMTP id E7AC82E8144
  for <qemu-devel@nongnu.org>; Wed, 10 Jun 2020 07:35:46 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 10 Jun 2020 07:26:38 -0000
-From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1882817@bugs.launchpad.net>
+Date: Wed, 10 Jun 2020 07:27:29 -0000
+From: r1ng0hacking <1882065@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=In Progress; importance=Undecided;
- assignee=None; 
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: philmd theartlav
-X-Launchpad-Bug-Reporter: Artyom (theartlav)
-X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
- =?utf-8?q?=29?=
-References: <159172265471.31406.7196816329603804386.malonedeb@gac.canonical.com>
-Message-Id: <159177399870.32462.17975347693674032703.launchpad@gac.canonical.com>
-Subject: [Bug 1882817] Re: Segfault in audio_pcm_sw_write with audio over VNC
+X-Launchpad-Bug-Commenters: r1ng0hacking
+X-Launchpad-Bug-Reporter: r1ng0hacking (r1ng0hacking)
+X-Launchpad-Bug-Modifier: r1ng0hacking (r1ng0hacking)
+References: <159126616614.13200.9922024695272390145.malonedeb@soybean.canonical.com>
+Message-Id: <159177404993.9073.2123494655282111856.launchpad@wampee.canonical.com>
+Subject: [Bug 1882065] Re: Could this cause OOB bug ?
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="ef9fc486e875d54078fa61cf91e898b895125d89";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: b17b448dc08fbea4b63689feaf267307dadec97a
+X-Launchpad-Hash: 6cf02945a4e53104af194a9c00e8c15452b9af68
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/10 03:25:41
@@ -85,65 +83,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1882817 <1882817@bugs.launchpad.net>
+Reply-To: Bug 1882065 <1882065@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Changed in: qemu
-       Status: New =3D> In Progress
+** Description changed:
+
+- In function megasas_handle_scsi(hw/scsi/megasas.c):
+- =
+
+- ```c
+- static int megasas_handle_scsi(MegasasState *s, MegasasCmd *cmd,
+-                                int frame_cmd)
+- {
+-     .....................................................................=
+.......
+-     cdb =3D cmd->frame->pass.cdb;
+-     target_id =3D cmd->frame->header.target_id;
+-     lun_id =3D cmd->frame->header.lun_id;
+-     cdb_len =3D cmd->frame->header.cdb_len;
+-     .....................................................................=
+.......
+-     if (cdb_len > 16) {
+-         trace_megasas_scsi_invalid_cdb_len(
+-                 mfi_frame_desc[frame_cmd], is_logical,
+-                 target_id, lun_id, cdb_len);
+-         megasas_write_sense(cmd, SENSE_CODE(INVALID_OPCODE));
+-         cmd->frame->header.scsi_status =3D CHECK_CONDITION;
+-         s->event_count++;
+-         return MFI_STAT_SCSI_DONE_WITH_ERROR;
+-     }
+- }
+- ```
+- =
+
+- Two variables, frame_cmd and cdb_len, can be controlled by guest os. So
+- can mfi_frame_desc[frame_cmd] cause OOB bug ?
++ close!!!!!
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1882817
+https://bugs.launchpad.net/bugs/1882065
 
 Title:
-  Segfault in audio_pcm_sw_write with audio over VNC
+  Could this cause OOB bug ?
 
 Status in QEMU:
-  In Progress
+  New
 
 Bug description:
-  QEMU 5.0.0, built with ./configure --target-list=3Dx86_64-softmmu
-  --enable-debug --disable-strip --disable-docs --disable-sdl
-
-  Running on a headless host (Ryzen 3600), Arch Linux, 64bit latest.
-  Guest is also Arch Linux, 64bit.
-
-  Started with qemu-system-x86_64 -vnc 0.0.0.0:0 -enable-kvm -m 4096 -cpu h=
-ost -smp cores=3D2,threads=3D1,sockets=3D1 -machine q35 -vga std -device
-   ich9-ahci,id=3Dahci -drive file=3Dvm0.qcow2,format=3Dqcow2,if=3Dnone,id=
-=3Ddsk0 -device ide-hd,drive=3Ddsk0,bus=3Dahci.0 -soundhw hda
-
-  So, a headless VM is running on a server and is being connected to
-  over VNC. The virtual sound card is detected and speaker test is
-  running inside the VM. So far so good.
-
-  Then, i tell the VNC client to enable audio (QEMU Audio Client
-  Message, 255,1,0). QEMU responds with a "stream is about to start"
-  message (QEMU Audio Server Message, 255,1,1) and then promptly crashes
-  without sending anything else.
-
-  Running it in GDB produces a crash at audio/audio.c:739
-
-  Thread 1 "qemu-system-x86" received signal SIGSEGV, Segmentation fault.
-  audio_pcm_sw_write (sw=3D0x5555575bbf30, buf=3D0x0, size=3D1628) at audio=
-/audio.c:739
-  739             if (!sw->hw->pcm_ops->volume_out) {
-
-  The exact sequence of events does not matter - i can enable sound
-  before playing anything, and then it would say nothing and keep
-  working, but crash with the same message once anything sound-playing
-  is launched in the VM.
-
-  Using different soundhw or adding various audiodev options does not
-  seem to affect anything.
-
-  I can't quite figure out if the QEMU Audio VNC extension is supposed
-  to work at all or not, but it would be handy to me if it is.
+  close!!!!!
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1882817/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1882065/+subscriptions
 
