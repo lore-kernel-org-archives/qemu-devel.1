@@ -2,67 +2,81 @@ Return-Path: <SRS0=wemX=7X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E428AC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 12:55:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 697E4C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 12:56:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B7D8720734
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 12:55:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7D8720734
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3E07E20734
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 12:56:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E07E20734
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32954 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36188 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jj0GF-0001sZ-P9
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 08:55:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59318)
+	id 1jj0HY-0003Zr-Ga
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 08:56:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59948)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jj0FW-0001Ls-4c; Wed, 10 Jun 2020 08:54:34 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:36291)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jj0FU-0007Wq-S7; Wed, 10 Jun 2020 08:54:33 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07457787|-1; CH=blue; DM=|OVERLOAD|false|;
- DS=CONTINUE|ham_system_inform|0.0261419-9.53996e-05-0.973763;
- FP=0|0|0|0|0|-1|-1|-1; HT=e01a16367; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=9; RT=8; SR=0; TI=SMTPD_---.Hkaf97i_1591793667; 
-Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.Hkaf97i_1591793667)
- by smtp.aliyun-inc.com(10.147.41.231);
- Wed, 10 Jun 2020 20:54:27 +0800
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-To: qemu-devel@nongnu.org,
-	qemu-riscv@nongnu.org
-Subject: [PATCH v9 38/61] target/riscv: vector floating-point sign-injection
- instructions
-Date: Wed, 10 Jun 2020 19:37:25 +0800
-Message-Id: <20200610113748.4754-39-zhiwei_liu@c-sky.com>
-X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20200610113748.4754-1-zhiwei_liu@c-sky.com>
-References: <20200610113748.4754-1-zhiwei_liu@c-sky.com>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jj0Gw-0002w5-4M
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 08:56:02 -0400
+Received: from indium.canonical.com ([91.189.90.7]:54810)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jj0Gv-00088w-1k
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 08:56:01 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jj0Gs-0002kz-9I
+ for <qemu-devel@nongnu.org>; Wed, 10 Jun 2020 12:55:58 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 444B22E8106
+ for <qemu-devel@nongnu.org>; Wed, 10 Jun 2020 12:55:58 +0000 (UTC)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: none client-ip=121.197.200.217;
- envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/10 07:37:52
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001, UNPARSEABLE_RELAY=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 10 Jun 2020 12:49:04 -0000
+From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1858415@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
+ assignee=samuel.thibault@ens-lyon.org; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: philmd r1ng0hacking th-huth
+X-Launchpad-Bug-Reporter: r1ng0hacking (r1ng0hacking)
+X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
+ =?utf-8?q?=29?=
+References: <157830904702.27324.6826841321216823570.malonedeb@chaenomeles.canonical.com>
+Message-Id: <159179334411.17787.9585807741907220473.malone@chaenomeles.canonical.com>
+Subject: [Bug 1858415] Re: in tcp_emu function has OOB bug
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="ef9fc486e875d54078fa61cf91e898b895125d89";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 62b96ff15d4e76a50e54d6f82cf8043266d9c069
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/10 06:30:56
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -71,177 +85,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: richard.henderson@linaro.org, wxy194768@alibaba-inc.com,
- wenmeng_zhang@c-sky.com, Alistair Francis <alistair.francis@wdc.com>,
- palmer@dabbelt.com, LIU Zhiwei <zhiwei_liu@c-sky.com>
+Reply-To: Bug 1858415 <1858415@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
----
- target/riscv/helper.h                   | 19 ++++++
- target/riscv/insn32.decode              |  6 ++
- target/riscv/insn_trans/trans_rvv.inc.c |  8 +++
- target/riscv/vector_helper.c            | 85 +++++++++++++++++++++++++
- 4 files changed, 118 insertions(+)
+libslirp fix included in commit 7769c23774d1, released in QEMU-v5.0.0
 
-diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index 12d959ba0d..d6e7ce57be 100644
---- a/target/riscv/helper.h
-+++ b/target/riscv/helper.h
-@@ -934,3 +934,22 @@ DEF_HELPER_6(vfmin_vf_d, void, ptr, ptr, i64, ptr, env, i32)
- DEF_HELPER_6(vfmax_vf_h, void, ptr, ptr, i64, ptr, env, i32)
- DEF_HELPER_6(vfmax_vf_w, void, ptr, ptr, i64, ptr, env, i32)
- DEF_HELPER_6(vfmax_vf_d, void, ptr, ptr, i64, ptr, env, i32)
-+
-+DEF_HELPER_6(vfsgnj_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vfsgnj_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vfsgnj_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vfsgnjn_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vfsgnjn_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vfsgnjn_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vfsgnjx_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vfsgnjx_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vfsgnjx_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vfsgnj_vf_h, void, ptr, ptr, i64, ptr, env, i32)
-+DEF_HELPER_6(vfsgnj_vf_w, void, ptr, ptr, i64, ptr, env, i32)
-+DEF_HELPER_6(vfsgnj_vf_d, void, ptr, ptr, i64, ptr, env, i32)
-+DEF_HELPER_6(vfsgnjn_vf_h, void, ptr, ptr, i64, ptr, env, i32)
-+DEF_HELPER_6(vfsgnjn_vf_w, void, ptr, ptr, i64, ptr, env, i32)
-+DEF_HELPER_6(vfsgnjn_vf_d, void, ptr, ptr, i64, ptr, env, i32)
-+DEF_HELPER_6(vfsgnjx_vf_h, void, ptr, ptr, i64, ptr, env, i32)
-+DEF_HELPER_6(vfsgnjx_vf_w, void, ptr, ptr, i64, ptr, env, i32)
-+DEF_HELPER_6(vfsgnjx_vf_d, void, ptr, ptr, i64, ptr, env, i32)
-diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index 5ec5595e2c..ce2f497ed2 100644
---- a/target/riscv/insn32.decode
-+++ b/target/riscv/insn32.decode
-@@ -494,6 +494,12 @@ vfmin_vv        000100 . ..... ..... 001 ..... 1010111 @r_vm
- vfmin_vf        000100 . ..... ..... 101 ..... 1010111 @r_vm
- vfmax_vv        000110 . ..... ..... 001 ..... 1010111 @r_vm
- vfmax_vf        000110 . ..... ..... 101 ..... 1010111 @r_vm
-+vfsgnj_vv       001000 . ..... ..... 001 ..... 1010111 @r_vm
-+vfsgnj_vf       001000 . ..... ..... 101 ..... 1010111 @r_vm
-+vfsgnjn_vv      001001 . ..... ..... 001 ..... 1010111 @r_vm
-+vfsgnjn_vf      001001 . ..... ..... 101 ..... 1010111 @r_vm
-+vfsgnjx_vv      001010 . ..... ..... 001 ..... 1010111 @r_vm
-+vfsgnjx_vf      001010 . ..... ..... 101 ..... 1010111 @r_vm
- 
- vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
- vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
-diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index 0c1e45123d..6170fce05d 100644
---- a/target/riscv/insn_trans/trans_rvv.inc.c
-+++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -2138,3 +2138,11 @@ GEN_OPFVV_TRANS(vfmin_vv, opfvv_check)
- GEN_OPFVV_TRANS(vfmax_vv, opfvv_check)
- GEN_OPFVF_TRANS(vfmin_vf, opfvf_check)
- GEN_OPFVF_TRANS(vfmax_vf, opfvf_check)
-+
-+/* Vector Floating-Point Sign-Injection Instructions */
-+GEN_OPFVV_TRANS(vfsgnj_vv, opfvv_check)
-+GEN_OPFVV_TRANS(vfsgnjn_vv, opfvv_check)
-+GEN_OPFVV_TRANS(vfsgnjx_vv, opfvv_check)
-+GEN_OPFVF_TRANS(vfsgnj_vf, opfvf_check)
-+GEN_OPFVF_TRANS(vfsgnjn_vf, opfvf_check)
-+GEN_OPFVF_TRANS(vfsgnjx_vf, opfvf_check)
-diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index 82e570da4e..7a1c5311bb 100644
---- a/target/riscv/vector_helper.c
-+++ b/target/riscv/vector_helper.c
-@@ -3844,3 +3844,88 @@ RVVCALL(OPFVF2, vfmax_vf_d, OP_UUU_D, H8, H8, float64_maxnum)
- GEN_VEXT_VF(vfmax_vf_h, 2, 2, clearh)
- GEN_VEXT_VF(vfmax_vf_w, 4, 4, clearl)
- GEN_VEXT_VF(vfmax_vf_d, 8, 8, clearq)
-+
-+/* Vector Floating-Point Sign-Injection Instructions */
-+static uint16_t fsgnj16(uint16_t a, uint16_t b, float_status *s)
-+{
-+    return deposit64(b, 0, 15, a);
-+}
-+
-+static uint32_t fsgnj32(uint32_t a, uint32_t b, float_status *s)
-+{
-+    return deposit64(b, 0, 31, a);
-+}
-+
-+static uint64_t fsgnj64(uint64_t a, uint64_t b, float_status *s)
-+{
-+    return deposit64(b, 0, 63, a);
-+}
-+
-+RVVCALL(OPFVV2, vfsgnj_vv_h, OP_UUU_H, H2, H2, H2, fsgnj16)
-+RVVCALL(OPFVV2, vfsgnj_vv_w, OP_UUU_W, H4, H4, H4, fsgnj32)
-+RVVCALL(OPFVV2, vfsgnj_vv_d, OP_UUU_D, H8, H8, H8, fsgnj64)
-+GEN_VEXT_VV_ENV(vfsgnj_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV_ENV(vfsgnj_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV_ENV(vfsgnj_vv_d, 8, 8, clearq)
-+RVVCALL(OPFVF2, vfsgnj_vf_h, OP_UUU_H, H2, H2, fsgnj16)
-+RVVCALL(OPFVF2, vfsgnj_vf_w, OP_UUU_W, H4, H4, fsgnj32)
-+RVVCALL(OPFVF2, vfsgnj_vf_d, OP_UUU_D, H8, H8, fsgnj64)
-+GEN_VEXT_VF(vfsgnj_vf_h, 2, 2, clearh)
-+GEN_VEXT_VF(vfsgnj_vf_w, 4, 4, clearl)
-+GEN_VEXT_VF(vfsgnj_vf_d, 8, 8, clearq)
-+
-+static uint16_t fsgnjn16(uint16_t a, uint16_t b, float_status *s)
-+{
-+    return deposit64(~b, 0, 15, a);
-+}
-+
-+static uint32_t fsgnjn32(uint32_t a, uint32_t b, float_status *s)
-+{
-+    return deposit64(~b, 0, 31, a);
-+}
-+
-+static uint64_t fsgnjn64(uint64_t a, uint64_t b, float_status *s)
-+{
-+    return deposit64(~b, 0, 63, a);
-+}
-+
-+RVVCALL(OPFVV2, vfsgnjn_vv_h, OP_UUU_H, H2, H2, H2, fsgnjn16)
-+RVVCALL(OPFVV2, vfsgnjn_vv_w, OP_UUU_W, H4, H4, H4, fsgnjn32)
-+RVVCALL(OPFVV2, vfsgnjn_vv_d, OP_UUU_D, H8, H8, H8, fsgnjn64)
-+GEN_VEXT_VV_ENV(vfsgnjn_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV_ENV(vfsgnjn_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV_ENV(vfsgnjn_vv_d, 8, 8, clearq)
-+RVVCALL(OPFVF2, vfsgnjn_vf_h, OP_UUU_H, H2, H2, fsgnjn16)
-+RVVCALL(OPFVF2, vfsgnjn_vf_w, OP_UUU_W, H4, H4, fsgnjn32)
-+RVVCALL(OPFVF2, vfsgnjn_vf_d, OP_UUU_D, H8, H8, fsgnjn64)
-+GEN_VEXT_VF(vfsgnjn_vf_h, 2, 2, clearh)
-+GEN_VEXT_VF(vfsgnjn_vf_w, 4, 4, clearl)
-+GEN_VEXT_VF(vfsgnjn_vf_d, 8, 8, clearq)
-+
-+static uint16_t fsgnjx16(uint16_t a, uint16_t b, float_status *s)
-+{
-+    return deposit64(b ^ a, 0, 15, a);
-+}
-+
-+static uint32_t fsgnjx32(uint32_t a, uint32_t b, float_status *s)
-+{
-+    return deposit64(b ^ a, 0, 31, a);
-+}
-+
-+static uint64_t fsgnjx64(uint64_t a, uint64_t b, float_status *s)
-+{
-+    return deposit64(b ^ a, 0, 63, a);
-+}
-+
-+RVVCALL(OPFVV2, vfsgnjx_vv_h, OP_UUU_H, H2, H2, H2, fsgnjx16)
-+RVVCALL(OPFVV2, vfsgnjx_vv_w, OP_UUU_W, H4, H4, H4, fsgnjx32)
-+RVVCALL(OPFVV2, vfsgnjx_vv_d, OP_UUU_D, H8, H8, H8, fsgnjx64)
-+GEN_VEXT_VV_ENV(vfsgnjx_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV_ENV(vfsgnjx_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV_ENV(vfsgnjx_vv_d, 8, 8, clearq)
-+RVVCALL(OPFVF2, vfsgnjx_vf_h, OP_UUU_H, H2, H2, fsgnjx16)
-+RVVCALL(OPFVF2, vfsgnjx_vf_w, OP_UUU_W, H4, H4, fsgnjx32)
-+RVVCALL(OPFVF2, vfsgnjx_vf_d, OP_UUU_D, H8, H8, fsgnjx64)
-+GEN_VEXT_VF(vfsgnjx_vf_h, 2, 2, clearh)
-+GEN_VEXT_VF(vfsgnjx_vf_w, 4, 4, clearl)
-+GEN_VEXT_VF(vfsgnjx_vf_d, 8, 8, clearq)
--- 
-2.23.0
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1858415
+
+Title:
+  in tcp_emu function has OOB bug
+
+Status in QEMU:
+  Fix Released
+
+Bug description:
+  qemu version: 4.1.0
+
+  ```c
+  int tcp_emu(struct socket *so, struct mbuf *m){
+  ............
+  case EMU_REALAUDIO:
+  ............
+      while (bptr < m->m_data + m->m_len) {
+          case 6:
+  ............
+              lport =3D (((uint8_t *)bptr)[0] << 8) + ((uint8_t *)bptr)[1];
+  ............               =
+
+              *(uint8_t *)bptr++ =3D (p >> 8) & 0xff;
+              *(uint8_t *)bptr =3D p & 0xff;
+  ............
+      }
+  ............
+  ............
+  }
+  ```
+
+  bptr)[1] and  bptr++ ,may make bptr =3D=3D  m->m_data + m->m_len,and cause
+  OOB=EF=BC=88out of bounds.=EF=BC=89
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1858415/+subscriptions
 
