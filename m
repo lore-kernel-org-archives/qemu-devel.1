@@ -2,84 +2,78 @@ Return-Path: <SRS0=wemX=7X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A97DC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 16:30:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7171AC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 16:32:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 132AD2072F
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 16:30:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3F7FE2070B
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 16:32:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OIi9AH9o"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 132AD2072F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R26Ev71r"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F7FE2070B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49868 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52488 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jj3cH-0003Yp-Ot
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 12:30:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38724)
+	id 1jj3eF-0005DA-Ft
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 12:32:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39398)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jj3bK-0002of-7n
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 12:29:18 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44172
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jj3dV-0004Sn-Th
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 12:31:33 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:37443
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jj3bI-0005Vl-D2
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 12:29:17 -0400
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jj3dU-00065J-VW
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 12:31:33 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591806555;
+ s=mimecast20190719; t=1591806691;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=sAbKxMQGFPVu4UkAhaHkmv2rOxwrHX6xVrrdaAiD1d8=;
- b=OIi9AH9otIb/xP/mGX7igyLQ7ZzoFSARfN0v1dASr0xYgh/GSVGLXcwQANi8HOexKqm5VZ
- Sqzp7KVEtYyquKOy6LWR1vXehZGRvr1OKdEDBdp7SXKPhs3WStj/GuE4x3zRc2GoAS2wP0
- OXG+g1n25qJ1ivX5cx8e8OYa9QX+6jI=
+ bh=+rQrJTNrE+IFxP2sunneGISYzwGWrYvcCsqRMNeSanM=;
+ b=R26Ev71rOu077lnuztRWV8uBMQTDPsP4yz6XZ6+0x64XANMDEAyp8wfDvrws92/behl1Ss
+ C18kUVByBuysHAXDZxB262Vufo0iLmNggerqah6pg85zDEiz2em/FS2tMcWXTk46yl323x
+ nfe49/HNYi9RuNvpkFnhlYHS3oIjkHU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-316-uct5aVxKPD-O_F0rbFZsYw-1; Wed, 10 Jun 2020 12:29:11 -0400
-X-MC-Unique: uct5aVxKPD-O_F0rbFZsYw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-309-J3bt16_6P3OozRkd7t3iYg-1; Wed, 10 Jun 2020 12:31:26 -0400
+X-MC-Unique: J3bt16_6P3OozRkd7t3iYg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 58824100CD03;
- Wed, 10 Jun 2020 16:29:10 +0000 (UTC)
-Received: from [10.3.113.22] (ovpn-113-22.phx2.redhat.com [10.3.113.22])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8B4291C4;
- Wed, 10 Jun 2020 16:29:09 +0000 (UTC)
-Subject: Re: [PATCH 2/2] block: Call attention to truncation of long NBD
- exports
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org
-References: <20200608182638.3256473-1-eblake@redhat.com>
- <20200608182638.3256473-3-eblake@redhat.com>
- <5430f8e5-8f28-d703-1b55-136e2296ec72@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <8bce0710-648b-1862-688c-8cee1cab9c8b@redhat.com>
-Date: Wed, 10 Jun 2020 11:29:08 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1AB8F461;
+ Wed, 10 Jun 2020 16:31:25 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-113-151.ams2.redhat.com [10.36.113.151])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7BC6B1A7D1;
+ Wed, 10 Jun 2020 16:31:23 +0000 (UTC)
+Date: Wed, 10 Jun 2020 18:31:22 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Sam Eiderman <sameid@google.com>
+Subject: Re: Clarification regarding new qemu-img convert --target-is-zero flag
+Message-ID: <20200610163122.GF6947@linux.fritz.box>
+References: <CAFr6bU=LjeW5_eGtwL38cher2TM52skohuANNXN9EpO+mA-z8Q@mail.gmail.com>
+ <m2imfz877v.fsf@dme.org>
+ <CAFr6bUk5LrEL8BPXYkNOqj_jsbxHBfbj_NYryUjszMtG89L+2w@mail.gmail.com>
+ <20200610140620.GE6947@linux.fritz.box>
+ <CAFr6bU=aD=AXnoR-qSdQtQC690FYFqFsDRHHGxdUDkTh2ho1cA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <5430f8e5-8f28-d703-1b55-136e2296ec72@virtuozzo.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <CAFr6bU=aD=AXnoR-qSdQtQC690FYFqFsDRHHGxdUDkTh2ho1cA@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=eblake@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 23:51:15
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 23:22:15
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -100,72 +94,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- qemu-stable@nongnu.org, Max Reitz <mreitz@redhat.com>, ppandit@redhat.com,
- xuwei@redhat.com
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, David Edmondson <dme@dme.org>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Tony Zhang <tzz@google.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/10/20 4:24 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 08.06.2020 21:26, Eric Blake wrote:
->> Commit 93676c88 relaxed our NBD client code to request export names up
->> to the NBD protocol maximum of 4096 bytes without NUL terminator, even
->> though the block layer can't store anything longer than 4096 bytes
->> including NUL terminator for display to the user.  Since this means
->> there are some export names where we have to truncate things, we can
->> at least try to make the truncation a bit more obvious for the user.
->> Note that in spite of the truncated display name, we can still
->> communicate with an NBD server using such a long export name; this was
->> deemed nicer than refusing to even connect to such a server (since the
->> server may not be under our control, and since determining our actual
->> length limits gets tricky when nbd://host:port/export and
->> nbd+unix:///export?socket=/path are themselves variable-length
->> expansions beyond the export name but count towards the block layer
->> name length).
->>
->> Reported-by: Xueqiang Wei <xuwei@redhat.com>
->> Fixes: https://bugzilla.redhat.com/1843684
->> Signed-off-by: Eric Blake <eblake@redhat.com>
+Am 10.06.2020 um 17:26 hat Sam Eiderman geschrieben:
+> Thanks for the clarification Kevin,
 > 
-> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> 
->> ---
->>   block.c     |  7 +++++--
->>   block/nbd.c | 21 +++++++++++++--------
->>   2 files changed, 18 insertions(+), 10 deletions(-)
->>
->> diff --git a/block.c b/block.c
->> index 8416376c9b71..6dbcb7e083ea 100644
->> --- a/block.c
->> +++ b/block.c
->> @@ -6809,8 +6809,11 @@ void bdrv_refresh_filename(BlockDriverState *bs)
->>           pstrcpy(bs->filename, sizeof(bs->filename), 
->> bs->exact_filename);
->>       } else {
->>           QString *json = 
->> qobject_to_json(QOBJECT(bs->full_open_options));
->> -        snprintf(bs->filename, sizeof(bs->filename), "json:%s",
->> -                 qstring_get_str(json));
->> +        if (snprintf(bs->filename, sizeof(bs->filename), "json:%s",
->> +                     qstring_get_str(json)) >= sizeof(bs->filename)) {
->> +            /* Give user a hint if we truncated things. */
->> +            strcpy(bs->filename + sizeof(bs->filename) - 4, "...");
->> +        }
-> 
-> Is  4096 really enough for json in normal cases?
+> Well first I want to discuss unallocated blocks.
+> From my understanding operating systems do not rely on disks to be
+> zero initialized, on the contrary, physical disks usually contain
+> garbage.
+> So an unallocated block should never be treated as zero by any real
+> world application.
 
-By its very nature, a json string tends be longer than a counterpart URI 
-string representing the same information (when such an explicit name 
-exists) because of the extra characters burned in adding "key":value 
-pairs wrapping the data that was compact in explicit form.  But 4k is 
-still quite a lot, and the only cases I've seen where names don't fit in 
-JSON form is where the user was explicitly trying to break things with 
-corner-case testing, rather than what you get with day-to-day use.
+I think this is a dangerous assumption to make. The guest did have
+access to these unallocated blocks before, and they read as zero, so not
+writing these to the conversion target does change the virtual disk.
+Whether or not this is a harmless change for the guest depends on the
+software running in the VM.
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+> Now assuming that I only care about the allocated content of the
+> disks, I would like to save io/time zeroing out unallocated blocks.
+> 
+> A real world example would be flushing a 500GB vmdk on a real SSD
+> disk, if the vmdk contained only 2GB of data, no point in writing
+> 498GB of zeroes to that SSD - reducing its lifespan for nothing.
+
+Don't pretty much all SSDs support efficient zeroing/hole punching these
+days so that the blocks would actually be deallocated on the disk level?
+
+> Now from what I understand --target-is-zero will give me this behavior
+> even though that I really use it as a "--skip-prezeroing-target"
+> (sorry for the bad name)
+> (This is only true if later *allocated zeroes* are indeed copied correctly)
+
+As you noticed later, it doesn't.
+
+The behaviour you want is more like -B, except that you don't have a
+backing file. If you also pass -n, the actual filename you pass isn't
+even used, so I guess '-B "" -n' should do the trick?
+
+Kevin
 
 
