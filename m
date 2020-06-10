@@ -2,87 +2,90 @@ Return-Path: <SRS0=wemX=7X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7485EC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 11:09:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57856C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 11:18:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3DD6C206F4
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 11:09:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2184B2072E
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 11:18:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UHneHVmw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3DD6C206F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JA4TsMLV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2184B2072E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44266 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46852 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jiybR-0002CV-Hc
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 07:09:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35638)
+	id 1jiykM-0004ci-Cd
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 07:18:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36988)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jiyak-0001fD-TR; Wed, 10 Jun 2020 07:08:22 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:37939)
- by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jiyak-0001fU-1X; Wed, 10 Jun 2020 07:08:22 -0400
-Received: by mail-wm1-x343.google.com with SMTP id f185so1427815wmf.3;
- Wed, 10 Jun 2020 04:08:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=SO8xwsqAc9ZgB1fur2HM0vFHynwzylFI5vm83ftmqrA=;
- b=UHneHVmwkAb9/Jc6ucNX0n75OllKeoRpLXP5MUl9a8KTlGsZrGd0LHEG3GTAG9VnXM
- NoydpZq0bx9GodfMF1U3HU7gDkvi0JnYp53I2ubqFwneaBtK3s62tWruTV3izLCfzpP/
- fQhckSiXpqAOsYsKX7cskgmiWPEEHIw1/T6z4clD/dDzOzdEZ9xAOwt9eWO5QamoLWW6
- 1UtQJAjB/Dd2RL0ygO8h3wxeer7HUYMSFrNBxKQbm0XyyH5POBgryHzLeKdg1YlvUWjj
- Ske9lBWn3t2YjXoF+WcOqka5JuGsoVbeoRobNK9y3IxNNo9xUx7rfJHEAQuyriyhgfI5
- euVA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=SO8xwsqAc9ZgB1fur2HM0vFHynwzylFI5vm83ftmqrA=;
- b=XDEnD2LgmCzGW2Q0yxYckp/T59y2A7liVHd+1zA/r416uV6YOkefVz/eeuHvXsmfoC
- p7AQe+/u6qYHl6tYB3reCbj4ZFjPhyFlg43pToqpvJUiEmTGCGJLOEZTC+daDk7j9xq+
- YWtGGmtPlpVI2SuAnd22vGH6yL5frNfLhCsDrY+fwMPi8R0YArhqvZUN5/aq/u2qwCSg
- 69foFH6eURNcLTcyzlr1FDfSSmStYSXABdPt6RLm01WejZl69sUMLi7mR2cVr+BxbD9c
- PzJtvYJyVmHbzt3cMZwyVG3Xtki3TefaRAHW+TA8jpgUCGdLPvhtK521aDHGtHeI19Be
- Le8Q==
-X-Gm-Message-State: AOAM531/huKCaF6TgPYWF+T8YPLXY2/ay7fNR/KZPXidOF7AMOK0Pqjz
- TItC6tm/ulcWyjwt7+4MK6rbOfbAJejPuK5ED24=
-X-Google-Smtp-Source: ABdhPJxwYYBIdv2yJV7yZ9qwoDqhpDRkZrpx61tU4Bp0UBiLm1pmv/B0AWiTPt1Li98nuq6ekx4ncyMcv9YLHzJ0ZB0=
-X-Received: by 2002:a05:600c:22c1:: with SMTP id
- 1mr2817537wmg.50.1591787300462; 
- Wed, 10 Jun 2020 04:08:20 -0700 (PDT)
-MIME-Version: 1.0
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jiyjB-000443-C6
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 07:17:05 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22825
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jiyj9-0003Ho-Dq
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 07:17:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591787822;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=ys+PWd2yjACemWlK/1sgYBE5TeJe7QO3+VKV0SkagRk=;
+ b=JA4TsMLVadoNjDb3yNuiB1nIvqq9dU7WnKdDsjJFeG4zLzWTLFEPqO/LCOqq4YrXtxI9m0
+ iq81u6dICLAsW9HEF0M98gheYw0tIv+pqpZFrs7pXoUOjgWj3+/ceAUnIITJAoVjBcL6Pz
+ qXjW53e9m28oTdyZCgXwMo07uOUDe6c=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-386-N9KIN_PVPgW2CeYqwK2foA-1; Wed, 10 Jun 2020 07:16:57 -0400
+X-MC-Unique: N9KIN_PVPgW2CeYqwK2foA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6E744107B000;
+ Wed, 10 Jun 2020 11:16:55 +0000 (UTC)
+Received: from thuth.remote.csb (unknown [10.40.192.19])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 76AF45D9D3;
+ Wed, 10 Jun 2020 11:16:49 +0000 (UTC)
+Subject: Re: [PATCH v2 1/8] MAINTAINERS: Mark SH4 hardware orphan
+To: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 References: <20200608090142.6793-1-f4bug@amsat.org>
  <20200608090142.6793-2-f4bug@amsat.org>
-In-Reply-To: <20200608090142.6793-2-f4bug@amsat.org>
-From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Date: Wed, 10 Jun 2020 13:08:07 +0200
-Message-ID: <CAHiYmc5UUaSKB6Ee0ds_hj0FBTzt0iLxzNWySt0mcZ9dvtZNyA@mail.gmail.com>
-Subject: Re: [PATCH v2 1/8] MAINTAINERS: Mark SH4 hardware orphan
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wm1-x343.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ <CAHiYmc5UUaSKB6Ee0ds_hj0FBTzt0iLxzNWySt0mcZ9dvtZNyA@mail.gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <5712d31d-93b1-4254-893a-93c2fc7e6502@redhat.com>
+Date: Wed, 10 Jun 2020 13:16:47 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
+MIME-Version: 1.0
+In-Reply-To: <CAHiYmc5UUaSKB6Ee0ds_hj0FBTzt0iLxzNWySt0mcZ9dvtZNyA@mail.gmail.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=thuth@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 23:51:15
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,103 +98,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
- Yoshinori Sato <ysato@users.sourceforge.jp>, qemu-trivial@nongnu.org,
- Michael Tokarev <mjt@tls.msk.ru>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- Magnus Damm <magnus.damm@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>,
+Cc: Fam Zheng <fam@euphon.net>, Yoshinori Sato <ysato@users.sourceforge.jp>,
+ qemu-trivial@nongnu.org, Magnus Damm <magnus.damm@gmail.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Michael Tokarev <mjt@tls.msk.ru>, QEMU Developers <qemu-devel@nongnu.org>,
  Laurent Vivier <laurent@vivier.eu>, Aurelien Jarno <aurelien@aurel32.net>,
  Richard Henderson <richard.henderson@linaro.org>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
  Markus Armbruster <armbru@redhat.com>,
  Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-=D0=BF=D0=BE=D0=BD, 8. =D1=98=D1=83=D0=BD 2020. =D1=83 11:05 Philippe Mathi=
-eu-Daud=C3=A9 <f4bug@amsat.org> =D1=98=D0=B5
-=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
->
-> Aurelien Jarno expressed his desire to orphan the SH4 hardware [*]:
->
->   I don't mind being [...] removed from there.
->   I do not really have time to work on that.
->
-> Mark the SH4 emulated hardware orphan.
->
-> Many thanks to Aurelien for his substantial contributions to QEMU,
-> and for maintaining the SH4 hardware for various years!
->
-> [*] https://www.mail-archive.com/qemu-devel@nongnu.org/msg708400.html
->
-> Message-Id: <20200601214125.GA1924990@aurel32.net>
-> Acked-by: Aurelien Jarno <aurelien@aurel32.net>
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
+On 10/06/2020 13.08, Aleksandar Markovic wrote:
+> пон, 8. јун 2020. у 11:05 Philippe Mathieu-Daudé <f4bug@amsat.org> је
+> написао/ла:
+>>
+>> Aurelien Jarno expressed his desire to orphan the SH4 hardware [*]:
+>>
+>>   I don't mind being [...] removed from there.
+>>   I do not really have time to work on that.
+>>
+>> Mark the SH4 emulated hardware orphan.
+>>
+>> Many thanks to Aurelien for his substantial contributions to QEMU,
+>> and for maintaining the SH4 hardware for various years!
+>>
+>> [*] https://www.mail-archive.com/qemu-devel@nongnu.org/msg708400.html
+>>
+>> Message-Id: <20200601214125.GA1924990@aurel32.net>
+>> Acked-by: Aurelien Jarno <aurelien@aurel32.net>
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> ---
+> 
+> The basic idea of the patch (as read from the title and the commit
+> message) is good and positive.
+> 
+> The problem is that the patch does something different than the commit
+> message says - pretending that it just orphans something. Which is not
+> good. Actually, very clumsy and bad.
 
-The basic idea of the patch (as read from the title and the commit
-message) is good and positive.
+Aleksandar, could you please stop being so negative? If you've got
+issues with a patch, that's fair, but you can then also simply express
+your opinion in a professional and constructive way. Calling the work of
+someone else "clumsy" is really not something that I want to read on the
+qemu-devel mailing list.
 
-The problem is that the patch does something different than the commit
-message says - pretending that it just orphans something. Which is not
-good. Actually, very clumsy and bad.
+ Thanks,
+  Thomas
 
-It creates a whole new subsection in MAINTAINERS file (not said in the
-commit message), without any consistency with the current organization
-in the file. That new subsection looks completely misplaced, living
-with "TCG CPUs" neighbours. On top of that, it creates a new
-precedent, leaving many unanswered questions, like: Should other
-targets follow the same pattern?
-
-I personally think that creating a new subsection is just a code
-churn, waste of everybody's time on unimportant things.
-
-Wouldn't it be simpler that you just changed statuses of all Aurelien
-sh4 sections to "Orphaned", as he already said he approves, and leave
-sh4 sections reorganization to a future maintainer?
-
-If you really want to reorganize sh4 sections, these changes should be
-in a separate patch. "Orphaning" patch should contain only changes of
-statuses.
-
-Regards,
-Aleksandar
-
->  MAINTAINERS | 10 ++++++++--
->  1 file changed, 8 insertions(+), 2 deletions(-)
->
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 6e7890ce82..49d90c70de 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -299,9 +299,7 @@ SH4 TCG CPUs
->  M: Aurelien Jarno <aurelien@aurel32.net>
->  S: Odd Fixes
->  F: target/sh4/
-> -F: hw/sh4/
->  F: disas/sh4.c
-> -F: include/hw/sh4/
->
->  SPARC TCG CPUs
->  M: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> @@ -1948,6 +1946,14 @@ F: hw/*/*xive*
->  F: include/hw/*/*xive*
->  F: docs/*/*xive*
->
-> +SH4 Hardware
-> +S: Orphan
-> +F: hw/sh4/
-> +F: hw/char/sh_serial.c
-> +F: hw/intc/sh_intc.c
-> +F: hw/timer/sh_timer.c
-> +F: include/hw/sh4/
-> +
->  Subsystems
->  ----------
->  Audio
-> --
-> 2.21.3
->
->
 
