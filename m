@@ -7,70 +7,70 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16A5BC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 22:10:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9DBFC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 22:10:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D29AB2072E
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 22:10:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B0D242072E
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 22:10:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sxzSwRy/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D29AB2072E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kCOrSdqz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0D242072E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58832 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59170 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jj8vs-0007Xe-0i
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 18:10:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39634)
+	id 1jj8vx-0007kM-TX
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 18:10:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39724)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jj8uF-0005Vh-ME; Wed, 10 Jun 2020 18:09:11 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:36267)
+ id 1jj8uI-0005a0-Su; Wed, 10 Jun 2020 18:09:14 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:33564)
  by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jj8uF-0008H7-0k; Wed, 10 Jun 2020 18:09:11 -0400
-Received: by mail-wm1-x343.google.com with SMTP id d128so3249818wmc.1;
- Wed, 10 Jun 2020 15:08:58 -0700 (PDT)
+ id 1jj8uI-0008HL-5b; Wed, 10 Jun 2020 18:09:14 -0400
+Received: by mail-wr1-x443.google.com with SMTP id l11so4068677wru.0;
+ Wed, 10 Jun 2020 15:09:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=4yC7yHQKz+xaxyB4JgWKHlHlwJW75Aq9W20uuS1StJw=;
- b=sxzSwRy/vLjGYFyX1N6MxytB/T7Rbql2Xjyw5lEDD83Ndrtw2OLnSI5/9mf1Gwg1d4
- 8tuaxSJ3iixo5vlh//vfASvZtAxDm8kNz0T9Z3FM4lzr4VgGFynCzsBcC3BR2POYI/AJ
- LaGqTo62pO5DrWdQ+yra3WsDm1YufCiNCYlNVR2LKfmCYJN+qIGlNNfnee2QsRFhyZT/
- bW+i/jrvpjJ837HykgYSmAXhiLhHenRRWIxsT6h+ifHVJz+Et+45rDEekPU/I/3rDRWu
- otW4AgsJK5TlSKf9/KaZ0cjs77UBVy12GSL/4qz8n5zEtfjew/E0ciAaTDkLcUDiIk0H
- 61/w==
+ bh=kApVhTiRZdHYmfzkme5PHn6iCnC1la+mtVXPuU6Ar5Q=;
+ b=kCOrSdqzoMcu/2hY7LCM55PK7Ewp5PkRGJY6HM/q80XFoQag7JalYIQnXD5k0O2j0v
+ 1RD8ispK1FkyG5y7w6whsI5uT1gJLZnQcmHg+aFVKQO/99B8kYOAbib1yObnjz6bnOh9
+ LHOtA/PWWtVMSoAWQmYPma1le6oScZliGJXe0stWJ9gCDlBEL3Z4aJKZ1yviazo52xsQ
+ B3GAwIwHai0te/zF4+r/mHX1YF8+tlNzXpbyNgPtwUfT1ZsVhw9OpjsXPNStqaAeGK29
+ +A+Im8mrM0ueanANfkgbZPl0A2Z+CFh76kyqeQnjm5S9mXhkknshyAaqjreuiVld7RA/
+ u2bA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=4yC7yHQKz+xaxyB4JgWKHlHlwJW75Aq9W20uuS1StJw=;
- b=FPGbMNctAOphP+SobHIzD5Dn7pmO4svqgKWYGIVPfTImRRyRP5d9/2Ens8tUh7E+KY
- MbY4glHYMTlMwBYHF0Zp77m6c4K6eb12BwNpj1lF2bcGHbzlgW8wQA7te4060DFnp/8W
- CkriISZHMyU7RGOlcwgx+gPfmsyIPOMkWrROCAF8/gTkiF2Z9PzSapysxmAS6Hl4GUzD
- Mr4xpvbBkhZyoVVuNKTm3qC+amQ5PWjLACe31YwT90V5HXtxiZEnEeNcnFkW8a2VQ23p
- AhDzuF7/oTNT5kFldMWAJ8PmmxjiUw5RjCFNJmcVe+2ofkUYHJnDPIa+hMMRtr7w+aNr
- ZalQ==
-X-Gm-Message-State: AOAM532n5jtPnPBXY0Lnjqj0JwQKZbG+4daNBu5k0PwRxdjC8HkK82zk
- 9W9InqUFgKSaPQgwV2qG3VwzMxGm
-X-Google-Smtp-Source: ABdhPJwtdYXH6IBDiojgcTAJjWnJlJAj79YIyr4gVX4hk0IInjqyfK2+StTAtFpZGO5gXcCPnoPBag==
-X-Received: by 2002:a05:600c:2218:: with SMTP id
- z24mr4950550wml.24.1591826937384; 
- Wed, 10 Jun 2020 15:08:57 -0700 (PDT)
+ bh=kApVhTiRZdHYmfzkme5PHn6iCnC1la+mtVXPuU6Ar5Q=;
+ b=AD5eiag6fCBxxbbfgdpkd6+Wj1/xnu1xqBA9T3AA1+hLte7eqfeoOG2oX9pZC+qX3D
+ cQtzRlrzQR145Jxxk4Z8k+aukmUEwLUiLu4pa1zg226s/2kwp5K87sR6Qu74uRmr7JXS
+ Iexx/atuUhMaY/VXdswJuGcZm+K3Ky7+XX0s7gQJNN0a8IHCpb4lujPvemEl9qTHasQ+
+ BIJaXpLngsx5Qut2rlhEjgafcsmJd3M5sSIAB2P3Z4hO7qA7I6otXmWDbAVYSYrMQIT5
+ U40r197Cj2W7ms7mOXeURd9hICgU8Gfa07OqBdRdtByZK+HQo/fyRXX2IItFheZR6Z47
+ +prQ==
+X-Gm-Message-State: AOAM530Nc6EWS/8HH1+RL/FU+6lfq4SQCNrt0tLbvNyQJPTdRzp0euKh
+ EGFYD9Hh7w50leqyqofLtxCQ65Xn
+X-Google-Smtp-Source: ABdhPJzsXpvIvqxx3TPvVyYlatPJ+W8FfkLAuXc1R2YLH9KOrm9Woj3AvOSwOdy2HRwRM1FmccD/Ag==
+X-Received: by 2002:a5d:4404:: with SMTP id z4mr6071554wrq.189.1591826940379; 
+ Wed, 10 Jun 2020 15:09:00 -0700 (PDT)
 Received: from x1w.redhat.com (181.red-88-10-103.dynamicip.rima-tde.net.
  [88.10.103.181])
- by smtp.gmail.com with ESMTPSA id 40sm1819354wrc.15.2020.06.10.15.08.55
+ by smtp.gmail.com with ESMTPSA id 40sm1819354wrc.15.2020.06.10.15.08.59
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 10 Jun 2020 15:08:56 -0700 (PDT)
+ Wed, 10 Jun 2020 15:08:59 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 01/11] MAINTAINERS: Mark SH4 section orphan
-Date: Thu, 11 Jun 2020 00:08:43 +0200
-Message-Id: <20200610220853.8558-2-f4bug@amsat.org>
+Subject: [PATCH v3 03/11] MAINTAINERS: Demote SH4 based R2D machine to 'Odd
+ Fixes'
+Date: Thu, 11 Jun 2020 00:08:45 +0200
+Message-Id: <20200610220853.8558-4-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200610220853.8558-1-f4bug@amsat.org>
 References: <20200610220853.8558-1-f4bug@amsat.org>
@@ -78,8 +78,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -108,46 +108,39 @@ Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
  Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Aurelien Jarno expressed his desire to orphan the SH4 section [*]:
+Magnus Damm doesn't have much time to maintain the R2D machine,
+but want to keep it [*]. Demote its status to 'Odd Fixes' so
+contributors won't expect Magnus to take the patches:
 
-  I don't mind being [...] removed from there.
-  I do not really have time to work on that.
+    Odd Fixes:   It has a maintainer but they don't have time to do
+                 much other than throw the odd patch in. See below.
 
-Mark the SH4 section orphan.
+[*] https://www.mail-archive.com/qemu-devel@nongnu.org/msg710319.html
 
-Many thanks to Aurelien for his substantial contributions to QEMU,
-and for maintaining the SH4 emulation for various years!
-
-[*] https://www.mail-archive.com/qemu-devel@nongnu.org/msg708400.html
-
-Message-Id: <20200601214125.GA1924990@aurel32.net>
-Acked-by: Aurelien Jarno <aurelien@aurel32.net>
-Suggested-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Cc: Magnus Damm <magnus.damm@gmail.com>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- MAINTAINERS | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ MAINTAINERS | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 3abe3faa4e..129517cfb4 100644
+index e1d1b0f62d..e4e27acd26 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -296,8 +296,7 @@ F: tests/tcg/s390x/
- L: qemu-s390x@nongnu.org
- 
- SH4 TCG CPUs
--M: Aurelien Jarno <aurelien@aurel32.net>
--S: Odd Fixes
-+S: Orphan
- F: target/sh4/
- F: hw/sh4/
- F: disas/sh4.c
+@@ -1251,7 +1251,7 @@ SH4 Machines
+ ------------
+ R2D
+ M: Magnus Damm <magnus.damm@gmail.com>
+-S: Maintained
++S: Odd Fixes
+ F: hw/sh4/r2d.c
+ F: hw/intc/sh_intc.c
+ F: hw/timer/sh_timer.c
 -- 
 2.21.3
 
