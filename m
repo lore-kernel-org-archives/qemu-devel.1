@@ -2,94 +2,92 @@ Return-Path: <SRS0=wemX=7X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84327C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 16:23:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A97DC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 16:30:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 505512070B
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 16:23:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 132AD2072F
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 16:30:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mCs/CU52"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 505512070B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OIi9AH9o"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 132AD2072F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43998 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49868 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jj3Vw-0008Kn-GT
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 12:23:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36616)
+	id 1jj3cH-0003Yp-Ot
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 12:30:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38724)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jj3Ud-0007Sd-1l
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 12:22:23 -0400
-Received: from mail-wm1-x32e.google.com ([2a00:1450:4864:20::32e]:40525)
- by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jj3UF-00047Z-Ob
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 12:22:22 -0400
-Received: by mail-wm1-x32e.google.com with SMTP id r15so2376142wmh.5
- for <qemu-devel@nongnu.org>; Wed, 10 Jun 2020 09:21:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=OAb7OXn+2uI1Ii8cVpOqqdMdYIGnCxCxoGCxZMdg7yM=;
- b=mCs/CU52nZBstzM29HOm27EYsd7QVE8Ph5BBmO86nPs0zjehGsyoqaHwKoxKbMKWj6
- mr6GNwhVsVKzpOHCdlCuKyjDpTBUt6l7DVvrgjfZLeNZXomyT81AlBkW/Ofu87JjmL4D
- bb9YU7gXng0jEFYU9bFGop3w6Vu0SIq6w7gvttTMhSMjs7Az4WGX8WKuRfh1s2vPQJtd
- PvHb1/yPCdwM1JM44o1d3KTnKuP4Lh08Pcq+XXDpGf+1YhzOtpqKzwuxfJT+3YZyLm9d
- 1jZExmY3SYcLlk9MT8XeHTp5BIRj1pSE4PIAPMsHfffzdvxsxhxiznCQ6OY6OVmSTZ0B
- vrsA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=OAb7OXn+2uI1Ii8cVpOqqdMdYIGnCxCxoGCxZMdg7yM=;
- b=ZvAADjoXfWzx/UNrcCX19/r5sDUkFRxWsE5HfkVLQIoplqcPLBxuHPQsyFFkQWNeYR
- WczWRSnM7Vnn733XVnRZKY9fP0/uIau8Y0FA9rrtVb4p6TQ7RRR+BJ/irzoquvMQkVw9
- xklHrRVe7J3UqxopGKY+ZY2iQAsXbkmmHb2b7SYR/ctKZQgLIvSmiZb89X7j2b/J5jGf
- 94yGixhz99Tge9kPGJuBvYjvxyGqno+jm5t0aQAHKLV/FIl56vnvkrr3itrMRoPwT3jN
- wydUvKOQnOI1BYDcE2OJlEhdToMk9ySXWutOLKLYkOp75rkFJsrVaceiK9Wx61y+SQX0
- 1I8Q==
-X-Gm-Message-State: AOAM530FqTobdnswO0R5jZQDG4L1pDWHbGNPDNm05RjJp4XgfX0+0i9j
- nsbwZnHWytMCSPu08Bys5N40gA==
-X-Google-Smtp-Source: ABdhPJwTfVX7R4mAGcGrxsfC6QcDGFQmMFUXh2ZXzVyUEL2rAbeecClU6u5DddGm9SD4JlWpETRulw==
-X-Received: by 2002:a1c:a901:: with SMTP id s1mr4205536wme.66.1591806110459;
- Wed, 10 Jun 2020 09:21:50 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id o6sm432446wrp.3.2020.06.10.09.21.48
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 10 Jun 2020 09:21:48 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id DDA311FF7E;
- Wed, 10 Jun 2020 17:21:47 +0100 (BST)
-References: <BL0PR2101MB1026A0AC34665437F4B7D4FED6820@BL0PR2101MB1026.namprd21.prod.outlook.com>
-User-agent: mu4e 1.5.2; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Robert Henry <robhenry@microsoft.com>
-Subject: Re: Failure of test 'basic gdbstub support'
-In-reply-to: <BL0PR2101MB1026A0AC34665437F4B7D4FED6820@BL0PR2101MB1026.namprd21.prod.outlook.com>
-Date: Wed, 10 Jun 2020 17:21:47 +0100
-Message-ID: <87sgf251t0.fsf@linaro.org>
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jj3bK-0002of-7n
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 12:29:18 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44172
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jj3bI-0005Vl-D2
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 12:29:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591806555;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=sAbKxMQGFPVu4UkAhaHkmv2rOxwrHX6xVrrdaAiD1d8=;
+ b=OIi9AH9otIb/xP/mGX7igyLQ7ZzoFSARfN0v1dASr0xYgh/GSVGLXcwQANi8HOexKqm5VZ
+ Sqzp7KVEtYyquKOy6LWR1vXehZGRvr1OKdEDBdp7SXKPhs3WStj/GuE4x3zRc2GoAS2wP0
+ OXG+g1n25qJ1ivX5cx8e8OYa9QX+6jI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-316-uct5aVxKPD-O_F0rbFZsYw-1; Wed, 10 Jun 2020 12:29:11 -0400
+X-MC-Unique: uct5aVxKPD-O_F0rbFZsYw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 58824100CD03;
+ Wed, 10 Jun 2020 16:29:10 +0000 (UTC)
+Received: from [10.3.113.22] (ovpn-113-22.phx2.redhat.com [10.3.113.22])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8B4291C4;
+ Wed, 10 Jun 2020 16:29:09 +0000 (UTC)
+Subject: Re: [PATCH 2/2] block: Call attention to truncation of long NBD
+ exports
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
+References: <20200608182638.3256473-1-eblake@redhat.com>
+ <20200608182638.3256473-3-eblake@redhat.com>
+ <5430f8e5-8f28-d703-1b55-136e2296ec72@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <8bce0710-648b-1862-688c-8cee1cab9c8b@redhat.com>
+Date: Wed, 10 Jun 2020 11:29:08 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::32e;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x32e.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <5430f8e5-8f28-d703-1b55-136e2296ec72@virtuozzo.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=eblake@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 23:51:15
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,73 +100,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ qemu-stable@nongnu.org, Max Reitz <mreitz@redhat.com>, ppandit@redhat.com,
+ xuwei@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 6/10/20 4:24 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 08.06.2020 21:26, Eric Blake wrote:
+>> Commit 93676c88 relaxed our NBD client code to request export names up
+>> to the NBD protocol maximum of 4096 bytes without NUL terminator, even
+>> though the block layer can't store anything longer than 4096 bytes
+>> including NUL terminator for display to the user.  Since this means
+>> there are some export names where we have to truncate things, we can
+>> at least try to make the truncation a bit more obvious for the user.
+>> Note that in spite of the truncated display name, we can still
+>> communicate with an NBD server using such a long export name; this was
+>> deemed nicer than refusing to even connect to such a server (since the
+>> server may not be under our control, and since determining our actual
+>> length limits gets tricky when nbd://host:port/export and
+>> nbd+unix:///export?socket=/path are themselves variable-length
+>> expansions beyond the export name but count towards the block layer
+>> name length).
+>>
+>> Reported-by: Xueqiang Wei <xuwei@redhat.com>
+>> Fixes: https://bugzilla.redhat.com/1843684
+>> Signed-off-by: Eric Blake <eblake@redhat.com>
+> 
+> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> 
+>> ---
+>>   block.c     |  7 +++++--
+>>   block/nbd.c | 21 +++++++++++++--------
+>>   2 files changed, 18 insertions(+), 10 deletions(-)
+>>
+>> diff --git a/block.c b/block.c
+>> index 8416376c9b71..6dbcb7e083ea 100644
+>> --- a/block.c
+>> +++ b/block.c
+>> @@ -6809,8 +6809,11 @@ void bdrv_refresh_filename(BlockDriverState *bs)
+>>           pstrcpy(bs->filename, sizeof(bs->filename), 
+>> bs->exact_filename);
+>>       } else {
+>>           QString *json = 
+>> qobject_to_json(QOBJECT(bs->full_open_options));
+>> -        snprintf(bs->filename, sizeof(bs->filename), "json:%s",
+>> -                 qstring_get_str(json));
+>> +        if (snprintf(bs->filename, sizeof(bs->filename), "json:%s",
+>> +                     qstring_get_str(json)) >= sizeof(bs->filename)) {
+>> +            /* Give user a hint if we truncated things. */
+>> +            strcpy(bs->filename + sizeof(bs->filename) - 4, "...");
+>> +        }
+> 
+> Is  4096 really enough for json in normal cases?
 
-Robert Henry <robhenry@microsoft.com> writes:
+By its very nature, a json string tends be longer than a counterpart URI 
+string representing the same information (when such an explicit name 
+exists) because of the extra characters burned in adding "key":value 
+pairs wrapping the data that was compact in explicit form.  But 4k is 
+still quite a lot, and the only cases I've seen where names don't fit in 
+JSON form is where the user was explicitly trying to break things with 
+corner-case testing, rather than what you get with day-to-day use.
 
-> The newish test 'basic gdbstub support' fails for me on an out-of-the-box=
-  build on a host x86_64.  (See below for the config.log head.)
->
-> Is this failure expected?  If so, where can I see that in the various
-> CI engines you have running them?
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
-No it shouldn't fail - if the GDB doesn't attach we should be skipping
-the test.
-
->
-> In digging through the test driver python code in tests/tcg/multiarch/gdb=
-stub/sha1.py I see that the test assumes that a breakpoint on the function =
-SHA1Init is a breakpoint at the 1st assignment statement; the 1st next exec=
-utes the 1st assignment statement, etc.
->
-> This is a very fragile assumption.  It depends on the compiler used to
-> compile sha1.c;
-
-True - certainly for "native" built test images.
-
->it depends on the optimization level; it depends on the accuracy of the
->pc mapping in the debug info;
-
-All test cases are built -O0 -g3 so should have full debug info.
-
->it depends on gdb.
-
-This is out biggest problem at the moment because it seems support for
-socket based debug is fairly new for gdb.
-
->
-> Better would be to change SHA1Init to do its work, and then call
-> another non-inlined function taking a context pointer, and then
-> examine context->state[0] and context->state[1].
-
-We are also trying to test the step and next functionality is working
-here.
-
->
-> Thanks in advance
->
-> TEST    basic gdbstub support
-> make[2]: ***
-> [/mnt/robhenry/qemu_robhenry_amd64/qemu/tests/tcg/multiarch/Makefile.targ=
-et:51:
-> run-gdbstub-sha1] Error 2
-
-Can you let me know what the contents of:
-
-  cat tests/tcg/x86_64-linux-user/run-gdbstub-sha1.out
-
-is please?
->
->  QEMU configure log Tue 09 Jun 2020 02:45:06 PM PDT
-> # Configured with: '../configure' '--disable-sdl' '--enable-gtk' '--extra=
--ldflags=3D-L/usr/lib' '--enable-plugins' '--target-list=3Dx86_64-softmmu x=
-86_64-linux-user'
-
-
---=20
-Alex Benn=C3=A9e
 
