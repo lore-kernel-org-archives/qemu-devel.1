@@ -2,91 +2,62 @@ Return-Path: <SRS0=wemX=7X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97B82C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:43:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8B4AC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:43:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6246320734
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:43:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SdPRzRLd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6246320734
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id BDFFD20734
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:43:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDFFD20734
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46472 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48854 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jj10T-0003S0-KT
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 09:43:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58146)
+	id 1jj10x-0004au-VR
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 09:43:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56866)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jj0nE-0002r0-97
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 09:29:24 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:28580
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jj0nC-0000AH-Nb
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 09:29:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591795760;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=vtRoNo4UmrYr/jyICdCpL0uqzJ5x2K1RQRzzbDEEtbw=;
- b=SdPRzRLdDK9GGnOITEzV6er9Eab3vgK4XC1UEMhk7P15jLu1JFnZWaWZ61buKmZP6M+dva
- lCTydgeARvW34ayfyAOv0EfVw2IgpdXKcIfLWnCvG3G1tt8mfUM87noDKBs2gnQrz0VMy9
- fFjRN4aoKDTxmTVTfQXm4r12MUxyQpM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-68-T-VjCc_fN_iHuZ84rxhcOA-1; Wed, 10 Jun 2020 09:29:17 -0400
-X-MC-Unique: T-VjCc_fN_iHuZ84rxhcOA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C642A107ACCA;
- Wed, 10 Jun 2020 13:29:15 +0000 (UTC)
-Received: from thuth.remote.csb (unknown [10.40.192.19])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 64EB87A8C9;
- Wed, 10 Jun 2020 13:29:13 +0000 (UTC)
-Subject: Re: [RFC] hw: nios2: update interrupt_request when STATUS_PIE disabled
-To: "Wu, Wentong" <wentong.wu@intel.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-References: <DM5PR11MB18339389B4BD1BB2B4B5AB7A8D860@DM5PR11MB1833.namprd11.prod.outlook.com>
- <e816a581-2bca-a1d3-a5d3-512200298623@redhat.com>
- <DM5PR11MB18332BBC3495C9D9DDC3D4218D820@DM5PR11MB1833.namprd11.prod.outlook.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <f464a208-8403-3f4e-7239-5b9c8299d24d@redhat.com>
-Date: Wed, 10 Jun 2020 15:29:11 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jj0km-0007uV-LP; Wed, 10 Jun 2020 09:26:52 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:49983)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jj0kl-0008Cd-8o; Wed, 10 Jun 2020 09:26:52 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07683609|-1; CH=blue; DM=|OVERLOAD|false|;
+ DS=CONTINUE|ham_system_inform|0.643886-0.000311504-0.355802;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e02c03307; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=8; RT=8; SR=0; TI=SMTPD_---.HkatOGi_1591795598; 
+Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.HkatOGi_1591795598)
+ by smtp.aliyun-inc.com(10.147.42.135);
+ Wed, 10 Jun 2020 21:26:38 +0800
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Subject: [PATCH v9 54/61] target/riscv: vector element index instruction
+Date: Wed, 10 Jun 2020 19:37:41 +0800
+Message-Id: <20200610113748.4754-55-zhiwei_liu@c-sky.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20200610113748.4754-1-zhiwei_liu@c-sky.com>
+References: <20200610113748.4754-1-zhiwei_liu@c-sky.com>
 MIME-Version: 1.0
-In-Reply-To: <DM5PR11MB18332BBC3495C9D9DDC3D4218D820@DM5PR11MB1833.namprd11.prod.outlook.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 23:51:15
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Received-SPF: none client-ip=121.197.200.217;
+ envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/10 07:37:52
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001, UNPARSEABLE_RELAY=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,123 +70,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Marek Vasut <marex@denx.de>, Chris Wulff <crwulff@gmail.com>
+Cc: richard.henderson@linaro.org, wxy194768@alibaba-inc.com,
+ wenmeng_zhang@c-sky.com, Alistair.Francis@wdc.com, palmer@dabbelt.com,
+ LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 09/06/2020 10.39, Wu, Wentong wrote:
-> Hi @Thomas Huth,
-> It's my first time to send patch in qemu community, not sure if there is something wrong sending patch like below and I'm happy to receive any suggestions. And by the way, could you please help review the patch? 
+Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/riscv/helper.h                   |  5 +++++
+ target/riscv/insn32.decode              |  2 ++
+ target/riscv/insn_trans/trans_rvv.inc.c | 25 +++++++++++++++++++++++++
+ target/riscv/vector_helper.c            | 24 ++++++++++++++++++++++++
+ 4 files changed, 56 insertions(+)
 
- Hi,
-
-it would be good if you could send the patch as plain text e-mail, not
-as HTML mail, otherwise it's impossible to apply it with "git am" or
-"patch". If you can, try to use "git send-email" to send out patches.
-Also see https://wiki.qemu.org/Contribute/SubmitAPatch for some more
-details.
-
-Technically, I don't have a clue about nios2, so sorry, I can't help
-reviewing it. But it's a very small patch, so maybe send the plain-text
-mail with CC: to qemu-trivial@nongnu.org - if Chris or Marek provide an
-Reviewed-by or Acked-by then, it should get merged with the next trivial
-pull request.
-
- HTH,
-  Thomas
-
-
-> Thanks
-> 
-> -----Original Message-----
-> From: Thomas Huth <thuth@redhat.com> 
-> Sent: Friday, June 5, 2020 3:07 PM
-> To: Wu, Wentong <wentong.wu@intel.com>; qemu-devel@nongnu.org
-> Cc: Chris Wulff <crwulff@gmail.com>; Marek Vasut <marex@denx.de>
-> Subject: Re: [RFC] hw: nios2: update interrupt_request when STATUS_PIE disabled
-> 
-> On 05/06/2020 07.59, Wu, Wentong wrote:
->> Hi all,
->>
->> I’m running icount mode on qemu_nios2 with customized  platform(almost 
->> same with 10m50_devboard),
->>
->> but cpu abort happened(qemu: fatal: Raised interrupt while not in I/O
->> function) when guest code changes
->>
->> state register with wrctl instruction, add some debug code finding 
->> that it’s caused by the interrupt_request
->>
->> mismatch, so I made a patch as below, not sure if it’s right, hope I 
->> can have some discussion with maintainers
-> 
->  Hi,
-> 
-> please have a look at the MAINTAINERS file in the main directory of the sources, you can find the corresponding maintainers there. Thus if you have questions related to nios2, please make sure to put Chris and Marek into CC: so that your patch gets the right attention!
-> 
->  Thanks,
->   Thomas
-> 
-> 
-> 
->> commit efdb3da4e145a7a34ba8b3ab1cdcfc346ae20a11 (HEAD -> master)
->>
->> Author: Wentong Wu <wentong.wu@intel.com>
->>
->> Date:   Fri Jun 5 09:29:43 2020 -0400
->>
->>  
->>
->>     hw: nios2: update interrupt_request when CR_STATUS_PIE disabled
->>
->>  
->>
->>     Update interrupt_request when external interupt pends for 
->> STATUS_PIE
->>
->>     disabled. Otherwise on icount enabled nios2 target there will be 
->> cpu
->>
->>     abort when guest code changes state register with wrctl instruction.
->>
->>  
->>
->>     Signed-off-by: Wentong Wu <wentong.wu@intel.com>
->>
->>  
->>
->> diff --git a/hw/nios2/cpu_pic.c b/hw/nios2/cpu_pic.c
->>
->> index 1c1989d5..b04db4d7 100644
->>
->> --- a/hw/nios2/cpu_pic.c
->>
->> +++ b/hw/nios2/cpu_pic.c
->>
->> @@ -42,7 +42,9 @@ static void nios2_pic_cpu_handler(void *opaque, int 
->> irq, int level)
->>
->>          } else if (!level) {
->>
->>              env->irq_pending = 0;
->>
->>              cpu_reset_interrupt(cs, type);
->>
->> -        }
->>
->> +        } else {
->>
->> +            cs->interrupt_request |= type;
->>
->> +       }
->>
->>      } else {
->>
->>          if (level) {
->>
->>              cpu_interrupt(cs, type);
->>
-> 
+diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+index 90e6d31d78..9e80e4ca23 100644
+--- a/target/riscv/helper.h
++++ b/target/riscv/helper.h
+@@ -1108,3 +1108,8 @@ DEF_HELPER_5(viota_m_b, void, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_5(viota_m_h, void, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_5(viota_m_w, void, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_5(viota_m_d, void, ptr, ptr, ptr, env, i32)
++
++DEF_HELPER_4(vid_v_b, void, ptr, ptr, env, i32)
++DEF_HELPER_4(vid_v_h, void, ptr, ptr, env, i32)
++DEF_HELPER_4(vid_v_w, void, ptr, ptr, env, i32)
++DEF_HELPER_4(vid_v_d, void, ptr, ptr, env, i32)
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index 37756fa76d..1231628cb2 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -70,6 +70,7 @@
+ @r2      .......   ..... ..... ... ..... ....... %rs1 %rd
+ @r2_nfvm ... ... vm:1 ..... ..... ... ..... ....... &r2nfvm %nf %rs1 %rd
+ @r2_vm   ...... vm:1 ..... ..... ... ..... ....... &rmr %rs2 %rd
++@r1_vm   ...... vm:1 ..... ..... ... ..... ....... %rd
+ @r_nfvm  ... ... vm:1 ..... ..... ... ..... ....... &rnfvm %nf %rs2 %rs1 %rd
+ @r_vm    ...... vm:1 ..... ..... ... ..... ....... &rmrr %rs2 %rs1 %rd
+ @r_vm_1  ...... . ..... ..... ... ..... .......    &rmrr vm=1 %rs2 %rs1 %rd
+@@ -559,6 +560,7 @@ vmsbf_m         010110 . ..... 00001 010 ..... 1010111 @r2_vm
+ vmsif_m         010110 . ..... 00011 010 ..... 1010111 @r2_vm
+ vmsof_m         010110 . ..... 00010 010 ..... 1010111 @r2_vm
+ viota_m         010110 . ..... 10000 010 ..... 1010111 @r2_vm
++vid_v           010110 . 00000 10001 010 ..... 1010111 @r1_vm
+ 
+ vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
+ vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
+diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+index b109732d11..e73e9dac33 100644
+--- a/target/riscv/insn_trans/trans_rvv.inc.c
++++ b/target/riscv/insn_trans/trans_rvv.inc.c
+@@ -2508,3 +2508,28 @@ static bool trans_viota_m(DisasContext *s, arg_viota_m *a)
+     }
+     return false;
+ }
++
++/* Vector Element Index Instruction */
++static bool trans_vid_v(DisasContext *s, arg_vid_v *a)
++{
++    if (vext_check_isa_ill(s) &&
++        vext_check_reg(s, a->rd, false) &&
++        vext_check_overlap_mask(s, a->rd, a->vm, false)) {
++        uint32_t data = 0;
++        TCGLabel *over = gen_new_label();
++        tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_vl, 0, over);
++
++        data = FIELD_DP32(data, VDATA, MLEN, s->mlen);
++        data = FIELD_DP32(data, VDATA, VM, a->vm);
++        data = FIELD_DP32(data, VDATA, LMUL, s->lmul);
++        static gen_helper_gvec_2_ptr * const fns[4] = {
++            gen_helper_vid_v_b, gen_helper_vid_v_h,
++            gen_helper_vid_v_w, gen_helper_vid_v_d,
++        };
++        tcg_gen_gvec_2_ptr(vreg_ofs(s, a->rd), vreg_ofs(s, 0),
++                           cpu_env, 0, s->vlen / 8, data, fns[s->sew]);
++        gen_set_label(over);
++        return true;
++    }
++    return false;
++}
+diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+index d6283053f1..1dc2a1ccb1 100644
+--- a/target/riscv/vector_helper.c
++++ b/target/riscv/vector_helper.c
+@@ -4673,3 +4673,27 @@ GEN_VEXT_VIOTA_M(viota_m_b, uint8_t, H1, clearb)
+ GEN_VEXT_VIOTA_M(viota_m_h, uint16_t, H2, clearh)
+ GEN_VEXT_VIOTA_M(viota_m_w, uint32_t, H4, clearl)
+ GEN_VEXT_VIOTA_M(viota_m_d, uint64_t, H8, clearq)
++
++/* Vector Element Index Instruction */
++#define GEN_VEXT_VID_V(NAME, ETYPE, H, CLEAR_FN)                          \
++void HELPER(NAME)(void *vd, void *v0, CPURISCVState *env, uint32_t desc)  \
++{                                                                         \
++    uint32_t mlen = vext_mlen(desc);                                      \
++    uint32_t vlmax = env_archcpu(env)->cfg.vlen / mlen;                   \
++    uint32_t vm = vext_vm(desc);                                          \
++    uint32_t vl = env->vl;                                                \
++    int i;                                                                \
++                                                                          \
++    for (i = 0; i < vl; i++) {                                            \
++        if (!vm && !vext_elem_mask(v0, mlen, i)) {                        \
++            continue;                                                     \
++        }                                                                 \
++        *((ETYPE *)vd + H(i)) = i;                                        \
++    }                                                                     \
++    CLEAR_FN(vd, vl, vl * sizeof(ETYPE), vlmax * sizeof(ETYPE));          \
++}
++
++GEN_VEXT_VID_V(vid_v_b, uint8_t, H1, clearb)
++GEN_VEXT_VID_V(vid_v_h, uint16_t, H2, clearh)
++GEN_VEXT_VID_V(vid_v_w, uint32_t, H4, clearl)
++GEN_VEXT_VID_V(vid_v_d, uint64_t, H8, clearq)
+-- 
+2.23.0
 
 
