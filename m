@@ -2,78 +2,91 @@ Return-Path: <SRS0=wemX=7X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23416C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 09:48:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99076C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 09:49:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E1832204EC
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 09:48:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 603B0204EC
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 09:49:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="elBaCIIF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1832204EC
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ge7p+VSb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 603B0204EC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35238 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38188 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jixLb-0008Gw-1h
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 05:48:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51062)
+	id 1jixMj-00014S-Fs
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 05:49:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51154)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jixFE-0006Xx-2X
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 05:42:04 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:27393
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jixGA-00085h-3l
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 05:43:02 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:44301
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jixFD-0001ea-18
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 05:42:03 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jixG9-0001pT-7B
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 05:43:01 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591782122;
+ s=mimecast20190719; t=1591782180;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=lHWY3T2haDr1DgUFNK5I86s2ugCm0pczOcfR2a7I8ns=;
- b=elBaCIIFk2A1HewW6E6fuyw1jfUo6bbkcRFeWnUlfnpTIb0GoEtLoD12f5sj1G1bXnLAcj
- x6b0Tk2SE95k9G8wq+dPdhOQX74x/WUcG6vYyIl6SWjiXXSnXCmTHBuLU19hRWgrLNsyMc
- Phz/lZr6xI/RbbhGofI3oiPVRAM4zh4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-156-WmB40t3TNhO6x9INB-punQ-1; Wed, 10 Jun 2020 05:42:01 -0400
-X-MC-Unique: WmB40t3TNhO6x9INB-punQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C4CB28AB38F;
- Wed, 10 Jun 2020 09:41:52 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-113-50.ams2.redhat.com
- [10.36.113.50])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DFB7C101E1C1;
- Wed, 10 Jun 2020 09:41:51 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id D78B117532; Wed, 10 Jun 2020 11:41:31 +0200 (CEST)
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v7 5/9] acpi: factor out fw_cfg_add_acpi_dsdt()
-Date: Wed, 10 Jun 2020 11:41:27 +0200
-Message-Id: <20200610094131.13346-6-kraxel@redhat.com>
-In-Reply-To: <20200610094131.13346-1-kraxel@redhat.com>
-References: <20200610094131.13346-1-kraxel@redhat.com>
+ bh=K3OqkjSCSx2AqWC2UvCLIuFq6DeGhjAJNDe0sRipJkM=;
+ b=Ge7p+VSbCasKujLajR5eKijxYwi7CbY1P453B218t8G7il7PcTivQqyxBW8jC8noPTFbzz
+ mrwcJrUCtwPzI8JNLDU0n28XUbytqudC3HMyjsmmpv5rgBjXAjQWHrqfpzUIDU+ziYQAbH
+ 0tyrwgo0p3+rjqLrGgXUy2PnbAIHi3w=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-387-FcgYB-T5OKakRz-COOKliA-1; Wed, 10 Jun 2020 05:42:59 -0400
+X-MC-Unique: FcgYB-T5OKakRz-COOKliA-1
+Received: by mail-wr1-f69.google.com with SMTP id r5so845297wrt.9
+ for <qemu-devel@nongnu.org>; Wed, 10 Jun 2020 02:42:58 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=K3OqkjSCSx2AqWC2UvCLIuFq6DeGhjAJNDe0sRipJkM=;
+ b=WSAmo/4D+jB8q8kS3uky/RZtjfOFOLsoxxelUJtg9kLv1+LSlyPZ9Rdbgvd//y/aQa
+ MlDvSi8mT5hfMMyfLxk+y1TQihXarkIpkNcJxBUeL3BPJeo9INftjKipE8rxQFqdmdWx
+ yngFM4+TF5wHZHDkoI3tfcnv548Pk6KJPSK5VIZQZqedmJR9oWLacSvArsK+zFbzxmyZ
+ /jhtM+YdwdqhIxbBLuaTJU0hZKdosSwzuWcLn9v9nhBPnT+cxdhdqKWQf1FtFwT6dlio
+ 8Fa8gRWgKUPepwrhE9crmzC56Z0gJvGCVrCgEOMgP9saaiK5+UhKLwTSEqqKz/TzdvBL
+ c+CA==
+X-Gm-Message-State: AOAM532kDfYnH8GvrXnQOHNbd6cVDj4QTfNEZXeDyNJ1ttidfP59QAtU
+ bfRxNMicEk6Y0VA2VyINB2WQ2GBLxIRglLPkbzl49D1AHPkGuB8Y06pwX+KcdqNxTvekLafy8G+
+ XCjFekrMqAOuuZH8=
+X-Received: by 2002:a5d:54c7:: with SMTP id x7mr2627222wrv.162.1591782177932; 
+ Wed, 10 Jun 2020 02:42:57 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw/fdvt7VzC0CG9RVGuIFHZlEwAtZT23VEyWq8BH+V5Lsl1R7+lDQPeuiiU4O16LVis89Ulyg==
+X-Received: by 2002:a5d:54c7:: with SMTP id x7mr2627188wrv.162.1591782177564; 
+ Wed, 10 Jun 2020 02:42:57 -0700 (PDT)
+Received: from redhat.com ([212.92.121.57])
+ by smtp.gmail.com with ESMTPSA id z12sm7845963wrg.9.2020.06.10.02.42.56
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 10 Jun 2020 02:42:57 -0700 (PDT)
+Date: Wed, 10 Jun 2020 05:42:54 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Subject: Re: [PATCH V2] virtio-pci: fix queue_enable write
+Message-ID: <20200610054248-mutt-send-email-mst@kernel.org>
+References: <20200610054351.15811-1-jasowang@redhat.com>
+ <20200610085726.jerorykxbycoesyu@steredhat>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <20200610085726.jerorykxbycoesyu@steredhat>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=kraxel@redhat.com;
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=mst@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 23:51:15
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 23:22:15
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -94,121 +107,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
- Max Reitz <mreitz@redhat.com>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>, John Snow <jsnow@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org,
+ stefanha@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add helper function to add fw_cfg device,
-also move code to hw/i386/fw_cfg.c.
+On Wed, Jun 10, 2020 at 10:57:26AM +0200, Stefano Garzarella wrote:
+> On Wed, Jun 10, 2020 at 01:43:51PM +0800, Jason Wang wrote:
+> > Spec said: The driver uses this to selectively prevent the device from
+> > executing requests from this virtqueue. 1 - enabled; 0 - disabled.
+> > 
+> > Though write 0 to queue_enable is forbidden by the spec, we should not
+> > assume that the value is 1.
+> > 
+> > Fix this by ignore the write value other than 1.
+> > 
+> > Signed-off-by: Jason Wang <jasowang@redhat.com>
+> > ---
+> > Changes from V1:
+> > - fix typo
+> > - warn wrong value through virtio_error
+> > ---
+> >  hw/virtio/virtio-pci.c | 12 ++++++++----
+> >  1 file changed, 8 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+> > index d028c17c24..7bc8c1c056 100644
+> > --- a/hw/virtio/virtio-pci.c
+> > +++ b/hw/virtio/virtio-pci.c
+> > @@ -1273,16 +1273,20 @@ static void virtio_pci_common_write(void *opaque, hwaddr addr,
+> >          virtio_queue_set_vector(vdev, vdev->queue_sel, val);
+> >          break;
+> >      case VIRTIO_PCI_COMMON_Q_ENABLE:
+> > -        virtio_queue_set_num(vdev, vdev->queue_sel,
+> > -                             proxy->vqs[vdev->queue_sel].num);
+> > -        virtio_queue_set_rings(vdev, vdev->queue_sel,
+> > +        if (val == 1) {
+> 
+> Does it have to be 1 or can it be any value other than 0?
+> 
+> Thanks,
+> Stefano
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
----
- hw/i386/fw_cfg.h     |  1 +
- hw/i386/acpi-build.c | 24 +-----------------------
- hw/i386/fw_cfg.c     | 28 ++++++++++++++++++++++++++++
- 3 files changed, 30 insertions(+), 23 deletions(-)
+spec says 1
 
-diff --git a/hw/i386/fw_cfg.h b/hw/i386/fw_cfg.h
-index 9e742787792b..275f15c1c5e8 100644
---- a/hw/i386/fw_cfg.h
-+++ b/hw/i386/fw_cfg.h
-@@ -25,5 +25,6 @@ FWCfgState *fw_cfg_arch_create(MachineState *ms,
-                                uint16_t apic_id_limit);
- void fw_cfg_build_smbios(MachineState *ms, FWCfgState *fw_cfg);
- void fw_cfg_build_feature_control(MachineState *ms, FWCfgState *fw_cfg);
-+void fw_cfg_add_acpi_dsdt(Aml *scope, FWCfgState *fw_cfg);
- 
- #endif
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 9fed13a27333..86be45eea17c 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -1759,30 +1759,8 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
- 
-     /* create fw_cfg node, unconditionally */
-     {
--        /* when using port i/o, the 8-bit data register *always* overlaps
--         * with half of the 16-bit control register. Hence, the total size
--         * of the i/o region used is FW_CFG_CTL_SIZE; when using DMA, the
--         * DMA control register is located at FW_CFG_DMA_IO_BASE + 4 */
--        uint8_t io_size = object_property_get_bool(OBJECT(x86ms->fw_cfg),
--                                                   "dma_enabled", NULL) ?
--                          ROUND_UP(FW_CFG_CTL_SIZE, 4) + sizeof(dma_addr_t) :
--                          FW_CFG_CTL_SIZE;
--
-         scope = aml_scope("\\_SB.PCI0");
--        dev = aml_device("FWCF");
--
--        aml_append(dev, aml_name_decl("_HID", aml_string("QEMU0002")));
--
--        /* device present, functioning, decoding, not shown in UI */
--        aml_append(dev, aml_name_decl("_STA", aml_int(0xB)));
--
--        crs = aml_resource_template();
--        aml_append(crs,
--            aml_io(AML_DECODE16, FW_CFG_IO_BASE, FW_CFG_IO_BASE, 0x01, io_size)
--        );
--        aml_append(dev, aml_name_decl("_CRS", crs));
--
--        aml_append(scope, dev);
-+        fw_cfg_add_acpi_dsdt(scope, x86ms->fw_cfg);
-         aml_append(dsdt, scope);
-     }
- 
-diff --git a/hw/i386/fw_cfg.c b/hw/i386/fw_cfg.c
-index da60ada59462..c55abfb01abb 100644
---- a/hw/i386/fw_cfg.c
-+++ b/hw/i386/fw_cfg.c
-@@ -15,6 +15,7 @@
- #include "qemu/osdep.h"
- #include "sysemu/numa.h"
- #include "hw/acpi/acpi.h"
-+#include "hw/acpi/aml-build.h"
- #include "hw/firmware/smbios.h"
- #include "hw/i386/fw_cfg.h"
- #include "hw/timer/hpet.h"
-@@ -179,3 +180,30 @@ void fw_cfg_build_feature_control(MachineState *ms, FWCfgState *fw_cfg)
-     *val = cpu_to_le64(feature_control_bits | FEATURE_CONTROL_LOCKED);
-     fw_cfg_add_file(fw_cfg, "etc/msr_feature_control", val, sizeof(*val));
- }
-+
-+void fw_cfg_add_acpi_dsdt(Aml *scope, FWCfgState *fw_cfg)
-+{
-+    /*
-+     * when using port i/o, the 8-bit data register *always* overlaps
-+     * with half of the 16-bit control register. Hence, the total size
-+     * of the i/o region used is FW_CFG_CTL_SIZE; when using DMA, the
-+     * DMA control register is located at FW_CFG_DMA_IO_BASE + 4
-+     */
-+    Object *obj = OBJECT(fw_cfg);
-+    uint8_t io_size = object_property_get_bool(obj, "dma_enabled", NULL) ?
-+        ROUND_UP(FW_CFG_CTL_SIZE, 4) + sizeof(dma_addr_t) :
-+        FW_CFG_CTL_SIZE;
-+    Aml *dev = aml_device("FWCF");
-+    Aml *crs = aml_resource_template();
-+
-+    aml_append(dev, aml_name_decl("_HID", aml_string("QEMU0002")));
-+
-+    /* device present, functioning, decoding, not shown in UI */
-+    aml_append(dev, aml_name_decl("_STA", aml_int(0xB)));
-+
-+    aml_append(crs,
-+        aml_io(AML_DECODE16, FW_CFG_IO_BASE, FW_CFG_IO_BASE, 0x01, io_size));
-+
-+    aml_append(dev, aml_name_decl("_CRS", crs));
-+    aml_append(scope, dev);
-+}
--- 
-2.18.4
+> > +            virtio_queue_set_num(vdev, vdev->queue_sel,
+> > +                                 proxy->vqs[vdev->queue_sel].num);
+> > +            virtio_queue_set_rings(vdev, vdev->queue_sel,
+> >                         ((uint64_t)proxy->vqs[vdev->queue_sel].desc[1]) << 32 |
+> >                         proxy->vqs[vdev->queue_sel].desc[0],
+> >                         ((uint64_t)proxy->vqs[vdev->queue_sel].avail[1]) << 32 |
+> >                         proxy->vqs[vdev->queue_sel].avail[0],
+> >                         ((uint64_t)proxy->vqs[vdev->queue_sel].used[1]) << 32 |
+> >                         proxy->vqs[vdev->queue_sel].used[0]);
+> > -        proxy->vqs[vdev->queue_sel].enabled = 1;
+> > +            proxy->vqs[vdev->queue_sel].enabled = 1;
+> > +        } else {
+> > +            virtio_error(vdev, "wrong value for queue_enable %"PRIx64, val);
+> > +        }
+> >          break;
+> >      case VIRTIO_PCI_COMMON_Q_DESCLO:
+> >          proxy->vqs[vdev->queue_sel].desc[0] = val;
+> > -- 
+> > 2.20.1
+> > 
+> > 
 
 
