@@ -2,83 +2,84 @@ Return-Path: <SRS0=wemX=7X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E8CFC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 20:41:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88046C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 20:42:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5D667204EC
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 20:41:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5248D204EC
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 20:42:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ReRT4Opb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D667204EC
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EoPYiIoW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5248D204EC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39368 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40466 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jj7Xe-0005c8-If
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 16:41:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49152)
+	id 1jj7Y5-00064A-G3
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 16:42:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49324)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jj7Vs-0003Sa-Ob
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 16:39:56 -0400
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:46077)
+ id 1jj7W1-0003k0-J1
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 16:40:05 -0400
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:41226)
  by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jj7Vq-0007h2-Vz
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 16:39:56 -0400
-Received: by mail-pf1-x442.google.com with SMTP id a127so1608853pfa.12
- for <qemu-devel@nongnu.org>; Wed, 10 Jun 2020 13:39:48 -0700 (PDT)
+ id 1jj7Vw-0007hO-Ko
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 16:40:05 -0400
+Received: by mail-pg1-x543.google.com with SMTP id b5so548422pgm.8
+ for <qemu-devel@nongnu.org>; Wed, 10 Jun 2020 13:39:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=/1VQEyGIT5SioB6kHr1I24ND+09JThHqu5Yl+UsE9Vk=;
- b=ReRT4OpbE2F7VnzIVlCibzaZIif7MzfWXFS7/+SXGR6ew5xiqe31TNe4qjjJTa7SQO
- eHBtRS30SFRUjKfC8GVFjiSMkAeRd6n2IZIIMs24m1lOHLIKQScQBSPNBzblSpvDyI1B
- K6LKI2xppQuao3ln+X6i13oRFngCgV+s5tC65PUhHM2DUbqM00k2NnqX8XSEs6Z39a6Z
- 3/BnyZIEr60l9b80f2HW1gPgn1khZU7XDCwW0mBXtKhNrOc1LvYDoyYaenfjuC7Jl60c
- tJ1vAl8MYd+gGwF2+wVH3RYUAzSc9Yan86o6hL/Hf+Qap7FSXHowZkWGylQuArEKkKXj
- PcZw==
+ bh=h9lWVjb7H1XkkBgxSVShhNTX95JNTaemDIvGHo4y1DI=;
+ b=EoPYiIoWDGbiFqh/gRr04SvwHczr8aOWHQSXCVs3lpJT8euZfREjYWmeWhpLGdGD43
+ HbOSpFwz9ZKoBnwl9yLtqxLub31SDpEALw/9xBmsG0jlBVzCzimefcFjorXbeIG/D2Gh
+ ldLPI6pnIQHvwfJfn/hNVeohpY/UDP+gUGsIu6oDFHSNqYoyv/JIcJ6//4DtrfjV5mL/
+ eINFuYMVw99Fmb9d90sm4ftZ3JtA2FgAbNVXSaIRwQJ32DVESVNZuyzxYCw3Nxye5Rt8
+ 4Gz4GGvVfcFlkKo0r26EIY1Xq/WdCDlkgQaXFAMFM1+nPyCbEv3OKhZm70UE3+lTM+Ro
+ cfMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=/1VQEyGIT5SioB6kHr1I24ND+09JThHqu5Yl+UsE9Vk=;
- b=GprfeGtNEGSd94nUIb4mNHYdlzs8q5sJNEdlDYwjZkia54hRJOMaGGUd+GjxkBp/B6
- sj75FFAbXyIxVBhKcHk/7sN4+8q5yWU85P/1t+bYm53PlqBMs38qnZCdSMqjYl5kYqoU
- wLAAv3EuqhE9iPpMbYWGP0Az0Ty6pHRNBjv88lLiHgghfMXz4jbRjDPoTrlmMuICfQlp
- OYHy9lQiGuSk3F2c3h1PuLlx9kurySSI/vVmPuYRY+R37DdK66M/b4qpR9H0XQdD6P80
- Pe/wtNgza9EDm/TEc5sETvUEeeSf+S8eMD3Dt1a9ihZj6VYV3qaHS2k1P1J1UaBvdH3N
- uhPQ==
-X-Gm-Message-State: AOAM531sHaOOT3GUXQA9NlnzdwCRf2sbhSKoYJsn+VE5vm94a11Sm8aF
- ziQJYFJUe9CvDQZdZwQwnoqGwfeQj1s=
-X-Google-Smtp-Source: ABdhPJwFcOmIA7QqpS4W6l15Jt4KV5U+yLoNOOrVnTTqnR0gYc9lpoEP4EbqANnhhLM3/iPmJhcAxw==
-X-Received: by 2002:aa7:97bd:: with SMTP id d29mr4013253pfq.262.1591821586787; 
- Wed, 10 Jun 2020 13:39:46 -0700 (PDT)
+ bh=h9lWVjb7H1XkkBgxSVShhNTX95JNTaemDIvGHo4y1DI=;
+ b=hjPx0Tg86Z8xgtrTWEZHSTqwiKnDwbB+ydxryemf9d7dlwHZXs5qzwtf2NS5gmoybj
+ Bwkgs6X5duNWQoXmoYWkUa8xzWE0MaudFZzH+j05wIu5empB7xAyb2snaW21er8ISzYp
+ mDFiHKip4fJuqGURxwBOPym9j3rMFPXNQG5CLOHZSXk6kwOfAsoDKoNRdqpTnvtmVfwq
+ /l3CAe+yfWWG+ZI3Ku33fxLjbNt9EMAx8FDVF4usCjL8KHK15hdqWvtF9UbAYdlST4fV
+ XFP7DzR1SkeQMHSDLW/tLBo6luQkKp1IWPGBZNOJEVWxrB6mS8N5NzrIL/kUIWfFTDlE
+ MFHg==
+X-Gm-Message-State: AOAM531SQaK8JnEpp34zq4I3dHmUDKnOFNjFE5x5gF88l+NNfIxALvs+
+ fdtG12NlMS1wn091QoKBYpaRoBIx614=
+X-Google-Smtp-Source: ABdhPJzRp7vs2Ttfmt0fJuWYjfv/3JEr1MFGLJatG5fe+nzDLJ9x7cGh1XmBfeMALfW3KkkojHJniA==
+X-Received: by 2002:a62:1c46:: with SMTP id c67mr4162269pfc.170.1591821589289; 
+ Wed, 10 Jun 2020 13:39:49 -0700 (PDT)
 Received: from localhost.localdomain (174-21-143-238.tukw.qwest.net.
  [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id g6sm740648pfb.164.2020.06.10.13.39.45
+ by smtp.gmail.com with ESMTPSA id g6sm740648pfb.164.2020.06.10.13.39.48
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 10 Jun 2020 13:39:45 -0700 (PDT)
+ Wed, 10 Jun 2020 13:39:48 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 2/5] migration: fix xbzrle encoding rate calculation
-Date: Wed, 10 Jun 2020 13:39:39 -0700
-Message-Id: <20200610203942.887374-3-richard.henderson@linaro.org>
+Subject: [PATCH v2 4/5] configure: Disable -Wtautological-type-limit-compare
+Date: Wed, 10 Jun 2020 13:39:41 -0700
+Message-Id: <20200610203942.887374-5-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200610203942.887374-1-richard.henderson@linaro.org>
 References: <20200610203942.887374-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::442;
- envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x442.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::543;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x543.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -100,44 +101,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Wei Wang <wei.w.wang@intel.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Wei Wang <wei.w.wang@intel.com>
+Clang 10 enables this by default with -Wtype-limit.
 
-It's reported an error of implicit conversion from "unsigned long" to
-"double" when compiling with Clang 10. Simply make the encoding rate 0
-when the encoded_size is 0.
+All of the instances flagged by this Werror so far have been
+cases in which we really do want the compiler to optimize away
+the test completely.  Disabling the warning will avoid having
+to add ifdefs to work around this.
 
-Fixes: e460a4b1a4
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reported-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+Cc: Eric Blake <eblake@redhat.com>
+Fixes: https://bugs.launchpad.net/qemu/+bug/1878628
+Acked-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- migration/ram.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+v2: Use the new add_to function.
+---
+ configure | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/migration/ram.c b/migration/ram.c
-index 41cc530d9d..069b6e30bc 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -913,10 +913,8 @@ static void migration_update_rates(RAMState *rs, int64_t end_time)
-         unencoded_size = (xbzrle_counters.pages - rs->xbzrle_pages_prev) *
-                          TARGET_PAGE_SIZE;
-         encoded_size = xbzrle_counters.bytes - rs->xbzrle_bytes_prev;
--        if (xbzrle_counters.pages == rs->xbzrle_pages_prev) {
-+        if (xbzrle_counters.pages == rs->xbzrle_pages_prev || !encoded_size) {
-             xbzrle_counters.encoding_rate = 0;
--        } else if (!encoded_size) {
--            xbzrle_counters.encoding_rate = UINT64_MAX;
-         } else {
-             xbzrle_counters.encoding_rate = unencoded_size / encoded_size;
-         }
+diff --git a/configure b/configure
+index 464202e375..8b33447048 100755
+--- a/configure
++++ b/configure
+@@ -2035,6 +2035,7 @@ add_to nowarn_flags -Wno-missing-include-dirs
+ add_to nowarn_flags -Wno-shift-negative-value
+ add_to nowarn_flags -Wno-string-plus-int
+ add_to nowarn_flags -Wno-typedef-redefinition
++add_to nowarn_flags -Wno-tautological-type-limit-compare
+ 
+ gcc_flags="$warn_flags $nowarn_flags"
+ 
 -- 
 2.25.1
 
