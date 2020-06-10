@@ -2,79 +2,78 @@ Return-Path: <SRS0=wemX=7X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDF22C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 05:55:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16618C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 05:55:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 85F3F2072E
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 05:55:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D51AF2072E
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 05:55:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FPoWQfQd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85F3F2072E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QNB6Mn0j"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D51AF2072E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52688 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53600 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jithn-00054z-Ls
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 01:55:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42630)
+	id 1jiti6-0005R6-1N
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 01:55:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42660)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jitMQ-0005FX-0T
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 01:33:14 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:55644
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jitMV-0005OD-8K
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 01:33:19 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:25175
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jitMC-0003rH-Qp
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 01:33:13 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jitME-0003sx-4T
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 01:33:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591767179;
+ s=mimecast20190719; t=1591767180;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=a8ucWRQluooxya9hLd54lAWqMMYexkDTTKyQZF6mOVQ=;
- b=FPoWQfQdaaNxdMNcPSHvoX3c0Q8syQ46eSWQV29q0cz/+6ZswuCGy0Pnj3rcoihq3AAHxm
- UhR/f0cpxwIHHoJ3+IQECwG0MeIT0fahrK2zTbPhWv7V5waVYLsi3ek1QsnW2dyc9KhePL
- QgV000WIPD+DFodq7CTAC9IzWxAG/GA=
+ bh=uGVN66GM9s0wNsrZknsbWNEJhPKyBmPDFqJmq/qcB7s=;
+ b=QNB6Mn0j0ZPLBl9OBGwnK8/TjYVrUmgf+QfZFrJXGdiR8N9j9nAWfcBRIDVxpwj0nnmD+M
+ m7aMBcT9r+jHefvkn2WkGqRh73dsI6LIMnL3xVwhzhW4Zn+AxC62Ni9YeTfevYpmgG5kuJ
+ BeCHMIigLCz2YrusaVKTgsc6u9XqnV0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-140-cb2qUMAvMmm3RvSP9Z9naA-1; Wed, 10 Jun 2020 01:32:57 -0400
-X-MC-Unique: cb2qUMAvMmm3RvSP9Z9naA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-23-vlNKVH9APdO5vEi1yJS0Og-1; Wed, 10 Jun 2020 01:32:59 -0400
+X-MC-Unique: vlNKVH9APdO5vEi1yJS0Og-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F2844805729
- for <qemu-devel@nongnu.org>; Wed, 10 Jun 2020 05:32:56 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2608B835B41
+ for <qemu-devel@nongnu.org>; Wed, 10 Jun 2020 05:32:58 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
  [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C303119C71;
- Wed, 10 Jun 2020 05:32:56 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 30131891CE;
+ Wed, 10 Jun 2020 05:32:55 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id D53BB1138484; Wed, 10 Jun 2020 07:32:48 +0200 (CEST)
+ id 5380A1138472; Wed, 10 Jun 2020 07:32:48 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH RESEND v3 46/58] qdev: Drop qdev_realize() support for null bus
-Date: Wed, 10 Jun 2020 07:32:35 +0200
-Message-Id: <20200610053247.1583243-47-armbru@redhat.com>
+Subject: [PATCH RESEND v3 28/58] usb: usb_create() is now unused, drop
+Date: Wed, 10 Jun 2020 07:32:17 +0200
+Message-Id: <20200610053247.1583243-29-armbru@redhat.com>
 In-Reply-To: <20200610053247.1583243-1-armbru@redhat.com>
 References: <20200610053247.1583243-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 23:51:15
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 23:22:15
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -95,54 +94,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The "null @bus means main system bus" convenience feature is no longer
-used.  Drop it.
-
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/core/qdev.c | 16 ++--------------
- 1 file changed, 2 insertions(+), 14 deletions(-)
+ include/hw/usb.h | 1 -
+ hw/usb/bus.c     | 8 --------
+ 2 files changed, 9 deletions(-)
 
-diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-index a1fdebb3aa..78a06db76e 100644
---- a/hw/core/qdev.c
-+++ b/hw/core/qdev.c
-@@ -408,8 +408,7 @@ void qdev_init_nofail(DeviceState *dev)
- /*
-  * Realize @dev.
-  * @dev must not be plugged into a bus.
-- * Plug @dev into @bus if non-null, else into the main system bus.
-- * This takes a reference to @dev.
-+ * Plug @dev into @bus.  This takes a reference to @dev.
-  * If @dev has no QOM parent, make one up, taking another reference.
-  * On success, return true.
-  * On failure, store an error through @errp and return false.
-@@ -419,18 +418,7 @@ bool qdev_realize(DeviceState *dev, BusState *bus, Error **errp)
-     Error *err = NULL;
+diff --git a/include/hw/usb.h b/include/hw/usb.h
+index 86093d941a..817dcebbef 100644
+--- a/include/hw/usb.h
++++ b/include/hw/usb.h
+@@ -535,7 +535,6 @@ void usb_legacy_register(const char *typename, const char *usbdevice_name,
+                          USBDevice *(*usbdevice_init)(const char *params));
+ USBDevice *usb_new(const char *name);
+ bool usb_realize_and_unref(USBDevice *dev, USBBus *bus, Error **errp);
+-USBDevice *usb_create(USBBus *bus, const char *name);
+ USBDevice *usb_create_simple(USBBus *bus, const char *name);
+ USBDevice *usbdevice_create(const char *cmdline);
+ void usb_register_port(USBBus *bus, USBPort *port, void *opaque, int index,
+diff --git a/hw/usb/bus.c b/hw/usb/bus.c
+index da85b8b005..5c4d31614e 100644
+--- a/hw/usb/bus.c
++++ b/hw/usb/bus.c
+@@ -323,14 +323,6 @@ bool usb_realize_and_unref(USBDevice *dev, USBBus *bus, Error **errp)
+     return qdev_realize_and_unref(&dev->qdev, &bus->qbus, errp);
+ }
  
-     assert(!dev->realized && !dev->parent_bus);
+-USBDevice *usb_create(USBBus *bus, const char *name)
+-{
+-    DeviceState *dev;
 -
--    if (!bus) {
--        /*
--         * Assert that the device really is a SysBusDevice before we
--         * put it onto the sysbus.  Non-sysbus devices which aren't
--         * being put onto a bus should be realized with
--         * object_property_set_bool(OBJECT(dev), true, "realized",
--         * errp);
--         */
--        g_assert(object_dynamic_cast(OBJECT(dev), TYPE_SYS_BUS_DEVICE));
--        bus = sysbus_get_default();
--    }
-+    assert(bus);
- 
-     qdev_set_parent_bus(dev, bus);
- 
+-    dev = qdev_create(&bus->qbus, name);
+-    return USB_DEVICE(dev);
+-}
+-
+ static USBDevice *usb_try_create_simple(USBBus *bus, const char *name,
+                                         Error **errp)
+ {
 -- 
 2.26.2
 
