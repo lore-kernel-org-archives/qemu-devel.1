@@ -2,62 +2,65 @@ Return-Path: <SRS0=wemX=7X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7992C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:48:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F322C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:51:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ABF2A20734
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:48:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ABF2A20734
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1BB9B206F4
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:51:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BB9B206F4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=efs-auto.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34470 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39646 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jj165-0002d6-T7
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 09:48:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33818)
+	id 1jj18h-0005EK-7a
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 09:51:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40386)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jj0wQ-0005y0-U4; Wed, 10 Jun 2020 09:38:54 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:37040)
+ (Exim 4.90_1) (envelope-from <Georg.Hofstetter@efs-auto.de>)
+ id 1jj170-0003eC-LY
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 09:49:50 -0400
+Received: from mailin4.audi.de ([143.164.102.18]:33053)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jj0wO-0002XV-AK; Wed, 10 Jun 2020 09:38:54 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07815792|-1; CH=blue; DM=|OVERLOAD|false|;
- DS=CONTINUE|ham_system_inform|0.16566-4.4491e-05-0.834296;
- FP=0|0|0|0|0|-1|-1|-1; HT=e02c03306; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=8; RT=8; SR=0; TI=SMTPD_---.HkbcsEO_1591796322; 
-Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.HkbcsEO_1591796322)
- by smtp.aliyun-inc.com(10.147.43.230);
- Wed, 10 Jun 2020 21:38:42 +0800
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-To: qemu-devel@nongnu.org,
-	qemu-riscv@nongnu.org
-Subject: [PATCH v9 60/61] target/riscv: vector compress instruction
-Date: Wed, 10 Jun 2020 19:37:47 +0800
-Message-Id: <20200610113748.4754-61-zhiwei_liu@c-sky.com>
-X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20200610113748.4754-1-zhiwei_liu@c-sky.com>
-References: <20200610113748.4754-1-zhiwei_liu@c-sky.com>
+ (Exim 4.90_1) (envelope-from <Georg.Hofstetter@efs-auto.de>)
+ id 1jj16y-0004xR-TV
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 09:49:50 -0400
+From: "Hofstetter, Georg (EFS-GH2)" <Georg.Hofstetter@efs-auto.de>
+To: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Subject: AW: [PATCH v2 1/1] tricore: added triboard with tc27x_soc
+Thread-Topic: [PATCH v2 1/1] tricore: added triboard with tc27x_soc
+Thread-Index: AQHWPnJScHnEYAKYDEWPeFmhEWMOQqjRaVoAgAByBHA=
+Date: Wed, 10 Jun 2020 13:49:37 +0000
+Message-ID: <69A9BBE82CEA98469F7BA51850C5B89CF2FEA8F8@AUDIINSX0364.audi.vwg>
+References: <20200609152553.4376-1-david.brenken@efs-auto.org>
+ <20200609152553.4376-2-david.brenken@efs-auto.org>
+ <20200610084818.yrzxqm6466w2wpiz@schnipp-desktop>
+In-Reply-To: <20200610084818.yrzxqm6466w2wpiz@schnipp-desktop>
+Accept-Language: de-DE, en-US
+Content-Language: de-DE
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.250.44.80]
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: none client-ip=121.197.200.217;
- envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/10 07:37:52
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001, UNPARSEABLE_RELAY=0.001 autolearn=_AUTOLEARN
+X-TM-AS-GCONF: 00
+Received-SPF: none client-ip=143.164.102.18;
+ envelope-from=Georg.Hofstetter@efs-auto.de; helo=mailin4.audi.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/10 09:49:41
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_PASS=-0.001,
+ SPF_NONE=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -70,122 +73,189 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: richard.henderson@linaro.org, wxy194768@alibaba-inc.com,
- wenmeng_zhang@c-sky.com, Alistair.Francis@wdc.com, palmer@dabbelt.com,
- LIU Zhiwei <zhiwei_liu@c-sky.com>
+Cc: "Brenken, David \(EFS-GH5\)" <david.brenken@efs-auto.de>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Konopik, Andreas
+ \(EFS-GH2\)" <andreas.konopik@efs-auto.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/riscv/helper.h                   |  5 ++++
- target/riscv/insn32.decode              |  1 +
- target/riscv/insn_trans/trans_rvv.inc.c | 32 +++++++++++++++++++++++++
- target/riscv/vector_helper.c            | 26 ++++++++++++++++++++
- 4 files changed, 64 insertions(+)
+Hello Bastian,
 
-diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index 3da863ac13..8d97114d81 100644
---- a/target/riscv/helper.h
-+++ b/target/riscv/helper.h
-@@ -1139,3 +1139,8 @@ DEF_HELPER_6(vrgather_vx_b, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vrgather_vx_h, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vrgather_vx_w, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vrgather_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-+
-+DEF_HELPER_6(vcompress_vm_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vcompress_vm_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vcompress_vm_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vcompress_vm_d, void, ptr, ptr, ptr, ptr, env, i32)
-diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index e07ff7eff6..a37e205eb7 100644
---- a/target/riscv/insn32.decode
-+++ b/target/riscv/insn32.decode
-@@ -575,6 +575,7 @@ vslide1down_vx  001111 . ..... ..... 110 ..... 1010111 @r_vm
- vrgather_vv     001100 . ..... ..... 000 ..... 1010111 @r_vm
- vrgather_vx     001100 . ..... ..... 100 ..... 1010111 @r_vm
- vrgather_vi     001100 . ..... ..... 011 ..... 1010111 @r_vm
-+vcompress_vm    010111 - ..... ..... 010 ..... 1010111 @r
- 
- vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
- vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
-diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index f6547f7e6d..ebc4e8174f 100644
---- a/target/riscv/insn_trans/trans_rvv.inc.c
-+++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -2854,3 +2854,35 @@ static bool trans_vrgather_vi(DisasContext *s, arg_rmrr *a)
-     }
-     return true;
- }
-+
-+/* Vector Compress Instruction */
-+static bool vcompress_vm_check(DisasContext *s, arg_r *a)
-+{
-+    return (vext_check_isa_ill(s) &&
-+            vext_check_reg(s, a->rd, false) &&
-+            vext_check_reg(s, a->rs2, false) &&
-+            vext_check_overlap_group(a->rd, 1 << s->lmul, a->rs1, 1) &&
-+            (a->rd != a->rs2));
-+}
-+
-+static bool trans_vcompress_vm(DisasContext *s, arg_r *a)
-+{
-+    if (vcompress_vm_check(s, a)) {
-+        uint32_t data = 0;
-+        static gen_helper_gvec_4_ptr * const fns[4] = {
-+            gen_helper_vcompress_vm_b, gen_helper_vcompress_vm_h,
-+            gen_helper_vcompress_vm_w, gen_helper_vcompress_vm_d,
-+        };
-+        TCGLabel *over = gen_new_label();
-+        tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_vl, 0, over);
-+
-+        data = FIELD_DP32(data, VDATA, MLEN, s->mlen);
-+        data = FIELD_DP32(data, VDATA, LMUL, s->lmul);
-+        tcg_gen_gvec_4_ptr(vreg_ofs(s, a->rd), vreg_ofs(s, 0),
-+                           vreg_ofs(s, a->rs1), vreg_ofs(s, a->rs2),
-+                           cpu_env, 0, s->vlen / 8, data, fns[s->sew]);
-+        gen_set_label(over);
-+        return true;
-+    }
-+    return false;
-+}
-diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index 220fa76d54..e9e0b1e7a8 100644
---- a/target/riscv/vector_helper.c
-+++ b/target/riscv/vector_helper.c
-@@ -4871,3 +4871,29 @@ GEN_VEXT_VRGATHER_VX(vrgather_vx_b, uint8_t, H1, clearb)
- GEN_VEXT_VRGATHER_VX(vrgather_vx_h, uint16_t, H2, clearh)
- GEN_VEXT_VRGATHER_VX(vrgather_vx_w, uint32_t, H4, clearl)
- GEN_VEXT_VRGATHER_VX(vrgather_vx_d, uint64_t, H8, clearq)
-+
-+/* Vector Compress Instruction */
-+#define GEN_VEXT_VCOMPRESS_VM(NAME, ETYPE, H, CLEAR_FN)                   \
-+void HELPER(NAME)(void *vd, void *v0, void *vs1, void *vs2,               \
-+                  CPURISCVState *env, uint32_t desc)                      \
-+{                                                                         \
-+    uint32_t mlen = vext_mlen(desc);                                      \
-+    uint32_t vlmax = env_archcpu(env)->cfg.vlen / mlen;                   \
-+    uint32_t vl = env->vl;                                                \
-+    uint32_t num = 0, i;                                                  \
-+                                                                          \
-+    for (i = 0; i < vl; i++) {                                            \
-+        if (!vext_elem_mask(vs1, mlen, i)) {                              \
-+            continue;                                                     \
-+        }                                                                 \
-+        *((ETYPE *)vd + H(num)) = *((ETYPE *)vs2 + H(i));                 \
-+        num++;                                                            \
-+    }                                                                     \
-+    CLEAR_FN(vd, num, num * sizeof(ETYPE), vlmax * sizeof(ETYPE));        \
-+}
-+
-+/* Compress into vd elements of vs2 where vs1 is enabled */
-+GEN_VEXT_VCOMPRESS_VM(vcompress_vm_b, uint8_t, H1, clearb)
-+GEN_VEXT_VCOMPRESS_VM(vcompress_vm_h, uint16_t, H2, clearh)
-+GEN_VEXT_VCOMPRESS_VM(vcompress_vm_w, uint32_t, H4, clearl)
-+GEN_VEXT_VCOMPRESS_VM(vcompress_vm_d, uint64_t, H8, clearq)
--- 
-2.23.0
+Thanks for your feedback, I like your proposals.
 
+> Also what do the _U and _C suffixes mean? I could not find them in the us=
+er manual [1].
+
+See TC27X UM chapter 3.2 "Contents of the Segments"
+"CPUx default attributes for these segments: non-cached" vs "cached"
+These regions are the same memory, just with address bit 29 set, which will=
+ bypass the DMI/PMI cache.
+The regions are reflected here with _C (cached) and _U (uncached) suffixes.
+
+> These aliases point to reserved memory in the user manual [1].
+
+See TC27X UM chapter 5.7.2 "Local and Global Addressing"
+"The local PSPR memory is always located at C0000000H. The local DSPR is al=
+ways located at D0000000H."
+Those addresses are not visible on the SRI crossbar, but are core-locally m=
+apped onto the current core memories.
+As we emulate only one core (yet?), the "local DSPR" is being mapped to "CP=
+U0 DSPR", same for PSPR.
+
+
+Regards,
+Georg
+
+
+-----Urspr=FCngliche Nachricht-----
+Von: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>=20
+Gesendet: Mittwoch, 10. Juni 2020 10:49
+An: David Brenken <david.brenken@efs-auto.org>
+Cc: qemu-devel@nongnu.org; Konopik, Andreas (EFS-GH2) <andreas.konopik@efs-=
+auto.de>; Brenken, David (EFS-GH5) <david.brenken@efs-auto.de>; Hofstetter,=
+ Georg (EFS-GH2) <Georg.Hofstetter@efs-auto.de>; Rasche, Robert (EFS-GH2) <=
+robert.rasche@efs-auto.de>; Biermanski, Lars (EFS-GH3) <lars.biermanski@efs=
+-auto.de>
+Betreff: Re: [PATCH v2 1/1] tricore: added triboard with tc27x_soc
+
+Hi,
+
+thanks for the patch. In general this looks good to me. However, a have a f=
+ew nitpicks.
+
+On Tue, Jun 09, 2020 at 05:25:53PM +0200, David Brenken wrote:
+> From: Andreas Konopik <andreas.konopik@efs-auto.de>
+> +static const int tc27x_soc_irqmap[] =3D { };
+
+Since this is empty, it's best to just remove it.
+
+> +
+> +static const hwaddr tc27x_soc_memmap[] =3D {
+> +    [TC27XD_DSPR2]     =3D 0x50000000,
+> +    [TC27XD_DCACHE2]   =3D 0x5001E000,
+> +    [TC27XD_DTAG2]     =3D 0x500C0000,
+> +    [TC27XD_PSPR2]     =3D 0x50100000,
+> +    [TC27XD_PCACHE2]   =3D 0x50108000,
+> +    [TC27XD_PTAG2]     =3D 0x501C0000,
+> +    [TC27XD_DSPR1]     =3D 0x60000000,
+> +    [TC27XD_DCACHE1]   =3D 0x6001E000,
+> +    [TC27XD_DTAG1]     =3D 0x600C0000,
+> +    [TC27XD_PSPR1]     =3D 0x60100000,
+> +    [TC27XD_PCACHE1]   =3D 0x60108000,
+> +    [TC27XD_PTAG1]     =3D 0x601C0000,
+> +    [TC27XD_DSPR0]     =3D 0x70000000,
+> +    [TC27XD_PSPR0]     =3D 0x70100000,
+> +    [TC27XD_PCACHE0]   =3D 0x70106000,
+> +    [TC27XD_PTAG0]     =3D 0x701C0000,
+> +    [TC27XD_PFLASH0_C] =3D 0x80000000,
+> +    [TC27XD_PFLASH1_C] =3D 0x80200000,
+> +    [TC27XD_OLDA_C]    =3D 0x8FE70000,
+> +    [TC27XD_BROM_C]    =3D 0x8FFF8000,
+> +    [TC27XD_LMURAM_C]  =3D 0x90000000,
+> +    [TC27XD_EMEM_C]    =3D 0x9F000000,
+> +    [TC27XD_PFLASH0_U] =3D 0xA0000000,
+> +    [TC27XD_PFLASH1_U] =3D 0xA0200000,
+> +    [TC27XD_DFLASH0]   =3D 0xAF000000,
+> +    [TC27XD_DFLASH1]   =3D 0xAF110000,
+> +    [TC27XD_OLDA_U]    =3D 0xAFE70000,
+> +    [TC27XD_BROM_U]    =3D 0xAFFF8000,
+> +    [TC27XD_LMURAM_U]  =3D 0xB0000000,
+> +    [TC27XD_EMEM_U]    =3D 0xBF000000,
+> +    [TC27XD_PSPRX]     =3D 0xC0000000,
+> +    [TC27XD_DSPRX]     =3D 0xD0000000,
+> +};
+
+Can we add the sizes here as well? That make it much easier to read. See hw=
+/riscv/sifive_e.c
+
+Also what do the _U and _C suffixes mean? I could not find them in the user=
+ manual [1].
+
+> +
+> +/*
+> + * Initialize the auxiliary ROM region @mr and map it into
+> + * the memory map at @base.
+> + */
+> +static void make_rom(MemoryRegion *mr, const char *name,
+> +                     hwaddr base, hwaddr size) {
+> +    memory_region_init_rom(mr, NULL, name, size, &error_fatal);
+> +    memory_region_add_subregion(get_system_memory(), base, mr); }
+> +
+> +/*
+> + * Initialize the auxiliary RAM region @mr and map it into
+> + * the memory map at @base.
+> + */
+> +static void make_ram(MemoryRegion *mr, const char *name,
+> +                     hwaddr base, hwaddr size)
+> +{
+> +    memory_region_init_ram(mr, NULL, name, size, &error_fatal);
+> +    memory_region_add_subregion(get_system_memory(), base, mr);
+> +}
+> +
+> +/*
+> + * Create an alias of an entire original MemoryRegion @orig
+> + * located at @base in the memory map.
+> + */
+> +static void make_alias(MemoryRegion *mr, const char *name,
+> +                           MemoryRegion *orig, hwaddr base)
+> +{
+> +    memory_region_init_alias(mr, NULL, name, orig, 0,
+> +                             memory_region_size(orig));
+> +    memory_region_add_subregion(get_system_memory(), base, mr);
+> +}
+
+These seem like very common idioms. It might be worth while to make this a
+generic QEMU API. However this is out of scope for this patchset.
+
+> +    /*
+> +     * TriCore QEMU executes CPU0 only, thus it is sufficient to map
+> +     * LOCAL.PSPR/LOCAL.DSPR exclusively onto PSPR0/DSPR0.
+> +     */
+> +    make_alias(&s->psprX, "LOCAL.PSPR", &s->cpu0mem.pspr,
+> +            sc->memmap[TC27XD_PSPRX]);
+> +    make_alias(&s->dsprX, "LOCAL.DSPR", &s->cpu0mem.dspr,
+> +            sc->memmap[TC27XD_DSPRX]);
+ =20
+These aliases point to reserved memory in the user manual [1].
+
+> +static void tc27x_soc_init(Object *obj)
+> +{
+> +    TC27XSoCState *s =3D TC27X_SOC(obj);
+> +    TC27XSoCClass *sc =3D TC27X_SOC_GET_CLASS(s);
+> +
+> +    sysbus_init_child_obj(OBJECT(s), "tc27x", OBJECT(&s->cpu), sizeof(s-=
+>cpu),
+> +                        sc->cpu_type);
+
+Unnecessary cast. Just use sysbus_init_child_obj(obj,...)
+
+> +static void tricore_load_kernel(const char *kernel_filename)
+> +{
+> +    uint64_t entry;
+> +    long kernel_size;
+> +    TriCoreCPU *cpu;
+> +    CPUTriCoreState *env;
+> +
+> +    kernel_size =3D load_elf(kernel_filename, NULL,
+> +                           NULL, NULL, &entry, NULL,
+> +                           NULL, NULL, 0,
+> +                           EM_TRICORE, 1, 0);
+> +    if (kernel_size <=3D 0) {
+> +        error_report("no kernel file '%s'", kernel_filename);
+> +        exit(1);
+> +    }
+> +    cpu =3D TRICORE_CPU(first_cpu);
+> +    env =3D &cpu->env;
+> +    env->PC =3D entry;
+> +}
+
+Just a note for the future. This seems like a function that ought to be
+generalized for all TriCore boards.
+
+Cheers,
+Bastian
+
+[1] https://hitex.co.uk/fileadmin/uk-files/downloads/ShieldBuddy/tc27xD_um_=
+v2.2.pdf=20
 
