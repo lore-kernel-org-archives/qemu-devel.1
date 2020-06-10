@@ -2,145 +2,82 @@ Return-Path: <SRS0=wemX=7X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F5EBC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 10:25:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33E9CC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 10:32:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3D5742064C
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 10:25:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bBmm7Bze"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D5742064C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0769720656
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 10:32:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0769720656
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52822 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55736 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jixvE-0005q5-7l
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 06:25:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57336)
+	id 1jiy1f-0007lA-6I
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 06:32:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58536)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jixuH-0005Or-V9
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 06:24:29 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:25762
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jixuF-0001Ny-Ln
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 06:24:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591784666;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=bbVi9EiCPvHy7kj7gQp21m4j1wn5Qsmy3053UBPypOM=;
- b=bBmm7Bze8aIv61mWAg1FR8r+ZVbSBsTPYQyxoPhQg291rxJBQDEdbfBi+DCZUDpbRcRRGX
- 6pEXOPY9Avl16axYZO63yZE+ITZa0rp43dtZ79K5FABVk1RzQBbO8lblls5ess0HriVD3O
- lH7FfyZPJwB70tho56+soHP0BdnX4EE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-354-w8IXE7kLPU6opOehTsJeww-1; Wed, 10 Jun 2020 06:24:22 -0400
-X-MC-Unique: w8IXE7kLPU6opOehTsJeww-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E34648014D4;
- Wed, 10 Jun 2020 10:24:20 +0000 (UTC)
-Received: from [10.36.114.42] (ovpn-114-42.ams2.redhat.com [10.36.114.42])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 54C815D9D3;
- Wed, 10 Jun 2020 10:24:15 +0000 (UTC)
-Subject: Re: [PATCH v2 1/1] virtio-ccw: auto-manage VIRTIO_F_IOMMU_PLATFORM if
- PV
-To: David Gibson <david@gibson.dropbear.id.au>
-References: <20200606013217.2cffa3ed.pasic@linux.ibm.com>
- <20200608181428.3c6f127c.cohuck@redhat.com>
- <20200608190045.319dd68b.pasic@linux.ibm.com>
- <20200609084402.35d317ec.cohuck@redhat.com>
- <20200609114130.0ca9190b.pasic@linux.ibm.com>
- <20200609174747.4e300818@ibm-vm>
- <20200609182839.7ac80938.pasic@linux.ibm.com>
- <20200609124155-mutt-send-email-mst@kernel.org>
- <20200610043118.GF494336@umbus.fritz.box>
- <4e5d62d8-9bfb-67d5-7398-2079729fd85e@redhat.com>
- <20200610100756.GO494336@umbus.fritz.box>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <858e9554-a4c7-6487-121b-ac3eaa209cb7@redhat.com>
-Date: Wed, 10 Jun 2020 12:24:14 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jiy0Z-00076M-H0
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 06:30:59 -0400
+Received: from indium.canonical.com ([91.189.90.7]:57898)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jiy0Y-0002vR-2J
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 06:30:59 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jiy0V-0000W9-Rk
+ for <qemu-devel@nongnu.org>; Wed, 10 Jun 2020 10:30:55 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id D043A2E8109
+ for <qemu-devel@nongnu.org>; Wed, 10 Jun 2020 10:30:55 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20200610100756.GO494336@umbus.fritz.box>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=david@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 23:51:15
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 10 Jun 2020 10:18:13 -0000
+From: Launchpad Bug Tracker <1882671@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
+ status=Confirmed; importance=Undecided; assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: janitor lersek vvaltchev
+X-Launchpad-Bug-Reporter: Vladislav K. Valtchev (vvaltchev)
+X-Launchpad-Bug-Modifier: Launchpad Janitor (janitor)
+References: <159169936514.32294.8785049859239547612.malonedeb@gac.canonical.com>
+Message-Id: <159178429367.18240.9985089997899652814.malone@chaenomeles.canonical.com>
+Subject: [Bug 1882671] Re: qemu-system-x86_64 (ver 4.2) stuck at boot with
+ OVMF bios
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="ef9fc486e875d54078fa61cf91e898b895125d89";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 4322dd016496a26645e8cc3dee45071332b1a7e0
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/10 06:30:56
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -149,74 +86,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Viktor Mihajlovski <mihajlov@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
- Boris Fiuczynski <fiuczy@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>,
- Pierre Morel <pmorel@linux.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, Richard Henderson <rth@twiddle.net>
+Reply-To: Bug 1882671 <1882671@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10.06.20 12:07, David Gibson wrote:
-> On Wed, Jun 10, 2020 at 09:22:45AM +0200, David Hildenbrand wrote:
->> On 10.06.20 06:31, David Gibson wrote:
->>> On Tue, Jun 09, 2020 at 12:44:39PM -0400, Michael S. Tsirkin wrote:
->>>> On Tue, Jun 09, 2020 at 06:28:39PM +0200, Halil Pasic wrote:
->>>>> On Tue, 9 Jun 2020 17:47:47 +0200
->>>>> Claudio Imbrenda <imbrenda@linux.ibm.com> wrote:
->>>>>
->>>>>> On Tue, 9 Jun 2020 11:41:30 +0200
->>>>>> Halil Pasic <pasic@linux.ibm.com> wrote:
->>>>>>
->>>>>> [...]
->>>>>>
->>>>>>> I don't know. Janosch could answer that, but he is on vacation. Adding
->>>>>>> Claudio maybe he can answer. My understanding is, that while it might
->>>>>>> be possible, it is ugly at best. The ability to do a transition is
->>>>>>> indicated by a CPU model feature. Indicating the feature to the guest
->>>>>>> and then failing the transition sounds wrong to me.
->>>>>>
->>>>>> I agree. If the feature is advertised, then it has to work. I don't
->>>>>> think we even have an architected way to fail the transition for that
->>>>>> reason.
->>>>>>
->>>>>> What __could__ be done is to prevent qemu from even starting if an
->>>>>> incompatible device is specified together with PV.
->>>>>
->>>>> AFAIU, the "specified together with PV" is the problem here. Currently
->>>>> we don't "specify PV" but PV is just a capability that is managed by the
->>>>> CPU model (like so many other).
->>>>
->>>> So if we want to keep it user friendly, there could be
->>>> protection property with values on/off/auto, and auto
->>>> would poke at host capability to figure out whether
->>>> it's supported.
->>>>
->>>> Both virtio and CPU would inherit from that.
->>>
->>> Right, that's what I have in mind for my 'host-trust-limitation'
->>> property (a generalized version of the existing 'memory-encryption'
->>> machine option).  My draft patches already set virtio properties
->>> accordingly, it should be possible to set (default) cpu properties as
->>> well.
->>
->> No crazy CPU model hacks please (at least speaking for the s390x).
-> 
-> Uh... I'm not really sure what you have in mind here.
-> 
+Status changed to 'Confirmed' because the bug affects multiple users.
 
-Reading along I got the impression that we want to glue the availability
-of CPU features to other QEMU cmdline parameters (besides the
-accelerator). ("to set (default) cpu properties as well"). If we are
-talking about other CPU properties not expressed as CPU features (e.g.,
--cpu X,Y=on ...), then there is no issue.
+** Changed in: qemu (Ubuntu)
+       Status: New =3D> Confirmed
 
--- 
-Thanks,
+-- =
 
-David / dhildenb
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1882671
 
+Title:
+  qemu-system-x86_64 (ver 4.2) stuck at boot with OVMF bios
+
+Status in QEMU:
+  New
+Status in qemu package in Ubuntu:
+  Confirmed
+
+Bug description:
+  The version of QEMU (4.2.0) packaged for Ubuntu 20.04 hangs
+  indefinitely at boot if an OVMF bios is used. This happens ONLY with
+  qemu-system-x86_64. qemu-system-i386 works fine with the latest ia32
+  OVMF bios.
+
+  NOTE[1]: the same identical OVMF bios works fine on QEMU 2.x packaged wit=
+h Ubuntu 18.04.
+  NOTE[2]: reproducing the fatal bug requires *no* operating system:
+
+     qemu-system-x86_64 -bios OVMF-pure-efi.fd
+
+  On its window QEMU gets stuck at the very first stage:
+     "Guest has not initialized the display (yet)."
+
+  NOTE[3]: QEMU gets stuck no matter if KVM is used or not.
+
+  NOTE[4]: By adding the `-d int` option it is possible to observe that
+  QEMU is, apparently, stuck in an endless loop of interrupts. For the
+  first few seconds, registers' values vary quickly, but at some point
+  they reach a final value, while the interrupt counter increments:
+
+    2568: v=3D68 e=3D0000 i=3D0 cpl=3D0 IP=3D0038:0000000007f1d225 pc=3D000=
+0000007f1d225 SP=3D0030:0000000007f0c8d0 env->regs[R_EAX]=3D0000000000000000
+  RAX=3D0000000000000000 RBX=3D0000000007f0c920 RCX=3D0000000000000000 RDX=
+=3D0000000000000001
+  RSI=3D0000000006d18798 RDI=3D0000000000008664 RBP=3D0000000000000000 RSP=
+=3D0000000007f0c8d0
+  R8 =3D0000000000000001 R9 =3D0000000000000089 R10=3D0000000000000000 R11=
+=3D0000000007f2c987
+  R12=3D0000000000000000 R13=3D0000000000000000 R14=3D0000000007087901 R15=
+=3D0000000000000000
+  RIP=3D0000000007f1d225 RFL=3D00000246 [---Z-P-] CPL=3D0 II=3D0 A20=3D1 SM=
+M=3D0 HLT=3D0
+  ES =3D0030 0000000000000000 ffffffff 00cf9300 DPL=3D0 DS   [-WA]
+  CS =3D0038 0000000000000000 ffffffff 00af9a00 DPL=3D0 CS64 [-R-]
+  SS =3D0030 0000000000000000 ffffffff 00cf9300 DPL=3D0 DS   [-WA]
+  DS =3D0030 0000000000000000 ffffffff 00cf9300 DPL=3D0 DS   [-WA]
+  FS =3D0030 0000000000000000 ffffffff 00cf9300 DPL=3D0 DS   [-WA]
+  GS =3D0030 0000000000000000 ffffffff 00cf9300 DPL=3D0 DS   [-WA]
+  LDT=3D0000 0000000000000000 0000ffff 00008200 DPL=3D0 LDT
+  TR =3D0000 0000000000000000 0000ffff 00008b00 DPL=3D0 TSS64-busy
+  GDT=3D     00000000079eea98 00000047
+  IDT=3D     000000000758f018 00000fff
+  CR0=3D80010033 CR2=3D0000000000000000 CR3=3D0000000007c01000 CR4=3D000006=
+68
+  DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=
+=3D0000000000000000 =
+
+  DR6=3D00000000ffff0ff0 DR7=3D0000000000000400
+  CCS=3D0000000000000044 CCD=3D0000000000000000 CCO=3DEFLAGS  =
+
+  EFER=3D0000000000000d00
+
+  =
+
+  NOTE[5]: Just to better help the investigation of the bug, I'd like to re=
+mark that the issue is NOT caused by an endless loop of triple-faults. I tr=
+ied with -d cpu_reset and there is NO such loop. No triple fault whatsoever.
+
+  NOTE[6]: The OVMF version used for the test has been downloaded from:
+  https://www.kraxel.org/repos/jenkins/edk2/edk2.git-ovmf-x64-0-20200515.13=
+98.g6ff7c838d0.noarch.rpm
+
+  but the issue is the same with older OVMF versions as well.
+
+  =
+
+  Please take a look at it, as the bug is NOT a corner case. QEMU 4.2.0 can=
+not boot with an UEFI firmware (OVMF) while virtualizing a x86_64 machine A=
+T ALL.
+
+  Thank you very much,
+  Vladislav K. Valtchev
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1882671/+subscriptions
 
