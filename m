@@ -2,74 +2,82 @@ Return-Path: <SRS0=wemX=7X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03E94C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:18:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3D15C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:19:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CF929206F4
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:18:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF929206F4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 9D68B206F4
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:19:23 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D9eVVAL0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D68B206F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54166 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58458 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jj0cO-0001Io-1S
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 09:18:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45166)
+	id 1jj0dW-00038s-T3
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 09:19:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50422)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1jj0Us-0007mr-1f; Wed, 10 Jun 2020 09:10:26 -0400
-Received: from mout.kundenserver.de ([212.227.126.134]:55147)
- by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1jj0Uq-0003f8-Sq; Wed, 10 Jun 2020 09:10:25 -0400
-Received: from localhost.localdomain ([82.252.135.106]) by
- mrelayeu.kundenserver.de (mreue009 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1MCsLo-1jaF3J1PaC-008nvu; Wed, 10 Jun 2020 15:10:17 +0200
-From: Laurent Vivier <laurent@vivier.eu>
+ (Exim 4.90_1) (envelope-from <mprivozn@redhat.com>)
+ id 1jj0c3-0001Id-B4
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 09:17:51 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32916
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mprivozn@redhat.com>)
+ id 1jj0c0-0005bS-Ux
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 09:17:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591795067;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=bBwIlUJKvdI8mJIkr5f/ihhX536ZYcXtU9gYYsc6uaI=;
+ b=D9eVVAL0G9N+9reupSdH7okn3dZTZcpANFVLZ7urfVdh7PG3hAaPyi2KuAbVvbVVEzCe3L
+ xLPC3K7muvFa9uYCRqM3CeUKnPh+HFesy42bXWJEp8wPv9VsZqAGsv62GDdo4iHb1I1TV7
+ fy6YXl1mzpGqhNgaG+viPOvsy1sZ2Fo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-4-hOFIcVPgMriET-n_0UXrvw-1; Wed, 10 Jun 2020 09:17:43 -0400
+X-MC-Unique: hOFIcVPgMriET-n_0UXrvw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CAA6F107ACCA
+ for <qemu-devel@nongnu.org>; Wed, 10 Jun 2020 13:17:42 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.40.195.12])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 498EC1025EB0
+ for <qemu-devel@nongnu.org>; Wed, 10 Jun 2020 13:17:42 +0000 (UTC)
+From: Michal Privoznik <mprivozn@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 06/16] hw/misc/auxbus: Use qemu_log_mask(UNIMP) instead of
- debug printf
-Date: Wed, 10 Jun 2020 15:10:01 +0200
-Message-Id: <20200610131011.1941209-7-laurent@vivier.eu>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200610131011.1941209-1-laurent@vivier.eu>
-References: <20200610131011.1941209-1-laurent@vivier.eu>
+Subject: [PATCH v2 0/2] A pair of HMAT docs fixes
+Date: Wed, 10 Jun 2020 15:17:33 +0200
+Message-Id: <cover.1591794890.git.mprivozn@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:f6tXZMwZDUbgrvEjnrqNSAxGAjaPzbZV3Tk/jRVBuao3Axji1JW
- iMcdgfLsBJQn0KoAx/EV2dKJIUc2GRqsaO4VDvLDJInZYsMkXlN4ZEfPiNeSSEavMfRP+io
- BTHcMLFyZjwApHoxVHGBrGX6vsjL8KPLT8uo9FmRPNil6K43vnmtfNVSmxq/E2gtyF0131s
- 3pZtqv2KCoqAqEeAciDuA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:95eZisdeyBY=:83FmCVHX5OnDe1rohRwect
- 2FTdWFWRbPFFZ9zEdLuVdCTBCNJpsQxZrbK+oiCx/pRjQbQK+YcnqCdiOM62+nXBuQOVzcL8t
- NZ9B/keYw8nmaqoeI3e/MyBxFoF1x8qsbw2milId6RmT09qasAAZ5B1znMUE1y9vRGmdBgEBA
- AmwgtqEAvj4pOmIatd6a/Q1B0n2U9BWTqEwOFvb3Y0dDT4Q0aXlVgMJKq0n9P7Op6SycayPtl
- fNbecJec7WMbrrQoIW7BXrj/EXguHdLF1fZ4HTjZdVyQjJqsdlLKXduJNGWrnAGKQwPuhaj/7
- 6Q3lVGlZupYS5uKIHFrIM8WeUm6PCK7Ec5AZR5R+u8TEB8do52S1RHk5pqNjwf8agfxErT9P/
- KU2uzPj4/vQXjSJDvqzEsRIZwiHt+q4xEHA+DZrmPd3aUGnefgmSS6YfOi5kPo2QU1bTDkytr
- 1Di95RjFa0Tp5BqIGbInIEdEPiYrrCOOQkb0V+xsZOzBAx4rfBh7FEJTsjz7PjplL7EuwP9yB
- g6kbfcw3yurhnuQh9M7Z5xeakAxCLB4ThPKu0GLthrwR88jE51Gj0ra3T1RVLkDSARm8DIcxa
- w9nO9UAwYkY/m3mG5OTZVsJoZjXnLCv3va3KpSywGky0vqLLACwQFAIqfJgrIK1U8GSEEh2De
- 30oZZTaPdB6zlNzY8dMr8HBZ8WndugaImUtkpQ82QwOCDqs61bbqI5UHXJ/+vQNQVl/Da5Zi2
- oznqZX3CicSGA6UaW3GZwmdUYHBNmoEux0Ingq5+d0Zj5+JaHzhUe6YKbfcXmoDTrh/xPuDON
- FZTKMJfNDff29JOcrmzqy7+brJFXSMTEfapg9tHoLDCYPw8wl24LqIYhpA6xOhoqxZjc7dY
-Received-SPF: none client-ip=212.227.126.134; envelope-from=laurent@vivier.eu;
- helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/10 09:10:23
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -28
-X-Spam_score: -2.9
-X-Spam_bar: --
-X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=mprivozn@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 23:51:15
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -82,41 +90,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-trivial@nongnu.org,
- Michael Tokarev <mjt@tls.msk.ru>,
- Richard Henderson <richard.henderson@linaro.org>,
- Laurent Vivier <laurent@vivier.eu>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Technically, this is a v2 of:
 
-Replace a deprecated DPRINTF() call by qemu_log_mask(LOG_UNIMP).
+https://lists.nongnu.org/archive/html/qemu-devel/2020-05/msg08316.html
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <20200606070216.30952-1-f4bug@amsat.org>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- hw/misc/auxbus.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+But as it turned out during the review of v1, we don't need to change
+the code rather than documentation.
 
-diff --git a/hw/misc/auxbus.c b/hw/misc/auxbus.c
-index f8e7b9797125..06aabf20c59c 100644
---- a/hw/misc/auxbus.c
-+++ b/hw/misc/auxbus.c
-@@ -196,7 +196,7 @@ AUXReply aux_request(AUXBus *bus, AUXCommand cmd, uint32_t address,
-         }
-         break;
-     default:
--        DPRINTF("Not implemented!\n");
-+        qemu_log_mask(LOG_UNIMP, "AUX cmd=%u not implemented\n", cmd);
-         return AUX_NACK;
-     }
- 
+Michal Privoznik (2):
+  qemu-options.hx: Mark all hmat-cache attributes required
+  qemu-options.hx: Document hmat-lb and hmat-cache order
+
+ qemu-options.hx | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
 -- 
 2.26.2
 
