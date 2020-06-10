@@ -6,75 +6,75 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFFFCC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 05:51:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C730C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 05:51:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 86D862074B
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 05:51:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EA5002074B
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 05:51:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HZ5Z1Dvx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86D862074B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f2urARag"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA5002074B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36718 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38560 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jitds-0006qr-OJ
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 01:51:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42646)
+	id 1jiteU-0007a2-6V
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 01:51:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42656)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jitMS-0005JD-Nn
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 01:33:16 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:23630
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jitMU-0005Me-Fd
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 01:33:18 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:45974
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jitMD-0003rP-16
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 01:33:16 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jitME-0003t3-29
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 01:33:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591767179;
+ s=mimecast20190719; t=1591767180;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=qS0RAo0whN0g7Q1Pp54kr5U+MdK6Rto2nOL6Fc3o6XY=;
- b=HZ5Z1DvxIq5/HOtqCFx5rvM3hqf8VngNExdPkQY76ZUwXJskihmripBEz2Gmk3RiJ2AXLw
- 9g2Ba4BEbfALiDoIya16up91vVDvb8WzZSRE4nvW+0j3eiHkBUY9Q8Csee9LMvvurjXXU/
- ySJG257cVTRH2p5d4+eMGkss4uGzeUo=
+ bh=JV4Y/vtGLCBT77Wo1IIP2KtX7DxxCrx4zcZEtQ7eNEc=;
+ b=f2urARagX0/+BGnvr/iIYEhXJcOne7U/i2fAW6sJI5YkyXQ5OGhtHWZYkKSAi3801Y33cD
+ 0PUhDgqr9x1U3Owj7S8fZXfSGJiB1dnG/xHn5s5iPMicQSiJJl+CrDY/s0d0oU3L7dddUG
+ 7ZIFzdgSRLBWRvX6AgU/9raN3zNeYY4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-53-xFozpVRdMcCw9qgPr_WSRA-1; Wed, 10 Jun 2020 01:32:57 -0400
-X-MC-Unique: xFozpVRdMcCw9qgPr_WSRA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-422-TCZaMnoUM76uFpx6Onxbbw-1; Wed, 10 Jun 2020 01:32:56 -0400
+X-MC-Unique: TCZaMnoUM76uFpx6Onxbbw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D67358018A5
- for <qemu-devel@nongnu.org>; Wed, 10 Jun 2020 05:32:56 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 457B81005510;
+ Wed, 10 Jun 2020 05:32:55 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
  [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5D11E7BFE3;
- Wed, 10 Jun 2020 05:32:56 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E597C512FE;
+ Wed, 10 Jun 2020 05:32:54 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id A6D00113847D; Wed, 10 Jun 2020 07:32:48 +0200 (CEST)
+ id 3160C113846C; Wed, 10 Jun 2020 07:32:48 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH RESEND v3 39/58] sysbus: Drop useless OBJECT() in
- sysbus_init_child_obj() calls
-Date: Wed, 10 Jun 2020 07:32:28 +0200
-Message-Id: <20200610053247.1583243-40-armbru@redhat.com>
+Subject: [PATCH RESEND v3 23/58] ssi: Convert uses of
+ ssi_create_slave_no_init() with Coccinelle
+Date: Wed, 10 Jun 2020 07:32:12 +0200
+Message-Id: <20200610053247.1583243-24-armbru@redhat.com>
 In-Reply-To: <20200610053247.1583243-1-armbru@redhat.com>
 References: <20200610053247.1583243-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 23:22:15
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 23:51:15
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -96,298 +96,232 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+ Alistair Francis <alistair@alistair23.me>,
+ Alistair Francis <alistair.francis@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-OBJECT(child) expands to ((Object *)(child)).  sysbus_init_child_obj()
-parameter @child is void *.  Pass child instead of OBJECT(child).
+Replace
 
+    dev = ssi_create_slave_no_init(bus, type_name);
+    ...
+    qdev_init_nofail(dev);
+
+by
+
+    dev = qdev_new(type_name);
+    ...
+    qdev_realize_and_unref(dev, bus, &error_fatal);
+
+Recent commit "qdev: New qdev_new(), qdev_realize(), etc." explains
+why.
+
+    @@
+    type SSIBus;
+    identifier bus;
+    expression dev, qbus, expr;
+    expression list args;
+    @@
+    -    bus = (SSIBus *)qbus;
+    +    bus = qbus; // TODO fix up decl
+         ...
+    -    dev = ssi_create_slave_no_init(bus, args);
+    +    dev = qdev_new(args);
+         ... when != dev = expr
+    -    qdev_init_nofail(dev);
+    +    qdev_realize_and_unref(dev, bus, &error_fatal);
+
+    @@
+    expression dev, bus, expr;
+    expression list args;
+    @@
+    -    dev = ssi_create_slave_no_init(bus, args);
+    +    dev = qdev_new(args);
+         ... when != dev = expr
+    -    qdev_init_nofail(dev);
+    +    qdev_realize_and_unref(dev, BUS(bus), &error_fatal);
+
+Bus declarations fixed up manually.
+
+Cc: Alistair Francis <alistair@alistair23.me>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/arm/allwinner-a10.c  |  4 ++--
- hw/arm/aspeed_ast2600.c | 39 +++++++++++++++++----------------------
- hw/arm/aspeed_soc.c     | 35 +++++++++++++++--------------------
- hw/arm/nrf51_soc.c      |  2 +-
- hw/mips/boston.c        |  4 ++--
- hw/mips/malta.c         |  2 +-
- 6 files changed, 38 insertions(+), 48 deletions(-)
+ hw/arm/aspeed.c                     |  4 ++--
+ hw/arm/msf2-som.c                   |  8 ++++----
+ hw/arm/sabrelite.c                  |  4 ++--
+ hw/arm/xilinx_zynq.c                |  4 ++--
+ hw/arm/xlnx-zcu102.c                | 16 ++++++++--------
+ hw/microblaze/petalogix_ml605_mmu.c |  4 ++--
+ 6 files changed, 20 insertions(+), 20 deletions(-)
 
-diff --git a/hw/arm/allwinner-a10.c b/hw/arm/allwinner-a10.c
-index 49c51463e1..64449416de 100644
---- a/hw/arm/allwinner-a10.c
-+++ b/hw/arm/allwinner-a10.c
-@@ -59,9 +59,9 @@ static void aw_a10_init(Object *obj)
-         int i;
+diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
+index 63a7105e8b..9c25d5da96 100644
+--- a/hw/arm/aspeed.c
++++ b/hw/arm/aspeed.c
+@@ -225,12 +225,12 @@ static void aspeed_board_init_flashes(AspeedSMCState *s, const char *flashtype,
+         DriveInfo *dinfo = drive_get_next(IF_MTD);
+         qemu_irq cs_line;
  
-         for (i = 0; i < AW_A10_NUM_USB; i++) {
--            sysbus_init_child_obj(obj, "ehci[*]", OBJECT(&s->ehci[i]),
-+            sysbus_init_child_obj(obj, "ehci[*]", &s->ehci[i],
-                                   sizeof(s->ehci[i]), TYPE_PLATFORM_EHCI);
--            sysbus_init_child_obj(obj, "ohci[*]", OBJECT(&s->ohci[i]),
-+            sysbus_init_child_obj(obj, "ohci[*]", &s->ohci[i],
-                                   sizeof(s->ohci[i]), TYPE_SYSBUS_OHCI);
+-        fl->flash = ssi_create_slave_no_init(s->spi, flashtype);
++        fl->flash = qdev_new(flashtype);
+         if (dinfo) {
+             qdev_prop_set_drive(fl->flash, "drive", blk_by_legacy_dinfo(dinfo),
+                                 errp);
          }
+-        qdev_init_nofail(fl->flash);
++        qdev_realize_and_unref(fl->flash, BUS(s->spi), &error_fatal);
+ 
+         cs_line = qdev_get_gpio_in_named(fl->flash, SSI_GPIO_CS, 0);
+         sysbus_connect_irq(SYS_BUS_DEVICE(s), i + 1, cs_line);
+diff --git a/hw/arm/msf2-som.c b/hw/arm/msf2-som.c
+index e398703742..ca9cbe1acb 100644
+--- a/hw/arm/msf2-som.c
++++ b/hw/arm/msf2-som.c
+@@ -47,7 +47,7 @@ static void emcraft_sf2_s2s010_init(MachineState *machine)
+     MachineClass *mc = MACHINE_GET_CLASS(machine);
+     DriveInfo *dinfo = drive_get_next(IF_MTD);
+     qemu_irq cs_line;
+-    SSIBus *spi_bus;
++    BusState *spi_bus;
+     MemoryRegion *sysmem = get_system_memory();
+     MemoryRegion *ddr = g_new(MemoryRegion, 1);
+ 
+@@ -82,14 +82,14 @@ static void emcraft_sf2_s2s010_init(MachineState *machine)
+     soc = MSF2_SOC(dev);
+ 
+     /* Attach SPI flash to SPI0 controller */
+-    spi_bus = (SSIBus *)qdev_get_child_bus(dev, "spi0");
+-    spi_flash = ssi_create_slave_no_init(spi_bus, "s25sl12801");
++    spi_bus = qdev_get_child_bus(dev, "spi0");
++    spi_flash = qdev_new("s25sl12801");
+     qdev_prop_set_uint8(spi_flash, "spansion-cr2nv", 1);
+     if (dinfo) {
+         qdev_prop_set_drive(spi_flash, "drive", blk_by_legacy_dinfo(dinfo),
+                                     &error_fatal);
      }
-diff --git a/hw/arm/aspeed_ast2600.c b/hw/arm/aspeed_ast2600.c
-index beb688fd8f..10e92643c1 100644
---- a/hw/arm/aspeed_ast2600.c
-+++ b/hw/arm/aspeed_ast2600.c
-@@ -131,8 +131,7 @@ static void aspeed_soc_ast2600_init(Object *obj)
-     }
+-    qdev_init_nofail(spi_flash);
++    qdev_realize_and_unref(spi_flash, spi_bus, &error_fatal);
+     cs_line = qdev_get_gpio_in_named(spi_flash, SSI_GPIO_CS, 0);
+     sysbus_connect_irq(SYS_BUS_DEVICE(&soc->spi[0]), 1, cs_line);
  
-     snprintf(typename, sizeof(typename), "aspeed.scu-%s", socname);
--    sysbus_init_child_obj(obj, "scu", OBJECT(&s->scu), sizeof(s->scu),
--                          typename);
-+    sysbus_init_child_obj(obj, "scu", &s->scu, sizeof(s->scu), typename);
-     qdev_prop_set_uint32(DEVICE(&s->scu), "silicon-rev",
-                          sc->silicon_rev);
-     object_property_add_alias(obj, "hw-strap1", OBJECT(&s->scu),
-@@ -145,36 +144,33 @@ static void aspeed_soc_ast2600_init(Object *obj)
-     sysbus_init_child_obj(obj, "a7mpcore", &s->a7mpcore,
-                           sizeof(s->a7mpcore), TYPE_A15MPCORE_PRIV);
+diff --git a/hw/arm/sabrelite.c b/hw/arm/sabrelite.c
+index 96cb30aa3c..33d731549d 100644
+--- a/hw/arm/sabrelite.c
++++ b/hw/arm/sabrelite.c
+@@ -75,13 +75,13 @@ static void sabrelite_init(MachineState *machine)
+                 qemu_irq cs_line;
+                 DriveInfo *dinfo = drive_get_next(IF_MTD);
  
--    sysbus_init_child_obj(obj, "rtc", OBJECT(&s->rtc), sizeof(s->rtc),
-+    sysbus_init_child_obj(obj, "rtc", &s->rtc, sizeof(s->rtc),
-                           TYPE_ASPEED_RTC);
+-                flash_dev = ssi_create_slave_no_init(spi_bus, "sst25vf016b");
++                flash_dev = qdev_new("sst25vf016b");
+                 if (dinfo) {
+                     qdev_prop_set_drive(flash_dev, "drive",
+                                         blk_by_legacy_dinfo(dinfo),
+                                         &error_fatal);
+                 }
+-                qdev_init_nofail(flash_dev);
++                qdev_realize_and_unref(flash_dev, BUS(spi_bus), &error_fatal);
  
-     snprintf(typename, sizeof(typename), "aspeed.timer-%s", socname);
--    sysbus_init_child_obj(obj, "timerctrl", OBJECT(&s->timerctrl),
-+    sysbus_init_child_obj(obj, "timerctrl", &s->timerctrl,
-                           sizeof(s->timerctrl), typename);
+                 cs_line = qdev_get_gpio_in_named(flash_dev, SSI_GPIO_CS, 0);
+                 sysbus_connect_irq(SYS_BUS_DEVICE(spi_dev), 1, cs_line);
+diff --git a/hw/arm/xilinx_zynq.c b/hw/arm/xilinx_zynq.c
+index 5fbd2b2e31..0e0f0976c4 100644
+--- a/hw/arm/xilinx_zynq.c
++++ b/hw/arm/xilinx_zynq.c
+@@ -157,12 +157,12 @@ static inline void zynq_init_spi_flashes(uint32_t base_addr, qemu_irq irq,
  
-     snprintf(typename, sizeof(typename), "aspeed.i2c-%s", socname);
--    sysbus_init_child_obj(obj, "i2c", OBJECT(&s->i2c), sizeof(s->i2c),
--                          typename);
-+    sysbus_init_child_obj(obj, "i2c", &s->i2c, sizeof(s->i2c), typename);
+         for (j = 0; j < num_ss; ++j) {
+             DriveInfo *dinfo = drive_get_next(IF_MTD);
+-            flash_dev = ssi_create_slave_no_init(spi, "n25q128");
++            flash_dev = qdev_new("n25q128");
+             if (dinfo) {
+                 qdev_prop_set_drive(flash_dev, "drive",
+                                     blk_by_legacy_dinfo(dinfo), &error_fatal);
+             }
+-            qdev_init_nofail(flash_dev);
++            qdev_realize_and_unref(flash_dev, BUS(spi), &error_fatal);
  
-     snprintf(typename, sizeof(typename), "aspeed.fmc-%s", socname);
--    sysbus_init_child_obj(obj, "fmc", OBJECT(&s->fmc), sizeof(s->fmc),
--                          typename);
-+    sysbus_init_child_obj(obj, "fmc", &s->fmc, sizeof(s->fmc), typename);
-     object_property_add_alias(obj, "num-cs", OBJECT(&s->fmc), "num-cs");
- 
-     for (i = 0; i < sc->spis_num; i++) {
-         snprintf(typename, sizeof(typename), "aspeed.spi%d-%s", i + 1, socname);
--        sysbus_init_child_obj(obj, "spi[*]", OBJECT(&s->spi[i]),
-+        sysbus_init_child_obj(obj, "spi[*]", &s->spi[i],
-                               sizeof(s->spi[i]), typename);
-     }
- 
-     for (i = 0; i < sc->ehcis_num; i++) {
--        sysbus_init_child_obj(obj, "ehci[*]", OBJECT(&s->ehci[i]),
-+        sysbus_init_child_obj(obj, "ehci[*]", &s->ehci[i],
-                               sizeof(s->ehci[i]), TYPE_PLATFORM_EHCI);
-     }
- 
-     snprintf(typename, sizeof(typename), "aspeed.sdmc-%s", socname);
--    sysbus_init_child_obj(obj, "sdmc", OBJECT(&s->sdmc), sizeof(s->sdmc),
--                          typename);
-+    sysbus_init_child_obj(obj, "sdmc", &s->sdmc, sizeof(s->sdmc), typename);
-     object_property_add_alias(obj, "ram-size", OBJECT(&s->sdmc),
-                               "ram-size");
-     object_property_add_alias(obj, "max-ram-size", OBJECT(&s->sdmc),
-@@ -182,30 +178,29 @@ static void aspeed_soc_ast2600_init(Object *obj)
- 
-     for (i = 0; i < sc->wdts_num; i++) {
-         snprintf(typename, sizeof(typename), "aspeed.wdt-%s", socname);
--        sysbus_init_child_obj(obj, "wdt[*]", OBJECT(&s->wdt[i]),
-+        sysbus_init_child_obj(obj, "wdt[*]", &s->wdt[i],
-                               sizeof(s->wdt[i]), typename);
-     }
- 
-     for (i = 0; i < sc->macs_num; i++) {
--        sysbus_init_child_obj(obj, "ftgmac100[*]", OBJECT(&s->ftgmac100[i]),
-+        sysbus_init_child_obj(obj, "ftgmac100[*]", &s->ftgmac100[i],
-                               sizeof(s->ftgmac100[i]), TYPE_FTGMAC100);
- 
-         sysbus_init_child_obj(obj, "mii[*]", &s->mii[i], sizeof(s->mii[i]),
-                               TYPE_ASPEED_MII);
-     }
- 
--    sysbus_init_child_obj(obj, "xdma", OBJECT(&s->xdma), sizeof(s->xdma),
-+    sysbus_init_child_obj(obj, "xdma", &s->xdma, sizeof(s->xdma),
-                           TYPE_ASPEED_XDMA);
- 
-     snprintf(typename, sizeof(typename), "aspeed.gpio-%s", socname);
--    sysbus_init_child_obj(obj, "gpio", OBJECT(&s->gpio), sizeof(s->gpio),
--                          typename);
-+    sysbus_init_child_obj(obj, "gpio", &s->gpio, sizeof(s->gpio), typename);
- 
-     snprintf(typename, sizeof(typename), "aspeed.gpio-%s-1_8v", socname);
--    sysbus_init_child_obj(obj, "gpio_1_8v", OBJECT(&s->gpio_1_8v),
-+    sysbus_init_child_obj(obj, "gpio_1_8v", &s->gpio_1_8v,
-                           sizeof(s->gpio_1_8v), typename);
- 
--    sysbus_init_child_obj(obj, "sd-controller", OBJECT(&s->sdhci),
-+    sysbus_init_child_obj(obj, "sd-controller", &s->sdhci,
-                           sizeof(s->sdhci), TYPE_ASPEED_SDHCI);
- 
-     object_property_set_int(OBJECT(&s->sdhci), 2, "num-slots", &error_abort);
-@@ -213,17 +208,17 @@ static void aspeed_soc_ast2600_init(Object *obj)
-     /* Init sd card slot class here so that they're under the correct parent */
-     for (i = 0; i < ASPEED_SDHCI_NUM_SLOTS; ++i) {
-         sysbus_init_child_obj(obj, "sd-controller.sdhci[*]",
--                              OBJECT(&s->sdhci.slots[i]),
-+                              &s->sdhci.slots[i],
-                               sizeof(s->sdhci.slots[i]), TYPE_SYSBUS_SDHCI);
+             cs_line = qdev_get_gpio_in_named(flash_dev, SSI_GPIO_CS, 0);
+             sysbus_connect_irq(busdev, i * num_ss + j + 1, cs_line);
+diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
+index 4229b2d936..77c84b82ab 100644
+--- a/hw/arm/xlnx-zcu102.c
++++ b/hw/arm/xlnx-zcu102.c
+@@ -149,21 +149,21 @@ static void xlnx_zcu102_init(MachineState *machine)
      }
  
--    sysbus_init_child_obj(obj, "emmc-controller", OBJECT(&s->emmc),
-+    sysbus_init_child_obj(obj, "emmc-controller", &s->emmc,
-                           sizeof(s->emmc), TYPE_ASPEED_SDHCI);
+     for (i = 0; i < XLNX_ZYNQMP_NUM_SPIS; i++) {
+-        SSIBus *spi_bus;
++        BusState *spi_bus;
+         DeviceState *flash_dev;
+         qemu_irq cs_line;
+         DriveInfo *dinfo = drive_get_next(IF_MTD);
+         gchar *bus_name = g_strdup_printf("spi%d", i);
  
-     object_property_set_int(OBJECT(&s->emmc), 1, "num-slots", &error_abort);
+-        spi_bus = (SSIBus *)qdev_get_child_bus(DEVICE(&s->soc), bus_name);
++        spi_bus = qdev_get_child_bus(DEVICE(&s->soc), bus_name);
+         g_free(bus_name);
  
-     sysbus_init_child_obj(obj, "emmc-controller.sdhci",
--                          OBJECT(&s->emmc.slots[0]), sizeof(s->emmc.slots[0]),
-+                          &s->emmc.slots[0], sizeof(s->emmc.slots[0]),
-                           TYPE_SYSBUS_SDHCI);
- }
+-        flash_dev = ssi_create_slave_no_init(spi_bus, "sst25wf080");
++        flash_dev = qdev_new("sst25wf080");
+         if (dinfo) {
+             qdev_prop_set_drive(flash_dev, "drive", blk_by_legacy_dinfo(dinfo),
+                                 &error_fatal);
+         }
+-        qdev_init_nofail(flash_dev);
++        qdev_realize_and_unref(flash_dev, spi_bus, &error_fatal);
  
-diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
-index 18d1763aba..5806e5c9b4 100644
---- a/hw/arm/aspeed_soc.c
-+++ b/hw/arm/aspeed_soc.c
-@@ -146,8 +146,7 @@ static void aspeed_soc_init(Object *obj)
+         cs_line = qdev_get_gpio_in_named(flash_dev, SSI_GPIO_CS, 0);
+ 
+@@ -171,22 +171,22 @@ static void xlnx_zcu102_init(MachineState *machine)
      }
  
-     snprintf(typename, sizeof(typename), "aspeed.scu-%s", socname);
--    sysbus_init_child_obj(obj, "scu", OBJECT(&s->scu), sizeof(s->scu),
--                          typename);
-+    sysbus_init_child_obj(obj, "scu", &s->scu, sizeof(s->scu), typename);
-     qdev_prop_set_uint32(DEVICE(&s->scu), "silicon-rev",
-                          sc->silicon_rev);
-     object_property_add_alias(obj, "hw-strap1", OBJECT(&s->scu),
-@@ -157,39 +156,36 @@ static void aspeed_soc_init(Object *obj)
-     object_property_add_alias(obj, "hw-prot-key", OBJECT(&s->scu),
-                               "hw-prot-key");
+     for (i = 0; i < XLNX_ZYNQMP_NUM_QSPI_FLASH; i++) {
+-        SSIBus *spi_bus;
++        BusState *spi_bus;
+         DeviceState *flash_dev;
+         qemu_irq cs_line;
+         DriveInfo *dinfo = drive_get_next(IF_MTD);
+         int bus = i / XLNX_ZYNQMP_NUM_QSPI_BUS_CS;
+         gchar *bus_name = g_strdup_printf("qspi%d", bus);
  
--    sysbus_init_child_obj(obj, "vic", OBJECT(&s->vic), sizeof(s->vic),
-+    sysbus_init_child_obj(obj, "vic", &s->vic, sizeof(s->vic),
-                           TYPE_ASPEED_VIC);
+-        spi_bus = (SSIBus *)qdev_get_child_bus(DEVICE(&s->soc), bus_name);
++        spi_bus = qdev_get_child_bus(DEVICE(&s->soc), bus_name);
+         g_free(bus_name);
  
--    sysbus_init_child_obj(obj, "rtc", OBJECT(&s->rtc), sizeof(s->rtc),
-+    sysbus_init_child_obj(obj, "rtc", &s->rtc, sizeof(s->rtc),
-                           TYPE_ASPEED_RTC);
+-        flash_dev = ssi_create_slave_no_init(spi_bus, "n25q512a11");
++        flash_dev = qdev_new("n25q512a11");
+         if (dinfo) {
+             qdev_prop_set_drive(flash_dev, "drive", blk_by_legacy_dinfo(dinfo),
+                                 &error_fatal);
+         }
+-        qdev_init_nofail(flash_dev);
++        qdev_realize_and_unref(flash_dev, spi_bus, &error_fatal);
  
-     snprintf(typename, sizeof(typename), "aspeed.timer-%s", socname);
--    sysbus_init_child_obj(obj, "timerctrl", OBJECT(&s->timerctrl),
-+    sysbus_init_child_obj(obj, "timerctrl", &s->timerctrl,
-                           sizeof(s->timerctrl), typename);
+         cs_line = qdev_get_gpio_in_named(flash_dev, SSI_GPIO_CS, 0);
  
-     snprintf(typename, sizeof(typename), "aspeed.i2c-%s", socname);
--    sysbus_init_child_obj(obj, "i2c", OBJECT(&s->i2c), sizeof(s->i2c),
--                          typename);
-+    sysbus_init_child_obj(obj, "i2c", &s->i2c, sizeof(s->i2c), typename);
+diff --git a/hw/microblaze/petalogix_ml605_mmu.c b/hw/microblaze/petalogix_ml605_mmu.c
+index 2e7a3fa119..d4bfa233c9 100644
+--- a/hw/microblaze/petalogix_ml605_mmu.c
++++ b/hw/microblaze/petalogix_ml605_mmu.c
+@@ -186,12 +186,12 @@ petalogix_ml605_init(MachineState *machine)
+             DriveInfo *dinfo = drive_get_next(IF_MTD);
+             qemu_irq cs_line;
  
-     snprintf(typename, sizeof(typename), "aspeed.fmc-%s", socname);
--    sysbus_init_child_obj(obj, "fmc", OBJECT(&s->fmc), sizeof(s->fmc),
--                          typename);
-+    sysbus_init_child_obj(obj, "fmc", &s->fmc, sizeof(s->fmc), typename);
-     object_property_add_alias(obj, "num-cs", OBJECT(&s->fmc), "num-cs");
+-            dev = ssi_create_slave_no_init(spi, "n25q128");
++            dev = qdev_new("n25q128");
+             if (dinfo) {
+                 qdev_prop_set_drive(dev, "drive", blk_by_legacy_dinfo(dinfo),
+                                     &error_fatal);
+             }
+-            qdev_init_nofail(dev);
++            qdev_realize_and_unref(dev, BUS(spi), &error_fatal);
  
-     for (i = 0; i < sc->spis_num; i++) {
-         snprintf(typename, sizeof(typename), "aspeed.spi%d-%s", i + 1, socname);
--        sysbus_init_child_obj(obj, "spi[*]", OBJECT(&s->spi[i]),
-+        sysbus_init_child_obj(obj, "spi[*]", &s->spi[i],
-                               sizeof(s->spi[i]), typename);
-     }
- 
-     for (i = 0; i < sc->ehcis_num; i++) {
--        sysbus_init_child_obj(obj, "ehci[*]", OBJECT(&s->ehci[i]),
-+        sysbus_init_child_obj(obj, "ehci[*]", &s->ehci[i],
-                               sizeof(s->ehci[i]), TYPE_PLATFORM_EHCI);
-     }
- 
-     snprintf(typename, sizeof(typename), "aspeed.sdmc-%s", socname);
--    sysbus_init_child_obj(obj, "sdmc", OBJECT(&s->sdmc), sizeof(s->sdmc),
--                          typename);
-+    sysbus_init_child_obj(obj, "sdmc", &s->sdmc, sizeof(s->sdmc), typename);
-     object_property_add_alias(obj, "ram-size", OBJECT(&s->sdmc),
-                               "ram-size");
-     object_property_add_alias(obj, "max-ram-size", OBJECT(&s->sdmc),
-@@ -197,30 +193,29 @@ static void aspeed_soc_init(Object *obj)
- 
-     for (i = 0; i < sc->wdts_num; i++) {
-         snprintf(typename, sizeof(typename), "aspeed.wdt-%s", socname);
--        sysbus_init_child_obj(obj, "wdt[*]", OBJECT(&s->wdt[i]),
-+        sysbus_init_child_obj(obj, "wdt[*]", &s->wdt[i],
-                               sizeof(s->wdt[i]), typename);
-     }
- 
-     for (i = 0; i < sc->macs_num; i++) {
--        sysbus_init_child_obj(obj, "ftgmac100[*]", OBJECT(&s->ftgmac100[i]),
-+        sysbus_init_child_obj(obj, "ftgmac100[*]", &s->ftgmac100[i],
-                               sizeof(s->ftgmac100[i]), TYPE_FTGMAC100);
-     }
- 
--    sysbus_init_child_obj(obj, "xdma", OBJECT(&s->xdma), sizeof(s->xdma),
-+    sysbus_init_child_obj(obj, "xdma", &s->xdma, sizeof(s->xdma),
-                           TYPE_ASPEED_XDMA);
- 
-     snprintf(typename, sizeof(typename), "aspeed.gpio-%s", socname);
--    sysbus_init_child_obj(obj, "gpio", OBJECT(&s->gpio), sizeof(s->gpio),
--                          typename);
-+    sysbus_init_child_obj(obj, "gpio", &s->gpio, sizeof(s->gpio), typename);
- 
--    sysbus_init_child_obj(obj, "sdc", OBJECT(&s->sdhci), sizeof(s->sdhci),
-+    sysbus_init_child_obj(obj, "sdc", &s->sdhci, sizeof(s->sdhci),
-                           TYPE_ASPEED_SDHCI);
- 
-     object_property_set_int(OBJECT(&s->sdhci), 2, "num-slots", &error_abort);
- 
-     /* Init sd card slot class here so that they're under the correct parent */
-     for (i = 0; i < ASPEED_SDHCI_NUM_SLOTS; ++i) {
--        sysbus_init_child_obj(obj, "sdhci[*]", OBJECT(&s->sdhci.slots[i]),
-+        sysbus_init_child_obj(obj, "sdhci[*]", &s->sdhci.slots[i],
-                               sizeof(s->sdhci.slots[i]), TYPE_SYSBUS_SDHCI);
-     }
- }
-diff --git a/hw/arm/nrf51_soc.c b/hw/arm/nrf51_soc.c
-index fe126581e4..c278827b09 100644
---- a/hw/arm/nrf51_soc.c
-+++ b/hw/arm/nrf51_soc.c
-@@ -189,7 +189,7 @@ static void nrf51_soc_init(Object *obj)
- 
-     memory_region_init(&s->container, obj, "nrf51-container", UINT64_MAX);
- 
--    sysbus_init_child_obj(OBJECT(s), "armv6m", OBJECT(&s->cpu), sizeof(s->cpu),
-+    sysbus_init_child_obj(OBJECT(s), "armv6m", &s->cpu, sizeof(s->cpu),
-                           TYPE_ARMV7M);
-     qdev_prop_set_string(DEVICE(&s->cpu), "cpu-type",
-                          ARM_CPU_TYPE_NAME("cortex-m0"));
-diff --git a/hw/mips/boston.c b/hw/mips/boston.c
-index a34ccdf616..d90f3a463b 100644
---- a/hw/mips/boston.c
-+++ b/hw/mips/boston.c
-@@ -454,8 +454,8 @@ static void boston_mach_init(MachineState *machine)
- 
-     is_64b = cpu_supports_isa(machine->cpu_type, ISA_MIPS64);
- 
--    sysbus_init_child_obj(OBJECT(machine), "cps", OBJECT(&s->cps),
--                          sizeof(s->cps), TYPE_MIPS_CPS);
-+    sysbus_init_child_obj(OBJECT(machine), "cps", &s->cps, sizeof(s->cps),
-+                          TYPE_MIPS_CPS);
-     object_property_set_str(OBJECT(&s->cps), machine->cpu_type, "cpu-type",
-                             &error_fatal);
-     object_property_set_int(OBJECT(&s->cps), machine->smp.cpus, "num-vp",
-diff --git a/hw/mips/malta.c b/hw/mips/malta.c
-index d03e1c3e49..be0b4d3195 100644
---- a/hw/mips/malta.c
-+++ b/hw/mips/malta.c
-@@ -1183,7 +1183,7 @@ static void create_cpu_without_cps(MachineState *ms,
- static void create_cps(MachineState *ms, MaltaState *s,
-                        qemu_irq *cbus_irq, qemu_irq *i8259_irq)
- {
--    sysbus_init_child_obj(OBJECT(s), "cps", OBJECT(&s->cps), sizeof(s->cps),
-+    sysbus_init_child_obj(OBJECT(s), "cps", &s->cps, sizeof(s->cps),
-                           TYPE_MIPS_CPS);
-     object_property_set_str(OBJECT(&s->cps), ms->cpu_type, "cpu-type",
-                             &error_fatal);
+             cs_line = qdev_get_gpio_in_named(dev, SSI_GPIO_CS, 0);
+             sysbus_connect_irq(busdev, i+1, cs_line);
 -- 
 2.26.2
 
