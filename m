@@ -2,85 +2,80 @@ Return-Path: <SRS0=wemX=7X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1583DC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 18:07:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F28DC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 18:12:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D69B7206F4
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 18:07:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YrC6mtEU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D69B7206F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 07B07206F4
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 18:12:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07B07206F4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35660 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38354 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jj58Y-0003ot-6M
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 14:07:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43760)
+	id 1jj5Cz-0005s7-9g
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 14:12:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45476)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jj56N-0001i1-RM
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 14:05:27 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:50439
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jj56M-0002j8-AW
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 14:05:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591812325;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=cVO1H/LJjMhPwy1NjI/LyqOueTTUkrpYCH8Cntq6jQ8=;
- b=YrC6mtEUEZqjSJPGNSoY02wP4xHgo8e0quQK6KpU/GDRjGeacu1QTYq2IbYV9/thQ0eKI/
- hz9+L1qKSCrDYQ8LnV795Hr5HTAMYISPd9SbfTqI4JxkD5A2kF0CMhQ6hXhLUTLJBhNMBd
- pbVeDEwg3TcuwaBRFWl25CfyokkPtFs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-496-ke8n5poxOZenZ-jK0t4Ziw-1; Wed, 10 Jun 2020 14:05:16 -0400
-X-MC-Unique: ke8n5poxOZenZ-jK0t4Ziw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D09698014D4
- for <qemu-devel@nongnu.org>; Wed, 10 Jun 2020 18:05:15 +0000 (UTC)
-Received: from blue.redhat.com (ovpn-113-22.phx2.redhat.com [10.3.113.22])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A02EF7A8DD
- for <qemu-devel@nongnu.org>; Wed, 10 Jun 2020 18:05:15 +0000 (UTC)
-From: Eric Blake <eblake@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL v2 0/3] NBD patches through 2020-06-09
-Date: Wed, 10 Jun 2020 13:05:10 -0500
-Message-Id: <20200610180514.3751958-1-eblake@redhat.com>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jj5CM-0005Cu-P7
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 14:11:38 -0400
+Received: from indium.canonical.com ([91.189.90.7]:46416)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jj5CJ-0003xd-4O
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 14:11:38 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jj5CF-0004Bj-26
+ for <qemu-devel@nongnu.org>; Wed, 10 Jun 2020 18:11:31 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 3926C2E812F
+ for <qemu-devel@nongnu.org>; Wed, 10 Jun 2020 18:11:27 +0000 (UTC)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=eblake@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 23:51:15
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 10 Jun 2020 17:55:55 -0000
+From: Diego Viola <1882851@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: diego-viola
+X-Launchpad-Bug-Reporter: Diego Viola (diego-viola)
+X-Launchpad-Bug-Modifier: Diego Viola (diego-viola)
+References: <159174217343.32241.17743917589333297614.malonedeb@gac.canonical.com>
+Message-Id: <159181175570.8671.17073842265786719088.malone@gac.canonical.com>
+Subject: [Bug 1882851] Re: QEMU video freezes with "Guest disabled display"
+ (virtio driver)
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="b190cebbf563f89e480a8b57f641753c8196bda0";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 767a7f90235e57901c538c848f139b881d675133
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/10 11:11:22
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -89,48 +84,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: Bug 1882851 <1882851@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit 31d321c2b3574dcc74e9f6411af06bca6b5d10f4:
+`xset dpms force off' on the guest is a good way to reproduce it.
 
-  Merge remote-tracking branch 'remotes/philmd-gitlab/tags/sparc-next-20200609' into staging (2020-06-09 17:29:47 +0100)
+-- =
 
-are available in the Git repository at:
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1882851
 
-  https://repo.or.cz/qemu/ericb.git tags/pull-nbd-2020-06-09-v2
+Title:
+  QEMU video freezes with "Guest disabled display" (virtio driver)
 
-for you to fetch changes up to 5c86bdf1208916ece0b87e1151c9b48ee54faa3e:
+Status in QEMU:
+  New
 
-  block: Call attention to truncation of long NBD exports (2020-06-10 12:58:59 -0500)
+Bug description:
+  I am using Arch Linux as my Guest and Host OS, after starting qemu
+  with the following command:
 
-In v2: patch 2 adjusted per review (only sending the changed patch)
+    $ qemu-system-x86_64 -enable-kvm -hda arch-zoom.qcow2 -m 4G -vga
+  virtio
 
-----------------------------------------------------------------
-NBD patches for 2020-06-09
+  and waiting for a screen blank, I get this message:
 
-- fix iotest 194 race
-- fix CVE-2020-10761: server DoS from assertion on long NBD error messages
+    Guest disabled display
 
-----------------------------------------------------------------
-Eric Blake (2):
-      nbd/server: Avoid long error message assertions CVE-2020-10761
-      block: Call attention to truncation of long NBD exports
+  And nothing happens after that, I can move the mouse or hit any key,
+  and the message is still there.
 
-Vladimir Sementsov-Ogievskiy (1):
-      iotests: 194: wait for migration completion on target too
+  I can still reboot the VM but that's not optimal.
 
- block.c                    |  7 +++++--
- block/nbd.c                | 21 +++++++++++++--------
- nbd/server.c               | 23 ++++++++++++++++++++---
- tests/qemu-iotests/143     |  4 ++++
- tests/qemu-iotests/143.out |  2 ++
- tests/qemu-iotests/194     | 10 ++++++++++
- tests/qemu-iotests/194.out |  5 +++++
- 7 files changed, 59 insertions(+), 13 deletions(-)
+  I can reproduce this with the latest QEMU release (5.0.0) or git master, =
 
--- 
-2.27.0
+  I also tried this with older releases (4.0.0, 3.0.0) and the issue is sti=
+ll there.
 
+  I can't reproduce this with other video drivers (std, qxl).
+
+  With std/qxl the screen will blank a bit and then continue as normal.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1882851/+subscriptions
 
