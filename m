@@ -2,95 +2,81 @@ Return-Path: <SRS0=wemX=7X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DB37C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 12:13:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B1EBC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 12:14:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C99C420734
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 12:13:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6404920734
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 12:14:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RqT+qYmV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C99C420734
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vc6+AD0A"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6404920734
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42150 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45200 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jizbY-0004Kz-2o
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 08:13:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45086)
+	id 1jizcR-0005lK-Kl
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 08:14:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43614)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jizUu-0002R0-4C; Wed, 10 Jun 2020 08:06:24 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:35693)
- by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jizUs-0004s3-UP; Wed, 10 Jun 2020 08:06:23 -0400
-Received: by mail-wm1-x341.google.com with SMTP id q25so1601258wmj.0;
- Wed, 10 Jun 2020 05:06:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=EYiwOCPGoH4QL4obrdsR0/VwwDZDDBEVLLPNRHJRRYk=;
- b=RqT+qYmVdEWSvhYLuuc0yogGzkbXfqiCrthkSFHzUnRtkfsasSQAP6uF+6gD9d7U1r
- pot9DHAhHEWFOafY9zFTW+4n9K1V+xAKBzHFyI2uNC59hzqTnc8dukX9j3Jd7SUZHcZi
- ksrDe94YTxjaZbDqxMIGcKBxnAJ3u9Oc9PdaO8JH+wHpeRHSmjvF4z9SuOquxUbCo9Op
- Yx3O23xnx7YRgo/rgY72nuL0k3nMwUlyuBI+nb8VrYU3msLdBxeIMKwRwV/Ci7i5/2nO
- ABhoauDSUa7cEdq2iZIlKs7aNl/lPosAq+IjbTaDGYhpSw4wuoQyXH4u1WRoxF4jPgJx
- 7KLw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=EYiwOCPGoH4QL4obrdsR0/VwwDZDDBEVLLPNRHJRRYk=;
- b=aHMviyPbuy+vMsqRkjr8RAU4xyyv/kTb/c1o4LliyHM1vOOMrEESrhSki2Blx8FBLc
- EEPpna5wzrQAks1RDMCPLuJ0LERD5HVeXxanYJJ7GChP9yX6sJOtKolfHRxcGH/vN4Je
- ZmXl//AFtV/KSgxx2u2G2TcwfYuxmgUdzdHnB7gIUYHFGv0UeFqCtRRyUtejq/bvDBkY
- foiResGcLSZLFKHMerRhn2osc3/N+/TicUdyFyqusbV9+xJuVsqIjYnzkCj8J3xt53zC
- pAjWXFlPAmVudLwpU92bGLYGtbTXmIBIGAV/ADv1b0RJhrLfCGtmNtjwxLkc3KZenB8R
- 0DnA==
-X-Gm-Message-State: AOAM531H4HF7XZWWbqkbPuQBYelOmI/T0xoOzJjnQ8y5xnyVC9uVxfob
- QaTkFcXQzV8eti+G9nSPqDI=
-X-Google-Smtp-Source: ABdhPJzBGLW2YIicCwNMpYS8Uw5lsG/q8bRzyorlRAZNIR+gMnqNv0znJ+APqf8BiZVL4TwTsWm6HQ==
-X-Received: by 2002:a1c:1f4d:: with SMTP id f74mr2753607wmf.12.1591790769992; 
- Wed, 10 Jun 2020 05:06:09 -0700 (PDT)
-Received: from [192.168.1.38] (181.red-88-10-103.dynamicip.rima-tde.net.
- [88.10.103.181])
- by smtp.gmail.com with ESMTPSA id d18sm7851366wrn.34.2020.06.10.05.06.08
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 10 Jun 2020 05:06:09 -0700 (PDT)
-Subject: Re: [PATCH v2 1/8] MAINTAINERS: Mark SH4 hardware orphan
-To: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-References: <20200608090142.6793-1-f4bug@amsat.org>
- <20200608090142.6793-2-f4bug@amsat.org>
- <CAHiYmc5UUaSKB6Ee0ds_hj0FBTzt0iLxzNWySt0mcZ9dvtZNyA@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <2503a468-d343-b40a-bf4e-628f3e8f56e3@amsat.org>
-Date: Wed, 10 Jun 2020 14:06:08 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jizL4-0004oG-Gv
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 07:56:15 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24030
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jizL2-0002Fu-VP
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 07:56:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591790172;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=OMm4of9YaGzegN5bSIFM+q+axawQAsBn39Dg4QO3Ssc=;
+ b=Vc6+AD0AMdlrA2DwSOk6vaiZ0+BJ6swksuGsbIOqkd6I740uCsYXTe0H7sDHnrO+YSkvWN
+ no/gsWZqJcHaAQn8aRi545YN4YcQZkCKnYjESCn63h+kR3c3eLW2zdicsA/4ZG67kuGqsG
+ NhGY5FhwoaXtVPLzsZjXPBEbAeie1cU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-237-iZtHDbZuMtaMTb9TjcRE4w-1; Wed, 10 Jun 2020 07:56:10 -0400
+X-MC-Unique: iZtHDbZuMtaMTb9TjcRE4w-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 607EF1B18BC2;
+ Wed, 10 Jun 2020 11:56:08 +0000 (UTC)
+Received: from t480s.redhat.com (ovpn-114-42.ams2.redhat.com [10.36.114.42])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 188245D9D3;
+ Wed, 10 Jun 2020 11:55:59 +0000 (UTC)
+From: David Hildenbrand <david@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v4 21/21] numa: Auto-enable NUMA when any memory devices are
+ possible
+Date: Wed, 10 Jun 2020 13:54:19 +0200
+Message-Id: <20200610115419.51688-22-david@redhat.com>
+In-Reply-To: <20200610115419.51688-1-david@redhat.com>
+References: <20200610115419.51688-1-david@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAHiYmc5UUaSKB6Ee0ds_hj0FBTzt0iLxzNWySt0mcZ9dvtZNyA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::341;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=david@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 21:17:20
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -104,182 +90,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
- Yoshinori Sato <ysato@users.sourceforge.jp>, qemu-trivial@nongnu.org,
- Michael Tokarev <mjt@tls.msk.ru>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Magnus Damm <magnus.damm@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Laurent Vivier <laurent@vivier.eu>, Aurelien Jarno <aurelien@aurel32.net>,
- Richard Henderson <richard.henderson@linaro.org>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Markus Armbruster <armbru@redhat.com>,
- Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Sergio Lopez <slp@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+ "Michael S . Tsirkin" <mst@redhat.com>, David Hildenbrand <david@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>, qemu-s390x@nongnu.org,
+ "qemu-arm @ nongnu . org" <qemu-arm@nongnu.org>,
+ Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Alex Shi <alex.shi@linux.alibaba.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/10/20 1:08 PM, Aleksandar Markovic wrote:
-> пон, 8. јун 2020. у 11:05 Philippe Mathieu-Daudé <f4bug@amsat.org> је
-> написао/ла:
->>
->> Aurelien Jarno expressed his desire to orphan the SH4 hardware [*]:
->>
->>   I don't mind being [...] removed from there.
->>   I do not really have time to work on that.
->>
->> Mark the SH4 emulated hardware orphan.
->>
->> Many thanks to Aurelien for his substantial contributions to QEMU,
->> and for maintaining the SH4 hardware for various years!
->>
->> [*] https://www.mail-archive.com/qemu-devel@nongnu.org/msg708400.html
->>
->> Message-Id: <20200601214125.GA1924990@aurel32.net>
->> Acked-by: Aurelien Jarno <aurelien@aurel32.net>
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> ---
-> 
-> The basic idea of the patch (as read from the title and the commit
-> message) is good and positive.
-> 
-> The problem is that the patch does something different than the commit
-> message says - pretending that it just orphans something. Which is not
-> good. Actually, very clumsy and bad.
+Let's auto-enable it also when maxmem is specified but no slots are
+defined. This will result in us properly creating ACPI srat tables,
+indicating the maximum possible PFN to the guest OS. Based on this, e.g.,
+Linux will enable the swiotlb properly.
 
-I can improve my English (actually I am trying, I started to take
-lessons 2 years ago). Remember it is not easy for non native English
-speaker to elaborate non-technical topics.
-As a side note, it is also hard sometimes to understand contributors who
-uses a very advanced English level with fancy words, as we have to take
-the time to translate to understand. Even if we learn new word, this is
-not often the best use of our time.
+This avoids having to manually force the switolb on (swiotlb=force) in
+Linux in case we're booting only using DMA memory (e.g., 2GB on x86-64),
+and virtio-mem adds memory later on that really needs the swiotlb to be
+used for DMA.
 
-> It creates a whole new subsection in MAINTAINERS file (not said in the
-> commit message), without any consistency with the current organization
-> in the file. That new subsection looks completely misplaced, living
-> with "TCG CPUs" neighbours. On top of that, it creates a new
-> precedent, leaving many unanswered questions, like: Should other
-> targets follow the same pattern?
+Let's take care of backwards compatibility if somebody has a setup that
+specifies "maxram" without "slots".
 
-If you look at git-log history, you'll see at the beginning there
-were not much separations in directories. Everything was altogether.
-Adding a new machine meant add the TCG emulation code and the hardware.
-The contributor adding TCG emulation was doing the harder work,
-usually doing it for a particular machine (hardware). Then other
-contributors could add other machines, and were maintaining only
-their machines. See commit b6f97c14f59 importing the short
-MAINTAINERS from SVN. It was already split in 3 broad categories:
-- TCG cores
-- Machines / Hardware
-- Subsystems (the rest)
+Reported-by: Alex Shi <alex.shi@linux.alibaba.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: Sergio Lopez <slp@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-arm@nongnu.org <qemu-arm@nongnu.org>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ hw/arm/virt.c       |  2 ++
+ hw/core/numa.c      | 11 ++++++-----
+ hw/i386/microvm.c   |  1 +
+ hw/i386/pc.c        |  1 +
+ hw/i386/pc_piix.c   |  1 +
+ hw/i386/pc_q35.c    |  1 +
+ include/hw/boards.h |  1 +
+ 7 files changed, 13 insertions(+), 5 deletions(-)
 
-In October 2010 (fd5d5c566af0) Anthony Liguori rewrote MAINTAINERS
-using Linux style tags.
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 37462a6f78..d50ad6f841 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -2265,6 +2265,7 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
+     mc->numa_mem_supported = true;
+     mc->nvdimm_supported = true;
+     mc->auto_enable_numa_with_memhp = true;
++    mc->auto_enable_numa_with_memdev = true;
+     mc->default_ram_id = "mach-virt.ram";
+ 
+     object_class_property_add(oc, "acpi", "OnOffAuto",
+@@ -2375,6 +2376,7 @@ DEFINE_VIRT_MACHINE_AS_LATEST(5, 1)
+ static void virt_machine_5_0_options(MachineClass *mc)
+ {
+     virt_machine_5_1_options(mc);
++    mc->auto_enable_numa_with_memdev = false;
+ }
+ DEFINE_VIRT_MACHINE(5, 0)
+ 
+diff --git a/hw/core/numa.c b/hw/core/numa.c
+index 06960918e7..b9923cdd45 100644
+--- a/hw/core/numa.c
++++ b/hw/core/numa.c
+@@ -681,8 +681,9 @@ void numa_complete_configuration(MachineState *ms)
+     NodeInfo *numa_info = ms->numa_state->nodes;
+ 
+     /*
+-     * If memory hotplug is enabled (slots > 0) but without '-numa'
+-     * options explicitly on CLI, guestes will break.
++     * If memory hotplug is enabled (slot > 0) or memory devices are enabled
++     * (ms->maxram_size > ram_size) but without '-numa' options explicitly on
++     * CLI, guests will break.
+      *
+      *   Windows: won't enable memory hotplug without SRAT table at all
+      *
+@@ -697,9 +698,9 @@ void numa_complete_configuration(MachineState *ms)
+      * assume there is just one node with whole RAM.
+      */
+     if (ms->numa_state->num_nodes == 0 &&
+-        ((ms->ram_slots > 0 &&
+-        mc->auto_enable_numa_with_memhp) ||
+-        mc->auto_enable_numa)) {
++        ((ms->ram_slots && mc->auto_enable_numa_with_memhp) ||
++         (ms->maxram_size > ms->ram_size && mc->auto_enable_numa_with_memdev) ||
++         mc->auto_enable_numa)) {
+             NumaNodeOptions node = { };
+             parse_numa_node(ms, &node, &error_abort);
+             numa_info[0].node_mem = ram_size;
+diff --git a/hw/i386/microvm.c b/hw/i386/microvm.c
+index 937db10ae6..2c052ee2e5 100644
+--- a/hw/i386/microvm.c
++++ b/hw/i386/microvm.c
+@@ -497,6 +497,7 @@ static void microvm_class_init(ObjectClass *oc, void *data)
+     mc->max_cpus = 288;
+     mc->has_hotpluggable_cpus = false;
+     mc->auto_enable_numa_with_memhp = false;
++    mc->auto_enable_numa_with_memdev = false;
+     mc->default_cpu_type = TARGET_DEFAULT_CPU_TYPE;
+     mc->nvdimm_supported = false;
+     mc->default_ram_id = "microvm.ram";
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index ee6368915b..ec93870de5 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1955,6 +1955,7 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
+     mc->get_default_cpu_node_id = x86_get_default_cpu_node_id;
+     mc->possible_cpu_arch_ids = x86_possible_cpu_arch_ids;
+     mc->auto_enable_numa_with_memhp = true;
++    mc->auto_enable_numa_with_memdev = true;
+     mc->has_hotpluggable_cpus = true;
+     mc->default_boot_order = "cad";
+     mc->hot_add_cpu = pc_hot_add_cpu;
+diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+index f66e1d73ce..1bc68c3841 100644
+--- a/hw/i386/pc_piix.c
++++ b/hw/i386/pc_piix.c
+@@ -440,6 +440,7 @@ static void pc_i440fx_5_0_machine_options(MachineClass *m)
+     m->is_default = false;
+     compat_props_add(m->compat_props, hw_compat_5_0, hw_compat_5_0_len);
+     compat_props_add(m->compat_props, pc_compat_5_0, pc_compat_5_0_len);
++    m->auto_enable_numa_with_memdev = false;
+ }
+ 
+ DEFINE_I440FX_MACHINE(v5_0, "pc-i440fx-5.0", NULL,
+diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+index 4ba8ac8774..a17459e37c 100644
+--- a/hw/i386/pc_q35.c
++++ b/hw/i386/pc_q35.c
+@@ -368,6 +368,7 @@ static void pc_q35_5_0_machine_options(MachineClass *m)
+     m->alias = NULL;
+     compat_props_add(m->compat_props, hw_compat_5_0, hw_compat_5_0_len);
+     compat_props_add(m->compat_props, pc_compat_5_0, pc_compat_5_0_len);
++    m->auto_enable_numa_with_memhp = false;
+ }
+ 
+ DEFINE_Q35_MACHINE(v5_0, "pc-q35-5.0", NULL,
+diff --git a/include/hw/boards.h b/include/hw/boards.h
+index 18815d9be2..426ce5f625 100644
+--- a/include/hw/boards.h
++++ b/include/hw/boards.h
+@@ -207,6 +207,7 @@ struct MachineClass {
+     const char **valid_cpu_types;
+     strList *allowed_dynamic_sysbus_devices;
+     bool auto_enable_numa_with_memhp;
++    bool auto_enable_numa_with_memdev;
+     void (*numa_auto_assign_ram)(MachineClass *mc, NodeInfo *nodes,
+                                  int nb_nodes, ram_addr_t size);
+     bool ignore_boot_device_suffixes;
+-- 
+2.26.2
 
-In January 2011 (42f5a7e9367) Aurelien Jarno clarified the
-difference between the TCG host part (backend, under the tcg/
-directory) VS the target part (frontend, under target/).
-
-Then the project grew, and eventually in May 2012 Paolo Bonzini
-started to clean, by moving files into "subsystem" directories
-(see 5e8861a0361..c353f261946). In March 2013 he followed by
-splitting various hardware files from the hw/ directory
-(see 0d09e41a51a..47b43a1f414).
-
-In November 2013 (f05b328c9d8) Stefan Hajnoczi clarified the
-importance of the 'block' subsystem (later completed in
-commit e7c6e631b1 in April 2015).
-
-2015 still, Paolo keeps cleaning (c17652ee409 cover the
-TCG backend disassembler, 062710000db introduce Peter
-Maydell for the ARM hardware).
-
-In October 2018 Thomas Huth added the target/ folder
-(commit fcf5ef2ab).
-
-Recently last year (6347e1f1cc7) Markus Armbruster tried
-to better describe the TCG frontend ("Overall TCG CPUs")
-and backend ("TCG target") differences.
-
-
-So while the difference between TCG emulation (or other
-accelerators, KVM, ...) versus the hardware emulation is
-not perfect, there is a separation (and the community
-failed at clarifying it).
-
-You can see when you were introduced as maintainer for the
-MIPS target (commit c92023bfd) you were also added as
-maintainer of the MIPSSIM and Fuloong 2E machines.
-
-In commit 485cd9820 you volunteered to maintain the Malta
-machine, so I believe you have a good understanding about
-the difference between target code and hardware code.
-
-> 
-> I personally think that creating a new subsection is just a code
-> churn, waste of everybody's time on unimportant things.
-
-Eh... I read that after spending 1h writing the previous
-paragraph. Yes, you are right.
-
-> 
-> Wouldn't it be simpler that you just changed statuses of all Aurelien
-> sh4 sections to "Orphaned", as he already said he approves, and leave
-> sh4 sections reorganization to a future maintainer?
-> 
-> If you really want to reorganize sh4 sections, these changes should be
-> in a separate patch. "Orphaning" patch should contain only changes of
-> statuses.
-
-Good idea! Maybe if you send a patch to show me how to do it, it
-will be easier to understand what you mean.
-
-Thanks for also caring about the SH4 hardware, the code was
-prone to bitrot and needed maintainer to look after it.
-
-Regards,
-
-Phil.
-
-> 
-> Regards,
-> Aleksandar
-> 
->>  MAINTAINERS | 10 ++++++++--
->>  1 file changed, 8 insertions(+), 2 deletions(-)
->>
->> diff --git a/MAINTAINERS b/MAINTAINERS
->> index 6e7890ce82..49d90c70de 100644
->> --- a/MAINTAINERS
->> +++ b/MAINTAINERS
->> @@ -299,9 +299,7 @@ SH4 TCG CPUs
->>  M: Aurelien Jarno <aurelien@aurel32.net>
->>  S: Odd Fixes
->>  F: target/sh4/
->> -F: hw/sh4/
->>  F: disas/sh4.c
->> -F: include/hw/sh4/
->>
->>  SPARC TCG CPUs
->>  M: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
->> @@ -1948,6 +1946,14 @@ F: hw/*/*xive*
->>  F: include/hw/*/*xive*
->>  F: docs/*/*xive*
->>
->> +SH4 Hardware
->> +S: Orphan
->> +F: hw/sh4/
->> +F: hw/char/sh_serial.c
->> +F: hw/intc/sh_intc.c
->> +F: hw/timer/sh_timer.c
->> +F: include/hw/sh4/
->> +
->>  Subsystems
->>  ----------
->>  Audio
->> --
->> 2.21.3
->>
->>
-> 
 
