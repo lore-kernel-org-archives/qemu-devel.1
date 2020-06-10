@@ -7,49 +7,48 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6CECC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 15:17:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EAE6DC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 15:17:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC60B206F4
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 15:17:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B8B76206F4
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 15:17:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="Gr5+q/YR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC60B206F4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="iqsFaXeI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8B76206F4
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32998 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33810 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jj2TT-0004MA-U5
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 11:17:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36142)
+	id 1jj2Tg-0004gH-QN
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 11:17:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36162)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1jj2Gv-0002gd-IN; Wed, 10 Jun 2020 11:04:09 -0400
-Received: from fanzine.igalia.com ([178.60.130.6]:58130)
+ id 1jj2Gy-0002mB-Rq; Wed, 10 Jun 2020 11:04:12 -0400
+Received: from fanzine.igalia.com ([178.60.130.6]:58253)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1jj2Gr-0006wD-FP; Wed, 10 Jun 2020 11:04:08 -0400
+ id 1jj2Gs-0006wf-OT; Wed, 10 Jun 2020 11:04:12 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
  s=20170329; 
  h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From;
- bh=wwP+F61UHuBD2MYWJK+ZYjI142FX+Mf725oBfkWGky0=; 
- b=Gr5+q/YR5Qtn1aQNXbzPMc0bF3iA+k7xsybnQlVTWyPRyKfl8SY1hPIq4kKiNGyDvSuS3ux429tlYtOKYjoQjQsCACdiyZ1dBr6PzSeRcRsQ/92Ng8BNvw65YJgK/xP8kP2BQJ69Yvuwsp5WyVmJXsqma4iopB82WBm95fS9xixvm6l2FvbvZ5dVDTyqN7Xh3OYZdrCiZNViWg2bfLIBndauZMi8chFCi7PUQC5RZju4FnYB1a+rv8ohOgLUVm0A72jiyJzP96/f9cqulzwy+LHedRcxgryNgeDJtA2POUQxurESpvUVtEHBgEllbkjl0Sq2iC9YdqN+/X2VuB/uug==;
+ bh=jiMv9S+Pgj4nbYi0/zDdysZBoTSQanZXM6tOp5flWJA=; 
+ b=iqsFaXeIV39lg3qH+p4JMDNKazZJh0LJwAfzFWaMYQclW13ccfMOFbT9bkI8yI98pSr/KbBvuNXOvOTSKWXNYVEdJmbo25pK8PiwwzHSINKWJSsjbKhe5gJ5OT0ZuUNd/6ORvbb+uzxewrhd6QmpwLmG2/LXBc0+M3Ydz1g9yWQj+RT3rhmnZ421UKZHVSvqwmHQALPjGj1Y8pmoop2b8x+GbTRHeWEgmwQ58IiwtXQei9Mct9DWg7HJ26U2on/YfvPv6Gp3160xXbl69fr6gudlRq6LWWPQSwx/fuZ5LSKAtG90c0Nwu9LTPfmxmxiS5u+AzRTLwc6QzPNKg2JEOQ==;
 Received: from [81.0.38.199] (helo=perseus.local)
  by fanzine.igalia.com with esmtpsa 
  (Cipher TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim)
- id 1jj2GR-0007h7-Jp; Wed, 10 Jun 2020 17:03:39 +0200
+ id 1jj2GR-0007hG-SJ; Wed, 10 Jun 2020 17:03:40 +0200
 Received: from berto by perseus.local with local (Exim 4.92)
  (envelope-from <berto@igalia.com>)
- id 1jj2GC-0007NT-BL; Wed, 10 Jun 2020 17:03:24 +0200
+ id 1jj2GC-0007Nl-HZ; Wed, 10 Jun 2020 17:03:24 +0200
 From: Alberto Garcia <berto@igalia.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v8 23/34] qcow2: Add subcluster support to
- discard_in_l2_slice()
-Date: Wed, 10 Jun 2020 17:03:01 +0200
-Message-Id: <402a16641f750c1069e0926c454f1da7b2eca10b.1591801197.git.berto@igalia.com>
+Subject: [PATCH v8 29/34] qcow2: Add subcluster support to qcow2_measure()
+Date: Wed, 10 Jun 2020 17:03:07 +0200
+Message-Id: <80fc75dd6dd7dba6d52ca7a0b57949ce5cabf943.1591801197.git.berto@igalia.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <cover.1591801197.git.berto@igalia.com>
 References: <cover.1591801197.git.berto@igalia.com>
@@ -85,109 +84,87 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Two things need to be taken into account here:
-
-1) With full_discard == true the L2 entry must be cleared completely.
-   This also includes the L2 bitmap if the image has extended L2
-   entries.
-
-2) With full_discard == false we have to make the discarded cluster
-   read back as zeroes. With normal L2 entries this is done with the
-   QCOW_OFLAG_ZERO bit, whereas with extended L2 entries this is done
-   with the individual 'all zeroes' bits for each subcluster.
-
-   Note however that QCOW_OFLAG_ZERO is not supported in v2 qcow2
-   images so, if there is a backing file, discard cannot guarantee
-   that the image will read back as zeroes. If this is important for
-   the caller it should forbid it as qcow2_co_pdiscard() does (see
-   80f5c01183 for more details).
+Extended L2 entries are bigger than normal L2 entries so this has an
+impact on the amount of metadata needed for a qcow2 file.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block/qcow2-cluster.c | 52 +++++++++++++++++++------------------------
- 1 file changed, 23 insertions(+), 29 deletions(-)
+ block/qcow2.c | 20 +++++++++++++-------
+ 1 file changed, 13 insertions(+), 7 deletions(-)
 
-diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index 4e59bbd545..edfc8ea91c 100644
---- a/block/qcow2-cluster.c
-+++ b/block/qcow2-cluster.c
-@@ -1847,11 +1847,17 @@ static int discard_in_l2_slice(BlockDriverState *bs, uint64_t offset,
-     assert(nb_clusters <= INT_MAX);
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 4edc3c72b9..72bd25e774 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -3233,28 +3233,31 @@ int64_t qcow2_refcount_metadata_size(int64_t clusters, size_t cluster_size,
+  * @total_size: virtual disk size in bytes
+  * @cluster_size: cluster size in bytes
+  * @refcount_order: refcount bits power-of-2 exponent
++ * @extended_l2: true if the image has extended L2 entries
+  *
+  * Returns: Total number of bytes required for the fully allocated image
+  * (including metadata).
+  */
+ static int64_t qcow2_calc_prealloc_size(int64_t total_size,
+                                         size_t cluster_size,
+-                                        int refcount_order)
++                                        int refcount_order,
++                                        bool extended_l2)
+ {
+     int64_t meta_size = 0;
+     uint64_t nl1e, nl2e;
+     int64_t aligned_total_size = ROUND_UP(total_size, cluster_size);
++    size_t l2e_size = extended_l2 ? L2E_SIZE_EXTENDED : L2E_SIZE_NORMAL;
  
-     for (i = 0; i < nb_clusters; i++) {
--        uint64_t old_l2_entry;
--
--        old_l2_entry = get_l2_entry(s, l2_slice, l2_index + i);
-+        uint64_t old_l2_entry = get_l2_entry(s, l2_slice, l2_index + i);
-+        uint64_t old_l2_bitmap = get_l2_bitmap(s, l2_slice, l2_index + i);
-+        uint64_t new_l2_entry = old_l2_entry;
-+        uint64_t new_l2_bitmap = old_l2_bitmap;
-+        QCow2ClusterType cluster_type =
-+            qcow2_get_cluster_type(bs, old_l2_entry);
+     /* header: 1 cluster */
+     meta_size += cluster_size;
  
-         /*
-+         * If full_discard is true, the cluster should not read back as zeroes,
-+         * but rather fall through to the backing file.
-+         *
-          * If full_discard is false, make sure that a discarded area reads back
-          * as zeroes for v3 images (we cannot do it for v2 without actually
-          * writing a zero-filled buffer). We can skip the operation if the
-@@ -1860,40 +1866,28 @@ static int discard_in_l2_slice(BlockDriverState *bs, uint64_t offset,
-          *
-          * TODO We might want to use bdrv_block_status(bs) here, but we're
-          * holding s->lock, so that doesn't work today.
--         *
--         * If full_discard is true, the sector should not read back as zeroes,
--         * but rather fall through to the backing file.
-          */
--        switch (qcow2_get_cluster_type(bs, old_l2_entry)) {
--        case QCOW2_CLUSTER_UNALLOCATED:
--            if (full_discard || !bs->backing) {
--                continue;
-+        if (full_discard) {
-+            new_l2_entry = new_l2_bitmap = 0;
-+        } else if (bs->backing || qcow2_cluster_is_allocated(cluster_type)) {
-+            if (has_subclusters(s)) {
-+                new_l2_entry = 0;
-+                new_l2_bitmap = QCOW_L2_BITMAP_ALL_ZEROES;
-+            } else {
-+                new_l2_entry = s->qcow_version >= 3 ? QCOW_OFLAG_ZERO : 0;
-             }
--            break;
-+        }
+     /* total size of L2 tables */
+     nl2e = aligned_total_size / cluster_size;
+-    nl2e = ROUND_UP(nl2e, cluster_size / sizeof(uint64_t));
+-    meta_size += nl2e * sizeof(uint64_t);
++    nl2e = ROUND_UP(nl2e, cluster_size / l2e_size);
++    meta_size += nl2e * l2e_size;
  
--        case QCOW2_CLUSTER_ZERO_PLAIN:
--            if (!full_discard) {
--                continue;
--            }
--            break;
--
--        case QCOW2_CLUSTER_ZERO_ALLOC:
--        case QCOW2_CLUSTER_NORMAL:
--        case QCOW2_CLUSTER_COMPRESSED:
--            break;
--
--        default:
--            abort();
-+        if (old_l2_entry == new_l2_entry && old_l2_bitmap == new_l2_bitmap) {
-+            continue;
-         }
+     /* total size of L1 tables */
+-    nl1e = nl2e * sizeof(uint64_t) / cluster_size;
++    nl1e = nl2e * l2e_size / cluster_size;
+     nl1e = ROUND_UP(nl1e, cluster_size / sizeof(uint64_t));
+     meta_size += nl1e * sizeof(uint64_t);
  
-         /* First remove L2 entries */
-         qcow2_cache_entry_mark_dirty(s->l2_table_cache, l2_slice);
--        if (!full_discard && s->qcow_version >= 3) {
--            set_l2_entry(s, l2_slice, l2_index + i, QCOW_OFLAG_ZERO);
--        } else {
--            set_l2_entry(s, l2_slice, l2_index + i, 0);
-+        set_l2_entry(s, l2_slice, l2_index + i, new_l2_entry);
-+        if (has_subclusters(s)) {
-+            set_l2_bitmap(s, l2_slice, l2_index + i, new_l2_bitmap);
-         }
--
-         /* Then decrease the refcount */
-         qcow2_free_any_clusters(bs, old_l2_entry, 1, type);
+@@ -4845,6 +4848,8 @@ static BlockMeasureInfo *qcow2_measure(QemuOpts *opts, BlockDriverState *in_bs,
+     PreallocMode prealloc;
+     bool has_backing_file;
+     bool has_luks;
++    bool extended_l2 = false; /* Set to false until the option is added */
++    size_t l2e_size;
+ 
+     /* Parse image creation options */
+     cluster_size = qcow2_opt_get_cluster_size_del(opts, &local_err);
+@@ -4910,8 +4915,9 @@ static BlockMeasureInfo *qcow2_measure(QemuOpts *opts, BlockDriverState *in_bs,
+     virtual_size = ROUND_UP(virtual_size, cluster_size);
+ 
+     /* Check that virtual disk size is valid */
++    l2e_size = extended_l2 ? L2E_SIZE_EXTENDED : L2E_SIZE_NORMAL;
+     l2_tables = DIV_ROUND_UP(virtual_size / cluster_size,
+-                             cluster_size / sizeof(uint64_t));
++                             cluster_size / l2e_size);
+     if (l2_tables * sizeof(uint64_t) > QCOW_MAX_L1_SIZE) {
+         error_setg(&local_err, "The image size is too large "
+                                "(try using a larger cluster size)");
+@@ -4974,9 +4980,9 @@ static BlockMeasureInfo *qcow2_measure(QemuOpts *opts, BlockDriverState *in_bs,
      }
+ 
+     info = g_new0(BlockMeasureInfo, 1);
+-    info->fully_allocated =
++    info->fully_allocated = luks_payload_size +
+         qcow2_calc_prealloc_size(virtual_size, cluster_size,
+-                                 ctz32(refcount_bits)) + luks_payload_size;
++                                 ctz32(refcount_bits), extended_l2);
+ 
+     /*
+      * Remove data clusters that are not required.  This overestimates the
 -- 
 2.20.1
 
