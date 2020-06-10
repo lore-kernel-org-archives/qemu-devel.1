@@ -7,49 +7,48 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E94BC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 15:23:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0B2AC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 15:23:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CE34020734
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 15:23:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AED4820812
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 15:23:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="eZV4qFck"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE34020734
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="Hk97vAeG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AED4820812
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51956 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52174 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jj2ZC-0004cy-1B
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 11:23:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36168)
+	id 1jj2ZF-0004k1-Tv
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 11:23:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36160)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1jj2H0-0002o6-TR; Wed, 10 Jun 2020 11:04:15 -0400
-Received: from fanzine.igalia.com ([178.60.130.6]:58283)
+ id 1jj2Gy-0002la-Dv; Wed, 10 Jun 2020 11:04:12 -0400
+Received: from fanzine.igalia.com ([178.60.130.6]:58248)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1jj2Gs-0006ws-OY; Wed, 10 Jun 2020 11:04:14 -0400
+ id 1jj2Gs-0006wX-O4; Wed, 10 Jun 2020 11:04:11 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
  s=20170329; 
  h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From;
- bh=jdA6WaY7hKoW016heKIZFDBwkSoL0B2SxxYO4r5/VA8=; 
- b=eZV4qFckifDjt4FTfYAVFCQDiJ8ALLbuca/d4A/JvZDfEFVb7A0slXps0tuoDWVey5MA5Qhr/nmeQi96pbLIYH+xSvs1eWcUuwIbxdq1TgTAZpq8mUGkCgNyN5XY4gAJAhXzjjjbBmpUR/5XFkNvFaj/BFLYXfqjpon/nPJVRGFqxB+7Ybma0KB3xJ7lxfmYWFhcbtGWP0CUx6Mc8vWQW71edYe9wgLVwSt9iiNsw9DVlktuf7833n84sAQwiHFeZYU38yiSgpulJxl+fL18Hd/cr+vioY31zO8rSCwGFI8yEXayvQ10qvRfXsCvUK+ZpAZtSTR6ZpPaFfB0Pml3dg==;
+ bh=JEa0mBV8UvnDyp5H8sfvCfcFuf5ZD0l+4WnlR2HdDiw=; 
+ b=Hk97vAeGneHEIfUo6TQa1lI6UJ7nJwyzpFLcA3BZWh1mzGFS36g3ARbEWBN48fi+FdbNgOPxPT382eFvnP/x6D9Q1pVwF8eodV/Z279j5itqhaHmjkOQ4wR/5/CFhsa4i8oDmw03i5vjhsUBVb6HcxXOLzDspDtMhmXnFWZY9T76ziaZpPnENjPYsk25gGTTOXJZutctfplzvDBXEv8QpFDoaJMQDzcL7uUmVY/JLoY1zlCLdEWpgI1jolAXPnKf2k4/h3k6YmK3Jo4WkFK9NtUe1lTPGXxNd14XVPeh+GAi0nms+273df/5RgOPc9cME4nk72IY0cFwtzT6frI5mA==;
 Received: from [81.0.38.199] (helo=perseus.local)
  by fanzine.igalia.com with esmtpsa 
  (Cipher TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim)
- id 1jj2GR-0007hC-OP; Wed, 10 Jun 2020 17:03:39 +0200
+ id 1jj2GR-0007gz-OV; Wed, 10 Jun 2020 17:03:39 +0200
 Received: from berto by perseus.local with local (Exim 4.92)
  (envelope-from <berto@igalia.com>)
- id 1jj2GC-0007Nc-Eb; Wed, 10 Jun 2020 17:03:24 +0200
+ id 1jj2GC-0007NH-7S; Wed, 10 Jun 2020 17:03:24 +0200
 From: Alberto Garcia <berto@igalia.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v8 26/34] qcow2: Clear the L2 bitmap when allocating a
- compressed cluster
-Date: Wed, 10 Jun 2020 17:03:04 +0200
-Message-Id: <616a16649a459538624d5197f988d90fc68d1281.1591801197.git.berto@igalia.com>
+Subject: [PATCH v8 19/34] qcow2: Handle QCOW2_SUBCLUSTER_UNALLOCATED_ALLOC
+Date: Wed, 10 Jun 2020 17:02:57 +0200
+Message-Id: <2ba36cf3cce78b6f5bd1e763be9cd18d8a08ef87.1591801197.git.berto@igalia.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <cover.1591801197.git.berto@igalia.com>
 References: <cover.1591801197.git.berto@igalia.com>
@@ -85,29 +84,78 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Compressed clusters always have the bitmap part of the extended L2
-entry set to 0.
+When dealing with subcluster types there is a new value called
+QCOW2_SUBCLUSTER_UNALLOCATED_ALLOC that has no equivalent in
+QCow2ClusterType.
+
+This patch handles that value in all places where subcluster types
+are processed.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- block/qcow2-cluster.c | 3 +++
- 1 file changed, 3 insertions(+)
+ block/qcow2.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
-diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index 2276cee6d6..deff838fe8 100644
---- a/block/qcow2-cluster.c
-+++ b/block/qcow2-cluster.c
-@@ -861,6 +861,9 @@ int qcow2_alloc_compressed_cluster_offset(BlockDriverState *bs,
-     BLKDBG_EVENT(bs->file, BLKDBG_L2_UPDATE_COMPRESSED);
-     qcow2_cache_entry_mark_dirty(s->l2_table_cache, l2_slice);
-     set_l2_entry(s, l2_slice, l2_index, cluster_offset);
-+    if (has_subclusters(s)) {
-+        set_l2_bitmap(s, l2_slice, l2_index, 0);
-+    }
-     qcow2_cache_put(s->l2_table_cache, (void **) &l2_slice);
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 2f7a2a7c7a..a3481cd85b 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -2054,7 +2054,8 @@ static int coroutine_fn qcow2_co_block_status(BlockDriverState *bs,
+     *pnum = bytes;
  
-     *host_offset = cluster_offset & s->cluster_offset_mask;
+     if ((type == QCOW2_SUBCLUSTER_NORMAL ||
+-         type == QCOW2_SUBCLUSTER_ZERO_ALLOC) && !s->crypto) {
++         type == QCOW2_SUBCLUSTER_ZERO_ALLOC ||
++         type == QCOW2_SUBCLUSTER_UNALLOCATED_ALLOC) && !s->crypto) {
+         *map = host_offset;
+         *file = s->data_file->bs;
+         status |= BDRV_BLOCK_OFFSET_VALID;
+@@ -2062,7 +2063,8 @@ static int coroutine_fn qcow2_co_block_status(BlockDriverState *bs,
+     if (type == QCOW2_SUBCLUSTER_ZERO_PLAIN ||
+         type == QCOW2_SUBCLUSTER_ZERO_ALLOC) {
+         status |= BDRV_BLOCK_ZERO;
+-    } else if (type != QCOW2_SUBCLUSTER_UNALLOCATED_PLAIN) {
++    } else if (type != QCOW2_SUBCLUSTER_UNALLOCATED_PLAIN &&
++               type != QCOW2_SUBCLUSTER_UNALLOCATED_ALLOC) {
+         status |= BDRV_BLOCK_DATA;
+     }
+     if (s->metadata_preallocation && (status & BDRV_BLOCK_DATA) &&
+@@ -2225,6 +2227,7 @@ static coroutine_fn int qcow2_co_preadv_task(BlockDriverState *bs,
+         g_assert_not_reached();
+ 
+     case QCOW2_SUBCLUSTER_UNALLOCATED_PLAIN:
++    case QCOW2_SUBCLUSTER_UNALLOCATED_ALLOC:
+         assert(bs->backing); /* otherwise handled in qcow2_co_preadv_part */
+ 
+         BLKDBG_EVENT(bs->file, BLKDBG_READ_BACKING_AIO);
+@@ -2293,7 +2296,8 @@ static coroutine_fn int qcow2_co_preadv_part(BlockDriverState *bs,
+ 
+         if (type == QCOW2_SUBCLUSTER_ZERO_PLAIN ||
+             type == QCOW2_SUBCLUSTER_ZERO_ALLOC ||
+-            (type == QCOW2_SUBCLUSTER_UNALLOCATED_PLAIN && !bs->backing))
++            (type == QCOW2_SUBCLUSTER_UNALLOCATED_PLAIN && !bs->backing) ||
++            (type == QCOW2_SUBCLUSTER_UNALLOCATED_ALLOC && !bs->backing))
+         {
+             qemu_iovec_memset(qiov, qiov_offset, 0, cur_bytes);
+         } else {
+@@ -3865,6 +3869,7 @@ static coroutine_fn int qcow2_co_pwrite_zeroes(BlockDriverState *bs,
+         ret = qcow2_get_host_offset(bs, offset, &nr, &off, &type);
+         if (ret < 0 ||
+             (type != QCOW2_SUBCLUSTER_UNALLOCATED_PLAIN &&
++             type != QCOW2_SUBCLUSTER_UNALLOCATED_ALLOC &&
+              type != QCOW2_SUBCLUSTER_ZERO_PLAIN &&
+              type != QCOW2_SUBCLUSTER_ZERO_ALLOC)) {
+             qemu_co_mutex_unlock(&s->lock);
+@@ -3943,6 +3948,7 @@ qcow2_co_copy_range_from(BlockDriverState *bs,
+ 
+         switch (type) {
+         case QCOW2_SUBCLUSTER_UNALLOCATED_PLAIN:
++        case QCOW2_SUBCLUSTER_UNALLOCATED_ALLOC:
+             if (bs->backing && bs->backing->bs) {
+                 int64_t backing_length = bdrv_getlength(bs->backing->bs);
+                 if (src_offset >= backing_length) {
 -- 
 2.20.1
 
