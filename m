@@ -6,75 +6,75 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07F94C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 12:08:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE828C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 12:09:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C591120734
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 12:08:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B80DE20734
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 12:09:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MUZ48gCl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C591120734
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QmPNMJ4V"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B80DE20734
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56640 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57030 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jizXN-0006vf-2P
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 08:08:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43526)
+	id 1jizXe-000756-Vc
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 08:09:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43576)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jizKi-0004AW-T0
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 07:55:52 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:44565
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jizKt-0004S0-Ut
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 07:56:04 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:58615
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jizKh-0002D1-7p
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 07:55:52 -0400
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jizKt-0002Eh-2a
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 07:56:03 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591790150;
+ s=mimecast20190719; t=1591790162;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=3peSn+MW315QQpa+fsZ3dboRuGSyq5a24dDEiIpLnsw=;
- b=MUZ48gClZqaq6T5H1Q4UxnSE0Hnvq7+VflmLOVCEAAcWysH0y7dI7KJalFaCkGLkDixepT
- O8tLvOR1BdMCEImfcbIB7GKzn30s1WIDwBgKkYfmLtQVaKOSW9uRItAFtg3J2ytbeo/qf7
- ImgAgb9wZmszVTYFYUXqnwobrMWxSHM=
+ bh=LNpYa81sj5PjQyv9U3qiC+uKU04GSUhnVRclqJQiLmE=;
+ b=QmPNMJ4VmwPgY370O6zCWVUNwseQgIBH8cTbcd2AJ8VH1g+IEwo3RXnM4UBJQhjzBdfpa0
+ w98WXcsZu6kCBUYuO+ue91o8+/dzcxcqNR0wjuDeihOZWRJkNuOS+KmpdDzNKTeTiZcUgE
+ k8fLV4LGE2xVF+U87iwMvpsfNVfZ5fc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-233-jC5yrNrNMdC27-0yN9xWlQ-1; Wed, 10 Jun 2020 07:55:48 -0400
-X-MC-Unique: jC5yrNrNMdC27-0yN9xWlQ-1
+ us-mta-257-WwlQQFjoPvGbDLkts7bPog-1; Wed, 10 Jun 2020 07:55:58 -0400
+X-MC-Unique: WwlQQFjoPvGbDLkts7bPog-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CC3616A2BF;
- Wed, 10 Jun 2020 11:55:47 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 899CC461;
+ Wed, 10 Jun 2020 11:55:57 +0000 (UTC)
 Received: from t480s.redhat.com (ovpn-114-42.ams2.redhat.com [10.36.114.42])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C34005D9D3;
- Wed, 10 Jun 2020 11:55:45 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 075FA5D9D3;
+ Wed, 10 Jun 2020 11:55:52 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 16/21] virtio-mem: Allow notifiers for size changes
-Date: Wed, 10 Jun 2020 13:54:14 +0200
-Message-Id: <20200610115419.51688-17-david@redhat.com>
+Subject: [PATCH v4 19/21] virtio-mem: Add trace events
+Date: Wed, 10 Jun 2020 13:54:17 +0200
+Message-Id: <20200610115419.51688-20-david@redhat.com>
 In-Reply-To: <20200610115419.51688-1-david@redhat.com>
 References: <20200610115419.51688-1-david@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=david@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 23:22:15
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=david@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 21:17:20
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -91,114 +91,116 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Cc: Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
  "Michael S . Tsirkin" <mst@redhat.com>, David Hildenbrand <david@redhat.com>,
  "Dr . David Alan Gilbert" <dgilbert@redhat.com>, qemu-s390x@nongnu.org,
- Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We want to send qapi events in case the size of a virtio-mem device
-changes. This allows upper layers to always know how much memory is
-actually currently consumed via a virtio-mem device.
+Let's add some trace events that might come in handy later.
 
-Unfortuantely, we have to report the id of our proxy device. Let's provide
-an easy way for our proxy device to register, so it can send the qapi
-events. Piggy-backing on the notifier infrastructure (although we'll
-only ever have one notifier registered) seems to be an easy way.
-
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Cc: "Michael S. Tsirkin" <mst@redhat.com>
 Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- hw/virtio/virtio-mem.c         | 21 ++++++++++++++++++++-
- include/hw/virtio/virtio-mem.h |  5 +++++
- 2 files changed, 25 insertions(+), 1 deletion(-)
+ hw/virtio/trace-events | 10 ++++++++++
+ hw/virtio/virtio-mem.c | 10 +++++++++-
+ 2 files changed, 19 insertions(+), 1 deletion(-)
 
+diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
+index e83500bee9..c40ad5ea27 100644
+--- a/hw/virtio/trace-events
++++ b/hw/virtio/trace-events
+@@ -73,3 +73,13 @@ virtio_iommu_get_domain(uint32_t domain_id) "Alloc domain=%d"
+ virtio_iommu_put_domain(uint32_t domain_id) "Free domain=%d"
+ virtio_iommu_translate_out(uint64_t virt_addr, uint64_t phys_addr, uint32_t sid) "0x%"PRIx64" -> 0x%"PRIx64 " for sid=%d"
+ virtio_iommu_report_fault(uint8_t reason, uint32_t flags, uint32_t endpoint, uint64_t addr) "FAULT reason=%d flags=%d endpoint=%d address =0x%"PRIx64
++
++# virtio-mem.c
++virtio_mem_send_response(uint16_t type) "type=%" PRIu16
++virtio_mem_plug_request(uint64_t addr, uint16_t nb_blocks) "addr=0x%" PRIx64 " nb_blocks=%" PRIu16
++virtio_mem_unplug_request(uint64_t addr, uint16_t nb_blocks) "addr=0x%" PRIx64 " nb_blocks=%" PRIu16
++virtio_mem_unplugged_all(void) ""
++virtio_mem_unplug_all_request(void) ""
++virtio_mem_resized_usable_region(uint64_t old_size, uint64_t new_size) "old_size=0x%" PRIx64 "new_size=0x%" PRIx64
++virtio_mem_state_request(uint64_t addr, uint16_t nb_blocks) "addr=0x%" PRIx64 " nb_blocks=%" PRIu16
++virtio_mem_state_response(uint16_t state) "state=%" PRIu16
 diff --git a/hw/virtio/virtio-mem.c b/hw/virtio/virtio-mem.c
-index d8a0c974d3..2df33f9125 100644
+index 450b8dc49d..468fb4170f 100644
 --- a/hw/virtio/virtio-mem.c
 +++ b/hw/virtio/virtio-mem.c
-@@ -184,6 +184,7 @@ static int virtio_mem_state_change_request(VirtIOMEM *vmem, uint64_t gpa,
-     } else {
-         vmem->size -= size;
+@@ -30,6 +30,7 @@
+ #include "hw/boards.h"
+ #include "hw/qdev-properties.h"
+ #include "config-devices.h"
++#include "trace.h"
+ 
+ /*
+  * Use QEMU_VMALLOC_ALIGN, so no THP will have to be split when unplugging
+@@ -100,6 +101,7 @@ static void virtio_mem_send_response(VirtIOMEM *vmem, VirtQueueElement *elem,
+     VirtIODevice *vdev = VIRTIO_DEVICE(vmem);
+     VirtQueue *vq = vmem->vq;
+ 
++    trace_virtio_mem_send_response(le16_to_cpu(resp->type));
+     iov_from_buf(elem->in_sg, elem->in_num, 0, resp, sizeof(*resp));
+ 
+     virtqueue_push(vq, elem, sizeof(*resp));
+@@ -195,6 +197,7 @@ static void virtio_mem_plug_request(VirtIOMEM *vmem, VirtQueueElement *elem,
+     const uint16_t nb_blocks = le16_to_cpu(req->u.plug.nb_blocks);
+     uint16_t type;
+ 
++    trace_virtio_mem_plug_request(gpa, nb_blocks);
+     type = virtio_mem_state_change_request(vmem, gpa, nb_blocks, true);
+     virtio_mem_send_response_simple(vmem, elem, type);
+ }
+@@ -206,6 +209,7 @@ static void virtio_mem_unplug_request(VirtIOMEM *vmem, VirtQueueElement *elem,
+     const uint16_t nb_blocks = le16_to_cpu(req->u.unplug.nb_blocks);
+     uint16_t type;
+ 
++    trace_virtio_mem_unplug_request(gpa, nb_blocks);
+     type = virtio_mem_state_change_request(vmem, gpa, nb_blocks, false);
+     virtio_mem_send_response_simple(vmem, elem, type);
+ }
+@@ -225,6 +229,7 @@ static void virtio_mem_resize_usable_region(VirtIOMEM *vmem,
+         return;
      }
-+    notifier_list_notify(&vmem->size_change_notifiers, &vmem->size);
-     return VIRTIO_MEM_RESP_ACK;
+ 
++    trace_virtio_mem_resized_usable_region(vmem->usable_region_size, newsize);
+     vmem->usable_region_size = newsize;
  }
  
-@@ -242,7 +243,10 @@ static int virtio_mem_unplug_all(VirtIOMEM *vmem)
-         return -EBUSY;
+@@ -247,7 +252,7 @@ static int virtio_mem_unplug_all(VirtIOMEM *vmem)
+         vmem->size = 0;
+         notifier_list_notify(&vmem->size_change_notifiers, &vmem->size);
      }
-     bitmap_clear(vmem->bitmap, 0, vmem->bitmap_size);
--    vmem->size = 0;
-+    if (vmem->size) {
-+        vmem->size = 0;
-+        notifier_list_notify(&vmem->size_change_notifiers, &vmem->size);
-+    }
- 
+-
++    trace_virtio_mem_unplugged_all();
      virtio_mem_resize_usable_region(vmem, vmem->requested_size, true);
      return 0;
-@@ -561,6 +565,18 @@ static MemoryRegion *virtio_mem_get_memory_region(VirtIOMEM *vmem, Error **errp)
-     return &vmem->memdev->mr;
  }
- 
-+static void virtio_mem_add_size_change_notifier(VirtIOMEM *vmem,
-+                                                Notifier *notifier)
-+{
-+    notifier_list_add(&vmem->size_change_notifiers, notifier);
-+}
-+
-+static void virtio_mem_remove_size_change_notifier(VirtIOMEM *vmem,
-+                                                   Notifier *notifier)
-+{
-+    notifier_remove(notifier);
-+}
-+
- static void virtio_mem_get_size(Object *obj, Visitor *v, const char *name,
-                                 void *opaque, Error **errp)
+@@ -255,6 +260,7 @@ static int virtio_mem_unplug_all(VirtIOMEM *vmem)
+ static void virtio_mem_unplug_all_request(VirtIOMEM *vmem,
+                                           VirtQueueElement *elem)
  {
-@@ -668,6 +684,7 @@ static void virtio_mem_instance_init(Object *obj)
-     VirtIOMEM *vmem = VIRTIO_MEM(obj);
++    trace_virtio_mem_unplug_all_request();
+     if (virtio_mem_unplug_all(vmem)) {
+         virtio_mem_send_response_simple(vmem, elem, VIRTIO_MEM_RESP_BUSY);
+     } else {
+@@ -272,6 +278,7 @@ static void virtio_mem_state_request(VirtIOMEM *vmem, VirtQueueElement *elem,
+         .type = cpu_to_le16(VIRTIO_MEM_RESP_ACK),
+     };
  
-     vmem->block_size = VIRTIO_MEM_MIN_BLOCK_SIZE;
-+    notifier_list_init(&vmem->size_change_notifiers);
- 
-     object_property_add(obj, VIRTIO_MEM_SIZE_PROP, "size", virtio_mem_get_size,
-                         NULL, NULL, NULL);
-@@ -705,6 +722,8 @@ static void virtio_mem_class_init(ObjectClass *klass, void *data)
- 
-     vmc->fill_device_info = virtio_mem_fill_device_info;
-     vmc->get_memory_region = virtio_mem_get_memory_region;
-+    vmc->add_size_change_notifier = virtio_mem_add_size_change_notifier;
-+    vmc->remove_size_change_notifier = virtio_mem_remove_size_change_notifier;
++    trace_virtio_mem_state_request(gpa, nb_blocks);
+     if (!virtio_mem_valid_range(vmem, gpa, size)) {
+         virtio_mem_send_response_simple(vmem, elem, VIRTIO_MEM_RESP_ERROR);
+         return;
+@@ -284,6 +291,7 @@ static void virtio_mem_state_request(VirtIOMEM *vmem, VirtQueueElement *elem,
+     } else {
+         resp.u.state.state = cpu_to_le16(VIRTIO_MEM_STATE_MIXED);
+     }
++    trace_virtio_mem_state_response(le16_to_cpu(resp.u.state.state));
+     virtio_mem_send_response(vmem, elem, &resp);
  }
  
- static const TypeInfo virtio_mem_info = {
-diff --git a/include/hw/virtio/virtio-mem.h b/include/hw/virtio/virtio-mem.h
-index 6981096f7c..b74c77cd42 100644
---- a/include/hw/virtio/virtio-mem.h
-+++ b/include/hw/virtio/virtio-mem.h
-@@ -64,6 +64,9 @@ typedef struct VirtIOMEM {
- 
-     /* block size and alignment */
-     uint64_t block_size;
-+
-+    /* notifiers to notify when "size" changes */
-+    NotifierList size_change_notifiers;
- } VirtIOMEM;
- 
- typedef struct VirtIOMEMClass {
-@@ -73,6 +76,8 @@ typedef struct VirtIOMEMClass {
-     /* public */
-     void (*fill_device_info)(const VirtIOMEM *vmen, VirtioMEMDeviceInfo *vi);
-     MemoryRegion *(*get_memory_region)(VirtIOMEM *vmem, Error **errp);
-+    void (*add_size_change_notifier)(VirtIOMEM *vmem, Notifier *notifier);
-+    void (*remove_size_change_notifier)(VirtIOMEM *vmem, Notifier *notifier);
- } VirtIOMEMClass;
- 
- #endif
 -- 
 2.26.2
 
