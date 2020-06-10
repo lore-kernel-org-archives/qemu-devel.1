@@ -2,81 +2,80 @@ Return-Path: <SRS0=wemX=7X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A0F7C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 04:34:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D79FAC433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 04:34:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 295792074B
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 04:34:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A36862074B
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 04:34:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RUYeVhsR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 295792074B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hGNEygwB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A36862074B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56864 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56948 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jisRR-0008NN-Cy
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 00:34:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34106)
+	id 1jisRS-0008PI-T8
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 00:34:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34030)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jisL0-00007s-8I
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 00:27:42 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:25668
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jisKZ-0007Ye-P7
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 00:27:15 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:26994
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jisKz-0008Ij-8v
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 00:27:41 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jisKY-0008FH-UP
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 00:27:15 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591763260;
+ s=mimecast20190719; t=1591763234;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=aqpkevWS1bn14Aqbrax5GGDgUtTsP9lYBB9gZceP86Y=;
- b=RUYeVhsRbj6VLh+oCu/kGw5PyebDpwvmbOggo0LB1/MU7HK1RF9SL0hQ4AkYoAG43E7PuD
- yvRlKplKI4om9dszKnmxmdaukJkvdzTcxZXdV2QKJQzKIGa+5JuRXu5NSrFnExj96gWB46
- rA+maP22ddYySqc+ObKw6qBcTn01H2k=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-88-5mkY8ig_MqOfSWyM0ln2og-1; Wed, 10 Jun 2020 00:27:38 -0400
-X-MC-Unique: 5mkY8ig_MqOfSWyM0ln2og-1
-Received: by mail-wr1-f71.google.com with SMTP id e7so505452wrp.14
- for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 21:27:38 -0700 (PDT)
+ bh=zGOoHYc7BnEUE5/Tw0vbz2Gw05a97G6XRUJWvEWyGjA=;
+ b=hGNEygwBh9TGqXjaCTERgxIjxmuE+4IdQ/KUIu8aE6OPwI8B9sO5Wn/JDMLXlJHVx85mwx
+ QR4jtojJla3aG1Vixl1ZHW7+urtbcwjdf6ThL8NrVlKX7okgyryxcsB54Zlh1WorEQVls5
+ h3m500jBDZnZbHZxnkkZG9aI/TN2DlY=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-80-r11W93iOPeG9g4HOQZNZFw-1; Wed, 10 Jun 2020 00:27:12 -0400
+X-MC-Unique: r11W93iOPeG9g4HOQZNZFw-1
+Received: by mail-wm1-f70.google.com with SMTP id p24so89198wmc.1
+ for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 21:27:12 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=aqpkevWS1bn14Aqbrax5GGDgUtTsP9lYBB9gZceP86Y=;
- b=EmPkAUQPbjmfjOxh6ZaD0Cc+CYELHIyIPfYeVJdYGZrgFeujvf8ohTtVVeQY3bOELl
- NxbsMZIgAL+FyCebTvIv97v78W2NXTAL8Z//rgV2ToeG4PCAnZdsl0tTl5itI+y/tHxP
- 9iXCDC4UQN6QZ+Vs+5ufN4fz3Q6+rwxztRl+1BsVHrOpUt6jxnNMKJIAnM8XW39hX0cY
- 4R29Xp0RdUN0ZeJ6GfWFEYAOmk3JDD9il6EqL4E86tlFtIkxkMh6W1m/e1iIcw8Peftq
- VFZzOCkzEkqqlmxR3FN+yFSlqrzzT+qil3IxgpO2UylT7a044MFjg0iYc48H/4bubNw2
- 0mGg==
-X-Gm-Message-State: AOAM530k43y3in2O1WWNM135hQxpQy0h3JNw+Sm6Zdo5Og8ZDcWv6Jow
- YtY2kfhulc/8U0swVGlDyJx69HzjG6KoWNhVz7+p/CB7MuwO2X2ShdfKTDmZvYr8uQB7oj7UTtw
- 9j2n5e2XDYlZ3Ac0=
-X-Received: by 2002:adf:ea11:: with SMTP id q17mr1278762wrm.75.1591763257253; 
- Tue, 09 Jun 2020 21:27:37 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxpPz0tfMBLH6Fu7SNnZXe6mCWlqP1HqueSMZMAnx8WcgFh1+rDA0oGXSmd6Uu3PCsPpkHibA==
-X-Received: by 2002:adf:ea11:: with SMTP id q17mr1278747wrm.75.1591763257026; 
- Tue, 09 Jun 2020 21:27:37 -0700 (PDT)
+ bh=zGOoHYc7BnEUE5/Tw0vbz2Gw05a97G6XRUJWvEWyGjA=;
+ b=aeZ5n9BuevV8Jze2dNIY54UrMEWkgE5Ji+FU2CvLgFpMry+hUBlQggRRUr9vy/Q4AB
+ vQI1lgpGHM2Hs3wUPUpqPi9xvtUu5WLNtYvOjWVMcyiNvX9YSeXGqchUg2fnb2ta1LOL
+ Ut66/4hCHNWfwCz9A4cVlson6uWhy5Dr/F/Ju6XBwyP73ub/uLLtwKriIX7y+GRPh6OL
+ fcBifkPwUrfyctlpIP0dknuGQIMHP3eoZNHt2pj8t73S+zNRd5ykPRfgDzTdCBxSb27l
+ jy0Rv1BPEzlVilQ3nYZqMcZjnbtyuRd1QWmHcsfy0rwCaBSylS5xOdM+u3XW+LR9TLfo
+ uDFw==
+X-Gm-Message-State: AOAM531d4rl9rF8dv6oy5zfw7lvFOeYh6dOyHCfn87HDnE9UYj9HNHbR
+ IX5mdOPQ2DrDEoA9Xm1ripBmjIVt7pfi3/9yw45cG0az1pzzo4j+sIuMNUPlFjvzdmTpzYAXJrS
+ 1QVoFVTQSYAICrP0=
+X-Received: by 2002:adf:ef47:: with SMTP id c7mr1398086wrp.57.1591763230823;
+ Tue, 09 Jun 2020 21:27:10 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzVcmgE6i6AquOT3NxJtCTdg/c4EoSz8wGkQ8hjX+2Za5mUcYjGIrnLLa8J5e6IcJZitCt6Lw==
+X-Received: by 2002:adf:ef47:: with SMTP id c7mr1398072wrp.57.1591763230611;
+ Tue, 09 Jun 2020 21:27:10 -0700 (PDT)
 Received: from redhat.com (bzq-79-181-55-232.red.bezeqint.net. [79.181.55.232])
- by smtp.gmail.com with ESMTPSA id a3sm5964129wrp.91.2020.06.09.21.27.36
+ by smtp.gmail.com with ESMTPSA id 50sm6432827wra.1.2020.06.09.21.27.09
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 09 Jun 2020 21:27:36 -0700 (PDT)
-Date: Wed, 10 Jun 2020 00:27:35 -0400
+ Tue, 09 Jun 2020 21:27:10 -0700 (PDT)
+Date: Wed, 10 Jun 2020 00:27:08 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 28/56] hw/pci/pcie: Move hot plug capability check to pre_plug
- callback
-Message-ID: <20200610042613.1459309-29-mst@redhat.com>
+Subject: [PULL 16/56] arm/acpi: TPM2 ACPI table support
+Message-ID: <20200610042613.1459309-17-mst@redhat.com>
 References: <20200610042613.1459309-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20200610042613.1459309-1-mst@redhat.com>
@@ -110,78 +109,98 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
- Julia Suvorova <jusual@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+ Eric Auger <eric.auger@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>,
+ qemu-arm@nongnu.org, Igor Mammedov <imammedo@redhat.com>,
+ Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Julia Suvorova <jusual@redhat.com>
+From: Eric Auger <eric.auger@redhat.com>
 
-Check for hot plug capability earlier to avoid removing devices attached
-during the initialization process.
+Add a TPM2 ACPI table if a TPM2.0 sysbus device has been
+dynamically instantiated.
 
-Run qemu with an unattached drive:
-  -drive file=$FILE,if=none,id=drive0 \
-  -device pcie-root-port,id=rp0,slot=3,bus=pcie.0,hotplug=off
-Hotplug a block device:
-  device_add virtio-blk-pci,id=blk0,drive=drive0,bus=rp0
-If hotplug fails on plug_cb, drive0 will be deleted.
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
-Fixes: 0501e1aa1d32a6 ("hw/pci/pcie: Forbid hot-plug if it's disabled on the slot")
-
-Acked-by: Igor Mammedov <imammedo@redhat.com>
-Signed-off-by: Julia Suvorova <jusual@redhat.com>
-Message-Id: <20200604125947.881210-1-jusual@redhat.com>
+Message-Id: <20200601095737.32671-4-eric.auger@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/pci/pcie.c | 19 +++++++++++--------
- 1 file changed, 11 insertions(+), 8 deletions(-)
+ include/sysemu/tpm.h     | 2 ++
+ hw/acpi/aml-build.c      | 5 +++--
+ hw/arm/virt-acpi-build.c | 7 +++++++
+ 3 files changed, 12 insertions(+), 2 deletions(-)
 
-diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
-index f50e10b8fb..5b9c022d91 100644
---- a/hw/pci/pcie.c
-+++ b/hw/pci/pcie.c
-@@ -407,6 +407,17 @@ static void pcie_cap_slot_plug_common(PCIDevice *hotplug_dev, DeviceState *dev,
- void pcie_cap_slot_pre_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
-                                Error **errp)
- {
-+    PCIDevice *hotplug_pdev = PCI_DEVICE(hotplug_dev);
-+    uint8_t *exp_cap = hotplug_pdev->config + hotplug_pdev->exp.exp_cap;
-+    uint32_t sltcap = pci_get_word(exp_cap + PCI_EXP_SLTCAP);
-+
-+    /* Check if hot-plug is disabled on the slot */
-+    if (dev->hotplugged && (sltcap & PCI_EXP_SLTCAP_HPC) == 0) {
-+        error_setg(errp, "Hot-plug failed: unsupported by the port device '%s'",
-+                         DEVICE(hotplug_pdev)->id);
-+        return;
-+    }
-+
-     pcie_cap_slot_plug_common(PCI_DEVICE(hotplug_dev), dev, errp);
- }
+diff --git a/include/sysemu/tpm.h b/include/sysemu/tpm.h
+index f37851b1aa..03fb25941c 100644
+--- a/include/sysemu/tpm.h
++++ b/include/sysemu/tpm.h
+@@ -50,6 +50,8 @@ typedef struct TPMIfClass {
  
-@@ -415,7 +426,6 @@ void pcie_cap_slot_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
- {
-     PCIDevice *hotplug_pdev = PCI_DEVICE(hotplug_dev);
-     uint8_t *exp_cap = hotplug_pdev->config + hotplug_pdev->exp.exp_cap;
--    uint32_t sltcap = pci_get_word(exp_cap + PCI_EXP_SLTCAP);
-     PCIDevice *pci_dev = PCI_DEVICE(dev);
+ #define TPM_IS_TIS_ISA(chr)                         \
+     object_dynamic_cast(OBJECT(chr), TYPE_TPM_TIS_ISA)
++#define TPM_IS_TIS_SYSBUS(chr)                      \
++    object_dynamic_cast(OBJECT(chr), TYPE_TPM_TIS_SYSBUS)
+ #define TPM_IS_CRB(chr)                             \
+     object_dynamic_cast(OBJECT(chr), TYPE_TPM_CRB)
+ #define TPM_IS_SPAPR(chr)                           \
+diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
+index b37052c1b4..d24e9e6c3a 100644
+--- a/hw/acpi/aml-build.c
++++ b/hw/acpi/aml-build.c
+@@ -1885,17 +1885,18 @@ void build_tpm2(GArray *table_data, BIOSLinker *linker, GArray *tcpalog)
+     unsigned log_addr_offset =
+         (char *)&tpm2_ptr->log_area_start_address - table_data->data;
+     uint8_t start_method_params[12] = {};
++    TPMIf *tpmif = tpm_find();
  
-     /* Don't send event when device is enabled during qemu machine creation:
-@@ -431,13 +441,6 @@ void pcie_cap_slot_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
-         return;
+     /* platform class */
+     build_append_int_noprefix(table_data, TPM2_ACPI_CLASS_CLIENT, 2);
+     /* reserved */
+     build_append_int_noprefix(table_data, 0, 2);
+-    if (TPM_IS_TIS_ISA(tpm_find())) {
++    if (TPM_IS_TIS_ISA(tpmif) || TPM_IS_TIS_SYSBUS(tpmif)) {
+         /* address of control area */
+         build_append_int_noprefix(table_data, 0, 8);
+         /* start method */
+         build_append_int_noprefix(table_data, TPM2_START_METHOD_MMIO, 4);
+-    } else if (TPM_IS_CRB(tpm_find())) {
++    } else if (TPM_IS_CRB(tpmif)) {
+         build_append_int_noprefix(table_data, TPM_CRB_ADDR_CTRL, 8);
+         build_append_int_noprefix(table_data, TPM2_START_METHOD_CRB, 4);
+     } else {
+diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+index 2cbccd5fe2..ca31f70f7f 100644
+--- a/hw/arm/virt-acpi-build.c
++++ b/hw/arm/virt-acpi-build.c
+@@ -41,12 +41,14 @@
+ #include "hw/acpi/pci.h"
+ #include "hw/acpi/memory_hotplug.h"
+ #include "hw/acpi/generic_event_device.h"
++#include "hw/acpi/tpm.h"
+ #include "hw/pci/pcie_host.h"
+ #include "hw/pci/pci.h"
+ #include "hw/arm/virt.h"
+ #include "hw/mem/nvdimm.h"
+ #include "sysemu/numa.h"
+ #include "sysemu/reset.h"
++#include "sysemu/tpm.h"
+ #include "kvm_arm.h"
+ #include "migration/vmstate.h"
+ #include "hw/acpi/ghes.h"
+@@ -848,6 +850,11 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
+         build_iort(tables_blob, tables->linker, vms);
      }
  
--    /* Check if hot-plug is disabled on the slot */
--    if ((sltcap & PCI_EXP_SLTCAP_HPC) == 0) {
--        error_setg(errp, "Hot-plug failed: unsupported by the port device '%s'",
--                         DEVICE(hotplug_pdev)->id);
--        return;
--    }
--
-     /* To enable multifunction hot-plug, we just ensure the function
-      * 0 added last. When function 0 is added, we set the sltsta and
-      * inform OS via event notification.
++    if (tpm_get_version(tpm_find()) == TPM_VERSION_2_0) {
++        acpi_add_table(table_offsets, tables_blob);
++        build_tpm2(tables_blob, tables->linker, tables->tcpalog);
++    }
++
+     /* XSDT is pointed to by RSDP */
+     xsdt = tables_blob->len;
+     build_xsdt(tables_blob, tables->linker, table_offsets, NULL, NULL);
 -- 
 MST
 
