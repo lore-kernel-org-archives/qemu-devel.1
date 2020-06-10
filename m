@@ -2,80 +2,80 @@ Return-Path: <SRS0=wemX=7X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE7ACC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 04:28:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF72DC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 04:29:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A49042074B
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 04:28:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 964FA2074B
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 04:29:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FTKqsfe2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A49042074B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a1RI7aB/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 964FA2074B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39656 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44924 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jisLX-0000pO-SC
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 00:28:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34014)
+	id 1jisMl-00030G-Np
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 00:29:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33906)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jisKW-0007Qy-3N
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 00:27:12 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:33006
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jisK3-0006h2-7s
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 00:26:43 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:38788
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jisKV-0008Ex-4T
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 00:27:11 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jisK2-000861-H3
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 00:26:42 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591763230;
+ s=mimecast20190719; t=1591763201;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=wz4LYmJYkwD0FRusftg9gxDl1X3bD+K8dONSs5X0hnA=;
- b=FTKqsfe2bTn3sjyIzxMW5lr3ztpjDER2Wae/ri3XD9s7FNRFgQOznuGzQUdEqFHuVPB2vt
- bxtgBQirr5Yak/IOnEbvBOdK5TX8w5zOE6+3nXOP4WHVObVzpxpMuAiTLJbhS5sJVS8IJl
- 80Xd/Qa8DApz1zBXVS2bixMEEp9G9Uk=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-32-FotIdlCnNwSthXi48vt_Ig-1; Wed, 10 Jun 2020 00:27:07 -0400
-X-MC-Unique: FotIdlCnNwSthXi48vt_Ig-1
-Received: by mail-wr1-f69.google.com with SMTP id s17so509214wrt.7
- for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 21:27:07 -0700 (PDT)
+ bh=kAMCwY6Ii66tK0+En6xfr/Bb9/oeXHnOnpsD9bdoRBE=;
+ b=a1RI7aB/tJOlfQnnBXHEduIcK9qiTjWgAn7y2hZegsoy7nXywdVwCUli1soSaaHt2RWfnA
+ u18U7XInxHcF6IeX5wo2klC1UxMMpdO8oSKyKQflvukiXtXnCFHtEmmLU1MnDGgf0pQKp/
+ /7xCUPzMhBXHnhCKEkZ1C7EljuFy+Gw=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-468-BjeTEsDRP46juaoPMxZRNg-1; Wed, 10 Jun 2020 00:26:39 -0400
+X-MC-Unique: BjeTEsDRP46juaoPMxZRNg-1
+Received: by mail-wr1-f70.google.com with SMTP id a4so511375wrp.5
+ for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 21:26:39 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=wz4LYmJYkwD0FRusftg9gxDl1X3bD+K8dONSs5X0hnA=;
- b=Yr6LBU4u/8aMVgEmLsleroTjX6wN7TjGEGYycXifWXa6IH8+zB8/6OFLz0VzLYQRY0
- 7LWyghFTVZYEFgLuRI3w7z5WrnAw4+Y7xXLC9eQPjKJ9aZ+mrcS8eUe5etc2RRt/mdme
- ohsYkvTsyIrz2Or8qlV5fmULHeiUbY+JQEcpTQcPwAcD/hJu4uTbcXLWn3pBfTO/kLrF
- 7dTFoKxiu0KSP7jqsrFXAnFbJylT9J80csWppAvVeNTsM/rmAhDMC2JmLqN3/TOpcJIN
- PP9AisoFkioM91tFw6XI+OSwnP672aYcG4hsKKfcXV4k0iqUWM7PkqNT3WTm8hT6KtUX
- rOXw==
-X-Gm-Message-State: AOAM533OsXoIO02lO6Zgq1PXf3ykLf65Prg+TI2O4wmsS16iHCnxNzs9
- BXjVuBPKpdl7E3smsxZMOpCSeI/6bADy/5f9lTCYUikxI8YAg3aC8xoG8/HHQ4tcQGh8bXtcA4n
- Ez9quClonY51QtV8=
-X-Received: by 2002:a7b:c145:: with SMTP id z5mr1223685wmi.6.1591763226321;
- Tue, 09 Jun 2020 21:27:06 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy3xnirnlqeMs0iB75rAPaM7hktq59XDZB9sVvXkJ1k8wS/zJqr3lAV9rREcI8rL62RffkSZw==
-X-Received: by 2002:a7b:c145:: with SMTP id z5mr1223673wmi.6.1591763226076;
- Tue, 09 Jun 2020 21:27:06 -0700 (PDT)
+ bh=kAMCwY6Ii66tK0+En6xfr/Bb9/oeXHnOnpsD9bdoRBE=;
+ b=QDi0XnVrYiGi+V9r7A8bcWdTK+LQR9xT4M8jC8tuqtfwkNMwA0QXVvyidrk49rN9Nk
+ yqfnjSXxrS34h+zM7FoFbWhz2SCORwkw7skva3IqOBNlDJ0F2b5aPxjBabooPwdUGZmZ
+ +ipsVGlcgdO0A3Y6r9Jaab5Bq7opbUz8TN9LcdY08YCY5fnzXH3KLtYghiXDxZcJGCat
+ hOJdV0gUOG4oK3mUn0expEx5DmnGbIlYBVz4tYHoJJsKENOJtXVHPvGLq5E+rnE1gEHX
+ nS7ZBOlLr0HMGNC3tWgUaLRgf8G2GJxWIE77jEspN9UIpCtUQHkK3nQF76kCyi89OioG
+ 6UYg==
+X-Gm-Message-State: AOAM5303H4r5jbusPE8elJtjtwxi3Fwv2xOCUQhnRYWO8w2CCP3YYu0S
+ TQsxsAzrXQylOsUwKvZfo9B84PG86k7qotDkk2+W9ZAwUNLp3JV2EaBi8ikE1s72eIDs5RPt3yI
+ 5+wel/7V1BUCo6VE=
+X-Received: by 2002:a1c:80d4:: with SMTP id b203mr1178105wmd.138.1591763198270; 
+ Tue, 09 Jun 2020 21:26:38 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwxE+k/V767keuhJMpVDjKtFN8IN6kE2WOu7A38f/lGYQ+LmMaxK6YmOew4MpyLDj5EUCUNGg==
+X-Received: by 2002:a1c:80d4:: with SMTP id b203mr1178096wmd.138.1591763198011; 
+ Tue, 09 Jun 2020 21:26:38 -0700 (PDT)
 Received: from redhat.com (bzq-79-181-55-232.red.bezeqint.net. [79.181.55.232])
- by smtp.gmail.com with ESMTPSA id c6sm6135976wro.92.2020.06.09.21.27.04
+ by smtp.gmail.com with ESMTPSA id y5sm6509410wrs.63.2020.06.09.21.26.37
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 09 Jun 2020 21:27:05 -0700 (PDT)
-Date: Wed, 10 Jun 2020 00:27:04 -0400
+ Tue, 09 Jun 2020 21:26:37 -0700 (PDT)
+Date: Wed, 10 Jun 2020 00:26:36 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 14/56] acpi: Convert build_tpm2() to build_append* API
-Message-ID: <20200610042613.1459309-15-mst@redhat.com>
+Subject: [PULL 02/56] diffs-allowed: add the SRAT AML to diffs-allowed
+Message-ID: <20200610042613.1459309-3-mst@redhat.com>
 References: <20200610042613.1459309-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20200610042613.1459309-1-mst@redhat.com>
@@ -85,8 +85,8 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=mst@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=mst@redhat.com;
+ helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 23:51:15
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
@@ -109,82 +109,33 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>, Eric Auger <eric.auger@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+ Igor Mammedov <imammedo@redhat.com>, Vishal Verma <vishal.l.verma@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Eric Auger <eric.auger@redhat.com>
+From: Vishal Verma <vishal.l.verma@intel.com>
 
-In preparation of its move to the generic acpi code,
-let's convert build_tpm2() to use build_append API. This
-latter now is prefered in place of direct ACPI struct field
-settings with manual endianness conversion.
+In anticipation of a change to the SRAT generation in qemu, add the AML
+file to diffs-allowed.
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Message-Id: <20200601095737.32671-2-eric.auger@redhat.com>
+Signed-off-by: Vishal Verma <vishal.l.verma@intel.com>
+Message-Id: <20200606000911.9896-2-vishal.l.verma@intel.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/i386/acpi-build.c | 28 +++++++++++++++++++---------
- 1 file changed, 19 insertions(+), 9 deletions(-)
+ tests/qtest/bios-tables-test-allowed-diff.h | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index d05d010f77..8d93a2d339 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -2197,30 +2197,40 @@ build_tpm_tcpa(GArray *table_data, BIOSLinker *linker, GArray *tcpalog)
- static void
- build_tpm2(GArray *table_data, BIOSLinker *linker, GArray *tcpalog)
- {
--    Acpi20TPM2 *tpm2_ptr = acpi_data_push(table_data, sizeof *tpm2_ptr);
-+    Acpi20TPM2 *tpm2_ptr = acpi_data_push(table_data, sizeof(AcpiTableHeader));
-     unsigned log_addr_size = sizeof(tpm2_ptr->log_area_start_address);
-     unsigned log_addr_offset =
-         (char *)&tpm2_ptr->log_area_start_address - table_data->data;
-+    uint8_t start_method_params[12] = {};
- 
--    tpm2_ptr->platform_class = cpu_to_le16(TPM2_ACPI_CLASS_CLIENT);
-+    /* platform class */
-+    build_append_int_noprefix(table_data, TPM2_ACPI_CLASS_CLIENT, 2);
-+    /* reserved */
-+    build_append_int_noprefix(table_data, 0, 2);
-     if (TPM_IS_TIS_ISA(tpm_find())) {
--        tpm2_ptr->control_area_address = cpu_to_le64(0);
--        tpm2_ptr->start_method = cpu_to_le32(TPM2_START_METHOD_MMIO);
-+        /* address of control area */
-+        build_append_int_noprefix(table_data, 0, 8);
-+        /* start method */
-+        build_append_int_noprefix(table_data, TPM2_START_METHOD_MMIO, 4);
-     } else if (TPM_IS_CRB(tpm_find())) {
--        tpm2_ptr->control_area_address = cpu_to_le64(TPM_CRB_ADDR_CTRL);
--        tpm2_ptr->start_method = cpu_to_le32(TPM2_START_METHOD_CRB);
-+        build_append_int_noprefix(table_data, TPM_CRB_ADDR_CTRL, 8);
-+        build_append_int_noprefix(table_data, TPM2_START_METHOD_CRB, 4);
-     } else {
-         g_warn_if_reached();
-     }
- 
--    tpm2_ptr->log_area_minimum_length =
--        cpu_to_le32(TPM_LOG_AREA_MINIMUM_SIZE);
-+    /* platform specific parameters */
-+    g_array_append_vals(table_data, &start_method_params, 12);
- 
--    acpi_data_push(tcpalog, le32_to_cpu(tpm2_ptr->log_area_minimum_length));
-+    /* log area minimum length */
-+    build_append_int_noprefix(table_data, TPM_LOG_AREA_MINIMUM_SIZE, 4);
-+
-+    acpi_data_push(tcpalog, TPM_LOG_AREA_MINIMUM_SIZE);
-     bios_linker_loader_alloc(linker, ACPI_BUILD_TPMLOG_FILE, tcpalog, 1,
-                              false);
- 
-     /* log area start address to be filled by Guest linker */
-+    build_append_int_noprefix(table_data, 0, 8);
-     bios_linker_loader_add_pointer(linker, ACPI_BUILD_TABLE_FILE,
-                                    log_addr_offset, log_addr_size,
-                                    ACPI_BUILD_TPMLOG_FILE, 0);
+diff --git a/tests/qtest/bios-tables-test-allowed-diff.h b/tests/qtest/bios-tables-test-allowed-diff.h
+index dfb8523c8b..e8f2766a63 100644
+--- a/tests/qtest/bios-tables-test-allowed-diff.h
++++ b/tests/qtest/bios-tables-test-allowed-diff.h
+@@ -1 +1,4 @@
+ /* List of comma-separated changed AML files to ignore */
++"tests/data/acpi/pc/SRAT.dimmpxm",
++"tests/data/acpi/q35/SRAT.dimmpxm",
++"tests/data/acpi/virt/SRAT.memhp",
 -- 
 MST
 
