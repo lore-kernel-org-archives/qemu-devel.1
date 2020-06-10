@@ -2,57 +2,64 @@ Return-Path: <SRS0=wemX=7X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_SBL,URIBL_SBL_A autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A3AFC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 05:07:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C7BFC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 05:08:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AFC242074B
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 05:07:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C91622074B
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 05:08:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Pt+RuPLt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AFC242074B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="XzhPdfyZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C91622074B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34588 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36410 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jisxh-0000mT-Vn
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 01:07:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37070)
+	id 1jisy5-0001Wm-1e
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 01:08:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37034)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jisjO-0002lq-SR; Wed, 10 Jun 2020 00:52:54 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:45099 helo=ozlabs.org)
+ id 1jisjJ-0002YO-Ln; Wed, 10 Jun 2020 00:52:49 -0400
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:41619 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jisjN-0004fF-Cu; Wed, 10 Jun 2020 00:52:54 -0400
+ id 1jisjG-0004eU-Nx; Wed, 10 Jun 2020 00:52:49 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 49hZFC3hzgz9sSd; Wed, 10 Jun 2020 14:46:07 +1000 (AEST)
+ id 49hZFC2R7Fz9sQx; Wed, 10 Jun 2020 14:46:07 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1591764367;
- bh=GAHcumRBPim0MrbmWI9QVBYHpb+KntBxmT/1zecd9DI=;
+ bh=ZG+dSKtYCs4GWV8rc0PS07x5YfO+R2meZ1M5/uNSHm4=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=Pt+RuPLtoS5tGrt0Xbuodk5x701RISKo0pFHkuaqvytBj0yfZ9oJ4p09kD1NTiLFv
- u7Nq1I816DA5VuPL2BjSHOnW2wmntW1dBNO4QgDhVt35onfdgLbzbSvwx13Gi82ctM
- /72sj0tcJDl3dkYcM6W7pJQ6GvJTV4ZWMS3WmCeM=
-Date: Wed, 10 Jun 2020 14:32:43 +1000
+ b=XzhPdfyZna8knULwR8dW3AxZ9yupXAterKxp1g8FBQxFilRqpBfNuA6h8NKlxZukD
+ 8AhBA+3rsr5+Z9Dawd/C0pDnukIxuIOXmqtdnbSh5Xx/Eo9+Yge2tl9Qia5XVPPngl
+ T42kjdNYONicLk2/QBhRTvEpz4E2AFJFV0q8ybKc=
+Date: Wed, 10 Jun 2020 14:29:29 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-To: Igor Mammedov <imammedo@redhat.com>
-Subject: Re: [PATCH v5] numa: forbid '-numa node,mem' for 5.1 and newer
- machine types
-Message-ID: <20200610043243.GG494336@umbus.fritz.box>
-References: <20200609135635.761587-1-imammedo@redhat.com>
+To: Halil Pasic <pasic@linux.ibm.com>
+Subject: Re: [PATCH v2 1/1] virtio-ccw: auto-manage VIRTIO_F_IOMMU_PLATFORM
+ if PV
+Message-ID: <20200610042929.GE494336@umbus.fritz.box>
+References: <20200514221155.32079-1-pasic@linux.ibm.com>
+ <20200520121507-mutt-send-email-mst@kernel.org>
+ <20200606013217.2cffa3ed.pasic@linux.ibm.com>
+ <20200608181428.3c6f127c.cohuck@redhat.com>
+ <20200608190045.319dd68b.pasic@linux.ibm.com>
+ <20200609084402.35d317ec.cohuck@redhat.com>
+ <20200609114130.0ca9190b.pasic@linux.ibm.com>
+ <20200609174747.4e300818@ibm-vm>
+ <20200609182839.7ac80938.pasic@linux.ibm.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="xjyYRNSh/RebjC6o"
+ protocol="application/pgp-signature"; boundary="uCPdOCrL+PnN2Vxy"
 Content-Disposition: inline
-In-Reply-To: <20200609135635.761587-1-imammedo@redhat.com>
+In-Reply-To: <20200609182839.7ac80938.pasic@linux.ibm.com>
 Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
  helo=ozlabs.org
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
@@ -75,271 +82,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, ehabkost@redhat.com,
- "Michael S . Tsirkin" <mst@redhat.com>, libvir-list@redhat.com,
- Michal Privoznik <mprivozn@redhat.com>, Greg Kurz <groug@kaod.org>,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
- pbonzini@redhat.com, rth@twiddle.net
+Cc: Viktor Mihajlovski <mihajlov@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
+ Boris Fiuczynski <fiuczy@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>,
+ Pierre Morel <pmorel@linux.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>, David Hildenbrand <david@redhat.com>,
+ qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>,
+ qemu-s390x@nongnu.org, Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---xjyYRNSh/RebjC6o
+--uCPdOCrL+PnN2Vxy
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jun 09, 2020 at 09:56:35AM -0400, Igor Mammedov wrote:
-> Deprecation period is run out and it's a time to flip the switch
-> introduced by cd5ff8333a.  Disable legacy option for new machine
-> types (since 5.1) and amend documentation.
+On Tue, Jun 09, 2020 at 06:28:39PM +0200, Halil Pasic wrote:
+> On Tue, 9 Jun 2020 17:47:47 +0200
+> Claudio Imbrenda <imbrenda@linux.ibm.com> wrote:
 >=20
-> '-numa node,memdev' shall be used instead of disabled option
-> with new machine types.
+> > On Tue, 9 Jun 2020 11:41:30 +0200
+> > Halil Pasic <pasic@linux.ibm.com> wrote:
+> >=20
+> > [...]
+> >=20
+> > > I don't know. Janosch could answer that, but he is on vacation. Adding
+> > > Claudio maybe he can answer. My understanding is, that while it might
+> > > be possible, it is ugly at best. The ability to do a transition is
+> > > indicated by a CPU model feature. Indicating the feature to the guest
+> > > and then failing the transition sounds wrong to me.
+> >=20
+> > I agree. If the feature is advertised, then it has to work. I don't
+> > think we even have an architected way to fail the transition for that
+> > reason.
+> >=20
+> > What __could__ be done is to prevent qemu from even starting if an
+> > incompatible device is specified together with PV.
 >=20
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> Reviewed-by: Michal Privoznik <mprivozn@redhat.com>
-> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-> Reviewed-by: Greg Kurz <groug@kaod.org>
+> AFAIU, the "specified together with PV" is the problem here. Currently
+> we don't "specify PV" but PV is just a capability that is managed by the
+> CPU model (like so many other). I.e. the fact that the
+> visualization environment is capable providing PV (unpack facility
+> available), and the fact, that the end user didn't fence the unpack
+> facility, does not mean, the user is dead set to use PV.
+>=20
+> My understanding is, that we want PV to just work, without having to
+> put together a peculiar VM definition that says: this is going to be
+> used as a PV VM.
 
-ppc parts
-Acked-b: David Gibson <david@gibson.dropbear.id.au>
+Having had a similar discussion for POWER, I no longer think this is a
+wise model.  I think we want to have an explicit "allow PV" option -
+but we do want it to be a *single* option, rather than having to
+change configuration of a whole bunch of places.
 
-> ---
-> v1:
->  - rebased on top of current master
->  - move compat mode from 4.2 to 5.0
-> v2:
->  - move deprecation text to recently removed section
-> v3:
->  - increase title line length for (deprecated.rst)
->      '``-numa node,mem=3D``\ *size* (removed in 5.1)'
-> v4:
->  - use error_append_hint() for suggesting valid CLI
-> v5:
->  - add "\n" at the end of error_append_hint()
->  - fix gramar/spelling in moved deprecation text
->=20
-> CC: peter.maydell@linaro.org
-> CC: ehabkost@redhat.com
-> CC: marcel.apfelbaum@gmail.com
-> CC: mst@redhat.com
-> CC: pbonzini@redhat.com
-> CC: rth@twiddle.net
-> CC: david@gibson.dropbear.id.au
-> CC: libvir-list@redhat.com
-> CC: qemu-arm@nongnu.org
-> CC: qemu-ppc@nongnu.org
-> CC: eblake@redhat.com
-> CC: groug@kaod.org
-> ---
->  docs/system/deprecated.rst | 37 ++++++++++++++++++++-----------------
->  hw/arm/virt.c              |  2 +-
->  hw/core/numa.c             |  7 +++++++
->  hw/i386/pc.c               |  1 -
->  hw/i386/pc_piix.c          |  1 +
->  hw/i386/pc_q35.c           |  1 +
->  hw/ppc/spapr.c             |  2 +-
->  qemu-options.hx            |  9 +++++----
->  8 files changed, 36 insertions(+), 24 deletions(-)
->=20
-> diff --git a/docs/system/deprecated.rst b/docs/system/deprecated.rst
-> index 544ece0a45..72666ac764 100644
-> --- a/docs/system/deprecated.rst
-> +++ b/docs/system/deprecated.rst
-> @@ -101,23 +101,6 @@ error in the future.
->  The ``-realtime mlock=3Don|off`` argument has been replaced by the
->  ``-overcommit mem-lock=3Don|off`` argument.
-> =20
-> -``-numa node,mem=3D``\ *size* (since 4.1)
-> -'''''''''''''''''''''''''''''''''''''''
-> -
-> -The parameter ``mem`` of ``-numa node`` is used to assign a part of
-> -guest RAM to a NUMA node. But when using it, it's impossible to manage s=
-pecified
-> -RAM chunk on the host side (like bind it to a host node, setting bind po=
-licy, ...),
-> -so guest end-ups with the fake NUMA configuration with suboptiomal perfo=
-rmance.
-> -However since 2014 there is an alternative way to assign RAM to a NUMA n=
-ode
-> -using parameter ``memdev``, which does the same as ``mem`` and adds
-> -means to actualy manage node RAM on the host side. Use parameter ``memde=
-v``
-> -with *memory-backend-ram* backend as an replacement for parameter ``mem``
-> -to achieve the same fake NUMA effect or a properly configured
-> -*memory-backend-file* backend to actually benefit from NUMA configuratio=
-n.
-> -In future new machine versions will not accept the option but it will st=
-ill
-> -work with old machine types. User can check QAPI schema to see if the le=
-gacy
-> -option is supported by looking at MachineInfo::numa-mem-supported proper=
-ty.
-> -
->  ``-numa`` node (without memory specified) (since 4.1)
->  '''''''''''''''''''''''''''''''''''''''''''''''''''''
-> =20
-> @@ -516,3 +499,23 @@ long starting at 1MiB, the old command::
->  can be rewritten as::
-> =20
->    qemu-nbd -t --image-opts driver=3Draw,offset=3D1M,size=3D100M,file.dri=
-ver=3Dqcow2,file.file.driver=3Dfile,file.file.filename=3Dfile.qcow2
-> +
-> +Command line options
-> +--------------------
-> +
-> +``-numa node,mem=3D``\ *size* (removed in 5.1)
-> +''''''''''''''''''''''''''''''''''''''''''''
-> +
-> +The parameter ``mem`` of ``-numa node`` was used to assign a part of
-> +guest RAM to a NUMA node. But when using it, it's impossible to manage a=
- specified
-> +RAM chunk on the host side (like bind it to a host node, setting bind po=
-licy, ...),
-> +so the guest ends up with the fake NUMA configuration with suboptiomal p=
-erformance.
-> +However since 2014 there is an alternative way to assign RAM to a NUMA n=
-ode
-> +using parameter ``memdev``, which does the same as ``mem`` and adds
-> +means to actually manage node RAM on the host side. Use parameter ``memd=
-ev``
-> +with *memory-backend-ram* backend as replacement for parameter ``mem``
-> +to achieve the same fake NUMA effect or a properly configured
-> +*memory-backend-file* backend to actually benefit from NUMA configuratio=
-n.
-> +New machine versions (since 5.1) will not accept the option but it will =
-still
-> +work with old machine types. User can check the QAPI schema to see if th=
-e legacy
-> +option is supported by looking at MachineInfo::numa-mem-supported proper=
-ty.
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index 37462a6f78..063d4703f7 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -2262,7 +2262,6 @@ static void virt_machine_class_init(ObjectClass *oc=
-, void *data)
->      hc->pre_plug =3D virt_machine_device_pre_plug_cb;
->      hc->plug =3D virt_machine_device_plug_cb;
->      hc->unplug_request =3D virt_machine_device_unplug_request_cb;
-> -    mc->numa_mem_supported =3D true;
->      mc->nvdimm_supported =3D true;
->      mc->auto_enable_numa_with_memhp =3D true;
->      mc->default_ram_id =3D "mach-virt.ram";
-> @@ -2375,6 +2374,7 @@ DEFINE_VIRT_MACHINE_AS_LATEST(5, 1)
->  static void virt_machine_5_0_options(MachineClass *mc)
->  {
->      virt_machine_5_1_options(mc);
-> +    mc->numa_mem_supported =3D true;
->  }
->  DEFINE_VIRT_MACHINE(5, 0)
-> =20
-> diff --git a/hw/core/numa.c b/hw/core/numa.c
-> index 316bc50d75..a935640962 100644
-> --- a/hw/core/numa.c
-> +++ b/hw/core/numa.c
-> @@ -117,6 +117,13 @@ static void parse_numa_node(MachineState *ms, NumaNo=
-deOptions *node,
->      }
-> =20
->      if (node->has_mem) {
-> +        if (!mc->numa_mem_supported) {
-> +            error_setg(errp, "Parameter -numa node,mem is not supported =
-by this"
-> +                      " machine type");
-> +            error_append_hint(errp, "Use -numa node,memdev instead\n");
-> +            return;
-> +        }
-> +
->          numa_info[nodenr].node_mem =3D node->mem;
->          if (!qtest_enabled()) {
->              warn_report("Parameter -numa node,mem is deprecated,"
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index 2128f3d6fe..a86136069c 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -1960,7 +1960,6 @@ static void pc_machine_class_init(ObjectClass *oc, =
-void *data)
->      hc->unplug =3D pc_machine_device_unplug_cb;
->      mc->default_cpu_type =3D TARGET_DEFAULT_CPU_TYPE;
->      mc->nvdimm_supported =3D true;
-> -    mc->numa_mem_supported =3D true;
->      mc->default_ram_id =3D "pc.ram";
-> =20
->      object_class_property_add(oc, PC_MACHINE_DEVMEM_REGION_SIZE, "int",
-> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-> index f66e1d73ce..8955436efa 100644
-> --- a/hw/i386/pc_piix.c
-> +++ b/hw/i386/pc_piix.c
-> @@ -438,6 +438,7 @@ static void pc_i440fx_5_0_machine_options(MachineClas=
-s *m)
->      pc_i440fx_5_1_machine_options(m);
->      m->alias =3D NULL;
->      m->is_default =3D false;
-> +    m->numa_mem_supported =3D true;
->      compat_props_add(m->compat_props, hw_compat_5_0, hw_compat_5_0_len);
->      compat_props_add(m->compat_props, pc_compat_5_0, pc_compat_5_0_len);
->  }
-> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-> index 4ba8ac8774..af6b32adb7 100644
-> --- a/hw/i386/pc_q35.c
-> +++ b/hw/i386/pc_q35.c
-> @@ -366,6 +366,7 @@ static void pc_q35_5_0_machine_options(MachineClass *=
-m)
->  {
->      pc_q35_5_1_machine_options(m);
->      m->alias =3D NULL;
-> +    m->numa_mem_supported =3D true;
->      compat_props_add(m->compat_props, hw_compat_5_0, hw_compat_5_0_len);
->      compat_props_add(m->compat_props, pc_compat_5_0, pc_compat_5_0_len);
->  }
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 3b1a5ed865..210d61d1b3 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -4511,7 +4511,6 @@ static void spapr_machine_class_init(ObjectClass *o=
-c, void *data)
->       * in which LMBs are represented and hot-added
->       */
->      mc->numa_mem_align_shift =3D 28;
-> -    mc->numa_mem_supported =3D true;
->      mc->auto_enable_numa =3D true;
-> =20
->      smc->default_caps.caps[SPAPR_CAP_HTM] =3D SPAPR_CAP_OFF;
-> @@ -4599,6 +4598,7 @@ static void spapr_machine_5_0_class_options(Machine=
-Class *mc)
->  {
->      spapr_machine_5_1_class_options(mc);
->      compat_props_add(mc->compat_props, hw_compat_5_0, hw_compat_5_0_len);
-> +    mc->numa_mem_supported =3D true;
->  }
-> =20
->  DEFINE_SPAPR_MACHINE(5_0, "5.0", false);
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index 93bde2bbc8..196f468786 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -239,10 +239,11 @@ SRST
->          -numa node,nodeid=3D0 -numa node,nodeid=3D1 \
->          -numa cpu,node-id=3D0,socket-id=3D0 -numa cpu,node-id=3D1,socket=
--id=3D1
-> =20
-> -    '\ ``mem``\ ' assigns a given RAM amount to a node. '\ ``memdev``\ '
-> -    assigns RAM from a given memory backend device to a node. If
-> -    '\ ``mem``\ ' and '\ ``memdev``\ ' are omitted in all nodes, RAM is
-> -    split equally between them.
-> +    Legacy '\ ``mem``\ ' assigns a given RAM amount to a node (not suppo=
-rted
-> +    for 5.1 and newer machine types). '\ ``memdev``\ ' assigns RAM from
-> +    a given memory backend device to a node. If '\ ``mem``\ ' and
-> +    '\ ``memdev``\ ' are omitted in all nodes, RAM is split equally betw=
-een them.
-> +
-> =20
->      '\ ``mem``\ ' and '\ ``memdev``\ ' are mutually exclusive.
->      Furthermore, if one node uses '\ ``memdev``\ ', all of them have to
+My intention is for my 'host-trust-limitation' series to accomplish
+that.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -347,25 +146,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---xjyYRNSh/RebjC6o
+--uCPdOCrL+PnN2Vxy
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl7gYmsACgkQbDjKyiDZ
-s5L52g/+PuT97bS3FIMzYZ5howQxprZkmbxCkNxpjdB81cVcC+116lQj9M80nEw2
-Ws9yNI5YmP5EUZUoAyW6+Q2qHIaUWWpnnzrDqna3GK/gma4FDXOyQxhQ0CGO43Pa
-xA24zUvpq9ofWmfpDWYKgB6Y3cYhwLVOjKTgszsgrHkPQ2PLLlvg0RKbMQ8TA/zx
-eig2Dfxl4nc3nF+I+bZDNwYU3KN+unbfe9KNjtmho72wX7ODob/GAqVQVSxYjzq/
-7NFihDgdtEjMvZzN44qPxY6XQ7/QFMyH9a7tLN6nml3goAW0nPWgSFhikZWzMh3W
-G+9vcNNE+CvGGvwGTeVaMuAlfrdhpI/1jn4vg51jAM4wW6f7Tz9JXJmIY+ZTAjlO
-AWywc5hrmsiFUWWa14R5ZNuJpaAyeJbKn87tNFqTuY5cM3i/ke1Mslwj4T9uPEbX
-MzC0H53GV+iFhkD9ipgezlPmIZw1yUyAj1JJQ2gX7e2Dju8U9xfSWp+JGpqch0pB
-MWd7vR0grRSRggKag4uyA+aBznRDuOHUmdVPVPO4W03NBp8hlOxSpopHe0BXJnT8
-9L9kFCX0Deyr6sYPcbB7bRfn50BzXNzvP9mSc6JrTHEQqaxHAO0cbN+G9vlAyfdC
-i6IwhlyT0a1pnPh0aKuxTXB46vuG3Si1MQxvzMgAHWNZgG5uAc0=
-=vbzX
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl7gYakACgkQbDjKyiDZ
+s5KssBAAv3X5FqeJqLQeW/ZNYCqjJcTdXoC2k8qhTxQMwpbSV8bM0/1FASFNK02X
+bMXzdr7FcBc9wLyGBd75Bfga6jDgffWEMparTTNmaPBBiMG9neq/TVX34OlEipGW
+7MK8BSJbK9RIOUP7NNGnV9K5VDVMSoX8f1kIUmiOGAzyIyj8UNJfuL/16L/SG1W+
+xQQrV+LCu0BE03qEhVCEEIwZKtDTBMxT6iNmAPw4RKuRkgHOGX3q+hL8+7T/2vog
++B2d5nu00hJcIY7smT+R1PNyCAya+JeVLEW5cMwCx7VtRjmAeGLlHnNfAPOveGoG
+tvueN+IiiN7MhJmGMYOzVbWh6J4aeats47SevyVNwAS0C1X/prMLMRL1h9z+2xwu
+n64CZq+G+5awmuOwzbbxAyEyFdBOXiIpunO2PZk7bK8i4Q9bf60Mo3Tk/tujB8Uv
+2Yb7Dt1OBp7rxe0qOBeTpDIoE87qOaQMaFt3KJPcCwPPT6UPBsGTyaXgYLcZjAiP
+YHS7Kt2VWUIS78k7nUgxD5XA3ZJ1QCuW7hgpfMMscbXtbQgf7a7m71nc1KecldCp
+70zykGZO/P7xvDd75Shh1l+NNzO0lEUV7Y0w0QX6aPZR6DZnc+87pmqcRYMnKZM1
+KWv9xstukqQqu4HmiXujF39GRwL01pl9FPEbfTsyrBe0VKeiY+c=
+=lwkf
 -----END PGP SIGNATURE-----
 
---xjyYRNSh/RebjC6o--
+--uCPdOCrL+PnN2Vxy--
 
