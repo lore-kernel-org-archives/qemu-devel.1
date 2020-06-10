@@ -7,75 +7,76 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22E51C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 04:41:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBC60C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 04:41:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DC29320734
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 04:41:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A45E520734
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 04:41:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fZ2IALgI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC29320734
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Sg7zlEzx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A45E520734
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51842 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54100 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jisY5-0001S3-1o
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 00:41:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34042)
+	id 1jisYU-0002Lz-RO
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 00:41:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34034)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jisKh-0007oY-2b
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 00:27:23 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:37025
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jisKc-0007ew-Iz
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 00:27:18 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36165
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jisKg-0008Fl-5z
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 00:27:22 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jisKb-0008FV-Mw
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 00:27:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591763241;
+ s=mimecast20190719; t=1591763237;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=i525bms7gqVVwpF2fPgVg2EaF8HaC1eOaVMCjQtCrsc=;
- b=fZ2IALgI4/McSBcQ7gmhDRMb0HMvbbQ5BUWueOxmOmW7nmo7P80PLhAzvqiw17CgCbrX90
- rq0bc9SvtxCgnThmST1jR6iww/9aSgsSfsZ9/lPDzEVLKTY5LZx3IW76E9TdC/AXd6FdGX
- AqW/UhwomlsndhZxIVWd7TaJ3+YTeWk=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-442-z86WRS74PJaafVpAaugqLA-1; Wed, 10 Jun 2020 00:27:19 -0400
-X-MC-Unique: z86WRS74PJaafVpAaugqLA-1
-Received: by mail-wr1-f71.google.com with SMTP id p10so498631wrn.19
- for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 21:27:19 -0700 (PDT)
+ bh=m70XDKVx5FpSNAmS9FGjLCI+V05BcMupEqmlBSYDPOk=;
+ b=Sg7zlEzxbSP8KiZMHPr3F7gw2fxCdI3KC9P8uV0/fP86AjmojYY0tHqrnSFSsF3kvGhGuD
+ bOTyxqqITD3Ss5a2xGo7XpwiO7WASsgw2RwVjyclZi+5GRx5LIlXrrM7etR3EVxxwgRbDp
+ JXpKvR6yY/WpGP43845GA/cEZDFG6mc=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-490-oR2SV-jPP3qlcTN4lI5xxw-1; Wed, 10 Jun 2020 00:27:14 -0400
+X-MC-Unique: oR2SV-jPP3qlcTN4lI5xxw-1
+Received: by mail-wr1-f70.google.com with SMTP id z10so518113wrs.2
+ for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 21:27:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=i525bms7gqVVwpF2fPgVg2EaF8HaC1eOaVMCjQtCrsc=;
- b=WiTz/hLoi8WIBLQ7nbh38eGptV/S3yRKDOuRoxiv4BhoToOgQNwZj3uzcUQH/pdAld
- 2ad6WS7PJbxAxn9/N5VnMF3T4Knuj3RJbeucZYct5cZeHbcqjsaTjebcWqdETaKPbK/f
- sIZaOxlda+epceVPXVJDDpx1HP7yoc+ZzJ4qhCdbP7R6f7utTQJpvGcZmKSEgEoqR/rH
- 4G0p+zhhayKURtFZ9s/uF1+PsgJpFtZKEDAwIdYzq31NcrkhQlZnfy1n6S7H8ZD6WRsf
- lBXyFtI0qkz8QrN18+vB1ImzhSuv1zD+hm5rw5Fqse1ahlodAWY2nkRepGOmrE469hYP
- 5g9g==
-X-Gm-Message-State: AOAM530k/x9eoOpez1WoY+GjQdNMYB0P+vImdTi+TqzRXGVsSAAXEzvd
- MDM0GTdcpmL53daMNeQ01qaIVeIZFhXjv6pBleF2LdckRaqNP0OK4Q3CDEW3FbCtPNwRCMDNO8H
- 8vnIYeIZEvLDWGfk=
-X-Received: by 2002:a1c:2506:: with SMTP id l6mr1210994wml.34.1591763237915;
- Tue, 09 Jun 2020 21:27:17 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyGpqwGc+dHVAdWUvv/HA23YeeOIIyXxzCtPkv5+FCY3dytSsuWl+lUGxLMV8xc3XwbZ0PruQ==
-X-Received: by 2002:a1c:2506:: with SMTP id l6mr1210988wml.34.1591763237714;
- Tue, 09 Jun 2020 21:27:17 -0700 (PDT)
+ bh=m70XDKVx5FpSNAmS9FGjLCI+V05BcMupEqmlBSYDPOk=;
+ b=PHk2KNqA+cJBD0OiDOby+bLrRKz0WuznimbNOEuh84/efHaMoP0fj4TmRqtQyCPc5V
+ v0ayGGFIvgUDG+pDwuv571TTSglhAPvRWLng3xNZKeaYkU1OEc8ovIqgI5aTG71rWYpv
+ 2m8+tZdrDSuDSGI1rqCZkW5d9I0kYVA8mbItmhfwks0WjMaQ5vaSOK/DeOn0hNbUBAUo
+ kBHwiV8T1EXgKZg8VQu0BAQimS7Ya3007ylcZIDBwziiPe35PiHrLop4hUIwGU2dc2aA
+ e5cTH2YKO+qc+3zdxTWNMyyuL31I8LkoaWD4W5rk6Qs51o4hqfj4XQMTKoec+swagJbD
+ XiYw==
+X-Gm-Message-State: AOAM533NGCVpERjaHArj8GSwpl4cEBAKohDI03s5J25or7wjYUNekEqU
+ FcMACeJPYktWPviqZFwXKdABKVAyWNS7eFmN0uSwSErPS4dqNS10x9ybLcqi3objsXwn/kg722G
+ SDli6JWAXvBStuyw=
+X-Received: by 2002:a1c:1d44:: with SMTP id d65mr1128949wmd.179.1591763233104; 
+ Tue, 09 Jun 2020 21:27:13 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw5+mHMbci/9Hal4JeswoKmAAnd2pAaAeF15lNGXmHzArRf3w7l+BDViaRH0KNAxGbvWQK7ug==
+X-Received: by 2002:a1c:1d44:: with SMTP id d65mr1128933wmd.179.1591763232910; 
+ Tue, 09 Jun 2020 21:27:12 -0700 (PDT)
 Received: from redhat.com (bzq-79-181-55-232.red.bezeqint.net. [79.181.55.232])
- by smtp.gmail.com with ESMTPSA id h27sm7109827wrb.18.2020.06.09.21.27.16
+ by smtp.gmail.com with ESMTPSA id q1sm5099009wmc.15.2020.06.09.21.27.11
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 09 Jun 2020 21:27:17 -0700 (PDT)
-Date: Wed, 10 Jun 2020 00:27:15 -0400
+ Tue, 09 Jun 2020 21:27:12 -0700 (PDT)
+Date: Wed, 10 Jun 2020 00:27:11 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 19/56] tests: tpm-emu: Remove assert on TPM2_ST_NO_SESSIONS
-Message-ID: <20200610042613.1459309-20-mst@redhat.com>
+Subject: [PULL 17/56] test/tpm-emu: include sockets and channel headers in
+ tpm-emu header
+Message-ID: <20200610042613.1459309-18-mst@redhat.com>
 References: <20200610042613.1459309-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20200610042613.1459309-1-mst@redhat.com>
@@ -118,39 +119,30 @@ Sender: "Qemu-devel"
 
 From: Eric Auger <eric.auger@redhat.com>
 
-bios-tables-test executes SeaBIOS. Indeed FW is needed to
-fetch tables from QEMU and put them into the guest RAM. Also
-the FW patches cross table pointers. At some point, SeaBIOS
-ends up calling the TPM2_CC_HierarchyControl command with
-TPM2_ST_SESSIONS tag, most probably steming from
-tpm_set_failure/tpm20_hierarchycontrol SeaBIOS call path.
-This causes an assert() in the qtest tpm emulation code.
-
-As the goal here is not to boot SeaBIOS completely but just
-let it grab the ACPI tables and consolidate them, let's just
-remove the assert().
+Include sockets and channel headers to that the header is
+self-contained.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-
-Message-Id: <20200609125409.24179-4-eric.auger@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Stefan Berger <stefanb@linux.ibm.com>
+Message-Id: <20200609125409.24179-2-eric.auger@redhat.com>
 ---
- tests/qtest/tpm-emu.c | 1 -
- 1 file changed, 1 deletion(-)
+ tests/qtest/tpm-emu.h | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/tests/qtest/tpm-emu.c b/tests/qtest/tpm-emu.c
-index c43ac4aef8..298d0eec74 100644
---- a/tests/qtest/tpm-emu.c
-+++ b/tests/qtest/tpm-emu.c
-@@ -49,7 +49,6 @@ static void *tpm_emu_tpm_thread(void *data)
-         s->tpm_msg->tag = be16_to_cpu(s->tpm_msg->tag);
-         s->tpm_msg->len = be32_to_cpu(s->tpm_msg->len);
-         g_assert_cmpint(s->tpm_msg->len, >=, minhlen);
--        g_assert_cmpint(s->tpm_msg->tag, ==, TPM2_ST_NO_SESSIONS);
+diff --git a/tests/qtest/tpm-emu.h b/tests/qtest/tpm-emu.h
+index a4f1d64226..73f3bed0c4 100644
+--- a/tests/qtest/tpm-emu.h
++++ b/tests/qtest/tpm-emu.h
+@@ -16,6 +16,9 @@
+ #define TPM_RC_FAILURE 0x101
+ #define TPM2_ST_NO_SESSIONS 0x8001
  
-         s->tpm_msg = g_realloc(s->tpm_msg, s->tpm_msg->len);
-         qio_channel_read(ioc, (char *)&s->tpm_msg->code,
++#include "qemu/sockets.h"
++#include "io/channel.h"
++
+ struct tpm_hdr {
+     uint16_t tag;
+     uint32_t len;
 -- 
 MST
 
