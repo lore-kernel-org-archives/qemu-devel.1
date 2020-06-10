@@ -2,81 +2,62 @@ Return-Path: <SRS0=wemX=7X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6931EC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 11:56:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC238C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 11:56:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 337EF2072E
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 11:56:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aRLnoQY+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 337EF2072E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 911362072E
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 11:56:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 911362072E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40614 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40870 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jizLG-0004TR-DB
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 07:56:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43268)
+	id 1jizLH-0004ay-QE
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 07:56:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42898)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jizJg-0002Sd-4q
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 07:54:48 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:22677
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jizJe-0001tb-0V
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 07:54:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591790084;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=U68jIOHuvNFPHE8HVjN9BLo12zDx2a4qnBp0EnzJr9o=;
- b=aRLnoQY+2mAPRl1CjeDp1dCzEVOJmubuDo+p5Qe0Ndub/Ywv0z0K8uq4UCF5y4rDVxA7o6
- 2GG3iXBcf3w9CWw8nuzCrjnyhDultn2rWo/SQZ1hjqzvCZDWQTBUCnUyVfEYYcnOHu8srt
- XV/jxZwGDkE77Pn0yCUoW7dss7w5qdo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-283-LYF1y1dlMwuABbJGim0Zvg-1; Wed, 10 Jun 2020 07:54:40 -0400
-X-MC-Unique: LYF1y1dlMwuABbJGim0Zvg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9C04E193F560;
- Wed, 10 Jun 2020 11:54:39 +0000 (UTC)
-Received: from t480s.redhat.com (ovpn-114-42.ams2.redhat.com [10.36.114.42])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BC3F25D9D3;
- Wed, 10 Jun 2020 11:54:37 +0000 (UTC)
-From: David Hildenbrand <david@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v4 01/21] exec: Introduce ram_block_discard_(disable|require)()
-Date: Wed, 10 Jun 2020 13:53:59 +0200
-Message-Id: <20200610115419.51688-2-david@redhat.com>
-In-Reply-To: <20200610115419.51688-1-david@redhat.com>
-References: <20200610115419.51688-1-david@redhat.com>
+ (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jizIx-0001RH-4O; Wed, 10 Jun 2020 07:54:03 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:50120)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jizIv-0001kq-H7; Wed, 10 Jun 2020 07:54:02 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07436282|-1; CH=green;
+ DM=|CONTINUE|false|; DS=CONTINUE|ham_system_inform|0.73175-0.000899287-0.26735;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e02c03307; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=9; RT=8; SR=0; TI=SMTPD_---.HkZc-c8_1591790036; 
+Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.HkZc-c8_1591790036)
+ by smtp.aliyun-inc.com(10.147.40.200);
+ Wed, 10 Jun 2020 19:53:57 +0800
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Subject: [PATCH v9 08/61] target/riscv: add fault-only-first unit stride load
+Date: Wed, 10 Jun 2020 19:36:55 +0800
+Message-Id: <20200610113748.4754-9-zhiwei_liu@c-sky.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20200610113748.4754-1-zhiwei_liu@c-sky.com>
+References: <20200610113748.4754-1-zhiwei_liu@c-sky.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=david@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 21:17:20
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Received-SPF: none client-ip=121.197.200.217;
+ envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/10 07:37:52
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001, UNPARSEABLE_RELAY=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -89,171 +70,276 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
- "Michael S . Tsirkin" <mst@redhat.com>, David Hildenbrand <david@redhat.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>, qemu-s390x@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: richard.henderson@linaro.org, wxy194768@alibaba-inc.com,
+ wenmeng_zhang@c-sky.com, Alistair Francis <alistair.francis@wdc.com>,
+ palmer@dabbelt.com, LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We want to replace qemu_balloon_inhibit() by something more generic.
-Especially, we want to make sure that technologies that really rely on
-RAM block discards to work reliably to run mutual exclusive with
-technologies that effectively break it.
+The unit-stride fault-only-fault load instructions are used to
+vectorize loops with data-dependent exit conditions(while loops).
+These instructions execute as a regular load except that they
+will only take a trap on element 0.
 
-E.g., vfio will usually pin all guest memory, turning the virtio-balloon
-basically useless and make the VM consume more memory than reported via
-the balloon. While the balloon is special already (=> no guarantees, same
-behavior possible afer reboots and with huge pages), this will be
-different, especially, with virtio-mem.
-
-Let's implement a way such that we can make both types of technology run
-mutually exclusive. We'll convert existing balloon inhibitors in successive
-patches and add some new ones. Add the check to
-qemu_balloon_is_inhibited() for now. We might want to make
-virtio-balloon an acutal inhibitor in the future - however, that
-requires more thought to not break existing setups.
-
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: David Hildenbrand <david@redhat.com>
+Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- balloon.c             |  3 ++-
- exec.c                | 52 +++++++++++++++++++++++++++++++++++++++++++
- include/exec/memory.h | 41 ++++++++++++++++++++++++++++++++++
- 3 files changed, 95 insertions(+), 1 deletion(-)
+ target/riscv/helper.h                   |  22 +++++
+ target/riscv/insn32.decode              |   7 ++
+ target/riscv/insn_trans/trans_rvv.inc.c |  73 ++++++++++++++++
+ target/riscv/vector_helper.c            | 110 ++++++++++++++++++++++++
+ 4 files changed, 212 insertions(+)
 
-diff --git a/balloon.c b/balloon.c
-index f104b42961..5fff79523a 100644
---- a/balloon.c
-+++ b/balloon.c
-@@ -40,7 +40,8 @@ static int balloon_inhibit_count;
- 
- bool qemu_balloon_is_inhibited(void)
- {
--    return atomic_read(&balloon_inhibit_count) > 0;
-+    return atomic_read(&balloon_inhibit_count) > 0 ||
-+           ram_block_discard_is_disabled();
- }
- 
- void qemu_balloon_inhibit(bool state)
-diff --git a/exec.c b/exec.c
-index be4be2df3a..c4c1d9df84 100644
---- a/exec.c
-+++ b/exec.c
-@@ -4051,4 +4051,56 @@ void mtree_print_dispatch(AddressSpaceDispatch *d, MemoryRegion *root)
-     }
- }
- 
+diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+index f9b3da60ca..72ba4d9bdb 100644
+--- a/target/riscv/helper.h
++++ b/target/riscv/helper.h
+@@ -218,3 +218,25 @@ DEF_HELPER_6(vsxe_v_b, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vsxe_v_h, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vsxe_v_w, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vsxe_v_d, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_5(vlbff_v_b, void, ptr, ptr, tl, env, i32)
++DEF_HELPER_5(vlbff_v_h, void, ptr, ptr, tl, env, i32)
++DEF_HELPER_5(vlbff_v_w, void, ptr, ptr, tl, env, i32)
++DEF_HELPER_5(vlbff_v_d, void, ptr, ptr, tl, env, i32)
++DEF_HELPER_5(vlhff_v_h, void, ptr, ptr, tl, env, i32)
++DEF_HELPER_5(vlhff_v_w, void, ptr, ptr, tl, env, i32)
++DEF_HELPER_5(vlhff_v_d, void, ptr, ptr, tl, env, i32)
++DEF_HELPER_5(vlwff_v_w, void, ptr, ptr, tl, env, i32)
++DEF_HELPER_5(vlwff_v_d, void, ptr, ptr, tl, env, i32)
++DEF_HELPER_5(vleff_v_b, void, ptr, ptr, tl, env, i32)
++DEF_HELPER_5(vleff_v_h, void, ptr, ptr, tl, env, i32)
++DEF_HELPER_5(vleff_v_w, void, ptr, ptr, tl, env, i32)
++DEF_HELPER_5(vleff_v_d, void, ptr, ptr, tl, env, i32)
++DEF_HELPER_5(vlbuff_v_b, void, ptr, ptr, tl, env, i32)
++DEF_HELPER_5(vlbuff_v_h, void, ptr, ptr, tl, env, i32)
++DEF_HELPER_5(vlbuff_v_w, void, ptr, ptr, tl, env, i32)
++DEF_HELPER_5(vlbuff_v_d, void, ptr, ptr, tl, env, i32)
++DEF_HELPER_5(vlhuff_v_h, void, ptr, ptr, tl, env, i32)
++DEF_HELPER_5(vlhuff_v_w, void, ptr, ptr, tl, env, i32)
++DEF_HELPER_5(vlhuff_v_d, void, ptr, ptr, tl, env, i32)
++DEF_HELPER_5(vlwuff_v_w, void, ptr, ptr, tl, env, i32)
++DEF_HELPER_5(vlwuff_v_d, void, ptr, ptr, tl, env, i32)
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index bc36df33b5..b76c09c8c0 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -224,6 +224,13 @@ vle_v      ... 000 . 00000 ..... 111 ..... 0000111 @r2_nfvm
+ vlbu_v     ... 000 . 00000 ..... 000 ..... 0000111 @r2_nfvm
+ vlhu_v     ... 000 . 00000 ..... 101 ..... 0000111 @r2_nfvm
+ vlwu_v     ... 000 . 00000 ..... 110 ..... 0000111 @r2_nfvm
++vlbff_v    ... 100 . 10000 ..... 000 ..... 0000111 @r2_nfvm
++vlhff_v    ... 100 . 10000 ..... 101 ..... 0000111 @r2_nfvm
++vlwff_v    ... 100 . 10000 ..... 110 ..... 0000111 @r2_nfvm
++vleff_v    ... 000 . 10000 ..... 111 ..... 0000111 @r2_nfvm
++vlbuff_v   ... 000 . 10000 ..... 000 ..... 0000111 @r2_nfvm
++vlhuff_v   ... 000 . 10000 ..... 101 ..... 0000111 @r2_nfvm
++vlwuff_v   ... 000 . 10000 ..... 110 ..... 0000111 @r2_nfvm
+ vsb_v      ... 000 . 00000 ..... 000 ..... 0100111 @r2_nfvm
+ vsh_v      ... 000 . 00000 ..... 101 ..... 0100111 @r2_nfvm
+ vsw_v      ... 000 . 00000 ..... 110 ..... 0100111 @r2_nfvm
+diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+index c3a79c5232..299b479ec1 100644
+--- a/target/riscv/insn_trans/trans_rvv.inc.c
++++ b/target/riscv/insn_trans/trans_rvv.inc.c
+@@ -561,3 +561,76 @@ GEN_VEXT_TRANS(vsxb_v, 0, rnfvm, st_index_op, st_index_check)
+ GEN_VEXT_TRANS(vsxh_v, 1, rnfvm, st_index_op, st_index_check)
+ GEN_VEXT_TRANS(vsxw_v, 2, rnfvm, st_index_op, st_index_check)
+ GEN_VEXT_TRANS(vsxe_v, 3, rnfvm, st_index_op, st_index_check)
++
 +/*
-+ * If positive, discarding RAM is disabled. If negative, discarding RAM is
-+ * required to work and cannot be disabled.
++ *** unit stride fault-only-first load
 + */
-+static int ram_block_discard_disabled;
-+
-+int ram_block_discard_disable(bool state)
++static bool ldff_trans(uint32_t vd, uint32_t rs1, uint32_t data,
++                       gen_helper_ldst_us *fn, DisasContext *s)
 +{
-+    int old;
++    TCGv_ptr dest, mask;
++    TCGv base;
++    TCGv_i32 desc;
 +
-+    if (!state) {
-+        atomic_dec(&ram_block_discard_disabled);
-+        return 0;
++    TCGLabel *over = gen_new_label();
++    tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_vl, 0, over);
++
++    dest = tcg_temp_new_ptr();
++    mask = tcg_temp_new_ptr();
++    base = tcg_temp_new();
++    desc = tcg_const_i32(simd_desc(0, s->vlen / 8, data));
++
++    gen_get_gpr(base, rs1);
++    tcg_gen_addi_ptr(dest, cpu_env, vreg_ofs(s, vd));
++    tcg_gen_addi_ptr(mask, cpu_env, vreg_ofs(s, 0));
++
++    fn(dest, mask, base, cpu_env, desc);
++
++    tcg_temp_free_ptr(dest);
++    tcg_temp_free_ptr(mask);
++    tcg_temp_free(base);
++    tcg_temp_free_i32(desc);
++    gen_set_label(over);
++    return true;
++}
++
++static bool ldff_op(DisasContext *s, arg_r2nfvm *a, uint8_t seq)
++{
++    uint32_t data = 0;
++    gen_helper_ldst_us *fn;
++    static gen_helper_ldst_us * const fns[7][4] = {
++        { gen_helper_vlbff_v_b,  gen_helper_vlbff_v_h,
++          gen_helper_vlbff_v_w,  gen_helper_vlbff_v_d },
++        { NULL,                  gen_helper_vlhff_v_h,
++          gen_helper_vlhff_v_w,  gen_helper_vlhff_v_d },
++        { NULL,                  NULL,
++          gen_helper_vlwff_v_w,  gen_helper_vlwff_v_d },
++        { gen_helper_vleff_v_b,  gen_helper_vleff_v_h,
++          gen_helper_vleff_v_w,  gen_helper_vleff_v_d },
++        { gen_helper_vlbuff_v_b, gen_helper_vlbuff_v_h,
++          gen_helper_vlbuff_v_w, gen_helper_vlbuff_v_d },
++        { NULL,                  gen_helper_vlhuff_v_h,
++          gen_helper_vlhuff_v_w, gen_helper_vlhuff_v_d },
++        { NULL,                  NULL,
++          gen_helper_vlwuff_v_w, gen_helper_vlwuff_v_d }
++    };
++
++    fn =  fns[seq][s->sew];
++    if (fn == NULL) {
++        return false;
 +    }
 +
-+    do {
-+        old = atomic_read(&ram_block_discard_disabled);
-+        if (old < 0) {
-+            return -EBUSY;
-+        }
-+    } while (atomic_cmpxchg(&ram_block_discard_disabled, old, old + 1) != old);
-+    return 0;
++    data = FIELD_DP32(data, VDATA, MLEN, s->mlen);
++    data = FIELD_DP32(data, VDATA, VM, a->vm);
++    data = FIELD_DP32(data, VDATA, LMUL, s->lmul);
++    data = FIELD_DP32(data, VDATA, NF, a->nf);
++    return ldff_trans(a->rd, a->rs1, data, fn, s);
 +}
 +
-+int ram_block_discard_require(bool state)
-+{
-+    int old;
++GEN_VEXT_TRANS(vlbff_v, 0, r2nfvm, ldff_op, ld_us_check)
++GEN_VEXT_TRANS(vlhff_v, 1, r2nfvm, ldff_op, ld_us_check)
++GEN_VEXT_TRANS(vlwff_v, 2, r2nfvm, ldff_op, ld_us_check)
++GEN_VEXT_TRANS(vleff_v, 3, r2nfvm, ldff_op, ld_us_check)
++GEN_VEXT_TRANS(vlbuff_v, 4, r2nfvm, ldff_op, ld_us_check)
++GEN_VEXT_TRANS(vlhuff_v, 5, r2nfvm, ldff_op, ld_us_check)
++GEN_VEXT_TRANS(vlwuff_v, 6, r2nfvm, ldff_op, ld_us_check)
+diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+index 9355958d3f..d4d34d2471 100644
+--- a/target/riscv/vector_helper.c
++++ b/target/riscv/vector_helper.c
+@@ -577,3 +577,113 @@ GEN_VEXT_ST_INDEX(vsxe_v_b, int8_t,  int8_t,  idx_b, ste_b)
+ GEN_VEXT_ST_INDEX(vsxe_v_h, int16_t, int16_t, idx_h, ste_h)
+ GEN_VEXT_ST_INDEX(vsxe_v_w, int32_t, int32_t, idx_w, ste_w)
+ GEN_VEXT_ST_INDEX(vsxe_v_d, int64_t, int64_t, idx_d, ste_d)
 +
-+    if (!state) {
-+        atomic_inc(&ram_block_discard_disabled);
-+        return 0;
++/*
++ *** unit-stride fault-only-fisrt load instructions
++ */
++static inline void
++vext_ldff(void *vd, void *v0, target_ulong base,
++          CPURISCVState *env, uint32_t desc,
++          vext_ldst_elem_fn *ldst_elem,
++          clear_fn *clear_elem,
++          uint32_t esz, uint32_t msz, uintptr_t ra)
++{
++    void *host;
++    uint32_t i, k, vl = 0;
++    uint32_t mlen = vext_mlen(desc);
++    uint32_t nf = vext_nf(desc);
++    uint32_t vm = vext_vm(desc);
++    uint32_t vlmax = vext_maxsz(desc) / esz;
++    target_ulong addr, offset, remain;
++
++    /* probe every access*/
++    for (i = 0; i < env->vl; i++) {
++        if (!vm && !vext_elem_mask(v0, mlen, i)) {
++            continue;
++        }
++        addr = base + nf * i * msz;
++        if (i == 0) {
++            probe_pages(env, addr, nf * msz, ra, MMU_DATA_LOAD);
++        } else {
++            /* if it triggers an exception, no need to check watchpoint */
++            remain = nf * msz;
++            while (remain > 0) {
++                offset = -(addr | TARGET_PAGE_MASK);
++                host = tlb_vaddr_to_host(env, addr, MMU_DATA_LOAD,
++                                         cpu_mmu_index(env, false));
++                if (host) {
++#ifdef CONFIG_USER_ONLY
++                    if (page_check_range(addr, nf * msz, PAGE_READ) < 0) {
++                        vl = i;
++                        goto ProbeSuccess;
++                    }
++#else
++                    probe_pages(env, addr, nf * msz, ra, MMU_DATA_LOAD);
++#endif
++                } else {
++                    vl = i;
++                    goto ProbeSuccess;
++                }
++                if (remain <=  offset) {
++                    break;
++                }
++                remain -= offset;
++                addr += offset;
++            }
++        }
 +    }
-+
-+    do {
-+        old = atomic_read(&ram_block_discard_disabled);
-+        if (old > 0) {
-+            return -EBUSY;
++ProbeSuccess:
++    /* load bytes from guest memory */
++    if (vl != 0) {
++        env->vl = vl;
++    }
++    for (i = 0; i < env->vl; i++) {
++        k = 0;
++        if (!vm && !vext_elem_mask(v0, mlen, i)) {
++            continue;
 +        }
-+    } while (atomic_cmpxchg(&ram_block_discard_disabled, old, old - 1) != old);
-+    return 0;
++        while (k < nf) {
++            target_ulong addr = base + (i * nf + k) * msz;
++            ldst_elem(env, addr, i + k * vlmax, vd, ra);
++            k++;
++        }
++    }
++    /* clear tail elements */
++    if (vl != 0) {
++        return;
++    }
++    for (k = 0; k < nf; k++) {
++        clear_elem(vd, env->vl + k * vlmax, env->vl * esz, vlmax * esz);
++    }
 +}
 +
-+bool ram_block_discard_is_disabled(void)
-+{
-+    return atomic_read(&ram_block_discard_disabled) > 0;
++#define GEN_VEXT_LDFF(NAME, MTYPE, ETYPE, LOAD_FN, CLEAR_FN)     \
++void HELPER(NAME)(void *vd, void *v0, target_ulong base,         \
++                  CPURISCVState *env, uint32_t desc)             \
++{                                                                \
++    vext_ldff(vd, v0, base, env, desc, LOAD_FN, CLEAR_FN,        \
++              sizeof(ETYPE), sizeof(MTYPE), GETPC());            \
 +}
 +
-+bool ram_block_discard_is_required(void)
-+{
-+    return atomic_read(&ram_block_discard_disabled) < 0;
-+}
-+
- #endif
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index 3e00cdbbfa..eea7d284b9 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -2474,6 +2474,47 @@ static inline MemOp devend_memop(enum device_endian end)
- }
- #endif
- 
-+/*
-+ * Inhibit technologies that require discarding of pages in RAM blocks, e.g.,
-+ * to manage the actual amount of memory consumed by the VM (then, the memory
-+ * provided by RAM blocks might be bigger than the desired memory consumption).
-+ * This *must* be set if:
-+ * - Discarding parts of a RAM blocks does not result in the change being
-+ *   reflected in the VM and the pages getting freed.
-+ * - All memory in RAM blocks is pinned or duplicated, invaldiating any previous
-+ *   discards blindly.
-+ * - Discarding parts of a RAM blocks will result in integrity issues (e.g.,
-+ *   encrypted VMs).
-+ * Technologies that only temporarily pin the current working set of a
-+ * driver are fine, because we don't expect such pages to be discarded
-+ * (esp. based on guest action like balloon inflation).
-+ *
-+ * This is *not* to be used to protect from concurrent discards (esp.,
-+ * postcopy).
-+ *
-+ * Returns 0 if successful. Returns -EBUSY if a technology that relies on
-+ * discards to work reliably is active.
-+ */
-+int ram_block_discard_disable(bool state);
-+
-+/*
-+ * Inhibit technologies that disable discarding of pages in RAM blocks.
-+ *
-+ * Returns 0 if successful. Returns -EBUSY if discards are already set to
-+ * broken.
-+ */
-+int ram_block_discard_require(bool state);
-+
-+/*
-+ * Test if discarding of memory in ram blocks is disabled.
-+ */
-+bool ram_block_discard_is_disabled(void);
-+
-+/*
-+ * Test if discarding of memory in ram blocks is required to work reliably.
-+ */
-+bool ram_block_discard_is_required(void);
-+
- #endif
- 
- #endif
++GEN_VEXT_LDFF(vlbff_v_b,  int8_t,   int8_t,   ldb_b,  clearb)
++GEN_VEXT_LDFF(vlbff_v_h,  int8_t,   int16_t,  ldb_h,  clearh)
++GEN_VEXT_LDFF(vlbff_v_w,  int8_t,   int32_t,  ldb_w,  clearl)
++GEN_VEXT_LDFF(vlbff_v_d,  int8_t,   int64_t,  ldb_d,  clearq)
++GEN_VEXT_LDFF(vlhff_v_h,  int16_t,  int16_t,  ldh_h,  clearh)
++GEN_VEXT_LDFF(vlhff_v_w,  int16_t,  int32_t,  ldh_w,  clearl)
++GEN_VEXT_LDFF(vlhff_v_d,  int16_t,  int64_t,  ldh_d,  clearq)
++GEN_VEXT_LDFF(vlwff_v_w,  int32_t,  int32_t,  ldw_w,  clearl)
++GEN_VEXT_LDFF(vlwff_v_d,  int32_t,  int64_t,  ldw_d,  clearq)
++GEN_VEXT_LDFF(vleff_v_b,  int8_t,   int8_t,   lde_b,  clearb)
++GEN_VEXT_LDFF(vleff_v_h,  int16_t,  int16_t,  lde_h,  clearh)
++GEN_VEXT_LDFF(vleff_v_w,  int32_t,  int32_t,  lde_w,  clearl)
++GEN_VEXT_LDFF(vleff_v_d,  int64_t,  int64_t,  lde_d,  clearq)
++GEN_VEXT_LDFF(vlbuff_v_b, uint8_t,  uint8_t,  ldbu_b, clearb)
++GEN_VEXT_LDFF(vlbuff_v_h, uint8_t,  uint16_t, ldbu_h, clearh)
++GEN_VEXT_LDFF(vlbuff_v_w, uint8_t,  uint32_t, ldbu_w, clearl)
++GEN_VEXT_LDFF(vlbuff_v_d, uint8_t,  uint64_t, ldbu_d, clearq)
++GEN_VEXT_LDFF(vlhuff_v_h, uint16_t, uint16_t, ldhu_h, clearh)
++GEN_VEXT_LDFF(vlhuff_v_w, uint16_t, uint32_t, ldhu_w, clearl)
++GEN_VEXT_LDFF(vlhuff_v_d, uint16_t, uint64_t, ldhu_d, clearq)
++GEN_VEXT_LDFF(vlwuff_v_w, uint32_t, uint32_t, ldwu_w, clearl)
++GEN_VEXT_LDFF(vlwuff_v_d, uint32_t, uint64_t, ldwu_d, clearq)
 -- 
-2.26.2
+2.23.0
 
 
