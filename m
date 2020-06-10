@@ -2,74 +2,81 @@ Return-Path: <SRS0=wemX=7X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3CFEC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 14:07:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77545C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 14:11:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B400E2067B
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 14:07:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3E4FB2067B
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 14:11:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dH6BvCmv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B400E2067B
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fWLx3bDC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E4FB2067B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60978 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36162 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jj1Nv-000800-Sn
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 10:07:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44738)
+	id 1jj1SL-0001k5-C1
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 10:11:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45634)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jj1NA-0007LK-GC
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 10:06:32 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:32342
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jj1Re-0001FL-G7
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 10:11:10 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:55517
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jj1N8-000179-8S
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 10:06:32 -0400
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jj1Rd-0002Il-Qj
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 10:11:10 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591797988;
+ s=mimecast20190719; t=1591798268;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=T5yh4MU28IH/Cn8TPifu3ZP5Fc6O1Lb46Svy33h8XhQ=;
- b=dH6BvCmvxDE1kxTbwlQvBJklK3up6gzbDT5ht9jxJHIytU5YOZ1LYgpry314XZ5JBzsMs9
- uBnNHCCruBzqATglKxrvhyQ+fwyb4nSTfR1X/MOSnclNZOXtVaBGf88MuVSEi73xMOmX7T
- 2DrtATrKJM8I9G2AZO91uPuPMG5ru5E=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=phthIbgSkiymNcUN8w0aZ9SlQ7+pFpY+Od4p28l49tg=;
+ b=fWLx3bDCf8mbGjK8b4KUiyRKcZhDti9meIUbHVkHWdquipLoMy3n/vpKFfE/F/5KV19VuS
+ 1QD8VE0Zi4VS1LkcLMXHGro5QeSu7gW1bYqoU4rO28YUnDpb1G7gCkFpjXK39UbdXkcZP5
+ 9BuJKmMwor8tdm5MyYo+WKjRhMIhPaw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-180-JoDkAR2HPHuzbUNWLATTzQ-1; Wed, 10 Jun 2020 10:06:25 -0400
-X-MC-Unique: JoDkAR2HPHuzbUNWLATTzQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-378-9hWD8v4NPwio5uQAprQVfA-1; Wed, 10 Jun 2020 10:10:49 -0400
+X-MC-Unique: 9hWD8v4NPwio5uQAprQVfA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E82D5107ACCA;
- Wed, 10 Jun 2020 14:06:23 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-113-151.ams2.redhat.com [10.36.113.151])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3CCE378B3A;
- Wed, 10 Jun 2020 14:06:22 +0000 (UTC)
-Date: Wed, 10 Jun 2020 16:06:20 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Sam Eiderman <sameid@google.com>
-Subject: Re: Clarification regarding new qemu-img convert --target-is-zero flag
-Message-ID: <20200610140620.GE6947@linux.fritz.box>
-References: <CAFr6bU=LjeW5_eGtwL38cher2TM52skohuANNXN9EpO+mA-z8Q@mail.gmail.com>
- <m2imfz877v.fsf@dme.org>
- <CAFr6bUk5LrEL8BPXYkNOqj_jsbxHBfbj_NYryUjszMtG89L+2w@mail.gmail.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5AC2C80B73A;
+ Wed, 10 Jun 2020 14:10:48 +0000 (UTC)
+Received: from thuth.remote.csb (unknown [10.40.192.19])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 296067DFF5;
+ Wed, 10 Jun 2020 14:10:36 +0000 (UTC)
+Subject: Re: [PATCH] hw/vfio/pci-quirks: Fix broken legacy IGD passthrough
+To: Laurent Vivier <laurent@vivier.eu>
+References: <20200610035102.20192-1-thuth@redhat.com>
+ <706060db-46c4-2dee-d746-eba24e6b137d@redhat.com>
+ <a8195883-fb78-0cc1-5e15-e100dcb807de@redhat.com>
+ <c5be50d5-5158-ddcc-8de0-bc6c3cfce12a@vivier.eu>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <c2809e06-5353-ca2d-e195-55c5a3e0dbac@redhat.com>
+Date: Wed, 10 Jun 2020 16:10:35 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <CAFr6bUk5LrEL8BPXYkNOqj_jsbxHBfbj_NYryUjszMtG89L+2w@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <c5be50d5-5158-ddcc-8de0-bc6c3cfce12a@vivier.eu>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=kwolf@redhat.com;
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=thuth@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 23:51:15
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -92,42 +99,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org, David Edmondson <dme@dme.org>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>, Tony Zhang <tzz@google.com>
+Cc: qemu-trivial@nongnu.org, Alex Williamson <alex.williamson@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org, qemu-stable@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 10.06.2020 um 14:19 hat Sam Eiderman geschrieben:
-> Thanks David,
+On 10/06/2020 15.16, Laurent Vivier wrote:
+> Le 10/06/2020 à 09:50, Thomas Huth a écrit :
+>> On 10/06/2020 09.31, Philippe Mathieu-Daudé wrote:
+>>> On 6/10/20 5:51 AM, Thomas Huth wrote:
+>>>> The #ifdef CONFIG_VFIO_IGD in pci-quirks.c is not working since the
+>>>> required header config-devices.h is not included, so that the legacy
+>>>> IGD passthrough is currently broken. Let's include the right header
+>>>> to fix this issue.
+>>>>
+>>>> Buglink: https://bugs.launchpad.net/qemu/+bug/1882784
+>>>> Fixes: 29d62771c81d8fd244a67c14a1d968c268d3fb19
+>>>>        ("hw/vfio: Move the IGD quirk code to a separate file")
+>>>
+>>> What about shorter tag?
+>>>
+>>> Fixes: 29d62771c81 ("vfio: Move the IGD quirk code to a separate file")
+>>
+>> I always forget whether to use the short or the long version for
+>> "Fixes:" ... this can hopefully be fixed (if necessary) when the patch
+>> gets picked up.
 > 
-> Yes, I imaging the following use case:
+> you can add in your ~/.gitconfig
 > 
-> disk.vmdk is a 50 GB disk that contains 12 MB binary of zeroes in its beginning.
-> /dev/sda is a raw disk containing garbage
+> [alias]
+>         showfix = log -1 --format=fixes
+> [pretty]
+>         fixes = Fixes: %h (\"%s\")%nCc: %ae
 > 
-> I invoke:
-> qemu-img convert disk.vmdk -O raw /dev/sda
+> and then:
 > 
-> Required output:
-> The first 12 MB of /dev/sda contain zeros, the rest garbage, qemu-img
-> finishes fast.
-> 
-> Kevin, from what I understood from you, this is the default behavior.
+> $ git showfix 29d62771c81d8fd244a67c14a1d968c268d3fb19
+> Fixes: 29d62771c81d ("hw/vfio: Move the IGD quirk code to a separate file")
 
-Sorry, I misunderstood what you want. qemu-img will write zeros to all
-unallocated parts, too. If it didn't do that, the resulting image on
-/dev/sda wouldn't be a copy of disk.vmdk.
+That's nice, thanks! I've put it now in my gitconfig :-)
 
-As the metadata (which blocks are allocated) cannot be preserved in raw
-images, you wouldn't be able to tell which part of the image contains
-valid data and which part needs to be interpreted as zeros even though
-it contains random garbage.
-
-What is your use case for this result where the actual virtual disk
-content is mixed with garbage?
-
-Kevin
+ Thomas
 
 
