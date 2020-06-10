@@ -2,88 +2,64 @@ Return-Path: <SRS0=wemX=7X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96703C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 12:32:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7061FC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 12:32:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4F9CA206F4
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 12:32:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B2PDAYe+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F9CA206F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 30D7B206F4
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 12:32:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30D7B206F4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56812 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57216 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jizth-0007K5-KC
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 08:32:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48660)
+	id 1jiztq-0007U7-ED
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 08:32:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46264)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1jiziq-0004oV-N8
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 08:20:49 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36163
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1jizin-00082X-RL
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 08:20:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591791644;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=6JmiVpP0lPe3b5F9EGqt2TvgR5UF5i1UayPu6VHkxqQ=;
- b=B2PDAYe+KgCTeE4WFqosI01ppZ/Oj8bF3yGr5WFGt7dLW4UDMv7jp5mCXUjp3dqmfpVWcy
- +I9UewFclVgPwISIUdQDnpcoEF87LOqsqIXL2vsYov0gZJZrfSctIeMynFhZxhujCHoNR1
- NeJH7NdAzKt/F4ly+OrC4Fm09jdPDDI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-333-HEWF9EAlMgu5I18D3_Vw1A-1; Wed, 10 Jun 2020 08:20:41 -0400
-X-MC-Unique: HEWF9EAlMgu5I18D3_Vw1A-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9ECA0A0BEE;
- Wed, 10 Jun 2020 12:20:34 +0000 (UTC)
-Received: from localhost (unknown [10.40.208.64])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E3C538FF76;
- Wed, 10 Jun 2020 12:20:21 +0000 (UTC)
-Date: Wed, 10 Jun 2020 14:20:18 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH v5 3/3] tests/acpi: update expected SRAT files
-Message-ID: <20200610142018.031539fc@redhat.com>
-In-Reply-To: <20200609101341-mutt-send-email-mst@kernel.org>
-References: <20200606000911.9896-1-vishal.l.verma@intel.com>
- <20200606000911.9896-4-vishal.l.verma@intel.com>
- <20200609101341-mutt-send-email-mst@kernel.org>
+ (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jizcV-0006KI-6w; Wed, 10 Jun 2020 08:14:15 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:56331)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jizcT-0006O0-My; Wed, 10 Jun 2020 08:14:14 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07436426|-1; CH=green;
+ DM=|CONTINUE|false|; DS=CONTINUE|ham_system_inform|0.335301-0.0134057-0.651294;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e02c03299; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=9; RT=8; SR=0; TI=SMTPD_---.HkaWva4_1591791244; 
+Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.HkaWva4_1591791244)
+ by smtp.aliyun-inc.com(10.147.42.198);
+ Wed, 10 Jun 2020 20:14:08 +0800
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Subject: [PATCH v9 18/61] target/riscv: vector single-width integer multiply
+ instructions
+Date: Wed, 10 Jun 2020 19:37:05 +0800
+Message-Id: <20200610113748.4754-19-zhiwei_liu@c-sky.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20200610113748.4754-1-zhiwei_liu@c-sky.com>
+References: <20200610113748.4754-1-zhiwei_liu@c-sky.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=imammedo@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 21:17:20
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: none client-ip=121.197.200.217;
+ envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/10 07:37:52
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001, UNPARSEABLE_RELAY=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,225 +72,280 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
- Vishal Verma <vishal.l.verma@intel.com>,
- Dave Hansen <dave.hansen@linux.intel.com>, qemu-devel@nongnu.org,
- Eduardo Habkost <ehabkost@redhat.com>, jingqi.liu@intel.com,
- Paolo Bonzini <pbonzini@redhat.com>, Dan Williams <dan.j.williams@intel.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: richard.henderson@linaro.org, wxy194768@alibaba-inc.com,
+ wenmeng_zhang@c-sky.com, Alistair Francis <alistair.francis@wdc.com>,
+ palmer@dabbelt.com, LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 9 Jun 2020 10:19:14 -0400
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
+Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/riscv/helper.h                   |  33 +++++
+ target/riscv/insn32.decode              |   8 ++
+ target/riscv/insn_trans/trans_rvv.inc.c |  10 ++
+ target/riscv/vector_helper.c            | 163 ++++++++++++++++++++++++
+ 4 files changed, 214 insertions(+)
 
-> On Fri, Jun 05, 2020 at 06:09:11PM -0600, Vishal Verma wrote:
-> > Update expected SRAT files for the change to account for NVDIMM NUMA
-> > nodes in the SRAT.
-> > 
-> > AML diffs:
-> > 
-> > tests/data/acpi/pc/SRAT.dimmpxm:
-> > --- /tmp/asl-3P2IL0.dsl	2020-05-28 15:11:02.326439263 -0600
-> > +++ /tmp/asl-1N4IL0.dsl	2020-05-28 15:11:02.325439280 -0600
-> > @@ -3,7 +3,7 @@
-> >   * AML/ASL+ Disassembler version 20190509 (64-bit version)
-> >   * Copyright (c) 2000 - 2019 Intel Corporation
-> >   *
-> > - * Disassembly of tests/data/acpi/pc/SRAT.dimmpxm, Thu May 28 15:11:02 2020
-> > + * Disassembly of /tmp/aml-4D4IL0, Thu May 28 15:11:02 2020
-> >   *
-> >   * ACPI Data Table [SRAT]
-> >   *
-> > @@ -13,7 +13,7 @@
-> >  [000h 0000   4]                    Signature : "SRAT"    [System Resource Affinity Table]
-> >  [004h 0004   4]                 Table Length : 00000188
-> >  [008h 0008   1]                     Revision : 01
-> > -[009h 0009   1]                     Checksum : 80
-> > +[009h 0009   1]                     Checksum : 68
-> >  [00Ah 0010   6]                       Oem ID : "BOCHS "
-> >  [010h 0016   8]                 Oem Table ID : "BXPCSRAT"
-> >  [018h 0024   4]                 Oem Revision : 00000001
-> > @@ -140,15 +140,15 @@
-> >  [138h 0312   1]                Subtable Type : 01 [Memory Affinity]
-> >  [139h 0313   1]                       Length : 28
-> > 
-> > -[13Ah 0314   4]             Proximity Domain : 00000000
-> > +[13Ah 0314   4]             Proximity Domain : 00000002
-> >  [13Eh 0318   2]                    Reserved1 : 0000
-> > -[140h 0320   8]                 Base Address : 0000000000000000
-> > -[148h 0328   8]               Address Length : 0000000000000000
-> > +[140h 0320   8]                 Base Address : 0000000108000000
-> > +[148h 0328   8]               Address Length : 0000000008000000
-> >  [150h 0336   4]                    Reserved2 : 00000000
-> > -[154h 0340   4]        Flags (decoded below) : 00000000
-> > -                                     Enabled : 0
-> > +[154h 0340   4]        Flags (decoded below) : 00000005
-> > +                                     Enabled : 1
-> >                                 Hot Pluggable : 0
-> > -                                Non-Volatile : 0
-> > +                                Non-Volatile : 1
-> >  [158h 0344   8]                    Reserved3 : 0000000000000000
-> > 
-> >  [160h 0352   1]                Subtable Type : 01 [Memory Affinity]
-> > 
-> > tests/data/acpi/q35/SRAT.dimmpxm:
-> > --- /tmp/asl-HW2LL0.dsl	2020-05-28 15:11:05.446384514 -0600
-> > +++ /tmp/asl-8MYLL0.dsl	2020-05-28 15:11:05.445384532 -0600
-> > @@ -3,7 +3,7 @@
-> >   * AML/ASL+ Disassembler version 20190509 (64-bit version)
-> >   * Copyright (c) 2000 - 2019 Intel Corporation
-> >   *
-> > - * Disassembly of tests/data/acpi/q35/SRAT.dimmpxm, Thu May 28 15:11:05 2020
-> > + * Disassembly of /tmp/aml-2CYLL0, Thu May 28 15:11:05 2020
-> >   *
-> >   * ACPI Data Table [SRAT]
-> >   *
-> > @@ -13,7 +13,7 @@
-> >  [000h 0000   4]                    Signature : "SRAT"    [System Resource Affinity Table]
-> >  [004h 0004   4]                 Table Length : 00000188
-> >  [008h 0008   1]                     Revision : 01
-> > -[009h 0009   1]                     Checksum : 80
-> > +[009h 0009   1]                     Checksum : 68
-> >  [00Ah 0010   6]                       Oem ID : "BOCHS "
-> >  [010h 0016   8]                 Oem Table ID : "BXPCSRAT"
-> >  [018h 0024   4]                 Oem Revision : 00000001
-> > @@ -140,15 +140,15 @@
-> >  [138h 0312   1]                Subtable Type : 01 [Memory Affinity]
-> >  [139h 0313   1]                       Length : 28
-> > 
-> > -[13Ah 0314   4]             Proximity Domain : 00000000
-> > +[13Ah 0314   4]             Proximity Domain : 00000002
-> >  [13Eh 0318   2]                    Reserved1 : 0000
-> > -[140h 0320   8]                 Base Address : 0000000000000000
-> > -[148h 0328   8]               Address Length : 0000000000000000
-> > +[140h 0320   8]                 Base Address : 0000000108000000
-> > +[148h 0328   8]               Address Length : 0000000008000000
-> >  [150h 0336   4]                    Reserved2 : 00000000
-> > -[154h 0340   4]        Flags (decoded below) : 00000000
-> > -                                     Enabled : 0
-> > +[154h 0340   4]        Flags (decoded below) : 00000005
-> > +                                     Enabled : 1
-> >                                 Hot Pluggable : 0
-> > -                                Non-Volatile : 0
-> > +                                Non-Volatile : 1
-> >  [158h 0344   8]                    Reserved3 : 0000000000000000
-> > 
-> >  [160h 0352   1]                Subtable Type : 01 [Memory Affinity]
-> > 
-> > tests/data/acpi/virt/SRAT.memhp:
-> > --- /tmp/asl-E32WL0.dsl	2020-05-28 15:19:56.976095582 -0600
-> > +++ /tmp/asl-Y69WL0.dsl	2020-05-28 15:19:56.974095617 -0600
-> > @@ -3,7 +3,7 @@
-> >   * AML/ASL+ Disassembler version 20190509 (64-bit version)
-> >   * Copyright (c) 2000 - 2019 Intel Corporation
-> >   *
-> > - * Disassembly of tests/data/acpi/virt/SRAT.memhp, Thu May 28 15:19:56 2020
-> > + * Disassembly of /tmp/aml-2CCXL0, Thu May 28 15:19:56 2020
-> >   *
-> >   * ACPI Data Table [SRAT]
-> >   *
-> > @@ -11,9 +11,9 @@
-> >   */
-> > 
-> >  [000h 0000   4]                    Signature : "SRAT"    [System Resource Affinity Table]
-> > -[004h 0004   4]                 Table Length : 000000BA
-> > +[004h 0004   4]                 Table Length : 000000E2
-> >  [008h 0008   1]                     Revision : 03
-> > -[009h 0009   1]                     Checksum : 43
-> > +[009h 0009   1]                     Checksum : 5C
-> >  [00Ah 0010   6]                       Oem ID : "BOCHS "
-> >  [010h 0016   8]                 Oem Table ID : "BXPCSRAT"
-> >  [018h 0024   4]                 Oem Revision : 00000001
-> > @@ -65,18 +65,32 @@
-> > 
-> >  [094h 0148   4]             Proximity Domain : 00000001
-> >  [098h 0152   2]                    Reserved1 : 0000
-> > -[09Ah 0154   8]                 Base Address : 0000000080000000
-> > -[0A2h 0162   8]               Address Length : 00000000F0000000
-> > +[09Ah 0154   8]                 Base Address : 0000000088000000
-> > +[0A2h 0162   8]               Address Length : 0000000008000000
-> >  [0AAh 0170   4]                    Reserved2 : 00000000
-> > -[0AEh 0174   4]        Flags (decoded below) : 00000003
-> > +[0AEh 0174   4]        Flags (decoded below) : 00000005
-> > +                                     Enabled : 1
-> > +                               Hot Pluggable : 0
-> > +                                Non-Volatile : 1
-> > +[0B2h 0178   8]                    Reserved3 : 0000000000000000
-> > +
-> > +[0BAh 0186   1]                Subtable Type : 01 [Memory Affinity]
-> > +[0BBh 0187   1]                       Length : 28
-> > +
-> > +[0BCh 0188   4]             Proximity Domain : 00000001
-> > +[0C0h 0192   2]                    Reserved1 : 0000
-> > +[0C2h 0194   8]                 Base Address : 0000000080000000
-> > +[0CAh 0202   8]               Address Length : 00000000F0000000
-> > +[0D2h 0210   4]                    Reserved2 : 00000000
-> > +[0D6h 0214   4]        Flags (decoded below) : 00000003
-> >                                       Enabled : 1
-> >                                 Hot Pluggable : 1
-> >                                  Non-Volatile : 0
-> > -[0B2h 0178   8]                    Reserved3 : 0000000000000000
-> > +[0DAh 0218   8]                    Reserved3 : 0000000000000000
-> > 
-> > Signed-off-by: Vishal Verma <vishal.l.verma@intel.com>  
-> 
-> So I went to apply this and notices that virt tests
-> did not seem to run. Igor did you notice this too?
-> Anyway, not this patch's fault.
-> 
-
-It runs fine here on current master + patches 1-2
-3/3 doesn't apply cleanly anymore.
-
-> 
-> > ---
-> >  tests/data/acpi/pc/SRAT.dimmpxm             | Bin 392 -> 392 bytes
-> >  tests/data/acpi/q35/SRAT.dimmpxm            | Bin 392 -> 392 bytes
-> >  tests/data/acpi/virt/SRAT.memhp             | Bin 186 -> 226 bytes
-> >  tests/qtest/bios-tables-test-allowed-diff.h |   3 ---
-> >  4 files changed, 3 deletions(-)
-> > 
-> > diff --git a/tests/data/acpi/pc/SRAT.dimmpxm b/tests/data/acpi/pc/SRAT.dimmpxm
-> > index f5c0267ea24bb404b6b4e687390140378fbdc3f1..5a13c61b9041c6045c29643bf93a111fb1c0c76a 100644
-> > GIT binary patch
-> > delta 51
-> > scmeBR?qKE$4ss0XU}Rum%-G0fz$nec00kUCF%aN@Pz(&LlS3Je0lmQmhyVZp
-> > 
-> > delta 51
-> > icmeBR?qKE$4ss0XU}RumY}m+Uz$ndt8%z#mGzI{_tp$hx
-> > 
-> > diff --git a/tests/data/acpi/q35/SRAT.dimmpxm b/tests/data/acpi/q35/SRAT.dimmpxm
-> > index f5c0267ea24bb404b6b4e687390140378fbdc3f1..5a13c61b9041c6045c29643bf93a111fb1c0c76a 100644
-> > GIT binary patch
-> > delta 51
-> > scmeBR?qKE$4ss0XU}Rum%-G0fz$nec00kUCF%aN@Pz(&LlS3Je0lmQmhyVZp
-> > 
-> > delta 51
-> > icmeBR?qKE$4ss0XU}RumY}m+Uz$ndt8%z#mGzI{_tp$hx
-> > 
-> > diff --git a/tests/data/acpi/virt/SRAT.memhp b/tests/data/acpi/virt/SRAT.memhp
-> > index 1b57db2072e7f7e2085c4a427aa31c7383851b71..9a35adb40c6f7cd822e5af37abba8aad033617cb 100644
-> > GIT binary patch
-> > delta 43
-> > rcmdnR_=u4!ILI;N5d#AQbIe4p$wD1K76@=aC<X@BiSc3+=gI;A(y0ha
-> > 
-> > delta 21
-> > dcmaFFxQmf1ILI+%7Xt$Wv-3o*$rF#t0suzv27~|r
-> > 
-> > diff --git a/tests/qtest/bios-tables-test-allowed-diff.h b/tests/qtest/bios-tables-test-allowed-diff.h
-> > index e8f2766a63..dfb8523c8b 100644
-> > --- a/tests/qtest/bios-tables-test-allowed-diff.h
-> > +++ b/tests/qtest/bios-tables-test-allowed-diff.h
-> > @@ -1,4 +1 @@
-> >  /* List of comma-separated changed AML files to ignore */
-> > -"tests/data/acpi/pc/SRAT.dimmpxm",
-> > -"tests/data/acpi/q35/SRAT.dimmpxm",
-> > -"tests/data/acpi/virt/SRAT.memhp",
-> > -- 
-> > 2.26.2  
-> 
+diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+index 32f4c76b34..08c1c02e13 100644
+--- a/target/riscv/helper.h
++++ b/target/riscv/helper.h
+@@ -529,3 +529,36 @@ DEF_HELPER_6(vmax_vx_b, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vmax_vx_h, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vmax_vx_w, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vmax_vx_d, void, ptr, ptr, tl, ptr, env, i32)
++
++DEF_HELPER_6(vmul_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmul_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmul_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmul_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmulh_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmulh_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmulh_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmulh_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmulhu_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmulhu_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmulhu_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmulhu_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmulhsu_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmulhsu_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmulhsu_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmulhsu_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmul_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmul_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmul_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmul_vx_d, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmulh_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmulh_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmulh_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmulh_vx_d, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmulhu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmulhu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmulhu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmulhu_vx_d, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmulhsu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmulhsu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmulhsu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmulhsu_vx_d, void, ptr, ptr, tl, ptr, env, i32)
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index aafbdc6be7..abfed469bc 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -363,6 +363,14 @@ vmaxu_vv        000110 . ..... ..... 000 ..... 1010111 @r_vm
+ vmaxu_vx        000110 . ..... ..... 100 ..... 1010111 @r_vm
+ vmax_vv         000111 . ..... ..... 000 ..... 1010111 @r_vm
+ vmax_vx         000111 . ..... ..... 100 ..... 1010111 @r_vm
++vmul_vv         100101 . ..... ..... 010 ..... 1010111 @r_vm
++vmul_vx         100101 . ..... ..... 110 ..... 1010111 @r_vm
++vmulh_vv        100111 . ..... ..... 010 ..... 1010111 @r_vm
++vmulh_vx        100111 . ..... ..... 110 ..... 1010111 @r_vm
++vmulhu_vv       100100 . ..... ..... 010 ..... 1010111 @r_vm
++vmulhu_vx       100100 . ..... ..... 110 ..... 1010111 @r_vm
++vmulhsu_vv      100110 . ..... ..... 010 ..... 1010111 @r_vm
++vmulhsu_vx      100110 . ..... ..... 110 ..... 1010111 @r_vm
+ 
+ vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
+ vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
+diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+index cbcb40e682..de5b8b7df6 100644
+--- a/target/riscv/insn_trans/trans_rvv.inc.c
++++ b/target/riscv/insn_trans/trans_rvv.inc.c
+@@ -1571,3 +1571,13 @@ GEN_OPIVX_TRANS(vminu_vx, opivx_check)
+ GEN_OPIVX_TRANS(vmin_vx,  opivx_check)
+ GEN_OPIVX_TRANS(vmaxu_vx, opivx_check)
+ GEN_OPIVX_TRANS(vmax_vx,  opivx_check)
++
++/* Vector Single-Width Integer Multiply Instructions */
++GEN_OPIVV_GVEC_TRANS(vmul_vv,  mul)
++GEN_OPIVV_TRANS(vmulh_vv, opivv_check)
++GEN_OPIVV_TRANS(vmulhu_vv, opivv_check)
++GEN_OPIVV_TRANS(vmulhsu_vv, opivv_check)
++GEN_OPIVX_GVEC_TRANS(vmul_vx,  muls)
++GEN_OPIVX_TRANS(vmulh_vx, opivx_check)
++GEN_OPIVX_TRANS(vmulhu_vx, opivx_check)
++GEN_OPIVX_TRANS(vmulhsu_vx, opivx_check)
+diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+index cb41daa3ac..3319370ae2 100644
+--- a/target/riscv/vector_helper.c
++++ b/target/riscv/vector_helper.c
+@@ -859,6 +859,10 @@ GEN_VEXT_AMO(vamomaxuw_v_w, uint32_t, uint32_t, idx_w, clearl)
+ #define OP_UUU_H uint16_t, uint16_t, uint16_t, uint16_t, uint16_t
+ #define OP_UUU_W uint32_t, uint32_t, uint32_t, uint32_t, uint32_t
+ #define OP_UUU_D uint64_t, uint64_t, uint64_t, uint64_t, uint64_t
++#define OP_SUS_B int8_t, uint8_t, int8_t, uint8_t, int8_t
++#define OP_SUS_H int16_t, uint16_t, int16_t, uint16_t, int16_t
++#define OP_SUS_W int32_t, uint32_t, int32_t, uint32_t, int32_t
++#define OP_SUS_D int64_t, uint64_t, int64_t, uint64_t, int64_t
+ 
+ /* operation of two vector elements */
+ typedef void opivv2_fn(void *vd, void *vs1, void *vs2, int i);
+@@ -1603,3 +1607,162 @@ GEN_VEXT_VX(vmax_vx_b, 1, 1, clearb)
+ GEN_VEXT_VX(vmax_vx_h, 2, 2, clearh)
+ GEN_VEXT_VX(vmax_vx_w, 4, 4, clearl)
+ GEN_VEXT_VX(vmax_vx_d, 8, 8, clearq)
++
++/* Vector Single-Width Integer Multiply Instructions */
++#define DO_MUL(N, M) (N * M)
++RVVCALL(OPIVV2, vmul_vv_b, OP_SSS_B, H1, H1, H1, DO_MUL)
++RVVCALL(OPIVV2, vmul_vv_h, OP_SSS_H, H2, H2, H2, DO_MUL)
++RVVCALL(OPIVV2, vmul_vv_w, OP_SSS_W, H4, H4, H4, DO_MUL)
++RVVCALL(OPIVV2, vmul_vv_d, OP_SSS_D, H8, H8, H8, DO_MUL)
++GEN_VEXT_VV(vmul_vv_b, 1, 1, clearb)
++GEN_VEXT_VV(vmul_vv_h, 2, 2, clearh)
++GEN_VEXT_VV(vmul_vv_w, 4, 4, clearl)
++GEN_VEXT_VV(vmul_vv_d, 8, 8, clearq)
++
++static int8_t do_mulh_b(int8_t s2, int8_t s1)
++{
++    return (int16_t)s2 * (int16_t)s1 >> 8;
++}
++
++static int16_t do_mulh_h(int16_t s2, int16_t s1)
++{
++    return (int32_t)s2 * (int32_t)s1 >> 16;
++}
++
++static int32_t do_mulh_w(int32_t s2, int32_t s1)
++{
++    return (int64_t)s2 * (int64_t)s1 >> 32;
++}
++
++static int64_t do_mulh_d(int64_t s2, int64_t s1)
++{
++    uint64_t hi_64, lo_64;
++
++    muls64(&lo_64, &hi_64, s1, s2);
++    return hi_64;
++}
++
++static uint8_t do_mulhu_b(uint8_t s2, uint8_t s1)
++{
++    return (uint16_t)s2 * (uint16_t)s1 >> 8;
++}
++
++static uint16_t do_mulhu_h(uint16_t s2, uint16_t s1)
++{
++    return (uint32_t)s2 * (uint32_t)s1 >> 16;
++}
++
++static uint32_t do_mulhu_w(uint32_t s2, uint32_t s1)
++{
++    return (uint64_t)s2 * (uint64_t)s1 >> 32;
++}
++
++static uint64_t do_mulhu_d(uint64_t s2, uint64_t s1)
++{
++    uint64_t hi_64, lo_64;
++
++    mulu64(&lo_64, &hi_64, s2, s1);
++    return hi_64;
++}
++
++static int8_t do_mulhsu_b(int8_t s2, uint8_t s1)
++{
++    return (int16_t)s2 * (uint16_t)s1 >> 8;
++}
++
++static int16_t do_mulhsu_h(int16_t s2, uint16_t s1)
++{
++    return (int32_t)s2 * (uint32_t)s1 >> 16;
++}
++
++static int32_t do_mulhsu_w(int32_t s2, uint32_t s1)
++{
++    return (int64_t)s2 * (uint64_t)s1 >> 32;
++}
++
++/*
++ * Let  A = signed operand,
++ *      B = unsigned operand
++ *      P = mulu64(A, B), unsigned product
++ *
++ * LET  X = 2 ** 64  - A, 2's complement of A
++ *      SP = signed product
++ * THEN
++ *      IF A < 0
++ *          SP = -X * B
++ *             = -(2 ** 64 - A) * B
++ *             = A * B - 2 ** 64 * B
++ *             = P - 2 ** 64 * B
++ *      ELSE
++ *          SP = P
++ * THEN
++ *      HI_P -= (A < 0 ? B : 0）
++ */
++
++static int64_t do_mulhsu_d(int64_t s2, uint64_t s1)
++{
++    uint64_t hi_64, lo_64;
++
++    mulu64(&lo_64, &hi_64, s2, s1);
++
++    hi_64 -= s2 < 0 ? s1 : 0;
++    return hi_64;
++}
++
++RVVCALL(OPIVV2, vmulh_vv_b, OP_SSS_B, H1, H1, H1, do_mulh_b)
++RVVCALL(OPIVV2, vmulh_vv_h, OP_SSS_H, H2, H2, H2, do_mulh_h)
++RVVCALL(OPIVV2, vmulh_vv_w, OP_SSS_W, H4, H4, H4, do_mulh_w)
++RVVCALL(OPIVV2, vmulh_vv_d, OP_SSS_D, H8, H8, H8, do_mulh_d)
++RVVCALL(OPIVV2, vmulhu_vv_b, OP_UUU_B, H1, H1, H1, do_mulhu_b)
++RVVCALL(OPIVV2, vmulhu_vv_h, OP_UUU_H, H2, H2, H2, do_mulhu_h)
++RVVCALL(OPIVV2, vmulhu_vv_w, OP_UUU_W, H4, H4, H4, do_mulhu_w)
++RVVCALL(OPIVV2, vmulhu_vv_d, OP_UUU_D, H8, H8, H8, do_mulhu_d)
++RVVCALL(OPIVV2, vmulhsu_vv_b, OP_SUS_B, H1, H1, H1, do_mulhsu_b)
++RVVCALL(OPIVV2, vmulhsu_vv_h, OP_SUS_H, H2, H2, H2, do_mulhsu_h)
++RVVCALL(OPIVV2, vmulhsu_vv_w, OP_SUS_W, H4, H4, H4, do_mulhsu_w)
++RVVCALL(OPIVV2, vmulhsu_vv_d, OP_SUS_D, H8, H8, H8, do_mulhsu_d)
++GEN_VEXT_VV(vmulh_vv_b, 1, 1, clearb)
++GEN_VEXT_VV(vmulh_vv_h, 2, 2, clearh)
++GEN_VEXT_VV(vmulh_vv_w, 4, 4, clearl)
++GEN_VEXT_VV(vmulh_vv_d, 8, 8, clearq)
++GEN_VEXT_VV(vmulhu_vv_b, 1, 1, clearb)
++GEN_VEXT_VV(vmulhu_vv_h, 2, 2, clearh)
++GEN_VEXT_VV(vmulhu_vv_w, 4, 4, clearl)
++GEN_VEXT_VV(vmulhu_vv_d, 8, 8, clearq)
++GEN_VEXT_VV(vmulhsu_vv_b, 1, 1, clearb)
++GEN_VEXT_VV(vmulhsu_vv_h, 2, 2, clearh)
++GEN_VEXT_VV(vmulhsu_vv_w, 4, 4, clearl)
++GEN_VEXT_VV(vmulhsu_vv_d, 8, 8, clearq)
++
++RVVCALL(OPIVX2, vmul_vx_b, OP_SSS_B, H1, H1, DO_MUL)
++RVVCALL(OPIVX2, vmul_vx_h, OP_SSS_H, H2, H2, DO_MUL)
++RVVCALL(OPIVX2, vmul_vx_w, OP_SSS_W, H4, H4, DO_MUL)
++RVVCALL(OPIVX2, vmul_vx_d, OP_SSS_D, H8, H8, DO_MUL)
++RVVCALL(OPIVX2, vmulh_vx_b, OP_SSS_B, H1, H1, do_mulh_b)
++RVVCALL(OPIVX2, vmulh_vx_h, OP_SSS_H, H2, H2, do_mulh_h)
++RVVCALL(OPIVX2, vmulh_vx_w, OP_SSS_W, H4, H4, do_mulh_w)
++RVVCALL(OPIVX2, vmulh_vx_d, OP_SSS_D, H8, H8, do_mulh_d)
++RVVCALL(OPIVX2, vmulhu_vx_b, OP_UUU_B, H1, H1, do_mulhu_b)
++RVVCALL(OPIVX2, vmulhu_vx_h, OP_UUU_H, H2, H2, do_mulhu_h)
++RVVCALL(OPIVX2, vmulhu_vx_w, OP_UUU_W, H4, H4, do_mulhu_w)
++RVVCALL(OPIVX2, vmulhu_vx_d, OP_UUU_D, H8, H8, do_mulhu_d)
++RVVCALL(OPIVX2, vmulhsu_vx_b, OP_SUS_B, H1, H1, do_mulhsu_b)
++RVVCALL(OPIVX2, vmulhsu_vx_h, OP_SUS_H, H2, H2, do_mulhsu_h)
++RVVCALL(OPIVX2, vmulhsu_vx_w, OP_SUS_W, H4, H4, do_mulhsu_w)
++RVVCALL(OPIVX2, vmulhsu_vx_d, OP_SUS_D, H8, H8, do_mulhsu_d)
++GEN_VEXT_VX(vmul_vx_b, 1, 1, clearb)
++GEN_VEXT_VX(vmul_vx_h, 2, 2, clearh)
++GEN_VEXT_VX(vmul_vx_w, 4, 4, clearl)
++GEN_VEXT_VX(vmul_vx_d, 8, 8, clearq)
++GEN_VEXT_VX(vmulh_vx_b, 1, 1, clearb)
++GEN_VEXT_VX(vmulh_vx_h, 2, 2, clearh)
++GEN_VEXT_VX(vmulh_vx_w, 4, 4, clearl)
++GEN_VEXT_VX(vmulh_vx_d, 8, 8, clearq)
++GEN_VEXT_VX(vmulhu_vx_b, 1, 1, clearb)
++GEN_VEXT_VX(vmulhu_vx_h, 2, 2, clearh)
++GEN_VEXT_VX(vmulhu_vx_w, 4, 4, clearl)
++GEN_VEXT_VX(vmulhu_vx_d, 8, 8, clearq)
++GEN_VEXT_VX(vmulhsu_vx_b, 1, 1, clearb)
++GEN_VEXT_VX(vmulhsu_vx_h, 2, 2, clearh)
++GEN_VEXT_VX(vmulhsu_vx_w, 4, 4, clearl)
++GEN_VEXT_VX(vmulhsu_vx_d, 8, 8, clearq)
+-- 
+2.23.0
 
 
