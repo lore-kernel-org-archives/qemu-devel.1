@@ -2,115 +2,62 @@ Return-Path: <SRS0=wemX=7X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A9E4C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:48:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7992C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:48:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E079620734
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:48:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E079620734
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id ABF2A20734
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:48:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ABF2A20734
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32878 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34470 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jj15h-0001xk-3x
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 09:48:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36448)
+	id 1jj165-0002d6-T7
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 09:48:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33818)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pasic@linux.ibm.com>)
- id 1jj12A-000772-Vb; Wed, 10 Jun 2020 09:44:50 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50992)
+ (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jj0wQ-0005y0-U4; Wed, 10 Jun 2020 09:38:54 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:37040)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pasic@linux.ibm.com>)
- id 1jj129-0003Nt-9X; Wed, 10 Jun 2020 09:44:50 -0400
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 05ACxCOt064679; Wed, 10 Jun 2020 09:01:43 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 31k00qr287-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 10 Jun 2020 09:01:42 -0400
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05ACxMwF065202;
- Wed, 10 Jun 2020 09:01:29 -0400
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com
- [149.81.74.106])
- by mx0a-001b2d01.pphosted.com with ESMTP id 31k00qr1xn-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 10 Jun 2020 09:01:27 -0400
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
- by ppma04fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05AD0jXR019405;
- Wed, 10 Jun 2020 13:01:06 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com
- (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
- by ppma04fra.de.ibm.com with ESMTP id 31g2s7u4ww-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 10 Jun 2020 13:01:06 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
- [9.149.105.62])
- by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 05AD13dd1638664
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 10 Jun 2020 13:01:03 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 68499AE056;
- Wed, 10 Jun 2020 13:01:03 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id B65DCAE05A;
- Wed, 10 Jun 2020 13:01:02 +0000 (GMT)
-Received: from oc2783563651 (unknown [9.145.127.50])
- by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Wed, 10 Jun 2020 13:01:02 +0000 (GMT)
-Date: Wed, 10 Jun 2020 15:00:33 +0200
-From: Halil Pasic <pasic@linux.ibm.com>
-To: David Hildenbrand <david@redhat.com>
-Subject: Re: [PATCH v2 1/1] virtio-ccw: auto-manage VIRTIO_F_IOMMU_PLATFORM
- if PV
-Message-ID: <20200610150033.5608ff95.pasic@linux.ibm.com>
-In-Reply-To: <858e9554-a4c7-6487-121b-ac3eaa209cb7@redhat.com>
-References: <20200606013217.2cffa3ed.pasic@linux.ibm.com>
- <20200608181428.3c6f127c.cohuck@redhat.com>
- <20200608190045.319dd68b.pasic@linux.ibm.com>
- <20200609084402.35d317ec.cohuck@redhat.com>
- <20200609114130.0ca9190b.pasic@linux.ibm.com>
- <20200609174747.4e300818@ibm-vm>
- <20200609182839.7ac80938.pasic@linux.ibm.com>
- <20200609124155-mutt-send-email-mst@kernel.org>
- <20200610043118.GF494336@umbus.fritz.box>
- <4e5d62d8-9bfb-67d5-7398-2079729fd85e@redhat.com>
- <20200610100756.GO494336@umbus.fritz.box>
- <858e9554-a4c7-6487-121b-ac3eaa209cb7@redhat.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
+ (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jj0wO-0002XV-AK; Wed, 10 Jun 2020 09:38:54 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07815792|-1; CH=blue; DM=|OVERLOAD|false|;
+ DS=CONTINUE|ham_system_inform|0.16566-4.4491e-05-0.834296;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e02c03306; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=8; RT=8; SR=0; TI=SMTPD_---.HkbcsEO_1591796322; 
+Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.HkbcsEO_1591796322)
+ by smtp.aliyun-inc.com(10.147.43.230);
+ Wed, 10 Jun 2020 21:38:42 +0800
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Subject: [PATCH v9 60/61] target/riscv: vector compress instruction
+Date: Wed, 10 Jun 2020 19:37:47 +0800
+Message-Id: <20200610113748.4754-61-zhiwei_liu@c-sky.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20200610113748.4754-1-zhiwei_liu@c-sky.com>
+References: <20200610113748.4754-1-zhiwei_liu@c-sky.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
- definitions=2020-06-10_07:2020-06-10,
- 2020-06-10 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 suspectscore=0
- cotscore=-2147483648 mlxlogscore=999 clxscore=1015 malwarescore=0
- impostorscore=0 bulkscore=0 spamscore=0 lowpriorityscore=0 mlxscore=0
- priorityscore=1501 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2006100095
-Received-SPF: pass client-ip=148.163.158.5; envelope-from=pasic@linux.ibm.com;
- helo=mx0b-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/10 08:25:00
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
-X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Received-SPF: none client-ip=121.197.200.217;
+ envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/10 07:37:52
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001, UNPARSEABLE_RELAY=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -123,76 +70,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Boris Fiuczynski <fiuczy@linux.ibm.com>,
- Janosch Frank <frankja@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, Richard Henderson <rth@twiddle.net>,
- Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Viktor Mihajlovski <mihajlov@linux.ibm.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: richard.henderson@linaro.org, wxy194768@alibaba-inc.com,
+ wenmeng_zhang@c-sky.com, Alistair.Francis@wdc.com, palmer@dabbelt.com,
+ LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 10 Jun 2020 12:24:14 +0200
-David Hildenbrand <david@redhat.com> wrote:
+Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/riscv/helper.h                   |  5 ++++
+ target/riscv/insn32.decode              |  1 +
+ target/riscv/insn_trans/trans_rvv.inc.c | 32 +++++++++++++++++++++++++
+ target/riscv/vector_helper.c            | 26 ++++++++++++++++++++
+ 4 files changed, 64 insertions(+)
 
-> On 10.06.20 12:07, David Gibson wrote:
-> > On Wed, Jun 10, 2020 at 09:22:45AM +0200, David Hildenbrand wrote:
-> >> On 10.06.20 06:31, David Gibson wrote:
-> >>> On Tue, Jun 09, 2020 at 12:44:39PM -0400, Michael S. Tsirkin wrote:
-> >>>> On Tue, Jun 09, 2020 at 06:28:39PM +0200, Halil Pasic wrote:
-> >>>>> On Tue, 9 Jun 2020 17:47:47 +0200
-> >>>>> Claudio Imbrenda <imbrenda@linux.ibm.com> wrote:
-> >>>>>
-> >>>>>> On Tue, 9 Jun 2020 11:41:30 +0200
-> >>>>>> Halil Pasic <pasic@linux.ibm.com> wrote:
-> >>>>>>
-> >>>>>> [...]
-> >>>>>>
-> >>>>>>> I don't know. Janosch could answer that, but he is on vacation. Adding
-> >>>>>>> Claudio maybe he can answer. My understanding is, that while it might
-> >>>>>>> be possible, it is ugly at best. The ability to do a transition is
-> >>>>>>> indicated by a CPU model feature. Indicating the feature to the guest
-> >>>>>>> and then failing the transition sounds wrong to me.
-> >>>>>>
-> >>>>>> I agree. If the feature is advertised, then it has to work. I don't
-> >>>>>> think we even have an architected way to fail the transition for that
-> >>>>>> reason.
-> >>>>>>
-> >>>>>> What __could__ be done is to prevent qemu from even starting if an
-> >>>>>> incompatible device is specified together with PV.
-> >>>>>
-> >>>>> AFAIU, the "specified together with PV" is the problem here. Currently
-> >>>>> we don't "specify PV" but PV is just a capability that is managed by the
-> >>>>> CPU model (like so many other).
-> >>>>
-> >>>> So if we want to keep it user friendly, there could be
-> >>>> protection property with values on/off/auto, and auto
-> >>>> would poke at host capability to figure out whether
-> >>>> it's supported.
-> >>>>
-> >>>> Both virtio and CPU would inherit from that.
-> >>>
-> >>> Right, that's what I have in mind for my 'host-trust-limitation'
-> >>> property (a generalized version of the existing 'memory-encryption'
-> >>> machine option).  My draft patches already set virtio properties
-> >>> accordingly, it should be possible to set (default) cpu properties as
-> >>> well.
-> >>
-> >> No crazy CPU model hacks please (at least speaking for the s390x).
-> > 
-> > Uh... I'm not really sure what you have in mind here.
-> > 
-> 
-> Reading along I got the impression that we want to glue the availability
-> of CPU features to other QEMU cmdline parameters (besides the
-> accelerator). ("to set (default) cpu properties as well"). If we are
-> talking about other CPU properties not expressed as CPU features (e.g.,
-> -cpu X,Y=on ...), then there is no issue.
-> 
-
-I share the concerns broght forward by David.
+diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+index 3da863ac13..8d97114d81 100644
+--- a/target/riscv/helper.h
++++ b/target/riscv/helper.h
+@@ -1139,3 +1139,8 @@ DEF_HELPER_6(vrgather_vx_b, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vrgather_vx_h, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vrgather_vx_w, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vrgather_vx_d, void, ptr, ptr, tl, ptr, env, i32)
++
++DEF_HELPER_6(vcompress_vm_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vcompress_vm_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vcompress_vm_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vcompress_vm_d, void, ptr, ptr, ptr, ptr, env, i32)
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index e07ff7eff6..a37e205eb7 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -575,6 +575,7 @@ vslide1down_vx  001111 . ..... ..... 110 ..... 1010111 @r_vm
+ vrgather_vv     001100 . ..... ..... 000 ..... 1010111 @r_vm
+ vrgather_vx     001100 . ..... ..... 100 ..... 1010111 @r_vm
+ vrgather_vi     001100 . ..... ..... 011 ..... 1010111 @r_vm
++vcompress_vm    010111 - ..... ..... 010 ..... 1010111 @r
+ 
+ vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
+ vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
+diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+index f6547f7e6d..ebc4e8174f 100644
+--- a/target/riscv/insn_trans/trans_rvv.inc.c
++++ b/target/riscv/insn_trans/trans_rvv.inc.c
+@@ -2854,3 +2854,35 @@ static bool trans_vrgather_vi(DisasContext *s, arg_rmrr *a)
+     }
+     return true;
+ }
++
++/* Vector Compress Instruction */
++static bool vcompress_vm_check(DisasContext *s, arg_r *a)
++{
++    return (vext_check_isa_ill(s) &&
++            vext_check_reg(s, a->rd, false) &&
++            vext_check_reg(s, a->rs2, false) &&
++            vext_check_overlap_group(a->rd, 1 << s->lmul, a->rs1, 1) &&
++            (a->rd != a->rs2));
++}
++
++static bool trans_vcompress_vm(DisasContext *s, arg_r *a)
++{
++    if (vcompress_vm_check(s, a)) {
++        uint32_t data = 0;
++        static gen_helper_gvec_4_ptr * const fns[4] = {
++            gen_helper_vcompress_vm_b, gen_helper_vcompress_vm_h,
++            gen_helper_vcompress_vm_w, gen_helper_vcompress_vm_d,
++        };
++        TCGLabel *over = gen_new_label();
++        tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_vl, 0, over);
++
++        data = FIELD_DP32(data, VDATA, MLEN, s->mlen);
++        data = FIELD_DP32(data, VDATA, LMUL, s->lmul);
++        tcg_gen_gvec_4_ptr(vreg_ofs(s, a->rd), vreg_ofs(s, 0),
++                           vreg_ofs(s, a->rs1), vreg_ofs(s, a->rs2),
++                           cpu_env, 0, s->vlen / 8, data, fns[s->sew]);
++        gen_set_label(over);
++        return true;
++    }
++    return false;
++}
+diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+index 220fa76d54..e9e0b1e7a8 100644
+--- a/target/riscv/vector_helper.c
++++ b/target/riscv/vector_helper.c
+@@ -4871,3 +4871,29 @@ GEN_VEXT_VRGATHER_VX(vrgather_vx_b, uint8_t, H1, clearb)
+ GEN_VEXT_VRGATHER_VX(vrgather_vx_h, uint16_t, H2, clearh)
+ GEN_VEXT_VRGATHER_VX(vrgather_vx_w, uint32_t, H4, clearl)
+ GEN_VEXT_VRGATHER_VX(vrgather_vx_d, uint64_t, H8, clearq)
++
++/* Vector Compress Instruction */
++#define GEN_VEXT_VCOMPRESS_VM(NAME, ETYPE, H, CLEAR_FN)                   \
++void HELPER(NAME)(void *vd, void *v0, void *vs1, void *vs2,               \
++                  CPURISCVState *env, uint32_t desc)                      \
++{                                                                         \
++    uint32_t mlen = vext_mlen(desc);                                      \
++    uint32_t vlmax = env_archcpu(env)->cfg.vlen / mlen;                   \
++    uint32_t vl = env->vl;                                                \
++    uint32_t num = 0, i;                                                  \
++                                                                          \
++    for (i = 0; i < vl; i++) {                                            \
++        if (!vext_elem_mask(vs1, mlen, i)) {                              \
++            continue;                                                     \
++        }                                                                 \
++        *((ETYPE *)vd + H(num)) = *((ETYPE *)vs2 + H(i));                 \
++        num++;                                                            \
++    }                                                                     \
++    CLEAR_FN(vd, num, num * sizeof(ETYPE), vlmax * sizeof(ETYPE));        \
++}
++
++/* Compress into vd elements of vs2 where vs1 is enabled */
++GEN_VEXT_VCOMPRESS_VM(vcompress_vm_b, uint8_t, H1, clearb)
++GEN_VEXT_VCOMPRESS_VM(vcompress_vm_h, uint16_t, H2, clearh)
++GEN_VEXT_VCOMPRESS_VM(vcompress_vm_w, uint32_t, H4, clearl)
++GEN_VEXT_VCOMPRESS_VM(vcompress_vm_d, uint64_t, H8, clearq)
+-- 
+2.23.0
 
 
