@@ -4,71 +4,61 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 259C5C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:23:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 392A1C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:25:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EF2552072E
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:23:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF2552072E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 0B8B02072E
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:25:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B8B02072E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46670 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53138 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jj0hw-0001nH-5I
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 09:23:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45204)
+	id 1jj0jR-0004dK-Tb
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 09:25:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46168)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1jj0Uv-0007tu-2H; Wed, 10 Jun 2020 09:10:29 -0400
-Received: from mout.kundenserver.de ([212.227.126.134]:43593)
- by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1jj0Uq-0003fA-SH; Wed, 10 Jun 2020 09:10:28 -0400
-Received: from localhost.localdomain ([82.252.135.106]) by
- mrelayeu.kundenserver.de (mreue009 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1MNbtD-1jYjdW08gF-00P9u5; Wed, 10 Jun 2020 15:10:21 +0200
-From: Laurent Vivier <laurent@vivier.eu>
-To: qemu-devel@nongnu.org
-Subject: [PULL v2 11/16] target/i386/cpu: Use the IEC binary prefix definitions
-Date: Wed, 10 Jun 2020 15:10:06 +0200
-Message-Id: <20200610131011.1941209-12-laurent@vivier.eu>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200610131011.1941209-1-laurent@vivier.eu>
-References: <20200610131011.1941209-1-laurent@vivier.eu>
+ (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jj0X2-0002lI-7s; Wed, 10 Jun 2020 09:12:40 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:47671)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jj0X0-00048j-Sn; Wed, 10 Jun 2020 09:12:39 -0400
+X-Alimail-AntiSpam: AC=PASS; BC=0.074611|-1; BR=01201311R131ee; CH=green;
+ DM=|OVERLOAD|false|; DS=SPAM|spam_blackmail|0.892561-9.6942e-05-0.107342;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e02c03300; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=9; RT=8; SR=0; TI=SMTPD_---.HkbDg2J_1591794753; 
+Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.HkbDg2J_1591794753)
+ by smtp.aliyun-inc.com(10.147.41.137);
+ Wed, 10 Jun 2020 21:12:34 +0800
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Subject: [PATCH v9 47/61] target/riscv: vector single-width floating-point
+ reduction instructions
+Date: Wed, 10 Jun 2020 19:37:34 +0800
+Message-Id: <20200610113748.4754-48-zhiwei_liu@c-sky.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20200610113748.4754-1-zhiwei_liu@c-sky.com>
+References: <20200610113748.4754-1-zhiwei_liu@c-sky.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:e6pNGKrZWZ3XWvCcug3ufm/XcEAN3JxTE4YulSlBdjBGInHKD7P
- 8RG2mFa7x7rkNi32v3TUmQwZQAh8kuBq0LTxlOSZU+D7BqYUg72Q2/Q15glmrQgkRvsu20B
- 8SNFU/QjZALKw32gkVISRkLI+fUEkRPTF5EEiKxG3F8YfMKaIROARMYRYYT8MuBZDfKNv7r
- W/SihU0Jfqb9WtAx4jVDw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:S5j0pdZnetU=:efiwghLxEfLhyUpTEtenyG
- os4RZcDi+sKn04oiYBBEY5IfBp4fOGxiN5hOLXl5nIoibKkhZq+BV2BZQTC+iZgknuNH8gkLq
- wbRfwv16MF7bTFOJ932oj9kwp3prj+q6qG2DDYkoTK7+kzq4U6NmFTcDM0s60tB/huYOlFtGG
- XD6Ah9ekk8jFvJHeinDyWfCLbmAQsGbbmyssim/yOiw9hj7WHC/zZ5Ow1LXJcZ0LmuVFBDCR3
- 3/vfLuC7OcgBF5IG1nummaboCPOMpj7t9yiMUADuqWkImS1hRmS9y9fbVTqf8tJ6oB7kyPfBF
- VqgG34Ew9iv1879ELILblaYMxUg3UDONcH8PK4PwEtF42YGum+d8C90HzbfPIZTXdoMs+n6TM
- CWJfX4Ecx4UESeY51DdbDmzkw2s0WXntE5X43wvvEfe680/YwoJ5i3J6JUod1DoHzUsQu8TcS
- wCwHVS4LdijbRfqoDs37EM6ZbGWCNq9Zx0iKMTA/1Z7zIb/LzpZw3ToY4UuauZ4Hw14dNP07V
- XTUWrm5huYSQV7mklcBB3jYv2EfXhdklbftF145H2sW421KCs8Bk2ors7VRFyZxyxrvTpSirX
- WGttVNXlXCh/WyfDctM/2LxggNPQxjYzwh0ggajZoLv1pa1R8fvbx4kU/rkTzm9oXzDfI5tlL
- E9QSptVL+bn/PafWmVgruA1Czo99TUYwhySrglo3089XKplU4dbOYoAS9ziw1hIAq5ARzFL2W
- ex+eaguJYsvO57OvNwkHrHNOLL8ZpafD8m+o+VZ9LBAkWkXCzFacGhywQmWSGVUOs9GDeOK9w
- 99+HEOpvOC6h6//Coq5KMwrUJ+cmyPWS6UjCyibIVlF83LcNy92EJGGcuFh2haZT8uJu7EO
-Received-SPF: none client-ip=212.227.126.134; envelope-from=laurent@vivier.eu;
- helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/10 09:10:23
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -28
-X-Spam_score: -2.9
-X-Spam_bar: --
-X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
+Received-SPF: none client-ip=121.197.200.217;
+ envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/10 07:37:52
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001, UNPARSEABLE_RELAY=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -81,42 +71,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-trivial@nongnu.org,
- Michael Tokarev <mjt@tls.msk.ru>,
- Richard Henderson <richard.henderson@linaro.org>,
- Laurent Vivier <laurent@vivier.eu>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: richard.henderson@linaro.org, wxy194768@alibaba-inc.com,
+ wenmeng_zhang@c-sky.com, Alistair Francis <alistair.francis@wdc.com>,
+ palmer@dabbelt.com, LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
-IEC binary prefixes ease code review: the unit is explicit.
-
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20200601142930.29408-9-f4bug@amsat.org>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- target/i386/cpu.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ target/riscv/helper.h                   | 10 +++++++
+ target/riscv/insn32.decode              |  4 +++
+ target/riscv/insn_trans/trans_rvv.inc.c |  5 ++++
+ target/riscv/vector_helper.c            | 39 +++++++++++++++++++++++++
+ 4 files changed, 58 insertions(+)
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index ba05da3f2e7f..02065e35d435 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -6159,7 +6159,7 @@ static void x86_cpu_machine_done(Notifier *n, void *unused)
-     if (smram) {
-         cpu->smram = g_new(MemoryRegion, 1);
-         memory_region_init_alias(cpu->smram, OBJECT(cpu), "smram",
--                                 smram, 0, 1ull << 32);
-+                                 smram, 0, 4 * GiB);
-         memory_region_set_enabled(cpu->smram, true);
-         memory_region_add_subregion_overlap(cpu->cpu_as_root, 0, cpu->smram, 1);
-     }
+diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+index ce31577ea9..17fd02c323 100644
+--- a/target/riscv/helper.h
++++ b/target/riscv/helper.h
+@@ -1073,3 +1073,13 @@ DEF_HELPER_6(vwredsumu_vs_w, void, ptr, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_6(vwredsum_vs_b, void, ptr, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_6(vwredsum_vs_h, void, ptr, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_6(vwredsum_vs_w, void, ptr, ptr, ptr, ptr, env, i32)
++
++DEF_HELPER_6(vfredsum_vs_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vfredsum_vs_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vfredsum_vs_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vfredmax_vs_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vfredmax_vs_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vfredmax_vs_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vfredmin_vs_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vfredmin_vs_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vfredmin_vs_d, void, ptr, ptr, ptr, ptr, env, i32)
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index b69d804fda..0592075167 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -539,6 +539,10 @@ vredmaxu_vs     000110 . ..... ..... 010 ..... 1010111 @r_vm
+ vredmax_vs      000111 . ..... ..... 010 ..... 1010111 @r_vm
+ vwredsumu_vs    110000 . ..... ..... 000 ..... 1010111 @r_vm
+ vwredsum_vs     110001 . ..... ..... 000 ..... 1010111 @r_vm
++# Vector ordered and unordered reduction sum
++vfredsum_vs     0000-1 . ..... ..... 001 ..... 1010111 @r_vm
++vfredmin_vs     000101 . ..... ..... 001 ..... 1010111 @r_vm
++vfredmax_vs     000111 . ..... ..... 001 ..... 1010111 @r_vm
+ 
+ vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
+ vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
+diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+index 06842c424e..7e9d0ded37 100644
+--- a/target/riscv/insn_trans/trans_rvv.inc.c
++++ b/target/riscv/insn_trans/trans_rvv.inc.c
+@@ -2346,3 +2346,8 @@ GEN_OPIVV_TRANS(vredxor_vs, reduction_check)
+ /* Vector Widening Integer Reduction Instructions */
+ GEN_OPIVV_WIDEN_TRANS(vwredsum_vs, reduction_check)
+ GEN_OPIVV_WIDEN_TRANS(vwredsumu_vs, reduction_check)
++
++/* Vector Single-Width Floating-Point Reduction Instructions */
++GEN_OPFVV_TRANS(vfredsum_vs, reduction_check)
++GEN_OPFVV_TRANS(vfredmax_vs, reduction_check)
++GEN_OPFVV_TRANS(vfredmin_vs, reduction_check)
+diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+index fdeedad64f..ba961230f6 100644
+--- a/target/riscv/vector_helper.c
++++ b/target/riscv/vector_helper.c
+@@ -4417,3 +4417,42 @@ GEN_VEXT_RED(vwredsum_vs_w, int64_t, int32_t, H8, H4, DO_ADD, clearq)
+ GEN_VEXT_RED(vwredsumu_vs_b, uint16_t, uint8_t, H2, H1, DO_ADD, clearh)
+ GEN_VEXT_RED(vwredsumu_vs_h, uint32_t, uint16_t, H4, H2, DO_ADD, clearl)
+ GEN_VEXT_RED(vwredsumu_vs_w, uint64_t, uint32_t, H8, H4, DO_ADD, clearq)
++
++/* Vector Single-Width Floating-Point Reduction Instructions */
++#define GEN_VEXT_FRED(NAME, TD, TS2, HD, HS2, OP, CLEAR_FN)\
++void HELPER(NAME)(void *vd, void *v0, void *vs1,           \
++                  void *vs2, CPURISCVState *env,           \
++                  uint32_t desc)                           \
++{                                                          \
++    uint32_t mlen = vext_mlen(desc);                       \
++    uint32_t vm = vext_vm(desc);                           \
++    uint32_t vl = env->vl;                                 \
++    uint32_t i;                                            \
++    uint32_t tot = env_archcpu(env)->cfg.vlen / 8;         \
++    TD s1 =  *((TD *)vs1 + HD(0));                         \
++                                                           \
++    for (i = 0; i < vl; i++) {                             \
++        TS2 s2 = *((TS2 *)vs2 + HS2(i));                   \
++        if (!vm && !vext_elem_mask(v0, mlen, i)) {         \
++            continue;                                      \
++        }                                                  \
++        s1 = OP(s1, (TD)s2, &env->fp_status);              \
++    }                                                      \
++    *((TD *)vd + HD(0)) = s1;                              \
++    CLEAR_FN(vd, 1, sizeof(TD), tot);                      \
++}
++
++/* Unordered sum */
++GEN_VEXT_FRED(vfredsum_vs_h, uint16_t, uint16_t, H2, H2, float16_add, clearh)
++GEN_VEXT_FRED(vfredsum_vs_w, uint32_t, uint32_t, H4, H4, float32_add, clearl)
++GEN_VEXT_FRED(vfredsum_vs_d, uint64_t, uint64_t, H8, H8, float64_add, clearq)
++
++/* Maximum value */
++GEN_VEXT_FRED(vfredmax_vs_h, uint16_t, uint16_t, H2, H2, float16_maxnum, clearh)
++GEN_VEXT_FRED(vfredmax_vs_w, uint32_t, uint32_t, H4, H4, float32_maxnum, clearl)
++GEN_VEXT_FRED(vfredmax_vs_d, uint64_t, uint64_t, H8, H8, float64_maxnum, clearq)
++
++/* Minimum value */
++GEN_VEXT_FRED(vfredmin_vs_h, uint16_t, uint16_t, H2, H2, float16_minnum, clearh)
++GEN_VEXT_FRED(vfredmin_vs_w, uint32_t, uint32_t, H4, H4, float32_minnum, clearl)
++GEN_VEXT_FRED(vfredmin_vs_d, uint64_t, uint64_t, H8, H8, float64_minnum, clearq)
 -- 
-2.26.2
+2.23.0
 
 
