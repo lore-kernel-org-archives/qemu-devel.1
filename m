@@ -2,62 +2,118 @@ Return-Path: <SRS0=wemX=7X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19667C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 12:21:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5912C433E4
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 12:23:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D5DEA20691
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 12:21:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5DEA20691
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8006B20734
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 12:23:47 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="lFWvKAcx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8006B20734
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60996 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38630 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jizjL-0004k0-W0
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 08:21:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44382)
+	id 1jizli-0007P5-Pq
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 08:23:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44712)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jizQm-000541-L6; Wed, 10 Jun 2020 08:02:08 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:50335)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jizTL-00007T-Jm; Wed, 10 Jun 2020 08:04:47 -0400
+Received: from mail-eopbgr150135.outbound.protection.outlook.com
+ ([40.107.15.135]:4365 helo=EUR01-DB5-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jizQj-0003WZ-Cb; Wed, 10 Jun 2020 08:02:08 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07608247|-1; CH=green;
- DM=|CONTINUE|false|; DS=CONTINUE|ham_system_inform|0.577342-0.00014803-0.42251;
- FP=0|0|0|0|0|-1|-1|-1; HT=e02c03293; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=9; RT=8; SR=0; TI=SMTPD_---.HkZtsAR_1591790519; 
-Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.HkZtsAR_1591790519)
- by smtp.aliyun-inc.com(10.147.43.95); Wed, 10 Jun 2020 20:02:00 +0800
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-To: qemu-devel@nongnu.org,
-	qemu-riscv@nongnu.org
-Subject: [PATCH v9 12/61] target/riscv: vector integer add-with-carry /
- subtract-with-borrow instructions
-Date: Wed, 10 Jun 2020 19:36:59 +0800
-Message-Id: <20200610113748.4754-13-zhiwei_liu@c-sky.com>
-X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20200610113748.4754-1-zhiwei_liu@c-sky.com>
-References: <20200610113748.4754-1-zhiwei_liu@c-sky.com>
-MIME-Version: 1.0
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jizTI-0004Tg-Jv; Wed, 10 Jun 2020 08:04:46 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=YUnSrccCRQorbZZkL0EjGK4imxhoXr87yJmrsx3dKBgV2a0o4PUHA/TwZDRE2lPihyg9cQ43lyWf9+J1QZLd9X0B0MSKAI4uvvupmAleWM2HSypk1rZS9X16pCHkE6RxdXWsk8HB27g90xYYLKW1y5unBNzR7o2L8XSUs/9rdsCPXdnh5we3nPiIu7EK/c0udcg/kf39qeUx0YqJR/SgeNtWt3SvSlLKiV58R+IwSVhnX+pmN421fJgUIRvp6zTsOA1F0b8JOndAVRrCB8rpjQuIOXt6L1Zv2xjFpfEQAxxJ+iG9JDoUc3reYbm6xKVBCbwnLO+G6wSJtq08JyTrQw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=7hJZJo4pyq1uF/65B6/G3TBaxyvo62zB9s2QAVVNKvo=;
+ b=cVKJ9dzkmeYvZWrdI+tYfHoS7DV4zHyR962Im6ZXrcwjoId4A+9G9raOPrvo0vAhiADsTsYQvjxdYZOrWpp/JN4lhwgWqZNq14rUv0VnWbFZcuU0SWaAjfH04Fn4pf/DD4HK8isoPhihaJGf5QB34R6oImkjMndGA3z8gnbStjCmZ0UoAoobyFEflZU0HwVVoM36ZKyC8eVtTCSqmIUhlO17cpJvsacDwADlzCrq6hG3PRUjc5DRv+++LoAGAjd1x+sb7UYLlH1Ft3CBfaNvH2kfvUscqBaFKPP/Opzhux/6M2dfm94XWhWV6LbXUiCK6H5EUpd7RvTOBIa8iIlMCg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=7hJZJo4pyq1uF/65B6/G3TBaxyvo62zB9s2QAVVNKvo=;
+ b=lFWvKAcxfHSMFcvBUe1pmOd5cvZj+dscBswHGy+IcA3CilQNJDoPQptdQY6XXmItHPHl9mlAJZP9O7ziayEZTUMf47bLw+aszeLnLxPftCsAmOi9xmi/iIAx8LGzZj/PjohJfai52kCb7HtDHDK4xi8GtgoY/g9OV6rAXneLN7Q=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM7PR08MB5495.eurprd08.prod.outlook.com (2603:10a6:20b:104::19)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3066.18; Wed, 10 Jun
+ 2020 12:04:41 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312%3]) with mapi id 15.20.3066.023; Wed, 10 Jun 2020
+ 12:04:41 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: qemu-block@nongnu.org
+Subject: [PATCH v5 0/5] fix & merge block_status_above and is_allocated_above
+Date: Wed, 10 Jun 2020 15:04:21 +0300
+Message-Id: <20200610120426.12826-1-vsementsov@virtuozzo.com>
+X-Mailer: git-send-email 2.21.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: none client-ip=121.197.200.217;
- envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/10 07:37:52
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001, UNPARSEABLE_RELAY=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain
+X-ClientProxiedBy: AM3PR05CA0104.eurprd05.prod.outlook.com
+ (2603:10a6:207:1::30) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from kvm.sw.ru (185.215.60.166) by
+ AM3PR05CA0104.eurprd05.prod.outlook.com (2603:10a6:207:1::30) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3088.18 via Frontend Transport; Wed, 10 Jun 2020 12:04:40 +0000
+X-Mailer: git-send-email 2.21.0
+X-Originating-IP: [185.215.60.166]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 164b4cd7-76e8-4b5e-e640-08d80d3674d0
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5495:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM7PR08MB54956110BA6D50675EB72D6FC1830@AM7PR08MB5495.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:2000;
+X-Forefront-PRVS: 0430FA5CB7
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: yWNIuLZCnMLpz1KvSiBckJiikSw3kxZsEQg4cgARkWPCnvBvC7b/hl0mjwsd9dTJMXko7LHJ3vkv9s0FjenynHrB7j8N6ykqvHvQIW5td2k+uF3R1m4iUcW7A/VdGKPyOtMucqwKR/KCscD6FQc3f/mfX+p+6ObM9a/cDyVL10OXuH+vOfrDkhyISUw28H7CZHrCrZofGgM2MgArYBPvLdlHWwATCQx28Y6CQRajKZE1JhQqHZenBOD+kKhoVtNFxqIuJ5Kp4auPca5LxDrFgkLZuQknPn3FaTj7oXHmS0B8ibYQiifBz58WTY2OE/gHwilGU8kWDVHXW68pQMwYa17E7P3NaixaPMYZGrevFOcdz86oy8bvqBz4B2U+belDEeHL7P5W2gzA+u6/TxtRuw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(136003)(376002)(346002)(396003)(39840400004)(366004)(86362001)(8676002)(478600001)(2616005)(107886003)(8936002)(4326008)(956004)(52116002)(966005)(83380400001)(1076003)(36756003)(66476007)(5660300002)(6506007)(2906002)(316002)(26005)(6666004)(66946007)(16526019)(6486002)(66556008)(6512007)(6916009)(186003);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: /A1xipzVU+Zlrx76oExoYb8+v8WrmDLqYPs+FAOR9p67QmzZKNEY2gfthM6vxqaOfnwJYmoU50An6wZRdZGljiRJbpmDEU+Kdk7ozBPp7tMjQwasZrZ30cMSbrBrHLwlneK/46sEUpZX/AaTrxY+t/d+JffbMo/+ufBkWbWtzFZm40/z2Uvm6J9ySRO5CBnOSay6AG0M89jSjKhir1TKYY5HWur74PsTlEgHFD3vYXYpxo2Nl966FcuRdzlSwqldL22o5XkaxSLVzvaorDeddPVQslD0jBN463kIXH4P/dh1+eDQ1GqBTT6pwxZRc8XfdWMbcx36XkcXyHwTHLrSaSkluXP/EFFZBvJiyso0vNT8Al1d4F+WeTlRAwH9en54QHfZXJVLXTD2nw0aVzPxSND0zSir4hkMjHLvNeAdU2QicZhZUi3Em+hmZ7mTmpwNvegasr1bA1PBfYJ7VPs4H5xy9f+plo9gwXEVQme8ZKqNt2UC000XNQ3G4bYNxOP2
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 164b4cd7-76e8-4b5e-e640-08d80d3674d0
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jun 2020 12:04:41.4248 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: DBc4NVkzpi91N5KG9PtyAvQEr6d1W49nwns4rM5VA2rb77HR1Ubzjt1a+TXDitz0JmuAmsyJuvRFpCM7DuvILyiyC5jtrlX91UUJlbRb658=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5495
+Received-SPF: pass client-ip=40.107.15.135;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR01-DB5-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/10 08:04:42
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -37
+X-Spam_score: -3.8
+X-Spam_bar: ---
+X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -70,367 +126,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: richard.henderson@linaro.org, wxy194768@alibaba-inc.com,
- wenmeng_zhang@c-sky.com, Alistair Francis <alistair.francis@wdc.com>,
- palmer@dabbelt.com, LIU Zhiwei <zhiwei_liu@c-sky.com>
+Cc: fam@euphon.net, kwolf@redhat.com, vsementsov@virtuozzo.com,
+ qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/riscv/helper.h                   |  33 ++++++
- target/riscv/insn32.decode              |  11 ++
- target/riscv/insn_trans/trans_rvv.inc.c | 113 +++++++++++++++++++
- target/riscv/vector_helper.c            | 137 ++++++++++++++++++++++++
- 4 files changed, 294 insertions(+)
+v5: rebase on coroutine-wrappers series, 02 changed correspondingly
 
-diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index 608704850a..186d72a2aa 100644
---- a/target/riscv/helper.h
-+++ b/target/riscv/helper.h
-@@ -343,3 +343,36 @@ DEF_HELPER_6(vwadd_wx_w, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vwsub_wx_b, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vwsub_wx_h, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vwsub_wx_w, void, ptr, ptr, tl, ptr, env, i32)
-+
-+DEF_HELPER_6(vadc_vvm_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vadc_vvm_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vadc_vvm_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vadc_vvm_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vsbc_vvm_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vsbc_vvm_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vsbc_vvm_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vsbc_vvm_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmadc_vvm_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmadc_vvm_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmadc_vvm_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmadc_vvm_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmsbc_vvm_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmsbc_vvm_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmsbc_vvm_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmsbc_vvm_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vadc_vxm_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vadc_vxm_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vadc_vxm_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vadc_vxm_d, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vsbc_vxm_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vsbc_vxm_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vsbc_vxm_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vsbc_vxm_d, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmadc_vxm_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmadc_vxm_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmadc_vxm_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmadc_vxm_d, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmsbc_vxm_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmsbc_vxm_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmsbc_vxm_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmsbc_vxm_d, void, ptr, ptr, tl, ptr, env, i32)
-diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index 4bdbfd16fa..022c8ea18b 100644
---- a/target/riscv/insn32.decode
-+++ b/target/riscv/insn32.decode
-@@ -70,6 +70,7 @@
- @r2_nfvm ... ... vm:1 ..... ..... ... ..... ....... &r2nfvm %nf %rs1 %rd
- @r_nfvm  ... ... vm:1 ..... ..... ... ..... ....... &rnfvm %nf %rs2 %rs1 %rd
- @r_vm    ...... vm:1 ..... ..... ... ..... ....... &rmrr %rs2 %rs1 %rd
-+@r_vm_1  ...... . ..... ..... ... ..... .......    &rmrr vm=1 %rs2 %rs1 %rd
- @r_wdvm  ..... wd:1 vm:1 ..... ..... ... ..... ....... &rwdvm %rs2 %rs1 %rd
- @r2_zimm . zimm:11  ..... ... ..... ....... %rs1 %rd
- 
-@@ -300,6 +301,16 @@ vwsubu_wv       110110 . ..... ..... 010 ..... 1010111 @r_vm
- vwsubu_wx       110110 . ..... ..... 110 ..... 1010111 @r_vm
- vwsub_wv        110111 . ..... ..... 010 ..... 1010111 @r_vm
- vwsub_wx        110111 . ..... ..... 110 ..... 1010111 @r_vm
-+vadc_vvm        010000 1 ..... ..... 000 ..... 1010111 @r_vm_1
-+vadc_vxm        010000 1 ..... ..... 100 ..... 1010111 @r_vm_1
-+vadc_vim        010000 1 ..... ..... 011 ..... 1010111 @r_vm_1
-+vmadc_vvm       010001 1 ..... ..... 000 ..... 1010111 @r_vm_1
-+vmadc_vxm       010001 1 ..... ..... 100 ..... 1010111 @r_vm_1
-+vmadc_vim       010001 1 ..... ..... 011 ..... 1010111 @r_vm_1
-+vsbc_vvm        010010 1 ..... ..... 000 ..... 1010111 @r_vm_1
-+vsbc_vxm        010010 1 ..... ..... 100 ..... 1010111 @r_vm_1
-+vmsbc_vvm       010011 1 ..... ..... 000 ..... 1010111 @r_vm_1
-+vmsbc_vxm       010011 1 ..... ..... 100 ..... 1010111 @r_vm_1
- 
- vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
- vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
-diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index 7a14b64c3d..6fe2f071e6 100644
---- a/target/riscv/insn_trans/trans_rvv.inc.c
-+++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -1249,3 +1249,116 @@ GEN_OPIWX_WIDEN_TRANS(vwaddu_wx)
- GEN_OPIWX_WIDEN_TRANS(vwadd_wx)
- GEN_OPIWX_WIDEN_TRANS(vwsubu_wx)
- GEN_OPIWX_WIDEN_TRANS(vwsub_wx)
-+
-+/* Vector Integer Add-with-Carry / Subtract-with-Borrow Instructions */
-+/* OPIVV without GVEC IR */
-+#define GEN_OPIVV_TRANS(NAME, CHECK)                               \
-+static bool trans_##NAME(DisasContext *s, arg_rmrr *a)             \
-+{                                                                  \
-+    if (CHECK(s, a)) {                                             \
-+        uint32_t data = 0;                                         \
-+        static gen_helper_gvec_4_ptr * const fns[4] = {            \
-+            gen_helper_##NAME##_b, gen_helper_##NAME##_h,          \
-+            gen_helper_##NAME##_w, gen_helper_##NAME##_d,          \
-+        };                                                         \
-+        TCGLabel *over = gen_new_label();                          \
-+        tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_vl, 0, over);          \
-+                                                                   \
-+        data = FIELD_DP32(data, VDATA, MLEN, s->mlen);             \
-+        data = FIELD_DP32(data, VDATA, VM, a->vm);                 \
-+        data = FIELD_DP32(data, VDATA, LMUL, s->lmul);             \
-+        tcg_gen_gvec_4_ptr(vreg_ofs(s, a->rd), vreg_ofs(s, 0),     \
-+                           vreg_ofs(s, a->rs1),                    \
-+                           vreg_ofs(s, a->rs2), cpu_env, 0,        \
-+                           s->vlen / 8, data, fns[s->sew]);        \
-+        gen_set_label(over);                                       \
-+        return true;                                               \
-+    }                                                              \
-+    return false;                                                  \
-+}
-+
-+/*
-+ * For vadc and vsbc, an illegal instruction exception is raised if the
-+ * destination vector register is v0 and LMUL > 1. (Section 12.3)
-+ */
-+static bool opivv_vadc_check(DisasContext *s, arg_rmrr *a)
-+{
-+    return (vext_check_isa_ill(s) &&
-+            vext_check_reg(s, a->rd, false) &&
-+            vext_check_reg(s, a->rs2, false) &&
-+            vext_check_reg(s, a->rs1, false) &&
-+            ((a->rd != 0) || (s->lmul == 0)));
-+}
-+
-+GEN_OPIVV_TRANS(vadc_vvm, opivv_vadc_check)
-+GEN_OPIVV_TRANS(vsbc_vvm, opivv_vadc_check)
-+
-+/*
-+ * For vmadc and vmsbc, an illegal instruction exception is raised if the
-+ * destination vector register overlaps a source vector register group.
-+ */
-+static bool opivv_vmadc_check(DisasContext *s, arg_rmrr *a)
-+{
-+    return (vext_check_isa_ill(s) &&
-+            vext_check_reg(s, a->rs2, false) &&
-+            vext_check_reg(s, a->rs1, false) &&
-+            vext_check_overlap_group(a->rd, 1, a->rs1, 1 << s->lmul) &&
-+            vext_check_overlap_group(a->rd, 1, a->rs2, 1 << s->lmul));
-+}
-+
-+GEN_OPIVV_TRANS(vmadc_vvm, opivv_vmadc_check)
-+GEN_OPIVV_TRANS(vmsbc_vvm, opivv_vmadc_check)
-+
-+static bool opivx_vadc_check(DisasContext *s, arg_rmrr *a)
-+{
-+    return (vext_check_isa_ill(s) &&
-+            vext_check_reg(s, a->rd, false) &&
-+            vext_check_reg(s, a->rs2, false) &&
-+            ((a->rd != 0) || (s->lmul == 0)));
-+}
-+
-+/* OPIVX without GVEC IR */
-+#define GEN_OPIVX_TRANS(NAME, CHECK)                                     \
-+static bool trans_##NAME(DisasContext *s, arg_rmrr *a)                   \
-+{                                                                        \
-+    if (CHECK(s, a)) {                                                   \
-+        static gen_helper_opivx * const fns[4] = {                       \
-+            gen_helper_##NAME##_b, gen_helper_##NAME##_h,                \
-+            gen_helper_##NAME##_w, gen_helper_##NAME##_d,                \
-+        };                                                               \
-+                                                                         \
-+        return opivx_trans(a->rd, a->rs1, a->rs2, a->vm, fns[s->sew], s);\
-+    }                                                                    \
-+    return false;                                                        \
-+}
-+
-+GEN_OPIVX_TRANS(vadc_vxm, opivx_vadc_check)
-+GEN_OPIVX_TRANS(vsbc_vxm, opivx_vadc_check)
-+
-+static bool opivx_vmadc_check(DisasContext *s, arg_rmrr *a)
-+{
-+    return (vext_check_isa_ill(s) &&
-+            vext_check_reg(s, a->rs2, false) &&
-+            vext_check_overlap_group(a->rd, 1, a->rs2, 1 << s->lmul));
-+}
-+
-+GEN_OPIVX_TRANS(vmadc_vxm, opivx_vmadc_check)
-+GEN_OPIVX_TRANS(vmsbc_vxm, opivx_vmadc_check)
-+
-+/* OPIVI without GVEC IR */
-+#define GEN_OPIVI_TRANS(NAME, ZX, OPIVX, CHECK)                          \
-+static bool trans_##NAME(DisasContext *s, arg_rmrr *a)                   \
-+{                                                                        \
-+    if (CHECK(s, a)) {                                                   \
-+        static gen_helper_opivx * const fns[4] = {                       \
-+            gen_helper_##OPIVX##_b, gen_helper_##OPIVX##_h,              \
-+            gen_helper_##OPIVX##_w, gen_helper_##OPIVX##_d,              \
-+        };                                                               \
-+        return opivi_trans(a->rd, a->rs1, a->rs2, a->vm,                 \
-+                           fns[s->sew], s, ZX);                          \
-+    }                                                                    \
-+    return false;                                                        \
-+}
-+
-+GEN_OPIVI_TRANS(vadc_vim, 0, vadc_vxm, opivx_vadc_check)
-+GEN_OPIVI_TRANS(vmadc_vim, 0, vmadc_vxm, opivx_vmadc_check)
-diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index 2aa1924960..ad746175bd 100644
---- a/target/riscv/vector_helper.c
-+++ b/target/riscv/vector_helper.c
-@@ -187,6 +187,14 @@ static void clearq(void *vd, uint32_t idx, uint32_t cnt, uint32_t tot)
-     vext_clear(cur, cnt, tot);
- }
- 
-+static inline void vext_set_elem_mask(void *v0, int mlen, int index,
-+        uint8_t value)
-+{
-+    int idx = (index * mlen) / 64;
-+    int pos = (index * mlen) % 64;
-+    uint64_t old = ((uint64_t *)v0)[idx];
-+    ((uint64_t *)v0)[idx] = deposit64(old, pos, mlen, value);
-+}
- 
- static inline int vext_elem_mask(void *v0, int mlen, int index)
- {
-@@ -1128,3 +1136,132 @@ GEN_VEXT_VX(vwadd_wx_w, 4, 8, clearq)
- GEN_VEXT_VX(vwsub_wx_b, 1, 2, clearh)
- GEN_VEXT_VX(vwsub_wx_h, 2, 4, clearl)
- GEN_VEXT_VX(vwsub_wx_w, 4, 8, clearq)
-+
-+/* Vector Integer Add-with-Carry / Subtract-with-Borrow Instructions */
-+#define DO_VADC(N, M, C) (N + M + C)
-+#define DO_VSBC(N, M, C) (N - M - C)
-+
-+#define GEN_VEXT_VADC_VVM(NAME, ETYPE, H, DO_OP, CLEAR_FN)    \
-+void HELPER(NAME)(void *vd, void *v0, void *vs1, void *vs2,   \
-+                  CPURISCVState *env, uint32_t desc)          \
-+{                                                             \
-+    uint32_t mlen = vext_mlen(desc);                          \
-+    uint32_t vl = env->vl;                                    \
-+    uint32_t esz = sizeof(ETYPE);                             \
-+    uint32_t vlmax = vext_maxsz(desc) / esz;                  \
-+    uint32_t i;                                               \
-+                                                              \
-+    for (i = 0; i < vl; i++) {                                \
-+        ETYPE s1 = *((ETYPE *)vs1 + H(i));                    \
-+        ETYPE s2 = *((ETYPE *)vs2 + H(i));                    \
-+        uint8_t carry = vext_elem_mask(v0, mlen, i);          \
-+                                                              \
-+        *((ETYPE *)vd + H(i)) = DO_OP(s2, s1, carry);         \
-+    }                                                         \
-+    CLEAR_FN(vd, vl, vl * esz, vlmax * esz);                  \
-+}
-+
-+GEN_VEXT_VADC_VVM(vadc_vvm_b, uint8_t,  H1, DO_VADC, clearb)
-+GEN_VEXT_VADC_VVM(vadc_vvm_h, uint16_t, H2, DO_VADC, clearh)
-+GEN_VEXT_VADC_VVM(vadc_vvm_w, uint32_t, H4, DO_VADC, clearl)
-+GEN_VEXT_VADC_VVM(vadc_vvm_d, uint64_t, H8, DO_VADC, clearq)
-+
-+GEN_VEXT_VADC_VVM(vsbc_vvm_b, uint8_t,  H1, DO_VSBC, clearb)
-+GEN_VEXT_VADC_VVM(vsbc_vvm_h, uint16_t, H2, DO_VSBC, clearh)
-+GEN_VEXT_VADC_VVM(vsbc_vvm_w, uint32_t, H4, DO_VSBC, clearl)
-+GEN_VEXT_VADC_VVM(vsbc_vvm_d, uint64_t, H8, DO_VSBC, clearq)
-+
-+#define GEN_VEXT_VADC_VXM(NAME, ETYPE, H, DO_OP, CLEAR_FN)               \
-+void HELPER(NAME)(void *vd, void *v0, target_ulong s1, void *vs2,        \
-+                  CPURISCVState *env, uint32_t desc)                     \
-+{                                                                        \
-+    uint32_t mlen = vext_mlen(desc);                                     \
-+    uint32_t vl = env->vl;                                               \
-+    uint32_t esz = sizeof(ETYPE);                                        \
-+    uint32_t vlmax = vext_maxsz(desc) / esz;                             \
-+    uint32_t i;                                                          \
-+                                                                         \
-+    for (i = 0; i < vl; i++) {                                           \
-+        ETYPE s2 = *((ETYPE *)vs2 + H(i));                               \
-+        uint8_t carry = vext_elem_mask(v0, mlen, i);                     \
-+                                                                         \
-+        *((ETYPE *)vd + H(i)) = DO_OP(s2, (ETYPE)(target_long)s1, carry);\
-+    }                                                                    \
-+    CLEAR_FN(vd, vl, vl * esz, vlmax * esz);                             \
-+}
-+
-+GEN_VEXT_VADC_VXM(vadc_vxm_b, uint8_t,  H1, DO_VADC, clearb)
-+GEN_VEXT_VADC_VXM(vadc_vxm_h, uint16_t, H2, DO_VADC, clearh)
-+GEN_VEXT_VADC_VXM(vadc_vxm_w, uint32_t, H4, DO_VADC, clearl)
-+GEN_VEXT_VADC_VXM(vadc_vxm_d, uint64_t, H8, DO_VADC, clearq)
-+
-+GEN_VEXT_VADC_VXM(vsbc_vxm_b, uint8_t,  H1, DO_VSBC, clearb)
-+GEN_VEXT_VADC_VXM(vsbc_vxm_h, uint16_t, H2, DO_VSBC, clearh)
-+GEN_VEXT_VADC_VXM(vsbc_vxm_w, uint32_t, H4, DO_VSBC, clearl)
-+GEN_VEXT_VADC_VXM(vsbc_vxm_d, uint64_t, H8, DO_VSBC, clearq)
-+
-+#define DO_MADC(N, M, C) (C ? (__typeof(N))(N + M + 1) <= N :           \
-+                          (__typeof(N))(N + M) < N)
-+#define DO_MSBC(N, M, C) (C ? N <= M : N < M)
-+
-+#define GEN_VEXT_VMADC_VVM(NAME, ETYPE, H, DO_OP)             \
-+void HELPER(NAME)(void *vd, void *v0, void *vs1, void *vs2,   \
-+                  CPURISCVState *env, uint32_t desc)          \
-+{                                                             \
-+    uint32_t mlen = vext_mlen(desc);                          \
-+    uint32_t vl = env->vl;                                    \
-+    uint32_t vlmax = vext_maxsz(desc) / sizeof(ETYPE);        \
-+    uint32_t i;                                               \
-+                                                              \
-+    for (i = 0; i < vl; i++) {                                \
-+        ETYPE s1 = *((ETYPE *)vs1 + H(i));                    \
-+        ETYPE s2 = *((ETYPE *)vs2 + H(i));                    \
-+        uint8_t carry = vext_elem_mask(v0, mlen, i);          \
-+                                                              \
-+        vext_set_elem_mask(vd, mlen, i, DO_OP(s2, s1, carry));\
-+    }                                                         \
-+    for (; i < vlmax; i++) {                                  \
-+        vext_set_elem_mask(vd, mlen, i, 0);                   \
-+    }                                                         \
-+}
-+
-+GEN_VEXT_VMADC_VVM(vmadc_vvm_b, uint8_t,  H1, DO_MADC)
-+GEN_VEXT_VMADC_VVM(vmadc_vvm_h, uint16_t, H2, DO_MADC)
-+GEN_VEXT_VMADC_VVM(vmadc_vvm_w, uint32_t, H4, DO_MADC)
-+GEN_VEXT_VMADC_VVM(vmadc_vvm_d, uint64_t, H8, DO_MADC)
-+
-+GEN_VEXT_VMADC_VVM(vmsbc_vvm_b, uint8_t,  H1, DO_MSBC)
-+GEN_VEXT_VMADC_VVM(vmsbc_vvm_h, uint16_t, H2, DO_MSBC)
-+GEN_VEXT_VMADC_VVM(vmsbc_vvm_w, uint32_t, H4, DO_MSBC)
-+GEN_VEXT_VMADC_VVM(vmsbc_vvm_d, uint64_t, H8, DO_MSBC)
-+
-+#define GEN_VEXT_VMADC_VXM(NAME, ETYPE, H, DO_OP)               \
-+void HELPER(NAME)(void *vd, void *v0, target_ulong s1,          \
-+                  void *vs2, CPURISCVState *env, uint32_t desc) \
-+{                                                               \
-+    uint32_t mlen = vext_mlen(desc);                            \
-+    uint32_t vl = env->vl;                                      \
-+    uint32_t vlmax = vext_maxsz(desc) / sizeof(ETYPE);          \
-+    uint32_t i;                                                 \
-+                                                                \
-+    for (i = 0; i < vl; i++) {                                  \
-+        ETYPE s2 = *((ETYPE *)vs2 + H(i));                      \
-+        uint8_t carry = vext_elem_mask(v0, mlen, i);            \
-+                                                                \
-+        vext_set_elem_mask(vd, mlen, i,                         \
-+                DO_OP(s2, (ETYPE)(target_long)s1, carry));      \
-+    }                                                           \
-+    for (; i < vlmax; i++) {                                    \
-+        vext_set_elem_mask(vd, mlen, i, 0);                     \
-+    }                                                           \
-+}
-+
-+GEN_VEXT_VMADC_VXM(vmadc_vxm_b, uint8_t,  H1, DO_MADC)
-+GEN_VEXT_VMADC_VXM(vmadc_vxm_h, uint16_t, H2, DO_MADC)
-+GEN_VEXT_VMADC_VXM(vmadc_vxm_w, uint32_t, H4, DO_MADC)
-+GEN_VEXT_VMADC_VXM(vmadc_vxm_d, uint64_t, H8, DO_MADC)
-+
-+GEN_VEXT_VMADC_VXM(vmsbc_vxm_b, uint8_t,  H1, DO_MSBC)
-+GEN_VEXT_VMADC_VXM(vmsbc_vxm_h, uint16_t, H2, DO_MSBC)
-+GEN_VEXT_VMADC_VXM(vmsbc_vxm_w, uint32_t, H4, DO_MSBC)
-+GEN_VEXT_VMADC_VXM(vmsbc_vxm_d, uint64_t, H8, DO_MSBC)
+Based on series "[PATCH v7 0/7] coroutines: generate wrapper code", or
+in other words:
+Based-on: <20200610100336.23451-1-vsementsov@virtuozzo.com>
+
+Hi all!
+
+These series are here to address the following problem:
+block-status-above functions may consider space after EOF of
+intermediate backing files as unallocated, which is wrong, as these
+backing files are the reason of producing zeroes, we never go further by
+backing chain after a short backing file. So, if such short-backing file
+is _inside_ requested sub-chain of the backing chain, we should never
+report space after its EOF as unallocated.
+
+See patches 01,04,05 for details.
+
+Note, that this series leaves for another day the general problem
+around block-status: misuse of BDRV_BLOCK_ALLOCATED as is-fs-allocated
+vs go-to-backing.
+Audit for this problem is done here:
+"backing chain & block status & filters"
+https://lists.gnu.org/archive/html/qemu-devel/2020-04/msg04706.html
+And I'm going to prepare series to address this problem.
+
+Also, get_block_status func have same disease, but remains unfixed here:
+I want to make separate series for it, as it need some more refactoring,
+which should be based on series
+"[PATCH v5 0/7] coroutines: generate wrapper code"
+
+Vladimir Sementsov-Ogievskiy (5):
+  block/io: fix bdrv_co_block_status_above
+  block/io: bdrv_common_block_status_above: support include_base
+  block/io: bdrv_common_block_status_above: support bs == base
+  block/io: fix bdrv_is_allocated_above
+  iotests: add commit top->base cases to 274
+
+ block/coroutines.h         |   2 +
+ block/io.c                 | 100 ++++++++++++++++++-------------------
+ block/qcow2.c              |  16 +++++-
+ tests/qemu-iotests/274     |  20 ++++++++
+ tests/qemu-iotests/274.out |  65 ++++++++++++++++++++++++
+ 5 files changed, 150 insertions(+), 53 deletions(-)
+
 -- 
-2.23.0
+2.21.0
 
 
