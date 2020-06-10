@@ -7,74 +7,75 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D778FC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 06:11:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25300C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 06:12:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7BB4720734
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 06:11:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C0C7320734
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 06:12:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JUckqs9e"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7BB4720734
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bHTYmViX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0C7320734
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40610 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42152 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jitxL-0007ec-PG
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 02:11:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42668)
+	id 1jityH-0008MM-2b
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 02:12:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42690)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jitMX-0005RW-2Z
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 01:33:21 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:47978
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jitMc-0005ci-Bh
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 01:33:26 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:49610
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jitMD-0003rv-32
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 01:33:20 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jitMI-0003wL-5J
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 01:33:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591767179;
+ s=mimecast20190719; t=1591767184;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=TfMpbtd565QgXoFt7VBVW5+7PnXpXgKEEU1HQhW9pi4=;
- b=JUckqs9e+f+Dppz5Yg/gUH3VQ8cN1J69WtR5VSgXs6SDYT7U91zobRjq1OI7kpEnOGT7eR
- NZopAREkpcZM+8YzDIDuqHi+dXdLh88a1veKvKH0zIKcCrgiN67PRmkfchsn67EyaAWOOt
- VEGr6sFcu22OizcWy3SO/VcPOj8f/Gw=
+ bh=J+wiQMvEgwUWDH06/STJQUIBGPu2Tgfa4O82C44aUW0=;
+ b=bHTYmViX4Pj44Wv161r7A7KGWZuz+gAf6UOuON1pZtYm8FpBF844GIfPyUeXWz/JxhG8Hq
+ OD64jXG08rdU+S9AEFrCsnqKR/SJl12HeHhyIPKrP/TBGDcUPIS1hSUuwIro8u5SBjbMfp
+ u5AAclvopuRShII1j0VximeqiVTBjKE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-504-XY62LyF0OsqSUd40xu0iWQ-1; Wed, 10 Jun 2020 01:32:57 -0400
-X-MC-Unique: XY62LyF0OsqSUd40xu0iWQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-285-oFEYnQW3PfCPsoPFsDXJnA-1; Wed, 10 Jun 2020 01:32:59 -0400
+X-MC-Unique: oFEYnQW3PfCPsoPFsDXJnA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DEEA6107BEFF;
- Wed, 10 Jun 2020 05:32:56 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CF84B107ACCD;
+ Wed, 10 Jun 2020 05:32:58 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
  [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 382FD5D9D3;
- Wed, 10 Jun 2020 05:32:56 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D56B619D61;
+ Wed, 10 Jun 2020 05:32:57 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 8D9B7113847A; Wed, 10 Jun 2020 07:32:48 +0200 (CEST)
+ id 1D54A113848E; Wed, 10 Jun 2020 07:32:49 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH RESEND v3 36/58] qom: Less verbose object_initialize_child()
-Date: Wed, 10 Jun 2020 07:32:25 +0200
-Message-Id: <20200610053247.1583243-37-armbru@redhat.com>
+Subject: [PATCH RESEND v3 56/58] qdev: Convert bus-less devices to
+ qdev_realize() with Coccinelle
+Date: Wed, 10 Jun 2020 07:32:45 +0200
+Message-Id: <20200610053247.1583243-57-armbru@redhat.com>
 In-Reply-To: <20200610053247.1583243-1-armbru@redhat.com>
 References: <20200610053247.1583243-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 23:51:15
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 23:22:15
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -101,50 +102,33 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-All users of object_initialize_child() pass the obvious child size
-argument.  Almost all pass &error_abort and no properties.  Tiresome.
+All remaining conversions to qdev_realize() are for bus-less devices.
+Coccinelle script:
 
-Rename object_initialize_child() to
-object_initialize_child_with_props() to free the name.  New
-convenience wrapper object_initialize_child() automates the size
-argument, and passes &error_abort and no properties.
-
-Rename object_initialize_childv() to
-object_initialize_child_with_propsv() for consistency.
-
-Convert callers with this Coccinelle script:
+    // only correct for bus-less @dev!
 
     @@
-    expression parent, propname, type;
-    expression child, size;
-    symbol error_abort;
+    expression errp;
+    expression dev;
     @@
-    -    object_initialize_child(parent, propname, OBJECT(child), size, type, &error_abort, NULL)
-    +    object_initialize_child(parent, propname, child, size, type, &error_abort, NULL)
+    -    qdev_init_nofail(dev);
+    +    qdev_realize(dev, NULL, &error_fatal);
 
+    @ depends on !(file in "hw/core/qdev.c") && !(file in "hw/core/bus.c")@
+    expression errp;
+    expression dev;
+    symbol true;
     @@
-    expression parent, propname, type;
-    expression child;
-    symbol error_abort;
-    @@
-    -    object_initialize_child(parent, propname, child, sizeof(*child), type, &error_abort, NULL)
-    +    object_initialize_child(parent, propname, child, type)
+    -    object_property_set_bool(OBJECT(dev), true, "realized", errp);
+    +    qdev_realize(DEVICE(dev), NULL, errp);
 
+    @ depends on !(file in "hw/core/qdev.c") && !(file in "hw/core/bus.c")@
+    expression errp;
+    expression dev;
+    symbol true;
     @@
-    expression parent, propname, type;
-    expression child;
-    symbol error_abort;
-    @@
-    -    object_initialize_child(parent, propname, &child, sizeof(child), type, &error_abort, NULL)
-    +    object_initialize_child(parent, propname, &child, type)
-
-    @@
-    expression parent, propname, type;
-    expression child, size, err;
-    expression list props;
-    @@
-    -    object_initialize_child(parent, propname, child, size, type, err, props)
-    +    object_initialize_child_with_props(parent, propname, child, size, type, err, props)
+    -    object_property_set_bool(dev, true, "realized", errp);
+    +    qdev_realize(DEVICE(dev), NULL, errp);
 
 Note that Coccinelle chokes on ARMSSE typedef vs. macro in
 hw/arm/armsse.c.  Worked around by temporarily renaming the macro for
@@ -152,1216 +136,1546 @@ the spatch run.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Acked-by: Alistair Francis <alistair.francis@wdc.com>
-[Rebased: machine opentitan is new (commit fe0fe4735e7)]
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- include/qom/object.h            | 30 +++++++++++++++++++----
- hw/arm/allwinner-a10.c          |  5 ++--
- hw/arm/allwinner-h3.c           |  5 ++--
- hw/arm/armsse.c                 | 26 +++++++-------------
- hw/arm/aspeed.c                 |  4 +---
- hw/arm/aspeed_ast2600.c         |  4 +---
- hw/arm/aspeed_soc.c             |  4 +---
- hw/arm/bcm2836.c                |  3 +--
- hw/arm/digic.c                  |  4 +---
- hw/arm/exynos4210.c             |  3 +--
- hw/arm/fsl-imx25.c              |  4 +---
- hw/arm/fsl-imx31.c              |  4 +---
- hw/arm/fsl-imx6.c               |  5 ++--
- hw/arm/fsl-imx6ul.c             |  4 ++--
- hw/arm/fsl-imx7.c               |  5 ++--
- hw/arm/imx25_pdk.c              |  3 +--
- hw/arm/kzm.c                    |  3 +--
- hw/arm/mps2-tz.c                | 14 +++++------
- hw/arm/musca.c                  | 14 +++++------
- hw/arm/raspi.c                  |  4 ++--
- hw/arm/stm32f405_soc.c          |  6 ++---
- hw/arm/xlnx-versal.c            |  5 ++--
- hw/arm/xlnx-zcu102.c            |  3 +--
- hw/arm/xlnx-zynqmp.c            | 16 +++++--------
- hw/char/serial-isa.c            |  3 +--
- hw/char/serial-pci-multi.c      |  4 +---
- hw/char/serial-pci.c            |  3 +--
- hw/char/serial.c                |  6 ++---
- hw/core/sysbus.c                |  4 ++--
- hw/dma/xilinx_axidma.c          |  9 +++----
- hw/intc/pnv_xive.c              |  6 ++---
- hw/intc/spapr_xive.c            |  6 ++---
- hw/microblaze/xlnx-zynqmp-pmu.c |  7 +++---
- hw/misc/macio/macio.c           | 10 ++++----
- hw/net/xilinx_axienet.c         |  9 +++----
- hw/pci-host/designware.c        |  3 +--
- hw/pci-host/gpex.c              |  3 +--
- hw/pci-host/pnv_phb3.c          | 12 ++++------
- hw/pci-host/pnv_phb4.c          |  6 ++---
- hw/pci-host/pnv_phb4_pec.c      |  6 ++---
- hw/pci-host/q35.c               |  3 +--
- hw/pci-host/xilinx-pcie.c       |  3 +--
- hw/ppc/pnv.c                    | 42 ++++++++++++---------------------
- hw/ppc/pnv_psi.c                |  6 ++---
- hw/ppc/spapr.c                  |  6 ++---
- hw/riscv/opentitan.c            |  3 +--
- hw/riscv/riscv_hart.c           |  4 +---
- hw/riscv/sifive_e.c             |  4 +---
- hw/riscv/sifive_u.c             | 12 +++-------
- hw/virtio/virtio.c              |  5 ++--
- qom/object.c                    | 19 +++++++++++----
- 51 files changed, 161 insertions(+), 221 deletions(-)
+ hw/arm/allwinner-a10.c                   |  2 +-
+ hw/arm/allwinner-h3.c                    |  2 +-
+ hw/arm/armsse.c                          | 20 ++++++---------
+ hw/arm/armv7m.c                          |  2 +-
+ hw/arm/aspeed.c                          |  3 +--
+ hw/arm/aspeed_ast2600.c                  |  2 +-
+ hw/arm/aspeed_soc.c                      |  2 +-
+ hw/arm/bcm2836.c                         |  3 +--
+ hw/arm/cubieboard.c                      |  2 +-
+ hw/arm/digic.c                           |  2 +-
+ hw/arm/digic_boards.c                    |  2 +-
+ hw/arm/exynos4210.c                      |  4 +--
+ hw/arm/fsl-imx25.c                       |  2 +-
+ hw/arm/fsl-imx31.c                       |  2 +-
+ hw/arm/fsl-imx6.c                        |  2 +-
+ hw/arm/fsl-imx6ul.c                      |  3 +--
+ hw/arm/fsl-imx7.c                        |  2 +-
+ hw/arm/highbank.c                        |  2 +-
+ hw/arm/imx25_pdk.c                       |  2 +-
+ hw/arm/integratorcp.c                    |  2 +-
+ hw/arm/kzm.c                             |  2 +-
+ hw/arm/mcimx6ul-evk.c                    |  2 +-
+ hw/arm/mcimx7d-sabre.c                   |  2 +-
+ hw/arm/mps2-tz.c                         |  9 +++----
+ hw/arm/mps2.c                            |  7 +++---
+ hw/arm/musca.c                           |  6 ++---
+ hw/arm/orangepi.c                        |  2 +-
+ hw/arm/raspi.c                           |  2 +-
+ hw/arm/realview.c                        |  2 +-
+ hw/arm/sabrelite.c                       |  2 +-
+ hw/arm/sbsa-ref.c                        |  2 +-
+ hw/arm/stm32f205_soc.c                   |  2 +-
+ hw/arm/stm32f405_soc.c                   |  2 +-
+ hw/arm/versatilepb.c                     |  2 +-
+ hw/arm/vexpress.c                        |  2 +-
+ hw/arm/virt.c                            |  2 +-
+ hw/arm/xilinx_zynq.c                     |  2 +-
+ hw/arm/xlnx-versal.c                     |  2 +-
+ hw/arm/xlnx-zcu102.c                     |  2 +-
+ hw/arm/xlnx-zynqmp.c                     | 10 +++-----
+ hw/block/nand.c                          |  2 +-
+ hw/char/serial-isa.c                     |  2 +-
+ hw/char/serial-pci-multi.c               |  2 +-
+ hw/char/serial-pci.c                     |  2 +-
+ hw/char/serial.c                         |  4 +--
+ hw/core/cpu.c                            |  2 +-
+ hw/hyperv/hyperv.c                       |  2 +-
+ hw/i386/x86.c                            |  2 +-
+ hw/ide/microdrive.c                      |  3 ++-
+ hw/intc/pnv_xive.c                       |  4 +--
+ hw/intc/spapr_xive.c                     |  4 +--
+ hw/intc/xics.c                           |  2 +-
+ hw/intc/xive.c                           |  2 +-
+ hw/microblaze/petalogix_ml605_mmu.c      |  2 +-
+ hw/microblaze/petalogix_s3adsp1800_mmu.c |  2 +-
+ hw/microblaze/xlnx-zynqmp-pmu.c          |  4 +--
+ hw/pci-host/pnv_phb3.c                   |  6 ++---
+ hw/pci-host/pnv_phb4.c                   |  2 +-
+ hw/pci-host/pnv_phb4_pec.c               |  2 +-
+ hw/pci-host/prep.c                       |  3 +--
+ hw/ppc/pnv.c                             | 32 ++++++++++--------------
+ hw/ppc/pnv_bmc.c                         |  2 +-
+ hw/ppc/pnv_core.c                        |  2 +-
+ hw/ppc/pnv_psi.c                         |  4 +--
+ hw/ppc/spapr.c                           |  5 ++--
+ hw/ppc/spapr_cpu_core.c                  |  2 +-
+ hw/ppc/spapr_drc.c                       |  2 +-
+ hw/ppc/spapr_iommu.c                     |  2 +-
+ hw/ppc/spapr_irq.c                       |  2 +-
+ hw/riscv/opentitan.c                     |  3 +--
+ hw/riscv/riscv_hart.c                    |  3 +--
+ hw/riscv/sifive_e.c                      |  3 +--
+ hw/riscv/sifive_u.c                      |  9 +++----
+ hw/s390x/s390-skeys.c                    |  2 +-
+ hw/s390x/s390-stattrib.c                 |  2 +-
+ hw/s390x/s390-virtio-ccw.c               |  4 +--
+ hw/s390x/sclp.c                          |  2 +-
+ hw/s390x/tod.c                           |  2 +-
+ target/i386/cpu.c                        |  3 +--
+ tests/test-qdev-global-props.c           |  9 ++++---
+ 80 files changed, 124 insertions(+), 152 deletions(-)
 
-diff --git a/include/qom/object.h b/include/qom/object.h
-index b3eb05d65d..9ce6c9c460 100644
---- a/include/qom/object.h
-+++ b/include/qom/object.h
-@@ -783,7 +783,7 @@ int object_set_propv(Object *obj,
- void object_initialize(void *obj, size_t size, const char *typename);
- 
- /**
-- * object_initialize_child:
-+ * object_initialize_child_with_props:
-  * @parentobj: The parent object to add a property to
-  * @propname: The name of the property
-  * @childobj: A pointer to the memory to be used for the object.
-@@ -803,12 +803,13 @@ void object_initialize(void *obj, size_t size, const char *typename);
-  * If the object implements the user creatable interface, the object will
-  * be marked complete once all the properties have been processed.
-  */
--void object_initialize_child(Object *parentobj, const char *propname,
-+void object_initialize_child_with_props(Object *parentobj,
-+                             const char *propname,
-                              void *childobj, size_t size, const char *type,
-                              Error **errp, ...) QEMU_SENTINEL;
- 
- /**
-- * object_initialize_childv:
-+ * object_initialize_child_with_propsv:
-  * @parentobj: The parent object to add a property to
-  * @propname: The name of the property
-  * @childobj: A pointer to the memory to be used for the object.
-@@ -819,10 +820,31 @@ void object_initialize_child(Object *parentobj, const char *propname,
-  *
-  * See object_initialize_child() for documentation.
-  */
--void object_initialize_childv(Object *parentobj, const char *propname,
-+void object_initialize_child_with_propsv(Object *parentobj,
-+                              const char *propname,
-                               void *childobj, size_t size, const char *type,
-                               Error **errp, va_list vargs);
- 
-+/**
-+ * object_initialize_child:
-+ * @parent: The parent object to add a property to
-+ * @propname: The name of the property
-+ * @child: A precisely typed pointer to the memory to be used for the
-+ * object.
-+ * @type: The name of the type of the object to instantiate.
-+ *
-+ * This is like
-+ * object_initialize_child_with_props(parent, propname,
-+ *                                    child, sizeof(*child), type,
-+ *                                    &error_abort, NULL)
-+ */
-+#define object_initialize_child(parent, propname, child, type)          \
-+    object_initialize_child_internal((parent), (propname),              \
-+                                     (child), sizeof(*(child)), (type))
-+void object_initialize_child_internal(Object *parent, const char *propname,
-+                                      void *child, size_t size,
-+                                      const char *type);
-+
- /**
-  * object_dynamic_cast:
-  * @obj: The object to cast.
 diff --git a/hw/arm/allwinner-a10.c b/hw/arm/allwinner-a10.c
-index 6e1329a4a2..49c51463e1 100644
+index e05099c757..52e0d83760 100644
 --- a/hw/arm/allwinner-a10.c
 +++ b/hw/arm/allwinner-a10.c
-@@ -41,9 +41,8 @@ static void aw_a10_init(Object *obj)
- {
-     AwA10State *s = AW_A10(obj);
+@@ -74,7 +74,7 @@ static void aw_a10_realize(DeviceState *dev, Error **errp)
+     SysBusDevice *sysbusdev;
+     Error *err = NULL;
  
--    object_initialize_child(obj, "cpu", &s->cpu, sizeof(s->cpu),
--                            ARM_CPU_TYPE_NAME("cortex-a8"),
--                            &error_abort, NULL);
-+    object_initialize_child(obj, "cpu", &s->cpu,
-+                            ARM_CPU_TYPE_NAME("cortex-a8"));
- 
-     sysbus_init_child_obj(obj, "intc", &s->intc, sizeof(s->intc),
-                           TYPE_AW_A10_PIC);
+-    object_property_set_bool(OBJECT(&s->cpu), true, "realized", &err);
++    qdev_realize(DEVICE(&s->cpu), NULL, &err);
+     if (err != NULL) {
+         error_propagate(errp, err);
+         return;
 diff --git a/hw/arm/allwinner-h3.c b/hw/arm/allwinner-h3.c
-index f10674da5a..7dc3671155 100644
+index 91d22640e4..8e09468e86 100644
 --- a/hw/arm/allwinner-h3.c
 +++ b/hw/arm/allwinner-h3.c
-@@ -194,9 +194,8 @@ static void allwinner_h3_init(Object *obj)
-     s->memmap = allwinner_h3_memmap;
+@@ -250,7 +250,7 @@ static void allwinner_h3_realize(DeviceState *dev, Error **errp)
+         qdev_prop_set_bit(DEVICE(&s->cpus[i]), "has_el2", true);
  
-     for (int i = 0; i < AW_H3_NUM_CPUS; i++) {
--        object_initialize_child(obj, "cpu[*]", &s->cpus[i], sizeof(s->cpus[i]),
--                                ARM_CPU_TYPE_NAME("cortex-a7"),
--                                &error_abort, NULL);
-+        object_initialize_child(obj, "cpu[*]", &s->cpus[i],
-+                                ARM_CPU_TYPE_NAME("cortex-a7"));
+         /* Mark realized */
+-        qdev_init_nofail(DEVICE(&s->cpus[i]));
++        qdev_realize(DEVICE(&s->cpus[i]), NULL, &error_fatal);
      }
  
-     sysbus_init_child_obj(obj, "gic", &s->gic, sizeof(s->gic),
+     /* Generic Interrupt Controller */
 diff --git a/hw/arm/armsse.c b/hw/arm/armsse.c
-index 174ca7effc..c903e725f7 100644
+index 8abe1307a9..9ddde339ec 100644
 --- a/hw/arm/armsse.c
 +++ b/hw/arm/armsse.c
-@@ -251,9 +251,7 @@ static void armsse_init(Object *obj)
-         char *name;
- 
-         name = g_strdup_printf("cluster%d", i);
--        object_initialize_child(obj, name, &s->cluster[i],
--                                sizeof(s->cluster[i]), TYPE_CPU_CLUSTER,
--                                &error_abort, NULL);
-+        object_initialize_child(obj, name, &s->cluster[i], TYPE_CPU_CLUSTER);
-         qdev_prop_set_uint32(DEVICE(&s->cluster[i]), "cluster-id", i);
-         g_free(name);
- 
-@@ -287,15 +285,13 @@ static void armsse_init(Object *obj)
-         g_free(name);
+@@ -584,8 +584,7 @@ static void armsse_realize(DeviceState *dev, Error **errp)
+          * CPU must exist and have been parented into the cluster before
+          * the cluster is realized.
+          */
+-        object_property_set_bool(OBJECT(&s->cluster[i]),
+-                                 true, "realized", &err);
++        qdev_realize(DEVICE(&s->cluster[i]), NULL, &err);
+         if (err) {
+             error_propagate(errp, err);
+             return;
+@@ -621,7 +620,7 @@ static void armsse_realize(DeviceState *dev, Error **errp)
+                     error_propagate(errp, err);
+                     return;
+                 }
+-                object_property_set_bool(splitter, true, "realized", &err);
++                qdev_realize(DEVICE(splitter), NULL, &err);
+                 if (err) {
+                     error_propagate(errp, err);
+                     return;
+@@ -677,8 +676,7 @@ static void armsse_realize(DeviceState *dev, Error **errp)
+         error_propagate(errp, err);
+         return;
      }
-     object_initialize_child(obj, "mpc-irq-orgate", &s->mpc_irq_orgate,
--                            sizeof(s->mpc_irq_orgate), TYPE_OR_IRQ,
--                            &error_abort, NULL);
-+                            TYPE_OR_IRQ);
- 
-     for (i = 0; i < IOTS_NUM_EXP_MPC + info->sram_banks; i++) {
-         char *name = g_strdup_printf("mpc-irq-splitter-%d", i);
-         SplitIRQ *splitter = &s->mpc_irq_splitter[i];
- 
--        object_initialize_child(obj, name, splitter, sizeof(*splitter),
--                                TYPE_SPLIT_IRQ, &error_abort, NULL);
-+        object_initialize_child(obj, name, splitter, TYPE_SPLIT_IRQ);
-         g_free(name);
+-    object_property_set_bool(OBJECT(&s->sec_resp_splitter), true,
+-                             "realized", &err);
++    qdev_realize(DEVICE(&s->sec_resp_splitter), NULL, &err);
+     if (err) {
+         error_propagate(errp, err);
+         return;
+@@ -729,8 +727,7 @@ static void armsse_realize(DeviceState *dev, Error **errp)
+         error_propagate(errp, err);
+         return;
      }
-     sysbus_init_child_obj(obj, "timer0", &s->timer0, sizeof(s->timer0),
-@@ -375,21 +371,16 @@ static void armsse_init(Object *obj)
-             g_free(name);
+-    object_property_set_bool(OBJECT(&s->mpc_irq_orgate), true,
+-                             "realized", &err);
++    qdev_realize(DEVICE(&s->mpc_irq_orgate), NULL, &err);
+     if (err) {
+         error_propagate(errp, err);
+         return;
+@@ -889,8 +886,7 @@ static void armsse_realize(DeviceState *dev, Error **errp)
+         error_propagate(errp, err);
+         return;
+     }
+-    object_property_set_bool(OBJECT(&s->ppc_irq_orgate), true,
+-                             "realized", &err);
++    qdev_realize(DEVICE(&s->ppc_irq_orgate), NULL, &err);
+     if (err) {
+         error_propagate(errp, err);
+         return;
+@@ -1065,7 +1061,7 @@ static void armsse_realize(DeviceState *dev, Error **errp)
+         error_propagate(errp, err);
+         return;
+     }
+-    object_property_set_bool(OBJECT(&s->nmi_orgate), true, "realized", &err);
++    qdev_realize(DEVICE(&s->nmi_orgate), NULL, &err);
+     if (err) {
+         error_propagate(errp, err);
+         return;
+@@ -1113,7 +1109,7 @@ static void armsse_realize(DeviceState *dev, Error **errp)
+             error_propagate(errp, err);
+             return;
          }
-     }
--    object_initialize_child(obj, "nmi-orgate", &s->nmi_orgate,
--                            sizeof(s->nmi_orgate), TYPE_OR_IRQ,
--                            &error_abort, NULL);
-+    object_initialize_child(obj, "nmi-orgate", &s->nmi_orgate, TYPE_OR_IRQ);
-     object_initialize_child(obj, "ppc-irq-orgate", &s->ppc_irq_orgate,
--                            sizeof(s->ppc_irq_orgate), TYPE_OR_IRQ,
--                            &error_abort, NULL);
-+                            TYPE_OR_IRQ);
-     object_initialize_child(obj, "sec-resp-splitter", &s->sec_resp_splitter,
--                            sizeof(s->sec_resp_splitter), TYPE_SPLIT_IRQ,
--                            &error_abort, NULL);
-+                            TYPE_SPLIT_IRQ);
-     for (i = 0; i < ARRAY_SIZE(s->ppc_irq_splitter); i++) {
-         char *name = g_strdup_printf("ppc-irq-splitter-%d", i);
-         SplitIRQ *splitter = &s->ppc_irq_splitter[i];
- 
--        object_initialize_child(obj, name, splitter, sizeof(*splitter),
--                                TYPE_SPLIT_IRQ, &error_abort, NULL);
-+        object_initialize_child(obj, name, splitter, TYPE_SPLIT_IRQ);
-         g_free(name);
-     }
-     if (info->num_cpus > 1) {
-@@ -398,8 +389,7 @@ static void armsse_init(Object *obj)
-                 char *name = g_strdup_printf("cpu-irq-splitter%d", i);
-                 SplitIRQ *splitter = &s->cpu_irq_splitter[i];
- 
--                object_initialize_child(obj, name, splitter, sizeof(*splitter),
--                                        TYPE_SPLIT_IRQ, &error_abort, NULL);
-+                object_initialize_child(obj, name, splitter, TYPE_SPLIT_IRQ);
-                 g_free(name);
-             }
+-        object_property_set_bool(splitter, true, "realized", &err);
++        qdev_realize(DEVICE(splitter), NULL, &err);
+         if (err) {
+             error_propagate(errp, err);
+             return;
+@@ -1160,7 +1156,7 @@ static void armsse_realize(DeviceState *dev, Error **errp)
+             error_propagate(errp, err);
+             return;
          }
+-        object_property_set_bool(OBJECT(splitter), true, "realized", &err);
++        qdev_realize(DEVICE(splitter), NULL, &err);
+         if (err) {
+             error_propagate(errp, err);
+             return;
+diff --git a/hw/arm/armv7m.c b/hw/arm/armv7m.c
+index 5cdd0b9b51..ce83586e03 100644
+--- a/hw/arm/armv7m.c
++++ b/hw/arm/armv7m.c
+@@ -216,7 +216,7 @@ static void armv7m_realize(DeviceState *dev, Error **errp)
+     s->cpu->env.nvic = &s->nvic;
+     s->nvic.cpu = s->cpu;
+ 
+-    object_property_set_bool(OBJECT(s->cpu), true, "realized", &err);
++    qdev_realize(DEVICE(s->cpu), NULL, &err);
+     if (err != NULL) {
+         error_propagate(errp, err);
+         return;
 diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
-index 296057b1ab..c548d24621 100644
+index c548d24621..ee346b27c8 100644
 --- a/hw/arm/aspeed.c
 +++ b/hw/arm/aspeed.c
-@@ -267,9 +267,7 @@ static void aspeed_machine_init(MachineState *machine)
-                        UINT32_MAX);
-     memory_region_add_subregion(&bmc->ram_container, 0, machine->ram);
+@@ -302,8 +302,7 @@ static void aspeed_machine_init(MachineState *machine)
+         object_property_set_int(OBJECT(&bmc->soc), ASPEED_SCU_PROT_KEY,
+                                 "hw-prot-key", &error_abort);
+     }
+-    object_property_set_bool(OBJECT(&bmc->soc), true, "realized",
+-                             &error_abort);
++    qdev_realize(DEVICE(&bmc->soc), NULL, &error_abort);
  
--    object_initialize_child(OBJECT(machine), "soc", &bmc->soc,
--                            sizeof(bmc->soc), amc->soc_name, &error_abort,
--                            NULL);
-+    object_initialize_child(OBJECT(machine), "soc", &bmc->soc, amc->soc_name);
- 
-     sc = ASPEED_SOC_GET_CLASS(&bmc->soc);
- 
+     memory_region_add_subregion(get_system_memory(),
+                                 sc->memmap[ASPEED_SDRAM],
 diff --git a/hw/arm/aspeed_ast2600.c b/hw/arm/aspeed_ast2600.c
-index b912d19f80..beb688fd8f 100644
+index d465743247..6da687299f 100644
 --- a/hw/arm/aspeed_ast2600.c
 +++ b/hw/arm/aspeed_ast2600.c
-@@ -127,9 +127,7 @@ static void aspeed_soc_ast2600_init(Object *obj)
-     }
+@@ -259,7 +259,7 @@ static void aspeed_soc_ast2600_realize(DeviceState *dev, Error **errp)
+          * is needed when using -kernel
+          */
  
-     for (i = 0; i < sc->num_cpus; i++) {
--        object_initialize_child(obj, "cpu[*]", OBJECT(&s->cpu[i]),
--                                sizeof(s->cpu[i]), sc->cpu_type,
--                                &error_abort, NULL);
-+        object_initialize_child(obj, "cpu[*]", &s->cpu[i], sc->cpu_type);
-     }
- 
-     snprintf(typename, sizeof(typename), "aspeed.scu-%s", socname);
+-        object_property_set_bool(OBJECT(&s->cpu[i]), true, "realized", &err);
++        qdev_realize(DEVICE(&s->cpu[i]), NULL, &err);
+         if (err) {
+             error_propagate(errp, err);
+             return;
 diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
-index 3ec1257c14..18d1763aba 100644
+index d1e48b7a5d..810cf9b6cc 100644
 --- a/hw/arm/aspeed_soc.c
 +++ b/hw/arm/aspeed_soc.c
-@@ -142,9 +142,7 @@ static void aspeed_soc_init(Object *obj)
-     }
+@@ -230,7 +230,7 @@ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
  
+     /* CPU */
      for (i = 0; i < sc->num_cpus; i++) {
--        object_initialize_child(obj, "cpu[*]", OBJECT(&s->cpu[i]),
--                                sizeof(s->cpu[i]), sc->cpu_type,
--                                &error_abort, NULL);
-+        object_initialize_child(obj, "cpu[*]", &s->cpu[i], sc->cpu_type);
-     }
- 
-     snprintf(typename, sizeof(typename), "aspeed.scu-%s", socname);
+-        object_property_set_bool(OBJECT(&s->cpu[i]), true, "realized", &err);
++        qdev_realize(DEVICE(&s->cpu[i]), NULL, &err);
+         if (err) {
+             error_propagate(errp, err);
+             return;
 diff --git a/hw/arm/bcm2836.c b/hw/arm/bcm2836.c
-index e51b4e0c43..82cd1d2df8 100644
+index 39a63f2565..ed1793f7b7 100644
 --- a/hw/arm/bcm2836.c
 +++ b/hw/arm/bcm2836.c
-@@ -53,8 +53,7 @@ static void bcm2836_init(Object *obj)
+@@ -133,8 +133,7 @@ static void bcm2836_realize(DeviceState *dev, Error **errp)
+             return;
+         }
  
-     for (n = 0; n < BCM283X_NCPUS; n++) {
-         object_initialize_child(obj, "cpu[*]", &s->cpu[n].core,
--                                sizeof(s->cpu[n].core), info->cpu_type,
--                                &error_abort, NULL);
-+                                info->cpu_type);
+-        object_property_set_bool(OBJECT(&s->cpu[n].core), true,
+-                                 "realized", &err);
++        qdev_realize(DEVICE(&s->cpu[n].core), NULL, &err);
+         if (err) {
+             error_propagate(errp, err);
+             return;
+diff --git a/hw/arm/cubieboard.c b/hw/arm/cubieboard.c
+index 4bc4f08caf..a96c860575 100644
+--- a/hw/arm/cubieboard.c
++++ b/hw/arm/cubieboard.c
+@@ -80,7 +80,7 @@ static void cubieboard_init(MachineState *machine)
+         exit(1);
      }
  
-     sysbus_init_child_obj(obj, "control", &s->control, sizeof(s->control),
+-    object_property_set_bool(OBJECT(a10), true, "realized", &err);
++    qdev_realize(DEVICE(a10), NULL, &err);
+     if (err != NULL) {
+         error_reportf_err(err, "Couldn't realize Allwinner A10: ");
+         exit(1);
 diff --git a/hw/arm/digic.c b/hw/arm/digic.c
-index 22434a65a2..6153d5f108 100644
+index 13acd2cf6e..13a83f7430 100644
 --- a/hw/arm/digic.c
 +++ b/hw/arm/digic.c
-@@ -36,9 +36,7 @@ static void digic_init(Object *obj)
-     DigicState *s = DIGIC(obj);
-     int i;
+@@ -62,7 +62,7 @@ static void digic_realize(DeviceState *dev, Error **errp)
+         return;
+     }
  
--    object_initialize_child(obj, "cpu", &s->cpu, sizeof(s->cpu),
--                            ARM_CPU_TYPE_NAME("arm946"),
--                            &error_abort, NULL);
-+    object_initialize_child(obj, "cpu", &s->cpu, ARM_CPU_TYPE_NAME("arm946"));
+-    object_property_set_bool(OBJECT(&s->cpu), true, "realized", &err);
++    qdev_realize(DEVICE(&s->cpu), NULL, &err);
+     if (err != NULL) {
+         error_propagate(errp, err);
+         return;
+diff --git a/hw/arm/digic_boards.c b/hw/arm/digic_boards.c
+index 518a63e61d..b6452d918c 100644
+--- a/hw/arm/digic_boards.c
++++ b/hw/arm/digic_boards.c
+@@ -62,7 +62,7 @@ static void digic4_board_init(MachineState *machine, DigicBoard *board)
+         exit(EXIT_FAILURE);
+     }
  
-     for (i = 0; i < DIGIC4_NB_TIMERS; i++) {
- #define DIGIC_TIMER_NAME_MLEN    11
+-    object_property_set_bool(OBJECT(s), true, "realized", &err);
++    qdev_realize(DEVICE(s), NULL, &err);
+     if (err != NULL) {
+         error_reportf_err(err, "Couldn't realize DIGIC SoC: ");
+         exit(1);
 diff --git a/hw/arm/exynos4210.c b/hw/arm/exynos4210.c
-index 9ff1a11f80..86cbd63857 100644
+index 2afeb73776..b888a5c9ab 100644
 --- a/hw/arm/exynos4210.c
 +++ b/hw/arm/exynos4210.c
-@@ -482,8 +482,7 @@ static void exynos4210_init(Object *obj)
-         char *name = g_strdup_printf("pl330-irq-orgate%d", i);
-         qemu_or_irq *orgate = &s->pl330_irq_orgate[i];
+@@ -190,7 +190,7 @@ static DeviceState *pl330_create(uint32_t base, qemu_or_irq *orgate,
  
--        object_initialize_child(obj, name, orgate, sizeof(*orgate),
--                                TYPE_OR_IRQ, &error_abort, NULL);
-+        object_initialize_child(obj, name, orgate, TYPE_OR_IRQ);
-         g_free(name);
+     object_property_set_int(OBJECT(orgate), nevents + 1, "num-lines",
+                             &error_abort);
+-    object_property_set_bool(OBJECT(orgate), true, "realized", &error_abort);
++    qdev_realize(DEVICE(orgate), NULL, &error_abort);
+ 
+     for (i = 0; i < nevents + 1; i++) {
+         sysbus_connect_irq(busdev, i, qdev_get_gpio_in(DEVICE(orgate), i));
+@@ -223,7 +223,7 @@ static void exynos4210_realize(DeviceState *socdev, Error **errp)
+                                 "mp-affinity", &error_abort);
+         object_property_set_int(cpuobj, EXYNOS4210_SMP_PRIVATE_BASE_ADDR,
+                                 "reset-cbar", &error_abort);
+-        object_property_set_bool(cpuobj, true, "realized", &error_fatal);
++        qdev_realize(DEVICE(cpuobj), NULL, &error_fatal);
      }
- }
+ 
+     /*** IRQs ***/
 diff --git a/hw/arm/fsl-imx25.c b/hw/arm/fsl-imx25.c
-index cdaa79c26b..d8340e3527 100644
+index d2c4970074..fb516bdbac 100644
 --- a/hw/arm/fsl-imx25.c
 +++ b/hw/arm/fsl-imx25.c
-@@ -38,9 +38,7 @@ static void fsl_imx25_init(Object *obj)
-     FslIMX25State *s = FSL_IMX25(obj);
-     int i;
+@@ -85,7 +85,7 @@ static void fsl_imx25_realize(DeviceState *dev, Error **errp)
+     uint8_t i;
+     Error *err = NULL;
  
--    object_initialize_child(obj, "cpu", &s->cpu, sizeof(s->cpu),
--                            ARM_CPU_TYPE_NAME("arm926"),
--                            &error_abort, NULL);
-+    object_initialize_child(obj, "cpu", &s->cpu, ARM_CPU_TYPE_NAME("arm926"));
- 
-     sysbus_init_child_obj(obj, "avic", &s->avic, sizeof(s->avic),
-                           TYPE_IMX_AVIC);
+-    object_property_set_bool(OBJECT(&s->cpu), true, "realized", &err);
++    qdev_realize(DEVICE(&s->cpu), NULL, &err);
+     if (err) {
+         error_propagate(errp, err);
+         return;
 diff --git a/hw/arm/fsl-imx31.c b/hw/arm/fsl-imx31.c
-index 1e7959863d..54eec89701 100644
+index 08236c3230..42cca529c3 100644
 --- a/hw/arm/fsl-imx31.c
 +++ b/hw/arm/fsl-imx31.c
-@@ -33,9 +33,7 @@ static void fsl_imx31_init(Object *obj)
-     FslIMX31State *s = FSL_IMX31(obj);
-     int i;
+@@ -66,7 +66,7 @@ static void fsl_imx31_realize(DeviceState *dev, Error **errp)
+     uint16_t i;
+     Error *err = NULL;
  
--    object_initialize_child(obj, "cpu", &s->cpu, sizeof(s->cpu),
--                            ARM_CPU_TYPE_NAME("arm1136"),
--                            &error_abort, NULL);
-+    object_initialize_child(obj, "cpu", &s->cpu, ARM_CPU_TYPE_NAME("arm1136"));
- 
-     sysbus_init_child_obj(obj, "avic", &s->avic, sizeof(s->avic),
-                           TYPE_IMX_AVIC);
+-    object_property_set_bool(OBJECT(&s->cpu), true, "realized", &err);
++    qdev_realize(DEVICE(&s->cpu), NULL, &err);
+     if (err) {
+         error_propagate(errp, err);
+         return;
 diff --git a/hw/arm/fsl-imx6.c b/hw/arm/fsl-imx6.c
-index f58c85aa8c..88fbba84a4 100644
+index 33b1be4000..17593485b7 100644
 --- a/hw/arm/fsl-imx6.c
 +++ b/hw/arm/fsl-imx6.c
-@@ -43,9 +43,8 @@ static void fsl_imx6_init(Object *obj)
+@@ -130,7 +130,7 @@ static void fsl_imx6_realize(DeviceState *dev, Error **errp)
+                                      "start-powered-off", &error_abort);
+         }
  
-     for (i = 0; i < MIN(ms->smp.cpus, FSL_IMX6_NUM_CPUS); i++) {
-         snprintf(name, NAME_SIZE, "cpu%d", i);
--        object_initialize_child(obj, name, &s->cpu[i], sizeof(s->cpu[i]),
--                                ARM_CPU_TYPE_NAME("cortex-a9"),
--                                &error_abort, NULL);
-+        object_initialize_child(obj, name, &s->cpu[i],
-+                                ARM_CPU_TYPE_NAME("cortex-a9"));
-     }
- 
-     sysbus_init_child_obj(obj, "a9mpcore", &s->a9mpcore, sizeof(s->a9mpcore),
+-        object_property_set_bool(OBJECT(&s->cpu[i]), true, "realized", &err);
++        qdev_realize(DEVICE(&s->cpu[i]), NULL, &err);
+         if (err) {
+             error_propagate(errp, err);
+             return;
 diff --git a/hw/arm/fsl-imx6ul.c b/hw/arm/fsl-imx6ul.c
-index 3ecb212da6..491f1b7f73 100644
+index 72142cc2b6..f8c564033e 100644
 --- a/hw/arm/fsl-imx6ul.c
 +++ b/hw/arm/fsl-imx6ul.c
-@@ -34,8 +34,8 @@ static void fsl_imx6ul_init(Object *obj)
-     char name[NAME_SIZE];
-     int i;
+@@ -168,8 +168,7 @@ static void fsl_imx6ul_realize(DeviceState *dev, Error **errp)
  
--    object_initialize_child(obj, "cpu0", &s->cpu, sizeof(s->cpu),
--                            ARM_CPU_TYPE_NAME("cortex-a7"), &error_abort, NULL);
-+    object_initialize_child(obj, "cpu0", &s->cpu,
-+                            ARM_CPU_TYPE_NAME("cortex-a7"));
+     object_property_set_int(OBJECT(&s->cpu), QEMU_PSCI_CONDUIT_SMC,
+                             "psci-conduit", &error_abort);
+-    object_property_set_bool(OBJECT(&s->cpu), true,
+-                             "realized", &error_abort);
++    qdev_realize(DEVICE(&s->cpu), NULL, &error_abort);
  
      /*
       * A7MPCORE
 diff --git a/hw/arm/fsl-imx7.c b/hw/arm/fsl-imx7.c
-index 89c3b64c06..5cf2b7a808 100644
+index aa7051307d..ca8b5cc358 100644
 --- a/hw/arm/fsl-imx7.c
 +++ b/hw/arm/fsl-imx7.c
-@@ -38,9 +38,8 @@ static void fsl_imx7_init(Object *obj)
+@@ -174,7 +174,7 @@ static void fsl_imx7_realize(DeviceState *dev, Error **errp)
+                                      "start-powered-off", &error_abort);
+         }
  
-     for (i = 0; i < MIN(ms->smp.cpus, FSL_IMX7_NUM_CPUS); i++) {
-         snprintf(name, NAME_SIZE, "cpu%d", i);
--        object_initialize_child(obj, name, &s->cpu[i], sizeof(s->cpu[i]),
--                                ARM_CPU_TYPE_NAME("cortex-a7"), &error_abort,
--                                NULL);
-+        object_initialize_child(obj, name, &s->cpu[i],
-+                                ARM_CPU_TYPE_NAME("cortex-a7"));
+-        object_property_set_bool(o, true, "realized", &error_abort);
++        qdev_realize(DEVICE(o), NULL, &error_abort);
      }
  
      /*
+diff --git a/hw/arm/highbank.c b/hw/arm/highbank.c
+index 7f279d7f93..c7ef48ecde 100644
+--- a/hw/arm/highbank.c
++++ b/hw/arm/highbank.c
+@@ -280,7 +280,7 @@ static void calxeda_init(MachineState *machine, enum cxmachines machine_id)
+             object_property_set_int(cpuobj, MPCORE_PERIPHBASE,
+                                     "reset-cbar", &error_abort);
+         }
+-        object_property_set_bool(cpuobj, true, "realized", &error_fatal);
++        qdev_realize(DEVICE(cpuobj), NULL, &error_fatal);
+         cpu_irq[n] = qdev_get_gpio_in(DEVICE(cpu), ARM_CPU_IRQ);
+         cpu_fiq[n] = qdev_get_gpio_in(DEVICE(cpu), ARM_CPU_FIQ);
+         cpu_virq[n] = qdev_get_gpio_in(DEVICE(cpu), ARM_CPU_VIRQ);
 diff --git a/hw/arm/imx25_pdk.c b/hw/arm/imx25_pdk.c
-index 75076f2ea4..69b95711e4 100644
+index 69b95711e4..af8f7f969c 100644
 --- a/hw/arm/imx25_pdk.c
 +++ b/hw/arm/imx25_pdk.c
-@@ -73,8 +73,7 @@ static void imx25_pdk_init(MachineState *machine)
-     unsigned int alias_offset;
-     int i;
+@@ -75,7 +75,7 @@ static void imx25_pdk_init(MachineState *machine)
  
--    object_initialize_child(OBJECT(machine), "soc", &s->soc, sizeof(s->soc),
--                            TYPE_FSL_IMX25, &error_abort, NULL);
-+    object_initialize_child(OBJECT(machine), "soc", &s->soc, TYPE_FSL_IMX25);
+     object_initialize_child(OBJECT(machine), "soc", &s->soc, TYPE_FSL_IMX25);
  
-     object_property_set_bool(OBJECT(&s->soc), true, "realized", &error_fatal);
+-    object_property_set_bool(OBJECT(&s->soc), true, "realized", &error_fatal);
++    qdev_realize(DEVICE(&s->soc), NULL, &error_fatal);
+ 
+     /* We need to initialize our memory */
+     if (machine->ram_size > (FSL_IMX25_SDRAM0_SIZE + FSL_IMX25_SDRAM1_SIZE)) {
+diff --git a/hw/arm/integratorcp.c b/hw/arm/integratorcp.c
+index a55d2c31e3..b11a846355 100644
+--- a/hw/arm/integratorcp.c
++++ b/hw/arm/integratorcp.c
+@@ -607,7 +607,7 @@ static void integratorcp_init(MachineState *machine)
+         object_property_set_bool(cpuobj, false, "has_el3", &error_fatal);
+     }
+ 
+-    object_property_set_bool(cpuobj, true, "realized", &error_fatal);
++    qdev_realize(DEVICE(cpuobj), NULL, &error_fatal);
+ 
+     cpu = ARM_CPU(cpuobj);
  
 diff --git a/hw/arm/kzm.c b/hw/arm/kzm.c
-index 34f6bcb491..0275d63079 100644
+index 0275d63079..e3f7d4ead2 100644
 --- a/hw/arm/kzm.c
 +++ b/hw/arm/kzm.c
-@@ -71,8 +71,7 @@ static void kzm_init(MachineState *machine)
-     unsigned int alias_offset;
-     unsigned int i;
+@@ -73,7 +73,7 @@ static void kzm_init(MachineState *machine)
  
--    object_initialize_child(OBJECT(machine), "soc", &s->soc, sizeof(s->soc),
--                            TYPE_FSL_IMX31, &error_abort, NULL);
-+    object_initialize_child(OBJECT(machine), "soc", &s->soc, TYPE_FSL_IMX31);
+     object_initialize_child(OBJECT(machine), "soc", &s->soc, TYPE_FSL_IMX31);
  
-     object_property_set_bool(OBJECT(&s->soc), true, "realized", &error_fatal);
+-    object_property_set_bool(OBJECT(&s->soc), true, "realized", &error_fatal);
++    qdev_realize(DEVICE(&s->soc), NULL, &error_fatal);
  
+     /* Check the amount of memory is compatible with the SOC */
+     if (machine->ram_size > (FSL_IMX31_SDRAM0_SIZE + FSL_IMX31_SDRAM1_SIZE)) {
+diff --git a/hw/arm/mcimx6ul-evk.c b/hw/arm/mcimx6ul-evk.c
+index 769fe6d802..3d1d2e3c04 100644
+--- a/hw/arm/mcimx6ul-evk.c
++++ b/hw/arm/mcimx6ul-evk.c
+@@ -40,7 +40,7 @@ static void mcimx6ul_evk_init(MachineState *machine)
+ 
+     s = FSL_IMX6UL(object_new(TYPE_FSL_IMX6UL));
+     object_property_add_child(OBJECT(machine), "soc", OBJECT(s));
+-    object_property_set_bool(OBJECT(s), true, "realized", &error_fatal);
++    qdev_realize(DEVICE(s), NULL, &error_fatal);
+ 
+     memory_region_add_subregion(get_system_memory(), FSL_IMX6UL_MMDC_ADDR,
+                                 machine->ram);
+diff --git a/hw/arm/mcimx7d-sabre.c b/hw/arm/mcimx7d-sabre.c
+index 645ad5470f..365f8183bc 100644
+--- a/hw/arm/mcimx7d-sabre.c
++++ b/hw/arm/mcimx7d-sabre.c
+@@ -42,7 +42,7 @@ static void mcimx7d_sabre_init(MachineState *machine)
+ 
+     s = FSL_IMX7(object_new(TYPE_FSL_IMX7));
+     object_property_add_child(OBJECT(machine), "soc", OBJECT(s));
+-    object_property_set_bool(OBJECT(s), true, "realized", &error_fatal);
++    qdev_realize(DEVICE(s), NULL, &error_fatal);
+ 
+     memory_region_add_subregion(get_system_memory(), FSL_IMX7_MMDC_ADDR,
+                                 machine->ram);
 diff --git a/hw/arm/mps2-tz.c b/hw/arm/mps2-tz.c
-index 07d11e439f..8a050228d0 100644
+index a2b20fff37..8155c35418 100644
 --- a/hw/arm/mps2-tz.c
 +++ b/hw/arm/mps2-tz.c
-@@ -414,9 +414,10 @@ static void mps2tz_common_init(MachineState *machine)
-             char *name = g_strdup_printf("mps2-irq-splitter%d", i);
-             SplitIRQ *splitter = &mms->cpu_irq_splitter[i];
- 
--            object_initialize_child(OBJECT(machine), name,
--                                    splitter, sizeof(*splitter),
--                                    TYPE_SPLIT_IRQ, &error_fatal, NULL);
-+            object_initialize_child_with_props(OBJECT(machine), name,
-+                                               splitter, sizeof(*splitter),
-+                                               TYPE_SPLIT_IRQ, &error_fatal,
-+                                               NULL);
-             g_free(name);
+@@ -414,8 +414,7 @@ static void mps2tz_common_init(MachineState *machine)
  
              object_property_set_int(OBJECT(splitter), 2, "num-lines",
-@@ -436,9 +437,7 @@ static void mps2tz_common_init(MachineState *machine)
-      * lines, one for each of the PPCs we create here, plus one per MSC.
-      */
-     object_initialize_child(OBJECT(machine), "sec-resp-splitter",
--                            &mms->sec_resp_splitter,
--                            sizeof(mms->sec_resp_splitter),
--                            TYPE_SPLIT_IRQ, &error_abort, NULL);
-+                            &mms->sec_resp_splitter, TYPE_SPLIT_IRQ);
+                                     &error_fatal);
+-            object_property_set_bool(OBJECT(splitter), true, "realized",
+-                                     &error_fatal);
++            qdev_realize(DEVICE(splitter), NULL, &error_fatal);
+             qdev_connect_gpio_out(DEVICE(splitter), 0,
+                                   qdev_get_gpio_in_named(DEVICE(&mms->iotkit),
+                                                          "EXP_IRQ", i));
+@@ -433,8 +432,7 @@ static void mps2tz_common_init(MachineState *machine)
      object_property_set_int(OBJECT(&mms->sec_resp_splitter),
                              ARRAY_SIZE(mms->ppc) + ARRAY_SIZE(mms->msc),
                              "num-lines", &error_fatal);
-@@ -472,8 +471,7 @@ static void mps2tz_common_init(MachineState *machine)
-      * Create the OR gate for this.
-      */
-     object_initialize_child(OBJECT(mms), "uart-irq-orgate",
--                            &mms->uart_irq_orgate, sizeof(mms->uart_irq_orgate),
--                            TYPE_OR_IRQ, &error_abort, NULL);
-+                            &mms->uart_irq_orgate, TYPE_OR_IRQ);
+-    object_property_set_bool(OBJECT(&mms->sec_resp_splitter), true,
+-                             "realized", &error_fatal);
++    qdev_realize(DEVICE(&mms->sec_resp_splitter), NULL, &error_fatal);
+     dev_splitter = DEVICE(&mms->sec_resp_splitter);
+     qdev_connect_gpio_out_named(iotkitdev, "sec_resp_cfg", 0,
+                                 qdev_get_gpio_in(dev_splitter, 0));
+@@ -466,8 +464,7 @@ static void mps2tz_common_init(MachineState *machine)
+                             &mms->uart_irq_orgate, TYPE_OR_IRQ);
      object_property_set_int(OBJECT(&mms->uart_irq_orgate), 10, "num-lines",
                              &error_fatal);
-     object_property_set_bool(OBJECT(&mms->uart_irq_orgate), true,
+-    object_property_set_bool(OBJECT(&mms->uart_irq_orgate), true,
+-                             "realized", &error_fatal);
++    qdev_realize(DEVICE(&mms->uart_irq_orgate), NULL, &error_fatal);
+     qdev_connect_gpio_out(DEVICE(&mms->uart_irq_orgate), 0,
+                           get_sse_irq_in(mms, 15));
+ 
+diff --git a/hw/arm/mps2.c b/hw/arm/mps2.c
+index 735f44c7a3..daa55f730b 100644
+--- a/hw/arm/mps2.c
++++ b/hw/arm/mps2.c
+@@ -229,7 +229,7 @@ static void mps2_common_init(MachineState *machine)
+ 
+         orgate = object_new(TYPE_OR_IRQ);
+         object_property_set_int(orgate, 6, "num-lines", &error_fatal);
+-        object_property_set_bool(orgate, true, "realized", &error_fatal);
++        qdev_realize(DEVICE(orgate), NULL, &error_fatal);
+         orgate_dev = DEVICE(orgate);
+         qdev_connect_gpio_out(orgate_dev, 0, qdev_get_gpio_in(armv7m, 12));
+ 
+@@ -266,7 +266,7 @@ static void mps2_common_init(MachineState *machine)
+ 
+         orgate = object_new(TYPE_OR_IRQ);
+         object_property_set_int(orgate, 10, "num-lines", &error_fatal);
+-        object_property_set_bool(orgate, true, "realized", &error_fatal);
++        qdev_realize(DEVICE(orgate), NULL, &error_fatal);
+         orgate_dev = DEVICE(orgate);
+         qdev_connect_gpio_out(orgate_dev, 0, qdev_get_gpio_in(armv7m, 12));
+ 
+@@ -281,8 +281,7 @@ static void mps2_common_init(MachineState *machine)
+ 
+             txrx_orgate = object_new(TYPE_OR_IRQ);
+             object_property_set_int(txrx_orgate, 2, "num-lines", &error_fatal);
+-            object_property_set_bool(txrx_orgate, true, "realized",
+-                                     &error_fatal);
++            qdev_realize(DEVICE(txrx_orgate), NULL, &error_fatal);
+             txrx_orgate_dev = DEVICE(txrx_orgate);
+             qdev_connect_gpio_out(txrx_orgate_dev, 0,
+                                   qdev_get_gpio_in(armv7m, uart_txrx_irqno[i]));
 diff --git a/hw/arm/musca.c b/hw/arm/musca.c
-index ba99dd1941..cd7df7c191 100644
+index d74042356d..34376328fc 100644
 --- a/hw/arm/musca.c
 +++ b/hw/arm/musca.c
-@@ -404,9 +404,9 @@ static void musca_init(MachineState *machine)
-         char *name = g_strdup_printf("musca-irq-splitter%d", i);
-         SplitIRQ *splitter = &mms->cpu_irq_splitter[i];
- 
--        object_initialize_child(OBJECT(machine), name,
--                                splitter, sizeof(*splitter),
--                                TYPE_SPLIT_IRQ, &error_fatal, NULL);
-+        object_initialize_child_with_props(OBJECT(machine), name, splitter,
-+                                           sizeof(*splitter), TYPE_SPLIT_IRQ,
-+                                           &error_fatal, NULL);
-         g_free(name);
+@@ -405,8 +405,7 @@ static void musca_init(MachineState *machine)
  
          object_property_set_int(OBJECT(splitter), 2, "num-lines",
-@@ -424,10 +424,10 @@ static void musca_init(MachineState *machine)
-      * The sec_resp_cfg output from the SSE-200 must be split into multiple
-      * lines, one for each of the PPCs we create here.
-      */
--    object_initialize_child(OBJECT(machine), "sec-resp-splitter",
--                            &mms->sec_resp_splitter,
--                            sizeof(mms->sec_resp_splitter),
--                            TYPE_SPLIT_IRQ, &error_fatal, NULL);
-+    object_initialize_child_with_props(OBJECT(machine), "sec-resp-splitter",
-+                                       &mms->sec_resp_splitter,
-+                                       sizeof(mms->sec_resp_splitter),
-+                                       TYPE_SPLIT_IRQ, &error_fatal, NULL);
+                                 &error_fatal);
+-        object_property_set_bool(OBJECT(splitter), true, "realized",
+-                                 &error_fatal);
++        qdev_realize(DEVICE(splitter), NULL, &error_fatal);
+         qdev_connect_gpio_out(DEVICE(splitter), 0,
+                               qdev_get_gpio_in_named(ssedev, "EXP_IRQ", i));
+         qdev_connect_gpio_out(DEVICE(splitter), 1,
+@@ -425,8 +424,7 @@ static void musca_init(MachineState *machine)
  
      object_property_set_int(OBJECT(&mms->sec_resp_splitter),
                              ARRAY_SIZE(mms->ppc), "num-lines", &error_fatal);
+-    object_property_set_bool(OBJECT(&mms->sec_resp_splitter), true,
+-                             "realized", &error_fatal);
++    qdev_realize(DEVICE(&mms->sec_resp_splitter), NULL, &error_fatal);
+     dev_splitter = DEVICE(&mms->sec_resp_splitter);
+     qdev_connect_gpio_out_named(ssedev, "sec_resp_cfg", 0,
+                                 qdev_get_gpio_in(dev_splitter, 0));
+diff --git a/hw/arm/orangepi.c b/hw/arm/orangepi.c
+index 44a333a6eb..678c93033e 100644
+--- a/hw/arm/orangepi.c
++++ b/hw/arm/orangepi.c
+@@ -86,7 +86,7 @@ static void orangepi_init(MachineState *machine)
+                             &error_abort);
+ 
+     /* Mark H3 object realized */
+-    object_property_set_bool(OBJECT(h3), true, "realized", &error_abort);
++    qdev_realize(DEVICE(h3), NULL, &error_abort);
+ 
+     /* Retrieve SD bus */
+     di = drive_get_next(IF_SD);
 diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
-index a8e26a70bb..78cb995251 100644
+index 78cb995251..380978fc27 100644
 --- a/hw/arm/raspi.c
 +++ b/hw/arm/raspi.c
-@@ -282,8 +282,8 @@ static void raspi_machine_init(MachineState *machine)
-                                         machine->ram, 0);
- 
-     /* Setup the SOC */
--    object_initialize_child(OBJECT(machine), "soc", &s->soc, sizeof(s->soc),
--                            board_soc_type(board_rev), &error_abort, NULL);
-+    object_initialize_child(OBJECT(machine), "soc", &s->soc,
-+                            board_soc_type(board_rev));
+@@ -287,7 +287,7 @@ static void raspi_machine_init(MachineState *machine)
      object_property_add_const_link(OBJECT(&s->soc), "ram", OBJECT(machine->ram));
      object_property_set_int(OBJECT(&s->soc), board_rev, "board-rev",
                              &error_abort);
-diff --git a/hw/arm/stm32f405_soc.c b/hw/arm/stm32f405_soc.c
-index c9a530eecf..33a83bd1d4 100644
---- a/hw/arm/stm32f405_soc.c
-+++ b/hw/arm/stm32f405_soc.c
-@@ -169,9 +169,9 @@ static void stm32f405_soc_realize(DeviceState *dev_soc, Error **errp)
+-    object_property_set_bool(OBJECT(&s->soc), true, "realized", &error_abort);
++    qdev_realize(DEVICE(&s->soc), NULL, &error_abort);
+ 
+     /* Create and plug in the SD cards */
+     di = drive_get_next(IF_SD);
+diff --git a/hw/arm/realview.c b/hw/arm/realview.c
+index aee7989037..f3c00fe00c 100644
+--- a/hw/arm/realview.c
++++ b/hw/arm/realview.c
+@@ -114,7 +114,7 @@ static void realview_init(MachineState *machine,
+                                     &error_fatal);
+         }
+ 
+-        object_property_set_bool(cpuobj, true, "realized", &error_fatal);
++        qdev_realize(DEVICE(cpuobj), NULL, &error_fatal);
+ 
+         cpu_irq[n] = qdev_get_gpio_in(DEVICE(cpuobj), ARM_CPU_IRQ);
+     }
+diff --git a/hw/arm/sabrelite.c b/hw/arm/sabrelite.c
+index 33d731549d..a27e5baf60 100644
+--- a/hw/arm/sabrelite.c
++++ b/hw/arm/sabrelite.c
+@@ -51,7 +51,7 @@ static void sabrelite_init(MachineState *machine)
+ 
+     s = FSL_IMX6(object_new(TYPE_FSL_IMX6));
+     object_property_add_child(OBJECT(machine), "soc", OBJECT(s));
+-    object_property_set_bool(OBJECT(s), true, "realized", &error_fatal);
++    qdev_realize(DEVICE(s), NULL, &error_fatal);
+ 
+     memory_region_add_subregion(get_system_memory(), FSL_IMX6_MMDC_ADDR,
+                                 machine->ram);
+diff --git a/hw/arm/sbsa-ref.c b/hw/arm/sbsa-ref.c
+index 3fd3536796..e40c868a82 100644
+--- a/hw/arm/sbsa-ref.c
++++ b/hw/arm/sbsa-ref.c
+@@ -680,7 +680,7 @@ static void sbsa_ref_init(MachineState *machine)
+         object_property_set_link(cpuobj, OBJECT(secure_sysmem),
+                                  "secure-memory", &error_abort);
+ 
+-        object_property_set_bool(cpuobj, true, "realized", &error_fatal);
++        qdev_realize(DEVICE(cpuobj), NULL, &error_fatal);
+         object_unref(cpuobj);
      }
  
-     /* ADC device, the IRQs are ORed together */
--    object_initialize_child(OBJECT(s), "adc-orirq", &s->adc_irqs,
--                            sizeof(s->adc_irqs), TYPE_OR_IRQ,
--                            &err, NULL);
-+    object_initialize_child_with_props(OBJECT(s), "adc-orirq", &s->adc_irqs,
-+                                       sizeof(s->adc_irqs), TYPE_OR_IRQ, &err,
-+                                       NULL);
+diff --git a/hw/arm/stm32f205_soc.c b/hw/arm/stm32f205_soc.c
+index e2c3479702..19487544f0 100644
+--- a/hw/arm/stm32f205_soc.c
++++ b/hw/arm/stm32f205_soc.c
+@@ -155,7 +155,7 @@ static void stm32f205_soc_realize(DeviceState *dev_soc, Error **errp)
+     /* ADC 1 to 3 */
+     object_property_set_int(OBJECT(s->adc_irqs), STM_NUM_ADCS,
+                             "num-lines", &err);
+-    object_property_set_bool(OBJECT(s->adc_irqs), true, "realized", &err);
++    qdev_realize(DEVICE(s->adc_irqs), NULL, &err);
      if (err != NULL) {
          error_propagate(errp, err);
          return;
+diff --git a/hw/arm/stm32f405_soc.c b/hw/arm/stm32f405_soc.c
+index 9f7838a4a3..c12d9f999d 100644
+--- a/hw/arm/stm32f405_soc.c
++++ b/hw/arm/stm32f405_soc.c
+@@ -173,7 +173,7 @@ static void stm32f405_soc_realize(DeviceState *dev_soc, Error **errp)
+     }
+     object_property_set_int(OBJECT(&s->adc_irqs), STM_NUM_ADCS,
+                             "num-lines", &err);
+-    object_property_set_bool(OBJECT(&s->adc_irqs), true, "realized", &err);
++    qdev_realize(DEVICE(&s->adc_irqs), NULL, &err);
+     if (err != NULL) {
+         error_propagate(errp, err);
+         return;
+diff --git a/hw/arm/versatilepb.c b/hw/arm/versatilepb.c
+index 29e3bc6bd0..2ebdcbd8ac 100644
+--- a/hw/arm/versatilepb.c
++++ b/hw/arm/versatilepb.c
+@@ -215,7 +215,7 @@ static void versatile_init(MachineState *machine, int board_id)
+         object_property_set_bool(cpuobj, false, "has_el3", &error_fatal);
+     }
+ 
+-    object_property_set_bool(cpuobj, true, "realized", &error_fatal);
++    qdev_realize(DEVICE(cpuobj), NULL, &error_fatal);
+ 
+     cpu = ARM_CPU(cpuobj);
+ 
+diff --git a/hw/arm/vexpress.c b/hw/arm/vexpress.c
+index bebb0ed5a4..7ca5d523a4 100644
+--- a/hw/arm/vexpress.c
++++ b/hw/arm/vexpress.c
+@@ -229,7 +229,7 @@ static void init_cpus(MachineState *ms, const char *cpu_type,
+             object_property_set_int(cpuobj, periphbase,
+                                     "reset-cbar", &error_abort);
+         }
+-        object_property_set_bool(cpuobj, true, "realized", &error_fatal);
++        qdev_realize(DEVICE(cpuobj), NULL, &error_fatal);
+     }
+ 
+     /* Create the private peripheral devices (including the GIC);
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index c3e80bcbce..caceb1e4a0 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -1819,7 +1819,7 @@ static void machvirt_init(MachineState *machine)
+                                      "secure-memory", &error_abort);
+         }
+ 
+-        object_property_set_bool(cpuobj, true, "realized", &error_fatal);
++        qdev_realize(DEVICE(cpuobj), NULL, &error_fatal);
+         object_unref(cpuobj);
+     }
+     fdt_add_timer_nodes(vms);
+diff --git a/hw/arm/xilinx_zynq.c b/hw/arm/xilinx_zynq.c
+index 69d62ee24b..4247c4dbd8 100644
+--- a/hw/arm/xilinx_zynq.c
++++ b/hw/arm/xilinx_zynq.c
+@@ -202,7 +202,7 @@ static void zynq_init(MachineState *machine)
+                             &error_fatal);
+     object_property_set_int(OBJECT(cpu), MPCORE_PERIPHBASE, "reset-cbar",
+                             &error_fatal);
+-    object_property_set_bool(OBJECT(cpu), true, "realized", &error_fatal);
++    qdev_realize(DEVICE(cpu), NULL, &error_fatal);
+ 
+     /* DDR remapped to address zero.  */
+     memory_region_add_subregion(address_space_mem, 0, machine->ram);
 diff --git a/hw/arm/xlnx-versal.c b/hw/arm/xlnx-versal.c
-index c3d47bb9e9..12e4469cf4 100644
+index 20f0121ab0..fed9d07ca2 100644
 --- a/hw/arm/xlnx-versal.c
 +++ b/hw/arm/xlnx-versal.c
-@@ -32,9 +32,8 @@ static void versal_create_apu_cpus(Versal *s)
-     for (i = 0; i < ARRAY_SIZE(s->fpd.apu.cpu); i++) {
-         Object *obj;
+@@ -47,7 +47,7 @@ static void versal_create_apu_cpus(Versal *s)
+                                 "core-count", &error_abort);
+         object_property_set_link(obj, OBJECT(&s->fpd.apu.mr), "memory",
+                                  &error_abort);
+-        object_property_set_bool(obj, true, "realized", &error_fatal);
++        qdev_realize(DEVICE(obj), NULL, &error_fatal);
+     }
+ }
  
--        object_initialize_child(OBJECT(s), "apu-cpu[*]",
--                                &s->fpd.apu.cpu[i], sizeof(s->fpd.apu.cpu[i]),
--                                XLNX_VERSAL_ACPU_TYPE, &error_abort, NULL);
-+        object_initialize_child(OBJECT(s), "apu-cpu[*]", &s->fpd.apu.cpu[i],
-+                                XLNX_VERSAL_ACPU_TYPE);
-         obj = OBJECT(&s->fpd.apu.cpu[i]);
-         object_property_set_int(obj, s->cfg.psci_conduit,
-                                 "psci-conduit", &error_abort);
 diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
-index 77c84b82ab..822e24af65 100644
+index 822e24af65..b920bcee94 100644
 --- a/hw/arm/xlnx-zcu102.c
 +++ b/hw/arm/xlnx-zcu102.c
-@@ -116,8 +116,7 @@ static void xlnx_zcu102_init(MachineState *machine)
-                  ram_size);
-     }
+@@ -125,7 +125,7 @@ static void xlnx_zcu102_init(MachineState *machine)
+     object_property_set_bool(OBJECT(&s->soc), s->virt, "virtualization",
+                              &error_fatal);
  
--    object_initialize_child(OBJECT(machine), "soc", &s->soc, sizeof(s->soc),
--                            TYPE_XLNX_ZYNQMP, &error_abort, NULL);
-+    object_initialize_child(OBJECT(machine), "soc", &s->soc, TYPE_XLNX_ZYNQMP);
+-    object_property_set_bool(OBJECT(&s->soc), true, "realized", &error_fatal);
++    qdev_realize(DEVICE(&s->soc), NULL, &error_fatal);
  
-     object_property_set_link(OBJECT(&s->soc), OBJECT(machine->ram),
-                          "ddr-ram", &error_abort);
+     /* Create and plug in the SD cards */
+     for (i = 0; i < XLNX_ZYNQMP_NUM_SDHCI; i++) {
 diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
-index f08abf60d7..890139d6a2 100644
+index 446b75a7aa..1de9d4a89d 100644
 --- a/hw/arm/xlnx-zynqmp.c
 +++ b/hw/arm/xlnx-zynqmp.c
-@@ -187,17 +187,15 @@ static void xlnx_zynqmp_create_rpu(MachineState *ms, XlnxZynqMPState *s,
+@@ -209,15 +209,14 @@ static void xlnx_zynqmp_create_rpu(MachineState *ms, XlnxZynqMPState *s,
+ 
+         object_property_set_bool(OBJECT(&s->rpu_cpu[i]), true, "reset-hivecs",
+                                  &error_abort);
+-        object_property_set_bool(OBJECT(&s->rpu_cpu[i]), true, "realized",
+-                                 &err);
++        qdev_realize(DEVICE(&s->rpu_cpu[i]), NULL, &err);
+         if (err) {
+             error_propagate(errp, err);
+             return;
+         }
      }
  
-     object_initialize_child(OBJECT(s), "rpu-cluster", &s->rpu_cluster,
--                            sizeof(s->rpu_cluster), TYPE_CPU_CLUSTER,
--                            &error_abort, NULL);
-+                            TYPE_CPU_CLUSTER);
-     qdev_prop_set_uint32(DEVICE(&s->rpu_cluster), "cluster-id", 1);
+-    qdev_init_nofail(DEVICE(&s->rpu_cluster));
++    qdev_realize(DEVICE(&s->rpu_cluster), NULL, &error_fatal);
+ }
  
-     for (i = 0; i < num_rpus; i++) {
-         char *name;
+ static void xlnx_zynqmp_init(Object *obj)
+@@ -341,7 +340,7 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
+     qdev_prop_set_bit(DEVICE(&s->gic),
+                       "has-virtualization-extensions", s->virt);
  
-         object_initialize_child(OBJECT(&s->rpu_cluster), "rpu-cpu[*]",
--                                &s->rpu_cpu[i], sizeof(s->rpu_cpu[i]),
--                                ARM_CPU_TYPE_NAME("cortex-r5f"),
--                                &error_abort, NULL);
-+                                &s->rpu_cpu[i],
-+                                ARM_CPU_TYPE_NAME("cortex-r5f"));
+-    qdev_init_nofail(DEVICE(&s->apu_cluster));
++    qdev_realize(DEVICE(&s->apu_cluster), NULL, &error_fatal);
  
-         name = object_get_canonical_path_component(OBJECT(&s->rpu_cpu[i]));
-         if (strcmp(name, boot_cpu)) {
-@@ -230,15 +228,13 @@ static void xlnx_zynqmp_init(Object *obj)
-     int num_apus = MIN(ms->smp.cpus, XLNX_ZYNQMP_NUM_APU_CPUS);
- 
-     object_initialize_child(obj, "apu-cluster", &s->apu_cluster,
--                            sizeof(s->apu_cluster), TYPE_CPU_CLUSTER,
--                            &error_abort, NULL);
-+                            TYPE_CPU_CLUSTER);
-     qdev_prop_set_uint32(DEVICE(&s->apu_cluster), "cluster-id", 0);
- 
+     /* Realize APUs before realizing the GIC. KVM requires this.  */
      for (i = 0; i < num_apus; i++) {
-         object_initialize_child(OBJECT(&s->apu_cluster), "apu-cpu[*]",
--                                &s->apu_cpu[i], sizeof(s->apu_cpu[i]),
--                                ARM_CPU_TYPE_NAME("cortex-a53"),
--                                &error_abort, NULL);
-+                                &s->apu_cpu[i],
-+                                ARM_CPU_TYPE_NAME("cortex-a53"));
+@@ -368,8 +367,7 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
+                                 "reset-cbar", &error_abort);
+         object_property_set_int(OBJECT(&s->apu_cpu[i]), num_apus,
+                                 "core-count", &error_abort);
+-        object_property_set_bool(OBJECT(&s->apu_cpu[i]), true, "realized",
+-                                 &err);
++        qdev_realize(DEVICE(&s->apu_cpu[i]), NULL, &err);
+         if (err) {
+             error_propagate(errp, err);
+             return;
+diff --git a/hw/block/nand.c b/hw/block/nand.c
+index cdf3429ce6..7e25681d59 100644
+--- a/hw/block/nand.c
++++ b/hw/block/nand.c
+@@ -651,7 +651,7 @@ DeviceState *nand_init(BlockBackend *blk, int manf_id, int chip_id)
+         qdev_prop_set_drive(dev, "drive", blk, &error_fatal);
      }
  
-     sysbus_init_child_obj(obj, "gic", &s->gic, sizeof(s->gic),
+-    qdev_init_nofail(dev);
++    qdev_realize(dev, NULL, &error_fatal);
+     return dev;
+ }
+ 
 diff --git a/hw/char/serial-isa.c b/hw/char/serial-isa.c
-index f13dd98c60..7630a874a8 100644
+index 7630a874a8..01f9245b9b 100644
 --- a/hw/char/serial-isa.c
 +++ b/hw/char/serial-isa.c
-@@ -114,8 +114,7 @@ static void serial_isa_initfn(Object *o)
- {
-     ISASerialState *self = ISA_SERIAL(o);
+@@ -74,7 +74,7 @@ static void serial_isa_realizefn(DeviceState *dev, Error **errp)
+     index++;
  
--    object_initialize_child(o, "serial", &self->state, sizeof(self->state),
--                            TYPE_SERIAL, &error_abort, NULL);
-+    object_initialize_child(o, "serial", &self->state, TYPE_SERIAL);
- }
+     isa_init_irq(isadev, &s->irq, isa->isairq);
+-    object_property_set_bool(OBJECT(s), true, "realized", errp);
++    qdev_realize(DEVICE(s), NULL, errp);
+     qdev_set_legacy_instance_id(dev, isa->iobase, 3);
  
- static const TypeInfo serial_isa_info = {
+     memory_region_init_io(&s->io, OBJECT(isa), &serial_io_ops, s, "serial", 8);
 diff --git a/hw/char/serial-pci-multi.c b/hw/char/serial-pci-multi.c
-index 23d0ebe2cd..1d65d64c4e 100644
+index 1d65d64c4e..56f915e7c9 100644
 --- a/hw/char/serial-pci-multi.c
 +++ b/hw/char/serial-pci-multi.c
-@@ -187,9 +187,7 @@ static void multi_serial_init(Object *o)
-     size_t i, nports = multi_serial_get_port_count(PCI_DEVICE_GET_CLASS(dev));
+@@ -106,7 +106,7 @@ static void multi_serial_pci_realize(PCIDevice *dev, Error **errp)
  
      for (i = 0; i < nports; i++) {
--        object_initialize_child(o, "serial[*]", &pms->state[i],
--                                sizeof(pms->state[i]),
--                                TYPE_SERIAL, &error_abort, NULL);
-+        object_initialize_child(o, "serial[*]", &pms->state[i], TYPE_SERIAL);
-     }
- }
- 
+         s = pci->state + i;
+-        object_property_set_bool(OBJECT(s), true, "realized", &err);
++        qdev_realize(DEVICE(s), NULL, &err);
+         if (err != NULL) {
+             error_propagate(errp, err);
+             multi_serial_pci_exit(dev);
 diff --git a/hw/char/serial-pci.c b/hw/char/serial-pci.c
-index 65eacfae0e..5f5ff10a75 100644
+index 5f5ff10a75..298f3adba7 100644
 --- a/hw/char/serial-pci.c
 +++ b/hw/char/serial-pci.c
-@@ -108,8 +108,7 @@ static void serial_pci_init(Object *o)
- {
-     PCISerialState *ps = PCI_SERIAL(o);
- 
--    object_initialize_child(o, "serial", &ps->state, sizeof(ps->state),
--                            TYPE_SERIAL, &error_abort, NULL);
-+    object_initialize_child(o, "serial", &ps->state, TYPE_SERIAL);
- }
- 
- static const TypeInfo serial_pci_info = {
-diff --git a/hw/char/serial.c b/hw/char/serial.c
-index a0cab38fb0..57c299e993 100644
---- a/hw/char/serial.c
-+++ b/hw/char/serial.c
-@@ -1014,8 +1014,7 @@ static void serial_io_instance_init(Object *o)
- {
-     SerialIO *sio = SERIAL_IO(o);
- 
--    object_initialize_child(o, "serial", &sio->serial, sizeof(sio->serial),
--                            TYPE_SERIAL, &error_abort, NULL);
-+    object_initialize_child(o, "serial", &sio->serial, TYPE_SERIAL);
- 
-     qdev_alias_all_properties(DEVICE(&sio->serial), o);
- }
-@@ -1148,8 +1147,7 @@ static void serial_mm_instance_init(Object *o)
- {
-     SerialMM *smm = SERIAL_MM(o);
- 
--    object_initialize_child(o, "serial", &smm->serial, sizeof(smm->serial),
--                            TYPE_SERIAL, &error_abort, NULL);
-+    object_initialize_child(o, "serial", &smm->serial, TYPE_SERIAL);
- 
-     qdev_alias_all_properties(DEVICE(&smm->serial), o);
- }
-diff --git a/hw/core/sysbus.c b/hw/core/sysbus.c
-index 7ff1b5f2de..e8d08d349b 100644
---- a/hw/core/sysbus.c
-+++ b/hw/core/sysbus.c
-@@ -348,8 +348,8 @@ BusState *sysbus_get_default(void)
- void sysbus_init_child_obj(Object *parent, const char *childname, void *child,
-                            size_t childsize, const char *childtype)
- {
--    object_initialize_child(parent, childname, child, childsize, childtype,
--                            &error_abort, NULL);
-+    object_initialize_child_with_props(parent, childname, child, childsize,
-+                                       childtype, &error_abort, NULL);
-     qdev_set_parent_bus(DEVICE(child), sysbus_get_default());
- }
- 
-diff --git a/hw/dma/xilinx_axidma.c b/hw/dma/xilinx_axidma.c
-index 460102b142..6a9df2c4db 100644
---- a/hw/dma/xilinx_axidma.c
-+++ b/hw/dma/xilinx_axidma.c
-@@ -579,13 +579,10 @@ static void xilinx_axidma_init(Object *obj)
-     SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
- 
-     object_initialize_child(OBJECT(s), "axistream-connected-target",
--                            &s->rx_data_dev, sizeof(s->rx_data_dev),
--                            TYPE_XILINX_AXI_DMA_DATA_STREAM, &error_abort,
--                            NULL);
-+                            &s->rx_data_dev, TYPE_XILINX_AXI_DMA_DATA_STREAM);
-     object_initialize_child(OBJECT(s), "axistream-control-connected-target",
--                            &s->rx_control_dev, sizeof(s->rx_control_dev),
--                            TYPE_XILINX_AXI_DMA_CONTROL_STREAM, &error_abort,
--                            NULL);
-+                            &s->rx_control_dev,
-+                            TYPE_XILINX_AXI_DMA_CONTROL_STREAM);
-     object_property_add_link(obj, "dma", TYPE_MEMORY_REGION,
-                              (Object **)&s->dma_mr,
-                              qdev_prop_allow_set_link_before_realize,
-diff --git a/hw/intc/pnv_xive.c b/hw/intc/pnv_xive.c
-index aeda488bd1..892c78069d 100644
---- a/hw/intc/pnv_xive.c
-+++ b/hw/intc/pnv_xive.c
-@@ -1796,11 +1796,9 @@ static void pnv_xive_init(Object *obj)
-     PnvXive *xive = PNV_XIVE(obj);
- 
-     object_initialize_child(obj, "ipi_source", &xive->ipi_source,
--                            sizeof(xive->ipi_source), TYPE_XIVE_SOURCE,
--                            &error_abort, NULL);
-+                            TYPE_XIVE_SOURCE);
-     object_initialize_child(obj, "end_source", &xive->end_source,
--                            sizeof(xive->end_source), TYPE_XIVE_END_SOURCE,
--                            &error_abort, NULL);
-+                            TYPE_XIVE_END_SOURCE);
- }
- 
- /*
-diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-index 6608d7220a..263cd1253c 100644
---- a/hw/intc/spapr_xive.c
-+++ b/hw/intc/spapr_xive.c
-@@ -272,12 +272,10 @@ static void spapr_xive_instance_init(Object *obj)
- {
-     SpaprXive *xive = SPAPR_XIVE(obj);
- 
--    object_initialize_child(obj, "source", &xive->source, sizeof(xive->source),
--                            TYPE_XIVE_SOURCE, &error_abort, NULL);
-+    object_initialize_child(obj, "source", &xive->source, TYPE_XIVE_SOURCE);
- 
-     object_initialize_child(obj, "end_source", &xive->end_source,
--                            sizeof(xive->end_source), TYPE_XIVE_END_SOURCE,
--                            &error_abort, NULL);
-+                            TYPE_XIVE_END_SOURCE);
- 
-     /* Not connected to the KVM XIVE device */
-     xive->fd = -1;
-diff --git a/hw/microblaze/xlnx-zynqmp-pmu.c b/hw/microblaze/xlnx-zynqmp-pmu.c
-index aa90b9d1be..bd56eccd66 100644
---- a/hw/microblaze/xlnx-zynqmp-pmu.c
-+++ b/hw/microblaze/xlnx-zynqmp-pmu.c
-@@ -61,8 +61,7 @@ static void xlnx_zynqmp_pmu_soc_init(Object *obj)
- {
-     XlnxZynqMPPMUSoCState *s = XLNX_ZYNQMP_PMU_SOC(obj);
- 
--    object_initialize_child(obj, "pmu-cpu", &s->cpu, sizeof(s->cpu),
--                            TYPE_MICROBLAZE_CPU, &error_abort, NULL);
-+    object_initialize_child(obj, "pmu-cpu", &s->cpu, TYPE_MICROBLAZE_CPU);
- 
-     sysbus_init_child_obj(obj, "intc", &s->intc, sizeof(s->intc),
-                           TYPE_XLNX_PMU_IO_INTC);
-@@ -174,8 +173,8 @@ static void xlnx_zynqmp_pmu_init(MachineState *machine)
-                                 pmu_ram);
- 
-     /* Create the PMU device */
--    object_initialize_child(OBJECT(machine), "pmu", pmu, sizeof(*pmu),
--                            TYPE_XLNX_ZYNQMP_PMU_SOC, &error_abort, NULL);
-+    object_initialize_child(OBJECT(machine), "pmu", pmu,
-+                            TYPE_XLNX_ZYNQMP_PMU_SOC);
-     object_property_set_bool(OBJECT(pmu), true, "realized", &error_fatal);
- 
-     /* Load the kernel */
-diff --git a/hw/misc/macio/macio.c b/hw/misc/macio/macio.c
-index 216bdc69c0..a2698e4a20 100644
---- a/hw/misc/macio/macio.c
-+++ b/hw/misc/macio/macio.c
-@@ -98,8 +98,8 @@ static void macio_init_child_obj(MacIOState *s, const char *childname,
-                                  void *child, size_t childsize,
-                                  const char *childtype)
- {
--    object_initialize_child(OBJECT(s), childname, child, childsize, childtype,
--                            &error_abort, NULL);
-+    object_initialize_child_with_props(OBJECT(s), childname, child, childsize,
-+                                       childtype, &error_abort, NULL);
-     qdev_set_parent_bus(DEVICE(child), BUS(&s->macio_bus));
- }
- 
-@@ -351,8 +351,7 @@ static void macio_newworld_realize(PCIDevice *d, Error **errp)
-         object_property_set_bool(OBJECT(&ns->gpio), true, "realized", &err);
- 
-         /* PMU */
--        object_initialize_child(OBJECT(s), "pmu", &s->pmu, sizeof(s->pmu),
--                                TYPE_VIA_PMU, &error_abort, NULL);
-+        object_initialize_child(OBJECT(s), "pmu", &s->pmu, TYPE_VIA_PMU);
-         object_property_set_link(OBJECT(&s->pmu), OBJECT(sysbus_dev), "gpio",
-                                  &error_abort);
-         qdev_prop_set_bit(DEVICE(&s->pmu), "has-adb", ns->has_adb);
-@@ -370,8 +369,7 @@ static void macio_newworld_realize(PCIDevice *d, Error **errp)
-         object_unparent(OBJECT(&ns->gpio));
- 
-         /* CUDA */
--        object_initialize_child(OBJECT(s), "cuda", &s->cuda, sizeof(s->cuda),
--                                TYPE_CUDA, &error_abort, NULL);
-+        object_initialize_child(OBJECT(s), "cuda", &s->cuda, TYPE_CUDA);
-         qdev_prop_set_uint64(DEVICE(&s->cuda), "timebase-frequency",
-                              s->frequency);
- 
-diff --git a/hw/net/xilinx_axienet.c b/hw/net/xilinx_axienet.c
-index 44fe04d889..c2f40b8ea9 100644
---- a/hw/net/xilinx_axienet.c
-+++ b/hw/net/xilinx_axienet.c
-@@ -1020,13 +1020,10 @@ static void xilinx_enet_init(Object *obj)
-     SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
- 
-     object_initialize_child(OBJECT(s), "axistream-connected-target",
--                            &s->rx_data_dev, sizeof(s->rx_data_dev),
--                            TYPE_XILINX_AXI_ENET_DATA_STREAM, &error_abort,
--                            NULL);
-+                            &s->rx_data_dev, TYPE_XILINX_AXI_ENET_DATA_STREAM);
-     object_initialize_child(OBJECT(s), "axistream-control-connected-target",
--                            &s->rx_control_dev, sizeof(s->rx_control_dev),
--                            TYPE_XILINX_AXI_ENET_CONTROL_STREAM, &error_abort,
--                            NULL);
-+                            &s->rx_control_dev,
-+                            TYPE_XILINX_AXI_ENET_CONTROL_STREAM);
-     sysbus_init_irq(sbd, &s->irq);
- 
-     memory_region_init_io(&s->iomem, OBJECT(s), &enet_ops, s, "enet", 0x40000);
-diff --git a/hw/pci-host/designware.c b/hw/pci-host/designware.c
-index 2e97d6b17f..8492c18991 100644
---- a/hw/pci-host/designware.c
-+++ b/hw/pci-host/designware.c
-@@ -722,8 +722,7 @@ static void designware_pcie_host_init(Object *obj)
-     DesignwarePCIEHost *s = DESIGNWARE_PCIE_HOST(obj);
-     DesignwarePCIERoot *root = &s->root;
- 
--    object_initialize_child(obj, "root",  root, sizeof(*root),
--                            TYPE_DESIGNWARE_PCIE_ROOT, &error_abort, NULL);
-+    object_initialize_child(obj, "root", root, TYPE_DESIGNWARE_PCIE_ROOT);
-     qdev_prop_set_int32(DEVICE(root), "addr", PCI_DEVFN(0, 0));
-     qdev_prop_set_bit(DEVICE(root), "multifunction", false);
- }
-diff --git a/hw/pci-host/gpex.c b/hw/pci-host/gpex.c
-index 3dfb3bf599..2bdbe7b456 100644
---- a/hw/pci-host/gpex.c
-+++ b/hw/pci-host/gpex.c
-@@ -124,8 +124,7 @@ static void gpex_host_initfn(Object *obj)
-     GPEXHost *s = GPEX_HOST(obj);
-     GPEXRootState *root = &s->gpex_root;
- 
--    object_initialize_child(obj, "gpex_root",  root, sizeof(*root),
--                            TYPE_GPEX_ROOT_DEVICE, &error_abort, NULL);
-+    object_initialize_child(obj, "gpex_root", root, TYPE_GPEX_ROOT_DEVICE);
-     qdev_prop_set_int32(DEVICE(root), "addr", PCI_DEVFN(0, 0));
-     qdev_prop_set_bit(DEVICE(root), "multifunction", false);
- }
-diff --git a/hw/pci-host/pnv_phb3.c b/hw/pci-host/pnv_phb3.c
-index 8dcfe4a2fd..6e2b0174f6 100644
---- a/hw/pci-host/pnv_phb3.c
-+++ b/hw/pci-host/pnv_phb3.c
-@@ -968,23 +968,19 @@ static void pnv_phb3_instance_init(Object *obj)
-     QLIST_INIT(&phb->dma_spaces);
- 
-     /* LSI sources */
--    object_initialize_child(obj, "lsi", &phb->lsis, sizeof(phb->lsis),
--                             TYPE_ICS, &error_abort, NULL);
-+    object_initialize_child(obj, "lsi", &phb->lsis, TYPE_ICS);
- 
-     /* Default init ... will be fixed by HW inits */
-     phb->lsis.offset = 0;
- 
-     /* MSI sources */
--    object_initialize_child(obj, "msi", &phb->msis, sizeof(phb->msis),
--                            TYPE_PHB3_MSI, &error_abort, NULL);
-+    object_initialize_child(obj, "msi", &phb->msis, TYPE_PHB3_MSI);
- 
-     /* Power Bus Common Queue */
--    object_initialize_child(obj, "pbcq", &phb->pbcq, sizeof(phb->pbcq),
--                            TYPE_PNV_PBCQ, &error_abort, NULL);
-+    object_initialize_child(obj, "pbcq", &phb->pbcq, TYPE_PNV_PBCQ);
- 
-     /* Root Port */
--    object_initialize_child(obj, "root", &phb->root, sizeof(phb->root),
--                            TYPE_PNV_PHB3_ROOT_PORT, &error_abort, NULL);
-+    object_initialize_child(obj, "root", &phb->root, TYPE_PNV_PHB3_ROOT_PORT);
-     qdev_prop_set_int32(DEVICE(&phb->root), "addr", PCI_DEVFN(0, 0));
-     qdev_prop_set_bit(DEVICE(&phb->root), "multifunction", false);
- }
-diff --git a/hw/pci-host/pnv_phb4.c b/hw/pci-host/pnv_phb4.c
-index aba710fd1f..368ae9eacd 100644
---- a/hw/pci-host/pnv_phb4.c
-+++ b/hw/pci-host/pnv_phb4.c
-@@ -1155,12 +1155,10 @@ static void pnv_phb4_instance_init(Object *obj)
-     QLIST_INIT(&phb->dma_spaces);
- 
-     /* XIVE interrupt source object */
--    object_initialize_child(obj, "source", &phb->xsrc, sizeof(phb->xsrc),
--                            TYPE_XIVE_SOURCE, &error_abort, NULL);
-+    object_initialize_child(obj, "source", &phb->xsrc, TYPE_XIVE_SOURCE);
- 
-     /* Root Port */
--    object_initialize_child(obj, "root", &phb->root, sizeof(phb->root),
--                            TYPE_PNV_PHB4_ROOT_PORT, &error_abort, NULL);
-+    object_initialize_child(obj, "root", &phb->root, TYPE_PNV_PHB4_ROOT_PORT);
- 
-     qdev_prop_set_int32(DEVICE(&phb->root), "addr", PCI_DEVFN(0, 0));
-     qdev_prop_set_bit(DEVICE(&phb->root), "multifunction", false);
-diff --git a/hw/pci-host/pnv_phb4_pec.c b/hw/pci-host/pnv_phb4_pec.c
-index 565345a018..f9b41c5042 100644
---- a/hw/pci-host/pnv_phb4_pec.c
-+++ b/hw/pci-host/pnv_phb4_pec.c
-@@ -370,8 +370,7 @@ static void pnv_pec_instance_init(Object *obj)
- 
-     for (i = 0; i < PHB4_PEC_MAX_STACKS; i++) {
-         object_initialize_child(obj, "stack[*]", &pec->stacks[i],
--                                sizeof(pec->stacks[i]), TYPE_PNV_PHB4_PEC_STACK,
--                                &error_abort, NULL);
-+                                TYPE_PNV_PHB4_PEC_STACK);
-     }
- }
- 
-@@ -522,8 +521,7 @@ static void pnv_pec_stk_instance_init(Object *obj)
- {
-     PnvPhb4PecStack *stack = PNV_PHB4_PEC_STACK(obj);
- 
--    object_initialize_child(obj, "phb", &stack->phb, sizeof(stack->phb),
--                            TYPE_PNV_PHB4, &error_abort, NULL);
-+    object_initialize_child(obj, "phb", &stack->phb, TYPE_PNV_PHB4);
- }
- 
- static void pnv_pec_stk_realize(DeviceState *dev, Error **errp)
-diff --git a/hw/pci-host/q35.c b/hw/pci-host/q35.c
-index 8d526457f4..d6028543d2 100644
---- a/hw/pci-host/q35.c
-+++ b/hw/pci-host/q35.c
-@@ -212,8 +212,7 @@ static void q35_host_initfn(Object *obj)
-     memory_region_init_io(&phb->data_mem, obj, &pci_host_data_le_ops, phb,
-                           "pci-conf-data", 4);
- 
--    object_initialize_child(OBJECT(s), "mch",  &s->mch, sizeof(s->mch),
--                            TYPE_MCH_PCI_DEVICE, &error_abort, NULL);
-+    object_initialize_child(OBJECT(s), "mch", &s->mch, TYPE_MCH_PCI_DEVICE);
-     qdev_prop_set_int32(DEVICE(&s->mch), "addr", PCI_DEVFN(0, 0));
-     qdev_prop_set_bit(DEVICE(&s->mch), "multifunction", false);
-     /* mch's object_initialize resets the default value, set it again */
-diff --git a/hw/pci-host/xilinx-pcie.c b/hw/pci-host/xilinx-pcie.c
-index e4fc8abb6a..3b321421b6 100644
---- a/hw/pci-host/xilinx-pcie.c
-+++ b/hw/pci-host/xilinx-pcie.c
-@@ -151,8 +151,7 @@ static void xilinx_pcie_host_init(Object *obj)
-     XilinxPCIEHost *s = XILINX_PCIE_HOST(obj);
-     XilinxPCIERoot *root = &s->root;
- 
--    object_initialize_child(obj, "root",  root, sizeof(*root),
--                            TYPE_XILINX_PCIE_ROOT, &error_abort, NULL);
-+    object_initialize_child(obj, "root", root, TYPE_XILINX_PCIE_ROOT);
-     qdev_prop_set_int32(DEVICE(root), "addr", PCI_DEVFN(0, 0));
-     qdev_prop_set_bit(DEVICE(root), "multifunction", false);
- }
-diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index ffaf12b006..8cf097ae7c 100644
---- a/hw/ppc/pnv.c
-+++ b/hw/ppc/pnv.c
-@@ -1061,22 +1061,16 @@ static void pnv_chip_power8_instance_init(Object *obj)
-                              object_property_allow_set_link,
-                              OBJ_PROP_LINK_STRONG);
- 
--    object_initialize_child(obj, "psi",  &chip8->psi, sizeof(chip8->psi),
--                            TYPE_PNV8_PSI, &error_abort, NULL);
-+    object_initialize_child(obj, "psi", &chip8->psi, TYPE_PNV8_PSI);
- 
--    object_initialize_child(obj, "lpc",  &chip8->lpc, sizeof(chip8->lpc),
--                            TYPE_PNV8_LPC, &error_abort, NULL);
-+    object_initialize_child(obj, "lpc", &chip8->lpc, TYPE_PNV8_LPC);
- 
--    object_initialize_child(obj, "occ",  &chip8->occ, sizeof(chip8->occ),
--                            TYPE_PNV8_OCC, &error_abort, NULL);
-+    object_initialize_child(obj, "occ", &chip8->occ, TYPE_PNV8_OCC);
- 
--    object_initialize_child(obj, "homer",  &chip8->homer, sizeof(chip8->homer),
--                            TYPE_PNV8_HOMER, &error_abort, NULL);
-+    object_initialize_child(obj, "homer", &chip8->homer, TYPE_PNV8_HOMER);
- 
-     for (i = 0; i < pcc->num_phbs; i++) {
--        object_initialize_child(obj, "phb[*]", &chip8->phbs[i],
--                                sizeof(chip8->phbs[i]), TYPE_PNV_PHB3,
--                                &error_abort, NULL);
-+        object_initialize_child(obj, "phb[*]", &chip8->phbs[i], TYPE_PNV_PHB3);
-     }
- 
-     /*
-@@ -1320,22 +1314,17 @@ static void pnv_chip_power9_instance_init(Object *obj)
-     object_property_add_alias(obj, "xive-fabric", OBJECT(&chip9->xive),
-                               "xive-fabric");
- 
--    object_initialize_child(obj, "psi",  &chip9->psi, sizeof(chip9->psi),
--                            TYPE_PNV9_PSI, &error_abort, NULL);
-+    object_initialize_child(obj, "psi", &chip9->psi, TYPE_PNV9_PSI);
- 
--    object_initialize_child(obj, "lpc",  &chip9->lpc, sizeof(chip9->lpc),
--                            TYPE_PNV9_LPC, &error_abort, NULL);
-+    object_initialize_child(obj, "lpc", &chip9->lpc, TYPE_PNV9_LPC);
- 
--    object_initialize_child(obj, "occ",  &chip9->occ, sizeof(chip9->occ),
--                            TYPE_PNV9_OCC, &error_abort, NULL);
-+    object_initialize_child(obj, "occ", &chip9->occ, TYPE_PNV9_OCC);
- 
--    object_initialize_child(obj, "homer",  &chip9->homer, sizeof(chip9->homer),
--                            TYPE_PNV9_HOMER, &error_abort, NULL);
-+    object_initialize_child(obj, "homer", &chip9->homer, TYPE_PNV9_HOMER);
- 
-     for (i = 0; i < PNV9_CHIP_MAX_PEC; i++) {
-         object_initialize_child(obj, "pec[*]", &chip9->pecs[i],
--                                sizeof(chip9->pecs[i]), TYPE_PNV_PHB4_PEC,
--                                &error_abort, NULL);
-+                                TYPE_PNV_PHB4_PEC);
-     }
- 
-     /*
-@@ -1359,8 +1348,9 @@ static void pnv_chip_quad_realize(Pnv9Chip *chip9, Error **errp)
-         int core_id = CPU_CORE(pnv_core)->core_id;
- 
-         snprintf(eq_name, sizeof(eq_name), "eq[%d]", core_id);
--        object_initialize_child(OBJECT(chip), eq_name, eq, sizeof(*eq),
--                                TYPE_PNV_QUAD, &error_fatal, NULL);
-+        object_initialize_child_with_props(OBJECT(chip), eq_name, eq,
-+                                           sizeof(*eq), TYPE_PNV_QUAD,
-+                                           &error_fatal, NULL);
- 
-         object_property_set_int(OBJECT(eq), core_id, "id", &error_fatal);
-         object_property_set_bool(OBJECT(eq), true, "realized", &error_fatal);
-@@ -1586,10 +1576,8 @@ static void pnv_chip_power10_instance_init(Object *obj)
- {
-     Pnv10Chip *chip10 = PNV10_CHIP(obj);
- 
--    object_initialize_child(obj, "psi",  &chip10->psi, sizeof(chip10->psi),
--                            TYPE_PNV10_PSI, &error_abort, NULL);
--    object_initialize_child(obj, "lpc",  &chip10->lpc, sizeof(chip10->lpc),
--                            TYPE_PNV10_LPC, &error_abort, NULL);
-+    object_initialize_child(obj, "psi", &chip10->psi, TYPE_PNV10_PSI);
-+    object_initialize_child(obj, "lpc", &chip10->lpc, TYPE_PNV10_LPC);
- }
- 
- static void pnv_chip_power10_realize(DeviceState *dev, Error **errp)
-diff --git a/hw/ppc/pnv_psi.c b/hw/ppc/pnv_psi.c
-index 82f0769465..20e54ad5ac 100644
---- a/hw/ppc/pnv_psi.c
-+++ b/hw/ppc/pnv_psi.c
-@@ -483,8 +483,7 @@ static void pnv_psi_power8_instance_init(Object *obj)
- {
-     Pnv8Psi *psi8 = PNV8_PSI(obj);
- 
--    object_initialize_child(obj, "ics-psi",  &psi8->ics, sizeof(psi8->ics),
--                            TYPE_ICS, &error_abort, NULL);
-+    object_initialize_child(obj, "ics-psi", &psi8->ics, TYPE_ICS);
-     object_property_add_alias(obj, ICS_PROP_XICS, OBJECT(&psi8->ics),
-                               ICS_PROP_XICS);
- }
-@@ -836,8 +835,7 @@ static void pnv_psi_power9_instance_init(Object *obj)
- {
-     Pnv9Psi *psi = PNV9_PSI(obj);
- 
--    object_initialize_child(obj, "source", &psi->source, sizeof(psi->source),
--                            TYPE_XIVE_SOURCE, &error_abort, NULL);
-+    object_initialize_child(obj, "source", &psi->source, TYPE_XIVE_SOURCE);
- }
- 
- static void pnv_psi_power9_realize(DeviceState *dev, Error **errp)
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 1228aeb4b0..7ef24ea2a1 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -1727,9 +1727,9 @@ static void spapr_create_nvram(SpaprMachineState *spapr)
- 
- static void spapr_rtc_create(SpaprMachineState *spapr)
- {
--    object_initialize_child(OBJECT(spapr), "rtc",
--                            &spapr->rtc, sizeof(spapr->rtc), TYPE_SPAPR_RTC,
--                            &error_fatal, NULL);
-+    object_initialize_child_with_props(OBJECT(spapr), "rtc", &spapr->rtc,
-+                                       sizeof(spapr->rtc), TYPE_SPAPR_RTC,
-+                                       &error_fatal, NULL);
-     object_property_set_bool(OBJECT(&spapr->rtc), true, "realized",
-                               &error_fatal);
-     object_property_add_alias(OBJECT(spapr), "rtc-time", OBJECT(&spapr->rtc),
-diff --git a/hw/riscv/opentitan.c b/hw/riscv/opentitan.c
-index 29887fe363..ae4c3ebb8a 100644
---- a/hw/riscv/opentitan.c
-+++ b/hw/riscv/opentitan.c
-@@ -60,8 +60,7 @@ static void riscv_opentitan_init(MachineState *machine)
- 
-     /* Initialize SoC */
-     object_initialize_child(OBJECT(machine), "soc", &s->soc,
--                            sizeof(s->soc), TYPE_RISCV_IBEX_SOC,
--                            &error_abort, NULL);
-+                            TYPE_RISCV_IBEX_SOC);
-     object_property_set_bool(OBJECT(&s->soc), true, "realized",
-                             &error_abort);
- 
-diff --git a/hw/riscv/riscv_hart.c b/hw/riscv/riscv_hart.c
-index 61e88e2e37..56c2be5312 100644
---- a/hw/riscv/riscv_hart.c
-+++ b/hw/riscv/riscv_hart.c
-@@ -45,9 +45,7 @@ static void riscv_hart_realize(RISCVHartArrayState *s, int idx,
- {
+@@ -49,7 +49,7 @@ static void serial_pci_realize(PCIDevice *dev, Error **errp)
+     SerialState *s = &pci->state;
      Error *err = NULL;
  
--    object_initialize_child(OBJECT(s), "harts[*]", &s->harts[idx],
--                            sizeof(s->harts[idx]), cpu_type,
--                            &error_abort, NULL);
-+    object_initialize_child(OBJECT(s), "harts[*]", &s->harts[idx], cpu_type);
+-    object_property_set_bool(OBJECT(s), true, "realized", &err);
++    qdev_realize(DEVICE(s), NULL, &err);
+     if (err != NULL) {
+         error_propagate(errp, err);
+         return;
+diff --git a/hw/char/serial.c b/hw/char/serial.c
+index 4582d488d0..9eebcb27e7 100644
+--- a/hw/char/serial.c
++++ b/hw/char/serial.c
+@@ -991,7 +991,7 @@ static void serial_io_realize(DeviceState *dev, Error **errp)
+     SerialState *s = &sio->serial;
+     Error *local_err = NULL;
+ 
+-    object_property_set_bool(OBJECT(s), true, "realized", &local_err);
++    qdev_realize(DEVICE(s), NULL, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+         return;
+@@ -1098,7 +1098,7 @@ static void serial_mm_realize(DeviceState *dev, Error **errp)
+     SerialState *s = &smm->serial;
+     Error *local_err = NULL;
+ 
+-    object_property_set_bool(OBJECT(s), true, "realized", &local_err);
++    qdev_realize(DEVICE(s), NULL, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+         return;
+diff --git a/hw/core/cpu.c b/hw/core/cpu.c
+index f31ec48ee6..4d5438b70e 100644
+--- a/hw/core/cpu.c
++++ b/hw/core/cpu.c
+@@ -59,7 +59,7 @@ CPUState *cpu_create(const char *typename)
+ {
+     Error *err = NULL;
+     CPUState *cpu = CPU(object_new(typename));
+-    object_property_set_bool(OBJECT(cpu), true, "realized", &err);
++    qdev_realize(DEVICE(cpu), NULL, &err);
+     if (err != NULL) {
+         error_report_err(err);
+         object_unref(OBJECT(cpu));
+diff --git a/hw/hyperv/hyperv.c b/hw/hyperv/hyperv.c
+index 4b11f7a76b..d527aa823f 100644
+--- a/hw/hyperv/hyperv.c
++++ b/hw/hyperv/hyperv.c
+@@ -133,7 +133,7 @@ void hyperv_synic_add(CPUState *cs)
+     synic->cs = cs;
+     object_property_add_child(OBJECT(cs), "synic", obj);
+     object_unref(obj);
+-    object_property_set_bool(obj, true, "realized", &error_abort);
++    qdev_realize(DEVICE(obj), NULL, &error_abort);
+ }
+ 
+ void hyperv_synic_reset(CPUState *cs)
+diff --git a/hw/i386/x86.c b/hw/i386/x86.c
+index 9b6ebd92b5..bb31935f70 100644
+--- a/hw/i386/x86.c
++++ b/hw/i386/x86.c
+@@ -124,7 +124,7 @@ void x86_cpu_new(X86MachineState *x86ms, int64_t apic_id, Error **errp)
+     cpu = object_new(MACHINE(x86ms)->cpu_type);
+ 
+     object_property_set_uint(cpu, apic_id, "apic-id", &local_err);
+-    object_property_set_bool(cpu, true, "realized", &local_err);
++    qdev_realize(DEVICE(cpu), NULL, &local_err);
+ 
+     object_unref(cpu);
+     error_propagate(errp, local_err);
+diff --git a/hw/ide/microdrive.c b/hw/ide/microdrive.c
+index 6b30e36ed8..c4cc0a84eb 100644
+--- a/hw/ide/microdrive.c
++++ b/hw/ide/microdrive.c
+@@ -26,6 +26,7 @@
+ #include "qemu/osdep.h"
+ #include "hw/pcmcia.h"
+ #include "migration/vmstate.h"
++#include "qapi/error.h"
+ #include "qemu/module.h"
+ #include "sysemu/dma.h"
+ 
+@@ -560,7 +561,7 @@ PCMCIACardState *dscm1xxxx_init(DriveInfo *dinfo)
+     MicroDriveState *md;
+ 
+     md = MICRODRIVE(object_new(TYPE_DSCM1XXXX));
+-    qdev_init_nofail(DEVICE(md));
++    qdev_realize(DEVICE(md), NULL, &error_fatal);
+ 
+     if (dinfo != NULL) {
+         ide_create_drive(&md->bus, 0, dinfo);
+diff --git a/hw/intc/pnv_xive.c b/hw/intc/pnv_xive.c
+index 892c78069d..85ba0b4655 100644
+--- a/hw/intc/pnv_xive.c
++++ b/hw/intc/pnv_xive.c
+@@ -1833,7 +1833,7 @@ static void pnv_xive_realize(DeviceState *dev, Error **errp)
+                             &error_fatal);
+     object_property_set_link(OBJECT(xsrc), OBJECT(xive), "xive",
+                              &error_abort);
+-    object_property_set_bool(OBJECT(xsrc), true, "realized", &local_err);
++    qdev_realize(DEVICE(xsrc), NULL, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+         return;
+@@ -1843,7 +1843,7 @@ static void pnv_xive_realize(DeviceState *dev, Error **errp)
+                             &error_fatal);
+     object_property_set_link(OBJECT(end_xsrc), OBJECT(xive), "xive",
+                              &error_abort);
+-    object_property_set_bool(OBJECT(end_xsrc), true, "realized", &local_err);
++    qdev_realize(DEVICE(end_xsrc), NULL, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+         return;
+diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+index 263cd1253c..b7fc8dde7a 100644
+--- a/hw/intc/spapr_xive.c
++++ b/hw/intc/spapr_xive.c
+@@ -312,7 +312,7 @@ static void spapr_xive_realize(DeviceState *dev, Error **errp)
+                             &error_fatal);
+     object_property_set_link(OBJECT(xsrc), OBJECT(xive), "xive",
+                              &error_abort);
+-    object_property_set_bool(OBJECT(xsrc), true, "realized", &local_err);
++    qdev_realize(DEVICE(xsrc), NULL, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+         return;
+@@ -326,7 +326,7 @@ static void spapr_xive_realize(DeviceState *dev, Error **errp)
+                             &error_fatal);
+     object_property_set_link(OBJECT(end_xsrc), OBJECT(xive), "xive",
+                              &error_abort);
+-    object_property_set_bool(OBJECT(end_xsrc), true, "realized", &local_err);
++    qdev_realize(DEVICE(end_xsrc), NULL, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+         return;
+diff --git a/hw/intc/xics.c b/hw/intc/xics.c
+index d5032c8f8a..d365eeca66 100644
+--- a/hw/intc/xics.c
++++ b/hw/intc/xics.c
+@@ -384,7 +384,7 @@ Object *icp_create(Object *cpu, const char *type, XICSFabric *xi, Error **errp)
+     object_unref(obj);
+     object_property_set_link(obj, OBJECT(xi), ICP_PROP_XICS, &error_abort);
+     object_property_set_link(obj, cpu, ICP_PROP_CPU, &error_abort);
+-    object_property_set_bool(obj, true, "realized", &local_err);
++    qdev_realize(DEVICE(obj), NULL, &local_err);
+     if (local_err) {
+         object_unparent(obj);
+         error_propagate(errp, local_err);
+diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+index 8f2b4050cb..2c30dc53d8 100644
+--- a/hw/intc/xive.c
++++ b/hw/intc/xive.c
+@@ -765,7 +765,7 @@ Object *xive_tctx_create(Object *cpu, XivePresenter *xptr, Error **errp)
+     object_unref(obj);
+     object_property_set_link(obj, cpu, "cpu", &error_abort);
+     object_property_set_link(obj, OBJECT(xptr), "presenter", &error_abort);
+-    object_property_set_bool(obj, true, "realized", &local_err);
++    qdev_realize(DEVICE(obj), NULL, &local_err);
+     if (local_err) {
+         goto error;
+     }
+diff --git a/hw/microblaze/petalogix_ml605_mmu.c b/hw/microblaze/petalogix_ml605_mmu.c
+index 4d80a691bc..23420028f5 100644
+--- a/hw/microblaze/petalogix_ml605_mmu.c
++++ b/hw/microblaze/petalogix_ml605_mmu.c
+@@ -91,7 +91,7 @@ petalogix_ml605_init(MachineState *machine)
+     object_property_set_bool(OBJECT(cpu), true, "dcache-writeback",
+                              &error_abort);
+     object_property_set_bool(OBJECT(cpu), true, "endianness", &error_abort);
+-    object_property_set_bool(OBJECT(cpu), true, "realized", &error_abort);
++    qdev_realize(DEVICE(cpu), NULL, &error_abort);
+ 
+     /* Attach emulated BRAM through the LMB.  */
+     memory_region_init_ram(phys_lmb_bram, NULL, "petalogix_ml605.lmb_bram",
+diff --git a/hw/microblaze/petalogix_s3adsp1800_mmu.c b/hw/microblaze/petalogix_s3adsp1800_mmu.c
+index 793006a822..a43c980fc9 100644
+--- a/hw/microblaze/petalogix_s3adsp1800_mmu.c
++++ b/hw/microblaze/petalogix_s3adsp1800_mmu.c
+@@ -71,7 +71,7 @@ petalogix_s3adsp1800_init(MachineState *machine)
+ 
+     cpu = MICROBLAZE_CPU(object_new(TYPE_MICROBLAZE_CPU));
+     object_property_set_str(OBJECT(cpu), "7.10.d", "version", &error_abort);
+-    object_property_set_bool(OBJECT(cpu), true, "realized", &error_abort);
++    qdev_realize(DEVICE(cpu), NULL, &error_abort);
+ 
+     /* Attach emulated BRAM through the LMB.  */
+     memory_region_init_ram(phys_lmb_bram, NULL,
+diff --git a/hw/microblaze/xlnx-zynqmp-pmu.c b/hw/microblaze/xlnx-zynqmp-pmu.c
+index e74b047380..abebc7e2ef 100644
+--- a/hw/microblaze/xlnx-zynqmp-pmu.c
++++ b/hw/microblaze/xlnx-zynqmp-pmu.c
+@@ -96,7 +96,7 @@ static void xlnx_zynqmp_pmu_soc_realize(DeviceState *dev, Error **errp)
+     object_property_set_str(OBJECT(&s->cpu), "8.40.b", "version",
+                             &error_abort);
+     object_property_set_uint(OBJECT(&s->cpu), 0, "pvr", &error_abort);
+-    object_property_set_bool(OBJECT(&s->cpu), true, "realized", &err);
++    qdev_realize(DEVICE(&s->cpu), NULL, &err);
+     if (err) {
+         error_propagate(errp, err);
+         return;
+@@ -172,7 +172,7 @@ static void xlnx_zynqmp_pmu_init(MachineState *machine)
+     /* Create the PMU device */
+     object_initialize_child(OBJECT(machine), "pmu", pmu,
+                             TYPE_XLNX_ZYNQMP_PMU_SOC);
+-    object_property_set_bool(OBJECT(pmu), true, "realized", &error_fatal);
++    qdev_realize(DEVICE(pmu), NULL, &error_fatal);
+ 
+     /* Load the kernel */
+     microblaze_load_kernel(&pmu->cpu, XLNX_ZYNQMP_PMU_RAM_ADDR,
+diff --git a/hw/pci-host/pnv_phb3.c b/hw/pci-host/pnv_phb3.c
+index 6e2b0174f6..3ec904a55f 100644
+--- a/hw/pci-host/pnv_phb3.c
++++ b/hw/pci-host/pnv_phb3.c
+@@ -1003,7 +1003,7 @@ static void pnv_phb3_realize(DeviceState *dev, Error **errp)
+                                    &error_abort);
+     object_property_set_int(OBJECT(&phb->lsis), PNV_PHB3_NUM_LSI, "nr-irqs",
+                             &error_abort);
+-    object_property_set_bool(OBJECT(&phb->lsis), true, "realized", &local_err);
++    qdev_realize(DEVICE(&phb->lsis), NULL, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+         return;
+@@ -1022,7 +1022,7 @@ static void pnv_phb3_realize(DeviceState *dev, Error **errp)
+                                    &error_abort);
+     object_property_set_int(OBJECT(&phb->msis), PHB3_MAX_MSI, "nr-irqs",
+                             &error_abort);
+-    object_property_set_bool(OBJECT(&phb->msis), true, "realized", &local_err);
++    qdev_realize(DEVICE(&phb->msis), NULL, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+         return;
+@@ -1031,7 +1031,7 @@ static void pnv_phb3_realize(DeviceState *dev, Error **errp)
+     /* Power Bus Common Queue */
+     object_property_set_link(OBJECT(&phb->pbcq), OBJECT(phb), "phb",
+                                    &error_abort);
+-    object_property_set_bool(OBJECT(&phb->pbcq), true, "realized", &local_err);
++    qdev_realize(DEVICE(&phb->pbcq), NULL, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+         return;
+diff --git a/hw/pci-host/pnv_phb4.c b/hw/pci-host/pnv_phb4.c
+index 368ae9eacd..10716d759d 100644
+--- a/hw/pci-host/pnv_phb4.c
++++ b/hw/pci-host/pnv_phb4.c
+@@ -1218,7 +1218,7 @@ static void pnv_phb4_realize(DeviceState *dev, Error **errp)
+     }
+     object_property_set_int(OBJECT(xsrc), nr_irqs, "nr-irqs", &error_fatal);
+     object_property_set_link(OBJECT(xsrc), OBJECT(phb), "xive", &error_fatal);
+-    object_property_set_bool(OBJECT(xsrc), true, "realized", &local_err);
++    qdev_realize(DEVICE(xsrc), NULL, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+         return;
+diff --git a/hw/pci-host/pnv_phb4_pec.c b/hw/pci-host/pnv_phb4_pec.c
+index f9b41c5042..2d634c838e 100644
+--- a/hw/pci-host/pnv_phb4_pec.c
++++ b/hw/pci-host/pnv_phb4_pec.c
+@@ -390,7 +390,7 @@ static void pnv_pec_realize(DeviceState *dev, Error **errp)
+ 
+         object_property_set_int(stk_obj, i, "stack-no", &error_abort);
+         object_property_set_link(stk_obj, OBJECT(pec), "pec", &error_abort);
+-        object_property_set_bool(stk_obj, true, "realized", &local_err);
++        qdev_realize(DEVICE(stk_obj), NULL, &local_err);
+         if (local_err) {
+             error_propagate(errp, local_err);
+             return;
+diff --git a/hw/pci-host/prep.c b/hw/pci-host/prep.c
+index 42c7e63a60..1af0ebee45 100644
+--- a/hw/pci-host/prep.c
++++ b/hw/pci-host/prep.c
+@@ -238,8 +238,7 @@ static void raven_pcihost_realizefn(DeviceState *d, Error **errp)
+         s->or_irq = OR_IRQ(object_new(TYPE_OR_IRQ));
+         object_property_set_int(OBJECT(s->or_irq), PCI_NUM_PINS, "num-lines",
+                                 &error_fatal);
+-        object_property_set_bool(OBJECT(s->or_irq), true, "realized",
+-                                 &error_fatal);
++        qdev_realize(DEVICE(s->or_irq), NULL, &error_fatal);
+         sysbus_init_irq(dev, &s->or_irq->out_irq);
+ 
+         for (i = 0; i < PCI_NUM_PINS; i++) {
+diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+index b64baf71ca..80b4afd211 100644
+--- a/hw/ppc/pnv.c
++++ b/hw/ppc/pnv.c
+@@ -1138,7 +1138,7 @@ static void pnv_chip_power8_realize(DeviceState *dev, Error **errp)
+                             "bar", &error_fatal);
+     object_property_set_link(OBJECT(&chip8->psi), OBJECT(chip8->xics),
+                              ICS_PROP_XICS, &error_abort);
+-    object_property_set_bool(OBJECT(&chip8->psi), true, "realized", &local_err);
++    qdev_realize(DEVICE(&chip8->psi), NULL, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+         return;
+@@ -1149,8 +1149,7 @@ static void pnv_chip_power8_realize(DeviceState *dev, Error **errp)
+     /* Create LPC controller */
+     object_property_set_link(OBJECT(&chip8->lpc), OBJECT(&chip8->psi), "psi",
+                              &error_abort);
+-    object_property_set_bool(OBJECT(&chip8->lpc), true, "realized",
+-                             &error_fatal);
++    qdev_realize(DEVICE(&chip8->lpc), NULL, &error_fatal);
+     pnv_xscom_add_subregion(chip, PNV_XSCOM_LPC_BASE, &chip8->lpc.xscom_regs);
+ 
+     chip->dt_isa_nodename = g_strdup_printf("/xscom@%" PRIx64 "/isa@%x",
+@@ -1170,7 +1169,7 @@ static void pnv_chip_power8_realize(DeviceState *dev, Error **errp)
+     /* Create the simplified OCC model */
+     object_property_set_link(OBJECT(&chip8->occ), OBJECT(&chip8->psi), "psi",
+                              &error_abort);
+-    object_property_set_bool(OBJECT(&chip8->occ), true, "realized", &local_err);
++    qdev_realize(DEVICE(&chip8->occ), NULL, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+         return;
+@@ -1184,8 +1183,7 @@ static void pnv_chip_power8_realize(DeviceState *dev, Error **errp)
+     /* HOMER */
+     object_property_set_link(OBJECT(&chip8->homer), OBJECT(chip), "chip",
+                              &error_abort);
+-    object_property_set_bool(OBJECT(&chip8->homer), true, "realized",
+-                             &local_err);
++    qdev_realize(DEVICE(&chip8->homer), NULL, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+         return;
+@@ -1352,7 +1350,7 @@ static void pnv_chip_quad_realize(Pnv9Chip *chip9, Error **errp)
+                                            &error_fatal, NULL);
+ 
+         object_property_set_int(OBJECT(eq), core_id, "id", &error_fatal);
+-        object_property_set_bool(OBJECT(eq), true, "realized", &error_fatal);
++        qdev_realize(DEVICE(eq), NULL, &error_fatal);
+ 
+         pnv_xscom_add_subregion(chip, PNV9_XSCOM_EQ_BASE(eq->id),
+                                 &eq->xscom_regs);
+@@ -1384,7 +1382,7 @@ static void pnv_chip_power9_phb_realize(PnvChip *chip, Error **errp)
+                                  &error_fatal);
+         object_property_set_link(OBJECT(pec), OBJECT(get_system_memory()),
+                                  "system-memory", &error_abort);
+-        object_property_set_bool(OBJECT(pec), true, "realized", &local_err);
++        qdev_realize(DEVICE(pec), NULL, &local_err);
+         if (local_err) {
+             error_propagate(errp, local_err);
+             return;
+@@ -1480,7 +1478,7 @@ static void pnv_chip_power9_realize(DeviceState *dev, Error **errp)
+     /* Processor Service Interface (PSI) Host Bridge */
+     object_property_set_int(OBJECT(&chip9->psi), PNV9_PSIHB_BASE(chip),
+                             "bar", &error_fatal);
+-    object_property_set_bool(OBJECT(&chip9->psi), true, "realized", &local_err);
++    qdev_realize(DEVICE(&chip9->psi), NULL, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+         return;
+@@ -1491,7 +1489,7 @@ static void pnv_chip_power9_realize(DeviceState *dev, Error **errp)
+     /* LPC */
+     object_property_set_link(OBJECT(&chip9->lpc), OBJECT(&chip9->psi), "psi",
+                              &error_abort);
+-    object_property_set_bool(OBJECT(&chip9->lpc), true, "realized", &local_err);
++    qdev_realize(DEVICE(&chip9->lpc), NULL, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+         return;
+@@ -1505,7 +1503,7 @@ static void pnv_chip_power9_realize(DeviceState *dev, Error **errp)
+     /* Create the simplified OCC model */
+     object_property_set_link(OBJECT(&chip9->occ), OBJECT(&chip9->psi), "psi",
+                              &error_abort);
+-    object_property_set_bool(OBJECT(&chip9->occ), true, "realized", &local_err);
++    qdev_realize(DEVICE(&chip9->occ), NULL, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+         return;
+@@ -1519,8 +1517,7 @@ static void pnv_chip_power9_realize(DeviceState *dev, Error **errp)
+     /* HOMER */
+     object_property_set_link(OBJECT(&chip9->homer), OBJECT(chip), "chip",
+                              &error_abort);
+-    object_property_set_bool(OBJECT(&chip9->homer), true, "realized",
+-                             &local_err);
++    qdev_realize(DEVICE(&chip9->homer), NULL, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+         return;
+@@ -1602,8 +1599,7 @@ static void pnv_chip_power10_realize(DeviceState *dev, Error **errp)
+     /* Processor Service Interface (PSI) Host Bridge */
+     object_property_set_int(OBJECT(&chip10->psi), PNV10_PSIHB_BASE(chip),
+                             "bar", &error_fatal);
+-    object_property_set_bool(OBJECT(&chip10->psi), true, "realized",
+-                             &local_err);
++    qdev_realize(DEVICE(&chip10->psi), NULL, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+         return;
+@@ -1614,8 +1610,7 @@ static void pnv_chip_power10_realize(DeviceState *dev, Error **errp)
+     /* LPC */
+     object_property_set_link(OBJECT(&chip10->lpc), OBJECT(&chip10->psi), "psi",
+                              &error_abort);
+-    object_property_set_bool(OBJECT(&chip10->lpc), true, "realized",
+-                             &local_err);
++    qdev_realize(DEVICE(&chip10->lpc), NULL, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+         return;
+@@ -1734,8 +1729,7 @@ static void pnv_chip_core_realize(PnvChip *chip, Error **errp)
+                                 "hrmor", &error_fatal);
+         object_property_set_link(OBJECT(pnv_core), OBJECT(chip), "chip",
+                                  &error_abort);
+-        object_property_set_bool(OBJECT(pnv_core), true, "realized",
+-                                 &error_fatal);
++        qdev_realize(DEVICE(pnv_core), NULL, &error_fatal);
+ 
+         /* Each core has an XSCOM MMIO region */
+         xscom_core_base = pcc->xscom_core_base(chip, core_hwid);
+diff --git a/hw/ppc/pnv_bmc.c b/hw/ppc/pnv_bmc.c
+index 5f86453b6a..2e1a03daa4 100644
+--- a/hw/ppc/pnv_bmc.c
++++ b/hw/ppc/pnv_bmc.c
+@@ -235,7 +235,7 @@ IPMIBmc *pnv_bmc_create(PnvPnor *pnor)
+     obj = object_new(TYPE_IPMI_BMC_SIMULATOR);
+     object_ref(OBJECT(pnor));
+     object_property_add_const_link(obj, "pnor", OBJECT(pnor));
+-    object_property_set_bool(obj, true, "realized", &error_fatal);
++    qdev_realize(DEVICE(obj), NULL, &error_fatal);
+ 
+     /* Install the HIOMAP protocol handlers to access the PNOR */
+     ipmi_sim_register_netfn(IPMI_BMC_SIMULATOR(obj), IPMI_NETFN_OEM,
+diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
+index 96a446f001..c986c16db1 100644
+--- a/hw/ppc/pnv_core.c
++++ b/hw/ppc/pnv_core.c
+@@ -173,7 +173,7 @@ static void pnv_core_cpu_realize(PnvCore *pc, PowerPCCPU *cpu, Error **errp)
+     Error *local_err = NULL;
+     PnvChipClass *pcc = PNV_CHIP_GET_CLASS(pc->chip);
+ 
+-    object_property_set_bool(OBJECT(cpu), true, "realized", &local_err);
++    qdev_realize(DEVICE(cpu), NULL, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+         return;
+diff --git a/hw/ppc/pnv_psi.c b/hw/ppc/pnv_psi.c
+index 20e54ad5ac..75b8ae9703 100644
+--- a/hw/ppc/pnv_psi.c
++++ b/hw/ppc/pnv_psi.c
+@@ -510,7 +510,7 @@ static void pnv_psi_power8_realize(DeviceState *dev, Error **errp)
+         error_propagate(errp, err);
+         return;
+     }
+-    object_property_set_bool(OBJECT(ics), true, "realized",  &err);
++    qdev_realize(DEVICE(ics), NULL, &err);
+     if (err) {
+         error_propagate(errp, err);
+         return;
+@@ -851,7 +851,7 @@ static void pnv_psi_power9_realize(DeviceState *dev, Error **errp)
+     object_property_set_int(OBJECT(xsrc), PSIHB9_NUM_IRQS, "nr-irqs",
+                             &error_fatal);
+     object_property_set_link(OBJECT(xsrc), OBJECT(psi), "xive", &error_abort);
+-    object_property_set_bool(OBJECT(xsrc), true, "realized", &local_err);
++    qdev_realize(DEVICE(xsrc), NULL, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+         return;
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index c381bb6fb5..8d630baa5d 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -1730,8 +1730,7 @@ static void spapr_rtc_create(SpaprMachineState *spapr)
+     object_initialize_child_with_props(OBJECT(spapr), "rtc", &spapr->rtc,
+                                        sizeof(spapr->rtc), TYPE_SPAPR_RTC,
+                                        &error_fatal, NULL);
+-    object_property_set_bool(OBJECT(&spapr->rtc), true, "realized",
+-                              &error_fatal);
++    qdev_realize(DEVICE(&spapr->rtc), NULL, &error_fatal);
+     object_property_add_alias(OBJECT(spapr), "rtc-time", OBJECT(&spapr->rtc),
+                               "date");
+ }
+@@ -2629,7 +2628,7 @@ static void spapr_init_cpus(SpaprMachineState *spapr)
+                                     &error_fatal);
+             object_property_set_int(core, core_id, CPU_CORE_PROP_CORE_ID,
+                                     &error_fatal);
+-            object_property_set_bool(core, true, "realized", &error_fatal);
++            qdev_realize(DEVICE(core), NULL, &error_fatal);
+ 
+             object_unref(core);
+         }
+diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+index 9c8c1b14cf..26ad566f42 100644
+--- a/hw/ppc/spapr_cpu_core.c
++++ b/hw/ppc/spapr_cpu_core.c
+@@ -239,7 +239,7 @@ static void spapr_realize_vcpu(PowerPCCPU *cpu, SpaprMachineState *spapr,
+     CPUState *cs = CPU(cpu);
+     Error *local_err = NULL;
+ 
+-    object_property_set_bool(OBJECT(cpu), true, "realized", &local_err);
++    qdev_realize(DEVICE(cpu), NULL, &local_err);
+     if (local_err) {
+         goto error;
+     }
+diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
+index b958f8acb5..2689104295 100644
+--- a/hw/ppc/spapr_drc.c
++++ b/hw/ppc/spapr_drc.c
+@@ -567,7 +567,7 @@ SpaprDrc *spapr_dr_connector_new(Object *owner, const char *type,
+                                 spapr_drc_index(drc));
+     object_property_add_child(owner, prop_name, OBJECT(drc));
+     object_unref(OBJECT(drc));
+-    object_property_set_bool(OBJECT(drc), true, "realized", NULL);
++    qdev_realize(DEVICE(drc), NULL, NULL);
+     g_free(prop_name);
+ 
+     return drc;
+diff --git a/hw/ppc/spapr_iommu.c b/hw/ppc/spapr_iommu.c
+index 7e1d6d59ac..0fecabc135 100644
+--- a/hw/ppc/spapr_iommu.c
++++ b/hw/ppc/spapr_iommu.c
+@@ -369,7 +369,7 @@ SpaprTceTable *spapr_tce_new_table(DeviceState *owner, uint32_t liobn)
+     g_free(tmp);
+     object_unref(OBJECT(tcet));
+ 
+-    object_property_set_bool(OBJECT(tcet), true, "realized", NULL);
++    qdev_realize(DEVICE(tcet), NULL, NULL);
+ 
+     return tcet;
+ }
+diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+index 79b0e40b66..897bf98587 100644
+--- a/hw/ppc/spapr_irq.c
++++ b/hw/ppc/spapr_irq.c
+@@ -311,7 +311,7 @@ void spapr_irq_init(SpaprMachineState *spapr, Error **errp)
+         object_property_set_link(obj, OBJECT(spapr), ICS_PROP_XICS,
+                                  &error_abort);
+         object_property_set_int(obj, smc->nr_xirqs, "nr-irqs", &error_abort);
+-        object_property_set_bool(obj, true, "realized", &local_err);
++        qdev_realize(DEVICE(obj), NULL, &local_err);
+         if (local_err) {
+             error_propagate(errp, local_err);
+             return;
+diff --git a/hw/riscv/opentitan.c b/hw/riscv/opentitan.c
+index bebd3213e1..f6776da8e9 100644
+--- a/hw/riscv/opentitan.c
++++ b/hw/riscv/opentitan.c
+@@ -61,8 +61,7 @@ static void riscv_opentitan_init(MachineState *machine)
+     /* Initialize SoC */
+     object_initialize_child(OBJECT(machine), "soc", &s->soc,
+                             TYPE_RISCV_IBEX_SOC);
+-    object_property_set_bool(OBJECT(&s->soc), true, "realized",
+-                            &error_abort);
++    qdev_realize(DEVICE(&s->soc), NULL, &error_abort);
+ 
+     memory_region_init_ram(main_mem, NULL, "riscv.lowrisc.ibex.ram",
+         memmap[IBEX_RAM].size, &error_fatal);
+diff --git a/hw/riscv/riscv_hart.c b/hw/riscv/riscv_hart.c
+index 56c2be5312..e26c382259 100644
+--- a/hw/riscv/riscv_hart.c
++++ b/hw/riscv/riscv_hart.c
+@@ -48,8 +48,7 @@ static void riscv_hart_realize(RISCVHartArrayState *s, int idx,
+     object_initialize_child(OBJECT(s), "harts[*]", &s->harts[idx], cpu_type);
      s->harts[idx].env.mhartid = s->hartid_base + idx;
      qemu_register_reset(riscv_harts_cpu_reset, &s->harts[idx]);
-     object_property_set_bool(OBJECT(&s->harts[idx]), true,
+-    object_property_set_bool(OBJECT(&s->harts[idx]), true,
+-                             "realized", &err);
++    qdev_realize(DEVICE(&s->harts[idx]), NULL, &err);
+     if (err) {
+         error_propagate(errp, err);
+         return;
 diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
-index d2e2350a4d..77742c1a6e 100644
+index a9e4482270..1c17d02cf0 100644
 --- a/hw/riscv/sifive_e.c
 +++ b/hw/riscv/sifive_e.c
-@@ -85,9 +85,7 @@ static void riscv_sifive_e_init(MachineState *machine)
-     int i;
+@@ -86,8 +86,7 @@ static void riscv_sifive_e_init(MachineState *machine)
  
      /* Initialize SoC */
--    object_initialize_child(OBJECT(machine), "soc", &s->soc,
--                            sizeof(s->soc), TYPE_RISCV_E_SOC,
--                            &error_abort, NULL);
-+    object_initialize_child(OBJECT(machine), "soc", &s->soc, TYPE_RISCV_E_SOC);
-     object_property_set_bool(OBJECT(&s->soc), true, "realized",
-                             &error_abort);
+     object_initialize_child(OBJECT(machine), "soc", &s->soc, TYPE_RISCV_E_SOC);
+-    object_property_set_bool(OBJECT(&s->soc), true, "realized",
+-                            &error_abort);
++    qdev_realize(DEVICE(&s->soc), NULL, &error_abort);
  
+     /* Data Tightly Integrated Memory */
+     memory_region_init_ram(main_mem, NULL, "riscv.sifive.e.ram",
 diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-index d6c6364596..3e39301124 100644
+index 5b86520b24..ea197ab64f 100644
 --- a/hw/riscv/sifive_u.c
 +++ b/hw/riscv/sifive_u.c
-@@ -328,9 +328,7 @@ static void sifive_u_machine_init(MachineState *machine)
-     int i;
- 
-     /* Initialize SoC */
--    object_initialize_child(OBJECT(machine), "soc", &s->soc,
--                            sizeof(s->soc), TYPE_RISCV_U_SOC,
--                            &error_abort, NULL);
-+    object_initialize_child(OBJECT(machine), "soc", &s->soc, TYPE_RISCV_U_SOC);
+@@ -331,8 +331,7 @@ static void sifive_u_machine_init(MachineState *machine)
+     object_initialize_child(OBJECT(machine), "soc", &s->soc, TYPE_RISCV_U_SOC);
      object_property_set_uint(OBJECT(&s->soc), s->serial, "serial",
                              &error_abort);
-     object_property_set_bool(OBJECT(&s->soc), true, "realized",
-@@ -486,9 +484,7 @@ static void sifive_u_soc_instance_init(Object *obj)
-     MachineState *ms = MACHINE(qdev_get_machine());
-     SiFiveUSoCState *s = RISCV_U_SOC(obj);
+-    object_property_set_bool(OBJECT(&s->soc), true, "realized",
+-                            &error_abort);
++    qdev_realize(DEVICE(&s->soc), NULL, &error_abort);
  
--    object_initialize_child(obj, "e-cluster", &s->e_cluster,
--                            sizeof(s->e_cluster), TYPE_CPU_CLUSTER,
--                            &error_abort, NULL);
-+    object_initialize_child(obj, "e-cluster", &s->e_cluster, TYPE_CPU_CLUSTER);
-     qdev_prop_set_uint32(DEVICE(&s->e_cluster), "cluster-id", 0);
+     /* register RAM */
+     memory_region_init_ram(main_mem, NULL, "riscv.sifive.u.ram",
+@@ -530,10 +529,8 @@ static void sifive_u_soc_realize(DeviceState *dev, Error **errp)
+      * CPU must exist and have been parented into the cluster before the
+      * cluster is realized.
+      */
+-    object_property_set_bool(OBJECT(&s->e_cluster), true, "realized",
+-                             &error_abort);
+-    object_property_set_bool(OBJECT(&s->u_cluster), true, "realized",
+-                             &error_abort);
++    qdev_realize(DEVICE(&s->e_cluster), NULL, &error_abort);
++    qdev_realize(DEVICE(&s->u_cluster), NULL, &error_abort);
  
-     sysbus_init_child_obj(OBJECT(&s->e_cluster), "e-cpus",
-@@ -498,9 +494,7 @@ static void sifive_u_soc_instance_init(Object *obj)
-     qdev_prop_set_uint32(DEVICE(&s->e_cpus), "hartid-base", 0);
-     qdev_prop_set_string(DEVICE(&s->e_cpus), "cpu-type", SIFIVE_E_CPU);
+     /* boot rom */
+     memory_region_init_rom(mask_rom, OBJECT(dev), "riscv.sifive.u.mrom",
+diff --git a/hw/s390x/s390-skeys.c b/hw/s390x/s390-skeys.c
+index d304b85640..1e036cc602 100644
+--- a/hw/s390x/s390-skeys.c
++++ b/hw/s390x/s390-skeys.c
+@@ -48,7 +48,7 @@ void s390_skeys_init(void)
+                               obj);
+     object_unref(obj);
  
--    object_initialize_child(obj, "u-cluster", &s->u_cluster,
--                            sizeof(s->u_cluster), TYPE_CPU_CLUSTER,
--                            &error_abort, NULL);
-+    object_initialize_child(obj, "u-cluster", &s->u_cluster, TYPE_CPU_CLUSTER);
-     qdev_prop_set_uint32(DEVICE(&s->u_cluster), "cluster-id", 1);
- 
-     sysbus_init_child_obj(OBJECT(&s->u_cluster), "u-cpus",
-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index 850fcce5e7..cc9c9dc162 100644
---- a/hw/virtio/virtio.c
-+++ b/hw/virtio/virtio.c
-@@ -3230,8 +3230,9 @@ void virtio_instance_init_common(Object *proxy_obj, void *data,
- {
-     DeviceState *vdev = data;
- 
--    object_initialize_child(proxy_obj, "virtio-backend", vdev, vdev_size,
--                            vdev_name, &error_abort, NULL);
-+    object_initialize_child_with_props(proxy_obj, "virtio-backend", vdev,
-+                                       vdev_size, vdev_name, &error_abort,
-+                                       NULL);
-     qdev_alias_all_properties(vdev, proxy_obj);
+-    qdev_init_nofail(DEVICE(obj));
++    qdev_realize(DEVICE(obj), NULL, &error_fatal);
  }
  
-diff --git a/qom/object.c b/qom/object.c
-index c02487ec1a..41848ba7eb 100644
---- a/qom/object.c
-+++ b/qom/object.c
-@@ -529,19 +529,21 @@ void object_initialize(void *data, size_t size, const char *typename)
-     object_initialize_with_type(data, size, type);
+ static void write_keys(FILE *f, uint8_t *keys, uint64_t startgfn,
+diff --git a/hw/s390x/s390-stattrib.c b/hw/s390x/s390-stattrib.c
+index 6d1e587527..0144b9021c 100644
+--- a/hw/s390x/s390-stattrib.c
++++ b/hw/s390x/s390-stattrib.c
+@@ -50,7 +50,7 @@ void s390_stattrib_init(void)
+                               obj);
+     object_unref(obj);
+ 
+-    qdev_init_nofail(DEVICE(obj));
++    qdev_realize(DEVICE(obj), NULL, &error_fatal);
  }
  
--void object_initialize_child(Object *parentobj, const char *propname,
-+void object_initialize_child_with_props(Object *parentobj,
-+                             const char *propname,
-                              void *childobj, size_t size, const char *type,
-                              Error **errp, ...)
- {
-     va_list vargs;
+ /* Console commands: */
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index 201f9604fe..b111406d56 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -75,7 +75,7 @@ static S390CPU *s390x_new_cpu(const char *typename, uint32_t core_id,
+     if (err != NULL) {
+         goto out;
+     }
+-    object_property_set_bool(OBJECT(cpu), true, "realized", &err);
++    qdev_realize(DEVICE(cpu), NULL, &err);
  
-     va_start(vargs, errp);
--    object_initialize_childv(parentobj, propname, childobj, size, type, errp,
--                             vargs);
-+    object_initialize_child_with_propsv(parentobj, propname,
-+                                        childobj, size, type, errp, vargs);
-     va_end(vargs);
+ out:
+     object_unref(OBJECT(cpu));
+@@ -210,7 +210,7 @@ static void s390_init_ipl_dev(const char *kernel_filename,
+     object_property_add_child(qdev_get_machine(), TYPE_S390_IPL,
+                               new);
+     object_unref(new);
+-    qdev_init_nofail(dev);
++    qdev_realize(dev, NULL, &error_fatal);
  }
  
--void object_initialize_childv(Object *parentobj, const char *propname,
-+void object_initialize_child_with_propsv(Object *parentobj,
-+                              const char *propname,
-                               void *childobj, size_t size, const char *type,
-                               Error **errp, va_list vargs)
- {
-@@ -582,6 +584,15 @@ out:
-     error_propagate(errp, local_err);
+ static void s390_create_virtio_net(BusState *bus, const char *name)
+diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
+index b66afb35c8..d39f6d7785 100644
+--- a/hw/s390x/sclp.c
++++ b/hw/s390x/sclp.c
+@@ -322,7 +322,7 @@ void s390_sclp_init(void)
+ 
+     object_property_add_child(qdev_get_machine(), TYPE_SCLP, new);
+     object_unref(new);
+-    qdev_init_nofail(DEVICE(new));
++    qdev_realize(DEVICE(new), NULL, &error_fatal);
  }
  
-+void object_initialize_child_internal(Object *parent,
-+                                      const char *propname,
-+                                      void *child, size_t size,
-+                                      const char *type)
-+{
-+    object_initialize_child_with_props(parent, propname, child, size, type,
-+                                       &error_abort, NULL);
-+}
-+
- static inline bool object_property_is_child(ObjectProperty *prop)
- {
-     return strstart(prop->type, "child<", NULL);
+ static void sclp_realize(DeviceState *dev, Error **errp)
+diff --git a/hw/s390x/tod.c b/hw/s390x/tod.c
+index 7324e37b5e..3c2979175e 100644
+--- a/hw/s390x/tod.c
++++ b/hw/s390x/tod.c
+@@ -29,7 +29,7 @@ void s390_init_tod(void)
+     object_property_add_child(qdev_get_machine(), TYPE_S390_TOD, obj);
+     object_unref(obj);
+ 
+-    qdev_init_nofail(DEVICE(obj));
++    qdev_realize(DEVICE(obj), NULL, &error_fatal);
+ }
+ 
+ S390TODState *s390_get_todstate(void)
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index ba05da3f2e..da42ce6615 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -6135,8 +6135,7 @@ static void x86_cpu_apic_realize(X86CPU *cpu, Error **errp)
+     if (cpu->apic_state == NULL) {
+         return;
+     }
+-    object_property_set_bool(OBJECT(cpu->apic_state), true, "realized",
+-                             errp);
++    qdev_realize(DEVICE(cpu->apic_state), NULL, errp);
+ 
+     /* Map APIC MMIO area */
+     apic = APIC_COMMON(cpu->apic_state);
+diff --git a/tests/test-qdev-global-props.c b/tests/test-qdev-global-props.c
+index 42d3dd7030..1e6b0f33ff 100644
+--- a/tests/test-qdev-global-props.c
++++ b/tests/test-qdev-global-props.c
+@@ -26,6 +26,7 @@
+ 
+ #include "hw/qdev-properties.h"
+ #include "qom/object.h"
++#include "qapi/error.h"
+ #include "qapi/visitor.h"
+ 
+ 
+@@ -76,7 +77,7 @@ static void test_static_prop_subprocess(void)
+     MyType *mt;
+ 
+     mt = STATIC_TYPE(object_new(TYPE_STATIC_PROPS));
+-    qdev_init_nofail(DEVICE(mt));
++    qdev_realize(DEVICE(mt), NULL, &error_fatal);
+ 
+     g_assert_cmpuint(mt->prop1, ==, PROP_DEFAULT);
+ }
+@@ -111,7 +112,7 @@ static void test_static_globalprop_subprocess(void)
+     register_global_properties(props);
+ 
+     mt = STATIC_TYPE(object_new(TYPE_STATIC_PROPS));
+-    qdev_init_nofail(DEVICE(mt));
++    qdev_realize(DEVICE(mt), NULL, &error_fatal);
+ 
+     g_assert_cmpuint(mt->prop1, ==, 200);
+     g_assert_cmpuint(mt->prop2, ==, PROP_DEFAULT);
+@@ -229,7 +230,7 @@ static void test_dynamic_globalprop_subprocess(void)
+     register_global_properties(props);
+ 
+     mt = DYNAMIC_TYPE(object_new(TYPE_DYNAMIC_PROPS));
+-    qdev_init_nofail(DEVICE(mt));
++    qdev_realize(DEVICE(mt), NULL, &error_fatal);
+ 
+     g_assert_cmpuint(mt->prop1, ==, 101);
+     g_assert_cmpuint(mt->prop2, ==, 102);
+@@ -272,7 +273,7 @@ static void test_subclass_global_props(void)
+     register_global_properties(props);
+ 
+     mt = STATIC_TYPE(object_new(TYPE_SUBCLASS));
+-    qdev_init_nofail(DEVICE(mt));
++    qdev_realize(DEVICE(mt), NULL, &error_fatal);
+ 
+     g_assert_cmpuint(mt->prop1, ==, 102);
+     g_assert_cmpuint(mt->prop2, ==, 104);
 -- 
 2.26.2
 
