@@ -7,48 +7,48 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A460CC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 15:06:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F8B3C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 15:06:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6FAAD206F4
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 15:06:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5E650206F4
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 15:06:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="bwCj7HYy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6FAAD206F4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="jL2wnb5M"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E650206F4
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52920 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53170 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jj2JN-0004vB-L1
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 11:06:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35952)
+	id 1jj2JQ-00051T-H5
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 11:06:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35962)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1jj2Ga-0002HI-Ag; Wed, 10 Jun 2020 11:03:48 -0400
-Received: from fanzine.igalia.com ([178.60.130.6]:58033)
+ id 1jj2Gb-0002J6-Th; Wed, 10 Jun 2020 11:03:49 -0400
+Received: from fanzine.igalia.com ([178.60.130.6]:58071)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1jj2GX-0006vv-LH; Wed, 10 Jun 2020 11:03:47 -0400
+ id 1jj2GX-0006vz-C7; Wed, 10 Jun 2020 11:03:49 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
  s=20170329; 
  h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From;
- bh=zhUI+SdcRuNKlLxl0eH0JWm96meGNa39l1+qfmyCMtQ=; 
- b=bwCj7HYyMSNjYYtS38gTtUlfP1yK7DTyPMzc9dq3eiNXjaOl4lCrsmZv46uF91o5baKa0rauDTNdEr73OO3IM8jQBZ8k6IQG4075Eu5wR9zh+Rg2H3J/nUg0fe3M58s/AYhQHBaLIuIbIx+TKsFwkJEy2ldWWIMC9itIiMfR/Y88THBK58BeY05CdhOeWfUql/cEbbQwwmIe+p8zfnG5lklv2EZpYtLcPmBR5f4bovfz8ua+sDmhbX2oQ5iWmxe4awHVZsG1sUBhCWAHF36JVxc6NWnK8r2Sn1A4V5IGOUESYZhc9s8YAEJVcVw2bHeXfpb14xusDnt3t1MkGSMfYA==;
+ bh=VTJ0AleYo0FtKqUbQGMQJVxhmwOgUpH8CMhdCjrgWgs=; 
+ b=jL2wnb5Mdn4V8Lplb5aCBWpZiAQgITHO91qcKVX705DrdvSUAhhKspvDEQRmdLblkj06YYO+nfZtGoAcUc3qRfkCPTShzHQV+OM2gtSeSC+YXtZC4rgUnSqpeXpqxXJeoxz5F1VItEgc3rd30kQjTccn57NpYDEW3nX5pYIoRsNTdKmmYmeWQJHht6fgsKNkdhvJKNdqzlOlngW73QjxQf+5+EDepzqkYVTpNsI0szi/in3UtVQxejg+4EnSIECwD9FaMmPX1DmWzEZ9cUt0MkZ8XAe9i+Slf01I4Ag6NDjFCAU5OoaB+dmebBvaksgk+X5Q7z/XwHDM6csjv8woeA==;
 Received: from [81.0.38.199] (helo=perseus.local)
  by fanzine.igalia.com with esmtpsa 
  (Cipher TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim)
- id 1jj2GQ-0007gf-Af; Wed, 10 Jun 2020 17:03:38 +0200
+ id 1jj2GR-0007gv-CG; Wed, 10 Jun 2020 17:03:39 +0200
 Received: from berto by perseus.local with local (Exim 4.92)
  (envelope-from <berto@igalia.com>)
- id 1jj2GB-0007MY-Nu; Wed, 10 Jun 2020 17:03:23 +0200
+ id 1jj2GC-0007N4-3H; Wed, 10 Jun 2020 17:03:24 +0200
 From: Alberto Garcia <berto@igalia.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v8 03/34] qcow2: Add calculate_l2_meta()
-Date: Wed, 10 Jun 2020 17:02:41 +0200
-Message-Id: <d61ad6351d7e06de6bc213b5e321daa2e22d7030.1591801197.git.berto@igalia.com>
+Subject: [PATCH v8 15/34] qcow2: Add qcow2_get_subcluster_range_type()
+Date: Wed, 10 Jun 2020 17:02:53 +0200
+Message-Id: <812b66824859bee38019fc4d35bda0985b13789f.1591801197.git.berto@igalia.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <cover.1591801197.git.berto@igalia.com>
 References: <cover.1591801197.git.berto@igalia.com>
@@ -84,118 +84,83 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-handle_alloc() creates a QCowL2Meta structure in order to update the
-image metadata and perform the necessary copy-on-write operations.
+There are situations in which we want to know how many contiguous
+subclusters of the same type there are in a given cluster. This can be
+done by simply iterating over the subclusters and repeatedly calling
+qcow2_get_subcluster_type() for each one of them.
 
-This patch moves that code to a separate function so it can be used
-from other places.
+However once we determined the type of a subcluster we can check the
+rest efficiently by counting the number of adjacent ones (or zeroes)
+in the bitmap. This is what this function does.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- block/qcow2-cluster.c | 77 +++++++++++++++++++++++++++++--------------
- 1 file changed, 53 insertions(+), 24 deletions(-)
+ block/qcow2-cluster.c | 51 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 51 insertions(+)
 
 diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index 9ab41cb728..61ad638bdc 100644
+index 8b2fc550b7..32dc6e75e3 100644
 --- a/block/qcow2-cluster.c
 +++ b/block/qcow2-cluster.c
-@@ -1037,6 +1037,56 @@ void qcow2_alloc_cluster_abort(BlockDriverState *bs, QCowL2Meta *m)
-     }
+@@ -375,6 +375,57 @@ fail:
+     return ret;
  }
  
 +/*
-+ * For a given write request, create a new QCowL2Meta structure, add
-+ * it to @m and the BDRVQcow2State.cluster_allocs list.
++ * For a given L2 entry, count the number of contiguous subclusters of
++ * the same type starting from @sc_from. Compressed clusters are
++ * treated as if they were divided into subclusters of size
++ * s->subcluster_size.
 + *
-+ * @host_cluster_offset points to the beginning of the first cluster.
++ * Return the number of contiguous subclusters and set @type to the
++ * subcluster type.
 + *
-+ * @guest_offset and @bytes indicate the offset and length of the
-+ * request.
-+ *
-+ * If @keep_old is true it means that the clusters were already
-+ * allocated and will be overwritten. If false then the clusters are
-+ * new and we have to decrease the reference count of the old ones.
++ * If the L2 entry is invalid return -errno and set @type to
++ * QCOW2_SUBCLUSTER_INVALID.
 + */
-+static void calculate_l2_meta(BlockDriverState *bs,
-+                              uint64_t host_cluster_offset,
-+                              uint64_t guest_offset, unsigned bytes,
-+                              QCowL2Meta **m, bool keep_old)
++G_GNUC_UNUSED
++static int qcow2_get_subcluster_range_type(BlockDriverState *bs,
++                                           uint64_t l2_entry,
++                                           uint64_t l2_bitmap,
++                                           unsigned sc_from,
++                                           QCow2SubclusterType *type)
 +{
 +    BDRVQcow2State *s = bs->opaque;
-+    unsigned cow_start_from = 0;
-+    unsigned cow_start_to = offset_into_cluster(s, guest_offset);
-+    unsigned cow_end_from = cow_start_to + bytes;
-+    unsigned cow_end_to = ROUND_UP(cow_end_from, s->cluster_size);
-+    unsigned nb_clusters = size_to_clusters(s, cow_end_from);
-+    QCowL2Meta *old_m = *m;
++    uint32_t val;
 +
-+    *m = g_malloc0(sizeof(**m));
-+    **m = (QCowL2Meta) {
-+        .next           = old_m,
++    *type = qcow2_get_subcluster_type(bs, l2_entry, l2_bitmap, sc_from);
 +
-+        .alloc_offset   = host_cluster_offset,
-+        .offset         = start_of_cluster(s, guest_offset),
-+        .nb_clusters    = nb_clusters,
++    if (*type == QCOW2_SUBCLUSTER_INVALID) {
++        return -EINVAL;
++    } else if (!has_subclusters(s) || *type == QCOW2_SUBCLUSTER_COMPRESSED) {
++        return s->subclusters_per_cluster - sc_from;
++    }
 +
-+        .keep_old_clusters = keep_old,
++    switch (*type) {
++    case QCOW2_SUBCLUSTER_NORMAL:
++        val = l2_bitmap | QCOW_OFLAG_SUB_ALLOC_RANGE(0, sc_from);
++        return cto32(val) - sc_from;
 +
-+        .cow_start = {
-+            .offset     = cow_start_from,
-+            .nb_bytes   = cow_start_to - cow_start_from,
-+        },
-+        .cow_end = {
-+            .offset     = cow_end_from,
-+            .nb_bytes   = cow_end_to - cow_end_from,
-+        },
-+    };
++    case QCOW2_SUBCLUSTER_ZERO_PLAIN:
++    case QCOW2_SUBCLUSTER_ZERO_ALLOC:
++        val = (l2_bitmap | QCOW_OFLAG_SUB_ZERO_RANGE(0, sc_from)) >> 32;
++        return cto32(val) - sc_from;
 +
-+    qemu_co_queue_init(&(*m)->dependent_requests);
-+    QLIST_INSERT_HEAD(&s->cluster_allocs, *m, next_in_flight);
++    case QCOW2_SUBCLUSTER_UNALLOCATED_PLAIN:
++    case QCOW2_SUBCLUSTER_UNALLOCATED_ALLOC:
++        val = ((l2_bitmap >> 32) | l2_bitmap)
++            & ~QCOW_OFLAG_SUB_ALLOC_RANGE(0, sc_from);
++        return ctz32(val) - sc_from;
++
++    default:
++        g_assert_not_reached();
++    }
 +}
 +
  /*
-  * Returns the number of contiguous clusters that can be used for an allocating
-  * write, but require COW to be performed (this includes yet unallocated space,
-@@ -1435,35 +1485,14 @@ static int handle_alloc(BlockDriverState *bs, uint64_t guest_offset,
-     uint64_t requested_bytes = *bytes + offset_into_cluster(s, guest_offset);
-     int avail_bytes = nb_clusters << s->cluster_bits;
-     int nb_bytes = MIN(requested_bytes, avail_bytes);
--    QCowL2Meta *old_m = *m;
--
--    *m = g_malloc0(sizeof(**m));
--
--    **m = (QCowL2Meta) {
--        .next           = old_m,
--
--        .alloc_offset   = alloc_cluster_offset,
--        .offset         = start_of_cluster(s, guest_offset),
--        .nb_clusters    = nb_clusters,
--
--        .keep_old_clusters  = keep_old_clusters,
--
--        .cow_start = {
--            .offset     = 0,
--            .nb_bytes   = offset_into_cluster(s, guest_offset),
--        },
--        .cow_end = {
--            .offset     = nb_bytes,
--            .nb_bytes   = avail_bytes - nb_bytes,
--        },
--    };
--    qemu_co_queue_init(&(*m)->dependent_requests);
--    QLIST_INSERT_HEAD(&s->cluster_allocs, *m, next_in_flight);
- 
-     *host_offset = alloc_cluster_offset + offset_into_cluster(s, guest_offset);
-     *bytes = MIN(*bytes, nb_bytes - offset_into_cluster(s, guest_offset));
-     assert(*bytes != 0);
- 
-+    calculate_l2_meta(bs, alloc_cluster_offset, guest_offset, *bytes,
-+                      m, keep_old_clusters);
-+
-     return 1;
- 
- fail:
+  * Checks how many clusters in a given L2 slice are contiguous in the image
+  * file. As soon as one of the flags in the bitmask stop_flags changes compared
 -- 
 2.20.1
 
