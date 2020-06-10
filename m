@@ -2,88 +2,74 @@ Return-Path: <SRS0=wemX=7X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D26B9C433E3
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:21:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D9B9C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:23:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9D03320820
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:21:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NZAIZuGg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D03320820
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2ED7B2072E
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:23:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2ED7B2072E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39164 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46092 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jj0fp-0006zD-PM
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 09:21:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50716)
+	id 1jj0hn-0001Wz-EI
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 09:23:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45254)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jj0cv-0002pf-1m
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 09:18:46 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:25676
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jj0cs-0006Dp-VP
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 09:18:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591795118;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=5fjvibfpYl0DByW4nbgX6jNyorU03kRmHFCfX1t45I0=;
- b=NZAIZuGgzSp08YDdJ1yVnPGqWfA19N8wt69gHkrAejHalVHvXtTEhamJIpk5i6uOmqNE1w
- jwreBbooW0xq4LxwbXkDhAG8VGsdEYc/mFjZPMYtSchWVn7sqf8aDiG/mzoMCFBmGzFcQf
- 1gCUmwT3GdpxEY8gTxMnwLzpg1YQ2qg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-69-Ejw63EgRO6yWEUerfaCKfA-1; Wed, 10 Jun 2020 09:18:30 -0400
-X-MC-Unique: Ejw63EgRO6yWEUerfaCKfA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 10F4C19200C9
- for <qemu-devel@nongnu.org>; Wed, 10 Jun 2020 13:18:30 +0000 (UTC)
-Received: from [10.3.113.22] (ovpn-113-22.phx2.redhat.com [10.3.113.22])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E1F8F7BA10
- for <qemu-devel@nongnu.org>; Wed, 10 Jun 2020 13:18:29 +0000 (UTC)
-Subject: Re: [PULL 0/3] NBD patches through 2020-06-09
-From: Eric Blake <eblake@redhat.com>
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
+ id 1jj0Uy-00081B-QI; Wed, 10 Jun 2020 09:10:32 -0400
+Received: from mout.kundenserver.de ([212.227.126.135]:56849)
+ by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
+ id 1jj0Ux-0003iZ-GY; Wed, 10 Jun 2020 09:10:32 -0400
+Received: from localhost.localdomain ([82.252.135.106]) by
+ mrelayeu.kundenserver.de (mreue009 [212.227.15.167]) with ESMTPSA (Nemesis)
+ id 1N5mOZ-1iqdNM3MqZ-017G53; Wed, 10 Jun 2020 15:10:24 +0200
+From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-References: <20200610011713.3687895-1-eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <0b58576a-593b-68ec-df80-26ad7dec4d42@redhat.com>
-Date: Wed, 10 Jun 2020 08:18:29 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+Subject: [PULL v2 15/16] hw/openrisc/openrisc_sim: Add assertion to silence
+ GCC warning
+Date: Wed, 10 Jun 2020 15:10:10 +0200
+Message-Id: <20200610131011.1941209-16-laurent@vivier.eu>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200610131011.1941209-1-laurent@vivier.eu>
+References: <20200610131011.1941209-1-laurent@vivier.eu>
 MIME-Version: 1.0
-In-Reply-To: <20200610011713.3687895-1-eblake@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=eblake@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 23:22:15
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:8hggNOYDOPfXdValh0/LtwKsrJvnZ4EGWVtbAUwp4s8OL/Fywjr
+ XM8ycjFTSCPGAN2lT70Si/9ZKlNzKz4q/t6UAuSq8IoixVgFpI9l3zb6Yv9nxbTdu7T4cw9
+ /QZ1kAQqEZfpoOKWn01BZtV70gNxTqFmEySF5H27YRkrwHpsP+mRxvZNVJrXZMiZtsk4SxM
+ INW3G9NIAo32IrI1A2ngw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:ZQZSn2q+FiE=:utUpGYNOY2gkjdSNwg1Qdr
+ SuHTxbDfUhNJeHTex7w5KiKoeXtrpaPqRVRZxxYoqK+CR8u0z6oBT5s8HuuwpL7Q8LUb6sVun
+ yb3JTSV3ixfDOLK2slgywpc4e9A1tPCd5uZk4Ht/WE7FqZLlyqtfZWDVOeY8vpogUciuTk7v8
+ Wyl67YSXn2k3WxM2A8ejAHGyhsSR5kXnHWLADJ5IsifLok4RX8LHC8onEvFUqxaUxh777UmIj
+ HcAshB5/pfmTKejbNJmuQPSwPEyaXW0VnfZnO7MvHubSvZAIbsaLTjzL77xx5Qpr/DDgu5e62
+ 29O6pLA2RNzpm7ryrA/M1WeVFoVxXMZYffHXSznimV8LjI4kfg2d3M2X1P+3ehMtbWP6SiaW1
+ A38ePOtiKNCNPT5RMsczmXftCkYndT0oGoFlNLyLOsSDomjDvjXBLrswwwbfLSIwhkttN/I4W
+ YSHFocH4FCyYnnJbSH1Ie9EYhW3qJ3emBbY/pibenvOadoiq5qLjxFbdV50ML/1VXuj4vjwG6
+ SSxBmNaH6I6QgXdx12+IsNlmqgk3xXK1Yl8ev9OJL2W/3W2LS6jYZPJ40njrQIPT9+fZwLKJm
+ SRX/xLKfpdH+RiW0juQmdyLCg4AMDa8TG3JwopX/76KKZ+NYNY24DU47SbD8OoopC+zrx/lrC
+ R+rhM4+Xso7/tS7w70Y24poBpfks/gCILThahOZdEk/50OCQJpqqA6sHUPTFy0hu2qgsoI5la
+ fT1Ou/xEV521eoAxXP/3FvgXPd5JzCt7fa6FtcWpFei2fMR4iLOTb7PRVunH6IaFEqS5nn3SL
+ EkCvG2eciz2EfVaNkyfzeM4eDpHMcFu0Qu4npbjWfiOb+BCJ84XOmQfy3D1jhzdSsjC1CgV
+Received-SPF: none client-ip=212.227.126.135; envelope-from=laurent@vivier.eu;
+ helo=mout.kundenserver.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/10 08:14:00
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -28
+X-Spam_score: -2.9
+X-Spam_bar: --
+X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,40 +82,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ qemu-trivial@nongnu.org, =?UTF-8?q?Martin=20Li=C5=A1ka?= <mliska@suse.cz>,
+ Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>,
+ Stafford Horne <shorne@gmail.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/9/20 8:17 PM, Eric Blake wrote:
-> The following changes since commit 31d321c2b3574dcc74e9f6411af06bca6b5d10f4:
-> 
->    Merge remote-tracking branch 'remotes/philmd-gitlab/tags/sparc-next-20200609' into staging (2020-06-09 17:29:47 +0100)
-> 
-> are available in the Git repository at:
-> 
->    https://repo.or.cz/qemu/ericb.git tags/pull-nbd-2020-06-09
-> 
-> for you to fetch changes up to 2886df0c75c1c5f6aed054c54f4ad48aeee04bfd:
-> 
->    block: Call attention to truncation of long NBD exports (2020-06-09 17:05:50 -0500)
-> 
-> ----------------------------------------------------------------
-> NBD patches for 2020-06-09
-> 
-> - fix iotest 194 race
-> - fix CVE-2020-10761: server DoS from assertion on long NBD error messages
-> 
-> ----------------------------------------------------------------
-> Eric Blake (2):
->        nbd/server: Avoid long error message assertions CVE-2020-10761
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Vladimir raised a potential thread-safety issue in this patch. As it is 
-intended to fix a CVE, let's hold off on this pull request, and I'll 
-send a v2 once I have better review.
+When compiling with GCC 10 (Fedora 32) using CFLAGS=-O2 we get:
 
+    CC      or1k-softmmu/hw/openrisc/openrisc_sim.o
+  hw/openrisc/openrisc_sim.c: In function ‘openrisc_sim_init’:
+  hw/openrisc/openrisc_sim.c:87:42: error: ‘cpu_irqs[0]’ may be used uninitialized in this function [-Werror=maybe-uninitialized]
+     87 |         sysbus_connect_irq(s, i, cpu_irqs[i][irq_pin]);
+        |                                  ~~~~~~~~^~~
+
+While humans can tell smp_cpus will always be in the [1, 2] range,
+(openrisc_sim_machine_init sets mc->max_cpus = 2), the compiler
+can't.
+
+Add an assertion to give the compiler a hint there's no use of
+uninitialized data.
+
+Buglink: https://bugs.launchpad.net/qemu/+bug/1874073
+Reported-by: Martin Liška <mliska@suse.cz>
+Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Tested-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Acked-by: Stafford Horne <shorne@gmail.com>
+Message-Id: <20200608160611.16966-1-philmd@redhat.com>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ hw/openrisc/openrisc_sim.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/hw/openrisc/openrisc_sim.c b/hw/openrisc/openrisc_sim.c
+index d08ce6181199..02f5259e5e33 100644
+--- a/hw/openrisc/openrisc_sim.c
++++ b/hw/openrisc/openrisc_sim.c
+@@ -134,6 +134,7 @@ static void openrisc_sim_init(MachineState *machine)
+     int n;
+     unsigned int smp_cpus = machine->smp.cpus;
+ 
++    assert(smp_cpus >= 1 && smp_cpus <= 2);
+     for (n = 0; n < smp_cpus; n++) {
+         cpu = OPENRISC_CPU(cpu_create(machine->cpu_type));
+         if (cpu == NULL) {
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+2.26.2
 
 
