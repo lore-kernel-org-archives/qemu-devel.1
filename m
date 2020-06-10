@@ -2,88 +2,64 @@ Return-Path: <SRS0=wemX=7X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7A48C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 12:38:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB808C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 12:39:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7218B2072E
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 12:38:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lwz4MM9l"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7218B2072E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTPS id AB8B22072E
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 12:39:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB8B22072E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46028 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49336 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jizzT-0006iK-Ob
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 08:37:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48506)
+	id 1jj00e-0008Bg-Vz
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 08:39:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49478)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <sameid@google.com>) id 1jizi5-0003tO-I2
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 08:20:01 -0400
-Received: from mail-qv1-xf2b.google.com ([2607:f8b0:4864:20::f2b]:42547)
- by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <sameid@google.com>) id 1jizi0-0007nN-2m
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 08:20:01 -0400
-Received: by mail-qv1-xf2b.google.com with SMTP id p15so877374qvr.9
- for <qemu-devel@nongnu.org>; Wed, 10 Jun 2020 05:19:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=I27Gf9kjAaWqAWeTCSX0aZVa1pjrNkI2HruSIZfC1s4=;
- b=lwz4MM9lJSaPYaIAXkvnwNuhjDe1fD3yhqt/Qw7uVa3FKi2u2iIlF9CZRVy8FkAtgv
- sURfJlDt56SCYgnx9xqEb3V1yAyRJfsfY8Fdw1mnB5li2T+CSq6jck5jLQd6OUVCfd2N
- j6lZ83kBfDSpuwvR9BSE5pXPhtzYKxbf4kns8nHJCmtRWEHdrU/tmRjHTBij6/ECXxNN
- 5V2KB3cXDheSTtK9KSaebo2qe19fQABZF4nWpch3FFweK3BDGvGvgfUY65NxkdBEh3vX
- H1F/+StfbJD6kso7eQzQAWLDm6fBJYO5smv43+4lc21I1cxTmvil/p9+Jk16XIw41WS2
- sRCQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=I27Gf9kjAaWqAWeTCSX0aZVa1pjrNkI2HruSIZfC1s4=;
- b=MX9fcEJbNkJL9cAUD8WiRN5sbZDcIKPuz99i6qR9djrt7+ptUwScJVvBIPHKxvRGti
- YMcgKUiks1abjhV8yL4JV0O0haYPKvwvKWh5xrxyyvu2bFmrQ93ByKgjp+Y+YPceBoV9
- 4hP2n8Gibe2epygtLL2hOy+5FhslVqc6K/51LQtncUl2IqFYv9L/c7qB4sDgg83bjsyT
- 4985o0Iow2ZLvoyRFJ1OAvVDjPOXI5iM5gAUULgga3kdvURrR0vkqVcTguWq3/orpSsx
- 7a3rpVd+yQbUPJ1yxAeZqK304/ZFxGp84tlQvnezHZC3xfmRgH0GYVZ22tOpiW0dNtoR
- 2WFQ==
-X-Gm-Message-State: AOAM532i12T0URaUttCyRImyO2CFjiYKDiIbXCbR1kmPoEsVPmhwudJB
- BqG1Sr70YkHgkiKqAyIA2DL9H86sPMm8JoVeOsTQDA==
-X-Google-Smtp-Source: ABdhPJzYpWGD5Pv4vqqBOQSfG4JeOr4SaQmWRqEw88awtBWaXSVw3ydPHzhZ1HQ4Ci7TwCPOdKp+4Qc3PSWYlbqgLF4=
-X-Received: by 2002:ad4:47aa:: with SMTP id a10mr2899047qvz.61.1591791589433; 
- Wed, 10 Jun 2020 05:19:49 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jizoJ-0002hT-95; Wed, 10 Jun 2020 08:26:27 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:51040)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jizoH-0000UO-5p; Wed, 10 Jun 2020 08:26:26 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07436282|-1; CH=green;
+ DM=|CONTINUE|false|;
+ DS=CONTINUE|ham_regular_dialog|0.0435712-0.000606192-0.955823;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e02c03308; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=9; RT=8; SR=0; TI=SMTPD_---.HkZpsNx_1591791977; 
+Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.HkZpsNx_1591791977)
+ by smtp.aliyun-inc.com(10.147.41.120);
+ Wed, 10 Jun 2020 20:26:18 +0800
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Subject: [PATCH v9 24/61] target/riscv: vector single-width saturating add and
+ subtract
+Date: Wed, 10 Jun 2020 19:37:11 +0800
+Message-Id: <20200610113748.4754-25-zhiwei_liu@c-sky.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20200610113748.4754-1-zhiwei_liu@c-sky.com>
+References: <20200610113748.4754-1-zhiwei_liu@c-sky.com>
 MIME-Version: 1.0
-References: <CAFr6bU=LjeW5_eGtwL38cher2TM52skohuANNXN9EpO+mA-z8Q@mail.gmail.com>
- <m2imfz877v.fsf@dme.org>
-In-Reply-To: <m2imfz877v.fsf@dme.org>
-From: Sam Eiderman <sameid@google.com>
-Date: Wed, 10 Jun 2020 15:19:38 +0300
-Message-ID: <CAFr6bUk5LrEL8BPXYkNOqj_jsbxHBfbj_NYryUjszMtG89L+2w@mail.gmail.com>
-Subject: Re: Clarification regarding new qemu-img convert --target-is-zero flag
-To: David Edmondson <dme@dme.org>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, 
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, eblake@redhat.com,
- Max Reitz <mreitz@redhat.com>, Tony Zhang <tzz@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::f2b;
- envelope-from=sameid@google.com; helo=mail-qv1-xf2b.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -185
-X-Spam_score: -18.6
-X-Spam_bar: ------------------
-X-Spam_report: (-18.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- ENV_AND_HDR_SPF_MATCH=-0.5, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, USER_IN_DEF_DKIM_WL=-7.5,
- USER_IN_DEF_SPF_WL=-7.5 autolearn=_AUTOLEARN
+Content-Transfer-Encoding: 8bit
+Received-SPF: none client-ip=121.197.200.217;
+ envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/10 07:37:52
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001, UNPARSEABLE_RELAY=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,65 +72,503 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: richard.henderson@linaro.org, wxy194768@alibaba-inc.com,
+ wenmeng_zhang@c-sky.com, Alistair Francis <alistair.francis@wdc.com>,
+ palmer@dabbelt.com, LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Thanks David,
+Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+---
+ target/riscv/helper.h                   |  33 ++
+ target/riscv/insn32.decode              |  10 +
+ target/riscv/insn_trans/trans_rvv.inc.c |  16 +
+ target/riscv/vector_helper.c            | 385 ++++++++++++++++++++++++
+ 4 files changed, 444 insertions(+)
 
-Yes, I imaging the following use case:
+diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+index 279b2e049f..9416ebb090 100644
+--- a/target/riscv/helper.h
++++ b/target/riscv/helper.h
+@@ -686,3 +686,36 @@ DEF_HELPER_4(vmv_v_x_b, void, ptr, i64, env, i32)
+ DEF_HELPER_4(vmv_v_x_h, void, ptr, i64, env, i32)
+ DEF_HELPER_4(vmv_v_x_w, void, ptr, i64, env, i32)
+ DEF_HELPER_4(vmv_v_x_d, void, ptr, i64, env, i32)
++
++DEF_HELPER_6(vsaddu_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vsaddu_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vsaddu_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vsaddu_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vsadd_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vsadd_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vsadd_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vsadd_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vssubu_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vssubu_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vssubu_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vssubu_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vssub_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vssub_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vssub_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vssub_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vsaddu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsaddu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsaddu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsaddu_vx_d, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsadd_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsadd_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsadd_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsadd_vx_d, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vssubu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vssubu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vssubu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vssubu_vx_d, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vssub_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vssub_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vssub_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vssub_vx_d, void, ptr, ptr, tl, ptr, env, i32)
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index adb76956c9..c9a4050adc 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -407,6 +407,16 @@ vmv_v_i         010111 1 00000 ..... 011 ..... 1010111 @r2
+ vmerge_vvm      010111 0 ..... ..... 000 ..... 1010111 @r_vm_0
+ vmerge_vxm      010111 0 ..... ..... 100 ..... 1010111 @r_vm_0
+ vmerge_vim      010111 0 ..... ..... 011 ..... 1010111 @r_vm_0
++vsaddu_vv       100000 . ..... ..... 000 ..... 1010111 @r_vm
++vsaddu_vx       100000 . ..... ..... 100 ..... 1010111 @r_vm
++vsaddu_vi       100000 . ..... ..... 011 ..... 1010111 @r_vm
++vsadd_vv        100001 . ..... ..... 000 ..... 1010111 @r_vm
++vsadd_vx        100001 . ..... ..... 100 ..... 1010111 @r_vm
++vsadd_vi        100001 . ..... ..... 011 ..... 1010111 @r_vm
++vssubu_vv       100010 . ..... ..... 000 ..... 1010111 @r_vm
++vssubu_vx       100010 . ..... ..... 100 ..... 1010111 @r_vm
++vssub_vv        100011 . ..... ..... 000 ..... 1010111 @r_vm
++vssub_vx        100011 . ..... ..... 100 ..... 1010111 @r_vm
+ 
+ vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
+ vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
+diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+index d726995f84..4d5eae8dde 100644
+--- a/target/riscv/insn_trans/trans_rvv.inc.c
++++ b/target/riscv/insn_trans/trans_rvv.inc.c
+@@ -1731,3 +1731,19 @@ static bool trans_vmv_v_i(DisasContext *s, arg_vmv_v_i *a)
+ GEN_OPIVV_TRANS(vmerge_vvm, opivv_vadc_check)
+ GEN_OPIVX_TRANS(vmerge_vxm, opivx_vadc_check)
+ GEN_OPIVI_TRANS(vmerge_vim, 0, vmerge_vxm, opivx_vadc_check)
++
++/*
++ *** Vector Fixed-Point Arithmetic Instructions
++ */
++
++/* Vector Single-Width Saturating Add and Subtract */
++GEN_OPIVV_TRANS(vsaddu_vv, opivv_check)
++GEN_OPIVV_TRANS(vsadd_vv,  opivv_check)
++GEN_OPIVV_TRANS(vssubu_vv, opivv_check)
++GEN_OPIVV_TRANS(vssub_vv,  opivv_check)
++GEN_OPIVX_TRANS(vsaddu_vx,  opivx_check)
++GEN_OPIVX_TRANS(vsadd_vx,  opivx_check)
++GEN_OPIVX_TRANS(vssubu_vx,  opivx_check)
++GEN_OPIVX_TRANS(vssub_vx,  opivx_check)
++GEN_OPIVI_TRANS(vsaddu_vi, 1, vsaddu_vx, opivx_check)
++GEN_OPIVI_TRANS(vsadd_vi, 0, vsadd_vx, opivx_check)
+diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+index 8439aeb0eb..3d4212ea4a 100644
+--- a/target/riscv/vector_helper.c
++++ b/target/riscv/vector_helper.c
+@@ -2112,3 +2112,388 @@ GEN_VEXT_VMERGE_VX(vmerge_vxm_b, int8_t,  H1, clearb)
+ GEN_VEXT_VMERGE_VX(vmerge_vxm_h, int16_t, H2, clearh)
+ GEN_VEXT_VMERGE_VX(vmerge_vxm_w, int32_t, H4, clearl)
+ GEN_VEXT_VMERGE_VX(vmerge_vxm_d, int64_t, H8, clearq)
++
++/*
++ *** Vector Fixed-Point Arithmetic Instructions
++ */
++
++/* Vector Single-Width Saturating Add and Subtract */
++
++/*
++ * As fixed point instructions probably have round mode and saturation,
++ * define common macros for fixed point here.
++ */
++typedef void opivv2_rm_fn(void *vd, void *vs1, void *vs2, int i,
++                          CPURISCVState *env, int vxrm);
++
++#define OPIVV2_RM(NAME, TD, T1, T2, TX1, TX2, HD, HS1, HS2, OP)     \
++static inline void                                                  \
++do_##NAME(void *vd, void *vs1, void *vs2, int i,                    \
++          CPURISCVState *env, int vxrm)                             \
++{                                                                   \
++    TX1 s1 = *((T1 *)vs1 + HS1(i));                                 \
++    TX2 s2 = *((T2 *)vs2 + HS2(i));                                 \
++    *((TD *)vd + HD(i)) = OP(env, vxrm, s2, s1);                    \
++}
++
++static inline void
++vext_vv_rm_1(void *vd, void *v0, void *vs1, void *vs2,
++             CPURISCVState *env,
++             uint32_t vl, uint32_t vm, uint32_t mlen, int vxrm,
++             opivv2_rm_fn *fn)
++{
++    for (uint32_t i = 0; i < vl; i++) {
++        if (!vm && !vext_elem_mask(v0, mlen, i)) {
++            continue;
++        }
++        fn(vd, vs1, vs2, i, env, vxrm);
++    }
++}
++
++static inline void
++vext_vv_rm_2(void *vd, void *v0, void *vs1, void *vs2,
++             CPURISCVState *env,
++             uint32_t desc, uint32_t esz, uint32_t dsz,
++             opivv2_rm_fn *fn, clear_fn *clearfn)
++{
++    uint32_t vlmax = vext_maxsz(desc) / esz;
++    uint32_t mlen = vext_mlen(desc);
++    uint32_t vm = vext_vm(desc);
++    uint32_t vl = env->vl;
++
++    switch (env->vxrm) {
++    case 0: /* rnu */
++        vext_vv_rm_1(vd, v0, vs1, vs2,
++                     env, vl, vm, mlen, 0, fn);
++        break;
++    case 1: /* rne */
++        vext_vv_rm_1(vd, v0, vs1, vs2,
++                     env, vl, vm, mlen, 1, fn);
++        break;
++    case 2: /* rdn */
++        vext_vv_rm_1(vd, v0, vs1, vs2,
++                     env, vl, vm, mlen, 2, fn);
++        break;
++    default: /* rod */
++        vext_vv_rm_1(vd, v0, vs1, vs2,
++                     env, vl, vm, mlen, 3, fn);
++        break;
++    }
++
++    clearfn(vd, vl, vl * dsz,  vlmax * dsz);
++}
++
++/* generate helpers for fixed point instructions with OPIVV format */
++#define GEN_VEXT_VV_RM(NAME, ESZ, DSZ, CLEAR_FN)                \
++void HELPER(NAME)(void *vd, void *v0, void *vs1, void *vs2,     \
++                  CPURISCVState *env, uint32_t desc)            \
++{                                                               \
++    vext_vv_rm_2(vd, v0, vs1, vs2, env, desc, ESZ, DSZ,         \
++                 do_##NAME, CLEAR_FN);                          \
++}
++
++static inline uint8_t saddu8(CPURISCVState *env, int vxrm, uint8_t a, uint8_t b)
++{
++    uint8_t res = a + b;
++    if (res < a) {
++        res = UINT8_MAX;
++        env->vxsat = 0x1;
++    }
++    return res;
++}
++
++static inline uint16_t saddu16(CPURISCVState *env, int vxrm, uint16_t a,
++                               uint16_t b)
++{
++    uint16_t res = a + b;
++    if (res < a) {
++        res = UINT16_MAX;
++        env->vxsat = 0x1;
++    }
++    return res;
++}
++
++static inline uint32_t saddu32(CPURISCVState *env, int vxrm, uint32_t a,
++                               uint32_t b)
++{
++    uint32_t res = a + b;
++    if (res < a) {
++        res = UINT32_MAX;
++        env->vxsat = 0x1;
++    }
++    return res;
++}
++
++static inline uint64_t saddu64(CPURISCVState *env, int vxrm, uint64_t a,
++                               uint64_t b)
++{
++    uint64_t res = a + b;
++    if (res < a) {
++        res = UINT64_MAX;
++        env->vxsat = 0x1;
++    }
++    return res;
++}
++
++RVVCALL(OPIVV2_RM, vsaddu_vv_b, OP_UUU_B, H1, H1, H1, saddu8)
++RVVCALL(OPIVV2_RM, vsaddu_vv_h, OP_UUU_H, H2, H2, H2, saddu16)
++RVVCALL(OPIVV2_RM, vsaddu_vv_w, OP_UUU_W, H4, H4, H4, saddu32)
++RVVCALL(OPIVV2_RM, vsaddu_vv_d, OP_UUU_D, H8, H8, H8, saddu64)
++GEN_VEXT_VV_RM(vsaddu_vv_b, 1, 1, clearb)
++GEN_VEXT_VV_RM(vsaddu_vv_h, 2, 2, clearh)
++GEN_VEXT_VV_RM(vsaddu_vv_w, 4, 4, clearl)
++GEN_VEXT_VV_RM(vsaddu_vv_d, 8, 8, clearq)
++
++typedef void opivx2_rm_fn(void *vd, target_long s1, void *vs2, int i,
++                          CPURISCVState *env, int vxrm);
++
++#define OPIVX2_RM(NAME, TD, T1, T2, TX1, TX2, HD, HS2, OP)          \
++static inline void                                                  \
++do_##NAME(void *vd, target_long s1, void *vs2, int i,               \
++          CPURISCVState *env, int vxrm)                             \
++{                                                                   \
++    TX2 s2 = *((T2 *)vs2 + HS2(i));                                 \
++    *((TD *)vd + HD(i)) = OP(env, vxrm, s2, (TX1)(T1)s1);           \
++}
++
++static inline void
++vext_vx_rm_1(void *vd, void *v0, target_long s1, void *vs2,
++             CPURISCVState *env,
++             uint32_t vl, uint32_t vm, uint32_t mlen, int vxrm,
++             opivx2_rm_fn *fn)
++{
++    for (uint32_t i = 0; i < vl; i++) {
++        if (!vm && !vext_elem_mask(v0, mlen, i)) {
++            continue;
++        }
++        fn(vd, s1, vs2, i, env, vxrm);
++    }
++}
++
++static inline void
++vext_vx_rm_2(void *vd, void *v0, target_long s1, void *vs2,
++             CPURISCVState *env,
++             uint32_t desc, uint32_t esz, uint32_t dsz,
++             opivx2_rm_fn *fn, clear_fn *clearfn)
++{
++    uint32_t vlmax = vext_maxsz(desc) / esz;
++    uint32_t mlen = vext_mlen(desc);
++    uint32_t vm = vext_vm(desc);
++    uint32_t vl = env->vl;
++
++    switch (env->vxrm) {
++    case 0: /* rnu */
++        vext_vx_rm_1(vd, v0, s1, vs2,
++                     env, vl, vm, mlen, 0, fn);
++        break;
++    case 1: /* rne */
++        vext_vx_rm_1(vd, v0, s1, vs2,
++                     env, vl, vm, mlen, 1, fn);
++        break;
++    case 2: /* rdn */
++        vext_vx_rm_1(vd, v0, s1, vs2,
++                     env, vl, vm, mlen, 2, fn);
++        break;
++    default: /* rod */
++        vext_vx_rm_1(vd, v0, s1, vs2,
++                     env, vl, vm, mlen, 3, fn);
++        break;
++    }
++
++    clearfn(vd, vl, vl * dsz,  vlmax * dsz);
++}
++
++/* generate helpers for fixed point instructions with OPIVX format */
++#define GEN_VEXT_VX_RM(NAME, ESZ, DSZ, CLEAR_FN)          \
++void HELPER(NAME)(void *vd, void *v0, target_ulong s1,    \
++        void *vs2, CPURISCVState *env, uint32_t desc)     \
++{                                                         \
++    vext_vx_rm_2(vd, v0, s1, vs2, env, desc, ESZ, DSZ,    \
++                 do_##NAME, CLEAR_FN);                    \
++}
++
++RVVCALL(OPIVX2_RM, vsaddu_vx_b, OP_UUU_B, H1, H1, saddu8)
++RVVCALL(OPIVX2_RM, vsaddu_vx_h, OP_UUU_H, H2, H2, saddu16)
++RVVCALL(OPIVX2_RM, vsaddu_vx_w, OP_UUU_W, H4, H4, saddu32)
++RVVCALL(OPIVX2_RM, vsaddu_vx_d, OP_UUU_D, H8, H8, saddu64)
++GEN_VEXT_VX_RM(vsaddu_vx_b, 1, 1, clearb)
++GEN_VEXT_VX_RM(vsaddu_vx_h, 2, 2, clearh)
++GEN_VEXT_VX_RM(vsaddu_vx_w, 4, 4, clearl)
++GEN_VEXT_VX_RM(vsaddu_vx_d, 8, 8, clearq)
++
++static inline int8_t sadd8(CPURISCVState *env, int vxrm, int8_t a, int8_t b)
++{
++    int8_t res = a + b;
++    if ((res ^ a) & (res ^ b) & INT8_MIN) {
++        res = a > 0 ? INT8_MAX : INT8_MIN;
++        env->vxsat = 0x1;
++    }
++    return res;
++}
++
++static inline int16_t sadd16(CPURISCVState *env, int vxrm, int16_t a, int16_t b)
++{
++    int16_t res = a + b;
++    if ((res ^ a) & (res ^ b) & INT16_MIN) {
++        res = a > 0 ? INT16_MAX : INT16_MIN;
++        env->vxsat = 0x1;
++    }
++    return res;
++}
++
++static inline int32_t sadd32(CPURISCVState *env, int vxrm, int32_t a, int32_t b)
++{
++    int32_t res = a + b;
++    if ((res ^ a) & (res ^ b) & INT32_MIN) {
++        res = a > 0 ? INT32_MAX : INT32_MIN;
++        env->vxsat = 0x1;
++    }
++    return res;
++}
++
++static inline int64_t sadd64(CPURISCVState *env, int vxrm, int64_t a, int64_t b)
++{
++    int64_t res = a + b;
++    if ((res ^ a) & (res ^ b) & INT64_MIN) {
++        res = a > 0 ? INT64_MAX : INT64_MIN;
++        env->vxsat = 0x1;
++    }
++    return res;
++}
++
++RVVCALL(OPIVV2_RM, vsadd_vv_b, OP_SSS_B, H1, H1, H1, sadd8)
++RVVCALL(OPIVV2_RM, vsadd_vv_h, OP_SSS_H, H2, H2, H2, sadd16)
++RVVCALL(OPIVV2_RM, vsadd_vv_w, OP_SSS_W, H4, H4, H4, sadd32)
++RVVCALL(OPIVV2_RM, vsadd_vv_d, OP_SSS_D, H8, H8, H8, sadd64)
++GEN_VEXT_VV_RM(vsadd_vv_b, 1, 1, clearb)
++GEN_VEXT_VV_RM(vsadd_vv_h, 2, 2, clearh)
++GEN_VEXT_VV_RM(vsadd_vv_w, 4, 4, clearl)
++GEN_VEXT_VV_RM(vsadd_vv_d, 8, 8, clearq)
++
++RVVCALL(OPIVX2_RM, vsadd_vx_b, OP_SSS_B, H1, H1, sadd8)
++RVVCALL(OPIVX2_RM, vsadd_vx_h, OP_SSS_H, H2, H2, sadd16)
++RVVCALL(OPIVX2_RM, vsadd_vx_w, OP_SSS_W, H4, H4, sadd32)
++RVVCALL(OPIVX2_RM, vsadd_vx_d, OP_SSS_D, H8, H8, sadd64)
++GEN_VEXT_VX_RM(vsadd_vx_b, 1, 1, clearb)
++GEN_VEXT_VX_RM(vsadd_vx_h, 2, 2, clearh)
++GEN_VEXT_VX_RM(vsadd_vx_w, 4, 4, clearl)
++GEN_VEXT_VX_RM(vsadd_vx_d, 8, 8, clearq)
++
++static inline uint8_t ssubu8(CPURISCVState *env, int vxrm, uint8_t a, uint8_t b)
++{
++    uint8_t res = a - b;
++    if (res > a) {
++        res = 0;
++        env->vxsat = 0x1;
++    }
++    return res;
++}
++
++static inline uint16_t ssubu16(CPURISCVState *env, int vxrm, uint16_t a,
++                               uint16_t b)
++{
++    uint16_t res = a - b;
++    if (res > a) {
++        res = 0;
++        env->vxsat = 0x1;
++    }
++    return res;
++}
++
++static inline uint32_t ssubu32(CPURISCVState *env, int vxrm, uint32_t a,
++                               uint32_t b)
++{
++    uint32_t res = a - b;
++    if (res > a) {
++        res = 0;
++        env->vxsat = 0x1;
++    }
++    return res;
++}
++
++static inline uint64_t ssubu64(CPURISCVState *env, int vxrm, uint64_t a,
++                               uint64_t b)
++{
++    uint64_t res = a - b;
++    if (res > a) {
++        res = 0;
++        env->vxsat = 0x1;
++    }
++    return res;
++}
++
++RVVCALL(OPIVV2_RM, vssubu_vv_b, OP_UUU_B, H1, H1, H1, ssubu8)
++RVVCALL(OPIVV2_RM, vssubu_vv_h, OP_UUU_H, H2, H2, H2, ssubu16)
++RVVCALL(OPIVV2_RM, vssubu_vv_w, OP_UUU_W, H4, H4, H4, ssubu32)
++RVVCALL(OPIVV2_RM, vssubu_vv_d, OP_UUU_D, H8, H8, H8, ssubu64)
++GEN_VEXT_VV_RM(vssubu_vv_b, 1, 1, clearb)
++GEN_VEXT_VV_RM(vssubu_vv_h, 2, 2, clearh)
++GEN_VEXT_VV_RM(vssubu_vv_w, 4, 4, clearl)
++GEN_VEXT_VV_RM(vssubu_vv_d, 8, 8, clearq)
++
++RVVCALL(OPIVX2_RM, vssubu_vx_b, OP_UUU_B, H1, H1, ssubu8)
++RVVCALL(OPIVX2_RM, vssubu_vx_h, OP_UUU_H, H2, H2, ssubu16)
++RVVCALL(OPIVX2_RM, vssubu_vx_w, OP_UUU_W, H4, H4, ssubu32)
++RVVCALL(OPIVX2_RM, vssubu_vx_d, OP_UUU_D, H8, H8, ssubu64)
++GEN_VEXT_VX_RM(vssubu_vx_b, 1, 1, clearb)
++GEN_VEXT_VX_RM(vssubu_vx_h, 2, 2, clearh)
++GEN_VEXT_VX_RM(vssubu_vx_w, 4, 4, clearl)
++GEN_VEXT_VX_RM(vssubu_vx_d, 8, 8, clearq)
++
++static inline int8_t ssub8(CPURISCVState *env, int vxrm, int8_t a, int8_t b)
++{
++    int8_t res = a - b;
++    if ((res ^ a) & (a ^ b) & INT8_MIN) {
++        res = a > 0 ? INT8_MAX : INT8_MIN;
++        env->vxsat = 0x1;
++    }
++    return res;
++}
++
++static inline int16_t ssub16(CPURISCVState *env, int vxrm, int16_t a, int16_t b)
++{
++    int16_t res = a - b;
++    if ((res ^ a) & (a ^ b) & INT16_MIN) {
++        res = a > 0 ? INT16_MAX : INT16_MIN;
++        env->vxsat = 0x1;
++    }
++    return res;
++}
++
++static inline int32_t ssub32(CPURISCVState *env, int vxrm, int32_t a, int32_t b)
++{
++    int32_t res = a - b;
++    if ((res ^ a) & (a ^ b) & INT32_MIN) {
++        res = a > 0 ? INT32_MAX : INT32_MIN;
++        env->vxsat = 0x1;
++    }
++    return res;
++}
++
++static inline int64_t ssub64(CPURISCVState *env, int vxrm, int64_t a, int64_t b)
++{
++    int64_t res = a - b;
++    if ((res ^ a) & (a ^ b) & INT64_MIN) {
++        res = a > 0 ? INT64_MAX : INT64_MIN;
++        env->vxsat = 0x1;
++    }
++    return res;
++}
++
++RVVCALL(OPIVV2_RM, vssub_vv_b, OP_SSS_B, H1, H1, H1, ssub8)
++RVVCALL(OPIVV2_RM, vssub_vv_h, OP_SSS_H, H2, H2, H2, ssub16)
++RVVCALL(OPIVV2_RM, vssub_vv_w, OP_SSS_W, H4, H4, H4, ssub32)
++RVVCALL(OPIVV2_RM, vssub_vv_d, OP_SSS_D, H8, H8, H8, ssub64)
++GEN_VEXT_VV_RM(vssub_vv_b, 1, 1, clearb)
++GEN_VEXT_VV_RM(vssub_vv_h, 2, 2, clearh)
++GEN_VEXT_VV_RM(vssub_vv_w, 4, 4, clearl)
++GEN_VEXT_VV_RM(vssub_vv_d, 8, 8, clearq)
++
++RVVCALL(OPIVX2_RM, vssub_vx_b, OP_SSS_B, H1, H1, ssub8)
++RVVCALL(OPIVX2_RM, vssub_vx_h, OP_SSS_H, H2, H2, ssub16)
++RVVCALL(OPIVX2_RM, vssub_vx_w, OP_SSS_W, H4, H4, ssub32)
++RVVCALL(OPIVX2_RM, vssub_vx_d, OP_SSS_D, H8, H8, ssub64)
++GEN_VEXT_VX_RM(vssub_vx_b, 1, 1, clearb)
++GEN_VEXT_VX_RM(vssub_vx_h, 2, 2, clearh)
++GEN_VEXT_VX_RM(vssub_vx_w, 4, 4, clearl)
++GEN_VEXT_VX_RM(vssub_vx_d, 8, 8, clearq)
+-- 
+2.23.0
 
-disk.vmdk is a 50 GB disk that contains 12 MB binary of zeroes in its beginning.
-/dev/sda is a raw disk containing garbage
-
-I invoke:
-qemu-img convert disk.vmdk -O raw /dev/sda
-
-Required output:
-The first 12 MB of /dev/sda contain zeros, the rest garbage, qemu-img
-finishes fast.
-
-Kevin, from what I understood from you, this is the default behavior.
-
-So if my VMDK is causing trouble (all virtual size is being written)
-this is probably since all the grains in the VMDK are zero allocated
-right?
-
-Thanks!
-
-On Wed, Jun 10, 2020 at 2:56 PM David Edmondson <dme@dme.org> wrote:
->
-> On Wednesday, 2020-06-10 at 08:28:29 +03, Sam Eiderman wrote:
->
-> > Hi,
-> >
-> > 168468fe19c8 ("qemu-img: Add --target-is-zero to convert") has added a
-> > nice functionality for cloud scenarios:
-> >
-> > * Create a virtual disk
-> > * Convert a sparse image (qcow2, vmdk) to the virtual disk using
-> > --target-is-zero
-> > * Use the virtual disk
-> >
-> > This saves many unnecessary writes - a qcow2 with 1MB of allocated
-> > data but with 100GB virtual size will be converted efficiently.
-> >
-> > However, does this pose a problem if the virtual disk is not zero initialized?
->
-> As Vladimir indicated, the intent of the flag is supposed to be clear
-> from the name :-) If your storage doesn't read zeroes absent any earlier
-> writes, you probably don't want to be using it.
->
-> > Theoretically - if all unallocated blocks contain garbage - this
-> > shouldn't matter, however what about allocated blocks of zero? Will
-> > convert skip copying allocated zero blocks in the source image to the
-> > target since it assumes that the target is zeroed out first thing?
->
-> So something like a "--no-need-to-zero" flag would do what you want,
-> presuming that it would write known zeroes but no longer clean the
-> device before use?
->
-> dme.
-> --
-> You can't hide from the flipside.
 
