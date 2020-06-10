@@ -2,92 +2,122 @@ Return-Path: <SRS0=wemX=7X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8F6FC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 09:38:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A24ABC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 09:41:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9D9D5204EC
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 09:38:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6CBC1204EC
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 09:41:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AOz1ybR/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D9D5204EC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="WOg3ncK/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6CBC1204EC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32880 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36310 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jixBy-000312-KZ
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 05:38:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50434)
+	id 1jixEC-0004mq-RH
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 05:41:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50684)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jixBM-0002IX-45
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 05:38:04 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:49535
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jixBK-0000nK-0P
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 05:38:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591781880;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=g3ylGyhNWx18vTtyhSRrRNVaT648sGai1d/pNJDWsyc=;
- b=AOz1ybR/QF1Wem9fA0mMcBB8wHm9K1X76yMg0apLhnxWNPA/ob1e9AXq3FC6WgiP+4oBHA
- 130qz7T4y+SeHAjp/P5XUwqCtvaXgjcK9cBrFy3QLGWkwNhQmKQqrClFz4AAz013y10/Jp
- bmv6cLteNRu30HAZooOT2qfQvnM6rqU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-255-TSpgZkIvM6yB7TGKZo8yag-1; Wed, 10 Jun 2020 05:37:59 -0400
-X-MC-Unique: TSpgZkIvM6yB7TGKZo8yag-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F3E561883600;
- Wed, 10 Jun 2020 09:37:57 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
- [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 73EA21002382;
- Wed, 10 Jun 2020 09:37:57 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 0767A11386A6; Wed, 10 Jun 2020 11:37:56 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH RESEND v3 56/58] qdev: Convert bus-less devices to
- qdev_realize() with Coccinelle
-References: <20200610053247.1583243-1-armbru@redhat.com>
- <20200610053247.1583243-57-armbru@redhat.com>
- <0a4e8a47-5d11-0864-8ad8-700922d08712@redhat.com>
-Date: Wed, 10 Jun 2020 11:37:55 +0200
-In-Reply-To: <0a4e8a47-5d11-0864-8ad8-700922d08712@redhat.com> ("Philippe
- =?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Wed, 10 Jun 2020 10:21:05
- +0200")
-Message-ID: <87sgf3feh8.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jixD4-0003hS-JM; Wed, 10 Jun 2020 05:39:50 -0400
+Received: from mail-eopbgr40110.outbound.protection.outlook.com
+ ([40.107.4.110]:53383 helo=EUR03-DB5-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jixD1-0001JE-OW; Wed, 10 Jun 2020 05:39:49 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=nICwwC6K6oTSVdgp6A1TYnRbj4h87xcSm+bFUt85fyGtSRsbpkxYn2ZH7/8hAy0JGIJRLH/D2Rh27ccpvGkUKvOlzAKrGWgXshwLr5eNAC2VThnAc9bGTC6tG5JAG3b0DBHhU/BGDspKTNh+bCL13yDGglSu024AUZgyMQ6/GG2pRrARVCwGl1CTInNY5Yh01uIFTLe4abGfhJni4yQkeo4tHnueLTnCPBqg3xK/s8X9bcJ+JMvAX4l2WNdk+Xi0+Sr6EWM1yO6hi0TiHhHjoUgkRE7DVr5lF7n0bd2DA7eGByTYD24dYWxwMoyiIIirTgurHS/xJoVe16jPJDeFRw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=62chBF+UGv0Xbf0DkaYDaWnROOMelVuszbZBqlHk8Iw=;
+ b=FTQvYfi5VmsL1mOYWtkAGCePAFei70X3xfyYlFnCfSqQo5wb+U0pDF5bR7YX1SNFdpTqyRXzWxqWA5elq9cOAhBYYDq9oVL69Q13QsV+tfu2jC6hTyTZGsWbWSeim8alrgpW6njFNBTG3J3fgYKmSN6/LLs9taZwzaxU4u7c1s5uc19yDdriwXBj9IipdHaNlbkYR9VTaWqZsI2m21Q+6n2azJmT8SS+cGmetaGEzJgc79slKunfh2Fvjl137YqemXVPKv99pt+XYnP7iSpJ7i4obAYbw790/q5BkcIMd/51Ni01BV3XOm6rupWU7T9Y/4aHdE9pDyv4OvyVzrV4PA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=62chBF+UGv0Xbf0DkaYDaWnROOMelVuszbZBqlHk8Iw=;
+ b=WOg3ncK/lSqLWMUQFkTXFCuqM2rDmKCNfKnpc9VxuclSbAoml49b+HBYLTeteFdJIlxrwic/DAy5NtG3oY/rhnccBwtL8L/bWD+J7EYT6R7IyfDFwugTz0xKXgbMETbZkUFY5wVZGuo2mVaR7hW2jHCy6/NcyzDT7KCI8CAWRzk=
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM7PR08MB5464.eurprd08.prod.outlook.com (2603:10a6:20b:10a::21)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3088.19; Wed, 10 Jun
+ 2020 09:24:40 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312%3]) with mapi id 15.20.3066.023; Wed, 10 Jun 2020
+ 09:24:40 +0000
+Subject: Re: [PATCH 2/2] block: Call attention to truncation of long NBD
+ exports
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+References: <20200608182638.3256473-1-eblake@redhat.com>
+ <20200608182638.3256473-3-eblake@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <5430f8e5-8f28-d703-1b55-136e2296ec72@virtuozzo.com>
+Date: Wed, 10 Jun 2020 12:24:37 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.1
+In-Reply-To: <20200608182638.3256473-3-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: AM3PR07CA0104.eurprd07.prod.outlook.com
+ (2603:10a6:207:7::14) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 21:17:20
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.166) by
+ AM3PR07CA0104.eurprd07.prod.outlook.com (2603:10a6:207:7::14) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3088.7 via Frontend Transport; Wed, 10 Jun 2020 09:24:39 +0000
+X-Originating-IP: [185.215.60.166]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 28c0d7f1-ca6c-483c-36d6-08d80d2019fa
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5464:
+X-Microsoft-Antispam-PRVS: <AM7PR08MB54646013E0A0A9C7ED7AC8C8C1830@AM7PR08MB5464.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:3826;
+X-Forefront-PRVS: 0430FA5CB7
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: QAvFGG94DObL9wPXXHK5PkIdS4gF6OHmsJ4MrptqS0eCy633Gl9QZsI4Uo/wXy1UIsp0IvkMhNFysfFYb0LO8RCYWPB7x4yB4Ae+G0AXHHD8YCs+1fsY/TnSXWvGaDkS3oa+kMWcWtLoieOw8FMb8CYLEnehmV2HHxeqRR68/6HgMPPK+7r2Vl3VIRh/UrwVZ/fuV8E14BE+ykTPb1rsYull0a39UmA3gKYOFRk4QQgq9yJjnFDKWRjVsBftnEKuffYQUvuqwr+X67xpE2pIjv6iWFL5XFWh7JjyQmEMn8NwlFMLVApneaVzAbBEVdJDGjzQF/sj3JRmy3VK5o0wMhnXMboY0E9v04nJ+wWgO82dXVrgJTOZkLXFPSLnu/282yVv06KfM2kqMn6M9Vb7iLhA2G2Txt8OnmJIV09xeYtAVBImtZrNVJwXOqaBTfE38KTOw5EQdId/TWlmmB+Ck7i6jsIOBmHEXiGg+yc1ArpimwoaIduJmdkugmgXK0hf
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(376002)(346002)(396003)(39850400004)(136003)(366004)(316002)(8676002)(54906003)(26005)(8936002)(31696002)(83380400001)(31686004)(16576012)(16526019)(86362001)(4326008)(2906002)(52116002)(956004)(6486002)(966005)(36756003)(478600001)(66476007)(66556008)(186003)(2616005)(5660300002)(66946007)(43740500002)(33290500001);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: xeBqknp9eCYiFECZTtwyYpow/JOXhruktOLU2FjoFTrA6nHUVNK4pB+suN/bbieVJ5ybtonrfh8ZPkPYAm7FfFI87Rmhzx4Zmjkzwb57Dm+XLqJHy6f7WjmV8Jewm7QF26DCuWk/hERzfzLbBI+8QXlXESjazC7fs/MxVWotuc05ovjNM+frnk9wdgKPw96lhjuDcmG2A0zY+o4gZ0gbW2c6FHu1iCMH/v+JRIzslVdPq+qDbSOskt34OpP25kmhZOFXk9N1yDa0J/QyKiAPe0ZtzhEeGeQ4bKiBkkcx8YYVY0M2bC/vjUfr6hPk8YDZgxz2alhE9df932mZ3pwdt5KZk2LEoeE4mRfygznoYwmXTcsaD61EkW/hHGICvGBajEoDWweppixm3EF16WoVADy412ancFbBipOIdkPFQIx2j5CAHZnWOh5Oq7W0FpePNXjUJ9h1XMnFM+ql6hVjXGrSFqOxh9pHn3Ay6OnmMx0Alz1rIy/2m+YRvEUjUK+/
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 28c0d7f1-ca6c-483c-36d6-08d80d2019fa
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jun 2020 09:24:40.0172 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 817L0cWfmbiz6020Z0WVFGTJh9EBC5gD6Tidrx7iPjulvZKhhJ5B301UhgliKHOtqFZkwGuypLW/Hwh2QlTHh7zTBBCiSu/8opIlPRUuwiQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5464
+Received-SPF: pass client-ip=40.107.4.110;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR03-DB5-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/10 05:39:44
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -37
+X-Spam_score: -3.8
 X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,199 +130,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- Alistair Francis <alistair.francis@wdc.com>, qemu-devel@nongnu.org,
- Peter Maydell <peter.maydell@linaro.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ qemu-stable@nongnu.org, Max Reitz <mreitz@redhat.com>, ppandit@redhat.com,
+ xuwei@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+08.06.2020 21:26, Eric Blake wrote:
+> Commit 93676c88 relaxed our NBD client code to request export names up
+> to the NBD protocol maximum of 4096 bytes without NUL terminator, even
+> though the block layer can't store anything longer than 4096 bytes
+> including NUL terminator for display to the user.  Since this means
+> there are some export names where we have to truncate things, we can
+> at least try to make the truncation a bit more obvious for the user.
+> Note that in spite of the truncated display name, we can still
+> communicate with an NBD server using such a long export name; this was
+> deemed nicer than refusing to even connect to such a server (since the
+> server may not be under our control, and since determining our actual
+> length limits gets tricky when nbd://host:port/export and
+> nbd+unix:///export?socket=/path are themselves variable-length
+> expansions beyond the export name but count towards the block layer
+> name length).
+> 
+> Reported-by: Xueqiang Wei <xuwei@redhat.com>
+> Fixes: https://bugzilla.redhat.com/1843684
+> Signed-off-by: Eric Blake <eblake@redhat.com>
 
-> Hi Markus, Peter.
->
-> On 6/10/20 7:32 AM, Markus Armbruster wrote:
->> All remaining conversions to qdev_realize() are for bus-less devices.
->> Coccinelle script:
->>=20
->>     // only correct for bus-less @dev!
->>=20
->>     @@
->>     expression errp;
->>     expression dev;
->>     @@
->>     -    qdev_init_nofail(dev);
->>     +    qdev_realize(dev, NULL, &error_fatal);
->>=20
->>     @ depends on !(file in "hw/core/qdev.c") && !(file in "hw/core/bus.c=
-")@
->>     expression errp;
->>     expression dev;
->>     symbol true;
->>     @@
->>     -    object_property_set_bool(OBJECT(dev), true, "realized", errp);
->>     +    qdev_realize(DEVICE(dev), NULL, errp);
->>=20
->>     @ depends on !(file in "hw/core/qdev.c") && !(file in "hw/core/bus.c=
-")@
->>     expression errp;
->>     expression dev;
->>     symbol true;
->>     @@
->>     -    object_property_set_bool(dev, true, "realized", errp);
->>     +    qdev_realize(DEVICE(dev), NULL, errp);
->
-> Finally. Now my ealier suggestion is easier to explain:
-> Rename qdev_realize() -> sysbus_realize(), extracting the qdev_realize()
-> part. qdev_realize() doesn't take a Bus argument anymore.
-> Left for later.
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-I'm still confused.
+> ---
+>   block.c     |  7 +++++--
+>   block/nbd.c | 21 +++++++++++++--------
+>   2 files changed, 18 insertions(+), 10 deletions(-)
+> 
+> diff --git a/block.c b/block.c
+> index 8416376c9b71..6dbcb7e083ea 100644
+> --- a/block.c
+> +++ b/block.c
+> @@ -6809,8 +6809,11 @@ void bdrv_refresh_filename(BlockDriverState *bs)
+>           pstrcpy(bs->filename, sizeof(bs->filename), bs->exact_filename);
+>       } else {
+>           QString *json = qobject_to_json(QOBJECT(bs->full_open_options));
+> -        snprintf(bs->filename, sizeof(bs->filename), "json:%s",
+> -                 qstring_get_str(json));
+> +        if (snprintf(bs->filename, sizeof(bs->filename), "json:%s",
+> +                     qstring_get_str(json)) >= sizeof(bs->filename)) {
+> +            /* Give user a hint if we truncated things. */
+> +            strcpy(bs->filename + sizeof(bs->filename) - 4, "...");
+> +        }
 
-Cases:
+Is  4096 really enough for json in normal cases?
 
-* Devices that plug into a bus: use qdev_realize() passing that bus.
+>           qobject_unref(json);
+>       }
+>   }
+> diff --git a/block/nbd.c b/block/nbd.c
+> index 4ac23c8f6299..eed160c5cda1 100644
+> --- a/block/nbd.c
+> +++ b/block/nbd.c
+> @@ -1984,6 +1984,7 @@ static void nbd_refresh_filename(BlockDriverState *bs)
+>   {
+>       BDRVNBDState *s = bs->opaque;
+>       const char *host = NULL, *port = NULL, *path = NULL;
+> +    size_t len = 0;
+> 
+>       if (s->saddr->type == SOCKET_ADDRESS_TYPE_INET) {
+>           const InetSocketAddress *inet = &s->saddr->u.inet;
+> @@ -1996,17 +1997,21 @@ static void nbd_refresh_filename(BlockDriverState *bs)
+>       } /* else can't represent as pseudo-filename */
+> 
+>       if (path && s->export) {
+> -        snprintf(bs->exact_filename, sizeof(bs->exact_filename),
+> -                 "nbd+unix:///%s?socket=%s", s->export, path);
+> +        len = snprintf(bs->exact_filename, sizeof(bs->exact_filename),
+> +                       "nbd+unix:///%s?socket=%s", s->export, path);
+>       } else if (path && !s->export) {
+> -        snprintf(bs->exact_filename, sizeof(bs->exact_filename),
+> -                 "nbd+unix://?socket=%s", path);
+> +        len = snprintf(bs->exact_filename, sizeof(bs->exact_filename),
+> +                       "nbd+unix://?socket=%s", path);
+>       } else if (host && s->export) {
+> -        snprintf(bs->exact_filename, sizeof(bs->exact_filename),
+> -                 "nbd://%s:%s/%s", host, port, s->export);
+> +        len = snprintf(bs->exact_filename, sizeof(bs->exact_filename),
+> +                       "nbd://%s:%s/%s", host, port, s->export);
+>       } else if (host && !s->export) {
+> -        snprintf(bs->exact_filename, sizeof(bs->exact_filename),
+> -                 "nbd://%s:%s", host, port);
+> +        len = snprintf(bs->exact_filename, sizeof(bs->exact_filename),
+> +                       "nbd://%s:%s", host, port);
+> +    }
+> +    if (len > sizeof(bs->exact_filename)) {
+> +        /* Name is too long to represent exactly, so leave it empty. */
+> +        bs->exact_filename[0] = '\0';
+>       }
+>   }
+> 
 
-  If there is a bus-specific wrapper, use that, for legibility.
 
-  In particular, use sysbus_realize() for sysbus devices plugging into
-  the main system bus.
-
-* Devices that don't plug into a bus: use qdev_realize() passing a null
-  bus.
-
-What would you like me to improve here?
-
->
->>=20
->> Note that Coccinelle chokes on ARMSSE typedef vs. macro in
->> hw/arm/armsse.c.  Worked around by temporarily renaming the macro for
->> the spatch run.
->>=20
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> Acked-by: Alistair Francis <alistair.francis@wdc.com>
->> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
->> ---
->>  hw/arm/allwinner-a10.c                   |  2 +-
->>  hw/arm/allwinner-h3.c                    |  2 +-
->>  hw/arm/armsse.c                          | 20 ++++++---------
->>  hw/arm/armv7m.c                          |  2 +-
->>  hw/arm/aspeed.c                          |  3 +--
->>  hw/arm/aspeed_ast2600.c                  |  2 +-
->>  hw/arm/aspeed_soc.c                      |  2 +-
->>  hw/arm/bcm2836.c                         |  3 +--
->>  hw/arm/cubieboard.c                      |  2 +-
->>  hw/arm/digic.c                           |  2 +-
->>  hw/arm/digic_boards.c                    |  2 +-
->>  hw/arm/exynos4210.c                      |  4 +--
->>  hw/arm/fsl-imx25.c                       |  2 +-
->>  hw/arm/fsl-imx31.c                       |  2 +-
->>  hw/arm/fsl-imx6.c                        |  2 +-
->>  hw/arm/fsl-imx6ul.c                      |  3 +--
->>  hw/arm/fsl-imx7.c                        |  2 +-
->>  hw/arm/highbank.c                        |  2 +-
->>  hw/arm/imx25_pdk.c                       |  2 +-
->>  hw/arm/integratorcp.c                    |  2 +-
->>  hw/arm/kzm.c                             |  2 +-
->>  hw/arm/mcimx6ul-evk.c                    |  2 +-
->>  hw/arm/mcimx7d-sabre.c                   |  2 +-
->>  hw/arm/mps2-tz.c                         |  9 +++----
->>  hw/arm/mps2.c                            |  7 +++---
->>  hw/arm/musca.c                           |  6 ++---
->>  hw/arm/orangepi.c                        |  2 +-
->>  hw/arm/raspi.c                           |  2 +-
->>  hw/arm/realview.c                        |  2 +-
->>  hw/arm/sabrelite.c                       |  2 +-
->>  hw/arm/sbsa-ref.c                        |  2 +-
->>  hw/arm/stm32f205_soc.c                   |  2 +-
->>  hw/arm/stm32f405_soc.c                   |  2 +-
->>  hw/arm/versatilepb.c                     |  2 +-
->>  hw/arm/vexpress.c                        |  2 +-
->>  hw/arm/virt.c                            |  2 +-
->>  hw/arm/xilinx_zynq.c                     |  2 +-
->>  hw/arm/xlnx-versal.c                     |  2 +-
->>  hw/arm/xlnx-zcu102.c                     |  2 +-
->>  hw/arm/xlnx-zynqmp.c                     | 10 +++-----
->
-> Peter you might want to skim at the changes (other
-> ARM devices out of hw/arm/ involved) but to resume
-> basically these types are not SysBusDev:
->
-> - cpu
-> - soc / container
-> - or-gate / irq-splitter
->
-> I reviewed all of them.
->
-> Next is for Markus.
->
->>  hw/char/serial-isa.c                     |  2 +-
->>  hw/char/serial-pci-multi.c               |  2 +-
->>  hw/char/serial-pci.c                     |  2 +-
->>  hw/char/serial.c                         |  4 +--
->
-> I need to review again hw/char/serial-isa.c, it is
-> not clear why it is a container and not a SysBusDevice.
-
-TYPE_SERIAL is a bus-less TYPE_DEVICE.
-
-TYPE_ISA_SERIAL is its adapter for the ISA bus.  It contains one
-TYPE_SERIAL child.
-
-TYPE_SERIAL_MM is its adapter for the sysbus pseudo-bus.  It contains
-one TYPE_SERIAL child.
-
-TYPE_PCI_SERIAL, "pci-serial-2x", "pci-serial-4x" are adapters for the
-PCI bus.  They contain one, two and four TYPE_SERIAL respectively.
-
-Exemplary use of QOM, I think.
-
->>  hw/ide/microdrive.c                      |  3 ++-
->
-> I never had to look at the PCMCIA devices, they seem
-> an unfinished attempt to plug a the devices on a bus.
-> Maybe it is finished, but the code is not clear (and
-> not documented). I need more time to review.
->
->>  hw/intc/pnv_xive.c                       |  4 +--
->>  hw/intc/spapr_xive.c                     |  4 +--
->>  hw/intc/xics.c                           |  2 +-
->>  hw/intc/xive.c                           |  2 +-
->>  hw/pci-host/pnv_phb3.c                   |  6 ++---
->>  hw/pci-host/pnv_phb4.c                   |  2 +-
->>  hw/pci-host/pnv_phb4_pec.c               |  2 +-
->>  hw/pci-host/prep.c                       |  3 +--
->>  hw/ppc/pnv.c                             | 32 ++++++++++--------------
->>  hw/ppc/pnv_bmc.c                         |  2 +-
->>  hw/ppc/pnv_core.c                        |  2 +-
->>  hw/ppc/pnv_psi.c                         |  4 +--
->>  hw/ppc/spapr.c                           |  5 ++--
->>  hw/ppc/spapr_cpu_core.c                  |  2 +-
->>  hw/ppc/spapr_drc.c                       |  2 +-
->>  hw/ppc/spapr_iommu.c                     |  2 +-
->>  hw/ppc/spapr_irq.c                       |  2 +-
->
-> Wow, lot of QOM code for PPC hardware. Not all clear
-> yet, in particular the pci-host devices. Apparently
-> a LPC bus in the middle. Need a bit more time.
->
->>  hw/s390x/s390-skeys.c                    |  2 +-
->>  hw/s390x/s390-stattrib.c                 |  2 +-
->>  hw/s390x/s390-virtio-ccw.c               |  4 +--
->>  hw/s390x/sclp.c                          |  2 +-
->>  hw/s390x/tod.c                           |  2 +-
->
-> Eh, odd s390x stuff. No clue, I might review it too.
->
->>  target/i386/cpu.c                        |  3 +--
->
-> What is this APIC stuff doing burried with TCG?...
->
-> All the rest that is elided and not commented is reviewed.
->
-> When do you plan to send a pullreq?
-
-I want to get this wrapped as quickly as possible; rebasing has been
-quite a time sink.  But not at the price of rushed review.
-
+-- 
+Best regards,
+Vladimir
 
