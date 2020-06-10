@@ -2,126 +2,142 @@ Return-Path: <SRS0=wemX=7X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4E49C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 06:51:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25E80C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 07:23:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6717220734
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 06:51:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E09612064C
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 07:23:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="jsE4zwCo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6717220734
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dxdO/DDZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E09612064C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56310 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33054 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jiuZs-0004eM-NY
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 02:51:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53294)
+	id 1jiv5F-00024Y-1G
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 03:23:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56790)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jiuZE-00042e-8I; Wed, 10 Jun 2020 02:50:32 -0400
-Received: from mail-eopbgr150122.outbound.protection.outlook.com
- ([40.107.15.122]:61921 helo=EUR01-DB5-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jiuZC-00027u-40; Wed, 10 Jun 2020 02:50:31 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gAGAUk893C/zPdPig/0BME0p6uJL1q+ETfcIxj/pu8bZJMflUqu27EoBJNWEA8SebuYikynrPlbLfWErZR6+h0bo3lQ3Q+976kRZIRgpIENZxFMgGZzZnob4LhfMnbyhiibgicc1qm47/5eWOkRAJzkHs9c3JOyVHpIPmtn4j82XnO6DbHlTwrzrWU2C/zrDq/oo3hvOPtxcjqQvByyYrOp1qadV6D++ctLkwHkSDW2ZJxe777XlzGEv+HHlfTPNuW5hzxpkTQD3xReWnP9otvdo9fspYljpVKXlVMCb/G3jBTGQKanUztMR6GOL7v2KdsjTfUNgv5quOipctRVy0w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5SqbUeZpWWy75RvhOmo+N9n7To1RBLVSkjJE6gbmbFg=;
- b=X2ZLQmIRId5XM51i5VGJBiGqDELE+pJaKSyxg98U8aLx5ZmasIncgFkvrVrFnyFWf2NmMZYxjAn1h5H6+6v1jebQlD36aEeuE+SEJg32f645hiu1Sd6husjmI02ZWHddN4jCKvgZmenQQIodglJsXgjRk3sEJGngzpncuits12DIcHTqPE+jozllj/fHWaUF38UBQCxWX1Dc/lw3CD+vF7WRu5c7L3Q4k01dxhUJfQgqPnHoiugWVf74Z1esltDzImreQRMmxOkIZ/n+qubC5xuxsFTDTBjmyLCSVvV5Yzvl94xWQs21tjgdsUzM/+NAV2LmNqK/b7P9DycGxnuYkg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5SqbUeZpWWy75RvhOmo+N9n7To1RBLVSkjJE6gbmbFg=;
- b=jsE4zwCodIE5DAJE0AhAR+47Lqx5rbg6czvWfi3ImZU79kqarTDi1kzR+BAreK+k3gVAIiQ92Ol7Rkf/EKPTuD1JjSTaEChJ6yNbTBpHYWuW6vpi31LZDjS68gGIqAqMEbDDt6KVE7JarFsgRyvrMg8uY2AJ7WewLNvHBV6+sYc=
-Authentication-Results: virtuozzo.com; dkim=none (message not signed)
- header.d=none;virtuozzo.com; dmarc=none action=none
- header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM7PR08MB5464.eurprd08.prod.outlook.com (2603:10a6:20b:10a::21)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3088.19; Wed, 10 Jun
- 2020 06:50:26 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::a408:2f0f:bc6c:d312%3]) with mapi id 15.20.3066.023; Wed, 10 Jun 2020
- 06:50:26 +0000
-Subject: Re: [PATCH] qcow2: Reduce write_zeroes size in handle_alloc_space()
-To: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>
-References: <20200609140859.142230-1-kwolf@redhat.com>
- <02e24dca-99da-873d-8425-09a07571e675@virtuozzo.com>
- <042f0b8f-dd51-acc3-8498-ac9a5532df15@redhat.com>
- <20200609151810.GD11003@linux.fritz.box>
- <b2c59302-2c14-474b-3bb8-3b48806f2689@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <07251d29-538b-82a0-2bf4-975127274127@virtuozzo.com>
-Date: Wed, 10 Jun 2020 09:50:24 +0300
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jiv4c-0001e5-7h
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 03:22:58 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42354
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jiv4b-000862-EK
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 03:22:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591773776;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=mnCZvY7471LqMB0qBvyRPhzUB3C/h6VvYNRek8vITiU=;
+ b=dxdO/DDZ2OXaiCthuck/obyNwGO+a1PA6QxMbIFVzGbLthvgwx0yc2zpX/ZYY3HFkJxWCC
+ tEklwyBe332EpnkFLk4CKHB+5h15qJ8no8zIjKdl6L1s/7Ko2epwd7q7t9g42tPO0pArdx
+ VbAVmBc+FsqUiuk4r4q2uJkEy2Cg+a8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-138-t-eJfVAmNFebLFSfay3dFg-1; Wed, 10 Jun 2020 03:22:52 -0400
+X-MC-Unique: t-eJfVAmNFebLFSfay3dFg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CE73A87182E;
+ Wed, 10 Jun 2020 07:22:49 +0000 (UTC)
+Received: from [10.36.114.42] (ovpn-114-42.ams2.redhat.com [10.36.114.42])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A783B8927E;
+ Wed, 10 Jun 2020 07:22:46 +0000 (UTC)
+Subject: Re: [PATCH v2 1/1] virtio-ccw: auto-manage VIRTIO_F_IOMMU_PLATFORM if
+ PV
+To: David Gibson <david@gibson.dropbear.id.au>,
+ "Michael S. Tsirkin" <mst@redhat.com>
+References: <20200514221155.32079-1-pasic@linux.ibm.com>
+ <20200520121507-mutt-send-email-mst@kernel.org>
+ <20200606013217.2cffa3ed.pasic@linux.ibm.com>
+ <20200608181428.3c6f127c.cohuck@redhat.com>
+ <20200608190045.319dd68b.pasic@linux.ibm.com>
+ <20200609084402.35d317ec.cohuck@redhat.com>
+ <20200609114130.0ca9190b.pasic@linux.ibm.com>
+ <20200609174747.4e300818@ibm-vm>
+ <20200609182839.7ac80938.pasic@linux.ibm.com>
+ <20200609124155-mutt-send-email-mst@kernel.org>
+ <20200610043118.GF494336@umbus.fritz.box>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
+ dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
+ QZLQMzNE74ap+GDK0wnacPQFpcG1AE9RMq3aeErY5tujekBS32jfC/7AnH7I0v1v1TbbK3Gp
+ XNeiN4QroO+5qaSr0ID2sz5jtBLRb15RMre27E1ImpaIv2Jw8NJgW0k/D1RyKCwaTsgRdwuK
+ Kx/Y91XuSBdz0uOyU/S8kM1+ag0wvsGlpBVxRR/xw/E8M7TEwuCZQArqqTCmkG6HGcXFT0V9
+ PXFNNgV5jXMQRwU0O/ztJIQqsE5LsUomE//bLwzj9IVsaQpKDqW6TAPjcdBDPLHvriq7kGjt
+ WhVhdl0qEYB8lkBEU7V2Yb+SYhmhpDrti9Fq1EsmhiHSkxJcGREoMK/63r9WLZYI3+4W2rAc
+ UucZa4OT27U5ZISjNg3Ev0rxU5UH2/pT4wJCfxwocmqaRr6UYmrtZmND89X0KigoFD/XSeVv
+ jwBRNjPAubK9/k5NoRrYqztM9W6sJqrH8+UWZ1Idd/DdmogJh0gNC0+N42Za9yBRURfIdKSb
+ B3JfpUqcWwE7vUaYrHG1nw54pLUoPG6sAA7Mehl3nd4pZUALHwARAQABtCREYXZpZCBIaWxk
+ ZW5icmFuZCA8ZGF2aWRAcmVkaGF0LmNvbT6JAlgEEwEIAEICGwMFCQlmAYAGCwkIBwMCBhUI
+ AgkKCwQWAgMBAh4BAheAFiEEG9nKrXNcTDpGDfzKTd4Q9wD/g1oFAl3pImkCGQEACgkQTd4Q
+ 9wD/g1o+VA//SFvIHUAvul05u6wKv/pIR6aICPdpF9EIgEU448g+7FfDgQwcEny1pbEzAmiw
+ zAXIQ9H0NZh96lcq+yDLtONnXk/bEYWHHUA014A1wqcYNRY8RvY1+eVHb0uu0KYQoXkzvu+s
+ Dncuguk470XPnscL27hs8PgOP6QjG4jt75K2LfZ0eAqTOUCZTJxA8A7E9+XTYuU0hs7QVrWJ
+ jQdFxQbRMrYz7uP8KmTK9/Cnvqehgl4EzyRaZppshruKMeyheBgvgJd5On1wWq4ZUV5PFM4x
+ II3QbD3EJfWbaJMR55jI9dMFa+vK7MFz3rhWOkEx/QR959lfdRSTXdxs8V3zDvChcmRVGN8U
+ Vo93d1YNtWnA9w6oCW1dnDZ4kgQZZSBIjp6iHcA08apzh7DPi08jL7M9UQByeYGr8KuR4i6e
+ RZI6xhlZerUScVzn35ONwOC91VdYiQgjemiVLq1WDDZ3B7DIzUZ4RQTOaIWdtXBWb8zWakt/
+ ztGhsx0e39Gvt3391O1PgcA7ilhvqrBPemJrlb9xSPPRbaNAW39P8ws/UJnzSJqnHMVxbRZC
+ Am4add/SM+OCP0w3xYss1jy9T+XdZa0lhUvJfLy7tNcjVG/sxkBXOaSC24MFPuwnoC9WvCVQ
+ ZBxouph3kqc4Dt5X1EeXVLeba+466P1fe1rC8MbcwDkoUo65Ag0EVcufkQEQAOfX3n0g0fZz
+ Bgm/S2zF/kxQKCEKP8ID+Vz8sy2GpDvveBq4H2Y34XWsT1zLJdvqPI4af4ZSMxuerWjXbVWb
+ T6d4odQIG0fKx4F8NccDqbgHeZRNajXeeJ3R7gAzvWvQNLz4piHrO/B4tf8svmRBL0ZB5P5A
+ 2uhdwLU3NZuK22zpNn4is87BPWF8HhY0L5fafgDMOqnf4guJVJPYNPhUFzXUbPqOKOkL8ojk
+ CXxkOFHAbjstSK5Ca3fKquY3rdX3DNo+EL7FvAiw1mUtS+5GeYE+RMnDCsVFm/C7kY8c2d0G
+ NWkB9pJM5+mnIoFNxy7YBcldYATVeOHoY4LyaUWNnAvFYWp08dHWfZo9WCiJMuTfgtH9tc75
+ 7QanMVdPt6fDK8UUXIBLQ2TWr/sQKE9xtFuEmoQGlE1l6bGaDnnMLcYu+Asp3kDT0w4zYGsx
+ 5r6XQVRH4+5N6eHZiaeYtFOujp5n+pjBaQK7wUUjDilPQ5QMzIuCL4YjVoylWiBNknvQWBXS
+ lQCWmavOT9sttGQXdPCC5ynI+1ymZC1ORZKANLnRAb0NH/UCzcsstw2TAkFnMEbo9Zu9w7Kv
+ AxBQXWeXhJI9XQssfrf4Gusdqx8nPEpfOqCtbbwJMATbHyqLt7/oz/5deGuwxgb65pWIzufa
+ N7eop7uh+6bezi+rugUI+w6DABEBAAGJAiUEGAECAA8FAlXLn5ECGwwFCQlmAYAACgkQTd4Q
+ 9wD/g1qA6w/+M+ggFv+JdVsz5+ZIc6MSyGUozASX+bmIuPeIecc9UsFRatc91LuJCKMkD9Uv
+ GOcWSeFpLrSGRQ1Z7EMzFVU//qVs6uzhsNk0RYMyS0B6oloW3FpyQ+zOVylFWQCzoyyf227y
+ GW8HnXunJSC+4PtlL2AY4yZjAVAPLK2l6mhgClVXTQ/S7cBoTQKP+jvVJOoYkpnFxWE9pn4t
+ H5QIFk7Ip8TKr5k3fXVWk4lnUi9MTF/5L/mWqdyIO1s7cjharQCstfWCzWrVeVctpVoDfJWp
+ 4LwTuQ5yEM2KcPeElLg5fR7WB2zH97oI6/Ko2DlovmfQqXh9xWozQt0iGy5tWzh6I0JrlcxJ
+ ileZWLccC4XKD1037Hy2FLAjzfoWgwBLA6ULu0exOOdIa58H4PsXtkFPrUF980EEibUp0zFz
+ GotRVekFAceUaRvAj7dh76cToeZkfsjAvBVb4COXuhgX6N4pofgNkW2AtgYu1nUsPAo+NftU
+ CxrhjHtLn4QEBpkbErnXQyMjHpIatlYGutVMS91XTQXYydCh5crMPs7hYVsvnmGHIaB9ZMfB
+ njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
+ FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
+Organization: Red Hat GmbH
+Message-ID: <4e5d62d8-9bfb-67d5-7398-2079729fd85e@redhat.com>
+Date: Wed, 10 Jun 2020 09:22:45 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.1
-In-Reply-To: <b2c59302-2c14-474b-3bb8-3b48806f2689@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: AM0PR04CA0056.eurprd04.prod.outlook.com
- (2603:10a6:208:1::33) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.2] (185.215.60.166) by
- AM0PR04CA0056.eurprd04.prod.outlook.com (2603:10a6:208:1::33) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3088.19 via Frontend Transport; Wed, 10 Jun 2020 06:50:25 +0000
-X-Originating-IP: [185.215.60.166]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 779b05d4-340e-40ed-7e26-08d80d0a8e59
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5464:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM7PR08MB5464CA05A4F27526586F94BEC1830@AM7PR08MB5464.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:1169;
-X-Forefront-PRVS: 0430FA5CB7
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: euRYl0WBks0RxcFrGmjCX/7pnD8hLo5lDM2MvbaGmZoksf0N2WiAKknFDsCg9NRqqLzIt6l7JaQMRUSdhawjEwQ+3M5+jY/ECh/FJKx83sxaCUAFr/Og/vUXejhX5aMZnrE+6l4F5ufbbUL19MbZhvB/G79qB3sx+nYZZinMTS7lq/rMWUzCdGcQFv001vNvM+Gsm0LcqSwrSDbldAO28tbCDMDsy2b+MsAWOkZKbrGgIXI2QXOh5hQi01rAUfl0HwhS8jeoSr0y7h+agq1MLLE00PBcXlAYcOZZWvuqWbPevC1q9QHNVPAaRfa0MBW09bTsR9i+RYduMFdV+3gqtvcalXRJuFz8BgbRU806oYekeCY3Gt+wgUBrXbA1qoHe7wSUYso09ByC99mN3aTGWo0IjeEiWHElQZWiWkp1ROBY4gD87agt9URSm6RforA0HrJr1gXvyoSFWrvP8hwfMA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(366004)(136003)(346002)(396003)(376002)(39840400004)(52116002)(4326008)(2906002)(66476007)(66556008)(66946007)(186003)(2616005)(5660300002)(956004)(53546011)(6486002)(966005)(36756003)(478600001)(54906003)(8676002)(107886003)(110136005)(26005)(8936002)(316002)(83380400001)(16576012)(31686004)(16526019)(86362001)(31696002)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: j3rgwADh7N72YOoVjbHdSAadnRPNaoMoWHuKvwBvkAxAfvO13WnJpJ3A61AQYPi2D225RW8lf7ib7dIv0A97Via3rGEVno82XAhfzTR+sirZC9L7nXawmCQqC05h0lkfFVP9lThl780Pd8Gfd3L5TfeGlnHy0IwHdh/fxlXhL/R0q05Z8Mr80trVs2KTywAPp64E94KGgqZV4e8q7Grr/frMP/FqTa9T0Ps0+IR+CW5pTYlEsnYQOXTPB2QJHRXk342KHjFgtebJbZPPrOmcrYq+0imMFogcLOd5gBBHOrp0PaWmsTYSjt7KqpgL1RnqvUWJbaEJpJz5vzTn7MWAVVr2F+xENFCvaGrkj++JzkmUnw73XW9ftbcuun2h7hcelHb/OyFRWFYSKB0ZK6aZviMvmSQr0ejvsRlpqy2YQxh4Amg4oYKuqORAPtLUNLkDohMNwBHRAuP1JyxF7NKvQ2RfXH4pvUiYdlSv1I6J9oh3dsCv1kET3YojWEV7A+vj
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 779b05d4-340e-40ed-7e26-08d80d0a8e59
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jun 2020 06:50:26.3014 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: qYSPKxThSV3zdnCiW9q2dTKfuZbncZqD8WEKO36P0TjbK6k2Xk2j45MH8d1QqGisEvsZ5pWQj2lV4CTXjPu4dODdiScJHj3JokpGK8OFOw8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5464
-Received-SPF: pass client-ip=40.107.15.122;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR01-DB5-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/10 02:50:27
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -37
-X-Spam_score: -3.8
+In-Reply-To: <20200610043118.GF494336@umbus.fritz.box>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=david@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 23:51:15
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
 X-Spam_bar: ---
-X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -134,73 +150,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: anton.nefedov@virtuozzo.com, qemu-block@nongnu.org, qemu-devel@nongnu.org,
- mreitz@redhat.com, Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
- "Denis V. Lunev" <den@openvz.org>
+Cc: Viktor Mihajlovski <mihajlov@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
+ Boris Fiuczynski <fiuczy@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>,
+ Pierre Morel <pmorel@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>,
+ qemu-devel@nongnu.org, Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-09.06.2020 19:19, Eric Blake wrote:
-> On 6/9/20 10:18 AM, Kevin Wolf wrote:
-> 
->>>>> -        ret = bdrv_co_pwrite_zeroes(s->data_file, m->alloc_offset,
->>>>> -                                    m->nb_clusters * s->cluster_size,
->>>>> +        ret = bdrv_co_pwrite_zeroes(s->data_file, start, len,
->>>>>                                        BDRV_REQ_NO_FALLBACK);
+On 10.06.20 06:31, David Gibson wrote:
+> On Tue, Jun 09, 2020 at 12:44:39PM -0400, Michael S. Tsirkin wrote:
+>> On Tue, Jun 09, 2020 at 06:28:39PM +0200, Halil Pasic wrote:
+>>> On Tue, 9 Jun 2020 17:47:47 +0200
+>>> Claudio Imbrenda <imbrenda@linux.ibm.com> wrote:
 >>>
->>> Good point.  If we weren't using BDRV_REQ_NO_FALLBACK, then avoiding a
->>> pre-zero pass over the middle is essential.  But since we are insisting that
->>> the pre-zero pass be fast or else immediately fail, the time spent in
->>> pre-zeroing should not be a concern.  Do you have benchmark numbers stating
->>> otherwise?
+>>>> On Tue, 9 Jun 2020 11:41:30 +0200
+>>>> Halil Pasic <pasic@linux.ibm.com> wrote:
+>>>>
+>>>> [...]
+>>>>
+>>>>> I don't know. Janosch could answer that, but he is on vacation. Adding
+>>>>> Claudio maybe he can answer. My understanding is, that while it might
+>>>>> be possible, it is ugly at best. The ability to do a transition is
+>>>>> indicated by a CPU model feature. Indicating the feature to the guest
+>>>>> and then failing the transition sounds wrong to me.
+>>>>
+>>>> I agree. If the feature is advertised, then it has to work. I don't
+>>>> think we even have an architected way to fail the transition for that
+>>>> reason.
+>>>>
+>>>> What __could__ be done is to prevent qemu from even starting if an
+>>>> incompatible device is specified together with PV.
+>>>
+>>> AFAIU, the "specified together with PV" is the problem here. Currently
+>>> we don't "specify PV" but PV is just a capability that is managed by the
+>>> CPU model (like so many other).
 >>
->> I stumbled across this behaviour (write_zeros for 2 MB, then overwrite
->> almost everything) in the context of a different bug, and it just didn't
->> make much sense to me. Is there really a file system where fragmentation
->> is introduced by not zeroing the area first and then overwriting it?
+>> So if we want to keep it user friendly, there could be
+>> protection property with values on/off/auto, and auto
+>> would poke at host capability to figure out whether
+>> it's supported.
 >>
->> I'm not insisting on making this change because the behaviour is
->> harmless if odd, but if we think that writing twice to some blocks is an
->> optimisation, maybe we should actually measure and document this.
->>
->>
->> Anyway, let's talk about the reported bug that made me look at the
->> strace that showed this behaviour because I feel it supports my last
->> point. It's a bit messy, but anyway:
->>
->>      https://bugzilla.redhat.com/show_bug.cgi?id=1666864
->>
->> So initially, bad performance on a fragmented image file was reported.
->> Not much to do there, but then in comment 16, QA reported a performance
->> regression in this case between 4.0 and 4.2. And this change caused by
->> c8bb23cbdbe, i.e. the commit that introduced handle_alloc_space().
->>
->> Turns out that BDRV_REQ_NO_FALLBACK doesn't always guarantee that it's
->> _really_ fast. fallocate(FALLOC_FL_ZERO_RANGE) causes some kind of flush
->> on XFS and buffered writes don't. So with the old code, qemu-img convert
->> to a file on a very full filesystem that will cause fragmentation, was
->> much faster with writing a zero buffer than with write_zeroes (because
->> it didn't flush the result).
+>> Both virtio and CPU would inherit from that.
 > 
-> Wow. That makes it sound like we should NOT attempt fallocate(FALLOC_FL_ZERO_RANGE) on the fast path, because we don't have guarantees that it is fast.
-> 
-> I really wish the kernel would give us fallocate(FALLOC_FL_ZERO_RANGE|FALLOC_FL_NO_FALLBACK) which would fail fast rather than doing a flush or other slow fallback.
-> 
->>
->> I don't fully understand why this is and hope that XFS can do something
->> about it. I also don't really think we should revert the change in QEMU,
->> though I'm not completely sure. But I just wanted to share this to show
->> that "obvious" characteristics of certain types of requests aren't
->> always true and doing obscure optimisations based on what we think
->> filesystems may do can actually achieve the opposite in some cases.
-> 
-> It also goes to show us that the kernel does NOT yet give us enough fine-grained control over what we really want (which is: 'pre-zero this if it is fast, but don't waste time if it is not).  Most of the kernel interfaces end up being 'pre-zero this, and it might be fast, fail fast, or even fall back to something safe but slow, and you can't tell the difference short of trying'.
-> 
+> Right, that's what I have in mind for my 'host-trust-limitation'
+> property (a generalized version of the existing 'memory-encryption'
+> machine option).  My draft patches already set virtio properties
+> accordingly, it should be possible to set (default) cpu properties as
+> well.
 
-Hmm, actually, for small cow areas (several bytes? several sectors?), I'm not surprised that direct writing zeroed buffer may work faster than any kind of WRITE_ZERO request. Especially, expanding write-request for a small amount of bytes may be faster than doing intead two requests. Possibly, we need some heuristics here. And I think, it would be good to add some benchmarks based on scripts/simplebench to have real numbers (we'll try).
+No crazy CPU model hacks please (at least speaking for the s390x).
 
 -- 
-Best regards,
-Vladimir
+Thanks,
+
+David / dhildenb
+
 
