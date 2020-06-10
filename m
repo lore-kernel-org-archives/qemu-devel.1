@@ -2,82 +2,74 @@ Return-Path: <SRS0=wemX=7X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3D15C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:19:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3343C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:21:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9D68B206F4
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:19:23 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D9eVVAL0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D68B206F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C716D2072E
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:21:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C716D2072E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58458 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35502 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jj0dW-00038s-T3
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 09:19:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50422)
+	id 1jj0f7-0005Sc-V4
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 09:21:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45180)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mprivozn@redhat.com>)
- id 1jj0c3-0001Id-B4
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 09:17:51 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32916
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mprivozn@redhat.com>)
- id 1jj0c0-0005bS-Ux
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 09:17:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591795067;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=bBwIlUJKvdI8mJIkr5f/ihhX536ZYcXtU9gYYsc6uaI=;
- b=D9eVVAL0G9N+9reupSdH7okn3dZTZcpANFVLZ7urfVdh7PG3hAaPyi2KuAbVvbVVEzCe3L
- xLPC3K7muvFa9uYCRqM3CeUKnPh+HFesy42bXWJEp8wPv9VsZqAGsv62GDdo4iHb1I1TV7
- fy6YXl1mzpGqhNgaG+viPOvsy1sZ2Fo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-4-hOFIcVPgMriET-n_0UXrvw-1; Wed, 10 Jun 2020 09:17:43 -0400
-X-MC-Unique: hOFIcVPgMriET-n_0UXrvw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CAA6F107ACCA
- for <qemu-devel@nongnu.org>; Wed, 10 Jun 2020 13:17:42 +0000 (UTC)
-Received: from localhost.localdomain (unknown [10.40.195.12])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 498EC1025EB0
- for <qemu-devel@nongnu.org>; Wed, 10 Jun 2020 13:17:42 +0000 (UTC)
-From: Michal Privoznik <mprivozn@redhat.com>
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
+ id 1jj0Ut-0007ox-5u; Wed, 10 Jun 2020 09:10:27 -0400
+Received: from mout.kundenserver.de ([212.227.126.131]:60575)
+ by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
+ id 1jj0Ur-0003gG-W3; Wed, 10 Jun 2020 09:10:26 -0400
+Received: from localhost.localdomain ([82.252.135.106]) by
+ mrelayeu.kundenserver.de (mreue009 [212.227.15.167]) with ESMTPSA (Nemesis)
+ id 1MZkxj-1jOsnZ13xf-00WoKz; Wed, 10 Jun 2020 15:10:22 +0200
+From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 0/2] A pair of HMAT docs fixes
-Date: Wed, 10 Jun 2020 15:17:33 +0200
-Message-Id: <cover.1591794890.git.mprivozn@redhat.com>
+Subject: [PULL v2 13/16] target/unicore32: Replace DPRINTF() by
+ qemu_log_mask(GUEST_ERROR)
+Date: Wed, 10 Jun 2020 15:10:08 +0200
+Message-Id: <20200610131011.1941209-14-laurent@vivier.eu>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200610131011.1941209-1-laurent@vivier.eu>
+References: <20200610131011.1941209-1-laurent@vivier.eu>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=mprivozn@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 23:51:15
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Provags-ID: V03:K1:9HfJrvfO+i3nrbxBCmnsBWWUGVvBPEiDsT6jc51M9j0dYoRioSV
+ wbheNYm6h88m2fHXRE5tcAeFNXJglFSKVcqc47mJeuXM2x6p9G5ZIY03kTbOE+XbN3SsR0Q
+ +8aTi7oc0qnVaX9TJ4bzJi5Tdo4eJXITW50UwiTkKp9kdQr6DXPbttl8mwZ8RsKVPgg1dSG
+ gMltdRkAEkJm7WDn3ybiQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:R3QjNgjxlbI=:XPfO0DPGtJSmkOpd0xfsXf
+ 1nmYZOqXdEzjXuIHf6X7AOl52UM3GEMgHLmqeuIsJ1aMghV7CgIuKCXR7UBDZ9rh/C8fYzkTn
+ Kd1dRBV/OjUuQUXC6zSlHWMAjvKFnfn1aB/iDU8v8ivG5cI9ugubGn/k5iI8S7CJbspR+OuFM
+ oGjg/fOTsHVqVzAJpNjo6F6k5NVYGsrMIIJI5bDHujU33ePLleYbkgqQDlHNn557qkPcxR5mS
+ 3wTUHLhkFAC6UrfSotgBj5MeX/OJM7081ncRwkedj9dNbcpwctwQyBaeoMPDnYy6wpOzUVEN4
+ hvZPmLEmoC5GjNSPyxe28uVgfl+hbye6BupYJlEWe+4PGoGCY/d5KN+hWYqySSdewLklhdrVi
+ IFYuP64gZTKxe2NRFLq3gLQRa/iTFoiO7qHMwgvgv9l5p7JV5dMx93vGm/szxqN+4P907KH9O
+ vM5pCk6+AwgB2dE9AchuRhNWWFJZQqDa80DDugnZjGV+VGn7qiqDUJ+s8S4t2IrgOZ7L/Gz/2
+ 0JXuMq6wlajWp89EhyFUcleGqYKS9WrEdsCmYlV08nJKD2E2RVt3bodpqni/so4NyFs8ZjRhx
+ EQ7ZpuXxcPc13R2fhsTREQSCbAxdZO+S0ReXfq3pV1LmMXm1smXFFkDc2MlREpxQGVPXW6nnd
+ kfS/ruErvXURnXg7yQ3E/Rb84I/EzkUqUjN+0+KwKoLp62DvIv/hxQJPwplq+wRRKp/bUpgfW
+ OKtQqNcZTQz3J0RnAH8ovueeTRoYl8/JUCk6VokU47IzErkAUSOglgJ4UJ5ZRqDNwpb1Isa7g
+ 9ZHSP7yTrGsxySz4LMgRfbZGYA18lkvEEPgcb/049Zpqet9wJpDa5RQ6x8C/o+pIVR0JyNy
+Received-SPF: none client-ip=212.227.126.131; envelope-from=laurent@vivier.eu;
+ helo=mout.kundenserver.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/10 09:10:24
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -28
+X-Spam_score: -2.9
+X-Spam_bar: --
+X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -90,24 +82,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-trivial@nongnu.org, Richard Henderson <richard.henderson@linaro.org>,
+ Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Technically, this is a v2 of:
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-https://lists.nongnu.org/archive/html/qemu-devel/2020-05/msg08316.html
+Replace disabled DPRINTF() by qemu_log_mask(GUEST_ERROR).
 
-But as it turned out during the review of v1, we don't need to change
-the code rather than documentation.
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20200603123754.19059-3-f4bug@amsat.org>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ target/unicore32/helper.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
-Michal Privoznik (2):
-  qemu-options.hx: Mark all hmat-cache attributes required
-  qemu-options.hx: Document hmat-lb and hmat-cache order
-
- qemu-options.hx | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
-
+diff --git a/target/unicore32/helper.c b/target/unicore32/helper.c
+index 53292ae311c1..00371a7da660 100644
+--- a/target/unicore32/helper.c
++++ b/target/unicore32/helper.c
+@@ -10,6 +10,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
++#include "qemu/log.h"
+ #include "cpu.h"
+ #include "exec/exec-all.h"
+ #include "exec/helper-proto.h"
+@@ -106,8 +107,9 @@ void helper_cp0_set(CPUUniCore32State *env, uint32_t val, uint32_t creg,
+     }
+     return;
+ unrecognized:
+-    DPRINTF("Wrong register (%d) or wrong operation (%d) in cp0_set!\n",
+-            creg, cop);
++    qemu_log_mask(LOG_GUEST_ERROR,
++                  "Wrong register (%d) or wrong operation (%d) in cp0_set!\n",
++                  creg, cop);
+ }
+ 
+ uint32_t helper_cp0_get(CPUUniCore32State *env, uint32_t creg, uint32_t cop)
+@@ -153,8 +155,9 @@ uint32_t helper_cp0_get(CPUUniCore32State *env, uint32_t creg, uint32_t cop)
+         }
+         break;
+     }
+-    DPRINTF("Wrong register (%d) or wrong operation (%d) in cp0_set!\n",
+-            creg, cop);
++    qemu_log_mask(LOG_GUEST_ERROR,
++                  "Wrong register (%d) or wrong operation (%d) in cp0_set!\n",
++                  creg, cop);
+     return 0;
+ }
+ 
 -- 
 2.26.2
 
