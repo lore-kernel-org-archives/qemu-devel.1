@@ -2,103 +2,70 @@ Return-Path: <SRS0=wemX=7X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87169C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 09:53:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26797C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 09:57:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4C65520760
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 09:53:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J0gdiCYS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C65520760
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id EC550206F7
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 09:57:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC550206F7
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44156 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46992 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jixQG-0003m9-Cx
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 05:53:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52684)
+	id 1jixTi-0005gM-7l
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 05:57:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53160)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <sgarzare@redhat.com>)
- id 1jixPN-0002w5-7E
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 05:52:33 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:35661
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <sgarzare@redhat.com>)
- id 1jixPL-0003d5-SN
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 05:52:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591782750;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=JSV9RVfGO/uoS7hO2N5rRU8BhFjAaGOOlFr48ueYxvU=;
- b=J0gdiCYSAJCsUl6+pQdbQlhfo7MlVs4jphaPacUvvEpv2n6JeDfu0obpurvsIngXkx6P1v
- sE2I9Wwj154OVlUNcROl2U4s6AJ+OzAMzpkjb8qqwHhg07RwlXOJ+6jU9KdXVAXsev3bNK
- aSMSU/Bp2kBf6hmh/09ol88rBrFdvuU=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-391-R6NamUBIPaeDl_Dgdx8VrQ-1; Wed, 10 Jun 2020 05:52:29 -0400
-X-MC-Unique: R6NamUBIPaeDl_Dgdx8VrQ-1
-Received: by mail-wm1-f70.google.com with SMTP id u15so269023wmm.5
- for <qemu-devel@nongnu.org>; Wed, 10 Jun 2020 02:52:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=JSV9RVfGO/uoS7hO2N5rRU8BhFjAaGOOlFr48ueYxvU=;
- b=m9NMqDihxNeMJRSBGq4Uds5++sfRqGkGtJ5vVvJE8Unetf107djJyLfPSid8OWON2h
- syYep2Zuvsk2apENjnn4EblSkJr3s1IoCTfv9XNvS0limzh1Rc2QXBAFQK8zfmf03Nju
- zx6iwfmLoCEL3IY0+LWhFc00gpkZSWYrpQ+9/Pn7UnhxXjU+QJmsbZhmbUWmbEiv9RF7
- PruB6NcdtDRiP6nwsXFW9WugtmIYbbqEzQu2IKPiIpPK7SE+Vda6C3KI61X+kuPGG9qn
- rRvzxMC94gNzJOazVaP97U+h0egJmYH7WkHUug8e/v/S1f/kAqP5xuyEQNkWu04z3SEz
- XyXg==
-X-Gm-Message-State: AOAM532xI/ZianEhnpC1R0F67AS19lTo3qfo4oB17BXb2ehvDoJwqijJ
- Ftv2ordU8+FQCKGAGIM+mMGKBjJci1+ebLENMS6FeEP8FLLWnjJnSdCk06y2Keuf4SJEiOgD7eo
- Bektb6XiJzQM3Z44=
-X-Received: by 2002:a5d:4bc5:: with SMTP id l5mr2773504wrt.104.1591782748135; 
- Wed, 10 Jun 2020 02:52:28 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw1Yh4YOmy5V0u7GcUN7iMAIWleTqHjlTE0f58tsU5Qw+ARBQH/MAzBIAzCJjaupkvrtL98sg==
-X-Received: by 2002:a5d:4bc5:: with SMTP id l5mr2773468wrt.104.1591782747721; 
- Wed, 10 Jun 2020 02:52:27 -0700 (PDT)
-Received: from steredhat (host-79-49-207-108.retail.telecomitalia.it.
- [79.49.207.108])
- by smtp.gmail.com with ESMTPSA id f185sm6315071wmf.43.2020.06.10.02.52.26
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 10 Jun 2020 02:52:27 -0700 (PDT)
-Date: Wed, 10 Jun 2020 11:52:24 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH V2] virtio-pci: fix queue_enable write
-Message-ID: <20200610095224.2q4ivledb42ubsz4@steredhat>
-References: <20200610054351.15811-1-jasowang@redhat.com>
- <20200610085726.jerorykxbycoesyu@steredhat>
- <20200610054248-mutt-send-email-mst@kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <20200610054248-mutt-send-email-mst@kernel.org>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=sgarzare@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 23:22:15
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ (Exim 4.90_1) (envelope-from <ysato@users.sourceforge.jp>)
+ id 1jixT7-0005F6-U0; Wed, 10 Jun 2020 05:56:25 -0400
+Received: from mail03.asahi-net.or.jp ([202.224.55.15]:51595)
+ by eggs.gnu.org with esmtp (Exim 4.90_1)
+ (envelope-from <ysato@users.sourceforge.jp>)
+ id 1jixT6-0004Uj-OI; Wed, 10 Jun 2020 05:56:25 -0400
+Received: from sakura.ysato.name (ik1-413-38519.vs.sakura.ne.jp
+ [153.127.30.23]) (Authenticated sender: PQ4Y-STU)
+ by mail03.asahi-net.or.jp (Postfix) with ESMTPA id 833F2EE71E;
+ Wed, 10 Jun 2020 18:56:19 +0900 (JST)
+Received: from yo-satoh-debian.ysato.ml (v046088.dynamic.ppp.asahi-net.or.jp
+ [124.155.46.88])
+ by sakura.ysato.name (Postfix) with ESMTPSA id 69A021C0816;
+ Wed, 10 Jun 2020 18:56:18 +0900 (JST)
+Date: Wed, 10 Jun 2020 18:56:17 +0900
+Message-ID: <87sgf3megu.wl-ysato@users.sourceforge.jp>
+From: Yoshinori Sato <ysato@users.sourceforge.jp>
+To: Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Subject: Re: [PATCH v2 2/8] MAINTAINERS: Mark SH4 based R2D & Shix machines
+ orphan
+In-Reply-To: <e55ba7d1-6617-ed1b-e9a2-a564bd490709@amsat.org>
+References: <20200608090142.6793-1-f4bug@amsat.org>
+ <20200608090142.6793-3-f4bug@amsat.org>
+ <8f97580c-bf25-dd83-e23e-dcea1e6ce6b7@redhat.com>
+ <875zc0skab.fsf@dusky.pond.sub.org>
+ <CANqRtoRwWksb8zngFqJnJg-gNs5_M_NoFZ1Y=A8mHK0NfCFBCg@mail.gmail.com>
+ <e55ba7d1-6617-ed1b-e9a2-a564bd490709@amsat.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM/1.14.9 (=?ISO-8859-4?Q?Goj=F2?=) APEL/10.8 EasyPG/1.0.0 Emacs/26
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: softfail client-ip=202.224.55.15;
+ envelope-from=ysato@users.sourceforge.jp; helo=mail03.asahi-net.or.jp
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/10 05:56:22
+X-ACL-Warn: Detected OS   = ???
+X-Spam_score_int: -9
+X-Spam_score: -1.0
+X-Spam_bar: -
+X-Spam_report: (-1.0 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_BL=0.01, RCVD_IN_MSPIKE_L3=0.9, SPF_HELO_NONE=0.001,
+ SPF_SOFTFAIL=0.665 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -111,61 +78,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org,
- stefanha@redhat.com
+Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
+ qemu-trivial@nongnu.org, Magnus Damm <magnus.damm@gmail.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Markus Armbruster <armbru@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Alex =?ISO-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
+ Michael Tokarev <mjt@tls.msk.ru>, Aurelien Jarno <aurelien@aurel32.net>,
+ Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+ Aleksandar Markovic <aleksandar.m.mail@gmail.com>,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jun 10, 2020 at 05:42:54AM -0400, Michael S. Tsirkin wrote:
-> On Wed, Jun 10, 2020 at 10:57:26AM +0200, Stefano Garzarella wrote:
-> > On Wed, Jun 10, 2020 at 01:43:51PM +0800, Jason Wang wrote:
-> > > Spec said: The driver uses this to selectively prevent the device from
-> > > executing requests from this virtqueue. 1 - enabled; 0 - disabled.
-> > > 
-> > > Though write 0 to queue_enable is forbidden by the spec, we should not
-> > > assume that the value is 1.
-> > > 
-> > > Fix this by ignore the write value other than 1.
-> > > 
-> > > Signed-off-by: Jason Wang <jasowang@redhat.com>
-> > > ---
-> > > Changes from V1:
-> > > - fix typo
-> > > - warn wrong value through virtio_error
-> > > ---
-> > >  hw/virtio/virtio-pci.c | 12 ++++++++----
-> > >  1 file changed, 8 insertions(+), 4 deletions(-)
-> > > 
-> > > diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-> > > index d028c17c24..7bc8c1c056 100644
-> > > --- a/hw/virtio/virtio-pci.c
-> > > +++ b/hw/virtio/virtio-pci.c
-> > > @@ -1273,16 +1273,20 @@ static void virtio_pci_common_write(void *opaque, hwaddr addr,
-> > >          virtio_queue_set_vector(vdev, vdev->queue_sel, val);
-> > >          break;
-> > >      case VIRTIO_PCI_COMMON_Q_ENABLE:
-> > > -        virtio_queue_set_num(vdev, vdev->queue_sel,
-> > > -                             proxy->vqs[vdev->queue_sel].num);
-> > > -        virtio_queue_set_rings(vdev, vdev->queue_sel,
-> > > +        if (val == 1) {
-> > 
-> > Does it have to be 1 or can it be any value other than 0?
-> > 
-> > Thanks,
-> > Stefano
-> 
-> spec says 1
+On Tue, 09 Jun 2020 18:12:42 +0900,
+Philippe Mathieu-Daud=E9 wrote:
+>=20
+> Hi Magnus,
+>=20
+> On 6/9/20 10:59 AM, Magnus Damm wrote:
+> > Hi Markus and Thomas,
+> >=20
+> > On Tue, Jun 9, 2020 at 5:41 PM Markus Armbruster <armbru@redhat.com> wr=
+ote:
+> >>
+> >> Thomas Huth <thuth@redhat.com> writes:
+> >>
+> >>> On 08/06/2020 11.01, Philippe Mathieu-Daud=E9 wrote:
+> >>>> Last commit from Magnus Damm is fc8e320ef583, which date is
+> >>>> Fri Nov 13 2009.  As nobody else seems to care about the patches
+> >>>> posted [*] related to the R2D and Shix machines, mark them orphan.
+> >>>>
+> >>>> Many thanks to Magnus for his substantial contributions to QEMU,
+> >>>> and for introducing these SH4 based machine!
+> >>
+> >> s/machine/machines/
+> >>
+> >>>>
+> >>>> [*] https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg08519.h=
+tml
+> >>>>
+> >>>> Cc: Magnus Damm <magnus.damm@gmail.com>
+> >>>> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+> >>>> ---
+> >>>>  MAINTAINERS | 5 +++--
+> >>>>  1 file changed, 3 insertions(+), 2 deletions(-)
+> >>>>
+> >>>> diff --git a/MAINTAINERS b/MAINTAINERS
+> >>>> index 49d90c70de..a012d9b74e 100644
+> >>>> --- a/MAINTAINERS
+> >>>> +++ b/MAINTAINERS
+> >>>> @@ -1250,14 +1250,15 @@ SH4 Machines
+> >>>>  ------------
+> >>>>  R2D
+> >>>>  M: Magnus Damm <magnus.damm@gmail.com>
+> >>>> -S: Maintained
+> >>>> +S: Orphan
+> >>>>  F: hw/sh4/r2d.c
+> >>>>  F: hw/intc/sh_intc.c
+> >>>>  F: hw/timer/sh_timer.c
+> >>>> +F: include/hw/sh4/sh_intc.h
+> >>>>
+> >>>>  Shix
+> >>>>  M: Magnus Damm <magnus.damm@gmail.com>
+> >>>> -S: Odd Fixes
+> >>>> +S: Orphan
+> >>>>  F: hw/sh4/shix.c
+> >>>
+> >>> Having both, an "M:" entry and "S: Orphan" in a section sounds weird.
+> >>> Magnus, are you still interested in these sections? If not, I think t=
+he
+> >>> "M:" line should be removed...?
+> >>
+> >> Concur.  Of course, let's give Magnus a chance to chime in.
+> >=20
+> > Thanks guys! I'm interested but don't have so much time available to
+> > commit to this I'm afraid. In particular I'm keen on trying to keep
+> > R2D around since I happen to have a physical machine setup in my
+> > remote access rack. SH4 with FPU used to have alright gcc + binutils
+> > toolchain and glibc support once while other SuperH SoCs lacked some
+> > portions. So keeping SH4 (sh775x) around would be nice IMO.
+>=20
+> Great news!
+>=20
+> FYI Yoshinori Sato did a great job on updating the Renesas
+> hardware, see:
+> https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg08584.html
+>=20
+> He might be able to help with the UART/TIMER peripherals used by the
+> R2D, see a suggestion to add a 'Renesas hardware' entry:
+> https://www.mail-archive.com/qemu-devel@nongnu.org/msg708478.html
+>=20
+> If Yoshinori accept the suggestion to add a Renesas hardware entry, do
+> you agree to be listed as there too? Maybe with a 'R:' tag for
+> designated reviewer instead of maintainer.
+>=20
+> So I'll respin this series with these changes:
+>=20
+> R2D: S: 'Maintained' -> 'Odd Fixes'
+>=20
+> So contributors don't wait for you to take the patches, and they can go
+> via qemu-trivial.
+>=20
+> And Shix -> No maintainer, S: 'Obsolete'.
+>=20
+> The TCG backend stay orphan.
+>=20
+> Regards,
+>=20
+> Phil.
+>=20
+> >=20
+> > Cheers,
+> >=20
+> > / magnus
+> >=20
+>=20
 
-I was confused by "The driver MUST NOT write a 0 to queue_enable.",
-interpreting it as "can write anything other than 0".
+OK.
+I also need sh4, so I will perform maintenance.
 
-But as Jason also wrote in the commit message, the driver should write
-1 to enable, so
-
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-
-Thanks,
-Stefano
-
+--=20
+Yosinori Sato
 
