@@ -7,81 +7,82 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D286C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 15:58:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0FF9C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 15:59:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CB5FA206F4
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 15:58:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BAEC9206F4
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 15:59:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fygIBSJi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB5FA206F4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BtEjoK65"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BAEC9206F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42786 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44116 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jj37h-0000SY-2w
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 11:58:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56004)
+	id 1jj384-00015e-TA
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 11:59:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55948)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jj34d-0003mx-8J
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 11:55:31 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:37657)
+ id 1jj34a-0003gQ-2J
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 11:55:28 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:46903)
  by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jj34b-0005E3-3A
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 11:55:30 -0400
-Received: by mail-wm1-x344.google.com with SMTP id y20so2304675wmi.2
- for <qemu-devel@nongnu.org>; Wed, 10 Jun 2020 08:55:20 -0700 (PDT)
+ id 1jj34Y-0005Bd-Sg
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 11:55:27 -0400
+Received: by mail-wr1-x441.google.com with SMTP id x6so2827827wrm.13
+ for <qemu-devel@nongnu.org>; Wed, 10 Jun 2020 08:55:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=K5O4iBO+Gb4CYP2dkK+QNloWbTQMSg+bPZS/dhOJAdk=;
- b=fygIBSJif8rAz2tfkD2LV5/qVawnF4VGcqNjenqgnS/2a7qqPnbdIo5OBvKTPVUdrx
- n/iPYFLHqbEkVnNO/foyYEccEnlZWyHrkS6EJtfqp9Ens/4wgfev2sami2BQCFj6eJzm
- VSkWeUeCDRVirJXPq4nE0NmkKu/fVj4IVKk1A9aajLghfiPlnjd+PNA9x2iSgJ0WRXRz
- zeIvoY/FkLi/Fmszloz1ReKBAqYMOplPVc92I75CVoVZu04P2tNDYMx/2F2vzFEaySe2
- UcQLg4eg7uI9iKlH2RUxB4Q5o6a2m4lcSm7dz7oLwSB6tT8LXnxTfb1dS2vNKHRjFUjf
- 9KIQ==
+ bh=8k3vUvil4yeFEKEfxW7+SynAd8ccYx17gBmoCdQYV0E=;
+ b=BtEjoK65Y6qRjtdjZrvvJHACecKeP8hvyuOX4TEr+Iodlocidgsxd3UjNoRuahYMbY
+ 0Jv0jG3PlFUHNMxqJg05byDlVjTC5VGlqR+KlfKXtCWo8VBbILMCbnVOY73cGTzwncE1
+ 0r+T7aoGVx+oPq1GowNCUFNTXiuP2ClgFSos3Cne8gOI66XmSC0PCnYGzNhI6uyqgTS1
+ kCc6Jfraljn/MnPS5HldS3buvt6evoDWVtJxB254UehfjE4LE7qKYZVfb4GFkvmjTnd1
+ yCYyRMZYmaZ0U8Jy6prrTLcsDIBqU8cyBMiQhvCuFzy/YrVafukKKEqpPAZWsIiPzJbb
+ FbTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=K5O4iBO+Gb4CYP2dkK+QNloWbTQMSg+bPZS/dhOJAdk=;
- b=kHV3x10jW8Rj1qHBNRLLXLwlGk7uuujFCPkdJyUXwZHY/HRUn1+z+VBLL8+dedovNz
- 45o5gqOnoAmucMp9igmDn+RpLYbjVly9Km04L0WvnvJzvjWL2vVHgTmN51ygvZ2VQJxK
- oNJqpT2S/kKZIwS5w1g0gLG9rBT59XBBPKdjlWUe1K+JSRpkEFPY4ArpoKk9iQC98l7b
- wlUDzGbnmKkR7zCy9YiBTFJGiKa7t+Sla8CquYX53aQ41IV275hzRAw8T39Xg8zwDc5u
- sf8mq5zsrdeWjzd+us6+lgagFgZM/S8fgVuasWrwIqEiQMaMNUADYTTw6hi/cZZ939An
- p7oQ==
-X-Gm-Message-State: AOAM531A6TJAt15MEFFnh7ZBmqzzX4ENUYSbRjNE50XFiwmrwW4fsPHm
- GeDkFGaJoy46goOtxTYybCZKxsAiOUE=
-X-Google-Smtp-Source: ABdhPJwWEQcuBbKrM/5m0J8DW22Nsjvfy5FUKPZK1/uj2SmLgOUJ6oARcavZcYO9xqczuv8bjmMquA==
-X-Received: by 2002:a1c:5411:: with SMTP id i17mr3982718wmb.137.1591804519629; 
- Wed, 10 Jun 2020 08:55:19 -0700 (PDT)
+ bh=8k3vUvil4yeFEKEfxW7+SynAd8ccYx17gBmoCdQYV0E=;
+ b=pog3/8J+Qd3OthcjJgnEkVFp5tX/qhEAs5Fwvza9sIsoRkjgSbEeA+jXE74QxL2Zqx
+ UDVvEvjyUI/3ly8m4OpACQY2OzDlGgYPO05RxC6OU8Ew4/dnLlPivMJxAy/sfEOhixwo
+ TCFK7ZQDp6W+3WRYkbmC6+gTRn1EFnfX4RWhzU08to9j3Bb5Hv8rf2+2Q5fdgY13l7jU
+ rGouswoEYB5YgLDsHQ2OoeT0SjsOyBip/r4IMhSJ2MhKb7EdVroe/M4lpcOtTlnE/tIF
+ bbj4x3C/DyslgebGGL5MeapSsQbUM+BN3JtNfG2MlvUu3I1Etg2NgV8uXazOtq7OSorL
+ aFsg==
+X-Gm-Message-State: AOAM533/aqKTUqXkmqFHBysGumOztWwgMPQOv3wnvGH4uvpmW65m4FE3
+ wjYVfziKoPYJsyFK0FGYpCyysw==
+X-Google-Smtp-Source: ABdhPJxcxv4LZBu8h1sw2awG7E/3QOasCYNVRoESTXFUgKybSynCL/2H+ZYymYqlKzOtv1fwLjy0yg==
+X-Received: by 2002:a5d:6586:: with SMTP id q6mr4398832wru.319.1591804516736; 
+ Wed, 10 Jun 2020 08:55:16 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id o8sm182467wmb.20.2020.06.10.08.55.13
+ by smtp.gmail.com with ESMTPSA id q128sm147184wma.38.2020.06.10.08.55.11
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 10 Jun 2020 08:55:18 -0700 (PDT)
+ Wed, 10 Jun 2020 08:55:11 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 62D901FF91;
+ by zen.linaroharston (Postfix) with ESMTP id 4B20B1FF90;
  Wed, 10 Jun 2020 16:55:10 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH  v2 5/6] plugins: add API to return a name for a IO device
-Date: Wed, 10 Jun 2020 16:55:08 +0100
-Message-Id: <20200610155509.12850-6-alex.bennee@linaro.org>
+Subject: [PATCH v2 4/6] hw/virtio/pci: include vdev name in registered PCI
+ sections
+Date: Wed, 10 Jun 2020 16:55:07 +0100
+Message-Id: <20200610155509.12850-5-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200610155509.12850-1-alex.bennee@linaro.org>
 References: <20200610155509.12850-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::344;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x344.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x441.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -103,78 +104,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: robert.foley@linaro.org, robhenry@microsoft.com,
- aaron@os.amperecomputing.com, cota@braap.org, kuhn.chenqun@huawei.com,
- peter.puhov@linaro.org, Clement Deschamps <clement.deschamps@greensocs.com>,
+Cc: robert.foley@linaro.org, "Michael S . Tsirkin" <mst@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ robhenry@microsoft.com, aaron@os.amperecomputing.com, cota@braap.org,
+ kuhn.chenqun@huawei.com, peter.puhov@linaro.org,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This may well end up being anonymous but it should always be unique.
+When viewing/debugging memory regions it is sometimes hard to figure
+out which PCI device something belongs to. Make the names unique by
+including the vdev name in the name string.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-[r-b provisional given change to g_intern_string]
-Reviewed-by: Clement Deschamps <clement.deschamps@greensocs.com>
-Reviewed-by: Emilio G. Cota <cota@braap.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 
 ---
-v3
-  - return a non-freeable const g_intern_string()
-  - checkpatch cleanups
+v2
+  - swap ()'s for an extra -
 ---
- include/qemu/qemu-plugin.h |  6 ++++++
- plugins/api.c              | 20 ++++++++++++++++++++
- 2 files changed, 26 insertions(+)
+ hw/virtio/virtio-pci.c | 22 ++++++++++++++--------
+ 1 file changed, 14 insertions(+), 8 deletions(-)
 
-diff --git a/include/qemu/qemu-plugin.h b/include/qemu/qemu-plugin.h
-index bab8b0d4b3a..c98c18d6b05 100644
---- a/include/qemu/qemu-plugin.h
-+++ b/include/qemu/qemu-plugin.h
-@@ -335,6 +335,12 @@ struct qemu_plugin_hwaddr *qemu_plugin_get_hwaddr(qemu_plugin_meminfo_t info,
- bool qemu_plugin_hwaddr_is_io(const struct qemu_plugin_hwaddr *haddr);
- uint64_t qemu_plugin_hwaddr_device_offset(const struct qemu_plugin_hwaddr *haddr);
- 
-+/*
-+ * Returns a string representing the device. The string is valid for
-+ * the lifetime of the plugin.
-+ */
-+const char *qemu_plugin_hwaddr_device_name(const struct qemu_plugin_hwaddr *h);
-+
- typedef void
- (*qemu_plugin_vcpu_mem_cb_t)(unsigned int vcpu_index,
-                              qemu_plugin_meminfo_t info, uint64_t vaddr,
-diff --git a/plugins/api.c b/plugins/api.c
-index bbdc5a4eb46..4304e63f0cf 100644
---- a/plugins/api.c
-+++ b/plugins/api.c
-@@ -303,6 +303,26 @@ uint64_t qemu_plugin_hwaddr_device_offset(const struct qemu_plugin_hwaddr *haddr
-     return 0;
+diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+index d028c17c240..51ab67304bc 100644
+--- a/hw/virtio/virtio-pci.c
++++ b/hw/virtio/virtio-pci.c
+@@ -1390,7 +1390,8 @@ static void virtio_pci_device_write(void *opaque, hwaddr addr,
+     }
  }
  
-+const char *qemu_plugin_hwaddr_device_name(const struct qemu_plugin_hwaddr *h)
-+{
-+#ifdef CONFIG_SOFTMMU
-+    if (h && h->is_io) {
-+        MemoryRegionSection *mrs = h->v.io.section;
-+        if (!mrs->mr->name) {
-+            unsigned long maddr = 0xffffffff & (uintptr_t) mrs->mr;
-+            g_autofree char *temp = g_strdup_printf("anon%08lx", maddr);
-+            return g_intern_string(temp);
-+        } else {
-+            return g_intern_string(mrs->mr->name);
-+        }
-+    } else {
-+        return g_intern_string("RAM");
-+    }
-+#else
-+    return g_intern_string("Invalid");
-+#endif
-+}
-+
- /*
-  * Queries to the number and potential maximum number of vCPUs there
-  * will be. This helps the plugin dimension per-vcpu arrays.
+-static void virtio_pci_modern_regions_init(VirtIOPCIProxy *proxy)
++static void virtio_pci_modern_regions_init(VirtIOPCIProxy *proxy,
++                                           const char *vdev_name)
+ {
+     static const MemoryRegionOps common_ops = {
+         .read = virtio_pci_common_read,
+@@ -1437,36 +1438,41 @@ static void virtio_pci_modern_regions_init(VirtIOPCIProxy *proxy)
+         },
+         .endianness = DEVICE_LITTLE_ENDIAN,
+     };
++    g_autoptr(GString) name = g_string_new(NULL);
+ 
+-
++    g_string_printf(name, "virtio-pci-common-%s", vdev_name);
+     memory_region_init_io(&proxy->common.mr, OBJECT(proxy),
+                           &common_ops,
+                           proxy,
+-                          "virtio-pci-common",
++                          name->str,
+                           proxy->common.size);
+ 
++    g_string_printf(name, "virtio-pci-isr-%s", vdev_name);
+     memory_region_init_io(&proxy->isr.mr, OBJECT(proxy),
+                           &isr_ops,
+                           proxy,
+-                          "virtio-pci-isr",
++                          name->str,
+                           proxy->isr.size);
+ 
++    g_string_printf(name, "virtio-pci-device-%s", vdev_name);
+     memory_region_init_io(&proxy->device.mr, OBJECT(proxy),
+                           &device_ops,
+                           virtio_bus_get_device(&proxy->bus),
+-                          "virtio-pci-device",
++                          name->str,
+                           proxy->device.size);
+ 
++    g_string_printf(name, "virtio-pci-notify-%s", vdev_name);
+     memory_region_init_io(&proxy->notify.mr, OBJECT(proxy),
+                           &notify_ops,
+                           virtio_bus_get_device(&proxy->bus),
+-                          "virtio-pci-notify",
++                          name->str,
+                           proxy->notify.size);
+ 
++    g_string_printf(name, "virtio-pci-notify-pio-%s", vdev_name);
+     memory_region_init_io(&proxy->notify_pio.mr, OBJECT(proxy),
+                           &notify_pio_ops,
+                           virtio_bus_get_device(&proxy->bus),
+-                          "virtio-pci-notify-pio",
++                          name->str,
+                           proxy->notify_pio.size);
+ }
+ 
+@@ -1607,7 +1613,7 @@ static void virtio_pci_device_plugged(DeviceState *d, Error **errp)
+ 
+         struct virtio_pci_cfg_cap *cfg_mask;
+ 
+-        virtio_pci_modern_regions_init(proxy);
++        virtio_pci_modern_regions_init(proxy, vdev->name);
+ 
+         virtio_pci_modern_mem_region_map(proxy, &proxy->common, &cap);
+         virtio_pci_modern_mem_region_map(proxy, &proxy->isr, &cap);
 -- 
 2.20.1
 
