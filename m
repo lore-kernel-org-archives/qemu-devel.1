@@ -2,76 +2,79 @@ Return-Path: <SRS0=wemX=7X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DB47C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 22:23:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 495A0C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 22:24:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3CD1E206F4
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 22:23:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 12157206F4
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 22:24:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="B2miHGni"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CD1E206F4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="ODdaP6Bk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12157206F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39860 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42844 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jj97x-0007Dt-FS
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 18:23:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42544)
+	id 1jj98i-0000C6-AO
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 18:24:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42590)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=4234ccaf3=alistair.francis@wdc.com>)
- id 1jj95u-0004Ki-0G; Wed, 10 Jun 2020 18:21:14 -0400
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:59124)
+ id 1jj962-0004Xi-Ag; Wed, 10 Jun 2020 18:21:22 -0400
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:59148)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=4234ccaf3=alistair.francis@wdc.com>)
- id 1jj95s-000237-5K; Wed, 10 Jun 2020 18:21:13 -0400
+ id 1jj961-00024C-6G; Wed, 10 Jun 2020 18:21:21 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1591827671; x=1623363671;
- h=from:to:cc:subject:date:message-id:mime-version:
- content-transfer-encoding;
- bh=9bD3QKWUr5LwbqJAQBdeqwpAm4nMqwx4Rcj7yirIh6Y=;
- b=B2miHGniKtUzHgoa6rHxtlac8GKxZWv6pIV21zx9Zhc9lBodeC1rrQtC
- dgOsAaChGLy0C1pEKpIKDYOSPf8YIrWUToTbf+EmKQluViWQ7nuUkScLZ
- zGad+vDdNBxfquvXRCx1+z/8fTkcbKxG/g3n5sxqTNO+qkNLd7QbkflXA
- NZ/B74sGAT9jg2QxaZ3qQHjZhMBep56m1FyRvFdY/dhjmzEUSdX4LdqpL
- +D+IE5r8qVOG5POii/y96Xe1TtGT8MH6GW/4m3oeiUqwxY3FvHaLi8pyX
- YTNqp96ltGE10ZaAxwI7iRtsy0s5pukv1+BRl+CAgV7o6WnrgW8Iot6uM w==;
-IronPort-SDR: WW8xMXxV6yB//Hr05R8Y/FdqdsQug6qQWGUgTudBTpCgqIeILhc+C7WpdkCDNm7eRHu70qidiv
- luboDhnwWyljUAkGmczCf7pU9+Sy7Ehx5PbJFQS+/K8Q/JV1lcahwoM0nTrZjRbKRx1jew9Tyk
- LYDKCmrwuTP5WQJI0rZQDBSFaIcvH68eM1Rj7W76pKifYIDVWM8rN3PhHWbiOxdKMP7kCiGDe5
- 5FJnhkZ5pcCdmYSho5fh/nuM7O1md3rZrjnnrc12AuV0idE+voipjVUk8saLEtvKmJ+CsLI/+/
- m5U=
-X-IronPort-AV: E=Sophos;i="5.73,497,1583164800"; d="scan'208";a="248819305"
+ t=1591827680; x=1623363680;
+ h=from:to:cc:subject:date:message-id:in-reply-to:
+ references:mime-version:content-transfer-encoding;
+ bh=4DL/dtShyfrUriwfPCj9ft4we7CjJK0RVJvz0+UA9EQ=;
+ b=ODdaP6BkhophXcJAtqiFc0iDD5fNyt4psZUZAyadpyqgJI1tuFagJb4O
+ RXhOw0lsKHIwfzUNQJ+rYfSgkHxmi3SdNVf/fqhHnS9XIrE5OeRqwwmRg
+ hX1WKQodOoRWW1ia+qsyCTsEZAG0Sw4uZ6ee823WY/eDX3+I90R/BFNiZ
+ S35xHP70gKZMOYsitNyZAem+ImcpDN7bNmc817YCgJsM+MifB8ik+f9bB
+ 4sPDZY7OaMLkAus9P/FqJwLgg5ooOfIF5kmUH2AMRLM9l4WWoea9WHckl
+ DfTKW1JJipQtFZRgUd0e36hy8ABZpS4fHkIn4HX0/zIKYcZJEpmXjsQiI g==;
+IronPort-SDR: Mm1LmeXMnTsipEAFwJPBnddmltgIqCWxSKhKWcqdkmndVRTxTXlMVm2QeSP2DzYBUOyoDkbAOe
+ 7NRJ06HSJyeC3z1kMeUIw/MJKGRRin9ewyknIxVgjt926K1OeNJjh/7KjB4HMAsNtiPNINi0OX
+ 7MNPo4+2FeFSpIKmmxCX97AS/OdS9E6ORaNkNKOtaOc2Ckg/iwiOziffHiT/UI2A6mcJPEz7HU
+ J4D8EwPC6mZfXosjKO7qorx52ixsNptzQD3x7oWA0Ia+/1l8TYt4YeIYxwkYu7ZnvjZsitzY/I
+ HDI=
+X-IronPort-AV: E=Sophos;i="5.73,497,1583164800"; d="scan'208";a="248819321"
 Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com)
  ([199.255.45.14])
- by ob1.hgst.iphmx.com with ESMTP; 11 Jun 2020 06:21:05 +0800
-IronPort-SDR: rojVYqLLuCpys4+s6mewY5hqayIiEwNJKLJikeQUlTpG+zglSDlnsEZgfDwh6K3o1vvbXSoCwu
- +pGx9d4t1nrEMSxQrxDTqgQTLIB5eWTBg=
+ by ob1.hgst.iphmx.com with ESMTP; 11 Jun 2020 06:21:19 +0800
+IronPort-SDR: KeFmZPLzyuPqW88tWnF9KGdbI7+BGX8LlzcLmn/1ZJgiGKJJd38U7EAl3VxacSEBmb2B+GHHwS
+ XElIHxxqZAOzKc9tkwYr7uWuiSzwcOKbU=
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 10 Jun 2020 15:10:31 -0700
-IronPort-SDR: zp3Ed/5IYkYhE+L/rju4LJzXZm4JbNssRwmRIJxOk8/W/7vrxpl1ECNS3Ruoi1BoisXPYTH3IG
- kJljxZ3MrJjQ==
+ 10 Jun 2020 15:10:45 -0700
+IronPort-SDR: Pgpx9fkR//rP7B77n1ZW3Rz5iW0bnT+g4eK4dEtrhIUs/QnJj01pTFBwloYmIncKTYVtikbrtl
+ ewXa/XLZrloQ==
 WDCIronportException: Internal
 Received: from us4qd5p12.ad.shared (HELO risc6-mainframe.hgst.com)
  ([10.86.58.34])
- by uls-op-cesaip02.wdc.com with ESMTP; 10 Jun 2020 15:21:05 -0700
+ by uls-op-cesaip02.wdc.com with ESMTP; 10 Jun 2020 15:21:19 -0700
 From: Alistair Francis <alistair.francis@wdc.com>
 To: qemu-devel@nongnu.org,
 	qemu-riscv@nongnu.org
-Subject: [PATCH v6 0/6]  RISC-V Add the OpenTitan Machine
-Date: Wed, 10 Jun 2020 15:12:08 -0700
-Message-Id: <cover.1591827110.git.alistair.francis@wdc.com>
+Subject: [PATCH v6 5/6] riscv/opentitan: Connect the UART device
+Date: Wed, 10 Jun 2020 15:12:22 -0700
+Message-Id: <d9501983de454e6d405c284104049c83a282fa2b.1591827110.git.alistair.francis@wdc.com>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <cover.1591827110.git.alistair.francis@wdc.com>
+References: <cover.1591827110.git.alistair.francis@wdc.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -104,68 +107,92 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-OpenTitan is an open source silicon Root of Trust (RoT) project. This
-series adds initial support for the OpenTitan machine to QEMU.
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Bin Meng <bin.meng@windriver.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ include/hw/riscv/opentitan.h | 13 +++++++++++++
+ hw/riscv/opentitan.c         | 24 ++++++++++++++++++++++--
+ 2 files changed, 35 insertions(+), 2 deletions(-)
 
-This series add the Ibex CPU to the QEMU RISC-V target. It then adds the
-OpenTitan machine, the Ibex UART and the Ibex PLIC.
-
-The UART has been tested sending and receiving data.
-
-With this series QEMU can boot the OpenTitan ROM, Tock OS and a Tock
-userspace app.
-
-The Ibex PLIC is similar to the RISC-V PLIC (and is based on the QEMU
-implementation) with some differences. The hope is that the Ibex PLIC
-will converge to follow the RISC-V spec. As that happens I want to
-update the QEMU Ibex PLIC and hopefully eventually replace the current
-PLIC as the implementation is a little overlay complex.
-
-For more details on OpenTitan, see here: https://docs.opentitan.org/
-
-v6:
- - Rebase on master (some patches applied)
- - Fix the ROM address
-v5:
- - Add some of the missing unimplemented devices
- - Don't set PMP feature in init() function
-v4:
- - Don't set the reset vector in realise
- - Fix a bug where the MMU is always enabled
- - Fixup the PMP/MMU size logic
-v3:
- - Small fixes pointed out in review
-v2:
- - Rebase on master
- - Get uart receive working
-
-
-
-Alistair Francis (6):
-  riscv/opentitan: Fix the ROM size
-  hw/char: Initial commit of Ibex UART
-  hw/intc: Initial commit of lowRISC Ibex PLIC
-  riscv/opentitan: Connect the PLIC device
-  riscv/opentitan: Connect the UART device
-  target/riscv: Use a smaller guess size for no-MMU PMP
-
- include/hw/char/ibex_uart.h  | 110 ++++++++
- include/hw/intc/ibex_plic.h  |  63 +++++
- include/hw/riscv/opentitan.h |  16 ++
- hw/char/ibex_uart.c          | 492 +++++++++++++++++++++++++++++++++++
- hw/intc/ibex_plic.c          | 261 +++++++++++++++++++
- hw/riscv/opentitan.c         |  45 +++-
- target/riscv/pmp.c           |  14 +-
- MAINTAINERS                  |   4 +
- hw/char/Makefile.objs        |   1 +
- hw/intc/Makefile.objs        |   1 +
- hw/riscv/Kconfig             |   4 +
- 11 files changed, 1001 insertions(+), 10 deletions(-)
- create mode 100644 include/hw/char/ibex_uart.h
- create mode 100644 include/hw/intc/ibex_plic.h
- create mode 100644 hw/char/ibex_uart.c
- create mode 100644 hw/intc/ibex_plic.c
-
+diff --git a/include/hw/riscv/opentitan.h b/include/hw/riscv/opentitan.h
+index 76f72905a8..8f29b9cbbf 100644
+--- a/include/hw/riscv/opentitan.h
++++ b/include/hw/riscv/opentitan.h
+@@ -21,6 +21,7 @@
+ 
+ #include "hw/riscv/riscv_hart.h"
+ #include "hw/intc/ibex_plic.h"
++#include "hw/char/ibex_uart.h"
+ 
+ #define TYPE_RISCV_IBEX_SOC "riscv.lowrisc.ibex.soc"
+ #define RISCV_IBEX_SOC(obj) \
+@@ -33,6 +34,7 @@ typedef struct LowRISCIbexSoCState {
+     /*< public >*/
+     RISCVHartArrayState cpus;
+     IbexPlicState plic;
++    IbexUartState uart;
+ 
+     MemoryRegion flash_mem;
+     MemoryRegion rom;
+@@ -68,4 +70,15 @@ enum {
+     IBEX_PADCTRL,
+ };
+ 
++enum {
++    IBEX_UART_RX_PARITY_ERR_IRQ = 0x28,
++    IBEX_UART_RX_TIMEOUT_IRQ = 0x27,
++    IBEX_UART_RX_BREAK_ERR_IRQ = 0x26,
++    IBEX_UART_RX_FRAME_ERR_IRQ = 0x25,
++    IBEX_UART_RX_OVERFLOW_IRQ = 0x24,
++    IBEX_UART_TX_EMPTY_IRQ = 0x23,
++    IBEX_UART_RX_WATERMARK_IRQ = 0x22,
++    IBEX_UART_TX_WATERMARK_IRQ = 0x21,
++};
++
+ #endif
+diff --git a/hw/riscv/opentitan.c b/hw/riscv/opentitan.c
+index 1fc0327cb5..c8b6d2e7df 100644
+--- a/hw/riscv/opentitan.c
++++ b/hw/riscv/opentitan.c
+@@ -101,6 +101,9 @@ static void riscv_lowrisc_ibex_soc_init(Object *obj)
+ 
+     sysbus_init_child_obj(obj, "plic", &s->plic,
+                           sizeof(s->plic), TYPE_IBEX_PLIC);
++
++    sysbus_init_child_obj(obj, "uart", &s->uart,
++                          sizeof(s->uart), TYPE_IBEX_UART);
+ }
+ 
+ static void riscv_lowrisc_ibex_soc_realize(DeviceState *dev_soc, Error **errp)
+@@ -142,8 +145,25 @@ static void riscv_lowrisc_ibex_soc_realize(DeviceState *dev_soc, Error **errp)
+     busdev = SYS_BUS_DEVICE(dev);
+     sysbus_mmio_map(busdev, 0, memmap[IBEX_PLIC].base);
+ 
+-    create_unimplemented_device("riscv.lowrisc.ibex.uart",
+-        memmap[IBEX_UART].base, memmap[IBEX_UART].size);
++    /* UART */
++    dev = DEVICE(&(s->uart));
++    qdev_prop_set_chr(dev, "chardev", serial_hd(0));
++    object_property_set_bool(OBJECT(&s->uart), true, "realized", &err);
++    if (err != NULL) {
++        error_propagate(errp, err);
++        return;
++    }
++    busdev = SYS_BUS_DEVICE(dev);
++    sysbus_mmio_map(busdev, 0, memmap[IBEX_UART].base);
++    sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(DEVICE(&s->plic),
++                       IBEX_UART_TX_WATERMARK_IRQ));
++    sysbus_connect_irq(busdev, 1, qdev_get_gpio_in(DEVICE(&s->plic),
++                       IBEX_UART_RX_WATERMARK_IRQ));
++    sysbus_connect_irq(busdev, 2, qdev_get_gpio_in(DEVICE(&s->plic),
++                       IBEX_UART_TX_EMPTY_IRQ));
++    sysbus_connect_irq(busdev, 3, qdev_get_gpio_in(DEVICE(&s->plic),
++                       IBEX_UART_RX_OVERFLOW_IRQ));
++
+     create_unimplemented_device("riscv.lowrisc.ibex.gpio",
+         memmap[IBEX_GPIO].base, memmap[IBEX_GPIO].size);
+     create_unimplemented_device("riscv.lowrisc.ibex.spi",
 -- 
 2.26.2
 
