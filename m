@@ -7,77 +7,78 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2053FC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 20:06:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4651C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 20:07:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DE168206F7
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 20:06:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 91853206F7
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 20:07:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BrvhnCra"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE168206F7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D+dSUKJY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91853206F7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52516 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53694 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jj6zs-0007sT-36
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 16:06:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40400)
+	id 1jj70E-0008Mu-QM
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 16:07:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40510)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jj6wA-0003Wn-6R
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 16:03:02 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:47572
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jj6wR-0003sV-Lp
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 16:03:19 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:21989
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jj6w9-0000Pi-CT
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 16:03:01 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jj6wQ-0000VV-M4
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 16:03:19 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591819380;
+ s=mimecast20190719; t=1591819397;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=CWMg4HObNcb0F4Bp7X8vxMJGRNjGiyU+9e6+l42zIY8=;
- b=BrvhnCraMyqORx51fxLGQlJzf12A1vB3nTHk6zbChHJ226kH8zOiw6GGVs3AIXgAjrl1Bj
- NHy/9J6TdYVi6q/9PxuOMPUb3Cr+CZdkgZtaAMU9Yh5VIm1+F+U6Sg21XNMH2+iJ2p5XIT
- jFAAyDU79UPi/HqsaJ3jIq8k2XNJiR4=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-129-KzK_5o-uMiylgxDyNja49Q-1; Wed, 10 Jun 2020 16:02:56 -0400
-X-MC-Unique: KzK_5o-uMiylgxDyNja49Q-1
-Received: by mail-wr1-f70.google.com with SMTP id t5so1520028wro.20
- for <qemu-devel@nongnu.org>; Wed, 10 Jun 2020 13:02:56 -0700 (PDT)
+ bh=yTmKvMxsRg6TDo1ZOS8kS+0m6cLpvXXwMo5jtOpsK98=;
+ b=D+dSUKJYke0YGJ406Em5EYdkEoMQj6FP/lVILKHgii8rjY8GNPHo+GnASTfPnWp9t/0FiB
+ knvj3p9qrgnUIvwJDz+/wjFFtG85dJ6gw5W5eJI2MGMKNtlHgGvWJugBZzLR9V1U/NxnZN
+ bXjbImahVshXv/WJpsJg+WRCow2HY3E=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-123-CaMsqCKSO-6uZ_yVAlsw2w-1; Wed, 10 Jun 2020 16:03:16 -0400
+X-MC-Unique: CaMsqCKSO-6uZ_yVAlsw2w-1
+Received: by mail-wm1-f70.google.com with SMTP id p24so734912wmc.1
+ for <qemu-devel@nongnu.org>; Wed, 10 Jun 2020 13:03:16 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=CWMg4HObNcb0F4Bp7X8vxMJGRNjGiyU+9e6+l42zIY8=;
- b=S6GYHvwE56jklZhprw+h9TCnuehcWDr8IN0QmsruAbusgp1C79YT1UF3YoqE0U+W4V
- WULiDis5iwVNYHS9Kc2oUbjQDnHpQvNv7glRbLa9an1yZiIRIXQAGhfeGpUEWb8x6bGZ
- t8MEk6rTH8NDLK8zEhtWr2HMsA/KdqLf1xo7Vu3o0aUB80JuOKTmrmkSccaCZYYcU2du
- OR1HdVknCvv80HT2NmN6kJ3Qg1cmDCMf7ar0+17j6vByHhiY5lfJpfwENeYgy0PlFYY4
- P2NBnA4nz93OnbvU5kk9IV/SVHOkKZcN6eWrVl7uUSvy2+zLnoYslm+s98UDGn61Jq8U
- ZTwQ==
-X-Gm-Message-State: AOAM532OjdyxjTD+c3yskdF1R7cfKuAevOoUJmA80/a3b/3pCA5KJ5WS
- H+y9H2ZWYDT3npaDmZPEcfgpw03PquOfkDZbC5H+gvbttWZppJIx1AIrmVt7382fNCeFpbTRBO7
- hijOQUNLQvA6puDI=
-X-Received: by 2002:a7b:cf35:: with SMTP id m21mr4852523wmg.181.1591819375001; 
- Wed, 10 Jun 2020 13:02:55 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxbyBtjI06ZTZmHCDEOnaR8fSzAPzaAsMJoMvVWxwNDyMzuiKaxX3D6unz34ccmr1ssKmbjoA==
-X-Received: by 2002:a7b:cf35:: with SMTP id m21mr4852505wmg.181.1591819374813; 
- Wed, 10 Jun 2020 13:02:54 -0700 (PDT)
+ bh=yTmKvMxsRg6TDo1ZOS8kS+0m6cLpvXXwMo5jtOpsK98=;
+ b=QbIrXGUhCwj1w2GbIO9p3uzR4i77A913QhZb8eai4SILX4qZMFhRBNQ1t9tdx1RkG/
+ stgOyuysyMPWFz/HlqkhawDc9MYIOuRV8v35ETttGqOXwp7MlWU7lM3WrglqW9adIfHf
+ MQ8aPkl2KHEYA/awZHJFN090HTOZ0kBfDALN/3/MWGo8uVw2nf1bix3sZBlF+NKc4U0u
+ VW9cU8pSXtZFuLFBbG9tvjjdRwylqn+XEElG8vwXGKZtDxRVtDskoljFx788WOOVy3bR
+ 2WbpqCQrNBC2Ao6lS41zeuwEcJcbhHnrrVNfsGt0XHU8BPCBLx+DYG004kwtaAEvIVOn
+ NTXg==
+X-Gm-Message-State: AOAM531AQbRK0cRrcwQa1gdNK6czCzv1I4Ntrl0NsEwXH9ysXBswHRwQ
+ 7vZwdgGyQ6CcTCr57XVApjbucdOERQTwQjpIKRNj2tnoXdS+K4siCn4PPEjNoZqLRLI2E/kCWX5
+ j4PRDd/JBESOetWA=
+X-Received: by 2002:a5d:4ec3:: with SMTP id s3mr5876517wrv.103.1591819395109; 
+ Wed, 10 Jun 2020 13:03:15 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwV7PU5Hok0cqrjyyL26FLB7N0HI1d3sRfeHGCP5fkiaDuIASYWGuckJO0jZ/GsbIxpZilkRQ==
+X-Received: by 2002:a5d:4ec3:: with SMTP id s3mr5876499wrv.103.1591819394890; 
+ Wed, 10 Jun 2020 13:03:14 -0700 (PDT)
 Received: from x1w.redhat.com (181.red-88-10-103.dynamicip.rima-tde.net.
  [88.10.103.181])
- by smtp.gmail.com with ESMTPSA id y37sm1374085wrd.55.2020.06.10.13.02.53
+ by smtp.gmail.com with ESMTPSA id o18sm996955wme.19.2020.06.10.13.03.13
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 10 Jun 2020 13:02:54 -0700 (PDT)
+ Wed, 10 Jun 2020 13:03:14 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 1/8] hw/tpm: Do not include 'qemu/osdep.h' in header
-Date: Wed, 10 Jun 2020 22:02:40 +0200
-Message-Id: <20200610200247.21378-2-philmd@redhat.com>
+Subject: [PATCH 5/8] hw/tpm: Move few declarations from 'tpm_util.h' to
+ 'tpm_int.h'
+Date: Wed, 10 Jun 2020 22:02:44 +0200
+Message-Id: <20200610200247.21378-6-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200610200247.21378-1-philmd@redhat.com>
 References: <20200610200247.21378-1-philmd@redhat.com>
@@ -120,29 +121,66 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From CODING_STYLE.rst:
-
-  Do not include "qemu/osdep.h" from header files since the .c
-  file will have already included it.
-
-Remove "qemu/osdep.h" from "tpm_tis.h".
+We are going to make "tpm_util.h" publicly accessible by
+moving it to the include/ directory in a pair of commits.
+Keep declarations internals to hw/tpm/ in "tpm_int.h".
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- hw/tpm/tpm_tis.h | 1 -
- 1 file changed, 1 deletion(-)
+ hw/tpm/tpm_int.h  | 11 +++++++++++
+ hw/tpm/tpm_util.h | 10 ----------
+ 2 files changed, 11 insertions(+), 10 deletions(-)
 
-diff --git a/hw/tpm/tpm_tis.h b/hw/tpm/tpm_tis.h
-index 5554989395..f6b5872ba6 100644
---- a/hw/tpm/tpm_tis.h
-+++ b/hw/tpm/tpm_tis.h
-@@ -24,7 +24,6 @@
- #ifndef TPM_TPM_TIS_H
- #define TPM_TPM_TIS_H
+diff --git a/hw/tpm/tpm_int.h b/hw/tpm/tpm_int.h
+index fd5ebc6489..9f72879d89 100644
+--- a/hw/tpm/tpm_int.h
++++ b/hw/tpm/tpm_int.h
+@@ -13,6 +13,7 @@
+ #define TPM_TPM_INT_H
  
--#include "qemu/osdep.h"
- #include "sysemu/tpm_backend.h"
- #include "tpm_ppi.h"
+ #include "qemu/option.h"
++#include "sysemu/tpm.h"
+ 
+ #define TPM_STANDARD_CMDLINE_OPTS \
+     { \
+@@ -74,4 +75,14 @@ struct tpm_resp_hdr {
+ #define TPM_RC_FAILURE            0x101
+ #define TPM_RC_LOCALITY           0x907
+ 
++int tpm_util_get_buffer_size(int tpm_fd, TPMVersion tpm_version,
++                             size_t *buffersize);
++
++typedef struct TPMSizedBuffer {
++    uint32_t size;
++    uint8_t  *buffer;
++} TPMSizedBuffer;
++
++void tpm_sized_buffer_reset(TPMSizedBuffer *tsb);
++
+ #endif /* TPM_TPM_INT_H */
+diff --git a/hw/tpm/tpm_util.h b/hw/tpm/tpm_util.h
+index 7889081fba..d524935576 100644
+--- a/hw/tpm/tpm_util.h
++++ b/hw/tpm/tpm_util.h
+@@ -66,19 +66,9 @@ static inline void tpm_cmd_set_error(void *b, uint32_t error)
+     stl_be_p(b + 6, error);
+ }
+ 
+-int tpm_util_get_buffer_size(int tpm_fd, TPMVersion tpm_version,
+-                             size_t *buffersize);
+-
+ #define DEFINE_PROP_TPMBE(_n, _s, _f)                     \
+     DEFINE_PROP(_n, _s, _f, qdev_prop_tpm, TPMBackend *)
+ 
+-typedef struct TPMSizedBuffer {
+-    uint32_t size;
+-    uint8_t  *buffer;
+-} TPMSizedBuffer;
+-
+-void tpm_sized_buffer_reset(TPMSizedBuffer *tsb);
+-
+ void tpm_util_show_buffer(const unsigned char *buffer,
+                           size_t buffer_size, const char *string);
  
 -- 
 2.21.3
