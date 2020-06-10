@@ -8,71 +8,71 @@ X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59782C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 23:35:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03034C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 23:39:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 109082074B
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 23:35:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ADCB42074B
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 23:39:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H7qx/7Wh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 109082074B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VO31r8tF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ADCB42074B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37430 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40428 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjAFW-0008B6-Bd
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 19:35:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58172)
+	id 1jjAJR-0001cw-1N
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 19:39:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59088)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jjAEi-0007i7-9o; Wed, 10 Jun 2020 19:34:24 -0400
-Received: from mail-il1-x143.google.com ([2607:f8b0:4864:20::143]:34748)
+ id 1jjAIe-0001AR-Of; Wed, 10 Jun 2020 19:38:28 -0400
+Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:38651)
  by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jjAEf-0008OS-Oa; Wed, 10 Jun 2020 19:34:23 -0400
-Received: by mail-il1-x143.google.com with SMTP id x18so3749864ilp.1;
- Wed, 10 Jun 2020 16:34:07 -0700 (PDT)
+ id 1jjAId-0000kb-FE; Wed, 10 Jun 2020 19:38:28 -0400
+Received: by mail-io1-xd42.google.com with SMTP id w18so4319822iom.5;
+ Wed, 10 Jun 2020 16:38:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=6OmcG62RhWTGisMVwEjFuIa06nh1OGYk0ffcVvJ5uOA=;
- b=H7qx/7WhjfGTspQxEq5TyxCahXo9OOlMIRT2orgxuHqf0HEjcGloiqI6PLSvyE/b3o
- CZNxSKiZIE4Bn2GM9yL5a4kifJmKcSakRXfJp7CgsfOWtnBPfO5fGQKKkoPt+zD6aTwM
- EtgEDOv5NhDZ4WDX5QaTbWA7/gXFGkMOVB7CY/cqOhoqZM2NAg4nwuLdin9aRzIjUEJF
- afbY4OnF5ek3BsN0JkPkP9WVv5750w1M2PwxCqzUr14N1pJ75UbdxHUrpzGsPx5RPchK
- dDH8trDGdIh+xnY4AUxgOCyjKwp5L10/ECa+Fctn5Aa1rcKlEvlzODBiglwmlVFyNkxF
- I16g==
+ :cc; bh=u0RGaeg9J4xUAx2oJDbclv1mXAnEXirbV3Ldefw/WhM=;
+ b=VO31r8tFlcNjASqpZj8s9TkE3INQDdDAComwPfOjX7ZNrIsQVyJxhEmee31jxvYunR
+ aMJ2Z9nwsacEPJJShvxCjKZ+/8MlU09K2yjz50VRekaODNArnf+dPoJa5o7rTyyq9FT+
+ JS4Qibhj9XUKmP5amXezrmP2M6cb0G+BMm7Y06T3D4gegLGL5t6sYNJlMGRljKlwkRu+
+ jAUAjgB7V4qptwRTSwxIB4notPKytZQxXZTPg7AhQ78QMCuvEWWOtU9dYN/FBxC2tuFF
+ ZzpZg6XEJ1kg7OmrIV0UrPesYpRuG3dlxKRKgSDUu7x++FItLUW8e66FSxINJFJQsKCk
+ 1Ksg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=6OmcG62RhWTGisMVwEjFuIa06nh1OGYk0ffcVvJ5uOA=;
- b=BNFz5ZrBKmvFUBlYJtNaeZVUlCOcpRb5x/5DkT4z0nSeXVM4BJBYm6EiWsDN+MN2Ue
- bK/xf2GKwz6dqnEc8JSqLcilMEnioiFE/COyP2/QmZwPXtALoiYPn4+tR40zVs0sxuKY
- tmUSeOr+ejM+kNGS+xIlRPkT8pvvgb+Oyb5e3IK6yN9pM75TwJGy8FN/YZh2px+beBwA
- r5C+MM3ZdlcMjs+O6a41eJjmVBMQzNBQRMPLqbIYTfZ3YWW3gPFehczgoWErOSjDl2s9
- lKqlwl74VyHXU5rx9hk66Di4QdRoiJWtxjNkMI6NcA0dcPA4FYF3lL77HkXp/ao3okLW
- ndCw==
-X-Gm-Message-State: AOAM531jYPoSy69BOJXwA4mA5kaW6TA8dOHNH2WaaOBtV2oWW6qvXM+f
- Jygm4O8NAn3UVzGRSIQKzAxIAh7A1wrDf975Z58=
-X-Google-Smtp-Source: ABdhPJwgqBAZQfGy+kZ0Q8XcpHDN0O8X4+yQw9UBz9SAy/b6unNu66iKrZHsMqgrW+a2UAGU8bIL9LRD033hd7pRMew=
-X-Received: by 2002:a92:bb45:: with SMTP id w66mr5524139ili.131.1591832045676; 
- Wed, 10 Jun 2020 16:34:05 -0700 (PDT)
+ bh=u0RGaeg9J4xUAx2oJDbclv1mXAnEXirbV3Ldefw/WhM=;
+ b=BZs8WBUL+CCYIbduSAhc6sRYtwbNVCkB7J0UZjcXeFSNLcPheVWyb59srPzpNBB21q
+ V+491IypnXgGSf2gAeh/1G5WmQiJaBf71Jbf5+LTeBkra6RGm74MUPOBUsSngMvesY/p
+ olWkjVYWOpjpuq/lX0cjSnNaxhP+XkhY7aOlIuXLIr4EuqHQF3rCPlMB/YgMZ65fLXm3
+ g9A0HAtZm3hOmafV+z6AqKKK4rC02NACBlOAungUXKIPs5Ke3eT30HSPBJOuHw1+D/bo
+ vZqjQqxv0bWRuALvc+yCFt7WjPBq3HJOnq6MaMj1cjslq+A4HNfbmGb30oyHqBeysAmV
+ VQ1g==
+X-Gm-Message-State: AOAM530CAJ/oCp2Ho/lpKloOIPqNM8eHcM6RQetL64W5wIDTWkhPhdu2
+ SSyFtux5DiqG9t1yRMDS5+0j0F3/E5p911kIWzE=
+X-Google-Smtp-Source: ABdhPJyYIFXcepY2Nlmbzpt8jojDLiGfTfeY1W2PyOWafPl0W6zbJjLzD5/wHYYbr+UsJoU/gdCh3MEqodL/6Nm9zDg=
+X-Received: by 2002:a5d:9604:: with SMTP id w4mr5973289iol.105.1591832293765; 
+ Wed, 10 Jun 2020 16:38:13 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200529114641.121332-1-anup.patel@wdc.com>
- <20200529114641.121332-6-anup.patel@wdc.com>
-In-Reply-To: <20200529114641.121332-6-anup.patel@wdc.com>
+ <20200529114641.121332-4-anup.patel@wdc.com>
+In-Reply-To: <20200529114641.121332-4-anup.patel@wdc.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Wed, 10 Jun 2020 16:24:43 -0700
-Message-ID: <CAKmqyKPqb_zYmbtUBVzN36_N6n91c7m05n1SU1R+u8qfmZHu3A@mail.gmail.com>
-Subject: Re: [PATCH v5 5/5] hw/riscv: virt: Allow creating multiple NUMA
- sockets
+Date: Wed, 10 Jun 2020 16:28:51 -0700
+Message-ID: <CAKmqyKMLp_U6hzd+6YAcCXtuXga0gZFUDB3-5SDuRTn3cJN_VA@mail.gmail.com>
+Subject: Re: [PATCH v5 3/5] hw/riscv: Add helpers for RISC-V multi-socket NUMA
+ machines
 To: Anup Patel <anup.patel@wdc.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::143;
- envelope-from=alistair23@gmail.com; helo=mail-il1-x143.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::d42;
+ envelope-from=alistair23@gmail.com; helo=mail-io1-xd42.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -17
@@ -105,735 +105,353 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, May 29, 2020 at 4:49 AM Anup Patel <anup.patel@wdc.com> wrote:
+On Fri, May 29, 2020 at 4:48 AM Anup Patel <anup.patel@wdc.com> wrote:
 >
-> We extend RISC-V virt machine to allow creating a multi-socket
-> machine. Each RISC-V virt machine socket is a NUMA node having
-> a set of HARTs, a memory instance, a CLINT instance, and a PLIC
-> instance. Other devices are shared between all sockets. We also
-> update the generated device tree accordingly.
+> We add common helper routines which can be shared by RISC-V
+> multi-socket NUMA machines.
 >
-> By default, NUMA multi-socket support is disabled for RISC-V virt
-> machine. To enable it, users can use "-numa" command-line options
-> of QEMU.
->
-> Example1: For two NUMA nodes with 2 CPUs each, append following
-> to command-line options: "-smp 4 -numa node -numa node"
->
-> Example2: For two NUMA nodes with 1 and 3 CPUs, append following
-> to command-line options:
-> "-smp 4 -numa node -numa node -numa cpu,node-id=0,core-id=0 \
-> -numa cpu,node-id=1,core-id=1 -numa cpu,node-id=1,core-id=2 \
-> -numa cpu,node-id=1,core-id=3"
->
-> The maximum number of sockets in a RISC-V virt machine is 8
-> but this limit can be changed in future.
+> We have two types of helpers:
+> 1. riscv_socket_xyz() - These helper assist managing multiple
+>    sockets irrespective whether QEMU NUMA is enabled/disabled
+> 2. riscv_numa_xyz() - These helpers assist in providing
+>    necessary QEMU machine callbacks for QEMU NUMA emulation
 >
 > Signed-off-by: Anup Patel <anup.patel@wdc.com>
 > ---
->  hw/riscv/virt.c         | 530 +++++++++++++++++++++++-----------------
->  include/hw/riscv/virt.h |   9 +-
->  2 files changed, 308 insertions(+), 231 deletions(-)
+>  hw/riscv/Makefile.objs  |   1 +
+>  hw/riscv/numa.c         | 242 ++++++++++++++++++++++++++++++++++++++++
+>  include/hw/riscv/numa.h |  51 +++++++++
+>  3 files changed, 294 insertions(+)
+>  create mode 100644 hw/riscv/numa.c
+>  create mode 100644 include/hw/riscv/numa.h
+
+I don't love that we have an entire file of functions to help with
+NUMA when no other arch seems to have anything this complex.
+
+What about RISC-V requires extra complexity?
+
 >
-> diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-> index 421815081d..2863b42cea 100644
-> --- a/hw/riscv/virt.c
-> +++ b/hw/riscv/virt.c
-> @@ -35,6 +35,7 @@
->  #include "hw/riscv/sifive_test.h"
->  #include "hw/riscv/virt.h"
->  #include "hw/riscv/boot.h"
+> diff --git a/hw/riscv/Makefile.objs b/hw/riscv/Makefile.objs
+> index fc3c6dd7c8..4483e61879 100644
+> --- a/hw/riscv/Makefile.objs
+> +++ b/hw/riscv/Makefile.objs
+> @@ -1,4 +1,5 @@
+>  obj-y += boot.o
+> +obj-y += numa.o
+>  obj-$(CONFIG_SPIKE) += riscv_htif.o
+>  obj-$(CONFIG_HART) += riscv_hart.o
+>  obj-$(CONFIG_SIFIVE_E) += sifive_e.o
+> diff --git a/hw/riscv/numa.c b/hw/riscv/numa.c
+> new file mode 100644
+> index 0000000000..4f92307102
+> --- /dev/null
+> +++ b/hw/riscv/numa.c
+> @@ -0,0 +1,242 @@
+> +/*
+> + * QEMU RISC-V NUMA Helper
+> + *
+> + * Copyright (c) 2020 Western Digital Corporation or its affiliates.
+> + *
+> + * This program is free software; you can redistribute it and/or modify it
+> + * under the terms and conditions of the GNU General Public License,
+> + * version 2 or later, as published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope it will be useful, but WITHOUT
+> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+> + * more details.
+> + *
+> + * You should have received a copy of the GNU General Public License along with
+> + * this program.  If not, see <http://www.gnu.org/licenses/>.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qemu/units.h"
+> +#include "qemu/log.h"
+> +#include "qemu/error-report.h"
+> +#include "qapi/error.h"
+> +#include "hw/boards.h"
+> +#include "hw/qdev-properties.h"
 > +#include "hw/riscv/numa.h"
->  #include "chardev/char.h"
->  #include "sysemu/arch_init.h"
->  #include "sysemu/device_tree.h"
-> @@ -60,7 +61,7 @@ static const struct MemmapEntry {
->      [VIRT_TEST] =        {   0x100000,        0x1000 },
->      [VIRT_RTC] =         {   0x101000,        0x1000 },
->      [VIRT_CLINT] =       {  0x2000000,       0x10000 },
-> -    [VIRT_PLIC] =        {  0xc000000,     0x4000000 },
-> +    [VIRT_PLIC] =        {  0xc000000, VIRT_PLIC_SIZE(VIRT_CPUS_MAX * 2) },
->      [VIRT_UART0] =       { 0x10000000,         0x100 },
->      [VIRT_VIRTIO] =      { 0x10001000,        0x1000 },
->      [VIRT_FLASH] =       { 0x20000000,     0x4000000 },
-> @@ -182,10 +183,17 @@ static void create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
->      uint64_t mem_size, const char *cmdline)
->  {
->      void *fdt;
-> -    int cpu, i;
-> -    uint32_t *cells;
-> -    char *nodename;
-> -    uint32_t plic_phandle, test_phandle, phandle = 1;
-> +    int i, cpu, socket;
-> +    MachineState *mc = MACHINE(s);
-> +    uint64_t addr, size;
-> +    uint32_t *clint_cells, *plic_cells;
-> +    unsigned long clint_addr, plic_addr;
-> +    uint32_t plic_phandle[MAX_NODES];
-> +    uint32_t cpu_phandle, intc_phandle, test_phandle;
-> +    uint32_t phandle = 1, plic_mmio_phandle = 1;
-> +    uint32_t plic_pcie_phandle = 1, plic_virtio_phandle = 1;
-> +    char *mem_name, *cpu_name, *core_name, *intc_name;
-> +    char *name, *clint_name, *plic_name, *clust_name;
->      hwaddr flashsize = virt_memmap[VIRT_FLASH].size / 2;
->      hwaddr flashbase = virt_memmap[VIRT_FLASH].base;
->
-> @@ -206,231 +214,238 @@ static void create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
->      qemu_fdt_setprop_cell(fdt, "/soc", "#size-cells", 0x2);
->      qemu_fdt_setprop_cell(fdt, "/soc", "#address-cells", 0x2);
->
-> -    nodename = g_strdup_printf("/memory@%lx",
-> -        (long)memmap[VIRT_DRAM].base);
-> -    qemu_fdt_add_subnode(fdt, nodename);
-> -    qemu_fdt_setprop_cells(fdt, nodename, "reg",
-> -        memmap[VIRT_DRAM].base >> 32, memmap[VIRT_DRAM].base,
-> -        mem_size >> 32, mem_size);
-> -    qemu_fdt_setprop_string(fdt, nodename, "device_type", "memory");
-> -    g_free(nodename);
-> -
->      qemu_fdt_add_subnode(fdt, "/cpus");
->      qemu_fdt_setprop_cell(fdt, "/cpus", "timebase-frequency",
->                            SIFIVE_CLINT_TIMEBASE_FREQ);
->      qemu_fdt_setprop_cell(fdt, "/cpus", "#size-cells", 0x0);
->      qemu_fdt_setprop_cell(fdt, "/cpus", "#address-cells", 0x1);
-> +    qemu_fdt_add_subnode(fdt, "/cpus/cpu-map");
-
-I'm no expert with cpu-map. Do you mind CCing Atish in the next
-version and see if he can Ack these DT changes?
-
+> +#include "sysemu/device_tree.h"
 > +
-> +    for (socket = (riscv_socket_count(mc) - 1); socket >= 0; socket--) {
-> +        clust_name = g_strdup_printf("/cpus/cpu-map/cluster%d", socket);
-> +        qemu_fdt_add_subnode(fdt, clust_name);
+> +static bool numa_enabled(const MachineState *ms)
+> +{
+> +    return (ms->numa_state && ms->numa_state->num_nodes) ? true : false;
+> +}
 > +
-> +        plic_cells = g_new0(uint32_t, s->soc[socket].num_harts * 4);
-> +        clint_cells = g_new0(uint32_t, s->soc[socket].num_harts * 4);
+> +int riscv_socket_count(const MachineState *ms)
+> +{
+> +    return (numa_enabled(ms)) ? ms->numa_state->num_nodes : 1;
+> +}
 > +
-> +        for (cpu = s->soc[socket].num_harts - 1; cpu >= 0; cpu--) {
-> +            cpu_phandle = phandle++;
->
-> -    for (cpu = s->soc.num_harts - 1; cpu >= 0; cpu--) {
-> -        int cpu_phandle = phandle++;
-> -        int intc_phandle;
-> -        nodename = g_strdup_printf("/cpus/cpu@%d", cpu);
-> -        char *intc = g_strdup_printf("/cpus/cpu@%d/interrupt-controller", cpu);
-> -        char *isa = riscv_isa_string(&s->soc.harts[cpu]);
-> -        qemu_fdt_add_subnode(fdt, nodename);
-> +            cpu_name = g_strdup_printf("/cpus/cpu@%d",
-> +                s->soc[socket].hartid_base + cpu);
-> +            qemu_fdt_add_subnode(fdt, cpu_name);
->  #if defined(TARGET_RISCV32)
-> -        qemu_fdt_setprop_string(fdt, nodename, "mmu-type", "riscv,sv32");
-> +            qemu_fdt_setprop_string(fdt, cpu_name, "mmu-type", "riscv,sv32");
->  #else
-> -        qemu_fdt_setprop_string(fdt, nodename, "mmu-type", "riscv,sv48");
-> +            qemu_fdt_setprop_string(fdt, cpu_name, "mmu-type", "riscv,sv48");
->  #endif
-> -        qemu_fdt_setprop_string(fdt, nodename, "riscv,isa", isa);
-> -        qemu_fdt_setprop_string(fdt, nodename, "compatible", "riscv");
-> -        qemu_fdt_setprop_string(fdt, nodename, "status", "okay");
-> -        qemu_fdt_setprop_cell(fdt, nodename, "reg", cpu);
-> -        qemu_fdt_setprop_string(fdt, nodename, "device_type", "cpu");
-> -        qemu_fdt_setprop_cell(fdt, nodename, "phandle", cpu_phandle);
-> -        intc_phandle = phandle++;
-> -        qemu_fdt_add_subnode(fdt, intc);
-> -        qemu_fdt_setprop_cell(fdt, intc, "phandle", intc_phandle);
-> -        qemu_fdt_setprop_string(fdt, intc, "compatible", "riscv,cpu-intc");
-> -        qemu_fdt_setprop(fdt, intc, "interrupt-controller", NULL, 0);
-> -        qemu_fdt_setprop_cell(fdt, intc, "#interrupt-cells", 1);
-> -        g_free(isa);
-> -        g_free(intc);
-> -        g_free(nodename);
-> -    }
-> +            name = riscv_isa_string(&s->soc[socket].harts[cpu]);
-> +            qemu_fdt_setprop_string(fdt, cpu_name, "riscv,isa", name);
-> +            g_free(name);
-> +            qemu_fdt_setprop_string(fdt, cpu_name, "compatible", "riscv");
-> +            qemu_fdt_setprop_string(fdt, cpu_name, "status", "okay");
-> +            qemu_fdt_setprop_cell(fdt, cpu_name, "reg",
-> +                s->soc[socket].hartid_base + cpu);
-> +            qemu_fdt_setprop_string(fdt, cpu_name, "device_type", "cpu");
-> +            riscv_socket_fdt_write_id(mc, fdt, cpu_name, socket);
-> +            qemu_fdt_setprop_cell(fdt, cpu_name, "phandle", cpu_phandle);
+> +int riscv_socket_first_hartid(const MachineState *ms, int socket_id)
+> +{
+> +    int i, first_hartid = ms->smp.cpus;
 > +
-> +            intc_name = g_strdup_printf("%s/interrupt-controller", cpu_name);
-> +            qemu_fdt_add_subnode(fdt, intc_name);
-> +            intc_phandle = phandle++;
-> +            qemu_fdt_setprop_cell(fdt, intc_name, "phandle", intc_phandle);
-> +            qemu_fdt_setprop_string(fdt, intc_name, "compatible",
-> +                "riscv,cpu-intc");
-> +            qemu_fdt_setprop(fdt, intc_name, "interrupt-controller", NULL, 0);
-> +            qemu_fdt_setprop_cell(fdt, intc_name, "#interrupt-cells", 1);
-> +
-> +            clint_cells[cpu * 4 + 0] = cpu_to_be32(intc_phandle);
-> +            clint_cells[cpu * 4 + 1] = cpu_to_be32(IRQ_M_SOFT);
-> +            clint_cells[cpu * 4 + 2] = cpu_to_be32(intc_phandle);
-> +            clint_cells[cpu * 4 + 3] = cpu_to_be32(IRQ_M_TIMER);
-> +
-> +            plic_cells[cpu * 4 + 0] = cpu_to_be32(intc_phandle);
-> +            plic_cells[cpu * 4 + 1] = cpu_to_be32(IRQ_M_EXT);
-> +            plic_cells[cpu * 4 + 2] = cpu_to_be32(intc_phandle);
-> +            plic_cells[cpu * 4 + 3] = cpu_to_be32(IRQ_S_EXT);
-> +
-> +            core_name = g_strdup_printf("%s/core%d", clust_name, cpu);
-> +            qemu_fdt_add_subnode(fdt, core_name);
-> +            qemu_fdt_setprop_cell(fdt, core_name, "cpu", cpu_phandle);
-> +
-> +            g_free(core_name);
-> +            g_free(intc_name);
-> +            g_free(cpu_name);
-> +        }
->
-> -    /* Add cpu-topology node */
-> -    qemu_fdt_add_subnode(fdt, "/cpus/cpu-map");
-> -    qemu_fdt_add_subnode(fdt, "/cpus/cpu-map/cluster0");
-> -    for (cpu = s->soc.num_harts - 1; cpu >= 0; cpu--) {
-> -        char *core_nodename = g_strdup_printf("/cpus/cpu-map/cluster0/core%d",
-> -                                              cpu);
-> -        char *cpu_nodename = g_strdup_printf("/cpus/cpu@%d", cpu);
-> -        uint32_t intc_phandle = qemu_fdt_get_phandle(fdt, cpu_nodename);
-> -        qemu_fdt_add_subnode(fdt, core_nodename);
-> -        qemu_fdt_setprop_cell(fdt, core_nodename, "cpu", intc_phandle);
-> -        g_free(core_nodename);
-> -        g_free(cpu_nodename);
-> +        addr = memmap[VIRT_DRAM].base + riscv_socket_mem_offset(mc, socket);
-> +        size = riscv_socket_mem_size(mc, socket);
-> +        mem_name = g_strdup_printf("/memory@%lx", (long)addr);
-> +        qemu_fdt_add_subnode(fdt, mem_name);
-> +        qemu_fdt_setprop_cells(fdt, mem_name, "reg",
-> +            addr >> 32, addr, size >> 32, size);
-> +        qemu_fdt_setprop_string(fdt, mem_name, "device_type", "memory");
-> +        riscv_socket_fdt_write_id(mc, fdt, mem_name, socket);
-> +        g_free(mem_name);
-> +
-> +        clint_addr = memmap[VIRT_CLINT].base +
-> +            (memmap[VIRT_CLINT].size * socket);
-> +        clint_name = g_strdup_printf("/soc/clint@%lx", clint_addr);
-> +        qemu_fdt_add_subnode(fdt, clint_name);
-> +        qemu_fdt_setprop_string(fdt, clint_name, "compatible", "riscv,clint0");
-> +        qemu_fdt_setprop_cells(fdt, clint_name, "reg",
-> +            0x0, clint_addr, 0x0, memmap[VIRT_CLINT].size);
-> +        qemu_fdt_setprop(fdt, clint_name, "interrupts-extended",
-> +            clint_cells, s->soc[socket].num_harts * sizeof(uint32_t) * 4);
-> +        riscv_socket_fdt_write_id(mc, fdt, clint_name, socket);
-> +        g_free(clint_name);
-> +
-> +        plic_phandle[socket] = phandle++;
-> +        plic_addr = memmap[VIRT_PLIC].base + (memmap[VIRT_PLIC].size * socket);
-> +        plic_name = g_strdup_printf("/soc/plic@%lx", plic_addr);
-> +        qemu_fdt_add_subnode(fdt, plic_name);
-> +        qemu_fdt_setprop_cell(fdt, plic_name,
-> +            "#address-cells", FDT_PLIC_ADDR_CELLS);
-> +        qemu_fdt_setprop_cell(fdt, plic_name,
-> +            "#interrupt-cells", FDT_PLIC_INT_CELLS);
-> +        qemu_fdt_setprop_string(fdt, plic_name, "compatible", "riscv,plic0");
-> +        qemu_fdt_setprop(fdt, plic_name, "interrupt-controller", NULL, 0);
-> +        qemu_fdt_setprop(fdt, plic_name, "interrupts-extended",
-> +            plic_cells, s->soc[socket].num_harts * sizeof(uint32_t) * 4);
-> +        qemu_fdt_setprop_cells(fdt, plic_name, "reg",
-> +            0x0, plic_addr, 0x0, memmap[VIRT_PLIC].size);
-> +        qemu_fdt_setprop_cell(fdt, plic_name, "riscv,ndev", VIRTIO_NDEV);
-> +        riscv_socket_fdt_write_id(mc, fdt, plic_name, socket);
-> +        qemu_fdt_setprop_cell(fdt, plic_name, "phandle", plic_phandle[socket]);
-> +        g_free(plic_name);
-> +
-> +        g_free(clint_cells);
-> +        g_free(plic_cells);
-> +        g_free(clust_name);
->      }
->
-> -    cells =  g_new0(uint32_t, s->soc.num_harts * 4);
-> -    for (cpu = 0; cpu < s->soc.num_harts; cpu++) {
-> -        nodename =
-> -            g_strdup_printf("/cpus/cpu@%d/interrupt-controller", cpu);
-> -        uint32_t intc_phandle = qemu_fdt_get_phandle(fdt, nodename);
-> -        cells[cpu * 4 + 0] = cpu_to_be32(intc_phandle);
-> -        cells[cpu * 4 + 1] = cpu_to_be32(IRQ_M_SOFT);
-> -        cells[cpu * 4 + 2] = cpu_to_be32(intc_phandle);
-> -        cells[cpu * 4 + 3] = cpu_to_be32(IRQ_M_TIMER);
-> -        g_free(nodename);
-> -    }
-> -    nodename = g_strdup_printf("/soc/clint@%lx",
-> -        (long)memmap[VIRT_CLINT].base);
-> -    qemu_fdt_add_subnode(fdt, nodename);
-> -    qemu_fdt_setprop_string(fdt, nodename, "compatible", "riscv,clint0");
-> -    qemu_fdt_setprop_cells(fdt, nodename, "reg",
-> -        0x0, memmap[VIRT_CLINT].base,
-> -        0x0, memmap[VIRT_CLINT].size);
-> -    qemu_fdt_setprop(fdt, nodename, "interrupts-extended",
-> -        cells, s->soc.num_harts * sizeof(uint32_t) * 4);
-> -    g_free(cells);
-> -    g_free(nodename);
-> -
-> -    plic_phandle = phandle++;
-> -    cells =  g_new0(uint32_t, s->soc.num_harts * 4);
-> -    for (cpu = 0; cpu < s->soc.num_harts; cpu++) {
-> -        nodename =
-> -            g_strdup_printf("/cpus/cpu@%d/interrupt-controller", cpu);
-> -        uint32_t intc_phandle = qemu_fdt_get_phandle(fdt, nodename);
-> -        cells[cpu * 4 + 0] = cpu_to_be32(intc_phandle);
-> -        cells[cpu * 4 + 1] = cpu_to_be32(IRQ_M_EXT);
-> -        cells[cpu * 4 + 2] = cpu_to_be32(intc_phandle);
-> -        cells[cpu * 4 + 3] = cpu_to_be32(IRQ_S_EXT);
-> -        g_free(nodename);
-> +    for (socket = 0; socket < riscv_socket_count(mc); socket++) {
-> +        if (socket == 0) {
-> +            plic_mmio_phandle = plic_phandle[socket];
-> +            plic_virtio_phandle = plic_phandle[socket];
-> +            plic_pcie_phandle = plic_phandle[socket];
-> +        }
-> +        if (socket == 1) {
-> +            plic_virtio_phandle = plic_phandle[socket];
-> +            plic_pcie_phandle = plic_phandle[socket];
-> +        }
-> +        if (socket == 2) {
-> +            plic_pcie_phandle = plic_phandle[socket];
-> +        }
->      }
-> -    nodename = g_strdup_printf("/soc/interrupt-controller@%lx",
-> -        (long)memmap[VIRT_PLIC].base);
-> -    qemu_fdt_add_subnode(fdt, nodename);
-> -    qemu_fdt_setprop_cell(fdt, nodename, "#address-cells",
-> -                          FDT_PLIC_ADDR_CELLS);
-> -    qemu_fdt_setprop_cell(fdt, nodename, "#interrupt-cells",
-> -                          FDT_PLIC_INT_CELLS);
-> -    qemu_fdt_setprop_string(fdt, nodename, "compatible", "riscv,plic0");
-> -    qemu_fdt_setprop(fdt, nodename, "interrupt-controller", NULL, 0);
-> -    qemu_fdt_setprop(fdt, nodename, "interrupts-extended",
-> -        cells, s->soc.num_harts * sizeof(uint32_t) * 4);
-> -    qemu_fdt_setprop_cells(fdt, nodename, "reg",
-> -        0x0, memmap[VIRT_PLIC].base,
-> -        0x0, memmap[VIRT_PLIC].size);
-> -    qemu_fdt_setprop_cell(fdt, nodename, "riscv,ndev", VIRTIO_NDEV);
-> -    qemu_fdt_setprop_cell(fdt, nodename, "phandle", plic_phandle);
-> -    plic_phandle = qemu_fdt_get_phandle(fdt, nodename);
-> -    g_free(cells);
-> -    g_free(nodename);
-> +
-> +    riscv_socket_fdt_write_distance_matrix(mc, fdt);
->
->      for (i = 0; i < VIRTIO_COUNT; i++) {
-> -        nodename = g_strdup_printf("/virtio_mmio@%lx",
-> +        name = g_strdup_printf("/soc/virtio_mmio@%lx",
->              (long)(memmap[VIRT_VIRTIO].base + i * memmap[VIRT_VIRTIO].size));
-> -        qemu_fdt_add_subnode(fdt, nodename);
-> -        qemu_fdt_setprop_string(fdt, nodename, "compatible", "virtio,mmio");
-> -        qemu_fdt_setprop_cells(fdt, nodename, "reg",
-> +        qemu_fdt_add_subnode(fdt, name);
-> +        qemu_fdt_setprop_string(fdt, name, "compatible", "virtio,mmio");
-> +        qemu_fdt_setprop_cells(fdt, name, "reg",
->              0x0, memmap[VIRT_VIRTIO].base + i * memmap[VIRT_VIRTIO].size,
->              0x0, memmap[VIRT_VIRTIO].size);
-> -        qemu_fdt_setprop_cell(fdt, nodename, "interrupt-parent", plic_phandle);
-> -        qemu_fdt_setprop_cell(fdt, nodename, "interrupts", VIRTIO_IRQ + i);
-> -        g_free(nodename);
-> +        qemu_fdt_setprop_cell(fdt, name, "interrupt-parent",
-> +            plic_virtio_phandle);
-> +        qemu_fdt_setprop_cell(fdt, name, "interrupts", VIRTIO_IRQ + i);
-> +        g_free(name);
->      }
->
-> -    nodename = g_strdup_printf("/soc/pci@%lx",
-> +    name = g_strdup_printf("/soc/pci@%lx",
->          (long) memmap[VIRT_PCIE_ECAM].base);
-> -    qemu_fdt_add_subnode(fdt, nodename);
-> -    qemu_fdt_setprop_cell(fdt, nodename, "#address-cells",
-> -                          FDT_PCI_ADDR_CELLS);
-> -    qemu_fdt_setprop_cell(fdt, nodename, "#interrupt-cells",
-> -                          FDT_PCI_INT_CELLS);
-> -    qemu_fdt_setprop_cell(fdt, nodename, "#size-cells", 0x2);
-> -    qemu_fdt_setprop_string(fdt, nodename, "compatible",
-> -                            "pci-host-ecam-generic");
-> -    qemu_fdt_setprop_string(fdt, nodename, "device_type", "pci");
-> -    qemu_fdt_setprop_cell(fdt, nodename, "linux,pci-domain", 0);
-> -    qemu_fdt_setprop_cells(fdt, nodename, "bus-range", 0,
-> -                           memmap[VIRT_PCIE_ECAM].size /
-> -                               PCIE_MMCFG_SIZE_MIN - 1);
-> -    qemu_fdt_setprop(fdt, nodename, "dma-coherent", NULL, 0);
-> -    qemu_fdt_setprop_cells(fdt, nodename, "reg", 0, memmap[VIRT_PCIE_ECAM].base,
-> -                           0, memmap[VIRT_PCIE_ECAM].size);
-> -    qemu_fdt_setprop_sized_cells(fdt, nodename, "ranges",
-> +    qemu_fdt_add_subnode(fdt, name);
-> +    qemu_fdt_setprop_cell(fdt, name, "#address-cells", FDT_PCI_ADDR_CELLS);
-> +    qemu_fdt_setprop_cell(fdt, name, "#interrupt-cells", FDT_PCI_INT_CELLS);
-> +    qemu_fdt_setprop_cell(fdt, name, "#size-cells", 0x2);
-> +    qemu_fdt_setprop_string(fdt, name, "compatible", "pci-host-ecam-generic");
-> +    qemu_fdt_setprop_string(fdt, name, "device_type", "pci");
-> +    qemu_fdt_setprop_cell(fdt, name, "linux,pci-domain", 0);
-> +    qemu_fdt_setprop_cells(fdt, name, "bus-range", 0,
-> +        memmap[VIRT_PCIE_ECAM].size / PCIE_MMCFG_SIZE_MIN - 1);
-> +    qemu_fdt_setprop(fdt, name, "dma-coherent", NULL, 0);
-> +    qemu_fdt_setprop_cells(fdt, name, "reg", 0,
-> +        memmap[VIRT_PCIE_ECAM].base, 0, memmap[VIRT_PCIE_ECAM].size);
-> +    qemu_fdt_setprop_sized_cells(fdt, name, "ranges",
->          1, FDT_PCI_RANGE_IOPORT, 2, 0,
->          2, memmap[VIRT_PCIE_PIO].base, 2, memmap[VIRT_PCIE_PIO].size,
->          1, FDT_PCI_RANGE_MMIO,
->          2, memmap[VIRT_PCIE_MMIO].base,
->          2, memmap[VIRT_PCIE_MMIO].base, 2, memmap[VIRT_PCIE_MMIO].size);
-> -    create_pcie_irq_map(fdt, nodename, plic_phandle);
-> -    g_free(nodename);
-> +    create_pcie_irq_map(fdt, name, plic_pcie_phandle);
-> +    g_free(name);
->
->      test_phandle = phandle++;
-> -    nodename = g_strdup_printf("/test@%lx",
-> +    name = g_strdup_printf("/soc/test@%lx",
->          (long)memmap[VIRT_TEST].base);
-> -    qemu_fdt_add_subnode(fdt, nodename);
-> +    qemu_fdt_add_subnode(fdt, name);
->      {
->          const char compat[] = "sifive,test1\0sifive,test0\0syscon";
-> -        qemu_fdt_setprop(fdt, nodename, "compatible", compat, sizeof(compat));
-> +        qemu_fdt_setprop(fdt, name, "compatible", compat, sizeof(compat));
->      }
-> -    qemu_fdt_setprop_cells(fdt, nodename, "reg",
-> +    qemu_fdt_setprop_cells(fdt, name, "reg",
->          0x0, memmap[VIRT_TEST].base,
->          0x0, memmap[VIRT_TEST].size);
-> -    qemu_fdt_setprop_cell(fdt, nodename, "phandle", test_phandle);
-> -    test_phandle = qemu_fdt_get_phandle(fdt, nodename);
-> -    g_free(nodename);
-> -
-> -    nodename = g_strdup_printf("/reboot");
-> -    qemu_fdt_add_subnode(fdt, nodename);
-> -    qemu_fdt_setprop_string(fdt, nodename, "compatible", "syscon-reboot");
-> -    qemu_fdt_setprop_cell(fdt, nodename, "regmap", test_phandle);
-> -    qemu_fdt_setprop_cell(fdt, nodename, "offset", 0x0);
-> -    qemu_fdt_setprop_cell(fdt, nodename, "value", FINISHER_RESET);
-> -    g_free(nodename);
-> -
-> -    nodename = g_strdup_printf("/poweroff");
-> -    qemu_fdt_add_subnode(fdt, nodename);
-> -    qemu_fdt_setprop_string(fdt, nodename, "compatible", "syscon-poweroff");
-> -    qemu_fdt_setprop_cell(fdt, nodename, "regmap", test_phandle);
-> -    qemu_fdt_setprop_cell(fdt, nodename, "offset", 0x0);
-> -    qemu_fdt_setprop_cell(fdt, nodename, "value", FINISHER_PASS);
-> -    g_free(nodename);
-> -
-> -    nodename = g_strdup_printf("/uart@%lx",
-> -        (long)memmap[VIRT_UART0].base);
-> -    qemu_fdt_add_subnode(fdt, nodename);
-> -    qemu_fdt_setprop_string(fdt, nodename, "compatible", "ns16550a");
-> -    qemu_fdt_setprop_cells(fdt, nodename, "reg",
-> +    qemu_fdt_setprop_cell(fdt, name, "phandle", test_phandle);
-> +    test_phandle = qemu_fdt_get_phandle(fdt, name);
-> +    g_free(name);
-> +
-> +    name = g_strdup_printf("/soc/reboot");
-> +    qemu_fdt_add_subnode(fdt, name);
-> +    qemu_fdt_setprop_string(fdt, name, "compatible", "syscon-reboot");
-> +    qemu_fdt_setprop_cell(fdt, name, "regmap", test_phandle);
-> +    qemu_fdt_setprop_cell(fdt, name, "offset", 0x0);
-> +    qemu_fdt_setprop_cell(fdt, name, "value", FINISHER_RESET);
-> +    g_free(name);
-> +
-> +    name = g_strdup_printf("/soc/poweroff");
-> +    qemu_fdt_add_subnode(fdt, name);
-> +    qemu_fdt_setprop_string(fdt, name, "compatible", "syscon-poweroff");
-> +    qemu_fdt_setprop_cell(fdt, name, "regmap", test_phandle);
-> +    qemu_fdt_setprop_cell(fdt, name, "offset", 0x0);
-> +    qemu_fdt_setprop_cell(fdt, name, "value", FINISHER_PASS);
-> +    g_free(name);
-> +
-> +    name = g_strdup_printf("/soc/uart@%lx", (long)memmap[VIRT_UART0].base);
-> +    qemu_fdt_add_subnode(fdt, name);
-> +    qemu_fdt_setprop_string(fdt, name, "compatible", "ns16550a");
-> +    qemu_fdt_setprop_cells(fdt, name, "reg",
->          0x0, memmap[VIRT_UART0].base,
->          0x0, memmap[VIRT_UART0].size);
-> -    qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency", 3686400);
-> -    qemu_fdt_setprop_cell(fdt, nodename, "interrupt-parent", plic_phandle);
-> -    qemu_fdt_setprop_cell(fdt, nodename, "interrupts", UART0_IRQ);
-> +    qemu_fdt_setprop_cell(fdt, name, "clock-frequency", 3686400);
-> +    qemu_fdt_setprop_cell(fdt, name, "interrupt-parent", plic_mmio_phandle);
-> +    qemu_fdt_setprop_cell(fdt, name, "interrupts", UART0_IRQ);
->
->      qemu_fdt_add_subnode(fdt, "/chosen");
-> -    qemu_fdt_setprop_string(fdt, "/chosen", "stdout-path", nodename);
-> +    qemu_fdt_setprop_string(fdt, "/chosen", "stdout-path", name);
->      if (cmdline) {
->          qemu_fdt_setprop_string(fdt, "/chosen", "bootargs", cmdline);
->      }
-> -    g_free(nodename);
-> -
-> -    nodename = g_strdup_printf("/rtc@%lx",
-> -        (long)memmap[VIRT_RTC].base);
-> -    qemu_fdt_add_subnode(fdt, nodename);
-> -    qemu_fdt_setprop_string(fdt, nodename, "compatible",
-> -        "google,goldfish-rtc");
-> -    qemu_fdt_setprop_cells(fdt, nodename, "reg",
-> +    g_free(name);
-> +
-> +    name = g_strdup_printf("/soc/rtc@%lx", (long)memmap[VIRT_RTC].base);
-> +    qemu_fdt_add_subnode(fdt, name);
-> +    qemu_fdt_setprop_string(fdt, name, "compatible", "google,goldfish-rtc");
-> +    qemu_fdt_setprop_cells(fdt, name, "reg",
->          0x0, memmap[VIRT_RTC].base,
->          0x0, memmap[VIRT_RTC].size);
-> -    qemu_fdt_setprop_cell(fdt, nodename, "interrupt-parent", plic_phandle);
-> -    qemu_fdt_setprop_cell(fdt, nodename, "interrupts", RTC_IRQ);
-> -    g_free(nodename);
-> -
-> -    nodename = g_strdup_printf("/flash@%" PRIx64, flashbase);
-> -    qemu_fdt_add_subnode(s->fdt, nodename);
-> -    qemu_fdt_setprop_string(s->fdt, nodename, "compatible", "cfi-flash");
-> -    qemu_fdt_setprop_sized_cells(s->fdt, nodename, "reg",
-> +    qemu_fdt_setprop_cell(fdt, name, "interrupt-parent", plic_mmio_phandle);
-> +    qemu_fdt_setprop_cell(fdt, name, "interrupts", RTC_IRQ);
-> +    g_free(name);
-> +
-> +    name = g_strdup_printf("/soc/flash@%" PRIx64, flashbase);
-> +    qemu_fdt_add_subnode(s->fdt, name);
-> +    qemu_fdt_setprop_string(s->fdt, name, "compatible", "cfi-flash");
-> +    qemu_fdt_setprop_sized_cells(s->fdt, name, "reg",
->                                   2, flashbase, 2, flashsize,
->                                   2, flashbase + flashsize, 2, flashsize);
-> -    qemu_fdt_setprop_cell(s->fdt, nodename, "bank-width", 4);
-> -    g_free(nodename);
-> +    qemu_fdt_setprop_cell(s->fdt, name, "bank-width", 4);
-> +    g_free(name);
->  }
->
-> -
->  static inline DeviceState *gpex_pcie_init(MemoryRegion *sys_mem,
->                                            hwaddr ecam_base, hwaddr ecam_size,
->                                            hwaddr mmio_base, hwaddr mmio_size,
-> @@ -478,21 +493,100 @@ static void riscv_virt_board_init(MachineState *machine)
->      MemoryRegion *system_memory = get_system_memory();
->      MemoryRegion *main_mem = g_new(MemoryRegion, 1);
->      MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
-> -    char *plic_hart_config;
-> +    char *plic_hart_config, *soc_name;
->      size_t plic_hart_config_len;
->      target_ulong start_addr = memmap[VIRT_DRAM].base;
-> -    int i;
-> -    unsigned int smp_cpus = machine->smp.cpus;
-> -
-> -    /* Initialize SOC */
-> -    object_initialize_child(OBJECT(machine), "soc", &s->soc, sizeof(s->soc),
-> -                            TYPE_RISCV_HART_ARRAY, &error_abort, NULL);
-> -    object_property_set_str(OBJECT(&s->soc), machine->cpu_type, "cpu-type",
-> -                            &error_abort);
-> -    object_property_set_int(OBJECT(&s->soc), smp_cpus, "num-harts",
-> -                            &error_abort);
-> -    object_property_set_bool(OBJECT(&s->soc), true, "realized",
-> -                            &error_abort);
-> +    DeviceState *mmio_plic, *virtio_plic, *pcie_plic;
-> +    int i, j, base_hartid, hart_count;
-> +
-> +    /* Check socket count limit */
-> +    if (VIRT_SOCKETS_MAX < riscv_socket_count(machine)) {
-> +        error_report("number of sockets/nodes should be less than %d",
-> +            VIRT_SOCKETS_MAX);
-> +        exit(1);
+> +    if (!numa_enabled(ms)) {
+> +        return (!socket_id) ? 0 : -1;
 > +    }
 > +
-> +    /* Initialize sockets */
-> +    mmio_plic = virtio_plic = pcie_plic = NULL;
-> +    for (i = 0; i < riscv_socket_count(machine); i++) {
-> +        if (!riscv_socket_check_hartids(machine, i)) {
-> +            error_report("discontinuous hartids in socket%d", i);
-> +            exit(1);
+> +    for (i = 0; i < ms->smp.cpus; i++) {
+> +        if (ms->possible_cpus->cpus[i].props.node_id != socket_id) {
+> +            continue;
 > +        }
-> +
-> +        base_hartid = riscv_socket_first_hartid(machine, i);
-> +        if (base_hartid < 0) {
-> +            error_report("can't find hartid base for socket%d", i);
-> +            exit(1);
+> +        if (i < first_hartid) {
+> +            first_hartid = i;
 > +        }
+> +    }
 > +
-> +        hart_count = riscv_socket_hart_count(machine, i);
-> +        if (hart_count < 0) {
-> +            error_report("can't find hart count for socket%d", i);
-> +            exit(1);
+> +    return (first_hartid < ms->smp.cpus) ? first_hartid : -1;
+> +}
+> +
+> +int riscv_socket_last_hartid(const MachineState *ms, int socket_id)
+> +{
+> +    int i, last_hartid = -1;
+> +
+> +    if (!numa_enabled(ms)) {
+> +        return (!socket_id) ? ms->smp.cpus - 1 : -1;
+> +    }
+> +
+> +    for (i = 0; i < ms->smp.cpus; i++) {
+> +        if (ms->possible_cpus->cpus[i].props.node_id != socket_id) {
+> +            continue;
 > +        }
+> +        if (i > last_hartid) {
+> +            last_hartid = i;
+> +        }
+> +    }
 > +
-> +        soc_name = g_strdup_printf("soc%d", i);
-> +        object_initialize_child(OBJECT(machine), soc_name, &s->soc[i],
-> +            sizeof(s->soc[i]), TYPE_RISCV_HART_ARRAY, &error_abort, NULL);
-> +        g_free(soc_name);
-> +        object_property_set_str(OBJECT(&s->soc[i]),
-> +            machine->cpu_type, "cpu-type", &error_abort);
-> +        object_property_set_int(OBJECT(&s->soc[i]),
-> +            base_hartid, "hartid-base", &error_abort);
-> +        object_property_set_int(OBJECT(&s->soc[i]),
-> +            hart_count, "num-harts", &error_abort);
-> +        object_property_set_bool(OBJECT(&s->soc[i]),
-> +            true, "realized", &error_abort);
+> +    return (last_hartid < ms->smp.cpus) ? last_hartid : -1;
+> +}
 > +
-> +        /* Per-socket CLINT */
-> +        sifive_clint_create(
-> +            memmap[VIRT_CLINT].base + i * memmap[VIRT_CLINT].size,
-> +            memmap[VIRT_CLINT].size, base_hartid, hart_count,
-> +            SIFIVE_SIP_BASE, SIFIVE_TIMECMP_BASE, SIFIVE_TIME_BASE, true);
+> +int riscv_socket_hart_count(const MachineState *ms, int socket_id)
+> +{
+> +    int first_hartid, last_hartid;
 > +
-> +        /* Per-socket PLIC hart topology configuration string */
-> +        plic_hart_config_len =
-> +            (strlen(VIRT_PLIC_HART_CONFIG) + 1) * hart_count;
-> +        plic_hart_config = g_malloc0(plic_hart_config_len);
-> +        for (j = 0; j < hart_count; j++) {
-> +            if (j != 0) {
-> +                strncat(plic_hart_config, ",", plic_hart_config_len);
+> +    if (!numa_enabled(ms)) {
+> +        return (!socket_id) ? ms->smp.cpus : -1;
+> +    }
+> +
+> +    first_hartid = riscv_socket_first_hartid(ms, socket_id);
+> +    if (first_hartid < 0) {
+> +        return -1;
+> +    }
+> +
+> +    last_hartid = riscv_socket_last_hartid(ms, socket_id);
+> +    if (last_hartid < 0) {
+> +        return -1;
+> +    }
+> +
+> +    if (first_hartid > last_hartid) {
+> +        return -1;
+> +    }
+> +
+> +    return last_hartid - first_hartid + 1;
+> +}
+> +
+> +bool riscv_socket_check_hartids(const MachineState *ms, int socket_id)
+> +{
+> +    int i, first_hartid, last_hartid;
+> +
+> +    if (!numa_enabled(ms)) {
+> +        return (!socket_id) ? true : false;
+> +    }
+> +
+> +    first_hartid = riscv_socket_first_hartid(ms, socket_id);
+> +    if (first_hartid < 0) {
+> +        return false;
+> +    }
+> +
+> +    last_hartid = riscv_socket_last_hartid(ms, socket_id);
+> +    if (last_hartid < 0) {
+> +        return false;
+> +    }
+> +
+> +    for (i = first_hartid; i <= last_hartid; i++) {
+> +        if (ms->possible_cpus->cpus[i].props.node_id != socket_id) {
+> +            return false;
+> +        }
+> +    }
+> +
+> +    return true;
+> +}
+> +
+> +uint64_t riscv_socket_mem_offset(const MachineState *ms, int socket_id)
+> +{
+> +    int i;
+> +    uint64_t mem_offset = 0;
+> +
+> +    if (!numa_enabled(ms)) {
+> +        return 0;
+> +    }
+> +
+> +    for (i = 0; i < ms->numa_state->num_nodes; i++) {
+> +        if (i == socket_id) {
+> +            break;
+> +        }
+> +        mem_offset += ms->numa_state->nodes[i].node_mem;
+> +    }
+> +
+> +    return (i == socket_id) ? mem_offset : 0;
+> +}
+> +
+> +uint64_t riscv_socket_mem_size(const MachineState *ms, int socket_id)
+> +{
+> +    if (!numa_enabled(ms)) {
+> +        return (!socket_id) ? ms->ram_size : 0;
+> +    }
+> +
+> +    return (socket_id < ms->numa_state->num_nodes) ?
+> +            ms->numa_state->nodes[socket_id].node_mem : 0;
+> +}
+> +
+> +void riscv_socket_fdt_write_id(const MachineState *ms, void *fdt,
+> +                               const char *node_name, int socket_id)
+> +{
+> +    if (numa_enabled(ms)) {
+> +        qemu_fdt_setprop_cell(fdt, node_name, "numa-node-id", socket_id);
+> +    }
+> +}
+> +
+> +void riscv_socket_fdt_write_distance_matrix(const MachineState *ms, void *fdt)
+> +{
+> +    int i, j, idx;
+> +    uint32_t *dist_matrix, dist_matrix_size;
+> +
+> +    if (numa_enabled(ms) && ms->numa_state->have_numa_distance) {
+> +        dist_matrix_size = riscv_socket_count(ms) * riscv_socket_count(ms);
+> +        dist_matrix_size *= (3 * sizeof(uint32_t));
+> +        dist_matrix = g_malloc0(dist_matrix_size);
+> +
+> +        for (i = 0; i < riscv_socket_count(ms); i++) {
+> +            for (j = 0; j < riscv_socket_count(ms); j++) {
+> +                idx = (i * riscv_socket_count(ms) + j) * 3;
+> +                dist_matrix[idx + 0] = cpu_to_be32(i);
+> +                dist_matrix[idx + 1] = cpu_to_be32(j);
+> +                dist_matrix[idx + 2] =
+> +                    cpu_to_be32(ms->numa_state->nodes[i].distance[j]);
 > +            }
-> +            strncat(plic_hart_config, VIRT_PLIC_HART_CONFIG,
-> +                plic_hart_config_len);
-> +            plic_hart_config_len -= (strlen(VIRT_PLIC_HART_CONFIG) + 1);
 > +        }
 > +
-> +        /* Per-socket PLIC */
-> +        s->plic[i] = sifive_plic_create(
-> +            memmap[VIRT_PLIC].base + i * memmap[VIRT_PLIC].size,
-> +            plic_hart_config, base_hartid,
-> +            VIRT_PLIC_NUM_SOURCES,
-> +            VIRT_PLIC_NUM_PRIORITIES,
-> +            VIRT_PLIC_PRIORITY_BASE,
-> +            VIRT_PLIC_PENDING_BASE,
-> +            VIRT_PLIC_ENABLE_BASE,
-> +            VIRT_PLIC_ENABLE_STRIDE,
-> +            VIRT_PLIC_CONTEXT_BASE,
-> +            VIRT_PLIC_CONTEXT_STRIDE,
-> +            memmap[VIRT_PLIC].size);
-> +        g_free(plic_hart_config);
+> +        qemu_fdt_add_subnode(fdt, "/distance-map");
+> +        qemu_fdt_setprop_string(fdt, "/distance-map", "compatible",
+> +                                "numa-distance-map-v1");
+> +        qemu_fdt_setprop(fdt, "/distance-map", "distance-matrix",
+> +                         dist_matrix, dist_matrix_size);
+> +        g_free(dist_matrix);
+> +    }
+> +}
 > +
-> +        /* Try to use different PLIC instance based device type */
-
-Why do we have different types of PLICs?
-
-> +        if (i == 0) {
-> +            mmio_plic = s->plic[i];
-> +            virtio_plic = s->plic[i];
-> +            pcie_plic = s->plic[i];
-> +        }
-> +        if (i == 1) {
-> +            virtio_plic = s->plic[i];
-> +            pcie_plic = s->plic[i];
-> +        }
-> +        if (i == 2) {
-> +            pcie_plic = s->plic[i];
+> +CpuInstanceProperties
+> +riscv_numa_cpu_index_to_props(MachineState *ms, unsigned cpu_index)
+> +{
+> +    MachineClass *mc = MACHINE_GET_CLASS(ms);
+> +    const CPUArchIdList *possible_cpus = mc->possible_cpu_arch_ids(ms);
+> +
+> +    assert(cpu_index < possible_cpus->len);
+> +    return possible_cpus->cpus[cpu_index].props;
+> +}
+> +
+> +int64_t riscv_numa_get_default_cpu_node_id(const MachineState *ms, int idx)
+> +{
+> +    int64_t nidx = 0;
+> +
+> +    if (ms->numa_state->num_nodes) {
+> +        nidx = idx / (ms->smp.cpus / ms->numa_state->num_nodes);
+> +        if (ms->numa_state->num_nodes <= nidx) {
+> +            nidx = ms->numa_state->num_nodes - 1;
 > +        }
 > +    }
->
->      /* register system main memory (actual RAM) */
->      memory_region_init_ram(main_mem, NULL, "riscv_virt_board.ram",
-> @@ -571,38 +665,14 @@ static void riscv_virt_board_init(MachineState *machine)
->                            memmap[VIRT_MROM].base + sizeof(reset_vec),
->                            &address_space_memory);
->
-> -    /* create PLIC hart topology configuration string */
-> -    plic_hart_config_len = (strlen(VIRT_PLIC_HART_CONFIG) + 1) * smp_cpus;
-> -    plic_hart_config = g_malloc0(plic_hart_config_len);
-> -    for (i = 0; i < smp_cpus; i++) {
-> -        if (i != 0) {
-> -            strncat(plic_hart_config, ",", plic_hart_config_len);
-> -        }
-> -        strncat(plic_hart_config, VIRT_PLIC_HART_CONFIG, plic_hart_config_len);
-> -        plic_hart_config_len -= (strlen(VIRT_PLIC_HART_CONFIG) + 1);
-> -    }
-> -
-> -    /* MMIO */
-> -    s->plic = sifive_plic_create(memmap[VIRT_PLIC].base,
-> -        plic_hart_config, 0,
-> -        VIRT_PLIC_NUM_SOURCES,
-> -        VIRT_PLIC_NUM_PRIORITIES,
-> -        VIRT_PLIC_PRIORITY_BASE,
-> -        VIRT_PLIC_PENDING_BASE,
-> -        VIRT_PLIC_ENABLE_BASE,
-> -        VIRT_PLIC_ENABLE_STRIDE,
-> -        VIRT_PLIC_CONTEXT_BASE,
-> -        VIRT_PLIC_CONTEXT_STRIDE,
-> -        memmap[VIRT_PLIC].size);
-> -    sifive_clint_create(memmap[VIRT_CLINT].base,
-> -        memmap[VIRT_CLINT].size, 0, smp_cpus,
-> -        SIFIVE_SIP_BASE, SIFIVE_TIMECMP_BASE, SIFIVE_TIME_BASE, true);
-> +    /* SiFive Test MMIO device */
->      sifive_test_create(memmap[VIRT_TEST].base);
->
-> +    /* VirtIO MMIO devices */
->      for (i = 0; i < VIRTIO_COUNT; i++) {
->          sysbus_create_simple("virtio-mmio",
->              memmap[VIRT_VIRTIO].base + i * memmap[VIRT_VIRTIO].size,
-> -            qdev_get_gpio_in(DEVICE(s->plic), VIRTIO_IRQ + i));
-> +            qdev_get_gpio_in(DEVICE(virtio_plic), VIRTIO_IRQ + i));
->      }
->
->      gpex_pcie_init(system_memory,
-> @@ -611,14 +681,14 @@ static void riscv_virt_board_init(MachineState *machine)
->                           memmap[VIRT_PCIE_MMIO].base,
->                           memmap[VIRT_PCIE_MMIO].size,
->                           memmap[VIRT_PCIE_PIO].base,
-> -                         DEVICE(s->plic), true);
-> +                         DEVICE(pcie_plic), true);
->
->      serial_mm_init(system_memory, memmap[VIRT_UART0].base,
-> -        0, qdev_get_gpio_in(DEVICE(s->plic), UART0_IRQ), 399193,
-> +        0, qdev_get_gpio_in(DEVICE(mmio_plic), UART0_IRQ), 399193,
->          serial_hd(0), DEVICE_LITTLE_ENDIAN);
->
->      sysbus_create_simple("goldfish_rtc", memmap[VIRT_RTC].base,
-> -        qdev_get_gpio_in(DEVICE(s->plic), RTC_IRQ));
-> +        qdev_get_gpio_in(DEVICE(mmio_plic), RTC_IRQ));
->
->      virt_flash_create(s);
->
-> @@ -628,8 +698,6 @@ static void riscv_virt_board_init(MachineState *machine)
->                                    drive_get(IF_PFLASH, 0, i));
->      }
->      virt_flash_map(s, system_memory);
-> -
-> -    g_free(plic_hart_config);
->  }
->
->  static void riscv_virt_machine_instance_init(Object *obj)
-> @@ -642,9 +710,13 @@ static void riscv_virt_machine_class_init(ObjectClass *oc, void *data)
->
->      mc->desc = "RISC-V VirtIO board";
->      mc->init = riscv_virt_board_init;
-> -    mc->max_cpus = 8;
-> +    mc->max_cpus = VIRT_CPUS_MAX;
->      mc->default_cpu_type = VIRT_CPU;
->      mc->pci_allow_0_address = true;
-> +    mc->possible_cpu_arch_ids = riscv_numa_possible_cpu_arch_ids;
-> +    mc->cpu_index_to_instance_props = riscv_numa_cpu_index_to_props;
-> +    mc->get_default_cpu_node_id = riscv_numa_get_default_cpu_node_id;
-> +    mc->numa_mem_supported = true;
->  }
->
->  static const TypeInfo riscv_virt_machine_typeinfo = {
-> diff --git a/include/hw/riscv/virt.h b/include/hw/riscv/virt.h
-> index e69355efaf..1beacd7666 100644
-> --- a/include/hw/riscv/virt.h
-> +++ b/include/hw/riscv/virt.h
-> @@ -23,6 +23,9 @@
->  #include "hw/sysbus.h"
->  #include "hw/block/flash.h"
->
-> +#define VIRT_CPUS_MAX 8
-> +#define VIRT_SOCKETS_MAX 8
 > +
->  #define TYPE_RISCV_VIRT_MACHINE MACHINE_TYPE_NAME("virt")
->  #define RISCV_VIRT_MACHINE(obj) \
->      OBJECT_CHECK(RISCVVirtState, (obj), TYPE_RISCV_VIRT_MACHINE)
-> @@ -32,8 +35,8 @@ typedef struct {
->      MachineState parent;
->
->      /*< public >*/
-> -    RISCVHartArrayState soc;
-> -    DeviceState *plic;
-> +    RISCVHartArrayState soc[VIRT_SOCKETS_MAX];
-> +    DeviceState *plic[VIRT_SOCKETS_MAX];
->      PFlashCFI01 *flash[2];
->
->      void *fdt;
-> @@ -74,6 +77,8 @@ enum {
->  #define VIRT_PLIC_ENABLE_STRIDE 0x80
->  #define VIRT_PLIC_CONTEXT_BASE 0x200000
->  #define VIRT_PLIC_CONTEXT_STRIDE 0x1000
-> +#define VIRT_PLIC_SIZE(__num_context) \
-> +    (VIRT_PLIC_CONTEXT_BASE + (__num_context) * VIRT_PLIC_CONTEXT_STRIDE)
->
->  #define FDT_PCI_ADDR_CELLS    3
->  #define FDT_PCI_INT_CELLS     1
+> +    return nidx;
+> +}
+> +
+> +const CPUArchIdList *riscv_numa_possible_cpu_arch_ids(MachineState *ms)
+> +{
+> +    int n;
+> +    unsigned int max_cpus = ms->smp.max_cpus;
+> +
+> +    if (ms->possible_cpus) {
+> +        assert(ms->possible_cpus->len == max_cpus);
+> +        return ms->possible_cpus;
+> +    }
+> +
+> +    ms->possible_cpus = g_malloc0(sizeof(CPUArchIdList) +
+> +                                  sizeof(CPUArchId) * max_cpus);
+> +    ms->possible_cpus->len = max_cpus;
+> +    for (n = 0; n < ms->possible_cpus->len; n++) {
+> +        ms->possible_cpus->cpus[n].type = ms->cpu_type;
+> +        ms->possible_cpus->cpus[n].arch_id = n;
+> +        ms->possible_cpus->cpus[n].props.has_core_id = true;
+> +        ms->possible_cpus->cpus[n].props.core_id = n;
+> +    }
+> +
+> +    return ms->possible_cpus;
+> +}
+> diff --git a/include/hw/riscv/numa.h b/include/hw/riscv/numa.h
+> new file mode 100644
+> index 0000000000..fd9517a315
+> --- /dev/null
+> +++ b/include/hw/riscv/numa.h
+> @@ -0,0 +1,51 @@
+> +/*
+> + * QEMU RISC-V NUMA Helper
+> + *
+> + * Copyright (c) 2020 Western Digital Corporation or its affiliates.
+> + *
+> + * This program is free software; you can redistribute it and/or modify it
+> + * under the terms and conditions of the GNU General Public License,
+> + * version 2 or later, as published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope it will be useful, but WITHOUT
+> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+> + * more details.
+> + *
+> + * You should have received a copy of the GNU General Public License along with
+> + * this program.  If not, see <http://www.gnu.org/licenses/>.
+> + */
+> +
+> +#ifndef RISCV_NUMA_H
+> +#define RISCV_NUMA_H
+> +
+> +#include "hw/sysbus.h"
+> +#include "sysemu/numa.h"
+> +
+> +int riscv_socket_count(const MachineState *ms);
+> +
+> +int riscv_socket_first_hartid(const MachineState *ms, int socket_id);
+> +
+> +int riscv_socket_last_hartid(const MachineState *ms, int socket_id);
+> +
+> +int riscv_socket_hart_count(const MachineState *ms, int socket_id);
+> +
+> +uint64_t riscv_socket_mem_offset(const MachineState *ms, int socket_id);
+> +
+> +uint64_t riscv_socket_mem_size(const MachineState *ms, int socket_id);
+> +
+> +bool riscv_socket_check_hartids(const MachineState *ms, int socket_id);
+> +
+> +void riscv_socket_fdt_write_id(const MachineState *ms, void *fdt,
+> +                               const char *node_name, int socket_id);
+> +
+> +void riscv_socket_fdt_write_distance_matrix(const MachineState *ms, void *fdt);
+> +
+> +CpuInstanceProperties
+> +riscv_numa_cpu_index_to_props(MachineState *ms, unsigned cpu_index);
+> +
+> +int64_t riscv_numa_get_default_cpu_node_id(const MachineState *ms, int idx);
+> +
+> +const CPUArchIdList *riscv_numa_possible_cpu_arch_ids(MachineState *ms);
+
+Can we add some comments for the functions of what they are expected
+to return (and that -1 is an error)?
+
+Alistair
+
+> +
+> +#endif /* RISCV_NUMA_H */
 > --
 > 2.25.1
 >
