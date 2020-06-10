@@ -2,129 +2,82 @@ Return-Path: <SRS0=wemX=7X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AC15C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 16:53:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EDE09C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 17:02:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E99162067B
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 16:53:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="QW7r/dvW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E99162067B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=openvz.org
+	by mail.kernel.org (Postfix) with ESMTPS id C0B51204EC
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 17:02:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0B51204EC
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49668 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59276 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jj3yG-0001zx-5s
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 12:53:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43986)
+	id 1jj475-0007Nj-1C
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 13:02:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45920)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <den@virtuozzo.com>)
- id 1jj3xe-0001TD-K0; Wed, 10 Jun 2020 12:52:22 -0400
-Received: from mail-eopbgr70122.outbound.protection.outlook.com
- ([40.107.7.122]:46848 helo=EUR04-HE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <den@virtuozzo.com>)
- id 1jj3xc-00022F-7U; Wed, 10 Jun 2020 12:52:22 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RnWdv+RwMoqzeLpcplfrVoPvZ9sOSOatPolgz3DJ1CATH5G6sH8P/rTF0ThxHFdol67+Eyn3ryXyNKqcEI2LCF13YJxk1LZaQAizaQlj0o25JUEqSjIdSrHB6FwRAEIi3BEwoHxgxskFe6Z6B/Zi0XJtOCOphiechh93npSru/djU+TeQisc197ajp8rpIrUbLg9s2+H7txf9WljVoC5VBvTEfnrEXwKsyQeJMJPOqigv6K0vf0pbsXBcQrpM7bsEcQybdd8FR8D85beht7N3PK5NlYVZhubi4chFDxnqBfpoVDybKbreHQkqGc6z3ak/OpZEPt6T1QeC8fikJeJjg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=H5ff7dMKWnEDvM4DD3VW3G3AxumyL1x6VkawwhDy9ss=;
- b=HhIjfg5yMkYu9kqTd0HnXA5ud4fazPI9pui4Ml5mcHE0O4F1WWmTUMoAWZf4rA/8AgHZMxI3uctwV905odqC74NilTyt1DrgrS956iaWiuko68N2B2Vgg7dcMSgsUrixG3su2p8aw08SmasGCx2Das7LqSqMo3T+EcriGQoXm4UooSTWG4i1nM0LbfcXMNwhQ8evvT0mltDa08wqXQPb3vNJega1ERxzudm3yJ45DpKjAHoZYNfl6LJ8iZlHWcdx1UFS4IP9Z0X9V45PGMdcb9pvolyVhetkAt/7OArYpRVZQx3Ns6tppdzcR5v+EibGMoRpujfVUGr9BMvRSgxzXw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none header.from=openvz.org;
- dkim=pass header.d=openvz.org; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=H5ff7dMKWnEDvM4DD3VW3G3AxumyL1x6VkawwhDy9ss=;
- b=QW7r/dvWXqVX587av2cHoIRPXOlGU6ZuCe314UvEEoBXFOS6od6SEMEg4PABSW2U/cWlfpfbFt52QrRFEKkAZuN2m3nrYJnOzGNTYjY/IqSHtB1H+xkHH7EBMPtsszRGqvFyvrmsHin8rzuFHkt+Adrz7UIqdXcksjy4U1qiz9U=
-Authentication-Results: virtuozzo.com; dkim=none (message not signed)
- header.d=none;virtuozzo.com; dmarc=none action=none header.from=openvz.org;
-Received: from AM6PR08MB4214.eurprd08.prod.outlook.com (2603:10a6:20b:8d::30)
- by AM6PR08MB4487.eurprd08.prod.outlook.com (2603:10a6:20b:74::17)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3066.18; Wed, 10 Jun
- 2020 16:52:15 +0000
-Received: from AM6PR08MB4214.eurprd08.prod.outlook.com
- ([fe80::821:7596:cf7f:68f8]) by AM6PR08MB4214.eurprd08.prod.outlook.com
- ([fe80::821:7596:cf7f:68f8%4]) with mapi id 15.20.3088.018; Wed, 10 Jun 2020
- 16:52:15 +0000
-Subject: Re: [PATCH 1/2] aio: allow to wait for coroutine pool from different
- coroutine
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org
-References: <20200610144129.27659-1-den@openvz.org>
- <20200610144129.27659-2-den@openvz.org>
- <e2208bb0-fc7d-b97f-a4ae-d8e4b265db4d@virtuozzo.com>
-From: "Denis V. Lunev" <den@openvz.org>
-Message-ID: <94f7d905-8d08-2f40-7212-1a79550a386a@openvz.org>
-Date: Wed, 10 Jun 2020 19:52:12 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
-In-Reply-To: <e2208bb0-fc7d-b97f-a4ae-d8e4b265db4d@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-ClientProxiedBy: HE1PR0901CA0061.eurprd09.prod.outlook.com
- (2603:10a6:3:45::29) To AM6PR08MB4214.eurprd08.prod.outlook.com
- (2603:10a6:20b:8d::30)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jj45y-0006nv-Jv
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 13:00:58 -0400
+Received: from indium.canonical.com ([91.189.90.7]:46684)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jj45x-0003yx-35
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 13:00:58 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jj45u-0006FC-NH
+ for <qemu-devel@nongnu.org>; Wed, 10 Jun 2020 17:00:54 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id AAD2E2E8106
+ for <qemu-devel@nongnu.org>; Wed, 10 Jun 2020 17:00:54 +0000 (UTC)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.1.27] (31.148.204.195) by
- HE1PR0901CA0061.eurprd09.prod.outlook.com (2603:10a6:3:45::29) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3088.21 via Frontend Transport; Wed, 10 Jun 2020 16:52:14 +0000
-X-Originating-IP: [31.148.204.195]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: b8f42113-6840-4532-bff3-08d80d5ea0d0
-X-MS-TrafficTypeDiagnostic: AM6PR08MB4487:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM6PR08MB4487EC7B90D525507C2A6CA5B6830@AM6PR08MB4487.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
-X-Forefront-PRVS: 0430FA5CB7
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: XDfL/kg+D8GIvhZzsLihNvq2wW8s3AbEgQV+Ohh38fRbjxOgXWN+jICKSVzPcTVvi/UJmsF4aH5BxsqsaOgSr/YTzAMySktEbEXGn3ZI/GZalagSgiuL0LuvIYeU6XfMUHkqjtHZUgzHLNbHX6+n3X3tNiSUJzfkHkp3aYK+VnPfjo7S5Fy9e84B3nKTJl6jBZPQW3uX65M+kf/6YMIqRiXk+LYMRpIq28HtNBn0kTPHhS7xvA2oSazhIuXcfLMTJ4mSpy9PPV+oXs4O54wjYnhvvWwDNiz1vPzCPo1jftvFZ5UyQ5D+hGxm4RboDr595ktdWMK1fFW7i2m1wH5rmQhxNsiJryuFTf0Vt6ngIE8m3V4FG0FaWedYIwT5JUGd
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM6PR08MB4214.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(366004)(346002)(136003)(376002)(39850400004)(396003)(186003)(16526019)(52116002)(26005)(53546011)(83380400001)(66476007)(66556008)(83170400001)(2906002)(66946007)(2616005)(478600001)(54906003)(4326008)(36756003)(31686004)(8676002)(8936002)(6486002)(16576012)(107886003)(956004)(316002)(42882007)(5660300002)(31696002)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: 0VlC9POWeMPRLKKvatAfu5j5CESg61OzaSDBqjMPgqOr3M0T8ZxraLt77aEZKe2SPsMJvrrH5Q7rFYA7K23YJgK4QFhiOQiYhTAsYMVhTgtzGj3oX3gG0bsT75/JM7of4Z3Pz42NtXIvZczNIpgAy9k8ajPbDEy6owTnHyxDKboxe1l+dWAIjXTjarmO2NdO8a2sPVxFyf1IGVnqQ9yX6AV8r4ctvgpR5K12tiaG3IYi7MNn3eRkL8p6mGwZq3WJv8YVIKKkW1pI2bLjwq+VR+xVPyaza5V0/hT2yb08evqiaZmD9E68I3yCh4dMRV6I7e14icJHm2jimUp1PqOSbBFK4+pPZs5jI3w/L25eJT9qCMmuKzwexyFXGi9GFY42LaoVNj3kHTxwA6pUHrbG+mGG/QkjQ+53/ywTSvWF+JKWqMFgcCljNkOBQGFv8+RHhXHM1eIxFMg0eVOtdJYUTCqXCqQ5FA9ENwC+w4wf9OesxjkEv6Z6Xr2LeKAq359i
-X-OriginatorOrg: openvz.org
-X-MS-Exchange-CrossTenant-Network-Message-Id: b8f42113-6840-4532-bff3-08d80d5ea0d0
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jun 2020 16:52:15.0396 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: mB8l+6+BJicqXdxHZjC8xrVbJ6kqJSfTzDQH+EHac1LBafqRTx9LH8jhpI7miwqv90bn5rrzH/LfOD8Nycg6Aw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4487
-Received-SPF: pass client-ip=40.107.7.122; envelope-from=den@virtuozzo.com;
- helo=EUR04-HE1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/10 12:52:16
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -26
-X-Spam_score: -2.7
-X-Spam_bar: --
-X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 10 Jun 2020 16:53:54 -0000
+From: "Laszlo Ersek \(Red Hat\)" <1882671@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
+ status=Confirmed; importance=Undecided; assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: janitor lersek vvaltchev
+X-Launchpad-Bug-Reporter: Vladislav K. Valtchev (vvaltchev)
+X-Launchpad-Bug-Modifier: Laszlo Ersek (Red Hat) (lersek)
+References: <159169936514.32294.8785049859239547612.malonedeb@gac.canonical.com>
+Message-Id: <159180803476.8114.4541490092043850606.malone@gac.canonical.com>
+Subject: [Bug 1882671] Re: qemu-system-x86_64 (ver 4.2) stuck at boot with
+ OVMF bios
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="b190cebbf563f89e480a8b57f641753c8196bda0";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: d7546103f60c2893fc8409b3d0eb2d6a0410f5e2
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/10 11:11:22
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -133,73 +86,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Denis Plotnikov <dplotnikov@virtuozzo.com>,
- Max Reitz <mreitz@redhat.com>
+Reply-To: Bug 1882671 <1882671@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/10/20 6:10 PM, Vladimir Sementsov-Ogievskiy wrote:
-> 10.06.2020 17:41, Denis V. Lunev wrote:
->> The patch preserves the constraint that the only waiter is allowed.
->>
->> Signed-off-by: Denis V. Lunev <den@openvz.org>
->> CC: Kevin Wolf <kwolf@redhat.com>
->> CC: Max Reitz <mreitz@redhat.com>
->> CC: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> CC: Denis Plotnikov <dplotnikov@virtuozzo.com>
->> ---
->>   block/aio_task.c | 8 ++++----
->>   1 file changed, 4 insertions(+), 4 deletions(-)
->>
->> diff --git a/block/aio_task.c b/block/aio_task.c
->> index 88989fa248..f338049147 100644
->> --- a/block/aio_task.c
->> +++ b/block/aio_task.c
->> @@ -27,7 +27,7 @@
->>   #include "block/aio_task.h"
->>     struct AioTaskPool {
->> -    Coroutine *main_co;
->> +    Coroutine *wake_co;
->>       int status;
->>       int max_busy_tasks;
->>       int busy_tasks;
->> @@ -54,15 +54,15 @@ static void coroutine_fn aio_task_co(void *opaque)
->>         if (pool->waiting) {
->>           pool->waiting = false;
->> -        aio_co_wake(pool->main_co);
->> +        aio_co_wake(pool->wake_co);
->>       }
->>   }
->>     void coroutine_fn aio_task_pool_wait_one(AioTaskPool *pool)
->>   {
->>       assert(pool->busy_tasks > 0);
->> -    assert(qemu_coroutine_self() == pool->main_co);
->>   +    pool->wake_co = qemu_coroutine_self();
->>       pool->waiting = true;
->>       qemu_coroutine_yield();
->>   @@ -98,7 +98,7 @@ AioTaskPool *coroutine_fn aio_task_pool_new(int
->> max_busy_tasks)
->>   {
->>       AioTaskPool *pool = g_new0(AioTaskPool, 1);
->>   -    pool->main_co = qemu_coroutine_self();
->> +    pool->wake_co = NULL;
->>       pool->max_busy_tasks = max_busy_tasks;
->>         return pool;
->>
->
-> With such approach, if several coroutines will wait simultaneously,
-> the only one will be finally woken and other will hang.
->
-> I think, we should use CoQueue here: CoQueue instead of wake_co,
-> qemu_co_queue_wait in wait_one, and qemu_co_queue_next instead of
-> aio_co_wake.
->
->
-I will make a check, but for now it would be enough to
-add
-  assert(!pool->waiting);
-at the beginning of aio_task_pool_wait_one
+Vladislav,
 
-Den
+The OVMF debug log ends like this (with UEFI protocol GUIDs decoded as
+their textual identifiers in edk2):
+
+> [Security] 3rd party image[6D19D18] can be loaded after EndOfDxe: PciRoot=
+(0x0)/Pci(0x3,0x0)/Offset(0x16400,0x4B1FF).
+> InstallProtocolInterface: [EfiLoadedImageProtocol] 6D187C0
+> Loading driver at 0x00006B1F000 EntryPoint=3D0x00006B25497 82540em.efi
+> InstallProtocolInterface: [EfiLoadedImageDevicePathProtocol] 6D18498
+> ProtectUefiImageCommon - 0x6D187C0
+>   - 0x0000000006B1F000 - 0x00000000000B6E60
+> InstallProtocolInterface: [EfiDriverBindingProtocol] 6B50C00
+> InstallProtocolInterface: [EfiComponentName2Protocol] 6B50BD0
+> ASSERT /home/jenkins/workspace/edk2/rpms/build/edk2-g6ff7c838d0/MdeModule=
+Pkg/Core/Dxe/Image/Image.c(1676): Image->Tpl =3D=3D gEfiCurrentTpl
+
+This final log snippet confirms that a UEFI device driver called
+"82540em.efi" is being loaded and started from the option ROM BAR of the
+PCI device that is at slot 3, function 0, of the root bridge.
+
+When this UEFI device driver is started, it trips an assert in the
+platform firmware. Namely, in the CoreStartImage() function in the
+"MdeModulePkg/Core/Dxe/Image/Image.c" source file of edk2:
+
+  //
+  // Image has completed.  Verify the tpl is the same
+  //
+  ASSERT (Image->Tpl =3D=3D gEfiCurrentTpl);
+
+This suggests that the "82540em.efi" driver exits its entry point
+function after having raised, but not having restored, the TPL (Task
+Priority Level). In other words, the symptom indicates a bug in the UEFI
+driver.
+
+I *suspect* (but am not sure) that you are using an e1000 emulated NIC,
+and the "82540em.efi" driver exposed in its oprom comes from the iPXE
+project:
+
+src/drivers/net/intel.c:        PCI_ROM ( 0x8086, 0x100e, "82540em",
+"82540EM", 0 ),
+
+Therefore I suspect a bug in the iPXE version that the Ubuntu 20.04
+upgrade brought to you.
+
+(I can see a number of TPL-related patches in the iPXE git history,
+around Feb-Mar 2018. And QEMU loads the iPXE oprom into the emulated
+NICs ROM BAR.)
+
+Please try installing different versions of the iPXE package on your
+Ubuntu host, and re-run your test (without changing any other elements
+of your setup).
+
+Thanks.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1882671
+
+Title:
+  qemu-system-x86_64 (ver 4.2) stuck at boot with OVMF bios
+
+Status in QEMU:
+  New
+Status in qemu package in Ubuntu:
+  Confirmed
+
+Bug description:
+  The version of QEMU (4.2.0) packaged for Ubuntu 20.04 hangs
+  indefinitely at boot if an OVMF bios is used. This happens ONLY with
+  qemu-system-x86_64. qemu-system-i386 works fine with the latest ia32
+  OVMF bios.
+
+  NOTE[1]: the same identical OVMF bios works fine on QEMU 2.x packaged wit=
+h Ubuntu 18.04.
+  NOTE[2]: reproducing the fatal bug requires *no* operating system:
+
+     qemu-system-x86_64 -bios OVMF-pure-efi.fd
+
+  On its window QEMU gets stuck at the very first stage:
+     "Guest has not initialized the display (yet)."
+
+  NOTE[3]: QEMU gets stuck no matter if KVM is used or not.
+
+  NOTE[4]: By adding the `-d int` option it is possible to observe that
+  QEMU is, apparently, stuck in an endless loop of interrupts. For the
+  first few seconds, registers' values vary quickly, but at some point
+  they reach a final value, while the interrupt counter increments:
+
+    2568: v=3D68 e=3D0000 i=3D0 cpl=3D0 IP=3D0038:0000000007f1d225 pc=3D000=
+0000007f1d225 SP=3D0030:0000000007f0c8d0 env->regs[R_EAX]=3D0000000000000000
+  RAX=3D0000000000000000 RBX=3D0000000007f0c920 RCX=3D0000000000000000 RDX=
+=3D0000000000000001
+  RSI=3D0000000006d18798 RDI=3D0000000000008664 RBP=3D0000000000000000 RSP=
+=3D0000000007f0c8d0
+  R8 =3D0000000000000001 R9 =3D0000000000000089 R10=3D0000000000000000 R11=
+=3D0000000007f2c987
+  R12=3D0000000000000000 R13=3D0000000000000000 R14=3D0000000007087901 R15=
+=3D0000000000000000
+  RIP=3D0000000007f1d225 RFL=3D00000246 [---Z-P-] CPL=3D0 II=3D0 A20=3D1 SM=
+M=3D0 HLT=3D0
+  ES =3D0030 0000000000000000 ffffffff 00cf9300 DPL=3D0 DS   [-WA]
+  CS =3D0038 0000000000000000 ffffffff 00af9a00 DPL=3D0 CS64 [-R-]
+  SS =3D0030 0000000000000000 ffffffff 00cf9300 DPL=3D0 DS   [-WA]
+  DS =3D0030 0000000000000000 ffffffff 00cf9300 DPL=3D0 DS   [-WA]
+  FS =3D0030 0000000000000000 ffffffff 00cf9300 DPL=3D0 DS   [-WA]
+  GS =3D0030 0000000000000000 ffffffff 00cf9300 DPL=3D0 DS   [-WA]
+  LDT=3D0000 0000000000000000 0000ffff 00008200 DPL=3D0 LDT
+  TR =3D0000 0000000000000000 0000ffff 00008b00 DPL=3D0 TSS64-busy
+  GDT=3D     00000000079eea98 00000047
+  IDT=3D     000000000758f018 00000fff
+  CR0=3D80010033 CR2=3D0000000000000000 CR3=3D0000000007c01000 CR4=3D000006=
+68
+  DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=
+=3D0000000000000000 =
+
+  DR6=3D00000000ffff0ff0 DR7=3D0000000000000400
+  CCS=3D0000000000000044 CCD=3D0000000000000000 CCO=3DEFLAGS  =
+
+  EFER=3D0000000000000d00
+
+  =
+
+  NOTE[5]: Just to better help the investigation of the bug, I'd like to re=
+mark that the issue is NOT caused by an endless loop of triple-faults. I tr=
+ied with -d cpu_reset and there is NO such loop. No triple fault whatsoever.
+
+  NOTE[6]: The OVMF version used for the test has been downloaded from:
+  https://www.kraxel.org/repos/jenkins/edk2/edk2.git-ovmf-x64-0-20200515.13=
+98.g6ff7c838d0.noarch.rpm
+
+  but the issue is the same with older OVMF versions as well.
+
+  =
+
+  Please take a look at it, as the bug is NOT a corner case. QEMU 4.2.0 can=
+not boot with an UEFI firmware (OVMF) while virtualizing a x86_64 machine A=
+T ALL.
+
+  Thank you very much,
+  Vladislav K. Valtchev
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1882671/+subscriptions
 
