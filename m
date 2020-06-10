@@ -2,71 +2,92 @@ Return-Path: <SRS0=wemX=7X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C82EAC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 20:26:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A7ECC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 20:41:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9CACF206F7
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 20:26:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CACF206F7
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 3241C204EC
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 20:41:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Kuwna6KQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3241C204EC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55922 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38870 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jj7Ir-00061i-UX
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 16:26:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45934)
+	id 1jj7XU-0005Pb-DW
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 16:41:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49030)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jj7I8-0005Al-CR; Wed, 10 Jun 2020 16:25:44 -0400
-Resent-Date: Wed, 10 Jun 2020 16:25:44 -0400
-Resent-Message-Id: <E1jj7I8-0005Al-CR@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21754)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jj7I6-0004y5-SH; Wed, 10 Jun 2020 16:25:44 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1591820724; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=j4Jr+NgPO8um44v8HrUgcwq25Ojz1cf8gt0r/ckHbzxGHZzsRcBMsFcn7lOE/CVW86GYzy0Vqh09FmfJgw0W94HVApf9RSBKZSXMxlY2YL1rmBBRnSA8MXmccjkb36vlK6Ks/G7OyHBqBgCMiFUeNsCkOiqkd9EqcqMYK0Joa+I=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1591820724;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=U+IbpKBWrbUElvajj2gbWiiGXQ2kM+H0RPs6upQpFBc=; 
- b=D7kgS4nidF4ZfIiTPongIf5p+yMj0pwpo9z4/LsQIrGySgy/PhJOtli53MS1lc+5lHYWC8+WCCT4YAu7L8dmUAhVqwA6hiLUcZuRhM0qyL6cIIwCKYlhgR2iazZUEJMCGO6KOloNaBto0jyZp2Mqz/dYwggVGRMe1SMVCPcbuYk=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1591820721376185.7963486919756;
- Wed, 10 Jun 2020 13:25:21 -0700 (PDT)
-Message-ID: <159182071987.21115.12956552187250814381@45ef0f9c86ae>
-In-Reply-To: <20200610182305.3462-1-vsementsov@virtuozzo.com>
-Subject: Re: [PATCH v3 0/4] nbd: reduce max_block restrictions
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jj7Vp-0003Kw-AI
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 16:39:53 -0400
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:41721)
+ by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jj7Vo-0007gg-4M
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 16:39:52 -0400
+Received: by mail-pl1-x644.google.com with SMTP id y17so1414223plb.8
+ for <qemu-devel@nongnu.org>; Wed, 10 Jun 2020 13:39:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=gQQj1sipgdOMwp2GOB85OYS6IIBkkX4MNoYnTOJv3F8=;
+ b=Kuwna6KQHzCAx6RRTO36pRZ+F9Ae3OYCK5+QW8UyYDjzy1/KK672NKQE9MhGB6tFkl
+ POwOLmAwjuUHR+2f/kAE93aNu6lZr/CD9BFSDKg7PLJyiummUZmZjCoQd4KUCg1Et87H
+ U4iBbox/EFFuJ5AVud/vjI/6m1e9KdHQ8IwzKMm5ADSBUKZfPM+ACEHJfbiUt3yZH9BI
+ ZzSP8bUe/FbKQ6ikr6qC3PpNINLPqtEIKg/hTc1jwQ8e3YL2Rkx4Xx9tOrl0BJQoBzlF
+ XVcRHAeNRGmS+DuhrnJ+q47wOY45ofa8EIzbEWklwk19/Efolx9Wyzoz3QE1zoJUBiqN
+ grRg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=gQQj1sipgdOMwp2GOB85OYS6IIBkkX4MNoYnTOJv3F8=;
+ b=Yvh9lA+nhNTvRTH/NFp4hgOAdF3ZxN0Xbg2pqFeYGm6ugZVFLkwN0Tjg+ntZb2cbyH
+ N7fhtmtTEnix/D9tuf4IXkYbdqGWsDPH/m+H0/MP+ZpuWuzfiMJA8jh9sXIT3oRZV3zw
+ LrePnbrqG24i0tpFIxPMht5VsDSFkkkriszbX6uPs8vv5WHGQzQPYHKACK9HhfdM3nV6
+ yl2naJHeMO6q8mqMYUk1o3LfIpbSJoh9I8zB7ZPZmnyuTts+Ars4PtyPO1yjF/nWv3CA
+ /ITB6sXPWdzjawg34oZGnuq2nquMwYstS3XApk2nbSGju7A19YjO3+RGEl9mAGoSuRFc
+ JLsA==
+X-Gm-Message-State: AOAM530i2rvYLxsHFMcDVbIkGkq/ji5Q9fNSzT7u8v5zrLvhpRfeiVrG
+ dmyTOTOzMN+u2mkTfYXWIeO/VyZL4UU=
+X-Google-Smtp-Source: ABdhPJxNv20Tb6FAVAQEg/+V86OLNTb5WheGnYnaJYV6RZ0Ic/Df6uYzsuOJpr926uEfr0h5Dh870w==
+X-Received: by 2002:a17:902:b685:: with SMTP id
+ c5mr4716670pls.154.1591821583751; 
+ Wed, 10 Jun 2020 13:39:43 -0700 (PDT)
+Received: from localhost.localdomain (174-21-143-238.tukw.qwest.net.
+ [174.21.143.238])
+ by smtp.gmail.com with ESMTPSA id g6sm740648pfb.164.2020.06.10.13.39.42
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 10 Jun 2020 13:39:43 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 0/5] Vs clang-10 and gcc-9 warnings
+Date: Wed, 10 Jun 2020 13:39:37 -0700
+Message-Id: <20200610203942.887374-1-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: vsementsov@virtuozzo.com
-Date: Wed, 10 Jun 2020 13:25:21 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/10 16:25:39
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::644;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x644.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -79,54 +100,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, fam@euphon.net, vsementsov@virtuozzo.com,
- qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com,
- stefanha@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDYxMDE4MjMwNS4zNDYy
-LTEtdnNlbWVudHNvdkB2aXJ0dW96em8uY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0
-aGUgZG9ja2VyLXF1aWNrQGNlbnRvczcgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3Rp
-bmcgY29tbWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGlu
-c3RhbGxlZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNU
-IFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKbWFrZSBkb2NrZXItaW1hZ2UtY2VudG9zNyBW
-PTEgTkVUV09SSz0xCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1xdWlja0BjZW50b3M3IFNIT1dfRU5W
-PTEgSj0xNCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCi0tLSAvdG1wL3FlbXUt
-dGVzdC9zcmMvdGVzdHMvcWVtdS1pb3Rlc3RzLzI1MS5vdXQgICAgICAgMjAyMC0wNi0xMCAxODo1
-NjozNi4wMDAwMDAwMDAgKzAwMDAKKysrIC90bXAvcWVtdS10ZXN0L2J1aWxkL3Rlc3RzL3FlbXUt
-aW90ZXN0cy8yNTEub3V0LmJhZCAyMDIwLTA2LTEwIDIwOjI0OjQwLjAwNzQxMjc5MCArMDAwMApA
-QCAtMTgsMjYgKzE4LDE2IEBACiBxZW11LWltZzogd2FybmluZzogZXJyb3Igd2hpbGUgcmVhZGlu
-ZyBvZmZzZXQgcmVhZF9mYWlsX29mZnNldF84OiBJbnB1dC9vdXRwdXQgZXJyb3IKIHFlbXUtaW1n
-OiB3YXJuaW5nOiBlcnJvciB3aGlsZSByZWFkaW5nIG9mZnNldCByZWFkX2ZhaWxfb2Zmc2V0Xzk6
-IElucHV0L291dHB1dCBlcnJvcgogCi13cm90ZSA1MTIvNTEyIGJ5dGVzIGF0IG9mZnNldCByZWFk
-X2ZhaWxfb2Zmc2V0XzAKLTUxMiBieXRlcywgWCBvcHM7IFhYOlhYOlhYLlggKFhYWCBZWVkvc2Vj
-IGFuZCBYWFggb3BzL3NlYykKLS0tCk5vdCBydW46IDI1OQpGYWlsdXJlczogMDMzIDAzNCAxNTQg
-MTc3IDI1MQpGYWlsZWQgNSBvZiAxMTkgaW90ZXN0cwptYWtlOiAqKiogW2NoZWNrLXRlc3RzL2No
-ZWNrLWJsb2NrLnNoXSBFcnJvciAxCm1ha2U6ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpv
-YnMuLi4uCiAgVEVTVCAgICBjaGVjay1xdGVzdC1hYXJjaDY0OiB0ZXN0cy9xdGVzdC9xb3MtdGVz
-dApUcmFjZWJhY2sgKG1vc3QgcmVjZW50IGNhbGwgbGFzdCk6Ci0tLQogICAgcmFpc2UgQ2FsbGVk
-UHJvY2Vzc0Vycm9yKHJldGNvZGUsIGNtZCkKc3VicHJvY2Vzcy5DYWxsZWRQcm9jZXNzRXJyb3I6
-IENvbW1hbmQgJ1snc3VkbycsICctbicsICdkb2NrZXInLCAncnVuJywgJy0tbGFiZWwnLCAnY29t
-LnFlbXUuaW5zdGFuY2UudXVpZD1mYWExZWRmYzY5Njg0NDIyYjMxNDM0M2NmMzAxNzRhNScsICct
-dScsICcxMDAzJywgJy0tc2VjdXJpdHktb3B0JywgJ3NlY2NvbXA9dW5jb25maW5lZCcsICctLXJt
-JywgJy1lJywgJ1RBUkdFVF9MSVNUPScsICctZScsICdFWFRSQV9DT05GSUdVUkVfT1BUUz0nLCAn
-LWUnLCAnVj0nLCAnLWUnLCAnSj0xNCcsICctZScsICdERUJVRz0nLCAnLWUnLCAnU0hPV19FTlY9
-MScsICctZScsICdDQ0FDSEVfRElSPS92YXIvdG1wL2NjYWNoZScsICctdicsICcvaG9tZS9wYXRj
-aGV3Mi8uY2FjaGUvcWVtdS1kb2NrZXItY2NhY2hlOi92YXIvdG1wL2NjYWNoZTp6JywgJy12Jywg
-Jy92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC05ZWd1cnk5cS9zcmMvZG9ja2VyLXNyYy4yMDIw
-LTA2LTEwLTE2LjEyLjA3LjExNTg0Oi92YXIvdG1wL3FlbXU6eixybycsICdxZW11OmNlbnRvczcn
-LCAnL3Zhci90bXAvcWVtdS9ydW4nLCAndGVzdC1xdWljayddJyByZXR1cm5lZCBub24temVybyBl
-eGl0IHN0YXR1cyAyLgpmaWx0ZXI9LS1maWx0ZXI9bGFiZWw9Y29tLnFlbXUuaW5zdGFuY2UudXVp
-ZD1mYWExZWRmYzY5Njg0NDIyYjMxNDM0M2NmMzAxNzRhNQptYWtlWzFdOiAqKiogW2RvY2tlci1y
-dW5dIEVycm9yIDEKbWFrZVsxXTogTGVhdmluZyBkaXJlY3RvcnkgYC92YXIvdG1wL3BhdGNoZXct
-dGVzdGVyLXRtcC05ZWd1cnk5cS9zcmMnCm1ha2U6ICoqKiBbZG9ja2VyLXJ1bi10ZXN0LXF1aWNr
-QGNlbnRvczddIEVycm9yIDIKCnJlYWwgICAgMTNtMTIuMjk4cwp1c2VyICAgIDBtOC42NzBzCgoK
-VGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIw
-MDYxMDE4MjMwNS4zNDYyLTEtdnNlbWVudHNvdkB2aXJ0dW96em8uY29tL3Rlc3RpbmcuZG9ja2Vy
-LXF1aWNrQGNlbnRvczcvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0
-aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91
-ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+Three of these patches are for cleaning up warnings vs clang-10.
+
+The -Wtautological-type-limit-compare patch has been improved
+as suggested by Eric Blake.
+
+The final patch is for a "new" warning from gcc-9 on aarch64 hosts.
+Our build box has been upgraded from bionic, so the warning is new
+to me, anyway.
+
+
+r~
+
+
+Philippe Mathieu-Daudé (1):
+  fpu/softfloat: Silence 'bitwise negation of boolean expression'
+    warning
+
+Richard Henderson (3):
+  configure: Clean up warning flag lists
+  configure: Disable -Wtautological-type-limit-compare
+  configure: Add -Wno-psabi
+
+Wei Wang (1):
+  migration: fix xbzrle encoding rate calculation
+
+ configure       | 42 ++++++++++++++++++++++++++++++++----------
+ fpu/softfloat.c | 33 ++++++++++++++++++++++++---------
+ migration/ram.c |  4 +---
+ 3 files changed, 57 insertions(+), 22 deletions(-)
+
+-- 
+2.25.1
+
 
