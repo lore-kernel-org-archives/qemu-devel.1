@@ -2,82 +2,123 @@ Return-Path: <SRS0=wemX=7X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF15CC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 17:26:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3381EC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 17:34:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B6344206F4
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 17:26:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6344206F4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 08C43206F4
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 17:34:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08C43206F4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56090 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33948 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jj4Up-0006TM-Tf
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 13:26:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57822)
+	id 1jj4c5-00025Y-AZ
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 13:34:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59146)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jj4U1-0005xM-DF
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 13:25:49 -0400
-Received: from indium.canonical.com ([91.189.90.7]:50238)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jj4U0-0001pT-2P
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 13:25:49 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jj4Tx-0000Rj-PN
- for <qemu-devel@nongnu.org>; Wed, 10 Jun 2020 17:25:45 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id BE6892E8109
- for <qemu-devel@nongnu.org>; Wed, 10 Jun 2020 17:25:45 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jj4bN-0001Cq-Tk
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 13:33:25 -0400
+Received: from mout.kundenserver.de ([212.227.126.131]:46363)
+ by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jj4bM-000367-Ra
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 13:33:25 -0400
+Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
+ (mreue010 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MK3BO-1jVOGP1yQQ-00LV5i; Wed, 10 Jun 2020 19:33:19 +0200
+Subject: Re: [PATCH v2 1/6] linux-user: Extend strace support to enable
+ argument printing after syscall execution
+To: Filip Bozuta <filip.bozuta@syrmia.com>, qemu-devel@nongnu.org
+References: <20200608164357.25065-1-filip.bozuta@syrmia.com>
+ <20200608164357.25065-2-filip.bozuta@syrmia.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <7da5b054-d378-10a7-f3a4-b3437baf00c3@vivier.eu>
+Date: Wed, 10 Jun 2020 19:33:18 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 10 Jun 2020 17:19:07 -0000
-From: "Laszlo Ersek \(Red Hat\)" <1882671@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
- status=Confirmed; importance=Undecided; assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: janitor lersek vvaltchev
-X-Launchpad-Bug-Reporter: Vladislav K. Valtchev (vvaltchev)
-X-Launchpad-Bug-Modifier: Laszlo Ersek (Red Hat) (lersek)
-References: <159169936514.32294.8785049859239547612.malonedeb@gac.canonical.com>
-Message-Id: <159180954791.6172.3059065929798452134.malone@chaenomeles.canonical.com>
-Subject: [Bug 1882671] Re: qemu-system-x86_64 (ver 4.2) stuck at boot with
- OVMF bios
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="b190cebbf563f89e480a8b57f641753c8196bda0";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 9c95565740ab71c61904ec98502c00b59c0bd6c1
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/10 11:11:22
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200608164357.25065-2-filip.bozuta@syrmia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:cS7nJ2so2pBswIoHxz6VvEiQZiL57bCbqXMkwmRk/ftfFs0mTBm
+ YDefzzCeyU/SF0GmVvy0xPsH1OQnxF5dfxUIjM4OdUVSNY3jL7HqW+vCVyRkyqsfpNCH2D8
+ Guzz6GxFZLGJq/l9ahph9lh0xpr8RXtVy6cR1pSsTJvyi6+3Z1bB9SnPK6Oyec7yjp5op4s
+ 3kZ8UoiUeGY7Is3w4I8bg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:+hO74hEYFO8=:MLI9BjmEj7JwxiR1S+3kmw
+ Lwq87X6LZNWFXOSgHJbBJg0jtuPp+LwiccbcwQCZwjI8XL4pqDVQ7YOyU2mdLK9AyT5V4FNaZ
+ rzL2/EcoqlIvRGo8Z9xeCenBxNuYsS0ImyCQsxlVlj9fskx7bnzGWi44u2nO7wpEtpL2NjBvP
+ Nk2XjpURWffnTgOXXPpZ8/kPFxR2ZOCU+18tDy6Ih0PjSdzZJvp4kNfWyoXBGdIf0OM6138bU
+ 1vq4Yuqq6TjNM2t63WpkM9A7+/+U4hgOPqXpfrEdV8One26SEpDxifB8gxIpJnXBg5daAmoAf
+ QKFI8rTxKnuDEdaEeGFntVvSSxV6Z8huE37ASOfDf66fRDIIP8IFAjIu5xy7HLiOlZSpBLGuF
+ kwjNliCbhdSsqa3xjvYSXNHHcXZYA3KZuiLjyyzsdAOH6cTjvDBN6Cj+dmHWwIDAJUV5V35LG
+ c/NJeHixOw06tjVUjJ8/MTLThfTwwJrr4rXVD7hOWatQHnBHTE03kt0Qhmla5rn28Mx+lovoH
+ Ju5NOUXGfIlYNmv+c/mPu0c6bP6Qiu8YjMItqhIb7fCKSHBpTVrBWySEVB5drsr3JiTLbAox2
+ 5ewWK1rIe4VMh3HUfTkUVLsvhpbqKE2iPPVKY4cqXJTwKdTC0ERfi5zzhTD5NZhZdgTTtfl1Y
+ DCKCyP7H1ZN2ZrfIUeOzVa3Bq+P3/ZLnMW8oXgVFxX1zvt3ahhdlaVQHIh908T0MmIxqvstbb
+ TNQtiPjdHioDzaGwYvB6RTcEkIbMwUs1LOna1VS5t9N/JS8mIblGG4hbyqYBp2MYiDbGRd8Qf
+ PIhy4GyA91zbYID3Bw751W/vSW0YFnki6huIjLfhHLYOnt631ZxSSZdV4GKhvlxAi8nCnhY
+Received-SPF: none client-ip=212.227.126.131; envelope-from=laurent@vivier.eu;
+ helo=mout.kundenserver.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/10 13:33:21
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -28
+X-Spam_score: -2.9
+X-Spam_bar: --
+X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -86,105 +127,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1882671 <1882671@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-(From the UEFI executable name "82540em.efi" in the log, I initially
-suspected an assigned physical NIC with a buggy flashed-on oprom. But
-grepping the iPXE tree for "82540em" yields a match, and QEMU loads the
-iPXE oproms by default into the emulated NICs' ROM BARs.)
+Le 08/06/2020 à 18:43, Filip Bozuta a écrit :
+> From: Filip Bozuta <Filip.Bozuta@syrmia.com>
+> 
+>     Structure "struct syscallname" in file "strace.c" is used for "-strace"
+>     to print arguments and return values of syscalls. The last field of
+>     this structure "result" represents the calling function that prints the
+>     return values. This field was extended in this patch so that this functions
+>     takes all syscalls arguments beside the return value. In this way, it enables
+>     "-strace" to print arguments of syscalls that have changed after the syscall
+>     execution. This extension will be useful as there are many syscalls that
+>     return values inside their arguments (i.e. listxattr() that returns the list
+>     of extended attributes inside the "list" argument).
+> 
+> Implementation notes:
+> 
+>     Since there are already three existing "print_syscall_ret*" functions inside
+>     "strace.c" ("print_syscall_ret_addr()", "print_syscall_ret_adjtimex()",
+>     "print_syscall_ret_newselect()"), they were changed to have all syscall arguments
+>     beside the return value. This was done so that these functions don't cause build
+>     errors (even though syscall arguments are not used in these functions).
+> 
+> Signed-off-by: Filip Bozuta <Filip.Bozuta@syrmia.com>
+> ---
+>  linux-user/qemu.h    |  4 +++-
+>  linux-user/strace.c  | 24 ++++++++++++++++++------
+>  linux-user/syscall.c |  2 +-
+>  3 files changed, 22 insertions(+), 8 deletions(-)
+> 
 
--- =
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1882671
-
-Title:
-  qemu-system-x86_64 (ver 4.2) stuck at boot with OVMF bios
-
-Status in QEMU:
-  New
-Status in qemu package in Ubuntu:
-  Confirmed
-
-Bug description:
-  The version of QEMU (4.2.0) packaged for Ubuntu 20.04 hangs
-  indefinitely at boot if an OVMF bios is used. This happens ONLY with
-  qemu-system-x86_64. qemu-system-i386 works fine with the latest ia32
-  OVMF bios.
-
-  NOTE[1]: the same identical OVMF bios works fine on QEMU 2.x packaged wit=
-h Ubuntu 18.04.
-  NOTE[2]: reproducing the fatal bug requires *no* operating system:
-
-     qemu-system-x86_64 -bios OVMF-pure-efi.fd
-
-  On its window QEMU gets stuck at the very first stage:
-     "Guest has not initialized the display (yet)."
-
-  NOTE[3]: QEMU gets stuck no matter if KVM is used or not.
-
-  NOTE[4]: By adding the `-d int` option it is possible to observe that
-  QEMU is, apparently, stuck in an endless loop of interrupts. For the
-  first few seconds, registers' values vary quickly, but at some point
-  they reach a final value, while the interrupt counter increments:
-
-    2568: v=3D68 e=3D0000 i=3D0 cpl=3D0 IP=3D0038:0000000007f1d225 pc=3D000=
-0000007f1d225 SP=3D0030:0000000007f0c8d0 env->regs[R_EAX]=3D0000000000000000
-  RAX=3D0000000000000000 RBX=3D0000000007f0c920 RCX=3D0000000000000000 RDX=
-=3D0000000000000001
-  RSI=3D0000000006d18798 RDI=3D0000000000008664 RBP=3D0000000000000000 RSP=
-=3D0000000007f0c8d0
-  R8 =3D0000000000000001 R9 =3D0000000000000089 R10=3D0000000000000000 R11=
-=3D0000000007f2c987
-  R12=3D0000000000000000 R13=3D0000000000000000 R14=3D0000000007087901 R15=
-=3D0000000000000000
-  RIP=3D0000000007f1d225 RFL=3D00000246 [---Z-P-] CPL=3D0 II=3D0 A20=3D1 SM=
-M=3D0 HLT=3D0
-  ES =3D0030 0000000000000000 ffffffff 00cf9300 DPL=3D0 DS   [-WA]
-  CS =3D0038 0000000000000000 ffffffff 00af9a00 DPL=3D0 CS64 [-R-]
-  SS =3D0030 0000000000000000 ffffffff 00cf9300 DPL=3D0 DS   [-WA]
-  DS =3D0030 0000000000000000 ffffffff 00cf9300 DPL=3D0 DS   [-WA]
-  FS =3D0030 0000000000000000 ffffffff 00cf9300 DPL=3D0 DS   [-WA]
-  GS =3D0030 0000000000000000 ffffffff 00cf9300 DPL=3D0 DS   [-WA]
-  LDT=3D0000 0000000000000000 0000ffff 00008200 DPL=3D0 LDT
-  TR =3D0000 0000000000000000 0000ffff 00008b00 DPL=3D0 TSS64-busy
-  GDT=3D     00000000079eea98 00000047
-  IDT=3D     000000000758f018 00000fff
-  CR0=3D80010033 CR2=3D0000000000000000 CR3=3D0000000007c01000 CR4=3D000006=
-68
-  DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=
-=3D0000000000000000 =
-
-  DR6=3D00000000ffff0ff0 DR7=3D0000000000000400
-  CCS=3D0000000000000044 CCD=3D0000000000000000 CCO=3DEFLAGS  =
-
-  EFER=3D0000000000000d00
-
-  =
-
-  NOTE[5]: Just to better help the investigation of the bug, I'd like to re=
-mark that the issue is NOT caused by an endless loop of triple-faults. I tr=
-ied with -d cpu_reset and there is NO such loop. No triple fault whatsoever.
-
-  NOTE[6]: The OVMF version used for the test has been downloaded from:
-  https://www.kraxel.org/repos/jenkins/edk2/edk2.git-ovmf-x64-0-20200515.13=
-98.g6ff7c838d0.noarch.rpm
-
-  but the issue is the same with older OVMF versions as well.
-
-  =
-
-  Please take a look at it, as the bug is NOT a corner case. QEMU 4.2.0 can=
-not boot with an UEFI firmware (OVMF) while virtualizing a x86_64 machine A=
-T ALL.
-
-  Thank you very much,
-  Vladislav K. Valtchev
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1882671/+subscriptions
 
