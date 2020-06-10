@@ -6,66 +6,66 @@ X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C47C6C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 17:19:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB895C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 17:19:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 89E7F2070B
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 17:19:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 89E7F2070B
+	by mail.kernel.org (Postfix) with ESMTPS id 81FE62070B
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 17:19:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 81FE62070B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45830 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46582 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jj4Ne-0000bY-I6
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 13:19:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55454)
+	id 1jj4Nq-0000vF-Mx
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 13:19:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55470)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jj4M4-0007CY-BN
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 13:17:36 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60839
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jj4MD-0007UT-3R
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 13:17:45 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:53262
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jj4M3-0000I0-5G
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 13:17:36 -0400
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jj4MB-0000Jc-L9
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 13:17:44 -0400
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-203-P1ew-mauN26CKyzRCOha7g-1; Wed, 10 Jun 2020 13:17:30 -0400
-X-MC-Unique: P1ew-mauN26CKyzRCOha7g-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-268-xYLFuKkwMveX96I0TEXbEw-1; Wed, 10 Jun 2020 13:17:38 -0400
+X-MC-Unique: xYLFuKkwMveX96I0TEXbEw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4F4ED461;
- Wed, 10 Jun 2020 17:17:29 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BE80A801504;
+ Wed, 10 Jun 2020 17:17:36 +0000 (UTC)
 Received: from bahia.lan (ovpn-114-202.ams2.redhat.com [10.36.114.202])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C3BC21002393;
- Wed, 10 Jun 2020 17:17:27 +0000 (UTC)
-Subject: [PATCH 1/3] error: auto propagated local_err
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6F5938FF61;
+ Wed, 10 Jun 2020 17:17:35 +0000 (UTC)
+Subject: [PATCH 2/3] spapr: Use error_append_hint() in spapr_caps.c
 From: Greg Kurz <groug@kaod.org>
 To: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 10 Jun 2020 19:17:26 +0200
-Message-ID: <159180944686.29090.6706368074192153633.stgit@bahia.lan>
+Date: Wed, 10 Jun 2020 19:17:34 +0200
+Message-ID: <159180945454.29090.15222636045973363294.stgit@bahia.lan>
 In-Reply-To: <159180935807.29090.16079635439548762534.stgit@bahia.lan>
 References: <159180935807.29090.16079635439548762534.stgit@bahia.lan>
 User-Agent: StGit/0.21
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: kaod.org
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: softfail client-ip=207.211.31.120; envelope-from=groug@kaod.org;
+Received-SPF: softfail client-ip=205.139.110.120; envelope-from=groug@kaod.org;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/10 12:37:47
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 23:51:15
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -12
 X-Spam_score: -1.3
 X-Spam_bar: -
 X-Spam_report: (-1.3 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
  SPF_SOFTFAIL=0.665 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -86,320 +86,302 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+We have a dedicated error API for hints. Use it instead of embedding
+the hint in the error message, as recommanded in the "qapi/error.h"
+header file.
 
-Introduce a new ERRP_AUTO_PROPAGATE macro, to be used at start of
-functions with an errp OUT parameter.
+Since spapr_caps_apply() passes &error_fatal, all functions must
+also call the ERRP_AUTO_PROPAGATE() macro for error_append_hint()
+to be functional.
 
-It has three goals:
+While here, add some missing braces around one line statements that
+are part of the patch context. Also have cap_fwnmi_apply(), which
+already uses error_append_hint() to call ERRP_AUTO_PROPAGATE() as
+well.
 
-1. Fix issue with error_fatal and error_prepend/error_append_hint: user
-can't see this additional information, because exit() happens in
-error_setg earlier than information is added. [Reported by Greg Kurz]
-
-2. Fix issue with error_abort and error_propagate: when we wrap
-error_abort by local_err+error_propagate, the resulting coredump will
-refer to error_propagate and not to the place where error happened.
-(the macro itself doesn't fix the issue, but it allows us to [3.] drop
-the local_err+error_propagate pattern, which will definitely fix the
-issue) [Reported by Kevin Wolf]
-
-3. Drop local_err+error_propagate pattern, which is used to workaround
-void functions with errp parameter, when caller wants to know resulting
-status. (Note: actually these functions could be merely updated to
-return int error code).
-
-To achieve these goals, later patches will add invocations
-of this macro at the start of functions with either use
-error_prepend/error_append_hint (solving 1) or which use
-local_err+error_propagate to check errors, switching those
-functions to use *errp instead (solving 2 and 3).
-
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Paul Durrant <paul@xen.org>
-Reviewed-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
- include/qapi/error.h |  205 ++++++++++++++++++++++++++++++++++++++++++----=
+ hw/ppc/spapr_caps.c |   93 +++++++++++++++++++++++++++++------------------=
 ----
- 1 file changed, 173 insertions(+), 32 deletions(-)
+ 1 file changed, 52 insertions(+), 41 deletions(-)
 
-diff --git a/include/qapi/error.h b/include/qapi/error.h
-index ad5b6e896ded..30140d9bfea9 100644
---- a/include/qapi/error.h
-+++ b/include/qapi/error.h
-@@ -15,6 +15,8 @@
- /*
-  * Error reporting system loosely patterned after Glib's GError.
-  *
-+ * =3D Deal with Error object =3D
-+ *
-  * Create an error:
-  *     error_setg(&err, "situation normal, all fouled up");
-  *
-@@ -47,28 +49,91 @@
-  * reporting it (primarily useful in testsuites):
-  *     error_free_or_abort(&err);
-  *
-- * Pass an existing error to the caller:
-- *     error_propagate(errp, err);
-- * where Error **errp is a parameter, by convention the last one.
-+ * =3D Deal with Error ** function parameter =3D
-  *
-- * Pass an existing error to the caller with the message modified:
-- *     error_propagate_prepend(errp, err);
-+ * A function may use the error system to return errors. In this case, the
-+ * function defines an Error **errp parameter, by convention the last one =
-(with
-+ * exceptions for functions using ... or va_list).
-  *
-- * Avoid
-- *     error_propagate(errp, err);
-- *     error_prepend(errp, "Could not frobnicate '%s': ", name);
-- * because this fails to prepend when @errp is &error_fatal.
-+ * The caller may then pass in the following errp values:
-  *
-- * Create a new error and pass it to the caller:
-+ * 1. &error_abort
-+ *    Any error will result in abort().
-+ * 2. &error_fatal
-+ *    Any error will result in exit() with a non-zero status.
-+ * 3. NULL
-+ *    No error reporting through errp parameter.
-+ * 4. The address of a NULL-initialized Error *err
-+ *    Any error will populate errp with an error object.
-+ *
-+ * The following rules then implement the correct semantics desired by the
-+ * caller.
-+ *
-+ * Create a new error to pass to the caller:
-  *     error_setg(errp, "situation normal, all fouled up");
-  *
-- * Call a function and receive an error from it:
-+ * Calling another errp-based function:
-+ *     f(..., errp);
-+ *
-+ * =3D=3D Checking success of subcall =3D=3D
-+ *
-+ * If a function returns a value indicating an error in addition to settin=
-g
-+ * errp (which is recommended), then you don't need any additional code, j=
-ust
-+ * do:
-+ *
-+ *     int ret =3D f(..., errp);
-+ *     if (ret < 0) {
-+ *         ... handle error ...
-+ *         return ret;
-+ *     }
-+ *
-+ * If a function returns nothing (not recommended for new code), the only =
-way
-+ * to check success is by consulting errp; doing this safely requires the =
-use
-+ * of the ERRP_AUTO_PROPAGATE macro, like this:
-+ *
-+ *     int our_func(..., Error **errp) {
-+ *         ERRP_AUTO_PROPAGATE();
-+ *         ...
-+ *         subcall(..., errp);
-+ *         if (*errp) {
-+ *             ...
-+ *             return -EINVAL;
-+ *         }
-+ *         ...
-+ *     }
-+ *
-+ * ERRP_AUTO_PROPAGATE takes care of wrapping the original errp as needed,=
- so
-+ * that the rest of the function can directly use errp (including
-+ * dereferencing), where any errors will then be propagated on to the orig=
-inal
-+ * errp when leaving the function.
-+ *
-+ * In some cases, we need to check result of subcall, but do not want to
-+ * propagate the Error object to our caller. In such cases we don't need
-+ * ERRP_AUTO_PROPAGATE, but just a local Error object:
-+ *
-+ * Receive an error and not pass it:
-  *     Error *err =3D NULL;
-- *     foo(arg, &err);
-+ *     subcall(arg, &err);
-  *     if (err) {
-  *         handle the error...
-+ *         error_free(err);
-  *     }
-  *
-+ * Note that older code that did not use ERRP_AUTO_PROPAGATE would instead=
- need
-+ * a local Error * variable and the use of error_propagate() to properly h=
-andle
-+ * all possible caller values of errp. Now this is DEPRECATED* (see below)=
-.
-+ *
-+ * Note that any function that wants to modify an error object, such as by
-+ * calling error_append_hint or error_prepend, must use ERRP_AUTO_PROPAGAT=
-E, in
-+ * order for a caller's use of &error_fatal to see the additional informat=
-ion.
-+ *
-+ * In rare cases, we need to pass existing Error object to the caller by h=
-and:
-+ *     error_propagate(errp, err);
-+ *
-+ * Pass an existing error to the caller with the message modified:
-+ *     error_propagate_prepend(errp, err);
-+ *
-+ *
-  * Call a function ignoring errors:
-  *     foo(arg, NULL);
-  *
-@@ -78,26 +143,6 @@
-  * Call a function treating errors as fatal:
-  *     foo(arg, &error_fatal);
-  *
-- * Receive an error and pass it on to the caller:
-- *     Error *err =3D NULL;
-- *     foo(arg, &err);
-- *     if (err) {
-- *         handle the error...
-- *         error_propagate(errp, err);
-- *     }
-- * where Error **errp is a parameter, by convention the last one.
-- *
-- * Do *not* "optimize" this to
-- *     foo(arg, errp);
-- *     if (*errp) { // WRONG!
-- *         handle the error...
-- *     }
-- * because errp may be NULL!
-- *
-- * But when all you do with the error is pass it on, please use
-- *     foo(arg, errp);
-- * for readability.
-- *
-  * Receive and accumulate multiple errors (first one wins):
-  *     Error *err =3D NULL, *local_err =3D NULL;
-  *     foo(arg, &err);
-@@ -114,6 +159,61 @@
-  *         handle the error...
-  *     }
-  * because this may pass a non-null err to bar().
-+ *
-+ * DEPRECATED*
-+ *
-+ * The following pattern of receiving, checking, and then forwarding an er=
-ror
-+ * to the caller by hand is now deprecated:
-+ *
-+ *     Error *err =3D NULL;
-+ *     foo(arg, &err);
-+ *     if (err) {
-+ *         handle the error...
-+ *         error_propagate(errp, err);
-+ *     }
-+ *
-+ * Instead, use ERRP_AUTO_PROPAGATE macro.
-+ *
-+ * The old pattern is deprecated because of two things:
-+ *
-+ * 1. Issue with error_abort and error_propagate: when we wrap error_abort=
- by
-+ * local_err+error_propagate, the resulting coredump will refer to
-+ * error_propagate and not to the place where error happened.
-+ *
-+ * 2. A lot of extra code of the same pattern
-+ *
-+ * How to update old code to use ERRP_AUTO_PROPAGATE?
-+ *
-+ * All you need is to add ERRP_AUTO_PROPAGATE() invocation at function sta=
-rt,
-+ * than you may safely dereference errp to check errors and do not need an=
-y
-+ * additional local Error variables or calls to error_propagate().
-+ *
-+ * Example:
-+ *
-+ * old code
-+ *
-+ *     void fn(..., Error **errp) {
-+ *         Error *err =3D NULL;
-+ *         foo(arg, &err);
-+ *         if (err) {
-+ *             handle the error...
-+ *             error_propagate(errp, err);
-+ *             return;
-+ *         }
-+ *         ...
-+ *     }
-+ *
-+ * updated code
-+ *
-+ *     void fn(..., Error **errp) {
-+ *         ERRP_AUTO_PROPAGATE();
-+ *         foo(arg, errp);
-+ *         if (*errp) {
-+ *             handle the error...
-+ *             return;
-+ *         }
-+ *         ...
-+ *     }
-  */
+diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+index efdc0dbbcfc0..0c3d3b64a508 100644
+--- a/hw/ppc/spapr_caps.c
++++ b/hw/ppc/spapr_caps.c
+@@ -189,24 +189,24 @@ static void spapr_cap_set_pagesize(Object *obj, Visit=
+or *v, const char *name,
 =20
- #ifndef ERROR_H
-@@ -322,6 +422,47 @@ void error_set_internal(Error **errp,
-                         ErrorClass err_class, const char *fmt, ...)
-     GCC_FMT_ATTR(6, 7);
+ static void cap_htm_apply(SpaprMachineState *spapr, uint8_t val, Error **e=
+rrp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     if (!val) {
+         /* TODO: We don't support disabling htm yet */
+         return;
+     }
+     if (tcg_enabled()) {
+-        error_setg(errp,
+-                   "No Transactional Memory support in TCG,"
+-                   " try appending -machine cap-htm=3Doff");
++        error_setg(errp, "No Transactional Memory support in TCG");
++        error_append_hint(errp, "Try appending -machine cap-htm=3Doff\n");
+     } else if (kvm_enabled() && !kvmppc_has_cap_htm()) {
+         error_setg(errp,
+-"KVM implementation does not support Transactional Memory,"
+-                   " try appending -machine cap-htm=3Doff"
+-            );
++"KVM implementation does not support Transactional Memory");
++        error_append_hint(errp, "Try appending -machine cap-htm=3Doff\n");
+     }
+ }
 =20
-+typedef struct ErrorPropagator {
-+    Error *local_err;
-+    Error **errp;
-+} ErrorPropagator;
-+
-+static inline void error_propagator_cleanup(ErrorPropagator *prop)
-+{
-+    error_propagate(prop->errp, prop->local_err);
-+}
-+
-+G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC(ErrorPropagator, error_propagator_cleanup=
+ static void cap_vsx_apply(SpaprMachineState *spapr, uint8_t val, Error **e=
+rrp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     PowerPCCPU *cpu =3D POWERPC_CPU(first_cpu);
+     CPUPPCState *env =3D &cpu->env;
+=20
+@@ -218,13 +218,14 @@ static void cap_vsx_apply(SpaprMachineState *spapr, u=
+int8_t val, Error **errp)
+      * rid of anything that doesn't do VMX */
+     g_assert(env->insns_flags & PPC_ALTIVEC);
+     if (!(env->insns_flags2 & PPC2_VSX)) {
+-        error_setg(errp, "VSX support not available,"
+-                   " try appending -machine cap-vsx=3Doff");
++        error_setg(errp, "VSX support not available");
++        error_append_hint(errp, "Try appending -machine cap-vsx=3Doff\n");
+     }
+ }
+=20
+ static void cap_dfp_apply(SpaprMachineState *spapr, uint8_t val, Error **e=
+rrp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     PowerPCCPU *cpu =3D POWERPC_CPU(first_cpu);
+     CPUPPCState *env =3D &cpu->env;
+=20
+@@ -233,8 +234,8 @@ static void cap_dfp_apply(SpaprMachineState *spapr, uin=
+t8_t val, Error **errp)
+         return;
+     }
+     if (!(env->insns_flags2 & PPC2_DFP)) {
+-        error_setg(errp, "DFP support not available,"
+-                   " try appending -machine cap-dfp=3Doff");
++        error_setg(errp, "DFP support not available");
++        error_append_hint(errp, "Try appending -machine cap-dfp=3Doff\n");
+     }
+ }
+=20
+@@ -248,6 +249,7 @@ SpaprCapPossible cap_cfpc_possible =3D {
+ static void cap_safe_cache_apply(SpaprMachineState *spapr, uint8_t val,
+                                  Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     Error *local_err =3D NULL;
+     uint8_t kvm_val =3D  kvmppc_get_cap_safe_cache();
+=20
+@@ -258,13 +260,14 @@ static void cap_safe_cache_apply(SpaprMachineState *s=
+papr, uint8_t val,
+                    cap_cfpc_possible.vals[val]);
+     } else if (kvm_enabled() && (val > kvm_val)) {
+         error_setg(errp,
+-                   "Requested safe cache capability level not supported by=
+ kvm,"
+-                   " try appending -machine cap-cfpc=3D%s",
+-                   cap_cfpc_possible.vals[kvm_val]);
++"Requested safe cache capability level not supported by KVM");
++        error_append_hint(errp, "Try appending -machine cap-cfpc=3D%s\n",
++                          cap_cfpc_possible.vals[kvm_val]);
+     }
+=20
+-    if (local_err !=3D NULL)
++    if (local_err !=3D NULL) {
+         warn_report_err(local_err);
++    }
+ }
+=20
+ SpaprCapPossible cap_sbbc_possible =3D {
+@@ -277,6 +280,7 @@ SpaprCapPossible cap_sbbc_possible =3D {
+ static void cap_safe_bounds_check_apply(SpaprMachineState *spapr, uint8_t =
+val,
+                                         Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     Error *local_err =3D NULL;
+     uint8_t kvm_val =3D  kvmppc_get_cap_safe_bounds_check();
+=20
+@@ -287,13 +291,14 @@ static void cap_safe_bounds_check_apply(SpaprMachineS=
+tate *spapr, uint8_t val,
+                    cap_sbbc_possible.vals[val]);
+     } else if (kvm_enabled() && (val > kvm_val)) {
+         error_setg(errp,
+-"Requested safe bounds check capability level not supported by kvm,"
+-                   " try appending -machine cap-sbbc=3D%s",
+-                   cap_sbbc_possible.vals[kvm_val]);
++"Requested safe bounds check capability level not supported by KVM");
++        error_append_hint(errp, "Try appending -machine cap-sbbc=3D%s\n",
++                          cap_sbbc_possible.vals[kvm_val]);
+     }
+=20
+-    if (local_err !=3D NULL)
++    if (local_err !=3D NULL) {
+         warn_report_err(local_err);
++    }
+ }
+=20
+ SpaprCapPossible cap_ibs_possible =3D {
+@@ -309,6 +314,7 @@ SpaprCapPossible cap_ibs_possible =3D {
+ static void cap_safe_indirect_branch_apply(SpaprMachineState *spapr,
+                                            uint8_t val, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     Error *local_err =3D NULL;
+     uint8_t kvm_val =3D kvmppc_get_cap_safe_indirect_branch();
+=20
+@@ -319,9 +325,9 @@ static void cap_safe_indirect_branch_apply(SpaprMachine=
+State *spapr,
+                    cap_ibs_possible.vals[val]);
+     } else if (kvm_enabled() && (val > kvm_val)) {
+         error_setg(errp,
+-"Requested safe indirect branch capability level not supported by kvm,"
+-                   " try appending -machine cap-ibs=3D%s",
+-                   cap_ibs_possible.vals[kvm_val]);
++"Requested safe indirect branch capability level not supported by KVM");
++        error_append_hint(errp, "Try appending -machine cap-ibs=3D%s\n",
++                          cap_ibs_possible.vals[kvm_val]);
+     }
+=20
+     if (local_err !=3D NULL) {
+@@ -408,17 +414,17 @@ static void cap_nested_kvm_hv_apply(SpaprMachineState=
+ *spapr,
+     }
+=20
+     if (tcg_enabled()) {
+-        error_setg(errp,
+-                   "No Nested KVM-HV support in tcg,"
+-                   " try appending -machine cap-nested-hv=3Doff");
++        error_setg(errp, "No Nested KVM-HV support in TCG");
++        error_append_hint(errp, "Try appending -machine cap-nested-hv=3Dof=
+f");
+     } else if (kvm_enabled()) {
+         if (!kvmppc_has_cap_nested_kvm_hv()) {
+             error_setg(errp,
+-"KVM implementation does not support Nested KVM-HV,"
+-                       " try appending -machine cap-nested-hv=3Doff");
++"KVM implementation does not support Nested KVM-HV");
++            error_append_hint(errp, "Try appending -machine cap-nested-hv=
+=3Doff");
+         } else if (kvmppc_set_cap_nested_kvm_hv(val) < 0) {
+-                error_setg(errp,
+-"Error enabling cap-nested-hv with KVM, try cap-nested-hv=3Doff");
++                error_setg(errp, "Error enabling cap-nested-hv with KVM");
++                error_append_hint(errp,
++                                  "Try appending -machine cap-nested-hv=3D=
+off");
+         }
+     }
+ }
+@@ -426,6 +432,7 @@ static void cap_nested_kvm_hv_apply(SpaprMachineState *=
+spapr,
+ static void cap_large_decr_apply(SpaprMachineState *spapr,
+                                  uint8_t val, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     PowerPCCPU *cpu =3D POWERPC_CPU(first_cpu);
+     PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cpu);
+=20
+@@ -436,22 +443,23 @@ static void cap_large_decr_apply(SpaprMachineState *s=
+papr,
+     if (tcg_enabled()) {
+         if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_3_00, 0,
+                               spapr->max_compat_pvr)) {
+-            error_setg(errp,
+-                "Large decrementer only supported on POWER9, try -cpu POWE=
+R9");
++            error_setg(errp, "Large decrementer only supported on POWER9")=
+;
++            error_append_hint(errp, "Try -cpu POWER9\n");
+             return;
+         }
+     } else if (kvm_enabled()) {
+         int kvm_nr_bits =3D kvmppc_get_cap_large_decr();
+=20
+         if (!kvm_nr_bits) {
+-            error_setg(errp,
+-                       "No large decrementer support,"
+-                        " try appending -machine cap-large-decr=3Doff");
++            error_setg(errp, "No large decrementer support");
++            error_append_hint(errp,
++                              "Try appending -machine cap-large-decr=3Doff=
+\n");
+         } else if (pcc->lrg_decr_bits !=3D kvm_nr_bits) {
+             error_setg(errp,
+-"KVM large decrementer size (%d) differs to model (%d),"
+-                " try appending -machine cap-large-decr=3Doff",
+-                kvm_nr_bits, pcc->lrg_decr_bits);
++                       "KVM large decrementer size (%d) differs to model (=
+%d)",
++                       kvm_nr_bits, pcc->lrg_decr_bits);
++            error_append_hint(errp,
++                              "Try appending -machine cap-large-decr=3Doff=
+\n");
+         }
+     }
+ }
+@@ -460,14 +468,15 @@ static void cap_large_decr_cpu_apply(SpaprMachineStat=
+e *spapr,
+                                      PowerPCCPU *cpu,
+                                      uint8_t val, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     CPUPPCState *env =3D &cpu->env;
+     target_ulong lpcr =3D env->spr[SPR_LPCR];
+=20
+     if (kvm_enabled()) {
+         if (kvmppc_enable_cap_large_decr(cpu, val)) {
+-            error_setg(errp,
+-                       "No large decrementer support,"
+-                       " try appending -machine cap-large-decr=3Doff");
++            error_setg(errp, "No large decrementer support");
++            error_append_hint(errp,
++                              "Try appending -machine cap-large-decr=3Doff=
+\n");
+         }
+     }
+=20
+@@ -482,6 +491,7 @@ static void cap_large_decr_cpu_apply(SpaprMachineState =
+*spapr,
+ static void cap_ccf_assist_apply(SpaprMachineState *spapr, uint8_t val,
+                                  Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     uint8_t kvm_val =3D kvmppc_get_cap_count_cache_flush_assist();
+=20
+     if (tcg_enabled() && val) {
+@@ -504,14 +514,15 @@ static void cap_ccf_assist_apply(SpaprMachineState *s=
+papr, uint8_t val,
+             return;
+         }
+         error_setg(errp,
+-"Requested count cache flush assist capability level not supported by kvm,=
+"
+-                   " try appending -machine cap-ccf-assist=3Doff");
++"Requested count cache flush assist capability level not supported by KVM"=
 );
-+
-+/*
-+ * ERRP_AUTO_PROPAGATE
-+ *
-+ * This macro exists to assist with proper error handling in a function wh=
-ich
-+ * uses an Error **errp parameter.  It must be used as the first line of a
-+ * function which modifies an error (with error_prepend, error_append_hint=
-, or
-+ * similar) or which wants to dereference *errp.  It is still safe (but
-+ * useless) to use in other functions.
-+ *
-+ * If errp is NULL or points to error_fatal, it is rewritten to point to a
-+ * local Error object, which will be automatically propagated to the origi=
-nal
-+ * errp on function exit (see error_propagator_cleanup).
-+ *
-+ * After invocation of this macro it is always safe to dereference errp
-+ * (as it's not NULL anymore) and to add information by error_prepend or
-+ * error_append_hint (as, if it was error_fatal, we swapped it with a
-+ * local_error to be propagated on cleanup).
-+ *
-+ * Note: we don't wrap the error_abort case, as we want resulting coredump
-+ * to point to the place where the error happened, not to error_propagate.
-+ */
-+#define ERRP_AUTO_PROPAGATE() \
-+    g_auto(ErrorPropagator) _auto_errp_prop =3D {.errp =3D errp}; \
-+    do { \
-+        if (!errp || errp =3D=3D &error_fatal) { \
-+            errp =3D &_auto_errp_prop.local_err; \
-+        } \
-+    } while (0)
-+
- /*
-  * Special error destination to abort on error.
-  * See error_setg() and error_propagate() for details.
++        error_append_hint(errp, "Try appending -machine cap-ccf-assist=3Do=
+ff\n");
+     }
+ }
+=20
+ static void cap_fwnmi_apply(SpaprMachineState *spapr, uint8_t val,
+                                 Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     if (!val) {
+         return; /* Disabled by default */
+     }
 
 
 
