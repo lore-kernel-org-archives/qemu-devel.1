@@ -2,48 +2,47 @@ Return-Path: <SRS0=wemX=7X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham
+	UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC501C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:31:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E733FC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:32:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 918C82067B
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:31:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 918C82067B
+	by mail.kernel.org (Postfix) with ESMTPS id BAF2320760
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:32:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BAF2320760
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40190 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43558 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jj0oy-0003xP-PT
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 09:31:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49542)
+	id 1jj0qF-0005bC-TA
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 09:32:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58612)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jj0bA-0000DR-P7; Wed, 10 Jun 2020 09:16:56 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:38257)
+ id 1jj0ob-00043l-BY; Wed, 10 Jun 2020 09:30:49 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:33295)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jj0av-0005Ln-Ep; Wed, 10 Jun 2020 09:16:56 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.08845051|-1; CH=blue; DM=|OVERLOAD|false|;
- DS=CONTINUE|ham_system_inform|0.0164755-7.95024e-05-0.983445;
- FP=0|0|0|0|0|-1|-1|-1; HT=e02c03310; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=8; RT=8; SR=0; TI=SMTPD_---.HkbK7rV_1591794995; 
+ id 1jj0oX-0000bD-UL; Wed, 10 Jun 2020 09:30:47 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.1192751|-1; CH=blue; DM=|OVERLOAD|false|;
+ DS=CONTINUE|ham_system_inform|0.0209329-0.00023831-0.978829;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e01a16384; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=8; RT=8; SR=0; TI=SMTPD_---.HkbavJv_1591795839; 
 Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.HkbK7rV_1591794995)
- by smtp.aliyun-inc.com(10.147.42.22); Wed, 10 Jun 2020 21:16:35 +0800
+ fp:SMTPD_---.HkbavJv_1591795839)
+ by smtp.aliyun-inc.com(10.147.40.44); Wed, 10 Jun 2020 21:30:39 +0800
 From: LIU Zhiwei <zhiwei_liu@c-sky.com>
 To: qemu-devel@nongnu.org,
 	qemu-riscv@nongnu.org
-Subject: [PATCH v9 49/61] target/riscv: vector mask-register logical
- instructions
-Date: Wed, 10 Jun 2020 19:37:36 +0800
-Message-Id: <20200610113748.4754-50-zhiwei_liu@c-sky.com>
+Subject: [PATCH v9 56/61] target/riscv: integer scalar move instruction
+Date: Wed, 10 Jun 2020 19:37:43 +0800
+Message-Id: <20200610113748.4754-57-zhiwei_liu@c-sky.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20200610113748.4754-1-zhiwei_liu@c-sky.com>
 References: <20200610113748.4754-1-zhiwei_liu@c-sky.com>
@@ -80,139 +79,106 @@ Sender: "Qemu-devel"
 Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/riscv/helper.h                   |  9 ++++++
- target/riscv/insn32.decode              |  8 +++++
- target/riscv/insn_trans/trans_rvv.inc.c | 35 ++++++++++++++++++++++
- target/riscv/vector_helper.c            | 40 +++++++++++++++++++++++++
- 4 files changed, 92 insertions(+)
+ target/riscv/insn32.decode              |  1 +
+ target/riscv/insn_trans/trans_rvv.inc.c | 60 +++++++++++++++++++++++++
+ target/riscv/internals.h                |  6 +++
+ 3 files changed, 67 insertions(+)
 
-diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index 6b932b444d..9bb4d8efd5 100644
---- a/target/riscv/helper.h
-+++ b/target/riscv/helper.h
-@@ -1086,3 +1086,12 @@ DEF_HELPER_6(vfredmin_vs_d, void, ptr, ptr, ptr, ptr, env, i32)
- 
- DEF_HELPER_6(vfwredsum_vs_h, void, ptr, ptr, ptr, ptr, env, i32)
- DEF_HELPER_6(vfwredsum_vs_w, void, ptr, ptr, ptr, ptr, env, i32)
-+
-+DEF_HELPER_6(vmand_mm, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmnand_mm, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmandnot_mm, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmxor_mm, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmor_mm, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmnor_mm, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmornot_mm, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmxnor_mm, void, ptr, ptr, ptr, ptr, env, i32)
 diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index 526a964d28..a4128c26a0 100644
+index 26dd0f1b1b..0741a25540 100644
 --- a/target/riscv/insn32.decode
 +++ b/target/riscv/insn32.decode
-@@ -545,6 +545,14 @@ vfredmin_vs     000101 . ..... ..... 001 ..... 1010111 @r_vm
- vfredmax_vs     000111 . ..... ..... 001 ..... 1010111 @r_vm
- # Vector widening ordered and unordered float reduction sum
- vfwredsum_vs    1100-1 . ..... ..... 001 ..... 1010111 @r_vm
-+vmand_mm        011001 - ..... ..... 010 ..... 1010111 @r
-+vmnand_mm       011101 - ..... ..... 010 ..... 1010111 @r
-+vmandnot_mm     011000 - ..... ..... 010 ..... 1010111 @r
-+vmxor_mm        011011 - ..... ..... 010 ..... 1010111 @r
-+vmor_mm         011010 - ..... ..... 010 ..... 1010111 @r
-+vmnor_mm        011110 - ..... ..... 010 ..... 1010111 @r
-+vmornot_mm      011100 - ..... ..... 010 ..... 1010111 @r
-+vmxnor_mm       011111 - ..... ..... 010 ..... 1010111 @r
+@@ -562,6 +562,7 @@ vmsof_m         010110 . ..... 00010 010 ..... 1010111 @r2_vm
+ viota_m         010110 . ..... 10000 010 ..... 1010111 @r2_vm
+ vid_v           010110 . 00000 10001 010 ..... 1010111 @r1_vm
+ vext_x_v        001100 1 ..... ..... 010 ..... 1010111 @r
++vmv_s_x         001101 1 00000 ..... 110 ..... 1010111 @r2
  
  vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
  vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
 diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index 1f1559b0bd..13e2c31421 100644
+index 0dedf4983d..e67eff0a7f 100644
 --- a/target/riscv/insn_trans/trans_rvv.inc.c
 +++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -2354,3 +2354,38 @@ GEN_OPFVV_TRANS(vfredmin_vs, reduction_check)
- 
- /* Vector Widening Floating-Point Reduction Instructions */
- GEN_OPFVV_WIDEN_TRANS(vfwredsum_vs, reduction_check)
-+
-+/*
-+ *** Vector Mask Operations
-+ */
-+
-+/* Vector Mask-Register Logical Instructions */
-+#define GEN_MM_TRANS(NAME)                                         \
-+static bool trans_##NAME(DisasContext *s, arg_r *a)                \
-+{                                                                  \
-+    if (vext_check_isa_ill(s)) {                                   \
-+        uint32_t data = 0;                                         \
-+        gen_helper_gvec_4_ptr *fn = gen_helper_##NAME;             \
-+        TCGLabel *over = gen_new_label();                          \
-+        tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_vl, 0, over);          \
-+                                                                   \
-+        data = FIELD_DP32(data, VDATA, MLEN, s->mlen);             \
-+        data = FIELD_DP32(data, VDATA, LMUL, s->lmul);             \
-+        tcg_gen_gvec_4_ptr(vreg_ofs(s, a->rd), vreg_ofs(s, 0),     \
-+                           vreg_ofs(s, a->rs1),                    \
-+                           vreg_ofs(s, a->rs2), cpu_env, 0,        \
-+                           s->vlen / 8, data, fn);                 \
-+        gen_set_label(over);                                       \
-+        return true;                                               \
-+    }                                                              \
-+    return false;                                                  \
-+}
-+
-+GEN_MM_TRANS(vmand_mm)
-+GEN_MM_TRANS(vmnand_mm)
-+GEN_MM_TRANS(vmandnot_mm)
-+GEN_MM_TRANS(vmxor_mm)
-+GEN_MM_TRANS(vmor_mm)
-+GEN_MM_TRANS(vmnor_mm)
-+GEN_MM_TRANS(vmornot_mm)
-+GEN_MM_TRANS(vmxnor_mm)
-diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index e30f8f83d3..54c1b2e739 100644
---- a/target/riscv/vector_helper.c
-+++ b/target/riscv/vector_helper.c
-@@ -4502,3 +4502,43 @@ void HELPER(vfwredsum_vs_w)(void *vd, void *v0, void *vs1,
-     *((uint64_t *)vd) = s1;
-     clearq(vd, 1, sizeof(uint64_t), tot);
+@@ -2649,3 +2649,63 @@ static bool trans_vext_x_v(DisasContext *s, arg_r *a)
+     tcg_temp_free_i64(tmp);
+     return true;
  }
 +
-+/*
-+ *** Vector Mask Operations
-+ */
-+/* Vector Mask-Register Logical Instructions */
-+#define GEN_VEXT_MASK_VV(NAME, OP)                        \
-+void HELPER(NAME)(void *vd, void *v0, void *vs1,          \
-+                  void *vs2, CPURISCVState *env,          \
-+                  uint32_t desc)                          \
-+{                                                         \
-+    uint32_t mlen = vext_mlen(desc);                      \
-+    uint32_t vlmax = env_archcpu(env)->cfg.vlen / mlen;   \
-+    uint32_t vl = env->vl;                                \
-+    uint32_t i;                                           \
-+    int a, b;                                             \
-+                                                          \
-+    for (i = 0; i < vl; i++) {                            \
-+        a = vext_elem_mask(vs1, mlen, i);                 \
-+        b = vext_elem_mask(vs2, mlen, i);                 \
-+        vext_set_elem_mask(vd, mlen, i, OP(b, a));        \
-+    }                                                     \
-+    for (; i < vlmax; i++) {                              \
-+        vext_set_elem_mask(vd, mlen, i, 0);               \
-+    }                                                     \
++/* Integer Scalar Move Instruction */
++
++static void store_element(TCGv_i64 val, TCGv_ptr base,
++                          int ofs, int sew)
++{
++    switch (sew) {
++    case MO_8:
++        tcg_gen_st8_i64(val, base, ofs);
++        break;
++    case MO_16:
++        tcg_gen_st16_i64(val, base, ofs);
++        break;
++    case MO_32:
++        tcg_gen_st32_i64(val, base, ofs);
++        break;
++    case MO_64:
++        tcg_gen_st_i64(val, base, ofs);
++        break;
++    default:
++        g_assert_not_reached();
++        break;
++    }
 +}
 +
-+#define DO_NAND(N, M)  (!(N & M))
-+#define DO_ANDNOT(N, M)  (N & !M)
-+#define DO_NOR(N, M)  (!(N | M))
-+#define DO_ORNOT(N, M)  (N | !M)
-+#define DO_XNOR(N, M)  (!(N ^ M))
++/*
++ * Store vreg[idx] = val.
++ * The index must be in range of VLMAX.
++ */
++static void vec_element_storei(DisasContext *s, int vreg,
++                               int idx, TCGv_i64 val)
++{
++    store_element(val, cpu_env, endian_ofs(s, vreg, idx), s->sew);
++}
 +
-+GEN_VEXT_MASK_VV(vmand_mm, DO_AND)
-+GEN_VEXT_MASK_VV(vmnand_mm, DO_NAND)
-+GEN_VEXT_MASK_VV(vmandnot_mm, DO_ANDNOT)
-+GEN_VEXT_MASK_VV(vmxor_mm, DO_XOR)
-+GEN_VEXT_MASK_VV(vmor_mm, DO_OR)
-+GEN_VEXT_MASK_VV(vmnor_mm, DO_NOR)
-+GEN_VEXT_MASK_VV(vmornot_mm, DO_ORNOT)
-+GEN_VEXT_MASK_VV(vmxnor_mm, DO_XNOR)
++/* vmv.s.x vd, rs1 # vd[0] = rs1 */
++static bool trans_vmv_s_x(DisasContext *s, arg_vmv_s_x *a)
++{
++    if (vext_check_isa_ill(s)) {
++        /* This instruction ignores LMUL and vector register groups */
++        int maxsz = s->vlen >> 3;
++        TCGv_i64 t1;
++        TCGLabel *over = gen_new_label();
++
++        tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_vl, 0, over);
++        tcg_gen_gvec_dup_imm(SEW64, vreg_ofs(s, a->rd), maxsz, maxsz, 0);
++        if (a->rs1 == 0) {
++            goto done;
++        }
++
++        t1 = tcg_temp_new_i64();
++        tcg_gen_extu_tl_i64(t1, cpu_gpr[a->rs1]);
++        vec_element_storei(s, a->rd, 0, t1);
++        tcg_temp_free_i64(t1);
++    done:
++        gen_set_label(over);
++        return true;
++    }
++    return false;
++}
+diff --git a/target/riscv/internals.h b/target/riscv/internals.h
+index f3cea478f7..37d33820ad 100644
+--- a/target/riscv/internals.h
++++ b/target/riscv/internals.h
+@@ -32,4 +32,10 @@ FIELD(VDATA, WD, 11, 1)
+ target_ulong fclass_h(uint64_t frs1);
+ target_ulong fclass_s(uint64_t frs1);
+ target_ulong fclass_d(uint64_t frs1);
++
++#define SEW8  0
++#define SEW16 1
++#define SEW32 2
++#define SEW64 3
++
+ #endif
 -- 
 2.23.0
 
