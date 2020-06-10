@@ -2,112 +2,62 @@ Return-Path: <SRS0=wemX=7X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7273EC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:39:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68D00C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:40:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 46AE820734
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:39:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46AE820734
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3D93F20734
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:40:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D93F20734
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33602 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37320 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jj0ww-000623-Hj
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 09:39:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60086)
+	id 1jj0yD-0007kj-Cm
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 09:40:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54776)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pasic@linux.ibm.com>)
- id 1jj0sV-0000N8-1o; Wed, 10 Jun 2020 09:34:51 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:10072)
+ (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jj0ij-0003rT-82; Wed, 10 Jun 2020 09:24:45 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:45749)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pasic@linux.ibm.com>)
- id 1jj0sT-0001tq-RB; Wed, 10 Jun 2020 09:34:50 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 05ADWgJ7038141; Wed, 10 Jun 2020 09:34:44 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 31k02b17a1-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 10 Jun 2020 09:34:44 -0400
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05ADWtIA039847;
- Wed, 10 Jun 2020 09:34:44 -0400
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com
- [169.51.49.98])
- by mx0a-001b2d01.pphosted.com with ESMTP id 31k02b178v-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 10 Jun 2020 09:34:43 -0400
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
- by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05ADVP4L003804;
- Wed, 10 Jun 2020 13:34:41 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com
- (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
- by ppma03ams.nl.ibm.com with ESMTP id 31g2s7ys8b-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 10 Jun 2020 13:34:41 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com
- (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
- by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id 05ADYcH366191792
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 10 Jun 2020 13:34:38 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 6FD24A4062;
- Wed, 10 Jun 2020 13:34:38 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id B6786A4054;
- Wed, 10 Jun 2020 13:34:37 +0000 (GMT)
-Received: from oc2783563651 (unknown [9.145.127.50])
- by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Wed, 10 Jun 2020 13:34:37 +0000 (GMT)
-Date: Wed, 10 Jun 2020 15:34:36 +0200
-From: Halil Pasic <pasic@linux.ibm.com>
-To: Cornelia Huck <cohuck@redhat.com>
-Subject: Re: [PATCH v2 1/1] virtio-ccw: auto-manage VIRTIO_F_IOMMU_PLATFORM
- if PV
-Message-ID: <20200610153436.1b79ee11.pasic@linux.ibm.com>
-In-Reply-To: <20200609180559.52298647.cohuck@redhat.com>
-References: <20200514221155.32079-1-pasic@linux.ibm.com>
- <20200520121507-mutt-send-email-mst@kernel.org>
- <20200606013217.2cffa3ed.pasic@linux.ibm.com>
- <20200608181428.3c6f127c.cohuck@redhat.com>
- <20200608190045.319dd68b.pasic@linux.ibm.com>
- <20200609084402.35d317ec.cohuck@redhat.com>
- <20200609114130.0ca9190b.pasic@linux.ibm.com>
- <20200609174747.4e300818@ibm-vm>
- <20200609180559.52298647.cohuck@redhat.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
+ (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jj0ih-0007ij-Vq; Wed, 10 Jun 2020 09:24:44 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.08050555|-1; BR=01201311R151ec; CH=green;
+ DM=|OVERLOAD|false|; DS=SPAM|spam_blackmail|0.948436-1.40596e-05-0.0515498;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e02c03293; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=8; RT=8; SR=0; TI=SMTPD_---.HkbBTzh_1591795477; 
+Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.HkbBTzh_1591795477)
+ by smtp.aliyun-inc.com(10.147.41.158);
+ Wed, 10 Jun 2020 21:24:38 +0800
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Subject: [PATCH v9 53/61] target/riscv: vector iota instruction
+Date: Wed, 10 Jun 2020 19:37:40 +0800
+Message-Id: <20200610113748.4754-54-zhiwei_liu@c-sky.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20200610113748.4754-1-zhiwei_liu@c-sky.com>
+References: <20200610113748.4754-1-zhiwei_liu@c-sky.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
- definitions=2020-06-10_08:2020-06-10,
- 2020-06-10 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- mlxscore=0 malwarescore=0
- spamscore=0 adultscore=0 priorityscore=1501 impostorscore=0 clxscore=1015
- lowpriorityscore=0 mlxlogscore=973 suspectscore=0 bulkscore=0
- cotscore=-2147483648 phishscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2006100100
-Received-SPF: pass client-ip=148.163.156.1; envelope-from=pasic@linux.ibm.com;
- helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/10 09:16:22
+Received-SPF: none client-ip=121.197.200.217;
+ envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/10 07:37:52
 X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
-X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001, UNPARSEABLE_RELAY=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -120,35 +70,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Viktor Mihajlovski <mihajlov@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
- Boris Fiuczynski <fiuczy@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>,
- Pierre Morel <pmorel@linux.ibm.com>, "Michael S.
- Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>,
- David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Claudio Imbrenda <imbrenda@linux.ibm.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: richard.henderson@linaro.org, wxy194768@alibaba-inc.com,
+ wenmeng_zhang@c-sky.com, Alistair.Francis@wdc.com, palmer@dabbelt.com,
+ LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 9 Jun 2020 18:05:59 +0200
-Cornelia Huck <cohuck@redhat.com> wrote:
+Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/riscv/helper.h                   |  5 +++++
+ target/riscv/insn32.decode              |  1 +
+ target/riscv/insn_trans/trans_rvv.inc.c | 27 +++++++++++++++++++++++
+ target/riscv/vector_helper.c            | 29 +++++++++++++++++++++++++
+ 4 files changed, 62 insertions(+)
 
-> Which devices are compatible in the end? It seems the only ones that
-> are known to be working are virtio-ccw devices with IOMMU_PLATFORM on.
-> virtio-pci devices and non-virtio ccw (vfio-ccw, 3270) seem to be out,
-> as far as I understand it. What about non-ccw? PCI in general, vfio-ap?
+diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+index ae93b6018d..90e6d31d78 100644
+--- a/target/riscv/helper.h
++++ b/target/riscv/helper.h
+@@ -1103,3 +1103,8 @@ DEF_HELPER_4(vmfirst_m, tl, ptr, ptr, env, i32)
+ DEF_HELPER_5(vmsbf_m, void, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_5(vmsif_m, void, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_5(vmsof_m, void, ptr, ptr, ptr, env, i32)
++
++DEF_HELPER_5(viota_m_b, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_5(viota_m_h, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_5(viota_m_w, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_5(viota_m_d, void, ptr, ptr, ptr, env, i32)
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index b2bc6ab3dd..37756fa76d 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -558,6 +558,7 @@ vmfirst_m       010101 . ..... ----- 010 ..... 1010111 @r2_vm
+ vmsbf_m         010110 . ..... 00001 010 ..... 1010111 @r2_vm
+ vmsif_m         010110 . ..... 00011 010 ..... 1010111 @r2_vm
+ vmsof_m         010110 . ..... 00010 010 ..... 1010111 @r2_vm
++viota_m         010110 . ..... 10000 010 ..... 1010111 @r2_vm
+ 
+ vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
+ vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
+diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+index 3b59170bed..b109732d11 100644
+--- a/target/riscv/insn_trans/trans_rvv.inc.c
++++ b/target/riscv/insn_trans/trans_rvv.inc.c
+@@ -2481,3 +2481,30 @@ static bool trans_##NAME(DisasContext *s, arg_rmr *a)              \
+ GEN_M_TRANS(vmsbf_m)
+ GEN_M_TRANS(vmsif_m)
+ GEN_M_TRANS(vmsof_m)
++
++/* Vector Iota Instruction */
++static bool trans_viota_m(DisasContext *s, arg_viota_m *a)
++{
++    if (vext_check_isa_ill(s) &&
++        vext_check_reg(s, a->rd, false) &&
++        vext_check_overlap_group(a->rd, 1 << s->lmul, a->rs2, 1) &&
++        (a->vm != 0 || a->rd != 0)) {
++        uint32_t data = 0;
++        TCGLabel *over = gen_new_label();
++        tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_vl, 0, over);
++
++        data = FIELD_DP32(data, VDATA, MLEN, s->mlen);
++        data = FIELD_DP32(data, VDATA, VM, a->vm);
++        data = FIELD_DP32(data, VDATA, LMUL, s->lmul);
++        static gen_helper_gvec_3_ptr * const fns[4] = {
++            gen_helper_viota_m_b, gen_helper_viota_m_h,
++            gen_helper_viota_m_w, gen_helper_viota_m_d,
++        };
++        tcg_gen_gvec_3_ptr(vreg_ofs(s, a->rd), vreg_ofs(s, 0),
++                           vreg_ofs(s, a->rs2), cpu_env, 0,
++                           s->vlen / 8, data, fns[s->sew]);
++        gen_set_label(over);
++        return true;
++    }
++    return false;
++}
+diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+index 6a579a6300..d6283053f1 100644
+--- a/target/riscv/vector_helper.c
++++ b/target/riscv/vector_helper.c
+@@ -4644,3 +4644,32 @@ void HELPER(vmsof_m)(void *vd, void *v0, void *vs2, CPURISCVState *env,
+ {
+     vmsetm(vd, v0, vs2, env, desc, ONLY_FIRST);
+ }
++
++/* Vector Iota Instruction */
++#define GEN_VEXT_VIOTA_M(NAME, ETYPE, H, CLEAR_FN)                        \
++void HELPER(NAME)(void *vd, void *v0, void *vs2, CPURISCVState *env,      \
++                  uint32_t desc)                                          \
++{                                                                         \
++    uint32_t mlen = vext_mlen(desc);                                      \
++    uint32_t vlmax = env_archcpu(env)->cfg.vlen / mlen;                   \
++    uint32_t vm = vext_vm(desc);                                          \
++    uint32_t vl = env->vl;                                                \
++    uint32_t sum = 0;                                                     \
++    int i;                                                                \
++                                                                          \
++    for (i = 0; i < vl; i++) {                                            \
++        if (!vm && !vext_elem_mask(v0, mlen, i)) {                        \
++            continue;                                                     \
++        }                                                                 \
++        *((ETYPE *)vd + H(i)) = sum;                                      \
++        if (vext_elem_mask(vs2, mlen, i)) {                               \
++            sum++;                                                        \
++        }                                                                 \
++    }                                                                     \
++    CLEAR_FN(vd, vl, vl * sizeof(ETYPE), vlmax * sizeof(ETYPE));          \
++}
++
++GEN_VEXT_VIOTA_M(viota_m_b, uint8_t, H1, clearb)
++GEN_VEXT_VIOTA_M(viota_m_h, uint16_t, H2, clearh)
++GEN_VEXT_VIOTA_M(viota_m_w, uint32_t, H4, clearl)
++GEN_VEXT_VIOTA_M(viota_m_d, uint64_t, H8, clearq)
+-- 
+2.23.0
 
-I've already answered how virtio is special. Regarding PCI, it is
-currently not supported in prot virt mode, and this is properly handled
-by the ultravisor: facility bits fenced and operation exceptions
-indicated if the guest were to try and do PCI instructions nevertheless.
-That also means we don't have to worry about virtio-pci for the
-moment. The status current of AP is analogous to that of PCI.
-
-So AFAIU all we have to worry about at the moment is ccw and virtio-ccw.
-
-Regards,
-Halil
 
