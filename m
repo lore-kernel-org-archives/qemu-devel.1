@@ -7,78 +7,79 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E990C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 04:46:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE117C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 04:47:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E617120734
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 04:46:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 651BD20734
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 04:47:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fdgE2wGz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E617120734
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P9VAV+jR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 651BD20734
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42600 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47152 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jiscp-00019t-V6
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 00:46:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34094)
+	id 1jiseU-000343-E4
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 00:47:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34630)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jisKy-0008V4-9I
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 00:27:40 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:28213
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jisNe-00041Y-43
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 00:30:26 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23930
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jisKx-0008IX-Fb
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 00:27:39 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jisNb-00005q-V5
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 00:30:25 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591763258;
+ s=mimecast20190719; t=1591763404;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=11YzbNhHFtGTHcpUmTTeopy8tsF4jxxnFLUzlloWLDM=;
- b=fdgE2wGz2Xd5o2S5xyItIpAEl0PnJ/S5SFUs0dSbuO0aCWyIDWNaXXXJ/9TZ+6Ct+9VvFN
- nPALQw08sI946zV25bqznCU05CeDCThnZ4mK49Kiveqb3+ABMZbwYbkaGpfGb2gFD+wAm9
- 4WaQNhmGul5sfv97WfVWCPwmt6eKEcM=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-201-tYhF77pNNlWQBP6xPFNniw-1; Wed, 10 Jun 2020 00:27:36 -0400
-X-MC-Unique: tYhF77pNNlWQBP6xPFNniw-1
-Received: by mail-wr1-f71.google.com with SMTP id c14so503471wrm.15
- for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 21:27:36 -0700 (PDT)
+ bh=KpsP6snzFwXir/Xzc+9Qv0RUmc46Jj6u+9GlR3QS4bo=;
+ b=P9VAV+jRPSsIxLbWqdGqRO4GDR9UDG619ix45JiQzRrwzTfTJS6gdsNWaftjeKjlrj/nsq
+ V30NLrpmUZS06xJAagdkagESK6UtD8G1SVO3uCocJhuNj/qobZ69GiOIFyvwcW25CSsMBz
+ 8sa624zmK8wBcjKi2+um3ZHK6hrWG4c=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-407-bz6pGaWCOCmLzfrzmKel3w-1; Wed, 10 Jun 2020 00:27:00 -0400
+X-MC-Unique: bz6pGaWCOCmLzfrzmKel3w-1
+Received: by mail-wr1-f72.google.com with SMTP id s17so509131wrt.7
+ for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 21:27:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:content-transfer-encoding
  :in-reply-to;
- bh=11YzbNhHFtGTHcpUmTTeopy8tsF4jxxnFLUzlloWLDM=;
- b=TXLHqJ+SWbZurfjtjFNlhEX5BJ1iE3InGGjx6n6kazERukSE5G09airucniRwe4Q97
- tAgSd3pasUZyNP6d3gJczBoLKODspOvJw9Z8PVSYgoMjb8cUZyFrpMkMpWcWrVmDTdmY
- vgXJUOziNgSq1W/89VVJrr3KLmC7aD9uOpoa9kftZfNIlHCN1/xfLFcPpaD4JD0FlWa4
- RBDlk3x2bb8GU1rMAUGr2nf3FMWblSx2mIbWX/5WXUBYPsnp49yYBB/ENZ0emKFX9bsv
- Kcjlhob5Zu/3+HLRZ9ZvLFIOeA0WAX6Ko5BQc0xclQRgyHTETKWEwavYWuNoK6dkpl8N
- +nSw==
-X-Gm-Message-State: AOAM530Ihv/aHyLYtyJa/ykAyoCjP1fbIsHsSGondo+j38TsNz++I8Tm
- NJDMjixb63Glb0kE9v3Z0hedMdLm9zvvOqJdBgsRpKC27wWXDXVAKzlwHhGcO0lZFCEVB2Vje5G
- 6zf8Mm2DIr4MHNp0=
-X-Received: by 2002:a5d:6087:: with SMTP id w7mr1448487wrt.158.1591763255131; 
- Tue, 09 Jun 2020 21:27:35 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzH/R0H1Yn1QXu55fk3L4uF2hDXWBaf5Pl3/mpGD+cyPzBv+HPuJnUktpq718maViwt1BXcPA==
-X-Received: by 2002:a5d:6087:: with SMTP id w7mr1448470wrt.158.1591763254960; 
- Tue, 09 Jun 2020 21:27:34 -0700 (PDT)
+ bh=KpsP6snzFwXir/Xzc+9Qv0RUmc46Jj6u+9GlR3QS4bo=;
+ b=OATKDZekG1M/Aq8riMGYDu3663pYVV/ceCvUoxzYfjznugkik5pjr7CwlOL3dt4KTY
+ nm6M/diEp8qL2q7xXWLMflpXxQuPO6K9wi7U8rY1Ov7GL9p5BBFLLzxgcJp1EfBfFGfd
+ 47k8JJKWCaB0cCgpkaxHHJSBBiq6GGsHvH4aLJx0bqAJGtSgoNndGoLx1BaZAQ8VAm53
+ ROkmIDPIu8p2OwkmYnGN/WVl9Tp8EbWLiFiep5AoLkt2ySl+wlwPIaTKybdp9Gf++eON
+ zfUF+4/xGJf7ERGqpyPbPVtWqmYruCWLzU4U9ZvQ5nO+TpAevlzXVILqVaz9anJPYC8W
+ EQ/A==
+X-Gm-Message-State: AOAM530M7s00V053LQ7qnlP5cbka9JCUbz9B6fc/5W0UlNBYLJu2FSZD
+ /i8eUKOfzS8m+mnFFm9bSjyjMX3fJU2XcQ8fZKHttVunSfyF/CXJ19Sfq1C543n9pknyJOKwJgS
+ nSE2dj57SipIgwlk=
+X-Received: by 2002:a05:600c:4102:: with SMTP id
+ j2mr1161429wmi.48.1591763219302; 
+ Tue, 09 Jun 2020 21:26:59 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz+P9LvctaFEEaesPYRV//eo6qXbENBwuie8d5WgqL5E6i9MHQiAUtnNtsQxQ8bb8dx1Z6D7Q==
+X-Received: by 2002:a05:600c:4102:: with SMTP id
+ j2mr1161417wmi.48.1591763219054; 
+ Tue, 09 Jun 2020 21:26:59 -0700 (PDT)
 Received: from redhat.com (bzq-79-181-55-232.red.bezeqint.net. [79.181.55.232])
- by smtp.gmail.com with ESMTPSA id a81sm5310455wmd.25.2020.06.09.21.27.33
+ by smtp.gmail.com with ESMTPSA id z206sm5397457wmg.30.2020.06.09.21.26.57
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 09 Jun 2020 21:27:34 -0700 (PDT)
-Date: Wed, 10 Jun 2020 00:27:33 -0400
+ Tue, 09 Jun 2020 21:26:58 -0700 (PDT)
+Date: Wed, 10 Jun 2020 00:26:56 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 27/56] MAINTAINERS: Fix the classification of
- bios-tables-test-allowed-diff.h
-Message-ID: <20200610042613.1459309-28-mst@redhat.com>
+Subject: [PULL 11/56] acpi: move aml builder code for parallel device
+Message-ID: <20200610042613.1459309-12-mst@redhat.com>
 References: <20200610042613.1459309-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20200610042613.1459309-1-mst@redhat.com>
@@ -112,52 +113,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Laurent Vivier <laurent@vivier.eu>, Markus Armbruster <armbru@redhat.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Thomas Huth <thuth@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
 
-The file tests/qtest/bios-tables-test-allowed-diff.h is currently only
-assigned to the qtest section according MAINTAINERS. However, this file
-normally only gets updated when the ACPI tables changed - something the
-qtest maintainers don't have much clue of. Thus this file should rather
-be assigned to the ACPI maintainers instead.
+Also adds support for multiple LPT devices.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <20200607052022.12222-1-thuth@redhat.com>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Message-Id: <20200515150421.25479-8-kraxel@redhat.com>
 ---
- MAINTAINERS | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ hw/char/parallel.c   | 22 ++++++++++++++++++++++
+ hw/i386/acpi-build.c | 23 -----------------------
+ 2 files changed, 22 insertions(+), 23 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 6e7890ce82..0c5ed09ad5 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1531,7 +1531,7 @@ F: hw/acpi/*
- F: hw/smbios/*
- F: hw/i386/acpi-build.[hc]
- F: hw/arm/virt-acpi-build.c
--F: tests/qtest/bios-tables-test.c
-+F: tests/qtest/bios-tables-test*
- F: tests/qtest/acpi-utils.[hc]
- F: tests/data/acpi/
+diff --git a/hw/char/parallel.c b/hw/char/parallel.c
+index 8dd67d1375..c0f34bf924 100644
+--- a/hw/char/parallel.c
++++ b/hw/char/parallel.c
+@@ -28,6 +28,7 @@
+ #include "qemu/module.h"
+ #include "chardev/char-parallel.h"
+ #include "chardev/char-fe.h"
++#include "hw/acpi/aml-build.h"
+ #include "hw/irq.h"
+ #include "hw/isa/isa.h"
+ #include "hw/qdev-properties.h"
+@@ -568,6 +569,25 @@ static void parallel_isa_realizefn(DeviceState *dev, Error **errp)
+                              s, "parallel");
+ }
  
-@@ -2321,6 +2321,7 @@ S: Maintained
- F: qtest.c
- F: accel/qtest.c
- F: tests/qtest/
-+X: tests/qtest/bios-tables-test-allowed-diff.h
++static void parallel_isa_build_aml(ISADevice *isadev, Aml *scope)
++{
++    ISAParallelState *isa = ISA_PARALLEL(isadev);
++    Aml *dev;
++    Aml *crs;
++
++    crs = aml_resource_template();
++    aml_append(crs, aml_io(AML_DECODE16, isa->iobase, isa->iobase, 0x08, 0x08));
++    aml_append(crs, aml_irq_no_flags(isa->isairq));
++
++    dev = aml_device("LPT%d", isa->index + 1);
++    aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0400")));
++    aml_append(dev, aml_name_decl("_UID", aml_int(isa->index + 1)));
++    aml_append(dev, aml_name_decl("_STA", aml_int(0xf)));
++    aml_append(dev, aml_name_decl("_CRS", crs));
++
++    aml_append(scope, dev);
++}
++
+ /* Memory mapped interface */
+ static uint64_t parallel_mm_readfn(void *opaque, hwaddr addr, unsigned size)
+ {
+@@ -624,9 +644,11 @@ static Property parallel_isa_properties[] = {
+ static void parallel_isa_class_initfn(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
++    ISADeviceClass *isa = ISA_DEVICE_CLASS(klass);
  
- Device Fuzzing
- M: Alexander Bulekov <alxndr@bu.edu>
+     dc->realize = parallel_isa_realizefn;
+     dc->vmsd = &vmstate_parallel_isa;
++    isa->build_aml = parallel_isa_build_aml;
+     device_class_set_props(dc, parallel_isa_properties);
+     set_bit(DEVICE_CATEGORY_INPUT, dc->categories);
+ }
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index 2cafad03e2..58fe505fb6 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -1173,28 +1173,6 @@ static Aml *build_mouse_device_aml(void)
+     return dev;
+ }
+ 
+-static void build_lpt_device_aml(Aml *scope)
+-{
+-    Aml *dev;
+-    Aml *crs;
+-
+-    if (!memory_region_present(get_system_io(), 0x0378)) {
+-        return;
+-    }
+-
+-    dev = aml_device("LPT");
+-    aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0400")));
+-
+-    aml_append(dev, aml_name_decl("_STA", aml_int(0xf)));
+-
+-    crs = aml_resource_template();
+-    aml_append(crs, aml_io(AML_DECODE16, 0x0378, 0x0378, 0x08, 0x08));
+-    aml_append(crs, aml_irq_no_flags(7));
+-    aml_append(dev, aml_name_decl("_CRS", crs));
+-
+-    aml_append(scope, dev);
+-}
+-
+ static void build_isa_devices_aml(Aml *table)
+ {
+     ISADevice *fdc = pc_find_fdc0();
+@@ -1208,7 +1186,6 @@ static void build_isa_devices_aml(Aml *table)
+     if (fdc) {
+         aml_append(scope, build_fdc_device_aml(fdc));
+     }
+-    build_lpt_device_aml(scope);
+ 
+     if (ambiguous) {
+         error_report("Multiple ISA busses, unable to define IPMI ACPI data");
 -- 
 MST
 
