@@ -7,71 +7,71 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E694DC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 22:24:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0796C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 22:25:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AD865206F4
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 22:24:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 959BC206F4
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 22:25:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="oFQ/ZviN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD865206F4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="UhHufcQb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 959BC206F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43662 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46442 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jj98v-0000d0-VA
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 18:24:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42598)
+	id 1jj99g-0002Pk-Tq
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 18:25:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42550)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=4234ccaf3=alistair.francis@wdc.com>)
- id 1jj964-0004aq-5f; Wed, 10 Jun 2020 18:21:24 -0400
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:59148)
+ id 1jj95u-0004LP-Ge; Wed, 10 Jun 2020 18:21:14 -0400
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:59139)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=4234ccaf3=alistair.francis@wdc.com>)
- id 1jj963-00024C-6O; Wed, 10 Jun 2020 18:21:23 -0400
+ id 1jj95t-00023G-5A; Wed, 10 Jun 2020 18:21:14 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1591827683; x=1623363683;
+ t=1591827672; x=1623363672;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=6FATJBjY3MEsYgFLnJ2w8QG6m7aF0O7YWGLLllI2F4A=;
- b=oFQ/ZviNFRjYX9JYfXkHpz9pqk46dCpVNeUc1O21RrWUwM2LT5O2ZHNr
- VuJMfXoZEFhyKTWUCGJXFGKmOmmzo3nC4IgAbfjWkgOAMDZbZWezQ6j5D
- EcgBxGspIAHNJlzbNLKjwo9fYvo3j6To+z5n47yhbMUnnPYFJ/JE9hhdu
- 4qmNChfxQAnHId/oiEIs4rXj9faRm3V7iJ2pxrzMx1unAStqBqzwDahJW
- 0fVb3/cUkogr/Gxw2+zX8Qd/lPlavSz/yokaRpon+40FWj1QqhQlU14ES
- XIAGm84MF+Y478ymSR137JIE2RXIpFYbQ8m076iE56rHrnBYUgN3lKA6d w==;
-IronPort-SDR: Dx/UHrjUbuwzP/P9ftiP8mv7iRg48fhVC7Ma+PNh0fiUcvXXGSzPI2djQJE77X3aSS2QfglYdz
- SC1X+y01kAP+1vvx7WAIEKJMoAIDgr6qvaWwqv4qu1/pj5wNKRz8+JJrGThgVKIvgZLXMqIWo1
- yVd8iGRVxGxPMnCvDTrgpvMKfnLz/nmCinX5SYl/GQcfFBqmxMjJ57ZssGY/4w9iiPSxdTdB5G
- ho3Nf5B1RwpSbcalAz0MehmaV8CqQ0NjuQf6n+pRIsSjRfAUVNmzoEe9OyWebA+ULMbdj4bXiF
- NyU=
-X-IronPort-AV: E=Sophos;i="5.73,497,1583164800"; d="scan'208";a="248819324"
+ bh=VXvPydcV3oG3Eb03rcTetmZt+5SiUVZX+S5uCVjMvU0=;
+ b=UhHufcQbVm8/D5MwY1t+JOVatkOacwUZv+YQfdNK1jdF2setAhSybomj
+ Kgxx/gZrHYssZ3PmgLOYw04KwDbrmfNnFBM/IkZxK/7NbogBgzUVP0c7z
+ hdkVqdpPk7l1BGeGxemQE6fd7ensv2j31qOkrozpBdfGC8fvGBzMmPtDL
+ fMsPO60IuWe4Sdv3Fou+ISF0BrmbDCHinB0cyHFsl8Usy9kuSdwMs+DBf
+ mfdYZnm9p81Lqm8twG+otb+d8Q8zKBcv9C8H1Nh2IiTWIV/oEG5OKtVZB
+ CDtMU33Dl4XRsdODKu8xpMyX0aq9oQDZMtpmNzzkMT+w/m9lQLEMm2fqS w==;
+IronPort-SDR: EATAsk3piwtgSUlEms79f5+neN7EeeYUVqu0mdkIwdDvPCZso7/eg2S21/IU4sttX3nOJJmPTo
+ QGgPht37UIFOybIZ7utfSNpOx1xCcL38/Do3Li+Ag6vQGZponKcZXqQz+bSIJRa1Rp0hzU5PXd
+ XBqmoC+SEB6tSjaRBGrBz5QAXb3pJT9xfSOhj8MwdlPpjRmChTl1J6ANNKslap5+mK7WcXSFEr
+ fuC4/QeOG9hM8AkHtdHjDB6xY4Sk+pkvybLBEROFNbEUJe0TktE9TnPrGm1VFSP/wBiwxWLBB9
+ GqE=
+X-IronPort-AV: E=Sophos;i="5.73,497,1583164800"; d="scan'208";a="248819307"
 Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com)
  ([199.255.45.14])
- by ob1.hgst.iphmx.com with ESMTP; 11 Jun 2020 06:21:21 +0800
-IronPort-SDR: AnBQIcO39xAKUJDqokY6DScpXWgo/3XeA8wyZxIcEtvysyERBiSAT/NluIWzSVUOsLG81uf27y
- 4LTVZ60Z/o8FNE1DJrVJMtkuNnvzxgp6U=
+ by ob1.hgst.iphmx.com with ESMTP; 11 Jun 2020 06:21:08 +0800
+IronPort-SDR: em4gQod2I33wuftNjaByBDw6F0otLSJ83K1BHjnxKG5Eako8NldvC1RhvCbX1v3VmooQmmJDxs
+ hkO5ZPmYwg80NLqLjMEL90vov1OdhoCkc=
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 10 Jun 2020 15:10:48 -0700
-IronPort-SDR: yHkgDLrwQGKDM/lc3pqkFTZ7oQStdCzRA00Flc6E8aYPIYWGooBbhE4K+bxA99Tz47hY1V2ejC
- aFKlHypwbylA==
+ 10 Jun 2020 15:10:34 -0700
+IronPort-SDR: P6gAm0pnUqwEmpqtCZdhD5DJ+E2EhUL0nCJzbWwK6vFzlwehSZeEr1DwJ4s/ocsFMQbyarnxUA
+ c4fgxITEzR9w==
 WDCIronportException: Internal
 Received: from us4qd5p12.ad.shared (HELO risc6-mainframe.hgst.com)
  ([10.86.58.34])
- by uls-op-cesaip02.wdc.com with ESMTP; 10 Jun 2020 15:21:21 -0700
+ by uls-op-cesaip02.wdc.com with ESMTP; 10 Jun 2020 15:21:08 -0700
 From: Alistair Francis <alistair.francis@wdc.com>
 To: qemu-devel@nongnu.org,
 	qemu-riscv@nongnu.org
-Subject: [PATCH v6 6/6] target/riscv: Use a smaller guess size for no-MMU PMP
-Date: Wed, 10 Jun 2020 15:12:25 -0700
-Message-Id: <563998aa064518eea5ae5495a6639f16d881844f.1591827110.git.alistair.francis@wdc.com>
+Subject: [PATCH v6 1/6] riscv/opentitan: Fix the ROM size
+Date: Wed, 10 Jun 2020 15:12:11 -0700
+Message-Id: <6cb4f31c9b72af4fb81848c233e1be77d1e0e83c.1591827110.git.alistair.francis@wdc.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <cover.1591827110.git.alistair.francis@wdc.com>
 References: <cover.1591827110.git.alistair.francis@wdc.com>
@@ -107,37 +107,24 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Bin Meng <bin.meng@windriver.com>
+Reported-by: Damien Hedde <damien.hedde@greensocs.com>
 ---
- target/riscv/pmp.c | 14 +++++++++-----
- 1 file changed, 9 insertions(+), 5 deletions(-)
+ hw/riscv/opentitan.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/target/riscv/pmp.c b/target/riscv/pmp.c
-index 0e6b640fbd..9418660f1b 100644
---- a/target/riscv/pmp.c
-+++ b/target/riscv/pmp.c
-@@ -233,12 +233,16 @@ bool pmp_hart_has_privs(CPURISCVState *env, target_ulong addr,
-         return true;
-     }
- 
--    /*
--     * if size is unknown (0), assume that all bytes
--     * from addr to the end of the page will be accessed.
--     */
-     if (size == 0) {
--        pmp_size = -(addr | TARGET_PAGE_MASK);
-+        if (riscv_feature(env, RISCV_FEATURE_MMU)) {
-+            /*
-+             * If size is unknown (0), assume that all bytes
-+             * from addr to the end of the page will be accessed.
-+             */
-+            pmp_size = -(addr | TARGET_PAGE_MASK);
-+        } else {
-+            pmp_size = sizeof(target_ulong);
-+        }
-     } else {
-         pmp_size = size;
-     }
+diff --git a/hw/riscv/opentitan.c b/hw/riscv/opentitan.c
+index b4fb836466..6c7359c190 100644
+--- a/hw/riscv/opentitan.c
++++ b/hw/riscv/opentitan.c
+@@ -30,7 +30,7 @@ static const struct MemmapEntry {
+     hwaddr base;
+     hwaddr size;
+ } ibex_memmap[] = {
+-    [IBEX_ROM] =            {  0x00008000,   0xc000 },
++    [IBEX_ROM] =            {  0x00008000, 16 * KiB },
+     [IBEX_RAM] =            {  0x10000000,  0x10000 },
+     [IBEX_FLASH] =          {  0x20000000,  0x80000 },
+     [IBEX_UART] =           {  0x40000000,  0x10000 },
 -- 
 2.26.2
 
