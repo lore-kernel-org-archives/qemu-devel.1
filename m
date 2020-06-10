@@ -2,98 +2,85 @@ Return-Path: <SRS0=wemX=7X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39AF9C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 22:28:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4920BC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 22:38:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 00B1C206F4
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 22:28:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0E1232074B
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 22:38:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TXZG/Jdg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00B1C206F4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GKTUGFVW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E1232074B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54160 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59702 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jj9DD-0005hw-7c
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 18:28:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44328)
+	id 1jj9M9-0001Ap-Ao
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 18:38:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46248)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jj9Bx-0004da-LY
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 18:27:29 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:34733)
+ (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
+ id 1jj9LR-0000X0-3G; Wed, 10 Jun 2020 18:37:18 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:53895)
  by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jj9Bw-0003bL-Sb
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 18:27:29 -0400
-Received: by mail-wr1-x442.google.com with SMTP id r7so4108443wro.1
- for <qemu-devel@nongnu.org>; Wed, 10 Jun 2020 15:27:22 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
+ id 1jj9LP-0005OL-T7; Wed, 10 Jun 2020 18:37:16 -0400
+Received: by mail-wm1-x341.google.com with SMTP id l26so3284179wme.3;
+ Wed, 10 Jun 2020 15:37:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=69CwjwJJLC41nXkjD+0k/B3NrwJNBgAQC1krp6ngFPI=;
- b=TXZG/JdgNYDQ/fBE3Cw9hk6vmI2jKQM6RceqkRlYMZHlfHa7+NP8BT6ZpryXW+tKme
- dIIrEFg5BHmTA+9cGQb3qELV6qmJBdlYhL/394O8eMvMlUUym2dQ5XjmuREsteWaokJ/
- //WTxwlt1qiA4vzdueY9SuWLyGfu+mSSsTG2rnhtMcRZ3jbjrGnuafdws6xHgF8Fj8Na
- LSW+aN53IxrAySSj+259R3v8HdSNHtf+0ndULy330UYOS5mgKRGvcn+seTyeJFBJAH5E
- aCRz7CyYlJxkqNTsn6JTPspcObFx2pykyXN2uKfReVe+wMUWSyoDwsh8seNwixa/iOz2
- R6cA==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=X1NZl19z7ZxNbyVulTDuGJmobBM7Gb0SHumeBceYjD0=;
+ b=GKTUGFVWaMu/JMOW5L4kfvoEByrCrkpi6eMBBr1V6wNO9PvKR7xWy+lEYliTrVzdM4
+ 5OYRY8aLn2PqnFx3ZGeo/G/lCYZ56Tp09eWCstFb96rbAOVXgEGzqzM1HbXiYFwz4yYA
+ 0I15U32poyPJA7QDNW8laRg3cYUwMKMv/uc+Wc70ba9uzxpWVoEooMtxCosqrVTkt2Z6
+ 8AkH44PwoAaaLdCQU6dCStt593rnMEX+AoQyjWLpaS2670BsDCHyx43/xsXL6pf3S3Ra
+ a6au2gm4UUlHF4Y1jh4xfnNJQNAnfHSxaoUS04wKe9B8z9gdJND74dhpjZUmc2LK6AIf
+ GfZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=69CwjwJJLC41nXkjD+0k/B3NrwJNBgAQC1krp6ngFPI=;
- b=p0se80s006JFD0eCtZkI06ZsSa+kZwy5ElCVn7QQPrYzjBLBeNwmpHqRRkFe80YXQx
- RCUq4zFKrOX0+adH93oTYw0qvDH0HxFIadmL/84R5JIes3K7/3r1odEUopdK4TJjC7N2
- 8iJqLHjoqIR1K3/mjuv7M9oCCFdMo3MJ0l867w8i8x3OymWCVPkIzLtrkcUBkOon7DGf
- me3FhYoy+sFz69gkwiySiptfLpFDAoMY4GY34c4BdqE8AVFSLQJrjLsUWJR4TJeGwi6e
- H11DbNJE+VlK2rHP2fc3i9UwZRItW6IYd24KyX7cPpByu17lIuBZGWIcRezayrT2Ralx
- yjIw==
-X-Gm-Message-State: AOAM530hyfMWLBphICM+aS+JG5v4oRJ2e+AZRqtVsz+cGpV+MSYxW8lu
- QwoUGWVQ9hfN7TS0YMmx4AI=
-X-Google-Smtp-Source: ABdhPJxBfdmEaqxSv1EjgwRMczwdJG3SrcWK4BcYdi4D3HZOQiDMv7qeQd48gP5dfX/oIUPGAl6ozg==
-X-Received: by 2002:a5d:4c45:: with SMTP id n5mr6056778wrt.341.1591828041170; 
- Wed, 10 Jun 2020 15:27:21 -0700 (PDT)
-Received: from [192.168.1.38] (181.red-88-10-103.dynamicip.rima-tde.net.
- [88.10.103.181])
- by smtp.gmail.com with ESMTPSA id u3sm1608695wrw.89.2020.06.10.15.27.19
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 10 Jun 2020 15:27:20 -0700 (PDT)
-Subject: Re: [PATCH] net: tulip: Set PCI revision to match dec21143
-To: Sven Schnelle <svens@stackframe.org>
-References: <20200418002552.343480-1-marek.vasut+renesas@gmail.com>
- <203b5328-b473-119c-4122-8f775f390ad0@amsat.org>
- <20200610211310.GA26448@t470p.stackframe.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <0ce463c4-164a-9618-a8dc-001273b1fde0@amsat.org>
-Date: Thu, 11 Jun 2020 00:27:19 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=X1NZl19z7ZxNbyVulTDuGJmobBM7Gb0SHumeBceYjD0=;
+ b=UQN8nkb5pE1YaIzznxiT2HyTT56sTZQ/UfqotDODL9EYQ5h4kLwiOAzJyD6pFW91u/
+ cGtwCu4/0Jx6iS9jODe4mr9wzPlEBHz6djFit35BXCmFkJpWCw8ckAYg1aD5pSh2siFk
+ vglbTKFXWyXD4uRUX9EeMoBsluxXD0BQXXkWykiBxvizZ61jwetc6/UPFcNUiAl/CRe5
+ /98AfBLFFCYcKHpf5mtWND+Nf5cmZlJHD/B5HVV/NoF/0kkb26JGqUsKz2le/3ilzxvJ
+ C0ZHIfmyF+GObR81FxVxiI9SOFQzJNdOKEuQm69VZGAo2tuS+81FA5WZ1qi4SsXNEAAB
+ 7ZdQ==
+X-Gm-Message-State: AOAM530+DEduhDB3D3tjaghGr1NC2xWW4UoAekKeidh0VzQ54FouKcs1
+ LD0Y7paJUiVtaQM0C8i6QeLcpbnILX6DZY92pIM=
+X-Google-Smtp-Source: ABdhPJyKGFtEEiQAknlJi6KCRfllbkscJJExhgN4lN2cTyULA8ttDgoGJrjTmgpIPsxR00q/qUF/E029YbhdaLBaEWI=
+X-Received: by 2002:a1c:46c3:: with SMTP id t186mr4957998wma.36.1591828621995; 
+ Wed, 10 Jun 2020 15:37:01 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200610211310.GA26448@t470p.stackframe.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x442.google.com
+References: <20200610220853.8558-1-f4bug@amsat.org>
+ <20200610220853.8558-2-f4bug@amsat.org>
+In-Reply-To: <20200610220853.8558-2-f4bug@amsat.org>
+From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Date: Thu, 11 Jun 2020 00:36:46 +0200
+Message-ID: <CAHiYmc6MCb44L6JXvttzQjagZkiYevkMdjgXz22g2GeCtf8gAg@mail.gmail.com>
+Subject: Re: [PATCH v3 01/11] MAINTAINERS: Mark SH4 section orphan
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Content-Type: multipart/alternative; boundary="0000000000008eb13705a7c27b86"
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wm1-x341.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -106,72 +93,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Prasad J Pandit <pjp@fedoraproject.org>, qemu-devel@nongnu.org,
- Marek Vasut <marek.vasut@gmail.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Marek Vasut <marek.vasut+renesas@gmail.com>
+Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
+ Magnus Damm <magnus.damm@gmail.com>,
+ Yoshinori Sato <ysato@users.sourceforge.jp>, qemu-trivial@nongnu.org,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ Michael Tokarev <mjt@tls.msk.ru>, QEMU Developers <qemu-devel@nongnu.org>,
+ Laurent Vivier <laurent@vivier.eu>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/10/20 11:13 PM, Sven Schnelle wrote:
-> On Mon, Jun 08, 2020 at 12:17:11AM +0200, Philippe Mathieu-DaudÃƒÂ© wrote:
->> Hi Sven, could you review thiw one-line patch?
->>
->> On 4/18/20 2:25 AM, Marek Vasut wrote:
->>> The tulip driver claims to emulate dec21143 and it does not emulate dec21142.
->>> The dec21142 and dec21143 can be discerned by the PCI revision register,
->>> where dec21142 reports value < 0x20 and dec21143 value >= 0x20. E.g. the
->>> U-Boot 'tulip' driver also only supports dec21143 and verifies that the
->>> PCI revision ID is >= 0x20, otherwise refuses to operate such a card.
->>>
->>> This patch sets the PCI revision ID to 0x20 to match the dec21143 and
->>> thus also permits e.g. U-Boot to work with the tulip emulation.
->>>
->>> Fixes: 34ea023d4b95 ("net: add tulip (dec21143) driver")
->>> Signed-off-by: Marek Vasut <marek.vasut+renesas@gmail.com>
->>> Cc: Marc-AndrÃƒÂ© Lureau <marcandre.lureau@redhat.com>
->>> Cc: Paolo Bonzini <pbonzini@redhat.com>
->>> Cc: Peter Maydell <peter.maydell@linaro.org>
->>> Cc: Prasad J Pandit <pjp@fedoraproject.org>
->>> Cc: Sven Schnelle <svens@stackframe.org>
->>> ---
->>>  hw/net/tulip.c | 2 ++
->>>  1 file changed, 2 insertions(+)
->>>
->>> diff --git a/hw/net/tulip.c b/hw/net/tulip.c
->>> index 1295f51d07..ffb6c2479a 100644
->>> --- a/hw/net/tulip.c
->>> +++ b/hw/net/tulip.c
->>> @@ -962,6 +962,8 @@ static void pci_tulip_realize(PCIDevice *pci_dev, Error **errp)
->>>  
->>>      pci_conf = s->dev.config;
->>>      pci_conf[PCI_INTERRUPT_PIN] = 1; /* interrupt pin A */
->>> +    /* Anything with revision < 0x20 is DC21142, anything >= 0x20 is DC21143 */
->>> +    pci_conf[PCI_REVISION_ID] = 0x20;
->>>  
->>>      s->eeprom = eeprom93xx_new(&pci_dev->qdev, 64);
->>>      tulip_fill_eeprom(s);
->>>
->>
-> 
-> The intel datasheet for the DEC21143 lists only Rev IDs > 30 for this particular family:
-> 
-> 21143-PB,TB,PC,TC - 0x30
-> 21143-PD,TD - x041
-> 
-> but maybe older DEC chips used 0x20 - don't know. The most interesting question is
-> whether ancient OS' like HP-UX or Windows XP would still work with this patch, but
-> i don't have test images at hand right now.
+--0000000000008eb13705a7c27b86
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-So the question is whether your HP-UX/WinXP images also boot with a
-DEC21142 (you aimed to model a DEC21143, and it is tested anyway).
+=D1=87=D0=B5=D1=82, 11. =D1=98=D1=83=D0=BD 2020. =D1=83 00:08 Philippe Math=
+ieu-Daud=C3=A9 <f4bug@amsat.org> =D1=98=D0=B5
+=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+>
+> Aurelien Jarno expressed his desire to orphan the SH4 section [*]:
+>
+>   I don't mind being [...] removed from there.
+>   I do not really have time to work on that.
+>
+> Mark the SH4 section orphan.
+>
+> Many thanks to Aurelien for his substantial contributions to QEMU,
+> and for maintaining the SH4 emulation for various years!
+>
+> [*] https://www.mail-archive.com/qemu-devel@nongnu.org/msg708400.html
+>
+> Message-Id: <20200601214125.GA1924990@aurel32.net>
+> Acked-by: Aurelien Jarno <aurelien@aurel32.net>
+> Suggested-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
 
-Marek, suggestion:
+I am sorry if I hurt anybody's feelings with my choice of words, or in
+other ways.
 
-Make pci_tulip_realize() abstract, add dec21142 and dec21143 models as
-you suggested, making 'tulip' an alias of dec21142 for backward
-compatibility. You can then use the dec21143.
+As requested by Philippe, I wrote the patch that represent a comprehensive
+summary of all needed changes related to sh4 maintainership, that is, I
+believe,
+simple, effective and productive in both short and long term.
+
+https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg03080.html
+
+The patch I wrote supersedes patches 1-2 from v2 of this series, and also
+patches
+1-6 from v3 (this one) of this series.
+
+Please let me know if you have any objection to such patch.
+
+Sincerely,
+Aleksandar
+
+
+>  MAINTAINERS | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+>
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 3abe3faa4e..129517cfb4 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -296,8 +296,7 @@ F: tests/tcg/s390x/
+>  L: qemu-s390x@nongnu.org
+>
+>  SH4 TCG CPUs
+> -M: Aurelien Jarno <aurelien@aurel32.net>
+> -S: Odd Fixes
+> +S: Orphan
+>  F: target/sh4/
+>  F: hw/sh4/
+>  F: disas/sh4.c
+> --
+> 2.21.3
+>
+
+--0000000000008eb13705a7c27b86
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><br><br>=D1=87=D0=B5=D1=82, 11. =D1=98=D1=83=D0=BD 2020. =
+=D1=83 00:08 Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:f4bug@amsat.=
+org">f4bug@amsat.org</a>&gt; =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=
+=B0=D0=BE/=D0=BB=D0=B0:<br>&gt;<br>&gt; Aurelien Jarno expressed his desire=
+ to orphan the SH4 section [*]:<br>&gt;<br>&gt; =C2=A0 I don&#39;t mind bei=
+ng [...] removed from there.<br>&gt; =C2=A0 I do not really have time to wo=
+rk on that.<br>&gt;<br>&gt; Mark the SH4 section orphan.<br>&gt;<br>&gt; Ma=
+ny thanks to Aurelien for his substantial contributions to QEMU,<br>&gt; an=
+d for maintaining the SH4 emulation for various years!<br>&gt;<br>&gt; [*] =
+<a href=3D"https://www.mail-archive.com/qemu-devel@nongnu.org/msg708400.htm=
+l">https://www.mail-archive.com/qemu-devel@nongnu.org/msg708400.html</a><br=
+>&gt;<br>&gt; Message-Id: &lt;<a href=3D"mailto:20200601214125.GA1924990@au=
+rel32.net">20200601214125.GA1924990@aurel32.net</a>&gt;<br>&gt; Acked-by: A=
+urelien Jarno &lt;<a href=3D"mailto:aurelien@aurel32.net">aurelien@aurel32.=
+net</a>&gt;<br>&gt; Suggested-by: Aleksandar Markovic &lt;<a href=3D"mailto=
+:aleksandar.qemu.devel@gmail.com">aleksandar.qemu.devel@gmail.com</a>&gt;<b=
+r>&gt; Signed-off-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:f4b=
+ug@amsat.org">f4bug@amsat.org</a>&gt;<br>&gt; ---<br><br><div>I am sorry if=
+ I hurt anybody&#39;s feelings with my choice of words, or in other ways.</=
+div><br>As requested by Philippe, I wrote the patch that represent a compre=
+hensive<br><div>summary of all needed changes related to sh4 maintainership=
+, that is, I believe,</div><div>simple, effective and productive in both sh=
+ort and long term.<br></div><div><br></div><div><a href=3D"https://lists.gn=
+u.org/archive/html/qemu-devel/2020-06/msg03080.html">https://lists.gnu.org/=
+archive/html/qemu-devel/2020-06/msg03080.html</a><br></div><div><br></div>T=
+he patch I wrote supersedes patches 1-2 from v2 of this series, and also pa=
+tches<br><div>1-6 from v3 (this one) of this series.</div><div><br></div><d=
+iv>Please let me know if you have any objection to such patch.<br></div><di=
+v><br></div><div>Sincerely,</div><div>Aleksandar<br></div><br><br>&gt; =C2=
+=A0MAINTAINERS | 3 +--<br>&gt; =C2=A01 file changed, 1 insertion(+), 2 dele=
+tions(-)<br>&gt;<br>&gt; diff --git a/MAINTAINERS b/MAINTAINERS<br>&gt; ind=
+ex 3abe3faa4e..129517cfb4 100644<br>&gt; --- a/MAINTAINERS<br>&gt; +++ b/MA=
+INTAINERS<br>&gt; @@ -296,8 +296,7 @@ F: tests/tcg/s390x/<br>&gt; =C2=A0L: =
+<a href=3D"mailto:qemu-s390x@nongnu.org">qemu-s390x@nongnu.org</a><br>&gt;<=
+br>&gt; =C2=A0SH4 TCG CPUs<br>&gt; -M: Aurelien Jarno &lt;<a href=3D"mailto=
+:aurelien@aurel32.net">aurelien@aurel32.net</a>&gt;<br>&gt; -S: Odd Fixes<b=
+r>&gt; +S: Orphan<br>&gt; =C2=A0F: target/sh4/<br>&gt; =C2=A0F: hw/sh4/<br>=
+&gt; =C2=A0F: disas/sh4.c<br>&gt; --<br>&gt; 2.21.3<br>&gt;</div>
+
+--0000000000008eb13705a7c27b86--
 
