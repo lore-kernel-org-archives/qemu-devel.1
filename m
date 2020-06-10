@@ -2,94 +2,125 @@ Return-Path: <SRS0=wemX=7X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FCF1C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 16:46:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AC15C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 16:53:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6A8392072E
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 16:46:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E99162067B
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 16:53:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uY1JMqYW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A8392072E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="QW7r/dvW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E99162067B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=openvz.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45344 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49668 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jj3rx-0007lZ-NS
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 12:46:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42972)
+	id 1jj3yG-0001zx-5s
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 12:53:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43986)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jj3qz-0006u6-32
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 12:45:29 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:40407)
- by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jj3qx-00006v-6N
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 12:45:28 -0400
-Received: by mail-wr1-x441.google.com with SMTP id h5so3051591wrc.7
- for <qemu-devel@nongnu.org>; Wed, 10 Jun 2020 09:45:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=cKE9+s/S5ErwB6RGgztPCiR+RwyQs+EidymdltJQJdQ=;
- b=uY1JMqYWIJ1nRrsescM9/SW1hzk3oTW1X9jEusnUmMYkq5Ak1yKzOEOvIGndaST2Or
- 15cHaKuU3yn6Xe5wI6FuHglMDTaxZpbxWU8oMoanqkXyZvQx4eZjds1L2k47ny1NRkBa
- PlcoDG0KH0RlmvAGcviaeptEMyKskUI/fB91Z3QsEf7A2QDJ6wCPSvQIPBWJvpMz/E1o
- jeuXcytJMR3ouqHK4wqxQZ8eTCmpC/3ZTP/2i1r/TYszZRpunQMCV0TNATsIoTcWQoK/
- 0lzdEgb/4RiInhz9VSXMzHBKPkOqYnlJ2vyNfEbXestLO6tBM8XwF9L4n3wiQg2BkqPb
- fhpw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=cKE9+s/S5ErwB6RGgztPCiR+RwyQs+EidymdltJQJdQ=;
- b=LqP9zN7rFCuGJPKnHbsz3wP/WOZHHgT7T21BM11rcvf91y9rbXm/dw2Jym6G18qZNG
- S9EhfyIjOxTykFfNp1SWHC+2pbu+FlAqwZDhC/8UO/yprqLxkQYIsmfrRxptMCp40pgw
- H1gYp2pdtZDVaAj5+7bX9etK+97bFSX25fRhy1U0gBo6lLqaWcS6Rr7iQ3ljVhoQ0AYY
- CpGZN/hrcYujhWyWb3KrUOQOakYgSuJ2fHAWo2nAMkX5NwSelkFRiTKf7FBO92Yo6lyR
- hzrUKTooT6EndujYUeMp+R/Z2w7jEjyatig4Yajg8VMwQYQxZPHAQL8tVSDRG+LzFQxH
- NVmg==
-X-Gm-Message-State: AOAM530rVblI09wNw2LuAwQ3L+6NqPNyGPX4V9GfV6Q19k7e3ologr0E
- 8jREpqU2U50gLuwNW1RvXrMPAA==
-X-Google-Smtp-Source: ABdhPJxIdHn69gy6p6v1tAwgvBAzVo9xqvL4IJUPWTr6KpunanKCwLmkD1tAGuq/BR8UmagBXn6Vjw==
-X-Received: by 2002:a5d:4c87:: with SMTP id z7mr4706393wrs.100.1591807517934; 
- Wed, 10 Jun 2020 09:45:17 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id k12sm532601wrn.42.2020.06.10.09.45.16
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 10 Jun 2020 09:45:16 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id CE4141FF7E;
- Wed, 10 Jun 2020 17:45:15 +0100 (BST)
-References: <20200609200738.445-1-robert.foley@linaro.org>
-User-agent: mu4e 1.5.2; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Robert Foley <robert.foley@linaro.org>
-Subject: Re: [PATCH v3 00/13] Add Thread Sanitizer support to QEMU
-In-reply-to: <20200609200738.445-1-robert.foley@linaro.org>
-Date: Wed, 10 Jun 2020 17:45:15 +0100
-Message-ID: <87mu5a50pw.fsf@linaro.org>
-MIME-Version: 1.0
+ (Exim 4.90_1) (envelope-from <den@virtuozzo.com>)
+ id 1jj3xe-0001TD-K0; Wed, 10 Jun 2020 12:52:22 -0400
+Received: from mail-eopbgr70122.outbound.protection.outlook.com
+ ([40.107.7.122]:46848 helo=EUR04-HE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <den@virtuozzo.com>)
+ id 1jj3xc-00022F-7U; Wed, 10 Jun 2020 12:52:22 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=RnWdv+RwMoqzeLpcplfrVoPvZ9sOSOatPolgz3DJ1CATH5G6sH8P/rTF0ThxHFdol67+Eyn3ryXyNKqcEI2LCF13YJxk1LZaQAizaQlj0o25JUEqSjIdSrHB6FwRAEIi3BEwoHxgxskFe6Z6B/Zi0XJtOCOphiechh93npSru/djU+TeQisc197ajp8rpIrUbLg9s2+H7txf9WljVoC5VBvTEfnrEXwKsyQeJMJPOqigv6K0vf0pbsXBcQrpM7bsEcQybdd8FR8D85beht7N3PK5NlYVZhubi4chFDxnqBfpoVDybKbreHQkqGc6z3ak/OpZEPt6T1QeC8fikJeJjg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=H5ff7dMKWnEDvM4DD3VW3G3AxumyL1x6VkawwhDy9ss=;
+ b=HhIjfg5yMkYu9kqTd0HnXA5ud4fazPI9pui4Ml5mcHE0O4F1WWmTUMoAWZf4rA/8AgHZMxI3uctwV905odqC74NilTyt1DrgrS956iaWiuko68N2B2Vgg7dcMSgsUrixG3su2p8aw08SmasGCx2Das7LqSqMo3T+EcriGQoXm4UooSTWG4i1nM0LbfcXMNwhQ8evvT0mltDa08wqXQPb3vNJega1ERxzudm3yJ45DpKjAHoZYNfl6LJ8iZlHWcdx1UFS4IP9Z0X9V45PGMdcb9pvolyVhetkAt/7OArYpRVZQx3Ns6tppdzcR5v+EibGMoRpujfVUGr9BMvRSgxzXw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none header.from=openvz.org;
+ dkim=pass header.d=openvz.org; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=H5ff7dMKWnEDvM4DD3VW3G3AxumyL1x6VkawwhDy9ss=;
+ b=QW7r/dvWXqVX587av2cHoIRPXOlGU6ZuCe314UvEEoBXFOS6od6SEMEg4PABSW2U/cWlfpfbFt52QrRFEKkAZuN2m3nrYJnOzGNTYjY/IqSHtB1H+xkHH7EBMPtsszRGqvFyvrmsHin8rzuFHkt+Adrz7UIqdXcksjy4U1qiz9U=
+Authentication-Results: virtuozzo.com; dkim=none (message not signed)
+ header.d=none;virtuozzo.com; dmarc=none action=none header.from=openvz.org;
+Received: from AM6PR08MB4214.eurprd08.prod.outlook.com (2603:10a6:20b:8d::30)
+ by AM6PR08MB4487.eurprd08.prod.outlook.com (2603:10a6:20b:74::17)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3066.18; Wed, 10 Jun
+ 2020 16:52:15 +0000
+Received: from AM6PR08MB4214.eurprd08.prod.outlook.com
+ ([fe80::821:7596:cf7f:68f8]) by AM6PR08MB4214.eurprd08.prod.outlook.com
+ ([fe80::821:7596:cf7f:68f8%4]) with mapi id 15.20.3088.018; Wed, 10 Jun 2020
+ 16:52:15 +0000
+Subject: Re: [PATCH 1/2] aio: allow to wait for coroutine pool from different
+ coroutine
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+References: <20200610144129.27659-1-den@openvz.org>
+ <20200610144129.27659-2-den@openvz.org>
+ <e2208bb0-fc7d-b97f-a4ae-d8e4b265db4d@virtuozzo.com>
+From: "Denis V. Lunev" <den@openvz.org>
+Message-ID: <94f7d905-8d08-2f40-7212-1a79550a386a@openvz.org>
+Date: Wed, 10 Jun 2020 19:52:12 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
+In-Reply-To: <e2208bb0-fc7d-b97f-a4ae-d8e4b265db4d@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x441.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-ClientProxiedBy: HE1PR0901CA0061.eurprd09.prod.outlook.com
+ (2603:10a6:3:45::29) To AM6PR08MB4214.eurprd08.prod.outlook.com
+ (2603:10a6:20b:8d::30)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.1.27] (31.148.204.195) by
+ HE1PR0901CA0061.eurprd09.prod.outlook.com (2603:10a6:3:45::29) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3088.21 via Frontend Transport; Wed, 10 Jun 2020 16:52:14 +0000
+X-Originating-IP: [31.148.204.195]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: b8f42113-6840-4532-bff3-08d80d5ea0d0
+X-MS-TrafficTypeDiagnostic: AM6PR08MB4487:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM6PR08MB4487EC7B90D525507C2A6CA5B6830@AM6PR08MB4487.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-Forefront-PRVS: 0430FA5CB7
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: XDfL/kg+D8GIvhZzsLihNvq2wW8s3AbEgQV+Ohh38fRbjxOgXWN+jICKSVzPcTVvi/UJmsF4aH5BxsqsaOgSr/YTzAMySktEbEXGn3ZI/GZalagSgiuL0LuvIYeU6XfMUHkqjtHZUgzHLNbHX6+n3X3tNiSUJzfkHkp3aYK+VnPfjo7S5Fy9e84B3nKTJl6jBZPQW3uX65M+kf/6YMIqRiXk+LYMRpIq28HtNBn0kTPHhS7xvA2oSazhIuXcfLMTJ4mSpy9PPV+oXs4O54wjYnhvvWwDNiz1vPzCPo1jftvFZ5UyQ5D+hGxm4RboDr595ktdWMK1fFW7i2m1wH5rmQhxNsiJryuFTf0Vt6ngIE8m3V4FG0FaWedYIwT5JUGd
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM6PR08MB4214.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(366004)(346002)(136003)(376002)(39850400004)(396003)(186003)(16526019)(52116002)(26005)(53546011)(83380400001)(66476007)(66556008)(83170400001)(2906002)(66946007)(2616005)(478600001)(54906003)(4326008)(36756003)(31686004)(8676002)(8936002)(6486002)(16576012)(107886003)(956004)(316002)(42882007)(5660300002)(31696002)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: 0VlC9POWeMPRLKKvatAfu5j5CESg61OzaSDBqjMPgqOr3M0T8ZxraLt77aEZKe2SPsMJvrrH5Q7rFYA7K23YJgK4QFhiOQiYhTAsYMVhTgtzGj3oX3gG0bsT75/JM7of4Z3Pz42NtXIvZczNIpgAy9k8ajPbDEy6owTnHyxDKboxe1l+dWAIjXTjarmO2NdO8a2sPVxFyf1IGVnqQ9yX6AV8r4ctvgpR5K12tiaG3IYi7MNn3eRkL8p6mGwZq3WJv8YVIKKkW1pI2bLjwq+VR+xVPyaza5V0/hT2yb08evqiaZmD9E68I3yCh4dMRV6I7e14icJHm2jimUp1PqOSbBFK4+pPZs5jI3w/L25eJT9qCMmuKzwexyFXGi9GFY42LaoVNj3kHTxwA6pUHrbG+mGG/QkjQ+53/ywTSvWF+JKWqMFgcCljNkOBQGFv8+RHhXHM1eIxFMg0eVOtdJYUTCqXCqQ5FA9ENwC+w4wf9OesxjkEv6Z6Xr2LeKAq359i
+X-OriginatorOrg: openvz.org
+X-MS-Exchange-CrossTenant-Network-Message-Id: b8f42113-6840-4532-bff3-08d80d5ea0d0
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jun 2020 16:52:15.0396 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: mB8l+6+BJicqXdxHZjC8xrVbJ6kqJSfTzDQH+EHac1LBafqRTx9LH8jhpI7miwqv90bn5rrzH/LfOD8Nycg6Aw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4487
+Received-SPF: pass client-ip=40.107.7.122; envelope-from=den@virtuozzo.com;
+ helo=EUR04-HE1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/10 12:52:16
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -26
+X-Spam_score: -2.7
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,55 +133,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.puhov@linaro.org, cota@braap.org, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Denis Plotnikov <dplotnikov@virtuozzo.com>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 6/10/20 6:10 PM, Vladimir Sementsov-Ogievskiy wrote:
+> 10.06.2020 17:41, Denis V. Lunev wrote:
+>> The patch preserves the constraint that the only waiter is allowed.
+>>
+>> Signed-off-by: Denis V. Lunev <den@openvz.org>
+>> CC: Kevin Wolf <kwolf@redhat.com>
+>> CC: Max Reitz <mreitz@redhat.com>
+>> CC: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> CC: Denis Plotnikov <dplotnikov@virtuozzo.com>
+>> ---
+>>   block/aio_task.c | 8 ++++----
+>>   1 file changed, 4 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/block/aio_task.c b/block/aio_task.c
+>> index 88989fa248..f338049147 100644
+>> --- a/block/aio_task.c
+>> +++ b/block/aio_task.c
+>> @@ -27,7 +27,7 @@
+>>   #include "block/aio_task.h"
+>>     struct AioTaskPool {
+>> -    Coroutine *main_co;
+>> +    Coroutine *wake_co;
+>>       int status;
+>>       int max_busy_tasks;
+>>       int busy_tasks;
+>> @@ -54,15 +54,15 @@ static void coroutine_fn aio_task_co(void *opaque)
+>>         if (pool->waiting) {
+>>           pool->waiting = false;
+>> -        aio_co_wake(pool->main_co);
+>> +        aio_co_wake(pool->wake_co);
+>>       }
+>>   }
+>>     void coroutine_fn aio_task_pool_wait_one(AioTaskPool *pool)
+>>   {
+>>       assert(pool->busy_tasks > 0);
+>> -    assert(qemu_coroutine_self() == pool->main_co);
+>>   +    pool->wake_co = qemu_coroutine_self();
+>>       pool->waiting = true;
+>>       qemu_coroutine_yield();
+>>   @@ -98,7 +98,7 @@ AioTaskPool *coroutine_fn aio_task_pool_new(int
+>> max_busy_tasks)
+>>   {
+>>       AioTaskPool *pool = g_new0(AioTaskPool, 1);
+>>   -    pool->main_co = qemu_coroutine_self();
+>> +    pool->wake_co = NULL;
+>>       pool->max_busy_tasks = max_busy_tasks;
+>>         return pool;
+>>
+>
+> With such approach, if several coroutines will wait simultaneously,
+> the only one will be finally woken and other will hang.
+>
+> I think, we should use CoQueue here: CoQueue instead of wake_co,
+> qemu_co_queue_wait in wait_one, and qemu_co_queue_next instead of
+> aio_co_wake.
+>
+>
+I will make a check, but for now it would be enough to
+add
+  assert(!pool->waiting);
+at the beginning of aio_task_pool_wait_one
 
-Robert Foley <robert.foley@linaro.org> writes:
-
-> Changes in v3:
-> - Fixed issue in tsan changes to start_switch_fiber(),=20
->   found by --enable-sanitizers testing.
-> - Removed the UC_TRACE() code.
-> - Removed the tb_destroy callback.
->
-> v2: https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg01534.html
->
-> This patch series continues the work done by Emilio Cota and others to add
-> Thread Sanitizer (TSan) support to QEMU.
->
-> The starting point for this work was Emilio's branch here:
-> https://github.com/cota/qemu/commits/tsan
-> specifically this commit: 0be125fc0afd47218b34d2019abdd19b644f3199
->
-> The main purpose of this patch is to enable TSan support so that=20
-> QEMU developers can start using the tool.=20=20
-> We found this tool useful and even ran it on our recent changes in
-> the cpu-locks series, which fixes many warnings.
-> Clearly there is work to do here to clean up all the warnings. :)
-> We have also made an effort to introduce enough of the TSan suppression
-> mechanisms, so that others can continue this work.
->
-> This series adds support for:
-> - configure option for --enable-tsan.
-> - testing.rst has the full details on how to use TSan with or without doc=
-ker,
->   including all the suppression mechanisms.
-> - We added an Ubuntu 20.04 docker that supports TSan builds.
-> - test-tsan is a new docker test that builds and runs make check under TS=
-an.
-> - We added an example blacklist file for files or functions TSan should i=
-gnore=20
->   at compile time.  This can now be specified manually.
-> - Added a suppression file for TSan to suppress certain warnings at run t=
-ime.
-> - Added tsan.h with annotations which also can be used to suppress
-> warnings.
-
-Queued to testing/next, thanks.
-
---=20
-Alex Benn=C3=A9e
+Den
 
