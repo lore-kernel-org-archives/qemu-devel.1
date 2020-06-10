@@ -7,77 +7,76 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 042D2C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 04:37:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E021C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 04:38:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C17BB207ED
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 04:37:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CB5DA20734
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 04:38:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cpicBbO1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C17BB207ED
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S3EcEpK9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB5DA20734
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38838 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43390 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jisUW-0004Oa-0G
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 00:37:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34066)
+	id 1jisVt-0006HF-VA
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 00:38:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34038)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jisKq-0008Bt-Ca
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 00:27:32 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:56804
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jisKe-0007iG-6n
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 00:27:20 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23663
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jisKp-0008GP-KT
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 00:27:32 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jisKd-0008Fe-AK
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 00:27:19 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591763250;
+ s=mimecast20190719; t=1591763238;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=IWR60ercXQZVd22zZQp4vrHc0/weVq8wSWjY7Go6ogE=;
- b=cpicBbO1O+lAl3EkX1Sq5g3F4OFYWGlQVt6V9mnhfT26cxoi73nHWzk18dvjf4JmU2W70Z
- yBX6HGbqsaLA+Td2O1H5uJDQHLTP3oSOoMm4GcWWjcfy+W/rJayi7rCKm1xXKJaaoENaRe
- gmdjNENyiQQHhqSTkzqZTjjBJESEYSw=
+ bh=/K+BMGp/Z1Mf6jaoeVGFnEXmqbuskYzi+ydMa9DJuV0=;
+ b=S3EcEpK9sCGqjRqKKkRJFFAhSgzGPdYBETHo2+Szu2fIvXGj93lOtM9MgNS/gHcCLbNILm
+ jXcB9rTUO4st0q5MO55GZKsBxx6UWC6Ixa70/ohXA1ZtSDR6jKslLmeXzGXSRMCU79Unnn
+ ZxdgF7pDdW20eBVTJjc7cST9ueCbPZY=
 Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
  [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-352-mG-MpiTCPOGVMxmf-0YMOw-1; Wed, 10 Jun 2020 00:27:28 -0400
-X-MC-Unique: mG-MpiTCPOGVMxmf-0YMOw-1
-Received: by mail-wr1-f69.google.com with SMTP id h6so515536wrx.4
- for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 21:27:27 -0700 (PDT)
+ us-mta-301-L0foAVNKM8Ol1JqKMLSrIA-1; Wed, 10 Jun 2020 00:27:16 -0400
+X-MC-Unique: L0foAVNKM8Ol1JqKMLSrIA-1
+Received: by mail-wr1-f69.google.com with SMTP id p10so498588wrn.19
+ for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 21:27:16 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=IWR60ercXQZVd22zZQp4vrHc0/weVq8wSWjY7Go6ogE=;
- b=EtM1BPwPlVskCGjbgUZ/czTJFrwxrmFGvZ6hjtyKw09ROl0laT7QeQmQKPlCX7oeMl
- Vgt+Q90hPR7+L0bZKH+WRth9jdpsk1MdiRtiXzboXwmp02q8KqTjvkgN7gQTcxLgxp5M
- ns6p/bC4FaHh9oTOqF7p3duhrUo4dUttHmLOJwbLFH9uufuGubo6NKgYqbVcxSWGLNj7
- rdK3GwN9FX7r6OjKEvraOjtLSPL0DC3Fv5mpGAmZ4PtquF8qD9KeriNWRgI4U6YuViN4
- 2QmPeWXGROk7IJRueskScRvLQI11apm/gUHw/FeD5oA8Luh0bed6iMIcK4AZcb9D1OCf
- X4sg==
-X-Gm-Message-State: AOAM530PFwCqpj2RhuXIFJBfiW3jZMEa54BCOwRAqthZd1t7Oe2EQPO+
- 1hxqgaCNMgOVtCO7+ben4OgGhnK0BUh96ahWDefPWBvscjuEyJmJJeF9XbE6BGC947xI9Gr2PEj
- bjdy6d7z8z0lo2wA=
-X-Received: by 2002:a7b:c399:: with SMTP id s25mr1188574wmj.185.1591763246653; 
- Tue, 09 Jun 2020 21:27:26 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwra3MR2zNx6OPnUxLatdvcu7XSHifv7PqkdUxpNP1lCtRcqGq8MFYmwFNa8LBIIaECV3Yi4g==
-X-Received: by 2002:a7b:c399:: with SMTP id s25mr1188559wmj.185.1591763246458; 
- Tue, 09 Jun 2020 21:27:26 -0700 (PDT)
+ :mime-version:content-disposition:in-reply-to;
+ bh=/K+BMGp/Z1Mf6jaoeVGFnEXmqbuskYzi+ydMa9DJuV0=;
+ b=Cxd5Y/lgdlGujxLmEjnX8cBW/EriP3BuchzEGQyRgQbTiFzZ0szLslKu2IzwOFmBCQ
+ JvDBk0etArHgma29jJsWV10k67zqzE60Lwq5w3cUqwEoiW7Foj3Sn4+Wj+Isn+IaE3Kc
+ C+R789qjNPtLp/4Y98qU74vk4EckID17Ty/Zav7MvuLP/2OFhlw5kXO1AGStsqd+ccNN
+ x8KwfXPW69GCf0ULGoKqgieVHnEouPNmPp6cjC/Kb8fFjNZCIUlEEzwe7SGGxZOBdhgo
+ A3BzJLKDEDcNQZQwnsdrfIho8+c01MucSu/kSDJV8QVjtsifMksHIASUaJKj8fBgKglM
+ hULw==
+X-Gm-Message-State: AOAM53363W/9Cq1v7f+Xrvh+IlsD6r22VwkqXM1d7WooUelelCtfn6i+
+ 9FOsMwXOqsdJ5tm2dO9mFPcU5gebqs72QeZrt9KY3PSlq2bVGZekSNMiMXFUzY0HDke5VB2FVXT
+ RWOmLCg8OmW0IAZA=
+X-Received: by 2002:a1c:4e10:: with SMTP id g16mr649684wmh.98.1591763235165;
+ Tue, 09 Jun 2020 21:27:15 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJx+Owe4I/D2wtRAiUO1R5sOL7GAOh1j5G9+h8tvyDhJIlKWHMPftIbqSqnfJ/QoVVB27z4rhQ==
+X-Received: by 2002:a1c:4e10:: with SMTP id g16mr649674wmh.98.1591763235000;
+ Tue, 09 Jun 2020 21:27:15 -0700 (PDT)
 Received: from redhat.com (bzq-79-181-55-232.red.bezeqint.net. [79.181.55.232])
- by smtp.gmail.com with ESMTPSA id w17sm6176506wra.71.2020.06.09.21.27.25
+ by smtp.gmail.com with ESMTPSA id c81sm5385446wmd.42.2020.06.09.21.27.14
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 09 Jun 2020 21:27:26 -0700 (PDT)
-Date: Wed, 10 Jun 2020 00:27:24 -0400
+ Tue, 09 Jun 2020 21:27:14 -0700 (PDT)
+Date: Wed, 10 Jun 2020 00:27:13 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 23/56] virtio-balloon: fix free page hinting check on unrealize
-Message-ID: <20200610042613.1459309-24-mst@redhat.com>
+Subject: [PULL 18/56] tests/acpi: Add void tables for Q35/TPM-TIS
+ bios-tables-test
+Message-ID: <20200610042613.1459309-19-mst@redhat.com>
 References: <20200610042613.1459309-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20200610042613.1459309-1-mst@redhat.com>
@@ -85,19 +84,18 @@ X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
 X-Mutt-Fcc: =sent
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=mst@redhat.com;
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=mst@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 23:51:15
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 21:17:20
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -112,49 +110,46 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
- David Hildenbrand <david@redhat.com>, qemu-stable@nongnu.org,
- Alexander Duyck <alexander.duyck@gmail.com>, Wei Wang <wei.w.wang@intel.com>,
- Alexander Duyck <alexander.h.duyck@linux.intel.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+ Igor Mammedov <imammedo@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>,
+ Eric Auger <eric.auger@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: David Hildenbrand <david@redhat.com>
+From: Eric Auger <eric.auger@redhat.com>
 
-Checking against guest features is wrong. We allocated data structures
-based on host features. We can rely on "free_page_bh" as an indicator
-whether to un-do stuff instead.
+Add placeholders for TPM and DSDT reference tables for
+Q35 TPM-TIS tests and ignore them for the time being.
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
-Fixes: c13c4153f76d ("virtio-balloon: VIRTIO_BALLOON_F_FREE_PAGE_HINT")
-Cc: qemu-stable@nongnu.org
-Cc: Wei Wang <wei.w.wang@intel.com>
-Cc: Michael S. Tsirkin <mst@redhat.com>
-Cc: Philippe Mathieu-Daudé <philmd@redhat.com>
-Cc: Alexander Duyck <alexander.duyck@gmail.com>
-Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20200520100439.19872-3-david@redhat.com>
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Stefan Berger <stefanb@linux.ibm.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+
+Message-Id: <20200609125409.24179-3-eric.auger@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/virtio/virtio-balloon.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tests/qtest/bios-tables-test-allowed-diff.h | 2 ++
+ tests/data/acpi/q35/DSDT.tis                | 0
+ tests/data/acpi/q35/TPM2.tis                | 0
+ 3 files changed, 2 insertions(+)
+ create mode 100644 tests/data/acpi/q35/DSDT.tis
+ create mode 100644 tests/data/acpi/q35/TPM2.tis
 
-diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-index 7ff6a7aa7c..32e9fe3f64 100644
---- a/hw/virtio/virtio-balloon.c
-+++ b/hw/virtio/virtio-balloon.c
-@@ -818,7 +818,7 @@ static void virtio_balloon_device_unrealize(DeviceState *dev)
-     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-     VirtIOBalloon *s = VIRTIO_BALLOON(dev);
- 
--    if (virtio_balloon_free_page_support(s)) {
-+    if (s->free_page_bh) {
-         qemu_bh_delete(s->free_page_bh);
-         virtio_balloon_free_page_stop(s);
-         precopy_remove_notifier(&s->free_page_report_notify);
+diff --git a/tests/qtest/bios-tables-test-allowed-diff.h b/tests/qtest/bios-tables-test-allowed-diff.h
+index dfb8523c8b..a2a45d1d31 100644
+--- a/tests/qtest/bios-tables-test-allowed-diff.h
++++ b/tests/qtest/bios-tables-test-allowed-diff.h
+@@ -1 +1,3 @@
+ /* List of comma-separated changed AML files to ignore */
++"tests/data/acpi/q35/DSDT.tis",
++"tests/data/acpi/q35/TPM2.tis",
+diff --git a/tests/data/acpi/q35/DSDT.tis b/tests/data/acpi/q35/DSDT.tis
+new file mode 100644
+index 0000000000..e69de29bb2
+diff --git a/tests/data/acpi/q35/TPM2.tis b/tests/data/acpi/q35/TPM2.tis
+new file mode 100644
+index 0000000000..e69de29bb2
 -- 
 MST
 
