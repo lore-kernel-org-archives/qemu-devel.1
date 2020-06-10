@@ -7,81 +7,81 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3917C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 15:57:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D286C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 15:58:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9E0A9206F4
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 15:57:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CB5FA206F4
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 15:58:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ntxZaEry"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E0A9206F4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fygIBSJi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB5FA206F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37248 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42786 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jj369-0006Ga-S7
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 11:57:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55870)
+	id 1jj37h-0000SY-2w
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 11:58:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56004)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jj34X-0003ca-3Y
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 11:55:25 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:51246)
+ id 1jj34d-0003mx-8J
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 11:55:31 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:37657)
  by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jj34V-0005A0-Qq
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 11:55:24 -0400
-Received: by mail-wm1-x342.google.com with SMTP id u13so2305130wml.1
- for <qemu-devel@nongnu.org>; Wed, 10 Jun 2020 08:55:15 -0700 (PDT)
+ id 1jj34b-0005E3-3A
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 11:55:30 -0400
+Received: by mail-wm1-x344.google.com with SMTP id y20so2304675wmi.2
+ for <qemu-devel@nongnu.org>; Wed, 10 Jun 2020 08:55:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=AKpSZsmxSDhJv+3Nh7RyP1/bV6hfWgn2W9oECqWqZTw=;
- b=ntxZaEryANx8smIzth6QaiD+zYPVcmqkRDEek3x85P0KKlD9el60DpgeYa81EvMsrt
- /YjlN8jnJG+nthU1BYgoBTG6uCloAcFS0NhNaXKQPBlHtET8LZGSX7v9S3P/YpBJJRbO
- 7cv/SPYELjLv0jwOgv9VLDUTkjs4UvQIMI6b0fFc6xAIzf0S/384I9UhQskg+7xvuNac
- mEZiR92hBMStF/OPES1FP2pP70nVVBb1tXXnG2i1kQC1uiS2opcoKI+fFCXSFNZZMEN9
- vPdsPrqTUzx+tcuoEmn8uVm1MpvfXLCS/6xnK38PXU+9qnDpIGSHbc5688YPGdjUGrab
- +bpQ==
+ bh=K5O4iBO+Gb4CYP2dkK+QNloWbTQMSg+bPZS/dhOJAdk=;
+ b=fygIBSJif8rAz2tfkD2LV5/qVawnF4VGcqNjenqgnS/2a7qqPnbdIo5OBvKTPVUdrx
+ n/iPYFLHqbEkVnNO/foyYEccEnlZWyHrkS6EJtfqp9Ens/4wgfev2sami2BQCFj6eJzm
+ VSkWeUeCDRVirJXPq4nE0NmkKu/fVj4IVKk1A9aajLghfiPlnjd+PNA9x2iSgJ0WRXRz
+ zeIvoY/FkLi/Fmszloz1ReKBAqYMOplPVc92I75CVoVZu04P2tNDYMx/2F2vzFEaySe2
+ UcQLg4eg7uI9iKlH2RUxB4Q5o6a2m4lcSm7dz7oLwSB6tT8LXnxTfb1dS2vNKHRjFUjf
+ 9KIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=AKpSZsmxSDhJv+3Nh7RyP1/bV6hfWgn2W9oECqWqZTw=;
- b=Km+z47fmekcWX1gI1UEB18ybw8VdPx3V7A5gkzWiYE+oMScyiKGS85+UwGNtEspfQ6
- GlnhsqVCYcBSnain+DjnX+m7Do0/dce/b5tOccYd+/mq7ohtoEwXFPoWCvXPKK27tvBq
- btaim8ZZJ2PElz7lvIQQ/PKEli8k5dnEQBjn10cwIxTLdIJupj8Q6QCzkD4hP0vmvPg7
- GgdCqbt4S95XCg3huu89cqwB3xZTN1bHXBBTjGD44YADD6jSolBi2/14G7sCr4pfOgG7
- mEEMYN6NVBTYfN2ouVynycjn5p6mT0jSI2S7A9yyTXPbLuwnOAJ3WHEbKVe6+QwPZZhA
- DcJw==
-X-Gm-Message-State: AOAM533wk9JDVsswFsH7tlnETrPsQo3F7iLDztCYvCz6n/Ra89Q/nwXt
- uMtKyD8iJCNgwOAq4zITgh6A/g==
-X-Google-Smtp-Source: ABdhPJzM+80i48OlN4jn6JWv874ZtEC0hbBYihU4fwCl9JD2kjjXPPbE19Nx8PzRrN8q8BPQqOc+Gw==
-X-Received: by 2002:a7b:c4cc:: with SMTP id g12mr3795348wmk.171.1591804514008; 
- Wed, 10 Jun 2020 08:55:14 -0700 (PDT)
+ bh=K5O4iBO+Gb4CYP2dkK+QNloWbTQMSg+bPZS/dhOJAdk=;
+ b=kHV3x10jW8Rj1qHBNRLLXLwlGk7uuujFCPkdJyUXwZHY/HRUn1+z+VBLL8+dedovNz
+ 45o5gqOnoAmucMp9igmDn+RpLYbjVly9Km04L0WvnvJzvjWL2vVHgTmN51ygvZ2VQJxK
+ oNJqpT2S/kKZIwS5w1g0gLG9rBT59XBBPKdjlWUe1K+JSRpkEFPY4ArpoKk9iQC98l7b
+ wlUDzGbnmKkR7zCy9YiBTFJGiKa7t+Sla8CquYX53aQ41IV275hzRAw8T39Xg8zwDc5u
+ sf8mq5zsrdeWjzd+us6+lgagFgZM/S8fgVuasWrwIqEiQMaMNUADYTTw6hi/cZZ939An
+ p7oQ==
+X-Gm-Message-State: AOAM531A6TJAt15MEFFnh7ZBmqzzX4ENUYSbRjNE50XFiwmrwW4fsPHm
+ GeDkFGaJoy46goOtxTYybCZKxsAiOUE=
+X-Google-Smtp-Source: ABdhPJwWEQcuBbKrM/5m0J8DW22Nsjvfy5FUKPZK1/uj2SmLgOUJ6oARcavZcYO9xqczuv8bjmMquA==
+X-Received: by 2002:a1c:5411:: with SMTP id i17mr3982718wmb.137.1591804519629; 
+ Wed, 10 Jun 2020 08:55:19 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id w17sm276703wra.71.2020.06.10.08.55.11
+ by smtp.gmail.com with ESMTPSA id o8sm182467wmb.20.2020.06.10.08.55.13
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 10 Jun 2020 08:55:11 -0700 (PDT)
+ Wed, 10 Jun 2020 08:55:18 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 352511FF8F;
+ by zen.linaroharston (Postfix) with ESMTP id 62D901FF91;
  Wed, 10 Jun 2020 16:55:10 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 3/6] cputlb: ensure we save the IOTLB data in case of reset
-Date: Wed, 10 Jun 2020 16:55:06 +0100
-Message-Id: <20200610155509.12850-4-alex.bennee@linaro.org>
+Subject: [PATCH  v2 5/6] plugins: add API to return a name for a IO device
+Date: Wed, 10 Jun 2020 16:55:08 +0100
+Message-Id: <20200610155509.12850-6-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200610155509.12850-1-alex.bennee@linaro.org>
 References: <20200610155509.12850-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::342;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x342.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::344;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x344.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -103,139 +103,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: robert.foley@linaro.org, Paolo Bonzini <pbonzini@redhat.com>,
- robhenry@microsoft.com, aaron@os.amperecomputing.com, cota@braap.org,
- kuhn.chenqun@huawei.com, peter.puhov@linaro.org,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Richard Henderson <rth@twiddle.net>
+Cc: robert.foley@linaro.org, robhenry@microsoft.com,
+ aaron@os.amperecomputing.com, cota@braap.org, kuhn.chenqun@huawei.com,
+ peter.puhov@linaro.org, Clement Deschamps <clement.deschamps@greensocs.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Any write to a device might cause a re-arrangement of memory
-triggering a TLB flush and potential re-size of the TLB invalidating
-previous entries. This would cause users of qemu_plugin_get_hwaddr()
-to see the warning:
-
-  invalid use of qemu_plugin_get_hwaddr
-
-because of the failed tlb_lookup which should always succeed. To
-prevent this we save the IOTLB data in case it is later needed by a
-plugin doing a lookup.
+This may well end up being anonymous but it should always be unique.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+[r-b provisional given change to g_intern_string]
+Reviewed-by: Clement Deschamps <clement.deschamps@greensocs.com>
+Reviewed-by: Emilio G. Cota <cota@braap.org>
 
 ---
-v2
-  - save the entry instead of re-running the tlb_fill.
-
-squash! cputlb: ensure we save the IOTLB entry in case of reset
+v3
+  - return a non-freeable const g_intern_string()
+  - checkpatch cleanups
 ---
- accel/tcg/cputlb.c | 63 ++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 61 insertions(+), 2 deletions(-)
+ include/qemu/qemu-plugin.h |  6 ++++++
+ plugins/api.c              | 20 ++++++++++++++++++++
+ 2 files changed, 26 insertions(+)
 
-diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-index eb2cf9de5e6..9bf9e479c7c 100644
---- a/accel/tcg/cputlb.c
-+++ b/accel/tcg/cputlb.c
-@@ -1058,6 +1058,47 @@ static uint64_t io_readx(CPUArchState *env, CPUIOTLBEntry *iotlbentry,
-     return val;
- }
+diff --git a/include/qemu/qemu-plugin.h b/include/qemu/qemu-plugin.h
+index bab8b0d4b3a..c98c18d6b05 100644
+--- a/include/qemu/qemu-plugin.h
++++ b/include/qemu/qemu-plugin.h
+@@ -335,6 +335,12 @@ struct qemu_plugin_hwaddr *qemu_plugin_get_hwaddr(qemu_plugin_meminfo_t info,
+ bool qemu_plugin_hwaddr_is_io(const struct qemu_plugin_hwaddr *haddr);
+ uint64_t qemu_plugin_hwaddr_device_offset(const struct qemu_plugin_hwaddr *haddr);
  
-+#ifdef CONFIG_PLUGIN
-+
-+typedef struct SavedIOTLB {
-+    struct rcu_head rcu;
-+    struct SavedIOTLB **save_loc;
-+    MemoryRegionSection *section;
-+    hwaddr mr_offset;
-+} SavedIOTLB;
-+
-+static void clean_saved_entry(SavedIOTLB *s)
-+{
-+    atomic_rcu_set(s->save_loc, NULL);
-+    g_free(s);
-+}
-+
-+static __thread SavedIOTLB *saved_for_plugin;
-+
 +/*
-+ * Save a potentially trashed IOTLB entry for later lookup by plugin.
-+ *
-+ * We also need to track the thread storage address because the RCU
-+ * cleanup that runs when we leave the critical region (the current
-+ * execution) is actually in a different thread.
++ * Returns a string representing the device. The string is valid for
++ * the lifetime of the plugin.
 + */
-+static void save_iotlb_data(MemoryRegionSection *section, hwaddr mr_offset)
-+{
-+    SavedIOTLB *s = g_new(SavedIOTLB, 1);
-+    s->save_loc = &saved_for_plugin;
-+    s->section = section;
-+    s->mr_offset = mr_offset;
-+    atomic_rcu_set(&saved_for_plugin, s);
-+    call_rcu(s, clean_saved_entry, rcu);
-+}
++const char *qemu_plugin_hwaddr_device_name(const struct qemu_plugin_hwaddr *h);
 +
-+#else
-+static void save_iotlb_data(MemoryRegionSection *section, hwaddr mr_offset)
-+{
-+    /* do nothing */
-+}
-+#endif
-+
- static void io_writex(CPUArchState *env, CPUIOTLBEntry *iotlbentry,
-                       int mmu_idx, uint64_t val, target_ulong addr,
-                       uintptr_t retaddr, MemOp op)
-@@ -1077,6 +1118,12 @@ static void io_writex(CPUArchState *env, CPUIOTLBEntry *iotlbentry,
-     }
-     cpu->mem_io_pc = retaddr;
- 
-+    /*
-+     * The memory_region_dispatch may trigger a flush/resize
-+     * so for plugins we save the iotlb_data just in case.
-+     */
-+    save_iotlb_data(section, mr_offset);
-+
-     if (mr->global_locking && !qemu_mutex_iothread_locked()) {
-         qemu_mutex_lock_iothread();
-         locked = true;
-@@ -1091,6 +1138,7 @@ static void io_writex(CPUArchState *env, CPUIOTLBEntry *iotlbentry,
-                                MMU_DATA_STORE, mmu_idx, iotlbentry->attrs, r,
-                                retaddr);
-     }
-+
-     if (locked) {
-         qemu_mutex_unlock_iothread();
-     }
-@@ -1366,8 +1414,11 @@ void *tlb_vaddr_to_host(CPUArchState *env, abi_ptr addr,
-  * in the softmmu lookup code (or helper). We don't handle re-fills or
-  * checking the victim table. This is purely informational.
-  *
-- * This should never fail as the memory access being instrumented
-- * should have just filled the TLB.
-+ * This almost never fails as the memory access being instrumented
-+ * should have just filled the TLB. The one corner case is io_writex
-+ * which can cause TLB flushes and potential resizing of the TLBs
-+ * loosing the information we need. In those cases we need to recover
-+ * data from a thread local copy of the io_tlb entry.
-  */
- 
- bool tlb_plugin_lookup(CPUState *cpu, target_ulong addr, int mmu_idx,
-@@ -1391,6 +1442,14 @@ bool tlb_plugin_lookup(CPUState *cpu, target_ulong addr, int mmu_idx,
-             data->v.ram.hostaddr = addr + tlbe->addend;
-         }
-         return true;
-+    } else {
-+        SavedIOTLB *saved = atomic_rcu_read(&saved_for_plugin);
-+        if (saved) {
-+            data->is_io = true;
-+            data->v.io.section = saved->section;
-+            data->v.io.offset = saved->mr_offset;
-+            return true;
-+        }
-     }
-     return false;
+ typedef void
+ (*qemu_plugin_vcpu_mem_cb_t)(unsigned int vcpu_index,
+                              qemu_plugin_meminfo_t info, uint64_t vaddr,
+diff --git a/plugins/api.c b/plugins/api.c
+index bbdc5a4eb46..4304e63f0cf 100644
+--- a/plugins/api.c
++++ b/plugins/api.c
+@@ -303,6 +303,26 @@ uint64_t qemu_plugin_hwaddr_device_offset(const struct qemu_plugin_hwaddr *haddr
+     return 0;
  }
+ 
++const char *qemu_plugin_hwaddr_device_name(const struct qemu_plugin_hwaddr *h)
++{
++#ifdef CONFIG_SOFTMMU
++    if (h && h->is_io) {
++        MemoryRegionSection *mrs = h->v.io.section;
++        if (!mrs->mr->name) {
++            unsigned long maddr = 0xffffffff & (uintptr_t) mrs->mr;
++            g_autofree char *temp = g_strdup_printf("anon%08lx", maddr);
++            return g_intern_string(temp);
++        } else {
++            return g_intern_string(mrs->mr->name);
++        }
++    } else {
++        return g_intern_string("RAM");
++    }
++#else
++    return g_intern_string("Invalid");
++#endif
++}
++
+ /*
+  * Queries to the number and potential maximum number of vCPUs there
+  * will be. This helps the plugin dimension per-vcpu arrays.
 -- 
 2.20.1
 
