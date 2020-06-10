@@ -2,80 +2,80 @@ Return-Path: <SRS0=wemX=7X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E9E3C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 05:00:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C9DDC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 05:01:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CA04F2072E
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 05:00:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5CEF4207ED
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 05:01:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BldhIna7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA04F2072E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZooXDSoO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5CEF4207ED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35774 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38654 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jisqQ-0005t1-06
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 01:00:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34256)
+	id 1jisrr-0007GQ-It
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 01:01:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34762)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jisLm-0001s0-LF
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 00:28:30 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:25754
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jisOG-0004fg-Vk
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 00:31:05 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:25121
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jisLk-0008NI-EO
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 00:28:30 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jisOE-0000gQ-TU
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 00:31:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591763307;
+ s=mimecast20190719; t=1591763462;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=MLMSPF+8gptcbag5dodTS3gEYTPDQrFUlsCRvov1pS4=;
- b=BldhIna7nXrY4XfaFT4u/jOWgnXQfrxYvByFuwjWQe6ePuMW9xGSbsS0wS8JuQAOe1NXSq
- GUU3Zt4yOBYPyOEAupQ2LwCZltSS3amhHVdKUqx+/gHSQaBPsbvbbGmu0FFqorZ5b2M80B
- 1vfXGI1+ARZv4NBwVDNUBNhR/uW48fE=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-492-keGJBn6nNsOMwGlk0WTwaA-1; Wed, 10 Jun 2020 00:28:25 -0400
-X-MC-Unique: keGJBn6nNsOMwGlk0WTwaA-1
-Received: by mail-wr1-f70.google.com with SMTP id j16so492132wre.22
- for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 21:28:25 -0700 (PDT)
+ bh=afqjR/PPKF3RnnjVexEnd3gC/JLrRCP0cPSdSL7aizY=;
+ b=ZooXDSoOYIjJZteFJ2BpI/XurdS7IcbVmTuMu9lSEhmWrgNiZzmZd4DnmxCfntiUXUiqaA
+ C2wnzmUEVDRSR7vgkruEkGpVVbnT01S3xtOlTevltqRZwanem1LBav9TU9exXSXZzqaMDe
+ VQE0zqfZFG5qyf0AiaROvbSFbSgdKQo=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-234-AEzjcuTkObOlBeRTKKOxmw-1; Wed, 10 Jun 2020 00:28:12 -0400
+X-MC-Unique: AEzjcuTkObOlBeRTKKOxmw-1
+Received: by mail-wr1-f71.google.com with SMTP id c14so504031wrm.15
+ for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 21:28:12 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=MLMSPF+8gptcbag5dodTS3gEYTPDQrFUlsCRvov1pS4=;
- b=H7A4WvrI0HjzYwRASwhfRJAa6yIsKXT5SB/2YOl+UMAGwuPzbe097WmA2MNxP1b9Gh
- uGFFmnCRu/G/dbWlngY3zzWQZGY/ilSB7pqqykAmMb6r28StgnuCjDWzhg2SSJsGnMR+
- n/TDrR5T+59Hg0XeNnW8Thz2W43j4aly1i5mIhuwaokorKw84sRuybyfjCzDFdi/elt8
- GttFOU95baed11DOOupWTYkRaYM/o7/rRaSxz/Xt9QWwnFtO8QhG5b6OqYMgQOz5lC/j
- Vx2+KxFC3e84EWw3zbnq3wXNIB/I7ffqGwGyz0mr7fsnn/oEvji9p2DYnr5sTlddkQ37
- 3Qow==
-X-Gm-Message-State: AOAM532FYd6TtmDeHdpFjcGo84aa80A7olVaFKlcJv2Y0Gfk5O8pTt+9
- CnU2hfynDLGR/VorrliFitkZFM9bASeg6hOhuGDUCR2sXhx1Lke8bpDXzZZbAz+HubjMZqhW2Hn
- fcWtPh30a3ltOAKQ=
-X-Received: by 2002:a1c:22d7:: with SMTP id i206mr1152666wmi.186.1591763303889; 
- Tue, 09 Jun 2020 21:28:23 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxlKiQdHxrGB0c2nXtqyolwaJauKHhDgJ7IaxXAfWcdiX3EEwWGs79vhDHoF7kodsB3fBoLJQ==
-X-Received: by 2002:a1c:22d7:: with SMTP id i206mr1152643wmi.186.1591763303364; 
- Tue, 09 Jun 2020 21:28:23 -0700 (PDT)
+ bh=afqjR/PPKF3RnnjVexEnd3gC/JLrRCP0cPSdSL7aizY=;
+ b=D+vZp/IR6HlAw+sf33/mr0xQnzRHkSL46oFAHGveCMcVSYT2ax9/mj+zLIwwtQf8I9
+ K6vkA5FY8QeIqHYRCFusL9vVmDYy2wuOVHu7jpQBzyznRnf2gMcIWsdNeiAUON/jCE7v
+ A3mF75VxCj56yKgpvQSzLgL6X6Jzz3d+rJzp2jkZr83IchA5bnDUJ7ivKAgMkhoEZNz3
+ A1urnTfor9vX4ghXogGzIFhBWOg1SBT4HKrmZnwTKyi4g8FyGcnHziGSCQI11B0BxvO+
+ UF8OTNmuISKyhmionDJgwWD91FfgX5sOfQQBOqLFX/r2VN+jc0zqBRHG3kNo3nGU8qje
+ guYg==
+X-Gm-Message-State: AOAM530lXOp0Oro3R6QsT6plfe1I8ev8rIsV1VVh2OVASQcyJm+lJlH7
+ DmRTTmrnWMMO2wjhc7Zd8SMyXHiWcQe4RPyNaP1DY0ZnRWVaDl3J+u29ALnTpwgnyo0s85JBiQk
+ bdDhmp/sM1DeqMEQ=
+X-Received: by 2002:a1c:740e:: with SMTP id p14mr1213644wmc.155.1591763291164; 
+ Tue, 09 Jun 2020 21:28:11 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy2b1ob3MWTUnE3xzOsTL37A8APxv75ijnGDpjwT0ROl8P1weELPpUiT69x03DTEaxIV4jJiw==
+X-Received: by 2002:a1c:740e:: with SMTP id p14mr1213630wmc.155.1591763290870; 
+ Tue, 09 Jun 2020 21:28:10 -0700 (PDT)
 Received: from redhat.com (bzq-79-181-55-232.red.bezeqint.net. [79.181.55.232])
- by smtp.gmail.com with ESMTPSA id a1sm5409504wmd.28.2020.06.09.21.28.22
+ by smtp.gmail.com with ESMTPSA id k21sm6517090wrd.24.2020.06.09.21.28.09
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 09 Jun 2020 21:28:22 -0700 (PDT)
-Date: Wed, 10 Jun 2020 00:28:21 -0400
+ Tue, 09 Jun 2020 21:28:10 -0700 (PDT)
+Date: Wed, 10 Jun 2020 00:28:08 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 48/56] vhost-vsock: add vhost-vsock-common abstraction
-Message-ID: <20200610042613.1459309-49-mst@redhat.com>
+Subject: [PULL 43/56] Support adding individual regions in libvhost-user
+Message-ID: <20200610042613.1459309-44-mst@redhat.com>
 References: <20200610042613.1459309-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20200610042613.1459309-1-mst@redhat.com>
@@ -85,16 +85,16 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=mst@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 23:51:15
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=mst@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 21:17:20
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -109,814 +109,197 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
- Stefano Garzarella <sgarzare@redhat.com>
+ Johannes Berg <johannes.berg@intel.com>, David Hildenbrand <david@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Raphael Norwitz <raphael.norwitz@nutanix.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Stefano Garzarella <sgarzare@redhat.com>
+From: Raphael Norwitz <raphael.norwitz@nutanix.com>
 
-This patch prepares the introduction of vhost-user-vsock, moving
-the common code usable for both vhost-vsock and vhost-user-vsock
-devices, in the new vhost-vsock-common parent class.
+When the VHOST_USER_PROTOCOL_F_CONFIGURE_MEM_SLOTS is enabled, qemu will
+transmit memory regions to a backend individually using the new message
+VHOST_USER_ADD_MEM_REG. With this change vhost-user backends built with
+libvhost-user can now map in new memory regions when VHOST_USER_ADD_MEM_REG
+messages are received.
 
-While moving the code, fixed checkpatch warnings about block comments.
+Qemu only sends VHOST_USER_ADD_MEM_REG messages when the
+VHOST_USER_PROTOCOL_F_CONFIGURE_MEM_SLOTS feature is negotiated, and
+since it is not yet supported in libvhost-user, this new functionality
+is not yet used.
 
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-Message-Id: <20200522122512.87413-2-sgarzare@redhat.com>
+Signed-off-by: Raphael Norwitz <raphael.norwitz@nutanix.com>
+Message-Id: <1588533678-23450-9-git-send-email-raphael.norwitz@nutanix.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- include/hw/virtio/vhost-vsock-common.h |  47 ++++
- include/hw/virtio/vhost-vsock.h        |  11 +-
- hw/virtio/vhost-vsock-common.c         | 258 ++++++++++++++++++++++
- hw/virtio/vhost-vsock.c                | 283 ++++---------------------
- hw/virtio/Makefile.objs                |   2 +-
- 5 files changed, 350 insertions(+), 251 deletions(-)
- create mode 100644 include/hw/virtio/vhost-vsock-common.h
- create mode 100644 hw/virtio/vhost-vsock-common.c
+ contrib/libvhost-user/libvhost-user.h |   7 ++
+ contrib/libvhost-user/libvhost-user.c | 103 ++++++++++++++++++++++++++
+ 2 files changed, 110 insertions(+)
 
-diff --git a/include/hw/virtio/vhost-vsock-common.h b/include/hw/virtio/vhost-vsock-common.h
-new file mode 100644
-index 0000000000..f8b4aaae00
---- /dev/null
-+++ b/include/hw/virtio/vhost-vsock-common.h
-@@ -0,0 +1,47 @@
-+/*
-+ * Parent class for vhost-vsock devices
-+ *
-+ * Copyright 2015-2020 Red Hat, Inc.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or
-+ * (at your option) any later version.  See the COPYING file in the
-+ * top-level directory.
-+ */
-+
-+#ifndef _QEMU_VHOST_VSOCK_COMMON_H
-+#define _QEMU_VHOST_VSOCK_COMMON_H
-+
-+#include "hw/virtio/virtio.h"
-+#include "hw/virtio/vhost.h"
-+
-+#define TYPE_VHOST_VSOCK_COMMON "vhost-vsock-common"
-+#define VHOST_VSOCK_COMMON(obj) \
-+        OBJECT_CHECK(VHostVSockCommon, (obj), TYPE_VHOST_VSOCK_COMMON)
-+
-+enum {
-+    VHOST_VSOCK_SAVEVM_VERSION = 0,
-+
-+    VHOST_VSOCK_QUEUE_SIZE = 128,
-+};
-+
-+typedef struct {
-+    VirtIODevice parent;
-+
-+    struct vhost_virtqueue vhost_vqs[2];
-+    struct vhost_dev vhost_dev;
-+
-+    VirtQueue *event_vq;
-+    VirtQueue *recv_vq;
-+    VirtQueue *trans_vq;
-+
-+    QEMUTimer *post_load_timer;
-+} VHostVSockCommon;
-+
-+int vhost_vsock_common_start(VirtIODevice *vdev);
-+void vhost_vsock_common_stop(VirtIODevice *vdev);
-+int vhost_vsock_common_pre_save(void *opaque);
-+int vhost_vsock_common_post_load(void *opaque, int version_id);
-+void vhost_vsock_common_realize(VirtIODevice *vdev, const char *name);
-+void vhost_vsock_common_unrealize(VirtIODevice *vdev);
-+
-+#endif /* _QEMU_VHOST_VSOCK_COMMON_H */
-diff --git a/include/hw/virtio/vhost-vsock.h b/include/hw/virtio/vhost-vsock.h
-index bc5a988ee5..8cbb7b90f9 100644
---- a/include/hw/virtio/vhost-vsock.h
-+++ b/include/hw/virtio/vhost-vsock.h
-@@ -14,8 +14,7 @@
- #ifndef QEMU_VHOST_VSOCK_H
- #define QEMU_VHOST_VSOCK_H
+diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost-user/libvhost-user.h
+index 88ef40d26a..60ef7fd13e 100644
+--- a/contrib/libvhost-user/libvhost-user.h
++++ b/contrib/libvhost-user/libvhost-user.h
+@@ -98,6 +98,7 @@ typedef enum VhostUserRequest {
+     VHOST_USER_GPU_SET_SOCKET = 33,
+     VHOST_USER_VRING_KICK = 35,
+     VHOST_USER_GET_MAX_MEM_SLOTS = 36,
++    VHOST_USER_ADD_MEM_REG = 37,
+     VHOST_USER_MAX
+ } VhostUserRequest;
  
--#include "hw/virtio/virtio.h"
--#include "hw/virtio/vhost.h"
-+#include "hw/virtio/vhost-vsock-common.h"
+@@ -124,6 +125,11 @@ typedef struct VhostUserMemory {
+     VhostUserMemoryRegion regions[VHOST_MEMORY_MAX_NREGIONS];
+ } VhostUserMemory;
  
- #define TYPE_VHOST_VSOCK "vhost-vsock-device"
- #define VHOST_VSOCK(obj) \
-@@ -28,14 +27,8 @@ typedef struct {
- 
- typedef struct {
-     /*< private >*/
--    VirtIODevice parent;
-+    VHostVSockCommon parent;
-     VHostVSockConf conf;
--    struct vhost_virtqueue vhost_vqs[2];
--    struct vhost_dev vhost_dev;
--    VirtQueue *event_vq;
--    VirtQueue *recv_vq;
--    VirtQueue *trans_vq;
--    QEMUTimer *post_load_timer;
- 
-     /*< public >*/
- } VHostVSock;
-diff --git a/hw/virtio/vhost-vsock-common.c b/hw/virtio/vhost-vsock-common.c
-new file mode 100644
-index 0000000000..5b2ebf3496
---- /dev/null
-+++ b/hw/virtio/vhost-vsock-common.c
-@@ -0,0 +1,258 @@
-+/*
-+ * Parent class for vhost-vsock devices
-+ *
-+ * Copyright 2015-2020 Red Hat, Inc.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or
-+ * (at your option) any later version.  See the COPYING file in the
-+ * top-level directory.
-+ */
++typedef struct VhostUserMemRegMsg {
++    uint32_t padding;
++    VhostUserMemoryRegion region;
++} VhostUserMemRegMsg;
 +
-+#include "qemu/osdep.h"
-+#include "standard-headers/linux/virtio_vsock.h"
-+#include "qapi/error.h"
-+#include "hw/virtio/virtio-access.h"
-+#include "qemu/error-report.h"
-+#include "hw/qdev-properties.h"
-+#include "hw/virtio/vhost-vsock.h"
-+#include "qemu/iov.h"
-+#include "monitor/monitor.h"
-+
-+int vhost_vsock_common_start(VirtIODevice *vdev)
-+{
-+    VHostVSockCommon *vvc = VHOST_VSOCK_COMMON(vdev);
-+    BusState *qbus = BUS(qdev_get_parent_bus(DEVICE(vdev)));
-+    VirtioBusClass *k = VIRTIO_BUS_GET_CLASS(qbus);
-+    int ret;
+ typedef struct VhostUserLog {
+     uint64_t mmap_size;
+     uint64_t mmap_offset;
+@@ -176,6 +182,7 @@ typedef struct VhostUserMsg {
+         struct vhost_vring_state state;
+         struct vhost_vring_addr addr;
+         VhostUserMemory memory;
++        VhostUserMemRegMsg memreg;
+         VhostUserLog log;
+         VhostUserConfig config;
+         VhostUserVringArea area;
+diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/libvhost-user.c
+index 9f039b707e..d8ee7a23a3 100644
+--- a/contrib/libvhost-user/libvhost-user.c
++++ b/contrib/libvhost-user/libvhost-user.c
+@@ -138,6 +138,7 @@ vu_request_to_string(unsigned int req)
+         REQ(VHOST_USER_GPU_SET_SOCKET),
+         REQ(VHOST_USER_VRING_KICK),
+         REQ(VHOST_USER_GET_MAX_MEM_SLOTS),
++        REQ(VHOST_USER_ADD_MEM_REG),
+         REQ(VHOST_USER_MAX),
+     };
+ #undef REQ
+@@ -662,6 +663,106 @@ generate_faults(VuDev *dev) {
+     return true;
+ }
+ 
++static bool
++vu_add_mem_reg(VuDev *dev, VhostUserMsg *vmsg) {
 +    int i;
-+
-+    if (!k->set_guest_notifiers) {
-+        error_report("binding does not support guest notifiers");
-+        return -ENOSYS;
-+    }
-+
-+    ret = vhost_dev_enable_notifiers(&vvc->vhost_dev, vdev);
-+    if (ret < 0) {
-+        error_report("Error enabling host notifiers: %d", -ret);
-+        return ret;
-+    }
-+
-+    ret = k->set_guest_notifiers(qbus->parent, vvc->vhost_dev.nvqs, true);
-+    if (ret < 0) {
-+        error_report("Error binding guest notifier: %d", -ret);
-+        goto err_host_notifiers;
-+    }
-+
-+    vvc->vhost_dev.acked_features = vdev->guest_features;
-+    ret = vhost_dev_start(&vvc->vhost_dev, vdev);
-+    if (ret < 0) {
-+        error_report("Error starting vhost: %d", -ret);
-+        goto err_guest_notifiers;
-+    }
++    bool track_ramblocks = dev->postcopy_listening;
++    VhostUserMemoryRegion m = vmsg->payload.memreg.region, *msg_region = &m;
++    VuDevRegion *dev_region = &dev->regions[dev->nregions];
++    void *mmap_addr;
 +
 +    /*
-+     * guest_notifier_mask/pending not used yet, so just unmask
-+     * everything here.  virtio-pci will do the right thing by
-+     * enabling/disabling irqfd.
++     * If we are in postcopy mode and we receive a u64 payload with a 0 value
++     * we know all the postcopy client bases have been recieved, and we
++     * should start generating faults.
 +     */
-+    for (i = 0; i < vvc->vhost_dev.nvqs; i++) {
-+        vhost_virtqueue_mask(&vvc->vhost_dev, vdev, i, false);
++    if (track_ramblocks &&
++        vmsg->size == sizeof(vmsg->payload.u64) &&
++        vmsg->payload.u64 == 0) {
++        (void)generate_faults(dev);
++        return false;
 +    }
 +
-+    return 0;
++    DPRINT("Adding region: %d\n", dev->nregions);
++    DPRINT("    guest_phys_addr: 0x%016"PRIx64"\n",
++           msg_region->guest_phys_addr);
++    DPRINT("    memory_size:     0x%016"PRIx64"\n",
++           msg_region->memory_size);
++    DPRINT("    userspace_addr   0x%016"PRIx64"\n",
++           msg_region->userspace_addr);
++    DPRINT("    mmap_offset      0x%016"PRIx64"\n",
++           msg_region->mmap_offset);
 +
-+err_guest_notifiers:
-+    k->set_guest_notifiers(qbus->parent, vvc->vhost_dev.nvqs, false);
-+err_host_notifiers:
-+    vhost_dev_disable_notifiers(&vvc->vhost_dev, vdev);
-+    return ret;
-+}
-+
-+void vhost_vsock_common_stop(VirtIODevice *vdev)
-+{
-+    VHostVSockCommon *vvc = VHOST_VSOCK_COMMON(vdev);
-+    BusState *qbus = BUS(qdev_get_parent_bus(DEVICE(vdev)));
-+    VirtioBusClass *k = VIRTIO_BUS_GET_CLASS(qbus);
-+    int ret;
-+
-+    if (!k->set_guest_notifiers) {
-+        return;
-+    }
-+
-+    vhost_dev_stop(&vvc->vhost_dev, vdev);
-+
-+    ret = k->set_guest_notifiers(qbus->parent, vvc->vhost_dev.nvqs, false);
-+    if (ret < 0) {
-+        error_report("vhost guest notifier cleanup failed: %d", ret);
-+        return;
-+    }
-+
-+    vhost_dev_disable_notifiers(&vvc->vhost_dev, vdev);
-+}
-+
-+
-+static void vhost_vsock_common_handle_output(VirtIODevice *vdev, VirtQueue *vq)
-+{
-+    /* Do nothing */
-+}
-+
-+static void vhost_vsock_common_guest_notifier_mask(VirtIODevice *vdev, int idx,
-+                                            bool mask)
-+{
-+    VHostVSockCommon *vvc = VHOST_VSOCK_COMMON(vdev);
-+
-+    vhost_virtqueue_mask(&vvc->vhost_dev, vdev, idx, mask);
-+}
-+
-+static bool vhost_vsock_common_guest_notifier_pending(VirtIODevice *vdev,
-+                                               int idx)
-+{
-+    VHostVSockCommon *vvc = VHOST_VSOCK_COMMON(vdev);
-+
-+    return vhost_virtqueue_pending(&vvc->vhost_dev, idx);
-+}
-+
-+static void vhost_vsock_common_send_transport_reset(VHostVSockCommon *vvc)
-+{
-+    VirtQueueElement *elem;
-+    VirtQueue *vq = vvc->event_vq;
-+    struct virtio_vsock_event event = {
-+        .id = cpu_to_le32(VIRTIO_VSOCK_EVENT_TRANSPORT_RESET),
-+    };
-+
-+    elem = virtqueue_pop(vq, sizeof(VirtQueueElement));
-+    if (!elem) {
-+        error_report("vhost-vsock missed transport reset event");
-+        return;
-+    }
-+
-+    if (elem->out_num) {
-+        error_report("invalid vhost-vsock event virtqueue element with "
-+                     "out buffers");
-+        goto out;
-+    }
-+
-+    if (iov_from_buf(elem->in_sg, elem->in_num, 0,
-+                     &event, sizeof(event)) != sizeof(event)) {
-+        error_report("vhost-vsock event virtqueue element is too short");
-+        goto out;
-+    }
-+
-+    virtqueue_push(vq, elem, sizeof(event));
-+    virtio_notify(VIRTIO_DEVICE(vvc), vq);
-+
-+out:
-+    g_free(elem);
-+}
-+
-+static void vhost_vsock_common_post_load_timer_cleanup(VHostVSockCommon *vvc)
-+{
-+    if (!vvc->post_load_timer) {
-+        return;
-+    }
-+
-+    timer_del(vvc->post_load_timer);
-+    timer_free(vvc->post_load_timer);
-+    vvc->post_load_timer = NULL;
-+}
-+
-+static void vhost_vsock_common_post_load_timer_cb(void *opaque)
-+{
-+    VHostVSockCommon *vvc = opaque;
-+
-+    vhost_vsock_common_post_load_timer_cleanup(vvc);
-+    vhost_vsock_common_send_transport_reset(vvc);
-+}
-+
-+int vhost_vsock_common_pre_save(void *opaque)
-+{
-+    VHostVSockCommon *vvc = opaque;
++    dev_region->gpa = msg_region->guest_phys_addr;
++    dev_region->size = msg_region->memory_size;
++    dev_region->qva = msg_region->userspace_addr;
++    dev_region->mmap_offset = msg_region->mmap_offset;
 +
 +    /*
-+     * At this point, backend must be stopped, otherwise
-+     * it might keep writing to memory.
++     * We don't use offset argument of mmap() since the
++     * mapped address has to be page aligned, and we use huge
++     * pages.
 +     */
-+    assert(!vvc->vhost_dev.started);
-+
-+    return 0;
-+}
-+
-+int vhost_vsock_common_post_load(void *opaque, int version_id)
-+{
-+    VHostVSockCommon *vvc = opaque;
-+    VirtIODevice *vdev = VIRTIO_DEVICE(vvc);
-+
-+    if (virtio_queue_get_addr(vdev, 2)) {
++    if (track_ramblocks) {
 +        /*
-+         * Defer transport reset event to a vm clock timer so that virtqueue
-+         * changes happen after migration has completed.
++         * In postcopy we're using PROT_NONE here to catch anyone
++         * accessing it before we userfault.
 +         */
-+        assert(!vvc->post_load_timer);
-+        vvc->post_load_timer =
-+            timer_new_ns(QEMU_CLOCK_VIRTUAL,
-+                         vhost_vsock_common_post_load_timer_cb,
-+                         vvc);
-+        timer_mod(vvc->post_load_timer, 1);
++        mmap_addr = mmap(0, dev_region->size + dev_region->mmap_offset,
++                         PROT_NONE, MAP_SHARED,
++                         vmsg->fds[0], 0);
++    } else {
++        mmap_addr = mmap(0, dev_region->size + dev_region->mmap_offset,
++                         PROT_READ | PROT_WRITE, MAP_SHARED, vmsg->fds[0],
++                         0);
 +    }
-+    return 0;
-+}
 +
-+void vhost_vsock_common_realize(VirtIODevice *vdev, const char *name)
-+{
-+    VHostVSockCommon *vvc = VHOST_VSOCK_COMMON(vdev);
++    if (mmap_addr == MAP_FAILED) {
++        vu_panic(dev, "region mmap error: %s", strerror(errno));
++    } else {
++        dev_region->mmap_addr = (uint64_t)(uintptr_t)mmap_addr;
++        DPRINT("    mmap_addr:       0x%016"PRIx64"\n",
++               dev_region->mmap_addr);
++    }
 +
-+    virtio_init(vdev, name, VIRTIO_ID_VSOCK,
-+                sizeof(struct virtio_vsock_config));
++    close(vmsg->fds[0]);
 +
-+    /* Receive and transmit queues belong to vhost */
-+    vvc->recv_vq = virtio_add_queue(vdev, VHOST_VSOCK_QUEUE_SIZE,
-+                                      vhost_vsock_common_handle_output);
-+    vvc->trans_vq = virtio_add_queue(vdev, VHOST_VSOCK_QUEUE_SIZE,
-+                                       vhost_vsock_common_handle_output);
++    if (track_ramblocks) {
++        /*
++         * Return the address to QEMU so that it can translate the ufd
++         * fault addresses back.
++         */
++        msg_region->userspace_addr = (uintptr_t)(mmap_addr +
++                                                 dev_region->mmap_offset);
 +
-+    /* The event queue belongs to QEMU */
-+    vvc->event_vq = virtio_add_queue(vdev, VHOST_VSOCK_QUEUE_SIZE,
-+                                       vhost_vsock_common_handle_output);
-+
-+    vvc->vhost_dev.nvqs = ARRAY_SIZE(vvc->vhost_vqs);
-+    vvc->vhost_dev.vqs = vvc->vhost_vqs;
-+
-+    vvc->post_load_timer = NULL;
-+}
-+
-+void vhost_vsock_common_unrealize(VirtIODevice *vdev)
-+{
-+    VHostVSockCommon *vvc = VHOST_VSOCK_COMMON(vdev);
-+
-+    vhost_vsock_common_post_load_timer_cleanup(vvc);
-+
-+    virtio_delete_queue(vvc->recv_vq);
-+    virtio_delete_queue(vvc->trans_vq);
-+    virtio_delete_queue(vvc->event_vq);
-+    virtio_cleanup(vdev);
-+}
-+
-+static void vhost_vsock_common_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+    VirtioDeviceClass *vdc = VIRTIO_DEVICE_CLASS(klass);
-+
-+    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
-+    vdc->guest_notifier_mask = vhost_vsock_common_guest_notifier_mask;
-+    vdc->guest_notifier_pending = vhost_vsock_common_guest_notifier_pending;
-+}
-+
-+static const TypeInfo vhost_vsock_common_info = {
-+    .name = TYPE_VHOST_VSOCK_COMMON,
-+    .parent = TYPE_VIRTIO_DEVICE,
-+    .instance_size = sizeof(VHostVSockCommon),
-+    .class_init = vhost_vsock_common_class_init,
-+    .abstract = true,
-+};
-+
-+static void vhost_vsock_common_register_types(void)
-+{
-+    type_register_static(&vhost_vsock_common_info);
-+}
-+
-+type_init(vhost_vsock_common_register_types)
-diff --git a/hw/virtio/vhost-vsock.c b/hw/virtio/vhost-vsock.c
-index 4a228f5168..c8f0699b4f 100644
---- a/hw/virtio/vhost-vsock.c
-+++ b/hw/virtio/vhost-vsock.c
-@@ -12,24 +12,14 @@
-  */
- 
- #include "qemu/osdep.h"
--#include <sys/ioctl.h>
- #include "standard-headers/linux/virtio_vsock.h"
- #include "qapi/error.h"
--#include "hw/virtio/virtio-bus.h"
- #include "hw/virtio/virtio-access.h"
- #include "qemu/error-report.h"
- #include "hw/qdev-properties.h"
- #include "hw/virtio/vhost-vsock.h"
--#include "qemu/iov.h"
--#include "qemu/module.h"
- #include "monitor/monitor.h"
- 
--enum {
--    VHOST_VSOCK_SAVEVM_VERSION = 0,
--
--    VHOST_VSOCK_QUEUE_SIZE = 128,
--};
--
- static void vhost_vsock_get_config(VirtIODevice *vdev, uint8_t *config)
- {
-     VHostVSock *vsock = VHOST_VSOCK(vdev);
-@@ -39,16 +29,18 @@ static void vhost_vsock_get_config(VirtIODevice *vdev, uint8_t *config)
-     memcpy(config, &vsockcfg, sizeof(vsockcfg));
- }
- 
--static int vhost_vsock_set_guest_cid(VHostVSock *vsock)
-+static int vhost_vsock_set_guest_cid(VirtIODevice *vdev)
- {
--    const VhostOps *vhost_ops = vsock->vhost_dev.vhost_ops;
-+    VHostVSockCommon *vvc = VHOST_VSOCK_COMMON(vdev);
-+    VHostVSock *vsock = VHOST_VSOCK(vdev);
-+    const VhostOps *vhost_ops = vvc->vhost_dev.vhost_ops;
-     int ret;
- 
-     if (!vhost_ops->vhost_vsock_set_guest_cid) {
-         return -ENOSYS;
-     }
- 
--    ret = vhost_ops->vhost_vsock_set_guest_cid(&vsock->vhost_dev,
-+    ret = vhost_ops->vhost_vsock_set_guest_cid(&vvc->vhost_dev,
-                                                vsock->conf.guest_cid);
-     if (ret < 0) {
-         return -errno;
-@@ -56,123 +48,58 @@ static int vhost_vsock_set_guest_cid(VHostVSock *vsock)
-     return 0;
- }
- 
--static int vhost_vsock_set_running(VHostVSock *vsock, int start)
-+static int vhost_vsock_set_running(VirtIODevice *vdev, int start)
- {
--    const VhostOps *vhost_ops = vsock->vhost_dev.vhost_ops;
-+    VHostVSockCommon *vvc = VHOST_VSOCK_COMMON(vdev);
-+    const VhostOps *vhost_ops = vvc->vhost_dev.vhost_ops;
-     int ret;
- 
-     if (!vhost_ops->vhost_vsock_set_running) {
-         return -ENOSYS;
-     }
- 
--    ret = vhost_ops->vhost_vsock_set_running(&vsock->vhost_dev, start);
-+    ret = vhost_ops->vhost_vsock_set_running(&vvc->vhost_dev, start);
-     if (ret < 0) {
-         return -errno;
-     }
-     return 0;
- }
- 
--static void vhost_vsock_start(VirtIODevice *vdev)
--{
--    VHostVSock *vsock = VHOST_VSOCK(vdev);
--    BusState *qbus = BUS(qdev_get_parent_bus(DEVICE(vdev)));
--    VirtioBusClass *k = VIRTIO_BUS_GET_CLASS(qbus);
--    int ret;
--    int i;
--
--    if (!k->set_guest_notifiers) {
--        error_report("binding does not support guest notifiers");
--        return;
--    }
--
--    ret = vhost_dev_enable_notifiers(&vsock->vhost_dev, vdev);
--    if (ret < 0) {
--        error_report("Error enabling host notifiers: %d", -ret);
--        return;
--    }
--
--    ret = k->set_guest_notifiers(qbus->parent, vsock->vhost_dev.nvqs, true);
--    if (ret < 0) {
--        error_report("Error binding guest notifier: %d", -ret);
--        goto err_host_notifiers;
--    }
--
--    vsock->vhost_dev.acked_features = vdev->guest_features;
--    ret = vhost_dev_start(&vsock->vhost_dev, vdev);
--    if (ret < 0) {
--        error_report("Error starting vhost: %d", -ret);
--        goto err_guest_notifiers;
--    }
--
--    ret = vhost_vsock_set_running(vsock, 1);
--    if (ret < 0) {
--        error_report("Error starting vhost vsock: %d", -ret);
--        goto err_dev_start;
--    }
--
--    /* guest_notifier_mask/pending not used yet, so just unmask
--     * everything here.  virtio-pci will do the right thing by
--     * enabling/disabling irqfd.
--     */
--    for (i = 0; i < vsock->vhost_dev.nvqs; i++) {
--        vhost_virtqueue_mask(&vsock->vhost_dev, vdev, i, false);
--    }
--
--    return;
--
--err_dev_start:
--    vhost_dev_stop(&vsock->vhost_dev, vdev);
--err_guest_notifiers:
--    k->set_guest_notifiers(qbus->parent, vsock->vhost_dev.nvqs, false);
--err_host_notifiers:
--    vhost_dev_disable_notifiers(&vsock->vhost_dev, vdev);
--}
--
--static void vhost_vsock_stop(VirtIODevice *vdev)
--{
--    VHostVSock *vsock = VHOST_VSOCK(vdev);
--    BusState *qbus = BUS(qdev_get_parent_bus(DEVICE(vdev)));
--    VirtioBusClass *k = VIRTIO_BUS_GET_CLASS(qbus);
--    int ret;
--
--    if (!k->set_guest_notifiers) {
--        return;
--    }
--
--    ret = vhost_vsock_set_running(vsock, 0);
--    if (ret < 0) {
--        error_report("vhost vsock set running failed: %d", ret);
--        return;
--    }
--
--    vhost_dev_stop(&vsock->vhost_dev, vdev);
--
--    ret = k->set_guest_notifiers(qbus->parent, vsock->vhost_dev.nvqs, false);
--    if (ret < 0) {
--        error_report("vhost guest notifier cleanup failed: %d", ret);
--        return;
--    }
--
--    vhost_dev_disable_notifiers(&vsock->vhost_dev, vdev);
--}
- 
- static void vhost_vsock_set_status(VirtIODevice *vdev, uint8_t status)
- {
--    VHostVSock *vsock = VHOST_VSOCK(vdev);
-+    VHostVSockCommon *vvc = VHOST_VSOCK_COMMON(vdev);
-     bool should_start = status & VIRTIO_CONFIG_S_DRIVER_OK;
-+    int ret;
- 
-     if (!vdev->vm_running) {
-         should_start = false;
-     }
- 
--    if (vsock->vhost_dev.started == should_start) {
-+    if (vvc->vhost_dev.started == should_start) {
-         return;
-     }
- 
-     if (should_start) {
--        vhost_vsock_start(vdev);
-+        ret = vhost_vsock_common_start(vdev);
-+        if (ret < 0) {
-+            return;
++        /* Send the message back to qemu with the addresses filled in. */
++        vmsg->fd_num = 0;
++        if (!vu_send_reply(dev, dev->sock, vmsg)) {
++            vu_panic(dev, "failed to respond to add-mem-region for postcopy");
++            return false;
 +        }
 +
-+        ret = vhost_vsock_set_running(vdev, 1);
-+        if (ret < 0) {
-+            vhost_vsock_common_stop(vdev);
-+            error_report("Error starting vhost vsock: %d", -ret);
-+            return;
-+        }
-     } else {
--        vhost_vsock_stop(vdev);
-+        ret = vhost_vsock_set_running(vdev, 0);
-+        if (ret < 0) {
-+            error_report("vhost vsock set running failed: %d", ret);
-+            return;
++        DPRINT("Successfully added new region in postcopy\n");
++        dev->nregions++;
++        return false;
++
++    } else {
++        for (i = 0; i < dev->max_queues; i++) {
++            if (dev->vq[i].vring.desc) {
++                if (map_ring(dev, &dev->vq[i])) {
++                    vu_panic(dev, "remapping queue %d for new memory region",
++                             i);
++                }
++            }
 +        }
 +
-+        vhost_vsock_common_stop(vdev);
-     }
- }
- 
-@@ -184,108 +111,6 @@ static uint64_t vhost_vsock_get_features(VirtIODevice *vdev,
-     return requested_features;
- }
- 
--static void vhost_vsock_handle_output(VirtIODevice *vdev, VirtQueue *vq)
--{
--    /* Do nothing */
--}
--
--static void vhost_vsock_guest_notifier_mask(VirtIODevice *vdev, int idx,
--                                            bool mask)
--{
--    VHostVSock *vsock = VHOST_VSOCK(vdev);
--
--    vhost_virtqueue_mask(&vsock->vhost_dev, vdev, idx, mask);
--}
--
--static bool vhost_vsock_guest_notifier_pending(VirtIODevice *vdev, int idx)
--{
--    VHostVSock *vsock = VHOST_VSOCK(vdev);
--
--    return vhost_virtqueue_pending(&vsock->vhost_dev, idx);
--}
--
--static void vhost_vsock_send_transport_reset(VHostVSock *vsock)
--{
--    VirtQueueElement *elem;
--    VirtQueue *vq = vsock->event_vq;
--    struct virtio_vsock_event event = {
--        .id = cpu_to_le32(VIRTIO_VSOCK_EVENT_TRANSPORT_RESET),
--    };
--
--    elem = virtqueue_pop(vq, sizeof(VirtQueueElement));
--    if (!elem) {
--        error_report("vhost-vsock missed transport reset event");
--        return;
--    }
--
--    if (elem->out_num) {
--        error_report("invalid vhost-vsock event virtqueue element with "
--                     "out buffers");
--        goto out;
--    }
--
--    if (iov_from_buf(elem->in_sg, elem->in_num, 0,
--                     &event, sizeof(event)) != sizeof(event)) {
--        error_report("vhost-vsock event virtqueue element is too short");
--        goto out;
--    }
--
--    virtqueue_push(vq, elem, sizeof(event));
--    virtio_notify(VIRTIO_DEVICE(vsock), vq);
--
--out:
--    g_free(elem);
--}
--
--static void vhost_vsock_post_load_timer_cleanup(VHostVSock *vsock)
--{
--    if (!vsock->post_load_timer) {
--        return;
--    }
--
--    timer_del(vsock->post_load_timer);
--    timer_free(vsock->post_load_timer);
--    vsock->post_load_timer = NULL;
--}
--
--static void vhost_vsock_post_load_timer_cb(void *opaque)
--{
--    VHostVSock *vsock = opaque;
--
--    vhost_vsock_post_load_timer_cleanup(vsock);
--    vhost_vsock_send_transport_reset(vsock);
--}
--
--static int vhost_vsock_pre_save(void *opaque)
--{
--    VHostVSock *vsock = opaque;
--
--    /* At this point, backend must be stopped, otherwise
--     * it might keep writing to memory. */
--    assert(!vsock->vhost_dev.started);
--
--    return 0;
--}
--
--static int vhost_vsock_post_load(void *opaque, int version_id)
--{
--    VHostVSock *vsock = opaque;
--    VirtIODevice *vdev = VIRTIO_DEVICE(vsock);
--
--    if (virtio_queue_get_addr(vdev, 2)) {
--        /* Defer transport reset event to a vm clock timer so that virtqueue
--         * changes happen after migration has completed.
--         */
--        assert(!vsock->post_load_timer);
--        vsock->post_load_timer =
--            timer_new_ns(QEMU_CLOCK_VIRTUAL,
--                         vhost_vsock_post_load_timer_cb,
--                         vsock);
--        timer_mod(vsock->post_load_timer, 1);
--    }
--    return 0;
--}
--
- static const VMStateDescription vmstate_virtio_vhost_vsock = {
-     .name = "virtio-vhost_vsock",
-     .minimum_version_id = VHOST_VSOCK_SAVEVM_VERSION,
-@@ -294,12 +119,13 @@ static const VMStateDescription vmstate_virtio_vhost_vsock = {
-         VMSTATE_VIRTIO_DEVICE,
-         VMSTATE_END_OF_LIST()
-     },
--    .pre_save = vhost_vsock_pre_save,
--    .post_load = vhost_vsock_post_load,
-+    .pre_save = vhost_vsock_common_pre_save,
-+    .post_load = vhost_vsock_common_post_load,
- };
- 
- static void vhost_vsock_device_realize(DeviceState *dev, Error **errp)
++        DPRINT("Successfully added new region\n");
++        dev->nregions++;
++        vmsg_set_reply_u64(vmsg, 0);
++        return true;
++    }
++}
++
+ static bool
+ vu_set_mem_table_exec_postcopy(VuDev *dev, VhostUserMsg *vmsg)
  {
-+    VHostVSockCommon *vvc = VHOST_VSOCK_COMMON(dev);
-     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-     VHostVSock *vsock = VHOST_VSOCK(dev);
-     int vhostfd;
-@@ -331,46 +157,29 @@ static void vhost_vsock_device_realize(DeviceState *dev, Error **errp)
-         }
-     }
- 
--    virtio_init(vdev, "vhost-vsock", VIRTIO_ID_VSOCK,
--                sizeof(struct virtio_vsock_config));
-+    vhost_vsock_common_realize(vdev, "vhost-vsock");
- 
--    /* Receive and transmit queues belong to vhost */
--    vsock->recv_vq = virtio_add_queue(vdev, VHOST_VSOCK_QUEUE_SIZE,
--                                      vhost_vsock_handle_output);
--    vsock->trans_vq = virtio_add_queue(vdev, VHOST_VSOCK_QUEUE_SIZE,
--                                       vhost_vsock_handle_output);
--
--    /* The event queue belongs to QEMU */
--    vsock->event_vq = virtio_add_queue(vdev, VHOST_VSOCK_QUEUE_SIZE,
--                                       vhost_vsock_handle_output);
--
--    vsock->vhost_dev.nvqs = ARRAY_SIZE(vsock->vhost_vqs);
--    vsock->vhost_dev.vqs = vsock->vhost_vqs;
--    ret = vhost_dev_init(&vsock->vhost_dev, (void *)(uintptr_t)vhostfd,
-+    ret = vhost_dev_init(&vvc->vhost_dev, (void *)(uintptr_t)vhostfd,
-                          VHOST_BACKEND_TYPE_KERNEL, 0);
-     if (ret < 0) {
-         error_setg_errno(errp, -ret, "vhost-vsock: vhost_dev_init failed");
-         goto err_virtio;
-     }
- 
--    ret = vhost_vsock_set_guest_cid(vsock);
-+    ret = vhost_vsock_set_guest_cid(vdev);
-     if (ret < 0) {
-         error_setg_errno(errp, -ret, "vhost-vsock: unable to set guest cid");
-         goto err_vhost_dev;
-     }
- 
--    vsock->post_load_timer = NULL;
-     return;
- 
- err_vhost_dev:
--    vhost_dev_cleanup(&vsock->vhost_dev);
-+    vhost_dev_cleanup(&vvc->vhost_dev);
-     /* vhost_dev_cleanup() closes the vhostfd passed to vhost_dev_init() */
-     vhostfd = -1;
- err_virtio:
--    virtio_delete_queue(vsock->recv_vq);
--    virtio_delete_queue(vsock->trans_vq);
--    virtio_delete_queue(vsock->event_vq);
--    virtio_cleanup(vdev);
-+    vhost_vsock_common_unrealize(vdev);
-     if (vhostfd >= 0) {
-         close(vhostfd);
-     }
-@@ -379,19 +188,14 @@ err_virtio:
- 
- static void vhost_vsock_device_unrealize(DeviceState *dev)
- {
-+    VHostVSockCommon *vvc = VHOST_VSOCK_COMMON(dev);
-     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
--    VHostVSock *vsock = VHOST_VSOCK(dev);
--
--    vhost_vsock_post_load_timer_cleanup(vsock);
- 
-     /* This will stop vhost backend if appropriate. */
-     vhost_vsock_set_status(vdev, 0);
- 
--    vhost_dev_cleanup(&vsock->vhost_dev);
--    virtio_delete_queue(vsock->recv_vq);
--    virtio_delete_queue(vsock->trans_vq);
--    virtio_delete_queue(vsock->event_vq);
--    virtio_cleanup(vdev);
-+    vhost_dev_cleanup(&vvc->vhost_dev);
-+    vhost_vsock_common_unrealize(vdev);
- }
- 
- static Property vhost_vsock_properties[] = {
-@@ -407,19 +211,16 @@ static void vhost_vsock_class_init(ObjectClass *klass, void *data)
- 
-     device_class_set_props(dc, vhost_vsock_properties);
-     dc->vmsd = &vmstate_virtio_vhost_vsock;
--    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
-     vdc->realize = vhost_vsock_device_realize;
-     vdc->unrealize = vhost_vsock_device_unrealize;
-     vdc->get_features = vhost_vsock_get_features;
-     vdc->get_config = vhost_vsock_get_config;
-     vdc->set_status = vhost_vsock_set_status;
--    vdc->guest_notifier_mask = vhost_vsock_guest_notifier_mask;
--    vdc->guest_notifier_pending = vhost_vsock_guest_notifier_pending;
- }
- 
- static const TypeInfo vhost_vsock_info = {
-     .name = TYPE_VHOST_VSOCK,
--    .parent = TYPE_VIRTIO_DEVICE,
-+    .parent = TYPE_VHOST_VSOCK_COMMON,
-     .instance_size = sizeof(VHostVSock),
-     .class_init = vhost_vsock_class_init,
- };
-diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
-index 4e4d39a0a4..b1eeb44eac 100644
---- a/hw/virtio/Makefile.objs
-+++ b/hw/virtio/Makefile.objs
-@@ -17,7 +17,7 @@ obj-$(CONFIG_VIRTIO_PMEM) += virtio-pmem.o
- common-obj-$(call land,$(CONFIG_VIRTIO_PMEM),$(CONFIG_VIRTIO_PCI)) += virtio-pmem-pci.o
- obj-$(call land,$(CONFIG_VHOST_USER_FS),$(CONFIG_VIRTIO_PCI)) += vhost-user-fs-pci.o
- obj-$(CONFIG_VIRTIO_IOMMU) += virtio-iommu.o
--obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock.o
-+obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock-common.o vhost-vsock.o
- 
- ifeq ($(CONFIG_VIRTIO_PCI),y)
- obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock-pci.o
+@@ -1668,6 +1769,8 @@ vu_process_message(VuDev *dev, VhostUserMsg *vmsg)
+         return vu_handle_vring_kick(dev, vmsg);
+     case VHOST_USER_GET_MAX_MEM_SLOTS:
+         return vu_handle_get_max_memslots(dev, vmsg);
++    case VHOST_USER_ADD_MEM_REG:
++        return vu_add_mem_reg(dev, vmsg);
+     default:
+         vmsg_close_fds(vmsg);
+         vu_panic(dev, "Unhandled request: %d", vmsg->request);
 -- 
 MST
 
