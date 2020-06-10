@@ -6,75 +6,75 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17B8AC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 12:04:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAAF8C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 12:04:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D47952072E
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 12:04:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 83D4D2074B
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 12:04:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a84Zw+vp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D47952072E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QGF8+40T"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83D4D2074B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37654 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39202 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jizSc-0006xM-Va
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 08:04:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43386)
+	id 1jizT7-0007cG-Gz
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 08:04:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43460)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jizK7-0003EJ-4z
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 07:55:15 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:50040
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jizKS-0003c4-AN
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 07:55:36 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27981
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jizK6-0001yL-Bf
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 07:55:14 -0400
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jizKN-0002AD-6I
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 07:55:35 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591790113;
+ s=mimecast20190719; t=1591790130;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=K0bxEZTNG5tW1NNkUgKUn7jrte0My/UUwSbEJ+zpHfA=;
- b=a84Zw+vpW7dNbvZDqFH/x2jKk9eNdVXMhGnu+CGxLEQrrEGwQT+pLzPSzLs2ExiJ28Tx6o
- QBxjl2p3sNFELjLifG9U/abek9F5kl6Ps3VNJJp+6jh59bMaaFYXl42Wu+0Ct84v+fhWOi
- ueeJDh76D1BeSDpuhQVq/+BB2lHCZYQ=
+ bh=T5v3hYYm9DIstRnaIeNybGzu7FzMeXYFYKVxfwtLhBE=;
+ b=QGF8+40TlKEo5NqynLOS7O8Kqy8W4GAyWRqw8VxNaK+bf2+9bYfMSG3V51J4rcHhXM2E18
+ WSgHBfecJlEDb99PBTIKaapqoiowEdpw8hkAf20J7iGmLXXnU//NkdnSCJkxky2CA1Pka/
+ BPSuTG2kJwV7q1kBF3Dzo2YkoOpCQqI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-36-xRLBABodNWGxytLWjIPfRQ-1; Wed, 10 Jun 2020 07:55:09 -0400
-X-MC-Unique: xRLBABodNWGxytLWjIPfRQ-1
+ us-mta-175-kgMDn9g2NhuBjnXkg83unw-1; Wed, 10 Jun 2020 07:55:28 -0400
+X-MC-Unique: kgMDn9g2NhuBjnXkg83unw-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D210A193F562;
- Wed, 10 Jun 2020 11:55:08 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 34C88DC09;
+ Wed, 10 Jun 2020 11:55:27 +0000 (UTC)
 Received: from t480s.redhat.com (ovpn-114-42.ams2.redhat.com [10.36.114.42])
- by smtp.corp.redhat.com (Postfix) with ESMTP id CED915D9D3;
- Wed, 10 Jun 2020 11:55:06 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CFE295D9D3;
+ Wed, 10 Jun 2020 11:55:21 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 07/21] migration/rdma: Use ram_block_discard_disable()
-Date: Wed, 10 Jun 2020 13:54:05 +0200
-Message-Id: <20200610115419.51688-8-david@redhat.com>
+Subject: [PATCH v4 10/21] virtio-mem: Paravirtualized memory hot(un)plug
+Date: Wed, 10 Jun 2020 13:54:08 +0200
+Message-Id: <20200610115419.51688-11-david@redhat.com>
 In-Reply-To: <20200610115419.51688-1-david@redhat.com>
 References: <20200610115419.51688-1-david@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=david@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 23:51:15
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=david@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 21:17:20
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -91,77 +91,1036 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Cc: Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
  "Michael S . Tsirkin" <mst@redhat.com>, David Hildenbrand <david@redhat.com>,
  "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Juan Quintela <quintela@redhat.com>, qemu-s390x@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+ Markus Armbruster <armbru@redhat.com>, qemu-s390x@nongnu.org,
+ Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-RDMA will pin all guest memory (as documented in docs/rdma.txt). We want
-to disable RAM block discards - however, to keep it simple use
-ram_block_discard_is_required() instead of inhibiting.
+This is the very basic/initial version of virtio-mem. An introduction to
+virtio-mem can be found in the Linux kernel driver [1]. While it can be
+used in the current state for hotplug of a smaller amount of memory, it
+will heavily benefit from resizeable memory regions in the future.
 
-Note: It is not sufficient to limit disabling to pin_all. Even when only
-conditionally pinning 1 MB chunks, as soon as one page within such a
-chunk was discarded and one page not, the discarded pages will be pinned
-as well.
+Each virtio-mem device manages a memory region (provided via a memory
+backend). After requested by the hypervisor ("requested-size"), the
+guest can try to plug/unplug blocks of memory within that region, in order
+to reach the requested size. Initially, and after a reboot, all memory is
+unplugged (except in special cases - reboot during postcopy).
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+The guest may only try to plug/unplug blocks of memory within the usable
+region size. The usable region size is a little bigger than the
+requested size, to give the device driver some flexibility. The usable
+region size will only grow, except on reboots or when all memory is
+requested to get unplugged. The guest can never plug more memory than
+requested. Unplugged memory will get zapped/discarded, similar to in a
+balloon device.
+
+The block size is variable, however, it is always chosen in a way such that
+THP splits are avoided (e.g., 2MB). The state of each block
+(plugged/unplugged) is tracked in a bitmap.
+
+As virtio-mem devices (e.g., virtio-mem-pci) will be memory devices, we now
+expose "VirtioMEMDeviceInfo" via "query-memory-devices".
+
+--------------------------------------------------------------------------
+
+There are two important follow-up items that are in the works:
+1. Resizeable memory regions: Use resizeable allocations/RAM blocks to
+   grow/shrink along with the usable region size. This avoids creating
+   initially very big VMAs, RAM blocks, and KVM slots.
+2. Protection of unplugged memory: Make sure the gust cannot actually
+   make use of unplugged memory.
+
+Other follow-up items that are in the works:
+1. Exclude unplugged memory during migration (via precopy notifier).
+2. Handle remapping of memory.
+3. Support for other architectures.
+
+--------------------------------------------------------------------------
+
+Example usage (virtio-mem-pci is introduced in follow-up patches):
+
+Start QEMU with two virtio-mem devices (one per NUMA node):
+ $ qemu-system-x86_64 -m 4G,maxmem=20G \
+  -smp sockets=2,cores=2 \
+  -numa node,nodeid=0,cpus=0-1 -numa node,nodeid=1,cpus=2-3 \
+  [...]
+  -object memory-backend-ram,id=mem0,size=8G \
+  -device virtio-mem-pci,id=vm0,memdev=mem0,node=0,requested-size=0M \
+  -object memory-backend-ram,id=mem1,size=8G \
+  -device virtio-mem-pci,id=vm1,memdev=mem1,node=1,requested-size=1G
+
+Query the configuration:
+ (qemu) info memory-devices
+ Memory device [virtio-mem]: "vm0"
+   memaddr: 0x140000000
+   node: 0
+   requested-size: 0
+   size: 0
+   max-size: 8589934592
+   block-size: 2097152
+   memdev: /objects/mem0
+ Memory device [virtio-mem]: "vm1"
+   memaddr: 0x340000000
+   node: 1
+   requested-size: 1073741824
+   size: 1073741824
+   max-size: 8589934592
+   block-size: 2097152
+   memdev: /objects/mem1
+
+Add some memory to node 0:
+ (qemu) qom-set vm0 requested-size 500M
+
+Remove some memory from node 1:
+ (qemu) qom-set vm1 requested-size 200M
+
+Query the configuration again:
+ (qemu) info memory-devices
+ Memory device [virtio-mem]: "vm0"
+   memaddr: 0x140000000
+   node: 0
+   requested-size: 524288000
+   size: 524288000
+   max-size: 8589934592
+   block-size: 2097152
+   memdev: /objects/mem0
+ Memory device [virtio-mem]: "vm1"
+   memaddr: 0x340000000
+   node: 1
+   requested-size: 209715200
+   size: 209715200
+   max-size: 8589934592
+   block-size: 2097152
+   memdev: /objects/mem1
+
+[1] https://lkml.kernel.org/r/20200311171422.10484-1-david@redhat.com
+
 Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Juan Quintela <quintela@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>
 Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- migration/rdma.c | 18 ++++++++++++++++--
- 1 file changed, 16 insertions(+), 2 deletions(-)
+ hw/virtio/Kconfig              |  11 +
+ hw/virtio/Makefile.objs        |   1 +
+ hw/virtio/virtio-mem.c         | 724 +++++++++++++++++++++++++++++++++
+ include/hw/virtio/virtio-mem.h |  78 ++++
+ qapi/misc.json                 |  39 +-
+ 5 files changed, 852 insertions(+), 1 deletion(-)
+ create mode 100644 hw/virtio/virtio-mem.c
+ create mode 100644 include/hw/virtio/virtio-mem.h
 
-diff --git a/migration/rdma.c b/migration/rdma.c
-index ec45d33ba3..bbe6f36627 100644
---- a/migration/rdma.c
-+++ b/migration/rdma.c
-@@ -29,6 +29,7 @@
- #include "qemu/sockets.h"
- #include "qemu/bitmap.h"
- #include "qemu/coroutine.h"
-+#include "exec/memory.h"
- #include <sys/socket.h>
- #include <netdb.h>
- #include <arpa/inet.h>
-@@ -4017,8 +4018,14 @@ void rdma_start_incoming_migration(const char *host_port, Error **errp)
-     Error *local_err = NULL;
+diff --git a/hw/virtio/Kconfig b/hw/virtio/Kconfig
+index 83122424fa..0eda25c4e1 100644
+--- a/hw/virtio/Kconfig
++++ b/hw/virtio/Kconfig
+@@ -47,3 +47,14 @@ config VIRTIO_PMEM
+     depends on VIRTIO
+     depends on VIRTIO_PMEM_SUPPORTED
+     select MEM_DEVICE
++
++config VIRTIO_MEM_SUPPORTED
++    bool
++
++config VIRTIO_MEM
++    bool
++    default y
++    depends on VIRTIO
++    depends on LINUX
++    depends on VIRTIO_MEM_SUPPORTED
++    select MEM_DEVICE
+diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
+index 4e4d39a0a4..7df70e977e 100644
+--- a/hw/virtio/Makefile.objs
++++ b/hw/virtio/Makefile.objs
+@@ -18,6 +18,7 @@ common-obj-$(call land,$(CONFIG_VIRTIO_PMEM),$(CONFIG_VIRTIO_PCI)) += virtio-pme
+ obj-$(call land,$(CONFIG_VHOST_USER_FS),$(CONFIG_VIRTIO_PCI)) += vhost-user-fs-pci.o
+ obj-$(CONFIG_VIRTIO_IOMMU) += virtio-iommu.o
+ obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock.o
++obj-$(CONFIG_VIRTIO_MEM) += virtio-mem.o
  
-     trace_rdma_start_incoming_migration();
--    rdma = qemu_rdma_data_init(host_port, &local_err);
- 
-+    /* Avoid ram_block_discard_disable(), cannot change during migration. */
-+    if (ram_block_discard_is_required()) {
-+        error_setg(errp, "RDMA: cannot disable RAM discard");
+ ifeq ($(CONFIG_VIRTIO_PCI),y)
+ obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock-pci.o
+diff --git a/hw/virtio/virtio-mem.c b/hw/virtio/virtio-mem.c
+new file mode 100644
+index 0000000000..d8a0c974d3
+--- /dev/null
++++ b/hw/virtio/virtio-mem.c
+@@ -0,0 +1,724 @@
++/*
++ * Virtio MEM device
++ *
++ * Copyright (C) 2020 Red Hat, Inc.
++ *
++ * Authors:
++ *  David Hildenbrand <david@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2.
++ * See the COPYING file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu-common.h"
++#include "qemu/iov.h"
++#include "qemu/cutils.h"
++#include "qemu/error-report.h"
++#include "qemu/units.h"
++#include "sysemu/numa.h"
++#include "sysemu/sysemu.h"
++#include "sysemu/reset.h"
++#include "hw/virtio/virtio.h"
++#include "hw/virtio/virtio-bus.h"
++#include "hw/virtio/virtio-access.h"
++#include "hw/virtio/virtio-mem.h"
++#include "qapi/error.h"
++#include "qapi/visitor.h"
++#include "exec/ram_addr.h"
++#include "migration/misc.h"
++#include "hw/boards.h"
++#include "hw/qdev-properties.h"
++#include "config-devices.h"
++
++/*
++ * Use QEMU_VMALLOC_ALIGN, so no THP will have to be split when unplugging
++ * memory (e.g., 2MB on x86_64).
++ */
++#define VIRTIO_MEM_MIN_BLOCK_SIZE QEMU_VMALLOC_ALIGN
++/*
++ * Size the usable region bigger than the requested size if possible. Esp.
++ * Linux guests will only add (aligned) memory blocks in case they fully
++ * fit into the usable region, but plug+online only a subset of the pages.
++ * The memory block size corresponds mostly to the section size.
++ *
++ * This allows e.g., to add 20MB with a section size of 128MB on x86_64, and
++ * a section size of 1GB on arm64 (as long as the start address is properly
++ * aligned, similar to ordinary DIMMs).
++ *
++ * We can change this at any time and maybe even make it configurable if
++ * necessary (as the section size can change). But it's more likely that the
++ * section size will rather get smaller and not bigger over time.
++ */
++#if defined(__x86_64__)
++#define VIRTIO_MEM_USABLE_EXTENT (2 * (128 * MiB))
++#else
++#error VIRTIO_MEM_USABLE_EXTENT not defined
++#endif
++
++static bool virtio_mem_is_busy(void)
++{
++    /*
++     * Postcopy cannot handle concurrent discards and we don't want to migrate
++     * pages on-demand with stale content when plugging new blocks.
++     */
++    return migration_in_incoming_postcopy();
++}
++
++static bool virtio_mem_test_bitmap(VirtIOMEM *vmem, uint64_t start_gpa,
++                                   uint64_t size, bool plugged)
++{
++    const unsigned long first_bit = (start_gpa - vmem->addr) / vmem->block_size;
++    const unsigned long last_bit = first_bit + (size / vmem->block_size) - 1;
++    unsigned long found_bit;
++
++    /* We fake a shorter bitmap to avoid searching too far. */
++    if (plugged) {
++        found_bit = find_next_zero_bit(vmem->bitmap, last_bit + 1, first_bit);
++    } else {
++        found_bit = find_next_bit(vmem->bitmap, last_bit + 1, first_bit);
++    }
++    return found_bit > last_bit;
++}
++
++static void virtio_mem_set_bitmap(VirtIOMEM *vmem, uint64_t start_gpa,
++                                  uint64_t size, bool plugged)
++{
++    const unsigned long bit = (start_gpa - vmem->addr) / vmem->block_size;
++    const unsigned long nbits = size / vmem->block_size;
++
++    if (plugged) {
++        bitmap_set(vmem->bitmap, bit, nbits);
++    } else {
++        bitmap_clear(vmem->bitmap, bit, nbits);
++    }
++}
++
++static void virtio_mem_send_response(VirtIOMEM *vmem, VirtQueueElement *elem,
++                                     struct virtio_mem_resp *resp)
++{
++    VirtIODevice *vdev = VIRTIO_DEVICE(vmem);
++    VirtQueue *vq = vmem->vq;
++
++    iov_from_buf(elem->in_sg, elem->in_num, 0, resp, sizeof(*resp));
++
++    virtqueue_push(vq, elem, sizeof(*resp));
++    virtio_notify(vdev, vq);
++}
++
++static void virtio_mem_send_response_simple(VirtIOMEM *vmem,
++                                            VirtQueueElement *elem,
++                                            uint16_t type)
++{
++    struct virtio_mem_resp resp = {
++        .type = cpu_to_le16(type),
++    };
++
++    virtio_mem_send_response(vmem, elem, &resp);
++}
++
++static bool virtio_mem_valid_range(VirtIOMEM *vmem, uint64_t gpa, uint64_t size)
++{
++    if (!QEMU_IS_ALIGNED(gpa, vmem->block_size)) {
++        return false;
++    }
++    if (gpa + size < gpa || !size) {
++        return false;
++    }
++    if (gpa < vmem->addr || gpa >= vmem->addr + vmem->usable_region_size) {
++        return false;
++    }
++    if (gpa + size > vmem->addr + vmem->usable_region_size) {
++        return false;
++    }
++    return true;
++}
++
++static int virtio_mem_set_block_state(VirtIOMEM *vmem, uint64_t start_gpa,
++                                      uint64_t size, bool plug)
++{
++    const uint64_t offset = start_gpa - vmem->addr;
++    int ret;
++
++    if (virtio_mem_is_busy()) {
++        return -EBUSY;
++    }
++
++    if (!plug) {
++        ret = ram_block_discard_range(vmem->memdev->mr.ram_block, offset, size);
++        if (ret) {
++            error_report("Unexpected error discarding RAM: %s",
++                         strerror(-ret));
++            return -EBUSY;
++        }
++    }
++    virtio_mem_set_bitmap(vmem, start_gpa, size, plug);
++    return 0;
++}
++
++static int virtio_mem_state_change_request(VirtIOMEM *vmem, uint64_t gpa,
++                                           uint16_t nb_blocks, bool plug)
++{
++    const uint64_t size = nb_blocks * vmem->block_size;
++    int ret;
++
++    if (!virtio_mem_valid_range(vmem, gpa, size)) {
++        return VIRTIO_MEM_RESP_ERROR;
++    }
++
++    if (plug && (vmem->size + size > vmem->requested_size)) {
++        return VIRTIO_MEM_RESP_NACK;
++    }
++
++    /* test if really all blocks are in the opposite state */
++    if (!virtio_mem_test_bitmap(vmem, gpa, size, !plug)) {
++        return VIRTIO_MEM_RESP_ERROR;
++    }
++
++    ret = virtio_mem_set_block_state(vmem, gpa, size, plug);
++    if (ret) {
++        return VIRTIO_MEM_RESP_BUSY;
++    }
++    if (plug) {
++        vmem->size += size;
++    } else {
++        vmem->size -= size;
++    }
++    return VIRTIO_MEM_RESP_ACK;
++}
++
++static void virtio_mem_plug_request(VirtIOMEM *vmem, VirtQueueElement *elem,
++                                    struct virtio_mem_req *req)
++{
++    const uint64_t gpa = le64_to_cpu(req->u.plug.addr);
++    const uint16_t nb_blocks = le16_to_cpu(req->u.plug.nb_blocks);
++    uint16_t type;
++
++    type = virtio_mem_state_change_request(vmem, gpa, nb_blocks, true);
++    virtio_mem_send_response_simple(vmem, elem, type);
++}
++
++static void virtio_mem_unplug_request(VirtIOMEM *vmem, VirtQueueElement *elem,
++                                      struct virtio_mem_req *req)
++{
++    const uint64_t gpa = le64_to_cpu(req->u.unplug.addr);
++    const uint16_t nb_blocks = le16_to_cpu(req->u.unplug.nb_blocks);
++    uint16_t type;
++
++    type = virtio_mem_state_change_request(vmem, gpa, nb_blocks, false);
++    virtio_mem_send_response_simple(vmem, elem, type);
++}
++
++static void virtio_mem_resize_usable_region(VirtIOMEM *vmem,
++                                            uint64_t requested_size,
++                                            bool can_shrink)
++{
++    uint64_t newsize = MIN(memory_region_size(&vmem->memdev->mr),
++                           requested_size + VIRTIO_MEM_USABLE_EXTENT);
++
++    if (!requested_size) {
++        newsize = 0;
++    }
++
++    if (newsize < vmem->usable_region_size && !can_shrink) {
 +        return;
 +    }
 +
-+    rdma = qemu_rdma_data_init(host_port, &local_err);
-     if (rdma == NULL) {
-         goto err;
-     }
-@@ -4067,10 +4074,17 @@ void rdma_start_outgoing_migration(void *opaque,
-                             const char *host_port, Error **errp)
- {
-     MigrationState *s = opaque;
--    RDMAContext *rdma = qemu_rdma_data_init(host_port, errp);
-     RDMAContext *rdma_return_path = NULL;
-+    RDMAContext *rdma;
-     int ret = 0;
- 
-+    /* Avoid ram_block_discard_disable(), cannot change during migration. */
-+    if (ram_block_discard_is_required()) {
-+        error_setg(errp, "RDMA: cannot disable RAM discard");
++    vmem->usable_region_size = newsize;
++}
++
++static int virtio_mem_unplug_all(VirtIOMEM *vmem)
++{
++    RAMBlock *rb = vmem->memdev->mr.ram_block;
++    int ret;
++
++    if (virtio_mem_is_busy()) {
++        return -EBUSY;
++    }
++
++    ret = ram_block_discard_range(rb, 0, qemu_ram_get_used_length(rb));
++    if (ret) {
++        error_report("Unexpected error discarding RAM: %s", strerror(-ret));
++        return -EBUSY;
++    }
++    bitmap_clear(vmem->bitmap, 0, vmem->bitmap_size);
++    vmem->size = 0;
++
++    virtio_mem_resize_usable_region(vmem, vmem->requested_size, true);
++    return 0;
++}
++
++static void virtio_mem_unplug_all_request(VirtIOMEM *vmem,
++                                          VirtQueueElement *elem)
++{
++    if (virtio_mem_unplug_all(vmem)) {
++        virtio_mem_send_response_simple(vmem, elem, VIRTIO_MEM_RESP_BUSY);
++    } else {
++        virtio_mem_send_response_simple(vmem, elem, VIRTIO_MEM_RESP_ACK);
++    }
++}
++
++static void virtio_mem_state_request(VirtIOMEM *vmem, VirtQueueElement *elem,
++                                     struct virtio_mem_req *req)
++{
++    const uint16_t nb_blocks = le16_to_cpu(req->u.state.nb_blocks);
++    const uint64_t gpa = le64_to_cpu(req->u.state.addr);
++    const uint64_t size = nb_blocks * vmem->block_size;
++    struct virtio_mem_resp resp = {
++        .type = cpu_to_le16(VIRTIO_MEM_RESP_ACK),
++    };
++
++    if (!virtio_mem_valid_range(vmem, gpa, size)) {
++        virtio_mem_send_response_simple(vmem, elem, VIRTIO_MEM_RESP_ERROR);
 +        return;
 +    }
 +
-+    rdma = qemu_rdma_data_init(host_port, errp);
-     if (rdma == NULL) {
-         goto err;
-     }
++    if (virtio_mem_test_bitmap(vmem, gpa, size, true)) {
++        resp.u.state.state = cpu_to_le16(VIRTIO_MEM_STATE_PLUGGED);
++    } else if (virtio_mem_test_bitmap(vmem, gpa, size, false)) {
++        resp.u.state.state = cpu_to_le16(VIRTIO_MEM_STATE_UNPLUGGED);
++    } else {
++        resp.u.state.state = cpu_to_le16(VIRTIO_MEM_STATE_MIXED);
++    }
++    virtio_mem_send_response(vmem, elem, &resp);
++}
++
++static void virtio_mem_handle_request(VirtIODevice *vdev, VirtQueue *vq)
++{
++    const int len = sizeof(struct virtio_mem_req);
++    VirtIOMEM *vmem = VIRTIO_MEM(vdev);
++    VirtQueueElement *elem;
++    struct virtio_mem_req req;
++    uint16_t type;
++
++    while (true) {
++        elem = virtqueue_pop(vq, sizeof(VirtQueueElement));
++        if (!elem) {
++            return;
++        }
++
++        if (iov_to_buf(elem->out_sg, elem->out_num, 0, &req, len) < len) {
++            virtio_error(vdev, "virtio-mem protocol violation: invalid request"
++                         " size: %d", len);
++            g_free(elem);
++            return;
++        }
++
++        if (iov_size(elem->in_sg, elem->in_num) <
++            sizeof(struct virtio_mem_resp)) {
++            virtio_error(vdev, "virtio-mem protocol violation: not enough space"
++                         " for response: %zu",
++                         iov_size(elem->in_sg, elem->in_num));
++            g_free(elem);
++            return;
++        }
++
++        type = le16_to_cpu(req.type);
++        switch (type) {
++        case VIRTIO_MEM_REQ_PLUG:
++            virtio_mem_plug_request(vmem, elem, &req);
++            break;
++        case VIRTIO_MEM_REQ_UNPLUG:
++            virtio_mem_unplug_request(vmem, elem, &req);
++            break;
++        case VIRTIO_MEM_REQ_UNPLUG_ALL:
++            virtio_mem_unplug_all_request(vmem, elem);
++            break;
++        case VIRTIO_MEM_REQ_STATE:
++            virtio_mem_state_request(vmem, elem, &req);
++            break;
++        default:
++            virtio_error(vdev, "virtio-mem protocol violation: unknown request"
++                         " type: %d", type);
++            g_free(elem);
++            return;
++        }
++
++        g_free(elem);
++    }
++}
++
++static void virtio_mem_get_config(VirtIODevice *vdev, uint8_t *config_data)
++{
++    VirtIOMEM *vmem = VIRTIO_MEM(vdev);
++    struct virtio_mem_config *config = (void *) config_data;
++
++    config->block_size = cpu_to_le64(vmem->block_size);
++    config->node_id = cpu_to_le16(vmem->node);
++    config->requested_size = cpu_to_le64(vmem->requested_size);
++    config->plugged_size = cpu_to_le64(vmem->size);
++    config->addr = cpu_to_le64(vmem->addr);
++    config->region_size = cpu_to_le64(memory_region_size(&vmem->memdev->mr));
++    config->usable_region_size = cpu_to_le64(vmem->usable_region_size);
++}
++
++static uint64_t virtio_mem_get_features(VirtIODevice *vdev, uint64_t features,
++                                        Error **errp)
++{
++    MachineState *ms = MACHINE(qdev_get_machine());
++
++    if (ms->numa_state) {
++#if defined(CONFIG_ACPI)
++        virtio_add_feature(&features, VIRTIO_MEM_F_ACPI_PXM);
++#endif
++    }
++    return features;
++}
++
++static void virtio_mem_system_reset(void *opaque)
++{
++    VirtIOMEM *vmem = VIRTIO_MEM(opaque);
++
++    /*
++     * During usual resets, we will unplug all memory and shrink the usable
++     * region size. This is, however, not possible in all scenarios. Then,
++     * the guest has to deal with this manually (VIRTIO_MEM_REQ_UNPLUG_ALL).
++     */
++    virtio_mem_unplug_all(vmem);
++}
++
++static void virtio_mem_device_realize(DeviceState *dev, Error **errp)
++{
++    MachineState *ms = MACHINE(qdev_get_machine());
++    int nb_numa_nodes = ms->numa_state ? ms->numa_state->num_nodes : 0;
++    VirtIODevice *vdev = VIRTIO_DEVICE(dev);
++    VirtIOMEM *vmem = VIRTIO_MEM(dev);
++    uint64_t page_size;
++    RAMBlock *rb;
++    int ret;
++
++    if (!vmem->memdev) {
++        error_setg(errp, "'%s' property is not set", VIRTIO_MEM_MEMDEV_PROP);
++        return;
++    } else if (host_memory_backend_is_mapped(vmem->memdev)) {
++        char *path = object_get_canonical_path_component(OBJECT(vmem->memdev));
++
++        error_setg(errp, "'%s' property specifies a busy memdev: %s",
++                   VIRTIO_MEM_MEMDEV_PROP, path);
++        g_free(path);
++        return;
++    } else if (!memory_region_is_ram(&vmem->memdev->mr) ||
++        memory_region_is_rom(&vmem->memdev->mr) ||
++        !vmem->memdev->mr.ram_block) {
++        error_setg(errp, "'%s' property specifies an unsupported memdev",
++                   VIRTIO_MEM_MEMDEV_PROP);
++        return;
++    }
++
++    if ((nb_numa_nodes && vmem->node >= nb_numa_nodes) ||
++        (!nb_numa_nodes && vmem->node)) {
++        error_setg(errp, "'%s' property has value '%" PRIu32 "', which exceeds"
++                   "the number of numa nodes: %d", VIRTIO_MEM_NODE_PROP,
++                   vmem->node, nb_numa_nodes ? nb_numa_nodes : 1);
++        return;
++    }
++
++    if (enable_mlock) {
++        error_setg(errp, "Incompatible with mlock");
++        return;
++    }
++
++    rb = vmem->memdev->mr.ram_block;
++    page_size = qemu_ram_pagesize(rb);
++
++    if (vmem->block_size < page_size) {
++        error_setg(errp, "'%s' property has to be at least the page size (0x%"
++                   PRIx64 ")", VIRTIO_MEM_BLOCK_SIZE_PROP, page_size);
++        return;
++    } else if (!QEMU_IS_ALIGNED(vmem->requested_size, vmem->block_size)) {
++        error_setg(errp, "'%s' property has to be multiples of '%s' (0x%" PRIx64
++                   ")", VIRTIO_MEM_REQUESTED_SIZE_PROP,
++                   VIRTIO_MEM_BLOCK_SIZE_PROP, vmem->block_size);
++        return;
++    } else if (!QEMU_IS_ALIGNED(memory_region_size(&vmem->memdev->mr),
++                                vmem->block_size)) {
++        error_setg(errp, "'%s' property memdev size has to be multiples of"
++                   "'%s' (0x%" PRIx64 ")", VIRTIO_MEM_MEMDEV_PROP,
++                   VIRTIO_MEM_BLOCK_SIZE_PROP, vmem->block_size);
++        return;
++    }
++
++    if (ram_block_discard_require(true)) {
++        error_setg(errp, "Discarding RAM is disabled");
++        return;
++    }
++
++    ret = ram_block_discard_range(rb, 0, qemu_ram_get_used_length(rb));
++    if (ret) {
++        error_setg_errno(errp, -ret, "Unexpected error discarding RAM");
++        ram_block_discard_require(false);
++        return;
++    }
++
++    virtio_mem_resize_usable_region(vmem, vmem->requested_size, true);
++
++    vmem->bitmap_size = memory_region_size(&vmem->memdev->mr) /
++                        vmem->block_size;
++    vmem->bitmap = bitmap_new(vmem->bitmap_size);
++
++    virtio_init(vdev, TYPE_VIRTIO_MEM, VIRTIO_ID_MEM,
++                sizeof(struct virtio_mem_config));
++    vmem->vq = virtio_add_queue(vdev, 128, virtio_mem_handle_request);
++
++    host_memory_backend_set_mapped(vmem->memdev, true);
++    vmstate_register_ram(&vmem->memdev->mr, DEVICE(vmem));
++    qemu_register_reset(virtio_mem_system_reset, vmem);
++}
++
++static void virtio_mem_device_unrealize(DeviceState *dev)
++{
++    VirtIODevice *vdev = VIRTIO_DEVICE(dev);
++    VirtIOMEM *vmem = VIRTIO_MEM(dev);
++
++    qemu_unregister_reset(virtio_mem_system_reset, vmem);
++    vmstate_unregister_ram(&vmem->memdev->mr, DEVICE(vmem));
++    host_memory_backend_set_mapped(vmem->memdev, false);
++    virtio_del_queue(vdev, 0);
++    virtio_cleanup(vdev);
++    g_free(vmem->bitmap);
++    ram_block_discard_require(false);
++}
++
++static int virtio_mem_restore_unplugged(VirtIOMEM *vmem)
++{
++    RAMBlock *rb = vmem->memdev->mr.ram_block;
++    unsigned long first_zero_bit, last_zero_bit;
++    uint64_t offset, length;
++    int ret;
++
++    /* Find consecutive unplugged blocks and discard the consecutive range. */
++    first_zero_bit = find_first_zero_bit(vmem->bitmap, vmem->bitmap_size);
++    while (first_zero_bit < vmem->bitmap_size) {
++        offset = first_zero_bit * vmem->block_size;
++        last_zero_bit = find_next_bit(vmem->bitmap, vmem->bitmap_size,
++                                      first_zero_bit + 1) - 1;
++        length = (last_zero_bit - first_zero_bit + 1) * vmem->block_size;
++
++        ret = ram_block_discard_range(rb, offset, length);
++        if (ret) {
++            error_report("Unexpected error discarding RAM: %s",
++                         strerror(-ret));
++            return -EINVAL;
++        }
++        first_zero_bit = find_next_zero_bit(vmem->bitmap, vmem->bitmap_size,
++                                            last_zero_bit + 2);
++    }
++    return 0;
++}
++
++static int virtio_mem_post_load(void *opaque, int version_id)
++{
++    if (migration_in_incoming_postcopy()) {
++        return 0;
++    }
++
++    return virtio_mem_restore_unplugged(VIRTIO_MEM(opaque));
++}
++
++static const VMStateDescription vmstate_virtio_mem_device = {
++    .name = "virtio-mem-device",
++    .minimum_version_id = 1,
++    .version_id = 1,
++    .post_load = virtio_mem_post_load,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT64(usable_region_size, VirtIOMEM),
++        VMSTATE_UINT64(size, VirtIOMEM),
++        VMSTATE_UINT64(requested_size, VirtIOMEM),
++        VMSTATE_BITMAP(bitmap, VirtIOMEM, 0, bitmap_size),
++        VMSTATE_END_OF_LIST()
++    },
++};
++
++static const VMStateDescription vmstate_virtio_mem = {
++    .name = "virtio-mem",
++    .minimum_version_id = 1,
++    .version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_VIRTIO_DEVICE,
++        VMSTATE_END_OF_LIST()
++    },
++};
++
++static void virtio_mem_fill_device_info(const VirtIOMEM *vmem,
++                                        VirtioMEMDeviceInfo *vi)
++{
++    vi->memaddr = vmem->addr;
++    vi->node = vmem->node;
++    vi->requested_size = vmem->requested_size;
++    vi->size = vmem->size;
++    vi->max_size = memory_region_size(&vmem->memdev->mr);
++    vi->block_size = vmem->block_size;
++    vi->memdev = object_get_canonical_path(OBJECT(vmem->memdev));
++}
++
++static MemoryRegion *virtio_mem_get_memory_region(VirtIOMEM *vmem, Error **errp)
++{
++    if (!vmem->memdev) {
++        error_setg(errp, "'%s' property must be set", VIRTIO_MEM_MEMDEV_PROP);
++        return NULL;
++    }
++
++    return &vmem->memdev->mr;
++}
++
++static void virtio_mem_get_size(Object *obj, Visitor *v, const char *name,
++                                void *opaque, Error **errp)
++{
++    const VirtIOMEM *vmem = VIRTIO_MEM(obj);
++    uint64_t value = vmem->size;
++
++    visit_type_size(v, name, &value, errp);
++}
++
++static void virtio_mem_get_requested_size(Object *obj, Visitor *v,
++                                          const char *name, void *opaque,
++                                          Error **errp)
++{
++    const VirtIOMEM *vmem = VIRTIO_MEM(obj);
++    uint64_t value = vmem->requested_size;
++
++    visit_type_size(v, name, &value, errp);
++}
++
++static void virtio_mem_set_requested_size(Object *obj, Visitor *v,
++                                          const char *name, void *opaque,
++                                          Error **errp)
++{
++    VirtIOMEM *vmem = VIRTIO_MEM(obj);
++    Error *err = NULL;
++    uint64_t value;
++
++    visit_type_size(v, name, &value, &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
++
++    /*
++     * The block size and memory backend are not fixed until the device was
++     * realized. realize() will verify these properties then.
++     */
++    if (DEVICE(obj)->realized) {
++        if (!QEMU_IS_ALIGNED(value, vmem->block_size)) {
++            error_setg(errp, "'%s' has to be multiples of '%s' (0x%" PRIx64
++                       ")", name, VIRTIO_MEM_BLOCK_SIZE_PROP,
++                       vmem->block_size);
++            return;
++        } else if (value > memory_region_size(&vmem->memdev->mr)) {
++            error_setg(errp, "'%s' cannot exceed the memory backend size"
++                       "(0x%" PRIx64 ")", name,
++                       memory_region_size(&vmem->memdev->mr));
++            return;
++        }
++
++        if (value != vmem->requested_size) {
++            virtio_mem_resize_usable_region(vmem, value, false);
++            vmem->requested_size = value;
++        }
++        /*
++         * Trigger a config update so the guest gets notified. We trigger
++         * even if the size didn't change (especially helpful for debugging).
++         */
++        virtio_notify_config(VIRTIO_DEVICE(vmem));
++    } else {
++        vmem->requested_size = value;
++    }
++}
++
++static void virtio_mem_get_block_size(Object *obj, Visitor *v, const char *name,
++                                      void *opaque, Error **errp)
++{
++    const VirtIOMEM *vmem = VIRTIO_MEM(obj);
++    uint64_t value = vmem->block_size;
++
++    visit_type_size(v, name, &value, errp);
++}
++
++static void virtio_mem_set_block_size(Object *obj, Visitor *v, const char *name,
++                                      void *opaque, Error **errp)
++{
++    VirtIOMEM *vmem = VIRTIO_MEM(obj);
++    Error *err = NULL;
++    uint64_t value;
++
++    if (DEVICE(obj)->realized) {
++        error_setg(errp, "'%s' cannot be changed", name);
++        return;
++    }
++
++    visit_type_size(v, name, &value, &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
++
++    if (value < VIRTIO_MEM_MIN_BLOCK_SIZE) {
++        error_setg(errp, "'%s' property has to be at least 0x%" PRIx32, name,
++                   VIRTIO_MEM_MIN_BLOCK_SIZE);
++        return;
++    } else if (!is_power_of_2(value)) {
++        error_setg(errp, "'%s' property has to be a power of two", name);
++        return;
++    }
++    vmem->block_size = value;
++}
++
++static void virtio_mem_instance_init(Object *obj)
++{
++    VirtIOMEM *vmem = VIRTIO_MEM(obj);
++
++    vmem->block_size = VIRTIO_MEM_MIN_BLOCK_SIZE;
++
++    object_property_add(obj, VIRTIO_MEM_SIZE_PROP, "size", virtio_mem_get_size,
++                        NULL, NULL, NULL);
++    object_property_add(obj, VIRTIO_MEM_REQUESTED_SIZE_PROP, "size",
++                        virtio_mem_get_requested_size,
++                        virtio_mem_set_requested_size, NULL, NULL);
++    object_property_add(obj, VIRTIO_MEM_BLOCK_SIZE_PROP, "size",
++                        virtio_mem_get_block_size, virtio_mem_set_block_size,
++                        NULL, NULL);
++}
++
++static Property virtio_mem_properties[] = {
++    DEFINE_PROP_UINT64(VIRTIO_MEM_ADDR_PROP, VirtIOMEM, addr, 0),
++    DEFINE_PROP_UINT32(VIRTIO_MEM_NODE_PROP, VirtIOMEM, node, 0),
++    DEFINE_PROP_LINK(VIRTIO_MEM_MEMDEV_PROP, VirtIOMEM, memdev,
++                     TYPE_MEMORY_BACKEND, HostMemoryBackend *),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void virtio_mem_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++    VirtioDeviceClass *vdc = VIRTIO_DEVICE_CLASS(klass);
++    VirtIOMEMClass *vmc = VIRTIO_MEM_CLASS(klass);
++
++    device_class_set_props(dc, virtio_mem_properties);
++    dc->vmsd = &vmstate_virtio_mem;
++
++    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
++    vdc->realize = virtio_mem_device_realize;
++    vdc->unrealize = virtio_mem_device_unrealize;
++    vdc->get_config = virtio_mem_get_config;
++    vdc->get_features = virtio_mem_get_features;
++    vdc->vmsd = &vmstate_virtio_mem_device;
++
++    vmc->fill_device_info = virtio_mem_fill_device_info;
++    vmc->get_memory_region = virtio_mem_get_memory_region;
++}
++
++static const TypeInfo virtio_mem_info = {
++    .name = TYPE_VIRTIO_MEM,
++    .parent = TYPE_VIRTIO_DEVICE,
++    .instance_size = sizeof(VirtIOMEM),
++    .instance_init = virtio_mem_instance_init,
++    .class_init = virtio_mem_class_init,
++    .class_size = sizeof(VirtIOMEMClass),
++};
++
++static void virtio_register_types(void)
++{
++    type_register_static(&virtio_mem_info);
++}
++
++type_init(virtio_register_types)
+diff --git a/include/hw/virtio/virtio-mem.h b/include/hw/virtio/virtio-mem.h
+new file mode 100644
+index 0000000000..6981096f7c
+--- /dev/null
++++ b/include/hw/virtio/virtio-mem.h
+@@ -0,0 +1,78 @@
++/*
++ * Virtio MEM device
++ *
++ * Copyright (C) 2020 Red Hat, Inc.
++ *
++ * Authors:
++ *  David Hildenbrand <david@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2.
++ * See the COPYING file in the top-level directory.
++ */
++
++#ifndef HW_VIRTIO_MEM_H
++#define HW_VIRTIO_MEM_H
++
++#include "standard-headers/linux/virtio_mem.h"
++#include "hw/virtio/virtio.h"
++#include "qapi/qapi-types-misc.h"
++#include "sysemu/hostmem.h"
++
++#define TYPE_VIRTIO_MEM "virtio-mem"
++
++#define VIRTIO_MEM(obj) \
++        OBJECT_CHECK(VirtIOMEM, (obj), TYPE_VIRTIO_MEM)
++#define VIRTIO_MEM_CLASS(oc) \
++        OBJECT_CLASS_CHECK(VirtIOMEMClass, (oc), TYPE_VIRTIO_MEM)
++#define VIRTIO_MEM_GET_CLASS(obj) \
++        OBJECT_GET_CLASS(VirtIOMEMClass, (obj), TYPE_VIRTIO_MEM)
++
++#define VIRTIO_MEM_MEMDEV_PROP "memdev"
++#define VIRTIO_MEM_NODE_PROP "node"
++#define VIRTIO_MEM_SIZE_PROP "size"
++#define VIRTIO_MEM_REQUESTED_SIZE_PROP "requested-size"
++#define VIRTIO_MEM_BLOCK_SIZE_PROP "block-size"
++#define VIRTIO_MEM_ADDR_PROP "memaddr"
++
++typedef struct VirtIOMEM {
++    VirtIODevice parent_obj;
++
++    /* guest -> host request queue */
++    VirtQueue *vq;
++
++    /* bitmap used to track unplugged memory */
++    int32_t bitmap_size;
++    unsigned long *bitmap;
++
++    /* assigned memory backend and memory region */
++    HostMemoryBackend *memdev;
++
++    /* NUMA node */
++    uint32_t node;
++
++    /* assigned address of the region in guest physical memory */
++    uint64_t addr;
++
++    /* usable region size (<= region_size) */
++    uint64_t usable_region_size;
++
++    /* actual size (how much the guest plugged) */
++    uint64_t size;
++
++    /* requested size */
++    uint64_t requested_size;
++
++    /* block size and alignment */
++    uint64_t block_size;
++} VirtIOMEM;
++
++typedef struct VirtIOMEMClass {
++    /* private */
++    VirtIODevice parent;
++
++    /* public */
++    void (*fill_device_info)(const VirtIOMEM *vmen, VirtioMEMDeviceInfo *vi);
++    MemoryRegion *(*get_memory_region)(VirtIOMEM *vmem, Error **errp);
++} VirtIOMEMClass;
++
++#endif
+diff --git a/qapi/misc.json b/qapi/misc.json
+index 99b90ac80b..e1c5547b65 100644
+--- a/qapi/misc.json
++++ b/qapi/misc.json
+@@ -1354,19 +1354,56 @@
+           }
+ }
+ 
++##
++# @VirtioMEMDeviceInfo:
++#
++# VirtioMEMDevice state information
++#
++# @id: device's ID
++#
++# @memaddr: physical address in memory, where device is mapped
++#
++# @requested-size: the user requested size of the device
++#
++# @size: the (current) size of memory that the device provides
++#
++# @max-size: the maximum size of memory that the device can provide
++#
++# @block-size: the block size of memory that the device provides
++#
++# @node: NUMA node number where device is assigned to
++#
++# @memdev: memory backend linked with the region
++#
++# Since: 5.1
++##
++{ 'struct': 'VirtioMEMDeviceInfo',
++  'data': { '*id': 'str',
++            'memaddr': 'size',
++            'requested-size': 'size',
++            'size': 'size',
++            'max-size': 'size',
++            'block-size': 'size',
++            'node': 'int',
++            'memdev': 'str'
++          }
++}
++
+ ##
+ # @MemoryDeviceInfo:
+ #
+ # Union containing information about a memory device
+ #
+ # nvdimm is included since 2.12. virtio-pmem is included since 4.1.
++# virtio-mem is included since 5.1.
+ #
+ # Since: 2.1
+ ##
+ { 'union': 'MemoryDeviceInfo',
+   'data': { 'dimm': 'PCDIMMDeviceInfo',
+             'nvdimm': 'PCDIMMDeviceInfo',
+-            'virtio-pmem': 'VirtioPMEMDeviceInfo'
++            'virtio-pmem': 'VirtioPMEMDeviceInfo',
++            'virtio-mem': 'VirtioMEMDeviceInfo'
+           }
+ }
+ 
 -- 
 2.26.2
 
