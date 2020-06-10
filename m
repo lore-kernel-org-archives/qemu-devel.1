@@ -7,43 +7,43 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AE7EC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:44:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 656A9C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:46:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E1BEA20760
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:44:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1BEA20760
+	by mail.kernel.org (Postfix) with ESMTPS id 3789520734
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:46:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3789520734
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53010 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55804 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jj12F-0006dA-PU
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 09:44:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59368)
+	id 1jj13w-00084R-EC
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 09:46:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58012)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jj0qa-0006lB-2r; Wed, 10 Jun 2020 09:32:52 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:40865)
+ id 1jj0mf-0002Ag-V6; Wed, 10 Jun 2020 09:28:50 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:37934)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jj0qY-00015O-SU; Wed, 10 Jun 2020 09:32:51 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.117027|-1; CH=blue; DM=|OVERLOAD|false|;
- DS=CONTINUE|ham_system_inform|0.0382717-0.000841702-0.960887;
- FP=0|0|0|0|0|-1|-1|-1; HT=e02c03303; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=8; RT=8; SR=0; TI=SMTPD_---.HkbjFSg_1591795960; 
+ id 1jj0md-0008Q7-Jw; Wed, 10 Jun 2020 09:28:49 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07443479|-1; CH=blue; DM=|OVERLOAD|false|;
+ DS=CONTINUE|ham_system_inform|0.0226376-0.00135837-0.976004;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e02c03298; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=8; RT=8; SR=0; TI=SMTPD_---.HkbcnLJ_1591795719; 
 Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.HkbjFSg_1591795960)
- by smtp.aliyun-inc.com(10.147.41.187);
- Wed, 10 Jun 2020 21:32:40 +0800
+ fp:SMTPD_---.HkbcnLJ_1591795719)
+ by smtp.aliyun-inc.com(10.147.43.230);
+ Wed, 10 Jun 2020 21:28:39 +0800
 From: LIU Zhiwei <zhiwei_liu@c-sky.com>
 To: qemu-devel@nongnu.org,
 	qemu-riscv@nongnu.org
-Subject: [PATCH v9 57/61] target/riscv: floating-point scalar move instructions
-Date: Wed, 10 Jun 2020 19:37:44 +0800
-Message-Id: <20200610113748.4754-58-zhiwei_liu@c-sky.com>
+Subject: [PATCH v9 55/61] target/riscv: integer extract instruction
+Date: Wed, 10 Jun 2020 19:37:42 +0800
+Message-Id: <20200610113748.4754-56-zhiwei_liu@c-sky.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20200610113748.4754-1-zhiwei_liu@c-sky.com>
 References: <20200610113748.4754-1-zhiwei_liu@c-sky.com>
@@ -80,79 +80,145 @@ Sender: "Qemu-devel"
 Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/riscv/insn32.decode              |  2 +
- target/riscv/insn_trans/trans_rvv.inc.c | 49 +++++++++++++++++++++++++
- 2 files changed, 51 insertions(+)
+ target/riscv/insn32.decode              |   1 +
+ target/riscv/insn_trans/trans_rvv.inc.c | 116 ++++++++++++++++++++++++
+ 2 files changed, 117 insertions(+)
 
 diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index 0741a25540..79f9b37b29 100644
+index 1231628cb2..26dd0f1b1b 100644
 --- a/target/riscv/insn32.decode
 +++ b/target/riscv/insn32.decode
-@@ -563,6 +563,8 @@ viota_m         010110 . ..... 10000 010 ..... 1010111 @r2_vm
+@@ -561,6 +561,7 @@ vmsif_m         010110 . ..... 00011 010 ..... 1010111 @r2_vm
+ vmsof_m         010110 . ..... 00010 010 ..... 1010111 @r2_vm
+ viota_m         010110 . ..... 10000 010 ..... 1010111 @r2_vm
  vid_v           010110 . 00000 10001 010 ..... 1010111 @r1_vm
- vext_x_v        001100 1 ..... ..... 010 ..... 1010111 @r
- vmv_s_x         001101 1 00000 ..... 110 ..... 1010111 @r2
-+vfmv_f_s        001100 1 ..... 00000 001 ..... 1010111 @r2rd
-+vfmv_s_f        001101 1 00000 ..... 101 ..... 1010111 @r2
++vext_x_v        001100 1 ..... ..... 010 ..... 1010111 @r
  
  vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
  vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
 diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index e67eff0a7f..884ad910b1 100644
+index e73e9dac33..0dedf4983d 100644
 --- a/target/riscv/insn_trans/trans_rvv.inc.c
 +++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -2709,3 +2709,52 @@ static bool trans_vmv_s_x(DisasContext *s, arg_vmv_s_x *a)
+@@ -2533,3 +2533,119 @@ static bool trans_vid_v(DisasContext *s, arg_vid_v *a)
      }
      return false;
  }
 +
-+/* Floating-Point Scalar Move Instructions */
-+static bool trans_vfmv_f_s(DisasContext *s, arg_vfmv_f_s *a)
++/*
++ *** Vector Permutation Instructions
++ */
++
++/* Integer Extract Instruction */
++
++static void load_element(TCGv_i64 dest, TCGv_ptr base,
++                         int ofs, int sew)
 +{
-+    if (!s->vill && has_ext(s, RVF) &&
-+        (s->mstatus_fs != 0) && (s->sew != 0)) {
-+        unsigned int len = 8 << s->sew;
-+
-+        vec_element_loadi(s, cpu_fpr[a->rd], a->rs2, 0);
-+        if (len < 64) {
-+            tcg_gen_ori_i64(cpu_fpr[a->rd], cpu_fpr[a->rd],
-+                            MAKE_64BIT_MASK(len, 64 - len));
-+        }
-+
-+        mark_fs_dirty(s);
-+        return true;
++    switch (sew) {
++    case MO_8:
++        tcg_gen_ld8u_i64(dest, base, ofs);
++        break;
++    case MO_16:
++        tcg_gen_ld16u_i64(dest, base, ofs);
++        break;
++    case MO_32:
++        tcg_gen_ld32u_i64(dest, base, ofs);
++        break;
++    case MO_64:
++        tcg_gen_ld_i64(dest, base, ofs);
++        break;
++    default:
++        g_assert_not_reached();
++        break;
 +    }
-+    return false;
 +}
 +
-+/* vfmv.s.f vd, rs1 # vd[0] = rs1 (vs2=0) */
-+static bool trans_vfmv_s_f(DisasContext *s, arg_vfmv_s_f *a)
++/* offset of the idx element with base regsiter r */
++static uint32_t endian_ofs(DisasContext *s, int r, int idx)
 +{
-+    if (!s->vill && has_ext(s, RVF) && (s->sew != 0)) {
-+        TCGv_i64 t1;
-+        /* The instructions ignore LMUL and vector register group. */
-+        uint32_t vlmax = s->vlen >> 3;
++#ifdef HOST_WORDS_BIGENDIAN
++    return vreg_ofs(s, r) + ((idx ^ (7 >> s->sew)) << s->sew);
++#else
++    return vreg_ofs(s, r) + (idx << s->sew);
++#endif
++}
 +
-+        /* if vl == 0, skip vector register write back */
-+        TCGLabel *over = gen_new_label();
-+        tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_vl, 0, over);
++/* adjust the index according to the endian */
++static void endian_adjust(TCGv_i32 ofs, int sew)
++{
++#ifdef HOST_WORDS_BIGENDIAN
++    tcg_gen_xori_i32(ofs, ofs, 7 >> sew);
++#endif
++}
 +
-+        /* zeroed all elements */
-+        tcg_gen_gvec_dup_imm(SEW64, vreg_ofs(s, a->rd), vlmax, vlmax, 0);
++/* Load idx >= VLMAX ? 0 : vreg[idx] */
++static void vec_element_loadx(DisasContext *s, TCGv_i64 dest,
++                              int vreg, TCGv idx, int vlmax)
++{
++    TCGv_i32 ofs = tcg_temp_new_i32();
++    TCGv_ptr base = tcg_temp_new_ptr();
++    TCGv_i64 t_idx = tcg_temp_new_i64();
++    TCGv_i64 t_vlmax, t_zero;
 +
-+        /* NaN-box f[rs1] as necessary for SEW */
-+        t1 = tcg_temp_new_i64();
-+        if (s->sew == MO_64 && !has_ext(s, RVD)) {
-+            tcg_gen_ori_i64(t1, cpu_fpr[a->rs1], MAKE_64BIT_MASK(32, 32));
-+        } else {
-+            tcg_gen_mov_i64(t1, cpu_fpr[a->rs1]);
-+        }
-+        vec_element_storei(s, a->rd, 0, t1);
-+        tcg_temp_free_i64(t1);
-+        gen_set_label(over);
-+        return true;
++    /*
++     * Mask the index to the length so that we do
++     * not produce an out-of-range load.
++     */
++    tcg_gen_trunc_tl_i32(ofs, idx);
++    tcg_gen_andi_i32(ofs, ofs, vlmax - 1);
++
++    /* Convert the index to an offset. */
++    endian_adjust(ofs, s->sew);
++    tcg_gen_shli_i32(ofs, ofs, s->sew);
++
++    /* Convert the index to a pointer. */
++    tcg_gen_ext_i32_ptr(base, ofs);
++    tcg_gen_add_ptr(base, base, cpu_env);
++
++    /* Perform the load. */
++    load_element(dest, base,
++                 vreg_ofs(s, vreg), s->sew);
++    tcg_temp_free_ptr(base);
++    tcg_temp_free_i32(ofs);
++
++    /* Flush out-of-range indexing to zero.  */
++    t_vlmax = tcg_const_i64(vlmax);
++    t_zero = tcg_const_i64(0);
++    tcg_gen_extu_tl_i64(t_idx, idx);
++
++    tcg_gen_movcond_i64(TCG_COND_LTU, dest, t_idx,
++                        t_vlmax, dest, t_zero);
++
++    tcg_temp_free_i64(t_vlmax);
++    tcg_temp_free_i64(t_zero);
++    tcg_temp_free_i64(t_idx);
++}
++
++static void vec_element_loadi(DisasContext *s, TCGv_i64 dest,
++                              int vreg, int idx)
++{
++    load_element(dest, cpu_env, endian_ofs(s, vreg, idx), s->sew);
++}
++
++static bool trans_vext_x_v(DisasContext *s, arg_r *a)
++{
++    TCGv_i64 tmp = tcg_temp_new_i64();
++    TCGv dest = tcg_temp_new();
++
++    if (a->rs1 == 0) {
++        /* Special case vmv.x.s rd, vs2. */
++        vec_element_loadi(s, tmp, a->rs2, 0);
++    } else {
++        /* This instruction ignores LMUL and vector register groups */
++        int vlmax = s->vlen >> (3 + s->sew);
++        vec_element_loadx(s, tmp, a->rs2, cpu_gpr[a->rs1], vlmax);
 +    }
-+    return false;
++    tcg_gen_trunc_i64_tl(dest, tmp);
++    gen_set_gpr(a->rd, dest);
++
++    tcg_temp_free(dest);
++    tcg_temp_free_i64(tmp);
++    return true;
 +}
 -- 
 2.23.0
