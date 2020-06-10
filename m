@@ -7,75 +7,76 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D91D1C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 04:57:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EC64C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 04:57:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A25672072E
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 04:57:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CAC342072E
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 04:57:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H4vzsjAW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A25672072E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eisIONYc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAC342072E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53264 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55626 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jisng-0001Ov-SF
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 00:57:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34230)
+	id 1jiso7-0002NA-Vy
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 00:57:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34252)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jisLa-0001VH-A8
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 00:28:18 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:29997
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jisLi-0001iy-TM
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 00:28:26 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:34729
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jisLZ-0008MU-6k
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 00:28:17 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jisLh-0008N7-R5
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 00:28:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591763296;
+ s=mimecast20190719; t=1591763305;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=/61PXreG9CtbL2ch+1GsTIa5m/Lv2qjj0nnVUy3KBs8=;
- b=H4vzsjAWkp9pLihSuBvLjxg22JkPaEANj7d3cdyGYtHBzL2H5E8asIoR7O1KgFkD5i4D4L
- PxJAc9g2M2BrGhlw2a3O2c6opXSoMBU3449cAp3isZMSQi51t2IJz8Pw/TK44jggQPfO8S
- DIoYWVgYKvWQBqTUOZgELKES8i0OibQ=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-107-JkYzOIovP9-gMwoeiGeTEw-1; Wed, 10 Jun 2020 00:28:14 -0400
-X-MC-Unique: JkYzOIovP9-gMwoeiGeTEw-1
-Received: by mail-wm1-f70.google.com with SMTP id x6so86975wmj.9
- for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 21:28:14 -0700 (PDT)
+ bh=2UE9wdKZP6GU89BTo6VTTIYbzUF0RJkP16ivEbUjuuA=;
+ b=eisIONYcOBHm0VlOszG5zT0q9nPuZ48aEoe2+N8wb0PFshqikwfxCh4f2QgZEXbRTHD4pi
+ 5VBe2vJ0RwaOP1hb/BbBYI1yb8HywYiHtf3lXDD8gB5GNfmk+vCJk4RAhCwx1ltAkYWHpp
+ o/PzY2k0r+dxUvjwGF6+nzWg6ySgels=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-140-O0Uf3zf0N3yF8wmwvcpuVg-1; Wed, 10 Jun 2020 00:28:23 -0400
+X-MC-Unique: O0Uf3zf0N3yF8wmwvcpuVg-1
+Received: by mail-wr1-f69.google.com with SMTP id e7so506161wrp.14
+ for <qemu-devel@nongnu.org>; Tue, 09 Jun 2020 21:28:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=/61PXreG9CtbL2ch+1GsTIa5m/Lv2qjj0nnVUy3KBs8=;
- b=rYiZ9BL3NABuT58ugOIOFgyeqSEcZ2EE0oZIrHvyHNanV1URWZORQTkDZ6+iv6Op8e
- vEPjABFz4+qI7qMCEdNPpyYjdWh/rY0RzQFa8LC9BnGzGrEf/SGCjkIYjVB2aCLHkNKF
- xRdPXAKLqK7p1YB7ivYTUDYZEPUSbh6sJOoXLDe8xlRob4o42LGYYDChVRKvfgj31rrB
- V6+U7S4sRnyWgjjfaq759cv8s0GkxLbP6LBVVbz95aYuGA4Hkv+c68jDPKSQfMlpom0I
- nHxJjBZpURG2wts2B3mTDNCCUTrYPdCC6UMbK7G8ZE5zrXAYDist+VY+TXRoF92kAXhy
- jAOA==
-X-Gm-Message-State: AOAM531Bv/qG6CDvRWwOvmBXDTwXcY9em5MgVcQdWdNTDpr/zzUCFMMK
- KPvCZ+eDx5iP2H1CTKiWTA8cxF3P/GArvqAzccjp7hYB+nAjI3Vq6T7lUG43Ry05vq/IyfPXt3O
- OIcww2Bjd0ollaxg=
-X-Received: by 2002:a5d:6a89:: with SMTP id s9mr1290959wru.15.1591763293290;
- Tue, 09 Jun 2020 21:28:13 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzoI0BCIMIA7Qn+cDeCy+2+S6jfdff3ksThVNues6g7z4bsQeuWuKZkMfWUssb49z4e4xqUhQ==
-X-Received: by 2002:a5d:6a89:: with SMTP id s9mr1290940wru.15.1591763293093;
- Tue, 09 Jun 2020 21:28:13 -0700 (PDT)
+ bh=2UE9wdKZP6GU89BTo6VTTIYbzUF0RJkP16ivEbUjuuA=;
+ b=XQLM8CIAvq/tB2XIYE4AxGQVN3wIzPK1DtSD8KFA8nItaF0KMB0YL08/vBoV9rF36X
+ +xH7w7j52tT/e5YJ5+PNzuQ8QNMLsu8zsIiuXikHDYKXCW/+MuCCw9+NWxabHRhw8NZ9
+ 6GM7WURZOVAVWrYPCIMPU1qwzG7Q38fvScvm1MQEMk9/Z/YPUYEbsWQtgVsQXg25CsEZ
+ 6xXBueDmSXoaB73MbG65OImSiWC91t+GtLnDUkXN80bDBJNbj0at4C5fDqShAbYD5W6B
+ v3FMVJnH7LxA8VBW5Iuztgg9ySA1oqHCJMR4k00GNk1e8KSWtgSxAuqCGtAZ1qLPqqjd
+ 3jDA==
+X-Gm-Message-State: AOAM5318WbCvOYH8fF4pCQqxvHIXbBDszUPQKA5V8rlPEfEtZPA5cr7n
+ yYOBWXSR7RbinXVdpp+U/e7W3L7TuOEA9fkJDF0U7t+teA8CE6JRA1tPJdhHZSADAfobePD2xSE
+ Us+Oon1MMBgDrkSM=
+X-Received: by 2002:a1c:1d49:: with SMTP id d70mr1166017wmd.49.1591763301562; 
+ Tue, 09 Jun 2020 21:28:21 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy4Ge2/FhgqXtvcDV3FLcO0FAqwIVy/A7D99qWCxWCgU8MfztxtviwQs2M0CPoFQCK5GmJ3iA==
+X-Received: by 2002:a1c:1d49:: with SMTP id d70mr1166004wmd.49.1591763301330; 
+ Tue, 09 Jun 2020 21:28:21 -0700 (PDT)
 Received: from redhat.com (bzq-79-181-55-232.red.bezeqint.net. [79.181.55.232])
- by smtp.gmail.com with ESMTPSA id r2sm6307143wrg.68.2020.06.09.21.28.11
+ by smtp.gmail.com with ESMTPSA id k17sm6482065wrl.54.2020.06.09.21.28.20
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 09 Jun 2020 21:28:12 -0700 (PDT)
-Date: Wed, 10 Jun 2020 00:28:11 -0400
+ Tue, 09 Jun 2020 21:28:20 -0700 (PDT)
+Date: Wed, 10 Jun 2020 00:28:19 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 44/56] Support individual region unmap in libvhost-user
-Message-ID: <20200610042613.1459309-45-mst@redhat.com>
+Subject: [PULL 47/56] hw/pci: Fix crash when running QEMU with "-nic
+ model=rocker"
+Message-ID: <20200610042613.1459309-48-mst@redhat.com>
 References: <20200610042613.1459309-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20200610042613.1459309-1-mst@redhat.com>
@@ -85,9 +86,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=mst@redhat.com;
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=mst@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 23:22:15
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 23:51:15
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -108,139 +109,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Johannes Berg <johannes.berg@intel.com>, David Hildenbrand <david@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Raphael Norwitz <raphael.norwitz@nutanix.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ Michael Tokarev <mjt@tls.msk.ru>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Raphael Norwitz <raphael.norwitz@nutanix.com>
+From: Thomas Huth <thuth@redhat.com>
 
-When the VHOST_USER_PROTOCOL_F_CONFIGURE_MEM_SLOTS protocol feature is
-enabled, on memory hot-unplug qemu will transmit memory regions to
-remove individually using the new message VHOST_USER_REM_MEM_REG
-message. With this change, vhost-user backends build with libvhost-user
-can now unmap individual memory regions when receiving the
-VHOST_USER_REM_MEM_REG message.
+QEMU currently aborts when being started with "-nic model=rocker" or with
+"-net nic,model=rocker". This happens because the "rocker" device is not
+a normal NIC but a switch, which has different properties. Thus we should
+only consider real NIC devices for "-nic" and "-net". These devices can
+be identified by the "netdev" property, so check for this property before
+adding the device to the list.
 
-Qemu only sends VHOST_USER_REM_MEM_REG messages when the
-VHOST_USER_PROTOCOL_F_CONFIGURE_MEM_SLOTS feature is negotiated, and
-support for that feature has not yet been added in libvhost-user, this
-new functionality is not yet used.
-
-Signed-off-by: Raphael Norwitz <raphael.norwitz@nutanix.com>
-Message-Id: <1588533678-23450-10-git-send-email-raphael.norwitz@nutanix.com>
+Reported-by: Michael Tokarev <mjt@tls.msk.ru>
+Fixes: 52310c3fa7dc854d ("net: allow using any PCI NICs in -net or -nic")
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <20200527153152.9211-1-thuth@redhat.com>
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- contrib/libvhost-user/libvhost-user.h |  1 +
- contrib/libvhost-user/libvhost-user.c | 63 +++++++++++++++++++++++++++
- 2 files changed, 64 insertions(+)
+ hw/pci/pci.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
 
-diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost-user/libvhost-user.h
-index 60ef7fd13e..f8439713a8 100644
---- a/contrib/libvhost-user/libvhost-user.h
-+++ b/contrib/libvhost-user/libvhost-user.h
-@@ -99,6 +99,7 @@ typedef enum VhostUserRequest {
-     VHOST_USER_VRING_KICK = 35,
-     VHOST_USER_GET_MAX_MEM_SLOTS = 36,
-     VHOST_USER_ADD_MEM_REG = 37,
-+    VHOST_USER_REM_MEM_REG = 38,
-     VHOST_USER_MAX
- } VhostUserRequest;
- 
-diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/libvhost-user.c
-index d8ee7a23a3..386449b697 100644
---- a/contrib/libvhost-user/libvhost-user.c
-+++ b/contrib/libvhost-user/libvhost-user.c
-@@ -139,6 +139,7 @@ vu_request_to_string(unsigned int req)
-         REQ(VHOST_USER_VRING_KICK),
-         REQ(VHOST_USER_GET_MAX_MEM_SLOTS),
-         REQ(VHOST_USER_ADD_MEM_REG),
-+        REQ(VHOST_USER_REM_MEM_REG),
-         REQ(VHOST_USER_MAX),
-     };
- #undef REQ
-@@ -763,6 +764,66 @@ vu_add_mem_reg(VuDev *dev, VhostUserMsg *vmsg) {
-     }
- }
- 
-+static inline bool reg_equal(VuDevRegion *vudev_reg,
-+                             VhostUserMemoryRegion *msg_reg)
-+{
-+    if (vudev_reg->gpa == msg_reg->guest_phys_addr &&
-+        vudev_reg->qva == msg_reg->userspace_addr &&
-+        vudev_reg->size == msg_reg->memory_size) {
-+        return true;
-+    }
-+
-+    return false;
-+}
-+
-+static bool
-+vu_rem_mem_reg(VuDev *dev, VhostUserMsg *vmsg) {
-+    int i, j;
-+    bool found = false;
-+    VuDevRegion shadow_regions[VHOST_MEMORY_MAX_NREGIONS] = {};
-+    VhostUserMemoryRegion m = vmsg->payload.memreg.region, *msg_region = &m;
-+
-+    DPRINT("Removing region:\n");
-+    DPRINT("    guest_phys_addr: 0x%016"PRIx64"\n",
-+           msg_region->guest_phys_addr);
-+    DPRINT("    memory_size:     0x%016"PRIx64"\n",
-+           msg_region->memory_size);
-+    DPRINT("    userspace_addr   0x%016"PRIx64"\n",
-+           msg_region->userspace_addr);
-+    DPRINT("    mmap_offset      0x%016"PRIx64"\n",
-+           msg_region->mmap_offset);
-+
-+    for (i = 0, j = 0; i < dev->nregions; i++) {
-+        if (!reg_equal(&dev->regions[i], msg_region)) {
-+            shadow_regions[j].gpa = dev->regions[i].gpa;
-+            shadow_regions[j].size = dev->regions[i].size;
-+            shadow_regions[j].qva = dev->regions[i].qva;
-+            shadow_regions[j].mmap_offset = dev->regions[i].mmap_offset;
-+            j++;
-+        } else {
-+            found = true;
-+            VuDevRegion *r = &dev->regions[i];
-+            void *m = (void *) (uintptr_t) r->mmap_addr;
-+
-+            if (m) {
-+                munmap(m, r->size + r->mmap_offset);
+diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+index 7bf2ae6d92..1b88a32cf7 100644
+--- a/hw/pci/pci.c
++++ b/hw/pci/pci.c
+@@ -1891,7 +1891,18 @@ PCIDevice *pci_nic_init_nofail(NICInfo *nd, PCIBus *rootbus,
+         if (test_bit(DEVICE_CATEGORY_NETWORK, dc->categories) &&
+             dc->user_creatable) {
+             const char *name = object_class_get_name(list->data);
+-            g_ptr_array_add(pci_nic_models, (gpointer)name);
++            /*
++             * A network device might also be something else than a NIC, see
++             * e.g. the "rocker" device. Thus we have to look for the "netdev"
++             * property, too. Unfortunately, some devices like virtio-net only
++             * create this property during instance_init, so we have to create
++             * a temporary instance here to be able to check it.
++             */
++            Object *obj = object_new_with_class(OBJECT_CLASS(dc));
++            if (object_property_find(obj, "netdev", NULL)) {
++                g_ptr_array_add(pci_nic_models, (gpointer)name);
 +            }
-+        }
-+    }
-+
-+    if (found) {
-+        memcpy(dev->regions, shadow_regions,
-+               sizeof(VuDevRegion) * VHOST_MEMORY_MAX_NREGIONS);
-+        DPRINT("Successfully removed a region\n");
-+        dev->nregions--;
-+        vmsg_set_reply_u64(vmsg, 0);
-+    } else {
-+        vu_panic(dev, "Specified region not found\n");
-+    }
-+
-+    return true;
-+}
-+
- static bool
- vu_set_mem_table_exec_postcopy(VuDev *dev, VhostUserMsg *vmsg)
- {
-@@ -1771,6 +1832,8 @@ vu_process_message(VuDev *dev, VhostUserMsg *vmsg)
-         return vu_handle_get_max_memslots(dev, vmsg);
-     case VHOST_USER_ADD_MEM_REG:
-         return vu_add_mem_reg(dev, vmsg);
-+    case VHOST_USER_REM_MEM_REG:
-+        return vu_rem_mem_reg(dev, vmsg);
-     default:
-         vmsg_close_fds(vmsg);
-         vu_panic(dev, "Unhandled request: %d", vmsg->request);
++            object_unref(obj);
+         }
+         next = list->next;
+         g_slist_free_1(list);
 -- 
 MST
 
