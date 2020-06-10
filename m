@@ -2,106 +2,63 @@ Return-Path: <SRS0=wemX=7X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A8C5C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:06:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B6FCC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:07:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E2D3320760
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:06:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2D3320760
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6EB50206F4
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:07:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6EB50206F4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52146 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55048 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jj0Qq-0003j2-6Q
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 09:06:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41608)
+	id 1jj0Ry-0004zo-Op
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 09:07:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43446)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <akrowiak@linux.ibm.com>)
- id 1jj0Pc-0002jl-LW; Wed, 10 Jun 2020 09:05:00 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:13006
- helo=mx0a-001b2d01.pphosted.com)
+ (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jj0RE-0004NW-3r; Wed, 10 Jun 2020 09:06:40 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:44794)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <akrowiak@linux.ibm.com>)
- id 1jj0Pa-0002GX-Si; Wed, 10 Jun 2020 09:05:00 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 05AD30gC179798; Wed, 10 Jun 2020 09:04:56 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 31k02cg3h8-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 10 Jun 2020 09:04:56 -0400
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05AD3FsM181596;
- Wed, 10 Jun 2020 09:04:55 -0400
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com
- [169.62.189.10])
- by mx0a-001b2d01.pphosted.com with ESMTP id 31k02cg3ga-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 10 Jun 2020 09:04:55 -0400
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
- by ppma02dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05AD0bUM027556;
- Wed, 10 Jun 2020 13:04:54 GMT
-Received: from b03cxnp08027.gho.boulder.ibm.com
- (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
- by ppma02dal.us.ibm.com with ESMTP id 31jqykderf-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 10 Jun 2020 13:04:54 +0000
-Received: from b03ledav004.gho.boulder.ibm.com
- (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
- by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 05AD4pF711141876
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 10 Jun 2020 13:04:51 GMT
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id D00C97805E;
- Wed, 10 Jun 2020 13:04:52 +0000 (GMT)
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 9481178064;
- Wed, 10 Jun 2020 13:04:51 +0000 (GMT)
-Received: from cpe-172-100-175-116.stny.res.rr.com (unknown [9.85.146.208])
- by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
- Wed, 10 Jun 2020 13:04:51 +0000 (GMT)
-Subject: Re: [PATCH v4 02/21] vfio: Convert to ram_block_discard_disable()
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-References: <20200610115419.51688-1-david@redhat.com>
- <20200610115419.51688-3-david@redhat.com>
-From: Tony Krowiak <akrowiak@linux.ibm.com>
-Message-ID: <8c71bfda-e958-56f8-ddaf-6a831fff2bc6@linux.ibm.com>
-Date: Wed, 10 Jun 2020 09:04:51 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jj0RB-0002mt-Kb; Wed, 10 Jun 2020 09:06:39 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.08162643|-1; CH=blue; DM=|OVERLOAD|false|;
+ DS=CONTINUE|ham_regular_dialog|0.146209-0.000366199-0.853425;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e02c03303; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=9; RT=8; SR=0; TI=SMTPD_---.HkaeUW9_1591794391; 
+Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.HkaeUW9_1591794391)
+ by smtp.aliyun-inc.com(10.147.41.199);
+ Wed, 10 Jun 2020 21:06:32 +0800
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Subject: [PATCH v9 44/61] target/riscv: narrowing floating-point/integer
+ type-convert instructions
+Date: Wed, 10 Jun 2020 19:37:31 +0800
+Message-Id: <20200610113748.4754-45-zhiwei_liu@c-sky.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20200610113748.4754-1-zhiwei_liu@c-sky.com>
+References: <20200610113748.4754-1-zhiwei_liu@c-sky.com>
 MIME-Version: 1.0
-In-Reply-To: <20200610115419.51688-3-david@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
- definitions=2020-06-10_08:2020-06-10,
- 2020-06-10 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- clxscore=1011 adultscore=0 mlxlogscore=999 malwarescore=0 suspectscore=4
- impostorscore=0 bulkscore=0 spamscore=0 lowpriorityscore=0 phishscore=0
- mlxscore=0 cotscore=-2147483648 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2006100099
-Received-SPF: pass client-ip=148.163.158.5;
- envelope-from=akrowiak@linux.ibm.com; helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/10 08:25:00
+Content-Transfer-Encoding: 8bit
+Received-SPF: none client-ip=121.197.200.217;
+ envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/10 07:37:52
 X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
-X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001, UNPARSEABLE_RELAY=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -114,265 +71,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eric Farman <farman@linux.ibm.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
- "Michael S . Tsirkin" <mst@redhat.com>, Pierre Morel <pmorel@linux.ibm.com>,
- Cornelia Huck <cohuck@redhat.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: richard.henderson@linaro.org, wxy194768@alibaba-inc.com,
+ wenmeng_zhang@c-sky.com, Alistair Francis <alistair.francis@wdc.com>,
+ palmer@dabbelt.com, LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+---
+ target/riscv/helper.h                   | 11 ++++++
+ target/riscv/insn32.decode              |  5 +++
+ target/riscv/insn_trans/trans_rvv.inc.c | 48 +++++++++++++++++++++++++
+ target/riscv/vector_helper.c            | 39 ++++++++++++++++++++
+ 4 files changed, 103 insertions(+)
 
-
-On 6/10/20 7:54 AM, David Hildenbrand wrote:
-> VFIO is (except devices without a physical IOMMU or some mediated devices)
-> incompatible with discarding of RAM. The kernel will pin basically all VM
-> memory. Let's convert to ram_block_discard_disable(), which can now
-> fail, in contrast to qemu_balloon_inhibit().
->
-> Leave "x-balloon-allowed" named as it is for now.
->
-> Cc: Cornelia Huck <cohuck@redhat.com>
-> Cc: Alex Williamson <alex.williamson@redhat.com>
-> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
-> Cc: Tony Krowiak <akrowiak@linux.ibm.com>
-> Cc: Halil Pasic <pasic@linux.ibm.com>
-> Cc: Pierre Morel <pmorel@linux.ibm.com>
-> Cc: Eric Farman <farman@linux.ibm.com>
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-
-See my two minor comments, other than that:
-Reviewed-by: Tony Krowiak <akrowiak@linux.ibm.com>
-
-> ---
->   hw/vfio/ap.c                  | 10 +++----
->   hw/vfio/ccw.c                 | 11 ++++----
->   hw/vfio/common.c              | 53 +++++++++++++++++++----------------
->   hw/vfio/pci.c                 |  6 ++--
->   include/hw/vfio/vfio-common.h |  4 +--
->   5 files changed, 45 insertions(+), 39 deletions(-)
->
-> diff --git a/hw/vfio/ap.c b/hw/vfio/ap.c
-> index 95564c17ed..d0b1bc7581 100644
-> --- a/hw/vfio/ap.c
-> +++ b/hw/vfio/ap.c
-> @@ -105,12 +105,12 @@ static void vfio_ap_realize(DeviceState *dev, Error **errp)
->       vapdev->vdev.dev = dev;
->   
->       /*
-> -     * vfio-ap devices operate in a way compatible with
-> -     * memory ballooning, as no pages are pinned in the host.
-> -     * This needs to be set before vfio_get_device() for vfio common to
-> -     * handle the balloon inhibitor.
-> +     * vfio-ap devices operate in a way compatible discarding of memory in
-
-s/compatible discarding/compatible with discarding/?
-
-> +     * RAM blocks, as no pages are pinned in the host. This needs to be
-> +     * set before vfio_get_device() for vfio common to handle
-> +     * ram_block_discard_disable().
->        */
-> -    vapdev->vdev.balloon_allowed = true;
-> +    vapdev->vdev.ram_block_discard_allowed = true;
->   
->       ret = vfio_get_device(vfio_group, mdevid, &vapdev->vdev, errp);
->       if (ret) {
-> diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
-> index 63406184d2..82857f1615 100644
-> --- a/hw/vfio/ccw.c
-> +++ b/hw/vfio/ccw.c
-> @@ -418,12 +418,13 @@ static void vfio_ccw_get_device(VFIOGroup *group, VFIOCCWDevice *vcdev,
->   
->       /*
->        * All vfio-ccw devices are believed to operate in a way compatible with
-> -     * memory ballooning, ie. pages pinned in the host are in the current
-> -     * working set of the guest driver and therefore never overlap with pages
-> -     * available to the guest balloon driver.  This needs to be set before
-> -     * vfio_get_device() for vfio common to handle the balloon inhibitor.
-> +     * discarding of memory in RAM blocks, ie. pages pinned in the host are
-> +     * in the current working set of the guest driver and therefore never
-> +     * overlap e.g., with pages available to the guest balloon driver.  This
-> +     * needs to be set before vfio_get_device() for vfio common to handle
-> +     * ram_block_discard_disable().
->        */
-> -    vcdev->vdev.balloon_allowed = true;
-> +    vcdev->vdev.ram_block_discard_allowed = true;
->   
->       if (vfio_get_device(group, vcdev->cdev.mdevid, &vcdev->vdev, errp)) {
->           goto out_err;
-> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-> index 0b3593b3c0..33357140b8 100644
-> --- a/hw/vfio/common.c
-> +++ b/hw/vfio/common.c
-> @@ -33,7 +33,6 @@
->   #include "qemu/error-report.h"
->   #include "qemu/main-loop.h"
->   #include "qemu/range.h"
-> -#include "sysemu/balloon.h"
->   #include "sysemu/kvm.h"
->   #include "sysemu/reset.h"
->   #include "trace.h"
-> @@ -1215,31 +1214,36 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
->       space = vfio_get_address_space(as);
->   
->       /*
-> -     * VFIO is currently incompatible with memory ballooning insofar as the
-> +     * VFIO is currently incompatible with discarding of RAM insofar as the
->        * madvise to purge (zap) the page from QEMU's address space does not
->        * interact with the memory API and therefore leaves stale virtual to
->        * physical mappings in the IOMMU if the page was previously pinned.  We
-> -     * therefore add a balloon inhibit for each group added to a container,
-> +     * therefore set discarding broken for each group added to a container,
->        * whether the container is used individually or shared.  This provides
->        * us with options to allow devices within a group to opt-in and allow
-> -     * ballooning, so long as it is done consistently for a group (for instance
-> +     * discarding, so long as it is done consistently for a group (for instance
->        * if the device is an mdev device where it is known that the host vendor
->        * driver will never pin pages outside of the working set of the guest
-> -     * driver, which would thus not be ballooning candidates).
-> +     * driver, which would thus not be discarding candidates).
->        *
->        * The first opportunity to induce pinning occurs here where we attempt to
->        * attach the group to existing containers within the AddressSpace.  If any
-> -     * pages are already zapped from the virtual address space, such as from a
-> -     * previous ballooning opt-in, new pinning will cause valid mappings to be
-> +     * pages are already zapped from the virtual address space, such as from
-> +     * previous discards, new pinning will cause valid mappings to be
->        * re-established.  Likewise, when the overall MemoryListener for a new
->        * container is registered, a replay of mappings within the AddressSpace
->        * will occur, re-establishing any previously zapped pages as well.
->        *
-> -     * NB. Balloon inhibiting does not currently block operation of the
-> -     * balloon driver or revoke previously pinned pages, it only prevents
-> -     * calling madvise to modify the virtual mapping of ballooned pages.
-> +     * Especially virtio-balloon is currently only prevented from discarding
-> +     * new memory, it will not yet set ram_block_discard_set_required() and
-> +     * therefore, neither stops us here or deals with the sudden memory
-> +     * consumption of inflated memory.
->        */
-> -    qemu_balloon_inhibit(true);
-> +    ret = ram_block_discard_disable(true);
-> +    if (ret) {
-> +        error_setg_errno(errp, -ret, "Cannot set discarding of RAM broken");
-> +        return ret;
-> +    }
->   
->       QLIST_FOREACH(container, &space->containers, next) {
->           if (!ioctl(group->fd, VFIO_GROUP_SET_CONTAINER, &container->fd)) {
-> @@ -1405,7 +1409,7 @@ close_fd_exit:
->       close(fd);
->   
->   put_space_exit:
-> -    qemu_balloon_inhibit(false);
-> +    ram_block_discard_disable(false);
->       vfio_put_address_space(space);
->   
->       return ret;
-> @@ -1526,8 +1530,8 @@ void vfio_put_group(VFIOGroup *group)
->           return;
->       }
->   
-> -    if (!group->balloon_allowed) {
-> -        qemu_balloon_inhibit(false);
-> +    if (!group->ram_block_discard_allowed) {
-> +        ram_block_discard_disable(false);
->       }
->       vfio_kvm_device_del_group(group);
->       vfio_disconnect_container(group);
-> @@ -1565,22 +1569,23 @@ int vfio_get_device(VFIOGroup *group, const char *name,
->       }
->   
->       /*
-> -     * Clear the balloon inhibitor for this group if the driver knows the
-> -     * device operates compatibly with ballooning.  Setting must be consistent
-> -     * per group, but since compatibility is really only possible with mdev
-> -     * currently, we expect singleton groups.
-> +     * Set discarding of RAM as not broken for this group if the driver knows
-> +     * the device operates compatibly with discarding.  Setting must be
-> +     * consistent per group, but since compatibility is really only possible
-> +     * with mdev currently, we expect singleton groups.
->        */
-> -    if (vbasedev->balloon_allowed != group->balloon_allowed) {
-> +    if (vbasedev->ram_block_discard_allowed !=
-> +        group->ram_block_discard_allowed) {
->           if (!QLIST_EMPTY(&group->device_list)) {
-> -            error_setg(errp,
-> -                       "Inconsistent device balloon setting within group");
-> +            error_setg(errp, "Inconsistent setting of support for discarding "
-> +                       "RAM (e.g., balloon) within group");
->               close(fd);
->               return -1;
->           }
->   
-> -        if (!group->balloon_allowed) {
-> -            group->balloon_allowed = true;
-> -            qemu_balloon_inhibit(false);
-> +        if (!group->ram_block_discard_allowed) {
-> +            group->ram_block_discard_allowed = true;
-> +            ram_block_discard_disable(false);
->           }
->       }
->   
-> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> index 342dd6b912..c33c11b7e4 100644
-> --- a/hw/vfio/pci.c
-> +++ b/hw/vfio/pci.c
-> @@ -2796,7 +2796,7 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
->       }
->   
->       /*
-> -     * Mediated devices *might* operate compatibly with memory ballooning, but
-> +     * Mediated devices *might* operate compatibly with discarding of RAM, but
->        * we cannot know for certain, it depends on whether the mdev vendor driver
->        * stays in sync with the active working set of the guest driver.  Prevent
->        * the x-balloon-allowed option unless this is minimally an mdev device.
-> @@ -2809,7 +2809,7 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
->   
->       trace_vfio_mdev(vdev->vbasedev.name, is_mdev);
->   
-> -    if (vdev->vbasedev.balloon_allowed && !is_mdev) {
-> +    if (vdev->vbasedev.ram_block_discard_allowed && !is_mdev) {
->           error_setg(errp, "x-balloon-allowed only potentially compatible "
->                      "with mdev devices");
-
-Should this error message be changed?
-
->           vfio_put_group(group);
-> @@ -3163,7 +3163,7 @@ static Property vfio_pci_dev_properties[] = {
->                       VFIO_FEATURE_ENABLE_IGD_OPREGION_BIT, false),
->       DEFINE_PROP_BOOL("x-no-mmap", VFIOPCIDevice, vbasedev.no_mmap, false),
->       DEFINE_PROP_BOOL("x-balloon-allowed", VFIOPCIDevice,
-> -                     vbasedev.balloon_allowed, false),
-> +                     vbasedev.ram_block_discard_allowed, false),
->       DEFINE_PROP_BOOL("x-no-kvm-intx", VFIOPCIDevice, no_kvm_intx, false),
->       DEFINE_PROP_BOOL("x-no-kvm-msi", VFIOPCIDevice, no_kvm_msi, false),
->       DEFINE_PROP_BOOL("x-no-kvm-msix", VFIOPCIDevice, no_kvm_msix, false),
-> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-> index fd564209ac..c78f3ff559 100644
-> --- a/include/hw/vfio/vfio-common.h
-> +++ b/include/hw/vfio/vfio-common.h
-> @@ -108,7 +108,7 @@ typedef struct VFIODevice {
->       bool reset_works;
->       bool needs_reset;
->       bool no_mmap;
-> -    bool balloon_allowed;
-> +    bool ram_block_discard_allowed;
->       VFIODeviceOps *ops;
->       unsigned int num_irqs;
->       unsigned int num_regions;
-> @@ -128,7 +128,7 @@ typedef struct VFIOGroup {
->       QLIST_HEAD(, VFIODevice) device_list;
->       QLIST_ENTRY(VFIOGroup) next;
->       QLIST_ENTRY(VFIOGroup) container_next;
-> -    bool balloon_allowed;
-> +    bool ram_block_discard_allowed;
->   } VFIOGroup;
->   
->   typedef struct VFIODMABuf {
+diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+index e59dcc5a7c..82c5d1129e 100644
+--- a/target/riscv/helper.h
++++ b/target/riscv/helper.h
+@@ -1022,3 +1022,14 @@ DEF_HELPER_5(vfwcvt_f_x_v_h, void, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_5(vfwcvt_f_x_v_w, void, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_5(vfwcvt_f_f_v_h, void, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_5(vfwcvt_f_f_v_w, void, ptr, ptr, ptr, env, i32)
++
++DEF_HELPER_5(vfncvt_xu_f_v_h, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_5(vfncvt_xu_f_v_w, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_5(vfncvt_x_f_v_h, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_5(vfncvt_x_f_v_w, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_5(vfncvt_f_xu_v_h, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_5(vfncvt_f_xu_v_w, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_5(vfncvt_f_x_v_h, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_5(vfncvt_f_x_v_w, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_5(vfncvt_f_f_v_h, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_5(vfncvt_f_f_v_w, void, ptr, ptr, ptr, env, i32)
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index e0efc63ec2..57ac4de1c2 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -524,6 +524,11 @@ vfwcvt_x_f_v    100010 . ..... 01001 001 ..... 1010111 @r2_vm
+ vfwcvt_f_xu_v   100010 . ..... 01010 001 ..... 1010111 @r2_vm
+ vfwcvt_f_x_v    100010 . ..... 01011 001 ..... 1010111 @r2_vm
+ vfwcvt_f_f_v    100010 . ..... 01100 001 ..... 1010111 @r2_vm
++vfncvt_xu_f_v   100010 . ..... 10000 001 ..... 1010111 @r2_vm
++vfncvt_x_f_v    100010 . ..... 10001 001 ..... 1010111 @r2_vm
++vfncvt_f_xu_v   100010 . ..... 10010 001 ..... 1010111 @r2_vm
++vfncvt_f_x_v    100010 . ..... 10011 001 ..... 1010111 @r2_vm
++vfncvt_f_f_v    100010 . ..... 10100 001 ..... 1010111 @r2_vm
+ 
+ vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
+ vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
+diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+index dd4182c327..4e4631ac6a 100644
+--- a/target/riscv/insn_trans/trans_rvv.inc.c
++++ b/target/riscv/insn_trans/trans_rvv.inc.c
+@@ -2276,3 +2276,51 @@ GEN_OPFV_WIDEN_TRANS(vfwcvt_x_f_v)
+ GEN_OPFV_WIDEN_TRANS(vfwcvt_f_xu_v)
+ GEN_OPFV_WIDEN_TRANS(vfwcvt_f_x_v)
+ GEN_OPFV_WIDEN_TRANS(vfwcvt_f_f_v)
++
++/* Narrowing Floating-Point/Integer Type-Convert Instructions */
++
++/*
++ * If the current SEW does not correspond to a supported IEEE floating-point
++ * type, an illegal instruction exception is raised
++ */
++static bool opfv_narrow_check(DisasContext *s, arg_rmr *a)
++{
++    return (vext_check_isa_ill(s) &&
++            vext_check_overlap_mask(s, a->rd, a->vm, false) &&
++            vext_check_reg(s, a->rd, false) &&
++            vext_check_reg(s, a->rs2, true) &&
++            vext_check_overlap_group(a->rd, 1 << s->lmul, a->rs2,
++                                     2 << s->lmul) &&
++            (s->lmul < 0x3) && (s->sew < 0x3) && (s->sew != 0));
++}
++
++#define GEN_OPFV_NARROW_TRANS(NAME)                                \
++static bool trans_##NAME(DisasContext *s, arg_rmr *a)              \
++{                                                                  \
++    if (opfv_narrow_check(s, a)) {                                 \
++        uint32_t data = 0;                                         \
++        static gen_helper_gvec_3_ptr * const fns[2] = {            \
++            gen_helper_##NAME##_h,                                 \
++            gen_helper_##NAME##_w,                                 \
++        };                                                         \
++        TCGLabel *over = gen_new_label();                          \
++        gen_set_rm(s, 7);                                          \
++        tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_vl, 0, over);          \
++                                                                   \
++        data = FIELD_DP32(data, VDATA, MLEN, s->mlen);             \
++        data = FIELD_DP32(data, VDATA, VM, a->vm);                 \
++        data = FIELD_DP32(data, VDATA, LMUL, s->lmul);             \
++        tcg_gen_gvec_3_ptr(vreg_ofs(s, a->rd), vreg_ofs(s, 0),     \
++                           vreg_ofs(s, a->rs2), cpu_env, 0,        \
++                           s->vlen / 8, data, fns[s->sew - 1]);    \
++        gen_set_label(over);                                       \
++        return true;                                               \
++    }                                                              \
++    return false;                                                  \
++}
++
++GEN_OPFV_NARROW_TRANS(vfncvt_xu_f_v)
++GEN_OPFV_NARROW_TRANS(vfncvt_x_f_v)
++GEN_OPFV_NARROW_TRANS(vfncvt_f_xu_v)
++GEN_OPFV_NARROW_TRANS(vfncvt_f_x_v)
++GEN_OPFV_NARROW_TRANS(vfncvt_f_f_v)
+diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+index 2e001d8502..d1950ebba5 100644
+--- a/target/riscv/vector_helper.c
++++ b/target/riscv/vector_helper.c
+@@ -4293,3 +4293,42 @@ RVVCALL(OPFVV1, vfwcvt_f_f_v_h, WOP_UU_H, H4, H2, vfwcvtffv16)
+ RVVCALL(OPFVV1, vfwcvt_f_f_v_w, WOP_UU_W, H8, H4, float32_to_float64)
+ GEN_VEXT_V_ENV(vfwcvt_f_f_v_h, 2, 4, clearl)
+ GEN_VEXT_V_ENV(vfwcvt_f_f_v_w, 4, 8, clearq)
++
++/* Narrowing Floating-Point/Integer Type-Convert Instructions */
++/* (TD, T2, TX2) */
++#define NOP_UU_H uint16_t, uint32_t, uint32_t
++#define NOP_UU_W uint32_t, uint64_t, uint64_t
++/* vfncvt.xu.f.v vd, vs2, vm # Convert float to unsigned integer. */
++RVVCALL(OPFVV1, vfncvt_xu_f_v_h, NOP_UU_H, H2, H4, float32_to_uint16)
++RVVCALL(OPFVV1, vfncvt_xu_f_v_w, NOP_UU_W, H4, H8, float64_to_uint32)
++GEN_VEXT_V_ENV(vfncvt_xu_f_v_h, 2, 2, clearh)
++GEN_VEXT_V_ENV(vfncvt_xu_f_v_w, 4, 4, clearl)
++
++/* vfncvt.x.f.v vd, vs2, vm # Convert double-width float to signed integer. */
++RVVCALL(OPFVV1, vfncvt_x_f_v_h, NOP_UU_H, H2, H4, float32_to_int16)
++RVVCALL(OPFVV1, vfncvt_x_f_v_w, NOP_UU_W, H4, H8, float64_to_int32)
++GEN_VEXT_V_ENV(vfncvt_x_f_v_h, 2, 2, clearh)
++GEN_VEXT_V_ENV(vfncvt_x_f_v_w, 4, 4, clearl)
++
++/* vfncvt.f.xu.v vd, vs2, vm # Convert double-width unsigned integer to float */
++RVVCALL(OPFVV1, vfncvt_f_xu_v_h, NOP_UU_H, H2, H4, uint32_to_float16)
++RVVCALL(OPFVV1, vfncvt_f_xu_v_w, NOP_UU_W, H4, H8, uint64_to_float32)
++GEN_VEXT_V_ENV(vfncvt_f_xu_v_h, 2, 2, clearh)
++GEN_VEXT_V_ENV(vfncvt_f_xu_v_w, 4, 4, clearl)
++
++/* vfncvt.f.x.v vd, vs2, vm # Convert double-width integer to float. */
++RVVCALL(OPFVV1, vfncvt_f_x_v_h, NOP_UU_H, H2, H4, int32_to_float16)
++RVVCALL(OPFVV1, vfncvt_f_x_v_w, NOP_UU_W, H4, H8, int64_to_float32)
++GEN_VEXT_V_ENV(vfncvt_f_x_v_h, 2, 2, clearh)
++GEN_VEXT_V_ENV(vfncvt_f_x_v_w, 4, 4, clearl)
++
++/* vfncvt.f.f.v vd, vs2, vm # Convert double float to single-width float. */
++static uint16_t vfncvtffv16(uint32_t a, float_status *s)
++{
++    return float32_to_float16(a, true, s);
++}
++
++RVVCALL(OPFVV1, vfncvt_f_f_v_h, NOP_UU_H, H2, H4, vfncvtffv16)
++RVVCALL(OPFVV1, vfncvt_f_f_v_w, NOP_UU_W, H4, H8, float64_to_float32)
++GEN_VEXT_V_ENV(vfncvt_f_f_v_h, 2, 2, clearh)
++GEN_VEXT_V_ENV(vfncvt_f_f_v_w, 4, 4, clearl)
+-- 
+2.23.0
 
 
