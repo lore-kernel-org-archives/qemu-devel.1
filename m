@@ -7,49 +7,49 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA126C433E0
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8908CC433DF
 	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 15:06:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7A4DE2078C
+	by mail.kernel.org (Postfix) with ESMTPS id 54347206F4
 	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 15:06:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="rU58MgrY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A4DE2078C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="hf0hgFPg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54347206F4
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52642 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52538 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jj2JG-0004o5-Gs
+	id 1jj2JG-0004lW-Ag
 	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 11:06:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35946)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35948)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1jj2GY-0002Go-RO; Wed, 10 Jun 2020 11:03:46 -0400
-Received: from fanzine.igalia.com ([178.60.130.6]:58134)
+ id 1jj2GZ-0002Gs-3X; Wed, 10 Jun 2020 11:03:47 -0400
+Received: from fanzine.igalia.com ([178.60.130.6]:58076)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1jj2GW-0006wJ-Oc; Wed, 10 Jun 2020 11:03:46 -0400
+ id 1jj2GW-0006w1-SO; Wed, 10 Jun 2020 11:03:46 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
  s=20170329; 
  h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From;
- bh=mWxBfZCwA3fQQGqfzhuDYPXDU/mKIOsOcPZxQSXCu4Q=; 
- b=rU58MgrYz95kZYOlYztr3CSO9G7+iYoql11x4GP3d/tHfzG05QbeWghfSdyjYgqzZyVVumOewOn4fw542duNjWwHpTRexYccrWhJWNZ5UtBoL6HB6AOraelK4TBNwtfAf3/z4OrVCFf4/EZt6uqfSfU0QIXNDs8REqN9cxWWnHAfiQAuvSox6jfz1uJ+gDCfW8PC5MdBycapn6zUiLR33nGG9TsffYm7P0wC+OQD64mk3ZdpBxtha9/zMBSul+oTD5lGrLLvAtGug44tO8Js7HEotj5S0C9Styophngu+DW2JPenZaYNjYLJraQ5COmjn+SNR6T17p84DJJVXUhkww==;
+ bh=3TcxrFGVkCtUtsIcvfPDHVNJ3SGTTueaU2gMyJDgFo0=; 
+ b=hf0hgFPg4+cvB5RAm2eQIiOk7f/jreIuLu/HovOBI86dpmPewieRVJ+BNQzp1SSjqJFOMjci+xLXjfenCWhPJkeZ6ESFvKgCYyfTdz4Fbuy9rrASdAOXlsrFBZwkcUFP1adNvTuyio7S/soknyMZ7mN1FN2RbGFBlYvbeUm/UtamPeZRZ2GIW+KXLISjjXnXZEZqUZ/m+GxFIQzM77qrZy4XEF3wGKEjvTAP2xq8yEPGkxGsIolHH6YogQINeLjwmQ4VoGQosq4Wz37EkGAEQjedP6x+wGDqN/m2MDzg/FDE4e2Bq0h2ZK/GkiIhusiMKEXu8wIQ7+YJ2QZwUppA4Q==;
 Received: from [81.0.38.199] (helo=perseus.local)
  by fanzine.igalia.com with esmtpsa 
  (Cipher TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim)
- id 1jj2GR-0007gr-K7; Wed, 10 Jun 2020 17:03:39 +0200
+ id 1jj2GR-0007gt-CR; Wed, 10 Jun 2020 17:03:39 +0200
 Received: from berto by perseus.local with local (Exim 4.92)
  (envelope-from <berto@igalia.com>)
- id 1jj2GB-0007Mt-Vz; Wed, 10 Jun 2020 17:03:23 +0200
+ id 1jj2GC-0007My-1f; Wed, 10 Jun 2020 17:03:24 +0200
 From: Alberto Garcia <berto@igalia.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v8 11/34] qcow2: Add offset_into_subcluster() and
- size_to_subclusters()
-Date: Wed, 10 Jun 2020 17:02:49 +0200
-Message-Id: <573172ba772686876365f9d80276da3bd328f283.1591801197.git.berto@igalia.com>
+Subject: [PATCH v8 13/34] qcow2: Update get/set_l2_entry() and add
+ get/set_l2_bitmap()
+Date: Wed, 10 Jun 2020 17:02:51 +0200
+Message-Id: <5373a508b5a8b9a961d1aa79833de988dc370666.1591801197.git.berto@igalia.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <cover.1591801197.git.berto@igalia.com>
 References: <cover.1591801197.git.berto@igalia.com>
@@ -85,41 +85,65 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Like offset_into_cluster() and size_to_clusters(), but for
-subclusters.
+Extended L2 entries are 128-bit wide: 64 bits for the entry itself and
+64 bits for the subcluster allocation bitmap.
+
+In order to support them correctly get/set_l2_entry() need to be
+updated so they take the entry width into account in order to
+calculate the correct offset.
+
+This patch also adds the get/set_l2_bitmap() functions that are
+used to access the bitmaps. For convenience we allow calling
+get_l2_bitmap() on images without subclusters. In this case the
+returned value is always 0 and has no meaning.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- block/qcow2.h | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ block/qcow2.h | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
 diff --git a/block/qcow2.h b/block/qcow2.h
-index 2503374677..4fe31adfd3 100644
+index 46b351229a..82b86f6cec 100644
 --- a/block/qcow2.h
 +++ b/block/qcow2.h
-@@ -555,11 +555,21 @@ static inline int64_t offset_into_cluster(BDRVQcow2State *s, int64_t offset)
-     return offset & (s->cluster_size - 1);
+@@ -533,15 +533,36 @@ static inline size_t l2_entry_size(BDRVQcow2State *s)
+ static inline uint64_t get_l2_entry(BDRVQcow2State *s, uint64_t *l2_slice,
+                                     int idx)
+ {
++    idx *= l2_entry_size(s) / sizeof(uint64_t);
+     return be64_to_cpu(l2_slice[idx]);
  }
  
-+static inline int64_t offset_into_subcluster(BDRVQcow2State *s, int64_t offset)
++static inline uint64_t get_l2_bitmap(BDRVQcow2State *s, uint64_t *l2_slice,
++                                     int idx)
 +{
-+    return offset & (s->subcluster_size - 1);
++    if (has_subclusters(s)) {
++        idx *= l2_entry_size(s) / sizeof(uint64_t);
++        return be64_to_cpu(l2_slice[idx + 1]);
++    } else {
++        return 0; /* For convenience only; this value has no meaning. */
++    }
 +}
 +
- static inline uint64_t size_to_clusters(BDRVQcow2State *s, uint64_t size)
+ static inline void set_l2_entry(BDRVQcow2State *s, uint64_t *l2_slice,
+                                 int idx, uint64_t entry)
  {
-     return (size + (s->cluster_size - 1)) >> s->cluster_bits;
++    idx *= l2_entry_size(s) / sizeof(uint64_t);
+     l2_slice[idx] = cpu_to_be64(entry);
  }
  
-+static inline uint64_t size_to_subclusters(BDRVQcow2State *s, uint64_t size)
++static inline void set_l2_bitmap(BDRVQcow2State *s, uint64_t *l2_slice,
++                                 int idx, uint64_t bitmap)
 +{
-+    return (size + (s->subcluster_size - 1)) >> s->subcluster_bits;
++    assert(has_subclusters(s));
++    idx *= l2_entry_size(s) / sizeof(uint64_t);
++    l2_slice[idx + 1] = cpu_to_be64(bitmap);
 +}
 +
- static inline int64_t size_to_l1(BDRVQcow2State *s, int64_t size)
+ static inline bool has_data_file(BlockDriverState *bs)
  {
-     int shift = s->cluster_bits + s->l2_bits;
+     BDRVQcow2State *s = bs->opaque;
 -- 
 2.20.1
 
