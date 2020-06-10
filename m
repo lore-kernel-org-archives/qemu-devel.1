@@ -2,69 +2,69 @@ Return-Path: <SRS0=wemX=7X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,URIBL_SBL,URIBL_SBL_A,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 535D9C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:14:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A901C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:14:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 27687206F4
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:14:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27687206F4
+	by mail.kernel.org (Postfix) with ESMTPS id 6194A206F4
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:14:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6194A206F4
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45970 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46294 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jj0Yv-0005tG-9q
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 09:14:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45146)
+	id 1jj0Yy-00062s-IZ
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 09:14:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45188)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1jj0Uq-0007kG-Dh; Wed, 10 Jun 2020 09:10:24 -0400
-Received: from mout.kundenserver.de ([212.227.126.133]:56225)
+ id 1jj0Ut-0007qf-Qn; Wed, 10 Jun 2020 09:10:27 -0400
+Received: from mout.kundenserver.de ([212.227.126.130]:45539)
  by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1jj0Up-0003cP-3r; Wed, 10 Jun 2020 09:10:23 -0400
+ id 1jj0Us-0003gq-HS; Wed, 10 Jun 2020 09:10:27 -0400
 Received: from localhost.localdomain ([82.252.135.106]) by
  mrelayeu.kundenserver.de (mreue009 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1MEmAV-1jhdZJ3B8t-00GFv7; Wed, 10 Jun 2020 15:10:18 +0200
+ id 1MIdW9-1jg0D53fAz-00EahL; Wed, 10 Jun 2020 15:10:23 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 08/16] hw/arm/aspeed: Correct DRAM container region size
-Date: Wed, 10 Jun 2020 15:10:03 +0200
-Message-Id: <20200610131011.1941209-9-laurent@vivier.eu>
+Subject: [PULL v2 14/16] target/unicore32: Prefer qemu_semihosting_log_out()
+ over curses
+Date: Wed, 10 Jun 2020 15:10:09 +0200
+Message-Id: <20200610131011.1941209-15-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200610131011.1941209-1-laurent@vivier.eu>
 References: <20200610131011.1941209-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:aoyblYvsxNs/VaIf9aNl95oG04olgSvD6l6khwnqzdMTlTYHqgl
- UEjXCX7l3XJ8HnTryfuiHK4bEvKYLzVnym1o4R3pnSYwxikSQ1ZcsLub42RkWfNCbPVzjw5
- WuzMReXW+1b3qZVeCQAIemzMZDJsrNWVfV6TznKkdYh41E+3Fw92dFf/AtewYlXtDqBriCr
- 3Iha14j7AFGtkpaePrgnQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:ga1Vdo8ob8c=:yfGYd7nSifPd9m5FG0rh8R
- ZvbTK/rLHlBMX6QP+IvJ6BInveyYoGgz2IFmBjkghgXu6sL0dUa5jpSLpVT1c4Nedf74goC6C
- u6WSnY9ia2KDStyJrGX8N7bMa8vJjQJqgKxlLlPji8PgrmCESYrqk9Sk7El4KMX+1vCDaz7lE
- VrHTFS/u6ROjH0MTmR7+ixIaJZmKhSaQiojBpTf1to9CQuKC0CfvPTnrhZf8QWcERtVuRl6UN
- 9kwg7mt3W50uiEcrdm+unUtcnsqXFdYgGTDawul7kaRrbr50BzDcWAUUw63rWBzBXL3MGZRp5
- 5CM5xdhggoMtRacCcOQOsxAnR6i/oE1dfiZD31yXbjTpSfvvoNGflaWME4N+EZQ+yjop78gZ7
- FB/SFVFT6fsjddZyYNMmB84cU9N7JQCblbWjNPR1xp58pwegXdwCSsHXF3rtLGnowlis5dyzS
- wGvlOFrdLCvn/s6cTc9c/d9RV/VNCUt/f6Wn8NOiAGn9yg0uns8moHZj6bUto/8bSMPhzuAh4
- le8UeDZEt1vKnrNYHvXNgmpeO2zS3VYOC+AOCnv9RA0hrnQHDkezVfJgfWfJqMIeaDnbBtXoO
- 58xxAOytoNK6WAyncz0wB/QQ/Ba0w4z1Nmk93/ma9DnzWCTMYvR/hoWbF9NGGCsvzoFN/sDwf
- 7T/c/vU3k1avy9tMBBfXZBv42QQZVQHOhoPQAqENHFr7T+TBdMqKpb+RzxeVMk0gU4D9LzqbH
- PdME4exr7IFscO78Ywit/QdbPo24BVfXsxJLyPuHGWKmGaG7uo9353h6UmRvagZrhqeJnHwte
- VNdzCODUyXRGfXFpgnEihUgdEyI9u7zBe+/wDMggHVkLmucYYjWVsyIcQoNZS+0+EyS2rZ6
-Received-SPF: none client-ip=212.227.126.133; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:nujbTLVeKt9LpZQbtZRxvpwXyfbarq8r5Bk1K42Ndq6YN0OacSQ
+ RM56+kdZz5ysrbbSarasKGjY3EURD0bJo4Mz7hLzRHGQWNdyDGCLlx1Ocoa3hcs0OQ+B6n+
+ GXaSjO4a31/Yz+hUunQI2HM/axggTOjV3spR0vhJMZhCon2SHBQMfWw3oXq6W0tCSYf99WZ
+ maom1MPm1jNzid/hHLUxQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:31TZV5x5tDg=:XrbprX7eZQeHeu4ew2uE2e
+ NiKAqgGKP87b+jo8vIHXujuIXGkAEH6HZkkkdr/4VexALoV8uU9BA0T2eaIpTtQFg+6NbJeQQ
+ ssE+kug7hMqlS/P85p+Y8SYoTKmCuWf7TDzS81qHp8AB2yUVRsLviXUhsQbI4ncGolyRM+iDx
+ FESoMm7n9tw9ylLTCTNUi5cbZ7/HycYTENnVqgrwTdddoPIhaz79Y6jj0tiyNmpjMFUWtotAB
+ Na8azqLuZLq15zd//b5471kN5k9PwXQSPAUI8oNnOE400tQZwKTc/nmp5HyyatrzwaUT/jCNd
+ VwAYB4s2Jd3p/iE0goxtStM794sKKc0hj5APO0TH0ZnhqPObkaf9o5tCnJXXP8xkZo0gcr4k9
+ 8VTGpjWMGJSgHk/YBi3MHfQhXlnpqR46TCcdcXE5GNY3rb2KcM0L9tzv+GLQou7gbd7zHlIDu
+ l/TU6pOjaLqZoFd+hjZ5kjI42h8Ityz0mg4hTTMzzZ0C6Mi5XEe0ZTAiKPad/7q5DKTdIhdgN
+ pePwzIntf3XoDgCbQr+VDhJD3C20e1HkylQ4SYTqD2RArHbG8IwhkbUrjLupmgLKG9LO31pP5
+ ocl4vMCoCSfNGpidenuZxRPwIiQc1e5R7GByKe8TfhFdHdjyIDPFt7D+D6OP+1G7yxmNHzSrP
+ /0alf45SSeZbnNybSHQSkEsXQ5GN23f3O2+5L/4iEKHIOaIYSf43NQCUg+T6vMn343mTnLw8l
+ fRG2ict5eA8JYdLNIsf4VpvS6CJNaeILE40A4nFyN6+Byv5lpkGQBmJfCXsdn3i6Bgnn/lG0z
+ oB/fciBqwR38r9NsTCv58/6ulBoJKPqVRpHiRofMIg82ubJ06k=
+Received-SPF: none client-ip=212.227.126.130; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/10 09:10:17
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/10 09:10:20
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
 X-Spam_score_int: -28
 X-Spam_score: -2.9
 X-Spam_bar: --
@@ -82,61 +82,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-trivial@nongnu.org,
- Richard Henderson <richard.henderson@linaro.org>,
+Cc: qemu-trivial@nongnu.org, Richard Henderson <richard.henderson@linaro.org>,
  Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-memory_region_set_size() handle the 16 Exabytes limit by
-special-casing the UINT64_MAX value. This is not a problem
-for the 32-bit maximum, 4 GiB.
-By using the UINT32_MAX value, the aspeed-ram-container
-MemoryRegion ends up missing 1 byte:
+Use the common API for semihosting logging.
 
- $ qemu-system-arm -M ast2600-evb -S -monitor stdio
- (qemu) info mtree
-
-  address-space: aspeed.fmc-ast2600-dma-dram
-    0000000080000000-000000017ffffffe (prio 0, i/o): aspeed-ram-container
-      0000000080000000-00000000bfffffff (prio 0, ram): ram
-      00000000c0000000-ffffffffffffffff (prio 0, i/o): max_ram
-
-Fix by using the correct value. We now have:
-
-  address-space: aspeed.fmc-ast2600-dma-dram
-    0000000080000000-000000017fffffff (prio 0, i/o): aspeed-ram-container
-      0000000080000000-00000000bfffffff (prio 0, ram): ram
-      00000000c0000000-ffffffffffffffff (prio 0, i/o): max_ram
-
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Cédric Le Goater <clg@kaod.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20200601142930.29408-2-f4bug@amsat.org>
+Message-Id: <20200603123754.19059-4-f4bug@amsat.org>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- hw/arm/aspeed.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ default-configs/unicore32-softmmu.mak |  1 +
+ target/unicore32/helper.c             | 57 +++------------------------
+ 2 files changed, 6 insertions(+), 52 deletions(-)
 
-diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
-index 2c23297edf07..62344ac6a3a2 100644
---- a/hw/arm/aspeed.c
-+++ b/hw/arm/aspeed.c
-@@ -262,7 +262,7 @@ static void aspeed_machine_init(MachineState *machine)
-     bmc = g_new0(AspeedBoardState, 1);
+diff --git a/default-configs/unicore32-softmmu.mak b/default-configs/unicore32-softmmu.mak
+index 0bfce48c6da7..899288e3d715 100644
+--- a/default-configs/unicore32-softmmu.mak
++++ b/default-configs/unicore32-softmmu.mak
+@@ -3,3 +3,4 @@
+ # Boards:
+ #
+ CONFIG_PUV3=y
++CONFIG_SEMIHOSTING=y
+diff --git a/target/unicore32/helper.c b/target/unicore32/helper.c
+index 00371a7da660..54c26871feab 100644
+--- a/target/unicore32/helper.c
++++ b/target/unicore32/helper.c
+@@ -14,9 +14,7 @@
+ #include "cpu.h"
+ #include "exec/exec-all.h"
+ #include "exec/helper-proto.h"
+-#ifndef CONFIG_USER_ONLY
+-#include "ui/console.h"
+-#endif
++#include "hw/semihosting/console.h"
  
-     memory_region_init(&bmc->ram_container, NULL, "aspeed-ram-container",
--                       UINT32_MAX);
-+                       4 * GiB);
-     memory_region_add_subregion(&bmc->ram_container, 0, machine->ram);
+ #undef DEBUG_UC32
  
-     object_initialize_child(OBJECT(machine), "soc", &bmc->soc,
+@@ -161,58 +159,13 @@ uint32_t helper_cp0_get(CPUUniCore32State *env, uint32_t creg, uint32_t cop)
+     return 0;
+ }
+ 
+-#ifdef CONFIG_CURSES
+-
+-/* KEY_EVENT is defined in wincon.h and in curses.h. Avoid redefinition. */
+-#undef KEY_EVENT
+-#include <curses.h>
+-#undef KEY_EVENT
+-
+-/*
+- * FIXME:
+- *     1. curses windows will be blank when switching back
+- *     2. backspace is not handled yet
+- */
+-static void putc_on_screen(unsigned char ch)
++void helper_cp1_putc(target_ulong regval)
+ {
+-    static WINDOW *localwin;
+-    static int init;
+-
+-    if (!init) {
+-        /* Assume 80 * 30 screen to minimize the implementation */
+-        localwin = newwin(30, 80, 0, 0);
+-        scrollok(localwin, TRUE);
+-        init = TRUE;
+-    }
++    const char c = regval;
+ 
+-    if (isprint(ch)) {
+-        wprintw(localwin, "%c", ch);
+-    } else {
+-        switch (ch) {
+-        case '\n':
+-            wprintw(localwin, "%c", ch);
+-            break;
+-        case '\r':
+-            /* If '\r' is put before '\n', the curses window will destroy the
+-             * last print line. And meanwhile, '\n' implifies '\r' inside. */
+-            break;
+-        default: /* Not handled, so just print it hex code */
+-            wprintw(localwin, "-- 0x%x --", ch);
+-        }
+-    }
+-
+-    wrefresh(localwin);
+-}
+-#else
+-#define putc_on_screen(c)               do { } while (0)
+-#endif
+-
+-void helper_cp1_putc(target_ulong x)
+-{
+-    putc_on_screen((unsigned char)x);   /* Output to screen */
+-    DPRINTF("%c", x);                   /* Output to stdout */
++    qemu_semihosting_log_out(&c, sizeof(c));
+ }
+-#endif
++#endif /* !CONFIG_USER_ONLY */
+ 
+ bool uc32_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
+ {
 -- 
 2.26.2
 
