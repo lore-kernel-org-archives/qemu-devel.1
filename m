@@ -2,61 +2,86 @@ Return-Path: <SRS0=wemX=7X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E733FC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:32:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11713C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:33:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BAF2320760
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:32:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BAF2320760
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id CA3322067B
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:33:17 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UFABh77h"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA3322067B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43558 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46250 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jj0qF-0005bC-TA
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 09:32:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58612)
+	id 1jj0qz-00071M-1v
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 09:33:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50406)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jj0ob-00043l-BY; Wed, 10 Jun 2020 09:30:49 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:33295)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jj0oX-0000bD-UL; Wed, 10 Jun 2020 09:30:47 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.1192751|-1; CH=blue; DM=|OVERLOAD|false|;
- DS=CONTINUE|ham_system_inform|0.0209329-0.00023831-0.978829;
- FP=0|0|0|0|0|-1|-1|-1; HT=e01a16384; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=8; RT=8; SR=0; TI=SMTPD_---.HkbavJv_1591795839; 
-Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.HkbavJv_1591795839)
- by smtp.aliyun-inc.com(10.147.40.44); Wed, 10 Jun 2020 21:30:39 +0800
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-To: qemu-devel@nongnu.org,
-	qemu-riscv@nongnu.org
-Subject: [PATCH v9 56/61] target/riscv: integer scalar move instruction
-Date: Wed, 10 Jun 2020 19:37:43 +0800
-Message-Id: <20200610113748.4754-57-zhiwei_liu@c-sky.com>
-X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20200610113748.4754-1-zhiwei_liu@c-sky.com>
-References: <20200610113748.4754-1-zhiwei_liu@c-sky.com>
+ (Exim 4.90_1) (envelope-from <mprivozn@redhat.com>)
+ id 1jj0c2-0001I9-0x
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 09:17:50 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56029
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mprivozn@redhat.com>)
+ id 1jj0c0-0005bD-CT
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 09:17:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591795066;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=UsUrkXC7N0Uw3M1ZNKMfpakBoCCPiiIIV7CKSN7BUQM=;
+ b=UFABh77hz6bX0THz61uMbwNnHNhvF0NIg1/VJ+mmv8SewXkF69MM7tUv8DSs/ReNFC+7PN
+ Spp3g1chZAu4QhgXBPnftG5sMr3dAwoxnJ7NlY2nocFWL0yxwzzy7p7luLsIRAQSvqbhlz
+ wzVqtka36m/VTd7iN9fEOVc25Aami3A=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-507-yslS28sDPyamS7iV4HE5lw-1; Wed, 10 Jun 2020 09:17:45 -0400
+X-MC-Unique: yslS28sDPyamS7iV4HE5lw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8328684B842
+ for <qemu-devel@nongnu.org>; Wed, 10 Jun 2020 13:17:44 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.40.195.12])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 02955100238E
+ for <qemu-devel@nongnu.org>; Wed, 10 Jun 2020 13:17:43 +0000 (UTC)
+From: Michal Privoznik <mprivozn@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 2/2] qemu-options.hx: Document hmat-lb and hmat-cache order
+Date: Wed, 10 Jun 2020 15:17:35 +0200
+Message-Id: <5bd3f4a03227658cbdb1d184518c7805c1c0122f.1591794890.git.mprivozn@redhat.com>
+In-Reply-To: <cover.1591794890.git.mprivozn@redhat.com>
+References: <cover.1591794890.git.mprivozn@redhat.com>
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: none client-ip=121.197.200.217;
- envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/10 07:37:52
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001, UNPARSEABLE_RELAY=0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=mprivozn@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 21:17:20
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -69,117 +94,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: richard.henderson@linaro.org, wxy194768@alibaba-inc.com,
- wenmeng_zhang@c-sky.com, Alistair.Francis@wdc.com, palmer@dabbelt.com,
- LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/riscv/insn32.decode              |  1 +
- target/riscv/insn_trans/trans_rvv.inc.c | 60 +++++++++++++++++++++++++
- target/riscv/internals.h                |  6 +++
- 3 files changed, 67 insertions(+)
+To simplify internal implementation the hmat-cache parsing code
+expects hmat-lb to be already parsed. This means, that hmat-lb
+arguments must come before hmat-cache. Document this restriction
+so that management applications can follow it.
 
-diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index 26dd0f1b1b..0741a25540 100644
---- a/target/riscv/insn32.decode
-+++ b/target/riscv/insn32.decode
-@@ -562,6 +562,7 @@ vmsof_m         010110 . ..... 00010 010 ..... 1010111 @r2_vm
- viota_m         010110 . ..... 10000 010 ..... 1010111 @r2_vm
- vid_v           010110 . 00000 10001 010 ..... 1010111 @r1_vm
- vext_x_v        001100 1 ..... ..... 010 ..... 1010111 @r
-+vmv_s_x         001101 1 00000 ..... 110 ..... 1010111 @r2
+Signed-off-by: Michal Privoznik <mprivozn@redhat.com>
+---
+ qemu-options.hx | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/qemu-options.hx b/qemu-options.hx
+index b1a399079a..3fe9e6d6a0 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -319,6 +319,9 @@ SRST
+     'none/direct(direct-mapped)/complex(complex cache indexing)'. policy
+     is the write policy. line is the cache Line size in bytes.
  
- vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
- vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
-diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index 0dedf4983d..e67eff0a7f 100644
---- a/target/riscv/insn_trans/trans_rvv.inc.c
-+++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -2649,3 +2649,63 @@ static bool trans_vext_x_v(DisasContext *s, arg_r *a)
-     tcg_temp_free_i64(tmp);
-     return true;
- }
++    Please note, that due to internal implementation, '\ ``hmat-cache``\ '
++    must be configured only after '\ ``hmat-lb``\ ' option.
 +
-+/* Integer Scalar Move Instruction */
-+
-+static void store_element(TCGv_i64 val, TCGv_ptr base,
-+                          int ofs, int sew)
-+{
-+    switch (sew) {
-+    case MO_8:
-+        tcg_gen_st8_i64(val, base, ofs);
-+        break;
-+    case MO_16:
-+        tcg_gen_st16_i64(val, base, ofs);
-+        break;
-+    case MO_32:
-+        tcg_gen_st32_i64(val, base, ofs);
-+        break;
-+    case MO_64:
-+        tcg_gen_st_i64(val, base, ofs);
-+        break;
-+    default:
-+        g_assert_not_reached();
-+        break;
-+    }
-+}
-+
-+/*
-+ * Store vreg[idx] = val.
-+ * The index must be in range of VLMAX.
-+ */
-+static void vec_element_storei(DisasContext *s, int vreg,
-+                               int idx, TCGv_i64 val)
-+{
-+    store_element(val, cpu_env, endian_ofs(s, vreg, idx), s->sew);
-+}
-+
-+/* vmv.s.x vd, rs1 # vd[0] = rs1 */
-+static bool trans_vmv_s_x(DisasContext *s, arg_vmv_s_x *a)
-+{
-+    if (vext_check_isa_ill(s)) {
-+        /* This instruction ignores LMUL and vector register groups */
-+        int maxsz = s->vlen >> 3;
-+        TCGv_i64 t1;
-+        TCGLabel *over = gen_new_label();
-+
-+        tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_vl, 0, over);
-+        tcg_gen_gvec_dup_imm(SEW64, vreg_ofs(s, a->rd), maxsz, maxsz, 0);
-+        if (a->rs1 == 0) {
-+            goto done;
-+        }
-+
-+        t1 = tcg_temp_new_i64();
-+        tcg_gen_extu_tl_i64(t1, cpu_gpr[a->rs1]);
-+        vec_element_storei(s, a->rd, 0, t1);
-+        tcg_temp_free_i64(t1);
-+    done:
-+        gen_set_label(over);
-+        return true;
-+    }
-+    return false;
-+}
-diff --git a/target/riscv/internals.h b/target/riscv/internals.h
-index f3cea478f7..37d33820ad 100644
---- a/target/riscv/internals.h
-+++ b/target/riscv/internals.h
-@@ -32,4 +32,10 @@ FIELD(VDATA, WD, 11, 1)
- target_ulong fclass_h(uint64_t frs1);
- target_ulong fclass_s(uint64_t frs1);
- target_ulong fclass_d(uint64_t frs1);
-+
-+#define SEW8  0
-+#define SEW16 1
-+#define SEW32 2
-+#define SEW64 3
-+
- #endif
+     For example, the following options describe 2 NUMA nodes. Node 0 has
+     2 cpus and a ram, node 1 has only a ram. The processors in node 0
+     access memory in node 0 with access-latency 5 nanoseconds,
 -- 
-2.23.0
+2.26.2
 
 
