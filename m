@@ -2,122 +2,151 @@ Return-Path: <SRS0=wemX=7X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB456C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 14:14:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E8C2C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 14:22:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7606C2067B
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 14:14:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CD7572067B
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 14:22:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ad26TQm6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7606C2067B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DIh4XhZB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD7572067B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38408 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44372 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jj1V5-00039y-MA
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 10:14:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46192)
+	id 1jj1cQ-00074j-1o
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 10:22:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52112)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jj1UJ-0002Oa-3v
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 10:13:55 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26396
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jj1bh-0006Xt-0Z
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 10:21:33 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:59889
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jj1UI-0002V9-9K
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 10:13:54 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jj1bf-0004Wr-CD
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 10:21:32 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591798433;
+ s=mimecast20190719; t=1591798889;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=vQGmaF3kJuwxZRfFPgkkAxZRnaRj43xPvFfzjX5dh88=;
- b=ad26TQm6n4zvt+IAWJaS9SAU3nRH7LwwiSQmHf6eYDsAcTMZ+axOdVYCm2lu8ykEAny4x7
- o4OOl7ZkcqujXlFNUtzSAm2iT1a3gCUzbaK+Ilh7xwLg4PMGfiQskAfUfPbDW8+Lk5oKxE
- 1FzW7njivU7Xv3cY41Agn3BGHemgr7o=
+ bh=ztwL5FnfrPOszGc4SkJmkDeoNJO/4EDRPRsH01HLsLg=;
+ b=DIh4XhZBupxtR7LEn10v3JKMaWlAmbjirYlHTmSK/6oH9DTJBvIpy3kKOpIxIxSPr5usV0
+ ZI9nLklc7mVbdVkYExmJjW32VqhMkIkynWkQlO6CP+TorO3Q2vXECeMfzcBk4pBMdu0djW
+ FaXYhYV2jw4vuOI65qT8x32TlTB4v1w=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-510-1tyO6TELM-2iYkoxtz2SDQ-1; Wed, 10 Jun 2020 10:13:49 -0400
-X-MC-Unique: 1tyO6TELM-2iYkoxtz2SDQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-88-F4dwqXnEMACNtvulP20-0w-1; Wed, 10 Jun 2020 10:21:26 -0400
+X-MC-Unique: F4dwqXnEMACNtvulP20-0w-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0AEA2461;
- Wed, 10 Jun 2020 14:13:48 +0000 (UTC)
-Received: from [10.36.114.42] (ovpn-114-42.ams2.redhat.com [10.36.114.42])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C039F5D9E5;
- Wed, 10 Jun 2020 14:13:39 +0000 (UTC)
-Subject: Re: [PATCH v4 02/21] vfio: Convert to ram_block_discard_disable()
-To: Tony Krowiak <akrowiak@linux.ibm.com>, qemu-devel@nongnu.org
-References: <20200610115419.51688-1-david@redhat.com>
- <20200610115419.51688-3-david@redhat.com>
- <8c71bfda-e958-56f8-ddaf-6a831fff2bc6@linux.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <56d20632-cab6-5768-ce9f-96f6587e4c2f@redhat.com>
-Date: Wed, 10 Jun 2020 16:13:38 +0200
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EE603800053;
+ Wed, 10 Jun 2020 14:21:25 +0000 (UTC)
+Received: from [10.10.117.188] (ovpn-117-188.rdu2.redhat.com [10.10.117.188])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C40547B91C;
+ Wed, 10 Jun 2020 14:21:24 +0000 (UTC)
+Subject: Re: [PATCH 00/16] Crazy shit around -global (pardon my french)
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20200605145625.2920920-1-armbru@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
+ IYzhgrPEe7ZmPxbCSe4iMykjhwMh5byIHDoPGDU+FsQty2KXuoxto+ZdrP9gymAgmyqdk3aV
+ vzzmCa3cOppcqKvA0Kqr10UeX/z4OMVV390V+DVWUvzXpda45/Sxup57pk+hyY52wxxjIqef
+ rj8u5BN93s5uCVTus0oiVA6W+iXYzTvVDStMFVqnTxSxlpZoH5RGKvmoWV3uutByQyBPHW2U
+ 1Y6n6iEZ9MlP3hcDqlo0S8jeP03HaD4gOqCuqLceWF5+2WyHzNfylpNMFVi+Hp0H/nSDtCvQ
+ ua7j+6Pt7q5rvqgHvRipkDDVsjqwasuNc3wyoHexrBeLU/iJBuDld5iLy+dHXoYMB3HmjMxj
+ 3K5/8XhGrDx6BDFeO3HIpi3u2z1jniB7RtyVEtdupED6lqsDj0oSz9NxaOFZrS3Jf6z/kHIf
+ h42mM9Sx7+s4c07N2LieUxcfqhFTaa/voRibF4cmkBVUhOD1AKXNfhEsTvmcz9NbUchCkcvA
+ T9119CrsxfVsE7bXiGvdXnzyGLXdsoosjzwacKdOrVaDmN3Uy+SHiQXo6TlkSdV0XH2PUxTM
+ LsBFIO9qXO43Ai6J6iPAP/01l8fuZfpJE0/L/c25yyaND7xA3wARAQABtCpKb2huIFNub3cg
+ KEpvaG4gSHVzdG9uKSA8anNub3dAcmVkaGF0LmNvbT6JAlQEEwECAD4CGwMCHgECF4AFCwkI
+ BwMFFQoJCAsFFgIDAQAWIQT665cRoSz0dYEvGPKIqQZNGDVh6wUCXF392gUJC1Xq3gAKCRCI
+ qQZNGDVh6558D/9pM4pu4njX5aT6uUW3vAmbWLF1jfPxiTQgSHAnm9EBMZED/fsvkzj97clo
+ LN7JKmbYZNgJmR01A7flG45V4iOR/249qAfaVuD+ZzZi1R4jFzr13WS+IEdn0hYp9ITndb7R
+ ezW+HGu6/rP2PnfmDnNowgJu6Dp6IUEabq8SXXwGHXZPuMIrsXJxUdKJdGnh1o2u7271yNO7
+ J9PEMuMDsgjsdnaGtv7aQ9CECtXvBleAc06pLW2HU10r5wQyBMZGITemJdBhhdzGmbHAL0M6
+ vKi/bafHRWqfMqOAdDkv3Jg4arl2NCG/uNateR1z5e529+UlB4XVAQT+f5T/YyI65DFTY940
+ il3aZhA8u788jZEPMXmt94u7uPZbEYp7V0jt68SrTaOgO7NaXsboXFjwEa42Ug5lB5d5/Qdp
+ 1AITUv0NJ51kKwhHL1dEagGeloIsGVQILmpS0MLdtitBHqZLsnJkRvtMaxo47giyBlv2ewmq
+ tIGTlVLxHx9xkc9aVepOuiGlZaZB72c9AvZs9rKaAjgU2UfJHlB/Hr4uSk/1EY0IgMv4vnsG
+ 1sA5gvS7A4T4euu0PqHtn2sZEWDrk5RDbw0yIb53JYdXboLFmFXKzVASfKh2ZVeXRBlQQSJi
+ 3PBR1GzzqORlfryby7mkY857xzCI2NkIkD2eq+HhzFTfFOTdGrkCDQRUynn8ARAAwbhP45BE
+ d/zAMBPV2dk2WwIwKRSKULElP3kXpcuiDWYQob3UODUUqClO+3aXVRndaNmZX9WbzGYexVo3
+ 5j+CVBCGr3DlU8AL9pp3KQ3SJihWcDed1LSmUf8tS+10d6mdGxDqgnd/OWU214isvhgWZtZG
+ MM/Xj7cx5pERIiP+jqu7PT1cibcfcEKhPjYdyV1QnLtKNGrTg/UMKaL+qkWBUI/8uBoa0HLs
+ NH63bXsRtNAG8w6qG7iiueYZUIXKc4IHINUguqYQJVdSe+u8b2N5XNhDSEUhdlqFYraJvX6d
+ TjxMTW5lzVG2KjztfErRNSUmu2gezbw1/CV0ztniOKDA7mkQi6UIUDRh4LxRm5mflfKiCyDQ
+ L6P/jxHBxFv+sIgjuLrfNhIC1p3z9rvCh+idAVJgtHtYl8p6GAVrF+4xQV2zZH45tgmHo2+S
+ JsLPjXZtWVsWANpepXnesyabWtNAV4qQB7/SfC77zZwsVX0OOY2Qc+iohmXo8U7DgXVDgl/R
+ /5Qgfnlv0/3rOdMt6ZPy5LJr8D9LJmcP0RvX98jyoBOf06Q9QtEwJsNLCOCo2LKNL71DNjZr
+ nXEwjUH66CXiRXDbDKprt71BiSTitkFhGGU88XCtrp8R9yArXPf4MN+wNYBjfT7K29gWTzxt
+ 9DYQIvEf69oZD5Z5qHYGp031E90AEQEAAYkCPAQYAQIAJgIbDBYhBPrrlxGhLPR1gS8Y8oip
+ Bk0YNWHrBQJcXf3JBQkLVerNAAoJEIipBk0YNWHrU1AP/1FOK2SBGbyhHa5vDHuf47fgLipC
+ e0/h1E0vdSonzlhPxuZoQ47FjzG9uOhqqQG6/PqtWs/FJIyz8aGG4aV+pSA/9Ko3/2ND8MSY
+ ZflWs7Y8Peg08Ro01GTHFITjEUgHpTpHiT6TNcZB5aZNJ8jqCtW5UlqvXXbVeSTmO70ZiVtc
+ vUJbpvSxYmzhFfZWaXIPcNcKWL1rnmnzs67lDhMLdkYVf91aml/XtyMUlfB8Iaejzud9Ht3r
+ C0pA9MG57pLblX7okEshxAC0+tUdY2vANWFeX0mgqRt1GSuG9XM9H/cKP1czfUV/FgaWo/Ya
+ fM4eMhUAlL/y+/AJxxumPhBXftM4yuiktp2JMezoIMJI9fmhjfWDw7+2jVrx9ze1joLakFD1
+ rVAoHxVJ7ORfQ4Ni/qWbQm3T6qQkSMt4N/scNsMczibdTPxU7qtwQwIeFOOc3wEwmJ9Qe3ox
+ TODQ0agXiWVj0OXYCHJ6MxTDswtyTGQW+nUHpKBgHGwUaR6d1kr/LK9+5LpOfRlK9VRfEu7D
+ PGNiRkr8Abp8jHsrBqQWfUS1bAf62bq6XUel0kUCtb7qCq024aOczXYWPFpJFX+nhp4d7NeH
+ Edq+wlC13sBSiSHC7T5yssJ+7JPa2ATLlSKhEvBsLe2TsSTTtFlA0nBclqhfJXzimiuge9qU
+ E40lvMWBuQINBFTKimUBEADDbJ+pQ5M4QBMWkaWImRj7c598xIZ37oKM6rGaSnuB1SVb7YCr
+ Ci2MTwQcrQscA2jm80O8VFqWk+/XsEp62dty47GVwSfdGje/3zv3VTH2KhOCKOq3oPP5ZXWY
+ rz2d2WnTvx++o6lU7HLHDEC3NGLYNLkL1lyVxLhnhvcMxkf1EGA1DboEcMgnJrNB1pGP27ww
+ cSfvdyPGseV+qZZa8kuViDga1oxmnYDxFKMGLxrClqHrRt8geQL1Wj5KFM5hFtGTK4da5lPn
+ wGNd6/CINMeCT2AWZY5ySz7/tSZe5F22vPvVZGoPgQicYWdNc3ap7+7IKP86JNjmec/9RJcz
+ jvrYjJdiqBVldXou72CtDydKVLVSKv8c2wBDJghYZitfYIaL8cTvQfUHRYTfo0n5KKSec8Vo
+ vjDuxmdbOUBA+SkRxqmneP5OxGoZ92VusrwWCjry8HRsNdR+2T+ClDCO6Wpihu4V3CPkQwTy
+ eCuMHPAT0ka5paTwLrnZIxsdfnjUa96T10vzmQgAxpbbiaLvgKJ8+76OPdDnhddyxd2ldYfw
+ RkF5PEGg3mqZnYKNNBtwjvX49SAvgETQvLzQ8IKVgZS0m4z9qHHvtc1BsQnFfe+LJOFjzZr7
+ CrDNJMqk1JTHYsSi2JcN3vY32WMezXSQ0TzeMK4kdnclSQyp/h23GWod5QARAQABiQRbBBgB
+ AgAmAhsCFiEE+uuXEaEs9HWBLxjyiKkGTRg1YesFAlxd/coFCQtV2mQCKcFdIAQZAQIABgUC
+ VMqKZQAKCRB974EGqvw5DiJoEACLmuiRq9ifvOh5DyBFwRS7gvA14DsGQngmC57EzV0EFcfM
+ XVi1jX5OtwUyUe0Az5r6lHyyHDsDsIpLKBlWrYCeLpUhRR3oy181T7UNxvujGFeTkzvLAOo6
+ Hs3b8Wv9ARg+7acRYkQRNY7k0GIJ6YZz149tRyRKAy/vSjsaB9Lt0NOd1wf2EQMKwRVELwJD
+ y0AazGn+0PRP7Bua2YbtxaBmhBBDb2tPpwn8U9xdckB4Vlft9lcWNsC/18Gi9bpjd9FSbdH/
+ sOUI+3ToWYENeoT4IP09wn6EkgWaJS3nAUN/MOycNej2i4Yhy2wDDSKyTAnVkSSSoXk+tK91
+ HfqtokbDanB8daP+K5LgoiWHzjfWzsxA2jKisI4YCGjrYQzTyGOT6P6u6SEeoEx10865B/zc
+ 8/vN50kncdjYz2naacIDEKQNZlnGLsGkpCbfmfdi3Zg4vuWKNdWr0wGUzDUcpqW0y/lUXna+
+ 6uyQShX5e4JD2UPuf9WAQ9HtgSAkaDd4O1I2J41sleePzZOVB3DmYgy+ECRJJ5nw3ihdxpgc
+ y/v3lfcJaqiyCv0PF+K/gSOvwhH7CbVqARmptT7yhhxqFdaYWo2Z2ksuKyoKSRMFCXQY5oac
+ uTmyPIT4STFyUQFeqSCWDum/NFNoSKhmItw2Td+4VSJHShRVbg39KNFPZ7mXYAkQiKkGTRg1
+ YesWJA/+PV3qDUtPNEGwjVvjQqHSbrBy94tu6gJvPHgGPtRDYvxnCaJsmgiC0pGB2KFRsnfl
+ 2zBNBEWF/XwsI081jQE5UO60GKmHTputChLXpVobyuc+lroG2YhknXRBAV969SLnZR4BS/1s
+ Gi046gOXfaKYatve8BiZr5it5Foq3FMPDNgZMit1H9Dk8rkKFfDMRf8EGS/Z+TmyEsIf99H7
+ TH3n7lco8qO81fSFwkh4pvo2kWRFYTC5vsIVQ+GqVUp+W1DZJHxX8LwWuF1AzUt4MUTtNAvy
+ TXl5EgsmoY9mpNNL7ZnW65oG63nEP5KNiybvuQJzXVxR8eqzOh2Mod4nHg3PE7UCd3DvLNsn
+ GXFRo44WyT/G2lArBtjpkut7bDm0i1nENABy2UgS+1QvdmgNu6aEZxdNthwRjUhuuvCCDMA4
+ rCDQYyakH2tJNQgkXkeLodBKF4bHiBbuwj0E39S9wmGgg+q4OTnAO/yhQGknle7a7G5xHBwE
+ i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
+ RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
+ glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
+Message-ID: <8425ecd8-a0d9-684a-85ef-05ea56c6e782@redhat.com>
+Date: Wed, 10 Jun 2020 10:21:24 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <8c71bfda-e958-56f8-ddaf-6a831fff2bc6@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200605145625.2920920-1-armbru@redhat.com>
 Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=david@redhat.com;
- helo=us-smtp-1.mimecast.com
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=jsnow@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 23:51:15
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
@@ -139,101 +168,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eric Farman <farman@linux.ibm.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
- "Michael S . Tsirkin" <mst@redhat.com>, Pierre Morel <pmorel@linux.ibm.com>,
- Cornelia Huck <cohuck@redhat.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: kwolf@redhat.com, berrange@redhat.com, ehabkost@redhat.com,
+ qemu-block@nongnu.org, mreitz@redhat.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10.06.20 15:04, Tony Krowiak wrote:
-> 
-> 
-> On 6/10/20 7:54 AM, David Hildenbrand wrote:
->> VFIO is (except devices without a physical IOMMU or some mediated devices)
->> incompatible with discarding of RAM. The kernel will pin basically all VM
->> memory. Let's convert to ram_block_discard_disable(), which can now
->> fail, in contrast to qemu_balloon_inhibit().
->>
->> Leave "x-balloon-allowed" named as it is for now.
->>
->> Cc: Cornelia Huck <cohuck@redhat.com>
->> Cc: Alex Williamson <alex.williamson@redhat.com>
->> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
->> Cc: Tony Krowiak <akrowiak@linux.ibm.com>
->> Cc: Halil Pasic <pasic@linux.ibm.com>
->> Cc: Pierre Morel <pmorel@linux.ibm.com>
->> Cc: Eric Farman <farman@linux.ibm.com>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
-> 
-> See my two minor comments, other than that:
-> Reviewed-by: Tony Krowiak <akrowiak@linux.ibm.com>
-> 
->> ---
->>   hw/vfio/ap.c                  | 10 +++----
->>   hw/vfio/ccw.c                 | 11 ++++----
->>   hw/vfio/common.c              | 53 +++++++++++++++++++----------------
->>   hw/vfio/pci.c                 |  6 ++--
->>   include/hw/vfio/vfio-common.h |  4 +--
->>   5 files changed, 45 insertions(+), 39 deletions(-)
->>
->> diff --git a/hw/vfio/ap.c b/hw/vfio/ap.c
->> index 95564c17ed..d0b1bc7581 100644
->> --- a/hw/vfio/ap.c
->> +++ b/hw/vfio/ap.c
->> @@ -105,12 +105,12 @@ static void vfio_ap_realize(DeviceState *dev, Error **errp)
->>       vapdev->vdev.dev = dev;
->>   
->>       /*
->> -     * vfio-ap devices operate in a way compatible with
->> -     * memory ballooning, as no pages are pinned in the host.
->> -     * This needs to be set before vfio_get_device() for vfio common to
->> -     * handle the balloon inhibitor.
->> +     * vfio-ap devices operate in a way compatible discarding of memory in
-> 
-> s/compatible discarding/compatible with discarding/?
 
-Very right!
 
-[...]
->> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
->> index 342dd6b912..c33c11b7e4 100644
->> --- a/hw/vfio/pci.c
->> +++ b/hw/vfio/pci.c
->> @@ -2796,7 +2796,7 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
->>       }
->>   
->>       /*
->> -     * Mediated devices *might* operate compatibly with memory ballooning, but
->> +     * Mediated devices *might* operate compatibly with discarding of RAM, but
->>        * we cannot know for certain, it depends on whether the mdev vendor driver
->>        * stays in sync with the active working set of the guest driver.  Prevent
->>        * the x-balloon-allowed option unless this is minimally an mdev device.
->> @@ -2809,7 +2809,7 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
->>   
->>       trace_vfio_mdev(vdev->vbasedev.name, is_mdev);
->>   
->> -    if (vdev->vbasedev.balloon_allowed && !is_mdev) {
->> +    if (vdev->vbasedev.ram_block_discard_allowed && !is_mdev) {
->>           error_setg(errp, "x-balloon-allowed only potentially compatible "
->>                      "with mdev devices");
+On 6/5/20 10:56 AM, Markus Armbruster wrote:
+> There are three ways to configure backends:
 > 
-> Should this error message be changed?
+> * -nic, -serial, -drive, ... (onboard devices)
+> 
+> * Set the property with -device, or, if you feel masochistic, with
+>   -set device (pluggable devices)
+> 
+> * Set the property with -global (both)
+> 
+> The trouble is -global is terrible.
+> 
+> It gets applied in object_new(), which can't fail.  We treat failure
+> to apply -global as fatal error, except when hot-plugging, where we
+> treat it as warning *boggle*.  I'm not addressing that today.
+> 
+> Some code falls apart when you use both -global and the other way.
+> 
+> To make life more interesting, we gave -drive two roles: with
+> interface type other than none, it's for configuring onboard devices,
+> and with interface type none, it's for defining backends for use with
+> -device and such.  Since we neglect to require interface type none for
+> the latter, you can use one -drive in both roles.  This confuses the
+> code about as much as you, dear reader, probably are by now.
+> 
+> Because this still isn't interesting enough, there's yet another way
+> to configure backends, just for floppies: set the floppy controller's
+> property.  Goes back to the time when floppy wasn't a separate device,
+> and involves some Bad Magic.  Now -global can interact with itself!
+> 
+> Digging through all this took me an embarrassing amount of time.
+> Hair, too.
+> 
+> My patches reject some the silliest uses outright, and deprecate some
+> not so silly ones that have replacements.
+> 
+> Apply on top of my "[PATCH v2 00/58] qdev: Rework how we plug into the
+> parent bus".
+> 
+> Enjoy!
+> 
+> Based-on: <20200529134523.8477-1-armbru@redhat.com>
+> 
+> Markus Armbruster (16):
+>   iotests/172: Include "info block" in test output
+>   iotests/172: Cover empty filename and multiple use of drives
+>   iotests/172: Cover -global floppy.drive=...
+>   fdc: Reject clash between -drive if=floppy and -global isa-fdc
+>   fdc: Open-code fdctrl_init_isa()
+>   fdc: Deprecate configuring floppies with -global isa-fdc
+>   docs/qdev-device-use.txt: Update section "Default Devices"
+>   blockdev: Deprecate -drive with bogus interface type
+>   qdev: Eliminate get_pointer(), set_pointer()
+>   qdev: Improve netdev property override error a bit
+>   qdev: Reject drive property override
+>   qdev: Reject chardev property override
+>   qdev: Make qdev_prop_set_drive() match the other helpers
+>   arm/aspeed: Drop aspeed_board_init_flashes() parameter @errp
+>   sd/pxa2xx_mmci: Don't crash on pxa2xx_mmci_init() error
+>   sd/milkymist-memcard: Fix error API violation
+> 
+>  docs/qdev-device-use.txt            |  17 +-
+>  docs/system/deprecated.rst          |  34 ++
+>  include/hw/block/fdc.h              |   2 +-
+>  include/hw/qdev-properties.h        |  18 +-
+>  include/sysemu/blockdev.h           |   2 +
+>  blockdev.c                          |  27 +-
+>  hw/arm/aspeed.c                     |  16 +-
+>  hw/arm/cubieboard.c                 |   2 +-
+>  hw/arm/exynos4210.c                 |   2 +-
+>  hw/arm/imx25_pdk.c                  |   2 +-
+>  hw/arm/mcimx6ul-evk.c               |   2 +-
+>  hw/arm/mcimx7d-sabre.c              |   2 +-
+>  hw/arm/msf2-som.c                   |   4 +-
+>  hw/arm/nseries.c                    |   4 +-
+>  hw/arm/orangepi.c                   |   2 +-
+>  hw/arm/raspi.c                      |   2 +-
+>  hw/arm/sabrelite.c                  |   6 +-
+>  hw/arm/vexpress.c                   |   3 +-
+>  hw/arm/xilinx_zynq.c                |   7 +-
+>  hw/arm/xlnx-versal-virt.c           |   2 +-
+>  hw/arm/xlnx-zcu102.c                |  10 +-
+>  hw/block/fdc.c                      |  82 ++--
+>  hw/block/nand.c                     |   2 +-
+>  hw/block/pflash_cfi01.c             |   6 +-
+>  hw/block/pflash_cfi02.c             |   2 +-
+>  hw/core/qdev-properties-system.c    | 151 ++++---
+>  hw/core/qdev-properties.c           |  17 +
+>  hw/i386/pc.c                        |   8 +-
+>  hw/ide/qdev.c                       |   4 +-
+>  hw/isa/isa-superio.c                |  18 +-
+>  hw/m68k/q800.c                      |   3 +-
+>  hw/microblaze/petalogix_ml605_mmu.c |   5 +-
+>  hw/ppc/pnv.c                        |   3 +-
+>  hw/ppc/spapr.c                      |   4 +-
+>  hw/scsi/scsi-bus.c                  |   2 +-
+>  hw/sd/milkymist-memcard.c           |   2 +-
+>  hw/sd/pxa2xx_mmci.c                 |  15 +-
+>  hw/sd/sd.c                          |   2 +-
+>  hw/sd/ssi-sd.c                      |   3 +-
+>  hw/sparc64/sun4u.c                  |   9 +-
+>  hw/xtensa/xtfpga.c                  |   3 +-
+>  softmmu/vl.c                        |   8 +
+>  tests/qemu-iotests/172              |  27 +-
+>  tests/qemu-iotests/172.out          | 656 +++++++++++++++++++++++++---
+>  44 files changed, 928 insertions(+), 270 deletions(-)
+> 
 
-I didn't rename the property ("x-balloon-allowed"), so the error message
-is still correct.
+I'll be honest that I'm a little pre-occupied and possibly unable to
+review the fdc related changes in-depth. I generally trust your
+judgment, and will try to give it a quick scan.
 
-Thanks!
+You may treat any further silence as an ACK. Any breakage due to this
+policy is therefore assumed to be the liability of the maintainer.
 
--- 
-Thanks,
-
-David / dhildenb
+--js
 
 
