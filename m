@@ -2,88 +2,94 @@ Return-Path: <SRS0=wemX=7X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF584C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 16:45:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FCF1C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 16:46:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7AFA0206F4
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 16:45:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6A8392072E
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 16:46:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MdZj8DCe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7AFA0206F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uY1JMqYW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A8392072E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44024 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45344 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jj3rP-0007F1-Nl
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 12:45:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42744)
+	id 1jj3rx-0007lZ-NS
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 12:46:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42972)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jj3qT-0006ND-KM
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 12:44:57 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:22251
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jj3qS-0008Tt-UG
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 12:44:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591807496;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=wB4khYeT5Kk0OngYYHb5SBNKLmkbP50lSa7RRW+B72c=;
- b=MdZj8DCeZrnqDrPaRAHG219pwqkm9LCRpeFgq2tW5I4Q/ne/o92lDVz8x57Cc17l5tpkaN
- xO2kbo/YmSDi4iMu2yfhBHyaH82T9cDQjXi4NSSs5tGEsfhisTgJjOFxYjcCzuze7orcwr
- EVQ3nsj4d/1MW/KtMqntQsGE8xb14bU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-305-doLWGNaoOlyuNtlXB4N-mQ-1; Wed, 10 Jun 2020 12:44:52 -0400
-X-MC-Unique: doLWGNaoOlyuNtlXB4N-mQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B5B89107ACCD;
- Wed, 10 Jun 2020 16:44:50 +0000 (UTC)
-Received: from [10.3.113.22] (ovpn-113-22.phx2.redhat.com [10.3.113.22])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id BBBD9891E2;
- Wed, 10 Jun 2020 16:44:49 +0000 (UTC)
-Subject: Re: [PATCH v8 30/34] qcow2: Add prealloc field to QCowL2Meta
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-References: <cover.1591801197.git.berto@igalia.com>
- <259e53cff2911316e427c40001801004e6b4257d.1591801197.git.berto@igalia.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <a1626701-1a7e-ea18-4813-56e9dd72c8c8@redhat.com>
-Date: Wed, 10 Jun 2020 11:44:49 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jj3qz-0006u6-32
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 12:45:29 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:40407)
+ by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jj3qx-00006v-6N
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 12:45:28 -0400
+Received: by mail-wr1-x441.google.com with SMTP id h5so3051591wrc.7
+ for <qemu-devel@nongnu.org>; Wed, 10 Jun 2020 09:45:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=cKE9+s/S5ErwB6RGgztPCiR+RwyQs+EidymdltJQJdQ=;
+ b=uY1JMqYWIJ1nRrsescM9/SW1hzk3oTW1X9jEusnUmMYkq5Ak1yKzOEOvIGndaST2Or
+ 15cHaKuU3yn6Xe5wI6FuHglMDTaxZpbxWU8oMoanqkXyZvQx4eZjds1L2k47ny1NRkBa
+ PlcoDG0KH0RlmvAGcviaeptEMyKskUI/fB91Z3QsEf7A2QDJ6wCPSvQIPBWJvpMz/E1o
+ jeuXcytJMR3ouqHK4wqxQZ8eTCmpC/3ZTP/2i1r/TYszZRpunQMCV0TNATsIoTcWQoK/
+ 0lzdEgb/4RiInhz9VSXMzHBKPkOqYnlJ2vyNfEbXestLO6tBM8XwF9L4n3wiQg2BkqPb
+ fhpw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=cKE9+s/S5ErwB6RGgztPCiR+RwyQs+EidymdltJQJdQ=;
+ b=LqP9zN7rFCuGJPKnHbsz3wP/WOZHHgT7T21BM11rcvf91y9rbXm/dw2Jym6G18qZNG
+ S9EhfyIjOxTykFfNp1SWHC+2pbu+FlAqwZDhC/8UO/yprqLxkQYIsmfrRxptMCp40pgw
+ H1gYp2pdtZDVaAj5+7bX9etK+97bFSX25fRhy1U0gBo6lLqaWcS6Rr7iQ3ljVhoQ0AYY
+ CpGZN/hrcYujhWyWb3KrUOQOakYgSuJ2fHAWo2nAMkX5NwSelkFRiTKf7FBO92Yo6lyR
+ hzrUKTooT6EndujYUeMp+R/Z2w7jEjyatig4Yajg8VMwQYQxZPHAQL8tVSDRG+LzFQxH
+ NVmg==
+X-Gm-Message-State: AOAM530rVblI09wNw2LuAwQ3L+6NqPNyGPX4V9GfV6Q19k7e3ologr0E
+ 8jREpqU2U50gLuwNW1RvXrMPAA==
+X-Google-Smtp-Source: ABdhPJxIdHn69gy6p6v1tAwgvBAzVo9xqvL4IJUPWTr6KpunanKCwLmkD1tAGuq/BR8UmagBXn6Vjw==
+X-Received: by 2002:a5d:4c87:: with SMTP id z7mr4706393wrs.100.1591807517934; 
+ Wed, 10 Jun 2020 09:45:17 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id k12sm532601wrn.42.2020.06.10.09.45.16
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 10 Jun 2020 09:45:16 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id CE4141FF7E;
+ Wed, 10 Jun 2020 17:45:15 +0100 (BST)
+References: <20200609200738.445-1-robert.foley@linaro.org>
+User-agent: mu4e 1.5.2; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Robert Foley <robert.foley@linaro.org>
+Subject: Re: [PATCH v3 00/13] Add Thread Sanitizer support to QEMU
+In-reply-to: <20200609200738.445-1-robert.foley@linaro.org>
+Date: Wed, 10 Jun 2020 17:45:15 +0100
+Message-ID: <87mu5a50pw.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <259e53cff2911316e427c40001801004e6b4257d.1591801197.git.berto@igalia.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=eblake@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 23:22:15
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x441.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,42 +102,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Derek Su <dereksu@qnap.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Cc: peter.puhov@linaro.org, cota@braap.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/10/20 10:03 AM, Alberto Garcia wrote:
-> This field allows us to indicate that the L2 metadata update does not
-> come from a write request with actual data but from a preallocation
-> request.
-> 
-> For traditional images this does not make any difference, but for
-> images with extended L2 entries this means that the clusters are
-> allocated normally in the L2 table but individual subclusters are
-> marked as unallocated.
-> 
-> This will allow preallocating images that have a backing file.
-> 
-> There is one special case: when we resize an existing image we can
-> also request that the new clusters are preallocated. If the image
-> already had a backing file then we have to hide any possible stale
-> data and zero out the new clusters (see commit 955c7d6687 for more
-> details).
-> 
-> In this case the subclusters cannot be left as unallocated so the L2
-> bitmap must be updated.
-> 
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> ---
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Robert Foley <robert.foley@linaro.org> writes:
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+> Changes in v3:
+> - Fixed issue in tsan changes to start_switch_fiber(),=20
+>   found by --enable-sanitizers testing.
+> - Removed the UC_TRACE() code.
+> - Removed the tb_destroy callback.
+>
+> v2: https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg01534.html
+>
+> This patch series continues the work done by Emilio Cota and others to add
+> Thread Sanitizer (TSan) support to QEMU.
+>
+> The starting point for this work was Emilio's branch here:
+> https://github.com/cota/qemu/commits/tsan
+> specifically this commit: 0be125fc0afd47218b34d2019abdd19b644f3199
+>
+> The main purpose of this patch is to enable TSan support so that=20
+> QEMU developers can start using the tool.=20=20
+> We found this tool useful and even ran it on our recent changes in
+> the cpu-locks series, which fixes many warnings.
+> Clearly there is work to do here to clean up all the warnings. :)
+> We have also made an effort to introduce enough of the TSan suppression
+> mechanisms, so that others can continue this work.
+>
+> This series adds support for:
+> - configure option for --enable-tsan.
+> - testing.rst has the full details on how to use TSan with or without doc=
+ker,
+>   including all the suppression mechanisms.
+> - We added an Ubuntu 20.04 docker that supports TSan builds.
+> - test-tsan is a new docker test that builds and runs make check under TS=
+an.
+> - We added an example blacklist file for files or functions TSan should i=
+gnore=20
+>   at compile time.  This can now be specified manually.
+> - Added a suppression file for TSan to suppress certain warnings at run t=
+ime.
+> - Added tsan.h with annotations which also can be used to suppress
+> warnings.
 
+Queued to testing/next, thanks.
+
+--=20
+Alex Benn=C3=A9e
 
