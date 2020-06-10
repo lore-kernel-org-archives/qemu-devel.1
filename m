@@ -6,82 +6,82 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C730C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 05:51:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B15BC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 05:53:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EA5002074B
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 05:51:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D45962074B
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 05:53:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f2urARag"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA5002074B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V58kPkY3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D45962074B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38560 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43740 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jiteU-0007a2-6V
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 01:51:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42656)
+	id 1jitfa-0001Kg-2c
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 01:53:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42634)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jitMU-0005Me-Fd
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 01:33:18 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:45974
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jitMQ-0005Fh-Uk
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 01:33:15 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42754
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jitME-0003t3-29
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 01:33:18 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jitMD-0003rh-0C
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 01:33:14 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591767180;
+ s=mimecast20190719; t=1591767179;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=JV4Y/vtGLCBT77Wo1IIP2KtX7DxxCrx4zcZEtQ7eNEc=;
- b=f2urARagX0/+BGnvr/iIYEhXJcOne7U/i2fAW6sJI5YkyXQ5OGhtHWZYkKSAi3801Y33cD
- 0PUhDgqr9x1U3Owj7S8fZXfSGJiB1dnG/xHn5s5iPMicQSiJJl+CrDY/s0d0oU3L7dddUG
- 7ZIFzdgSRLBWRvX6AgU/9raN3zNeYY4=
+ bh=LN21TAO75aQBfGc7iA5pi/tk6JhwKVCIzDphOzDmXH0=;
+ b=V58kPkY338+sN8Pf2dBHMnL/yv+aGCn6AxSte90SyG8d0H8fkkIM9ZDnwD7qc+3Z5aauyS
+ DfIVMbGiShhC2SCYHZ5tm2vvQZO4WjqG8g6NSl5aJjqAI+2RpIgDBHjOOe18taGAi56z3Q
+ FrvAFrX7oC5bqpljh8qTqeI5K8TJ2A8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-422-TCZaMnoUM76uFpx6Onxbbw-1; Wed, 10 Jun 2020 01:32:56 -0400
-X-MC-Unique: TCZaMnoUM76uFpx6Onxbbw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-337-hvWqDWCTMPynpv7uKB7zDA-1; Wed, 10 Jun 2020 01:32:57 -0400
+X-MC-Unique: hvWqDWCTMPynpv7uKB7zDA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 457B81005510;
- Wed, 10 Jun 2020 05:32:55 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E0993107ACCD
+ for <qemu-devel@nongnu.org>; Wed, 10 Jun 2020 05:32:56 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
  [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E597C512FE;
- Wed, 10 Jun 2020 05:32:54 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B25A57BFEA;
+ Wed, 10 Jun 2020 05:32:56 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 3160C113846C; Wed, 10 Jun 2020 07:32:48 +0200 (CEST)
+ id C696B1138482; Wed, 10 Jun 2020 07:32:48 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH RESEND v3 23/58] ssi: Convert uses of
- ssi_create_slave_no_init() with Coccinelle
-Date: Wed, 10 Jun 2020 07:32:12 +0200
-Message-Id: <20200610053247.1583243-24-armbru@redhat.com>
+Subject: [PATCH RESEND v3 44/58] sysbus: New sysbus_realize(),
+ sysbus_realize_and_unref()
+Date: Wed, 10 Jun 2020 07:32:33 +0200
+Message-Id: <20200610053247.1583243-45-armbru@redhat.com>
 In-Reply-To: <20200610053247.1583243-1-armbru@redhat.com>
 References: <20200610053247.1583243-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 23:51:15
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 21:17:20
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,232 +96,87 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Paolo Bonzini <pbonzini@redhat.com>,
- Alistair Francis <alistair@alistair23.me>,
- Alistair Francis <alistair.francis@wdc.com>
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Replace
+Sysbus devices almost always plug into the main system bus.
+qdev_create() even has a convenience feature to make that easy: a null
+bus argument gets replaced by the main system bus.  qdev_realize() and
+qdev_realize_and_unref() do the same.
 
-    dev = ssi_create_slave_no_init(bus, type_name);
-    ...
-    qdev_init_nofail(dev);
+We can do better.  Provide convenience wrappers around qdev_realize()
+and qdev_realize_and_unref() that don't take a @bus argument.  They
+always pass the main system bus.
 
-by
-
-    dev = qdev_new(type_name);
-    ...
-    qdev_realize_and_unref(dev, bus, &error_fatal);
-
-Recent commit "qdev: New qdev_new(), qdev_realize(), etc." explains
-why.
-
-    @@
-    type SSIBus;
-    identifier bus;
-    expression dev, qbus, expr;
-    expression list args;
-    @@
-    -    bus = (SSIBus *)qbus;
-    +    bus = qbus; // TODO fix up decl
-         ...
-    -    dev = ssi_create_slave_no_init(bus, args);
-    +    dev = qdev_new(args);
-         ... when != dev = expr
-    -    qdev_init_nofail(dev);
-    +    qdev_realize_and_unref(dev, bus, &error_fatal);
-
-    @@
-    expression dev, bus, expr;
-    expression list args;
-    @@
-    -    dev = ssi_create_slave_no_init(bus, args);
-    +    dev = qdev_new(args);
-         ... when != dev = expr
-    -    qdev_init_nofail(dev);
-    +    qdev_realize_and_unref(dev, BUS(bus), &error_fatal);
-
-Bus declarations fixed up manually.
-
-Cc: Alistair Francis <alistair@alistair23.me>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/arm/aspeed.c                     |  4 ++--
- hw/arm/msf2-som.c                   |  8 ++++----
- hw/arm/sabrelite.c                  |  4 ++--
- hw/arm/xilinx_zynq.c                |  4 ++--
- hw/arm/xlnx-zcu102.c                | 16 ++++++++--------
- hw/microblaze/petalogix_ml605_mmu.c |  4 ++--
- 6 files changed, 20 insertions(+), 20 deletions(-)
+ include/hw/sysbus.h |  4 +++-
+ hw/core/sysbus.c    | 14 ++++++++++++--
+ 2 files changed, 15 insertions(+), 3 deletions(-)
 
-diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
-index 63a7105e8b..9c25d5da96 100644
---- a/hw/arm/aspeed.c
-+++ b/hw/arm/aspeed.c
-@@ -225,12 +225,12 @@ static void aspeed_board_init_flashes(AspeedSMCState *s, const char *flashtype,
-         DriveInfo *dinfo = drive_get_next(IF_MTD);
-         qemu_irq cs_line;
+diff --git a/include/hw/sysbus.h b/include/hw/sysbus.h
+index c4a1c0adfa..606095ba35 100644
+--- a/include/hw/sysbus.h
++++ b/include/hw/sysbus.h
+@@ -90,6 +90,9 @@ void sysbus_add_io(SysBusDevice *dev, hwaddr addr,
+                    MemoryRegion *mem);
+ MemoryRegion *sysbus_address_space(SysBusDevice *dev);
  
--        fl->flash = ssi_create_slave_no_init(s->spi, flashtype);
-+        fl->flash = qdev_new(flashtype);
-         if (dinfo) {
-             qdev_prop_set_drive(fl->flash, "drive", blk_by_legacy_dinfo(dinfo),
-                                 errp);
-         }
--        qdev_init_nofail(fl->flash);
-+        qdev_realize_and_unref(fl->flash, BUS(s->spi), &error_fatal);
++bool sysbus_realize(SysBusDevice *dev, Error **errp);
++bool sysbus_realize_and_unref(SysBusDevice *dev, Error **errp);
++
+ /**
+  * sysbus_init_child_obj:
+  * @parent: The parent object
+@@ -121,5 +124,4 @@ static inline DeviceState *sysbus_create_simple(const char *name,
+     return sysbus_create_varargs(name, addr, irq, NULL);
+ }
  
-         cs_line = qdev_get_gpio_in_named(fl->flash, SSI_GPIO_CS, 0);
-         sysbus_connect_irq(SYS_BUS_DEVICE(s), i + 1, cs_line);
-diff --git a/hw/arm/msf2-som.c b/hw/arm/msf2-som.c
-index e398703742..ca9cbe1acb 100644
---- a/hw/arm/msf2-som.c
-+++ b/hw/arm/msf2-som.c
-@@ -47,7 +47,7 @@ static void emcraft_sf2_s2s010_init(MachineState *machine)
-     MachineClass *mc = MACHINE_GET_CLASS(machine);
-     DriveInfo *dinfo = drive_get_next(IF_MTD);
-     qemu_irq cs_line;
--    SSIBus *spi_bus;
-+    BusState *spi_bus;
-     MemoryRegion *sysmem = get_system_memory();
-     MemoryRegion *ddr = g_new(MemoryRegion, 1);
+-
+ #endif /* HW_SYSBUS_H */
+diff --git a/hw/core/sysbus.c b/hw/core/sysbus.c
+index e8d08d349b..68b837ac85 100644
+--- a/hw/core/sysbus.c
++++ b/hw/core/sysbus.c
+@@ -217,7 +217,7 @@ void sysbus_init_ioports(SysBusDevice *dev, uint32_t ioport, uint32_t size)
+  * from being set to NULL to break the normal init/realize
+  * of some devices.
+  */
+-static void sysbus_realize(DeviceState *dev, Error **errp)
++static void sysbus_device_realize(DeviceState *dev, Error **errp)
+ {
+ }
  
-@@ -82,14 +82,14 @@ static void emcraft_sf2_s2s010_init(MachineState *machine)
-     soc = MSF2_SOC(dev);
+@@ -250,6 +250,16 @@ DeviceState *sysbus_create_varargs(const char *name,
+     return dev;
+ }
  
-     /* Attach SPI flash to SPI0 controller */
--    spi_bus = (SSIBus *)qdev_get_child_bus(dev, "spi0");
--    spi_flash = ssi_create_slave_no_init(spi_bus, "s25sl12801");
-+    spi_bus = qdev_get_child_bus(dev, "spi0");
-+    spi_flash = qdev_new("s25sl12801");
-     qdev_prop_set_uint8(spi_flash, "spansion-cr2nv", 1);
-     if (dinfo) {
-         qdev_prop_set_drive(spi_flash, "drive", blk_by_legacy_dinfo(dinfo),
-                                     &error_fatal);
-     }
--    qdev_init_nofail(spi_flash);
-+    qdev_realize_and_unref(spi_flash, spi_bus, &error_fatal);
-     cs_line = qdev_get_gpio_in_named(spi_flash, SSI_GPIO_CS, 0);
-     sysbus_connect_irq(SYS_BUS_DEVICE(&soc->spi[0]), 1, cs_line);
- 
-diff --git a/hw/arm/sabrelite.c b/hw/arm/sabrelite.c
-index 96cb30aa3c..33d731549d 100644
---- a/hw/arm/sabrelite.c
-+++ b/hw/arm/sabrelite.c
-@@ -75,13 +75,13 @@ static void sabrelite_init(MachineState *machine)
-                 qemu_irq cs_line;
-                 DriveInfo *dinfo = drive_get_next(IF_MTD);
- 
--                flash_dev = ssi_create_slave_no_init(spi_bus, "sst25vf016b");
-+                flash_dev = qdev_new("sst25vf016b");
-                 if (dinfo) {
-                     qdev_prop_set_drive(flash_dev, "drive",
-                                         blk_by_legacy_dinfo(dinfo),
-                                         &error_fatal);
-                 }
--                qdev_init_nofail(flash_dev);
-+                qdev_realize_and_unref(flash_dev, BUS(spi_bus), &error_fatal);
- 
-                 cs_line = qdev_get_gpio_in_named(flash_dev, SSI_GPIO_CS, 0);
-                 sysbus_connect_irq(SYS_BUS_DEVICE(spi_dev), 1, cs_line);
-diff --git a/hw/arm/xilinx_zynq.c b/hw/arm/xilinx_zynq.c
-index 5fbd2b2e31..0e0f0976c4 100644
---- a/hw/arm/xilinx_zynq.c
-+++ b/hw/arm/xilinx_zynq.c
-@@ -157,12 +157,12 @@ static inline void zynq_init_spi_flashes(uint32_t base_addr, qemu_irq irq,
- 
-         for (j = 0; j < num_ss; ++j) {
-             DriveInfo *dinfo = drive_get_next(IF_MTD);
--            flash_dev = ssi_create_slave_no_init(spi, "n25q128");
-+            flash_dev = qdev_new("n25q128");
-             if (dinfo) {
-                 qdev_prop_set_drive(flash_dev, "drive",
-                                     blk_by_legacy_dinfo(dinfo), &error_fatal);
-             }
--            qdev_init_nofail(flash_dev);
-+            qdev_realize_and_unref(flash_dev, BUS(spi), &error_fatal);
- 
-             cs_line = qdev_get_gpio_in_named(flash_dev, SSI_GPIO_CS, 0);
-             sysbus_connect_irq(busdev, i * num_ss + j + 1, cs_line);
-diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
-index 4229b2d936..77c84b82ab 100644
---- a/hw/arm/xlnx-zcu102.c
-+++ b/hw/arm/xlnx-zcu102.c
-@@ -149,21 +149,21 @@ static void xlnx_zcu102_init(MachineState *machine)
-     }
- 
-     for (i = 0; i < XLNX_ZYNQMP_NUM_SPIS; i++) {
--        SSIBus *spi_bus;
-+        BusState *spi_bus;
-         DeviceState *flash_dev;
-         qemu_irq cs_line;
-         DriveInfo *dinfo = drive_get_next(IF_MTD);
-         gchar *bus_name = g_strdup_printf("spi%d", i);
- 
--        spi_bus = (SSIBus *)qdev_get_child_bus(DEVICE(&s->soc), bus_name);
-+        spi_bus = qdev_get_child_bus(DEVICE(&s->soc), bus_name);
-         g_free(bus_name);
- 
--        flash_dev = ssi_create_slave_no_init(spi_bus, "sst25wf080");
-+        flash_dev = qdev_new("sst25wf080");
-         if (dinfo) {
-             qdev_prop_set_drive(flash_dev, "drive", blk_by_legacy_dinfo(dinfo),
-                                 &error_fatal);
-         }
--        qdev_init_nofail(flash_dev);
-+        qdev_realize_and_unref(flash_dev, spi_bus, &error_fatal);
- 
-         cs_line = qdev_get_gpio_in_named(flash_dev, SSI_GPIO_CS, 0);
- 
-@@ -171,22 +171,22 @@ static void xlnx_zcu102_init(MachineState *machine)
-     }
- 
-     for (i = 0; i < XLNX_ZYNQMP_NUM_QSPI_FLASH; i++) {
--        SSIBus *spi_bus;
-+        BusState *spi_bus;
-         DeviceState *flash_dev;
-         qemu_irq cs_line;
-         DriveInfo *dinfo = drive_get_next(IF_MTD);
-         int bus = i / XLNX_ZYNQMP_NUM_QSPI_BUS_CS;
-         gchar *bus_name = g_strdup_printf("qspi%d", bus);
- 
--        spi_bus = (SSIBus *)qdev_get_child_bus(DEVICE(&s->soc), bus_name);
-+        spi_bus = qdev_get_child_bus(DEVICE(&s->soc), bus_name);
-         g_free(bus_name);
- 
--        flash_dev = ssi_create_slave_no_init(spi_bus, "n25q512a11");
-+        flash_dev = qdev_new("n25q512a11");
-         if (dinfo) {
-             qdev_prop_set_drive(flash_dev, "drive", blk_by_legacy_dinfo(dinfo),
-                                 &error_fatal);
-         }
--        qdev_init_nofail(flash_dev);
-+        qdev_realize_and_unref(flash_dev, spi_bus, &error_fatal);
- 
-         cs_line = qdev_get_gpio_in_named(flash_dev, SSI_GPIO_CS, 0);
- 
-diff --git a/hw/microblaze/petalogix_ml605_mmu.c b/hw/microblaze/petalogix_ml605_mmu.c
-index 2e7a3fa119..d4bfa233c9 100644
---- a/hw/microblaze/petalogix_ml605_mmu.c
-+++ b/hw/microblaze/petalogix_ml605_mmu.c
-@@ -186,12 +186,12 @@ petalogix_ml605_init(MachineState *machine)
-             DriveInfo *dinfo = drive_get_next(IF_MTD);
-             qemu_irq cs_line;
- 
--            dev = ssi_create_slave_no_init(spi, "n25q128");
-+            dev = qdev_new("n25q128");
-             if (dinfo) {
-                 qdev_prop_set_drive(dev, "drive", blk_by_legacy_dinfo(dinfo),
-                                     &error_fatal);
-             }
--            qdev_init_nofail(dev);
-+            qdev_realize_and_unref(dev, BUS(spi), &error_fatal);
- 
-             cs_line = qdev_get_gpio_in_named(dev, SSI_GPIO_CS, 0);
-             sysbus_connect_irq(busdev, i+1, cs_line);
++bool sysbus_realize(SysBusDevice *dev, Error **errp)
++{
++    return qdev_realize(DEVICE(dev), sysbus_get_default(), errp);
++}
++
++bool sysbus_realize_and_unref(SysBusDevice *dev, Error **errp)
++{
++    return qdev_realize_and_unref(DEVICE(dev), sysbus_get_default(), errp);
++}
++
+ static void sysbus_dev_print(Monitor *mon, DeviceState *dev, int indent)
+ {
+     SysBusDevice *s = SYS_BUS_DEVICE(dev);
+@@ -301,7 +311,7 @@ MemoryRegion *sysbus_address_space(SysBusDevice *dev)
+ static void sysbus_device_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *k = DEVICE_CLASS(klass);
+-    k->realize = sysbus_realize;
++    k->realize = sysbus_device_realize;
+     k->bus_type = TYPE_SYSTEM_BUS;
+     /*
+      * device_add plugs devices into a suitable bus.  For "real" buses,
 -- 
 2.26.2
 
