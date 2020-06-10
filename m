@@ -2,92 +2,86 @@ Return-Path: <SRS0=wemX=7X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F293C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 06:02:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6754AC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 06:03:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 35F7920801
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 06:02:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 34E1820825
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 06:03:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CxDshkf2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35F7920801
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dHLfqDV3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34E1820825
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44886 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49014 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jitog-0005OL-GN
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 02:02:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45112)
+	id 1jitpm-00076h-Dt
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 02:03:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42644)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jith0-0004CF-E9
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 01:54:30 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:20395
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jitMS-0005Ic-H2
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 01:33:16 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24547
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jitgy-0007rT-J6
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 01:54:29 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jitMC-0003rA-UC
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 01:33:16 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591768467;
+ s=mimecast20190719; t=1591767179;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=uegmMcuk4pFLcQ1UN2sVC8vVe/47eSxBzL/QCXVnwVY=;
- b=CxDshkf2zpRc3W0ggLLymQXMgwpeRhKmKFmIxlpL+nuaxIR+d/pV3IrLF46jCCwfko53yT
- EihiNe4dccde8qN0DzHzrSkbE3Dsf5NaG5yNUHm/JXSryFHjVZPkiVSNco6908GIPIgP6s
- /CFGo93zYbbdaL/fQLyY49y0EIWDd8o=
+ bh=MGLA2gsRoCzJ7Ei2E6fyup82cKtao2wPX0pWPphN46E=;
+ b=dHLfqDV3c/wyJWm0oz/zz52w0L8jwlg+All33IuBIb6aCDodUCt1LqX/G1Df1UgIKUgMdd
+ wey3ViKEcXtv7VfbvsMed8OKbQsjHl8ba1eZS1mstELT7Sceu2Ml95npzCG1Hsaw/PGLDj
+ H1XZ5cpvDEK5vMX6iZ6AQg199hQmtAg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-16-QU02jJvONtqUxxrZbioLNQ-1; Wed, 10 Jun 2020 01:54:23 -0400
-X-MC-Unique: QU02jJvONtqUxxrZbioLNQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-173-QHzhir8bO0iFr00VeuWCiQ-1; Wed, 10 Jun 2020 01:32:57 -0400
+X-MC-Unique: QHzhir8bO0iFr00VeuWCiQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 54674BFC0;
- Wed, 10 Jun 2020 05:54:22 +0000 (UTC)
-Received: from [10.72.13.194] (ovpn-13-194.pek2.redhat.com [10.72.13.194])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5E4CA891CE;
- Wed, 10 Jun 2020 05:53:59 +0000 (UTC)
-Subject: Re: [PATCH v2 4/7] vhost: involve device backends in feature
- negotiation
-To: "Michael S. Tsirkin" <mst@redhat.com>
-References: <20200609170218.246468-1-stefanha@redhat.com>
- <20200609170218.246468-5-stefanha@redhat.com>
- <20200609135007-mutt-send-email-mst@kernel.org>
- <37ac3fbb-9a9b-9290-abee-a8603c81925c@redhat.com>
- <20200610001156-mutt-send-email-mst@kernel.org>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <1e503661-0652-b0dc-f900-8cd9aca2ccb8@redhat.com>
-Date: Wed, 10 Jun 2020 13:53:57 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 99AE8188360A
+ for <qemu-devel@nongnu.org>; Wed, 10 Jun 2020 05:32:56 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
+ [10.36.112.121])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6B11460C84;
+ Wed, 10 Jun 2020 05:32:56 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id AF7EB113847E; Wed, 10 Jun 2020 07:32:48 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH RESEND v3 40/58] microbit: Tidy up sysbus_init_child_obj()
+ @child argument
+Date: Wed, 10 Jun 2020 07:32:29 +0200
+Message-Id: <20200610053247.1583243-41-armbru@redhat.com>
+In-Reply-To: <20200610053247.1583243-1-armbru@redhat.com>
+References: <20200610053247.1583243-1-armbru@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200610001156-mutt-send-email-mst@kernel.org>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=jasowang@redhat.com;
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 23:51:15
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 21:17:20
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -101,65 +95,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- qemu-block@nongnu.org, Laurent Vivier <lvivier@redhat.com>, cohuck@redhat.com,
- qemu-devel@nongnu.org, Raphael Norwitz <raphael.norwitz@nutanix.com>,
- "Gonglei \(Arei\)" <arei.gonglei@huawei.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Max Reitz <mreitz@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+The callers of sysbus_init_child_obj() commonly pass either &child,
+sizeof(child), or pchild, sizeof(*pchild).  Tidy up two that don't,
+mostly to keep future commits simpler.
 
-On 2020/6/10 下午12:15, Michael S. Tsirkin wrote:
-> On Wed, Jun 10, 2020 at 11:21:50AM +0800, Jason Wang wrote:
->> On 2020/6/10 上午2:07, Michael S. Tsirkin wrote:
->>>> +/*
->>>> + * Default vhost_get_features() feature bits for existing device types that do
->>>> + * not define their own.
->>>> + *
->>>> + * This is a workaround for existing device types, do not use this in new vhost
->>>> + * device types. Explicitly define a list of feature bits instead.
->>>> + *
->>>> + * The following feature bits are excluded because libvhost-user device
->>>> + * backends did not advertise them for a long time. Therefore we cannot detect
->>>> + * their presence. Instead we assume they are always supported by the device
->>>> + * backend:
->>>> + * VIRTIO_F_NOTIFY_ON_EMPTY
->>>> + * VIRTIO_F_ANY_LAYOUT
->>>> + * VIRTIO_F_VERSION_1
->>>> + * VIRTIO_RING_F_INDIRECT_DESC
->>>> + * VIRTIO_RING_F_EVENT_IDX
->>> Weird. I remember that it's common for vhost-user not to set
->>> VIRTIO_RING_F_INDIRECT_DESC - they have huge queues so
->>> don't need it and inline descriptors give them better
->>> performance.
->>>
->>> So what's going on here?
->>
->> I guess one reason is to support live migration between vhost-user and
->> vhost-net.
->>
->> Thanks
->>
-> But how can we force-enable features backend doesn't want to enable?
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ hw/arm/microbit.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-
-We can't and the code just forces qemu to validate 
-VIRTIO_RING_F_INDIRECT_DESC for each vhost backends instead of assuming 
-the support silently.
-
-Thanks
-
-
-> This may or may not break backends ...
-> I would rather just be strict and ask backends to fix their feature
-> bits. See user_feature_bits in hw/net/vhost-net.c which supports
-> all these features.
->
+diff --git a/hw/arm/microbit.c b/hw/arm/microbit.c
+index ef213695bd..72fab429c4 100644
+--- a/hw/arm/microbit.c
++++ b/hw/arm/microbit.c
+@@ -39,7 +39,7 @@ static void microbit_init(MachineState *machine)
+     Object *soc = OBJECT(&s->nrf51);
+     Object *i2c = OBJECT(&s->i2c);
+ 
+-    sysbus_init_child_obj(OBJECT(machine), "nrf51", soc, sizeof(s->nrf51),
++    sysbus_init_child_obj(OBJECT(machine), "nrf51", &s->nrf51, sizeof(s->nrf51),
+                           TYPE_NRF51_SOC);
+     qdev_prop_set_chr(DEVICE(&s->nrf51), "serial0", serial_hd(0));
+     object_property_set_link(soc, OBJECT(system_memory), "memory",
+@@ -51,7 +51,7 @@ static void microbit_init(MachineState *machine)
+      * hack until we implement the nRF51 TWI controller properly and the
+      * magnetometer/accelerometer devices.
+      */
+-    sysbus_init_child_obj(OBJECT(machine), "microbit.twi", i2c,
++    sysbus_init_child_obj(OBJECT(machine), "microbit.twi", &s->i2c,
+                           sizeof(s->i2c), TYPE_MICROBIT_I2C);
+     object_property_set_bool(i2c, true, "realized", &error_fatal);
+     mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(i2c), 0);
+-- 
+2.26.2
 
 
