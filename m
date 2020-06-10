@@ -2,110 +2,122 @@ Return-Path: <SRS0=wemX=7X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67207C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:41:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B9ECC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:42:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3A95E20760
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:41:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A95E20760
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id E9BB82078C
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:42:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="wWvHYfXj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9BB82078C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41462 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42186 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jj0zJ-0001MC-AP
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 09:41:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53012)
+	id 1jj0zT-0001fW-2N
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 09:42:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32792)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pasic@linux.ibm.com>)
- id 1jj0gy-0000w6-9Z; Wed, 10 Jun 2020 09:22:56 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:56544)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jj0uF-000347-K3; Wed, 10 Jun 2020 09:36:40 -0400
+Received: from mail-am6eur05on2139.outbound.protection.outlook.com
+ ([40.107.22.139]:34400 helo=EUR05-AM6-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pasic@linux.ibm.com>)
- id 1jj0gw-0006xl-Fy; Wed, 10 Jun 2020 09:22:55 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 05AD2teK055896; Wed, 10 Jun 2020 09:22:48 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 31k02b0rw0-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 10 Jun 2020 09:22:48 -0400
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05AD3JVj059016;
- Wed, 10 Jun 2020 09:22:47 -0400
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com
- [169.51.49.99])
- by mx0a-001b2d01.pphosted.com with ESMTP id 31k02b0ruj-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 10 Jun 2020 09:22:47 -0400
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
- by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05ADFDft018008;
- Wed, 10 Jun 2020 13:22:45 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com
- (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
- by ppma04ams.nl.ibm.com with ESMTP id 31g2s7yrqg-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 10 Jun 2020 13:22:44 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com
- [9.149.105.60])
- by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id 05ADLQAj64028968
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 10 Jun 2020 13:21:26 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 790C242049;
- Wed, 10 Jun 2020 13:22:42 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id CE4244204F;
- Wed, 10 Jun 2020 13:22:41 +0000 (GMT)
-Received: from oc2783563651 (unknown [9.145.127.50])
- by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Wed, 10 Jun 2020 13:22:41 +0000 (GMT)
-Date: Wed, 10 Jun 2020 15:21:59 +0200
-From: Halil Pasic <pasic@linux.ibm.com>
-To: Cornelia Huck <cohuck@redhat.com>
-Subject: Re: [RFC v2 18/18] guest memory protection: Alter virtio default
- properties for protected guests
-Message-ID: <20200610152159.0b892016.pasic@linux.ibm.com>
-In-Reply-To: <20200610104842.2687215a.cohuck@redhat.com>
-References: <20200521034304.340040-1-david@gibson.dropbear.id.au>
- <20200521034304.340040-19-david@gibson.dropbear.id.au>
- <20200606162014-mutt-send-email-mst@kernel.org>
- <20200607030735.GN228651@umbus.fritz.box>
- <20200609121641.5b3ffa48.cohuck@redhat.com>
- <20200610043922.GI494336@umbus.fritz.box>
- <20200610104842.2687215a.cohuck@redhat.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jj0uD-0002Kp-Kh; Wed, 10 Jun 2020 09:36:38 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=eS9Ql45bVwWKwXsER93FPLKWIZGZ4RjNvdADW2+mf2KhI3Ch41FO+YMC08FEPlz7aC5LCDs1KMjADg59xB6TLEDXl64VESFDoxmK5X+QPG6o5uo9RvOft9V0rVXZgHbsSddOJ8ulVCwqg7wFEUb5kHLYD8XQotK/+13SJtEzlwtmlzp8B95/vAQes9ozf7XC3cBVogmtxZmUqC2R7Sp/0JavHV+rowAr0T/aV+YqenOB/tqvqqDA+o4by3c2HmN6BNF/OiS+XCFR96FGDWBgzRddOzDtLpvTrOwC4lQkZY4WOFVSI+lUKbfd5jAZsVyVsbRhPsnaojfYb6BzAeEiPw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=sRmV5DQIqM2Q6Y38Z+ebQQtWxza4Pwwwb9+OIQRYmgE=;
+ b=Sb2uGBUaGh8+DeNe2QyqkZyKktkXtTYLxwoaf2t81cT7uxV78+L6FtFn532/zKJ8MgwpmZWCkhiDYzUEiJVP2Btc/GffSvGx8nkVVdvl8LcMo/lTCMibgYWhZiu/K8omZrq2xfxHTc89sCYXsDliFv0paDOx+o0tuEdIdFeESetCFZYqKa7sL9xmB0eujt/K58x2dtkHJF5lHFp/Lis/hgGnOPoZsxRs9dn++qYlyxnPB+qESf1Z0ff1bxXtKIKXnpT6dw2+FaWgmdS3C9mHi/y0jF/0Acd7cDed/bc0cqRP7xd/8jEJjECveHLrULD84pGkIOPI6xqBuBp1CCnUfA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=sRmV5DQIqM2Q6Y38Z+ebQQtWxza4Pwwwb9+OIQRYmgE=;
+ b=wWvHYfXjAmYrDPgqvE6glBGGQ+1jZpDpwIWQZLCAUvVjqNrQf376sBNYVaDOPFUQHO/AwP3Mq+rk5tPbQWttNwGCPCfjA/DeIovE6UFxTMXD32MiluZNuGPpfNasMbT3m1VL6PwVHmXDtbqcnUdHELPTn+yYpxV/D16PbqbRLVo=
+Authentication-Results: google.com; dkim=none (message not signed)
+ header.d=none;google.com; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM7PR08MB5397.eurprd08.prod.outlook.com (2603:10a6:20b:dd::17)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3088.18; Wed, 10 Jun
+ 2020 13:36:34 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312%3]) with mapi id 15.20.3066.023; Wed, 10 Jun 2020
+ 13:36:34 +0000
+Subject: Re: Clarification regarding new qemu-img convert --target-is-zero flag
+To: Sam Eiderman <sameid@google.com>, David Edmondson <dme@dme.org>
+References: <CAFr6bU=LjeW5_eGtwL38cher2TM52skohuANNXN9EpO+mA-z8Q@mail.gmail.com>
+ <m2imfz877v.fsf@dme.org>
+ <CAFr6bUk5LrEL8BPXYkNOqj_jsbxHBfbj_NYryUjszMtG89L+2w@mail.gmail.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <2d3e27a0-8f72-b65c-e2c8-c91f305d03ce@virtuozzo.com>
+Date: Wed, 10 Jun 2020 16:36:32 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.1
+In-Reply-To: <CAFr6bUk5LrEL8BPXYkNOqj_jsbxHBfbj_NYryUjszMtG89L+2w@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: AM0PR10CA0128.EURPRD10.PROD.OUTLOOK.COM
+ (2603:10a6:208:e6::45) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
- boundary="Sig_/4sqcT16HYh+2IUfpFzvYsKp"; protocol="application/pgp-signature"
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
- definitions=2020-06-10_07:2020-06-10,
- 2020-06-10 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- mlxscore=0 malwarescore=0
- spamscore=0 adultscore=0 priorityscore=1501 impostorscore=0 clxscore=1015
- lowpriorityscore=0 mlxlogscore=999 suspectscore=0 bulkscore=0
- cotscore=-2147483648 phishscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2006100096
-Received-SPF: pass client-ip=148.163.156.1; envelope-from=pasic@linux.ibm.com;
- helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/10 09:16:22
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.166) by
+ AM0PR10CA0128.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:208:e6::45) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3088.21 via Frontend Transport; Wed, 10 Jun 2020 13:36:33 +0000
+X-Originating-IP: [185.215.60.166]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: c36f9fe5-cf89-4226-a467-08d80d434ab3
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5397:
+X-Microsoft-Antispam-PRVS: <AM7PR08MB5397F4463DE1F9E88F4309A1C1830@AM7PR08MB5397.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-Forefront-PRVS: 0430FA5CB7
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: uLxtNIHpy1sWYRHK0JRB3gM+csVCERiydOhg1VmhD6ThOoCTCbz2yrXZYz2jc6ye9mZ4OpXEr2F38aNqVOaD/VC2hI/GE1gSDyFORIJS2lEBLacmFGdcS0Kn1BUZZ9d0k9dyv+ciJIDOMAQ75VOCTrXo9no41TYt/P1zwS0nHZRAHT/OQ02uSajis3zgONDKdIe9ctR73dJBdezE7UsRt6GlWHlJfJ3bf/1AS3Iw7REqPToYNov4a28frvMkCZlv2gBNrDLRYxGTkek2Z6lFDKoQ1Ya/CV2l5FRPIC1bBCIo/Gcp9lAK4XYODfCb54gQAyJ2Ciyf8FEIpGklgDtfK/KexSmou4SxeeLR/jYl2Y/cqsF4d4sNRcy3u1YbXsTS
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(346002)(366004)(396003)(136003)(39840400004)(376002)(31686004)(6486002)(8676002)(8936002)(36756003)(316002)(54906003)(186003)(110136005)(16576012)(16526019)(2906002)(86362001)(53546011)(83380400001)(2616005)(66946007)(4326008)(52116002)(5660300002)(26005)(66476007)(956004)(66556008)(31696002)(478600001)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: 1VzY89qhvhQkIpneqG1DFe3txwi6xXR+H6LWuDbWp8LudMobWtw3SUJTdTX3WOodWa06+EgXjvnQTUKgUaRPvfQGmWwK23dCPYSkEOOPF82DvPH8zyvSTtTo73/C+hBkZXXWnrEEXSt1nz9YnGs1Cd/zZqY6U3mtj08QssYdQC3sThxfgGFZWVZYkeGVX0d8e7+rJkukFOB2gvpXHYVWSuQG3NXGi+UA3YpO7ADUInx6yAgEMpYJs8GDGuIMcaLeW9skYWR0dl4CDKDDxL9TACHgG/BeHpueM5NFuLcbN16qgJ33RE9tZTb3yAKWO44l57SlhuJZk6nI3+fmTZNzuZRk450EEZJ5Sd+OPmkeTtKheKHFXB85izxRqjnRmU2VM08BqhCxJQr1z8BjqVrBZfZ5IIoJDYGgQXfGi4HAKGvGEbfV/vob6QIWhC1KYP7qyTN4JPRWGzu2/pWm0D6tvpVeDinnw4OimGoFZQjVbGFo+58FyTmY2RMxriXNbcCf
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c36f9fe5-cf89-4226-a467-08d80d434ab3
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jun 2020 13:36:34.1775 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: XE5MW9A0Fgvq0D5Xh7s5taCTPp0VPkaWTTn0qKFCZSySZSZBJLeoiidxxky3VgRU8EiXDQ0/SdHj1qtoFvrfgKU4xpvTx6ohfRIXLOIoTik=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5397
+Received-SPF: pass client-ip=40.107.22.139;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR05-AM6-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/10 09:36:35
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -37
+X-Spam_score: -3.8
 X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -118,144 +130,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pair@us.ibm.com, brijesh.singh@amd.com, frankja@linux.ibm.com,
- kvm@vger.kernel.org, "Michael
- S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
- Eduardo Habkost <ehabkost@redhat.com>, dgilbert@redhat.com,
- qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <rth@twiddle.net>, mdroth@linux.vnet.ibm.com,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Tony Zhang <tzz@google.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/4sqcT16HYh+2IUfpFzvYsKp
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+10.06.2020 15:19, Sam Eiderman wrote:
+> Thanks David,
+> 
+> Yes, I imaging the following use case:
+> 
+> disk.vmdk is a 50 GB disk that contains 12 MB binary of zeroes in its beginning.
+> /dev/sda is a raw disk containing garbage
+> 
+> I invoke:
+> qemu-img convert disk.vmdk -O raw /dev/sda
+> 
+> Required output:
+> The first 12 MB of /dev/sda contain zeros, the rest garbage, qemu-img
+> finishes fast.
+> 
+> Kevin, from what I understood from you, this is the default behavior.
+> 
+> So if my VMDK is causing trouble (all virtual size is being written)
+> this is probably since all the grains in the VMDK are zero allocated
+> right?
+> 
+> Thanks!
 
-On Wed, 10 Jun 2020 10:48:42 +0200
-Cornelia Huck <cohuck@redhat.com> wrote:
+I'm not sure that skipping unallocated clusters in qcow2/vmdk is default. As I see,
+briefly looking at the code, unallocated clusters are skipped with -B option. But
+it assuming using some backing file, which is not your case.
 
-> On Wed, 10 Jun 2020 14:39:22 +1000
-> David Gibson <david@gibson.dropbear.id.au> wrote:
->=20
-> > On Tue, Jun 09, 2020 at 12:16:41PM +0200, Cornelia Huck wrote:
-> > > On Sun, 7 Jun 2020 13:07:35 +1000
-> > > David Gibson <david@gibson.dropbear.id.au> wrote:
-> > >  =20
-> > > > On Sat, Jun 06, 2020 at 04:21:31PM -0400, Michael S. Tsirkin wrote:=
- =20
-> > > > > On Thu, May 21, 2020 at 01:43:04PM +1000, David Gibson wrote:   =
-=20
-> > > > > > The default behaviour for virtio devices is not to use the plat=
-forms normal
-> > > > > > DMA paths, but instead to use the fact that it's running in a h=
-ypervisor
-> > > > > > to directly access guest memory.  That doesn't work if the gues=
-t's memory
-> > > > > > is protected from hypervisor access, such as with AMD's SEV or =
-POWER's PEF.
-> > > > > >=20
-> > > > > > So, if a guest memory protection mechanism is enabled, then app=
-ly the
-> > > > > > iommu_platform=3Don option so it will go through normal DMA mec=
-hanisms.
-> > > > > > Those will presumably have some way of marking memory as shared=
- with the
-> > > > > > hypervisor or hardware so that DMA will work.
-> > > > > >=20
-> > > > > > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > > > > > ---
-> > > > > >  hw/core/machine.c | 11 +++++++++++
-> > > > > >  1 file changed, 11 insertions(+)
-> > > > > >=20
-> > > > > > diff --git a/hw/core/machine.c b/hw/core/machine.c
-> > > > > > index 88d699bceb..cb6580954e 100644
-> > > > > > --- a/hw/core/machine.c
-> > > > > > +++ b/hw/core/machine.c
-> > > > > > @@ -28,6 +28,8 @@
-> > > > > >  #include "hw/mem/nvdimm.h"
-> > > > > >  #include "migration/vmstate.h"
-> > > > > >  #include "exec/guest-memory-protection.h"
-> > > > > > +#include "hw/virtio/virtio.h"
-> > > > > > +#include "hw/virtio/virtio-pci.h"
-> > > > > > =20
-> > > > > >  GlobalProperty hw_compat_5_0[] =3D {};
-> > > > > >  const size_t hw_compat_5_0_len =3D G_N_ELEMENTS(hw_compat_5_0);
-> > > > > > @@ -1159,6 +1161,15 @@ void machine_run_board_init(MachineState=
- *machine)
-> > > > > >           * areas.
-> > > > > >           */
-> > > > > >          machine_set_mem_merge(OBJECT(machine), false, &error_a=
-bort);
-> > > > > > +
-> > > > > > +        /*
-> > > > > > +         * Virtio devices can't count on directly accessing gu=
-est
-> > > > > > +         * memory, so they need iommu_platform=3Don to use nor=
-mal DMA
-> > > > > > +         * mechanisms.  That requires disabling legacy virtio =
-support
-> > > > > > +         * for virtio pci devices
-> > > > > > +         */
-> > > > > > +        object_register_sugar_prop(TYPE_VIRTIO_PCI, "disable-l=
-egacy", "on");
-> > > > > > +        object_register_sugar_prop(TYPE_VIRTIO_DEVICE, "iommu_=
-platform", "on");
-> > > > > >      }
-> > > > > >     =20
-> > > > >=20
-> > > > > I think it's a reasonable way to address this overall.
-> > > > > As Cornelia has commented, addressing ccw as well   =20
-> > > >=20
-> > > > Sure.  I was assuming somebody who actually knows ccw could do that=
- as
-> > > > a follow up. =20
-> > >=20
-> > > FWIW, I think we could simply enable iommu_platform for protected
-> > > guests for ccw; no prereqs like pci's disable-legacy. =20
-> >=20
-> > Right, and the code above should in fact already do so, since it
-> > applies that to TYPE_VIRTIO_DEVICE, which is common.  The
-> > disable-legacy part should be harmless for s390, since this is
-> > effectively just setting a default, and we don't expect any
-> > TYPE_VIRTIO_PCI devices to be instantiated on z.
->=20
-> Well, virtio-pci is available on s390, so people could try to use it --
-> however, forcing disable-legacy won't hurt in that case, as it won't
-> make the situation worse (I don't expect virtio-pci to work on s390
-> protected guests.)
-
-Currently we don't have to worry about virtio-pci when running in
-protected mode, because PCI is not supported currently, and this is
-enforced by the ultravisor which would inject operation exceptions should
-a PV guest try to use our PCI instructions.
-
-[..]
+Let's check:
+]# ./qemu-img create -f raw b 1M
+Formatting 'b', fmt=raw size=1048576
+]# ./qemu-img create -f qcow2 a 1M
+Formatting 'a', fmt=qcow2 size=1048576 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
+]# ./qemu-io -c 'write -P 0xff 0 1M' -f raw b
+wrote 1048576/1048576 bytes at offset 0
+1 MiB, 1 ops; 00.05 sec (21.646 MiB/sec and 21.6457 ops/sec)
+]# xxd b | head
+00000000: ffff ffff ffff ffff ffff ffff ffff ffff  ................
+00000010: ffff ffff ffff ffff ffff ffff ffff ffff  ................
+00000020: ffff ffff ffff ffff ffff ffff ffff ffff  ................
+00000030: ffff ffff ffff ffff ffff ffff ffff ffff  ................
+00000040: ffff ffff ffff ffff ffff ffff ffff ffff  ................
+00000050: ffff ffff ffff ffff ffff ffff ffff ffff  ................
+00000060: ffff ffff ffff ffff ffff ffff ffff ffff  ................
+00000070: ffff ffff ffff ffff ffff ffff ffff ffff  ................
+00000080: ffff ffff ffff ffff ffff ffff ffff ffff  ................
+00000090: ffff ffff ffff ffff ffff ffff ffff ffff  ................
+]# ./qemu-img convert -f qcow2 -O raw a b
+]# xxd b | head
+00000000: 0000 0000 0000 0000 0000 0000 0000 0000  ................
+00000010: 0000 0000 0000 0000 0000 0000 0000 0000  ................
+00000020: 0000 0000 0000 0000 0000 0000 0000 0000  ................
+00000030: 0000 0000 0000 0000 0000 0000 0000 0000  ................
+00000040: 0000 0000 0000 0000 0000 0000 0000 0000  ................
+00000050: 0000 0000 0000 0000 0000 0000 0000 0000  ................
+00000060: 0000 0000 0000 0000 0000 0000 0000 0000  ................
+00000070: 0000 0000 0000 0000 0000 0000 0000 0000  ................
+00000080: 0000 0000 0000 0000 0000 0000 0000 0000  ................
+00000090: 0000 0000 0000 0000 0000 0000 0000 0000  ................
+]# ./qemu-io -c 'write -P 0xff 0 1M' -f raw b
+wrote 1048576/1048576 bytes at offset 0
+1 MiB, 1 ops; 00.05 sec (20.648 MiB/sec and 20.6478 ops/sec)
+]# ./qemu-img create -f qcow2 base 1M
+Formatting 'base', fmt=qcow2 size=1048576 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
+]# ./qemu-img convert -f qcow2 -O raw -B base a b
+qemu-img: Backing file not supported for file format 'raw'
 
 
---Sig_/4sqcT16HYh+2IUfpFzvYsKp
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+So you see, in a newly created qcow2 file all cllusters are unallocated. Still by default qemu-img convert writes all zeroes. And we can't use -B with raw tartget.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.22 (GNU/Linux)
+> 
+> On Wed, Jun 10, 2020 at 2:56 PM David Edmondson <dme@dme.org> wrote:
+>>
+>> On Wednesday, 2020-06-10 at 08:28:29 +03, Sam Eiderman wrote:
+>>
+>>> Hi,
+>>>
+>>> 168468fe19c8 ("qemu-img: Add --target-is-zero to convert") has added a
+>>> nice functionality for cloud scenarios:
+>>>
+>>> * Create a virtual disk
+>>> * Convert a sparse image (qcow2, vmdk) to the virtual disk using
+>>> --target-is-zero
+>>> * Use the virtual disk
+>>>
+>>> This saves many unnecessary writes - a qcow2 with 1MB of allocated
+>>> data but with 100GB virtual size will be converted efficiently.
+>>>
+>>> However, does this pose a problem if the virtual disk is not zero initialized?
+>>
+>> As Vladimir indicated, the intent of the flag is supposed to be clear
+>> from the name :-) If your storage doesn't read zeroes absent any earlier
+>> writes, you probably don't want to be using it.
+>>
+>>> Theoretically - if all unallocated blocks contain garbage - this
+>>> shouldn't matter, however what about allocated blocks of zero? Will
+>>> convert skip copying allocated zero blocks in the source image to the
+>>> target since it assumes that the target is zeroed out first thing?
+>>
+>> So something like a "--no-need-to-zero" flag would do what you want,
+>> presuming that it would write known zeroes but no longer clean the
+>> device before use?
+>>
+>> dme.
+>> --
+>> You can't hide from the flipside.
 
-iQIcBAEBAgAGBQJe4N6gAAoJEA0vhuyXGx0ACkgP/0IBF5+0fba4WXo3noX8v2eY
-MrkedmHTQZiMhFxu8lv3RNIYs5K0SYu1MVzzhIP8Iwm90LFMyT2qedMdG7lnY1gk
-h7MkxJeGi2+igKobGKaE4JUqA6jvPuwj7PS3i/RCak2/heB1Tr8gVyEfE4tEGgz+
-x/mo37Av8VrCosd/ct/SooJh0Zuz6MW6ZKAjwOm3ktpdhDrW/jINaw0JYBtGD31H
-bLyX3R37Iscmk7ml+nvug4W85Ak9bghuFR4Aa3IY0I/0dglmEpNZJXdA+Db/XRuF
-hsV2BhvHwElrqlOrhbIKuQYZhhjBdY0uExOmTQX+H3EjraaNBAzRHI9vs1Rgdxc/
-D9uvUYhj7Urrc+sR2reCjgali+nagdKJZ+Ihp6+j5L0DBqIlXgoGJZX7DHoNxwVm
-wjvH+lvIiTzKUoJYnanisrTsFkKJE9eW143+APonid/hiGqnXknEyULmrqQNthfa
-kWrxL/S1zQbpvZaal3mMoGgjGTAFuyeBI6fFDrCxWwMoUOxVjgqX6rsEAQRgAQ6f
-vLgpKTCFf9mB0Oxn/YWFYVl3CnSKQZ7Zzr5jewv2a+iih9AVtv925iNSibY2AC07
-YxUW6oj+7gzTjW8+J3IXpMiIcFUeaeisICnksoXoBpYrIKSk1jZWbvqpQfXhFO0b
-mPmejhBA4t++1dd30YwD
-=iOJD
------END PGP SIGNATURE-----
 
---Sig_/4sqcT16HYh+2IUfpFzvYsKp--
-
+-- 
+Best regards,
+Vladimir
 
