@@ -2,59 +2,97 @@ Return-Path: <SRS0=wemX=7X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D08CAC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:53:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D531C433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:54:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A350A206F4
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:53:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A350A206F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nutanix.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0CAAA206F4
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:54:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hmPuLGk5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0CAAA206F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43748 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46644 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jj1AF-0007Sb-VL
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 09:53:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34800)
+	id 1jj1Bo-0000JI-5W
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 09:54:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39924)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ani.sinha@ani-sinha1.localdomain>)
- id 1jj0yR-0000O0-AI
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 09:40:59 -0400
-Received: from [192.146.154.243] (port=47438 helo=mcp01.nutanix.com)
- by eggs.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ani.sinha@ani-sinha1.localdomain>)
- id 1jj0yP-0002tD-Ry
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 09:40:58 -0400
-Received: from ani-sinha1.localdomain (ani-sinha1.dev.nutanix.com
- [10.41.71.199])
- by mcp01.nutanix.com (Postfix) with ESMTP id 13BB3101A9E2;
- Wed, 10 Jun 2020 13:40:53 +0000 (UTC)
-Received: by ani-sinha1.localdomain (Postfix, from userid 16671)
- id 0E2A6220A23; Wed, 10 Jun 2020 13:40:53 +0000 (UTC)
-From: Ani Sinha <ani.sinha@nutanix.com>
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jj15M-0001rA-Kh
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 09:48:08 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:50680)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jj15B-0004lP-Si
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 09:48:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591796876;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+ bh=zIHbjAuTXCXAYtFA8fUW6Vwi+20Th0tosizv7lYurWk=;
+ b=hmPuLGk5U2HPUelogve8MLCa9Gyd0YPEAJuKtWqLdZSoaVKPSHcfMnJqRSueABrBA0dVcZ
+ 06P9B98e+NJl4Rnx1diCinDp2JjV9hiVJ41BgoYkctF6TEJgT9SxOt/B8BsTYjIXFFtYKC
+ ihfV86dzamHJ6cpECdz0rURV1x/O2H8=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-13-y_4kQJlHPUWVLIFcsfjeFQ-1; Wed, 10 Jun 2020 09:47:54 -0400
+X-MC-Unique: y_4kQJlHPUWVLIFcsfjeFQ-1
+Received: by mail-wr1-f72.google.com with SMTP id f4so1101841wrp.21
+ for <qemu-devel@nongnu.org>; Wed, 10 Jun 2020 06:47:54 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+ :content-disposition;
+ bh=zIHbjAuTXCXAYtFA8fUW6Vwi+20Th0tosizv7lYurWk=;
+ b=TCSOtJeVTi6nbGTIGgAwtYGNFh9vCDFTMQprloJ2gLNFSiiquoFvwwZeBPdH8m+ZZC
+ Rj70Ab9SoaqORGd2MmFX6VMc9zzsa+jWPUcZcjdLlFH0F0LPaJsqouFgTM9q/UvExxV4
+ NzSw4iigR9qRCUxs0UPe+MknYdjdZasEvfauduFCGoYH/WDuTpvWacBG41GmnVMMnqKs
+ g/MNQg2JsFwRG+y8qovjXIQ8Yu4M3ueaqmNZtkDgUknnNjA50sm2NnBxG9sKiKlXWj2d
+ 7stzvRl9dm2nwy1eDNJIa2hAi9E+cDhtAtM+Vvk80oUZeL2zHHxNp+xxr2AKePdevVxp
+ Xgbw==
+X-Gm-Message-State: AOAM532pEsXKExyUTK7/2tPmcukAa6NtuquqU/k3iPTIPKISW8495OlM
+ 2V1l+/XN63OLdYCKCj8Ehbiqj8CjVdrqMhE9nxS6bAqLbFWXmUlXMJp/zZP2amT0AswPqwpeTRf
+ j8NiA9+GNMKsYxxI=
+X-Received: by 2002:a5d:6986:: with SMTP id g6mr3951073wru.27.1591796872999;
+ Wed, 10 Jun 2020 06:47:52 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzjEXGrY2vgqUqKgFE1ftCULDYdAP/4IbVwuvn16o80BKIprEbk3mYxJHNOTrjy8TOxivUvuQ==
+X-Received: by 2002:a5d:6986:: with SMTP id g6mr3951040wru.27.1591796872619;
+ Wed, 10 Jun 2020 06:47:52 -0700 (PDT)
+Received: from redhat.com ([212.92.121.57])
+ by smtp.gmail.com with ESMTPSA id i10sm8095061wrw.51.2020.06.10.06.47.51
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 10 Jun 2020 06:47:52 -0700 (PDT)
+Date: Wed, 10 Jun 2020 09:47:49 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH V2] Rename use_acpi_pci_hotplug to more appropriate
- use_acpi_hotplug_bridge
-Date: Wed, 10 Jun 2020 13:40:51 +0000
-Message-Id: <1591796451-49987-1-git-send-email-ani.sinha@nutanix.com>
-X-Mailer: git-send-email 1.8.3.1
-X-Host-Lookup-Failed: Reverse DNS lookup failed for 192.146.154.243 (deferred)
-Received-SPF: none client-ip=192.146.154.243;
- envelope-from=ani.sinha@ani-sinha1.localdomain; helo=mcp01.nutanix.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/10 09:36:59
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: 19
-X-Spam_score: 1.9
-X-Spam_bar: +
-X-Spam_report: (1.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- NO_DNS_FOR_FROM=0.001, RDNS_NONE=0.793, SPF_HELO_NONE=0.001, SPF_NONE=0.001,
- SUBJ_OBFU_PUNCT_FEW=1, SUBJ_OBFU_PUNCT_MANY=1 autolearn=_AUTOLEARN
+Subject: [PATCH] memory: Revert "memory: accept mismatching sizes in
+ memory_region_access_valid"
+Message-ID: <20200610134731.1514409-1-mst@redhat.com>
+MIME-Version: 1.0
+X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
+X-Mutt-Fcc: =sent
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=mst@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 23:22:15
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -67,102 +105,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Ani Sinha <ani.sinha@nutanix.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, ani@anisinha.ca,
- Igor Mammedov <imammedo@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-stable@nongnu.org,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Currently, the option use_acpi_pci_hotplug is being used to control device
-hotplug capability using ACPI for slots of cold plugged bridges. Hence, we
-are renaming this option to better reflect what it actually does.
+Memory API documentation documents valid .min_access_size and .max_access_size
+fields and explains that any access outside these boundaries is blocked.
 
-Change-Id: I2a6ab47e80fa2bc9504ce88e063d710efaceb842
-Signed-off-by: Ani Sinha <ani.sinha@nutanix.com>
+This is what devices seem to assume.
+
+However this is not what the implementation does: it simply
+ignores the boundaries unless there's an "accepts" callback.
+
+Naturally, this breaks a bunch of devices.
+
+Revert to the documented behaviour.
+
+Devices that want to allow any access can just drop the valid field,
+or add the impl field to have accesses converted to appropriate
+length.
+
+Cc: qemu-stable@nongnu.org
+Reviewed-by: Richard Henderson <rth@twiddle.net>
+Fixes: CVE-2020-13754
+Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1842363
+Fixes: a014ed07bd5a ("memory: accept mismatching sizes in memory_region_access_valid")
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/acpi/piix4.c | 21 +++++++++++----------
- 1 file changed, 11 insertions(+), 10 deletions(-)
+ memory.c | 29 +++++++++--------------------
+ 1 file changed, 9 insertions(+), 20 deletions(-)
 
-diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
-index 85c199b..7de44bc 100644
---- a/hw/acpi/piix4.c
-+++ b/hw/acpi/piix4.c
-@@ -77,7 +77,7 @@ typedef struct PIIX4PMState {
-     Notifier powerdown_notifier;
- 
-     AcpiPciHpState acpi_pci_hotplug;
--    bool use_acpi_pci_hotplug;
-+    bool use_acpi_hotplug_bridge;
- 
-     uint8_t disable_s3;
-     uint8_t disable_s4;
-@@ -204,16 +204,17 @@ static const VMStateDescription vmstate_pci_status = {
-     }
- };
- 
--static bool vmstate_test_use_acpi_pci_hotplug(void *opaque, int version_id)
-+static bool vmstate_test_use_acpi_hotplug_bridge(void *opaque, int version_id)
+diff --git a/memory.c b/memory.c
+index 91ceaf9fcf..3e9388fb74 100644
+--- a/memory.c
++++ b/memory.c
+@@ -1352,35 +1352,24 @@ bool memory_region_access_valid(MemoryRegion *mr,
+                                 bool is_write,
+                                 MemTxAttrs attrs)
  {
-     PIIX4PMState *s = opaque;
--    return s->use_acpi_pci_hotplug;
-+    return s->use_acpi_hotplug_bridge;
- }
+-    int access_size_min, access_size_max;
+-    int access_size, i;
++    if (mr->ops->valid.accepts
++        && !mr->ops->valid.accepts(mr->opaque, addr, size, is_write, attrs)) {
++        return false;
++    }
  
--static bool vmstate_test_no_use_acpi_pci_hotplug(void *opaque, int version_id)
-+static bool vmstate_test_no_use_acpi_hotplug_bridge(void *opaque,
-+                                                    int version_id)
- {
-     PIIX4PMState *s = opaque;
--    return !s->use_acpi_pci_hotplug;
-+    return !s->use_acpi_hotplug_bridge;
- }
- 
- static bool vmstate_test_use_memhp(void *opaque)
-@@ -290,11 +291,11 @@ static const VMStateDescription vmstate_acpi = {
-         VMSTATE_STRUCT_TEST(
-             acpi_pci_hotplug.acpi_pcihp_pci_status[ACPI_PCIHP_BSEL_DEFAULT],
-             PIIX4PMState,
--            vmstate_test_no_use_acpi_pci_hotplug,
-+            vmstate_test_no_use_acpi_hotplug_bridge,
-             2, vmstate_pci_status,
-             struct AcpiPciHpPciStatus),
-         VMSTATE_PCI_HOTPLUG(acpi_pci_hotplug, PIIX4PMState,
--                            vmstate_test_use_acpi_pci_hotplug),
-+                            vmstate_test_use_acpi_hotplug_bridge),
-         VMSTATE_END_OF_LIST()
-     },
-     .subsections = (const VMStateDescription*[]) {
-@@ -528,7 +529,7 @@ I2CBus *piix4_pm_init(PCIBus *bus, int devfn, uint32_t smb_io_base,
-     s->smi_irq = smi_irq;
-     s->smm_enabled = smm_enabled;
-     if (xen_enabled()) {
--        s->use_acpi_pci_hotplug = false;
-+        s->use_acpi_hotplug_bridge = false;
+     if (!mr->ops->valid.unaligned && (addr & (size - 1))) {
+         return false;
      }
  
-     qdev_init_nofail(dev);
-@@ -593,7 +594,7 @@ static void piix4_acpi_system_hot_add_init(MemoryRegion *parent,
-     memory_region_add_subregion(parent, GPE_BASE, &s->io_gpe);
+-    if (!mr->ops->valid.accepts) {
++    /* Treat zero as compatibility all valid */
++    if (!mr->ops->valid.max_access_size) {
+         return true;
+     }
  
-     acpi_pcihp_init(OBJECT(s), &s->acpi_pci_hotplug, bus, parent,
--                    s->use_acpi_pci_hotplug);
-+                    s->use_acpi_hotplug_bridge);
+-    access_size_min = mr->ops->valid.min_access_size;
+-    if (!mr->ops->valid.min_access_size) {
+-        access_size_min = 1;
++    if (size > mr->ops->valid.max_access_size
++        || size < mr->ops->valid.min_access_size) {
++        return false;
+     }
+-
+-    access_size_max = mr->ops->valid.max_access_size;
+-    if (!mr->ops->valid.max_access_size) {
+-        access_size_max = 4;
+-    }
+-
+-    access_size = MAX(MIN(size, access_size_max), access_size_min);
+-    for (i = 0; i < size; i += access_size) {
+-        if (!mr->ops->valid.accepts(mr->opaque, addr + i, access_size,
+-                                    is_write, attrs)) {
+-            return false;
+-        }
+-    }
+-
+     return true;
+ }
  
-     s->cpu_hotplug_legacy = true;
-     object_property_add_bool(OBJECT(s), "cpu-hotplug-legacy",
-@@ -631,7 +632,7 @@ static Property piix4_pm_properties[] = {
-     DEFINE_PROP_UINT8(ACPI_PM_PROP_S4_DISABLED, PIIX4PMState, disable_s4, 0),
-     DEFINE_PROP_UINT8(ACPI_PM_PROP_S4_VAL, PIIX4PMState, s4_val, 2),
-     DEFINE_PROP_BOOL("acpi-pci-hotplug-with-bridge-support", PIIX4PMState,
--                     use_acpi_pci_hotplug, true),
-+                     use_acpi_hotplug_bridge, true),
-     DEFINE_PROP_BOOL("memory-hotplug-support", PIIX4PMState,
-                      acpi_memory_hotplug.is_enabled, true),
-     DEFINE_PROP_END_OF_LIST(),
 -- 
-1.9.4
+MST
 
 
