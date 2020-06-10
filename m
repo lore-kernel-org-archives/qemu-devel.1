@@ -2,118 +2,62 @@ Return-Path: <SRS0=wemX=7X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 923EEC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:38:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEBC9C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:38:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 24B8520734
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:38:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24B8520734
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id C11FB20734
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:38:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C11FB20734
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59762 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60206 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jj0wG-00055M-PM
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 09:38:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50960)
+	id 1jj0wP-0005IF-02
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 09:38:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32950)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mihajlov@linux.ibm.com>)
- id 1jj0dq-00042a-O9; Wed, 10 Jun 2020 09:19:42 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:12574
- helo=mx0a-001b2d01.pphosted.com)
+ (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jj0uP-0003Pz-R6; Wed, 10 Jun 2020 09:36:49 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:52568)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mihajlov@linux.ibm.com>)
- id 1jj0dp-0006Je-C0; Wed, 10 Jun 2020 09:19:42 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 05AD5Gox141896; Wed, 10 Jun 2020 09:19:31 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 31k03hrdfh-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 10 Jun 2020 09:19:30 -0400
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05AD67Ap143849;
- Wed, 10 Jun 2020 09:19:30 -0400
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com
- [149.81.74.106])
- by mx0b-001b2d01.pphosted.com with ESMTP id 31k03hrdev-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 10 Jun 2020 09:19:30 -0400
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
- by ppma04fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05ADGjD3031466;
- Wed, 10 Jun 2020 13:19:28 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com
- (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
- by ppma04fra.de.ibm.com with ESMTP id 31g2s7u59u-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 10 Jun 2020 13:19:28 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
- [9.149.105.58])
- by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 05ADJPxP58589226
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 10 Jun 2020 13:19:25 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 7D1B14C046;
- Wed, 10 Jun 2020 13:19:25 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 161EA4C04A;
- Wed, 10 Jun 2020 13:19:24 +0000 (GMT)
-Received: from oc6604088431.ibm.com (unknown [9.145.22.8])
- by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Wed, 10 Jun 2020 13:19:24 +0000 (GMT)
-Subject: Re: [PATCH v2 1/1] virtio-ccw: auto-manage VIRTIO_F_IOMMU_PLATFORM if
- PV
-To: David Hildenbrand <david@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>
-References: <20200606013217.2cffa3ed.pasic@linux.ibm.com>
- <20200608181428.3c6f127c.cohuck@redhat.com>
- <20200608190045.319dd68b.pasic@linux.ibm.com>
- <20200609084402.35d317ec.cohuck@redhat.com>
- <20200609114130.0ca9190b.pasic@linux.ibm.com>
- <20200609174747.4e300818@ibm-vm>
- <20200609182839.7ac80938.pasic@linux.ibm.com>
- <20200609124155-mutt-send-email-mst@kernel.org>
- <20200610043118.GF494336@umbus.fritz.box>
- <4e5d62d8-9bfb-67d5-7398-2079729fd85e@redhat.com>
- <20200610100756.GO494336@umbus.fritz.box>
- <858e9554-a4c7-6487-121b-ac3eaa209cb7@redhat.com>
-From: Viktor Mihajlovski <mihajlov@linux.ibm.com>
-Message-ID: <4738b708-9d19-beae-4345-b77453afc585@linux.ibm.com>
-Date: Wed, 10 Jun 2020 15:19:22 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jj0uN-0002LX-TX; Wed, 10 Jun 2020 09:36:49 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07625946|-1; CH=blue; DM=|OVERLOAD|false|;
+ DS=CONTINUE|ham_system_inform|0.664654-0.00204451-0.333301;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e02c03310; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=8; RT=8; SR=0; TI=SMTPD_---.HkbPbqf_1591796201; 
+Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.HkbPbqf_1591796201)
+ by smtp.aliyun-inc.com(10.147.42.198);
+ Wed, 10 Jun 2020 21:36:41 +0800
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Subject: [PATCH v9 59/61] target/riscv: vector register gather instruction
+Date: Wed, 10 Jun 2020 19:37:46 +0800
+Message-Id: <20200610113748.4754-60-zhiwei_liu@c-sky.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20200610113748.4754-1-zhiwei_liu@c-sky.com>
+References: <20200610113748.4754-1-zhiwei_liu@c-sky.com>
 MIME-Version: 1.0
-In-Reply-To: <858e9554-a4c7-6487-121b-ac3eaa209cb7@redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
- definitions=2020-06-10_07:2020-06-10,
- 2020-06-10 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1011 suspectscore=0
- priorityscore=1501 lowpriorityscore=0 mlxscore=0 adultscore=0 spamscore=0
- bulkscore=0 phishscore=0 mlxlogscore=999 malwarescore=0 impostorscore=0
- cotscore=-2147483648 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2004280000 definitions=main-2006100096
-Received-SPF: pass client-ip=148.163.158.5;
- envelope-from=mihajlov@linux.ibm.com; helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/10 08:25:00
+Content-Transfer-Encoding: 8bit
+Received-SPF: none client-ip=121.197.200.217;
+ envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/10 07:37:52
 X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
-X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001, UNPARSEABLE_RELAY=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -126,84 +70,208 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Boris Fiuczynski <fiuczy@linux.ibm.com>,
- Janosch Frank <frankja@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- qemu-devel@nongnu.org, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, Richard Henderson <rth@twiddle.net>
+Cc: richard.henderson@linaro.org, wxy194768@alibaba-inc.com,
+ wenmeng_zhang@c-sky.com, Alistair.Francis@wdc.com, palmer@dabbelt.com,
+ LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/riscv/helper.h                   |  9 +++
+ target/riscv/insn32.decode              |  3 +
+ target/riscv/insn_trans/trans_rvv.inc.c | 78 +++++++++++++++++++++++++
+ target/riscv/vector_helper.c            | 60 +++++++++++++++++++
+ 4 files changed, 150 insertions(+)
 
-
-On 6/10/20 12:24 PM, David Hildenbrand wrote:
-> On 10.06.20 12:07, David Gibson wrote:
->> On Wed, Jun 10, 2020 at 09:22:45AM +0200, David Hildenbrand wrote:
->>> On 10.06.20 06:31, David Gibson wrote:
->>>> On Tue, Jun 09, 2020 at 12:44:39PM -0400, Michael S. Tsirkin wrote:
->>>>> On Tue, Jun 09, 2020 at 06:28:39PM +0200, Halil Pasic wrote:
->>>>>> On Tue, 9 Jun 2020 17:47:47 +0200
->>>>>> Claudio Imbrenda <imbrenda@linux.ibm.com> wrote:
->>>>>>
->>>>>>> On Tue, 9 Jun 2020 11:41:30 +0200
->>>>>>> Halil Pasic <pasic@linux.ibm.com> wrote:
->>>>>>>
->>>>>>> [...]
->>>>>>>
->>>>>>>> I don't know. Janosch could answer that, but he is on vacation. Adding
->>>>>>>> Claudio maybe he can answer. My understanding is, that while it might
->>>>>>>> be possible, it is ugly at best. The ability to do a transition is
->>>>>>>> indicated by a CPU model feature. Indicating the feature to the guest
->>>>>>>> and then failing the transition sounds wrong to me.
->>>>>>>
->>>>>>> I agree. If the feature is advertised, then it has to work. I don't
->>>>>>> think we even have an architected way to fail the transition for that
->>>>>>> reason.
->>>>>>>
->>>>>>> What __could__ be done is to prevent qemu from even starting if an
->>>>>>> incompatible device is specified together with PV.
->>>>>>
->>>>>> AFAIU, the "specified together with PV" is the problem here. Currently
->>>>>> we don't "specify PV" but PV is just a capability that is managed by the
->>>>>> CPU model (like so many other).
->>>>>
->>>>> So if we want to keep it user friendly, there could be
->>>>> protection property with values on/off/auto, and auto
->>>>> would poke at host capability to figure out whether
->>>>> it's supported.
->>>>>
->>>>> Both virtio and CPU would inherit from that.
->>>>
->>>> Right, that's what I have in mind for my 'host-trust-limitation'
->>>> property (a generalized version of the existing 'memory-encryption'
->>>> machine option).  My draft patches already set virtio properties
->>>> accordingly, it should be possible to set (default) cpu properties as
->>>> well.
->>>
->>> No crazy CPU model hacks please (at least speaking for the s390x).
->>
->> Uh... I'm not really sure what you have in mind here.
->>
-> 
-> Reading along I got the impression that we want to glue the availability
-> of CPU features to other QEMU cmdline parameters (besides the
-> accelerator). ("to set (default) cpu properties as well"). If we are
-> talking about other CPU properties not expressed as CPU features (e.g.,
-> -cpu X,Y=on ...), then there is no issue.
-> 
-
-The reason that the capability to run in PV mode is expressed in the CPU
-model is that this capability *is* provided by the CPU in terms of
-available instructions. I wouldn't see a benefit in providing
-a meta-property that needs to be synced with the CPU model.
-
-So, if something has to be concluded from the fact that a VM
-could run in PV mode, that decision should be derived from the
-CPU model.
-
+diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+index 6a5e32d1e4..3da863ac13 100644
+--- a/target/riscv/helper.h
++++ b/target/riscv/helper.h
+@@ -1130,3 +1130,12 @@ DEF_HELPER_6(vslide1down_vx_b, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vslide1down_vx_h, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vslide1down_vx_w, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vslide1down_vx_d, void, ptr, ptr, tl, ptr, env, i32)
++
++DEF_HELPER_6(vrgather_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vrgather_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vrgather_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vrgather_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vrgather_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vrgather_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vrgather_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vrgather_vx_d, void, ptr, ptr, tl, ptr, env, i32)
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index 34ccad53a9..e07ff7eff6 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -572,6 +572,9 @@ vslide1up_vx    001110 . ..... ..... 110 ..... 1010111 @r_vm
+ vslidedown_vx   001111 . ..... ..... 100 ..... 1010111 @r_vm
+ vslidedown_vi   001111 . ..... ..... 011 ..... 1010111 @r_vm
+ vslide1down_vx  001111 . ..... ..... 110 ..... 1010111 @r_vm
++vrgather_vv     001100 . ..... ..... 000 ..... 1010111 @r_vm
++vrgather_vx     001100 . ..... ..... 100 ..... 1010111 @r_vm
++vrgather_vi     001100 . ..... ..... 011 ..... 1010111 @r_vm
+ 
+ vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
+ vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
+diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+index ffb9835d07..f6547f7e6d 100644
+--- a/target/riscv/insn_trans/trans_rvv.inc.c
++++ b/target/riscv/insn_trans/trans_rvv.inc.c
+@@ -2776,3 +2776,81 @@ GEN_OPIVI_TRANS(vslideup_vi, 1, vslideup_vx, slideup_check)
+ GEN_OPIVX_TRANS(vslidedown_vx, opivx_check)
+ GEN_OPIVX_TRANS(vslide1down_vx, opivx_check)
+ GEN_OPIVI_TRANS(vslidedown_vi, 1, vslidedown_vx, opivx_check)
++
++/* Vector Register Gather Instruction */
++static bool vrgather_vv_check(DisasContext *s, arg_rmrr *a)
++{
++    return (vext_check_isa_ill(s) &&
++            vext_check_overlap_mask(s, a->rd, a->vm, true) &&
++            vext_check_reg(s, a->rd, false) &&
++            vext_check_reg(s, a->rs1, false) &&
++            vext_check_reg(s, a->rs2, false) &&
++            (a->rd != a->rs2) && (a->rd != a->rs1));
++}
++
++GEN_OPIVV_TRANS(vrgather_vv, vrgather_vv_check)
++
++static bool vrgather_vx_check(DisasContext *s, arg_rmrr *a)
++{
++    return (vext_check_isa_ill(s) &&
++            vext_check_overlap_mask(s, a->rd, a->vm, true) &&
++            vext_check_reg(s, a->rd, false) &&
++            vext_check_reg(s, a->rs2, false) &&
++            (a->rd != a->rs2));
++}
++
++/* vrgather.vx vd, vs2, rs1, vm # vd[i] = (x[rs1] >= VLMAX) ? 0 : vs2[rs1] */
++static bool trans_vrgather_vx(DisasContext *s, arg_rmrr *a)
++{
++    if (!vrgather_vx_check(s, a)) {
++        return false;
++    }
++
++    if (a->vm && s->vl_eq_vlmax) {
++        int vlmax = s->vlen / s->mlen;
++        TCGv_i64 dest = tcg_temp_new_i64();
++
++        if (a->rs1 == 0) {
++            vec_element_loadi(s, dest, a->rs2, 0);
++        } else {
++            vec_element_loadx(s, dest, a->rs2, cpu_gpr[a->rs1], vlmax);
++        }
++
++        tcg_gen_gvec_dup_i64(s->sew, vreg_ofs(s, a->rd),
++                             MAXSZ(s), MAXSZ(s), dest);
++        tcg_temp_free_i64(dest);
++    } else {
++        static gen_helper_opivx * const fns[4] = {
++            gen_helper_vrgather_vx_b, gen_helper_vrgather_vx_h,
++            gen_helper_vrgather_vx_w, gen_helper_vrgather_vx_d
++        };
++        return opivx_trans(a->rd, a->rs1, a->rs2, a->vm, fns[s->sew], s);
++    }
++    return true;
++}
++
++/* vrgather.vi vd, vs2, imm, vm # vd[i] = (imm >= VLMAX) ? 0 : vs2[imm] */
++static bool trans_vrgather_vi(DisasContext *s, arg_rmrr *a)
++{
++    if (!vrgather_vx_check(s, a)) {
++        return false;
++    }
++
++    if (a->vm && s->vl_eq_vlmax) {
++        if (a->rs1 >= s->vlen / s->mlen) {
++            tcg_gen_gvec_dup_imm(SEW64, vreg_ofs(s, a->rd),
++                                 MAXSZ(s), MAXSZ(s), 0);
++        } else {
++            tcg_gen_gvec_dup_mem(s->sew, vreg_ofs(s, a->rd),
++                                 endian_ofs(s, a->rs2, a->rs1),
++                                 MAXSZ(s), MAXSZ(s));
++        }
++    } else {
++        static gen_helper_opivx * const fns[4] = {
++            gen_helper_vrgather_vx_b, gen_helper_vrgather_vx_h,
++            gen_helper_vrgather_vx_w, gen_helper_vrgather_vx_d
++        };
++        return opivi_trans(a->rd, a->rs1, a->rs2, a->vm, fns[s->sew], s, 1);
++    }
++    return true;
++}
+diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+index 28b54d2589..220fa76d54 100644
+--- a/target/riscv/vector_helper.c
++++ b/target/riscv/vector_helper.c
+@@ -4811,3 +4811,63 @@ GEN_VEXT_VSLIDE1DOWN_VX(vslide1down_vx_b, uint8_t, H1, clearb)
+ GEN_VEXT_VSLIDE1DOWN_VX(vslide1down_vx_h, uint16_t, H2, clearh)
+ GEN_VEXT_VSLIDE1DOWN_VX(vslide1down_vx_w, uint32_t, H4, clearl)
+ GEN_VEXT_VSLIDE1DOWN_VX(vslide1down_vx_d, uint64_t, H8, clearq)
++
++/* Vector Register Gather Instruction */
++#define GEN_VEXT_VRGATHER_VV(NAME, ETYPE, H, CLEAR_FN)                    \
++void HELPER(NAME)(void *vd, void *v0, void *vs1, void *vs2,               \
++                  CPURISCVState *env, uint32_t desc)                      \
++{                                                                         \
++    uint32_t mlen = vext_mlen(desc);                                      \
++    uint32_t vlmax = env_archcpu(env)->cfg.vlen / mlen;                   \
++    uint32_t vm = vext_vm(desc);                                          \
++    uint32_t vl = env->vl;                                                \
++    uint32_t index, i;                                                    \
++                                                                          \
++    for (i = 0; i < vl; i++) {                                            \
++        if (!vm && !vext_elem_mask(v0, mlen, i)) {                        \
++            continue;                                                     \
++        }                                                                 \
++        index = *((ETYPE *)vs1 + H(i));                                   \
++        if (index >= vlmax) {                                             \
++            *((ETYPE *)vd + H(i)) = 0;                                    \
++        } else {                                                          \
++            *((ETYPE *)vd + H(i)) = *((ETYPE *)vs2 + H(index));           \
++        }                                                                 \
++    }                                                                     \
++    CLEAR_FN(vd, vl, vl * sizeof(ETYPE), vlmax * sizeof(ETYPE));          \
++}
++
++/* vd[i] = (vs1[i] >= VLMAX) ? 0 : vs2[vs1[i]]; */
++GEN_VEXT_VRGATHER_VV(vrgather_vv_b, uint8_t, H1, clearb)
++GEN_VEXT_VRGATHER_VV(vrgather_vv_h, uint16_t, H2, clearh)
++GEN_VEXT_VRGATHER_VV(vrgather_vv_w, uint32_t, H4, clearl)
++GEN_VEXT_VRGATHER_VV(vrgather_vv_d, uint64_t, H8, clearq)
++
++#define GEN_VEXT_VRGATHER_VX(NAME, ETYPE, H, CLEAR_FN)                    \
++void HELPER(NAME)(void *vd, void *v0, target_ulong s1, void *vs2,         \
++                  CPURISCVState *env, uint32_t desc)                      \
++{                                                                         \
++    uint32_t mlen = vext_mlen(desc);                                      \
++    uint32_t vlmax = env_archcpu(env)->cfg.vlen / mlen;                   \
++    uint32_t vm = vext_vm(desc);                                          \
++    uint32_t vl = env->vl;                                                \
++    uint32_t index = s1, i;                                               \
++                                                                          \
++    for (i = 0; i < vl; i++) {                                            \
++        if (!vm && !vext_elem_mask(v0, mlen, i)) {                        \
++            continue;                                                     \
++        }                                                                 \
++        if (index >= vlmax) {                                             \
++            *((ETYPE *)vd + H(i)) = 0;                                    \
++        } else {                                                          \
++            *((ETYPE *)vd + H(i)) = *((ETYPE *)vs2 + H(index));           \
++        }                                                                 \
++    }                                                                     \
++    CLEAR_FN(vd, vl, vl * sizeof(ETYPE), vlmax * sizeof(ETYPE));          \
++}
++
++/* vd[i] = (x[rs1] >= VLMAX) ? 0 : vs2[rs1] */
++GEN_VEXT_VRGATHER_VX(vrgather_vx_b, uint8_t, H1, clearb)
++GEN_VEXT_VRGATHER_VX(vrgather_vx_h, uint16_t, H2, clearh)
++GEN_VEXT_VRGATHER_VX(vrgather_vx_w, uint32_t, H4, clearl)
++GEN_VEXT_VRGATHER_VX(vrgather_vx_d, uint64_t, H8, clearq)
 -- 
-Kind Regards,
-    Viktor
+2.23.0
+
 
