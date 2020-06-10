@@ -2,80 +2,79 @@ Return-Path: <SRS0=wemX=7X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E861C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 05:36:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09522C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 05:39:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F0997207ED
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 05:36:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C76C5207F9
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 05:39:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hjrCWGF6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0997207ED
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MbM1aP7z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C76C5207F9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43028 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50822 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jitPZ-0002AB-8T
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 01:36:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42496)
+	id 1jitS6-0005R8-0t
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 01:39:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42486)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jitMA-0004xf-Le
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jitMA-0004wj-2H
  for qemu-devel@nongnu.org; Wed, 10 Jun 2020 01:32:58 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:46304
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:57161
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jitM9-0003pC-3S
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 01:32:58 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jitM8-0003ov-OI
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 01:32:57 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591767176;
+ s=mimecast20190719; t=1591767175;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=GMQkoCA98vIuNv1ROVK3Ov3b/ghMux8fGTKdW5hV1no=;
- b=hjrCWGF6NkrEWIkz0ES2rq2DPPZaqFLPqItHgpGiJlolcYCVGUeQjwPEPZ7r/YZEkmFsbE
- DJuNfyRJ/sutlfXuzxbRCfrIl3G4w/WfolYFoKlcLaIAVgpzuKZcKdnN0dLs+5xEawq1aP
- 03gakDCMPWDb+oGor+7V6DSlrZ2yphM=
+ bh=wuHDY/V/hc5LJklJaHXuQSCUC3XA1DHvn8lDejzuBzo=;
+ b=MbM1aP7z6GswKnuyDacNxjTfPOu07LKvaABmC0kaA9H9zwdWqdGJS/BppaJ1pkxqVBuEaP
+ OCbVeLTpfvhIgsDv2LgYCzMz4zOtyAqb8MhIAF9vXwzUz95Vv3umB/C6Z9veLfsDJqBkWs
+ NKAcB2tcGkikemx3gP/V0pkW8b449J8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-179-eMXI7T2mN8KxznNWc_uD-A-1; Wed, 10 Jun 2020 01:32:55 -0400
-X-MC-Unique: eMXI7T2mN8KxznNWc_uD-A-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-460-d6ak6JNuMBih7_f-7WLwHw-1; Wed, 10 Jun 2020 01:32:54 -0400
+X-MC-Unique: d6ak6JNuMBih7_f-7WLwHw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 18020107ACF3
- for <qemu-devel@nongnu.org>; Wed, 10 Jun 2020 05:32:54 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 95CE3107ACCA
+ for <qemu-devel@nongnu.org>; Wed, 10 Jun 2020 05:32:53 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
  [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DE2A2196B8;
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 659645D9D3;
  Wed, 10 Jun 2020 05:32:53 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 18C711138469; Wed, 10 Jun 2020 07:32:48 +0200 (CEST)
+ id D7EE51138461; Wed, 10 Jun 2020 07:32:47 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH RESEND v3 20/58] isa: Convert uses of isa_create(),
- isa_try_create() manually
-Date: Wed, 10 Jun 2020 07:32:09 +0200
-Message-Id: <20200610053247.1583243-21-armbru@redhat.com>
+Subject: [PATCH RESEND v3 12/58] qdev: Convert uses of qdev_set_parent_bus()
+ manually
+Date: Wed, 10 Jun 2020 07:32:01 +0200
+Message-Id: <20200610053247.1583243-13-armbru@redhat.com>
 In-Reply-To: <20200610053247.1583243-1-armbru@redhat.com>
 References: <20200610053247.1583243-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 23:22:15
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 23:51:15
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -96,116 +95,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Same transformation as in the previous commit.  Manual, because
-convincing Coccinelle to transform these cases is not worthwhile.
+convincing Coccinelle to transform these cases is somewhere between
+not worthwhile and infeasible (at least for me).
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- include/hw/net/ne2000-isa.h | 5 +++--
- hw/block/fdc.c              | 4 ++--
- hw/i386/pc.c                | 4 ++--
- hw/ppc/pnv.c                | 9 ++++-----
- 4 files changed, 11 insertions(+), 11 deletions(-)
+ hw/pci-host/prep.c |  3 +--
+ hw/ppc/pnv.c       |  6 ++----
+ hw/s390x/sclp.c    | 10 ++++------
+ 3 files changed, 7 insertions(+), 12 deletions(-)
 
-diff --git a/include/hw/net/ne2000-isa.h b/include/hw/net/ne2000-isa.h
-index eef17a680d..af59ee0b02 100644
---- a/include/hw/net/ne2000-isa.h
-+++ b/include/hw/net/ne2000-isa.h
-@@ -13,6 +13,7 @@
- #include "hw/isa/isa.h"
- #include "hw/qdev-properties.h"
- #include "net/net.h"
-+#include "qapi/error.h"
+diff --git a/hw/pci-host/prep.c b/hw/pci-host/prep.c
+index c821ef889d..42c7e63a60 100644
+--- a/hw/pci-host/prep.c
++++ b/hw/pci-host/prep.c
+@@ -268,7 +268,7 @@ static void raven_pcihost_realizefn(DeviceState *d, Error **errp)
+     memory_region_add_subregion(address_space_mem, 0xbffffff0, &s->pci_intack);
  
- #define TYPE_ISA_NE2000 "ne2k_isa"
- 
-@@ -23,14 +24,14 @@ static inline ISADevice *isa_ne2000_init(ISABus *bus, int base, int irq,
- 
-     qemu_check_nic_model(nd, "ne2k_isa");
- 
--    d = isa_try_create(bus, TYPE_ISA_NE2000);
-+    d = isa_try_new(TYPE_ISA_NE2000);
-     if (d) {
-         DeviceState *dev = DEVICE(d);
- 
-         qdev_prop_set_uint32(dev, "iobase", base);
-         qdev_prop_set_uint32(dev, "irq",    irq);
-         qdev_set_nic_properties(dev, nd);
--        qdev_init_nofail(dev);
-+        isa_realize_and_unref(d, bus, &error_fatal);
-     }
-     return d;
+     /* TODO Remove once realize propagates to child devices. */
+-    object_property_set_bool(OBJECT(&s->pci_dev), true, "realized", errp);
++    qdev_realize(DEVICE(&s->pci_dev), BUS(&s->pci_bus), errp);
  }
-diff --git a/hw/block/fdc.c b/hw/block/fdc.c
-index 1feb398875..a3250f6fdb 100644
---- a/hw/block/fdc.c
-+++ b/hw/block/fdc.c
-@@ -2544,7 +2544,7 @@ ISADevice *fdctrl_init_isa(ISABus *bus, DriveInfo **fds)
-     DeviceState *dev;
-     ISADevice *isadev;
  
--    isadev = isa_try_create(bus, TYPE_ISA_FDC);
-+    isadev = isa_try_new(TYPE_ISA_FDC);
-     if (!isadev) {
-         return NULL;
-     }
-@@ -2558,7 +2558,7 @@ ISADevice *fdctrl_init_isa(ISABus *bus, DriveInfo **fds)
-         qdev_prop_set_drive(dev, "driveB", blk_by_legacy_dinfo(fds[1]),
-                             &error_fatal);
-     }
--    qdev_init_nofail(dev);
-+    isa_realize_and_unref(isadev, bus, &error_fatal);
+ static void raven_pcihost_initfn(Object *obj)
+@@ -308,7 +308,6 @@ static void raven_pcihost_initfn(Object *obj)
  
-     return isadev;
- }
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index b549d0bbfc..280560f790 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1157,14 +1157,14 @@ static void pc_superio_init(ISABus *isa_bus, bool create_fdctrl, bool no_vmport)
-     i8042 = isa_create_simple(isa_bus, "i8042");
-     if (!no_vmport) {
-         isa_create_simple(isa_bus, TYPE_VMPORT);
--        vmmouse = isa_try_create(isa_bus, "vmmouse");
-+        vmmouse = isa_try_new("vmmouse");
-     } else {
-         vmmouse = NULL;
-     }
-     if (vmmouse) {
-         object_property_set_link(OBJECT(vmmouse), OBJECT(i8042),
-                                  "i8042", &error_abort);
--        qdev_init_nofail(DEVICE(vmmouse));
-+        isa_realize_and_unref(vmmouse, isa_bus, &error_fatal);
-     }
-     port92 = isa_create_simple(isa_bus, TYPE_PORT92);
- 
+     object_initialize(&s->pci_dev, sizeof(s->pci_dev), TYPE_RAVEN_PCI_DEVICE);
+     pci_dev = DEVICE(&s->pci_dev);
+-    qdev_set_parent_bus(pci_dev, BUS(&s->pci_bus));
+     object_property_set_int(OBJECT(&s->pci_dev), PCI_DEVFN(0, 0), "addr",
+                             NULL);
+     qdev_prop_set_bit(pci_dev, "multifunction", false);
 diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index e0588285a2..ffaf12b006 100644
+index 8562af3fe0..e0588285a2 100644
 --- a/hw/ppc/pnv.c
 +++ b/hw/ppc/pnv.c
-@@ -694,12 +694,11 @@ static bool pnv_match_cpu(const char *default_type, const char *cpu_type)
+@@ -1212,12 +1212,11 @@ static void pnv_chip_power8_realize(DeviceState *dev, Error **errp)
+         object_property_set_int(OBJECT(phb), i, "index", &error_fatal);
+         object_property_set_int(OBJECT(phb), chip->chip_id, "chip-id",
+                                 &error_fatal);
+-        object_property_set_bool(OBJECT(phb), true, "realized", &local_err);
++        qdev_realize(DEVICE(phb), NULL, &local_err);
+         if (local_err) {
+             error_propagate(errp, local_err);
+             return;
+         }
+-        qdev_set_parent_bus(DEVICE(phb), sysbus_get_default());
  
- static void pnv_ipmi_bt_init(ISABus *bus, IPMIBmc *bmc, uint32_t irq)
- {
--    Object *obj;
-+    ISADevice *dev = isa_new("isa-ipmi-bt");
+         /* Populate the XSCOM address space. */
+         pnv_xscom_add_subregion(chip,
+@@ -1422,12 +1421,11 @@ static void pnv_chip_power9_phb_realize(PnvChip *chip, Error **errp)
+             object_property_set_int(obj, PNV_PHB4_DEVICE_ID, "device-id",
+                                     &error_fatal);
+             object_property_set_link(obj, OBJECT(stack), "stack", &error_abort);
+-            object_property_set_bool(obj, true, "realized", &local_err);
++            qdev_realize(DEVICE(obj), NULL, &local_err);
+             if (local_err) {
+                 error_propagate(errp, local_err);
+                 return;
+             }
+-            qdev_set_parent_bus(DEVICE(obj), sysbus_get_default());
  
--    obj = OBJECT(isa_create(bus, "isa-ipmi-bt"));
--    object_property_set_link(obj, OBJECT(bmc), "bmc", &error_fatal);
--    object_property_set_int(obj, irq, "irq", &error_fatal);
--    object_property_set_bool(obj, true, "realized", &error_fatal);
-+    object_property_set_link(OBJECT(dev), OBJECT(bmc), "bmc", &error_fatal);
-+    object_property_set_int(OBJECT(dev), irq, "irq", &error_fatal);
-+    isa_realize_and_unref(dev, bus, &error_fatal);
- }
+             /* Populate the XSCOM address space. */
+             pnv_xscom_add_subregion(chip,
+diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
+index 20aca30ac4..40e27a8cb4 100644
+--- a/hw/s390x/sclp.c
++++ b/hw/s390x/sclp.c
+@@ -333,17 +333,15 @@ static void sclp_realize(DeviceState *dev, Error **errp)
+     uint64_t hw_limit;
+     int ret;
  
- static void pnv_chip_power10_pic_print_info(PnvChip *chip, Monitor *mon)
+-    object_property_set_bool(OBJECT(sclp->event_facility), true, "realized",
+-                             &err);
+-    if (err) {
+-        goto out;
+-    }
+     /*
+      * qdev_device_add searches the sysbus for TYPE_SCLP_EVENTS_BUS. As long
+      * as we can't find a fitting bus via the qom tree, we have to add the
+      * event facility to the sysbus, so e.g. a sclp console can be created.
+      */
+-    qdev_set_parent_bus(DEVICE(sclp->event_facility), sysbus_get_default());
++    qdev_realize(DEVICE(sclp->event_facility), NULL, &err);
++    if (err) {
++        goto out;
++    }
+ 
+     ret = s390_set_memory_limit(machine->maxram_size, &hw_limit);
+     if (ret == -E2BIG) {
 -- 
 2.26.2
 
