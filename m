@@ -2,75 +2,82 @@ Return-Path: <SRS0=wemX=7X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80F00C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 17:21:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF15CC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 17:26:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5892D206F4
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 17:21:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5892D206F4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id B6344206F4
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 17:26:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6344206F4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52934 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56090 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jj4QH-0004EG-Ht
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 13:21:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55478)
+	id 1jj4Up-0006TM-Tf
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 13:26:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57822)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jj4MJ-0007eb-DA
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 13:17:51 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:25085
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jj4MH-0000KC-Hg
- for qemu-devel@nongnu.org; Wed, 10 Jun 2020 13:17:49 -0400
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-269-m7dc_wQbMLWlA1lrQ2VWbw-1; Wed, 10 Jun 2020 13:17:45 -0400
-X-MC-Unique: m7dc_wQbMLWlA1lrQ2VWbw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 087D918FF662;
- Wed, 10 Jun 2020 17:17:44 +0000 (UTC)
-Received: from bahia.lan (ovpn-114-202.ams2.redhat.com [10.36.114.202])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D63B87BE60;
- Wed, 10 Jun 2020 17:17:42 +0000 (UTC)
-Subject: [PATCH 3/3] spapr: Forbid nested KVM-HV in pre-power9 compat mode
-From: Greg Kurz <groug@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 10 Jun 2020 19:17:42 +0200
-Message-ID: <159180946200.29090.1530776456251159527.stgit@bahia.lan>
-In-Reply-To: <159180935807.29090.16079635439548762534.stgit@bahia.lan>
-References: <159180935807.29090.16079635439548762534.stgit@bahia.lan>
-User-Agent: StGit/0.21
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jj4U1-0005xM-DF
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 13:25:49 -0400
+Received: from indium.canonical.com ([91.189.90.7]:50238)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jj4U0-0001pT-2P
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 13:25:49 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jj4Tx-0000Rj-PN
+ for <qemu-devel@nongnu.org>; Wed, 10 Jun 2020 17:25:45 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id BE6892E8109
+ for <qemu-devel@nongnu.org>; Wed, 10 Jun 2020 17:25:45 +0000 (UTC)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: kaod.org
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: softfail client-ip=207.211.31.81; envelope-from=groug@kaod.org;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/09 23:22:15
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -12
-X-Spam_score: -1.3
-X-Spam_bar: -
-X-Spam_report: (-1.3 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_SOFTFAIL=0.665 autolearn=_AUTOLEARN
+Date: Wed, 10 Jun 2020 17:19:07 -0000
+From: "Laszlo Ersek \(Red Hat\)" <1882671@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
+ status=Confirmed; importance=Undecided; assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: janitor lersek vvaltchev
+X-Launchpad-Bug-Reporter: Vladislav K. Valtchev (vvaltchev)
+X-Launchpad-Bug-Modifier: Laszlo Ersek (Red Hat) (lersek)
+References: <159169936514.32294.8785049859239547612.malonedeb@gac.canonical.com>
+Message-Id: <159180954791.6172.3059065929798452134.malone@chaenomeles.canonical.com>
+Subject: [Bug 1882671] Re: qemu-system-x86_64 (ver 4.2) stuck at boot with
+ OVMF bios
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="b190cebbf563f89e480a8b57f641753c8196bda0";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 9c95565740ab71c61904ec98502c00b59c0bd6c1
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/10 11:11:22
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,53 +86,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
+Reply-To: Bug 1882671 <1882671@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Nested KVM-HV only works on POWER9.
+(From the UEFI executable name "82540em.efi" in the log, I initially
+suspected an assigned physical NIC with a buggy flashed-on oprom. But
+grepping the iPXE tree for "82540em" yields a match, and QEMU loads the
+iPXE oproms by default into the emulated NICs' ROM BARs.)
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- hw/ppc/spapr_caps.c |   11 +++++++++++
- 1 file changed, 11 insertions(+)
+-- =
 
-diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-index 0c3d3b64a508..05c8f70506ad 100644
---- a/hw/ppc/spapr_caps.c
-+++ b/hw/ppc/spapr_caps.c
-@@ -408,6 +408,9 @@ static void cap_hpt_maxpagesize_cpu_apply(SpaprMachineS=
-tate *spapr,
- static void cap_nested_kvm_hv_apply(SpaprMachineState *spapr,
-                                     uint8_t val, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-+    PowerPCCPU *cpu =3D POWERPC_CPU(first_cpu);
-+
-     if (!val) {
-         /* capability disabled by default */
-         return;
-@@ -417,6 +420,14 @@ static void cap_nested_kvm_hv_apply(SpaprMachineState =
-*spapr,
-         error_setg(errp, "No Nested KVM-HV support in TCG");
-         error_append_hint(errp, "Try appending -machine cap-nested-hv=3Dof=
-f");
-     } else if (kvm_enabled()) {
-+        if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_3_00, 0,
-+                              spapr->max_compat_pvr)) {
-+            error_setg(errp, "Nested KVM-HV only supported on POWER9");
-+            error_append_hint(errp,
-+                              "Try appending -machine max-cpu-compat=3Dpow=
-er9\n");
-+            return;
-+        }
-+
-         if (!kvmppc_has_cap_nested_kvm_hv()) {
-             error_setg(errp,
- "KVM implementation does not support Nested KVM-HV");
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1882671
 
+Title:
+  qemu-system-x86_64 (ver 4.2) stuck at boot with OVMF bios
 
+Status in QEMU:
+  New
+Status in qemu package in Ubuntu:
+  Confirmed
+
+Bug description:
+  The version of QEMU (4.2.0) packaged for Ubuntu 20.04 hangs
+  indefinitely at boot if an OVMF bios is used. This happens ONLY with
+  qemu-system-x86_64. qemu-system-i386 works fine with the latest ia32
+  OVMF bios.
+
+  NOTE[1]: the same identical OVMF bios works fine on QEMU 2.x packaged wit=
+h Ubuntu 18.04.
+  NOTE[2]: reproducing the fatal bug requires *no* operating system:
+
+     qemu-system-x86_64 -bios OVMF-pure-efi.fd
+
+  On its window QEMU gets stuck at the very first stage:
+     "Guest has not initialized the display (yet)."
+
+  NOTE[3]: QEMU gets stuck no matter if KVM is used or not.
+
+  NOTE[4]: By adding the `-d int` option it is possible to observe that
+  QEMU is, apparently, stuck in an endless loop of interrupts. For the
+  first few seconds, registers' values vary quickly, but at some point
+  they reach a final value, while the interrupt counter increments:
+
+    2568: v=3D68 e=3D0000 i=3D0 cpl=3D0 IP=3D0038:0000000007f1d225 pc=3D000=
+0000007f1d225 SP=3D0030:0000000007f0c8d0 env->regs[R_EAX]=3D0000000000000000
+  RAX=3D0000000000000000 RBX=3D0000000007f0c920 RCX=3D0000000000000000 RDX=
+=3D0000000000000001
+  RSI=3D0000000006d18798 RDI=3D0000000000008664 RBP=3D0000000000000000 RSP=
+=3D0000000007f0c8d0
+  R8 =3D0000000000000001 R9 =3D0000000000000089 R10=3D0000000000000000 R11=
+=3D0000000007f2c987
+  R12=3D0000000000000000 R13=3D0000000000000000 R14=3D0000000007087901 R15=
+=3D0000000000000000
+  RIP=3D0000000007f1d225 RFL=3D00000246 [---Z-P-] CPL=3D0 II=3D0 A20=3D1 SM=
+M=3D0 HLT=3D0
+  ES =3D0030 0000000000000000 ffffffff 00cf9300 DPL=3D0 DS   [-WA]
+  CS =3D0038 0000000000000000 ffffffff 00af9a00 DPL=3D0 CS64 [-R-]
+  SS =3D0030 0000000000000000 ffffffff 00cf9300 DPL=3D0 DS   [-WA]
+  DS =3D0030 0000000000000000 ffffffff 00cf9300 DPL=3D0 DS   [-WA]
+  FS =3D0030 0000000000000000 ffffffff 00cf9300 DPL=3D0 DS   [-WA]
+  GS =3D0030 0000000000000000 ffffffff 00cf9300 DPL=3D0 DS   [-WA]
+  LDT=3D0000 0000000000000000 0000ffff 00008200 DPL=3D0 LDT
+  TR =3D0000 0000000000000000 0000ffff 00008b00 DPL=3D0 TSS64-busy
+  GDT=3D     00000000079eea98 00000047
+  IDT=3D     000000000758f018 00000fff
+  CR0=3D80010033 CR2=3D0000000000000000 CR3=3D0000000007c01000 CR4=3D000006=
+68
+  DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=
+=3D0000000000000000 =
+
+  DR6=3D00000000ffff0ff0 DR7=3D0000000000000400
+  CCS=3D0000000000000044 CCD=3D0000000000000000 CCO=3DEFLAGS  =
+
+  EFER=3D0000000000000d00
+
+  =
+
+  NOTE[5]: Just to better help the investigation of the bug, I'd like to re=
+mark that the issue is NOT caused by an endless loop of triple-faults. I tr=
+ied with -d cpu_reset and there is NO such loop. No triple fault whatsoever.
+
+  NOTE[6]: The OVMF version used for the test has been downloaded from:
+  https://www.kraxel.org/repos/jenkins/edk2/edk2.git-ovmf-x64-0-20200515.13=
+98.g6ff7c838d0.noarch.rpm
+
+  but the issue is the same with older OVMF versions as well.
+
+  =
+
+  Please take a look at it, as the bug is NOT a corner case. QEMU 4.2.0 can=
+not boot with an UEFI firmware (OVMF) while virtualizing a x86_64 machine A=
+T ALL.
+
+  Thank you very much,
+  Vladislav K. Valtchev
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1882671/+subscriptions
 
