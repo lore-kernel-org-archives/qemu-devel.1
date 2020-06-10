@@ -2,63 +2,59 @@ Return-Path: <SRS0=wemX=7X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84BDCC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:51:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D08CAC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:53:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 57E95206F4
-	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:51:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57E95206F4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id A350A206F4
+	for <qemu-devel@archiver.kernel.org>; Wed, 10 Jun 2020 13:53:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A350A206F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nutanix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40178 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43748 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jj18t-0005Yf-K1
-	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 09:51:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34736)
+	id 1jj1AF-0007Sb-VL
+	for qemu-devel@archiver.kernel.org; Wed, 10 Jun 2020 09:53:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34800)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jj0yK-0000Fa-Po; Wed, 10 Jun 2020 09:40:53 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:52434)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jj0yI-0002sc-0k; Wed, 10 Jun 2020 09:40:52 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07437667|-1; CH=blue; DM=|OVERLOAD|false|;
- DS=CONTINUE|ham_system_inform|0.0270799-9.17707e-05-0.972828;
- FP=0|0|0|0|0|-1|-1|-1; HT=e02c03279; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=9; RT=8; SR=0; TI=SMTPD_---.HkbD5EZ_1591796442; 
-Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.HkbD5EZ_1591796442)
- by smtp.aliyun-inc.com(10.147.42.253);
- Wed, 10 Jun 2020 21:40:43 +0800
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-To: qemu-devel@nongnu.org,
-	qemu-riscv@nongnu.org
-Subject: [PATCH v9 61/61] target/riscv: configure and turn on vector extension
- from command line
-Date: Wed, 10 Jun 2020 19:37:48 +0800
-Message-Id: <20200610113748.4754-62-zhiwei_liu@c-sky.com>
-X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20200610113748.4754-1-zhiwei_liu@c-sky.com>
-References: <20200610113748.4754-1-zhiwei_liu@c-sky.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: none client-ip=121.197.200.217;
- envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/10 07:37:52
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001, UNPARSEABLE_RELAY=0.001 autolearn=_AUTOLEARN
+ (Exim 4.90_1) (envelope-from <ani.sinha@ani-sinha1.localdomain>)
+ id 1jj0yR-0000O0-AI
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 09:40:59 -0400
+Received: from [192.146.154.243] (port=47438 helo=mcp01.nutanix.com)
+ by eggs.gnu.org with esmtp (Exim 4.90_1)
+ (envelope-from <ani.sinha@ani-sinha1.localdomain>)
+ id 1jj0yP-0002tD-Ry
+ for qemu-devel@nongnu.org; Wed, 10 Jun 2020 09:40:58 -0400
+Received: from ani-sinha1.localdomain (ani-sinha1.dev.nutanix.com
+ [10.41.71.199])
+ by mcp01.nutanix.com (Postfix) with ESMTP id 13BB3101A9E2;
+ Wed, 10 Jun 2020 13:40:53 +0000 (UTC)
+Received: by ani-sinha1.localdomain (Postfix, from userid 16671)
+ id 0E2A6220A23; Wed, 10 Jun 2020 13:40:53 +0000 (UTC)
+From: Ani Sinha <ani.sinha@nutanix.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH V2] Rename use_acpi_pci_hotplug to more appropriate
+ use_acpi_hotplug_bridge
+Date: Wed, 10 Jun 2020 13:40:51 +0000
+Message-Id: <1591796451-49987-1-git-send-email-ani.sinha@nutanix.com>
+X-Mailer: git-send-email 1.8.3.1
+X-Host-Lookup-Failed: Reverse DNS lookup failed for 192.146.154.243 (deferred)
+Received-SPF: none client-ip=192.146.154.243;
+ envelope-from=ani.sinha@ani-sinha1.localdomain; helo=mcp01.nutanix.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/10 09:36:59
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: 19
+X-Spam_score: 1.9
+X-Spam_bar: +
+X-Spam_report: (1.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ NO_DNS_FOR_FROM=0.001, RDNS_NONE=0.793, SPF_HELO_NONE=0.001, SPF_NONE=0.001,
+ SUBJ_OBFU_PUNCT_FEW=1, SUBJ_OBFU_PUNCT_MANY=1 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -71,125 +67,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: richard.henderson@linaro.org, wxy194768@alibaba-inc.com,
- wenmeng_zhang@c-sky.com, Alistair Francis <alistair.francis@wdc.com>,
- palmer@dabbelt.com, LIU Zhiwei <zhiwei_liu@c-sky.com>
+Cc: Ani Sinha <ani.sinha@nutanix.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, ani@anisinha.ca,
+ Igor Mammedov <imammedo@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Vector extension is default off. The only way to use vector extension is
-1. use cpu rv32 or rv64
-2. turn on it by command line
-   "-cpu rv64,x-v=true,vlen=128,elen=64,vext_spec=v0.7.1".
+Currently, the option use_acpi_pci_hotplug is being used to control device
+hotplug capability using ACPI for slots of cold plugged bridges. Hence, we
+are renaming this option to better reflect what it actually does.
 
-vlen is the vector register length, default value is 128 bit.
-elen is the max operator size in bits, default value is 64 bit.
-vext_spec is the vector specification version, default value is v0.7.1.
-These properties can be specified with other values.
-
-Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Change-Id: I2a6ab47e80fa2bc9504ce88e063d710efaceb842
+Signed-off-by: Ani Sinha <ani.sinha@nutanix.com>
 ---
- target/riscv/cpu.c | 43 +++++++++++++++++++++++++++++++++++++++++++
- target/riscv/cpu.h |  4 +++-
- 2 files changed, 46 insertions(+), 1 deletion(-)
+ hw/acpi/piix4.c | 21 +++++++++++----------
+ 1 file changed, 11 insertions(+), 10 deletions(-)
 
-diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-index 1af79404fa..33483acd25 100644
---- a/target/riscv/cpu.c
-+++ b/target/riscv/cpu.c
-@@ -457,6 +457,45 @@ static void riscv_cpu_realize(DeviceState *dev, Error **errp)
-         if (cpu->cfg.ext_h) {
-             target_misa |= RVH;
-         }
-+        if (cpu->cfg.ext_v) {
-+            target_misa |= RVV;
-+            if (!is_power_of_2(cpu->cfg.vlen)) {
-+                error_setg(errp,
-+                        "Vector extension VLEN must be power of 2");
-+                return;
-+            }
-+            if (cpu->cfg.vlen > RV_VLEN_MAX || cpu->cfg.vlen < 128) {
-+                error_setg(errp,
-+                        "Vector extension implementation only supports VLEN "
-+                        "in the range [128, %d]", RV_VLEN_MAX);
-+                return;
-+            }
-+            if (!is_power_of_2(cpu->cfg.elen)) {
-+                error_setg(errp,
-+                        "Vector extension ELEN must be power of 2");
-+                return;
-+            }
-+            if (cpu->cfg.elen > 64 || cpu->cfg.vlen < 8) {
-+                error_setg(errp,
-+                        "Vector extension implementation only supports ELEN "
-+                        "in the range [8, 64]");
-+                return;
-+            }
-+            if (cpu->cfg.vext_spec) {
-+                if (!g_strcmp0(cpu->cfg.vext_spec, "v0.7.1")) {
-+                    vext_version = VEXT_VERSION_0_07_1;
-+                } else {
-+                    error_setg(errp,
-+                           "Unsupported vector spec version '%s'",
-+                           cpu->cfg.vext_spec);
-+                    return;
-+                }
-+            } else {
-+                qemu_log("vector verison is not specified, "
-+                        "use the default value v0.7.1\n");
-+            }
-+            set_vext_version(env, vext_version);
-+        }
+diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
+index 85c199b..7de44bc 100644
+--- a/hw/acpi/piix4.c
++++ b/hw/acpi/piix4.c
+@@ -77,7 +77,7 @@ typedef struct PIIX4PMState {
+     Notifier powerdown_notifier;
  
-         set_misa(env, RVXLEN | target_misa);
+     AcpiPciHpState acpi_pci_hotplug;
+-    bool use_acpi_pci_hotplug;
++    bool use_acpi_hotplug_bridge;
+ 
+     uint8_t disable_s3;
+     uint8_t disable_s4;
+@@ -204,16 +204,17 @@ static const VMStateDescription vmstate_pci_status = {
      }
-@@ -496,10 +535,14 @@ static Property riscv_cpu_properties[] = {
-     DEFINE_PROP_BOOL("u", RISCVCPU, cfg.ext_u, true),
-     /* This is experimental so mark with 'x-' */
-     DEFINE_PROP_BOOL("x-h", RISCVCPU, cfg.ext_h, false),
-+    DEFINE_PROP_BOOL("x-v", RISCVCPU, cfg.ext_v, false),
-     DEFINE_PROP_BOOL("Counters", RISCVCPU, cfg.ext_counters, true),
-     DEFINE_PROP_BOOL("Zifencei", RISCVCPU, cfg.ext_ifencei, true),
-     DEFINE_PROP_BOOL("Zicsr", RISCVCPU, cfg.ext_icsr, true),
-     DEFINE_PROP_STRING("priv_spec", RISCVCPU, cfg.priv_spec),
-+    DEFINE_PROP_STRING("vext_spec", RISCVCPU, cfg.vext_spec),
-+    DEFINE_PROP_UINT16("vlen", RISCVCPU, cfg.vlen, 128),
-+    DEFINE_PROP_UINT16("elen", RISCVCPU, cfg.elen, 64),
-     DEFINE_PROP_BOOL("mmu", RISCVCPU, cfg.mmu, true),
-     DEFINE_PROP_BOOL("pmp", RISCVCPU, cfg.pmp, true),
+ };
+ 
+-static bool vmstate_test_use_acpi_pci_hotplug(void *opaque, int version_id)
++static bool vmstate_test_use_acpi_hotplug_bridge(void *opaque, int version_id)
+ {
+     PIIX4PMState *s = opaque;
+-    return s->use_acpi_pci_hotplug;
++    return s->use_acpi_hotplug_bridge;
+ }
+ 
+-static bool vmstate_test_no_use_acpi_pci_hotplug(void *opaque, int version_id)
++static bool vmstate_test_no_use_acpi_hotplug_bridge(void *opaque,
++                                                    int version_id)
+ {
+     PIIX4PMState *s = opaque;
+-    return !s->use_acpi_pci_hotplug;
++    return !s->use_acpi_hotplug_bridge;
+ }
+ 
+ static bool vmstate_test_use_memhp(void *opaque)
+@@ -290,11 +291,11 @@ static const VMStateDescription vmstate_acpi = {
+         VMSTATE_STRUCT_TEST(
+             acpi_pci_hotplug.acpi_pcihp_pci_status[ACPI_PCIHP_BSEL_DEFAULT],
+             PIIX4PMState,
+-            vmstate_test_no_use_acpi_pci_hotplug,
++            vmstate_test_no_use_acpi_hotplug_bridge,
+             2, vmstate_pci_status,
+             struct AcpiPciHpPciStatus),
+         VMSTATE_PCI_HOTPLUG(acpi_pci_hotplug, PIIX4PMState,
+-                            vmstate_test_use_acpi_pci_hotplug),
++                            vmstate_test_use_acpi_hotplug_bridge),
+         VMSTATE_END_OF_LIST()
+     },
+     .subsections = (const VMStateDescription*[]) {
+@@ -528,7 +529,7 @@ I2CBus *piix4_pm_init(PCIBus *bus, int devfn, uint32_t smb_io_base,
+     s->smi_irq = smi_irq;
+     s->smm_enabled = smm_enabled;
+     if (xen_enabled()) {
+-        s->use_acpi_pci_hotplug = false;
++        s->use_acpi_hotplug_bridge = false;
+     }
+ 
+     qdev_init_nofail(dev);
+@@ -593,7 +594,7 @@ static void piix4_acpi_system_hot_add_init(MemoryRegion *parent,
+     memory_region_add_subregion(parent, GPE_BASE, &s->io_gpe);
+ 
+     acpi_pcihp_init(OBJECT(s), &s->acpi_pci_hotplug, bus, parent,
+-                    s->use_acpi_pci_hotplug);
++                    s->use_acpi_hotplug_bridge);
+ 
+     s->cpu_hotplug_legacy = true;
+     object_property_add_bool(OBJECT(s), "cpu-hotplug-legacy",
+@@ -631,7 +632,7 @@ static Property piix4_pm_properties[] = {
+     DEFINE_PROP_UINT8(ACPI_PM_PROP_S4_DISABLED, PIIX4PMState, disable_s4, 0),
+     DEFINE_PROP_UINT8(ACPI_PM_PROP_S4_VAL, PIIX4PMState, s4_val, 2),
+     DEFINE_PROP_BOOL("acpi-pci-hotplug-with-bridge-support", PIIX4PMState,
+-                     use_acpi_pci_hotplug, true),
++                     use_acpi_hotplug_bridge, true),
+     DEFINE_PROP_BOOL("memory-hotplug-support", PIIX4PMState,
+                      acpi_memory_hotplug.is_enabled, true),
      DEFINE_PROP_END_OF_LIST(),
-diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-index 0ad51c6580..eef20ca6e5 100644
---- a/target/riscv/cpu.h
-+++ b/target/riscv/cpu.h
-@@ -92,7 +92,7 @@ typedef struct CPURISCVState CPURISCVState;
- 
- #include "pmp.h"
- 
--#define RV_VLEN_MAX 512
-+#define RV_VLEN_MAX 256
- 
- FIELD(VTYPE, VLMUL, 0, 2)
- FIELD(VTYPE, VSEW, 2, 3)
-@@ -279,12 +279,14 @@ typedef struct RISCVCPU {
-         bool ext_s;
-         bool ext_u;
-         bool ext_h;
-+        bool ext_v;
-         bool ext_counters;
-         bool ext_ifencei;
-         bool ext_icsr;
- 
-         char *priv_spec;
-         char *user_spec;
-+        char *vext_spec;
-         uint16_t vlen;
-         uint16_t elen;
-         bool mmu;
 -- 
-2.23.0
+1.9.4
 
 
