@@ -2,88 +2,109 @@ Return-Path: <SRS0=U615=7Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13807C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 12:09:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A368C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 12:22:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D5E1A20760
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 12:09:32 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f3HwN5+f"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5E1A20760
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5F56A2072F
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 12:22:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F56A2072F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52648 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56582 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjM1U-0004yU-62
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 08:09:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33592)
+	id 1jjME6-00018l-KK
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 08:22:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37026)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jjM0p-0004YQ-Ub
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 08:08:51 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:53041)
- by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jjM0o-0007vV-Jc
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 08:08:51 -0400
-Received: by mail-wm1-x341.google.com with SMTP id r9so4752821wmh.2
- for <qemu-devel@nongnu.org>; Thu, 11 Jun 2020 05:08:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=Wt5EjiyrU4aBN21K/jgvPRs5FXkJwvxPIiZylk4m1x4=;
- b=f3HwN5+f7eTNWCTzZjjjTb2Aj1lv5YH9sBp2Ctto85xOtkNTooViAFjsgGfa0emVbx
- +2WUcp9GeWFywcKpUAg1MAa053grPTCs4uIPIyLtlKeQiMFgP8JgiGoLlgMtGM0DOiiJ
- B42iIYd9M9/BvS9ygBXkEHJxYA9Ir8z69O261aCM+yvgIce+GttlOhE5uCXzbW/T4+oY
- cZq+7X3tQfx/cv5RSAkyA2J5fM2p3giK9tgCK5mFvTrnURHHQljYGXSKjVmAs4kyuekf
- TsetOaRJnlGXuztfBafEhKAKTTNG0U2SW9BiKYShDqvUR3kRek2W9l3XUUQvqcUbxZYh
- D4FA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=Wt5EjiyrU4aBN21K/jgvPRs5FXkJwvxPIiZylk4m1x4=;
- b=AuUI2pFggrKpRZYaxEOQREHctT+kFAM28HXlXzFDEN+YqKUIwrnEFqNx0UP8CifbwV
- Qu049vpmtfDMcq1U/tIeVrKycRZhfAXJ8R/3XBVXmNji9hnz/CnyIE7ayxFjoo71ntdY
- 6odXCC8tt5l37Stt4eRmKvh2L15fOFJa+M8cGu58BYAa90kXW8ESoJsPJ9lSyGsbBtdV
- xdH7MALIkRbHZCx6dOPVYCmflgXd103oIUHBjG1tvyItGnXEGlcHftmFhNVATEusqbwd
- /ZFl1JUE7qcvqjOgTUwMVWAXMkFSEPRWw/LWrXn2jOSVWvCl0046GEXxg6zkjKx8qMV+
- yNOA==
-X-Gm-Message-State: AOAM53219IEl0YNq1DEeQIS39IJBtFNY2Ajj3CqJJHPqp36w4WyOqIiL
- NwxlJo8QBREHLe54BrVektrm9AocLHJC9NIo8Rz8VheW598=
-X-Google-Smtp-Source: ABdhPJxuYHcaJo4gvaP/TGpSpVfhnTWSRNnQiU6dy7LvqmwrfJxe3VhA0G4qo8UNfWz0QwuCAdJ9hMt0coAizUV288E=
-X-Received: by 2002:a1c:cc0d:: with SMTP id h13mr8485336wmb.168.1591877323719; 
- Thu, 11 Jun 2020 05:08:43 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <stefanb@linux.ibm.com>)
+ id 1jjMD2-0000fv-3U
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 08:21:29 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51660)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <stefanb@linux.ibm.com>)
+ id 1jjMD0-0002E1-MK
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 08:21:27 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 05BC6ZBX180665; Thu, 11 Jun 2020 08:21:21 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 31k5hy7epq-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 11 Jun 2020 08:21:21 -0400
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05BCCoZL026205;
+ Thu, 11 Jun 2020 08:21:21 -0400
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com
+ [169.62.189.11])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 31k5hy7epc-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 11 Jun 2020 08:21:21 -0400
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+ by ppma03dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05BCFHoA010625;
+ Thu, 11 Jun 2020 12:21:20 GMT
+Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com
+ [9.57.198.28]) by ppma03dal.us.ibm.com with ESMTP id 31hw1c6569-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 11 Jun 2020 12:21:20 +0000
+Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com
+ [9.57.199.109])
+ by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 05BCLJtV46989708
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 11 Jun 2020 12:21:19 GMT
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 7B8B9112064;
+ Thu, 11 Jun 2020 12:21:19 +0000 (GMT)
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 69FF5112061;
+ Thu, 11 Jun 2020 12:21:19 +0000 (GMT)
+Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
+ by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
+ Thu, 11 Jun 2020 12:21:19 +0000 (GMT)
+Subject: Re: [RFC PATCH 8/8] tpm: Move backend code under the 'backends/'
+ directory
+To: Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
+ <philmd@redhat.com>, qemu-devel@nongnu.org
+References: <20200610200247.21378-1-philmd@redhat.com>
+ <20200610200247.21378-9-philmd@redhat.com>
+ <ed92c76e-c20c-1ac1-04c7-66cef6b3eabc@linux.ibm.com>
+ <0e1be827-0420-8bcc-c16e-3c2abd0727ba@redhat.com>
+From: Stefan Berger <stefanb@linux.ibm.com>
+Message-ID: <9f30d8ab-abd2-0a32-8524-396962844150@linux.ibm.com>
+Date: Thu, 11 Jun 2020 08:21:19 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-References: <20200611114523.15584-1-aleksandar.qemu.devel@gmail.com>
- <20200611114523.15584-2-aleksandar.qemu.devel@gmail.com>
-In-Reply-To: <20200611114523.15584-2-aleksandar.qemu.devel@gmail.com>
-From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Date: Thu, 11 Jun 2020 14:08:29 +0200
-Message-ID: <CAHiYmc60Z6Vp9hy1GqThrL+63TYFaMcgjHAccLO4iy7FyXq1rQ@mail.gmail.com>
-Subject: Re: [PATCH v2 1/1] translations: Add Swedish language
-To: QEMU Developers <qemu-devel@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::341;
- envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wm1-x341.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+In-Reply-To: <0e1be827-0420-8bcc-c16e-3c2abd0727ba@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
+ definitions=2020-06-11_11:2020-06-11,
+ 2020-06-11 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1015 spamscore=0
+ mlxscore=0 mlxlogscore=999 suspectscore=0 bulkscore=0 impostorscore=0
+ cotscore=-2147483648 phishscore=0 malwarescore=0 lowpriorityscore=0
+ adultscore=0 priorityscore=1501 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2004280000 definitions=main-2006110095
+Received-SPF: pass client-ip=148.163.156.1; envelope-from=stefanb@linux.ibm.com;
+ helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 07:55:30
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
+X-Spam_bar: ---
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -97,113 +118,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Sebastian Rasmussen <sebras@gmail.com>
+Cc: Laurent Vivier <lvivier@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-=D1=87=D0=B5=D1=82, 11. =D1=98=D1=83=D0=BD 2020. =D1=83 13:45 Aleksandar Ma=
-rkovic
-<aleksandar.qemu.devel@gmail.com> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=
-=81=D0=B0=D0=BE/=D0=BB=D0=B0:
->
-> From: Sebastian Rasmussen <sebras@gmail.com>
->
-> This patch adds translation of QEMU to Swedish.
->
-> Signed-off-by: Sebastian Rasmussen <sebras@gmail.com>
-> Signed-off-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-> ---
+On 6/11/20 8:05 AM, Thomas Huth wrote:
+> On 11/06/2020 14.00, Stefan Berger wrote:
+>> On 6/10/20 4:02 PM, Philippe Mathieu-Daudé wrote:
+>>> TPM subsytem is split into backends (see commit f4ede81eed2)
+>>> and frontends (see i.e. 3676bc69b35). Keep the emulated
+>>> hardware 'frontends' under hw/tpm/, but move the backends
+>>> in the backends/ directory.
+>>>
+>>> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>>> ---
+>>> RFC due to a FIXME in tpm_tis_common.c, it uses
+>>> TRACE_TPM_UTIL_SHOW_BUFFER which is now generated
+>>> by backends/trace-events...
+>>> ---
+>>>    Makefile                               |  2 +-
+>>>    {hw/tpm => backends}/tpm_int.h         |  6 ++---
+>>>    {hw/tpm => backends}/tpm_ioctl.h       |  0
+>>>    {hw/tpm => backends}/tpm_emulator.c    |  0
+>>>    {hw/tpm => backends}/tpm_passthrough.c |  0
+>>>    {hw/tpm => backends}/tpm_util.c        |  0
+>> I don't understand this move. Why not keep everything TPM related in one
+>> directory even though there may be a backend directory where 'nothing
+>> else fits but the name.' All we need to remember is that 'emulator' and
+>> 'passthrough' are the backends.
+> We try to have a clean separation between frontends and backends in
+> QEMU. The concepts have been mixed in the past (see e.g. the -drive
+> parameter) and that led only to confusion and trouble later. The hw/
+> directory is clearly for emulated hardware device frontends only, we
+> should not include any backend code here.
 
-Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Then move it into backends/tpm/ as Marc-Andre suggested.
 
->  po/sv.po | 75 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 75 insertions(+)
->  create mode 100644 po/sv.po
 >
-> diff --git a/po/sv.po b/po/sv.po
-> new file mode 100644
-> index 0000000000..1e430edd65
-> --- /dev/null
-> +++ b/po/sv.po
-> @@ -0,0 +1,75 @@
-> +# Swedish translation of qemu po-file.
-> +# This file is put in the public domain.
-> +# Sebastian Rasmussen <sebras@gmail.com>, 2019.
-> +#
-> +msgid ""
-> +msgstr ""
-> +"Project-Id-Version: QEMU 2.12.91\n"
-> +"Report-Msgid-Bugs-To: qemu-devel@nongnu.org\n"
-> +"POT-Creation-Date: 2018-07-18 07:56+0200\n"
-> +"PO-Revision-Date: 2019-08-16 21:19+0200\n"
-> +"Last-Translator: Sebastian Rasmussen <sebras@gmail.com>\n"
-> +"Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
-> +"Language: sv\n"
-> +"MIME-Version: 1.0\n"
-> +"Content-Type: text/plain; charset=3DUTF-8\n"
-> +"Content-Transfer-Encoding: 8bit\n"
-> +"Plural-Forms: nplurals=3D2; plural=3D(n !=3D 1);\n"
-> +"X-Generator: Poedit 2.2.3\n"
-> +
-> +msgid " - Press Ctrl+Alt+G to release grab"
-> +msgstr " - Tryck Ctrl+Alt+G f=C3=B6r att sluta f=C3=A5nga"
-> +
-> +msgid " [Paused]"
-> +msgstr " [Pausad]"
-> +
-> +msgid "_Pause"
-> +msgstr "_Paus"
-> +
-> +msgid "_Reset"
-> +msgstr "_Starta om"
-> +
-> +msgid "Power _Down"
-> +msgstr "St=C3=A4ng _ner"
-> +
-> +msgid "_Quit"
-> +msgstr "_Avsluta"
-> +
-> +msgid "_Fullscreen"
-> +msgstr "_Helsk=C3=A4rm"
-> +
-> +msgid "_Copy"
-> +msgstr "_Kopiera"
-> +
-> +msgid "Zoom _In"
-> +msgstr "Zooma _in"
-> +
-> +msgid "Zoom _Out"
-> +msgstr "Zooma _ut"
-> +
-> +msgid "Best _Fit"
-> +msgstr "Anpassad _storlek"
-> +
-> +msgid "Zoom To _Fit"
-> +msgstr "Zooma ti_ll anpassad storlek"
-> +
-> +msgid "Grab On _Hover"
-> +msgstr "F=C3=A5nga vi_d hovring"
-> +
-> +msgid "_Grab Input"
-> +msgstr "F=C3=A5n_ga inmatning"
-> +
-> +msgid "Show _Tabs"
-> +msgstr "Visa _flika"
-> +
-> +msgid "Detach Tab"
-> +msgstr "Frig=C3=B6r flik"
-> +
-> +msgid "Show Menubar"
-> +msgstr "Visa menyrad"
-> +
-> +msgid "_Machine"
-> +msgstr "_Maskin"
-> +
-> +msgid "_View"
-> +msgstr "_Visa"
-> --
-> 2.20.1
+>   Thomas
 >
+
 
