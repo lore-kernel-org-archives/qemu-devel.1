@@ -2,88 +2,55 @@ Return-Path: <SRS0=U615=7Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68756C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 17:06:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01F2AC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 17:13:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 35EAC206C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 17:06:39 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mH2SaamN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35EAC206C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id D15BE20792
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 17:13:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D15BE20792
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=openvz.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53106 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34098 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjQf0-0001mI-Cf
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 13:06:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59328)
+	id 1jjQlI-0007fd-1W
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 13:13:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34032)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jjQdr-0000fx-Lo
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 13:05:27 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:42817)
- by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jjQdp-0007dq-US
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 13:05:27 -0400
-Received: by mail-ot1-x342.google.com with SMTP id t6so5085078otk.9
- for <qemu-devel@nongnu.org>; Thu, 11 Jun 2020 10:05:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=jnpMvxPIBKMFACOSSbza1pcMxQ8eGv/1PVQ9OlP6zUE=;
- b=mH2SaamNpLUO+M3uc1nUVlnL7aZb0A/2D1irhUXfqYlCSMPz64HKWTbdCnvido1Oq4
- sO1N901xFuCfR+7x8z7gMgTaG9XJ7gZRZuxov3sqsorlEc0KY7/tbX6ur9CyTmirIZGk
- 6CRzhByNoK4ycaZq4FJFoIRLKYYrN3fKh5ZvBYldPolbgGOy6yeIz0XzTbUEzUfjcoXo
- bWyFBnQUHXrsoRUHHOEImGV+90vECDqBYEEt4Mr9/Hjc+npQdTrmUa0uzHvE53NOGTY2
- tfmRvbdNkEXvi/mDinh6d7saOfqo4O0JFa0U3+pJOTz1BDUrGPYRyk1EOTly2OrgrNd4
- AVyg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=jnpMvxPIBKMFACOSSbza1pcMxQ8eGv/1PVQ9OlP6zUE=;
- b=t+BOoQkGomv7N8cSox4AXORd5RYnPyUprjVE7p9CSR2mFJBPS5LKaegiOtczBqLU6X
- LOpJEVRdq1lcepu0X6l8tjX0FCanrjzMK3w8TTkn1QIcIY1IBBS2WOh6OsM/vtftP/uW
- B0fWftjEwtU3wfQNQJg6SGf/QXKxyBlT9WXHNaIhhah9SjU7VkeOu9fQmq0u/dlg5MuW
- HTJHzRP8PF6tDpMzqlKd3oDWFF780luc74qnHioUhWt5Z7cmKK4//S0oqgXD+j470edI
- Jtk4AZ9Ar7kdR6eaN2PiIBiK89U+3v/etTjzVKteSPmi2xI6+HQNFqUS/gdxdDVLuSIm
- R5kw==
-X-Gm-Message-State: AOAM533q/9STXjFlsFr1wEkwGfOWGGZyB5/vpT3FuzSpjxOW5QDuasJ7
- x3AG5av7thLvVqCRjQZ26xxAcRnxWFcxegiCeSyPHw==
-X-Google-Smtp-Source: ABdhPJzxdthIcgmguvMgqQcPH4quPdufa8IN00kieiiY7OoykdoJCoV6QxLOJdHzBc28FMpA/WqRblVOACnQ6wAjgGY=
-X-Received: by 2002:a05:6830:8d:: with SMTP id
- a13mr7366786oto.91.1591895117425; 
- Thu, 11 Jun 2020 10:05:17 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200611144529.8873-1-peter.maydell@linaro.org>
- <20200611144529.8873-3-peter.maydell@linaro.org>
- <d32b36c2-6662-91b1-5b18-ff7a56386cd8@linaro.org>
-In-Reply-To: <d32b36c2-6662-91b1-5b18-ff7a56386cd8@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 11 Jun 2020 18:05:06 +0100
-Message-ID: <CAFEAcA-xw6pHejLVjUze1UWwBpygNWjam_KNOCyfthL-3vYDBQ@mail.gmail.com>
-Subject: Re: [PATCH 02/10] target/arm: Add missing TCG temp free in
- do_2shift_env_64()
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::342;
- envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x342.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ (Exim 4.90_1) (envelope-from <den@openvz.org>)
+ id 1jjQk6-0005Sl-IF; Thu, 11 Jun 2020 13:11:54 -0400
+Received: from relay.sw.ru ([185.231.240.75]:35191 helo=relay3.sw.ru)
+ by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <den@openvz.org>)
+ id 1jjQk3-0000qk-6z; Thu, 11 Jun 2020 13:11:54 -0400
+Received: from [192.168.15.81] (helo=iris.sw.ru)
+ by relay3.sw.ru with esmtp (Exim 4.93)
+ (envelope-from <den@openvz.org>)
+ id 1jjQjs-0000BN-Ou; Thu, 11 Jun 2020 20:11:40 +0300
+From: "Denis V. Lunev" <den@openvz.org>
+To: qemu-block@nongnu.org,
+	qemu-devel@nongnu.org
+Subject: [PATCH 1/4] migration/savevm: respect qemu_fclose() error code in
+ save_snapshot()
+Date: Thu, 11 Jun 2020 20:11:40 +0300
+Message-Id: <20200611171143.21589-2-den@openvz.org>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200611171143.21589-1-den@openvz.org>
+References: <20200611171143.21589-1-den@openvz.org>
+Received-SPF: pass client-ip=185.231.240.75; envelope-from=den@openvz.org;
+ helo=relay3.sw.ru
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 13:11:47
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -97,49 +64,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Juan Quintela <quintela@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Denis Plotnikov <dplotnikov@virtuozzo.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, "Denis V. Lunev" <den@openvz.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 11 Jun 2020 at 16:43, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> On 6/11/20 7:45 AM, Peter Maydell wrote:
-> > In commit 37bfce81b10450071 we accidentally introduced a leak of a TCG
-> > temporary in do_2shift_env_64(); free it.
-> >
-> > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> > ---
-> > My test setup wasn't looking for temporary-leak warnings (they are
-> > not as easy to get at as they used to be because they only appear
-> > if you enable qemu_log tracing for some other purpose). This is the
-> > only one that snuck through, though.
-> > ---
-> >  target/arm/translate-neon.inc.c | 1 +
-> >  1 file changed, 1 insertion(+)
-> >
-> > diff --git a/target/arm/translate-neon.inc.c b/target/arm/translate-neon.inc.c
-> > index 7c4888a80c9..f2c241a87e9 100644
-> > --- a/target/arm/translate-neon.inc.c
-> > +++ b/target/arm/translate-neon.inc.c
-> > @@ -1329,6 +1329,7 @@ static bool do_2shift_env_64(DisasContext *s, arg_2reg_shift *a,
-> >          neon_load_reg64(tmp, a->vm + pass);
-> >          fn(tmp, cpu_env, tmp, constimm);
-> >          neon_store_reg64(tmp, a->vd + pass);
-> > +        tcg_temp_free_i64(tmp);
->
-> Huh.  I thought all the a32 stores magically freed their inputs.  I guess
-> that's just the general-purpose registers.
+qemu_fclose() could return error, f.e. if bdrv_co_flush() will return
+the error.
 
-Confusingly, neon_load_reg()/neon_store_reg() do the "create
-new TCG temp for the load, free the store input" thing, but
-neon_load_reg64()/neon_store_reg64()/neon_load_reg32()/neon_store_reg32()
-do not. I'd kind of like to get rid of this weird proliferation
-of load and store functions, but neon_load_reg()/neon_store_reg() are
-also the only ones which take a (regno, pass) pair of inputs,
-so it's not a completely trivial substitution.
+This validation will become more important once we will start waiting of
+asynchronous IO operations, started from bdrv_write_vmstate(), which are
+coming soon.
 
-thanks
--- PMM
+Signed-off-by: Denis V. Lunev <den@openvz.org>
+CC: Kevin Wolf <kwolf@redhat.com>
+CC: Max Reitz <mreitz@redhat.com>
+CC: Stefan Hajnoczi <stefanha@redhat.com>
+CC: Fam Zheng <fam@euphon.net>
+CC: Juan Quintela <quintela@redhat.com>
+CC: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+CC: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+CC: Denis Plotnikov <dplotnikov@virtuozzo.com>
+---
+ migration/savevm.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/migration/savevm.c b/migration/savevm.c
+index c00a6807d9..0ff5bb40ed 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -2628,7 +2628,7 @@ int save_snapshot(const char *name, Error **errp)
+ {
+     BlockDriverState *bs, *bs1;
+     QEMUSnapshotInfo sn1, *sn = &sn1, old_sn1, *old_sn = &old_sn1;
+-    int ret = -1;
++    int ret = -1, ret2;
+     QEMUFile *f;
+     int saved_vm_running;
+     uint64_t vm_state_size;
+@@ -2712,10 +2712,14 @@ int save_snapshot(const char *name, Error **errp)
+     }
+     ret = qemu_savevm_state(f, errp);
+     vm_state_size = qemu_ftell(f);
+-    qemu_fclose(f);
++    ret2 = qemu_fclose(f);
+     if (ret < 0) {
+         goto the_end;
+     }
++    if (ret2 < 0) {
++        ret = ret2;
++        goto the_end;
++    }
+ 
+     /* The bdrv_all_create_snapshot() call that follows acquires the AioContext
+      * for itself.  BDRV_POLL_WHILE() does not support nested locking because
+-- 
+2.17.1
+
 
