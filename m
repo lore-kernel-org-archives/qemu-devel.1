@@ -2,125 +2,128 @@ Return-Path: <SRS0=U615=7Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D7A9C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 08:27:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 772CDC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 08:28:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D9A7B2072F
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 08:27:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3EBC32072F
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 08:28:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="rhdgo5lp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9A7B2072F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=openvz.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PveVnDsp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3EBC32072F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53746 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56404 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjIYl-0006Xt-3f
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 04:27:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38514)
+	id 1jjIZn-00081Y-F4
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 04:28:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38882)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <den@virtuozzo.com>)
- id 1jjIWw-0003D7-79; Thu, 11 Jun 2020 04:25:46 -0400
-Received: from mail-eopbgr150097.outbound.protection.outlook.com
- ([40.107.15.97]:3810 helo=EUR01-DB5-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <den@virtuozzo.com>)
- id 1jjIWr-0007Tc-Hg; Thu, 11 Jun 2020 04:25:45 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=H57H0bBDcqapE+K09ILCzqp91u7acOoEwTIqVFQS4oD55zIGsUbVOxlBmv+NvovBcL5NsBrwzsp8Gpu0xZ5fsIK9Sfm9c5Dg+Gk4Ubrd9/TIEbTQEtCBcg6Sju4T26SQaRSEKakreq1TjYyZdyyN10omL+m7r2IbnxXUHpJorY32M5mmTbW9tj8O8/j7lqRyiOlM8ihuBtDSSQMqrJz+XeO/ZnnHmui3ZfCzFDR8/zuRRXsgU6jANAk6aOW1Fhcn9xW3zNuShyPDuoc7BHSVzpy2XG++1wd75x0URJLXRYUFUnQd6eeO16nlNr5bXiw1H1P3CSHr5PrT9IDwyiwpaA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6WsTheoeBSLAl40Hgfa2IGvCOLS7eim/MN41PHc6aFo=;
- b=N4Dh1+OW0zuzbojXybzAKymIL8cZAEgsMwezRqso57CobtSqlcj1s3JdMV01oE9qlK4DDXsCwZWCON9zX9x6q3ABXsaEzXBP6BRB9tadEmUSstF0tsSCVjVVp1KPB3/CVZ1T0G8xQBUr86YQud9x8Na6OomZPYlNNmTmdW1kU2AoiAg3GnzY97jOamnRCIv12gyFjRNEK13ClknY1hC8rfm9N3ucvc0X8DiLdGWet6OQr3FWlGmOHpRHruK8WVMquQYy7ZzM4vtliv1Ay4gBOrNJQBxpiK514kmDHLelSJG8bLwVxLgerb11R4wT9iM9gxSVJhS1PLiBFuIGw5eBAQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none header.from=openvz.org;
- dkim=pass header.d=openvz.org; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6WsTheoeBSLAl40Hgfa2IGvCOLS7eim/MN41PHc6aFo=;
- b=rhdgo5lpWuV8Hk0Itli4J0gURuptxzN/CJyBBVRT7H9gfRYXDNtWHxoh2Uu9nxU27br5ALZ3B3V6FqjSxK7g5B8a1OufUPyNv82H+BXm5APoIMI5pb4VwCUf3de8/2a8c65WZWCVEE9LB5hnRn+NH2uPNqbW1TBcGXB3jTJ29C0=
-Authentication-Results: virtuozzo.com; dkim=none (message not signed)
- header.d=none;virtuozzo.com; dmarc=none action=none header.from=openvz.org;
-Received: from AM6PR08MB4214.eurprd08.prod.outlook.com (2603:10a6:20b:8d::30)
- by AM6PR08MB3141.eurprd08.prod.outlook.com (2603:10a6:209:4a::31)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3088.18; Thu, 11 Jun
- 2020 08:25:38 +0000
-Received: from AM6PR08MB4214.eurprd08.prod.outlook.com
- ([fe80::821:7596:cf7f:68f8]) by AM6PR08MB4214.eurprd08.prod.outlook.com
- ([fe80::821:7596:cf7f:68f8%4]) with mapi id 15.20.3088.018; Thu, 11 Jun 2020
- 08:25:38 +0000
-Subject: Re: [PATCH 2/2] qcow2: improve savevm performance
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org
-References: <20200610190058.10781-1-den@openvz.org>
- <20200610190058.10781-3-den@openvz.org>
- <b9f05b2f-f82c-95c6-aaea-27950169fcf3@virtuozzo.com>
-From: "Denis V. Lunev" <den@openvz.org>
-Message-ID: <bda806a8-7363-d41c-e86b-c2f8736d5a1d@openvz.org>
-Date: Thu, 11 Jun 2020 11:25:35 +0300
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jjIYt-0006p1-BG
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 04:27:47 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:54609
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jjIYs-0007s8-Ia
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 04:27:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591864065;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=1Xi775hupdIXxMrC5dMRX9LlpsPa3GdKHAVLBqD9DIo=;
+ b=PveVnDspyAa/eKt7q6WdWzabxqgLP9V84Wb3FhhxLbgcPU7cBVdTUOS/hBxAtPxvUC7DNe
+ mfVI8jHMiVYjxtaVWF0gGAw0Hxcv6/b8x0FwOXZsMIjDHRQV5HCHnZNfzSQPQu9cmse1ky
+ AMeLapasyVfsz6hGNDoZOVrTugsOnmw=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-138-EcWX-LahPmis7IVxvHN0MQ-1; Thu, 11 Jun 2020 04:27:43 -0400
+X-MC-Unique: EcWX-LahPmis7IVxvHN0MQ-1
+Received: by mail-wm1-f70.google.com with SMTP id r1so1054968wmh.7
+ for <qemu-devel@nongnu.org>; Thu, 11 Jun 2020 01:27:43 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=1Xi775hupdIXxMrC5dMRX9LlpsPa3GdKHAVLBqD9DIo=;
+ b=kIu2ISQGsaaGB6FpSq5pOSd6rH42JnBTCOtv8q+CpVGCVOezhFnSZqqEcqFQfK02oE
+ lihrkeLVIuXf1LvmxEKemfOwCpjruC9fq/Od5jXH8KC0jtg2AEuuYFYpq4rLj4C+Ufax
+ ig68yiSGOxLWkvSUy4CHcBuVGlgQcxuaXSnQB/HbKgAxXjj1jLu/i7lKpI7rvry9h5Tm
+ NUSrGp42SK/Cs/UwhWCs1+HAoeOWrq/i9o+tGhhWvNMLR7NF/1cS/WZZfgAufjohY5Eg
+ JMNCDUiN69YELUdxzsA1WorrKzL+7Se33bSMhkWphHfGc72Tn2SCycR05jRON4YfweOK
+ eSQg==
+X-Gm-Message-State: AOAM533aOd4bNJ7NJ9R6xCsvPxaSRtqoVtTgVXktQC2IgjpzucH06APQ
+ XVMZ74jpHvqOmMP/vBL8g2DtUK/pM2MKb8as7KL0W43wpKhegietfdhqHOHmFmRxPEX+0C60Pgi
+ cKhWhwBWam/MiPdw=
+X-Received: by 2002:adf:d852:: with SMTP id k18mr8337829wrl.177.1591864062323; 
+ Thu, 11 Jun 2020 01:27:42 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzZrW0cv0rbNXJLo+fZ5qnKreZKwva1sfWIzcQke+uMT3UcYjjUu66w0bknFxCBx0Px2sQKYg==
+X-Received: by 2002:adf:d852:: with SMTP id k18mr8337813wrl.177.1591864062078; 
+ Thu, 11 Jun 2020 01:27:42 -0700 (PDT)
+Received: from [192.168.1.38] (181.red-88-10-103.dynamicip.rima-tde.net.
+ [88.10.103.181])
+ by smtp.gmail.com with ESMTPSA id v7sm3806678wro.76.2020.06.11.01.27.40
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 11 Jun 2020 01:27:41 -0700 (PDT)
+Subject: Re: [PATCH v8 10/10] acpi: q35: drop _SB.PCI0.ISA.LPCD opregion.
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+References: <20200611072919.16638-1-kraxel@redhat.com>
+ <20200611072919.16638-11-kraxel@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <49164120-0186-5ae2-0690-98e27a82c5ab@redhat.com>
+Date: Thu, 11 Jun 2020 10:27:40 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
-In-Reply-To: <b9f05b2f-f82c-95c6-aaea-27950169fcf3@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-ClientProxiedBy: HE1PR0102CA0015.eurprd01.prod.exchangelabs.com
- (2603:10a6:7:14::28) To AM6PR08MB4214.eurprd08.prod.outlook.com
- (2603:10a6:20b:8d::30)
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.1.27] (31.148.204.195) by
- HE1PR0102CA0015.eurprd01.prod.exchangelabs.com (2603:10a6:7:14::28) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3088.18 via Frontend
- Transport; Thu, 11 Jun 2020 08:25:37 +0000
-X-Originating-IP: [31.148.204.195]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: a0882133-8eab-4700-b3a2-08d80de10537
-X-MS-TrafficTypeDiagnostic: AM6PR08MB3141:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM6PR08MB3141A2940DA4614A6511374EB6800@AM6PR08MB3141.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:4125;
-X-Forefront-PRVS: 0431F981D8
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: MyJRfvqi8oAAdiNUT+2si8ZrL0pHD3f32aoFtk/VcvJYEG1A8vJJVoS+/mIGHmU2jAj3T4XCK2n04n4/TLPJo2zpMKPYl2G8kvitl1mqJzCmVcTssn6fo9ZzNzMeq6CUpfISTL4uydH9nSfw9U6JCJUSjY/YnrDgBiU9L9lUIWf6NcmSlJEy54tULrepTWtIudxUKvCegyMcuyUmq2E5mQmL+4tpr8/deS/+KfKsjI1bWrJ9vTVEjvLkfTNW95rhgGl6da5opCS60Hp92Nxz7SV6NJOlGokXqpyTdjIMYLTnn/nXRt87tHA/COpCR3tiAIbJIw/qVSjp9HhvkzKVmNL9zvM77e75AqvvFedyalnlAugXw8Fa/zr8IIMp8+Ba
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM6PR08MB4214.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(366004)(396003)(136003)(346002)(376002)(39840400004)(52116002)(66946007)(42882007)(2616005)(4326008)(66476007)(186003)(66556008)(956004)(5660300002)(2906002)(6486002)(36756003)(19627235002)(478600001)(53546011)(83380400001)(107886003)(8936002)(83170400001)(316002)(31696002)(31686004)(54906003)(26005)(16526019)(16576012)(8676002)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: phI+BvCZGp6V63SzvOj1OALnfvwCLRKfWzKMfVsI64ENPxVTbYFfWxvNWkz9vI/5mcLEMYkKAVPXKqb4mQ8xfrMtKn/fjuRB62HGD2GxyGqIXLoosHiidyoAxLsyBMqdr7IDks+zIuEgioeCjjA9sgqrmF1J8vgKZ132bfSMrsGaVwr/9l4jk0tc7ArldGFHirUO5TP2L+OZMdQUQaDZT6Yuw72kgaaIyqViagEzRcfHM69Xl6r5njmg/zmLkby+ET659daez48YBOmenpW6EoSP73aGTj3EblqZBMDsTndHGF8Nzy9ec68o/aaAGr0x5BZn7zvDUHjH70u7yGa9ysIGz4lI9e7Qk6fAca42Bh6GbRKYVdvnh2BKKwTfiCxWuN1U2wx0bU+gEEPcT1wijn4I9Ap7mw5aX51EYJ3fM0q5t5kwvMD6GSqQC5s2E0CC5OcIlS/eP5wsJ00sNAWOCSwHV++QZM5DEgjt2YUTr/Qec4OUBHSrpJN6mwd3a/H6
-X-OriginatorOrg: openvz.org
-X-MS-Exchange-CrossTenant-Network-Message-Id: a0882133-8eab-4700-b3a2-08d80de10537
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jun 2020 08:25:38.1153 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: nC500Qr5jKNxETKCG7tzBda0zGcIkdu9OMrqHpV6kkqWLpDmwCYqUm+8tiaHW6vLe0r7ophGlGkr27rvIyuqXQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3141
-Received-SPF: pass client-ip=40.107.15.97; envelope-from=den@virtuozzo.com;
- helo=EUR01-DB5-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 04:25:39
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -26
-X-Spam_score: -2.7
-X-Spam_bar: --
-X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200611072919.16638-11-kraxel@redhat.com>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 03:29:33
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -133,244 +136,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Denis Plotnikov <dplotnikov@virtuozzo.com>,
- Max Reitz <mreitz@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/11/20 11:04 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 10.06.2020 22:00, Denis V. Lunev wrote:
->> This patch does 2 standard basic things:
->> - it creates intermediate buffer for all writes from QEMU migration code
->>    to QCOW2 image,
->> - this buffer is sent to disk asynchronously, allowing several writes to
->>    run in parallel.
->>
->> In general, migration code is fantastically inefficent (by observation),
->> buffers are not aligned and sent with arbitrary pieces, a lot of time
->> less than 100 bytes at a chunk, which results in read-modify-write
->> operations with non-cached operations. It should also be noted that all
->> operations are performed into unallocated image blocks, which also
->> suffer
->> due to partial writes to such new clusters.
->>
->> Snapshot creation time (2 GB Fedora-31 VM running over NVME storage):
->>                  original     fixed
->> cached:          1.79s       1.27s
->> non-cached:      3.29s       0.81s
->>
->> The difference over HDD would be more significant :)
->>
->> Signed-off-by: Denis V. Lunev <den@openvz.org>
->
-> If I follow correctly, you make qcow2_save_vmstate implicitly
-> asynchronous:
-> it may return immediately after creating a task, and task is executing in
-> parallel.
->
-> I think, block-layer is unprepared for such behavior, it rely on the
-> fact that
-> .bdrv_save_vmstate is synchronous.
->
-> For example, look at bdrv_co_rw_vmstate(). It calls
-> drv->bdrv_save_vmstate
-> inside pair of bdrv_inc_in_flight()/bdrv_dec_in_flight(). It means
-> that with
-> this patch, we may break drained section.
->
-Drained sections are not involved into the equation - the guest
-is stopped at the moment.
+Hi Gerd,
 
-If we are talking about in_flight count, it should not be a problem
-even if the guest is running. We could just put inc/dec into
-qcow2_co_vmstate_task_entry().
+On 6/11/20 9:29 AM, Gerd Hoffmann wrote:
+> Seems to be unused.
+> 
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+>  hw/i386/acpi-build.c | 11 -----------
+>  1 file changed, 11 deletions(-)
+> 
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index 02cf4199c2e9..d93ea40c58b9 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -1296,7 +1296,6 @@ static void build_q35_isa_bridge(Aml *table)
+>  {
+>      Aml *dev;
+>      Aml *scope;
+> -    Aml *field;
+>  
+>      scope =  aml_scope("_SB.PCI0");
+>      dev = aml_device("ISA");
+> @@ -1306,16 +1305,6 @@ static void build_q35_isa_bridge(Aml *table)
+>      aml_append(dev, aml_operation_region("PIRQ", AML_PCI_CONFIG,
+>                                           aml_int(0x60), 0x0C));
+>  
+> -    aml_append(dev, aml_operation_region("LPCD", AML_PCI_CONFIG,
+> -                                         aml_int(0x80), 0x02));
+> -    field = aml_field("LPCD", AML_ANY_ACC, AML_NOLOCK, AML_PRESERVE);
+> -    aml_append(field, aml_named_field("COMA", 3));
+> -    aml_append(field, aml_reserved_field(1));
+> -    aml_append(field, aml_named_field("COMB", 3));
+> -    aml_append(field, aml_reserved_field(1));
+> -    aml_append(field, aml_named_field("LPTD", 2));
+> -    aml_append(dev, field);
+> -
+>      aml_append(scope, dev);
+>      aml_append(table, scope);
+>  }
+> 
 
-> Next, it's a kind of cache for vmstate-write operation. It seems for
-> me that
-> it's not directly related to qcow2. So, we can implement it in generic
-> block
-> layer, where we can handle in_fligth requests. Can we keep
-> .bdrv_save_vmstate
-> handlers of format drivers as is, keep them synchronous, but instead
-> change
-> generic interface to be (optionally?) cached?
+I'm a bit confused, isn't it use to describe these
+devices?
 
-This has been discussed already in the previous thread. .bdrv_save_vmstate
-is implemented in QCOW2 and sheepdog only. Thus other formats are
-mostly non-interested.
-
->
->> ---
->>   block/qcow2.c | 111 +++++++++++++++++++++++++++++++++++++++++++++++++-
->>   block/qcow2.h |   4 ++
->>   2 files changed, 113 insertions(+), 2 deletions(-)
->>
->> diff --git a/block/qcow2.c b/block/qcow2.c
->> index 0cd2e6757e..e6232f32e2 100644
->> --- a/block/qcow2.c
->> +++ b/block/qcow2.c
->> @@ -4797,11 +4797,43 @@ static int qcow2_make_empty(BlockDriverState
->> *bs)
->>       return ret;
->>   }
->>   +
->> +typedef struct Qcow2VMStateTask {
->> +    AioTask task;
->> +
->> +    BlockDriverState *bs;
->> +    int64_t offset;
->> +    void *buf;
->> +    size_t bytes;
->> +} Qcow2VMStateTask;
->> +
->> +typedef struct Qcow2SaveVMState {
->> +    AioTaskPool *pool;
->> +    Qcow2VMStateTask *t;
->> +} Qcow2SaveVMState;
->> +
->>   static coroutine_fn int qcow2_co_flush_to_os(BlockDriverState *bs)
->>   {
->>       BDRVQcow2State *s = bs->opaque;
->> +    Qcow2SaveVMState *state = s->savevm_state;
->>       int ret;
->>   +    if (state != NULL) {
->> +        aio_task_pool_start_task(state->pool, &state->t->task);
->> +
->> +        aio_task_pool_wait_all(state->pool);
->> +        ret = aio_task_pool_status(state->pool);
->> +
->> +        aio_task_pool_free(state->pool);
->> +        g_free(state);
->> +
->> +        s->savevm_state = NULL;
->> +
->> +        if (ret < 0) {
->> +            return ret;
->> +        }
->> +    }
->> +
->>       qemu_co_mutex_lock(&s->lock);
->>       ret = qcow2_write_caches(bs);
->>       qemu_co_mutex_unlock(&s->lock);
->> @@ -5098,14 +5130,89 @@ static int
->> qcow2_has_zero_init(BlockDriverState *bs)
->>       }
->>   }
->>   +
->> +static coroutine_fn int qcow2_co_vmstate_task_entry(AioTask *task)
->> +{
->> +    int err = 0;
->> +    Qcow2VMStateTask *t = container_of(task, Qcow2VMStateTask, task);
->> +
->> +    if (t->bytes != 0) {
->> +        QEMUIOVector local_qiov;
->> +        qemu_iovec_init_buf(&local_qiov, t->buf, t->bytes);
->> +        err = t->bs->drv->bdrv_co_pwritev_part(t->bs, t->offset,
->> t->bytes,
->> +                                               &local_qiov, 0, 0);
->> +    }
->> +
->> +    qemu_vfree(t->buf);
->> +    return err;
->> +}
->> +
->> +static Qcow2VMStateTask *qcow2_vmstate_task_create(BlockDriverState
->> *bs,
->> +                                                    int64_t pos,
->> size_t size)
->> +{
->> +    BDRVQcow2State *s = bs->opaque;
->> +    Qcow2VMStateTask *t = g_new(Qcow2VMStateTask, 1);
->> +
->> +    *t = (Qcow2VMStateTask) {
->> +        .task.func = qcow2_co_vmstate_task_entry,
->> +        .buf = qemu_blockalign(bs, size),
->> +        .offset = qcow2_vm_state_offset(s) + pos,
->> +        .bs = bs,
->> +    };
->> +
->> +    return t;
->> +}
->> +
->>   static int qcow2_save_vmstate(BlockDriverState *bs, QEMUIOVector
->> *qiov,
->>                                 int64_t pos)
->>   {
->>       BDRVQcow2State *s = bs->opaque;
->> +    Qcow2SaveVMState *state = s->savevm_state;
->> +    Qcow2VMStateTask *t;
->> +    size_t buf_size = MAX(s->cluster_size, 1 * MiB);
->> +    size_t to_copy;
->> +    size_t off;
->>         BLKDBG_EVENT(bs->file, BLKDBG_VMSTATE_SAVE);
->> -    return bs->drv->bdrv_co_pwritev_part(bs,
->> qcow2_vm_state_offset(s) + pos,
->> -                                         qiov->size, qiov, 0, 0);
->> +
->> +    if (state == NULL) {
->> +        state = g_new(Qcow2SaveVMState, 1);
->> +        *state = (Qcow2SaveVMState) {
->> +            .pool = aio_task_pool_new(QCOW2_MAX_WORKERS),
->> +            .t = qcow2_vmstate_task_create(bs, pos, buf_size),
->> +        };
->> +
->> +        s->savevm_state = state;
->> +    }
->> +
->> +    if (aio_task_pool_status(state->pool) != 0) {
->> +        return aio_task_pool_status(state->pool);
->> +    }
->> +
->> +    t = state->t;
->> +    if (t->offset + t->bytes != qcow2_vm_state_offset(s) + pos) {
->> +        /* Normally this branch is not reachable from migration */
->> +        return bs->drv->bdrv_co_pwritev_part(bs,
->> +                qcow2_vm_state_offset(s) + pos, qiov->size, qiov, 0,
->> 0);
->> +    }
->> +
->> +    off = 0;
->> +    while (1) {
->> +        to_copy = MIN(qiov->size - off, buf_size - t->bytes);
->> +        qemu_iovec_to_buf(qiov, off, t->buf + t->bytes, to_copy);
->> +        t->bytes += to_copy;
->> +        if (t->bytes < buf_size) {
->> +            return 0;
->> +        }
->> +
->> +        aio_task_pool_start_task(state->pool, &t->task);
->> +
->> +        pos += to_copy;
->> +        off += to_copy;
->> +        state->t = t = qcow2_vmstate_task_create(bs, pos, buf_size);
->> +    }
->> +
->> +    return 0;
->>   }
->>     static int qcow2_load_vmstate(BlockDriverState *bs, QEMUIOVector
->> *qiov,
->> diff --git a/block/qcow2.h b/block/qcow2.h
->> index 7ce2c23bdb..146cfed739 100644
->> --- a/block/qcow2.h
->> +++ b/block/qcow2.h
->> @@ -291,6 +291,8 @@ typedef struct Qcow2BitmapHeaderExt {
->>     #define QCOW2_MAX_THREADS 4
->>   +typedef struct Qcow2SaveVMState Qcow2SaveVMState;
->> +
->>   typedef struct BDRVQcow2State {
->>       int cluster_bits;
->>       int cluster_size;
->> @@ -384,6 +386,8 @@ typedef struct BDRVQcow2State {
->>        * is to convert the image with the desired compression type set.
->>        */
->>       Qcow2CompressionType compression_type;
->> +
->> +    Qcow2SaveVMState *savevm_state;
->>   } BDRVQcow2State;
->>     typedef struct Qcow2COWRegion {
->>
->
->
+(qemu) info qtree
+bus: main-system-bus
+  type System
+  dev: q35-pcihost, id ""
+    bus: pcie.0
+      type PCIE
+      dev: ICH9-LPC, id ""
+        gpio-out "gsi" 24
+        class ISA bridge, addr 00:1f.0, pci id 8086:2918 (sub 1af4:1100)
+        bus: isa.0
+          type ISA
+          dev: port92, id ""
+            gpio-out "a20" 1
+          dev: vmmouse, id ""
+          dev: vmport, id ""
+          dev: isa-parallel, id ""
+            index = 0 (0x0)
+            iobase = 888 (0x378)
+            irq = 7 (0x7)
+            chardev = "parallel0"
+            isa irq 7
+          dev: isa-serial, id ""
+            index = 1 (0x1)
+            iobase = 760 (0x2f8)
+            irq = 3 (0x3)
+            chardev = "serial1"
+            wakeup = 0 (0x0)
+            isa irq 3
+          dev: isa-serial, id ""
+            index = 0 (0x0)
+            iobase = 1016 (0x3f8)
+            irq = 4 (0x4)
+            chardev = "serial0"
+            wakeup = 0 (0x0)
+            isa irq 4
 
 
