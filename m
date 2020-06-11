@@ -2,84 +2,77 @@ Return-Path: <SRS0=U615=7Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08C25C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 16:21:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 148A8C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 16:22:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 874C7206C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 16:21:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D2932206C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 16:22:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gm7Oex/M"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 874C7206C3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SRSFfAEU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2932206C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38712 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41708 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjPxZ-0008KF-H8
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 12:21:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50866)
+	id 1jjPyR-0001Rf-0X
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 12:22:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52210)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jjPq9-0006Xb-GO
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 12:14:05 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:40876
- helo=us-smtp-delivery-1.mimecast.com)
+ id 1jjPsC-0001lF-Mn
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 12:16:12 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:41376)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jjPq7-0003SY-C1
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 12:14:05 -0400
+ id 1jjPs9-0004CQ-BT
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 12:16:12 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591892042;
+ s=mimecast20190719; t=1591892165;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=QALi5QxsMK0ujvCfbxSdhrgVY4YCpa5MMOhXwIlG8sQ=;
- b=gm7Oex/MyfzIC1l8qITwafKTXXDJpbmQDnOLitDFMIPLyFSMqzASXxBHHr0D21s2c6nbYp
- FKvLR8OewXZXU3jKbHX32qSCvjjmBZ+3zupB61FZNyUrJQxWPdNtdkrhGkFDS7SE1E8m2O
- Nm35H85hTjFtmYV7aOD0YoWun+iVaUA=
+ bh=ARv8qSDziPHTJvaLmyQIW8b8LLLtOfE1f3+HLmQbobU=;
+ b=SRSFfAEUIsfHCvLWhpsLL6VgIPzGbPLdVfiZrT/4s+J6CU+MHmdFsPu50qBajdrvilc3Ng
+ +YUlgclt71A9R7Y6I43b2Uo+mw2W/0fdYhad859ubmqXJ4KWjTNkJ6lknpC//1fQf3R7zY
+ Ey/hgz5FU4x/QwrSkyogRoWbiXrEh9c=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-414-wM8IkWGePlSmFSFUpZ8n8Q-1; Thu, 11 Jun 2020 12:13:57 -0400
-X-MC-Unique: wM8IkWGePlSmFSFUpZ8n8Q-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-2-VKWpJVvWNk2aJSXFxx2vcw-1; Thu, 11 Jun 2020 12:16:03 -0400
+X-MC-Unique: VKWpJVvWNk2aJSXFxx2vcw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 053B91005512;
- Thu, 11 Jun 2020 16:13:56 +0000 (UTC)
-Received: from [10.36.114.197] (ovpn-114-197.ams2.redhat.com [10.36.114.197])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 44AF65EE0E;
- Thu, 11 Jun 2020 16:13:47 +0000 (UTC)
-Subject: Re: [PATCH v4 1/5] acpi: Convert build_tpm2() to build_append* API
-To: Stefan Berger <stefanb@linux.ibm.com>, eric.auger.pro@gmail.com,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org,
- mst@redhat.com, shannon.zhaosl@gmail.com, imammedo@redhat.com
-References: <20200611135917.18300-1-eric.auger@redhat.com>
- <20200611135917.18300-2-eric.auger@redhat.com>
- <7889f607-6915-3e81-2293-294d20689d4e@linux.ibm.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <dea2491d-0d14-8f2d-242d-ca006c4a8a08@redhat.com>
-Date: Thu, 11 Jun 2020 18:13:45 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9DFF5EC1A4;
+ Thu, 11 Jun 2020 16:16:01 +0000 (UTC)
+Received: from laptop.redhat.com (ovpn-114-197.ams2.redhat.com [10.36.114.197])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 32FCE10013C2;
+ Thu, 11 Jun 2020 16:15:58 +0000 (UTC)
+From: Eric Auger <eric.auger@redhat.com>
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org, peter.maydell@linaro.org, peterx@redhat.com
+Subject: [PATCH RESEND 7/9] hw/arm/smmuv3: Introduce smmuv3_s1_range_inval()
+ helper
+Date: Thu, 11 Jun 2020 18:14:58 +0200
+Message-Id: <20200611161500.23580-8-eric.auger@redhat.com>
+In-Reply-To: <20200611161500.23580-1-eric.auger@redhat.com>
+References: <20200611161500.23580-1-eric.auger@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <7889f607-6915-3e81-2293-294d20689d4e@linux.ibm.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=205.139.110.61;
- envelope-from=eric.auger@redhat.com; helo=us-smtp-delivery-1.mimecast.com
+ envelope-from=eric.auger@redhat.com; helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 03:29:33
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
@@ -101,133 +94,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@redhat.com, drjones@redhat.com, lersek@redhat.com,
- ardb@kernel.org, philmd@redhat.com
+Cc: jean-philippe@linaro.org, robh@kernel.org, robin.murphy@arm.com,
+ mst@redhat.com, zhangfei.gao@foxmail.com, shameerali.kolothum.thodi@huawei.com,
+ will@kernel.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Stefan,
+Let's introduce an helper for S1 IOVA range invalidation.
+This will be used for NH_VA and NH_VAA commands. It decodes
+the same fields, trace, calls the UNMAP notifiers and
+invalidate the corresponding IOTLB entries.
 
-On 6/11/20 5:19 PM, Stefan Berger wrote:
-> On 6/11/20 9:59 AM, Eric Auger wrote:
->> In preparation of its move to the generic acpi code,
->> let's convert build_tpm2() to use build_append API. This
->> latter now is prefered in place of direct ACPI struct field
->> settings with manual endianness conversion.
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> 
->>
->> ---
->>
->> v3 -> v4:
->> - Don't use Acpi20TPM2 *tpm2_ptr anymore
->> - Use variables for control area start address and start method
->> - Simplified arg values passed to bios_linker_loader_add_pointer
->> - use g_assert_not_reached()
->> ---
->>   hw/i386/acpi-build.c | 49 +++++++++++++++++++++++++++++---------------
->>   1 file changed, 33 insertions(+), 16 deletions(-)
->>
->> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
->> index b5669d6c65..f150d95ecc 100644
->> --- a/hw/i386/acpi-build.c
->> +++ b/hw/i386/acpi-build.c
->> @@ -2298,35 +2298,52 @@ build_tpm_tcpa(GArray *table_data, BIOSLinker
->> *linker, GArray *tcpalog)
->>   static void
->>   build_tpm2(GArray *table_data, BIOSLinker *linker, GArray *tcpalog)
->>   {
->> -    Acpi20TPM2 *tpm2_ptr = acpi_data_push(table_data, sizeof *tpm2_ptr);
->> -    unsigned log_addr_size = sizeof(tpm2_ptr->log_area_start_address);
->> -    unsigned log_addr_offset =
->> -        (char *)&tpm2_ptr->log_area_start_address - table_data->data;
->> +    uint8_t start_method_params[12] = {};
->> +    unsigned log_addr_offset, tpm2_start;
->> +    uint64_t control_area_start_address;
->> +    uint32_t start_method;
->> +    void *tpm2_ptr;
->>   -    tpm2_ptr->platform_class = cpu_to_le16(TPM2_ACPI_CLASS_CLIENT);
->> +    tpm2_start = table_data->len;
->> +    tpm2_ptr = acpi_data_push(table_data, sizeof(AcpiTableHeader));
->> +
->> +    /* Platform Class */
->> +    build_append_int_noprefix(table_data, TPM2_ACPI_CLASS_CLIENT, 2);
->> +    /* Reserved */
->> +    build_append_int_noprefix(table_data, 0, 2);
->>       if (TPM_IS_TIS_ISA(tpm_find())) {
->> -        tpm2_ptr->control_area_address = cpu_to_le64(0);
->> -        tpm2_ptr->start_method = cpu_to_le32(TPM2_START_METHOD_MMIO);
->> +        control_area_start_address = 0;
->> +        start_method = TPM2_START_METHOD_MMIO;
->>       } else if (TPM_IS_CRB(tpm_find())) {
->> -        tpm2_ptr->control_area_address = cpu_to_le64(TPM_CRB_ADDR_CTRL);
->> -        tpm2_ptr->start_method = cpu_to_le32(TPM2_START_METHOD_CRB);
->> +        control_area_start_address = TPM_CRB_ADDR_CTRL;
->> +        start_method = TPM2_START_METHOD_CRB;
->>       } else {
->> -        g_warn_if_reached();
->> +        g_assert_not_reached();
->>       }
->> +    /* Address of Control Area */
->> +    build_append_int_noprefix(table_data, control_area_start_address,
->> 8);
->> +    /* Start Method */
->> +    build_append_int_noprefix(table_data, start_method, 4);
->>   -    tpm2_ptr->log_area_minimum_length =
->> -        cpu_to_le32(TPM_LOG_AREA_MINIMUM_SIZE);
->> +    /* Platform Specific Parameters */
->> +    g_array_append_vals(table_data, &start_method_params,
->> +                        ARRAY_SIZE(start_method_params));
->>   -    acpi_data_push(tcpalog,
->> le32_to_cpu(tpm2_ptr->log_area_minimum_length));
->> +    /* Log Area Minimum Length */
->> +    build_append_int_noprefix(table_data, TPM_LOG_AREA_MINIMUM_SIZE, 4);
->> +
->> +    acpi_data_push(tcpalog, TPM_LOG_AREA_MINIMUM_SIZE);
->>       bios_linker_loader_alloc(linker, ACPI_BUILD_TPMLOG_FILE,
->> tcpalog, 1,
->>                                false);
->>   -    /* log area start address to be filled by Guest linker */
->> +    log_addr_offset = table_data->len;
->> +    build_append_int_noprefix(table_data, 0, 8);
->> +    /* Log Area Start Address to be filled by Guest linker */
->>       bios_linker_loader_add_pointer(linker, ACPI_BUILD_TABLE_FILE,
->> -                                   log_addr_offset, log_addr_size,
->> +                                   log_addr_offset, 8,
-> 
-> 
-> 8 => sizeof(tpm2_ptr->log_area_start_address);
-Igor asked for sizeof(tpm2_ptr->log_area_start_address) => 8 ;-)
+At the moment, we do not support 3.2 range invalidation yet.
+So it reduces to a single IOVA invalidation.
 
-Also he asked for Acpi20TPM2 removal so tpm2_ptr now is a void *.
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+---
+ hw/arm/smmuv3.c     | 36 +++++++++++++++++-------------------
+ hw/arm/trace-events |  3 +--
+ 2 files changed, 18 insertions(+), 21 deletions(-)
 
-I don't have a strong opinion on that so I will follow the consensus, if
-any.
-
-
-> 
-> 
->>                                      ACPI_BUILD_TPMLOG_FILE, 0);
->>       build_header(linker, table_data,
->> -                 (void *)tpm2_ptr, "TPM2", sizeof(*tpm2_ptr), 4,
->> NULL, NULL);
->> +                 tpm2_ptr, "TPM2", table_data->len - tpm2_start, 4,
->> NULL, NULL);
->>   }
->>     #define HOLE_640K_START  (640 * KiB)
-> 
-> 
-> Reviewed-by: Stefan Berger <stefanb@linux.ibm.com>
-thanks!
-
-Thanks
-
-Eric
-> 
-> 
-> 
-> 
+diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
+index 931a2b6872..4eda16be7b 100644
+--- a/hw/arm/smmuv3.c
++++ b/hw/arm/smmuv3.c
+@@ -840,6 +840,22 @@ static void smmuv3_inv_notifiers_iova(SMMUState *s, int asid, dma_addr_t iova)
+     }
+ }
+ 
++static void smmuv3_s1_range_inval(SMMUState *s, Cmd *cmd)
++{
++    dma_addr_t addr = CMD_ADDR(cmd);
++    uint8_t type = CMD_TYPE(cmd);
++    uint16_t vmid = CMD_VMID(cmd);
++    bool leaf = CMD_LEAF(cmd);
++    int asid = -1;
++
++    if (type == SMMU_CMD_TLBI_NH_VA) {
++        asid = CMD_ASID(cmd);
++    }
++    trace_smmuv3_s1_range_inval(vmid, asid, addr, leaf);
++    smmuv3_inv_notifiers_iova(s, asid, addr);
++    smmu_iotlb_inv_iova(s, asid, addr);
++}
++
+ static int smmuv3_cmdq_consume(SMMUv3State *s)
+ {
+     SMMUState *bs = ARM_SMMU(s);
+@@ -970,27 +986,9 @@ static int smmuv3_cmdq_consume(SMMUv3State *s)
+             smmu_iotlb_inv_all(bs);
+             break;
+         case SMMU_CMD_TLBI_NH_VAA:
+-        {
+-            dma_addr_t addr = CMD_ADDR(&cmd);
+-            uint16_t vmid = CMD_VMID(&cmd);
+-
+-            trace_smmuv3_cmdq_tlbi_nh_vaa(vmid, addr);
+-            smmuv3_inv_notifiers_iova(bs, -1, addr);
+-            smmu_iotlb_inv_iova(bs, -1, addr);
+-            break;
+-        }
+         case SMMU_CMD_TLBI_NH_VA:
+-        {
+-            uint16_t asid = CMD_ASID(&cmd);
+-            uint16_t vmid = CMD_VMID(&cmd);
+-            dma_addr_t addr = CMD_ADDR(&cmd);
+-            bool leaf = CMD_LEAF(&cmd);
+-
+-            trace_smmuv3_cmdq_tlbi_nh_va(vmid, asid, addr, leaf);
+-            smmuv3_inv_notifiers_iova(bs, asid, addr);
+-            smmu_iotlb_inv_iova(bs, asid, addr);
++            smmuv3_s1_range_inval(bs, &cmd);
+             break;
+-        }
+         case SMMU_CMD_TLBI_EL3_ALL:
+         case SMMU_CMD_TLBI_EL3_VA:
+         case SMMU_CMD_TLBI_EL2_ALL:
+diff --git a/hw/arm/trace-events b/hw/arm/trace-events
+index 2d445c99b7..b366973739 100644
+--- a/hw/arm/trace-events
++++ b/hw/arm/trace-events
+@@ -45,8 +45,7 @@ smmuv3_cmdq_cfgi_ste_range(int start, int end) "start=0x%d - end=0x%d"
+ smmuv3_cmdq_cfgi_cd(uint32_t sid) "streamid = %d"
+ smmuv3_config_cache_hit(uint32_t sid, uint32_t hits, uint32_t misses, uint32_t perc) "Config cache HIT for sid %d (hits=%d, misses=%d, hit rate=%d)"
+ smmuv3_config_cache_miss(uint32_t sid, uint32_t hits, uint32_t misses, uint32_t perc) "Config cache MISS for sid %d (hits=%d, misses=%d, hit rate=%d)"
+-smmuv3_cmdq_tlbi_nh_va(int vmid, int asid, uint64_t addr, bool leaf) "vmid =%d asid =%d addr=0x%"PRIx64" leaf=%d"
+-smmuv3_cmdq_tlbi_nh_vaa(int vmid, uint64_t addr) "vmid =%d addr=0x%"PRIx64
++smmuv3_s1_range_inval(int vmid, int asid, uint64_t addr, bool leaf) "vmid =%d asid =%d addr=0x%"PRIx64" leaf=%d"
+ smmuv3_cmdq_tlbi_nh(void) ""
+ smmuv3_cmdq_tlbi_nh_asid(uint16_t asid) "asid=%d"
+ smmuv3_config_cache_inv(uint32_t sid) "Config cache INV for sid %d"
+-- 
+2.20.1
 
 
