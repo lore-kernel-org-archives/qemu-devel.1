@@ -6,42 +6,43 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B5CBC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 17:15:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 410C6C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 17:17:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2343F20829
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 17:15:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2343F20829
+	by mail.kernel.org (Postfix) with ESMTPS id 148C420829
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 17:17:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 148C420829
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=openvz.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43716 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47676 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjQnh-0003JJ-E1
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 13:15:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34044)
+	id 1jjQp3-00055C-C3
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 13:17:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36132)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <den@openvz.org>)
- id 1jjQk8-0005XS-2t; Thu, 11 Jun 2020 13:11:56 -0400
-Received: from relay.sw.ru ([185.231.240.75]:35188 helo=relay3.sw.ru)
+ id 1jjQoI-00040y-J3; Thu, 11 Jun 2020 13:16:14 -0400
+Received: from relay.sw.ru ([185.231.240.75]:36378 helo=relay3.sw.ru)
  by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <den@openvz.org>)
- id 1jjQk2-0000qi-OE; Thu, 11 Jun 2020 13:11:55 -0400
+ id 1jjQoF-0001g0-Om; Thu, 11 Jun 2020 13:16:14 -0400
 Received: from [192.168.15.81] (helo=iris.sw.ru)
  by relay3.sw.ru with esmtp (Exim 4.93)
  (envelope-from <den@openvz.org>)
- id 1jjQjt-0000BN-0n; Thu, 11 Jun 2020 20:11:41 +0300
+ id 1jjQo9-0000E7-NL; Thu, 11 Jun 2020 20:16:05 +0300
 From: "Denis V. Lunev" <den@openvz.org>
 To: qemu-block@nongnu.org,
 	qemu-devel@nongnu.org
-Subject: [PATCH 3/4] block, migration: add bdrv_flush_vmstate helper
-Date: Thu, 11 Jun 2020 20:11:42 +0300
-Message-Id: <20200611171143.21589-4-den@openvz.org>
+Subject: [PATCH 1/2] block: propagate discard alignment from format drivers to
+ the guest
+Date: Thu, 11 Jun 2020 20:16:07 +0300
+Message-Id: <20200611171608.22052-2-den@openvz.org>
 X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200611171143.21589-1-den@openvz.org>
-References: <20200611171143.21589-1-den@openvz.org>
+In-Reply-To: <20200611171608.22052-1-den@openvz.org>
+References: <20200611171608.22052-1-den@openvz.org>
 Received-SPF: pass client-ip=185.231.240.75; envelope-from=den@openvz.org;
  helo=relay3.sw.ru
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 13:11:47
@@ -64,146 +65,172 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Juan Quintela <quintela@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Denis Plotnikov <dplotnikov@virtuozzo.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, "Denis V. Lunev" <den@openvz.org>
+ Eduardo Habkost <ehabkost@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, "Denis V. Lunev" <den@openvz.org>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Right now bdrv_fclose() is just calling bdrv_flush().
+Nowaday SCSI drivers in guests are able to align UNMAP requests before
+sending to the device. Right now QEMU provides an ability to set
+this via "discard_granularity" property of the block device which could
+be used by management layer.
 
-The problem is that migration code is working inefficently from black
-layer terms and are frequently called for very small pieces of not
-properly aligned data. Block layer is capable to work this way, but
-this is very slow.
+Though, in particular, from the point of QEMU, there is
+pdiscard_granularity on the format driver level, f.e. on QCOW2 or iSCSI.
+It would be beneficial to pass this value as a default for this
+property.
 
-This patch is a preparation for the introduction of the intermediate
-buffer at block driver state. It would be beneficial to separate
-conventional bdrv_flush() from closing QEMU file from migration code.
-
-The patch also forces bdrv_flush_vmstate() operation inside
-synchronous blk_save_vmstate() operation. This helper is used from
-qemu-io only.
+Technically this should reduce the amount of use less UNMAP requests
+from the guest to the host. Basic test confirms this.
 
 Signed-off-by: Denis V. Lunev <den@openvz.org>
 CC: Kevin Wolf <kwolf@redhat.com>
 CC: Max Reitz <mreitz@redhat.com>
-CC: Stefan Hajnoczi <stefanha@redhat.com>
+CC: Eduardo Habkost <ehabkost@redhat.com>
+CC: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+CC: John Snow <jsnow@redhat.com>
+CC: Paolo Bonzini <pbonzini@redhat.com>
 CC: Fam Zheng <fam@euphon.net>
-CC: Juan Quintela <quintela@redhat.com>
-CC: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-CC: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-CC: Denis Plotnikov <dplotnikov@virtuozzo.com>
 ---
- block/block-backend.c |  6 +++++-
- block/io.c            | 39 +++++++++++++++++++++++++++++++++++++++
- include/block/block.h |  1 +
- migration/savevm.c    |  3 +++
- 4 files changed, 48 insertions(+), 1 deletion(-)
+ block/block-backend.c          | 11 +++++++++++
+ hw/core/machine.c              | 15 ++++++++++++++-
+ hw/ide/qdev.c                  |  3 ++-
+ hw/scsi/scsi-disk.c            |  5 ++++-
+ include/hw/block/block.h       |  2 +-
+ include/sysemu/block-backend.h |  6 ++++++
+ 6 files changed, 38 insertions(+), 4 deletions(-)
 
 diff --git a/block/block-backend.c b/block/block-backend.c
-index 9342a475cb..2107ace699 100644
+index 6936b25c83..9342a475cb 100644
 --- a/block/block-backend.c
 +++ b/block/block-backend.c
-@@ -2177,7 +2177,7 @@ int blk_truncate(BlockBackend *blk, int64_t offset, bool exact,
- int blk_save_vmstate(BlockBackend *blk, const uint8_t *buf,
-                      int64_t pos, int size)
- {
--    int ret;
-+    int ret, ret2;
+@@ -2222,6 +2222,17 @@ int blk_probe_geometry(BlockBackend *blk, HDGeometry *geo)
+     return bdrv_probe_geometry(blk_bs(blk), geo);
+ }
  
-     if (!blk_is_available(blk)) {
-         return -ENOMEDIUM;
-@@ -2187,6 +2187,10 @@ int blk_save_vmstate(BlockBackend *blk, const uint8_t *buf,
-     if (ret < 0) {
-         return ret;
++int blk_discard_granularity(BlockBackend *blk)
++{
++    BlockDriverState *bs = blk_bs(blk);
++
++    if (bs == NULL) {
++        return DEFAULT_DISCARD_GRANULARITY;
++    }
++
++    return bs->bl.pdiscard_alignment;
++}
++
+ /*
+  * Updates the BlockBackendRootState object with data from the currently
+  * attached BlockDriverState.
+diff --git a/hw/core/machine.c b/hw/core/machine.c
+index bb3a7b18b1..08a242d606 100644
+--- a/hw/core/machine.c
++++ b/hw/core/machine.c
+@@ -28,7 +28,20 @@
+ #include "hw/mem/nvdimm.h"
+ #include "migration/vmstate.h"
+ 
+-GlobalProperty hw_compat_5_0[] = {};
++GlobalProperty hw_compat_5_0[] = {
++    { "ide-cd", "discard_granularity", "0xffffffff" },
++    { "ide-hd", "discard_granularity", "0xffffffff" },
++    { "ide-drive", "discard_granularity", "0xffffffff" },
++    { "scsi-hd", "discard_granularity", "0xffffffff" },
++    { "scsi-cd", "discard_granularity", "0xffffffff" },
++    { "scsi-disk", "discard_granularity", "0xffffffff" },
++    { "virtio-blk-pci", "discard_granularity", "0xffffffff" },
++    { "xen-block", "discard_granularity", "0xffffffff" },
++    { "usb-storage", "discard_granularity", "0xffffffff" },
++    { "swim-drive", "discard_granularity", "0xffffffff" },
++    { "floppy", "discard_granularity", "0xffffffff" },
++    { "nvme", "discard_granularity", "0xffffffff" },
++};
+ const size_t hw_compat_5_0_len = G_N_ELEMENTS(hw_compat_5_0);
+ 
+ GlobalProperty hw_compat_4_2[] = {
+diff --git a/hw/ide/qdev.c b/hw/ide/qdev.c
+index 06b11583f5..e515dbeb0e 100644
+--- a/hw/ide/qdev.c
++++ b/hw/ide/qdev.c
+@@ -179,7 +179,8 @@ static void ide_dev_initfn(IDEDevice *dev, IDEDriveKind kind, Error **errp)
+         }
      }
-+    ret2 = bdrv_flush_vmstate(blk_bs(blk));
-+    if (ret2 < 0) {
-+        return ret;
-+    }
  
-     if (ret == size && !blk->enable_write_cache) {
-         ret = bdrv_flush(blk_bs(blk));
-diff --git a/block/io.c b/block/io.c
-index 121ce17a49..fbf352f39d 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -2725,6 +2725,45 @@ int bdrv_readv_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos)
-     return bdrv_rw_vmstate(bs, qiov, pos, true);
- }
+-    if (dev->conf.discard_granularity == -1) {
++    if (dev->conf.discard_granularity == -1 ||
++        dev->conf.discard_granularity == -2) {
+         dev->conf.discard_granularity = 512;
+     } else if (dev->conf.discard_granularity &&
+                dev->conf.discard_granularity != 512) {
+diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
+index 387503e11b..6b809608e4 100644
+--- a/hw/scsi/scsi-disk.c
++++ b/hw/scsi/scsi-disk.c
+@@ -48,7 +48,6 @@
+ #define SCSI_MAX_INQUIRY_LEN        256
+ #define SCSI_MAX_MODE_LEN           256
+ 
+-#define DEFAULT_DISCARD_GRANULARITY (4 * KiB)
+ #define DEFAULT_MAX_UNMAP_SIZE      (1 * GiB)
+ #define DEFAULT_MAX_IO_SIZE         INT_MAX     /* 2 GB - 1 block */
+ 
+@@ -2381,6 +2380,10 @@ static void scsi_realize(SCSIDevice *dev, Error **errp)
+     if (s->qdev.conf.discard_granularity == -1) {
+         s->qdev.conf.discard_granularity =
+             MAX(s->qdev.conf.logical_block_size, DEFAULT_DISCARD_GRANULARITY);
++    } else if (s->qdev.conf.discard_granularity == -2) {
++        s->qdev.conf.discard_granularity =
++            MAX(s->qdev.conf.logical_block_size,
++                blk_discard_granularity(s->qdev.conf.blk));
+     }
+ 
+     if (!s->version) {
+diff --git a/include/hw/block/block.h b/include/hw/block/block.h
+index d7246f3862..53d4a38044 100644
+--- a/include/hw/block/block.h
++++ b/include/hw/block/block.h
+@@ -54,7 +54,7 @@ static inline unsigned int get_physical_block_exp(BlockConf *conf)
+     DEFINE_PROP_UINT16("min_io_size", _state, _conf.min_io_size, 0),    \
+     DEFINE_PROP_UINT32("opt_io_size", _state, _conf.opt_io_size, 0),    \
+     DEFINE_PROP_UINT32("discard_granularity", _state,                   \
+-                       _conf.discard_granularity, -1),                  \
++                       _conf.discard_granularity, -2),                  \
+     DEFINE_PROP_ON_OFF_AUTO("write-cache", _state, _conf.wce,           \
+                             ON_OFF_AUTO_AUTO),                          \
+     DEFINE_PROP_BOOL("share-rw", _state, _conf.share_rw, false)
+diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backend.h
+index 8203d7f6f9..241a759432 100644
+--- a/include/sysemu/block-backend.h
++++ b/include/sysemu/block-backend.h
+@@ -13,6 +13,7 @@
+ #ifndef BLOCK_BACKEND_H
+ #define BLOCK_BACKEND_H
+ 
++#include "qemu/units.h"
+ #include "qemu/iov.h"
+ #include "block/throttle-groups.h"
+ 
+@@ -25,6 +26,10 @@
+  */
+ #include "block/block.h"
  
 +
-+typedef struct FlushVMStateCo {
-+    BlockDriverState *bs;
-+    int ret;
-+} FlushVMStateCo;
++#define DEFAULT_DISCARD_GRANULARITY (4 * KiB)
 +
-+static int coroutine_fn bdrv_co_flush_vmstate(BlockDriverState *bs)
-+{
-+    return 0;
-+}
 +
-+static void coroutine_fn bdrv_flush_vmstate_co_entry(void *opaque)
-+{
-+    FlushVMStateCo *rwco = opaque;
-+
-+    rwco->ret = bdrv_co_flush_vmstate(rwco->bs);
-+    aio_wait_kick();
-+}
-+
-+int bdrv_flush_vmstate(BlockDriverState *bs)
-+{
-+    Coroutine *co;
-+    FlushVMStateCo flush_co = {
-+        .bs = bs,
-+        .ret = NOT_DONE,
-+    };
-+
-+    if (qemu_in_coroutine()) {
-+        /* Fast-path if already in coroutine context */
-+        bdrv_flush_vmstate_co_entry(&flush_co);
-+    } else {
-+        co = qemu_coroutine_create(bdrv_flush_vmstate_co_entry, &flush_co);
-+        bdrv_coroutine_enter(bs, co);
-+        BDRV_POLL_WHILE(bs, flush_co.ret == NOT_DONE);
-+    }
-+
-+    return flush_co.ret;
-+}
-+
- /**************************************************************/
- /* async I/Os */
- 
-diff --git a/include/block/block.h b/include/block/block.h
-index 25e299605e..024525b87d 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -572,6 +572,7 @@ int bdrv_save_vmstate(BlockDriverState *bs, const uint8_t *buf,
- 
- int bdrv_load_vmstate(BlockDriverState *bs, uint8_t *buf,
-                       int64_t pos, int size);
-+int bdrv_flush_vmstate(BlockDriverState *bs);
- 
- void bdrv_img_create(const char *filename, const char *fmt,
-                      const char *base_filename, const char *base_fmt,
-diff --git a/migration/savevm.c b/migration/savevm.c
-index 0ff5bb40ed..9698c909d7 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -150,6 +150,9 @@ static ssize_t block_get_buffer(void *opaque, uint8_t *buf, int64_t pos,
- 
- static int bdrv_fclose(void *opaque, Error **errp)
- {
-+    int err = bdrv_flush_vmstate(opaque);
-+    if (err < 0)
-+        return err;
-     return bdrv_flush(opaque);
- }
- 
+ /* Callbacks for block device models */
+ typedef struct BlockDevOps {
+     /*
+@@ -246,6 +251,7 @@ int blk_save_vmstate(BlockBackend *blk, const uint8_t *buf,
+ int blk_load_vmstate(BlockBackend *blk, uint8_t *buf, int64_t pos, int size);
+ int blk_probe_blocksizes(BlockBackend *blk, BlockSizes *bsz);
+ int blk_probe_geometry(BlockBackend *blk, HDGeometry *geo);
++int blk_discard_granularity(BlockBackend *blk);
+ BlockAIOCB *blk_abort_aio_request(BlockBackend *blk,
+                                   BlockCompletionFunc *cb,
+                                   void *opaque, int ret);
 -- 
 2.17.1
 
