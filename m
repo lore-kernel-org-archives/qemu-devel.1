@@ -2,84 +2,107 @@ Return-Path: <SRS0=U615=7Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 379D3C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 16:26:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CB78C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 16:27:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 01D36207ED
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 16:26:28 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FAH2igFO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01D36207ED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2D5F720792
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 16:27:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D5F720792
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56224 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60308 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjQ27-0008Ep-5n
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 12:26:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51762)
+	id 1jjQ2r-0001UY-Dc
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 12:27:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54126)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jjPrP-0000Pf-6Z
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 12:15:23 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22752
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jjPrN-00040z-AK
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 12:15:22 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591892120;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=vOZcCyG6+q6mpWKybdwSRlg7xtE0dYIf0cnK+vy6ob4=;
- b=FAH2igFOVzJvgxXSmaxbXUmblfc5UmN1DCuMmaov0wfl9Bma/1RDtnlQmfHDu6fdjEXrLS
- vIYPi+0+HiiF69RjDuBSjwataSLwhfqU4X8ousG+ub/CLaFNdL7bxkO8t0ooppjUio0Un6
- AS2kAIwLOtk3URPebn8o5N69HGT9oDE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-12-iZ52zfHpMHiZbHQP_GDy0g-1; Thu, 11 Jun 2020 12:15:18 -0400
-X-MC-Unique: iZ52zfHpMHiZbHQP_GDy0g-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 139F61B18BC0;
- Thu, 11 Jun 2020 16:15:17 +0000 (UTC)
-Received: from laptop.redhat.com (ovpn-114-197.ams2.redhat.com [10.36.114.197])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 474FB1024871;
- Thu, 11 Jun 2020 16:15:03 +0000 (UTC)
-From: Eric Auger <eric.auger@redhat.com>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org, peter.maydell@linaro.org, peterx@redhat.com
-Subject: [PATCH RESEND 0/9] SMMUv3.2 Range-based TLB Invalidation Support
-Date: Thu, 11 Jun 2020 18:14:51 +0200
-Message-Id: <20200611161500.23580-1-eric.auger@redhat.com>
+ (Exim 4.90_1) (envelope-from <stefanb@linux.ibm.com>)
+ id 1jjPwx-0008PQ-9E
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 12:21:07 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50926)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <stefanb@linux.ibm.com>)
+ id 1jjPwc-0005BG-1I
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 12:21:06 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 05BG3ax2020452; Thu, 11 Jun 2020 12:20:41 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 31kp0ycbtb-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 11 Jun 2020 12:20:41 -0400
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05BG3gv2021207;
+ Thu, 11 Jun 2020 12:20:40 -0400
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com
+ [169.63.214.131])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 31kp0ycbsv-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 11 Jun 2020 12:20:40 -0400
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+ by ppma01dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05BGJB6M017425;
+ Thu, 11 Jun 2020 16:20:39 GMT
+Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com
+ [9.57.198.26]) by ppma01dal.us.ibm.com with ESMTP id 31hygyy4w6-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 11 Jun 2020 16:20:39 +0000
+Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com
+ [9.57.199.109])
+ by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 05BGJcQs15598370
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 11 Jun 2020 16:19:39 GMT
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id E38CE112062;
+ Thu, 11 Jun 2020 16:19:38 +0000 (GMT)
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id D0510112061;
+ Thu, 11 Jun 2020 16:19:38 +0000 (GMT)
+Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
+ by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
+ Thu, 11 Jun 2020 16:19:38 +0000 (GMT)
+Subject: Re: [PATCH v2 01/11] docs/specs/tpm: Correct header path name
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20200611160306.2751-1-philmd@redhat.com>
+ <20200611160306.2751-2-philmd@redhat.com>
+From: Stefan Berger <stefanb@linux.ibm.com>
+Message-ID: <4ed28a4c-8679-75d8-1078-9dbd0f38a8ca@linux.ibm.com>
+Date: Thu, 11 Jun 2020 12:19:38 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20200611160306.2751-2-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120;
- envelope-from=eric.auger@redhat.com; helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 03:29:33
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
+ definitions=2020-06-11_16:2020-06-11,
+ 2020-06-11 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ bulkscore=0 adultscore=0
+ mlxscore=0 cotscore=-2147483648 lowpriorityscore=0 malwarescore=0
+ suspectscore=0 spamscore=0 impostorscore=0 priorityscore=1501 phishscore=0
+ mlxlogscore=999 clxscore=1015 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2004280000 definitions=main-2006110126
+Received-SPF: pass client-ip=148.163.156.1; envelope-from=stefanb@linux.ibm.com;
+ helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 10:26:43
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
 X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -92,80 +115,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jean-philippe@linaro.org, robh@kernel.org, robin.murphy@arm.com,
- mst@redhat.com, zhangfei.gao@foxmail.com, shameerali.kolothum.thodi@huawei.com,
- will@kernel.org
+Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-SMMU3.2 brings the support of range-based TLB invalidation and
-level hint. When this feature is supported, the SMMUv3 driver
-is allowed to send TLB invalidations for a range of IOVAs instead
-of using page based invalidation.
+On 6/11/20 12:02 PM, Philippe Mathieu-Daudé wrote:
+> Commit 8dc6701722 introduce the documentation but an
+> incorrect path name was used. Fix that.
+>
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Implementing this feature in the virtual SMMUv3 device is
-mandated for DPDK on guest use case: DPDK uses hugepage
-buffers and guest sends invalidations for blocks. Without
-this feature, a guest invalidation of a block of 1GB for instance
-translates into a storm of page invalidations. Each of them
-is trapped by the VMM and cascaded downto the physical IOMMU.
-This completely stalls the execution. This integration issue
-was initially reported in [1].
+Reviewed-by: Stefan Berger <stefanb@linux.ibm.com>
 
-Now SMMUv3.2 specifies additional parameters to NH_VA and NH_VAA
-stage 1 invalidation commands so we can support those extensions.
 
-patches [1, 3] are cleanup patches.
-patches [4, 6] changes the implementation of the VSMMUV3 IOTLB
-   This IOTLB is a minimalist IOTLB implementation that avoids to
-   do the page table walk in case we have an entry in the TLB.
-   Previously entries were page mappings only. Now they can be
-   blocks.
-patches [7, 9] bring support for range invalidation.
+> ---
+>   docs/specs/tpm.rst | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/docs/specs/tpm.rst b/docs/specs/tpm.rst
+> index 5e61238bc5..9e48e3b981 100644
+> --- a/docs/specs/tpm.rst
+> +++ b/docs/specs/tpm.rst
+> @@ -199,8 +199,8 @@ to be used with the passthrough backend or the swtpm backend.
+>   
+>   QEMU files related to TPM backends:
+>    - ``backends/tpm.c``
+> + - ``include/sysemu/tpm.h``
+>    - ``include/sysemu/tpm_backend.h``
+> - - ``include/sysemu/tpm_backend_int.h``
+>   
+>   The QEMU TPM passthrough device
+>   -------------------------------
 
-Supporting block mappings in the IOTLB look sensible in terms of
-TLB entry consumption. However looking at virtio/vhost device usage,
-without block mapping and without range invalidation (< 5.7 kernels
-it may be less performant. However for recent guest kernels
-supporting range invalidations [2], the performance should be similar.
-
-Best Regards
-
-Eric
-
-This series can be found at:
-https://github.com/eauger/qemu.git
-branch: v5.0.0-smmuv3-ril-v1
-
-References:
-[1] [RFC v2 4/4] iommu/arm-smmu-v3: add CMD_TLBI_NH_VA_AM command
-for iova range invalidation
-(https://lists.linuxfoundation.org/pipermail/iommu/2017-August/023679.html
-
-[2] 5.7+ kernels featuring
-6a481a95d4c1 iommu/arm-smmu-v3: Add SMMUv3.2 range invalidation support
-
-Eric Auger (9):
-  hw/arm/smmu-common: Factorize some code in smmu_ptw_64()
-  hw/arm/smmu-common: Add IOTLB helpers
-  hw/arm/smmu: Simplify the IOTLB key format
-  hw/arm/smmu: Introduce SMMUTLBEntry for PTW and IOTLB value
-  hw/arm/smmuv3: Store the starting level in SMMUTransTableInfo
-  hw/arm/smmu-common: Manage IOTLB block entries
-  hw/arm/smmuv3: Introduce smmuv3_s1_range_inval() helper
-  hw/arm/smmuv3: Get prepared for range invalidation
-  hw/arm/smmuv3: Advertise SMMUv3.2 range invalidation
-
- hw/arm/smmu-internal.h       |  14 +++
- hw/arm/smmuv3-internal.h     |   5 +
- include/hw/arm/smmu-common.h |  24 ++--
- hw/arm/smmu-common.c         | 205 +++++++++++++++++++++++------------
- hw/arm/smmuv3.c              | 142 ++++++++++++------------
- hw/arm/trace-events          |  12 +-
- 6 files changed, 246 insertions(+), 156 deletions(-)
-
--- 
-2.20.1
 
 
