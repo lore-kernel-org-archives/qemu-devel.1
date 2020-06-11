@@ -7,52 +7,52 @@ X-Spam-Status: No, score=-5.7 required=3.0 tests=DATE_IN_PAST_06_12,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8442BC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 00:24:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE297C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 00:26:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4C03E20835
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 00:24:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A59D820842
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 00:26:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=hostfission.com header.i=@hostfission.com header.b="JMNhrEsZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C03E20835
+	dkim=pass (1024-bit key) header.d=hostfission.com header.i=@hostfission.com header.b="AdirZgRO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A59D820842
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=hostfission.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35900 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40170 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjXUw-0002gh-Hg
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 20:24:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40606)
+	id 1jjXWL-0004q9-Vw
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 20:26:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40640)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <geoff@hostfission.com>)
- id 1jjXSu-0006zB-H8
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 20:22:36 -0400
-Received: from mail1.hostfission.com ([139.99.139.48]:33198)
+ id 1jjXSw-000734-TX
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 20:22:38 -0400
+Received: from mail1.hostfission.com ([139.99.139.48]:33226)
  by eggs.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <geoff@hostfission.com>) id 1jjXSr-0001I3-Ko
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 20:22:36 -0400
+ (envelope-from <geoff@hostfission.com>) id 1jjXSv-0001Jg-E4
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 20:22:38 -0400
 Received: from moya.office.hostfission.com (office.hostfission.com
  [220.233.29.71])
- by mail1.hostfission.com (Postfix) with ESMTP id 157B8444F1;
- Fri, 12 Jun 2020 10:16:13 +1000 (AEST)
+ by mail1.hostfission.com (Postfix) with ESMTP id F3620444E6;
+ Fri, 12 Jun 2020 10:16:12 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=hostfission.com;
  s=mail; t=1591920973;
- bh=1t76te5+unvB/lGElLkT/Q78MNCTZLQzmHCzHolgV6k=;
+ bh=gPfDx0oOx78hVDtbsa3uYMHvYIzSXfoDfgaF8sNcNrE=;
  h=From:Date:Subject:To:Cc:From;
- b=JMNhrEsZITkAlD31y0XaZZxDdohS5/IfAKTXt6YEnP2MBunMBiF1OdxwXrybfMcYL
- iII6OecMcvmarNuK5IXegYtxT2GCOeB5mBTlPNZlrypAWVL5dBNKgxJG/YMJycMkR0
- axVppOoRF+nSLR9YI39ctAsUJKRuvX1FZFQey17g=
+ b=AdirZgRO3VyI0We6O/MCkbfwaUxOMetZ8SvmPnRy0h/hokK33pkc7aYuvoEtu16pM
+ 0/wUesMZgC/uEdC63/+NMvPk9jv45ptfYl4rz4L5vkPTHTIB2y4Dr55qg34gprfWsa
+ NQFziR9HYhEHNkQ+Zh74mBkMIQfTldy+Zs0rcsg8=
 Received: by moya.office.hostfission.com (Postfix, from userid 0)
- id E7F733A069B; Fri, 12 Jun 2020 10:16:12 +1000 (AEST)
+ id D7A853A0680; Fri, 12 Jun 2020 10:16:12 +1000 (AEST)
 From: Geoffrey McRae <geoff@hostfission.com>
-Date: Fri, 12 Jun 2020 01:20:54 +1000
-Subject: [PATCH 5/6] audio/jack: honour the enable state of the audio device
+Date: Fri, 12 Jun 2020 01:14:19 +1000
+Subject: [PATCH 3/6] audio/jack: remove invalid set of input support bool
 To: <qemu-devel@nongnu.org>
 Cc: <kraxel@redhat.com>
 X-Mailer: mail (GNU Mailutils 3.5)
-Message-Id: <20200612001612.E7F733A069B@moya.office.hostfission.com>
+Message-Id: <20200612001612.D7A853A0680@moya.office.hostfission.com>
 Received-SPF: pass client-ip=139.99.139.48; envelope-from=geoff@hostfission.com;
  helo=mail1.hostfission.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 20:16:15
@@ -82,111 +82,23 @@ Sender: "Qemu-devel"
 
 Signed-off-by: Geoffrey McRae <geoff@hostfission.com>
 ---
- audio/jackaudio.c | 29 +++++++++++++++++++++--------
- 1 file changed, 21 insertions(+), 8 deletions(-)
+ audio/jackaudio.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
 diff --git a/audio/jackaudio.c b/audio/jackaudio.c
-index 249cbd3265..b2b53985ae 100644
+index fb8efd7af7..58c7344497 100644
 --- a/audio/jackaudio.c
 +++ b/audio/jackaudio.c
-@@ -56,7 +56,7 @@ typedef struct QJackClient {
-     AudiodevJackPerDirectionOptions *opt;
- 
-     bool out;
--    bool finished;
-+    bool enabled;
-     bool connect_ports;
-     int  packets;
- 
-@@ -271,9 +271,17 @@ static int qjack_process(jack_nframes_t nframes, void *arg)
-     }
- 
-     if (c->out) {
--        qjack_buffer_read_l(&c->fifo, buffers, nframes);
-+        if (likely(c->enabled)) {
-+            qjack_buffer_read_l(&c->fifo, buffers, nframes);
-+        } else {
-+            for(int i = 0; i < c->nchannels; ++i) {
-+                memset(buffers[i], 0, nframes * sizeof(float));
-+            }
-+        }
-     } else {
--        qjack_buffer_write_l(&c->fifo, buffers, nframes);
-+        if (likely(c->enabled)) {
-+            qjack_buffer_write_l(&c->fifo, buffers, nframes);
-+        }
-     }
- 
-     return 0;
-@@ -314,8 +322,8 @@ static void qjack_client_recover(QJackClient *c)
-     if (c->state == QJACK_STATE_DISCONNECTED &&
-         c->packets % 100 == 0) {
- 
--        /* if not finished then attempt to recover */
--        if (!c->finished) {
-+        /* if enabled then attempt to recover */
-+        if (c->enabled) {
-             dolog("attempting to reconnect to server\n");
-             qjack_client_init(c);
-         }
-@@ -387,7 +395,6 @@ static int qjack_client_init(QJackClient *c)
-     char client_name[jack_client_name_size()];
-     jack_options_t options = JackNullOption;
- 
--    c->finished      = false;
-     c->connect_ports = true;
- 
-     snprintf(client_name, sizeof(client_name), "%s-%s",
-@@ -483,8 +490,10 @@ static int qjack_init_out(HWVoiceOut *hw, struct audsettings *as,
-     }
- 
-     jo->c.out       = true;
-+    jo->c.enabled   = false;
-     jo->c.nchannels = as->nchannels;
-     jo->c.opt       = dev->u.jack.out;
-+
-     int ret = qjack_client_init(&jo->c);
-     if (ret != 0) {
-         return ret;
-@@ -519,8 +528,10 @@ static int qjack_init_in(HWVoiceIn *hw, struct audsettings *as,
-     }
- 
-     ji->c.out       = false;
-+    ji->c.enabled   = false;
-     ji->c.nchannels = as->nchannels;
-     ji->c.opt       = dev->u.jack.in;
-+
-     int ret = qjack_client_init(&ji->c);
-     if (ret != 0) {
-         return ret;
-@@ -568,23 +579,25 @@ static void qjack_client_fini(QJackClient *c)
- static void qjack_fini_out(HWVoiceOut *hw)
+@@ -607,9 +607,6 @@ static int qjack_thread_creator(jack_native_thread_t *thread,
+ static void *qjack_init(Audiodev *dev)
  {
-     QJackOut *jo = (QJackOut *)hw;
--    jo->c.finished = true;
-     qjack_client_fini(&jo->c);
+     assert(dev->driver == AUDIODEV_DRIVER_JACK);
+-
+-    dev->u.jack.has_in = false;
+-
+     return dev;
  }
  
- static void qjack_fini_in(HWVoiceIn *hw)
- {
-     QJackIn *ji = (QJackIn *)hw;
--    ji->c.finished = true;
-     qjack_client_fini(&ji->c);
- }
- 
- static void qjack_enable_out(HWVoiceOut *hw, bool enable)
- {
-+    QJackOut *jo = (QJackOut *)hw;
-+    jo->c.enabled = enable;
- }
- 
- static void qjack_enable_in(HWVoiceIn *hw, bool enable)
- {
-+    QJackIn *ji = (QJackIn *)hw;
-+    ji->c.enabled = enable;
- }
- 
- static int qjack_thread_creator(jack_native_thread_t *thread,
 -- 
 2.20.1
 
