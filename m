@@ -6,64 +6,64 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 436BAC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 14:01:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8F1EC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 14:02:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0DE2A2083E
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 14:01:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B3458206C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 14:02:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YhA57T4A"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0DE2A2083E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BtMhGgC/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3458206C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58356 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60106 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjNlv-0003VT-8d
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 10:01:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51752)
+	id 1jjNmS-0004Di-UF
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 10:02:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51934)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jjNk6-00024E-6Y
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 09:59:42 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:58701
+ id 1jjNkL-0002YB-IE
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 09:59:57 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:42053
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jjNk4-00028p-O0
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 09:59:41 -0400
+ id 1jjNkK-0002Bi-1h
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 09:59:57 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591883979;
+ s=mimecast20190719; t=1591883995;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=u2ZwDqBhLE/jAL775l2qv2t5H2xr+fSUtwHIc08DgoA=;
- b=YhA57T4ADbRK5hlZT0qxP6FRqzcMbrQdd/FCM3ibICMUyctQbaTveYsOsX7qJxk1Bcrudf
- Cr+MQJ3WIGOcu+ph6lCEiM3eoy2yAnzzNem8BJt0hdUPSkC/WLp9DvQDxOQg67Zuy/isgG
- ktl4AcIz8wGDpGGZYa0KQeAyEFHLyuU=
+ bh=l/tsqs0CV87SZ1ggKjgE+gFxoq7g2D7z8Ikszig2jYc=;
+ b=BtMhGgC/SdQlBoSpOXzkhY73qRGaNihb11Cp7/wnn7yhuI9PoJsnkD1yo0JCnbXnq21Y3f
+ OHuPnmkCEANr+pT+YzroJ3DbuH7hDJ8ga1QbaFYPdL0LGF69sX/LM5ojjuiOMX2/g4C7xy
+ p0Ldq6rfEpu5Xd/cFguIC2RZ0wwI+Pw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-192-XUhi_seiOi2nutEEZy1zMQ-1; Thu, 11 Jun 2020 09:59:38 -0400
-X-MC-Unique: XUhi_seiOi2nutEEZy1zMQ-1
+ us-mta-225-zQf7JofQNBSF6NrVhN50HQ-1; Thu, 11 Jun 2020 09:59:53 -0400
+X-MC-Unique: zQf7JofQNBSF6NrVhN50HQ-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9F1B0461;
- Thu, 11 Jun 2020 13:59:36 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8751D1005513;
+ Thu, 11 Jun 2020 13:59:52 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-114-197.ams2.redhat.com [10.36.114.197])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 938415D9DC;
- Thu, 11 Jun 2020 13:59:33 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6A5785D9DC;
+ Thu, 11 Jun 2020 13:59:40 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, stefanb@linux.ibm.com,
  qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org,
  mst@redhat.com, shannon.zhaosl@gmail.com, imammedo@redhat.com
-Subject: [PATCH v4 1/5] acpi: Convert build_tpm2() to build_append* API
-Date: Thu, 11 Jun 2020 15:59:13 +0200
-Message-Id: <20200611135917.18300-2-eric.auger@redhat.com>
+Subject: [PATCH v4 3/5] arm/acpi: TPM2 ACPI table support
+Date: Thu, 11 Jun 2020 15:59:15 +0200
+Message-Id: <20200611135917.18300-4-eric.auger@redhat.com>
 In-Reply-To: <20200611135917.18300-1-eric.auger@redhat.com>
 References: <20200611135917.18300-1-eric.auger@redhat.com>
 MIME-Version: 1.0
@@ -72,8 +72,8 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61;
- envelope-from=eric.auger@redhat.com; helo=us-smtp-delivery-1.mimecast.com
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=eric.auger@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 03:29:33
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
@@ -101,97 +101,94 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In preparation of its move to the generic acpi code,
-let's convert build_tpm2() to use build_append API. This
-latter now is prefered in place of direct ACPI struct field
-settings with manual endianness conversion.
+Add a TPM2 ACPI table if a TPM2.0 sysbus device has been
+dynamically instantiated.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
 ---
 
-v3 -> v4:
-- Don't use Acpi20TPM2 *tpm2_ptr anymore
-- Use variables for control area start address and start method
-- Simplified arg values passed to bios_linker_loader_add_pointer
-- use g_assert_not_reached()
----
- hw/i386/acpi-build.c | 49 +++++++++++++++++++++++++++++---------------
- 1 file changed, 33 insertions(+), 16 deletions(-)
+v2 -> v3:
+- do not to need to create the log area anymore
 
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index b5669d6c65..f150d95ecc 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -2298,35 +2298,52 @@ build_tpm_tcpa(GArray *table_data, BIOSLinker *linker, GArray *tcpalog)
- static void
- build_tpm2(GArray *table_data, BIOSLinker *linker, GArray *tcpalog)
- {
--    Acpi20TPM2 *tpm2_ptr = acpi_data_push(table_data, sizeof *tpm2_ptr);
--    unsigned log_addr_size = sizeof(tpm2_ptr->log_area_start_address);
--    unsigned log_addr_offset =
--        (char *)&tpm2_ptr->log_area_start_address - table_data->data;
-+    uint8_t start_method_params[12] = {};
-+    unsigned log_addr_offset, tpm2_start;
-+    uint64_t control_area_start_address;
-+    uint32_t start_method;
-+    void *tpm2_ptr;
+v1 -> v2:
+- reuse generic build_tpm2() and alloc log area externally
+- call tpm_find() once in build_tpm2()
+---
+ include/sysemu/tpm.h     | 2 ++
+ hw/acpi/aml-build.c      | 5 +++--
+ hw/arm/virt-acpi-build.c | 7 +++++++
+ 3 files changed, 12 insertions(+), 2 deletions(-)
+
+diff --git a/include/sysemu/tpm.h b/include/sysemu/tpm.h
+index f37851b1aa..03fb25941c 100644
+--- a/include/sysemu/tpm.h
++++ b/include/sysemu/tpm.h
+@@ -50,6 +50,8 @@ typedef struct TPMIfClass {
  
--    tpm2_ptr->platform_class = cpu_to_le16(TPM2_ACPI_CLASS_CLIENT);
-+    tpm2_start = table_data->len;
-+    tpm2_ptr = acpi_data_push(table_data, sizeof(AcpiTableHeader));
-+
-+    /* Platform Class */
-+    build_append_int_noprefix(table_data, TPM2_ACPI_CLASS_CLIENT, 2);
-+    /* Reserved */
-+    build_append_int_noprefix(table_data, 0, 2);
-     if (TPM_IS_TIS_ISA(tpm_find())) {
--        tpm2_ptr->control_area_address = cpu_to_le64(0);
--        tpm2_ptr->start_method = cpu_to_le32(TPM2_START_METHOD_MMIO);
-+        control_area_start_address = 0;
-+        start_method = TPM2_START_METHOD_MMIO;
-     } else if (TPM_IS_CRB(tpm_find())) {
--        tpm2_ptr->control_area_address = cpu_to_le64(TPM_CRB_ADDR_CTRL);
--        tpm2_ptr->start_method = cpu_to_le32(TPM2_START_METHOD_CRB);
-+        control_area_start_address = TPM_CRB_ADDR_CTRL;
-+        start_method = TPM2_START_METHOD_CRB;
+ #define TPM_IS_TIS_ISA(chr)                         \
+     object_dynamic_cast(OBJECT(chr), TYPE_TPM_TIS_ISA)
++#define TPM_IS_TIS_SYSBUS(chr)                      \
++    object_dynamic_cast(OBJECT(chr), TYPE_TPM_TIS_SYSBUS)
+ #define TPM_IS_CRB(chr)                             \
+     object_dynamic_cast(OBJECT(chr), TYPE_TPM_CRB)
+ #define TPM_IS_SPAPR(chr)                           \
+diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
+index 2a1d9fc839..a0c4d71fe9 100644
+--- a/hw/acpi/aml-build.c
++++ b/hw/acpi/aml-build.c
+@@ -1883,6 +1883,7 @@ void build_tpm2(GArray *table_data, BIOSLinker *linker, GArray *tcpalog)
+     uint8_t start_method_params[12] = {};
+     unsigned log_addr_offset, tpm2_start;
+     uint64_t control_area_start_address;
++    TPMIf *tpmif = tpm_find();
+     uint32_t start_method;
+     void *tpm2_ptr;
+ 
+@@ -1893,10 +1894,10 @@ void build_tpm2(GArray *table_data, BIOSLinker *linker, GArray *tcpalog)
+     build_append_int_noprefix(table_data, TPM2_ACPI_CLASS_CLIENT, 2);
+     /* Reserved */
+     build_append_int_noprefix(table_data, 0, 2);
+-    if (TPM_IS_TIS_ISA(tpm_find())) {
++    if (TPM_IS_TIS_ISA(tpmif) || TPM_IS_TIS_SYSBUS(tpmif)) {
+         control_area_start_address = 0;
+         start_method = TPM2_START_METHOD_MMIO;
+-    } else if (TPM_IS_CRB(tpm_find())) {
++    } else if (TPM_IS_CRB(tpmif)) {
+         control_area_start_address = TPM_CRB_ADDR_CTRL;
+         start_method = TPM2_START_METHOD_CRB;
      } else {
--        g_warn_if_reached();
-+        g_assert_not_reached();
+diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+index 1b0a584c7b..6d152ab481 100644
+--- a/hw/arm/virt-acpi-build.c
++++ b/hw/arm/virt-acpi-build.c
+@@ -41,12 +41,14 @@
+ #include "hw/acpi/pci.h"
+ #include "hw/acpi/memory_hotplug.h"
+ #include "hw/acpi/generic_event_device.h"
++#include "hw/acpi/tpm.h"
+ #include "hw/pci/pcie_host.h"
+ #include "hw/pci/pci.h"
+ #include "hw/arm/virt.h"
+ #include "hw/mem/nvdimm.h"
+ #include "sysemu/numa.h"
+ #include "sysemu/reset.h"
++#include "sysemu/tpm.h"
+ #include "kvm_arm.h"
+ #include "migration/vmstate.h"
+ #include "hw/acpi/ghes.h"
+@@ -844,6 +846,11 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
+         build_iort(tables_blob, tables->linker, vms);
      }
-+    /* Address of Control Area */
-+    build_append_int_noprefix(table_data, control_area_start_address, 8);
-+    /* Start Method */
-+    build_append_int_noprefix(table_data, start_method, 4);
  
--    tpm2_ptr->log_area_minimum_length =
--        cpu_to_le32(TPM_LOG_AREA_MINIMUM_SIZE);
-+    /* Platform Specific Parameters */
-+    g_array_append_vals(table_data, &start_method_params,
-+                        ARRAY_SIZE(start_method_params));
- 
--    acpi_data_push(tcpalog, le32_to_cpu(tpm2_ptr->log_area_minimum_length));
-+    /* Log Area Minimum Length */
-+    build_append_int_noprefix(table_data, TPM_LOG_AREA_MINIMUM_SIZE, 4);
++    if (tpm_get_version(tpm_find()) == TPM_VERSION_2_0) {
++        acpi_add_table(table_offsets, tables_blob);
++        build_tpm2(tables_blob, tables->linker, tables->tcpalog);
++    }
 +
-+    acpi_data_push(tcpalog, TPM_LOG_AREA_MINIMUM_SIZE);
-     bios_linker_loader_alloc(linker, ACPI_BUILD_TPMLOG_FILE, tcpalog, 1,
-                              false);
- 
--    /* log area start address to be filled by Guest linker */
-+    log_addr_offset = table_data->len;
-+    build_append_int_noprefix(table_data, 0, 8);
-+    /* Log Area Start Address to be filled by Guest linker */
-     bios_linker_loader_add_pointer(linker, ACPI_BUILD_TABLE_FILE,
--                                   log_addr_offset, log_addr_size,
-+                                   log_addr_offset, 8,
-                                    ACPI_BUILD_TPMLOG_FILE, 0);
-     build_header(linker, table_data,
--                 (void *)tpm2_ptr, "TPM2", sizeof(*tpm2_ptr), 4, NULL, NULL);
-+                 tpm2_ptr, "TPM2", table_data->len - tpm2_start, 4, NULL, NULL);
- }
- 
- #define HOLE_640K_START  (640 * KiB)
+     /* XSDT is pointed to by RSDP */
+     xsdt = tables_blob->len;
+     build_xsdt(tables_blob, tables->linker, table_offsets, NULL, NULL);
 -- 
 2.20.1
 
