@@ -2,80 +2,79 @@ Return-Path: <SRS0=U615=7Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 751DEC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 19:07:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E32BC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 19:47:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3937B206A4
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 19:07:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EEA7020836
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 19:47:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VHF8VIPC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3937B206A4
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bx9wU6JZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEA7020836
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56754 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51000 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjSXd-00061P-Ii
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 15:07:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59660)
+	id 1jjTAT-0001Hy-TE
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 15:47:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53782)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jjSWT-0004Uw-B9
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 15:05:57 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:24819
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jjT8H-0007Cf-Nj
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 15:45:01 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:30027
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jjSWR-0000DE-LP
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 15:05:56 -0400
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jjT8E-0000li-RB
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 15:45:01 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591902354;
+ s=mimecast20190719; t=1591904696;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ulzwYtyxHadepsaREFFfmiWCaGMR27Q7uvA0kz5lPc0=;
- b=VHF8VIPCJWHq+ZnbkoJe2YHjA9m1QhOfgb/2kiRH+ikrK8snLVjn+oHFZPUFAxjPvR892v
- dBbm88nOR9BcD0qie/lu45t9MUWsfIJ5oPg62v3LAR3F9fN6soA4+Jji7JpMTHXVdgV0aB
- atIsVAbqbcTFCt3AGCktJYEizH2/zwQ=
+ bh=1x1449wh9fFr7gq1V8OCFbpQf1TKKB1YZGtB8zf4V7c=;
+ b=Bx9wU6JZO9qwyCOSpWBjdDoyGL8IV5Iad8ibLWdo9Jtmg2AwaoIjqdJOTVqC17fbvvaJA8
+ EO0WRZnqTBblb1Y9TtqHPZdNDobn0wOdpHKPuzGoILQaZMCZPcRenQTRzXqgYCaaUBEieH
+ 86pmY9O0xeo84zvytwkyF9FpuZO9iAE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-289-4EmD5WGFOxeBJy0DL3sx-A-1; Thu, 11 Jun 2020 15:05:52 -0400
-X-MC-Unique: 4EmD5WGFOxeBJy0DL3sx-A-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-448-Shpqr4PROleL3WbBYnpWKg-1; Thu, 11 Jun 2020 15:44:53 -0400
+X-MC-Unique: Shpqr4PROleL3WbBYnpWKg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E8B6B107ACCD;
- Thu, 11 Jun 2020 19:05:51 +0000 (UTC)
-Received: from work-vm (ovpn-114-116.ams2.redhat.com [10.36.114.116])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4413660BF4;
- Thu, 11 Jun 2020 19:05:51 +0000 (UTC)
-Date: Thu, 11 Jun 2020 20:05:48 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
-Subject: Re: [PATCH 9/9] migration/ram: calculate un/encoded_size only when
- needed.
-Message-ID: <20200611190548.GE2969@work-vm>
-References: <20200603080904.997083-1-maozhongyi@cmss.chinamobile.com>
- <20200603080904.997083-10-maozhongyi@cmss.chinamobile.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 00FE9107ACCA
+ for <qemu-devel@nongnu.org>; Thu, 11 Jun 2020 19:44:53 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com
+ (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B1EE25EE0E
+ for <qemu-devel@nongnu.org>; Thu, 11 Jun 2020 19:44:52 +0000 (UTC)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 004/115] run-coverity-scan: use docker.py
+Date: Thu, 11 Jun 2020 15:42:58 -0400
+Message-Id: <20200611194449.31468-5-pbonzini@redhat.com>
+In-Reply-To: <20200611194449.31468-1-pbonzini@redhat.com>
+References: <20200611194449.31468-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200603080904.997083-10-maozhongyi@cmss.chinamobile.com>
-User-Agent: Mutt/1.14.0 (2020-05-02)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=dgilbert@redhat.com;
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 03:29:33
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 14:57:53
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -83,7 +82,7 @@ X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,54 +95,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Mao Zhongyi (maozhongyi@cmss.chinamobile.com) wrote:
-> Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
-> ---
->  migration/ram.c | 9 +++++----
->  1 file changed, 5 insertions(+), 4 deletions(-)
-> 
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 41cc530d9d..ca20030b64 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -910,14 +910,15 @@ static void migration_update_rates(RAMState *rs, int64_t end_time)
->          xbzrle_counters.cache_miss_rate = (double)(xbzrle_counters.cache_miss -
->              rs->xbzrle_cache_miss_prev) / page_count;
->          rs->xbzrle_cache_miss_prev = xbzrle_counters.cache_miss;
-> -        unencoded_size = (xbzrle_counters.pages - rs->xbzrle_pages_prev) *
-> -                         TARGET_PAGE_SIZE;
-> -        encoded_size = xbzrle_counters.bytes - rs->xbzrle_bytes_prev;
->          if (xbzrle_counters.pages == rs->xbzrle_pages_prev) {
->              xbzrle_counters.encoding_rate = 0;
-> -        } else if (!encoded_size) {
-> +        } else if (xbzrle_counters.bytes == rs->xbzrle_bytes_prev) {
+Our trusted docker wrapper allows run-coverity-scan to run with both
+docker and podman.
 
-No, I don't think this change is worth it - this is really just the same
-as 'encoded_size', and then we may as well keep the two together.
+For the "run" phase this is transparent; for the "build" phase however
+scripts are replaced with a bind mount (-v).  This is not an issue
+because the secret option is meant for secrets stored globally in the
+system and bind mounts are a valid substitute for secrets that are known
+to whoever builds the container.
 
-Dave
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ scripts/coverity-scan/coverity-scan.docker |  2 +-
+ scripts/coverity-scan/run-coverity-scan    | 32 ++++++++++++++--------
+ 2 files changed, 22 insertions(+), 12 deletions(-)
 
->              xbzrle_counters.encoding_rate = UINT64_MAX;
->          } else {
-> +            unencoded_size = (xbzrle_counters.pages - rs->xbzrle_pages_prev) *
-> +                             TARGET_PAGE_SIZE;
-> +            encoded_size = xbzrle_counters.bytes - rs->xbzrle_bytes_prev;
-> +
->              xbzrle_counters.encoding_rate = unencoded_size / encoded_size;
->          }
->          rs->xbzrle_pages_prev = xbzrle_counters.pages;
-> -- 
-> 2.17.1
-> 
-> 
-> 
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+diff --git a/scripts/coverity-scan/coverity-scan.docker b/scripts/coverity-scan/coverity-scan.docker
+index a4f64d1283..6f0460b66c 100644
+--- a/scripts/coverity-scan/coverity-scan.docker
++++ b/scripts/coverity-scan/coverity-scan.docker
+@@ -128,4 +128,4 @@ RUN rpm -q $PACKAGES | sort > /packages.txt
+ ENV PATH $PATH:/usr/libexec/python3-sphinx/
+ ENV COVERITY_TOOL_BASE=/coverity-tools
+ COPY run-coverity-scan run-coverity-scan
+-RUN --mount=type=secret,id=coverity.token,required ./run-coverity-scan --update-tools-only --tokenfile /run/secrets/coverity.token
++RUN ./run-coverity-scan --update-tools-only --tokenfile /work/token
+diff --git a/scripts/coverity-scan/run-coverity-scan b/scripts/coverity-scan/run-coverity-scan
+index 990f75138d..e926623b3b 100755
+--- a/scripts/coverity-scan/run-coverity-scan
++++ b/scripts/coverity-scan/run-coverity-scan
+@@ -29,7 +29,9 @@
+ 
+ # Command line options:
+ #   --dry-run : run the tools, but don't actually do the upload
+-#   --docker : create and work inside a docker container
++#   --docker : create and work inside a container
++#   --docker-engine : specify the container engine to use (docker/podman/auto);
++#                     implies --docker
+ #   --update-tools-only : update the cached copy of the tools, but don't run them
+ #   --tokenfile : file to read Coverity token from
+ #   --version ver : specify version being analyzed (default: ask git)
+@@ -197,6 +199,17 @@ while [ "$#" -ge 1 ]; do
+             ;;
+         --docker)
+             DOCKER=yes
++            DOCKER_ENGINE=auto
++            shift
++            ;;
++        --docker-engine)
++            shift
++            if [ $# -eq 0 ]; then
++                echo "--docker-engine needs an argument"
++                exit 1
++            fi
++            DOCKER=yes
++            DOCKER_ENGINE="$1"
+             shift
+             ;;
+         *)
+@@ -283,9 +296,8 @@ if [ "$DOCKER" = yes ]; then
+     # build docker container including the coverity-scan tools
+     # Put the Coverity token into a temporary file that only
+     # we have read access to, and then pass it to docker build
+-    # using --secret. This requires at least Docker 18.09.
+-    # Mostly what we are trying to do here is ensure we don't leak
+-    # the token into the Docker image.
++    # using a volume.  A volume is enough for the token not to
++    # leak into the Docker image.
+     umask 077
+     SECRETDIR=$(mktemp -d)
+     if [ -z "$SECRETDIR" ]; then
+@@ -300,12 +312,10 @@ if [ "$DOCKER" = yes ]; then
+     # TODO: This re-downloads the tools every time, rather than
+     # caching and reusing the image produced with the downloaded tools.
+     # Not sure why.
+-    # TODO: how do you get 'docker build' to print the output of the
+-    # commands it is running to its stdout? This would be useful for debug.
+-    DOCKER_BUILDKIT=1 docker build -t coverity-scanner \
+-                   --secret id=coverity.token,src="$SECRET" \
+-                   -f scripts/coverity-scan/coverity-scan.docker \
+-                   scripts/coverity-scan
++    tests/docker/docker.py --engine ${DOCKER_ENGINE} build \
++                   -t coverity-scanner -f scripts/coverity-scan/coverity-scan.docker \
++                   -v "$SECRETDIR:/work" \
++                   --extra-files scripts/coverity-scan/run-coverity-scan
+     echo "Archiving sources to be analyzed..."
+     ./scripts/archive-source.sh "$SECRETDIR/qemu-sources.tgz"
+     if [ "$DRYRUN" = yes ]; then
+@@ -323,7 +333,7 @@ if [ "$DOCKER" = yes ]; then
+     # Arrange for this docker run to get access to the sources with -v.
+     # We pass through all the configuration from the outer script to the inner.
+     export COVERITY_EMAIL COVERITY_BUILD_CMD
+-    docker run -it --env COVERITY_EMAIL --env COVERITY_BUILD_CMD \
++    tests/docker/docker.py run -it --env COVERITY_EMAIL --env COVERITY_BUILD_CMD \
+            -v "$SECRETDIR:/work" coverity-scanner \
+            ./run-coverity-scan --version "$VERSION" \
+            --description "$DESCRIPTION" $DRYRUNARG --tokenfile /work/token \
+-- 
+2.26.2
+
 
 
