@@ -2,75 +2,75 @@ Return-Path: <SRS0=U615=7Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85243C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 11:48:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C05FAC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 11:51:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4C6102072F
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 11:48:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8EFA620691
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 11:51:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IOPrqH/Y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C6102072F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TiajQ8p5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8EFA620691
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39894 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45282 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjLhV-0001CR-Dk
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 07:48:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52066)
+	id 1jjLjj-0003ej-Bf
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 07:51:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52118)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jjLcR-0001xm-CE; Thu, 11 Jun 2020 07:43:39 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:39957)
+ id 1jjLcV-00026o-Sw; Thu, 11 Jun 2020 07:43:43 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:37797)
  by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jjLcQ-0001rJ-IZ; Thu, 11 Jun 2020 07:43:39 -0400
-Received: by mail-wr1-x443.google.com with SMTP id h5so5822921wrc.7;
- Thu, 11 Jun 2020 04:43:27 -0700 (PDT)
+ id 1jjLcV-0001sQ-5d; Thu, 11 Jun 2020 07:43:43 -0400
+Received: by mail-wr1-x443.google.com with SMTP id x13so5824448wrv.4;
+ Thu, 11 Jun 2020 04:43:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=8b3HXRDRgYc7wWaPey7dft5cQmLY7o7QcJ77viT780g=;
- b=IOPrqH/Ye4O+raoOM2jedEclGHK08/B0sAxd+yvVWJOrO6r0wYafpnOIJdZRPqCiNL
- /mKWQcoHedYDBGQvy76H/r2QosdGWjMl0HklZer+4PQ+J2tZUzWN4pYw/g3v2vKcljMu
- icIa4U8uxPlEVPcGhSAuUAnJmyqIDn7Lyhx2t4SyTF6T6h0kP5xxcKGRhKgAWaRfhwfr
- erMV+tVnNes3kEjtoM4gctqxuBSDIzM7chykfLdgsRrTu1juit5DR5JiXix70c+CjrYz
- pVZUZL05XzLEJojEXoAIj4mAcnHcp4xKbSxKhfjqGfabdLqZdF1mRZT4Xyel21ZkT9NZ
- OqeQ==
+ bh=RyB5laGZqcuqh7DkQBAguo9SE2App1lOHf/woViMpfs=;
+ b=TiajQ8p5g4ekcdqLrLtXA9kOkwx4HuUpUq/eL0KJW66l44yEBBtgMpGbcTt2cPcH23
+ N3ORFAEO09JUF/aEMl+HtsHRggeWnqLICgOrfSlyydf/rIqzBC4V9dXJ59LZjqGRrzY3
+ HIe9G+/cg3v4FWJ1M55U6g/uYIOJb/Av6G96NllBYOit1chMvgdJY8JsSneyOsI5heNr
+ 3otvHjkqC2XYIrhAYNizl40eQnc+GrvQsguLNlmNQ7grw5VB6EYOQ3KSsqxlqLCIisCQ
+ BN2nppqKThdY8Xn8nSeUPbStfIDte+9gVx6wcwLkOQFJTgTBdiZmPVogFq8ns4F/1sbS
+ Om2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=8b3HXRDRgYc7wWaPey7dft5cQmLY7o7QcJ77viT780g=;
- b=sxIKasVEuBr9V6F2h5IdPIluge65F1D2IRy5MOMu1J0q3XZirxLE33y3hwwv8oJmVB
- yW1+4RPF7dOa+XFcwAg90XfLT/4nos4rh5+i7BhJnpyfJwK+pqNNUqjPqJZxdjTbTqV8
- AXGjJq9dFI/EAq/2wcqQBuVJiRkIcr+Zl4QyigpPkaw22QYqDjqq7+HdqijaJx7H60+e
- KngxeMUphAQp+TsbLmHjyi2x2iiXwJpoPqtQxc4TkV9OPSJMns0N/mnDqL9B871znac7
- UDmLBLd4vnJMAEXLS3J3i68Y1NjRxgIclrECWfz+nP2BJn8cpgVedFt1vvoCOeiPOCZ2
- eAJw==
-X-Gm-Message-State: AOAM530PlbGXvfnQG6buCByr1YJoZJQX5CDfZS92G7v0RkATtkH2kEUT
- NApaiSrovSqZPJjv3LqYTP+AUj4I
-X-Google-Smtp-Source: ABdhPJwln6u2PrOtmnmJUWxncBkooV2OJxy4+TvhwcjmVb5YEMawrNrmQzlE75zeq5NQloWFP8fPHQ==
-X-Received: by 2002:a5d:50c9:: with SMTP id f9mr9493024wrt.9.1591875806373;
- Thu, 11 Jun 2020 04:43:26 -0700 (PDT)
+ bh=RyB5laGZqcuqh7DkQBAguo9SE2App1lOHf/woViMpfs=;
+ b=N2L7vFRXK8Wi4ihrs0bmwAaag83cQvcq5zdN/A+QI8wIntIii9oqtYsDnQitLKA0U0
+ h0GFqcWvWVFLLlOp61mJA8yCxieK/SBGhpWc8KNte92es0G+FLVOvGaEiiW4UgMCRxjk
+ lsMQ9sfILX6R1i9gODSxQhvbxsDKCVmpl1TrP9cJmXwV/xTwecv2rb64u7RnZlu4QeEB
+ RgzskUsWy621lKbXrpYuLWrc6zgdmaRuzPwO/EApORg7qGCuY2V2/S+C80ibENIj0dgH
+ dMFfzDtCfF2EU5eXAcVXiLYu/J/CfGIhPctL2PYLMUyifZcX0iIFUemSbquiaG3ud7m9
+ 1btg==
+X-Gm-Message-State: AOAM530XEf2jh7gv0Tl85qiPoTh+aX1nBN7YTIucntTR0UfL4/t/RaiJ
+ 6DQKyr5UsFCfAF/aYEYCIFmyuB0o
+X-Google-Smtp-Source: ABdhPJwKbpviewOqD2a0GCbY/AYeAXqG4oT/K2w5dTDTYCEZHiyLF2pACckP8M6eEYlaaLR3TF5bBA==
+X-Received: by 2002:a05:6000:11cd:: with SMTP id
+ i13mr8700463wrx.141.1591875810723; 
+ Thu, 11 Jun 2020 04:43:30 -0700 (PDT)
 Received: from x1w.redhat.com (181.red-88-10-103.dynamicip.rima-tde.net.
  [88.10.103.181])
- by smtp.gmail.com with ESMTPSA id h29sm4832863wrc.78.2020.06.11.04.43.25
+ by smtp.gmail.com with ESMTPSA id h29sm4832863wrc.78.2020.06.11.04.43.29
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 11 Jun 2020 04:43:25 -0700 (PDT)
+ Thu, 11 Jun 2020 04:43:29 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 4/7] hw/sh4: Extract timer definitions to
- 'hw/timer/tmu012.h'
-Date: Thu, 11 Jun 2020 13:43:14 +0200
-Message-Id: <20200611114317.13044-5-f4bug@amsat.org>
+Subject: [PATCH v4 7/7] .travis.yml: Test SH4 QEMU advent calendar image
+Date: Thu, 11 Jun 2020 13:43:17 +0200
+Message-Id: <20200611114317.13044-8-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200611114317.13044-1-f4bug@amsat.org>
 References: <20200611114317.13044-1-f4bug@amsat.org>
@@ -101,107 +101,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Yoshinori Sato <ysato@users.sourceforge.jp>,
- qemu-trivial@nongnu.org, Magnus Damm <magnus.damm@gmail.com>,
- Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>,
+Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
+ Yoshinori Sato <ysato@users.sourceforge.jp>, qemu-trivial@nongnu.org,
+ Magnus Damm <magnus.damm@gmail.com>, Michael Tokarev <mjt@tls.msk.ru>,
+ Laurent Vivier <laurent@vivier.eu>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Extract timer definitions to 'hw/timer/tmu012.h'.
+From: Thomas Huth <thuth@redhat.com>
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Now that we can select the second serial console in the acceptance tests
+(see commit 746f244d9720 "Allow to use other serial consoles than default"),
+we can also test the sh4 image from the QEMU advent calendar 2018.
+
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-Id: <20200515164337.4899-1-thuth@redhat.com>
+[PMD: Split tests/acceptance/boot_linux_console.py in previous commit]
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- include/hw/sh4/sh.h       |  9 ---------
- include/hw/timer/tmu012.h | 23 +++++++++++++++++++++++
- hw/sh4/sh7750.c           |  1 +
- hw/timer/sh_timer.c       |  2 ++
- 4 files changed, 26 insertions(+), 9 deletions(-)
- create mode 100644 include/hw/timer/tmu012.h
+ .travis.yml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/hw/sh4/sh.h b/include/hw/sh4/sh.h
-index fe773cb01d..93f464bf4c 100644
---- a/include/hw/sh4/sh.h
-+++ b/include/hw/sh4/sh.h
-@@ -27,15 +27,6 @@ typedef struct {
- 
- int sh7750_register_io_device(struct SH7750State *s,
- 			      sh7750_io_device * device);
--/* sh_timer.c */
--#define TMU012_FEAT_TOCR   (1 << 0)
--#define TMU012_FEAT_3CHAN  (1 << 1)
--#define TMU012_FEAT_EXTCLK (1 << 2)
--void tmu012_init(MemoryRegion *sysmem, hwaddr base,
--                 int feat, uint32_t freq,
--		 qemu_irq ch0_irq, qemu_irq ch1_irq,
--		 qemu_irq ch2_irq0, qemu_irq ch2_irq1);
--
- 
- /* sh_serial.c */
- #define SH_SERIAL_FEAT_SCIF (1 << 0)
-diff --git a/include/hw/timer/tmu012.h b/include/hw/timer/tmu012.h
-new file mode 100644
-index 0000000000..808ed8de1d
---- /dev/null
-+++ b/include/hw/timer/tmu012.h
-@@ -0,0 +1,23 @@
-+/*
-+ * SuperH Timer
-+ *
-+ * Copyright (c) 2007 Magnus Damm
-+ *
-+ * This code is licensed under the GPL.
-+ */
-+
-+#ifndef HW_TIMER_TMU012_H
-+#define HW_TIMER_TMU012_H
-+
-+#include "exec/hwaddr.h"
-+
-+#define TMU012_FEAT_TOCR   (1 << 0)
-+#define TMU012_FEAT_3CHAN  (1 << 1)
-+#define TMU012_FEAT_EXTCLK (1 << 2)
-+
-+void tmu012_init(MemoryRegion *sysmem, hwaddr base,
-+                 int feat, uint32_t freq,
-+                 qemu_irq ch0_irq, qemu_irq ch1_irq,
-+                 qemu_irq ch2_irq0, qemu_irq ch2_irq1);
-+
-+#endif
-diff --git a/hw/sh4/sh7750.c b/hw/sh4/sh7750.c
-index d660714443..f8ac3ec6e3 100644
---- a/hw/sh4/sh7750.c
-+++ b/hw/sh4/sh7750.c
-@@ -30,6 +30,7 @@
- #include "sh7750_regs.h"
- #include "sh7750_regnames.h"
- #include "hw/sh4/sh_intc.h"
-+#include "hw/timer/tmu012.h"
- #include "cpu.h"
- #include "exec/exec-all.h"
- 
-diff --git a/hw/timer/sh_timer.c b/hw/timer/sh_timer.c
-index 13c4051808..b9cbacf5d0 100644
---- a/hw/timer/sh_timer.c
-+++ b/hw/timer/sh_timer.c
-@@ -9,10 +9,12 @@
-  */
- 
- #include "qemu/osdep.h"
-+#include "exec/memory.h"
- #include "hw/hw.h"
- #include "hw/irq.h"
- #include "hw/sh4/sh.h"
- #include "qemu/timer.h"
-+#include "hw/timer/tmu012.h"
- #include "hw/ptimer.h"
- 
- //#define DEBUG_TIMER
+diff --git a/.travis.yml b/.travis.yml
+index 564be50a3c..e2003565d8 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -293,7 +293,7 @@ jobs:
+     - name: "GCC check-acceptance"
+       dist: bionic
+       env:
+-        - CONFIG="--enable-tools --target-list=aarch64-softmmu,alpha-softmmu,arm-softmmu,m68k-softmmu,microblaze-softmmu,mips-softmmu,mips64el-softmmu,nios2-softmmu,or1k-softmmu,ppc-softmmu,ppc64-softmmu,s390x-softmmu,sparc-softmmu,x86_64-softmmu,xtensa-softmmu"
++        - CONFIG="--enable-tools --target-list=aarch64-softmmu,alpha-softmmu,arm-softmmu,m68k-softmmu,microblaze-softmmu,mips-softmmu,mips64el-softmmu,nios2-softmmu,or1k-softmmu,ppc-softmmu,ppc64-softmmu,s390x-softmmu,sh4-softmmu,sparc-softmmu,x86_64-softmmu,xtensa-softmmu"
+         - TEST_CMD="make check-acceptance"
+         - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-acceptance"
+       after_script:
 -- 
 2.21.3
 
