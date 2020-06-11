@@ -2,75 +2,75 @@ Return-Path: <SRS0=U615=7Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 109DDC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 20:13:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACB0DC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 20:13:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CFDA1206C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 20:13:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 798D1206C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 20:13:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gGlsxl5U"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFDA1206C3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YwgtY0E9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 798D1206C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49418 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50956 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjTZY-0000Op-O8
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 16:13:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54938)
+	id 1jjTZp-00011X-MV
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 16:13:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54906)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jjT8x-0007xb-7M
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 15:45:43 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48332
+ id 1jjT8w-0007vm-6I
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 15:45:42 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51368
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jjT8t-00012O-Mp
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 15:45:42 -0400
+ id 1jjT8r-00011i-1o
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 15:45:41 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591904738;
+ s=mimecast20190719; t=1591904736;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=UDBHQtVitR2UF3gM0easaFDJXNK3KOw8227wlXl8uXk=;
- b=gGlsxl5U1NMMBvZiOpZ8qAhGx19aSQWwmAYZNwsVxHJmb+SsUkCCS/kaiUtOONKl/dY0SI
- OnqrfUJr35WT53kDbgJtutb2oOklBcageSX8U9VDPFxa/qK7Rhgxv6PA79p9yaVlaaF6Zt
- wa2y/G5BsN+ObJTUxUG3i+dQajGquuA=
+ bh=N/wjUl3m9r8YPv43a4ONQjZjOlKS4ioJdW6M+fE0u9c=;
+ b=YwgtY0E98ouV9J526lj9yN5rlRCi7K7rkbv53glSHCuuNt/0BShk5xpdu5ZhXLmXGssPlp
+ jPjAi/M3XutFw0EwbjXccRP+WaSOvawX4gE6w2N4CLxejwLeWQXWVmEwMMcT+VyiP231Cm
+ 4gPHCoTLujQPonydUhUagVHTputl9Og=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-394-Chn9K9sdN4Cp-6v131tnIw-1; Thu, 11 Jun 2020 15:45:36 -0400
-X-MC-Unique: Chn9K9sdN4Cp-6v131tnIw-1
+ us-mta-192-RvBDhcJTOM26uZFVRVuLfw-1; Thu, 11 Jun 2020 15:45:33 -0400
+X-MC-Unique: RvBDhcJTOM26uZFVRVuLfw-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7CB078064DD;
- Thu, 11 Jun 2020 19:45:35 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F030F100A8E8;
+ Thu, 11 Jun 2020 19:45:32 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2053997B12;
- Thu, 11 Jun 2020 19:45:35 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 76010707C6;
+ Thu, 11 Jun 2020 19:45:32 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 055/115] target/i386: fix fscale handling of rounding precision
-Date: Thu, 11 Jun 2020 15:43:49 -0400
-Message-Id: <20200611194449.31468-56-pbonzini@redhat.com>
+Subject: [PULL 051/115] target/i386: implement special cases for fxtract
+Date: Thu, 11 Jun 2020 15:43:45 -0400
+Message-Id: <20200611194449.31468-52-pbonzini@redhat.com>
 In-Reply-To: <20200611194449.31468-1-pbonzini@redhat.com>
 References: <20200611194449.31468-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-1.mimecast.com
@@ -95,74 +95,194 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Joseph Myers <joseph@codesourcery.com>
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Joseph Myers <joseph@codesourcery.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: Joseph Myers <joseph@codesourcery.com>
 
-The fscale implementation uses floatx80_scalbn for the final scaling
-operation.  floatx80_scalbn ends up rounding the result using the
-dynamic rounding precision configured for the FPU.  But only a limited
-set of x87 floating-point instructions are supposed to respect the
-dynamic rounding precision, and fscale is not in that set.  Fix the
-implementation to save and restore the rounding precision around the
-call to floatx80_scalbn.
+The implementation of the fxtract instruction treats all nonzero
+operands as normal numbers, so yielding incorrect results for invalid
+formats, infinities, NaNs and subnormal and pseudo-denormal operands.
+Implement appropriate handling of all those cases.
 
 Signed-off-by: Joseph Myers <joseph@codesourcery.com>
-Message-Id: <alpine.DEB.2.21.2005070045430.18350@digraph.polyomino.org.uk>
+Acked-by: Alex Bennée <alex.bennee@linaro.org>
+Message-Id: <alpine.DEB.2.21.2005070042360.18350@digraph.polyomino.org.uk>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- target/i386/fpu_helper.c          |  3 +++
- tests/tcg/i386/test-i386-fscale.c | 13 +++++++++++++
- 2 files changed, 16 insertions(+)
+ target/i386/fpu_helper.c           |  25 +++++-
+ tests/tcg/i386/test-i386-fxtract.c | 120 +++++++++++++++++++++++++++++
+ 2 files changed, 144 insertions(+), 1 deletion(-)
+ create mode 100644 tests/tcg/i386/test-i386-fxtract.c
 
 diff --git a/target/i386/fpu_helper.c b/target/i386/fpu_helper.c
-index 72d1e77eb0..4d14c1ca24 100644
+index b34fa784eb..568bd3b359 100644
 --- a/target/i386/fpu_helper.c
 +++ b/target/i386/fpu_helper.c
-@@ -1001,7 +1001,10 @@ void helper_fscale(CPUX86State *env)
-         }
+@@ -767,10 +767,33 @@ void helper_fxtract(CPUX86State *env)
+                            &env->fp_status);
+         fpush(env);
+         ST0 = temp.d;
++    } else if (floatx80_invalid_encoding(ST0)) {
++        float_raise(float_flag_invalid, &env->fp_status);
++        ST0 = floatx80_default_nan(&env->fp_status);
++        fpush(env);
++        ST0 = ST1;
++    } else if (floatx80_is_any_nan(ST0)) {
++        if (floatx80_is_signaling_nan(ST0, &env->fp_status)) {
++            float_raise(float_flag_invalid, &env->fp_status);
++            ST0 = floatx80_silence_nan(ST0, &env->fp_status);
++        }
++        fpush(env);
++        ST0 = ST1;
++    } else if (floatx80_is_infinity(ST0)) {
++        fpush(env);
++        ST0 = ST1;
++        ST1 = floatx80_infinity;
      } else {
-         int n = floatx80_to_int32_round_to_zero(ST1, &env->fp_status);
-+        signed char save = env->fp_status.floatx80_rounding_precision;
-+        env->fp_status.floatx80_rounding_precision = 80;
-         ST0 = floatx80_scalbn(ST0, n, &env->fp_status);
-+        env->fp_status.floatx80_rounding_precision = save;
-     }
- }
+         int expdif;
  
-diff --git a/tests/tcg/i386/test-i386-fscale.c b/tests/tcg/i386/test-i386-fscale.c
-index b953e7c563..d23b3cfeec 100644
---- a/tests/tcg/i386/test-i386-fscale.c
-+++ b/tests/tcg/i386/test-i386-fscale.c
-@@ -8,6 +8,8 @@ union u {
-     long double ld;
- };
- 
-+volatile long double ld_third = 1.0L / 3.0L;
-+volatile long double ld_four_thirds = 4.0L / 3.0L;
- volatile union u ld_invalid_1 = { .s = { 1, 1234 } };
- volatile union u ld_invalid_2 = { .s = { 0, 1234 } };
- volatile union u ld_invalid_3 = { .s = { 0, 0x7fff } };
-@@ -91,5 +93,16 @@ int main(void)
-         printf("FAIL: fscale finite down inf\n");
-         ret = 1;
-     }
-+    /* Set round-to-nearest with single-precision rounding.  */
-+    cw = cw & ~0xf00;
-+    __asm__ volatile ("fldcw %0" : : "m" (cw));
-+    __asm__ volatile ("fscale" : "=t" (ld_res) :
-+                      "0" (ld_third), "u" (2.0L));
-+    cw = cw | 0x300;
-+    __asm__ volatile ("fldcw %0" : : "m" (cw));
-+    if (ld_res != ld_four_thirds) {
-+        printf("FAIL: fscale single-precision\n");
+-        expdif = EXPD(temp) - EXPBIAS;
++        if (EXPD(temp) == 0) {
++            int shift = clz64(temp.l.lower);
++            temp.l.lower <<= shift;
++            expdif = 1 - EXPBIAS - shift;
++            float_raise(float_flag_input_denormal, &env->fp_status);
++        } else {
++            expdif = EXPD(temp) - EXPBIAS;
++        }
+         /* DP exponent bias */
+         ST0 = int32_to_floatx80(expdif, &env->fp_status);
+         fpush(env);
+diff --git a/tests/tcg/i386/test-i386-fxtract.c b/tests/tcg/i386/test-i386-fxtract.c
+new file mode 100644
+index 0000000000..64fd93d333
+--- /dev/null
++++ b/tests/tcg/i386/test-i386-fxtract.c
+@@ -0,0 +1,120 @@
++/* Test fxtract instruction.  */
++
++#include <stdint.h>
++#include <stdio.h>
++
++union u {
++    struct { uint64_t sig; uint16_t sign_exp; } s;
++    long double ld;
++};
++
++volatile union u ld_pseudo_m16382 = { .s = { UINT64_C(1) << 63, 0 } };
++volatile union u ld_invalid_1 = { .s = { 1, 1234 } };
++volatile union u ld_invalid_2 = { .s = { 0, 1234 } };
++volatile union u ld_invalid_3 = { .s = { 0, 0x7fff } };
++volatile union u ld_invalid_4 = { .s = { (UINT64_C(1) << 63) - 1, 0x7fff } };
++
++volatile long double ld_sig, ld_exp;
++
++int isnan_ld(long double x)
++{
++  union u tmp = { .ld = x };
++  return ((tmp.s.sign_exp & 0x7fff) == 0x7fff &&
++          (tmp.s.sig >> 63) != 0 &&
++          (tmp.s.sig << 1) != 0);
++}
++
++int issignaling_ld(long double x)
++{
++    union u tmp = { .ld = x };
++    return isnan_ld(x) && (tmp.s.sig & UINT64_C(0x4000000000000000)) == 0;
++}
++
++int main(void)
++{
++    int ret = 0;
++    __asm__ volatile ("fxtract" : "=t" (ld_sig), "=u" (ld_exp) : "0" (2.5L));
++    if (ld_sig != 1.25L || ld_exp != 1.0L) {
++        printf("FAIL: fxtract 2.5\n");
 +        ret = 1;
 +    }
-     return ret;
- }
++    __asm__ volatile ("fxtract" : "=t" (ld_sig), "=u" (ld_exp) : "0" (0.0L));
++    if (ld_sig != 0.0L || __builtin_copysignl(1.0L, ld_sig) != 1.0L ||
++        ld_exp != -__builtin_infl()) {
++        printf("FAIL: fxtract 0.0\n");
++        ret = 1;
++    }
++    __asm__ volatile ("fxtract" : "=t" (ld_sig), "=u" (ld_exp) : "0" (-0.0L));
++    if (ld_sig != -0.0L || __builtin_copysignl(1.0L, ld_sig) != -1.0L ||
++        ld_exp != -__builtin_infl()) {
++        printf("FAIL: fxtract -0.0\n");
++        ret = 1;
++    }
++    __asm__ volatile ("fxtract" : "=t" (ld_sig), "=u" (ld_exp) :
++                      "0" (__builtin_infl()));
++    if (ld_sig != __builtin_infl() || ld_exp != __builtin_infl()) {
++        printf("FAIL: fxtract inf\n");
++        ret = 1;
++    }
++    __asm__ volatile ("fxtract" : "=t" (ld_sig), "=u" (ld_exp) :
++                      "0" (-__builtin_infl()));
++    if (ld_sig != -__builtin_infl() || ld_exp != __builtin_infl()) {
++        printf("FAIL: fxtract -inf\n");
++        ret = 1;
++    }
++    __asm__ volatile ("fxtract" : "=t" (ld_sig), "=u" (ld_exp) :
++                      "0" (__builtin_nanl("")));
++    if (!isnan_ld(ld_sig) || issignaling_ld(ld_sig) ||
++        !isnan_ld(ld_exp) || issignaling_ld(ld_exp)) {
++        printf("FAIL: fxtract qnan\n");
++        ret = 1;
++    }
++    __asm__ volatile ("fxtract" : "=t" (ld_sig), "=u" (ld_exp) :
++                      "0" (__builtin_nansl("")));
++    if (!isnan_ld(ld_sig) || issignaling_ld(ld_sig) ||
++        !isnan_ld(ld_exp) || issignaling_ld(ld_exp)) {
++        printf("FAIL: fxtract snan\n");
++        ret = 1;
++    }
++    __asm__ volatile ("fxtract" : "=t" (ld_sig), "=u" (ld_exp) :
++                      "0" (0x1p-16445L));
++    if (ld_sig != 1.0L || ld_exp != -16445.0L) {
++        printf("FAIL: fxtract subnormal\n");
++        ret = 1;
++    }
++    __asm__ volatile ("fxtract" : "=t" (ld_sig), "=u" (ld_exp) :
++                      "0" (ld_pseudo_m16382.ld));
++    if (ld_sig != 1.0L || ld_exp != -16382.0L) {
++        printf("FAIL: fxtract pseudo\n");
++        ret = 1;
++    }
++    __asm__ volatile ("fxtract" : "=t" (ld_sig), "=u" (ld_exp) :
++                      "0" (ld_invalid_1.ld));
++    if (!isnan_ld(ld_sig) || issignaling_ld(ld_sig) ||
++        !isnan_ld(ld_exp) || issignaling_ld(ld_exp)) {
++        printf("FAIL: fxtract invalid 1\n");
++        ret = 1;
++    }
++    __asm__ volatile ("fxtract" : "=t" (ld_sig), "=u" (ld_exp) :
++                      "0" (ld_invalid_2.ld));
++    if (!isnan_ld(ld_sig) || issignaling_ld(ld_sig) ||
++        !isnan_ld(ld_exp) || issignaling_ld(ld_exp)) {
++        printf("FAIL: fxtract invalid 2\n");
++        ret = 1;
++    }
++    __asm__ volatile ("fxtract" : "=t" (ld_sig), "=u" (ld_exp) :
++                      "0" (ld_invalid_3.ld));
++    if (!isnan_ld(ld_sig) || issignaling_ld(ld_sig) ||
++        !isnan_ld(ld_exp) || issignaling_ld(ld_exp)) {
++        printf("FAIL: fxtract invalid 3\n");
++        ret = 1;
++    }
++    __asm__ volatile ("fxtract" : "=t" (ld_sig), "=u" (ld_exp) :
++                      "0" (ld_invalid_4.ld));
++    if (!isnan_ld(ld_sig) || issignaling_ld(ld_sig) ||
++        !isnan_ld(ld_exp) || issignaling_ld(ld_exp)) {
++        printf("FAIL: fxtract invalid 4\n");
++        ret = 1;
++    }
++    return ret;
++}
 -- 
 2.26.2
 
