@@ -2,80 +2,79 @@ Return-Path: <SRS0=U615=7Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8315BC433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 19:56:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1149C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 19:57:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4FE862073E
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 19:56:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8AC872073E
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 19:57:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cC+q22TV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4FE862073E
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GCNapBG2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8AC872073E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51770 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56626 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjTJ8-00073P-EQ
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 15:56:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54394)
+	id 1jjTKL-0001U9-Py
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 15:57:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54340)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jjT8f-0007eY-AJ
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 15:45:25 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58067
- helo=us-smtp-1.mimecast.com)
+ id 1jjT8d-0007cp-LQ
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 15:45:24 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:37962
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jjT8Y-0000uw-Qi
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 15:45:24 -0400
+ id 1jjT8Y-0000uV-MB
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 15:45:23 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
  s=mimecast20190719; t=1591904717;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=hijUk5uiY3tThGyqGp2dK/1kEFzv4beqcQ8rk+uJ0cM=;
- b=cC+q22TVGWXwz+okLnEaQnPX+873Zw3oMk818hjV0q12xIMt7/4MYLsnndnwSQwo3Ubyyf
- N5E1PA2sScjW1C1xJKX9ZVItEBHoNlFoJJRi91VbwCwCWzPkr3/wvOPRMztIxmpumopVjd
- wWTb8BTzydYfECyo/2STod8kJRNV4q4=
+ bh=ocL89FGGKbmVMoIaKKI8IoyvSt8Z4cxyeOb9yEuX8ow=;
+ b=GCNapBG2KFBYVrJH5aju2IijJ16FPpk835e9yeITFb4KB0qmWTOwPvGKSx/r7n/4vrnOSR
+ GAsqfbJTbXtbUZ2QPoR+0pnwQLSovwh/1MYzeBmp1gfjt2PatW0AVtZHajbVxmbfPDhB9m
+ 22Lu595YdzNIfw9v2MtQVmWVa9OMXEc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-220-izAqN0PTNhuXKmg1eUcbjw-1; Thu, 11 Jun 2020 15:45:03 -0400
-X-MC-Unique: izAqN0PTNhuXKmg1eUcbjw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-293-WfwU4piBMyS9FxFlhZd1ow-1; Thu, 11 Jun 2020 15:45:14 -0400
+X-MC-Unique: WfwU4piBMyS9FxFlhZd1ow-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3D7DE8018A6;
- Thu, 11 Jun 2020 19:45:02 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 58E3A107ACCA;
+ Thu, 11 Jun 2020 19:45:13 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5D72060CC0;
- Thu, 11 Jun 2020 19:44:58 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DBB415D9DC;
+ Thu, 11 Jun 2020 19:45:12 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 012/115] qom/object: Fix object_child_foreach_recursive()
- return value
-Date: Thu, 11 Jun 2020 15:43:06 -0400
-Message-Id: <20200611194449.31468-13-pbonzini@redhat.com>
+Subject: [PULL 023/115] target/i386: Fix the CPUID leaf CPUID_Fn80000008
+Date: Thu, 11 Jun 2020 15:43:17 -0400
+Message-Id: <20200611194449.31468-24-pbonzini@redhat.com>
 In-Reply-To: <20200611194449.31468-1-pbonzini@redhat.com>
 References: <20200611194449.31468-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 14:52:10
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 03:29:33
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -96,46 +95,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Peter Crosthwaite <peter.crosthwaite@xilinx.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Cc: Babu Moger <babu.moger@amd.com>,
+ Philipp Eppelt <1871842@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Cédric Le Goater <clg@kaod.org>
+From: Babu Moger <babu.moger@amd.com>
 
-When recursing, the return value of do_object_child_foreach() is not
-taken into account.
+CPUID leaf CPUID_Fn80000008_ECX provides information about the
+number of threads supported by the processor. It was found that
+the field ApicIdSize(bits 15-12) was not set correctly.
 
-Cc: Peter Crosthwaite <peter.crosthwaite@xilinx.com>
-Fixes: d714b8de7747 ("qom: Add recursive version of object_child_for_each")
-Signed-off-by: Cédric Le Goater <clg@kaod.org>
-Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20200404153340.164861-1-clg@kaod.org>
+ApicIdSize is defined as the number of bits required to represent
+all the ApicId values within a package.
+
+Valid Values: Value Description
+3h-0h		Reserved.
+4h		up to 16 threads.
+5h		up to 32 threads.
+6h		up to 64 threads.
+7h		up to 128 threads.
+Fh-8h		Reserved.
+
+Fix the bit appropriately.
+
+This came up during following thread.
+https://lore.kernel.org/qemu-devel/158643709116.17430.15995069125716778943.malonedeb@wampee.canonical.com/#t
+
+Refer the Processor Programming Reference (PPR) for AMD Family 17h
+Model 01h, Revision B1 Processors. The documentation is available
+from the bugzilla Link below.
+Link: https://bugzilla.kernel.org/show_bug.cgi?id=206537
+
+Reported-by: Philipp Eppelt <1871842@bugs.launchpad.net>
+Signed-off-by: Babu Moger <babu.moger@amd.com>
+Message-Id: <20200417215345.64800.73351.stgit@localhost.localdomain>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- qom/object.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ target/i386/cpu.c | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
 
-diff --git a/qom/object.c b/qom/object.c
-index d0be42c8d6..484465f1c8 100644
---- a/qom/object.c
-+++ b/qom/object.c
-@@ -1051,7 +1051,10 @@ static int do_object_child_foreach(Object *obj,
-                 break;
-             }
-             if (recurse) {
--                do_object_child_foreach(child, fn, opaque, true);
-+                ret = do_object_child_foreach(child, fn, opaque, true);
-+                if (ret != 0) {
-+                    break;
-+                }
-             }
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index ba05da3f2e..25a8f6b1ad 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -5837,11 +5837,20 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+             *eax = cpu->phys_bits;
          }
-     }
+         *ebx = env->features[FEAT_8000_0008_EBX];
+-        *ecx = 0;
+-        *edx = 0;
+         if (cs->nr_cores * cs->nr_threads > 1) {
+-            *ecx |= (cs->nr_cores * cs->nr_threads) - 1;
++            /*
++             * Bits 15:12 is "The number of bits in the initial
++             * Core::X86::Apic::ApicId[ApicId] value that indicate
++             * thread ID within a package". This is already stored at
++             * CPUX86State::pkg_offset.
++             * Bits 7:0 is "The number of threads in the package is NC+1"
++             */
++            *ecx = (env->pkg_offset << 12) |
++                   ((cs->nr_cores * cs->nr_threads) - 1);
++        } else {
++            *ecx = 0;
+         }
++        *edx = 0;
+         break;
+     case 0x8000000A:
+         if (env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_SVM) {
 -- 
 2.26.2
 
