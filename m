@@ -6,63 +6,63 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 148A8C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 16:22:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFF7EC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 16:22:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D2932206C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 16:22:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7D9E6206C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 16:22:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SRSFfAEU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2932206C3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ih2Oe2pH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D9E6206C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41708 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42014 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjPyR-0001Rf-0X
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 12:22:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52210)
+	id 1jjPyT-0001Zc-NS
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 12:22:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51870)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jjPsC-0001lF-Mn
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 12:16:12 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:41376)
+ id 1jjPra-0000md-JD
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 12:15:34 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:38710
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jjPs9-0004CQ-BT
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 12:16:12 -0400
+ id 1jjPrX-00042H-7V
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 12:15:34 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591892165;
+ s=mimecast20190719; t=1591892130;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ARv8qSDziPHTJvaLmyQIW8b8LLLtOfE1f3+HLmQbobU=;
- b=SRSFfAEUIsfHCvLWhpsLL6VgIPzGbPLdVfiZrT/4s+J6CU+MHmdFsPu50qBajdrvilc3Ng
- +YUlgclt71A9R7Y6I43b2Uo+mw2W/0fdYhad859ubmqXJ4KWjTNkJ6lknpC//1fQf3R7zY
- Ey/hgz5FU4x/QwrSkyogRoWbiXrEh9c=
+ bh=88JfQ/V18ykOPEZ1/11XYsmgAaywXOVJDbk3ySzrtNY=;
+ b=Ih2Oe2pHb+sTkM6l7LGQYigIbxKZlA9XaAmI7UrjGM5h0sVRK0JKODUKhg6g93M2a6EzNT
+ QDUfv2b4BmtsggR3Oz5BZM7ujRc8ZKQBsTC3YhyMZVNFhDjkBMNO53sqGVKOMmhwzauDmZ
+ 6HdcniUDzEhfTg2htGMkzaGSRopGVCQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-2-VKWpJVvWNk2aJSXFxx2vcw-1; Thu, 11 Jun 2020 12:16:03 -0400
-X-MC-Unique: VKWpJVvWNk2aJSXFxx2vcw-1
+ us-mta-476-xNUU2s4GPtOGTJ67sd0utQ-1; Thu, 11 Jun 2020 12:15:26 -0400
+X-MC-Unique: xNUU2s4GPtOGTJ67sd0utQ-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9DFF5EC1A4;
- Thu, 11 Jun 2020 16:16:01 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2506C8018A2;
+ Thu, 11 Jun 2020 16:15:25 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-114-197.ams2.redhat.com [10.36.114.197])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 32FCE10013C2;
- Thu, 11 Jun 2020 16:15:58 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9EE0010013C2;
+ Thu, 11 Jun 2020 16:15:21 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
  qemu-arm@nongnu.org, peter.maydell@linaro.org, peterx@redhat.com
-Subject: [PATCH RESEND 7/9] hw/arm/smmuv3: Introduce smmuv3_s1_range_inval()
- helper
-Date: Thu, 11 Jun 2020 18:14:58 +0200
-Message-Id: <20200611161500.23580-8-eric.auger@redhat.com>
+Subject: [PATCH RESEND 2/9] hw/arm/smmu-common: Add IOTLB helpers
+Date: Thu, 11 Jun 2020 18:14:53 +0200
+Message-Id: <20200611161500.23580-3-eric.auger@redhat.com>
 In-Reply-To: <20200611161500.23580-1-eric.auger@redhat.com>
 References: <20200611161500.23580-1-eric.auger@redhat.com>
 MIME-Version: 1.0
@@ -72,7 +72,7 @@ X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=205.139.110.61;
- envelope-from=eric.auger@redhat.com; helo=us-smtp-1.mimecast.com
+ envelope-from=eric.auger@redhat.com; helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 03:29:33
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
@@ -101,90 +101,159 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Let's introduce an helper for S1 IOVA range invalidation.
-This will be used for NH_VA and NH_VAA commands. It decodes
-the same fields, trace, calls the UNMAP notifiers and
-invalidate the corresponding IOTLB entries.
-
-At the moment, we do not support 3.2 range invalidation yet.
-So it reduces to a single IOVA invalidation.
+Add two helpers to lookup for a given IOTLB entry and
+an one. We also more the tracing there.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 ---
- hw/arm/smmuv3.c     | 36 +++++++++++++++++-------------------
- hw/arm/trace-events |  3 +--
- 2 files changed, 18 insertions(+), 21 deletions(-)
+ include/hw/arm/smmu-common.h |  2 ++
+ hw/arm/smmu-common.c         | 36 ++++++++++++++++++++++++++++++++++++
+ hw/arm/smmuv3.c              | 26 ++------------------------
+ hw/arm/trace-events          |  5 +++--
+ 4 files changed, 43 insertions(+), 26 deletions(-)
 
-diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
-index 931a2b6872..4eda16be7b 100644
---- a/hw/arm/smmuv3.c
-+++ b/hw/arm/smmuv3.c
-@@ -840,6 +840,22 @@ static void smmuv3_inv_notifiers_iova(SMMUState *s, int asid, dma_addr_t iova)
-     }
- }
+diff --git a/include/hw/arm/smmu-common.h b/include/hw/arm/smmu-common.h
+index ca4a4b1ad1..1dceec5cb1 100644
+--- a/include/hw/arm/smmu-common.h
++++ b/include/hw/arm/smmu-common.h
+@@ -153,6 +153,8 @@ IOMMUMemoryRegion *smmu_iommu_mr(SMMUState *s, uint32_t sid);
  
-+static void smmuv3_s1_range_inval(SMMUState *s, Cmd *cmd)
+ #define SMMU_IOTLB_MAX_SIZE 256
+ 
++IOMMUTLBEntry *smmu_iotlb_lookup(SMMUState *bs, SMMUTransCfg *cfg, hwaddr iova);
++void smmu_iotlb_insert(SMMUState *bs, SMMUTransCfg *cfg, IOMMUTLBEntry *entry);
+ void smmu_iotlb_inv_all(SMMUState *s);
+ void smmu_iotlb_inv_asid(SMMUState *s, uint16_t asid);
+ void smmu_iotlb_inv_iova(SMMUState *s, uint16_t asid, dma_addr_t iova);
+diff --git a/hw/arm/smmu-common.c b/hw/arm/smmu-common.c
+index f2de2be527..8409de052d 100644
+--- a/hw/arm/smmu-common.c
++++ b/hw/arm/smmu-common.c
+@@ -32,6 +32,42 @@
+ 
+ /* IOTLB Management */
+ 
++IOMMUTLBEntry *smmu_iotlb_lookup(SMMUState *bs, SMMUTransCfg *cfg,
++                                 hwaddr iova)
 +{
-+    dma_addr_t addr = CMD_ADDR(cmd);
-+    uint8_t type = CMD_TYPE(cmd);
-+    uint16_t vmid = CMD_VMID(cmd);
-+    bool leaf = CMD_LEAF(cmd);
-+    int asid = -1;
++    SMMUIOTLBKey key = {.asid = cfg->asid, .iova = iova};
++    IOMMUTLBEntry *entry = g_hash_table_lookup(bs->iotlb, &key);
 +
-+    if (type == SMMU_CMD_TLBI_NH_VA) {
-+        asid = CMD_ASID(cmd);
++    if (entry) {
++        cfg->iotlb_hits++;
++        trace_smmu_iotlb_lookup_hit(cfg->asid, iova,
++                                    cfg->iotlb_hits, cfg->iotlb_misses,
++                                    100 * cfg->iotlb_hits /
++                                    (cfg->iotlb_hits + cfg->iotlb_misses));
++    } else {
++        cfg->iotlb_misses++;
++        trace_smmu_iotlb_lookup_miss(cfg->asid, iova,
++                                     cfg->iotlb_hits, cfg->iotlb_misses,
++                                     100 * cfg->iotlb_hits /
++                                     (cfg->iotlb_hits + cfg->iotlb_misses));
 +    }
-+    trace_smmuv3_s1_range_inval(vmid, asid, addr, leaf);
-+    smmuv3_inv_notifiers_iova(s, asid, addr);
-+    smmu_iotlb_inv_iova(s, asid, addr);
++    return entry;
 +}
 +
- static int smmuv3_cmdq_consume(SMMUv3State *s)
++void smmu_iotlb_insert(SMMUState *bs, SMMUTransCfg *cfg, IOMMUTLBEntry *entry)
++{
++    SMMUIOTLBKey *key = g_new0(SMMUIOTLBKey, 1);
++
++    if (g_hash_table_size(bs->iotlb) >= SMMU_IOTLB_MAX_SIZE) {
++        smmu_iotlb_inv_all(bs);
++    }
++
++    key->asid = cfg->asid;
++    key->iova = entry->iova;
++    trace_smmu_iotlb_insert(cfg->asid, entry->iova);
++    g_hash_table_insert(bs->iotlb, key, entry);
++}
++
+ inline void smmu_iotlb_inv_all(SMMUState *s)
  {
-     SMMUState *bs = ARM_SMMU(s);
-@@ -970,27 +986,9 @@ static int smmuv3_cmdq_consume(SMMUv3State *s)
-             smmu_iotlb_inv_all(bs);
-             break;
-         case SMMU_CMD_TLBI_NH_VAA:
--        {
--            dma_addr_t addr = CMD_ADDR(&cmd);
--            uint16_t vmid = CMD_VMID(&cmd);
+     trace_smmu_iotlb_inv_all();
+diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
+index 57a79df55b..cd2a2e7e14 100644
+--- a/hw/arm/smmuv3.c
++++ b/hw/arm/smmuv3.c
+@@ -636,7 +636,6 @@ static IOMMUTLBEntry smmuv3_translate(IOMMUMemoryRegion *mr, hwaddr addr,
+         .addr_mask = ~(hwaddr)0,
+         .perm = IOMMU_NONE,
+     };
+-    SMMUIOTLBKey key, *new_key;
+ 
+     qemu_mutex_lock(&s->mutex);
+ 
+@@ -675,16 +674,8 @@ static IOMMUTLBEntry smmuv3_translate(IOMMUMemoryRegion *mr, hwaddr addr,
+     page_mask = (1ULL << (tt->granule_sz)) - 1;
+     aligned_addr = addr & ~page_mask;
+ 
+-    key.asid = cfg->asid;
+-    key.iova = aligned_addr;
 -
--            trace_smmuv3_cmdq_tlbi_nh_vaa(vmid, addr);
--            smmuv3_inv_notifiers_iova(bs, -1, addr);
--            smmu_iotlb_inv_iova(bs, -1, addr);
--            break;
--        }
-         case SMMU_CMD_TLBI_NH_VA:
--        {
--            uint16_t asid = CMD_ASID(&cmd);
--            uint16_t vmid = CMD_VMID(&cmd);
--            dma_addr_t addr = CMD_ADDR(&cmd);
--            bool leaf = CMD_LEAF(&cmd);
+-    cached_entry = g_hash_table_lookup(bs->iotlb, &key);
++    cached_entry = smmu_iotlb_lookup(bs, cfg, aligned_addr);
+     if (cached_entry) {
+-        cfg->iotlb_hits++;
+-        trace_smmu_iotlb_cache_hit(cfg->asid, aligned_addr,
+-                                   cfg->iotlb_hits, cfg->iotlb_misses,
+-                                   100 * cfg->iotlb_hits /
+-                                   (cfg->iotlb_hits + cfg->iotlb_misses));
+         if ((flag & IOMMU_WO) && !(cached_entry->perm & IOMMU_WO)) {
+             status = SMMU_TRANS_ERROR;
+             if (event.record_trans_faults) {
+@@ -698,16 +689,6 @@ static IOMMUTLBEntry smmuv3_translate(IOMMUMemoryRegion *mr, hwaddr addr,
+         goto epilogue;
+     }
+ 
+-    cfg->iotlb_misses++;
+-    trace_smmu_iotlb_cache_miss(cfg->asid, addr & ~page_mask,
+-                                cfg->iotlb_hits, cfg->iotlb_misses,
+-                                100 * cfg->iotlb_hits /
+-                                (cfg->iotlb_hits + cfg->iotlb_misses));
 -
--            trace_smmuv3_cmdq_tlbi_nh_va(vmid, asid, addr, leaf);
--            smmuv3_inv_notifiers_iova(bs, asid, addr);
--            smmu_iotlb_inv_iova(bs, asid, addr);
-+            smmuv3_s1_range_inval(bs, &cmd);
-             break;
--        }
-         case SMMU_CMD_TLBI_EL3_ALL:
-         case SMMU_CMD_TLBI_EL3_VA:
-         case SMMU_CMD_TLBI_EL2_ALL:
+-    if (g_hash_table_size(bs->iotlb) >= SMMU_IOTLB_MAX_SIZE) {
+-        smmu_iotlb_inv_all(bs);
+-    }
+-
+     cached_entry = g_new0(IOMMUTLBEntry, 1);
+ 
+     if (smmu_ptw(cfg, aligned_addr, flag, cached_entry, &ptw_info)) {
+@@ -753,10 +734,7 @@ static IOMMUTLBEntry smmuv3_translate(IOMMUMemoryRegion *mr, hwaddr addr,
+         }
+         status = SMMU_TRANS_ERROR;
+     } else {
+-        new_key = g_new0(SMMUIOTLBKey, 1);
+-        new_key->asid = cfg->asid;
+-        new_key->iova = aligned_addr;
+-        g_hash_table_insert(bs->iotlb, new_key, cached_entry);
++        smmu_iotlb_insert(bs, cfg, cached_entry);
+         status = SMMU_TRANS_SUCCESS;
+     }
+ 
 diff --git a/hw/arm/trace-events b/hw/arm/trace-events
-index 2d445c99b7..b366973739 100644
+index 0acedcedc6..b808a1bfc1 100644
 --- a/hw/arm/trace-events
 +++ b/hw/arm/trace-events
-@@ -45,8 +45,7 @@ smmuv3_cmdq_cfgi_ste_range(int start, int end) "start=0x%d - end=0x%d"
- smmuv3_cmdq_cfgi_cd(uint32_t sid) "streamid = %d"
- smmuv3_config_cache_hit(uint32_t sid, uint32_t hits, uint32_t misses, uint32_t perc) "Config cache HIT for sid %d (hits=%d, misses=%d, hit rate=%d)"
- smmuv3_config_cache_miss(uint32_t sid, uint32_t hits, uint32_t misses, uint32_t perc) "Config cache MISS for sid %d (hits=%d, misses=%d, hit rate=%d)"
--smmuv3_cmdq_tlbi_nh_va(int vmid, int asid, uint64_t addr, bool leaf) "vmid =%d asid =%d addr=0x%"PRIx64" leaf=%d"
--smmuv3_cmdq_tlbi_nh_vaa(int vmid, uint64_t addr) "vmid =%d addr=0x%"PRIx64
-+smmuv3_s1_range_inval(int vmid, int asid, uint64_t addr, bool leaf) "vmid =%d asid =%d addr=0x%"PRIx64" leaf=%d"
+@@ -14,6 +14,9 @@ smmu_iotlb_inv_all(void) "IOTLB invalidate all"
+ smmu_iotlb_inv_asid(uint16_t asid) "IOTLB invalidate asid=%d"
+ smmu_iotlb_inv_iova(uint16_t asid, uint64_t addr) "IOTLB invalidate asid=%d addr=0x%"PRIx64
+ smmu_inv_notifiers_mr(const char *name) "iommu mr=%s"
++smmu_iotlb_lookup_hit(uint16_t asid, uint64_t addr, uint32_t hit, uint32_t miss, uint32_t p) "IOTLB cache HIT asid=%d addr=0x%"PRIx64" hit=%d miss=%d hit rate=%d"
++smmu_iotlb_lookup_miss(uint16_t asid, uint64_t addr, uint32_t hit, uint32_t miss, uint32_t p) "IOTLB cache MISS asid=%d addr=0x%"PRIx64" hit=%d miss=%d hit rate=%d"
++smmu_iotlb_insert(uint16_t asid, uint64_t addr) "IOTLB ++ asid=%d addr=0x%"PRIx64
+ 
+ # smmuv3.c
+ smmuv3_read_mmio(uint64_t addr, uint64_t val, unsigned size, uint32_t r) "addr: 0x%"PRIx64" val:0x%"PRIx64" size: 0x%x(%d)"
+@@ -46,8 +49,6 @@ smmuv3_cmdq_tlbi_nh_va(int vmid, int asid, uint64_t addr, bool leaf) "vmid =%d a
+ smmuv3_cmdq_tlbi_nh_vaa(int vmid, uint64_t addr) "vmid =%d addr=0x%"PRIx64
  smmuv3_cmdq_tlbi_nh(void) ""
  smmuv3_cmdq_tlbi_nh_asid(uint16_t asid) "asid=%d"
+-smmu_iotlb_cache_hit(uint16_t asid, uint64_t addr, uint32_t hit, uint32_t miss, uint32_t p) "IOTLB cache HIT asid=%d addr=0x%"PRIx64" hit=%d miss=%d hit rate=%d"
+-smmu_iotlb_cache_miss(uint16_t asid, uint64_t addr, uint32_t hit, uint32_t miss, uint32_t p) "IOTLB cache MISS asid=%d addr=0x%"PRIx64" hit=%d miss=%d hit rate=%d"
  smmuv3_config_cache_inv(uint32_t sid) "Config cache INV for sid %d"
+ smmuv3_notify_flag_add(const char *iommu) "ADD SMMUNotifier node for iommu mr=%s"
+ smmuv3_notify_flag_del(const char *iommu) "DEL SMMUNotifier node for iommu mr=%s"
 -- 
 2.20.1
 
