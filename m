@@ -2,69 +2,68 @@ Return-Path: <SRS0=U615=7Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B34DC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 20:34:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82F9BC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 20:34:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E9B7120720
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 20:34:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4C2F620720
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 20:34:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aVXEa1wq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9B7120720
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KZSpiFue"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C2F620720
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42666 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43648 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjTu1-0002kk-6M
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 16:34:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55658)
+	id 1jjTuE-0003Im-ES
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 16:34:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56048)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jjTA3-0001F4-Lm
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 15:46:52 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:55704
+ id 1jjTAO-0001rS-BF
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 15:47:12 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:20514
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jjTA1-0001LR-Si
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 15:46:51 -0400
+ id 1jjTAM-0001Pq-5e
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 15:47:11 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591904809;
+ s=mimecast20190719; t=1591904829;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=F81J/ZRp0YOpkDwfZ6abXb/SMvXJi0mCgUnRO82JJ0A=;
- b=aVXEa1wqKssPrZqFwBQ4HtqICC2MTefQ90TMBaA2XVy4FQTrgWu8eba9V6Xe+N4VPK1lZk
- TuVjOy+pUGsn8Bmo/6lM1A6ET3ecT+Pbp84/LiTUEsNtqMUuMCJfSCUyelfZdG7SGzkjSH
- 6kZtbZbg1/9YOUjByAYScujy9dPDcME=
+ bh=CqSVqjnl4aUpOYRqUchj6CeSEWEGszyemmeLF9cKaks=;
+ b=KZSpiFue4OZ7gIJHxlQwB2KIjgf2ZMuIe1oDQxUleJWtWK1MAsztNyB1lVoQLS43nD6i15
+ LlIt4SDfaUTzIAzgE/JN1BS4M2uC19XMGU69jqMyQBkWMpLJcgY8MGF5tQouogHBTIodJI
+ uIhGkmk9yZepJ+TcHqewzZZWPaJfW5k=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-301-n7l9T1rvOumJbNpS-2jgzw-1; Thu, 11 Jun 2020 15:46:47 -0400
-X-MC-Unique: n7l9T1rvOumJbNpS-2jgzw-1
+ us-mta-447-_u2DCYnkM8iXmsLkWI6ZNw-1; Thu, 11 Jun 2020 15:46:58 -0400
+X-MC-Unique: _u2DCYnkM8iXmsLkWI6ZNw-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1C9541005512;
- Thu, 11 Jun 2020 19:46:46 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 49F84461;
+ Thu, 11 Jun 2020 19:46:57 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B0D6660CC0;
- Thu, 11 Jun 2020 19:46:45 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 03FF760CC0;
+ Thu, 11 Jun 2020 19:46:56 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 072/115] hw/i386/amd_iommu: Fix the reserved bits definition of
- IOMMU commands
-Date: Thu, 11 Jun 2020 15:44:06 -0400
-Message-Id: <20200611194449.31468-73-pbonzini@redhat.com>
+Subject: [PULL 087/115] i386: hvf: Move HVFState definition into hvf
+Date: Thu, 11 Jun 2020 15:44:21 -0400
+Message-Id: <20200611194449.31468-88-pbonzini@redhat.com>
 In-Reply-To: <20200611194449.31468-1-pbonzini@redhat.com>
 References: <20200611194449.31468-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -96,97 +95,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Wei Huang <wei.huang2@amd.com>
+Cc: Roman Bolshakov <r.bolshakov@yadro.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Wei Huang <wei.huang2@amd.com>
+From: Roman Bolshakov <r.bolshakov@yadro.com>
 
-Many reserved bits of amd_iommu commands are defined incorrectly in QEMU.
-Because of it, QEMU incorrectly injects lots of illegal commands into guest
-VM's IOMMU event log.
+"sysemu/hvf.h" is intended for inclusion in generic code. However it
+also contains several hvf definitions and declarations, including
+HVFState that are used only inside "hvf.c". "hvf-i386.h" would be more
+appropriate place to define HVFState as it's only included by "hvf.c"
+and "x86_task.c".
 
-Signed-off-by: Wei Huang <wei.huang2@amd.com>
-Message-Id: <20200418042845.596457-1-wei.huang2@amd.com>
+Signed-off-by: Roman Bolshakov <r.bolshakov@yadro.com>
+Message-Id: <20200528193758.51454-2-r.bolshakov@yadro.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/i386/amd_iommu.c | 19 ++++++++++---------
- 1 file changed, 10 insertions(+), 9 deletions(-)
+ include/sysemu/hvf.h       | 37 -------------------------------------
+ target/i386/hvf/hvf-i386.h | 35 +++++++++++++++++++++++++++++++++++
+ 2 files changed, 35 insertions(+), 37 deletions(-)
 
-diff --git a/hw/i386/amd_iommu.c b/hw/i386/amd_iommu.c
-index fd75cae024..4346060e62 100644
---- a/hw/i386/amd_iommu.c
-+++ b/hw/i386/amd_iommu.c
-@@ -370,7 +370,7 @@ static void amdvi_completion_wait(AMDVIState *s, uint64_t *cmd)
-     hwaddr addr = cpu_to_le64(extract64(cmd[0], 3, 49)) << 3;
-     uint64_t data = cpu_to_le64(cmd[1]);
+diff --git a/include/sysemu/hvf.h b/include/sysemu/hvf.h
+index fe95743124..644bdfc722 100644
+--- a/include/sysemu/hvf.h
++++ b/include/sysemu/hvf.h
+@@ -15,8 +15,6 @@
  
--    if (extract64(cmd[0], 51, 8)) {
-+    if (extract64(cmd[0], 52, 8)) {
-         amdvi_log_illegalcom_error(s, extract64(cmd[0], 60, 4),
-                                    s->cmdbuf + s->cmdbuf_head);
-     }
-@@ -395,7 +395,7 @@ static void amdvi_inval_devtab_entry(AMDVIState *s, uint64_t *cmd)
-     uint16_t devid = cpu_to_le16((uint16_t)extract64(cmd[0], 0, 16));
+ #include "cpu.h"
+ #include "qemu/bitops.h"
+-#include "exec/memory.h"
+-#include "sysemu/accel.h"
  
-     /* This command should invalidate internal caches of which there isn't */
--    if (extract64(cmd[0], 15, 16) || cmd[1]) {
-+    if (extract64(cmd[0], 16, 44) || cmd[1]) {
-         amdvi_log_illegalcom_error(s, extract64(cmd[0], 60, 4),
-                                    s->cmdbuf + s->cmdbuf_head);
-     }
-@@ -405,9 +405,9 @@ static void amdvi_inval_devtab_entry(AMDVIState *s, uint64_t *cmd)
+ #ifdef CONFIG_HVF
+ #include <Hypervisor/hv.h>
+@@ -32,41 +30,6 @@ extern bool hvf_allowed;
+ #define hvf_get_supported_cpuid(func, idx, reg) 0
+ #endif /* !CONFIG_HVF */
  
- static void amdvi_complete_ppr(AMDVIState *s, uint64_t *cmd)
- {
--    if (extract64(cmd[0], 15, 16) ||  extract64(cmd[0], 19, 8) ||
-+    if (extract64(cmd[0], 16, 16) ||  extract64(cmd[0], 52, 8) ||
-         extract64(cmd[1], 0, 2) || extract64(cmd[1], 3, 29)
--        || extract64(cmd[1], 47, 16)) {
-+        || extract64(cmd[1], 48, 16)) {
-         amdvi_log_illegalcom_error(s, extract64(cmd[0], 60, 4),
-                                    s->cmdbuf + s->cmdbuf_head);
-     }
-@@ -438,8 +438,8 @@ static void amdvi_inval_pages(AMDVIState *s, uint64_t *cmd)
- {
-     uint16_t domid = cpu_to_le16((uint16_t)extract64(cmd[0], 32, 16));
+-/* hvf_slot flags */
+-#define HVF_SLOT_LOG (1 << 0)
+-
+-typedef struct hvf_slot {
+-    uint64_t start;
+-    uint64_t size;
+-    uint8_t *mem;
+-    int slot_id;
+-    uint32_t flags;
+-    MemoryRegion *region;
+-} hvf_slot;
+-
+-typedef struct hvf_vcpu_caps {
+-    uint64_t vmx_cap_pinbased;
+-    uint64_t vmx_cap_procbased;
+-    uint64_t vmx_cap_procbased2;
+-    uint64_t vmx_cap_entry;
+-    uint64_t vmx_cap_exit;
+-    uint64_t vmx_cap_preemption_timer;
+-} hvf_vcpu_caps;
+-
+-typedef struct HVFState {
+-    AccelState parent;
+-    hvf_slot slots[32];
+-    int num_slots;
+-
+-    hvf_vcpu_caps *hvf_caps;
+-} HVFState;
+-extern HVFState *hvf_state;
+-
+-void hvf_set_phys_mem(MemoryRegionSection *, bool);
+-void hvf_handle_io(CPUArchState *, uint16_t, void *,
+-                  int, int, int);
+-hvf_slot *hvf_find_overlap_slot(uint64_t, uint64_t);
+-
+ /* Disable HVF if |disable| is 1, otherwise, enable it iff it is supported by
+  * the host CPU. Use hvf_enabled() after this to get the result. */
+ void hvf_disable(int disable);
+diff --git a/target/i386/hvf/hvf-i386.h b/target/i386/hvf/hvf-i386.h
+index fbe4a350c5..ef20c73eca 100644
+--- a/target/i386/hvf/hvf-i386.h
++++ b/target/i386/hvf/hvf-i386.h
+@@ -16,6 +16,7 @@
+ #ifndef HVF_I386_H
+ #define HVF_I386_H
  
--    if (extract64(cmd[0], 20, 12) || extract64(cmd[0], 16, 12) ||
--        extract64(cmd[0], 3, 10)) {
-+    if (extract64(cmd[0], 20, 12) || extract64(cmd[0], 48, 12) ||
-+        extract64(cmd[1], 3, 9)) {
-         amdvi_log_illegalcom_error(s, extract64(cmd[0], 60, 4),
-                                    s->cmdbuf + s->cmdbuf_head);
-     }
-@@ -451,7 +451,7 @@ static void amdvi_inval_pages(AMDVIState *s, uint64_t *cmd)
++#include "sysemu/accel.h"
+ #include "sysemu/hvf.h"
+ #include "cpu.h"
+ #include "x86.h"
+@@ -35,6 +36,40 @@ struct hvf_state {
+     uint64_t mem_quota;
+ };
  
- static void amdvi_prefetch_pages(AMDVIState *s, uint64_t *cmd)
- {
--    if (extract64(cmd[0], 16, 8) || extract64(cmd[0], 20, 8) ||
-+    if (extract64(cmd[0], 16, 8) || extract64(cmd[0], 52, 8) ||
-         extract64(cmd[1], 1, 1) || extract64(cmd[1], 3, 1) ||
-         extract64(cmd[1], 5, 7)) {
-         amdvi_log_illegalcom_error(s, extract64(cmd[0], 60, 4),
-@@ -463,7 +463,7 @@ static void amdvi_prefetch_pages(AMDVIState *s, uint64_t *cmd)
++/* hvf_slot flags */
++#define HVF_SLOT_LOG (1 << 0)
++
++typedef struct hvf_slot {
++    uint64_t start;
++    uint64_t size;
++    uint8_t *mem;
++    int slot_id;
++    uint32_t flags;
++    MemoryRegion *region;
++} hvf_slot;
++
++typedef struct hvf_vcpu_caps {
++    uint64_t vmx_cap_pinbased;
++    uint64_t vmx_cap_procbased;
++    uint64_t vmx_cap_procbased2;
++    uint64_t vmx_cap_entry;
++    uint64_t vmx_cap_exit;
++    uint64_t vmx_cap_preemption_timer;
++} hvf_vcpu_caps;
++
++typedef struct HVFState {
++    AccelState parent;
++    hvf_slot slots[32];
++    int num_slots;
++
++    hvf_vcpu_caps *hvf_caps;
++} HVFState;
++extern HVFState *hvf_state;
++
++void hvf_set_phys_mem(MemoryRegionSection *, bool);
++void hvf_handle_io(CPUArchState *, uint16_t, void *, int, int, int);
++hvf_slot *hvf_find_overlap_slot(uint64_t, uint64_t);
++
+ #ifdef NEED_CPU_H
+ /* Functions exported to host specific mode */
  
- static void amdvi_inval_inttable(AMDVIState *s, uint64_t *cmd)
- {
--    if (extract64(cmd[0], 16, 16) || cmd[1]) {
-+    if (extract64(cmd[0], 16, 44) || cmd[1]) {
-         amdvi_log_illegalcom_error(s, extract64(cmd[0], 60, 4),
-                                    s->cmdbuf + s->cmdbuf_head);
-         return;
-@@ -479,7 +479,8 @@ static void iommu_inval_iotlb(AMDVIState *s, uint64_t *cmd)
- {
- 
-     uint16_t devid = extract64(cmd[0], 0, 16);
--    if (extract64(cmd[1], 1, 1) || extract64(cmd[1], 3, 9)) {
-+    if (extract64(cmd[1], 1, 1) || extract64(cmd[1], 3, 1) ||
-+        extract64(cmd[1], 6, 6)) {
-         amdvi_log_illegalcom_error(s, extract64(cmd[0], 60, 4),
-                                    s->cmdbuf + s->cmdbuf_head);
-         return;
 -- 
 2.26.2
 
