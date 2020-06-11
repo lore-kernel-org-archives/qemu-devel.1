@@ -2,80 +2,89 @@ Return-Path: <SRS0=U615=7Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73E1FC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 08:36:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57141C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 08:42:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 497B720812
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 08:36:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 497B720812
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 203B9207C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 08:42:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cPq/w2NM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 203B9207C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37764 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41416 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjIhO-0004g9-JK
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 04:36:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41816)
+	id 1jjImr-0007DB-Cv
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 04:42:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43194)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jjIgc-0003bS-Cu
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 04:35:46 -0400
-Received: from indium.canonical.com ([91.189.90.7]:35696)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jjIga-0001In-Ou
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 04:35:45 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jjIgX-0004wK-Ru
- for <qemu-devel@nongnu.org>; Thu, 11 Jun 2020 08:35:41 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id B56E82E810B
- for <qemu-devel@nongnu.org>; Thu, 11 Jun 2020 08:35:41 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1jjImG-0006mP-5Y
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 04:41:36 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57651
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1jjImF-0002Ci-AG
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 04:41:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591864894;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=0NwSdNxSwUtgReMB9EMxZ12JYsRcU4Dhe8zUlgL2/RI=;
+ b=cPq/w2NMqQ0SnB2WzrXKLAp5DYsKC1zUIVuYZflkJjUC7TezhwvUIY+I+mTAmaQts0ciiq
+ yppTVaGtGVoh/Kk2LwfOfilOeGwjWAj13VmQvtaTslxr2cSwUcOrO3fpSGzP5gJmAynChG
+ d2LEkS4UgRlSrR54jU5SsT56OdeFdlY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-307-X0hw-npJOwi4u_ez2p0xFA-1; Thu, 11 Jun 2020 04:41:32 -0400
+X-MC-Unique: X0hw-npJOwi4u_ez2p0xFA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 96B131009455
+ for <qemu-devel@nongnu.org>; Thu, 11 Jun 2020 08:41:31 +0000 (UTC)
+Received: from localhost (ovpn-114-102.ams2.redhat.com [10.36.114.102])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4D941512FE;
+ Thu, 11 Jun 2020 08:41:28 +0000 (UTC)
+Date: Thu, 11 Jun 2020 09:41:26 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Jason Wang <jasowang@redhat.com>
+Subject: Re: [PATCH V2] virtio-pci: fix queue_enable write
+Message-ID: <20200611084126.GB22045@stefanha-x1.localdomain>
+References: <20200610054351.15811-1-jasowang@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 11 Jun 2020 08:27:17 -0000
-From: Gerd Hoffmann <1882851@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: diego-viola kraxel-redhat
-X-Launchpad-Bug-Reporter: Diego Viola (diego-viola)
-X-Launchpad-Bug-Modifier: Gerd Hoffmann (kraxel-redhat)
-References: <159174217343.32241.17743917589333297614.malonedeb@gac.canonical.com>
-Message-Id: <159186403749.14683.9757780897356419590.malone@wampee.canonical.com>
-Subject: [Bug 1882851] Re: QEMU video freezes with "Guest disabled display"
- (virtio driver)
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="b190cebbf563f89e480a8b57f641753c8196bda0";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 22ba1465b64c31411af528438f3eaaebe3745ada
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 04:11:21
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200610054351.15811-1-jasowang@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="FkmkrVfFsRoUs1wW"
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=stefanha@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 03:29:35
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -84,52 +93,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1882851 <1882851@bugs.launchpad.net>
+Cc: qemu-devel@nongnu.org, mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hmm, happens with xorg only.
-Wayland behaves as expected (any mouse/kbd event wakes up the screen).
-Which pretty much implies this is a guest bug.
+--FkmkrVfFsRoUs1wW
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
--- =
+On Wed, Jun 10, 2020 at 01:43:51PM +0800, Jason Wang wrote:
+> Spec said: The driver uses this to selectively prevent the device from
+> executing requests from this virtqueue. 1 - enabled; 0 - disabled.
+>=20
+> Though write 0 to queue_enable is forbidden by the spec, we should not
+> assume that the value is 1.
+>=20
+> Fix this by ignore the write value other than 1.
+>=20
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
+> ---
+> Changes from V1:
+> - fix typo
+> - warn wrong value through virtio_error
+> ---
+>  hw/virtio/virtio-pci.c | 12 ++++++++----
+>  1 file changed, 8 insertions(+), 4 deletions(-)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1882851
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-Title:
-  QEMU video freezes with "Guest disabled display" (virtio driver)
+--FkmkrVfFsRoUs1wW
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Status in QEMU:
-  New
+-----BEGIN PGP SIGNATURE-----
 
-Bug description:
-  I am using Arch Linux as my Guest and Host OS, after starting qemu
-  with the following command:
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl7h7jYACgkQnKSrs4Gr
+c8jO0Qf9GRg7BbCfa2DhrKxfBdWdYX0PSQe9DBGBFoBiMHEEocWpopRCA7Ic4G4V
++BmyjU5OrewptyNyXZ1yeCz0ljHRKCyh0VX7S+S5Rlt/ijKSKCIoO8RLp08ZlOSu
+e5F947uN7Ji2xpNKVqrJuyG6X8qe/1vWeRPBInV3feRfICEU7+kCmQcTpKErOO8g
+YkNEKhI8OP+jWHIqljGPqrg33opyAq+ff3QvzbmdGGLjsGD38NiPP2QbBlwRb4WU
+qy2ceYb+MKozx3eHSc9MH4AKkNnR9wb4GsxxM03+SwE5g9qF3che2bzAEc65N7P7
+Fa/zVKiL4lUuUZUDisrzQ4KcqMsDqw==
+=n5HM
+-----END PGP SIGNATURE-----
 
-    $ qemu-system-x86_64 -enable-kvm -hda arch-zoom.qcow2 -m 4G -vga
-  virtio
+--FkmkrVfFsRoUs1wW--
 
-  and waiting for a screen blank, I get this message:
-
-    Guest disabled display
-
-  And nothing happens after that, I can move the mouse or hit any key,
-  and the message is still there.
-
-  I can still reboot the VM but that's not optimal.
-
-  I can reproduce this with the latest QEMU release (5.0.0) or git master, =
-
-  I also tried this with older releases (4.0.0, 3.0.0) and the issue is sti=
-ll there.
-
-  I can't reproduce this with other video drivers (std, qxl).
-
-  With std/qxl the screen will blank a bit and then continue as normal.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1882851/+subscriptions
 
