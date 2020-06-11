@@ -2,72 +2,81 @@ Return-Path: <SRS0=U615=7Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 345C1C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 07:38:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59539C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 07:39:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F17182072F
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 07:38:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 215862072F
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 07:39:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HM9QPKBb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F17182072F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ixlt/Vde"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 215862072F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35282 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37126 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjHnX-0004mf-8X
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 03:38:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53476)
+	id 1jjHns-0005c0-Cb
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 03:39:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54622)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jjHjS-0007YF-I5
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 03:34:38 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:33192
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jjHn3-00044d-1r
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 03:38:21 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:47883
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jjHjR-0005iF-FW
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 03:34:38 -0400
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jjHn2-0006Gp-83
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 03:38:20 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591860876;
+ s=mimecast20190719; t=1591861099;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
- references:references; bh=ATI7m16SCuNy+Jab1DsewPMACsTqqtSHU8CUglFAJ5M=;
- b=HM9QPKBbSNweem+jbYzHsHt25YMpPivGFedIbRVF+rWeg18vlHXVnNGq9wAQHZsHLCaNSu
- C3NFkmjgXrQKQoWyAkq0t5vWRFFwWMELMeJseXlh2rT2dyUijzti1VIEkiGS65x8mztyrb
- TXEoC6mryoHX77iTdaqe5wvPDlxHiMc=
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=j9TbR9CiYS5xke6KPzjPF/ExSl4P94rgEh3Zthl/ekw=;
+ b=ixlt/VdeBLKU37+lrOk30fUUrf7UkTH3beArs+C6bvEYQ9x0K6c663FAcIi5gnCNzfOwKe
+ b78rUPR6jGgcdoDKxdJ0f9dBg1IcEFr+LimZzibCe2JFsDfEnxIsNEprK0lUUE0BU6MF63
+ YnoRlUd8ifyzU0DkR/B39rqHb7R23Vw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-125-3d7KLYllP--Tz8hHmsk-jg-1; Thu, 11 Jun 2020 03:29:31 -0400
-X-MC-Unique: 3d7KLYllP--Tz8hHmsk-jg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-382-ZnWV_MDGOPqrlh0immLyZA-1; Thu, 11 Jun 2020 03:38:15 -0400
+X-MC-Unique: ZnWV_MDGOPqrlh0immLyZA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 891D9872FE0;
- Thu, 11 Jun 2020 07:29:30 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-113-50.ams2.redhat.com
- [10.36.113.50])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D1FB75D9D3;
- Thu, 11 Jun 2020 07:29:20 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id B320717510; Thu, 11 Jun 2020 09:29:19 +0200 (CEST)
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v8 02/10] acpi: move aml builder code for floppy device
-Date: Thu, 11 Jun 2020 09:29:11 +0200
-Message-Id: <20200611072919.16638-3-kraxel@redhat.com>
-In-Reply-To: <20200611072919.16638-1-kraxel@redhat.com>
-References: <20200611072919.16638-1-kraxel@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 118CF8018A6;
+ Thu, 11 Jun 2020 07:38:13 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-113-215.ams2.redhat.com [10.36.113.215])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 55DED5C1B0;
+ Thu, 11 Jun 2020 07:38:09 +0000 (UTC)
+Subject: Re: [PATCH v3 05/11] MAINTAINERS: Add an entry for common Renesas
+ peripherals
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org
+References: <20200610220853.8558-1-f4bug@amsat.org>
+ <20200610220853.8558-6-f4bug@amsat.org>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <03112dec-ca30-2fa2-02a7-7a7402721783@redhat.com>
+Date: Thu, 11 Jun 2020 09:38:06 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
+MIME-Version: 1.0
+In-Reply-To: <20200610220853.8558-6-f4bug@amsat.org>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=kraxel@redhat.com;
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=thuth@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 03:29:33
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -90,273 +99,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>, John Snow <jsnow@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Fam Zheng <fam@euphon.net>, Magnus Damm <magnus.damm@gmail.com>,
+ Yoshinori Sato <ysato@users.sourceforge.jp>, qemu-trivial@nongnu.org,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
----
- hw/block/fdc.c       | 83 ++++++++++++++++++++++++++++++++++++++++++++
- hw/i386/acpi-build.c | 83 --------------------------------------------
- stubs/cmos.c         |  7 ++++
- stubs/Makefile.objs  |  1 +
- 4 files changed, 91 insertions(+), 83 deletions(-)
- create mode 100644 stubs/cmos.c
+On 11/06/2020 00.08, Philippe Mathieu-Daudé wrote:
+> Renesas peripherals are common to SH4/RX based MCUs. Their
+> datasheets share common sections. It makes sense to maintain
+> them altogether. The current names are misleading (see the
+> 'sh' prefix). This will be fixed later when RX peripherals
+> will be added.
+> 
+> Cc: Magnus Damm <magnus.damm@gmail.com>
+> Cc: Yoshinori Sato <ysato@users.sourceforge.jp>
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+>  MAINTAINERS | 9 +++++++--
+>  1 file changed, 7 insertions(+), 2 deletions(-)
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 653fca1da8..0398634179 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -1254,8 +1254,6 @@ M: Magnus Damm <magnus.damm@gmail.com>
+>  S: Odd Fixes
+>  F: hw/sh4/r2d.c
+>  F: hw/intc/sh_intc.c
+> -F: hw/timer/sh_timer.c
+> -F: include/hw/sh4/sh_intc.h
 
-diff --git a/hw/block/fdc.c b/hw/block/fdc.c
-index c5fb9d6ece77..b4d2eaf66dcd 100644
---- a/hw/block/fdc.c
-+++ b/hw/block/fdc.c
-@@ -32,6 +32,8 @@
- #include "qapi/error.h"
- #include "qemu/error-report.h"
- #include "qemu/timer.h"
-+#include "hw/i386/pc.h"
-+#include "hw/acpi/aml-build.h"
- #include "hw/irq.h"
- #include "hw/isa/isa.h"
- #include "hw/qdev-properties.h"
-@@ -2765,6 +2767,85 @@ void isa_fdc_get_drive_max_chs(FloppyDriveType type,
-     (*maxc)--;
- }
- 
-+static Aml *build_fdinfo_aml(int idx, FloppyDriveType type)
-+{
-+    Aml *dev, *fdi;
-+    uint8_t maxc, maxh, maxs;
-+
-+    isa_fdc_get_drive_max_chs(type, &maxc, &maxh, &maxs);
-+
-+    dev = aml_device("FLP%c", 'A' + idx);
-+
-+    aml_append(dev, aml_name_decl("_ADR", aml_int(idx)));
-+
-+    fdi = aml_package(16);
-+    aml_append(fdi, aml_int(idx));  /* Drive Number */
-+    aml_append(fdi,
-+        aml_int(cmos_get_fd_drive_type(type)));  /* Device Type */
-+    /*
-+     * the values below are the limits of the drive, and are thus independent
-+     * of the inserted media
-+     */
-+    aml_append(fdi, aml_int(maxc));  /* Maximum Cylinder Number */
-+    aml_append(fdi, aml_int(maxs));  /* Maximum Sector Number */
-+    aml_append(fdi, aml_int(maxh));  /* Maximum Head Number */
-+    /*
-+     * SeaBIOS returns the below values for int 0x13 func 0x08 regardless of
-+     * the drive type, so shall we
-+     */
-+    aml_append(fdi, aml_int(0xAF));  /* disk_specify_1 */
-+    aml_append(fdi, aml_int(0x02));  /* disk_specify_2 */
-+    aml_append(fdi, aml_int(0x25));  /* disk_motor_wait */
-+    aml_append(fdi, aml_int(0x02));  /* disk_sector_siz */
-+    aml_append(fdi, aml_int(0x12));  /* disk_eot */
-+    aml_append(fdi, aml_int(0x1B));  /* disk_rw_gap */
-+    aml_append(fdi, aml_int(0xFF));  /* disk_dtl */
-+    aml_append(fdi, aml_int(0x6C));  /* disk_formt_gap */
-+    aml_append(fdi, aml_int(0xF6));  /* disk_fill */
-+    aml_append(fdi, aml_int(0x0F));  /* disk_head_sttl */
-+    aml_append(fdi, aml_int(0x08));  /* disk_motor_strt */
-+
-+    aml_append(dev, aml_name_decl("_FDI", fdi));
-+    return dev;
-+}
-+
-+static void fdc_isa_build_aml(ISADevice *isadev, Aml *scope)
-+{
-+    Aml *dev;
-+    Aml *crs;
-+    int i;
-+
-+#define ACPI_FDE_MAX_FD 4
-+    uint32_t fde_buf[5] = {
-+        0, 0, 0, 0,     /* presence of floppy drives #0 - #3 */
-+        cpu_to_le32(2)  /* tape presence (2 == never present) */
-+    };
-+
-+    crs = aml_resource_template();
-+    aml_append(crs, aml_io(AML_DECODE16, 0x03F2, 0x03F2, 0x00, 0x04));
-+    aml_append(crs, aml_io(AML_DECODE16, 0x03F7, 0x03F7, 0x00, 0x01));
-+    aml_append(crs, aml_irq_no_flags(6));
-+    aml_append(crs,
-+        aml_dma(AML_COMPATIBILITY, AML_NOTBUSMASTER, AML_TRANSFER8, 2));
-+
-+    dev = aml_device("FDC0");
-+    aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0700")));
-+    aml_append(dev, aml_name_decl("_CRS", crs));
-+
-+    for (i = 0; i < MIN(MAX_FD, ACPI_FDE_MAX_FD); i++) {
-+        FloppyDriveType type = isa_fdc_get_drive_type(isadev, i);
-+
-+        if (type < FLOPPY_DRIVE_TYPE_NONE) {
-+            fde_buf[i] = cpu_to_le32(1);  /* drive present */
-+            aml_append(dev, build_fdinfo_aml(i, type));
-+        }
-+    }
-+    aml_append(dev, aml_name_decl("_FDE",
-+               aml_buffer(sizeof(fde_buf), (uint8_t *)fde_buf)));
-+
-+    aml_append(scope, dev);
-+}
-+
- static const VMStateDescription vmstate_isa_fdc ={
-     .name = "fdc",
-     .version_id = 2,
-@@ -2798,11 +2879,13 @@ static Property isa_fdc_properties[] = {
- static void isabus_fdc_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(klass);
-+    ISADeviceClass *isa = ISA_DEVICE_CLASS(klass);
- 
-     dc->realize = isabus_fdc_realize;
-     dc->fw_name = "fdc";
-     dc->reset = fdctrl_external_reset_isa;
-     dc->vmsd = &vmstate_isa_fdc;
-+    isa->build_aml = fdc_isa_build_aml;
-     device_class_set_props(dc, isa_fdc_properties);
-     set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
- }
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 473cbdfffd05..7726d5c0f7cb 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -937,85 +937,6 @@ static void build_hpet_aml(Aml *table)
-     aml_append(table, scope);
- }
- 
--static Aml *build_fdinfo_aml(int idx, FloppyDriveType type)
--{
--    Aml *dev, *fdi;
--    uint8_t maxc, maxh, maxs;
--
--    isa_fdc_get_drive_max_chs(type, &maxc, &maxh, &maxs);
--
--    dev = aml_device("FLP%c", 'A' + idx);
--
--    aml_append(dev, aml_name_decl("_ADR", aml_int(idx)));
--
--    fdi = aml_package(16);
--    aml_append(fdi, aml_int(idx));  /* Drive Number */
--    aml_append(fdi,
--        aml_int(cmos_get_fd_drive_type(type)));  /* Device Type */
--    /*
--     * the values below are the limits of the drive, and are thus independent
--     * of the inserted media
--     */
--    aml_append(fdi, aml_int(maxc));  /* Maximum Cylinder Number */
--    aml_append(fdi, aml_int(maxs));  /* Maximum Sector Number */
--    aml_append(fdi, aml_int(maxh));  /* Maximum Head Number */
--    /*
--     * SeaBIOS returns the below values for int 0x13 func 0x08 regardless of
--     * the drive type, so shall we
--     */
--    aml_append(fdi, aml_int(0xAF));  /* disk_specify_1 */
--    aml_append(fdi, aml_int(0x02));  /* disk_specify_2 */
--    aml_append(fdi, aml_int(0x25));  /* disk_motor_wait */
--    aml_append(fdi, aml_int(0x02));  /* disk_sector_siz */
--    aml_append(fdi, aml_int(0x12));  /* disk_eot */
--    aml_append(fdi, aml_int(0x1B));  /* disk_rw_gap */
--    aml_append(fdi, aml_int(0xFF));  /* disk_dtl */
--    aml_append(fdi, aml_int(0x6C));  /* disk_formt_gap */
--    aml_append(fdi, aml_int(0xF6));  /* disk_fill */
--    aml_append(fdi, aml_int(0x0F));  /* disk_head_sttl */
--    aml_append(fdi, aml_int(0x08));  /* disk_motor_strt */
--
--    aml_append(dev, aml_name_decl("_FDI", fdi));
--    return dev;
--}
--
--static Aml *build_fdc_device_aml(ISADevice *fdc)
--{
--    int i;
--    Aml *dev;
--    Aml *crs;
--
--#define ACPI_FDE_MAX_FD 4
--    uint32_t fde_buf[5] = {
--        0, 0, 0, 0,     /* presence of floppy drives #0 - #3 */
--        cpu_to_le32(2)  /* tape presence (2 == never present) */
--    };
--
--    dev = aml_device("FDC0");
--    aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0700")));
--
--    crs = aml_resource_template();
--    aml_append(crs, aml_io(AML_DECODE16, 0x03F2, 0x03F2, 0x00, 0x04));
--    aml_append(crs, aml_io(AML_DECODE16, 0x03F7, 0x03F7, 0x00, 0x01));
--    aml_append(crs, aml_irq_no_flags(6));
--    aml_append(crs,
--        aml_dma(AML_COMPATIBILITY, AML_NOTBUSMASTER, AML_TRANSFER8, 2));
--    aml_append(dev, aml_name_decl("_CRS", crs));
--
--    for (i = 0; i < MIN(MAX_FD, ACPI_FDE_MAX_FD); i++) {
--        FloppyDriveType type = isa_fdc_get_drive_type(fdc, i);
--
--        if (type < FLOPPY_DRIVE_TYPE_NONE) {
--            fde_buf[i] = cpu_to_le32(1);  /* drive present */
--            aml_append(dev, build_fdinfo_aml(i, type));
--        }
--    }
--    aml_append(dev, aml_name_decl("_FDE",
--               aml_buffer(sizeof(fde_buf), (uint8_t *)fde_buf)));
--
--    return dev;
--}
--
- static Aml *build_kbd_device_aml(void)
- {
-     Aml *dev;
-@@ -1054,7 +975,6 @@ static Aml *build_mouse_device_aml(void)
- 
- static void build_isa_devices_aml(Aml *table)
- {
--    ISADevice *fdc = pc_find_fdc0();
-     bool ambiguous;
- 
-     Aml *scope = aml_scope("_SB.PCI0.ISA");
-@@ -1062,9 +982,6 @@ static void build_isa_devices_aml(Aml *table)
- 
-     aml_append(scope, build_kbd_device_aml());
-     aml_append(scope, build_mouse_device_aml());
--    if (fdc) {
--        aml_append(scope, build_fdc_device_aml(fdc));
--    }
- 
-     if (ambiguous) {
-         error_report("Multiple ISA busses, unable to define IPMI ACPI data");
-diff --git a/stubs/cmos.c b/stubs/cmos.c
-new file mode 100644
-index 000000000000..416cbe4055ff
---- /dev/null
-+++ b/stubs/cmos.c
-@@ -0,0 +1,7 @@
-+#include "qemu/osdep.h"
-+#include "hw/i386/pc.h"
-+
-+int cmos_get_fd_drive_type(FloppyDriveType fd0)
-+{
-+    return 0;
-+}
-diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-index c1e43ac68f87..df2cbfe68ca0 100644
---- a/stubs/Makefile.objs
-+++ b/stubs/Makefile.objs
-@@ -1,4 +1,5 @@
- stub-obj-y += blk-commit-all.o
-+stub-obj-y += cmos.o
- stub-obj-y += cpu-get-clock.o
- stub-obj-y += cpu-get-icount.o
- stub-obj-y += dump.o
--- 
-2.18.4
+You've added the line for sh_intc.h in the previous patch, just to
+remove it here again? ... I guess you only wanted to remove sh_timer.c
+here instead?
+
+ Thomas
+
+>  Shix
+>  S: Orphan
+> @@ -1954,6 +1952,13 @@ F: hw/*/*xive*
+>  F: include/hw/*/*xive*
+>  F: docs/*/*xive*
+>  
+> +Renesas peripherals
+> +M: Magnus Damm <magnus.damm@gmail.com>
+> +S: Odd Fixes
+> +F: hw/char/sh_serial.c
+> +F: hw/timer/sh_timer.c
+> +F: include/hw/sh4/sh.h
+> +
+>  Subsystems
+>  ----------
+>  Audio
+> 
 
 
