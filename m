@@ -2,81 +2,85 @@ Return-Path: <SRS0=U615=7Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 459BAC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 09:54:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1F61C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 09:54:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0DA8220656
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 09:54:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 74B0E20656
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 09:54:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I6kzIVD5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0DA8220656
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VxL2umYl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74B0E20656
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46892 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48376 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjJuf-0002zI-Ao
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 05:54:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40446)
+	id 1jjJvD-0003a8-Oi
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 05:54:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40538)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jjJu0-0002PU-2j
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 05:53:40 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:40835)
+ id 1jjJuJ-0002kH-76
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 05:53:59 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:54495)
  by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jjJtz-0002K9-0A
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 05:53:39 -0400
-Received: by mail-wr1-x443.google.com with SMTP id h5so5474423wrc.7
- for <qemu-devel@nongnu.org>; Thu, 11 Jun 2020 02:53:33 -0700 (PDT)
+ id 1jjJuI-0002N1-DB
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 05:53:58 -0400
+Received: by mail-wm1-x342.google.com with SMTP id g10so4379178wmh.4
+ for <qemu-devel@nongnu.org>; Thu, 11 Jun 2020 02:53:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=n+vcgdFVpwYWhcXEEfAjio2aJoK4lcTJB69gTdUJSx0=;
- b=I6kzIVD5GsqmAKsIibERp0+GKcehvUILGA/MPoqY3IrL8Wt/or4dgWDeEgbAlnX1Zb
- SfYTsRvjkoxidQQdJGs5XYN4/RL89wj/3tne/5ZzjnpsC4HzMCytSsxDstGYdbbEpQNS
- 9HjGP2jHFKXGYqvB7zbuYd95QoWSg70O5q7AjU6VNFAFXHEhVSobE/uBd/vTycgB5/rp
- 3nsjB65wxUk1rNfrPe9UxPX/zNnUyxsVnoHqF2Np4sM37KTHk61NpLqkuVXlpkZ75bSO
- kvEXh3Ilyr0mkAuD1K5pDk7yu3OLd9SI9/UufKbiu/OR91l4Vlu11+3ry41Q3WhG+ipq
- 6WYg==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=QGmeKoMjUx2P3GmL7M76rOcN1cHpZ8t5GZzb0yL6t/w=;
+ b=VxL2umYlDS+6Dp56jQn9CIBYAH3ScLEeqdxvH8Cr0c45v373g5rJjXmfT7+qVhKH0o
+ 1yreLxcTBr/SuhLKJSiTKpRE5HOBkMqxazw3j0HT71/M22lyoGVww5vTx9V2WP/9mzUW
+ 93nr995bk/RnMhMfpvFzR4AfjS4BdnHKJ+wrjMIJ2judzXLT0XJ42KmaHoMhl08i74Qn
+ sWYt1hY+e6bjXcJpfAwtk/e1MamdTulNr1fTxe8RXH4+mbusm6ZdSaLipASB3xvZt7+A
+ YLufiq9G4xle6sH+GwhYmeaRIEsrNjQWexQhqqkWwiwp+ywyZgW7uzCA7Xeh9Zj4ay62
+ 2y+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=n+vcgdFVpwYWhcXEEfAjio2aJoK4lcTJB69gTdUJSx0=;
- b=fuGTHk/9rM/hkIleFilKyVWa0eaafgUtFnPPEapfIP/6fIGV/BEU5ulP8KsDRUfHEE
- Dx7pf5wzBKGNKKkjnYQcaLLIkkZhrLw8yuppTcaovcbiq7Zyk2o0ZEjmDyRv2Zo1aD2a
- 57kglHFTxwpdoQ4s1pwNKZLA6+HG3GzoMZPakuy0TP8f9xvKFMtic7D7VHZOltjTvF0F
- lwZmsTK2e44nWpQi8Sz6ZJjZxk/skvQ1Zl/UbgGsvz6ew3wOBEXUpRMSrJFY1Q30GA7g
- JN9oSShV1+gTJSE6562brgEj9mvJHwi9cCQ2v0KCF2kZiOiBQqhuN47zqS2hauYDgSkS
- ofYQ==
-X-Gm-Message-State: AOAM530Yn23nKc5eFIsmdXs5cvayb78bfr5eAliBICYEFKztnPSkuNit
- nATF/FAxiOOa3xdm8i+GX5YTl2+rcac=
-X-Google-Smtp-Source: ABdhPJzUIEe/9BV+YN8QGsLW0KDsY7lRIToJAKxPUS5olWfz/UhyZObyv61qPE8aVqHIzWOXNUD7mg==
-X-Received: by 2002:adf:a507:: with SMTP id i7mr9406545wrb.0.1591869212227;
- Thu, 11 Jun 2020 02:53:32 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=QGmeKoMjUx2P3GmL7M76rOcN1cHpZ8t5GZzb0yL6t/w=;
+ b=RIXPyXPJLugdTsGHfAXQ+82fz9ZOCmanVCpIY4j8qMAe3m5vvRqi2GQSLnUX4Sjq50
+ 5CKEPcNA9g7EjposXeBq/1J0yyXRPoWKB29Nv3u3KvrRp491PolR88M0Wxvfaq76NnvH
+ 7IcSxOMk7b/kEfGDKVhgOEb0QhjoayS99ude5d5Yu7mzUJKrWSW2GMnvZTy8/YKWEIUa
+ QcRysBc9YBgcjo9YosRPUtEorvmb5BfSdeBpawbfktb9wY+evciZF5jZWLGimMbwEHWL
+ HMhhswCAXyF78xG9a3KPYHK60u+JnkAjdk0Movib18C3RmnnnazufzIdPP6eQwve6QmZ
+ H6tQ==
+X-Gm-Message-State: AOAM5300skdlvYDjFj9f56HCMZRKtbh76yhl4TwyiAMPp5XQLR4ZEmEK
+ LO0wIEO7uaiVNi2GJrw0xrwJwuiB0x0=
+X-Google-Smtp-Source: ABdhPJydcGYHR9GrFmSYYfzKnxvtit0Vg0BzNZgptgCMzXZEx3s0bs7N9NXxqQffYrnBEZTSU6/WNw==
+X-Received: by 2002:a1c:4e17:: with SMTP id g23mr7114231wmh.38.1591869231640; 
+ Thu, 11 Jun 2020 02:53:51 -0700 (PDT)
 Received: from localhost.localdomain (net53-38-245-109.mbb.telenor.rs.
  [109.245.38.53])
- by smtp.gmail.com with ESMTPSA id i10sm4060257wrw.51.2020.06.11.02.53.31
+ by smtp.gmail.com with ESMTPSA id i10sm4060257wrw.51.2020.06.11.02.53.41
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 11 Jun 2020 02:53:31 -0700 (PDT)
+ Thu, 11 Jun 2020 02:53:51 -0700 (PDT)
 From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 0/1] Resolution of sh4 maintainership
-Date: Thu, 11 Jun 2020 11:53:15 +0200
-Message-Id: <20200611095316.10133-1-aleksandar.qemu.devel@gmail.com>
+Subject: [PATCH v3 1/1] MAINTAINERS: Adjust sh4 maintainership
+Date: Thu, 11 Jun 2020 11:53:16 +0200
+Message-Id: <20200611095316.10133-2-aleksandar.qemu.devel@gmail.com>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200611095316.10133-1-aleksandar.qemu.devel@gmail.com>
+References: <20200611095316.10133-1-aleksandar.qemu.devel@gmail.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wr1-x443.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::342;
+ envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wm1-x342.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -98,40 +102,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Cc: peter.maydell@linaro.org, Yoshinori Sato <ysato@users.sourceforge.jp>,
+ Magnus Damm <magnus.damm@gmail.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This series consists of a single patch that introduces a new
-maintainer for sh4 target.
+This patch transfers sh4 sections to Yoshinori Sato, who is
+best positioned in the community to assume sh4 maintainership.
+He is the maintainer of the related target rx as well, which
+means that some synergy between the two targets can be expected
+in future.
 
-He may or may not adjust further the details of sh4 sections,
-with recent discussions in mind.
+Further adjustments, reorganizations, and improvements of sh4
+sections are left to the future maintainer to be devised and
+executed, as he deems suitable.
 
-The central idea of this series is that noone imposes his/hers
-particular vision on the new maintainer person, but that we
-let him organize himself the way it suites his style, and his
-code situation, and his target position.
+Aurelien and Magnus are deleted as maintainers in some sections
+of the MAINTAINERS file with this patch. However, they will not
+be deleted from QEMU Hall of Fame, where their names will always
+remained carved in stone as QEMU pioneers and granddaddies.
 
-Three "Acked-by"s were deduced from the content of recent
-discussions on the mailing list.
-
-v2->v3:
-
-  - keep Magnus as a reviewer for sh4 machines
-
-v1->v2:
-
-  - improve commit message
-
-Aleksandar Markovic (1):
-  MAINTAINERS: Adjust sh4 maintainership
-
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Acked-by: Aurelien Jarno <aurelien@aurel32.net>
+Acked-by: Magnus Damm <magnus.damm@gmail.com>
+Acked-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+Signed-off-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+---
  MAINTAINERS | 8 +++++---
  1 file changed, 5 insertions(+), 3 deletions(-)
 
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 6e7890ce82..5c78ff5672 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -296,7 +296,7 @@ F: tests/tcg/s390x/
+ L: qemu-s390x@nongnu.org
+ 
+ SH4 TCG CPUs
+-M: Aurelien Jarno <aurelien@aurel32.net>
++M: Yoshinori Sato <ysato@users.sourceforge.jp>
+ S: Odd Fixes
+ F: target/sh4/
+ F: hw/sh4/
+@@ -1251,14 +1251,16 @@ F: include/hw/riscv/opentitan.h
+ SH4 Machines
+ ------------
+ R2D
+-M: Magnus Damm <magnus.damm@gmail.com>
++M: Yoshinori Sato <ysato@users.sourceforge.jp>
++R: Magnus Damm <magnus.damm@gmail.com>
+ S: Maintained
+ F: hw/sh4/r2d.c
+ F: hw/intc/sh_intc.c
+ F: hw/timer/sh_timer.c
+ 
+ Shix
+-M: Magnus Damm <magnus.damm@gmail.com>
++M: Yoshinori Sato <ysato@users.sourceforge.jp>
++R: Magnus Damm <magnus.damm@gmail.com>
+ S: Odd Fixes
+ F: hw/sh4/shix.c
+ 
 -- 
 2.20.1
 
