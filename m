@@ -2,96 +2,81 @@ Return-Path: <SRS0=U615=7Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9F54C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 07:35:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64EF8C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 07:35:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 61AFE2072F
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 07:35:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2CF712072F
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 07:35:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lWd7IsPe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61AFE2072F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QeX6Kedc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2CF712072F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51812 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52722 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjHkF-0007xD-9V
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 03:35:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53384)
+	id 1jjHkR-0008JS-7g
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 03:35:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52240)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jjHiq-0006F2-Ce
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 03:34:00 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:39046)
- by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jjHip-0005eo-Fn
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 03:34:00 -0400
-Received: by mail-wm1-x343.google.com with SMTP id k26so4004153wmi.4
- for <qemu-devel@nongnu.org>; Thu, 11 Jun 2020 00:33:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=G5lXivT62i1580UvMBwVMD3q6hah6T/ddCJhlrWqJ7A=;
- b=lWd7IsPe1yG/lDhYBRbQpVU/wc5n/OvzvKPUxOj7hGq3NNg4kr7lAvOnDb5CR6GW+b
- te6V55qFUE6sMIEdHoR0JHc4lLl7JQ9079Zmz8YdBSPtP78lkOpa7cUTNybs4dQkUhBv
- HmlP7arax0TInrtGvYBVEaFvpiCiXoKIzD3Qu5RX394VdcEnIHU/HDPX2anG844KuKPk
- EUnTFqLhWGwzIy0w/jp9jqTB2qlr+g3VmQMwTUYCzjhGBmNUZuSfEAv4EXaNFsh1+h93
- Mm+eG3/rgb4EnQzblObXni8PXTWYC2EJotTCTFIWVIpazCmAT8bzY7jRK1lfAr1vdPHS
- 5w0g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=G5lXivT62i1580UvMBwVMD3q6hah6T/ddCJhlrWqJ7A=;
- b=V0z/BEMR3atZxBPnc6sSTb48hlVBa5fe7AYSUhx1Xrt9OEk56EAoDxyRwuG3qhInJI
- tR0CargXlCkOEE9RIGQLQOiniHZWUOSD8IMd5ChK/b+/e+FtZTVFmUFLAgQal35sCn3V
- 6TIVohv2MiOWhBZfrs3WBv5IgmQMuaS7UJJ8h7N31sCCPNXKQil5nNGz8pn3dqZyDkZK
- MHywulijDXawwaNDELl4Bvjhf/UCPQ785+9LrpTaxMPBm0Xk6ouBhgWPNHRQdYzl9TbI
- jza7JrwO2mPmYIwmv6rey4lIHDs8FiOks30bPFMMdzshX57vjxBvPktSlV49lyYKcKpa
- LiBA==
-X-Gm-Message-State: AOAM5332dIdCR4cTiaDC+alD8yA6ODp89cTsa+iYkfXFZ6VsTbvlkYNf
- h/8UMBnLyN7RLNneP4uP8X0=
-X-Google-Smtp-Source: ABdhPJz4Yv87PePgMQwkYXpl7X9ukh7wYXU77sXG4wnig61wD6xU2CVEoRJt+mJjLlrDoEFIf9IhYA==
-X-Received: by 2002:a1c:3bc2:: with SMTP id i185mr6923025wma.33.1591860832733; 
- Thu, 11 Jun 2020 00:33:52 -0700 (PDT)
-Received: from [192.168.1.38] (181.red-88-10-103.dynamicip.rima-tde.net.
- [88.10.103.181])
- by smtp.gmail.com with ESMTPSA id b81sm2993605wmc.5.2020.06.11.00.33.51
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 11 Jun 2020 00:33:52 -0700 (PDT)
-Subject: Re: [PATCH] hw/m68k/mcf5206: Replace remaining hw_error()s by
- qemu_log_mask()
-To: Thomas Huth <huth@tuxfamily.org>, qemu-devel@nongnu.org
-References: <20200611055807.15921-1-huth@tuxfamily.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <b221aaa3-280b-7c9d-c2d8-2b1991def4ac@amsat.org>
-Date: Thu, 11 Jun 2020 09:33:51 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
-MIME-Version: 1.0
-In-Reply-To: <20200611055807.15921-1-huth@tuxfamily.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jjHet-0000Q2-Ib
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 03:29:55 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46824
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jjHes-0004kU-O5
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 03:29:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591860594;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
+ references:references; bh=6k1jcxf8ypU/XW3uW5/tOJlrRS6jF0mmavKqpADz79A=;
+ b=QeX6Kedcr88gwUwkVbxDR7xIjRO+ckqisAK9h592cQk32qTQoULFiuysn78r8k4Wz4OyOt
+ STQOJegkrfE3Kps6IM2wBsyuMUFCtA1mbNU1cSWLvD4liPPF3NxFgEzGaMZwlW1lGuzPyC
+ pJg/mVJRWIxlUMjuHTzmoQPQrTXkCM4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-114-St0AVwkaN22CXtFcv47h3g-1; Thu, 11 Jun 2020 03:29:52 -0400
+X-MC-Unique: St0AVwkaN22CXtFcv47h3g-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 783571009600;
+ Thu, 11 Jun 2020 07:29:51 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-113-50.ams2.redhat.com
+ [10.36.113.50])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3073E5C3E7;
+ Thu, 11 Jun 2020 07:29:31 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 0A4A39D57; Thu, 11 Jun 2020 09:29:20 +0200 (CEST)
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v8 09/10] acpi: drop build_piix4_pm()
+Date: Thu, 11 Jun 2020 09:29:18 +0200
+Message-Id: <20200611072919.16638-10-kraxel@redhat.com>
+In-Reply-To: <20200611072919.16638-1-kraxel@redhat.com>
+References: <20200611072919.16638-1-kraxel@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 03:29:33
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -105,124 +90,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: laurent@vivier.eu
+Cc: Laurent Vivier <lvivier@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>, John Snow <jsnow@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/11/20 7:58 AM, Thomas Huth wrote:
-> hw_error() dumps the CPU state and exits QEMU. This is ok during initial
-> code development (to see where the guest code is currently executing),
-> but it is certainly not the desired behavior that we want to present to
-> normal users, and it can also cause trouble when e.g. fuzzing devices.
-> Thus let's replace these hw_error()s by qemu_log_mask()s instead.
-> 
-> Signed-off-by: Thomas Huth <thuth@tuxfamily.org>
+The _SB.PCI0.PX13.P13C opregion (holds isa device enable bits)
+is not used any more, remove it from DSDT.
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Reviewed-by: Igor Mammedow <imammedo@redhat.com>
+---
+ hw/i386/acpi-build.c | 16 ----------------
+ 1 file changed, 16 deletions(-)
 
-> ---
->  hw/m68k/mcf5206.c | 39 ++++++++++++++++++++++++++++-----------
->  1 file changed, 28 insertions(+), 11 deletions(-)
-> 
-> diff --git a/hw/m68k/mcf5206.c b/hw/m68k/mcf5206.c
-> index a2fef04f8e..94a37a1a46 100644
-> --- a/hw/m68k/mcf5206.c
-> +++ b/hw/m68k/mcf5206.c
-> @@ -10,7 +10,6 @@
->  #include "qemu/error-report.h"
->  #include "qemu/log.h"
->  #include "cpu.h"
-> -#include "hw/hw.h"
->  #include "hw/irq.h"
->  #include "hw/m68k/mcf.h"
->  #include "qemu/timer.h"
-> @@ -69,10 +68,16 @@ static void m5206_timer_recalibrate(m5206_timer_state *s)
->      if (mode == 2)
->          prescale *= 16;
->  
-> -    if (mode == 3 || mode == 0)
-> -        hw_error("m5206_timer: mode %d not implemented\n", mode);
-> -    if ((s->tmr & TMR_FRR) == 0)
-> -        hw_error("m5206_timer: free running mode not implemented\n");
-> +    if (mode == 3 || mode == 0) {
-> +        qemu_log_mask(LOG_UNIMP, "m5206_timer: mode %d not implemented\n",
-> +                      mode);
-> +        goto exit;
-> +    }
-> +    if ((s->tmr & TMR_FRR) == 0) {
-> +        qemu_log_mask(LOG_UNIMP,
-> +                      "m5206_timer: free running mode not implemented\n");
-> +        goto exit;
-> +    }
->  
->      /* Assume 66MHz system clock.  */
->      ptimer_set_freq(s->timer, 66000000 / prescale);
-> @@ -391,7 +396,9 @@ static uint32_t m5206_mbar_readb(void *opaque, hwaddr offset)
->      m5206_mbar_state *s = (m5206_mbar_state *)opaque;
->      offset &= 0x3ff;
->      if (offset >= 0x200) {
-> -        hw_error("Bad MBAR read offset 0x%x", (int)offset);
-> +        qemu_log_mask(LOG_GUEST_ERROR, "Bad MBAR read offset 0x%" HWADDR_PRIX,
-> +                      offset);
-> +        return 0;
->      }
->      if (m5206_mbar_width[offset >> 2] > 1) {
->          uint16_t val;
-> @@ -410,7 +417,9 @@ static uint32_t m5206_mbar_readw(void *opaque, hwaddr offset)
->      int width;
->      offset &= 0x3ff;
->      if (offset >= 0x200) {
-> -        hw_error("Bad MBAR read offset 0x%x", (int)offset);
-> +        qemu_log_mask(LOG_GUEST_ERROR, "Bad MBAR read offset 0x%" HWADDR_PRIX,
-> +                      offset);
-> +        return 0;
->      }
->      width = m5206_mbar_width[offset >> 2];
->      if (width > 2) {
-> @@ -434,7 +443,9 @@ static uint32_t m5206_mbar_readl(void *opaque, hwaddr offset)
->      int width;
->      offset &= 0x3ff;
->      if (offset >= 0x200) {
-> -        hw_error("Bad MBAR read offset 0x%x", (int)offset);
-> +        qemu_log_mask(LOG_GUEST_ERROR, "Bad MBAR read offset 0x%" HWADDR_PRIX,
-> +                      offset);
-> +        return 0;
->      }
->      width = m5206_mbar_width[offset >> 2];
->      if (width < 4) {
-> @@ -458,7 +469,9 @@ static void m5206_mbar_writeb(void *opaque, hwaddr offset,
->      int width;
->      offset &= 0x3ff;
->      if (offset >= 0x200) {
-> -        hw_error("Bad MBAR write offset 0x%x", (int)offset);
-> +        qemu_log_mask(LOG_GUEST_ERROR, "Bad MBAR write offset 0x%" HWADDR_PRIX,
-> +                      offset);
-> +        return;
->      }
->      width = m5206_mbar_width[offset >> 2];
->      if (width > 1) {
-> @@ -482,7 +495,9 @@ static void m5206_mbar_writew(void *opaque, hwaddr offset,
->      int width;
->      offset &= 0x3ff;
->      if (offset >= 0x200) {
-> -        hw_error("Bad MBAR write offset 0x%x", (int)offset);
-> +        qemu_log_mask(LOG_GUEST_ERROR, "Bad MBAR write offset 0x%" HWADDR_PRIX,
-> +                      offset);
-> +        return;
->      }
->      width = m5206_mbar_width[offset >> 2];
->      if (width > 2) {
-> @@ -510,7 +525,9 @@ static void m5206_mbar_writel(void *opaque, hwaddr offset,
->      int width;
->      offset &= 0x3ff;
->      if (offset >= 0x200) {
-> -        hw_error("Bad MBAR write offset 0x%x", (int)offset);
-> +        qemu_log_mask(LOG_GUEST_ERROR, "Bad MBAR write offset 0x%" HWADDR_PRIX,
-> +                      offset);
-> +        return;
->      }
->      width = m5206_mbar_width[offset >> 2];
->      if (width < 4) {
-> 
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index 750fcf9baa37..02cf4199c2e9 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -1320,21 +1320,6 @@ static void build_q35_isa_bridge(Aml *table)
+     aml_append(table, scope);
+ }
+ 
+-static void build_piix4_pm(Aml *table)
+-{
+-    Aml *dev;
+-    Aml *scope;
+-
+-    scope =  aml_scope("_SB.PCI0");
+-    dev = aml_device("PX13");
+-    aml_append(dev, aml_name_decl("_ADR", aml_int(0x00010003)));
+-
+-    aml_append(dev, aml_operation_region("P13C", AML_PCI_CONFIG,
+-                                         aml_int(0x00), 0xff));
+-    aml_append(scope, dev);
+-    aml_append(table, scope);
+-}
+-
+ static void build_piix4_isa_bridge(Aml *table)
+ {
+     Aml *dev;
+@@ -1486,7 +1471,6 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+         aml_append(dsdt, sb_scope);
+ 
+         build_hpet_aml(dsdt);
+-        build_piix4_pm(dsdt);
+         build_piix4_isa_bridge(dsdt);
+         build_isa_devices_aml(dsdt);
+         build_piix4_pci_hotplug(dsdt);
+-- 
+2.18.4
+
 
