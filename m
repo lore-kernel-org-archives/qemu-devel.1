@@ -2,123 +2,96 @@ Return-Path: <SRS0=U615=7Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE100C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 14:38:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFE3BC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 14:43:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 88DDC2075F
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 14:38:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 79D44206C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 14:43:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="L7SXSBxL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88DDC2075F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bt/q1Btb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79D44206C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46306 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50404 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjOLM-0005kO-JC
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 10:38:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37650)
+	id 1jjOQW-0008OJ-LP
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 10:43:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39406)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jjOKL-0004j8-08; Thu, 11 Jun 2020 10:37:09 -0400
-Received: from mail-eopbgr70121.outbound.protection.outlook.com
- ([40.107.7.121]:11590 helo=EUR04-HE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jjOKI-0001w4-Od; Thu, 11 Jun 2020 10:37:07 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=aZSA+eDZOIWXl1EClRTknof1vW1r1lcv6fbN+OC6YNckG6hpUTZXzynZ5JDkbyBcqIsssz1NksOqJg1oBAApkCHMz8MRmHfYVu4FINKGXSoH6c6sdhj98Y6S+YXeJcwnHH7n3sfR8Yhrm+H/kvwwvLrgeSMbOnID3iYmTftUoZCqX/5XVuRM1Uixc9KBd0ZLviM8d3oHUaxJNkgkKa4t2qjan2PRyNVmczxpBEGr4692qFrnHw4izyydNpN6FfrHrYjJ6vlc88wjbHLafDEZSJhkS5s7RO6dXoxcduYWMslSgxtR0x6LXzkAzjFHcW9NnoRWVG+1h1It0mwHFg1k7w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rvT8cmqH004fMvnWFpUwzdQX3em1j5adDL1wcNxoPoE=;
- b=dU/R7YGF8FjuSXchGO1jPSMiccslISrfNl+FdUAQGvY+WD48wQsTNlqB5jHUAaxtO2AwIJMxpBQLO4R9GkaR2pXesSlW5Coxig0VUSzg05EnmthdeG3L8/10BevaeWqu48vmY6WpSNgvHnXZnMyK9/c+wi7c1qoyQurPz2wL856N3KWGYyz6Jm9dskW5Yng7WWHQqxeqmOjiL8d7CDEugHletyTv17gKLe4M4dEYVhYAUGnIlVuj7u5ssA6v74R0ZacbGJziIesU5tx7UwmTlBDZjEpZXBumfMyeAumXhGd1YJ1RTK3mLyRElLQUNlC4zP5lauwUhkpkxV76p4uQyQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rvT8cmqH004fMvnWFpUwzdQX3em1j5adDL1wcNxoPoE=;
- b=L7SXSBxL5QYwWjhoxPgg9VcNF+LVnk1GLBM6LEaqDbFeh5r3ZuwmkWpkv0PyF3NnjfSTggfkjBDd0TgsGGeg+zig/15V353EJ0L1DfAh260ER0CJkXbcrXhVqG761pARcN9tDO2OkQFBwLBF/VsFwyju88B5pizn3c1v9KCq9hE=
-Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM7PR08MB5301.eurprd08.prod.outlook.com (2603:10a6:20b:dd::14)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3088.21; Thu, 11 Jun
- 2020 14:37:03 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::a408:2f0f:bc6c:d312%3]) with mapi id 15.20.3088.022; Thu, 11 Jun 2020
- 14:37:03 +0000
-Subject: Re: [PATCH v3 1/4] spapr: Simplify some warning printing paths in
- spapr_caps.c
-To: Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
-References: <159188280345.70166.14940592691021389043.stgit@bahia.lan>
- <159188281098.70166.18387926536399257573.stgit@bahia.lan>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <6d81d0ab-5993-83ff-0344-23dd079f9e15@virtuozzo.com>
-Date: Thu, 11 Jun 2020 17:37:01 +0300
+ (Exim 4.90_1) (envelope-from <mprivozn@redhat.com>)
+ id 1jjOPb-0007pq-3E
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 10:42:35 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:35029
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mprivozn@redhat.com>)
+ id 1jjOPY-0003Q2-MA
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 10:42:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591886549;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=1Aj9yQ9oVDkmCnw6/U7oEkmz/bTO8fySLcwGI6Cf93Q=;
+ b=Bt/q1Btb5Mi8Rwgh99Z3zW+0R1XNzvp9vvHsW0fkZZZuORjVNQYvAwLtQbQNiMAeVhbOwR
+ eWb2XJfSCVsMUU3JsXMWDIWvGl/jSCe4dc/inux7/i+kW+prf5EvRI7GiS6icDk6sNKZTU
+ xkBM/VfJCQEBz3RhDMYFg24PTtFvakM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-315-S2sZ4g-MMiGjFUXmtMO4og-1; Thu, 11 Jun 2020 10:42:24 -0400
+X-MC-Unique: S2sZ4g-MMiGjFUXmtMO4og-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8DC2981CBE1;
+ Thu, 11 Jun 2020 14:42:23 +0000 (UTC)
+Received: from [10.40.193.30] (unknown [10.40.193.30])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4E3687E596;
+ Thu, 11 Jun 2020 14:42:22 +0000 (UTC)
+Subject: Re: [PATCH 3/3] numa: Initialize node initiator with respect to
+ .has_cpu
+To: Tao Xu <tao3.xu@intel.com>, Igor Mammedov <imammedo@redhat.com>
+References: <cover.1590753455.git.mprivozn@redhat.com>
+ <d3039c47e4ce1118bc7c4d4f51da6412c6669339.1590753455.git.mprivozn@redhat.com>
+ <20200529170948.5bdb3316@redhat.com>
+ <d6c8e7c5-62c5-5ac5-0941-d28867761014@redhat.com>
+ <4bde8796-7479-9fe0-20e4-6c173a865cec@intel.com>
+ <33014889-a70e-3d5d-3138-0e0f72553477@redhat.com>
+ <1b670edc-dd14-4e7e-34db-c1f2860297f0@intel.com>
+From: Michal Privoznik <mprivozn@redhat.com>
+Message-ID: <bb9d32bd-3273-542f-4451-2711cff481f3@redhat.com>
+Date: Thu, 11 Jun 2020 16:42:21 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.1
-In-Reply-To: <159188281098.70166.18387926536399257573.stgit@bahia.lan>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AM0P190CA0024.EURP190.PROD.OUTLOOK.COM
- (2603:10a6:208:190::34) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.2] (185.215.60.159) by
- AM0P190CA0024.EURP190.PROD.OUTLOOK.COM (2603:10a6:208:190::34) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3088.19 via Frontend Transport; Thu, 11 Jun 2020 14:37:03 +0000
-X-Originating-IP: [185.215.60.159]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 4bcaa285-7185-4b71-a3a9-08d80e14e86b
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5301:
-X-Microsoft-Antispam-PRVS: <AM7PR08MB5301796168F5B3EA36D44598C1800@AM7PR08MB5301.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:2803;
-X-Forefront-PRVS: 0431F981D8
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: lzMPdZPjryYg9xNGC4KYOJuovLAS01ZJGO3SzK4oOYw/AI4dwAUt3OFlUNQaEltf8j/ljqnDTd1FwC5PR/0LhBAnImBnL+UlM3NqWfvbEf8NfzFBI2SwAFoLby0zrX2vxY078ByaIq+/wMsptEVruR7gCa7dh3z4QXG5H/Y3f4KKl/wgpp0knYvO0WGZLyc0h1up5VbrbK2ChiPneAyS3w9ocDD3J+6nCssbques0Zw+qDNo4f/XMppO49t3S9UpgBijU6D6ktrBxbneilcA5NNKJ3lF/Lbb+nR8SxH167AVj6CUOtFx/v/CgRGY12/K5BAJwuB3t7B7HEPWMOvnb4xcG1bY3z4WA5qFPuSUxzd4iZh6OuRfgk+oqCbjuSoc
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(346002)(376002)(39840400004)(136003)(396003)(366004)(478600001)(26005)(186003)(8676002)(66476007)(66556008)(31686004)(36756003)(2906002)(2616005)(956004)(5660300002)(66946007)(52116002)(8936002)(16576012)(6486002)(110136005)(31696002)(4326008)(16526019)(316002)(4744005)(86362001)(83380400001)(54906003)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: xv0na6cwUBno9oUbnVIEwj1X4JhRAvM+OdR+06VDs3j4Y64tuNtw8Hg4OydOhXvw51KbcUEm7IR0rEBErxgbm6A/ot+3jd8KFhXA2c1AIDalRHhjXuRT9o44iGLF55SapmIWbBk3MQN48V72aJFKR//O329I1lxmF4lYwUPbcy4zd/c/UKBrNyQRfb5AzkWNbJPOL194dJLl+TQmSox0DmA9VthvJ+53DV19cKqbtppPm71YM0s6rDscAzBsmE1dz1xnsB8YQDjAAUdtAjJnemJrYBN7PMsbpp+PvVP0yZayPqjQwRxiDXe5k4evuLU2RBJvmuFIOAWA7YpfYV0oqijrwnYWRtPSxSXDbS1SrAjWoRYTRBhZeN61/dupgvf4jT5UY0ijvqZHlKEcIWRpJ39vLVBBy2vM+GWo2puM9I+0iYhF1cuBd4SZYVVC+I32/U9jrCjKdnozWPGtwqPQqWJPZi14R7i925heTBpafBpkc6RcAA3pREBSfum3y3cZ
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4bcaa285-7185-4b71-a3a9-08d80e14e86b
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jun 2020 14:37:03.6210 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: MItQ/3ITWoTRa+F6Cka44vefgc6SKb0zO9kU9gt11oUOC/v955Qm94vFEZA3i5etrTIuBOFe0449PDM9G0lEHnde23yORW17Dtw24Kt/cnc=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5301
-Received-SPF: pass client-ip=40.107.7.121;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR04-HE1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 10:37:04
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -37
-X-Spam_score: -3.8
+In-Reply-To: <1b670edc-dd14-4e7e-34db-c1f2860297f0@intel.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=mprivozn@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 03:29:33
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
 X-Spam_bar: ---
-X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -131,21 +104,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
+Cc: "Liu, Jingqi" <jingqi.liu@intel.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "ehabkost@redhat.com" <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-11.06.2020 16:40, Greg Kurz wrote:
-> We obviously only want to print a warning in these cases, but this is done
-> in a rather convoluted manner. Just use warn_report() instead.
+On 6/5/20 3:52 AM, Tao Xu wrote:
+> On 6/3/20 5:16 PM, Michal Privoznik wrote:
+>> On 6/2/20 10:00 AM, Tao Xu wrote:
+>>>
+>>> On 6/1/2020 4:10 PM, Michal Privoznik wrote:
+>>>> On 5/29/20 5:09 PM, Igor Mammedov wrote:
+>>>>> On Fri, 29 May 2020 15:33:48 +0200
+>>>>> Michal Privoznik <mprivozn@redhat.com> wrote:
+>>>>>
+>>>>>> The initiator attribute of a NUMA node is documented as the 'NUMA
+>>>>>> node that has best performance to given NUMA node'. If a NUMA
+>>>>>> node has at least one CPU there can hardly be a different node
+>>>>>> with better performace and thus all NUMA nodes which have a CPU
+>>>>>> are initiators to themselves. Reflect this fact when initializing
+>>>>>> the attribute.
+>>>>>
+>>>>> It is not true in case of the node is memory-less
+>>>>
+>>>> Are you saying that if there's a memory-less NUMA node, then it 
+>>>> needs to
+>>>> have initiator set too? Asking mostly out of curiosity because we don't
+>>>> allow memory-less NUMA nodes in Libvirt just yet. Nor cpu-less, but my
+>>>> patches that I'm referring to in cover letter will allow at least
+>>>> cpu-less nodes. Should I allow both?
+>>> QEMU now is not support memory-less NUMA node, but in hardware may be
+>>> supported. So we reserve this type of NUMA node for future usage. And
+>>> QEMU now can support cpu-less NUMA node, for emulating some "slow"
+>>> memory(like some NVDIMM).
+>>
+>> Oh yeah, I understand that. But it doesn't explain why initiator needs
+>> to be specified for NUMA nodes with cpus and memory, or does it? Maybe
+>> I'm still misunderstanding what the initiator is.
+>>
 > 
-> Signed-off-by: Greg Kurz<groug@kaod.org>
+> Yes, the initiator NUMA nodes with cpus and memory should be itself. In 
+> ACPI 6.3 spec, initiator is defined as:
+> 
+> This field is valid only if the memory controller
+> responsible for satisfying the access to memory
+> belonging to the specified memory proximity
+> domain is directly attached to an initiator that
+> belongs to a proximity domain. In that case, this
+> field contains the integer that represents the
+> proximity domain to which the initiator (Generic
+> Initiator or Processor) belongs. This number shall
+> match the corresponding entry in the SRAT table’s
+> processor affinity structure (e.g., Processor Local
+> APIC/SAPIC Affinity Structure, Processor Local
+> x2APIC Affinity Structure, GICC Affinity Structure) if
+> the initiator is a processor, or the Generic Initiator
+> Affinity Structure if the initator is a generic
+> initiator.
+> Note: this field provides additional information as
+> to the initiator node that is closest (as in directly
+> attached) to the memory address ranges within
+> the specified memory proximity domain, and
+> therefore should provide the best performance.
+> 
+> And if in the future, there is a memory-less NUMA node. Because in HMAT 
+> we describe "Memory" Proximity Domain Attributes Structure, I think we 
+> should not add memory-less NUMA node into HMAT.
 
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Then I guess something else must be broken. Because as reported here [1] 
+if I configure two numa nodes, both with two vCPUs and set initiators of 
+each node to itselfs I get the following error message:
 
--- 
-Best regards,
-Vladimir
+qemu-system-x86_64: -numa 
+node,nodeid=1,cpus=2-3,initiator=1,memdev=ram-node1: The initiator of 
+CPU NUMA node 1 should be itself
+
+Funny about this error message is how contradictory it is. The cmd line 
+showed in the error shows the initiator of the node 1 is indeed node 1.
+
+1: https://lists.nongnu.org/archive/html/qemu-devel/2020-06/msg00071.html
+
+Michal
+
 
