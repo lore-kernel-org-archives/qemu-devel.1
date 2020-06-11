@@ -2,90 +2,88 @@ Return-Path: <SRS0=U615=7Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3864FC433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 18:37:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E216C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 18:53:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0888F207ED
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 18:37:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CD8B8206DC
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 18:53:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kX2uWo0O"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0888F207ED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F+0vR9oY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD8B8206DC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50876 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38256 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjS4u-00027F-9C
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 14:37:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44046)
+	id 1jjSKV-000490-W8
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 14:53:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52182)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jjS4E-0001LN-DR
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 14:36:46 -0400
-Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:34545)
- by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jjS4A-0002Hv-6e
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 14:36:46 -0400
-Received: by mail-wm1-x335.google.com with SMTP id u26so7530890wmn.1
- for <qemu-devel@nongnu.org>; Thu, 11 Jun 2020 11:36:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=C4lGZTOfBAmv5NvbaIoThipkj369sRzWPqjyESkqsLc=;
- b=kX2uWo0OjNYJhBmdOh5hZM4lz44oipHHSe1xCfqrp2n0XVaVT/aBP8n4QnZfsEeivH
- PNCOD7XD1CWEaM7LQwVpseRzZFYegv4Kg2RNcys0wILCHnjz0tvAD1IPw8mEiZV9TbM0
- dpCivZtI5TNVLH730ZfKp1gZZWlXbmddLeL18oVz/U65f5AmUA5aJJbdwR41yjmtCKKo
- SuzArRR0BkyYEq5L6qYyQNHY6nym1NY1DMg/NXYHUU89HgkWTsxOgaK+zWfjdcHtPWr6
- rZrz+M7e8DsUSWeWDgHdPmO5sPiuDKWfOQo+7V6v5qfK0zsxHhEkEt/gqaGYhk/c9hDU
- Az0A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=C4lGZTOfBAmv5NvbaIoThipkj369sRzWPqjyESkqsLc=;
- b=P7Wg1JuyKVI07i4U+qHfAdAZnAd/F+P4APah74hkGrrrXpzjexISO1ZVzII5XPI9lE
- Y2bwD8gfcETsNKHmR63aLIFdx0FKelR+jN7odTsyhu75FD9ph6KzR2cbRQT694XvcGbM
- fhVsY9iCzPB5NmLCCP2iVw19EJ4cjavVGNcniHIHxowrYLMRCk9spUsJrHKMlHiUuUWp
- tc7/rIfKT6YaiVOdU/jNPmrvvH8nCjtc0GqBhBxpFuuTHWByB3TfbnyjNlT44w7Wah4v
- cpgZZIi2TQ4GdDC1BjedKnpPS/u7rwv6uTg+YUnWadj+J1balH32SBju5rYmCqhPyjBY
- lArw==
-X-Gm-Message-State: AOAM533JQEQWmt+MSttKYgnAGHdftakYSCCtPZkImTcSmK5ztEII/r/e
- ZIJrNteN7I+GIHXCFcGZfIbmnwlKxbSDqsFcx/k=
-X-Google-Smtp-Source: ABdhPJwOdximraw+dbqGzq4Hy8hlo0eRWJNexxJ6Hpa6m1BkpwUc02fCs63o5ZiKrV/EcA0Y87nWkIiFB3A+4FCMfeQ=
-X-Received: by 2002:a1c:4c05:: with SMTP id z5mr9017664wmf.129.1591900594877; 
- Thu, 11 Jun 2020 11:36:34 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jjSJD-0002bV-NI
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 14:52:16 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:50453
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jjSJA-0005To-43
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 14:52:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591901530;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=Hi/hupA3QJDP1QW6qWiYTsGLdM4MOK2OL5CiHvFRMYI=;
+ b=F+0vR9oYusV2vUcXYAe/bvqS5lbOKTGIhisgZeH5eKGPB3rGid5ZBJemxdNX0IQJnMFgvU
+ 05Pa3qjKGW/mpYDDvwceE0N2zNiefQ/gEK4C/twUMOee5KA5PBTNR/bRnKBJPbl2jGAeGX
+ nbgGB0X/H39vppe5vC69VQbKfi4GJQg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-502-SLhAMKx2MM6wztqhC-aiTQ-1; Thu, 11 Jun 2020 14:52:08 -0400
+X-MC-Unique: SLhAMKx2MM6wztqhC-aiTQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4DC40100CCC8;
+ Thu, 11 Jun 2020 18:52:07 +0000 (UTC)
+Received: from work-vm (ovpn-114-116.ams2.redhat.com [10.36.114.116])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B4CED1A8EA;
+ Thu, 11 Jun 2020 18:52:05 +0000 (UTC)
+Date: Thu, 11 Jun 2020 19:52:03 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
+Subject: Re: [PATCH 5/9] monitor/hmp-cmds: delete redundant Error check
+ before invoke hmp_handle_error()
+Message-ID: <20200611185203.GA2969@work-vm>
+References: <20200603080904.997083-1-maozhongyi@cmss.chinamobile.com>
+ <20200603080904.997083-6-maozhongyi@cmss.chinamobile.com>
 MIME-Version: 1.0
-References: <1591015405-19651-1-git-send-email-aleksandar.qemu.devel@gmail.com>
- <1591015405-19651-5-git-send-email-aleksandar.qemu.devel@gmail.com>
- <87h7vi3p9h.fsf@linaro.org>
-In-Reply-To: <87h7vi3p9h.fsf@linaro.org>
-From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Date: Thu, 11 Jun 2020 20:36:21 +0200
-Message-ID: <CAHiYmc6GuADCpWU4UgqnR1mCkRo=n4GafRU_TQYc8oJ7cVMs_Q@mail.gmail.com>
-Subject: Re: [PULL 4/6] target/mips: Add more CP0 register for save/restore
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::335;
- envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wm1-x335.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200603080904.997083-6-maozhongyi@cmss.chinamobile.com>
+User-Agent: Mutt/1.14.0 (2020-05-02)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 14:52:10
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,169 +96,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-=D1=87=D0=B5=D1=82, 11. =D1=98=D1=83=D0=BD 2020. =D1=83 11:50 Alex Benn=C3=
-=A9e <alex.bennee@linaro.org> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=
-=D0=B0=D0=BE/=D0=BB=D0=B0:
->
->
-> Aleksandar Markovic <aleksandar.qemu.devel@gmail.com> writes:
->
-> > From: Huacai Chen <zltjiangshi@gmail.com>
-> >
-> > Add more CP0 register for save/restore, including: EBase, XContext,
-> > PageGrain, PWBase, PWSize, PWField, PWCtl, Config*, KScratch1~KScratch6=
-.
-> >
-> > Signed-off-by: Huacai Chen <chenhc@lemote.com>
-> > Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
-> > Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-> > Signed-off-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-> > Message-Id: <1588501221-1205-6-git-send-email-chenhc@lemote.com>
->
-> It seems while our mips cross build has been broken this commit has
-> caused a build regression:
->
+* Mao Zhongyi (maozhongyi@cmss.chinamobile.com) wrote:
+> hmp_handle_error() does Error check internally.
+> 
+> Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
 
-Alex, this problem should disappear now, since a commit that is
-supposed to fix it is upstreamed this afternoon.
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-From my side, I will expand my test bed for similar cases that require
-more thorough attention.
+> ---
+>  monitor/hmp-cmds.c | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
+> 
+> diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
+> index 6938f1060e..acdd6baff3 100644
+> --- a/monitor/hmp-cmds.c
+> +++ b/monitor/hmp-cmds.c
+> @@ -1636,9 +1636,8 @@ void hmp_object_add(Monitor *mon, const QDict *qdict)
+>      obj = user_creatable_add_opts(opts, &err);
+>      qemu_opts_del(opts);
+>  
+> -    if (err) {
+> -        hmp_handle_error(mon, err);
+> -    }
+> +    hmp_handle_error(mon, err);
+> +
+>      if (obj) {
+>          object_unref(obj);
+>      }
+> -- 
+> 2.17.1
+> 
+> 
+> 
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
-Could you just please confirm or disconfirm that your scenario does
-not have this problem anymore?
-
-Thanks,
-Aleksandar
-
->   make docker-test-build@debian-mips-cross J=3D30
->
-> Results in:
->
->   /tmp/qemu-test/src/target/mips/kvm.c: In function 'kvm_mips_put_cp0_reg=
-isters':
->   /tmp/qemu-test/src/target/mips/kvm.c:412:49: error: 'CP0C6_BPPASS' unde=
-clared (first use in this function); did you mean 'CP0C3_LPA'?
->    #define KVM_REG_MIPS_CP0_CONFIG6_MASK   ((1U << CP0C6_BPPASS) | \
->                                                    ^~~~~~~~~~~~
->   /tmp/qemu-test/src/target/mips/kvm.c:923:35: note: in expansion of macr=
-o 'KVM_REG_MIPS_CP0_CONFIG6_MASK'
->                                      KVM_REG_MIPS_CP0_CONFIG6_MASK);
->                                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->   /tmp/qemu-test/src/target/mips/kvm.c:412:49: note: each undeclared iden=
-tifier is reported only once for each function it appears in
->    #define KVM_REG_MIPS_CP0_CONFIG6_MASK   ((1U << CP0C6_BPPASS) | \
->                                                    ^~~~~~~~~~~~
->   /tmp/qemu-test/src/target/mips/kvm.c:923:35: note: in expansion of macr=
-o 'KVM_REG_MIPS_CP0_CONFIG6_MASK'
->                                      KVM_REG_MIPS_CP0_CONFIG6_MASK);
->                                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->   /tmp/qemu-test/src/target/mips/kvm.c:413:52: error: 'CP0C6_KPOS' undecl=
-ared (first use in this function); did you mean 'CP0C3_IPLV'?
->                                             (0x3fU << CP0C6_KPOS) | \
->                                                       ^~~~~~~~~~
->   /tmp/qemu-test/src/target/mips/kvm.c:923:35: note: in expansion of macr=
-o 'KVM_REG_MIPS_CP0_CONFIG6_MASK'
->                                      KVM_REG_MIPS_CP0_CONFIG6_MASK);
->                                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->   /tmp/qemu-test/src/target/mips/kvm.c:414:49: error: 'CP0C6_KE' undeclar=
-ed (first use in this function); did you mean 'CP0C4_AE'?
->                                             (1U << CP0C6_KE) | \
->                                                    ^~~~~~~~
->   /tmp/qemu-test/src/target/mips/kvm.c:923:35: note: in expansion of macr=
-o 'KVM_REG_MIPS_CP0_CONFIG6_MASK'
->                                      KVM_REG_MIPS_CP0_CONFIG6_MASK);
->
->
-> > ---
-> >  target/mips/kvm.c     | 212 ++++++++++++++++++++++++++++++++++++++++++=
-++++++++
-> >  target/mips/machine.c |   6 +-
-> >  2 files changed, 216 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/target/mips/kvm.c b/target/mips/kvm.c
-> > index de3e26e..96cfa10 100644
-> > --- a/target/mips/kvm.c
-> > +++ b/target/mips/kvm.c
-> > @@ -245,10 +245,16 @@ int kvm_mips_set_ipi_interrupt(MIPSCPU *cpu, int =
-irq, int level)
-> >      (KVM_REG_MIPS_CP0 | KVM_REG_SIZE_U64 | (8 * (_R) + (_S)))
-> >
-> >  #define KVM_REG_MIPS_CP0_INDEX          MIPS_CP0_32(0, 0)
-> > +#define KVM_REG_MIPS_CP0_RANDOM         MIPS_CP0_32(1, 0)
-> >  #define KVM_REG_MIPS_CP0_CONTEXT        MIPS_CP0_64(4, 0)
-> >  #define KVM_REG_MIPS_CP0_USERLOCAL      MIPS_CP0_64(4, 2)
-> >  #define KVM_REG_MIPS_CP0_PAGEMASK       MIPS_CP0_32(5, 0)
-> > +#define KVM_REG_MIPS_CP0_PAGEGRAIN      MIPS_CP0_32(5, 1)
-> > +#define KVM_REG_MIPS_CP0_PWBASE         MIPS_CP0_64(5, 5)
-> > +#define KVM_REG_MIPS_CP0_PWFIELD        MIPS_CP0_64(5, 6)
-> > +#define KVM_REG_MIPS_CP0_PWSIZE         MIPS_CP0_64(5, 7)
-> >  #define KVM_REG_MIPS_CP0_WIRED          MIPS_CP0_32(6, 0)
-> > +#define KVM_REG_MIPS_CP0_PWCTL          MIPS_CP0_32(6, 6)
-> >  #define KVM_REG_MIPS_CP0_HWRENA         MIPS_CP0_32(7, 0)
-> >  #define KVM_REG_MIPS_CP0_BADVADDR       MIPS_CP0_64(8, 0)
-> >  #define KVM_REG_MIPS_CP0_COUNT          MIPS_CP0_32(9, 0)
-> > @@ -258,13 +264,22 @@ int kvm_mips_set_ipi_interrupt(MIPSCPU *cpu, int =
-irq, int level)
-> >  #define KVM_REG_MIPS_CP0_CAUSE          MIPS_CP0_32(13, 0)
-> >  #define KVM_REG_MIPS_CP0_EPC            MIPS_CP0_64(14, 0)
-> >  #define KVM_REG_MIPS_CP0_PRID           MIPS_CP0_32(15, 0)
-> > +#define KVM_REG_MIPS_CP0_EBASE          MIPS_CP0_64(15, 1)
-> >  #define KVM_REG_MIPS_CP0_CONFIG         MIPS_CP0_32(16, 0)
-> >  #define KVM_REG_MIPS_CP0_CONFIG1        MIPS_CP0_32(16, 1)
-> >  #define KVM_REG_MIPS_CP0_CONFIG2        MIPS_CP0_32(16, 2)
-> >  #define KVM_REG_MIPS_CP0_CONFIG3        MIPS_CP0_32(16, 3)
-> >  #define KVM_REG_MIPS_CP0_CONFIG4        MIPS_CP0_32(16, 4)
-> >  #define KVM_REG_MIPS_CP0_CONFIG5        MIPS_CP0_32(16, 5)
-> > +#define KVM_REG_MIPS_CP0_CONFIG6        MIPS_CP0_32(16, 6)
-> > +#define KVM_REG_MIPS_CP0_XCONTEXT       MIPS_CP0_64(20, 0)
-> >  #define KVM_REG_MIPS_CP0_ERROREPC       MIPS_CP0_64(30, 0)
-> > +#define KVM_REG_MIPS_CP0_KSCRATCH1      MIPS_CP0_64(31, 2)
-> > +#define KVM_REG_MIPS_CP0_KSCRATCH2      MIPS_CP0_64(31, 3)
-> > +#define KVM_REG_MIPS_CP0_KSCRATCH3      MIPS_CP0_64(31, 4)
-> > +#define KVM_REG_MIPS_CP0_KSCRATCH4      MIPS_CP0_64(31, 5)
-> > +#define KVM_REG_MIPS_CP0_KSCRATCH5      MIPS_CP0_64(31, 6)
-> > +#define KVM_REG_MIPS_CP0_KSCRATCH6      MIPS_CP0_64(31, 7)
-> >
-> >  static inline int kvm_mips_put_one_reg(CPUState *cs, uint64_t reg_id,
-> >                                         int32_t *addr)
-> > @@ -394,6 +409,29 @@ static inline int kvm_mips_get_one_ureg64(CPUState=
- *cs, uint64_t reg_id,
-> >                                           (1U << CP0C5_UFE) | \
-> >                                           (1U << CP0C5_FRE) | \
-> >                                           (1U << CP0C5_UFR))
-> > +#define KVM_REG_MIPS_CP0_CONFIG6_MASK   ((1U << CP0C6_BPPASS) | \
-> > +                                         (0x3fU << CP0C6_KPOS) | \
-> > +                                         (1U << CP0C6_KE) | \
-> > +                                         (1U << CP0C6_VTLBONLY) | \
-> > +                                         (1U << CP0C6_LASX) | \
-> > +                                         (1U << CP0C6_SSEN) | \
-> > +                                         (1U << CP0C6_DISDRTIME) | \
-> > +                                         (1U << CP0C6_PIXNUEN) | \
-> > +                                         (1U << CP0C6_SCRAND) | \
-> > +                                         (1U << CP0C6_LLEXCEN) | \
-> > +                                         (1U << CP0C6_DISVC) | \
-> > +                                         (1U << CP0C6_VCLRU) | \
-> > +                                         (1U << CP0C6_DCLRU) | \
-> > +                                         (1U << CP0C6_PIXUEN) | \
-> > +                                         (1U << CP0C6_DISBLKLYEN) | \
-> > +                                         (1U << CP0C6_UMEMUALEN) | \
-> > +                                         (1U << CP0C6_SFBEN) | \
-> > +                                         (1U << CP0C6_FLTINT) | \
-> > +                                         (1U << CP0C6_VLTINT) | \
-> > +                                         (1U << CP0C6_DISBTB) | \
-> > +                                         (3U << CP0C6_STPREFCTL) | \
-> > +                                         (1U << CP0C6_INSTPREF) | \
-> > +                                         (1U << CP0C6_DATAPREF))
->
-> It seems a lot of the defines here aren't in this commit. Was one missed?
->
-> --
-> Alex Benn=C3=A9e
 
