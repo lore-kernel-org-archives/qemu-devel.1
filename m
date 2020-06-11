@@ -2,99 +2,92 @@ Return-Path: <SRS0=U615=7Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8890C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 13:46:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9508DC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 13:47:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 40B69206C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 13:46:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5E90B206C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 13:47:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BNXpl6sJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40B69206C3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="E1mqLbA2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E90B206C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43180 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46106 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjNXS-0003aL-F3
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 09:46:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46870)
+	id 1jjNYS-0004n0-E8
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 09:47:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45606)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jjNW8-0002fU-AV
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 09:45:16 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:37941)
+ (Exim 4.90_1) (envelope-from <sameid@google.com>) id 1jjNT9-0007eC-Vm
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 09:42:12 -0400
+Received: from mail-qk1-x736.google.com ([2607:f8b0:4864:20::736]:40605)
  by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jjNW6-0006xM-Cy
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 09:45:15 -0400
-Received: by mail-wr1-x443.google.com with SMTP id e1so6234118wrt.5
- for <qemu-devel@nongnu.org>; Thu, 11 Jun 2020 06:45:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=m3ezYcTQLQbFJ6sNQOTr3+Lvv/VGMb52JK09a+QAxDU=;
- b=BNXpl6sJHJhxAqJge1icpnvGxBy6BAVPNPxi9pFZGhk5rr6dGoEnvZb5xTSWgFvfDC
- Qg0IX+KIEMwZ2AySfGLS68Gtfq1hIWw0a0Se82VqT30IuwcpO0nyV259SqfPvnLcZHEk
- zCiDkjIApzYcHWKCilA7rtXOxEmlhJG1uGNqMc/0V7J171JCwIPLDlTiO1iI4ubc/0ma
- Suf80Kf/aBbOhABLcOqL3yTjBMfhbYrGgPR6fHZ8T1HVW2tZQ3RzL513xJnRVWKMUG9J
- fsqwnqLUIKLld8Xw1V6Mw271tugNEjCBgyR/s7hq2K11dICKkpMPwsEdJXDoAm3zo785
- 1L/Q==
+ (Exim 4.90_1) (envelope-from <sameid@google.com>) id 1jjNT7-0006Gs-Hv
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 09:42:11 -0400
+Received: by mail-qk1-x736.google.com with SMTP id c185so5556225qke.7
+ for <qemu-devel@nongnu.org>; Thu, 11 Jun 2020 06:42:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=cJHbUePUtX0gR4rRzB4TOAY6qOeaSy9xql/JyZDP9PQ=;
+ b=E1mqLbA2BuHJQdAgiCYgTrWEE/F5W77YWYwuNyEEc5oK50u5uxepi7q3vTlP1C2+Ku
+ llMdYz0jFUZEINp3uMdJEOo4ODLm/h7YUotrKBhzorlW+Ue817Ou90+aCa/XhQ5TB9te
+ 7X1pKlKu3n7UgPGh6u6rmY3lxCTYUdY8+Gt3pyLD1wwFRUJhuGG/qnHeko6n7YCKM6vE
+ XdVGfWqCgZKWR2oufCMjOWpBOi5EjpEQLd0lYoJ+eRmfKLmi6f08psLwymipbm2M95T2
+ ZXvy+5me4Y5NwQfxjzq91SaOw6B3Os99wCeHd1rGDINozXeAQLvT+NuM84qC94HTdKne
+ +7iw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=m3ezYcTQLQbFJ6sNQOTr3+Lvv/VGMb52JK09a+QAxDU=;
- b=TQQ0nY7VrYrf2OecLfF3yuX0dLWeWLwcSIk0cexmOpeGyg+oZ+x42V2eLGeYmryZIs
- RnZPMTbwRrlxCoRyxqAJ6Cn/EODXH1qvOsB1c7sMrmh4r0Op/Chr5rp5gCi4RqzoYvBa
- UYMfnpauZPNhtHoIc63DgI/Ep4LS16vMOI9Bt5sfc8sEuG+ymnkC+hruIXp8r/+u7g1V
- 7LWLfuA/U3ChIDkM5zEsr1I/vtQJsfjOR2/VQ800L5LS1rQWFcL6V+u12zzmjPfuFo0B
- KvLeUdAcfHIe0PttNNy4qiXWt8lbiJtuY6cCjzwiqJJJB4I/kK03gjFZELH0+Rg7GhEz
- +hgg==
-X-Gm-Message-State: AOAM533Ezy9QYPe9s0Jhsr95CrBgOMYbnbcqOuFsLShWCtHtckIf8VoM
- Q97ztUez68niejZvkwkVgEI=
-X-Google-Smtp-Source: ABdhPJyfdJeWwK41UUjRZhnyufROWNdSIsaQp/zqaYB19Ud/woTVvM6Xq2NI2nhrcYmZGZdUfRZS0A==
-X-Received: by 2002:adf:a34d:: with SMTP id d13mr9274187wrb.270.1591883107065; 
- Thu, 11 Jun 2020 06:45:07 -0700 (PDT)
-Received: from [192.168.1.38] (181.red-88-10-103.dynamicip.rima-tde.net.
- [88.10.103.181])
- by smtp.gmail.com with ESMTPSA id x8sm5308435wrs.43.2020.06.11.06.45.05
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 11 Jun 2020 06:45:06 -0700 (PDT)
-Subject: Re: [PULL 00/16] SPARC patches for 2020-06-09
-To: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-References: <20200609073214.14079-1-f4bug@amsat.org>
- <da5851a4-953b-8915-7bc8-37c20a23805f@ilande.co.uk>
- <c2cfa843-ca76-8aa7-7b74-1ad261222c3e@amsat.org>
- <CAHiYmc5_9HY-RtKuMfqrU-Lwu0zA3xEwBJUH+01PpzDNaZ2vcw@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <9c192dce-ca0d-182e-9f64-a7cdc2477695@amsat.org>
-Date: Thu, 11 Jun 2020 15:45:05 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=cJHbUePUtX0gR4rRzB4TOAY6qOeaSy9xql/JyZDP9PQ=;
+ b=UEnhcLrCSpbuLgatJHD/Sy37635OxGBkE8oHqES7jP3Xml23s5qjPAVaxBi7RinSF0
+ pjyNrqye9xO6NCNivv10F/690LJP/VewcLqwrJqz9X4w0b3cA58OPbk+/TOEpdLh0YdV
+ aUpkw3b/wO0EJIqdavkvMQjrCSQ/irQqCI4GYrurknc5LlYgkZWvAespWsiiLLL/ivax
+ 33gz0TSJSfs/PQ2a/cNfropbQm8naMNDQn1Z7Fvf+yNFEhIkUqhurOyXY7lK7bVXCyv8
+ w7XAgrVb2vpekfLu10Wh56OM6+h71efAnjcMJvJ8ramiZvEJ+BGTHhYUdVpmZKYQnpVj
+ kkDg==
+X-Gm-Message-State: AOAM531mzqru4D4q+oME7iUsup4bvI++Pezlcz5l7NG6NAJxhScDSlUE
+ haw772Uxmb6tddmLEZOuRr7lJAmz9VnXBe7FFAhqNw==
+X-Google-Smtp-Source: ABdhPJyBUC6VsPERSvKcMYZaydfB0AvS4bQ12Y90Shi3mN7bzWs1NZCwKuyet9T5/zx1z7gWB11lXt/0IVpFM2lxf0M=
+X-Received: by 2002:a37:b501:: with SMTP id e1mr8261653qkf.269.1591882921558; 
+ Thu, 11 Jun 2020 06:42:01 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAHiYmc5_9HY-RtKuMfqrU-Lwu0zA3xEwBJUH+01PpzDNaZ2vcw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
+References: <CAFr6bU=LjeW5_eGtwL38cher2TM52skohuANNXN9EpO+mA-z8Q@mail.gmail.com>
+ <m2imfz877v.fsf@dme.org>
+ <CAFr6bUk5LrEL8BPXYkNOqj_jsbxHBfbj_NYryUjszMtG89L+2w@mail.gmail.com>
+ <20200610140620.GE6947@linux.fritz.box>
+ <CAFr6bU=aD=AXnoR-qSdQtQC690FYFqFsDRHHGxdUDkTh2ho1cA@mail.gmail.com>
+ <20200610163122.GF6947@linux.fritz.box>
+In-Reply-To: <20200610163122.GF6947@linux.fritz.box>
+From: Sam Eiderman <sameid@google.com>
+Date: Thu, 11 Jun 2020 16:41:50 +0300
+Message-ID: <CAFr6bUnNF=Ria7owVKgZbmATJi3jy04RaiOPKjrbYQi5qNoZnA@mail.gmail.com>
+Subject: Re: Clarification regarding new qemu-img convert --target-is-zero flag
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: David Edmondson <dme@dme.org>, qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, eblake@redhat.com,
+ Max Reitz <mreitz@redhat.com>, Tony Zhang <tzz@google.com>
+Content-Type: multipart/alternative; boundary="00000000000010a79405a7cf2007"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::736;
+ envelope-from=sameid@google.com; helo=mail-qk1-x736.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_score_int: -185
+X-Spam_score: -18.6
+X-Spam_bar: ------------------
+X-Spam_report: (-18.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ ENV_AND_HDR_SPF_MATCH=-0.5, HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, USER_IN_DEF_DKIM_WL=-7.5,
+ USER_IN_DEF_SPF_WL=-7.5 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,151 +100,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Fabien Chouteau <chouteau@adacore.com>,
- KONRAD Frederic <frederic.konrad@adacore.com>,
- Aurelien Jarno <aurelien@aurel32.net>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Artyom Tarasenko <atar4qemu@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/11/20 3:35 PM, Aleksandar Markovic wrote:
-> чет, 11. јун 2020. у 15:30 Philippe Mathieu-Daudé <f4bug@amsat.org> је
-> написао/ла:
->>
->> On 6/9/20 10:55 PM, Mark Cave-Ayland wrote:
->>> On 09/06/2020 08:31, Philippe Mathieu-Daudé wrote:
->>>
->>>> Hi Peter,
->>>>
->>>> These are the latest SPARC patches sent to the list.
->>>>
->>>> This pull request is with authorization of Artyom and Mark:
->>>> - https://www.mail-archive.com/qemu-devel@nongnu.org/msg710154.html
->>>> - https://www.mail-archive.com/qemu-devel@nongnu.org/msg710156.html
->>>>
->>>> Frederic doesn't have his GPG key signed:
->>>> - https://www.mail-archive.com/qemu-devel@nongnu.org/msg706509.html
->>>>
->>>> The following changes since commit 49ee11555262a256afec592dfed7c5902d5eefd2:
->>>>
->>>>   Merge remote-tracking branch 'remotes/vivier2/tags/linux-user-for-5.1-pull-=
->>>> request' into staging (2020-06-08 11:04:57 +0100)
->>>>
->>>> are available in the Git repository at:
->>>>
->>>>   https://gitlab.com/philmd/qemu.git tags/sparc-next-20200609
->>>>
->>>> for you to fetch changes up to 86e8c353f705f14f2f2fd7a6195cefa431aa24d9:
->>>>
->>>>   target/sparc/int32_helper: Extract and use excp_name_str() (2020-06-09 09:2=
->>>> 1:10 +0200)
->>>>
->>>> ----------------------------------------------------------------
->>>> SPARC patches
->>>>
->>>> HW:
->>>> - Use UNIMP device instead of EMPTY_SLOT
->>>> - Make EMPTY_SLOT similar to UNIMP device
->>>> - Map UART devices unconditionally
->>>> - Pair of fixes for AHB PnP
->>>> - Add trace events to AHB PnP
->>>>
->>>> TCG:
->>>> - Improve exception logging
->>>>
->>>> CI:
->>>> - https://gitlab.com/philmd/qemu/-/pipelines/154231191
->>>> - https://travis-ci.org/github/philmd/qemu/builds/696321130
->>>>
->>>> ----------------------------------------------------------------
->>>>
->>>> Philippe Mathieu-Daud=C3=A9 (16):
->>>>   hw/sparc/sun4m: Use UnimplementedDevice for I/O devices
->>>>   hw/misc/empty_slot: Lower address space priority
->>>>   hw/misc/empty_slot: Convert 'size' field as qdev property
->>>>   hw/misc/empty_slot: Add a 'name' qdev property
->>>>   hw/misc/empty_slot: Convert debug printf() to trace event
->>>>   hw/misc/empty_slot: Move the 'hw/misc' and cover in MAINTAINERS
->>>>   hw/misc/empty_slot: Name the slots when created
->>>>   hw/sparc/leon3: Map the UART device unconditionally
->>>>   hw/sparc64/niagara: Map the UART device unconditionally
->>>>   hw/sparc64/niagara: Remove duplicated NIAGARA_UART_BASE definition
->>>>   hw/misc/grlib_ahb_apb_pnp: Avoid crash when writing to AHB PnP
->>>>     registers
->>>>   hw/misc/grlib_ahb_apb_pnp: Fix AHB PnP 8-bit accesses
->>>>   hw/misc/grlib_ahb_apb_pnp: Add trace events on read accesses
->>>>   hw/timer/grlib_gptimer: Display frequency in decimal
->>>>   target/sparc/int32_helper: Remove DEBUG_PCALL definition
->>>>   target/sparc/int32_helper: Extract and use excp_name_str()
->>>>
->>>>  include/hw/empty_slot.h        |  9 -------
->>>>  include/hw/misc/empty_slot.h   | 19 ++++++++++++++
->>>>  hw/mips/malta.c                |  4 +--
->>>>  hw/{core =3D> misc}/empty_slot.c | 47 +++++++++++++++++++---------------
->>>>  hw/misc/grlib_ahb_apb_pnp.c    | 24 +++++++++++++++--
->>>>  hw/sparc/leon3.c               | 18 ++++++-------
->>>>  hw/sparc/sun4m.c               | 23 +++++++++++------
->>>>  hw/sparc64/niagara.c           |  7 ++---
->>>>  target/sparc/int32_helper.c    | 23 +++++++++--------
->>>>  MAINTAINERS                    |  7 +++++
->>>>  hw/core/Makefile.objs          |  1 -
->>>>  hw/misc/Makefile.objs          |  1 +
->>>>  hw/misc/trace-events           |  8 ++++++
->>>>  hw/sparc/Kconfig               |  1 +
->>>>  hw/timer/trace-events          |  2 +-
->>>>  15 files changed, 124 insertions(+), 70 deletions(-)
->>>>  delete mode 100644 include/hw/empty_slot.h
->>>>  create mode 100644 include/hw/misc/empty_slot.h
->>>>  rename hw/{core =3D> misc}/empty_slot.c (66%)
->>>>
->>>> --=20
->>>> 2.21.3
->>>
->>> Philippe, thanks so much for handling this - things are really busy here at the
->>> moment, so the help is greatly appreciated :)
->>
->> I know you were busy, and the patches are just cleanups, so no problem.
->>
-> 
-> I guess it is just a matter of time Philippe would ask for SPARC
-> maintainership. Mark, would you perhaps accept Philippe as a
-> co-maintainer?
+--00000000000010a79405a7cf2007
+Content-Type: text/plain; charset="UTF-8"
 
-Don't worry Aleksandar, Mark and Artyom are experts and manage the
-SPARC codebase very well. I don't want to overstep, I simply
-wanted to give some help while they are busy.
+On Wed, Jun 10, 2020 at 7:31 PM Kevin Wolf <kwolf@redhat.com> wrote:
 
-Actually the core content here are the patches related to the
-empty_slot device. The discussion started with Artyom in October
-2018:
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg564065.html
+> Am 10.06.2020 um 17:26 hat Sam Eiderman geschrieben:
+> > Thanks for the clarification Kevin,
+> >
+> > Well first I want to discuss unallocated blocks.
+> > From my understanding operating systems do not rely on disks to be
+> > zero initialized, on the contrary, physical disks usually contain
+> > garbage.
+> > So an unallocated block should never be treated as zero by any real
+> > world application.
+>
+> I think this is a dangerous assumption to make. The guest did have
+> access to these unallocated blocks before, and they read as zero, so not
+> writing these to the conversion target does change the virtual disk.
+> Whether or not this is a harmless change for the guest depends on the
+> software running in the VM.
+>
 
-Since Artyom acked the patches, I pinged few times, Mark and him
-were busy, I simply asked them and they agree, but I am not
-interested in maintainance, neither I have the SPARC knowledge.
+I see your point
 
-Regards,
 
-Phil.
+>
+> > Now assuming that I only care about the allocated content of the
+> > disks, I would like to save io/time zeroing out unallocated blocks.
+> >
+> > A real world example would be flushing a 500GB vmdk on a real SSD
+> > disk, if the vmdk contained only 2GB of data, no point in writing
+> > 498GB of zeroes to that SSD - reducing its lifespan for nothing.
+>
+> Don't pretty much all SSDs support efficient zeroing/hole punching these
+> days so that the blocks would actually be deallocated on the disk level?
+>
+> > Now from what I understand --target-is-zero will give me this behavior
+> > even though that I really use it as a "--skip-prezeroing-target"
+> > (sorry for the bad name)
+> > (This is only true if later *allocated zeroes* are indeed copied
+> correctly)
+>
+> As you noticed later, it doesn't.
+>
+> The behaviour you want is more like -B, except that you don't have a
+> backing file. If you also pass -n, the actual filename you pass isn't
+> even used, so I guess '-B "" -n' should do the trick?
+>
+> Kevin
+>
+>
 
-> 
-> Yours,
-> Aleksandar
-> 
->> Before sending, I tested with all the images I could grab from
->> https://wiki.qemu.org/Documentation/Platforms/SPARC
->> and
->> https://www.qemu.org/docs/master/system/target-sparc64.html
->>
->> I might add more acceptance tests later to automate that.
->>
->> Regards,
->>
->> Phil.
-> 
+--00000000000010a79405a7cf2007
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
+<div dir=3D"ltr" class=3D"gmail_attr">On Wed, Jun 10, 2020 at 7:31 PM Kevin=
+ Wolf &lt;<a href=3D"mailto:kwolf@redhat.com">kwolf@redhat.com</a>&gt; wrot=
+e:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0=
+.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">Am 10.06.2020=
+ um 17:26 hat Sam Eiderman geschrieben:<br>
+&gt; Thanks for the clarification Kevin,<br>
+&gt; <br>
+&gt; Well first I want to discuss unallocated blocks.<br>
+&gt; From my understanding operating systems do not rely on disks to be<br>
+&gt; zero initialized, on the contrary, physical disks usually contain<br>
+&gt; garbage.<br>
+&gt; So an unallocated block should never be treated as zero by any real<br=
+>
+&gt; world application.<br>
+<br>
+I think this is a dangerous assumption to make. The guest did have<br>
+access to these unallocated blocks before, and they read as zero, so not<br=
+>
+writing these to the conversion target does change the virtual disk.<br>
+Whether or not this is a harmless change for the guest depends on the<br>
+software running in the VM.<br></blockquote><div><br></div><div>I see your =
+point</div><div>=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"marg=
+in:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1e=
+x">
+<br>
+&gt; Now assuming that I only care about the allocated content of the<br>
+&gt; disks, I would like to save io/time zeroing out unallocated blocks.<br=
+>
+&gt; <br>
+&gt; A real world example would be flushing a 500GB vmdk on a real SSD<br>
+&gt; disk, if the vmdk contained only 2GB of data, no point in writing<br>
+&gt; 498GB of zeroes to that SSD - reducing its lifespan for nothing.<br>
+<br>
+Don&#39;t pretty much all SSDs support efficient zeroing/hole punching thes=
+e<br>
+days so that the blocks would actually be deallocated on the disk level?<br=
+>
+<br>
+&gt; Now from what I understand --target-is-zero will give me this behavior=
+<br>
+&gt; even though that I really use it as a &quot;--skip-prezeroing-target&q=
+uot;<br>
+&gt; (sorry for the bad name)<br>
+&gt; (This is only true if later *allocated zeroes* are indeed copied corre=
+ctly)<br>
+<br>
+As you noticed later, it doesn&#39;t.<br>
+<br>
+The behaviour you want is more like -B, except that you don&#39;t have a<br=
+>
+backing file. If you also pass -n, the actual filename you pass isn&#39;t<b=
+r>
+even used, so I guess &#39;-B &quot;&quot; -n&#39; should do the trick?<br>
+<br>
+Kevin<br>
+<br>
+</blockquote></div></div>
+
+--00000000000010a79405a7cf2007--
 
