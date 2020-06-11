@@ -2,103 +2,99 @@ Return-Path: <SRS0=U615=7Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2609FC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 16:13:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C11E0C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 16:14:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E2025206DC
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 16:13:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8C74D206DC
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 16:14:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Kx2cn4CB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2025206DC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Vyex3gPL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C74D206DC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42538 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44894 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjPpc-0005SZ-2q
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 12:13:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45746)
+	id 1jjPqJ-0006Q6-PO
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 12:14:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48752)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jjPgj-00074c-NY
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 12:04:25 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:59119
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jjPgg-00011c-JZ
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 12:04:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591891457;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Ux4aj329B1BwmC7nDJ/LNHc4D/BIeJqak7rhlE6WHSo=;
- b=Kx2cn4CBjPK1CqpQKI9i6oBCXlwJTf1P2MTW+lh1OaKNcizEpSyyt+JsGHY1XN0nx2Y2P6
- a1uzm/1crup0g6I+rpOLqa3bmPDBP6gfisxonqhrQJhYwGhWRrrBnggW8cTZ2Q3VwyDYpH
- jJOa+VyqMPb9ZwKFIBjA0zu52T9CziA=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-54-yf2d5jhNM6KYnyi0u79FlA-1; Thu, 11 Jun 2020 12:03:47 -0400
-X-MC-Unique: yf2d5jhNM6KYnyi0u79FlA-1
-Received: by mail-wm1-f71.google.com with SMTP id r1so1493891wmh.7
- for <qemu-devel@nongnu.org>; Thu, 11 Jun 2020 09:03:47 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jjPlc-0005nZ-Lz
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 12:09:24 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:36522)
+ by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jjPla-0002CC-NU
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 12:09:24 -0400
+Received: by mail-pl1-x642.google.com with SMTP id bg4so2497488plb.3
+ for <qemu-devel@nongnu.org>; Thu, 11 Jun 2020 09:09:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:references:from:message-id:date:user-agent:mime-version
+ :in-reply-to:content-language:content-transfer-encoding;
+ bh=HmzbD5r9ZmIXlBwfVAybbPhriqGbw0DowzngQ2ANp8s=;
+ b=Vyex3gPL6Z2tpv6u6NJQiZN8xApkf0/+zEi6BF7Jqq8h+szd3RNz9GzD9ZBCS9tBHk
+ A9OOqgsc7i4PJv7qf6BDrvcZTRtsdoYOWhLqwHo/Bf4Y+Z6kwYBcJnz6B32TEKw86G/K
+ g/MCOKOYF6fa3it1hxj2DGyQQlfm4fX6mV0Ss6+b6Z9gM81WsXVteiobGsagZRZJS1oq
+ HD2UwjqPbHEVomgJv4tgNUD5enkGMB+e5Tt88FTlDpdHqWy87qjQ8ROB4tP7R+5vod8L
+ BLj6xwPQMg7SandPtD8xlgXLBoAz4zjI/6DlmTejQgWGlAS10LWS+olJ2YfFUrrpVTpx
+ qcuQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=Ux4aj329B1BwmC7nDJ/LNHc4D/BIeJqak7rhlE6WHSo=;
- b=km1eZW9AP3IDi8ElYGc9WOh0sTuvzShAKx+tJMDAJrFQh0cbOM1CsE3OaOkPyoI5KL
- PXL8i7JgsHHv2CrwCGsBoR/hWvc2f2PCUgFm8Lo5AgRGLy/VbB/nvzjuokSWL5lvfyT9
- qLEOYPk1C9Wb2R0YAp5UE99FcjvOq4IgspyD1hqSB7qogTskDH0CGWKi6xYuTgrPe75A
- TQq0Y6k/thl7AAJw0SEo61l+1pHJ4YIefVRoIHiG6CLq4F53X8jtOUM8ZaayVKIaZ5Mj
- HO9XWWF6Mu3znyOQxUL6wg84Z2miE500sj6oehZ8ZDYBn2NiFyxkDBYisMYoTA2lzWPd
- 6YaQ==
-X-Gm-Message-State: AOAM53027qcLROVygYoSR9xWIWtns+KL8ld+/5sBBZotV1KHJkV1ZF7L
- Sx4Mt/n7PcZZMBmWsgtVZFtXbGCdEAvqVIiL+aDtqRIuHHEbhZFzBjbr9CnBZF3bjeiS+S86ekt
- ++X1404dT3b5Mwww=
-X-Received: by 2002:a1c:e355:: with SMTP id a82mr8773683wmh.1.1591891425834;
- Thu, 11 Jun 2020 09:03:45 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwriCdule6rDyHlaOYJfsMRQUFtfkg7m1fkMoEufPkUS5l2qH13Kg73X86hkLtbD/7aT3zCew==
-X-Received: by 2002:a1c:e355:: with SMTP id a82mr8773657wmh.1.1591891425631;
- Thu, 11 Jun 2020 09:03:45 -0700 (PDT)
-Received: from x1w.redhat.com (181.red-88-10-103.dynamicip.rima-tde.net.
- [88.10.103.181])
- by smtp.gmail.com with ESMTPSA id q13sm5612598wrn.84.2020.06.11.09.03.44
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 11 Jun 2020 09:03:45 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 07/11] hw/tpm: Remove unnecessary 'tpm_int.h' header
- inclusion
-Date: Thu, 11 Jun 2020 18:03:02 +0200
-Message-Id: <20200611160306.2751-8-philmd@redhat.com>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200611160306.2751-1-philmd@redhat.com>
-References: <20200611160306.2751-1-philmd@redhat.com>
+ h=x-gm-message-state:subject:to:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=HmzbD5r9ZmIXlBwfVAybbPhriqGbw0DowzngQ2ANp8s=;
+ b=Be9IwL39njVXJZzOoun4XnKrhw4SXz5EcMmtYQ2sk2RG3K/L1YHe18fG4pI+q3OrZj
+ 44ObbuOc+bNnPJe95mY81h/RmmEZuWA0oCm9kNvcmGlFsmRGzOZLI/DywBtg5Hal2FYT
+ ctzX9oEIsqk7a+TPXFr2nyHRsnDoi4at0R5NJfQ7zVh+BTeEajmuF4AzAyphfmubXI1c
+ 6e0sJ9XLj41c8kRUS5eBOmrpQ7y/DL5ccMk7ZdrXeDHKjqHrkC8/Xm3hRCwZdgAoSBmO
+ amWDsJln9xE/J6ijnEwNhS7RXas6Iwn5QH1sf8ap+ULdIK+Z1VxXNuUWnSLj0mvVL7V5
+ DCpA==
+X-Gm-Message-State: AOAM533GpZ8/OJMIlQ8iGlZW8/ShZw0gBqX4fKF0SioX0sdruUuP3Fnm
+ vZIdX2JyTfprkMSOBpyWN65A3zrybHQ=
+X-Google-Smtp-Source: ABdhPJwtDMxLpFGMIbVBuTxEalJ6In+kjsdYVztvwjYxTHhyot6m+Kw06oTyiFqjjAL210RoUTte8w==
+X-Received: by 2002:a17:90a:886:: with SMTP id
+ v6mr8297144pjc.161.1591891754412; 
+ Thu, 11 Jun 2020 09:09:14 -0700 (PDT)
+Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
+ by smtp.gmail.com with ESMTPSA id z1sm3522424pfr.88.2020.06.11.09.09.13
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 11 Jun 2020 09:09:13 -0700 (PDT)
+Subject: Re: [PATCH 03/10] target/arm: Convert Neon 2-reg-scalar integer
+ multiplies to decodetree
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org
+References: <20200611144529.8873-1-peter.maydell@linaro.org>
+ <20200611144529.8873-4-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <9e1c9363-2c6e-dd3b-3e2c-c28b9bd42c54@linaro.org>
+Date: Thu, 11 Jun 2020 09:09:11 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8;
-	text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 03:29:33
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200611144529.8873-4-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::642;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x642.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -111,63 +107,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Remove unnecessary 'tpm_int.h' header inclusion.
+On 6/11/20 7:45 AM, Peter Maydell wrote:
+> Convert the VMLA, VMLS and VMUL insns in the Neon "2 registers and a
+> scalar" group to decodetree.  These are 32x32->32 operations where
+> one of the inputs is the scalar, followed by a possible accumulate
+> operation of the 32-bit result.
+> 
+> The refactoring removes some of the oddities of the old decoder:
+>  * operands to the operation and accumulation were often
+>    reversed (taking advantage of the fact that most of these ops
+>    are commutative); the new code follows the pseudocode order
+>  * the Q bit in the insn was in a local variable 'u'; in the
+>    new code it is decoded into a->q
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-Reviewed-by: Stefan Berger <stefanb@linux.ibm.com>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
- hw/tpm/tpm_crb.c        | 1 -
- hw/tpm/tpm_spapr.c      | 1 -
- hw/tpm/tpm_tis_common.c | 1 -
- 3 files changed, 3 deletions(-)
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-diff --git a/hw/tpm/tpm_crb.c b/hw/tpm/tpm_crb.c
-index cd004e7f8e..664ff70ef9 100644
---- a/hw/tpm/tpm_crb.c
-+++ b/hw/tpm/tpm_crb.c
-@@ -25,7 +25,6 @@
- #include "migration/vmstate.h"
- #include "sysemu/tpm_backend.h"
- #include "sysemu/reset.h"
--#include "tpm_int.h"
- #include "tpm_util.h"
- #include "tpm_ppi.h"
- #include "trace.h"
-diff --git a/hw/tpm/tpm_spapr.c b/hw/tpm/tpm_spapr.c
-index ce65eb2e45..ab1a86ad6e 100644
---- a/hw/tpm/tpm_spapr.c
-+++ b/hw/tpm/tpm_spapr.c
-@@ -20,7 +20,6 @@
- #include "migration/vmstate.h"
- 
- #include "sysemu/tpm_backend.h"
--#include "tpm_int.h"
- #include "tpm_util.h"
- 
- #include "hw/ppc/spapr.h"
-diff --git a/hw/tpm/tpm_tis_common.c b/hw/tpm/tpm_tis_common.c
-index 1af4bce139..94704870f6 100644
---- a/hw/tpm/tpm_tis_common.c
-+++ b/hw/tpm/tpm_tis_common.c
-@@ -33,7 +33,6 @@
- #include "hw/qdev-properties.h"
- #include "migration/vmstate.h"
- #include "sysemu/tpm_backend.h"
--#include "tpm_int.h"
- #include "tpm_util.h"
- #include "tpm_ppi.h"
- #include "trace.h"
--- 
-2.21.3
 
+> +static void gen_neon_dup_low16(TCGv_i32 var)
+> +{
+> +    TCGv_i32 tmp = tcg_temp_new_i32();
+> +    tcg_gen_ext16u_i32(var, var);
+> +    tcg_gen_shli_i32(tmp, var, 16);
+> +    tcg_gen_or_i32(var, var, tmp);
+> +    tcg_temp_free_i32(tmp);
+> +}
+> +
+> +static void gen_neon_dup_high16(TCGv_i32 var)
+> +{
+> +    TCGv_i32 tmp = tcg_temp_new_i32();
+> +    tcg_gen_andi_i32(var, var, 0xffff0000);
+> +    tcg_gen_shri_i32(tmp, var, 16);
+> +    tcg_gen_or_i32(var, var, tmp);
+> +    tcg_temp_free_i32(tmp);
+> +}
+
+I was going to quibble about this implementation, but see that it's a straight
+move from translate.c.
+
+The real TODO should be a conversion to tcg_gen_gvec_2s(), so that we use real
+vector multiplies and adds here, with the scalar duped across the vector, not
+just an i32.
+
+
+r~
 
