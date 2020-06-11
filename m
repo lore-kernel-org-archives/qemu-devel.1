@@ -4,70 +4,69 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A24B7C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 20:04:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30BFAC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 20:04:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 65CFA2073E
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 20:04:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EC4092073E
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 20:04:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aW0vIDK+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65CFA2073E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dHPXwr0Z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC4092073E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45346 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45848 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjTQi-0001AK-G2
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 16:04:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54614)
+	id 1jjTR2-0001Nk-3B
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 16:04:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54822)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jjT8l-0007nV-5k
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 15:45:32 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:49208
+ id 1jjT8t-0007t0-9z
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 15:45:39 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:57705
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jjT8h-0000yy-Eh
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 15:45:30 -0400
+ id 1jjT8r-00011Y-0A
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 15:45:38 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591904726;
+ s=mimecast20190719; t=1591904735;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=eNI90hF5jWb7xRl5hBHJFOvP+eCf2slz7DXLlGdAccw=;
- b=aW0vIDK+jkCsiLIxbJM3hlMBiUnIjBRMbXVq+vFgr6AVEU9zrBezfYfn2yikwvw5m8EI/l
- YKdKDwV2ddQ9ULXjeztBXJkxI+NHosULLKjVVY1uUYY9y3q2RlXUbIoI8eRHkMxY18rzLp
- 0zzWdKStzrMwwPilRtrJERPUC2cF2WM=
+ bh=Vl9+4Ve7uqE2qdXwMEU88RpILo1l/1GNFgId+2u59oQ=;
+ b=dHPXwr0Z5c1XBPRZLep+fM70MlfGEEBjfVyVxo41LiTdakcsEOfDy9C6oxxKQBLHOM/LcT
+ M7/2wocw0pqGRVDk+jufo2gPOGa6/xC65L1BDMCMtZef/KZG+FL3C4ZLcc8yah4Bge6c59
+ V2IHxLtXlmtBBFLjUKldbaG0EkDu8Zg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-334-O6-2OJ0jMgOCytxMhSAXbA-1; Thu, 11 Jun 2020 15:45:04 -0400
-X-MC-Unique: O6-2OJ0jMgOCytxMhSAXbA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-204-8A9stek-P3W2dtLqGztl8A-1; Thu, 11 Jun 2020 15:45:15 -0400
+X-MC-Unique: 8A9stek-P3W2dtLqGztl8A-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 022D3100A68F;
- Thu, 11 Jun 2020 19:45:03 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D7E1E86ABD5;
+ Thu, 11 Jun 2020 19:45:14 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6E1BC60CC0;
- Thu, 11 Jun 2020 19:45:02 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 713D65D9DC;
+ Thu, 11 Jun 2020 19:45:14 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 013/115] target/i386: Fix OUTL debug output
-Date: Thu, 11 Jun 2020 15:43:07 -0400
-Message-Id: <20200611194449.31468-14-pbonzini@redhat.com>
+Subject: [PULL 026/115] hw/i386/vmport: Add device properties
+Date: Thu, 11 Jun 2020 15:43:20 -0400
+Message-Id: <20200611194449.31468-27-pbonzini@redhat.com>
 In-Reply-To: <20200611194449.31468-1-pbonzini@redhat.com>
 References: <20200611194449.31468-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
@@ -95,37 +94,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Liran Alon <liran.alon@oracle.com>,
+ Nikita Leshenko <nikita.leshchenko@oracle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+From: Liran Alon <liran.alon@oracle.com>
 
-Fix OUTL instructions incorrectly displayed as OUTW.
+No functional change.
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20200517110147.26026-1-f4bug@amsat.org>
+This is done as a preparation for the following patches that will
+introduce several device properties.
+
+Reviewed-by: Nikita Leshenko <nikita.leshchenko@oracle.com>
+Signed-off-by: Liran Alon <liran.alon@oracle.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <20200312165431.82118-3-liran.alon@oracle.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- target/i386/misc_helper.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/i386/vmport.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/target/i386/misc_helper.c b/target/i386/misc_helper.c
-index 7d61221024..b6b1d41b14 100644
---- a/target/i386/misc_helper.c
-+++ b/target/i386/misc_helper.c
-@@ -70,7 +70,7 @@ target_ulong helper_inw(CPUX86State *env, uint32_t port)
- void helper_outl(CPUX86State *env, uint32_t port, uint32_t data)
+diff --git a/hw/i386/vmport.c b/hw/i386/vmport.c
+index fc0074608e..5985167dcf 100644
+--- a/hw/i386/vmport.c
++++ b/hw/i386/vmport.c
+@@ -30,6 +30,7 @@
+ 
+ #include "qemu/osdep.h"
+ #include "hw/isa/isa.h"
++#include "hw/qdev-properties.h"
+ #include "sysemu/hw_accel.h"
+ #include "qemu/log.h"
+ #include "vmport.h"
+@@ -140,6 +141,10 @@ static void vmport_realizefn(DeviceState *dev, Error **errp)
+     vmport_register(VMPORT_CMD_GETRAMSIZE, vmport_cmd_ram_size, NULL);
+ }
+ 
++static Property vmport_properties[] = {
++    DEFINE_PROP_END_OF_LIST(),
++};
++
+ static void vmport_class_initfn(ObjectClass *klass, void *data)
  {
- #ifdef CONFIG_USER_ONLY
--    fprintf(stderr, "outw: port=0x%04x, data=%08x\n", port, data);
-+    fprintf(stderr, "outl: port=0x%04x, data=%08x\n", port, data);
- #else
-     address_space_stl(&address_space_io, port, data,
-                       cpu_get_mem_attrs(env), NULL);
+     DeviceClass *dc = DEVICE_CLASS(klass);
+@@ -147,6 +152,7 @@ static void vmport_class_initfn(ObjectClass *klass, void *data)
+     dc->realize = vmport_realizefn;
+     /* Reason: realize sets global port_state */
+     dc->user_creatable = false;
++    device_class_set_props(dc, vmport_properties);
+ }
+ 
+ static const TypeInfo vmport_info = {
 -- 
 2.26.2
 
