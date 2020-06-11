@@ -2,129 +2,70 @@ Return-Path: <SRS0=U615=7Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC0DAC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 08:32:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF49BC433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 08:34:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 75F5D2072F
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 08:32:14 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eKSefXk8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 75F5D2072F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8723A2072F
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 08:34:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8723A2072F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59504 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34150 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjIdB-0001E4-Mk
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 04:32:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40308)
+	id 1jjIfZ-0002rr-PS
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 04:34:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40978)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jjIcA-0000db-0a
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 04:31:10 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26873
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jjIc9-0000TO-7Q
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 04:31:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591864268;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=JgjtVZdKKV1lGhYEIl0h5y7fqrPpk+nlovsRBA6vlc0=;
- b=eKSefXk8XL/VomJfNW0Z55gVtl8o4e35vXAMjjUCgDWvfP4DJtQMrxd0Q5mxNf484rXDx0
- k/rEkHT8tPAHjrUTH5njTwfsRjIJo0PyhbMSH7huvvXQUNXXTgZg9AtIfeVEdVPdY7Q+OO
- rODoRa5lbZeHJsrl8+B3Un9bEv6RDKE=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-320-LKZyivQeOjyFv3ZAQNKSeg-1; Thu, 11 Jun 2020 04:31:04 -0400
-X-MC-Unique: LKZyivQeOjyFv3ZAQNKSeg-1
-Received: by mail-wr1-f70.google.com with SMTP id a4so2274822wrp.5
- for <qemu-devel@nongnu.org>; Thu, 11 Jun 2020 01:31:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:from:to:cc:references:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=JgjtVZdKKV1lGhYEIl0h5y7fqrPpk+nlovsRBA6vlc0=;
- b=t1z9hil1imk7PZLN012ZQycwwVgUwbocG2Q2mhlh/qVNKa/asPZFdB6GjQQiDCnCYB
- OZj2NgJYNgDKHJX85P+BUlA9BrjUCZWjS9ud6lq7UP7NQtJmyLMxziPXotcUUIuUWgbh
- uf0uhRYI+271WoNS8WFHvU1rfQPfum8I5ihZW5tPF605Y3POEngmft9l2fob7oeh/RBp
- gNwPEOLLCfQ+A+t1Px+Ya7qPN7CKqxmXiKMlNYyWmsmouevhCeWJZeYGjZOwEfzQqtLV
- 7upzJdR5ugLfvac883wssqRXWtvMSAKoY5O9fx76m1CXjzDErCCoyuRo4qaAeZP8sY/7
- tkUQ==
-X-Gm-Message-State: AOAM530mAmQawkImIKqULKOrKHF+w7ScucL/G741e2Xi9Iad0lwP+PlU
- 6BDqAlnDX+KtRdwyXooCJEzrD3Y+9T9xUNvsNgJpFlW1Wxe5WVi5Elu3gm9a5WntS6O33rZRNkb
- EazPmB+cWVCyWA/0=
-X-Received: by 2002:a5d:40d0:: with SMTP id b16mr8098271wrq.218.1591864263380; 
- Thu, 11 Jun 2020 01:31:03 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwj4nI21T78XdL9HJiT7xM12dFD/qSKK8O4w/2c0tLLpCkF2DX48jjhkE4WElimVv5hmkJa5g==
-X-Received: by 2002:a5d:40d0:: with SMTP id b16mr8098241wrq.218.1591864263146; 
- Thu, 11 Jun 2020 01:31:03 -0700 (PDT)
-Received: from [192.168.1.38] (181.red-88-10-103.dynamicip.rima-tde.net.
- [88.10.103.181])
- by smtp.gmail.com with ESMTPSA id a7sm3204898wmh.14.2020.06.11.01.31.01
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 11 Jun 2020 01:31:02 -0700 (PDT)
-Subject: Re: [PATCH v8 10/10] acpi: q35: drop _SB.PCI0.ISA.LPCD opregion.
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-References: <20200611072919.16638-1-kraxel@redhat.com>
- <20200611072919.16638-11-kraxel@redhat.com>
- <49164120-0186-5ae2-0690-98e27a82c5ab@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <0d74324f-47a1-203a-9623-1cacb948a6d5@redhat.com>
-Date: Thu, 11 Jun 2020 10:31:01 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jjIeo-0002BG-A5
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 04:33:54 -0400
+Received: from 2.mo68.mail-out.ovh.net ([46.105.52.162]:42223)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jjIel-0000n6-J5
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 04:33:54 -0400
+Received: from player157.ha.ovh.net (unknown [10.108.42.23])
+ by mo68.mail-out.ovh.net (Postfix) with ESMTP id A711D16B2F3
+ for <qemu-devel@nongnu.org>; Thu, 11 Jun 2020 10:33:48 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player157.ha.ovh.net (Postfix) with ESMTPSA id 773C31345895A;
+ Thu, 11 Jun 2020 08:33:42 +0000 (UTC)
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-106R006d97da734-53f4-4f52-a513-fc7c860fefaa,8E3DA20A17A7E5167CC729B80B53FA75D16C5C19)
+ smtp.auth=groug@kaod.org
+Date: Thu, 11 Jun 2020 10:33:41 +0200
+From: Greg Kurz <groug@kaod.org>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Subject: Re: [PATCH 2/3] spapr: Use error_append_hint() in spapr_caps.c
+Message-ID: <20200611103341.3e84e565@bahia.lan>
+In-Reply-To: <3bbcf90e-13c3-1c45-b100-69e0e5bcb0ef@virtuozzo.com>
+References: <159180935807.29090.16079635439548762534.stgit@bahia.lan>
+ <159180945454.29090.15222636045973363294.stgit@bahia.lan>
+ <3bbcf90e-13c3-1c45-b100-69e0e5bcb0ef@virtuozzo.com>
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <49164120-0186-5ae2-0690-98e27a82c5ab@redhat.com>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 03:29:33
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-Ovh-Tracer-Id: 17035991493948971347
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedrudehkedgtdeiucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthhqredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepveefteefgfeikedtgfetiedvveeggfeggeeileeuffeggfffieetfefgkedttdejnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhduheejrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
+Received-SPF: pass client-ip=46.105.52.162; envelope-from=groug@kaod.org;
+ helo=2.mo68.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 04:33:48
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -137,105 +78,378 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/11/20 10:27 AM, Philippe Mathieu-Daudé wrote:
-> Hi Gerd,
-> 
-> On 6/11/20 9:29 AM, Gerd Hoffmann wrote:
->> Seems to be unused.
->>
->> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
->> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
->> ---
->>  hw/i386/acpi-build.c | 11 -----------
->>  1 file changed, 11 deletions(-)
->>
->> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
->> index 02cf4199c2e9..d93ea40c58b9 100644
->> --- a/hw/i386/acpi-build.c
->> +++ b/hw/i386/acpi-build.c
->> @@ -1296,7 +1296,6 @@ static void build_q35_isa_bridge(Aml *table)
->>  {
->>      Aml *dev;
->>      Aml *scope;
->> -    Aml *field;
->>  
->>      scope =  aml_scope("_SB.PCI0");
->>      dev = aml_device("ISA");
->> @@ -1306,16 +1305,6 @@ static void build_q35_isa_bridge(Aml *table)
->>      aml_append(dev, aml_operation_region("PIRQ", AML_PCI_CONFIG,
->>                                           aml_int(0x60), 0x0C));
->>  
->> -    aml_append(dev, aml_operation_region("LPCD", AML_PCI_CONFIG,
->> -                                         aml_int(0x80), 0x02));
->> -    field = aml_field("LPCD", AML_ANY_ACC, AML_NOLOCK, AML_PRESERVE);
->> -    aml_append(field, aml_named_field("COMA", 3));
->> -    aml_append(field, aml_reserved_field(1));
->> -    aml_append(field, aml_named_field("COMB", 3));
->> -    aml_append(field, aml_reserved_field(1));
->> -    aml_append(field, aml_named_field("LPTD", 2));
->> -    aml_append(dev, field);
->> -
->>      aml_append(scope, dev);
->>      aml_append(table, scope);
->>  }
->>
-> 
-> I'm a bit confused, isn't it use to describe these
-> devices?
-> 
-> (qemu) info qtree
-> bus: main-system-bus
->   type System
->   dev: q35-pcihost, id ""
->     bus: pcie.0
->       type PCIE
->       dev: ICH9-LPC, id ""
->         gpio-out "gsi" 24
->         class ISA bridge, addr 00:1f.0, pci id 8086:2918 (sub 1af4:1100)
->         bus: isa.0
->           type ISA
->           dev: port92, id ""
->             gpio-out "a20" 1
->           dev: vmmouse, id ""
->           dev: vmport, id ""
->           dev: isa-parallel, id ""
->             index = 0 (0x0)
->             iobase = 888 (0x378)
->             irq = 7 (0x7)
->             chardev = "parallel0"
->             isa irq 7
->           dev: isa-serial, id ""
->             index = 1 (0x1)
->             iobase = 760 (0x2f8)
->             irq = 3 (0x3)
->             chardev = "serial1"
->             wakeup = 0 (0x0)
->             isa irq 3
->           dev: isa-serial, id ""
->             index = 0 (0x0)
->             iobase = 1016 (0x3f8)
->             irq = 4 (0x4)
->             chardev = "serial0"
->             wakeup = 0 (0x0)
->             isa irq 4
-> 
+On Wed, 10 Jun 2020 21:03:15 +0300
+Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> wrote:
 
-Ah, this patch complements the previous "acpi: drop serial/parallel
-enable bits from dsdt", right? Maybe better to include this change
-with the build_q35_isa_bridge() part. Like in a single patch:
-"acpi: q35: drop lpc/serial/parallel enable bits from dsdt"
+> 10.06.2020 20:17, Greg Kurz wrote:
+> > We have a dedicated error API for hints. Use it instead of embedding
+> > the hint in the error message, as recommanded in the "qapi/error.h"
+> > header file.
+> >=20
+> > Since spapr_caps_apply() passes &error_fatal, all functions must
+> > also call the ERRP_AUTO_PROPAGATE() macro for error_append_hint()
+> > to be functional.
+> >=20
+> > While here, add some missing braces around one line statements that
+> > are part of the patch context. Also have cap_fwnmi_apply(), which
+> > already uses error_append_hint() to call ERRP_AUTO_PROPAGATE() as
+> > well.
+> >=20
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > ---
+> >   hw/ppc/spapr_caps.c |   93 +++++++++++++++++++++++++++++-------------=
+---------
+> >   1 file changed, 52 insertions(+), 41 deletions(-)
+> >=20
+> > diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+> > index efdc0dbbcfc0..0c3d3b64a508 100644
+> > --- a/hw/ppc/spapr_caps.c
+> > +++ b/hw/ppc/spapr_caps.c
+> > @@ -189,24 +189,24 @@ static void spapr_cap_set_pagesize(Object *obj, V=
+isitor *v, const char *name,
+> >  =20
+> >   static void cap_htm_apply(SpaprMachineState *spapr, uint8_t val, Erro=
+r **errp)
+> >   {
+> > +    ERRP_AUTO_PROPAGATE();
+> >       if (!val) {
+> >           /* TODO: We don't support disabling htm yet */
+> >           return;
+> >       }
+> >       if (tcg_enabled()) {
+> > -        error_setg(errp,
+> > -                   "No Transactional Memory support in TCG,"
+> > -                   " try appending -machine cap-htm=3Doff");
+> > +        error_setg(errp, "No Transactional Memory support in TCG");
+> > +        error_append_hint(errp, "Try appending -machine cap-htm=3Doff\=
+n");
+> >       } else if (kvm_enabled() && !kvmppc_has_cap_htm()) {
+> >           error_setg(errp,
+> > -"KVM implementation does not support Transactional Memory,"
+> > -                   " try appending -machine cap-htm=3Doff"
+> > -            );
+> > +"KVM implementation does not support Transactional Memory");
+>=20
+> Should be indented after opening '('
+>=20
 
-Then keep the PIIX part of the patches.
+Many error_setg() lines in this file follow the same style of tweaking
+indentation to stay below the 80 character limit. I've just kept the
+existing style.
+
+> > +        error_append_hint(errp, "Try appending -machine cap-htm=3Doff\=
+n");
+> >       }
+> >   }
+> >  =20
+> >   static void cap_vsx_apply(SpaprMachineState *spapr, uint8_t val, Erro=
+r **errp)
+> >   {
+> > +    ERRP_AUTO_PROPAGATE();
+> >       PowerPCCPU *cpu =3D POWERPC_CPU(first_cpu);
+> >       CPUPPCState *env =3D &cpu->env;
+> >  =20
+> > @@ -218,13 +218,14 @@ static void cap_vsx_apply(SpaprMachineState *spap=
+r, uint8_t val, Error **errp)
+> >        * rid of anything that doesn't do VMX */
+> >       g_assert(env->insns_flags & PPC_ALTIVEC);
+> >       if (!(env->insns_flags2 & PPC2_VSX)) {
+> > -        error_setg(errp, "VSX support not available,"
+> > -                   " try appending -machine cap-vsx=3Doff");
+> > +        error_setg(errp, "VSX support not available");
+> > +        error_append_hint(errp, "Try appending -machine cap-vsx=3Doff\=
+n");
+> >       }
+> >   }
+> >  =20
+> >   static void cap_dfp_apply(SpaprMachineState *spapr, uint8_t val, Erro=
+r **errp)
+> >   {
+> > +    ERRP_AUTO_PROPAGATE();
+> >       PowerPCCPU *cpu =3D POWERPC_CPU(first_cpu);
+> >       CPUPPCState *env =3D &cpu->env;
+> >  =20
+> > @@ -233,8 +234,8 @@ static void cap_dfp_apply(SpaprMachineState *spapr,=
+ uint8_t val, Error **errp)
+> >           return;
+> >       }
+> >       if (!(env->insns_flags2 & PPC2_DFP)) {
+> > -        error_setg(errp, "DFP support not available,"
+> > -                   " try appending -machine cap-dfp=3Doff");
+> > +        error_setg(errp, "DFP support not available");
+> > +        error_append_hint(errp, "Try appending -machine cap-dfp=3Doff\=
+n");
+> >       }
+> >   }
+> >  =20
+> > @@ -248,6 +249,7 @@ SpaprCapPossible cap_cfpc_possible =3D {
+> >   static void cap_safe_cache_apply(SpaprMachineState *spapr, uint8_t va=
+l,
+> >                                    Error **errp)
+> >   {
+> > +    ERRP_AUTO_PROPAGATE();
+> >       Error *local_err =3D NULL;
+> >       uint8_t kvm_val =3D  kvmppc_get_cap_safe_cache();
+> >  =20
+> > @@ -258,13 +260,14 @@ static void cap_safe_cache_apply(SpaprMachineStat=
+e *spapr, uint8_t val,
+> >                      cap_cfpc_possible.vals[val]);
+> >       } else if (kvm_enabled() && (val > kvm_val)) {
+> >           error_setg(errp,
+> > -                   "Requested safe cache capability level not supporte=
+d by kvm,"
+> > -                   " try appending -machine cap-cfpc=3D%s",
+> > -                   cap_cfpc_possible.vals[kvm_val]);
+> > +"Requested safe cache capability level not supported by KVM");
+>=20
+> Hmm you do this intentionally.. OK, than, it's a kind of taste.
+>=20
+
+Yes, but as said above, there's precedence in this file.
+
+I'm okay with fixing the indent. It is acceptable to have error_setg()
+lines span over 80 characters for the sake of being able to grep error
+strings in the code base.
+
+> > +        error_append_hint(errp, "Try appending -machine cap-cfpc=3D%s\=
+n",
+> > +                          cap_cfpc_possible.vals[kvm_val]);
+> >       }
+> >  =20
+> > -    if (local_err !=3D NULL)
+> > +    if (local_err !=3D NULL) {
+> >           warn_report_err(local_err);
+> > +    }
+> >   }
+> >  =20
+> >   SpaprCapPossible cap_sbbc_possible =3D {
+> > @@ -277,6 +280,7 @@ SpaprCapPossible cap_sbbc_possible =3D {
+> >   static void cap_safe_bounds_check_apply(SpaprMachineState *spapr, uin=
+t8_t val,
+> >                                           Error **errp)
+> >   {
+> > +    ERRP_AUTO_PROPAGATE();
+> >       Error *local_err =3D NULL;
+> >       uint8_t kvm_val =3D  kvmppc_get_cap_safe_bounds_check();
+> >  =20
+> > @@ -287,13 +291,14 @@ static void cap_safe_bounds_check_apply(SpaprMach=
+ineState *spapr, uint8_t val,
+> >                      cap_sbbc_possible.vals[val]);
+> >       } else if (kvm_enabled() && (val > kvm_val)) {
+> >           error_setg(errp,
+> > -"Requested safe bounds check capability level not supported by kvm,"
+> > -                   " try appending -machine cap-sbbc=3D%s",
+> > -                   cap_sbbc_possible.vals[kvm_val]);
+> > +"Requested safe bounds check capability level not supported by KVM");
+> > +        error_append_hint(errp, "Try appending -machine cap-sbbc=3D%s\=
+n",
+> > +                          cap_sbbc_possible.vals[kvm_val]);
+> >       }
+> >  =20
+> > -    if (local_err !=3D NULL)
+> > +    if (local_err !=3D NULL) {
+> >           warn_report_err(local_err);
+> > +    }
+> >   }
+> >  =20
+> >   SpaprCapPossible cap_ibs_possible =3D {
+> > @@ -309,6 +314,7 @@ SpaprCapPossible cap_ibs_possible =3D {
+> >   static void cap_safe_indirect_branch_apply(SpaprMachineState *spapr,
+> >                                              uint8_t val, Error **errp)
+> >   {
+> > +    ERRP_AUTO_PROPAGATE();
+> >       Error *local_err =3D NULL;
+> >       uint8_t kvm_val =3D kvmppc_get_cap_safe_indirect_branch();
+> >  =20
+> > @@ -319,9 +325,9 @@ static void cap_safe_indirect_branch_apply(SpaprMac=
+hineState *spapr,
+> >                      cap_ibs_possible.vals[val]);
+> >       } else if (kvm_enabled() && (val > kvm_val)) {
+> >           error_setg(errp,
+> > -"Requested safe indirect branch capability level not supported by kvm,"
+> > -                   " try appending -machine cap-ibs=3D%s",
+> > -                   cap_ibs_possible.vals[kvm_val]);
+> > +"Requested safe indirect branch capability level not supported by KVM"=
+);
+> > +        error_append_hint(errp, "Try appending -machine cap-ibs=3D%s\n=
+",
+> > +                          cap_ibs_possible.vals[kvm_val]);
+> >       }
+> >  =20
+> >       if (local_err !=3D NULL) {
+> > @@ -408,17 +414,17 @@ static void cap_nested_kvm_hv_apply(SpaprMachineS=
+tate *spapr,
+>=20
+> You forget to add ERRP_AUTO_PROPAGATE
+>=20
+
+Oops, it's in the next patch... I've re-ordered the patches and
+I simply forgot to move that hunk here. I will fix that in v2.
+
+> >       }
+> >  =20
+> >       if (tcg_enabled()) {
+> > -        error_setg(errp,
+> > -                   "No Nested KVM-HV support in tcg,"
+> > -                   " try appending -machine cap-nested-hv=3Doff");
+> > +        error_setg(errp, "No Nested KVM-HV support in TCG");
+> > +        error_append_hint(errp, "Try appending -machine cap-nested-hv=
+=3Doff");
+>=20
+> Hmm, didn't you forget '\n' ? You consistantly add it in previous hints. =
+(I do think that it's strange that we should add it by hand, but it seems a=
+ common thing to add it)
+>=20
+
+Oops indeed I forgot. Good catch ! :)
+
+=46rom the documentation of error_append_hint() in "qapi/error.h" :
+
+ * May be called multiple times.  The resulting hint should end with a
+ * newline.
+
+> >       } else if (kvm_enabled()) {
+> >           if (!kvmppc_has_cap_nested_kvm_hv()) {
+> >               error_setg(errp,
+> > -"KVM implementation does not support Nested KVM-HV,"
+> > -                       " try appending -machine cap-nested-hv=3Doff");
+> > +"KVM implementation does not support Nested KVM-HV");
+> > +            error_append_hint(errp, "Try appending -machine cap-nested=
+-hv=3Doff");
+>=20
+> and here
+>=20
+
+Oops
+
+> >           } else if (kvmppc_set_cap_nested_kvm_hv(val) < 0) {
+> > -                error_setg(errp,
+> > -"Error enabling cap-nested-hv with KVM, try cap-nested-hv=3Doff");
+> > +                error_setg(errp, "Error enabling cap-nested-hv with KV=
+M");
+> > +                error_append_hint(errp,
+> > +                                  "Try appending -machine cap-nested-h=
+v=3Doff");
+>=20
+> and here
+>=20
+
+Thanks for all the catches !
+
+> >           }
+> >       }
+> >   }
+> > @@ -426,6 +432,7 @@ static void cap_nested_kvm_hv_apply(SpaprMachineSta=
+te *spapr,
+> >   static void cap_large_decr_apply(SpaprMachineState *spapr,
+> >                                    uint8_t val, Error **errp)
+> >   {
+> > +    ERRP_AUTO_PROPAGATE();
+> >       PowerPCCPU *cpu =3D POWERPC_CPU(first_cpu);
+> >       PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cpu);
+> >  =20
+> > @@ -436,22 +443,23 @@ static void cap_large_decr_apply(SpaprMachineStat=
+e *spapr,
+> >       if (tcg_enabled()) {
+> >           if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_3_00, 0,
+> >                                 spapr->max_compat_pvr)) {
+> > -            error_setg(errp,
+> > -                "Large decrementer only supported on POWER9, try -cpu =
+POWER9");
+> > +            error_setg(errp, "Large decrementer only supported on POWE=
+R9");
+> > +            error_append_hint(errp, "Try -cpu POWER9\n");
+> >               return;
+> >           }
+> >       } else if (kvm_enabled()) {
+> >           int kvm_nr_bits =3D kvmppc_get_cap_large_decr();
+> >  =20
+> >           if (!kvm_nr_bits) {
+> > -            error_setg(errp,
+> > -                       "No large decrementer support,"
+> > -                        " try appending -machine cap-large-decr=3Doff"=
+);
+> > +            error_setg(errp, "No large decrementer support");
+> > +            error_append_hint(errp,
+> > +                              "Try appending -machine cap-large-decr=
+=3Doff\n");
+> >           } else if (pcc->lrg_decr_bits !=3D kvm_nr_bits) {
+> >               error_setg(errp,
+> > -"KVM large decrementer size (%d) differs to model (%d),"
+> > -                " try appending -machine cap-large-decr=3Doff",
+> > -                kvm_nr_bits, pcc->lrg_decr_bits);
+> > +                       "KVM large decrementer size (%d) differs to mod=
+el (%d)",
+> > +                       kvm_nr_bits, pcc->lrg_decr_bits);
+> > +            error_append_hint(errp,
+> > +                              "Try appending -machine cap-large-decr=
+=3Doff\n");
+> >           }
+> >       }
+> >   }
+> > @@ -460,14 +468,15 @@ static void cap_large_decr_cpu_apply(SpaprMachine=
+State *spapr,
+> >                                        PowerPCCPU *cpu,
+> >                                        uint8_t val, Error **errp)
+> >   {
+> > +    ERRP_AUTO_PROPAGATE();
+> >       CPUPPCState *env =3D &cpu->env;
+> >       target_ulong lpcr =3D env->spr[SPR_LPCR];
+> >  =20
+> >       if (kvm_enabled()) {
+> >           if (kvmppc_enable_cap_large_decr(cpu, val)) {
+> > -            error_setg(errp,
+> > -                       "No large decrementer support,"
+> > -                       " try appending -machine cap-large-decr=3Doff");
+> > +            error_setg(errp, "No large decrementer support");
+> > +            error_append_hint(errp,
+> > +                              "Try appending -machine cap-large-decr=
+=3Doff\n");
+> >           }
+> >       }
+> >  =20
+> > @@ -482,6 +491,7 @@ static void cap_large_decr_cpu_apply(SpaprMachineSt=
+ate *spapr,
+> >   static void cap_ccf_assist_apply(SpaprMachineState *spapr, uint8_t va=
+l,
+> >                                    Error **errp)
+> >   {
+> > +    ERRP_AUTO_PROPAGATE();
+> >       uint8_t kvm_val =3D kvmppc_get_cap_count_cache_flush_assist();
+> >  =20
+> >       if (tcg_enabled() && val) {
+> > @@ -504,14 +514,15 @@ static void cap_ccf_assist_apply(SpaprMachineStat=
+e *spapr, uint8_t val,
+> >               return;
+> >           }
+> >           error_setg(errp,
+> > -"Requested count cache flush assist capability level not supported by =
+kvm,"
+> > -                   " try appending -machine cap-ccf-assist=3Doff");
+> > +"Requested count cache flush assist capability level not supported by =
+KVM");
+> > +        error_append_hint(errp, "Try appending -machine cap-ccf-assist=
+=3Doff\n");
+> >       }
+> >   }
+> >  =20
+> >   static void cap_fwnmi_apply(SpaprMachineState *spapr, uint8_t val,
+> >                                   Error **errp)
+> >   {
+> > +    ERRP_AUTO_PROPAGATE();
+> >       if (!val) {
+> >           return; /* Disabled by default */
+> >       }
+> >=20
+> >=20
+>=20
+>=20
 
 
