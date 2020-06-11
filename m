@@ -2,86 +2,122 @@ Return-Path: <SRS0=U615=7Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EACC3C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 07:36:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51836C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 07:38:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B5FED2083B
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 07:36:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1C2792074B
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 07:38:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hx4ELaev"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5FED2083B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="X2InG3d5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C2792074B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57282 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33432 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjHld-00026G-0V
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 03:36:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52276)
+	id 1jjHnC-0003ui-BR
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 03:38:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54198)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jjHew-0000X7-31
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 03:29:58 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:25045
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jjHev-0004l9-6Z
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 03:29:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591860596;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=lHWY3T2haDr1DgUFNK5I86s2ugCm0pczOcfR2a7I8ns=;
- b=hx4ELaevfHOsOMUf9LwAcwZNO7XTrq5gKEWPYgMAwyYpE7ORZqOYYS4SSKyPiPuUp7LPQT
- jvqVbrob+JQOax4C4Z+gLuSxQBaLyHOOh7K5sn0XniAXykvjGblzEmT5XzatmAwezsDZpe
- 71AuzSXgGWlPKbMKVI9QvCPNs+rSh94=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-118-0DRwrBW0OduljZLuFXcwpQ-1; Thu, 11 Jun 2020 03:29:53 -0400
-X-MC-Unique: 0DRwrBW0OduljZLuFXcwpQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DE5C218B6423;
- Thu, 11 Jun 2020 07:29:51 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-113-50.ams2.redhat.com
- [10.36.113.50])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E3D4C5C541;
- Thu, 11 Jun 2020 07:29:33 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id E2E3817538; Thu, 11 Jun 2020 09:29:19 +0200 (CEST)
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v8 06/10] acpi: factor out fw_cfg_add_acpi_dsdt()
-Date: Thu, 11 Jun 2020 09:29:15 +0200
-Message-Id: <20200611072919.16638-7-kraxel@redhat.com>
-In-Reply-To: <20200611072919.16638-1-kraxel@redhat.com>
-References: <20200611072919.16638-1-kraxel@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jjHlk-0002dy-G1; Thu, 11 Jun 2020 03:37:00 -0400
+Received: from mail-eopbgr20128.outbound.protection.outlook.com
+ ([40.107.2.128]:14561 helo=EUR02-VE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jjHlg-00066c-ME; Thu, 11 Jun 2020 03:36:59 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=lgeXC5m6c0mrX/+aNoD9uUe8i2y4EkUGrTUfH5H+cYMhp8RjWXMPlQEQxM89GXCf8GAgJwbLkbZ+zXLGccz0gZ7xmvVb2dm6CYqixsJx/vT8sGr66nSV4d+Fb4tD0R5PhBXi59Pw4AuOJY8DVcKedYxlkK6Y1SyFQJONNFXHTR9N0ZN06Z0bDy9IsLI1rVAAw7M4yJEjhHpGxRSnaPqFFpTbvX/gUBWRJBj6cSI2TgpWpZGi28/KrUqMi/mRbA7fSmt7y2oYV4C6bvRv81r4jRbem6Hu6mPI29iY3xDZRfAn68LSBSLk7lujiqGHLJkDFbDFXrmM4vZXSOdntgUUlg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=RQI6j/S8OWyPmlOqvH7qfs/N6yXUe3w7QAZhMFeg7ms=;
+ b=GaW64Dxl9ySHDuw0Sa2oXRCG0wvsr77SVgMMs4/w/U3nC1wdLgAHzD94593kjGN1/QamKcjlAXsfbX1D6w2z5+qMHNCLuvCmaUXG1Ik604edThqX0/MXCxUs9iRlJ/3ZAVLDEBWFQsLinDAQtn7fn3+sGZoCli1fHb05/XVHBoKwdljthIXwMTSLme1aw0g5vxBY7E+30g9YCQZOmD/O8At3nBoMxieNcSZfDHWs/CgSYKPB17/CVHly++JLJlCF8hXWaTcMFgIRr1Nx21oA5AOYO64Rg+RUwT2AyqYr/4onLOrg4CRqc8MSmib/fST2CVJ9jXaUwJXpn7YNHbB1XA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=RQI6j/S8OWyPmlOqvH7qfs/N6yXUe3w7QAZhMFeg7ms=;
+ b=X2InG3d5jPKnkpg6TSoyR4nIdTAS74l7C9jUzsPnhIZ+g1zfY/mkmMrulNcUJY/hHTUD/Ik6U+GxToKNE5xwomyErUXQlB0M0TO2QqJfJ5eosusBvDLxtw+9A8UECiRvfhGGbIF7SLOH9XCfKEWv+9/g/hKIJ+pGT/WIQMdCuWg=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM7PR08MB5416.eurprd08.prod.outlook.com (2603:10a6:20b:10e::12)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3066.18; Thu, 11 Jun
+ 2020 07:36:52 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312%3]) with mapi id 15.20.3088.022; Thu, 11 Jun 2020
+ 07:36:51 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: qemu-block@nongnu.org,
+	qemu-devel@nongnu.org
+Subject: [PATCH] block/aio_task: allow start/wait task from any coroutine
+Date: Thu, 11 Jun 2020 10:36:31 +0300
+Message-Id: <20200611073631.10817-1-vsementsov@virtuozzo.com>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20200610190058.10781-2-den@openvz.org>
+References: <20200610190058.10781-2-den@openvz.org>
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=kraxel@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 03:29:33
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
+Content-Type: text/plain
+X-ClientProxiedBy: FRYP281CA0016.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10::26)
+ To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from localhost.localdomain (185.215.60.159) by
+ FRYP281CA0016.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10::26) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3088.18 via Frontend Transport; Thu, 11 Jun 2020 07:36:51 +0000
+X-Mailer: git-send-email 2.21.0
+X-Originating-IP: [185.215.60.159]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: d29023f6-3cd9-4a02-a56d-08d80dda3505
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5416:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM7PR08MB5416E1FD731CEAC0A5343F20C1800@AM7PR08MB5416.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-Forefront-PRVS: 0431F981D8
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 5q36yWDgZX+h8b78zS3Yr8YuiSvMrHyK8B7U2CTvRDcBOJmickPuDUC0GHvgVU0anO4/sF/zhgm6tUw5lSE6qRCKCzoRVe/jmc+zgW+nkht6lE3Db1t7ypXkO/569jbRgftwIlCU3nsoUmVXE+BJNH4npSSyRXU79iBRiqsIZPOhOHChArNlQbdEWFMuAnUI+FiU3Rxk2mZVlYTynYi6gPtICuiegg+zbmA4Ec1l7lBJu/ZKVTsd0G0GYQD0tCgXWoHJ60wiktg6NCHL1LqHmz85w03IX4DdkfkXIb87rOnCdbIUNgDC9/anT37mBwQ5qublVX8IwsUziGSUSaJHi+B5ZktyTaRlIaSgyrUZZOKvrAKHmXIhpRB+zNjE5Bh1
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(396003)(39850400004)(346002)(366004)(136003)(376002)(16526019)(5660300002)(69590400007)(186003)(83380400001)(956004)(36756003)(66476007)(2616005)(1076003)(66556008)(478600001)(66946007)(8936002)(6666004)(316002)(8676002)(107886003)(6512007)(6506007)(52116002)(2906002)(6486002)(86362001)(26005)(4326008);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: d9txzRZPdomSrw17EJLz5/WqlPCU2JpCNlPIeAlhZye4RPA+cxx9rRlbdfqOR8/0T3LKak8L88DfOFHYIcYwK65yvezA07XH7wZzU5R7kuuH1ACjjfW8bwpuffCiG2mlIigkSlaZ15eeh7K0Xj8vfDaSEmyKIGLEgQvvlnWZL0DcTZnFVwJ7gEGl33aKByzabFAep044gMAA3lRz5vKwqTI+go7vrgmKlJH8EBbhw4+5IRay5fTdu4z5iNQ12rGhLwKr1No5a6XI6t5JqIBD+rQGRpBweFOQTvdYGyNI3dOLW+yssHQqZdU9KpNj6Bd0iveqc5X/G071uOioValx2rBS7D6jYd3LHZ9pgo+xA1NVBQR2u8mjuZk0SucKwsf2VTlz91Tn1jdB2DCIoYf/UiY3UkvrYaGtTvaX5JpiclFTNAmUWDUU6y59gjxD76HxpWtDznqcdIUjZd3Z4IRbGShily4JoNhekNE6F2QubH4h0lsXwi0i6ZX2YMBcDbIS
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d29023f6-3cd9-4a02-a56d-08d80dda3505
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jun 2020 07:36:51.8575 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: OFqxYsHp4q/AlOY09+QN2jZplrUYLj4MtOFCTeUaaI+fK2a4NbK52TnGNV+ZUGUrV94bYidSKsaaFsoZ6Yau1BoXHtPgIwnTlc36q/MJcIk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5416
+Received-SPF: pass client-ip=40.107.2.128;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR02-VE1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 03:36:53
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -37
+X-Spam_score: -3.8
 X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,121 +130,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>, John Snow <jsnow@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: kwolf@redhat.com, den@openvz.org, vsementsov@virtuozzo.com,
+ dplotnikov@virtuozzo.com, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add helper function to add fw_cfg device,
-also move code to hw/i386/fw_cfg.c.
+Currently, aio task pool assumes that there is a main coroutine, which
+creates tasks and wait for them. Let's remove the restriction by using
+CoQueue. Code becomes clearer, interface more obvious.
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- hw/i386/fw_cfg.h     |  1 +
- hw/i386/acpi-build.c | 24 +-----------------------
- hw/i386/fw_cfg.c     | 28 ++++++++++++++++++++++++++++
- 3 files changed, 30 insertions(+), 23 deletions(-)
 
-diff --git a/hw/i386/fw_cfg.h b/hw/i386/fw_cfg.h
-index 9e742787792b..275f15c1c5e8 100644
---- a/hw/i386/fw_cfg.h
-+++ b/hw/i386/fw_cfg.h
-@@ -25,5 +25,6 @@ FWCfgState *fw_cfg_arch_create(MachineState *ms,
-                                uint16_t apic_id_limit);
- void fw_cfg_build_smbios(MachineState *ms, FWCfgState *fw_cfg);
- void fw_cfg_build_feature_control(MachineState *ms, FWCfgState *fw_cfg);
-+void fw_cfg_add_acpi_dsdt(Aml *scope, FWCfgState *fw_cfg);
+Hi! Here is my counter-propasal for
+"[PATCH 1/2] aio: allow to wait for coroutine pool from different coroutine"
+by Denis. I'm sure that if we are going to change something here, better
+is make the interface work from any coroutine without the restriction of
+only-on-waiter at the moment.
+
+(Note, that it is still not thread-safe)
+
+
+ block/aio_task.c | 15 ++++-----------
+ 1 file changed, 4 insertions(+), 11 deletions(-)
+
+diff --git a/block/aio_task.c b/block/aio_task.c
+index 88989fa248..d48b29ff83 100644
+--- a/block/aio_task.c
++++ b/block/aio_task.c
+@@ -27,11 +27,10 @@
+ #include "block/aio_task.h"
  
- #endif
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 9fed13a27333..86be45eea17c 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -1759,30 +1759,8 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+ struct AioTaskPool {
+-    Coroutine *main_co;
+     int status;
+     int max_busy_tasks;
+     int busy_tasks;
+-    bool waiting;
++    CoQueue waiters;
+ };
  
-     /* create fw_cfg node, unconditionally */
-     {
--        /* when using port i/o, the 8-bit data register *always* overlaps
--         * with half of the 16-bit control register. Hence, the total size
--         * of the i/o region used is FW_CFG_CTL_SIZE; when using DMA, the
--         * DMA control register is located at FW_CFG_DMA_IO_BASE + 4 */
--        uint8_t io_size = object_property_get_bool(OBJECT(x86ms->fw_cfg),
--                                                   "dma_enabled", NULL) ?
--                          ROUND_UP(FW_CFG_CTL_SIZE, 4) + sizeof(dma_addr_t) :
--                          FW_CFG_CTL_SIZE;
--
-         scope = aml_scope("\\_SB.PCI0");
--        dev = aml_device("FWCF");
--
--        aml_append(dev, aml_name_decl("_HID", aml_string("QEMU0002")));
--
--        /* device present, functioning, decoding, not shown in UI */
--        aml_append(dev, aml_name_decl("_STA", aml_int(0xB)));
--
--        crs = aml_resource_template();
--        aml_append(crs,
--            aml_io(AML_DECODE16, FW_CFG_IO_BASE, FW_CFG_IO_BASE, 0x01, io_size)
--        );
--        aml_append(dev, aml_name_decl("_CRS", crs));
--
--        aml_append(scope, dev);
-+        fw_cfg_add_acpi_dsdt(scope, x86ms->fw_cfg);
-         aml_append(dsdt, scope);
-     }
+ static void coroutine_fn aio_task_co(void *opaque)
+@@ -52,21 +51,15 @@ static void coroutine_fn aio_task_co(void *opaque)
  
-diff --git a/hw/i386/fw_cfg.c b/hw/i386/fw_cfg.c
-index da60ada59462..c55abfb01abb 100644
---- a/hw/i386/fw_cfg.c
-+++ b/hw/i386/fw_cfg.c
-@@ -15,6 +15,7 @@
- #include "qemu/osdep.h"
- #include "sysemu/numa.h"
- #include "hw/acpi/acpi.h"
-+#include "hw/acpi/aml-build.h"
- #include "hw/firmware/smbios.h"
- #include "hw/i386/fw_cfg.h"
- #include "hw/timer/hpet.h"
-@@ -179,3 +180,30 @@ void fw_cfg_build_feature_control(MachineState *ms, FWCfgState *fw_cfg)
-     *val = cpu_to_le64(feature_control_bits | FEATURE_CONTROL_LOCKED);
-     fw_cfg_add_file(fw_cfg, "etc/msr_feature_control", val, sizeof(*val));
+     g_free(task);
+ 
+-    if (pool->waiting) {
+-        pool->waiting = false;
+-        aio_co_wake(pool->main_co);
+-    }
++    qemu_co_queue_next(&pool->waiters);
  }
-+
-+void fw_cfg_add_acpi_dsdt(Aml *scope, FWCfgState *fw_cfg)
-+{
-+    /*
-+     * when using port i/o, the 8-bit data register *always* overlaps
-+     * with half of the 16-bit control register. Hence, the total size
-+     * of the i/o region used is FW_CFG_CTL_SIZE; when using DMA, the
-+     * DMA control register is located at FW_CFG_DMA_IO_BASE + 4
-+     */
-+    Object *obj = OBJECT(fw_cfg);
-+    uint8_t io_size = object_property_get_bool(obj, "dma_enabled", NULL) ?
-+        ROUND_UP(FW_CFG_CTL_SIZE, 4) + sizeof(dma_addr_t) :
-+        FW_CFG_CTL_SIZE;
-+    Aml *dev = aml_device("FWCF");
-+    Aml *crs = aml_resource_template();
-+
-+    aml_append(dev, aml_name_decl("_HID", aml_string("QEMU0002")));
-+
-+    /* device present, functioning, decoding, not shown in UI */
-+    aml_append(dev, aml_name_decl("_STA", aml_int(0xB)));
-+
-+    aml_append(crs,
-+        aml_io(AML_DECODE16, FW_CFG_IO_BASE, FW_CFG_IO_BASE, 0x01, io_size));
-+
-+    aml_append(dev, aml_name_decl("_CRS", crs));
-+    aml_append(scope, dev);
-+}
+ 
+ void coroutine_fn aio_task_pool_wait_one(AioTaskPool *pool)
+ {
+     assert(pool->busy_tasks > 0);
+-    assert(qemu_coroutine_self() == pool->main_co);
+ 
+-    pool->waiting = true;
+-    qemu_coroutine_yield();
++    qemu_co_queue_wait(&pool->waiters, NULL);
+ 
+-    assert(!pool->waiting);
+     assert(pool->busy_tasks < pool->max_busy_tasks);
+ }
+ 
+@@ -98,8 +91,8 @@ AioTaskPool *coroutine_fn aio_task_pool_new(int max_busy_tasks)
+ {
+     AioTaskPool *pool = g_new0(AioTaskPool, 1);
+ 
+-    pool->main_co = qemu_coroutine_self();
+     pool->max_busy_tasks = max_busy_tasks;
++    qemu_co_queue_init(&pool->waiters);
+ 
+     return pool;
+ }
 -- 
-2.18.4
+2.21.0
 
 
