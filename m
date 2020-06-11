@@ -7,52 +7,51 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E3C7C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 13:03:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED7E4C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 13:04:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1234E20801
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 13:03:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1234E20801
+	by mail.kernel.org (Postfix) with ESMTPS id C1BD02078D
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 13:04:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1BD02078D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37498 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41080 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjMrF-000252-AQ
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 09:03:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46458)
+	id 1jjMsI-0003tE-00
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 09:04:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46466)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <yi.l.liu@intel.com>)
- id 1jjMd3-0002pW-00
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 08:48:21 -0400
-Received: from mga06.intel.com ([134.134.136.31]:46975)
+ id 1jjMd4-0002tI-AG
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 08:48:22 -0400
+Received: from mga06.intel.com ([134.134.136.31]:47012)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <yi.l.liu@intel.com>)
- id 1jjMcy-0007ze-Hn
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 08:48:20 -0400
-IronPort-SDR: ToimgzC8gN6X+RRILTF06gRnYViOAQ5IWoJDqMWu7iPOdCkMM2u0do9oIVEephLh/75BLlvExx
- 28JfggGamzSw==
+ id 1jjMd2-00081x-PB
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 08:48:21 -0400
+IronPort-SDR: MzDPVIujyXDIf5ORQ4daCHE0DBdbRe/3PuCS3PB9TEiz0VDO3XOvIUao5Y2Lc63EZ6ZHlfQ3zc
+ 2TCa1nJUj3Lw==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga005.jf.intel.com ([10.7.209.41])
  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
  11 Jun 2020 05:48:01 -0700
-IronPort-SDR: 4qfAmefgLYNTnN/vWx+pZwUgGdhdApYcHReu/f4iKic1P5cIMvE/vSomhjx9zYqNHp+CtJTF1J
- hyAeICU6WHnw==
+IronPort-SDR: Z2bXpPoYpZRMP6jJlDId9/q+RMYyujGNd2/taW25w59reO5oZpEWYmsaCOLLvzwwqIdyVUPAt+
+ 8VvJ2Mz/sLLA==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,499,1583222400"; d="scan'208";a="447911266"
+X-IronPort-AV: E=Sophos;i="5.73,499,1583222400"; d="scan'208";a="447911297"
 Received: from jacob-builder.jf.intel.com ([10.7.199.155])
- by orsmga005.jf.intel.com with ESMTP; 11 Jun 2020 05:48:00 -0700
+ by orsmga005.jf.intel.com with ESMTP; 11 Jun 2020 05:48:01 -0700
 From: Liu Yi L <yi.l.liu@intel.com>
 To: qemu-devel@nongnu.org,
 	alex.williamson@redhat.com,
 	peterx@redhat.com
-Subject: [RFC v6 17/25] intel_iommu: sync IOMMU nesting cap info for assigned
- devices
-Date: Thu, 11 Jun 2020 05:54:16 -0700
-Message-Id: <1591880064-30638-18-git-send-email-yi.l.liu@intel.com>
+Subject: [RFC v6 25/25] intel_iommu: modify x-scalable-mode to be string option
+Date: Thu, 11 Jun 2020 05:54:24 -0700
+Message-Id: <1591880064-30638-26-git-send-email-yi.l.liu@intel.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1591880064-30638-1-git-send-email-yi.l.liu@intel.com>
 References: <1591880064-30638-1-git-send-email-yi.l.liu@intel.com>
@@ -78,8 +77,9 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: jean-philippe@linaro.org, kevin.tian@intel.com, yi.l.liu@intel.com,
- Yi Sun <yi.y.sun@linux.intel.com>, kvm@vger.kernel.org, mst@redhat.com,
- jun.j.tian@intel.com, eric.auger@redhat.com, yi.y.sun@intel.com,
+ Yi Sun <yi.y.sun@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ kvm@vger.kernel.org, mst@redhat.com, jun.j.tian@intel.com,
+ eric.auger@redhat.com, yi.y.sun@intel.com,
  Jacob Pan <jacob.jun.pan@linux.intel.com>, pbonzini@redhat.com,
  hao.wu@intel.com, Richard Henderson <rth@twiddle.net>,
  david@gibson.dropbear.id.au
@@ -87,19 +87,22 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-For assigned devices, Intel vIOMMU which wants to build DMA protection
-based on physical IOMMU nesting paging should check the IOMMU nesting
-support in host side. The host will return IOMMU nesting cap info to
-user-space (e.g. VFIO returns IOMMU nesting cap info for nesting type
-IOMMU). vIOMMU needs to check:
-a) IOMMU model
-b) 1st-level page table supports
-c) address width
-d) pasid support
+Intel VT-d 3.0 introduces scalable mode, and it has a bunch of capabilities
+related to scalable mode translation, thus there are multiple combinations.
+While this vIOMMU implementation wants simplify it for user by providing
+typical combinations. User could config it by "x-scalable-mode" option. The
+usage is as below:
 
-This patch syncs the IOMMU nesting cap info when PCIe device (VFIO case)
-sets HostIOMMUContext to vIOMMU. If the host IOMMU nesting support is not
-compatible, vIOMMU should return failure to PCIe device.
+"-device intel-iommu,x-scalable-mode=["legacy"|"modern"|"off"]"
+
+ - "legacy": gives support for SL page table
+ - "modern": gives support for FL page table, pasid, virtual command
+ - "off": no scalable mode support
+ -  if not configured, means no scalable mode support, if not proper
+    configured, will throw error
+
+Note: this patch is supposed to be merged when  the whole vSVA patch series
+were merged.
 
 Cc: Kevin Tian <kevin.tian@intel.com>
 Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
@@ -107,205 +110,142 @@ Cc: Peter Xu <peterx@redhat.com>
 Cc: Yi Sun <yi.y.sun@linux.intel.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Richard Henderson <rth@twiddle.net>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
 Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+Signed-off-by: Yi Sun <yi.y.sun@linux.intel.com>
 ---
- hw/i386/intel_iommu.c          | 105 +++++++++++++++++++++++++++++++++++++++++
- hw/i386/intel_iommu_internal.h |   5 ++
- include/hw/i386/intel_iommu.h  |   4 ++
- 3 files changed, 114 insertions(+)
+rfcv5 (v2) -> rfcv6:
+*) reports want_nested to VFIO;
+*) assert iommu_set/unset_iommu_context() if vIOMMU is not scalable modern.
+
+ hw/i386/intel_iommu.c          | 39 +++++++++++++++++++++++++++++++++++----
+ hw/i386/intel_iommu_internal.h |  3 +++
+ include/hw/i386/intel_iommu.h  |  2 ++
+ 3 files changed, 40 insertions(+), 4 deletions(-)
 
 diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index 805801c..4a794f9 100644
+index ef16f18..a504dc4 100644
 --- a/hw/i386/intel_iommu.c
 +++ b/hw/i386/intel_iommu.c
-@@ -4099,6 +4099,82 @@ static int vtd_dev_get_iommu_attr(PCIBus *bus, void *opaque, int32_t devfn,
-     return ret;
- }
+@@ -4043,7 +4043,7 @@ static Property vtd_properties[] = {
+     DEFINE_PROP_UINT8("aw-bits", IntelIOMMUState, aw_bits,
+                       VTD_HOST_ADDRESS_WIDTH),
+     DEFINE_PROP_BOOL("caching-mode", IntelIOMMUState, caching_mode, FALSE),
+-    DEFINE_PROP_BOOL("x-scalable-mode", IntelIOMMUState, scalable_mode, FALSE),
++    DEFINE_PROP_STRING("x-scalable-mode", IntelIOMMUState, scalable_mode_str),
+     DEFINE_PROP_BOOL("dma-drain", IntelIOMMUState, dma_drain, true),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+@@ -4413,6 +4413,7 @@ VTDAddressSpace *vtd_find_add_as(IntelIOMMUState *s, PCIBus *bus, int devfn)
+ static int vtd_dev_get_iommu_attr(PCIBus *bus, void *opaque, int32_t devfn,
+                                    IOMMUAttr attr, void *data)
+ {
++    IntelIOMMUState *s = opaque;
+     int ret = 0;
  
-+
-+static bool vtd_check_nesting_info(IntelIOMMUState *s,
-+                                   struct iommu_nesting_info_vtd *vtd)
-+{
-+    return !((s->aw_bits != vtd->addr_width) ||
-+             ((s->host_cap & vtd->cap_mask) !=
-+              (vtd->cap_reg & vtd->cap_mask)) ||
-+             ((s->host_ecap & vtd->ecap_mask) !=
-+              (vtd->ecap_reg & vtd->ecap_mask)) ||
-+             (VTD_GET_PSS(s->host_ecap) != (vtd->pasid_bits - 1)));
-+}
-+
-+/* Caller should hold iommu lock. */
-+static bool vtd_sync_nesting_info(IntelIOMMUState *s,
-+                                      struct iommu_nesting_info_vtd *vtd)
-+{
-+    uint64_t cap, ecap;
-+
-+    if (s->cap_finalized) {
-+        return vtd_check_nesting_info(s, vtd);
-+    }
-+
-+    if (s->aw_bits > vtd->addr_width) {
-+        error_report("User aw-bits: %u > host address width: %u",
-+                      s->aw_bits, vtd->addr_width);
-+        return false;
-+    }
-+
-+    cap = s->host_cap & vtd->cap_reg & vtd->cap_mask;
-+    s->host_cap &= ~vtd->cap_mask;
-+    s->host_cap |= cap;
-+
-+    ecap = s->host_ecap & vtd->ecap_reg & vtd->ecap_mask;
-+    s->host_ecap &= ~vtd->ecap_mask;
-+    s->host_ecap |= ecap;
-+
-+    if ((VTD_ECAP_PASID & s->host_ecap) && vtd->pasid_bits &&
-+        (VTD_GET_PSS(s->host_ecap) > (vtd->pasid_bits - 1))) {
-+        s->host_ecap &= ~VTD_ECAP_PSS_MASK;
-+        s->host_ecap |= VTD_ECAP_PSS(vtd->pasid_bits - 1);
-+    }
-+    return true;
-+}
-+
-+/*
-+ * virtual VT-d which wants nested needs to check the host IOMMU
-+ * nesting cap info behind the assigned devices. Thus that vIOMMU
-+ * could bind guest page table to host.
-+ */
-+static bool vtd_check_iommu_ctx(IntelIOMMUState *s,
-+                                HostIOMMUContext *iommu_ctx)
-+{
-+    struct iommu_nesting_info *info = iommu_ctx->info;
-+    struct iommu_nesting_info_vtd *vtd;
-+    uint32_t minsz, size;
-+
-+    if (IOMMU_PASID_FORMAT_INTEL_VTD != info->format) {
-+        error_report("Format is not compatible for nesting!!!");
-+        return false;
-+    }
-+
-+    size = sizeof(*vtd);
-+    minsz = endof(struct iommu_nesting_info, flags);
-+    if (size > (info->size - minsz)) {
-+        /*
-+         * QEMU may have been using new linux-headers/iommu.h than
-+         * kernel supports, hence fail it.
-+         */
-+        error_report("IOMMU nesting cap is not compatible!!!");
-+        return false;
-+    }
-+
-+    vtd =  (struct iommu_nesting_info_vtd *) &info->data;
-+    return vtd_sync_nesting_info(s, vtd);
-+}
-+
- static int vtd_dev_set_iommu_context(PCIBus *bus, void *opaque,
-                                      int devfn,
-                                      HostIOMMUContext *iommu_ctx)
-@@ -4113,6 +4189,11 @@ static int vtd_dev_set_iommu_context(PCIBus *bus, void *opaque,
+     assert(0 <= devfn && devfn < PCI_DEVFN_MAX);
+@@ -4422,8 +4423,7 @@ static int vtd_dev_get_iommu_attr(PCIBus *bus, void *opaque, int32_t devfn,
+     {
+         bool *pdata = data;
  
-     vtd_iommu_lock(s);
+-        /* return false until vSVA is ready */
+-        *pdata = false;
++        *pdata = s->scalable_modern ? true : false;
+         break;
+     }
+     default:
+@@ -4517,6 +4517,8 @@ static int vtd_dev_set_iommu_context(PCIBus *bus, void *opaque,
+     VTDHostIOMMUContext *vtd_dev_icx;
  
-+    if (!vtd_check_iommu_ctx(s, iommu_ctx)) {
-+        vtd_iommu_unlock(s);
-+        return -ENOENT;
-+    }
-+
-     vtd_dev_icx = vtd_bus->dev_icx[devfn];
+     assert(0 <= devfn && devfn < PCI_DEVFN_MAX);
++    /* only modern scalable supports set_ioimmu_context */
++    assert(s->scalable_modern);
  
-     assert(!vtd_dev_icx);
-@@ -4368,6 +4449,14 @@ static void vtd_init(IntelIOMMUState *s)
-         s->ecap |= VTD_ECAP_SMTS | VTD_ECAP_SRS | VTD_ECAP_SLTS;
+     vtd_bus = vtd_find_add_bus(s, bus);
+ 
+@@ -4551,6 +4553,8 @@ static void vtd_dev_unset_iommu_context(PCIBus *bus, void *opaque, int devfn)
+     VTDHostIOMMUContext *vtd_dev_icx;
+ 
+     assert(0 <= devfn && devfn < PCI_DEVFN_MAX);
++    /* only modern scalable supports unset_ioimmu_context */
++    assert(s->scalable_modern);
+ 
+     vtd_bus = vtd_find_add_bus(s, bus);
+ 
+@@ -4778,8 +4782,13 @@ static void vtd_init(IntelIOMMUState *s)
      }
  
-+    if (!s->cap_finalized) {
-+        s->host_cap = s->cap;
-+        s->host_ecap = s->ecap;
-+    } else {
-+        s->cap = s->host_cap;
-+        s->ecap = s->host_ecap;
+     /* TODO: read cap/ecap from host to decide which cap to be exposed. */
+-    if (s->scalable_mode) {
++    if (s->scalable_mode && !s->scalable_modern) {
+         s->ecap |= VTD_ECAP_SMTS | VTD_ECAP_SRS | VTD_ECAP_SLTS;
++    } else if (s->scalable_mode && s->scalable_modern) {
++        s->ecap |= VTD_ECAP_SMTS | VTD_ECAP_SRS | VTD_ECAP_PASID |
++                   VTD_ECAP_FLTS | VTD_ECAP_PSS(VTD_PASID_SS) |
++                   VTD_ECAP_VCS;
++        s->vccap |= VTD_VCCAP_PAS;
+     }
+ 
+     if (!s->cap_finalized) {
+@@ -4920,6 +4929,28 @@ static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)
+         return false;
+     }
+ 
++    if (s->scalable_mode_str &&
++        (strcmp(s->scalable_mode_str, "off") &&
++         strcmp(s->scalable_mode_str, "modern") &&
++         strcmp(s->scalable_mode_str, "legacy"))) {
++        error_setg(errp, "Invalid x-scalable-mode config,"
++                         "Please use \"modern\", \"legacy\" or \"off\"");
++        return false;
 +    }
 +
-     vtd_reset_caches(s);
- 
-     /* Define registers with default values and bit semantics */
-@@ -4501,6 +4590,12 @@ static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)
++    if (s->scalable_mode_str &&
++        !strcmp(s->scalable_mode_str, "legacy")) {
++        s->scalable_mode = true;
++        s->scalable_modern = false;
++    } else if (s->scalable_mode_str &&
++        !strcmp(s->scalable_mode_str, "modern")) {
++        s->scalable_mode = true;
++        s->scalable_modern = true;
++    } else {
++        s->scalable_mode = false;
++        s->scalable_modern = false;
++    }
++
      return true;
  }
  
-+static void vtd_refresh_capability_reg(IntelIOMMUState *s)
-+{
-+    vtd_set_quad(s, DMAR_CAP_REG, s->cap);
-+    vtd_set_quad(s, DMAR_ECAP_REG, s->ecap);
-+}
-+
- static int vtd_machine_done_notify_one(Object *child, void *unused)
- {
-     IntelIOMMUState *iommu = INTEL_IOMMU_DEVICE(x86_iommu_get_default());
-@@ -4514,6 +4609,15 @@ static int vtd_machine_done_notify_one(Object *child, void *unused)
-         vtd_panic_require_caching_mode();
-     }
- 
-+    vtd_iommu_lock(iommu);
-+    iommu->cap = iommu->host_cap & iommu->cap;
-+    iommu->ecap = iommu->host_ecap & iommu->ecap;
-+    if (!iommu->cap_finalized) {
-+        iommu->cap_finalized = true;
-+    }
-+
-+    vtd_refresh_capability_reg(iommu);
-+    vtd_iommu_unlock(iommu);
-     return 0;
- }
- 
-@@ -4545,6 +4649,7 @@ static void vtd_realize(DeviceState *dev, Error **errp)
-     QLIST_INIT(&s->vtd_as_with_notifiers);
-     QLIST_INIT(&s->vtd_dev_icx_list);
-     qemu_mutex_init(&s->iommu_lock);
-+    s->cap_finalized = false;
-     memset(s->vtd_as_by_bus_num, 0, sizeof(s->vtd_as_by_bus_num));
-     memory_region_init_io(&s->csrmem, OBJECT(s), &vtd_mem_ops, s,
-                           "intel_iommu", DMAR_REG_SIZE);
 diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_internal.h
-index 51c0833..dbadd66 100644
+index 9530e0d..e7c5815 100644
 --- a/hw/i386/intel_iommu_internal.h
 +++ b/hw/i386/intel_iommu_internal.h
-@@ -196,9 +196,14 @@
- #define VTD_ECAP_PT                 (1ULL << 6)
- #define VTD_ECAP_MHMV               (15ULL << 20)
- #define VTD_ECAP_SRS                (1ULL << 31)
-+#define VTD_ECAP_PSS(val)           (((val) & 0x1fULL) << 35)
-+#define VTD_ECAP_PASID              (1ULL << 40)
+@@ -199,8 +199,11 @@
+ #define VTD_ECAP_PSS(val)           (((val) & 0x1fULL) << 35)
+ #define VTD_ECAP_PASID              (1ULL << 40)
  #define VTD_ECAP_SMTS               (1ULL << 43)
++#define VTD_ECAP_VCS                (1ULL << 44)
  #define VTD_ECAP_SLTS               (1ULL << 46)
++#define VTD_ECAP_FLTS               (1ULL << 47)
  
-+#define VTD_GET_PSS(val)            (((val) >> 35) & 0x1f)
-+#define VTD_ECAP_PSS_MASK           (0x1fULL << 35)
-+
- /* CAP_REG */
- /* (offset >> 4) << 24 */
- #define VTD_CAP_FRO                 (DMAR_FRCD_REG_OFFSET << 20)
++#define VTD_PASID_SS                (19)
+ #define VTD_GET_PSS(val)            (((val) >> 35) & 0x1f)
+ #define VTD_ECAP_PSS_MASK           (0x1fULL << 35)
+ 
 diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
-index 626c1cd..1aab882 100644
+index 1aab882..fd64364 100644
 --- a/include/hw/i386/intel_iommu.h
 +++ b/include/hw/i386/intel_iommu.h
-@@ -284,6 +284,9 @@ struct IntelIOMMUState {
-     uint64_t cap;                   /* The value of capability reg */
-     uint64_t ecap;                  /* The value of extended capability reg */
+@@ -263,6 +263,8 @@ struct IntelIOMMUState {
  
-+    uint64_t host_cap;              /* The value of host capability reg */
-+    uint64_t host_ecap;             /* The value of host ext-capability reg */
-+
-     uint32_t context_cache_gen;     /* Should be in [1,MAX] */
-     GHashTable *iotlb;              /* IOTLB */
+     bool caching_mode;              /* RO - is cap CM enabled? */
+     bool scalable_mode;             /* RO - is Scalable Mode supported? */
++    char *scalable_mode_str;        /* RO - admin's Scalable Mode config */
++    bool scalable_modern;           /* RO - is modern SM supported? */
  
-@@ -310,6 +313,7 @@ struct IntelIOMMUState {
-     uint64_t vccap;                 /* The value of vcmd capability reg */
-     uint64_t vcrsp;                 /* Current value of VCMD RSP REG */
- 
-+    bool cap_finalized;             /* Whether VTD capability finalized */
-     /*
-      * iommu_lock protects below:
-      * - per-IOMMU IOTLB caches
+     dma_addr_t root;                /* Current root table pointer */
+     bool root_scalable;             /* Type of root table (scalable or not) */
 -- 
 2.7.4
 
