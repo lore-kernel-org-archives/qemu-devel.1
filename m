@@ -7,68 +7,68 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1260AC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 20:15:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32284C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 20:15:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CC972206C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 20:15:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F0A5E2068E
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 20:15:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BLBAGrpt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC972206C3
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U/akjp+Y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0A5E2068E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57982 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59386 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjTbL-0003s3-1g
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 16:15:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55162)
+	id 1jjTbn-0004SQ-2W
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 16:15:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54974)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jjT98-00086r-7B
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 15:45:55 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:53081
+ id 1jjT8y-0007ys-3P
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 15:45:44 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:41655
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jjT8z-00018M-Ec
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 15:45:50 -0400
+ id 1jjT8s-000123-Dq
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 15:45:43 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591904744;
+ s=mimecast20190719; t=1591904737;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=R33mP9vMfsFFS6scj4tu07aOYyJWL6/9GYRUw28mqtE=;
- b=BLBAGrptxMFJP24Hp4JZWoKIIqedRl2/qnzy/fIOqUgNLoZu7gApl0gHXTHvGygUaDCWGL
- WzB2pqk6wjc0ts2Bp0U5+6Ihn6lsSReZl47f0NT0f4XDBSQgzdV2zGh38dyAFlzxkilkIY
- paf8ovnpWxKENSya2XU1qpr4GLXRnAQ=
+ bh=7pqCnSjTR2PzSL+AfGbFKdpToycd8SKN9cXtHQcKSko=;
+ b=U/akjp+YdMq2I6G/7AR9okt3hteO/0A2aZe6hpSz5HMuoC9qP5fF9ALZFBHRdc6CzL+ld5
+ 3ctO1Stx7fDzI93piTzvktyhtOnCoPjibVpu1PyyYqsO4O4/iS5yPCRWueFoaowFzpMZEb
+ 31LNWLR2DPcGaiXRQoRdhWeo9ZcKCJg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-70-qoMAg_mFOWO0sd4z8b9jgw-1; Thu, 11 Jun 2020 15:45:42 -0400
-X-MC-Unique: qoMAg_mFOWO0sd4z8b9jgw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-136-cUdRcWTjPWyjC3MWTIT2Kg-1; Thu, 11 Jun 2020 15:45:35 -0400
+X-MC-Unique: cUdRcWTjPWyjC3MWTIT2Kg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C4F0B846363;
- Thu, 11 Jun 2020 19:45:41 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6BFAE1800D41;
+ Thu, 11 Jun 2020 19:45:34 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5802F500D3;
- Thu, 11 Jun 2020 19:45:41 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 12AD38FF88;
+ Thu, 11 Jun 2020 19:45:33 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 064/115] target/i386: fix fisttpl,
- fisttpll handling of out-of-range values
-Date: Thu, 11 Jun 2020 15:43:58 -0400
-Message-Id: <20200611194449.31468-65-pbonzini@redhat.com>
+Subject: [PULL 053/115] target/i386: fix fscale handling of invalid exponent
+ encodings
+Date: Thu, 11 Jun 2020 15:43:47 -0400
+Message-Id: <20200611194449.31468-54-pbonzini@redhat.com>
 In-Reply-To: <20200611194449.31468-1-pbonzini@redhat.com>
 References: <20200611194449.31468-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
@@ -103,174 +103,82 @@ Sender: "Qemu-devel"
 
 From: Joseph Myers <joseph@codesourcery.com>
 
-The fist / fistt family of instructions should all store the most
-negative integer in the destination format when the rounded /
-truncated integer result is out of range or the input is an invalid
-encoding, infinity or NaN.  The fisttpl and fisttpll implementations
-(32-bit and 64-bit results, truncate towards zero) failed to do this,
-producing the most positive integer in some cases instead.  Fix this
-by copying the code used to handle this issue for fistpl and fistpll,
-adjusted to use the _round_to_zero functions for the actual
-conversion (but without any other changes to that code).
+The fscale implementation does not check for invalid encodings in the
+exponent operand, thus treating them like INT_MIN (the value returned
+for invalid encodings by floatx80_to_int32_round_to_zero).  Fix it to
+treat them similarly to signaling NaN exponents, thus generating a
+quiet NaN result.
 
 Signed-off-by: Joseph Myers <joseph@codesourcery.com>
-Message-Id: <alpine.DEB.2.21.2005152119160.3469@digraph.polyomino.org.uk>
+Message-Id: <alpine.DEB.2.21.2005070044190.18350@digraph.polyomino.org.uk>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- target/i386/fpu_helper.c          |  28 ++++++++-
- tests/tcg/i386/test-i386-fisttp.c | 100 ++++++++++++++++++++++++++++++
- 2 files changed, 126 insertions(+), 2 deletions(-)
- create mode 100644 tests/tcg/i386/test-i386-fisttp.c
+ target/i386/fpu_helper.c          |  5 ++++-
+ tests/tcg/i386/test-i386-fscale.c | 29 +++++++++++++++++++++++++++++
+ 2 files changed, 33 insertions(+), 1 deletion(-)
 
 diff --git a/target/i386/fpu_helper.c b/target/i386/fpu_helper.c
-index 41f6f391ca..9c93f385b1 100644
+index 0671de6952..10ff90370e 100644
 --- a/target/i386/fpu_helper.c
 +++ b/target/i386/fpu_helper.c
-@@ -338,12 +338,36 @@ int32_t helper_fistt_ST0(CPUX86State *env)
+@@ -968,7 +968,10 @@ void helper_frndint(CPUX86State *env)
  
- int32_t helper_fisttl_ST0(CPUX86State *env)
+ void helper_fscale(CPUX86State *env)
  {
--    return floatx80_to_int32_round_to_zero(ST0, &env->fp_status);
-+    int32_t val;
-+    signed char old_exp_flags;
-+
-+    old_exp_flags = get_float_exception_flags(&env->fp_status);
-+    set_float_exception_flags(0, &env->fp_status);
-+
-+    val = floatx80_to_int32_round_to_zero(ST0, &env->fp_status);
-+    if (get_float_exception_flags(&env->fp_status) & float_flag_invalid) {
-+        val = 0x80000000;
-+    }
-+    set_float_exception_flags(get_float_exception_flags(&env->fp_status)
-+                                | old_exp_flags, &env->fp_status);
-+    return val;
- }
+-    if (floatx80_is_any_nan(ST1)) {
++    if (floatx80_invalid_encoding(ST1)) {
++        float_raise(float_flag_invalid, &env->fp_status);
++        ST0 = floatx80_default_nan(&env->fp_status);
++    } else if (floatx80_is_any_nan(ST1)) {
+         ST0 = ST1;
+         if (floatx80_is_signaling_nan(ST0, &env->fp_status)) {
+             float_raise(float_flag_invalid, &env->fp_status);
+diff --git a/tests/tcg/i386/test-i386-fscale.c b/tests/tcg/i386/test-i386-fscale.c
+index aecac5125f..b65a055d0a 100644
+--- a/tests/tcg/i386/test-i386-fscale.c
++++ b/tests/tcg/i386/test-i386-fscale.c
+@@ -8,6 +8,11 @@ union u {
+     long double ld;
+ };
  
- int64_t helper_fisttll_ST0(CPUX86State *env)
- {
--    return floatx80_to_int64_round_to_zero(ST0, &env->fp_status);
-+    int64_t val;
-+    signed char old_exp_flags;
-+
-+    old_exp_flags = get_float_exception_flags(&env->fp_status);
-+    set_float_exception_flags(0, &env->fp_status);
-+
-+    val = floatx80_to_int64_round_to_zero(ST0, &env->fp_status);
-+    if (get_float_exception_flags(&env->fp_status) & float_flag_invalid) {
-+        val = 0x8000000000000000ULL;
-+    }
-+    set_float_exception_flags(get_float_exception_flags(&env->fp_status)
-+                                | old_exp_flags, &env->fp_status);
-+    return val;
- }
- 
- void helper_fldt_ST0(CPUX86State *env, target_ulong ptr)
-diff --git a/tests/tcg/i386/test-i386-fisttp.c b/tests/tcg/i386/test-i386-fisttp.c
-new file mode 100644
-index 0000000000..16af59a774
---- /dev/null
-+++ b/tests/tcg/i386/test-i386-fisttp.c
-@@ -0,0 +1,100 @@
-+/* Test fisttpl and fisttpll instructions.  */
-+
-+#include <stdint.h>
-+#include <stdio.h>
-+#include <string.h>
-+
-+union u {
-+    struct { uint64_t sig; uint16_t sign_exp; } s;
-+    long double ld;
-+};
-+
 +volatile union u ld_invalid_1 = { .s = { 1, 1234 } };
++volatile union u ld_invalid_2 = { .s = { 0, 1234 } };
++volatile union u ld_invalid_3 = { .s = { 0, 0x7fff } };
++volatile union u ld_invalid_4 = { .s = { (UINT64_C(1) << 63) - 1, 0x7fff } };
 +
-+int main(void)
-+{
-+    int ret = 0;
-+    int32_t res_32;
-+    int64_t res_64;
-+    __asm__ volatile ("fisttpl %0" : "=m" (res_32) : "t" (0x1p100L) : "st");
-+    if (res_32 != INT32_MIN) {
-+        printf("FAIL: fisttpl 0x1p100\n");
+ volatile long double ld_res;
+ 
+ int isnan_ld(long double x)
+@@ -33,5 +38,29 @@ int main(void)
+         printf("FAIL: fscale snan\n");
+         ret = 1;
+     }
++    __asm__ volatile ("fscale" : "=t" (ld_res) :
++                      "0" (2.5L), "u" (ld_invalid_1.ld));
++    if (!isnan_ld(ld_res) || issignaling_ld(ld_res)) {
++        printf("FAIL: fscale invalid 1\n");
 +        ret = 1;
 +    }
-+    __asm__ volatile ("fisttpl %0" : "=m" (res_32) : "t" (-0x1p100L) : "st");
-+    if (res_32 != INT32_MIN) {
-+        printf("FAIL: fisttpl -0x1p100\n");
++    __asm__ volatile ("fscale" : "=t" (ld_res) :
++                      "0" (2.5L), "u" (ld_invalid_2.ld));
++    if (!isnan_ld(ld_res) || issignaling_ld(ld_res)) {
++        printf("FAIL: fscale invalid 2\n");
 +        ret = 1;
 +    }
-+    __asm__ volatile ("fisttpl %0" : "=m" (res_32) : "t" (__builtin_infl()) :
-+                      "st");
-+    if (res_32 != INT32_MIN) {
-+        printf("FAIL: fisttpl inf\n");
++    __asm__ volatile ("fscale" : "=t" (ld_res) :
++                      "0" (2.5L), "u" (ld_invalid_3.ld));
++    if (!isnan_ld(ld_res) || issignaling_ld(ld_res)) {
++        printf("FAIL: fscale invalid 3\n");
 +        ret = 1;
 +    }
-+    __asm__ volatile ("fisttpl %0" : "=m" (res_32) : "t" (-__builtin_infl()) :
-+                      "st");
-+    if (res_32 != INT32_MIN) {
-+        printf("FAIL: fisttpl -inf\n");
++    __asm__ volatile ("fscale" : "=t" (ld_res) :
++                      "0" (2.5L), "u" (ld_invalid_4.ld));
++    if (!isnan_ld(ld_res) || issignaling_ld(ld_res)) {
++        printf("FAIL: fscale invalid 4\n");
 +        ret = 1;
 +    }
-+    __asm__ volatile ("fisttpl %0" : "=m" (res_32) : "t" (__builtin_nanl("")) :
-+                      "st");
-+    if (res_32 != INT32_MIN) {
-+        printf("FAIL: fisttpl nan\n");
-+        ret = 1;
-+    }
-+    __asm__ volatile ("fisttpl %0" : "=m" (res_32) :
-+                      "t" (-__builtin_nanl("")) : "st");
-+    if (res_32 != INT32_MIN) {
-+        printf("FAIL: fisttpl -nan\n");
-+        ret = 1;
-+    }
-+    __asm__ volatile ("fisttpl %0" : "=m" (res_32) : "t" (ld_invalid_1.ld) :
-+                      "st");
-+    if (res_32 != INT32_MIN) {
-+        printf("FAIL: fisttpl invalid\n");
-+        ret = 1;
-+    }
-+    __asm__ volatile ("fisttpll %0" : "=m" (res_64) : "t" (0x1p100L) : "st");
-+    if (res_64 != INT64_MIN) {
-+        printf("FAIL: fisttpll 0x1p100\n");
-+        ret = 1;
-+    }
-+    __asm__ volatile ("fisttpll %0" : "=m" (res_64) : "t" (-0x1p100L) : "st");
-+    if (res_64 != INT64_MIN) {
-+        printf("FAIL: fisttpll -0x1p100\n");
-+        ret = 1;
-+    }
-+    __asm__ volatile ("fisttpll %0" : "=m" (res_64) : "t" (__builtin_infl()) :
-+                      "st");
-+    if (res_64 != INT64_MIN) {
-+        printf("FAIL: fisttpll inf\n");
-+        ret = 1;
-+    }
-+    __asm__ volatile ("fisttpll %0" : "=m" (res_64) : "t" (-__builtin_infl()) :
-+                      "st");
-+    if (res_64 != INT64_MIN) {
-+        printf("FAIL: fisttpll -inf\n");
-+        ret = 1;
-+    }
-+    __asm__ volatile ("fisttpll %0" : "=m" (res_64) :
-+                      "t" (__builtin_nanl("")) : "st");
-+    if (res_64 != INT64_MIN) {
-+        printf("FAIL: fisttpll nan\n");
-+        ret = 1;
-+    }
-+    __asm__ volatile ("fisttpll %0" : "=m" (res_64) :
-+                      "t" (-__builtin_nanl("")) : "st");
-+    if (res_64 != INT64_MIN) {
-+        printf("FAIL: fisttpll -nan\n");
-+        ret = 1;
-+    }
-+    __asm__ volatile ("fisttpll %0" : "=m" (res_64) : "t" (ld_invalid_1.ld) :
-+                      "st");
-+    if (res_64 != INT64_MIN) {
-+        printf("FAIL: fisttpll invalid\n");
-+        ret = 1;
-+    }
-+    return ret;
-+}
+     return ret;
+ }
 -- 
 2.26.2
 
