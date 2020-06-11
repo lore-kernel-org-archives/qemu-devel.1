@@ -2,90 +2,145 @@ Return-Path: <SRS0=U615=7Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98CB7C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 08:52:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6726C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 09:08:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 59BA620656
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 08:52:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 95B3B20760
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 09:08:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DXfZtLfI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59BA620656
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V1myj3ci"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95B3B20760
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48730 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52536 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjIwK-0003GX-Iu
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 04:52:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46536)
+	id 1jjJCg-000872-Rn
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 05:08:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51944)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jjIvX-0002qT-Ei
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 04:51:11 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:54925)
- by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jjIvW-0004Dv-Es
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 04:51:11 -0400
-Received: by mail-wm1-x341.google.com with SMTP id g10so4199636wmh.4
- for <qemu-devel@nongnu.org>; Thu, 11 Jun 2020 01:51:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=XcV31mE9cV85LRDKBkaUuOKqUXVQcEtcxcXOxsgcs4M=;
- b=DXfZtLfIJ6BE4siMm8LmrYiene3EC066wjBuabCz1ohSCHkbLmm02XNg3aSQrRMmPm
- d9TzjwYrP4+g1spj5MJt+vpSb3fKvGM3to2kEopbmugOQ0rWsrohzmzoy3mnoZT0bq/I
- Hn4NkFASPghH8cXI03FtoxSDwhGyKv8LVMH26D/m/WGWYlKlFg+qw7Z4Y+fwAgqwxi1d
- ZjIw5/Y6dMBKLzKTdT6Ec0mqmYcSexhO8jrbcHpGscwqVJGIOMJY1aXIkqWUmWo8r50k
- uiFmSxtC0EBOMluPVDt/9RY8XRYFWyymkSnDvsSHDpewyFw/GtwnYyDIVnuI7iZZUs55
- SgwA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=XcV31mE9cV85LRDKBkaUuOKqUXVQcEtcxcXOxsgcs4M=;
- b=qGE/sNvKwEBAlUIerZfrnC7FEkqw1AXS8UX4ktaOkiY7Y+gQUWZaEAaL+6wJtwH/O+
- OxRyI7+nTe+AcoyHbOu4erRRCodzvS+senjkZJbso0Y8GY4UXFDY2UyZElGXNSjgggFr
- qm0hXnmk0A+cyLSj0sfl6F8cjColeB7W3KwjV+Hg8ovj6ANREn5iWenM252SOvDnVxhL
- tZN7KEUzTHHMCC0IbV2gLtrehuo4iupF3WYHhgxrHz7UMhXlASAGZrHM2ti/vggZ2z14
- r7A53C/A9mly+j1LbAkqNVXkDrPH+jvPIDb2GMWcCqvrZUFkqeSYix9ISadrt4rFzfXV
- kTKQ==
-X-Gm-Message-State: AOAM531/qT/jzHoVBtXk0jjpFiMg7Ye8rR15DQBLz5oN4x/GLx+cCvA9
- F/mqkx8QCeudxmQI7f/LAT0+B4c3ThW6BRaRS+M=
-X-Google-Smtp-Source: ABdhPJyn57R5h+I26YEdCt+5sJ5xnT5/2JWBbE6iKLGSj5M57bhUNvoZtg58r5jJ4VyanB0Kk4r3ZigM/7LsCts3Hxc=
-X-Received: by 2002:a1c:cc0d:: with SMTP id h13mr7584148wmb.168.1591865463862; 
- Thu, 11 Jun 2020 01:51:03 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <lvivier@redhat.com>)
+ id 1jjJC3-0007go-Le
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 05:08:15 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:58512
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <lvivier@redhat.com>)
+ id 1jjJC1-0007vJ-RU
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 05:08:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591866491;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=oFGE11LRFyok6s84FTq4hcMV1SBsOAfjb3j6Mmz2C44=;
+ b=V1myj3cikIqaCFWB/T2cNF+oKCQc8yOYuMUT2GYQ7JwYmFfHfS8A9otG9ubX/YsOcZkJhN
+ FJUEr32WL2bUOuaYqmAhhSYwj0DmhZEqRjJrD5RTPbtEe3UfqYmkAM2NElYxK40HcsrOLq
+ uBOxkOmNctuRfzKWsBUgtdd6bTfxMig=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-29-eNTs-W_6NaKno13FjLH7hA-1; Thu, 11 Jun 2020 05:08:09 -0400
+X-MC-Unique: eNTs-W_6NaKno13FjLH7hA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D941B100A8E8;
+ Thu, 11 Jun 2020 09:08:06 +0000 (UTC)
+Received: from [10.36.113.1] (ovpn-113-1.ams2.redhat.com [10.36.113.1])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A637710013C1;
+ Thu, 11 Jun 2020 09:07:52 +0000 (UTC)
+Subject: Re: [RFC v3 1/8] net: introduce qemu_get_peer
+To: Cindy Lu <lulu@redhat.com>, mst@redhat.com, armbru@redhat.com,
+ eblake@redhat.com, cohuck@redhat.com, jasowang@redhat.com
+References: <20200529140620.28759-1-lulu@redhat.com>
+ <20200529140620.28759-2-lulu@redhat.com>
+From: Laurent Vivier <lvivier@redhat.com>
+Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ D+Ofp0T3KOr1RUHvCZoLURfFhSQ=
+Message-ID: <d5f3e088-282e-846a-6c02-fbbe3813854f@redhat.com>
+Date: Thu, 11 Jun 2020 11:07:51 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-References: <1591065557-9174-1-git-send-email-chenhc@lemote.com>
- <1591065557-9174-4-git-send-email-chenhc@lemote.com>
- <59a6cfbb-3b53-1ca0-7871-5956b4188e31@flygoat.com>
- <CAAhV-H66OdX3zNwWj5sRjAWLJWoB5GPLsj1-MnV5G8Dt0i_RmQ@mail.gmail.com>
- <3cfda172-7637-2791-cf65-0ba7a2e4c6bb@flygoat.com>
-In-Reply-To: <3cfda172-7637-2791-cf65-0ba7a2e4c6bb@flygoat.com>
-From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Date: Thu, 11 Jun 2020 10:50:45 +0200
-Message-ID: <CAHiYmc7BoPkwDHOoOOKAWdW7gyZ5UiDAZZ0A8v8EZheP3GxhNQ@mail.gmail.com>
-Subject: Re: [PATCH for-5.1 V4 3/4] hw/mips: Add Loongson-3 machine support
- (with KVM)
-To: Jiaxun Yang <jiaxun.yang@flygoat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::341;
- envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wm1-x341.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200529140620.28759-2-lulu@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=lvivier@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 03:29:35
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,135 +153,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Huacai Chen <zltjiangshi@gmail.com>, Huacai Chen <chenhuacai@gmail.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: mhabets@solarflare.com, qemu-devel@nongnu.org, rob.miller@broadcom.com,
+ saugatm@xilinx.com, maxime.coquelin@redhat.com, hch@infradead.org,
+ eperezma@redhat.com, jgg@mellanox.com, shahafs@mellanox.com,
+ kevin.tian@intel.com, parav@mellanox.com, vmireyno@marvell.com,
+ cunming.liang@intel.com, gdawar@xilinx.com, jiri@mellanox.com,
+ xiao.w.wang@intel.com, stefanha@redhat.com, zhihong.wang@intel.com,
+ aadam@redhat.com, rdunlap@infradead.org, hanand@xilinx.com,
+ lingshan.zhu@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> >>> +    int fd = 0, freq = 0;
-> >>> +    char buf[1024], *buf_p;
+On 29/05/2020 16:06, Cindy Lu wrote:
+> This is a small function that can get the peer from given NetClientState and queue_index
+> 
+> Signed-off-by: Cindy Lu <lulu@redhat.com>
+> ---
+>  include/net/net.h | 1 +
+>  net/net.c         | 6 ++++++
+>  2 files changed, 7 insertions(+)
+> 
+> diff --git a/include/net/net.h b/include/net/net.h
+> index 39085d9444..e7ef42d62b 100644
+> --- a/include/net/net.h
+> +++ b/include/net/net.h
+> @@ -176,6 +176,7 @@ void hmp_info_network(Monitor *mon, const QDict *qdict);
+>  void net_socket_rs_init(SocketReadState *rs,
+>                          SocketReadStateFinalize *finalize,
+>                          bool vnet_hdr);
+> +NetClientState *qemu_get_peer(NetClientState *nc, int queue_index);
+>  
+>  /* NIC info */
+>  
+> diff --git a/net/net.c b/net/net.c
+> index 38778e831d..599fb61028 100644
+> --- a/net/net.c
+> +++ b/net/net.c
+> @@ -324,6 +324,12 @@ void *qemu_get_nic_opaque(NetClientState *nc)
+>  
+>      return nic->opaque;
+>  }
 
-1024 should have been defined via preprocessor constant
+To be consistent with the style of the file, you should add a blank line
+here.
 
-> >>> +
-> >>> +    fd = open("/proc/cpuinfo", O_RDONLY);
-> >>> +    if (fd == -1) {
-> >>> +        fprintf(stderr, "Failed to open /proc/cpuinfo!\n");
-> >>> +        return 0;
-> >>> +    }
-> >>> +
-> >>> +    if (read(fd, buf, 1024) < 0) {
-
-The same constant should be used here.
-
-...
-
-> >>> +    loaderparams.a1 = 0xffffffff80000000ULL + BOOTPARAM_PHYADDR;
-> >>> +    loaderparams.a2 = 0xffffffff80000000ULL + BOOTPARAM_PHYADDR + ret;
-
-What is 0xffffffff80000000ULL? Preprocessor constant possible?
-
-...
-
-> >>> +    if (!kvm_enabled()) {
-> >>> +        if (!machine->cpu_type) {
-> >>> +            machine->cpu_type = MIPS_CPU_TYPE_NAME("Loongson-3A1000");
-> >>> +        }
-> >>> +        if (!strstr(machine->cpu_type, "Loongson-3A1000")) {
-> >>> +            error_report("Loongson-3/TCG need cpu type Loongson-3A1000");
-> >>> +            exit(1);
-> >>> +        }
-> >>> +    } else {
-> >>> +        if (!machine->cpu_type) {
-> >>> +            machine->cpu_type = MIPS_CPU_TYPE_NAME("Loongson-3A4000");
-> >>> +        }
-> >>> +        if (!strstr(machine->cpu_type, "Loongson-3A4000")) {
-> >>> +            error_report("Loongson-3/KVM need cpu type Loongson-3A4000");
-> >>> +            exit(1);
-> >>> +        }
-> >>> +    }
-
-Some explanation needs to be written in comments about the code segment above.
-
-I find the whole segment a little bit questionable. For non-KVM one
-CPU, for KVM another? Why non-KVM can't use both, and allow to be
-specified via command line?
-
-> >>> +    memory_region_add_subregion(address_space_mem, 0x00000000LL, ram);
-> >>> +    memory_region_add_subregion(address_space_mem, 0x1fc00000LL, bios);
-> >>> +    memory_region_add_subregion(address_space_mem, 0x80000000LL, machine->ram);
-> >>> +    memory_region_add_subregion(address_space_mem, PM_MMIO_ADDR, iomem);
-
-I would avoid hard coded numbers.
-
-> >>> +
-> >>> +    /*
-> >>> +     * We do not support flash operation, just loading pmon.bin as raw BIOS.
-> >>> +     * Please use -L to set the BIOS path and -bios to set bios name.
-> >>> +     */
-> >>> +
-> >>> +    if (kernel_filename) {
-> >>> +        loaderparams.ram_size = ram_size;
-> >>> +        loaderparams.kernel_filename = kernel_filename;
-> >>> +        loaderparams.kernel_cmdline = kernel_cmdline;
-> >>> +        loaderparams.initrd_filename = initrd_filename;
-> >>> +        loaderparams.kernel_entry = load_kernel(env);
-> >>> +        rom_add_blob_fixed("bios",
-> >>> +                         bios_boot_code, sizeof(bios_boot_code), 0x1fc00000LL);
-
-Again, here, 0x1fc00000LL. This should be defined and properly named
-via preprocessor.
-
-> >>> +    } else {
-> >>> +        if (bios_name == NULL) {
-> >>> +                bios_name = LOONGSON3_BIOSNAME;
-> >>> +        }
-> >>> +        filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
-> >>> +        if (filename) {
-> >>> +            bios_size = load_image_targphys(filename, 0x1fc00000LL,
-
-Again.
-
-> >>> +                                            BIOS_SIZE);
-> >>> +            g_free(filename);
-> >>> +        } else {
-> >>> +            bios_size = -1;
-> >>> +        }
-> >>> +
-> >>> +    if (serial_hd(0)) {
-> >>> +        serial_mm_init(address_space_mem, 0x1fe001e0, 0, env->irq[2],
-> >>> +                           115200, serial_hd(0), DEVICE_NATIVE_ENDIAN);
-
-115200 should be something like XXX_DEFAULT_BAUDRATE
-
-> >>> +    }
-> >>> +}
-> >>> +
-> >>> +static void mips_loongson3_machine_init(MachineClass *mc)
-> >>> +{
-> >>> +    mc->desc = "Generic Loongson-3 Platform";
-> >>> +    mc->init = mips_loongson3_init;
-> >>> +    mc->block_default_type = IF_IDE;
-> >>> +    mc->max_cpus = LOONGSON_MAX_VCPUS;
-> >>> +    mc->default_ram_id = "loongson3.highram";
-> >>> +    mc->default_ram_size = 1200 * MiB;
-> >>
-> >> 1200MiB looks wired... Why not 1024?
-> > Oh, it is just because our Fedora28 needs more than 1024MB to work
-> > fine, maybe 1280 is better?
->
-> Ahh if that's the reason then it looks fine for me.
->
-
-These choices should be documented in brief comments.
-
-If left this way, we leave future developers solve puzzles and
-desperately guessing.
+> +NetClientState *qemu_get_peer(NetClientState *nc, int queue_index)
+> +{
+> +    assert(nc != NULL);
+> +    NetClientState *ncs = nc + queue_index;
+> +    return ncs->peer;
+> +}
+>  
+>  static void qemu_cleanup_net_client(NetClientState *nc)
+>  {
+> 
 
 Thanks,
-Aleksandar
+Laurent
+
 
