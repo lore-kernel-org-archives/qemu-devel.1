@@ -2,46 +2,44 @@ Return-Path: <SRS0=U615=7Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3451C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 17:13:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02F73C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 17:14:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7E54420829
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 17:13:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E54420829
+	by mail.kernel.org (Postfix) with ESMTPS id CD7A820870
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 17:14:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD7A820870
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=openvz.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34446 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40794 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjQlM-0007o6-P9
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 13:13:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34004)
+	id 1jjQmb-0001yT-23
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 13:14:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34036)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <den@openvz.org>)
- id 1jjQk5-0005Qz-6d; Thu, 11 Jun 2020 13:11:53 -0400
-Received: from relay.sw.ru ([185.231.240.75]:35194 helo=relay3.sw.ru)
+ id 1jjQk6-0005TM-Oe; Thu, 11 Jun 2020 13:11:54 -0400
+Received: from relay.sw.ru ([185.231.240.75]:35186 helo=relay3.sw.ru)
  by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <den@openvz.org>)
- id 1jjQk2-0000qj-O4; Thu, 11 Jun 2020 13:11:52 -0400
+ id 1jjQk3-0000qh-8R; Thu, 11 Jun 2020 13:11:54 -0400
 Received: from [192.168.15.81] (helo=iris.sw.ru)
  by relay3.sw.ru with esmtp (Exim 4.93)
  (envelope-from <den@openvz.org>)
- id 1jjQjt-0000BN-4x; Thu, 11 Jun 2020 20:11:41 +0300
+ id 1jjQjs-0000BN-Kl; Thu, 11 Jun 2020 20:11:40 +0300
 From: "Denis V. Lunev" <den@openvz.org>
 To: qemu-block@nongnu.org,
 	qemu-devel@nongnu.org
-Subject: [PATCH 4/4] block/io: improve savevm performance
-Date: Thu, 11 Jun 2020 20:11:43 +0300
-Message-Id: <20200611171143.21589-5-den@openvz.org>
+Subject: [PATCH v3 0/4] block: seriously improve savevm performance
+Date: Thu, 11 Jun 2020 20:11:39 +0300
+Message-Id: <20200611171143.21589-1-den@openvz.org>
 X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200611171143.21589-1-den@openvz.org>
-References: <20200611171143.21589-1-den@openvz.org>
 Received-SPF: pass client-ip=185.231.240.75; envelope-from=den@openvz.org;
  helo=relay3.sw.ru
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 13:11:47
@@ -68,34 +66,42 @@ Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
  Juan Quintela <quintela@redhat.com>,
  "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
  Denis Plotnikov <dplotnikov@virtuozzo.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, "Denis V. Lunev" <den@openvz.org>
+ Stefan Hajnoczi <stefanha@redhat.com>, "Denis V . Lunev" <den@openvz.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch does 2 standard basic things:
+This series do standard basic things:
 - it creates intermediate buffer for all writes from QEMU migration code
-  to block driver,
+  to QCOW2 image,
 - this buffer is sent to disk asynchronously, allowing several writes to
   run in parallel.
-
-Thus bdrv_vmstate_write() is becoming asynchronous. All pending operations
-completion are performed in newly invented bdrv_flush_vmstate().
 
 In general, migration code is fantastically inefficent (by observation),
 buffers are not aligned and sent with arbitrary pieces, a lot of time
 less than 100 bytes at a chunk, which results in read-modify-write
-operations if target file descriptor is opened with O_DIRECT. It should
-also be noted that all operations are performed into unallocated image
-blocks, which also suffer due to partial writes to such new clusters
-even on cached file descriptors.
+operations with non-cached operations. It should also be noted that all
+operations are performed into unallocated image blocks, which also suffer
+due to partial writes to such new clusters.
 
-Snapshot creation time (2 GB Fedora-31 VM running over NVME storage):
-                original     fixed
-cached:          1.79s       1.27s
-non-cached:      3.29s       0.81s
+This patch series is an implementation of idea discussed in the RFC
+posted by Denis Plotnikov
+https://lists.gnu.org/archive/html/qemu-devel/2020-04/msg01925.html
+Results with this series over NVME are better than original code
+                original     rfc    this
+cached:          1.79s      2.38s   1.27s
+non-cached:      3.29s      1.31s   0.81s
 
-The difference over HDD would be more significant :)
+Changes from v2:
+- code moved from QCOW2 level to generic block level
+- created bdrv_flush_vmstate helper to fix 022, 029 tests
+- added recursive for bs->file in bdrv_co_flush_vmstate (fix 267)
+- fixed blk_save_vmstate helper
+- fixed coroutine wait as Vladimir suggested with waiting fixes from me
+
+Changes from v1:
+- patchew warning fixed
+- fixed validation that only 1 waiter is allowed in patch 1
 
 Signed-off-by: Denis V. Lunev <den@openvz.org>
 CC: Kevin Wolf <kwolf@redhat.com>
@@ -106,198 +112,6 @@ CC: Juan Quintela <quintela@redhat.com>
 CC: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 CC: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 CC: Denis Plotnikov <dplotnikov@virtuozzo.com>
----
- block/io.c                | 121 +++++++++++++++++++++++++++++++++++++-
- include/block/block_int.h |   8 +++
- 2 files changed, 127 insertions(+), 2 deletions(-)
 
-diff --git a/block/io.c b/block/io.c
-index fbf352f39d..698f1eef76 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -26,6 +26,7 @@
- #include "trace.h"
- #include "sysemu/block-backend.h"
- #include "block/aio-wait.h"
-+#include "block/aio_task.h"
- #include "block/blockjob.h"
- #include "block/blockjob_int.h"
- #include "block/block_int.h"
-@@ -2633,6 +2634,102 @@ typedef struct BdrvVmstateCo {
-     int                 ret;
- } BdrvVmstateCo;
- 
-+typedef struct BdrvVMStateTask {
-+    AioTask task;
-+
-+    BlockDriverState *bs;
-+    int64_t offset;
-+    void *buf;
-+    size_t bytes;
-+} BdrvVMStateTask;
-+
-+typedef struct BdrvSaveVMState {
-+    AioTaskPool *pool;
-+    BdrvVMStateTask *t;
-+} BdrvSaveVMState;
-+
-+
-+static coroutine_fn int bdrv_co_vmstate_save_task_entry(AioTask *task)
-+{
-+    int err = 0;
-+    BdrvVMStateTask *t = container_of(task, BdrvVMStateTask, task);
-+
-+    if (t->bytes != 0) {
-+        QEMUIOVector local_qiov;
-+        qemu_iovec_init_buf(&local_qiov, t->buf, t->bytes);
-+
-+        bdrv_inc_in_flight(t->bs);
-+        err = t->bs->drv->bdrv_save_vmstate(t->bs, &local_qiov, t->offset);
-+        bdrv_dec_in_flight(t->bs);
-+    }
-+
-+    qemu_vfree(t->buf);
-+    return err;
-+}
-+
-+static BdrvVMStateTask *bdrv_vmstate_task_create(BlockDriverState *bs,
-+                                                 int64_t pos, size_t size)
-+{
-+    BdrvVMStateTask *t = g_new(BdrvVMStateTask, 1);
-+
-+    *t = (BdrvVMStateTask) {
-+        .task.func = bdrv_co_vmstate_save_task_entry,
-+        .buf = qemu_blockalign(bs, size),
-+        .offset = pos,
-+        .bs = bs,
-+    };
-+
-+    return t;
-+}
-+
-+static int bdrv_co_do_save_vmstate(BlockDriverState *bs, QEMUIOVector *qiov,
-+                                   int64_t pos)
-+{
-+    BdrvSaveVMState *state = bs->savevm_state;
-+    BdrvVMStateTask *t;
-+    size_t buf_size = MAX(bdrv_get_cluster_size(bs), 1 * MiB);
-+    size_t to_copy;
-+    size_t off;
-+
-+    if (state == NULL) {
-+        state = g_new(BdrvSaveVMState, 1);
-+        *state = (BdrvSaveVMState) {
-+            .pool = aio_task_pool_new(BDRV_VMSTATE_WORKERS_MAX),
-+            .t = bdrv_vmstate_task_create(bs, pos, buf_size),
-+        };
-+
-+        bs->savevm_state = state;
-+    }
-+
-+    if (aio_task_pool_status(state->pool) < 0) {
-+        return aio_task_pool_status(state->pool);
-+    }
-+
-+    t = state->t;
-+    if (t->offset + t->bytes != pos) {
-+        /* Normally this branch is not reachable from migration */
-+        return bs->drv->bdrv_save_vmstate(bs, qiov, pos);
-+    }
-+
-+    off = 0;
-+    while (1) {
-+        to_copy = MIN(qiov->size - off, buf_size - t->bytes);
-+        qemu_iovec_to_buf(qiov, off, t->buf + t->bytes, to_copy);
-+        t->bytes += to_copy;
-+        if (t->bytes < buf_size) {
-+            return qiov->size;
-+        }
-+
-+        aio_task_pool_start_task(state->pool, &t->task);
-+
-+        pos += to_copy;
-+        off += to_copy;
-+        state->t = t = bdrv_vmstate_task_create(bs, pos, buf_size);
-+    }
-+
-+    return qiov->size;
-+}
-+
- static int coroutine_fn
- bdrv_co_rw_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos,
-                    bool is_read)
-@@ -2648,7 +2745,7 @@ bdrv_co_rw_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos,
-         if (is_read) {
-             ret = drv->bdrv_load_vmstate(bs, qiov, pos);
-         } else {
--            ret = drv->bdrv_save_vmstate(bs, qiov, pos);
-+            ret = bdrv_co_do_save_vmstate(bs, qiov, pos);
-         }
-     } else if (bs->file) {
-         ret = bdrv_co_rw_vmstate(bs->file->bs, qiov, pos, is_read);
-@@ -2733,7 +2830,27 @@ typedef struct FlushVMStateCo {
- 
- static int coroutine_fn bdrv_co_flush_vmstate(BlockDriverState *bs)
- {
--    return 0;
-+    int err;
-+    BdrvSaveVMState *state = bs->savevm_state;
-+
-+    if (bs->drv->bdrv_save_vmstate == NULL && bs->file != NULL) {
-+        return bdrv_co_flush_vmstate(bs->file->bs);
-+    }
-+    if (state == NULL) {
-+        return 0;
-+    }
-+
-+    aio_task_pool_start_task(state->pool, &state->t->task);
-+
-+    aio_task_pool_wait_all(state->pool);
-+    err = aio_task_pool_status(state->pool);
-+
-+    aio_task_pool_free(state->pool);
-+    g_free(state);
-+
-+    bs->savevm_state = NULL;
-+
-+    return err;
- }
- 
- static void coroutine_fn bdrv_flush_vmstate_co_entry(void *opaque)
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 791de6a59c..f90f0e8b6a 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -61,6 +61,8 @@
- 
- #define BLOCK_PROBE_BUF_SIZE        512
- 
-+#define BDRV_VMSTATE_WORKERS_MAX    8
-+
- enum BdrvTrackedRequestType {
-     BDRV_TRACKED_READ,
-     BDRV_TRACKED_WRITE,
-@@ -784,6 +786,9 @@ struct BdrvChild {
-     QLIST_ENTRY(BdrvChild) next_parent;
- };
- 
-+
-+typedef struct BdrvSaveVMState BdrvSaveVMState;
-+
- /*
-  * Note: the function bdrv_append() copies and swaps contents of
-  * BlockDriverStates, so if you add new fields to this struct, please
-@@ -947,6 +952,9 @@ struct BlockDriverState {
- 
-     /* BdrvChild links to this node may never be frozen */
-     bool never_freeze;
-+
-+    /* Intermediate buffer for VM state saving from snapshot creation code */
-+    BdrvSaveVMState *savevm_state;
- };
- 
- struct BlockBackendRootState {
--- 
-2.17.1
 
 
