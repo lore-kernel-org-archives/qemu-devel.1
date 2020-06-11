@@ -2,60 +2,62 @@ Return-Path: <SRS0=U615=7Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B561C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 09:11:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85A4DC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 09:11:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 42DD320760
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 09:11:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42DD320760
+	by mail.kernel.org (Postfix) with ESMTPS id 48DF220760
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 09:11:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48DF220760
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56940 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57772 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjJEp-0001b9-Dw
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 05:11:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52672)
+	id 1jjJF5-0001vS-Dr
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 05:11:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52784)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jjJDe-00008n-4p
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 05:09:54 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:24371
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jjJDk-0000IP-MR
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 05:10:00 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:58483
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jjJDd-0008QX-1p
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 05:09:53 -0400
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jjJDj-0008RB-LJ
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 05:10:00 -0400
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-86-x6_vbLpvOE-pfCsa5TJraQ-1; Thu, 11 Jun 2020 05:09:48 -0400
-X-MC-Unique: x6_vbLpvOE-pfCsa5TJraQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-323-lw3x7evtMomC-9X5BC6tXQ-1; Thu, 11 Jun 2020 05:09:56 -0400
+X-MC-Unique: lw3x7evtMomC-9X5BC6tXQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 80139107ACF3;
- Thu, 11 Jun 2020 09:09:47 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 037D9461;
+ Thu, 11 Jun 2020 09:09:55 +0000 (UTC)
 Received: from bahia.lan (ovpn-114-202.ams2.redhat.com [10.36.114.202])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0EABC2B4DD;
- Thu, 11 Jun 2020 09:09:45 +0000 (UTC)
-Subject: [PATCH v2 0/3] spapr: Improve error reporting in spapr_caps.c
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A70BC7CCF0;
+ Thu, 11 Jun 2020 09:09:53 +0000 (UTC)
+Subject: [PATCH v2 1/3] error: auto propagated local_err
 From: Greg Kurz <groug@kaod.org>
 To: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu, 11 Jun 2020 11:09:45 +0200
-Message-ID: <159186635896.48605.3457464705220760573.stgit@bahia.lan>
+Date: Thu, 11 Jun 2020 11:09:52 +0200
+Message-ID: <159186659275.48605.4861193351013314644.stgit@bahia.lan>
+In-Reply-To: <159186635896.48605.3457464705220760573.stgit@bahia.lan>
+References: <159186635896.48605.3457464705220760573.stgit@bahia.lan>
 User-Agent: StGit/0.21
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: kaod.org
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: softfail client-ip=205.139.110.61; envelope-from=groug@kaod.org;
+Received-SPF: softfail client-ip=207.211.31.81; envelope-from=groug@kaod.org;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 03:29:33
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -84,39 +86,320 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Spapr capabilities are checked at machine init. If a capability cannot
-be used, an error message is printed and QEMU exits. In most places,
-the error message also contains an hint for the user. But we should
-use error_append_hint() for that, as explained in the "qapi/error.h"
-header.
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-This is already the case for cap_fwnmi_apply() and we now want to add=20
-a similar check for nested KVM-HV. Unfortunately, spapr_caps_apply()
-passes &error_fatal to all apply hooks and error_append_hint() is
-never called.=20
+Introduce a new ERRP_AUTO_PROPAGATE macro, to be used at start of
+functions with an errp OUT parameter.
 
-So this reuses previous work from Vladimir Sementsov-Ogievskiy to
-address that.
+It has three goals:
 
-v2: - Fix indentation and add some missing \n in patch 2
-    - Add ERRP_AUTO_PROPAGATE() to cap_nested_kvm_hv_apply() in
-      patch 2 instead of patch 3
+1. Fix issue with error_fatal and error_prepend/error_append_hint: user
+can't see this additional information, because exit() happens in
+error_setg earlier than information is added. [Reported by Greg Kurz]
+
+2. Fix issue with error_abort and error_propagate: when we wrap
+error_abort by local_err+error_propagate, the resulting coredump will
+refer to error_propagate and not to the place where error happened.
+(the macro itself doesn't fix the issue, but it allows us to [3.] drop
+the local_err+error_propagate pattern, which will definitely fix the
+issue) [Reported by Kevin Wolf]
+
+3. Drop local_err+error_propagate pattern, which is used to workaround
+void functions with errp parameter, when caller wants to know resulting
+status. (Note: actually these functions could be merely updated to
+return int error code).
+
+To achieve these goals, later patches will add invocations
+of this macro at the start of functions with either use
+error_prepend/error_append_hint (solving 1) or which use
+local_err+error_propagate to check errors, switching those
+functions to use *errp instead (solving 2 and 3).
+
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Paul Durrant <paul@xen.org>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
-
-Greg Kurz (2):
-      spapr: Use error_append_hint() in spapr_caps.c
-      spapr: Forbid nested KVM-HV in pre-power9 compat mode
-
-Vladimir Sementsov-Ogievskiy (1):
-      error: auto propagated local_err
-
-
- hw/ppc/spapr_caps.c  |  105 ++++++++++++++++----------
  include/qapi/error.h |  205 ++++++++++++++++++++++++++++++++++++++++++----=
 ----
- 2 files changed, 237 insertions(+), 73 deletions(-)
+ 1 file changed, 173 insertions(+), 32 deletions(-)
 
---
-Greg
+diff --git a/include/qapi/error.h b/include/qapi/error.h
+index ad5b6e896ded..30140d9bfea9 100644
+--- a/include/qapi/error.h
++++ b/include/qapi/error.h
+@@ -15,6 +15,8 @@
+ /*
+  * Error reporting system loosely patterned after Glib's GError.
+  *
++ * =3D Deal with Error object =3D
++ *
+  * Create an error:
+  *     error_setg(&err, "situation normal, all fouled up");
+  *
+@@ -47,28 +49,91 @@
+  * reporting it (primarily useful in testsuites):
+  *     error_free_or_abort(&err);
+  *
+- * Pass an existing error to the caller:
+- *     error_propagate(errp, err);
+- * where Error **errp is a parameter, by convention the last one.
++ * =3D Deal with Error ** function parameter =3D
+  *
+- * Pass an existing error to the caller with the message modified:
+- *     error_propagate_prepend(errp, err);
++ * A function may use the error system to return errors. In this case, the
++ * function defines an Error **errp parameter, by convention the last one =
+(with
++ * exceptions for functions using ... or va_list).
+  *
+- * Avoid
+- *     error_propagate(errp, err);
+- *     error_prepend(errp, "Could not frobnicate '%s': ", name);
+- * because this fails to prepend when @errp is &error_fatal.
++ * The caller may then pass in the following errp values:
+  *
+- * Create a new error and pass it to the caller:
++ * 1. &error_abort
++ *    Any error will result in abort().
++ * 2. &error_fatal
++ *    Any error will result in exit() with a non-zero status.
++ * 3. NULL
++ *    No error reporting through errp parameter.
++ * 4. The address of a NULL-initialized Error *err
++ *    Any error will populate errp with an error object.
++ *
++ * The following rules then implement the correct semantics desired by the
++ * caller.
++ *
++ * Create a new error to pass to the caller:
+  *     error_setg(errp, "situation normal, all fouled up");
+  *
+- * Call a function and receive an error from it:
++ * Calling another errp-based function:
++ *     f(..., errp);
++ *
++ * =3D=3D Checking success of subcall =3D=3D
++ *
++ * If a function returns a value indicating an error in addition to settin=
+g
++ * errp (which is recommended), then you don't need any additional code, j=
+ust
++ * do:
++ *
++ *     int ret =3D f(..., errp);
++ *     if (ret < 0) {
++ *         ... handle error ...
++ *         return ret;
++ *     }
++ *
++ * If a function returns nothing (not recommended for new code), the only =
+way
++ * to check success is by consulting errp; doing this safely requires the =
+use
++ * of the ERRP_AUTO_PROPAGATE macro, like this:
++ *
++ *     int our_func(..., Error **errp) {
++ *         ERRP_AUTO_PROPAGATE();
++ *         ...
++ *         subcall(..., errp);
++ *         if (*errp) {
++ *             ...
++ *             return -EINVAL;
++ *         }
++ *         ...
++ *     }
++ *
++ * ERRP_AUTO_PROPAGATE takes care of wrapping the original errp as needed,=
+ so
++ * that the rest of the function can directly use errp (including
++ * dereferencing), where any errors will then be propagated on to the orig=
+inal
++ * errp when leaving the function.
++ *
++ * In some cases, we need to check result of subcall, but do not want to
++ * propagate the Error object to our caller. In such cases we don't need
++ * ERRP_AUTO_PROPAGATE, but just a local Error object:
++ *
++ * Receive an error and not pass it:
+  *     Error *err =3D NULL;
+- *     foo(arg, &err);
++ *     subcall(arg, &err);
+  *     if (err) {
+  *         handle the error...
++ *         error_free(err);
+  *     }
+  *
++ * Note that older code that did not use ERRP_AUTO_PROPAGATE would instead=
+ need
++ * a local Error * variable and the use of error_propagate() to properly h=
+andle
++ * all possible caller values of errp. Now this is DEPRECATED* (see below)=
+.
++ *
++ * Note that any function that wants to modify an error object, such as by
++ * calling error_append_hint or error_prepend, must use ERRP_AUTO_PROPAGAT=
+E, in
++ * order for a caller's use of &error_fatal to see the additional informat=
+ion.
++ *
++ * In rare cases, we need to pass existing Error object to the caller by h=
+and:
++ *     error_propagate(errp, err);
++ *
++ * Pass an existing error to the caller with the message modified:
++ *     error_propagate_prepend(errp, err);
++ *
++ *
+  * Call a function ignoring errors:
+  *     foo(arg, NULL);
+  *
+@@ -78,26 +143,6 @@
+  * Call a function treating errors as fatal:
+  *     foo(arg, &error_fatal);
+  *
+- * Receive an error and pass it on to the caller:
+- *     Error *err =3D NULL;
+- *     foo(arg, &err);
+- *     if (err) {
+- *         handle the error...
+- *         error_propagate(errp, err);
+- *     }
+- * where Error **errp is a parameter, by convention the last one.
+- *
+- * Do *not* "optimize" this to
+- *     foo(arg, errp);
+- *     if (*errp) { // WRONG!
+- *         handle the error...
+- *     }
+- * because errp may be NULL!
+- *
+- * But when all you do with the error is pass it on, please use
+- *     foo(arg, errp);
+- * for readability.
+- *
+  * Receive and accumulate multiple errors (first one wins):
+  *     Error *err =3D NULL, *local_err =3D NULL;
+  *     foo(arg, &err);
+@@ -114,6 +159,61 @@
+  *         handle the error...
+  *     }
+  * because this may pass a non-null err to bar().
++ *
++ * DEPRECATED*
++ *
++ * The following pattern of receiving, checking, and then forwarding an er=
+ror
++ * to the caller by hand is now deprecated:
++ *
++ *     Error *err =3D NULL;
++ *     foo(arg, &err);
++ *     if (err) {
++ *         handle the error...
++ *         error_propagate(errp, err);
++ *     }
++ *
++ * Instead, use ERRP_AUTO_PROPAGATE macro.
++ *
++ * The old pattern is deprecated because of two things:
++ *
++ * 1. Issue with error_abort and error_propagate: when we wrap error_abort=
+ by
++ * local_err+error_propagate, the resulting coredump will refer to
++ * error_propagate and not to the place where error happened.
++ *
++ * 2. A lot of extra code of the same pattern
++ *
++ * How to update old code to use ERRP_AUTO_PROPAGATE?
++ *
++ * All you need is to add ERRP_AUTO_PROPAGATE() invocation at function sta=
+rt,
++ * than you may safely dereference errp to check errors and do not need an=
+y
++ * additional local Error variables or calls to error_propagate().
++ *
++ * Example:
++ *
++ * old code
++ *
++ *     void fn(..., Error **errp) {
++ *         Error *err =3D NULL;
++ *         foo(arg, &err);
++ *         if (err) {
++ *             handle the error...
++ *             error_propagate(errp, err);
++ *             return;
++ *         }
++ *         ...
++ *     }
++ *
++ * updated code
++ *
++ *     void fn(..., Error **errp) {
++ *         ERRP_AUTO_PROPAGATE();
++ *         foo(arg, errp);
++ *         if (*errp) {
++ *             handle the error...
++ *             return;
++ *         }
++ *         ...
++ *     }
+  */
+=20
+ #ifndef ERROR_H
+@@ -322,6 +422,47 @@ void error_set_internal(Error **errp,
+                         ErrorClass err_class, const char *fmt, ...)
+     GCC_FMT_ATTR(6, 7);
+=20
++typedef struct ErrorPropagator {
++    Error *local_err;
++    Error **errp;
++} ErrorPropagator;
++
++static inline void error_propagator_cleanup(ErrorPropagator *prop)
++{
++    error_propagate(prop->errp, prop->local_err);
++}
++
++G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC(ErrorPropagator, error_propagator_cleanup=
+);
++
++/*
++ * ERRP_AUTO_PROPAGATE
++ *
++ * This macro exists to assist with proper error handling in a function wh=
+ich
++ * uses an Error **errp parameter.  It must be used as the first line of a
++ * function which modifies an error (with error_prepend, error_append_hint=
+, or
++ * similar) or which wants to dereference *errp.  It is still safe (but
++ * useless) to use in other functions.
++ *
++ * If errp is NULL or points to error_fatal, it is rewritten to point to a
++ * local Error object, which will be automatically propagated to the origi=
+nal
++ * errp on function exit (see error_propagator_cleanup).
++ *
++ * After invocation of this macro it is always safe to dereference errp
++ * (as it's not NULL anymore) and to add information by error_prepend or
++ * error_append_hint (as, if it was error_fatal, we swapped it with a
++ * local_error to be propagated on cleanup).
++ *
++ * Note: we don't wrap the error_abort case, as we want resulting coredump
++ * to point to the place where the error happened, not to error_propagate.
++ */
++#define ERRP_AUTO_PROPAGATE() \
++    g_auto(ErrorPropagator) _auto_errp_prop =3D {.errp =3D errp}; \
++    do { \
++        if (!errp || errp =3D=3D &error_fatal) { \
++            errp =3D &_auto_errp_prop.local_err; \
++        } \
++    } while (0)
++
+ /*
+  * Special error destination to abort on error.
+  * See error_setg() and error_propagate() for details.
+
 
 
