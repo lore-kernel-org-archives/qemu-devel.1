@@ -6,39 +6,38 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A115EC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 21:24:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74823C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 21:24:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7506F2074B
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 21:24:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7506F2074B
+	by mail.kernel.org (Postfix) with ESMTPS id 48CA72074B
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 21:24:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48CA72074B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44384 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45260 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjUg8-0000kL-Kp
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 17:24:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46736)
+	id 1jjUgL-0001Dp-En
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 17:24:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46708)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jjUbk-00037T-GR; Thu, 11 Jun 2020 17:19:32 -0400
-Received: from relay.sw.ru ([185.231.240.75]:40346 helo=relay3.sw.ru)
+ id 1jjUbj-000363-S3; Thu, 11 Jun 2020 17:19:31 -0400
+Received: from relay.sw.ru ([185.231.240.75]:40358 helo=relay3.sw.ru)
  by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jjUbf-00057l-6h; Thu, 11 Jun 2020 17:19:32 -0400
+ id 1jjUbf-00057n-7e; Thu, 11 Jun 2020 17:19:31 -0400
 Received: from [172.16.25.136] (helo=localhost.sw.ru)
  by relay3.sw.ru with esmtp (Exim 4.93)
  (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jjUbW-0001xE-VJ; Fri, 12 Jun 2020 00:19:18 +0300
+ id 1jjUbW-0001xE-S3; Fri, 12 Jun 2020 00:19:18 +0300
 From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v6 8/8] qcow2_format.py: support dumping metadata in JSON
- format
-Date: Fri, 12 Jun 2020 00:19:20 +0300
-Message-Id: <1591910360-867499-9-git-send-email-andrey.shinkevich@virtuozzo.com>
+Subject: [PATCH v6 5/8] qcow2_format.py: Dump bitmap table serialized entries
+Date: Fri, 12 Jun 2020 00:19:17 +0300
+Message-Id: <1591910360-867499-6-git-send-email-andrey.shinkevich@virtuozzo.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1591910360-867499-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 References: <1591910360-867499-1-git-send-email-andrey.shinkevich@virtuozzo.com>
@@ -50,7 +49,7 @@ X-Spam_score_int: -18
 X-Spam_score: -1.9
 X-Spam_bar: -
 X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -69,179 +68,93 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Implementation of dumping QCOW2 image metadata.
-The sample output:
-{
-    "Header_extensions": [
-        {
-            "name": "Feature table",
-            "magic": 1745090647,
-            "length": 192,
-            "data_str": "<binary>"
-        },
-        {
-            "name": "Bitmaps",
-            "magic": 595929205,
-            "length": 24,
-            "data": {
-                "nb_bitmaps": 2,
-                "reserved32": 0,
-                "bitmap_directory_size": 64,
-                "bitmap_directory_offset": 1048576,
-                "entries": [
-                    {
-                        "name": "bitmap-1",
-                        "bitmap_table_offset": 589824,
-                        "bitmap_table_size": 1,
-                        "flags": [
-                            "auto"
-                        ],
-                        "type": 1,
-                        "granularity_bits": 16,
-                        "name_size": 8,
-                        "extra_data_size": 0,
-                        "bitmap_table": {
-                            "table_entries": [
-                                {
-                                    "type": "serialized",
-                                    "offset": 655360
-                                },
-                                ...
+Add bitmap table information to the QCOW2 metadata dump.
 
-Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Bitmap name               bitmap-1
+...
+Bitmap table    type            offset          size
+        0       serialized      0xa0000         65536
+        1       all-zeroes      0x0             65536
+        2       all-zeroes      0x0             65536
+        3       all-zeroes      0x0             65536
+        4       all-zeroes      0x0             65536
+        5       all-zeroes      0x0             65536
+        6       all-zeroes      0x0             65536
+        7       all-zeroes      0x0             65536
+
 Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- tests/qemu-iotests/qcow2_format.py | 60 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 60 insertions(+)
+ tests/qemu-iotests/qcow2_format.py | 42 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 42 insertions(+)
 
 diff --git a/tests/qemu-iotests/qcow2_format.py b/tests/qemu-iotests/qcow2_format.py
-index bb2f13b..d87f8e0 100644
+index 6589f68..2e7c058 100644
 --- a/tests/qemu-iotests/qcow2_format.py
 +++ b/tests/qemu-iotests/qcow2_format.py
-@@ -18,6 +18,15 @@
+@@ -137,6 +137,9 @@ class Qcow2BitmapExt(Qcow2Struct):
+             shift = ((entry_raw_size + 7) & ~7) - entry_raw_size
+             fd.seek(shift, FROM_CURRENT)
  
- import struct
- import string
-+import json
++        for bm in self.bitmaps:
++            bm.read_bitmap_table(fd)
 +
+     def load(self, fd):
+         self.read_bitmap_directory(fd)
+ 
+@@ -181,6 +184,12 @@ class Qcow2BitmapDirEntry(Qcow2Struct):
+         return struct.calcsize(self.fmt) + self.name_size + \
+             self.extra_data_size
+ 
++    def read_bitmap_table(self, fd):
++        fd.seek(self.bitmap_table_offset)
++        table_size = self.bitmap_table_bytes * struct.calcsize('Q')
++        table = [e[0] for e in struct.iter_unpack('>Q', fd.read(table_size))]
++        self.bitmap_table = Qcow2BitmapTable(table)
 +
-+class ComplexEncoder(json.JSONEncoder):
-+    def default(self, obj):
-+        if hasattr(obj, 'get_fields_dict'):
-+            return obj.get_fields_dict()
-+        else:
-+            return json.JSONEncoder.default(self, obj)
- 
- 
- class Qcow2Field:
-@@ -95,6 +104,11 @@ class Qcow2Struct(metaclass=Qcow2StructMeta):
-         self.fields_dict = self.__dict__.copy()
- 
-     def dump(self, dump_json=None):
-+        if dump_json:
-+            print(json.dumps(self.get_fields_dict(), indent=4,
-+                             cls=ComplexEncoder))
-+            return
-+
-         for f in self.fields:
-             value = self.__dict__[f[2]]
-             if isinstance(f[1], str):
-@@ -150,6 +164,9 @@ class Qcow2BitmapExt(Qcow2Struct):
-         for bm in self.bitmaps:
-             bm.dump_bitmap_dir_entry(dump_json)
- 
-+    def get_fields_dict(self):
-+        return self.fields_dict
-+
- 
- BME_FLAG_IN_USE = 1 << 0
- BME_FLAG_AUTO = 1 << 1
-@@ -202,6 +219,12 @@ class Qcow2BitmapDirEntry(Qcow2Struct):
+     def dump_bitmap_dir_entry(self):
+         print()
+         print(f'{"Bitmap name":<25} {self.name}')
+@@ -188,6 +197,39 @@ class Qcow2BitmapDirEntry(Qcow2Struct):
+             print(f'{"flag":<25} {fl}')
+         print(f'{"table size ":<25} {self.bitmap_table_bytes} {"(bytes)"}')
          super().dump()
-         self.bitmap_table.print_bitmap_table(self.cluster_size)
- 
-+    def get_fields_dict(self):
-+        bmp_name = dict(name=self.name)
-+        bme_dict = {**bmp_name, **self.fields_dict}
-+        bme_dict['flags'] = self.bitmap_flags
-+        return bme_dict
-+
- 
- class Qcow2BitmapTableEntry:
- 
-@@ -218,6 +241,9 @@ class Qcow2BitmapTableEntry:
-         else:
-             self.type = 'all-zeroes'
- 
-+    def get_fields_dict(self):
-+        return dict(type=self.type, offset=self.offset)
-+
- 
- class Qcow2BitmapTable:
- 
-@@ -234,6 +260,18 @@ class Qcow2BitmapTable:
-                                              cluster_size))
-         print("")
- 
-+    def get_fields_dict(self):
-+        return dict(table_entries=self.entries)
++        self.bitmap_table.print_bitmap_table(self.cluster_size)
 +
 +
-+class Qcow2HeaderExtensionsDoc:
++class Qcow2BitmapTableEntry:
 +
-+    def __init__(self, extensions):
-+        self.extensions = extensions
++    BME_TABLE_ENTRY_OFFSET_MASK = 0x00fffffffffffe00
++    BME_TABLE_ENTRY_FLAG_ALL_ONES = 1
++    bmte_type = ['all-zeroes', 'all-ones', 'serialized']
 +
-+    def get_fields_dict(self):
-+        return dict(Header_extensions=self.extensions)
++    def __init__(self, entry):
++        self.offset = entry & self.BME_TABLE_ENTRY_OFFSET_MASK
++        if self.offset:
++            self.type = 'serialized'
++        elif entry & self.BME_TABLE_ENTRY_FLAG_ALL_ONES:
++            self.type = 'all-ones'
++        else:
++            self.type = 'all-zeroes'
 +
++
++class Qcow2BitmapTable:
++
++    def __init__(self, raw_table):
++        self.entries = []
++        for entry in raw_table:
++            self.entries.append(Qcow2BitmapTableEntry(entry))
++
++    def print_bitmap_table(self, cluster_size):
++        bitmap_table = enumerate(self.entries)
++        print("Bitmap table\ttype\t\toffset\t\tsize")
++        for i, entry in bitmap_table:
++            print("\t%-4d\t%s\t%#x\t\t%d" % (i, entry.type, entry.offset,
++                                             cluster_size))
++        print("")
+ 
  
  QCOW2_EXT_MAGIC_BITMAPS = 0x23852875
- 
-@@ -249,6 +287,9 @@ class QcowHeaderExtension(Qcow2Struct):
-             0x44415441: 'Data file'
-         }
- 
-+        def get_fields_dict(self):
-+            return self.mapping.get(self.value, "<unknown>")
-+
-     fields = (
-         ('u32', Magic, 'magic'),
-         ('u32', '{}', 'length')
-@@ -309,6 +350,16 @@ class QcowHeaderExtension(Qcow2Struct):
-         else:
-             self.obj.dump(dump_json)
- 
-+    def get_fields_dict(self):
-+        ext_name = dict(name=self.Magic(self.magic))
-+        he_dict = {**ext_name, **self.fields_dict}
-+        if self.obj is not None:
-+            he_dict.update(data=self.obj)
-+        else:
-+            he_dict.update(data_str=self.data_str)
-+
-+        return he_dict
-+
-     @classmethod
-     def create(cls, magic, data):
-         return QcowHeaderExtension(magic, len(data), data)
-@@ -411,7 +462,16 @@ class QcowHeader(Qcow2Struct):
-         fd.write(buf)
- 
-     def dump_extensions(self, dump_json=None):
-+        if dump_json:
-+            ext_doc = Qcow2HeaderExtensionsDoc(self.extensions)
-+            print(json.dumps(ext_doc.get_fields_dict(), indent=4,
-+                             cls=ComplexEncoder))
-+            return
-+
-         for ex in self.extensions:
-             print('Header extension:')
-             ex.dump(dump_json)
-             print()
-+
-+    def get_fields_dict(self):
-+        return self.fields_dict
 -- 
 1.8.3.1
 
