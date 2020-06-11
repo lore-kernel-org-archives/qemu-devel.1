@@ -2,91 +2,73 @@ Return-Path: <SRS0=U615=7Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59539C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 07:39:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C247FC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 07:40:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 215862072F
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 07:39:13 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ixlt/Vde"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 215862072F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 930F62075F
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 07:40:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 930F62075F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37126 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40114 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjHns-0005c0-Cb
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 03:39:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54622)
+	id 1jjHpH-0006zO-QE
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 03:40:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55214)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jjHn3-00044d-1r
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 03:38:21 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:47883
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jjHof-0006St-Ow
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 03:40:01 -0400
+Resent-Date: Thu, 11 Jun 2020 03:40:01 -0400
+Resent-Message-Id: <E1jjHof-0006St-Ow@lists.gnu.org>
+Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21795)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jjHn2-0006Gp-83
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 03:38:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591861099;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=j9TbR9CiYS5xke6KPzjPF/ExSl4P94rgEh3Zthl/ekw=;
- b=ixlt/VdeBLKU37+lrOk30fUUrf7UkTH3beArs+C6bvEYQ9x0K6c663FAcIi5gnCNzfOwKe
- b78rUPR6jGgcdoDKxdJ0f9dBg1IcEFr+LimZzibCe2JFsDfEnxIsNEprK0lUUE0BU6MF63
- YnoRlUd8ifyzU0DkR/B39rqHb7R23Vw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-382-ZnWV_MDGOPqrlh0immLyZA-1; Thu, 11 Jun 2020 03:38:15 -0400
-X-MC-Unique: ZnWV_MDGOPqrlh0immLyZA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 118CF8018A6;
- Thu, 11 Jun 2020 07:38:13 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-113-215.ams2.redhat.com [10.36.113.215])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 55DED5C1B0;
- Thu, 11 Jun 2020 07:38:09 +0000 (UTC)
-Subject: Re: [PATCH v3 05/11] MAINTAINERS: Add an entry for common Renesas
- peripherals
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org
-References: <20200610220853.8558-1-f4bug@amsat.org>
- <20200610220853.8558-6-f4bug@amsat.org>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <03112dec-ca30-2fa2-02a7-7a7402721783@redhat.com>
-Date: Thu, 11 Jun 2020 09:38:06 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jjHod-0006o8-6V
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 03:40:01 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1591861186; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=Y9g31Say+rgju2s6ODU7fBG3kNuXIHT53vksJjXQIKqez9m/zULcRLD2SFfAQt3ucF4cZTdTdJmvOevNCu/JgPVkFgWU1iQVi7+gKc/y3M6D5o6MZhaepBGM7uMy2YScGnPA9X1AuBbgfx+SIK2J+EzljpW1ZAW+2/UUnw/3bwM=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1591861186;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=VTa/tWMd/BWqDEhtmGThTR16+ANC4Vc0mp9th3H/Eak=; 
+ b=LqoWNI+AkDGKIZWoJm+dvdgjtDY73F4H1wTEiqK3NzegV6iMQY7VtCEYQZqbqsDxK5uVdo64JpE7lbBKS4Kywdlcx5l2dZEo6xpG4eCijRpERZb+oIHj1Uq9LAhE/x8zQzNh4znW2TZ3y0p0Ercjno5/fmiA+VGP65Kia+WIj9M=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1591861185006310.3483483061244;
+ Thu, 11 Jun 2020 00:39:45 -0700 (PDT)
+Message-ID: <159186118366.32061.11810142383812381547@45ef0f9c86ae>
+In-Reply-To: <20200611061355.31967-1-alxndr@bu.edu>
+Subject: Re: [PATCH v3] fuzz: add oss-fuzz build-script
 MIME-Version: 1.0
-In-Reply-To: <20200610220853.8558-6-f4bug@amsat.org>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 03:29:33
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: alxndr@bu.edu
+Date: Thu, 11 Jun 2020 00:39:45 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o57.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 02:55:58
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,63 +81,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Magnus Damm <magnus.damm@gmail.com>,
- Yoshinori Sato <ysato@users.sourceforge.jp>, qemu-trivial@nongnu.org,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: darren.kenny@oracle.com, qemu-devel@nongnu.org, f4bug@amsat.org,
+ alxndr@bu.edu, bsd@redhat.com, stefanha@redhat.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/06/2020 00.08, Philippe Mathieu-Daudé wrote:
-> Renesas peripherals are common to SH4/RX based MCUs. Their
-> datasheets share common sections. It makes sense to maintain
-> them altogether. The current names are misleading (see the
-> 'sh' prefix). This will be fixed later when RX peripherals
-> will be added.
-> 
-> Cc: Magnus Damm <magnus.damm@gmail.com>
-> Cc: Yoshinori Sato <ysato@users.sourceforge.jp>
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> ---
->  MAINTAINERS | 9 +++++++--
->  1 file changed, 7 insertions(+), 2 deletions(-)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 653fca1da8..0398634179 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -1254,8 +1254,6 @@ M: Magnus Damm <magnus.damm@gmail.com>
->  S: Odd Fixes
->  F: hw/sh4/r2d.c
->  F: hw/intc/sh_intc.c
-> -F: hw/timer/sh_timer.c
-> -F: include/hw/sh4/sh_intc.h
-
-You've added the line for sh_intc.h in the previous patch, just to
-remove it here again? ... I guess you only wanted to remove sh_timer.c
-here instead?
-
- Thomas
-
->  Shix
->  S: Orphan
-> @@ -1954,6 +1952,13 @@ F: hw/*/*xive*
->  F: include/hw/*/*xive*
->  F: docs/*/*xive*
->  
-> +Renesas peripherals
-> +M: Magnus Damm <magnus.damm@gmail.com>
-> +S: Odd Fixes
-> +F: hw/char/sh_serial.c
-> +F: hw/timer/sh_timer.c
-> +F: include/hw/sh4/sh.h
-> +
->  Subsystems
->  ----------
->  Audio
-> 
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDYxMTA2MTM1NS4zMTk2
+Ny0xLWFseG5kckBidS5lZHUvCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2ZSBzb21l
+IGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBpbmZvcm1h
+dGlvbjoKCk1lc3NhZ2UtaWQ6IDIwMjAwNjExMDYxMzU1LjMxOTY3LTEtYWx4bmRyQGJ1LmVkdQpT
+dWJqZWN0OiBbUEFUQ0ggdjNdIGZ1eno6IGFkZCBvc3MtZnV6eiBidWlsZC1zY3JpcHQKVHlwZTog
+c2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFy
+c2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVu
+YW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZp
+ZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5w
+bCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4
+Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHVi
+LmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogLSBbdGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3LzIw
+MjAwNjExMDU1ODA3LjE1OTIxLTEtaHV0aEB0dXhmYW1pbHkub3JnIC0+IHBhdGNoZXcvMjAyMDA2
+MTEwNTU4MDcuMTU5MjEtMS1odXRoQHR1eGZhbWlseS5vcmcKU3dpdGNoZWQgdG8gYSBuZXcgYnJh
+bmNoICd0ZXN0Jwo5NGEyNTY4IGZ1eno6IGFkZCBvc3MtZnV6eiBidWlsZC1zY3JpcHQKCj09PSBP
+VVRQVVQgQkVHSU4gPT09CldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyks
+IGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzI4OiAKbmV3IGZpbGUgbW9kZSAxMDA3
+NTUKCkVSUk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNlCiMxMDg6IEZJTEU6IHNjcmlwdHMvb3NzLWZ1
+enovYnVpbGQuc2g6NzY6Citmb3IgaSBpbiAkKGxkZCAuL2kzODYtc29mdG1tdS9xZW11LWZ1enot
+aTM4NiB8IGN1dCAtZjMgLWQnICcpOyBkbyAkCgp0b3RhbDogMSBlcnJvcnMsIDEgd2FybmluZ3Ms
+IDEwNiBsaW5lcyBjaGVja2VkCgpDb21taXQgOTRhMjU2OGRhYjRlIChmdXp6OiBhZGQgb3NzLWZ1
+enogYnVpbGQtc2NyaXB0KSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBh
+bnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhl
+IG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo9PT0gT1VUUFVUIEVO
+RCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlz
+IGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIwMDYxMTA2MTM1NS4zMTk2
+Ny0xLWFseG5kckBidS5lZHUvdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpF
+bWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcu
+b3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQu
+Y29t
 
