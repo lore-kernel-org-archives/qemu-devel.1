@@ -7,52 +7,52 @@ X-Spam-Status: No, score=-5.7 required=3.0 tests=DATE_IN_PAST_06_12,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE297C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 00:26:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9E38C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 00:26:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A59D820842
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 00:26:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 97A3220842
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 00:26:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=hostfission.com header.i=@hostfission.com header.b="AdirZgRO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A59D820842
+	dkim=pass (1024-bit key) header.d=hostfission.com header.i=@hostfission.com header.b="iqB1QgIE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97A3220842
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=hostfission.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40170 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40206 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjXWL-0004q9-Vw
+	id 1jjXWM-0004r1-UK
 	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 20:26:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40640)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40642)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <geoff@hostfission.com>)
- id 1jjXSw-000734-TX
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 20:22:38 -0400
-Received: from mail1.hostfission.com ([139.99.139.48]:33226)
+ id 1jjXSw-00073C-W5
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 20:22:39 -0400
+Received: from mail1.hostfission.com ([139.99.139.48]:33228)
  by eggs.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <geoff@hostfission.com>) id 1jjXSv-0001Jg-E4
+ (envelope-from <geoff@hostfission.com>) id 1jjXSv-0001Jh-Ei
  for qemu-devel@nongnu.org; Thu, 11 Jun 2020 20:22:38 -0400
 Received: from moya.office.hostfission.com (office.hostfission.com
  [220.233.29.71])
- by mail1.hostfission.com (Postfix) with ESMTP id F3620444E6;
- Fri, 12 Jun 2020 10:16:12 +1000 (AEST)
+ by mail1.hostfission.com (Postfix) with ESMTP id 01AE7444EF;
+ Fri, 12 Jun 2020 10:16:13 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=hostfission.com;
  s=mail; t=1591920973;
- bh=gPfDx0oOx78hVDtbsa3uYMHvYIzSXfoDfgaF8sNcNrE=;
+ bh=pg+SEjYVoc0ewqGzX4xmTtmRex2TRmRRC0Bo/Lc2z+s=;
  h=From:Date:Subject:To:Cc:From;
- b=AdirZgRO3VyI0We6O/MCkbfwaUxOMetZ8SvmPnRy0h/hokK33pkc7aYuvoEtu16pM
- 0/wUesMZgC/uEdC63/+NMvPk9jv45ptfYl4rz4L5vkPTHTIB2y4Dr55qg34gprfWsa
- NQFziR9HYhEHNkQ+Zh74mBkMIQfTldy+Zs0rcsg8=
+ b=iqB1QgIEqDkneKtV5X0pDtArCrMA6C4MKyWq/Z6FMdcJT1SdGW2lW3zR8T1rrmErw
+ Co8VRrFOxyASJsO/7g2owK2CiUpdhXUxZjgJ9/h4u/fSZrLDsI8ycVKiDdYFRgPxJL
+ LOyImtQezU7HQIETFy0GqER/8BIFEw6HOFzFKmEM=
 Received: by moya.office.hostfission.com (Postfix, from userid 0)
- id D7A853A0680; Fri, 12 Jun 2020 10:16:12 +1000 (AEST)
+ id DF41D3A0697; Fri, 12 Jun 2020 10:16:12 +1000 (AEST)
 From: Geoffrey McRae <geoff@hostfission.com>
-Date: Fri, 12 Jun 2020 01:14:19 +1000
-Subject: [PATCH 3/6] audio/jack: remove invalid set of input support bool
+Date: Fri, 12 Jun 2020 01:16:41 +1000
+Subject: [PATCH 4/6] audio/jack: do not remove ports when finishing
 To: <qemu-devel@nongnu.org>
 Cc: <kraxel@redhat.com>
 X-Mailer: mail (GNU Mailutils 3.5)
-Message-Id: <20200612001612.D7A853A0680@moya.office.hostfission.com>
+Message-Id: <20200612001612.DF41D3A0697@moya.office.hostfission.com>
 Received-SPF: pass client-ip=139.99.139.48; envelope-from=geoff@hostfission.com;
  helo=mail1.hostfission.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 20:16:15
@@ -80,24 +80,28 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This fixes a hang when there is a communications issue with the JACK
+server. Simply closing the connection is enough to completely clean up
+and as such we do not need to remove the ports first.
+
 Signed-off-by: Geoffrey McRae <geoff@hostfission.com>
 ---
  audio/jackaudio.c | 3 ---
  1 file changed, 3 deletions(-)
 
 diff --git a/audio/jackaudio.c b/audio/jackaudio.c
-index fb8efd7af7..58c7344497 100644
+index 58c7344497..249cbd3265 100644
 --- a/audio/jackaudio.c
 +++ b/audio/jackaudio.c
-@@ -607,9 +607,6 @@ static int qjack_thread_creator(jack_native_thread_t *thread,
- static void *qjack_init(Audiodev *dev)
+@@ -548,9 +548,6 @@ static void qjack_client_fini(QJackClient *c)
  {
-     assert(dev->driver == AUDIODEV_DRIVER_JACK);
--
--    dev->u.jack.has_in = false;
--
-     return dev;
- }
+     switch (c->state) {
+     case QJACK_STATE_RUNNING:
+-        for (int i = 0; i < c->nchannels; ++i) {
+-            jack_port_unregister(c->client, c->port[i]);
+-        }
+         jack_deactivate(c->client);
+         /* fallthrough */
  
 -- 
 2.20.1
