@@ -2,74 +2,88 @@ Return-Path: <SRS0=U615=7Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0864BC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 09:15:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 662A8C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 09:19:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BF4AB2078D
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 09:15:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 306162078D
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 09:19:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TEAuDVPu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF4AB2078D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aXWEwMzI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 306162078D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39470 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41904 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjJIw-0006X1-W6
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 05:15:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53646)
+	id 1jjJNA-0008Gt-Ak
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 05:19:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54940)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
- id 1jjJI4-0005tN-62
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 05:14:28 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:51779
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jjJMS-0007nR-Iv
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 05:19:00 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:20893
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
- id 1jjJI3-0000yL-DL
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 05:14:27 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jjJMR-00025s-Tu
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 05:19:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591866866;
+ s=mimecast20190719; t=1591867138;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=P8c1wxI9qT72Dg+EUCoyPxu2yI/s+ts/sEYQpOuBIkg=;
- b=TEAuDVPuc4o5dPi35iC45Z4REN8Nyyx2A7Kjtd9slKlGxmi0APp7Uo/E+5Og9GziEvyd1J
- 8wXox0kfYT3+3zzfV2FbFER8W6UmazKWJkV9fLVMerhGphXMvDBsrAgHvenNXVzND+3EX4
- IqUHhQJ4pFQAlZHynEo99EN1YzLhoC8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-414-gOKvY7lXPAyyfQoQl3PTBg-1; Thu, 11 Jun 2020 05:14:24 -0400
-X-MC-Unique: gOKvY7lXPAyyfQoQl3PTBg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8AE52835B92;
- Thu, 11 Jun 2020 09:14:23 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.195.76])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4DA558FF80;
- Thu, 11 Jun 2020 09:14:22 +0000 (UTC)
-Date: Thu, 11 Jun 2020 11:14:19 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Haibo Xu <haibo.xu@linaro.org>, philmd@redhat.com
-Subject: Re: Core dump happened when starting a VM on arm64 server
-Message-ID: <20200611091419.e2rfcurztmlajlwr@kamzik.brq.redhat.com>
-References: <CAJc+Z1Eb815hroFPY+9Ai_9hh=+eje+X2ENtGj9XA+_F0XUPqg@mail.gmail.com>
+ bh=ZPrm3cl7admQpiBRpdK1penV5q335GTbrJUgsfPP69o=;
+ b=aXWEwMzIFdxOMTIXtXB2DvsRnVVpUPSZvz5FLuOc3wSXygjLVXLeBdfGy001wgNkEGlPpV
+ rvrRgRMVY38a4hodXwMUXeJ5YsR1+Spz1ai9G0JaKrVTbeJyFaUuHK9mrokjx8jOwrT34P
+ HjOf15Wb6xr4bYx+1VE0G8de3TYV/kQ=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-487-irRxrzfKMauYmFddZtwcdw-1; Thu, 11 Jun 2020 05:18:56 -0400
+X-MC-Unique: irRxrzfKMauYmFddZtwcdw-1
+Received: by mail-wm1-f72.google.com with SMTP id a18so896139wmm.3
+ for <qemu-devel@nongnu.org>; Thu, 11 Jun 2020 02:18:56 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=ZPrm3cl7admQpiBRpdK1penV5q335GTbrJUgsfPP69o=;
+ b=um6eu5tmXYtZcmsE4nciPGKe4IHycDut8fEr767z4bHC0g/kK35Li3YE5OSDdfcaTa
+ 7Bedvmpb8ryYIcSRjOjgN9IcHi0Vqfkp52oI13dbl6cmH4k/0gMweZSPKRfE3cqKNzGk
+ XyP4qnpEdd2ktOjkCkSZPvX8aaVmqwPFOZmYXsbmWaaEoXHgxQNyLCn3ut8O35JwwgNm
+ /3ijWg//Uz+rilM19ZC2Ct8mAxKJZCDYfcts5hG4xSyQQHyn5wwVqNJOmQSJtaJtwjam
+ nAWloqVm55qry3vorzZpM/pzc/DCqk9GoBiAviofTT1RJlhUgMXF05SfjdB08CtLygI1
+ MgeA==
+X-Gm-Message-State: AOAM530VDxSIp9TM4WvHl8i6TM1SyKGtXjuxzlvtxjBDdhFlkr9EnKIQ
+ I7IZ7EK+uz4eJ3mIcjtnWkShc8+QRyF7pDDLumkK94N/XT20BX06RSkDZxVaJGCyLz8vdK0d8v2
+ XmBuSGm9ZRtEgd4s=
+X-Received: by 2002:a5d:54c3:: with SMTP id x3mr8266238wrv.312.1591867135502; 
+ Thu, 11 Jun 2020 02:18:55 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy0iWMk6/fl5/hw32zWpOWAKIjjptIRmmLkqebAoWCfbQzjez5K9SFuh8bhSnZHTJ5D4o7vOQ==
+X-Received: by 2002:a5d:54c3:: with SMTP id x3mr8266213wrv.312.1591867135288; 
+ Thu, 11 Jun 2020 02:18:55 -0700 (PDT)
+Received: from redhat.com (bzq-79-181-55-232.red.bezeqint.net. [79.181.55.232])
+ by smtp.gmail.com with ESMTPSA id l17sm4060295wrq.17.2020.06.11.02.18.53
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 11 Jun 2020 02:18:54 -0700 (PDT)
+Date: Thu, 11 Jun 2020 05:18:51 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Subject: Re: [PATCH v8 01/10] qtest: allow DSDT acpi table changes
+Message-ID: <20200611051318-mutt-send-email-mst@kernel.org>
+References: <20200611072919.16638-1-kraxel@redhat.com>
+ <20200611072919.16638-2-kraxel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAJc+Z1Eb815hroFPY+9Ai_9hh=+eje+X2ENtGj9XA+_F0XUPqg@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20200611072919.16638-2-kraxel@redhat.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=drjones@redhat.com;
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=mst@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 03:29:33
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -92,50 +106,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: Laurent Vivier <lvivier@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>, John Snow <jsnow@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jun 11, 2020 at 04:46:45PM +0800, Haibo Xu wrote:
-> Hi,
-> 
-> I met a qemu core dump issue when starting a VM with cpu feature
-> "pmu=on" on an arm server.
-> The commands to start the machine is:
-> 
->   ./qemu-system-aarch64 \
->            -cpu host,pmu=on -M virt,accel=kvm,gic-version=3 -nographic
-> -m 2048M \
->            -kernel ./Image \
->            -initrd /boot/initrd.img-5.6.0-rc2+ \
->            -append "root=/dev/vda rw console=ttyAMA0" -nodefaults -serial stdio\
->            -drive if=none,file=./xenial.rootfs.ext4,id=hd0,format=raw \
->            -device virtio-blk-device,drive=hd0
-> 
-> 
-> And here is the stack dump:
-> 
->  Core was generated by `./qemu-system-aarch64 -cpu host,pmu=on -M
-> virt,accel=kvm,gic-version=3 -nograph'.
->  Program terminated with signal SIGSEGV, Segmentation fault.
->  #0  kvm_ioctl (s=0x0, type=type@entry=44547) at
+On Thu, Jun 11, 2020 at 09:29:10AM +0200, Gerd Hoffmann wrote:
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 
-s=0x0 means cpu->kvm_state is NULL
+OK, thanks! What is still missing is resulting ASL
+differences in the expected files for reviewers.
+See ./tests/qtest/bios-tables-test.c step 7.
 
-> The root cause is in the arm_get_pmu() operation which was introduced
-> in ae502508f83.
+I'm working on a tool that will show the changes
+more easily so they can be included with each
+change, but that will do for now.
 
-Actually the root cause is d70c996df23f ("target/arm/kvm: Use
-CPUState::kvm_state in kvm_arm_pmu_supported()"). ae502508f83 used
-the machine kvm_state, not the cpu kvm_state, and that allows pmu=on
-to work. d70c996df23f changed that saying that "KVMState is already
-accessible via CPUState::kvm_state, use it.", but I'm not sure why,
-since kvm_init_vcpu() doesn't run until the vcpu thread is created.
+Thanks and sorry about all the bureaucracy.
 
-Philippe?
-
-Thanks,
-drew
+> ---
+>  tests/qtest/bios-tables-test-allowed-diff.h | 17 +++++++++++++++++
+>  1 file changed, 17 insertions(+)
+> 
+> diff --git a/tests/qtest/bios-tables-test-allowed-diff.h b/tests/qtest/bios-tables-test-allowed-diff.h
+> index dfb8523c8bf4..6a052c50447a 100644
+> --- a/tests/qtest/bios-tables-test-allowed-diff.h
+> +++ b/tests/qtest/bios-tables-test-allowed-diff.h
+> @@ -1 +1,18 @@
+>  /* List of comma-separated changed AML files to ignore */
+> +"tests/data/acpi/pc/DSDT",
+> +"tests/data/acpi/pc/DSDT.acpihmat",
+> +"tests/data/acpi/pc/DSDT.bridge",
+> +"tests/data/acpi/pc/DSDT.cphp",
+> +"tests/data/acpi/pc/DSDT.dimmpxm",
+> +"tests/data/acpi/pc/DSDT.ipmikcs",
+> +"tests/data/acpi/pc/DSDT.memhp",
+> +"tests/data/acpi/pc/DSDT.numamem",
+> +"tests/data/acpi/q35/DSDT",
+> +"tests/data/acpi/q35/DSDT.acpihmat",
+> +"tests/data/acpi/q35/DSDT.bridge",
+> +"tests/data/acpi/q35/DSDT.cphp",
+> +"tests/data/acpi/q35/DSDT.dimmpxm",
+> +"tests/data/acpi/q35/DSDT.ipmibt",
+> +"tests/data/acpi/q35/DSDT.memhp",
+> +"tests/data/acpi/q35/DSDT.mmio64",
+> +"tests/data/acpi/q35/DSDT.numamem",
+> -- 
+> 2.18.4
 
 
