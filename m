@@ -2,89 +2,107 @@ Return-Path: <SRS0=U615=7Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC71CC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 15:23:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A18FC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 15:25:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 760DF2067B
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 15:23:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DcKQlFI2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 760DF2067B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4FAEE2067B
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 15:25:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4FAEE2067B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41650 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44984 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjP3P-0007ec-Le
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 11:23:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51510)
+	id 1jjP5F-0001S0-Jj
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 11:25:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51880)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jjOsu-0004vP-Hr
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 11:12:56 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:58659
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jjOss-0003Zz-Gh
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 11:12:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591888369;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=etSKwmHIuRxmvuLy4Ysxortsu0bSspOTDF7irDUHZ+c=;
- b=DcKQlFI20Z9l2eAHTleIE1YvWfVZuldE3WEUcNYSEj5Hj3f3KBjSu/zjF2DuPzdjqsM6Xo
- oLiAwY6o1ZCnz/jyTdcGbb4vJCcjFxxiou8MTjvcoPDQ2k354kdAqHZgszilF9+6RH05dn
- Z6slT4cab3PPslF7aQICp5SZ2HXY1EM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-335-lvXWdkubOgusbROoqBEFAQ-1; Thu, 11 Jun 2020 11:12:48 -0400
-X-MC-Unique: lvXWdkubOgusbROoqBEFAQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ECB681009610;
- Thu, 11 Jun 2020 15:12:46 +0000 (UTC)
-Received: from laptop.redhat.com (ovpn-114-197.ams2.redhat.com [10.36.114.197])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 452FF8FF81;
- Thu, 11 Jun 2020 15:12:44 +0000 (UTC)
-From: Eric Auger <eric.auger@redhat.com>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org, peter.maydell@linaro.org, mst@redhat.com,
- armbru@redhat.com, pbonzini@redhat.com, jean-philippe@linaro.org,
- bbhushan2@marvell.com, peterx@redhat.com
-Subject: [PATCH v3 5/5] hw/arm/virt: Let the virtio-iommu bypass MSIs
-Date: Thu, 11 Jun 2020 17:12:09 +0200
-Message-Id: <20200611151209.22547-6-eric.auger@redhat.com>
-In-Reply-To: <20200611151209.22547-1-eric.auger@redhat.com>
-References: <20200611151209.22547-1-eric.auger@redhat.com>
+ (Exim 4.90_1) (envelope-from <stefanb@linux.ibm.com>)
+ id 1jjOuN-0006KA-M4; Thu, 11 Jun 2020 11:14:23 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60158)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <stefanb@linux.ibm.com>)
+ id 1jjOuL-0003if-PQ; Thu, 11 Jun 2020 11:14:23 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 05BF41jN149616; Thu, 11 Jun 2020 11:14:18 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 31kdn6spaf-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 11 Jun 2020 11:14:17 -0400
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05BF4Ewc150462;
+ Thu, 11 Jun 2020 11:14:16 -0400
+Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com
+ [169.55.91.170])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 31kdn6sp9t-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 11 Jun 2020 11:14:16 -0400
+Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
+ by ppma02wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05BFAt3O006648;
+ Thu, 11 Jun 2020 15:14:15 GMT
+Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com
+ [9.57.198.29]) by ppma02wdc.us.ibm.com with ESMTP id 31g2s8w2j4-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 11 Jun 2020 15:14:15 +0000
+Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com
+ [9.57.199.109])
+ by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 05BFEE6v49807814
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 11 Jun 2020 15:14:15 GMT
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id DF35B112061;
+ Thu, 11 Jun 2020 15:14:14 +0000 (GMT)
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id CC52E112066;
+ Thu, 11 Jun 2020 15:14:14 +0000 (GMT)
+Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
+ by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
+ Thu, 11 Jun 2020 15:14:14 +0000 (GMT)
+Subject: Re: [PATCH v4 2/5] acpi: Move build_tpm2() in the generic part
+To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org,
+ mst@redhat.com, shannon.zhaosl@gmail.com, imammedo@redhat.com
+References: <20200611135917.18300-1-eric.auger@redhat.com>
+ <20200611135917.18300-3-eric.auger@redhat.com>
+From: Stefan Berger <stefanb@linux.ibm.com>
+Message-ID: <0c34a3c3-a5b0-15a1-e8e9-418d611a26f3@linux.ibm.com>
+Date: Thu, 11 Jun 2020 11:14:14 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120;
- envelope-from=eric.auger@redhat.com; helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 08:37:10
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
+In-Reply-To: <20200611135917.18300-3-eric.auger@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
+ definitions=2020-06-11_15:2020-06-11,
+ 2020-06-11 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0 spamscore=0
+ clxscore=1015 cotscore=-2147483648 malwarescore=0 mlxlogscore=999
+ suspectscore=0 bulkscore=0 adultscore=0 mlxscore=0 priorityscore=1501
+ lowpriorityscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2004280000 definitions=main-2006110115
+Received-SPF: pass client-ip=148.163.156.1; envelope-from=stefanb@linux.ibm.com;
+ helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 10:26:43
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
 X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,108 +115,173 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: marcandre.lureau@redhat.com, drjones@redhat.com, lersek@redhat.com,
+ ardb@kernel.org, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-At the moment the virtio-iommu translates MSI transactions.
-This behavior is inherited from ARM SMMU. The virt machine
-code knows where the guest MSI doorbells are so we can easily
-declare those regions as VIRTIO_IOMMU_RESV_MEM_T_MSI. With that
-setting the guest will not map MSIs through the IOMMU and those
-transactions will be simply bypassed.
+On 6/11/20 9:59 AM, Eric Auger wrote:
+> We plan to build the TPM2 table on ARM too. In order to reuse the
+> generation code, let's move build_tpm2() to aml-build.c.
+>
+> No change in the implementation.
+>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
-Depending on which MSI controller is in use (ITS or GICV2M),
-we declare either:
-- the ITS interrupt translation space (ITS_base + 0x10000),
-  containing the GITS_TRANSLATOR or
-- The GICV2M single frame, containing the MSI_SETSP_NS register.
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Stefan Berger <stefanb@linux.ibm.com>
 
----
-v2 -> v3:
-- Add a new value to VirtMSIControllerType
 
-v1 -> v2:
-- Test which MSI controller is instantiated
-- If GICV2M is in use, declare its doorbell as an MSI doorbell too
----
- include/hw/arm/virt.h |  7 +++++++
- hw/arm/virt.c         | 18 ++++++++++++++++++
- 2 files changed, 25 insertions(+)
+> ---
+>   include/hw/acpi/aml-build.h |  2 ++
+>   hw/acpi/aml-build.c         | 51 +++++++++++++++++++++++++++++++++++++
+>   hw/i386/acpi-build.c        | 51 -------------------------------------
+>   3 files changed, 53 insertions(+), 51 deletions(-)
+>
+> diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
+> index ed7c89309e..d27da03d64 100644
+> --- a/include/hw/acpi/aml-build.h
+> +++ b/include/hw/acpi/aml-build.h
+> @@ -437,4 +437,6 @@ void build_slit(GArray *table_data, BIOSLinker *linker, MachineState *ms);
+>   
+>   void build_fadt(GArray *tbl, BIOSLinker *linker, const AcpiFadtData *f,
+>                   const char *oem_id, const char *oem_table_id);
+> +
+> +void build_tpm2(GArray *table_data, BIOSLinker *linker, GArray *tcpalog);
+>   #endif
+> diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
+> index 3681ec6e3d..2a1d9fc839 100644
+> --- a/hw/acpi/aml-build.c
+> +++ b/hw/acpi/aml-build.c
+> @@ -26,6 +26,7 @@
+>   #include "qemu/bitops.h"
+>   #include "sysemu/numa.h"
+>   #include "hw/boards.h"
+> +#include "hw/acpi/tpm.h"
+>   
+>   static GArray *build_alloc_array(void)
+>   {
+> @@ -1877,6 +1878,56 @@ build_hdr:
+>                    "FACP", tbl->len - fadt_start, f->rev, oem_id, oem_table_id);
+>   }
+>   
+> +void build_tpm2(GArray *table_data, BIOSLinker *linker, GArray *tcpalog)
+> +{
+> +    uint8_t start_method_params[12] = {};
+> +    unsigned log_addr_offset, tpm2_start;
+> +    uint64_t control_area_start_address;
+> +    uint32_t start_method;
+> +    void *tpm2_ptr;
+> +
+> +    tpm2_start = table_data->len;
+> +    tpm2_ptr = acpi_data_push(table_data, sizeof(AcpiTableHeader));
+> +
+> +    /* Platform Class */
+> +    build_append_int_noprefix(table_data, TPM2_ACPI_CLASS_CLIENT, 2);
+> +    /* Reserved */
+> +    build_append_int_noprefix(table_data, 0, 2);
+> +    if (TPM_IS_TIS_ISA(tpm_find())) {
+> +        control_area_start_address = 0;
+> +        start_method = TPM2_START_METHOD_MMIO;
+> +    } else if (TPM_IS_CRB(tpm_find())) {
+> +        control_area_start_address = TPM_CRB_ADDR_CTRL;
+> +        start_method = TPM2_START_METHOD_CRB;
+> +    } else {
+> +        g_assert_not_reached();
+> +    }
+> +    /* Address of Control Area */
+> +    build_append_int_noprefix(table_data, control_area_start_address, 8);
+> +    /* Start Method */
+> +    build_append_int_noprefix(table_data, start_method, 4);
+> +
+> +    /* Platform Specific Parameters */
+> +    g_array_append_vals(table_data, &start_method_params,
+> +                        ARRAY_SIZE(start_method_params));
+> +
+> +    /* Log Area Minimum Length */
+> +    build_append_int_noprefix(table_data, TPM_LOG_AREA_MINIMUM_SIZE, 4);
+> +
+> +    acpi_data_push(tcpalog, TPM_LOG_AREA_MINIMUM_SIZE);
+> +    bios_linker_loader_alloc(linker, ACPI_BUILD_TPMLOG_FILE, tcpalog, 1,
+> +                             false);
+> +
+> +    log_addr_offset = table_data->len;
+> +    build_append_int_noprefix(table_data, 0, 8);
+> +    /* Log Area Start Address to be filled by Guest linker */
+> +    bios_linker_loader_add_pointer(linker, ACPI_BUILD_TABLE_FILE,
+> +                                   log_addr_offset, 8,
+> +                                   ACPI_BUILD_TPMLOG_FILE, 0);
+> +    build_header(linker, table_data,
+> +                 tpm2_ptr, "TPM2", table_data->len - tpm2_start, 4, NULL, NULL);
+> +}
+> +
+>   /* ACPI 5.0: 6.4.3.8.2 Serial Bus Connection Descriptors */
+>   static Aml *aml_serial_bus_device(uint8_t serial_bus_type, uint8_t flags,
+>                                     uint16_t type_flags,
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index f150d95ecc..b7c7583b5f 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -2295,57 +2295,6 @@ build_tpm_tcpa(GArray *table_data, BIOSLinker *linker, GArray *tcpalog)
+>                    (void *)tcpa, "TCPA", sizeof(*tcpa), 2, NULL, NULL);
+>   }
+>   
+> -static void
+> -build_tpm2(GArray *table_data, BIOSLinker *linker, GArray *tcpalog)
+> -{
+> -    uint8_t start_method_params[12] = {};
+> -    unsigned log_addr_offset, tpm2_start;
+> -    uint64_t control_area_start_address;
+> -    uint32_t start_method;
+> -    void *tpm2_ptr;
+> -
+> -    tpm2_start = table_data->len;
+> -    tpm2_ptr = acpi_data_push(table_data, sizeof(AcpiTableHeader));
+> -
+> -    /* Platform Class */
+> -    build_append_int_noprefix(table_data, TPM2_ACPI_CLASS_CLIENT, 2);
+> -    /* Reserved */
+> -    build_append_int_noprefix(table_data, 0, 2);
+> -    if (TPM_IS_TIS_ISA(tpm_find())) {
+> -        control_area_start_address = 0;
+> -        start_method = TPM2_START_METHOD_MMIO;
+> -    } else if (TPM_IS_CRB(tpm_find())) {
+> -        control_area_start_address = TPM_CRB_ADDR_CTRL;
+> -        start_method = TPM2_START_METHOD_CRB;
+> -    } else {
+> -        g_assert_not_reached();
+> -    }
+> -    /* Address of Control Area */
+> -    build_append_int_noprefix(table_data, control_area_start_address, 8);
+> -    /* Start Method */
+> -    build_append_int_noprefix(table_data, start_method, 4);
+> -
+> -    /* Platform Specific Parameters */
+> -    g_array_append_vals(table_data, &start_method_params,
+> -                        ARRAY_SIZE(start_method_params));
+> -
+> -    /* Log Area Minimum Length */
+> -    build_append_int_noprefix(table_data, TPM_LOG_AREA_MINIMUM_SIZE, 4);
+> -
+> -    acpi_data_push(tcpalog, TPM_LOG_AREA_MINIMUM_SIZE);
+> -    bios_linker_loader_alloc(linker, ACPI_BUILD_TPMLOG_FILE, tcpalog, 1,
+> -                             false);
+> -
+> -    log_addr_offset = table_data->len;
+> -    build_append_int_noprefix(table_data, 0, 8);
+> -    /* Log Area Start Address to be filled by Guest linker */
+> -    bios_linker_loader_add_pointer(linker, ACPI_BUILD_TABLE_FILE,
+> -                                   log_addr_offset, 8,
+> -                                   ACPI_BUILD_TPMLOG_FILE, 0);
+> -    build_header(linker, table_data,
+> -                 tpm2_ptr, "TPM2", table_data->len - tpm2_start, 4, NULL, NULL);
+> -}
+> -
+>   #define HOLE_640K_START  (640 * KiB)
+>   #define HOLE_640K_END   (1 * MiB)
+>   
 
-diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-index 31878ddc72..a18b6b397b 100644
---- a/include/hw/arm/virt.h
-+++ b/include/hw/arm/virt.h
-@@ -96,6 +96,12 @@ typedef enum VirtIOMMUType {
-     VIRT_IOMMU_VIRTIO,
- } VirtIOMMUType;
- 
-+typedef enum VirtMSIControllerType {
-+    VIRT_MSI_CTRL_NONE,
-+    VIRT_MSI_CTRL_GICV2M,
-+    VIRT_MSI_CTRL_ITS,
-+} VirtMSIControllerType;
-+
- typedef enum VirtGICType {
-     VIRT_GIC_VERSION_MAX,
-     VIRT_GIC_VERSION_HOST,
-@@ -136,6 +142,7 @@ typedef struct {
-     OnOffAuto acpi;
-     VirtGICType gic_version;
-     VirtIOMMUType iommu;
-+    VirtMSIControllerType msi_controller;
-     uint16_t virtio_iommu_bdf;
-     struct arm_boot_info bootinfo;
-     MemMapEntry *memmap;
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 37462a6f78..451b150459 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -602,6 +602,7 @@ static void create_its(VirtMachineState *vms)
-     sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, vms->memmap[VIRT_GIC_ITS].base);
- 
-     fdt_add_its_gic_node(vms);
-+    vms->msi_controller = VIRT_MSI_CTRL_ITS;
- }
- 
- static void create_v2m(VirtMachineState *vms)
-@@ -622,6 +623,7 @@ static void create_v2m(VirtMachineState *vms)
-     }
- 
-     fdt_add_v2m_gic_node(vms);
-+    vms->msi_controller = VIRT_MSI_CTRL_GICV2M;
- }
- 
- static void create_gic(VirtMachineState *vms)
-@@ -2149,8 +2151,24 @@ out:
- static void virt_machine_device_pre_plug_cb(HotplugHandler *hotplug_dev,
-                                             DeviceState *dev, Error **errp)
- {
-+    VirtMachineState *vms = VIRT_MACHINE(hotplug_dev);
-+
-     if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-         virt_memory_pre_plug(hotplug_dev, dev, errp);
-+    } else if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_IOMMU_PCI)) {
-+        /* we declare a VIRTIO_IOMMU_RESV_MEM_T_MSI region */
-+
-+        if (vms->msi_controller == VIRT_MSI_CTRL_ITS) {
-+            /* GITS_TRANSLATER page */
-+            qdev_prop_set_uint32(dev, "len-reserved-regions", 1);
-+            qdev_prop_set_string(dev, "reserved-regions[0]",
-+                                 "0x8090000, 0x809FFFF, 1");
-+        } else if (vms->msi_controller == VIRT_MSI_CTRL_GICV2M) {
-+            /* MSI_SETSPI_NS page */
-+            qdev_prop_set_uint32(dev, "len-reserved-regions", 1);
-+            qdev_prop_set_string(dev, "reserved-regions[0]",
-+                                 "0x8020000, 0x8020FFF, 1");
-+        }
-     }
- }
- 
--- 
-2.20.1
+
 
 
