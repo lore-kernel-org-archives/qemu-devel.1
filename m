@@ -2,72 +2,72 @@ Return-Path: <SRS0=U615=7Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C16A3C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 20:11:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B70E5C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 20:12:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8AE45206C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 20:11:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 85FED206C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 20:12:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wbbd+JKj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8AE45206C3
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NSO+amRl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85FED206C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43562 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45794 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjTXz-0005Wn-Nq
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 16:11:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55360)
+	id 1jjTYk-0006Ru-A7
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 16:12:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54848)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jjT9W-00004r-Jh
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 15:46:18 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33327
+ id 1jjT8u-0007tW-Ds
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 15:45:40 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:28695
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jjT9U-0001Ev-Jm
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 15:46:18 -0400
+ id 1jjT8s-00011u-00
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 15:45:39 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591904775;
+ s=mimecast20190719; t=1591904737;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=MrdrRYejp3x0pPisYrmqtFlKLM7DEQL3Jy2KygyfTlI=;
- b=Wbbd+JKjqNxKhM93aYMZBdCx8KqWb2DVhvoQhjsqXxJbIG+Wxcm35E+/yGpd2HPd++ZBg6
- o3m7bNv5ngF2bW4TW6cjdmWuWwdCjxBapgDS0GvGrjsXM9pSoOjfSNzZJF5BPnmU/7dZUC
- LvAHy3zp0XmadAPLkC9PlwO9NeIIR0Q=
+ bh=bjlB80Koby3bUcNCP1SMMXQG/Rg7x+AxPJv8cE+Cwoo=;
+ b=NSO+amRl1abcnZfhcVOC/mqrjOjKvLR7GFde+tdfyjiztw3YM1xpRx2M7f9mqTL02gzv+C
+ m4LI5cVUjMn8IDcwas+gcomW88In8Aal2r1JXJJ+JydOrv6USb1oONUez0oMS6EGDxh4px
+ /QDNsE+sYNl6+yppj3b4WCdX5bT6XO0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-376-bme4Yv0vP8u6ImnceFK0ow-1; Thu, 11 Jun 2020 15:45:14 -0400
-X-MC-Unique: bme4Yv0vP8u6ImnceFK0ow-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-194-qN8xpH4gMai0TI1T3yAZPg-1; Thu, 11 Jun 2020 15:45:23 -0400
+X-MC-Unique: qN8xpH4gMai0TI1T3yAZPg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E5A85107ACF4;
- Thu, 11 Jun 2020 19:45:13 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A945DA0C01;
+ Thu, 11 Jun 2020 19:45:22 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7652C5D9DC;
- Thu, 11 Jun 2020 19:45:13 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3B53B7E589;
+ Thu, 11 Jun 2020 19:45:22 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 024/115] target/i386: fix phadd* with identical destination and
- source register
-Date: Thu, 11 Jun 2020 15:43:18 -0400
-Message-Id: <20200611194449.31468-25-pbonzini@redhat.com>
+Subject: [PULL 034/115] hw/i386/vmport: Add support for CMD_GET_VCPU_INFO
+Date: Thu, 11 Jun 2020 15:43:28 -0400
+Message-Id: <20200611194449.31468-35-pbonzini@redhat.com>
 In-Reply-To: <20200611194449.31468-1-pbonzini@redhat.com>
 References: <20200611194449.31468-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
@@ -82,7 +82,7 @@ X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,98 +95,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- Janne Grunau <j@jannau.net>
+Cc: Liran Alon <liran.alon@oracle.com>,
+ Nikita Leshenko <nikita.leshchenko@oracle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Janne Grunau <j@jannau.net>
+From: Liran Alon <liran.alon@oracle.com>
 
-Detected by asm test suite failures in dav1d
-(https://code.videolan.org/videolan/dav1d). Can be reproduced by
-`qemu-x86_64 -cpu core2duo ./tests/checkasm --test=mc_8bpc 1659890620`.
+Command currently returns that it is unimplemented by setting
+the reserved-bit in it's return value.
 
-Signed-off-by: Janne Grunau <j@jannau.net>
-Message-Id: <20200401225253.30745-1-j@jannau.net>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Following patches will return various useful vCPU information
+to guest.
+
+Reviewed-by: Nikita Leshenko <nikita.leshchenko@oracle.com>
+Signed-off-by: Liran Alon <liran.alon@oracle.com>
+Message-Id: <20200312165431.82118-13-liran.alon@oracle.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- target/i386/ops_sse.h | 53 +++++++++++++++++++++++++++----------------
- 1 file changed, 33 insertions(+), 20 deletions(-)
+ hw/i386/vmport.c         | 14 ++++++++++++++
+ include/hw/i386/vmport.h |  1 +
+ 2 files changed, 15 insertions(+)
 
-diff --git a/target/i386/ops_sse.h b/target/i386/ops_sse.h
-index 4658768de2..01d6017412 100644
---- a/target/i386/ops_sse.h
-+++ b/target/i386/ops_sse.h
-@@ -1435,34 +1435,47 @@ void glue(helper_pshufb, SUFFIX)(CPUX86State *env, Reg *d, Reg *s)
+diff --git a/hw/i386/vmport.c b/hw/i386/vmport.c
+index 8006ff91d4..942a0e94e3 100644
+--- a/hw/i386/vmport.c
++++ b/hw/i386/vmport.c
+@@ -54,6 +54,13 @@
+ #define VMPORT_COMPAT_CMDS_V2                   \
+     (1 << VMPORT_COMPAT_CMDS_V2_BIT)
  
- void glue(helper_phaddw, SUFFIX)(CPUX86State *env, Reg *d, Reg *s)
- {
--    d->W(0) = (int16_t)d->W(0) + (int16_t)d->W(1);
--    d->W(1) = (int16_t)d->W(2) + (int16_t)d->W(3);
--    XMM_ONLY(d->W(2) = (int16_t)d->W(4) + (int16_t)d->W(5));
--    XMM_ONLY(d->W(3) = (int16_t)d->W(6) + (int16_t)d->W(7));
--    d->W((2 << SHIFT) + 0) = (int16_t)s->W(0) + (int16_t)s->W(1);
--    d->W((2 << SHIFT) + 1) = (int16_t)s->W(2) + (int16_t)s->W(3);
--    XMM_ONLY(d->W(6) = (int16_t)s->W(4) + (int16_t)s->W(5));
--    XMM_ONLY(d->W(7) = (int16_t)s->W(6) + (int16_t)s->W(7));
++/* vCPU features reported by CMD_GET_VCPU_INFO */
++#define VCPU_INFO_SLC64_BIT             0
++#define VCPU_INFO_SYNC_VTSCS_BIT        1
++#define VCPU_INFO_HV_REPLAY_OK_BIT      2
++#define VCPU_INFO_LEGACY_X2APIC_BIT     3
++#define VCPU_INFO_RESERVED_BIT          31
 +
-+    Reg r;
-+
-+    r.W(0) = (int16_t)d->W(0) + (int16_t)d->W(1);
-+    r.W(1) = (int16_t)d->W(2) + (int16_t)d->W(3);
-+    XMM_ONLY(r.W(2) = (int16_t)d->W(4) + (int16_t)d->W(5));
-+    XMM_ONLY(r.W(3) = (int16_t)d->W(6) + (int16_t)d->W(7));
-+    r.W((2 << SHIFT) + 0) = (int16_t)s->W(0) + (int16_t)s->W(1);
-+    r.W((2 << SHIFT) + 1) = (int16_t)s->W(2) + (int16_t)s->W(3);
-+    XMM_ONLY(r.W(6) = (int16_t)s->W(4) + (int16_t)s->W(5));
-+    XMM_ONLY(r.W(7) = (int16_t)s->W(6) + (int16_t)s->W(7));
-+
-+    *d = r;
+ #define VMPORT(obj) OBJECT_CHECK(VMPortState, (obj), TYPE_VMPORT)
+ 
+ typedef struct VMPortState {
+@@ -167,6 +174,11 @@ static uint32_t vmport_cmd_ram_size(void *opaque, uint32_t addr)
+     return ram_size;
  }
  
- void glue(helper_phaddd, SUFFIX)(CPUX86State *env, Reg *d, Reg *s)
- {
--    d->L(0) = (int32_t)d->L(0) + (int32_t)d->L(1);
--    XMM_ONLY(d->L(1) = (int32_t)d->L(2) + (int32_t)d->L(3));
--    d->L((1 << SHIFT) + 0) = (int32_t)s->L(0) + (int32_t)s->L(1);
--    XMM_ONLY(d->L(3) = (int32_t)s->L(2) + (int32_t)s->L(3));
-+    Reg r;
++static uint32_t vmport_cmd_get_vcpu_info(void *opaque, uint32_t addr)
++{
++    return 1 << VCPU_INFO_RESERVED_BIT;
++}
 +
-+    r.L(0) = (int32_t)d->L(0) + (int32_t)d->L(1);
-+    XMM_ONLY(r.L(1) = (int32_t)d->L(2) + (int32_t)d->L(3));
-+    r.L((1 << SHIFT) + 0) = (int32_t)s->L(0) + (int32_t)s->L(1);
-+    XMM_ONLY(r.L(3) = (int32_t)s->L(2) + (int32_t)s->L(3));
-+
-+    *d = r;
+ static const MemoryRegionOps vmport_ops = {
+     .read = vmport_ioport_read,
+     .write = vmport_ioport_write,
+@@ -192,6 +204,8 @@ static void vmport_realizefn(DeviceState *dev, Error **errp)
+     vmport_register(VMPORT_CMD_GETRAMSIZE, vmport_cmd_ram_size, NULL);
+     if (s->compat_flags & VMPORT_COMPAT_CMDS_V2) {
+         vmport_register(VMPORT_CMD_GETBIOSUUID, vmport_cmd_get_bios_uuid, NULL);
++        vmport_register(VMPORT_CMD_GET_VCPU_INFO, vmport_cmd_get_vcpu_info,
++                        NULL);
+     }
  }
  
- void glue(helper_phaddsw, SUFFIX)(CPUX86State *env, Reg *d, Reg *s)
- {
--    d->W(0) = satsw((int16_t)d->W(0) + (int16_t)d->W(1));
--    d->W(1) = satsw((int16_t)d->W(2) + (int16_t)d->W(3));
--    XMM_ONLY(d->W(2) = satsw((int16_t)d->W(4) + (int16_t)d->W(5)));
--    XMM_ONLY(d->W(3) = satsw((int16_t)d->W(6) + (int16_t)d->W(7)));
--    d->W((2 << SHIFT) + 0) = satsw((int16_t)s->W(0) + (int16_t)s->W(1));
--    d->W((2 << SHIFT) + 1) = satsw((int16_t)s->W(2) + (int16_t)s->W(3));
--    XMM_ONLY(d->W(6) = satsw((int16_t)s->W(4) + (int16_t)s->W(5)));
--    XMM_ONLY(d->W(7) = satsw((int16_t)s->W(6) + (int16_t)s->W(7)));
-+    Reg r;
-+
-+    r.W(0) = satsw((int16_t)d->W(0) + (int16_t)d->W(1));
-+    r.W(1) = satsw((int16_t)d->W(2) + (int16_t)d->W(3));
-+    XMM_ONLY(r.W(2) = satsw((int16_t)d->W(4) + (int16_t)d->W(5)));
-+    XMM_ONLY(r.W(3) = satsw((int16_t)d->W(6) + (int16_t)d->W(7)));
-+    r.W((2 << SHIFT) + 0) = satsw((int16_t)s->W(0) + (int16_t)s->W(1));
-+    r.W((2 << SHIFT) + 1) = satsw((int16_t)s->W(2) + (int16_t)s->W(3));
-+    XMM_ONLY(r.W(6) = satsw((int16_t)s->W(4) + (int16_t)s->W(5)));
-+    XMM_ONLY(r.W(7) = satsw((int16_t)s->W(6) + (int16_t)s->W(7)));
-+
-+    *d = r;
- }
+diff --git a/include/hw/i386/vmport.h b/include/hw/i386/vmport.h
+index 7f566ccc02..7656432358 100644
+--- a/include/hw/i386/vmport.h
++++ b/include/hw/i386/vmport.h
+@@ -13,6 +13,7 @@ typedef enum {
+     VMPORT_CMD_VMMOUSE_DATA     = 39,
+     VMPORT_CMD_VMMOUSE_STATUS   = 40,
+     VMPORT_CMD_VMMOUSE_COMMAND  = 41,
++    VMPORT_CMD_GET_VCPU_INFO    = 68,
+     VMPORT_ENTRIES
+ } VMPortCommand;
  
- void glue(helper_pmaddubsw, SUFFIX)(CPUX86State *env, Reg *d, Reg *s)
 -- 
 2.26.2
 
