@@ -4,67 +4,66 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A919EC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 20:29:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F6ACC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 20:30:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6D25720720
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 20:29:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 476BE20720
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 20:30:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cyWq9nbE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D25720720
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LBPM3Jxv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 476BE20720
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55980 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59950 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjTp8-0004Eh-NE
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 16:29:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55750)
+	id 1jjTqi-0005r4-ES
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 16:30:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55304)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jjTAA-0001QV-2x
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 15:46:58 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57275
+ id 1jjT9Q-0008I4-FJ
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 15:46:12 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37355
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jjTA7-0001M9-NY
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 15:46:57 -0400
+ id 1jjT9N-0001Dr-Qx
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 15:46:12 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591904815;
+ s=mimecast20190719; t=1591904768;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=eOCmrAmGxQCiphXmXYzrnQMo7oAMTlydx7QpNksXJw0=;
- b=cyWq9nbEm7XMnvZakHwchi5cRv7rGK3ImBZK2Ji0gDiKzV17i6Wab1PadG482KdM2i5G1P
- +U6Yk+svcOpfOdMgn4vgjT9qR7jteCHkzFOFMAQg9JBmh+yJr/6IL3JufeHUo9QxLbjmSg
- oFSYp71Xr2FCkbL7/y0F++BuGYOUrmA=
+ bh=KGJrn4mBcuuQPbf5h+fVCvjwwd4L5qQyUYwiSYCkEv4=;
+ b=LBPM3JxvkpOACg5/0p3aBpb+McEX0j+U+5EWr64NaFqQVEIt39MNJ1SNqLV8ctU27E5khL
+ xelqXUAjXzYTVOjVq8tfnCmX28YDPlp3e0Y2SL53YKYNM2c7zpnAVoM7LqFh3NDTxAOBzf
+ hkwjpvCkJHFnVeRqiqAU45qY1Xa2p74=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-47-Sff3GHm-NzWV7pti8d8OLw-1; Thu, 11 Jun 2020 15:46:53 -0400
-X-MC-Unique: Sff3GHm-NzWV7pti8d8OLw-1
+ us-mta-179-K9DwVHw_P-WDhLRWDaJKzg-1; Thu, 11 Jun 2020 15:46:06 -0400
+X-MC-Unique: K9DwVHw_P-WDhLRWDaJKzg-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 16E4C91165;
- Thu, 11 Jun 2020 19:46:48 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 02610107ACCA
+ for <qemu-devel@nongnu.org>; Thu, 11 Jun 2020 19:46:06 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6F45860CC0;
- Thu, 11 Jun 2020 19:46:47 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4AC2051C50;
+ Thu, 11 Jun 2020 19:45:43 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 075/115] target/i386: define a new MSR based feature word -
- FEAT_PERF_CAPABILITIES
-Date: Thu, 11 Jun 2020 15:44:09 -0400
-Message-Id: <20200611194449.31468-76-pbonzini@redhat.com>
+Subject: [PULL 067/115] vfio/pci: Use kvm_irqchip_add_irqfd_notifier_gsi() for
+ irqfds
+Date: Thu, 11 Jun 2020 15:44:01 -0400
+Message-Id: <20200611194449.31468-68-pbonzini@redhat.com>
 In-Reply-To: <20200611194449.31468-1-pbonzini@redhat.com>
 References: <20200611194449.31468-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -96,157 +95,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Marcelo Tosatti <mtosatti@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Like Xu <like.xu@linux.intel.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Eric Auger <eric.auger@redhat.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>, Peter Xu <peterx@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Like Xu <like.xu@linux.intel.com>
+From: Peter Xu <peterx@redhat.com>
 
-The Perfmon and Debug Capability MSR named IA32_PERF_CAPABILITIES is
-a feature-enumerating MSR, which only enumerates the feature full-width
-write (via bit 13) by now which indicates the processor supports IA32_A_PMCx
-interface for updating bits 32 and above of IA32_PMCx.
+VFIO is currently the only one left that is not using the generic
+function (kvm_irqchip_add_irqfd_notifier_gsi()) to register irqfds.
+Let VFIO use the common framework too.
 
-The existence of MSR IA32_PERF_CAPABILITIES is enumerated by CPUID.1:ECX[15].
+Follow up patches will introduce extra features for kvm irqfd, so that
+VFIO can easily leverage that after the switch.
 
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Marcelo Tosatti <mtosatti@redhat.com>
-Cc: qemu-devel@nongnu.org
-Signed-off-by: Like Xu <like.xu@linux.intel.com>
-Message-Id: <20200529074347.124619-5-like.xu@linux.intel.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Reviewed-by: Alex Williamson <alex.williamson@redhat.com>
+Acked-by: Alex Williamson <alex.williamson@redhat.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+Message-Id: <20200318145204.74483-3-peterx@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- target/i386/cpu.c | 23 +++++++++++++++++++++++
- target/i386/cpu.h |  3 +++
- target/i386/kvm.c | 20 ++++++++++++++++++++
- 3 files changed, 46 insertions(+)
+ hw/vfio/pci.c | 37 +++++++++++++++----------------------
+ 1 file changed, 15 insertions(+), 22 deletions(-)
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index e89d9fa894..2d3b8d5dea 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -1139,6 +1139,22 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             .index = MSR_IA32_CORE_CAPABILITY,
-         },
-     },
-+    [FEAT_PERF_CAPABILITIES] = {
-+        .type = MSR_FEATURE_WORD,
-+        .feat_names = {
-+            NULL, NULL, NULL, NULL,
-+            NULL, NULL, NULL, NULL,
-+            NULL, NULL, NULL, NULL,
-+            NULL, "full-width-write", NULL, NULL,
-+            NULL, NULL, NULL, NULL,
-+            NULL, NULL, NULL, NULL,
-+            NULL, NULL, NULL, NULL,
-+            NULL, NULL, NULL, NULL,
-+        },
-+        .msr = {
-+            .index = MSR_IA32_PERF_CAPABILITIES,
-+        },
-+    },
- 
-     [FEAT_VMX_PROCBASED_CTLS] = {
-         .type = MSR_FEATURE_WORD,
-@@ -1316,6 +1332,10 @@ static FeatureDep feature_dependencies[] = {
-         .from = { FEAT_7_0_EDX,             CPUID_7_0_EDX_CORE_CAPABILITY },
-         .to = { FEAT_CORE_CAPABILITY,       ~0ull },
-     },
-+    {
-+        .from = { FEAT_1_ECX,             CPUID_EXT_PDCM },
-+        .to = { FEAT_PERF_CAPABILITIES,       ~0ull },
-+    },
-     {
-         .from = { FEAT_1_ECX,               CPUID_EXT_VMX },
-         .to = { FEAT_VMX_PROCBASED_CTLS,    ~0ull },
-@@ -5488,6 +5508,9 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-             *ebx |= (cs->nr_cores * cs->nr_threads) << 16;
-             *edx |= CPUID_HT;
-         }
-+        if (!cpu->enable_pmu) {
-+            *ecx &= ~CPUID_EXT_PDCM;
-+        }
-         break;
-     case 2:
-         /* cache info: needed for Pentium Pro compatibility */
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 100476ee89..c2b8bdcbde 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -356,6 +356,8 @@ typedef enum X86Seg {
- #define MSR_IA32_ARCH_CAPABILITIES      0x10a
- #define ARCH_CAP_TSX_CTRL_MSR		(1<<7)
- 
-+#define MSR_IA32_PERF_CAPABILITIES      0x345
-+
- #define MSR_IA32_TSX_CTRL		0x122
- #define MSR_IA32_TSCDEADLINE            0x6e0
- 
-@@ -529,6 +531,7 @@ typedef enum FeatureWord {
-     FEAT_XSAVE_COMP_HI, /* CPUID[EAX=0xd,ECX=0].EDX */
-     FEAT_ARCH_CAPABILITIES,
-     FEAT_CORE_CAPABILITY,
-+    FEAT_PERF_CAPABILITIES,
-     FEAT_VMX_PROCBASED_CTLS,
-     FEAT_VMX_SECONDARY_CTLS,
-     FEAT_VMX_PINBASED_CTLS,
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index ef2e0a81dd..b3c13cb898 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -110,6 +110,7 @@ static bool has_msr_core_capabs;
- static bool has_msr_vmx_vmfunc;
- static bool has_msr_ucode_rev;
- static bool has_msr_vmx_procbased_ctls2;
-+static bool has_msr_perf_capabs;
- 
- static uint32_t has_architectural_pmu_version;
- static uint32_t num_architectural_pmu_gp_counters;
-@@ -2033,6 +2034,9 @@ static int kvm_get_supported_msrs(KVMState *s)
-             case MSR_IA32_CORE_CAPABILITY:
-                 has_msr_core_capabs = true;
-                 break;
-+            case MSR_IA32_PERF_CAPABILITIES:
-+                has_msr_perf_capabs = true;
-+                break;
-             case MSR_IA32_VMX_VMFUNC:
-                 has_msr_vmx_vmfunc = true;
-                 break;
-@@ -2649,6 +2653,18 @@ static void kvm_msr_entry_add_vmx(X86CPU *cpu, FeatureWordArray f)
-                       VMCS12_MAX_FIELD_INDEX << 1);
- }
- 
-+static void kvm_msr_entry_add_perf(X86CPU *cpu, FeatureWordArray f)
-+{
-+    uint64_t kvm_perf_cap =
-+        kvm_arch_get_supported_msr_feature(kvm_state,
-+                                           MSR_IA32_PERF_CAPABILITIES);
-+
-+    if (kvm_perf_cap) {
-+        kvm_msr_entry_add(cpu, MSR_IA32_PERF_CAPABILITIES,
-+                        kvm_perf_cap & f[FEAT_PERF_CAPABILITIES]);
-+    }
-+}
-+
- static int kvm_buf_set_msrs(X86CPU *cpu)
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index 342dd6b912..6838bcc4b3 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -115,11 +115,7 @@ static void vfio_intx_eoi(VFIODevice *vbasedev)
+ static void vfio_intx_enable_kvm(VFIOPCIDevice *vdev, Error **errp)
  {
-     int ret = kvm_vcpu_ioctl(CPU(cpu), KVM_SET_MSRS, cpu->kvm_msr_buf);
-@@ -2681,6 +2697,10 @@ static void kvm_init_msrs(X86CPU *cpu)
-                           env->features[FEAT_CORE_CAPABILITY]);
+ #ifdef CONFIG_KVM
+-    struct kvm_irqfd irqfd = {
+-        .fd = event_notifier_get_fd(&vdev->intx.interrupt),
+-        .gsi = vdev->intx.route.irq,
+-        .flags = KVM_IRQFD_FLAG_RESAMPLE,
+-    };
++    int irq_fd = event_notifier_get_fd(&vdev->intx.interrupt);
+     Error *err = NULL;
+ 
+     if (vdev->no_kvm_intx || !kvm_irqfds_enabled() ||
+@@ -129,7 +125,7 @@ static void vfio_intx_enable_kvm(VFIOPCIDevice *vdev, Error **errp)
      }
  
-+    if (has_msr_perf_capabs && cpu->enable_pmu) {
-+        kvm_msr_entry_add_perf(cpu, env->features);
-+    }
-+
-     if (has_msr_ucode_rev) {
-         kvm_msr_entry_add(cpu, MSR_IA32_UCODE_REV, cpu->ucode_rev);
+     /* Get to a known interrupt state */
+-    qemu_set_fd_handler(irqfd.fd, NULL, NULL, vdev);
++    qemu_set_fd_handler(irq_fd, NULL, NULL, vdev);
+     vfio_mask_single_irqindex(&vdev->vbasedev, VFIO_PCI_INTX_IRQ_INDEX);
+     vdev->intx.pending = false;
+     pci_irq_deassert(&vdev->pdev);
+@@ -140,17 +136,18 @@ static void vfio_intx_enable_kvm(VFIOPCIDevice *vdev, Error **errp)
+         goto fail;
      }
+ 
+-    /* KVM triggers it, VFIO listens for it */
+-    irqfd.resamplefd = event_notifier_get_fd(&vdev->intx.unmask);
+-
+-    if (kvm_vm_ioctl(kvm_state, KVM_IRQFD, &irqfd)) {
++    if (kvm_irqchip_add_irqfd_notifier_gsi(kvm_state,
++                                           &vdev->intx.interrupt,
++                                           &vdev->intx.unmask,
++                                           vdev->intx.route.irq)) {
+         error_setg_errno(errp, errno, "failed to setup resample irqfd");
+         goto fail_irqfd;
+     }
+ 
+     if (vfio_set_irq_signaling(&vdev->vbasedev, VFIO_PCI_INTX_IRQ_INDEX, 0,
+                                VFIO_IRQ_SET_ACTION_UNMASK,
+-                               irqfd.resamplefd, &err)) {
++                               event_notifier_get_fd(&vdev->intx.unmask),
++                               &err)) {
+         error_propagate(errp, err);
+         goto fail_vfio;
+     }
+@@ -165,12 +162,12 @@ static void vfio_intx_enable_kvm(VFIOPCIDevice *vdev, Error **errp)
+     return;
+ 
+ fail_vfio:
+-    irqfd.flags = KVM_IRQFD_FLAG_DEASSIGN;
+-    kvm_vm_ioctl(kvm_state, KVM_IRQFD, &irqfd);
++    kvm_irqchip_remove_irqfd_notifier_gsi(kvm_state, &vdev->intx.interrupt,
++                                          vdev->intx.route.irq);
+ fail_irqfd:
+     event_notifier_cleanup(&vdev->intx.unmask);
+ fail:
+-    qemu_set_fd_handler(irqfd.fd, vfio_intx_interrupt, NULL, vdev);
++    qemu_set_fd_handler(irq_fd, vfio_intx_interrupt, NULL, vdev);
+     vfio_unmask_single_irqindex(&vdev->vbasedev, VFIO_PCI_INTX_IRQ_INDEX);
+ #endif
+ }
+@@ -178,12 +175,6 @@ fail:
+ static void vfio_intx_disable_kvm(VFIOPCIDevice *vdev)
+ {
+ #ifdef CONFIG_KVM
+-    struct kvm_irqfd irqfd = {
+-        .fd = event_notifier_get_fd(&vdev->intx.interrupt),
+-        .gsi = vdev->intx.route.irq,
+-        .flags = KVM_IRQFD_FLAG_DEASSIGN,
+-    };
+-
+     if (!vdev->intx.kvm_accel) {
+         return;
+     }
+@@ -197,7 +188,8 @@ static void vfio_intx_disable_kvm(VFIOPCIDevice *vdev)
+     pci_irq_deassert(&vdev->pdev);
+ 
+     /* Tell KVM to stop listening for an INTx irqfd */
+-    if (kvm_vm_ioctl(kvm_state, KVM_IRQFD, &irqfd)) {
++    if (kvm_irqchip_remove_irqfd_notifier_gsi(kvm_state, &vdev->intx.interrupt,
++                                              vdev->intx.route.irq)) {
+         error_report("vfio: Error: Failed to disable INTx irqfd: %m");
+     }
+ 
+@@ -205,7 +197,8 @@ static void vfio_intx_disable_kvm(VFIOPCIDevice *vdev)
+     event_notifier_cleanup(&vdev->intx.unmask);
+ 
+     /* QEMU starts listening for interrupt events. */
+-    qemu_set_fd_handler(irqfd.fd, vfio_intx_interrupt, NULL, vdev);
++    qemu_set_fd_handler(event_notifier_get_fd(&vdev->intx.interrupt),
++                        vfio_intx_interrupt, NULL, vdev);
+ 
+     vdev->intx.kvm_accel = false;
+ 
 -- 
 2.26.2
 
