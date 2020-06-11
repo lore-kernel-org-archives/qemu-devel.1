@@ -2,88 +2,127 @@ Return-Path: <SRS0=U615=7Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1ED3C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 15:19:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64677C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 15:19:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BBDF9206A4
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 15:19:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2D397206A4
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 15:19:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bbrHs7Ok"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BBDF9206A4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J9hg7swh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D397206A4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58720 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60998 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjOyt-0000yT-P2
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 11:19:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51442)
+	id 1jjOzS-00034T-ED
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 11:19:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51324)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jjOsk-0004iK-T5
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 11:12:43 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:34430
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jjOsQ-0004Wv-Qq
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 11:12:24 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:60368
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jjOsg-0003U2-Tr
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 11:12:42 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jjOsN-0003Lx-Hy
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 11:12:21 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591888356;
+ s=mimecast20190719; t=1591888338;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=EG9/EteMQ7YFZhz4LAPnTuvoSkpBzI4tpCBXknkBiuI=;
- b=bbrHs7OkvvONHiizZJXBRYL19GsCC44FRSCAnXgqvftWNQEukDYcct9uv828cNPEmdYJb0
- iYPRQ21jcTkgeyjPfdrEgplA31yT9090R1C2fwrrYxGmK2OR5/qhI9YlMWtcLO+tBMD0EO
- QadicBGpZBb8eeJONVxI8kGKJOnAYSU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-9-WKoxITT1MFO-IuEYh2XM6Q-1; Thu, 11 Jun 2020 11:12:30 -0400
-X-MC-Unique: WKoxITT1MFO-IuEYh2XM6Q-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8D9FC461;
- Thu, 11 Jun 2020 15:12:29 +0000 (UTC)
-Received: from laptop.redhat.com (ovpn-114-197.ams2.redhat.com [10.36.114.197])
- by smtp.corp.redhat.com (Postfix) with ESMTP id EE91F8FF61;
- Thu, 11 Jun 2020 15:12:26 +0000 (UTC)
-From: Eric Auger <eric.auger@redhat.com>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org, peter.maydell@linaro.org, mst@redhat.com,
- armbru@redhat.com, pbonzini@redhat.com, jean-philippe@linaro.org,
- bbhushan2@marvell.com, peterx@redhat.com
-Subject: [PATCH v3 2/5] virtio-iommu: Implement RESV_MEM probe request
-Date: Thu, 11 Jun 2020 17:12:06 +0200
-Message-Id: <20200611151209.22547-3-eric.auger@redhat.com>
-In-Reply-To: <20200611151209.22547-1-eric.auger@redhat.com>
-References: <20200611151209.22547-1-eric.auger@redhat.com>
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=deFoKk7gNM/At55U2tuzz4P+LxVy3t7zfFh3JkK9FCM=;
+ b=J9hg7swhipwUC3/GHCoydI9hpQCiamBKxxQb48Wd3E+hxilOvhsHrZDy3aPu4sJGcTeNcm
+ UD/Zt85TMnH+makvdIXzGb5BD6yRH5JCh14iYHbs/sWsdEb5cBwKCnROWg4gIpjDzU0cGf
+ jW+m4PR+7rwEkVVF6fh0c7rPll+QSuk=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-486-YKmgSmR5OWKzB17r36ERcQ-1; Thu, 11 Jun 2020 11:12:06 -0400
+X-MC-Unique: YKmgSmR5OWKzB17r36ERcQ-1
+Received: by mail-wr1-f69.google.com with SMTP id p9so2679291wrx.10
+ for <qemu-devel@nongnu.org>; Thu, 11 Jun 2020 08:12:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=deFoKk7gNM/At55U2tuzz4P+LxVy3t7zfFh3JkK9FCM=;
+ b=ZiHPUdsweGgIKfwdOKft+leH4EHdMzs+wnmADKevRMBZlbXt5P9bDOS2EI48FCTLdL
+ os8bKxnAQdX1NeQEbLNec3u3HfCS0z3ZFik5wGASc3nnIV3bT9oMi+TslbVyFT732kUc
+ ZoJUTcA0UL/D2pmoAQdytBY34HZMDc+DBsPCy0YGAS5YzaWDA144/bH5xxxYvhLx0wEq
+ lRPT7wwci4vZi9BREQs+5nYCw/XZRUIdc+fvDKXrtebzxW8aBA6yhTOnxTDBlHcJOv4W
+ r5p/hKDQZ2B2Y47rC1QLBhC0nzLcyX8aIZncPMSaB5Og9lnwwOJ6p6YYah2iWF/GXiKY
+ no1w==
+X-Gm-Message-State: AOAM532vXpGQX8xm/hyga9txMWecAZhYToQkrsw0a+6BJ75cg3p3IynO
+ AgvFU2RfXA42gPEVlGbX0CClOzLQAZPeu/eYME7mbRq/oLLrHxlihGVx30mfixu8nTz5SPp5CIQ
+ RcHzGLR2viFt/Kg0=
+X-Received: by 2002:adf:f2c2:: with SMTP id d2mr9663095wrp.424.1591888324887; 
+ Thu, 11 Jun 2020 08:12:04 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyiK+zmnTnnd16SZ6xjRG8+5lUWRe/1R5JXhsronq6xUjdvqjq4d1Y7fSvEF6cGN5oKpr9QQg==
+X-Received: by 2002:adf:f2c2:: with SMTP id d2mr9663072wrp.424.1591888324630; 
+ Thu, 11 Jun 2020 08:12:04 -0700 (PDT)
+Received: from [192.168.1.38] (181.red-88-10-103.dynamicip.rima-tde.net.
+ [88.10.103.181])
+ by smtp.gmail.com with ESMTPSA id z22sm4603295wmf.9.2020.06.11.08.12.03
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 11 Jun 2020 08:12:04 -0700 (PDT)
+Subject: Re: [RFC PATCH] logging: add a LOG_TCG_WARN for temp leaks
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+References: <20200611144531.20142-1-alex.bennee@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <999a1545-48df-c6f7-cf37-6cd0c394da77@redhat.com>
+Date: Thu, 11 Jun 2020 17:12:02 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20200611144531.20142-1-alex.bennee@linaro.org>
+Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120;
- envelope-from=eric.auger@redhat.com; helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 08:37:10
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 03:29:33
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -97,219 +136,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch implements the PROBE request. At the moment,
-only THE RESV_MEM property is handled. The first goal is
-to report iommu wide reserved regions such as the MSI regions
-set by the machine code. On x86 this will be the IOAPIC MSI
-region, [0xFEE00000 - 0xFEEFFFFF], on ARM this may be the ITS
-doorbell.
+On 6/11/20 4:45 PM, Alex Bennée wrote:
+> Pretty much all calls to qemu_log are either wrapped in some other
+> enabling check or only enabled with debug defines. Add a specific flag
+> for TCG warnings and expand the documentation of the qemu_log
+> function.
+> 
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  include/qemu/log-for-trace.h | 9 ++++++++-
+>  include/qemu/log.h           | 2 ++
+>  accel/tcg/translator.c       | 4 ++--
+>  util/log.c                   | 2 ++
+>  4 files changed, 14 insertions(+), 3 deletions(-)
+> 
+> diff --git a/include/qemu/log-for-trace.h b/include/qemu/log-for-trace.h
+> index 2f0a5b080ea..521d7936243 100644
+> --- a/include/qemu/log-for-trace.h
+> +++ b/include/qemu/log-for-trace.h
+> @@ -29,7 +29,14 @@ static inline bool qemu_loglevel_mask(int mask)
+>      return (qemu_loglevel & mask) != 0;
+>  }
+>  
+> -/* main logging function */
+> +/**
+> + * qemu_log: main logging function
+> + *
+> + * Most users shouldn't be calling qemu_log unconditionally as it adds
+> + * noise to logging output. Either use qemu_log_mask() or wrap
+> + * successive log calls a qemu_loglevel_mask() check and
+> + * qemu_log_lock/unlock(). The tracing infrastructure does similar wrapping.
+> + */
+>  int GCC_FMT_ATTR(1, 2) qemu_log(const char *fmt, ...);
+>  
+>  #endif
+> diff --git a/include/qemu/log.h b/include/qemu/log.h
+> index f4724f73301..e1574ef7c14 100644
+> --- a/include/qemu/log.h
+> +++ b/include/qemu/log.h
+> @@ -64,6 +64,8 @@ static inline bool qemu_log_separate(void)
+>  #define CPU_LOG_PLUGIN     (1 << 18)
+>  /* LOG_STRACE is used for user-mode strace logging. */
+>  #define LOG_STRACE         (1 << 19)
+> +/* Additional TCG warnings */
+> +#define LOG_TCG_WARN       (1 << 20)
+>  
+>  /* Lock output for a series of related logs.  Since this is not needed
+>   * for a single qemu_log / qemu_log_mask / qemu_log_mask_and_addr, we
+> diff --git a/accel/tcg/translator.c b/accel/tcg/translator.c
+> index 603d17ff831..44396ccd7ad 100644
+> --- a/accel/tcg/translator.c
+> +++ b/accel/tcg/translator.c
+> @@ -26,8 +26,8 @@
+>  void translator_loop_temp_check(DisasContextBase *db)
+>  {
+>      if (tcg_check_temp_count()) {
+> -        qemu_log("warning: TCG temporary leaks before "
+> -                 TARGET_FMT_lx "\n", db->pc_next);
+> +        qemu_log_mask(LOG_TCG_WARN, "warning: TCG temporary leaks before "
+> +                      TARGET_FMT_lx "\n", db->pc_next);
 
-In the future we may introduce per device reserved regions.
-This will be useful when protecting host assigned devices
-which may expose their own reserved regions
+Why not replace by warn_report_once()?
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-
----
-
-v2 -> v3:
-- on probe, do not fill the reminder of the buffer with zeroes
-  as the buffer was already zero initialized (Bharat)
-
-v1 -> v2:
-- move the unlock back to the same place
-- remove the push label and factorize the code after the out label
-- fix a bunch of cpu_to_leX according to the latest spec revision
-- do not remove sizeof(last) from free space
-- check the ep exists
----
- include/hw/virtio/virtio-iommu.h |  2 +
- hw/virtio/virtio-iommu.c         | 91 ++++++++++++++++++++++++++++++--
- hw/virtio/trace-events           |  1 +
- 3 files changed, 90 insertions(+), 4 deletions(-)
-
-diff --git a/include/hw/virtio/virtio-iommu.h b/include/hw/virtio/virtio-iommu.h
-index e653004d7c..49eb105cd8 100644
---- a/include/hw/virtio/virtio-iommu.h
-+++ b/include/hw/virtio/virtio-iommu.h
-@@ -53,6 +53,8 @@ typedef struct VirtIOIOMMU {
-     GHashTable *as_by_busptr;
-     IOMMUPciBus *iommu_pcibus_by_bus_num[PCI_BUS_MAX];
-     PCIBus *primary_bus;
-+    ReservedRegion *reserved_regions;
-+    uint32_t nb_reserved_regions;
-     GTree *domains;
-     QemuMutex mutex;
-     GTree *endpoints;
-diff --git a/hw/virtio/virtio-iommu.c b/hw/virtio/virtio-iommu.c
-index 483883ec1d..be1527c1d6 100644
---- a/hw/virtio/virtio-iommu.c
-+++ b/hw/virtio/virtio-iommu.c
-@@ -38,6 +38,7 @@
- 
- /* Max size */
- #define VIOMMU_DEFAULT_QUEUE_SIZE 256
-+#define VIOMMU_PROBE_SIZE 512
- 
- typedef struct VirtIOIOMMUDomain {
-     uint32_t id;
-@@ -378,6 +379,62 @@ static int virtio_iommu_unmap(VirtIOIOMMU *s,
-     return ret;
- }
- 
-+static ssize_t virtio_iommu_fill_resv_mem_prop(VirtIOIOMMU *s, uint32_t ep,
-+                                               uint8_t *buf, size_t free)
-+{
-+    struct virtio_iommu_probe_resv_mem prop = {};
-+    size_t size = sizeof(prop), length = size - sizeof(prop.head), total;
-+    int i;
-+
-+    total = size * s->nb_reserved_regions;
-+
-+    if (total > free) {
-+        return -ENOSPC;
-+    }
-+
-+    for (i = 0; i < s->nb_reserved_regions; i++) {
-+        prop.head.type = cpu_to_le16(VIRTIO_IOMMU_PROBE_T_RESV_MEM);
-+        prop.head.length = cpu_to_le16(length);
-+        prop.subtype = s->reserved_regions[i].type;
-+        prop.start = cpu_to_le64(s->reserved_regions[i].low);
-+        prop.end = cpu_to_le64(s->reserved_regions[i].high);
-+
-+        memcpy(buf, &prop, size);
-+
-+        trace_virtio_iommu_fill_resv_property(ep, prop.subtype,
-+                                              prop.start, prop.end);
-+        buf += size;
-+    }
-+    return total;
-+}
-+
-+/**
-+ * virtio_iommu_probe - Fill the probe request buffer with
-+ * the properties the device is able to return and add a NONE
-+ * property at the end.
-+ */
-+static int virtio_iommu_probe(VirtIOIOMMU *s,
-+                              struct virtio_iommu_req_probe *req,
-+                              uint8_t *buf)
-+{
-+    uint32_t ep_id = le32_to_cpu(req->endpoint);
-+    size_t free = VIOMMU_PROBE_SIZE;
-+    ssize_t count;
-+
-+    if (!virtio_iommu_mr(s, ep_id)) {
-+        return VIRTIO_IOMMU_S_NOENT;
-+    }
-+
-+    count = virtio_iommu_fill_resv_mem_prop(s, ep_id, buf, free);
-+    if (count < 0) {
-+        return VIRTIO_IOMMU_S_INVAL;
-+    }
-+    buf += count;
-+    free -= count;
-+
-+    return VIRTIO_IOMMU_S_OK;
-+}
-+
- static int virtio_iommu_iov_to_req(struct iovec *iov,
-                                    unsigned int iov_cnt,
-                                    void *req, size_t req_sz)
-@@ -407,15 +464,27 @@ virtio_iommu_handle_req(detach)
- virtio_iommu_handle_req(map)
- virtio_iommu_handle_req(unmap)
- 
-+static int virtio_iommu_handle_probe(VirtIOIOMMU *s,
-+                                     struct iovec *iov,
-+                                     unsigned int iov_cnt,
-+                                     uint8_t *buf)
-+{
-+    struct virtio_iommu_req_probe req;
-+    int ret = virtio_iommu_iov_to_req(iov, iov_cnt, &req, sizeof(req));
-+
-+    return ret ? ret : virtio_iommu_probe(s, &req, buf);
-+}
-+
- static void virtio_iommu_handle_command(VirtIODevice *vdev, VirtQueue *vq)
- {
-     VirtIOIOMMU *s = VIRTIO_IOMMU(vdev);
-     struct virtio_iommu_req_head head;
-     struct virtio_iommu_req_tail tail = {};
-+    size_t output_size = sizeof(tail), sz;
-     VirtQueueElement *elem;
-     unsigned int iov_cnt;
-     struct iovec *iov;
--    size_t sz;
-+    void *buf = NULL;
- 
-     for (;;) {
-         elem = virtqueue_pop(vq, sizeof(VirtQueueElement));
-@@ -452,6 +521,17 @@ static void virtio_iommu_handle_command(VirtIODevice *vdev, VirtQueue *vq)
-         case VIRTIO_IOMMU_T_UNMAP:
-             tail.status = virtio_iommu_handle_unmap(s, iov, iov_cnt);
-             break;
-+        case VIRTIO_IOMMU_T_PROBE:
-+        {
-+            struct virtio_iommu_req_tail *ptail;
-+
-+            output_size = s->config.probe_size + sizeof(tail);
-+            buf = g_malloc0(output_size);
-+
-+            ptail = (struct virtio_iommu_req_tail *)
-+                        (buf + s->config.probe_size);
-+            ptail->status = virtio_iommu_handle_probe(s, iov, iov_cnt, buf);
-+        }
-         default:
-             tail.status = VIRTIO_IOMMU_S_UNSUPP;
-         }
-@@ -459,12 +539,13 @@ static void virtio_iommu_handle_command(VirtIODevice *vdev, VirtQueue *vq)
- 
- out:
-         sz = iov_from_buf(elem->in_sg, elem->in_num, 0,
--                          &tail, sizeof(tail));
--        assert(sz == sizeof(tail));
-+                          buf ? buf : &tail, output_size);
-+        assert(sz == output_size);
- 
--        virtqueue_push(vq, elem, sizeof(tail));
-+        virtqueue_push(vq, elem, sz);
-         virtio_notify(vdev, vq);
-         g_free(elem);
-+        g_free(buf);
-     }
- }
- 
-@@ -667,6 +748,7 @@ static void virtio_iommu_device_realize(DeviceState *dev, Error **errp)
-     s->config.page_size_mask = TARGET_PAGE_MASK;
-     s->config.input_range.end = -1UL;
-     s->config.domain_range.end = 32;
-+    s->config.probe_size = VIOMMU_PROBE_SIZE;
- 
-     virtio_add_feature(&s->features, VIRTIO_RING_F_EVENT_IDX);
-     virtio_add_feature(&s->features, VIRTIO_RING_F_INDIRECT_DESC);
-@@ -676,6 +758,7 @@ static void virtio_iommu_device_realize(DeviceState *dev, Error **errp)
-     virtio_add_feature(&s->features, VIRTIO_IOMMU_F_MAP_UNMAP);
-     virtio_add_feature(&s->features, VIRTIO_IOMMU_F_BYPASS);
-     virtio_add_feature(&s->features, VIRTIO_IOMMU_F_MMIO);
-+    virtio_add_feature(&s->features, VIRTIO_IOMMU_F_PROBE);
- 
-     qemu_mutex_init(&s->mutex);
- 
-diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
-index 6427a0047d..23109f69bb 100644
---- a/hw/virtio/trace-events
-+++ b/hw/virtio/trace-events
-@@ -74,3 +74,4 @@ virtio_iommu_get_domain(uint32_t domain_id) "Alloc domain=%d"
- virtio_iommu_put_domain(uint32_t domain_id) "Free domain=%d"
- virtio_iommu_translate_out(uint64_t virt_addr, uint64_t phys_addr, uint32_t sid) "0x%"PRIx64" -> 0x%"PRIx64 " for sid=%d"
- virtio_iommu_report_fault(uint8_t reason, uint32_t flags, uint32_t endpoint, uint64_t addr) "FAULT reason=%d flags=%d endpoint=%d address =0x%"PRIx64
-+virtio_iommu_fill_resv_property(uint32_t devid, uint8_t subtype, uint64_t start, uint64_t end) "dev= %d, type=%d start=0x%"PRIx64" end=0x%"PRIx64
--- 
-2.20.1
+>      }
+>  }
+>  
+> diff --git a/util/log.c b/util/log.c
+> index bdb3d712e88..fad25d9317f 100644
+> --- a/util/log.c
+> +++ b/util/log.c
+> @@ -334,6 +334,8 @@ const QEMULogItem qemu_log_items[] = {
+>  #endif
+>      { LOG_STRACE, "strace",
+>        "log every user-mode syscall, its input, and its result" },
+> +    { LOG_TCG_WARN, "tcg",
+> +      "log TCG warnings useful to developers." },
+>      { 0, NULL, NULL },
+>  };
+>  
+> 
 
 
