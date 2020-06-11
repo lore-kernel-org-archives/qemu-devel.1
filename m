@@ -2,69 +2,68 @@ Return-Path: <SRS0=U615=7Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23E33C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 14:03:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CF1BC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 14:05:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E3DDF206C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 14:03:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1B92E2078D
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 14:05:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Gejp3q2V"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3DDF206C3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gxnfnRZr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B92E2078D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36232 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39558 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjNo8-0006Nb-5t
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 10:03:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51782)
+	id 1jjNpx-0000mg-Ce
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 10:05:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52060)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jjNk9-0002BP-RA
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 09:59:45 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35335
+ id 1jjNkU-0002js-8Q
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 10:00:09 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:33990
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jjNk8-00029R-QD
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 09:59:45 -0400
+ id 1jjNkT-0002Eg-CR
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 10:00:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591883984;
+ s=mimecast20190719; t=1591884004;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Vfn8PEYJwv5gpdW+8cLkQ+SzSoDxtmh4V9PWHKDoHb0=;
- b=Gejp3q2Vrvdg+oQyQMAt1ACHvrPtsWvSDqkcfFTX4YdpCeCx+zS8WCzufcAOZFTOymYhpv
- 8PIq+tkyNYrXrIwYmxCjG69oOPCUAUbaFRp/V7aS8WSlLd21pT1KNHxRr0D1B4NVlPtI29
- gjfv1g1yG7uCBM+q22iM7q6F5K8TaAI=
+ bh=qDNBig6IWQiFeyOxhMViPcQxZlm7fNfvrCXicg2128w=;
+ b=gxnfnRZr+DkezsBGlzzCmHoQlr2B1Ix12IZrJ+OH6324ZRMz0Kb12Gu+X48YU/HNIfZeGK
+ 66NcJ4JiNMM8kq+tQkYKc54if+IR8cos2Ki3AlQapmuMCzlYZLCKGCeC1dgfZkug6lOK7h
+ 1UdTC25HJ/kTqpB49sWjHqw9O9JrKQM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-281-FTZZBi9YOrGffb5T9LhY1w-1; Thu, 11 Jun 2020 09:59:42 -0400
-X-MC-Unique: FTZZBi9YOrGffb5T9LhY1w-1
+ us-mta-67-Gi3LDhk_PUODY9vPMY3jeA-1; Thu, 11 Jun 2020 10:00:00 -0400
+X-MC-Unique: Gi3LDhk_PUODY9vPMY3jeA-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 11A40107ACCA;
- Thu, 11 Jun 2020 13:59:40 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6F4F3107ACCD;
+ Thu, 11 Jun 2020 13:59:59 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-114-197.ams2.redhat.com [10.36.114.197])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 02E365D9DC;
- Thu, 11 Jun 2020 13:59:36 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5FAF35D9DC;
+ Thu, 11 Jun 2020 13:59:56 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, stefanb@linux.ibm.com,
  qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org,
  mst@redhat.com, shannon.zhaosl@gmail.com, imammedo@redhat.com
-Subject: [PATCH v4 2/5] acpi: Move build_tpm2() in the generic part
-Date: Thu, 11 Jun 2020 15:59:14 +0200
-Message-Id: <20200611135917.18300-3-eric.auger@redhat.com>
+Subject: [PATCH v4 5/5] docs/specs/tpm: ACPI boot now supported for TPM/ARM
+Date: Thu, 11 Jun 2020 15:59:17 +0200
+Message-Id: <20200611135917.18300-6-eric.auger@redhat.com>
 In-Reply-To: <20200611135917.18300-1-eric.auger@redhat.com>
 References: <20200611135917.18300-1-eric.auger@redhat.com>
 MIME-Version: 1.0
@@ -102,159 +101,26 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We plan to build the TPM2 table on ARM too. In order to reuse the
-generation code, let's move build_tpm2() to aml-build.c.
-
-No change in the implementation.
+ACPI boot now is supported. Let's remove the comment
+saying it is not.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 ---
- include/hw/acpi/aml-build.h |  2 ++
- hw/acpi/aml-build.c         | 51 +++++++++++++++++++++++++++++++++++++
- hw/i386/acpi-build.c        | 51 -------------------------------------
- 3 files changed, 53 insertions(+), 51 deletions(-)
+ docs/specs/tpm.rst | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
-index ed7c89309e..d27da03d64 100644
---- a/include/hw/acpi/aml-build.h
-+++ b/include/hw/acpi/aml-build.h
-@@ -437,4 +437,6 @@ void build_slit(GArray *table_data, BIOSLinker *linker, MachineState *ms);
+diff --git a/docs/specs/tpm.rst b/docs/specs/tpm.rst
+index 5e61238bc5..eeeb93730a 100644
+--- a/docs/specs/tpm.rst
++++ b/docs/specs/tpm.rst
+@@ -346,8 +346,6 @@ In case an Arm virt machine is emulated, use the following command line:
+     -drive if=pflash,format=raw,file=flash0.img,readonly \
+     -drive if=pflash,format=raw,file=flash1.img
  
- void build_fadt(GArray *tbl, BIOSLinker *linker, const AcpiFadtData *f,
-                 const char *oem_id, const char *oem_table_id);
-+
-+void build_tpm2(GArray *table_data, BIOSLinker *linker, GArray *tcpalog);
- #endif
-diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
-index 3681ec6e3d..2a1d9fc839 100644
---- a/hw/acpi/aml-build.c
-+++ b/hw/acpi/aml-build.c
-@@ -26,6 +26,7 @@
- #include "qemu/bitops.h"
- #include "sysemu/numa.h"
- #include "hw/boards.h"
-+#include "hw/acpi/tpm.h"
- 
- static GArray *build_alloc_array(void)
- {
-@@ -1877,6 +1878,56 @@ build_hdr:
-                  "FACP", tbl->len - fadt_start, f->rev, oem_id, oem_table_id);
- }
- 
-+void build_tpm2(GArray *table_data, BIOSLinker *linker, GArray *tcpalog)
-+{
-+    uint8_t start_method_params[12] = {};
-+    unsigned log_addr_offset, tpm2_start;
-+    uint64_t control_area_start_address;
-+    uint32_t start_method;
-+    void *tpm2_ptr;
-+
-+    tpm2_start = table_data->len;
-+    tpm2_ptr = acpi_data_push(table_data, sizeof(AcpiTableHeader));
-+
-+    /* Platform Class */
-+    build_append_int_noprefix(table_data, TPM2_ACPI_CLASS_CLIENT, 2);
-+    /* Reserved */
-+    build_append_int_noprefix(table_data, 0, 2);
-+    if (TPM_IS_TIS_ISA(tpm_find())) {
-+        control_area_start_address = 0;
-+        start_method = TPM2_START_METHOD_MMIO;
-+    } else if (TPM_IS_CRB(tpm_find())) {
-+        control_area_start_address = TPM_CRB_ADDR_CTRL;
-+        start_method = TPM2_START_METHOD_CRB;
-+    } else {
-+        g_assert_not_reached();
-+    }
-+    /* Address of Control Area */
-+    build_append_int_noprefix(table_data, control_area_start_address, 8);
-+    /* Start Method */
-+    build_append_int_noprefix(table_data, start_method, 4);
-+
-+    /* Platform Specific Parameters */
-+    g_array_append_vals(table_data, &start_method_params,
-+                        ARRAY_SIZE(start_method_params));
-+
-+    /* Log Area Minimum Length */
-+    build_append_int_noprefix(table_data, TPM_LOG_AREA_MINIMUM_SIZE, 4);
-+
-+    acpi_data_push(tcpalog, TPM_LOG_AREA_MINIMUM_SIZE);
-+    bios_linker_loader_alloc(linker, ACPI_BUILD_TPMLOG_FILE, tcpalog, 1,
-+                             false);
-+
-+    log_addr_offset = table_data->len;
-+    build_append_int_noprefix(table_data, 0, 8);
-+    /* Log Area Start Address to be filled by Guest linker */
-+    bios_linker_loader_add_pointer(linker, ACPI_BUILD_TABLE_FILE,
-+                                   log_addr_offset, 8,
-+                                   ACPI_BUILD_TPMLOG_FILE, 0);
-+    build_header(linker, table_data,
-+                 tpm2_ptr, "TPM2", table_data->len - tpm2_start, 4, NULL, NULL);
-+}
-+
- /* ACPI 5.0: 6.4.3.8.2 Serial Bus Connection Descriptors */
- static Aml *aml_serial_bus_device(uint8_t serial_bus_type, uint8_t flags,
-                                   uint16_t type_flags,
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index f150d95ecc..b7c7583b5f 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -2295,57 +2295,6 @@ build_tpm_tcpa(GArray *table_data, BIOSLinker *linker, GArray *tcpalog)
-                  (void *)tcpa, "TCPA", sizeof(*tcpa), 2, NULL, NULL);
- }
- 
--static void
--build_tpm2(GArray *table_data, BIOSLinker *linker, GArray *tcpalog)
--{
--    uint8_t start_method_params[12] = {};
--    unsigned log_addr_offset, tpm2_start;
--    uint64_t control_area_start_address;
--    uint32_t start_method;
--    void *tpm2_ptr;
+-  On Arm, ACPI boot with TPM is not yet supported.
 -
--    tpm2_start = table_data->len;
--    tpm2_ptr = acpi_data_push(table_data, sizeof(AcpiTableHeader));
--
--    /* Platform Class */
--    build_append_int_noprefix(table_data, TPM2_ACPI_CLASS_CLIENT, 2);
--    /* Reserved */
--    build_append_int_noprefix(table_data, 0, 2);
--    if (TPM_IS_TIS_ISA(tpm_find())) {
--        control_area_start_address = 0;
--        start_method = TPM2_START_METHOD_MMIO;
--    } else if (TPM_IS_CRB(tpm_find())) {
--        control_area_start_address = TPM_CRB_ADDR_CTRL;
--        start_method = TPM2_START_METHOD_CRB;
--    } else {
--        g_assert_not_reached();
--    }
--    /* Address of Control Area */
--    build_append_int_noprefix(table_data, control_area_start_address, 8);
--    /* Start Method */
--    build_append_int_noprefix(table_data, start_method, 4);
--
--    /* Platform Specific Parameters */
--    g_array_append_vals(table_data, &start_method_params,
--                        ARRAY_SIZE(start_method_params));
--
--    /* Log Area Minimum Length */
--    build_append_int_noprefix(table_data, TPM_LOG_AREA_MINIMUM_SIZE, 4);
--
--    acpi_data_push(tcpalog, TPM_LOG_AREA_MINIMUM_SIZE);
--    bios_linker_loader_alloc(linker, ACPI_BUILD_TPMLOG_FILE, tcpalog, 1,
--                             false);
--
--    log_addr_offset = table_data->len;
--    build_append_int_noprefix(table_data, 0, 8);
--    /* Log Area Start Address to be filled by Guest linker */
--    bios_linker_loader_add_pointer(linker, ACPI_BUILD_TABLE_FILE,
--                                   log_addr_offset, 8,
--                                   ACPI_BUILD_TPMLOG_FILE, 0);
--    build_header(linker, table_data,
--                 tpm2_ptr, "TPM2", table_data->len - tpm2_start, 4, NULL, NULL);
--}
--
- #define HOLE_640K_START  (640 * KiB)
- #define HOLE_640K_END   (1 * MiB)
+ In case SeaBIOS is used as firmware, it should show the TPM menu item
+ after entering the menu with 'ESC'.
  
 -- 
 2.20.1
