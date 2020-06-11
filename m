@@ -2,88 +2,82 @@ Return-Path: <SRS0=U615=7Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CBB1C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 21:11:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61923C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 21:12:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 19BED20720
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 21:11:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 29D8220720
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 21:12:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fskc0Ul5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19BED20720
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FoIHQBDY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29D8220720
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43630 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46252 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjUTv-0001Eu-82
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 17:11:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56202)
+	id 1jjUV0-0003Eb-B8
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 17:12:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41752)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jjTAW-000265-3r
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 15:47:20 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:34168
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jjTAT-0001Rx-Pj
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 15:47:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591904837;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=b51M9KztetPMSGfaOOWNQjB7fE1LQXN0ycQf577nQoE=;
- b=Fskc0Ul5QiUScZmhtn1yJPezK1rRkHNClmzt684E8zrC5P5Ae6l0YcDshBBoG6ZTZ3XVT0
- ZjhYl/5FSssU+AL9g5kZzMHXSxMxHW9+Tb7y+lqJWcyUWiU4Df5E1y+v6EbEgJzta3u7jg
- HnLloZ3xiSUAv5LH9GWI4zmX5oU7rv4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-91-rCM9AFaaOjum2dlsqQ8hqQ-1; Thu, 11 Jun 2020 15:47:15 -0400
-X-MC-Unique: rCM9AFaaOjum2dlsqQ8hqQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EA8B3A0BEB;
- Thu, 11 Jun 2020 19:47:13 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com
- (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 498DD60CD3;
- Thu, 11 Jun 2020 19:47:13 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 108/115] target/i386: sev: Unify SEVState and SevGuestState
-Date: Thu, 11 Jun 2020 15:44:42 -0400
-Message-Id: <20200611194449.31468-109-pbonzini@redhat.com>
-In-Reply-To: <20200611194449.31468-1-pbonzini@redhat.com>
-References: <20200611194449.31468-1-pbonzini@redhat.com>
+ (Exim 4.90_1) (envelope-from <devnexen@gmail.com>)
+ id 1jjUTZ-00018P-IG; Thu, 11 Jun 2020 17:11:05 -0400
+Received: from mail-ej1-x62d.google.com ([2a00:1450:4864:20::62d]:33944)
+ by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <devnexen@gmail.com>)
+ id 1jjUTY-0003GN-5f; Thu, 11 Jun 2020 17:11:05 -0400
+Received: by mail-ej1-x62d.google.com with SMTP id l27so7963185ejc.1;
+ Thu, 11 Jun 2020 14:10:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:from:date:message-id:subject:to;
+ bh=uqRkS+04znKDsw7rOy4FGLZ4dtAJHAdv4x6eVo3FtZQ=;
+ b=FoIHQBDYczrL+czYzIaom7LOKvtqYd/K5ixr6/h7Yz1gCvt51KwjK7l7Uags38oA4B
+ lTlH5k7n/hZ5+NXliI5V0ivLTtXVU0saEsXXIFrPGlaE2+VlA9/nylvnRp3G2D7h2WDJ
+ 0vvTJlQz4cVYWVnbI85OYHct0jvCYHV1mEEkyjS7+wbcsMw5Xyk6TTKFTVvTB/ToKqzr
+ +be5w8TM6xXF82CsbIoJKVJyEDL23Tv8vexA4LBkQXe5PDNEFMnovoNIv70Te4ds9bqs
+ 3V17JRzLgnjH7/tGSCQtsaDQ/fUS5qkXvunkkZ9HhcDETisVryew3loMFv9TWOARq9aX
+ VZUA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+ bh=uqRkS+04znKDsw7rOy4FGLZ4dtAJHAdv4x6eVo3FtZQ=;
+ b=Kz+NYtsbjEVbqD157dOGBj62jmEn4GShzwUz0eMUW5l67dmhx/JCcQf0cAegaX3lh4
+ eRLclYfipZC+pZrziIOOCZyVUGewPcqp+rsKuO36ddR+K5IwLKSNJPlCZC3e4YA+SH4U
+ BpiWqbRureIOErJh3b8J2EcpiwL60fbXpgMGIYqq4WOLWJecoXITJ0X9lYx5nH5xbRX7
+ DpPrPSifi+4H7m8jp2iC136WtwfQsvqTc8yzg/lcDVu2ZcnT5ppRleYCVUmjbODkm9Bf
+ opsx4z8LLf7BTxk3LGSSzZ4InH7s7sSKAXbf4coMUN9jQpBADUk6FiAt9k5wtDdShLKd
+ esxw==
+X-Gm-Message-State: AOAM530Nb8e8DgTBVDAWolenmCd5F0h3wufOuIfkbH2YqnV3yGC0iEEi
+ sXyCOeGC3+QORJgN99EXFntjXRTMK+qy8Z/UvEInA2vnf70=
+X-Google-Smtp-Source: ABdhPJzw8cnlZYYizgg3OBrN9zi4QYxb/3gYxagiS4jl+WXuiHUTenDw2xAZxE/oOLShUlw6py4VrNor2jBmF+tyLsI=
+X-Received: by 2002:a17:906:68ca:: with SMTP id
+ y10mr9967077ejr.322.1591909850248; 
+ Thu, 11 Jun 2020 14:10:50 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 08:37:10
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- T_FILL_THIS_FORM_SHORT=0.01 autolearn=_AUTOLEARN
+From: David CARLIER <devnexen@gmail.com>
+Date: Thu, 11 Jun 2020 22:10:39 +0100
+Message-ID: <CA+XhMqwHSBd_TSFqipO6bn=hVSV8+Mdm3y=_i6gQoGBxRsjS0g@mail.gmail.com>
+Subject: [PATCH 1/1] util/getauxval: Porting to FreeBSD getauxval feature
+To: qemu-trivial@nongnu.org, qemu-devel <qemu-devel@nongnu.org>, 
+ Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: multipart/mixed; boundary="00000000000023a19605a7d56545"
+Received-SPF: pass client-ip=2a00:1450:4864:20::62d;
+ envelope-from=devnexen@gmail.com; helo=mail-ej1-x62d.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -6
+X-Spam_score: -0.7
+X-Spam_bar: /
+X-Spam_report: (-0.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ PYZOR_CHECK=1.392, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,266 +90,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: David Gibson <david@gibson.dropbear.id.au>
-
-SEVState is contained with SevGuestState.  We've now fixed redundancies
-and name conflicts, so there's no real point to the nested structure.  Just
-move all the fields of SEVState into SevGuestState.
-
-This eliminates the SEVState structure, which as a bonus removes the
-confusion with the SevState enum.
-
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20200604064219.436242-10-david@gibson.dropbear.id.au>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- target/i386/sev.c | 79 ++++++++++++++++++++---------------------------
- 1 file changed, 34 insertions(+), 45 deletions(-)
-
-diff --git a/target/i386/sev.c b/target/i386/sev.c
-index 24e2dea9b8..d273174ad3 100644
---- a/target/i386/sev.c
-+++ b/target/i386/sev.c
-@@ -35,18 +35,6 @@
- 
- typedef struct SevGuestState SevGuestState;
- 
--struct SEVState {
--    uint8_t api_major;
--    uint8_t api_minor;
--    uint8_t build_id;
--    uint64_t me_mask;
--    int sev_fd;
--    SevState state;
--    gchar *measurement;
--};
--
--typedef struct SEVState SEVState;
--
- /**
-  * SevGuestState:
-  *
-@@ -70,7 +58,13 @@ struct SevGuestState {
- 
-     /* runtime state */
-     uint32_t handle;
--    SEVState state;
-+    uint8_t api_major;
-+    uint8_t api_minor;
-+    uint8_t build_id;
-+    uint64_t me_mask;
-+    int sev_fd;
-+    SevState state;
-+    gchar *measurement;
- };
- 
- #define DEFAULT_GUEST_POLICY    0x1 /* disable debug */
-@@ -158,7 +152,7 @@ static bool
- sev_check_state(const SevGuestState *sev, SevState state)
- {
-     assert(sev);
--    return sev->state.state == state ? true : false;
-+    return sev->state == state ? true : false;
- }
- 
- static void
-@@ -167,9 +161,9 @@ sev_set_guest_state(SevGuestState *sev, SevState new_state)
-     assert(new_state < SEV_STATE__MAX);
-     assert(sev);
- 
--    trace_kvm_sev_change_state(SevState_str(sev->state.state),
-+    trace_kvm_sev_change_state(SevState_str(sev->state),
-                                SevState_str(new_state));
--    sev->state.state = new_state;
-+    sev->state = new_state;
- }
- 
- static void
-@@ -368,7 +362,7 @@ sev_enabled(void)
- uint64_t
- sev_get_me_mask(void)
- {
--    return sev_guest ? sev_guest->state.me_mask : ~0;
-+    return sev_guest ? sev_guest->me_mask : ~0;
- }
- 
- uint32_t
-@@ -392,11 +386,11 @@ sev_get_info(void)
-     info->enabled = sev_enabled();
- 
-     if (info->enabled) {
--        info->api_major = sev_guest->state.api_major;
--        info->api_minor = sev_guest->state.api_minor;
--        info->build_id = sev_guest->state.build_id;
-+        info->api_major = sev_guest->api_major;
-+        info->api_minor = sev_guest->api_minor;
-+        info->build_id = sev_guest->build_id;
-         info->policy = sev_guest->policy;
--        info->state = sev_guest->state.state;
-+        info->state = sev_guest->state;
-         info->handle = sev_guest->handle;
-     }
- 
-@@ -507,7 +501,6 @@ sev_read_file_base64(const char *filename, guchar **data, gsize *len)
- static int
- sev_launch_start(SevGuestState *sev)
- {
--    SEVState *s = &sev->state;
-     gsize sz;
-     int ret = 1;
-     int fw_error, rc;
-@@ -535,7 +528,7 @@ sev_launch_start(SevGuestState *sev)
-     }
- 
-     trace_kvm_sev_launch_start(start->policy, session, dh_cert);
--    rc = sev_ioctl(s->sev_fd, KVM_SEV_LAUNCH_START, start, &fw_error);
-+    rc = sev_ioctl(sev->sev_fd, KVM_SEV_LAUNCH_START, start, &fw_error);
-     if (rc < 0) {
-         error_report("%s: LAUNCH_START ret=%d fw_error=%d '%s'",
-                 __func__, ret, fw_error, fw_error_to_str(fw_error));
-@@ -566,7 +559,7 @@ sev_launch_update_data(SevGuestState *sev, uint8_t *addr, uint64_t len)
-     update.uaddr = (__u64)(unsigned long)addr;
-     update.len = len;
-     trace_kvm_sev_launch_update_data(addr, len);
--    ret = sev_ioctl(sev->state.sev_fd, KVM_SEV_LAUNCH_UPDATE_DATA,
-+    ret = sev_ioctl(sev->sev_fd, KVM_SEV_LAUNCH_UPDATE_DATA,
-                     &update, &fw_error);
-     if (ret) {
-         error_report("%s: LAUNCH_UPDATE ret=%d fw_error=%d '%s'",
-@@ -582,7 +575,6 @@ sev_launch_get_measure(Notifier *notifier, void *unused)
-     SevGuestState *sev = sev_guest;
-     int ret, error;
-     guchar *data;
--    SEVState *s = &sev->state;
-     struct kvm_sev_launch_measure *measurement;
- 
-     if (!sev_check_state(sev, SEV_STATE_LAUNCH_UPDATE)) {
-@@ -592,7 +584,7 @@ sev_launch_get_measure(Notifier *notifier, void *unused)
-     measurement = g_new0(struct kvm_sev_launch_measure, 1);
- 
-     /* query the measurement blob length */
--    ret = sev_ioctl(sev->state.sev_fd, KVM_SEV_LAUNCH_MEASURE,
-+    ret = sev_ioctl(sev->sev_fd, KVM_SEV_LAUNCH_MEASURE,
-                     measurement, &error);
-     if (!measurement->len) {
-         error_report("%s: LAUNCH_MEASURE ret=%d fw_error=%d '%s'",
-@@ -604,7 +596,7 @@ sev_launch_get_measure(Notifier *notifier, void *unused)
-     measurement->uaddr = (unsigned long)data;
- 
-     /* get the measurement blob */
--    ret = sev_ioctl(sev->state.sev_fd, KVM_SEV_LAUNCH_MEASURE,
-+    ret = sev_ioctl(sev->sev_fd, KVM_SEV_LAUNCH_MEASURE,
-                     measurement, &error);
-     if (ret) {
-         error_report("%s: LAUNCH_MEASURE ret=%d fw_error=%d '%s'",
-@@ -615,8 +607,8 @@ sev_launch_get_measure(Notifier *notifier, void *unused)
-     sev_set_guest_state(sev, SEV_STATE_LAUNCH_SECRET);
- 
-     /* encode the measurement value and emit the event */
--    s->measurement = g_base64_encode(data, measurement->len);
--    trace_kvm_sev_launch_measurement(s->measurement);
-+    sev->measurement = g_base64_encode(data, measurement->len);
-+    trace_kvm_sev_launch_measurement(sev->measurement);
- 
- free_data:
-     g_free(data);
-@@ -628,8 +620,8 @@ char *
- sev_get_launch_measurement(void)
- {
-     if (sev_guest &&
--        sev_guest->state.state >= SEV_STATE_LAUNCH_SECRET) {
--        return g_strdup(sev_guest->state.measurement);
-+        sev_guest->state >= SEV_STATE_LAUNCH_SECRET) {
-+        return g_strdup(sev_guest->measurement);
-     }
- 
-     return NULL;
-@@ -642,12 +634,11 @@ static Notifier sev_machine_done_notify = {
- static void
- sev_launch_finish(SevGuestState *sev)
- {
--    SEVState *s = &sev->state;
-     int ret, error;
-     Error *local_err = NULL;
- 
-     trace_kvm_sev_launch_finish();
--    ret = sev_ioctl(s->sev_fd, KVM_SEV_LAUNCH_FINISH, 0, &error);
-+    ret = sev_ioctl(sev->sev_fd, KVM_SEV_LAUNCH_FINISH, 0, &error);
-     if (ret) {
-         error_report("%s: LAUNCH_FINISH ret=%d fw_error=%d '%s'",
-                      __func__, ret, error, fw_error_to_str(error));
-@@ -683,7 +674,6 @@ void *
- sev_guest_init(const char *id)
- {
-     SevGuestState *sev;
--    SEVState *s;
-     char *devname;
-     int ret, fw_error;
-     uint32_t ebx;
-@@ -698,8 +688,7 @@ sev_guest_init(const char *id)
-     }
- 
-     sev_guest = sev;
--    s = &sev->state;
--    s->state = SEV_STATE_UNINIT;
-+    sev->state = SEV_STATE_UNINIT;
- 
-     host_cpuid(0x8000001F, 0, NULL, &ebx, NULL, NULL);
-     host_cbitpos = ebx & 0x3f;
-@@ -716,20 +705,20 @@ sev_guest_init(const char *id)
-         goto err;
-     }
- 
--    s->me_mask = ~(1UL << sev->cbitpos);
-+    sev->me_mask = ~(1UL << sev->cbitpos);
- 
-     devname = object_property_get_str(OBJECT(sev), "sev-device", NULL);
--    s->sev_fd = open(devname, O_RDWR);
--    if (s->sev_fd < 0) {
-+    sev->sev_fd = open(devname, O_RDWR);
-+    if (sev->sev_fd < 0) {
-         error_report("%s: Failed to open %s '%s'", __func__,
-                      devname, strerror(errno));
-     }
-     g_free(devname);
--    if (s->sev_fd < 0) {
-+    if (sev->sev_fd < 0) {
-         goto err;
-     }
- 
--    ret = sev_platform_ioctl(s->sev_fd, SEV_PLATFORM_STATUS, &status,
-+    ret = sev_platform_ioctl(sev->sev_fd, SEV_PLATFORM_STATUS, &status,
-                              &fw_error);
-     if (ret) {
-         error_report("%s: failed to get platform status ret=%d "
-@@ -737,12 +726,12 @@ sev_guest_init(const char *id)
-                      fw_error_to_str(fw_error));
-         goto err;
-     }
--    s->build_id = status.build;
--    s->api_major = status.api_major;
--    s->api_minor = status.api_minor;
-+    sev->build_id = status.build;
-+    sev->api_major = status.api_major;
-+    sev->api_minor = status.api_minor;
- 
-     trace_kvm_sev_init();
--    ret = sev_ioctl(s->sev_fd, KVM_SEV_INIT, NULL, &fw_error);
-+    ret = sev_ioctl(sev->sev_fd, KVM_SEV_INIT, NULL, &fw_error);
-     if (ret) {
-         error_report("%s: failed to initialize ret=%d fw_error=%d '%s'",
-                      __func__, ret, fw_error, fw_error_to_str(fw_error));
--- 
-2.26.2
+--00000000000023a19605a7d56545
+Content-Type: text/plain; charset="UTF-8"
 
 
+
+--00000000000023a19605a7d56545
+Content-Type: application/octet-stream; 
+	name="0001-util-getauxval-Porting-to-FreeBSD-the-getauxval-feat.patch"
+Content-Disposition: attachment; 
+	filename="0001-util-getauxval-Porting-to-FreeBSD-the-getauxval-feat.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_kbb9ztph0>
+X-Attachment-Id: f_kbb9ztph0
+
+RnJvbSAzMTZjYmRlYTA0MzRhNTIzYzc4ZDNmMThmZTdlNjY5NzU3N2U0YWFlIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBEYXZpZCBDYXJsaWVyIDxkZXZuZXhlbkBnbWFpbC5jb20+CkRh
+dGU6IFR1ZSwgMjYgTWF5IDIwMjAgMDg6MzM6MTIgKzAxMDAKU3ViamVjdDogW1BBVENIXSB1dGls
+L2dldGF1eHZhbDogUG9ydGluZyB0byBGcmVlQlNEIHRoZSBnZXRhdXh2YWwgZmVhdHVyZQoKRnJl
+ZUJTRCBoYXMgYSBzaW1pbGFyIEFQSSBmb3IgYXV4aWxpYXJ5IHZlY3Rvci4KClNpZ25lZC1vZmYt
+Ynk6IERhdmlkIENhcmxpZXIgPGRldm5leGVuQGdtYWlsLmNvbT4KLS0tCiBjb25maWd1cmUgICAg
+ICAgIHwgNSArKysrKwogdXRpbC9nZXRhdXh2YWwuYyB8IDYgKysrKysrCiAyIGZpbGVzIGNoYW5n
+ZWQsIDExIGluc2VydGlvbnMoKykKCmRpZmYgLS1naXQgYS9jb25maWd1cmUgYi9jb25maWd1cmUK
+aW5kZXggMmZjMDVjNDQ2NS4uMmM5Mzg2NzA4MCAxMDA3NTUKLS0tIGEvY29uZmlndXJlCisrKyBi
+L2NvbmZpZ3VyZQpAQCAtNTgyNCw3ICs1ODI0LDEyIEBAIGdldGF1eHZhbD1ubwogY2F0ID4gJFRN
+UEMgPDwgRU9GCiAjaW5jbHVkZSA8c3lzL2F1eHYuaD4KIGludCBtYWluKHZvaWQpIHsKKyNpZiBk
+ZWZpbmVkKF9fRnJlZUJTRF9fKQorICB1bnNpZ25lZCBsb25nIGEgPSAwOworICByZXR1cm4gZWxm
+X2F1eF9pbmZvKEFUX0hXQ0FQLCAmYSwgc2l6ZW9mKGEpKSA9PSAwOworI2Vsc2UKICAgcmV0dXJu
+IGdldGF1eHZhbChBVF9IV0NBUCkgPT0gMDsKKyNlbmRpZgogfQogRU9GCiBpZiBjb21waWxlX3By
+b2cgIiIgIiIgOyB0aGVuCmRpZmYgLS1naXQgYS91dGlsL2dldGF1eHZhbC5jIGIvdXRpbC9nZXRh
+dXh2YWwuYwppbmRleCAzNmFmZGZiOWU2Li4zNzNlZDM4OTlmIDEwMDY0NAotLS0gYS91dGlsL2dl
+dGF1eHZhbC5jCisrKyBiL3V0aWwvZ2V0YXV4dmFsLmMKQEAgLTMzLDcgKzMzLDEzIEBACiAKIHVu
+c2lnbmVkIGxvbmcgcWVtdV9nZXRhdXh2YWwodW5zaWduZWQgbG9uZyBrZXkpCiB7CisjaWYgZGVm
+aW5lZChfX2xpbnV4X18pCiAgICAgcmV0dXJuIGdldGF1eHZhbChrZXkpOworI2VsaWYgZGVmaW5l
+ZChfX0ZyZWVCU0RfXykKKyAgICB1bnNpZ25lZCBsb25nIGF1eCA9IDA7CisgICAgZWxmX2F1eF9p
+bmZvKGtleSwgJmF1eCwgc2l6ZW9mKGF1eCkpOworICAgIHJldHVybiBhdXg7CisjZW5kaWYKIH0K
+ICNlbGlmIGRlZmluZWQoX19saW51eF9fKQogI2luY2x1ZGUgImVsZi5oIgotLSAKMi4yNy4wLnJj
+MAoK
+--00000000000023a19605a7d56545--
 
