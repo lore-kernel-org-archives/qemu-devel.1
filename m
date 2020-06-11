@@ -2,102 +2,86 @@ Return-Path: <SRS0=U615=7Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DCD8C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 16:15:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D287FC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 16:15:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DC1A7206DC
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 16:15:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9C641206DC
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 16:15:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gwb0IxYj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC1A7206DC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Sdl794V9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C641206DC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48878 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49668 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjPrF-00082e-1n
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 12:15:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48608)
+	id 1jjPrS-0008Ly-PX
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 12:15:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48242)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jjPlJ-00059v-9F
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 12:09:05 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:28403
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jjPlH-0002BE-5t
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 12:09:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591891741;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=8lWB0Ui4g7romPhYjN7+fNOLPfWPt76YM8vzgCCtMno=;
- b=gwb0IxYj5TWBf4KsI3wfl/uc65N+1AnSekdSOxXojDFFc8qZSZ9XTluWx3+FLpAl+nkWbN
- KV3b69Z6J/LFhC8R21b20+svLIt9a27QSPcmj40Rj/9swpfcGTkY1bLydQfPfHWwztwwbO
- UZzgTsvnRR8mCDSonkNu5bKdtW7PmZU=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-262-a85W7eDBN8O4ZI2y4J6cYg-1; Thu, 11 Jun 2020 12:03:27 -0400
-X-MC-Unique: a85W7eDBN8O4ZI2y4J6cYg-1
-Received: by mail-wr1-f71.google.com with SMTP id p10so2723258wrn.19
- for <qemu-devel@nongnu.org>; Thu, 11 Jun 2020 09:03:27 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jjPkE-0003GS-My; Thu, 11 Jun 2020 12:07:58 -0400
+Received: from mail-il1-x143.google.com ([2607:f8b0:4864:20::143]:43766)
+ by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jjPkA-0001pz-Ui; Thu, 11 Jun 2020 12:07:58 -0400
+Received: by mail-il1-x143.google.com with SMTP id g3so5896076ilq.10;
+ Thu, 11 Jun 2020 09:07:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=gBTuH6EAM+lMB7EkTRADdYlxqy3PAbX4mi45MI5BDx0=;
+ b=Sdl794V9TvEMfBo3FVMuhWTTpCT9Vx5TEfFFiiMkDuQeqxqxY/mUfzRUb6MgJFuAya
+ LZS4BuDUeGRgQZ2Lt4M1BwxiscthVH1bLPxcFPSr1r1c0zVPjZfMwMdW129SQaNGR+gB
+ ljsdDgFNKVLCrr7/erERQRhz1aLuUrHkW4EanjFV6NCuTVOCDh2UmT9C9yvdcOJDczqM
+ hldqiO3kU1/b/iIFa3okLWr0DNu6pE3LjVxCrXC2ltHgKIKOlxo7mx4H4+SnXaS6uzoW
+ NLpa4DVtU8LuRcU6+W/Q11wWSatgI/cFG5oD5O50mqBsYESOmO1KosTEne7Rag8gnqew
+ 5qKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=8lWB0Ui4g7romPhYjN7+fNOLPfWPt76YM8vzgCCtMno=;
- b=lUPmbC/YixhFqPR+Y02yxvYEvqmV/gAmjppmH77zmuhPvAuhinahllVHzjdBxAEGgz
- kugWGbYEOw/zlEvfNuI4xLKb0415SXJxMs7RHG90Vc6QyQ9MkWggsVtkQPAIPp37Okno
- JyGXbfvHU6VMZw54g7bfvGi1a5IPoBjwQ0LKu5WoQvNmfZ1/OCfG1XmSCAO9phWkNTRs
- 8V1vSWfY+SprI5gQTrExqv+Kg+cx5YWEr+7Rq7wl8z4f3w4piwtrJlHLLm3aWWOP4tkJ
- v1OoJLs5Q7s4vg1iWpju3jS1V9y9kk4XDzFM2aCL/D9viV57Cfuyyx2FRAjt7spIMo5A
- 89Gw==
-X-Gm-Message-State: AOAM531ChYv4lGkA54FevzucHE0ezPP4I8FNNjv8t2Xur9r2Ul/CIJwy
- La2Gz+CZ48oCYuSKO7h4ncQv7EFOX76kflrTTZlZsnQ3jEJZhJfYGx2TcP09fByKSf6q8DDYG34
- 1VVLw/lmRHSZ62Rg=
-X-Received: by 2002:adf:e78a:: with SMTP id n10mr10677300wrm.114.1591891406198; 
- Thu, 11 Jun 2020 09:03:26 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJztQUYXO6NNQtaF8o4BnQnfggb8b2XxntyaTl90JbG0uqF9bBRx+torpCUTWf7j1IM777kLcQ==
-X-Received: by 2002:adf:e78a:: with SMTP id n10mr10677271wrm.114.1591891405969; 
- Thu, 11 Jun 2020 09:03:25 -0700 (PDT)
-Received: from x1w.redhat.com (181.red-88-10-103.dynamicip.rima-tde.net.
- [88.10.103.181])
- by smtp.gmail.com with ESMTPSA id d2sm5880260wrs.95.2020.06.11.09.03.24
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 11 Jun 2020 09:03:25 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 03/11] hw/tpm: Rename TPMDEV as TPM_BACKEND in Kconfig
-Date: Thu, 11 Jun 2020 18:02:58 +0200
-Message-Id: <20200611160306.2751-4-philmd@redhat.com>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200611160306.2751-1-philmd@redhat.com>
-References: <20200611160306.2751-1-philmd@redhat.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=gBTuH6EAM+lMB7EkTRADdYlxqy3PAbX4mi45MI5BDx0=;
+ b=OvYgCX4dPFihnV6eXSeJhIA6AJ5K7/Dhcf+cLQMSrj083SQixpeV0AksUr390H0PGk
+ UUoXXHz3du/iY9ad6ayT1YnGW3VYsnVjaZ2kvqqsqmscwO4etbBDModg0kqsqh3ysSVa
+ X4unzd7DE2r7agNDb4NjHV6GHZCqLCuZDxFJgDwBqwMBjtDE5yxcIDnoKv5Zfq7ysxKw
+ +KYne2XqilndLIat26xxSQb/JgqT/RhSTPHTFtERuJOs10L/XF3n6FCmm0EE9y1e1HnG
+ Dshh5wUDW5uSVEmq0v+3YomOCwZ7/Z98RfVwvLlinzKp0voxafLXPYl/w6fMyTNoG53R
+ BvMg==
+X-Gm-Message-State: AOAM533HlHudqS6kgFYi0nGujM9boQkX9pGNlnfBqI2TGABjLVZzQwvk
+ ttHvQgedVKSI8A7U1Z7y5MBghGI0/pNn2TzSoF8=
+X-Google-Smtp-Source: ABdhPJzVeDsw3cENC5kLricOgl6womJYp9UtBQ6Q50o9V/ab8DgZihmOneJlnR1zrXkst4JqZC10kpuTgqg4lqnactQ=
+X-Received: by 2002:a05:6e02:4d:: with SMTP id
+ i13mr9148147ilr.227.1591891661383; 
+ Thu, 11 Jun 2020 09:07:41 -0700 (PDT)
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8;
-	text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 08:37:10
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+References: <1591837729-27486-1-git-send-email-bmeng.cn@gmail.com>
+In-Reply-To: <1591837729-27486-1-git-send-email-bmeng.cn@gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Thu, 11 Jun 2020 08:58:17 -0700
+Message-ID: <CAKmqyKNdxrwKgaC+Bdff=sBCQc5VcrWHZ=haO1O3Es2io2FnGA@mail.gmail.com>
+Subject: Re: [PATCH v2 1/4] riscv: Generalize CPU init routine for the base CPU
+To: Bin Meng <bmeng.cn@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::143;
+ envelope-from=alistair23@gmail.com; helo=mail-il1-x143.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -110,67 +94,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Stefan Berger <stefanb@linux.ibm.com>
+Cc: Bin Meng <bin.meng@windriver.com>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Palmer Dabbelt <palmerdabbelt@google.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The TPMDEV describe TPM backends. Use the TPM_BACKEND config
-name which is self-explicit.
+On Wed, Jun 10, 2020 at 6:09 PM Bin Meng <bmeng.cn@gmail.com> wrote:
+>
+> From: Bin Meng <bin.meng@windriver.com>
+>
+> There is no need to have two functions that have exactly the same
+> codes for 32-bit and 64-bit base CPUs.
+>
+> Signed-off-by: Bin Meng <bin.meng@windriver.com>
+> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
- hw/tpm/Kconfig | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+Applied to riscv-to-apply branch.
 
-diff --git a/hw/tpm/Kconfig b/hw/tpm/Kconfig
-index 4794e7fe28..5028fd8880 100644
---- a/hw/tpm/Kconfig
-+++ b/hw/tpm/Kconfig
-@@ -1,4 +1,4 @@
--config TPMDEV
-+config TPM_BACKEND
-     bool
-     depends on TPM
- 
-@@ -15,26 +15,26 @@ config TPM_TIS_SYSBUS
- config TPM_TIS
-     bool
-     depends on TPM
--    select TPMDEV
-+    select TPM_BACKEND
- 
- config TPM_CRB
-     bool
-     depends on TPM && PC
--    select TPMDEV
-+    select TPM_BACKEND
- 
- config TPM_PASSTHROUGH
-     bool
-     default y
-     # FIXME: should check for x86 host as well
--    depends on TPMDEV && LINUX
-+    depends on TPM_BACKEND && LINUX
- 
- config TPM_EMULATOR
-     bool
-     default y
--    depends on TPMDEV
-+    depends on TPM_BACKEND
- 
- config TPM_SPAPR
-     bool
-     default y
-     depends on TPM && PSERIES
--    select TPMDEV
-+    select TPM_BACKEND
--- 
-2.21.3
+Alistair
 
+> ---
+>
+> (no changes since v1)
+>
+>  target/riscv/cpu.c | 18 +++++-------------
+>  1 file changed, 5 insertions(+), 13 deletions(-)
+>
+> diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+> index 3a6d202..81cdea8 100644
+> --- a/target/riscv/cpu.c
+> +++ b/target/riscv/cpu.c
+> @@ -126,9 +126,7 @@ static void riscv_any_cpu_init(Object *obj)
+>      set_resetvec(env, DEFAULT_RSTVEC);
+>  }
+>
+> -#if defined(TARGET_RISCV32)
+> -
+> -static void riscv_base32_cpu_init(Object *obj)
+> +static void riscv_base_cpu_init(Object *obj)
+>  {
+>      CPURISCVState *env = &RISCV_CPU(obj)->env;
+>      /* We set this in the realise function */
+> @@ -136,6 +134,8 @@ static void riscv_base32_cpu_init(Object *obj)
+>      set_resetvec(env, DEFAULT_RSTVEC);
+>  }
+>
+> +#if defined(TARGET_RISCV32)
+> +
+>  static void rv32gcsu_priv1_10_0_cpu_init(Object *obj)
+>  {
+>      CPURISCVState *env = &RISCV_CPU(obj)->env;
+> @@ -173,14 +173,6 @@ static void rv32imafcu_nommu_cpu_init(Object *obj)
+>
+>  #elif defined(TARGET_RISCV64)
+>
+> -static void riscv_base64_cpu_init(Object *obj)
+> -{
+> -    CPURISCVState *env = &RISCV_CPU(obj)->env;
+> -    /* We set this in the realise function */
+> -    set_misa(env, 0);
+> -    set_resetvec(env, DEFAULT_RSTVEC);
+> -}
+> -
+>  static void rv64gcsu_priv1_10_0_cpu_init(Object *obj)
+>  {
+>      CPURISCVState *env = &RISCV_CPU(obj)->env;
+> @@ -603,13 +595,13 @@ static const TypeInfo riscv_cpu_type_infos[] = {
+>      },
+>      DEFINE_CPU(TYPE_RISCV_CPU_ANY,              riscv_any_cpu_init),
+>  #if defined(TARGET_RISCV32)
+> -    DEFINE_CPU(TYPE_RISCV_CPU_BASE32,           riscv_base32_cpu_init),
+> +    DEFINE_CPU(TYPE_RISCV_CPU_BASE32,           riscv_base_cpu_init),
+>      DEFINE_CPU(TYPE_RISCV_CPU_IBEX,             rv32imcu_nommu_cpu_init),
+>      DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_E31,       rv32imacu_nommu_cpu_init),
+>      DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_E34,       rv32imafcu_nommu_cpu_init),
+>      DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_U34,       rv32gcsu_priv1_10_0_cpu_init),
+>  #elif defined(TARGET_RISCV64)
+> -    DEFINE_CPU(TYPE_RISCV_CPU_BASE64,           riscv_base64_cpu_init),
+> +    DEFINE_CPU(TYPE_RISCV_CPU_BASE64,           riscv_base_cpu_init),
+>      DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_E51,       rv64imacu_nommu_cpu_init),
+>      DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_U54,       rv64gcsu_priv1_10_0_cpu_init),
+>  #endif
+> --
+> 2.7.4
+>
+>
 
