@@ -6,67 +6,67 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01503C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 20:00:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32FE2C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 20:00:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BE36F2073E
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 20:00:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F33052073E
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 20:00:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hbjK0Qev"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE36F2073E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UZTWv9tc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F33052073E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36820 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37470 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjTN9-00051f-10
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 16:00:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54350)
+	id 1jjTNh-0005Sy-4o
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 16:00:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54610)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jjT8e-0007ct-3d
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 15:45:24 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48467
+ id 1jjT8l-0007nD-2a
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 15:45:31 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:38966
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jjT8a-0000wV-Ox
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 15:45:23 -0400
+ id 1jjT8h-0000yu-DV
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 15:45:30 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591904719;
+ s=mimecast20190719; t=1591904726;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=iwfsifuosc1Hr9eoc0Zlhiw1A6ToPZpXeqtV05HpnVc=;
- b=hbjK0Qev6vMDj3c5qDC6q+CTfLo1xWtwKmHXafcKyOHhdoOW1Q6mqxVODBtG5a7HPD4iLL
- 7z/wsjZoJM+fCIV+BKHvHtuImlloUOK6be0F4IbYr+ratjAi4HIxRoJIXxLYuPjbL1Qt+r
- 5LRz8vXkP7B1RWczjX4LPX6Zd8aHWNk=
+ bh=o7ERHdN4iEb7/q9LObdRVPQ2Shiyg7n3Z4Gh4J1WRik=;
+ b=UZTWv9tcVi5aSr0hzw23BAYU/ykizPBOmI8IG/ArObr+kq0j1KztSpzD+gI/z1Qzp5LsdP
+ GWLBhzfLIstvA+ezNvrCfOnty3TYHQSfGG/jCXyUgRjE4R3S7i57aBK37u4yMHYrxamLwc
+ 4B9UpbsGPp4SV25tmmYnfESHt2FY6Hg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-230-LQqjEWeDOKqLz0VMgejBEA-1; Thu, 11 Jun 2020 15:45:17 -0400
-X-MC-Unique: LQqjEWeDOKqLz0VMgejBEA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-418-i5SUaUhzOGGz5r6xZeG47A-1; Thu, 11 Jun 2020 15:45:24 -0400
+X-MC-Unique: i5SUaUhzOGGz5r6xZeG47A-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 569A1A0C00;
- Thu, 11 Jun 2020 19:45:16 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 73A448018A5;
+ Thu, 11 Jun 2020 19:45:22 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E53195D9DC;
- Thu, 11 Jun 2020 19:45:15 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E4E9E7BA1A;
+ Thu, 11 Jun 2020 19:45:20 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 029/115] hw/i386/vmport: Introduce vmware-vmx-version property
-Date: Thu, 11 Jun 2020 15:43:23 -0400
-Message-Id: <20200611194449.31468-30-pbonzini@redhat.com>
+Subject: [PULL 032/115] hw/i386/vmport: Define enum for all commands
+Date: Thu, 11 Jun 2020 15:43:26 -0400
+Message-Id: <20200611194449.31468-33-pbonzini@redhat.com>
 In-Reply-To: <20200611194449.31468-1-pbonzini@redhat.com>
 References: <20200611194449.31468-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
@@ -103,60 +103,133 @@ Sender: "Qemu-devel"
 
 From: Liran Alon <liran.alon@oracle.com>
 
-vmware-vmx-version is a number returned from CMD_GETVERSION which specifies
-to guest VMware Tools the the host VMX version. If the host reports a number
-that is different than what the guest VMware Tools expects, it may force
-guest to upgrade VMware Tools. (See comment above VERSION_MAGIC and
-VmCheck_IsVirtualWorld() function in open-vm-tools open-source code).
+No functional change.
 
-For better readability and allow maintaining compatability for guests
-which may expect different vmware-vmx-version, make vmware-vmx-version a
-VMPort object property. This would allow user to control it's value via
-"-global vmport.vmware-vmx-version=X".
+Defining an enum for all VMPort commands have the following advantages:
+* It gets rid of the error-prone requirement to update VMPORT_ENTRIES
+when new VMPort commands are added to QEMU.
+* It makes it clear to know by looking at one place at the source, what
+are all the VMPort commands supported by QEMU.
 
 Reviewed-by: Nikita Leshenko <nikita.leshchenko@oracle.com>
 Signed-off-by: Liran Alon <liran.alon@oracle.com>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20200312165431.82118-6-liran.alon@oracle.com>
+Message-Id: <20200312165431.82118-9-liran.alon@oracle.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/i386/vmport.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ hw/i386/vmmouse.c        | 18 ++++++------------
+ hw/i386/vmport.c         | 11 ++---------
+ include/hw/i386/vmport.h | 11 ++++++++++-
+ 3 files changed, 18 insertions(+), 22 deletions(-)
 
-diff --git a/hw/i386/vmport.c b/hw/i386/vmport.c
-index 730b61fcaa..dfebaf5b73 100644
---- a/hw/i386/vmport.c
-+++ b/hw/i386/vmport.c
-@@ -60,6 +60,8 @@ typedef struct VMPortState {
-     VMPortReadFunc *func[VMPORT_ENTRIES];
-     void *opaque[VMPORT_ENTRIES];
+diff --git a/hw/i386/vmmouse.c b/hw/i386/vmmouse.c
+index b73f076753..ba5c987bd2 100644
+--- a/hw/i386/vmmouse.c
++++ b/hw/i386/vmmouse.c
+@@ -34,12 +34,6 @@
+ /* debug only vmmouse */
+ //#define DEBUG_VMMOUSE
  
-+    uint32_t vmware_vmx_version;
-+
-     uint32_t compat_flags;
- } VMPortState;
+-/* VMMouse Commands */
+-#define VMMOUSE_GETVERSION	10
+-#define VMMOUSE_DATA		39
+-#define VMMOUSE_STATUS		40
+-#define VMMOUSE_COMMAND		41
+-
+ #define VMMOUSE_READ_ID			0x45414552
+ #define VMMOUSE_DISABLE			0x000000f5
+ #define VMMOUSE_REQUEST_RELATIVE	0x4c455252
+@@ -217,10 +211,10 @@ static uint32_t vmmouse_ioport_read(void *opaque, uint32_t addr)
+     command = data[2] & 0xFFFF;
  
-@@ -138,7 +140,7 @@ static uint32_t vmport_cmd_get_version(void *opaque, uint32_t addr)
-     X86CPU *cpu = X86_CPU(current_cpu);
+     switch (command) {
+-    case VMMOUSE_STATUS:
++    case VMPORT_CMD_VMMOUSE_STATUS:
+         data[0] = vmmouse_get_status(s);
+         break;
+-    case VMMOUSE_COMMAND:
++    case VMPORT_CMD_VMMOUSE_COMMAND:
+         switch (data[1]) {
+         case VMMOUSE_DISABLE:
+             vmmouse_disable(s);
+@@ -239,7 +233,7 @@ static uint32_t vmmouse_ioport_read(void *opaque, uint32_t addr)
+             break;
+         }
+         break;
+-    case VMMOUSE_DATA:
++    case VMPORT_CMD_VMMOUSE_DATA:
+         vmmouse_data(s, data, data[1]);
+         break;
+     default:
+@@ -296,9 +290,9 @@ static void vmmouse_realizefn(DeviceState *dev, Error **errp)
+         return;
+     }
  
-     cpu->env.regs[R_EBX] = VMPORT_MAGIC;
--    return 6;
-+    return port_state->vmware_vmx_version;
+-    vmport_register(VMMOUSE_STATUS, vmmouse_ioport_read, s);
+-    vmport_register(VMMOUSE_COMMAND, vmmouse_ioport_read, s);
+-    vmport_register(VMMOUSE_DATA, vmmouse_ioport_read, s);
++    vmport_register(VMPORT_CMD_VMMOUSE_STATUS, vmmouse_ioport_read, s);
++    vmport_register(VMPORT_CMD_VMMOUSE_COMMAND, vmmouse_ioport_read, s);
++    vmport_register(VMPORT_CMD_VMMOUSE_DATA, vmmouse_ioport_read, s);
  }
  
- static uint32_t vmport_cmd_ram_size(void *opaque, uint32_t addr)
-@@ -179,6 +181,11 @@ static Property vmport_properties[] = {
-                     VMPORT_COMPAT_READ_SET_EAX_BIT, true),
-     DEFINE_PROP_BIT("x-signal-unsupported-cmd", VMPortState, compat_flags,
-                     VMPORT_COMPAT_SIGNAL_UNSUPPORTED_CMD_BIT, true),
-+
-+    /* Default value taken from open-vm-tools code VERSION_MAGIC definition */
-+    DEFINE_PROP_UINT32("vmware-vmx-version", VMPortState,
-+                       vmware_vmx_version, 6),
-+
-     DEFINE_PROP_END_OF_LIST(),
- };
+ static Property vmmouse_properties[] = {
+diff --git a/hw/i386/vmport.c b/hw/i386/vmport.c
+index e6d169566d..359cdef1e0 100644
+--- a/hw/i386/vmport.c
++++ b/hw/i386/vmport.c
+@@ -37,10 +37,6 @@
+ #include "cpu.h"
+ #include "trace.h"
  
+-#define VMPORT_CMD_GETVERSION 0x0a
+-#define VMPORT_CMD_GETRAMSIZE 0x14
+-
+-#define VMPORT_ENTRIES 0x2c
+ #define VMPORT_MAGIC   0x564D5868
+ 
+ /* Compatibility flags for migration */
+@@ -71,12 +67,9 @@ typedef struct VMPortState {
+ 
+ static VMPortState *port_state;
+ 
+-void vmport_register(unsigned char command, VMPortReadFunc *func, void *opaque)
++void vmport_register(VMPortCommand command, VMPortReadFunc *func, void *opaque)
+ {
+-    if (command >= VMPORT_ENTRIES) {
+-        return;
+-    }
+-
++    assert(command < VMPORT_ENTRIES);
+     trace_vmport_register(command, func, opaque);
+     port_state->func[command] = func;
+     port_state->opaque[command] = opaque;
+diff --git a/include/hw/i386/vmport.h b/include/hw/i386/vmport.h
+index efbe3e0e3f..bbe2c58bf9 100644
+--- a/include/hw/i386/vmport.h
++++ b/include/hw/i386/vmport.h
+@@ -6,11 +6,20 @@
+ #define TYPE_VMPORT "vmport"
+ typedef uint32_t (VMPortReadFunc)(void *opaque, uint32_t address);
+ 
++typedef enum {
++    VMPORT_CMD_GETVERSION       = 10,
++    VMPORT_CMD_GETRAMSIZE       = 20,
++    VMPORT_CMD_VMMOUSE_DATA     = 39,
++    VMPORT_CMD_VMMOUSE_STATUS   = 40,
++    VMPORT_CMD_VMMOUSE_COMMAND  = 41,
++    VMPORT_ENTRIES
++} VMPortCommand;
++
+ static inline void vmport_init(ISABus *bus)
+ {
+     isa_create_simple(bus, TYPE_VMPORT);
+ }
+ 
+-void vmport_register(unsigned char command, VMPortReadFunc *func, void *opaque);
++void vmport_register(VMPortCommand command, VMPortReadFunc *func, void *opaque);
+ 
+ #endif
 -- 
 2.26.2
 
