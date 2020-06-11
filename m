@@ -2,90 +2,91 @@ Return-Path: <SRS0=U615=7Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-17.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
+	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA10BC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 21:38:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD97CC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 22:32:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 744092073E
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 21:38:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A79762073E
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 22:32:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RFQXdY2h"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 744092073E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MYXcyWQ8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A79762073E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36700 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59220 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjUu2-00050A-RP
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 17:38:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58786)
+	id 1jjVkI-0005da-PI
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 18:32:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33506)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jjUtL-0004UC-QT
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 17:37:43 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43464
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jjUtJ-0000xy-SN
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 17:37:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591911461;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=7Gg0y76aLgegBzrhSWfmixF2gX1CnqXlKqfMSyw66Go=;
- b=RFQXdY2hggD2mr210jg1BJrnNga5Vm1zQKPwvM3cX9ZeS7pWDHoRK9eWnKVWPh7noD8DRB
- Kfal99JBp9xWngBJ9UE/6ezCuZw5JbyMIBZAazDPNkcyirRrvHCtnfOvOP7zPLrcJCY39k
- Hr0meOi4aX/uYOgdXTScvsiLUUSaOEs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-498-8nqteu9qMp-8KcQOKUMZFg-1; Thu, 11 Jun 2020 17:37:20 -0400
-X-MC-Unique: 8nqteu9qMp-8KcQOKUMZFg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2971A107ACCA;
- Thu, 11 Jun 2020 21:37:19 +0000 (UTC)
-Received: from [10.3.112.27] (ovpn-112-27.phx2.redhat.com [10.3.112.27])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 38ACB60CC0;
- Thu, 11 Jun 2020 21:37:18 +0000 (UTC)
-Subject: Re: [PATCH v6 1/8] qcow2: Fix capitalization of header extension
- constant.
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-block@nongnu.org
-References: <1591910360-867499-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <1591910360-867499-2-git-send-email-andrey.shinkevich@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <feb6213f-d3af-4bf6-f201-af3b45826bb7@redhat.com>
-Date: Thu, 11 Jun 2020 16:37:17 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
-MIME-Version: 1.0
-In-Reply-To: <1591910360-867499-2-git-send-email-andrey.shinkevich@virtuozzo.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=eblake@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 14:52:10
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ (Exim 4.90_1) (envelope-from
+ <3hbDiXgsKCm4TeWUZZQYaQZSaaSXQ.OaYcQYg-PQhQXZaZSZg.adS@flex--hskinnemoen.bounces.google.com>)
+ id 1jjViZ-0003sc-5n
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 18:30:40 -0400
+Received: from mail-yb1-xb4a.google.com ([2607:f8b0:4864:20::b4a]:36642)
+ by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from
+ <3hbDiXgsKCm4TeWUZZQYaQZSaaSXQ.OaYcQYg-PQhQXZaZSZg.adS@flex--hskinnemoen.bounces.google.com>)
+ id 1jjViX-00041p-0h
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 18:30:38 -0400
+Received: by mail-yb1-xb4a.google.com with SMTP id c3so8163950ybi.3
+ for <qemu-devel@nongnu.org>; Thu, 11 Jun 2020 15:30:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+ :cc; bh=IQsEaB5zb1n6vsfoAp6zXcRCVesUArc2Mv6NZg2LuPw=;
+ b=MYXcyWQ8nILs+/tnF1h6mYzKlCEpLGtUuV+ye62MtsqJ4JX9MdYKZAxFNu2Ib7eRI7
+ jRqUYE0L91ddrhLOjkaV3DRdqiyIZBO2KLAepsjRL9gzpFzhFQeQIBW+h1teJVqr4Opl
+ c0fXUsb1WnZ75rqkRpuS3l4Z4SayRumXYC0IqjVgFwDJWFhvETPErqCkQMpYBGZaTEyo
+ cYEXwILmUsoCgjbZzkzDkZU/6MfJDlcaRKes7TLuOrmthEEM25t8pWkEuaiplIMNar0G
+ ViPV2NHflxToheM6zSRwnoBpVwyogGRJTSm2AIHTmaBTRBP1TQYVYtcyAT9gRO4X/N8Z
+ aGWQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+ :references:subject:from:to:cc;
+ bh=IQsEaB5zb1n6vsfoAp6zXcRCVesUArc2Mv6NZg2LuPw=;
+ b=Ma9XYoLPAdMjFAvBbX3XHlkSxrIfjyrSvhvmg3OJeAS157NaYWcZDbSByl1pw0wE6+
+ AzxHmXW6r79t5eEUaqDZA7zGDdBwCWZEDzkOF/gb3/K2EIfHRjo+IYO8CRftSf8zyp/7
+ N17fWxKI7jMuFL6RdKc4QFs+F7gFT37UV4d7mOsTOoipR9ekxrouxZ+Oz3VA/Cw9CevU
+ ANPvmqf4oS0V90pOxQH3/Q0Sd3RI9KqgWTIRc8tv+UB7xtgD8u8+1fDaLHP05KKuyl0C
+ d75Nr6HS2ftgfmJKlL1S/dCBcDnyCiXO7b5HkkhjEjcRonzhFOXUINnIm9ghSo2G4Jft
+ UO8w==
+X-Gm-Message-State: AOAM531JSFy4yT3b3JHPHkCeo0y5nY7iUPBeXBuhBAsJrT5QeFNXYkJu
+ OgjWg2sM7+ZHtaPkSp1s0is7C+gwl8qIb8w/2Q==
+X-Google-Smtp-Source: ABdhPJxemRcA+QEQAgrqMwTEDGJSv/SQkhWUoMkv32Dbh31TQrn3f5IcMa0GNv+4hS35z23MwRtYhAQ+xOAQ8xC0zw==
+X-Received: by 2002:a25:3055:: with SMTP id w82mr17824647ybw.21.1591914629653; 
+ Thu, 11 Jun 2020 15:30:29 -0700 (PDT)
+Date: Thu, 11 Jun 2020 15:30:05 -0700
+In-Reply-To: <20200611223016.259837-1-hskinnemoen@google.com>
+Message-Id: <20200611223016.259837-2-hskinnemoen@google.com>
+Mime-Version: 1.0
+References: <20200611223016.259837-1-hskinnemoen@google.com>
+X-Mailer: git-send-email 2.27.0.290.gba653c62da-goog
+Subject: [PATCH v2 01/12] npcm7xx: Add config symbol
+From: Havard Skinnemoen <hskinnemoen@google.com>
+To: peter.maydell@linaro.org, clg@kaod.org, joel@jms.id.au
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Avi.Fishman@nuvoton.com, 
+ kfting@nuvoton.com, Havard Skinnemoen <hskinnemoen@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::b4a;
+ envelope-from=3hbDiXgsKCm4TeWUZZQYaQZSaaSXQ.OaYcQYg-PQhQXZaZSZg.adS@flex--hskinnemoen.bounces.google.com;
+ helo=mail-yb1-xb4a.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -105
+X-Spam_score: -10.6
+X-Spam_bar: ----------
+X-Spam_report: (-10.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ USER_IN_DEF_DKIM_WL=-7.5 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,33 +99,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, den@openvz.org, vsementsov@virtuozzo.com,
- qemu-devel@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/11/20 4:19 PM, Andrey Shinkevich wrote:
-> Make the capitalization of the hexadecimal numbers consistent for the
-> QCOW2 header extension constants in docs/interop/qcow2.txt.
-> 
-> Suggested-by: Eric Blake <eblake@redhat.com>
-> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-> ---
->   block/qcow2.c          | 2 +-
->   docs/interop/qcow2.txt | 2 +-
->   2 files changed, 2 insertions(+), 2 deletions(-)
-> 
+Add a config symbol for the NPCM7xx BMC SoC family that subsequent
+patches can use in Makefiles.
 
-tests/qemu-iotests/114 has an instance that could be adjusted as well 
-(no change to 114.out).
+Change-Id: I6e4d5c58716cb6fe4ea5d06f148beeafda55f9a5
+Reviewed-by: Tyrone Ting <kfting@nuvoton.com>
+Acked-by: Joel Stanley <joel@jms.id.au>
+Signed-off-by: Havard Skinnemoen <hskinnemoen@google.com>
+---
+ default-configs/arm-softmmu.mak | 1 +
+ hw/arm/Kconfig                  | 8 ++++++++
+ 2 files changed, 9 insertions(+)
 
-With that added,
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
+diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+index 8fc09a4a51..9a94ebd0be 100644
+--- a/default-configs/arm-softmmu.mak
++++ b/default-configs/arm-softmmu.mak
+@@ -27,6 +27,7 @@ CONFIG_GUMSTIX=y
+ CONFIG_SPITZ=y
+ CONFIG_TOSA=y
+ CONFIG_Z2=y
++CONFIG_NPCM7XX=y
+ CONFIG_COLLIE=y
+ CONFIG_ASPEED_SOC=y
+ CONFIG_NETDUINO2=y
+diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
+index 9afa6eee79..3738c1f5cd 100644
+--- a/hw/arm/Kconfig
++++ b/hw/arm/Kconfig
+@@ -354,6 +354,14 @@ config XLNX_VERSAL
+     select VIRTIO_MMIO
+     select UNIMP
+ 
++config NPCM7XX
++    bool
++    select A9MPCORE
++    select ARM_GIC
++    select PL310  # cache controller
++    select SERIAL
++    select UNIMP
++
+ config FSL_IMX25
+     bool
+     select IMX
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+2.27.0.290.gba653c62da-goog
 
 
