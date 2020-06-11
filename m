@@ -2,145 +2,99 @@ Return-Path: <SRS0=U615=7Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1DCFC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 15:39:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD2DCC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 15:42:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B9277206DC
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 15:39:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A6CD8206DC
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 15:42:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dzW6oZ9q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9277206DC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="a6ywLGvF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6CD8206DC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40778 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44174 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjPIU-0004iT-Vr
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 11:39:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60242)
+	id 1jjPLd-0006tX-00
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 11:42:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35550)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lvivier@redhat.com>)
- id 1jjPCz-0007nn-2O
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 11:33:37 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26142
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <lvivier@redhat.com>)
- id 1jjPCw-000051-Ib
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 11:33:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591889612;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=69JBfp9RlIw2/dfVQ72VGVWwXUMR+jkXfc92kGTFkGA=;
- b=dzW6oZ9qH+0jRAeJw/xdhEEmhAKIB85553JheOyicg1mkUIbi32H3qIJHc8Y6YJ1nuu2X3
- pductb6hA7VTUBeu5duGRr1GbWS8gaUskWqoLTjuRAKn7eC/QyAFUVywa30gF8TIh+zZnL
- O1qVgHnUpcCPLzTc+VKZB88dXiFnA6A=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-114-PGAg8xKxOk-fn5LtG4KoCQ-1; Thu, 11 Jun 2020 11:33:31 -0400
-X-MC-Unique: PGAg8xKxOk-fn5LtG4KoCQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D054A107B0EF;
- Thu, 11 Jun 2020 15:33:29 +0000 (UTC)
-Received: from [10.36.113.1] (ovpn-113-1.ams2.redhat.com [10.36.113.1])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D6A875C28E;
- Thu, 11 Jun 2020 15:33:27 +0000 (UTC)
-Subject: Re: [PATCH v3 1/4] spapr: Simplify some warning printing paths in
- spapr_caps.c
-To: Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
-References: <159188280345.70166.14940592691021389043.stgit@bahia.lan>
- <159188281098.70166.18387926536399257573.stgit@bahia.lan>
-From: Laurent Vivier <lvivier@redhat.com>
-Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- D+Ofp0T3KOr1RUHvCZoLURfFhSQ=
-Message-ID: <83bd0a39-f9ca-665b-97d3-03a8bd586278@redhat.com>
-Date: Thu, 11 Jun 2020 17:33:26 +0200
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jjPKt-00068b-NU
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 11:41:49 -0400
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:39468)
+ by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jjPKr-00025W-KI
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 11:41:47 -0400
+Received: by mail-pl1-x644.google.com with SMTP id v24so2461946plo.6
+ for <qemu-devel@nongnu.org>; Thu, 11 Jun 2020 08:41:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:references:from:message-id:date:user-agent:mime-version
+ :in-reply-to:content-language:content-transfer-encoding;
+ bh=taWCnuUGc3aBjWxN8/zwY/zGugn1tYn2OOhu/tU0z0M=;
+ b=a6ywLGvFJR36HkUvHnxlGz6GiKxo03UcolEy3izkAdH8/Eob2aE9Mq77D55Sq2QxqO
+ NOIDuiAvOLv+2MldKGoyIVhhu4o0fcy24ZNhxGbCk6R8b68Vmx7jTB66vDmq/M61Eel7
+ inePlf5zJXumvB8jL3ASuCVK9X4eWVqz1ARKPV0HUVagoVMowd3Cf6WLqliF7pvST/Yb
+ sI+XveP1EfEGuqeAyE4Ll+cElCK/yZVH/ErqjiN1IRUu+1PUydjsyfaSIErV+4hgAsN7
+ oqkirSB3swx2VsswroIKSgJK0UZt/XJG0jA4Vp1qVzIU2u9DDdEuLqlTZGTJ1Ok3lhRO
+ tq5w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=taWCnuUGc3aBjWxN8/zwY/zGugn1tYn2OOhu/tU0z0M=;
+ b=tZ3iOGlgvv24Y4kGPCRkZIFEdWc4mN5xjdpNt00EBiNOw0+xxW/I3VDHvay+mXENUH
+ aqAv8fyr0pNPHftBc+B6ZruuDaCKokiAUr/gWIjtLeRll0EgAjXNndaOOuL3DBIqCCol
+ XH/LSZCikeSvVfppNN2Bvne5zAnWlnzY6/Iu++sHeuO1Slv7QSg1ohY9DKOQjHhzoMqk
+ L8sKkwVvvVCYGZMp+AFNGMYKSps2/Uz/FZDqZXdzTkkiXBZxI+8Ncd3wRTpMEA/B6uiS
+ 5WQnytdzMYKX365WelQtPHLaYmQwLjpZOmKewkApRYPErrCR8tv2d9jJYziJDTEzOKSV
+ d4gg==
+X-Gm-Message-State: AOAM5301Ymkzk1kpt+lS75juTBrCU21A9BOn9QnboRUMSvBluhkQ9VU9
+ odq20ZmqFFIcoVuK2fWv66IbUjuXBK4=
+X-Google-Smtp-Source: ABdhPJwTdQI9BYok9VvHTgNuupRwWe+ESoS08BB4HRWqJ1Nwqt/PW/65FNxmS3LKvrKfAFa8MpVTxQ==
+X-Received: by 2002:a17:90a:e007:: with SMTP id
+ u7mr8760344pjy.208.1591890096198; 
+ Thu, 11 Jun 2020 08:41:36 -0700 (PDT)
+Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
+ by smtp.gmail.com with ESMTPSA id c2sm3537979pfi.71.2020.06.11.08.41.35
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 11 Jun 2020 08:41:35 -0700 (PDT)
+Subject: Re: [PATCH 01/10] target/arm: Add 'static' and 'const' annotations to
+ VSHLL function arrays
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org
+References: <20200611144529.8873-1-peter.maydell@linaro.org>
+ <20200611144529.8873-2-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <4f4808c3-c33d-55a3-6f80-6168c64979ae@linaro.org>
+Date: Thu, 11 Jun 2020 08:41:33 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <159188281098.70166.18387926536399257573.stgit@bahia.lan>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <20200611144529.8873-2-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=lvivier@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 03:29:33
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=2607:f8b0:4864:20::644;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x644.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -153,108 +107,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/06/2020 15:40, Greg Kurz wrote:
-> We obviously only want to print a warning in these cases, but this is done
-> in a rather convoluted manner. Just use warn_report() instead.
+On 6/11/20 7:45 AM, Peter Maydell wrote:
+> Mark the arrays of function pointers in trans_VSHLL_S_2sh() and
+> trans_VSHLL_U_2sh() as both 'static' and 'const'.
 > 
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->  hw/ppc/spapr_caps.c |   28 ++++++----------------------
->  1 file changed, 6 insertions(+), 22 deletions(-)
-> 
-> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-> index efdc0dbbcfc0..0c2bc8e06e44 100644
-> --- a/hw/ppc/spapr_caps.c
-> +++ b/hw/ppc/spapr_caps.c
-> @@ -248,23 +248,18 @@ SpaprCapPossible cap_cfpc_possible = {
->  static void cap_safe_cache_apply(SpaprMachineState *spapr, uint8_t val,
->                                   Error **errp)
->  {
-> -    Error *local_err = NULL;
->      uint8_t kvm_val =  kvmppc_get_cap_safe_cache();
->  
->      if (tcg_enabled() && val) {
->          /* TCG only supports broken, allow other values and print a warning */
-> -        error_setg(&local_err,
-> -                   "TCG doesn't support requested feature, cap-cfpc=%s",
-> -                   cap_cfpc_possible.vals[val]);
-> +        warn_report("TCG doesn't support requested feature, cap-cfpc=%s",
-> +                    cap_cfpc_possible.vals[val]);
->      } else if (kvm_enabled() && (val > kvm_val)) {
->          error_setg(errp,
->                     "Requested safe cache capability level not supported by kvm,"
->                     " try appending -machine cap-cfpc=%s",
->                     cap_cfpc_possible.vals[kvm_val]);
->      }
-> -
-> -    if (local_err != NULL)
-> -        warn_report_err(local_err);
->  }
->  
->  SpaprCapPossible cap_sbbc_possible = {
-> @@ -277,23 +272,18 @@ SpaprCapPossible cap_sbbc_possible = {
->  static void cap_safe_bounds_check_apply(SpaprMachineState *spapr, uint8_t val,
->                                          Error **errp)
->  {
-> -    Error *local_err = NULL;
->      uint8_t kvm_val =  kvmppc_get_cap_safe_bounds_check();
->  
->      if (tcg_enabled() && val) {
->          /* TCG only supports broken, allow other values and print a warning */
-> -        error_setg(&local_err,
-> -                   "TCG doesn't support requested feature, cap-sbbc=%s",
-> -                   cap_sbbc_possible.vals[val]);
-> +        warn_report("TCG doesn't support requested feature, cap-sbbc=%s",
-> +                    cap_sbbc_possible.vals[val]);
->      } else if (kvm_enabled() && (val > kvm_val)) {
->          error_setg(errp,
->  "Requested safe bounds check capability level not supported by kvm,"
->                     " try appending -machine cap-sbbc=%s",
->                     cap_sbbc_possible.vals[kvm_val]);
->      }
-> -
-> -    if (local_err != NULL)
-> -        warn_report_err(local_err);
->  }
->  
->  SpaprCapPossible cap_ibs_possible = {
-> @@ -309,24 +299,18 @@ SpaprCapPossible cap_ibs_possible = {
->  static void cap_safe_indirect_branch_apply(SpaprMachineState *spapr,
->                                             uint8_t val, Error **errp)
->  {
-> -    Error *local_err = NULL;
->      uint8_t kvm_val = kvmppc_get_cap_safe_indirect_branch();
->  
->      if (tcg_enabled() && val) {
->          /* TCG only supports broken, allow other values and print a warning */
-> -        error_setg(&local_err,
-> -                   "TCG doesn't support requested feature, cap-ibs=%s",
-> -                   cap_ibs_possible.vals[val]);
-> +        warn_report("TCG doesn't support requested feature, cap-ibs=%s",
-> +                    cap_ibs_possible.vals[val]);
->      } else if (kvm_enabled() && (val > kvm_val)) {
->          error_setg(errp,
->  "Requested safe indirect branch capability level not supported by kvm,"
->                     " try appending -machine cap-ibs=%s",
->                     cap_ibs_possible.vals[kvm_val]);
->      }
-> -
-> -    if (local_err != NULL) {
-> -        warn_report_err(local_err);
-> -    }
->  }
->  
->  #define VALUE_DESC_TRISTATE     " (broken, workaround, fixed)"
-> 
-> 
+>  target/arm/translate-neon.inc.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
+r~
 
