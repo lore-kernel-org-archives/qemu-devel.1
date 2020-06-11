@@ -2,86 +2,96 @@ Return-Path: <SRS0=U615=7Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 376F5C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 16:47:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0337BC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 16:49:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0141E2053B
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 16:47:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C72F42053B
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 16:49:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GjuoyOqH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0141E2053B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vkkBPKid"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C72F42053B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56402 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59580 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjQMs-00030w-8P
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 12:47:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49740)
+	id 1jjQO0-0004aD-4T
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 12:49:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49764)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jjQL7-0001Dp-4h
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 12:46:05 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26086
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jjQL3-0003Q9-Ja
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 12:46:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591893958;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=gfW0+nvo2978Ic6c8AX83DZu98rIYzMrl7NVl+J7Sbo=;
- b=GjuoyOqH5PAGbqKwjIyeeNpyTu+WybrAcI09loxDUqyGMQM+AFMWOaiqMJD0Y8adlYqoRw
- qKhx0cHbJBaEJqP42ndjrPewxKoedAa8qhc4v2e/iKnn/kqDO+mbhatvn6eJ+WcQYWnK6j
- gjKN5ZnVKIjVm3QtytV8xC56G3zPUPU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-514-A-I3wBbuPXGHTo5GGmrD9A-1; Thu, 11 Jun 2020 12:45:55 -0400
-X-MC-Unique: A-I3wBbuPXGHTo5GGmrD9A-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7F8AC9119F
- for <qemu-devel@nongnu.org>; Thu, 11 Jun 2020 16:45:54 +0000 (UTC)
-Received: from work-vm (ovpn-114-116.ams2.redhat.com [10.36.114.116])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4B2FC7C3C5;
- Thu, 11 Jun 2020 16:45:53 +0000 (UTC)
-Date: Thu, 11 Jun 2020 17:45:50 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Eric Blake <eblake@redhat.com>
-Subject: Re: [PATCH 0/2] monitor openfd commands
-Message-ID: <20200611164550.GG2968@work-vm>
-References: <20200611111703.159590-1-dgilbert@redhat.com>
- <cec98884-f2cd-02f3-1806-a6579ce68961@redhat.com>
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jjQL8-0001Iy-I9
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 12:46:06 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:44055)
+ by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jjQL6-0003PU-Jj
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 12:46:06 -0400
+Received: by mail-pf1-x444.google.com with SMTP id 64so2900930pfv.11
+ for <qemu-devel@nongnu.org>; Thu, 11 Jun 2020 09:45:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:references:from:message-id:date:user-agent:mime-version
+ :in-reply-to:content-language:content-transfer-encoding;
+ bh=YJqzyYWnUHVekweupt/NqEBdOYNCkIHVXtWmiR0uVIo=;
+ b=vkkBPKidzdQ1pc3aTqSL7Yqo4rSeODaj1AswlMpYGxzLgjXVssD+fA6IryLuo66ocz
+ DYfE+/eoch3bXWc/5m5n7oD8fSlihc/+HauMbNDYXJeORA0eAivnXvzSQccLHawCo+IT
+ +YLmFLzlRcFDuivaYAHf1vj/KnhjvlTwLqR9BzObSnufhh7UBpTkT74ZB73c0Lqe8XC2
+ 3Wg6CpRf+Yr00y7jY7ARwx+1TkSczewyP8McaVkU/gK+3BghrUBc5rzenuQMFfJp72rJ
+ gSiLVfpbQIWw2o0kzGK34P5qMqrSaKvnJZT3x3EnQPaJn/adgsgdfIff9cuEZy4ncahr
+ O2SA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=YJqzyYWnUHVekweupt/NqEBdOYNCkIHVXtWmiR0uVIo=;
+ b=F9HTTgNKlcdzBNLsfzz26NgZ8ZWMOMrnYL5MxWwR7D4+/aNVEvw3dnuy4aGT1ny/eI
+ UUM357+TxVm9k84+2/orG3vk9zoi/mFHWpE9jI/CRm7MFqol7LLYef98OwUI954qh2gS
+ 5tXnEbz+dW70/iu4AImy5wL/KNGjJj8aKrQAV5JS3ojSv4qZYKXh3L/iZ3fF6sjkayj4
+ mdrPcwly7DFeAu3hlq/o4G00ow5gwmtmk4r4xjjrvyoiW8YL9QQCahxB8qAO34bkTbSP
+ l9pI0wzYHRejVZiYp4B1lVrKGv+MGFyCcpQgYCZYkw2UypZKXP2FZASupKQILBrS5wcv
+ ptPg==
+X-Gm-Message-State: AOAM5332s6kHRxMq1prUBTOAMAmx1QDip4Jmx0Oe7VMP//fk/Q3tjJPT
+ REaI03GTBoGaLpZZaBos0fhyJCQs3QM=
+X-Google-Smtp-Source: ABdhPJwyYLurVWYvE7NlEazAk7eoYdh00exxfMnvGL4dHxBMth82iWn1Apjj9fcycTES9Y+65i1CRQ==
+X-Received: by 2002:a63:b252:: with SMTP id t18mr7439760pgo.133.1591893953164; 
+ Thu, 11 Jun 2020 09:45:53 -0700 (PDT)
+Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
+ by smtp.gmail.com with ESMTPSA id v129sm3629236pfv.18.2020.06.11.09.45.51
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 11 Jun 2020 09:45:52 -0700 (PDT)
+Subject: Re: [PATCH 09/10] target/arm: Convert Neon VTBL, VTBX to decodetree
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org
+References: <20200611144529.8873-1-peter.maydell@linaro.org>
+ <20200611144529.8873-10-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <4e7b0959-0f0f-d523-cd1d-87bcd50c9628@linaro.org>
+Date: Thu, 11 Jun 2020 09:45:50 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <cec98884-f2cd-02f3-1806-a6579ce68961@redhat.com>
-User-Agent: Mutt/1.14.0 (2020-05-02)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 03:29:33
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200611144529.8873-10-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::444;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x444.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,98 +104,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, quintela@redhat.com, qemu-devel@nongnu.org,
- armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Eric Blake (eblake@redhat.com) wrote:
-> On 6/11/20 6:17 AM, Dr. David Alan Gilbert (git) wrote:
-> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > 
-> > The monitors currently have a 'getfd' command that lets you pass an fd
-> > via the monitor socket.  'openfd' is a new command that opens a file
-> > and puts the fd in the same fd pool.  The file is opened RW and created
-> > if it doesn't exist.
-> > It makes it easy to test migration to and from a file.
-> 
-> We have two fd-passing mechanisms: getfd and add-fd.  add-fd is newer, and
-> allows things like /dev/fdset/NNN to work anywhere a filename works.
+On 6/11/20 7:45 AM, Peter Maydell wrote:
+> +static bool trans_VTBL(DisasContext *s, arg_VTBL *a)
+> +{
+> +    int n;
+> +    TCGv_i32 tmp, tmp2, tmp3, tmp4;
+> +    TCGv_ptr ptr1;
+> +
+> +    if (!arm_dc_feature(s, ARM_FEATURE_NEON)) {
+> +        return false;
+> +    }
+> +
+> +    /* UNDEF accesses to D16-D31 if they don't exist. */
+> +    if (!dc_isar_feature(aa32_simd_r32, s) &&
+> +        ((a->vd | a->vn | a->vm) & 0x10)) {
+> +        return false;
+> +    }
+> +
+> +    if (!vfp_access_check(s)) {
+> +        return true;
+> +    }
+> +
+> +    n = a->len + 1;
+> +    if ((a->vn + n) > 32) {
+> +        /*
+> +         * This is UNPREDICTABLE; we choose to UNDEF to avoid the
+> +         * helper function running off the end of the register file.
+> +         */
+> +        return 1;
+> +    }
 
-Ewww I do dislike fake paths, they tend to be the source of great
-security bugs.
+Oops, meant to point out: return false.
 
->  I'm
-> guessing that the issue here is that migration hasn't been tweaked to work
-> nicely with the newer add-fd, but instead insists on the older getfd
-> interface (where you have to use getfd to associate an fd with a name, then
-> tell migration to use that special name, but the special name is via a
-> different parameter than the normal filename parameter).  At which point
-> openfd looks like it is just sugar to make getfd easier to use.
 
-Yep, openfd is just intended to be sugar; it's a pain to use getfd at
-runtime because you have to play all the passing fd's over socket magic.
-My main reason here is because I wanted an easy way to migrate to
-/dev/null for performance testing, but it would make life easier when
-migrating to/from a file.
-
-> Would it instead be worth modifying migration to work with add-fd?
-
-Probably.  At the moment what we have is an 'fd:string' syntax for both
-inbound and outbound migration.
-The outbound migration looks up the string in the getfd index and uses
-it. (via monitor_get_fd)
-
-The inbound migration checks if the string starts with a number, if it
-is then it uses it raw as the unix fd; else it passes it to getfd index.
-(via monitor_fd_param).
-(getfd disallows names that are numeric)
-
-I can see a few solutions here:
-  a) Teach qemu a new fdset:number syntax - it's a bit of a pain
-     but is discoverable.
-  b) Modify the getfd string lookup to parse /dev/fdset and go use
-     the fdset
-
-The problem with (b) is that the getfd mechanism doesn't have a
-concept of open mode, and only has a single fd bound to a name,
-so none of the existing parsing code would know which entry to use in an
-fdset. (I'm assuming here no one created a getfd entry named
-/dev/fdset/0 - although it seems legal).
-
-The problem with (a) is that adding a new syntax is a bit more code;
-but I guess it's probably more discoverable.
-
-ANy preferences?
-
-> add-fd need the same sort of sugar?
-
-Yep, I'd like to have a way to open a file other than via scmrights.
-I'd also need to add an HMP equivalent.
-
-Dave
-
-> 
-> > 
-> > Dr. David Alan Gilbert (2):
-> >    qmp: Add 'openfd' command
-> >    hmp: Add 'openfd' command
-> > 
-> >   hmp-commands.hx        | 16 +++++++++++++-
-> >   include/monitor/hmp.h  |  1 +
-> >   monitor/hmp-cmds.c     | 10 +++++++++
-> >   monitor/misc.c         | 48 +++++++++++++++++++++++++++++++++---------
-> >   qapi/misc.json         | 23 +++++++++++++++++++-
-> >   tests/qtest/test-hmp.c |  2 ++
-> >   6 files changed, 88 insertions(+), 12 deletions(-)
-> > 
-> 
-> -- 
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3226
-> Virtualization:  qemu.org | libvirt.org
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-
+r~
 
