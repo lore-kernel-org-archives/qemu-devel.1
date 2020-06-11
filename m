@@ -2,84 +2,88 @@ Return-Path: <SRS0=U615=7Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8825BC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 18:14:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3864FC433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 18:37:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 548C5206DC
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 18:14:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0888F207ED
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 18:37:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QT7Yh7u1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 548C5206DC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kX2uWo0O"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0888F207ED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42236 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50876 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjRj7-0000Fq-Ha
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 14:14:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59848)
+	id 1jjS4u-00027F-9C
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 14:37:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44046)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jjRiA-0008Em-Q2
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 14:13:58 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:45019)
+ (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
+ id 1jjS4E-0001LN-DR
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 14:36:46 -0400
+Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:34545)
  by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jjRi8-000576-Pn
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 14:13:58 -0400
-Received: by mail-ot1-x341.google.com with SMTP id e5so5249283ote.11
- for <qemu-devel@nongnu.org>; Thu, 11 Jun 2020 11:13:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
+ id 1jjS4A-0002Hv-6e
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 14:36:46 -0400
+Received: by mail-wm1-x335.google.com with SMTP id u26so7530890wmn.1
+ for <qemu-devel@nongnu.org>; Thu, 11 Jun 2020 11:36:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=d0OiiyKtI69FJxy2gWZkt0wIRgV7ojwd4zqvGn9q+Ds=;
- b=QT7Yh7u1FcDjoct6KkwmJ3NOot/A13Ly94HiqLIivDskn6Wnq5Prf04gq5PFbncIo7
- 83Wby5C3aktRVtLJbYKmSUa8A19xN4XpmaUgJE9Wh2ufmv22se5nzo+V9G2YJmMYMgaA
- nDSahoWzrM7npnoXByImIgQd/FnzxwuEBHk6rWK7hKKS6lTe9j13lLShw/emPRGXTokQ
- JubEze0JDO8QN1F3VJHJzrfBI3TpZbYvNVd/wzbja2HBpf3xLzGWf0jstEaL46mwBTGu
- 0N61V4MWleqXYwsvvnMSqukjP5JmhmuSOHXiGQngznhmlxgHryY2lEFMJKPpO8fGQsUv
- g22Q==
+ :cc:content-transfer-encoding;
+ bh=C4lGZTOfBAmv5NvbaIoThipkj369sRzWPqjyESkqsLc=;
+ b=kX2uWo0OjNYJhBmdOh5hZM4lz44oipHHSe1xCfqrp2n0XVaVT/aBP8n4QnZfsEeivH
+ PNCOD7XD1CWEaM7LQwVpseRzZFYegv4Kg2RNcys0wILCHnjz0tvAD1IPw8mEiZV9TbM0
+ dpCivZtI5TNVLH730ZfKp1gZZWlXbmddLeL18oVz/U65f5AmUA5aJJbdwR41yjmtCKKo
+ SuzArRR0BkyYEq5L6qYyQNHY6nym1NY1DMg/NXYHUU89HgkWTsxOgaK+zWfjdcHtPWr6
+ rZrz+M7e8DsUSWeWDgHdPmO5sPiuDKWfOQo+7V6v5qfK0zsxHhEkEt/gqaGYhk/c9hDU
+ Az0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=d0OiiyKtI69FJxy2gWZkt0wIRgV7ojwd4zqvGn9q+Ds=;
- b=sANcSu4S6etrTUBkIFh5XwmOQiLJs4AY+A48WTCzuE0mr+M/mcoj5It4z4c/rznR4m
- hysaMCgSdMMCmuf9jfo6uerGg/I4W/MEuM/ATerAsaWskdIH5HQIbGUO8stQ20uKWBXo
- rjE4Ctpq+rcItk0BzW2R2PHThSwdkR2IzXrwYC78W0tl0cBe/Rtuh014oEz1dWVff902
- yvV87RQGHtGXaphwik5FbOXXHpM6M99MKNLbzGKmf/nPD7i4KG/JFvuMsh+sXxKB/H7J
- 7AuYa4BiZNYSdF7WV68siiqjKz2BnSUxvCn+s4fDb/g27n24wGNjbeUS0LaWwz0Ex3KP
- H9Lw==
-X-Gm-Message-State: AOAM530yZ4O+hYBjxj6Xs3bGghupwVeMuwHH5yLsSsnxB0YpTX00J6SU
- 1NxzNVoVJMstJzhDOyPzKH1Nt/xMiGV+V5KYCrznTw==
-X-Google-Smtp-Source: ABdhPJy7RSwRF+II2xQ4jjRxOwao/FqXbjMD481A4GyQcyF0nvNPbSho/kUCswBeuopGd2zp41cRQgQiluO0eLpmFSg=
-X-Received: by 2002:a05:6830:8d:: with SMTP id
- a13mr7606092oto.91.1591899226465; 
- Thu, 11 Jun 2020 11:13:46 -0700 (PDT)
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=C4lGZTOfBAmv5NvbaIoThipkj369sRzWPqjyESkqsLc=;
+ b=P7Wg1JuyKVI07i4U+qHfAdAZnAd/F+P4APah74hkGrrrXpzjexISO1ZVzII5XPI9lE
+ Y2bwD8gfcETsNKHmR63aLIFdx0FKelR+jN7odTsyhu75FD9ph6KzR2cbRQT694XvcGbM
+ fhVsY9iCzPB5NmLCCP2iVw19EJ4cjavVGNcniHIHxowrYLMRCk9spUsJrHKMlHiUuUWp
+ tc7/rIfKT6YaiVOdU/jNPmrvvH8nCjtc0GqBhBxpFuuTHWByB3TfbnyjNlT44w7Wah4v
+ cpgZZIi2TQ4GdDC1BjedKnpPS/u7rwv6uTg+YUnWadj+J1balH32SBju5rYmCqhPyjBY
+ lArw==
+X-Gm-Message-State: AOAM533JQEQWmt+MSttKYgnAGHdftakYSCCtPZkImTcSmK5ztEII/r/e
+ ZIJrNteN7I+GIHXCFcGZfIbmnwlKxbSDqsFcx/k=
+X-Google-Smtp-Source: ABdhPJwOdximraw+dbqGzq4Hy8hlo0eRWJNexxJ6Hpa6m1BkpwUc02fCs63o5ZiKrV/EcA0Y87nWkIiFB3A+4FCMfeQ=
+X-Received: by 2002:a1c:4c05:: with SMTP id z5mr9017664wmf.129.1591900594877; 
+ Thu, 11 Jun 2020 11:36:34 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200610042613.1459309-1-mst@redhat.com>
-In-Reply-To: <20200610042613.1459309-1-mst@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 11 Jun 2020 19:13:35 +0100
-Message-ID: <CAFEAcA-5yy9Gs57Cc7A8QJ=oSuUDaja+sBWt2miM5QiX65pOtA@mail.gmail.com>
-Subject: Re: [PULL 00/56] virtio,acpi,pci: features, fixes, cleanups, tests
-To: "Michael S. Tsirkin" <mst@redhat.com>
+References: <1591015405-19651-1-git-send-email-aleksandar.qemu.devel@gmail.com>
+ <1591015405-19651-5-git-send-email-aleksandar.qemu.devel@gmail.com>
+ <87h7vi3p9h.fsf@linaro.org>
+In-Reply-To: <87h7vi3p9h.fsf@linaro.org>
+From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Date: Thu, 11 Jun 2020 20:36:21 +0200
+Message-ID: <CAHiYmc6GuADCpWU4UgqnR1mCkRo=n4GafRU_TQYc8oJ7cVMs_Q@mail.gmail.com>
+Subject: Re: [PULL 4/6] target/mips: Add more CP0 register for save/restore
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::341;
- envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x341.google.com
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::335;
+ envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wm1-x335.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
@@ -94,60 +98,169 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 10 Jun 2020 at 05:26, Michael S. Tsirkin <mst@redhat.com> wrote:
+=D1=87=D0=B5=D1=82, 11. =D1=98=D1=83=D0=BD 2020. =D1=83 11:50 Alex Benn=C3=
+=A9e <alex.bennee@linaro.org> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=
+=D0=B0=D0=BE/=D0=BB=D0=B0:
 >
-> The following changes since commit 49ee11555262a256afec592dfed7c5902d5eefd2:
->/tmp/par8snSu.par
+>
+> Aleksandar Markovic <aleksandar.qemu.devel@gmail.com> writes:
+>
+> > From: Huacai Chen <zltjiangshi@gmail.com>
+> >
+> > Add more CP0 register for save/restore, including: EBase, XContext,
+> > PageGrain, PWBase, PWSize, PWField, PWCtl, Config*, KScratch1~KScratch6=
+.
+> >
+> > Signed-off-by: Huacai Chen <chenhc@lemote.com>
+> > Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
+> > Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+> > Signed-off-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+> > Message-Id: <1588501221-1205-6-git-send-email-chenhc@lemote.com>
+>
+> It seems while our mips cross build has been broken this commit has
+> caused a build regression:
+>
 
->   Merge remote-tracking branch 'remotes/vivier2/tags/linux-user-for-5.1-pull-request' into staging (2020-06-08 11:04:57 +0100)
->
-> are available in the Git repository at:
->
->   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
->
-> for you to fetch changes up to 23fe04b63b412276c7c2f67c550961af9d0b4e1e:
->
->   Fix parameter type in vhost migration log path (2020-06-09 14:18:04 -0400)
->
-> ----------------------------------------------------------------
-> virtio,acpi,pci: features, fixes, cleanups, tests
->
-> Max slots negotiation for vhost-user.
-> Free page reporting for balloon.
-> Partial TPM2 ACPI support for ARM.
-> Support for NVDIMMs having their own proximity domains.
-> New vhost-user-vsock device.
->
-> Fixes, cleanups in ACPI, PCI, virtio.
-> New tests for TPM ACPI.
->
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Alex, this problem should disappear now, since a commit that is
+supposed to fix it is upstreamed this afternoon.
 
-Hi; I'm afraid this has format string issues:
+From my side, I will expand my test bed for similar cases that require
+more thorough attention.
 
-/Users/pm215/src/qemu-for-merges/hw/virtio/vhost-user.c:759:51: error:
-format specifies type 'unsigned long' but the argument has type
-'uint64_t' (aka 'unsigned long long') [-Werror,-Wformat]
-                                 "%lX", __func__, reply_gpa,
-                                                  ^~~~~~~~~
-/Users/pm215/src/qemu-for-merges/hw/virtio/vhost-user.c:760:34: error:
-format specifies type 'unsigned long' but the argument has type
-'uint64_t' (aka 'unsigned long long') [-Werror,-Wformat]
-                                 dev->mem->regions[reg_idx].guest_phys_addr);
-                                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/Users/pm215/src/qemu-for-merges/hw/virtio/vhost-user.c:1876:67:
-error: format specifies type 'unsigned long' but the argument has type
-'uint64_t' (aka 'unsigned long long') [-Werror,-Wformat]
-                             "This limit should never decrease.", ram_slots,
-                                                                  ^~~~~~~~~
+Could you just please confirm or disconfirm that your scenario does
+not have this problem anymore?
 
-(repros on OSX, OpenBSD, and 32-bit hosts)
+Thanks,
+Aleksandar
 
-thanks
--- PMM
+>   make docker-test-build@debian-mips-cross J=3D30
+>
+> Results in:
+>
+>   /tmp/qemu-test/src/target/mips/kvm.c: In function 'kvm_mips_put_cp0_reg=
+isters':
+>   /tmp/qemu-test/src/target/mips/kvm.c:412:49: error: 'CP0C6_BPPASS' unde=
+clared (first use in this function); did you mean 'CP0C3_LPA'?
+>    #define KVM_REG_MIPS_CP0_CONFIG6_MASK   ((1U << CP0C6_BPPASS) | \
+>                                                    ^~~~~~~~~~~~
+>   /tmp/qemu-test/src/target/mips/kvm.c:923:35: note: in expansion of macr=
+o 'KVM_REG_MIPS_CP0_CONFIG6_MASK'
+>                                      KVM_REG_MIPS_CP0_CONFIG6_MASK);
+>                                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>   /tmp/qemu-test/src/target/mips/kvm.c:412:49: note: each undeclared iden=
+tifier is reported only once for each function it appears in
+>    #define KVM_REG_MIPS_CP0_CONFIG6_MASK   ((1U << CP0C6_BPPASS) | \
+>                                                    ^~~~~~~~~~~~
+>   /tmp/qemu-test/src/target/mips/kvm.c:923:35: note: in expansion of macr=
+o 'KVM_REG_MIPS_CP0_CONFIG6_MASK'
+>                                      KVM_REG_MIPS_CP0_CONFIG6_MASK);
+>                                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>   /tmp/qemu-test/src/target/mips/kvm.c:413:52: error: 'CP0C6_KPOS' undecl=
+ared (first use in this function); did you mean 'CP0C3_IPLV'?
+>                                             (0x3fU << CP0C6_KPOS) | \
+>                                                       ^~~~~~~~~~
+>   /tmp/qemu-test/src/target/mips/kvm.c:923:35: note: in expansion of macr=
+o 'KVM_REG_MIPS_CP0_CONFIG6_MASK'
+>                                      KVM_REG_MIPS_CP0_CONFIG6_MASK);
+>                                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>   /tmp/qemu-test/src/target/mips/kvm.c:414:49: error: 'CP0C6_KE' undeclar=
+ed (first use in this function); did you mean 'CP0C4_AE'?
+>                                             (1U << CP0C6_KE) | \
+>                                                    ^~~~~~~~
+>   /tmp/qemu-test/src/target/mips/kvm.c:923:35: note: in expansion of macr=
+o 'KVM_REG_MIPS_CP0_CONFIG6_MASK'
+>                                      KVM_REG_MIPS_CP0_CONFIG6_MASK);
+>
+>
+> > ---
+> >  target/mips/kvm.c     | 212 ++++++++++++++++++++++++++++++++++++++++++=
+++++++++
+> >  target/mips/machine.c |   6 +-
+> >  2 files changed, 216 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/target/mips/kvm.c b/target/mips/kvm.c
+> > index de3e26e..96cfa10 100644
+> > --- a/target/mips/kvm.c
+> > +++ b/target/mips/kvm.c
+> > @@ -245,10 +245,16 @@ int kvm_mips_set_ipi_interrupt(MIPSCPU *cpu, int =
+irq, int level)
+> >      (KVM_REG_MIPS_CP0 | KVM_REG_SIZE_U64 | (8 * (_R) + (_S)))
+> >
+> >  #define KVM_REG_MIPS_CP0_INDEX          MIPS_CP0_32(0, 0)
+> > +#define KVM_REG_MIPS_CP0_RANDOM         MIPS_CP0_32(1, 0)
+> >  #define KVM_REG_MIPS_CP0_CONTEXT        MIPS_CP0_64(4, 0)
+> >  #define KVM_REG_MIPS_CP0_USERLOCAL      MIPS_CP0_64(4, 2)
+> >  #define KVM_REG_MIPS_CP0_PAGEMASK       MIPS_CP0_32(5, 0)
+> > +#define KVM_REG_MIPS_CP0_PAGEGRAIN      MIPS_CP0_32(5, 1)
+> > +#define KVM_REG_MIPS_CP0_PWBASE         MIPS_CP0_64(5, 5)
+> > +#define KVM_REG_MIPS_CP0_PWFIELD        MIPS_CP0_64(5, 6)
+> > +#define KVM_REG_MIPS_CP0_PWSIZE         MIPS_CP0_64(5, 7)
+> >  #define KVM_REG_MIPS_CP0_WIRED          MIPS_CP0_32(6, 0)
+> > +#define KVM_REG_MIPS_CP0_PWCTL          MIPS_CP0_32(6, 6)
+> >  #define KVM_REG_MIPS_CP0_HWRENA         MIPS_CP0_32(7, 0)
+> >  #define KVM_REG_MIPS_CP0_BADVADDR       MIPS_CP0_64(8, 0)
+> >  #define KVM_REG_MIPS_CP0_COUNT          MIPS_CP0_32(9, 0)
+> > @@ -258,13 +264,22 @@ int kvm_mips_set_ipi_interrupt(MIPSCPU *cpu, int =
+irq, int level)
+> >  #define KVM_REG_MIPS_CP0_CAUSE          MIPS_CP0_32(13, 0)
+> >  #define KVM_REG_MIPS_CP0_EPC            MIPS_CP0_64(14, 0)
+> >  #define KVM_REG_MIPS_CP0_PRID           MIPS_CP0_32(15, 0)
+> > +#define KVM_REG_MIPS_CP0_EBASE          MIPS_CP0_64(15, 1)
+> >  #define KVM_REG_MIPS_CP0_CONFIG         MIPS_CP0_32(16, 0)
+> >  #define KVM_REG_MIPS_CP0_CONFIG1        MIPS_CP0_32(16, 1)
+> >  #define KVM_REG_MIPS_CP0_CONFIG2        MIPS_CP0_32(16, 2)
+> >  #define KVM_REG_MIPS_CP0_CONFIG3        MIPS_CP0_32(16, 3)
+> >  #define KVM_REG_MIPS_CP0_CONFIG4        MIPS_CP0_32(16, 4)
+> >  #define KVM_REG_MIPS_CP0_CONFIG5        MIPS_CP0_32(16, 5)
+> > +#define KVM_REG_MIPS_CP0_CONFIG6        MIPS_CP0_32(16, 6)
+> > +#define KVM_REG_MIPS_CP0_XCONTEXT       MIPS_CP0_64(20, 0)
+> >  #define KVM_REG_MIPS_CP0_ERROREPC       MIPS_CP0_64(30, 0)
+> > +#define KVM_REG_MIPS_CP0_KSCRATCH1      MIPS_CP0_64(31, 2)
+> > +#define KVM_REG_MIPS_CP0_KSCRATCH2      MIPS_CP0_64(31, 3)
+> > +#define KVM_REG_MIPS_CP0_KSCRATCH3      MIPS_CP0_64(31, 4)
+> > +#define KVM_REG_MIPS_CP0_KSCRATCH4      MIPS_CP0_64(31, 5)
+> > +#define KVM_REG_MIPS_CP0_KSCRATCH5      MIPS_CP0_64(31, 6)
+> > +#define KVM_REG_MIPS_CP0_KSCRATCH6      MIPS_CP0_64(31, 7)
+> >
+> >  static inline int kvm_mips_put_one_reg(CPUState *cs, uint64_t reg_id,
+> >                                         int32_t *addr)
+> > @@ -394,6 +409,29 @@ static inline int kvm_mips_get_one_ureg64(CPUState=
+ *cs, uint64_t reg_id,
+> >                                           (1U << CP0C5_UFE) | \
+> >                                           (1U << CP0C5_FRE) | \
+> >                                           (1U << CP0C5_UFR))
+> > +#define KVM_REG_MIPS_CP0_CONFIG6_MASK   ((1U << CP0C6_BPPASS) | \
+> > +                                         (0x3fU << CP0C6_KPOS) | \
+> > +                                         (1U << CP0C6_KE) | \
+> > +                                         (1U << CP0C6_VTLBONLY) | \
+> > +                                         (1U << CP0C6_LASX) | \
+> > +                                         (1U << CP0C6_SSEN) | \
+> > +                                         (1U << CP0C6_DISDRTIME) | \
+> > +                                         (1U << CP0C6_PIXNUEN) | \
+> > +                                         (1U << CP0C6_SCRAND) | \
+> > +                                         (1U << CP0C6_LLEXCEN) | \
+> > +                                         (1U << CP0C6_DISVC) | \
+> > +                                         (1U << CP0C6_VCLRU) | \
+> > +                                         (1U << CP0C6_DCLRU) | \
+> > +                                         (1U << CP0C6_PIXUEN) | \
+> > +                                         (1U << CP0C6_DISBLKLYEN) | \
+> > +                                         (1U << CP0C6_UMEMUALEN) | \
+> > +                                         (1U << CP0C6_SFBEN) | \
+> > +                                         (1U << CP0C6_FLTINT) | \
+> > +                                         (1U << CP0C6_VLTINT) | \
+> > +                                         (1U << CP0C6_DISBTB) | \
+> > +                                         (3U << CP0C6_STPREFCTL) | \
+> > +                                         (1U << CP0C6_INSTPREF) | \
+> > +                                         (1U << CP0C6_DATAPREF))
+>
+> It seems a lot of the defines here aren't in this commit. Was one missed?
+>
+> --
+> Alex Benn=C3=A9e
 
