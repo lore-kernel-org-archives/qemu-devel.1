@@ -2,72 +2,72 @@ Return-Path: <SRS0=U615=7Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B4F6C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 20:22:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A44FC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 20:24:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D465720720
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 20:22:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 14BF320720
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 20:24:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="godjkGwe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D465720720
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PwLAhIXD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 14BF320720
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59956 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36818 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjTip-0001L6-2E
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 16:22:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55056)
+	id 1jjTkU-0003Qg-Bw
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 16:24:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55090)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jjT90-00082M-Bu
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 15:45:46 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:50740
+ id 1jjT91-00085A-S1
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 15:45:48 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52360
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jjT8x-00016y-Fc
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 15:45:45 -0400
+ id 1jjT8w-00016F-Og
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 15:45:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591904742;
+ s=mimecast20190719; t=1591904741;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=6DTxtOc5LdYdP17d4UDiZN2OUZYIKMNt5E0uvZNLm+g=;
- b=godjkGweT2sWc3ak0rBpVyK0QBtdgJK22UByJXTn34oo6XmuImJ4oNAF8tzcq+AkWAJI56
- LVXRqOhTnDQz/k+9MNTN31tjohZCRIw9oSaBaib4vL74nGoKmneZXEFIneDlQ9nv/l/nct
- tKTp91ve1+YKNckcd9duBCWc/NyOMoo=
+ bh=FnVW+q5k7WUlLd05tyYL72pgIZMJJCUmWa0BR/hltaI=;
+ b=PwLAhIXD+gdW7+mBeYDtcaN3Eesv1fGpZoas6ReH+xpQikpXW8ikCqt44CuuNlQv9FlaiE
+ sFr5ps0Po8tijvIf5f3b8hjB9oQ+ML/Qeg/HFpcddFgmaQ/zvSarTItDm/KpMtl8r99OB3
+ bQE9hxwEVcblo3CXhNvybez3zvChgXY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-409-IYNd9nSgOUatmNfMtw6ZlA-1; Thu, 11 Jun 2020 15:45:36 -0400
-X-MC-Unique: IYNd9nSgOUatmNfMtw6ZlA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-349-sq-fFeQ_P-2D24g8a4vIsg-1; Thu, 11 Jun 2020 15:45:09 -0400
+X-MC-Unique: sq-fFeQ_P-2D24g8a4vIsg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0221419057BF;
- Thu, 11 Jun 2020 19:45:35 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A7719A0C00;
+ Thu, 11 Jun 2020 19:45:08 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 920938FF7E;
- Thu, 11 Jun 2020 19:45:34 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3A4E660CD3;
+ Thu, 11 Jun 2020 19:45:08 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 054/115] target/i386: fix fscale handling of infinite exponents
-Date: Thu, 11 Jun 2020 15:43:48 -0400
-Message-Id: <20200611194449.31468-55-pbonzini@redhat.com>
+Subject: [PULL 017/115] hyperv: expose API to determine if synic is enabled
+Date: Thu, 11 Jun 2020 15:43:11 -0400
+Message-Id: <20200611194449.31468-18-pbonzini@redhat.com>
 In-Reply-To: <20200611194449.31468-1-pbonzini@redhat.com>
 References: <20200611194449.31468-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
@@ -95,111 +95,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Joseph Myers <joseph@codesourcery.com>
+Cc: Jon Doron <arilou@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Joseph Myers <joseph@codesourcery.com>
+From: Jon Doron <arilou@gmail.com>
 
-The fscale implementation passes infinite exponents through to generic
-code that rounds the exponent to a 32-bit integer before using
-floatx80_scalbn.  In round-to-nearest mode, and ignoring exceptions,
-this works in many cases.  But it fails to handle the special cases of
-scaling 0 by a +Inf exponent or an infinity by a -Inf exponent, which
-should produce a NaN, and because it produces an inexact result for
-finite nonzero numbers being scaled, the result is sometimes incorrect
-in other rounding modes.  Add appropriate handling of infinite
-exponents to produce a NaN or an appropriately signed exact zero or
-infinity as a result.
-
-Signed-off-by: Joseph Myers <joseph@codesourcery.com>
-Message-Id: <alpine.DEB.2.21.2005070045010.18350@digraph.polyomino.org.uk>
+Signed-off-by: Jon Doron <arilou@gmail.com>
+Message-Id: <20200424123444.3481728-2-arilou@gmail.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- target/i386/fpu_helper.c          | 22 ++++++++++++++++++++++
- tests/tcg/i386/test-i386-fscale.c | 29 +++++++++++++++++++++++++++++
- 2 files changed, 51 insertions(+)
+ hw/hyperv/hyperv.c         | 8 ++++++++
+ include/hw/hyperv/hyperv.h | 1 +
+ 2 files changed, 9 insertions(+)
 
-diff --git a/target/i386/fpu_helper.c b/target/i386/fpu_helper.c
-index 10ff90370e..72d1e77eb0 100644
---- a/target/i386/fpu_helper.c
-+++ b/target/i386/fpu_helper.c
-@@ -977,6 +977,28 @@ void helper_fscale(CPUX86State *env)
-             float_raise(float_flag_invalid, &env->fp_status);
-             ST0 = floatx80_silence_nan(ST0, &env->fp_status);
-         }
-+    } else if (floatx80_is_infinity(ST1) &&
-+               !floatx80_invalid_encoding(ST0) &&
-+               !floatx80_is_any_nan(ST0)) {
-+        if (floatx80_is_neg(ST1)) {
-+            if (floatx80_is_infinity(ST0)) {
-+                float_raise(float_flag_invalid, &env->fp_status);
-+                ST0 = floatx80_default_nan(&env->fp_status);
-+            } else {
-+                ST0 = (floatx80_is_neg(ST0) ?
-+                       floatx80_chs(floatx80_zero) :
-+                       floatx80_zero);
-+            }
-+        } else {
-+            if (floatx80_is_zero(ST0)) {
-+                float_raise(float_flag_invalid, &env->fp_status);
-+                ST0 = floatx80_default_nan(&env->fp_status);
-+            } else {
-+                ST0 = (floatx80_is_neg(ST0) ?
-+                       floatx80_chs(floatx80_infinity) :
-+                       floatx80_infinity);
-+            }
-+        }
-     } else {
-         int n = floatx80_to_int32_round_to_zero(ST1, &env->fp_status);
-         ST0 = floatx80_scalbn(ST0, n, &env->fp_status);
-diff --git a/tests/tcg/i386/test-i386-fscale.c b/tests/tcg/i386/test-i386-fscale.c
-index b65a055d0a..b953e7c563 100644
---- a/tests/tcg/i386/test-i386-fscale.c
-+++ b/tests/tcg/i386/test-i386-fscale.c
-@@ -31,6 +31,7 @@ int issignaling_ld(long double x)
+diff --git a/hw/hyperv/hyperv.c b/hw/hyperv/hyperv.c
+index 4b11f7a76b..a3933c34c6 100644
+--- a/hw/hyperv/hyperv.c
++++ b/hw/hyperv/hyperv.c
+@@ -38,6 +38,13 @@ typedef struct SynICState {
+ #define TYPE_SYNIC "hyperv-synic"
+ #define SYNIC(obj) OBJECT_CHECK(SynICState, (obj), TYPE_SYNIC)
  
- int main(void)
++static bool synic_enabled;
++
++bool hyperv_is_synic_enabled(void)
++{
++    return synic_enabled;
++}
++
+ static SynICState *get_synic(CPUState *cs)
  {
-+    short cw;
-     int ret = 0;
-     __asm__ volatile ("fscale" : "=t" (ld_res) :
-                       "0" (2.5L), "u" (__builtin_nansl("")));
-@@ -62,5 +63,33 @@ int main(void)
-         printf("FAIL: fscale invalid 4\n");
-         ret = 1;
-     }
-+    __asm__ volatile ("fscale" : "=t" (ld_res) :
-+                      "0" (0.0L), "u" (__builtin_infl()));
-+    if (!isnan_ld(ld_res) || issignaling_ld(ld_res)) {
-+        printf("FAIL: fscale 0 up inf\n");
-+        ret = 1;
-+    }
-+    __asm__ volatile ("fscale" : "=t" (ld_res) :
-+                      "0" (__builtin_infl()), "u" (-__builtin_infl()));
-+    if (!isnan_ld(ld_res) || issignaling_ld(ld_res)) {
-+        printf("FAIL: fscale inf down inf\n");
-+        ret = 1;
-+    }
-+    /* Set round-downward.  */
-+    __asm__ volatile ("fnstcw %0" : "=m" (cw));
-+    cw = (cw & ~0xc00) | 0x400;
-+    __asm__ volatile ("fldcw %0" : : "m" (cw));
-+    __asm__ volatile ("fscale" : "=t" (ld_res) :
-+                      "0" (1.0L), "u" (__builtin_infl()));
-+    if (ld_res != __builtin_infl()) {
-+        printf("FAIL: fscale finite up inf\n");
-+        ret = 1;
-+    }
-+    __asm__ volatile ("fscale" : "=t" (ld_res) :
-+                      "0" (-1.0L), "u" (-__builtin_infl()));
-+    if (ld_res != -0.0L || __builtin_copysignl(1.0L, ld_res) != -1.0L) {
-+        printf("FAIL: fscale finite down inf\n");
-+        ret = 1;
-+    }
-     return ret;
+     return SYNIC(object_resolve_path_component(OBJECT(cs), "synic"));
+@@ -134,6 +141,7 @@ void hyperv_synic_add(CPUState *cs)
+     object_property_add_child(OBJECT(cs), "synic", obj);
+     object_unref(obj);
+     object_property_set_bool(obj, true, "realized", &error_abort);
++    synic_enabled = true;
  }
+ 
+ void hyperv_synic_reset(CPUState *cs)
+diff --git a/include/hw/hyperv/hyperv.h b/include/hw/hyperv/hyperv.h
+index 597381cb01..a63ee0003c 100644
+--- a/include/hw/hyperv/hyperv.h
++++ b/include/hw/hyperv/hyperv.h
+@@ -79,5 +79,6 @@ void hyperv_synic_add(CPUState *cs);
+ void hyperv_synic_reset(CPUState *cs);
+ void hyperv_synic_update(CPUState *cs, bool enable,
+                          hwaddr msg_page_addr, hwaddr event_page_addr);
++bool hyperv_is_synic_enabled(void);
+ 
+ #endif
 -- 
 2.26.2
 
