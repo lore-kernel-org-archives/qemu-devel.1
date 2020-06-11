@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0AF2C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 20:36:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB52CC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 20:37:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6A38C2073E
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 20:36:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 807352073E
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 20:37:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P8mzQ1Mt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A38C2073E
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GP4EoOX9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 807352073E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52130 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52984 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjTwV-000839-PB
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 16:36:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56082)
+	id 1jjTwh-0008SR-Qf
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 16:37:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56096)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jjTAP-0001uf-SF
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 15:47:13 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:25832
+ id 1jjTAQ-0001vi-D7
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 15:47:14 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:51103
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jjTAN-0001QC-4c
+ id 1jjTAM-0001Py-MS
  for qemu-devel@nongnu.org; Thu, 11 Jun 2020 15:47:13 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591904830;
+ s=mimecast20190719; t=1591904829;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=gQuqoF6ysfE+PJsNjiFp4bgJ5ewc0pmiCefhv+JlDGM=;
- b=P8mzQ1MtqFAfyXXXUG6/9Key/ovmAnHSlmTPdvNKBN/JC2qrVu9EjPpuUWOUTK3VpEPbnc
- RVd3ki/I33vRrBl5QlJRyyB6OrZ4MdpdQ3IeUw91M0RPo/ZgtWEGs2l8uLaU7f8X0ydsf3
- +KYpz0zHS4T57YH/xkmmUALWHs6QAGk=
+ bh=Mt/mzo7Xjry8W/ngrfH4ZHzjNcs1f2BBM2/k/sxZwoM=;
+ b=GP4EoOX9TZhDU3voysGzgeZIc4hxjYTvigBkb98KTp45QKYlCgJ/gniuON/9UwZa63xUrB
+ u8PjPcqYjZMXvjrrp8J8N0QJsvl3vB68IkOUHIG9N2cT2xyNb8its7B14fGC3bOIi0uXYO
+ oCBfoZREB08Ocy0I6FvLSfpXwio+znE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-281-hDbcjJ8aPoSTZN_bzTw1Kg-1; Thu, 11 Jun 2020 15:47:08 -0400
-X-MC-Unique: hDbcjJ8aPoSTZN_bzTw1Kg-1
+ us-mta-395-DzieUaGuOYeOynBIcw234g-1; Thu, 11 Jun 2020 15:47:02 -0400
+X-MC-Unique: DzieUaGuOYeOynBIcw234g-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D91E01005512;
- Thu, 11 Jun 2020 19:47:04 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 85C75845F2A;
+ Thu, 11 Jun 2020 19:47:01 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6C91410013D0;
- Thu, 11 Jun 2020 19:47:04 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1861010013D7;
+ Thu, 11 Jun 2020 19:47:00 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 098/115] i386: hvf: Drop HVFX86EmulatorState
-Date: Thu, 11 Jun 2020 15:44:32 -0400
-Message-Id: <20200611194449.31468-99-pbonzini@redhat.com>
+Subject: [PULL 093/115] i386: hvf: Drop rflags from HVFX86EmulatorState
+Date: Thu, 11 Jun 2020 15:44:27 -0400
+Message-Id: <20200611194449.31468-94-pbonzini@redhat.com>
 In-Reply-To: <20200611194449.31468-1-pbonzini@redhat.com>
 References: <20200611194449.31468-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -82,7 +82,7 @@ X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,67 +102,254 @@ Sender: "Qemu-devel"
 
 From: Roman Bolshakov <r.bolshakov@yadro.com>
 
+HVFX86EmulatorState carries it's own copy of x86 flags. It can be
+dropped in favor of eflags in generic CPUX86State.
+
 Signed-off-by: Roman Bolshakov <r.bolshakov@yadro.com>
-Message-Id: <20200528193758.51454-14-r.bolshakov@yadro.com>
+Message-Id: <20200528193758.51454-9-r.bolshakov@yadro.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- include/qemu/typedefs.h | 1 -
- target/i386/cpu.h       | 1 -
- target/i386/hvf/hvf.c   | 1 -
- target/i386/hvf/x86.h   | 4 ----
- 4 files changed, 7 deletions(-)
+ target/i386/hvf/hvf.c       |  5 ++---
+ target/i386/hvf/x86.c       |  2 +-
+ target/i386/hvf/x86.h       | 42 -------------------------------------
+ target/i386/hvf/x86_emu.c   |  6 +++---
+ target/i386/hvf/x86_flags.c | 24 ++++++++++-----------
+ target/i386/hvf/x86_task.c  |  6 +++---
+ target/i386/hvf/x86hvf.c    |  6 +++---
+ 7 files changed, 24 insertions(+), 67 deletions(-)
 
-diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
-index de68d51d52..ce4a78b687 100644
---- a/include/qemu/typedefs.h
-+++ b/include/qemu/typedefs.h
-@@ -51,7 +51,6 @@ typedef struct FWCfgIoState FWCfgIoState;
- typedef struct FWCfgMemState FWCfgMemState;
- typedef struct FWCfgState FWCfgState;
- typedef struct HostMemoryBackend HostMemoryBackend;
--typedef struct HVFX86EmulatorState HVFX86EmulatorState;
- typedef struct I2CBus I2CBus;
- typedef struct I2SCodec I2SCodec;
- typedef struct IOMMUMemoryRegion IOMMUMemoryRegion;
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index da511a23b3..c6f816c58d 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1600,7 +1600,6 @@ typedef struct CPUX86State {
- #if defined(CONFIG_HVF)
-     hvf_lazy_flags hvf_lflags;
-     void *hvf_mmio_buf;
--    HVFX86EmulatorState *hvf_emul;
- #endif
- 
-     uint64_t mcg_cap;
 diff --git a/target/i386/hvf/hvf.c b/target/i386/hvf/hvf.c
-index 57696c46c7..be016b951a 100644
+index 416a6fae7c..4cee496d71 100644
 --- a/target/i386/hvf/hvf.c
 +++ b/target/i386/hvf/hvf.c
-@@ -568,7 +568,6 @@ int hvf_init_vcpu(CPUState *cpu)
+@@ -723,8 +723,7 @@ int hvf_vcpu_exec(CPUState *cpu)
  
-     hvf_state->hvf_caps = g_new0(struct hvf_vcpu_caps, 1);
-     env->hvf_mmio_buf = g_new(char, 4096);
--    env->hvf_emul = g_new0(HVFX86EmulatorState, 1);
+         hvf_store_events(cpu, ins_len, idtvec_info);
+         rip = rreg(cpu->hvf_fd, HV_X86_RIP);
+-        RFLAGS(env) = rreg(cpu->hvf_fd, HV_X86_RFLAGS);
+-        env->eflags = RFLAGS(env);
++        env->eflags = rreg(cpu->hvf_fd, HV_X86_RFLAGS);
  
-     r = hv_vcpu_create((hv_vcpuid_t *)&cpu->hvf_fd, HV_VCPU_DEFAULT);
-     cpu->vcpu_dirty = 1;
+         qemu_mutex_lock_iothread();
+ 
+@@ -736,7 +735,7 @@ int hvf_vcpu_exec(CPUState *cpu)
+         case EXIT_REASON_HLT: {
+             macvm_set_rip(cpu, rip + ins_len);
+             if (!((cpu->interrupt_request & CPU_INTERRUPT_HARD) &&
+-                (EFLAGS(env) & IF_MASK))
++                (env->eflags & IF_MASK))
+                 && !(cpu->interrupt_request & CPU_INTERRUPT_NMI) &&
+                 !(idtvec_info & VMCS_IDT_VEC_VALID)) {
+                 cpu->halted = 1;
+diff --git a/target/i386/hvf/x86.c b/target/i386/hvf/x86.c
+index 3afcedc7fc..7ebb5b45bd 100644
+--- a/target/i386/hvf/x86.c
++++ b/target/i386/hvf/x86.c
+@@ -131,7 +131,7 @@ bool x86_is_v8086(struct CPUState *cpu)
+ {
+     X86CPU *x86_cpu = X86_CPU(cpu);
+     CPUX86State *env = &x86_cpu->env;
+-    return x86_is_protected(cpu) && (RFLAGS(env) & RFLAGS_VM);
++    return x86_is_protected(cpu) && (env->eflags & RFLAGS_VM);
+ }
+ 
+ bool x86_is_long_mode(struct CPUState *cpu)
 diff --git a/target/i386/hvf/x86.h b/target/i386/hvf/x86.h
-index 483fcea762..bacade7b65 100644
+index 411e4b6599..e309b8f203 100644
 --- a/target/i386/hvf/x86.h
 +++ b/target/i386/hvf/x86.h
-@@ -228,10 +228,6 @@ typedef struct x68_segment_selector {
-     };
- } __attribute__ ((__packed__)) x68_segment_selector;
+@@ -62,44 +62,6 @@ typedef enum x86_rflags {
+     RFLAGS_ID       = (1L << 21),
+ } x86_rflags;
  
--/* Definition of hvf_x86_state is here */
--struct HVFX86EmulatorState {
--};
+-/* rflags register */
+-typedef struct x86_reg_flags {
+-    union {
+-        struct {
+-            uint64_t rflags;
+-        };
+-        struct {
+-            uint32_t eflags;
+-            uint32_t hi32_unused1;
+-        };
+-        struct {
+-            uint32_t cf:1;
+-            uint32_t unused1:1;
+-            uint32_t pf:1;
+-            uint32_t unused2:1;
+-            uint32_t af:1;
+-            uint32_t unused3:1;
+-            uint32_t zf:1;
+-            uint32_t sf:1;
+-            uint32_t tf:1;
+-            uint32_t ief:1;
+-            uint32_t df:1;
+-            uint32_t of:1;
+-            uint32_t iopl:2;
+-            uint32_t nt:1;
+-            uint32_t unused4:1;
+-            uint32_t rf:1;
+-            uint32_t vm:1;
+-            uint32_t ac:1;
+-            uint32_t vif:1;
+-            uint32_t vip:1;
+-            uint32_t id:1;
+-            uint32_t unused5:10;
+-            uint32_t hi32_unused2;
+-        };
+-    };
+-} __attribute__ ((__packed__)) x86_reg_flags;
 -
- /* useful register access  macros */
- #define x86_reg(cpu, reg) ((x86_register *) &cpu->regs[reg])
+ typedef enum x86_reg_cr0 {
+     CR0_PE =            (1L << 0),
+     CR0_MP =            (1L << 1),
+@@ -294,15 +256,11 @@ typedef struct lazy_flags {
+ /* Definition of hvf_x86_state is here */
+ struct HVFX86EmulatorState {
+     struct x86_register regs[16];
+-    struct x86_reg_flags   rflags;
+     struct lazy_flags   lflags;
+     uint8_t mmio_buf[4096];
+ };
  
+ /* useful register access  macros */
+-#define RFLAGS(cpu) (cpu->hvf_emul->rflags.rflags)
+-#define EFLAGS(cpu) (cpu->hvf_emul->rflags.eflags)
+-
+ #define RRX(cpu, reg) (cpu->hvf_emul->regs[reg].rrx)
+ #define RAX(cpu)        RRX(cpu, R_EAX)
+ #define RCX(cpu)        RRX(cpu, R_ECX)
+diff --git a/target/i386/hvf/x86_emu.c b/target/i386/hvf/x86_emu.c
+index 0efd9f9928..04fac64e72 100644
+--- a/target/i386/hvf/x86_emu.c
++++ b/target/i386/hvf/x86_emu.c
+@@ -459,7 +459,7 @@ static inline void string_increment_reg(struct CPUX86State *env, int reg,
+                                         struct x86_decode *decode)
+ {
+     target_ulong val = read_reg(env, reg, decode->addressing_size);
+-    if (env->hvf_emul->rflags.df) {
++    if (env->eflags & DF_MASK) {
+         val -= decode->operand_size;
+     } else {
+         val += decode->operand_size;
+@@ -1432,7 +1432,7 @@ void load_regs(struct CPUState *cpu)
+         RRX(env, i) = rreg(cpu->hvf_fd, HV_X86_RAX + i);
+     }
+ 
+-    RFLAGS(env) = rreg(cpu->hvf_fd, HV_X86_RFLAGS);
++    env->eflags = rreg(cpu->hvf_fd, HV_X86_RFLAGS);
+     rflags_to_lflags(env);
+     env->eip = rreg(cpu->hvf_fd, HV_X86_RIP);
+ }
+@@ -1456,7 +1456,7 @@ void store_regs(struct CPUState *cpu)
+     }
+ 
+     lflags_to_rflags(env);
+-    wreg(cpu->hvf_fd, HV_X86_RFLAGS, RFLAGS(env));
++    wreg(cpu->hvf_fd, HV_X86_RFLAGS, env->eflags);
+     macvm_set_rip(cpu, env->eip);
+ }
+ 
+diff --git a/target/i386/hvf/x86_flags.c b/target/i386/hvf/x86_flags.c
+index ee6d33f861..1152cd7234 100644
+--- a/target/i386/hvf/x86_flags.c
++++ b/target/i386/hvf/x86_flags.c
+@@ -295,21 +295,21 @@ void set_SF(CPUX86State *env, bool val)
+ 
+ void lflags_to_rflags(CPUX86State *env)
+ {
+-    env->hvf_emul->rflags.cf = get_CF(env);
+-    env->hvf_emul->rflags.pf = get_PF(env);
+-    env->hvf_emul->rflags.af = get_AF(env);
+-    env->hvf_emul->rflags.zf = get_ZF(env);
+-    env->hvf_emul->rflags.sf = get_SF(env);
+-    env->hvf_emul->rflags.of = get_OF(env);
++    env->eflags |= get_CF(env) ? CC_C : 0;
++    env->eflags |= get_PF(env) ? CC_P : 0;
++    env->eflags |= get_AF(env) ? CC_A : 0;
++    env->eflags |= get_ZF(env) ? CC_Z : 0;
++    env->eflags |= get_SF(env) ? CC_S : 0;
++    env->eflags |= get_OF(env) ? CC_O : 0;
+ }
+ 
+ void rflags_to_lflags(CPUX86State *env)
+ {
+     env->hvf_emul->lflags.auxbits = env->hvf_emul->lflags.result = 0;
+-    set_OF(env, env->hvf_emul->rflags.of);
+-    set_SF(env, env->hvf_emul->rflags.sf);
+-    set_ZF(env, env->hvf_emul->rflags.zf);
+-    set_AF(env, env->hvf_emul->rflags.af);
+-    set_PF(env, env->hvf_emul->rflags.pf);
+-    set_CF(env, env->hvf_emul->rflags.cf);
++    set_OF(env, env->eflags & CC_O);
++    set_SF(env, env->eflags & CC_S);
++    set_ZF(env, env->eflags & CC_Z);
++    set_AF(env, env->eflags & CC_A);
++    set_PF(env, env->eflags & CC_P);
++    set_CF(env, env->eflags & CC_C);
+ }
+diff --git a/target/i386/hvf/x86_task.c b/target/i386/hvf/x86_task.c
+index 834baec3ea..6ea8508946 100644
+--- a/target/i386/hvf/x86_task.c
++++ b/target/i386/hvf/x86_task.c
+@@ -39,7 +39,7 @@ static void save_state_to_tss32(CPUState *cpu, struct x86_tss_segment32 *tss)
+ 
+     /* CR3 and ldt selector are not saved intentionally */
+     tss->eip = (uint32_t)env->eip;
+-    tss->eflags = EFLAGS(env);
++    tss->eflags = (uint32_t)env->eflags;
+     tss->eax = EAX(env);
+     tss->ecx = ECX(env);
+     tss->edx = EDX(env);
+@@ -65,7 +65,7 @@ static void load_state_from_tss32(CPUState *cpu, struct x86_tss_segment32 *tss)
+     wvmcs(cpu->hvf_fd, VMCS_GUEST_CR3, tss->cr3);
+ 
+     env->eip = tss->eip;
+-    EFLAGS(env) = tss->eflags | 2;
++    env->eflags = tss->eflags | 2;
+ 
+     /* General purpose registers */
+     RAX(env) = tss->eax;
+@@ -158,7 +158,7 @@ void vmx_handle_task_switch(CPUState *cpu, x68_segment_selector tss_sel, int rea
+     }
+ 
+     if (reason == TSR_IRET)
+-        EFLAGS(env) &= ~RFLAGS_NT;
++        env->eflags &= ~RFLAGS_NT;
+ 
+     if (reason != TSR_CALL && reason != TSR_IDT_GATE)
+         old_tss_sel.sel = 0xffff;
+diff --git a/target/i386/hvf/x86hvf.c b/target/i386/hvf/x86hvf.c
+index edefe5319a..5cbcb32ab6 100644
+--- a/target/i386/hvf/x86hvf.c
++++ b/target/i386/hvf/x86hvf.c
+@@ -412,7 +412,7 @@ bool hvf_inject_interrupts(CPUState *cpu_state)
+ 
+     if (!(env->hflags & HF_INHIBIT_IRQ_MASK) &&
+         (cpu_state->interrupt_request & CPU_INTERRUPT_HARD) &&
+-        (EFLAGS(env) & IF_MASK) && !(info & VMCS_INTR_VALID)) {
++        (env->eflags & IF_MASK) && !(info & VMCS_INTR_VALID)) {
+         int line = cpu_get_pic_interrupt(&x86cpu->env);
+         cpu_state->interrupt_request &= ~CPU_INTERRUPT_HARD;
+         if (line >= 0) {
+@@ -432,7 +432,7 @@ int hvf_process_events(CPUState *cpu_state)
+     X86CPU *cpu = X86_CPU(cpu_state);
+     CPUX86State *env = &cpu->env;
+ 
+-    EFLAGS(env) = rreg(cpu_state->hvf_fd, HV_X86_RFLAGS);
++    env->eflags = rreg(cpu_state->hvf_fd, HV_X86_RFLAGS);
+ 
+     if (cpu_state->interrupt_request & CPU_INTERRUPT_INIT) {
+         hvf_cpu_synchronize_state(cpu_state);
+@@ -444,7 +444,7 @@ int hvf_process_events(CPUState *cpu_state)
+         apic_poll_irq(cpu->apic_state);
+     }
+     if (((cpu_state->interrupt_request & CPU_INTERRUPT_HARD) &&
+-        (EFLAGS(env) & IF_MASK)) ||
++        (env->eflags & IF_MASK)) ||
+         (cpu_state->interrupt_request & CPU_INTERRUPT_NMI)) {
+         cpu_state->halted = 0;
+     }
 -- 
 2.26.2
 
