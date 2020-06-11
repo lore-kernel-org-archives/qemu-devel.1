@@ -2,69 +2,69 @@ Return-Path: <SRS0=U615=7Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F470C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 20:39:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBDABC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 20:40:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5A15D2073E
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 20:39:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A13F02073E
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 20:40:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EEU6JdrT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A15D2073E
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nmfq7lof"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A13F02073E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33098 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38218 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjTyq-0003zk-KS
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 16:39:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56106)
+	id 1jjU03-0006H4-TH
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 16:40:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55656)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jjTAQ-0001xG-Uu
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 15:47:14 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43153
+ id 1jjTA3-0001Ef-AP
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 15:46:52 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20489
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jjTAO-0001QN-02
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 15:47:14 -0400
+ id 1jjTA1-0001LM-JU
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 15:46:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591904831;
+ s=mimecast20190719; t=1591904809;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=81izy4+9EMYGX4ur7U9oBg5fWRzOwFW3sWwfve6UJ8w=;
- b=EEU6JdrTVQO+lC8cCjb8+9id3jDvyy4y4WZQyYnK6yZFpnjmxyPLGkX1EHDbAOrDLLmtC4
- D5vZEpDiAUMpZxqWHyICkpZj3+UB90BUMeOcdCZVb0/4ZDm1MY3MkIoTNe89DTjMYW624L
- 3S7UlxlNou1ztMyytIpsYH/fZOyIjKA=
+ bh=DCsNk6O2BBst3KYCL9PdkLrI3ixjpMCThmPZ1p8h97c=;
+ b=Nmfq7lofVNwAdUxCt8vJ06zKr0JNPT1+PQvf5rjlN7STzB0Y53MEgWgX4IF8o914EQMawO
+ LrLAZIvw9/BLYyBOpc+JPPD0pOncX0A3RTLovkcVuosJVShibQ1/qNkdPtTTYHBMKujyLw
+ Rim6AELxJHOUESMl6DlnVk5QmESl+2Y=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-34-S4DT20YwORSQibEJzFNBPA-1; Thu, 11 Jun 2020 15:47:09 -0400
-X-MC-Unique: S4DT20YwORSQibEJzFNBPA-1
+ us-mta-217-RF9ftbvkONuhfUmxI-fPeA-1; Thu, 11 Jun 2020 15:46:46 -0400
+X-MC-Unique: RF9ftbvkONuhfUmxI-fPeA-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 25DF3107ACF3;
- Thu, 11 Jun 2020 19:47:08 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0976E1005513;
+ Thu, 11 Jun 2020 19:46:45 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7946460CC0;
- Thu, 11 Jun 2020 19:47:07 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8E17860CC0;
+ Thu, 11 Jun 2020 19:46:44 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 101/115] target/i386: sev: Move local structure definitions
- into .c file
-Date: Thu, 11 Jun 2020 15:44:35 -0400
-Message-Id: <20200611194449.31468-102-pbonzini@redhat.com>
+Subject: [PULL 070/115] chardev/char-socket: Properly make qio connections non
+ blocking
+Date: Thu, 11 Jun 2020 15:44:04 -0400
+Message-Id: <20200611194449.31468-71-pbonzini@redhat.com>
 In-Reply-To: <20200611194449.31468-1-pbonzini@redhat.com>
 References: <20200611194449.31468-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -73,16 +73,16 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 14:52:10
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 08:37:10
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,144 +96,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>,
+ =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: David Gibson <david@gibson.dropbear.id.au>
+From: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
 
-Neither QSevGuestInfo nor SEVState (not to be confused with SevState) is
-used anywhere outside target/i386/sev.c, so they might as well live in
-there rather than in a (somewhat) exposed header.
+In tcp_chr_sync_read function, there is a possibility of socket
+disconnection during blocking read, then tcp_chr_hup function would clean up
+the qio channel pointers(i.e ioc, sioc).
 
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20200604064219.436242-3-david@gibson.dropbear.id.au>
+Signed-off-by: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
+Message-Id: <1587289900-29485-1-git-send-email-sai.pavan.boddu@xilinx.com>
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- target/i386/sev.c      | 44 ++++++++++++++++++++++++++++++++++++++++++
- target/i386/sev_i386.h | 44 ------------------------------------------
- 2 files changed, 44 insertions(+), 44 deletions(-)
+ chardev/char-socket.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/target/i386/sev.c b/target/i386/sev.c
-index 2312510cf2..53def5f41a 100644
---- a/target/i386/sev.c
-+++ b/target/i386/sev.c
-@@ -29,6 +29,50 @@
- #include "trace.h"
- #include "migration/blocker.h"
+diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+index db253d4024..dd3d3ed8d6 100644
+--- a/chardev/char-socket.c
++++ b/chardev/char-socket.c
+@@ -550,7 +550,9 @@ static int tcp_chr_sync_read(Chardev *chr, const uint8_t *buf, int len)
  
-+#define TYPE_QSEV_GUEST_INFO "sev-guest"
-+#define QSEV_GUEST_INFO(obj)                  \
-+    OBJECT_CHECK(QSevGuestInfo, (obj), TYPE_QSEV_GUEST_INFO)
-+
-+typedef struct QSevGuestInfo QSevGuestInfo;
-+
-+/**
-+ * QSevGuestInfo:
-+ *
-+ * The QSevGuestInfo object is used for creating a SEV guest.
-+ *
-+ * # $QEMU \
-+ *         -object sev-guest,id=sev0 \
-+ *         -machine ...,memory-encryption=sev0
-+ */
-+struct QSevGuestInfo {
-+    Object parent_obj;
-+
-+    char *sev_device;
-+    uint32_t policy;
-+    uint32_t handle;
-+    char *dh_cert_file;
-+    char *session_file;
-+    uint32_t cbitpos;
-+    uint32_t reduced_phys_bits;
-+};
-+
-+struct SEVState {
-+    QSevGuestInfo *sev_info;
-+    uint8_t api_major;
-+    uint8_t api_minor;
-+    uint8_t build_id;
-+    uint32_t policy;
-+    uint64_t me_mask;
-+    uint32_t cbitpos;
-+    uint32_t reduced_phys_bits;
-+    uint32_t handle;
-+    int sev_fd;
-+    SevState state;
-+    gchar *measurement;
-+};
-+
-+typedef struct SEVState SEVState;
-+
- #define DEFAULT_GUEST_POLICY    0x1 /* disable debug */
- #define DEFAULT_SEV_DEVICE      "/dev/sev"
- 
-diff --git a/target/i386/sev_i386.h b/target/i386/sev_i386.h
-index 4f193642ac..8eb7de1bef 100644
---- a/target/i386/sev_i386.h
-+++ b/target/i386/sev_i386.h
-@@ -28,10 +28,6 @@
- #define SEV_POLICY_DOMAIN       0x10
- #define SEV_POLICY_SEV          0x20
- 
--#define TYPE_QSEV_GUEST_INFO "sev-guest"
--#define QSEV_GUEST_INFO(obj)                  \
--    OBJECT_CHECK(QSevGuestInfo, (obj), TYPE_QSEV_GUEST_INFO)
--
- extern bool sev_enabled(void);
- extern uint64_t sev_get_me_mask(void);
- extern SevInfo *sev_get_info(void);
-@@ -40,44 +36,4 @@ extern uint32_t sev_get_reduced_phys_bits(void);
- extern char *sev_get_launch_measurement(void);
- extern SevCapability *sev_get_capabilities(void);
- 
--typedef struct QSevGuestInfo QSevGuestInfo;
--
--/**
-- * QSevGuestInfo:
-- *
-- * The QSevGuestInfo object is used for creating a SEV guest.
-- *
-- * # $QEMU \
-- *         -object sev-guest,id=sev0 \
-- *         -machine ...,memory-encryption=sev0
-- */
--struct QSevGuestInfo {
--    Object parent_obj;
--
--    char *sev_device;
--    uint32_t policy;
--    uint32_t handle;
--    char *dh_cert_file;
--    char *session_file;
--    uint32_t cbitpos;
--    uint32_t reduced_phys_bits;
--};
--
--struct SEVState {
--    QSevGuestInfo *sev_info;
--    uint8_t api_major;
--    uint8_t api_minor;
--    uint8_t build_id;
--    uint32_t policy;
--    uint64_t me_mask;
--    uint32_t cbitpos;
--    uint32_t reduced_phys_bits;
--    uint32_t handle;
--    int sev_fd;
--    SevState state;
--    gchar *measurement;
--};
--
--typedef struct SEVState SEVState;
--
- #endif
+     qio_channel_set_blocking(s->ioc, true, NULL);
+     size = tcp_chr_recv(chr, (void *) buf, len);
+-    qio_channel_set_blocking(s->ioc, false, NULL);
++    if (s->state != TCP_CHARDEV_STATE_DISCONNECTED) {
++        qio_channel_set_blocking(s->ioc, false, NULL);
++    }
+     if (size == 0) {
+         /* connection closed */
+         tcp_chr_disconnect(chr);
 -- 
 2.26.2
 
