@@ -7,64 +7,63 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBDABC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 20:40:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF107C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 20:40:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A13F02073E
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 20:40:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 80D792073E
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 20:40:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nmfq7lof"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A13F02073E
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vlcx/JYF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80D792073E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38218 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39092 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjU03-0006H4-TH
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 16:40:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55656)
+	id 1jjU0K-0006jJ-Ps
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 16:40:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55944)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jjTA3-0001Ef-AP
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 15:46:52 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20489
+ id 1jjTAI-0001ga-Vc
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 15:47:07 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54925
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jjTA1-0001LM-JU
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 15:46:50 -0400
+ id 1jjTAH-0001On-3u
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 15:47:06 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591904809;
+ s=mimecast20190719; t=1591904824;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=DCsNk6O2BBst3KYCL9PdkLrI3ixjpMCThmPZ1p8h97c=;
- b=Nmfq7lofVNwAdUxCt8vJ06zKr0JNPT1+PQvf5rjlN7STzB0Y53MEgWgX4IF8o914EQMawO
- LrLAZIvw9/BLYyBOpc+JPPD0pOncX0A3RTLovkcVuosJVShibQ1/qNkdPtTTYHBMKujyLw
- Rim6AELxJHOUESMl6DlnVk5QmESl+2Y=
+ bh=5SORuWqQy0re94mGrihKTtIfRZNWse6QdmhvjhWiRng=;
+ b=Vlcx/JYFnUb2IN8RVzk8dujD2M36l0Debt1486efV7k6edNymAt4vTSZN/u7ABE02/qD2E
+ 3a88Fvzjuo1UL2xM9HT+EGh/ZSJPos20aljRE1og4IZPbpNGoi2WqJbBCyJPpJvAOI/SI0
+ +DN0PoMFnYPIPATCrU+4YQAa1ij51xQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-217-RF9ftbvkONuhfUmxI-fPeA-1; Thu, 11 Jun 2020 15:46:46 -0400
-X-MC-Unique: RF9ftbvkONuhfUmxI-fPeA-1
+ us-mta-202-tVQlcYgKNZ2IEquQrzAwCw-1; Thu, 11 Jun 2020 15:46:59 -0400
+X-MC-Unique: tVQlcYgKNZ2IEquQrzAwCw-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0976E1005513;
- Thu, 11 Jun 2020 19:46:45 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3BC7E1800D41;
+ Thu, 11 Jun 2020 19:46:58 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8E17860CC0;
- Thu, 11 Jun 2020 19:46:44 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DA82F60CC0;
+ Thu, 11 Jun 2020 19:46:57 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 070/115] chardev/char-socket: Properly make qio connections non
- blocking
-Date: Thu, 11 Jun 2020 15:44:04 -0400
-Message-Id: <20200611194449.31468-71-pbonzini@redhat.com>
+Subject: [PULL 089/115] i386: hvf: Drop unused variable
+Date: Thu, 11 Jun 2020 15:44:23 -0400
+Message-Id: <20200611194449.31468-90-pbonzini@redhat.com>
 In-Reply-To: <20200611194449.31468-1-pbonzini@redhat.com>
 References: <20200611194449.31468-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -73,16 +72,16 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 08:37:10
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 14:52:10
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,41 +95,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>,
- =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Cc: Roman Bolshakov <r.bolshakov@yadro.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
+From: Roman Bolshakov <r.bolshakov@yadro.com>
 
-In tcp_chr_sync_read function, there is a possibility of socket
-disconnection during blocking read, then tcp_chr_hup function would clean up
-the qio channel pointers(i.e ioc, sioc).
-
-Signed-off-by: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
-Message-Id: <1587289900-29485-1-git-send-email-sai.pavan.boddu@xilinx.com>
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+Signed-off-by: Roman Bolshakov <r.bolshakov@yadro.com>
+Message-Id: <20200528193758.51454-5-r.bolshakov@yadro.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- chardev/char-socket.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ target/i386/hvf/x86.h | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-index db253d4024..dd3d3ed8d6 100644
---- a/chardev/char-socket.c
-+++ b/chardev/char-socket.c
-@@ -550,7 +550,9 @@ static int tcp_chr_sync_read(Chardev *chr, const uint8_t *buf, int len)
+diff --git a/target/i386/hvf/x86.h b/target/i386/hvf/x86.h
+index c95d5b2116..56fcde13c6 100644
+--- a/target/i386/hvf/x86.h
++++ b/target/i386/hvf/x86.h
+@@ -293,7 +293,6 @@ typedef struct lazy_flags {
  
-     qio_channel_set_blocking(s->ioc, true, NULL);
-     size = tcp_chr_recv(chr, (void *) buf, len);
--    qio_channel_set_blocking(s->ioc, false, NULL);
-+    if (s->state != TCP_CHARDEV_STATE_DISCONNECTED) {
-+        qio_channel_set_blocking(s->ioc, false, NULL);
-+    }
-     if (size == 0) {
-         /* connection closed */
-         tcp_chr_disconnect(chr);
+ /* Definition of hvf_x86_state is here */
+ struct HVFX86EmulatorState {
+-    int interruptable;
+     uint64_t fetch_rip;
+     uint64_t rip;
+     struct x86_register regs[16];
 -- 
 2.26.2
 
