@@ -2,99 +2,88 @@ Return-Path: <SRS0=U615=7Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3945CC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 10:59:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8BD1C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 10:59:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 034482063A
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 10:59:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 830662063A
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 10:59:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=dme-org.20150623.gappssmtp.com header.i=@dme-org.20150623.gappssmtp.com header.b="hMQ+Kb55"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 034482063A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=dme.org
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eAvjnKGF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 830662063A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40722 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41690 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjKvF-0002Bw-7M
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 06:59:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37006)
+	id 1jjKvW-0002Zf-He
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 06:59:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37076)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dme@dme.org>) id 1jjKuN-0001BV-Ks
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 06:58:07 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:40481)
+ (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
+ id 1jjKuj-0001fr-BW
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 06:58:29 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:44238)
  by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <dme@dme.org>) id 1jjKuM-0008Cv-Jl
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 06:58:07 -0400
-Received: by mail-wr1-x444.google.com with SMTP id h5so5683345wrc.7
- for <qemu-devel@nongnu.org>; Thu, 11 Jun 2020 03:58:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=dme-org.20150623.gappssmtp.com; s=20150623;
- h=to:cc:subject:in-reply-to:references:from:date:message-id
- :mime-version; bh=TGEysEym/r9mkXU6aBSqwx7SOJ/Ch+nknE4tNvEv2Kk=;
- b=hMQ+Kb5569TCLrYLD7anQ4dX0Ah2JUvbY1mPFW9tHeo6N5TKakwwL8j1nuRRAMVou6
- arDSv/lNfJJ2H+aID+8Vxl6qXb1BsZWtQNZMn2oibZE2DKkWeiOU1jkwlUdB2f8YcgCG
- UQmqTeUutLEk0DQjO8GqB5Id3EAQZ3eDJ3agughZZ7fxZOGukngraDwaaGrEgXIqbtND
- glmMVOVTYabmwl5v9bYkJld7eteTf8XUgb1/UoLlduAcRS0ogibZo+a6dHE8IHn23W7s
- 2o2J7xVyqrA1olFZv4MobD3cS952EHXT3SJ4DE7ypQEQtKmjsyJe1jC/Es+lmJbex/Ju
- J0eQ==
+ (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
+ id 1jjKuh-0008E4-HJ
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 06:58:28 -0400
+Received: by mail-wr1-x442.google.com with SMTP id y17so5659811wrn.11
+ for <qemu-devel@nongnu.org>; Thu, 11 Jun 2020 03:58:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=idvPFCU5stMGa4qhmjOVcbkLx9hS6g853aJIDSpX+aE=;
+ b=eAvjnKGFwaghY6nPymFQY7qJ1U9BJ7fW+jiar/BpttIlT4NjjB2LkjIC05Q+V/NF+s
+ 0CAPdRZfTho2CjfaugdxF9LWgR4l7hP/bKHOtbiVx6U3CggB3bTpifPvhye2ZXGkFvHR
+ PdsnFCMWIUqb28at/kI+Bl84kfiWK8y0zjrY1fcGfsrpbywe1Q4N9pA5IPiztrff8z0L
+ aIGeBk07AOOtyX+Nu0zIZbsVPLrGQYW1Qb1dyyvLHHfB6KRABy1sxGEPMZ91EPVjGopw
+ s/e6TNI4jlEGO0luXG3TWLyTVVucrohhAvCnxS9U2o/2ohoT2T8T0FgFLNIwel5t+FDw
+ ow/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:to:cc:subject:in-reply-to:references:from:date
- :message-id:mime-version;
- bh=TGEysEym/r9mkXU6aBSqwx7SOJ/Ch+nknE4tNvEv2Kk=;
- b=CxrAbsxJfLrjd2dhnVMgCgteXIgy+5u6xrQmNCxNUJYydpLKf91457ht4/4P+P08yF
- nM3yZ6H4acT0rlLf66zKIRahw4eJD9FbANX7JJ2Dhs8tnJ+OVKK7D2JORSrNd/WLJBLl
- JoGiFjg6keM6IonSvuVCsr9CEsSx7DzSm+qjVS7jn/e5FK1CTKokZGC/OlLSHPAIlnMm
- uRGyyJq3+0i7SaNKhDHBFjIMWcRQpHGhHj6lvzAf3cmM5Zd2GG+viieX6J/qrA9JKTML
- lafoEQA4ZEtVJpbCzEPZLNVNIJdlb4wGgxICLZZ/EBCd42pFsc0/tQOr899DRo5kAg2T
- 0KdQ==
-X-Gm-Message-State: AOAM531qyoANXA8yjuj2hm/NEn76iAi56Sn5oy0ah1SaAGThu8X/rb4X
- T6BY1ikDKzuKJHl9InqkL9JwEA==
-X-Google-Smtp-Source: ABdhPJwgT7yWAaocAka2VD+rwe2IaaFQ85IFfsk36FMlHGkAZbOXvjrbH5dhvrUg2RaAebOudbk/+Q==
-X-Received: by 2002:adf:e4d1:: with SMTP id v17mr8785845wrm.224.1591873084666; 
- Thu, 11 Jun 2020 03:58:04 -0700 (PDT)
-Received: from disaster-area.hh.sledj.net (disaster-area.hh.sledj.net.
- [2001:8b0:bb71:7140:64::1])
- by smtp.gmail.com with ESMTPSA id h15sm4209708wrt.73.2020.06.11.03.58.03
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 11 Jun 2020 03:58:03 -0700 (PDT)
-Received: from localhost (disaster-area.hh.sledj.net [local])
- by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id 0d3e0be9;
- Thu, 11 Jun 2020 10:58:02 +0000 (UTC)
-To: Eric Blake <eblake@redhat.com>, Sam Eiderman <sameid@google.com>, Kevin
- Wolf <kwolf@redhat.com>
-Subject: Re: Clarification regarding new qemu-img convert --target-is-zero flag
-In-Reply-To: <03718921-c988-98e2-3a72-3f10b9f14fcd@redhat.com>
-References: <CAFr6bU=LjeW5_eGtwL38cher2TM52skohuANNXN9EpO+mA-z8Q@mail.gmail.com>
- <m2imfz877v.fsf@dme.org>
- <CAFr6bUk5LrEL8BPXYkNOqj_jsbxHBfbj_NYryUjszMtG89L+2w@mail.gmail.com>
- <20200610140620.GE6947@linux.fritz.box>
- <CAFr6bU=aD=AXnoR-qSdQtQC690FYFqFsDRHHGxdUDkTh2ho1cA@mail.gmail.com>
- <CAFr6bUksp1Nm4nL69na5WDj6A5iXzwcc4K3=JNnyP4xZ+HKJHA@mail.gmail.com>
- <m2bllr7wrg.fsf@dme.org> <999a1a74-d082-bcdb-e3f9-6c44b2526433@redhat.com>
- <m28sgu9ame.fsf@dme.org> <03718921-c988-98e2-3a72-3f10b9f14fcd@redhat.com>
-X-HGTTG: heart-of-gold
-From: David Edmondson <dme@dme.org>
-Date: Thu, 11 Jun 2020 11:58:02 +0100
-Message-ID: <m25zbx98ed.fsf@dme.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=idvPFCU5stMGa4qhmjOVcbkLx9hS6g853aJIDSpX+aE=;
+ b=R06sVvNlNro+VdZh6jP9o3zzWyfa1JAjEqNeg/bboAvUJ1b01aUHJXx2zGWIfuXE1/
+ MjutItp+OMZSiakWa1nWG1Sx2FbgqwUX5Gcl4muvys4cAYqSsOHYJUuoKAMu6IP9B1hj
+ 9ekv0lSdmdmwzzz//kBA2RanOF8EddeytPZcIo05Sv9jMiuHOv+HWr92NXySzrgOPY2m
+ q3up/myb8V/biHLdJsW6SEgfqK3WfsZWPL95sSk5ZmoARcmT/q3UD6imFEyL488U9/Af
+ PulAl/kmzhurdl0XvyURT9Ou+g7/ewkFlo5kVJbh+TtDh9phecGUUtWbi0tvbJvNwwWM
+ HDnA==
+X-Gm-Message-State: AOAM5310AE61dr3hioOqeG+oXzrTC6XRFVBIh7p/grVvSotVCJeUc77O
+ CU3Wb5qT84S6aos4sG/cRACnlGti+j/tGbdW4+PLeqjMqQY=
+X-Google-Smtp-Source: ABdhPJywqQT4kiLmcuDDyx4dR/5xVfU+loIm6nT/Ec5P7TTmQysTgUu9+7jB8U/WXvK801mm+K1P33fXGz5R8yY0mQM=
+X-Received: by 2002:adf:c98a:: with SMTP id f10mr8839158wrh.329.1591873100885; 
+ Thu, 11 Jun 2020 03:58:20 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-Received-SPF: neutral client-ip=2a00:1450:4864:20::444;
- envelope-from=dme@dme.org; helo=mail-wr1-x444.google.com
+References: <1591015405-19651-1-git-send-email-aleksandar.qemu.devel@gmail.com>
+ <1591015405-19651-5-git-send-email-aleksandar.qemu.devel@gmail.com>
+ <87h7vi3p9h.fsf@linaro.org>
+In-Reply-To: <87h7vi3p9h.fsf@linaro.org>
+From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Date: Thu, 11 Jun 2020 12:58:05 +0200
+Message-ID: <CAHiYmc6g1AuaV+knvwfMqpdDx5zmnwQMcHqn+CLeLHDmJ=L=Vw@mail.gmail.com>
+Subject: Re: [PULL 4/6] target/mips: Add more CP0 register for save/restore
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Content-Type: multipart/alternative; boundary="000000000000b4b1f705a7ccd6ef"
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wr1-x442.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -10
-X-Spam_score: -1.1
-X-Spam_bar: -
-X-Spam_report: (-1.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_NEUTRAL=0.779, UNPARSEABLE_RELAY=0.001 autolearn=_AUTOLEARN
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,72 +96,390 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Tony Zhang <tzz@google.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wednesday, 2020-06-10 at 11:21:27 -05, Eric Blake wrote:
+--000000000000b4b1f705a7ccd6ef
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> On 6/10/20 10:57 AM, David Edmondson wrote:
->> On Wednesday, 2020-06-10 at 10:48:52 -05, Eric Blake wrote:
->> 
->>> On 6/10/20 10:42 AM, David Edmondson wrote:
->>>> On Wednesday, 2020-06-10 at 18:29:33 +03, Sam Eiderman wrote:
->>>>
->>>>> Excuse me,
->>>>>
->>>>> Vladimir already pointed out in the first comment that it will skip
->>>>> writing real zeroes later.
->>>>
->>>> Right. That's why you want something like "--no-need-to-zero-initialise"
->>>> (the name keeps getting longer!), which would still write zeroes to the
->>>> blocks that should contain zeroes, as opposed to writing zeroes to
->>>> prepare the device.
->>>
->>> Or maybe something like:
->>>
->>> qemu-img convert --skip-unallocated
->> 
->> This seems fine.
->> 
->>> which says that a pre-zeroing pass may be attempted, but it if fails,
->> 
->> This bit puzzles me. In what circumstances might we attempt but fail?
->> Does it really mean "if it can be done instantly, it will be done, but
->> not if it costs something"?
+=D1=87=D0=B5=D1=82, 11. =D1=98=D1=83=D0=BD 2020. =D1=83 11:50 Alex Benn=C3=
+=A9e <alex.bennee@linaro.org> =D1=98=D0=B5
+=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
 >
-> A fast pre-zeroing pass is faster than writing explicit zeroes.  If such 
-> a fast pass works, then you can avoid further I/O for all subsequent 
-> zero sections; the unallocated sections will now happen to read as zero, 
-> but that is not a problem since the content of unallocated portions is 
-> not guaranteed.
 >
-> But if pre-zeroing is not fast, then you have to spend the extra I/O to 
-> explicitly zero the portions that are allocated but read as zero, while 
-> still skipping the unallocated portions.
-
-The lack of deterministic behaviour would worry me. If the caller can't
-be sure whether the unallocated portions of the device will be zeroed or
-not, it feels as though the number of potential use cases is reduced.
-
-The optimisation is focused on images where there are a significant
-number of allocated zero blocks. Is that a common case? (It obviously
-exists, because many images generated before "--target-is-zero" will be
-like that, but perhaps they would be better cleaned by an unallocator.)
-
->> I'd be more inclined to go for "unallocated blocks will not be written",
->> without any attempts to pre-zero.
+> Aleksandar Markovic <aleksandar.qemu.devel@gmail.com> writes:
 >
-> But that can be slower, when pre-zeroing is fast.  "Unallocated blocks 
-> need not be written" allows for optimizations, "unallocated blocks must 
-> not be touched" does not.
+> > From: Huacai Chen <zltjiangshi@gmail.com>
+> >
+> > Add more CP0 register for save/restore, including: EBase, XContext,
+> > PageGrain, PWBase, PWSize, PWField, PWCtl, Config*, KScratch1~KScratch6=
+.
+> >
+> > Signed-off-by: Huacai Chen <chenhc@lemote.com>
+> > Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
+> > Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+> > Signed-off-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+> > Message-Id: <1588501221-1205-6-git-send-email-chenhc@lemote.com>
+>
+> It seems while our mips cross build has been broken this commit has
+> caused a build regression:
+>
 
-"unallocated blocks may not be written" would be fine.
+It appears that the fix for this issue is already a part of my pull request
+from Tuesday evening:
 
-dme.
--- 
-There is love in you.
+https://github.com/AMarkovic/qemu/commit/af868995e1b7641577300d1342ede452ef=
+0c5565
+
+There should be need for any additional patch to fix the issue.
+
+Of course, this wouldn't have happened, if I had been more careful. My bad.
+
+Hopefully everything will work without any problems and glitches after the
+pull request is applied.
+
+Thanks,
+Aleksandar
+
+>   make docker-test-build@debian-mips-cross J=3D30
+>
+> Results in:
+>
+>   /tmp/qemu-test/src/target/mips/kvm.c: In function
+'kvm_mips_put_cp0_registers':
+>   /tmp/qemu-test/src/target/mips/kvm.c:412:49: error: 'CP0C6_BPPASS'
+undeclared (first use in this function); did you mean 'CP0C3_LPA'?
+>    #define KVM_REG_MIPS_CP0_CONFIG6_MASK   ((1U << CP0C6_BPPASS) | \
+>                                                    ^~~~~~~~~~~~
+>   /tmp/qemu-test/src/target/mips/kvm.c:923:35: note: in expansion of
+macro 'KVM_REG_MIPS_CP0_CONFIG6_MASK'
+>                                      KVM_REG_MIPS_CP0_CONFIG6_MASK);
+>                                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>   /tmp/qemu-test/src/target/mips/kvm.c:412:49: note: each undeclared
+identifier is reported only once for each function it appears in
+>    #define KVM_REG_MIPS_CP0_CONFIG6_MASK   ((1U << CP0C6_BPPASS) | \
+>                                                    ^~~~~~~~~~~~
+>   /tmp/qemu-test/src/target/mips/kvm.c:923:35: note: in expansion of
+macro 'KVM_REG_MIPS_CP0_CONFIG6_MASK'
+>                                      KVM_REG_MIPS_CP0_CONFIG6_MASK);
+>                                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>   /tmp/qemu-test/src/target/mips/kvm.c:413:52: error: 'CP0C6_KPOS'
+undeclared (first use in this function); did you mean 'CP0C3_IPLV'?
+>                                             (0x3fU << CP0C6_KPOS) | \
+>                                                       ^~~~~~~~~~
+>   /tmp/qemu-test/src/target/mips/kvm.c:923:35: note: in expansion of
+macro 'KVM_REG_MIPS_CP0_CONFIG6_MASK'
+>                                      KVM_REG_MIPS_CP0_CONFIG6_MASK);
+>                                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>   /tmp/qemu-test/src/target/mips/kvm.c:414:49: error: 'CP0C6_KE'
+undeclared (first use in this function); did you mean 'CP0C4_AE'?
+>                                             (1U << CP0C6_KE) | \
+>                                                    ^~~~~~~~
+>   /tmp/qemu-test/src/target/mips/kvm.c:923:35: note: in expansion of
+macro 'KVM_REG_MIPS_CP0_CONFIG6_MASK'
+>                                      KVM_REG_MIPS_CP0_CONFIG6_MASK);
+>
+>
+> > ---
+> >  target/mips/kvm.c     | 212
+++++++++++++++++++++++++++++++++++++++++++++++++++
+> >  target/mips/machine.c |   6 +-
+> >  2 files changed, 216 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/target/mips/kvm.c b/target/mips/kvm.c
+> > index de3e26e..96cfa10 100644
+> > --- a/target/mips/kvm.c
+> > +++ b/target/mips/kvm.c
+> > @@ -245,10 +245,16 @@ int kvm_mips_set_ipi_interrupt(MIPSCPU *cpu, int
+irq, int level)
+> >      (KVM_REG_MIPS_CP0 | KVM_REG_SIZE_U64 | (8 * (_R) + (_S)))
+> >
+> >  #define KVM_REG_MIPS_CP0_INDEX          MIPS_CP0_32(0, 0)
+> > +#define KVM_REG_MIPS_CP0_RANDOM         MIPS_CP0_32(1, 0)
+> >  #define KVM_REG_MIPS_CP0_CONTEXT        MIPS_CP0_64(4, 0)
+> >  #define KVM_REG_MIPS_CP0_USERLOCAL      MIPS_CP0_64(4, 2)
+> >  #define KVM_REG_MIPS_CP0_PAGEMASK       MIPS_CP0_32(5, 0)
+> > +#define KVM_REG_MIPS_CP0_PAGEGRAIN      MIPS_CP0_32(5, 1)
+> > +#define KVM_REG_MIPS_CP0_PWBASE         MIPS_CP0_64(5, 5)
+> > +#define KVM_REG_MIPS_CP0_PWFIELD        MIPS_CP0_64(5, 6)
+> > +#define KVM_REG_MIPS_CP0_PWSIZE         MIPS_CP0_64(5, 7)
+> >  #define KVM_REG_MIPS_CP0_WIRED          MIPS_CP0_32(6, 0)
+> > +#define KVM_REG_MIPS_CP0_PWCTL          MIPS_CP0_32(6, 6)
+> >  #define KVM_REG_MIPS_CP0_HWRENA         MIPS_CP0_32(7, 0)
+> >  #define KVM_REG_MIPS_CP0_BADVADDR       MIPS_CP0_64(8, 0)
+> >  #define KVM_REG_MIPS_CP0_COUNT          MIPS_CP0_32(9, 0)
+> > @@ -258,13 +264,22 @@ int kvm_mips_set_ipi_interrupt(MIPSCPU *cpu, int
+irq, int level)
+> >  #define KVM_REG_MIPS_CP0_CAUSE          MIPS_CP0_32(13, 0)
+> >  #define KVM_REG_MIPS_CP0_EPC            MIPS_CP0_64(14, 0)
+> >  #define KVM_REG_MIPS_CP0_PRID           MIPS_CP0_32(15, 0)
+> > +#define KVM_REG_MIPS_CP0_EBASE          MIPS_CP0_64(15, 1)
+> >  #define KVM_REG_MIPS_CP0_CONFIG         MIPS_CP0_32(16, 0)
+> >  #define KVM_REG_MIPS_CP0_CONFIG1        MIPS_CP0_32(16, 1)
+> >  #define KVM_REG_MIPS_CP0_CONFIG2        MIPS_CP0_32(16, 2)
+> >  #define KVM_REG_MIPS_CP0_CONFIG3        MIPS_CP0_32(16, 3)
+> >  #define KVM_REG_MIPS_CP0_CONFIG4        MIPS_CP0_32(16, 4)
+> >  #define KVM_REG_MIPS_CP0_CONFIG5        MIPS_CP0_32(16, 5)
+> > +#define KVM_REG_MIPS_CP0_CONFIG6        MIPS_CP0_32(16, 6)
+> > +#define KVM_REG_MIPS_CP0_XCONTEXT       MIPS_CP0_64(20, 0)
+> >  #define KVM_REG_MIPS_CP0_ERROREPC       MIPS_CP0_64(30, 0)
+> > +#define KVM_REG_MIPS_CP0_KSCRATCH1      MIPS_CP0_64(31, 2)
+> > +#define KVM_REG_MIPS_CP0_KSCRATCH2      MIPS_CP0_64(31, 3)
+> > +#define KVM_REG_MIPS_CP0_KSCRATCH3      MIPS_CP0_64(31, 4)
+> > +#define KVM_REG_MIPS_CP0_KSCRATCH4      MIPS_CP0_64(31, 5)
+> > +#define KVM_REG_MIPS_CP0_KSCRATCH5      MIPS_CP0_64(31, 6)
+> > +#define KVM_REG_MIPS_CP0_KSCRATCH6      MIPS_CP0_64(31, 7)
+> >
+> >  static inline int kvm_mips_put_one_reg(CPUState *cs, uint64_t reg_id,
+> >                                         int32_t *addr)
+> > @@ -394,6 +409,29 @@ static inline int kvm_mips_get_one_ureg64(CPUState
+*cs, uint64_t reg_id,
+> >                                           (1U << CP0C5_UFE) | \
+> >                                           (1U << CP0C5_FRE) | \
+> >                                           (1U << CP0C5_UFR))
+> > +#define KVM_REG_MIPS_CP0_CONFIG6_MASK   ((1U << CP0C6_BPPASS) | \
+> > +                                         (0x3fU << CP0C6_KPOS) | \
+> > +                                         (1U << CP0C6_KE) | \
+> > +                                         (1U << CP0C6_VTLBONLY) | \
+> > +                                         (1U << CP0C6_LASX) | \
+> > +                                         (1U << CP0C6_SSEN) | \
+> > +                                         (1U << CP0C6_DISDRTIME) | \
+> > +                                         (1U << CP0C6_PIXNUEN) | \
+> > +                                         (1U << CP0C6_SCRAND) | \
+> > +                                         (1U << CP0C6_LLEXCEN) | \
+> > +                                         (1U << CP0C6_DISVC) | \
+> > +                                         (1U << CP0C6_VCLRU) | \
+> > +                                         (1U << CP0C6_DCLRU) | \
+> > +                                         (1U << CP0C6_PIXUEN) | \
+> > +                                         (1U << CP0C6_DISBLKLYEN) | \
+> > +                                         (1U << CP0C6_UMEMUALEN) | \
+> > +                                         (1U << CP0C6_SFBEN) | \
+> > +                                         (1U << CP0C6_FLTINT) | \
+> > +                                         (1U << CP0C6_VLTINT) | \
+> > +                                         (1U << CP0C6_DISBTB) | \
+> > +                                         (3U << CP0C6_STPREFCTL) | \
+> > +                                         (1U << CP0C6_INSTPREF) | \
+> > +                                         (1U << CP0C6_DATAPREF))
+>
+> It seems a lot of the defines here aren't in this commit. Was one missed?
+>
+> --
+> Alex Benn=C3=A9e
+
+--000000000000b4b1f705a7ccd6ef
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><br><br>=D1=87=D0=B5=D1=82, 11. =D1=98=D1=83=D0=BD 2020. =
+=D1=83 11:50 Alex Benn=C3=A9e &lt;<a href=3D"mailto:alex.bennee@linaro.org"=
+>alex.bennee@linaro.org</a>&gt; =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=
+=D0=B0=D0=BE/=D0=BB=D0=B0:<br>&gt;<br>&gt;<br>&gt; Aleksandar Markovic &lt;=
+<a href=3D"mailto:aleksandar.qemu.devel@gmail.com">aleksandar.qemu.devel@gm=
+ail.com</a>&gt; writes:<br>&gt;<br>&gt; &gt; From: Huacai Chen &lt;<a href=
+=3D"mailto:zltjiangshi@gmail.com">zltjiangshi@gmail.com</a>&gt;<br>&gt; &gt=
+;<br>&gt; &gt; Add more CP0 register for save/restore, including: EBase, XC=
+ontext,<br>&gt; &gt; PageGrain, PWBase, PWSize, PWField, PWCtl, Config*, KS=
+cratch1~KScratch6.<br>&gt; &gt;<br>&gt; &gt; Signed-off-by: Huacai Chen &lt=
+;<a href=3D"mailto:chenhc@lemote.com">chenhc@lemote.com</a>&gt;<br>&gt; &gt=
+; Co-developed-by: Jiaxun Yang &lt;<a href=3D"mailto:jiaxun.yang@flygoat.co=
+m">jiaxun.yang@flygoat.com</a>&gt;<br>&gt; &gt; Reviewed-by: Aleksandar Mar=
+kovic &lt;<a href=3D"mailto:aleksandar.qemu.devel@gmail.com">aleksandar.qem=
+u.devel@gmail.com</a>&gt;<br>&gt; &gt; Signed-off-by: Aleksandar Markovic &=
+lt;<a href=3D"mailto:aleksandar.qemu.devel@gmail.com">aleksandar.qemu.devel=
+@gmail.com</a>&gt;<br>&gt; &gt; Message-Id: &lt;<a href=3D"mailto:158850122=
+1-1205-6-git-send-email-chenhc@lemote.com">1588501221-1205-6-git-send-email=
+-chenhc@lemote.com</a>&gt;<br>&gt;<br>&gt; It seems while our mips cross bu=
+ild has been broken this commit has<br>&gt; caused a build regression:<br><=
+div>&gt;</div><div><br></div><div>It appears that the fix for this issue is=
+ already a part of my pull request from Tuesday evening:</div><div><br></di=
+v><div><a href=3D"https://github.com/AMarkovic/qemu/commit/af868995e1b76415=
+77300d1342ede452ef0c5565">https://github.com/AMarkovic/qemu/commit/af868995=
+e1b7641577300d1342ede452ef0c5565</a></div><div><br></div><div>There should =
+be need for any additional patch to fix the issue.</div><div><br></div><div=
+>Of course, this wouldn&#39;t have happened, if I had been more careful. My=
+ bad.</div><div><br></div><div>Hopefully everything will work without any p=
+roblems and glitches after the pull request is applied.</div><div><br></div=
+><div>Thanks,</div><div>Aleksandar<br></div><div><br></div>&gt; =C2=A0 make=
+ docker-test-build@debian-mips-cross J=3D30<br>&gt;<br>&gt; Results in:<br>=
+&gt;<br>&gt; =C2=A0 /tmp/qemu-test/src/target/mips/kvm.c: In function &#39;=
+kvm_mips_put_cp0_registers&#39;:<br>&gt; =C2=A0 /tmp/qemu-test/src/target/m=
+ips/kvm.c:412:49: error: &#39;CP0C6_BPPASS&#39; undeclared (first use in th=
+is function); did you mean &#39;CP0C3_LPA&#39;?<br>&gt; =C2=A0 =C2=A0#defin=
+e KVM_REG_MIPS_CP0_CONFIG6_MASK =C2=A0 ((1U &lt;&lt; CP0C6_BPPASS) | \<br>&=
+gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0^~~~~~~~~~~~<br>&gt; =C2=A0 /tmp/qemu=
+-test/src/target/mips/kvm.c:923:35: note: in expansion of macro &#39;KVM_RE=
+G_MIPS_CP0_CONFIG6_MASK&#39;<br>&gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0KVM_REG_MIPS_CP0_CONFIG6_MASK);<br>&gt; =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0^~~~~~~~~~~~~~~~~~~~~~~~~~~~~<=
+br>&gt; =C2=A0 /tmp/qemu-test/src/target/mips/kvm.c:412:49: note: each unde=
+clared identifier is reported only once for each function it appears in<br>=
+&gt; =C2=A0 =C2=A0#define KVM_REG_MIPS_CP0_CONFIG6_MASK =C2=A0 ((1U &lt;&lt=
+; CP0C6_BPPASS) | \<br>&gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0^~~~~~~~~~~~<=
+br>&gt; =C2=A0 /tmp/qemu-test/src/target/mips/kvm.c:923:35: note: in expans=
+ion of macro &#39;KVM_REG_MIPS_CP0_CONFIG6_MASK&#39;<br>&gt; =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0KVM_REG_MIPS_CP0_CONFIG6_MASK)=
+;<br>&gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0^~~~~~=
+~~~~~~~~~~~~~~~~~~~~~~~<br>&gt; =C2=A0 /tmp/qemu-test/src/target/mips/kvm.c=
+:413:52: error: &#39;CP0C6_KPOS&#39; undeclared (first use in this function=
+); did you mean &#39;CP0C3_IPLV&#39;?<br>&gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 (0x3fU &lt;&lt; CP0C6_=
+KPOS) | \<br>&gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ^~~~~~~~~~<br>&=
+gt; =C2=A0 /tmp/qemu-test/src/target/mips/kvm.c:923:35: note: in expansion =
+of macro &#39;KVM_REG_MIPS_CP0_CONFIG6_MASK&#39;<br>&gt; =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0KVM_REG_MIPS_CP0_CONFIG6_MASK);<br=
+>&gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0^~~~~~~~~~~~=
+~~~~~~~~~~~~~~~~~<br>&gt; =C2=A0 /tmp/qemu-test/src/target/mips/kvm.c:414:4=
+9: error: &#39;CP0C6_KE&#39; undeclared (first use in this function); did y=
+ou mean &#39;CP0C4_AE&#39;?<br>&gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 (1U &lt;&lt; CP0C6_KE) | \<br>&gt=
+; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0^~~~~~~~<br>&gt; =C2=A0 /tmp/qemu-test/sr=
+c/target/mips/kvm.c:923:35: note: in expansion of macro &#39;KVM_REG_MIPS_C=
+P0_CONFIG6_MASK&#39;<br>&gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0KVM_REG_MIPS_CP0_CONFIG6_MASK);<br>&gt;<br>&gt;<br>&gt; &gt; -=
+--<br>&gt; &gt; =C2=A0target/mips/kvm.c =C2=A0 =C2=A0 | 212 +++++++++++++++=
++++++++++++++++++++++++++++++++++++<br>&gt; &gt; =C2=A0target/mips/machine.=
+c | =C2=A0 6 +-<br>&gt; &gt; =C2=A02 files changed, 216 insertions(+), 2 de=
+letions(-)<br>&gt; &gt;<br>&gt; &gt; diff --git a/target/mips/kvm.c b/targe=
+t/mips/kvm.c<br>&gt; &gt; index de3e26e..96cfa10 100644<br>&gt; &gt; --- a/=
+target/mips/kvm.c<br>&gt; &gt; +++ b/target/mips/kvm.c<br>&gt; &gt; @@ -245=
+,10 +245,16 @@ int kvm_mips_set_ipi_interrupt(MIPSCPU *cpu, int irq, int le=
+vel)<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0(KVM_REG_MIPS_CP0 | KVM_REG_SIZE_U64 =
+| (8 * (_R) + (_S)))<br>&gt; &gt; <br>&gt; &gt; =C2=A0#define KVM_REG_MIPS_=
+CP0_INDEX =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0MIPS_CP0_32(0, 0)<br>&gt; &gt; =
++#define KVM_REG_MIPS_CP0_RANDOM =C2=A0 =C2=A0 =C2=A0 =C2=A0 MIPS_CP0_32(1,=
+ 0)<br>&gt; &gt; =C2=A0#define KVM_REG_MIPS_CP0_CONTEXT =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0MIPS_CP0_64(4, 0)<br>&gt; &gt; =C2=A0#define KVM_REG_MIPS_CP0_USE=
+RLOCAL =C2=A0 =C2=A0 =C2=A0MIPS_CP0_64(4, 2)<br>&gt; &gt; =C2=A0#define KVM=
+_REG_MIPS_CP0_PAGEMASK =C2=A0 =C2=A0 =C2=A0 MIPS_CP0_32(5, 0)<br>&gt; &gt; =
++#define KVM_REG_MIPS_CP0_PAGEGRAIN =C2=A0 =C2=A0 =C2=A0MIPS_CP0_32(5, 1)<b=
+r>&gt; &gt; +#define KVM_REG_MIPS_CP0_PWBASE =C2=A0 =C2=A0 =C2=A0 =C2=A0 MI=
+PS_CP0_64(5, 5)<br>&gt; &gt; +#define KVM_REG_MIPS_CP0_PWFIELD =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0MIPS_CP0_64(5, 6)<br>&gt; &gt; +#define KVM_REG_MIPS_CP0_P=
+WSIZE =C2=A0 =C2=A0 =C2=A0 =C2=A0 MIPS_CP0_64(5, 7)<br>&gt; &gt; =C2=A0#def=
+ine KVM_REG_MIPS_CP0_WIRED =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0MIPS_CP0_32(6,=
+ 0)<br>&gt; &gt; +#define KVM_REG_MIPS_CP0_PWCTL =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0MIPS_CP0_32(6, 6)<br>&gt; &gt; =C2=A0#define KVM_REG_MIPS_CP0_HWR=
+ENA =C2=A0 =C2=A0 =C2=A0 =C2=A0 MIPS_CP0_32(7, 0)<br>&gt; &gt; =C2=A0#defin=
+e KVM_REG_MIPS_CP0_BADVADDR =C2=A0 =C2=A0 =C2=A0 MIPS_CP0_64(8, 0)<br>&gt; =
+&gt; =C2=A0#define KVM_REG_MIPS_CP0_COUNT =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0MIPS_CP0_32(9, 0)<br>&gt; &gt; @@ -258,13 +264,22 @@ int kvm_mips_set_ip=
+i_interrupt(MIPSCPU *cpu, int irq, int level)<br>&gt; &gt; =C2=A0#define KV=
+M_REG_MIPS_CP0_CAUSE =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0MIPS_CP0_32(13, 0)<b=
+r>&gt; &gt; =C2=A0#define KVM_REG_MIPS_CP0_EPC =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0MIPS_CP0_64(14, 0)<br>&gt; &gt; =C2=A0#define KVM_REG_MIPS_CP0=
+_PRID =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 MIPS_CP0_32(15, 0)<br>&gt; &gt; +#=
+define KVM_REG_MIPS_CP0_EBASE =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0MIPS_CP0_64=
+(15, 1)<br>&gt; &gt; =C2=A0#define KVM_REG_MIPS_CP0_CONFIG =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 MIPS_CP0_32(16, 0)<br>&gt; &gt; =C2=A0#define KVM_REG_MIPS_CP=
+0_CONFIG1 =C2=A0 =C2=A0 =C2=A0 =C2=A0MIPS_CP0_32(16, 1)<br>&gt; &gt; =C2=A0=
+#define KVM_REG_MIPS_CP0_CONFIG2 =C2=A0 =C2=A0 =C2=A0 =C2=A0MIPS_CP0_32(16,=
+ 2)<br>&gt; &gt; =C2=A0#define KVM_REG_MIPS_CP0_CONFIG3 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0MIPS_CP0_32(16, 3)<br>&gt; &gt; =C2=A0#define KVM_REG_MIPS_CP0_CO=
+NFIG4 =C2=A0 =C2=A0 =C2=A0 =C2=A0MIPS_CP0_32(16, 4)<br>&gt; &gt; =C2=A0#def=
+ine KVM_REG_MIPS_CP0_CONFIG5 =C2=A0 =C2=A0 =C2=A0 =C2=A0MIPS_CP0_32(16, 5)<=
+br>&gt; &gt; +#define KVM_REG_MIPS_CP0_CONFIG6 =C2=A0 =C2=A0 =C2=A0 =C2=A0M=
+IPS_CP0_32(16, 6)<br>&gt; &gt; +#define KVM_REG_MIPS_CP0_XCONTEXT =C2=A0 =
+=C2=A0 =C2=A0 MIPS_CP0_64(20, 0)<br>&gt; &gt; =C2=A0#define KVM_REG_MIPS_CP=
+0_ERROREPC =C2=A0 =C2=A0 =C2=A0 MIPS_CP0_64(30, 0)<br>&gt; &gt; +#define KV=
+M_REG_MIPS_CP0_KSCRATCH1 =C2=A0 =C2=A0 =C2=A0MIPS_CP0_64(31, 2)<br>&gt; &gt=
+; +#define KVM_REG_MIPS_CP0_KSCRATCH2 =C2=A0 =C2=A0 =C2=A0MIPS_CP0_64(31, 3=
+)<br>&gt; &gt; +#define KVM_REG_MIPS_CP0_KSCRATCH3 =C2=A0 =C2=A0 =C2=A0MIPS=
+_CP0_64(31, 4)<br>&gt; &gt; +#define KVM_REG_MIPS_CP0_KSCRATCH4 =C2=A0 =C2=
+=A0 =C2=A0MIPS_CP0_64(31, 5)<br>&gt; &gt; +#define KVM_REG_MIPS_CP0_KSCRATC=
+H5 =C2=A0 =C2=A0 =C2=A0MIPS_CP0_64(31, 6)<br>&gt; &gt; +#define KVM_REG_MIP=
+S_CP0_KSCRATCH6 =C2=A0 =C2=A0 =C2=A0MIPS_CP0_64(31, 7)<br>&gt; &gt; <br>&gt=
+; &gt; =C2=A0static inline int kvm_mips_put_one_reg(CPUState *cs, uint64_t =
+reg_id,<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 int32_t *addr)<br>&gt; &gt; @@ -394,6 +409,29 @@ static inlin=
+e int kvm_mips_get_one_ureg64(CPUState *cs, uint64_t reg_id,<br>&gt; &gt; =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 (=
+1U &lt;&lt; CP0C5_UFE) | \<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 (1U &lt;&lt; CP0C5_FRE) | \<br>&gt; =
+&gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 (1U &lt;&lt; CP0C5_UFR))<br>&gt; &gt; +#define KVM_REG_MIPS_CP0_CONFIG6=
+_MASK =C2=A0 ((1U &lt;&lt; CP0C6_BPPASS) | \<br>&gt; &gt; + =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 (0x3fU &lt;&lt; CP0C6_=
+KPOS) | \<br>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 (1U &lt;&lt; CP0C6_KE) | \<br>&gt; &gt; + =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 (1U &lt;&lt; CP0C6_VTL=
+BONLY) | \<br>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 (1U &lt;&lt; CP0C6_LASX) | \<br>&gt; &gt; + =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 (1U &lt;&lt; CP0C6_SSE=
+N) | \<br>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 (1U &lt;&lt; CP0C6_DISDRTIME) | \<br>&gt; &gt; + =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 (1U &lt;&lt; CP0C6_=
+PIXNUEN) | \<br>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 (1U &lt;&lt; CP0C6_SCRAND) | \<br>&gt; &gt; + =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 (1U &lt;&lt; CP=
+0C6_LLEXCEN) | \<br>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 (1U &lt;&lt; CP0C6_DISVC) | \<br>&gt; &gt; + =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 (1U &lt;&lt;=
+ CP0C6_VCLRU) | \<br>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 (1U &lt;&lt; CP0C6_DCLRU) | \<br>&gt; &gt; + =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 (1U &lt;&lt;=
+ CP0C6_PIXUEN) | \<br>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 (1U &lt;&lt; CP0C6_DISBLKLYEN) | \<br>&gt; &gt; + =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 (1U &lt;=
+&lt; CP0C6_UMEMUALEN) | \<br>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 (1U &lt;&lt; CP0C6_SFBEN) | \<br>&gt; &gt; =
++ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 (1U &lt;=
+&lt; CP0C6_FLTINT) | \<br>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 (1U &lt;&lt; CP0C6_VLTINT) | \<br>&gt; &gt;=
+ + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 (1U &=
+lt;&lt; CP0C6_DISBTB) | \<br>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 (3U &lt;&lt; CP0C6_STPREFCTL) | \<br>&gt; &=
+gt; + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 (1U =
+&lt;&lt; CP0C6_INSTPREF) | \<br>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 (1U &lt;&lt; CP0C6_DATAPREF))<br>&gt;<br=
+>&gt; It seems a lot of the defines here aren&#39;t in this commit. Was one=
+ missed?<br>&gt;<br>&gt; --<br>&gt; Alex Benn=C3=A9e</div>
+
+--000000000000b4b1f705a7ccd6ef--
 
