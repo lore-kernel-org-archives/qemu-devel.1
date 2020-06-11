@@ -2,96 +2,144 @@ Return-Path: <SRS0=U615=7Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4104C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 09:51:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B899C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 09:52:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8AB1E20656
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 09:51:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CA73220656
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 09:52:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zzPKDuqN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8AB1E20656
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L3PN/pze"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA73220656
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39950 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42124 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjJrf-0007yy-SS
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 05:51:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38314)
+	id 1jjJsb-0000h1-3i
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 05:52:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38828)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jjJqw-0007YG-5b
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 05:50:30 -0400
-Received: from mail-wm1-x32f.google.com ([2a00:1450:4864:20::32f]:51300)
- by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jjJqu-0001S6-S2
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 05:50:29 -0400
-Received: by mail-wm1-x32f.google.com with SMTP id u13so4384093wml.1
- for <qemu-devel@nongnu.org>; Thu, 11 Jun 2020 02:50:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=X0SVFBD78fLbKhaKNWJwY01qaBtpmAjglqTvJa24q4Q=;
- b=zzPKDuqNK764EddlwGhBsiSaPZHJ8t8QWt7ZG0nJfiIBhjzOLF16U0rlVhMnyI7kF0
- MS3Zi47jEKGNrBHcyomUMH8wMHIiKPW5wnPTU1ERIq59bZd1cm6A5f+2SzzvZJqIQgde
- 90A8USMoc+3t3eQsXNSBk9q2Qi1UAjXpM4yIFyh/pHNVDp3GnUXTB/WVHFXPI81Mshht
- f3P9aTDUg5V3NYYCzKfMlxGIUhcfVeWZKIEWz897EUickHyxeRr/QD5az7WnymDrXL3D
- idS3AZH4esTxrj6F5JmrhYH+AhPYaEhWerzWWQyqp/fm75OtqtU6HxLVMRWgvanPMWT2
- Kpew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=X0SVFBD78fLbKhaKNWJwY01qaBtpmAjglqTvJa24q4Q=;
- b=qkXgJBPJb7pz4tnSxnQCLkOLoIKHw+3yswzYA5hHPmej+hYazNBveMYzFD6HtDkh14
- Cm/T1mDeRdc7b3/XaZRFFlrs3eBgIkmTCcIAsMzH0tQ3pQ3qYoGpJiB2ojRu18XNq0Rm
- NFQWHvd0Uk+Onk31mnuOb2DgPgNAv3Gb4KqnFSTbId1V/r02D3aX/S5mEMhETprppbBn
- /C/5y/mu0DAxJ/aOlXjYLWPomHEcALFw0jHNaL5Jk4Czipsn/6Bo7v3G3o9UbWIQdDAF
- lbIDwSITRyuelQIiThu1EjxLQAjOFuKjkHsu8pF/foBkagzf5EwJzbAWQmqtI/l7s7bB
- 5UcA==
-X-Gm-Message-State: AOAM532vS7GwDm6hLjTAAgQiRYSUUckYC00/kXjqEDdsjOKMMpnKRxQO
- a16nUsf8Toh7R/UplMp+dudOhg==
-X-Google-Smtp-Source: ABdhPJyuV1GcJpI90dvNBSThYNT3WhzHEMDev6yr8t3fvvDViAjEHglv7FO/gCiUkJM3f8sMZbOTjg==
-X-Received: by 2002:a1c:1fc2:: with SMTP id f185mr7375759wmf.4.1591869020713; 
- Thu, 11 Jun 2020 02:50:20 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id e15sm3416191wme.9.2020.06.11.02.50.19
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 11 Jun 2020 02:50:19 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 636911FF7E;
- Thu, 11 Jun 2020 10:50:18 +0100 (BST)
-References: <1591015405-19651-1-git-send-email-aleksandar.qemu.devel@gmail.com>
- <1591015405-19651-5-git-send-email-aleksandar.qemu.devel@gmail.com>
-User-agent: mu4e 1.5.2; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Subject: Re: [PULL 4/6] target/mips: Add more CP0 register for save/restore
-In-reply-to: <1591015405-19651-5-git-send-email-aleksandar.qemu.devel@gmail.com>
-Date: Thu, 11 Jun 2020 10:50:18 +0100
-Message-ID: <87h7vi3p9h.fsf@linaro.org>
+ (Exim 4.90_1) (envelope-from <lvivier@redhat.com>)
+ id 1jjJrZ-00082Q-N2
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 05:51:09 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:59223
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <lvivier@redhat.com>)
+ id 1jjJrV-0001zz-DR
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 05:51:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591869063;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=MGl6avya21D4WaRyuPV7Ci+a0i7jlHqGsFw6mzkcmfo=;
+ b=L3PN/pzek1VxnSn96sMQd63a1rTyUT0FjcPBK0vT3zdsbuDCVKBgDcZ1NynD1djibke5KD
+ q4lnoZpCtx23c5G6ZzHX9uYO8JsLz6+oEBL31zYXcw23iW//IjOwb3+YYJUxnM5AB8cCyP
+ Hj/D4bzxUFPlnMHiri2MkKGNwe2Ae9A=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-205-l6ZQpoP2Ou-siFwFNHaYeg-1; Thu, 11 Jun 2020 05:51:02 -0400
+X-MC-Unique: l6ZQpoP2Ou-siFwFNHaYeg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C7AE58015CB;
+ Thu, 11 Jun 2020 09:51:00 +0000 (UTC)
+Received: from [10.36.113.1] (ovpn-113-1.ams2.redhat.com [10.36.113.1])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D43288FF61;
+ Thu, 11 Jun 2020 09:50:58 +0000 (UTC)
+Subject: Re: [PATCH v2 2/3] spapr: Use error_append_hint() in spapr_caps.c
+To: Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+References: <159186635896.48605.3457464705220760573.stgit@bahia.lan>
+ <159186660024.48605.6756496231687601694.stgit@bahia.lan>
+From: Laurent Vivier <lvivier@redhat.com>
+Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ D+Ofp0T3KOr1RUHvCZoLURfFhSQ=
+Message-ID: <deb1914f-f476-18e3-10f8-2a4aa0a1dddd@redhat.com>
+Date: Thu, 11 Jun 2020 11:50:57 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
+In-Reply-To: <159186660024.48605.6756496231687601694.stgit@bahia.lan>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::32f;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x32f.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=lvivier@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 03:29:35
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -104,150 +152,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-Aleksandar Markovic <aleksandar.qemu.devel@gmail.com> writes:
-
-> From: Huacai Chen <zltjiangshi@gmail.com>
->
-> Add more CP0 register for save/restore, including: EBase, XContext,
-> PageGrain, PWBase, PWSize, PWField, PWCtl, Config*, KScratch1~KScratch6.
->
-> Signed-off-by: Huacai Chen <chenhc@lemote.com>
-> Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
-> Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-> Signed-off-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-> Message-Id: <1588501221-1205-6-git-send-email-chenhc@lemote.com>
-
-It seems while our mips cross build has been broken this commit has
-caused a build regression:
-
-  make docker-test-build@debian-mips-cross J=3D30
-
-Results in:
-
-  /tmp/qemu-test/src/target/mips/kvm.c: In function 'kvm_mips_put_cp0_regis=
-ters':
-  /tmp/qemu-test/src/target/mips/kvm.c:412:49: error: 'CP0C6_BPPASS' undecl=
-ared (first use in this function); did you mean 'CP0C3_LPA'?
-   #define KVM_REG_MIPS_CP0_CONFIG6_MASK   ((1U << CP0C6_BPPASS) | \
-                                                   ^~~~~~~~~~~~
-  /tmp/qemu-test/src/target/mips/kvm.c:923:35: note: in expansion of macro =
-'KVM_REG_MIPS_CP0_CONFIG6_MASK'
-                                     KVM_REG_MIPS_CP0_CONFIG6_MASK);
-                                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  /tmp/qemu-test/src/target/mips/kvm.c:412:49: note: each undeclared identi=
-fier is reported only once for each function it appears in
-   #define KVM_REG_MIPS_CP0_CONFIG6_MASK   ((1U << CP0C6_BPPASS) | \
-                                                   ^~~~~~~~~~~~
-  /tmp/qemu-test/src/target/mips/kvm.c:923:35: note: in expansion of macro =
-'KVM_REG_MIPS_CP0_CONFIG6_MASK'
-                                     KVM_REG_MIPS_CP0_CONFIG6_MASK);
-                                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  /tmp/qemu-test/src/target/mips/kvm.c:413:52: error: 'CP0C6_KPOS' undeclar=
-ed (first use in this function); did you mean 'CP0C3_IPLV'?
-                                            (0x3fU << CP0C6_KPOS) | \
-                                                      ^~~~~~~~~~
-  /tmp/qemu-test/src/target/mips/kvm.c:923:35: note: in expansion of macro =
-'KVM_REG_MIPS_CP0_CONFIG6_MASK'
-                                     KVM_REG_MIPS_CP0_CONFIG6_MASK);
-                                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  /tmp/qemu-test/src/target/mips/kvm.c:414:49: error: 'CP0C6_KE' undeclared=
- (first use in this function); did you mean 'CP0C4_AE'?
-                                            (1U << CP0C6_KE) | \
-                                                   ^~~~~~~~
-  /tmp/qemu-test/src/target/mips/kvm.c:923:35: note: in expansion of macro =
-'KVM_REG_MIPS_CP0_CONFIG6_MASK'
-                                     KVM_REG_MIPS_CP0_CONFIG6_MASK);
-
-
+On 11/06/2020 11:10, Greg Kurz wrote:
+> We have a dedicated error API for hints. Use it instead of embedding
+> the hint in the error message, as recommanded in the "qapi/error.h"
+> header file.
+> 
+> Since spapr_caps_apply() passes &error_fatal, all functions must
+> also call the ERRP_AUTO_PROPAGATE() macro for error_append_hint()
+> to be functional.
+> 
+> While here, add some missing braces around one line statements that
+> are part of the patch context. Also have cap_fwnmi_apply(), which
+> already uses error_append_hint() to call ERRP_AUTO_PROPAGATE() as
+> well.
+> 
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 > ---
->  target/mips/kvm.c     | 212 ++++++++++++++++++++++++++++++++++++++++++++=
-++++++
->  target/mips/machine.c |   6 +-
->  2 files changed, 216 insertions(+), 2 deletions(-)
->
-> diff --git a/target/mips/kvm.c b/target/mips/kvm.c
-> index de3e26e..96cfa10 100644
-> --- a/target/mips/kvm.c
-> +++ b/target/mips/kvm.c
-> @@ -245,10 +245,16 @@ int kvm_mips_set_ipi_interrupt(MIPSCPU *cpu, int ir=
-q, int level)
->      (KVM_REG_MIPS_CP0 | KVM_REG_SIZE_U64 | (8 * (_R) + (_S)))
->=20=20
->  #define KVM_REG_MIPS_CP0_INDEX          MIPS_CP0_32(0, 0)
-> +#define KVM_REG_MIPS_CP0_RANDOM         MIPS_CP0_32(1, 0)
->  #define KVM_REG_MIPS_CP0_CONTEXT        MIPS_CP0_64(4, 0)
->  #define KVM_REG_MIPS_CP0_USERLOCAL      MIPS_CP0_64(4, 2)
->  #define KVM_REG_MIPS_CP0_PAGEMASK       MIPS_CP0_32(5, 0)
-> +#define KVM_REG_MIPS_CP0_PAGEGRAIN      MIPS_CP0_32(5, 1)
-> +#define KVM_REG_MIPS_CP0_PWBASE         MIPS_CP0_64(5, 5)
-> +#define KVM_REG_MIPS_CP0_PWFIELD        MIPS_CP0_64(5, 6)
-> +#define KVM_REG_MIPS_CP0_PWSIZE         MIPS_CP0_64(5, 7)
->  #define KVM_REG_MIPS_CP0_WIRED          MIPS_CP0_32(6, 0)
-> +#define KVM_REG_MIPS_CP0_PWCTL          MIPS_CP0_32(6, 6)
->  #define KVM_REG_MIPS_CP0_HWRENA         MIPS_CP0_32(7, 0)
->  #define KVM_REG_MIPS_CP0_BADVADDR       MIPS_CP0_64(8, 0)
->  #define KVM_REG_MIPS_CP0_COUNT          MIPS_CP0_32(9, 0)
-> @@ -258,13 +264,22 @@ int kvm_mips_set_ipi_interrupt(MIPSCPU *cpu, int ir=
-q, int level)
->  #define KVM_REG_MIPS_CP0_CAUSE          MIPS_CP0_32(13, 0)
->  #define KVM_REG_MIPS_CP0_EPC            MIPS_CP0_64(14, 0)
->  #define KVM_REG_MIPS_CP0_PRID           MIPS_CP0_32(15, 0)
-> +#define KVM_REG_MIPS_CP0_EBASE          MIPS_CP0_64(15, 1)
->  #define KVM_REG_MIPS_CP0_CONFIG         MIPS_CP0_32(16, 0)
->  #define KVM_REG_MIPS_CP0_CONFIG1        MIPS_CP0_32(16, 1)
->  #define KVM_REG_MIPS_CP0_CONFIG2        MIPS_CP0_32(16, 2)
->  #define KVM_REG_MIPS_CP0_CONFIG3        MIPS_CP0_32(16, 3)
->  #define KVM_REG_MIPS_CP0_CONFIG4        MIPS_CP0_32(16, 4)
->  #define KVM_REG_MIPS_CP0_CONFIG5        MIPS_CP0_32(16, 5)
-> +#define KVM_REG_MIPS_CP0_CONFIG6        MIPS_CP0_32(16, 6)
-> +#define KVM_REG_MIPS_CP0_XCONTEXT       MIPS_CP0_64(20, 0)
->  #define KVM_REG_MIPS_CP0_ERROREPC       MIPS_CP0_64(30, 0)
-> +#define KVM_REG_MIPS_CP0_KSCRATCH1      MIPS_CP0_64(31, 2)
-> +#define KVM_REG_MIPS_CP0_KSCRATCH2      MIPS_CP0_64(31, 3)
-> +#define KVM_REG_MIPS_CP0_KSCRATCH3      MIPS_CP0_64(31, 4)
-> +#define KVM_REG_MIPS_CP0_KSCRATCH4      MIPS_CP0_64(31, 5)
-> +#define KVM_REG_MIPS_CP0_KSCRATCH5      MIPS_CP0_64(31, 6)
-> +#define KVM_REG_MIPS_CP0_KSCRATCH6      MIPS_CP0_64(31, 7)
->=20=20
->  static inline int kvm_mips_put_one_reg(CPUState *cs, uint64_t reg_id,
->                                         int32_t *addr)
-> @@ -394,6 +409,29 @@ static inline int kvm_mips_get_one_ureg64(CPUState *=
-cs, uint64_t reg_id,
->                                           (1U << CP0C5_UFE) | \
->                                           (1U << CP0C5_FRE) | \
->                                           (1U << CP0C5_UFR))
-> +#define KVM_REG_MIPS_CP0_CONFIG6_MASK   ((1U << CP0C6_BPPASS) | \
-> +                                         (0x3fU << CP0C6_KPOS) | \
-> +                                         (1U << CP0C6_KE) | \
-> +                                         (1U << CP0C6_VTLBONLY) | \
-> +                                         (1U << CP0C6_LASX) | \
-> +                                         (1U << CP0C6_SSEN) | \
-> +                                         (1U << CP0C6_DISDRTIME) | \
-> +                                         (1U << CP0C6_PIXNUEN) | \
-> +                                         (1U << CP0C6_SCRAND) | \
-> +                                         (1U << CP0C6_LLEXCEN) | \
-> +                                         (1U << CP0C6_DISVC) | \
-> +                                         (1U << CP0C6_VCLRU) | \
-> +                                         (1U << CP0C6_DCLRU) | \
-> +                                         (1U << CP0C6_PIXUEN) | \
-> +                                         (1U << CP0C6_DISBLKLYEN) | \
-> +                                         (1U << CP0C6_UMEMUALEN) | \
-> +                                         (1U << CP0C6_SFBEN) | \
-> +                                         (1U << CP0C6_FLTINT) | \
-> +                                         (1U << CP0C6_VLTINT) | \
-> +                                         (1U << CP0C6_DISBTB) | \
-> +                                         (3U << CP0C6_STPREFCTL) | \
-> +                                         (1U << CP0C6_INSTPREF) | \
-> +                                         (1U << CP0C6_DATAPREF))
+>  hw/ppc/spapr_caps.c |   95 +++++++++++++++++++++++++++++----------------------
+>  1 file changed, 54 insertions(+), 41 deletions(-)
+> 
+> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+> index efdc0dbbcfc0..2cb7ba8f005a 100644
+> --- a/hw/ppc/spapr_caps.c
+> +++ b/hw/ppc/spapr_caps.c
+...
+> @@ -248,6 +249,7 @@ SpaprCapPossible cap_cfpc_possible = {
+>  static void cap_safe_cache_apply(SpaprMachineState *spapr, uint8_t val,
+>                                   Error **errp)
+>  {
+> +    ERRP_AUTO_PROPAGATE();
+>      Error *local_err = NULL;
 
-It seems a lot of the defines here aren't in this commit. Was one missed?
+I think you should rename it, something like "local_warn" to not be
+confused with the _auto_errp_prop.local_err...
 
---=20
-Alex Benn=C3=A9e
+or don't use ERRP_AUTO_PROPAGE(), use the local_err instead and move the
+warning inside the braces of the if.
+
+Same comment for cap_safe_bounds_check_apply() and
+cap_safe_indirect_branch_apply()
+
+>      uint8_t kvm_val =  kvmppc_get_cap_safe_cache();
+>  
+> @@ -258,13 +260,14 @@ static void cap_safe_cache_apply(SpaprMachineState *spapr, uint8_t val,
+>                     cap_cfpc_possible.vals[val]);
+>      } else if (kvm_enabled() && (val > kvm_val)) {
+>          error_setg(errp,
+> -                   "Requested safe cache capability level not supported by kvm,"
+> -                   " try appending -machine cap-cfpc=%s",
+> -                   cap_cfpc_possible.vals[kvm_val]);
+> +                   "Requested safe cache capability level not supported by KVM");
+> +        error_append_hint(errp, "Try appending -machine cap-cfpc=%s\n",
+> +                          cap_cfpc_possible.vals[kvm_val]);
+>      }
+>  
+> -    if (local_err != NULL)
+> +    if (local_err != NULL) {
+>          warn_report_err(local_err);
+> +    }
+>  }
+>  
+>  SpaprCapPossible cap_sbbc_possible = {
+
+Thanks,
+Laurent
+
 
