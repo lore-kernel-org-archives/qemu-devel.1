@@ -8,77 +8,78 @@ X-Spam-Status: No, score=-17.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D585BC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 22:36:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF179C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 22:37:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D3B1206D7
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 22:36:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7BF272073E
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 22:37:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YmisMpAe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D3B1206D7
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iCKQe0pM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7BF272073E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45456 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49106 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjVoO-0004Qf-NL
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 18:36:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33788)
+	id 1jjVpD-0006hO-Kj
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 18:37:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34012)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from
- <3i7DiXgsKCnQZkcaffWegWfYggYdW.UgeiWem-VWnWdfgfYfm.gjY@flex--hskinnemoen.bounces.google.com>)
- id 1jjVig-0003vg-De
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 18:30:46 -0400
-Received: from mail-yb1-xb49.google.com ([2607:f8b0:4864:20::b49]:51381)
+ <3krDiXgsKCnsgrjhmmdlndmfnnfkd.bnlpdlt-cdudkmnmfmt.nqf@flex--hskinnemoen.bounces.google.com>)
+ id 1jjVim-00044X-2h
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 18:30:52 -0400
+Received: from mail-yb1-xb4a.google.com ([2607:f8b0:4864:20::b4a]:32889)
  by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from
- <3i7DiXgsKCnQZkcaffWegWfYggYdW.UgeiWem-VWnWdfgfYfm.gjY@flex--hskinnemoen.bounces.google.com>)
- id 1jjVic-00045a-Kn
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 18:30:46 -0400
-Received: by mail-yb1-xb49.google.com with SMTP id k186so8228811yba.18
- for <qemu-devel@nongnu.org>; Thu, 11 Jun 2020 15:30:35 -0700 (PDT)
+ <3krDiXgsKCnsgrjhmmdlndmfnnfkd.bnlpdlt-cdudkmnmfmt.nqf@flex--hskinnemoen.bounces.google.com>)
+ id 1jjVij-0004An-K0
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 18:30:51 -0400
+Received: by mail-yb1-xb4a.google.com with SMTP id o84so8330222ybg.0
+ for <qemu-devel@nongnu.org>; Thu, 11 Jun 2020 15:30:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=ykRkitKWRD8tjUP9lBVNVHQX+rR9uM3NWilJcbFNZ1U=;
- b=YmisMpAe2SsvxQREIyRILU+H+w5NBx+08vhQ/cORxbyoT4VzPZME71K643zWYq8uZx
- jNC2KXm+JmshM7+AU010vaewaKSja5ehZv5MUxA6HevFjKrAjCC04wTPVun5NGjvETq9
- SoXULusdtOP4BN+2gDwOdqU3G36WtBCnLEE89FqyAkX7Hw4RQNrXRGHophZkRmNs8lY9
- 4HN/NTGcgvZasCBI5VmZcZx/fAEgE4S1PWXZiZqd3XnFpK2wonHF0axRo8kmp8+fjA+f
- c79Sn2H64Ll6o+YW1a/4AqmU+H4eJpdKtPkdGRomk/JaDss0fo1xaMR99VznrYANRXOj
- iWVw==
+ :cc; bh=i4tv8xxRdBtrus7+nTWEmLZQCTSTfD0hL1Td9tmJuSs=;
+ b=iCKQe0pMTCc8VwHEObS4C0isTsuCvbl/3GXC73vCI0JoXY6e87IM2kM7op2Yvmw4kF
+ BmBlqR75En7GGp5+kZU97UFknKZAOYz31V5nU1sN/RzfVOSb6tz2AlSaqtNGgARtwgn0
+ uXnELIpmMqJfZJgd3+lUyeoPrZ7S7SWvjwIk5ma30t/IkiQtoBChxNUIdj18k/V9EY/j
+ VSAU7qpOZqW6USQl0KKEd00LSDGAIlKEfYl8HZNyPvOClGE6ZR73y/IdVj5ziJN3ylgO
+ T6OVcH7skvdii6YJFHOvZs0RgxJ+6Kf/pzdt09dNgUHHeXQXSQb8PVhDSllL88Mf0DlZ
+ KxsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=ykRkitKWRD8tjUP9lBVNVHQX+rR9uM3NWilJcbFNZ1U=;
- b=iFHaJ5mjbzDT6yXyRBcpUhzupiv/smXxCbhoYpX6q7vfWW700JQosPztiF3j+sfzKL
- 32HeVnXMOe4tuYkCvaBBo3iA5GoxuGgLLtkZMhAuZOzv+/Lqb9VecPmh5eHmPmXAd0Y9
- mopuNhlzOc4h5Gq26WKQw+2f0VmQm+0Bibp3xQUqteZZ+Y3dMhN4MfIbdkWZgnVlAuyO
- HikCpMDe2WKqQINC1xKj+TCWKWPLdmCbwKPtQ3Mz9Nwjie4UPSdyLQRRo5JBFcKvl8On
- RU9qmVOEvHbivdAuE2VhxmGt8Cca92rNJnlp0PfAEk11wVH98V0BK9On9Yis1I+2iPQW
- NyPg==
-X-Gm-Message-State: AOAM533uvvEI0DfDZtib6fGi6PTEAh/+BzfF/8M+9xZdzkhu8bUh44EJ
- 6ZC4k4N+/Q7ptu4vNaw86wp8Xcm+u4ZrQHIROA==
-X-Google-Smtp-Source: ABdhPJwFLrcKPFox2HEK0CmaVkTnudaDCK7gVuXV+QL4DTPqZi/66eyo8A7vWF/7dFwyEImfSX/Y30sXPOGdO97uSw==
-X-Received: by 2002:a25:14d5:: with SMTP id 204mr18474873ybu.446.1591914635183; 
- Thu, 11 Jun 2020 15:30:35 -0700 (PDT)
-Date: Thu, 11 Jun 2020 15:30:08 -0700
+ bh=i4tv8xxRdBtrus7+nTWEmLZQCTSTfD0hL1Td9tmJuSs=;
+ b=FBG+EU2Si3M1i0oi5I3e9lDaJLtBjob6cH3YE5qtdyS8nxxy98kDoOND/1/E+KPmIE
+ HL2a3YqxMDLdvwCq5Jji2Oku1Pk3U0Vbr8EqIMKZFPyUzRcpOTQBQNRaDhc9dendDhQz
+ 5V0TXwIFnJUXkPwLyeL6UEYRc+GCDk2i1RbSqvir1RCfPlTIVxRR+TUDQ7J2q0nP6h8L
+ tilpdODseA4RqfttP6vwcc7IuXGLIsShO5ut8pQG2zItwaKabDlyo5YLr5QrJVR6BmlK
+ flhHon8cJdf8yINXueuNLu8x/8ZqRurHc2yfO3LVYgq/xqhkMxnxbsq2OMnVj0cEtjWv
+ 62jQ==
+X-Gm-Message-State: AOAM531XVXA1yv2ULh220gqWuw1BdMqxNsgu8MYUAvtfaxeS7Eh+V3m9
+ OCaryYvgShsDvq1xTc6uwI63Sb+mHbaX6mQL6g==
+X-Google-Smtp-Source: ABdhPJyJSTR0kubUFkz3NG+ZFJgeJDe7sWQzeLtBUM2V1SLvfEC5Usn1Grh9so0TWw+3xKAmb6ogfsiKLrdFzuipvQ==
+X-Received: by 2002:a25:e747:: with SMTP id e68mr13588358ybh.341.1591914642389; 
+ Thu, 11 Jun 2020 15:30:42 -0700 (PDT)
+Date: Thu, 11 Jun 2020 15:30:12 -0700
 In-Reply-To: <20200611223016.259837-1-hskinnemoen@google.com>
-Message-Id: <20200611223016.259837-5-hskinnemoen@google.com>
+Message-Id: <20200611223016.259837-9-hskinnemoen@google.com>
 Mime-Version: 1.0
 References: <20200611223016.259837-1-hskinnemoen@google.com>
 X-Mailer: git-send-email 2.27.0.290.gba653c62da-goog
-Subject: [PATCH v2 04/12] hw/timer: Add NPCM7xx Timer device model
+Subject: [PATCH v2 08/12] hw/nvram: NPCM7xx OTP device model
 From: Havard Skinnemoen <hskinnemoen@google.com>
 To: peter.maydell@linaro.org, clg@kaod.org, joel@jms.id.au
 Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Avi.Fishman@nuvoton.com, 
- kfting@nuvoton.com, Havard Skinnemoen <hskinnemoen@google.com>
+ kfting@nuvoton.com, Havard Skinnemoen <hskinnemoen@google.com>, 
+ Avi Fishman <avi.fishman@nuvoton.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::b49;
- envelope-from=3i7DiXgsKCnQZkcaffWegWfYggYdW.UgeiWem-VWnWdfgfYfm.gjY@flex--hskinnemoen.bounces.google.com;
- helo=mail-yb1-xb49.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::b4a;
+ envelope-from=3krDiXgsKCnsgrjhmmdlndmfnnfkd.bnlpdlt-cdudkmnmfmt.nqf@flex--hskinnemoen.bounces.google.com;
+ helo=mail-yb1-xb4a.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -105
@@ -104,66 +105,122 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The NPCM730 and NPCM750 SoCs have three timer modules each holding five
-timers and some shared registers (e.g. interrupt status).
+This supports reading and writing OTP fuses and keys. Only fuse reading
+has been tested. Protection is not implemented.
 
-Each timer runs at 25 MHz divided by a prescaler, and counts down from a
-configurable initial value to zero. When zero is reached, the interrupt
-flag for the timer is set, and the timer is disabled (one-shot mode) or
-reloaded from its initial value (periodic mode).
-
-This implementation is sufficient to boot a Linux kernel configured for
-NPCM750. Note that the kernel does not seem to actually turn on the
-interrupts.
-
-Change-Id: I4305fc6bd81b81930737a9c06d0f7dd06f017797
-Reviewed-by: Tyrone Ting <kfting@nuvoton.com>
-Reviewed-by: Joel Stanley <joel@jms.id.au>
+Change-Id: Ie67d7e2ed5e1010061b7383c71a8ba0611794103
+Reviewed-by: Avi Fishman <avi.fishman@nuvoton.com>
 Signed-off-by: Havard Skinnemoen <hskinnemoen@google.com>
 ---
- MAINTAINERS                      |   2 +
- hw/timer/Makefile.objs           |   1 +
- hw/timer/npcm7xx_timer.c         | 437 +++++++++++++++++++++++++++++++
- hw/timer/trace-events            |   5 +
- include/hw/timer/npcm7xx_timer.h |  95 +++++++
- 5 files changed, 540 insertions(+)
- create mode 100644 hw/timer/npcm7xx_timer.c
- create mode 100644 include/hw/timer/npcm7xx_timer.h
+ MAINTAINERS                    |   2 +
+ hw/arm/npcm7xx.c               |  32 +++
+ hw/nvram/Makefile.objs         |   1 +
+ hw/nvram/npcm7xx_otp.c         | 391 +++++++++++++++++++++++++++++++++
+ include/hw/arm/npcm7xx.h       |   3 +
+ include/hw/nvram/npcm7xx_otp.h |  93 ++++++++
+ 6 files changed, 522 insertions(+)
+ create mode 100644 hw/nvram/npcm7xx_otp.c
+ create mode 100644 include/hw/nvram/npcm7xx_otp.h
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index efe7f499e3..97d24b1443 100644
+index 077c86643c..9814e7b4c4 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -727,7 +727,9 @@ M: Tyrone Ting <kfting@nuvoton.com>
- L: qemu-arm@nongnu.org
+@@ -728,9 +728,11 @@ L: qemu-arm@nongnu.org
  S: Supported
+ F: hw/arm/npcm7xx*
  F: hw/misc/npcm7xx*
-+F: hw/timer/npcm7xx*
++F: hw/nvram/npcm7xx*
+ F: hw/timer/npcm7xx*
+ F: include/hw/arm/npcm7xx*
  F: include/hw/misc/npcm7xx*
-+F: include/hw/timer/npcm7xx*
++F: include/hw/nvram/npcm7xx*
+ F: include/hw/timer/npcm7xx*
  
  nSeries
- M: Andrzej Zaborowski <balrogg@gmail.com>
-diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
-index dece235fd7..6ea6d644ad 100644
---- a/hw/timer/Makefile.objs
-+++ b/hw/timer/Makefile.objs
-@@ -14,6 +14,7 @@ common-obj-$(CONFIG_IMX) += imx_epit.o
- common-obj-$(CONFIG_IMX) += imx_gpt.o
- common-obj-$(CONFIG_LM32) += lm32_timer.o
- common-obj-$(CONFIG_MILKYMIST) += milkymist-sysctl.o
-+common-obj-$(CONFIG_NPCM7XX) += npcm7xx_timer.o
- common-obj-$(CONFIG_NRF51_SOC) += nrf51_timer.o
+diff --git a/hw/arm/npcm7xx.c b/hw/arm/npcm7xx.c
+index 417bc16b5c..f9e3b5842b 100644
+--- a/hw/arm/npcm7xx.c
++++ b/hw/arm/npcm7xx.c
+@@ -37,6 +37,10 @@
+ #define NPCM7XX_MMIO_BA         (0x80000000)
+ #define NPCM7XX_MMIO_SZ         (0x7FFD0000)
  
- common-obj-$(CONFIG_ALTERA_TIMER) += altera_timer.o
-diff --git a/hw/timer/npcm7xx_timer.c b/hw/timer/npcm7xx_timer.c
++/* OTP key storage and fuse strap array */
++#define NPCM7XX_OTP1_BA         (0xF0189000)
++#define NPCM7XX_OTP2_BA         (0xF018a000)
++
+ /* Core system modules. */
+ #define NPCM7XX_L2C_BA          (0xF03FC000)
+ #define NPCM7XX_CPUP_BA         (0xF03FE000)
+@@ -121,6 +125,15 @@ void npcm7xx_write_secondary_boot(ARMCPU *cpu, const struct arm_boot_info *info)
+                        NPCM7XX_SMP_LOADER_START);
+ }
+ 
++static void npcm7xx_init_fuses(NPCM7xxState *s)
++{
++    NPCM7xxClass *nc = NPCM7XX_GET_CLASS(s);
++    uint32_t value;
++
++    value = tswap32(nc->disabled_modules);
++    npcm7xx_otp_array_write(&s->fuse_array, &value, 64, sizeof(value));
++}
++
+ static qemu_irq npcm7xx_irq(NPCM7xxState *s, int n)
+ {
+     return qdev_get_gpio_in(DEVICE(&s->a9mpcore), n);
+@@ -144,6 +157,10 @@ static void npcm7xx_init(Object *obj)
+                           TYPE_NPCM7XX_GCR);
+     sysbus_init_child_obj(obj, "clk", OBJECT(&s->clk), sizeof(s->clk),
+                           TYPE_NPCM7XX_CLK);
++    sysbus_init_child_obj(obj, "otp1", OBJECT(&s->key_storage),
++                          sizeof(s->key_storage), TYPE_NPCM7XX_KEY_STORAGE);
++    sysbus_init_child_obj(obj, "otp2", OBJECT(&s->fuse_array),
++                          sizeof(s->fuse_array), TYPE_NPCM7XX_FUSE_ARRAY);
+ 
+     for (i = 0; i < ARRAY_SIZE(s->tim); i++) {
+         sysbus_init_child_obj(obj, "tim[*]", OBJECT(&s->tim[i]),
+@@ -226,6 +243,21 @@ static void npcm7xx_realize(DeviceState *dev, Error **errp)
+     }
+     sysbus_mmio_map(SYS_BUS_DEVICE(&s->clk), 0, NPCM7XX_CLK_BA);
+ 
++    /* OTP key storage and fuse strap array */
++    object_property_set_bool(OBJECT(&s->key_storage), true, "realized", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
++    sysbus_mmio_map(SYS_BUS_DEVICE(&s->key_storage), 0, NPCM7XX_OTP1_BA);
++    object_property_set_bool(OBJECT(&s->fuse_array), true, "realized", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
++    sysbus_mmio_map(SYS_BUS_DEVICE(&s->fuse_array), 0, NPCM7XX_OTP2_BA);
++    npcm7xx_init_fuses(s);
++
+     /* Timer Modules (TIM) */
+     QEMU_BUILD_BUG_ON(ARRAY_SIZE(npcm7xx_tim_addr) != ARRAY_SIZE(s->tim));
+     for (i = 0; i < ARRAY_SIZE(s->tim); i++) {
+diff --git a/hw/nvram/Makefile.objs b/hw/nvram/Makefile.objs
+index f3ad921382..0270f0bbf7 100644
+--- a/hw/nvram/Makefile.objs
++++ b/hw/nvram/Makefile.objs
+@@ -4,5 +4,6 @@ common-obj-$(CONFIG_AT24C) += eeprom_at24c.o
+ common-obj-y += fw_cfg.o
+ common-obj-$(CONFIG_CHRP_NVRAM) += chrp_nvram.o
+ common-obj-$(CONFIG_MAC_NVRAM) += mac_nvram.o
++common-obj-$(CONFIG_NPCM7XX) += npcm7xx_otp.o
+ common-obj-$(CONFIG_NRF51_SOC) += nrf51_nvm.o
+ obj-$(CONFIG_PSERIES) += spapr_nvram.o
+diff --git a/hw/nvram/npcm7xx_otp.c b/hw/nvram/npcm7xx_otp.c
 new file mode 100644
-index 0000000000..9aae4b09b9
+index 0000000000..71fc728a2d
 --- /dev/null
-+++ b/hw/timer/npcm7xx_timer.c
-@@ -0,0 +1,437 @@
++++ b/hw/nvram/npcm7xx_otp.c
+@@ -0,0 +1,391 @@
 +/*
-+ * Nuvoton NPCM7xx Timer Controller
++ * Nuvoton NPCM7xx OTP (Fuse Array) Interface
 + *
 + * Copyright 2020 Google LLC
 + *
@@ -179,338 +236,254 @@ index 0000000000..9aae4b09b9
 +
 +#include "qemu/osdep.h"
 +
-+#include "hw/irq.h"
-+#include "hw/timer/npcm7xx_timer.h"
++#include "hw/nvram/npcm7xx_otp.h"
++#include "qapi/error.h"
 +#include "qemu/bitops.h"
-+#include "qemu/error-report.h"
 +#include "qemu/log.h"
 +#include "qemu/module.h"
-+#include "qemu/timer.h"
 +#include "qemu/units.h"
-+#include "trace.h"
++
++/* Each module has 4 KiB of register space. Only a fraction of it is used. */
++#define NPCM7XX_OTP_REGS_SIZE (4 * KiB)
 +
 +/* Register field definitions. */
-+#define NPCM7XX_TCSR_CEN                BIT(30)
-+#define NPCM7XX_TCSR_IE                 BIT(29)
-+#define NPCM7XX_TCSR_PERIODIC           BIT(27)
-+#define NPCM7XX_TCSR_CRST               BIT(26)
-+#define NPCM7XX_TCSR_CACT               BIT(25)
-+#define NPCM7XX_TCSR_RSVD               0x21ffff00
-+#define NPCM7XX_TCSR_PRESCALE_START     0
-+#define NPCM7XX_TCSR_PRESCALE_LEN       8
++#define FST_RIEN BIT(2)
++#define FST_RDST BIT(1)
++#define FST_RDY BIT(0)
++#define FST_RO_MASK (FST_RDST | FST_RDY)
 +
-+/* The reference clock frequency is always 25 MHz. */
-+#define NPCM7XX_TIMER_REF_HZ            (25000000)
++#define FADDR_BYTEADDR(rv) extract32((rv), 0, 10)
++#define FADDR_BITPOS(rv) extract32((rv), 10, 3)
 +
-+/* Return the value by which to divide the reference clock rate. */
-+static uint32_t npcm7xx_timer_prescaler(const NPCM7xxTimer *t)
++#define FDATA_CLEAR 0x00000001
++
++#define FCFG_FDIS BIT(31)
++#define FCFG_FCFGLK_MASK 0x00ff0000
++
++#define FCTL_PROG_CMD1 0x00000001
++#define FCTL_PROG_CMD2 0xbf79e5d0
++#define FCTL_READ_CMD 0x00000002
++
++static uint8_t ecc_encode_nibble(uint8_t n)
 +{
-+    return extract32(t->tcsr, NPCM7XX_TCSR_PRESCALE_START,
-+                     NPCM7XX_TCSR_PRESCALE_LEN) + 1;
++    uint8_t result = n;
++
++    result |= (((n >> 0) & 1) ^ ((n >> 1) & 1)) << 4;
++    result |= (((n >> 2) & 1) ^ ((n >> 3) & 1)) << 5;
++    result |= (((n >> 0) & 1) ^ ((n >> 2) & 1)) << 6;
++    result |= (((n >> 1) & 1) ^ ((n >> 3) & 1)) << 7;
++
++    return result;
 +}
 +
-+/* Convert a timer cycle count to a time interval in nanoseconds. */
-+static int64_t npcm7xx_timer_count_to_ns(NPCM7xxTimer *t, uint32_t count)
++void npcm7xx_otp_array_write(NPCM7xxOTPState *s, const void *data,
++                             unsigned int offset, unsigned int len)
 +{
-+    int64_t ns = count;
++    const uint8_t *src = data;
++    uint8_t *dst = s->array + offset;
 +
-+    ns *= NANOSECONDS_PER_SECOND / NPCM7XX_TIMER_REF_HZ;
-+    ns *= npcm7xx_timer_prescaler(t);
++    while (len-- > 0) {
++        uint8_t c = *src++;
 +
-+    return ns;
-+}
-+
-+/* Convert a time interval in nanoseconds to a timer cycle count. */
-+static uint32_t npcm7xx_timer_ns_to_count(NPCM7xxTimer *t, int64_t ns)
-+{
-+    int64_t count;
-+
-+    count = ns / (NANOSECONDS_PER_SECOND / NPCM7XX_TIMER_REF_HZ);
-+    count /= npcm7xx_timer_prescaler(t);
-+
-+    return count;
-+}
-+
-+/*
-+ * Raise the interrupt line if there's a pending interrupt and interrupts are
-+ * enabled for this timer. If not, lower it.
-+ */
-+static void npcm7xx_timer_check_interrupt(NPCM7xxTimer *t)
-+{
-+    NPCM7xxTimerCtrlState *tc = t->ctrl;
-+    /* Find the array index of this timer. */
-+    int index = t - tc->timer;
-+
-+    g_assert(index >= 0 && index < NPCM7XX_TIMERS_PER_CTRL);
-+
-+    if ((t->tcsr & NPCM7XX_TCSR_IE) && (tc->tisr & BIT(index))) {
-+        qemu_irq_raise(t->irq);
-+        trace_npcm7xx_timer_irq(DEVICE(tc)->canonical_path, index, 1);
-+    } else {
-+        qemu_irq_lower(t->irq);
-+        trace_npcm7xx_timer_irq(DEVICE(tc)->canonical_path, index, 0);
++        *dst++ = ecc_encode_nibble(extract8(c, 0, 4));
++        *dst++ = ecc_encode_nibble(extract8(c, 4, 4));
 +    }
 +}
 +
-+/* Start or resume the timer. */
-+static void npcm7xx_timer_start(NPCM7xxTimer *t)
++/* Common register read handler for both OTP classes. */
++static uint64_t npcm7xx_otp_read(NPCM7xxOTPState *s, NPCM7xxOTPRegister reg)
 +{
-+    int64_t now;
++    uint32_t value = 0;
 +
-+    now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+    t->expires_ns = now + t->remaining_ns;
-+    timer_mod(&t->qtimer, t->expires_ns);
-+}
-+
-+/*
-+ * Called when the counter reaches zero. Sets the interrupt flag, and either
-+ * restarts or disables the timer.
-+ */
-+static void npcm7xx_timer_reached_zero(NPCM7xxTimer *t)
-+{
-+    NPCM7xxTimerCtrlState *tc = t->ctrl;
-+    int index = t - tc->timer;
-+
-+    g_assert(index >= 0 && index < NPCM7XX_TIMERS_PER_CTRL);
-+
-+    tc->tisr |= BIT(index);
-+
-+    if (t->tcsr & NPCM7XX_TCSR_PERIODIC) {
-+        t->remaining_ns = npcm7xx_timer_count_to_ns(t, t->ticr);
-+        if (t->tcsr & NPCM7XX_TCSR_CEN) {
-+            npcm7xx_timer_start(t);
-+        }
-+    } else {
-+        t->tcsr &= ~(NPCM7XX_TCSR_CEN | NPCM7XX_TCSR_CACT);
-+    }
-+
-+    npcm7xx_timer_check_interrupt(t);
-+}
-+
-+/* Stop counting. Record the time remaining so we can continue later. */
-+static void npcm7xx_timer_pause(NPCM7xxTimer *t)
-+{
-+    int64_t now;
-+
-+    timer_del(&t->qtimer);
-+    now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+    t->remaining_ns = t->expires_ns - now;
-+    if (t->remaining_ns <= 0) {
-+        npcm7xx_timer_reached_zero(t);
-+    }
-+}
-+
-+/*
-+ * Restart the timer from its initial value. If the timer was enabled and stays
-+ * enabled, adjust the QEMU timer according to the new count. If the timer is
-+ * transitioning from disabled to enabled, the caller is expected to start the
-+ * timer later.
-+ */
-+static void npcm7xx_timer_restart(NPCM7xxTimer *t, uint32_t old_tcsr)
-+{
-+    t->remaining_ns = npcm7xx_timer_count_to_ns(t, t->ticr);
-+
-+    if (old_tcsr & t->tcsr & NPCM7XX_TCSR_CEN) {
-+        npcm7xx_timer_start(t);
-+    }
-+}
-+
-+/* Register read and write handlers */
-+
-+static void npcm7xx_timer_write_tcsr(NPCM7xxTimer *t, uint32_t new_tcsr)
-+{
-+    uint32_t old_tcsr = t->tcsr;
-+
-+    if (new_tcsr & NPCM7XX_TCSR_RSVD) {
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: reserved bits in 0x%08x ignored\n",
-+                      __func__, new_tcsr);
-+        new_tcsr &= ~NPCM7XX_TCSR_RSVD;
-+    }
-+    if (new_tcsr & NPCM7XX_TCSR_CACT) {
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: read-only bits in 0x%08x ignored\n",
-+                      __func__, new_tcsr);
-+        new_tcsr &= ~NPCM7XX_TCSR_CACT;
-+    }
-+
-+    t->tcsr = (t->tcsr & NPCM7XX_TCSR_CACT) | new_tcsr;
-+
-+    if ((old_tcsr ^ new_tcsr) & NPCM7XX_TCSR_IE) {
-+        npcm7xx_timer_check_interrupt(t);
-+    }
-+    if (new_tcsr & NPCM7XX_TCSR_CRST) {
-+        npcm7xx_timer_restart(t, old_tcsr);
-+        t->tcsr &= ~NPCM7XX_TCSR_CRST;
-+    }
-+    if ((old_tcsr ^ new_tcsr) & NPCM7XX_TCSR_CEN) {
-+        if (new_tcsr & NPCM7XX_TCSR_CEN) {
-+            npcm7xx_timer_start(t);
-+        } else {
-+            npcm7xx_timer_pause(t);
-+        }
-+    }
-+}
-+
-+static void npcm7xx_timer_write_ticr(NPCM7xxTimer *t, uint32_t new_ticr)
-+{
-+    t->ticr = new_ticr;
-+
-+    npcm7xx_timer_restart(t, t->tcsr);
-+}
-+
-+static uint32_t npcm7xx_timer_read_tdr(NPCM7xxTimer *t)
-+{
-+    if (t->tcsr & NPCM7XX_TCSR_CEN) {
-+        int64_t now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+
-+        return npcm7xx_timer_ns_to_count(t, t->expires_ns - now);
-+    }
-+
-+    return npcm7xx_timer_ns_to_count(t, t->remaining_ns);
-+}
-+
-+static uint64_t npcm7xx_timer_read(void *opaque, hwaddr offset, unsigned size)
-+{
-+    NPCM7xxTimerCtrlState *s = opaque;
-+    uint64_t value = 0;
-+    hwaddr reg;
-+
-+    reg = offset / sizeof(uint32_t);
 +    switch (reg) {
-+    case NPCM7XX_TIMER_TCSR0:
-+        value = s->timer[0].tcsr;
-+        break;
-+    case NPCM7XX_TIMER_TCSR1:
-+        value = s->timer[1].tcsr;
-+        break;
-+    case NPCM7XX_TIMER_TCSR2:
-+        value = s->timer[2].tcsr;
-+        break;
-+    case NPCM7XX_TIMER_TCSR3:
-+        value = s->timer[3].tcsr;
-+        break;
-+    case NPCM7XX_TIMER_TCSR4:
-+        value = s->timer[4].tcsr;
++    case NPCM7XX_OTP_FST:
++    case NPCM7XX_OTP_FADDR:
++    case NPCM7XX_OTP_FDATA:
++    case NPCM7XX_OTP_FCFG:
++        value = s->regs[reg];
 +        break;
 +
-+    case NPCM7XX_TIMER_TICR0:
-+        value = s->timer[0].ticr;
-+        break;
-+    case NPCM7XX_TIMER_TICR1:
-+        value = s->timer[1].ticr;
-+        break;
-+    case NPCM7XX_TIMER_TICR2:
-+        value = s->timer[2].ticr;
-+        break;
-+    case NPCM7XX_TIMER_TICR3:
-+        value = s->timer[3].ticr;
-+        break;
-+    case NPCM7XX_TIMER_TICR4:
-+        value = s->timer[4].ticr;
-+        break;
-+
-+    case NPCM7XX_TIMER_TDR0:
-+        value = npcm7xx_timer_read_tdr(&s->timer[0]);
-+        break;
-+    case NPCM7XX_TIMER_TDR1:
-+        value = npcm7xx_timer_read_tdr(&s->timer[1]);
-+        break;
-+    case NPCM7XX_TIMER_TDR2:
-+        value = npcm7xx_timer_read_tdr(&s->timer[2]);
-+        break;
-+    case NPCM7XX_TIMER_TDR3:
-+        value = npcm7xx_timer_read_tdr(&s->timer[3]);
-+        break;
-+    case NPCM7XX_TIMER_TDR4:
-+        value = npcm7xx_timer_read_tdr(&s->timer[4]);
-+        break;
-+
-+    case NPCM7XX_TIMER_TISR:
-+        value = s->tisr;
-+        break;
-+
-+    case NPCM7XX_TIMER_WTCR:
-+        value = s->wtcr;
++    case NPCM7XX_OTP_FCTL:
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "%s: read from write-only FCTL register\n",
++                      DEVICE(s)->canonical_path);
 +        break;
 +
 +    default:
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: invalid offset 0x%04x\n",
-+                      __func__, (unsigned int)offset);
++        qemu_log_mask(LOG_GUEST_ERROR, "%s: read from invalid offset 0x%zx\n",
++                      DEVICE(s)->canonical_path, reg * sizeof(uint32_t));
 +        break;
 +    }
-+
-+    trace_npcm7xx_timer_read(DEVICE(s)->canonical_path, offset, value);
 +
 +    return value;
 +}
 +
-+static void npcm7xx_timer_write(void *opaque, hwaddr offset,
-+                                uint64_t v, unsigned size)
++/* Read a byte from the OTP array into the data register. */
++static void npcm7xx_otp_read_array(NPCM7xxOTPState *s)
 +{
-+    uint32_t reg = offset / sizeof(uint32_t);
-+    NPCM7xxTimerCtrlState *s = opaque;
-+    uint32_t value = v;
++    uint32_t faddr = s->regs[NPCM7XX_OTP_FADDR];
 +
-+    trace_npcm7xx_timer_write(DEVICE(s)->canonical_path, offset, value);
++    s->regs[NPCM7XX_OTP_FDATA] = s->array[FADDR_BYTEADDR(faddr)];
++    s->regs[NPCM7XX_OTP_FST] |= FST_RDST | FST_RDY;
++}
 +
++/* Program a byte from the data register into the OTP array. */
++static void npcm7xx_otp_program_array(NPCM7xxOTPState *s)
++{
++    uint32_t faddr = s->regs[NPCM7XX_OTP_FADDR];
++
++    /* Bits can only go 0->1, never 1->0. */
++    s->array[FADDR_BYTEADDR(faddr)] |= (1U << FADDR_BITPOS(faddr));
++    s->regs[NPCM7XX_OTP_FST] |= FST_RDST | FST_RDY;
++}
++
++/* Compute the next value of the FCFG register. */
++static uint32_t npcm7xx_otp_compute_fcfg(uint32_t cur_value, uint32_t new_value)
++{
++    uint32_t lock_mask;
++    uint32_t value;
++
++    /*
++     * FCFGLK holds sticky bits 16..23, indicating which bits in FPRGLK (8..15)
++     * and FRDLK (0..7) that are read-only.
++     */
++    lock_mask = (cur_value & FCFG_FCFGLK_MASK) >> 8;
++    lock_mask |= lock_mask >> 8;
++    /* FDIS and FCFGLK bits are sticky (write 1 to set; can't clear). */
++    value = cur_value & (FCFG_FDIS | FCFG_FCFGLK_MASK);
++    /* Preserve read-only bits in FPRGLK and FRDLK */
++    value |= cur_value & lock_mask;
++    /* Set all bits that aren't read-only. */
++    value |= new_value & ~lock_mask;
++
++    return value;
++}
++
++/* Common register write handler for both OTP classes. */
++static void npcm7xx_otp_write(NPCM7xxOTPState *s, NPCM7xxOTPRegister reg,
++                              uint32_t value)
++{
 +    switch (reg) {
-+    case NPCM7XX_TIMER_TCSR0:
-+        npcm7xx_timer_write_tcsr(&s->timer[0], value);
-+        return;
-+    case NPCM7XX_TIMER_TCSR1:
-+        npcm7xx_timer_write_tcsr(&s->timer[1], value);
-+        return;
-+    case NPCM7XX_TIMER_TCSR2:
-+        npcm7xx_timer_write_tcsr(&s->timer[2], value);
-+        return;
-+    case NPCM7XX_TIMER_TCSR3:
-+        npcm7xx_timer_write_tcsr(&s->timer[3], value);
-+        return;
-+    case NPCM7XX_TIMER_TCSR4:
-+        npcm7xx_timer_write_tcsr(&s->timer[4], value);
-+        return;
++    case NPCM7XX_OTP_FST:
++        /* RDST is cleared by writing 1 to it. */
++        if (value & FST_RDST) {
++            s->regs[NPCM7XX_OTP_FST] &= ~FST_RDST;
++        }
++        /* Preserve read-only and write-one-to-clear bits */
++        value =
++            (value & ~FST_RO_MASK) | (s->regs[NPCM7XX_OTP_FST] & FST_RO_MASK);
++        break;
 +
-+    case NPCM7XX_TIMER_TICR0:
-+        npcm7xx_timer_write_ticr(&s->timer[0], value);
-+        return;
-+    case NPCM7XX_TIMER_TICR1:
-+        npcm7xx_timer_write_ticr(&s->timer[1], value);
-+        return;
-+    case NPCM7XX_TIMER_TICR2:
-+        npcm7xx_timer_write_ticr(&s->timer[2], value);
-+        return;
-+    case NPCM7XX_TIMER_TICR3:
-+        npcm7xx_timer_write_ticr(&s->timer[3], value);
-+        return;
-+    case NPCM7XX_TIMER_TICR4:
-+        npcm7xx_timer_write_ticr(&s->timer[4], value);
-+        return;
++    case NPCM7XX_OTP_FADDR:
++        break;
 +
-+    case NPCM7XX_TIMER_TDR0:
-+    case NPCM7XX_TIMER_TDR1:
-+    case NPCM7XX_TIMER_TDR2:
-+    case NPCM7XX_TIMER_TDR3:
-+    case NPCM7XX_TIMER_TDR4:
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: register @ 0x%04x is read-only\n",
-+                      __func__, (unsigned int)offset);
-+        return;
++    case NPCM7XX_OTP_FDATA:
++        /*
++         * This register is cleared by writing a magic value to it; no other
++         * values can be written.
++         */
++        if (value == FDATA_CLEAR) {
++            value = 0;
++        } else {
++            value = s->regs[NPCM7XX_OTP_FDATA];
++        }
++        break;
 +
-+    case NPCM7XX_TIMER_TISR:
-+        s->tisr &= ~value;
-+        return;
++    case NPCM7XX_OTP_FCFG:
++        value = npcm7xx_otp_compute_fcfg(s->regs[NPCM7XX_OTP_FCFG], value);
++        break;
 +
-+    case NPCM7XX_TIMER_WTCR:
-+        qemu_log_mask(LOG_UNIMP, "%s: WTCR write not implemented: 0x%08x\n",
-+                      __func__, value);
++    case NPCM7XX_OTP_FCTL:
++        switch (value) {
++        case FCTL_READ_CMD:
++            npcm7xx_otp_read_array(s);
++            break;
++
++        case FCTL_PROG_CMD1:
++            /*
++             * Programming requires writing two separate magic values to this
++             * register; this is the first one. Just store it so it can be
++             * verified later when the second magic value is received.
++             */
++            break;
++
++        case FCTL_PROG_CMD2:
++            /*
++             * Only initiate programming if we received the first half of the
++             * command immediately before this one.
++             */
++            if (s->regs[NPCM7XX_OTP_FCTL] == FCTL_PROG_CMD1) {
++                npcm7xx_otp_program_array(s);
++            }
++            break;
++
++        default:
++            qemu_log_mask(LOG_GUEST_ERROR,
++                          "%s: unrecognized FCNTL value 0x%" PRIx32 "\n",
++                          DEVICE(s)->canonical_path, value);
++            break;
++        }
++        if (value != FCTL_PROG_CMD1) {
++            value = 0;
++        }
++        break;
++
++    default:
++        qemu_log_mask(LOG_GUEST_ERROR, "%s: write to invalid offset 0x%zx\n",
++                      DEVICE(s)->canonical_path, reg * sizeof(uint32_t));
 +        return;
 +    }
 +
-+    qemu_log_mask(LOG_GUEST_ERROR, "%s: invalid offset 0x%04x\n",
-+                  __func__, (unsigned int)offset);
++    s->regs[reg] = value;
 +}
 +
-+static const struct MemoryRegionOps npcm7xx_timer_ops = {
-+    .read       = npcm7xx_timer_read,
-+    .write      = npcm7xx_timer_write,
++/* Register read handler specific to the fuse array OTP module. */
++static uint64_t npcm7xx_fuse_array_read(void *opaque, hwaddr addr,
++                                        unsigned int size)
++{
++    NPCM7xxOTPRegister reg = addr / sizeof(uint32_t);
++    NPCM7xxOTPState *s = opaque;
++    uint32_t value;
++
++    /*
++     * Only the Fuse Strap register needs special handling; all other registers
++     * work the same way for both kinds of OTP modules.
++     */
++    if (reg != NPCM7XX_OTP_FUSTRAP) {
++        value = npcm7xx_otp_read(s, reg);
++    } else {
++        /* FUSTRAP is stored as three copies in the OTP array. */
++        uint32_t fustrap[3];
++
++        memcpy(fustrap, &s->array[0], sizeof(fustrap));
++
++        /* Determine value by a majority vote on each bit. */
++        value = (fustrap[0] & fustrap[1]) | (fustrap[0] & fustrap[2]) |
++                (fustrap[1] & fustrap[2]);
++    }
++
++    return value;
++}
++
++/* Register write handler specific to the fuse array OTP module. */
++static void npcm7xx_fuse_array_write(void *opaque, hwaddr addr, uint64_t v,
++                                     unsigned int size)
++{
++    NPCM7xxOTPRegister reg = addr / sizeof(uint32_t);
++    NPCM7xxOTPState *s = opaque;
++
++    /*
++     * The Fuse Strap register is read-only. Other registers are handled by
++     * common code.
++     */
++    if (reg != NPCM7XX_OTP_FUSTRAP) {
++        npcm7xx_otp_write(s, reg, v);
++    }
++}
++
++static const MemoryRegionOps npcm7xx_fuse_array_ops = {
++    .read       = npcm7xx_fuse_array_read,
++    .write      = npcm7xx_fuse_array_write,
 +    .endianness = DEVICE_LITTLE_ENDIAN,
 +    .valid      = {
 +        .min_access_size        = 4,
@@ -519,110 +492,153 @@ index 0000000000..9aae4b09b9
 +    },
 +};
 +
-+/* Called when the QEMU timer expires. */
-+static void npcm7xx_timer_expired(void *opaque)
++/* Register read handler specific to the key storage OTP module. */
++static uint64_t npcm7xx_key_storage_read(void *opaque, hwaddr addr,
++                                         unsigned int size)
 +{
-+    NPCM7xxTimer *t = opaque;
++    NPCM7xxOTPRegister reg = addr / sizeof(uint32_t);
++    NPCM7xxOTPState *s = opaque;
 +
-+    if (t->tcsr & NPCM7XX_TCSR_CEN) {
-+        npcm7xx_timer_reached_zero(t);
-+    }
-+}
-+
-+static void npcm7xx_timer_enter_reset(Object *obj, ResetType type)
-+{
-+    NPCM7xxTimerCtrlState *s = NPCM7XX_TIMER(obj);
-+    int i;
-+
-+    for (i = 0; i < NPCM7XX_TIMERS_PER_CTRL; i++) {
-+        NPCM7xxTimer *t = &s->timer[i];
-+
-+        timer_del(&t->qtimer);
-+        t->expires_ns = 0;
-+        t->remaining_ns = 0;
-+        t->tcsr = 0x00000005;
-+        t->ticr = 0x00000000;
++    /*
++     * Only the Fuse Key Index register needs special handling; all other
++     * registers work the same way for both kinds of OTP modules.
++     */
++    if (reg != NPCM7XX_OTP_FKEYIND) {
++        return npcm7xx_otp_read(s, reg);
 +    }
 +
-+    s->tisr = 0x00000000;
-+    s->wtcr = 0x00000400;
++    qemu_log_mask(LOG_UNIMP, "%s: FKEYIND is not implemented\n", __func__);
++
++    return s->regs[NPCM7XX_OTP_FKEYIND];
 +}
 +
-+static void npcm7xx_timer_hold_reset(Object *obj)
++/* Register write handler specific to the key storage OTP module. */
++static void npcm7xx_key_storage_write(void *opaque, hwaddr addr, uint64_t v,
++                                      unsigned int size)
 +{
-+    NPCM7xxTimerCtrlState *s = NPCM7XX_TIMER(obj);
-+    int i;
++    NPCM7xxOTPRegister reg = addr / sizeof(uint32_t);
++    NPCM7xxOTPState *s = opaque;
 +
-+    for (i = 0; i < NPCM7XX_TIMERS_PER_CTRL; i++) {
-+        qemu_irq_lower(s->timer[i].irq);
++    /*
++     * Only the Fuse Key Index register needs special handling; all other
++     * registers work the same way for both kinds of OTP modules.
++     */
++    if (reg != NPCM7XX_OTP_FKEYIND) {
++        npcm7xx_otp_write(s, reg, v);
++        return;
 +    }
++
++    qemu_log_mask(LOG_UNIMP, "%s: FKEYIND is not implemented\n", __func__);
++
++    s->regs[NPCM7XX_OTP_FKEYIND] = v;
 +}
 +
-+static void npcm7xx_timer_realize(DeviceState *dev, Error **errp)
++static const MemoryRegionOps npcm7xx_key_storage_ops = {
++    .read       = npcm7xx_key_storage_read,
++    .write      = npcm7xx_key_storage_write,
++    .endianness = DEVICE_LITTLE_ENDIAN,
++    .valid      = {
++        .min_access_size        = 4,
++        .max_access_size        = 4,
++        .unaligned              = false,
++    },
++};
++
++static void npcm7xx_otp_enter_reset(Object *obj, ResetType type)
 +{
-+    NPCM7xxTimerCtrlState *s = NPCM7XX_TIMER(dev);
++    NPCM7xxOTPState *s = NPCM7XX_OTP(obj);
++
++    memset(s->regs, 0, sizeof(s->regs));
++
++    s->regs[NPCM7XX_OTP_FST] = 0x00000001;
++    s->regs[NPCM7XX_OTP_FCFG] = 0x20000000;
++}
++
++static void npcm7xx_otp_realize(DeviceState *dev, Error **errp)
++{
++    NPCM7xxOTPClass *oc = NPCM7XX_OTP_GET_CLASS(dev);
++    NPCM7xxOTPState *s = NPCM7XX_OTP(dev);
 +    SysBusDevice *sbd = &s->parent;
-+    int i;
 +
-+    for (i = 0; i < NPCM7XX_TIMERS_PER_CTRL; i++) {
-+        NPCM7xxTimer *t = &s->timer[i];
-+        t->ctrl = s;
-+        timer_init_ns(&t->qtimer, QEMU_CLOCK_VIRTUAL, npcm7xx_timer_expired, t);
-+        sysbus_init_irq(sbd, &t->irq);
-+    }
++    s->array = g_malloc0(NPCM7XX_OTP_ARRAY_BYTES);
 +
-+    memory_region_init_io(&s->iomem, OBJECT(s), &npcm7xx_timer_ops, s,
-+                          TYPE_NPCM7XX_TIMER, 4 * KiB);
-+    sysbus_init_mmio(sbd, &s->iomem);
++    memory_region_init_io(&s->mmio, OBJECT(s), oc->mmio_ops, s, "regs",
++                          NPCM7XX_OTP_REGS_SIZE);
++    sysbus_init_mmio(sbd, &s->mmio);
 +}
 +
-+static void npcm7xx_timer_class_init(ObjectClass *klass, void *data)
++static void npcm7xx_otp_class_init(ObjectClass *klass, void *data)
 +{
 +    ResettableClass *rc = RESETTABLE_CLASS(klass);
 +    DeviceClass *dc = DEVICE_CLASS(klass);
 +
-+    dc->desc = "NPCM7xx Timer Controller";
-+    dc->realize = npcm7xx_timer_realize;
-+    rc->phases.enter = npcm7xx_timer_enter_reset;
-+    rc->phases.hold = npcm7xx_timer_hold_reset;
++    dc->realize = npcm7xx_otp_realize;
++    rc->phases.enter = npcm7xx_otp_enter_reset;
 +}
 +
-+static const TypeInfo npcm7xx_timer_info = {
-+    .name               = TYPE_NPCM7XX_TIMER,
-+    .parent             = TYPE_SYS_BUS_DEVICE,
-+    .instance_size      = sizeof(NPCM7xxTimerCtrlState),
-+    .class_init         = npcm7xx_timer_class_init,
-+};
-+
-+static void npcm7xx_timer_register_type(void)
++static void npcm7xx_key_storage_class_init(ObjectClass *klass, void *data)
 +{
-+    type_register_static(&npcm7xx_timer_info);
-+}
-+type_init(npcm7xx_timer_register_type);
-diff --git a/hw/timer/trace-events b/hw/timer/trace-events
-index 866c9f546a..e2434ecf3f 100644
---- a/hw/timer/trace-events
-+++ b/hw/timer/trace-events
-@@ -66,6 +66,11 @@ cmsdk_apb_dualtimer_read(uint64_t offset, uint64_t data, unsigned size) "CMSDK A
- cmsdk_apb_dualtimer_write(uint64_t offset, uint64_t data, unsigned size) "CMSDK APB dualtimer write: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u"
- cmsdk_apb_dualtimer_reset(void) "CMSDK APB dualtimer: reset"
- 
-+# npcm7xx_timer.c
-+npcm7xx_timer_read(const char *id, uint64_t offset, uint64_t value) " %s offset: 0x%04" PRIx64 " value 0x%08" PRIx64
-+npcm7xx_timer_write(const char *id, uint64_t offset, uint64_t value) "%s offset: 0x%04" PRIx64 " value 0x%08" PRIx64
-+npcm7xx_timer_irq(const char *id, int timer, int state) "%s timer %d state %d"
++    NPCM7xxOTPClass *oc = NPCM7XX_OTP_CLASS(klass);
 +
- # nrf51_timer.c
- nrf51_timer_read(uint8_t timer_id, uint64_t addr, uint32_t value, unsigned size) "timer %u read addr 0x%" PRIx64 " data 0x%" PRIx32 " size %u"
- nrf51_timer_write(uint8_t timer_id, uint64_t addr, uint32_t value, unsigned size) "timer %u write addr 0x%" PRIx64 " data 0x%" PRIx32 " size %u"
-diff --git a/include/hw/timer/npcm7xx_timer.h b/include/hw/timer/npcm7xx_timer.h
++    oc->mmio_ops = &npcm7xx_key_storage_ops;
++}
++
++static void npcm7xx_fuse_array_class_init(ObjectClass *klass, void *data)
++{
++    NPCM7xxOTPClass *oc = NPCM7XX_OTP_CLASS(klass);
++
++    oc->mmio_ops = &npcm7xx_fuse_array_ops;
++}
++
++static const TypeInfo npcm7xx_otp_types[] = {
++    {
++        .name = TYPE_NPCM7XX_OTP,
++        .parent = TYPE_SYS_BUS_DEVICE,
++        .instance_size = sizeof(NPCM7xxOTPState),
++        .class_init = npcm7xx_otp_class_init,
++        .abstract = true,
++    },
++    {
++        .name = TYPE_NPCM7XX_KEY_STORAGE,
++        .parent = TYPE_NPCM7XX_OTP,
++        .class_init = npcm7xx_key_storage_class_init,
++    },
++    {
++        .name = TYPE_NPCM7XX_FUSE_ARRAY,
++        .parent = TYPE_NPCM7XX_OTP,
++        .class_init = npcm7xx_fuse_array_class_init,
++    },
++};
++DEFINE_TYPES(npcm7xx_otp_types);
+diff --git a/include/hw/arm/npcm7xx.h b/include/hw/arm/npcm7xx.h
+index a241af0b8c..360cd965a7 100644
+--- a/include/hw/arm/npcm7xx.h
++++ b/include/hw/arm/npcm7xx.h
+@@ -19,6 +19,7 @@
+ #include "hw/cpu/a9mpcore.h"
+ #include "hw/misc/npcm7xx_clk.h"
+ #include "hw/misc/npcm7xx_gcr.h"
++#include "hw/nvram/npcm7xx_otp.h"
+ #include "hw/timer/npcm7xx_timer.h"
+ #include "target/arm/cpu.h"
+ 
+@@ -62,6 +63,8 @@ typedef struct NPCM7xxState {
+     NPCM7xxGCRState     gcr;
+     NPCM7xxCLKState     clk;
+     NPCM7xxTimerCtrlState tim[3];
++    NPCM7xxOTPState     key_storage;
++    NPCM7xxOTPState     fuse_array;
+ } NPCM7xxState;
+ 
+ #define TYPE_NPCM7XX    "npcm7xx"
+diff --git a/include/hw/nvram/npcm7xx_otp.h b/include/hw/nvram/npcm7xx_otp.h
 new file mode 100644
-index 0000000000..d8ed98933d
+index 0000000000..1127c48fef
 --- /dev/null
-+++ b/include/hw/timer/npcm7xx_timer.h
-@@ -0,0 +1,95 @@
++++ b/include/hw/nvram/npcm7xx_otp.h
+@@ -0,0 +1,93 @@
 +/*
-+ * Nuvoton NPCM7xx Timer Controller
++ * Nuvoton NPCM7xx OTP (Fuse Array) Interface
 + *
 + * Copyright 2020 Google LLC
 + *
@@ -635,87 +651,85 @@ index 0000000000..d8ed98933d
 + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 + * GNU General Public License for more details.
 + */
-+#ifndef NPCM7XX_TIMER_H
-+#define NPCM7XX_TIMER_H
++#ifndef NPCM7XX_OTP_H
++#define NPCM7XX_OTP_H
 +
 +#include "exec/memory.h"
 +#include "hw/sysbus.h"
-+#include "qemu/timer.h"
 +
-+/* Each Timer Module (TIM) instance holds five 25 MHz timers. */
-+#define NPCM7XX_TIMERS_PER_CTRL (5)
++/* Each OTP module holds 8192 bits of one-time programmable storage */
++#define NPCM7XX_OTP_ARRAY_BITS (8192)
++#define NPCM7XX_OTP_ARRAY_BYTES (NPCM7XX_OTP_ARRAY_BITS / 8)
 +
 +/**
-+ * enum NPCM7xxTimerRegisters - 32-bit register indices.
++ * enum NPCM7xxOTPRegister - 32-bit register indices.
 + */
-+enum NPCM7xxTimerRegisters {
-+    NPCM7XX_TIMER_TCSR0,
-+    NPCM7XX_TIMER_TCSR1,
-+    NPCM7XX_TIMER_TICR0,
-+    NPCM7XX_TIMER_TICR1,
-+    NPCM7XX_TIMER_TDR0,
-+    NPCM7XX_TIMER_TDR1,
-+    NPCM7XX_TIMER_TISR,
-+    NPCM7XX_TIMER_WTCR,
-+    NPCM7XX_TIMER_TCSR2,
-+    NPCM7XX_TIMER_TCSR3,
-+    NPCM7XX_TIMER_TICR2,
-+    NPCM7XX_TIMER_TICR3,
-+    NPCM7XX_TIMER_TDR2,
-+    NPCM7XX_TIMER_TDR3,
-+    NPCM7XX_TIMER_TCSR4         = 0x0040 / sizeof(uint32_t),
-+    NPCM7XX_TIMER_TICR4         = 0x0048 / sizeof(uint32_t),
-+    NPCM7XX_TIMER_TDR4          = 0x0050 / sizeof(uint32_t),
-+    NPCM7XX_TIMER_NR_REGS,
-+};
-+
-+typedef struct NPCM7xxTimerCtrlState NPCM7xxTimerCtrlState;
++typedef enum NPCM7xxOTPRegister {
++    NPCM7XX_OTP_FST,
++    NPCM7XX_OTP_FADDR,
++    NPCM7XX_OTP_FDATA,
++    NPCM7XX_OTP_FCFG,
++    /* Offset 0x10 is FKEYIND in OTP1, FUSTRAP in OTP2 */
++    NPCM7XX_OTP_FKEYIND = 0x0010 / sizeof(uint32_t),
++    NPCM7XX_OTP_FUSTRAP = 0x0010 / sizeof(uint32_t),
++    NPCM7XX_OTP_FCTL,
++    NPCM7XX_OTP_NR_REGS,
++} NPCM7xxOTPRegister;
 +
 +/**
-+ * struct NPCM7xxTimer - Individual timer state.
-+ * @irq: GIC interrupt line to fire on expiration (if enabled).
-+ * @qtimer: QEMU timer that notifies us on expiration.
-+ * @expires_ns: Absolute virtual expiration time.
-+ * @remaining_ns: Remaining time until expiration if timer is paused.
-+ * @tcsr: The Timer Control and Status Register.
-+ * @ticr: The Timer Initial Count Register.
-+ */
-+typedef struct NPCM7xxTimer {
-+    NPCM7xxTimerCtrlState *ctrl;
-+
-+    qemu_irq    irq;
-+    QEMUTimer   qtimer;
-+    int64_t     expires_ns;
-+    int64_t     remaining_ns;
-+
-+    uint32_t    tcsr;
-+    uint32_t    ticr;
-+} NPCM7xxTimer;
-+
-+/**
-+ * struct NPCM7xxTimerCtrlState - Timer Module device state.
++ * struct NPCM7xxOTPState - Device state for one OTP module.
 + * @parent: System bus device.
-+ * @iomem: Memory region through which registers are accessed.
-+ * @tisr: The Timer Interrupt Status Register.
-+ * @wtcr: The Watchdog Timer Control Register.
-+ * @timer: The five individual timers managed by this module.
++ * @mmio: Memory region through which registers are accessed.
++ * @regs: Register contents.
++ * @array: OTP storage array.
 + */
-+struct NPCM7xxTimerCtrlState {
++typedef struct NPCM7xxOTPState {
 +    SysBusDevice parent;
 +
-+    MemoryRegion iomem;
++    MemoryRegion mmio;
++    uint32_t regs[NPCM7XX_OTP_NR_REGS];
++    uint8_t *array;
++} NPCM7xxOTPState;
 +
-+    uint32_t    tisr;
-+    uint32_t    wtcr;
++#define TYPE_NPCM7XX_OTP "npcm7xx-otp"
++#define NPCM7XX_OTP(obj) OBJECT_CHECK(NPCM7xxOTPState, (obj), TYPE_NPCM7XX_OTP)
 +
-+    NPCM7xxTimer timer[NPCM7XX_TIMERS_PER_CTRL];
-+};
++#define TYPE_NPCM7XX_KEY_STORAGE "npcm7xx-key-storage"
++#define TYPE_NPCM7XX_FUSE_ARRAY "npcm7xx-fuse-array"
 +
-+#define TYPE_NPCM7XX_TIMER "npcm7xx-timer"
-+#define NPCM7XX_TIMER(obj)                                              \
-+    OBJECT_CHECK(NPCM7xxTimerCtrlState, (obj), TYPE_NPCM7XX_TIMER)
++/**
++ * struct NPCM7xxOTPClass - OTP module class.
++ * @parent: System bus device class.
++ * @mmio_ops: MMIO register operations for this type of module.
++ *
++ * The two OTP modules (key-storage and fuse-array) have slightly different
++ * behavior, so we give them different MMIO register operations.
++ */
++typedef struct NPCM7xxOTPClass {
++    SysBusDeviceClass parent;
 +
-+#endif /* NPCM7XX_TIMER_H */
++    const MemoryRegionOps *mmio_ops;
++} NPCM7xxOTPClass;
++
++#define NPCM7XX_OTP_CLASS(klass) \
++    OBJECT_CLASS_CHECK(NPCM7xxOTPClass, (klass), TYPE_NPCM7XX_OTP)
++#define NPCM7XX_OTP_GET_CLASS(obj) \
++    OBJECT_GET_CLASS(NPCM7xxOTPClass, (obj), TYPE_NPCM7XX_OTP)
++
++/**
++ * npcm7xx_otp_array_write - ECC encode and write data to OTP array.
++ * @s: OTP module.
++ * @data: Data to be encoded and written.
++ * @offset: Offset of first byte to be written in the OTP array.
++ * @len: Number of bytes before ECC encoding.
++ *
++ * Each nibble of data is encoded into a byte, so the number of bytes written
++ * to the array will be @len * 2.
++ */
++extern void npcm7xx_otp_array_write(NPCM7xxOTPState *s, const void *data,
++                                    unsigned int offset, unsigned int len);
++
++#endif /* NPCM7XX_OTP_H */
 -- 
 2.27.0.290.gba653c62da-goog
 
