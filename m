@@ -2,92 +2,89 @@ Return-Path: <SRS0=U615=7Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4AF2C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 14:59:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68489C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 15:06:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 991D22075E
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 14:59:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 33B1A2065C
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 15:06:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ai5w5ZdZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 991D22075E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=yadro.com header.i=@yadro.com header.b="Au3ymbl7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33B1A2065C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yadro.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33424 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38970 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjOfX-0002Yt-Sk
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 10:59:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41438)
+	id 1jjOn4-0007Hf-9q
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 11:06:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47074)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jjOSo-0001YD-4m
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 10:45:54 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:42714)
- by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jjOSm-0003u3-QW
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 10:45:53 -0400
-Received: by mail-wr1-x443.google.com with SMTP id p5so6428361wrw.9
- for <qemu-devel@nongnu.org>; Thu, 11 Jun 2020 07:45:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=0GTBE7suxOurPxe1504VaO03lCFiaXnVjqdBviXZXww=;
- b=ai5w5ZdZrrgo0aPoHFf+EZ9VgHDMubszLdxFSQvuDY9Z4gGuMJ8ICfv689aICkp0rl
- MJ2zFio2pM8tbwhHjp1U/QEo74RLjjWF0c/X+940YnqMyU6ilI2DvPcsZfmgJnQiBcDa
- l535HPdZ1dv2wzJHVZQ2NXOnaqT/rHk60rNg3PcU2dHwzu3GstgpjI9+EPILHZfdusOw
- sfhNtIj+X6Edeaodm+DmDw7wIwAzr8+snrSjjiNIQcpNcYN24TCmOSvB8S9FHH9TkHWM
- /dv6aeFyhGMXCOiCk763CY/QNlRRUhxOyLWDljChY0+ZdV/7VxVz5rv/czj3gjZbLDGI
- KqGQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=0GTBE7suxOurPxe1504VaO03lCFiaXnVjqdBviXZXww=;
- b=SJPt5S8tpTZuJ54RxAGa/ZqS7R27eOxSe5OiOT3CiI7ckF+QEjVHiwpZpJdySCGEWS
- HnraCSIWjfdnREqLy4hX0kbOJZYS8nsOCAC2bkyTqdcAZs4HAhOUtJ9d2bQ4Cm5qltrA
- BKcBnNW/c1sOmLeqGganmixcbEQo1eb/pSNY/+2pi+/oD5NLYB5+xc4h3uU2rfYY1zjA
- NoMOizjg5VEm3Nrvadk7vhnnbRxecGvjf9/+gN/KiV8L+s3pDjgVzOrCnnQKZdqFv64j
- w19OpSO3L1pj4fwFZItxSN4XwIkQME1T7bI4z9CWbMBxDfe2SRUiBftWQgHEDN8irjvo
- z2yQ==
-X-Gm-Message-State: AOAM532D8cSRVULz4lnRqNE9ESXDbewhFsoCBOfHhfXdbBEOz1StPio1
- +psMjTBCfEAiARvxyYFYyTWOhw==
-X-Google-Smtp-Source: ABdhPJy5pdjQFz42jbgPPi4VLWDNc7AH1r4/FTFQotMaivGG2YT2BlNJihVc838BouDHc3JcjUO5Zg==
-X-Received: by 2002:adf:93a3:: with SMTP id 32mr9915226wrp.344.1591886743071; 
- Thu, 11 Jun 2020 07:45:43 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id h18sm5271658wru.7.2020.06.11.07.45.41
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 11 Jun 2020 07:45:42 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-arm@nongnu.org,
-	qemu-devel@nongnu.org
-Subject: [PATCH 08/10] target/arm: Convert Neon VEXT to decodetree
-Date: Thu, 11 Jun 2020 15:45:27 +0100
-Message-Id: <20200611144529.8873-9-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200611144529.8873-1-peter.maydell@linaro.org>
-References: <20200611144529.8873-1-peter.maydell@linaro.org>
+ (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
+ id 1jjOjH-0004x0-M1
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 11:02:55 -0400
+Received: from mta-02.yadro.com ([89.207.88.252]:40948 helo=mta-01.yadro.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
+ id 1jjOj8-00083s-N6
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 11:02:55 -0400
+Received: from localhost (unknown [127.0.0.1])
+ by mta-01.yadro.com (Postfix) with ESMTP id 053AB4C893;
+ Thu, 11 Jun 2020 15:02:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
+ in-reply-to:content-disposition:content-type:content-type
+ :mime-version:references:message-id:subject:subject:from:from
+ :date:date:received:received:received; s=mta-01; t=1591887751;
+ x=1593702152; bh=sq8uhQ7nz1BvdO6/bUw8epsRxrpAmJ3guZV9S8Ws50E=; b=
+ Au3ymbl7nexfxJVxJSdWzTEmMOhsD1RwVMyf+E0Uitobkgx0jxLx1CngZ8FPFKxN
+ +sPOcSnhwYNzii7tavyendrqfuRCPDR5Alku0lDt29/FmeWTMmsm9H+YVNIFk2IT
+ 6UFCuUYYju4jE/uXhY+1g4i8lBpQjIfVeCX/2XvAUXk=
+X-Virus-Scanned: amavisd-new at yadro.com
+Received: from mta-01.yadro.com ([127.0.0.1])
+ by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id E3pORXTzJFjT; Thu, 11 Jun 2020 18:02:31 +0300 (MSK)
+Received: from T-EXCH-02.corp.yadro.com (t-exch-02.corp.yadro.com
+ [172.17.10.102])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mta-01.yadro.com (Postfix) with ESMTPS id 839B54C854;
+ Thu, 11 Jun 2020 18:02:28 +0300 (MSK)
+Received: from localhost (172.17.204.212) by T-EXCH-02.corp.yadro.com
+ (172.17.10.102) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id 15.1.669.32; Thu, 11
+ Jun 2020 18:02:28 +0300
+Date: Thu, 11 Jun 2020 18:02:27 +0300
+From: Roman Bolshakov <r.bolshakov@yadro.com>
+To: Claudio Fontana <cfontana@suse.de>
+Subject: Re: [PATCH 12/13] i386: hvf: Move mmio_buf into CPUX86State
+Message-ID: <20200611150227.GA76007@SPB-NB-133.local>
+References: <20200528193758.51454-1-r.bolshakov@yadro.com>
+ <20200528193758.51454-13-r.bolshakov@yadro.com>
+ <d57e48c6-574e-471c-78be-1245d62bc908@redhat.com>
+ <3101f615-e1c9-2cf4-7a7b-6e30c7942c53@suse.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x443.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <3101f615-e1c9-2cf4-7a7b-6e30c7942c53@suse.de>
+X-Originating-IP: [172.17.204.212]
+X-ClientProxiedBy: T-EXCH-01.corp.yadro.com (172.17.10.101) To
+ T-EXCH-02.corp.yadro.com (172.17.10.102)
+Received-SPF: pass client-ip=89.207.88.252; envelope-from=r.bolshakov@yadro.com;
+ helo=mta-01.yadro.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 11:02:33
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,208 +97,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
+ qemu-devel@nongnu.org, Cameron Esfahani <dirty@apple.com>,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Convert the Neon VEXT insn to decodetree. Rather than keeping the
-old implementation which used fixed temporaries cpu_V0 and cpu_V1
-and did the extraction with by-hand shift and logic ops, we use
-the TCG extract2 insn.
+On Thu, Jun 11, 2020 at 03:24:31PM +0200, Claudio Fontana wrote:
+> On 6/4/20 8:27 PM, Paolo Bonzini wrote:
+> > On 28/05/20 21:37, Roman Bolshakov wrote:
+> >> There's no similar field in CPUX86State, but it's needed for MMIO traps.
+> >>
+> >> Signed-off-by: Roman Bolshakov <r.bolshakov@yadro.com>
+> >> ---
+> >>  target/i386/cpu.h         |  1 +
+> >>  target/i386/hvf/hvf.c     |  5 +++++
+> >>  target/i386/hvf/x86.h     |  1 -
+> >>  target/i386/hvf/x86_emu.c | 12 ++++++------
+> >>  4 files changed, 12 insertions(+), 7 deletions(-)
+> >>
+> >> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+> >> index 7e6566565a..be44e19154 100644
+> >> --- a/target/i386/cpu.h
+> >> +++ b/target/i386/cpu.h
+> >> @@ -1593,6 +1593,7 @@ typedef struct CPUX86State {
+> >>  #endif
+> >>  #if defined(CONFIG_HVF)
+> >>      hvf_lazy_flags hvf_lflags;
+> >> +    void *hvf_mmio_buf;
+> >>      HVFX86EmulatorState *hvf_emul;
+> >>  #endif
+> >>  
+> >> diff --git a/target/i386/hvf/hvf.c b/target/i386/hvf/hvf.c
+> >> index 4cee496d71..57696c46c7 100644
+> >> --- a/target/i386/hvf/hvf.c
+> >> +++ b/target/i386/hvf/hvf.c
+> >> @@ -533,7 +533,11 @@ void hvf_reset_vcpu(CPUState *cpu) {
+> >>  
+> >>  void hvf_vcpu_destroy(CPUState *cpu)
+> >>  {
+> >> +    X86CPU *x86_cpu = X86_CPU(cpu);
+> >> +    CPUX86State *env = &x86_cpu->env;
+> >> +
+> >>      hv_return_t ret = hv_vcpu_destroy((hv_vcpuid_t)cpu->hvf_fd);
+> >> +    g_free(env->hvf_mmio_buf);
+> >>      assert_hvf_ok(ret);
+> >>  }
+> >>  
+> >> @@ -563,6 +567,7 @@ int hvf_init_vcpu(CPUState *cpu)
+> >>      init_decoder();
+> >>  
+> >>      hvf_state->hvf_caps = g_new0(struct hvf_vcpu_caps, 1);
+> >> +    env->hvf_mmio_buf = g_new(char, 4096);
+> >>      env->hvf_emul = g_new0(HVFX86EmulatorState, 1);
+> >>  
+> >>      r = hv_vcpu_create((hv_vcpuid_t *)&cpu->hvf_fd, HV_VCPU_DEFAULT);
+> >> diff --git a/target/i386/hvf/x86.h b/target/i386/hvf/x86.h
+> >> index 2363616c07..483fcea762 100644
+> >> --- a/target/i386/hvf/x86.h
+> >> +++ b/target/i386/hvf/x86.h
+> >> @@ -230,7 +230,6 @@ typedef struct x68_segment_selector {
+> >>  
+> >>  /* Definition of hvf_x86_state is here */
+> >>  struct HVFX86EmulatorState {
+> >> -    uint8_t mmio_buf[4096];
+> >>  };
+> >>  
+> >>  /* useful register access  macros */
+> >> diff --git a/target/i386/hvf/x86_emu.c b/target/i386/hvf/x86_emu.c
+> >> index 1ad2c30e16..d3e289ed87 100644
+> >> --- a/target/i386/hvf/x86_emu.c
+> >> +++ b/target/i386/hvf/x86_emu.c
+> >> @@ -187,8 +187,8 @@ void write_val_ext(struct CPUX86State *env, target_ulong ptr, target_ulong val,
+> >>  
+> >>  uint8_t *read_mmio(struct CPUX86State *env, target_ulong ptr, int bytes)
+> >>  {
+> >> -    vmx_read_mem(env_cpu(env), env->hvf_emul->mmio_buf, ptr, bytes);
+> >> -    return env->hvf_emul->mmio_buf;
+> >> +    vmx_read_mem(env_cpu(env), env->hvf_mmio_buf, ptr, bytes);
+> >> +    return env->hvf_mmio_buf;
+> >>  }
+> >>  
+> >>  
+> >> @@ -489,9 +489,9 @@ static void exec_ins_single(struct CPUX86State *env, struct x86_decode *decode)
+> >>      target_ulong addr = linear_addr_size(env_cpu(env), RDI(env),
+> >>                                           decode->addressing_size, R_ES);
+> >>  
+> >> -    hvf_handle_io(env_cpu(env), DX(env), env->hvf_emul->mmio_buf, 0,
+> >> +    hvf_handle_io(env_cpu(env), DX(env), env->hvf_mmio_buf, 0,
+> >>                    decode->operand_size, 1);
+> >> -    vmx_write_mem(env_cpu(env), addr, env->hvf_emul->mmio_buf,
+> >> +    vmx_write_mem(env_cpu(env), addr, env->hvf_mmio_buf,
+> >>                    decode->operand_size);
+> >>  
+> >>      string_increment_reg(env, R_EDI, decode);
+> >> @@ -512,9 +512,9 @@ static void exec_outs_single(struct CPUX86State *env, struct x86_decode *decode)
+> >>  {
+> >>      target_ulong addr = decode_linear_addr(env, decode, RSI(env), R_DS);
+> >>  
+> >> -    vmx_read_mem(env_cpu(env), env->hvf_emul->mmio_buf, addr,
+> >> +    vmx_read_mem(env_cpu(env), env->hvf_mmio_buf, addr,
+> >>                   decode->operand_size);
+> >> -    hvf_handle_io(env_cpu(env), DX(env), env->hvf_emul->mmio_buf, 1,
+> >> +    hvf_handle_io(env_cpu(env), DX(env), env->hvf_mmio_buf, 1,
+> >>                    decode->operand_size, 1);
+> >>  
+> >>      string_increment_reg(env, R_ESI, decode);
+> >>
+> > 
+> > It should be possible to get rid of the buffer altogether, but it's ok
+> > to do it separately.
+> > 
+> > I queued the series, thanks.
+> > 
+> > Paolo
+> > 
+> > 
+> 
+> Thanks Paolo, I am waiting for this (and maybe another series from Roman) to be able to do the cpus refactoring.
+> 
+> Incidentally, would it not be great to have some machinery that automatically tracks which series is already queued where?
+> Maybe there is already a mechanism I am unaware of?
+> 
+> Ciao,
+> 
+> Claudio
 
-We don't need to special case 0 or 8 immediates any more as the
-optimizer is smart enough to throw away the dead code.
+Hi Claudio,
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- target/arm/neon-dp.decode       |  8 +++-
- target/arm/translate-neon.inc.c | 76 +++++++++++++++++++++++++++++++++
- target/arm/translate.c          | 58 +------------------------
- 3 files changed, 85 insertions(+), 57 deletions(-)
+I also had the same question earlier today on IRC but I've just recalled
+that PULL requests typically have a reference to the queue repo/branch:
 
-diff --git a/target/arm/neon-dp.decode b/target/arm/neon-dp.decode
-index 9ff182f56d7..26d60220168 100644
---- a/target/arm/neon-dp.decode
-+++ b/target/arm/neon-dp.decode
-@@ -413,7 +413,13 @@ Vimm_1r          1111 001 . 1 . 000 ... .... cmode:4 0 . op:1 1 .... @1reg_imm
- # return false for size==3.
- ######################################################################
- {
--  # 0b11 subgroup will go here
-+  [
-+    ##################################################################
-+    # Miscellaneous size=0b11 insns
-+    ##################################################################
-+    VEXT         1111 001 0 1 . 11 .... .... imm:4 . q:1 . 0 .... \
-+                 vm=%vm_dp vn=%vn_dp vd=%vd_dp
-+  ]
- 
-   # Subgroup for size != 0b11
-   [
-diff --git a/target/arm/translate-neon.inc.c b/target/arm/translate-neon.inc.c
-index f054b567c8f..ba0e7091e1a 100644
---- a/target/arm/translate-neon.inc.c
-+++ b/target/arm/translate-neon.inc.c
-@@ -2812,3 +2812,79 @@ static bool trans_VQDMLSL_2sc(DisasContext *s, arg_2scalar *a)
- 
-     return do_2scalar_long(s, a, opfn[a->size], accfn[a->size]);
- }
-+
-+static bool trans_VEXT(DisasContext *s, arg_VEXT *a)
-+{
-+    if (!arm_dc_feature(s, ARM_FEATURE_NEON)) {
-+        return false;
-+    }
-+
-+    /* UNDEF accesses to D16-D31 if they don't exist. */
-+    if (!dc_isar_feature(aa32_simd_r32, s) &&
-+        ((a->vd | a->vn | a->vm) & 0x10)) {
-+        return false;
-+    }
-+
-+    if ((a->vn | a->vm | a->vd) & a->q) {
-+        return false;
-+    }
-+
-+    if (a->imm > 7 && !a->q) {
-+        return false;
-+    }
-+
-+    if (!vfp_access_check(s)) {
-+        return true;
-+    }
-+
-+    if (!a->q) {
-+        /* Extract 64 bits from <Vm:Vn> */
-+        TCGv_i64 left, right, dest;
-+
-+        left = tcg_temp_new_i64();
-+        right = tcg_temp_new_i64();
-+        dest = tcg_temp_new_i64();
-+
-+        neon_load_reg64(right, a->vn);
-+        neon_load_reg64(left, a->vm);
-+        tcg_gen_extract2_i64(dest, right, left, a->imm * 8);
-+        neon_store_reg64(dest, a->vd);
-+
-+        tcg_temp_free_i64(left);
-+        tcg_temp_free_i64(right);
-+        tcg_temp_free_i64(dest);
-+    } else {
-+        /* Extract 128 bits from <Vm+1:Vm:Vn+1:Vn> */
-+        TCGv_i64 left, middle, right, destleft, destright;
-+
-+        left = tcg_temp_new_i64();
-+        middle = tcg_temp_new_i64();
-+        right = tcg_temp_new_i64();
-+        destleft = tcg_temp_new_i64();
-+        destright = tcg_temp_new_i64();
-+
-+        if (a->imm < 8) {
-+            neon_load_reg64(right, a->vn);
-+            neon_load_reg64(middle, a->vn + 1);
-+            tcg_gen_extract2_i64(destright, right, middle, a->imm * 8);
-+            neon_load_reg64(left, a->vm);
-+            tcg_gen_extract2_i64(destleft, middle, left, a->imm * 8);
-+        } else {
-+            neon_load_reg64(right, a->vn + 1);
-+            neon_load_reg64(middle, a->vm);
-+            tcg_gen_extract2_i64(destright, right, middle, (a->imm - 8) * 8);
-+            neon_load_reg64(left, a->vm + 1);
-+            tcg_gen_extract2_i64(destleft, middle, left, (a->imm - 8) * 8);
-+        }
-+
-+        neon_store_reg64(destright, a->vd);
-+        neon_store_reg64(destleft, a->vd + 1);
-+
-+        tcg_temp_free_i64(destright);
-+        tcg_temp_free_i64(destleft);
-+        tcg_temp_free_i64(right);
-+        tcg_temp_free_i64(middle);
-+        tcg_temp_free_i64(left);
-+    }
-+    return true;
-+}
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 4d39bbf035b..a0822dba5e2 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -5030,10 +5030,8 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-     int pass;
-     int u;
-     int vec_size;
--    uint32_t imm;
-     TCGv_i32 tmp, tmp2, tmp3, tmp5;
-     TCGv_ptr ptr1;
--    TCGv_i64 tmp64;
- 
-     if (!arm_dc_feature(s, ARM_FEATURE_NEON)) {
-         return 1;
-@@ -5076,60 +5074,8 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-             return 1;
-         } else { /* size == 3 */
-             if (!u) {
--                /* Extract.  */
--                imm = (insn >> 8) & 0xf;
--
--                if (imm > 7 && !q)
--                    return 1;
--
--                if (q && ((rd | rn | rm) & 1)) {
--                    return 1;
--                }
--
--                if (imm == 0) {
--                    neon_load_reg64(cpu_V0, rn);
--                    if (q) {
--                        neon_load_reg64(cpu_V1, rn + 1);
--                    }
--                } else if (imm == 8) {
--                    neon_load_reg64(cpu_V0, rn + 1);
--                    if (q) {
--                        neon_load_reg64(cpu_V1, rm);
--                    }
--                } else if (q) {
--                    tmp64 = tcg_temp_new_i64();
--                    if (imm < 8) {
--                        neon_load_reg64(cpu_V0, rn);
--                        neon_load_reg64(tmp64, rn + 1);
--                    } else {
--                        neon_load_reg64(cpu_V0, rn + 1);
--                        neon_load_reg64(tmp64, rm);
--                    }
--                    tcg_gen_shri_i64(cpu_V0, cpu_V0, (imm & 7) * 8);
--                    tcg_gen_shli_i64(cpu_V1, tmp64, 64 - ((imm & 7) * 8));
--                    tcg_gen_or_i64(cpu_V0, cpu_V0, cpu_V1);
--                    if (imm < 8) {
--                        neon_load_reg64(cpu_V1, rm);
--                    } else {
--                        neon_load_reg64(cpu_V1, rm + 1);
--                        imm -= 8;
--                    }
--                    tcg_gen_shli_i64(cpu_V1, cpu_V1, 64 - (imm * 8));
--                    tcg_gen_shri_i64(tmp64, tmp64, imm * 8);
--                    tcg_gen_or_i64(cpu_V1, cpu_V1, tmp64);
--                    tcg_temp_free_i64(tmp64);
--                } else {
--                    /* BUGFIX */
--                    neon_load_reg64(cpu_V0, rn);
--                    tcg_gen_shri_i64(cpu_V0, cpu_V0, imm * 8);
--                    neon_load_reg64(cpu_V1, rm);
--                    tcg_gen_shli_i64(cpu_V1, cpu_V1, 64 - (imm * 8));
--                    tcg_gen_or_i64(cpu_V0, cpu_V0, cpu_V1);
--                }
--                neon_store_reg64(cpu_V0, rd);
--                if (q) {
--                    neon_store_reg64(cpu_V1, rd + 1);
--                }
-+                /* Extract: handled by decodetree */
-+                return 1;
-             } else if ((insn & (1 << 11)) == 0) {
-                 /* Two register misc.  */
-                 op = ((insn >> 12) & 0x30) | ((insn >> 7) & 0xf);
--- 
-2.20.1
+https://lists.gnu.org/archive/html/qemu-devel/2020-02/msg06825.html
 
+I'll rebase on it and prepare the series.
+
+Regards,
+Roman
 
