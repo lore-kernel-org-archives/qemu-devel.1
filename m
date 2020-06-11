@@ -2,74 +2,84 @@ Return-Path: <SRS0=U615=7Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9990BC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 16:25:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 379D3C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 16:26:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6CE4120792
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 16:25:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6CE4120792
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 01D36207ED
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 16:26:28 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FAH2igFO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01D36207ED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53958 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56224 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjQ1D-0007DR-Lh
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 12:25:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52512)
+	id 1jjQ27-0008Ep-5n
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 12:26:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51762)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jjPt9-0003FJ-3B
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 12:17:11 -0400
-Resent-Date: Thu, 11 Jun 2020 12:17:11 -0400
-Resent-Message-Id: <E1jjPt9-0003FJ-3B@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21787)
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1jjPrP-0000Pf-6Z
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 12:15:23 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22752
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jjPt5-0004Id-D7
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 12:17:10 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1591892199; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=PtBupQt1GSrl2k6h7I7cMwbSlLkVciHfIlwUDcz0Y0bc7VWZ7reYeQEGS9rKppPXxj6FMpb8n4127P1s2erUSXQeYSylAwS4NPdSiiaIC/F6ZDNOWeoXGwrVJ/jicBzpEzqeCB615MCK+DoFUtguSTofZhJQlBySEGQSrP6eIRY=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1591892199;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=iHH1aisMwRNIZG5c0Lx1A0xZG2/4K+uPeZgdUXlN5H4=; 
- b=Ph3lnJD9eiTK6EUZ11oAutoWT+TwcKujJOOJZWvXc+5T/ZX4IYz412bXTwnArS5bYawvUca1A+XeQDSU4BxUDKB9wnI7qHdvyawI0Kf/AIDrvoxCCwUyC6R7TSiFooa2dd9Q2DOTeU0uhfz/MO2G2hx73EQzquNvuxGjnfbT/og=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 15918921950411000.9154528554718;
- Thu, 11 Jun 2020 09:16:35 -0700 (PDT)
-Message-ID: <159189219293.1247.7275400437936161232@45ef0f9c86ae>
-In-Reply-To: <1591880064-30638-1-git-send-email-yi.l.liu@intel.com>
-Subject: Re: [RFC v6 00/25] intel_iommu: expose Shared Virtual Addressing to
- VMs
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1jjPrN-00040z-AK
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 12:15:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591892120;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=vOZcCyG6+q6mpWKybdwSRlg7xtE0dYIf0cnK+vy6ob4=;
+ b=FAH2igFOVzJvgxXSmaxbXUmblfc5UmN1DCuMmaov0wfl9Bma/1RDtnlQmfHDu6fdjEXrLS
+ vIYPi+0+HiiF69RjDuBSjwataSLwhfqU4X8ousG+ub/CLaFNdL7bxkO8t0ooppjUio0Un6
+ AS2kAIwLOtk3URPebn8o5N69HGT9oDE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-12-iZ52zfHpMHiZbHQP_GDy0g-1; Thu, 11 Jun 2020 12:15:18 -0400
+X-MC-Unique: iZ52zfHpMHiZbHQP_GDy0g-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 139F61B18BC0;
+ Thu, 11 Jun 2020 16:15:17 +0000 (UTC)
+Received: from laptop.redhat.com (ovpn-114-197.ams2.redhat.com [10.36.114.197])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 474FB1024871;
+ Thu, 11 Jun 2020 16:15:03 +0000 (UTC)
+From: Eric Auger <eric.auger@redhat.com>
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org, peter.maydell@linaro.org, peterx@redhat.com
+Subject: [PATCH RESEND 0/9] SMMUv3.2 Range-based TLB Invalidation Support
+Date: Thu, 11 Jun 2020 18:14:51 +0200
+Message-Id: <20200611161500.23580-1-eric.auger@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: yi.l.liu@intel.com
-Date: Thu, 11 Jun 2020 09:16:35 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 12:17:05
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.120;
+ envelope-from=eric.auger@redhat.com; helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 03:29:33
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -82,54 +92,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: jean-philippe@linaro.org, kevin.tian@intel.com, yi.l.liu@intel.com,
- kvm@vger.kernel.org, mst@redhat.com, jun.j.tian@intel.com,
- qemu-devel@nongnu.org, peterx@redhat.com, eric.auger@redhat.com,
- alex.williamson@redhat.com, pbonzini@redhat.com, david@gibson.dropbear.id.au,
- yi.y.sun@intel.com, hao.wu@intel.com
+Cc: jean-philippe@linaro.org, robh@kernel.org, robin.murphy@arm.com,
+ mst@redhat.com, zhangfei.gao@foxmail.com, shameerali.kolothum.thodi@huawei.com,
+ will@kernel.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTkxODgwMDY0LTMwNjM4LTEt
-Z2l0LXNlbmQtZW1haWwteWkubC5saXVAaW50ZWwuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZh
-aWxlZCB0aGUgZG9ja2VyLW1pbmd3QGZlZG9yYSBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUg
-dGVzdGluZyBjb21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2Nr
-ZXIgaW5zdGFsbGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09
-IFRFU1QgU0NSSVBUIEJFR0lOID09PQojISAvYmluL2Jhc2gKZXhwb3J0IEFSQ0g9eDg2XzY0Cm1h
-a2UgZG9ja2VyLWltYWdlLWZlZG9yYSBWPTEgTkVUV09SSz0xCnRpbWUgbWFrZSBkb2NrZXItdGVz
-dC1taW5nd0BmZWRvcmEgSj0xNCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCiAg
-ICAgICAgICAgICAgICAgZnJvbSAvdG1wL3FlbXUtdGVzdC9zcmMvaW5jbHVkZS9ody9wY2kvcGNp
-X2J1cy5oOjQsCiAgICAgICAgICAgICAgICAgZnJvbSAvdG1wL3FlbXUtdGVzdC9zcmMvaW5jbHVk
-ZS9ody9wY2ktaG9zdC9pNDQwZnguaDoxNSwKICAgICAgICAgICAgICAgICBmcm9tIC90bXAvcWVt
-dS10ZXN0L3NyYy9zdHVicy9wY2ktaG9zdC1waWl4LmM6MjoKL3RtcC9xZW11LXRlc3Qvc3JjL2lu
-Y2x1ZGUvaHcvaW9tbXUvaG9zdF9pb21tdV9jb250ZXh0Lmg6Mjg6MTA6IGZhdGFsIGVycm9yOiBs
-aW51eC9pb21tdS5oOiBObyBzdWNoIGZpbGUgb3IgZGlyZWN0b3J5CiAjaW5jbHVkZSA8bGludXgv
-aW9tbXUuaD4KICAgICAgICAgIF5+fn5+fn5+fn5+fn5+fgpjb21waWxhdGlvbiB0ZXJtaW5hdGVk
-LgptYWtlOiAqKiogWy90bXAvcWVtdS10ZXN0L3NyYy9ydWxlcy5tYWs6Njk6IHN0dWJzL3BjaS1o
-b3N0LXBpaXgub10gRXJyb3IgMQptYWtlOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2Jz
-Li4uLgpUcmFjZWJhY2sgKG1vc3QgcmVjZW50IGNhbGwgbGFzdCk6CiAgRmlsZSAiLi90ZXN0cy9k
-b2NrZXIvZG9ja2VyLnB5IiwgbGluZSA2NjUsIGluIDxtb2R1bGU+Ci0tLQogICAgcmFpc2UgQ2Fs
-bGVkUHJvY2Vzc0Vycm9yKHJldGNvZGUsIGNtZCkKc3VicHJvY2Vzcy5DYWxsZWRQcm9jZXNzRXJy
-b3I6IENvbW1hbmQgJ1snc3VkbycsICctbicsICdkb2NrZXInLCAncnVuJywgJy0tbGFiZWwnLCAn
-Y29tLnFlbXUuaW5zdGFuY2UudXVpZD0yMGFiMmU5NmUyMTg0YTM0OTkxYjkyMWNjZjY1MzY5Mics
-ICctdScsICcxMDAzJywgJy0tc2VjdXJpdHktb3B0JywgJ3NlY2NvbXA9dW5jb25maW5lZCcsICct
-LXJtJywgJy1lJywgJ1RBUkdFVF9MSVNUPScsICctZScsICdFWFRSQV9DT05GSUdVUkVfT1BUUz0n
-LCAnLWUnLCAnVj0nLCAnLWUnLCAnSj0xNCcsICctZScsICdERUJVRz0nLCAnLWUnLCAnU0hPV19F
-TlY9JywgJy1lJywgJ0NDQUNIRV9ESVI9L3Zhci90bXAvY2NhY2hlJywgJy12JywgJy9ob21lL3Bh
-dGNoZXcyLy5jYWNoZS9xZW11LWRvY2tlci1jY2FjaGU6L3Zhci90bXAvY2NhY2hlOnonLCAnLXYn
-LCAnL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLTd2Y3NfenVoL3NyYy9kb2NrZXItc3JjLjIw
-MjAtMDYtMTEtMTIuMTQuMDAuOTE5ODovdmFyL3RtcC9xZW11Onoscm8nLCAncWVtdTpmZWRvcmEn
-LCAnL3Zhci90bXAvcWVtdS9ydW4nLCAndGVzdC1taW5ndyddJyByZXR1cm5lZCBub24temVybyBl
-eGl0IHN0YXR1cyAyLgpmaWx0ZXI9LS1maWx0ZXI9bGFiZWw9Y29tLnFlbXUuaW5zdGFuY2UudXVp
-ZD0yMGFiMmU5NmUyMTg0YTM0OTkxYjkyMWNjZjY1MzY5MgptYWtlWzFdOiAqKiogW2RvY2tlci1y
-dW5dIEVycm9yIDEKbWFrZVsxXTogTGVhdmluZyBkaXJlY3RvcnkgYC92YXIvdG1wL3BhdGNoZXct
-dGVzdGVyLXRtcC03dmNzX3p1aC9zcmMnCm1ha2U6ICoqKiBbZG9ja2VyLXJ1bi10ZXN0LW1pbmd3
-QGZlZG9yYV0gRXJyb3IgMgoKcmVhbCAgICAybTMzLjAyN3MKdXNlciAgICAwbTguMzU3cwoKClRo
-ZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMTU5MTg4
-MDA2NC0zMDYzOC0xLWdpdC1zZW5kLWVtYWlsLXlpLmwubGl1QGludGVsLmNvbS90ZXN0aW5nLmRv
-Y2tlci1taW5nd0BmZWRvcmEvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRv
-bWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQg
-eW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+SMMU3.2 brings the support of range-based TLB invalidation and
+level hint. When this feature is supported, the SMMUv3 driver
+is allowed to send TLB invalidations for a range of IOVAs instead
+of using page based invalidation.
+
+Implementing this feature in the virtual SMMUv3 device is
+mandated for DPDK on guest use case: DPDK uses hugepage
+buffers and guest sends invalidations for blocks. Without
+this feature, a guest invalidation of a block of 1GB for instance
+translates into a storm of page invalidations. Each of them
+is trapped by the VMM and cascaded downto the physical IOMMU.
+This completely stalls the execution. This integration issue
+was initially reported in [1].
+
+Now SMMUv3.2 specifies additional parameters to NH_VA and NH_VAA
+stage 1 invalidation commands so we can support those extensions.
+
+patches [1, 3] are cleanup patches.
+patches [4, 6] changes the implementation of the VSMMUV3 IOTLB
+   This IOTLB is a minimalist IOTLB implementation that avoids to
+   do the page table walk in case we have an entry in the TLB.
+   Previously entries were page mappings only. Now they can be
+   blocks.
+patches [7, 9] bring support for range invalidation.
+
+Supporting block mappings in the IOTLB look sensible in terms of
+TLB entry consumption. However looking at virtio/vhost device usage,
+without block mapping and without range invalidation (< 5.7 kernels
+it may be less performant. However for recent guest kernels
+supporting range invalidations [2], the performance should be similar.
+
+Best Regards
+
+Eric
+
+This series can be found at:
+https://github.com/eauger/qemu.git
+branch: v5.0.0-smmuv3-ril-v1
+
+References:
+[1] [RFC v2 4/4] iommu/arm-smmu-v3: add CMD_TLBI_NH_VA_AM command
+for iova range invalidation
+(https://lists.linuxfoundation.org/pipermail/iommu/2017-August/023679.html
+
+[2] 5.7+ kernels featuring
+6a481a95d4c1 iommu/arm-smmu-v3: Add SMMUv3.2 range invalidation support
+
+Eric Auger (9):
+  hw/arm/smmu-common: Factorize some code in smmu_ptw_64()
+  hw/arm/smmu-common: Add IOTLB helpers
+  hw/arm/smmu: Simplify the IOTLB key format
+  hw/arm/smmu: Introduce SMMUTLBEntry for PTW and IOTLB value
+  hw/arm/smmuv3: Store the starting level in SMMUTransTableInfo
+  hw/arm/smmu-common: Manage IOTLB block entries
+  hw/arm/smmuv3: Introduce smmuv3_s1_range_inval() helper
+  hw/arm/smmuv3: Get prepared for range invalidation
+  hw/arm/smmuv3: Advertise SMMUv3.2 range invalidation
+
+ hw/arm/smmu-internal.h       |  14 +++
+ hw/arm/smmuv3-internal.h     |   5 +
+ include/hw/arm/smmu-common.h |  24 ++--
+ hw/arm/smmu-common.c         | 205 +++++++++++++++++++++++------------
+ hw/arm/smmuv3.c              | 142 ++++++++++++------------
+ hw/arm/trace-events          |  12 +-
+ 6 files changed, 246 insertions(+), 156 deletions(-)
+
+-- 
+2.20.1
+
 
