@@ -6,81 +6,81 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDF03C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 11:56:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 987F1C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 11:57:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C166F206C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 11:56:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C166F206C3
+	by mail.kernel.org (Postfix) with ESMTPS id 70917206C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 11:57:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70917206C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55500 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57406 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjLpD-0000mu-Og
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 07:56:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57100)
+	id 1jjLpe-0001aT-OM
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 07:57:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57188)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <stefanb@linux.ibm.com>)
- id 1jjLo5-0007aG-5K
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 07:55:41 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:5842
- helo=mx0a-001b2d01.pphosted.com)
+ id 1jjLod-0000AL-1y
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 07:56:15 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49510)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <stefanb@linux.ibm.com>)
- id 1jjLo4-0005LT-B6
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 07:55:40 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 05BBWbkr077518; Thu, 11 Jun 2020 07:55:35 -0400
+ id 1jjLoa-0005Tn-AW
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 07:56:14 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 05BBVpGw096037; Thu, 11 Jun 2020 07:56:09 -0400
 Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 31kkkas2ks-1
+ by mx0a-001b2d01.pphosted.com with ESMTP id 31kdn6kb8r-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 11 Jun 2020 07:55:34 -0400
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05BBWf1r077961;
- Thu, 11 Jun 2020 07:55:34 -0400
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com
- [169.63.214.131])
- by mx0b-001b2d01.pphosted.com with ESMTP id 31kkkas2k7-1
+ Thu, 11 Jun 2020 07:56:08 -0400
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05BBX8cN099714;
+ Thu, 11 Jun 2020 07:56:08 -0400
+Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com
+ [169.55.91.170])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 31kdn6kb77-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 11 Jun 2020 07:55:34 -0400
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
- by ppma01dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05BBtAaP010374;
- Thu, 11 Jun 2020 11:55:32 GMT
+ Thu, 11 Jun 2020 07:56:08 -0400
+Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
+ by ppma02wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05BBsrVj023151;
+ Thu, 11 Jun 2020 11:56:07 GMT
 Received: from b01cxnp23032.gho.pok.ibm.com (b01cxnp23032.gho.pok.ibm.com
- [9.57.198.27]) by ppma01dal.us.ibm.com with ESMTP id 31hygyvacu-1
+ [9.57.198.27]) by ppma02wdc.us.ibm.com with ESMTP id 31g2s8v7y1-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 11 Jun 2020 11:55:32 +0000
+ Thu, 11 Jun 2020 11:56:07 +0000
 Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com
  [9.57.199.109])
  by b01cxnp23032.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 05BBtVne51380648
+ 05BBu65w53281070
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 11 Jun 2020 11:55:31 GMT
+ Thu, 11 Jun 2020 11:56:06 GMT
 Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id D4B28112065;
- Thu, 11 Jun 2020 11:55:31 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 9D17C112062;
+ Thu, 11 Jun 2020 11:56:06 +0000 (GMT)
 Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id BF4A6112061;
- Thu, 11 Jun 2020 11:55:31 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 8F63D112061;
+ Thu, 11 Jun 2020 11:56:06 +0000 (GMT)
 Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
  by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
- Thu, 11 Jun 2020 11:55:31 +0000 (GMT)
-Subject: Re: [PATCH 2/8] hw/tpm: Include missing 'qemu/option.h' header
+ Thu, 11 Jun 2020 11:56:06 +0000 (GMT)
+Subject: Re: [PATCH 4/8] hw/tpm: Remove unnecessary 'tpm_int.h' header
+ inclusion
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
  qemu-devel@nongnu.org
 References: <20200610200247.21378-1-philmd@redhat.com>
- <20200610200247.21378-3-philmd@redhat.com>
+ <20200610200247.21378-5-philmd@redhat.com>
 From: Stefan Berger <stefanb@linux.ibm.com>
-Message-ID: <1b522fdc-50dc-5200-b855-65838146896f@linux.ibm.com>
-Date: Thu, 11 Jun 2020 07:55:31 -0400
+Message-ID: <75a54014-700e-2a32-307c-ac1ea9d01b84@linux.ibm.com>
+Date: Thu, 11 Jun 2020 07:56:06 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200610200247.21378-3-philmd@redhat.com>
+In-Reply-To: <20200610200247.21378-5-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Content-Language: en-US
@@ -89,15 +89,14 @@ X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
  definitions=2020-06-11_10:2020-06-10,
  2020-06-11 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 malwarescore=0
- bulkscore=0 adultscore=0 impostorscore=0 cotscore=-2147483648
- lowpriorityscore=0 suspectscore=0 mlxlogscore=999 spamscore=0
- priorityscore=1501 mlxscore=0 clxscore=1015 classifier=spam adjust=0
- reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2006110087
-Received-SPF: pass client-ip=148.163.158.5; envelope-from=stefanb@linux.ibm.com;
+ impostorscore=0 spamscore=0
+ clxscore=1015 cotscore=-2147483648 malwarescore=0 mlxlogscore=999
+ suspectscore=0 bulkscore=0 adultscore=0 mlxscore=0 priorityscore=1501
+ lowpriorityscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2004280000 definitions=main-2006110087
+Received-SPF: pass client-ip=148.163.156.1; envelope-from=stefanb@linux.ibm.com;
  helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 06:23:08
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 07:55:30
 X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
 X-Spam_score_int: -35
 X-Spam_score: -3.6
@@ -126,32 +125,53 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 6/10/20 4:02 PM, Philippe Mathieu-Daudé wrote:
-> Files using the TPM_STANDARD_CMDLINE_OPTS macro declared in
-> "tpm_int.h" will use QEMU_OPT_STRING definition declared in
-> "qemu/option.h".
->
 > Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
 Reviewed-by: Stefan Berger <stefanb@linux.ibm.com>
 
 
 > ---
->   hw/tpm/tpm_int.h | 2 ++
->   1 file changed, 2 insertions(+)
+>   hw/tpm/tpm_crb.c        | 1 -
+>   hw/tpm/tpm_spapr.c      | 1 -
+>   hw/tpm/tpm_tis_common.c | 1 -
+>   3 files changed, 3 deletions(-)
 >
-> diff --git a/hw/tpm/tpm_int.h b/hw/tpm/tpm_int.h
-> index 3fb28a9d6c..fd5ebc6489 100644
-> --- a/hw/tpm/tpm_int.h
-> +++ b/hw/tpm/tpm_int.h
-> @@ -12,6 +12,8 @@
->   #ifndef TPM_TPM_INT_H
->   #define TPM_TPM_INT_H
+> diff --git a/hw/tpm/tpm_crb.c b/hw/tpm/tpm_crb.c
+> index cd004e7f8e..664ff70ef9 100644
+> --- a/hw/tpm/tpm_crb.c
+> +++ b/hw/tpm/tpm_crb.c
+> @@ -25,7 +25,6 @@
+>   #include "migration/vmstate.h"
+>   #include "sysemu/tpm_backend.h"
+>   #include "sysemu/reset.h"
+> -#include "tpm_int.h"
+>   #include "tpm_util.h"
+>   #include "tpm_ppi.h"
+>   #include "trace.h"
+> diff --git a/hw/tpm/tpm_spapr.c b/hw/tpm/tpm_spapr.c
+> index ce65eb2e45..ab1a86ad6e 100644
+> --- a/hw/tpm/tpm_spapr.c
+> +++ b/hw/tpm/tpm_spapr.c
+> @@ -20,7 +20,6 @@
+>   #include "migration/vmstate.h"
 >   
-> +#include "qemu/option.h"
-> +
->   #define TPM_STANDARD_CMDLINE_OPTS \
->       { \
->           .name = "type", \
+>   #include "sysemu/tpm_backend.h"
+> -#include "tpm_int.h"
+>   #include "tpm_util.h"
+>   
+>   #include "hw/ppc/spapr.h"
+> diff --git a/hw/tpm/tpm_tis_common.c b/hw/tpm/tpm_tis_common.c
+> index 1af4bce139..94704870f6 100644
+> --- a/hw/tpm/tpm_tis_common.c
+> +++ b/hw/tpm/tpm_tis_common.c
+> @@ -33,7 +33,6 @@
+>   #include "hw/qdev-properties.h"
+>   #include "migration/vmstate.h"
+>   #include "sysemu/tpm_backend.h"
+> -#include "tpm_int.h"
+>   #include "tpm_util.h"
+>   #include "tpm_ppi.h"
+>   #include "trace.h"
 
 
 
