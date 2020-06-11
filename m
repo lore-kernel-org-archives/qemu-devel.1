@@ -2,93 +2,93 @@ Return-Path: <SRS0=U615=7Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 567E5C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 14:55:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDAA6C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 14:56:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2496D2075E
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 14:55:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 985692075E
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 14:56:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wFoCLSAg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2496D2075E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I1AlBpEU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 985692075E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52372 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53812 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjOcY-0006Gc-AL
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 10:55:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41178)
+	id 1jjOcq-00070A-SV
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 10:56:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42228)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jjOSj-0001SI-2B
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 10:45:49 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:35290)
- by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jjOSh-0003pX-1u
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 10:45:48 -0400
-Received: by mail-wm1-x342.google.com with SMTP id q25so5333150wmj.0
- for <qemu-devel@nongnu.org>; Thu, 11 Jun 2020 07:45:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=wXS6Jvw/GsSQRzbLxX/W7xj1FrkzmEuqqbzjBJFsOR0=;
- b=wFoCLSAgc5g40uPU2llbxpOqxSM74OV2GVb1HeAEKcEx8PJioV6K8MVDjTXak/sLgk
- x2CpBpbJach8FfpbBcyNmOzVP0K2mkXtkb9qK+OaphKHdknCdIj21V1gG5HB3eg7NS+8
- ndcG+e3JC7CqptrRbryF2Ldx96IbJHgdxwe5pjxwKsLbE4G3+R7k16aB2cJib2hmJ6JE
- R5AFO+m260tprgWtXj6TUwI2Kyjqs71SUg6sesg7SUOYYqgKqNBXbyU5MUxUAnImpAHK
- R+zM13Br/M+vGoc3pfmxPkp/pEG1Ma4e8ATGVOp0lSviIuq+eVAAy3mW/NZiMDXyokT5
- VbwA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=wXS6Jvw/GsSQRzbLxX/W7xj1FrkzmEuqqbzjBJFsOR0=;
- b=PCvVxqJYJ8spLSiVsHPf6YCSceH7ZWaulkl6KweKgoblMtakF81AaOaLJZ7FLIepcw
- DpZ/7XKzWLwDm31Li0QMqiDT4hUI8Ocaz9O4aOFAyQG+4K5BVbXZwND49hJcDSLPhrWQ
- XdIDufNZ5fa5YAMgS5Y2F9fxVm09jwWTacHU4Gu294qChWp192s2EJbLc0YIYPMa/ijx
- 5YqWiWYm+fZxxFWbVeZ/ANeA2BaGCZY05bf+R/7bvAN1lhXQmEGg1eDePQpbthZmG+N5
- sVXzQtirjQw6wUoviUFckyJM695NdYNXNBHT9QpJdWg1H3c0y/ypqX6VYviUg9JaPaiD
- oePQ==
-X-Gm-Message-State: AOAM530A1z0UmQYjTFIRvIIBqysJGvO8KOxSRVf/Iky93Kel/K0aon2w
- dnMbqfdUEP/olBMCS+/nbtUo2A==
-X-Google-Smtp-Source: ABdhPJyL3NeanDqGvc20q08m9wL5k8LZTcyOc3MORZlmBnqTv2ufM/vChghBfzANzboMEDbZy4pqCQ==
-X-Received: by 2002:a7b:cc82:: with SMTP id p2mr8448712wma.101.1591886739090; 
- Thu, 11 Jun 2020 07:45:39 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id h18sm5271658wru.7.2020.06.11.07.45.38
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 11 Jun 2020 07:45:38 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-arm@nongnu.org,
-	qemu-devel@nongnu.org
-Subject: [PATCH 05/10] target/arm: Convert Neon 2-reg-scalar VQDMULH,
- VQRDMULH to decodetree
-Date: Thu, 11 Jun 2020 15:45:24 +0100
-Message-Id: <20200611144529.8873-6-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200611144529.8873-1-peter.maydell@linaro.org>
-References: <20200611144529.8873-1-peter.maydell@linaro.org>
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1jjOWS-0007tF-CQ
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 10:49:40 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31697
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1jjOWP-0004ts-VJ
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 10:49:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591886976;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=srtc2Ah29M8oB8zJEweGXpRadlqbV1bf9fHHBupmYu8=;
+ b=I1AlBpEUDllhOK/0ky/xRvsBFCOWmDLSPNXW1JR6b6k1WRGlf0uJnoaq8ijw/U78UCfWTU
+ tvnJ5cRZAiT8Mbad1pDLp+08HO3VmijyFb9I+r+GpY2eutgKySRMIzzp30seFeOr0YlNl3
+ ic3TvesmnmY6/7DRgktuQOdkdnnogkc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-494-4zjCMRGhNkyleCE1Df_5xw-1; Thu, 11 Jun 2020 10:49:35 -0400
+X-MC-Unique: 4zjCMRGhNkyleCE1Df_5xw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9F11E80B71E;
+ Thu, 11 Jun 2020 14:49:33 +0000 (UTC)
+Received: from [10.36.114.197] (ovpn-114-197.ams2.redhat.com [10.36.114.197])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D946B60E3E;
+ Thu, 11 Jun 2020 14:49:22 +0000 (UTC)
+Subject: Re: [PATCH v4 1/5] acpi: Convert build_tpm2() to build_append* API
+To: Stefan Berger <stefanb@linux.ibm.com>, eric.auger.pro@gmail.com,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org,
+ mst@redhat.com, shannon.zhaosl@gmail.com, imammedo@redhat.com
+References: <20200611135917.18300-1-eric.auger@redhat.com>
+ <20200611135917.18300-2-eric.auger@redhat.com>
+ <28121558-7a75-73da-6939-da0c0e776087@linux.ibm.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <4ffc8301-b7b8-d568-ce13-477860a7a607@redhat.com>
+Date: Thu, 11 Jun 2020 16:49:20 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
+In-Reply-To: <28121558-7a75-73da-6939-da0c0e776087@linux.ibm.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::342;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x342.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=205.139.110.120;
+ envelope-from=eric.auger@redhat.com; helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 03:29:33
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,134 +101,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>
+Cc: marcandre.lureau@redhat.com, drjones@redhat.com, lersek@redhat.com,
+ ardb@kernel.org, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Convert the VQDMULH and VQRDMULH insns in the 2-reg-scalar group
-to decodetree.
+Hi Stefan,
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- target/arm/neon-dp.decode       |  3 +++
- target/arm/translate-neon.inc.c | 29 +++++++++++++++++++++++
- target/arm/translate.c          | 42 ++-------------------------------
- 3 files changed, 34 insertions(+), 40 deletions(-)
+On 6/11/20 4:25 PM, Stefan Berger wrote:
+> On 6/11/20 9:59 AM, Eric Auger wrote:
+>> In preparation of its move to the generic acpi code,
+>> let's convert build_tpm2() to use build_append API. This
+>> latter now is prefered in place of direct ACPI struct field
+>> settings with manual endianness conversion.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>
+>> ---
+>>
+>> v3 -> v4:
+>> - Don't use Acpi20TPM2 *tpm2_ptr anymore
+>> - Use variables for control area start address and start method
+>> - Simplified arg values passed to bios_linker_loader_add_pointer
+>> - use g_assert_not_reached()
+>> ---
+>>   hw/i386/acpi-build.c | 49 +++++++++++++++++++++++++++++---------------
+>>   1 file changed, 33 insertions(+), 16 deletions(-)
+>>
+>> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+>> index b5669d6c65..f150d95ecc 100644
+>> --- a/hw/i386/acpi-build.c
+>> +++ b/hw/i386/acpi-build.c
+>> @@ -2298,35 +2298,52 @@ build_tpm_tcpa(GArray *table_data, BIOSLinker
+>> *linker, GArray *tcpalog)
+>>   static void
+>>   build_tpm2(GArray *table_data, BIOSLinker *linker, GArray *tcpalog)
+>>   {
+>> -    Acpi20TPM2 *tpm2_ptr = acpi_data_push(table_data, sizeof *tpm2_ptr);
+>> -    unsigned log_addr_size = sizeof(tpm2_ptr->log_area_start_address);
+>> -    unsigned log_addr_offset =
+>> -        (char *)&tpm2_ptr->log_area_start_address - table_data->data;
+>> +    uint8_t start_method_params[12] = {};
+>> +    unsigned log_addr_offset, tpm2_start;
+>> +    uint64_t control_area_start_address;
+>> +    uint32_t start_method;
+>> +    void *tpm2_ptr;
+>>   -    tpm2_ptr->platform_class = cpu_to_le16(TPM2_ACPI_CLASS_CLIENT);
+>> +    tpm2_start = table_data->len;
+>> +    tpm2_ptr = acpi_data_push(table_data, sizeof(AcpiTableHeader));
+>> +
+>> +    /* Platform Class */
+>> +    build_append_int_noprefix(table_data, TPM2_ACPI_CLASS_CLIENT, 2);
+>> +    /* Reserved */
+>> +    build_append_int_noprefix(table_data, 0, 2);
+>>       if (TPM_IS_TIS_ISA(tpm_find())) {
+>> -        tpm2_ptr->control_area_address = cpu_to_le64(0);
+>> -        tpm2_ptr->start_method = cpu_to_le32(TPM2_START_METHOD_MMIO);
+>> +        control_area_start_address = 0;
+>> +        start_method = TPM2_START_METHOD_MMIO;
+>>       } else if (TPM_IS_CRB(tpm_find())) {
+>> -        tpm2_ptr->control_area_address = cpu_to_le64(TPM_CRB_ADDR_CTRL);
+>> -        tpm2_ptr->start_method = cpu_to_le32(TPM2_START_METHOD_CRB);
+>> +        control_area_start_address = TPM_CRB_ADDR_CTRL;
+>> +        start_method = TPM2_START_METHOD_CRB;
+>>       } else {
+>> -        g_warn_if_reached();
+>> +        g_assert_not_reached();
+>>       }
+>> +    /* Address of Control Area */
+>> +    build_append_int_noprefix(table_data, control_area_start_address,
+>> 8);
+>> +    /* Start Method */
+>> +    build_append_int_noprefix(table_data, start_method, 4);
+>>   -    tpm2_ptr->log_area_minimum_length =
+>> -        cpu_to_le32(TPM_LOG_AREA_MINIMUM_SIZE);
+>> +    /* Platform Specific Parameters */
+>> +    g_array_append_vals(table_data, &start_method_params,
+>> +                        ARRAY_SIZE(start_method_params));
+>>   -    acpi_data_push(tcpalog,
+>> le32_to_cpu(tpm2_ptr->log_area_minimum_length));
+>> +    /* Log Area Minimum Length */
+>> +    build_append_int_noprefix(table_data, TPM_LOG_AREA_MINIMUM_SIZE, 4);
+> 
+> Here you push data related to TPM2 table...
+> 
+> 
+>> +
+>> +    acpi_data_push(tcpalog, TPM_LOG_AREA_MINIMUM_SIZE);
 
-diff --git a/target/arm/neon-dp.decode b/target/arm/neon-dp.decode
-index cc2ee9641d6..105cf2b2db3 100644
---- a/target/arm/neon-dp.decode
-+++ b/target/arm/neon-dp.decode
-@@ -485,5 +485,8 @@ Vimm_1r          1111 001 . 1 . 000 ... .... cmode:4 0 . op:1 1 .... @1reg_imm
- 
-     VMUL_2sc     1111 001 . 1 . .. .... .... 1000 . 1 . 0 .... @2scalar
-     VMUL_F_2sc   1111 001 . 1 . .. .... .... 1001 . 1 . 0 .... @2scalar
-+
-+    VQDMULH_2sc  1111 001 . 1 . .. .... .... 1100 . 1 . 0 .... @2scalar
-+    VQRDMULH_2sc 1111 001 . 1 . .. .... .... 1101 . 1 . 0 .... @2scalar
-   ]
- }
-diff --git a/target/arm/translate-neon.inc.c b/target/arm/translate-neon.inc.c
-index a5c7d60bdac..6301016d5cf 100644
---- a/target/arm/translate-neon.inc.c
-+++ b/target/arm/translate-neon.inc.c
-@@ -2546,3 +2546,32 @@ static bool trans_VMLS_F_2sc(DisasContext *s, arg_2scalar *a)
- 
-     return do_2scalar(s, a, opfn[a->size], accfn[a->size]);
- }
-+
-+WRAP_ENV_FN(gen_VQDMULH_16, gen_helper_neon_qdmulh_s16)
-+WRAP_ENV_FN(gen_VQDMULH_32, gen_helper_neon_qdmulh_s32)
-+WRAP_ENV_FN(gen_VQRDMULH_16, gen_helper_neon_qrdmulh_s16)
-+WRAP_ENV_FN(gen_VQRDMULH_32, gen_helper_neon_qrdmulh_s32)
-+
-+static bool trans_VQDMULH_2sc(DisasContext *s, arg_2scalar *a)
-+{
-+    static NeonGenTwoOpFn * const opfn[] = {
-+        NULL,
-+        gen_VQDMULH_16,
-+        gen_VQDMULH_32,
-+        NULL,
-+    };
-+
-+    return do_2scalar(s, a, opfn[a->size], NULL);
-+}
-+
-+static bool trans_VQRDMULH_2sc(DisasContext *s, arg_2scalar *a)
-+{
-+    static NeonGenTwoOpFn * const opfn[] = {
-+        NULL,
-+        gen_VQRDMULH_16,
-+        gen_VQRDMULH_32,
-+        NULL,
-+    };
-+
-+    return do_2scalar(s, a, opfn[a->size], NULL);
-+}
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index e4a6a38c782..5d0e00f92e0 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -2973,19 +2973,6 @@ static void gen_exception_return(DisasContext *s, TCGv_i32 pc)
- 
- #define CPU_V001 cpu_V0, cpu_V0, cpu_V1
- 
--static TCGv_i32 neon_load_scratch(int scratch)
--{
--    TCGv_i32 tmp = tcg_temp_new_i32();
--    tcg_gen_ld_i32(tmp, cpu_env, offsetof(CPUARMState, vfp.scratch[scratch]));
--    return tmp;
--}
--
--static void neon_store_scratch(int scratch, TCGv_i32 var)
--{
--    tcg_gen_st_i32(var, cpu_env, offsetof(CPUARMState, vfp.scratch[scratch]));
--    tcg_temp_free_i32(var);
--}
--
- static int gen_neon_unzip(int rd, int rm, int size, int q)
- {
-     TCGv_ptr pd, pm;
-@@ -5190,35 +5177,10 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-                 case 1: /* Float VMLA scalar */
-                 case 5: /* Floating point VMLS scalar */
-                 case 9: /* Floating point VMUL scalar */
--                    return 1; /* handled by decodetree */
--
-                 case 12: /* VQDMULH scalar */
-                 case 13: /* VQRDMULH scalar */
--                    if (u && ((rd | rn) & 1)) {
--                        return 1;
--                    }
--                    tmp = neon_get_scalar(size, rm);
--                    neon_store_scratch(0, tmp);
--                    for (pass = 0; pass < (u ? 4 : 2); pass++) {
--                        tmp = neon_load_scratch(0);
--                        tmp2 = neon_load_reg(rn, pass);
--                        if (op == 12) {
--                            if (size == 1) {
--                                gen_helper_neon_qdmulh_s16(tmp, cpu_env, tmp, tmp2);
--                            } else {
--                                gen_helper_neon_qdmulh_s32(tmp, cpu_env, tmp, tmp2);
--                            }
--                        } else {
--                            if (size == 1) {
--                                gen_helper_neon_qrdmulh_s16(tmp, cpu_env, tmp, tmp2);
--                            } else {
--                                gen_helper_neon_qrdmulh_s32(tmp, cpu_env, tmp, tmp2);
--                            }
--                        }
--                        tcg_temp_free_i32(tmp2);
--                        neon_store_reg(rd, pass, tmp);
--                    }
--                    break;
-+                    return 1; /* handled by decodetree */
-+
-                 case 3: /* VQDMLAL scalar */
-                 case 7: /* VQDMLSL scalar */
-                 case 11: /* VQDMULL scalar */
--- 
-2.20.1
+This was:
+    tpm2_ptr->log_area_minimum_length =
+        cpu_to_le32(TPM_LOG_AREA_MINIMUM_SIZE);
+> 
+> ... here you push log area memory ...
+yes.
+> 
+> 
+>>       bios_linker_loader_alloc(linker, ACPI_BUILD_TPMLOG_FILE,
+>> tcpalog, 1,
+>>                                false);
+
+after "acpi: tpm: Do not build TCPA table for TPM 2" we had:
+
+1) acpi_data_push(tcpalog, le32_to_cpu(tpm2_ptr->log_area_minimum_length));
+2) bios_linker_loader_alloc(linker, ACPI_BUILD_TPMLOG_FILE, tcpalog, 1,
+                             false);
+
+so 1) also pushed log area memory
+
+>>   -    /* log area start address to be filled by Guest linker */
+>> +    log_addr_offset = table_data->len;
+>> +    build_append_int_noprefix(table_data, 0, 8);
+> 
+> 
+> ... here you push TPM2 table related data again. Is this right or did we
+> just mess up the TPM 2 table?
+this is to increment the table_data->len according to the
+log_addr_offset length. So yes it updates tpm2
+
+The bios-table-tests passes so at least the tpm2 shall be identical.
+
+Thanks
+
+Eric
+> 
+> 
+>> +    /* Log Area Start Address to be filled by Guest linker */
+>>       bios_linker_loader_add_pointer(linker, ACPI_BUILD_TABLE_FILE,
+>> -                                   log_addr_offset, log_addr_size,
+>> +                                   log_addr_offset, 8,
+>>                                      ACPI_BUILD_TPMLOG_FILE, 0);
+>>       build_header(linker, table_data,
+>> -                 (void *)tpm2_ptr, "TPM2", sizeof(*tpm2_ptr), 4,
+>> NULL, NULL);
+>> +                 tpm2_ptr, "TPM2", table_data->len - tpm2_start, 4,
+>> NULL, NULL);
+>>   }
+>>     #define HOLE_640K_START  (640 * KiB)
+> 
+> 
+> 
 
 
