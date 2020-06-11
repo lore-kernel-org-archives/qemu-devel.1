@@ -2,63 +2,70 @@ Return-Path: <SRS0=U615=7Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08A98C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 13:25:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 158CFC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 13:26:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D2CF42078D
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 13:25:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2CF42078D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
+	by mail.kernel.org (Postfix) with ESMTPS id CD24E2078D
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 13:26:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="Chi9BmGi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD24E2078D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42104 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43414 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjNDB-0003yS-0O
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 09:25:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33900)
+	id 1jjNDY-0004eM-35
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 09:26:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34420)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1jjNCB-0002zZ-KJ
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 09:24:39 -0400
-Received: from mx2.suse.de ([195.135.220.15]:57592)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1jjNCA-0000OO-90
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 09:24:39 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
- by mx2.suse.de (Postfix) with ESMTP id 5E69FAF92;
- Thu, 11 Jun 2020 13:24:37 +0000 (UTC)
-Subject: Re: [PATCH 12/13] i386: hvf: Move mmio_buf into CPUX86State
-To: Paolo Bonzini <pbonzini@redhat.com>,
- Roman Bolshakov <r.bolshakov@yadro.com>, qemu-devel@nongnu.org
-References: <20200528193758.51454-1-r.bolshakov@yadro.com>
- <20200528193758.51454-13-r.bolshakov@yadro.com>
- <d57e48c6-574e-471c-78be-1245d62bc908@redhat.com>
-From: Claudio Fontana <cfontana@suse.de>
-Message-ID: <3101f615-e1c9-2cf4-7a7b-6e30c7942c53@suse.de>
-Date: Thu, 11 Jun 2020 15:24:31 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (Exim 4.90_1) (envelope-from <berto@igalia.com>)
+ id 1jjNCT-0003PM-5f; Thu, 11 Jun 2020 09:24:57 -0400
+Received: from fanzine.igalia.com ([178.60.130.6]:54281)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <berto@igalia.com>)
+ id 1jjNCR-0000Mz-Ho; Thu, 11 Jun 2020 09:24:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+ s=20170329; 
+ h=Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
+ bh=TbGuVxNClVfyTAUvLHlpJV0TvM5BxgfRDVj0lAWDjZo=; 
+ b=Chi9BmGi0idvpgfzsClghcy+VfTB2acQz1wt+33nt+GGAexQBKs4PKzciLZy/VOXvk8AOyeqXl3kWZwKlLBYQECLKl1/ebbDIrRWqxP4WWIzQR3h2LuiWW20/hyuub+goKQ7yD9Us6ESV66TAjX+Yz1OC33g1l4ZLcOflDhXk1lrZISvNdRpoLrlAq4Ip3NpF58ZGLg4881jbhesN0RCS3Necj4LRysbD0vdC643ctEosDk0vQJBHACYScADVOYYQObLBaq1RdgV/vTgOqI9Pf8T/eGLHmx+zcdOG3ztdrYOo1pm+aKQPjjL3A/EWAMiCuNqbM7JbMzZJP+pIKS1Bg==;
+Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
+ by fanzine.igalia.com with esmtps 
+ (Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
+ id 1jjNC2-00061n-Ru; Thu, 11 Jun 2020 15:24:30 +0200
+Received: from berto by mail.igalia.com with local (Exim)
+ id 1jjNC2-0006sE-Hj; Thu, 11 Jun 2020 15:24:30 +0200
+From: Alberto Garcia <berto@igalia.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Subject: Re: [PATCH v8 33/34] qcow2: Assert that expand_zero_clusters_in_l1()
+ does not support subclusters
+In-Reply-To: <abcbfa4c-c70f-3c2e-ec8f-4087b348af26@redhat.com>
+References: <cover.1591801197.git.berto@igalia.com>
+ <19afb93b267b9698edf5e0253458c5db69ef91a2.1591801197.git.berto@igalia.com>
+ <abcbfa4c-c70f-3c2e-ec8f-4087b348af26@redhat.com>
+User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
+ (i586-pc-linux-gnu)
+Date: Thu, 11 Jun 2020 15:24:30 +0200
+Message-ID: <w51y2othh0x.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <d57e48c6-574e-471c-78be-1245d62bc908@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=195.135.220.15; envelope-from=cfontana@suse.de;
- helo=mx2.suse.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 00:13:26
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain
+Received-SPF: pass client-ip=178.60.130.6; envelope-from=berto@igalia.com;
+ helo=fanzine.igalia.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 09:24:32
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -71,128 +78,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Cameron Esfahani <dirty@apple.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, Derek Su <dereksu@qnap.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/4/20 8:27 PM, Paolo Bonzini wrote:
-> On 28/05/20 21:37, Roman Bolshakov wrote:
->> There's no similar field in CPUX86State, but it's needed for MMIO traps.
->>
->> Signed-off-by: Roman Bolshakov <r.bolshakov@yadro.com>
->> ---
->>  target/i386/cpu.h         |  1 +
->>  target/i386/hvf/hvf.c     |  5 +++++
->>  target/i386/hvf/x86.h     |  1 -
->>  target/i386/hvf/x86_emu.c | 12 ++++++------
->>  4 files changed, 12 insertions(+), 7 deletions(-)
->>
->> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
->> index 7e6566565a..be44e19154 100644
->> --- a/target/i386/cpu.h
->> +++ b/target/i386/cpu.h
->> @@ -1593,6 +1593,7 @@ typedef struct CPUX86State {
->>  #endif
->>  #if defined(CONFIG_HVF)
->>      hvf_lazy_flags hvf_lflags;
->> +    void *hvf_mmio_buf;
->>      HVFX86EmulatorState *hvf_emul;
->>  #endif
->>  
->> diff --git a/target/i386/hvf/hvf.c b/target/i386/hvf/hvf.c
->> index 4cee496d71..57696c46c7 100644
->> --- a/target/i386/hvf/hvf.c
->> +++ b/target/i386/hvf/hvf.c
->> @@ -533,7 +533,11 @@ void hvf_reset_vcpu(CPUState *cpu) {
->>  
->>  void hvf_vcpu_destroy(CPUState *cpu)
->>  {
->> +    X86CPU *x86_cpu = X86_CPU(cpu);
->> +    CPUX86State *env = &x86_cpu->env;
->> +
->>      hv_return_t ret = hv_vcpu_destroy((hv_vcpuid_t)cpu->hvf_fd);
->> +    g_free(env->hvf_mmio_buf);
->>      assert_hvf_ok(ret);
->>  }
->>  
->> @@ -563,6 +567,7 @@ int hvf_init_vcpu(CPUState *cpu)
->>      init_decoder();
->>  
->>      hvf_state->hvf_caps = g_new0(struct hvf_vcpu_caps, 1);
->> +    env->hvf_mmio_buf = g_new(char, 4096);
->>      env->hvf_emul = g_new0(HVFX86EmulatorState, 1);
->>  
->>      r = hv_vcpu_create((hv_vcpuid_t *)&cpu->hvf_fd, HV_VCPU_DEFAULT);
->> diff --git a/target/i386/hvf/x86.h b/target/i386/hvf/x86.h
->> index 2363616c07..483fcea762 100644
->> --- a/target/i386/hvf/x86.h
->> +++ b/target/i386/hvf/x86.h
->> @@ -230,7 +230,6 @@ typedef struct x68_segment_selector {
->>  
->>  /* Definition of hvf_x86_state is here */
->>  struct HVFX86EmulatorState {
->> -    uint8_t mmio_buf[4096];
->>  };
->>  
->>  /* useful register access  macros */
->> diff --git a/target/i386/hvf/x86_emu.c b/target/i386/hvf/x86_emu.c
->> index 1ad2c30e16..d3e289ed87 100644
->> --- a/target/i386/hvf/x86_emu.c
->> +++ b/target/i386/hvf/x86_emu.c
->> @@ -187,8 +187,8 @@ void write_val_ext(struct CPUX86State *env, target_ulong ptr, target_ulong val,
->>  
->>  uint8_t *read_mmio(struct CPUX86State *env, target_ulong ptr, int bytes)
->>  {
->> -    vmx_read_mem(env_cpu(env), env->hvf_emul->mmio_buf, ptr, bytes);
->> -    return env->hvf_emul->mmio_buf;
->> +    vmx_read_mem(env_cpu(env), env->hvf_mmio_buf, ptr, bytes);
->> +    return env->hvf_mmio_buf;
->>  }
->>  
->>  
->> @@ -489,9 +489,9 @@ static void exec_ins_single(struct CPUX86State *env, struct x86_decode *decode)
->>      target_ulong addr = linear_addr_size(env_cpu(env), RDI(env),
->>                                           decode->addressing_size, R_ES);
->>  
->> -    hvf_handle_io(env_cpu(env), DX(env), env->hvf_emul->mmio_buf, 0,
->> +    hvf_handle_io(env_cpu(env), DX(env), env->hvf_mmio_buf, 0,
->>                    decode->operand_size, 1);
->> -    vmx_write_mem(env_cpu(env), addr, env->hvf_emul->mmio_buf,
->> +    vmx_write_mem(env_cpu(env), addr, env->hvf_mmio_buf,
->>                    decode->operand_size);
->>  
->>      string_increment_reg(env, R_EDI, decode);
->> @@ -512,9 +512,9 @@ static void exec_outs_single(struct CPUX86State *env, struct x86_decode *decode)
->>  {
->>      target_ulong addr = decode_linear_addr(env, decode, RSI(env), R_DS);
->>  
->> -    vmx_read_mem(env_cpu(env), env->hvf_emul->mmio_buf, addr,
->> +    vmx_read_mem(env_cpu(env), env->hvf_mmio_buf, addr,
->>                   decode->operand_size);
->> -    hvf_handle_io(env_cpu(env), DX(env), env->hvf_emul->mmio_buf, 1,
->> +    hvf_handle_io(env_cpu(env), DX(env), env->hvf_mmio_buf, 1,
->>                    decode->operand_size, 1);
->>  
->>      string_increment_reg(env, R_ESI, decode);
->>
-> 
-> It should be possible to get rid of the buffer altogether, but it's ok
-> to do it separately.
-> 
-> I queued the series, thanks.
-> 
-> Paolo
-> 
-> 
+On Wed 10 Jun 2020 09:43:53 PM CEST, Eric Blake wrote:
+> On 6/10/20 10:03 AM, Alberto Garcia wrote:
+>> This function is only used by qcow2_expand_zero_clusters() to
+>> downgrade a qcow2 image to a previous version. It is however not
+>> possible to downgrade an image with extended L2 entries because older
+>> versions of qcow2 do not have this feature.
+>
+> Well, it _is_ possible, but it would involve rewriting the entire
+> L1/L2 tables (including all internal snapshots)
 
-Thanks Paolo, I am waiting for this (and maybe another series from Roman) to be able to do the cpus refactoring.
+Right :-) Let's try this way:
 
-Incidentally, would it not be great to have some machinery that automatically tracks which series is already queued where?
-Maybe there is already a mechanism I am unaware of?
+    This function is only used by qcow2_expand_zero_clusters() to
+    downgrade a qcow2 image to a previous version. This would require
+    transforming all extended L2 entries into normal L2 entries but
+    this is not a simple task and there are no plans to implement this
+    at the moment.
 
-Ciao,
-
-Claudio
+Berto
 
