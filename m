@@ -2,82 +2,82 @@ Return-Path: <SRS0=U615=7Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74C53C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 11:32:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40692C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 11:34:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3D90220760
-	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 11:32:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0B96120760
+	for <qemu-devel@archiver.kernel.org>; Thu, 11 Jun 2020 11:34:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F95zLJLq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D90220760
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bll9qjoH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B96120760
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41804 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44404 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjLRk-000438-II
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 07:32:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46786)
+	id 1jjLTY-0005Ad-9k
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 07:34:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47358)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1jjLQs-00033T-G8
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 07:31:42 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:30440
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jjLSs-0004ii-Hu
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 07:33:46 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41942
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1jjLQq-0007KF-Ho
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 07:31:41 -0400
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jjLSr-0007h0-Mv
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 07:33:46 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591875098;
+ s=mimecast20190719; t=1591875224;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=bb5MbMUt7rfx56ny1QmggNavflgbu2RsHY+5CyxxMbk=;
- b=F95zLJLq0lz30rH+VhQyqQ/qDWTrC3/JeZcFvlK0MdUDn27nWkQsE2fD4pqTFnq29TqS+Q
- huSaCB8WI2CoACTAnwcxBFSgDzG649EvhD5jPCRV0pdKZPjYyyZbaX3ebu8rUR4vJkRCS/
- 51W+1LFY/X/OL7V1/4RAIpY/sqhKNOo=
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=2MrhYnJvZB9ucDVKqxStanDhO5Om5u13tRftOccw93I=;
+ b=bll9qjoHMrhmvs5Nm9I+uEQgcW1B+VaXba8ySs2Q6eWKi0k8+06PtBuEAMPY7kItNfFZQu
+ NYOokaNJ/t7lWGxjKUZZ1CPJdSk35JmbnYY4XI21Ck9AX01nzDE95hREcQCzb8Smgxx4MR
+ euYLLT/FiejIZuWQw6b1uH4DBQ7EzR8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-426-UulC92iDPlmgC3iBK9k_eA-1; Thu, 11 Jun 2020 07:31:34 -0400
-X-MC-Unique: UulC92iDPlmgC3iBK9k_eA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-430-dH_uS4i1MQuFnFRLbwLZMQ-1; Thu, 11 Jun 2020 07:33:40 -0400
+X-MC-Unique: dH_uS4i1MQuFnFRLbwLZMQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 854891845160;
- Thu, 11 Jun 2020 11:31:33 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-114-21.ams2.redhat.com
- [10.36.114.21])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1B3B98929B;
- Thu, 11 Jun 2020 11:31:28 +0000 (UTC)
-Subject: Re: [PATCH v7 2/5] softmmu/vl: Let -fw_cfg option take a 'gen_id'
- argument
-To: minyard@acm.org
-References: <20200528173141.17495-1-philmd@redhat.com>
- <20200528173141.17495-3-philmd@redhat.com>
- <f3f6154e-bbc1-98bd-0f44-77b28c74915f@redhat.com>
- <20200609155050.GT2880@minyard.net>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <6e4b9540-7d5b-0951-2870-bada03e29d83@redhat.com>
-Date: Thu, 11 Jun 2020 13:31:28 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.9.1
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7D9548AB5D3;
+ Thu, 11 Jun 2020 11:33:32 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-114-175.ams2.redhat.com [10.36.114.175])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5F8597E597;
+ Thu, 11 Jun 2020 11:33:18 +0000 (UTC)
+Subject: Re: [PATCH v2 1/8] s390/sclp: get machine once during read scp/cpu
+ info
+To: Collin Walling <walling@linux.ibm.com>, qemu-devel@nongnu.org,
+ qemu-s390x@nongnu.org
+References: <20200515222032.18838-1-walling@linux.ibm.com>
+ <20200515222032.18838-2-walling@linux.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <bf517581-8892-c823-8037-edbf7441881e@redhat.com>
+Date: Thu, 11 Jun 2020 13:33:16 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200609155050.GT2880@minyard.net>
+In-Reply-To: <20200515222032.18838-2-walling@linux.ibm.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=lersek@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=thuth@redhat.com;
+ helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 03:29:33
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
@@ -99,95 +99,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
+Cc: frankja@linux.ibm.com, david@redhat.com, cohuck@redhat.com,
+ pasic@linux.ibm.com, borntraeger@de.ibm.com, mst@redhat.com,
+ svens@linux.ibm.com, pbonzini@redhat.com, mihajlov@linux.ibm.com,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 06/09/20 17:50, Corey Minyard wrote:
-> On Fri, May 29, 2020 at 11:50:24AM +0200, Laszlo Ersek wrote:
->> Gerd, Corey: there's a question for you near the end, please.
->>
->> On 05/28/20 19:31, Philippe Mathieu-Daudé wrote:
+On 16/05/2020 00.20, Collin Walling wrote:
+> Functions within read scp/cpu info will need access to the machine
+> state. Let's make a call to retrieve the machine state once and
+> pass the appropriate data to the respective functions.
 > 
-> snip...
+> Signed-off-by: Collin Walling <walling@linux.ibm.com>
+> ---
+>  hw/s390x/sclp.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
 > 
->>
->>
->> (3) I've noticed another *potential* issue, from looking at the larger
->> context. I apologize for missing it in v6.
->>
->> See commit bab47d9a75a3 ("Sort the fw_cfg file list", 2016-04-07). (I'm
->> copying Corey; Gerd is already copied.) From that commit, we have, at
->> the end of this function:
->>
->>     /* For legacy, keep user files in a specific global order. */
->>     fw_cfg_set_order_override(fw_cfg, FW_CFG_ORDER_OVERRIDE_USER);
->>     fw_cfg_add_file(fw_cfg, name, buf, size);
->>     fw_cfg_reset_order_override(fw_cfg);
->>
->> This takes effect for "file" and "string", but not for "gen_id". Should
->> we apply it to "gen_id" as well? (Sorry, I really don't understand what
->> commit bab47d9a75a3 is about!)
+> diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
+> index ede056b3ef..61e2e2839c 100644
+> --- a/hw/s390x/sclp.c
+> +++ b/hw/s390x/sclp.c
+> @@ -49,9 +49,8 @@ static inline bool sclp_command_code_valid(uint32_t code)
+>      return false;
+>  }
+>  
+> -static void prepare_cpu_entries(SCLPDevice *sclp, CPUEntry *entry, int *count)
+> +static void prepare_cpu_entries(MachineState *ms, CPUEntry *entry, int *count)
+>  {
+> -    MachineState *ms = MACHINE(qdev_get_machine());
+>      uint8_t features[SCCB_CPU_FEATURE_LEN] = { 0 };
+>      int i;
+>  
+> @@ -77,7 +76,7 @@ static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
+>      IplParameterBlock *ipib = s390_ipl_get_iplb();
+>  
+>      /* CPU information */
+> -    prepare_cpu_entries(sclp, read_info->entries, &cpu_count);
+> +    prepare_cpu_entries(machine, read_info->entries, &cpu_count);
+>      read_info->entries_cpu = cpu_to_be16(cpu_count);
+>      read_info->offset_cpu = cpu_to_be16(offsetof(ReadInfo, entries));
+>      read_info->highest_cpu = cpu_to_be16(machine->smp.max_cpus - 1);
+> @@ -132,10 +131,11 @@ static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
+>  /* Provide information about the CPU */
+>  static void sclp_read_cpu_info(SCLPDevice *sclp, SCCB *sccb)
+>  {
+> +    MachineState *machine = MACHINE(qdev_get_machine());
+>      ReadCpuInfo *cpu_info = (ReadCpuInfo *) sccb;
+>      int cpu_count;
+>  
+> -    prepare_cpu_entries(sclp, cpu_info->entries, &cpu_count);
+> +    prepare_cpu_entries(machine, cpu_info->entries, &cpu_count);
+>      cpu_info->nr_configured = cpu_to_be16(cpu_count);
+>      cpu_info->offset_configured = cpu_to_be16(offsetof(ReadCpuInfo, entries));
+>      cpu_info->nr_standby = cpu_to_be16(0);
 > 
-> I can explain the rationale for that change, but I'm not sure of the
-> answer to your question.  That changes makes sure that the fw_cfg data
-> remains exactly the same even on newer versions of qemu if the machine
-> is set the same.  This way you can do migrations to newer qemu versions
-> and anything using fw_cfg won't get confused because the data changes.
-> 
-> The reason that change was so complex was preserving the order for
-> migrating from older versions.
-> 
-> This is only about migration.  I'm not sure what gen_id is, but if it's
-> migrated, it better be future proof.
 
-Whenever introducing a new fw_cfg file (*any* new named file), how do we
-decide whether we need fw_cfg_set_order_override()?
-
-Thanks
-Laszlo
-
-
-> 
-> -corey
-> 
->>
->> *IF* we want to apply the same logic to "gen_id", then we should
->> *perhaps* do, on the "nonempty_str(gen_id)" branch:
->>
->>         size_t fw_cfg_size;
->>
->>         fw_cfg_set_order_override(fw_cfg, FW_CFG_ORDER_OVERRIDE_USER);
->>         fw_cfg_size = fw_cfg_add_from_generator(fw_cfg, name, gen_id, errp);
->>         fw_cfg_reset_order_override(fw_cfg);
->>         return (fw_cfg_size > 0) ? 0 : -1;
->>
->> I think???
->>
->> Or maybe even use FW_CFG_ORDER_OVERRIDE_DEVICE rather than
->> FW_CFG_ORDER_OVERRIDE_USER? I don't have the slightest clue.
->>
->> (I guess if I understood what commit bab47d9a75a3 was about, I'd be less
->> in doubt now. But that commit only hints at "avoid[ing] any future
->> issues of moving the file creation" -- I don't know what those issues
->> were in the first place!)
->>
->> With (1) optionally fixed, and (2) fixed, I'd be willing to R-b this
->> patch; but I'm really thrown off by (3).
->>
->> Thanks,
->> Laszlo
->>
->>
->>>      } else {
->>>          GError *err = NULL;
->>>          if (!g_file_get_contents(file, &buf, &size, &err)) {
->>>
->>
-> 
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
 
