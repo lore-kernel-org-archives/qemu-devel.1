@@ -7,75 +7,77 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8EE2C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 15:20:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AC4AC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 15:20:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9376B206A4
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 15:20:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E52AB206A4
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 15:20:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WdOH7hVH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9376B206A4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DtKPh3/j"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E52AB206A4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60162 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60716 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjlTO-0008Bo-RQ
-	for qemu-devel@archiver.kernel.org; Fri, 12 Jun 2020 11:20:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51070)
+	id 1jjlTU-0008Pe-6L
+	for qemu-devel@archiver.kernel.org; Fri, 12 Jun 2020 11:20:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50752)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jjl4O-00031E-SF
- for qemu-devel@nongnu.org; Fri, 12 Jun 2020 10:54:12 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:39361
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jjl3a-0001i6-9a
+ for qemu-devel@nongnu.org; Fri, 12 Jun 2020 10:53:22 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:56642
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jjl4L-0001qM-Bw
- for qemu-devel@nongnu.org; Fri, 12 Jun 2020 10:54:12 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jjl3Y-0001l3-FI
+ for qemu-devel@nongnu.org; Fri, 12 Jun 2020 10:53:21 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591973648;
+ s=mimecast20190719; t=1591973599;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=kAMCwY6Ii66tK0+En6xfr/Bb9/oeXHnOnpsD9bdoRBE=;
- b=WdOH7hVHgOMP3BZKyoW2QxkNbfsnn3pS8zpY9w1gGMKTIOLzfXXTKEJtebPmOf2bgbh+PA
- t2Ume63wxjvehOJzVQt43zRNtW6JDgHk1V5gnBy2pjNwu3UECEHR4NfpBK12G0nH+vvaQV
- Rlo/whCfuUwYPSAje8Qpf6S/dq3R4qY=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-32-Mq-_R6AQOmuj616quP0hUQ-1; Fri, 12 Jun 2020 10:51:08 -0400
-X-MC-Unique: Mq-_R6AQOmuj616quP0hUQ-1
-Received: by mail-wm1-f69.google.com with SMTP id 14so2514374wmi.8
- for <qemu-devel@nongnu.org>; Fri, 12 Jun 2020 07:51:08 -0700 (PDT)
+ bh=D/GZNs5L1C46gfOzGMxtE23sRQlVqpPh51YO3SQfyZM=;
+ b=DtKPh3/jHpHpknEgQxeWeFj1fQc5Wr7iTrSqsTgYlgExbCSN7zNLO15ez3RXX1NfoHYR6f
+ soNCiCs67tC2JwSgG/UiNt5g315WgCpJM05EfHvzq76ZEWivvGj77NhknNPO0F/MlQ8iB2
+ vCyaYggVfPTRrinuZ1XJ6DzbEaguSV8=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-218--s92U7c-PS25Tu2R-BKSDQ-1; Fri, 12 Jun 2020 10:53:10 -0400
+X-MC-Unique: -s92U7c-PS25Tu2R-BKSDQ-1
+Received: by mail-wr1-f72.google.com with SMTP id w16so3977463wru.18
+ for <qemu-devel@nongnu.org>; Fri, 12 Jun 2020 07:53:10 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=kAMCwY6Ii66tK0+En6xfr/Bb9/oeXHnOnpsD9bdoRBE=;
- b=RS31XClJksoXok4zWF04mG7M+/uBliU6+IXV8cSMSDghHCWmfBxJOXitRP3ggOj7o1
- JxhV9MYboT0snw7qX3gMDzaTlaMNWre1lSfnOXsJIO9xYRkpHPXGAveGjAJbYLVR6cJW
- Q5XFD/1M+RIy0kqClIGJF9fEaHQFDQ7wuorA5OAWh9MurGWpgMCDjU1Ml8uN69WB/M1S
- sS42GN/J+eSdfzgF6rtjWWDQsPeSzM4ORoF4oX/YdwaO/ceXB/NujJEcMgoAJvtiyovR
- wMxvrr0HvLtpDotFjuyUZF9hslDDn81UIosJxGzy1Z0t532s9E3ulsXN9/yUmWrc4ogC
- a4AA==
-X-Gm-Message-State: AOAM531oWTURTO8eqb2gsbo8T+tNTB6EdNVtlZJPG7SVA9cZIFEEUZbs
- 2a0CEbHXe9C3KOkHeCNNuNs2KgPCjkzTzhNqYHMCiTyGNMGYtqLmLRTrmofFMvsxFArfTtk6XAI
- zsOiQXU8XeiZwBqU=
-X-Received: by 2002:a7b:cd06:: with SMTP id f6mr13653110wmj.8.1591973466926;
- Fri, 12 Jun 2020 07:51:06 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxPXfXfB2hD4f9KCExUVh69jj9NTS6oEjhg0FSx7DpxEgZeRUv4OhDvqW4bHksYZYUVgLjrQw==
-X-Received: by 2002:a7b:cd06:: with SMTP id f6mr13653092wmj.8.1591973466723;
- Fri, 12 Jun 2020 07:51:06 -0700 (PDT)
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=D/GZNs5L1C46gfOzGMxtE23sRQlVqpPh51YO3SQfyZM=;
+ b=JsXkkIrA1r6+TS0bZafStIocTwy07j1KSlV4NKqWh5gBGyrG1h2oyNHsgusol8gdIY
+ 8aiyFeRLfnip0a/zl7DS10WsY9aGNNquPbnSUezd5tcM/RsuhKIYOknD3R2MgbRV6BsO
+ dkDfSfwpx5wP6IEhTGri14ILmFYzw4kHehOvJ5YbvmQiPF2J0/BSXvS2QQToM/IuXkhP
+ +OF1/sHVUDg78O8eDETpuUwXFsnDKmF1QK/ZDDgULO8EADyCslAxhP9MVNpa9nW86RPq
+ oxD6yu7AIbieplZgIrzOU13JSq3SZaLHTkuT6PWzIqM+1hcJoiJshAnkgPjFg7UlcRGj
+ oP+g==
+X-Gm-Message-State: AOAM533kHxxdIhYJOvcGq2L27fHE/eKm9f5ahSfgVY7LQ+EfNM5bHUlD
+ FG+U7qCytc/MyWlU6NP9Qiv4or1597Vz6BIb6iu4+4wNbWuxp2DMgoiV2VIbYIjoRvfNJFfR5bx
+ cS5UQNfv1/PZeyEg=
+X-Received: by 2002:a7b:cf02:: with SMTP id l2mr13811840wmg.136.1591973589411; 
+ Fri, 12 Jun 2020 07:53:09 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJx7xp0gcKJKKCkJffaHQnlVl4YAOFuhnq+k1Wmzpgw6wmORfyYY30TGsbE2HiW0+cao2ZIpXA==
+X-Received: by 2002:a7b:cf02:: with SMTP id l2mr13811811wmg.136.1591973589172; 
+ Fri, 12 Jun 2020 07:53:09 -0700 (PDT)
 Received: from redhat.com (bzq-79-178-18-124.red.bezeqint.net. [79.178.18.124])
- by smtp.gmail.com with ESMTPSA id o10sm10407217wrq.40.2020.06.12.07.51.05
+ by smtp.gmail.com with ESMTPSA id d9sm10286957wre.28.2020.06.12.07.53.07
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 12 Jun 2020 07:51:06 -0700 (PDT)
-Date: Fri, 12 Jun 2020 10:51:04 -0400
+ Fri, 12 Jun 2020 07:53:08 -0700 (PDT)
+Date: Fri, 12 Jun 2020 10:53:07 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 02/58] diffs-allowed: add the SRAT AML to diffs-allowed
-Message-ID: <20200612141917.9446-3-mst@redhat.com>
+Subject: [PULL v2 57/58] pci: Display PCI IRQ pin in "info pci"
+Message-ID: <20200612141917.9446-58-mst@redhat.com>
 References: <20200612141917.9446-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20200612141917.9446-1-mst@redhat.com>
@@ -83,7 +85,8 @@ X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
 X-Mutt-Fcc: =sent
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 Content-Disposition: inline
 Received-SPF: pass client-ip=205.139.110.61; envelope-from=mst@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
@@ -109,33 +112,92 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
- Igor Mammedov <imammedo@redhat.com>, Vishal Verma <vishal.l.verma@intel.com>
+ Julia Suvorova <jusual@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Vishal Verma <vishal.l.verma@intel.com>
+From: Peter Xu <peterx@redhat.com>
 
-In anticipation of a change to the SRAT generation in qemu, add the AML
-file to diffs-allowed.
+Sometimes it would be good to be able to read the pin number along
+with the IRQ number allocated.  Since we'll dump the IRQ number, no
+reason to not dump the pin information.  For example, the vfio-pci
+device will overwrite the pin with the hardware pin number.  It would
+be nice to know the pin number of one assigned device from QMP/HMP.
 
-Signed-off-by: Vishal Verma <vishal.l.verma@intel.com>
-Message-Id: <20200606000911.9896-2-vishal.l.verma@intel.com>
+CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
+CC: Alex Williamson <alex.williamson@redhat.com>
+CC: Michael S. Tsirkin <mst@redhat.com>
+CC: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+CC: Julia Suvorova <jusual@redhat.com>
+CC: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+Message-Id: <20200317195908.283800-1-peterx@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Acked-by: Markus Armbruster <armbru@redhat.com>
 ---
- tests/qtest/bios-tables-test-allowed-diff.h | 3 +++
- 1 file changed, 3 insertions(+)
+ qapi/misc.json     | 6 ++++--
+ hw/pci/pci.c       | 1 +
+ monitor/hmp-cmds.c | 3 ++-
+ 3 files changed, 7 insertions(+), 3 deletions(-)
 
-diff --git a/tests/qtest/bios-tables-test-allowed-diff.h b/tests/qtest/bios-tables-test-allowed-diff.h
-index dfb8523c8b..e8f2766a63 100644
---- a/tests/qtest/bios-tables-test-allowed-diff.h
-+++ b/tests/qtest/bios-tables-test-allowed-diff.h
-@@ -1 +1,4 @@
- /* List of comma-separated changed AML files to ignore */
-+"tests/data/acpi/pc/SRAT.dimmpxm",
-+"tests/data/acpi/q35/SRAT.dimmpxm",
-+"tests/data/acpi/virt/SRAT.memhp",
+diff --git a/qapi/misc.json b/qapi/misc.json
+index 99b90ac80b..a5a0beb902 100644
+--- a/qapi/misc.json
++++ b/qapi/misc.json
+@@ -403,6 +403,8 @@
+ #
+ # @irq: if an IRQ is assigned to the device, the IRQ number
+ #
++# @irq_pin: the IRQ pin, zero means no IRQ (since 5.1)
++#
+ # @qdev_id: the device name of the PCI device
+ #
+ # @pci_bridge: if the device is a PCI bridge, the bridge information
+@@ -417,8 +419,8 @@
+ { 'struct': 'PciDeviceInfo',
+   'data': {'bus': 'int', 'slot': 'int', 'function': 'int',
+            'class_info': 'PciDeviceClass', 'id': 'PciDeviceId',
+-           '*irq': 'int', 'qdev_id': 'str', '*pci_bridge': 'PciBridgeInfo',
+-           'regions': ['PciMemoryRegion']} }
++           '*irq': 'int', 'irq_pin': 'int', 'qdev_id': 'str',
++           '*pci_bridge': 'PciBridgeInfo', 'regions': ['PciMemoryRegion'] }}
+ 
+ ##
+ # @PciInfo:
+diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+index 1b88a32cf7..a60cf3ae3b 100644
+--- a/hw/pci/pci.c
++++ b/hw/pci/pci.c
+@@ -1776,6 +1776,7 @@ static PciDeviceInfo *qmp_query_pci_device(PCIDevice *dev, PCIBus *bus,
+     info->regions = qmp_query_pci_regions(dev);
+     info->qdev_id = g_strdup(dev->qdev.id ? dev->qdev.id : "");
+ 
++    info->irq_pin = dev->config[PCI_INTERRUPT_PIN];
+     if (dev->config[PCI_INTERRUPT_PIN] != 0) {
+         info->has_irq = true;
+         info->irq = dev->config[PCI_INTERRUPT_LINE];
+diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
+index 9c61e769ca..e03adf0d4d 100644
+--- a/monitor/hmp-cmds.c
++++ b/monitor/hmp-cmds.c
+@@ -688,7 +688,8 @@ static void hmp_info_pci_device(Monitor *mon, const PciDeviceInfo *dev)
+     }
+ 
+     if (dev->has_irq) {
+-        monitor_printf(mon, "      IRQ %" PRId64 ".\n", dev->irq);
++        monitor_printf(mon, "      IRQ %" PRId64 ", pin %c\n",
++                       dev->irq, (char)('A' + dev->irq_pin - 1));
+     }
+ 
+     if (dev->has_pci_bridge) {
 -- 
 MST
 
