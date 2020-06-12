@@ -7,79 +7,80 @@ X-Spam-Status: No, score=-17.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
 	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD8CEC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 01:49:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1125DC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 01:50:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 94E5D20853
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 01:49:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D0BB7206A4
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 01:50:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sh9rj0Ze"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 94E5D20853
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="E4F4T8Cy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0BB7206A4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59644 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33604 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjYoe-0005sz-UN
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 21:49:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51030)
+	id 1jjYpi-0006nk-3a
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 21:50:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51118)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from
- <3Zd7iXgMKCqoTUjQYYQVO.MYWaOWe-NOfOVXYXQXe.YbQ@flex--jkz.bounces.google.com>)
- id 1jjYlz-0000xD-Ds
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 21:46:23 -0400
-Received: from mail-qk1-x749.google.com ([2607:f8b0:4864:20::749]:44709)
+ <3a97iXgMKCrAZapWeeWbU.SecgUck-TUlUbdedWdk.ehW@flex--jkz.bounces.google.com>)
+ id 1jjYm4-00016r-GZ
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 21:46:28 -0400
+Received: from mail-qv1-xf49.google.com ([2607:f8b0:4864:20::f49]:42163)
  by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from
- <3Zd7iXgMKCqoTUjQYYQVO.MYWaOWe-NOfOVXYXQXe.YbQ@flex--jkz.bounces.google.com>)
- id 1jjYlx-0001Up-C4
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 21:46:23 -0400
-Received: by mail-qk1-x749.google.com with SMTP id j16so6800262qka.11
- for <qemu-devel@nongnu.org>; Thu, 11 Jun 2020 18:46:14 -0700 (PDT)
+ <3a97iXgMKCrAZapWeeWbU.SecgUck-TUlUbdedWdk.ehW@flex--jkz.bounces.google.com>)
+ id 1jjYm2-0001VU-IX
+ for qemu-devel@nongnu.org; Thu, 11 Jun 2020 21:46:28 -0400
+Received: by mail-qv1-xf49.google.com with SMTP id w3so5845285qvl.9
+ for <qemu-devel@nongnu.org>; Thu, 11 Jun 2020 18:46:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=zrAZryzclMmQ2GnW3+4bij4G7St8PIqWiedWlSplzFg=;
- b=sh9rj0Ze7pugCxLZjpbqmMaoKlnzXdDEqx/0wdHHh9PVhw4JU8BVAU9wsvU9wzdJlS
- ePqKSE3IET/Y0oQuMhPvY+zLcJBGM+VmOFC0L+xzIYUtD91jkMN53kZ1q22nKXZR0X7C
- ckJMAcHT2f7K46LiAknyOzQnkRg0WrGvwRwWM7FpNOXDfsKFfQq61cB3AxUM/OUntXnz
- 3HRqfbv9yyC6eNrF6rg1krmH3bJBFbf6AuvXeWAXa487ExLV02Z0j4ZkOr2EQNtw6I8f
- vO5tFuFVza2sg2qWpJ+LZ2pCWyVv7Fo7dmTCSp25BvsW6H7LCErYb+7rz8pYmSiIna4f
- IYSA==
+ :cc; bh=E4ik8F3C9Ws3lL4kBNltyKwjw/0cR5DBXCIJAWDvMCQ=;
+ b=E4F4T8Cy2xR0y1KX38vZfba81i0X7CyiecxwNKCR4zh3nzXXfJOPYU+LILn2ZbZUl9
+ CoXIa7VhRxMG7us19Tor3Uo0NfRN2k3Z9WQxmTwX8YYeVWUWlYIkBK/kfymfu6lMeEM3
+ FVtw1Fw+zTOAVEdyFcBQD3G8//0HtX+CgbdcJnyy5DUeT4/F/klNqnugQkyZ5FPxNluq
+ JI4N8oF1gzaj4JwzmT5jpTlcq2alhXRmHe9e3ZguBdnfuO0CIZfpZfotU50IKkeQFjaX
+ d1ezF/6vl4J0aJhQixCZoVN8yYGqWHRmeHFTx18ZSWWfVWur/fl4MrL7MzBWqCv8elmS
+ zV1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=zrAZryzclMmQ2GnW3+4bij4G7St8PIqWiedWlSplzFg=;
- b=UMvV0cRJ3Z79iaQhocj7/K0aLJ7mnfO+ONFriCr3w8BKlKkCuG9906V6MNbO0XpmcX
- sItLpM5AIndpwIu64RLQy+uM+LwLg0odeDE8YjBbRuFcKJQVFSoEoJg5AQx0g3XQ4ftG
- 8Se68ngJB1tX9ViUppinEqlIH9a4iuJ6y8sVs9qTWB1uYekeiWAbVaiy3RLikXopUiMN
- VIssGI9q1BdYB/IFh9ygNz5oqW7T8Zz/7IgSK3mUKuKxTVdafy4Ivkpipz5Db135VfwF
- WqWKaZ/UA1ovVktZq8/NISPCSUb51tqh6KMfPzxTGnEjkeruwdoa1VSG4fmT3Nm6cb6Y
- jp2w==
-X-Gm-Message-State: AOAM530iRx0+dTNVNv/Xbdf/HplfmFjJe7Ig3BlXwX6lNk/J80i8hsRw
- L6Gw0/UB2mS11erji7FfiIjetdKckQU5+REmcWOcPzJHgIaZFOv/j03jO+KCPIlMtBmABqp38Kr
- 9HtTo42QDV7ywDsudHWj8LuxqP1q50XRzWQbh4tmMW+LGf2AHJnZl
-X-Google-Smtp-Source: ABdhPJzeAyJjF03I50ifR/5PtDnbCByuW3dr6mY5DWWXG5piARCTwYxjHYUyEDMxEGJFh1LCFlWtfWc=
-X-Received: by 2002:a05:6214:846:: with SMTP id
- dg6mr9942730qvb.210.1591926373252; 
- Thu, 11 Jun 2020 18:46:13 -0700 (PDT)
-Date: Thu, 11 Jun 2020 18:46:03 -0700
+ bh=E4ik8F3C9Ws3lL4kBNltyKwjw/0cR5DBXCIJAWDvMCQ=;
+ b=anvUR0OvuS9fnr6evYEh/S5gGF2RAuQ1aK2Bp8Vqic9SHOQ8oQvEY3Z9DnlBeg+iwN
+ N/EAfdKe/3R38eHptiZmg5cRXl/nq7QXnRx4r1jdtMmmel65ulX9BhCv6dqJocNEMxv4
+ yTmJ5Rk4VMbGQyBI19fCsHQa0ZuQi58W6fDGT2Gluub7BBRgznFXbqJGA23boKFxA5Oc
+ Y3rPGAwkB9v4ix5Hr0tLglvxM7sFj9ppJx0ZPsHJqRdPZe5Rkbi0kDFX/qEWwGNOx/8t
+ EygFDSOCRe07FOkREEQjme9fMZohCgNgKxRHkKmgOB2ZanZqAaRhjou2Rh4wvf7ZVjpo
+ 4hLw==
+X-Gm-Message-State: AOAM530TtSTHLl8N2AKG7stjARcwrZ32XTyKU0SLxBg/YmHaPlTbODsC
+ oVuFN8LOQSN++kDuJEkfvirzFaHmlCOtVWytQaGt3Vxja5uxXhJNeinB8I0a8ytcWLAUNw6d1em
+ Ls08DEdqzpbOna91in9E3XkKu3lg7hd7RlnLF+XuGfUyhyAijTrMN
+X-Google-Smtp-Source: ABdhPJxKQFGXJRYnQx9WtxygmdRTedVUH/CHhykVMpalGOxw5Yw7Z/23BDIgD/FwQoGpQVGc4+womNk=
+X-Received: by 2002:a05:6214:11f0:: with SMTP id
+ e16mr10306827qvu.37.1591926379175; 
+ Thu, 11 Jun 2020 18:46:19 -0700 (PDT)
+Date: Thu, 11 Jun 2020 18:46:06 -0700
 In-Reply-To: <20200612014606.147691-1-jkz@google.com>
-Message-Id: <20200612014606.147691-3-jkz@google.com>
+Message-Id: <20200612014606.147691-6-jkz@google.com>
 Mime-Version: 1.0
 References: <20200612014606.147691-1-jkz@google.com>
 X-Mailer: git-send-email 2.27.0.290.gba653c62da-goog
-Subject: [PATCH 2/5] linux-user: Make fd_trans task-specific.
+Subject: [PATCH 5/5] linux-user: Add PDEATHSIG test for clone process
+ hierarchy.
 From: Josh Kunz <jkz@google.com>
 To: qemu-devel@nongnu.org
 Cc: riku.voipio@iki.fi, laurent@vivier.eu, alex.bennee@linaro.org, 
  Josh Kunz <jkz@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::749;
- envelope-from=3Zd7iXgMKCqoTUjQYYQVO.MYWaOWe-NOfOVXYXQXe.YbQ@flex--jkz.bounces.google.com;
- helo=mail-qk1-x749.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::f49;
+ envelope-from=3a97iXgMKCrAZapWeeWbU.SecgUck-TUlUbdedWdk.ehW@flex--jkz.bounces.google.com;
+ helo=mail-qv1-xf49.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -105
@@ -105,304 +106,280 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The file-descriptor translation subsystem used by QEMU uses some global
-variables to track file descriptors an their associated state. In the
-future (when clone is implemented) it may be possible to have two
-processes that share memory, but have a unique set of file descriptors.
-This change associates the file-descriptor translation table with the
-per-task TaskState structure. Since many tasks will share file
-descriptors (e.g., threads), a structure similar to the existing structure is
-used. Each task has a pointer to a global table. That table can be
-shared by multiple tasks, or changed if a task needs to use a different
-FD table.
+Certain process-level linux features like subreapers, and PDEATHSIG,
+depend on the guest's process hierarchy being emulated correctly on the
+host. This change adds a test that makes sure PDEATHSIG works for a
+guest process created with `clone`.
 
 Signed-off-by: Josh Kunz <jkz@google.com>
 ---
- linux-user/Makefile.objs   |  2 +-
- linux-user/fd-trans-tbl.c  | 13 +++++++
- linux-user/fd-trans-type.h | 17 +++++++++
- linux-user/fd-trans.c      |  3 --
- linux-user/fd-trans.h      | 75 ++++++++++++++++++++++++--------------
- linux-user/main.c          |  1 +
- linux-user/qemu.h          | 24 ++++++++++++
- linux-user/syscall.c       | 12 ++++++
- 8 files changed, 115 insertions(+), 32 deletions(-)
- create mode 100644 linux-user/fd-trans-tbl.c
- create mode 100644 linux-user/fd-trans-type.h
+ tests/tcg/multiarch/Makefile.target |   3 +
+ tests/tcg/multiarch/linux-test.c    | 160 ++++++++++++++++++++++++++--
+ 2 files changed, 153 insertions(+), 10 deletions(-)
 
-diff --git a/linux-user/Makefile.objs b/linux-user/Makefile.objs
-index d6788f012c..d19102e244 100644
---- a/linux-user/Makefile.objs
-+++ b/linux-user/Makefile.objs
-@@ -1,7 +1,7 @@
- obj-y = main.o syscall.o strace.o mmap.o signal.o \
- 	elfload.o linuxload.o uaccess.o uname.o \
- 	safe-syscall.o $(TARGET_ABI_DIR)/signal.o \
--        $(TARGET_ABI_DIR)/cpu_loop.o exit.o fd-trans.o clone.o
-+        $(TARGET_ABI_DIR)/cpu_loop.o exit.o fd-trans.o clone.o fd-trans-tbl.o
+diff --git a/tests/tcg/multiarch/Makefile.target b/tests/tcg/multiarch/Makefile.target
+index cb49cc9ccb..d937b4c59b 100644
+--- a/tests/tcg/multiarch/Makefile.target
++++ b/tests/tcg/multiarch/Makefile.target
+@@ -60,3 +60,6 @@ endif
  
- obj-$(TARGET_HAS_BFLT) += flatload.o
- obj-$(TARGET_I386) += vm86.o
-diff --git a/linux-user/fd-trans-tbl.c b/linux-user/fd-trans-tbl.c
-new file mode 100644
-index 0000000000..6afe91096e
---- /dev/null
-+++ b/linux-user/fd-trans-tbl.c
-@@ -0,0 +1,13 @@
-+#include "qemu/osdep.h"
-+#include "fd-trans.h"
+ # Update TESTS
+ TESTS += $(MULTIARCH_TESTS)
 +
-+struct fd_trans_table *fd_trans_table_clone(struct fd_trans_table *tbl)
-+{
-+    struct fd_trans_table *new_tbl = g_new0(struct fd_trans_table, 1);
-+    new_tbl->fd_max = tbl->fd_max;
-+    new_tbl->entries = g_new0(TargetFdTrans*, tbl->fd_max);
-+    memcpy(new_tbl->entries,
-+           tbl->entries,
-+           sizeof(*new_tbl->entries) * tbl->fd_max);
-+    return new_tbl;
-+}
-diff --git a/linux-user/fd-trans-type.h b/linux-user/fd-trans-type.h
-new file mode 100644
-index 0000000000..06c4427642
---- /dev/null
-+++ b/linux-user/fd-trans-type.h
-@@ -0,0 +1,17 @@
-+#ifndef FD_TRANS_TYPE_H
-+#define FD_TRANS_TYPE_H
-+
-+/*
-+ * Break out the TargetFdTrans typedefs into a separate file, to break
-+ * the circular dependency between qemu.h and fd-trans.h.
-+ */
-+
-+typedef abi_long (*TargetFdDataFunc)(void *, size_t);
-+typedef abi_long (*TargetFdAddrFunc)(void *, abi_ulong, socklen_t);
-+typedef struct TargetFdTrans {
-+    TargetFdDataFunc host_to_target_data;
-+    TargetFdDataFunc target_to_host_data;
-+    TargetFdAddrFunc target_to_host_addr;
-+} TargetFdTrans;
-+
-+#endif /* FD_TRANS_TYPE_H */
-diff --git a/linux-user/fd-trans.c b/linux-user/fd-trans.c
-index c0687c52e6..c552034a5e 100644
---- a/linux-user/fd-trans.c
-+++ b/linux-user/fd-trans.c
-@@ -261,9 +261,6 @@ enum {
-     QEMU___RTA_MAX
- };
++# linux-test.c depends on -pthread.
++LDFLAGS += -pthread
+diff --git a/tests/tcg/multiarch/linux-test.c b/tests/tcg/multiarch/linux-test.c
+index a7723556c2..1824a5a0c2 100644
+--- a/tests/tcg/multiarch/linux-test.c
++++ b/tests/tcg/multiarch/linux-test.c
+@@ -20,16 +20,19 @@
+ #include <stdarg.h>
+ #include <stdlib.h>
+ #include <stdio.h>
++#include <stdbool.h>
+ #include <unistd.h>
+ #include <fcntl.h>
+ #include <inttypes.h>
+ #include <string.h>
+ #include <sys/types.h>
++#include <syscall.h>
+ #include <sys/stat.h>
+ #include <sys/wait.h>
+ #include <errno.h>
+ #include <utime.h>
+ #include <time.h>
++#include <sys/prctl.h>
+ #include <sys/time.h>
+ #include <sys/resource.h>
+ #include <sys/uio.h>
+@@ -41,6 +44,7 @@
+ #include <setjmp.h>
+ #include <sys/shm.h>
+ #include <assert.h>
++#include <pthread.h>
  
--TargetFdTrans **target_fd_trans;
--unsigned int target_fd_max;
+ #define STACK_SIZE 16384
+ 
+@@ -368,14 +372,12 @@ static void test_pipe(void)
+     chk_error(close(fds[1]));
+ }
+ 
+-static int thread1_res;
+-static int thread2_res;
 -
- static void tswap_nlmsghdr(struct nlmsghdr *nlh)
+ static int thread1_func(void *arg)
  {
-     nlh->nlmsg_len = tswap32(nlh->nlmsg_len);
-diff --git a/linux-user/fd-trans.h b/linux-user/fd-trans.h
-index a3fcdaabc7..07ae04dad7 100644
---- a/linux-user/fd-trans.h
-+++ b/linux-user/fd-trans.h
-@@ -16,38 +16,45 @@
- #ifndef FD_TRANS_H
- #define FD_TRANS_H
- 
--typedef abi_long (*TargetFdDataFunc)(void *, size_t);
--typedef abi_long (*TargetFdAddrFunc)(void *, abi_ulong, socklen_t);
--typedef struct TargetFdTrans {
--    TargetFdDataFunc host_to_target_data;
--    TargetFdDataFunc target_to_host_data;
--    TargetFdAddrFunc target_to_host_addr;
--} TargetFdTrans;
-+#include "qemu.h"
-+#include "fd-trans-type.h"
- 
--extern TargetFdTrans **target_fd_trans;
--
--extern unsigned int target_fd_max;
-+/*
-+ * Return a duplicate of the given fd_trans_table. This function always
-+ * succeeds. Ownership of the pointed-to table is yielded to the caller. The
-+ * caller is responsible for freeing the table when it is no longer in-use.
-+ */
-+struct fd_trans_table *fd_trans_table_clone(struct fd_trans_table *tbl);
- 
- static inline TargetFdDataFunc fd_trans_target_to_host_data(int fd)
- {
--    if (fd >= 0 && fd < target_fd_max && target_fd_trans[fd]) {
--        return target_fd_trans[fd]->target_to_host_data;
-+    TaskState *ts = (TaskState *)thread_cpu->opaque;
-+    struct fd_trans_table *tbl = ts->fd_trans_tbl;
-+
-+    if (fd >= 0 && fd < tbl->fd_max && tbl->entries[fd]) {
-+        return tbl->entries[fd]->target_to_host_data;
++    int *res = (int *) arg;
+     int i;
+     for(i=0;i<5;i++) {
+-        thread1_res++;
++        (*res)++;
+         usleep(10 * 1000);
      }
-     return NULL;
+     return 0;
+@@ -383,9 +385,10 @@ static int thread1_func(void *arg)
+ 
+ static int thread2_func(void *arg)
+ {
++    int *res = (int *) arg;
+     int i;
+     for(i=0;i<6;i++) {
+-        thread2_res++;
++        (*res)++;
+         usleep(10 * 1000);
+     }
+     return 0;
+@@ -405,25 +408,27 @@ static void test_clone(void)
+     uint8_t *stack1, *stack2;
+     pid_t pid1, pid2;
+ 
++    int t1 = 0, t2 = 0;
++
+     stack1 = malloc(STACK_SIZE);
+     pid1 = chk_error(clone(thread1_func, stack1 + STACK_SIZE,
+                            CLONE_VM | SIGCHLD,
+-                            "hello1"));
++                            &t1));
+ 
+     stack2 = malloc(STACK_SIZE);
+     pid2 = chk_error(clone(thread2_func, stack2 + STACK_SIZE,
+                            CLONE_VM | CLONE_FS | CLONE_FILES |
+                            CLONE_SIGHAND | CLONE_SYSVSEM | SIGCHLD,
+-                           "hello2"));
++                           &t2));
+ 
+     wait_for_child(pid1);
+     free(stack1);
+     wait_for_child(pid2);
+     free(stack2);
+ 
+-    if (thread1_res != 5 ||
+-        thread2_res != 6)
++    if (t1 != 5 || t2 != 6) {
+         error("clone");
++    }
  }
  
- static inline TargetFdDataFunc fd_trans_host_to_target_data(int fd)
- {
--    if (fd >= 0 && fd < target_fd_max && target_fd_trans[fd]) {
--        return target_fd_trans[fd]->host_to_target_data;
-+    TaskState *ts = (TaskState *)thread_cpu->opaque;
-+    struct fd_trans_table *tbl = ts->fd_trans_tbl;
-+
-+    if (fd >= 0 && fd < tbl->fd_max && tbl->entries[fd]) {
-+        return tbl->entries[fd]->host_to_target_data;
-     }
-     return NULL;
- }
+ /***********************************/
+@@ -562,6 +567,7 @@ static void test_clone_signal_count(void)
+      * SIGCHLD.
+      */
+     chk_error(waitpid(pid, &status, __WCLONE));
++    free(child_stack);
  
- static inline TargetFdAddrFunc fd_trans_target_to_host_addr(int fd)
- {
--    if (fd >= 0 && fd < target_fd_max && target_fd_trans[fd]) {
--        return target_fd_trans[fd]->target_to_host_addr;
-+    TaskState *ts = (TaskState *)thread_cpu->opaque;
-+    struct fd_trans_table *tbl = ts->fd_trans_tbl;
-+
-+    if (fd >= 0 && fd < tbl->fd_max && tbl->entries[fd]) {
-+        return tbl->entries[fd]->target_to_host_addr;
-     }
-     return NULL;
- }
-@@ -56,29 +63,41 @@ static inline void fd_trans_register(int fd, TargetFdTrans *trans)
- {
-     unsigned int oldmax;
+     chk_error(sigaction(SIGRTMIN, &prev, NULL));
  
--    if (fd >= target_fd_max) {
--        oldmax = target_fd_max;
--        target_fd_max = ((fd >> 6) + 1) << 6; /* by slice of 64 entries */
--        target_fd_trans = g_renew(TargetFdTrans *,
--                                  target_fd_trans, target_fd_max);
--        memset((void *)(target_fd_trans + oldmax), 0,
--               (target_fd_max - oldmax) * sizeof(TargetFdTrans *));
-+    TaskState *ts = (TaskState *)thread_cpu->opaque;
-+    struct fd_trans_table *tbl = ts->fd_trans_tbl;
-+
-+    /*
-+     * TODO: This is racy. Updates to tbl->entries should be guarded by
-+     * a lock.
-+     */
-+    if (fd >= tbl->fd_max) {
-+        oldmax = tbl->fd_max;
-+        tbl->fd_max = ((fd >> 6) + 1) << 6; /* by slice of 64 entries */
-+        tbl->entries = g_renew(TargetFdTrans *, tbl->entries, tbl->fd_max);
-+        memset((void *)(tbl->entries + oldmax), 0,
-+               (tbl->fd_max - oldmax) * sizeof(TargetFdTrans *));
-     }
--    target_fd_trans[fd] = trans;
-+    tbl->entries[fd] = trans;
- }
- 
- static inline void fd_trans_unregister(int fd)
- {
--    if (fd >= 0 && fd < target_fd_max) {
--        target_fd_trans[fd] = NULL;
-+    TaskState *ts = (TaskState *)thread_cpu->opaque;
-+    struct fd_trans_table *tbl = ts->fd_trans_tbl;
-+
-+    if (fd >= 0 && fd < tbl->fd_max) {
-+        tbl->entries[fd] = NULL;
+@@ -571,6 +577,139 @@ static void test_clone_signal_count(void)
      }
  }
  
- static inline void fd_trans_dup(int oldfd, int newfd)
- {
-+    TaskState *ts = (TaskState *)thread_cpu->opaque;
-+    struct fd_trans_table *tbl = ts->fd_trans_tbl;
-+
-     fd_trans_unregister(newfd);
--    if (oldfd < target_fd_max && target_fd_trans[oldfd]) {
--        fd_trans_register(newfd, target_fd_trans[oldfd]);
-+    if (oldfd >= 0 && oldfd < tbl->fd_max && tbl->entries[oldfd]) {
-+        fd_trans_register(newfd, tbl->entries[oldfd]);
-     }
- }
- 
-diff --git a/linux-user/main.c b/linux-user/main.c
-index 3597e99bb1..d1ed0f6120 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -796,6 +796,7 @@ int main(int argc, char **argv, char **envp)
-     ts->bprm = &bprm;
-     cpu->opaque = ts;
-     task_settid(ts);
-+    ts->fd_trans_tbl = g_new0(struct fd_trans_table, 1);
- 
-     ret = loader_exec(execfd, exec_path, target_argv, target_environ, regs,
-         info, &bprm);
-diff --git a/linux-user/qemu.h b/linux-user/qemu.h
-index ce902f5132..989e01ad8d 100644
---- a/linux-user/qemu.h
-+++ b/linux-user/qemu.h
-@@ -5,6 +5,7 @@
- #include "cpu.h"
- #include "exec/exec-all.h"
- #include "exec/cpu_ldst.h"
-+#include "fd-trans-type.h"
- 
- #undef DEBUG_REMAP
- #ifdef DEBUG_REMAP
-@@ -96,6 +97,22 @@ struct emulated_sigtable {
-     target_siginfo_t info;
- };
- 
-+/*
-+ * The fd_trans_table is used the FD data translation subsystem to
-+ * find FD data translators (i.e. functions). `entries` is an array of pointers
-+ * with size `fd_max`, containing pointers to TargetFDTrans structs. A pointer
-+ * to a struct of this type is stored TaskState, which allows the struct itself
-+ * to be shared by all tasks (e.g., threads) that share a file descriptor
-+ * namespace. Storing a pointer to this table in the TaskState struct is needed
-+ * to support rare cases where tasks share an address space, but do not share
-+ * a set of file descriptors (e.g., after clone(CLONE_VM) when CLONE_FILES is
-+ * not set). See `fd-trans.h` for more info on the FD translation subsystem.
-+ */
-+struct fd_trans_table {
-+    uint64_t fd_max;
-+    TargetFdTrans **entries;
++struct test_clone_pdeathsig_info {
++    uint8_t *child_stack;
++    pthread_mutex_t notify_test_mutex;
++    pthread_cond_t notify_test_cond;
++    pthread_mutex_t notify_parent_mutex;
++    pthread_cond_t notify_parent_cond;
++    bool signal_received;
 +};
 +
- /* NOTE: we force a big alignment so that the stack stored after is
-    aligned too */
- typedef struct TaskState {
-@@ -153,6 +170,13 @@ typedef struct TaskState {
- 
-     /* This thread's sigaltstack, if it has one */
-     struct target_sigaltstack sigaltstack_used;
++static int test_clone_pdeathsig_child(void *arg)
++{
++    struct test_clone_pdeathsig_info *info =
++        (struct test_clone_pdeathsig_info *) arg;
++    sigset_t wait_on, block_all;
++    siginfo_t sinfo;
++    struct timespec timeout;
++    int ret;
++
++    /* Block all signals, so SIGUSR1 will be pending when we wait on it. */
++    sigfillset(&block_all);
++    chk_error(sigprocmask(SIG_BLOCK, &block_all, NULL));
++
++    chk_error(prctl(PR_SET_PDEATHSIG, SIGUSR1));
++
++    pthread_mutex_lock(&info->notify_parent_mutex);
++    pthread_cond_broadcast(&info->notify_parent_cond);
++    pthread_mutex_unlock(&info->notify_parent_mutex);
++
++    sigemptyset(&wait_on);
++    sigaddset(&wait_on, SIGUSR1);
++    timeout.tv_sec = 0;
++    timeout.tv_nsec = 300 * 1000 * 1000;  /* 300ms */
++
++    ret = sigtimedwait(&wait_on, &sinfo, &timeout);
++
++    if (ret < 0 && errno != EAGAIN) {
++        error("%m (ret=%d, errno=%d/%s)", ret, errno, strerror(errno));
++    }
++    if (ret == SIGUSR1) {
++        info->signal_received = true;
++    }
++    pthread_mutex_lock(&info->notify_test_mutex);
++    pthread_cond_broadcast(&info->notify_test_cond);
++    pthread_mutex_unlock(&info->notify_test_mutex);
++    _exit(0);
++}
++
++static int test_clone_pdeathsig_parent(void *arg)
++{
++    struct test_clone_pdeathsig_info *info =
++        (struct test_clone_pdeathsig_info *) arg;
++
++    pthread_mutex_lock(&info->notify_parent_mutex);
++
++    chk_error(clone(
++        test_clone_pdeathsig_child,
++        info->child_stack + STACK_SIZE,
++        CLONE_VM,
++        info
++    ));
++
++    /* No need to reap the child, it will get reaped by init. */
++
++    /* Wait for the child to signal that they have set up PDEATHSIG. */
++    pthread_cond_wait(&info->notify_parent_cond, &info->notify_parent_mutex);
++    pthread_mutex_unlock(&info->notify_parent_mutex);  /* avoid UB on destroy */
++
++    _exit(0);
++}
++
++/*
++ * This checks that cloned children have the correct parent/child
++ * relationship using PDEATHSIG. PDEATHSIG is based on kernel task hierarchy,
++ * rather than "process" hierarchy, so it should be pretty sensitive to
++ * breakages. PDEATHSIG is also a widely used feature, so it's important
++ * it's correct.
++ *
++ * This test works by spawning a child process (parent) which then spawns it's
++ * own child (the child). The child registers a PDEATHSIG handler, and then
++ * notifies the parent which exits. The child then waits for the PDEATHSIG
++ * signal it regsitered. The child reports whether or not the signal is
++ * received within a small time window, and then notifies the test runner
++ * (this function) that the test is finished.
++ */
++static void test_clone_pdeathsig(void)
++{
++    uint8_t *parent_stack;
++    struct test_clone_pdeathsig_info info;
++    pid_t pid;
++    int status;
++
++    memset(&info, 0, sizeof(info));
 +
 +    /*
-+     * A pointer to the FD trans table to be used by this task. Note that the
-+     * task doesn't have exclusive control of the fd_trans_table so access to
-+     * the table itself should be guarded.
++     * Setup condition variables, so we can be notified once the final child
++     * observes the PDEATHSIG signal from it's parent exiting. When the parent
++     * exits, the child will be orphaned, so we can't use `wait*` to wait for
++     * it to finish.
 +     */
-+    struct fd_trans_table *fd_trans_tbl;
- } __attribute__((aligned(16))) TaskState;
- 
- extern char *exec_path;
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 7ce021cea2..ff1d07871f 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -6013,6 +6013,18 @@ static int do_fork(CPUArchState *env, unsigned int flags, abi_ulong newsp,
-     ts->info = parent_ts->info;
-     ts->signal_mask = parent_ts->signal_mask;
- 
-+    if (flags & CLONE_FILES) {
-+        ts->fd_trans_tbl = parent_ts->fd_trans_tbl;
-+    } else {
-+        /*
-+         * When CLONE_FILES is not set, the parent and child will have
-+         * different file descriptor tables, so we need a new
-+         * fd_trans_tbl. Clone from parent_ts, since child inherits all our
-+         * file descriptors.
-+         */
-+        ts->fd_trans_tbl = fd_trans_table_clone(parent_ts->fd_trans_tbl);
-+    }
++    chk_error(pthread_mutex_init(&info.notify_test_mutex, NULL));
++    chk_error(pthread_cond_init(&info.notify_test_cond, NULL));
++    chk_error(pthread_mutex_init(&info.notify_parent_mutex, NULL));
++    chk_error(pthread_cond_init(&info.notify_parent_cond, NULL));
 +
-     if (flags & CLONE_CHILD_CLEARTID) {
-         ts->child_tidptr = child_tidptr;
-     }
++    parent_stack = malloc(STACK_SIZE);
++    info.child_stack = malloc(STACK_SIZE);
++
++    pthread_mutex_lock(&info.notify_test_mutex);
++
++    pid = chk_error(clone(
++        test_clone_pdeathsig_parent,
++        parent_stack + STACK_SIZE,
++        CLONE_VM,
++        &info
++    ));
++
++    pthread_cond_wait(&info.notify_test_cond, &info.notify_test_mutex);
++    pthread_mutex_unlock(&info.notify_test_mutex);
++    chk_error(waitpid(pid, &status, __WCLONE));  /* reap the parent */
++
++    free(parent_stack);
++    free(info.child_stack);
++
++    pthread_cond_destroy(&info.notify_parent_cond);
++    pthread_mutex_destroy(&info.notify_parent_mutex);
++    pthread_cond_destroy(&info.notify_test_cond);
++    pthread_mutex_destroy(&info.notify_test_mutex);
++
++    if (!info.signal_received) {
++        error("child did not receive PDEATHSIG on parent death");
++    }
++}
++
+ int main(int argc, char **argv)
+ {
+     test_file();
+@@ -580,8 +719,9 @@ int main(int argc, char **argv)
+     test_socket();
+     test_clone();
+     test_clone_signal_count();
+-
++    test_clone_pdeathsig();
+     test_signal();
+     test_shm();
++
+     return 0;
+ }
 -- 
 2.27.0.290.gba653c62da-goog
 
