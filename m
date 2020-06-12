@@ -7,79 +7,77 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A2E0C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 08:56:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB07FC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 08:58:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 356E9206D7
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 08:56:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7306C206D7
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 08:58:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TNMB+xtV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 356E9206D7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g1IpwiPX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7306C206D7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36684 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44074 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjfU3-0007Rl-FI
-	for qemu-devel@archiver.kernel.org; Fri, 12 Jun 2020 04:56:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52762)
+	id 1jjfVj-0002pG-Ng
+	for qemu-devel@archiver.kernel.org; Fri, 12 Jun 2020 04:58:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52764)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jjfT7-0005Z6-AU
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jjfT7-0005ZS-Ex
  for qemu-devel@nongnu.org; Fri, 12 Jun 2020 04:55:21 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:39136
- helo=us-smtp-1.mimecast.com)
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:59864
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jjfT4-0006z1-J1
- for qemu-devel@nongnu.org; Fri, 12 Jun 2020 04:55:19 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jjfT5-0006z6-Cj
+ for qemu-devel@nongnu.org; Fri, 12 Jun 2020 04:55:21 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591952117;
+ s=mimecast20190719; t=1591952118;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=lg93mmx8nphNH1y4bYZrwT9M+1WJW6lG0NFyoN2HHMc=;
- b=TNMB+xtVttGNGM+ysYmUvxSm4xJdRKhNs5JJ0eLwRnJBJAbym1WmoT8WYxFsuKz3posQqi
- NewoqMA3CEkQ7f4dlGPmgUCGWOdE7n20B30J6g+dbyGyMBeQRnXPn/nTctmcqyhXaj+K7W
- igx4chAHgc7O6PtvogQ0Zo4/WxtR5E8=
+ bh=GhYz6sKF2bPYiUHoKS1Jnt6TjZbsEwWbEop5lmusuaY=;
+ b=g1IpwiPXFF8hb4Vu2zJHUFApjKYhm5Tm4R6P1VPeo8PcLuzA4kV3hYZt+MCaO4SV/6C5q5
+ o1wcYIvr7Fi/lAKwn/qruf+sF9xig4YYxudIPmod6wmyx+xjN3czklpeFY57irgt7YnD/9
+ MXh3SeuMqjHxNSbtLSSsniHs069l6Kw=
 Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
  [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-514-bvhjp0dkNF-XxB8H7bF99w-1; Fri, 12 Jun 2020 04:55:11 -0400
-X-MC-Unique: bvhjp0dkNF-XxB8H7bF99w-1
-Received: by mail-wm1-f71.google.com with SMTP id b63so3581511wme.1
- for <qemu-devel@nongnu.org>; Fri, 12 Jun 2020 01:55:10 -0700 (PDT)
+ us-mta-447-0R3-TkmqOf-zmOvWSxEcjg-1; Fri, 12 Jun 2020 04:55:16 -0400
+X-MC-Unique: 0R3-TkmqOf-zmOvWSxEcjg-1
+Received: by mail-wm1-f71.google.com with SMTP id h25so3585359wmb.0
+ for <qemu-devel@nongnu.org>; Fri, 12 Jun 2020 01:55:16 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=lg93mmx8nphNH1y4bYZrwT9M+1WJW6lG0NFyoN2HHMc=;
- b=JKuIODMTBMgAz3tWe+yJJofthmynX2EqRz9NVcWS2IHg6BVi9r3AcJ7AQqMZxW9Hpl
- S5YbIbxST5OX7Hwnh6BCM7JkWRRkPQM5HgkFxhGsujUQCpUdRUE06AcigTMn0UjRBS1m
- BpThXSbfAXHdR5hqPTgSBtTDRSKMEb7oyNmpFX3E1z3+Vymw3dWLERbzaGwr1a7e1xex
- 4/wpIZSgZaNHb0UE4u7xdX6ODRAClBFLOLQ1vBzHh6+gXUhMolXKAq59IkgdqEeYBAYh
- dTJe0ccUQJP11W4Q1DuMQXjcowAuA8u5IFpRpg6t5sOUeTxMelNK/aPw2DBupj10RbBH
- KZ/w==
-X-Gm-Message-State: AOAM5330V/XC4m3ky42aBGMgxSmfm3ddh2yO+BA7ADISEGwNWP4QtvX4
- ZNGhif9bS/gfXODDlQOiy4aM57RGx/Buyt3RyJA2nHhoj0/KGdwXPDysiLKeObwAhzdQbv7t53k
- aGWNR/1nLK7XNoV4=
-X-Received: by 2002:a05:600c:2153:: with SMTP id
- v19mr11856736wml.47.1591952109702; 
- Fri, 12 Jun 2020 01:55:09 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxK1SsH1g/ZqIDz1SJ2QIRIb/Emcyy4zImtouMadvAKTPVupewtUyXwEsQmPV4xP9JbliUHRg==
-X-Received: by 2002:a05:600c:2153:: with SMTP id
- v19mr11856720wml.47.1591952109469; 
- Fri, 12 Jun 2020 01:55:09 -0700 (PDT)
+ bh=GhYz6sKF2bPYiUHoKS1Jnt6TjZbsEwWbEop5lmusuaY=;
+ b=MXdQzj2C1f7LhL5TTzN5V2vF4HSESq5DsOqNyFRJMh3KsSo1HYRTUMepZP+AIIQXo+
+ Sji1dRYf5izGe9MU196eVo3jr5bjV8gp50xvNMPHtT5rLt6XkvAIhePo0MAMao9szMrI
+ KHid4zNUcBZCXEFZG66eOt90t1xPhwa3maan7j9JaESL+wL6TrxrfWsVJSkycyDmG1fa
+ aZoDJUOTsoZTzfPXCk5TEarz/ynYMFyFnz5Xkanibj3ihawGANZJ8whC0TTBWQ/s6+MD
+ ol9ItC7qqYjPhNc/vic1V0lfRTnX+HbXh1Z3Rpl5WaDB8rvpH0Yf+qKA9msMzLuIZm1+
+ g8pQ==
+X-Gm-Message-State: AOAM532ISJaNGrwa/7ODarafnlorFLpvc9KIIuMUYtNOMEothi2PFzzp
+ JJscrv/vv8VKI/NBQeB2GKXw37kX4YhlPWtxX4G19TKeDqRgaWu8qbw0CzpSpeA7pd6ZJfjZVwQ
+ 5N4EVatcOxfKQ/84=
+X-Received: by 2002:a7b:cd95:: with SMTP id y21mr11574009wmj.147.1591952114995; 
+ Fri, 12 Jun 2020 01:55:14 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxUvjv2ITtyGVOuRQGlp5Dy5oc6bi81ezaxeL9w6O2df3WzesCaq1aOnUAJafAqdYdFKVZI5w==
+X-Received: by 2002:a7b:cd95:: with SMTP id y21mr11573989wmj.147.1591952114785; 
+ Fri, 12 Jun 2020 01:55:14 -0700 (PDT)
 Received: from localhost.localdomain
  (181.red-88-10-103.dynamicip.rima-tde.net. [88.10.103.181])
- by smtp.gmail.com with ESMTPSA id d24sm7693353wmb.45.2020.06.12.01.55.08
+ by smtp.gmail.com with ESMTPSA id i10sm8920420wrw.51.2020.06.12.01.55.13
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 12 Jun 2020 01:55:08 -0700 (PDT)
+ Fri, 12 Jun 2020 01:55:14 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 04/12] hw/tpm: Do not include 'qemu/osdep.h' in header
-Date: Fri, 12 Jun 2020 10:54:36 +0200
-Message-Id: <20200612085444.8362-5-philmd@redhat.com>
+Subject: [PATCH v3 05/12] hw/tpm: Include missing 'qemu/option.h' header
+Date: Fri, 12 Jun 2020 10:54:37 +0200
+Message-Id: <20200612085444.8362-6-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200612085444.8362-1-philmd@redhat.com>
 References: <20200612085444.8362-1-philmd@redhat.com>
@@ -89,9 +87,9 @@ X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8;
 	text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/12 04:54:57
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/12 04:55:01
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -121,31 +119,29 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From CODING_STYLE.rst:
-
-  Do not include "qemu/osdep.h" from header files since the .c
-  file will have already included it.
-
-Remove "qemu/osdep.h" from "tpm_tis.h".
+Files using the TPM_STANDARD_CMDLINE_OPTS macro declared in
+"tpm_int.h" will use QEMU_OPT_STRING definition declared in
+"qemu/option.h".
 
 Reviewed-by: Stefan Berger <stefanb@linux.ibm.com>
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- hw/tpm/tpm_tis.h | 1 -
- 1 file changed, 1 deletion(-)
+ hw/tpm/tpm_int.h | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/hw/tpm/tpm_tis.h b/hw/tpm/tpm_tis.h
-index 5554989395..f6b5872ba6 100644
---- a/hw/tpm/tpm_tis.h
-+++ b/hw/tpm/tpm_tis.h
-@@ -24,7 +24,6 @@
- #ifndef TPM_TPM_TIS_H
- #define TPM_TPM_TIS_H
+diff --git a/hw/tpm/tpm_int.h b/hw/tpm/tpm_int.h
+index 3fb28a9d6c..fd5ebc6489 100644
+--- a/hw/tpm/tpm_int.h
++++ b/hw/tpm/tpm_int.h
+@@ -12,6 +12,8 @@
+ #ifndef TPM_TPM_INT_H
+ #define TPM_TPM_INT_H
  
--#include "qemu/osdep.h"
- #include "sysemu/tpm_backend.h"
- #include "tpm_ppi.h"
- 
++#include "qemu/option.h"
++
+ #define TPM_STANDARD_CMDLINE_OPTS \
+     { \
+         .name = "type", \
 -- 
 2.21.3
 
