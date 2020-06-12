@@ -2,108 +2,121 @@ Return-Path: <SRS0=+PsZ=7Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28A15C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 16:42:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FD4CC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 16:43:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E6B66207ED
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 16:42:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5ACCC207ED
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 16:43:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cpPWeVwG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6B66207ED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=syrmia.com header.i=@syrmia.com header.b="N7cBEhoO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5ACCC207ED
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=syrmia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35482 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38908 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjmkl-0007aJ-5Y
-	for qemu-devel@archiver.kernel.org; Fri, 12 Jun 2020 12:42:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49734)
+	id 1jjmlp-0000cR-Ls
+	for qemu-devel@archiver.kernel.org; Fri, 12 Jun 2020 12:43:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49684)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jjmju-0006kx-2o
- for qemu-devel@nongnu.org; Fri, 12 Jun 2020 12:41:10 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:20883
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jjmjs-0007mK-5l
- for qemu-devel@nongnu.org; Fri, 12 Jun 2020 12:41:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591980067;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=x4xBB9UESeUa7inym1PxyNQUxva3dRzfQlnrXIl/x1I=;
- b=cpPWeVwGCdEplMJygD4Shw4zgx9ozXLPVVSnj0hCAv+wBdVuYnoTOWwN0ukom61NWlOO1h
- L25sLhQU/qR5DiHFGWFHWa7dXJH3K1uhr80uUgzmr8zpSrgTga3W0D1WhZUOfPw20dg2JE
- pdn9BLPIlhP3bzL9WtztRP9Eox8mgDU=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-475-JsXyLLC-P-CuXv-DPi0IdQ-1; Fri, 12 Jun 2020 12:41:05 -0400
-X-MC-Unique: JsXyLLC-P-CuXv-DPi0IdQ-1
-Received: by mail-wr1-f71.google.com with SMTP id e7so4242130wrp.14
- for <qemu-devel@nongnu.org>; Fri, 12 Jun 2020 09:41:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=x4xBB9UESeUa7inym1PxyNQUxva3dRzfQlnrXIl/x1I=;
- b=JauyGJnyrw7xFBobzM+p+vCpxJ0R0d7niqNew5Rwz4EYblHw/1G4FGu/f1hcvGlCjK
- dK90UnCb6ZhTq4StfXPrsolMckVKx19RfvcgwMRWil3KmII8gC07MtJLpdE7IBrZcCBT
- jrUf97JpbH9I28fPNogrH983AoxP3ynQK+lK/64sjp27cQSIjG8LfsmvwiaVEZaU5272
- LmgR2j6aUZEDHFRu7HJhKsPmpzt+oM9Q6xZjGhT6tzWKTEK5iry4Qq8XmZiGqTMQJ6rw
- rzpX8Q97nuAHdQ5m/lULCRDXmiAMqKUy3tRt9Ohvx3bDGtDAaJqHOCSigfs8scTsp7Hk
- BBDw==
-X-Gm-Message-State: AOAM532CGoQKSV0T29coWAIXkAFBW3MfJj14c2PmnTjkc7GEFFV7O/Gs
- aRE7zybxCLCuMpl/2uVj0r1a0wi5K6ssrt/qldZlRYDJknKNGgvBMO05YD7l2sk4/F1miDyuwxD
- D7vFXA/zBZV0w2cM=
-X-Received: by 2002:adf:ef83:: with SMTP id d3mr15052085wro.145.1591980064055; 
- Fri, 12 Jun 2020 09:41:04 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzm6mo8cMyTI3N2evBuP3T64kHlurE+EnGChJr60rSXOTP2pluFKjeYO/+34Gh80oS4JBAarQ==
-X-Received: by 2002:adf:ef83:: with SMTP id d3mr15052056wro.145.1591980063709; 
- Fri, 12 Jun 2020 09:41:03 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:29ed:810e:962c:aa0d?
- ([2001:b07:6468:f312:29ed:810e:962c:aa0d])
- by smtp.gmail.com with ESMTPSA id z6sm10699672wrh.79.2020.06.12.09.41.02
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 12 Jun 2020 09:41:03 -0700 (PDT)
-Subject: Re: [PATCH v2 0/6] softfloat, target/i386: fprem, fprem1 fixes
-To: Joseph Myers <joseph@codesourcery.com>, qemu-devel@nongnu.org,
- aurelien@aurel32.net, peter.maydell@linaro.org, alex.bennee@linaro.org,
- laurent@vivier.eu, rth@twiddle.net, ehabkost@redhat.com
-References: <alpine.DEB.2.21.2006081653080.23637@digraph.polyomino.org.uk>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <eb560234-5bdc-e78a-a9c0-c823839f2010@redhat.com>
-Date: Fri, 12 Jun 2020 18:41:02 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (Exim 4.90_1) (envelope-from <Filip.Bozuta@syrmia.com>)
+ id 1jjmji-0006YY-4I
+ for qemu-devel@nongnu.org; Fri, 12 Jun 2020 12:40:58 -0400
+Received: from mail-eopbgr50134.outbound.protection.outlook.com
+ ([40.107.5.134]:25837 helo=EUR03-VE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <Filip.Bozuta@syrmia.com>)
+ id 1jjmjf-0007g9-SW
+ for qemu-devel@nongnu.org; Fri, 12 Jun 2020 12:40:57 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=X6AwZoJYgqqXUq1gRERARTkR3E9yWySEmdaMVzNxMH+KO+jZTMMheydshO+YRQp3Fyjf4n0of4J49WYSVNyF+uw+ETXkX7htJt5Cm1kjvtmU3yKrLPPI6WQRjAIvyAE2JFeMn66Xa0FOBDA7nwZ39UkoJ7YwQeIY+MZXc0Xw/XU5CnK3Oazw+gBokxGYFajJsy2IxiGdRYuOlWGamSAtipu8PSaPMe4nCkqqgPFyoD3ccOLIvSrkpfe1Z1DgtVjjJjFxybdHfKljSAYQL3mBUy2I82qujKBe4qzh+OrVhbN/lllIEDXBuEEvbEtE9F139hesVkrDAadbddTjuaOCXw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=esi8iZdkGh0OuRkQXZ8LJnaQjZwL3twgPT09ZZoA36E=;
+ b=LLq6kWwVpBKA43gOzfsLxBUbL1umsqI41wLGVRIGZtj9Miq+vQbv7mZlLwtyTOxMWDerRiECwUDIA6Y5ags1hnu+Qm9VHBbYY5UYp/u6gNCtmubKBzcVAzeTJtG5S5kMoBrd9jsFSg3TLgBcuLmzRvwnqK65V7emdfbYbaKnZqjUfSwPm7cWT3qJzUS+LuTWz/SmaXIcHCUZhrV+b4yRzl+SUVW+ZM2EzUQRGbqWedrbRKPxa/6pLXWWlhauPXkz9X2te29VUne5mDZ81yQ/tLKDqXVrLB8+LMAoDvOlOL4MIFwwzv8GYb3kL2icjMbocrO1D8hkEzFvEZ8D8tJx/A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=syrmia.com; dmarc=pass action=none header.from=syrmia.com;
+ dkim=pass header.d=syrmia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=syrmia.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=esi8iZdkGh0OuRkQXZ8LJnaQjZwL3twgPT09ZZoA36E=;
+ b=N7cBEhoOko8uuWQAZaSon/XVjU5FVqoJcXhyiSftaAzVSMg9UDw4uLKqxBziPGBQk58RHJP0Dsyk0RqMydnpEeFMss5QAA/gAXlkphMrjnL0tq0rrZxkSaSZnV9MqnunCggnEPyIhCDef3YCt+Dz7h0u8nH6orGK+i8X8irvaoI=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=syrmia.com;
+Received: from AM6PR03MB5233.eurprd03.prod.outlook.com (2603:10a6:20b:d1::19)
+ by AM6PR03MB4072.eurprd03.prod.outlook.com (2603:10a6:20b:24::14)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3088.22; Fri, 12 Jun
+ 2020 16:40:17 +0000
+Received: from AM6PR03MB5233.eurprd03.prod.outlook.com
+ ([fe80::98f0:b948:78a8:f618]) by AM6PR03MB5233.eurprd03.prod.outlook.com
+ ([fe80::98f0:b948:78a8:f618%7]) with mapi id 15.20.3066.023; Fri, 12 Jun 2020
+ 16:40:17 +0000
+From: Filip Bozuta <filip.bozuta@syrmia.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 2/2] linux-user: Add strace support for printing arguments of
+ ioctl()
+Date: Fri, 12 Jun 2020 18:40:01 +0200
+Message-Id: <20200612164001.27405-3-filip.bozuta@syrmia.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200612164001.27405-1-filip.bozuta@syrmia.com>
+References: <20200612164001.27405-1-filip.bozuta@syrmia.com>
+Content-Type: text/plain
+X-ClientProxiedBy: LO2P265CA0444.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:e::24) To AM6PR03MB5233.eurprd03.prod.outlook.com
+ (2603:10a6:20b:d1::19)
 MIME-Version: 1.0
-In-Reply-To: <alpine.DEB.2.21.2006081653080.23637@digraph.polyomino.org.uk>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/12 08:07:17
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from bozuta-ubuntu-18.syrmia.com (46.240.135.226) by
+ LO2P265CA0444.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:e::24) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3088.18 via Frontend Transport; Fri, 12 Jun 2020 16:40:16 +0000
+X-Mailer: git-send-email 2.17.1
+X-Originating-IP: [46.240.135.226]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: c6954f7a-6f62-4083-5359-08d80eef49ae
+X-MS-TrafficTypeDiagnostic: AM6PR03MB4072:
+X-Microsoft-Antispam-PRVS: <AM6PR03MB407261AFCA779734547F7A87EB810@AM6PR03MB4072.eurprd03.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:660;
+X-Forefront-PRVS: 0432A04947
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Fd4PCr93RY7of3sZ3E1Uy4mDQxcXy+OCmseFnZXxQZsiNMFVXcD1rRv0stktZvih2tUL+IS7UtLPMkBonqleJfrLQ4NXxDx/FdN4NnqQeRylTFS7QIzW1Scrbn4CaWvLPgrEYMm5ArBPVljxB44NRerhDdyeiU3V1OOX/Q7BcxUj+G0aTCklIhZuq0B0bSWfwxuiClzlPN/2EVZ5aT4tf5NMYYUsl0xvvjj+Y/ZKWHulEexgyBCRfjp8/q6aEwT1R6qgQ1lresFNw58ONvkXiZs8Mh88PEyjFYAxplsVgmXWsAk8NN6sKCLPN2kzBj/c65OOfrASG9eSjmY1qLGKvg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM6PR03MB5233.eurprd03.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(136003)(346002)(39830400003)(376002)(396003)(366004)(8936002)(66476007)(30864003)(86362001)(2616005)(52116002)(66556008)(956004)(66946007)(36756003)(26005)(6666004)(83380400001)(508600001)(44832011)(186003)(16526019)(7696005)(316002)(4326008)(5660300002)(8676002)(2906002)(6916009)(6486002)(1076003);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: pH9Y9gjhOFCHMGjML8iqQiU6FvVgmrdi94hNTgO+PVR6aUZ1nEbpr1oQd3Hl0u3QIB4/X1emjyPU2Lu3w+MkEyGHDWYrUeWH/w28KC5eVytdgAj+QCxoq6DLOyfyNl5/zXia0jqIQDa0Q5BWgymv12HfrrkuHZRPZ/D4vh7+2Qfwu3Lv7MIAn25WIoMwrKWbWa2bsZG/Qu1kenQIQhygNYWtI3z64HialyqrEEmLfdxdl+gAg2gf3H9hauZQx8hWaU7I4NksWy988xpLPx3djBY8Ql/e1n4WRxkgUf3GUz6GZY38XogLqpfheXVe6X/5NJLKjpc+Cj43aTWHoFmSMFqxtwL+QyON5fIt9LOzAkFpOOHu+mUrLcQAKNB0h9bmXfC0o8Ag1hUY4eN3IsF65aapXgPgwtV9WKmHRTkEvhvXVeb7XwRZ7R3OEOht2Dm85p1Bf1fnpIzh34lRH5dnNUXAK26EuKMXJZup9zO4iVg=
+X-OriginatorOrg: syrmia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c6954f7a-6f62-4083-5359-08d80eef49ae
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jun 2020 16:40:17.0888 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 19214a73-c1ab-4e19-8f59-14bdcb09a66e
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: K3LXgoRhGois6908MJi7pkHoFJ0Y6VxdjN//yog1Xp9k1rf5mWQ6RcY6cvE4jkX/nyUoPob1hggQMbhB1N1rqg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR03MB4072
+Received-SPF: pass client-ip=40.107.5.134;
+ envelope-from=Filip.Bozuta@syrmia.com;
+ helo=EUR03-VE1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/12 12:40:51
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -37
+X-Spam_score: -3.8
 X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -116,92 +129,459 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: laurent@vivier.eu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 08/06/20 18:54, Joseph Myers wrote:
-> The x87 floating-point emulation of the fprem and fprem1 instructions
-> works via conversion to and from double.  This is inherently
-> unsuitable for a good emulation of any floatx80 operation.  This patch
-> series adapts the softfloat floatx80_rem implementation to be suitable
-> for these instructions and uses it to reimplement them.
-> 
-> There is an existing test for these instructions, test-i386-fprem.c,
-> based on comparison of output.  It produces 1679695 lines of output,
-> and before this patch series 415422 of those lines are different on
-> hardware from the output produced by QEMU.  Some of those differences
-> are because QEMU's x87 emulation does not yet produce the "denormal
-> operand" exception; ignoring such differences (modifying the output
-> from a native run not to report that exception), there are still
-> 398833 different lines.  This patch series reduces that latter number
-> to 1 (that one difference being because of missing checks for
-> floating-point stack underflow, another global issue with the x87
-> emulation), or 35517 different lines without the correction for lack
-> of denormal operand exception support.
-> 
-> Several fixes to and new features in the softfloat support for this
-> operation are needed; floatx80_mod, previously present in the m68k
-> code only, is made generic and unified with floatx80_rem in a new
-> floatx80_modrem of which floatx80_mod and floatx80_rem are thin
-> wrappers.  The only architectures using float*_rem for other formats
-> are arm (FPA emulation) and openrisc (instructions that have been
-> removed in the latest architecture version); they do not appear to
-> need any of the new features, and all the bugs fixed are specific to
-> floatx80, so no changes are made to the remainder implementation for
-> those formats.
-> 
-> A new feature added is returning the low bits of the quotient from
-> floatx80_modrem, as needed for both x87 and m68k.  The logic used to
-> determine the low 7 bits of the quotient for m68k
-> (target/m68k/fpu_helper.c:make_quotient) appears completely bogus (it
-> looks at the result of converting the remainder to integer, the
-> quotient having been discarded by that point); this patch series does
-> not change that to use the new interface, but the m68k maintainers may
-> wish to do so.
-> 
-> The Intel instruction set documentation leaves unspecified the exact
-> number of bits by which the remainder instructions reduce the operand
-> each time.  The AMD documentation gives a specific formula, which
-> empirically Intel processors follow as well, and that formula is
-> implemented in the code.  The AMD documentation also specifies that
-> flags other than C2 are cleared in the partial remainder case, whereas
-> the Intel manual is silent on that (but the processors do appear to
-> clear those flags); this patch implements that flag clearing, and
-> keeps the existing flag clearing in cases where the instructions raise
-> "invalid" (although it seems hardware in fact only clears some but not
-> all flags in that case, leaving other flags unchanged).
-> 
-> The Intel manuals include an inaccurate table asserting that (finite
-> REM 0) should raise "divide by zero"; actually, in accordance with
-> IEEE semantics, it raises "invalid".  The AMD manuals inaccurately say
-> for both fprem and fprem1 that if the exponent difference is negative,
-> the numerator is returned unchanged, which is correct (apart from
-> normalizing pseudo-denormals) for fprem but not for fprem1 (and the
-> old QEMU code had an incorrect optimization following the AMD manuals
-> for fprem1).
-> 
-> Changes in version 2 of the patch series: fix comment formatting and
-> combine patches 6 and 7.
-> 
-> Joseph Myers (6):
->   softfloat: merge floatx80_mod and floatx80_rem
->   softfloat: fix floatx80 remainder pseudo-denormal check for zero
->   softfloat: do not return pseudo-denormal from floatx80 remainder
->   softfloat: do not set denominator high bit for floatx80 remainder
->   softfloat: return low bits of quotient from floatx80_modrem
->   target/i386: reimplement fprem, fprem1 using floatx80 operations
-> 
->  fpu/softfloat.c          |  87 ++++++++++++++++++----
->  include/fpu/softfloat.h  |   3 +
->  target/i386/fpu_helper.c | 156 ++++++++++++---------------------------
->  target/m68k/softfloat.c  |  83 ---------------------
->  target/m68k/softfloat.h  |   1 -
->  5 files changed, 122 insertions(+), 208 deletions(-)
-> 
+From: Filip Bozuta <Filip.Bozuta@syrmia.com>
 
-Queued, thanks.
+This patch implements functionality for strace argument printing for ioctls.
+When running ioctls through qemu with "-strace", they get printed in format:
 
-Paolo
+    "ioctl(fd_num,0x*,0x*) = ret_value"
+
+where the request code an the ioctl's third argument get printed in a hexadicemal
+format. This patch changes that by enabling strace to print both the request code
+name and the contents of the third argument. For example, when running ioctl
+RTC_SET_TIME with "-strace", with changes from this patch, it gets printed in
+this way:
+
+    "ioctl(3,RTC_SET_TIME,{12,13,15,20,10,119,0,0,0}) = 0"
+
+In case of IOC_R type ioctls, the contents of the third argument get printed
+after the return value, and the argument inside the ioctl call gets printed
+as pointer in hexadecimal format. For example, when running RTC_RD_TIME with
+"-strace", with changes from this patch, it gets printed in this way:
+
+    "ioctl(3,RTC_RD_TIME,0x40800374) = 0 ({22,9,13,11,5,120,0,0,0})"
+
+In case of IOC_RW type ioctls, the contents of the third argument get printed
+both inside the ioctl call and after the return value.
+
+Implementation notes:
+
+    Functions "print_ioctl()" and "print_syscall_ret_ioctl()", that are defined
+    in "strace.c", are listed in file "strace.list" as "call" and "result"
+    value for ioctl. Structure definition "IOCTLEntry" as well as predefined
+    values for IOC_R, IOC_W and IOC_RW were cut and pasted from file "syscall.c"
+    to file "qemu.h" so that they can be used by these functions to print the
+    contents of the third ioctl argument. Also, the "static" identifier for array
+    "ioctl_entries[]" was removed and this array was declared as "extern" in "qemu.h"
+    so that it can also be used by these functions. To decode the structure type
+    of the ioctl third argument, function "thunk_print()" was defined in file
+    "thunk.c" and its definition is somewhat simillar to that of function
+    "thunk_convert()".
+
+Signed-off-by: Filip Bozuta <Filip.Bozuta@syrmia.com>
+---
+ include/exec/user/thunk.h |   1 +
+ linux-user/qemu.h         |  20 +++++
+ linux-user/strace.c       | 120 +++++++++++++++++++++++++++++
+ linux-user/strace.list    |   3 +-
+ linux-user/syscall.c      |  20 +----
+ thunk.c                   | 154 ++++++++++++++++++++++++++++++++++++++
+ 6 files changed, 298 insertions(+), 20 deletions(-)
+
+diff --git a/include/exec/user/thunk.h b/include/exec/user/thunk.h
+index eae2c27f99..7992475c9f 100644
+--- a/include/exec/user/thunk.h
++++ b/include/exec/user/thunk.h
+@@ -73,6 +73,7 @@ void thunk_register_struct_direct(int id, const char *name,
+                                   const StructEntry *se1);
+ const argtype *thunk_convert(void *dst, const void *src,
+                              const argtype *type_ptr, int to_host);
++const argtype *thunk_print(void *arg, const argtype *type_ptr);
+ 
+ extern StructEntry *struct_entries;
+ 
+diff --git a/linux-user/qemu.h b/linux-user/qemu.h
+index be67391ba4..5c964389c1 100644
+--- a/linux-user/qemu.h
++++ b/linux-user/qemu.h
+@@ -184,6 +184,26 @@ struct linux_binprm {
+         int (*core_dump)(int, const CPUArchState *); /* coredump routine */
+ };
+ 
++typedef struct IOCTLEntry IOCTLEntry;
++
++typedef abi_long do_ioctl_fn(const IOCTLEntry *ie, uint8_t *buf_temp,
++                             int fd, int cmd, abi_long arg);
++
++struct IOCTLEntry {
++    int target_cmd;
++    unsigned int host_cmd;
++    const char *name;
++    int access;
++    do_ioctl_fn *do_ioctl;
++    const argtype arg_type[5];
++};
++
++extern IOCTLEntry ioctl_entries[];
++
++#define IOC_R 0x0001
++#define IOC_W 0x0002
++#define IOC_RW (IOC_R | IOC_W)
++
+ void do_init_thread(struct target_pt_regs *regs, struct image_info *infop);
+ abi_ulong loader_build_argptr(int envc, int argc, abi_ulong sp,
+                               abi_ulong stringp, int push_ptr);
+diff --git a/linux-user/strace.c b/linux-user/strace.c
+index 5f370256e3..8de8f242ae 100644
+--- a/linux-user/strace.c
++++ b/linux-user/strace.c
+@@ -869,6 +869,51 @@ print_syscall_ret_listxattr(const struct syscallname *name, abi_long ret,
+ #define print_syscall_ret_flistxattr     print_syscall_ret_listxattr
+ #endif
+ 
++#ifdef TARGET_NR_ioctl
++static void
++print_syscall_ret_ioctl(const struct syscallname *name, abi_long ret,
++                        abi_long arg0, abi_long arg1, abi_long arg2,
++                        abi_long arg3, abi_long arg4, abi_long arg5)
++{
++    const char *errstr = NULL;
++
++    qemu_log(" = ");
++    if (ret < 0) {
++        qemu_log("-1 errno=%d", errno);
++        errstr = target_strerror(-ret);
++        if (errstr) {
++            qemu_log(" (%s)", errstr);
++        }
++    } else {
++        qemu_log(TARGET_ABI_FMT_ld, ret);
++
++        const IOCTLEntry *ie;
++        const argtype *arg_type;
++        void *argptr;
++        int target_size;
++
++        for (ie = ioctl_entries; ie->target_cmd != 0; ie++) {
++            if (ie->target_cmd == arg1) {
++                break;
++            }
++        }
++
++        if (ie->target_cmd == arg1 &&
++           (ie->access == IOC_R || ie->access == IOC_RW)) {
++            arg_type = ie->arg_type;
++            qemu_log(" (");
++            arg_type++;
++            target_size = thunk_type_size(arg_type, 0);
++            argptr = lock_user(VERIFY_READ, arg2, target_size, 1);
++            thunk_print(argptr, arg_type);
++            unlock_user(argptr, arg2, target_size);
++            qemu_log(")");
++        }
++    }
++    qemu_log("\n");
++}
++#endif
++
+ UNUSED static struct flags access_flags[] = {
+     FLAG_GENERIC(F_OK),
+     FLAG_GENERIC(R_OK),
+@@ -3008,6 +3053,81 @@ print_statx(const struct syscallname *name,
+ }
+ #endif
+ 
++#ifdef TARGET_NR_ioctl
++static void
++print_ioctl(const struct syscallname *name,
++            abi_long arg0, abi_long arg1, abi_long arg2,
++            abi_long arg3, abi_long arg4, abi_long arg5)
++{
++    print_syscall_prologue(name);
++    print_raw_param("%d", arg0, 0);
++
++    const IOCTLEntry *ie;
++    const argtype *arg_type;
++    void *argptr;
++    int target_size;
++
++    for (ie = ioctl_entries; ie->target_cmd != 0; ie++) {
++        if (ie->target_cmd == arg1) {
++            break;
++        }
++    }
++
++    if (ie->target_cmd == 0) {
++        print_raw_param("%#x", arg1, 0);
++        print_raw_param("%#x", arg2, 1);
++    } else {
++        qemu_log("%s", ie->name);
++        arg_type = ie->arg_type;
++
++        if (arg_type[0] != TYPE_NULL) {
++            qemu_log(",");
++
++            switch (arg_type[0]) {
++            case TYPE_PTRVOID:
++                print_pointer(arg2, 1);
++                break;
++            case TYPE_CHAR:
++            case TYPE_SHORT:
++            case TYPE_INT:
++                print_raw_param("%d", arg2, 1);
++                break;
++            case TYPE_LONG:
++                print_raw_param(TARGET_ABI_FMT_ld, arg2, 1);
++                break;
++            case TYPE_ULONG:
++                print_raw_param(TARGET_ABI_FMT_lu, arg2, 1);
++                break;
++            case TYPE_LONGLONG:
++                print_raw_param("%lld", arg2, 1);
++                break;
++            case TYPE_ULONGLONG:
++                print_raw_param("%llu", arg2, 1);
++                break;
++            case TYPE_PTR:
++                switch (ie->access) {
++                case IOC_R:
++                    print_pointer(arg2, 1);
++                    break;
++                case IOC_W:
++                case IOC_RW:
++                    arg_type++;
++                    target_size = thunk_type_size(arg_type, 0);
++                    argptr = lock_user(VERIFY_READ, arg2, target_size, 1);
++                    thunk_print(argptr, arg_type);
++                    unlock_user(argptr, arg2, target_size);
++                    break;
++                }
++                break;
++            default:
++                g_assert_not_reached();
++            }
++        }
++    }
++    print_syscall_epilogue(name);
++}
++#endif
++
+ /*
+  * An array of all of the syscalls we know about
+  */
+diff --git a/linux-user/strace.list b/linux-user/strace.list
+index 05bb91acc6..1b77cdc0dd 100644
+--- a/linux-user/strace.list
++++ b/linux-user/strace.list
+@@ -433,7 +433,8 @@
+ { TARGET_NR_io_cancel, "io_cancel" , NULL, NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_ioctl
+-{ TARGET_NR_ioctl, "ioctl" , "%s(%d,%#x,%#x)", NULL, NULL },
++{ TARGET_NR_ioctl, "ioctl" , NULL, print_ioctl,
++                   print_syscall_ret_ioctl},
+ #endif
+ #ifdef TARGET_NR_io_destroy
+ { TARGET_NR_io_destroy, "io_destroy" , NULL, NULL, NULL },
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 7cc5a65b4f..007febed08 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -4478,24 +4478,6 @@ STRUCT_MAX
+ #undef STRUCT
+ #undef STRUCT_SPECIAL
+ 
+-typedef struct IOCTLEntry IOCTLEntry;
+-
+-typedef abi_long do_ioctl_fn(const IOCTLEntry *ie, uint8_t *buf_temp,
+-                             int fd, int cmd, abi_long arg);
+-
+-struct IOCTLEntry {
+-    int target_cmd;
+-    unsigned int host_cmd;
+-    const char *name;
+-    int access;
+-    do_ioctl_fn *do_ioctl;
+-    const argtype arg_type[5];
+-};
+-
+-#define IOC_R 0x0001
+-#define IOC_W 0x0002
+-#define IOC_RW (IOC_R | IOC_W)
+-
+ #define MAX_STRUCT_SIZE 4096
+ 
+ #ifdef CONFIG_FIEMAP
+@@ -5276,7 +5258,7 @@ static abi_long do_ioctl_tiocgptpeer(const IOCTLEntry *ie, uint8_t *buf_temp,
+ }
+ #endif
+ 
+-static IOCTLEntry ioctl_entries[] = {
++IOCTLEntry ioctl_entries[] = {
+ #define IOCTL(cmd, access, ...) \
+     { TARGET_ ## cmd, cmd, #cmd, access, 0, {  __VA_ARGS__ } },
+ #define IOCTL_SPECIAL(cmd, access, dofn, ...)                      \
+diff --git a/thunk.c b/thunk.c
+index 7f31cffe09..992a19b1c9 100644
+--- a/thunk.c
++++ b/thunk.c
+@@ -271,6 +271,160 @@ const argtype *thunk_convert(void *dst, const void *src,
+     return type_ptr;
+ }
+ 
++const argtype *thunk_print(void *arg, const argtype *type_ptr)
++{
++    int type;
++
++    type = *type_ptr++;
++
++    switch (type) {
++    case TYPE_CHAR:
++        qemu_log("%c", *(uint8_t *)arg);
++        break;
++    case TYPE_SHORT:
++        qemu_log("%" PRId16, tswap16(*(uint16_t *)arg));
++        break;
++    case TYPE_INT:
++        qemu_log("%" PRId32, tswap32(*(uint32_t *)arg));
++        break;
++    case TYPE_LONGLONG:
++        qemu_log("%" PRId64, tswap64(*(uint64_t *)arg));
++        break;
++    case TYPE_ULONGLONG:
++        qemu_log("%" PRIu64, tswap64(*(uint64_t *)arg));
++        break;
++#if HOST_LONG_BITS == 32 && TARGET_ABI_BITS == 32
++    case TYPE_PTRVOID:
++        qemu_log("0x%" PRIx32, tswap32(*(uint32_t *)arg));
++        break;
++    case TYPE_LONG:
++        qemu_log("%" PRId32, tswap32(*(uint32_t *)arg));
++        break;
++    case TYPE_ULONG:
++        qemu_log("%" PRIu32, tswap32(*(uint32_t *))arg);
++        break;
++#elif HOST_LONG_BITS == 64 && TARGET_ABI_BITS == 32
++    case TYPE_PTRVOID:
++        qemu_log("0x%" PRIx32, tswap32(*(uint64_t *)arg & 0xffffffff));
++        break;
++    case TYPE_LONG:
++        qemu_log("%" PRId32, tswap32(*(uint64_t *)arg & 0xffffffff));
++        break;
++    case TYPE_ULONG:
++        qemu_log("%" PRIu32, tswap32(*(uint64_t *)arg & 0xffffffff));
++        break;
++#elif HOST_LONG_BITS == 64 && TARGET_ABI_BITS == 64
++    case TYPE_PTRVOID:
++        qemu_log("0x%" PRIx64, tswap64(*(uint64_t *)arg));
++        break;
++    case TYPE_LONG:
++        qemu_log("%" PRId64, tswap64(*(uint64_t *)arg));
++        break;
++    case TYPE_ULONG:
++        qemu_log("%" PRIu64, tswap64(*(uint64_t *)arg));
++        break;
++#else
++    case TYPE_PTRVOID:
++        qemu_log("0x%" PRIx64, tswap64(*(uint64_t *)arg));
++        break;
++    case TYPE_LONG:
++        qemu_log("%" PRId64, tswap64(*(uint64_t *)arg));
++        break;
++    case TYPE_ULONG:
++        qemu_log("%" PRIu64, tswap64(*(uint64_t *)arg));
++        break;
++#endif
++    case TYPE_OLDDEVT:
++    {
++        uint64_t val = 0;
++        switch (thunk_type_size(type_ptr - 1, 1)) {
++        case 2:
++            val = *(uint16_t *)arg;
++            break;
++        case 4:
++            val = *(uint32_t *)arg;
++            break;
++        case 8:
++            val = *(uint64_t *)arg;
++            break;
++        }
++        switch (thunk_type_size(type_ptr - 1, 0)) {
++        case 2:
++            qemu_log("%" PRIu16, tswap16(val));
++            break;
++        case 4:
++            qemu_log("%" PRIu32, tswap32(val));
++            break;
++        case 8:
++            qemu_log("%" PRIu64, tswap64(val));
++            break;
++        }
++    }
++    break;
++    case TYPE_ARRAY:
++        {
++            int i, array_length, arg_size;
++            uint8_t *a;
++            int is_string = 0;
++
++            array_length = *type_ptr++;
++            arg_size = thunk_type_size(type_ptr, 0);
++            a = arg;
++
++            if (*type_ptr == TYPE_CHAR) {
++                qemu_log("\"");
++                is_string = 1;
++            } else {
++                qemu_log("[");
++            }
++
++            for (i = 0; i < array_length; i++) {
++                if (i > 0 && !is_string) {
++                    qemu_log(",");
++                }
++                thunk_print(a, type_ptr);
++                a += arg_size;
++            }
++
++            if (is_string) {
++                qemu_log("\"");
++            } else {
++                qemu_log("]");
++            }
++
++            type_ptr = thunk_type_next(type_ptr);
++        }
++        break;
++    case TYPE_STRUCT:
++        {
++            int i;
++            const StructEntry *se;
++            uint8_t  *a;
++            const argtype *field_types;
++            const int *arg_offsets;
++
++            se = struct_entries + *type_ptr++;
++            a = arg;
++
++            field_types = se->field_types;
++            arg_offsets = se->field_offsets[0];
++
++            qemu_log("{");
++            for (i = 0; i < se->nb_fields; i++) {
++                if (i > 0) {
++                    qemu_log(",");
++                }
++                field_types = thunk_print(a + arg_offsets[i], field_types);
++            }
++            qemu_log("}");
++        }
++        break;
++    default:
++        g_assert_not_reached();
++    }
++    return type_ptr;
++}
++
+ /* from em86 */
+ 
+ /* Utility function: Table-driven functions to translate bitmasks
+-- 
+2.17.1
 
 
