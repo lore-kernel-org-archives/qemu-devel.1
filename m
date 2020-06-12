@@ -2,83 +2,80 @@ Return-Path: <SRS0=+PsZ=7Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8072FC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 14:56:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6594DC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 14:56:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4D4C220691
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 14:56:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 312E620691
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 14:56:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VNyOHpfA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D4C220691
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BVrGgP9K"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 312E620691
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55040 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55660 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjl6h-00077V-H0
-	for qemu-devel@archiver.kernel.org; Fri, 12 Jun 2020 10:56:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50014)
+	id 1jjl6r-0007Zo-Fz
+	for qemu-devel@archiver.kernel.org; Fri, 12 Jun 2020 10:56:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49876)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jjl2H-0006jt-Dn
- for qemu-devel@nongnu.org; Fri, 12 Jun 2020 10:52:02 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57353
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jjl22-0006Er-Ar
+ for qemu-devel@nongnu.org; Fri, 12 Jun 2020 10:51:46 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:59103
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jjl2D-0001S3-Il
- for qemu-devel@nongnu.org; Fri, 12 Jun 2020 10:52:01 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jjl1z-0001PX-Ga
+ for qemu-devel@nongnu.org; Fri, 12 Jun 2020 10:51:45 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591973516;
+ s=mimecast20190719; t=1591973502;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=NgqF724ZlpYDgxpsvGgomKXglTKeYnsN1WEfd42scpg=;
- b=VNyOHpfAObih3Q60mgSthocDRqwfPocxyMOpRpiixxHq+7kXxX5AfbUpkjNsh0ft7YgqY/
- lpULqZUwJdFItO9qVGbtvT1MqgM9wISJvZMvQptCpnCLyucP3gAqytKU1lt9Q+MWO9Y+F9
- G/d+xNZcnLW+Pasjv5sJGWIgn2D1wjs=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-322-wPwPLDA6MZ2vO67S_WECWg-1; Fri, 12 Jun 2020 10:51:54 -0400
-X-MC-Unique: wPwPLDA6MZ2vO67S_WECWg-1
-Received: by mail-wr1-f72.google.com with SMTP id w16so3976208wru.18
- for <qemu-devel@nongnu.org>; Fri, 12 Jun 2020 07:51:54 -0700 (PDT)
+ bh=zGOoHYc7BnEUE5/Tw0vbz2Gw05a97G6XRUJWvEWyGjA=;
+ b=BVrGgP9KPFaPBV/tSHHr+jE7nLX1k3ymHzRriBrIjR2ETM5ICJQGXQKO5aYjEQQfgaPl0K
+ +PZZEfRBr1eXUpHMdoD1iu+Jc1vOevp2Zi9D7zlgM2z0z6EmApCeOnZe8/INRtYZF6ni+p
+ Vx8+6Z1oCyd1Be4f3DBmko/Avb1zljQ=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-8-hm62ABFKNDOEeEtNpnHoOA-1; Fri, 12 Jun 2020 10:51:40 -0400
+X-MC-Unique: hm62ABFKNDOEeEtNpnHoOA-1
+Received: by mail-wr1-f71.google.com with SMTP id r5so4002236wrt.9
+ for <qemu-devel@nongnu.org>; Fri, 12 Jun 2020 07:51:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=NgqF724ZlpYDgxpsvGgomKXglTKeYnsN1WEfd42scpg=;
- b=ojbUNp3/pPMXkDsSyV3xNMIskCNFsdZQ42SwTuLJ+at02IkEubvcSGiYmrq4YskQ05
- 6YVrXQk5I8vxd60BFe4wlgmH/vHT15+4OmPtwVLg80/kOdYj0JYrjYfjEF/VD2EVUmSl
- ws5jXuS9pFAWmBbdK0D5d/syOo/GUOCnL5JBgqwBirZc6TtRJHTElZVQqQZL1fTrH8Zb
- L1CiOjcHZT7Z+Jd1jFL7A3wHA8DWbe5Ow+1YZvDbkS5HWWwrWOUFgiAwJ/gKm3zyq++O
- Y0xgYJlGwZd1XkKqnyhd/0HYItXCZN1B6Hbj3sP/NnSRQRKKEF9EUw73Pcv8BSPIyp+L
- lgLw==
-X-Gm-Message-State: AOAM531Ee0m/IXV2gTdaFBXSwShTwmvFQepiUGRRyfaLTz6rEPQIR+mF
- lC3jGunMMIMmWyyVxFqk8Ve673pBXvE/l3StM4CsyBizqi76dCmkQV6KlN1Bep/ZjbsHJw5dcim
- VsPv6Wb0Jh8dbVZ8=
-X-Received: by 2002:a1c:c904:: with SMTP id f4mr13775290wmb.69.1591973513430; 
- Fri, 12 Jun 2020 07:51:53 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzKGK6kZ7bJZt+ZRB9Ra7NjW85+BqxOmHfzGKkZXtXQhVBBOpwtN7uQeoTnx6kp4Fdh7EABRA==
-X-Received: by 2002:a1c:c904:: with SMTP id f4mr13775267wmb.69.1591973513175; 
- Fri, 12 Jun 2020 07:51:53 -0700 (PDT)
+ :mime-version:content-disposition:in-reply-to;
+ bh=zGOoHYc7BnEUE5/Tw0vbz2Gw05a97G6XRUJWvEWyGjA=;
+ b=qZKvsNleKPXXC4D1dAziC+h56+Onq5O2pv51KQxi+mw6z03nnMjrNWoNVsBVYxKb0r
+ HoW1pnE0g5v5tEYvNNfEvpTTD01JsUI7zi1lBGUyim/QM5nmI6kT+Wyrdxo32I0Yx6Wr
+ 65WuKZqCjGeab6Y7JpaGe20Z/bLNMnNv9x3ujR20Pjg0sytGw3LyLa0gyCKJVFrnfBdE
+ OL+liJ0IP9dDQLkKhdVYkxdVpHwrcXSNfrzPaSWSnC6jsshOgHTffwb28F1G8CIAw8s1
+ l/DonX7rbg4QMzB/aCS8NxRNGgEuEGK2aOTdmmv8eRO0wo/TZidHXBJTZthyhYpP2HUJ
+ +Ejg==
+X-Gm-Message-State: AOAM531Cem4kVZImjtiTD4AyUgXGnIhJ6Ifbk797yFWvKbfTBhKZyORb
+ NC7/HgiedXfzJITDUlTNHSTpWW3nAb3hjBHhpIPxrB1/A68jWs74UhQ/Wo8aPFx45DW3WokAwwG
+ QGu3+dAeTbPhPdVs=
+X-Received: by 2002:a1c:7903:: with SMTP id l3mr13483925wme.50.1591973499328; 
+ Fri, 12 Jun 2020 07:51:39 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyR4D2VtuT67U58RnzCGHC3lbDYP+TWdHWYomPasF6q6FgznRdyNmRy7Qs1NVFk1eh3mF6kBQ==
+X-Received: by 2002:a1c:7903:: with SMTP id l3mr13483903wme.50.1591973499160; 
+ Fri, 12 Jun 2020 07:51:39 -0700 (PDT)
 Received: from redhat.com (bzq-79-178-18-124.red.bezeqint.net. [79.178.18.124])
- by smtp.gmail.com with ESMTPSA id o18sm9407093wme.19.2020.06.12.07.51.51
+ by smtp.gmail.com with ESMTPSA id y37sm11339873wrd.55.2020.06.12.07.51.38
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 12 Jun 2020 07:51:52 -0700 (PDT)
-Date: Fri, 12 Jun 2020 10:51:51 -0400
+ Fri, 12 Jun 2020 07:51:38 -0700 (PDT)
+Date: Fri, 12 Jun 2020 10:51:37 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 22/58] virtio-balloon: fix free page hinting without an
- iothread
-Message-ID: <20200612141917.9446-23-mst@redhat.com>
+Subject: [PULL v2 16/58] arm/acpi: TPM2 ACPI table support
+Message-ID: <20200612141917.9446-17-mst@redhat.com>
 References: <20200612141917.9446-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20200612141917.9446-1-mst@redhat.com>
@@ -86,13 +83,12 @@ X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
 X-Mutt-Fcc: =sent
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Received-SPF: pass client-ip=205.139.110.120; envelope-from=mst@redhat.com;
  helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/12 08:00:42
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
@@ -113,115 +109,98 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
- David Hildenbrand <david@redhat.com>, qemu-stable@nongnu.org,
- Alexander Duyck <alexander.duyck@gmail.com>, Alexander Bulekov <alxndr@bu.edu>,
- Wei Wang <wei.w.wang@intel.com>,
- Alexander Duyck <alexander.h.duyck@linux.intel.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+ Eric Auger <eric.auger@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>,
+ qemu-arm@nongnu.org, Igor Mammedov <imammedo@redhat.com>,
+ Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: David Hildenbrand <david@redhat.com>
+From: Eric Auger <eric.auger@redhat.com>
 
-In case we don't have an iothread, we mark the feature as abscent but
-still add the queue. 'free_page_bh' remains set to NULL.
+Add a TPM2 ACPI table if a TPM2.0 sysbus device has been
+dynamically instantiated.
 
-qemu-system-i386 \
-        -M microvm \
-        -nographic \
-        -device virtio-balloon-device,free-page-hint=true \
-        -nographic \
-        -display none \
-        -monitor none \
-        -serial none \
-        -qtest stdio
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
-Doing a "write 0xc0000e30 0x24
-0x030000000300000003000000030000000300000003000000030000000300000003000000"
-
-We will trigger a SEGFAULT. Let's move the check and bail out.
-
-While at it, move the static initializations to instance_init().
-free_page_report_status and block_iothread are implicitly set to the
-right values (0/false) already, so drop the initialization.
-
-Reviewed-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Fixes: c13c4153f76d ("virtio-balloon: VIRTIO_BALLOON_F_FREE_PAGE_HINT")
-Reported-by: Alexander Bulekov <alxndr@bu.edu>
-Cc: qemu-stable@nongnu.org
-Cc: Wei Wang <wei.w.wang@intel.com>
-Cc: Michael S. Tsirkin <mst@redhat.com>
-Cc: Philippe Mathieu-Daudé <philmd@redhat.com>
-Cc: Alexander Duyck <alexander.duyck@gmail.com>
-Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20200520100439.19872-2-david@redhat.com>
+Message-Id: <20200601095737.32671-4-eric.auger@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/virtio/virtio-balloon.c | 33 ++++++++++++++++-----------------
- 1 file changed, 16 insertions(+), 17 deletions(-)
+ include/sysemu/tpm.h     | 2 ++
+ hw/acpi/aml-build.c      | 5 +++--
+ hw/arm/virt-acpi-build.c | 7 +++++++
+ 3 files changed, 12 insertions(+), 2 deletions(-)
 
-diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-index 065cd450f1..7ff6a7aa7c 100644
---- a/hw/virtio/virtio-balloon.c
-+++ b/hw/virtio/virtio-balloon.c
-@@ -789,6 +789,13 @@ static void virtio_balloon_device_realize(DeviceState *dev, Error **errp)
-         return;
+diff --git a/include/sysemu/tpm.h b/include/sysemu/tpm.h
+index f37851b1aa..03fb25941c 100644
+--- a/include/sysemu/tpm.h
++++ b/include/sysemu/tpm.h
+@@ -50,6 +50,8 @@ typedef struct TPMIfClass {
+ 
+ #define TPM_IS_TIS_ISA(chr)                         \
+     object_dynamic_cast(OBJECT(chr), TYPE_TPM_TIS_ISA)
++#define TPM_IS_TIS_SYSBUS(chr)                      \
++    object_dynamic_cast(OBJECT(chr), TYPE_TPM_TIS_SYSBUS)
+ #define TPM_IS_CRB(chr)                             \
+     object_dynamic_cast(OBJECT(chr), TYPE_TPM_CRB)
+ #define TPM_IS_SPAPR(chr)                           \
+diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
+index b37052c1b4..d24e9e6c3a 100644
+--- a/hw/acpi/aml-build.c
++++ b/hw/acpi/aml-build.c
+@@ -1885,17 +1885,18 @@ void build_tpm2(GArray *table_data, BIOSLinker *linker, GArray *tcpalog)
+     unsigned log_addr_offset =
+         (char *)&tpm2_ptr->log_area_start_address - table_data->data;
+     uint8_t start_method_params[12] = {};
++    TPMIf *tpmif = tpm_find();
+ 
+     /* platform class */
+     build_append_int_noprefix(table_data, TPM2_ACPI_CLASS_CLIENT, 2);
+     /* reserved */
+     build_append_int_noprefix(table_data, 0, 2);
+-    if (TPM_IS_TIS_ISA(tpm_find())) {
++    if (TPM_IS_TIS_ISA(tpmif) || TPM_IS_TIS_SYSBUS(tpmif)) {
+         /* address of control area */
+         build_append_int_noprefix(table_data, 0, 8);
+         /* start method */
+         build_append_int_noprefix(table_data, TPM2_START_METHOD_MMIO, 4);
+-    } else if (TPM_IS_CRB(tpm_find())) {
++    } else if (TPM_IS_CRB(tpmif)) {
+         build_append_int_noprefix(table_data, TPM_CRB_ADDR_CTRL, 8);
+         build_append_int_noprefix(table_data, TPM2_START_METHOD_CRB, 4);
+     } else {
+diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+index 2cbccd5fe2..ca31f70f7f 100644
+--- a/hw/arm/virt-acpi-build.c
++++ b/hw/arm/virt-acpi-build.c
+@@ -41,12 +41,14 @@
+ #include "hw/acpi/pci.h"
+ #include "hw/acpi/memory_hotplug.h"
+ #include "hw/acpi/generic_event_device.h"
++#include "hw/acpi/tpm.h"
+ #include "hw/pci/pcie_host.h"
+ #include "hw/pci/pci.h"
+ #include "hw/arm/virt.h"
+ #include "hw/mem/nvdimm.h"
+ #include "sysemu/numa.h"
+ #include "sysemu/reset.h"
++#include "sysemu/tpm.h"
+ #include "kvm_arm.h"
+ #include "migration/vmstate.h"
+ #include "hw/acpi/ghes.h"
+@@ -848,6 +850,11 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
+         build_iort(tables_blob, tables->linker, vms);
      }
  
-+    if (virtio_has_feature(s->host_features, VIRTIO_BALLOON_F_FREE_PAGE_HINT) &&
-+        !s->iothread) {
-+        error_setg(errp, "'free-page-hint' requires 'iothread' to be set");
-+        virtio_cleanup(vdev);
-+        return;
++    if (tpm_get_version(tpm_find()) == TPM_VERSION_2_0) {
++        acpi_add_table(table_offsets, tables_blob);
++        build_tpm2(tables_blob, tables->linker, tables->tcpalog);
 +    }
 +
-     s->ivq = virtio_add_queue(vdev, 128, virtio_balloon_handle_output);
-     s->dvq = virtio_add_queue(vdev, 128, virtio_balloon_handle_output);
-     s->svq = virtio_add_queue(vdev, 128, virtio_balloon_receive_stats);
-@@ -797,24 +804,11 @@ static void virtio_balloon_device_realize(DeviceState *dev, Error **errp)
-                            VIRTIO_BALLOON_F_FREE_PAGE_HINT)) {
-         s->free_page_vq = virtio_add_queue(vdev, VIRTQUEUE_MAX_SIZE,
-                                            virtio_balloon_handle_free_page_vq);
--        s->free_page_report_status = FREE_PAGE_REPORT_S_STOP;
--        s->free_page_report_cmd_id =
--                           VIRTIO_BALLOON_FREE_PAGE_REPORT_CMD_ID_MIN;
--        s->free_page_report_notify.notify =
--                                       virtio_balloon_free_page_report_notify;
-         precopy_add_notifier(&s->free_page_report_notify);
--        if (s->iothread) {
--            object_ref(OBJECT(s->iothread));
--            s->free_page_bh = aio_bh_new(iothread_get_aio_context(s->iothread),
--                                       virtio_ballloon_get_free_page_hints, s);
--            qemu_mutex_init(&s->free_page_lock);
--            qemu_cond_init(&s->free_page_cond);
--            s->block_iothread = false;
--        } else {
--            /* Simply disable this feature if the iothread wasn't created. */
--            s->host_features &= ~(1 << VIRTIO_BALLOON_F_FREE_PAGE_HINT);
--            virtio_error(vdev, "iothread is missing");
--        }
-+
-+        object_ref(OBJECT(s->iothread));
-+        s->free_page_bh = aio_bh_new(iothread_get_aio_context(s->iothread),
-+                                     virtio_ballloon_get_free_page_hints, s);
-     }
-     reset_stats(s);
- }
-@@ -892,6 +886,11 @@ static void virtio_balloon_instance_init(Object *obj)
- {
-     VirtIOBalloon *s = VIRTIO_BALLOON(obj);
- 
-+    qemu_mutex_init(&s->free_page_lock);
-+    qemu_cond_init(&s->free_page_cond);
-+    s->free_page_report_cmd_id = VIRTIO_BALLOON_FREE_PAGE_REPORT_CMD_ID_MIN;
-+    s->free_page_report_notify.notify = virtio_balloon_free_page_report_notify;
-+
-     object_property_add(obj, "guest-stats", "guest statistics",
-                         balloon_stats_get_all, NULL, NULL, s);
- 
+     /* XSDT is pointed to by RSDP */
+     xsdt = tables_blob->len;
+     build_xsdt(tables_blob, tables->linker, table_offsets, NULL, NULL);
 -- 
 MST
 
