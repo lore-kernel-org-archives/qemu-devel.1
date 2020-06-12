@@ -7,77 +7,77 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06E97C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 15:04:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AC4AC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 15:05:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C669E20691
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 15:04:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5EDD72081A
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 15:05:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GjW6WUrw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C669E20691
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WewJJ9+Q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5EDD72081A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55164 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57442 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjlEX-0003y3-W4
-	for qemu-devel@archiver.kernel.org; Fri, 12 Jun 2020 11:04:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50290)
+	id 1jjlFF-0005RN-Ia
+	for qemu-devel@archiver.kernel.org; Fri, 12 Jun 2020 11:05:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50220)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jjl2n-0007wy-3I
- for qemu-devel@nongnu.org; Fri, 12 Jun 2020 10:52:33 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46909
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jjl2d-0007Zz-BB
+ for qemu-devel@nongnu.org; Fri, 12 Jun 2020 10:52:23 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:35597
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jjl2k-0001VW-P9
- for qemu-devel@nongnu.org; Fri, 12 Jun 2020 10:52:32 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jjl2b-0001Um-IB
+ for qemu-devel@nongnu.org; Fri, 12 Jun 2020 10:52:23 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591973548;
+ s=mimecast20190719; t=1591973540;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=MPP6uVIK/72gmaaGLDDvftHafSRk3w6HEMlvs19A15A=;
- b=GjW6WUrwN5A+k0rIr7cxm2JoyVbCMhyZK+ucJsQfLe0EcNRItsZPiU04jSHTQjgmakbt/q
- P/dSEBBkdSXoVFKJsxG3GLqLEQGcB2v0hTZjNG7iT5XsR+f9LDuz36xhx/HzRZkI4GNru8
- TGroEfsiL2DVRil4TPZJcHHkuvEuzcQ=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-374-7_bIRhXmP7Sb27P70P2bVg-1; Fri, 12 Jun 2020 10:52:25 -0400
-X-MC-Unique: 7_bIRhXmP7Sb27P70P2bVg-1
-Received: by mail-wr1-f71.google.com with SMTP id n6so3999527wrv.6
- for <qemu-devel@nongnu.org>; Fri, 12 Jun 2020 07:52:25 -0700 (PDT)
+ bh=XYJWosKtNa0YrCdfi+nbmPQlsHhZsqpfDeFMOxFj1JA=;
+ b=WewJJ9+QoRES2Me9JANlanMZRywQo8/4+PscGEi8djqwzAftNf5ksz/88ql36iG0UEk9Jb
+ JmVPnLaJIzyTJS11eB+F026XyIYtFlSgJm2rgRuDvGVqYmv6K7FWq5wtHgcvumeInw+aQY
+ /7Ubx1VHMSFfXWsgKNrDQCo2HEpNQxw=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-289-mWhjM3pVNrabT2no1CwXkQ-1; Fri, 12 Jun 2020 10:52:19 -0400
+X-MC-Unique: mWhjM3pVNrabT2no1CwXkQ-1
+Received: by mail-wm1-f72.google.com with SMTP id t145so2546280wmt.2
+ for <qemu-devel@nongnu.org>; Fri, 12 Jun 2020 07:52:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:content-transfer-encoding
  :in-reply-to;
- bh=MPP6uVIK/72gmaaGLDDvftHafSRk3w6HEMlvs19A15A=;
- b=Qcz6qcsCuGO+94mcR22NxeyPHTwxBgiG0ZRMX9JcUxNCSqcMP94ZBJuY0kmpyjHJ3h
- h3MvYxojyKgQGKeH+4e7bMZQk6NEWnTpWJMla5wK2nF59sWwu/DhiVIY0ClWYHkdha8k
- Yanw2lACVLC0spF/7vqLHexSo1an2yKz+6SyKG84G062joXzVrE/mcX3WrxSo6PSM8K7
- pm+jW2v7FLpiN5d2V/VSAltVxXCI8TD4X4rvzGxg+iB5lwQMhiJfDMehg9V/F4gUtwvL
- 08tbAAmDhTy4mUKkVTBavSzoCuENBbepiS3/btoWKhASnf1qby2Ou7iHSxuVsu6GOIkw
- sJ2g==
-X-Gm-Message-State: AOAM530UeSGDGO+VLah8XXIMzCzsYy+0zk6LQ8dCJGUhYwaZQNX1CU1H
- kLllRouIayNBO7CzXSXJbCkvDLzLubtg0j6+K7JY/4KXpxuBubNQKz+zXI9HzU9eoKrjVg5J3LR
- mi91fRa9rko/Odq8=
-X-Received: by 2002:a1c:4b0f:: with SMTP id y15mr14594303wma.83.1591973544077; 
- Fri, 12 Jun 2020 07:52:24 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzkj06rbkNWZvdnA2dEzeo38FV6ISZCTjjnH8CLOkLLrDW96lYhASXA8vDJyOEftqXCMuhPIw==
-X-Received: by 2002:a1c:4b0f:: with SMTP id y15mr14594282wma.83.1591973543835; 
- Fri, 12 Jun 2020 07:52:23 -0700 (PDT)
+ bh=XYJWosKtNa0YrCdfi+nbmPQlsHhZsqpfDeFMOxFj1JA=;
+ b=k2uijgiO4oFzoG6p+0iwqGFXxB0v8LCUWC8UrjyWl6e9Y4wF/SbYfyHQSbVlerJ/0d
+ SiKVAcXrsIO7hlvQHw1a1Cl7sm3ux0RN7xRobjkd7mTBLuN5mh6HoU4NeayvROalXCur
+ HJFR5c8L6tx6YA9gZJ7yIPb/f23eVi5TUyXQ92ijvomZNMmuDr3fuJ2C+9Qsse5f1tQP
+ PY1kiVaRS6cwWSAES6W3gfq0BCriG18/ZvFGipODorqv4DutaP41TqGokeZ+PJ6gp+nk
+ 7aUzLTKsYBl3Ss+GwlO2zn8T87jDiEZCXifvnmqPneKx/qXsQ4c8br85uiAuHxLKN9qN
+ iC9g==
+X-Gm-Message-State: AOAM531l95cZlv0KoGqbJRrua4/TDVpYF6qp2h7WHokbl93EgvbZawvQ
+ KbXc0F1VGEvBy5UsUOX85TcRYivR9GjGcy46QKvnrS0zAz0MieR7Nv6T9m/VqybFf6AM4fZfyWt
+ 5+GnK2Mbb8ghFMhk=
+X-Received: by 2002:adf:fc4e:: with SMTP id e14mr15313516wrs.348.1591973537895; 
+ Fri, 12 Jun 2020 07:52:17 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyzR0j3QgiKw9ix9SXDk1SqR2xOa3qiy/u2bEGSFuXXqKMvXpTcEf/zzWvP/yEizLNKjqqwHQ==
+X-Received: by 2002:adf:fc4e:: with SMTP id e14mr15313498wrs.348.1591973537689; 
+ Fri, 12 Jun 2020 07:52:17 -0700 (PDT)
 Received: from redhat.com (bzq-79-178-18-124.red.bezeqint.net. [79.178.18.124])
- by smtp.gmail.com with ESMTPSA id 88sm11331100wre.45.2020.06.12.07.52.22
+ by smtp.gmail.com with ESMTPSA id k64sm9481743wmf.34.2020.06.12.07.52.16
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 12 Jun 2020 07:52:23 -0700 (PDT)
-Date: Fri, 12 Jun 2020 10:52:22 -0400
+ Fri, 12 Jun 2020 07:52:17 -0700 (PDT)
+Date: Fri, 12 Jun 2020 10:52:15 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 36/58] Add helper to populate vhost-user message regions
-Message-ID: <20200612141917.9446-37-mst@redhat.com>
+Subject: [PULL v2 33/58] hw/pci-host: Use the IEC binary prefix definitions
+Message-ID: <20200612141917.9446-34-mst@redhat.com>
 References: <20200612141917.9446-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20200612141917.9446-1-mst@redhat.com>
@@ -88,9 +88,9 @@ X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
 Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=mst@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/12 08:00:42
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=mst@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/12 08:07:17
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -111,72 +111,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- Raphael Norwitz <raphael.norwitz@nutanix.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Raphael Norwitz <raphael.norwitz@nutanix.com>
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-When setting vhost-user memory tables, memory region descriptors must be
-copied from the vhost_dev struct to the vhost-user message. To avoid
-duplicating code in setting the memory tables, we should use a helper to
-populate this field. This change adds this helper.
+IEC binary prefixes ease code review: the unit is explicit.
 
-Signed-off-by: Raphael Norwitz <raphael.norwitz@nutanix.com>
-Message-Id: <1588533678-23450-2-git-send-email-raphael.norwitz@nutanix.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-Id: <20200601142930.29408-6-f4bug@amsat.org>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- hw/virtio/vhost-user.c | 18 ++++++++++++------
- 1 file changed, 12 insertions(+), 6 deletions(-)
+ hw/pci-host/i440fx.c    | 3 ++-
+ hw/pci-host/q35.c       | 2 +-
+ hw/pci-host/versatile.c | 5 +++--
+ 3 files changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-index ec21e8fbe8..2e0552dd74 100644
---- a/hw/virtio/vhost-user.c
-+++ b/hw/virtio/vhost-user.c
-@@ -407,6 +407,15 @@ static int vhost_user_set_log_base(struct vhost_dev *dev, uint64_t base,
-     return 0;
- }
+diff --git a/hw/pci-host/i440fx.c b/hw/pci-host/i440fx.c
+index 0adbd77553..aefb416c8f 100644
+--- a/hw/pci-host/i440fx.c
++++ b/hw/pci-host/i440fx.c
+@@ -23,6 +23,7 @@
+  */
  
-+static void vhost_user_fill_msg_region(VhostUserMemoryRegion *dst,
-+                                       struct vhost_memory_region *src)
-+{
-+    assert(src != NULL && dst != NULL);
-+    dst->userspace_addr = src->userspace_addr;
-+    dst->memory_size = src->memory_size;
-+    dst->guest_phys_addr = src->guest_phys_addr;
-+}
-+
- static int vhost_user_fill_set_mem_table_msg(struct vhost_user *u,
-                                              struct vhost_dev *dev,
-                                              VhostUserMsg *msg,
-@@ -417,6 +426,7 @@ static int vhost_user_fill_set_mem_table_msg(struct vhost_user *u,
-     ram_addr_t offset;
-     MemoryRegion *mr;
-     struct vhost_memory_region *reg;
-+    VhostUserMemoryRegion region_buffer;
+ #include "qemu/osdep.h"
++#include "qemu/units.h"
+ #include "qemu/range.h"
+ #include "hw/i386/pc.h"
+ #include "hw/pci/pci.h"
+@@ -301,7 +302,7 @@ PCIBus *i440fx_init(const char *host_type, const char *pci_type,
+     memory_region_set_enabled(&f->smram_region, true);
  
-     msg->hdr.request = VHOST_USER_SET_MEM_TABLE;
+     /* smram, as seen by SMM CPUs */
+-    memory_region_init(&f->smram, OBJECT(d), "smram", 1ull << 32);
++    memory_region_init(&f->smram, OBJECT(d), "smram", 4 * GiB);
+     memory_region_set_enabled(&f->smram, true);
+     memory_region_init_alias(&f->low_smram, OBJECT(d), "smram-low",
+                              f->ram_memory, 0xa0000, 0x20000);
+diff --git a/hw/pci-host/q35.c b/hw/pci-host/q35.c
+index 352aeecfa7..b788f17b2c 100644
+--- a/hw/pci-host/q35.c
++++ b/hw/pci-host/q35.c
+@@ -589,7 +589,7 @@ static void mch_realize(PCIDevice *d, Error **errp)
+     memory_region_set_enabled(&mch->open_high_smram, false);
  
-@@ -441,12 +451,8 @@ static int vhost_user_fill_set_mem_table_msg(struct vhost_user *u,
-                 error_report("Failed preparing vhost-user memory table msg");
-                 return -1;
-             }
--            msg->payload.memory.regions[*fd_num].userspace_addr =
--                reg->userspace_addr;
--            msg->payload.memory.regions[*fd_num].memory_size =
--                reg->memory_size;
--            msg->payload.memory.regions[*fd_num].guest_phys_addr =
--                reg->guest_phys_addr;
-+            vhost_user_fill_msg_region(&region_buffer, reg);
-+            msg->payload.memory.regions[*fd_num] = region_buffer;
-             msg->payload.memory.regions[*fd_num].mmap_offset = offset;
-             fds[(*fd_num)++] = fd;
-         } else if (track_ramblocks) {
+     /* smram, as seen by SMM CPUs */
+-    memory_region_init(&mch->smram, OBJECT(mch), "smram", 1ull << 32);
++    memory_region_init(&mch->smram, OBJECT(mch), "smram", 4 * GiB);
+     memory_region_set_enabled(&mch->smram, true);
+     memory_region_init_alias(&mch->low_smram, OBJECT(mch), "smram-low",
+                              mch->ram_memory, MCH_HOST_BRIDGE_SMRAM_C_BASE,
+diff --git a/hw/pci-host/versatile.c b/hw/pci-host/versatile.c
+index cfb9a78ea6..8ddfb8772a 100644
+--- a/hw/pci-host/versatile.c
++++ b/hw/pci-host/versatile.c
+@@ -8,6 +8,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
++#include "qemu/units.h"
+ #include "hw/sysbus.h"
+ #include "migration/vmstate.h"
+ #include "hw/irq.h"
+@@ -399,8 +400,8 @@ static void pci_vpb_realize(DeviceState *dev, Error **errp)
+     pci_map_irq_fn mapfn;
+     int i;
+ 
+-    memory_region_init(&s->pci_io_space, OBJECT(s), "pci_io", 1ULL << 32);
+-    memory_region_init(&s->pci_mem_space, OBJECT(s), "pci_mem", 1ULL << 32);
++    memory_region_init(&s->pci_io_space, OBJECT(s), "pci_io", 4 * GiB);
++    memory_region_init(&s->pci_mem_space, OBJECT(s), "pci_mem", 4 * GiB);
+ 
+     pci_root_bus_new_inplace(&s->pci_bus, sizeof(s->pci_bus), dev, "pci",
+                              &s->pci_mem_space, &s->pci_io_space,
 -- 
 MST
 
