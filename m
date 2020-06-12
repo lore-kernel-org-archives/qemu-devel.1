@@ -2,86 +2,108 @@ Return-Path: <SRS0=+PsZ=7Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF55CC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 15:28:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 096A2C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 15:31:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B50F220835
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 15:28:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B50F220835
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id C799820801
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 15:31:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aVbwIZb8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C799820801
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35138 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39562 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjlbd-0006y9-0I
-	for qemu-devel@archiver.kernel.org; Fri, 12 Jun 2020 11:28:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59024)
+	id 1jjleF-00022P-19
+	for qemu-devel@archiver.kernel.org; Fri, 12 Jun 2020 11:31:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32934)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jonathan.derrick@intel.com>)
- id 1jjlL0-00010q-QT
- for qemu-devel@nongnu.org; Fri, 12 Jun 2020 11:11:22 -0400
-Received: from mga03.intel.com ([134.134.136.65]:18225)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jonathan.derrick@intel.com>)
- id 1jjlKx-0005m0-RL
- for qemu-devel@nongnu.org; Fri, 12 Jun 2020 11:11:22 -0400
-IronPort-SDR: CjqK5J6nVJ7GpFBFOpCx+SRGjzFsXQutMvh19FijATNdkERHzKq5hHPkBhPOD2GHFtVcEnKm0W
- oct6La2W/YYQ==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
- by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 12 Jun 2020 08:11:16 -0700
-IronPort-SDR: gWYtmwS4CqAZdgOvyx7dX8ZDmyOqJ8Y4Fncp77qtakbVb+6bOLwLOrg3dsdSHXoyVoGIl5GBnZ
- RVwuMDRwmTLw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,503,1583222400"; d="scan'208";a="271925759"
-Received: from orsmsx108.amr.corp.intel.com ([10.22.240.6])
- by orsmga003.jf.intel.com with ESMTP; 12 Jun 2020 08:11:16 -0700
-Received: from orsmsx101.amr.corp.intel.com ([169.254.8.250]) by
- ORSMSX108.amr.corp.intel.com ([169.254.2.62]) with mapi id 14.03.0439.000;
- Fri, 12 Jun 2020 08:11:16 -0700
-From: "Derrick, Jonathan" <jonathan.derrick@intel.com>
-To: "lorenzo.pieralisi@arm.com" <lorenzo.pieralisi@arm.com>,
- "bhelgaas@google.com" <bhelgaas@google.com>
-Subject: Re: [PATCH v3 1/2] PCI: vmd: Filter resource type bits from shadow
- register
-Thread-Topic: [PATCH v3 1/2] PCI: vmd: Filter resource type bits from shadow
- register
-Thread-Index: AQHWNJ6/KA9BUx6s/UuCJV3Lsz6Rn6i/VTmAgABYZACAAAgMAIAUwX2AgAEXAYCAABUAgA==
-Date: Fri, 12 Jun 2020 15:11:15 +0000
-Message-ID: <8466e3ff386547a3bbaf578c3099dd12d545a7f8.camel@intel.com>
-References: <20200528030240.16024-1-jonathan.derrick@intel.com>
- <20200528030240.16024-3-jonathan.derrick@intel.com>
- <20200529103315.GC12270@e121166-lin.cambridge.arm.com>
- <163e8cb37ece0c8daa6d6e5fd7fcae47ba4fa437.camel@intel.com>
- <20200529161824.GA17642@e121166-lin.cambridge.arm.com>
- <f1d36b8fc4ab7aacf6efca19303b04a5b4f8189c.camel@intel.com>
- <20200612135443.GA25653@e121166-lin.cambridge.arm.com>
-In-Reply-To: <20200612135443.GA25653@e121166-lin.cambridge.arm.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.209.129.249]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <D2235C0C9FC0184E9366125CF83DC4A3@intel.com>
-Content-Transfer-Encoding: base64
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jjlOd-0000kv-BV
+ for qemu-devel@nongnu.org; Fri, 12 Jun 2020 11:15:08 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:46444
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jjlOa-0006jB-J4
+ for qemu-devel@nongnu.org; Fri, 12 Jun 2020 11:15:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591974902;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=u6KB07jwi2F6z8moct9YY9DDxKzEhWNccWd41dfLnhI=;
+ b=aVbwIZb8iI3leLlf4fLrXwJG4W3sHuOZcxogMQk6vdko+IhhlJMU+SOdB0KxHmhvTdlOne
+ P2jJzew5TusOVWx1Uz4xEeUu4IeaBsjnUEgBRsAVGxYJfsxhdh215vLWre00hwxoIUc4p+
+ 6PLtQucB8bxT1sR7fmxSwXLaJ/6jrJ0=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-96-EpwVnDoUPkSwMZRAoF34CQ-1; Fri, 12 Jun 2020 11:14:59 -0400
+X-MC-Unique: EpwVnDoUPkSwMZRAoF34CQ-1
+Received: by mail-wm1-f71.google.com with SMTP id a7so2060152wmf.1
+ for <qemu-devel@nongnu.org>; Fri, 12 Jun 2020 08:14:58 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=u6KB07jwi2F6z8moct9YY9DDxKzEhWNccWd41dfLnhI=;
+ b=Q8thwXbRB3RZGc2tAQoMUfwWVZDfWcRHxyFLJfLLXnOtKtx5pljICNZZsi9gijhXOu
+ hMLsdnng93X0vBHGXy5Wioi/7L1F62O64vqyiSCbDhd6rrvl0YZJ8qJG7II/KKXj39GV
+ q283Jdf7Iw0fJ6pjIPF9GoEvIQP1fjfFXKXwDqCMn4ScRm3pDPva8aGkEWITCrjHd1kY
+ LJrQestNuKyDHhjre4KJVvds7af0sBAq2eNy+RJrmpdysnMQVtgaJ+QvlSCyzzaIFPeA
+ I6E/B44XlKSOP4nOiPga/M3R8yKaGQMgw7csdc4Bst9KdDOYdZjNo6G0HSDPCN31qegB
+ RzRw==
+X-Gm-Message-State: AOAM533QZkVBGHH6nGW7QIPKyK9633gItLiVvOiRUyy5rvEUlLEPDkIl
+ rXqZK9UsT1Nse3iTiQZ0Luw4zNeJOrCNvpbyftwEgUFA9Kk6Vk4ra+eyvgovIkL7lzP74ejUG00
+ 2VAX8erNRx6neeIA=
+X-Received: by 2002:adf:fe07:: with SMTP id n7mr15000500wrr.240.1591974897868; 
+ Fri, 12 Jun 2020 08:14:57 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzkN9VNZeiQeBxw1l3GOTkUX2c3Q0x4xerY/1ChgmyVJ4erR6D1/wqAEhbTsA9XH4sJddYNYw==
+X-Received: by 2002:adf:fe07:: with SMTP id n7mr15000472wrr.240.1591974897518; 
+ Fri, 12 Jun 2020 08:14:57 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:29ed:810e:962c:aa0d?
+ ([2001:b07:6468:f312:29ed:810e:962c:aa0d])
+ by smtp.gmail.com with ESMTPSA id g18sm9981640wme.17.2020.06.12.08.14.56
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 12 Jun 2020 08:14:56 -0700 (PDT)
+Subject: Re: [PULL 000/115] Huge miscellaneous pull request for 2020-06-11
+To: Roman Bolshakov <r.bolshakov@yadro.com>
+References: <20200611194449.31468-1-pbonzini@redhat.com>
+ <CAFEAcA-qrxBdn5aA0kaituroTX8c1yFGdRux0_X1Y+W5_s-WHA@mail.gmail.com>
+ <6e1f1fa5-2a23-b586-a3b4-1394c82794d7@redhat.com>
+ <20200612145357.GC76007@SPB-NB-133.local>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <fcffbb56-37d4-c575-171c-4915927af4b7@redhat.com>
+Date: Fri, 12 Jun 2020 17:14:55 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Received-SPF: pass client-ip=134.134.136.65;
- envelope-from=jonathan.derrick@intel.com; helo=mga03.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/12 11:11:17
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -68
-X-Spam_score: -6.9
-X-Spam_bar: ------
-X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_HI=-5,
+In-Reply-To: <20200612145357.GC76007@SPB-NB-133.local>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/12 09:30:54
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -95,35 +117,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "virtualization@lists.linux-foundation.org"
- <virtualization@lists.linux-foundation.org>,
- "andrzej.jakowski@linux.intel.com" <andrzej.jakowski@linux.intel.com>,
- "helgaas@kernel.org" <helgaas@kernel.org>, "hch@lst.de" <hch@lst.de>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ "Joseph S. Myers" <joseph@codesourcery.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-T24gRnJpLCAyMDIwLTA2LTEyIGF0IDE0OjU0ICswMTAwLCBMb3JlbnpvIFBpZXJhbGlzaSB3cm90
-ZToNCj4gT24gVGh1LCBKdW4gMTEsIDIwMjAgYXQgMDk6MTY6NDhQTSArMDAwMCwgRGVycmljaywg
-Sm9uYXRoYW4gd3JvdGU6DQo+IA0KPiBbLi4uXQ0KPiANCj4gPiA+ID4gPiBIaSBKb24sDQo+ID4g
-PiA+ID4gDQo+ID4gPiA+ID4gaXQgbG9va3MgbGlrZSBJIGNhbiB0YWtlIHRoaXMgcGF0Y2ggZm9y
-IHY1Ljggd2hlcmVhcyBwYXRjaCAyIGRlcGVuZHMNCj4gPiA+ID4gPiBvbiB0aGUgUUVNVSBjaGFu
-Z2VzIGFjY2VwdGFuY2UgYW5kIHNob3VsZCBwcm9iYWJseSB3YWl0Lg0KPiA+ID4gPiA+IA0KPiA+
-ID4gPiA+IFBsZWFzZSBsZXQgbWUga25vdyB5b3VyIHRob3VnaHRzIGFzYXAgYW5kIEkgd2lsbCB0
-cnkgdG8gYXQgbGVhc3QNCj4gPiA+ID4gPiBzcXVlZXplIHRoaXMgcGF0Y2ggaW4uDQo+ID4gPiA+
-ID4gDQo+ID4gPiA+ID4gTG9yZW56bw0KPiA+ID4gPiANCj4gPiA+ID4gSGkgTG9yZW56bywNCj4g
-PiA+ID4gDQo+ID4gPiA+IFRoaXMgaXMgZmluZS4gUGxlYXNlIHRha2UgUGF0Y2ggMS4NCj4gPiA+
-ID4gUGF0Y2ggMiBpcyBoYXJtbGVzcyB3aXRob3V0IHRoZSBRRU1VIGNoYW5nZXMsIGJ1dCBtYXkg
-YWx3YXlzIG5lZWQgYQ0KPiA+ID4gPiBkaWZmZXJlbnQgYXBwcm9hY2guDQo+ID4gPiANCj4gPiA+
-IFB1bGxlZCBwYXRjaCAxIGludG8gcGNpL3ZtZCwgdGhhbmtzLg0KPiA+ID4gDQo+ID4gPiBMb3Jl
-bnpvDQo+ID4gDQo+ID4gSGkgTG9yZW56bywNCj4gPiANCj4gPiBBbGV4IGhhcyBwci1lZCB0aGUg
-UUVNVSBwYXRjaCBbMV0NCj4gPiBJcyBpdCB0b28gbGF0ZSB0byBwdWxsIHBhdGNoIDIvMiBmb3Ig
-djUuOD8NCj4gDQo+IEkgdGhpbmsgaXQgaXMgLSBJIGRvbid0IGtub3cgaWYgQmpvcm4gcGxhbm5l
-ZCBhIHNlY29uZCBQUiBmb3IgdGhpcw0KPiBtZXJnZSB3aW5kb3csIGlmIG5vdCBpdCBpcyB2NS45
-IG1hdGVyaWFsIEkgYW0gYWZyYWlkLg0KPiANCj4gVGhhbmtzLA0KPiBMb3JlbnpvDQo+IA0KPiA+
-IFsxXSANCj4gPiBodHRwczovL2dpdGh1Yi5jb20vYXdpbGxpYW0vcWVtdS12ZmlvL3JlbGVhc2Vz
-L3RhZy92ZmlvLXVwZGF0ZS0yMDIwMDYxMS4wDQoNCk5vIHByb2JsZW0NCkpvbg0K
+On 12/06/20 16:53, Roman Bolshakov wrote:
+> It seems rebase is not needed. The queue doesn't include the patch:
+> https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg08076.html
+
+Thanks, it had a conflict with
+
+commit f291cf54148e5b9e51c55b9056e4be546492a9ca
+Author: Philippe Mathieu-Daudé <philmd@redhat.com>
+Date:   Tue May 26 19:24:23 2020 +0200
+
+    sysemu/hvf: Only declare hvf_allowed when HVF is available
+
+    When HVF is not available, the hvf_allowed variable does not exist.
+
+    Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+    Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+    Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+    Reviewed-by: Roman Bolshakov <r.bolshakov@yadro.com>
+    Message-Id: <20200526172427.17460-4-f4bug@amsat.org>
+    Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+
+but I've fixed it up now.  (It wasn't clear from the commit message that
+this patch could not simply be dropped.  Unfortunately I didn't have an
+OS X installation to test it).
+
+Paolo
+
 
