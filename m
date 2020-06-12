@@ -6,64 +6,63 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B32FC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 17:46:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7398C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 17:51:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4A94F207F7
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 17:46:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A94F207F7
+	by mail.kernel.org (Postfix) with ESMTPS id 9BDAC207ED
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 17:51:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BDAC207ED
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34136 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37026 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjnlP-0001oI-Ja
-	for qemu-devel@archiver.kernel.org; Fri, 12 Jun 2020 13:46:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50994)
+	id 1jjnpj-0004PH-US
+	for qemu-devel@archiver.kernel.org; Fri, 12 Jun 2020 13:51:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54272)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jjnkQ-0001L6-Nh
- for qemu-devel@nongnu.org; Fri, 12 Jun 2020 13:45:46 -0400
-Received: from indium.canonical.com ([91.189.90.7]:57852)
+ id 1jjnp8-0003x6-7f
+ for qemu-devel@nongnu.org; Fri, 12 Jun 2020 13:50:38 -0400
+Received: from indium.canonical.com ([91.189.90.7]:58780)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jjnkM-0002SE-UT
- for qemu-devel@nongnu.org; Fri, 12 Jun 2020 13:45:46 -0400
+ id 1jjnp6-0003gM-78
+ for qemu-devel@nongnu.org; Fri, 12 Jun 2020 13:50:37 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jjnkK-000264-F7
- for <qemu-devel@nongnu.org>; Fri, 12 Jun 2020 17:45:40 +0000
+ id 1jjnp4-0002cl-Ea
+ for <qemu-devel@nongnu.org>; Fri, 12 Jun 2020 17:50:34 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 6D4792E8050
- for <qemu-devel@nongnu.org>; Fri, 12 Jun 2020 17:45:40 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 5CB392E8109
+ for <qemu-devel@nongnu.org>; Fri, 12 Jun 2020 17:50:34 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 12 Jun 2020 17:36:47 -0000
-From: =?utf-8?q?Alex_Benn=C3=A9e?= <1883268@bugs.launchpad.net>
+Date: Fri, 12 Jun 2020 17:44:34 -0000
+From: Diego Viola <1882851@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: arm testcase
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: christophe-lyon
-X-Launchpad-Bug-Reporter: Christophe Lyon (christophe-lyon)
-X-Launchpad-Bug-Modifier: =?utf-8?q?Alex_Benn=C3=A9e_=28ajbennee=29?=
-References: <159197267869.7647.15246075911938911102.malonedeb@gac.canonical.com>
-Message-Id: <159198340771.7893.3089877324736465012.launchpad@gac.canonical.com>
-Subject: [Bug 1883268] Re: random errors on aarch64 when executing
- __aarch64_cas8_acq_rel
+X-Launchpad-Bug-Commenters: diego-viola kraxel-redhat
+X-Launchpad-Bug-Reporter: Diego Viola (diego-viola)
+X-Launchpad-Bug-Modifier: Diego Viola (diego-viola)
+References: <159174217343.32241.17743917589333297614.malonedeb@gac.canonical.com>
+Message-Id: <159198387419.11356.10148892825808980172.malone@soybean.canonical.com>
+Subject: [Bug 1882851] Re: QEMU video freezes with "Guest disabled display"
+ (virtio driver)
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="b190cebbf563f89e480a8b57f641753c8196bda0";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: b58afc5dbad3aaac991f195a3a45aa19d8625507
+X-Launchpad-Hash: ebeb129eb10b92d96c0c9ce4c540511e354fab35
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/12 13:35:28
@@ -85,69 +84,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1883268 <1883268@bugs.launchpad.net>
+Reply-To: Bug 1882851 <1882851@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Tags added: arm testcase
+Yeah, I can reproduce the same exact behavior outside of QEMU with sway
+and it's consistent to what I observed in QEMU.
+
+> Hmm, happens with xorg only.
+
+I think you were right all along about this, sorry.
+
+Thanks for fixing this bug, feel free to close this bug as fixed.
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1883268
+https://bugs.launchpad.net/bugs/1882851
 
 Title:
-  random errors on aarch64 when executing __aarch64_cas8_acq_rel
+  QEMU video freezes with "Guest disabled display" (virtio driver)
 
 Status in QEMU:
   New
 
 Bug description:
-  Hello,
+  I am using Arch Linux as my Guest and Host OS, after starting qemu
+  with the following command:
 
-  Since I upgraded to qemu-5.0 when executing the GCC testsuite,
-  I've noticed random failures of g++.dg/ext/sync-4.C.
+    $ qemu-system-x86_64 -enable-kvm -hda arch-zoom.qcow2 -m 4G -vga
+  virtio
 
-  I'm attaching the source of the testcase, the binary executable and
-  the qemu traces (huge, 111MB!) starting at main (with qemu-aarch64
-  -cpu cortex-a57 -R 0 -d
-  in_asm,int,exec,cpu,unimp,guest_errors,nochain)
+  and waiting for a screen blank, I get this message:
 
-  The traces where generated by a CI build, I built the executable
-  manually but I expect it to be the same as the one executed by CI.
+    Guest disabled display
 
-  In seems the problem occurs in f13, which leads to a call to abort()
+  And nothing happens after that, I can move the mouse or hit any key,
+  and the message is still there.
 
-  The preprocessed version of f13/t13 are as follows:
-  static bool f13 (void *p) __attribute__ ((noinline));
-  static bool f13 (void *p)
-  {
-    return (__sync_bool_compare_and_swap((ditype*)p, 1, 2));
-  }
-  static void t13 ()
-  {
-    try {
-      f13(0);
-    }
-    catch (...) {
-      return;
-    }
-    abort();
-  }
+  I can still reboot the VM but that's not optimal.
 
-  =
+  I can reproduce this with the latest QEMU release (5.0.0) or git master, =
 
-  When looking at the execution traces at address 0x00400c9c, main calls f1=
-3, which in turn calls __aarch64_cas8_acq_rel (at 0x00401084)
-  __aarch64_cas8_acq_rel returns to f13 (address 0x0040113c), then f13 retu=
-rns to main (0x0040108c) which then calls abort (0x00400ca0)
+  I also tried this with older releases (4.0.0, 3.0.0) and the issue is sti=
+ll there.
 
-  I'm not quite sure what's wrong :-(
+  I can't reproduce this with other video drivers (std, qxl).
 
-  I've not noticed such random problems with native aarch64 hardware.
+  With std/qxl the screen will blank a bit and then continue as normal.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1883268/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1882851/+subscriptions
 
