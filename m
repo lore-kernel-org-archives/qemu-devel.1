@@ -2,80 +2,93 @@ Return-Path: <SRS0=+PsZ=7Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7398C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 17:51:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB9F7C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 17:56:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9BDAC207ED
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 17:51:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BDAC207ED
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 8DFC9207F7
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 17:56:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rjikRcBD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DFC9207F7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37026 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43068 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjnpj-0004PH-US
-	for qemu-devel@archiver.kernel.org; Fri, 12 Jun 2020 13:51:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54272)
+	id 1jjnuO-0008Gu-Or
+	for qemu-devel@archiver.kernel.org; Fri, 12 Jun 2020 13:56:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55406)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jjnp8-0003x6-7f
- for qemu-devel@nongnu.org; Fri, 12 Jun 2020 13:50:38 -0400
-Received: from indium.canonical.com ([91.189.90.7]:58780)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jjnp6-0003gM-78
- for qemu-devel@nongnu.org; Fri, 12 Jun 2020 13:50:37 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jjnp4-0002cl-Ea
- for <qemu-devel@nongnu.org>; Fri, 12 Jun 2020 17:50:34 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 5CB392E8109
- for <qemu-devel@nongnu.org>; Fri, 12 Jun 2020 17:50:34 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 12 Jun 2020 17:44:34 -0000
-From: Diego Viola <1882851@bugs.launchpad.net>
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jjntL-0006gR-Ja; Fri, 12 Jun 2020 13:54:59 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:51005)
+ by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jjntK-0004BT-0E; Fri, 12 Jun 2020 13:54:59 -0400
+Received: by mail-wm1-x344.google.com with SMTP id l17so8952935wmj.0;
+ Fri, 12 Jun 2020 10:54:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=p75piuRGRVdgKrKUdWtk1/TByzVc4JQeMSyMnV9UFU8=;
+ b=rjikRcBDQeK+zQ7+ulLj+9QEGm5yyg6TCkrHk013URk7NhUSnyJES7MTCK8VPJPKc+
+ IJzFAA58xODzS2T9KEnCMy0aVc4wAu9/wO2IYA1XzOd+ikgIdFqg6AOlrNSkLbTlPqTy
+ 01unp6dV86Su+sv6VRP/BRrOyqdPWcfRpxfYkt9JuEp2IbaTcKTbbQjgSaS1Aw9yXtpu
+ YGt2YRmNbSXJzyW2nV6JLfcIDHRXpV7i2N/ackAZHP1XNVqpJwsmU4wi+c15Bj+fTveR
+ VtvJ/1KtG3P+IZKwNP3qV0lsxlRlkvwNttjfcRFA1kEkiVk89WkqjIm7am5oJSSXSnZs
+ Qytg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=p75piuRGRVdgKrKUdWtk1/TByzVc4JQeMSyMnV9UFU8=;
+ b=gaQJXuDU1+3nqkbiuK+bqDh3teaQMt8fIhJB7X8ImDSY6jHTTXbQXJzaza38DuI/M5
+ 5G18l79Yb8yn/DIOfbOvA7DCaVx9dmgzMxWTUDI3sOPUZ2fzPVWI65sZVOyxryhTcMZd
+ +AnyrGtXjRhM8BhTRGHncLlrcVCFxs+vXiNH1vZC9ZlY4CX8Asm1HSan8DVhYRxQXatd
+ HKOnYsoxO+16JF1vElUnn+khr95RkgxceDSezLkxywOyDsytUoMsnmVNjtg078XEiTu+
+ hkP388FRhjjsBMwNCzxpoRo3GRLOq3kIQFKuQER1SOOEPUPQnB/QX0QmwKZTtnh94O9R
+ SrXQ==
+X-Gm-Message-State: AOAM533l9tBYvdEjQpmOHdLx3XqH9vGKjUWNvKwSS+cJN2CxhUhk0xAW
+ BP8bZemcqCqzcv6l+bQa93Hk5Tc0
+X-Google-Smtp-Source: ABdhPJweeqU2QSOHqoQkhmDZbgXq30e+gvb2y36PpbYjeLpKDj5wYo3tvUiSY9gVQOfVdIQUfMjEww==
+X-Received: by 2002:a1c:4189:: with SMTP id o131mr119559wma.110.1591984483567; 
+ Fri, 12 Jun 2020 10:54:43 -0700 (PDT)
+Received: from localhost.localdomain
+ (181.red-88-10-103.dynamicip.rima-tde.net. [88.10.103.181])
+ by smtp.gmail.com with ESMTPSA id e12sm11288658wro.52.2020.06.12.10.54.42
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 12 Jun 2020 10:54:42 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: diego-viola kraxel-redhat
-X-Launchpad-Bug-Reporter: Diego Viola (diego-viola)
-X-Launchpad-Bug-Modifier: Diego Viola (diego-viola)
-References: <159174217343.32241.17743917589333297614.malonedeb@gac.canonical.com>
-Message-Id: <159198387419.11356.10148892825808980172.malone@soybean.canonical.com>
-Subject: [Bug 1882851] Re: QEMU video freezes with "Guest disabled display"
- (virtio driver)
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="b190cebbf563f89e480a8b57f641753c8196bda0";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: ebeb129eb10b92d96c0c9ce4c540511e354fab35
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/12 13:35:28
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
+Subject: [RFC PATCH v2 0/5] hw/misc: Add LED device
+Date: Fri, 12 Jun 2020 19:54:35 +0200
+Message-Id: <20200612175440.9901-1-f4bug@amsat.org>
+X-Mailer: git-send-email 2.21.3
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::344;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x344.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -84,57 +97,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1882851 <1882851@bugs.launchpad.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Esteban Bosse <estebanbosse@gmail.com>,
+ qemu-arm@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
+ Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Yeah, I can reproduce the same exact behavior outside of QEMU with sway
-and it's consistent to what I observed in QEMU.
+Hello,
 
-> Hmm, happens with xorg only.
+These patches are part of the GSoC unselected 'QEMU visualizer'
+project.  As the AVR port is not merged, I switched to microbit
+to keep working on it.
 
-I think you were right all along about this, sorry.
+This series presents a proof of concept of LED device that can
+be easily connected to a GPIO.
+The LED emit QMP events, so an external visualizer can display
+the LED events.
 
-Thanks for fixing this bug, feel free to close this bug as fixed.
+Since v1: addressed Eric Blake review comments
+- Added QMP rate limit
 
--- =
+This is stable enough to be used for the GSoC UI.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1882851
+Next steps planned:
 
-Title:
-  QEMU video freezes with "Guest disabled display" (virtio driver)
+- integrate Zephyr test
 
-Status in QEMU:
-  New
+- have a centralized container for all the machine's LEDs, to
+track state changes in a single place and send less QMP events
+(grouping changes, restricted to what actually changed).
+[see to include keyboard LEDs].
 
-Bug description:
-  I am using Arch Linux as my Guest and Host OS, after starting qemu
-  with the following command:
+- look at LED array/matrix such 7segments.
 
-    $ qemu-system-x86_64 -enable-kvm -hda arch-zoom.qcow2 -m 4G -vga
-  virtio
+Regards,
 
-  and waiting for a screen blank, I get this message:
+Phil.
 
-    Guest disabled display
+$ git backport-diff -u rfc-v1
+Key:
+[----] : patches are identical
+[####] : number of functional differences between upstream/downstream patch
+[down] : patch is downstream-only
+The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
 
-  And nothing happens after that, I can move the mouse or hit any key,
-  and the message is still there.
+001/5:[0004] [FC] 'hw/misc: Add a LED device'
+002/5:[0027] [FC] 'hw/misc/led: Add LED_STATUS_CHANGED QAPI event'
+003/5:[----] [--] 'hw/misc/led: Add create_led_by_gpio_id() helper'
+004/5:[----] [--] 'hw/arm/microbit: Add a fake LED to use as proof-of-concept with Zephyr'
+005/5:[----] [--] 'hw/arm/tosa: Use LED device for the Bluetooth led'
 
-  I can still reboot the VM but that's not optimal.
+Philippe Mathieu-Daudé (5):
+  hw/misc: Add a LED device
+  hw/misc/led: Add LED_STATUS_CHANGED QAPI event
+  hw/misc/led: Add create_led_by_gpio_id() helper
+  hw/arm/microbit: Add a fake LED to use as proof-of-concept with Zephyr
+  hw/arm/tosa: Use LED device for the Bluetooth led
 
-  I can reproduce this with the latest QEMU release (5.0.0) or git master, =
+ qapi/led.json         |  47 ++++++++++++++++
+ qapi/qapi-schema.json |   1 +
+ include/hw/misc/led.h |  45 +++++++++++++++
+ hw/arm/microbit.c     |   3 +
+ hw/arm/tosa.c         |   7 +--
+ hw/misc/led.c         | 126 ++++++++++++++++++++++++++++++++++++++++++
+ MAINTAINERS           |   7 +++
+ hw/arm/Kconfig        |   2 +
+ hw/misc/Kconfig       |   3 +
+ hw/misc/Makefile.objs |   1 +
+ hw/misc/trace-events  |   3 +
+ qapi/Makefile.objs    |   2 +-
+ 12 files changed, 242 insertions(+), 5 deletions(-)
+ create mode 100644 qapi/led.json
+ create mode 100644 include/hw/misc/led.h
+ create mode 100644 hw/misc/led.c
 
-  I also tried this with older releases (4.0.0, 3.0.0) and the issue is sti=
-ll there.
+-- 
+2.21.3
 
-  I can't reproduce this with other video drivers (std, qxl).
-
-  With std/qxl the screen will blank a bit and then continue as normal.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1882851/+subscriptions
 
