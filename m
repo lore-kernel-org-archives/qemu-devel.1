@@ -2,94 +2,87 @@ Return-Path: <SRS0=+PsZ=7Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5D7DC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 15:59:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43D15C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 16:09:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6F737207F7
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 15:59:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0F5F820801
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 16:09:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OcWufKvA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F737207F7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AHonzAQx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F5F820801
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34956 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53194 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjm5R-0003wM-Ls
-	for qemu-devel@archiver.kernel.org; Fri, 12 Jun 2020 11:59:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55030)
+	id 1jjmEq-0006bx-Am
+	for qemu-devel@archiver.kernel.org; Fri, 12 Jun 2020 12:09:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58518)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <coiby.xu@gmail.com>)
- id 1jjm4i-0003Iv-MQ
- for qemu-devel@nongnu.org; Fri, 12 Jun 2020 11:58:36 -0400
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:37047)
- by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <coiby.xu@gmail.com>)
- id 1jjm4h-0007CP-4D
- for qemu-devel@nongnu.org; Fri, 12 Jun 2020 11:58:36 -0400
-Received: by mail-pl1-x644.google.com with SMTP id y18so3914264plr.4
- for <qemu-devel@nongnu.org>; Fri, 12 Jun 2020 08:58:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:date:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=weMvZslEdSVlBYz6n2J8T66q9SDJwAZ3g7FDMCCWpIY=;
- b=OcWufKvAAZe1aSBwLyY1jmjzjsCibisozxJaxwH6dluMUV3WimKbGBKhUhvtIJ/L+N
- Eq0wKlN3T8tiQ28r1Y2vfmEm/JQPwh7VvLEVuV5TYhhzwm47hpHI33U5BgTuLp/XiG4c
- 5b0ONsS9a+BRmQVc43LBNnduMH/O3QTs8w84cBbyigX6YQ/IkC52NaK7b21rT5v7cqJL
- UXXT0qb7ncQEx8q4xXShQoeDDkr05sXXkN/7ZWHvyL3fLE7rSMDN/jBqhq+c/A1Rqh35
- VQtc1MyOGi2W6iHrBPiLpn9yca/BjAT69QVQRB7cSzn4onpVqHakImpiX8MtQbjgM1RJ
- pz1g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:date:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=weMvZslEdSVlBYz6n2J8T66q9SDJwAZ3g7FDMCCWpIY=;
- b=ItQjeqZBu4VdUxbA+cXNmUo950HyHI2g8en6M+qi8Sv2Rsbt2pUyXCQBcU4AzlDBXI
- CGGmgwnD56JoEAfy01aAy6j1dkiLks6PLAQAioLIRuKlQAfAUTqvUcrFbl+qZv9NwLlB
- IYicsjLn6wAlNHMEYEGikc8EI/4uFq/ARx/IPxE0Hci3yvYs5x17hSBaxpYnQFm6PFmY
- aQxJTlGjSsIFHCZsHsQT7I8wKY8H/oJfWZdPqOhirXFXpzSTqSMGmqzEkKh87Uwb8FcY
- P3FTfOKP6PJ0rsf7vWVHcO2swl4hhE6pWQkQeMp5t2sSKtfZ2rAgNJ/H7ysH9wPS65HX
- RIOQ==
-X-Gm-Message-State: AOAM531/9oznKQv2VL9eI6xAexBDlRksAWw5PiSSLKSqOf3TpvBlkNR5
- +zld9xC4ig82x2K4fU3ezwg=
-X-Google-Smtp-Source: ABdhPJzJsWOLg8pmovhXBhb4nXCFHM0n9VvU3v57NUovh+vSDOOTUJRl+PPwIF9ohCAUacTgykdXOA==
-X-Received: by 2002:a17:90a:1a17:: with SMTP id
- 23mr13490542pjk.231.1591977507292; 
- Fri, 12 Jun 2020 08:58:27 -0700 (PDT)
-Received: from localhost ([2001:e42:102:1532:160:16:113:140])
- by smtp.gmail.com with ESMTPSA id iq19sm5645990pjb.48.2020.06.12.08.58.25
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 12 Jun 2020 08:58:26 -0700 (PDT)
-From: Coiby Xu <coiby.xu@gmail.com>
-X-Google-Original-From: Coiby Xu <Coiby.Xu@gmail.com>
-Date: Fri, 12 Jun 2020 23:58:22 +0800
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Re: [PATCH v8 0/4] vhost-user block device backend implementation
-Message-ID: <20200612155822.k25elf3hpciw67lk@r>
-References: <20200604233538.256325-1-coiby.xu@gmail.com>
- <20200611152744.GD77457@stefanha-x1.localdomain>
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jjmDv-0005L0-LQ
+ for qemu-devel@nongnu.org; Fri, 12 Jun 2020 12:08:07 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38122
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jjmDs-00013P-Ec
+ for qemu-devel@nongnu.org; Fri, 12 Jun 2020 12:08:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591978083;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=OJ5QpuHxGC44PNW734u7oiMMHq6LfU6fDDTfKL7vXIs=;
+ b=AHonzAQxeaYMa2OVJ30zhD44AcdOJnkMB+MIBSgHoGvravzap9/mTOvSfqz6UfH/YsBZ+A
+ dzpTVhv7hoYlcMMK1f6sXrRLrkxwXyt9k2JhvfUu8fiIkawCDyIMHuuAPKf26LmfE4UJIF
+ dxi0fujyFOBwAojwctPh7ELWOxyFFlM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-231-RPGPZLbJMQSYOeqZAwo1Fg-1; Fri, 12 Jun 2020 12:08:01 -0400
+X-MC-Unique: RPGPZLbJMQSYOeqZAwo1Fg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 718A1872FE0;
+ Fri, 12 Jun 2020 16:08:00 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com
+ (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 052088FF91;
+ Fri, 12 Jun 2020 16:07:59 +0000 (UTC)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 098/116] i386: hvf: Move mmio_buf into CPUX86State
+Date: Fri, 12 Jun 2020 12:07:55 -0400
+Message-Id: <20200612160755.9597-5-pbonzini@redhat.com>
+In-Reply-To: <20200612160755.9597-1-pbonzini@redhat.com>
+References: <20200612160755.9597-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20200611152744.GD77457@stefanha-x1.localdomain>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::644;
- envelope-from=coiby.xu@gmail.com; helo=mail-pl1-x644.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/12 08:07:26
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,26 +95,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, bharatlkmlkvm@gmail.com, qemu-devel@nongnu.org
+Cc: Roman Bolshakov <r.bolshakov@yadro.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jun 11, 2020 at 04:27:44PM +0100, Stefan Hajnoczi wrote:
->On Fri, Jun 05, 2020 at 07:35:34AM +0800, Coiby Xu wrote:
->> v8
->>  - re-try connecting to socket server to fix asan error
->>  - fix license naming issue
->
->Great, thanks for posting these patches!
->
->I have posted feedback. I'd like to merge this soon. If you are busy I
->can send you patches that address the comments I've made, please let me
->know.
+From: Roman Bolshakov <r.bolshakov@yadro.com>
 
-Thank you for reviewing my work! I'll post v9 to address all the comments this
-weekend, does you think it's soon enough?
+There's no similar field in CPUX86State, but it's needed for MMIO traps.
 
-Best regards,
-Coiby
+Signed-off-by: Roman Bolshakov <r.bolshakov@yadro.com>
+Message-Id: <20200528193758.51454-13-r.bolshakov@yadro.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ target/i386/cpu.h         |  1 +
+ target/i386/hvf/hvf.c     |  5 +++++
+ target/i386/hvf/x86.h     |  1 -
+ target/i386/hvf/x86_emu.c | 12 ++++++------
+ 4 files changed, 12 insertions(+), 7 deletions(-)
+
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index f742ba933f..25a2f4c0c3 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -1603,6 +1603,7 @@ typedef struct CPUX86State {
+ #endif
+ #if defined(CONFIG_HVF)
+     HVFX86LazyFlags hvf_lflags;
++    void *hvf_mmio_buf;
+     HVFX86EmulatorState *hvf_emul;
+ #endif
+ 
+diff --git a/target/i386/hvf/hvf.c b/target/i386/hvf/hvf.c
+index 4cee496d71..57696c46c7 100644
+--- a/target/i386/hvf/hvf.c
++++ b/target/i386/hvf/hvf.c
+@@ -533,7 +533,11 @@ void hvf_reset_vcpu(CPUState *cpu) {
+ 
+ void hvf_vcpu_destroy(CPUState *cpu)
+ {
++    X86CPU *x86_cpu = X86_CPU(cpu);
++    CPUX86State *env = &x86_cpu->env;
++
+     hv_return_t ret = hv_vcpu_destroy((hv_vcpuid_t)cpu->hvf_fd);
++    g_free(env->hvf_mmio_buf);
+     assert_hvf_ok(ret);
+ }
+ 
+@@ -563,6 +567,7 @@ int hvf_init_vcpu(CPUState *cpu)
+     init_decoder();
+ 
+     hvf_state->hvf_caps = g_new0(struct hvf_vcpu_caps, 1);
++    env->hvf_mmio_buf = g_new(char, 4096);
+     env->hvf_emul = g_new0(HVFX86EmulatorState, 1);
+ 
+     r = hv_vcpu_create((hv_vcpuid_t *)&cpu->hvf_fd, HV_VCPU_DEFAULT);
+diff --git a/target/i386/hvf/x86.h b/target/i386/hvf/x86.h
+index 2363616c07..483fcea762 100644
+--- a/target/i386/hvf/x86.h
++++ b/target/i386/hvf/x86.h
+@@ -230,7 +230,6 @@ typedef struct x68_segment_selector {
+ 
+ /* Definition of hvf_x86_state is here */
+ struct HVFX86EmulatorState {
+-    uint8_t mmio_buf[4096];
+ };
+ 
+ /* useful register access  macros */
+diff --git a/target/i386/hvf/x86_emu.c b/target/i386/hvf/x86_emu.c
+index 1ad2c30e16..d3e289ed87 100644
+--- a/target/i386/hvf/x86_emu.c
++++ b/target/i386/hvf/x86_emu.c
+@@ -187,8 +187,8 @@ void write_val_ext(struct CPUX86State *env, target_ulong ptr, target_ulong val,
+ 
+ uint8_t *read_mmio(struct CPUX86State *env, target_ulong ptr, int bytes)
+ {
+-    vmx_read_mem(env_cpu(env), env->hvf_emul->mmio_buf, ptr, bytes);
+-    return env->hvf_emul->mmio_buf;
++    vmx_read_mem(env_cpu(env), env->hvf_mmio_buf, ptr, bytes);
++    return env->hvf_mmio_buf;
+ }
+ 
+ 
+@@ -489,9 +489,9 @@ static void exec_ins_single(struct CPUX86State *env, struct x86_decode *decode)
+     target_ulong addr = linear_addr_size(env_cpu(env), RDI(env),
+                                          decode->addressing_size, R_ES);
+ 
+-    hvf_handle_io(env_cpu(env), DX(env), env->hvf_emul->mmio_buf, 0,
++    hvf_handle_io(env_cpu(env), DX(env), env->hvf_mmio_buf, 0,
+                   decode->operand_size, 1);
+-    vmx_write_mem(env_cpu(env), addr, env->hvf_emul->mmio_buf,
++    vmx_write_mem(env_cpu(env), addr, env->hvf_mmio_buf,
+                   decode->operand_size);
+ 
+     string_increment_reg(env, R_EDI, decode);
+@@ -512,9 +512,9 @@ static void exec_outs_single(struct CPUX86State *env, struct x86_decode *decode)
+ {
+     target_ulong addr = decode_linear_addr(env, decode, RSI(env), R_DS);
+ 
+-    vmx_read_mem(env_cpu(env), env->hvf_emul->mmio_buf, addr,
++    vmx_read_mem(env_cpu(env), env->hvf_mmio_buf, addr,
+                  decode->operand_size);
+-    hvf_handle_io(env_cpu(env), DX(env), env->hvf_emul->mmio_buf, 1,
++    hvf_handle_io(env_cpu(env), DX(env), env->hvf_mmio_buf, 1,
+                   decode->operand_size, 1);
+ 
+     string_increment_reg(env, R_ESI, decode);
+-- 
+2.26.2
+
 
