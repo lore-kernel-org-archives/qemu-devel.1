@@ -2,86 +2,102 @@ Return-Path: <SRS0=+PsZ=7Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD38AC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 08:47:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99DD4C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 08:56:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 789B22068E
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 08:47:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 61A32206D7
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 08:56:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QLxX++bz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 789B22068E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XLDpqQAC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61A32206D7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55002 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35050 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjfLZ-0000wW-QG
-	for qemu-devel@archiver.kernel.org; Fri, 12 Jun 2020 04:47:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50062)
+	id 1jjfTn-0006bh-Kg
+	for qemu-devel@archiver.kernel.org; Fri, 12 Jun 2020 04:56:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52396)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <devnexen@gmail.com>)
- id 1jjfKZ-0000Nh-HI; Fri, 12 Jun 2020 04:46:31 -0400
-Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:36024)
- by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <devnexen@gmail.com>)
- id 1jjfKX-0005Zp-PD; Fri, 12 Jun 2020 04:46:31 -0400
-Received: by mail-ed1-x542.google.com with SMTP id y6so587107edi.3;
- Fri, 12 Jun 2020 01:46:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=qfeE6zmcSql8OhesVzb1Sr68zmtX88A+xWed9/ZkMoc=;
- b=QLxX++bzdLH9/Gtgw3ZkjSp+0bjUZLmkQLCUaOHD3a7krlQHpqlu1bRO5IXTDxfDlH
- S0B2gu5MzH6ApelMYSQ3XPNijURUDBFpRFCc7fH/WY2wZ052xKH1mIhYUqQ4sfkx1gMY
- ndAvm5iGqnRW4vy+jHicRCeXS8GaywHqeqZ0k6kehtDwWSM843z3jOJfaq7ujs/A/Zta
- U/FbE9qVaVQd5WD6peXBu+n8v8+kSA3lieHsLrTvbFqppAP0Ttxe5JahVQY/lrHvsttV
- 9Rb/OdALxl/rT9utjH8m5AX6vahmxJ13A+t2QRGb6JxmJ/0wGQtJW3szyxsPV+l19MC3
- j74A==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jjfSn-0005AU-Mp
+ for qemu-devel@nongnu.org; Fri, 12 Jun 2020 04:55:01 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:25883
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jjfSl-0006xL-HG
+ for qemu-devel@nongnu.org; Fri, 12 Jun 2020 04:55:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591952097;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=5GHBSuF7Q+CJBw+7dBn2iaHmKbWBMMH0+Nvg3ibl58s=;
+ b=XLDpqQACgyWj3bRZ/pb60cCqOSzBh4gOH9ObohtK+iaIRdE/gBUPaQCItnRDO1GfrHZLTF
+ WSKp5caPa5H8BYSvbaBXbZw9j+ylFvd90L9VeacfGebejFK9offHpRhhknBCd6SPRmIuWC
+ V05uZMzx47Q3fX5+2T6zHMZOdxQDiqA=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-228-KMTnKCFdNBG-YQmWoPjcKQ-1; Fri, 12 Jun 2020 04:54:55 -0400
+X-MC-Unique: KMTnKCFdNBG-YQmWoPjcKQ-1
+Received: by mail-wr1-f71.google.com with SMTP id l1so3642490wrc.8
+ for <qemu-devel@nongnu.org>; Fri, 12 Jun 2020 01:54:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=qfeE6zmcSql8OhesVzb1Sr68zmtX88A+xWed9/ZkMoc=;
- b=bBR5vVsVdbR2oRwCjE7VTUy6Ot3CUsj/cVrKM8pVdcsjjGc6Yhvx6kArYJ5L3PlU8F
- 9jr/Sq6892H6FRWLkxEA8HhozX025GTOG8vsYAujcVy1QTnps+1p8cLGg4B/LR2qEYFk
- KsJIMob9sNoEcOsX/N2KFpsmqSu43IZNq4z4hI5ZzQLqY2ssUXpf6KltUJ4GFc/7rMr4
- vlIqT3e2ld9bAvOQF0fk96zcABMIrmHIT8qwFYYrO/Mmh1QqcjzLaG3jKIZm7bkzzbzv
- qhoxjlcpg8dx8RXZUANathNojo4GUgbjUgOJPWJkAWLpyYHeCYMbxzL12Ow/9UTSAXiO
- ldsw==
-X-Gm-Message-State: AOAM530kN3LaCZhmt8ePNr/72dL599d8nrVFV/6Bjm0G4eChosmuLW1Z
- hzJ0gsB3+IZ0YZ8UDnikQ8eCWmscq8OG3/mNFPo=
-X-Google-Smtp-Source: ABdhPJx+Fz0JUOkxeBwLeE8uYPRWuojwjeWFoBku3zlEl+MDZ9ciVIDAR648CxcV6R+1RAsOwDVEu4vrMb+8vM/8iD0=
-X-Received: by 2002:aa7:da14:: with SMTP id r20mr10857133eds.7.1591951577200; 
- Fri, 12 Jun 2020 01:46:17 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=5GHBSuF7Q+CJBw+7dBn2iaHmKbWBMMH0+Nvg3ibl58s=;
+ b=sPBHTzd4t+7N0EOty46vHtxj2RcIow42n1UQOYJKyVk4FJtlpBPxaTySXpqIL1Xsa8
+ jLw7QBewFaeIb+orV8zNdy/aRDzSy72Ydn+n4+x+Amdt69QuR4+JoRWQmS2H2Z0KIdov
+ XX2HjGhAvXP0TjktqYXX5IPBMzseaINdobZYzRzSFjcM7SHhINOEAYOBA4rwzI4yUQS0
+ h27DXlFD1eDdSdq0I2hYSdkAUXtbbRFZeO+pwxm6gDDsg0wQZcnOmmxp+7t+Bw/GK+t/
+ L04+WqfoICxVnuCdoYKZfSFOB7Az85bVb8f+GFaY0+6KnIWNje0aCfm+O+Pp6lzZ7V19
+ y75w==
+X-Gm-Message-State: AOAM530joDbM9IqI3L2gugoqn8uaP9ESeocg6gGcL1xZj1yZ6su1r+C+
+ Q8h83QBnE/p0ympU7BQxF7nauOcp11MbDywxF0jI05cl/xq0gfIHpmM85gU7VJslsecbGcNDSr2
+ NmZ8Yz/Hxao6Gf9c=
+X-Received: by 2002:a1c:f301:: with SMTP id q1mr12301048wmq.110.1591952093726; 
+ Fri, 12 Jun 2020 01:54:53 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyqhDCdRl68UmaQpiMZNriLEsGk3nedDOWqe1PJXCPTSPMtCieXNzuYPRry+6IWQ1jp5a4rxA==
+X-Received: by 2002:a1c:f301:: with SMTP id q1mr12301031wmq.110.1591952093518; 
+ Fri, 12 Jun 2020 01:54:53 -0700 (PDT)
+Received: from localhost.localdomain
+ (181.red-88-10-103.dynamicip.rima-tde.net. [88.10.103.181])
+ by smtp.gmail.com with ESMTPSA id c70sm7470421wme.32.2020.06.12.01.54.52
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 12 Jun 2020 01:54:53 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 01/12] docs/specs/tpm: Correct header path name
+Date: Fri, 12 Jun 2020 10:54:33 +0200
+Message-Id: <20200612085444.8362-2-philmd@redhat.com>
+X-Mailer: git-send-email 2.21.3
+In-Reply-To: <20200612085444.8362-1-philmd@redhat.com>
+References: <20200612085444.8362-1-philmd@redhat.com>
 MIME-Version: 1.0
-References: <CA+XhMqwHSBd_TSFqipO6bn=hVSV8+Mdm3y=_i6gQoGBxRsjS0g@mail.gmail.com>
- <e7df4877-7700-ea36-ceb0-3bf84fec8df8@vivier.eu>
-In-Reply-To: <e7df4877-7700-ea36-ceb0-3bf84fec8df8@vivier.eu>
-From: David CARLIER <devnexen@gmail.com>
-Date: Fri, 12 Jun 2020 09:46:06 +0100
-Message-ID: <CA+XhMqxTU6PUSQBpbA9VrS1QZfqgrCAKUCtUF-x2aF=fCMTDOw@mail.gmail.com>
-Subject: Re: [PATCH 1/1] util/getauxval: Porting to FreeBSD getauxval feature
-To: Laurent Vivier <laurent@vivier.eu>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::542;
- envelope-from=devnexen@gmail.com; helo=mail-ed1-x542.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8;
+	text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/12 04:54:57
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,68 +110,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- Thomas Huth <thuth@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From d7f9d40777d1ed7c9450b0be4f957da2993dfc72 Mon Sep 17 00:00:00 2001
-From: David Carlier <devnexen@gmail.com>
-Date: Fri, 12 Jun 2020 09:39:17 +0100
-Subject: [PATCH] util/getauxval: Porting to FreeBSD getauxval feature
+Commit 8dc6701722 introduce the documentation but an
+incorrect path name was used. Fix that.
 
-FreeBSD has a similar API for auxiliary vector.
-
-Signed-off-by: David Carlier <devnexen@gmail.com>
+Reviewed-by: Stefan Berger <stefanb@linux.ibm.com>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- util/getauxval.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ docs/specs/tpm.rst | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/util/getauxval.c b/util/getauxval.c
-index 36afdfb9e6..b124107d61 100644
---- a/util/getauxval.c
-+++ b/util/getauxval.c
-@@ -98,6 +98,16 @@ unsigned long qemu_getauxval(unsigned long type)
-     return 0;
- }
+diff --git a/docs/specs/tpm.rst b/docs/specs/tpm.rst
+index 5e61238bc5..9e48e3b981 100644
+--- a/docs/specs/tpm.rst
++++ b/docs/specs/tpm.rst
+@@ -199,8 +199,8 @@ to be used with the passthrough backend or the swtpm backend.
+ 
+ QEMU files related to TPM backends:
+  - ``backends/tpm.c``
++ - ``include/sysemu/tpm.h``
+  - ``include/sysemu/tpm_backend.h``
+- - ``include/sysemu/tpm_backend_int.h``
+ 
+ The QEMU TPM passthrough device
+ -------------------------------
+-- 
+2.21.3
 
-+#elif defined(__FreeBSD__)
-+#include <sys/auxv.h>
-+
-+unsigned long qemu_getauxval(unsigned long type)
-+{
-+    unsigned long aux =3D 0;
-+    elf_aux_info(type, &aux, sizeof(aux));
-+    return aux;
-+}
-+
- #else
-
- unsigned long qemu_getauxval(unsigned long type)
---=20
-2.27.0
-
-On Fri, 12 Jun 2020 at 08:13, Laurent Vivier <laurent@vivier.eu> wrote:
->
-> Le 11/06/2020 =C3=A0 23:10, David CARLIER a =C3=A9crit :
-> >
-> Hi,
->
-> please don't put your patch in attachements, you can use "git
-> send-email" if your emailer doesn't allow it.
->
-> https://wiki.qemu.org/Contribute/SubmitAPatch#Do_not_send_as_an_attachmen=
-t
->
-> I think your patch is not correct, you put a "#if defined(__linux__)" in
-> a block that is followed by "#elif defined(__linux__)" and there is no
-> return value if none of the "defined()" is true.
->
-> I think you should not modify the configure and add directly a "#if
-> defined(__FreeBSD__)" at the beginning of getauxval.c to define your
-> function.
->
-> Thanks,
-> Laurent
 
