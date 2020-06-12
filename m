@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7DEBC433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 14:47:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5039C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 14:48:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 79D56206A4
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 14:47:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79D56206A4
+	by mail.kernel.org (Postfix) with ESMTPS id 9874D206A4
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 14:48:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9874D206A4
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55118 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58506 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjkxi-0001Gv-Ok
-	for qemu-devel@archiver.kernel.org; Fri, 12 Jun 2020 10:47:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47728)
+	id 1jjkzJ-0003gT-Tx
+	for qemu-devel@archiver.kernel.org; Fri, 12 Jun 2020 10:48:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47714)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jjkwD-0008Pe-Uv
- for qemu-devel@nongnu.org; Fri, 12 Jun 2020 10:45:45 -0400
-Received: from indium.canonical.com ([91.189.90.7]:38510)
+ id 1jjkwB-0008Oz-6T
+ for qemu-devel@nongnu.org; Fri, 12 Jun 2020 10:45:43 -0400
+Received: from indium.canonical.com ([91.189.90.7]:38560)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jjkw7-0000PG-QB
- for qemu-devel@nongnu.org; Fri, 12 Jun 2020 10:45:45 -0400
+ id 1jjkw8-0000PP-13
+ for qemu-devel@nongnu.org; Fri, 12 Jun 2020 10:45:42 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jjkw5-0000Lm-Gt
- for <qemu-devel@nongnu.org>; Fri, 12 Jun 2020 14:45:37 +0000
+ id 1jjkw7-0000Lv-0V
+ for <qemu-devel@nongnu.org>; Fri, 12 Jun 2020 14:45:39 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 7B06F2E8025
- for <qemu-devel@nongnu.org>; Fri, 12 Jun 2020 14:45:37 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 028D12E8025
+ for <qemu-devel@nongnu.org>; Fri, 12 Jun 2020 14:45:39 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 12 Jun 2020 14:37:58 -0000
+Date: Fri, 12 Jun 2020 14:38:36 -0000
 From: Christophe Lyon <1883268@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -52,8 +52,9 @@ X-Launchpad-Bug-Security-Vulnerability: no
 X-Launchpad-Bug-Commenters: christophe-lyon
 X-Launchpad-Bug-Reporter: Christophe Lyon (christophe-lyon)
 X-Launchpad-Bug-Modifier: Christophe Lyon (christophe-lyon)
-Message-Id: <159197267869.7647.15246075911938911102.malonedeb@gac.canonical.com>
-Subject: [Bug 1883268] [NEW] random errors on aarch64 when executing
+References: <159197267869.7647.15246075911938911102.malonedeb@gac.canonical.com>
+Message-Id: <159197271670.5951.7768509761376511070.malone@chaenomeles.canonical.com>
+Subject: [Bug 1883268] Re: random errors on aarch64 when executing
  __aarch64_cas8_acq_rel
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
@@ -61,7 +62,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="b190cebbf563f89e480a8b57f641753c8196bda0";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: adf4d4377216114959a34fc0be8206d9c632abe0
+X-Launchpad-Hash: c44ddfe0c8f7ed232e646c609074f936d2dc4b38
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/12 10:45:37
@@ -88,56 +89,9 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
-
-Hello,
-
-Since I upgraded to qemu-5.0 when executing the GCC testsuite,
-I've noticed random failures of g++.dg/ext/sync-4.C.
-
-I'm attaching the source of the testcase, the binary executable and the
-qemu traces (huge, 111MB!) starting at main (with qemu-aarch64 -cpu
-cortex-a57 -R 0 -d in_asm,int,exec,cpu,unimp,guest_errors,nochain)
-
-The traces where generated by a CI build, I built the executable
-manually but I expect it to be the same as the one executed by CI.
-
-In seems the problem occurs in f13, which leads to a call to abort()
-
-The preprocessed version of f13/t13 are as follows:
-static bool f13 (void *p) __attribute__ ((noinline));
-static bool f13 (void *p)
-{
-  return (__sync_bool_compare_and_swap((ditype*)p, 1, 2));
-}
-static void t13 ()
-{
-  try {
-    f13(0);
-  }
-  catch (...) {
-    return;
-  }
-  abort();
-}
-
-
-When looking at the execution traces at address 0x00400c9c, main calls f13,=
- which in turn calls __aarch64_cas8_acq_rel (at 0x00401084)
-__aarch64_cas8_acq_rel returns to f13 (address 0x0040113c), then f13 return=
-s to main (0x0040108c) which then calls abort (0x00400ca0)
-
-I'm not quite sure what's wrong :-(
-
-I've not noticed such random problems with native aarch64 hardware.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-** Attachment added: "Source"
-   https://bugs.launchpad.net/bugs/1883268/+attachment/5383272/+files/sync-=
-4.C
+** Attachment added: "QEMU traces"
+   https://bugs.launchpad.net/qemu/+bug/1883268/+attachment/5383274/+files/=
+sync-4.qemu.log.xz
 
 -- =
 
