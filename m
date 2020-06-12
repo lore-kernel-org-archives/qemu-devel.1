@@ -7,77 +7,77 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00CC5C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 15:12:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29B6CC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 15:12:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AFD072081A
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 15:12:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D97AC2081A
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 15:12:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L7W3qVqp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AFD072081A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C3S+bM+H"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D97AC2081A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60216 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60920 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjlM8-0003hK-Pi
-	for qemu-devel@archiver.kernel.org; Fri, 12 Jun 2020 11:12:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50350)
+	id 1jjlMG-00047O-1y
+	for qemu-devel@archiver.kernel.org; Fri, 12 Jun 2020 11:12:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50668)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jjl2t-0008Jj-U6
- for qemu-devel@nongnu.org; Fri, 12 Jun 2020 10:52:39 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39488
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jjl3R-0001KU-7g
+ for qemu-devel@nongnu.org; Fri, 12 Jun 2020 10:53:13 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33490
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jjl2q-0001Wc-Te
- for qemu-devel@nongnu.org; Fri, 12 Jun 2020 10:52:39 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jjl3L-0001eW-0R
+ for qemu-devel@nongnu.org; Fri, 12 Jun 2020 10:53:12 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591973556;
+ s=mimecast20190719; t=1591973583;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=jSO3UNNmFcp3vQWCnC6yM3hOuOjgPmF0S065cZCDRxA=;
- b=L7W3qVqp3mZ0EVltvSG16QIKSh7kNhsKBDyJJs7OxI9roMuSKZ2Egjc8pXuIoAtVaBYaPS
- CFHWrSBL5eeYPtOqw/Y6ksGR73uXLWg5cPnYcSZL8ue9+dOSpPfylFdub33zTYV1mVI0su
- Qw6BOaAYRpl1745dIGYVCZr48J8x6Zs=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-505-huaNC275MlCvcQpTZvXpZw-1; Fri, 12 Jun 2020 10:52:32 -0400
-X-MC-Unique: huaNC275MlCvcQpTZvXpZw-1
-Received: by mail-wm1-f69.google.com with SMTP id x6so2546471wmj.9
- for <qemu-devel@nongnu.org>; Fri, 12 Jun 2020 07:52:32 -0700 (PDT)
+ bh=4SkTpw3tlfOMxd2u5FlY1lVrn4tytemDjVdlXjNxP9Y=;
+ b=C3S+bM+HC7A2bD2orvEWZtC5jM2VTLGkpVOgW0qE51Gj0/xUbEnCLJ/A8RqpZ944GbBBYf
+ 2WeISOeRrQAtoYsvRE8mm4R5Eoqrzvm5KoEF8jtspIa/SlG7K5JWPvUjiL4LlYs/Or2G30
+ qkcClPTRRgI+wTMiwaJS/6r4B7Eg2tY=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-122-9WwjXo6CMqOLgZOasYvqJQ-1; Fri, 12 Jun 2020 10:53:00 -0400
+X-MC-Unique: 9WwjXo6CMqOLgZOasYvqJQ-1
+Received: by mail-wr1-f69.google.com with SMTP id e1so4006669wrm.3
+ for <qemu-devel@nongnu.org>; Fri, 12 Jun 2020 07:53:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:content-transfer-encoding
  :in-reply-to;
- bh=jSO3UNNmFcp3vQWCnC6yM3hOuOjgPmF0S065cZCDRxA=;
- b=sB2sk8tBFpSskO2lD3k0WXUIovU+MXZV9fqRgW0tIzoWkSY2eUoNCekg1+BVh/PgM5
- 64ujrGPu7NOdMIodIAfSENdjyLGmi+RR1oSCkmJIMgHNAlf/8ZrERc2WZD9aSPUG9uFb
- nElg3nEx+WStioFLgeAPhsCVkIlF7DwTOXKMZ9vWAhTCy5IVxhgzF+ZFsghsKNiQMqIc
- AL9iqGIuLv3GDcs2C1i53OVLHsJL3T8HFstYM/vKjK6OxzqUJhGmZ3M9AAvfjE+nkFPR
- UcXtDZ8BGhevb5YQ63+dsHr7LLkZOGOk6haRlWYaN6WWXsOHYnOBKL2SpFzOOaP9JuPy
- Ab/Q==
-X-Gm-Message-State: AOAM531a9nFFpShtKuRrYD2ZdMxbtKv/XThJFVCYm02vpG5FHTYpDE+4
- WHEXf7himVumtOehCtxrcLcTzxCmDbwSjTZZiCfwu4sR1LixRRos9EQiXalRMj3aKJk2wRkhtDe
- LngaKC+pGI7s1Cp8=
-X-Received: by 2002:adf:d84a:: with SMTP id k10mr15180269wrl.336.1591973550804; 
- Fri, 12 Jun 2020 07:52:30 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxRhPlwZnn6ZQCCjEboiKHODWGgD9cRxRUOt7pbdK2KZBa4UMdgP5b6Sk8irDeAFIsmVujagw==
-X-Received: by 2002:adf:d84a:: with SMTP id k10mr15180226wrl.336.1591973550223; 
- Fri, 12 Jun 2020 07:52:30 -0700 (PDT)
+ bh=4SkTpw3tlfOMxd2u5FlY1lVrn4tytemDjVdlXjNxP9Y=;
+ b=d+GETSfS3fYOtdTyi/Ne3oWrUhOj4Xi2tycAOsie0SAIciWei751C3bTv1EXxT+xcF
+ Y6ogY2/VCUzdBkIsE6FnFLHQYQzcat9jhA3dlXMbxzn4IeUgt95XSXCqmgC4elikXjGJ
+ cnFJXQqYTVKguyZO4KFBHsHhJaE4HK+1GoTblbNRmZKlJ/GD3rdKP9fIG6MRyENR4tJo
+ prImCljkgWTq1MhzWRTBE6BwVF6lRbU/bJ6sSrbB+wbEPYXEnCaq8kuTNTV9zsSA77T/
+ 5+B7v6y4n+1wbovO4rgT0cB+vLqjCJo1qOcvfDoWrGaEEBx8fFeOTcjowCgQD1jH9+x1
+ 0img==
+X-Gm-Message-State: AOAM53022kiXMrOz7qpO1VQ0jLmD1QCK/ACsg6VvRBP7YGaxPclRQUoh
+ FS58m6dhyyIIhxqU20jIH0o41GTOO4G3ub4YStR8eH8PbhTqoM2C8elYY4PbW0sGgmld7Xuqzbd
+ qWe1FeKsoM5OpSUI=
+X-Received: by 2002:a1c:b656:: with SMTP id g83mr13701372wmf.27.1591973578710; 
+ Fri, 12 Jun 2020 07:52:58 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzwCKRhLe6T7jjRlZIYZDglcFMcNekwHPE+pJ57R0duPA7GPXL4sAK4asnDbFZQyROGlLOQyQ==
+X-Received: by 2002:a1c:b656:: with SMTP id g83mr13701349wmf.27.1591973578337; 
+ Fri, 12 Jun 2020 07:52:58 -0700 (PDT)
 Received: from redhat.com (bzq-79-178-18-124.red.bezeqint.net. [79.178.18.124])
- by smtp.gmail.com with ESMTPSA id g3sm11411101wrb.46.2020.06.12.07.52.28
+ by smtp.gmail.com with ESMTPSA id h15sm9920995wrt.73.2020.06.12.07.52.57
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 12 Jun 2020 07:52:29 -0700 (PDT)
-Date: Fri, 12 Jun 2020 10:52:28 -0400
+ Fri, 12 Jun 2020 07:52:57 -0700 (PDT)
+Date: Fri, 12 Jun 2020 10:52:56 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 39/58] Transmit vhost-user memory regions individually
-Message-ID: <20200612141917.9446-40-mst@redhat.com>
+Subject: [PULL v2 52/58] acpi: create acpi-common.c and move madt code
+Message-ID: <20200612141917.9446-53-mst@redhat.com>
 References: <20200612141917.9446-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20200612141917.9446-1-mst@redhat.com>
@@ -88,16 +88,16 @@ X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
 Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=mst@redhat.com;
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=mst@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/12 08:07:26
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/12 08:00:42
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -111,678 +111,380 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Mike Cui <cui@nutanix.com>, Peter Maydell <peter.maydell@linaro.org>,
- Swapnil Ingle <swapnil.ingle@nutanix.com>,
- Peter Turschmid <peter.turschm@nutanix.com>,
- Raphael Norwitz <raphael.norwitz@nutanix.com>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Raphael Norwitz <raphael.norwitz@nutanix.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
 
-With this change, when the VHOST_USER_PROTOCOL_F_CONFIGURE_MEM_SLOTS
-protocol feature has been negotiated, Qemu no longer sends the backend
-all the memory regions in a single message. Rather, when the memory
-tables are set or updated, a series of VHOST_USER_ADD_MEM_REG and
-VHOST_USER_REM_MEM_REG messages are sent to transmit the regions to map
-and/or unmap instead of sending send all the regions in one fixed size
-VHOST_USER_SET_MEM_TABLE message.
+We'll need madt support for microvm.
 
-The vhost_user struct maintains a shadow state of the VM’s memory
-regions. When the memory tables are modified, the
-vhost_user_set_mem_table() function compares the new device memory state
-to the shadow state and only sends regions which need to be unmapped or
-mapped in. The regions which must be unmapped are sent first, followed
-by the new regions to be mapped in. After all the messages have been
-sent, the shadow state is set to the current virtual device state.
-
-Existing backends which do not support
-VHOST_USER_PROTOCOL_F_CONFIGURE_MEM_SLOTS are unaffected.
-
-Signed-off-by: Raphael Norwitz <raphael.norwitz@nutanix.com>
-Signed-off-by: Swapnil Ingle <swapnil.ingle@nutanix.com>
-Signed-off-by: Peter Turschmid <peter.turschm@nutanix.com>
-Suggested-by: Mike Cui <cui@nutanix.com>
-Message-Id: <1588533678-23450-5-git-send-email-raphael.norwitz@nutanix.com>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Message-Id: <20200520132003.9492-7-kraxel@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Acked-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 ---
- hw/virtio/vhost-user.c      | 516 ++++++++++++++++++++++++++++++------
- docs/interop/vhost-user.rst |  33 ++-
- 2 files changed, 472 insertions(+), 77 deletions(-)
+ hw/i386/acpi-common.h |  14 ++++
+ hw/i386/acpi-build.c  | 126 +---------------------------------
+ hw/i386/acpi-common.c | 152 ++++++++++++++++++++++++++++++++++++++++++
+ hw/i386/Makefile.objs |   1 +
+ 4 files changed, 170 insertions(+), 123 deletions(-)
+ create mode 100644 hw/i386/acpi-common.h
+ create mode 100644 hw/i386/acpi-common.c
 
-diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-index 754ad885cf..3640f017a2 100644
---- a/hw/virtio/vhost-user.c
-+++ b/hw/virtio/vhost-user.c
-@@ -104,6 +104,8 @@ typedef enum VhostUserRequest {
-     VHOST_USER_RESET_DEVICE = 34,
-     /* Message number 35 reserved for VHOST_USER_VRING_KICK. */
-     VHOST_USER_GET_MAX_MEM_SLOTS = 36,
-+    VHOST_USER_ADD_MEM_REG = 37,
-+    VHOST_USER_REM_MEM_REG = 38,
-     VHOST_USER_MAX
- } VhostUserRequest;
- 
-@@ -128,6 +130,11 @@ typedef struct VhostUserMemory {
-     VhostUserMemoryRegion regions[VHOST_MEMORY_MAX_NREGIONS];
- } VhostUserMemory;
- 
-+typedef struct VhostUserMemRegMsg {
-+    uint32_t padding;
-+    VhostUserMemoryRegion region;
-+} VhostUserMemRegMsg;
+diff --git a/hw/i386/acpi-common.h b/hw/i386/acpi-common.h
+new file mode 100644
+index 0000000000..c30e461f18
+--- /dev/null
++++ b/hw/i386/acpi-common.h
+@@ -0,0 +1,14 @@
++#ifndef HW_I386_ACPI_COMMON_H
++#define HW_I386_ACPI_COMMON_H
++#include "include/hw/acpi/acpi_dev_interface.h"
 +
- typedef struct VhostUserLog {
-     uint64_t mmap_size;
-     uint64_t mmap_offset;
-@@ -186,6 +193,7 @@ typedef union {
-         struct vhost_vring_state state;
-         struct vhost_vring_addr addr;
-         VhostUserMemory memory;
-+        VhostUserMemRegMsg mem_reg;
-         VhostUserLog log;
-         struct vhost_iotlb_msg iotlb;
-         VhostUserConfig config;
-@@ -226,6 +234,16 @@ struct vhost_user {
- 
-     /* True once we've entered postcopy_listen */
-     bool               postcopy_listen;
++#include "include/hw/acpi/bios-linker-loader.h"
++#include "include/hw/i386/x86.h"
 +
-+    /* Our current regions */
-+    int num_shadow_regions;
-+    struct vhost_memory_region shadow_regions[VHOST_MEMORY_MAX_NREGIONS];
-+};
++/* Default IOAPIC ID */
++#define ACPI_BUILD_IOAPIC_ID 0x0
 +
-+struct scrub_regions {
-+    struct vhost_memory_region *region;
-+    int reg_idx;
-+    int fd_idx;
- };
++void acpi_build_madt(GArray *table_data, BIOSLinker *linker,
++                     X86MachineState *x86ms, AcpiDeviceIf *adev);
++
++#endif
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index d217fc1fe6..26c0c8aefa 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -24,6 +24,7 @@
+ #include "qapi/error.h"
+ #include "qapi/qmp/qnum.h"
+ #include "acpi-build.h"
++#include "acpi-common.h"
+ #include "qemu/bitmap.h"
+ #include "qemu/error-report.h"
+ #include "hw/pci/pci.h"
+@@ -89,9 +90,6 @@
+ #define ACPI_BUILD_DPRINTF(fmt, ...)
+ #endif
  
- static bool ioeventfd_enabled(void)
-@@ -489,8 +507,332 @@ static int vhost_user_fill_set_mem_table_msg(struct vhost_user *u,
-     return 1;
+-/* Default IOAPIC ID */
+-#define ACPI_BUILD_IOAPIC_ID 0x0
+-
+ typedef struct AcpiPmInfo {
+     bool s3_disabled;
+     bool s4_disabled;
+@@ -327,124 +325,6 @@ build_facs(GArray *table_data)
+     facs->length = cpu_to_le32(sizeof(*facs));
  }
  
-+static inline bool reg_equal(struct vhost_memory_region *shadow_reg,
-+                             struct vhost_memory_region *vdev_reg)
+-void pc_madt_cpu_entry(AcpiDeviceIf *adev, int uid,
+-                       const CPUArchIdList *apic_ids, GArray *entry)
+-{
+-    uint32_t apic_id = apic_ids->cpus[uid].arch_id;
+-
+-    /* ACPI spec says that LAPIC entry for non present
+-     * CPU may be omitted from MADT or it must be marked
+-     * as disabled. However omitting non present CPU from
+-     * MADT breaks hotplug on linux. So possible CPUs
+-     * should be put in MADT but kept disabled.
+-     */
+-    if (apic_id < 255) {
+-        AcpiMadtProcessorApic *apic = acpi_data_push(entry, sizeof *apic);
+-
+-        apic->type = ACPI_APIC_PROCESSOR;
+-        apic->length = sizeof(*apic);
+-        apic->processor_id = uid;
+-        apic->local_apic_id = apic_id;
+-        if (apic_ids->cpus[uid].cpu != NULL) {
+-            apic->flags = cpu_to_le32(1);
+-        } else {
+-            apic->flags = cpu_to_le32(0);
+-        }
+-    } else {
+-        AcpiMadtProcessorX2Apic *apic = acpi_data_push(entry, sizeof *apic);
+-
+-        apic->type = ACPI_APIC_LOCAL_X2APIC;
+-        apic->length = sizeof(*apic);
+-        apic->uid = cpu_to_le32(uid);
+-        apic->x2apic_id = cpu_to_le32(apic_id);
+-        if (apic_ids->cpus[uid].cpu != NULL) {
+-            apic->flags = cpu_to_le32(1);
+-        } else {
+-            apic->flags = cpu_to_le32(0);
+-        }
+-    }
+-}
+-
+-static void
+-build_madt(GArray *table_data, BIOSLinker *linker,
+-           X86MachineState *x86ms, AcpiDeviceIf *adev)
+-{
+-    MachineClass *mc = MACHINE_GET_CLASS(x86ms);
+-    const CPUArchIdList *apic_ids = mc->possible_cpu_arch_ids(MACHINE(x86ms));
+-    int madt_start = table_data->len;
+-    AcpiDeviceIfClass *adevc = ACPI_DEVICE_IF_GET_CLASS(adev);
+-    bool x2apic_mode = false;
+-
+-    AcpiMultipleApicTable *madt;
+-    AcpiMadtIoApic *io_apic;
+-    AcpiMadtIntsrcovr *intsrcovr;
+-    int i;
+-
+-    madt = acpi_data_push(table_data, sizeof *madt);
+-    madt->local_apic_address = cpu_to_le32(APIC_DEFAULT_ADDRESS);
+-    madt->flags = cpu_to_le32(1);
+-
+-    for (i = 0; i < apic_ids->len; i++) {
+-        adevc->madt_cpu(adev, i, apic_ids, table_data);
+-        if (apic_ids->cpus[i].arch_id > 254) {
+-            x2apic_mode = true;
+-        }
+-    }
+-
+-    io_apic = acpi_data_push(table_data, sizeof *io_apic);
+-    io_apic->type = ACPI_APIC_IO;
+-    io_apic->length = sizeof(*io_apic);
+-    io_apic->io_apic_id = ACPI_BUILD_IOAPIC_ID;
+-    io_apic->address = cpu_to_le32(IO_APIC_DEFAULT_ADDRESS);
+-    io_apic->interrupt = cpu_to_le32(0);
+-
+-    if (x86ms->apic_xrupt_override) {
+-        intsrcovr = acpi_data_push(table_data, sizeof *intsrcovr);
+-        intsrcovr->type   = ACPI_APIC_XRUPT_OVERRIDE;
+-        intsrcovr->length = sizeof(*intsrcovr);
+-        intsrcovr->source = 0;
+-        intsrcovr->gsi    = cpu_to_le32(2);
+-        intsrcovr->flags  = cpu_to_le16(0); /* conforms to bus specifications */
+-    }
+-    for (i = 1; i < 16; i++) {
+-#define ACPI_BUILD_PCI_IRQS ((1<<5) | (1<<9) | (1<<10) | (1<<11))
+-        if (!(ACPI_BUILD_PCI_IRQS & (1 << i))) {
+-            /* No need for a INT source override structure. */
+-            continue;
+-        }
+-        intsrcovr = acpi_data_push(table_data, sizeof *intsrcovr);
+-        intsrcovr->type   = ACPI_APIC_XRUPT_OVERRIDE;
+-        intsrcovr->length = sizeof(*intsrcovr);
+-        intsrcovr->source = i;
+-        intsrcovr->gsi    = cpu_to_le32(i);
+-        intsrcovr->flags  = cpu_to_le16(0xd); /* active high, level triggered */
+-    }
+-
+-    if (x2apic_mode) {
+-        AcpiMadtLocalX2ApicNmi *local_nmi;
+-
+-        local_nmi = acpi_data_push(table_data, sizeof *local_nmi);
+-        local_nmi->type   = ACPI_APIC_LOCAL_X2APIC_NMI;
+-        local_nmi->length = sizeof(*local_nmi);
+-        local_nmi->uid    = 0xFFFFFFFF; /* all processors */
+-        local_nmi->flags  = cpu_to_le16(0);
+-        local_nmi->lint   = 1; /* ACPI_LINT1 */
+-    } else {
+-        AcpiMadtLocalNmi *local_nmi;
+-
+-        local_nmi = acpi_data_push(table_data, sizeof *local_nmi);
+-        local_nmi->type         = ACPI_APIC_LOCAL_NMI;
+-        local_nmi->length       = sizeof(*local_nmi);
+-        local_nmi->processor_id = 0xff; /* all processors */
+-        local_nmi->flags        = cpu_to_le16(0);
+-        local_nmi->lint         = 1; /* ACPI_LINT1 */
+-    }
+-
+-    build_header(linker, table_data,
+-                 (void *)(table_data->data + madt_start), "APIC",
+-                 table_data->len - madt_start, 1, NULL, NULL);
+-}
+-
+ static void build_append_pcihp_notify_entry(Aml *method, int slot)
+ {
+     Aml *if_ctx;
+@@ -2707,8 +2587,8 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
+     aml_len += tables_blob->len - fadt;
+ 
+     acpi_add_table(table_offsets, tables_blob);
+-    build_madt(tables_blob, tables->linker, x86ms,
+-               ACPI_DEVICE_IF(pcms->acpi_dev));
++    acpi_build_madt(tables_blob, tables->linker, x86ms,
++                    ACPI_DEVICE_IF(pcms->acpi_dev));
+ 
+     vmgenid_dev = find_vmgenid_dev();
+     if (vmgenid_dev) {
+diff --git a/hw/i386/acpi-common.c b/hw/i386/acpi-common.c
+new file mode 100644
+index 0000000000..5caca16a0b
+--- /dev/null
++++ b/hw/i386/acpi-common.c
+@@ -0,0 +1,152 @@
++/* Support for generating ACPI tables and passing them to Guests
++ *
++ * Copyright (C) 2008-2010  Kevin O'Connor <kevin@koconnor.net>
++ * Copyright (C) 2006 Fabrice Bellard
++ * Copyright (C) 2013 Red Hat Inc
++ *
++ * Author: Michael S. Tsirkin <mst@redhat.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++
++ * You should have received a copy of the GNU General Public License along
++ * with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "qapi/error.h"
++
++#include "exec/memory.h"
++#include "hw/acpi/acpi.h"
++#include "hw/acpi/aml-build.h"
++#include "hw/acpi/utils.h"
++#include "hw/i386/pc.h"
++#include "target/i386/cpu.h"
++
++#include "acpi-build.h"
++#include "acpi-common.h"
++
++void pc_madt_cpu_entry(AcpiDeviceIf *adev, int uid,
++                       const CPUArchIdList *apic_ids, GArray *entry)
 +{
-+    return shadow_reg->guest_phys_addr == vdev_reg->guest_phys_addr &&
-+        shadow_reg->userspace_addr == vdev_reg->userspace_addr &&
-+        shadow_reg->memory_size == vdev_reg->memory_size;
++    uint32_t apic_id = apic_ids->cpus[uid].arch_id;
++
++    /* ACPI spec says that LAPIC entry for non present
++     * CPU may be omitted from MADT or it must be marked
++     * as disabled. However omitting non present CPU from
++     * MADT breaks hotplug on linux. So possible CPUs
++     * should be put in MADT but kept disabled.
++     */
++    if (apic_id < 255) {
++        AcpiMadtProcessorApic *apic = acpi_data_push(entry, sizeof *apic);
++
++        apic->type = ACPI_APIC_PROCESSOR;
++        apic->length = sizeof(*apic);
++        apic->processor_id = uid;
++        apic->local_apic_id = apic_id;
++        if (apic_ids->cpus[uid].cpu != NULL) {
++            apic->flags = cpu_to_le32(1);
++        } else {
++            apic->flags = cpu_to_le32(0);
++        }
++    } else {
++        AcpiMadtProcessorX2Apic *apic = acpi_data_push(entry, sizeof *apic);
++
++        apic->type = ACPI_APIC_LOCAL_X2APIC;
++        apic->length = sizeof(*apic);
++        apic->uid = cpu_to_le32(uid);
++        apic->x2apic_id = cpu_to_le32(apic_id);
++        if (apic_ids->cpus[uid].cpu != NULL) {
++            apic->flags = cpu_to_le32(1);
++        } else {
++            apic->flags = cpu_to_le32(0);
++        }
++    }
 +}
 +
-+static void scrub_shadow_regions(struct vhost_dev *dev,
-+                                 struct scrub_regions *add_reg,
-+                                 int *nr_add_reg,
-+                                 struct scrub_regions *rem_reg,
-+                                 int *nr_rem_reg, uint64_t *shadow_pcb,
-+                                 bool track_ramblocks)
++void acpi_build_madt(GArray *table_data, BIOSLinker *linker,
++                     X86MachineState *x86ms, AcpiDeviceIf *adev)
 +{
-+    struct vhost_user *u = dev->opaque;
-+    bool found[VHOST_MEMORY_MAX_NREGIONS] = {};
-+    struct vhost_memory_region *reg, *shadow_reg;
-+    int i, j, fd, add_idx = 0, rm_idx = 0, fd_num = 0;
-+    ram_addr_t offset;
-+    MemoryRegion *mr;
-+    bool matching;
++    MachineClass *mc = MACHINE_GET_CLASS(x86ms);
++    const CPUArchIdList *apic_ids = mc->possible_cpu_arch_ids(MACHINE(x86ms));
++    int madt_start = table_data->len;
++    AcpiDeviceIfClass *adevc = ACPI_DEVICE_IF_GET_CLASS(adev);
++    bool x2apic_mode = false;
 +
-+    /*
-+     * Find memory regions present in our shadow state which are not in
-+     * the device's current memory state.
-+     *
-+     * Mark regions in both the shadow and device state as "found".
-+     */
-+    for (i = 0; i < u->num_shadow_regions; i++) {
-+        shadow_reg = &u->shadow_regions[i];
-+        matching = false;
++    AcpiMultipleApicTable *madt;
++    AcpiMadtIoApic *io_apic;
++    AcpiMadtIntsrcovr *intsrcovr;
++    int i;
 +
-+        for (j = 0; j < dev->mem->nregions; j++) {
-+            reg = &dev->mem->regions[j];
++    madt = acpi_data_push(table_data, sizeof *madt);
++    madt->local_apic_address = cpu_to_le32(APIC_DEFAULT_ADDRESS);
++    madt->flags = cpu_to_le32(1);
 +
-+            mr = vhost_user_get_mr_data(reg->userspace_addr, &offset, &fd);
-+
-+            if (reg_equal(shadow_reg, reg)) {
-+                matching = true;
-+                found[j] = true;
-+                if (track_ramblocks) {
-+                    /*
-+                     * Reset postcopy client bases, region_rb, and
-+                     * region_rb_offset in case regions are removed.
-+                     */
-+                    if (fd > 0) {
-+                        u->region_rb_offset[j] = offset;
-+                        u->region_rb[j] = mr->ram_block;
-+                        shadow_pcb[j] = u->postcopy_client_bases[i];
-+                    } else {
-+                        u->region_rb_offset[j] = 0;
-+                        u->region_rb[j] = NULL;
-+                    }
-+                }
-+                break;
-+            }
-+        }
-+
-+        /*
-+         * If the region was not found in the current device memory state
-+         * create an entry for it in the removed list.
-+         */
-+        if (!matching) {
-+            rem_reg[rm_idx].region = shadow_reg;
-+            rem_reg[rm_idx++].reg_idx = i;
++    for (i = 0; i < apic_ids->len; i++) {
++        adevc->madt_cpu(adev, i, apic_ids, table_data);
++        if (apic_ids->cpus[i].arch_id > 254) {
++            x2apic_mode = true;
 +        }
 +    }
 +
-+    /*
-+     * For regions not marked "found", create entries in the added list.
-+     *
-+     * Note their indexes in the device memory state and the indexes of their
-+     * file descriptors.
-+     */
-+    for (i = 0; i < dev->mem->nregions; i++) {
-+        reg = &dev->mem->regions[i];
-+        mr = vhost_user_get_mr_data(reg->userspace_addr, &offset, &fd);
-+        if (fd > 0) {
-+            ++fd_num;
-+        }
++    io_apic = acpi_data_push(table_data, sizeof *io_apic);
++    io_apic->type = ACPI_APIC_IO;
++    io_apic->length = sizeof(*io_apic);
++    io_apic->io_apic_id = ACPI_BUILD_IOAPIC_ID;
++    io_apic->address = cpu_to_le32(IO_APIC_DEFAULT_ADDRESS);
++    io_apic->interrupt = cpu_to_le32(0);
 +
-+        /*
-+         * If the region was in both the shadow and device state we don't
-+         * need to send a VHOST_USER_ADD_MEM_REG message for it.
-+         */
-+        if (found[i]) {
++    if (x86ms->apic_xrupt_override) {
++        intsrcovr = acpi_data_push(table_data, sizeof *intsrcovr);
++        intsrcovr->type   = ACPI_APIC_XRUPT_OVERRIDE;
++        intsrcovr->length = sizeof(*intsrcovr);
++        intsrcovr->source = 0;
++        intsrcovr->gsi    = cpu_to_le32(2);
++        intsrcovr->flags  = cpu_to_le16(0); /* conforms to bus specifications */
++    }
++    for (i = 1; i < 16; i++) {
++#define ACPI_BUILD_PCI_IRQS ((1<<5) | (1<<9) | (1<<10) | (1<<11))
++        if (!(ACPI_BUILD_PCI_IRQS & (1 << i))) {
++            /* No need for a INT source override structure. */
 +            continue;
 +        }
-+
-+        add_reg[add_idx].region = reg;
-+        add_reg[add_idx].reg_idx = i;
-+        add_reg[add_idx++].fd_idx = fd_num;
-+    }
-+    *nr_rem_reg = rm_idx;
-+    *nr_add_reg = add_idx;
-+
-+    return;
-+}
-+
-+static int send_remove_regions(struct vhost_dev *dev,
-+                               struct scrub_regions *remove_reg,
-+                               int nr_rem_reg, VhostUserMsg *msg,
-+                               bool reply_supported)
-+{
-+    struct vhost_user *u = dev->opaque;
-+    struct vhost_memory_region *shadow_reg;
-+    int i, fd, shadow_reg_idx, ret;
-+    ram_addr_t offset;
-+    VhostUserMemoryRegion region_buffer;
-+
-+    /*
-+     * The regions in remove_reg appear in the same order they do in the
-+     * shadow table. Therefore we can minimize memory copies by iterating
-+     * through remove_reg backwards.
-+     */
-+    for (i = nr_rem_reg - 1; i >= 0; i--) {
-+        shadow_reg = remove_reg[i].region;
-+        shadow_reg_idx = remove_reg[i].reg_idx;
-+
-+        vhost_user_get_mr_data(shadow_reg->userspace_addr, &offset, &fd);
-+
-+        if (fd > 0) {
-+            msg->hdr.request = VHOST_USER_REM_MEM_REG;
-+            vhost_user_fill_msg_region(&region_buffer, shadow_reg);
-+            msg->payload.mem_reg.region = region_buffer;
-+
-+            if (vhost_user_write(dev, msg, &fd, 1) < 0) {
-+                return -1;
-+            }
-+
-+            if (reply_supported) {
-+                ret = process_message_reply(dev, msg);
-+                if (ret) {
-+                    return ret;
-+                }
-+            }
-+        }
-+
-+        /*
-+         * At this point we know the backend has unmapped the region. It is now
-+         * safe to remove it from the shadow table.
-+         */
-+        memmove(&u->shadow_regions[shadow_reg_idx],
-+                &u->shadow_regions[shadow_reg_idx + 1],
-+                sizeof(struct vhost_memory_region) *
-+                (u->num_shadow_regions - shadow_reg_idx));
-+        u->num_shadow_regions--;
++        intsrcovr = acpi_data_push(table_data, sizeof *intsrcovr);
++        intsrcovr->type   = ACPI_APIC_XRUPT_OVERRIDE;
++        intsrcovr->length = sizeof(*intsrcovr);
++        intsrcovr->source = i;
++        intsrcovr->gsi    = cpu_to_le32(i);
++        intsrcovr->flags  = cpu_to_le16(0xd); /* active high, level triggered */
 +    }
 +
-+    return 0;
-+}
++    if (x2apic_mode) {
++        AcpiMadtLocalX2ApicNmi *local_nmi;
 +
-+static int send_add_regions(struct vhost_dev *dev,
-+                            struct scrub_regions *add_reg, int nr_add_reg,
-+                            VhostUserMsg *msg, uint64_t *shadow_pcb,
-+                            bool reply_supported, bool track_ramblocks)
-+{
-+    struct vhost_user *u = dev->opaque;
-+    int i, fd, ret, reg_idx, reg_fd_idx;
-+    struct vhost_memory_region *reg;
-+    MemoryRegion *mr;
-+    ram_addr_t offset;
-+    VhostUserMsg msg_reply;
-+    VhostUserMemoryRegion region_buffer;
-+
-+    for (i = 0; i < nr_add_reg; i++) {
-+        reg = add_reg[i].region;
-+        reg_idx = add_reg[i].reg_idx;
-+        reg_fd_idx = add_reg[i].fd_idx;
-+
-+        mr = vhost_user_get_mr_data(reg->userspace_addr, &offset, &fd);
-+
-+        if (fd > 0) {
-+            if (track_ramblocks) {
-+                trace_vhost_user_set_mem_table_withfd(reg_fd_idx, mr->name,
-+                                                      reg->memory_size,
-+                                                      reg->guest_phys_addr,
-+                                                      reg->userspace_addr,
-+                                                      offset);
-+                u->region_rb_offset[reg_idx] = offset;
-+                u->region_rb[reg_idx] = mr->ram_block;
-+            }
-+            msg->hdr.request = VHOST_USER_ADD_MEM_REG;
-+            vhost_user_fill_msg_region(&region_buffer, reg);
-+            msg->payload.mem_reg.region = region_buffer;
-+            msg->payload.mem_reg.region.mmap_offset = offset;
-+
-+            if (vhost_user_write(dev, msg, &fd, 1) < 0) {
-+                return -1;
-+            }
-+
-+            if (track_ramblocks) {
-+                uint64_t reply_gpa;
-+
-+                if (vhost_user_read(dev, &msg_reply) < 0) {
-+                    return -1;
-+                }
-+
-+                reply_gpa = msg_reply.payload.mem_reg.region.guest_phys_addr;
-+
-+                if (msg_reply.hdr.request != VHOST_USER_ADD_MEM_REG) {
-+                    error_report("%s: Received unexpected msg type."
-+                                 "Expected %d received %d", __func__,
-+                                 VHOST_USER_ADD_MEM_REG,
-+                                 msg_reply.hdr.request);
-+                    return -1;
-+                }
-+
-+                /*
-+                 * We're using the same structure, just reusing one of the
-+                 * fields, so it should be the same size.
-+                 */
-+                if (msg_reply.hdr.size != msg->hdr.size) {
-+                    error_report("%s: Unexpected size for postcopy reply "
-+                                 "%d vs %d", __func__, msg_reply.hdr.size,
-+                                 msg->hdr.size);
-+                    return -1;
-+                }
-+
-+                /* Get the postcopy client base from the backend's reply. */
-+                if (reply_gpa == dev->mem->regions[reg_idx].guest_phys_addr) {
-+                    shadow_pcb[reg_idx] =
-+                        msg_reply.payload.mem_reg.region.userspace_addr;
-+                    trace_vhost_user_set_mem_table_postcopy(
-+                        msg_reply.payload.mem_reg.region.userspace_addr,
-+                        msg->payload.mem_reg.region.userspace_addr,
-+                        reg_fd_idx, reg_idx);
-+                } else {
-+                    error_report("%s: invalid postcopy reply for region. "
-+                                 "Got guest physical address %" PRIX64 ", expected "
-+                                 "%" PRIX64, __func__, reply_gpa,
-+                                 dev->mem->regions[reg_idx].guest_phys_addr);
-+                    return -1;
-+                }
-+            } else if (reply_supported) {
-+                ret = process_message_reply(dev, msg);
-+                if (ret) {
-+                    return ret;
-+                }
-+            }
-+        } else if (track_ramblocks) {
-+            u->region_rb_offset[reg_idx] = 0;
-+            u->region_rb[reg_idx] = NULL;
-+        }
-+
-+        /*
-+         * At this point, we know the backend has mapped in the new
-+         * region, if the region has a valid file descriptor.
-+         *
-+         * The region should now be added to the shadow table.
-+         */
-+        u->shadow_regions[u->num_shadow_regions].guest_phys_addr =
-+            reg->guest_phys_addr;
-+        u->shadow_regions[u->num_shadow_regions].userspace_addr =
-+            reg->userspace_addr;
-+        u->shadow_regions[u->num_shadow_regions].memory_size =
-+            reg->memory_size;
-+        u->num_shadow_regions++;
-+    }
-+
-+    return 0;
-+}
-+
-+static int vhost_user_add_remove_regions(struct vhost_dev *dev,
-+                                         VhostUserMsg *msg,
-+                                         bool reply_supported,
-+                                         bool track_ramblocks)
-+{
-+    struct vhost_user *u = dev->opaque;
-+    struct scrub_regions add_reg[VHOST_MEMORY_MAX_NREGIONS];
-+    struct scrub_regions rem_reg[VHOST_MEMORY_MAX_NREGIONS];
-+    uint64_t shadow_pcb[VHOST_MEMORY_MAX_NREGIONS] = {};
-+    int nr_add_reg, nr_rem_reg;
-+
-+    msg->hdr.size = sizeof(msg->payload.mem_reg.padding) +
-+        sizeof(VhostUserMemoryRegion);
-+
-+    /* Find the regions which need to be removed or added. */
-+    scrub_shadow_regions(dev, add_reg, &nr_add_reg, rem_reg, &nr_rem_reg,
-+                         shadow_pcb, track_ramblocks);
-+
-+    if (nr_rem_reg && send_remove_regions(dev, rem_reg, nr_rem_reg, msg,
-+                reply_supported) < 0)
-+    {
-+        goto err;
-+    }
-+
-+    if (nr_add_reg && send_add_regions(dev, add_reg, nr_add_reg, msg,
-+                shadow_pcb, reply_supported, track_ramblocks) < 0)
-+    {
-+        goto err;
-+    }
-+
-+    if (track_ramblocks) {
-+        memcpy(u->postcopy_client_bases, shadow_pcb,
-+               sizeof(uint64_t) * VHOST_MEMORY_MAX_NREGIONS);
-+        /*
-+         * Now we've registered this with the postcopy code, we ack to the
-+         * client, because now we're in the position to be able to deal with
-+         * any faults it generates.
-+         */
-+        /* TODO: Use this for failure cases as well with a bad value. */
-+        msg->hdr.size = sizeof(msg->payload.u64);
-+        msg->payload.u64 = 0; /* OK */
-+
-+        if (vhost_user_write(dev, msg, NULL, 0) < 0) {
-+            return -1;
-+        }
-+    }
-+
-+    return 0;
-+
-+err:
-+    if (track_ramblocks) {
-+        memcpy(u->postcopy_client_bases, shadow_pcb,
-+               sizeof(uint64_t) * VHOST_MEMORY_MAX_NREGIONS);
-+    }
-+
-+    return -1;
-+}
-+
- static int vhost_user_set_mem_table_postcopy(struct vhost_dev *dev,
--                                             struct vhost_memory *mem)
-+                                             struct vhost_memory *mem,
-+                                             bool reply_supported,
-+                                             bool config_mem_slots)
- {
-     struct vhost_user *u = dev->opaque;
-     int fds[VHOST_MEMORY_MAX_NREGIONS];
-@@ -513,71 +855,84 @@ static int vhost_user_set_mem_table_postcopy(struct vhost_dev *dev,
-         u->region_rb_len = dev->mem->nregions;
-     }
- 
--    if (vhost_user_fill_set_mem_table_msg(u, dev, &msg, fds, &fd_num,
-+    if (config_mem_slots) {
-+        if (vhost_user_add_remove_regions(dev, &msg, reply_supported,
-                                           true) < 0) {
--        return -1;
--    }
--
--    if (vhost_user_write(dev, &msg, fds, fd_num) < 0) {
--        return -1;
--    }
--
--    if (vhost_user_read(dev, &msg_reply) < 0) {
--        return -1;
--    }
--
--    if (msg_reply.hdr.request != VHOST_USER_SET_MEM_TABLE) {
--        error_report("%s: Received unexpected msg type."
--                     "Expected %d received %d", __func__,
--                     VHOST_USER_SET_MEM_TABLE, msg_reply.hdr.request);
--        return -1;
--    }
--    /* We're using the same structure, just reusing one of the
--     * fields, so it should be the same size.
--     */
--    if (msg_reply.hdr.size != msg.hdr.size) {
--        error_report("%s: Unexpected size for postcopy reply "
--                     "%d vs %d", __func__, msg_reply.hdr.size, msg.hdr.size);
--        return -1;
--    }
--
--    memset(u->postcopy_client_bases, 0,
--           sizeof(uint64_t) * VHOST_MEMORY_MAX_NREGIONS);
--
--    /* They're in the same order as the regions that were sent
--     * but some of the regions were skipped (above) if they
--     * didn't have fd's
--    */
--    for (msg_i = 0, region_i = 0;
--         region_i < dev->mem->nregions;
--        region_i++) {
--        if (msg_i < fd_num &&
--            msg_reply.payload.memory.regions[msg_i].guest_phys_addr ==
--            dev->mem->regions[region_i].guest_phys_addr) {
--            u->postcopy_client_bases[region_i] =
--                msg_reply.payload.memory.regions[msg_i].userspace_addr;
--            trace_vhost_user_set_mem_table_postcopy(
--                msg_reply.payload.memory.regions[msg_i].userspace_addr,
--                msg.payload.memory.regions[msg_i].userspace_addr,
--                msg_i, region_i);
--            msg_i++;
-+            return -1;
-+        }
++        local_nmi = acpi_data_push(table_data, sizeof *local_nmi);
++        local_nmi->type   = ACPI_APIC_LOCAL_X2APIC_NMI;
++        local_nmi->length = sizeof(*local_nmi);
++        local_nmi->uid    = 0xFFFFFFFF; /* all processors */
++        local_nmi->flags  = cpu_to_le16(0);
++        local_nmi->lint   = 1; /* ACPI_LINT1 */
 +    } else {
-+        if (vhost_user_fill_set_mem_table_msg(u, dev, &msg, fds, &fd_num,
-+                                              true) < 0) {
-+            return -1;
-+        }
++        AcpiMadtLocalNmi *local_nmi;
 +
-+        if (vhost_user_write(dev, &msg, fds, fd_num) < 0) {
-+            return -1;
-+        }
++        local_nmi = acpi_data_push(table_data, sizeof *local_nmi);
++        local_nmi->type         = ACPI_APIC_LOCAL_NMI;
++        local_nmi->length       = sizeof(*local_nmi);
++        local_nmi->processor_id = 0xff; /* all processors */
++        local_nmi->flags        = cpu_to_le16(0);
++        local_nmi->lint         = 1; /* ACPI_LINT1 */
++    }
 +
-+        if (vhost_user_read(dev, &msg_reply) < 0) {
-+            return -1;
-+        }
++    build_header(linker, table_data,
++                 (void *)(table_data->data + madt_start), "APIC",
++                 table_data->len - madt_start, 1, NULL, NULL);
++}
 +
-+        if (msg_reply.hdr.request != VHOST_USER_SET_MEM_TABLE) {
-+            error_report("%s: Received unexpected msg type."
-+                         "Expected %d received %d", __func__,
-+                         VHOST_USER_SET_MEM_TABLE, msg_reply.hdr.request);
-+            return -1;
-+        }
-+
-+        /*
-+         * We're using the same structure, just reusing one of the
-+         * fields, so it should be the same size.
-+         */
-+        if (msg_reply.hdr.size != msg.hdr.size) {
-+            error_report("%s: Unexpected size for postcopy reply "
-+                         "%d vs %d", __func__, msg_reply.hdr.size,
-+                         msg.hdr.size);
-+            return -1;
-+        }
-+
-+        memset(u->postcopy_client_bases, 0,
-+               sizeof(uint64_t) * VHOST_MEMORY_MAX_NREGIONS);
-+
-+        /*
-+         * They're in the same order as the regions that were sent
-+         * but some of the regions were skipped (above) if they
-+         * didn't have fd's
-+         */
-+        for (msg_i = 0, region_i = 0;
-+             region_i < dev->mem->nregions;
-+             region_i++) {
-+            if (msg_i < fd_num &&
-+                msg_reply.payload.memory.regions[msg_i].guest_phys_addr ==
-+                dev->mem->regions[region_i].guest_phys_addr) {
-+                u->postcopy_client_bases[region_i] =
-+                    msg_reply.payload.memory.regions[msg_i].userspace_addr;
-+                trace_vhost_user_set_mem_table_postcopy(
-+                    msg_reply.payload.memory.regions[msg_i].userspace_addr,
-+                    msg.payload.memory.regions[msg_i].userspace_addr,
-+                    msg_i, region_i);
-+                msg_i++;
-+            }
-+        }
-+        if (msg_i != fd_num) {
-+            error_report("%s: postcopy reply not fully consumed "
-+                         "%d vs %zd",
-+                         __func__, msg_i, fd_num);
-+            return -1;
-+        }
-+
-+        /*
-+         * Now we've registered this with the postcopy code, we ack to the
-+         * client, because now we're in the position to be able to deal
-+         * with any faults it generates.
-+         */
-+        /* TODO: Use this for failure cases as well with a bad value. */
-+        msg.hdr.size = sizeof(msg.payload.u64);
-+        msg.payload.u64 = 0; /* OK */
-+        if (vhost_user_write(dev, &msg, NULL, 0) < 0) {
-+            return -1;
-         }
--    }
--    if (msg_i != fd_num) {
--        error_report("%s: postcopy reply not fully consumed "
--                     "%d vs %zd",
--                     __func__, msg_i, fd_num);
--        return -1;
--    }
--    /* Now we've registered this with the postcopy code, we ack to the client,
--     * because now we're in the position to be able to deal with any faults
--     * it generates.
--     */
--    /* TODO: Use this for failure cases as well with a bad value */
--    msg.hdr.size = sizeof(msg.payload.u64);
--    msg.payload.u64 = 0; /* OK */
--    if (vhost_user_write(dev, &msg, NULL, 0) < 0) {
--        return -1;
-     }
+diff --git a/hw/i386/Makefile.objs b/hw/i386/Makefile.objs
+index 8ce1b26533..6abc74551a 100644
+--- a/hw/i386/Makefile.objs
++++ b/hw/i386/Makefile.objs
+@@ -16,4 +16,5 @@ obj-$(CONFIG_VMMOUSE) += vmmouse.o
+ obj-$(CONFIG_PC) += port92.o
  
-     return 0;
-@@ -592,12 +947,17 @@ static int vhost_user_set_mem_table(struct vhost_dev *dev,
-     bool do_postcopy = u->postcopy_listen && u->postcopy_fd.handler;
-     bool reply_supported = virtio_has_feature(dev->protocol_features,
-                                               VHOST_USER_PROTOCOL_F_REPLY_ACK);
-+    bool config_mem_slots =
-+        virtio_has_feature(dev->protocol_features,
-+                           VHOST_USER_PROTOCOL_F_CONFIGURE_MEM_SLOTS);
- 
-     if (do_postcopy) {
--        /* Postcopy has enough differences that it's best done in it's own
-+        /*
-+         * Postcopy has enough differences that it's best done in it's own
-          * version
-          */
--        return vhost_user_set_mem_table_postcopy(dev, mem);
-+        return vhost_user_set_mem_table_postcopy(dev, mem, reply_supported,
-+                                                 config_mem_slots);
-     }
- 
-     VhostUserMsg msg = {
-@@ -608,17 +968,23 @@ static int vhost_user_set_mem_table(struct vhost_dev *dev,
-         msg.hdr.flags |= VHOST_USER_NEED_REPLY_MASK;
-     }
- 
--    if (vhost_user_fill_set_mem_table_msg(u, dev, &msg, fds, &fd_num,
-+    if (config_mem_slots) {
-+        if (vhost_user_add_remove_regions(dev, &msg, reply_supported,
-                                           false) < 0) {
--        return -1;
--    }
-+            return -1;
-+        }
-+    } else {
-+        if (vhost_user_fill_set_mem_table_msg(u, dev, &msg, fds, &fd_num,
-+                                              false) < 0) {
-+            return -1;
-+        }
-+        if (vhost_user_write(dev, &msg, fds, fd_num) < 0) {
-+            return -1;
-+        }
- 
--    if (vhost_user_write(dev, &msg, fds, fd_num) < 0) {
--        return -1;
--    }
--
--    if (reply_supported) {
--        return process_message_reply(dev, &msg);
-+        if (reply_supported) {
-+            return process_message_reply(dev, &msg);
-+        }
-     }
- 
-     return 0;
-diff --git a/docs/interop/vhost-user.rst b/docs/interop/vhost-user.rst
-index b3cf5c3cb5..037eefab0e 100644
---- a/docs/interop/vhost-user.rst
-+++ b/docs/interop/vhost-user.rst
-@@ -1276,8 +1276,37 @@ Master message types
-   QEMU to expose to the guest. At this point, the value returned
-   by the backend will be capped at the maximum number of ram slots
-   which can be supported by vhost-user. Currently that limit is set
--  at VHOST_USER_MAX_RAM_SLOTS = 8 because of underlying protocol
--  limitations.
-+  at VHOST_USER_MAX_RAM_SLOTS = 8.
-+
-+``VHOST_USER_ADD_MEM_REG``
-+  :id: 37
-+  :equivalent ioctl: N/A
-+  :slave payload: memory region
-+
-+  When the ``VHOST_USER_PROTOCOL_F_CONFIGURE_MEM_SLOTS`` protocol
-+  feature has been successfully negotiated, this message is submitted
-+  by the master to the slave. The message payload contains a memory
-+  region descriptor struct, describing a region of guest memory which
-+  the slave device must map in. When the
-+  ``VHOST_USER_PROTOCOL_F_CONFIGURE_MEM_SLOTS`` protocol feature has
-+  been successfully negotiated, along with the
-+  ``VHOST_USER_REM_MEM_REG`` message, this message is used to set and
-+  update the memory tables of the slave device.
-+
-+``VHOST_USER_REM_MEM_REG``
-+  :id: 38
-+  :equivalent ioctl: N/A
-+  :slave payload: memory region
-+
-+  When the ``VHOST_USER_PROTOCOL_F_CONFIGURE_MEM_SLOTS`` protocol
-+  feature has been successfully negotiated, this message is submitted
-+  by the master to the slave. The message payload contains a memory
-+  region descriptor struct, describing a region of guest memory which
-+  the slave device must unmap. When the
-+  ``VHOST_USER_PROTOCOL_F_CONFIGURE_MEM_SLOTS`` protocol feature has
-+  been successfully negotiated, along with the
-+  ``VHOST_USER_ADD_MEM_REG`` message, this message is used to set and
-+  update the memory tables of the slave device.
- 
- Slave message types
- -------------------
+ obj-y += kvmvapic.o
++obj-$(CONFIG_ACPI) += acpi-common.o
+ obj-$(CONFIG_PC) += acpi-build.o
 -- 
 MST
 
