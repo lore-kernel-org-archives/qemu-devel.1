@@ -2,73 +2,54 @@ Return-Path: <SRS0=+PsZ=7Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC201C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 00:02:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BA6CC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 00:06:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8516520853
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 00:02:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8516520853
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id D2FE520835
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 00:06:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2FE520835
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58244 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36702 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjX9h-000768-P0
-	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 20:02:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54256)
+	id 1jjXDB-0001yp-V1
+	for qemu-devel@archiver.kernel.org; Thu, 11 Jun 2020 20:06:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56588)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jjX8z-0006gG-94
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 20:02:01 -0400
-Resent-Date: Thu, 11 Jun 2020 20:02:01 -0400
-Resent-Message-Id: <E1jjX8z-0006gG-94@lists.gnu.org>
-Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21340)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jjX8w-0005de-Uq
- for qemu-devel@nongnu.org; Thu, 11 Jun 2020 20:02:00 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1591920110; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=ExvQDYhg/AdGDFT9GPWKVVeTZrsvYsBhpA1SvHk4OOnGrbIyDB17Obecy55Q5VNU+6XpQFjsE4RqmuI6sQsAkkREIl1J88Us8XROX1LkZ4srhtO0tYVMaoyduF6PVEwKJW4p/SY32SfcpHN/TpugCXoe0NH1D1ITb5DcQ4WFPaQ=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1591920110;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=KGrJZYSSejqzSAWzW6C1mOOlDWq62bhNdg02j7y4YP4=; 
- b=IIvvN0FPC8zv9EhBER8N7LYm83a66wlE+oq06pt3Nw6hJR6h3FID4yZnqf74FTT4+5v5sCb/1wzqOiMnk0zGsblwab9Lrr0XECm0Cn3lBAmMJFmNWvrjIyUBIHsEr1anVNncN3PSUOJtvWe/osF9fVMdpdjcCNSx2LxHy8KnEVw=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1591920109024709.779771451084;
- Thu, 11 Jun 2020 17:01:49 -0700 (PDT)
-Message-ID: <159192010800.1247.9525195647123498948@45ef0f9c86ae>
-In-Reply-To: <20200611165112.30979-1-mst@redhat.com>
-Subject: Re: [PATCH] tests: disassemble-asm.sh: generate AML in readable format
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: mst@redhat.com
-Date: Thu, 11 Jun 2020 17:01:49 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o53.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 19:16:13
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+ (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1jjXC2-0008Lr-ER; Thu, 11 Jun 2020 20:05:10 -0400
+Received: from relay.sw.ru ([185.231.240.75]:52837 helo=relay3.sw.ru)
+ by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1jjXBy-0006IA-K0; Thu, 11 Jun 2020 20:05:10 -0400
+Received: from [172.16.25.136] (helo=localhost.sw.ru)
+ by relay3.sw.ru with esmtp (Exim 4.93)
+ (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1jjXBr-0002Yd-OG; Fri, 12 Jun 2020 03:04:59 +0300
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+To: qemu-block@nongnu.org
+Subject: [PATCH v7 7/9] qcow2.py: Introduce '-j' key to dump in JSON format
+Date: Fri, 12 Jun 2020 03:05:00 +0300
+Message-Id: <1591920302-1002219-8-git-send-email-andrey.shinkevich@virtuozzo.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1591920302-1002219-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+References: <1591920302-1002219-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+Received-SPF: pass client-ip=185.231.240.75;
+ envelope-from=andrey.shinkevich@virtuozzo.com; helo=relay3.sw.ru
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/11 20:05:03
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
 X-Spam_score_int: -18
 X-Spam_score: -1.9
 X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -81,42 +62,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: imammedo@redhat.com, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, qemu-devel@nongnu.org,
+ mreitz@redhat.com, andrey.shinkevich@virtuozzo.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDYxMTE2NTExMi4zMDk3
-OS0xLW1zdEByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUgc29t
-ZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5mb3Jt
-YXRpb246CgpNZXNzYWdlLWlkOiAyMDIwMDYxMTE2NTExMi4zMDk3OS0xLW1zdEByZWRoYXQuY29t
-ClN1YmplY3Q6IFtQQVRDSF0gdGVzdHM6IGRpc2Fzc2VtYmxlLWFzbS5zaDogZ2VuZXJhdGUgQU1M
-IGluIHJlYWRhYmxlIGZvcm1hdApUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9
-PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApn
-aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBk
-aWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9n
-cmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFND
-UklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4
-NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKOTY1NzFlNiB0ZXN0czogZGlz
-YXNzZW1ibGUtYXNtLnNoOiBnZW5lcmF0ZSBBTUwgaW4gcmVhZGFibGUgZm9ybWF0Cgo9PT0gT1VU
-UFVUIEJFR0lOID09PQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBk
-b2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMxNjogCm5ldyBmaWxlIG1vZGUgMTAwNzU1
-CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMzA6IEZJTEU6IHRlc3RzL2RhdGEv
-YWNwaS9kaXNhc3NlbWxlLWFtbC5zaDoxMDoKKyAgICAgICAgZWNobyAiVXNhZ2U6IC4vdGVzdHMv
-ZGF0YS9hY3BpL2Rpc2Fzc2VtbGUtYW1sLnNoIFstbyA8b3V0cHV0LWRpcmVjdG9yeT5dIgoKRVJS
-T1I6IHRyYWlsaW5nIHdoaXRlc3BhY2UKIzMzOiBGSUxFOiB0ZXN0cy9kYXRhL2FjcGkvZGlzYXNz
-ZW1sZS1hbWwuc2g6MTM6CisgICAgJAoKRVJST1I6IHRyYWlsaW5nIHdoaXRlc3BhY2UKIzcwOiBG
-SUxFOiB0ZXN0cy9kYXRhL2FjcGkvZGlzYXNzZW1sZS1hbWwuc2g6NTA6CisgICAgICAgIGlhc2wg
-LWQgLXAgJHthc2x9ICR7ZXh0cmF9ICR7YW1sfSAkCgp0b3RhbDogMiBlcnJvcnMsIDIgd2Fybmlu
-Z3MsIDUyIGxpbmVzIGNoZWNrZWQKCkNvbW1pdCA5NjU3MWU2MzFiZmIgKHRlc3RzOiBkaXNhc3Nl
-bWJsZS1hc20uc2g6IGdlbmVyYXRlIEFNTCBpbiByZWFkYWJsZSBmb3JtYXQpIGhhcyBzdHlsZSBw
-cm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNl
-IHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0gg
-aW4gTUFJTlRBSU5FUlMuCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3
-aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3
-Lm9yZy9sb2dzLzIwMjAwNjExMTY1MTEyLjMwOTc5LTEtbXN0QHJlZGhhdC5jb20vdGVzdGluZy5j
-aGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxs
-eSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVl
-ZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+Add the command key to the qcow2.py arguments list to dump QCOW2
+metadata in JSON format. Here is the suggested way to do that. The
+implementation of the dump in JSON format is in the patch that follows.
+
+Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+---
+ tests/qemu-iotests/qcow2.py        | 20 +++++++++++++++-----
+ tests/qemu-iotests/qcow2_format.py | 18 +++++++++---------
+ 2 files changed, 24 insertions(+), 14 deletions(-)
+
+diff --git a/tests/qemu-iotests/qcow2.py b/tests/qemu-iotests/qcow2.py
+index 8c187e9..b08d8fc 100755
+--- a/tests/qemu-iotests/qcow2.py
++++ b/tests/qemu-iotests/qcow2.py
+@@ -24,16 +24,19 @@ from qcow2_format import (
+ )
+ 
+ 
++dump_json = False
++
++
+ def cmd_dump_header(fd):
+     h = QcowHeader(fd)
+-    h.dump()
++    h.dump(dump_json)
+     print()
+-    h.dump_extensions()
++    h.dump_extensions(dump_json)
+ 
+ 
+ def cmd_dump_header_exts(fd):
+     h = QcowHeader(fd)
+-    h.dump_extensions()
++    h.dump_extensions(dump_json)
+ 
+ 
+ def cmd_set_header(fd, name, value):
+@@ -132,6 +135,11 @@ cmds = [
+ 
+ 
+ def main(filename, cmd, args):
++    global dump_json
++    dump_json = '-j' in sys.argv
++    if dump_json:
++        sys.argv.remove('-j')
++        args.remove('-j')
+     fd = open(filename, "r+b")
+     try:
+         for name, handler, num_args, desc in cmds:
+@@ -149,12 +157,14 @@ def main(filename, cmd, args):
+ 
+ 
+ def usage():
+-    print("Usage: %s <file> <cmd> [<arg>, ...]" % sys.argv[0])
++    print("Usage: %s <file> <cmd> [<arg>, ...] [<key>, ...]" % sys.argv[0])
+     print("")
+     print("Supported commands:")
+     for name, handler, num_args, desc in cmds:
+         print("    %-20s - %s" % (name, desc))
+-
++    print("")
++    print("Supported keys:")
++    print("    %-20s - %s" % ('-j', 'Dump in JSON format'))
+ 
+ if __name__ == '__main__':
+     if len(sys.argv) < 3:
+diff --git a/tests/qemu-iotests/qcow2_format.py b/tests/qemu-iotests/qcow2_format.py
+index c1c2773..a19f3b3 100644
+--- a/tests/qemu-iotests/qcow2_format.py
++++ b/tests/qemu-iotests/qcow2_format.py
+@@ -92,7 +92,7 @@ class Qcow2Struct(metaclass=Qcow2StructMeta):
+         self.__dict__ = dict((field[2], values[i])
+                              for i, field in enumerate(self.fields))
+ 
+-    def dump(self):
++    def dump(self, dump_json=None):
+         for f in self.fields:
+             value = self.__dict__[f[2]]
+             if isinstance(f[1], str):
+@@ -143,10 +143,10 @@ class Qcow2BitmapExt(Qcow2Struct):
+     def load(self, fd):
+         self.read_bitmap_directory(fd)
+ 
+-    def dump(self):
+-        super().dump()
++    def dump(self, dump_json=None):
++        super().dump(dump_json)
+         for bm in self.bitmaps:
+-            bm.dump_bitmap_dir_entry()
++            bm.dump_bitmap_dir_entry(dump_json)
+ 
+ 
+ BME_FLAG_IN_USE = 1 << 0
+@@ -190,7 +190,7 @@ class Qcow2BitmapDirEntry(Qcow2Struct):
+         table = [e[0] for e in struct.iter_unpack('>Q', fd.read(table_size))]
+         self.bitmap_table = Qcow2BitmapTable(table)
+ 
+-    def dump_bitmap_dir_entry(self):
++    def dump_bitmap_dir_entry(self, dump_json=None):
+         print()
+         print(f'{"Bitmap name":<25} {self.name}')
+         for fl in self.bitmap_flags:
+@@ -296,13 +296,13 @@ class QcowHeaderExtension(Qcow2Struct):
+         else:
+             self.obj = None
+ 
+-    def dump(self):
++    def dump(self, dump_json=None):
+         super().dump()
+ 
+         if self.obj is None:
+             print(f'{"data":<25} {self.data_str}')
+         else:
+-            self.obj.dump()
++            self.obj.dump(dump_json)
+ 
+     @classmethod
+     def create(cls, magic, data):
+@@ -405,8 +405,8 @@ class QcowHeader(Qcow2Struct):
+         buf = buf[0:header_bytes-1]
+         fd.write(buf)
+ 
+-    def dump_extensions(self):
++    def dump_extensions(self, dump_json=None):
+         for ex in self.extensions:
+             print('Header extension:')
+-            ex.dump()
++            ex.dump(dump_json)
+             print()
+-- 
+1.8.3.1
+
 
