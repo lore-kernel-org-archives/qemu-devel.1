@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43D15C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 16:09:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15DADC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 16:09:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0F5F820801
+	by mail.kernel.org (Postfix) with ESMTPS id D8C5B20801
 	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 16:09:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AHonzAQx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F5F820801
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jHlHKS5p"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8C5B20801
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53194 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53296 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjmEq-0006bx-Am
-	for qemu-devel@archiver.kernel.org; Fri, 12 Jun 2020 12:09:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58518)
+	id 1jjmEr-0006eN-1O
+	for qemu-devel@archiver.kernel.org; Fri, 12 Jun 2020 12:09:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58522)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jjmDv-0005L0-LQ
+ id 1jjmDv-0005OW-Qb
  for qemu-devel@nongnu.org; Fri, 12 Jun 2020 12:08:07 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38122
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:59826
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jjmDs-00013P-Ec
- for qemu-devel@nongnu.org; Fri, 12 Jun 2020 12:08:06 -0400
+ id 1jjmDu-00013b-0l
+ for qemu-devel@nongnu.org; Fri, 12 Jun 2020 12:08:07 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591978083;
+ s=mimecast20190719; t=1591978085;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=OJ5QpuHxGC44PNW734u7oiMMHq6LfU6fDDTfKL7vXIs=;
- b=AHonzAQxeaYMa2OVJ30zhD44AcdOJnkMB+MIBSgHoGvravzap9/mTOvSfqz6UfH/YsBZ+A
- dzpTVhv7hoYlcMMK1f6sXrRLrkxwXyt9k2JhvfUu8fiIkawCDyIMHuuAPKf26LmfE4UJIF
- dxi0fujyFOBwAojwctPh7ELWOxyFFlM=
+ bh=zlGv0ColsFzFdBWt58Lk3HnUJTk37xOsT1i8UmuRwiU=;
+ b=jHlHKS5p3RxHEJA/WisoEcu/4HsxWLzyV7L9uDx5+iPmkUNQ0LEU68jZijc5o9nOFE8Lc1
+ j3eZSrlaHztU3+nsiJ331BFUltzQOMi4IOUCiSa5Lb627ZCqayE0EX7McnWyvRsUMGyD5H
+ s/tNPkBZaja1kaRNmtsdFBHc1rSWOWg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-231-RPGPZLbJMQSYOeqZAwo1Fg-1; Fri, 12 Jun 2020 12:08:01 -0400
-X-MC-Unique: RPGPZLbJMQSYOeqZAwo1Fg-1
+ us-mta-398-psHKMq66NsuGNbnpcc8mkQ-1; Fri, 12 Jun 2020 12:08:00 -0400
+X-MC-Unique: psHKMq66NsuGNbnpcc8mkQ-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 718A1872FE0;
- Fri, 12 Jun 2020 16:08:00 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C8AB4800053;
+ Fri, 12 Jun 2020 16:07:59 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 052088FF91;
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5AD778FF98;
  Fri, 12 Jun 2020 16:07:59 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 098/116] i386: hvf: Move mmio_buf into CPUX86State
-Date: Fri, 12 Jun 2020 12:07:55 -0400
-Message-Id: <20200612160755.9597-5-pbonzini@redhat.com>
+Subject: [PULL 097/116] i386: hvf: Move lazy_flags into CPUX86State
+Date: Fri, 12 Jun 2020 12:07:54 -0400
+Message-Id: <20200612160755.9597-4-pbonzini@redhat.com>
 In-Reply-To: <20200612160755.9597-1-pbonzini@redhat.com>
 References: <20200612160755.9597-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -72,16 +72,16 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/12 08:07:26
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/12 08:00:42
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -102,106 +102,214 @@ Sender: "Qemu-devel"
 
 From: Roman Bolshakov <r.bolshakov@yadro.com>
 
-There's no similar field in CPUX86State, but it's needed for MMIO traps.
+The lazy flags are still needed for instruction decoder.
 
 Signed-off-by: Roman Bolshakov <r.bolshakov@yadro.com>
-Message-Id: <20200528193758.51454-13-r.bolshakov@yadro.com>
+Message-Id: <20200528193758.51454-12-r.bolshakov@yadro.com>
+[Move struct to target/i386/cpu.h - Paolo]
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- target/i386/cpu.h         |  1 +
- target/i386/hvf/hvf.c     |  5 +++++
- target/i386/hvf/x86.h     |  1 -
- target/i386/hvf/x86_emu.c | 12 ++++++------
- 4 files changed, 12 insertions(+), 7 deletions(-)
+ target/i386/cpu.h           |  6 ++++
+ target/i386/hvf/x86.h       |  6 ----
+ target/i386/hvf/x86_flags.c | 57 ++++++++++++++++++-------------------
+ 3 files changed, 34 insertions(+), 35 deletions(-)
 
 diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index f742ba933f..25a2f4c0c3 100644
+index c2b8bdcbde..f742ba933f 100644
 --- a/target/i386/cpu.h
 +++ b/target/i386/cpu.h
-@@ -1603,6 +1603,7 @@ typedef struct CPUX86State {
+@@ -1366,6 +1366,11 @@ typedef struct CPUCaches {
+         CPUCacheInfo *l3_cache;
+ } CPUCaches;
+ 
++typedef struct HVFX86LazyFlags {
++    target_ulong result;
++    target_ulong auxbits;
++} HVFX86LazyFlags;
++
+ typedef struct CPUX86State {
+     /* standard registers */
+     target_ulong regs[CPU_NB_REGS];
+@@ -1597,6 +1602,7 @@ typedef struct CPUX86State {
+     struct kvm_nested_state *nested_state;
  #endif
  #if defined(CONFIG_HVF)
-     HVFX86LazyFlags hvf_lflags;
-+    void *hvf_mmio_buf;
++    HVFX86LazyFlags hvf_lflags;
      HVFX86EmulatorState *hvf_emul;
  #endif
  
-diff --git a/target/i386/hvf/hvf.c b/target/i386/hvf/hvf.c
-index 4cee496d71..57696c46c7 100644
---- a/target/i386/hvf/hvf.c
-+++ b/target/i386/hvf/hvf.c
-@@ -533,7 +533,11 @@ void hvf_reset_vcpu(CPUState *cpu) {
- 
- void hvf_vcpu_destroy(CPUState *cpu)
- {
-+    X86CPU *x86_cpu = X86_CPU(cpu);
-+    CPUX86State *env = &x86_cpu->env;
-+
-     hv_return_t ret = hv_vcpu_destroy((hv_vcpuid_t)cpu->hvf_fd);
-+    g_free(env->hvf_mmio_buf);
-     assert_hvf_ok(ret);
- }
- 
-@@ -563,6 +567,7 @@ int hvf_init_vcpu(CPUState *cpu)
-     init_decoder();
- 
-     hvf_state->hvf_caps = g_new0(struct hvf_vcpu_caps, 1);
-+    env->hvf_mmio_buf = g_new(char, 4096);
-     env->hvf_emul = g_new0(HVFX86EmulatorState, 1);
- 
-     r = hv_vcpu_create((hv_vcpuid_t *)&cpu->hvf_fd, HV_VCPU_DEFAULT);
 diff --git a/target/i386/hvf/x86.h b/target/i386/hvf/x86.h
-index 2363616c07..483fcea762 100644
+index 6048b5cc74..2363616c07 100644
 --- a/target/i386/hvf/x86.h
 +++ b/target/i386/hvf/x86.h
-@@ -230,7 +230,6 @@ typedef struct x68_segment_selector {
+@@ -228,14 +228,8 @@ typedef struct x68_segment_selector {
+     };
+ } __attribute__ ((__packed__)) x68_segment_selector;
  
+-typedef struct lazy_flags {
+-    target_ulong result;
+-    target_ulong auxbits;
+-} lazy_flags;
+-
  /* Definition of hvf_x86_state is here */
  struct HVFX86EmulatorState {
--    uint8_t mmio_buf[4096];
+-    struct lazy_flags   lflags;
+     uint8_t mmio_buf[4096];
  };
  
- /* useful register access  macros */
-diff --git a/target/i386/hvf/x86_emu.c b/target/i386/hvf/x86_emu.c
-index 1ad2c30e16..d3e289ed87 100644
---- a/target/i386/hvf/x86_emu.c
-+++ b/target/i386/hvf/x86_emu.c
-@@ -187,8 +187,8 @@ void write_val_ext(struct CPUX86State *env, target_ulong ptr, target_ulong val,
- 
- uint8_t *read_mmio(struct CPUX86State *env, target_ulong ptr, int bytes)
- {
--    vmx_read_mem(env_cpu(env), env->hvf_emul->mmio_buf, ptr, bytes);
--    return env->hvf_emul->mmio_buf;
-+    vmx_read_mem(env_cpu(env), env->hvf_mmio_buf, ptr, bytes);
-+    return env->hvf_mmio_buf;
+diff --git a/target/i386/hvf/x86_flags.c b/target/i386/hvf/x86_flags.c
+index 1152cd7234..5ca4f41f5c 100644
+--- a/target/i386/hvf/x86_flags.c
++++ b/target/i386/hvf/x86_flags.c
+@@ -63,7 +63,7 @@
+ #define SET_FLAGS_OSZAPC_SIZE(size, lf_carries, lf_result) { \
+     target_ulong temp = ((lf_carries) & (LF_MASK_AF)) | \
+     (((lf_carries) >> (size - 2)) << LF_BIT_PO); \
+-    env->hvf_emul->lflags.result = (target_ulong)(int##size##_t)(lf_result); \
++    env->hvf_lflags.result = (target_ulong)(int##size##_t)(lf_result); \
+     if ((size) == 32) { \
+         temp = ((lf_carries) & ~(LF_MASK_PDB | LF_MASK_SD)); \
+     } else if ((size) == 16) { \
+@@ -73,7 +73,7 @@
+     } else { \
+         VM_PANIC("unimplemented");  \
+     } \
+-    env->hvf_emul->lflags.auxbits = (target_ulong)(uint32_t)temp; \
++    env->hvf_lflags.auxbits = (target_ulong)(uint32_t)temp; \
  }
  
+ /* carries, result */
+@@ -100,10 +100,10 @@
+     } else { \
+         VM_PANIC("unimplemented");      \
+     } \
+-    env->hvf_emul->lflags.result = (target_ulong)(int##size##_t)(lf_result); \
+-    target_ulong delta_c = (env->hvf_emul->lflags.auxbits ^ temp) & LF_MASK_CF; \
++    env->hvf_lflags.result = (target_ulong)(int##size##_t)(lf_result); \
++    target_ulong delta_c = (env->hvf_lflags.auxbits ^ temp) & LF_MASK_CF; \
+     delta_c ^= (delta_c >> 1); \
+-    env->hvf_emul->lflags.auxbits = (target_ulong)(uint32_t)(temp ^ delta_c); \
++    env->hvf_lflags.auxbits = (target_ulong)(uint32_t)(temp ^ delta_c); \
+ }
  
-@@ -489,9 +489,9 @@ static void exec_ins_single(struct CPUX86State *env, struct x86_decode *decode)
-     target_ulong addr = linear_addr_size(env_cpu(env), RDI(env),
-                                          decode->addressing_size, R_ES);
- 
--    hvf_handle_io(env_cpu(env), DX(env), env->hvf_emul->mmio_buf, 0,
-+    hvf_handle_io(env_cpu(env), DX(env), env->hvf_mmio_buf, 0,
-                   decode->operand_size, 1);
--    vmx_write_mem(env_cpu(env), addr, env->hvf_emul->mmio_buf,
-+    vmx_write_mem(env_cpu(env), addr, env->hvf_mmio_buf,
-                   decode->operand_size);
- 
-     string_increment_reg(env, R_EDI, decode);
-@@ -512,9 +512,9 @@ static void exec_outs_single(struct CPUX86State *env, struct x86_decode *decode)
+ /* carries, result */
+@@ -117,9 +117,8 @@
+ void SET_FLAGS_OxxxxC(CPUX86State *env, uint32_t new_of, uint32_t new_cf)
  {
-     target_ulong addr = decode_linear_addr(env, decode, RSI(env), R_DS);
+     uint32_t temp_po = new_of ^ new_cf;
+-    env->hvf_emul->lflags.auxbits &= ~(LF_MASK_PO | LF_MASK_CF);
+-    env->hvf_emul->lflags.auxbits |= (temp_po << LF_BIT_PO) |
+-                                     (new_cf << LF_BIT_CF);
++    env->hvf_lflags.auxbits &= ~(LF_MASK_PO | LF_MASK_CF);
++    env->hvf_lflags.auxbits |= (temp_po << LF_BIT_PO) | (new_cf << LF_BIT_CF);
+ }
  
--    vmx_read_mem(env_cpu(env), env->hvf_emul->mmio_buf, addr,
-+    vmx_read_mem(env_cpu(env), env->hvf_mmio_buf, addr,
-                  decode->operand_size);
--    hvf_handle_io(env_cpu(env), DX(env), env->hvf_emul->mmio_buf, 1,
-+    hvf_handle_io(env_cpu(env), DX(env), env->hvf_mmio_buf, 1,
-                   decode->operand_size, 1);
+ void SET_FLAGS_OSZAPC_SUB32(CPUX86State *env, uint32_t v1, uint32_t v2,
+@@ -215,27 +214,27 @@ void SET_FLAGS_OSZAPC_LOGIC8(CPUX86State *env, uint8_t v1, uint8_t v2,
  
-     string_increment_reg(env, R_ESI, decode);
+ bool get_PF(CPUX86State *env)
+ {
+-    uint32_t temp = (255 & env->hvf_emul->lflags.result);
+-    temp = temp ^ (255 & (env->hvf_emul->lflags.auxbits >> LF_BIT_PDB));
++    uint32_t temp = (255 & env->hvf_lflags.result);
++    temp = temp ^ (255 & (env->hvf_lflags.auxbits >> LF_BIT_PDB));
+     temp = (temp ^ (temp >> 4)) & 0x0F;
+     return (0x9669U >> temp) & 1;
+ }
+ 
+ void set_PF(CPUX86State *env, bool val)
+ {
+-    uint32_t temp = (255 & env->hvf_emul->lflags.result) ^ (!val);
+-    env->hvf_emul->lflags.auxbits &= ~(LF_MASK_PDB);
+-    env->hvf_emul->lflags.auxbits |= (temp << LF_BIT_PDB);
++    uint32_t temp = (255 & env->hvf_lflags.result) ^ (!val);
++    env->hvf_lflags.auxbits &= ~(LF_MASK_PDB);
++    env->hvf_lflags.auxbits |= (temp << LF_BIT_PDB);
+ }
+ 
+ bool get_OF(CPUX86State *env)
+ {
+-    return ((env->hvf_emul->lflags.auxbits + (1U << LF_BIT_PO)) >> LF_BIT_CF) & 1;
++    return ((env->hvf_lflags.auxbits + (1U << LF_BIT_PO)) >> LF_BIT_CF) & 1;
+ }
+ 
+ bool get_CF(CPUX86State *env)
+ {
+-    return (env->hvf_emul->lflags.auxbits >> LF_BIT_CF) & 1;
++    return (env->hvf_lflags.auxbits >> LF_BIT_CF) & 1;
+ }
+ 
+ void set_OF(CPUX86State *env, bool val)
+@@ -252,45 +251,45 @@ void set_CF(CPUX86State *env, bool val)
+ 
+ bool get_AF(CPUX86State *env)
+ {
+-    return (env->hvf_emul->lflags.auxbits >> LF_BIT_AF) & 1;
++    return (env->hvf_lflags.auxbits >> LF_BIT_AF) & 1;
+ }
+ 
+ void set_AF(CPUX86State *env, bool val)
+ {
+-    env->hvf_emul->lflags.auxbits &= ~(LF_MASK_AF);
+-    env->hvf_emul->lflags.auxbits |= val << LF_BIT_AF;
++    env->hvf_lflags.auxbits &= ~(LF_MASK_AF);
++    env->hvf_lflags.auxbits |= val << LF_BIT_AF;
+ }
+ 
+ bool get_ZF(CPUX86State *env)
+ {
+-    return !env->hvf_emul->lflags.result;
++    return !env->hvf_lflags.result;
+ }
+ 
+ void set_ZF(CPUX86State *env, bool val)
+ {
+     if (val) {
+-        env->hvf_emul->lflags.auxbits ^=
+-         (((env->hvf_emul->lflags.result >> LF_SIGN_BIT) & 1) << LF_BIT_SD);
++        env->hvf_lflags.auxbits ^=
++         (((env->hvf_lflags.result >> LF_SIGN_BIT) & 1) << LF_BIT_SD);
+         /* merge the parity bits into the Parity Delta Byte */
+-        uint32_t temp_pdb = (255 & env->hvf_emul->lflags.result);
+-        env->hvf_emul->lflags.auxbits ^= (temp_pdb << LF_BIT_PDB);
++        uint32_t temp_pdb = (255 & env->hvf_lflags.result);
++        env->hvf_lflags.auxbits ^= (temp_pdb << LF_BIT_PDB);
+         /* now zero the .result value */
+-        env->hvf_emul->lflags.result = 0;
++        env->hvf_lflags.result = 0;
+     } else {
+-        env->hvf_emul->lflags.result |= (1 << 8);
++        env->hvf_lflags.result |= (1 << 8);
+     }
+ }
+ 
+ bool get_SF(CPUX86State *env)
+ {
+-    return ((env->hvf_emul->lflags.result >> LF_SIGN_BIT) ^
+-            (env->hvf_emul->lflags.auxbits >> LF_BIT_SD)) & 1;
++    return ((env->hvf_lflags.result >> LF_SIGN_BIT) ^
++            (env->hvf_lflags.auxbits >> LF_BIT_SD)) & 1;
+ }
+ 
+ void set_SF(CPUX86State *env, bool val)
+ {
+     bool temp_sf = get_SF(env);
+-    env->hvf_emul->lflags.auxbits ^= (temp_sf ^ val) << LF_BIT_SD;
++    env->hvf_lflags.auxbits ^= (temp_sf ^ val) << LF_BIT_SD;
+ }
+ 
+ void lflags_to_rflags(CPUX86State *env)
+@@ -305,7 +304,7 @@ void lflags_to_rflags(CPUX86State *env)
+ 
+ void rflags_to_lflags(CPUX86State *env)
+ {
+-    env->hvf_emul->lflags.auxbits = env->hvf_emul->lflags.result = 0;
++    env->hvf_lflags.auxbits = env->hvf_lflags.result = 0;
+     set_OF(env, env->eflags & CC_O);
+     set_SF(env, env->eflags & CC_S);
+     set_ZF(env, env->eflags & CC_Z);
 -- 
 2.26.2
+
 
 
