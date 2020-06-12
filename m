@@ -2,75 +2,80 @@ Return-Path: <SRS0=+PsZ=7Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98030C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 14:05:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E853C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 14:47:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6D762206A4
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 14:05:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D762206A4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 32ADD206A4
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 14:47:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32ADD206A4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41550 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54984 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjkIl-0007Mu-Nn
-	for qemu-devel@archiver.kernel.org; Fri, 12 Jun 2020 10:04:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51910)
+	id 1jjkxh-0001DU-Bg
+	for qemu-devel@archiver.kernel.org; Fri, 12 Jun 2020 10:47:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47704)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jjkIA-0006wq-FZ
- for qemu-devel@nongnu.org; Fri, 12 Jun 2020 10:04:22 -0400
-Received: from mout.kundenserver.de ([212.227.126.135]:39461)
- by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jjkI8-0000y4-ME
- for qemu-devel@nongnu.org; Fri, 12 Jun 2020 10:04:22 -0400
-Received: from localhost.localdomain ([82.252.135.106]) by
- mrelayeu.kundenserver.de (mreue011 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1Myb09-1j0JhZ1My5-00yxJY; Fri, 12 Jun 2020 16:04:04 +0200
-From: Laurent Vivier <laurent@vivier.eu>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] softfloat,m68k: disable floatx80_invalid_encoding() for m68k
-Date: Fri, 12 Jun 2020 16:04:00 +0200
-Message-Id: <20200612140400.2130118-1-laurent@vivier.eu>
-X-Mailer: git-send-email 2.26.2
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jjkw9-0008Oq-T9
+ for qemu-devel@nongnu.org; Fri, 12 Jun 2020 10:45:41 -0400
+Received: from indium.canonical.com ([91.189.90.7]:38536)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jjkw7-0000PJ-SV
+ for qemu-devel@nongnu.org; Fri, 12 Jun 2020 10:45:41 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jjkw6-0000Lp-Ft
+ for <qemu-devel@nongnu.org>; Fri, 12 Jun 2020 14:45:38 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 772E32E8025
+ for <qemu-devel@nongnu.org>; Fri, 12 Jun 2020 14:45:38 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:a9jKNi+yn8udGdyoILk5oiydQ93tYVinB3TssE+G77Eh+uueACy
- oJm1XFIzfYCgy4XaxQx0pFoZbwXsJd8ZIcP05K8hgaF9rhLg7UhilLoeiCrmrVceWVWa98x
- aJu2sBOMeYY51a6xM0scNIdQiDz9zrbqPkFxhRjZbfJ7JsbktNcrDqEaAAJIXo/5nvAQgYc
- NNDo5FJ574ez7buOjm79Q==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:etJL1QB3ZMc=:i2aAXrN8fQqVSxDflPZx69
- fCarQhzoIEj3ePYG85Zwg+iDXf/6bpD0rvNm+J6EIHyIwKCDVsZvIlSWaxg+43h5AkGRjtHWN
- kqGVKUnEEnfqKeDAsmoKWBH2jJWaXYwdBEMEZIugFFeG+qW7V/1Sx35u+PDIH+rD692JKUNJF
- /EvmZheKNAMAbRt8FAfsefNRvhSA048/NXiNiplZBp69yT3u2ZPvSiPYDUW9vjQcKmxg3dZhR
- DfXGEF6b/98GvLoXYo39lFnaFWqUmGR3r7QmtP0LPgD3TDsM426g2EZgnybiHpqw1TJkMZ7Az
- TfWVZNSLwwOpBFfzk+QbxXVpoPpJmOKLE5cffo1KZY6q3LzAiQePIK6xQ7xCxZKGt8IkbzAeK
- g5UjIwZgPbU8mIMEIzMYw1hf1yh6OsgTCGtVeqfI4UbLWy/lfpUb01y9e9+FPS1QC6u5E+8h1
- mcfKIhUJRsGJNcN5cBHCww9PxS8eyLq6g4bCkpGpMADcKtoEqhW2NkCRVlnIhUeEABHNpogqx
- KUe52wJBIAxE05yple6YyNziuPBQkZ79OKrNMizSUZ8SFwBKSAXSUcncU1WRv1ExlDyfGgmEi
- kCzyPspwpGL9W4PNSz50mvetjwD+bQsmEWO3ln52UD/3jAFcnsfO6KU4563QzTknNMFwJKb8x
- hDLsr6WoYhjyl7cd4kzq8uZOy23mqsbNyqqCPXNuzk/jRCkhR/NwLqJFiWfwFYr4sMLzUBDMF
- 0P8eW1OwSMKXUVGVZTydrv+kZ0eo4eMtTjTHVGC+kaJ2eJJk2tGcnZK+4K5GNbHpzz1E4/tei
- EOPf1EBAqaugSJXJEccQlJsNVDrpptLsKe4PtkP4VSIo5OEkY0wnzpiQvCvven8IfRSVGLD
-Received-SPF: none client-ip=212.227.126.135; envelope-from=laurent@vivier.eu;
- helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/12 10:04:18
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -28
-X-Spam_score: -2.9
-X-Spam_bar: --
-X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 12 Jun 2020 14:38:18 -0000
+From: Christophe Lyon <1883268@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: christophe-lyon
+X-Launchpad-Bug-Reporter: Christophe Lyon (christophe-lyon)
+X-Launchpad-Bug-Modifier: Christophe Lyon (christophe-lyon)
+References: <159197267869.7647.15246075911938911102.malonedeb@gac.canonical.com>
+Message-Id: <159197269832.5453.12699045239215110244.malone@chaenomeles.canonical.com>
+Subject: [Bug 1883268] Re: random errors on aarch64 when executing
+ __aarch64_cas8_acq_rel
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="b190cebbf563f89e480a8b57f641753c8196bda0";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 07cfb13d8ac307396306b5c6b5aa6d06ccae0187
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/12 10:45:37
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,84 +84,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Laurent Vivier <laurent@vivier.eu>,
- KONRAD Frederic <frederic.konrad@adacore.com>,
- Pierre Muller <pierre@freepascal.org>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Aurelien Jarno <aurelien@aurel32.net>
+Reply-To: Bug 1883268 <1883268@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-According to the comment, this definition of invalid encoding is given
-by intel developer's manual, and doesn't comply with 680x0 FPU.
+** Attachment added: "Binary"
+   https://bugs.launchpad.net/qemu/+bug/1883268/+attachment/5383273/+files/=
+sync-4.exe
 
-With m68k, the explicit integer bit can be zero in the case of:
- - zeros                (exp == 0, mantissa == 0)
- - denormalized numbers (exp == 0, mantissa != 0)
- - unnormalized numbers (exp != 0, exp < 0x7FFF)
- - infinities           (exp == 0x7FFF, mantissa == 0)
- - not-a-numbers        (exp == 0x7FFF, mantissa != 0)
+-- =
 
-For infinities and NaNs, the explicit integer bit can be either one or
-zero.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1883268
 
-The IEEE 754 standard does not define a zero integer bit. Such a number
-is an unnormalized number. Hardware does not directly support
-denormalized and unnormalized numbers, but implicitly supports them by
-trapping them as unimplemented data types, allowing efficient conversion
-in software.
+Title:
+  random errors on aarch64 when executing __aarch64_cas8_acq_rel
 
-See "M68000 FAMILY PROGRAMMER’S REFERENCE MANUAL",
-    "1.6 FLOATING-POINT DATA TYPES"
+Status in QEMU:
+  New
 
-We will implement in the m68k TCG emulator the FP_UNIMP exception to
-trap into the kernel to normalize the number. In case of linux-user,
-the number will be normalized by QEMU.
+Bug description:
+  Hello,
 
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- include/fpu/softfloat.h | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+  Since I upgraded to qemu-5.0 when executing the GCC testsuite,
+  I've noticed random failures of g++.dg/ext/sync-4.C.
 
-diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
-index 16ca697a73b7..f6eda4ca8e6c 100644
---- a/include/fpu/softfloat.h
-+++ b/include/fpu/softfloat.h
-@@ -791,7 +791,31 @@ static inline bool floatx80_unordered_quiet(floatx80 a, floatx80 b,
- *----------------------------------------------------------------------------*/
- static inline bool floatx80_invalid_encoding(floatx80 a)
- {
-+#if defined(TARGET_M68K)
-+    /*-------------------------------------------------------------------------
-+    | With m68k, the explicit integer bit can be zero in the case of:
-+    | - zeros                (exp == 0, mantissa == 0)
-+    | - denormalized numbers (exp == 0, mantissa != 0)
-+    | - unnormalized numbers (exp != 0, exp < 0x7FFF)
-+    | - infinities           (exp == 0x7FFF, mantissa == 0)
-+    | - not-a-numbers        (exp == 0x7FFF, mantissa != 0)
-+    |
-+    | For infinities and NaNs, the explicit integer bit can be either one or
-+    | zero.
-+    |
-+    | The IEEE 754 standard does not define a zero integer bit. Such a number
-+    | is an unnormalized number. Hardware does not directly support
-+    | denormalized and unnormalized numbers, but implicitly supports them by
-+    | trapping them as unimplemented data types, allowing efficient conversion
-+    | in software.
-+    |
-+    | See "M68000 FAMILY PROGRAMMER’S REFERENCE MANUAL",
-+    |     "1.6 FLOATING-POINT DATA TYPES"
-+    *------------------------------------------------------------------------*/
-+    return false;
-+#else
-     return (a.low & (1ULL << 63)) == 0 && (a.high & 0x7FFF) != 0;
-+#endif
- }
- 
- #define floatx80_zero make_floatx80(0x0000, 0x0000000000000000LL)
--- 
-2.26.2
+  I'm attaching the source of the testcase, the binary executable and
+  the qemu traces (huge, 111MB!) starting at main (with qemu-aarch64
+  -cpu cortex-a57 -R 0 -d
+  in_asm,int,exec,cpu,unimp,guest_errors,nochain)
 
+  The traces where generated by a CI build, I built the executable
+  manually but I expect it to be the same as the one executed by CI.
+
+  In seems the problem occurs in f13, which leads to a call to abort()
+
+  The preprocessed version of f13/t13 are as follows:
+  static bool f13 (void *p) __attribute__ ((noinline));
+  static bool f13 (void *p)
+  {
+    return (__sync_bool_compare_and_swap((ditype*)p, 1, 2));
+  }
+  static void t13 ()
+  {
+    try {
+      f13(0);
+    }
+    catch (...) {
+      return;
+    }
+    abort();
+  }
+
+  =
+
+  When looking at the execution traces at address 0x00400c9c, main calls f1=
+3, which in turn calls __aarch64_cas8_acq_rel (at 0x00401084)
+  __aarch64_cas8_acq_rel returns to f13 (address 0x0040113c), then f13 retu=
+rns to main (0x0040108c) which then calls abort (0x00400ca0)
+
+  I'm not quite sure what's wrong :-(
+
+  I've not noticed such random problems with native aarch64 hardware.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1883268/+subscriptions
 
