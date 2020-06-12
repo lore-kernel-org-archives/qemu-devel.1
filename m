@@ -7,75 +7,77 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C80EC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 14:56:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22EDDC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 14:58:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 37BBC20691
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 14:56:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DD01D20691
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 14:58:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VRUdgZ/S"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37BBC20691
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Iag6ZhhP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD01D20691
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56408 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34660 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjl6y-0007s4-EF
-	for qemu-devel@archiver.kernel.org; Fri, 12 Jun 2020 10:56:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49936)
+	id 1jjl8Y-00023W-2H
+	for qemu-devel@archiver.kernel.org; Fri, 12 Jun 2020 10:58:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49722)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jjl27-0006Sc-TK
- for qemu-devel@nongnu.org; Fri, 12 Jun 2020 10:51:51 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:29416
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jjl1p-0005oE-Ox
+ for qemu-devel@nongnu.org; Fri, 12 Jun 2020 10:51:33 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:54386
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jjl26-0001QP-9H
- for qemu-devel@nongnu.org; Fri, 12 Jun 2020 10:51:51 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jjl1n-0001OR-Tu
+ for qemu-devel@nongnu.org; Fri, 12 Jun 2020 10:51:33 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591973509;
+ s=mimecast20190719; t=1591973491;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=i525bms7gqVVwpF2fPgVg2EaF8HaC1eOaVMCjQtCrsc=;
- b=VRUdgZ/S8+7Rc7+UPBpQFEJOtprDM25goi3eRRwbu2sw0Qc6lMHkweJ8QU+eELmsVyXakY
- AH8N4HL+bQ4k+RF7tnahfeK7Akk4LPh184l0Ujm4RnWgZulMmHf2M7OCdI6LuztNOJJI3j
- a9kJh+zF2g7AiEchUUvdlwYxXIkzxK4=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-189-zhmBKMwNN-aToIxBO1t0NQ-1; Fri, 12 Jun 2020 10:51:47 -0400
-X-MC-Unique: zhmBKMwNN-aToIxBO1t0NQ-1
-Received: by mail-wm1-f69.google.com with SMTP id 14so2515144wmi.8
- for <qemu-devel@nongnu.org>; Fri, 12 Jun 2020 07:51:47 -0700 (PDT)
+ bh=KpsP6snzFwXir/Xzc+9Qv0RUmc46Jj6u+9GlR3QS4bo=;
+ b=Iag6ZhhP1jMPgMJlwvD/q5HIre97nOgUsVZN+Gr1rwBtmh7ssoIw7EWW6ipJQEobWEIX36
+ 69E0vQrqb3yWq0tTEujyfDCt1AUWec4/BLygO1NhcS0uaWawZoHBLn6BALTsMwiWrcUa9i
+ H8S4VNylv9YpuF/qzv/2PRBlSSLPPqo=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-317-T1IOaocINeyIfa33qLyWMQ-1; Fri, 12 Jun 2020 10:51:29 -0400
+X-MC-Unique: T1IOaocINeyIfa33qLyWMQ-1
+Received: by mail-wr1-f70.google.com with SMTP id c14so3961574wrw.11
+ for <qemu-devel@nongnu.org>; Fri, 12 Jun 2020 07:51:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=i525bms7gqVVwpF2fPgVg2EaF8HaC1eOaVMCjQtCrsc=;
- b=JkJ/6a9E+x50SUWLr/x+1IW26lfAfoRZ6IRbUeQ6THY4+yoEcAiLxQAriURhYHw2KL
- O0XryidKGhoIWg/VtszcqOfdFn3TNA4UXa9mY0sE4ywqIbNu3FVm1JaVoevNvOMD2W+p
- BjVAUQb0/biXycONsyMsZSmeeSvvw3Mxnnh4dEfXsNxQyK/WL/bk6YKCeTty2e14QivH
- ML8DyoMRHDxb5ZJLj0lSGnNj6+gqmDVBv0xxGFMOBCrbwljvADKK9KUGYHVzR8SOKL2g
- F9sSjw437SbJK7gzvRLrPrWVJe96iGrNj0kqiYvYf0F8W5gnjFf8axIU3wBmNegVy13s
- UQXQ==
-X-Gm-Message-State: AOAM532+fFYqOxnhpyyrxqqRdEtf5bjOeLfH+2kkfbnUQbf19x3l/UhD
- sGOxvWUn0q8edBFfn0R+wsdmT9KZ2M5i2d4fH+um+AZJbbFpKeFCxlOnhNxDmQbSbgJjub6IOYL
- QWjs7XxnGUJBQVRc=
-X-Received: by 2002:adf:f30d:: with SMTP id i13mr14579521wro.146.1591973506546; 
- Fri, 12 Jun 2020 07:51:46 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxDFmlycbv7zP4AvmREggXcVcaIbtb3vGSvUl1amEK1TwlPCLglGdLKXIRdAKy/x7dnr0ggYg==
-X-Received: by 2002:adf:f30d:: with SMTP id i13mr14579509wro.146.1591973506376; 
- Fri, 12 Jun 2020 07:51:46 -0700 (PDT)
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=KpsP6snzFwXir/Xzc+9Qv0RUmc46Jj6u+9GlR3QS4bo=;
+ b=jpZRCfeIJg/S2Np+Mhb98xs4ExECfzCrVXaX/m388DVjt3+yeej64KeK5cB89TFDkG
+ qrN8LmY9Z9DBmHKpqnKgBEyaLp4Y2u16QJBlRDSeDu1FC3dDO8avgZqDZ33mlvLUyrdy
+ snmYnbUwMB9eYrFsdty8L9c6B+BvVN7PjiVqjWeVKyVx07+hDRyZltDrT7W5U4PtClkf
+ nuWsltyNfvhH3+I/+3I1+We0JKJxtYSPEJ5vh627eVFie2Hy/3mHRaN+R0KPcwrK/wAw
+ StbrJeOklE7BzciKhfY1YlTYh8WgQo6BnGyzSJ2mUSd+vEutpOksXlrCQSKFsC2CuLeY
+ iydw==
+X-Gm-Message-State: AOAM530b/25DePiEhU3WaR/wCf/v2NN0HqWA2dduTtDFrPO0rTiWIr2l
+ qzeU83DnyVgcOwxdIk0Nhgh18mWEBa2fV4eKIrlfnNDrNCrCG0CtST86u1loyScBmruh7/662cV
+ ZvtmpEDomcrq0oP4=
+X-Received: by 2002:a5d:5704:: with SMTP id a4mr15280569wrv.389.1591973488111; 
+ Fri, 12 Jun 2020 07:51:28 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy8xJDnl0b3jVB+hsMKJucrZNmC19qNHHbLXV7tqtyW/zHJTYVWw/AyvpbR8PnZJTsMmU1gSQ==
+X-Received: by 2002:a5d:5704:: with SMTP id a4mr15280547wrv.389.1591973487935; 
+ Fri, 12 Jun 2020 07:51:27 -0700 (PDT)
 Received: from redhat.com (bzq-79-178-18-124.red.bezeqint.net. [79.178.18.124])
- by smtp.gmail.com with ESMTPSA id s5sm9019681wme.37.2020.06.12.07.51.44
+ by smtp.gmail.com with ESMTPSA id x18sm8853389wmi.35.2020.06.12.07.51.26
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 12 Jun 2020 07:51:45 -0700 (PDT)
-Date: Fri, 12 Jun 2020 10:51:44 -0400
+ Fri, 12 Jun 2020 07:51:27 -0700 (PDT)
+Date: Fri, 12 Jun 2020 10:51:25 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 19/58] tests: tpm-emu: Remove assert on TPM2_ST_NO_SESSIONS
-Message-ID: <20200612141917.9446-20-mst@redhat.com>
+Subject: [PULL v2 11/58] acpi: move aml builder code for parallel device
+Message-ID: <20200612141917.9446-12-mst@redhat.com>
 References: <20200612141917.9446-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20200612141917.9446-1-mst@redhat.com>
@@ -83,18 +85,19 @@ X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
 X-Mutt-Fcc: =sent
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=mst@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/12 08:07:26
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=mst@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/12 08:07:17
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -108,49 +111,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Eric Auger <eric.auger@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Stefan Berger <stefanb@linux.ibm.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Eric Auger <eric.auger@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
 
-bios-tables-test executes SeaBIOS. Indeed FW is needed to
-fetch tables from QEMU and put them into the guest RAM. Also
-the FW patches cross table pointers. At some point, SeaBIOS
-ends up calling the TPM2_CC_HierarchyControl command with
-TPM2_ST_SESSIONS tag, most probably steming from
-tpm_set_failure/tpm20_hierarchycontrol SeaBIOS call path.
-This causes an assert() in the qtest tpm emulation code.
+Also adds support for multiple LPT devices.
 
-As the goal here is not to boot SeaBIOS completely but just
-let it grab the ACPI tables and consolidate them, let's just
-remove the assert().
-
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-
-Message-Id: <20200609125409.24179-4-eric.auger@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <20200515150421.25479-8-kraxel@redhat.com>
 ---
- tests/qtest/tpm-emu.c | 1 -
- 1 file changed, 1 deletion(-)
+ hw/char/parallel.c   | 22 ++++++++++++++++++++++
+ hw/i386/acpi-build.c | 23 -----------------------
+ 2 files changed, 22 insertions(+), 23 deletions(-)
 
-diff --git a/tests/qtest/tpm-emu.c b/tests/qtest/tpm-emu.c
-index c43ac4aef8..298d0eec74 100644
---- a/tests/qtest/tpm-emu.c
-+++ b/tests/qtest/tpm-emu.c
-@@ -49,7 +49,6 @@ static void *tpm_emu_tpm_thread(void *data)
-         s->tpm_msg->tag = be16_to_cpu(s->tpm_msg->tag);
-         s->tpm_msg->len = be32_to_cpu(s->tpm_msg->len);
-         g_assert_cmpint(s->tpm_msg->len, >=, minhlen);
--        g_assert_cmpint(s->tpm_msg->tag, ==, TPM2_ST_NO_SESSIONS);
+diff --git a/hw/char/parallel.c b/hw/char/parallel.c
+index 8dd67d1375..c0f34bf924 100644
+--- a/hw/char/parallel.c
++++ b/hw/char/parallel.c
+@@ -28,6 +28,7 @@
+ #include "qemu/module.h"
+ #include "chardev/char-parallel.h"
+ #include "chardev/char-fe.h"
++#include "hw/acpi/aml-build.h"
+ #include "hw/irq.h"
+ #include "hw/isa/isa.h"
+ #include "hw/qdev-properties.h"
+@@ -568,6 +569,25 @@ static void parallel_isa_realizefn(DeviceState *dev, Error **errp)
+                              s, "parallel");
+ }
  
-         s->tpm_msg = g_realloc(s->tpm_msg, s->tpm_msg->len);
-         qio_channel_read(ioc, (char *)&s->tpm_msg->code,
++static void parallel_isa_build_aml(ISADevice *isadev, Aml *scope)
++{
++    ISAParallelState *isa = ISA_PARALLEL(isadev);
++    Aml *dev;
++    Aml *crs;
++
++    crs = aml_resource_template();
++    aml_append(crs, aml_io(AML_DECODE16, isa->iobase, isa->iobase, 0x08, 0x08));
++    aml_append(crs, aml_irq_no_flags(isa->isairq));
++
++    dev = aml_device("LPT%d", isa->index + 1);
++    aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0400")));
++    aml_append(dev, aml_name_decl("_UID", aml_int(isa->index + 1)));
++    aml_append(dev, aml_name_decl("_STA", aml_int(0xf)));
++    aml_append(dev, aml_name_decl("_CRS", crs));
++
++    aml_append(scope, dev);
++}
++
+ /* Memory mapped interface */
+ static uint64_t parallel_mm_readfn(void *opaque, hwaddr addr, unsigned size)
+ {
+@@ -624,9 +644,11 @@ static Property parallel_isa_properties[] = {
+ static void parallel_isa_class_initfn(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
++    ISADeviceClass *isa = ISA_DEVICE_CLASS(klass);
+ 
+     dc->realize = parallel_isa_realizefn;
+     dc->vmsd = &vmstate_parallel_isa;
++    isa->build_aml = parallel_isa_build_aml;
+     device_class_set_props(dc, parallel_isa_properties);
+     set_bit(DEVICE_CATEGORY_INPUT, dc->categories);
+ }
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index 2cafad03e2..58fe505fb6 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -1173,28 +1173,6 @@ static Aml *build_mouse_device_aml(void)
+     return dev;
+ }
+ 
+-static void build_lpt_device_aml(Aml *scope)
+-{
+-    Aml *dev;
+-    Aml *crs;
+-
+-    if (!memory_region_present(get_system_io(), 0x0378)) {
+-        return;
+-    }
+-
+-    dev = aml_device("LPT");
+-    aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0400")));
+-
+-    aml_append(dev, aml_name_decl("_STA", aml_int(0xf)));
+-
+-    crs = aml_resource_template();
+-    aml_append(crs, aml_io(AML_DECODE16, 0x0378, 0x0378, 0x08, 0x08));
+-    aml_append(crs, aml_irq_no_flags(7));
+-    aml_append(dev, aml_name_decl("_CRS", crs));
+-
+-    aml_append(scope, dev);
+-}
+-
+ static void build_isa_devices_aml(Aml *table)
+ {
+     ISADevice *fdc = pc_find_fdc0();
+@@ -1208,7 +1186,6 @@ static void build_isa_devices_aml(Aml *table)
+     if (fdc) {
+         aml_append(scope, build_fdc_device_aml(fdc));
+     }
+-    build_lpt_device_aml(scope);
+ 
+     if (ambiguous) {
+         error_report("Multiple ISA busses, unable to define IPMI ACPI data");
 -- 
 MST
 
