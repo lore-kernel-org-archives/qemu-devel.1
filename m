@@ -7,75 +7,78 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0319CC433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 14:56:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8072FC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 14:56:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C2E5A20691
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 14:56:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4D4C220691
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 14:56:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RT3V9VC9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2E5A20691
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VNyOHpfA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D4C220691
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54314 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55040 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjl6a-0006Z8-Uy
-	for qemu-devel@archiver.kernel.org; Fri, 12 Jun 2020 10:56:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49694)
+	id 1jjl6h-00077V-H0
+	for qemu-devel@archiver.kernel.org; Fri, 12 Jun 2020 10:56:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50014)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jjl1n-0005hJ-2R
- for qemu-devel@nongnu.org; Fri, 12 Jun 2020 10:51:31 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:29730
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jjl2H-0006jt-Dn
+ for qemu-devel@nongnu.org; Fri, 12 Jun 2020 10:52:02 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57353
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jjl1l-0001O2-CE
- for qemu-devel@nongnu.org; Fri, 12 Jun 2020 10:51:30 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jjl2D-0001S3-Il
+ for qemu-devel@nongnu.org; Fri, 12 Jun 2020 10:52:01 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591973488;
+ s=mimecast20190719; t=1591973516;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=eElz0rYHeKUNjkzhwC6MFQcNn/IDvjC4Rb+mBNhdY5E=;
- b=RT3V9VC9o+Vsf98pqeXklh4zw1xFMXrSxXGyvacytp2ZD4euS8Nz7+k5zZIPt3anEce34Y
- X+V1yLahQuinOS2sWnlTtFhgYJWq6Iev8KwUpJ9ibTiVILXJD2b/CO4J3PQtnoc9QybK9K
- 9C/YlnUiPPq2yUx2Krc0GdbqJJzEPho=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-487--Zh3xB-UP0myQ8nuMJHo3g-1; Fri, 12 Jun 2020 10:51:26 -0400
-X-MC-Unique: -Zh3xB-UP0myQ8nuMJHo3g-1
-Received: by mail-wm1-f70.google.com with SMTP id p24so2034505wma.4
- for <qemu-devel@nongnu.org>; Fri, 12 Jun 2020 07:51:26 -0700 (PDT)
+ bh=NgqF724ZlpYDgxpsvGgomKXglTKeYnsN1WEfd42scpg=;
+ b=VNyOHpfAObih3Q60mgSthocDRqwfPocxyMOpRpiixxHq+7kXxX5AfbUpkjNsh0ft7YgqY/
+ lpULqZUwJdFItO9qVGbtvT1MqgM9wISJvZMvQptCpnCLyucP3gAqytKU1lt9Q+MWO9Y+F9
+ G/d+xNZcnLW+Pasjv5sJGWIgn2D1wjs=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-322-wPwPLDA6MZ2vO67S_WECWg-1; Fri, 12 Jun 2020 10:51:54 -0400
+X-MC-Unique: wPwPLDA6MZ2vO67S_WECWg-1
+Received: by mail-wr1-f72.google.com with SMTP id w16so3976208wru.18
+ for <qemu-devel@nongnu.org>; Fri, 12 Jun 2020 07:51:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=eElz0rYHeKUNjkzhwC6MFQcNn/IDvjC4Rb+mBNhdY5E=;
- b=ZfzWY1yLbklLPtIeQlA/0Tov2Btl3XhPVPvqXtkQpMu3/oRB0fpPTR0beQianxLgEu
- wZ94s5FPmN5YHaOZQYUrjX1EUhQ+uoRAXahzfmgLstUg0P7H9NdV/S/8qj5FnTHJOpl6
- HweIFyLHYoevCj9hHUyE16uJ6Gw/2tmswJNQch8VwOEyHNbp56+OxRAhUNXgRKPQS3nZ
- l+WcHmy94J8j1TIbE1QfUKly3XEym6i1qj0trQa3Za+2MNWEk0Acs+HimQBcBWRwB+DF
- o9gpv2IdlwuzLyMiiWOY3BXs4Qzi9Ku64PPzlNDHZ9m6St++xew7fLPcsVdLTXfJqDmb
- x4hg==
-X-Gm-Message-State: AOAM530WedUJoKr9FfRbbiT6cV6A2jFzjpeLItxPEX0qRwX0kZtA419F
- v3yXXX5vPN+NMLa6nxLHDTNKReeVowPjI2fU2kKbgIwiCnDQA1fDVvN/f5h28gUneKxU8qxubcn
- TvdzcYKYZvnCygU8=
-X-Received: by 2002:adf:a18b:: with SMTP id u11mr15250682wru.102.1591973485467; 
- Fri, 12 Jun 2020 07:51:25 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxlegNpe6tsxrdR/sdAWfEXbFwlkS2Pz4v7NRMTJq4RF5jPAhrC7VNd/2w46+/o/xO8jkai3A==
-X-Received: by 2002:adf:a18b:: with SMTP id u11mr15250657wru.102.1591973485236; 
- Fri, 12 Jun 2020 07:51:25 -0700 (PDT)
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=NgqF724ZlpYDgxpsvGgomKXglTKeYnsN1WEfd42scpg=;
+ b=ojbUNp3/pPMXkDsSyV3xNMIskCNFsdZQ42SwTuLJ+at02IkEubvcSGiYmrq4YskQ05
+ 6YVrXQk5I8vxd60BFe4wlgmH/vHT15+4OmPtwVLg80/kOdYj0JYrjYfjEF/VD2EVUmSl
+ ws5jXuS9pFAWmBbdK0D5d/syOo/GUOCnL5JBgqwBirZc6TtRJHTElZVQqQZL1fTrH8Zb
+ L1CiOjcHZT7Z+Jd1jFL7A3wHA8DWbe5Ow+1YZvDbkS5HWWwrWOUFgiAwJ/gKm3zyq++O
+ Y0xgYJlGwZd1XkKqnyhd/0HYItXCZN1B6Hbj3sP/NnSRQRKKEF9EUw73Pcv8BSPIyp+L
+ lgLw==
+X-Gm-Message-State: AOAM531Ee0m/IXV2gTdaFBXSwShTwmvFQepiUGRRyfaLTz6rEPQIR+mF
+ lC3jGunMMIMmWyyVxFqk8Ve673pBXvE/l3StM4CsyBizqi76dCmkQV6KlN1Bep/ZjbsHJw5dcim
+ VsPv6Wb0Jh8dbVZ8=
+X-Received: by 2002:a1c:c904:: with SMTP id f4mr13775290wmb.69.1591973513430; 
+ Fri, 12 Jun 2020 07:51:53 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzKGK6kZ7bJZt+ZRB9Ra7NjW85+BqxOmHfzGKkZXtXQhVBBOpwtN7uQeoTnx6kp4Fdh7EABRA==
+X-Received: by 2002:a1c:c904:: with SMTP id f4mr13775267wmb.69.1591973513175; 
+ Fri, 12 Jun 2020 07:51:53 -0700 (PDT)
 Received: from redhat.com (bzq-79-178-18-124.red.bezeqint.net. [79.178.18.124])
- by smtp.gmail.com with ESMTPSA id 88sm11327904wre.45.2020.06.12.07.51.24
+ by smtp.gmail.com with ESMTPSA id o18sm9407093wme.19.2020.06.12.07.51.51
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 12 Jun 2020 07:51:24 -0700 (PDT)
-Date: Fri, 12 Jun 2020 10:51:23 -0400
+ Fri, 12 Jun 2020 07:51:52 -0700 (PDT)
+Date: Fri, 12 Jun 2020 10:51:51 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 10/58] acpi: parallel: don't use _STA method
-Message-ID: <20200612141917.9446-11-mst@redhat.com>
+Subject: [PULL v2 22/58] virtio-balloon: fix free page hinting without an
+ iothread
+Message-ID: <20200612141917.9446-23-mst@redhat.com>
 References: <20200612141917.9446-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20200612141917.9446-1-mst@redhat.com>
@@ -83,18 +86,19 @@ X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
 X-Mutt-Fcc: =sent
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=mst@redhat.com;
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=mst@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/12 08:07:26
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/12 08:00:42
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -109,91 +113,115 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+ David Hildenbrand <david@redhat.com>, qemu-stable@nongnu.org,
+ Alexander Duyck <alexander.duyck@gmail.com>, Alexander Bulekov <alxndr@bu.edu>,
+ Wei Wang <wei.w.wang@intel.com>,
+ Alexander Duyck <alexander.h.duyck@linux.intel.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Gerd Hoffmann <kraxel@redhat.com>
+From: David Hildenbrand <david@redhat.com>
 
-The _STA method dates back to the days where we had a static DSDT.  The
-device is listed in the DSDT table unconditionally and the _STA method
-checks a bit in the isa bridge pci config space to figure whenever a
-given is isa device is present or not, then evaluates to 0x0f (present)
-or 0x00 (absent).
+In case we don't have an iothread, we mark the feature as abscent but
+still add the queue. 'free_page_bh' remains set to NULL.
 
-These days the DSDT is generated by qemu anyway, so if a device is not
-present we can simply drop it from the DSDT instead.
+qemu-system-i386 \
+        -M microvm \
+        -nographic \
+        -device virtio-balloon-device,free-page-hint=true \
+        -nographic \
+        -display none \
+        -monitor none \
+        -serial none \
+        -qtest stdio
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Message-Id: <20200515150421.25479-7-kraxel@redhat.com>
+Doing a "write 0xc0000e30 0x24
+0x030000000300000003000000030000000300000003000000030000000300000003000000"
+
+We will trigger a SEGFAULT. Let's move the check and bail out.
+
+While at it, move the static initializations to instance_init().
+free_page_report_status and block_iothread are implicitly set to the
+right values (0/false) already, so drop the initialization.
+
+Reviewed-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Fixes: c13c4153f76d ("virtio-balloon: VIRTIO_BALLOON_F_FREE_PAGE_HINT")
+Reported-by: Alexander Bulekov <alxndr@bu.edu>
+Cc: qemu-stable@nongnu.org
+Cc: Wei Wang <wei.w.wang@intel.com>
+Cc: Michael S. Tsirkin <mst@redhat.com>
+Cc: Philippe Mathieu-Daudé <philmd@redhat.com>
+Cc: Alexander Duyck <alexander.duyck@gmail.com>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+Message-Id: <20200520100439.19872-2-david@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/i386/acpi-build.c | 29 ++++++++---------------------
- 1 file changed, 8 insertions(+), 21 deletions(-)
+ hw/virtio/virtio-balloon.c | 33 ++++++++++++++++-----------------
+ 1 file changed, 16 insertions(+), 17 deletions(-)
 
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 6de25f6484..2cafad03e2 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -1173,39 +1173,26 @@ static Aml *build_mouse_device_aml(void)
-     return dev;
- }
+diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
+index 065cd450f1..7ff6a7aa7c 100644
+--- a/hw/virtio/virtio-balloon.c
++++ b/hw/virtio/virtio-balloon.c
+@@ -789,6 +789,13 @@ static void virtio_balloon_device_realize(DeviceState *dev, Error **errp)
+         return;
+     }
  
--static Aml *build_lpt_device_aml(void)
-+static void build_lpt_device_aml(Aml *scope)
- {
-     Aml *dev;
-     Aml *crs;
--    Aml *method;
--    Aml *if_ctx;
--    Aml *else_ctx;
--    Aml *zero = aml_int(0);
--    Aml *is_present = aml_local(0);
-+
-+    if (!memory_region_present(get_system_io(), 0x0378)) {
++    if (virtio_has_feature(s->host_features, VIRTIO_BALLOON_F_FREE_PAGE_HINT) &&
++        !s->iothread) {
++        error_setg(errp, "'free-page-hint' requires 'iothread' to be set");
++        virtio_cleanup(vdev);
 +        return;
 +    }
- 
-     dev = aml_device("LPT");
-     aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0400")));
- 
--    method = aml_method("_STA", 0, AML_NOTSERIALIZED);
--    aml_append(method, aml_store(aml_name("LPEN"), is_present));
--    if_ctx = aml_if(aml_equal(is_present, zero));
--    {
--        aml_append(if_ctx, aml_return(aml_int(0x00)));
--    }
--    aml_append(method, if_ctx);
--    else_ctx = aml_else();
--    {
--        aml_append(else_ctx, aml_return(aml_int(0x0f)));
--    }
--    aml_append(method, else_ctx);
--    aml_append(dev, method);
-+    aml_append(dev, aml_name_decl("_STA", aml_int(0xf)));
- 
-     crs = aml_resource_template();
-     aml_append(crs, aml_io(AML_DECODE16, 0x0378, 0x0378, 0x08, 0x08));
-     aml_append(crs, aml_irq_no_flags(7));
-     aml_append(dev, aml_name_decl("_CRS", crs));
- 
--    return dev;
-+    aml_append(scope, dev);
- }
- 
- static void build_isa_devices_aml(Aml *table)
-@@ -1221,7 +1208,7 @@ static void build_isa_devices_aml(Aml *table)
-     if (fdc) {
-         aml_append(scope, build_fdc_device_aml(fdc));
++
+     s->ivq = virtio_add_queue(vdev, 128, virtio_balloon_handle_output);
+     s->dvq = virtio_add_queue(vdev, 128, virtio_balloon_handle_output);
+     s->svq = virtio_add_queue(vdev, 128, virtio_balloon_receive_stats);
+@@ -797,24 +804,11 @@ static void virtio_balloon_device_realize(DeviceState *dev, Error **errp)
+                            VIRTIO_BALLOON_F_FREE_PAGE_HINT)) {
+         s->free_page_vq = virtio_add_queue(vdev, VIRTQUEUE_MAX_SIZE,
+                                            virtio_balloon_handle_free_page_vq);
+-        s->free_page_report_status = FREE_PAGE_REPORT_S_STOP;
+-        s->free_page_report_cmd_id =
+-                           VIRTIO_BALLOON_FREE_PAGE_REPORT_CMD_ID_MIN;
+-        s->free_page_report_notify.notify =
+-                                       virtio_balloon_free_page_report_notify;
+         precopy_add_notifier(&s->free_page_report_notify);
+-        if (s->iothread) {
+-            object_ref(OBJECT(s->iothread));
+-            s->free_page_bh = aio_bh_new(iothread_get_aio_context(s->iothread),
+-                                       virtio_ballloon_get_free_page_hints, s);
+-            qemu_mutex_init(&s->free_page_lock);
+-            qemu_cond_init(&s->free_page_cond);
+-            s->block_iothread = false;
+-        } else {
+-            /* Simply disable this feature if the iothread wasn't created. */
+-            s->host_features &= ~(1 << VIRTIO_BALLOON_F_FREE_PAGE_HINT);
+-            virtio_error(vdev, "iothread is missing");
+-        }
++
++        object_ref(OBJECT(s->iothread));
++        s->free_page_bh = aio_bh_new(iothread_get_aio_context(s->iothread),
++                                     virtio_ballloon_get_free_page_hints, s);
      }
--    aml_append(scope, build_lpt_device_aml());
-+    build_lpt_device_aml(scope);
+     reset_stats(s);
+ }
+@@ -892,6 +886,11 @@ static void virtio_balloon_instance_init(Object *obj)
+ {
+     VirtIOBalloon *s = VIRTIO_BALLOON(obj);
  
-     if (ambiguous) {
-         error_report("Multiple ISA busses, unable to define IPMI ACPI data");
++    qemu_mutex_init(&s->free_page_lock);
++    qemu_cond_init(&s->free_page_cond);
++    s->free_page_report_cmd_id = VIRTIO_BALLOON_FREE_PAGE_REPORT_CMD_ID_MIN;
++    s->free_page_report_notify.notify = virtio_balloon_free_page_report_notify;
++
+     object_property_add(obj, "guest-stats", "guest statistics",
+                         balloon_stats_get_all, NULL, NULL, s);
+ 
 -- 
 MST
 
