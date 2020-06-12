@@ -2,121 +2,108 @@ Return-Path: <SRS0=+PsZ=7Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01CA9C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 16:41:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28A15C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 16:42:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BFF38207ED
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 16:41:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E6B66207ED
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 16:42:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=syrmia.com header.i=@syrmia.com header.b="QnU/K7TJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFF38207ED
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=syrmia.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cpPWeVwG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6B66207ED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34536 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35482 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjmkV-0007BQ-He
-	for qemu-devel@archiver.kernel.org; Fri, 12 Jun 2020 12:41:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49668)
+	id 1jjmkl-0007aJ-5Y
+	for qemu-devel@archiver.kernel.org; Fri, 12 Jun 2020 12:42:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49734)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <Filip.Bozuta@syrmia.com>)
- id 1jjmjf-0006Wd-Ij
- for qemu-devel@nongnu.org; Fri, 12 Jun 2020 12:40:55 -0400
-Received: from mail-eopbgr50134.outbound.protection.outlook.com
- ([40.107.5.134]:25837 helo=EUR03-VE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <Filip.Bozuta@syrmia.com>)
- id 1jjmjd-0007g9-DW
- for qemu-devel@nongnu.org; Fri, 12 Jun 2020 12:40:55 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Ibt6+y7fGF+s+wxGr+bOPyxLQTXDb00EBrjdDPv1/z8niR6bAlwIVlP1NxgCfNCFARBLZE7Jtf31VTLD7CQ8e3tAT5aMtDA3XsDXoDVmJokB0SHFHXXBwuC9zJSMzOJCjQwdSdVAL4lZ7CgtN8/R6fsnJvE1E1aRMOwB4idbT9hEosxuA8NM6nRu2yV2egAaTjxltwD0nG6wwNNe/nXlYOmpznhXh6NqvgkUaPHkt2Dj2yeQsIxiU069bOBqC6dG04xACxvb55btbeD+GjsLyPuDtNs9u9881Kf3z8+QOSil7n6Ypxgm8FNXyckTVC2m2DZhBJm4/XBD/Jqb5BZitQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=O/D83u8MP/6De2mojCuZdYBZpjqTWXoK/aHqMgf0uR4=;
- b=HXYXBMAkzBbudRn1NkfPE/BlE4SgdDBN/fPjVlBiegipyrzvjMN+RhUol4GZUb1H9ghJlqigu0dImoCfqgvg4mUWtGcH6cx5HuPETRPOkp0NZIQYfm8Wib3r+UkaJE9zpLwCf8pNvaaXMpS/KKx7pUNaif/NUCD4CBxlkuk+iuOnZK6lGjHIA4gt1qf7db/M75R2jV7SN//d44Dt7yfu7JcHv//Lt6gEUjouqmH6hcX+jPvfQQ62p+ADAl1VMDn8VJ5mZbAILanfOSXkmzcGZOuPPcGvjlzsY4N0Iu/NyqIC+HAUudf9KWalKJAP8xMOXaA9BW6cjZ+XRxein32wRQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=syrmia.com; dmarc=pass action=none header.from=syrmia.com;
- dkim=pass header.d=syrmia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=syrmia.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=O/D83u8MP/6De2mojCuZdYBZpjqTWXoK/aHqMgf0uR4=;
- b=QnU/K7TJAD5PRasD5ArtrlwBa+UcGAZg/BZOyj5AClW6DObeovBONBYErQijoS6qPD7pobAyBihZuAOmNVu6utssd3BmWmIYtQmPCugkAssTuceyEcS0zLnYOAcUD9iTQwCHlzHusSPsJAP84TRNV45nP1Qqh4ru2VCyVkpZhGk=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=syrmia.com;
-Received: from AM6PR03MB5233.eurprd03.prod.outlook.com (2603:10a6:20b:d1::19)
- by AM6PR03MB4072.eurprd03.prod.outlook.com (2603:10a6:20b:24::14)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3088.22; Fri, 12 Jun
- 2020 16:40:16 +0000
-Received: from AM6PR03MB5233.eurprd03.prod.outlook.com
- ([fe80::98f0:b948:78a8:f618]) by AM6PR03MB5233.eurprd03.prod.outlook.com
- ([fe80::98f0:b948:78a8:f618%7]) with mapi id 15.20.3066.023; Fri, 12 Jun 2020
- 16:40:16 +0000
-From: Filip Bozuta <filip.bozuta@syrmia.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 1/2] linux-user: Add thunk argument types for SIOCGSTAMP and
- SIOCGSTAMPNS
-Date: Fri, 12 Jun 2020 18:40:00 +0200
-Message-Id: <20200612164001.27405-2-filip.bozuta@syrmia.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200612164001.27405-1-filip.bozuta@syrmia.com>
-References: <20200612164001.27405-1-filip.bozuta@syrmia.com>
-Content-Type: text/plain
-X-ClientProxiedBy: LO2P265CA0444.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:e::24) To AM6PR03MB5233.eurprd03.prod.outlook.com
- (2603:10a6:20b:d1::19)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jjmju-0006kx-2o
+ for qemu-devel@nongnu.org; Fri, 12 Jun 2020 12:41:10 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:20883
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jjmjs-0007mK-5l
+ for qemu-devel@nongnu.org; Fri, 12 Jun 2020 12:41:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591980067;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=x4xBB9UESeUa7inym1PxyNQUxva3dRzfQlnrXIl/x1I=;
+ b=cpPWeVwGCdEplMJygD4Shw4zgx9ozXLPVVSnj0hCAv+wBdVuYnoTOWwN0ukom61NWlOO1h
+ L25sLhQU/qR5DiHFGWFHWa7dXJH3K1uhr80uUgzmr8zpSrgTga3W0D1WhZUOfPw20dg2JE
+ pdn9BLPIlhP3bzL9WtztRP9Eox8mgDU=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-475-JsXyLLC-P-CuXv-DPi0IdQ-1; Fri, 12 Jun 2020 12:41:05 -0400
+X-MC-Unique: JsXyLLC-P-CuXv-DPi0IdQ-1
+Received: by mail-wr1-f71.google.com with SMTP id e7so4242130wrp.14
+ for <qemu-devel@nongnu.org>; Fri, 12 Jun 2020 09:41:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=x4xBB9UESeUa7inym1PxyNQUxva3dRzfQlnrXIl/x1I=;
+ b=JauyGJnyrw7xFBobzM+p+vCpxJ0R0d7niqNew5Rwz4EYblHw/1G4FGu/f1hcvGlCjK
+ dK90UnCb6ZhTq4StfXPrsolMckVKx19RfvcgwMRWil3KmII8gC07MtJLpdE7IBrZcCBT
+ jrUf97JpbH9I28fPNogrH983AoxP3ynQK+lK/64sjp27cQSIjG8LfsmvwiaVEZaU5272
+ LmgR2j6aUZEDHFRu7HJhKsPmpzt+oM9Q6xZjGhT6tzWKTEK5iry4Qq8XmZiGqTMQJ6rw
+ rzpX8Q97nuAHdQ5m/lULCRDXmiAMqKUy3tRt9Ohvx3bDGtDAaJqHOCSigfs8scTsp7Hk
+ BBDw==
+X-Gm-Message-State: AOAM532CGoQKSV0T29coWAIXkAFBW3MfJj14c2PmnTjkc7GEFFV7O/Gs
+ aRE7zybxCLCuMpl/2uVj0r1a0wi5K6ssrt/qldZlRYDJknKNGgvBMO05YD7l2sk4/F1miDyuwxD
+ D7vFXA/zBZV0w2cM=
+X-Received: by 2002:adf:ef83:: with SMTP id d3mr15052085wro.145.1591980064055; 
+ Fri, 12 Jun 2020 09:41:04 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzm6mo8cMyTI3N2evBuP3T64kHlurE+EnGChJr60rSXOTP2pluFKjeYO/+34Gh80oS4JBAarQ==
+X-Received: by 2002:adf:ef83:: with SMTP id d3mr15052056wro.145.1591980063709; 
+ Fri, 12 Jun 2020 09:41:03 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:29ed:810e:962c:aa0d?
+ ([2001:b07:6468:f312:29ed:810e:962c:aa0d])
+ by smtp.gmail.com with ESMTPSA id z6sm10699672wrh.79.2020.06.12.09.41.02
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 12 Jun 2020 09:41:03 -0700 (PDT)
+Subject: Re: [PATCH v2 0/6] softfloat, target/i386: fprem, fprem1 fixes
+To: Joseph Myers <joseph@codesourcery.com>, qemu-devel@nongnu.org,
+ aurelien@aurel32.net, peter.maydell@linaro.org, alex.bennee@linaro.org,
+ laurent@vivier.eu, rth@twiddle.net, ehabkost@redhat.com
+References: <alpine.DEB.2.21.2006081653080.23637@digraph.polyomino.org.uk>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <eb560234-5bdc-e78a-a9c0-c823839f2010@redhat.com>
+Date: Fri, 12 Jun 2020 18:41:02 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from bozuta-ubuntu-18.syrmia.com (46.240.135.226) by
- LO2P265CA0444.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:e::24) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3088.18 via Frontend Transport; Fri, 12 Jun 2020 16:40:16 +0000
-X-Mailer: git-send-email 2.17.1
-X-Originating-IP: [46.240.135.226]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 45a63c1f-4eb5-438b-773d-08d80eef4958
-X-MS-TrafficTypeDiagnostic: AM6PR03MB4072:
-X-Microsoft-Antispam-PRVS: <AM6PR03MB407223BE18C5352E13E9EAF4EB810@AM6PR03MB4072.eurprd03.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
-X-Forefront-PRVS: 0432A04947
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: K9/VE7EInpfMqNNTFfMpy/EPpoGTbIC8u/yLcpFyrao4s3cOrvkbYCAb3Q4r+XBSGuAdKE82tKQoPdt1Te6x2yJzAlSBW2mE35IrbqqzvBg2NkdfRMWlVhC7wpL7aUS64yDPoictPiSO1UfPlMbf1Qfs1yLlSkwmf3JSccS5LMpJU1B0Qian3Gpx6+uMyv/XT5yoWiuiU5gth2WZTwvKOjaZn+pUqHZ+5AnkOnMqGiMsUhLvluwK69vCRfTXFPJvyl4xMZPHEsXmFKQ0apQaw0pZOhixYtjErdY3TSTBUVL737KZ1PAoTTWfIGJqtzjmf8Shejfwv4aLioRzKSdSbg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM6PR03MB5233.eurprd03.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(136003)(346002)(39830400003)(376002)(396003)(366004)(8936002)(66476007)(86362001)(2616005)(52116002)(66556008)(956004)(66946007)(36756003)(26005)(6666004)(83380400001)(508600001)(44832011)(186003)(16526019)(7696005)(316002)(4326008)(5660300002)(8676002)(2906002)(6916009)(6486002)(1076003);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: 79qzpJ6So8l1RxkK/lIIK1G4xHTyrhIVLpznupsNlAOn7RDERXTYAHTdu+we6uwEUksT/7ZozPiYba1NpcbGMpYcz2F3fafUa0nR2MJgADrzTJ/4vQQTfHSJ92tB56nupWmnzpBVnI0T0ifhaynnS5G7PpS+ZHhwnLHTcj0PYiZnT/utQtvNk6jyTUy0FlzDCbOAZ9DnBbJxWWB829peXDU+xRxYKmS3XT4kRvgftSPu1ZnNTUK+8GqwIUqiGgGX/vKmrxCmFdR7fseFpFaaosZEsu+sEKkgLcBngJkUzjSu8D/V9C518rxDSIfpoo2GeGeR5tnIvK8WyBQ/NMcBRVtLJHr30sB4WXY+DD67tIeTYIT70bfgUVWs3yilKwPI74xq7t7IiQHemsgpY4lANx013gwaLhUDVonRXmHLk7EZsFFHpfqpvPyrKZewpNGktJorow8ao8CDLRAOPeXZYxarb4ULJiSSccN/KeOOekw=
-X-OriginatorOrg: syrmia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 45a63c1f-4eb5-438b-773d-08d80eef4958
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jun 2020 16:40:16.5041 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 19214a73-c1ab-4e19-8f59-14bdcb09a66e
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: RUhUuHAJm4V0EGIqUsLdpVDkx+Ah4YxjMPNnvPSGIbBOEBYDEQFTUEqx2U7bhWHmDL/A7Glk8sGBAPyPXH2Oag==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR03MB4072
-Received-SPF: pass client-ip=40.107.5.134;
- envelope-from=Filip.Bozuta@syrmia.com;
- helo=EUR03-VE1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/12 12:40:51
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -37
-X-Spam_score: -3.8
+In-Reply-To: <alpine.DEB.2.21.2006081653080.23637@digraph.polyomino.org.uk>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/12 08:07:17
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
 X-Spam_bar: ---
-X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -129,94 +116,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: laurent@vivier.eu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Filip Bozuta <Filip.Bozuta@syrmia.com>
+On 08/06/20 18:54, Joseph Myers wrote:
+> The x87 floating-point emulation of the fprem and fprem1 instructions
+> works via conversion to and from double.  This is inherently
+> unsuitable for a good emulation of any floatx80 operation.  This patch
+> series adapts the softfloat floatx80_rem implementation to be suitable
+> for these instructions and uses it to reimplement them.
+> 
+> There is an existing test for these instructions, test-i386-fprem.c,
+> based on comparison of output.  It produces 1679695 lines of output,
+> and before this patch series 415422 of those lines are different on
+> hardware from the output produced by QEMU.  Some of those differences
+> are because QEMU's x87 emulation does not yet produce the "denormal
+> operand" exception; ignoring such differences (modifying the output
+> from a native run not to report that exception), there are still
+> 398833 different lines.  This patch series reduces that latter number
+> to 1 (that one difference being because of missing checks for
+> floating-point stack underflow, another global issue with the x87
+> emulation), or 35517 different lines without the correction for lack
+> of denormal operand exception support.
+> 
+> Several fixes to and new features in the softfloat support for this
+> operation are needed; floatx80_mod, previously present in the m68k
+> code only, is made generic and unified with floatx80_rem in a new
+> floatx80_modrem of which floatx80_mod and floatx80_rem are thin
+> wrappers.  The only architectures using float*_rem for other formats
+> are arm (FPA emulation) and openrisc (instructions that have been
+> removed in the latest architecture version); they do not appear to
+> need any of the new features, and all the bugs fixed are specific to
+> floatx80, so no changes are made to the remainder implementation for
+> those formats.
+> 
+> A new feature added is returning the low bits of the quotient from
+> floatx80_modrem, as needed for both x87 and m68k.  The logic used to
+> determine the low 7 bits of the quotient for m68k
+> (target/m68k/fpu_helper.c:make_quotient) appears completely bogus (it
+> looks at the result of converting the remainder to integer, the
+> quotient having been discarded by that point); this patch series does
+> not change that to use the new interface, but the m68k maintainers may
+> wish to do so.
+> 
+> The Intel instruction set documentation leaves unspecified the exact
+> number of bits by which the remainder instructions reduce the operand
+> each time.  The AMD documentation gives a specific formula, which
+> empirically Intel processors follow as well, and that formula is
+> implemented in the code.  The AMD documentation also specifies that
+> flags other than C2 are cleared in the partial remainder case, whereas
+> the Intel manual is silent on that (but the processors do appear to
+> clear those flags); this patch implements that flag clearing, and
+> keeps the existing flag clearing in cases where the instructions raise
+> "invalid" (although it seems hardware in fact only clears some but not
+> all flags in that case, leaving other flags unchanged).
+> 
+> The Intel manuals include an inaccurate table asserting that (finite
+> REM 0) should raise "divide by zero"; actually, in accordance with
+> IEEE semantics, it raises "invalid".  The AMD manuals inaccurately say
+> for both fprem and fprem1 that if the exponent difference is negative,
+> the numerator is returned unchanged, which is correct (apart from
+> normalizing pseudo-denormals) for fprem but not for fprem1 (and the
+> old QEMU code had an incorrect optimization following the AMD manuals
+> for fprem1).
+> 
+> Changes in version 2 of the patch series: fix comment formatting and
+> combine patches 6 and 7.
+> 
+> Joseph Myers (6):
+>   softfloat: merge floatx80_mod and floatx80_rem
+>   softfloat: fix floatx80 remainder pseudo-denormal check for zero
+>   softfloat: do not return pseudo-denormal from floatx80 remainder
+>   softfloat: do not set denominator high bit for floatx80 remainder
+>   softfloat: return low bits of quotient from floatx80_modrem
+>   target/i386: reimplement fprem, fprem1 using floatx80 operations
+> 
+>  fpu/softfloat.c          |  87 ++++++++++++++++++----
+>  include/fpu/softfloat.h  |   3 +
+>  target/i386/fpu_helper.c | 156 ++++++++++++---------------------------
+>  target/m68k/softfloat.c  |  83 ---------------------
+>  target/m68k/softfloat.h  |   1 -
+>  5 files changed, 122 insertions(+), 208 deletions(-)
+> 
 
-Socket ioctls SIOCGSTAMP and SIOCGSTAMPNS, used for timestamping the socket
-connection, are defined in file "ioctls.h" differently from other ioctls.
-The reason for this difference is explained in the comments above their definition.
-These ioctls didn't have defined thunk argument types before changes from this
-patch. They have special handling functions ("do_ioctl_SIOCGSTAMP" and
-"do_ioctl_SIOCGSTAMPNS") that take care of setting values for approppriate argument
-types (struct timeval and struct timespec) and thus no thunk argument types were
-needed for their implementation. But this patch adds those argument type definitions
-in file "syscall_types.h" and "ioctls.h" as it is needed for printing arguments
-of these ioctls with strace.
+Queued, thanks.
 
-Implementation notes:
-
-    There are two variants of these ioctls: SIOCGSTAMP_OLD/SIOCGSTAM_NEW and
-    SIOCGSTAMPNS_OLD/SIOCGSTAMPNS_NEW. One is the old existing definition and the
-    other is the 2038 safe variant used for 32-bit architectures. These variants
-    use types "struct timeval/timeval64" and "struct timespec/timespec64" respectively.
-    That is the reason why corresponding structure definitions were added in file
-    "syscall_types.h". STRUCT_timeval definition was already inside the file as
-    it is used by another implemented ioctl.
-
-Signed-off-by: Filip Bozuta <Filip.Bozuta@syrmia.com>
----
- linux-user/ioctls.h        | 12 ++++++++----
- linux-user/syscall_types.h | 12 ++++++++++++
- 2 files changed, 20 insertions(+), 4 deletions(-)
-
-diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-index 0defa1d8c1..68d43f71cc 100644
---- a/linux-user/ioctls.h
-+++ b/linux-user/ioctls.h
-@@ -279,13 +279,17 @@
-    * FIXME: create a macro to define this kind of entry
-    */
-   { TARGET_SIOCGSTAMP_OLD, TARGET_SIOCGSTAMP_OLD,
--    "SIOCGSTAMP_OLD", IOC_R, do_ioctl_SIOCGSTAMP },
-+    "SIOCGSTAMP_OLD", IOC_R, do_ioctl_SIOCGSTAMP,
-+    { MK_PTR(MK_STRUCT(STRUCT_timeval)) } },
-   { TARGET_SIOCGSTAMPNS_OLD, TARGET_SIOCGSTAMPNS_OLD,
--    "SIOCGSTAMPNS_OLD", IOC_R, do_ioctl_SIOCGSTAMPNS },
-+    "SIOCGSTAMPNS_OLD", IOC_R, do_ioctl_SIOCGSTAMPNS,
-+    { MK_PTR(MK_STRUCT(STRUCT_timespec)) } },
-   { TARGET_SIOCGSTAMP_NEW, TARGET_SIOCGSTAMP_NEW,
--    "SIOCGSTAMP_NEW", IOC_R, do_ioctl_SIOCGSTAMP },
-+    "SIOCGSTAMP_NEW", IOC_R, do_ioctl_SIOCGSTAMP,
-+    { MK_PTR(MK_STRUCT(STRUCT_timeval64)) } },
-   { TARGET_SIOCGSTAMPNS_NEW, TARGET_SIOCGSTAMPNS_NEW,
--    "SIOCGSTAMPNS_NEW", IOC_R, do_ioctl_SIOCGSTAMPNS },
-+    "SIOCGSTAMPNS_NEW", IOC_R, do_ioctl_SIOCGSTAMPNS,
-+    { MK_PTR(MK_STRUCT(STRUCT_timespec64)) } },
- 
-   IOCTL(RNDGETENTCNT, IOC_R, MK_PTR(TYPE_INT))
-   IOCTL(RNDADDTOENTCNT, IOC_W, MK_PTR(TYPE_INT))
-diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
-index 4e12c1661e..a5ad5a9ddc 100644
---- a/linux-user/syscall_types.h
-+++ b/linux-user/syscall_types.h
-@@ -137,10 +137,22 @@ STRUCT(snd_timer_params,
-        TYPE_INT, /* filter */
-        MK_ARRAY(TYPE_CHAR, 60)) /* reserved */
- 
-+STRUCT(timeval,
-+       TYPE_LONG, /* tv_sec */
-+       TYPE_LONG) /* tv_usec */
-+
-+STRUCT(timeval64,
-+       TYPE_LONGLONG, /* tv_sec */
-+       TYPE_LONGLONG) /* tv_usec */
-+
- STRUCT(timespec,
-        TYPE_LONG, /* tv_sec */
-        TYPE_LONG) /* tv_nsec */
- 
-+STRUCT(timespec64,
-+       TYPE_LONGLONG, /* tv_sec */
-+       TYPE_LONGLONG) /* tv_nsec */
-+
- STRUCT(snd_timer_status,
-        MK_STRUCT(STRUCT_timespec), /* tstamp */
-        TYPE_INT, /* resolution */
--- 
-2.17.1
+Paolo
 
 
