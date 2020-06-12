@@ -7,77 +7,77 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82987C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 14:54:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C3ADC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 14:54:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4DBE12067B
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 14:54:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CFB922067B
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 14:54:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eQgKiJaf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DBE12067B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JGl8VLRv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFB922067B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46466 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46866 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjl4u-0003CI-Jj
-	for qemu-devel@archiver.kernel.org; Fri, 12 Jun 2020 10:54:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49698)
+	id 1jjl4z-0003MA-31
+	for qemu-devel@archiver.kernel.org; Fri, 12 Jun 2020 10:54:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49634)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jjl1n-0005ik-NB
- for qemu-devel@nongnu.org; Fri, 12 Jun 2020 10:51:31 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:41392
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jjl1i-0005Vc-7d
+ for qemu-devel@nongnu.org; Fri, 12 Jun 2020 10:51:26 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:36041
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jjl1l-0001O8-SJ
- for qemu-devel@nongnu.org; Fri, 12 Jun 2020 10:51:31 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jjl1g-0001NQ-Ea
+ for qemu-devel@nongnu.org; Fri, 12 Jun 2020 10:51:25 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591973489;
+ s=mimecast20190719; t=1591973483;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=loh3X3+SXpnVYZPqqNYKR+1uymLr/TH131RlRRt7Mrw=;
- b=eQgKiJafPq6N17SWuWDcXhUstVcPgRuwQ6c0bt2EiUaQ2vPVKyFULB/kZpV4yo+mAVJD2m
- aGOsQ/onvYl/eKIN2LHWxsb7PalCb0b5PYHHXoRmT1Ry40B+bgeIonGFmnzcOZ4Dpo7cZ0
- BF/Vl9V491yTHD/axSlVG4j2bOX8rLo=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-68-KCQ7P_SPMbyMKq7NmMBxUQ-1; Fri, 12 Jun 2020 10:51:27 -0400
-X-MC-Unique: KCQ7P_SPMbyMKq7NmMBxUQ-1
-Received: by mail-wm1-f69.google.com with SMTP id u15so2034421wmm.5
- for <qemu-devel@nongnu.org>; Fri, 12 Jun 2020 07:51:27 -0700 (PDT)
+ bh=3luZdMVyzlQigwCf25ntlxiRwHdihmch0JzTpvPMHt4=;
+ b=JGl8VLRv7QXkYXr5xpub/QzDsgZy+YBF/gc/QZHL7b9fyXHAdfwp33mn+Xp5Gz/4/u6P4R
+ 4YnEo3jtFPS+Qqr0hi8NEcWWkM84QentJS2/uApxkEpwEJDczOsW+hH/Ds+/1x6xoQ8wL3
+ 5UZr10uQik0cd4QCpc5+Uak6vUh+2Fo=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-364-HR-c2yN5NZOIurtpgBMqbQ-1; Fri, 12 Jun 2020 10:51:21 -0400
+X-MC-Unique: HR-c2yN5NZOIurtpgBMqbQ-1
+Received: by mail-wr1-f71.google.com with SMTP id l1so3984112wrc.8
+ for <qemu-devel@nongnu.org>; Fri, 12 Jun 2020 07:51:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:content-transfer-encoding
  :in-reply-to;
- bh=loh3X3+SXpnVYZPqqNYKR+1uymLr/TH131RlRRt7Mrw=;
- b=AOif7dkIkQXWj0064n6p5ClGJBXXNzMuN0licIHQ4vIIBiJxALkp4pTXq3+SUbNsU2
- OmiBgPsLxXUpr8nReef9EbZg0Rxnb3dyruZKZWC0mx4KrOoiTOgSlZvfsYjVsA2ohm7q
- adCCYpOT8mQKaP3Q9kj5dSATK0WwQWVPHFi3KeEPGFJHJ3dZuJI+TdHC4nT6fex/5gGl
- ui/J3nI8jaW6wiBK1ttnlIuJwIoUwqzk8T4kxieO1yKhiR6OIeYamNu13WSt9htl0QWj
- F7obIAwfk/hRwqbMaiDZzig1AYedUizrZuqNQ/+mXJMmOkvsB9O0SsAcXg2QJRyqLPV+
- CH7Q==
-X-Gm-Message-State: AOAM533NUM3KkSTKHvV5txTMOFr9nbpB+e1Vvqggke/Xu3QowcNx8nOA
- xHbN7yxf2FmeqtYJ2epwot8lbUcXagrcK+E6ai3FRTccQIDLGIh7mcZ/muVcjQPk2TL60qRakpU
- 6XjZljTW0HI5PAe8=
-X-Received: by 2002:a1c:7206:: with SMTP id n6mr14233883wmc.4.1591973483207;
- Fri, 12 Jun 2020 07:51:23 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw2wIMdcECWDx1W9/F27uwoiq2hrAbmk1LTDZI64gJdWi8mhBBqiCuYhMZYQmVg78U43XpbqQ==
-X-Received: by 2002:a1c:7206:: with SMTP id n6mr14233867wmc.4.1591973483018;
- Fri, 12 Jun 2020 07:51:23 -0700 (PDT)
+ bh=3luZdMVyzlQigwCf25ntlxiRwHdihmch0JzTpvPMHt4=;
+ b=s1HzD0g1AkkO+HZvqEmsoA17XqAa2jorAzH1NMOBuqlU9bVPY9cn2NSKXVDzAcsrPo
+ mKRjrTGu3tpcg730v9SaZ/O+4Ou3XE++Ym55ysFae7LBNWAWu4DooFw50nlAH3CaBS0i
+ 2FlJWVmkAyDya7IcD57kNOsiQB1pCkIxHUPW9o4ti9Wh2zooVJsq0ooam3CghkAkQrdJ
+ VXHkaMxRs9jp/rpHYVKauQXUACQME0lOJ1v/unN2Mihnx/tAa3IzVaNgj4qrgbwCEjFd
+ iyN31qVCaXiJbV2iVs9zg1hu+CZor5TA/264O4WictrBWNgJz7bDHpFmxwlTlK+lN41a
+ FGAA==
+X-Gm-Message-State: AOAM533H3IMU+UyqTMvQwB6YySY4P06luAX1nIhZ1X+dpqwIeQ4VgsLh
+ 93yd0p3cUDnry+kj1unRiB5yi3MG+rGWwi7javRCP+LMRTId6FmXLJMfVEx6fGPp1+8liyrr3kJ
+ S1iqIHhQmc1/H+IM=
+X-Received: by 2002:a1c:9896:: with SMTP id a144mr13548287wme.75.1591973480541; 
+ Fri, 12 Jun 2020 07:51:20 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwDToCNur4o9tcugHwWj9jToyFrRqE9wWkqek/dvAyQU2moUF2aO3prp+Yb6Q7iz5BawZAAqg==
+X-Received: by 2002:a1c:9896:: with SMTP id a144mr13548277wme.75.1591973480358; 
+ Fri, 12 Jun 2020 07:51:20 -0700 (PDT)
 Received: from redhat.com (bzq-79-178-18-124.red.bezeqint.net. [79.178.18.124])
- by smtp.gmail.com with ESMTPSA id 40sm11158791wrc.15.2020.06.12.07.51.21
+ by smtp.gmail.com with ESMTPSA id y80sm9200104wmc.34.2020.06.12.07.51.19
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 12 Jun 2020 07:51:22 -0700 (PDT)
-Date: Fri, 12 Jun 2020 10:51:20 -0400
+ Fri, 12 Jun 2020 07:51:19 -0700 (PDT)
+Date: Fri, 12 Jun 2020 10:51:18 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 09/58] acpi: move aml builder code for serial device
-Message-ID: <20200612141917.9446-10-mst@redhat.com>
+Subject: [PULL v2 08/58] acpi: serial: don't use _STA method
+Message-ID: <20200612141917.9446-9-mst@redhat.com>
 References: <20200612141917.9446-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20200612141917.9446-1-mst@redhat.com>
@@ -112,10 +112,8 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
  Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
@@ -124,116 +122,92 @@ Sender: "Qemu-devel"
 
 From: Gerd Hoffmann <kraxel@redhat.com>
 
-The code uses the isa_serial_io array to figure what the device uid is.
-Side effect is that acpi antries are not limited to port 1+2 any more,
-we'll also get entries for ports 3+4.
+The _STA method dates back to the days where we had a static DSDT.  The
+device is listed in the DSDT table unconditionally and the _STA method
+checks a bit in the isa bridge pci config space to figure whenever a
+given is isa device is present or not, then evaluates to 0x0f (present)
+or 0x00 (absent).
+
+These days the DSDT is generated by qemu anyway, so if a device is not
+present we can simply drop it from the DSDT instead.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20200515150421.25479-6-kraxel@redhat.com>
+Message-Id: <20200515150421.25479-5-kraxel@redhat.com>
 ---
- hw/char/serial-isa.c | 22 ++++++++++++++++++++++
- hw/i386/acpi-build.c | 32 --------------------------------
- 2 files changed, 22 insertions(+), 32 deletions(-)
+ hw/i386/acpi-build.c | 32 ++++++++------------------------
+ 1 file changed, 8 insertions(+), 24 deletions(-)
 
-diff --git a/hw/char/serial-isa.c b/hw/char/serial-isa.c
-index f9b6eed783..165e320e65 100644
---- a/hw/char/serial-isa.c
-+++ b/hw/char/serial-isa.c
-@@ -27,6 +27,7 @@
- #include "qapi/error.h"
- #include "qemu/module.h"
- #include "sysemu/sysemu.h"
-+#include "hw/acpi/aml-build.h"
- #include "hw/char/serial.h"
- #include "hw/isa/isa.h"
- #include "hw/qdev-properties.h"
-@@ -81,6 +82,25 @@ static void serial_isa_realizefn(DeviceState *dev, Error **errp)
-     isa_register_ioport(isadev, &s->io, isa->iobase);
- }
- 
-+static void serial_isa_build_aml(ISADevice *isadev, Aml *scope)
-+{
-+    ISASerialState *isa = ISA_SERIAL(isadev);
-+    Aml *dev;
-+    Aml *crs;
-+
-+    crs = aml_resource_template();
-+    aml_append(crs, aml_io(AML_DECODE16, isa->iobase, isa->iobase, 0x00, 0x08));
-+    aml_append(crs, aml_irq_no_flags(isa->isairq));
-+
-+    dev = aml_device("COM%d", isa->index + 1);
-+    aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0501")));
-+    aml_append(dev, aml_name_decl("_UID", aml_int(isa->index + 1)));
-+    aml_append(dev, aml_name_decl("_STA", aml_int(0xf)));
-+    aml_append(dev, aml_name_decl("_CRS", crs));
-+
-+    aml_append(scope, dev);
-+}
-+
- static const VMStateDescription vmstate_isa_serial = {
-     .name = "serial",
-     .version_id = 3,
-@@ -103,9 +123,11 @@ static Property serial_isa_properties[] = {
- static void serial_isa_class_initfn(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(klass);
-+    ISADeviceClass *isa = ISA_DEVICE_CLASS(klass);
- 
-     dc->realize = serial_isa_realizefn;
-     dc->vmsd = &vmstate_isa_serial;
-+    isa->build_aml = serial_isa_build_aml;
-     device_class_set_props(dc, serial_isa_properties);
-     set_bit(DEVICE_CATEGORY_INPUT, dc->categories);
- }
 diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index cb22cb0fe6..6de25f6484 100644
+index df5417c75f..cb22cb0fe6 100644
 --- a/hw/i386/acpi-build.c
 +++ b/hw/i386/acpi-build.c
-@@ -1208,36 +1208,6 @@ static Aml *build_lpt_device_aml(void)
+@@ -1208,50 +1208,34 @@ static Aml *build_lpt_device_aml(void)
      return dev;
  }
  
--static void build_com_device_aml(Aml *scope, uint8_t uid)
--{
--    Aml *dev;
--    Aml *crs;
--    uint8_t irq = 4;
--    uint16_t io_port = 0x03F8;
--
--    assert(uid == 1 || uid == 2);
--    if (uid == 2) {
--        irq = 3;
--        io_port = 0x02F8;
--    }
--    if (!memory_region_present(get_system_io(), io_port)) {
--        return;
--    }
--
--    dev = aml_device("COM%d", uid);
--    aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0501")));
--    aml_append(dev, aml_name_decl("_UID", aml_int(uid)));
--
--    aml_append(dev, aml_name_decl("_STA", aml_int(0xf)));
--
--    crs = aml_resource_template();
--    aml_append(crs, aml_io(AML_DECODE16, io_port, io_port, 0x00, 0x08));
--    aml_append(crs, aml_irq_no_flags(irq));
--    aml_append(dev, aml_name_decl("_CRS", crs));
--
--    aml_append(scope, dev);
--}
--
- static void build_isa_devices_aml(Aml *table)
+-static Aml *build_com_device_aml(uint8_t uid)
++static void build_com_device_aml(Aml *scope, uint8_t uid)
  {
-     ISADevice *fdc = pc_find_fdc0();
-@@ -1252,8 +1222,6 @@ static void build_isa_devices_aml(Aml *table)
+     Aml *dev;
+     Aml *crs;
+-    Aml *method;
+-    Aml *if_ctx;
+-    Aml *else_ctx;
+-    Aml *zero = aml_int(0);
+-    Aml *is_present = aml_local(0);
+-    const char *enabled_field = "CAEN";
+     uint8_t irq = 4;
+     uint16_t io_port = 0x03F8;
+ 
+     assert(uid == 1 || uid == 2);
+     if (uid == 2) {
+-        enabled_field = "CBEN";
+         irq = 3;
+         io_port = 0x02F8;
+     }
++    if (!memory_region_present(get_system_io(), io_port)) {
++        return;
++    }
+ 
+     dev = aml_device("COM%d", uid);
+     aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0501")));
+     aml_append(dev, aml_name_decl("_UID", aml_int(uid)));
+ 
+-    method = aml_method("_STA", 0, AML_NOTSERIALIZED);
+-    aml_append(method, aml_store(aml_name("%s", enabled_field), is_present));
+-    if_ctx = aml_if(aml_equal(is_present, zero));
+-    {
+-        aml_append(if_ctx, aml_return(aml_int(0x00)));
+-    }
+-    aml_append(method, if_ctx);
+-    else_ctx = aml_else();
+-    {
+-        aml_append(else_ctx, aml_return(aml_int(0x0f)));
+-    }
+-    aml_append(method, else_ctx);
+-    aml_append(dev, method);
++    aml_append(dev, aml_name_decl("_STA", aml_int(0xf)));
+ 
+     crs = aml_resource_template();
+     aml_append(crs, aml_io(AML_DECODE16, io_port, io_port, 0x00, 0x08));
+     aml_append(crs, aml_irq_no_flags(irq));
+     aml_append(dev, aml_name_decl("_CRS", crs));
+ 
+-    return dev;
++    aml_append(scope, dev);
+ }
+ 
+ static void build_isa_devices_aml(Aml *table)
+@@ -1268,8 +1252,8 @@ static void build_isa_devices_aml(Aml *table)
          aml_append(scope, build_fdc_device_aml(fdc));
      }
      aml_append(scope, build_lpt_device_aml());
--    build_com_device_aml(scope, 1);
--    build_com_device_aml(scope, 2);
+-    aml_append(scope, build_com_device_aml(1));
+-    aml_append(scope, build_com_device_aml(2));
++    build_com_device_aml(scope, 1);
++    build_com_device_aml(scope, 2);
  
      if (ambiguous) {
          error_report("Multiple ISA busses, unable to define IPMI ACPI data");
