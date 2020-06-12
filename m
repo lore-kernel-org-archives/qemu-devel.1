@@ -7,80 +7,75 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02D01C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 15:08:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79C62C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 15:09:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C38F520835
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 15:08:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 492E02081A
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 15:09:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CjDxo3/9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C38F520835
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g7wH69Hg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 492E02081A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43010 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43750 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjlIY-0003ed-U0
-	for qemu-devel@archiver.kernel.org; Fri, 12 Jun 2020 11:08:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50246)
+	id 1jjlIh-0003zZ-Ho
+	for qemu-devel@archiver.kernel.org; Fri, 12 Jun 2020 11:08:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50438)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jjl2k-0007mw-9R
- for qemu-devel@nongnu.org; Fri, 12 Jun 2020 10:52:30 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:45560
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jjl31-0000EU-0u
+ for qemu-devel@nongnu.org; Fri, 12 Jun 2020 10:52:47 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39563
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jjl2e-0001V8-1f
- for qemu-devel@nongnu.org; Fri, 12 Jun 2020 10:52:28 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jjl2z-0001Yv-5o
+ for qemu-devel@nongnu.org; Fri, 12 Jun 2020 10:52:46 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591973543;
+ s=mimecast20190719; t=1591973564;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=gdv4ziay2Sv+upSlMJ3KLdxkcpgWNHmqMtF1sz11Yck=;
- b=CjDxo3/9XIXiiHkt8E89bLgWmoz88+gsd+1Ogsf2Sd8AmXTETxeywmDgISV8Ku10fI8d6C
- CH1vvBz4d5PdA9YLfdbvhAdk6bI6cshDbfL2NYNCdedwOTmS21oAWQJg1ohe53My6/9+e6
- jQ9TtRnZi5Mti1uywxK6ZP30C1/5G3g=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-42-62RR6lLdMKulMVoeJwd7Hw-1; Fri, 12 Jun 2020 10:52:21 -0400
-X-MC-Unique: 62RR6lLdMKulMVoeJwd7Hw-1
-Received: by mail-wr1-f69.google.com with SMTP id c14so3979861wrm.15
- for <qemu-devel@nongnu.org>; Fri, 12 Jun 2020 07:52:21 -0700 (PDT)
+ bh=/61PXreG9CtbL2ch+1GsTIa5m/Lv2qjj0nnVUy3KBs8=;
+ b=g7wH69HgjG+0aDwCr+7Pk9x+M6YgE3khimSXeLrNuTYyQGe4qO25Qrdou6FHeJyr7sUN8I
+ E3CB0torDjkUznT4pQvmsHbjQxU6KJiacZnGBeF0OOrP/bAALLOHmHEKMLcbcd6j1BXY+Z
+ eVnWO5PAjKhIEIxVJgILi/aRrvd9h7c=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-491--LDxGG3HNGOhkejuAnIOZw-1; Fri, 12 Jun 2020 10:52:42 -0400
+X-MC-Unique: -LDxGG3HNGOhkejuAnIOZw-1
+Received: by mail-wr1-f72.google.com with SMTP id c14so3980161wrm.15
+ for <qemu-devel@nongnu.org>; Fri, 12 Jun 2020 07:52:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=gdv4ziay2Sv+upSlMJ3KLdxkcpgWNHmqMtF1sz11Yck=;
- b=BcD1kMfusj33cHpfFWtCorpkY+m1tWbD/p5BcbvVZXdBuqfVrDr0Xk415ib3V4UoHk
- DodRMMfEKtn6rsYUYPgItZrHEoBA4vTGpQHtEZe9AtFRh6IW4jCkzJko02lUtBphuKDW
- OyTLKgrXRdNPGZXQfpxhsSb0DzG7fCJ6R+u7NBwGP4HNXxW2D/DcDVeyNcZi8IqRrPom
- uY6hPg8jOYtq8roGRCSCu3D21b3Si6t5k/X6gZmeDNtU/KZIx2laeH0xurww5tIvZBba
- 7FMJajwcamTAi4hdnW0BSQio0vjmxaKcv5qP/v/flqOf7iBoK/L3hotH64tMbbu2tqE+
- 20zQ==
-X-Gm-Message-State: AOAM533fA6VcJtzoyt5R60wmJTUVmwIWOHAUKSDsBuepoZrH1Zi3zdYS
- GwOuc1Rxou3W0lDrHUVnCMzxhWiLMUHkQynyyXkb61RFzKVGPUWybexK6UEBe3jg/KDkS0rVCki
- agwT84ZcrQRyfxBw=
-X-Received: by 2002:a05:6000:1292:: with SMTP id
- f18mr15674956wrx.208.1591973539968; 
- Fri, 12 Jun 2020 07:52:19 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwa5mcffTMaSnGZF6/zS88N0NN3r1kHzKXVGkv+XnWyPrHtbcaazC5JvlYUqrFc6fessnR9EA==
-X-Received: by 2002:a05:6000:1292:: with SMTP id
- f18mr15674948wrx.208.1591973539752; 
- Fri, 12 Jun 2020 07:52:19 -0700 (PDT)
+ :mime-version:content-disposition:in-reply-to;
+ bh=/61PXreG9CtbL2ch+1GsTIa5m/Lv2qjj0nnVUy3KBs8=;
+ b=O44+Z3DaBDnowsY5/T8z1aHVPZ3uphMm1OIv2cz9I8dkm0eufYn+lOSNQ4k3Tn54mV
+ ZXUMHTLxSN0wlBlSFhNkn5ByQ5HkMJq9RiiCJVQ52tZwxJjlw8tp9PALalzye4JCIg6x
+ +Qp6mP4C8Ho4/Pix3nljme+Hi4f6WuxSnDWIU3v/ox8LUGrnaFo6d5h81rio5JzwRfxV
+ ooLEyMrBDFJjvc2G2TwwUjeLVN/C3Ts2LUM2Ftlav3Vg2/9MBDOtMUPxksmGT2l22/80
+ Kp6PJB4lo0FEyvePHYA+ZpBx7AH2oFbSyM50ifk/F4hQeA/95TP3oEoijsStnjrBlstm
+ nR8A==
+X-Gm-Message-State: AOAM5308bJcAGUbHxfWKHrrGb3joUrI1UDpX3AsJZNSzc1MI0RXnXLjJ
+ WrmJD5fx/dVauCbHIk0yW27BmKygXCbiFfuHdS6N6WRIHtFhvJIjPfH5JblQkOjLbAvB1lUCmXK
+ ZLSYjJ5gCUO9rEaQ=
+X-Received: by 2002:a1c:2c45:: with SMTP id s66mr14424576wms.40.1591973561589; 
+ Fri, 12 Jun 2020 07:52:41 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxDb7wtsbBKIK5Jby1Kz+peKBBPvIuXhdZpDu8O1dmNK/046yiLgjeKRP3cDXIMFk5FsxzhxA==
+X-Received: by 2002:a1c:2c45:: with SMTP id s66mr14424561wms.40.1591973561357; 
+ Fri, 12 Jun 2020 07:52:41 -0700 (PDT)
 Received: from redhat.com (bzq-79-178-18-124.red.bezeqint.net. [79.178.18.124])
- by smtp.gmail.com with ESMTPSA id h7sm9538585wml.24.2020.06.12.07.52.18
+ by smtp.gmail.com with ESMTPSA id t7sm9674317wrq.41.2020.06.12.07.52.40
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 12 Jun 2020 07:52:19 -0700 (PDT)
-Date: Fri, 12 Jun 2020 10:52:18 -0400
+ Fri, 12 Jun 2020 07:52:40 -0700 (PDT)
+Date: Fri, 12 Jun 2020 10:52:39 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 34/58] char-socket: return -1 in case of disconnect during
- tcp_chr_write
-Message-ID: <20200612141917.9446-35-mst@redhat.com>
+Subject: [PULL v2 44/58] Support individual region unmap in libvhost-user
+Message-ID: <20200612141917.9446-45-mst@redhat.com>
 References: <20200612141917.9446-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20200612141917.9446-1-mst@redhat.com>
@@ -88,12 +83,11 @@ X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
 X-Mutt-Fcc: =sent
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=mst@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/12 09:30:54
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=mst@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/12 08:07:26
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -115,86 +109,139 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Dima Stepanov <dimastep@yandex-team.ru>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+ Johannes Berg <johannes.berg@intel.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Raphael Norwitz <raphael.norwitz@nutanix.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Dima Stepanov <dimastep@yandex-team.ru>
+From: Raphael Norwitz <raphael.norwitz@nutanix.com>
 
-During testing of the vhost-user-blk reconnect functionality the qemu
-SIGSEGV was triggered:
- start qemu as:
- x86_64-softmmu/qemu-system-x86_64 -m 1024M -M q35 \
-   -object memory-backend-file,id=ram-node0,size=1024M,mem-path=/dev/shm/qemu,share=on \
-   -numa node,cpus=0,memdev=ram-node0 \
-   -chardev socket,id=chardev0,path=./vhost.sock,noserver,reconnect=1 \
-   -device vhost-user-blk-pci,chardev=chardev0,num-queues=4 --enable-kvm
- start vhost-user-blk daemon:
- ./vhost-user-blk -s ./vhost.sock -b test-img.raw
+When the VHOST_USER_PROTOCOL_F_CONFIGURE_MEM_SLOTS protocol feature is
+enabled, on memory hot-unplug qemu will transmit memory regions to
+remove individually using the new message VHOST_USER_REM_MEM_REG
+message. With this change, vhost-user backends build with libvhost-user
+can now unmap individual memory regions when receiving the
+VHOST_USER_REM_MEM_REG message.
 
-If vhost-user-blk will be killed during the vhost initialization
-process, for instance after getting VHOST_SET_VRING_CALL command, then
-QEMU will fail with the following backtrace:
+Qemu only sends VHOST_USER_REM_MEM_REG messages when the
+VHOST_USER_PROTOCOL_F_CONFIGURE_MEM_SLOTS feature is negotiated, and
+support for that feature has not yet been added in libvhost-user, this
+new functionality is not yet used.
 
-Thread 1 "qemu-system-x86" received signal SIGSEGV, Segmentation fault.
-0x00005555559272bb in vhost_user_read (dev=0x7fffef2d53e0, msg=0x7fffffffd5b0)
-    at ./hw/virtio/vhost-user.c:260
-260         CharBackend *chr = u->user->chr;
-
- #0  0x00005555559272bb in vhost_user_read (dev=0x7fffef2d53e0, msg=0x7fffffffd5b0)
-    at ./hw/virtio/vhost-user.c:260
- #1  0x000055555592acb8 in vhost_user_get_config (dev=0x7fffef2d53e0, config=0x7fffef2d5394 "", config_len=60)
-    at ./hw/virtio/vhost-user.c:1645
- #2  0x0000555555925525 in vhost_dev_get_config (hdev=0x7fffef2d53e0, config=0x7fffef2d5394 "", config_len=60)
-    at ./hw/virtio/vhost.c:1490
- #3  0x00005555558cc46b in vhost_user_blk_device_realize (dev=0x7fffef2d51a0, errp=0x7fffffffd8f0)
-    at ./hw/block/vhost-user-blk.c:429
- #4  0x0000555555920090 in virtio_device_realize (dev=0x7fffef2d51a0, errp=0x7fffffffd948)
-    at ./hw/virtio/virtio.c:3615
- #5  0x0000555555a9779c in device_set_realized (obj=0x7fffef2d51a0, value=true, errp=0x7fffffffdb88)
-    at ./hw/core/qdev.c:891
- ...
-
-The problem is that vhost_user_write doesn't get an error after
-disconnect and try to call vhost_user_read(). The tcp_chr_write()
-routine should return -1 in case of disconnect. Indicate the EIO error
-if this routine is called in the disconnected state.
-
-Signed-off-by: Dima Stepanov <dimastep@yandex-team.ru>
-Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-Message-Id: <aeb7806bfc945faadf09f64dcfa30f59de3ac053.1590396396.git.dimastep@yandex-team.ru>
+Signed-off-by: Raphael Norwitz <raphael.norwitz@nutanix.com>
+Message-Id: <1588533678-23450-10-git-send-email-raphael.norwitz@nutanix.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- chardev/char-socket.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ contrib/libvhost-user/libvhost-user.h |  1 +
+ contrib/libvhost-user/libvhost-user.c | 63 +++++++++++++++++++++++++++
+ 2 files changed, 64 insertions(+)
 
-diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-index db253d4024..18e762643b 100644
---- a/chardev/char-socket.c
-+++ b/chardev/char-socket.c
-@@ -175,15 +175,16 @@ static int tcp_chr_write(Chardev *chr, const uint8_t *buf, int len)
+diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost-user/libvhost-user.h
+index 60ef7fd13e..f8439713a8 100644
+--- a/contrib/libvhost-user/libvhost-user.h
++++ b/contrib/libvhost-user/libvhost-user.h
+@@ -99,6 +99,7 @@ typedef enum VhostUserRequest {
+     VHOST_USER_VRING_KICK = 35,
+     VHOST_USER_GET_MAX_MEM_SLOTS = 36,
+     VHOST_USER_ADD_MEM_REG = 37,
++    VHOST_USER_REM_MEM_REG = 38,
+     VHOST_USER_MAX
+ } VhostUserRequest;
  
-         if (ret < 0 && errno != EAGAIN) {
-             if (tcp_chr_read_poll(chr) <= 0) {
-+                /* Perform disconnect and return error. */
-                 tcp_chr_disconnect_locked(chr);
--                return len;
-             } /* else let the read handler finish it properly */
-         }
- 
-         return ret;
-     } else {
--        /* XXX: indicate an error ? */
--        return len;
-+        /* Indicate an error. */
-+        errno = EIO;
-+        return -1;
+diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/libvhost-user.c
+index d8ee7a23a3..386449b697 100644
+--- a/contrib/libvhost-user/libvhost-user.c
++++ b/contrib/libvhost-user/libvhost-user.c
+@@ -139,6 +139,7 @@ vu_request_to_string(unsigned int req)
+         REQ(VHOST_USER_VRING_KICK),
+         REQ(VHOST_USER_GET_MAX_MEM_SLOTS),
+         REQ(VHOST_USER_ADD_MEM_REG),
++        REQ(VHOST_USER_REM_MEM_REG),
+         REQ(VHOST_USER_MAX),
+     };
+ #undef REQ
+@@ -763,6 +764,66 @@ vu_add_mem_reg(VuDev *dev, VhostUserMsg *vmsg) {
      }
  }
  
++static inline bool reg_equal(VuDevRegion *vudev_reg,
++                             VhostUserMemoryRegion *msg_reg)
++{
++    if (vudev_reg->gpa == msg_reg->guest_phys_addr &&
++        vudev_reg->qva == msg_reg->userspace_addr &&
++        vudev_reg->size == msg_reg->memory_size) {
++        return true;
++    }
++
++    return false;
++}
++
++static bool
++vu_rem_mem_reg(VuDev *dev, VhostUserMsg *vmsg) {
++    int i, j;
++    bool found = false;
++    VuDevRegion shadow_regions[VHOST_MEMORY_MAX_NREGIONS] = {};
++    VhostUserMemoryRegion m = vmsg->payload.memreg.region, *msg_region = &m;
++
++    DPRINT("Removing region:\n");
++    DPRINT("    guest_phys_addr: 0x%016"PRIx64"\n",
++           msg_region->guest_phys_addr);
++    DPRINT("    memory_size:     0x%016"PRIx64"\n",
++           msg_region->memory_size);
++    DPRINT("    userspace_addr   0x%016"PRIx64"\n",
++           msg_region->userspace_addr);
++    DPRINT("    mmap_offset      0x%016"PRIx64"\n",
++           msg_region->mmap_offset);
++
++    for (i = 0, j = 0; i < dev->nregions; i++) {
++        if (!reg_equal(&dev->regions[i], msg_region)) {
++            shadow_regions[j].gpa = dev->regions[i].gpa;
++            shadow_regions[j].size = dev->regions[i].size;
++            shadow_regions[j].qva = dev->regions[i].qva;
++            shadow_regions[j].mmap_offset = dev->regions[i].mmap_offset;
++            j++;
++        } else {
++            found = true;
++            VuDevRegion *r = &dev->regions[i];
++            void *m = (void *) (uintptr_t) r->mmap_addr;
++
++            if (m) {
++                munmap(m, r->size + r->mmap_offset);
++            }
++        }
++    }
++
++    if (found) {
++        memcpy(dev->regions, shadow_regions,
++               sizeof(VuDevRegion) * VHOST_MEMORY_MAX_NREGIONS);
++        DPRINT("Successfully removed a region\n");
++        dev->nregions--;
++        vmsg_set_reply_u64(vmsg, 0);
++    } else {
++        vu_panic(dev, "Specified region not found\n");
++    }
++
++    return true;
++}
++
+ static bool
+ vu_set_mem_table_exec_postcopy(VuDev *dev, VhostUserMsg *vmsg)
+ {
+@@ -1771,6 +1832,8 @@ vu_process_message(VuDev *dev, VhostUserMsg *vmsg)
+         return vu_handle_get_max_memslots(dev, vmsg);
+     case VHOST_USER_ADD_MEM_REG:
+         return vu_add_mem_reg(dev, vmsg);
++    case VHOST_USER_REM_MEM_REG:
++        return vu_rem_mem_reg(dev, vmsg);
+     default:
+         vmsg_close_fds(vmsg);
+         vu_panic(dev, "Unhandled request: %d", vmsg->request);
 -- 
 MST
 
