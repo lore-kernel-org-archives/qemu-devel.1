@@ -2,100 +2,87 @@ Return-Path: <SRS0=+PsZ=7Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60E04C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 15:18:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DFD1C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 15:18:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 30CB82081A
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 15:18:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3A2AB20835
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 15:18:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jFzDa4h4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30CB82081A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=yadro.com header.i=@yadro.com header.b="YMoCArPQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A2AB20835
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yadro.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52624 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54990 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjlRq-00059L-B7
-	for qemu-devel@archiver.kernel.org; Fri, 12 Jun 2020 11:18:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51666)
+	id 1jjlSG-00066C-EQ
+	for qemu-devel@archiver.kernel.org; Fri, 12 Jun 2020 11:18:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51014)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jjl5M-0004mJ-5o
- for qemu-devel@nongnu.org; Fri, 12 Jun 2020 10:55:12 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:26887
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jjl5K-00024e-7t
- for qemu-devel@nongnu.org; Fri, 12 Jun 2020 10:55:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591973709;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=wz4LYmJYkwD0FRusftg9gxDl1X3bD+K8dONSs5X0hnA=;
- b=jFzDa4h44CmSMJlaEX1daVQPaI2ZSsFwrKYS4kptmvFvVil5pG1M4mcu20phZIitnVcQwH
- 5rSZIWBQ53fGeBh0Nff3+x7Gf7EnXmCUEvJny4JuAXT1f+aX/nIrN2Sw8rGBoV1q/O/lj4
- OvY/KVxzrdvd1booNpF1l4rP5ALd7tg=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-151-gSN03lqiOw-5IBA1fUHXyg-1; Fri, 12 Jun 2020 10:51:36 -0400
-X-MC-Unique: gSN03lqiOw-5IBA1fUHXyg-1
-Received: by mail-wr1-f69.google.com with SMTP id t5so3974008wro.20
- for <qemu-devel@nongnu.org>; Fri, 12 Jun 2020 07:51:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=wz4LYmJYkwD0FRusftg9gxDl1X3bD+K8dONSs5X0hnA=;
- b=aaPAOvQarcSlAcz+Sk59rjMSK1db6L+QJuD3HZw0m4aopWvhRpH1PkQ+QrszsFh0C0
- F0BJ6k4VsZjnSzmKgnMVSmEdtP3015ica8uPirgO6PSkmRlu62RW56q+tJYlBEuSyIzV
- SNBBNjiO5Pz68U73qCJYsAwBSive8mQRKXkU5MS4GURcrbP/iogg3VJOdYx5Xj0696u0
- ai1b2iy8eFg9YLV1nnM/CIvd8uvCdZAyts5y3psRgENNjBZK/w873Nq7OTlHrDc/DqOe
- b5EtfVKPv1gMsMKrk7wpdUw34pALOxGqAKJc5ZlsMnhvJsfXPshO2MPRRipTqPa3PA/y
- OCVw==
-X-Gm-Message-State: AOAM532rkCJPUCMZcKzNdU6xVkgupoMnXz6AYHHWTO2cqVfd2gJgOOor
- 3CiouJe+RKMB6TJ+IPoG4QJ5zKe/O2JHLWAb27yiHsFLYxMqzkVcze44tsfOCBlOgdM1SvCWJZ1
- iWKd3ak6KFnsOMFg=
-X-Received: by 2002:adf:dec5:: with SMTP id i5mr16213545wrn.16.1591973495028; 
- Fri, 12 Jun 2020 07:51:35 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyrq48yz7GKmE8biEtjLjKte04AD/V185NMosqi+HXXu1HIpVy8uQ1w6+MVMJsd+zzNXqKLTA==
-X-Received: by 2002:adf:dec5:: with SMTP id i5mr16213512wrn.16.1591973494718; 
- Fri, 12 Jun 2020 07:51:34 -0700 (PDT)
-Received: from redhat.com (bzq-79-178-18-124.red.bezeqint.net. [79.178.18.124])
- by smtp.gmail.com with ESMTPSA id s72sm8916007wme.35.2020.06.12.07.51.33
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 12 Jun 2020 07:51:34 -0700 (PDT)
-Date: Fri, 12 Jun 2020 10:51:32 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL v2 14/58] acpi: Convert build_tpm2() to build_append* API
-Message-ID: <20200612141917.9446-15-mst@redhat.com>
-References: <20200612141917.9446-1-mst@redhat.com>
+ (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
+ id 1jjl4L-0002yN-Af
+ for qemu-devel@nongnu.org; Fri, 12 Jun 2020 10:54:09 -0400
+Received: from mta-02.yadro.com ([89.207.88.252]:45450 helo=mta-01.yadro.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
+ id 1jjl4E-0001pm-Jj
+ for qemu-devel@nongnu.org; Fri, 12 Jun 2020 10:54:08 -0400
+Received: from localhost (unknown [127.0.0.1])
+ by mta-01.yadro.com (Postfix) with ESMTP id 743F84C8B1;
+ Fri, 12 Jun 2020 14:54:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
+ in-reply-to:content-disposition:content-type:content-type
+ :mime-version:references:message-id:subject:subject:from:from
+ :date:date:received:received:received; s=mta-01; t=1591973638;
+ x=1593788039; bh=kHKE8/vGWplHmamSiOvrKdeoMqtHMvqSpZ88Sz7fEFs=; b=
+ YMoCArPQAtQkoGB0+JDsabeSaJ9xXsExkx8RQnsqM54mNN52F/iZslbPvcKvztJ6
+ jJrn11ZQTZSbdfWtBeYnkHcaN7lBi3AwM9gxKkhn7RJrtkbTPZIPEj+uLVetPXFD
+ vu4DV7rATEwR5wcPmJeVndf4Q8QLCXuC1B9WcBqQ3/Q=
+X-Virus-Scanned: amavisd-new at yadro.com
+Received: from mta-01.yadro.com ([127.0.0.1])
+ by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 3gBtRw_Mx6Ee; Fri, 12 Jun 2020 17:53:58 +0300 (MSK)
+Received: from T-EXCH-02.corp.yadro.com (t-exch-02.corp.yadro.com
+ [172.17.10.102])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mta-01.yadro.com (Postfix) with ESMTPS id 0AC894C896;
+ Fri, 12 Jun 2020 17:53:58 +0300 (MSK)
+Received: from localhost (172.17.204.212) by T-EXCH-02.corp.yadro.com
+ (172.17.10.102) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id 15.1.669.32; Fri, 12
+ Jun 2020 17:53:57 +0300
+Date: Fri, 12 Jun 2020 17:53:57 +0300
+From: Roman Bolshakov <r.bolshakov@yadro.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PULL 000/115] Huge miscellaneous pull request for 2020-06-11
+Message-ID: <20200612145357.GC76007@SPB-NB-133.local>
+References: <20200611194449.31468-1-pbonzini@redhat.com>
+ <CAFEAcA-qrxBdn5aA0kaituroTX8c1yFGdRux0_X1Y+W5_s-WHA@mail.gmail.com>
+ <6e1f1fa5-2a23-b586-a3b4-1394c82794d7@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200612141917.9446-1-mst@redhat.com>
-X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
-X-Mutt-Fcc: =sent
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=mst@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/12 09:30:54
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+In-Reply-To: <6e1f1fa5-2a23-b586-a3b4-1394c82794d7@redhat.com>
+X-Originating-IP: [172.17.204.212]
+X-ClientProxiedBy: T-EXCH-01.corp.yadro.com (172.17.10.101) To
+ T-EXCH-02.corp.yadro.com (172.17.10.102)
+Received-SPF: pass client-ip=89.207.88.252; envelope-from=r.bolshakov@yadro.com;
+ helo=mta-01.yadro.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/12 09:46:08
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -109,83 +96,82 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>, Eric Auger <eric.auger@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+ QEMU Developers <qemu-devel@nongnu.org>,
+ "Joseph S. Myers" <joseph@codesourcery.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Eric Auger <eric.auger@redhat.com>
+On Fri, Jun 12, 2020 at 03:33:38PM +0200, Paolo Bonzini wrote:
+> On 12/06/20 15:09, Peter Maydell wrote:
+> > Hi; I'm afraid this fails to build on OSX, and has a check-tcg
+> > failure on x86-64 Linux.
+> > 
+> > OSX:
+> > 
+> > In file included from /Users/pm215/src/qemu-for-merges/target/i386/hvf/hvf.c:53:
+> > In file included from /Users/pm215/src/qemu-for-merges/include/sysemu/hvf.h:16:
+> > /Users/pm215/src/qemu-for-merges/target/i386/cpu.h:1601:5: error:
+> > unknown type name 'hvf_lazy_flags'
+> >     hvf_lazy_flags hvf_lflags;
+> >     ^
+> > In file included from /Users/pm215/src/qemu-for-merges/target/i386/hvf/hvf.c:53:
+> > In file included from /Users/pm215/src/qemu-for-merges/include/sysemu/hvf.h:16:
+> > In file included from /Users/pm215/src/qemu-for-merges/target/i386/cpu.h:2021:
+> > /Users/pm215/src/qemu-for-merges/include/exec/cpu-all.h:442:12: error:
+> > returning 'void' from a function with incompatible result type
+> > 'ArchCPU *' (aka 'struct X86CPU *')
+> >     return container_of(env, ArchCPU, env);
+> >            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> > /Users/pm215/src/qemu-for-merges/include/qemu/compiler.h:56:41: note:
+> > expanded from macro 'container_of'
+> > #define container_of(ptr, type, member) ({                      \
+> >                                         ^~~~~~~~~~~~~~~~~~~~~~~~~
+> > In file included from /Users/pm215/src/qemu-for-merges/target/i386/hvf/hvf.c:53:
+> > In file included from /Users/pm215/src/qemu-for-merges/include/sysemu/hvf.h:16:
+> > In file included from /Users/pm215/src/qemu-for-merges/target/i386/cpu.h:2021:
+> > /Users/pm215/src/qemu-for-merges/include/exec/cpu-all.h:464:14: error:
+> > initializing 'ArchCPU *' (aka 'struct X86CPU *') with an expression of
+> > incompatible type 'void'
+> >     ArchCPU *arch_cpu = container_of(env, ArchCPU, env);
+> >              ^          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> > 3 errors generated.
+> > 
+> > 
+> > On x86-64 Linux host, running the check-tcg tests on the static
+> > linux-user build:
+> > 
+> >   BUILD   i386-linux-user guest-tests with docker qemu:fedora-i386-cross
+> > /home/petmay01/linaro/qemu-for-merges/tests/tcg/i386/test-i386-pcmpistri.c:
+> > In function 'main':
+> > /home/petmay01/linaro/qemu-for-merges/tests/tcg/i386/test-i386-pcmpistri.c:28:15:
+> > warning: left-hand operand of comma expression has no effect
+> > [-Wunused-value]
+> >    28 |     if ("%d\n", _mm_cmpistri(s1.x, s3.x, 0x4c) != 16) {
+> >       |               ^
+> > 
+> > (only a warning because we don't seem to be using -Werror here?)
+> > 
+> > and then the test crashed at runtime:
+> > 
+> >   TEST    test-i386-pcmpistri on i386
+> > qemu: uncaught target signal 4 (Illegal instruction) - core dumped
+> > timeout: the monitored command dumped core
+> > Illegal instruction
+> > ../Makefile.target:151: recipe for target 'run-test-i386-pcmpistri' failed
+> 
+> I'll resend without the offending patch.  Roman, Joseph, please take a
+> look and (especially for the OS X) please check if your series need a
+> rebase.
+> 
+> Thanks,
+> 
+> Paolo
+> 
 
-In preparation of its move to the generic acpi code,
-let's convert build_tpm2() to use build_append API. This
-latter now is prefered in place of direct ACPI struct field
-settings with manual endianness conversion.
+It seems rebase is not needed. The queue doesn't include the patch:
+https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg08076.html
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Message-Id: <20200601095737.32671-2-eric.auger@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
- hw/i386/acpi-build.c | 28 +++++++++++++++++++---------
- 1 file changed, 19 insertions(+), 9 deletions(-)
-
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index d05d010f77..8d93a2d339 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -2197,30 +2197,40 @@ build_tpm_tcpa(GArray *table_data, BIOSLinker *linker, GArray *tcpalog)
- static void
- build_tpm2(GArray *table_data, BIOSLinker *linker, GArray *tcpalog)
- {
--    Acpi20TPM2 *tpm2_ptr = acpi_data_push(table_data, sizeof *tpm2_ptr);
-+    Acpi20TPM2 *tpm2_ptr = acpi_data_push(table_data, sizeof(AcpiTableHeader));
-     unsigned log_addr_size = sizeof(tpm2_ptr->log_area_start_address);
-     unsigned log_addr_offset =
-         (char *)&tpm2_ptr->log_area_start_address - table_data->data;
-+    uint8_t start_method_params[12] = {};
- 
--    tpm2_ptr->platform_class = cpu_to_le16(TPM2_ACPI_CLASS_CLIENT);
-+    /* platform class */
-+    build_append_int_noprefix(table_data, TPM2_ACPI_CLASS_CLIENT, 2);
-+    /* reserved */
-+    build_append_int_noprefix(table_data, 0, 2);
-     if (TPM_IS_TIS_ISA(tpm_find())) {
--        tpm2_ptr->control_area_address = cpu_to_le64(0);
--        tpm2_ptr->start_method = cpu_to_le32(TPM2_START_METHOD_MMIO);
-+        /* address of control area */
-+        build_append_int_noprefix(table_data, 0, 8);
-+        /* start method */
-+        build_append_int_noprefix(table_data, TPM2_START_METHOD_MMIO, 4);
-     } else if (TPM_IS_CRB(tpm_find())) {
--        tpm2_ptr->control_area_address = cpu_to_le64(TPM_CRB_ADDR_CTRL);
--        tpm2_ptr->start_method = cpu_to_le32(TPM2_START_METHOD_CRB);
-+        build_append_int_noprefix(table_data, TPM_CRB_ADDR_CTRL, 8);
-+        build_append_int_noprefix(table_data, TPM2_START_METHOD_CRB, 4);
-     } else {
-         g_warn_if_reached();
-     }
- 
--    tpm2_ptr->log_area_minimum_length =
--        cpu_to_le32(TPM_LOG_AREA_MINIMUM_SIZE);
-+    /* platform specific parameters */
-+    g_array_append_vals(table_data, &start_method_params, 12);
- 
--    acpi_data_push(tcpalog, le32_to_cpu(tpm2_ptr->log_area_minimum_length));
-+    /* log area minimum length */
-+    build_append_int_noprefix(table_data, TPM_LOG_AREA_MINIMUM_SIZE, 4);
-+
-+    acpi_data_push(tcpalog, TPM_LOG_AREA_MINIMUM_SIZE);
-     bios_linker_loader_alloc(linker, ACPI_BUILD_TPMLOG_FILE, tcpalog, 1,
-                              false);
- 
-     /* log area start address to be filled by Guest linker */
-+    build_append_int_noprefix(table_data, 0, 8);
-     bios_linker_loader_add_pointer(linker, ACPI_BUILD_TABLE_FILE,
-                                    log_addr_offset, log_addr_size,
-                                    ACPI_BUILD_TPMLOG_FILE, 0);
--- 
-MST
-
+Regards,
+Roman
 
