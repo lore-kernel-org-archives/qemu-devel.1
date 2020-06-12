@@ -2,99 +2,95 @@ Return-Path: <SRS0=+PsZ=7Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2C2EC433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 16:15:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4023C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 16:24:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 729CA20801
-	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 16:15:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AB961207ED
+	for <qemu-devel@archiver.kernel.org>; Fri, 12 Jun 2020 16:24:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ebv7NWYB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 729CA20801
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dTAKQ73c"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB961207ED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40932 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49448 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjmLK-0005Ws-Lj
-	for qemu-devel@archiver.kernel.org; Fri, 12 Jun 2020 12:15:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60418)
+	id 1jjmU0-0003mv-Uh
+	for qemu-devel@archiver.kernel.org; Fri, 12 Jun 2020 12:24:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37378)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jjmKh-00056E-91
- for qemu-devel@nongnu.org; Fri, 12 Jun 2020 12:15:07 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35122
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jjmKe-0002gu-IA
- for qemu-devel@nongnu.org; Fri, 12 Jun 2020 12:15:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591978503;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=7U1BQCzJR+OvRN7i4AWbk+G7QzZalmOt34EdX7HznFo=;
- b=ebv7NWYBNHgF8QsFTNcOYSOmd+6UE/XDWrCNszNyVNVWiSpyf07gS0pvQKvYnUDdt7sTwr
- gcT9WewVzwynTXub5Hbp8zst0APil5M4mXNwb02ZqDwHq1J/HrhSdgoyhwizyI7FBBdv7e
- BOXu6AZkLFgJHcrLIjlB6IzgFFHJvQ4=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-122-Lx2ng53qN66mTRRYVSM6aQ-1; Fri, 12 Jun 2020 12:11:38 -0400
-X-MC-Unique: Lx2ng53qN66mTRRYVSM6aQ-1
-Received: by mail-wr1-f71.google.com with SMTP id l18so4096854wrm.0
- for <qemu-devel@nongnu.org>; Fri, 12 Jun 2020 09:11:38 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <hskinnemoen@google.com>)
+ id 1jjmTK-0003Fc-4U
+ for qemu-devel@nongnu.org; Fri, 12 Jun 2020 12:24:02 -0400
+Received: from mail-vk1-xa2d.google.com ([2607:f8b0:4864:20::a2d]:37211)
+ by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <hskinnemoen@google.com>)
+ id 1jjmTI-0004EG-FX
+ for qemu-devel@nongnu.org; Fri, 12 Jun 2020 12:24:01 -0400
+Received: by mail-vk1-xa2d.google.com with SMTP id q10so2388594vka.4
+ for <qemu-devel@nongnu.org>; Fri, 12 Jun 2020 09:23:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=ZBdoNOBMEF0YZONd1lNj5Y/k6+JiQQJ7kERWF7pOyRo=;
+ b=dTAKQ73cyoPelcj13qBIZ3juj/RHD2H/2mggfRq4VMTW4ecN7iiZ3rURe0hhe0hDJ3
+ 6OQ7vlOi527ln3w2zfMo7AfPu1wewgNOgSnAInTqJIDOm6ROlGAMzloO1/MNHKUX6kby
+ pgePyH8jmxBc8DcCxsQMaPfKAMIdL82cT1BlPSj2U4Wl4sXrY/oti/dHUpWyeg8huaJO
+ 2Gt6oPeAKo3KYC4lBjgcJJvvD6KGL295pitW8iBLF3Kl+lhZCgq0w7Oud/aZl3eATszT
+ 1vNe206I/FyyRHzZMWEE3q9aj7AiMr8QdMg+8KYCgloPxoACRdg/l/kJFhWDw91b/7TY
+ KRfg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=7U1BQCzJR+OvRN7i4AWbk+G7QzZalmOt34EdX7HznFo=;
- b=t3zlZF25j8XH0vno7OYDiQlE6ufsEdfhCwfQXOnQFSURcmf5NJSMpNqkQK03elQmAJ
- WM57RglxaUt/TTwGXYynIVMfoQ/yfxO4+13kJOgYNY3G28YsoZKLDTwoU1L8PnOi8Knc
- ovEs2bICAjH7438nMXcE0GJ7KeAijBZqFfzJu8AExNdEYB3AMbiFfpAVK5YlQZPx4sjd
- Bct4OnXxu/hLO2yW+9oqAH3D0XQ+pB9v1QeBg0uiTDUd5pXFhoCvLBGewq20iBGB+8ve
- IUJaEDMtymezfXU8NYscqMbm1AIeT465veS+7HU8zW+BvmeYE1X2TZJ6Gh205bmV8REK
- yNSw==
-X-Gm-Message-State: AOAM530Dgs/4+HBBBSfqewolO6RXhqf90HCUJSsks1y1BtKQkSdFvnHA
- SRDMtanEGzSsZGj9OZjP01brb8B9L7PnENvBhWdKxVZbK1wc555QfTorz2xXp6UY9nIH4dpinyY
- PAI5IxiJ91CVdnho=
-X-Received: by 2002:a1c:544d:: with SMTP id p13mr14952582wmi.25.1591978296850; 
- Fri, 12 Jun 2020 09:11:36 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz5qT7utu9k1msJTpvOP+WHuvGSNn/lKxo05YOmJwGujH50iDsh8w6+AwFQdDaCGTaKlPQ7bg==
-X-Received: by 2002:a1c:544d:: with SMTP id p13mr14952558wmi.25.1591978296538; 
- Fri, 12 Jun 2020 09:11:36 -0700 (PDT)
-Received: from redhat.com (bzq-79-178-18-124.red.bezeqint.net. [79.178.18.124])
- by smtp.gmail.com with ESMTPSA id r5sm10677655wrq.0.2020.06.12.09.11.35
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 12 Jun 2020 09:11:35 -0700 (PDT)
-Date: Fri, 12 Jun 2020 12:11:33 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: Re: [PULL v2 00/58] virtio, acpi, pci: features, fixes, cleanups,
- tests
-Message-ID: <20200612120750-mutt-send-email-mst@kernel.org>
-References: <20200612141917.9446-1-mst@redhat.com>
- <159197710509.1247.17471146455948380339@45ef0f9c86ae>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=ZBdoNOBMEF0YZONd1lNj5Y/k6+JiQQJ7kERWF7pOyRo=;
+ b=j42APafhxEvFbOrdKl4BJxsdA2nfebOW5taPK+hVncaD26Mi1hcdorb/SBDuJEvgbP
+ k1qE7G4/6+/S/iV2iz05/JAUxy/9L0yp+Jlqv3Z+MqgDViRWoR93F/rGZhfM90ZWz128
+ MM/p88y4XPI694l4M8HB3j8DlbMgASHxMtTsbmcUeUeE39N+KyN9JNWBspMW7i//n0bQ
+ IQYJYatKclh2ggtS6CLJLajDnpALjKWjCekzXew8+Bkn8Aj49SGrKj1RAMkpTZc7VUUX
+ ur1HWhSgDJZNpchTtUfoirfa2P2lnkJYoZOOPK6fCRLB8xKXg9giwF2vZq2SwhnI/d96
+ KQUA==
+X-Gm-Message-State: AOAM531mmPR7yESoI+miiPMQ5WYSLNtqmLMAzou8zKHA+UZMshDpZpm6
+ hskzN0VBOKtji24bvnzB+3hNrFusrtpSByZLNd4eOA==
+X-Google-Smtp-Source: ABdhPJzFzVh29/H+2EbkfDiGK9ywjy2+c4yY7w37zmhtYDNr6NMA6DmQdlWoazfZSV+4gE0+tZZ9OXXsALI0J7wU/t0=
+X-Received: by 2002:a05:6122:130b:: with SMTP id
+ e11mr11914299vkp.20.1591979032700; 
+ Fri, 12 Jun 2020 09:23:52 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <159197710509.1247.17471146455948380339@45ef0f9c86ae>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=mst@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/12 08:00:42
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+References: <20200611223016.259837-1-hskinnemoen@google.com>
+ <20200611223016.259837-2-hskinnemoen@google.com>
+ <c16e1f35-ec5b-d479-16b4-944a4567a453@redhat.com>
+In-Reply-To: <c16e1f35-ec5b-d479-16b4-944a4567a453@redhat.com>
+From: Havard Skinnemoen <hskinnemoen@google.com>
+Date: Fri, 12 Jun 2020 09:23:41 -0700
+Message-ID: <CAFQmdRarCC=Etq2baN9UsTBWXxJPSNcA3CKi19P6asJjLevzzw@mail.gmail.com>
+Subject: Re: [PATCH v2 01/12] npcm7xx: Add config symbol
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, 
+ Joel Stanley <joel@jms.id.au>, qemu-arm <qemu-arm@nongnu.org>, 
+ QEMU Developers <qemu-devel@nongnu.org>,
+ IS20 Avi Fishman <Avi.Fishman@nuvoton.com>, 
+ CS20 KFTing <kfting@nuvoton.com>
+Content-Type: multipart/alternative; boundary="000000000000bcd78905a7e580e3"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::a2d;
+ envelope-from=hskinnemoen@google.com; helo=mail-vk1-xa2d.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -185
+X-Spam_score: -18.6
+X-Spam_bar: ------------------
+X-Spam_report: (-18.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ ENV_AND_HDR_SPF_MATCH=-0.5, HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, USER_IN_DEF_DKIM_WL=-7.5,
+ USER_IN_DEF_SPF_WL=-7.5 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,106 +103,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jun 12, 2020 at 08:51:46AM -0700, no-reply@patchew.org wrote:
-> Patchew URL: https://patchew.org/QEMU/20200612141917.9446-1-mst@redhat.com/
-> 
-> 
-> 
-> Hi,
-> 
-> This series seems to have some coding style problems. See output below for
-> more information:
-> 
-> Message-id: 20200612141917.9446-1-mst@redhat.com
-> Subject: [PULL v2 00/58] virtio,acpi,pci: features, fixes, cleanups, tests
-> Type: series
-> 
-> === TEST SCRIPT BEGIN ===
-> #!/bin/bash
-> git rev-parse base > /dev/null || exit 0
-> git config --local diff.renamelimit 0
-> git config --local diff.renames True
-> git config --local diff.algorithm histogram
-> ./scripts/checkpatch.pl --mailback base..
-> === TEST SCRIPT END ===
-> 
-> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
-> Switched to a new branch 'test'
-> 46dd9b7 virtio-pci: fix queue_enable write
-> d9d64b5 pci: Display PCI IRQ pin in "info pci"
-> d784b45 acpi: ged: rename event memory region
-> 31f9185 acpi: fadt: add hw-reduced sleep register support
-> 7ea0b6d acpi: madt: skip pci override on pci-less systems.
-> c105d68 acpi: create acpi-common.c and move madt code
-> e5065df acpi: make build_madt() more generic.
-> 984d983 virtio: add vhost-user-vsock-pci device
-> 9da4528 virtio: add vhost-user-vsock base device
-> 65280b9 vhost-vsock: add vhost-vsock-common abstraction
-> 938682f hw/pci: Fix crash when running QEMU with "-nic model=rocker"
-> dc89e8a libvhost-user: advertise vring features
-> 91ccf2f Lift max ram slots limit in libvhost-user
-> 2d95eb8 Support individual region unmap in libvhost-user
-> 5965847 Support adding individual regions in libvhost-user
-> 4cbf181 Support ram slot configuration in libvhost-user
-> df71a7d Refactor out libvhost-user fault generation logic
-> c26fd6d Lift max memory slots limit imposed by vhost-user
-> 2c027ae Transmit vhost-user memory regions individually
-> 31f458e Add VHOST_USER_PROTOCOL_F_CONFIGURE_MEM_SLOTS
-> a498834 Add vhost-user helper to get MemoryRegion data
-> 0b879bd Add helper to populate vhost-user message regions
-> aeb2dd3 vhost-user-blk: delay vhost_user_blk_disconnect
-> 2764cfd char-socket: return -1 in case of disconnect during tcp_chr_write
-> 8094f71 hw/pci-host: Use the IEC binary prefix definitions
-> 2182c70 hw/pci/pci_bridge: Use the IEC binary prefix definitions
-> c2a6ce2 hw/pci/pci_bridge: Correct pci_bridge_io memory region size
-> 55e9447 hw/pci-host/prep: Correct RAVEN bus bridge memory region size
-> 9b4b0a1 pci: assert configuration access is within bounds
-> f5161c8 hw/pci/pcie: Move hot plug capability check to pre_plug callback
-> 61e916f MAINTAINERS: Fix the classification of bios-tables-test-allowed-diff.h
-> 8c4d9bc virtio-balloon: Provide an interface for free page reporting
-> 1f62891 virtio-balloon: Implement support for page poison reporting feature
-> a186c69 virtio-balloon: unref the iothread when unrealizing
-> f995a73 virtio-balloon: fix free page hinting check on unrealize
-> 1ae2534 virtio-balloon: fix free page hinting without an iothread
-> 23ca28d bios-tables-test: Generate reference tables for Q35/TPM-TIS
-> 681761b bios-tables-test: Add Q35/TPM-TIS test
-> 55dc15d tests: tpm-emu: Remove assert on TPM2_ST_NO_SESSIONS
-> d156ed4 tests/acpi: Add void tables for Q35/TPM-TIS bios-tables-test
-> 1f7f0ed test/tpm-emu: include sockets and channel headers in tpm-emu header
-> 1d4ccd1 arm/acpi: TPM2 ACPI table support
-> 05d06ef acpi: Move build_tpm2() in the generic part
-> b3d7639 acpi: Convert build_tpm2() to build_append* API
-> c83165b acpi: tpm: Do not build TCPA table for TPM 2
-> d5513c9 tests/acpi: update DSDT expected files
-> fd8fce1 acpi: move aml builder code for parallel device
-> ef1eb92 acpi: parallel: don't use _STA method
-> 7dd4ccf acpi: move aml builder code for serial device
-> bae880e acpi: serial: don't use _STA method
-> 97466cf acpi: rtc: use a single crs range
-> 74ad15b acpi: move aml builder code for rtc device
-> 7168264 qtest: allow DSDT acpi table changes
-> f0b0e85 tests/acpi: update expected SRAT files
-> cc03da0 hw/acpi/nvdimm: add a helper to augment SRAT generation
-> c864987 diffs-allowed: add the SRAT AML to diffs-allowed
-> 2029ad3 msix: allow qword MSI-X table accesses
-> 
-> === OUTPUT BEGIN ===
-> 1/57 Checking commit 2029ad30a9a4 (msix: allow qword MSI-X table accesses)
-> 2/57 Checking commit c8649877f7aa (diffs-allowed: add the SRAT AML to diffs-allowed)
-> 3/57 Checking commit cc03da0d8b45 (hw/acpi/nvdimm: add a helper to augment SRAT generation)
-> 4/57 Checking commit f0b0e85de3ba (tests/acpi: update expected SRAT files)
-> ERROR: Do not add expected files together with tests, follow instructions in tests/qtest/bios-tables-test.c: both tests/data/acpi/virt/SRAT.memhp and tests/qtest/bios-tables-test-allowed-diff.h found
-> 
-> ERROR: Do not add expected files together with tests, follow instructions in tests/qtest/bios-tables-test.c: both tests/data/acpi/virt/SRAT.memhp and tests/qtest/bios-tables-test-allowed-diff.h found
+--000000000000bcd78905a7e580e3
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The checkpatch fix isn't merged yet...
+Hi Philippe,
 
--- 
-MST
+On Fri, Jun 12, 2020 at 6:35 AM Philippe Mathieu-Daud=C3=A9 <philmd@redhat.=
+com>
+wrote:
 
+> Hi Havard
+>
+> On 6/12/20 12:30 AM, Havard Skinnemoen wrote:
+> > Add a config symbol for the NPCM7xx BMC SoC family that subsequent
+> > patches can use in Makefiles.
+> >
+> > Change-Id: I6e4d5c58716cb6fe4ea5d06f148beeafda55f9a5
+>
+> What it this Change-Id tag used for?
+>
+
+It's used by Gerrit code review, which we use for reviews internally
+(between Google and Nuvoton). I meant to remove it before mailing the
+patches, sorry.
+
+--000000000000bcd78905a7e580e3
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div>Hi Philippe,</div><div><br></div><div dir=3D"ltr">On =
+Fri, Jun 12, 2020 at 6:35 AM Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mai=
+lto:philmd@redhat.com">philmd@redhat.com</a>&gt; wrote:<br></div><div class=
+=3D"gmail_quote"><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px =
+0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">Hi Havar=
+d<br>
+<br>
+On 6/12/20 12:30 AM, Havard Skinnemoen wrote:<br>
+&gt; Add a config symbol for the NPCM7xx BMC SoC family that subsequent<br>
+&gt; patches can use in Makefiles.<br>
+&gt; <br>
+&gt; Change-Id: I6e4d5c58716cb6fe4ea5d06f148beeafda55f9a5<br>
+<br>
+What it this Change-Id tag used for?<br></blockquote><div><br></div><div>It=
+&#39;s used by Gerrit code review,=C2=A0which we use for reviews internally=
+ (between Google and Nuvoton). I meant to remove it before mailing the patc=
+hes, sorry.</div></div></div>
+
+--000000000000bcd78905a7e580e3--
 
