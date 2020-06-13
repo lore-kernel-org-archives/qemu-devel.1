@@ -2,94 +2,85 @@ Return-Path: <SRS0=+z+v=72=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB428C433E0
-	for <qemu-devel@archiver.kernel.org>; Sat, 13 Jun 2020 11:17:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DDDAC433E0
+	for <qemu-devel@archiver.kernel.org>; Sat, 13 Jun 2020 11:22:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7B4CC2078A
-	for <qemu-devel@archiver.kernel.org>; Sat, 13 Jun 2020 11:17:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3A0822074D
+	for <qemu-devel@archiver.kernel.org>; Sat, 13 Jun 2020 11:22:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xW/eZnR5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B4CC2078A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=yadro.com header.i=@yadro.com header.b="sAksLQWo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A0822074D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yadro.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34088 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37916 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jk4Ac-0002lG-NK
-	for qemu-devel@archiver.kernel.org; Sat, 13 Jun 2020 07:17:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59028)
+	id 1jk4Ei-0005f7-Ew
+	for qemu-devel@archiver.kernel.org; Sat, 13 Jun 2020 07:22:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33916)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jk49n-0001hX-BT
- for qemu-devel@nongnu.org; Sat, 13 Jun 2020 07:17:04 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:40877)
- by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jk49l-0004cW-0u
- for qemu-devel@nongnu.org; Sat, 13 Jun 2020 07:17:02 -0400
-Received: by mail-wm1-x343.google.com with SMTP id r15so10266924wmh.5
- for <qemu-devel@nongnu.org>; Sat, 13 Jun 2020 04:16:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=H+lZ/bzUu/WlKlAoN7/C0YR19ugvHxsurBmCu9+4kUU=;
- b=xW/eZnR5OC9f5Tzo10XF2V+eNuGDSG/oxyVGVre74hm89w9YxD9c+XoAFnB2TkPv9i
- SfrKnw2rxlvEAz9pzKi4n8gbYdoG6ORSoqfTrGGD9VbulajmcICWYaP5tgwVGuH0Jsq0
- lLUGbKJxnorib8uiDYAr+wU3ejvb7YO45if9R/iB9ouoXT0TNdmlC2up7kd+sihF4wjf
- yJ978czO2Sg0h4CQLsAQtn5kRFs5/vR05hvwKCmIqPfpiUBJRrRJjON5UyQQw53iSMXd
- 1fvTEc4utcB1/upHHcLy8FiDfSYAqTLM6s+AcsmTiWYrL3MdlAVrThRWSsNAA8F/5idh
- rHgw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=H+lZ/bzUu/WlKlAoN7/C0YR19ugvHxsurBmCu9+4kUU=;
- b=BJ21naNGeWc8ADez9alt3v0u9YFhHJnzJaDUwqDoPYkpfq+Ud8iq4vbNMB4O6tVifn
- oi1aGsxc2/RdagQ3Yt5ic8i/rUgpEIBdtDrE1ncNlcMw6oow/B1FSTuEoxyymjF+H3jt
- NxH3dYxp7kE9d+rYyekvMNJklwjch1S6YvxR8i2LbRBRXdCVLWzojbT45+sDvEy/Rr7H
- jTsP4+C8izzTb/8ZfvkwmzFwxQzw311e0wIsAochbygg81LEk7S6/nMobSz95yP8i0n2
- Z1X86sENkmg3v2C0kTNyvOD2dqoGOXMB1BScp5wCjeY1IGPeiPzOD2ZBUJZr0e3KYtiD
- C5nA==
-X-Gm-Message-State: AOAM5310gF2XZtdeY4d+Ai3oZlFUPgyjEemiGT27lTTozyMUmZ0uZm1r
- c5+W2lk2+nL6NyX2IoqpfnLQOw==
-X-Google-Smtp-Source: ABdhPJx8B7Ai47J3j35X2zFeSK74q9/eVnfjaWNJNHcTNknlHx2bLR1RF5r0LRg/TA2sGk9Pdfev6w==
-X-Received: by 2002:a1c:dc44:: with SMTP id t65mr3733192wmg.128.1592047011635; 
- Sat, 13 Jun 2020 04:16:51 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id j16sm16804120wre.21.2020.06.13.04.16.50
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 13 Jun 2020 04:16:50 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 5909E1FF7E;
- Sat, 13 Jun 2020 12:16:49 +0100 (BST)
-References: <20200612014606.147691-1-jkz@google.com>
-User-agent: mu4e 1.5.2; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Josh Kunz <jkz@google.com>
-Subject: Re: [PATCH 0/5] linux-user: Support extended clone(CLONE_VM)
-In-reply-to: <20200612014606.147691-1-jkz@google.com>
-Date: Sat, 13 Jun 2020 12:16:49 +0100
-Message-ID: <87lfkr43mm.fsf@linaro.org>
+ (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
+ id 1jk4Dx-00051P-V7
+ for qemu-devel@nongnu.org; Sat, 13 Jun 2020 07:21:21 -0400
+Received: from mta-02.yadro.com ([89.207.88.252]:38382 helo=mta-01.yadro.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
+ id 1jk4Dv-0005LZ-Q2
+ for qemu-devel@nongnu.org; Sat, 13 Jun 2020 07:21:21 -0400
+Received: from localhost (unknown [127.0.0.1])
+ by mta-01.yadro.com (Postfix) with ESMTP id 851D14C83C;
+ Sat, 13 Jun 2020 11:21:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
+ content-transfer-encoding:content-type:content-type:mime-version
+ :x-mailer:message-id:date:date:subject:subject:from:from
+ :received:received:received; s=mta-01; t=1592047275; x=
+ 1593861676; bh=alsXcJxWknvFuPc/oEcJ3hyIN36XcRR6QP0Aas7G7Cs=; b=s
+ AksLQWofu2EMdvsmWBztHW7XAAWHgSIs6d6AHFWTIsRKb6vKibmov397Xfl2NG1S
+ sTSiZl7OzZL2r24NPd1CrVnlvXS6QaJGr8JNfjdic/rwPL0X/1S0LaGwHtCTEO1A
+ xGP0oLUMTZb46rvP0iUAPE+kIMKPNM0dBh5ofy0GDw=
+X-Virus-Scanned: amavisd-new at yadro.com
+Received: from mta-01.yadro.com ([127.0.0.1])
+ by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 5aMpPov6ypGO; Sat, 13 Jun 2020 14:21:15 +0300 (MSK)
+Received: from T-EXCH-02.corp.yadro.com (t-exch-02.corp.yadro.com
+ [172.17.10.102])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mta-01.yadro.com (Postfix) with ESMTPS id 8C29F47D0B;
+ Sat, 13 Jun 2020 14:21:14 +0300 (MSK)
+Received: from localhost (172.17.204.212) by T-EXCH-02.corp.yadro.com
+ (172.17.10.102) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id 15.1.669.32; Sat, 13
+ Jun 2020 14:21:14 +0300
+From: Roman Bolshakov <r.bolshakov@yadro.com>
+To: <seabios@seabios.org>
+Subject: [PATCH] timer: Handle decrements of PIT counter
+Date: Sat, 13 Jun 2020 14:19:12 +0300
+Message-ID: <20200613111911.65497-1-r.bolshakov@yadro.com>
+X-Mailer: git-send-email 2.26.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x343.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [172.17.204.212]
+X-ClientProxiedBy: T-EXCH-01.corp.yadro.com (172.17.10.101) To
+ T-EXCH-02.corp.yadro.com (172.17.10.102)
+Received-SPF: pass client-ip=89.207.88.252; envelope-from=r.bolshakov@yadro.com;
+ helo=mta-01.yadro.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/13 07:21:16
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,79 +93,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: riku.voipio@iki.fi, qemu-devel@nongnu.org, laurent@vivier.eu
+Cc: Roman Bolshakov <r.bolshakov@yadro.com>,
+ Kevin O'Connor <kevin@koconnor.net>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+There's a fallback to PIT if TSC is not present but it doesn't work
+properly. It prevents boot from floppy on isapc and 486 cpu [1][2].
 
-Josh Kunz <jkz@google.com> writes:
+SeaBIOS configures PIT in Mode 2. PIT counter is decremented in the mode
+but timer_adjust_bits() thinks that the counter overflows and increases
+32-bit tick counter on each detected "overflow". Invalid overflow
+detection results in 55ms time advance (1 / 18.2Hz) on each read from
+PIT counter. So all timers expire much faster and 5-second floppy
+timeout expires in 83 real microseconds (or just a bit longer).
 
-> This patch series implements extended support for the `clone` system
-> call. As best I can tell, any option combination including `CLONE_VM`
-> should be supported with the addition of this patch series. The
-> implementation is described in greater detail in the patches themselves.
->
-> Testing:
->
->   * All targets built on x86_64.
->   * `make check` and `make check-tcg` are passing. Additional tests have
->     been added to `linux-test.c` to validate clone behavior.
->
-> Caveats:
->
->   * This series touches, but does not fix, several bits of code that are
->     racey (namely the sigact table and the fd trans table).
->   * `exit_group` does not perform the appropriate cleanup for non-thread
->     children created with `CLONE_VM`. CPUs for such children are never
->     cleaned up. The correct implementation of exit-group is non-trivial
->     (since it also needs to track/handle cleanup for threads in the
->     clone'd child process). Also, I don't fully understand the
->     interaction between QOM<->linux-user.
+Provide counter direction to timer_adjust_bits() and normalize the
+counter to advance ticks in monotonically increasing TimerLast.
 
-When the QOM object gets unrefed for the final time it should cause a
-bunch of clean-up in the common vCPU management code where things like
-plugin cleanup are done.
+1. https://bugs.launchpad.net/seabios/+bug/1840719
+2. https://lists.gnu.org/archive/html/qemu-devel/2019-08/msg03924.html
 
-This was recently touched in 1f81ce90e31ef338ee53a0cea02344237bc470cc
-where I removed linux-user messing around with the active cpu list and
-left it to the core code to deal with. Previously it wasn't being
-properly unrealized.
+Fixes: eac11944019 ("Unify pmtimer_read() and pittimer_read() code.")
+Reported-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Cc: Kevin O'Connor <kevin@koconnor.net>
+Signed-off-by: Roman Bolshakov <r.bolshakov@yadro.com>
+---
+ src/hw/timer.c | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
 
->     My naive implementation based
->     on the current implementation `exit(2)` was regularly crashing. If
->     maintainers have suggestions for better ways to handle exit_group,
->     they would be greatly appreciated.=20
->   * execve does not clean up the CPUs of clone'd children, for the same
->     reasons as `exit_group`.
->
-> Josh Kunz (5):
->   linux-user: Refactor do_fork to use new `qemu_clone`
->   linux-user: Make fd_trans task-specific.
->   linux-user: Make sigact_table part of the task state.
->   linux-user: Support CLONE_VM and extended clone options
->   linux-user: Add PDEATHSIG test for clone process hierarchy.
->
->  linux-user/Makefile.objs            |   2 +-
->  linux-user/clone.c                  | 565 ++++++++++++++++++++++++++++
->  linux-user/clone.h                  |  27 ++
->  linux-user/fd-trans-tbl.c           |  13 +
->  linux-user/fd-trans-type.h          |  17 +
->  linux-user/fd-trans.c               |   3 -
->  linux-user/fd-trans.h               |  75 ++--
->  linux-user/main.c                   |   1 +
->  linux-user/qemu.h                   |  49 +++
->  linux-user/signal.c                 |  84 ++++-
->  linux-user/syscall.c                | 452 ++++++++++++----------
->  tests/tcg/multiarch/Makefile.target |   3 +
->  tests/tcg/multiarch/linux-test.c    | 227 ++++++++++-
->  13 files changed, 1264 insertions(+), 254 deletions(-)
->  create mode 100644 linux-user/clone.c
->  create mode 100644 linux-user/clone.h
->  create mode 100644 linux-user/fd-trans-tbl.c
->  create mode 100644 linux-user/fd-trans-type.h
+diff --git a/src/hw/timer.c b/src/hw/timer.c
+index 56bb289..2441402 100644
+--- a/src/hw/timer.c
++++ b/src/hw/timer.c
+@@ -156,10 +156,15 @@ u32 TimerLast VARLOW;
+ 
+ // Add extra high bits to timers that have less than 32bits of precision.
+ static u32
+-timer_adjust_bits(u32 value, u32 validbits)
++timer_adjust_bits(u32 value, u32 validbits, u8 countup)
+ {
+     u32 last = GET_LOW(TimerLast);
+-    value = (last & ~validbits) | (value & validbits);
++    u32 validvalue;
++    if (countup)
++        validvalue = value & validbits;
++    else
++        validvalue = validbits - (value & validbits);
++    value = (last & ~validbits) | validvalue;
+     if (value < last)
+         value += validbits + 1;
+     SET_LOW(TimerLast, value);
+@@ -176,11 +181,11 @@ timer_read(void)
+         return rdtscll() >> GET_GLOBAL(ShiftTSC);
+     if (CONFIG_PMTIMER && port != PORT_PIT_COUNTER0)
+         // Read from PMTIMER
+-        return timer_adjust_bits(inl(port), 0xffffff);
++        return timer_adjust_bits(inl(port), 0xffffff, 1);
+     // Read from PIT.
+     outb(PM_SEL_READBACK | PM_READ_VALUE | PM_READ_COUNTER0, PORT_PIT_MODE);
+     u16 v = inb(PORT_PIT_COUNTER0) | (inb(PORT_PIT_COUNTER0) << 8);
+-    return timer_adjust_bits(v, 0xffff);
++    return timer_adjust_bits(v, 0xffff, 0);
+ }
+ 
+ // Return the TSC value that is 'msecs' time in the future.
+-- 
+2.26.1
 
-
---=20
-Alex Benn=C3=A9e
 
