@@ -2,85 +2,92 @@ Return-Path: <SRS0=+z+v=72=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DDDAC433E0
-	for <qemu-devel@archiver.kernel.org>; Sat, 13 Jun 2020 11:22:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04335C433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 13 Jun 2020 13:07:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3A0822074D
-	for <qemu-devel@archiver.kernel.org>; Sat, 13 Jun 2020 11:22:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C2FC320739
+	for <qemu-devel@archiver.kernel.org>; Sat, 13 Jun 2020 13:07:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=yadro.com header.i=@yadro.com header.b="sAksLQWo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A0822074D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yadro.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PYjg5tDy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2FC320739
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37916 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43276 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jk4Ei-0005f7-Ew
-	for qemu-devel@archiver.kernel.org; Sat, 13 Jun 2020 07:22:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33916)
+	id 1jk5sN-0006zH-0h
+	for qemu-devel@archiver.kernel.org; Sat, 13 Jun 2020 09:07:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47024)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
- id 1jk4Dx-00051P-V7
- for qemu-devel@nongnu.org; Sat, 13 Jun 2020 07:21:21 -0400
-Received: from mta-02.yadro.com ([89.207.88.252]:38382 helo=mta-01.yadro.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
- id 1jk4Dv-0005LZ-Q2
- for qemu-devel@nongnu.org; Sat, 13 Jun 2020 07:21:21 -0400
-Received: from localhost (unknown [127.0.0.1])
- by mta-01.yadro.com (Postfix) with ESMTP id 851D14C83C;
- Sat, 13 Jun 2020 11:21:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
- content-transfer-encoding:content-type:content-type:mime-version
- :x-mailer:message-id:date:date:subject:subject:from:from
- :received:received:received; s=mta-01; t=1592047275; x=
- 1593861676; bh=alsXcJxWknvFuPc/oEcJ3hyIN36XcRR6QP0Aas7G7Cs=; b=s
- AksLQWofu2EMdvsmWBztHW7XAAWHgSIs6d6AHFWTIsRKb6vKibmov397Xfl2NG1S
- sTSiZl7OzZL2r24NPd1CrVnlvXS6QaJGr8JNfjdic/rwPL0X/1S0LaGwHtCTEO1A
- xGP0oLUMTZb46rvP0iUAPE+kIMKPNM0dBh5ofy0GDw=
-X-Virus-Scanned: amavisd-new at yadro.com
-Received: from mta-01.yadro.com ([127.0.0.1])
- by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5aMpPov6ypGO; Sat, 13 Jun 2020 14:21:15 +0300 (MSK)
-Received: from T-EXCH-02.corp.yadro.com (t-exch-02.corp.yadro.com
- [172.17.10.102])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
- (No client certificate requested)
- by mta-01.yadro.com (Postfix) with ESMTPS id 8C29F47D0B;
- Sat, 13 Jun 2020 14:21:14 +0300 (MSK)
-Received: from localhost (172.17.204.212) by T-EXCH-02.corp.yadro.com
- (172.17.10.102) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id 15.1.669.32; Sat, 13
- Jun 2020 14:21:14 +0300
-From: Roman Bolshakov <r.bolshakov@yadro.com>
-To: <seabios@seabios.org>
-Subject: [PATCH] timer: Handle decrements of PIT counter
-Date: Sat, 13 Jun 2020 14:19:12 +0300
-Message-ID: <20200613111911.65497-1-r.bolshakov@yadro.com>
-X-Mailer: git-send-email 2.26.1
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jk5rm-0006Yz-Nr
+ for qemu-devel@nongnu.org; Sat, 13 Jun 2020 09:06:34 -0400
+Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:38197)
+ by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jk5rl-00054G-2i
+ for qemu-devel@nongnu.org; Sat, 13 Jun 2020 09:06:34 -0400
+Received: by mail-wm1-x336.google.com with SMTP id f185so10418682wmf.3
+ for <qemu-devel@nongnu.org>; Sat, 13 Jun 2020 06:06:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=UxymZrFuiABFSy74WKjgHF4mxbBkme4bRDdyk44DbUc=;
+ b=PYjg5tDyf1xYNKdKPDydL5Hqi1Ck1Nqxiht1nfol2d09WLZjfhMDpAsfcPi39pVuQ1
+ uHf93KDWaps3VMY+I9/vLUKaYqQPysvReCvPCXIkwd3KqIlg78qykyBrnYOnzWgQGti+
+ /6uP5/OqwhPAJgoZf8TLq/ofoZn+vaBDPbUBHoIgPVCAWQU8k1w/4THfsh2mqSGZuDoI
+ m6SUgmAtC7KrK1lnht5/DtGLHoLQ2xVt9JAlDzGoNyqrwftd1F6GSqqQ4P2Pa59FVIft
+ ZOIIBwm4+IoD1wAqcrWDU3tPVoiLn5YfvHkuPbgoD8IgCAocHqK2IazUwBo2eBfGy9lv
+ vWlg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=UxymZrFuiABFSy74WKjgHF4mxbBkme4bRDdyk44DbUc=;
+ b=BplTKQGj/b1qig1GRWtjS82VhHlRPLdevCqNRTp7HRhxJFNh7KY+VAdr1jFFQEFnJm
+ ea3BvAI8/yuq1wJo7cHSmQwSJbq7EMeM1PpUWSJvhzXHbibdGnSzWllCqbgnWHweNWC3
+ UU9g1cEct12EVJ+AyHWpNGdSMUcjAZiuGGXj95m2GcIRue2mDCk9yv0Y/avjVQIAIP0W
+ D++gF4QkOeMI7XNraRjcfE85IxbBTnHUu5zGs+eN782yOUnYPx2DAJ121qKDJt/qb01J
+ a55Mvecm/oVJgNWtzb35fNwGgtXjkTiKpnmXvkLuz4qxv2qt1+wZGISgTXksOILUKRQ9
+ Z1sQ==
+X-Gm-Message-State: AOAM5317eqq3wb8AAeMG8EwmZ8VTPDQwCc3IbiQ3iNxipM9QEMZ8cIpL
+ p57SH+z+g3RGE/dQXjml5GeQkJOm
+X-Google-Smtp-Source: ABdhPJwtYtiPeSqbKj7hhx5p1/PpAZJiJcoq8LaUUuTz9b2hHbW+dMRtqzf7CZ26RCVbapLJvV6TWw==
+X-Received: by 2002:a1c:7d4c:: with SMTP id y73mr3833829wmc.188.1592053585471; 
+ Sat, 13 Jun 2020 06:06:25 -0700 (PDT)
+Received: from localhost.localdomain
+ (181.red-88-10-103.dynamicip.rima-tde.net. [88.10.103.181])
+ by smtp.gmail.com with ESMTPSA id b18sm14353454wrn.88.2020.06.13.06.06.23
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sat, 13 Jun 2020 06:06:24 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] .travis.yml: Use travis_retry() in case of network issues
+Date: Sat, 13 Jun 2020 15:06:21 +0200
+Message-Id: <20200613130622.20541-1-f4bug@amsat.org>
+X-Mailer: git-send-email 2.21.3
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [172.17.204.212]
-X-ClientProxiedBy: T-EXCH-01.corp.yadro.com (172.17.10.101) To
- T-EXCH-02.corp.yadro.com (172.17.10.102)
-Received-SPF: pass client-ip=89.207.88.252; envelope-from=r.bolshakov@yadro.com;
- helo=mta-01.yadro.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/13 07:21:16
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=2a00:1450:4864:20::336;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x336.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,75 +100,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Roman Bolshakov <r.bolshakov@yadro.com>,
- Kevin O'Connor <kevin@koconnor.net>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Cornelia Huck <cohuck@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-There's a fallback to PIT if TSC is not present but it doesn't work
-properly. It prevents boot from floppy on isapc and 486 cpu [1][2].
+Use travis_retry() when cloning SLOF (see 31c8cc4f94e) in the
+s390x container job, to avoid build failures:
 
-SeaBIOS configures PIT in Mode 2. PIT counter is decremented in the mode
-but timer_adjust_bits() thinks that the counter overflows and increases
-32-bit tick counter on each detected "overflow". Invalid overflow
-detection results in 55ms time advance (1 / 18.2Hz) on each read from
-PIT counter. So all timers expire much faster and 5-second floppy
-timeout expires in 83 real microseconds (or just a bit longer).
+  $ ( cd ${SRC_DIR} ; git submodule update --init roms/SLOF )
+  Submodule 'roms/SLOF' (https://git.qemu.org/git/SLOF.git) registered for path 'roms/SLOF'
+  Cloning into '/home/travis/build/user/qemu/roms/SLOF'...
+  fatal: unable to access 'https://git.qemu.org/git/SLOF.git/': Could not resolve host: git.qemu.org
+  fatal: clone of 'https://git.qemu.org/git/SLOF.git' into submodule path '/home/travis/build/user/qemu/roms/SLOF' failed
+  Failed to clone 'roms/SLOF'. Retry scheduled
+  Cloning into '/home/travis/build/user/qemu/roms/SLOF'...
+  fatal: unable to access 'https://git.qemu.org/git/SLOF.git/': Could not resolve host: git.qemu.org
+  fatal: clone of 'https://git.qemu.org/git/SLOF.git' into submodule path '/home/travis/build/user/qemu/roms/SLOF' failed
+  Failed to clone 'roms/SLOF' a second time, aborting
+  The command "( cd ${SRC_DIR} ; git submodule update --init roms/SLOF )" exited with 1.
 
-Provide counter direction to timer_adjust_bits() and normalize the
-counter to advance ticks in monotonically increasing TimerLast.
-
-1. https://bugs.launchpad.net/seabios/+bug/1840719
-2. https://lists.gnu.org/archive/html/qemu-devel/2019-08/msg03924.html
-
-Fixes: eac11944019 ("Unify pmtimer_read() and pittimer_read() code.")
-Reported-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Cc: Kevin O'Connor <kevin@koconnor.net>
-Signed-off-by: Roman Bolshakov <r.bolshakov@yadro.com>
+Reported-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- src/hw/timer.c | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
+ .travis.yml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/src/hw/timer.c b/src/hw/timer.c
-index 56bb289..2441402 100644
---- a/src/hw/timer.c
-+++ b/src/hw/timer.c
-@@ -156,10 +156,15 @@ u32 TimerLast VARLOW;
- 
- // Add extra high bits to timers that have less than 32bits of precision.
- static u32
--timer_adjust_bits(u32 value, u32 validbits)
-+timer_adjust_bits(u32 value, u32 validbits, u8 countup)
- {
-     u32 last = GET_LOW(TimerLast);
--    value = (last & ~validbits) | (value & validbits);
-+    u32 validvalue;
-+    if (countup)
-+        validvalue = value & validbits;
-+    else
-+        validvalue = validbits - (value & validbits);
-+    value = (last & ~validbits) | validvalue;
-     if (value < last)
-         value += validbits + 1;
-     SET_LOW(TimerLast, value);
-@@ -176,11 +181,11 @@ timer_read(void)
-         return rdtscll() >> GET_GLOBAL(ShiftTSC);
-     if (CONFIG_PMTIMER && port != PORT_PIT_COUNTER0)
-         // Read from PMTIMER
--        return timer_adjust_bits(inl(port), 0xffffff);
-+        return timer_adjust_bits(inl(port), 0xffffff, 1);
-     // Read from PIT.
-     outb(PM_SEL_READBACK | PM_READ_VALUE | PM_READ_COUNTER0, PORT_PIT_MODE);
-     u16 v = inb(PORT_PIT_COUNTER0) | (inb(PORT_PIT_COUNTER0) << 8);
--    return timer_adjust_bits(v, 0xffff);
-+    return timer_adjust_bits(v, 0xffff, 0);
- }
- 
- // Return the TSC value that is 'msecs' time in the future.
+diff --git a/.travis.yml b/.travis.yml
+index ec6367af1f..19a1b55aab 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -496,7 +496,7 @@ jobs:
+         - CONFIG="--disable-containers --target-list=${MAIN_SOFTMMU_TARGETS},s390x-linux-user"
+         - UNRELIABLE=true
+       script:
+-        - ( cd ${SRC_DIR} ; git submodule update --init roms/SLOF )
++        - ( cd ${SRC_DIR} ; travis_retry git submodule update --init roms/SLOF )
+         - BUILD_RC=0 && make -j${JOBS} || BUILD_RC=$?
+         - |
+           if [ "$BUILD_RC" -eq 0 ] ; then
 -- 
-2.26.1
+2.21.3
 
 
