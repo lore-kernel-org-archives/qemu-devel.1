@@ -2,125 +2,74 @@ Return-Path: <SRS0=clLO=73=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CC3FC433DF
-	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 03:49:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D711EC433DF
+	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 04:13:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F3D8420714
-	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 03:49:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A0A782065D
+	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 04:13:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mymailcheap.com header.i=@mymailcheap.com header.b="lbSGKIit";
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=flygoat.com header.i=@flygoat.com header.b="aS8uLqSN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3D8420714
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=flygoat.com
+	dkim=pass (1024-bit key) header.d=hostfission.com header.i=@hostfission.com header.b="EQ6RRkbT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0A782065D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=hostfission.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55270 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59934 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkJdp-00085e-81
-	for qemu-devel@archiver.kernel.org; Sat, 13 Jun 2020 23:49:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43930)
+	id 1jkK1C-0005xx-Rr
+	for qemu-devel@archiver.kernel.org; Sun, 14 Jun 2020 00:13:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51032)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jiaxun.yang@flygoat.com>)
- id 1jkJd9-0007f4-O1
- for qemu-devel@nongnu.org; Sat, 13 Jun 2020 23:48:24 -0400
-Received: from relay5.mymailcheap.com ([159.100.241.64]:56044)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jiaxun.yang@flygoat.com>)
- id 1jkJd7-0004tj-2V
- for qemu-devel@nongnu.org; Sat, 13 Jun 2020 23:48:23 -0400
-Received: from relay3.mymailcheap.com (relay3.mymailcheap.com
- [217.182.119.157])
- by relay5.mymailcheap.com (Postfix) with ESMTPS id AD0ED20096
- for <qemu-devel@nongnu.org>; Sun, 14 Jun 2020 03:48:16 +0000 (UTC)
-Received: from filter1.mymailcheap.com (filter1.mymailcheap.com
- [149.56.130.247])
- by relay3.mymailcheap.com (Postfix) with ESMTPS id 429613F1CC;
- Sun, 14 Jun 2020 05:48:10 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
- by filter1.mymailcheap.com (Postfix) with ESMTP id 6831D2A3AB;
- Sat, 13 Jun 2020 23:48:09 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=mymailcheap.com;
- s=default; t=1592106489;
- bh=YN7E3xl1eNZ5H2IPbaiSBqzAEZUaLXI6vSNkSxzMl5o=;
- h=From:To:Cc:Subject:Date:From;
- b=lbSGKIitP85+sadjAQhfT+V9RX7t6c7p2nugY/m33Zir5su58HrcpwhZm2LgNkv4e
- WCUWUhJnj9yDiMzMFCROVkKifZpkxnDbDqLBugpxXF5R0WOuVk+gXESK+KFA5ewjTN
- jXI+Igq3amDfGaxOzffDn0yhCjb7y6/pOyZngdP4=
-X-Virus-Scanned: Debian amavisd-new at filter1.mymailcheap.com
-Received: from filter1.mymailcheap.com ([127.0.0.1])
- by localhost (filter1.mymailcheap.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id SEmpGC_I8R5Q; Sat, 13 Jun 2020 23:48:08 -0400 (EDT)
-Received: from mail20.mymailcheap.com (mail20.mymailcheap.com [51.83.111.147])
- (using TLSv1.2 with cipher ADH-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by filter1.mymailcheap.com (Postfix) with ESMTPS;
- Sat, 13 Jun 2020 23:48:08 -0400 (EDT)
-Received: from [213.133.102.83] (ml.mymailcheap.com [213.133.102.83])
- by mail20.mymailcheap.com (Postfix) with ESMTP id D1573403B5;
- Sun, 14 Jun 2020 03:48:04 +0000 (UTC)
-Authentication-Results: mail20.mymailcheap.com; dkim=pass (1024-bit key;
- unprotected) header.d=flygoat.com header.i=@flygoat.com header.b="aS8uLqSN"; 
- dkim-atps=neutral
-AI-Spam-Status: Not processed
-Received: from halation.202.net.flygoat.com (unknown [183.157.45.207])
- (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
- key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest
- SHA256) (No client certificate requested)
- by mail20.mymailcheap.com (Postfix) with ESMTPSA id A00ED403B5;
- Sun, 14 Jun 2020 03:47:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=flygoat.com;
- s=default; t=1592106482;
- bh=YN7E3xl1eNZ5H2IPbaiSBqzAEZUaLXI6vSNkSxzMl5o=;
- h=From:To:Cc:Subject:Date:From;
- b=aS8uLqSNhyPU5Ri/yzAYkGNjvx42up/zy9qCERu3JE+gLVSJxfiTd+wt2lwnSb3b5
- XWA7kGtN802jGnSuDUVjT69AcwZoTFlo+6WG/D/6jFAHGgXyzMbMuzVIs2KMAdyIfN
- nEOuxvgKnqslcsSW/wXO3CFGtRSX0QLJv9fdxPU0=
-From: Jiaxun Yang <jiaxun.yang@flygoat.com>
-To: aleksandar.qemu.devel@gmail.com
-Subject: [PATCH] target/mips: Fix PageMask with variable page size
-Date: Sun, 14 Jun 2020 11:47:29 +0800
-Message-Id: <20200614034729.3004-1-jiaxun.yang@flygoat.com>
-X-Mailer: git-send-email 2.27.0
+ (Exim 4.90_1) (envelope-from <root@moya.office.hostfission.com>)
+ id 1jkK0b-0005ZT-TX
+ for qemu-devel@nongnu.org; Sun, 14 Jun 2020 00:12:37 -0400
+Received: from mail1.hostfission.com ([139.99.139.48]:57166)
+ by eggs.gnu.org with esmtp (Exim 4.90_1)
+ (envelope-from <root@moya.office.hostfission.com>)
+ id 1jkK0Z-0000Wv-6g
+ for qemu-devel@nongnu.org; Sun, 14 Jun 2020 00:12:37 -0400
+Received: from moya.office.hostfission.com (office.hostfission.com
+ [220.233.29.71])
+ by mail1.hostfission.com (Postfix) with ESMTP id F40CE445F5;
+ Sat, 13 Jun 2020 14:06:03 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=hostfission.com;
+ s=mail; t=1592021164;
+ bh=OdRJm45Q4UNv6+P+Ib6qm82RVr++vAH8VUG3t1Sh9As=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=EQ6RRkbTradms1c0z8CjTkJwEhZCGlifW+0zK7nIftNw4xvLHlCAfgzq1RoPUTVXA
+ +AAEe3GSWdDPDt0h3FwlCRAoXG5Jt9dxHGER6X9MCCVn7I5JvCtWo7dcIb0xImPQKU
+ HxNYSfgxKO6bsuFxtME/KslpjAOgduxzOMlJb5P0=
+Received: by moya.office.hostfission.com (Postfix, from userid 0)
+ id DEEF23A0A09; Sat, 13 Jun 2020 14:06:03 +1000 (AEST)
+From: Geoffrey McRae <geoff@hostfission.com>
+To: qemu-devel@nongnu.org
+Cc: kraxel@redhat.com,
+	geoff@hostfission.com
+Subject: [PATCH 5/6] audio/jack: honour the enable state of the audio device
+Date: Sat, 13 Jun 2020 14:05:17 +1000
+Message-Id: <20200613040518.38172-6-geoff@hostfission.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200613040518.38172-1-geoff@hostfission.com>
+References: <20200613040518.38172-1-geoff@hostfission.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: D1573403B5
-X-Spamd-Result: default: False [6.40 / 10.00]; RCVD_VIA_SMTP_AUTH(0.00)[];
- TO_DN_SOME(0.00)[]; R_MISSING_CHARSET(2.50)[];
- BROKEN_CONTENT_TYPE(1.50)[]; R_SPF_SOFTFAIL(0.00)[~all];
- RCPT_COUNT_FIVE(0.00)[5]; ML_SERVERS(-3.10)[213.133.102.83];
- DKIM_TRACE(0.00)[flygoat.com:+];
- DMARC_POLICY_ALLOW(0.00)[flygoat.com,none];
- DMARC_POLICY_ALLOW_WITH_FAILURES(0.00)[];
- FREEMAIL_TO(0.00)[gmail.com]; RCVD_NO_TLS_LAST(0.10)[];
- RECEIVED_SPAMHAUS_PBL(0.00)[183.157.45.207:received];
- FROM_EQ_ENVFROM(0.00)[]; MIME_TRACE(0.00)[0:+];
- ASN(0.00)[asn:24940, ipnet:213.133.96.0/19, country:DE];
- ARC_NA(0.00)[]; R_DKIM_ALLOW(0.00)[flygoat.com:s=default];
- FROM_HAS_DN(0.00)[]; FREEMAIL_ENVRCPT(0.00)[gmail.com];
- TO_MATCH_ENVRCPT_ALL(0.00)[]; TAGGED_RCPT(0.00)[];
- MIME_GOOD(-0.10)[text/plain]; MID_CONTAINS_FROM(1.00)[];
- RCVD_IN_DNSWL_NONE(0.00)[213.133.102.83:from];
- HFILTER_HELO_BAREIP(3.00)[213.133.102.83,1];
- RCVD_COUNT_TWO(0.00)[2]; SUSPICIOUS_RECIPS(1.50)[]
-X-Rspamd-Server: mail20.mymailcheap.com
-X-Spam: Yes
-Received-SPF: pass client-ip=159.100.241.64;
- envelope-from=jiaxun.yang@flygoat.com; helo=relay5.mymailcheap.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/13 23:48:17
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+Received-SPF: none client-ip=139.99.139.48;
+ envelope-from=root@moya.office.hostfission.com; helo=mail1.hostfission.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/13 00:05:57
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_LOW=-0.7, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -133,122 +82,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jiaxun Yang <jiaxun.yang@flygoat.com>, aleksandar.rikalo@syrmia.com,
- qemu-devel@nongnu.org, aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Our current code assumed the target page size is always 4k
-when handling PageMask and VPN2, however, variable page size
-was just added to mips target and that's nolonger true.
+When the guest closes the audio device we must start dropping input
+samples from JACK and zeroing the output buffer samples. Failure to do
+so causes sound artifacts during operations such as guest OS reboot, and
+causes a hang of the input pipeline breaking it until QEMU is restated.
 
-So we refined this piece of code to handle any target page size.
-Also added Big Page support defined by MIPS64 Release2.
+Closing and reconnecting to JACK was tested during these enable/disable
+calls which works well for Linux guests, however Windows re-opens the
+audio hardware repeatedly even when doing simple tasks like playing a
+system sounds. As such it was decided it is better to feed silence to
+JACK while the device is disabled.
 
-Signed-off-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
+Signed-off-by: Geoffrey McRae <geoff@hostfission.com>
 ---
- target/mips/cp0_helper.c | 48 ++++++++++++++++++++++++++++++----------
- target/mips/cpu.h        |  3 ++-
- target/mips/machine.c    |  2 +-
- 3 files changed, 39 insertions(+), 14 deletions(-)
+ audio/jackaudio.c | 29 +++++++++++++++++++++--------
+ 1 file changed, 21 insertions(+), 8 deletions(-)
 
-diff --git a/target/mips/cp0_helper.c b/target/mips/cp0_helper.c
-index bbf12e4a97..7a134085f7 100644
---- a/target/mips/cp0_helper.c
-+++ b/target/mips/cp0_helper.c
-@@ -872,20 +872,44 @@ void helper_mtc0_memorymapid(CPUMIPSState *env, target_ulong arg1)
+diff --git a/audio/jackaudio.c b/audio/jackaudio.c
+index 249cbd3265..b2b53985ae 100644
+--- a/audio/jackaudio.c
++++ b/audio/jackaudio.c
+@@ -56,7 +56,7 @@ typedef struct QJackClient {
+     AudiodevJackPerDirectionOptions *opt;
+ 
+     bool out;
+-    bool finished;
++    bool enabled;
+     bool connect_ports;
+     int  packets;
+ 
+@@ -271,9 +271,17 @@ static int qjack_process(jack_nframes_t nframes, void *arg)
      }
+ 
+     if (c->out) {
+-        qjack_buffer_read_l(&c->fifo, buffers, nframes);
++        if (likely(c->enabled)) {
++            qjack_buffer_read_l(&c->fifo, buffers, nframes);
++        } else {
++            for(int i = 0; i < c->nchannels; ++i) {
++                memset(buffers[i], 0, nframes * sizeof(float));
++            }
++        }
+     } else {
+-        qjack_buffer_write_l(&c->fifo, buffers, nframes);
++        if (likely(c->enabled)) {
++            qjack_buffer_write_l(&c->fifo, buffers, nframes);
++        }
+     }
+ 
+     return 0;
+@@ -314,8 +322,8 @@ static void qjack_client_recover(QJackClient *c)
+     if (c->state == QJACK_STATE_DISCONNECTED &&
+         c->packets % 100 == 0) {
+ 
+-        /* if not finished then attempt to recover */
+-        if (!c->finished) {
++        /* if enabled then attempt to recover */
++        if (c->enabled) {
+             dolog("attempting to reconnect to server\n");
+             qjack_client_init(c);
+         }
+@@ -387,7 +395,6 @@ static int qjack_client_init(QJackClient *c)
+     char client_name[jack_client_name_size()];
+     jack_options_t options = JackNullOption;
+ 
+-    c->finished      = false;
+     c->connect_ports = true;
+ 
+     snprintf(client_name, sizeof(client_name), "%s-%s",
+@@ -483,8 +490,10 @@ static int qjack_init_out(HWVoiceOut *hw, struct audsettings *as,
+     }
+ 
+     jo->c.out       = true;
++    jo->c.enabled   = false;
+     jo->c.nchannels = as->nchannels;
+     jo->c.opt       = dev->u.jack.out;
++
+     int ret = qjack_client_init(&jo->c);
+     if (ret != 0) {
+         return ret;
+@@ -519,8 +528,10 @@ static int qjack_init_in(HWVoiceIn *hw, struct audsettings *as,
+     }
+ 
+     ji->c.out       = false;
++    ji->c.enabled   = false;
+     ji->c.nchannels = as->nchannels;
+     ji->c.opt       = dev->u.jack.in;
++
+     int ret = qjack_client_init(&ji->c);
+     if (ret != 0) {
+         return ret;
+@@ -568,23 +579,25 @@ static void qjack_client_fini(QJackClient *c)
+ static void qjack_fini_out(HWVoiceOut *hw)
+ {
+     QJackOut *jo = (QJackOut *)hw;
+-    jo->c.finished = true;
+     qjack_client_fini(&jo->c);
  }
  
--void update_pagemask(CPUMIPSState *env, target_ulong arg1, int32_t *pagemask)
-+void helper_mtc0_pagemask(CPUMIPSState *env, target_ulong arg1)
+ static void qjack_fini_in(HWVoiceIn *hw)
  {
--    uint64_t mask = arg1 >> (TARGET_PAGE_BITS + 1);
--    if (!(env->insn_flags & ISA_MIPS32R6) || (arg1 == ~0) ||
--        (mask == 0x0000 || mask == 0x0003 || mask == 0x000F ||
--         mask == 0x003F || mask == 0x00FF || mask == 0x03FF ||
--         mask == 0x0FFF || mask == 0x3FFF || mask == 0xFFFF)) {
--        env->CP0_PageMask = arg1 & (0x1FFFFFFF & (TARGET_PAGE_MASK << 1));
-+    uint64_t mask;
-+    int maxmaskbits, maskbits;
-+
-+    if (env->insn_flags & ISA_MIPS32R6) {
-+        return;
-     }
--}
- 
--void helper_mtc0_pagemask(CPUMIPSState *env, target_ulong arg1)
--{
--    update_pagemask(env, arg1, &env->CP0_PageMask);
-+    /* Don't care MASKX as we don't support 1KB page */
-+#ifdef TARGET_MIPS64
-+    if (env->CP0_Config3 & CP0C3_BPG) {
-+        maxmaskbits = 47;
-+    } else {
-+        maxmaskbits = 16;
-+    }
-+#else
-+    maxmaskbits = 16;
-+#endif
-+    mask = extract64((uint64_t)arg1, CP0PM_MASK, maxmaskbits);
-+
-+    maskbits = find_first_zero_bit(&mask, 64);
-+
-+    /* Ensure no more set bit after first zero */
-+    if (mask >> maskbits) {
-+        goto invalid;
-+    }
-+    /* We don't support VTLB entry smaller than target page */
-+    if ((maskbits + 12) < TARGET_PAGE_BITS) {
-+        goto invalid;
-+    }
-+    env->CP0_PageMask = mask << CP0PM_MASK;
-+
-+    return;
-+
-+invalid:
-+    maskbits = MIN(maxmaskbits, MAX(maskbits, TARGET_PAGE_BITS - 12));
-+    env->CP0_PageMask = ((1 << (maskbits + 1)) - 1) << CP0PM_MASK;
+     QJackIn *ji = (QJackIn *)hw;
+-    ji->c.finished = true;
+     qjack_client_fini(&ji->c);
  }
  
- void helper_mtc0_pagegrain(CPUMIPSState *env, target_ulong arg1)
-@@ -1111,7 +1135,7 @@ void helper_mthc0_saar(CPUMIPSState *env, target_ulong arg1)
- void helper_mtc0_entryhi(CPUMIPSState *env, target_ulong arg1)
+ static void qjack_enable_out(HWVoiceOut *hw, bool enable)
  {
-     target_ulong old, val, mask;
--    mask = (TARGET_PAGE_MASK << 1) | env->CP0_EntryHi_ASID_mask;
-+    mask = ~((1 << 14) - 1) | env->CP0_EntryHi_ASID_mask;
-     if (((env->CP0_Config4 >> CP0C4_IE) & 0x3) >= 2) {
-         mask |= 1 << CP0EnHi_EHINV;
-     }
-diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-index 0b3c987bb3..b69806792d 100644
---- a/target/mips/cpu.h
-+++ b/target/mips/cpu.h
-@@ -617,7 +617,8 @@ struct CPUMIPSState {
- /*
-  * CP0 Register 5
-  */
--    int32_t CP0_PageMask;
-+    target_ulong CP0_PageMask;
-+#define CP0PM_MASK 13
-     int32_t CP0_PageGrain_rw_bitmask;
-     int32_t CP0_PageGrain;
- #define CP0PG_RIE 31
-diff --git a/target/mips/machine.c b/target/mips/machine.c
-index 5b23e3e912..b30a75d46b 100644
---- a/target/mips/machine.c
-+++ b/target/mips/machine.c
-@@ -252,7 +252,7 @@ const VMStateDescription vmstate_mips_cpu = {
-         VMSTATE_UINT64(env.CP0_EntryLo1, MIPSCPU),
-         VMSTATE_UINTTL(env.CP0_Context, MIPSCPU),
-         VMSTATE_INT32(env.CP0_MemoryMapID, MIPSCPU),
--        VMSTATE_INT32(env.CP0_PageMask, MIPSCPU),
-+        VMSTATE_UINTTL(env.CP0_PageMask, MIPSCPU),
-         VMSTATE_INT32(env.CP0_PageGrain, MIPSCPU),
-         VMSTATE_UINTTL(env.CP0_SegCtl0, MIPSCPU),
-         VMSTATE_UINTTL(env.CP0_SegCtl1, MIPSCPU),
++    QJackOut *jo = (QJackOut *)hw;
++    jo->c.enabled = enable;
+ }
+ 
+ static void qjack_enable_in(HWVoiceIn *hw, bool enable)
+ {
++    QJackIn *ji = (QJackIn *)hw;
++    ji->c.enabled = enable;
+ }
+ 
+ static int qjack_thread_creator(jack_native_thread_t *thread,
 -- 
-2.27.0
+2.20.1
+
 
