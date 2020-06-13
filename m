@@ -8,78 +8,78 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CD38C433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 13 Jun 2020 15:33:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D25DC433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 13 Jun 2020 15:35:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 161B32078A
-	for <qemu-devel@archiver.kernel.org>; Sat, 13 Jun 2020 15:33:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CB1DD2078A
+	for <qemu-devel@archiver.kernel.org>; Sat, 13 Jun 2020 15:34:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MdxHf2B5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 161B32078A
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="si59/GC7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB1DD2078A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40372 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42798 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jk89b-0008TE-CH
-	for qemu-devel@archiver.kernel.org; Sat, 13 Jun 2020 11:33:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49978)
+	id 1jk8BP-00019n-2b
+	for qemu-devel@archiver.kernel.org; Sat, 13 Jun 2020 11:34:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50004)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jk7z2-0001Q7-EW
- for qemu-devel@nongnu.org; Sat, 13 Jun 2020 11:22:12 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:40533)
+ id 1jk7z3-0001Tg-SV
+ for qemu-devel@nongnu.org; Sat, 13 Jun 2020 11:22:13 -0400
+Received: from mail-wm1-x329.google.com ([2a00:1450:4864:20::329]:34827)
  by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jk7z0-0002ne-KJ
- for qemu-devel@nongnu.org; Sat, 13 Jun 2020 11:22:12 -0400
-Received: by mail-wr1-x441.google.com with SMTP id h5so12811921wrc.7
- for <qemu-devel@nongnu.org>; Sat, 13 Jun 2020 08:22:05 -0700 (PDT)
+ id 1jk7z1-0002o1-Vw
+ for qemu-devel@nongnu.org; Sat, 13 Jun 2020 11:22:13 -0400
+Received: by mail-wm1-x329.google.com with SMTP id q25so10650881wmj.0
+ for <qemu-devel@nongnu.org>; Sat, 13 Jun 2020 08:22:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=24Z9Qv/yT/z6yvpoxE5cFm39RSDFAnNFy1xD6xkMAiI=;
- b=MdxHf2B5by1WlWJwh1OVDxLIzGDB98IA8heT8NwCnQf1xMWZ67Dbzre4+Y5vOcqyKv
- w1vKIVJhJTA7Ju/Szwcu0Ve38JmC6aIEF8g+TavxLADnElBngXoiI48NQIUyyBynflzP
- oThxapRHbD/QmBiNbpVGYnieRc/aUrXeI17wSW5KH5urE4kk+9+nUcBjrePZeBDCZ4G8
- RtkLTF9ERO6BMIen6x0heM16GaWjtoL4ZYzsoU9+RPoODVnrSP3otnZVstSAFnn2HHDV
- cUW+uDoLLtISgUn/RWWnEy8Ot6qAGC8bH65CCcmMau/dmIZLH6aVewB7b+7pBR8cmQnK
- on1w==
+ bh=NQjFJdWuFw8eLqcFkHl+IhX0r/S4J/dMRQ5TJLbrRco=;
+ b=si59/GC7WNa1Isv4K/O6xw+WboyMIEU4qzQoNVRyX/TgDYPEHeZDT+N7S884yid/lW
+ 4QOo/6MFhgzSwXoQjRA+hQSDLmjoFY1KbmXxR6qvu8eCs2uzJ/XIfGM4elGbK4OhpIxD
+ 7/Wpi28bDSbv9dlmydMQVoRimEy0WCRv89mrjW3MA34vrdi93ovHRc1sbxPa6g3BVsfy
+ Wih6vJqKVd5UX8lwRFfBSnivpAf+SROrit/jO7OY9PhRhGCBzwWC2iMXdD/440xpvj07
+ 6PT1jQ5obs+rKYHyw/2w5ydHnYs0SM2IYjkZjA8/wLXLlRuOcBBjkXNJmx6SC7ackM9W
+ nLzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=24Z9Qv/yT/z6yvpoxE5cFm39RSDFAnNFy1xD6xkMAiI=;
- b=kMPj/GQfyQBs9t82OfPrQpRbfLBonsCBPdKRM6Dk+SlB/XzVuv3cHeYSai/vqG6QYQ
- YqcmlZYAxIssWupB+OdQkD+eMpvFktPrXOUjlPdQrY+1Mz7GOY9dnzM9kfyUUELrXMrl
- olb2x6/Zg8O1JtM5RILcLc1Pv9fEas16gNRHTc5KMNClm2HTOwmQ2QRVup3DBvfUMREH
- 7ScskJPjwFX+sHgoymRTwC+X88biMcsHIxzG97xKz52gny6r0/lTgso9UCDMV1+jmKI5
- oe2yvpQ/EJEAn+V/j8ZtsqmlI+LeiBoeF1UgpvV6P337wVONL1o4HEVCASi+8RfGs/iB
- Lsqg==
-X-Gm-Message-State: AOAM533uidpGOWkypVRwUp67ISl4ix4SGSSmOS2RxtwxOVGYaql5Rfjc
- 9Jg1S3d86MkXZgdaKJ+nT1vyuN0IKbI=
-X-Google-Smtp-Source: ABdhPJzuJutdwK+Dth0YN3XcsjxbFwa2bz++dh6hDVNZZjsGvcFubLzu3MBv6EjUZROzSuypBc1pHw==
-X-Received: by 2002:a5d:4a43:: with SMTP id v3mr21358859wrs.115.1592061724042; 
- Sat, 13 Jun 2020 08:22:04 -0700 (PDT)
+ bh=NQjFJdWuFw8eLqcFkHl+IhX0r/S4J/dMRQ5TJLbrRco=;
+ b=hvGNZLPhbeqOysbtIIKh4x6EwYKeXuhS5ymC9TOT+s6Gi79Lqc+9aR8F3gBp5bhnzn
+ eMv+//oCOLhCygv/AsUpwECJ0XvdcZ3LsOLNFYhksuhnIsyf6+gYxods2HoZ/nabifx4
+ 3/btTNyb3BzLMIKpiL7wd4iE/UvoNW1MRUjdhckcRenYz8UQtCi7hXSpItLIbd4AoqDx
+ SptvIuXHX7v6NpTeZG6YE0BrGLH0AIcoacL4KhCQMHrzFe4BhV72EFilyn3xv9iv5t6j
+ dd4ObVUFhpyq9UNUIE9NPsqHqJXYz2BfrbkhZUlDTqd+5tzo5y1531wg9ODuyWOtX1Ak
+ 31Pg==
+X-Gm-Message-State: AOAM5315cfIetNSsj3fePu6l87tBfTiEXXH5He95fQY0mg9HdchVR+32
+ Wys9QPms0BEk7oC++K9AiI7nFioIQyY=
+X-Google-Smtp-Source: ABdhPJyRk/GteEqiHmXQ0s7SEQBNbsLZOpr9Ubk3WistJsCD+/YFvMy9fqh2jGaY8cNWn2fJ6Eo7Sg==
+X-Received: by 2002:a1c:9993:: with SMTP id b141mr4044682wme.113.1592061725372; 
+ Sat, 13 Jun 2020 08:22:05 -0700 (PDT)
 Received: from localhost.localdomain (net212-32-245-109.mbb.telenor.rs.
  [109.245.32.212])
- by smtp.gmail.com with ESMTPSA id 67sm16045399wrk.49.2020.06.13.08.22.03
+ by smtp.gmail.com with ESMTPSA id 67sm16045399wrk.49.2020.06.13.08.22.04
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 13 Jun 2020 08:22:03 -0700 (PDT)
+ Sat, 13 Jun 2020 08:22:04 -0700 (PDT)
 From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v8 13/14] target/mips: msa: Split helpers for SUBV.<B|H|W|D>
-Date: Sat, 13 Jun 2020 17:21:32 +0200
-Message-Id: <20200613152133.8964-14-aleksandar.qemu.devel@gmail.com>
+Subject: [PATCH v8 14/14] target/mips: msa: Split helpers for MULV.<B|H|W|D>
+Date: Sat, 13 Jun 2020 17:21:33 +0200
+Message-Id: <20200613152133.8964-15-aleksandar.qemu.devel@gmail.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200613152133.8964-1-aleksandar.qemu.devel@gmail.com>
 References: <20200613152133.8964-1-aleksandar.qemu.devel@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wr1-x441.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::329;
+ envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wm1-x329.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -112,173 +112,164 @@ Achieves clearer code and slightly better performance.
 Signed-off-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
 ---
  target/mips/helper.h     |  6 ++-
- target/mips/msa_helper.c | 81 +++++++++++++++++++++++++++++++++++-----
+ target/mips/msa_helper.c | 79 ++++++++++++++++++++++++++++++++++++----
  target/mips/translate.c  | 15 +++++++-
- 3 files changed, 91 insertions(+), 11 deletions(-)
+ 3 files changed, 91 insertions(+), 9 deletions(-)
 
 diff --git a/target/mips/helper.h b/target/mips/helper.h
-index 4795c97f47..5d7ba6a847 100644
+index 5d7ba6a847..e97655dc0e 100644
 --- a/target/mips/helper.h
 +++ b/target/mips/helper.h
-@@ -998,6 +998,11 @@ DEF_HELPER_4(msa_subsuu_s_h, void, env, i32, i32, i32)
- DEF_HELPER_4(msa_subsuu_s_w, void, env, i32, i32, i32)
- DEF_HELPER_4(msa_subsuu_s_d, void, env, i32, i32, i32)
+@@ -960,6 +960,11 @@ DEF_HELPER_4(msa_msubv_h, void, env, i32, i32, i32)
+ DEF_HELPER_4(msa_msubv_w, void, env, i32, i32, i32)
+ DEF_HELPER_4(msa_msubv_d, void, env, i32, i32, i32)
  
-+DEF_HELPER_4(msa_subv_b, void, env, i32, i32, i32)
-+DEF_HELPER_4(msa_subv_h, void, env, i32, i32, i32)
-+DEF_HELPER_4(msa_subv_w, void, env, i32, i32, i32)
-+DEF_HELPER_4(msa_subv_d, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_mulv_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_mulv_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_mulv_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_mulv_d, void, env, i32, i32, i32)
 +
- DEF_HELPER_4(msa_ilvev_b, void, env, i32, i32, i32)
- DEF_HELPER_4(msa_ilvev_h, void, env, i32, i32, i32)
- DEF_HELPER_4(msa_ilvev_w, void, env, i32, i32, i32)
-@@ -1093,7 +1098,6 @@ DEF_HELPER_5(msa_srlri_df, void, env, i32, i32, i32, i32)
+ DEF_HELPER_4(msa_asub_s_b, void, env, i32, i32, i32)
+ DEF_HELPER_4(msa_asub_s_h, void, env, i32, i32, i32)
+ DEF_HELPER_4(msa_asub_s_w, void, env, i32, i32, i32)
+@@ -1098,7 +1103,6 @@ DEF_HELPER_5(msa_srlri_df, void, env, i32, i32, i32, i32)
  
  DEF_HELPER_5(msa_binsl_df, void, env, i32, i32, i32, i32)
  DEF_HELPER_5(msa_binsr_df, void, env, i32, i32, i32, i32)
--DEF_HELPER_5(msa_subv_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_mulv_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_mulv_df, void, env, i32, i32, i32, i32)
  
  DEF_HELPER_4(msa_dotp_s_h, void, env, i32, i32, i32)
+ DEF_HELPER_4(msa_dotp_s_w, void, env, i32, i32, i32)
 diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
-index 27a9c36a89..d099e00b40 100644
+index d099e00b40..6865addaf6 100644
 --- a/target/mips/msa_helper.c
 +++ b/target/mips/msa_helper.c
-@@ -3553,9 +3553,6 @@ void helper_msa_asub_u_d(CPUMIPSState *env,
+@@ -3360,6 +3360,78 @@ void helper_msa_msubv_d(CPUMIPSState *env,
  }
  
  
--/* TODO: insert the rest of Int Subtract group helpers here */
--
--
- static inline int64_t msa_hsub_s_df(uint32_t df, int64_t arg1, int64_t arg2)
- {
-     return SIGNED_ODD(arg1, df) - SIGNED_EVEN(arg2, df);
-@@ -3970,6 +3967,78 @@ void helper_msa_subsuu_s_d(CPUMIPSState *env,
- }
- 
- 
-+static inline int64_t msa_subv_df(uint32_t df, int64_t arg1, int64_t arg2)
++static inline int64_t msa_mulv_df(uint32_t df, int64_t arg1, int64_t arg2)
 +{
-+    return arg1 - arg2;
++    return arg1 * arg2;
 +}
 +
-+void helper_msa_subv_b(CPUMIPSState *env,
++void helper_msa_mulv_b(CPUMIPSState *env,
 +                       uint32_t wd, uint32_t ws, uint32_t wt)
 +{
 +    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
 +    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
 +    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
 +
-+    pwd->b[0]  = msa_subv_df(DF_BYTE, pws->b[0],  pwt->b[0]);
-+    pwd->b[1]  = msa_subv_df(DF_BYTE, pws->b[1],  pwt->b[1]);
-+    pwd->b[2]  = msa_subv_df(DF_BYTE, pws->b[2],  pwt->b[2]);
-+    pwd->b[3]  = msa_subv_df(DF_BYTE, pws->b[3],  pwt->b[3]);
-+    pwd->b[4]  = msa_subv_df(DF_BYTE, pws->b[4],  pwt->b[4]);
-+    pwd->b[5]  = msa_subv_df(DF_BYTE, pws->b[5],  pwt->b[5]);
-+    pwd->b[6]  = msa_subv_df(DF_BYTE, pws->b[6],  pwt->b[6]);
-+    pwd->b[7]  = msa_subv_df(DF_BYTE, pws->b[7],  pwt->b[7]);
-+    pwd->b[8]  = msa_subv_df(DF_BYTE, pws->b[8],  pwt->b[8]);
-+    pwd->b[9]  = msa_subv_df(DF_BYTE, pws->b[9],  pwt->b[9]);
-+    pwd->b[10] = msa_subv_df(DF_BYTE, pws->b[10], pwt->b[10]);
-+    pwd->b[11] = msa_subv_df(DF_BYTE, pws->b[11], pwt->b[11]);
-+    pwd->b[12] = msa_subv_df(DF_BYTE, pws->b[12], pwt->b[12]);
-+    pwd->b[13] = msa_subv_df(DF_BYTE, pws->b[13], pwt->b[13]);
-+    pwd->b[14] = msa_subv_df(DF_BYTE, pws->b[14], pwt->b[14]);
-+    pwd->b[15] = msa_subv_df(DF_BYTE, pws->b[15], pwt->b[15]);
++    pwd->b[0]  = msa_mulv_df(DF_BYTE, pws->b[0],  pwt->b[0]);
++    pwd->b[1]  = msa_mulv_df(DF_BYTE, pws->b[1],  pwt->b[1]);
++    pwd->b[2]  = msa_mulv_df(DF_BYTE, pws->b[2],  pwt->b[2]);
++    pwd->b[3]  = msa_mulv_df(DF_BYTE, pws->b[3],  pwt->b[3]);
++    pwd->b[4]  = msa_mulv_df(DF_BYTE, pws->b[4],  pwt->b[4]);
++    pwd->b[5]  = msa_mulv_df(DF_BYTE, pws->b[5],  pwt->b[5]);
++    pwd->b[6]  = msa_mulv_df(DF_BYTE, pws->b[6],  pwt->b[6]);
++    pwd->b[7]  = msa_mulv_df(DF_BYTE, pws->b[7],  pwt->b[7]);
++    pwd->b[8]  = msa_mulv_df(DF_BYTE, pws->b[8],  pwt->b[8]);
++    pwd->b[9]  = msa_mulv_df(DF_BYTE, pws->b[9],  pwt->b[9]);
++    pwd->b[10] = msa_mulv_df(DF_BYTE, pws->b[10], pwt->b[10]);
++    pwd->b[11] = msa_mulv_df(DF_BYTE, pws->b[11], pwt->b[11]);
++    pwd->b[12] = msa_mulv_df(DF_BYTE, pws->b[12], pwt->b[12]);
++    pwd->b[13] = msa_mulv_df(DF_BYTE, pws->b[13], pwt->b[13]);
++    pwd->b[14] = msa_mulv_df(DF_BYTE, pws->b[14], pwt->b[14]);
++    pwd->b[15] = msa_mulv_df(DF_BYTE, pws->b[15], pwt->b[15]);
 +}
 +
-+void helper_msa_subv_h(CPUMIPSState *env,
++void helper_msa_mulv_h(CPUMIPSState *env,
 +                       uint32_t wd, uint32_t ws, uint32_t wt)
 +{
 +    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
 +    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
 +    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
 +
-+    pwd->h[0]  = msa_subv_df(DF_HALF, pws->h[0],  pwt->h[0]);
-+    pwd->h[1]  = msa_subv_df(DF_HALF, pws->h[1],  pwt->h[1]);
-+    pwd->h[2]  = msa_subv_df(DF_HALF, pws->h[2],  pwt->h[2]);
-+    pwd->h[3]  = msa_subv_df(DF_HALF, pws->h[3],  pwt->h[3]);
-+    pwd->h[4]  = msa_subv_df(DF_HALF, pws->h[4],  pwt->h[4]);
-+    pwd->h[5]  = msa_subv_df(DF_HALF, pws->h[5],  pwt->h[5]);
-+    pwd->h[6]  = msa_subv_df(DF_HALF, pws->h[6],  pwt->h[6]);
-+    pwd->h[7]  = msa_subv_df(DF_HALF, pws->h[7],  pwt->h[7]);
++    pwd->h[0]  = msa_mulv_df(DF_HALF, pws->h[0],  pwt->h[0]);
++    pwd->h[1]  = msa_mulv_df(DF_HALF, pws->h[1],  pwt->h[1]);
++    pwd->h[2]  = msa_mulv_df(DF_HALF, pws->h[2],  pwt->h[2]);
++    pwd->h[3]  = msa_mulv_df(DF_HALF, pws->h[3],  pwt->h[3]);
++    pwd->h[4]  = msa_mulv_df(DF_HALF, pws->h[4],  pwt->h[4]);
++    pwd->h[5]  = msa_mulv_df(DF_HALF, pws->h[5],  pwt->h[5]);
++    pwd->h[6]  = msa_mulv_df(DF_HALF, pws->h[6],  pwt->h[6]);
++    pwd->h[7]  = msa_mulv_df(DF_HALF, pws->h[7],  pwt->h[7]);
 +}
 +
-+void helper_msa_subv_w(CPUMIPSState *env,
++void helper_msa_mulv_w(CPUMIPSState *env,
 +                       uint32_t wd, uint32_t ws, uint32_t wt)
 +{
 +    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
 +    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
 +    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
 +
-+    pwd->w[0]  = msa_subv_df(DF_WORD, pws->w[0],  pwt->w[0]);
-+    pwd->w[1]  = msa_subv_df(DF_WORD, pws->w[1],  pwt->w[1]);
-+    pwd->w[2]  = msa_subv_df(DF_WORD, pws->w[2],  pwt->w[2]);
-+    pwd->w[3]  = msa_subv_df(DF_WORD, pws->w[3],  pwt->w[3]);
++    pwd->w[0]  = msa_mulv_df(DF_WORD, pws->w[0],  pwt->w[0]);
++    pwd->w[1]  = msa_mulv_df(DF_WORD, pws->w[1],  pwt->w[1]);
++    pwd->w[2]  = msa_mulv_df(DF_WORD, pws->w[2],  pwt->w[2]);
++    pwd->w[3]  = msa_mulv_df(DF_WORD, pws->w[3],  pwt->w[3]);
 +}
 +
-+void helper_msa_subv_d(CPUMIPSState *env,
++void helper_msa_mulv_d(CPUMIPSState *env,
 +                       uint32_t wd, uint32_t ws, uint32_t wt)
 +{
 +    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
 +    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
 +    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
 +
-+    pwd->d[0]  = msa_subv_df(DF_DOUBLE, pws->d[0],  pwt->d[0]);
-+    pwd->d[1]  = msa_subv_df(DF_DOUBLE, pws->d[1],  pwt->d[1]);
++    pwd->d[0]  = msa_mulv_df(DF_DOUBLE, pws->d[0],  pwt->d[0]);
++    pwd->d[1]  = msa_mulv_df(DF_DOUBLE, pws->d[1],  pwt->d[1]);
 +}
 +
 +
  /*
-  * Interleave
-  * ----------
-@@ -5194,11 +5263,6 @@ void helper_msa_shf_df(CPUMIPSState *env, uint32_t df, uint32_t wd,
-     msa_move_v(pwd, pwx);
- }
+  * Int Subtract
+  * ------------
+@@ -5444,11 +5516,6 @@ MSA_TEROP_IMMU_DF(binsli, binsl)
+ MSA_TEROP_IMMU_DF(binsri, binsr)
+ #undef MSA_TEROP_IMMU_DF
  
--static inline int64_t msa_subv_df(uint32_t df, int64_t arg1, int64_t arg2)
+-static inline int64_t msa_mulv_df(uint32_t df, int64_t arg1, int64_t arg2)
 -{
--    return arg1 - arg2;
+-    return arg1 * arg2;
 -}
 -
- #define MSA_BINOP_IMM_DF(helper, func)                                  \
- void helper_msa_ ## helper ## _df(CPUMIPSState *env, uint32_t df,       \
-                         uint32_t wd, uint32_t ws, int32_t u5)           \
-@@ -5502,7 +5566,6 @@ void helper_msa_ ## func ## _df(CPUMIPSState *env, uint32_t df,         \
+ #define CONCATENATE_AND_SLIDE(s, k)             \
+     do {                                        \
+         for (i = 0; i < s; i++) {               \
+@@ -5566,8 +5633,6 @@ void helper_msa_ ## func ## _df(CPUMIPSState *env, uint32_t df,         \
      }                                                                   \
  }
  
--MSA_BINOP_DF(subv)
- MSA_BINOP_DF(mulv)
- 
+-MSA_BINOP_DF(mulv)
+-
  MSA_BINOP_DF(mul_q)
+ MSA_BINOP_DF(mulr_q)
+ #undef MSA_BINOP_DF
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 3509613798..6a6df58d29 100644
+index 6a6df58d29..8fe79cc4ca 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -29323,7 +29323,20 @@ static void gen_msa_3r(CPUMIPSState *env, DisasContext *ctx)
-         gen_helper_msa_vshf_df(cpu_env, tdf, twd, tws, twt);
+@@ -29314,7 +29314,20 @@ static void gen_msa_3r(CPUMIPSState *env, DisasContext *ctx)
+         }
          break;
-     case OPC_SUBV_df:
--        gen_helper_msa_subv_df(cpu_env, tdf, twd, tws, twt);
+     case OPC_MULV_df:
+-        gen_helper_msa_mulv_df(cpu_env, tdf, twd, tws, twt);
 +        switch (df) {
 +        case DF_BYTE:
-+            gen_helper_msa_subv_b(cpu_env, twd, tws, twt);
++            gen_helper_msa_mulv_b(cpu_env, twd, tws, twt);
 +            break;
 +        case DF_HALF:
-+            gen_helper_msa_subv_h(cpu_env, twd, tws, twt);
++            gen_helper_msa_mulv_h(cpu_env, twd, tws, twt);
 +            break;
 +        case DF_WORD:
-+            gen_helper_msa_subv_w(cpu_env, twd, tws, twt);
++            gen_helper_msa_mulv_w(cpu_env, twd, tws, twt);
 +            break;
 +        case DF_DOUBLE:
-+            gen_helper_msa_subv_d(cpu_env, twd, tws, twt);
++            gen_helper_msa_mulv_d(cpu_env, twd, tws, twt);
 +            break;
 +        }
          break;
-     case OPC_SUBS_U_df:
-         switch (df) {
+     case OPC_SLD_df:
+         gen_helper_msa_sld_df(cpu_env, tdf, twd, tws, twt);
 -- 
 2.20.1
 
