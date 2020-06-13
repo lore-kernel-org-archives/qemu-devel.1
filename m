@@ -2,93 +2,89 @@ Return-Path: <SRS0=+z+v=72=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A16CDC433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 13 Jun 2020 00:20:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BABEC433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 13 Jun 2020 01:02:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 61F1E2078A
-	for <qemu-devel@archiver.kernel.org>; Sat, 13 Jun 2020 00:20:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 13C1B206F5
+	for <qemu-devel@archiver.kernel.org>; Sat, 13 Jun 2020 01:02:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CinAQnau"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61F1E2078A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DGCD5JnP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13C1B206F5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40820 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46970 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jjtu3-0003Lt-JQ
-	for qemu-devel@archiver.kernel.org; Fri, 12 Jun 2020 20:20:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38814)
+	id 1jjuZN-0003SM-AN
+	for qemu-devel@archiver.kernel.org; Fri, 12 Jun 2020 21:02:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58880)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <hskinnemoen@google.com>)
- id 1jjttM-0002Xa-Fz
- for qemu-devel@nongnu.org; Fri, 12 Jun 2020 20:19:24 -0400
-Received: from mail-ua1-x935.google.com ([2607:f8b0:4864:20::935]:33736)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jjuYb-00030x-D1; Fri, 12 Jun 2020 21:02:01 -0400
+Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:45183)
  by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <hskinnemoen@google.com>)
- id 1jjttJ-0002Kr-Jb
- for qemu-devel@nongnu.org; Fri, 12 Jun 2020 20:19:24 -0400
-Received: by mail-ua1-x935.google.com with SMTP id b10so3819652uaf.0
- for <qemu-devel@nongnu.org>; Fri, 12 Jun 2020 17:19:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jjuYY-0000Sz-LR; Fri, 12 Jun 2020 21:02:01 -0400
+Received: by mail-io1-xd42.google.com with SMTP id y5so12119948iob.12;
+ Fri, 12 Jun 2020 18:01:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=fePs81fA+XH2lGKybDVVekfZVoP1uy6wDnoFXdUsDDw=;
- b=CinAQnauJYNORGoTD1BsTNa3j/4gsBkChCiWeuB/0VgO29M+ie3EvSIATS6kDMMxTO
- aeGr7kDX3zt7XIGdUdQ9fyhfrDxrCld2tZk5W82ouMwEucjSfintecmYWvhzoIUs2/GR
- keDhEIeorMFODMGlilIT/ws04Tc9/b+yIU+zgp6zJ1tdyCkKiFKyeGHipKOQulY2OoyT
- hHjnLjxNE4IrXNLEn+Nl74gqIDwy8cr8Gzwg4Uthq4vKsVRTfKeZT5HD45g3419gqoUw
- Q3QZbuQmkliIadgaAwMDy0K2dHkgeSo4GpkS8+USudCCxOgvcM8FpAGGNrTS0T5oAzlW
- jE8A==
+ :cc; bh=UevGvUZsbLJ64pd01J92B00PQ3Vlyu8PftiS9ERthlY=;
+ b=DGCD5JnPWFqfltLL6aax68imi4tVF6Qw5P0FTz26No6fz0mP9zlaXLWOY4+zSCRAfM
+ 7akG9ma3mDhUp8UlEMHIAdlwrrV4FdxPPaUeWiftOlnv1b9DerC1NvaRcWaWcOuPxrqG
+ YyDZwH+2DDSODec3l7L/0p4hWUgkO8QqbvF6YjMjd2rVxLqqb481WZNrkMr58Ci1kmqO
+ 2utpAn5+ittwD+94/icBO/lpJLpDZqpTqRxj3Vpzq9I9+JuAyoaxTz1mdNEkOiHVoChV
+ 0vD7CPDMet36VVCAJ7b1zBFD+vrwc0paPLtIdtKIWM5ehX0OfODAYiz3VZSLpwOxWg6f
+ eO7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=fePs81fA+XH2lGKybDVVekfZVoP1uy6wDnoFXdUsDDw=;
- b=H+9Ho7npBUAB43AkGIVSMv4K0LH5E6YExnOgn1iIIKUxkucVm0YDaevUVL6hVSUYfO
- YMn8u0yadXW5ML9jLPv9Tj82P2lxLLvJ8jF7+CHkhpZvUbM9FKO+zNz5nRPPyPnOkt6Z
- zIFxvXqhURIPAySrwHzMFW9rZuVIvFLa8JxnFzQzTKEboBxwK6A0JqR9/J4o1C3YbNck
- +Yf4GXyPBVDcAhZ3pwc4nRiwtwr93bPyFi+MBIQFo74SILcB2mHeneblMR8x6FC9oF6i
- aA2x/3vUfUJvt1aqTa9OzvIdQ7WqOXW7wOS35hPYn6Ne4iRBfMTR7HrfLcazKf7b9199
- psgQ==
-X-Gm-Message-State: AOAM530nKMaI0CHQXuHKFirc+5bB5RcTiFtJQmDlWk9HUM2Wg+01/Kxa
- cGGLSoj7Mlnt59jdjHSES/DUT19AYnnmKhOL9kPJvQ==
-X-Google-Smtp-Source: ABdhPJzsRIcA44a75RBASCfUoLej7OTrb3qdR4URlJo6kzxtVbr3IzWe/dm+mnOWSw4+L+8c12W4V8SteaCeiH1fn+A=
-X-Received: by 2002:ab0:6ec6:: with SMTP id c6mr14608973uav.7.1592007554624;
- Fri, 12 Jun 2020 17:19:14 -0700 (PDT)
+ bh=UevGvUZsbLJ64pd01J92B00PQ3Vlyu8PftiS9ERthlY=;
+ b=bkYI2eYE4zoiI2MXka/VxgUWxu9E2tUTySCZkakGgltB0wDDHQOZjlZssLqgdyBQFy
+ qwTiLQ+P+96vxvVRpSuFnXw/KjNxrE3OO95y6fCMQStCl+0sR+ulmFvhyghJu/E6Lzyv
+ NoduVy3mXUGrot81wiybGz8GZLk2XdTezcNK4KhpcIkLjeqqLXn5Pb3Ksf4jCOvTZ57o
+ 1Zg0U32WMNLKmVLdBYPiQQkylWfLjxGQsyH5XxoAErkH8RNbmcWuMUVxAOApWFGlUZM0
+ Aljn5ux/A4iTehwbwJV4dCa2AZWb0mBofrHjPanviCmeMUtT94xd9onifJf/IfDMthLf
+ JMbw==
+X-Gm-Message-State: AOAM530ifIfqH2Kscogiqnp6YP3wi/E+4mJp2/v0A4CjZnDDA3TxW4eY
+ CGet8nkLulQxnj2jAR0KILDHuN3Jc+k/JJnvR6w=
+X-Google-Smtp-Source: ABdhPJyVFj3fd5tI55sq5fdEOzPxExbU+QZFU2IxFmtYK5DvvwprhNKNj0KRCmQYnk1G/6rjjP+3Mbw6pFWoJsCr0F4=
+X-Received: by 2002:a02:b782:: with SMTP id f2mr10614948jam.91.1592010106607; 
+ Fri, 12 Jun 2020 18:01:46 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200611223016.259837-1-hskinnemoen@google.com>
- <20200611223016.259837-12-hskinnemoen@google.com>
-In-Reply-To: <20200611223016.259837-12-hskinnemoen@google.com>
-From: Havard Skinnemoen <hskinnemoen@google.com>
-Date: Fri, 12 Jun 2020 17:19:03 -0700
-Message-ID: <CAFQmdRbMb5HBvhV02rd8beC4KtxyMjLb0SXrmgRSSDY3eG_N2A@mail.gmail.com>
-Subject: Re: [PATCH v2 11/12] hw/arm: Wire up BMC boot flash for npcm750-evb
- and quanta-gsj
-To: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, 
- Joel Stanley <joel@jms.id.au>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, 
- IS20 Avi Fishman <Avi.Fishman@nuvoton.com>,
- CS20 KFTing <kfting@nuvoton.com>
-Content-Type: multipart/alternative; boundary="000000000000c6637705a7ec2424"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::935;
- envelope-from=hskinnemoen@google.com; helo=mail-ua1-x935.google.com
+References: <20200529114641.121332-1-anup.patel@wdc.com>
+ <20200529114641.121332-4-anup.patel@wdc.com>
+ <CAKmqyKMLp_U6hzd+6YAcCXtuXga0gZFUDB3-5SDuRTn3cJN_VA@mail.gmail.com>
+ <MN2PR04MB6207E0CD66FE6E87C7D4AB618D800@MN2PR04MB6207.namprd04.prod.outlook.com>
+In-Reply-To: <MN2PR04MB6207E0CD66FE6E87C7D4AB618D800@MN2PR04MB6207.namprd04.prod.outlook.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Fri, 12 Jun 2020 17:52:19 -0700
+Message-ID: <CAKmqyKO+Vi5-0CuPZK5xDzXnfjXincPisniNqz7=n4DdjpffTQ@mail.gmail.com>
+Subject: Re: [PATCH v5 3/5] hw/riscv: Add helpers for RISC-V multi-socket NUMA
+ machines
+To: Anup Patel <Anup.Patel@wdc.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::d42;
+ envelope-from=alistair23@gmail.com; helo=mail-io1-xd42.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -185
-X-Spam_score: -18.6
-X-Spam_bar: ------------------
-X-Spam_report: (-18.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- ENV_AND_HDR_SPF_MATCH=-0.5, HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, USER_IN_DEF_DKIM_WL=-7.5,
- USER_IN_DEF_SPF_WL=-7.5 autolearn=_AUTOLEARN
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,99 +97,425 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>, Anup Patel <anup@brainfault.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Atish Patra <Atish.Patra@wdc.com>, Alistair Francis <Alistair.Francis@wdc.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000c6637705a7ec2424
-Content-Type: text/plain; charset="UTF-8"
-
-On Thu, Jun 11, 2020 at 3:30 PM Havard Skinnemoen <hskinnemoen@google.com>
-wrote:
-
-> @@ -57,18 +72,30 @@ static NPCM7xxState *npcm7xx_create_soc(MachineState
-> *machine)
->  static void npcm750_evb_init(MachineState *machine)
->  {
->      NPCM7xxState *soc;
-> +    DriveInfo *dinfo;
+On Thu, Jun 11, 2020 at 6:11 AM Anup Patel <Anup.Patel@wdc.com> wrote:
 >
->      soc = npcm7xx_create_soc(machine);
 >
-> +    dinfo = drive_get(IF_MTD, 0, 0);
-> +    if (dinfo) {
-> +        npcm7xx_connect_flash(&soc->fiu[0], 0, "w25q256", dinfo);
 >
+> > -----Original Message-----
+> > From: Qemu-riscv <qemu-riscv-
+> > bounces+anup.patel=wdc.com@nongnu.org> On Behalf Of Alistair Francis
+> > Sent: 11 June 2020 04:59
+> > To: Anup Patel <Anup.Patel@wdc.com>
+> > Cc: Peter Maydell <peter.maydell@linaro.org>; open list:RISC-V <qemu-
+> > riscv@nongnu.org>; Sagar Karandikar <sagark@eecs.berkeley.edu>; Anup
+> > Patel <anup@brainfault.org>; qemu-devel@nongnu.org Developers <qemu-
+> > devel@nongnu.org>; Atish Patra <Atish.Patra@wdc.com>; Alistair Francis
+> > <Alistair.Francis@wdc.com>; Palmer Dabbelt <palmer@dabbelt.com>
+> > Subject: Re: [PATCH v5 3/5] hw/riscv: Add helpers for RISC-V multi-socket
+> > NUMA machines
+> >
+> > On Fri, May 29, 2020 at 4:48 AM Anup Patel <anup.patel@wdc.com> wrote:
+> > >
+> > > We add common helper routines which can be shared by RISC-V
+> > > multi-socket NUMA machines.
+> > >
+> > > We have two types of helpers:
+> > > 1. riscv_socket_xyz() - These helper assist managing multiple
+> > >    sockets irrespective whether QEMU NUMA is enabled/disabled 2.
+> > > riscv_numa_xyz() - These helpers assist in providing
+> > >    necessary QEMU machine callbacks for QEMU NUMA emulation
+> > >
+> > > Signed-off-by: Anup Patel <anup.patel@wdc.com>
+> > > ---
+> > >  hw/riscv/Makefile.objs  |   1 +
+> > >  hw/riscv/numa.c         | 242
+> > ++++++++++++++++++++++++++++++++++++++++
+> > >  include/hw/riscv/numa.h |  51 +++++++++
+> > >  3 files changed, 294 insertions(+)
+> > >  create mode 100644 hw/riscv/numa.c
+> > >  create mode 100644 include/hw/riscv/numa.h
+> >
+> > I don't love that we have an entire file of functions to help with NUMA when
+> > no other arch seems to have anything this complex.
+> >
+> > What about RISC-V requires extra complexity?
+>
+> Other architectures, generally have one machine supporting NUMA.
+>
+> In QEMU RISC-V, we are supporting NUMA in two machines (i.e Virt
+> and Spike). Both these machines, are synthetic machines and don't
+> match real-world hardware. The Spike machine is even more unique
+> because it has minimum number of devices and no interrupt controller.
+>
+> In future, we might have few more machines in QEMU RISC-V having
+> NUMA/multi-socket support.
+>
+> Comparted to other architectures, the riscv_numa_xyz() callbacks
+> defined here do:
+> 1. Linear mapping of CPU arch_id to CPU logical idx
+> 2. Linear assignment of node_id to CPU idx
+>
+> The requirement 2) mentioned above is because CLINT and PLIC
+> device emulation require contiguous hard IDs in a socket.
 
-Btw, this does not actually work. I initially tested it with the same flash
-chip as gsj, which seems to work, but after switching to the Winbond model
-(as per the npcm750 evb schematics) it looks like it reads incorrect data
-in DIO mode.
+Ok, fair enough :)
 
-While trying to figure out what's going wrong, I stumbled across this patch:
+Do you mind sending a new version, I think the Spike part will need to
+be rebased on top of the Spike machine changes.
 
-https://lists.gnu.org/archive/html/qemu-devel/2016-07/msg01586.html
+Then just pressure Atish to ack the DT changes :P
 
-which I don't understand. It looks like the winbond model wants one dummy
-cycle after the address, since dummy cycles are modeled as byte transfers.
-This doesn't seem to match the data sheet, which specifies 4 dummy cycles
-in DIO mode (which is actually a special command byte transferred across
-two data lines).
+Alistair
 
-If the "continuous read mode command" is actually modeled as a single byte,
-then it makes sense because that works out to 4 dummy cycles in DIO mode.
-However, I don't understand how the flash controller model is supposed to
-detect this situation, and I don't see any flash controller models that
-support sending anything but dummy _bits_ between the address and data
-phases.
-
-Could you please clarify how this is supposed to work? Are there any
-existing machines that use a w25 chip in DIO mode?
-
-Havard
-
---000000000000c6637705a7ec2424
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr">On Thu, Jun 11, 2020 at 3:30 PM Havard Sk=
-innemoen &lt;<a href=3D"mailto:hskinnemoen@google.com">hskinnemoen@google.c=
-om</a>&gt; wrote:</div><div class=3D"gmail_quote"><blockquote class=3D"gmai=
-l_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,20=
-4,204);padding-left:1ex">
-@@ -57,18 +72,30 @@ static NPCM7xxState *npcm7xx_create_soc(MachineState *m=
-achine)<br>
-=C2=A0static void npcm750_evb_init(MachineState *machine)<br>
-=C2=A0{<br>
-=C2=A0 =C2=A0 =C2=A0NPCM7xxState *soc;<br>
-+=C2=A0 =C2=A0 DriveInfo *dinfo;<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0soc =3D npcm7xx_create_soc(machine);<br>
-<br>
-+=C2=A0 =C2=A0 dinfo =3D drive_get(IF_MTD, 0, 0);<br>
-+=C2=A0 =C2=A0 if (dinfo) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 npcm7xx_connect_flash(&amp;soc-&gt;fiu[0], 0, =
-&quot;w25q256&quot;, dinfo);<br></blockquote><div><br></div><div>Btw, this =
-does not actually work. I initially tested it with the same flash chip as g=
-sj, which seems to work, but after switching to the=C2=A0Winbond model (as =
-per the npcm750 evb schematics) it looks like it reads incorrect data in DI=
-O mode.</div><div><br></div><div>While trying to figure out what&#39;s goin=
-g wrong, I stumbled across this patch:</div><div><br></div><div><a href=3D"=
-https://lists.gnu.org/archive/html/qemu-devel/2016-07/msg01586.html">https:=
-//lists.gnu.org/archive/html/qemu-devel/2016-07/msg01586.html</a></div><div=
-><br></div><div>which I don&#39;t understand. It looks like the winbond mod=
-el wants one dummy cycle after the address, since dummy cycles are modeled =
-as byte transfers. This doesn&#39;t seem to match the data sheet, which spe=
-cifies 4 dummy cycles in DIO mode (which is actually a special command byte=
- transferred across two data lines).</div><div><br></div><div>If the &quot;=
-continuous read mode command&quot; is actually modeled as a single byte, th=
-en it makes sense because that works out to 4 dummy cycles in DIO mode. How=
-ever, I don&#39;t understand how the flash controller model is supposed to =
-detect this situation, and I don&#39;t see any flash controller models that=
- support sending anything but dummy _bits_ between the address and data pha=
-ses.</div><div><br></div><div>Could you please clarify how this is supposed=
- to work? Are there any existing machines that use a w25 chip in DIO mode?<=
-/div><div><br></div><div>Havard</div></div></div>
-
---000000000000c6637705a7ec2424--
+>
+> Regards,
+> Anup
+>
+> >
+> > >
+> > > diff --git a/hw/riscv/Makefile.objs b/hw/riscv/Makefile.objs index
+> > > fc3c6dd7c8..4483e61879 100644
+> > > --- a/hw/riscv/Makefile.objs
+> > > +++ b/hw/riscv/Makefile.objs
+> > > @@ -1,4 +1,5 @@
+> > >  obj-y += boot.o
+> > > +obj-y += numa.o
+> > >  obj-$(CONFIG_SPIKE) += riscv_htif.o
+> > >  obj-$(CONFIG_HART) += riscv_hart.o
+> > >  obj-$(CONFIG_SIFIVE_E) += sifive_e.o
+> > > diff --git a/hw/riscv/numa.c b/hw/riscv/numa.c new file mode 100644
+> > > index 0000000000..4f92307102
+> > > --- /dev/null
+> > > +++ b/hw/riscv/numa.c
+> > > @@ -0,0 +1,242 @@
+> > > +/*
+> > > + * QEMU RISC-V NUMA Helper
+> > > + *
+> > > + * Copyright (c) 2020 Western Digital Corporation or its affiliates.
+> > > + *
+> > > + * This program is free software; you can redistribute it and/or
+> > > +modify it
+> > > + * under the terms and conditions of the GNU General Public License,
+> > > + * version 2 or later, as published by the Free Software Foundation.
+> > > + *
+> > > + * This program is distributed in the hope it will be useful, but
+> > > +WITHOUT
+> > > + * ANY WARRANTY; without even the implied warranty of
+> > MERCHANTABILITY
+> > > +or
+> > > + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
+> > > +License for
+> > > + * more details.
+> > > + *
+> > > + * You should have received a copy of the GNU General Public License
+> > > +along with
+> > > + * this program.  If not, see <http://www.gnu.org/licenses/>.
+> > > + */
+> > > +
+> > > +#include "qemu/osdep.h"
+> > > +#include "qemu/units.h"
+> > > +#include "qemu/log.h"
+> > > +#include "qemu/error-report.h"
+> > > +#include "qapi/error.h"
+> > > +#include "hw/boards.h"
+> > > +#include "hw/qdev-properties.h"
+> > > +#include "hw/riscv/numa.h"
+> > > +#include "sysemu/device_tree.h"
+> > > +
+> > > +static bool numa_enabled(const MachineState *ms) {
+> > > +    return (ms->numa_state && ms->numa_state->num_nodes) ? true :
+> > > +false; }
+> > > +
+> > > +int riscv_socket_count(const MachineState *ms) {
+> > > +    return (numa_enabled(ms)) ? ms->numa_state->num_nodes : 1; }
+> > > +
+> > > +int riscv_socket_first_hartid(const MachineState *ms, int socket_id)
+> > > +{
+> > > +    int i, first_hartid = ms->smp.cpus;
+> > > +
+> > > +    if (!numa_enabled(ms)) {
+> > > +        return (!socket_id) ? 0 : -1;
+> > > +    }
+> > > +
+> > > +    for (i = 0; i < ms->smp.cpus; i++) {
+> > > +        if (ms->possible_cpus->cpus[i].props.node_id != socket_id) {
+> > > +            continue;
+> > > +        }
+> > > +        if (i < first_hartid) {
+> > > +            first_hartid = i;
+> > > +        }
+> > > +    }
+> > > +
+> > > +    return (first_hartid < ms->smp.cpus) ? first_hartid : -1; }
+> > > +
+> > > +int riscv_socket_last_hartid(const MachineState *ms, int socket_id) {
+> > > +    int i, last_hartid = -1;
+> > > +
+> > > +    if (!numa_enabled(ms)) {
+> > > +        return (!socket_id) ? ms->smp.cpus - 1 : -1;
+> > > +    }
+> > > +
+> > > +    for (i = 0; i < ms->smp.cpus; i++) {
+> > > +        if (ms->possible_cpus->cpus[i].props.node_id != socket_id) {
+> > > +            continue;
+> > > +        }
+> > > +        if (i > last_hartid) {
+> > > +            last_hartid = i;
+> > > +        }
+> > > +    }
+> > > +
+> > > +    return (last_hartid < ms->smp.cpus) ? last_hartid : -1; }
+> > > +
+> > > +int riscv_socket_hart_count(const MachineState *ms, int socket_id) {
+> > > +    int first_hartid, last_hartid;
+> > > +
+> > > +    if (!numa_enabled(ms)) {
+> > > +        return (!socket_id) ? ms->smp.cpus : -1;
+> > > +    }
+> > > +
+> > > +    first_hartid = riscv_socket_first_hartid(ms, socket_id);
+> > > +    if (first_hartid < 0) {
+> > > +        return -1;
+> > > +    }
+> > > +
+> > > +    last_hartid = riscv_socket_last_hartid(ms, socket_id);
+> > > +    if (last_hartid < 0) {
+> > > +        return -1;
+> > > +    }
+> > > +
+> > > +    if (first_hartid > last_hartid) {
+> > > +        return -1;
+> > > +    }
+> > > +
+> > > +    return last_hartid - first_hartid + 1; }
+> > > +
+> > > +bool riscv_socket_check_hartids(const MachineState *ms, int
+> > > +socket_id) {
+> > > +    int i, first_hartid, last_hartid;
+> > > +
+> > > +    if (!numa_enabled(ms)) {
+> > > +        return (!socket_id) ? true : false;
+> > > +    }
+> > > +
+> > > +    first_hartid = riscv_socket_first_hartid(ms, socket_id);
+> > > +    if (first_hartid < 0) {
+> > > +        return false;
+> > > +    }
+> > > +
+> > > +    last_hartid = riscv_socket_last_hartid(ms, socket_id);
+> > > +    if (last_hartid < 0) {
+> > > +        return false;
+> > > +    }
+> > > +
+> > > +    for (i = first_hartid; i <= last_hartid; i++) {
+> > > +        if (ms->possible_cpus->cpus[i].props.node_id != socket_id) {
+> > > +            return false;
+> > > +        }
+> > > +    }
+> > > +
+> > > +    return true;
+> > > +}
+> > > +
+> > > +uint64_t riscv_socket_mem_offset(const MachineState *ms, int
+> > > +socket_id) {
+> > > +    int i;
+> > > +    uint64_t mem_offset = 0;
+> > > +
+> > > +    if (!numa_enabled(ms)) {
+> > > +        return 0;
+> > > +    }
+> > > +
+> > > +    for (i = 0; i < ms->numa_state->num_nodes; i++) {
+> > > +        if (i == socket_id) {
+> > > +            break;
+> > > +        }
+> > > +        mem_offset += ms->numa_state->nodes[i].node_mem;
+> > > +    }
+> > > +
+> > > +    return (i == socket_id) ? mem_offset : 0; }
+> > > +
+> > > +uint64_t riscv_socket_mem_size(const MachineState *ms, int socket_id)
+> > > +{
+> > > +    if (!numa_enabled(ms)) {
+> > > +        return (!socket_id) ? ms->ram_size : 0;
+> > > +    }
+> > > +
+> > > +    return (socket_id < ms->numa_state->num_nodes) ?
+> > > +            ms->numa_state->nodes[socket_id].node_mem : 0; }
+> > > +
+> > > +void riscv_socket_fdt_write_id(const MachineState *ms, void *fdt,
+> > > +                               const char *node_name, int socket_id)
+> > > +{
+> > > +    if (numa_enabled(ms)) {
+> > > +        qemu_fdt_setprop_cell(fdt, node_name, "numa-node-id",
+> > socket_id);
+> > > +    }
+> > > +}
+> > > +
+> > > +void riscv_socket_fdt_write_distance_matrix(const MachineState *ms,
+> > > +void *fdt) {
+> > > +    int i, j, idx;
+> > > +    uint32_t *dist_matrix, dist_matrix_size;
+> > > +
+> > > +    if (numa_enabled(ms) && ms->numa_state->have_numa_distance) {
+> > > +        dist_matrix_size = riscv_socket_count(ms) * riscv_socket_count(ms);
+> > > +        dist_matrix_size *= (3 * sizeof(uint32_t));
+> > > +        dist_matrix = g_malloc0(dist_matrix_size);
+> > > +
+> > > +        for (i = 0; i < riscv_socket_count(ms); i++) {
+> > > +            for (j = 0; j < riscv_socket_count(ms); j++) {
+> > > +                idx = (i * riscv_socket_count(ms) + j) * 3;
+> > > +                dist_matrix[idx + 0] = cpu_to_be32(i);
+> > > +                dist_matrix[idx + 1] = cpu_to_be32(j);
+> > > +                dist_matrix[idx + 2] =
+> > > +                    cpu_to_be32(ms->numa_state->nodes[i].distance[j]);
+> > > +            }
+> > > +        }
+> > > +
+> > > +        qemu_fdt_add_subnode(fdt, "/distance-map");
+> > > +        qemu_fdt_setprop_string(fdt, "/distance-map", "compatible",
+> > > +                                "numa-distance-map-v1");
+> > > +        qemu_fdt_setprop(fdt, "/distance-map", "distance-matrix",
+> > > +                         dist_matrix, dist_matrix_size);
+> > > +        g_free(dist_matrix);
+> > > +    }
+> > > +}
+> > > +
+> > > +CpuInstanceProperties
+> > > +riscv_numa_cpu_index_to_props(MachineState *ms, unsigned
+> > cpu_index) {
+> > > +    MachineClass *mc = MACHINE_GET_CLASS(ms);
+> > > +    const CPUArchIdList *possible_cpus =
+> > > +mc->possible_cpu_arch_ids(ms);
+> > > +
+> > > +    assert(cpu_index < possible_cpus->len);
+> > > +    return possible_cpus->cpus[cpu_index].props;
+> > > +}
+> > > +
+> > > +int64_t riscv_numa_get_default_cpu_node_id(const MachineState *ms,
+> > > +int idx) {
+> > > +    int64_t nidx = 0;
+> > > +
+> > > +    if (ms->numa_state->num_nodes) {
+> > > +        nidx = idx / (ms->smp.cpus / ms->numa_state->num_nodes);
+> > > +        if (ms->numa_state->num_nodes <= nidx) {
+> > > +            nidx = ms->numa_state->num_nodes - 1;
+> > > +        }
+> > > +    }
+> > > +
+> > > +    return nidx;
+> > > +}
+> > > +
+> > > +const CPUArchIdList *riscv_numa_possible_cpu_arch_ids(MachineState
+> > > +*ms) {
+> > > +    int n;
+> > > +    unsigned int max_cpus = ms->smp.max_cpus;
+> > > +
+> > > +    if (ms->possible_cpus) {
+> > > +        assert(ms->possible_cpus->len == max_cpus);
+> > > +        return ms->possible_cpus;
+> > > +    }
+> > > +
+> > > +    ms->possible_cpus = g_malloc0(sizeof(CPUArchIdList) +
+> > > +                                  sizeof(CPUArchId) * max_cpus);
+> > > +    ms->possible_cpus->len = max_cpus;
+> > > +    for (n = 0; n < ms->possible_cpus->len; n++) {
+> > > +        ms->possible_cpus->cpus[n].type = ms->cpu_type;
+> > > +        ms->possible_cpus->cpus[n].arch_id = n;
+> > > +        ms->possible_cpus->cpus[n].props.has_core_id = true;
+> > > +        ms->possible_cpus->cpus[n].props.core_id = n;
+> > > +    }
+> > > +
+> > > +    return ms->possible_cpus;
+> > > +}
+> > > diff --git a/include/hw/riscv/numa.h b/include/hw/riscv/numa.h new
+> > > file mode 100644 index 0000000000..fd9517a315
+> > > --- /dev/null
+> > > +++ b/include/hw/riscv/numa.h
+> > > @@ -0,0 +1,51 @@
+> > > +/*
+> > > + * QEMU RISC-V NUMA Helper
+> > > + *
+> > > + * Copyright (c) 2020 Western Digital Corporation or its affiliates.
+> > > + *
+> > > + * This program is free software; you can redistribute it and/or
+> > > +modify it
+> > > + * under the terms and conditions of the GNU General Public License,
+> > > + * version 2 or later, as published by the Free Software Foundation.
+> > > + *
+> > > + * This program is distributed in the hope it will be useful, but
+> > > +WITHOUT
+> > > + * ANY WARRANTY; without even the implied warranty of
+> > MERCHANTABILITY
+> > > +or
+> > > + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
+> > > +License for
+> > > + * more details.
+> > > + *
+> > > + * You should have received a copy of the GNU General Public License
+> > > +along with
+> > > + * this program.  If not, see <http://www.gnu.org/licenses/>.
+> > > + */
+> > > +
+> > > +#ifndef RISCV_NUMA_H
+> > > +#define RISCV_NUMA_H
+> > > +
+> > > +#include "hw/sysbus.h"
+> > > +#include "sysemu/numa.h"
+> > > +
+> > > +int riscv_socket_count(const MachineState *ms);
+> > > +
+> > > +int riscv_socket_first_hartid(const MachineState *ms, int socket_id);
+> > > +
+> > > +int riscv_socket_last_hartid(const MachineState *ms, int socket_id);
+> > > +
+> > > +int riscv_socket_hart_count(const MachineState *ms, int socket_id);
+> > > +
+> > > +uint64_t riscv_socket_mem_offset(const MachineState *ms, int
+> > > +socket_id);
+> > > +
+> > > +uint64_t riscv_socket_mem_size(const MachineState *ms, int
+> > > +socket_id);
+> > > +
+> > > +bool riscv_socket_check_hartids(const MachineState *ms, int
+> > > +socket_id);
+> > > +
+> > > +void riscv_socket_fdt_write_id(const MachineState *ms, void *fdt,
+> > > +                               const char *node_name, int socket_id);
+> > > +
+> > > +void riscv_socket_fdt_write_distance_matrix(const MachineState *ms,
+> > > +void *fdt);
+> > > +
+> > > +CpuInstanceProperties
+> > > +riscv_numa_cpu_index_to_props(MachineState *ms, unsigned
+> > cpu_index);
+> > > +
+> > > +int64_t riscv_numa_get_default_cpu_node_id(const MachineState *ms,
+> > > +int idx);
+> > > +
+> > > +const CPUArchIdList *riscv_numa_possible_cpu_arch_ids(MachineState
+> > > +*ms);
+> >
+> > Can we add some comments for the functions of what they are expected to
+> > return (and that -1 is an error)?
+> >
+> > Alistair
+> >
+> > > +
+> > > +#endif /* RISCV_NUMA_H */
+> > > --
+> > > 2.25.1
+> > >
+> > >
+>
 
