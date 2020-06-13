@@ -2,83 +2,86 @@ Return-Path: <SRS0=+z+v=72=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 230C7C433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 13 Jun 2020 16:18:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84A30C433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 13 Jun 2020 16:30:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DCCCE207BC
-	for <qemu-devel@archiver.kernel.org>; Sat, 13 Jun 2020 16:18:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4EE892078A
+	for <qemu-devel@archiver.kernel.org>; Sat, 13 Jun 2020 16:30:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kZPACV1p"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCCCE207BC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Lud70OFl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4EE892078A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49524 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55274 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jk8rn-0000Lb-5A
-	for qemu-devel@archiver.kernel.org; Sat, 13 Jun 2020 12:18:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49324)
+	id 1jk92m-000755-I3
+	for qemu-devel@archiver.kernel.org; Sat, 13 Jun 2020 12:30:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52220)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jk8r4-0008Hb-9I
- for qemu-devel@nongnu.org; Sat, 13 Jun 2020 12:18:02 -0400
-Received: from mail-oi1-x230.google.com ([2607:f8b0:4864:20::230]:42170)
+ (Exim 4.90_1) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1jk921-0006L9-RB; Sat, 13 Jun 2020 12:29:21 -0400
+Received: from mail-ej1-x642.google.com ([2a00:1450:4864:20::642]:33661)
  by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jk8r2-00055t-BK
- for qemu-devel@nongnu.org; Sat, 13 Jun 2020 12:18:01 -0400
-Received: by mail-oi1-x230.google.com with SMTP id s21so11746819oic.9
- for <qemu-devel@nongnu.org>; Sat, 13 Jun 2020 09:17:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ (Exim 4.90_1) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1jk920-00072H-03; Sat, 13 Jun 2020 12:29:21 -0400
+Received: by mail-ej1-x642.google.com with SMTP id n24so13139421ejd.0;
+ Sat, 13 Jun 2020 09:29:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=DjJNX3D6RNLc9mcxY2AGXC5IDPGLUpOISMcPuArgfFs=;
- b=kZPACV1p/EGNpuOrbYO2c7SZkb4cdI4RvK19Xoso78YQMrXBAFsV7TCfBfFwUlhmt6
- vJx7+7TbXFu2IHYTS2ekQ5/Tt+428W0iCTWYTkt8QO9wBrjgQPlFiP9njvN1lBX3gevP
- mvH671EUUXg6dOBXxMI/VNVa9Uib0PscPxw2Zwq6Ie2meWOYYm95sUnsDgZ5lM8g3/R9
- t5aW0aTCO77C1ATJzcNy+tylZXbdcwduvYcH8b8k1ZASVCqJOOTdeTKIPgkWtSNb3Q1L
- AoKkN6LOx/CKEgAd0gQI1JfhFjRFCcrp/9aYXVnOTXBmm69YpkGeF9NcjARYp3ngU9mY
- S3kA==
+ :cc; bh=uatsu9mHhKIA6c1jG2JglrXLJNvoevvsx4EjKK88bwk=;
+ b=Lud70OFlbpOekQ/1akd3CXKPJz0G5qaa6+lTl014vN0sY29e1Jl+KxqzIR6nAsV99j
+ QE9Sd33TmnaShKIzarYqHWuI2UaTRZzaKcHseKb/2sKFmhn4ctYvVZOs97W+PPdj9sRh
+ 751jTrWNng0j3i/cPobbqKEE+W1+D+DNt3DCQ9t9i43QnCNuwJHSFC/lmzG7+9pueIzO
+ 9t8RE1RzQx/YdSM7QtFmCyTgnXUBQM13d84EsZqLGnbn/qukCebkHeSSGmvj4Zfr1SUD
+ 71S5dUvffqMtZgqMz9ioi40Q4i9FZOruW15Pa1e/sD7O17TSgK11YEYAZi3xfzhIN/gJ
+ y8mQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=DjJNX3D6RNLc9mcxY2AGXC5IDPGLUpOISMcPuArgfFs=;
- b=Vq0fN3SDQexbUpFxf2G0eIoFoEyQu/ZFfz+pkWGL8GLkPzFEvBy5bPqzNErgrmE4Lc
- EgZY5WxHozz6YSmjGpZerdY3V2T8+I4q1ikL/jGWGz0RhnUpNegdtWGDgAAd1YmCrasX
- fgPau7EpHx6aoEzz9Unq9mQHjxTulbNbNrv9mZd+Z8k9TlbOYAGP5HuAqTe0ya9Nr3mV
- ywytBV7p0CspcAYKWbtQp/GWK1aR8LhYbKagBVPR345yjHkdVBpMNKf7+L4LznDnSFev
- G28pJxcDDG/ABegCjThmyrHbKX43/9++xZDW+/yaIco1fCo2cXZ9MQtslRNdgkRJMig1
- VzCg==
-X-Gm-Message-State: AOAM530gqYeqbxthO51yPUxL8gahqnUnQbmyzzI8DGJhcJ4y5tnVsdOk
- 1uvtNezzHCzyp0Kr97nWq9jq/fBg80vQdv0lsh/pjA==
-X-Google-Smtp-Source: ABdhPJyUi4vrkCU1fSMQ0HSVD5IciNdNWxB1JJADgHXynP8yQnLftdXQuZHxYWuyazC3P++vvEVQA5vkye1H+Es7Kuk=
-X-Received: by 2002:aca:1a07:: with SMTP id a7mr3232670oia.163.1592065073409; 
- Sat, 13 Jun 2020 09:17:53 -0700 (PDT)
+ bh=uatsu9mHhKIA6c1jG2JglrXLJNvoevvsx4EjKK88bwk=;
+ b=fEewMO5kdGhI7cAXM2zMnDK7EWWaTrMlKvccpI71MKrWFTdVp74KX2vRtPb/kvfsBZ
+ dnopumEzBvVcAi1jujVvDobTLZINkUJfxkKiMXMq3nfpDdXOZXRodtu6na9L0VtlpVSr
+ 923oeN8CBTzqB8+xfzjGnNPfxq9INtStjoxdthwlVu2s/b29x6gR3L8uXJWX4qzYEPbL
+ i3nEzY8R77V6Cqmbeuja/8QIz3tOlIoJo1Frr2SkW9dANECUdM5R6/O5IUX0K7TFFOG6
+ 3qxergfxlFCrMaYSfL5C3OjQ2kNjmmmHCI4C3l3ZxE1tGhYEet5wRS2v6Xihx4pFDkQh
+ zT+A==
+X-Gm-Message-State: AOAM530BjraqA23PmnF0TPImkmvDt1wv4sWPgwVBCA3DAZ+N5vw1SsnZ
+ dZSoFjgEwkkDiJpNJX2OoPNovF5LCAeafepbLws=
+X-Google-Smtp-Source: ABdhPJwV2lTazTeL2QN3zm0QY0DkgwcDT7DZSBX1j5XGsGa+0miKCrWJDajQ/YdPnYcg39R3yu6/jyexYhWs9ZnCpKU=
+X-Received: by 2002:a17:906:e47:: with SMTP id
+ q7mr18293279eji.279.1592065748002; 
+ Sat, 13 Jun 2020 09:29:08 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200612160755.9597-1-pbonzini@redhat.com>
-In-Reply-To: <20200612160755.9597-1-pbonzini@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sat, 13 Jun 2020 17:17:42 +0100
-Message-ID: <CAFEAcA_jwCYccvLhFBMawjZsTh7ujVVwJOvhehm6ufuXOBU+yA@mail.gmail.com>
-Subject: Re: [PULL v2 000/116] Huge miscellaneous pull request for 2020-06-11
-To: Paolo Bonzini <pbonzini@redhat.com>
+References: <20191008082815.8267-1-thuth@redhat.com>
+ <CAL1e-=gYkhM99Ee0LxZJ5dCjeEdC08G4_Tm3WCZpCSWvJ=b26Q@mail.gmail.com>
+ <4bfea125-eb63-f4a2-bca0-bce462f73d89@redhat.com>
+ <CAFEAcA_+V7SNsxPSgsd04s8f7PnP3qdyXMp6NvS2inHjE08pJw@mail.gmail.com>
+In-Reply-To: <CAFEAcA_+V7SNsxPSgsd04s8f7PnP3qdyXMp6NvS2inHjE08pJw@mail.gmail.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Sat, 13 Jun 2020 18:28:55 +0200
+Message-ID: <CAL1e-=ijjbTG19NHnsDrcJdb7kajBdcndMT8JXymqC6UViiitQ@mail.gmail.com>
+Subject: Re: [PATCH v2] Makefile: Remove generated files when doing
+ 'distclean' (and 'clean')
+To: Peter Maydell <peter.maydell@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::230;
- envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x230.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::642;
+ envelope-from=aleksandar.m.mail@gmail.com; helo=mail-ej1-x642.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
@@ -93,44 +96,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 12 Jun 2020 at 17:11, Paolo Bonzini <pbonzini@redhat.com> wrote:
+On Tue, Oct 8, 2019 at 2:41 PM Peter Maydell <peter.maydell@linaro.org> wrote:
 >
-> The following changes since commit 31d321c2b3574dcc74e9f6411af06bca6b5d10f4:
+> On Tue, 8 Oct 2019 at 13:37, Thomas Huth <thuth@redhat.com> wrote:
+> >
+> > On 08/10/2019 14.18, Aleksandar Markovic wrote:
+> > > If I remember well, QAPI-related c files are generated while doing
+> > > 'make'. If that is true, these files should be deleted by 'make clean',
+> > > shouldn't they?
+> >
+> > I think that's a philosophical question. Should "make clean" delete all
+> > files that have been generated by a Makefile (i.e. not by "configure"),
+> > or rather mainly the binary files?
 >
->   Merge remote-tracking branch 'remotes/philmd-gitlab/tags/sparc-next-20200609' into staging (2020-06-09 17:29:47 +0100)
+> https://www.gnu.org/software/automake/manual/html_node/Clean.html
 >
-> are available in the Git repository at:
+> The autoconf manual suggests some heuristics:
+>  - If make built it, and it is commonly something that one would want
+>    to rebuild (for instance, a .o file), then mostlyclean should delete it.
+>  - Otherwise, if make built it, then clean should delete it.
+>  - If configure built it, then distclean should delete it.
+>  - If the maintainer built it (for instance, a .info file), then
+>    maintainer-clean should delete it. However maintainer-clean should
+>    not delete anything that needs to exist in order to run
+> './configure && make'.
 >
->   git://github.com/bonzini/qemu.git tags/for-upstream
->
-> for you to fetch changes up to 3575b0aea983ad57804c9af739ed8ff7bc168393:
->
->   target/i386: Remove obsolete TODO file (2020-06-12 11:20:15 -0400)
->
-> ----------------------------------------------------------------
-> * Miscellaneous fixes and feature enablement (many)
-> * SEV refactoring (David)
-> * Hyper-V initial support (Jon)
-> * i386 TCG fixes (x87 and SSE, Joseph)
-> * vmport cleanup and improvements (Philippe, Liran)
-> * Use-after-free with vCPU hot-unplug (Nengyuan)
-> * run-coverity-scan improvements (myself)
-> * Record/replay fixes (Pavel)
-> * -machine kernel_irqchip=split improvements for INTx (Peter)
-> * Code cleanups (Philippe)
-> * Crash and security fixes (PJP)
-> * HVF cleanups (Roman)
 
-Applied, thanks. (I had to fix up a conflict in hw/i386/acpi-build.c;
-might be worth checking that I got it right.)
+Thomas, can we reincarnate this patch? It needs only fairly simple
+corrections, as said by Peter above. It would be nice to have at least
+one release of QEMU with clean clean and distclean.
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.1
-for any user-visible changes.
-
--- PMM
+Yours,
+Aleksandar
+> Not all of that applies for QEMU, but it seems like a reasonable
+> set of ideas.
+>
+> thanks
+> -- PMM
 
