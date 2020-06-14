@@ -2,134 +2,88 @@ Return-Path: <SRS0=clLO=73=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DB26C433DF
-	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 21:42:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA5E1C433DF
+	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 21:52:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C1789206B7
-	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 21:42:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1789206B7
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=maciej.szmigiero.name
+	by mail.kernel.org (Postfix) with ESMTPS id 5AA19206D7
+	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 21:52:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rfbpVM+Z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5AA19206D7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52104 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56408 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkaOL-0005wo-UR
-	for qemu-devel@archiver.kernel.org; Sun, 14 Jun 2020 17:42:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47206)
+	id 1jkaY1-0001Z0-GX
+	for qemu-devel@archiver.kernel.org; Sun, 14 Jun 2020 17:52:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49598)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mail@maciej.szmigiero.name>)
- id 1jkaN8-0005CG-0p
- for qemu-devel@nongnu.org; Sun, 14 Jun 2020 17:40:58 -0400
-Received: from vps-vb.mhejs.net ([37.28.154.113]:56346)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mail@maciej.szmigiero.name>)
- id 1jkaN5-0003co-LH
- for qemu-devel@nongnu.org; Sun, 14 Jun 2020 17:40:57 -0400
-Received: from MUA
- by vps-vb.mhejs.net with esmtps (TLS1.2:ECDHE-RSA-AES128-GCM-SHA256:128)
- (Exim 4.93.0.4) (envelope-from <mail@maciej.szmigiero.name>)
- id 1jkaMn-0004Cd-E1; Sun, 14 Jun 2020 23:40:37 +0200
-Subject: Re: [PATCH v4 5/6] i386: Hyper-V VMBus ACPI DSDT entry
-To: Jon Doron <arilou@gmail.com>
-References: <20200424123444.3481728-1-arilou@gmail.com>
- <20200424123444.3481728-6-arilou@gmail.com>
- <20200505150637.7131e79b@redhat.com> <20200511182121.GA1307176@rvkaganb.lan>
- <20200513173414.62e3cb4e@redhat.com>
- <fb1661c0-7282-58b4-03b4-a77793cc8e97@redhat.com>
- <20200522104053.4e7834a8@nas.mammed.net> <20200528052642.GB3071@jondnuc>
- <20200528123700.0a364b0e@redhat.com> <20200528110247.GD3071@jondnuc>
- <20200614141144.GA8561@jondnuc>
-From: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Autocrypt: addr=mail@maciej.szmigiero.name; prefer-encrypt=mutual; keydata=
- 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 mA==
-Message-ID: <7a3c068b-94d1-7af4-f3ea-94dadc2fad29@maciej.szmigiero.name>
-Date: Sun, 14 Jun 2020 23:40:31 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
+ id 1jkaXP-0000zx-87
+ for qemu-devel@nongnu.org; Sun, 14 Jun 2020 17:51:35 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:50762)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
+ id 1jkaXN-0005GN-9O
+ for qemu-devel@nongnu.org; Sun, 14 Jun 2020 17:51:34 -0400
+Received: by mail-wm1-x343.google.com with SMTP id l17so12758422wmj.0
+ for <qemu-devel@nongnu.org>; Sun, 14 Jun 2020 14:51:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+ :cc; bh=TGW/23PRJFxA3LQe/MKOQu/0tTiFMmzfZbMBAQ4ARvI=;
+ b=rfbpVM+ZHRCbqyMC4G1Z24EptZuP/3L31Pqm9JE+R1jqxYRtjp0wa9j1ILhP6EtPZu
+ Cn4bMkW9WfE2aLXxB0c9x2+KT+crm6qXlM+9DebnSG7sgvqaxa5t6LMN0jf/Ju8zjmyb
+ VD1VaonSjuWDxqZ1Qfgx20c9VPcCPFekzSBdEC33nEwoNyYAJ/wsCJjZQ2C0Il7DsO52
+ OQ3LsEKSl5cfhrg/s+k/VGrMT5EmvUR2rYouRLBnMB0jAm8w9yQBJk0QfRQA0AjoyLGJ
+ 7Ife9zMe9YieVn5jAqLVyRETYKzlEz2pR9fU8HP9X0dggwdGzaPuN7eNhsRMNvMtBb//
+ +TCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+ :message-id:subject:to:cc;
+ bh=TGW/23PRJFxA3LQe/MKOQu/0tTiFMmzfZbMBAQ4ARvI=;
+ b=ETu7K/mK2ZEHlGwU7C22T1RltoORb0OyI859L8jGyNJOyD90DrZ53axRKeh17GrnZJ
+ fMMmeh3Th/4R/2nY9C5CJp3c54dYhNH1rRTs8jbg95hrPCr+pFCzA+CeWlKonbLuFoi0
+ i+iHClQk0rIZBljXkNFeqVt+hMDFYsx+Jwe6CetQ1Vf58XoZfuwfMZf1lXzxX4Y8JWQA
+ CauZfvSSAYT2NdA6lAQ0FefOizBL8CIZOSC3uTnAZ1GVw7qvIHH6P2n7vq18FP4eTgZX
+ 1150eUyvyNdk84Pz4iDDJNqS3KPaJMSXjD/z1DFu6dXMH9btyZQ5d0a0AY621i/EzF4e
+ qgLg==
+X-Gm-Message-State: AOAM530Yt8vdC+dt9FFaHmJ5WxvYMjSuRKaABWNCHYE0xVriSp0NUPac
+ wATTIo3ImhB0S4CIfO1jsaTWIbLYOP+v7E001EQ=
+X-Google-Smtp-Source: ABdhPJzSgTRY3K6jFegukaGLCF7mDAa3V4nD8X6Hv0nz2vFkgVwudZJtaO+ulC9bZ5MWnlkzYeLtHVY2UD0XwK3/Z5o=
+X-Received: by 2002:a05:600c:22c1:: with SMTP id
+ 1mr10358373wmg.50.1592171491162; 
+ Sun, 14 Jun 2020 14:51:31 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200614141144.GA8561@jondnuc>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=37.28.154.113;
- envelope-from=mail@maciej.szmigiero.name; helo=vps-vb.mhejs.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/14 17:40:46
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+Received: by 2002:a1c:451:0:0:0:0:0 with HTTP;
+ Sun, 14 Jun 2020 14:51:30 -0700 (PDT)
+In-Reply-To: <20200614034729.3004-1-jiaxun.yang@flygoat.com>
+References: <20200614034729.3004-1-jiaxun.yang@flygoat.com>
+From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Date: Sun, 14 Jun 2020 23:51:30 +0200
+Message-ID: <CAHiYmc5haGPCxR4Nr-WmL_4PG48F+dqeJLzvVRHjcoBZKykr8Q@mail.gmail.com>
+Subject: Re: [PATCH] target/mips: Fix PageMask with variable page size
+To: Jiaxun Yang <jiaxun.yang@flygoat.com>
+Content-Type: multipart/alternative; boundary="00000000000026fd7805a812504b"
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wm1-x343.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -143,138 +97,317 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: eyakovlev@virtuozzo.com, ehabkost@redhat.com, qemu-devel@nongnu.org,
- Roman Kagan <rvkagan@yandex-team.ru>, liran.alon@oracle.com,
- Roman Kagan <rkagan@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>, vkuznets@redhat.com
+Cc: "aleksandar.rikalo@syrmia.com" <aleksandar.rikalo@syrmia.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "aurelien@aurel32.net" <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Jon,
+--00000000000026fd7805a812504b
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 14.06.2020 16:11, Jon Doron wrote:
-> On 28/05/2020, Jon Doron wrote:
->> On 28/05/2020, Igor Mammedov wrote:
->>> On Thu, 28 May 2020 08:26:42 +0300
->>> Jon Doron <arilou@gmail.com> wrote:
->>>
->>>> On 22/05/2020, Igor Mammedow wrote:
->>>>> On Thu, 21 May 2020 18:02:07 +0200
->>>>> Paolo Bonzini <pbonzini@redhat.com> wrote:
->>>>>
->>>>>> On 13/05/20 17:34, Igor Mammedov wrote:
->>>>>> > I'd rather avoid using random IRQ numbers (considering we are
->>>>>> > dealing with black-box here). So if it's really necessary to have
->>>>>> > IRQ described here, I'd suggest to implement them in device model
->>>>>> > so they would be reserved and QEMU would error out in a sane way if
->>>>>> > IRQ conflict is detected.
->>>>>>
->>>>>> We don't generally detect ISA IRQ conflicts though, do we?
->>>>>
->>>>> that I don't know that's why I'm not suggesting how to do it.
->>>>> The point is hard-coding in AML random IRQs is not right thing to do,
->>>>> (especially with the lack of 'any' spec), as minimum AML should pull
->>>>> it from device model and that probably should be configurable and set
->>>>> by board.
->>>>>
->>>>> Other thing is:
->>>>> I haven't looked at VMBus device model in detail, but DSDT part aren't
->>>>> matching device though (device model is not ISA device hence AML part
->>>>> shouldn't be on in ISA scope), where to put it is open question.
->>>>> There were other issues with AML code, I've commented on, so I was
->>>>> waiting on respin with comments addressed.
->>>>> I don't think that this patch is good enough for merging.
->>>>>
->>>>>
->>>>
->>>> But it seems like the current patch does match what's Microsoft HyperV
->>>> is publishing in it's APCI tables.
->>>>
->>>> I dont think it's correct for us to "fix" Microsoft emulation even if
->>>> it's wrong, since that's what Windows probably expects to see...
->>>>
->>>> I tried looking where Microsoft uses the ACPI tables to identify the
->>>> VMBus but without much luck in order to understand how flexible a change
->>>> would be for the OS to still detect the VMBus device, but in general
->>>> I think "correcting" something that is emulated 1:1 because there is no
->>>> spec is the right way.
->>>
->>> I'd agree, if removing nonsense would break VMBus detection (does it?).
->>> if something is that doesn't make sense but has to stay because it is need
->>> to make windows happy, that's fine , just add annotate is with comment,
->>> so it won't confuse anyone why that code exists there later on.
->>>
->>> I suggest to:
->>> 1. try dropping _PS* & _STA as it doesn't actually does anything and _PS3 is plain wrong
->>> 2. drop one IRQ, newer hyper-v seems to be doing fine with only one
->>> 3. it's not ISA device, I'd suggest to move into _SB scope
->>> 4. I don't know much about IRQs but
->>>      git grep DEFINE_PROP_ | grep -i iqr
->>>   yields nothing so I'm not sure if it's acceptable. Typically it's board that assigns
->>>   IRQ and not device, for Sysbus devices (see: sysbus_init_irq/sysbus_connect_irq).
->>>   So I'd leave it upto Paolo or someone else to decide/comment on.
->>>
->>
->> Sounds like a plan, I'll try to come up with the test results
->> (at least for Windows 10 guest which is  what I have setup) and update
->> this thread with the results.
->>
->> -- Jon.
->>
->>>>
->>>>>>
->>>>>> Paolo
->>>>>>
->>>>>
->>>>
->>>
-> Hi guys,
-> 
-> Sorry for the delay...
-> 
-> So first ill clarify what was the test, the test was to see the device
-> "Microsoft Hyper-V Virtual Machine Bus" in Windows Device Manager under
-> "System devices" with a state of "working properly".
-> 
-> It seems like it's ok to drop all the _PS* and _STA.
+=D0=BD=D0=B5=D0=B4=D0=B5=D1=99=D0=B0, 14. =D1=98=D1=83=D0=BD 2020., Jiaxun =
+Yang <jiaxun.yang@flygoat.com> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=
+=D0=B0=D0=BE/=D0=BB=D0=B0:
+
+> Our current code assumed the target page size is always 4k
+> when handling PageMask and VPN2, however, variable page size
+> was just added to mips target and that's nolonger true.
 >
-> It seems to be functioning with single IRQ as well, it is worth noting that even when i dropped the entire _CRS (so no IRQs resources are required, the device was still showing that it's functioning, but I suspect this might affect the child devices like hv-net and hv-scsi).
-
-I guess you tested a single Windows version, correct?
-It may be that requirements differ between Windows versions, just as you
-say below about the required enlightenments.
- 
-> With that said I did run into a small issue I set-up Win10 1903 (aka 19H1) and it seems like VMBus now requires to have the following features enabled:
-> HV_VP_RUNTIME_AVAILABLE
-> HV_TIME_REF_COUNT_AVAILABLE
-> HV_SYNIC_AVAILABLE
-> HV_SYNTIMERS_AVAILABLE
-> HV_APIC_ACCESS_AVAILABLE
-> HV_HYPERCALL_AVAILABLE
-> HV_VP_INDEX_AVAILABLE
-> 
-> So notice that previously only SYNIC and VPINDEX was needed, now you need the whole thing so you need to run qemu with something like
-> -cpu host,hv-relaxed,hv_spinlocks=0x1fff,hv_time,hv-vapic,hv-vpindex,hv-synic,hv-runtime,hv-stimer
-> 
-> The validation was done in winhv!WinHvpCheckPartitionPrivileges .
+> So we refined this piece of code to handle any target page size.
+> Also added Big Page support defined by MIPS64 Release2.
 >
-> Paolo I noticed you have done a PULL request, would you like to wait on it and we will submit a version with a single IRQ (selectable by user property) and go with Igor's suggestion dropping _PS* and _STA (though like I said before I prefer to mimic the original HyperV with it's bugs, but I'll leave this decision to you).
+> Signed-off-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
+> ---
+>  target/mips/cp0_helper.c | 48 ++++++++++++++++++++++++++++++----------
 
-The code is already in the upstream QEMU tree, it's a known-working code,
-so I think it is better to simply work incrementally on further improving
-the current version rather than backing it out and merging it again later.
 
-This way it will (hopefully) get some wider testing sooner.
+Hi, Jiaxun.
 
-Not to mention that it is less likely for some other QEMU change to
-accidentally break it.
+Thanks for this contribution too.
 
-> Also today VMBus only verifies SYNIC is enabled I'm not sure how but I wonder if we want to some how exports from the CPU which other HV features are enabled so we can verify all the required ones are set, would appreciate if you have any suggestions here.
-> 
-> Cheers,
-> -- Jon.
+When you change machine.c the way you did it, you need to bump the version.
+Please see git log on machine.c for details.
+
+Also, this patch covers logicaly related, but slightly different and, in
+some cases almost independanr things, and should be split to two or more
+logical units - in other words, patches.
 
 Thanks,
-Maciej
+Akeksandar
+
+
+>  target/mips/cpu.h        |  3 ++-
+>  target/mips/machine.c    |  2 +-
+>  3 files changed, 39 insertions(+), 14 deletions(-)
+>
+> diff --git a/target/mips/cp0_helper.c b/target/mips/cp0_helper.c
+> index bbf12e4a97..7a134085f7 100644
+> --- a/target/mips/cp0_helper.c
+> +++ b/target/mips/cp0_helper.c
+> @@ -872,20 +872,44 @@ void helper_mtc0_memorymapid(CPUMIPSState *env,
+> target_ulong arg1)
+>      }
+>  }
+>
+> -void update_pagemask(CPUMIPSState *env, target_ulong arg1, int32_t
+> *pagemask)
+> +void helper_mtc0_pagemask(CPUMIPSState *env, target_ulong arg1)
+>  {
+> -    uint64_t mask =3D arg1 >> (TARGET_PAGE_BITS + 1);
+> -    if (!(env->insn_flags & ISA_MIPS32R6) || (arg1 =3D=3D ~0) ||
+> -        (mask =3D=3D 0x0000 || mask =3D=3D 0x0003 || mask =3D=3D 0x000F =
+||
+> -         mask =3D=3D 0x003F || mask =3D=3D 0x00FF || mask =3D=3D 0x03FF =
+||
+> -         mask =3D=3D 0x0FFF || mask =3D=3D 0x3FFF || mask =3D=3D 0xFFFF)=
+) {
+> -        env->CP0_PageMask =3D arg1 & (0x1FFFFFFF & (TARGET_PAGE_MASK << =
+1));
+> +    uint64_t mask;
+> +    int maxmaskbits, maskbits;
+> +
+> +    if (env->insn_flags & ISA_MIPS32R6) {
+> +        return;
+>      }
+> -}
+>
+> -void helper_mtc0_pagemask(CPUMIPSState *env, target_ulong arg1)
+> -{
+> -    update_pagemask(env, arg1, &env->CP0_PageMask);
+> +    /* Don't care MASKX as we don't support 1KB page */
+> +#ifdef TARGET_MIPS64
+> +    if (env->CP0_Config3 & CP0C3_BPG) {
+> +        maxmaskbits =3D 47;
+> +    } else {
+> +        maxmaskbits =3D 16;
+> +    }
+> +#else
+> +    maxmaskbits =3D 16;
+> +#endif
+> +    mask =3D extract64((uint64_t)arg1, CP0PM_MASK, maxmaskbits);
+> +
+> +    maskbits =3D find_first_zero_bit(&mask, 64);
+> +
+> +    /* Ensure no more set bit after first zero */
+> +    if (mask >> maskbits) {
+> +        goto invalid;
+> +    }
+> +    /* We don't support VTLB entry smaller than target page */
+> +    if ((maskbits + 12) < TARGET_PAGE_BITS) {
+> +        goto invalid;
+> +    }
+> +    env->CP0_PageMask =3D mask << CP0PM_MASK;
+> +
+> +    return;
+> +
+> +invalid:
+> +    maskbits =3D MIN(maxmaskbits, MAX(maskbits, TARGET_PAGE_BITS - 12));
+> +    env->CP0_PageMask =3D ((1 << (maskbits + 1)) - 1) << CP0PM_MASK;
+>  }
+>
+>  void helper_mtc0_pagegrain(CPUMIPSState *env, target_ulong arg1)
+> @@ -1111,7 +1135,7 @@ void helper_mthc0_saar(CPUMIPSState *env,
+> target_ulong arg1)
+>  void helper_mtc0_entryhi(CPUMIPSState *env, target_ulong arg1)
+>  {
+>      target_ulong old, val, mask;
+> -    mask =3D (TARGET_PAGE_MASK << 1) | env->CP0_EntryHi_ASID_mask;
+> +    mask =3D ~((1 << 14) - 1) | env->CP0_EntryHi_ASID_mask;
+>      if (((env->CP0_Config4 >> CP0C4_IE) & 0x3) >=3D 2) {
+>          mask |=3D 1 << CP0EnHi_EHINV;
+>      }
+> diff --git a/target/mips/cpu.h b/target/mips/cpu.h
+> index 0b3c987bb3..b69806792d 100644
+> --- a/target/mips/cpu.h
+> +++ b/target/mips/cpu.h
+> @@ -617,7 +617,8 @@ struct CPUMIPSState {
+>  /*
+>   * CP0 Register 5
+>   */
+> -    int32_t CP0_PageMask;
+> +    target_ulong CP0_PageMask;
+> +#define CP0PM_MASK 13
+>      int32_t CP0_PageGrain_rw_bitmask;
+>      int32_t CP0_PageGrain;
+>  #define CP0PG_RIE 31
+> diff --git a/target/mips/machine.c b/target/mips/machine.c
+> index 5b23e3e912..b30a75d46b 100644
+> --- a/target/mips/machine.c
+> +++ b/target/mips/machine.c
+> @@ -252,7 +252,7 @@ const VMStateDescription vmstate_mips_cpu =3D {
+>          VMSTATE_UINT64(env.CP0_EntryLo1, MIPSCPU),
+>          VMSTATE_UINTTL(env.CP0_Context, MIPSCPU),
+>          VMSTATE_INT32(env.CP0_MemoryMapID, MIPSCPU),
+> -        VMSTATE_INT32(env.CP0_PageMask, MIPSCPU),
+> +        VMSTATE_UINTTL(env.CP0_PageMask, MIPSCPU),
+>          VMSTATE_INT32(env.CP0_PageGrain, MIPSCPU),
+>          VMSTATE_UINTTL(env.CP0_SegCtl0, MIPSCPU),
+>          VMSTATE_UINTTL(env.CP0_SegCtl1, MIPSCPU),
+> --
+> 2.27.0
+>
+
+--00000000000026fd7805a812504b
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<br><br>=D0=BD=D0=B5=D0=B4=D0=B5=D1=99=D0=B0, 14. =D1=98=D1=83=D0=BD 2020.,=
+ Jiaxun Yang &lt;<a href=3D"mailto:jiaxun.yang@flygoat.com">jiaxun.yang@fly=
+goat.com</a>&gt; =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=
+=D0=BB=D0=B0:<br><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8=
+ex;border-left:1px #ccc solid;padding-left:1ex">Our current code assumed th=
+e target page size is always 4k<br>
+when handling PageMask and VPN2, however, variable page size<br>
+was just added to mips target and that&#39;s nolonger true.<br>
+<br>
+So we refined this piece of code to handle any target page size.<br>
+Also added Big Page support defined by MIPS64 Release2.<br>
+<br>
+Signed-off-by: Jiaxun Yang &lt;<a href=3D"mailto:jiaxun.yang@flygoat.com">j=
+iaxun.yang@flygoat.com</a>&gt;<br>
+---<br>
+=C2=A0target/mips/cp0_helper.c | 48 ++++++++++++++++++++++++++++++<wbr>----=
+------</blockquote><div><br></div><div>Hi, Jiaxun.</div><div><br></div><div=
+>Thanks for this contribution too.</div><div><br></div><div>When you change=
+ machine.c the way you did it, you need to bump the version. Please see git=
+ log on machine.c for details.</div><div><br></div><div>Also, this patch co=
+vers logicaly related, but slightly different and, in some cases almost ind=
+ependanr things, and should be split to two or more logical units - in othe=
+r words, patches.</div><div><br></div><div>Thanks,</div><div>Akeksandar</di=
+v><div>=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 =
+.8ex;border-left:1px #ccc solid;padding-left:1ex">
+=C2=A0target/mips/cpu.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 3 ++-<br>
+=C2=A0target/mips/machine.c=C2=A0 =C2=A0 |=C2=A0 2 +-<br>
+=C2=A03 files changed, 39 insertions(+), 14 deletions(-)<br>
+<br>
+diff --git a/target/mips/cp0_helper.c b/target/mips/cp0_helper.c<br>
+index bbf12e4a97..7a134085f7 100644<br>
+--- a/target/mips/cp0_helper.c<br>
++++ b/target/mips/cp0_helper.c<br>
+@@ -872,20 +872,44 @@ void helper_mtc0_memorymapid(<wbr>CPUMIPSState *env, =
+target_ulong arg1)<br>
+=C2=A0 =C2=A0 =C2=A0}<br>
+=C2=A0}<br>
+<br>
+-void update_pagemask(CPUMIPSState *env, target_ulong arg1, int32_t *pagema=
+sk)<br>
++void helper_mtc0_pagemask(<wbr>CPUMIPSState *env, target_ulong arg1)<br>
+=C2=A0{<br>
+-=C2=A0 =C2=A0 uint64_t mask =3D arg1 &gt;&gt; (TARGET_PAGE_BITS + 1);<br>
+-=C2=A0 =C2=A0 if (!(env-&gt;insn_flags &amp; ISA_MIPS32R6) || (arg1 =3D=3D=
+ ~0) ||<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 (mask =3D=3D 0x0000 || mask =3D=3D 0x0003 || m=
+ask =3D=3D 0x000F ||<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0mask =3D=3D 0x003F || mask =3D=3D 0x00FF=
+ || mask =3D=3D 0x03FF ||<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0mask =3D=3D 0x0FFF || mask =3D=3D 0x3FFF=
+ || mask =3D=3D 0xFFFF)) {<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 env-&gt;CP0_PageMask =3D arg1 &amp; (0x1FFFFFF=
+F &amp; (TARGET_PAGE_MASK &lt;&lt; 1));<br>
++=C2=A0 =C2=A0 uint64_t mask;<br>
++=C2=A0 =C2=A0 int maxmaskbits, maskbits;<br>
++<br>
++=C2=A0 =C2=A0 if (env-&gt;insn_flags &amp; ISA_MIPS32R6) {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 return;<br>
+=C2=A0 =C2=A0 =C2=A0}<br>
+-}<br>
+<br>
+-void helper_mtc0_pagemask(<wbr>CPUMIPSState *env, target_ulong arg1)<br>
+-{<br>
+-=C2=A0 =C2=A0 update_pagemask(env, arg1, &amp;env-&gt;CP0_PageMask);<br>
++=C2=A0 =C2=A0 /* Don&#39;t care MASKX as we don&#39;t support 1KB page */<=
+br>
++#ifdef TARGET_MIPS64<br>
++=C2=A0 =C2=A0 if (env-&gt;CP0_Config3 &amp; CP0C3_BPG) {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 maxmaskbits =3D 47;<br>
++=C2=A0 =C2=A0 } else {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 maxmaskbits =3D 16;<br>
++=C2=A0 =C2=A0 }<br>
++#else<br>
++=C2=A0 =C2=A0 maxmaskbits =3D 16;<br>
++#endif<br>
++=C2=A0 =C2=A0 mask =3D extract64((uint64_t)arg1, CP0PM_MASK, maxmaskbits);=
+<br>
++<br>
++=C2=A0 =C2=A0 maskbits =3D find_first_zero_bit(&amp;mask, 64);<br>
++<br>
++=C2=A0 =C2=A0 /* Ensure no more set bit after first zero */<br>
++=C2=A0 =C2=A0 if (mask &gt;&gt; maskbits) {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 goto invalid;<br>
++=C2=A0 =C2=A0 }<br>
++=C2=A0 =C2=A0 /* We don&#39;t support VTLB entry smaller than target page =
+*/<br>
++=C2=A0 =C2=A0 if ((maskbits + 12) &lt; TARGET_PAGE_BITS) {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 goto invalid;<br>
++=C2=A0 =C2=A0 }<br>
++=C2=A0 =C2=A0 env-&gt;CP0_PageMask =3D mask &lt;&lt; CP0PM_MASK;<br>
++<br>
++=C2=A0 =C2=A0 return;<br>
++<br>
++invalid:<br>
++=C2=A0 =C2=A0 maskbits =3D MIN(maxmaskbits, MAX(maskbits, TARGET_PAGE_BITS=
+ - 12));<br>
++=C2=A0 =C2=A0 env-&gt;CP0_PageMask =3D ((1 &lt;&lt; (maskbits + 1)) - 1) &=
+lt;&lt; CP0PM_MASK;<br>
+=C2=A0}<br>
+<br>
+=C2=A0void helper_mtc0_pagegrain(<wbr>CPUMIPSState *env, target_ulong arg1)=
+<br>
+@@ -1111,7 +1135,7 @@ void helper_mthc0_saar(CPUMIPSState *env, target_ulon=
+g arg1)<br>
+=C2=A0void helper_mtc0_entryhi(<wbr>CPUMIPSState *env, target_ulong arg1)<b=
+r>
+=C2=A0{<br>
+=C2=A0 =C2=A0 =C2=A0target_ulong old, val, mask;<br>
+-=C2=A0 =C2=A0 mask =3D (TARGET_PAGE_MASK &lt;&lt; 1) | env-&gt;CP0_EntryHi=
+_ASID_mask;<br>
++=C2=A0 =C2=A0 mask =3D ~((1 &lt;&lt; 14) - 1) | env-&gt;CP0_EntryHi_ASID_m=
+ask;<br>
+=C2=A0 =C2=A0 =C2=A0if (((env-&gt;CP0_Config4 &gt;&gt; CP0C4_IE) &amp; 0x3)=
+ &gt;=3D 2) {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0mask |=3D 1 &lt;&lt; CP0EnHi_EHINV;<br>
+=C2=A0 =C2=A0 =C2=A0}<br>
+diff --git a/target/mips/cpu.h b/target/mips/cpu.h<br>
+index 0b3c987bb3..b69806792d 100644<br>
+--- a/target/mips/cpu.h<br>
++++ b/target/mips/cpu.h<br>
+@@ -617,7 +617,8 @@ struct CPUMIPSState {<br>
+=C2=A0/*<br>
+=C2=A0 * CP0 Register 5<br>
+=C2=A0 */<br>
+-=C2=A0 =C2=A0 int32_t CP0_PageMask;<br>
++=C2=A0 =C2=A0 target_ulong CP0_PageMask;<br>
++#define CP0PM_MASK 13<br>
+=C2=A0 =C2=A0 =C2=A0int32_t CP0_PageGrain_rw_bitmask;<br>
+=C2=A0 =C2=A0 =C2=A0int32_t CP0_PageGrain;<br>
+=C2=A0#define CP0PG_RIE 31<br>
+diff --git a/target/mips/machine.c b/target/mips/machine.c<br>
+index 5b23e3e912..b30a75d46b 100644<br>
+--- a/target/mips/machine.c<br>
++++ b/target/mips/machine.c<br>
+@@ -252,7 +252,7 @@ const VMStateDescription vmstate_mips_cpu =3D {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0VMSTATE_UINT64(env.CP0_<wbr>EntryLo1, MIP=
+SCPU),<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0VMSTATE_UINTTL(env.CP0_<wbr>Context, MIPS=
+CPU),<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0VMSTATE_INT32(env.CP0_<wbr>MemoryMapID, M=
+IPSCPU),<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 VMSTATE_INT32(env.CP0_<wbr>PageMask, MIPSCPU),=
+<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 VMSTATE_UINTTL(env.CP0_<wbr>PageMask, MIPSCPU)=
+,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0VMSTATE_INT32(env.CP0_<wbr>PageGrain, MIP=
+SCPU),<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0VMSTATE_UINTTL(env.CP0_<wbr>SegCtl0, MIPS=
+CPU),<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0VMSTATE_UINTTL(env.CP0_<wbr>SegCtl1, MIPS=
+CPU),<br>
+-- <br>
+2.27.0<br>
+</blockquote>
+
+--00000000000026fd7805a812504b--
 
