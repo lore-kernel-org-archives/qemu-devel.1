@@ -2,62 +2,98 @@ Return-Path: <SRS0=clLO=73=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61D10C433E0
-	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 14:47:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86614C433E0
+	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 15:21:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3538D206D7
-	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 14:47:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3538D206D7
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id 4F913206D7
+	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 15:21:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GbSKDuWU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F913206D7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51108 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36348 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkTvJ-0005nx-HM
-	for qemu-devel@archiver.kernel.org; Sun, 14 Jun 2020 10:47:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60342)
+	id 1jkUSH-0001qN-Fr
+	for qemu-devel@archiver.kernel.org; Sun, 14 Jun 2020 11:21:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57228)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jkTuH-0005Kf-4z; Sun, 14 Jun 2020 10:46:45 -0400
-Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:47954)
- by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jkTuE-0000M5-9c; Sun, 14 Jun 2020 10:46:44 -0400
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id BFB89746331;
- Sun, 14 Jun 2020 16:46:33 +0200 (CEST)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id 9618F746307; Sun, 14 Jun 2020 16:46:33 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
- by zero.eik.bme.hu (Postfix) with ESMTP id 94A727456F8;
- Sun, 14 Jun 2020 16:46:33 +0200 (CEST)
-Date: Sun, 14 Jun 2020 16:46:33 +0200 (CEST)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Subject: Re: [PATCH v2 1/5] mac_oldworld: Allow loading binary ROM image
-In-Reply-To: <ef46b912-aa47-09bc-3362-a9dea0c82523@ilande.co.uk>
-Message-ID: <alpine.BSF.2.22.395.2006141623190.56690@zero.eik.bme.hu>
-References: <cover.1592055375.git.balaton@eik.bme.hu>
- <4a304a01a87fc8154023bc8f48e22811d7cfcaf0.1592055375.git.balaton@eik.bme.hu>
- <ef46b912-aa47-09bc-3362-a9dea0c82523@ilande.co.uk>
-User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
+ (Exim 4.90_1) (envelope-from <arilou@gmail.com>) id 1jkURI-00013K-F9
+ for qemu-devel@nongnu.org; Sun, 14 Jun 2020 11:20:52 -0400
+Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:40166)
+ by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <arilou@gmail.com>) id 1jkURG-0000gY-Bu
+ for qemu-devel@nongnu.org; Sun, 14 Jun 2020 11:20:52 -0400
+Received: by mail-ed1-x544.google.com with SMTP id p18so9682429eds.7
+ for <qemu-devel@nongnu.org>; Sun, 14 Jun 2020 08:20:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=2zT6tXiuI05AbKUm8jI0U9MH5HyXRAFycm2wWZFgquA=;
+ b=GbSKDuWUBU+Z2Zb1vkgxUK7+3zB22eyakcMttLSpjOhpqiVb81xh5bjh+cAy3lDDNn
+ xKbw98O392DwunSx2cZadon8j8BPJlvCTlx6AAIZd6qQisXh70rUmt20qM5fEIoa134c
+ WdLv2BTbv953amQJwSoR15B7o3PpBjG/8lxdszPh5ecVHc7Oaof4Yka498PwVXU0oYL0
+ ySd94QGUXsFDXMQvhu62tyHMxHJ/OuUP8MHFGg+VMguFURSYmeyiiWkVl6359zZ34EiT
+ kOWVCoyJdZZKf7QXC5sP3Gg+TEMxwlIqKrykiIeTi9NaKjGmOJfe/SpBMk9RmEZPvt0c
+ kmqw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=2zT6tXiuI05AbKUm8jI0U9MH5HyXRAFycm2wWZFgquA=;
+ b=aXrfZSe3k2KXdDbIaKdshH9aYLCADGk0iSClzv6QIkRu+5ma+ejbjop6OA87E5Bqz5
+ ghA/7SPO6NHnznAUvnfCsIseWHZduv9f4csu7ONDzJiXDEKCZb652E1mJcTIOb8b33X4
+ akc9gxJ0D7tPnnUrqD17qsySEs8TRQj/DXTWny55KvxIT7nv5FRS8YP9Ba/8vQi1rS60
+ Ab3BikwkjGpMokHuMKYB1BzJC82/NYSxYPnsKfg6csCCWCbdCrGyJdQfgiKdzJ18OBIy
+ /UNGBfDDSL0TbXxK2WlURut5PbcHoRFd8QnM/xS0EAuV6ITy1RAvD7HQvujtktd2vAJC
+ AoIw==
+X-Gm-Message-State: AOAM5305xX5TFSLcVIZCD0mQbs39PtOOXmHO2tEgOg85nx9hai1tfq3z
+ BlVv9mpFyTl9lqL3mQVHlQ8=
+X-Google-Smtp-Source: ABdhPJwTH6L0B5SOV8GM9yHuwdzmKZn5Vdsv5RxKtQM2ooAF3Yx7uTf86pH2BltKSOM1YYtzCLOXgw==
+X-Received: by 2002:a05:6402:54d:: with SMTP id
+ i13mr20098181edx.330.1592148043592; 
+ Sun, 14 Jun 2020 08:20:43 -0700 (PDT)
+Received: from jondnuc (IGLD-84-229-154-20.inter.net.il. [84.229.154.20])
+ by smtp.gmail.com with ESMTPSA id v12sm6790438eda.39.2020.06.14.08.20.42
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sun, 14 Jun 2020 08:20:42 -0700 (PDT)
+Date: Sun, 14 Jun 2020 18:20:41 +0300
+From: Jon Doron <arilou@gmail.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Subject: Re: [PATCH v4 5/6] i386: Hyper-V VMBus ACPI DSDT entry
+Message-ID: <20200614152041.GB8561@jondnuc>
+References: <20200424123444.3481728-6-arilou@gmail.com>
+ <20200505150637.7131e79b@redhat.com>
+ <20200511182121.GA1307176@rvkaganb.lan>
+ <20200513173414.62e3cb4e@redhat.com>
+ <fb1661c0-7282-58b4-03b4-a77793cc8e97@redhat.com>
+ <20200522104053.4e7834a8@nas.mammed.net>
+ <20200528052642.GB3071@jondnuc>
+ <20200528123700.0a364b0e@redhat.com>
+ <20200528110247.GD3071@jondnuc> <20200614141144.GA8561@jondnuc>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Received-SPF: pass client-ip=2001:738:2001:2001::2001;
- envelope-from=balaton@eik.bme.hu; helo=zero.eik.bme.hu
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20200614141144.GA8561@jondnuc>
+Received-SPF: pass client-ip=2a00:1450:4864:20::544;
+ envelope-from=arilou@gmail.com; helo=mail-ed1-x544.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -70,105 +106,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Howard Spoelstra <hsp.cat7@gmail.com>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: mail@maciej.szmigiero.name, eyakovlev@virtuozzo.com, ehabkost@redhat.com,
+ qemu-devel@nongnu.org, Roman Kagan <rvkagan@yandex-team.ru>,
+ liran.alon@oracle.com, Roman Kagan <rkagan@virtuozzo.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, vkuznets@redhat.com,
+ "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, 14 Jun 2020, Mark Cave-Ayland wrote:
-> On 13/06/2020 14:36, BALATON Zoltan wrote:
+On 14/06/2020, Jon Doron wrote:
+>On 28/05/2020, Jon Doron wrote:
+>>On 28/05/2020, Igor Mammedov wrote:
+>>>On Thu, 28 May 2020 08:26:42 +0300
+>>>Jon Doron <arilou@gmail.com> wrote:
+>>>
+>>>>On 22/05/2020, Igor Mammedow wrote:
+>>>>>On Thu, 21 May 2020 18:02:07 +0200
+>>>>>Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>>>>
+>>>>>>On 13/05/20 17:34, Igor Mammedov wrote:
+>>>>>>> I'd rather avoid using random IRQ numbers (considering we are
+>>>>>>> dealing with black-box here). So if it's really necessary to have
+>>>>>>> IRQ described here, I'd suggest to implement them in device model
+>>>>>>> so they would be reserved and QEMU would error out in a sane way if
+>>>>>>> IRQ conflict is detected.
+>>>>>>
+>>>>>>We don't generally detect ISA IRQ conflicts though, do we?
+>>>>>
+>>>>>that I don't know that's why I'm not suggesting how to do it.
+>>>>>The point is hard-coding in AML random IRQs is not right thing to do,
+>>>>>(especially with the lack of 'any' spec), as minimum AML should pull
+>>>>>it from device model and that probably should be configurable and set
+>>>>>by board.
+>>>>>
+>>>>>Other thing is:
+>>>>>I haven't looked at VMBus device model in detail, but DSDT part aren't
+>>>>>matching device though (device model is not ISA device hence AML part
+>>>>>shouldn't be on in ISA scope), where to put it is open question.
+>>>>>There were other issues with AML code, I've commented on, so I was
+>>>>>waiting on respin with comments addressed.
+>>>>>I don't think that this patch is good enough for merging.
+>>>>>
+>>>>>
+>>>>
+>>>>But it seems like the current patch does match what's Microsoft HyperV
+>>>>is publishing in it's APCI tables.
+>>>>
+>>>>I dont think it's correct for us to "fix" Microsoft emulation even if
+>>>>it's wrong, since that's what Windows probably expects to see...
+>>>>
+>>>>I tried looking where Microsoft uses the ACPI tables to identify the
+>>>>VMBus but without much luck in order to understand how flexible a change
+>>>>would be for the OS to still detect the VMBus device, but in general
+>>>>I think "correcting" something that is emulated 1:1 because there is no
+>>>>spec is the right way.
+>>>
+>>>I'd agree, if removing nonsense would break VMBus detection (does it?).
+>>>if something is that doesn't make sense but has to stay because it is need
+>>>to make windows happy, that's fine , just add annotate is with comment,
+>>>so it won't confuse anyone why that code exists there later on.
+>>>
+>>>I suggest to:
+>>>1. try dropping _PS* & _STA as it doesn't actually does anything and _PS3 is plain wrong
+>>>2. drop one IRQ, newer hyper-v seems to be doing fine with only one
+>>>3. it's not ISA device, I'd suggest to move into _SB scope
+>>>4. I don't know much about IRQs but
+>>>     git grep DEFINE_PROP_ | grep -i iqr
+>>>  yields nothing so I'm not sure if it's acceptable. Typically it's board that assigns
+>>>  IRQ and not device, for Sysbus devices (see: sysbus_init_irq/sysbus_connect_irq).
+>>>  So I'd leave it upto Paolo or someone else to decide/comment on.
+>>>
+>>
+>>Sounds like a plan, I'll try to come up with the test results
+>>(at least for Windows 10 guest which is  what I have setup) and update
+>>this thread with the results.
+>>
+>>-- Jon.
+>>
+>>>>
+>>>>>>
+>>>>>>Paolo
+>>>>>>
+>>>>>
+>>>>
+>>>
+>Hi guys,
 >
->> The G3 beige machine has a 4MB firmware ROM. Fix the size of the rom
->> region and allow loading a binary image with -bios. This makes it
->> possible to test emulation with a ROM image from real hardware.
->>
->> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
->> ---
->>  hw/ppc/mac_oldworld.c | 24 +++++++++++++++---------
->>  1 file changed, 15 insertions(+), 9 deletions(-)
->>
->> diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
->> index 0b4c1c6373..3812adc441 100644
->> --- a/hw/ppc/mac_oldworld.c
->> +++ b/hw/ppc/mac_oldworld.c
->> @@ -59,6 +59,8 @@
->>  #define NDRV_VGA_FILENAME "qemu_vga.ndrv"
->>
->>  #define GRACKLE_BASE 0xfec00000
->> +#define PROM_BASE 0xffc00000
->> +#define PROM_SIZE (4 * MiB)
->>
->>  static void fw_cfg_boot_set(void *opaque, const char *boot_device,
->>                              Error **errp)
->> @@ -127,24 +129,28 @@ static void ppc_heathrow_init(MachineState *machine)
->>
->>      memory_region_add_subregion(sysmem, 0, machine->ram);
->>
->> -    /* allocate and load BIOS */
->> -    memory_region_init_rom(bios, NULL, "ppc_heathrow.bios", BIOS_SIZE,
->> +    /* allocate and load firmware ROM */
->> +    memory_region_init_rom(bios, NULL, "ppc_heathrow.bios", PROM_SIZE,
->>                             &error_fatal);
->> +    memory_region_add_subregion(sysmem, PROM_BASE, bios);
->>
->> -    if (bios_name == NULL)
->> +    if (!bios_name) {
->>          bios_name = PROM_FILENAME;
->> +    }
->>      filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
->> -    memory_region_add_subregion(sysmem, PROM_ADDR, bios);
->> -
->> -    /* Load OpenBIOS (ELF) */
->>      if (filename) {
->> -        bios_size = load_elf(filename, NULL, 0, NULL, NULL, NULL, NULL, NULL,
->> -                             1, PPC_ELF_MACHINE, 0, 0);
->> +        /* Load OpenBIOS (ELF) */
->> +        bios_size = load_elf(filename, NULL, NULL, NULL, NULL, NULL, NULL,
->> +                             NULL, 1, PPC_ELF_MACHINE, 0, 0);
->> +        if (bios_size <= 0) {
->> +            /* or load binary ROM image */
->> +            bios_size = load_image_targphys(filename, PROM_BASE, PROM_SIZE);
->> +        }
->>          g_free(filename);
->>      } else {
->>          bios_size = -1;
->>      }
->> -    if (bios_size < 0 || bios_size > BIOS_SIZE) {
->> +    if (bios_size < 0 || bios_size > PROM_SIZE) {
->>          error_report("could not load PowerPC bios '%s'", bios_name);
->>          exit(1);
->>      }
+>Sorry for the delay...
 >
-> I think the logic could be improved a bit here: load_elf() can return the physical
-> address from the ELF, so it would make sense to use that as the address for
-> load_image_targphys() if present, and otherwise fall back to loading at 0xffc00000.
+>So first ill clarify what was the test, the test was to see the device
+>"Microsoft Hyper-V Virtual Machine Bus" in Windows Device Manager under
+>"System devices" with a state of "working properly".
+>
+>It seems like it's ok to drop all the _PS* and _STA.
+>
+>It seems to be functioning with single IRQ as well, it is worth noting 
+>that even when i dropped the entire _CRS (so no IRQs resources are 
+>required, the device was still showing that it's functioning, but I 
+>suspect this might affect the child devices like hv-net and hv-scsi).
+>
+>With that said I did run into a small issue I set-up Win10 1903 (aka 
+>19H1) and it seems like VMBus now requires to have the following 
+>features enabled:
+>HV_VP_RUNTIME_AVAILABLE
+>HV_TIME_REF_COUNT_AVAILABLE
+>HV_SYNIC_AVAILABLE
+>HV_SYNTIMERS_AVAILABLE
+>HV_APIC_ACCESS_AVAILABLE
+>HV_HYPERCALL_AVAILABLE
+>HV_VP_INDEX_AVAILABLE
+>
+>So notice that previously only SYNIC and VPINDEX was needed, now you 
+>need the whole thing so you need to run qemu with something like
+>-cpu host,hv-relaxed,hv_spinlocks=0x1fff,hv_time,hv-vapic,hv-vpindex,hv-synic,hv-runtime,hv-stimer
+>
+>The validation was done in winhv!WinHvpCheckPartitionPrivileges .
+>
+>Paolo I noticed you have done a PULL request, would you like to wait 
+>on it and we will submit a version with a single IRQ (selectable by 
+>user property) and go with Igor's suggestion dropping _PS* and _STA 
+>(though like I said before I prefer to mimic the original HyperV with 
+>it's bugs, but I'll leave this decision to you).
+>
+>Also today VMBus only verifies SYNIC is enabled I'm not sure how but I 
+>wonder if we want to some how exports from the CPU which other HV 
+>features are enabled so we can verify all the required ones are set, 
+>would appreciate if you have any suggestions here.
+>
+>Cheers,
+>-- Jon.
 
-I don't get this. No need to do it that way because load_elf already loads 
-the image at address specified in ELF file (I guess because it still works 
-with OpenBIOS after this patch) so don't have to call load_image_targphys 
-for that case. The above tries load_elf and only if it did not succeed 
-calls load_image_targphys to load a binary image to fill the ROM. I don't 
-see how this logic could be simpler.
+I got the latest DSDT from one of the latest builds 19041
 
-Maybe we need the load address from the ELF to check if an ELF would 
-overflow the region as in elf_addr + bios_size > PROM_ADDR + PROM_SIZE but 
-I'm not sure. Any suggestion?
+     Device (\_SB.VMOD.VMBS)
+     {
+         Name (STA, 0x0F)
+         Name (_ADR, Zero)  // _ADR: Address
+         Name (_DDN, "VMBUS")  // _DDN: DOS Device Name
+         Name (_HID, "VMBus")  // _HID: Hardware ID
+         Name (_UID, Zero)  // _UID: Unique ID
+         Method (_DIS, 0, NotSerialized)  // _DIS: Disable Device
+         {
+             STA &= 0x0D
+         }
 
-> It may also make sense to split PROM_ADDR to PROM_ADDR_OLDWORLD and
-> PROM_ADDR_NEWWORLD (and similar for BIOS_SIZE) to allow these values to be adjusted
-> separately for each machine.
+         Method (_PS0, 0, NotSerialized)  // _PS0: Power State 0
+         {
+             STA |= 0x0F
+         }
 
-BIOS_SIZE is not used in this board after this patch any more so that's 
-basically PROM_SIZE_NEWWORLD now which can be defined in mac_newworld and 
-removed from mac.h. Then we have separate PROM_SIZE for each board. I've 
-also defined PROM_ADDR here in mac_oldworld and similar define can be 
-added to mac_newworld if needed. These should not be in mac.h I think as 
-these are board specific. I regard the previous BIOS_* values specific to 
-OpenBIOS not to boards so now that boards can use other ROMs not just 
-OpenBIOS BIOS_SIZE may not be needed, what we need is the size of the ROM 
-chip on board instead.
+         Method (_STA, 0, NotSerialized)  // _STA: Status
+         {
+             Return (STA) /* \_SB_.VMOD.VMBS.STA_ */
+         }
 
-Regards,
-BALATON Zoltan
+         Name (_PS3, Zero)  // _PS3: Power State 3
+         Name (_CRS, ResourceTemplate ()  // _CRS: Current Resource Settings
+         {
+             IRQ (Edge, ActiveHigh, Exclusive, )
+                 {5}
+         })
+     }
+
+So things looks the same...
 
