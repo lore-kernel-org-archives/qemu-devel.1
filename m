@@ -2,43 +2,43 @@ Return-Path: <SRS0=clLO=73=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D033C433DF
-	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 18:30:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49AD1C433E0
+	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 18:30:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 11FFC206D7
-	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 18:30:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11FFC206D7
+	by mail.kernel.org (Postfix) with ESMTPS id 21405206D7
+	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 18:30:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21405206D7
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55364 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55384 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkXOT-0000ll-91
-	for qemu-devel@archiver.kernel.org; Sun, 14 Jun 2020 14:30:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48820)
+	id 1jkXOU-0000mC-BW
+	for qemu-devel@archiver.kernel.org; Sun, 14 Jun 2020 14:30:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48728)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jkXLS-0004Fo-Eh; Sun, 14 Jun 2020 14:27:02 -0400
-Received: from zero.eik.bme.hu ([152.66.115.2]:52080)
+ id 1jkXLM-000439-0h; Sun, 14 Jun 2020 14:26:56 -0400
+Received: from zero.eik.bme.hu ([152.66.115.2]:52047)
  by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jkXLQ-0007gy-D4; Sun, 14 Jun 2020 14:27:02 -0400
+ id 1jkXLI-0007dC-SF; Sun, 14 Jun 2020 14:26:55 -0400
 Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 6C198748DDD;
+ by localhost (Postfix) with SMTP id 1F66A745702;
  Sun, 14 Jun 2020 20:26:44 +0200 (CEST)
 Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id C44E2748DDB; Sun, 14 Jun 2020 20:26:43 +0200 (CEST)
-Message-Id: <b6cbd6aefffb0d60938ebc6ee442b2f3eb671b47.1592158400.git.balaton@eik.bme.hu>
+ id B3EDF748DD8; Sun, 14 Jun 2020 20:26:43 +0200 (CEST)
+Message-Id: <3d8c105ee2234d003dc65e25a07f568510829d0c.1592158400.git.balaton@eik.bme.hu>
 In-Reply-To: <cover.1592158400.git.balaton@eik.bme.hu>
 References: <cover.1592158400.git.balaton@eik.bme.hu>
 From: BALATON Zoltan <balaton@eik.bme.hu>
-Subject: [PATCH v4 9/9] mac_oldworld: Add SPD data to cover RAM
+Subject: [PATCH v4 5/9] mac_oldworld: Map macio to expected address at reset
 Date: Sun, 14 Jun 2020 20:13:19 +0200
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -73,68 +73,96 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-OpenBIOS gets RAM size via fw_cfg but rhe original board firmware
-detects RAM using SPD data so generate and add SDP eeproms to cover as
-much RAM as possible to describe with SPD (this may be less than the
-actual ram_size due to SDRAM size constraints).
+Add a reset function that maps macio to the address expected by the
+firmware of the board at startup.
 
 Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 ---
- hw/ppc/mac_oldworld.c | 19 ++++++++++++++++++-
- 1 file changed, 18 insertions(+), 1 deletion(-)
+ hw/ppc/mac.h          | 12 ++++++++++++
+ hw/ppc/mac_oldworld.c | 17 +++++++++++++++--
+ 2 files changed, 27 insertions(+), 2 deletions(-)
 
+diff --git a/hw/ppc/mac.h b/hw/ppc/mac.h
+index a0d9e47031..e04288ddfd 100644
+--- a/hw/ppc/mac.h
++++ b/hw/ppc/mac.h
+@@ -55,6 +55,18 @@
+ #define OLDWORLD_IDE1_IRQ      0xe
+ #define OLDWORLD_IDE1_DMA_IRQ  0x3
+ 
++/* g3beige machine */
++#define TYPE_HEATHROW_MACHINE MACHINE_TYPE_NAME("g3beige")
++#define HEATHROW_MACHINE(obj) OBJECT_CHECK(HeathrowMachineState, (obj), \
++                                           TYPE_HEATHROW_MACHINE)
++
++typedef struct HeathrowMachineState {
++    /*< private >*/
++    MachineState parent;
++
++    PCIDevice *macio_pci;
++} HeathrowMachineState;
++
+ /* New World IRQs */
+ #define NEWWORLD_CUDA_IRQ      0x19
+ #define NEWWORLD_PMU_IRQ       0x19
 diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
-index 53615af6b1..1f85859034 100644
+index 2afdef55aa..cb4a0f3211 100644
 --- a/hw/ppc/mac_oldworld.c
 +++ b/hw/ppc/mac_oldworld.c
-@@ -34,6 +34,7 @@
- #include "hw/input/adb.h"
- #include "sysemu/sysemu.h"
- #include "net/net.h"
-+#include "hw/i2c/smbus_eeprom.h"
- #include "hw/isa/isa.h"
- #include "hw/pci/pci.h"
- #include "hw/pci/pci_host.h"
-@@ -137,6 +138,8 @@ static void ppc_heathrow_init(MachineState *machine)
-     DriveInfo *hd[MAX_IDE_BUS * MAX_IDE_DEVS];
-     void *fw_cfg;
-     uint64_t tbfreq;
-+    uint8_t *spd_data[3] = {};
-+    I2CBus *i2c_bus;
+@@ -73,6 +73,15 @@ static uint64_t translate_kernel_address(void *opaque, uint64_t addr)
+     return (addr & 0x0fffffff) + KERNEL_LOAD_ADDR;
+ }
  
-     linux_boot = (kernel_filename != NULL);
++static void ppc_heathrow_reset(MachineState *machine)
++{
++    HeathrowMachineState *m = HEATHROW_MACHINE(machine);
++
++    qemu_devices_reset();
++    pci_default_write_config(m->macio_pci, PCI_COMMAND, PCI_COMMAND_MEMORY, 2);
++    pci_default_write_config(m->macio_pci, PCI_BASE_ADDRESS_0, 0xf3000000, 4);
++}
++
+ static void ppc_heathrow_cpu_reset(void *opaque)
+ {
+     PowerPCCPU *cpu = opaque;
+@@ -82,6 +91,7 @@ static void ppc_heathrow_cpu_reset(void *opaque)
  
-@@ -156,8 +159,16 @@ static void ppc_heathrow_init(MachineState *machine)
-                      "maximum 2047 MB", ram_size / MiB);
-         exit(1);
-     }
--
-     memory_region_add_subregion(sysmem, 0, machine->ram);
-+    for (i = 0; i < 3; i++) {
-+        int size_left = ram_size - i * 512 * MiB;
-+        if (size_left > 0) {
-+            uint32_t s = size_left / MiB;
-+            s = (s > 512 ? 512 : s);
-+            s = 1U << (31 - clz32(s));
-+            spd_data[i] = spd_data_generate(SDR, s * MiB);
-+        }
-+    }
+ static void ppc_heathrow_init(MachineState *machine)
+ {
++    HeathrowMachineState *hm = HEATHROW_MACHINE(machine);
+     ram_addr_t ram_size = machine->ram_size;
+     const char *kernel_filename = machine->kernel_filename;
+     const char *kernel_cmdline = machine->kernel_cmdline;
+@@ -289,7 +299,8 @@ static void ppc_heathrow_init(MachineState *machine)
+     ide_drive_get(hd, ARRAY_SIZE(hd));
  
-     /* allocate and load firmware ROM */
-     memory_region_init_rom(bios, NULL, "ppc_heathrow.bios", PROM_SIZE,
-@@ -340,6 +351,12 @@ static void ppc_heathrow_init(MachineState *machine)
-     macio_ide_init_drives(macio_ide, &hd[MAX_IDE_DEVS]);
+     /* MacIO */
+-    macio = OLDWORLD_MACIO(pci_create(pci_bus, -1, TYPE_OLDWORLD_MACIO));
++    hm->macio_pci = pci_create(pci_bus, -1, TYPE_OLDWORLD_MACIO);
++    macio = OLDWORLD_MACIO(hm->macio_pci);
+     dev = DEVICE(macio);
+     qdev_prop_set_uint64(dev, "frequency", tbfreq);
+     object_property_set_link(OBJECT(macio), OBJECT(pic_dev), "pic",
+@@ -441,6 +452,7 @@ static void heathrow_class_init(ObjectClass *oc, void *data)
  
-     dev = DEVICE(object_resolve_path_component(OBJECT(macio), "cuda"));
-+    i2c_bus = I2C_BUS(qdev_get_child_bus(dev, "i2c"));
-+    for (i = 0; i < 3; i++) {
-+        if (spd_data[i]) {
-+            smbus_eeprom_init_one(i2c_bus, 0x50 + i, spd_data[i]);
-+        }
-+    }
-     adb_bus = qdev_get_child_bus(dev, "adb.0");
-     dev = qdev_create(adb_bus, TYPE_ADB_KEYBOARD);
-     qdev_init_nofail(dev);
+     mc->desc = "Heathrow based PowerMAC";
+     mc->init = ppc_heathrow_init;
++    mc->reset = ppc_heathrow_reset;
+     mc->block_default_type = IF_IDE;
+     mc->max_cpus = MAX_CPUS;
+ #ifndef TARGET_PPC64
+@@ -457,9 +469,10 @@ static void heathrow_class_init(ObjectClass *oc, void *data)
+ }
+ 
+ static const TypeInfo ppc_heathrow_machine_info = {
+-    .name          = MACHINE_TYPE_NAME("g3beige"),
++    .name          = TYPE_HEATHROW_MACHINE,
+     .parent        = TYPE_MACHINE,
+     .class_init    = heathrow_class_init,
++    .instance_size = sizeof(HeathrowMachineState),
+     .interfaces = (InterfaceInfo[]) {
+         { TYPE_FW_PATH_PROVIDER },
+         { }
 -- 
 2.21.3
 
