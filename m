@@ -2,46 +2,45 @@ Return-Path: <SRS0=clLO=73=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77835C433DF
-	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 14:33:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9D9AC433E0
+	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 14:33:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4B6462071A
-	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 14:33:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B6462071A
+	by mail.kernel.org (Postfix) with ESMTPS id BA84E2071A
+	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 14:33:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA84E2071A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35256 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38264 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkTgx-0002rO-Gc
-	for qemu-devel@archiver.kernel.org; Sun, 14 Jun 2020 10:32:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51426)
+	id 1jkThf-0004FU-Q2
+	for qemu-devel@archiver.kernel.org; Sun, 14 Jun 2020 10:33:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51932)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jkTdL-0005p2-99; Sun, 14 Jun 2020 10:29:15 -0400
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:38344
+ id 1jkTe8-0007Po-9e; Sun, 14 Jun 2020 10:30:04 -0400
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:38412
  helo=mail.default.ilande.uk0.bigv.io)
  by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jkTdJ-0005Ab-Op; Sun, 14 Jun 2020 10:29:14 -0400
+ id 1jkTe6-0005FV-JT; Sun, 14 Jun 2020 10:30:03 -0400
 Received: from host217-39-64-113.range217-39.btcentralplus.com
  ([217.39.64.113] helo=kentang.home)
  by mail.default.ilande.uk0.bigv.io with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jkTdA-0006Hv-6N; Sun, 14 Jun 2020 15:29:11 +0100
+ id 1jkTdv-0006Hv-3q; Sun, 14 Jun 2020 15:30:00 +0100
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, laurent@vivier.eu,
  fthain@telegraphics.com.au
-Date: Sun, 14 Jun 2020 15:28:21 +0100
-Message-Id: <20200614142840.10245-4-mark.cave-ayland@ilande.co.uk>
+Date: Sun, 14 Jun 2020 15:28:29 +0100
+Message-Id: <20200614142840.10245-12-mark.cave-ayland@ilande.co.uk>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200614142840.10245-1-mark.cave-ayland@ilande.co.uk>
 References: <20200614142840.10245-1-mark.cave-ayland@ilande.co.uk>
@@ -49,7 +48,8 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 217.39.64.113
 X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: [PATCH 03/22] cuda: convert ADB autopoll timer from ns to ms
+Subject: [PATCH 11/22] adb: introduce new ADBDeviceHasData method to
+ ADBDeviceClass
 X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
 X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
 Received-SPF: pass client-ip=2001:41c9:1:41f::167;
@@ -78,61 +78,90 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is in preparation for consolidating all of the ADB autopoll management
-in one place.
+This is required later to allow devices to assert a service request (SRQ)
+signal to indicate that it has data to send, without having to consume it.
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 ---
- hw/misc/macio/cuda.c | 15 ++++++++-------
- 1 file changed, 8 insertions(+), 7 deletions(-)
+ hw/input/adb-kbd.c     | 8 ++++++++
+ hw/input/adb-mouse.c   | 9 +++++++++
+ include/hw/input/adb.h | 3 +++
+ 3 files changed, 20 insertions(+)
 
-diff --git a/hw/misc/macio/cuda.c b/hw/misc/macio/cuda.c
-index e0cc0aac5d..a407f2abc8 100644
---- a/hw/misc/macio/cuda.c
-+++ b/hw/misc/macio/cuda.c
-@@ -208,8 +208,9 @@ static void cuda_adb_poll(void *opaque)
-         obuf[1] = 0x40; /* polled data */
-         cuda_send_packet_to_host(s, obuf, olen + 2);
-     }
--    timer_mod(s->adb_poll_timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
--              (NANOSECONDS_PER_SECOND / (1000 / s->autopoll_rate_ms)));
+diff --git a/hw/input/adb-kbd.c b/hw/input/adb-kbd.c
+index 027dd3e531..23760ecf7b 100644
+--- a/hw/input/adb-kbd.c
++++ b/hw/input/adb-kbd.c
+@@ -300,6 +300,13 @@ static int adb_kbd_request(ADBDevice *d, uint8_t *obuf,
+     return olen;
+ }
+ 
++static bool adb_kbd_has_data(ADBDevice *d)
++{
++    KBDState *s = ADB_KEYBOARD(d);
 +
-+    timer_mod(s->adb_poll_timer, qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) +
-+              s->autopoll_rate_ms);
++    return s->count > 0;
++}
++
+ /* This is where keyboard events enter this file */
+ static void adb_keyboard_event(DeviceState *dev, QemuConsole *src,
+                                InputEvent *evt)
+@@ -382,6 +389,7 @@ static void adb_kbd_class_init(ObjectClass *oc, void *data)
+     set_bit(DEVICE_CATEGORY_INPUT, dc->categories);
+ 
+     adc->devreq = adb_kbd_request;
++    adc->devhasdata = adb_kbd_has_data;
+     dc->reset = adb_kbd_reset;
+     dc->vmsd = &vmstate_adb_kbd;
+ }
+diff --git a/hw/input/adb-mouse.c b/hw/input/adb-mouse.c
+index 78b6f5030c..e2359fd74d 100644
+--- a/hw/input/adb-mouse.c
++++ b/hw/input/adb-mouse.c
+@@ -197,6 +197,14 @@ static int adb_mouse_request(ADBDevice *d, uint8_t *obuf,
+     return olen;
  }
  
- /* description of commands */
-@@ -236,8 +237,8 @@ static bool cuda_cmd_autopoll(CUDAState *s,
-         s->autopoll = autopoll;
-         if (autopoll) {
-             timer_mod(s->adb_poll_timer,
--                      qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
--                      (NANOSECONDS_PER_SECOND / (1000 / s->autopoll_rate_ms)));
-+                      qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) +
-+                      s->autopoll_rate_ms);
-         } else {
-             timer_del(s->adb_poll_timer);
-         }
-@@ -262,8 +263,8 @@ static bool cuda_cmd_set_autorate(CUDAState *s,
-     s->autopoll_rate_ms = in_data[0];
-     if (s->autopoll) {
-         timer_mod(s->adb_poll_timer,
--                  qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
--                  (NANOSECONDS_PER_SECOND / (1000 / s->autopoll_rate_ms)));
-+                  qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) +
-+                  s->autopoll_rate_ms);
-     }
-     return true;
- }
-@@ -539,7 +540,7 @@ static void cuda_realize(DeviceState *dev, Error **errp)
-     s->sr_delay_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, cuda_set_sr_int, s);
-     s->sr_delay_ns = 20 * SCALE_US;
++static bool adb_mouse_has_data(ADBDevice *d)
++{
++    MouseState *s = ADB_MOUSE(d);
++
++    return !(s->last_buttons_state == s->buttons_state &&
++             s->dx == 0 && s->dy == 0);
++}
++
+ static void adb_mouse_reset(DeviceState *dev)
+ {
+     ADBDevice *d = ADB_DEVICE(dev);
+@@ -252,6 +260,7 @@ static void adb_mouse_class_init(ObjectClass *oc, void *data)
+     set_bit(DEVICE_CATEGORY_INPUT, dc->categories);
  
--    s->adb_poll_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, cuda_adb_poll, s);
-+    s->adb_poll_timer = timer_new_ms(QEMU_CLOCK_VIRTUAL, cuda_adb_poll, s);
-     s->adb_poll_mask = 0xffff;
-     s->autopoll_rate_ms = 20;
+     adc->devreq = adb_mouse_request;
++    adc->devhasdata = adb_mouse_has_data;
+     dc->reset = adb_mouse_reset;
+     dc->vmsd = &vmstate_adb_mouse;
  }
+diff --git a/include/hw/input/adb.h b/include/hw/input/adb.h
+index 15b1874a3d..9b80204e43 100644
+--- a/include/hw/input/adb.h
++++ b/include/hw/input/adb.h
+@@ -39,6 +39,8 @@ typedef struct ADBDevice ADBDevice;
+ typedef int ADBDeviceRequest(ADBDevice *d, uint8_t *buf_out,
+                               const uint8_t *buf, int len);
+ 
++typedef bool ADBDeviceHasData(ADBDevice *d);
++
+ #define TYPE_ADB_DEVICE "adb-device"
+ #define ADB_DEVICE(obj) OBJECT_CHECK(ADBDevice, (obj), TYPE_ADB_DEVICE)
+ 
+@@ -62,6 +64,7 @@ typedef struct ADBDeviceClass {
+     /*< public >*/
+ 
+     ADBDeviceRequest *devreq;
++    ADBDeviceHasData *devhasdata;
+ } ADBDeviceClass;
+ 
+ #define TYPE_ADB_BUS "apple-desktop-bus"
 -- 
 2.20.1
 
