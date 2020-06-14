@@ -2,65 +2,62 @@ Return-Path: <SRS0=clLO=73=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7C43C433E0
-	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 14:46:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61D10C433E0
+	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 14:47:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ABC53206D7
-	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 14:46:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ABC53206D7
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id 3538D206D7
+	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 14:47:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3538D206D7
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48872 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51108 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkTtv-0004n6-Ti
-	for qemu-devel@archiver.kernel.org; Sun, 14 Jun 2020 10:46:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52402)
+	id 1jkTvJ-0005nx-HM
+	for qemu-devel@archiver.kernel.org; Sun, 14 Jun 2020 10:47:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60342)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jkTfG-0000dg-1b; Sun, 14 Jun 2020 10:31:14 -0400
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:38510
- helo=mail.default.ilande.uk0.bigv.io)
+ (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
+ id 1jkTuH-0005Kf-4z; Sun, 14 Jun 2020 10:46:45 -0400
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:47954)
  by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jkTfE-0005bD-7S; Sun, 14 Jun 2020 10:31:13 -0400
-Received: from host217-39-64-113.range217-39.btcentralplus.com
- ([217.39.64.113] helo=kentang.home)
- by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jkTf5-0006Hv-6t; Sun, 14 Jun 2020 15:31:09 +0100
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, laurent@vivier.eu,
- fthain@telegraphics.com.au
-Date: Sun, 14 Jun 2020 15:28:40 +0100
-Message-Id: <20200614142840.10245-23-mark.cave-ayland@ilande.co.uk>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200614142840.10245-1-mark.cave-ayland@ilande.co.uk>
-References: <20200614142840.10245-1-mark.cave-ayland@ilande.co.uk>
+ (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
+ id 1jkTuE-0000M5-9c; Sun, 14 Jun 2020 10:46:44 -0400
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+ by localhost (Postfix) with SMTP id BFB89746331;
+ Sun, 14 Jun 2020 16:46:33 +0200 (CEST)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+ id 9618F746307; Sun, 14 Jun 2020 16:46:33 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+ by zero.eik.bme.hu (Postfix) with ESMTP id 94A727456F8;
+ Sun, 14 Jun 2020 16:46:33 +0200 (CEST)
+Date: Sun, 14 Jun 2020 16:46:33 +0200 (CEST)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Subject: Re: [PATCH v2 1/5] mac_oldworld: Allow loading binary ROM image
+In-Reply-To: <ef46b912-aa47-09bc-3362-a9dea0c82523@ilande.co.uk>
+Message-ID: <alpine.BSF.2.22.395.2006141623190.56690@zero.eik.bme.hu>
+References: <cover.1592055375.git.balaton@eik.bme.hu>
+ <4a304a01a87fc8154023bc8f48e22811d7cfcaf0.1592055375.git.balaton@eik.bme.hu>
+ <ef46b912-aa47-09bc-3362-a9dea0c82523@ilande.co.uk>
+User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 217.39.64.113
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: [PATCH 22/22] adb: add ADB bus trace events
-X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
-Received-SPF: pass client-ip=2001:41c9:1:41f::167;
- envelope-from=mark.cave-ayland@ilande.co.uk;
- helo=mail.default.ilande.uk0.bigv.io
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Received-SPF: pass client-ip=2001:738:2001:2001::2001;
+ envelope-from=balaton@eik.bme.hu; helo=zero.eik.bme.hu
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -18
 X-Spam_score: -1.9
 X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -73,104 +70,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Howard Spoelstra <hsp.cat7@gmail.com>, qemu-ppc@nongnu.org,
+ qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
----
- hw/input/adb.c        | 23 ++++++++++++++++++++++-
- hw/input/trace-events |  7 +++++++
- 2 files changed, 29 insertions(+), 1 deletion(-)
+On Sun, 14 Jun 2020, Mark Cave-Ayland wrote:
+> On 13/06/2020 14:36, BALATON Zoltan wrote:
+>
+>> The G3 beige machine has a 4MB firmware ROM. Fix the size of the rom
+>> region and allow loading a binary image with -bios. This makes it
+>> possible to test emulation with a ROM image from real hardware.
+>>
+>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+>> ---
+>>  hw/ppc/mac_oldworld.c | 24 +++++++++++++++---------
+>>  1 file changed, 15 insertions(+), 9 deletions(-)
+>>
+>> diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
+>> index 0b4c1c6373..3812adc441 100644
+>> --- a/hw/ppc/mac_oldworld.c
+>> +++ b/hw/ppc/mac_oldworld.c
+>> @@ -59,6 +59,8 @@
+>>  #define NDRV_VGA_FILENAME "qemu_vga.ndrv"
+>>
+>>  #define GRACKLE_BASE 0xfec00000
+>> +#define PROM_BASE 0xffc00000
+>> +#define PROM_SIZE (4 * MiB)
+>>
+>>  static void fw_cfg_boot_set(void *opaque, const char *boot_device,
+>>                              Error **errp)
+>> @@ -127,24 +129,28 @@ static void ppc_heathrow_init(MachineState *machine)
+>>
+>>      memory_region_add_subregion(sysmem, 0, machine->ram);
+>>
+>> -    /* allocate and load BIOS */
+>> -    memory_region_init_rom(bios, NULL, "ppc_heathrow.bios", BIOS_SIZE,
+>> +    /* allocate and load firmware ROM */
+>> +    memory_region_init_rom(bios, NULL, "ppc_heathrow.bios", PROM_SIZE,
+>>                             &error_fatal);
+>> +    memory_region_add_subregion(sysmem, PROM_BASE, bios);
+>>
+>> -    if (bios_name == NULL)
+>> +    if (!bios_name) {
+>>          bios_name = PROM_FILENAME;
+>> +    }
+>>      filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
+>> -    memory_region_add_subregion(sysmem, PROM_ADDR, bios);
+>> -
+>> -    /* Load OpenBIOS (ELF) */
+>>      if (filename) {
+>> -        bios_size = load_elf(filename, NULL, 0, NULL, NULL, NULL, NULL, NULL,
+>> -                             1, PPC_ELF_MACHINE, 0, 0);
+>> +        /* Load OpenBIOS (ELF) */
+>> +        bios_size = load_elf(filename, NULL, NULL, NULL, NULL, NULL, NULL,
+>> +                             NULL, 1, PPC_ELF_MACHINE, 0, 0);
+>> +        if (bios_size <= 0) {
+>> +            /* or load binary ROM image */
+>> +            bios_size = load_image_targphys(filename, PROM_BASE, PROM_SIZE);
+>> +        }
+>>          g_free(filename);
+>>      } else {
+>>          bios_size = -1;
+>>      }
+>> -    if (bios_size < 0 || bios_size > BIOS_SIZE) {
+>> +    if (bios_size < 0 || bios_size > PROM_SIZE) {
+>>          error_report("could not load PowerPC bios '%s'", bios_name);
+>>          exit(1);
+>>      }
+>
+> I think the logic could be improved a bit here: load_elf() can return the physical
+> address from the ELF, so it would make sense to use that as the address for
+> load_image_targphys() if present, and otherwise fall back to loading at 0xffc00000.
 
-diff --git a/hw/input/adb.c b/hw/input/adb.c
-index fe0f6c7ef3..4976f52c36 100644
---- a/hw/input/adb.c
-+++ b/hw/input/adb.c
-@@ -29,10 +29,18 @@
- #include "qemu/module.h"
- #include "qemu/timer.h"
- #include "adb-internal.h"
-+#include "trace.h"
- 
- /* error codes */
- #define ADB_RET_NOTPRESENT (-2)
- 
-+static const char *adb_commands[] = {
-+    "RESET", "FLUSH", "(Reserved 0x2)", "(Reserved 0x3)",
-+    "Reserved (0x4)", "(Reserved 0x5)", "(Reserved 0x6)", "(Reserved 0x7)",
-+    "LISTEN r0", "LISTEN r1", "LISTEN r2", "LISTEN r3",
-+    "TALK r0", "TALK r1", "TALK r2", "TALK r3",
-+};
-+
- static void adb_device_reset(ADBDevice *d)
- {
-     qdev_reset_all(DEVICE(d));
-@@ -86,9 +94,16 @@ static int do_adb_request(ADBBusState *s, uint8_t *obuf, const uint8_t *buf,
- 
- int adb_request(ADBBusState *s, uint8_t *obuf, const uint8_t *buf, int len)
- {
-+    int ret;
-+
-+    trace_adb_bus_request(buf[0] >> 4, adb_commands[buf[0] & 0xf], len);
-+
-     assert(s->autopoll_blocked);
- 
--    return do_adb_request(s, obuf, buf, len);
-+    ret = do_adb_request(s, obuf, buf, len);
-+
-+    trace_adb_bus_request_done(buf[0] >> 4, adb_commands[buf[0] & 0xf], ret);
-+    return ret;
- }
- 
- int adb_poll(ADBBusState *s, uint8_t *obuf, uint16_t poll_mask)
-@@ -160,6 +175,8 @@ void adb_set_autopoll_mask(ADBBusState *s, uint16_t mask)
- 
- void adb_autopoll_block(ADBBusState *s)
- {
-+    trace_adb_bus_autopoll_block("autopoll BLOCKED");
-+
-     s->autopoll_blocked = true;
- 
-     if (s->autopoll_enabled) {
-@@ -169,6 +186,8 @@ void adb_autopoll_block(ADBBusState *s)
- 
- void adb_autopoll_unblock(ADBBusState *s)
- {
-+    trace_adb_bus_autopoll_block("autopoll UNBLOCKED");
-+
-     s->autopoll_blocked = false;
- 
-     if (s->autopoll_enabled) {
-@@ -183,7 +202,9 @@ static void adb_autopoll(void *opaque)
-     ADBBusState *s = opaque;
- 
-     if (!s->autopoll_blocked) {
-+        trace_adb_bus_autopoll_cb(s->autopoll_mask);
-         s->autopoll_cb(s->autopoll_cb_opaque);
-+        trace_adb_bus_autopoll_cb_done(s->autopoll_mask);
-     }
- 
-     timer_mod(s->autopoll_timer,
-diff --git a/hw/input/trace-events b/hw/input/trace-events
-index 6f0d78241c..119d1ce2bd 100644
---- a/hw/input/trace-events
-+++ b/hw/input/trace-events
-@@ -14,6 +14,13 @@ adb_device_mouse_readreg(int reg, uint8_t val0, uint8_t val1) "reg %d obuf[0] 0x
- adb_device_mouse_request_change_addr(int devaddr) "change addr to 0x%x"
- adb_device_mouse_request_change_addr_and_handler(int devaddr, int handler) "change addr and handler to 0x%x, 0x%x"
- 
-+# adb.c
-+adb_bus_request(uint8_t addr, const char *cmd, int size) "device 0x%x %s cmdsize=%d"
-+adb_bus_request_done(uint8_t addr, const char *cmd, int size) "device 0x%x %s replysize=%d"
-+adb_bus_autopoll_block(const char *s) "%s"
-+adb_bus_autopoll_cb(uint16_t mask) "executing autopoll_cb with autopoll mask 0x%x"
-+adb_bus_autopoll_cb_done(uint16_t mask) "done executing autopoll_cb with autopoll mask 0x%x"
-+
- # pckbd.c
- pckbd_kbd_read_data(uint32_t val) "0x%02x"
- pckbd_kbd_read_status(int status) "0x%02x"
--- 
-2.20.1
+I don't get this. No need to do it that way because load_elf already loads 
+the image at address specified in ELF file (I guess because it still works 
+with OpenBIOS after this patch) so don't have to call load_image_targphys 
+for that case. The above tries load_elf and only if it did not succeed 
+calls load_image_targphys to load a binary image to fill the ROM. I don't 
+see how this logic could be simpler.
 
+Maybe we need the load address from the ELF to check if an ELF would 
+overflow the region as in elf_addr + bios_size > PROM_ADDR + PROM_SIZE but 
+I'm not sure. Any suggestion?
+
+> It may also make sense to split PROM_ADDR to PROM_ADDR_OLDWORLD and
+> PROM_ADDR_NEWWORLD (and similar for BIOS_SIZE) to allow these values to be adjusted
+> separately for each machine.
+
+BIOS_SIZE is not used in this board after this patch any more so that's 
+basically PROM_SIZE_NEWWORLD now which can be defined in mac_newworld and 
+removed from mac.h. Then we have separate PROM_SIZE for each board. I've 
+also defined PROM_ADDR here in mac_oldworld and similar define can be 
+added to mac_newworld if needed. These should not be in mac.h I think as 
+these are board specific. I regard the previous BIOS_* values specific to 
+OpenBIOS not to boards so now that boards can use other ROMs not just 
+OpenBIOS BIOS_SIZE may not be needed, what we need is the size of the ROM 
+chip on board instead.
+
+Regards,
+BALATON Zoltan
 
