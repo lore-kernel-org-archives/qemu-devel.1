@@ -2,78 +2,92 @@ Return-Path: <SRS0=clLO=73=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39718C433DF
-	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 08:51:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97063C433DF
+	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 09:35:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0E914206D7
-	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 08:51:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E914206D7
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 61C4D206D7
+	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 09:35:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sFUDKqIN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61C4D206D7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54598 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34072 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkOMJ-0006NK-Bw
-	for qemu-devel@archiver.kernel.org; Sun, 14 Jun 2020 04:51:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52022)
+	id 1jkP3R-0001QT-K5
+	for qemu-devel@archiver.kernel.org; Sun, 14 Jun 2020 05:35:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48892)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jkOLj-0005wA-Cx
- for qemu-devel@nongnu.org; Sun, 14 Jun 2020 04:50:43 -0400
-Received: from indium.canonical.com ([91.189.90.7]:57014)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jkOLh-00040c-3z
- for qemu-devel@nongnu.org; Sun, 14 Jun 2020 04:50:43 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jkOLf-0005ha-Gb
- for <qemu-devel@nongnu.org>; Sun, 14 Jun 2020 08:50:39 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 7188D2E810B
- for <qemu-devel@nongnu.org>; Sun, 14 Jun 2020 08:50:39 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
+ id 1jkP2i-0000up-RT
+ for qemu-devel@nongnu.org; Sun, 14 Jun 2020 05:35:09 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:37805)
+ by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
+ id 1jkP2f-0003rw-V9
+ for qemu-devel@nongnu.org; Sun, 14 Jun 2020 05:35:08 -0400
+Received: by mail-wm1-x341.google.com with SMTP id y20so11905445wmi.2
+ for <qemu-devel@nongnu.org>; Sun, 14 Jun 2020 02:35:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=FK/nAYkrwWGQ0ifdU5wzx5p962C1PNsZc8gb/xYT1HQ=;
+ b=sFUDKqINcyqPna8zs0ln50jVHYyPzFyk77SI9NfEQHmmETOLs0mwPGnzVnLsn3Rmvq
+ Dd+SHIDM1icQk6Xff5FBfn7ilW14AdccLPwGAx7dbKWXzMIgOiz0nVETRcaW0+2YSSTv
+ dStBtv3FInFTuaMkr50xIdCElqmzX7s2D1AhD2L9o7vv+MI68qC7KPpGsdZ5oDIm+OdP
+ SvYLE/4S6vDTUf7JgjHf33lfWZhk4icMAGZMs37MYuYG9jiAmZpv679Bu7UZ5f2p0c9H
+ dxKCyUJBHfRW6aP80VoYGGJfdoIyMgSWvhI3jKiE/pvPyLzEm0s11eFL3PAKFXzbheKN
+ o0yA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=FK/nAYkrwWGQ0ifdU5wzx5p962C1PNsZc8gb/xYT1HQ=;
+ b=cGA9vwa7U6IguCtiiglO+bZZ+f+KtAT1V/TFGesGykhpr1Igl44yG5KkDlns1xeSFZ
+ 29sqEyQ0emcuGi+L8Y4BobslJVpANgVPkB380wd83+jatxSaTlzBWtbZv+f+fsHRBVcb
+ q+UeldKRT7CYjcuYQa33s56QDrHs69ZOkMge2ixESMXvkNS1W2K7ty2iuu2Cx9Iis25D
+ PHQ9P4NFh0QZj0Xj/Yo4Ns5LbXjG0X9U7VqcQ++T1hIDyBaE2ARMvuMCK6lm887uuXDS
+ DUcGMH2LdHfJeyDm+ZbZcIwDrh40aOoLHWRMBD71BNBdyNm/6jytbiMcDMEBsUU9vIhS
+ EmkQ==
+X-Gm-Message-State: AOAM530ll8/kmfXWR5m4QruFy7wTjZezaueNyNhNRHooGzgYFPTKd4R/
+ xASsXbbkm4w117hN/8zNznh0MMw3BrK64lSZPzQ=
+X-Google-Smtp-Source: ABdhPJw0S6GvWQEhzQJ94GNNIP89RRgQjhL7C8Z8x7Y3D8YXuSiK0gtj28Eg+sVZnxknwhWy8XIKw0ShtA+HGV8Rf9c=
+X-Received: by 2002:a1c:cc0d:: with SMTP id h13mr8184243wmb.168.1592127298566; 
+ Sun, 14 Jun 2020 02:34:58 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+References: <20200614080049.31134-1-jiaxun.yang@flygoat.com>
+ <20200614080049.31134-4-jiaxun.yang@flygoat.com>
+In-Reply-To: <20200614080049.31134-4-jiaxun.yang@flygoat.com>
+From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Date: Sun, 14 Jun 2020 11:34:46 +0200
+Message-ID: <CAHiYmc5oqVsgtBp+c3zcc+u-aH2uCq_nUMKT33Ur5VmFvmc-zA@mail.gmail.com>
+Subject: Re: [PATCH 3/4] target/mips: Add loongson ext lsdc2 instrustions
+To: Jiaxun Yang <jiaxun.yang@flygoat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 14 Jun 2020 08:45:34 -0000
-From: Uri Simchoni <1883414@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: urisimchoni
-X-Launchpad-Bug-Reporter: Uri Simchoni (urisimchoni)
-X-Launchpad-Bug-Modifier: Uri Simchoni (urisimchoni)
-Message-Id: <159212433474.11524.6446671863571065618.malonedeb@soybean.canonical.com>
-Subject: [Bug 1883414] [NEW] Cannot build qemu-5.0.0 from tarball
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="b190cebbf563f89e480a8b57f641753c8196bda0";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 30f3aa252e1fc6d2f6836191e9a9742152ef0eee
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/14 03:10:48
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wm1-x341.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -82,88 +96,261 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1883414 <1883414@bugs.launchpad.net>
+Cc: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+=D0=BD=D0=B5=D0=B4, 14. =D1=98=D1=83=D0=BD 2020. =D1=83 10:02 Jiaxun Yang <=
+jiaxun.yang@flygoat.com> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=
+=D0=BE/=D0=BB=D0=B0:
+>
+> LDC2/SDC2 opcodes have been rewritten as "load & store with offset"
+> instructions by loongson-ext ASE.
+>
+> Signed-off-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
+> ---
 
-Cannot build qemu 5.0.0 from the release tarball. Building from git-
-clone succeeds.
+Please use "group of instructions" instead of just "instructions" in the ti=
+tle.
 
-After downloading and unpacking the 5.0.0 tarball, I typed the
-following:
+>  target/mips/translate.c | 176 ++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 176 insertions(+)
+>
+> diff --git a/target/mips/translate.c b/target/mips/translate.c
+> index e49f32f6ae..8b45ff37e6 100644
+> --- a/target/mips/translate.c
+> +++ b/target/mips/translate.c
+> @@ -460,6 +460,24 @@ enum {
+>      R6_OPC_SCD         =3D 0x27 | OPC_SPECIAL3,
+>  };
+>
+> +/* Loongson EXT LDC2/SDC2 opcodes */
+> +#define MASK_LOONGSON_LSDC2(op)           (MASK_OP_MAJOR(op) | (op & 0x7=
+))
+> +
+> +enum {
+> +    OPC_GSLBX      =3D 0x0 | OPC_LDC2,
+> +    OPC_GSLHX      =3D 0x1 | OPC_LDC2,
+> +    OPC_GSLWX      =3D 0x2 | OPC_LDC2,
+> +    OPC_GSLDX      =3D 0x3 | OPC_LDC2,
+> +    OPC_GSLWXC1    =3D 0x6 | OPC_LDC2,
+> +    OPC_GSLDXC1    =3D 0x7 | OPC_LDC2,
+> +    OPC_GSSBX      =3D 0x0 | OPC_SDC2,
+> +    OPC_GSSHX      =3D 0x1 | OPC_SDC2,
+> +    OPC_GSSWX      =3D 0x2 | OPC_SDC2,
+> +    OPC_GSSDX      =3D 0x3 | OPC_SDC2,
+> +    OPC_GSSWXC1    =3D 0x6 | OPC_SDC2,
+> +    OPC_GSSDXC1    =3D 0x7 | OPC_SDC2,
+> +};
+> +
+>  /* BSHFL opcodes */
+>  #define MASK_BSHFL(op)              (MASK_SPECIAL3(op) | (op & (0x1F << =
+6)))
+>
+> @@ -5910,6 +5928,162 @@ no_rd:
+>      tcg_temp_free_i64(t1);
+>  }
+>
+> +/* Loongson EXT LDC2/SDC2 */
+> +static void gen_loongson_lsdc2(DisasContext *ctx, int rt,
+> +                                int rs, int rd)
+> +{
+> +    int offset =3D (int8_t)(ctx->opcode >> 3);
+> +    uint32_t opc =3D MASK_LOONGSON_LSDC2(ctx->opcode);
+> +    TCGv t0, t1;
+> +    TCGv_i32 fp0;
+> +
+> +    /* Pre-conditions */
+> +    switch (opc) {
+> +    case OPC_GSLBX:
+> +    case OPC_GSLHX:
+> +    case OPC_GSLWX:
+> +    case OPC_GSLDX:
+> +        /* prefetch, implement as NOP */
+> +        if (rt =3D=3D 0) {
+> +            return;
+> +        }
+> +        break;
+> +    case OPC_GSSBX:
+> +    case OPC_GSSHX:
+> +    case OPC_GSSWX:
+> +    case OPC_GSSDX:
+> +        break;
+> +    case OPC_GSLWXC1:
+> +    case OPC_GSSWXC1:
+> +#if defined(TARGET_MIPS64)
+> +    case OPC_GSLDXC1:
+> +    case OPC_GSSDXC1:
+> +#endif
+> +        check_cp1_enabled(ctx);
+> +        /* Check prefetch for CP1 load instructions */
+> +        if ((opc =3D=3D OPC_GSLDXC1 || opc =3D=3D  OPC_GSLWXC1)
+> +            && rt =3D=3D 0) {
+> +            return;
+> +        }
+> +        break;
 
-mkdir build
-cd build
-../configure
+I think the segment for the last four instructions got needlessly
+complicated and harder to read. Wouldn't this be simpler and clearer,
+if written as:
 
-Then got the following error message:
+    case OPC_GSLWXC1:
+#if defined(TARGET_MIPS64)
+    case OPC_GSLDXC1:
+#endif
+        check_cp1_enabled(ctx);
+        if (rt =3D=3D 0) {
+            return;
+        }
+        break;
+    case OPC_GSSWXC1:
+#if defined(TARGET_MIPS64)
+    case OPC_GSSDXC1:
+#endif
+        check_cp1_enabled(ctx);
+        break;
 
-ERROR: missing file /home/uri/qemu-5.0.0/ui/keycodemapdb/README
+Please, Jiaxun, convert this segment to the simpler-to-read form I proposed=
+.
 
-This is not a GIT checkout but module content appears to
-be missing. Do not use 'git archive' or GitHub download links
-to acquire QEMU source archives. Non-GIT builds are only
-supported with source archives linked from:
+The same applies to other similar cases in 3/4 and 4/4 patches, if any.
 
-  https://www.qemu.org/download/#source
+Thanks,
+Aleksandar
 
-Developers working with GIT can use scripts/archive-source.sh
-if they need to create valid source archives.
-
-It appears the ui/keycodemapdb is missing some files that are obtained
-from a git submodule in a git tree.
-
-Building from a git clone succeeds.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1883414
-
-Title:
-  Cannot build qemu-5.0.0 from tarball
-
-Status in QEMU:
-  New
-
-Bug description:
-  Cannot build qemu 5.0.0 from the release tarball. Building from git-
-  clone succeeds.
-
-  After downloading and unpacking the 5.0.0 tarball, I typed the
-  following:
-
-  mkdir build
-  cd build
-  ../configure
-
-  Then got the following error message:
-
-  ERROR: missing file /home/uri/qemu-5.0.0/ui/keycodemapdb/README
-
-  This is not a GIT checkout but module content appears to
-  be missing. Do not use 'git archive' or GitHub download links
-  to acquire QEMU source archives. Non-GIT builds are only
-  supported with source archives linked from:
-
-    https://www.qemu.org/download/#source
-
-  Developers working with GIT can use scripts/archive-source.sh
-  if they need to create valid source archives.
-
-  It appears the ui/keycodemapdb is missing some files that are obtained
-  from a git submodule in a git tree.
-
-  Building from a git clone succeeds.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1883414/+subscriptions
+> +    default:
+> +        MIPS_INVAL("loongson_lsdc2");
+> +        generate_exception_end(ctx, EXCP_RI);
+> +        return;
+> +        break;
+> +    }
+> +
+> +    t0 =3D tcg_temp_new();
+> +
+> +    gen_base_offset_addr(ctx, t0, rs, offset);
+> +    gen_op_addr_add(ctx, t0, cpu_gpr[rd], t0);
+> +
+> +    switch (opc) {
+> +    case OPC_GSLBX:
+> +        tcg_gen_qemu_ld_tl(t0, t0, ctx->mem_idx, MO_SB);
+> +        gen_store_gpr(t0, rt);
+> +        break;
+> +    case OPC_GSLHX:
+> +        tcg_gen_qemu_ld_tl(t0, t0, ctx->mem_idx, MO_TESW |
+> +                            ctx->default_tcg_memop_mask);
+> +        gen_store_gpr(t0, rt);
+> +        break;
+> +    case OPC_GSLWX:
+> +        gen_base_offset_addr(ctx, t0, rs, offset);
+> +        if (rd) {
+> +            gen_op_addr_add(ctx, t0, cpu_gpr[rd], t0);
+> +        }
+> +        tcg_gen_qemu_ld_tl(t0, t0, ctx->mem_idx, MO_TESL |
+> +                            ctx->default_tcg_memop_mask);
+> +        gen_store_gpr(t0, rt);
+> +        break;
+> +#if defined(TARGET_MIPS64)
+> +    case OPC_GSLDX:
+> +        gen_base_offset_addr(ctx, t0, rs, offset);
+> +        if (rd) {
+> +            gen_op_addr_add(ctx, t0, cpu_gpr[rd], t0);
+> +        }
+> +        tcg_gen_qemu_ld_tl(t0, t0, ctx->mem_idx, MO_TEQ |
+> +                            ctx->default_tcg_memop_mask);
+> +        gen_store_gpr(t0, rt);
+> +        break;
+> +#endif
+> +    case OPC_GSLWXC1:
+> +        check_cp1_enabled(ctx);
+> +        gen_base_offset_addr(ctx, t0, rs, offset);
+> +        if (rd) {
+> +            gen_op_addr_add(ctx, t0, cpu_gpr[rd], t0);
+> +        }
+> +        fp0 =3D tcg_temp_new_i32();
+> +        tcg_gen_qemu_ld_i32(fp0, t0, ctx->mem_idx, MO_TESL |
+> +                            ctx->default_tcg_memop_mask);
+> +        gen_store_fpr32(ctx, fp0, rt);
+> +        tcg_temp_free_i32(fp0);
+> +        break;
+> +#if defined(TARGET_MIPS64)
+> +    case OPC_GSLDXC1:
+> +        check_cp1_enabled(ctx);
+> +        gen_base_offset_addr(ctx, t0, rs, offset);
+> +        if (rd) {
+> +            gen_op_addr_add(ctx, t0, cpu_gpr[rd], t0);
+> +        }
+> +        tcg_gen_qemu_ld_tl(t0, t0, ctx->mem_idx, MO_TEQ |
+> +                            ctx->default_tcg_memop_mask);
+> +        gen_store_fpr64(ctx, t0, rt);
+> +        break;
+> +#endif
+> +    case OPC_GSSBX:
+> +        t1 =3D tcg_temp_new();
+> +        gen_load_gpr(t1, rt);
+> +        tcg_gen_qemu_st_tl(t1, t0, ctx->mem_idx, MO_SB);
+> +        tcg_temp_free(t1);
+> +        break;
+> +    case OPC_GSSHX:
+> +        t1 =3D tcg_temp_new();
+> +        gen_load_gpr(t1, rt);
+> +        tcg_gen_qemu_st_tl(t1, t0, ctx->mem_idx, MO_TEUW |
+> +                            ctx->default_tcg_memop_mask);
+> +        tcg_temp_free(t1);
+> +        break;
+> +    case OPC_GSSWX:
+> +        t1 =3D tcg_temp_new();
+> +        gen_load_gpr(t1, rt);
+> +        tcg_gen_qemu_st_tl(t1, t0, ctx->mem_idx, MO_TEUL |
+> +                            ctx->default_tcg_memop_mask);
+> +        tcg_temp_free(t1);
+> +        break;
+> +#if defined(TARGET_MIPS64)
+> +    case OPC_GSSDX:
+> +        t1 =3D tcg_temp_new();
+> +        gen_load_gpr(t1, rt);
+> +        tcg_gen_qemu_st_tl(t1, t0, ctx->mem_idx, MO_TEQ |
+> +                            ctx->default_tcg_memop_mask);
+> +        tcg_temp_free(t1);
+> +        break;
+> +#endif
+> +    case OPC_GSSWXC1:
+> +        fp0 =3D tcg_temp_new_i32();
+> +        gen_load_fpr32(ctx, fp0, rt);
+> +        tcg_gen_qemu_st_i32(fp0, t0, ctx->mem_idx, MO_TEUL |
+> +                            ctx->default_tcg_memop_mask);
+> +        tcg_temp_free_i32(fp0);
+> +        break;
+> +#if defined(TARGET_MIPS64)
+> +    case OPC_GSSDXC1:
+> +        t1 =3D tcg_temp_new();
+> +        gen_load_fpr64(ctx, t1, rt);
+> +        tcg_gen_qemu_st_i64(t1, t0, ctx->mem_idx, MO_TEQ |
+> +                            ctx->default_tcg_memop_mask);
+> +        tcg_temp_free(t1);
+> +        break;
+> +#endif
+> +    default:
+> +        break;
+> +    }
+> +
+> +    tcg_temp_free(t0);
+> +}
+> +
+>  /* Traps */
+>  static void gen_trap(DisasContext *ctx, uint32_t opc,
+>                       int rs, int rt, int16_t imm)
+> @@ -30635,6 +30809,8 @@ static void decode_opc(CPUMIPSState *env, DisasCo=
+ntext *ctx)
+>                  /* OPC_JIC, OPC_JIALC */
+>                  gen_compute_compact_branch(ctx, op, 0, rt, imm);
+>              }
+> +        } else if (ctx->insn_flags & ASE_LEXT) {
+> +            gen_loongson_lsdc2(ctx, rt, rs, rd);
+>          } else {
+>              /* OPC_LWC2, OPC_SWC2 */
+>              /* COP2: Not implemented. */
+> --
+> 2.27.0
 
