@@ -2,86 +2,94 @@ Return-Path: <SRS0=clLO=73=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.2 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6043C433DF
-	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 09:42:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5FDDC433DF
+	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 09:49:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7FAAD206D7
-	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 09:42:59 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AR/N7aQ9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FAAD206D7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8A187204EA
+	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 09:49:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A187204EA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38386 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40888 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkPAI-0004Ua-Oq
-	for qemu-devel@archiver.kernel.org; Sun, 14 Jun 2020 05:42:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50974)
+	id 1jkPGv-0006rB-Ry
+	for qemu-devel@archiver.kernel.org; Sun, 14 Jun 2020 05:49:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53006)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jkP9f-00042j-9W
- for qemu-devel@nongnu.org; Sun, 14 Jun 2020 05:42:19 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:41384)
- by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jkP9d-0004y2-Dn
- for qemu-devel@nongnu.org; Sun, 14 Jun 2020 05:42:18 -0400
-Received: by mail-wr1-x444.google.com with SMTP id j10so14094805wrw.8
- for <qemu-devel@nongnu.org>; Sun, 14 Jun 2020 02:42:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=KPv0YbfF+zF3FBuojCuzKw7jMdnq6/gvZecM0LjHR+A=;
- b=AR/N7aQ9beXFU8CWKAIG5ItmKzBNINUY9y49oIYoeN/ExG/FK11jEElsUr1Z3Dhrxz
- WhyHUsuKtGlB+3tYp+iUv6UUXEKK7eM3gbCfkmSL8GWFH9FvkhaLRUDrbaWjJ04RNB+C
- yruY8/fwjZBBNlNM9lvArreWTbtNT7hcoTZ7mJOXQA6RiNExvXQKaD8IuMKVNUN7MO06
- k2Q6h4WGcsE58klK/yTb464XnLcMQJMQfPScuUCrRioBDkugcS7XtUBshsHycfDjlZhq
- W3nKHmZ84imRR6D1+K3aaZtv3bjVSgLcT+q/5Hn2Gew5P5+nUBbJJqrF6aOegODUnzg2
- u7gw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=KPv0YbfF+zF3FBuojCuzKw7jMdnq6/gvZecM0LjHR+A=;
- b=qlFV2g1+kLA5LAf/LxPM2890kzhHIRxqsDUs6LFSo1KpmzB7/SbXFGnZy+++4fHHol
- NbECuQg8GnPJrqGoIoN1JeqGaCfbMOeIwnfAZ5iYGrIiNoOmt3sPC4GlNJ6yvH/f3Cmn
- Rlctu+gsrN5SQmeExEKkvEbUOdIah8uaB2ZbQQDsk85hi1VfKgjJ1qBbrhrBb2SBYYcm
- F1B3J+HTuTTQ5y+VXrPp5AoNuvnSmiBn15dg9urSpjGLZa6j/HzAiWGY7d/EN3L04w3u
- m2LF5O5rFu7rmJOqbnXTUFkP9QTTq/wXLHC6dngKwA4+vfyw1GGKBH/xJHwHElMi9EDr
- 2LyA==
-X-Gm-Message-State: AOAM5311jw06pzBZn24blGO93xQSM6J54eEJxtioy1/hE9QdGjzZRofi
- +ST8bkt+hqRgoijy/lVWbwcvZOKpA3vImBOmytA=
-X-Google-Smtp-Source: ABdhPJwnq8Ac97Tt4MLlkYOWfSXLSctNWTh2fw7CC1bxY1qwrn3mU5GT2Lur+Yw2uB4Ru9mVy1kW1YXP6VaqETAdrLY=
-X-Received: by 2002:a5d:54c7:: with SMTP id x7mr22964566wrv.162.1592127729849; 
- Sun, 14 Jun 2020 02:42:09 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1jkPGN-0006RW-55
+ for qemu-devel@nongnu.org; Sun, 14 Jun 2020 05:49:15 -0400
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:56006
+ helo=mail.default.ilande.uk0.bigv.io)
+ by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1jkPGK-0005wG-Vb
+ for qemu-devel@nongnu.org; Sun, 14 Jun 2020 05:49:14 -0400
+Received: from host217-39-64-113.range217-39.btcentralplus.com
+ ([217.39.64.113] helo=[192.168.1.65])
+ by mail.default.ilande.uk0.bigv.io with esmtpsa
+ (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1jkPGF-00052S-F2; Sun, 14 Jun 2020 10:49:12 +0100
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org
+References: <20200613130622.20541-1-f4bug@amsat.org>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
+ mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
+ 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
+ E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
+ PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
+ PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
+ AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
+ OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
+ NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
+ mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
+ z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
+ T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
+ DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
+ y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
+ 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
+ 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
+ YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
+ Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
+ BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
+ opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
+ NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
+ Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
+ KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
+ imgcU9TTGC5qd9g=
+Message-ID: <5ba02176-34c9-f984-95f4-1f61103d785c@ilande.co.uk>
+Date: Sun, 14 Jun 2020 10:48:56 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-References: <20200614080049.31134-1-jiaxun.yang@flygoat.com>
-In-Reply-To: <20200614080049.31134-1-jiaxun.yang@flygoat.com>
-From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Date: Sun, 14 Jun 2020 11:41:57 +0200
-Message-ID: <CAHiYmc5m4-ZoMai48OLipMRg8LRbrbNzX2MRZhHHn1WY+iZ7Yg@mail.gmail.com>
-Subject: Re: [PATCH 0/4] Basic TCG Loongson-3A1000 Support
-To: Jiaxun Yang <jiaxun.yang@flygoat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wr1-x444.google.com
+In-Reply-To: <20200613130622.20541-1-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 217.39.64.113
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+Subject: Re: [PATCH] .travis.yml: Use travis_retry() in case of network issues
+X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
+X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
+Received-SPF: pass client-ip=2001:41c9:1:41f::167;
+ envelope-from=mark.cave-ayland@ilande.co.uk;
+ helo=mail.default.ilande.uk0.bigv.io
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -95,52 +103,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: Fam Zheng <fam@euphon.net>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-=D0=BD=D0=B5=D0=B4, 14. =D1=98=D1=83=D0=BD 2020. =D1=83 10:03 Jiaxun Yang <=
-jiaxun.yang@flygoat.com> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=
-=D0=BE/=D0=BB=D0=B0:
->
-> This series is the sucessor of
-> "target/mips: Add loongson gs464 core" [1].
->
+On 13/06/2020 14:06, Philippe Mathieu-Daudé wrote:
 
-For some reason, patch 4/4 didn't manage to get to the list, and
-neither through email. It happens from time to time virtually to
-anybody. I guess 4/4 is in a similar form as 3/4. Everything I said
-for 3/4 applies to 4/4 as well.
+> Use travis_retry() when cloning SLOF (see 31c8cc4f94e) in the
+> s390x container job, to avoid build failures:
+> 
+>   $ ( cd ${SRC_DIR} ; git submodule update --init roms/SLOF )
+>   Submodule 'roms/SLOF' (https://git.qemu.org/git/SLOF.git) registered for path 'roms/SLOF'
+>   Cloning into '/home/travis/build/user/qemu/roms/SLOF'...
+>   fatal: unable to access 'https://git.qemu.org/git/SLOF.git/': Could not resolve host: git.qemu.org
+>   fatal: clone of 'https://git.qemu.org/git/SLOF.git' into submodule path '/home/travis/build/user/qemu/roms/SLOF' failed
+>   Failed to clone 'roms/SLOF'. Retry scheduled
+>   Cloning into '/home/travis/build/user/qemu/roms/SLOF'...
+>   fatal: unable to access 'https://git.qemu.org/git/SLOF.git/': Could not resolve host: git.qemu.org
+>   fatal: clone of 'https://git.qemu.org/git/SLOF.git' into submodule path '/home/travis/build/user/qemu/roms/SLOF' failed
+>   Failed to clone 'roms/SLOF' a second time, aborting
+>   The command "( cd ${SRC_DIR} ; git submodule update --init roms/SLOF )" exited with 1.
+> 
+> Reported-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+>  .travis.yml | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/.travis.yml b/.travis.yml
+> index ec6367af1f..19a1b55aab 100644
+> --- a/.travis.yml
+> +++ b/.travis.yml
+> @@ -496,7 +496,7 @@ jobs:
+>          - CONFIG="--disable-containers --target-list=${MAIN_SOFTMMU_TARGETS},s390x-linux-user"
+>          - UNRELIABLE=true
+>        script:
+> -        - ( cd ${SRC_DIR} ; git submodule update --init roms/SLOF )
+> +        - ( cd ${SRC_DIR} ; travis_retry git submodule update --init roms/SLOF )
+>          - BUILD_RC=0 && make -j${JOBS} || BUILD_RC=$?
+>          - |
+>            if [ "$BUILD_RC" -eq 0 ] ; then
 
-1/4 and 2/4 were applied ti the next mips queue, planned to be sent on
-Monday (tomorrow).
+Hi Phil,
 
-Kind regards, and thanks for continuing your contributions!
+Thanks for diagnosing and proposing a fix. Is there a reason why SLOF in particular
+is failing compared to other repositories that might also need a similar change?
 
-Aleksandar
 
-> Based on Huacai's CPU define.
-> Boot test have been performed with Huacai's KVM series.
->
-> Note: This series only adds instructions that can be generated by GCC,
-> as we're relying on toolchain for documents of these instructions.
->
-> [1]: https://patchwork.kernel.org/cover/11457385/
->
-> Thanks.
->
-> Jiaxun Yang (4):
->   target/mips: Legalize Loongson insn flags
->   target/mips: Add comments for vendor-specific ASEs
->   target/mips: Add loongson ext lsdc2 instrustions
->   target/mips: Add loongson ext lswc2 instrustions
->
->  target/mips/mips-defs.h |   8 +-
->  target/mips/translate.c | 442 +++++++++++++++++++++++++++++++++++++++-
->  2 files changed, 442 insertions(+), 8 deletions(-)
->
-> --
-> 2.27.0
+ATB,
+
+Mark.
 
