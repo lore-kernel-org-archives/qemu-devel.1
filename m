@@ -8,79 +8,78 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6455C433DF
-	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 18:40:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60E53C433E0
+	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 18:40:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9E6C3206D7
-	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 18:40:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1E384206D7
+	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 18:40:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vG4bEski"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E6C3206D7
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ukHcB4ni"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E384206D7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45092 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45040 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkXYv-0002BG-UW
-	for qemu-devel@archiver.kernel.org; Sun, 14 Jun 2020 14:40:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57072)
+	id 1jkXYw-00029t-5O
+	for qemu-devel@archiver.kernel.org; Sun, 14 Jun 2020 14:40:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57012)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <coiby.xu@gmail.com>)
- id 1jkXXm-000078-8R
- for qemu-devel@nongnu.org; Sun, 14 Jun 2020 14:39:46 -0400
-Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:38223)
+ id 1jkXXj-0008VP-L4
+ for qemu-devel@nongnu.org; Sun, 14 Jun 2020 14:39:43 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:46954)
  by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <coiby.xu@gmail.com>)
- id 1jkXXk-00019O-HG
- for qemu-devel@nongnu.org; Sun, 14 Jun 2020 14:39:45 -0400
-Received: by mail-pj1-x1044.google.com with SMTP id d6so6077023pjs.3
- for <qemu-devel@nongnu.org>; Sun, 14 Jun 2020 11:39:39 -0700 (PDT)
+ id 1jkXXh-000198-Dj
+ for qemu-devel@nongnu.org; Sun, 14 Jun 2020 14:39:43 -0400
+Received: by mail-pl1-x642.google.com with SMTP id n2so5841223pld.13
+ for <qemu-devel@nongnu.org>; Sun, 14 Jun 2020 11:39:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=gQsW4GQWWocPFSbE+a86Ei8A/IwEA+wxuYPi/uczMr0=;
- b=vG4bEski6KSEwz4+7HUke8OoTTMfVacq5DiGsS9R6i1oYX+/PWuG2GD7JhO9h+1Nxj
- krruUxzrtLDDvnSVSxLgwJZlWmHfniBLOc+h/e/oitcUhVbTWW8RujZv1wSurdHs7nvW
- H4c4gykcaqbqmHilw25M3rcm2+6q7SynaXy2vEtzDbemZSFLAIibFg2gYmIUvYw0SMMG
- mCEmuMfSgNouVrs4f3I4Zxgo8syObJCM9cuZ8O8fh0Akd8stJjaiSBrUyfQKHPGo3M45
- 4fnSqyxbeu0LLLvdH93ZsHVB4NaKc0600+4PRxeu9N6kG34r/k8M88AwmrkZAHC4cNDD
- 82JA==
+ bh=cmxBQrA+sytNwthQ8QVqk9DggYfm2DatGhLl09VI8ws=;
+ b=ukHcB4niWh2XWXM2zImbYY/kJxfEoAoCXHwF0JjAunoh74n9WY2nQzAcB1QaYq+mt5
+ oO1afNue7hMOrmyuQSw6skuxXENKN3XxWp3KtA2QUd/Rgq1cEQvi3y1EtA0Tl7DIQeOS
+ OjvFXLa3IE50vxIDX/IluSBm/YhjoGtNxnhACGcDUmzTCldUQTtDfGSKkBOVoPf8RVuU
+ 5Pwh2W2cKtdg93p5o3MNAdZWl5XoPOFNPbXDG1pwNGgfVVWUk45BVCc3Pc7pwhWdF8LS
+ RidDdTDETSdcy3Cub9yoIMQXwDeUuDfR7MoXeN0Jjhud2W3gRXeBukucJ0f3E4OazXTK
+ IDTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=gQsW4GQWWocPFSbE+a86Ei8A/IwEA+wxuYPi/uczMr0=;
- b=Q+l6Fe+Vla2yXY95B7QYDAJJHqt/BD7+wXuwYWBkdZLBd24nVcwC92wfhuobw3T+lc
- y/HvE8q0mOv942l5N+hLLhCEQVNBTy0ZpbgHGiN6vZGscd87F6Ur9dgHOZUKJ244I+hp
- ICok7BxA1ZNOhmUzqQNI2jFWL1V/NYuQUyZK8K7CS6RgxU5fmg91/wv8/EwwDZoGlkk8
- hgs+LtGQCuVeG01EIIMedPKADxTp7Dc5AfxSiO1JWcxba2MiPpffIy87z8swD0R1al9B
- rtyvoSSkJ7sKJHQ26KwMocz06ejtYEK7Cns4apln1S6/Gjk7V1zwUYeRENgskH5/gxss
- gzMQ==
-X-Gm-Message-State: AOAM533Tfaoi0khOQNq9ORTLqBvWL9IUi5tAQbdUzbqbBS4hYMpuOMRK
- 3fAZzmwxCm8oDLogsnzVkmkJ0MbkxF5Fvms7
-X-Google-Smtp-Source: ABdhPJy6O9eEqIOZwHe6oOuPyehX9iYTSrAO1JY5u4Js1B5q7vbc1hZNbj4TWn7dacb8yoDh6Gj33Q==
-X-Received: by 2002:a17:90a:a405:: with SMTP id
- y5mr8534338pjp.15.1592159978079; 
- Sun, 14 Jun 2020 11:39:38 -0700 (PDT)
+ bh=cmxBQrA+sytNwthQ8QVqk9DggYfm2DatGhLl09VI8ws=;
+ b=Y9nXSo7BM/BCw6mo5226hri06kCURvRGc7J9FgpKVGfMSZwsJO8tBq5l3q8hEiqfnR
+ Zt8yPxoxbDITtTH3BrwrxMWKzNhfnDiAbMP2AzF6oaVttQNgIuJqPU8ScJUXJOlSm7Bw
+ epYY4QHInWcuIEd7Z+TJc5MjQaq1WO4M/OayVKqFAowdYXT6lwqnwkwa79bVUqve/YwO
+ p2dZrTcacWt2Lzub2Nw4g1p9jBrRqti2y42f/9cmw+eoH518W8NmucE2R+Q71bdanm3F
+ SoJGjHBxmATMhSslgjFxFanyLUz+nRxPIb7XPhpfRixZkmwdk4AkdZ3EFcE6VbXP0HmO
+ AeFQ==
+X-Gm-Message-State: AOAM531ikjUNaPcVANFRF0cvI5GjwqY6FbCgjppkBIiHotb793H/tyMw
+ GPtM+veuItg1s0WJRcUr1Q6lobioEO+6oQ==
+X-Google-Smtp-Source: ABdhPJwjUtXHJRw0UZRFB7vL0Qzea6w1wYTbPSg8uPdU80ZdBFr0mbXQ2xLN9Wcqd5bE8XC/MLZbdA==
+X-Received: by 2002:a17:90b:f09:: with SMTP id
+ br9mr7918007pjb.168.1592159974050; 
+ Sun, 14 Jun 2020 11:39:34 -0700 (PDT)
 Received: from localhost ([2001:e42:102:1532:160:16:113:140])
- by smtp.gmail.com with ESMTPSA id b14sm11354728pft.23.2020.06.14.11.39.36
+ by smtp.gmail.com with ESMTPSA id i67sm11552545pfb.82.2020.06.14.11.39.32
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 14 Jun 2020 11:39:37 -0700 (PDT)
+ Sun, 14 Jun 2020 11:39:33 -0700 (PDT)
 From: Coiby Xu <coiby.xu@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v9 3/5] move logical block size check function to a common
- utility function
-Date: Mon, 15 Jun 2020 02:39:05 +0800
-Message-Id: <20200614183907.514282-4-coiby.xu@gmail.com>
+Subject: [PATCH v9 2/5] generic vhost user server
+Date: Mon, 15 Jun 2020 02:39:04 +0800
+Message-Id: <20200614183907.514282-3-coiby.xu@gmail.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200614183907.514282-1-coiby.xu@gmail.com>
 References: <20200614183907.514282-1-coiby.xu@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1044;
- envelope-from=coiby.xu@gmail.com; helo=mail-pj1-x1044.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::642;
+ envelope-from=coiby.xu@gmail.com; helo=mail-pl1-x642.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -102,149 +101,510 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Coiby Xu <coiby.xu@gmail.com>,
- bharatlkmlkvm@gmail.com, stefanha@redhat.com,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: kwolf@redhat.com, bharatlkmlkvm@gmail.com, Coiby Xu <coiby.xu@gmail.com>,
+ stefanha@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Move logical block size check function in hw/core/qdev-properties.c:set_blocksize() to util/block-helpers.c
+Sharing QEMU devices via vhost-user protocol.
+
+Only one vhost-user client can connect to the server one time.
 
 Signed-off-by: Coiby Xu <coiby.xu@gmail.com>
 ---
- hw/core/qdev-properties.c | 18 +++------------
- util/Makefile.objs        |  1 +
- util/block-helpers.c      | 46 +++++++++++++++++++++++++++++++++++++++
- util/block-helpers.h      |  7 ++++++
- 4 files changed, 57 insertions(+), 15 deletions(-)
- create mode 100644 util/block-helpers.c
- create mode 100644 util/block-helpers.h
+ util/Makefile.objs       |   1 +
+ util/vhost-user-server.c | 400 +++++++++++++++++++++++++++++++++++++++
+ util/vhost-user-server.h |  61 ++++++
+ 3 files changed, 462 insertions(+)
+ create mode 100644 util/vhost-user-server.c
+ create mode 100644 util/vhost-user-server.h
 
-diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
-index cc924815da..a4a6aa5204 100644
---- a/hw/core/qdev-properties.c
-+++ b/hw/core/qdev-properties.c
-@@ -14,6 +14,7 @@
- #include "qapi/visitor.h"
- #include "chardev/char.h"
- #include "qemu/uuid.h"
-+#include "util/block-helpers.h"
- 
- void qdev_prop_set_after_realize(DeviceState *dev, const char *name,
-                                   Error **errp)
-@@ -736,8 +737,6 @@ static void set_blocksize(Object *obj, Visitor *v, const char *name,
-     Property *prop = opaque;
-     uint16_t value, *ptr = qdev_get_prop_ptr(dev, prop);
-     Error *local_err = NULL;
--    const int64_t min = 512;
--    const int64_t max = 32768;
- 
-     if (dev->realized) {
-         qdev_prop_set_after_realize(dev, name, errp);
-@@ -749,21 +748,10 @@ static void set_blocksize(Object *obj, Visitor *v, const char *name,
-         error_propagate(errp, local_err);
-         return;
-     }
--    /* value of 0 means "unset" */
--    if (value && (value < min || value > max)) {
--        error_setg(errp, QERR_PROPERTY_VALUE_OUT_OF_RANGE,
--                   dev->id ? : "", name, (int64_t)value, min, max);
-+    check_logical_block_size(dev->id ? : "", name, value, errp);
-+    if (errp) {
-         return;
-     }
--
--    /* We rely on power-of-2 blocksizes for bitmasks */
--    if ((value & (value - 1)) != 0) {
--        error_setg(errp,
--                  "Property %s.%s doesn't take value '%" PRId64 "', it's not a power of 2",
--                  dev->id ?: "", name, (int64_t)value);
--        return;
--    }
--
-     *ptr = value;
- }
- 
 diff --git a/util/Makefile.objs b/util/Makefile.objs
-index b4d4af06dc..fa5380ddab 100644
+index cc5e37177a..b4d4af06dc 100644
 --- a/util/Makefile.objs
 +++ b/util/Makefile.objs
 @@ -66,6 +66,7 @@ util-obj-y += hbitmap.o
  util-obj-y += main-loop.o
  util-obj-y += nvdimm-utils.o
  util-obj-y += qemu-coroutine.o qemu-coroutine-lock.o qemu-coroutine-io.o
-+util-obj-y += block-helpers.o
- util-obj-$(CONFIG_LINUX) += vhost-user-server.o
++util-obj-$(CONFIG_LINUX) += vhost-user-server.o
  util-obj-y += qemu-coroutine-sleep.o
  util-obj-y += qemu-co-shared-resource.o
-diff --git a/util/block-helpers.c b/util/block-helpers.c
+ util-obj-y += qemu-sockets.o
+diff --git a/util/vhost-user-server.c b/util/vhost-user-server.c
 new file mode 100644
-index 0000000000..d31309cc0e
+index 0000000000..393beeb6b9
 --- /dev/null
-+++ b/util/block-helpers.c
-@@ -0,0 +1,46 @@
++++ b/util/vhost-user-server.c
+@@ -0,0 +1,400 @@
 +/*
-+ * Block utility functions
++ * Sharing QEMU devices via vhost-user protocol
 + *
-+ * Copyright (c) 2020 Coiby Xu <coiby.xu@gmail.com>
++ * Author: Coiby Xu <coiby.xu@gmail.com>
 + *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
++ * This work is licensed under the terms of the GNU GPL, version 2 or
++ * later.  See the COPYING file in the top-level directory.
 + */
-+
 +#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "qapi/qmp/qerror.h"
-+#include "block-helpers.h"
++#include <sys/eventfd.h>
++#include "qemu/main-loop.h"
++#include "vhost-user-server.h"
 +
-+/*
-+ * Logical block size input validation
-+ *
-+ * The size should meet the following conditions:
-+ * 1. min=512
-+ * 2. max=32768
-+ * 3. a power of 2
-+ *
-+ *  Moved from hw/core/qdev-properties.c:set_blocksize()
-+ */
-+void check_logical_block_size(const char *id, const char *name, uint16_t value,
-+                     Error **errp)
++static void vmsg_close_fds(VhostUserMsg *vmsg)
 +{
-+    const int64_t min = 512;
-+    const int64_t max = 32768;
-+
-+    /* value of 0 means "unset" */
-+    if (value && (value < min || value > max)) {
-+        error_setg(errp, QERR_PROPERTY_VALUE_OUT_OF_RANGE,
-+                   id, name, (int64_t)value, min, max);
-+        return;
-+    }
-+
-+    /* We rely on power-of-2 blocksizes for bitmasks */
-+    if ((value & (value - 1)) != 0) {
-+        error_setg(errp,
-+                   "Property %s.%s doesn't take value '%" PRId64
-+                   "', it's not a power of 2",
-+                   id, name, (int64_t)value);
-+        return;
++    int i;
++    for (i = 0; i < vmsg->fd_num; i++) {
++        close(vmsg->fds[i]);
 +    }
 +}
-diff --git a/util/block-helpers.h b/util/block-helpers.h
++
++static void vmsg_unblock_fds(VhostUserMsg *vmsg)
++{
++    int i;
++    for (i = 0; i < vmsg->fd_num; i++) {
++        qemu_set_nonblock(vmsg->fds[i]);
++    }
++}
++
++static void vu_accept(QIONetListener *listener, QIOChannelSocket *sioc,
++                      gpointer opaque);
++
++static void close_client(VuServer *server)
++{
++    vu_deinit(&server->vu_dev);
++    object_unref(OBJECT(server->sioc));
++    object_unref(OBJECT(server->ioc));
++    server->sioc_slave = NULL;
++    object_unref(OBJECT(server->ioc_slave));
++    /*
++     * Set the callback function for network listener so another
++     * vhost-user client can connect to this server
++     */
++    qio_net_listener_set_client_func(server->listener,
++                                     vu_accept,
++                                     server,
++                                     NULL);
++}
++
++static void panic_cb(VuDev *vu_dev, const char *buf)
++{
++    VuServer *server = container_of(vu_dev, VuServer, vu_dev);
++
++    if (buf) {
++        error_report("vu_panic: %s", buf);
++    }
++
++    if (server->sioc) {
++        close_client(server);
++        server->sioc = NULL;
++    }
++
++    if (server->device_panic_notifier) {
++        server->device_panic_notifier(server);
++    }
++}
++
++static QIOChannel *slave_io_channel(VuServer *server, int fd,
++                                    Error **local_err)
++{
++    if (server->sioc_slave) {
++        if (fd == server->sioc_slave->fd) {
++            return server->ioc_slave;
++        }
++    } else {
++        server->sioc_slave = qio_channel_socket_new_fd(fd, local_err);
++        if (!*local_err) {
++            server->ioc_slave = QIO_CHANNEL(server->sioc_slave);
++            return server->ioc_slave;
++        }
++    }
++
++    return NULL;
++}
++
++static bool coroutine_fn
++vu_message_read(VuDev *vu_dev, int conn_fd, VhostUserMsg *vmsg)
++{
++    struct iovec iov = {
++        .iov_base = (char *)vmsg,
++        .iov_len = VHOST_USER_HDR_SIZE,
++    };
++    int rc, read_bytes = 0;
++    Error *local_err = NULL;
++    /*
++     * Store fds/nfds returned from qio_channel_readv_full into
++     * temporary variables.
++     *
++     * VhostUserMsg is a packed structure, gcc will complain about passing
++     * pointer to a packed structure member if we pass &VhostUserMsg.fd_num
++     * and &VhostUserMsg.fds directly when calling qio_channel_readv_full,
++     * thus two temporary variables nfds and fds are used here.
++     */
++    size_t nfds = 0, nfds_t = 0;
++    int *fds_t = NULL;
++    VuServer *server = container_of(vu_dev, VuServer, vu_dev);
++    QIOChannel *ioc = NULL;
++
++    if (conn_fd == server->sioc->fd) {
++        ioc = server->ioc;
++    } else {
++        /* Slave communication will also use this function to read msg */
++        ioc = slave_io_channel(server, conn_fd, &local_err);
++    }
++
++    if (!ioc) {
++        error_report_err(local_err);
++        goto fail;
++    }
++
++    assert(qemu_in_coroutine());
++    do {
++        /*
++         * qio_channel_readv_full may have short reads, keeping calling it
++         * until getting VHOST_USER_HDR_SIZE or 0 bytes in total
++         */
++        rc = qio_channel_readv_full(ioc, &iov, 1, &fds_t, &nfds_t, &local_err);
++        if (rc < 0) {
++            if (rc == QIO_CHANNEL_ERR_BLOCK) {
++                qio_channel_yield(ioc, G_IO_IN);
++                continue;
++            } else {
++                error_report_err(local_err);
++                return false;
++            }
++        }
++        read_bytes += rc;
++        if (nfds_t > 0) {
++            if (nfds + nfds_t > G_N_ELEMENTS(vmsg->fds)) {
++                error_report("A maximum of %d fds are allowed, "
++                             "however got %lu fds now",
++                             VHOST_MEMORY_MAX_NREGIONS, nfds + nfds_t);
++                goto fail;
++            }
++            memcpy(vmsg->fds + nfds, fds_t,
++                   nfds_t *sizeof(vmsg->fds[0]));
++            nfds += nfds_t;
++            g_free(fds_t);
++        }
++        if (read_bytes == VHOST_USER_HDR_SIZE || rc == 0) {
++            break;
++        }
++        iov.iov_base = (char *)vmsg + read_bytes;
++        iov.iov_len = VHOST_USER_HDR_SIZE - read_bytes;
++    } while (true);
++
++    vmsg->fd_num = nfds;
++    /* qio_channel_readv_full will make socket fds blocking, unblock them */
++    vmsg_unblock_fds(vmsg);
++    if (vmsg->size > sizeof(vmsg->payload)) {
++        error_report("Error: too big message request: %d, "
++                     "size: vmsg->size: %u, "
++                     "while sizeof(vmsg->payload) = %zu",
++                     vmsg->request, vmsg->size, sizeof(vmsg->payload));
++        goto fail;
++    }
++
++    struct iovec iov_payload = {
++        .iov_base = (char *)&vmsg->payload,
++        .iov_len = vmsg->size,
++    };
++    if (vmsg->size) {
++        rc = qio_channel_readv_all_eof(ioc, &iov_payload, 1, &local_err);
++        if (rc == -1) {
++            error_report_err(local_err);
++            goto fail;
++        }
++    }
++
++    return true;
++
++fail:
++    vmsg_close_fds(vmsg);
++
++    return false;
++}
++
++
++static void vu_client_start(VuServer *server);
++static coroutine_fn void vu_client_trip(void *opaque)
++{
++    VuServer *server = opaque;
++
++    while (!server->aio_context_changed && server->sioc) {
++        vu_dispatch(&server->vu_dev);
++    }
++
++    if (server->aio_context_changed && server->sioc) {
++        server->aio_context_changed = false;
++        vu_client_start(server);
++    }
++}
++
++static void vu_client_start(VuServer *server)
++{
++    server->co_trip = qemu_coroutine_create(vu_client_trip, server);
++    aio_co_enter(server->ctx, server->co_trip);
++}
++
++/*
++ * a wrapper for vu_kick_cb
++ *
++ * since aio_dispatch can only pass one user data pointer to the
++ * callback function, pack VuDev and pvt into a struct. Then unpack it
++ * and pass them to vu_kick_cb
++ */
++static void kick_handler(void *opaque)
++{
++    KickInfo *kick_info = opaque;
++    kick_info->cb(kick_info->vu_dev, 0, (void *) kick_info->index);
++}
++
++
++static void
++set_watch(VuDev *vu_dev, int fd, int vu_evt,
++          vu_watch_cb cb, void *pvt)
++{
++
++    VuServer *server = container_of(vu_dev, VuServer, vu_dev);
++    g_assert(vu_dev);
++    g_assert(fd >= 0);
++    long index = (intptr_t) pvt;
++    g_assert(cb);
++    KickInfo *kick_info = &server->kick_info[index];
++    if (!kick_info->cb) {
++        kick_info->fd = fd;
++        kick_info->cb = cb;
++        qemu_set_nonblock(fd);
++        aio_set_fd_handler(server->ioc->ctx, fd, false, kick_handler,
++                           NULL, NULL, kick_info);
++        kick_info->vu_dev = vu_dev;
++    }
++}
++
++
++static void remove_watch(VuDev *vu_dev, int fd)
++{
++    VuServer *server;
++    int i;
++    int index = -1;
++    g_assert(vu_dev);
++    g_assert(fd >= 0);
++
++    server = container_of(vu_dev, VuServer, vu_dev);
++    for (i = 0; i < vu_dev->max_queues; i++) {
++        if (server->kick_info[i].fd == fd) {
++            index = i;
++            break;
++        }
++    }
++
++    if (index == -1) {
++        return;
++    }
++    server->kick_info[i].cb = NULL;
++    aio_set_fd_handler(server->ioc->ctx, fd, false, NULL, NULL, NULL, NULL);
++}
++
++
++static void vu_accept(QIONetListener *listener, QIOChannelSocket *sioc,
++                      gpointer opaque)
++{
++    VuServer *server = opaque;
++
++    if (server->sioc) {
++        warn_report("Only one vhost-user client is allowed to "
++                    "connect the server one time");
++        return;
++    }
++
++    if (!vu_init(&server->vu_dev, server->max_queues, sioc->fd, panic_cb,
++                 vu_message_read, set_watch, remove_watch, server->vu_iface)) {
++        error_report("Failed to initialized libvhost-user");
++        return;
++    }
++
++    /*
++     * Unset the callback function for network listener to make another
++     * vhost-user client keeping waiting until this client disconnects
++     */
++    qio_net_listener_set_client_func(server->listener,
++                                     NULL,
++                                     NULL,
++                                     NULL);
++    server->sioc = sioc;
++    server->kick_info = g_new0(KickInfo, server->max_queues);
++    /*
++     * Increase the object reference, so sioc will not freed by
++     * qio_net_listener_channel_func which will call object_unref(OBJECT(sioc))
++     */
++    object_ref(OBJECT(server->sioc));
++    qio_channel_set_name(QIO_CHANNEL(sioc), "vhost-user client");
++    server->ioc = QIO_CHANNEL(sioc);
++    object_ref(OBJECT(server->ioc));
++    qio_channel_attach_aio_context(server->ioc, server->ctx);
++    qio_channel_set_blocking(QIO_CHANNEL(server->sioc), false, NULL);
++    vu_client_start(server);
++}
++
++
++void vhost_user_server_stop(VuServer *server)
++{
++    if (!server) {
++        return;
++    }
++
++    if (server->sioc) {
++        close_client(server);
++        object_unref(OBJECT(server->sioc));
++    }
++
++    if (server->listener) {
++        qio_net_listener_disconnect(server->listener);
++        object_unref(OBJECT(server->listener));
++    }
++
++    g_free(server->kick_info);
++}
++
++static void detach_context(VuServer *server)
++{
++    int i;
++    AioContext *ctx = server->ioc->ctx;
++    qio_channel_detach_aio_context(server->ioc);
++    for (i = 0; i < server->vu_dev.max_queues; i++) {
++        if (server->kick_info[i].cb) {
++            aio_set_fd_handler(ctx, server->kick_info[i].fd, false, NULL,
++                               NULL, NULL, NULL);
++        }
++    }
++}
++
++static void attach_context(VuServer *server, AioContext *ctx)
++{
++    int i;
++    qio_channel_attach_aio_context(server->ioc, ctx);
++    server->aio_context_changed = true;
++    if (server->co_trip) {
++        aio_co_schedule(ctx, server->co_trip);
++    }
++    for (i = 0; i < server->vu_dev.max_queues; i++) {
++        if (server->kick_info[i].cb) {
++            aio_set_fd_handler(ctx, server->kick_info[i].fd, false,
++                               kick_handler, NULL, NULL,
++                               &server->kick_info[i]);
++        }
++    }
++}
++
++void vhost_user_server_set_aio_context(AioContext *ctx, VuServer *server)
++{
++    server->ctx = ctx ? ctx : qemu_get_aio_context();
++    if (!server->sioc) {
++        return;
++    }
++    if (ctx) {
++        attach_context(server, ctx);
++    } else {
++        detach_context(server);
++    }
++}
++
++
++bool vhost_user_server_start(VuServer *server,
++                             SocketAddress *socket_addr,
++                             AioContext *ctx,
++                             uint16_t max_queues,
++                             DevicePanicNotifierFn *device_panic_notifier,
++                             const VuDevIface *vu_iface,
++                             Error **errp)
++{
++    server->listener = qio_net_listener_new();
++    if (qio_net_listener_open_sync(server->listener, socket_addr, 1,
++                                   errp) < 0) {
++        return false;
++    }
++
++    qio_net_listener_set_name(server->listener, "vhost-user-backend-listener");
++
++    server->vu_iface = vu_iface;
++    server->max_queues = max_queues;
++    server->ctx = ctx;
++    server->device_panic_notifier = device_panic_notifier;
++    qio_net_listener_set_client_func(server->listener,
++                                     vu_accept,
++                                     server,
++                                     NULL);
++
++    return true;
++}
+diff --git a/util/vhost-user-server.h b/util/vhost-user-server.h
 new file mode 100644
-index 0000000000..f06be282a1
+index 0000000000..5baf58f96a
 --- /dev/null
-+++ b/util/block-helpers.h
-@@ -0,0 +1,7 @@
-+#ifndef BLOCK_HELPERS_H
-+#define BLOCK_HELPERS_H
++++ b/util/vhost-user-server.h
+@@ -0,0 +1,61 @@
++/*
++ * Sharing QEMU devices via vhost-user protocol
++ *
++ * Author: Coiby Xu <coiby.xu@gmail.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or
++ * later.  See the COPYING file in the top-level directory.
++ */
 +
-+void check_logical_block_size(const char *id, const char *name, uint16_t value,
-+                     Error **errp);
++#ifndef VHOST_USER_SERVER_H
++#define VHOST_USER_SERVER_H
 +
-+#endif /* BLOCK_HELPERS_H */
++#include "contrib/libvhost-user/libvhost-user.h"
++#include "io/channel-socket.h"
++#include "io/channel-file.h"
++#include "io/net-listener.h"
++#include "qemu/error-report.h"
++#include "qapi/error.h"
++#include "standard-headers/linux/virtio_blk.h"
++
++typedef struct KickInfo {
++    VuDev *vu_dev;
++    int fd; /*kick fd*/
++    long index; /*queue index*/
++    vu_watch_cb cb;
++} KickInfo;
++
++typedef struct VuServer {
++    QIONetListener *listener;
++    AioContext *ctx;
++    void (*device_panic_notifier)(struct VuServer *server) ;
++    int max_queues;
++    const VuDevIface *vu_iface;
++    VuDev vu_dev;
++    QIOChannel *ioc; /* The I/O channel with the client */
++    QIOChannelSocket *sioc; /* The underlying data channel with the client */
++    /* IOChannel for fd provided via VHOST_USER_SET_SLAVE_REQ_FD */
++    QIOChannel *ioc_slave;
++    QIOChannelSocket *sioc_slave;
++    Coroutine *co_trip; /* coroutine for processing VhostUserMsg */
++    KickInfo *kick_info; /* an array with the length of the queue number */
++    /* restart coroutine co_trip if AIOContext is changed */
++    bool aio_context_changed;
++} VuServer;
++
++
++typedef void DevicePanicNotifierFn(struct VuServer *server);
++
++bool vhost_user_server_start(VuServer *server,
++                             SocketAddress *unix_socket,
++                             AioContext *ctx,
++                             uint16_t max_queues,
++                             DevicePanicNotifierFn *device_panic_notifier,
++                             const VuDevIface *vu_iface,
++                             Error **errp);
++
++void vhost_user_server_stop(VuServer *server);
++
++void vhost_user_server_set_aio_context(AioContext *ctx, VuServer *server);
++
++#endif /* VHOST_USER_SERVER_H */
 -- 
 2.27.0
 
