@@ -6,51 +6,53 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75DB5C433E0
-	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 08:47:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3063BC433DF
+	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 08:47:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3EFD220714
-	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 08:47:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3EFD220714
+	by mail.kernel.org (Postfix) with ESMTPS id 0978520714
+	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 08:47:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0978520714
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51230 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51314 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkOIH-00048e-HU
-	for qemu-devel@archiver.kernel.org; Sun, 14 Jun 2020 04:47:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50650)
+	id 1jkOII-0004Ai-BO
+	for qemu-devel@archiver.kernel.org; Sun, 14 Jun 2020 04:47:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50672)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <like.xu@linux.intel.com>)
- id 1jkOHO-0003JN-Em
- for qemu-devel@nongnu.org; Sun, 14 Jun 2020 04:46:14 -0400
-Received: from mga11.intel.com ([192.55.52.93]:62473)
+ id 1jkOHP-0003JZ-T3
+ for qemu-devel@nongnu.org; Sun, 14 Jun 2020 04:46:15 -0400
+Received: from mga11.intel.com ([192.55.52.93]:62474)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <like.xu@linux.intel.com>)
- id 1jkOHM-0003VW-Fb
- for qemu-devel@nongnu.org; Sun, 14 Jun 2020 04:46:14 -0400
-IronPort-SDR: VT7rMHVbv/sgaK2GXKMz0z0dUu1ATo24x2qEB3+VMOjGahA3cAO4rJAudQun3303WIzAB306pO
- yROfrNTqnYkw==
+ id 1jkOHO-0003Ve-7Y
+ for qemu-devel@nongnu.org; Sun, 14 Jun 2020 04:46:15 -0400
+IronPort-SDR: xkgO0W667Wv9OOGsBVKqc4uKBNyOzYWUgLD+9aYAYlyWwmtsHFgEJ6bFQprWiztrowc8JiSimp
+ KejF/Dvg/9WQ==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga007.jf.intel.com ([10.7.209.58])
  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 14 Jun 2020 01:46:06 -0700
-IronPort-SDR: 4H+x0U98+DkucugVzStO9nJwtlxX5CrHb6lajLx+GZF9zHxnPqavP+XjpHXUTvFHlZ/mBoVEqB
- iFQjBps0+VCg==
+ 14 Jun 2020 01:46:07 -0700
+IronPort-SDR: FfGAzbDDyQTBrQcby1Mu8ESEwO+LIdlRqOKFcM6loDo9D6amgGJb5kMdJ/gucZlhMu7spcL0YD
+ UD8hffIBih0A==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,510,1583222400"; d="scan'208";a="261405140"
+X-IronPort-AV: E=Sophos;i="5.73,510,1583222400"; d="scan'208";a="261405146"
 Received: from sqa-gate.sh.intel.com (HELO clx-ap-likexu.tsp.org)
  ([10.239.48.212])
- by orsmga007.jf.intel.com with ESMTP; 14 Jun 2020 01:46:05 -0700
+ by orsmga007.jf.intel.com with ESMTP; 14 Jun 2020 01:46:06 -0700
 From: Like Xu <like.xu@linux.intel.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 1/2] migration/colo: fix typo in the COLO Framework module
-Date: Sun, 14 Jun 2020 16:45:09 +0800
-Message-Id: <20200614084510.7917-1-like.xu@linux.intel.com>
+Subject: [PATCH 2/2] migration/colo/net: fix typo in the COLO Proxy module
+Date: Sun, 14 Jun 2020 16:45:10 +0800
+Message-Id: <20200614084510.7917-2-like.xu@linux.intel.com>
 X-Mailer: git-send-email 2.21.3
+In-Reply-To: <20200614084510.7917-1-like.xu@linux.intel.com>
+References: <20200614084510.7917-1-like.xu@linux.intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Received-SPF: none client-ip=192.55.52.93;
@@ -74,69 +76,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Hailiang Zhang <zhang.zhanghailiang@huawei.com>,
+Cc: Zhang Chen <chen.zhang@intel.com>, Li Zhijian <lizhijian@cn.fujitsu.com>,
  Like Xu <like.xu@linux.intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Cc: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
+Cc: Zhang Chen <chen.zhang@intel.com>
+Cc: Li Zhijian <lizhijian@cn.fujitsu.com>
 Signed-off-by: Like Xu <like.xu@linux.intel.com>
 ---
- docs/COLO-FT.txt | 8 ++++----
- migration/colo.c | 2 +-
- 2 files changed, 5 insertions(+), 5 deletions(-)
+ docs/colo-proxy.txt | 4 ++--
+ net/colo-compare.c  | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/docs/COLO-FT.txt b/docs/COLO-FT.txt
-index c8e1740935..fdc0207cff 100644
---- a/docs/COLO-FT.txt
-+++ b/docs/COLO-FT.txt
-@@ -10,7 +10,7 @@ See the COPYING file in the top-level directory.
- This document gives an overview of COLO's design and how to use it.
+diff --git a/docs/colo-proxy.txt b/docs/colo-proxy.txt
+index fa1cef0278..0bbd6f720a 100644
+--- a/docs/colo-proxy.txt
++++ b/docs/colo-proxy.txt
+@@ -21,7 +21,7 @@ and filter-rewriter compose the COLO-proxy.
+ == Architecture ==
  
- == Background ==
--Virtual machine (VM) replication is a well known technique for providing
-+Virtual machine (VM) replication is a well-known technique for providing
- application-agnostic software-implemented hardware fault tolerance,
- also known as "non-stop service".
+ COLO-Proxy is based on qemu netfilter and it's a plugin for qemu netfilter
+-(except colo-compare). It keep Secondary VM connect normally to
++(except colo-compare). It keeps Secondary VM connect normally to
+ client and compare packets sent by PVM with sent by SVM.
+ If the packet difference, notify COLO-frame to do checkpoint and send
+ all primary packet has queued. Otherwise just send the queued primary
+@@ -94,7 +94,7 @@ Redirect Server Filter --> COLO-Compare
+ COLO-compare receive primary guest packet then
+ waiting secondary redirect packet to compare it.
+ If packet same,send queued primary packet and clear
+-queued secondary packet, Otherwise send primary packet
++queued secondary packet, otherwise send primary packet
+ and do checkpoint.
  
-@@ -103,7 +103,7 @@ Primary side.
+ COLO-Compare --> Another Redirector Filter
+diff --git a/net/colo-compare.c b/net/colo-compare.c
+index c07e7c1c09..3efc61c777 100644
+--- a/net/colo-compare.c
++++ b/net/colo-compare.c
+@@ -658,7 +658,7 @@ static void colo_compare_packet(CompareState *s, Connection *conn,
+             g_queue_remove(&conn->secondary_list, result->data);
+         } else {
+             /*
+-             * If one packet arrive late, the secondary_list or
++             * If one packet arrives late, the secondary_list or
+              * primary_list will be empty, so we can't compare it
+              * until next comparison. If the packets in the list are
+              * timeout, it will trigger a checkpoint request.
+@@ -1296,7 +1296,7 @@ static void colo_compare_finalize(Object *obj)
+         }
+     }
  
- COLO Proxy:
- Delivers packets to Primary and Secondary, and then compare the responses from
--both side. Then decide whether to start a checkpoint according to some rules.
-+both sides. Then decide whether to start a checkpoint according to some rules.
- Please refer to docs/colo-proxy.txt for more information.
+-    /* Release all unhandled packets after compare thead exited */
++    /* Release all unhandled packets after compare thread exited */
+     g_queue_foreach(&s->conn_list, colo_flush_packets, s);
  
- Note:
-@@ -146,12 +146,12 @@ in test procedure.
- 
- == Test procedure ==
- Note: Here we are running both instances on the same host for testing,
--change the IP Addresses if you want to run it on two hosts. Initally
-+change the IP Addresses if you want to run it on two hosts. Initially
- 127.0.0.1 is the Primary Host and 127.0.0.2 is the Secondary Host.
- 
- == Startup qemu ==
- 1. Primary:
--Note: Initally, $imagefolder/primary.qcow2 needs to be copied to all hosts.
-+Note: Initially, $imagefolder/primary.qcow2 needs to be copied to all hosts.
- You don't need to change any IP's here, because 0.0.0.0 listens on any
- interface. The chardev's with 127.0.0.1 IP's loopback to the local qemu
- instance.
-diff --git a/migration/colo.c b/migration/colo.c
-index ea7d1e9d4e..80788d46b5 100644
---- a/migration/colo.c
-+++ b/migration/colo.c
-@@ -632,7 +632,7 @@ out:
-     /*
-      * It is safe to unregister notifier after failover finished.
-      * Besides, colo_delay_timer and colo_checkpoint_sem can't be
--     * released befor unregister notifier, or there will be use-after-free
-+     * released before unregister notifier, or there will be use-after-free
-      * error.
-      */
-     colo_compare_unregister_notifier(&packets_compare_notifier);
+     g_queue_clear(&s->conn_list);
 -- 
 2.21.3
 
