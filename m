@@ -7,88 +7,88 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93425C433DF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 411A9C433E0
 	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 08:04:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5F00220714
-	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 08:04:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0637420714
+	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 08:04:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mymailcheap.com header.i=@mymailcheap.com header.b="X9wdSW+h";
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=flygoat.com header.i=@flygoat.com header.b="A0sIOz5H"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F00220714
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mymailcheap.com header.i=@mymailcheap.com header.b="qikbPez5";
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=flygoat.com header.i=@flygoat.com header.b="elCRV2YX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0637420714
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=flygoat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57292 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57280 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkNdG-0004G5-Lk
+	id 1jkNdG-0004Fl-8J
 	for qemu-devel@archiver.kernel.org; Sun, 14 Jun 2020 04:04:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59854)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59856)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jiaxun.yang@flygoat.com>)
- id 1jkNcR-0002tF-OP
- for qemu-devel@nongnu.org; Sun, 14 Jun 2020 04:03:55 -0400
-Received: from relay1.mymailcheap.com ([149.56.97.132]:36838)
+ id 1jkNcS-0002tM-CE
+ for qemu-devel@nongnu.org; Sun, 14 Jun 2020 04:03:56 -0400
+Received: from relay1.mymailcheap.com ([149.56.97.132]:45992)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jiaxun.yang@flygoat.com>)
- id 1jkNcP-0004nE-Tm
- for qemu-devel@nongnu.org; Sun, 14 Jun 2020 04:03:55 -0400
+ id 1jkNcP-0004nC-3f
+ for qemu-devel@nongnu.org; Sun, 14 Jun 2020 04:03:56 -0400
 Received: from filter1.mymailcheap.com (filter1.mymailcheap.com
  [149.56.130.247])
- by relay1.mymailcheap.com (Postfix) with ESMTPS id 5E8453F201;
- Sun, 14 Jun 2020 04:03:50 -0400 (EDT)
+ by relay1.mymailcheap.com (Postfix) with ESMTPS id ED8D63F1C5;
+ Sun, 14 Jun 2020 04:03:49 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by filter1.mymailcheap.com (Postfix) with ESMTP id 3A0ED2A3AE;
- Sun, 14 Jun 2020 04:03:50 -0400 (EDT)
+ by filter1.mymailcheap.com (Postfix) with ESMTP id C4D782A3B1;
+ Sun, 14 Jun 2020 04:03:49 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=mymailcheap.com;
- s=default; t=1592121830;
- bh=3chMFuOQMgc9QzGLu50+ndxJoqfGHEefwrW77Wyex+g=;
+ s=default; t=1592121829;
+ bh=mdmYydToiMZ54x34/5NlXcOMMXrGcl1A4CvrtAn7GVw=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=X9wdSW+hbGX5GOMJkRBUWehYIFE2hgbDk5+tjjG8vAFKkjxsS2dPAZhRGPZHoqPYw
- KWxOuneHECJuJ7rF8N/q7TWBCgFEzrZMva/POgWxk+VhPWhFMH4A9AfY95C6OGKa8t
- 56jeHhkm+5+C3vQWU9Exo40cCzgh8ex4XXIi5hEY=
+ b=qikbPez5jrtDksAGQrU1tt2x1qbkobaOdqDycACms2B0iOL/nPk0BkVKIjsO5cqev
+ Nyp/oBCKKyQR8nCHuAgFWaqXhqpE7kbdSNgxnmNDUlcJT0PgeP+yU7OiGDd1+xweOy
+ L7MICtanuJdMO2X4kLYeTflzjsmDn4IGlgNHWLlI=
 X-Virus-Scanned: Debian amavisd-new at filter1.mymailcheap.com
 Received: from filter1.mymailcheap.com ([127.0.0.1])
  by localhost (filter1.mymailcheap.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id FkHsVE0ujJ_s; Sun, 14 Jun 2020 04:03:49 -0400 (EDT)
+ with ESMTP id wIH9KwZCgv_K; Sun, 14 Jun 2020 04:03:48 -0400 (EDT)
 Received: from mail20.mymailcheap.com (mail20.mymailcheap.com [51.83.111.147])
  (using TLSv1.2 with cipher ADH-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
  by filter1.mymailcheap.com (Postfix) with ESMTPS;
- Sun, 14 Jun 2020 04:03:49 -0400 (EDT)
+ Sun, 14 Jun 2020 04:03:48 -0400 (EDT)
 Received: from [148.251.23.173] (ml.mymailcheap.com [148.251.23.173])
- by mail20.mymailcheap.com (Postfix) with ESMTP id 60FCC40EFB;
- Sun, 14 Jun 2020 08:03:48 +0000 (UTC)
+ by mail20.mymailcheap.com (Postfix) with ESMTP id B8C5140EF3;
+ Sun, 14 Jun 2020 08:03:47 +0000 (UTC)
 Authentication-Results: mail20.mymailcheap.com; dkim=pass (1024-bit key;
- unprotected) header.d=flygoat.com header.i=@flygoat.com header.b="A0sIOz5H"; 
+ unprotected) header.d=flygoat.com header.i=@flygoat.com header.b="elCRV2YX"; 
  dkim-atps=neutral
 AI-Spam-Status: Not processed
 Received: from halation.202.net.flygoat.com (unknown [183.157.45.207])
  (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
  key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest
  SHA256) (No client certificate requested)
- by mail20.mymailcheap.com (Postfix) with ESMTPSA id D9D64403B5;
- Sun, 14 Jun 2020 08:01:11 +0000 (UTC)
+ by mail20.mymailcheap.com (Postfix) with ESMTPSA id 03F41403B5;
+ Sun, 14 Jun 2020 08:01:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=flygoat.com;
- s=default; t=1592121675;
- bh=3chMFuOQMgc9QzGLu50+ndxJoqfGHEefwrW77Wyex+g=;
+ s=default; t=1592121671;
+ bh=mdmYydToiMZ54x34/5NlXcOMMXrGcl1A4CvrtAn7GVw=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=A0sIOz5H01tf3iL4JYRXrN7cl5Us7ECAxN+FzuBArDBS/YaGhLQTREoaBWBmFunWm
- NyWcTiII1b2OwVxPZX0Nh9havjtxUVrrFZ4/66EcCHekYI9A1sA5znq6kmkAvK3Kix
- kfRCLvklV7Ahtch96Pk3oq5efcCpMqPuCNbvmJl4=
+ b=elCRV2YXRLTiPLaqUNnKJ8J7DruqtN0/1/qkvfsyfXGCykJbKloyc7OU+3tNm/SMZ
+ B+CW08fJkskVkVluV6cmsd3w257qWVHWcr3QUYQd7Ro3Y1NRJe0emWhRU9+19py/W/
+ v+9L6jjfHoAHisgoDX3S23zNVPzDSCxA4dcKVSpg=
 From: Jiaxun Yang <jiaxun.yang@flygoat.com>
 To: aleksandar.qemu.devel@gmail.com
-Subject: [PATCH 2/4] target/mips: Add comments for vendor-specific ASEs
-Date: Sun, 14 Jun 2020 16:00:47 +0800
-Message-Id: <20200614080049.31134-3-jiaxun.yang@flygoat.com>
+Subject: [PATCH 1/4] target/mips: Legalize Loongson insn flags
+Date: Sun, 14 Jun 2020 16:00:46 +0800
+Message-Id: <20200614080049.31134-2-jiaxun.yang@flygoat.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200614080049.31134-1-jiaxun.yang@flygoat.com>
 References: <20200614080049.31134-1-jiaxun.yang@flygoat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 60FCC40EFB
+X-Rspamd-Queue-Id: B8C5140EF3
 X-Spamd-Result: default: False [6.40 / 10.00]; RCVD_VIA_SMTP_AUTH(0.00)[];
  TO_DN_SOME(0.00)[]; R_MISSING_CHARSET(2.50)[];
  BROKEN_CONTENT_TYPE(1.50)[]; R_SPF_SOFTFAIL(0.00)[~all:c];
@@ -136,32 +136,103 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Abbreviations of vendor-specific ASEs looks very similiar.
-Add comments to explain the full name and vendors of these flags.
+To match the actual status of Loongson insn, we split flags
+for LMMI and LEXT from INSN_LOONGSON2F.
+
+As Loongson-2F only implemented interger part of LEXT, we'll
+not enable LEXT for the processor, but instead we're still using
+INSN_LOONGSON2F as switch flag of these instructions.
+
+All multimedia instructions have been moved to LMMI flag. Loongson-2F
+and Loongson-3A are sharing these instructions.
 
 Signed-off-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
 ---
- target/mips/mips-defs.h | 4 ++++
- 1 file changed, 4 insertions(+)
+ target/mips/mips-defs.h |  4 ++--
+ target/mips/translate.c | 13 +++++++------
+ 2 files changed, 9 insertions(+), 8 deletions(-)
 
 diff --git a/target/mips/mips-defs.h b/target/mips/mips-defs.h
-index f1b833f947..ed6a7a9e54 100644
+index 0c129106c8..f1b833f947 100644
 --- a/target/mips/mips-defs.h
 +++ b/target/mips/mips-defs.h
-@@ -57,9 +57,13 @@
- /*
-  *   bits 52-63: vendor-specific ASEs
-  */
-+/* MultiMedia Instructions defined by R5900 */
- #define ASE_MMI           0x0010000000000000ULL
-+/* MIPS eXtension/enhanced Unit defined by Ingenic */
- #define ASE_MXU           0x0020000000000000ULL
-+/* Loongson MultiMedia Instructions */
- #define ASE_LMMI          0x0040000000000000ULL
-+/* Loongson EXTensions */
- #define ASE_LEXT          0x0080000000000000ULL
+@@ -70,7 +70,7 @@
+ #define CPU_VR54XX      (CPU_MIPS4 | INSN_VR54XX)
+ #define CPU_R5900       (CPU_MIPS3 | INSN_R5900)
+ #define CPU_LOONGSON2E  (CPU_MIPS3 | INSN_LOONGSON2E)
+-#define CPU_LOONGSON2F  (CPU_MIPS3 | INSN_LOONGSON2F)
++#define CPU_LOONGSON2F  (CPU_MIPS3 | INSN_LOONGSON2F | ASE_LMMI)
  
- /* MIPS CPU defines. */
+ #define CPU_MIPS5       (CPU_MIPS4 | ISA_MIPS5)
+ 
+@@ -97,7 +97,7 @@
+ /* Wave Computing: "nanoMIPS" */
+ #define CPU_NANOMIPS32  (CPU_MIPS32R6 | ISA_NANOMIPS32)
+ 
+-#define CPU_LOONGSON3A  (CPU_MIPS64R2 | INSN_LOONGSON3A)
++#define CPU_LOONGSON3A  (CPU_MIPS64R2 | INSN_LOONGSON3A | ASE_LMMI | ASE_LEXT)
+ 
+ /*
+  * Strictly follow the architecture standard:
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index 2caf4cba5a..e49f32f6ae 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -1046,7 +1046,7 @@ enum {
+     OPC_BC2NEZ  = (0x0D << 21) | OPC_CP2,
+ };
+ 
+-#define MASK_LMI(op)    (MASK_OP_MAJOR(op) | (op & (0x1F << 21)) | (op & 0x1F))
++#define MASK_LMMI(op)    (MASK_OP_MAJOR(op) | (op & (0x1F << 21)) | (op & 0x1F))
+ 
+ enum {
+     OPC_PADDSH      = (24 << 21) | (0x00) | OPC_CP2,
+@@ -3421,7 +3421,8 @@ static void gen_ld(DisasContext *ctx, uint32_t opc,
+     TCGv t0, t1, t2;
+     int mem_idx = ctx->mem_idx;
+ 
+-    if (rt == 0 && ctx->insn_flags & (INSN_LOONGSON2E | INSN_LOONGSON2F)) {
++    if (rt == 0 && ctx->insn_flags & (INSN_LOONGSON2E | INSN_LOONGSON2F |
++                                      INSN_LOONGSON3A)) {
+         /*
+          * Loongson CPU uses a load to zero register for prefetch.
+          * We emulate it as a NOP. On other CPU we must perform the
+@@ -5531,7 +5532,7 @@ static void gen_loongson_multimedia(DisasContext *ctx, int rd, int rs, int rt)
+     TCGv_i64 t0, t1;
+     TCGCond cond;
+ 
+-    opc = MASK_LMI(ctx->opcode);
++    opc = MASK_LMMI(ctx->opcode);
+     switch (opc) {
+     case OPC_ADD_CP2:
+     case OPC_SUB_CP2:
+@@ -27161,7 +27162,7 @@ static void decode_opc_special2_legacy(CPUMIPSState *env, DisasContext *ctx)
+     case OPC_MULTU_G_2F:
+     case OPC_MOD_G_2F:
+     case OPC_MODU_G_2F:
+-        check_insn(ctx, INSN_LOONGSON2F);
++        check_insn(ctx, INSN_LOONGSON2F | ASE_LEXT);
+         gen_loongson_integer(ctx, op1, rd, rs, rt);
+         break;
+     case OPC_CLO:
+@@ -27194,7 +27195,7 @@ static void decode_opc_special2_legacy(CPUMIPSState *env, DisasContext *ctx)
+     case OPC_DDIVU_G_2F:
+     case OPC_DMOD_G_2F:
+     case OPC_DMODU_G_2F:
+-        check_insn(ctx, INSN_LOONGSON2F);
++        check_insn(ctx, INSN_LOONGSON2F | ASE_LEXT);
+         gen_loongson_integer(ctx, op1, rd, rs, rt);
+         break;
+ #endif
+@@ -30641,7 +30642,7 @@ static void decode_opc(CPUMIPSState *env, DisasContext *ctx)
+         }
+         break;
+     case OPC_CP2:
+-        check_insn(ctx, INSN_LOONGSON2F);
++        check_insn(ctx, ASE_LMMI);
+         /* Note that these instructions use different fields.  */
+         gen_loongson_multimedia(ctx, sa, rd, rt);
+         break;
 -- 
 2.27.0
 
