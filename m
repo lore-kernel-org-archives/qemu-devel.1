@@ -6,40 +6,40 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5970EC433DF
-	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 10:55:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AA6AC433E0
+	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 10:59:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2CAE120739
-	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 10:55:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2CAE120739
+	by mail.kernel.org (Postfix) with ESMTPS id EDE7A20739
+	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 10:59:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDE7A20739
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59252 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35660 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkQIG-0000Z9-EM
-	for qemu-devel@archiver.kernel.org; Sun, 14 Jun 2020 06:55:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52654)
+	id 1jkQM0-0003Gl-50
+	for qemu-devel@archiver.kernel.org; Sun, 14 Jun 2020 06:59:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54202)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jkQHP-0008Kp-U2; Sun, 14 Jun 2020 06:54:23 -0400
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:56074
+ id 1jkQLD-0002lG-PX; Sun, 14 Jun 2020 06:58:19 -0400
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:56088
  helo=mail.default.ilande.uk0.bigv.io)
  by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jkQHO-0008RB-BJ; Sun, 14 Jun 2020 06:54:23 -0400
+ id 1jkQLC-0000eb-8L; Sun, 14 Jun 2020 06:58:19 -0400
 Received: from host217-39-64-113.range217-39.btcentralplus.com
  ([217.39.64.113] helo=[192.168.1.65])
  by mail.default.ilande.uk0.bigv.io with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
  (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jkQHS-0005QW-MD; Sun, 14 Jun 2020 11:54:29 +0100
+ id 1jkQLG-0005SP-FN; Sun, 14 Jun 2020 11:58:26 +0100
 To: BALATON Zoltan <balaton@eik.bme.hu>, qemu-devel@nongnu.org,
  qemu-ppc@nongnu.org
 References: <cover.1592055375.git.balaton@eik.bme.hu>
- <dc05efa9c54fb4cafdcea70c396c0790bf99c849.1592055375.git.balaton@eik.bme.hu>
+ <c637ae5d399e5681bb4f21662c7240590e7182e1.1592055375.git.balaton@eik.bme.hu>
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
  mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
@@ -65,19 +65,19 @@ Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
  Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
  KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
  imgcU9TTGC5qd9g=
-Message-ID: <1055a4d9-0545-02eb-4b3d-9b791f751e3d@ilande.co.uk>
-Date: Sun, 14 Jun 2020 11:54:15 +0100
+Message-ID: <470996b7-26a5-2f3b-25c1-5812a4cf4f12@ilande.co.uk>
+Date: Sun, 14 Jun 2020 11:58:11 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <dc05efa9c54fb4cafdcea70c396c0790bf99c849.1592055375.git.balaton@eik.bme.hu>
+In-Reply-To: <c637ae5d399e5681bb4f21662c7240590e7182e1.1592055375.git.balaton@eik.bme.hu>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-SA-Exim-Connect-IP: 217.39.64.113
 X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: Re: [PATCH v2 4/5] mac_oldworld: Rename ppc_heathrow_reset reset to
- ppc_heathrow_cpu_reset
+Subject: Re: [PATCH v2 5/5] mac_oldworld: Map macio to expected address at
+ reset
 X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
 X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
 Received-SPF: pass client-ip=2001:41c9:1:41f::167;
@@ -110,41 +110,104 @@ Sender: "Qemu-devel"
 
 On 13/06/2020 14:36, BALATON Zoltan wrote:
 
-> This function resets a CPU not the whole machine so reflect that in
-> its name.
+> Add a reset function that maps macio to the address expected by the
+> firmware of the board at startup.
 > 
 > Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 > ---
->  hw/ppc/mac_oldworld.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  hw/ppc/mac.h          | 12 ++++++++++++
+>  hw/ppc/mac_oldworld.c | 17 +++++++++++++++--
+>  2 files changed, 27 insertions(+), 2 deletions(-)
 > 
+> diff --git a/hw/ppc/mac.h b/hw/ppc/mac.h
+> index 6af87d1fa0..35a5f21163 100644
+> --- a/hw/ppc/mac.h
+> +++ b/hw/ppc/mac.h
+> @@ -57,6 +57,18 @@
+>  #define OLDWORLD_IDE1_IRQ      0xe
+>  #define OLDWORLD_IDE1_DMA_IRQ  0x3
+>  
+> +/* g3beige machine */
+> +#define TYPE_HEATHROW_MACHINE MACHINE_TYPE_NAME("g3beige")
+> +#define HEATHROW_MACHINE(obj) OBJECT_CHECK(HeathrowMachineState, (obj), \
+> +                                           TYPE_HEATHROW_MACHINE)
+> +
+> +typedef struct HeathrowMachineState {
+> +    /*< private >*/
+> +    MachineState parent;
+> +
+> +    PCIDevice *macio_pci;
+> +} HeathrowMachineState;
+> +
+>  /* New World IRQs */
+>  #define NEWWORLD_CUDA_IRQ      0x19
+>  #define NEWWORLD_PMU_IRQ       0x19
 > diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
-> index 4dd872c1a3..9138752ccb 100644
+> index 9138752ccb..fa9527410d 100644
 > --- a/hw/ppc/mac_oldworld.c
 > +++ b/hw/ppc/mac_oldworld.c
-> @@ -73,7 +73,7 @@ static uint64_t translate_kernel_address(void *opaque, uint64_t addr)
+> @@ -73,6 +73,15 @@ static uint64_t translate_kernel_address(void *opaque, uint64_t addr)
 >      return (addr & 0x0fffffff) + KERNEL_LOAD_ADDR;
 >  }
 >  
-> -static void ppc_heathrow_reset(void *opaque)
-> +static void ppc_heathrow_cpu_reset(void *opaque)
+> +static void ppc_heathrow_reset(MachineState *machine)
+> +{
+> +    HeathrowMachineState *m = HEATHROW_MACHINE(machine);
+> +
+> +    qemu_devices_reset();
+> +    pci_default_write_config(m->macio_pci, PCI_COMMAND, PCI_COMMAND_MEMORY, 2);
+> +    pci_default_write_config(m->macio_pci, PCI_BASE_ADDRESS_0, 0xf3000000, 4);
+> +}
+> +
+>  static void ppc_heathrow_cpu_reset(void *opaque)
 >  {
 >      PowerPCCPU *cpu = opaque;
+> @@ -91,6 +100,7 @@ const MemoryRegionOps machine_id_reg_ops = {
 >  
-> @@ -127,7 +127,7 @@ static void ppc_heathrow_init(MachineState *machine)
+>  static void ppc_heathrow_init(MachineState *machine)
+>  {
+> +    HeathrowMachineState *hm = HEATHROW_MACHINE(machine);
+>      ram_addr_t ram_size = machine->ram_size;
+>      const char *kernel_filename = machine->kernel_filename;
+>      const char *kernel_cmdline = machine->kernel_cmdline;
+> @@ -298,7 +308,8 @@ static void ppc_heathrow_init(MachineState *machine)
+>      ide_drive_get(hd, ARRAY_SIZE(hd));
 >  
->          /* Set time-base frequency to 16.6 Mhz */
->          cpu_ppc_tb_init(env,  TBFREQ);
-> -        qemu_register_reset(ppc_heathrow_reset, cpu);
-> +        qemu_register_reset(ppc_heathrow_cpu_reset, cpu);
->      }
+>      /* MacIO */
+> -    macio = OLDWORLD_MACIO(pci_create(pci_bus, -1, TYPE_OLDWORLD_MACIO));
+> +    hm->macio_pci = pci_create(pci_bus, -1, TYPE_OLDWORLD_MACIO);
+> +    macio = OLDWORLD_MACIO(hm->macio_pci);
+>      dev = DEVICE(macio);
+>      qdev_prop_set_uint64(dev, "frequency", tbfreq);
+>      object_property_set_link(OBJECT(macio), OBJECT(pic_dev), "pic",
+> @@ -450,6 +461,7 @@ static void heathrow_class_init(ObjectClass *oc, void *data)
 >  
->      /* allocate RAM */
+>      mc->desc = "Heathrow based PowerMAC";
+>      mc->init = ppc_heathrow_init;
+> +    mc->reset = ppc_heathrow_reset;
+>      mc->block_default_type = IF_IDE;
+>      mc->max_cpus = MAX_CPUS;
+>  #ifndef TARGET_PPC64
+> @@ -466,9 +478,10 @@ static void heathrow_class_init(ObjectClass *oc, void *data)
+>  }
+>  
+>  static const TypeInfo ppc_heathrow_machine_info = {
+> -    .name          = MACHINE_TYPE_NAME("g3beige"),
+> +    .name          = TYPE_HEATHROW_MACHINE,
+>      .parent        = TYPE_MACHINE,
+>      .class_init    = heathrow_class_init,
+> +    .instance_size = sizeof(HeathrowMachineState),
+>      .interfaces = (InterfaceInfo[]) {
+>          { TYPE_FW_PATH_PROVIDER },
+>          { }
 
-Technically this is a board level reset which just happens to pass the CPU for the
-opaque, so I'm not quite sold on this one (as an example look at mac_newworld.c where
-using the ELF load address for the PROM would require a dynamic NIP which is most
-conveniently accessed via a MachineState).
+This doesn't feel right to me - either the PROM should be configuring the BARs as it
+requires before trying to use the macio device, or the macio device has a fixed
+mapping. Possibly the latter could be true given that things are so early in the boot
+process?
+
+Are there any hints in the macio "reg" and "address" properties suggesting that this
+might be the case?
 
 
 ATB,
