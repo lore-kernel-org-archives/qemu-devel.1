@@ -7,72 +7,71 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E2B7C433E0
-	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 17:04:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AC8FC433E0
+	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 17:17:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D2310206D7
-	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 17:04:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 15A8B206A4
+	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 17:17:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AcEC+XNT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2310206D7
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cC4qFP4/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15A8B206A4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34062 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40420 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkW3D-0005IQ-2B
-	for qemu-devel@archiver.kernel.org; Sun, 14 Jun 2020 13:04:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35542)
+	id 1jkWGR-0002Yx-9o
+	for qemu-devel@archiver.kernel.org; Sun, 14 Jun 2020 13:17:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40344)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jkW2Z-0004ca-MR; Sun, 14 Jun 2020 13:03:27 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:44963)
+ id 1jkWFP-0001z8-NQ; Sun, 14 Jun 2020 13:16:43 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:40446)
  by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jkW2Y-0003RH-4e; Sun, 14 Jun 2020 13:03:27 -0400
-Received: by mail-wr1-x444.google.com with SMTP id y17so14676685wrn.11;
- Sun, 14 Jun 2020 10:03:14 -0700 (PDT)
+ id 1jkWFO-0005Lf-1r; Sun, 14 Jun 2020 13:16:43 -0400
+Received: by mail-wr1-x442.google.com with SMTP id h5so14754255wrc.7;
+ Sun, 14 Jun 2020 10:16:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:subject:to:references:from:autocrypt:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=f18LcKocwUA4j+gn6LBL6lVopyy2KsPDBe64BcnOzyw=;
- b=AcEC+XNT1HHHcDQrAMqGaNdZkNS+GtLhcB483bjWKSDCvByl7dsUV0a2rfsZn/JAzx
- PKiFxiKtaBk82Ee1aQQgPitUQqWQu/VYqJBQMTIUD28l5hUsLpct4oaMvtNgk1F61Gf6
- ikMry2u9TOYVOjV2ttBzHbfmgNcxYWdLfq7pyDKkDv19/CUVw5GI0vDtmFtveeqLbEt3
- I7WTIIbBnxlvPfaNRbvoCb55x0psPBRPL8PAswVUlUxXLNmwOJ/H6LqhyvXYyqjIS/vR
- +qEc74kgKb1ca/rhcAA7J8BEnS2qCBHFaPHmekGYoK6cLbGKWJaBE4QZXo6s559qQuU6
- 4J5w==
+ bh=A6ygokNgtS7TmGmx0HclCMjm3stS0K7lkEtgQh2kHak=;
+ b=cC4qFP4/8nGrjr/DyEu7ykPHjZVbF26XwkirvRv99+utVC3tLpxv0Y25lJUzxzfnjj
+ r1hqLR9dTVspjgc0qTk+Yq4jpWHn0Nk6C5w/EZ9k+1zMtYyGTN2KiBRZPB0/Wghag+M9
+ tUSEG2JLNTrTbuU6TlTfcpkdnioJLM1ZlTPy3DBE+oGxm+kMDkEkMzRGv+46v6advgv8
+ Cmbr5iQF7u7iPG5Uv6/ZUPo4AALDQEGsD4oBXWhOziba8BuMXikOP7ktO/iv34IsDECG
+ 5+991dkpF7kJ2ltaHQ/aexOYjODJT3aQ9twXwKrNmbfJPNVWBCcBjSyK3seoUNF2iuX2
+ Mhwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:subject:to:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=f18LcKocwUA4j+gn6LBL6lVopyy2KsPDBe64BcnOzyw=;
- b=OZJ72qC5HmmLxCVbgU2QxRc99KPfhxdhLWxsmgEyLdxjh7aJDCatKLmAaQL9wDS8Xq
- z0htENAJEabNvys6xyutSo3oouipvkMJF9j+vL8yBRySnSFMH0jXUutAg2p5+CXuyASp
- XMLbkKyq4Q18/HuYUMXAgJKviAHlDtxnT4+A9dtrjsA21klcKy/XLhXwGixPhetycdHm
- ilv1bJXskWU8FoKnJ57soIudNYtQFMmg4kxsVti2AaW7f2VvMp3RX9dDjKX9wYBVJ4P6
- 1bEzDvwOObuWJgDak5O5QkCCAMKD09JhRVSUJcJvliIdeb7FpGmh8mcm8KtQaxPJsZYs
- vYNQ==
-X-Gm-Message-State: AOAM531ra6UrGytjGTB4XsSjnOhZFyZz44YTBH9kCBZgKbdZUm6WTa/v
- 8XEDIrmYiVKNsljOFJGRjBs=
-X-Google-Smtp-Source: ABdhPJxx8LJLB7STAP8wX6tOtA/MfKPn49FDbykMnKYqU8ClzvAc19g5BfJCU54jU0PVGTTyCdzffQ==
-X-Received: by 2002:a5d:68cb:: with SMTP id p11mr23845618wrw.379.1592154193729; 
- Sun, 14 Jun 2020 10:03:13 -0700 (PDT)
+ bh=A6ygokNgtS7TmGmx0HclCMjm3stS0K7lkEtgQh2kHak=;
+ b=JTNOHtoLkCOmDzAjWy5/j24wriCKza6fWKKyH6o7+Kdb/AJHm4j5GLrO2+9TKY6XVK
+ 3IeQopDG7sbNx7oeDkAuT3lmA2W7vsEqkFKNZxBvaBqipFej8z22flZMMVw3iAcW8VZ7
+ Z8oIzT6zzU1FJVuAuQLNmDuSg3H9dWaqsSdHt1i4ZJl3Cqazc2hllrsoqt8ALuMIf3GI
+ EbtHuUk5A7T5TyF0alrFSNonuk8IARun/K3BGqv2F+OVX6nSudvzOGwf2EKg9cztI6u4
+ 70nzlBzoZhMWDkH5vpDbz+JLsFTi5f/1JNFtzVdWEExWdOSALETF4/GxHPUMjJO/umCG
+ e2yQ==
+X-Gm-Message-State: AOAM531go8SoEX4bvOg0HEA6hXyafeZfRMghiiO74ykiBB2vP3LBRkG6
+ G0XwPGL1d0gXrLFX5/afYE4=
+X-Google-Smtp-Source: ABdhPJxMdKc9RnlZ8hXpM06w1Z5UpkGUZxzIO6YWUN+w813W12GTS/2n9zjh9AqOOq17f7UvhUO2Lg==
+X-Received: by 2002:a5d:4bc5:: with SMTP id l5mr25343257wrt.104.1592154989995; 
+ Sun, 14 Jun 2020 10:16:29 -0700 (PDT)
 Received: from [192.168.1.40] (181.red-88-10-103.dynamicip.rima-tde.net.
  [88.10.103.181])
- by smtp.gmail.com with ESMTPSA id o20sm21656831wra.29.2020.06.14.10.03.12
+ by smtp.gmail.com with ESMTPSA id n189sm18833235wmb.43.2020.06.14.10.16.29
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sun, 14 Jun 2020 10:03:13 -0700 (PDT)
-Subject: Re: [PATCH 18/22] mac_via: move VIA1 portB write logic into
- mos6522_q800_via1_write()
+ Sun, 14 Jun 2020 10:16:29 -0700 (PDT)
+Subject: Re: [PATCH 22/22] adb: add ADB bus trace events
 To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
  qemu-ppc@nongnu.org, laurent@vivier.eu, fthain@telegraphics.com.au
 References: <20200614142840.10245-1-mark.cave-ayland@ilande.co.uk>
- <20200614142840.10245-19-mark.cave-ayland@ilande.co.uk>
+ <20200614142840.10245-23-mark.cave-ayland@ilande.co.uk>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
@@ -97,17 +96,17 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <734182d2-91f8-6799-e732-066f4b773d98@amsat.org>
-Date: Sun, 14 Jun 2020 19:03:12 +0200
+Message-ID: <ab46d38d-9b64-18c9-bd2f-08e48b1dc82f@amsat.org>
+Date: Sun, 14 Jun 2020 19:16:28 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200614142840.10245-19-mark.cave-ayland@ilande.co.uk>
+In-Reply-To: <20200614142840.10245-23-mark.cave-ayland@ilande.co.uk>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x442.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -133,76 +132,129 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hi Mark,
+
 On 6/14/20 4:28 PM, Mark Cave-Ayland wrote:
-> Currently the logic is split between the mos6522 portB_write() callback and
-> the memory region used to capture the VIA1 MMIO accesses. Move everything
-> into the latter mos6522_q800_via1_write() function to keep all the logic in
-> one place to make it easier to follow.
-> 
 > Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 > ---
->  hw/misc/mac_via.c | 24 ++++++++++--------------
->  1 file changed, 10 insertions(+), 14 deletions(-)
+>  hw/input/adb.c        | 23 ++++++++++++++++++++++-
+>  hw/input/trace-events |  7 +++++++
+>  2 files changed, 29 insertions(+), 1 deletion(-)
 > 
-> diff --git a/hw/misc/mac_via.c b/hw/misc/mac_via.c
-> index 669fdca4c4..4779236f95 100644
-> --- a/hw/misc/mac_via.c
-> +++ b/hw/misc/mac_via.c
-> @@ -801,11 +801,21 @@ static void mos6522_q800_via1_write(void *opaque, hwaddr addr, uint64_t val,
->                                      unsigned size)
+> diff --git a/hw/input/adb.c b/hw/input/adb.c
+> index fe0f6c7ef3..4976f52c36 100644
+> --- a/hw/input/adb.c
+> +++ b/hw/input/adb.c
+> @@ -29,10 +29,18 @@
+>  #include "qemu/module.h"
+>  #include "qemu/timer.h"
+>  #include "adb-internal.h"
+> +#include "trace.h"
+>  
+>  /* error codes */
+>  #define ADB_RET_NOTPRESENT (-2)
+>  
+> +static const char *adb_commands[] = {
+> +    "RESET", "FLUSH", "(Reserved 0x2)", "(Reserved 0x3)",
+> +    "Reserved (0x4)", "(Reserved 0x5)", "(Reserved 0x6)", "(Reserved 0x7)",
+> +    "LISTEN r0", "LISTEN r1", "LISTEN r2", "LISTEN r3",
+> +    "TALK r0", "TALK r1", "TALK r2", "TALK r3",
+> +};
+> +
+>  static void adb_device_reset(ADBDevice *d)
 >  {
->      MOS6522Q800VIA1State *v1s = MOS6522_Q800_VIA1(opaque);
-> +    MacVIAState *m = container_of(v1s, MacVIAState, mos6522_via1);
+>      qdev_reset_all(DEVICE(d));
+> @@ -86,9 +94,16 @@ static int do_adb_request(ADBBusState *s, uint8_t *obuf, const uint8_t *buf,
+>  
+>  int adb_request(ADBBusState *s, uint8_t *obuf, const uint8_t *buf, int len)
+>  {
+> +    int ret;
+> +
+> +    trace_adb_bus_request(buf[0] >> 4, adb_commands[buf[0] & 0xf], len);
+> +
+>      assert(s->autopoll_blocked);
+>  
+> -    return do_adb_request(s, obuf, buf, len);
+> +    ret = do_adb_request(s, obuf, buf, len);
+> +
+> +    trace_adb_bus_request_done(buf[0] >> 4, adb_commands[buf[0] & 0xf], ret);
+> +    return ret;
+>  }
+>  
+>  int adb_poll(ADBBusState *s, uint8_t *obuf, uint16_t poll_mask)
+> @@ -160,6 +175,8 @@ void adb_set_autopoll_mask(ADBBusState *s, uint16_t mask)
+>  
+>  void adb_autopoll_block(ADBBusState *s)
+>  {
+> +    trace_adb_bus_autopoll_block("autopoll BLOCKED");
+
+Regarding how trace backends work, in this case it is better
+to use a boolean value and let the backend do the formatting:
+
+       trace_adb_bus_autopoll_block(true);
+
+The rationale is it is easier for backends to filter on a
+bool (register) arg rather than fetching memory for strcmp.
+
+So format can be:
+
+adb_bus_autopoll_block(bool state) "autopoll is_blocked:%u"
+
+Anyway if you want to keep as it, it is cleaner to change the
+format as "autopoll %s".
+
+> +
+>      s->autopoll_blocked = true;
+
+This can also be:
+
+       trace_adb_bus_autopoll_block(s->autopoll_blocked);
+
+>  
+>      if (s->autopoll_enabled) {
+> @@ -169,6 +186,8 @@ void adb_autopoll_block(ADBBusState *s)
+>  
+>  void adb_autopoll_unblock(ADBBusState *s)
+>  {
+> +    trace_adb_bus_autopoll_block("autopoll UNBLOCKED");
+> +
+>      s->autopoll_blocked = false;
+
+Ditto:
+
+       trace_adb_bus_autopoll_block(s->autopoll_blocked);
+
+>  
+>      if (s->autopoll_enabled) {
+> @@ -183,7 +202,9 @@ static void adb_autopoll(void *opaque)
+>      ADBBusState *s = opaque;
+>  
+>      if (!s->autopoll_blocked) {
+> +        trace_adb_bus_autopoll_cb(s->autopoll_mask);
+>          s->autopoll_cb(s->autopoll_cb_opaque);
+> +        trace_adb_bus_autopoll_cb_done(s->autopoll_mask);
+>      }
+>  
+>      timer_mod(s->autopoll_timer,
+> diff --git a/hw/input/trace-events b/hw/input/trace-events
+> index 6f0d78241c..119d1ce2bd 100644
+> --- a/hw/input/trace-events
+> +++ b/hw/input/trace-events
+> @@ -14,6 +14,13 @@ adb_device_mouse_readreg(int reg, uint8_t val0, uint8_t val1) "reg %d obuf[0] 0x
+>  adb_device_mouse_request_change_addr(int devaddr) "change addr to 0x%x"
+>  adb_device_mouse_request_change_addr_and_handler(int devaddr, int handler) "change addr and handler to 0x%x, 0x%x"
+>  
+> +# adb.c
+> +adb_bus_request(uint8_t addr, const char *cmd, int size) "device 0x%x %s cmdsize=%d"
+> +adb_bus_request_done(uint8_t addr, const char *cmd, int size) "device 0x%x %s replysize=%d"
+> +adb_bus_autopoll_block(const char *s) "%s"
+> +adb_bus_autopoll_cb(uint16_t mask) "executing autopoll_cb with autopoll mask 0x%x"
+> +adb_bus_autopoll_cb_done(uint16_t mask) "done executing autopoll_cb with autopoll mask 0x%x"
+> +
+>  # pckbd.c
+>  pckbd_kbd_read_data(uint32_t val) "0x%02x"
+>  pckbd_kbd_read_status(int status) "0x%02x"
+> 
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
->      MOS6522State *ms = MOS6522(v1s);
->  
->      addr = (addr >> 9) & 0xf;
->      mos6522_write(ms, addr, val, size);
->  
-> +    switch (addr) {
-> +    case VIA_REG_B:
-> +        via1_rtc_update(m);
-> +        via1_adb_update(m);
-> +
-> +        v1s->last_b = ms->b;
-> +        break;
-> +    }
-> +
->      via1_one_second_update(v1s);
->      via1_VBL_update(v1s);
->  }
-> @@ -1034,18 +1044,6 @@ static TypeInfo mac_via_info = {
->  };
->  
->  /* VIA 1 */
-> -static void mos6522_q800_via1_portB_write(MOS6522State *s)
-> -{
-> -    MOS6522Q800VIA1State *v1s = container_of(s, MOS6522Q800VIA1State,
-> -                                             parent_obj);
-> -    MacVIAState *m = container_of(v1s, MacVIAState, mos6522_via1);
-> -
-> -    via1_rtc_update(m);
-> -    via1_adb_update(m);
-> -
-> -    v1s->last_b = s->b;
-> -}
-> -
->  static void mos6522_q800_via1_reset(DeviceState *dev)
->  {
->      MOS6522State *ms = MOS6522(dev);
-> @@ -1068,10 +1066,8 @@ static void mos6522_q800_via1_init(Object *obj)
->  static void mos6522_q800_via1_class_init(ObjectClass *oc, void *data)
->  {
->      DeviceClass *dc = DEVICE_CLASS(oc);
-> -    MOS6522DeviceClass *mdc = MOS6522_DEVICE_CLASS(oc);
->  
->      dc->reset = mos6522_q800_via1_reset;
-> -    mdc->portB_write = mos6522_q800_via1_portB_write;
->  }
->  
->  static const TypeInfo mos6522_q800_via1_type_info = {
-> 
-
 
