@@ -7,41 +7,41 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7A49C433E0
-	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 14:40:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B583C433DF
+	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 14:40:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9DB78206D7
-	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 14:40:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DB78206D7
+	by mail.kernel.org (Postfix) with ESMTPS id EF97C206D7
+	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 14:40:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF97C206D7
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33850 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34892 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkTno-0006HO-Sc
-	for qemu-devel@archiver.kernel.org; Sun, 14 Jun 2020 10:40:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51850)
+	id 1jkTo5-0006mR-6F
+	for qemu-devel@archiver.kernel.org; Sun, 14 Jun 2020 10:40:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52102)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jkTdy-00073q-TX; Sun, 14 Jun 2020 10:29:54 -0400
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:38402
+ id 1jkTed-0008Ox-GV; Sun, 14 Jun 2020 10:30:35 -0400
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:38458
  helo=mail.default.ilande.uk0.bigv.io)
  by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jkTdx-0005Eh-3e; Sun, 14 Jun 2020 10:29:54 -0400
+ id 1jkTeb-0005Ri-BT; Sun, 14 Jun 2020 10:30:35 -0400
 Received: from host217-39-64-113.range217-39.btcentralplus.com
  ([217.39.64.113] helo=kentang.home)
  by mail.default.ilande.uk0.bigv.io with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jkTdn-0006Hv-DC; Sun, 14 Jun 2020 15:29:50 +0100
+ id 1jkTeR-0006Hv-NI; Sun, 14 Jun 2020 15:30:31 +0100
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, laurent@vivier.eu,
  fthain@telegraphics.com.au
-Date: Sun, 14 Jun 2020 15:28:28 +0100
-Message-Id: <20200614142840.10245-11-mark.cave-ayland@ilande.co.uk>
+Date: Sun, 14 Jun 2020 15:28:34 +0100
+Message-Id: <20200614142840.10245-17-mark.cave-ayland@ilande.co.uk>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200614142840.10245-1-mark.cave-ayland@ilande.co.uk>
 References: <20200614142840.10245-1-mark.cave-ayland@ilande.co.uk>
@@ -49,8 +49,8 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 217.39.64.113
 X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: [PATCH 10/22] mac_via: convert to use ADBBusState internal autopoll
- variables
+Subject: [PATCH 16/22] cuda: add adb_autopoll_block() and
+ adb_autopoll_unblock() functions
 X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
 X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
 Received-SPF: pass client-ip=2001:41c9:1:41f::167;
@@ -79,107 +79,44 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Ensure that the CUDA buffer is protected from autopoll requests overwriting
+its contents whilst existing CUDA requests are in progress.
+
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 ---
- hw/misc/mac_via.c         | 22 ++++++++++------------
- include/hw/misc/mac_via.h |  1 -
- 2 files changed, 10 insertions(+), 13 deletions(-)
+ hw/misc/macio/cuda.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/hw/misc/mac_via.c b/hw/misc/mac_via.c
-index e05623d730..669fdca4c4 100644
---- a/hw/misc/mac_via.c
-+++ b/hw/misc/mac_via.c
-@@ -601,6 +601,8 @@ static void via1_rtc_update(MacVIAState *m)
- 
- static int adb_via_poll(MacVIAState *s, int state, uint8_t *data)
+diff --git a/hw/misc/macio/cuda.c b/hw/misc/macio/cuda.c
+index 716866ea34..3e46ab6864 100644
+--- a/hw/misc/macio/cuda.c
++++ b/hw/misc/macio/cuda.c
+@@ -114,6 +114,7 @@ static void cuda_update(CUDAState *s)
  {
+     MOS6522CUDAState *mcs = &s->mos6522_cuda;
+     MOS6522State *ms = MOS6522(mcs);
 +    ADBBusState *adb_bus = &s->adb_bus;
-+
-     if (state != ADB_STATE_IDLE) {
-         return 0;
-     }
-@@ -615,7 +617,8 @@ static int adb_via_poll(MacVIAState *s, int state, uint8_t *data)
+     int packet_received, len;
  
-     s->adb_data_in_index = 0;
-     s->adb_data_out_index = 0;
--    s->adb_data_in_size = adb_poll(&s->adb_bus, s->adb_data_in, 0xffff);
-+    s->adb_data_in_size = adb_poll(adb_bus, s->adb_data_in,
-+                                   adb_bus->autopoll_mask);
- 
-     if (s->adb_data_in_size) {
-         *data = s->adb_data_in[s->adb_data_in_index++];
-@@ -768,10 +771,6 @@ static void via_adb_poll(void *opaque)
-             s->b &= ~VIA1B_vADBInt;
-         }
-     }
--
--    timer_mod(m->adb_poll_timer,
--              qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
--              (NANOSECONDS_PER_SECOND / VIA_ADB_POLL_FREQ));
- }
- 
- static uint64_t mos6522_q800_via1_read(void *opaque, hwaddr addr, unsigned size)
-@@ -854,10 +853,9 @@ static void mac_via_reset(DeviceState *dev)
- {
-     MacVIAState *m = MAC_VIA(dev);
-     MOS6522Q800VIA1State *v1s = &m->mos6522_via1;
-+    ADBBusState *adb_bus = &m->adb_bus;
- 
--    timer_mod(m->adb_poll_timer,
--              qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
--              (NANOSECONDS_PER_SECOND / VIA_ADB_POLL_FREQ));
-+    adb_set_autopoll_enabled(adb_bus, true);
- 
-     timer_del(v1s->VBL_timer);
-     v1s->next_VBL = 0;
-@@ -872,6 +870,7 @@ static void mac_via_realize(DeviceState *dev, Error **errp)
- {
-     MacVIAState *m = MAC_VIA(dev);
-     MOS6522State *ms;
-+    ADBBusState *adb_bus = &m->adb_bus;
-     struct tm tm;
-     int ret;
- 
-@@ -904,7 +903,7 @@ static void mac_via_realize(DeviceState *dev, Error **errp)
-     qemu_get_timedate(&tm, 0);
-     m->tick_offset = (uint32_t)mktimegm(&tm) + RTC_OFFSET;
- 
--    m->adb_poll_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, via_adb_poll, m);
-+    adb_register_autopoll_callback(adb_bus, via_adb_poll, m);
-     m->adb_data_ready = qdev_get_gpio_in_named(dev, "via1-irq",
-                                                VIA1_IRQ_ADB_READY_BIT);
- 
-@@ -977,8 +976,8 @@ static int mac_via_post_load(void *opaque, int version_id)
- 
- static const VMStateDescription vmstate_mac_via = {
-     .name = "mac-via",
--    .version_id = 1,
--    .minimum_version_id = 1,
-+    .version_id = 2,
-+    .minimum_version_id = 2,
-     .post_load = mac_via_post_load,
-     .fields = (VMStateField[]) {
-         /* VIAs */
-@@ -1002,7 +1001,6 @@ static const VMStateDescription vmstate_mac_via = {
-         VMSTATE_INT32(wprotect, MacVIAState),
-         VMSTATE_INT32(alt, MacVIAState),
-         /* ADB */
--        VMSTATE_TIMER_PTR(adb_poll_timer, MacVIAState),
-         VMSTATE_INT32(adb_data_in_size, MacVIAState),
-         VMSTATE_INT32(adb_data_in_index, MacVIAState),
-         VMSTATE_INT32(adb_data_out_index, MacVIAState),
-diff --git a/include/hw/misc/mac_via.h b/include/hw/misc/mac_via.h
-index e74f85be0f..2aaf9e27bf 100644
---- a/include/hw/misc/mac_via.h
-+++ b/include/hw/misc/mac_via.h
-@@ -106,7 +106,6 @@ typedef struct MacVIAState {
- 
-     /* ADB */
-     ADBBusState adb_bus;
--    QEMUTimer *adb_poll_timer;
-     qemu_irq adb_data_ready;
-     int adb_data_in_size;
-     int adb_data_in_index;
+     packet_received = 0;
+@@ -124,6 +125,9 @@ static void cuda_update(CUDAState *s)
+             /* data output */
+             if ((ms->b & (TACK | TIP)) != (s->last_b & (TACK | TIP))) {
+                 if (s->data_out_index < sizeof(s->data_out)) {
++                    if (s->data_out_index == 0) {
++                        adb_autopoll_block(adb_bus);
++                    }
+                     trace_cuda_data_send(ms->sr);
+                     s->data_out[s->data_out_index++] = ms->sr;
+                     cuda_delay_set_sr_int(s);
+@@ -138,6 +142,7 @@ static void cuda_update(CUDAState *s)
+                     /* indicate end of transfer */
+                     if (s->data_in_index >= s->data_in_size) {
+                         ms->b = (ms->b | TREQ);
++                        adb_autopoll_unblock(adb_bus);
+                     }
+                     cuda_delay_set_sr_int(s);
+                 }
 -- 
 2.20.1
 
