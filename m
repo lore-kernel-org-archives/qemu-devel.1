@@ -6,41 +6,41 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1AB9C433DF
-	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 14:38:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B69EC433DF
+	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 14:39:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 75BE6206D7
-	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 14:38:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 75BE6206D7
+	by mail.kernel.org (Postfix) with ESMTPS id 60041206D7
+	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 14:39:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60041206D7
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57350 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58932 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkTmJ-0004L1-NP
-	for qemu-devel@archiver.kernel.org; Sun, 14 Jun 2020 10:38:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51694)
+	id 1jkTn1-0004z2-Mi
+	for qemu-devel@archiver.kernel.org; Sun, 14 Jun 2020 10:39:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52058)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jkTdq-0006jp-Ux; Sun, 14 Jun 2020 10:29:46 -0400
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:38396
+ id 1jkTeV-0008BJ-9A; Sun, 14 Jun 2020 10:30:27 -0400
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:38446
  helo=mail.default.ilande.uk0.bigv.io)
  by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jkTdp-0005E2-5o; Sun, 14 Jun 2020 10:29:46 -0400
+ id 1jkTeT-0005PO-K2; Sun, 14 Jun 2020 10:30:26 -0400
 Received: from host217-39-64-113.range217-39.btcentralplus.com
  ([217.39.64.113] helo=kentang.home)
  by mail.default.ilande.uk0.bigv.io with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jkTdk-0006Hv-67; Sun, 14 Jun 2020 15:29:43 +0100
+ id 1jkTeM-0006Hv-Po; Sun, 14 Jun 2020 15:30:23 +0100
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, laurent@vivier.eu,
  fthain@telegraphics.com.au
-Date: Sun, 14 Jun 2020 15:28:27 +0100
-Message-Id: <20200614142840.10245-10-mark.cave-ayland@ilande.co.uk>
+Date: Sun, 14 Jun 2020 15:28:33 +0100
+Message-Id: <20200614142840.10245-16-mark.cave-ayland@ilande.co.uk>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200614142840.10245-1-mark.cave-ayland@ilande.co.uk>
 References: <20200614142840.10245-1-mark.cave-ayland@ilande.co.uk>
@@ -48,8 +48,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 217.39.64.113
 X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: [PATCH 09/22] pmu: convert to use ADBBusState internal autopoll
- variables
+Subject: [PATCH 15/22] adb: add autopoll_blocked variable to block autopoll
 X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
 X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
 Received-SPF: pass client-ip=2001:41c9:1:41f::167;
@@ -78,148 +77,81 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Whilst autopoll is enabled it is necessary to prevent the ADB buffer contents
+from being overwritten until the host has read back the response in its
+entirety.
+
+Add adb_autopoll_block() and adb_autopoll_unblock() functions in preparation
+for ensuring that the ADB buffer contents are protected for explicit ADB
+requests.
+
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 ---
- hw/misc/macio/pmu.c         | 39 ++++++++++++++-----------------------
- include/hw/misc/macio/pmu.h |  3 ---
- 2 files changed, 15 insertions(+), 27 deletions(-)
+ hw/input/adb.c         | 21 +++++++++++++++++++++
+ include/hw/input/adb.h |  4 ++++
+ 2 files changed, 25 insertions(+)
 
-diff --git a/hw/misc/macio/pmu.c b/hw/misc/macio/pmu.c
-index edb061e417..e2291cc9f6 100644
---- a/hw/misc/macio/pmu.c
-+++ b/hw/misc/macio/pmu.c
-@@ -90,10 +90,11 @@ static void pmu_update_extirq(PMUState *s)
- static void pmu_adb_poll(void *opaque)
- {
-     PMUState *s = opaque;
-+    ADBBusState *adb_bus = &s->adb_bus;
-     int olen;
- 
-     if (!(s->intbits & PMU_INT_ADB)) {
--        olen = adb_poll(&s->adb_bus, s->adb_reply, s->adb_poll_mask);
-+        olen = adb_poll(adb_bus, s->adb_reply, adb_bus->autopoll_mask);
-         trace_pmu_adb_poll(olen);
- 
-         if (olen > 0) {
-@@ -102,9 +103,6 @@ static void pmu_adb_poll(void *opaque)
-             pmu_update_extirq(s);
-         }
-     }
--
--    timer_mod(s->adb_poll_timer,
--              qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) + s->autopoll_rate_ms);
- }
- 
- static void pmu_one_sec_timer(void *opaque)
-@@ -171,18 +169,15 @@ static void pmu_cmd_set_int_mask(PMUState *s,
- 
- static void pmu_cmd_set_adb_autopoll(PMUState *s, uint16_t mask)
- {
--    trace_pmu_cmd_set_adb_autopoll(mask);
-+    ADBBusState *adb_bus = &s->adb_bus;
- 
--    if (s->adb_poll_mask == mask) {
--        return;
--    }
-+    trace_pmu_cmd_set_adb_autopoll(mask);
- 
--    s->adb_poll_mask = mask;
-     if (mask) {
--        timer_mod(s->adb_poll_timer,
--                  qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) + s->autopoll_rate_ms);
-+        adb_set_autopoll_mask(adb_bus, mask);
-+        adb_set_autopoll_enabled(adb_bus, true);
-     } else {
--        timer_del(s->adb_poll_timer);
-+        adb_set_autopoll_enabled(adb_bus, false);
+diff --git a/hw/input/adb.c b/hw/input/adb.c
+index b3ad7c5fca..70aa1f4570 100644
+--- a/hw/input/adb.c
++++ b/hw/input/adb.c
+@@ -157,6 +157,26 @@ void adb_set_autopoll_mask(ADBBusState *s, uint16_t mask)
      }
  }
  
-@@ -265,6 +260,8 @@ static void pmu_cmd_adb_poll_off(PMUState *s,
-                                  const uint8_t *in_data, uint8_t in_len,
-                                  uint8_t *out_data, uint8_t *out_len)
- {
-+    ADBBusState *adb_bus = &s->adb_bus;
++void adb_autopoll_block(ADBBusState *s)
++{
++    s->autopoll_blocked = true;
 +
-     if (in_len != 0) {
-         qemu_log_mask(LOG_GUEST_ERROR,
-                       "PMU: ADB POLL OFF command, invalid len: %d want: 0\n",
-@@ -272,9 +269,8 @@ static void pmu_cmd_adb_poll_off(PMUState *s,
-         return;
-     }
- 
--    if (s->has_adb && s->adb_poll_mask) {
--        timer_del(s->adb_poll_timer);
--        s->adb_poll_mask = 0;
-+    if (s->has_adb) {
-+        adb_set_autopoll_enabled(adb_bus, false);
-     }
- }
- 
-@@ -682,12 +678,10 @@ static bool pmu_adb_state_needed(void *opaque)
- 
- static const VMStateDescription vmstate_pmu_adb = {
-     .name = "pmu/adb",
--    .version_id = 0,
--    .minimum_version_id = 0,
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-     .needed = pmu_adb_state_needed,
-     .fields = (VMStateField[]) {
--        VMSTATE_UINT16(adb_poll_mask, PMUState),
--        VMSTATE_TIMER_PTR(adb_poll_timer, PMUState),
-         VMSTATE_UINT8(adb_reply_size, PMUState),
-         VMSTATE_BUFFER(adb_reply, PMUState),
++    if (s->autopoll_enabled) {
++        timer_del(s->autopoll_timer);
++    }
++}
++
++void adb_autopoll_unblock(ADBBusState *s)
++{
++    s->autopoll_blocked = false;
++
++    if (s->autopoll_enabled) {
++        timer_mod(s->autopoll_timer,
++                  qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) +
++                  s->autopoll_rate_ms);
++    }
++}
++
+ static void adb_autopoll(void *opaque)
+ {
+     ADBBusState *s = opaque;
+@@ -184,6 +204,7 @@ static const VMStateDescription vmstate_adb_bus = {
+         VMSTATE_BOOL(autopoll_enabled, ADBBusState),
+         VMSTATE_UINT8(autopoll_rate_ms, ADBBusState),
+         VMSTATE_UINT16(autopoll_mask, ADBBusState),
++        VMSTATE_BOOL(autopoll_blocked, ADBBusState),
          VMSTATE_END_OF_LIST()
-@@ -712,7 +706,6 @@ static const VMStateDescription vmstate_pmu = {
-         VMSTATE_BUFFER(cmd_rsp, PMUState),
-         VMSTATE_UINT8(intbits, PMUState),
-         VMSTATE_UINT8(intmask, PMUState),
--        VMSTATE_UINT8(autopoll_rate_ms, PMUState),
-         VMSTATE_UINT32(tick_offset, PMUState),
-         VMSTATE_TIMER_PTR(one_sec_timer, PMUState),
-         VMSTATE_INT64(one_sec_target, PMUState),
-@@ -732,7 +725,6 @@ static void pmu_reset(DeviceState *dev)
-     s->intbits = 0;
- 
-     s->cmd_state = pmu_state_idle;
--    s->adb_poll_mask = 0;
- }
- 
- static void pmu_realize(DeviceState *dev, Error **errp)
-@@ -741,6 +733,7 @@ static void pmu_realize(DeviceState *dev, Error **errp)
-     SysBusDevice *sbd;
-     MOS6522State *ms;
-     DeviceState *d;
-+    ADBBusState *adb_bus = &s->adb_bus;
-     struct tm tm;
- 
-     /* Pass IRQ from 6522 */
-@@ -758,9 +751,7 @@ static void pmu_realize(DeviceState *dev, Error **errp)
-     if (s->has_adb) {
-         qbus_create_inplace(&s->adb_bus, sizeof(s->adb_bus), TYPE_ADB_BUS,
-                             dev, "adb.0");
--        s->adb_poll_timer = timer_new_ms(QEMU_CLOCK_VIRTUAL, pmu_adb_poll, s);
--        s->adb_poll_mask = 0xffff;
--        s->autopoll_rate_ms = 20;
-+        adb_register_autopoll_callback(adb_bus, pmu_adb_poll, s);
      }
- }
+ };
+diff --git a/include/hw/input/adb.h b/include/hw/input/adb.h
+index cff264739c..bb75a7b1e3 100644
+--- a/include/hw/input/adb.h
++++ b/include/hw/input/adb.h
+@@ -86,6 +86,7 @@ struct ADBBusState {
  
-diff --git a/include/hw/misc/macio/pmu.h b/include/hw/misc/macio/pmu.h
-index 4f34b6f9e7..72f75612b6 100644
---- a/include/hw/misc/macio/pmu.h
-+++ b/include/hw/misc/macio/pmu.h
-@@ -218,9 +218,6 @@ typedef struct PMUState {
-     /* ADB */
-     bool has_adb;
-     ADBBusState adb_bus;
--    uint16_t adb_poll_mask;
--    uint8_t autopoll_rate_ms;
--    QEMUTimer *adb_poll_timer;
-     uint8_t adb_reply_size;
-     uint8_t adb_reply[ADB_MAX_OUT_LEN];
+     QEMUTimer *autopoll_timer;
+     bool autopoll_enabled;
++    bool autopoll_blocked;
+     uint8_t autopoll_rate_ms;
+     uint16_t autopoll_mask;
+     void (*autopoll_cb)(void *opaque);
+@@ -96,6 +97,9 @@ int adb_request(ADBBusState *s, uint8_t *buf_out,
+                 const uint8_t *buf, int len);
+ int adb_poll(ADBBusState *s, uint8_t *buf_out, uint16_t poll_mask);
  
++void adb_autopoll_block(ADBBusState *s);
++void adb_autopoll_unblock(ADBBusState *s);
++
+ void adb_set_autopoll_enabled(ADBBusState *s, bool enabled);
+ void adb_set_autopoll_rate_ms(ADBBusState *s, int rate_ms);
+ void adb_set_autopoll_mask(ADBBusState *s, uint16_t mask);
 -- 
 2.20.1
 
