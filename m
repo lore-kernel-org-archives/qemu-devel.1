@@ -2,46 +2,45 @@ Return-Path: <SRS0=clLO=73=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B2C5C433DF
-	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 14:31:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7E12C433DF
+	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 14:32:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1F4E62071A
-	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 14:31:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F4E62071A
+	by mail.kernel.org (Postfix) with ESMTPS id 8A7E22071A
+	for <qemu-devel@archiver.kernel.org>; Sun, 14 Jun 2020 14:32:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A7E22071A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57830 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33912 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkTfK-0008Q5-CJ
-	for qemu-devel@archiver.kernel.org; Sun, 14 Jun 2020 10:31:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51648)
+	id 1jkTgi-0002CZ-Mf
+	for qemu-devel@archiver.kernel.org; Sun, 14 Jun 2020 10:32:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51394)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jkTdn-0006bz-T7; Sun, 14 Jun 2020 10:29:43 -0400
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:38388
+ id 1jkTdE-0005bu-1d; Sun, 14 Jun 2020 10:29:08 -0400
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:38338
  helo=mail.default.ilande.uk0.bigv.io)
  by eggs.gnu.org with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jkTdm-0005Do-1O; Sun, 14 Jun 2020 10:29:43 -0400
+ id 1jkTdC-000599-5v; Sun, 14 Jun 2020 10:29:07 -0400
 Received: from host217-39-64-113.range217-39.btcentralplus.com
  ([217.39.64.113] helo=kentang.home)
  by mail.default.ilande.uk0.bigv.io with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jkTdf-0006Hv-Kz; Sun, 14 Jun 2020 15:29:40 +0100
+ id 1jkTd3-0006Hv-Mn; Sun, 14 Jun 2020 15:29:04 +0100
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, laurent@vivier.eu,
  fthain@telegraphics.com.au
-Date: Sun, 14 Jun 2020 15:28:26 +0100
-Message-Id: <20200614142840.10245-9-mark.cave-ayland@ilande.co.uk>
+Date: Sun, 14 Jun 2020 15:28:20 +0100
+Message-Id: <20200614142840.10245-3-mark.cave-ayland@ilande.co.uk>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200614142840.10245-1-mark.cave-ayland@ilande.co.uk>
 References: <20200614142840.10245-1-mark.cave-ayland@ilande.co.uk>
@@ -49,8 +48,8 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 217.39.64.113
 X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: [PATCH 08/22] cuda: convert to use ADBBusState internal autopoll
- variables
+Subject: [PATCH 02/22] adb: fix adb-mouse read length and revert
+ disable-reg3-direct-writes workaround
 X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
 X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
 Received-SPF: pass client-ip=2001:41c9:1:41f::167;
@@ -79,183 +78,181 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Commit 84051eb400 "adb: add property to disable direct reg 3 writes" introduced
+a workaround for spurious writes to ADB register 3 when MacOS 9 enables
+autopoll on the mouse device. Further analysis shows that the problem is that
+only a partial request is sent, and since the len parameter is ignored then
+stale data from the previous request is used causing the incorrect address
+assignment.
+
+Remove the disable-reg3-direct-writes workaround and instead check the length
+parameter when the write is attempted, discarding the invalid request.
+
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 ---
- hw/misc/macio/cuda.c         | 56 +++++++++++++++---------------------
- include/hw/misc/macio/cuda.h |  4 ---
- 2 files changed, 23 insertions(+), 37 deletions(-)
+ hw/input/adb-kbd.c     | 26 +++++++++++------------
+ hw/input/adb-mouse.c   | 48 ++++++++++++++++++++++++------------------
+ hw/input/adb.c         |  7 ------
+ hw/ppc/mac_newworld.c  |  2 --
+ include/hw/input/adb.h |  1 -
+ 5 files changed, 40 insertions(+), 44 deletions(-)
 
-diff --git a/hw/misc/macio/cuda.c b/hw/misc/macio/cuda.c
-index a407f2abc8..716866ea34 100644
---- a/hw/misc/macio/cuda.c
-+++ b/hw/misc/macio/cuda.c
-@@ -199,18 +199,16 @@ static void cuda_send_packet_to_host(CUDAState *s,
- static void cuda_adb_poll(void *opaque)
- {
-     CUDAState *s = opaque;
-+    ADBBusState *adb_bus = &s->adb_bus;
-     uint8_t obuf[ADB_MAX_OUT_LEN + 2];
-     int olen;
- 
--    olen = adb_poll(&s->adb_bus, obuf + 2, s->adb_poll_mask);
-+    olen = adb_poll(adb_bus, obuf + 2, adb_bus->autopoll_mask);
-     if (olen > 0) {
-         obuf[0] = ADB_PACKET;
-         obuf[1] = 0x40; /* polled data */
-         cuda_send_packet_to_host(s, obuf, olen + 2);
-     }
+diff --git a/hw/input/adb-kbd.c b/hw/input/adb-kbd.c
+index a6d5c9b7c9..027dd3e531 100644
+--- a/hw/input/adb-kbd.c
++++ b/hw/input/adb-kbd.c
+@@ -259,21 +259,19 @@ static int adb_kbd_request(ADBDevice *d, uint8_t *obuf,
+                 trace_adb_kbd_request_change_addr(d->devaddr);
+                 break;
+             default:
+-                if (!d->disable_direct_reg3_writes) {
+-                    d->devaddr = buf[1] & 0xf;
 -
--    timer_mod(s->adb_poll_timer, qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) +
--              s->autopoll_rate_ms);
+-                    /* we support handlers:
+-                     * 1: Apple Standard Keyboard
+-                     * 2: Apple Extended Keyboard (LShift = RShift)
+-                     * 3: Apple Extended Keyboard (LShift != RShift)
+-                     */
+-                    if (buf[2] == 1 || buf[2] == 2 || buf[2] == 3) {
+-                        d->handler = buf[2];
+-                    }
+-
+-                    trace_adb_kbd_request_change_addr_and_handler(d->devaddr,
+-                                                                  d->handler);
++                d->devaddr = buf[1] & 0xf;
++                /*
++                 * we support handlers:
++                 * 1: Apple Standard Keyboard
++                 * 2: Apple Extended Keyboard (LShift = RShift)
++                 * 3: Apple Extended Keyboard (LShift != RShift)
++                 */
++                if (buf[2] == 1 || buf[2] == 2 || buf[2] == 3) {
++                    d->handler = buf[2];
+                 }
++
++                trace_adb_kbd_request_change_addr_and_handler(d->devaddr,
++                                                              d->handler);
+                 break;
+             }
+         }
+diff --git a/hw/input/adb-mouse.c b/hw/input/adb-mouse.c
+index aeba41bddd..78b6f5030c 100644
+--- a/hw/input/adb-mouse.c
++++ b/hw/input/adb-mouse.c
+@@ -135,6 +135,16 @@ static int adb_mouse_request(ADBDevice *d, uint8_t *obuf,
+         case 2:
+             break;
+         case 3:
++            /*
++             * MacOS 9 has a bug in its ADB driver whereby after configuring
++             * the ADB bus devices it sends another write of invalid length
++             * to reg 3. Make sure we ignore it to prevent an address clash
++             * with the previous device.
++             */
++            if (len != 3) {
++                return 0;
++            }
++
+             switch (buf[2]) {
+             case ADB_CMD_SELF_TEST:
+                 break;
+@@ -145,27 +155,25 @@ static int adb_mouse_request(ADBDevice *d, uint8_t *obuf,
+                 trace_adb_mouse_request_change_addr(d->devaddr);
+                 break;
+             default:
+-                if (!d->disable_direct_reg3_writes) {
+-                    d->devaddr = buf[1] & 0xf;
+-
+-                    /* we support handlers:
+-                     * 0x01: Classic Apple Mouse Protocol / 100 cpi operations
+-                     * 0x02: Classic Apple Mouse Protocol / 200 cpi operations
+-                     * we don't support handlers (at least):
+-                     * 0x03: Mouse systems A3 trackball
+-                     * 0x04: Extended Apple Mouse Protocol
+-                     * 0x2f: Microspeed mouse
+-                     * 0x42: Macally
+-                     * 0x5f: Microspeed mouse
+-                     * 0x66: Microspeed mouse
+-                     */
+-                    if (buf[2] == 1 || buf[2] == 2) {
+-                        d->handler = buf[2];
+-                    }
+-
+-                    trace_adb_mouse_request_change_addr_and_handler(
+-                        d->devaddr, d->handler);
++                d->devaddr = buf[1] & 0xf;
++                /*
++                 * we support handlers:
++                 * 0x01: Classic Apple Mouse Protocol / 100 cpi operations
++                 * 0x02: Classic Apple Mouse Protocol / 200 cpi operations
++                 * we don't support handlers (at least):
++                 * 0x03: Mouse systems A3 trackball
++                 * 0x04: Extended Apple Mouse Protocol
++                 * 0x2f: Microspeed mouse
++                 * 0x42: Macally
++                 * 0x5f: Microspeed mouse
++                 * 0x66: Microspeed mouse
++                 */
++                if (buf[2] == 1 || buf[2] == 2) {
++                    d->handler = buf[2];
+                 }
++
++                trace_adb_mouse_request_change_addr_and_handler(d->devaddr,
++                                                                d->handler);
+                 break;
+             }
+         }
+diff --git a/hw/input/adb.c b/hw/input/adb.c
+index bf1bc30d19..d85278a7b7 100644
+--- a/hw/input/adb.c
++++ b/hw/input/adb.c
+@@ -118,18 +118,11 @@ static void adb_device_realizefn(DeviceState *dev, Error **errp)
+     bus->devices[bus->nb_devices++] = d;
  }
  
- /* description of commands */
-@@ -226,23 +224,16 @@ static bool cuda_cmd_autopoll(CUDAState *s,
-                               const uint8_t *in_data, int in_len,
-                               uint8_t *out_data, int *out_len)
+-static Property adb_device_properties[] = {
+-    DEFINE_PROP_BOOL("disable-direct-reg3-writes", ADBDevice,
+-                     disable_direct_reg3_writes, false),
+-    DEFINE_PROP_END_OF_LIST(),
+-};
+-
+ static void adb_device_class_init(ObjectClass *oc, void *data)
  {
--    int autopoll;
-+    ADBBusState *adb_bus = &s->adb_bus;
-+    bool autopoll;
+     DeviceClass *dc = DEVICE_CLASS(oc);
  
-     if (in_len != 1) {
-         return false;
-     }
- 
--    autopoll = (in_data[0] != 0);
--    if (autopoll != s->autopoll) {
--        s->autopoll = autopoll;
--        if (autopoll) {
--            timer_mod(s->adb_poll_timer,
--                      qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) +
--                      s->autopoll_rate_ms);
--        } else {
--            timer_del(s->adb_poll_timer);
--        }
--    }
-+    autopoll = (in_data[0] != 0) ? true : false;
-+
-+    adb_set_autopoll_enabled(adb_bus, autopoll);
-     return true;
+     dc->realize = adb_device_realizefn;
+-    device_class_set_props(dc, adb_device_properties);
+     dc->bus_type = TYPE_ADB_BUS;
  }
  
-@@ -250,6 +241,8 @@ static bool cuda_cmd_set_autorate(CUDAState *s,
-                                   const uint8_t *in_data, int in_len,
-                                   uint8_t *out_data, int *out_len)
- {
-+    ADBBusState *adb_bus = &s->adb_bus;
-+
-     if (in_len != 1) {
-         return false;
-     }
-@@ -260,12 +253,7 @@ static bool cuda_cmd_set_autorate(CUDAState *s,
-         return false;
-     }
+diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
+index 3507f26f6e..12a2864341 100644
+--- a/hw/ppc/mac_newworld.c
++++ b/hw/ppc/mac_newworld.c
+@@ -404,11 +404,9 @@ static void ppc_core99_init(MachineState *machine)
  
--    s->autopoll_rate_ms = in_data[0];
--    if (s->autopoll) {
--        timer_mod(s->adb_poll_timer,
--                  qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) +
--                  s->autopoll_rate_ms);
--    }
-+    adb_set_autopoll_rate_ms(adb_bus, in_data[0]);
-     return true;
- }
+         adb_bus = qdev_get_child_bus(dev, "adb.0");
+         dev = qdev_create(adb_bus, TYPE_ADB_KEYBOARD);
+-        qdev_prop_set_bit(dev, "disable-direct-reg3-writes", true);
+         qdev_init_nofail(dev);
  
-@@ -273,11 +261,16 @@ static bool cuda_cmd_set_device_list(CUDAState *s,
-                                      const uint8_t *in_data, int in_len,
-                                      uint8_t *out_data, int *out_len)
- {
-+    ADBBusState *adb_bus = &s->adb_bus;
-+    uint16_t mask;
-+
-     if (in_len != 2) {
-         return false;
+         dev = qdev_create(adb_bus, TYPE_ADB_MOUSE);
+-        qdev_prop_set_bit(dev, "disable-direct-reg3-writes", true);
+         qdev_init_nofail(dev);
      }
  
--    s->adb_poll_mask = (((uint16_t)in_data[0]) << 8) | in_data[1];
-+    mask = (((uint16_t)in_data[0]) << 8) | in_data[1];
-+
-+    adb_set_autopoll_mask(adb_bus, mask);
-     return true;
- }
+diff --git a/include/hw/input/adb.h b/include/hw/input/adb.h
+index b7b32e2b16..4d2c565f54 100644
+--- a/include/hw/input/adb.h
++++ b/include/hw/input/adb.h
+@@ -49,7 +49,6 @@ struct ADBDevice {
  
-@@ -488,8 +481,8 @@ static const MemoryRegionOps mos6522_cuda_ops = {
+     int devaddr;
+     int handler;
+-    bool disable_direct_reg3_writes;
+ };
  
- static const VMStateDescription vmstate_cuda = {
-     .name = "cuda",
--    .version_id = 5,
--    .minimum_version_id = 5,
-+    .version_id = 6,
-+    .minimum_version_id = 6,
-     .fields = (VMStateField[]) {
-         VMSTATE_STRUCT(mos6522_cuda.parent_obj, CUDAState, 0, vmstate_mos6522,
-                        MOS6522State),
-@@ -498,13 +491,9 @@ static const VMStateDescription vmstate_cuda = {
-         VMSTATE_INT32(data_in_size, CUDAState),
-         VMSTATE_INT32(data_in_index, CUDAState),
-         VMSTATE_INT32(data_out_index, CUDAState),
--        VMSTATE_UINT8(autopoll, CUDAState),
--        VMSTATE_UINT8(autopoll_rate_ms, CUDAState),
--        VMSTATE_UINT16(adb_poll_mask, CUDAState),
-         VMSTATE_BUFFER(data_in, CUDAState),
-         VMSTATE_BUFFER(data_out, CUDAState),
-         VMSTATE_UINT32(tick_offset, CUDAState),
--        VMSTATE_TIMER_PTR(adb_poll_timer, CUDAState),
-         VMSTATE_TIMER_PTR(sr_delay_timer, CUDAState),
-         VMSTATE_END_OF_LIST()
-     }
-@@ -513,11 +502,13 @@ static const VMStateDescription vmstate_cuda = {
- static void cuda_reset(DeviceState *dev)
- {
-     CUDAState *s = CUDA(dev);
-+    ADBBusState *adb_bus = &s->adb_bus;
- 
-     s->data_in_size = 0;
-     s->data_in_index = 0;
-     s->data_out_index = 0;
--    s->autopoll = 0;
-+
-+    adb_set_autopoll_enabled(adb_bus, false);
- }
- 
- static void cuda_realize(DeviceState *dev, Error **errp)
-@@ -526,6 +517,7 @@ static void cuda_realize(DeviceState *dev, Error **errp)
-     SysBusDevice *sbd;
-     MOS6522State *ms;
-     DeviceState *d;
-+    ADBBusState *adb_bus = &s->adb_bus;
-     struct tm tm;
- 
-     /* Pass IRQ from 6522 */
-@@ -540,9 +532,7 @@ static void cuda_realize(DeviceState *dev, Error **errp)
-     s->sr_delay_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, cuda_set_sr_int, s);
-     s->sr_delay_ns = 20 * SCALE_US;
- 
--    s->adb_poll_timer = timer_new_ms(QEMU_CLOCK_VIRTUAL, cuda_adb_poll, s);
--    s->adb_poll_mask = 0xffff;
--    s->autopoll_rate_ms = 20;
-+    adb_register_autopoll_callback(adb_bus, cuda_adb_poll, s);
- }
- 
- static void cuda_init(Object *obj)
-diff --git a/include/hw/misc/macio/cuda.h b/include/hw/misc/macio/cuda.h
-index 5768075ac5..a8cf0be1ec 100644
---- a/include/hw/misc/macio/cuda.h
-+++ b/include/hw/misc/macio/cuda.h
-@@ -95,12 +95,8 @@ typedef struct CUDAState {
-     int data_out_index;
- 
-     qemu_irq irq;
--    uint16_t adb_poll_mask;
--    uint8_t autopoll_rate_ms;
--    uint8_t autopoll;
-     uint8_t data_in[128];
-     uint8_t data_out[16];
--    QEMUTimer *adb_poll_timer;
- } CUDAState;
- 
- #endif /* CUDA_H */
+ #define ADB_DEVICE_CLASS(cls) \
 -- 
 2.20.1
 
