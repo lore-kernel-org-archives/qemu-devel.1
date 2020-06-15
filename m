@@ -2,83 +2,80 @@ Return-Path: <SRS0=tJVC=74=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BCE2C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 07:25:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62065C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 07:27:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 22C682068E
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 07:25:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22C682068E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=canonical.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3279C2068E
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 07:27:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MUZTCVnl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3279C2068E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53148 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55496 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkjUS-0002yC-7o
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 03:25:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47608)
+	id 1jkjWz-00047Z-HC
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 03:27:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48038)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <christian.ehrhardt@canonical.com>)
- id 1jkjTu-0002XJ-Rn
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 03:24:34 -0400
-Received: from youngberry.canonical.com ([91.189.89.112]:43135)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_CBC_SHA1:128)
- (Exim 4.90_1) (envelope-from <christian.ehrhardt@canonical.com>)
- id 1jkjTs-00046E-SH
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 03:24:34 -0400
-Received: from mail-vs1-f69.google.com ([209.85.217.69])
- by youngberry.canonical.com with esmtps
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.86_2)
- (envelope-from <christian.ehrhardt@canonical.com>)
- id 1jkjTp-0004hG-Tt
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 07:24:30 +0000
-Received: by mail-vs1-f69.google.com with SMTP id b7so1704295vsh.14
- for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 00:24:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=mb5GvPq0DWHxlH1+kA1vodEW516AcRwabqpZs5YQmNs=;
- b=d/kjpOEUfHassN/qrVtrgiaBITnToQqR4zWkyLxQ2ufbN+0yiAt5RRWPVdFpePxmTF
- gUUvUGFTNctNRvkZnVzFwKm2vWTNnj+vffx5ydtXG5yWv/wR9Czx7iGDnjRaa3ooVd2L
- OusrXXC/XFD2QlzLe6IW/1EjapJTgzZDksDB6b6tRqZqfuoztVhvNS1e8vIb6weXvNN3
- GMsaR8ExOQwGfOjE7h3NU0dp2U67SqG84LVsfoHgqrFDUKh04+XkYaInopR0whCR7e6N
- tG5Eo09Km3+yveQH8bTCRDT54GMoHTU+2bRw6qsN3WWRNrMtn1v8des5UGDHeW5+PiWK
- XMag==
-X-Gm-Message-State: AOAM531HBi3ZXVgH4SIrEZUs0FpsgPpNg9/wKQObpO1DMPAWIgfxBklT
- jBP7c6mlsSn1aIbgOK8TLWS7yfl/IQE1gKCvsTsafsjZolqa8TFCp0Jx/RFotwJmRYoy7fli6ho
- VZ6wnZA0WBTFxneTHbUa1hKWmkxjfu7HA+43jnnaMeG/I2puI
-X-Received: by 2002:a1f:60d5:: with SMTP id u204mr16560986vkb.91.1592205869044; 
- Mon, 15 Jun 2020 00:24:29 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyaXDVz6nl5Zp7ucYuuUW8xYiU3hfR5+xTYVQhj2VNGOU9vNv4JxxwQC6Bh/V2I1ScwnIVTKVZO/MMlTiWzt+U=
-X-Received: by 2002:a1f:60d5:: with SMTP id u204mr16560975vkb.91.1592205868756; 
- Mon, 15 Jun 2020 00:24:28 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200604094425.63020-1-marcandre.lureau@redhat.com>
- <CAATJJ0KpmbbdojFy5uHyh01VdidBEBMBtcmqrKnMyhzASrN2hw@mail.gmail.com>
- <CAATJJ0+zTJBqNPV8e4A827Z-Hf0is1ocBFiZ3TmRb_2PV2HqQg@mail.gmail.com>
-In-Reply-To: <CAATJJ0+zTJBqNPV8e4A827Z-Hf0is1ocBFiZ3TmRb_2PV2HqQg@mail.gmail.com>
-From: Christian Ehrhardt <christian.ehrhardt@canonical.com>
-Date: Mon, 15 Jun 2020 09:24:02 +0200
-Message-ID: <CAATJJ0KrXxGeZ2zo7eejGFh_ika-CTpBkhu+M3nqR66o8k5CRQ@mail.gmail.com>
-Subject: Re: [PATCH] qga: fix assert regression on guest-shutdown
-To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Content-Type: multipart/alternative; boundary="00000000000037915805a81a51f4"
-Received-SPF: none client-ip=91.189.89.112;
- envelope-from=christian.ehrhardt@canonical.com; helo=youngberry.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 03:24:30
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10
-X-Spam_score_int: -68
-X-Spam_score: -6.9
-X-Spam_bar: ------
-X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, HTML_MESSAGE=0.001,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jkjWF-0003c4-A9
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 03:26:59 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30447
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jkjW8-0004fP-PN
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 03:26:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592206011;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:content-type:content-type;
+ bh=h2ykzcIixGwsxXRoKJ8JAYW4DjryARvaFM5dKgHkWFY=;
+ b=MUZTCVnl03vPmZqIOtFYX13IUkTGllxPyDb/d1v8GTDwdVEp6jJY3JEO5s3AI0kqtAaH+k
+ QD2DBpBsrEnVvlY9vDhyM42p+gaNf+Uuyc2+NINS/mkXAsS/Rm1//YWNstufceUceGH83k
+ DL88QHJRfCZkQ7OBhQPTP2HOplFCBpA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-131-mT_KEVYnNpSQeA2192dFZw-1; Mon, 15 Jun 2020 03:26:35 -0400
+X-MC-Unique: mT_KEVYnNpSQeA2192dFZw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 962A6873077;
+ Mon, 15 Jun 2020 07:26:34 +0000 (UTC)
+Received: from thuth.com (ovpn-112-111.ams2.redhat.com [10.36.112.111])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C9FA75D9CD;
+ Mon, 15 Jun 2020 07:26:31 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: qemu-devel@nongnu.org,
+	Hannes Reinecke <hare@suse.com>
+Subject: [PATCH] hw/scsi/megasas: Fix possible out-of-bounds array access in
+ tracepoints
+Date: Mon, 15 Jun 2020 09:26:29 +0200
+Message-Id: <20200615072629.32321-1-thuth@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=thuth@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 01:17:36
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -91,144 +88,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel <qemu-devel@nongnu.org>,
- Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: Fam Zheng <fam@euphon.net>, Paolo Bonzini <pbonzini@redhat.com>,
+ qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000037915805a81a51f4
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Some tracepoints in megasas.c use a guest-controlled value as an index
+into the mfi_frame_desc[] array. Thus a malicious guest could cause an
+out-of-bounds error here. Fortunately, the impact is very low since this
+can only happen when the corresponding tracepoints have been enabled
+before, but the problem should be fixed anyway with a proper check.
 
-On Tue, Jun 9, 2020 at 1:15 PM Christian Ehrhardt <
-christian.ehrhardt@canonical.com> wrote:
+Buglink: https://bugs.launchpad.net/qemu/+bug/1882065
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ hw/scsi/megasas.c | 36 +++++++++++++++++++++++-------------
+ 1 file changed, 23 insertions(+), 13 deletions(-)
 
->
->
-> On Thu, Jun 4, 2020 at 3:43 PM Christian Ehrhardt <
-> christian.ehrhardt@canonical.com> wrote:
->
->>
->>
->> On Thu, Jun 4, 2020 at 11:46 AM Marc-Andr=C3=A9 Lureau <
->> marcandre.lureau@redhat.com> wrote:
->>
->>> Since commit 781f2b3d1e ("qga: process_event() simplification"),
->>> send_response() is called unconditionally, but will assert when "rsp" i=
-s
->>> NULL. This may happen with QCO_NO_SUCCESS_RESP commands, such as
->>> "guest-shutdown".
->>>
->>> Fixes: 781f2b3d1e5ef389b44016a897fd55e7a780bf35
->>> Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
->>> Reported-by: Christian Ehrhardt <christian.ehrhardt@canonical.com>
->>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->>> ---
->>>  qga/main.c | 6 +++++-
->>>  1 file changed, 5 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/qga/main.c b/qga/main.c
->>> index f0e454f28d3..3febf3b0fdf 100644
->>> --- a/qga/main.c
->>> +++ b/qga/main.c
->>> @@ -531,7 +531,11 @@ static int send_response(GAState *s, const QDict
->>> *rsp)
->>>      QString *payload_qstr, *response_qstr;
->>>      GIOStatus status;
->>>
->>> -    g_assert(rsp && s->channel);
->>> +    g_assert(s->channel);
->>> +
->>> +    if (!rsp) {
->>> +        return 0;
->>> +    }
->>>
->>>
->>>
->> Thanks Marc-Andr=C3=A9,
->> LGTM and should fix the issues I was seeing.
->>
->> Reviewed-by: Christian Ehrhardt <christian.ehrhardt@canonical.com>
->>
->
-> In the meantime I also got to test this against the initially reported
-> issue, LGTM as well (ran as no-change backport onto 4.2).
->
-> Tested-by: Christian Ehrhardt <christian.ehrhardt@canonical.com>
->
+diff --git a/hw/scsi/megasas.c b/hw/scsi/megasas.c
+index af18c88b65..aa930226f8 100644
+--- a/hw/scsi/megasas.c
++++ b/hw/scsi/megasas.c
+@@ -54,10 +54,6 @@
+ #define MEGASAS_FLAG_USE_QUEUE64   1
+ #define MEGASAS_MASK_USE_QUEUE64   (1 << MEGASAS_FLAG_USE_QUEUE64)
+ 
+-static const char *mfi_frame_desc[] = {
+-    "MFI init", "LD Read", "LD Write", "LD SCSI", "PD SCSI",
+-    "MFI Doorbell", "MFI Abort", "MFI SMP", "MFI Stop"};
+-
+ typedef struct MegasasCmd {
+     uint32_t index;
+     uint16_t flags;
+@@ -183,6 +179,20 @@ static void megasas_frame_set_scsi_status(MegasasState *s,
+     stb_pci_dma(pci, frame + offsetof(struct mfi_frame_header, scsi_status), v);
+ }
+ 
++static inline const char *mfi_frame_desc(unsigned int cmd)
++{
++    static const char *mfi_frame_descs[] = {
++        "MFI init", "LD Read", "LD Write", "LD SCSI", "PD SCSI",
++        "MFI Doorbell", "MFI Abort", "MFI SMP", "MFI Stop"
++    };
++
++    if (cmd < ARRAY_SIZE(mfi_frame_descs)) {
++        return mfi_frame_descs[cmd];
++    }
++
++    return "Unknown";
++}
++
+ /*
+  * Context is considered opaque, but the HBA firmware is running
+  * in little endian mode. So convert it to little endian, too.
+@@ -1670,25 +1680,25 @@ static int megasas_handle_scsi(MegasasState *s, MegasasCmd *cmd,
+     if (is_logical) {
+         if (target_id >= MFI_MAX_LD || lun_id != 0) {
+             trace_megasas_scsi_target_not_present(
+-                mfi_frame_desc[frame_cmd], is_logical, target_id, lun_id);
++                mfi_frame_desc(frame_cmd), is_logical, target_id, lun_id);
+             return MFI_STAT_DEVICE_NOT_FOUND;
+         }
+     }
+     sdev = scsi_device_find(&s->bus, 0, target_id, lun_id);
+ 
+     cmd->iov_size = le32_to_cpu(cmd->frame->header.data_len);
+-    trace_megasas_handle_scsi(mfi_frame_desc[frame_cmd], is_logical,
++    trace_megasas_handle_scsi(mfi_frame_desc(frame_cmd), is_logical,
+                               target_id, lun_id, sdev, cmd->iov_size);
+ 
+     if (!sdev || (megasas_is_jbod(s) && is_logical)) {
+         trace_megasas_scsi_target_not_present(
+-            mfi_frame_desc[frame_cmd], is_logical, target_id, lun_id);
++            mfi_frame_desc(frame_cmd), is_logical, target_id, lun_id);
+         return MFI_STAT_DEVICE_NOT_FOUND;
+     }
+ 
+     if (cdb_len > 16) {
+         trace_megasas_scsi_invalid_cdb_len(
+-                mfi_frame_desc[frame_cmd], is_logical,
++                mfi_frame_desc(frame_cmd), is_logical,
+                 target_id, lun_id, cdb_len);
+         megasas_write_sense(cmd, SENSE_CODE(INVALID_OPCODE));
+         cmd->frame->header.scsi_status = CHECK_CONDITION;
+@@ -1706,7 +1716,7 @@ static int megasas_handle_scsi(MegasasState *s, MegasasCmd *cmd,
+     cmd->req = scsi_req_new(sdev, cmd->index, lun_id, cdb, cmd);
+     if (!cmd->req) {
+         trace_megasas_scsi_req_alloc_failed(
+-                mfi_frame_desc[frame_cmd], target_id, lun_id);
++                mfi_frame_desc(frame_cmd), target_id, lun_id);
+         megasas_write_sense(cmd, SENSE_CODE(NO_SENSE));
+         cmd->frame->header.scsi_status = BUSY;
+         s->event_count++;
+@@ -1751,17 +1761,17 @@ static int megasas_handle_io(MegasasState *s, MegasasCmd *cmd, int frame_cmd)
+     }
+ 
+     trace_megasas_handle_io(cmd->index,
+-                            mfi_frame_desc[frame_cmd], target_id, lun_id,
++                            mfi_frame_desc(frame_cmd), target_id, lun_id,
+                             (unsigned long)lba_start, (unsigned long)lba_count);
+     if (!sdev) {
+         trace_megasas_io_target_not_present(cmd->index,
+-            mfi_frame_desc[frame_cmd], target_id, lun_id);
++            mfi_frame_desc(frame_cmd), target_id, lun_id);
+         return MFI_STAT_DEVICE_NOT_FOUND;
+     }
+ 
+     if (cdb_len > 16) {
+         trace_megasas_scsi_invalid_cdb_len(
+-            mfi_frame_desc[frame_cmd], 1, target_id, lun_id, cdb_len);
++            mfi_frame_desc(frame_cmd), 1, target_id, lun_id, cdb_len);
+         megasas_write_sense(cmd, SENSE_CODE(INVALID_OPCODE));
+         cmd->frame->header.scsi_status = CHECK_CONDITION;
+         s->event_count++;
+@@ -1781,7 +1791,7 @@ static int megasas_handle_io(MegasasState *s, MegasasCmd *cmd, int frame_cmd)
+                             lun_id, cdb, cmd);
+     if (!cmd->req) {
+         trace_megasas_scsi_req_alloc_failed(
+-            mfi_frame_desc[frame_cmd], target_id, lun_id);
++            mfi_frame_desc(frame_cmd), target_id, lun_id);
+         megasas_write_sense(cmd, SENSE_CODE(NO_SENSE));
+         cmd->frame->header.scsi_status = BUSY;
+         s->event_count++;
+-- 
+2.18.1
 
-This LGTM with 2*reviews 1*tested and 11 days on the list without any
-negative feedback.
-I just wanted to re-check if there is anything else left for this to be
-committed?
-
---00000000000037915805a81a51f4
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">On Tue, Jun 9, 2020 at 1:15 PM Christ=
-ian Ehrhardt &lt;<a href=3D"mailto:christian.ehrhardt@canonical.com">christ=
-ian.ehrhardt@canonical.com</a>&gt; wrote:<br></div><blockquote class=3D"gma=
-il_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,2=
-04,204);padding-left:1ex"><div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><=
-div class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">On Thu, Jun=
- 4, 2020 at 3:43 PM Christian Ehrhardt &lt;<a href=3D"mailto:christian.ehrh=
-ardt@canonical.com" target=3D"_blank">christian.ehrhardt@canonical.com</a>&=
-gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0=
-px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex"><div =
-dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote"><div =
-dir=3D"ltr" class=3D"gmail_attr">On Thu, Jun 4, 2020 at 11:46 AM Marc-Andr=
-=C3=A9 Lureau &lt;<a href=3D"mailto:marcandre.lureau@redhat.com" target=3D"=
-_blank">marcandre.lureau@redhat.com</a>&gt; wrote:<br></div><blockquote cla=
-ss=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid =
-rgb(204,204,204);padding-left:1ex">Since commit 781f2b3d1e (&quot;qga: proc=
-ess_event() simplification&quot;),<br>
-send_response() is called unconditionally, but will assert when &quot;rsp&q=
-uot; is<br>
-NULL. This may happen with QCO_NO_SUCCESS_RESP commands, such as<br>
-&quot;guest-shutdown&quot;.<br>
-<br>
-Fixes: 781f2b3d1e5ef389b44016a897fd55e7a780bf35<br>
-Cc: Michael Roth &lt;<a href=3D"mailto:mdroth@linux.vnet.ibm.com" target=3D=
-"_blank">mdroth@linux.vnet.ibm.com</a>&gt;<br>
-Reported-by: Christian Ehrhardt &lt;<a href=3D"mailto:christian.ehrhardt@ca=
-nonical.com" target=3D"_blank">christian.ehrhardt@canonical.com</a>&gt;<br>
-Signed-off-by: Marc-Andr=C3=A9 Lureau &lt;<a href=3D"mailto:marcandre.lurea=
-u@redhat.com" target=3D"_blank">marcandre.lureau@redhat.com</a>&gt;<br>
----<br>
-=C2=A0qga/main.c | 6 +++++-<br>
-=C2=A01 file changed, 5 insertions(+), 1 deletion(-)<br>
-<br>
-diff --git a/qga/main.c b/qga/main.c<br>
-index f0e454f28d3..3febf3b0fdf 100644<br>
---- a/qga/main.c<br>
-+++ b/qga/main.c<br>
-@@ -531,7 +531,11 @@ static int send_response(GAState *s, const QDict *rsp)=
-<br>
-=C2=A0 =C2=A0 =C2=A0QString *payload_qstr, *response_qstr;<br>
-=C2=A0 =C2=A0 =C2=A0GIOStatus status;<br>
-<br>
--=C2=A0 =C2=A0 g_assert(rsp &amp;&amp; s-&gt;channel);<br>
-+=C2=A0 =C2=A0 g_assert(s-&gt;channel);<br>
-+<br>
-+=C2=A0 =C2=A0 if (!rsp) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 return 0;<br>
-+=C2=A0 =C2=A0 }<br>
-<br><br>
-</blockquote></div><div><br></div><div>Thanks Marc-Andr=C3=A9,</div><div>LG=
-TM and should fix the issues I was seeing.</div><br clear=3D"all"><div>Revi=
-ewed-by: Christian Ehrhardt &lt;<a href=3D"mailto:christian.ehrhardt@canoni=
-cal.com" target=3D"_blank">christian.ehrhardt@canonical.com</a>&gt;</div></=
-div></blockquote><div><br></div><div>In the meantime I also got to test thi=
-s against the initially reported issue, LGTM as well (ran as no-change back=
-port onto 4.2).</div><div><br></div><div>Tested-by: Christian Ehrhardt &lt;=
-<a href=3D"mailto:christian.ehrhardt@canonical.com" target=3D"_blank">chris=
-tian.ehrhardt@canonical.com</a>&gt;</div></div></div>
-</blockquote></div><br><div>This LGTM with 2*reviews 1*tested and 11 days o=
-n the list without any negative feedback.</div><div>I just wanted to re-che=
-ck if there is anything else left for this to be committed?</div></div>
-
---00000000000037915805a81a51f4--
 
