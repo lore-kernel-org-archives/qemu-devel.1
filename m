@@ -2,93 +2,127 @@ Return-Path: <SRS0=tJVC=74=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81ECFC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 10:04:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08C94C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 10:14:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4E21C2068E
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 10:04:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C7F5F206B7
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 10:14:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S0qbd6PU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E21C2068E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WBisuLbY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7F5F206B7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49054 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55728 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jklyZ-00023A-Ga
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 06:04:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44602)
+	id 1jkm8A-0005Wu-0u
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 06:14:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47572)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jklxK-0000X9-CI
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 06:03:06 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:29417
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jkm7Z-00056D-RW
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 06:13:41 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:29609
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jklxH-0001Yl-Pu
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 06:03:05 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jkm7T-0003GD-KT
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 06:13:40 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592215381;
+ s=mimecast20190719; t=1592216014;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=rLeDHP8+6xhVwNxOy8bdm9f03R3/6Et50BEQXRu9FXc=;
- b=S0qbd6PUFAGaegeE8D35PCKQSILPRvUahU352VH6uisecvGifn9QWhG2HB1LKZ2RJVanmB
- HmEBtL+HNcRqesX6LN5V+SRdg587De/wf55erAzlONBgeO2cv7I6uzV+FpDd2ayC6PzYMe
- bIo8YHJzMs17l2AJBR0dR0yt3ocyLnU=
-Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com
- [209.85.210.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-94-spW-MEETOGqr3ZcQ6aJ-Cg-1; Mon, 15 Jun 2020 06:02:59 -0400
-X-MC-Unique: spW-MEETOGqr3ZcQ6aJ-Cg-1
-Received: by mail-ot1-f71.google.com with SMTP id c2so6168355otb.2
- for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 03:02:59 -0700 (PDT)
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=/F+fJs/IglwSy1W4jigQ/SxZk05uXn55JHXEgTyk3Q8=;
+ b=WBisuLbYmNlrKCMPWCXRDyGtkZn3nSsjZNtwAssJArzqxd6DzNvt7JJD5fIMNKj5YrC6NJ
+ DX/8Tue9RHI4X0ITUISDpiefz9k1+ZSawVlSKXQyBCaaNq+tbqwqywGfu6Me4nnopvKhZg
+ VDV0VESSVtGI1S9mtS+WkWUL9DZymPg=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-181-nuA4iVeKMk-FuUYM1Axp_g-1; Mon, 15 Jun 2020 06:13:32 -0400
+X-MC-Unique: nuA4iVeKMk-FuUYM1Axp_g-1
+Received: by mail-wr1-f71.google.com with SMTP id e1so6881515wrm.3
+ for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 03:13:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=rLeDHP8+6xhVwNxOy8bdm9f03R3/6Et50BEQXRu9FXc=;
- b=OmZ5ICISn3EyExBwBTsYIbyGeKfuxHr6i2hfNWSAqzPfCwHlnMnxXbwpFyflEsN04c
- Bv8VYx+u6YftjbyF5ECaBwLnPVIKc7oEQBzgwOb+41mHrZQTefyWUDYLMF3y9zPCdFO8
- JAbOnJwNolI4jVBr3zB7QFBO2u8x1TjoIZJPBGDHt6rsdr82ehKVxKVmE/BWEe2igQbo
- 5+sRy+b2KDFvwh7b4yVu9yZoeTQpTLMrXsp6xBWPi2JQGNVZYtOYLDAdiBHDUI/7ZQ7p
- Sn/R+hTCJMOPGeK0dhtyIZ507qiWkDg6qayg97Jv87rsQmg/yVXmEhkKAkIiZxuqqEnE
- dbcA==
-X-Gm-Message-State: AOAM5307ibPxHm8CTElqMaT1K9KYIjXZOg4ej+HV/VWWuUSMYckHZ2f3
- dkqtrHDqzd/HLcVSlRO0Tg1OcT0ctKzRWdfyQh9fEI7QGvIDJW6Kv++ZVVv68zWbslEAakpQQw/
- qVtq19QM59aa14aBgNA44T6tSvvBLcUM=
-X-Received: by 2002:a4a:e658:: with SMTP id q24mr20459598oot.87.1592215378775; 
- Mon, 15 Jun 2020 03:02:58 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJypHq2UlIl1V77qQYJnFtHXa2PQIzOfCXod9KrGyIDmaCbKkTCvQfIQtJRHHVG/5f9Sksgqw/7C1V2aawaixHw=
-X-Received: by 2002:a4a:e658:: with SMTP id q24mr20459572oot.87.1592215378500; 
- Mon, 15 Jun 2020 03:02:58 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=/F+fJs/IglwSy1W4jigQ/SxZk05uXn55JHXEgTyk3Q8=;
+ b=n+fCFdMqyIp/N+e3kzjn9XD2PkVRb9vQ/0CSipOjVTt92lIjrTPaAhhSFiMgFJQqaT
+ HFAC+DayU51AiRX1enw04dQOb3cihtq52gae0ISLPztjjrWrSi6ZETCl8iBZq/MucBRO
+ CJMW7bMKshR2efWsedrGJv799d4/fqhtTcIl/4AmUen+wN53sBSBRTdVOOkxsiSWdzXE
+ 2OjHzSFR0exBXGddHBWIYPUdnjZRLbEp20Na8271HxwqimBYmi/vHDqF7GD9F9G9O6fW
+ GtcngD0vQF3gH8kllOrkQu+pOWHWpOCGVwxAAEdqfl6my+M5pj2fj56ETr9TDrRgkT0Q
+ mUUg==
+X-Gm-Message-State: AOAM530RqdqE0byC/iRPB1RwNDW98d4Bdc0Rka+E+zA9WNlj5XUUB/Hg
+ qiCh26W5m+KpNub9RbyL0BOYIFyPTnfASD5RQzwhjIZv3YQ8HdAU4IX8klGlNVXLijXJ0YoPbtP
+ fodGcTurHRNU0Rxg=
+X-Received: by 2002:a5d:4090:: with SMTP id o16mr27659250wrp.354.1592216011594; 
+ Mon, 15 Jun 2020 03:13:31 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzP67opBMj598Qazy0GF0d+Yz6rtO3h1h0W/aimpJdX/8s7AhErmNh5AHaS4NZcorc1656GQw==
+X-Received: by 2002:a5d:4090:: with SMTP id o16mr27659231wrp.354.1592216011383; 
+ Mon, 15 Jun 2020 03:13:31 -0700 (PDT)
+Received: from [192.168.1.40] (181.red-88-10-103.dynamicip.rima-tde.net.
+ [88.10.103.181])
+ by smtp.gmail.com with ESMTPSA id f2sm2665912wmj.39.2020.06.15.03.13.30
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 15 Jun 2020 03:13:30 -0700 (PDT)
+Subject: Re: [PATCH v1 2/2] semihosting: don't send the trailing '\0'
+To: konrad@adacore.com, qemu-devel@nongnu.org
+References: <1592215252-26742-1-git-send-email-frederic.konrad@adacore.com>
+ <1592215252-26742-2-git-send-email-frederic.konrad@adacore.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <fff8f08b-5fbe-93ff-d0e9-c45940f649c6@redhat.com>
+Date: Mon, 15 Jun 2020 12:13:29 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-References: <20200612141917.9446-1-mst@redhat.com>
- <20200612141917.9446-21-mst@redhat.com>
-In-Reply-To: <20200612141917.9446-21-mst@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Date: Mon, 15 Jun 2020 12:02:47 +0200
-Message-ID: <CAP+75-V7YX9Kw86konzTv=urYF_hi3ht5eWUtRqALJGZ-WLEDQ@mail.gmail.com>
-Subject: Re: [PULL v2 20/58] bios-tables-test: Add Q35/TPM-TIS test
-To: "Michael S. Tsirkin" <mst@redhat.com>, Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <1592215252-26742-2-git-send-email-frederic.konrad@adacore.com>
+Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 01:12:36
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 01:43:27
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -102,135 +136,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Igor Mammedov <imammedo@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: KONRAD Frederic <frederic.konrad@adacore.com>, alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jun 12, 2020 at 5:00 PM Michael S. Tsirkin <mst@redhat.com> wrote:
->
-> From: Eric Auger <eric.auger@redhat.com>
->
-> Test tables specific to the TPM-TIS instantiation.
-> The TPM2 is added in the framework. Also the DSDT
-> is updated with the TPM. The new function should be
-> be usable for CRB as well, later one.
->
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->
-> Message-Id: <20200609125409.24179-5-eric.auger@redhat.com>
-> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+On 6/15/20 12:00 PM, konrad@adacore.com wrote:
+> From: KONRAD Frederic <frederic.konrad@adacore.com>
+> 
+> Don't send the trailing 0 from the string.
+> 
+
+Fixes: a331c6d7741
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+> Signed-off-by: KONRAD Frederic <frederic.konrad@adacore.com>
 > ---
->  tests/qtest/bios-tables-test.c | 58 ++++++++++++++++++++++++++++++++++
->  tests/qtest/Makefile.include   |  1 +
->  2 files changed, 59 insertions(+)
->
-> diff --git a/tests/qtest/bios-tables-test.c b/tests/qtest/bios-tables-test.c
-> index c9843829b3..53f104a9c5 100644
-> --- a/tests/qtest/bios-tables-test.c
-> +++ b/tests/qtest/bios-tables-test.c
-> @@ -57,6 +57,9 @@
->  #include "qemu/bitmap.h"
->  #include "acpi-utils.h"
->  #include "boot-sector.h"
-> +#include "tpm-emu.h"
-> +#include "hw/acpi/tpm.h"
-> +
->
->  #define MACHINE_PC "pc"
->  #define MACHINE_Q35 "q35"
-> @@ -874,6 +877,60 @@ static void test_acpi_piix4_tcg_numamem(void)
->      free_test_data(&data);
->  }
->
-> +uint64_t tpm_tis_base_addr;
-> +
-> +static void test_acpi_tcg_tpm(const char *machine, const char *tpm_if,
-> +                              uint64_t base)
-> +{
-> +    gchar *tmp_dir_name = g_strdup_printf("qemu-test_acpi_%s_tcg_%s.XXXXXX",
-> +                                          machine, tpm_if);
-> +    char *tmp_path = g_dir_make_tmp(tmp_dir_name, NULL);
-> +    TestState test;
-> +    test_data data;
-> +    GThread *thread;
-> +    char *args, *variant = g_strdup_printf(".%s", tpm_if);
-> +
-> +    tpm_tis_base_addr = base;
-> +
-> +    module_call_init(MODULE_INIT_QOM);
-> +
-> +    test.addr = g_new0(SocketAddress, 1);
-> +    test.addr->type = SOCKET_ADDRESS_TYPE_UNIX;
-> +    test.addr->u.q_unix.path = g_build_filename(tmp_path, "sock", NULL);
-> +    g_mutex_init(&test.data_mutex);
-> +    g_cond_init(&test.data_cond);
-> +    test.data_cond_signal = false;
-> +
-> +    thread = g_thread_new(NULL, tpm_emu_ctrl_thread, &test);
-> +    tpm_emu_test_wait_cond(&test);
-> +
-> +    memset(&data, 0, sizeof(data));
-> +    data.machine = machine;
-> +    data.variant = variant;
-> +
-> +    args = g_strdup_printf(
-> +        " -chardev socket,id=chr,path=%s"
-> +        " -tpmdev emulator,id=dev,chardev=chr"
-
-This test makes our CI fail:
-https://gitlab.com/qemu-project/qemu/-/jobs/593586369#L3466
-
-> +        " -device tpm-%s,tpmdev=dev",
-> +        test.addr->u.q_unix.path, tpm_if);
-> +
-> +    test_acpi_one(args, &data);
-> +
-> +    g_thread_join(thread);
-> +    g_unlink(test.addr->u.q_unix.path);
-> +    qapi_free_SocketAddress(test.addr);
-> +    g_rmdir(tmp_path);
-> +    g_free(variant);
-> +    g_free(tmp_path);
-> +    g_free(tmp_dir_name);
-> +    free_test_data(&data);
-> +}
-> +
-> +static void test_acpi_q35_tcg_tpm_tis(void)
-> +{
-> +    test_acpi_tcg_tpm("q35", "tis", 0xFED40000);
-> +}
-> +
->  static void test_acpi_tcg_dimm_pxm(const char *machine)
->  {
->      test_data data;
-> @@ -1037,6 +1094,7 @@ int main(int argc, char *argv[])
->              return ret;
->          }
->
-> +        qtest_add_func("acpi/q35/tpm-tis", test_acpi_q35_tcg_tpm_tis);
->          qtest_add_func("acpi/piix4", test_acpi_piix4_tcg);
->          qtest_add_func("acpi/piix4/bridge", test_acpi_piix4_tcg_bridge);
->          qtest_add_func("acpi/q35", test_acpi_q35_tcg);
-> diff --git a/tests/qtest/Makefile.include b/tests/qtest/Makefile.include
-> index 9e5a51d033..5023fa413d 100644
-> --- a/tests/qtest/Makefile.include
-> +++ b/tests/qtest/Makefile.include
-> @@ -262,6 +262,7 @@ tests/qtest/hd-geo-test$(EXESUF): tests/qtest/hd-geo-test.o $(libqos-obj-y)
->  tests/qtest/boot-order-test$(EXESUF): tests/qtest/boot-order-test.o $(libqos-obj-y)
->  tests/qtest/boot-serial-test$(EXESUF): tests/qtest/boot-serial-test.o $(libqos-obj-y)
->  tests/qtest/bios-tables-test$(EXESUF): tests/qtest/bios-tables-test.o \
-> +        tests/qtest/tpm-emu.o $(test-io-obj-y) \
->         tests/qtest/boot-sector.o tests/qtest/acpi-utils.o $(libqos-obj-y)
->  tests/qtest/pxe-test$(EXESUF): tests/qtest/pxe-test.o tests/qtest/boot-sector.o $(libqos-obj-y)
->  tests/qtest/microbit-test$(EXESUF): tests/qtest/microbit-test.o
-> --
-> MST
->
->
+>  hw/semihosting/console.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/semihosting/console.c b/hw/semihosting/console.c
+> index 22e7827..9b4fee9 100644
+> --- a/hw/semihosting/console.c
+> +++ b/hw/semihosting/console.c
+> @@ -52,7 +52,9 @@ static GString *copy_user_string(CPUArchState *env, target_ulong addr)
+>  
+>      do {
+>          if (cpu_memory_rw_debug(cpu, addr++, &c, 1, 0) == 0) {
+> -            s = g_string_append_c(s, c);
+> +            if (c) {
+> +                s = g_string_append_c(s, c);
+> +            }
+>          } else {
+>              qemu_log_mask(LOG_GUEST_ERROR,
+>                            "%s: passed inaccessible address " TARGET_FMT_lx,
+> 
 
 
