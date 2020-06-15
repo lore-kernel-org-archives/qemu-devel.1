@@ -2,115 +2,115 @@ Return-Path: <SRS0=tJVC=74=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
 	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31DB6C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 09:47:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70016C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 09:48:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EF6432065F
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 09:47:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3C5672065F
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 09:48:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="P5qpoLq2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF6432065F
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="vvYxP353"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C5672065F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59452 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34482 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkli3-0001gE-6t
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 05:47:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40400)
+	id 1jkljM-00035j-Gk
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 05:48:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40976)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jklfH-0007pw-18; Mon, 15 Jun 2020 05:44:27 -0400
-Received: from mail-db8eur05on2114.outbound.protection.outlook.com
- ([40.107.20.114]:50272 helo=EUR05-DB8-obe.outbound.protection.outlook.com)
+ id 1jklhz-0001rz-Id; Mon, 15 Jun 2020 05:47:15 -0400
+Received: from mail-eopbgr60127.outbound.protection.outlook.com
+ ([40.107.6.127]:50754 helo=EUR04-DB3-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jklfF-0006Lq-D8; Mon, 15 Jun 2020 05:44:26 -0400
+ id 1jklhx-0007EF-VT; Mon, 15 Jun 2020 05:47:15 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=eIZUX4hZr/M0CUkBvuxv8EkJn92+U8fhoAKgdbUfRJTcjBuFDFso5Q8+EpWozP9iNLBLwDSa+sqnbchDgJq+iKZZUJ8ShTy5KhCyxxJHKBukMeCQLfowHKvjjCb5CbeKjMtgmjW0Rpf+0BMZijB4LBjmfpaV85ik5F52r+5AGz/MUnwqiKMbUHvf4BxC4BMqe7w9eI6FCj/boFr7qPTDJ8E2QA7xW826IH4Jkk8quHJHAwkqlLM53UjBKttGsXR1eD8sZvfZS9I3mXyyFD+i9QXy7TuduFjym8i0mMAzXV3dNcUPJP4hvT0BiGnEb6QPjboncFCjz466XmMXSG5YNA==
+ b=IUrZD1U/LtvZo7cLY63YHppaTxr/NHn/t1iMsW9wEZya/T2FizxR0yx5dIsxHND1/BiZKs1+5yPvXhpvX8FfLLeWxIB74nn1YzQMZOTwj/jhSYSC2ICH9I5fIpFwQg7pQ+R+LK3QMWz/qUjnOcS7Lz8lJW7P2SA5q+p/vV0VtZb8+NUocn28NKrPDqf3pPAwpa3B+k9vcdyj8fg35vI38JjIIW8BQMqdmNMPR1u5iUw3FD4RZqxYAxDM/GLaTficlbGyTpGpkWXWIsf/pgWjwhAvXTKK/jGxtaS/xg1ABJeS3nmrcNEgbAztAki914u21rPq+iCrbhpLBIMlhYmIKA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ovFVMR9BiACTdWaCDAcuNsVk0qjBuMBpkab6QgsgboE=;
- b=CzSauLYxLFERaj3UW3epJhKL/G89L91R8DCuwgnmWsL+AE7LJCqdRF1eRhsjHgln/5TeIAPZn8/aep2Ua3lzj5cc6UUf1JrjZ5SzhOgAyi0QbS7VxvbmtV1JV1cvNXyFX48tG7AtGVu3KxF7n9sQXHEUvHRYlWDHXoyD5IuRMCLtMLk+CPg+RqCmyRr5pvESAdmBwa0i1ssK8zr/xckwhjW0G4c9ny51MavHdKheUJ3haJ0p4Owdl/1otsks3vo+BqPo4bC3/S5Z99MUZN7KZ4UOip1qhRHArNloA1feorScMDeVnhzt2rZ3Y3Fke3Vgj+I8eJd4QuUdChHgGjmmog==
+ bh=ZyqOzCmv2w6NneYc7jdWkb/9lQsUnXSL4Kan7YfPkXs=;
+ b=UEmBRXEjh2/kf17k31pm4dC3YP0vITR7icQMPTQzcUVvorczX1vvI/Rhmq+BMvn3Dgr3Kqkg5v6lBWpAb+VVU4imkvI3xKnpWHQzBeX5QY75AapjfkNr2pDuPG5sPVjl6pn/a6uI3vqao9XE5DKmjUKg3Fv29RLstt+viCgq6IzvjuUHv01js9SjeDQYESIs18Da/eJOaoNVNUz57tsH1fAR8p0m/XJ6lRtiplGbyyGwPGn8bcYLn655jq4Sjez1608VvrUKuhWjfJu3TCvKIyLOHd/dNQQ6zRlzUtOq/dASS2u/zZ2PVAmBBVu7Q4EkHsgGlW88q2pFCb0OUY9HKA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
  header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ovFVMR9BiACTdWaCDAcuNsVk0qjBuMBpkab6QgsgboE=;
- b=P5qpoLq2Zde8eiW3iCYuw5cVpui3isbq9xMIms0Mcb0JsFbADxvNaLDmjK2kFOVsPfEr+hR1p9xnL5IpFMlb9FfrjKGBIx1Fg7DIh5+lf/8ezDKD+CXxtFq78bFTO6KtMkUBw+RA8tBrr0xtuirr2pizrtAhjWcQfmpMJ+t/G7w=
+ bh=ZyqOzCmv2w6NneYc7jdWkb/9lQsUnXSL4Kan7YfPkXs=;
+ b=vvYxP353tLpqOUQeHsU2V3j5GGsobmugSso2J4TdJUE/rcEQ+PxMhVVK1Bo+jDfIjqMrRZ9q7KQbDjF4vRpad0bcsAkpmOrdqiMuQC9p67wGeinvr3m8WKKfL9Q1U4VzBGcIzdoeDUIEVpk87TIlbXxaIZhFcbaCQaLLZ4jL7sg=
 Authentication-Results: openvz.org; dkim=none (message not signed)
  header.d=none;openvz.org; dmarc=none action=none header.from=virtuozzo.com;
 Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM7PR08MB5448.eurprd08.prod.outlook.com (2603:10a6:20b:106::10)
+ by AM7PR08MB5415.eurprd08.prod.outlook.com (2603:10a6:20b:10d::10)
  with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3088.22; Mon, 15 Jun
- 2020 09:44:23 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3088.21; Mon, 15 Jun
+ 2020 09:47:11 +0000
 Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
  ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
  ([fe80::a408:2f0f:bc6c:d312%3]) with mapi id 15.20.3088.028; Mon, 15 Jun 2020
- 09:44:23 +0000
-Subject: Re: [PATCH v7 2/9] qcow2: Fix capitalization of header extension
- constant.
+ 09:47:11 +0000
+Subject: Re: [PATCH v7 3/9] qcow2_format.py: make printable data an extension
+ class member
 To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-block@nongnu.org
 References: <1591920302-1002219-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <1591920302-1002219-3-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <1591920302-1002219-4-git-send-email-andrey.shinkevich@virtuozzo.com>
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <0848cc66-d909-8537-5277-320ecef35925@virtuozzo.com>
-Date: Mon, 15 Jun 2020 12:44:20 +0300
+Message-ID: <4e340353-2a5b-3a96-8ffa-ece2e024b2e3@virtuozzo.com>
+Date: Mon, 15 Jun 2020 12:47:09 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.1
-In-Reply-To: <1591920302-1002219-3-git-send-email-andrey.shinkevich@virtuozzo.com>
+In-Reply-To: <1591920302-1002219-4-git-send-email-andrey.shinkevich@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR2P281CA0016.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:a::26) To AM7PR08MB5494.eurprd08.prod.outlook.com
+X-ClientProxiedBy: AM0PR07CA0029.eurprd07.prod.outlook.com
+ (2603:10a6:208:ac::42) To AM7PR08MB5494.eurprd08.prod.outlook.com
  (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
 Received: from [192.168.100.2] (185.215.60.182) by
- FR2P281CA0016.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10:a::26) with Microsoft
+ AM0PR07CA0029.eurprd07.prod.outlook.com (2603:10a6:208:ac::42) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3088.23 via Frontend Transport; Mon, 15 Jun 2020 09:44:21 +0000
+ 15.20.3109.10 via Frontend Transport; Mon, 15 Jun 2020 09:47:10 +0000
 X-Originating-IP: [185.215.60.182]
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 45500061-3f39-4f43-6a2a-08d81110aec9
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5448:
+X-MS-Office365-Filtering-Correlation-Id: ec398d20-5608-421f-12fd-08d811111385
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5415:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM7PR08MB544866BB7204248F08CE7B5EC19C0@AM7PR08MB5448.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:3631;
+X-Microsoft-Antispam-PRVS: <AM7PR08MB5415A9AF76F2922CFADA6C1AC19C0@AM7PR08MB5415.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
 X-Forefront-PRVS: 04359FAD81
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: kypJroPoc858cfXxd9P47ZGVt0fonSFStHWFBoiGBR0p7F9B9ggoieWusmpXX+C/PuEgcmgYmqVIpKzb11f+e13oBTrVgL962dXj9KWvTikQas0pIrp/o5Lgl1n8rnNB8Pu0UOBJL7peJV6kfIvTC2g9yS/W78Dw8JNt84lYqxG2s3qDhDrR6dwT/ZRFmImkxBZPbHhKJPhNsdO2Y0sbz7e2htE/bhP5K7lMmyB8ks9cMAYjF6Kef2VZ3uxL2I+dZhVjvi7xbY5tO/y6n9EdLN6MXxK82fKUuR8bpADIl4y6xELFgpA2h8ZfGYCsouVJh65aETYelAojZvR/4lrdUJ2F3uqBzMTDjZsGMZraP+85ReKsnGlIPiLYXg66L9+C
+X-Microsoft-Antispam-Message-Info: j3gOaKdG/BovZJyOSy8M6dag+VIBbeBXmAEcKJXusTeZl6CetY4uDiAPMZMXRt9WRzfYCYJmq86nKp1PL0MFvAggnmOObespcK4PiXq/xgDxFhaKZdypDRDEaRpHy7mcJJC1TudR13KJjcY5aNHUbbPqclCLz1vag1IKbCf1AABLWr9MueeiNBG82UNV+u1PO98HZU87GTdLfC1ZIpFKL8XdvYY09lry5hRAwk0ZzJW51gM2BAGTO7+GWn5XFl8icndPOy8BboTTmMmvHEYc+xX0X8QVrvrWvlZEaEYpwht19lPLV9TlFCGvv/jedqeTQD+AFYVu7AOLDlSyX9ULWHdT9tnW1wTOYjRpoWd25wWoWLRX8QFkLeutscbn2K0W
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
  SFTY:;
- SFS:(4636009)(136003)(366004)(396003)(346002)(39840400004)(376002)(66946007)(2616005)(66476007)(66556008)(478600001)(316002)(956004)(2906002)(8936002)(186003)(36756003)(52116002)(6486002)(31686004)(16576012)(26005)(4744005)(86362001)(8676002)(16526019)(5660300002)(107886003)(31696002)(4326008)(43740500002);
+ SFS:(4636009)(136003)(396003)(39840400004)(346002)(366004)(376002)(2906002)(83380400001)(4326008)(36756003)(107886003)(5660300002)(956004)(31686004)(2616005)(66556008)(52116002)(26005)(8936002)(186003)(316002)(66946007)(66476007)(6486002)(478600001)(31696002)(86362001)(16576012)(16526019)(8676002)(43740500002);
  DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: eMKUo01t6lgXvZGcCmULx28Mofl3h7MBLWv2NT8Db+OVvCWbyzvLWNHnc2NXLiaYTwMUcj2DLp+/tgUhdx0Embs4NJYgvVvZPbc+AA83qd2kw3TfSFo1n3XRg8HF8/ueHaSSLyK43aNT1OfZAukq7IyNtZG3UdHzh5n/w73JyE3urrLlzA3O++E6WtBewr8KZ0qSYDoupk1cuk24JDpWqbgvOdfoA6L/Oox9mqhulQbjASPNLtKcMR05JnUfpB0zL4IUq29oT8keytXuxJzP4EzLUsU957AgWCenmFdww6tll3dkU9qNtmsUKX+2dn99Jneg1hRo5R5TBFzf+IDJVyGhmfM2q41mPx1nv0WztW1dok6R5iTt1oEcXP4rU4X4PtYA+VLBHnqV9Rh0kaOYNY7cDMOFpamYlP9suKwNqI1v9Sx/SkxJ2tkoknHsdD89Re1wyo6oivsigK5j1Yle8cPSqEj9/kz/ybWJMrUQFWtzoRpFKWjINI1pcFf6wm/b
+X-MS-Exchange-AntiSpam-MessageData: SIZ0hlVd/vVyNM+iRzKIsZ+qAMr/9HMypE/zL7sdU7tYI/HhH8cH4xgTx20DWUdiyOzcP36kma3nHfPVjW3NGz72r53VtgID8Av4aDVd5jFvsvm9Zgoiw/9xfaNO2IUOAsylhlkJFSLV0tLTM1vX0OEryXnwmip7mQAnUU7VRTxDOim90/wC1iZpJ545X+g/5f90Gx2a2rfH+OoV9JgjFaVTNnZMS9RBY6X5M9sRAlBpETUbFRMQwBbBfuEeVw5u4fv9RDd3OtUf/5DQey4M1wdn2C2s8qbzw8XK5oDqShyzz0K/JVluUUkYkQxmXoaNVcxYDxVyLNG1sS5MBnuChWw3jIB1eKV9+WfrPTxy18Stei3urWqmqt/jw/tVfgkKNxvoPs7iZVLOcWqMsZYcsWCwymlpElAEw1c3bzxQ/N45LJ1wko7j1s3oBQESM63rz0OAdZfmYfjWw1lSNiWryyzAL7OH/xnATvWzMe4AYqDgUrIJJO8lX2ZjgoxOqTil
 X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 45500061-3f39-4f43-6a2a-08d81110aec9
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jun 2020 09:44:22.8503 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: ec398d20-5608-421f-12fd-08d811111385
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jun 2020 09:47:11.3943 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: e1lOLZXfj+2Zhx6ebA6koTozKoYYTgsC1kzJKIEL1YTOMTx8n0QIi9fXjiJE5rXTnBNOeD18iIsfoFWvNk7kNZLvLO+P2lCo/QyWiA29ZJQ=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5448
-Received-SPF: pass client-ip=40.107.20.114;
+X-MS-Exchange-CrossTenant-UserPrincipalName: dhGcxKIST9VWTnYLBvxuERos5D9wr5AJtcN6gbiaL7wBybCC8HAQuK2lCPwQgaQWTROF206mNq4V9se+mKXAwQC5sc8WHJ5rL/L1+4rwYak=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5415
+Received-SPF: pass client-ip=40.107.6.127;
  envelope-from=vsementsov@virtuozzo.com;
- helo=EUR05-DB8-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 05:44:23
+ helo=EUR04-DB3-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 05:47:12
 X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
 X-Spam_score_int: -37
 X-Spam_score: -3.8
@@ -138,14 +138,53 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 12.06.2020 03:04, Andrey Shinkevich wrote:
-> Make the capitalization of the hexadecimal numbers consistent for the
-> QCOW2 header extension constants in docs/interop/qcow2.txt.
+> Let us differ binary data type from string one for the extension data
+> variable and keep the string as the QcowHeaderExtension class member.
+
+Keep my r-b, but I just want to note, that I missed, what is the actual aim of this change..
+
 > 
-> Suggested-by: Eric Blake<eblake@redhat.com>
-> Signed-off-by: Andrey Shinkevich<andrey.shinkevich@virtuozzo.com>
+> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>   tests/qemu-iotests/qcow2_format.py | 14 ++++++++------
+>   1 file changed, 8 insertions(+), 6 deletions(-)
+> 
+> diff --git a/tests/qemu-iotests/qcow2_format.py b/tests/qemu-iotests/qcow2_format.py
+> index 0f65fd1..d4f0000 100644
+> --- a/tests/qemu-iotests/qcow2_format.py
+> +++ b/tests/qemu-iotests/qcow2_format.py
+> @@ -164,6 +164,13 @@ class QcowHeaderExtension(Qcow2Struct):
+>               self.data = fd.read(padded)
+>               assert self.data is not None
+>   
+> +        data_str = self.data[:self.length]
+> +        if all(c in string.printable.encode('ascii') for c in data_str):
+> +            data_str = f"'{ data_str.decode('ascii') }'"
+> +        else:
+> +            data_str = '<binary>'
+> +        self.data_str = data_str
+> +
+>           if self.magic == QCOW2_EXT_MAGIC_BITMAPS:
+>               self.obj = Qcow2BitmapExt(data=self.data)
+>           else:
+> @@ -173,12 +180,7 @@ class QcowHeaderExtension(Qcow2Struct):
+>           super().dump()
+>   
+>           if self.obj is None:
+> -            data = self.data[:self.length]
+> -            if all(c in string.printable.encode('ascii') for c in data):
+> -                data = f"'{ data.decode('ascii') }'"
+> -            else:
+> -                data = '<binary>'
+> -            print(f'{"data":<25} {data}')
+> +            print(f'{"data":<25} {self.data_str}')
+>           else:
+>               self.obj.dump()
+>   
+> 
 
-
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
 -- 
 Best regards,
