@@ -2,84 +2,88 @@ Return-Path: <SRS0=tJVC=74=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E650AC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 13:51:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2FC0C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 14:07:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B0ECF207DA
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 13:51:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7E3E0207D3
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 14:07:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GS3ew9y4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0ECF207DA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EWch8Rld"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E3E0207D3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53380 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56606 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkpWm-00005b-15
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 09:51:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41470)
+	id 1jkplb-0002ZR-Qh
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 10:07:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44182)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jkpW1-0007yA-Co
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 09:51:09 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:21011
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jkpVz-0008NL-Kq
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 09:51:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592229066;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=R1vmQhia25dZPeeC9y6WkhxF+ixuZ7VSqwLTNTglzAs=;
- b=GS3ew9y498WkGBWl3oNKbGKVeeysJ+kQDk+3fLtYW3Au+vGLd2Y7dWaGbc0Fem1LUULg/F
- +oQF0hq4AAf5QnyQpZeKzRqwY3270n5UKWaYDKb2OnkllD1/5HXVjpGZh3Ag5jDK0nCBPz
- GIEpi8N/higiIDzh/AmJr1Wkg9SgnUI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-487-dsdNhBGdN6quX4rsai-tvA-1; Mon, 15 Jun 2020 09:51:05 -0400
-X-MC-Unique: dsdNhBGdN6quX4rsai-tvA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B297E18FE88C;
- Mon, 15 Jun 2020 13:51:03 +0000 (UTC)
-Received: from laptop.redhat.com (ovpn-114-197.ams2.redhat.com [10.36.114.197])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 09AB95C1B0;
- Mon, 15 Jun 2020 13:50:54 +0000 (UTC)
-From: Eric Auger <eric.auger@redhat.com>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, stefanb@linux.ibm.com,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org,
- mst@redhat.com, imammedo@redhat.com
-Subject: [PATCH] bios-tables-test: Fix "-tpmdev: invalid option"
-Date: Mon, 15 Jun 2020 15:50:51 +0200
-Message-Id: <20200615135051.2213-1-eric.auger@redhat.com>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jkpku-00024r-4R
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 10:06:32 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:43277)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jkpkr-0002IZ-ED
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 10:06:31 -0400
+Received: by mail-ot1-x344.google.com with SMTP id u23so13191895otq.10
+ for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 07:06:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=p1rQlclb2e1rQgql4GxIpe/vNWLSDdqvPBIX9WuMdQw=;
+ b=EWch8RldSII/4xU+fzXomNdQB9Gw2u+s6h+SlhAVXhwNGiv2sNgDt9hXlgvy7PasuU
+ tA8Nk02br/vlQR/G0ZHjGII/Eh7mngigS+lpNuZsUfg/i4VSfV6/yEvkPPDTxmzjyN/i
+ bNMDNLbUlzQYcCPNyy8ph0Q3AG+g2hGQd7qHhgc8yQG5xfUbcv7kUb2OBlZ7qn26oSDH
+ 82rq8OR2nu4iDJYLcM7uUplN90C646OJ/eUFck3I43aXy6CfwskPvFzymB/toUTAOzX6
+ KebkdEVZrxvcBNcGdo9i0EtXt11fD0zyH/L7gl+rHYFT/NkKa2sBOcJZgOO5WAoPcKoN
+ kIQg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=p1rQlclb2e1rQgql4GxIpe/vNWLSDdqvPBIX9WuMdQw=;
+ b=FDvbyU7B73fNJgdGeWyxlr8Zjnov+53QtyKb3MOBLXYlft3Z9+B9t9vUXxLuId0wUw
+ ICGfMHzPdAktFMIYIgsGJP6ncDPMdI3tEOxKckTCP1xi5rlbLnscEIhYI+rRpoFTrkCJ
+ U0sLWOojfL1TCC+gjeDTXX527gTawusAdtWXgZ5o5FgbC2FpALytvGXn95+eSZbckJPk
+ i1FvX2drjWg4PS3jBehErbvz9FC09asAZS3FIrmKRgvA4DNUAh2juuUM5zqMpq0rlTY3
+ Qx8i+yiu3i9tRMx5af82bLLWBv/c7fhjN4YOBHkByc/5tM6kFe8MrgmkFJdSyuou8I3g
+ t0+w==
+X-Gm-Message-State: AOAM533lxuK4szkBIy/E/0V+XdBhDKwpqR+CpUUhFpxqEVWskA1VBv2d
+ z0PnoCKPvg+DkIuxo0B44/Sjo/qE/tDz8Yc8+JL3VA==
+X-Google-Smtp-Source: ABdhPJzG3W10lzMLbzt+sxmE90xFlmGFbUEFSN6Jbp9K0yYyxoL4bITf4Dg4bv+8NZA0x8rSCZPVi+oOZlUjmEcuI1M=
+X-Received: by 2002:a9d:67d6:: with SMTP id c22mr20621424otn.221.1592229988115; 
+ Mon, 15 Jun 2020 07:06:28 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=eric.auger@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 01:43:27
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+References: <20200605102230.21493-1-philmd@redhat.com>
+ <20200605102230.21493-4-philmd@redhat.com>
+In-Reply-To: <20200605102230.21493-4-philmd@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 15 Jun 2020 15:06:17 +0100
+Message-ID: <CAFEAcA-6Vv5Q31Z0bsXPpWanEj8Z0gBeZFWTCrQF3W8RuaQiMQ@mail.gmail.com>
+Subject: Re: [PATCH v3 03/11] hw/sd/sdcard: Do not switch to ReceivingData if
+ address is invalid
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::344;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x344.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -92,45 +96,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, philmd@redhat.com
+Cc: Alexander Bulekov <alxndr@bu.edu>, Prasad J Pandit <pjp@fedoraproject.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When configure is run with "--disable-tpm", the bios-tables-test
-q35/tis test fails with "-tpmdev: invalid option".
+On Fri, 5 Jun 2020 at 11:25, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com=
+> wrote:
+>
+> From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>
+> Only move the state machine to ReceivingData if there is no
+> pending error.  This avoids later OOB access while processing
+> commands queued.
+>
+>   "SD Specifications Part 1 Physical Layer Simplified Spec. v3.01"
+>
+>   4.3.3 Data Read
+>
+>   Read command is rejected if BLOCK_LEN_ERROR or ADDRESS_ERROR
+>   occurred and no data transfer is performed.
+>
+>   4.3.4 Data Write
+>
+>   Write command is rejected if BLOCK_LEN_ERROR or ADDRESS_ERROR
+>   occurred and no data transfer is performed.
 
-Skip the test if CONFIG_TPM is unset.
+It's not clear from the spec that this should also
+apply to WP_VIOLATION errors. The text about WP_VIOLATION
+suggests that it is handled by aborting the data transfer
+(ie set the error bit, stay in receive-data state, wait for
+a stop command, but ignore all further data transfer),
+which is I think distinct from "rejecting" the command.
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Reported-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
- tests/qtest/bios-tables-test.c | 4 ++++
- 1 file changed, 4 insertions(+)
+If that theory is right then moving the check for the
+ADDRESS_ERROR in this patch is correct but the WP_VIOLATION
+tests should stay as they are, I think.
 
-diff --git a/tests/qtest/bios-tables-test.c b/tests/qtest/bios-tables-test.c
-index 53f104a9c5..b482f76c03 100644
---- a/tests/qtest/bios-tables-test.c
-+++ b/tests/qtest/bios-tables-test.c
-@@ -882,6 +882,7 @@ uint64_t tpm_tis_base_addr;
- static void test_acpi_tcg_tpm(const char *machine, const char *tpm_if,
-                               uint64_t base)
- {
-+#ifdef CONFIG_TPM
-     gchar *tmp_dir_name = g_strdup_printf("qemu-test_acpi_%s_tcg_%s.XXXXXX",
-                                           machine, tpm_if);
-     char *tmp_path = g_dir_make_tmp(tmp_dir_name, NULL);
-@@ -924,6 +925,9 @@ static void test_acpi_tcg_tpm(const char *machine, const char *tpm_if,
-     g_free(tmp_path);
-     g_free(tmp_dir_name);
-     free_test_data(&data);
-+#else
-+    g_test_skip("TPM disabled");
-+#endif
- }
- 
- static void test_acpi_q35_tcg_tpm_tis(void)
--- 
-2.20.1
+NB: is the buffer overrun we're trying to protect against
+caused by passing sd_wp_addr() a bad address? Maybe we
+should assert in sd_addr_to_wpnum() that the address is
+in range, as a defence.
 
+thanks
+-- PMM
 
