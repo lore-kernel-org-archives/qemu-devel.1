@@ -5,78 +5,78 @@ X-Spam-Level:
 X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33CF5C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 19:23:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2CD6C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 19:23:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F0EFC20756
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 19:23:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 774EB20756
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 19:23:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dGxpRwG/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0EFC20756
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BhSolBpN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 774EB20756
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57554 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57880 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkuhr-0007xd-6j
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 15:23:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44880)
+	id 1jkuhu-00085S-Nz
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 15:23:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44960)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jkugu-0006KD-Ph
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 15:22:44 -0400
-Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:42716)
+ id 1jkugy-0006Ow-KT
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 15:22:48 -0400
+Received: from mail-wm1-x32e.google.com ([2a00:1450:4864:20::32e]:53797)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jkugt-0003oG-5a
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 15:22:44 -0400
-Received: by mail-wr1-x42f.google.com with SMTP id p5so18291075wrw.9
- for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 12:22:42 -0700 (PDT)
+ id 1jkugw-0003oy-LK
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 15:22:48 -0400
+Received: by mail-wm1-x32e.google.com with SMTP id l26so667115wme.3
+ for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 12:22:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=bhNHHGAWghjftc/HKLdKGz55TUKqNK7zCNOxSxW8eWM=;
- b=dGxpRwG/XOyRf32xWNtP7GlRA+8n7lKAJfWqof8s/+OkNe1Mx613eKql35r1mKkeOV
- uTTXTl1kL7iKHnHG5hcOGEzchTQWOVAg2uK1NDVVUtENw/Lq47iAqoPL1Opti96TZZcS
- lVz1OmXIZGOGDOTt+MeqcqYAavWy2cyVn5Awd3F/LofbaWo6Eh1V5hSy5US/KOcacyR0
- xqkuwgSlIpr9ywWJ3v/2nfGMejZcVJ5GmnaQ4dk/chq8mXDxZiWX6oyWUt8gWKlAY1Q6
- P++vZUPZzZYGZQ2kDAE5cp1yo5fSNCcqkrp53lr7xFsTeZQwYd9xpdu+ASjG05ewU87M
- KAyw==
+ bh=lJFNcAr2PTehLumxuWaD2JP+ifoFJuahvTqLADXR2uw=;
+ b=BhSolBpNJvmBvs4dLjneeVSPpXxRfii5ixGJZ98nyoot8Q9jGLX0UHijvERENsg0DR
+ W8EXFisyPbmrztE2ZHOflBhmsXM9Qmugrp9dQKX5xvwwQHWiw41x6HKT7FzY2QLKKJtE
+ 1vcx8QgPzsa6ATUpuuPWGrbyUB+aD/eofSvTVjzzrvlEBtJNGv//WAvfCoYWZtimCU7a
+ ItoNh/vZmwp2xu0xm6b/8YQkgNXoQAtE6fPrIerNdtN/fa9/8vbF+n1t+s5VojrwQA9a
+ oREF0at9kbdE03L/owdpSjFTw7VZp6uBUo9SO6J9nJ3Xs9r/Dn1dXb+GOhXPiz/pcBl/
+ EkVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=bhNHHGAWghjftc/HKLdKGz55TUKqNK7zCNOxSxW8eWM=;
- b=qgLL0/c20p92Fx3xLoL6AU4PjbL++ZJxvmDEodDDGoFOgbNBeICZTwKGsFpqSap1sR
- jQIy6qnw3CcCgmJY6OvyUwgWfwLRuGCYt4IKfJH+Aa2WCSZ2iMcD6J2yMYWE0crn+9H7
- 5N8PqGFzRSj6SvxzDmlIV3SmMPqO128dY4QN2KlL1Rtoxk3zm132H3iBoIN2OX6EMhpY
- +L5fFqVQDJUOZia8rTOUZBgO+9dFzlhC9TdrScsrw81OOoHaXLmpp+5HpkEBDJJR2Ax/
- 1NS7okM7IpdKVRL3BfqZtkCwx8ZBFALHhVrrr/F/avIyxFjgrtIxYOaxX7VUVKUZBoMb
- ywrA==
-X-Gm-Message-State: AOAM530kfF/x3rxpcVBBXS9wbIIzXmUqJYVWIGkJupzcFM/Yoxyh8pb1
- B+ajL36QBXAidu2myKdC/obhCQWH
-X-Google-Smtp-Source: ABdhPJxtPq5Hn4gQt4zArqnlOz9T3JnO63LdejL1/dOQsSxsIdw96Km5QoVMUfqqB/8+vplDLjeMDg==
-X-Received: by 2002:a5d:554a:: with SMTP id g10mr31390439wrw.334.1592248961546; 
- Mon, 15 Jun 2020 12:22:41 -0700 (PDT)
+ bh=lJFNcAr2PTehLumxuWaD2JP+ifoFJuahvTqLADXR2uw=;
+ b=XglSounhteyp4grK837jyd+z1NCml3/I0aKMSq3frTfggUGwhxQuGPIr2n+ZWSXP0A
+ 8zCgyxmFFSZV3lb4FWxxEQETd0B5wqGHGbZCev+jsIOyV9cMDGx8q0+/6c4FtP17+8Be
+ jX4+gCkYw72pnkrzYg1xDewJiGTcPkIirfLp72OmqriPtXe7foSSdqKhktgxwRJ5xNJP
+ 4ggd8eDFQ5zCv6DSK8HYMFDE+yUSSV8CmcMA46C9WUEFawjRjIkbZOKYk4qve/i5NULB
+ nIPtORzZZ/FoVFZwVioqMx+CD8TOVI/l/S5Xj8m5fsRApjkKkVi2p+/o+Ti18CF8CkUW
+ 3Vhw==
+X-Gm-Message-State: AOAM531jiSEUdNxK7I2fF2Ul2N6bD2PMp9+c02IQJBnIPpPUECgn+Amy
+ VD4Lg4UYaIiRiBP0CKmAerzKYP85
+X-Google-Smtp-Source: ABdhPJxsJrkuqAGT89l1sbKOyfcyROfa+qSpbKTdGz7Kiu/Na1zvgRvmOjNdJNR0j13MHt0Ta1UppA==
+X-Received: by 2002:a1c:e90a:: with SMTP id q10mr881746wmc.140.1592248964629; 
+ Mon, 15 Jun 2020 12:22:44 -0700 (PDT)
 Received: from rtrkw774-lin.syrmia.com ([46.240.135.226])
- by smtp.gmail.com with ESMTPSA id 50sm27823909wra.1.2020.06.15.12.22.40
+ by smtp.gmail.com with ESMTPSA id 50sm27823909wra.1.2020.06.15.12.22.44
  (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 15 Jun 2020 12:22:41 -0700 (PDT)
+ Mon, 15 Jun 2020 12:22:44 -0700 (PDT)
 From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
 To: qemu-devel@nongnu.org,
 	peter.maydell@linaro.org
-Subject: [PULL 01/18] target/mips: Legalize Loongson insn flags
-Date: Mon, 15 Jun 2020 21:22:16 +0200
-Message-Id: <1592248953-8162-2-git-send-email-aleksandar.qemu.devel@gmail.com>
+Subject: [PULL 05/18] target/mips: msa: Split helpers for DPADD_S.<H|W|D>
+Date: Mon, 15 Jun 2020 21:22:20 +0200
+Message-Id: <1592248953-8162-6-git-send-email-aleksandar.qemu.devel@gmail.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1592248953-8162-1-git-send-email-aleksandar.qemu.devel@gmail.com>
 References: <1592248953-8162-1-git-send-email-aleksandar.qemu.devel@gmail.com>
-Received-SPF: pass client-ip=2a00:1450:4864:20::42f;
- envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wr1-x42f.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::32e;
+ envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wm1-x32e.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -98,113 +98,182 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: aleksandar.qemu.devel@gmail.com, Jiaxun Yang <jiaxun.yang@flygoat.com>
+Cc: aleksandar.qemu.devel@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Jiaxun Yang <jiaxun.yang@flygoat.com>
+Achieves clearer code and slightly better performance.
 
-To match the actual status of Loongson insn, we split flags
-for LMMI and LEXT from INSN_LOONGSON2F.
-
-As Loongson-2F only implemented interger part of LEXT, we'll
-not enable LEXT for the processor, but instead we're still using
-INSN_LOONGSON2F as switch flag of these instructions.
-
-All multimedia instructions have been moved to LMMI flag. Loongson-2F
-and Loongson-3A are sharing these instructions.
-
-Signed-off-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
-Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Reviewed-by: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
 Signed-off-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Message-Id: <20200614080049.31134-2-jiaxun.yang@flygoat.com>
+Message-Id: <20200613152133.8964-4-aleksandar.qemu.devel@gmail.com>
 ---
- target/mips/mips-defs.h |  4 ++--
- target/mips/translate.c | 13 +++++++------
- 2 files changed, 9 insertions(+), 8 deletions(-)
+ target/mips/helper.h     |  4 ++-
+ target/mips/msa_helper.c | 90 ++++++++++++++++++++++++++++++++++--------------
+ target/mips/translate.c  | 12 ++++++-
+ 3 files changed, 78 insertions(+), 28 deletions(-)
 
-diff --git a/target/mips/mips-defs.h b/target/mips/mips-defs.h
-index 0c12910..f1b833f 100644
---- a/target/mips/mips-defs.h
-+++ b/target/mips/mips-defs.h
-@@ -70,7 +70,7 @@
- #define CPU_VR54XX      (CPU_MIPS4 | INSN_VR54XX)
- #define CPU_R5900       (CPU_MIPS3 | INSN_R5900)
- #define CPU_LOONGSON2E  (CPU_MIPS3 | INSN_LOONGSON2E)
--#define CPU_LOONGSON2F  (CPU_MIPS3 | INSN_LOONGSON2F)
-+#define CPU_LOONGSON2F  (CPU_MIPS3 | INSN_LOONGSON2F | ASE_LMMI)
+diff --git a/target/mips/helper.h b/target/mips/helper.h
+index 7ca0036..16f2d53 100644
+--- a/target/mips/helper.h
++++ b/target/mips/helper.h
+@@ -1081,7 +1081,9 @@ DEF_HELPER_5(msa_subsuu_s_df, void, env, i32, i32, i32, i32)
+ DEF_HELPER_5(msa_mulv_df, void, env, i32, i32, i32, i32)
+ DEF_HELPER_5(msa_dotp_s_df, void, env, i32, i32, i32, i32)
+ DEF_HELPER_5(msa_dotp_u_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_dpadd_s_df, void, env, i32, i32, i32, i32)
++DEF_HELPER_4(msa_dpadd_s_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_dpadd_s_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_dpadd_s_d, void, env, i32, i32, i32)
+ DEF_HELPER_5(msa_dpadd_u_df, void, env, i32, i32, i32, i32)
+ DEF_HELPER_5(msa_dpsub_s_df, void, env, i32, i32, i32, i32)
+ DEF_HELPER_5(msa_dpsub_u_df, void, env, i32, i32, i32, i32)
+diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
+index 2b54de0..086b56f 100644
+--- a/target/mips/msa_helper.c
++++ b/target/mips/msa_helper.c
+@@ -2224,7 +2224,70 @@ void helper_msa_div_u_d(CPUMIPSState *env,
+  * +---------------+----------------------------------------------------------+
+  */
  
- #define CPU_MIPS5       (CPU_MIPS4 | ISA_MIPS5)
+-/* TODO: insert Int Dot Product group helpers here */
++#define SIGNED_EXTRACT(e, o, a, df)     \
++    do {                                \
++        e = SIGNED_EVEN(a, df);         \
++        o = SIGNED_ODD(a, df);          \
++    } while (0)
++
++#define UNSIGNED_EXTRACT(e, o, a, df)   \
++    do {                                \
++        e = UNSIGNED_EVEN(a, df);       \
++        o = UNSIGNED_ODD(a, df);        \
++    } while (0)
++
++static inline int64_t msa_dpadd_s_df(uint32_t df, int64_t dest, int64_t arg1,
++                                     int64_t arg2)
++{
++    int64_t even_arg1;
++    int64_t even_arg2;
++    int64_t odd_arg1;
++    int64_t odd_arg2;
++    SIGNED_EXTRACT(even_arg1, odd_arg1, arg1, df);
++    SIGNED_EXTRACT(even_arg2, odd_arg2, arg2, df);
++    return dest + (even_arg1 * even_arg2) + (odd_arg1 * odd_arg2);
++}
++
++void helper_msa_dpadd_s_h(CPUMIPSState *env,
++                          uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++    pwd->h[0]  = msa_dpadd_s_df(DF_HALF, pwd->h[0],  pws->h[0],  pwt->h[0]);
++    pwd->h[1]  = msa_dpadd_s_df(DF_HALF, pwd->h[1],  pws->h[1],  pwt->h[1]);
++    pwd->h[2]  = msa_dpadd_s_df(DF_HALF, pwd->h[2],  pws->h[2],  pwt->h[2]);
++    pwd->h[3]  = msa_dpadd_s_df(DF_HALF, pwd->h[3],  pws->h[3],  pwt->h[3]);
++    pwd->h[4]  = msa_dpadd_s_df(DF_HALF, pwd->h[4],  pws->h[4],  pwt->h[4]);
++    pwd->h[5]  = msa_dpadd_s_df(DF_HALF, pwd->h[5],  pws->h[5],  pwt->h[5]);
++    pwd->h[6]  = msa_dpadd_s_df(DF_HALF, pwd->h[6],  pws->h[6],  pwt->h[6]);
++    pwd->h[7]  = msa_dpadd_s_df(DF_HALF, pwd->h[7],  pws->h[7],  pwt->h[7]);
++}
++
++void helper_msa_dpadd_s_w(CPUMIPSState *env,
++                          uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++    pwd->w[0]  = msa_dpadd_s_df(DF_WORD, pwd->w[0],  pws->w[0],  pwt->w[0]);
++    pwd->w[1]  = msa_dpadd_s_df(DF_WORD, pwd->w[1],  pws->w[1],  pwt->w[1]);
++    pwd->w[2]  = msa_dpadd_s_df(DF_WORD, pwd->w[2],  pws->w[2],  pwt->w[2]);
++    pwd->w[3]  = msa_dpadd_s_df(DF_WORD, pwd->w[3],  pws->w[3],  pwt->w[3]);
++}
++
++void helper_msa_dpadd_s_d(CPUMIPSState *env,
++                          uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++    pwd->d[0]  = msa_dpadd_s_df(DF_DOUBLE, pwd->d[0],  pws->d[0],  pwt->d[0]);
++    pwd->d[1]  = msa_dpadd_s_df(DF_DOUBLE, pwd->d[1],  pws->d[1],  pwt->d[1]);
++}
  
-@@ -97,7 +97,7 @@
- /* Wave Computing: "nanoMIPS" */
- #define CPU_NANOMIPS32  (CPU_MIPS32R6 | ISA_NANOMIPS32)
- 
--#define CPU_LOONGSON3A  (CPU_MIPS64R2 | INSN_LOONGSON3A)
-+#define CPU_LOONGSON3A  (CPU_MIPS64R2 | INSN_LOONGSON3A | ASE_LMMI | ASE_LEXT)
  
  /*
-  * Strictly follow the architecture standard:
+@@ -4785,18 +4848,6 @@ static inline int64_t msa_mulv_df(uint32_t df, int64_t arg1, int64_t arg2)
+     return arg1 * arg2;
+ }
+ 
+-#define SIGNED_EXTRACT(e, o, a, df)     \
+-    do {                                \
+-        e = SIGNED_EVEN(a, df);         \
+-        o = SIGNED_ODD(a, df);          \
+-    } while (0)
+-
+-#define UNSIGNED_EXTRACT(e, o, a, df)   \
+-    do {                                \
+-        e = UNSIGNED_EVEN(a, df);       \
+-        o = UNSIGNED_ODD(a, df);        \
+-    } while (0)
+-
+ static inline int64_t msa_dotp_s_df(uint32_t df, int64_t arg1, int64_t arg2)
+ {
+     int64_t even_arg1;
+@@ -4958,18 +5009,6 @@ void helper_msa_sld_df(CPUMIPSState *env, uint32_t df, uint32_t wd,
+     msa_sld_df(df, pwd, pws, env->active_tc.gpr[rt]);
+ }
+ 
+-static inline int64_t msa_dpadd_s_df(uint32_t df, int64_t dest, int64_t arg1,
+-                                     int64_t arg2)
+-{
+-    int64_t even_arg1;
+-    int64_t even_arg2;
+-    int64_t odd_arg1;
+-    int64_t odd_arg2;
+-    SIGNED_EXTRACT(even_arg1, odd_arg1, arg1, df);
+-    SIGNED_EXTRACT(even_arg2, odd_arg2, arg2, df);
+-    return dest + (even_arg1 * even_arg2) + (odd_arg1 * odd_arg2);
+-}
+-
+ static inline int64_t msa_dpadd_u_df(uint32_t df, int64_t dest, int64_t arg1,
+                                      int64_t arg2)
+ {
+@@ -5132,7 +5171,6 @@ void helper_msa_ ## func ## _df(CPUMIPSState *env, uint32_t df, uint32_t wd,  \
+     }                                                                         \
+ }
+ 
+-MSA_TEROP_DF(dpadd_s)
+ MSA_TEROP_DF(dpadd_u)
+ MSA_TEROP_DF(dpsub_s)
+ MSA_TEROP_DF(dpsub_u)
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 2caf4cb..e49f32f 100644
+index 7388a16..47ac4ea 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -1046,7 +1046,7 @@ enum {
-     OPC_BC2NEZ  = (0x0D << 21) | OPC_CP2,
- };
- 
--#define MASK_LMI(op)    (MASK_OP_MAJOR(op) | (op & (0x1F << 21)) | (op & 0x1F))
-+#define MASK_LMMI(op)    (MASK_OP_MAJOR(op) | (op & (0x1F << 21)) | (op & 0x1F))
- 
- enum {
-     OPC_PADDSH      = (24 << 21) | (0x00) | OPC_CP2,
-@@ -3421,7 +3421,8 @@ static void gen_ld(DisasContext *ctx, uint32_t opc,
-     TCGv t0, t1, t2;
-     int mem_idx = ctx->mem_idx;
- 
--    if (rt == 0 && ctx->insn_flags & (INSN_LOONGSON2E | INSN_LOONGSON2F)) {
-+    if (rt == 0 && ctx->insn_flags & (INSN_LOONGSON2E | INSN_LOONGSON2F |
-+                                      INSN_LOONGSON3A)) {
-         /*
-          * Loongson CPU uses a load to zero register for prefetch.
-          * We emulate it as a NOP. On other CPU we must perform the
-@@ -5531,7 +5532,7 @@ static void gen_loongson_multimedia(DisasContext *ctx, int rd, int rs, int rt)
-     TCGv_i64 t0, t1;
-     TCGCond cond;
- 
--    opc = MASK_LMI(ctx->opcode);
-+    opc = MASK_LMMI(ctx->opcode);
-     switch (opc) {
-     case OPC_ADD_CP2:
-     case OPC_SUB_CP2:
-@@ -27161,7 +27162,7 @@ static void decode_opc_special2_legacy(CPUMIPSState *env, DisasContext *ctx)
-     case OPC_MULTU_G_2F:
-     case OPC_MOD_G_2F:
-     case OPC_MODU_G_2F:
--        check_insn(ctx, INSN_LOONGSON2F);
-+        check_insn(ctx, INSN_LOONGSON2F | ASE_LEXT);
-         gen_loongson_integer(ctx, op1, rd, rs, rt);
-         break;
-     case OPC_CLO:
-@@ -27194,7 +27195,7 @@ static void decode_opc_special2_legacy(CPUMIPSState *env, DisasContext *ctx)
-     case OPC_DDIVU_G_2F:
-     case OPC_DMOD_G_2F:
-     case OPC_DMODU_G_2F:
--        check_insn(ctx, INSN_LOONGSON2F);
-+        check_insn(ctx, INSN_LOONGSON2F | ASE_LEXT);
-         gen_loongson_integer(ctx, op1, rd, rs, rt);
-         break;
- #endif
-@@ -30641,7 +30642,7 @@ static void decode_opc(CPUMIPSState *env, DisasContext *ctx)
-         }
-         break;
-     case OPC_CP2:
--        check_insn(ctx, INSN_LOONGSON2F);
-+        check_insn(ctx, ASE_LMMI);
-         /* Note that these instructions use different fields.  */
-         gen_loongson_multimedia(ctx, sa, rd, rt);
-         break;
+@@ -29400,7 +29400,17 @@ static void gen_msa_3r(CPUMIPSState *env, DisasContext *ctx)
+             gen_helper_msa_dotp_u_df(cpu_env, tdf, twd, tws, twt);
+             break;
+         case OPC_DPADD_S_df:
+-            gen_helper_msa_dpadd_s_df(cpu_env, tdf, twd, tws, twt);
++            switch (df) {
++            case DF_HALF:
++                gen_helper_msa_dpadd_s_h(cpu_env, twd, tws, twt);
++                break;
++            case DF_WORD:
++                gen_helper_msa_dpadd_s_w(cpu_env, twd, tws, twt);
++                break;
++            case DF_DOUBLE:
++                gen_helper_msa_dpadd_s_d(cpu_env, twd, tws, twt);
++                break;
++            }
+             break;
+         case OPC_DPADD_U_df:
+             gen_helper_msa_dpadd_u_df(cpu_env, tdf, twd, tws, twt);
 -- 
 2.7.4
 
