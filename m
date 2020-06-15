@@ -2,93 +2,85 @@ Return-Path: <SRS0=tJVC=74=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67E16C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 16:14:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78464C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 16:16:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3001E2078A
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 16:14:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 43F3320663
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 16:16:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HI3gUSAn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3001E2078A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qjlZl/KY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43F3320663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37964 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40222 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkrkw-0003Mi-Gi
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 12:14:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51792)
+	id 1jkrmM-0004Wr-Bq
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 12:16:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52140)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jkrjP-0001nk-3Z
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 12:13:07 -0400
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:34670)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jkrlT-0003qm-7q; Mon, 15 Jun 2020 12:15:15 -0400
+Received: from mail-il1-x143.google.com ([2607:f8b0:4864:20::143]:46016)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jkrjM-0003AM-1j
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 12:13:05 -0400
-Received: by mail-pf1-x442.google.com with SMTP id z63so7087262pfb.1
- for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 09:13:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:references:from:message-id:date:user-agent:mime-version
- :in-reply-to:content-language:content-transfer-encoding;
- bh=0F61GR9Yb98dXuR5nFbrZYM4/fo1i+Zd1ehqQrfzwKA=;
- b=HI3gUSAndLqIejRQtzLzfcKJ++R8ruohWKu3wJ88cDqLgO4gdx8Pndx3T/GpSRxmi5
- sEXm/YL7BCyqFt//52AuVHp30kA8rHPUE7dL9C7acUrBUEgACpNrRFJ/KD0zQfafeVpR
- xg1/KQ2D4MiGCnRm0tenssWgWjtU7fQYqHb6d7yWVxK7lCvS26Ow3jls5n0AALG9IEJm
- LmfoLUuevZba0RNY+vGzmI0GinK6iZpd/zmN0NCkfmcOsA/iXDbAkBFKKprFb0xGXsnR
- hExRGVEc7BtHPBtlgzVwDEaQVCOmIrlNq//IP4pTaEFIoP8/So2xxlL4cKWGlj0khftp
- sVPA==
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jkrlQ-0003RU-P8; Mon, 15 Jun 2020 12:15:14 -0400
+Received: by mail-il1-x143.google.com with SMTP id 9so15809826ilg.12;
+ Mon, 15 Jun 2020 09:15:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=jFr1/KpNmOHeaq44SQLd3Y7cVXzFee0fXpzGhnbidqU=;
+ b=qjlZl/KYsjudmWB/360AQz+KN/mv3ujVBVPXBEd8qhGfBhgiMDXdaB5yNwNJdcZV5T
+ FNHyLg1wt5IY71t90NEjo47dfZfV33fWq3F435BHXulRg1bbFDQ8X1jGcPIx8pdwNMBf
+ huz95H4RMTUQdNYdKjbIw+VJQWx+NPybyk27lUHJltHBSlAJAqpHH3Ia/ZBPqlS6imBW
+ 65wenusyALbQayVFjFY6/y9FIA1hEi0xiICny6DauJT6s4E4uvuNOup1S67kKhr4m27H
+ 1jrh4Vv6Zr0TVZ6W8uJhHNHq8Tyl9UrAs/DJB7R3stwWIH0RkCJnm+oz6/bXzok9lYDV
+ 8d4A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=0F61GR9Yb98dXuR5nFbrZYM4/fo1i+Zd1ehqQrfzwKA=;
- b=M0eV3Z+8idCuEf5hRcUDtrkNqnSF4c7r2QFybDcXFFEunvVWvqW2QjXmACi1xn+yQn
- Tg/pEkcMTAiRTIL0+2xdYvdZxLWjJT5XSN3GxzvKL4fQdcdG6Ke4oqrLkMz6mz+x5mNg
- T1xpf0dnSxIBaefDK+pPBN2TjRqEsknV3ig6MJT+1j+ppHoELxtw30gWO4jg9nN4rAW6
- V+OFTE+YjllcTYQ+mAKRTeNhElgQvKnuYADc4wMxSIqtChi3By7msdVVFbS3J9CSBFFI
- /8dTXzP+Hf7QMqDbgWlu5ZUO2CZjB8yE3zRfHCtWpGtSWQEQUzjVnHTOBFupmdbUpX7I
- b8Vg==
-X-Gm-Message-State: AOAM532PG6wpfM9AchUZFxDpyjWrO6UV8ozn4+JrXAjpa6TYnSdVqqFc
- OAtOMP+jOfTEMDilS0bREcoqvDbohUo=
-X-Google-Smtp-Source: ABdhPJwFr1KxiY4ZBBxGOunU3AUIk3yCKW/QCZooIeL6RnUcy+hUvY7P6x6U4yUoGKGqC1mtTtQKjw==
-X-Received: by 2002:aa7:9d9a:: with SMTP id f26mr23143478pfq.229.1592237581829; 
- Mon, 15 Jun 2020 09:13:01 -0700 (PDT)
-Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id v7sm11668829pfn.147.2020.06.15.09.13.00
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 15 Jun 2020 09:13:01 -0700 (PDT)
-Subject: Re: [PATCH v2] target/ppc: add vmsumudm vmsumcud instructions
-To: Lijun Pan <ljp@linux.ibm.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
-References: <20200613035546.22041-1-ljp@linux.ibm.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <4f0e24af-5043-98d3-0f7b-e8d460bac617@linaro.org>
-Date: Mon, 15 Jun 2020 09:12:59 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=jFr1/KpNmOHeaq44SQLd3Y7cVXzFee0fXpzGhnbidqU=;
+ b=BLb2OpduV3guwmCkY/qjD5SytEbVvaoZKwNqbfQNMwrsi5tXriTRZx6xCRSYQsNVP8
+ aYHVgLDAYcYDKFfnWlJ3Vo16YZJUmKxY/QWmtjcGfAp3kk2MTliRUp5DWuElpthdoid6
+ QAQgRScdYQ1pFLVl8oqFs3fJ3+fhEDpuA1zuAt/ZAt1KVMoyevrP/2raT8sTDzpCMVyX
+ IET4rN+mIUhteVcq+ZxvOPFCi57wK7a9YGzVvQ5WvUTlOhOleOQzR5LXTkLWdvd3IlJt
+ 34oPIUnhAZQeznQNe3dmgvZP0uXNzORhqeZDq2CvzJ1z5Yq0Lkjr46Y7evLa8P+MXTpF
+ VsSg==
+X-Gm-Message-State: AOAM530ZzjqpMnr+mEnMMLINYRGj1LEc6Ggr3itUVF39oeAhPKV502g6
+ kGCBOxLQhz/qUeCkzctR/YabnnxnGjk5xNAtywk=
+X-Google-Smtp-Source: ABdhPJzGD3Cu6HLOZTVHuHJj8a4Jj5XuvuzgejVrw9IHvKoQlGsq1zMlucDa/sGCn7uHgir0RSBrMtmQQ3Qxytnjwlk=
+X-Received: by 2002:a92:bb45:: with SMTP id w66mr27868277ili.131.1592237710720; 
+ Mon, 15 Jun 2020 09:15:10 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200613035546.22041-1-ljp@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::442;
- envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x442.google.com
+References: <1591625864-31494-1-git-send-email-bmeng.cn@gmail.com>
+ <1591625864-31494-2-git-send-email-bmeng.cn@gmail.com>
+In-Reply-To: <1591625864-31494-2-git-send-email-bmeng.cn@gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Mon, 15 Jun 2020 09:05:47 -0700
+Message-ID: <CAKmqyKNH-sxGyPiWVLFWzKVNxxFKWT79r=4Q1pQvLueTMvi9FQ@mail.gmail.com>
+Subject: Re: [PATCH 01/15] hw/riscv: sifive_e: Remove the riscv_ prefix of the
+ machine* and soc* functions
+To: Bin Meng <bmeng.cn@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::143;
+ envelope-from=alistair23@gmail.com; helo=mail-il1-x143.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
@@ -103,120 +95,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Bin Meng <bin.meng@windriver.com>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Palmer Dabbelt <palmerdabbelt@google.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/12/20 8:55 PM, Lijun Pan wrote:
-> vmsumudm (Power ISA 3.0) - Vector Multiply-Sum Unsigned Doubleword Modulo
-> VA-form.
-> vmsumcud (Power ISA 3.1) - Vector Multiply-Sum & write Carry-out Unsigned
-> Doubleword VA-form.
-> 
-> Signed-off-by: Lijun Pan <ljp@linux.ibm.com>
+On Mon, Jun 8, 2020 at 7:20 AM Bin Meng <bmeng.cn@gmail.com> wrote:
+>
+> From: Bin Meng <bin.meng@windriver.com>
+>
+> This was done in the virt & sifive_u codes, but sifive_e codes were
+> missed. Remove the riscv_ prefix of the machine* and soc* functions.
+>
+> Signed-off-by: Bin Meng <bin.meng@windriver.com>
+
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+
+Alistair
+
 > ---
-> v2: move vmsumcudm() to qemu/int128.h as Richard Henderson suggested,
->     also rename addu128() to uint128_add() and include it in qemu/int128.h
-> 
->  disas/ppc.c                         |  2 +
->  include/qemu/int128.h               | 97 +++++++++++++++++++++++++++++
->  target/ppc/helper.h                 |  4 +-
->  target/ppc/int_helper.c             | 19 +++++-
->  target/ppc/translate.c              |  1 -
->  target/ppc/translate/vmx-impl.inc.c | 39 ++++++------
->  target/ppc/translate/vmx-ops.inc.c  |  2 +
->  7 files changed, 143 insertions(+), 21 deletions(-)
-> 
-> diff --git a/disas/ppc.c b/disas/ppc.c
-> index 63e97cfe1d..3ed4d23ed3 100644
-> --- a/disas/ppc.c
-> +++ b/disas/ppc.c
-> @@ -2261,7 +2261,9 @@ const struct powerpc_opcode powerpc_opcodes[] = {
->  { "vmsumshs",  VXA(4,  41), VXA_MASK,	PPCVEC,		{ VD, VA, VB, VC } },
->  { "vmsumubm",  VXA(4,  36), VXA_MASK,   PPCVEC,		{ VD, VA, VB, VC } },
->  { "vmsumuhm",  VXA(4,  38), VXA_MASK,   PPCVEC,		{ VD, VA, VB, VC } },
-> +{ "vmsumudm",  VXA(4,  35), VXA_MASK,   PPCVEC,		{ VD, VA, VB, VC } },
->  { "vmsumuhs",  VXA(4,  39), VXA_MASK,   PPCVEC,		{ VD, VA, VB, VC } },
-> +{ "vmsumcud",  VXA(4,  23), VXA_MASK,   PPCVEC,		{ VD, VA, VB, VC } },
->  { "vmulesb",   VX(4,  776), VX_MASK,	PPCVEC,		{ VD, VA, VB } },
->  { "vmulesh",   VX(4,  840), VX_MASK,	PPCVEC,		{ VD, VA, VB } },
->  { "vmuleub",   VX(4,  520), VX_MASK,	PPCVEC,		{ VD, VA, VB } },
-> diff --git a/include/qemu/int128.h b/include/qemu/int128.h
-> index 5c9890db8b..3362973cc5 100644
-> --- a/include/qemu/int128.h
-> +++ b/include/qemu/int128.h
-> @@ -3,6 +3,7 @@
->  
->  #ifdef CONFIG_INT128
->  #include "qemu/bswap.h"
-> +#include "qemu/host-utils.h"
->  
->  typedef __int128_t Int128;
->  
-> @@ -143,6 +144,55 @@ static inline Int128 bswap128(Int128 a)
->      return int128_make128(bswap64(int128_gethi(a)), bswap64(int128_getlo(a)));
+>
+>  hw/riscv/sifive_e.c | 24 ++++++++++++------------
+>  1 file changed, 12 insertions(+), 12 deletions(-)
+>
+> diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
+> index 472a989..8fab152 100644
+> --- a/hw/riscv/sifive_e.c
+> +++ b/hw/riscv/sifive_e.c
+> @@ -75,7 +75,7 @@ static const struct MemmapEntry {
+>      [SIFIVE_E_DTIM] =     { 0x80000000,     0x4000 }
+>  };
+>
+> -static void riscv_sifive_e_init(MachineState *machine)
+> +static void sifive_e_machine_init(MachineState *machine)
+>  {
+>      const struct MemmapEntry *memmap = sifive_e_memmap;
+>
+> @@ -124,7 +124,7 @@ static void sifive_e_machine_class_init(ObjectClass *oc, void *data)
+>      MachineClass *mc = MACHINE_CLASS(oc);
+>
+>      mc->desc = "RISC-V Board compatible with SiFive E SDK";
+> -    mc->init = riscv_sifive_e_init;
+> +    mc->init = sifive_e_machine_init;
+>      mc->max_cpus = 1;
+>      mc->default_cpu_type = SIFIVE_E_CPU;
 >  }
->  
-> +/**
-> + * uint128_add - add two 128-bit values (r=a+b, ca=carry-out)
-> + * @ah: high 64 bits of a
-> + * @al: low 64 bits of a
-> + * @bh: high 64 bits of b
-> + * @bl: low 64 bits of b
-> + * @rh: high 64 bits of r to be returned
-> + * @rl: low 64 bits of r to be returned
-> + * @ca: carry out to be returned.
-> + */
-> +static inline void uint128_add(uint64_t ah, uint64_t al, uint64_t bh,
-> +		uint64_t bl, uint64_t *rh, uint64_t *rl, uint64_t *ca)
-> +{
-> +	__uint128_t a = (__uint128_t)ah << 64 | (__uint128_t)al;
-> +	__uint128_t b = (__uint128_t)bh << 64 | (__uint128_t)bl;
-> +	__uint128_t r = a + b;
-> +
-> +	*rh = (uint64_t)(r >> 64);
-> +	*rl = (uint64_t)r;
-> +	*ca = (~a < b);
-> +}
-
-This is *not* what I had in mind at all.
-
-int128.h should be operating on Int128, and *not* component uint64_t values.
-
-
-> +
-> +/**
-> + * mulsum - (rh, rl) = ah*bh + al*bl + (ch, cl)
-> + * @ah: high 64 bits of a
-> + * @al: low 64 bits of a
-> + * @bh: high 64 bits of b
-> + * @bl: low 64 bits of b
-> + * @ch: high 64 bits of c
-> + * @cl: low 64 bits of c
-> + * @rh: high 64 bits of r to be returned
-> + * @rl: low 64 bits of r to be returned
-> + * @ca: carry-out to be returned.
-> + */
-> +static inline void mulsum(uint64_t ah, uint64_t al, uint64_t bh,
-> +		uint64_t bl, uint64_t ch, uint64_t cl, uint64_t *rh,
-> +		uint64_t *rl, uint64_t *ca)
-> +{
-> +	__uint128_t prod1, prod2, r;
-> +	__uint128_t c = (__uint128_t)ch << 64 | (__uint128_t)cl;
-> +
-> +	prod1 = (__uint128_t)ah * (__uint128_t)bh;
-> +	prod2 = (__uint128_t)al * (__uint128_t)bl;
-> +	r = prod1 + prod2 + c;
-> +	*rh = (uint64_t)(r >> 64);
-> +	*rl = (uint64_t)r;
-> +	*ca = (~prod1 < prod2) + (~c < (prod1 + prod2));
-> +}
-
-Why is mulsum an interesting primitive for int128.h?
-I would think int128_mul and int128_add sufficient here.
-
-I did not ask you to place the entire ppc instruction in int128.h.
-
-
-r~
+> @@ -144,7 +144,7 @@ static void sifive_e_machine_init_register_types(void)
+>
+>  type_init(sifive_e_machine_init_register_types)
+>
+> -static void riscv_sifive_e_soc_init(Object *obj)
+> +static void sifive_e_soc_init(Object *obj)
+>  {
+>      MachineState *ms = MACHINE(qdev_get_machine());
+>      SiFiveESoCState *s = RISCV_E_SOC(obj);
+> @@ -159,7 +159,7 @@ static void riscv_sifive_e_soc_init(Object *obj)
+>                            TYPE_SIFIVE_GPIO);
+>  }
+>
+> -static void riscv_sifive_e_soc_realize(DeviceState *dev, Error **errp)
+> +static void sifive_e_soc_realize(DeviceState *dev, Error **errp)
+>  {
+>      MachineState *ms = MACHINE(qdev_get_machine());
+>      const struct MemmapEntry *memmap = sifive_e_memmap;
+> @@ -243,26 +243,26 @@ static void riscv_sifive_e_soc_realize(DeviceState *dev, Error **errp)
+>          &s->xip_mem);
+>  }
+>
+> -static void riscv_sifive_e_soc_class_init(ObjectClass *oc, void *data)
+> +static void sifive_e_soc_class_init(ObjectClass *oc, void *data)
+>  {
+>      DeviceClass *dc = DEVICE_CLASS(oc);
+>
+> -    dc->realize = riscv_sifive_e_soc_realize;
+> +    dc->realize = sifive_e_soc_realize;
+>      /* Reason: Uses serial_hds in realize function, thus can't be used twice */
+>      dc->user_creatable = false;
+>  }
+>
+> -static const TypeInfo riscv_sifive_e_soc_type_info = {
+> +static const TypeInfo sifive_e_soc_type_info = {
+>      .name = TYPE_RISCV_E_SOC,
+>      .parent = TYPE_DEVICE,
+>      .instance_size = sizeof(SiFiveESoCState),
+> -    .instance_init = riscv_sifive_e_soc_init,
+> -    .class_init = riscv_sifive_e_soc_class_init,
+> +    .instance_init = sifive_e_soc_init,
+> +    .class_init = sifive_e_soc_class_init,
+>  };
+>
+> -static void riscv_sifive_e_soc_register_types(void)
+> +static void sifive_e_soc_register_types(void)
+>  {
+> -    type_register_static(&riscv_sifive_e_soc_type_info);
+> +    type_register_static(&sifive_e_soc_type_info);
+>  }
+>
+> -type_init(riscv_sifive_e_soc_register_types)
+> +type_init(sifive_e_soc_register_types)
+> --
+> 2.7.4
+>
+>
 
