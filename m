@@ -6,63 +6,64 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E98CC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 21:08:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFD63C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 21:09:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C86C92078E
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 21:08:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B51AC2078E
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 21:09:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NFfJvuqw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C86C92078E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hHyW410h"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B51AC2078E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48154 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50742 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkwLO-0002RF-W2
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 17:08:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33700)
+	id 1jkwLq-0003Vw-Ne
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 17:09:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33598)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jkvuS-0003HW-VU
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 16:40:48 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:39771
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jkvuO-00037R-HH
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 16:40:44 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:58010
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jkvuM-0000aZ-8v
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 16:40:48 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jkvuJ-0000Z5-C4
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 16:40:44 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592253641;
+ s=mimecast20190719; t=1592253637;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=8O0wtKjavh5H9EftYoHd/y7jFQcuTY0M2MfQNyhUGHw=;
- b=NFfJvuqw9lh2Exeu16VPWrvKvTKrYUBP9+DKHLJR2THvLSWoHr76CHeHEbgPvhBJ1VIoYf
- NdRUb959WGp3GWCo/ID3s1kW8W1U+Itrg7f+fds3lBSq6cmFp7Obv48atl3hPwfj+u/nCE
- ttnVoljrjWCmCY1ZdE4LFpfmITYZHns=
+ bh=FpRbmSfuZ3uYmHIIHm/5f/Tg22gLDt8DklwGQYbmndA=;
+ b=hHyW410h29QTrqzTweMtYvJ5uS52EM0Qh4mc2s7kEBulOzF6oOrUpZHkAofuOM8EDh99X4
+ iSDz86n4VQ2mwlS0OukwcCiMcn6LNQSNP9zwfnYRWegS43q+OrLIC8e4vYh2uCtvgMEJZb
+ 0DwmN+aIeC68Tr7KN6J3MXgThRDRODk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-490-3_VAFFCJOJiD6rr9Up3aIw-1; Mon, 15 Jun 2020 16:40:39 -0400
-X-MC-Unique: 3_VAFFCJOJiD6rr9Up3aIw-1
+ us-mta-400-oQYTduESMAa5tcRm1Ojbmw-1; Mon, 15 Jun 2020 16:40:33 -0400
+X-MC-Unique: oQYTduESMAa5tcRm1Ojbmw-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 22150873405;
- Mon, 15 Jun 2020 20:40:38 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 60AFC1883608;
+ Mon, 15 Jun 2020 20:40:32 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
  [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id BFB919033C;
- Mon, 15 Jun 2020 20:40:37 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 32B6B9034A;
+ Mon, 15 Jun 2020 20:40:32 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 6C9F11135220; Mon, 15 Jun 2020 22:40:08 +0200 (CEST)
+ id 5AC1A11358D1; Mon, 15 Jun 2020 22:40:08 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 23/84] sparc/leon3: Fix to put grlib,* devices on sysbus
-Date: Mon, 15 Jun 2020 22:39:07 +0200
-Message-Id: <20200615204008.3069956-24-armbru@redhat.com>
+Subject: [PULL 18/84] ppc/pnv: Put "*-pnv-chip" and "pnv-xive" on the main
+ system bus
+Date: Mon, 15 Jun 2020 22:39:02 +0200
+Message-Id: <20200615204008.3069956-19-armbru@redhat.com>
 In-Reply-To: <20200615204008.3069956-1-armbru@redhat.com>
 References: <20200615204008.3069956-1-armbru@redhat.com>
 MIME-Version: 1.0
@@ -71,16 +72,16 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 16:38:57
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 15:33:00
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -94,62 +95,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- KONRAD Frederic <frederic.konrad@adacore.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Fabien Chouteau <chouteau@adacore.com>
+Cc: qemu-ppc@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-leon3_generic_hw_init() creates a "grlib,ahbpnp" and a "grlib,apbpnp"
-sysbus device in a way that leaves them unplugged.
+pnv_init() creates "power10_v1.0-pnv-chip", "power8_v2.0-pnv-chip",
+"power8e_v2.1-pnv-chip", "power8nvl_v1.0-pnv-chip", or
+"power9_v2.0-pnv-chip" sysbus devices in a way that leaves them
+unplugged.
+
+pnv_chip_power9_instance_init() creates a "pnv-xive" sysbus device in
+a way that leaves it unplugged.
 
 Create them the common way that puts them into the main system bus.
-Affects machine leon3_generic.  Visible in "info qtree":
+Affects machines powernv8, powernv9, and powernv10.  Visible in "info
+qtree".  Here's the change for powernv9:
 
      bus: main-system-bus
        type System
-    +  dev: grlib,ahbpnp, id ""
-    +    mmio 00000000fffff000/0000000000001000
-    +  dev: grlib,apbpnp, id ""
-    +    mmio 00000000800ff000/0000000000001000
-       dev: grlib,irqmp, id ""
+    +  dev: power9_v2.0-pnv-chip, id ""
+    +    chip-id = 0 (0x0)
+    +    ram-start = 0 (0x0)
+    +    ram-size = 1879048192 (0x70000000)
+    +    nr-cores = 1 (0x1)
+    +    cores-mask = 72057594037927935 (0xffffffffffffff)
+    +    nr-threads = 1 (0x1)
+    +    num-phbs = 6 (0x6)
+    +    mmio 000603fc00000000/0000000400000000
+    [...]
+    +  dev: pnv-xive, id ""
+    +    ic-bar = 1692157036462080 (0x6030203100000)
+    +    vc-bar = 1689949371891712 (0x6010000000000)
+    +    pc-bar = 1690499127705600 (0x6018000000000)
+    +    tm-bar = 1692157036986368 (0x6030203180000)
 
-Cc: Fabien Chouteau <chouteau@adacore.com>
-Cc: KONRAD Frederic <frederic.konrad@adacore.com>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: Artyom Tarasenko <atar4qemu@gmail.com>
+Cc: "Cédric Le Goater" <clg@kaod.org>
+Cc: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: KONRAD Frederic <frederic.konrad@adacore.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20200609122339.937862-22-armbru@redhat.com>
-Acked-by: Artyom Tarasenko <atar4qemu@gmail.com>
+Reviewed-by: Cédric Le Goater <clg@kaod.org>
+Message-Id: <20200609122339.937862-17-armbru@redhat.com>
 ---
- hw/sparc/leon3.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/ppc/pnv.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/hw/sparc/leon3.c b/hw/sparc/leon3.c
-index cc55117dec..d3ab8c9400 100644
---- a/hw/sparc/leon3.c
-+++ b/hw/sparc/leon3.c
-@@ -213,14 +213,14 @@ static void leon3_generic_hw_init(MachineState *machine)
-     reset_info->sp    = LEON3_RAM_OFFSET + ram_size;
-     qemu_register_reset(main_cpu_reset, reset_info);
+diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+index 806a5d9a8d..9d1a11adb7 100644
+--- a/hw/ppc/pnv.c
++++ b/hw/ppc/pnv.c
+@@ -818,7 +818,7 @@ static void pnv_init(MachineState *machine)
+     pnv->chips = g_new0(PnvChip *, pnv->num_chips);
+     for (i = 0; i < pnv->num_chips; i++) {
+         char chip_name[32];
+-        Object *chip = object_new(chip_typename);
++        Object *chip = OBJECT(qdev_create(NULL, chip_typename));
  
--    ahb_pnp = GRLIB_AHB_PNP(object_new(TYPE_GRLIB_AHB_PNP));
-+    ahb_pnp = GRLIB_AHB_PNP(qdev_create(NULL, TYPE_GRLIB_AHB_PNP));
-     object_property_set_bool(OBJECT(ahb_pnp), true, "realized", &error_fatal);
-     sysbus_mmio_map(SYS_BUS_DEVICE(ahb_pnp), 0, LEON3_AHB_PNP_OFFSET);
-     grlib_ahb_pnp_add_entry(ahb_pnp, 0, 0, GRLIB_VENDOR_GAISLER,
-                             GRLIB_LEON3_DEV, GRLIB_AHB_MASTER,
-                             GRLIB_CPU_AREA);
+         pnv->chips[i] = PNV_CHIP(chip);
  
--    apb_pnp = GRLIB_APB_PNP(object_new(TYPE_GRLIB_APB_PNP));
-+    apb_pnp = GRLIB_APB_PNP(qdev_create(NULL, TYPE_GRLIB_APB_PNP));
-     object_property_set_bool(OBJECT(apb_pnp), true, "realized", &error_fatal);
-     sysbus_mmio_map(SYS_BUS_DEVICE(apb_pnp), 0, LEON3_APB_PNP_OFFSET);
-     grlib_ahb_pnp_add_entry(ahb_pnp, LEON3_APB_PNP_OFFSET, 0xFFF,
+@@ -1317,8 +1317,8 @@ static void pnv_chip_power9_instance_init(Object *obj)
+     PnvChipClass *pcc = PNV_CHIP_GET_CLASS(obj);
+     int i;
+ 
+-    object_initialize_child(obj, "xive", &chip9->xive, sizeof(chip9->xive),
+-                            TYPE_PNV_XIVE, &error_abort, NULL);
++    sysbus_init_child_obj(obj, "xive", &chip9->xive, sizeof(chip9->xive),
++                          TYPE_PNV_XIVE);
+     object_property_add_alias(obj, "xive-fabric", OBJECT(&chip9->xive),
+                               "xive-fabric");
+ 
 -- 
 2.26.2
 
