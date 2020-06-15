@@ -2,73 +2,76 @@ Return-Path: <SRS0=tJVC=74=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE181C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 10:39:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F204DC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 10:41:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 893EC20663
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 10:39:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BC1E820663
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 10:41:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D+k8lhQ5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 893EC20663
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I1T3rv+x"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC1E820663
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36056 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39252 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkmWc-0005YH-Qn
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 06:39:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52470)
+	id 1jkmY4-00072v-W6
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 06:41:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52512)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jkmTq-0000a5-9x
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 06:36:42 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:53903
- helo=us-smtp-delivery-1.mimecast.com)
+ id 1jkmTy-0000uR-Os
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 06:36:50 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:45533
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jkmTo-0007RQ-Gd
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 06:36:41 -0400
+ id 1jkmTw-0007SI-TS
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 06:36:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592217399;
+ s=mimecast20190719; t=1592217408;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=WQhkqdS6EaGMQv+B05yQexMyipgFg0KRPPWB3xIi5G0=;
- b=D+k8lhQ5pjVNtSXY96Tx/FhKLeKiumPUJJVxx98PUj+qBgzJrF0mjSC7yUoGOm9U4fo5kZ
- 55ar3sCFPQ33wKASb/zPVWcoS8JWdSH05+oBoHvDVSbhaeZy4t5dNmN6MUgYruxuMvnLGW
- t1KUsusDu7f8v8QpFoJebHw43IPTFAM=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=lDPcbbQN9/45I+316wizP19u8fb11YOlZCffXtV4MRg=;
+ b=I1T3rv+x34sOJwFGe+fjhuxj6olKjoMBfVLFFi4S1DCzgxSb0zxHXZhj5hPR1Y7ca8O8KO
+ GpLn8NUB87wmgTcTEOrKbo5+6DNEo7vMeJA55GtjqQF3/jv5Gg8AwnU9tkA2bKvNNrpejT
+ UYFJSuBDv+GvKLtHn8Tvp22PYZzJQ2M=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-116-F8wV5614PnS3Vp_i7bq_9w-1; Mon, 15 Jun 2020 06:36:36 -0400
-X-MC-Unique: F8wV5614PnS3Vp_i7bq_9w-1
+ us-mta-353-0c7d3AguP-e9_NppyrpyMg-1; Mon, 15 Jun 2020 06:36:46 -0400
+X-MC-Unique: 0c7d3AguP-e9_NppyrpyMg-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9557E1009442
- for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 10:36:35 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 85A0A1009441
+ for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 10:36:45 +0000 (UTC)
 Received: from localhost.localdomain.com (unknown [10.36.110.57])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BA5835D9CC;
- Mon, 15 Jun 2020 10:36:34 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 90A3D5D9CC;
+ Mon, 15 Jun 2020 10:36:44 +0000 (UTC)
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 0/5] Qcrypto next patches
-Date: Mon, 15 Jun 2020 11:36:28 +0100
-Message-Id: <20200615103633.300208-1-berrange@redhat.com>
+Subject: [PULL 5/5] crypto: Remove use of GCRYPT_VERSION macro.
+Date: Mon, 15 Jun 2020 11:36:33 +0100
+Message-Id: <20200615103633.300208-6-berrange@redhat.com>
+In-Reply-To: <20200615103633.300208-1-berrange@redhat.com>
+References: <20200615103633.300208-1-berrange@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=berrange@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 01:12:36
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=berrange@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 01:17:36
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -89,67 +92,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ "Richard W.M. Jones" <rjones@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit 7d3660e79830a069f1848bb4fa1cdf8f666424fb=
-:=0D
-=0D
-  Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into sta=
-gi=3D=0D
-ng (2020-06-12 23:06:22 +0100)=0D
-=0D
-are available in the Git repository at:=0D
-=0D
-  https://github.com/berrange/qemu tags/qcrypto-next-pull-request=0D
-=0D
-for you to fetch changes up to d6cca8e111696fbbd7c233dc53f9c80b6a43359d:=0D
-=0D
-  crypto: Remove use of GCRYPT_VERSION macro. (2020-06-15 11:33:51 +0100)=0D
-=0D
-----------------------------------------------------------------=0D
-Misc crypto subsystem fixes=0D
-=0D
-* Improve error message for large files when creating LUKS volumes=0D
-* Expand crypto hash benchmark coverage=0D
-* Misc code refactoring with no functional change=0D
-=0D
-----------------------------------------------------------------=0D
-=0D
-Alexey Krasikov (3):=0D
-  crypto/secret: move main logic from 'secret' to 'secret_common'.=0D
-  crypto/linux_keyring: add 'secret_keyring' secret object.=0D
-  test-crypto-secret: add 'secret_keyring' object tests.=0D
-=0D
-Marek Marczykowski-G=3DC3=3DB3recki (1):=0D
-  crypto: add "none" random provider=0D
-=0D
-Richard W.M. Jones (1):=0D
-  crypto: Remove use of GCRYPT_VERSION macro.=0D
-=0D
- configure                       |  80 +++++++=0D
- crypto/Makefile.objs            |   5 +-=0D
- crypto/init.c                   |   2 +-=0D
- crypto/random-none.c            |  38 +++=0D
- crypto/secret.c                 | 347 +--------------------------=0D
- crypto/secret_common.c          | 403 ++++++++++++++++++++++++++++++++=0D
- crypto/secret_keyring.c         | 148 ++++++++++++=0D
- include/crypto/secret.h         |  20 +-=0D
- include/crypto/secret_common.h  |  68 ++++++=0D
- include/crypto/secret_keyring.h |  52 +++++=0D
- tests/Makefile.include          |   4 +=0D
- tests/test-crypto-secret.c      | 158 +++++++++++++=0D
- 12 files changed, 966 insertions(+), 359 deletions(-)=0D
- create mode 100644 crypto/random-none.c=0D
- create mode 100644 crypto/secret_common.c=0D
- create mode 100644 crypto/secret_keyring.c=0D
- create mode 100644 include/crypto/secret_common.h=0D
- create mode 100644 include/crypto/secret_keyring.h=0D
-=0D
---=3D20=0D
-2.26.2=0D
-=0D
+From: "Richard W.M. Jones" <rjones@redhat.com>
+
+According to the gcrypt documentation it's intended that
+gcry_check_version() is called with the minimum version of gcrypt
+needed by the program, not the version from the <gcrypt.h> header file
+that happened to be installed when qemu was compiled.  Indeed the
+gcrypt.h header says that you shouldn't use the GCRYPT_VERSION macro.
+
+This causes the following failure:
+
+  qemu-img: Unable to initialize gcrypt
+
+if a slightly older version of libgcrypt is installed with a newer
+qemu, even though the slightly older version works fine.  This can
+happen with RPM packaging which uses symbol versioning to determine
+automatically which libgcrypt is required by qemu, which caused the
+following bug in RHEL 8:
+
+  https://bugzilla.redhat.com/show_bug.cgi?id=1840485
+
+qemu actually requires libgcrypt >= 1.5.0, so we might put the string
+"1.5.0" here.  However since 1.5.0 was released in 2011, it hardly
+seems we need to check that.  So I replaced GCRYPT_VERSION with NULL.
+Perhaps in future if we move to requiring a newer version of gcrypt we
+could put a literal string here.
+
+Signed-off-by: Richard W.M. Jones <rjones@redhat.com>
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ crypto/init.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/crypto/init.c b/crypto/init.c
+index b305381ec5..ea233b9192 100644
+--- a/crypto/init.c
++++ b/crypto/init.c
+@@ -122,7 +122,7 @@ int qcrypto_init(Error **errp)
+ #endif
+ 
+ #ifdef CONFIG_GCRYPT
+-    if (!gcry_check_version(GCRYPT_VERSION)) {
++    if (!gcry_check_version(NULL)) {
+         error_setg(errp, "Unable to initialize gcrypt");
+         return -1;
+     }
+-- 
+2.26.2
 
 
