@@ -2,83 +2,89 @@ Return-Path: <SRS0=tJVC=74=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10171C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 15:05:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E0FDC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 15:07:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CE83520663
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 15:05:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 24CC920739
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 15:07:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SvNLD0jo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE83520663
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XVv0uteQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24CC920739
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56128 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58748 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkqfi-0008O8-3k
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 11:05:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34122)
+	id 1jkqiM-0001L7-2r
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 11:07:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35662)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jkqen-0007mI-Jr
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 11:04:17 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27542
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <mlureau@redhat.com>)
+ id 1jkqhg-0000qy-0F
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 11:07:16 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:25119
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jkqel-0005hk-VM
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 11:04:17 -0400
+ (Exim 4.90_1) (envelope-from <mlureau@redhat.com>)
+ id 1jkqhe-0006g1-4X
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 11:07:15 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592233455;
+ s=mimecast20190719; t=1592233632;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=rDXHNn4llN8h05BcHUuuVSe1J4X6+/m4EERYE2Xb/9E=;
- b=SvNLD0joqn8qxai5lDVvE3ADP1oWkPSrfp5bcjVnff4IIum7/gq+muzNtKZHfVTIwdetlm
- cORE3L11/rIn0uh0/fwpUcsDuOz/uUJODIM3fO2EYkWOjm3aXBese6r6RIiV8p9xvA3BsF
- Uv55Ey4clJRx13Hd7cc6dm3SGjmer9Y=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-319-sfaIdtjINXWot2gpB_YCeQ-1; Mon, 15 Jun 2020 11:04:13 -0400
-X-MC-Unique: sfaIdtjINXWot2gpB_YCeQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1D9591054FA6
- for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 15:04:09 +0000 (UTC)
-Received: from [10.36.114.197] (ovpn-114-197.ams2.redhat.com [10.36.114.197])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 38C5B5D9CC;
- Mon, 15 Jun 2020 15:04:00 +0000 (UTC)
-Subject: Re: [PATCH] tests/qtest/bios-tables: Only run the TPM test with
- CONFIG_TPM enabled
-To: Thomas Huth <thuth@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
-References: <20200615125402.12898-1-thuth@redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <647f57b4-b25b-7c90-4324-267f254804bb@redhat.com>
-Date: Mon, 15 Jun 2020 17:03:58 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ bh=WH+76HoBXgxtvbvf2lu7BrhzdhDjDAbFCFs7nh1vauQ=;
+ b=XVv0uteQ3wSpSiKQdQxzP05zThQNijfU9KZWnoodUEut94bpgLDQ9+A+0P96fdWKHRh4/H
+ 7532WqSNi/nb5rTLPHTBPayDm6cSEGrQzvzgE2kOkmhq0tEaG+SyTDKusLxVEVV8IRDm41
+ K5mI7p7bVr7+OHcO88E/eay+vbiWqV8=
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
+ [209.85.166.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-280-hmO3kHUaM9iHBsA4Gv4Dlw-1; Mon, 15 Jun 2020 11:07:08 -0400
+X-MC-Unique: hmO3kHUaM9iHBsA4Gv4Dlw-1
+Received: by mail-il1-f197.google.com with SMTP id v14so12264129ilo.19
+ for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 08:07:08 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=WH+76HoBXgxtvbvf2lu7BrhzdhDjDAbFCFs7nh1vauQ=;
+ b=qUviuNF34/ku0ICVvR2CVT4E2WoXXe6YLUSeDy1v+G0Tm7fvAjSnDQh6adDwC3NM7M
+ tBC47p0qE9HiZlxDA+Rgc1GsW6usH9G73vCJPuBcE7SfeZ2YCLgPcVECKdEgHfU0n7Ud
+ nkAgsUKOYbGzhu3DLs2RTYRuZolVPzhZaZ+mfh0IjCH3Lovl2l1tQ+GC6cfMfGffX+fN
+ xbF5DWDrCin7SUtN1rgfLnatvQm4zAUxEmKXB76XYtKyUzrqbhPQv1qbSNxhtXD++zKe
+ dw4evgNERYkiMppdl1XadaUEKZMj3r6OGcjxzXNSCADdK6HyFYR1nFw4Hhps3eU+2oAA
+ Am/A==
+X-Gm-Message-State: AOAM531sMr4CmivvhaPaI7i6n65WKxNolHIq2ZHcEc7kQQBshUK2I84d
+ gD9U/Fr7ztjaSai7xprHhKDQ0H/WpgtiJIfQ0UTOMdwjwnbxBr5rlupLRYkDXKW5vTsxGERoYcZ
+ JrV6NCooT9X8rQL/dL2DZHp/wH5Y175A=
+X-Received: by 2002:a92:909:: with SMTP id y9mr27546139ilg.165.1592233627754; 
+ Mon, 15 Jun 2020 08:07:07 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwnTbryKHeBYJnC239lNUdfLZApamtajnKqdadsvLzKtlwnhKMZAOoZKrh5rH+vpc8aq2oUAlOKwTYk5xWO+cE=
+X-Received: by 2002:a92:909:: with SMTP id y9mr27546120ilg.165.1592233627566; 
+ Mon, 15 Jun 2020 08:07:07 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200615125402.12898-1-thuth@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+References: <20200615142327.671546-1-stefanb@linux.vnet.ibm.com>
+ <20200615142327.671546-2-stefanb@linux.vnet.ibm.com>
+In-Reply-To: <20200615142327.671546-2-stefanb@linux.vnet.ibm.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Mon, 15 Jun 2020 19:06:56 +0400
+Message-ID: <CAMxuvazRHiZq+Qe36vpsTsKJqH7kdK6KGSF8SFiW35cj9TO2ew@mail.gmail.com>
+Subject: Re: [PATCH v2 1/5] tpm_tis: Allow lowering of IRQ also when locality
+ is not active
+To: Stefan Berger <stefanb@linux.vnet.ibm.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120;
- envelope-from=eric.auger@redhat.com; helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 01:17:36
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=mlureau@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 01:12:36
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -99,64 +105,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Eric Auger <eric.auger@redhat.com>,
+ "Bonzini, Paolo" <pbonzini@redhat.com>,
+ Philippe Mathieu Daude <philmd@redhat.com>,
+ Marek Kedzierski <mkedzier@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Thomas,
+Hi
 
-On 6/15/20 2:54 PM, Thomas Huth wrote:
-> "make check-qtest" currently fails if configure has been run with
-> "--disable-tpm" - the TPM-related tests can only work if the TPM is
-> enabled in the build. So let's use the CONFIG_TPM switch to disable
-> the test if TPM is not available.
-Please forgive me, I did not notice your patch and sent another one :-(
+On Mon, Jun 15, 2020 at 6:23 PM Stefan Berger
+<stefanb@linux.vnet.ibm.com> wrote:
+>
+> From: Stefan Berger <stefanb@linux.ibm.com>
+>
+> This patch fixes a bug that occurs when using interrupts. It
+> allows to lower the IRQ also when a locality is not active.
+>
 
-Either fix is fine for me.
+Can you quote the specification, or is it purely based on testing
+(Windows & Linux) or checking expected behaviour from Linux code?
 
-Thanks
-
-Eric
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
 > ---
->  tests/qtest/bios-tables-test.c | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
-> diff --git a/tests/qtest/bios-tables-test.c b/tests/qtest/bios-tables-test.c
-> index 53f104a9c5..d170a617d8 100644
-> --- a/tests/qtest/bios-tables-test.c
-> +++ b/tests/qtest/bios-tables-test.c
-> @@ -877,6 +877,8 @@ static void test_acpi_piix4_tcg_numamem(void)
->      free_test_data(&data);
->  }
->  
-> +#ifdef CONFIG_TPM
-> +
->  uint64_t tpm_tis_base_addr;
->  
->  static void test_acpi_tcg_tpm(const char *machine, const char *tpm_if,
-> @@ -931,6 +933,8 @@ static void test_acpi_q35_tcg_tpm_tis(void)
->      test_acpi_tcg_tpm("q35", "tis", 0xFED40000);
->  }
->  
-> +#endif /* CONFIG_TPM */
-> +
->  static void test_acpi_tcg_dimm_pxm(const char *machine)
->  {
->      test_data data;
-> @@ -1094,7 +1098,9 @@ int main(int argc, char *argv[])
->              return ret;
->          }
->  
-> +#ifdef CONFIG_TPM
->          qtest_add_func("acpi/q35/tpm-tis", test_acpi_q35_tcg_tpm_tis);
-> +#endif
->          qtest_add_func("acpi/piix4", test_acpi_piix4_tcg);
->          qtest_add_func("acpi/piix4/bridge", test_acpi_piix4_tcg_bridge);
->          qtest_add_func("acpi/q35", test_acpi_q35_tcg);
-> 
+>  hw/tpm/tpm_tis_common.c | 4 ----
+>  1 file changed, 4 deletions(-)
+>
+> diff --git a/hw/tpm/tpm_tis_common.c b/hw/tpm/tpm_tis_common.c
+> index 1af4bce139..0f42696f1f 100644
+> --- a/hw/tpm/tpm_tis_common.c
+> +++ b/hw/tpm/tpm_tis_common.c
+> @@ -601,10 +601,6 @@ static void tpm_tis_mmio_write(void *opaque, hwaddr addr,
+>          /* hard wired -- ignore */
+>          break;
+>      case TPM_TIS_REG_INT_STATUS:
+> -        if (s->active_locty != locty) {
+> -            break;
+> -        }
+> -
+>          /* clearing of interrupt flags */
+>          if (((val & TPM_TIS_INTERRUPTS_SUPPORTED)) &&
+>              (s->loc[locty].ints & TPM_TIS_INTERRUPTS_SUPPORTED)) {
+> --
+> 2.24.1
+>
 
 
