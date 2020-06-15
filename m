@@ -2,88 +2,105 @@ Return-Path: <SRS0=tJVC=74=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CDAEC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 14:22:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82EA9C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 14:24:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 59187206B7
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 14:22:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aXLXvXDi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59187206B7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 513B0206B7
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 14:24:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 513B0206B7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55384 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60970 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkq0G-0006EY-Kh
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 10:22:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47870)
+	id 1jkq2K-00007J-EE
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 10:24:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48256)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jkpzL-0004vQ-6P
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 10:21:27 -0400
-Received: from mail-oo1-xc44.google.com ([2607:f8b0:4864:20::c44]:40082)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jkpzJ-0004xA-9G
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 10:21:26 -0400
-Received: by mail-oo1-xc44.google.com with SMTP id v26so3387329oof.7
- for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 07:21:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=UNLmVU9/tKgHfE+6X5EXk/g8GcwZfNcSwp3dTWtTh0k=;
- b=aXLXvXDiPoUZGwY/AzqcHTYtCB3HxhQs0rtvoclHRpB/1U7Bn7Rpm1kDQvgdRiGHWA
- 3gxXegVJCX9gCPE8pxaDHo0o1UxvC7kMWkDklGG8JaeJTztk/2RKM52ZOvHJYEGgafsX
- SiabRUQhVQMBB1dRyEq4vSYOiHL2xrKHJ3AEUjw3jOKXAw/bexbr0Rci6mrSRYH8uYMS
- 0uji6p0y7xuaEhZx9yRSfiZQIC/OQey3DSX0f0wQJxnRFDoy1gtJtQB6V1UhLrg3ko5d
- 397r6L1ThVKTWp7V2/mUe65cmJ5tk2WQT8rFnZ+qlpFH18KlgiTd+/HEAx+44aLR4prk
- hbrw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=UNLmVU9/tKgHfE+6X5EXk/g8GcwZfNcSwp3dTWtTh0k=;
- b=ha03Dv52A/MajtFoszciVk+F4eXKUcNZgwBf9O90K7EX257/xKTaJl9F3LZoZhXrCK
- XgPeuLmw+X7nfK5XNOFQMNogOxnm6eyQqbbhQf75F5C5OTyGT04jrrevwHIdxSOFEWXc
- CB6OtFYZCFuiSbPNkPdwiYMiK0VEwN3Me9NBdUA7DWIuyG3HwP57rF7D7YSMj9PPyvoZ
- wR4ElMzPNbwBlhVPClvtGpoxsOB5qCu1qeh8teE3bzZ3gP5BdImMkGxwEQPno/j7Cgpc
- EipTIPfi0yORYqVAt9apXpGiAlaPzrCWvhH5ziVJTa8HvIRnTpMPhHqlNbdEWPRIuVXA
- Tpew==
-X-Gm-Message-State: AOAM532O1B1HytRpjpMx/aVbMnQ5BsHAlrmEcoXPINjbHineDNqKCjDe
- 9Vp9n+Dva6udJ5wwzI3D/p7VDV6uUf/KtrkaUiK03Q==
-X-Google-Smtp-Source: ABdhPJwuQpDWLMb93D6tCC80t48d8b4kl3oR9Mc16M1GMcy8w2t1ofLzYsdKqJZsTSx8s8DcSlKhjFloEI/AYOTkIkU=
-X-Received: by 2002:a4a:9528:: with SMTP id m37mr21238379ooi.85.1592230884015; 
- Mon, 15 Jun 2020 07:21:24 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <stefanb@linux.vnet.ibm.com>)
+ id 1jkq1S-0007MP-PI
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 10:23:38 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51606)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <stefanb@linux.vnet.ibm.com>)
+ id 1jkq1R-0005JI-6Q
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 10:23:38 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 05FE3Cib021612
+ for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 10:23:35 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 31n3020c00-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 10:23:35 -0400
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05FE6w9r041191
+ for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 10:23:35 -0400
+Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com
+ [169.62.189.10])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 31n3020byh-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 15 Jun 2020 10:23:35 -0400
+Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
+ by ppma02dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05FEKwk3001021;
+ Mon, 15 Jun 2020 14:23:34 GMT
+Received: from b03cxnp08027.gho.boulder.ibm.com
+ (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
+ by ppma02dal.us.ibm.com with ESMTP id 31mpe9dur1-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 15 Jun 2020 14:23:34 +0000
+Received: from b03ledav006.gho.boulder.ibm.com
+ (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
+ by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 05FENVGa12518096
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 15 Jun 2020 14:23:31 GMT
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id EC917C6059;
+ Mon, 15 Jun 2020 14:23:32 +0000 (GMT)
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 5C7B5C6057;
+ Mon, 15 Jun 2020 14:23:32 +0000 (GMT)
+Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
+ by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
+ Mon, 15 Jun 2020 14:23:32 +0000 (GMT)
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 1/5] tpm_tis: Allow lowering of IRQ also when locality is
+ not active
+Date: Mon, 15 Jun 2020 10:23:23 -0400
+Message-Id: <20200615142327.671546-2-stefanb@linux.vnet.ibm.com>
+X-Mailer: git-send-email 2.24.1
+In-Reply-To: <20200615142327.671546-1-stefanb@linux.vnet.ibm.com>
+References: <20200615142327.671546-1-stefanb@linux.vnet.ibm.com>
 MIME-Version: 1.0
-References: <20200605102230.21493-1-philmd@redhat.com>
- <20200605102230.21493-11-philmd@redhat.com>
-In-Reply-To: <20200605102230.21493-11-philmd@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 15 Jun 2020 15:21:13 +0100
-Message-ID: <CAFEAcA_TS-Q+xMgFMeh9JmA1MUvxxBcbROtdTc_hDokDNRqKXw@mail.gmail.com>
-Subject: Re: [PATCH v3 10/11] hw/sd/sdcard: Display offset in
- read/write_data() trace events
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::c44;
- envelope-from=peter.maydell@linaro.org; helo=mail-oo1-xc44.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
+ definitions=2020-06-15_02:2020-06-15,
+ 2020-06-15 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0
+ cotscore=-2147483648 bulkscore=0 mlxscore=0 suspectscore=1 adultscore=0
+ priorityscore=1501 malwarescore=0 clxscore=1015 spamscore=0
+ mlxlogscore=657 lowpriorityscore=0 impostorscore=0 classifier=spam
+ adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2006150111
+Received-SPF: none client-ip=148.163.156.1;
+ envelope-from=stefanb@linux.vnet.ibm.com; helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 08:37:04
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
+X-Spam_bar: ---
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,25 +113,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: eric.auger@redhat.com, pbonzini@redhat.com, marcandre.lureau@redhat.com,
+ philmd@redhat.com, mkedzier@redhat.com, Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 5 Jun 2020 at 11:32, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com=
-> wrote:
->
-> From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->
-> Having 'base address' and 'relative offset' displayed
-> separately is more helpful than the absolute address.
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
+From: Stefan Berger <stefanb@linux.ibm.com>
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+This patch fixes a bug that occurs when using interrupts. It
+allows to lower the IRQ also when a locality is not active.
 
-thanks
--- PMM
+Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
+---
+ hw/tpm/tpm_tis_common.c | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/hw/tpm/tpm_tis_common.c b/hw/tpm/tpm_tis_common.c
+index 1af4bce139..0f42696f1f 100644
+--- a/hw/tpm/tpm_tis_common.c
++++ b/hw/tpm/tpm_tis_common.c
+@@ -601,10 +601,6 @@ static void tpm_tis_mmio_write(void *opaque, hwaddr addr,
+         /* hard wired -- ignore */
+         break;
+     case TPM_TIS_REG_INT_STATUS:
+-        if (s->active_locty != locty) {
+-            break;
+-        }
+-
+         /* clearing of interrupt flags */
+         if (((val & TPM_TIS_INTERRUPTS_SUPPORTED)) &&
+             (s->loc[locty].ints & TPM_TIS_INTERRUPTS_SUPPORTED)) {
+-- 
+2.24.1
+
 
