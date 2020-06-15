@@ -8,67 +8,67 @@ X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E1F3C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 16:18:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE88DC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 16:18:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 657A12078A
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 16:18:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A819F20663
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 16:18:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M/hQoYay"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 657A12078A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ia0/iCOs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A819F20663
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44286 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45926 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkroS-0006aT-K4
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 12:18:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52518)
+	id 1jkror-0007Ia-Pn
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 12:18:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52668)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jkrn2-0005CF-VR; Mon, 15 Jun 2020 12:16:53 -0400
-Received: from mail-il1-x143.google.com ([2607:f8b0:4864:20::143]:40083)
+ id 1jkrno-0005zs-Fz; Mon, 15 Jun 2020 12:17:40 -0400
+Received: from mail-il1-x143.google.com ([2607:f8b0:4864:20::143]:36651)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jkrn1-0003pl-4u; Mon, 15 Jun 2020 12:16:52 -0400
-Received: by mail-il1-x143.google.com with SMTP id t8so15836237ilm.7;
- Mon, 15 Jun 2020 09:16:50 -0700 (PDT)
+ id 1jkrnm-00040h-N0; Mon, 15 Jun 2020 12:17:40 -0400
+Received: by mail-il1-x143.google.com with SMTP id a13so15875246ilh.3;
+ Mon, 15 Jun 2020 09:17:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=9wsHomtj0zeizuyp8OfCHz9BNt87WuGG7N7Wa4Qh+FA=;
- b=M/hQoYayzj+SebOeP45brGd9IkwwMq4VjQCVgbQvpcoE58B4HriwKNho9cGhHZzhs5
- Wu14T9+D8eV9H9JfHklywqjGmm7cxHr9gFYpUT3PTpO5NgjnXGnXIg5gjyatTnMBgbD6
- iXbrjkH7AoUVfKu/nBrRW8RI0T1y5jfjqxq74PU+murBa5WrYl7BDsGK/+JkLYb0rr6f
- nAYHAGx5uwYkgzZUQwBNKE2CsY54clHNMCsejiuHhFrkOkrr5Zi2UKQOTztSuEhOpG/8
- ZkmYqAulRK+lXWKW/yrWluGfBGNff8jQZc8mKXCI4d+m+LdjlBKGHBWKVnfGTs3Sx2gF
- AyRA==
+ :cc; bh=hI9MX4ofyyUfruODIlPBhDAbqYvRiqrXJQq+F+BFs1M=;
+ b=ia0/iCOsdFHjyruRBIleN6Pb1uw/SmEH79k5Z+N2SjBLEfKKjTGvwpY8/8DdhnRA2K
+ Ekq6YE8mn+zk5UZX+PRB9Rb94ms6/+BKrWn0KpqoJYVXA7YqzCCdqLEnjJMOFEJvfve8
+ bMd+7S61eZnwVCkxhv6PhR93od5EIKEJMa30MdT+BSR3QbCJW63lXnKTV7BNBUn7XWXy
+ E071vNc1b1InZ5nVRtzFIuhD+UH7Hl5pdd8bNSjCiR+qkv0gfeubsQR9/0MKyuTs2o3X
+ /ZKSP/MiiH7UNEW6wrT8BvEOHqBnIt93+5+H9otIN3kdjY61RFF3E95uaJTlAgaOiDs+
+ Yfyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=9wsHomtj0zeizuyp8OfCHz9BNt87WuGG7N7Wa4Qh+FA=;
- b=WikoW7pHvpaZV/t4wFj4KzZKg9UnS1l7RYNZWqNU85qBZqyAZBWuQXHXyARPo9QGQR
- 6/7lqqD5YFQphOkMj25BCh1sZhllJEsrxH4vobQJpfQ88HXQUktDJQTL43nL0h8iWxTB
- XiohfRlJFuGpWvDorSt2dLV7BcsN9xkTCK80KVOUbeTW+hAednGPEPyzAjgU3uMo/48B
- iUwRkUkXlrtJdisM03hz4MTj83EMR0ajtEhTbezjIYfRFurAerXto6HNb584PeW6m1N8
- skoAjt2NlVwijGF/cDv4n69QJgNhm0Qk2+7uCe+hfQ33nB5D/kCmp8m0LVOGiMPUrPSR
- Lxrg==
-X-Gm-Message-State: AOAM533l0Wb2zl8hq0vxEVLeisAhGUe/PDTraN3UH1UyRf0x3gw5D4+J
- eoCDPn0594Q24Khd044+fkoMlEtmR4KNVI4qnTM=
-X-Google-Smtp-Source: ABdhPJx5G3TB8uyCAWljlIe7EfiM4SM3uSPn0tcOTyTtHHmaWVHrY+fhjF34xakhGR4xFNKMUb/hrw6aOySZhcjBSlg=
-X-Received: by 2002:a92:c94b:: with SMTP id i11mr28183386ilq.177.1592237809664; 
- Mon, 15 Jun 2020 09:16:49 -0700 (PDT)
+ bh=hI9MX4ofyyUfruODIlPBhDAbqYvRiqrXJQq+F+BFs1M=;
+ b=jrylOc7qc8A5+qo3ZdFawJbNWCzeM2gn+/1sGwA6eGFB7NIyst5RZUcDFEv/U6bVYj
+ rNkGpK1iRoHOIQRiU/lmScccb0WJdIvt1xdprqyXLNLhsBbbU5I/mDrjPNZg7CJPaL3j
+ lMogv5n9D8f/0c7s6Eel7CGsYJ21HqhVXPY09zQPc8nS+m64Ns1kd1cwhajNzMcxGB6T
+ /+i+7dRscTtqWzlUbhNS2yw9Jz7V7qMYambwEEriVuNgnroq1Eiq00E02Mxs/YQB6CbP
+ nYWdFeqIWa3mo3S8aPLyyZwboDBXzDso8lveB3Qu++ozO7VhG7T9xL56kYVB13hrWCSQ
+ G86A==
+X-Gm-Message-State: AOAM532/OLCt+urK8f0xTlI/KIAx2nMPR5BFtVZ+KAIkRi4xW7Qqgj/c
+ hndkYPGvha6BFxovDI0awnULpkl9b46LlhQGNdo=
+X-Google-Smtp-Source: ABdhPJzhbR/oe70IMDJ3kDyqkmKMxRxOBeKbR3GkGiU+3mkXeAfNm2WewAAzaWIIWW0MY9mMTyMyttYQBZ5IWq0SnKU=
+X-Received: by 2002:a92:aa07:: with SMTP id j7mr27549997ili.40.1592237856632; 
+ Mon, 15 Jun 2020 09:17:36 -0700 (PDT)
 MIME-Version: 1.0
 References: <1591625864-31494-1-git-send-email-bmeng.cn@gmail.com>
- <1591625864-31494-4-git-send-email-bmeng.cn@gmail.com>
-In-Reply-To: <1591625864-31494-4-git-send-email-bmeng.cn@gmail.com>
+ <1591625864-31494-5-git-send-email-bmeng.cn@gmail.com>
+In-Reply-To: <1591625864-31494-5-git-send-email-bmeng.cn@gmail.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 15 Jun 2020 09:07:26 -0700
-Message-ID: <CAKmqyKPqVcztg-060inbqcSEM+1BCrKi9W=-8tw4CjGKHkV3zQ@mail.gmail.com>
-Subject: Re: [PATCH 03/15] hw/riscv: sifive_u: Simplify the GEM IRQ connect
- code a little bit
+Date: Mon, 15 Jun 2020 09:08:13 -0700
+Message-ID: <CAKmqyKObYVrCuYHKWKLYYcJEQJMxoCvRbYVTBObXm_crtCJSzQ@mail.gmail.com>
+Subject: Re: [PATCH 04/15] hw/riscv: sifive_u: Generate device tree node for
+ OTP
 To: Bin Meng <bmeng.cn@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Received-SPF: pass client-ip=2607:f8b0:4864:20::143;
@@ -106,13 +106,13 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jun 8, 2020 at 7:19 AM Bin Meng <bmeng.cn@gmail.com> wrote:
+On Mon, Jun 8, 2020 at 7:21 AM Bin Meng <bmeng.cn@gmail.com> wrote:
 >
 > From: Bin Meng <bin.meng@windriver.com>
 >
-> There is no need to retrieve all PLIC IRQ information in order to
-> just connect the GEM IRQ. Use qdev_get_gpio_in() directly like
-> what is done for other peripherals.
+> Upstream U-Boot v2020.07 codes switch to access SiFive FU540 OTP
+> based on device tree information. Let's generate the device tree
+> node for OTP.
 >
 > Signed-off-by: Bin Meng <bin.meng@windriver.com>
 
@@ -122,41 +122,31 @@ Alistair
 
 > ---
 >
->  hw/riscv/sifive_u.c | 7 +------
->  1 file changed, 1 insertion(+), 6 deletions(-)
+>  hw/riscv/sifive_u.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
 >
 > diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-> index f9fef2b..cf7f833 100644
+> index cf7f833..8dc6842 100644
 > --- a/hw/riscv/sifive_u.c
 > +++ b/hw/riscv/sifive_u.c
-> @@ -528,7 +528,6 @@ static void sifive_u_soc_realize(DeviceState *dev, Error **errp)
->      MemoryRegion *system_memory = get_system_memory();
->      MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
->      MemoryRegion *l2lim_mem = g_new(MemoryRegion, 1);
-> -    qemu_irq plic_gpios[SIFIVE_U_PLIC_NUM_SOURCES];
->      char *plic_hart_config;
->      size_t plic_hart_config_len;
->      int i;
-> @@ -612,10 +611,6 @@ static void sifive_u_soc_realize(DeviceState *dev, Error **errp)
->      object_property_set_bool(OBJECT(&s->otp), true, "realized", &err);
->      sysbus_mmio_map(SYS_BUS_DEVICE(&s->otp), 0, memmap[SIFIVE_U_OTP].base);
+> @@ -207,6 +207,17 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
+>      g_free(cells);
+>      g_free(nodename);
 >
-> -    for (i = 0; i < SIFIVE_U_PLIC_NUM_SOURCES; i++) {
-> -        plic_gpios[i] = qdev_get_gpio_in(DEVICE(s->plic), i);
-> -    }
-> -
->      if (nd->used) {
->          qemu_check_nic_model(nd, TYPE_CADENCE_GEM);
->          qdev_set_nic_properties(DEVICE(&s->gem), nd);
-> @@ -629,7 +624,7 @@ static void sifive_u_soc_realize(DeviceState *dev, Error **errp)
->      }
->      sysbus_mmio_map(SYS_BUS_DEVICE(&s->gem), 0, memmap[SIFIVE_U_GEM].base);
->      sysbus_connect_irq(SYS_BUS_DEVICE(&s->gem), 0,
-> -                       plic_gpios[SIFIVE_U_GEM_IRQ]);
-> +                       qdev_get_gpio_in(DEVICE(s->plic), SIFIVE_U_GEM_IRQ));
->
->      create_unimplemented_device("riscv.sifive.u.gem-mgmt",
->          memmap[SIFIVE_U_GEM_MGMT].base, memmap[SIFIVE_U_GEM_MGMT].size);
+> +    nodename = g_strdup_printf("/soc/otp@%lx",
+> +        (long)memmap[SIFIVE_U_OTP].base);
+> +    qemu_fdt_add_subnode(fdt, nodename);
+> +    qemu_fdt_setprop_cell(fdt, nodename, "fuse-count", SIFIVE_U_OTP_REG_SIZE);
+> +    qemu_fdt_setprop_cells(fdt, nodename, "reg",
+> +        0x0, memmap[SIFIVE_U_OTP].base,
+> +        0x0, memmap[SIFIVE_U_OTP].size);
+> +    qemu_fdt_setprop_string(fdt, nodename, "compatible",
+> +        "sifive,fu540-c000-otp");
+> +    g_free(nodename);
+> +
+>      prci_phandle = phandle++;
+>      nodename = g_strdup_printf("/soc/clock-controller@%lx",
+>          (long)memmap[SIFIVE_U_PRCI].base);
 > --
 > 2.7.4
 >
