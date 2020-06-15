@@ -2,99 +2,79 @@ Return-Path: <SRS0=tJVC=74=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6187AC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 19:47:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EE16C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 19:51:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2300F206F1
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 19:47:39 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aeSntI7N"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2300F206F1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3E73920734
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 19:51:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E73920734
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42574 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44756 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkv50-0006Ga-E1
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 15:47:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49954)
+	id 1jkv8R-0007OW-Iu
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 15:51:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50630)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jkv44-0005R7-3A
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 15:46:40 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:36402
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jkv42-0007nE-J2
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 15:46:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592250397;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=bj7Iu9xUZE2bPUWgFA3C7WbxdD/CaBi7Ejb9ZCJY0go=;
- b=aeSntI7NcYckGkJVROZwLklbuGQOFg+7jCuiwaL3tED+4SqwX8CmrUx+9JQ4MAbywe6+4S
- uXSydoMBC9RjUcwhFuV/8kNVDNWdWTTnVHPYoi2Ia0JAR4rtrk2gA9ssu+si86xU5N8g/y
- MuhFigS47vKHWlNWqbisao0/jY5Ki24=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-324-Pt-adq1NPQ6zPWJSo2aYsg-1; Mon, 15 Jun 2020 15:46:31 -0400
-X-MC-Unique: Pt-adq1NPQ6zPWJSo2aYsg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1442B10AEA01;
- Mon, 15 Jun 2020 19:46:30 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
- [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 74D9F60BEC;
- Mon, 15 Jun 2020 19:46:26 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id E39001138648; Mon, 15 Jun 2020 21:46:17 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v2] Makefile: Remove generated files when doing
- 'distclean' (and 'clean')
-References: <20191008082815.8267-1-thuth@redhat.com>
- <CAL1e-=gYkhM99Ee0LxZJ5dCjeEdC08G4_Tm3WCZpCSWvJ=b26Q@mail.gmail.com>
- <4bfea125-eb63-f4a2-bca0-bce462f73d89@redhat.com>
- <CAFEAcA_+V7SNsxPSgsd04s8f7PnP3qdyXMp6NvS2inHjE08pJw@mail.gmail.com>
- <CAL1e-=ijjbTG19NHnsDrcJdb7kajBdcndMT8JXymqC6UViiitQ@mail.gmail.com>
- <770c89b9-44d1-0982-34ff-1830911ac413@redhat.com>
- <89c5b73f-2294-b58a-85e0-5ed64926fb0c@redhat.com>
-Date: Mon, 15 Jun 2020 21:46:17 +0200
-In-Reply-To: <89c5b73f-2294-b58a-85e0-5ed64926fb0c@redhat.com> (Paolo
- Bonzini's message of "Mon, 15 Jun 2020 09:13:43 +0200")
-Message-ID: <87d0605cza.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jkv7u-0006zg-ED
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 15:50:38 -0400
+Received: from indium.canonical.com ([91.189.90.7]:44854)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jkv7s-0008GS-BL
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 15:50:38 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jkv7q-00041V-Pe
+ for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 19:50:34 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id C0C132E8052
+ for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 19:50:34 +0000 (UTC)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 15:33:00
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Date: Mon, 15 Jun 2020 19:41:43 -0000
+From: Randy Rhoads <1883593@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: randy3
+X-Launchpad-Bug-Reporter: Randy Rhoads (randy3)
+X-Launchpad-Bug-Modifier: Randy Rhoads (randy3)
+Message-Id: <159225010396.5666.14857392307926027696.malonedeb@chaenomeles.canonical.com>
+Subject: [Bug 1883593] [NEW] Windows XP takes much longer to boot in TCG mode
+ since 5.0
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="b190cebbf563f89e480a8b57f641753c8196bda0";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: ac28ef7896faf76bf545827ad0bc79a097f5d94d
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 15:50:35
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -103,30 +83,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- =?utf-8?Q?Marc-An?= =?utf-8?Q?dr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Reply-To: Bug 1883593 <1883593@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+Public bug reported:
 
-> On 15/06/20 07:17, Thomas Huth wrote:
->> That depends ... Marc-Andr=C3=A9, Paolo, what's the status of the meson =
-patch
->> series? Do you think it will be merged for the next release already? If
->> so, it does not make much sense to respin my distclean patch. Otherwise
->> I could do another iteration...
->
-> I prefer to aim for 5.2, making it the very first series merged there
-> and forcing everyone else to rebase.
+Since upgrading from 4.2 to 5.0, a Windows XP VM takes much longer to
+boot.
 
-Makes sense to me.
+It hangs about three minutes on "welcome" screen with the blue
+background, while previously the total boot time was less than a minute.
 
-I wish I had the time for supporting this effort with more review, but
-who am I kidding.
+The issue only happens in TCG mode (not with KVM) and also happens with
+the current master which includes the uring patches (7d3660e7).
 
+I can reproduce this issue with a clean XP install with no flags other
+than `-m 2G`. After booting, the performance seems to be normal.
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1883593
+
+Title:
+  Windows XP takes much longer to boot in TCG mode since 5.0
+
+Status in QEMU:
+  New
+
+Bug description:
+  Since upgrading from 4.2 to 5.0, a Windows XP VM takes much longer to
+  boot.
+
+  It hangs about three minutes on "welcome" screen with the blue
+  background, while previously the total boot time was less than a
+  minute.
+
+  The issue only happens in TCG mode (not with KVM) and also happens
+  with the current master which includes the uring patches (7d3660e7).
+
+  I can reproduce this issue with a clean XP install with no flags other
+  than `-m 2G`. After booting, the performance seems to be normal.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1883593/+subscriptions
 
