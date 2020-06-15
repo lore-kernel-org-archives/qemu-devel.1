@@ -8,61 +8,61 @@ X-Spam-Status: No, score=-11.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A82EC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 04:43:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87F47C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 04:51:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 23550206DB
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 04:43:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2A17F20679
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 04:51:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Otl+WTao"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 23550206DB
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gR8Eg2Fg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A17F20679
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50864 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53644 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkgyH-0007MB-7G
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 00:43:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35760)
+	id 1jkh5f-0000cw-5g
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 00:51:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39614)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jkgxD-0006a8-EK
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 00:42:39 -0400
-Received: from mail-wm1-x32c.google.com ([2a00:1450:4864:20::32c]:51786)
+ id 1jkh4o-00007b-Jd
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 00:50:30 -0400
+Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:50564)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jkgx9-0001U1-OL
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 00:42:39 -0400
-Received: by mail-wm1-x32c.google.com with SMTP id b82so4700233wmb.1
- for <qemu-devel@nongnu.org>; Sun, 14 Jun 2020 21:42:35 -0700 (PDT)
+ id 1jkh4k-00039V-T1
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 00:50:30 -0400
+Received: by mail-wm1-x335.google.com with SMTP id l17so13242335wmj.0
+ for <qemu-devel@nongnu.org>; Sun, 14 Jun 2020 21:50:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=OMjdTIDli5VnEgUDPb7WATXb1tPCFQhDA1XJTo/WHqE=;
- b=Otl+WTao3/c46qFr7SwA4IhBG0E5r1MCP2guCr2fFZM46Tsrjs9zaMIhn291SqR8v8
- NvrTcS1JMhx1cBLGk6RpKWStg5q4kxWOhXG7dcsPd4EltKr7J96hIB3KEfcpK9CZsPM4
- +w+wU8LqZUHEwFv5knqqk7nZ6jVi3iXJjQ0e06mMkKPCf1xkJCjVTpYENV3eoFdbGzm+
- MFeDiWkwKhvAmyL1lAYxli3TfeIhvCQubUO9kaMKYe2oKTh/0GktBjO32uXXlu1aUPuI
- Cad9defZZ3P+l787tkdLD8GkTisH5jnRfvAu6gxS+GzUC9TsgRILR9ofoAglNcnvPNK6
- 2koQ==
+ bh=gKoodE+CpK7MkmERg3HP/rONNOq7ItUfs/wfTv0yHzI=;
+ b=gR8Eg2FgGpH7T8rbAeEUTfX4QrVpE8LHzTJA6l4yyVefQ1T4dG8VGuPVUq3HQ2YR+w
+ lNziIZtmUwZaz0ynNJBvTlxR3nDZX+JWpXenZHKwFlLil76unInKHPHSUoNhu/R96ddo
+ GsuCBi3zZ5v9Y322BjgNKNln2JTlZRXB3KQAfB18tJ0CrOMYiA4KtYDT3GimU/RSYzdW
+ 1DWJCfSj0D0Y9TUQX0KYcKtcBTWUrfnDdIKatzeEMDLKrG/cZhYz36twG+56FiB+Ewux
+ RZ/w+81PE5PSf+k+X50yHPLzdUaS04hSo7Sma+EDbbgsysoXgFHg6iXB6cgAiUXD8mZB
+ Q27g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=OMjdTIDli5VnEgUDPb7WATXb1tPCFQhDA1XJTo/WHqE=;
- b=LGAS/dyN0+nA6QeD08GBU9GwN+/EZNMTP1FA2u3rAJvhZKmL8lx1SnZ+0WTMoqwvyj
- ZFOwk7TWJJ4uDhTxq+jg47MxD+lFRqING+evQkR+J0/6bb3QsNNTv317Ptlt9qWXDMGD
- PDtZ4nRtI9qBz8dY8E9jpvNZAhAp5eEwBAWkVr6zry1fZJv0HSfZ14+s7MBg9mdcWfmr
- LqG+66uLWeep+jjI7DrkVLPmAyBi5577lIhOWuPQqzIGcT9Uy/2QbHlEuuEiJj9M97pD
- VEuTP3PTqe5We9Hwf46GNWJYK3qPLZAvuXKyw18vBSo7K6mMYHnz2Y61Hozrdng4I/Ts
- OhSA==
-X-Gm-Message-State: AOAM530fUael9NnBx0npEACrWVrFFm4BdUI0iuNCcjLJZOjRuYe6vCqy
- Q46S87eTkiB7DZz30i23unzmJd2eZkEdIlZ9J7Y=
-X-Google-Smtp-Source: ABdhPJzADsclcT5B+DBm4qS6LRdHzb05d6+m4w94zVqpSIzgHWAC5AMkxQNec+PyCmiHLz5Ps3qOgnSUaRVUkUD/4ck=
-X-Received: by 2002:a1c:4c05:: with SMTP id z5mr10587564wmf.129.1592196153914; 
- Sun, 14 Jun 2020 21:42:33 -0700 (PDT)
+ bh=gKoodE+CpK7MkmERg3HP/rONNOq7ItUfs/wfTv0yHzI=;
+ b=goTDnqGiOVG2r70ADWuX7suoy64k64YaSN+W2vswJYIM+IaDHaj4NawOd83bvGPAWi
+ beviri87jTVzBYB4SEioUo4GGoXdPk3K++eyoiPXD2n2DVNqmj5ET3oBMpSh1xhFA5cJ
+ DkWjTRcIRNP3PkqhTMHRhwFaeHk7FfHcZEuW/1Aj6jmRz85PW0DmlpdgXjbrnJwzSQtk
+ 7Fin3dD3xDuaVnMAmADzkdKOI0W4KE+AmzXmSiuYBYBNyFA/Y7kj5vphToohD1kX61a9
+ Jer3YfmueOEMn3xTMM2gXLDuA/5EMbgmbfFfOgp8d5webel279HQO9fE6Dd80IfTI+ag
+ NTcQ==
+X-Gm-Message-State: AOAM532Wv8VnOZo8xx0i5KFGLv4Kv/HyYv1EGqxsIe4TSRGCqSQVi8NH
+ cjaSiTmjaeSc3CfwxDU/81Et44HqLg+a7RBRzHk=
+X-Google-Smtp-Source: ABdhPJx/o79lokwm16qJbg+GzyzDhBm2zqx0hSgnVimHiiEdN091LmJgivtPJL6VX9UTLSpyBMUNpAbiJ1tyKBP3etg=
+X-Received: by 2002:a1c:4c05:: with SMTP id z5mr10609354wmf.129.1592196625113; 
+ Sun, 14 Jun 2020 21:50:25 -0700 (PDT)
 MIME-Version: 1.0
 References: <1591065557-9174-1-git-send-email-chenhc@lemote.com>
  <1591065557-9174-4-git-send-email-chenhc@lemote.com>
@@ -70,15 +70,15 @@ References: <1591065557-9174-1-git-send-email-chenhc@lemote.com>
  <CAAhV-H5LRLmHxKcd3m73q1PNexz7pGTD0u7352-YSkpyDQrMCQ@mail.gmail.com>
 In-Reply-To: <CAAhV-H5LRLmHxKcd3m73q1PNexz7pGTD0u7352-YSkpyDQrMCQ@mail.gmail.com>
 From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Date: Mon, 15 Jun 2020 06:42:20 +0200
-Message-ID: <CAHiYmc6xiGjr2Wfq5ThY_pekdnmsmJ1iv8cRfQSe3CyhCYuiKQ@mail.gmail.com>
+Date: Mon, 15 Jun 2020 06:50:11 +0200
+Message-ID: <CAHiYmc7AatS4jV45RbqVsn8rY-j1mdD=+ApD3wcrx1+MddJ7Qw@mail.gmail.com>
 Subject: Re: [PATCH for-5.1 V4 3/4] hw/mips: Add Loongson-3 machine support
  (with KVM)
 To: Huacai Chen <chenhuacai@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::32c;
- envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wm1-x32c.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::335;
+ envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wm1-x335.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -142,12 +142,9 @@ n <zltjiangshi@gmail.com> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=
 > names can keep their old names.
 >
 
-Sorry, Huacai, this is ruled out. We definitely do not want to pile
-versions 1.0, 2.0, 3.0 etc. of such virtual machine. One can update
-the machine without creating a new version if backward compatibility
-for end user is satisfied. But, the better outcome would be if you
-provide real machine model instead, rather than spend time and energy
-on multi-version virtual machine.
+Loongson3 is instruction set name, not a machine name, and treating
+such name as machine name is incorrect. Renaming as I outlined in my
+comments must occur.
 
 Yours,
 Aleksandar
