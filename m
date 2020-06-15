@@ -2,92 +2,113 @@ Return-Path: <SRS0=tJVC=74=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47540C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 06:58:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8192BC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 07:14:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1101A2067B
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 06:58:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4E1E620707
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 07:14:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nm3jTVzK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1101A2067B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U2eqv9Dx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E1E620707
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42474 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50250 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkj4F-0005E0-Bz
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 02:58:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41444)
+	id 1jkjKN-00015l-AG
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 03:14:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45794)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jkj3h-0004g6-07; Mon, 15 Jun 2020 02:57:29 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:40647)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jkj3f-00083M-63; Mon, 15 Jun 2020 02:57:28 -0400
-Received: by mail-wm1-x343.google.com with SMTP id r15so13599417wmh.5;
- Sun, 14 Jun 2020 23:57:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=SCX7Y0uWvEKoPRCo0XNxyDaKzLlVeynL0mvSqc+FuX4=;
- b=nm3jTVzKKO1lrlN2qyeqR2Y7Ea7Pg2qBYxcPzrx8aFDxGou2DPsfMaj46xjCnuOvRu
- Rq7QIIV8kinEypJ3LMtM8JF12N6EBMhi/m/wCGj5CwzUdeotrzWhVovloArgqc+rwB+W
- 9ElpRAXdgoHSdpNTgPYIFk3a/qA5tmrEcYhVhXDe3xuvKbRAUFKjlo/8EDgKCNkgNUJD
- mrvHScljip6jeb7dLLcXoTPsqLkleUuIxnIEoTnTVsu8djR+uTfOaUFTm2N7VmkS7AjP
- UXi6dZbJUO/HMhn4yl4FvvDnvcSKqMmETn/ScKYvca9X+lSOBgmZqCPfEhxLMzddxXlO
- +lCw==
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jkjJZ-0000Ts-SR
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 03:13:54 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:40193
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jkjJY-0002a9-HA
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 03:13:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592205232;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=bcE1sJcTgxf9JcZw+/HYUXG5c649gABbFGq3WamqEQY=;
+ b=U2eqv9Dxt/KDP1KP4ywxEwSU8Z/NVsY3V7Kal/egcTp2ZWtQo0QWiDJggnFTlfj3coyg/S
+ 1Z/zdNGW59Mu8bqNLofrtGPoZPWxMgQyW52LcXKFGMjr5zKb+ddAoNnEH0bBP0aDhP9h8g
+ qbqxK7ySqBSz6r28IdEJWsMa01gr9VM=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-197-hiaTONJ4PPKF1mt8osTYIQ-1; Mon, 15 Jun 2020 03:13:45 -0400
+X-MC-Unique: hiaTONJ4PPKF1mt8osTYIQ-1
+Received: by mail-wr1-f72.google.com with SMTP id a4so6654620wrp.5
+ for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 00:13:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=SCX7Y0uWvEKoPRCo0XNxyDaKzLlVeynL0mvSqc+FuX4=;
- b=Q1AgUlPBo/rUWz1IAzAAqc/TNlgPeAr/mNEQL+MI1IFk8oMIJ/Odla4gxBSVx5zEdT
- xSOKCMP4uKLM3LJ6s2c0s8rmixOL3URIItkQDBr4shZkmAJZxNrXYYUmP89BVIvHmLBj
- G4h7dw20Ix5xThPmqhLRi6O/7DYYChXC0youidhjRAcXx0lsUGR/5e4ZnXqZB3moIsiF
- 0vSO6EVcBVKwtQ1R3wIqEnoGHi9wsL4pFPORAmi7xgOlgNH6V4yCUHGLSIpIjd6jmLhC
- iPV18TtjszIcBUuU9Vo93r6IBqW+zROQvCUi4CGJ3BGv5XQP1yK+PehMxCHcCBQP4PSF
- HL1w==
-X-Gm-Message-State: AOAM532T0cJhN7rhScEaHfWujF9PCFnTjQ+AEo1Lnrq8G+N5XrBaI3t8
- 9EPTx2bK7qUrVH4613Ojtcqz4t/r
-X-Google-Smtp-Source: ABdhPJzlJAIkbRTOuPhe5nNsHhY8DgUYftFGXBH/mbTxKScPloVRA7XPRE7NpbNUS6yDmKVH+4zRGg==
-X-Received: by 2002:a05:600c:c3:: with SMTP id
- u3mr10874782wmm.108.1592204244780; 
- Sun, 14 Jun 2020 23:57:24 -0700 (PDT)
-Received: from localhost.localdomain
- (181.red-88-10-103.dynamicip.rima-tde.net. [88.10.103.181])
- by smtp.gmail.com with ESMTPSA id 23sm20600008wmg.10.2020.06.14.23.57.23
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 14 Jun 2020 23:57:24 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2] configure: Let SLOF be initialized by
- ./scripts/git-submodule.sh
-Date: Mon, 15 Jun 2020 08:57:21 +0200
-Message-Id: <20200615065721.7873-1-f4bug@amsat.org>
-X-Mailer: git-send-email 2.21.3
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=bcE1sJcTgxf9JcZw+/HYUXG5c649gABbFGq3WamqEQY=;
+ b=tbaa+NHv4v0uCJB2mhLTgDhSJEZCm7Y7IzbMZ5u231wfT2Nzxu+nUeQbS0jwrkUO6R
+ sWMRLc6l1Qe1fI4aXU9x50zWXfEnEwBxpeKraT1ph4kiZeksYVByKpOTv5DsiQs51aSw
+ RSQrrpmmUp7Ux0Wz+Ib8x8IjHp2C9jj81yUftVh55Ame3bBR8EasJ42J/eYLM5f4MtGe
+ RUNMPfzX+a9whdy4cCE9vFa3Yj0//j4q3pllWtic85kwcx+Jnx0qQRgRus/zNFR4bRJP
+ y5tvXj8XvX1p2XiMmsPDfDLoI4/9Bdo5g/VMjX1J2r92K/mXej7oonkQ6tMDvi7YCXAv
+ 2clg==
+X-Gm-Message-State: AOAM531HrU+lrDFY24n0epgvVdQx/OY9epNzLMicfqG2Qyb2sI2rxrM6
+ U7wBFsY3lQ7fzrkqZkRi18C/0SKDF7y3b7kANxtl75CsxR02JUZ/AQ6o20eZ3fsCaCFgM6p1RV9
+ zFrTxhlPTFt1B5zo=
+X-Received: by 2002:a1c:a5d4:: with SMTP id o203mr11530444wme.98.1592205224500; 
+ Mon, 15 Jun 2020 00:13:44 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJx1BgpIeEbSqzCTvIAhQqiQo2Zpw/YuqSsjDVndF85x31itNXadmtv6fqOnF0LAAwXVK8S2kw==
+X-Received: by 2002:a1c:a5d4:: with SMTP id o203mr11530423wme.98.1592205224250; 
+ Mon, 15 Jun 2020 00:13:44 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c461:afc9:1:2046?
+ ([2001:b07:6468:f312:c461:afc9:1:2046])
+ by smtp.gmail.com with ESMTPSA id k21sm24148236wrd.24.2020.06.15.00.13.43
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 15 Jun 2020 00:13:43 -0700 (PDT)
+Subject: Re: [PATCH v2] Makefile: Remove generated files when doing
+ 'distclean' (and 'clean')
+To: Thomas Huth <thuth@redhat.com>,
+ Aleksandar Markovic <aleksandar.m.mail@gmail.com>,
+ Peter Maydell <peter.maydell@linaro.org>
+References: <20191008082815.8267-1-thuth@redhat.com>
+ <CAL1e-=gYkhM99Ee0LxZJ5dCjeEdC08G4_Tm3WCZpCSWvJ=b26Q@mail.gmail.com>
+ <4bfea125-eb63-f4a2-bca0-bce462f73d89@redhat.com>
+ <CAFEAcA_+V7SNsxPSgsd04s8f7PnP3qdyXMp6NvS2inHjE08pJw@mail.gmail.com>
+ <CAL1e-=ijjbTG19NHnsDrcJdb7kajBdcndMT8JXymqC6UViiitQ@mail.gmail.com>
+ <770c89b9-44d1-0982-34ff-1830911ac413@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <89c5b73f-2294-b58a-85e0-5ed64926fb0c@redhat.com>
+Date: Mon, 15 Jun 2020 09:13:43 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <770c89b9-44d1-0982-34ff-1830911ac413@redhat.com>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 01:43:27
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,82 +121,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Laurent Vivier <lvivier@redhat.com>,
- Thomas Huth <thuth@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- qemu-ppc@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The git-submodule.sh script is called by make and initialize the
-submodules listed in the GIT_SUBMODULES variable generated by
-./configure.
+On 15/06/20 07:17, Thomas Huth wrote:
+> That depends ... Marc-André, Paolo, what's the status of the meson patch
+> series? Do you think it will be merged for the next release already? If
+> so, it does not make much sense to respin my distclean patch. Otherwise
+> I could do another iteration...
 
-Add SLOF when we build the ppc64-softmmu target for the pSeries
-machines (which use SLOF). This fixes:
+I prefer to aim for 5.2, making it the very first series merged there
+and forcing everyone else to rebase.
 
-  $ ( cd ${SRC_DIR} ; git submodule update --init roms/SLOF )
-  Submodule 'roms/SLOF' (https://git.qemu.org/git/SLOF.git) registered for path 'roms/SLOF'
-  Cloning into '/home/travis/build/user/qemu/roms/SLOF'...
-  fatal: unable to access 'https://git.qemu.org/git/SLOF.git/': Could not resolve host: git.qemu.org
-  fatal: clone of 'https://git.qemu.org/git/SLOF.git' into submodule path '/home/travis/build/user/qemu/roms/SLOF' failed
-  Failed to clone 'roms/SLOF'. Retry scheduled
-  Cloning into '/home/travis/build/user/qemu/roms/SLOF'...
-  fatal: unable to access 'https://git.qemu.org/git/SLOF.git/': Could not resolve host: git.qemu.org
-  fatal: clone of 'https://git.qemu.org/git/SLOF.git' into submodule path '/home/travis/build/user/qemu/roms/SLOF' failed
-  Failed to clone 'roms/SLOF' a second time, aborting
-  The command "( cd ${SRC_DIR} ; git submodule update --init roms/SLOF )" exited with 1.
-
-Reported-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
-CI: https://travis-ci.org/github/philmd/qemu/jobs/698406512#L1596
----
- configure   | 12 ++++++++++++
- .travis.yml |  1 -
- 2 files changed, 12 insertions(+), 1 deletion(-)
-
-diff --git a/configure b/configure
-index 7c2adf36e5..f297a4b68f 100755
---- a/configure
-+++ b/configure
-@@ -2248,6 +2248,18 @@ if test "$edk2_blobs" = "yes" && ! has bzip2; then
-   error_exit "The bzip2 program is required for building QEMU"
- fi
- 
-+###################################
-+# SLOF is mandatory for the pSeries
-+for target in $target_list; do
-+  case $target in
-+    ppc64-softmmu)
-+      if test -e "${source_path}/.git" ; then
-+          git_submodules="${git_submodules} roms/SLOF"
-+      fi
-+    ;;
-+  esac
-+done
-+
- feature_not_found() {
-   feature=$1
-   remedy=$2
-diff --git a/.travis.yml b/.travis.yml
-index ec6367af1f..220855c1f0 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -496,7 +496,6 @@ jobs:
-         - CONFIG="--disable-containers --target-list=${MAIN_SOFTMMU_TARGETS},s390x-linux-user"
-         - UNRELIABLE=true
-       script:
--        - ( cd ${SRC_DIR} ; git submodule update --init roms/SLOF )
-         - BUILD_RC=0 && make -j${JOBS} || BUILD_RC=$?
-         - |
-           if [ "$BUILD_RC" -eq 0 ] ; then
--- 
-2.21.3
+Paolo
 
 
