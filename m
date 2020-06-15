@@ -2,95 +2,85 @@ Return-Path: <SRS0=tJVC=74=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5E5FC433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 19:42:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69CA8C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 19:43:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A62ED207E8
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 19:42:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2EA0C20714
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 19:43:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e6DSp/yA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A62ED207E8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ukzvHSyE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2EA0C20714
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59230 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35092 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkuzb-0001Li-Tk
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 15:42:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47162)
+	id 1jkv0t-00031o-Ey
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 15:43:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48438)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <nsoffer@redhat.com>)
- id 1jkuqw-0002CF-8M
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 15:33:06 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:60485
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <nsoffer@redhat.com>)
- id 1jkuqs-0005U4-Tj
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 15:33:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592249580;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=+XmhHOQCukJ3uHEnY1lz75CJaE1mVNGMeIxWKMwUMhU=;
- b=e6DSp/yAT0s+DmSMWKx7ZBL4udqW2EWb9dz63+ZY9qN6401hN5TD/qXXm49bqvUMoFL96T
- 6Wp6jyD35R9vQNBXBKX/EDv/HbMfnp4qfuBICom1S6Oo28eiNt60mm5qC08zE7y2b20PUO
- Dc22yhLwwt6U4tVB4zk33ZB3xFTfGFw=
-Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com
- [209.85.167.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-138-gu0AMQ9QOtG0T9ZxI2UmYg-1; Mon, 15 Jun 2020 15:32:58 -0400
-X-MC-Unique: gu0AMQ9QOtG0T9ZxI2UmYg-1
-Received: by mail-oi1-f199.google.com with SMTP id s9so9482612oih.20
- for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 12:32:58 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jkuyC-0008HV-M8; Mon, 15 Jun 2020 15:40:36 -0400
+Received: from mail-il1-x143.google.com ([2607:f8b0:4864:20::143]:39125)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jkuyA-0006i0-Qa; Mon, 15 Jun 2020 15:40:36 -0400
+Received: by mail-il1-x143.google.com with SMTP id p5so147602ile.6;
+ Mon, 15 Jun 2020 12:40:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=Jp42kBAUA7U2Nm7mn62S8Xlr804bOEMiFEW0kgbKwVI=;
+ b=ukzvHSyE0c55e+3LGTVDlSKHcgOygIT/JJGTyjS6zmypAUcKMtEI5NIlMUUD5/9tOV
+ 8m/doAXv8UGp2NQbsq5I3tEzWEhTwRtFg/pvsI3HxHb4ZoCnlGcKB5OJ/tGyyBAZGdY2
+ Q/fW3VoJuin8s6+skLpayTAS9QlL3vH5wHhTcFvTEpBVwSdlku+UvHhWTO9eyN3GG5Oc
+ EM1Yb7OzNyZmbbeXyRc6CyskAAzQ3Z7sHoWpuxshmdoB94SMtQ59pVkVpZphKrv8k6mI
+ Ft3qjoEUpiS2C69IdlL4Jyv+LbLp+OcE/qdZxZ7FQcQ13qnU1DgIqk2fA4uFIhQf6Lsq
+ H5RA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=+XmhHOQCukJ3uHEnY1lz75CJaE1mVNGMeIxWKMwUMhU=;
- b=l7RYswwouf+7gVgV2EAJRE4pe9nGqBFVk968qBoGf085Bt0fhqudOzipMVB+w9YQj2
- ESE2w7IriZlApWyScDAJdQTeSnuAvY5cZznyBX2RC+Yp5vcEQP8RDy1dpZmMCROGRyqi
- Miq/pa9rgFg++gu0NbYkIN2AkxtAowUSYb3G7pBcrXdkd21flwApzTGwpktV7TmJ2BGq
- 5mqmWqJJlrmwBLFCSC2ihRFwhSEbbiRXafkZAMtmFQLlH4MYIEiGOLe7kx05FUFGhzLa
- uJWtvwWHU5fv0Q81iibYpw0ycxMHpdvnRn0qxZw7lNdn3jBLmmGCU5LgI1AOIaShT9o2
- Yqng==
-X-Gm-Message-State: AOAM533ttOC4BiitjBva3b5oWwu1TNwxu4y9ulln51YPz/7F1QfwfG/W
- GXGCyQ1oiP8Ul4arSyfNU5nkcWVIUmwf2T71/hFb9UCKOrIR0w/Xj4Iu1GArYqlQs9hp2PC6yNK
- cSal3EVap8BAnXXjkd6NSbPHjwh6E2Mg=
-X-Received: by 2002:aca:e044:: with SMTP id x65mr843991oig.56.1592249577052;
- Mon, 15 Jun 2020 12:32:57 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz4nrQo1jUksz/xo9siwSQG9fxsSbLx+EL7g5v4XSCD70y8FydYVvRBYa0SpYJc63MgtegTo3WndY0AmjZElXY=
-X-Received: by 2002:aca:e044:: with SMTP id x65mr843965oig.56.1592249576645;
- Mon, 15 Jun 2020 12:32:56 -0700 (PDT)
+ bh=Jp42kBAUA7U2Nm7mn62S8Xlr804bOEMiFEW0kgbKwVI=;
+ b=mNtTe3rkJ+tCAc53BjERbrgvkymYXWZo2iqRCOFXU5rw7Kbrv7+UgwG9AiYPJgOhUc
+ 9zFaKsCogjUtMWTvafgGqe83seFtmmyj09MxIpQxPLBf34OdH0TP4M/dnAtq4LYPVTRj
+ 4H1h9jneyywHtRvKEJj4XMMEEhe9cHVKE7X0G4SMd/DW6iwp3oblPVLUdXtmqgzD00/e
+ qMaCcadRWIF1zOM2587w4b1WnbGLPW6eV/0EJ+LHtPTCvlta8scDsOTh7hF9cpoCXiw9
+ F/D3efKVTyK3x1nEz0E8qxktGuCXMO87RvIZz4ptzAVPmjEe6SAw1+kf9ev2zroultjj
+ nTxA==
+X-Gm-Message-State: AOAM533FsJYO2QsbE5lNQE5XKku8KHR8i5kWbvXj5Ae5PjdHZLDv8b/J
+ atUJkTsJbp6g368r2sPzIDIjFkYaKd6tYmYpDZA=
+X-Google-Smtp-Source: ABdhPJwzPr1BqWIrmpRv82VTDaH6puajnLzQZrlVAOmYoLH9/lk22G3C94vF3jrqYUT6vEmtToJxj3pV69BUK2mqIeo=
+X-Received: by 2002:a92:aa07:: with SMTP id j7mr28365902ili.40.1592250033326; 
+ Mon, 15 Jun 2020 12:40:33 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200613170826.354270-1-nsoffer@redhat.com>
-In-Reply-To: <20200613170826.354270-1-nsoffer@redhat.com>
-From: Nir Soffer <nsoffer@redhat.com>
-Date: Mon, 15 Jun 2020 22:32:40 +0300
-Message-ID: <CAMRbyyswkaedF0dN2nPb3H8fj5+pmhLWh9GHGor4wUk_Su=b8A@mail.gmail.com>
-Subject: Re: [PATCH] block: file-posix: Fail unmap with NO_FALLBACK on block
- device
-To: nirsof <nirsof@gmail.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+References: <1591625864-31494-1-git-send-email-bmeng.cn@gmail.com>
+In-Reply-To: <1591625864-31494-1-git-send-email-bmeng.cn@gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Mon, 15 Jun 2020 12:31:10 -0700
+Message-ID: <CAKmqyKOtX5QpBDY_e+Z93ALqStqRKo8DF_2=ShGEFF6WDy_95w@mail.gmail.com>
+Subject: Re: [PATCH 00/15] hw/riscv: sifive_u: Add GPIO and Mode Select
+ (MSEL[3:0]) support
+To: Bin Meng <bmeng.cn@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=nsoffer@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 15:33:00
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=2607:f8b0:4864:20::143;
+ envelope-from=alistair23@gmail.com; helo=mail-il1-x143.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,246 +93,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- qemu-block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
+Cc: Bin Meng <bin.meng@windriver.com>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Palmer Dabbelt <palmerdabbelt@google.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, Jun 13, 2020 at 8:08 PM Nir Soffer <nirsof@gmail.com> wrote:
+On Mon, Jun 8, 2020 at 7:18 AM Bin Meng <bmeng.cn@gmail.com> wrote:
 >
-> Punching holes on block device uses blkdev_issue_zeroout() with
-> BLKDEV_ZERO_NOFALLBACK but there is no guarantee that this is fast
-> enough for pre-zeroing an entire device.
+> From: Bin Meng <bin.meng@windriver.com>
 >
-> Zeroing block device can be slow as writing zeroes or 100 times faster,
-> depending on the storage. There is no way to tell if zeroing it fast
-> enough.  The kernel BLKDEV_ZERO_NOFALLBACK flag does not mean that the
-> operation is fast; it just means that the kernel will not fall back to
-> manual zeroing.
+> This series updates the 'sifive_u' machine support:
 >
-> Here is an example converting 10g image with 8g of data to block device:
+> - Add GPIO controller support
+> - Support reboot functionality via GPIO pin#10
+> - Change SiFive E/U series CPU reset vector to 0x1004
+> - Support Mode Select (MSEL[3:0]) settings at 0x1000 via a new
+>   "msel" machine property
+> - Add a dummy DDR memory controller device
 >
-> $ ./qemu-img info test.img
-> image: test.img
-> file format: raw
-> virtual size: 10 GiB (10737418240 bytes)
-> disk size: 8 GiB
+> The series also does some clean-ups to the existing codes.
 >
-> $ time ./qemu-img convert -f raw -O raw -t none -T none -W test.img /dev/test/lv1
+> With this series, QEMU can boot U-Boot SPL built for SiFive FU540
+> all the way up to loading U-Boot proper from MMC:
 >
-> Before:
+> $ qemu-system-riscv64 -nographic -M sifive_u,msel=6 -m 8G -bios u-boot-spl.bin
 >
-> real    1m20.483s
-> user    0m0.490s
-> sys     0m0.739s
+> U-Boot SPL 2020.07-rc3-00208-g88bd5b1 (Jun 08 2020 - 20:16:10 +0800)
+> Trying to boot from MMC1
+> Unhandled exception: Load access fault
+> EPC: 0000000008009be6 TVAL: 0000000010050014
 >
-> After:
+> The last big gap for the 'sifive_u' machine is the QSPI modeling.
 >
-> real    0m55.831s
-> user    0m0.610s
-> sys     0m0.956s
+>
+> Bin Meng (15):
+>   hw/riscv: sifive_e: Remove the riscv_ prefix of the machine* and soc*
+>     functions
+>   hw/riscv: opentitan: Remove the riscv_ prefix of the machine* and soc*
+>     functions
+>   hw/riscv: sifive_u: Simplify the GEM IRQ connect code a little bit
+>   hw/riscv: sifive_u: Generate device tree node for OTP
+>   hw/riscv: sifive_gpio: Clean up the codes
+>   hw/riscv: sifive_gpio: Add a new 'ngpio' property
+>   hw/riscv: sifive_u: Hook a GPIO controller
+>   hw/riscv: sifive_gpio: Do not blindly trigger output IRQs
+>   hw/riscv: sifive_u: Add reset functionality
+>   hw/riscv: sifive_u: Rename serial property get/set functions to a
+>     generic name
+>   hw/riscv: sifive_u: Add a new property msel for MSEL pin state
+>   hw/riscv: sifive: Change SiFive E/U CPU reset vector to 0x1004
+>   hw/riscv: sifive_u: Support different boot source per MSEL pin state
+>   hw/riscv: sifive_u: Sort the SoC memmap table entries
+>   hw/riscv: sifive_u: Add a dummy DDR memory controller device
 
-I did more testing with real server and storage, and the results confirm
-what I reported here in my vm based environment and poor storage.
+I have applied patches 1 to 11 to the RISC-V branch.
 
-
-Testing this LUN:
-
-# multipath -ll
-3600a098038304437415d4b6a59684a52 dm-3 NETAPP,LUN C-Mode
-size=5.0T features='3 queue_if_no_path pg_init_retries 50'
-hwhandler='1 alua' wp=rw
-|-+- policy='service-time 0' prio=50 status=active
-| |- 18:0:0:0 sdb     8:16  active ready running
-| `- 19:0:0:0 sdc     8:32  active ready running
-`-+- policy='service-time 0' prio=10 status=enabled
-  |- 20:0:0:0 sdd     8:48  active ready running
-  `- 21:0:0:0 sde     8:64  active ready running
-
-
-The destination is 100g logical volume on this LUN:
-
-# qemu-img info test-lv
-image: test-lv
-file format: raw
-virtual size: 100 GiB (107374182400 bytes)
-disk size: 0 B
-
-
-The source image is 100g image with 48g of data:
-
-# qemu-img info fedora-31-100g-50p.raw
-image: fedora-31-100g-50p.raw
-file format: raw
-virtual size: 100 GiB (107374182400 bytes)
-disk size: 48.4 GiB
-
-
-We can zero 2.3 g/s:
-
-# time blkdiscard -z test-lv
-
-real 0m43.902s
-user 0m0.002s
-sys 0m0.130s
-
-(I should really test with fallocate instead of blkdiscard, but the results look
-the same.)
-
-# iostat -xdm dm-3 5
-
-Device            r/s     w/s     rMB/s     wMB/s   rrqm/s   wrqm/s
-%rrqm  %wrqm r_await w_await aqu-sz rareq-sz wareq-sz  svctm  %util
-
-dm-3            20.80  301.40      0.98   2323.31     0.00     0.00
-0.00   0.00   26.56  854.50 257.94    48.23  7893.41   0.73  23.58
-
-dm-3            15.20  297.20      0.80   2321.67     0.00     0.00
-0.00   0.00   26.43  836.06 248.72    53.80  7999.30   0.78  24.22
-
-
-We can write 445m/s:
-
-# dd if=/dev/zero bs=2M count=51200 of=test-lv oflag=direct conv=fsync
-107374182400 bytes (107 GB, 100 GiB) copied, 241.257 s, 445 MB/s
-
-# iostat -xdm dm-3 5
-
-Device            r/s     w/s     rMB/s     wMB/s   rrqm/s   wrqm/s
-%rrqm  %wrqm r_await w_await aqu-sz rareq-sz wareq-sz  svctm  %util
-
-dm-3             6.60 6910.00      0.39    431.85     0.00     0.00
-0.00   0.00    2.48    2.70  15.19    60.73    64.00   0.14  98.84
-
-dm-3            40.80 6682.60      1.59    417.61     0.00     0.00
-0.00   0.00    1.71    2.73  14.92    40.00    63.99   0.15  97.60
-
-dm-3             6.60 6887.40      0.39    430.46     0.00     0.00
-0.00   0.00    2.15    2.66  14.92    60.73    64.00   0.14  98.22
-
-
-Testing latest qemu-img:
-
-# rpm -q qemu-img
-qemu-img-4.2.0-22.module+el8.2.1+6758+cb8d64c2.x86_64
-
-# time qemu-img convert -p -f raw -O raw -t none -W
-fedora-31-100g-50p.raw test-lv
-    (100.00/100%)
-
-real 2m2.337s
-user 0m2.708s
-sys 0m17.326s
-
-# iostat -xdm dm-3 5
-
-pre zero phase:
-
-Device            r/s     w/s     rMB/s     wMB/s   rrqm/s   wrqm/s
-%rrqm  %wrqm r_await w_await aqu-sz rareq-sz wareq-sz  svctm  %util
-
-dm-3            24.00  265.40      1.00   2123.20     0.00     0.00
-0.00   0.00   36.81  543.52 144.99    42.48  8192.00   0.70  20.14
-
-dm-3             9.60  283.60      0.59   2265.60     0.00     0.00
-0.00   0.00   35.42  576.80 163.78    62.50  8180.44   0.70  20.58
-
-dm-3            24.00  272.00      1.00   2176.00     0.00     0.00
-0.00   0.00   22.89  512.40 139.77    42.48  8192.00   0.67  19.90
-
-copy phase:
-
-Device            r/s     w/s     rMB/s     wMB/s   rrqm/s   wrqm/s
-%rrqm  %wrqm r_await w_await aqu-sz rareq-sz wareq-sz  svctm  %util
-
-dm-3            27.20 10671.20      1.19    655.84     0.00     0.00
-0.00   0.00    2.70   10.99 111.98    44.83    62.93   0.09  96.74
-
-dm-3             6.40 11537.00      0.39    712.33     0.00     0.00
-0.00   0.00    3.00   11.90 131.52    62.50    63.23   0.08  97.82
-
-dm-3            27.20 12400.20      1.19    765.47     0.00     0.00
-0.00   0.00    3.60   11.16 132.31    44.83    63.21   0.08  95.50
-
-dm-3             9.60 11312.60      0.59    698.20     0.00     0.20
-0.00   0.00    3.73   11.69 126.64    63.00    63.20   0.09  97.70
-
-
-Testing latest qemu-img + this patch:
-
-# rpm -q qemu-img
-qemu-img-4.2.0-25.module+el8.2.1+6815+1c792dc8.nsoffer202006140516.x86_64
-
-# time qemu-img convert -p -f raw -O raw -t none -W
-fedora-31-100g-50p.raw test-lv
-    (100.00/100%)
-
-real 1m42.083s
-user 0m3.007s
-sys 0m18.735s
-
-# iostat -xdm dm-3 5
-
-Device            r/s     w/s     rMB/s     wMB/s   rrqm/s   wrqm/s
-%rrqm  %wrqm r_await w_await aqu-sz rareq-sz wareq-sz  svctm  %util
-
-dm-3             6.60 7919.60      0.39   1136.67     0.00     0.00
-0.00   0.00   14.70   15.32 117.43    60.73   146.97   0.10  77.84
-
-dm-3            27.00 9065.00      1.19    571.38     0.00     0.20
-0.00   0.00    2.52   14.64 128.21    45.13    64.54   0.11  97.46
-
-dm-3             6.80 9467.40      0.40    814.75     0.00     0.00
-0.00   0.00    2.74   12.15 110.25    60.82    88.12   0.10  90.46
-
-dm-3            29.00 7713.20      1.32    996.48     0.00     0.40
-0.00   0.01    5.40   14.48 107.98    46.60   132.29   0.11  83.76
-
-dm-3            11.60 9661.60      0.70    703.54     0.00     0.40
-0.00   0.00    2.26   11.22 103.56    61.72    74.57   0.10  97.98
-
-dm-3            23.80 9639.20      0.99    696.82     0.00     0.00
-0.00   0.00    1.98   11.54 106.49    42.80    74.03   0.10  93.68
-
-dm-3            10.00 7184.60      0.60   1147.56     0.00     0.00
-0.00   0.00   12.84   15.32 106.58    61.36   163.56   0.09  68.30
-
-dm-3            35.00 6771.40      1.69   1293.37     0.00     0.00
-0.00   0.00   17.44   18.06 119.48    49.58   195.59   0.10  66.46
-
-
-
+Alistair
 
 >
-> Signed-off-by: Nir Soffer <nsoffer@redhat.com>
-> ---
->  block/file-posix.c | 10 ++++++++++
->  1 file changed, 10 insertions(+)
+>  hw/riscv/opentitan.c           |  29 ++++----
+>  hw/riscv/sifive_e.c            |  32 +++++----
+>  hw/riscv/sifive_gpio.c         |  45 +++++++-----
+>  hw/riscv/sifive_u.c            | 158 ++++++++++++++++++++++++++++++++++-------
+>  include/hw/riscv/sifive_gpio.h |   8 ++-
+>  include/hw/riscv/sifive_u.h    |  27 +++++++
+>  target/riscv/cpu.c             |   4 +-
+>  7 files changed, 223 insertions(+), 80 deletions(-)
 >
-> diff --git a/block/file-posix.c b/block/file-posix.c
-> index 3ab8f5a0fa..cd2e409184 100644
-> --- a/block/file-posix.c
-> +++ b/block/file-posix.c
-> @@ -1621,6 +1621,16 @@ static int handle_aiocb_write_zeroes_unmap(void *opaque)
->      /* First try to write zeros and unmap at the same time */
->
->  #ifdef CONFIG_FALLOCATE_PUNCH_HOLE
-> +    /*
-> +     * The block device fallocate() implementation in the kernel does set
-> +     * BLKDEV_ZERO_NOFALLBACK, but it does not guarantee that the operation is
-> +     * fast so we can't call this if we have to avoid slow fallbacks.
-> +     */
-> +    if (aiocb->aio_type & QEMU_AIO_BLKDEV &&
-> +        aiocb->aio_type & QEMU_AIO_NO_FALLBACK) {
-> +        return -ENOTSUP;
-> +    }
-> +
->      int ret = do_fallocate(s->fd, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE,
->                             aiocb->aio_offset, aiocb->aio_nbytes);
->      if (ret != -ENOTSUP) {
 > --
-> 2.25.4
+> 2.7.4
 >
-
+>
 
