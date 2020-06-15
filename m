@@ -2,74 +2,76 @@ Return-Path: <SRS0=tJVC=74=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1511C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 21:12:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E7C0C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 21:13:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6582F2078E
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 21:12:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 472A22080D
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 21:13:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aqD3Q8ND"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6582F2078E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hwIccpcF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 472A22080D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60526 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37080 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkwOt-0007hm-H0
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 17:12:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33956)
+	id 1jkwQE-0001QP-F1
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 17:13:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33840)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jkvuf-0003YJ-Lu
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 16:41:01 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:44632
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jkvub-0003QO-E6
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 16:40:57 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:46260
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jkvua-0000gv-2d
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 16:41:01 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jkvuU-0000es-F1
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 16:40:56 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592253651;
+ s=mimecast20190719; t=1592253649;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=vyJJny2n+uv4N9Ypg1gW88LQd4WLpK2YY9vPs+d/TRA=;
- b=aqD3Q8ND/q8SK3Hvpkh1KGDstP0I11yO4XsayH8V28TSAIHZlm+ZOQR0NP1eGmrF09zeS5
- Fmiojjs9D+iZCx5zBKXbzTOKL7nBPiiVzSgt32GwJXE5sHNhauJ5XVDvjMKQaCEF+8h4Mc
- gmKlnZs13rEX6arcWVbFRSEe0nhosu0=
+ bh=Tu6oN8P5a3SiiGnMytUEyDGYIt/xwoTVOqYVGKpX4gY=;
+ b=hwIccpcFhyDipR5//qd/PMSJvz+V6dGOlcSxC36JuOQPH2KeFNfZSAT7Zbxvhlm/OHueF+
+ bwHCJFZVtK67jNP800I+xdpEdRYEhUvjUgSXQqlLZTQ+y1ZUpvJPYWZ7CP9mWcDJeEvgqy
+ 6qAsdpfql4O6yTtLblvMZ2Y8nZV36zk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-99-OgafaLUTOC-vc7BRXjbXtg-1; Mon, 15 Jun 2020 16:40:49 -0400
-X-MC-Unique: OgafaLUTOC-vc7BRXjbXtg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-271-yeHxlLOIP7KdY323RxFg6A-1; Mon, 15 Jun 2020 16:40:47 -0400
+X-MC-Unique: yeHxlLOIP7KdY323RxFg6A-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 38FAA1091325
- for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 20:40:40 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2B62A873408;
+ Mon, 15 Jun 2020 20:40:46 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
  [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0AA0E5D9CD;
- Mon, 15 Jun 2020 20:40:33 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id F0DFB5C1D2;
+ Mon, 15 Jun 2020 20:40:45 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 936BE113523F; Mon, 15 Jun 2020 22:40:08 +0200 (CEST)
+ id D1D0A1132EA9; Mon, 15 Jun 2020 22:40:08 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 34/84] qdev: Convert to qdev_unrealize() manually
-Date: Mon, 15 Jun 2020 22:39:18 +0200
-Message-Id: <20200615204008.3069956-35-armbru@redhat.com>
+Subject: [PULL 50/84] ssi: Convert last use of ssi_create_slave_no_init()
+ manually
+Date: Mon, 15 Jun 2020 22:39:34 +0200
+Message-Id: <20200615204008.3069956-51-armbru@redhat.com>
 In-Reply-To: <20200615204008.3069956-1-armbru@redhat.com>
 References: <20200615204008.3069956-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
@@ -95,54 +97,48 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+ Alistair Francis <alistair@alistair23.me>,
+ Alistair Francis <alistair.francis@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <20200610053247.1583243-9-armbru@redhat.com>
----
- include/hw/qdev-core.h | 1 -
- hw/core/qdev.c         | 4 ++--
- 2 files changed, 2 insertions(+), 3 deletions(-)
+Same transformation as in the previous commit.  Manual, because
+convincing Coccinelle to transform this case is not worthwhile.
 
-diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-index fba29308f7..be6f7c4736 100644
---- a/include/hw/qdev-core.h
-+++ b/include/hw/qdev-core.h
-@@ -328,7 +328,6 @@ void qdev_init_nofail(DeviceState *dev);
- bool qdev_realize(DeviceState *dev, BusState *bus, Error **errp);
- bool qdev_realize_and_unref(DeviceState *dev, BusState *bus, Error **errp);
- void qdev_unrealize(DeviceState *dev);
--
- void qdev_set_legacy_instance_id(DeviceState *dev, int alias_id,
-                                  int required_for_version);
- HotplugHandler *qdev_get_bus_hotplug_handler(DeviceState *dev);
-diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-index b7355fbcd0..4768244f31 100644
---- a/hw/core/qdev.c
-+++ b/hw/core/qdev.c
-@@ -421,7 +421,7 @@ static void device_reset_child_foreach(Object *obj, ResettableChildCallback cb,
- void qdev_simple_device_unplug_cb(HotplugHandler *hotplug_dev,
-                                   DeviceState *dev, Error **errp)
+Cc: Alistair Francis <alistair@alistair23.me>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Acked-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+Message-Id: <20200610053247.1583243-25-armbru@redhat.com>
+---
+ hw/ssi/ssi.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/hw/ssi/ssi.c b/hw/ssi/ssi.c
+index 54106f5ef8..58e7d904db 100644
+--- a/hw/ssi/ssi.c
++++ b/hw/ssi/ssi.c
+@@ -16,6 +16,7 @@
+ #include "hw/ssi/ssi.h"
+ #include "migration/vmstate.h"
+ #include "qemu/module.h"
++#include "qapi/error.h"
+ 
+ struct SSIBus {
+     BusState parent_obj;
+@@ -96,9 +97,9 @@ DeviceState *ssi_create_slave_no_init(SSIBus *bus, const char *name)
+ 
+ DeviceState *ssi_create_slave(SSIBus *bus, const char *name)
  {
--    object_property_set_bool(OBJECT(dev), false, "realized", &error_abort);
-+    qdev_unrealize(dev);
+-    DeviceState *dev = ssi_create_slave_no_init(bus, name);
++    DeviceState *dev = qdev_new(name);
+ 
+-    qdev_init_nofail(dev);
++    qdev_realize_and_unref(dev, &bus->parent_obj, &error_fatal);
+     return dev;
  }
  
- /*
-@@ -1183,7 +1183,7 @@ static void device_unparent(Object *obj)
-     BusState *bus;
- 
-     if (dev->realized) {
--        object_property_set_bool(obj, false, "realized", &error_abort);
-+        qdev_unrealize(dev);
-     }
-     while (dev->num_child_bus) {
-         bus = QLIST_FIRST(&dev->child_bus);
 -- 
 2.26.2
 
