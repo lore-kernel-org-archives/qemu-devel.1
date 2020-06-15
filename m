@@ -2,88 +2,99 @@ Return-Path: <SRS0=tJVC=74=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D84F1C433E3
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 21:39:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 462AAC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 21:41:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 99F3D208C7
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 21:39:15 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IHjuoyE/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99F3D208C7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 17C3120714
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 21:41:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17C3120714
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47770 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50838 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkwp0-0007uW-TF
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 17:39:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36352)
+	id 1jkwql-0000wP-AY
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 17:41:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36998)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jkw6j-0006N5-G1
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 16:53:29 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:40840
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jkw6h-0002Zx-OC
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 16:53:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592254407;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=XspKplkkGC3H6N9voSjI3xvUOJlfM1ITQDFN+GfAPzw=;
- b=IHjuoyE/W7pvqoOBqx3TZc0pbJaf0I3pNAbBbymznHTrSRp7zyBr2ZuAo/agMVsX69Vr0l
- KsN8V/QEGBANuOAI1bldvZCCz9Bu1IiRzmbKkVgIYN84joJqXW3scIAQvdCAPWyV9dyWSp
- OINKSD/PAXHIV/Es/aQtVY+gJqUyWk0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-201-AGJbpY6tPGG-1MbyJqywmQ-1; Mon, 15 Jun 2020 16:53:25 -0400
-X-MC-Unique: AGJbpY6tPGG-1MbyJqywmQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C8835DBE2
- for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 20:53:23 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
- [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9903E768AA;
- Mon, 15 Jun 2020 20:53:23 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 56D571131C02; Mon, 15 Jun 2020 22:40:09 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 77/84] sysbus: sysbus_init_child_obj() is now unused, drop
-Date: Mon, 15 Jun 2020 22:40:01 +0200
-Message-Id: <20200615204008.3069956-78-armbru@redhat.com>
-In-Reply-To: <20200615204008.3069956-1-armbru@redhat.com>
-References: <20200615204008.3069956-1-armbru@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 15:33:04
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
+ (Exim 4.90_1) (envelope-from <ljp@linux.vnet.ibm.com>)
+ id 1jkw9I-0002Wd-23; Mon, 15 Jun 2020 16:56:08 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40720)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <ljp@linux.vnet.ibm.com>)
+ id 1jkw9G-00037B-9L; Mon, 15 Jun 2020 16:56:07 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 05FK8S21162852; Mon, 15 Jun 2020 16:55:58 -0400
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com
+ [169.63.214.131])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 31n0j874v5-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 15 Jun 2020 16:55:57 -0400
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+ by ppma01dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05FKoT22001994;
+ Mon, 15 Jun 2020 20:55:57 GMT
+Received: from b03cxnp08028.gho.boulder.ibm.com
+ (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
+ by ppma01dal.us.ibm.com with ESMTP id 31pckfjs92-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 15 Jun 2020 20:55:57 +0000
+Received: from b03ledav003.gho.boulder.ibm.com
+ (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
+ by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 05FKsute28246442
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 15 Jun 2020 20:54:56 GMT
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id F2F986A047;
+ Mon, 15 Jun 2020 20:54:55 +0000 (GMT)
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 73A006A04D;
+ Mon, 15 Jun 2020 20:54:55 +0000 (GMT)
+Received: from [9.160.92.109] (unknown [9.160.92.109])
+ by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTPS;
+ Mon, 15 Jun 2020 20:54:55 +0000 (GMT)
+Content-Type: text/plain;
+	charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
+Subject: Re: [PATCH 0/6] Add several Power ISA 3.1 32/64-bit vector
+ instructions
+From: Lijun Pan <ljp@linux.vnet.ibm.com>
+In-Reply-To: <ef31bb82-607c-3fde-577b-559ff5033be6@kaod.org>
+Date: Mon, 15 Jun 2020 15:54:54 -0500
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <4A745EBC-6605-4688-9D1A-A29773C14FE3@linux.vnet.ibm.com>
+References: <20200613042029.22321-1-ljp@linux.ibm.com>
+ <ef31bb82-607c-3fde-577b-559ff5033be6@kaod.org>
+To: =?utf-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
+X-Mailer: Apple Mail (2.3608.80.23.2.2)
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
+ definitions=2020-06-15_03:2020-06-15,
+ 2020-06-15 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ lowpriorityscore=0
+ spamscore=0 suspectscore=0 malwarescore=0 cotscore=-2147483648
+ clxscore=1011 adultscore=0 phishscore=0 priorityscore=1501 mlxlogscore=936
+ mlxscore=0 impostorscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2004280000 definitions=main-2006150111
+Received-SPF: none client-ip=148.163.158.5;
+ envelope-from=ljp@linux.vnet.ibm.com; helo=mx0b-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 16:53:21
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
 X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
+X-Mailman-Approved-At: Mon, 15 Jun 2020 17:16:16 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,67 +106,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-ppc@nongnu.org, Lijun Pan <ljp@linux.ibm.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <20200610053247.1583243-52-armbru@redhat.com>
----
- include/hw/sysbus.h | 17 -----------------
- hw/core/sysbus.c    |  8 --------
- 2 files changed, 25 deletions(-)
 
-diff --git a/include/hw/sysbus.h b/include/hw/sysbus.h
-index 606095ba35..da9f85c58c 100644
---- a/include/hw/sysbus.h
-+++ b/include/hw/sysbus.h
-@@ -93,23 +93,6 @@ MemoryRegion *sysbus_address_space(SysBusDevice *dev);
- bool sysbus_realize(SysBusDevice *dev, Error **errp);
- bool sysbus_realize_and_unref(SysBusDevice *dev, Error **errp);
- 
--/**
-- * sysbus_init_child_obj:
-- * @parent: The parent object
-- * @childname: Used as name of the "child<>" property in the parent
-- * @child: A pointer to the memory to be used for the object.
-- * @childsize: The maximum size available at @child for the object.
-- * @childtype: The name of the type of the object to instantiate.
-- *
-- * This function will initialize an object and attach it to the main system
-- * bus. The memory for the object should have already been allocated. The
-- * object will then be added as child to the given parent. The returned object
-- * has a reference count of 1 (for the "child<...>" property from the parent),
-- * so the object will be finalized automatically when the parent gets removed.
-- */
--void sysbus_init_child_obj(Object *parent, const char *childname, void *child,
--                           size_t childsize, const char *childtype);
--
- /* Call func for every dynamically created sysbus device in the system */
- void foreach_dynamic_sysbus_device(FindSysbusDeviceFunc *func, void *opaque);
- 
-diff --git a/hw/core/sysbus.c b/hw/core/sysbus.c
-index 1220298e8f..70239b7e7d 100644
---- a/hw/core/sysbus.c
-+++ b/hw/core/sysbus.c
-@@ -355,14 +355,6 @@ BusState *sysbus_get_default(void)
-     return main_system_bus;
- }
- 
--void sysbus_init_child_obj(Object *parent, const char *childname, void *child,
--                           size_t childsize, const char *childtype)
--{
--    object_initialize_child_with_props(parent, childname, child, childsize,
--                                       childtype, &error_abort, NULL);
--    qdev_set_parent_bus(DEVICE(child), sysbus_get_default());
--}
--
- static void sysbus_register_types(void)
- {
-     type_register_static(&system_bus_info);
--- 
-2.26.2
+
+> On Jun 15, 2020, at 12:36 PM, C=C3=A9dric Le Goater <clg@kaod.org> =
+wrote:
+>=20
+> Hello,
+>=20
+> On 6/13/20 6:20 AM, Lijun Pan wrote:
+>> This patch series add several newly introduced 32/64-bit vector
+>> instructions in Power ISA 3.1. The newly added instructions are
+>> flagged as ISA300 temporarily in vmx-ops.inc.c and vmx-impl.inc.c
+>> to make them compile and function since Power ISA 3.1, together
+>> with next generation processor, has not been fully enabled in QEMU
+>> yet. When Power ISA 3.1 and next generation processor are fully
+>> supported, the flags should be changed.
+>=20
+> What do you mean ?=20
+>=20
+> ISA 3.1 and POWER10 are merged in Linux and in the QEMU pseries=20
+> and PowerNV (OPAL) machines.
+>=20
+> It's very much empty but it's there.
+
+I mean it does not work if you boots the guest in TCG mode, not KVM =
+mode.
+
+Lijun
+
+>=20
+> C.=20
+>=20
+>=20
+>>=20
+>> Lijun Pan (6):
+>>  target/ppc: add byte-reverse br[dwh] instructions
+>>  target/ppc: add vmulld instruction
+>>  targetc/ppc: add vmulh{su}w instructions
+>>  target/ppc: add vmulh{su}d instructions
+>>  fix the prototype of muls64/mulu64
+>>  target/ppc: add vdiv{su}{wd} vmod{su}{wd} instructions
+>>=20
+>> include/qemu/host-utils.h           |  4 +-
+>> target/ppc/helper.h                 | 13 ++++++
+>> target/ppc/int_helper.c             | 58 +++++++++++++++++++++++++
+>> target/ppc/translate.c              | 65 =
++++++++++++++++++++++++++++++
+>> target/ppc/translate/vmx-impl.inc.c | 24 +++++++++++
+>> target/ppc/translate/vmx-ops.inc.c  | 22 ++++++++--
+>> 6 files changed, 180 insertions(+), 6 deletions(-)
+>>=20
+>=20
 
 
