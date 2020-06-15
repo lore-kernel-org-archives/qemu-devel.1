@@ -2,74 +2,75 @@ Return-Path: <SRS0=tJVC=74=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 335B9C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 21:17:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE0CBC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 21:18:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EF50420739
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 21:17:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6FEB420739
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 21:18:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dawvt73I"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF50420739
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DBbsv2mw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6FEB420739
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47304 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50906 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkwTY-0005s2-4v
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 17:17:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34080)
+	id 1jkwUi-0007Mj-Kg
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 17:18:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34048)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jkvul-0003hZ-W2
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 16:41:08 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23287
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jkvuj-0003fG-Jz
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 16:41:06 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49111
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jkvuk-0000lF-AC
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 16:41:07 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jkvub-0000jX-G1
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 16:41:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592253665;
+ s=mimecast20190719; t=1592253656;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=xCBKmkLID7OXDyqd1kaeiBRGzfo6TyzYzDgQqoHhgvE=;
- b=dawvt73IboAa5VXRugCuAx9MFAoF71Ig4C+ak2GvLYC3QT1ZVhksfK3j9drQ0T3Y9E/z2Q
- sTmfntaPT5qHZy5EcR30hGo/phjWGOxytXZGgeHQV4yKinlXF9AJTPTPkMnm3o8Sxt61FQ
- YpyzQIpAy0m3CatHduwr2YJELc9S1hM=
+ bh=ICE9Y63OeuxIgSBdXmgh5/V873dMGDI8DckTpRdPpYU=;
+ b=DBbsv2mwdnuGtIICnPA43TtvuB1k6DSx8kha/BV6D/JFo67X1rKbNkADXR6mgFjHxicqTz
+ YD/855O5VKrBeeRq5/c7Fu/OazhWGbdqB39LTIB8DIiBTonmUBlhO/NGAg68l5AsjRrdlb
+ 3RSgG4FRt+0OXdvJA2bKr+ITKqpLLVw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-216-Zh049f4VMSGzY9s_YmEhcw-1; Mon, 15 Jun 2020 16:40:45 -0400
-X-MC-Unique: Zh049f4VMSGzY9s_YmEhcw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-278-rzIWgcYuM6aMQLY6-F-aAw-1; Mon, 15 Jun 2020 16:40:54 -0400
+X-MC-Unique: rzIWgcYuM6aMQLY6-F-aAw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0D860100CCC4
- for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 20:40:45 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 064AB5AEC0
+ for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 20:40:54 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
  [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D33B390344;
- Mon, 15 Jun 2020 20:40:44 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A3AD4619C1;
+ Mon, 15 Jun 2020 20:40:50 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 1766F1132B4F; Mon, 15 Jun 2020 22:40:09 +0200 (CEST)
+ id 744F01130373; Mon, 15 Jun 2020 22:40:09 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 66/84] microbit: Tidy up sysbus_init_child_obj() @child argument
-Date: Mon, 15 Jun 2020 22:39:50 +0200
-Message-Id: <20200615204008.3069956-67-armbru@redhat.com>
+Subject: [PULL 83/84] qdev: qdev_init_nofail() is now unused, drop
+Date: Mon, 15 Jun 2020 22:40:07 +0200
+Message-Id: <20200615204008.3069956-84-armbru@redhat.com>
 In-Reply-To: <20200615204008.3069956-1-armbru@redhat.com>
 References: <20200615204008.3069956-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
  helo=us-smtp-1.mimecast.com
@@ -94,46 +95,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The callers of sysbus_init_child_obj() commonly pass either &child,
-sizeof(child), or pchild, sizeof(*pchild).  Tidy up two that don't,
-mostly to keep future commits simpler.
-
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <20200610053247.1583243-41-armbru@redhat.com>
+Message-Id: <20200610053247.1583243-58-armbru@redhat.com>
 ---
- hw/arm/microbit.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ include/hw/qdev-core.h |  3 +--
+ hw/core/qdev.c         | 29 -----------------------------
+ 2 files changed, 1 insertion(+), 31 deletions(-)
 
-diff --git a/hw/arm/microbit.c b/hw/arm/microbit.c
-index ef213695bd..72fab429c4 100644
---- a/hw/arm/microbit.c
-+++ b/hw/arm/microbit.c
-@@ -39,7 +39,7 @@ static void microbit_init(MachineState *machine)
-     Object *soc = OBJECT(&s->nrf51);
-     Object *i2c = OBJECT(&s->i2c);
+diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+index ef6137b6a8..7dc10be46f 100644
+--- a/include/hw/qdev-core.h
++++ b/include/hw/qdev-core.h
+@@ -57,7 +57,7 @@ typedef void (*BusUnrealize)(BusState *bus);
+  * After successful realization, setting static properties will fail.
+  *
+  * As an interim step, the #DeviceState:realized property can also be
+- * set with qdev_realize() or qdev_init_nofail().
++ * set with qdev_realize().
+  * In the future, devices will propagate this state change to their children
+  * and along busses they expose.
+  * The point in time will be deferred to machine creation, so that values
+@@ -322,7 +322,6 @@ compat_props_add(GPtrArray *arr,
  
--    sysbus_init_child_obj(OBJECT(machine), "nrf51", soc, sizeof(s->nrf51),
-+    sysbus_init_child_obj(OBJECT(machine), "nrf51", &s->nrf51, sizeof(s->nrf51),
-                           TYPE_NRF51_SOC);
-     qdev_prop_set_chr(DEVICE(&s->nrf51), "serial0", serial_hd(0));
-     object_property_set_link(soc, OBJECT(system_memory), "memory",
-@@ -51,7 +51,7 @@ static void microbit_init(MachineState *machine)
-      * hack until we implement the nRF51 TWI controller properly and the
-      * magnetometer/accelerometer devices.
-      */
--    sysbus_init_child_obj(OBJECT(machine), "microbit.twi", i2c,
-+    sysbus_init_child_obj(OBJECT(machine), "microbit.twi", &s->i2c,
-                           sizeof(s->i2c), TYPE_MICROBIT_I2C);
-     object_property_set_bool(i2c, true, "realized", &error_fatal);
-     mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(i2c), 0);
+ DeviceState *qdev_new(const char *name);
+ DeviceState *qdev_try_new(const char *name);
+-void qdev_init_nofail(DeviceState *dev);
+ bool qdev_realize(DeviceState *dev, BusState *bus, Error **errp);
+ bool qdev_realize_and_unref(DeviceState *dev, BusState *bus, Error **errp);
+ void qdev_unrealize(DeviceState *dev);
+diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+index 50336168f2..2131c7f951 100644
+--- a/hw/core/qdev.c
++++ b/hw/core/qdev.c
+@@ -376,35 +376,6 @@ void qdev_simple_device_unplug_cb(HotplugHandler *hotplug_dev,
+     qdev_unrealize(dev);
+ }
+ 
+-/*
+- * Realize @dev.
+- * Device properties should be set before calling this function.  IRQs
+- * and MMIO regions should be connected/mapped after calling this
+- * function.
+- * On failure, report an error with error_report() and terminate the
+- * program.  This is okay during machine creation.  Don't use for
+- * hotplug, because there callers need to recover from failure.
+- * Exception: if you know the device's init() callback can't fail,
+- * then qdev_init_nofail() can't fail either, and is therefore usable
+- * even then.  But relying on the device implementation that way is
+- * somewhat unclean, and best avoided.
+- */
+-void qdev_init_nofail(DeviceState *dev)
+-{
+-    Error *err = NULL;
+-
+-    assert(!dev->realized);
+-
+-    object_ref(OBJECT(dev));
+-    object_property_set_bool(OBJECT(dev), true, "realized", &err);
+-    if (err) {
+-        error_reportf_err(err, "Initialization of device %s failed: ",
+-                          object_get_typename(OBJECT(dev)));
+-        exit(1);
+-    }
+-    object_unref(OBJECT(dev));
+-}
+-
+ /*
+  * Realize @dev.
+  * @dev must not be plugged into a bus.
 -- 
 2.26.2
 
