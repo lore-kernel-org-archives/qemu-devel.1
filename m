@@ -2,142 +2,132 @@ Return-Path: <SRS0=tJVC=74=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43233C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 15:01:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30B2EC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 15:03:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0A2392071A
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 15:01:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E8C1E206D7
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 15:03:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U2QQstd+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A2392071A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B33YCTXr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8C1E206D7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50272 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53252 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkqc8-00056g-7X
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 11:01:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60368)
+	id 1jkqdm-0006dE-4N
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 11:03:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33226)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groeck7@gmail.com>)
- id 1jkqaX-0003xb-4V; Mon, 15 Jun 2020 10:59:53 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:33009)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <groeck7@gmail.com>)
- id 1jkqaV-00043P-6z; Mon, 15 Jun 2020 10:59:52 -0400
-Received: by mail-pg1-x542.google.com with SMTP id s10so7726142pgm.0;
- Mon, 15 Jun 2020 07:59:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:autocrypt:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=OO0w3uVnv3TBcjEAMx/SA8ptSXyEaj7w2t3ZvIFQMts=;
- b=U2QQstd+rmTYQksOEhWUgMP98sCR8Sc6AGC8uF1IETB8HCtAHkye8KW7C9TIGX8ltY
- ixhefjOhhMhF9JpUgF8e8n2Gq4lYrGjJb2k9m5KOmYvfue4FsVztxdAK49n3weu4fEk+
- YQ+rKuFG22DRHmGiS92lDc44++z7G/tDvDgkfz8Ux3CPfH7p3XbsX+MPtGt082t5Ppva
- qrH+x3+ACPQp5yhFjyQiETfVV05nX/fa7dSkpdojOXhi0CuEmMVF/baKWRu0PctfQ2RJ
- E3/MXYgDyl4UnAkG2O/eNnsMvaRVM6t7toIaXjJ/2lg4HCXLLSkqkJkXr8Reu2aDQCFF
- VGfQ==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jkqcz-00069B-V8
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 11:02:25 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43656
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jkqcx-0004zP-BH
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 11:02:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592233341;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=G5V3cIBg/HoQbRwYOdfT+XHVvtOd3fhu/VBCzZHpP7M=;
+ b=B33YCTXrb0VEOc9tOCn/QnEp3dZN3YvId/ocae9mAoUQcj7pH64IT2itEovg6Ob9bVaYJa
+ SHVlML8io5jwc6KYA7I1ckbb0q3wv0agH9zVT7dAAtkV1Avp6pDeYafRXQQLLpguDOVfpv
+ l5+p7wE2I+VEPVQ6uW04y96ZlHMSzTI=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-410-umGkHlgAP7SNKzPU8_kEzQ-1; Mon, 15 Jun 2020 11:02:17 -0400
+X-MC-Unique: umGkHlgAP7SNKzPU8_kEzQ-1
+Received: by mail-ej1-f71.google.com with SMTP id op14so7950379ejb.15
+ for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 08:02:17 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:autocrypt
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=OO0w3uVnv3TBcjEAMx/SA8ptSXyEaj7w2t3ZvIFQMts=;
- b=GPwLlY1789LIKfSpL2+KKDWRL/Rw0OV1ELptonO6b/gVvR9dJr2wRgcLAIVW5+vQJA
- +qv2EAIJFrdXZrx+mrpNxmJg+Vk8H/uSwQ20q4WdBNTIDsVttJmTMYLu3qf0b24xHtwq
- TwuksJJL/wom3A1do0rcWZKR2jY9G1CPkjy39Gi62zCfP+1S8rF1NU3s8sHb+3p0RXX2
- BJFFYX7auWddpnxyRo0DJSi3egzxj+KKlZ+7VPFNJeu+IGfnmn+JizgUSIVsl8wBGq3w
- GtrZVr9GxYPgGzw+MKxNRvzBhs41kLmL5zzJmEV3goqxNOeS86w0g31l3sqvzn6KmyKn
- X4sw==
-X-Gm-Message-State: AOAM533FdxuSW5HqX6E8eUGbJqRrGsUtmrbbowe1buoAStKOguVi9FRo
- N8kYjoANFj2YL5/+L4UwKBpD5PpN
-X-Google-Smtp-Source: ABdhPJxcwDReBqzn9WcP8RibxTgcXWTrTjv1RIbtLkbL9KVcAg5+Jpw/UzJdxKtS5a0wRdsLECC24w==
-X-Received: by 2002:a63:7844:: with SMTP id t65mr21943592pgc.382.1592233188703; 
- Mon, 15 Jun 2020 07:59:48 -0700 (PDT)
-Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
- by smtp.gmail.com with ESMTPSA id
- k18sm14366448pfp.208.2020.06.15.07.59.47
+ bh=G5V3cIBg/HoQbRwYOdfT+XHVvtOd3fhu/VBCzZHpP7M=;
+ b=lkgN2VGvvSJYEDzAErrx2mJUqCCGGeKdTi7zYlYTXwZxnQtCGLJWVy5rJBVqAZtcy2
+ wbkwVONn+cOXz2xVrtpF3w3O5Prjs6aY4/fmc1mxmWpob0lQwLNu5F/FJGBK4KSkK86D
+ 02XNihYYqFH3Edoxo2fc7JNWVhXCJxZltD28B5RxssDf8FEed12H7b802gnjhGaFpAwj
+ DNkGdBtz0maLnCBXpFPOeZ1Z+vp9X2K6kDKgzovvAxK9uuxks7GzA3N4sMY34J/faylD
+ FYkhn0RGnbEG89/6/tHGtc9YG5jojxPLEzhOXkf3pXV+/xDegd2uPI56qc4W2jecCg75
+ FoJA==
+X-Gm-Message-State: AOAM530sYAW8akD001TL6FxSHbJLCt9ffPwSgp2LlvrNBq6dJKSrvtQG
+ /FTT3InnSd32SSYJ4+7Z/ufBxjsaGUvAsqtp0rFD54X6ZvCfr2hooKozDZI1su2qirHMJBm+w9u
+ CwPlaI/7zY2nK4KM=
+X-Received: by 2002:a50:f044:: with SMTP id u4mr24462060edl.226.1592233335975; 
+ Mon, 15 Jun 2020 08:02:15 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxPX0uBJ43DH6mpNM9Hj6f2e/6Npr5Gv6m+nDkLfr5x1fGTmwG/r3kaLysElQ9m5ePnNHc9PQ==
+X-Received: by 2002:a50:f044:: with SMTP id u4mr24462022edl.226.1592233335696; 
+ Mon, 15 Jun 2020 08:02:15 -0700 (PDT)
+Received: from [192.168.1.38] (181.red-88-10-103.dynamicip.rima-tde.net.
+ [88.10.103.181])
+ by smtp.gmail.com with ESMTPSA id p13sm8575173edx.69.2020.06.15.08.02.14
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 15 Jun 2020 07:59:47 -0700 (PDT)
-Subject: Re: [PATCH v2 2/2] hw: arm: Set vendor property for IMX SDHCI
- emulations
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20200603145258.195920-1-linux@roeck-us.net>
- <20200603145258.195920-3-linux@roeck-us.net>
- <CAFEAcA9HE0Be9QNfGKxp4YL-V_+khUNS4KOL43LBC9mQd75eLA@mail.gmail.com>
-From: Guenter Roeck <linux@roeck-us.net>
-Autocrypt: addr=linux@roeck-us.net; keydata=
- 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
- mDW4+i+XlNFUPUYMrIKi9joBhu18ssf5i5Q=
-Message-ID: <5fcdc717-9313-010b-e713-8bf09921dae8@roeck-us.net>
-Date: Mon, 15 Jun 2020 07:59:46 -0700
+ Mon, 15 Jun 2020 08:02:15 -0700 (PDT)
+Subject: Re: [PATCH v7 2/5] softmmu/vl: Let -fw_cfg option take a 'gen_id'
+ argument
+To: Gerd Hoffmann <kraxel@redhat.com>, Laszlo Ersek <lersek@redhat.com>
+References: <20200528173141.17495-1-philmd@redhat.com>
+ <20200528173141.17495-3-philmd@redhat.com>
+ <f3f6154e-bbc1-98bd-0f44-77b28c74915f@redhat.com>
+ <20200609155050.GT2880@minyard.net>
+ <6e4b9540-7d5b-0951-2870-bada03e29d83@redhat.com>
+ <20200615144527.w2637fq5jzpk7jtt@sirius.home.kraxel.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <dbb5766d-ffd6-df64-09f6-0a78efe6e46c@redhat.com>
+Date: Mon, 15 Jun 2020 17:02:13 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9HE0Be9QNfGKxp4YL-V_+khUNS4KOL43LBC9mQd75eLA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200615144527.w2637fq5jzpk7jtt@sirius.home.kraxel.org>
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::542;
- envelope-from=groeck7@gmail.com; helo=mail-pg1-x542.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 3
-X-Spam_score: 0.3
-X-Spam_bar: /
-X-Spam_report: (0.3 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_ENVFROM_END_DIGIT=0.25,
- FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 11:02:21
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -150,58 +140,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrey Smirnov <andrew.smirnov@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Jean-Christophe Dubois <jcd@tribudubois.net>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ qemu-devel@nongnu.org, minyard@acm.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/15/20 6:18 AM, Peter Maydell wrote:
-> On Wed, 3 Jun 2020 at 15:53, Guenter Roeck <linux@roeck-us.net> wrote:
->>
->> Set vendor property to IMX to enable IMX specific functionality
->> in sdhci code.
->>
->> Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> Signed-off-by: Guenter Roeck <linux@roeck-us.net>
->> ---
->> v2: Added missing error checks
->>     Added Philippe's Tested-by: tag
->>
->>  hw/arm/fsl-imx25.c  | 6 ++++++
->>  hw/arm/fsl-imx6.c   | 6 ++++++
->>  hw/arm/fsl-imx6ul.c | 2 ++
->>  hw/arm/fsl-imx7.c   | 2 ++
->>  4 files changed, 16 insertions(+)
->>
->> diff --git a/hw/arm/fsl-imx25.c b/hw/arm/fsl-imx25.c
->> index cdaa79c26b..a853ffcc00 100644
->> --- a/hw/arm/fsl-imx25.c
->> +++ b/hw/arm/fsl-imx25.c
->> @@ -274,6 +274,12 @@ static void fsl_imx25_realize(DeviceState *dev, Error **errp)
->>                                   &err);
->>          object_property_set_uint(OBJECT(&s->esdhc[i]), IMX25_ESDHC_CAPABILITIES,
->>                                   "capareg", &err);
->> +        object_property_set_uint(OBJECT(&s->esdhc[i]), SDHCI_VENDOR_IMX,
->> +                                 "vendor", &err);
->> +        if (err) {
->> +            error_propagate(errp, err);
->> +            return;
->> +        }
+On 6/15/20 4:45 PM, Gerd Hoffmann wrote:
+>   Hi,
 > 
-> The existing error handling in this function is wrong -- for multiple
-> calls that take a pointer to a local Error*, the
-> check-and-error_propagate() has to be done after each call, it can't
-> be rolled up into a single check after all the calls. (see
-> include/qapi/error.h for the patterns that are valid).
+>>> I can explain the rationale for that change, but I'm not sure of the
+>>> answer to your question.  That changes makes sure that the fw_cfg data
+>>> remains exactly the same even on newer versions of qemu if the machine
+>>> is set the same.  This way you can do migrations to newer qemu versions
+>>> and anything using fw_cfg won't get confused because the data changes.
+>>>
+>>> The reason that change was so complex was preserving the order for
+>>> migrating from older versions.
+>>>
+>>> This is only about migration.  I'm not sure what gen_id is, but if it's
+>>> migrated, it better be future proof.
+>>
+>> Whenever introducing a new fw_cfg file (*any* new named file), how do we
+>> decide whether we need fw_cfg_set_order_override()?
 > 
+> The whole point of the sorting is to make sure the fw_cfg directory
+> listing entry (FW_CFG_FILE_DIR) is stable and doesn't change underneath
+> the guest when it gets live-migrated.
+> 
+> That sorting was added in qemu 2.6, to make sure things don't chance by
+> accident in case the initialization order changes.  Now you've got a
+> problem when you migrate from qemu 2.5 (+older) to qemu 2.6 (+newer),
+> because 2.5 has the entries in initialization order and 2.6 has the
+> entries in alphabetical order.  To deal with that machine types for 2.5
+> & older keep the old sort order.  This is the reason why
+> legacy_fw_cfg_order exists.
+> 
+> For new features and files you can completely ignore the whole legacy
+> sorting mess.  cross-version live migration works only for features
+> supported by both qemu versions, therefore the legacy sorting is only
+> relevant for features & files already supported by qemu 2.5.
 
-A fix for that problem was submitted by Philippe:
+Thanks you Gerd for the whole explanation. I added an entry to
+my TODO list to document this, based on your comment (and Corey's).
 
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg695544.html
+I'll address it later, as you confirmed it doesn't impact this
+series.
 
-Thanks,
-Guenter
+Regards,
+
+Phil.
+
 
