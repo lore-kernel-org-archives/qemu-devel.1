@@ -2,87 +2,86 @@ Return-Path: <SRS0=tJVC=74=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C03AC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 21:34:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1E96C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 21:35:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 36C23207D3
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 21:34:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 795302071A
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 21:35:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hnWA1MlI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36C23207D3
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xar5YUny"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 795302071A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59386 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35934 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkwkj-00010A-Ed
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 17:34:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35584)
+	id 1jkwlp-00031r-Nn
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 17:35:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35540)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jkw23-00075L-AQ
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 16:48:39 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:53636
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jkw20-0006yK-4z
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 16:48:36 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:54181
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jkw1z-0001sh-2l
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 16:48:38 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jkw1x-0001sI-Fm
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 16:48:35 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592254114;
+ s=mimecast20190719; t=1592254112;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=4/N/qdd2vGuSHd641b14kVv0r6nRlJ212mugWR9M9Rw=;
- b=hnWA1MlIgLH+LGLb6BiwiLuHlOYZT3i+IkPJx+DV6BWsZCLBdleCz37uD56gH91HN6R2pE
- aSSHFjGpEMAX31PIEz6v6LzWLQNxATbXWUuddoC0GHwW6BXDesph18ppUeuKh4eOU553R8
- gUtlxZ4uzeKSVyr3KEsMxpQsvSU3GA0=
+ bh=/kaOdXKFX8fBv1C74UUej8EyLMgDrn0m3AxMKhi4J2g=;
+ b=Xar5YUnyxDrLUUPWJYTt9O0O3Iv6xleDh9eqM6DdNFtGOp6wHVGGXLemhk+J8tG2LPZtUB
+ lmOn0s1yI3BVJE1/oIAAAIWs3aPVoHkRnzkFmwWITJLDArZY8ta+P1RUPma1hJERQCrr6s
+ P4lote4dreUtNgPcQylL+qqRG+g0o5A=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-348-YfNrHADgOSiBjkev6YHKpw-1; Mon, 15 Jun 2020 16:48:30 -0400
-X-MC-Unique: YfNrHADgOSiBjkev6YHKpw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-197--zeVf2wXPJ6sRK6Q6S0HWg-1; Mon, 15 Jun 2020 16:48:31 -0400
+X-MC-Unique: -zeVf2wXPJ6sRK6Q6S0HWg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5F115E920;
- Mon, 15 Jun 2020 20:48:29 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3414818585D0
+ for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 20:48:30 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
  [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 29D0E7FE8B;
- Mon, 15 Jun 2020 20:48:26 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CD01390348;
+ Mon, 15 Jun 2020 20:48:29 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 601751131C04; Mon, 15 Jun 2020 22:40:09 +0200 (CEST)
+ id 1B0531132B59; Mon, 15 Jun 2020 22:40:09 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 79/84] s390x/event-facility: Simplify creation of SCLP event
- devices
-Date: Mon, 15 Jun 2020 22:40:03 +0200
-Message-Id: <20200615204008.3069956-80-armbru@redhat.com>
+Subject: [PULL 67/84] sysbus: Tidy up sysbus_init_child_obj()'s @childsize arg, part 1
+Date: Mon, 15 Jun 2020 22:39:51 +0200
+Message-Id: <20200615204008.3069956-68-armbru@redhat.com>
 In-Reply-To: <20200615204008.3069956-1-armbru@redhat.com>
 References: <20200615204008.3069956-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 15:33:00
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 15:33:04
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,164 +95,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-init_event_facility() creates the SCLP events bus with two SCLP event
-devices (sclpquiesce and sclp-cpu-hotplug).  It leaves the devices
-unrealized.  A comment explains they will be realized "via the bus".
+The callers of sysbus_init_child_obj() commonly pass either &child,
+sizeof(child), or pchild, sizeof(*pchild).  Tidy up the few that use
+sizeof(child_type) instead, mostly to keep future commits simpler.
 
-The bus's realize method sclp_events_bus_realize() indeed realizes all
-unrealized devices on this bus.  It carries a TODO comment claiming
-this "has to be done in common code".  No other bus realize method
-realizes its devices.
+Coccinelle script:
 
-The common code in question is bus_set_realized(), which has a TODO
-comment asking for recursive realization.  It's been asking for years.
+    @@
+    expression parent, propname, type;
+    type T;
+    T child;
+    @@
+    -    sysbus_init_child_obj(parent, propname, &child, sizeof(T), type)
+    +    sysbus_init_child_obj(parent, propname, &child, sizeof(child), type)
 
-The only devices sclp_events_bus_realize() will ever realize are the
-two init_event_facility() puts there.
+    @@
+    expression parent, propname, type;
+    type T;
+    T *child;
+    @@
+    -    sysbus_init_child_obj(parent, propname, child, sizeof(T), type)
+    +    sysbus_init_child_obj(parent, propname, child, sizeof(*child), type)
 
-Simplify as follows:
-
-* Make the devices members of the event facility instance struct, just
-  like the bus.  object_initialize_child() is simpler than
-  object_property_add_child() and object_unref().
-
-* Realize them in the event facility realize method.
-
-This is in line with how such things are done elsewhere.
-
-Cc: Cornelia Huck <cohuck@redhat.com>
-Cc: Halil Pasic <pasic@linux.ibm.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: David Hildenbrand <david@redhat.com>
-Cc: qemu-s390x@nongnu.org
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: David Hildenbrand <david@redhat.com>
-Acked-by: Cornelia Huck <cohuck@redhat.com>
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <20200610053247.1583243-54-armbru@redhat.com>
+Message-Id: <20200610053247.1583243-42-armbru@redhat.com>
 ---
- hw/s390x/event-facility.c | 64 ++++++++++++++++++---------------------
- 1 file changed, 29 insertions(+), 35 deletions(-)
+ hw/arm/bcm2835_peripherals.c    | 3 +--
+ hw/arm/mps2-tz.c                | 5 ++---
+ hw/arm/musca.c                  | 8 +++-----
+ hw/display/sm501.c              | 2 +-
+ hw/microblaze/xlnx-zynqmp-pmu.c | 4 ++--
+ 5 files changed, 9 insertions(+), 13 deletions(-)
 
-diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
-index 97a4f0b1f5..164b1fd295 100644
---- a/hw/s390x/event-facility.c
-+++ b/hw/s390x/event-facility.c
-@@ -39,6 +39,7 @@ typedef struct SCLPEventsBus {
- struct SCLPEventFacility {
-     SysBusDevice parent_obj;
-     SCLPEventsBus sbus;
-+    SCLPEvent quiesce, cpu_hotplug;
-     /* guest's receive mask */
-     union {
-         uint32_t receive_mask_pieces[2];
-@@ -328,34 +329,9 @@ static void write_event_mask(SCLPEventFacility *ef, SCCB *sccb)
- 
- #define TYPE_SCLP_EVENTS_BUS "s390-sclp-events-bus"
- 
--static void sclp_events_bus_realize(BusState *bus, Error **errp)
--{
--    Error *err = NULL;
--    BusChild *kid;
--
--    /* TODO: recursive realization has to be done in common code */
--    QTAILQ_FOREACH(kid, &bus->children, sibling) {
--        DeviceState *dev = kid->child;
--
--        object_property_set_bool(OBJECT(dev), true, "realized", &err);
--        if (err) {
--            error_propagate(errp, err);
--            return;
--        }
--    }
--}
--
--static void sclp_events_bus_class_init(ObjectClass *klass, void *data)
--{
--    BusClass *bc = BUS_CLASS(klass);
--
--    bc->realize = sclp_events_bus_realize;
--}
--
- static const TypeInfo sclp_events_bus_info = {
-     .name = TYPE_SCLP_EVENTS_BUS,
-     .parent = TYPE_BUS,
--    .class_init = sclp_events_bus_class_init,
- };
- 
- static void command_handler(SCLPEventFacility *ef, SCCB *sccb, uint64_t code)
-@@ -443,27 +419,44 @@ static void init_event_facility(Object *obj)
+diff --git a/hw/arm/bcm2835_peripherals.c b/hw/arm/bcm2835_peripherals.c
+index cca5b5ad04..188b112c13 100644
+--- a/hw/arm/bcm2835_peripherals.c
++++ b/hw/arm/bcm2835_peripherals.c
+@@ -27,8 +27,7 @@ static void create_unimp(BCM2835PeripheralState *ps,
+                          UnimplementedDeviceState *uds,
+                          const char *name, hwaddr ofs, hwaddr size)
  {
-     SCLPEventFacility *event_facility = EVENT_FACILITY(obj);
-     DeviceState *sdev = DEVICE(obj);
--    Object *new;
+-    sysbus_init_child_obj(OBJECT(ps), name, uds,
+-                          sizeof(UnimplementedDeviceState),
++    sysbus_init_child_obj(OBJECT(ps), name, uds, sizeof(*uds),
+                           TYPE_UNIMPLEMENTED_DEVICE);
+     qdev_prop_set_string(DEVICE(uds), "name", name);
+     qdev_prop_set_uint64(DEVICE(uds), "size", size);
+diff --git a/hw/arm/mps2-tz.c b/hw/arm/mps2-tz.c
+index 8a050228d0..ad0bc9365a 100644
+--- a/hw/arm/mps2-tz.c
++++ b/hw/arm/mps2-tz.c
+@@ -174,8 +174,7 @@ static MemoryRegion *make_unimp_dev(MPS2TZMachineState *mms,
+      */
+     UnimplementedDeviceState *uds = opaque;
  
-     event_facility->mask_length = 4;
-     event_facility->allow_all_mask_sizes = true;
-     object_property_add_bool(obj, "allow_all_mask_sizes",
-                              sclp_event_get_allow_all_mask_sizes,
-                              sclp_event_set_allow_all_mask_sizes);
-+
-     /* Spawn a new bus for SCLP events */
-     qbus_create_inplace(&event_facility->sbus, sizeof(event_facility->sbus),
-                         TYPE_SCLP_EVENTS_BUS, sdev, NULL);
+-    sysbus_init_child_obj(OBJECT(mms), name, uds,
+-                          sizeof(UnimplementedDeviceState),
++    sysbus_init_child_obj(OBJECT(mms), name, uds, sizeof(*uds),
+                           TYPE_UNIMPLEMENTED_DEVICE);
+     qdev_prop_set_string(DEVICE(uds), "name", name);
+     qdev_prop_set_uint64(DEVICE(uds), "size", size);
+@@ -552,7 +551,7 @@ static void mps2tz_common_init(MachineState *machine)
+         char *gpioname;
  
--    new = object_new(TYPE_SCLP_QUIESCE);
--    object_property_add_child(obj, TYPE_SCLP_QUIESCE, new);
--    object_unref(new);
--    qdev_set_parent_bus(DEVICE(new), BUS(&event_facility->sbus));
-+    object_initialize_child(obj, TYPE_SCLP_QUIESCE,
-+                            &event_facility->quiesce,
-+                            TYPE_SCLP_QUIESCE);
+         sysbus_init_child_obj(OBJECT(machine), ppcinfo->name, ppc,
+-                              sizeof(TZPPC), TYPE_TZ_PPC);
++                              sizeof(*ppc), TYPE_TZ_PPC);
+         ppcdev = DEVICE(ppc);
  
--    new = object_new(TYPE_SCLP_CPU_HOTPLUG);
--    object_property_add_child(obj, TYPE_SCLP_CPU_HOTPLUG, new);
--    object_unref(new);
--    qdev_set_parent_bus(DEVICE(new), BUS(&event_facility->sbus));
--    /* the facility will automatically realize the devices via the bus */
-+    object_initialize_child(obj, TYPE_SCLP_CPU_HOTPLUG,
-+                            &event_facility->cpu_hotplug,
-+                            TYPE_SCLP_CPU_HOTPLUG);
-+}
-+
-+static void realize_event_facility(DeviceState *dev, Error **errp)
-+{
-+    SCLPEventFacility *event_facility = EVENT_FACILITY(dev);
-+    Error *local_err = NULL;
-+
-+    qdev_realize(DEVICE(&event_facility->quiesce),
-+                 BUS(&event_facility->sbus), &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
-+    qdev_realize(DEVICE(&event_facility->cpu_hotplug),
-+                 BUS(&event_facility->sbus), &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        qdev_unrealize(DEVICE(&event_facility->quiesce));
-+        return;
-+    }
+         for (port = 0; port < TZ_NUM_PORTS; port++) {
+diff --git a/hw/arm/musca.c b/hw/arm/musca.c
+index cd7df7c191..b7f1c4e128 100644
+--- a/hw/arm/musca.c
++++ b/hw/arm/musca.c
+@@ -142,8 +142,7 @@ static MemoryRegion *make_unimp_dev(MuscaMachineState *mms,
+      */
+     UnimplementedDeviceState *uds = opaque;
+ 
+-    sysbus_init_child_obj(OBJECT(mms), name, uds,
+-                          sizeof(UnimplementedDeviceState),
++    sysbus_init_child_obj(OBJECT(mms), name, uds, sizeof(*uds),
+                           TYPE_UNIMPLEMENTED_DEVICE);
+     qdev_prop_set_string(DEVICE(uds), "name", name);
+     qdev_prop_set_uint64(DEVICE(uds), "size", size);
+@@ -246,8 +245,7 @@ static MemoryRegion *make_mpc(MuscaMachineState *mms, void *opaque,
+     case MPC_CRYPTOISLAND:
+         /* We don't implement the CryptoIsland yet */
+         uds = &mms->cryptoisland;
+-        sysbus_init_child_obj(OBJECT(mms), name, uds,
+-                              sizeof(UnimplementedDeviceState),
++        sysbus_init_child_obj(OBJECT(mms), name, uds, sizeof(*uds),
+                               TYPE_UNIMPLEMENTED_DEVICE);
+         qdev_prop_set_string(DEVICE(uds), "name", mpcinfo[i].name);
+         qdev_prop_set_uint64(DEVICE(uds), "size", mpcinfo[i].size);
+@@ -535,7 +533,7 @@ static void musca_init(MachineState *machine)
+         char *gpioname;
+ 
+         sysbus_init_child_obj(OBJECT(machine), ppcinfo->name, ppc,
+-                              sizeof(TZPPC), TYPE_TZ_PPC);
++                              sizeof(*ppc), TYPE_TZ_PPC);
+         ppcdev = DEVICE(ppc);
+ 
+         for (port = 0; port < TZ_NUM_PORTS; port++) {
+diff --git a/hw/display/sm501.c b/hw/display/sm501.c
+index 3e62eca3de..ccdbce1a06 100644
+--- a/hw/display/sm501.c
++++ b/hw/display/sm501.c
+@@ -2023,7 +2023,7 @@ static void sm501_sysbus_init(Object *o)
+     SM501SysBusState *sm501 = SYSBUS_SM501(o);
+     SerialMM *smm = &sm501->serial;
+ 
+-    sysbus_init_child_obj(o, "serial", smm, sizeof(SerialMM), TYPE_SERIAL_MM);
++    sysbus_init_child_obj(o, "serial", smm, sizeof(*smm), TYPE_SERIAL_MM);
+     qdev_set_legacy_instance_id(DEVICE(smm), SM501_UART0, 2);
+     qdev_prop_set_uint8(DEVICE(smm), "regshift", 2);
+     qdev_prop_set_uint8(DEVICE(smm), "endianness", DEVICE_LITTLE_ENDIAN);
+diff --git a/hw/microblaze/xlnx-zynqmp-pmu.c b/hw/microblaze/xlnx-zynqmp-pmu.c
+index bd56eccd66..30ad133ec3 100644
+--- a/hw/microblaze/xlnx-zynqmp-pmu.c
++++ b/hw/microblaze/xlnx-zynqmp-pmu.c
+@@ -69,8 +69,8 @@ static void xlnx_zynqmp_pmu_soc_init(Object *obj)
+     /* Create the IPI device */
+     for (int i = 0; i < XLNX_ZYNQMP_PMU_NUM_IPIS; i++) {
+         char *name = g_strdup_printf("ipi%d", i);
+-        sysbus_init_child_obj(obj, name, &s->ipi[i],
+-                              sizeof(XlnxZynqMPIPI), TYPE_XLNX_ZYNQMP_IPI);
++        sysbus_init_child_obj(obj, name, &s->ipi[i], sizeof(s->ipi[i]),
++                              TYPE_XLNX_ZYNQMP_IPI);
+         g_free(name);
+     }
  }
- 
- static void reset_event_facility(DeviceState *dev)
-@@ -479,6 +472,7 @@ static void init_event_facility_class(ObjectClass *klass, void *data)
-     DeviceClass *dc = DEVICE_CLASS(sbdc);
-     SCLPEventFacilityClass *k = EVENT_FACILITY_CLASS(dc);
- 
-+    dc->realize = realize_event_facility;
-     dc->reset = reset_event_facility;
-     dc->vmsd = &vmstate_event_facility;
-     set_bit(DEVICE_CATEGORY_MISC, dc->categories);
 -- 
 2.26.2
 
