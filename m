@@ -2,87 +2,86 @@ Return-Path: <SRS0=tJVC=74=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8DC6C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 21:37:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D21A2C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 21:38:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7F6422071A
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 21:37:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9A2F92071A
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 21:38:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VXwXLxiA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F6422071A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a7ilzJW5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A2F92071A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41654 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45038 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkwnI-0005QU-In
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 17:37:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35626)
+	id 1jkwo3-0006mm-R0
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 17:38:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35676)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jkw25-00078d-0E
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 16:48:41 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:24459
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jkw2B-0007Eu-HW
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 16:48:49 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44703
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jkw21-0001tL-25
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 16:48:40 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jkw29-0001uR-PS
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 16:48:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592254116;
+ s=mimecast20190719; t=1592254125;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=mlWQ/wW+zd4OpJtVRp4FbnsDGjJBdXtVksWOepzXqbM=;
- b=VXwXLxiA6DoFL2nDbDK8jNx2h6rB6/8j9eLncd6iLYySpr28bRpJ3dGPipFrtUqaXsZaK6
- NWvTzv5jWBzS/e6UfHqjzlSNYV0vLzY4y4tTeKQ+BnRnQm7p0SNOXw4ckTSL0SS5sW6j7v
- uUTYS1D1FxSfLXxlNorINtKEl7IzElY=
+ bh=gCR0r8c9B6368eZJUIJfJCKZ1x3SQUYboifJx+LHihs=;
+ b=a7ilzJW5EmYLHrWsk1FMbmGpi9+uC94/ONRHMlXMY3rk14gskFX2mVCMwji8grHQtYoPL9
+ w7/KE9DBL0Hg8mfK5iPH2g0unMxVZntomLziqp1q32xV7oaEEfbajLgvbPmadpHYDgHsYz
+ Mo4sJPLi4ndNx/U9vBua8yurnmFBNXo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-59-EIsBwPZDMT6wiNCgYifFFg-1; Mon, 15 Jun 2020 16:48:34 -0400
-X-MC-Unique: EIsBwPZDMT6wiNCgYifFFg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-269-rV9PLTerPP-dBYwn_RKJvA-1; Mon, 15 Jun 2020 16:48:32 -0400
+X-MC-Unique: rV9PLTerPP-dBYwn_RKJvA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2DB7D10AB66E
- for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 20:48:33 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AB62834773;
+ Mon, 15 Jun 2020 20:48:31 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
  [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A4D8B5D9D5;
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7AB8F61169;
  Mon, 15 Jun 2020 20:48:31 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 4DFD31132751; Mon, 15 Jun 2020 22:40:09 +0200 (CEST)
+ id 102381132C2E; Mon, 15 Jun 2020 22:40:09 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 75/84] sysbus: Convert qdev_set_parent_bus() use with
- Coccinelle, part 3
-Date: Mon, 15 Jun 2020 22:39:59 +0200
-Message-Id: <20200615204008.3069956-76-armbru@redhat.com>
+Subject: [PULL 64/84] macio: Eliminate macio_init_child_obj()
+Date: Mon, 15 Jun 2020 22:39:48 +0200
+Message-Id: <20200615204008.3069956-65-armbru@redhat.com>
 In-Reply-To: <20200615204008.3069956-1-armbru@redhat.com>
 References: <20200615204008.3069956-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 15:33:04
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 16:40:20
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,281 +95,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-These are init/realize pairs produced by the previous commit's
-Coccinelle script where the argument test doesn't quite match.  They
-need even more careful review.
+macio_init_child_obj() has become a trivial wrapper around
+object_initialize_child_with_props().  Eliminate it, since the general
+convenience wrapper object_initialize_child() is just as convenient
+already.
 
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <20200610053247.1583243-50-armbru@redhat.com>
+Message-Id: <20200610053247.1583243-39-armbru@redhat.com>
 ---
- hw/arm/armsse.c          | 33 +++++++++++++--------------------
- hw/arm/armv7m.c          |  6 +++---
- hw/arm/microbit.c        | 12 ++++++------
- hw/arm/xlnx-versal.c     |  6 +++---
- hw/arm/xlnx-zynqmp.c     |  6 +++---
- hw/cpu/realview_mpcore.c |  5 ++---
- hw/display/sm501.c       |  4 ++--
- hw/intc/armv7m_nvic.c    |  7 +++----
- 8 files changed, 35 insertions(+), 44 deletions(-)
+ hw/misc/macio/macio.c | 30 +++++++++---------------------
+ 1 file changed, 9 insertions(+), 21 deletions(-)
 
-diff --git a/hw/arm/armsse.c b/hw/arm/armsse.c
-index 6571c1ed4c..8abe1307a9 100644
---- a/hw/arm/armsse.c
-+++ b/hw/arm/armsse.c
-@@ -256,9 +256,8 @@ static void armsse_init(Object *obj)
-         g_free(name);
- 
-         name = g_strdup_printf("armv7m%d", i);
--        sysbus_init_child_obj(OBJECT(&s->cluster[i]), name,
--                              &s->armv7m[i], sizeof(s->armv7m[i]),
--                              TYPE_ARMV7M);
-+        object_initialize_child(OBJECT(&s->cluster[i]), name, &s->armv7m[i],
-+                                TYPE_ARMV7M);
-         qdev_prop_set_string(DEVICE(&s->armv7m[i]), "cpu-type",
-                              ARM_CPU_TYPE_NAME("cortex-m33"));
-         g_free(name);
-@@ -308,31 +307,26 @@ static void armsse_init(Object *obj)
-     object_initialize_child(obj, "armsse-sysinfo", &s->sysinfo,
-                             TYPE_IOTKIT_SYSINFO);
-     if (info->has_mhus) {
--        sysbus_init_child_obj(obj, "mhu0", &s->mhu[0], sizeof(s->mhu[0]),
--                              TYPE_ARMSSE_MHU);
--        sysbus_init_child_obj(obj, "mhu1", &s->mhu[1], sizeof(s->mhu[1]),
--                              TYPE_ARMSSE_MHU);
-+        object_initialize_child(obj, "mhu0", &s->mhu[0], TYPE_ARMSSE_MHU);
-+        object_initialize_child(obj, "mhu1", &s->mhu[1], TYPE_ARMSSE_MHU);
-     }
-     if (info->has_ppus) {
-         for (i = 0; i < info->num_cpus; i++) {
-             char *name = g_strdup_printf("CPU%dCORE_PPU", i);
-             int ppuidx = CPU0CORE_PPU + i;
- 
--            sysbus_init_child_obj(obj, name, &s->ppu[ppuidx],
--                                  sizeof(s->ppu[ppuidx]),
--                                  TYPE_UNIMPLEMENTED_DEVICE);
-+            object_initialize_child(obj, name, &s->ppu[ppuidx],
-+                                    TYPE_UNIMPLEMENTED_DEVICE);
-             g_free(name);
-         }
--        sysbus_init_child_obj(obj, "DBG_PPU", &s->ppu[DBG_PPU],
--                              sizeof(s->ppu[DBG_PPU]),
--                              TYPE_UNIMPLEMENTED_DEVICE);
-+        object_initialize_child(obj, "DBG_PPU", &s->ppu[DBG_PPU],
-+                                TYPE_UNIMPLEMENTED_DEVICE);
-         for (i = 0; i < info->sram_banks; i++) {
-             char *name = g_strdup_printf("RAM%d_PPU", i);
-             int ppuidx = RAM0_PPU + i;
- 
--            sysbus_init_child_obj(obj, name, &s->ppu[ppuidx],
--                                  sizeof(s->ppu[ppuidx]),
--                                  TYPE_UNIMPLEMENTED_DEVICE);
-+            object_initialize_child(obj, name, &s->ppu[ppuidx],
-+                                    TYPE_UNIMPLEMENTED_DEVICE);
-             g_free(name);
-         }
-     }
-@@ -428,7 +422,7 @@ static void map_ppu(ARMSSE *s, int ppuidx, const char *name, hwaddr addr)
- 
-     qdev_prop_set_string(dev, "name", name);
-     qdev_prop_set_uint64(dev, "size", 0x1000);
--    qdev_init_nofail(dev);
-+    sysbus_realize(SYS_BUS_DEVICE(dev), &error_fatal);
-     sysbus_mmio_map(SYS_BUS_DEVICE(&s->ppu[ppuidx]), 0, addr);
+diff --git a/hw/misc/macio/macio.c b/hw/misc/macio/macio.c
+index 1a07ca2ca5..8ba7af073c 100644
+--- a/hw/misc/macio/macio.c
++++ b/hw/misc/macio/macio.c
+@@ -94,14 +94,6 @@ static void macio_bar_setup(MacIOState *s)
+     macio_escc_legacy_setup(s);
  }
  
-@@ -579,7 +573,7 @@ static void armsse_realize(DeviceState *dev, Error **errp)
-             error_propagate(errp, err);
-             return;
-         }
--        object_property_set_bool(cpuobj, true, "realized", &err);
-+        sysbus_realize(SYS_BUS_DEVICE(cpuobj), &err);
-         if (err) {
-             error_propagate(errp, err);
-             return;
-@@ -815,8 +809,7 @@ static void armsse_realize(DeviceState *dev, Error **errp)
-             int cpunum;
-             SysBusDevice *mhu_sbd = SYS_BUS_DEVICE(&s->mhu[i]);
- 
--            object_property_set_bool(OBJECT(&s->mhu[i]), true,
--                                     "realized", &err);
-+            sysbus_realize(SYS_BUS_DEVICE(&s->mhu[i]), &err);
-             if (err) {
-                 error_propagate(errp, err);
-                 return;
-diff --git a/hw/arm/armv7m.c b/hw/arm/armv7m.c
-index 6fd672e7d9..5cdd0b9b51 100644
---- a/hw/arm/armv7m.c
-+++ b/hw/arm/armv7m.c
-@@ -141,8 +141,8 @@ static void armv7m_instance_init(Object *obj)
-                               OBJECT(&s->nvic), "num-irq");
- 
-     for (i = 0; i < ARRAY_SIZE(s->bitband); i++) {
--        sysbus_init_child_obj(obj, "bitband[*]", &s->bitband[i],
--                              sizeof(s->bitband[i]), TYPE_BITBAND);
-+        object_initialize_child(obj, "bitband[*]", &s->bitband[i],
-+                                TYPE_BITBAND);
+-static void macio_init_child_obj(MacIOState *s, const char *childname,
+-                                 void *child, size_t childsize,
+-                                 const char *childtype)
+-{
+-    object_initialize_child_with_props(OBJECT(s), childname, child, childsize,
+-                                       childtype, &error_abort, NULL);
+-}
+-
+ static void macio_common_realize(PCIDevice *d, Error **errp)
+ {
+     MacIOState *s = MACIO(d);
+@@ -218,13 +210,12 @@ static void macio_oldworld_realize(PCIDevice *d, Error **errp)
      }
  }
  
-@@ -257,7 +257,7 @@ static void armv7m_realize(DeviceState *dev, Error **errp)
-             }
-             object_property_set_link(obj, OBJECT(s->board_memory),
-                                      "source-memory", &error_abort);
--            object_property_set_bool(obj, true, "realized", &err);
-+            sysbus_realize(SYS_BUS_DEVICE(obj), &err);
-             if (err != NULL) {
-                 error_propagate(errp, err);
-                 return;
-diff --git a/hw/arm/microbit.c b/hw/arm/microbit.c
-index 72fab429c4..d20ebd3aad 100644
---- a/hw/arm/microbit.c
-+++ b/hw/arm/microbit.c
-@@ -39,21 +39,21 @@ static void microbit_init(MachineState *machine)
-     Object *soc = OBJECT(&s->nrf51);
-     Object *i2c = OBJECT(&s->i2c);
+-static void macio_init_ide(MacIOState *s, MACIOIDEState *ide, size_t ide_size,
+-                           int index)
++static void macio_init_ide(MacIOState *s, MACIOIDEState *ide, int index)
+ {
+     gchar *name = g_strdup_printf("ide[%i]", index);
+     uint32_t addr = 0x1f000 + ((index + 1) * 0x1000);
  
--    sysbus_init_child_obj(OBJECT(machine), "nrf51", &s->nrf51, sizeof(s->nrf51),
--                          TYPE_NRF51_SOC);
-+    object_initialize_child(OBJECT(machine), "nrf51", &s->nrf51,
-+                            TYPE_NRF51_SOC);
-     qdev_prop_set_chr(DEVICE(&s->nrf51), "serial0", serial_hd(0));
-     object_property_set_link(soc, OBJECT(system_memory), "memory",
-                              &error_fatal);
--    object_property_set_bool(soc, true, "realized", &error_fatal);
-+    sysbus_realize(SYS_BUS_DEVICE(soc), &error_fatal);
+-    macio_init_child_obj(s, name, ide, ide_size, TYPE_MACIO_IDE);
++    object_initialize_child(OBJECT(s), name, ide, TYPE_MACIO_IDE);
+     qdev_prop_set_uint32(DEVICE(ide), "addr", addr);
+     memory_region_add_subregion(&s->bar, addr, &ide->mem);
+     g_free(name);
+@@ -242,16 +233,15 @@ static void macio_oldworld_init(Object *obj)
+                              qdev_prop_allow_set_link_before_realize,
+                              0);
  
-     /*
-      * Overlap the TWI stub device into the SoC.  This is a microbit-specific
-      * hack until we implement the nRF51 TWI controller properly and the
-      * magnetometer/accelerometer devices.
-      */
--    sysbus_init_child_obj(OBJECT(machine), "microbit.twi", &s->i2c,
--                          sizeof(s->i2c), TYPE_MICROBIT_I2C);
--    object_property_set_bool(i2c, true, "realized", &error_fatal);
-+    object_initialize_child(OBJECT(machine), "microbit.twi", &s->i2c,
-+                            TYPE_MICROBIT_I2C);
-+    sysbus_realize(SYS_BUS_DEVICE(i2c), &error_fatal);
-     mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(i2c), 0);
-     memory_region_add_subregion_overlap(&s->nrf51.container, NRF51_TWI_BASE,
-                                         mr, -1);
-diff --git a/hw/arm/xlnx-versal.c b/hw/arm/xlnx-versal.c
-index a27c315a6b..20f0121ab0 100644
---- a/hw/arm/xlnx-versal.c
-+++ b/hw/arm/xlnx-versal.c
-@@ -238,10 +238,10 @@ static void versal_create_rtc(Versal *s, qemu_irq *pic)
-     SysBusDevice *sbd;
-     MemoryRegion *mr;
+-    macio_init_child_obj(s, "cuda", &s->cuda, sizeof(s->cuda), TYPE_CUDA);
++    object_initialize_child(OBJECT(s), "cuda", &s->cuda, TYPE_CUDA);
  
--    sysbus_init_child_obj(OBJECT(s), "rtc", &s->pmc.rtc, sizeof(s->pmc.rtc),
--                          TYPE_XLNX_ZYNQMP_RTC);
-+    object_initialize_child(OBJECT(s), "rtc", &s->pmc.rtc,
-+                            TYPE_XLNX_ZYNQMP_RTC);
-     sbd = SYS_BUS_DEVICE(&s->pmc.rtc);
--    qdev_init_nofail(DEVICE(sbd));
-+    sysbus_realize(SYS_BUS_DEVICE(sbd), &error_fatal);
+-    macio_init_child_obj(s, "nvram", &os->nvram, sizeof(os->nvram),
+-                         TYPE_MACIO_NVRAM);
++    object_initialize_child(OBJECT(s), "nvram", &os->nvram, TYPE_MACIO_NVRAM);
+     dev = DEVICE(&os->nvram);
+     qdev_prop_set_uint32(dev, "size", 0x2000);
+     qdev_prop_set_uint32(dev, "it_shift", 4);
  
-     mr = sysbus_mmio_get_region(sbd, 0);
-     memory_region_add_subregion(&s->mr_ps, MM_PMC_RTC, mr);
-diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
-index 667c11ac8d..446b75a7aa 100644
---- a/hw/arm/xlnx-zynqmp.c
-+++ b/hw/arm/xlnx-zynqmp.c
-@@ -251,8 +251,8 @@ static void xlnx_zynqmp_init(Object *obj)
-     object_initialize_child(obj, "sata", &s->sata, TYPE_SYSBUS_AHCI);
- 
-     for (i = 0; i < XLNX_ZYNQMP_NUM_SDHCI; i++) {
--        sysbus_init_child_obj(obj, "sdhci[*]", &s->sdhci[i],
--                              sizeof(s->sdhci[i]), TYPE_SYSBUS_SDHCI);
-+        object_initialize_child(obj, "sdhci[*]", &s->sdhci[i],
-+                                TYPE_SYSBUS_SDHCI);
-     }
- 
-     for (i = 0; i < XLNX_ZYNQMP_NUM_SPIS; i++) {
-@@ -530,7 +530,7 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
-             error_propagate(errp, err);
-             return;
-         }
--        object_property_set_bool(sdhci, true, "realized", &err);
-+        sysbus_realize(SYS_BUS_DEVICE(sdhci), &err);
-         if (err) {
-             error_propagate(errp, err);
-             return;
-diff --git a/hw/cpu/realview_mpcore.c b/hw/cpu/realview_mpcore.c
-index 672d0f8a25..d2e426fa45 100644
---- a/hw/cpu/realview_mpcore.c
-+++ b/hw/cpu/realview_mpcore.c
-@@ -81,7 +81,7 @@ static void realview_mpcore_realize(DeviceState *dev, Error **errp)
-     }
-     /* ??? IRQ routing is hardcoded to "normal" mode.  */
-     for (n = 0; n < 4; n++) {
--        object_property_set_bool(OBJECT(&s->gic[n]), true, "realized", &err);
-+        sysbus_realize(SYS_BUS_DEVICE(&s->gic[n]), &err);
-         if (err != NULL) {
-             error_propagate(errp, err);
-             return;
-@@ -109,8 +109,7 @@ static void mpcore_rirq_init(Object *obj)
-     sysbus_init_mmio(sbd, sysbus_mmio_get_region(privbusdev, 0));
- 
-     for (i = 0; i < 4; i++) {
--        sysbus_init_child_obj(obj, "gic[*]", &s->gic[i], sizeof(s->gic[i]),
--                              TYPE_REALVIEW_GIC);
-+        object_initialize_child(obj, "gic[*]", &s->gic[i], TYPE_REALVIEW_GIC);
+     for (i = 0; i < 2; i++) {
+-        macio_init_ide(s, &os->ide[i], sizeof(os->ide[i]), i);
++        macio_init_ide(s, &os->ide[i], i);
      }
  }
  
-diff --git a/hw/display/sm501.c b/hw/display/sm501.c
-index 80da8575fe..a7fc08c52b 100644
---- a/hw/display/sm501.c
-+++ b/hw/display/sm501.c
-@@ -1977,7 +1977,7 @@ static void sm501_realize_sysbus(DeviceState *dev, Error **errp)
-     sysbus_pass_irq(sbd, SYS_BUS_DEVICE(usb_dev));
+@@ -396,11 +386,10 @@ static void macio_newworld_init(Object *obj)
+                              qdev_prop_allow_set_link_before_realize,
+                              0);
  
-     /* bridge to serial emulation module */
--    qdev_init_nofail(DEVICE(&s->serial));
-+    sysbus_realize(SYS_BUS_DEVICE(&s->serial), &error_fatal);
-     mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->serial), 0);
-     memory_region_add_subregion(&s->state.mmio_region, SM501_UART0, mr);
-     /* TODO : chain irq to IRL */
-@@ -2023,7 +2023,7 @@ static void sm501_sysbus_init(Object *o)
-     SM501SysBusState *sm501 = SYSBUS_SM501(o);
-     SerialMM *smm = &sm501->serial;
+-    macio_init_child_obj(s, "gpio", &ns->gpio, sizeof(ns->gpio),
+-                         TYPE_MACIO_GPIO);
++    object_initialize_child(OBJECT(s), "gpio", &ns->gpio, TYPE_MACIO_GPIO);
  
--    sysbus_init_child_obj(o, "serial", smm, sizeof(*smm), TYPE_SERIAL_MM);
-+    object_initialize_child(o, "serial", smm, TYPE_SERIAL_MM);
-     qdev_set_legacy_instance_id(DEVICE(smm), SM501_UART0, 2);
-     qdev_prop_set_uint8(DEVICE(smm), "regshift", 2);
-     qdev_prop_set_uint8(DEVICE(smm), "endianness", DEVICE_LITTLE_ENDIAN);
-diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
-index f035079168..af9f4c5a85 100644
---- a/hw/intc/armv7m_nvic.c
-+++ b/hw/intc/armv7m_nvic.c
-@@ -2640,8 +2640,7 @@ static void armv7m_nvic_realize(DeviceState *dev, Error **errp)
+     for (i = 0; i < 2; i++) {
+-        macio_init_ide(s, &ns->ide[i], sizeof(ns->ide[i]), i);
++        macio_init_ide(s, &ns->ide[i], i);
+     }
+ }
  
-     s->num_prio_bits = arm_feature(&s->cpu->env, ARM_FEATURE_V7) ? 8 : 2;
+@@ -413,10 +402,9 @@ static void macio_instance_init(Object *obj)
+     qbus_create_inplace(&s->macio_bus, sizeof(s->macio_bus), TYPE_MACIO_BUS,
+                         DEVICE(obj), "macio.0");
  
--    object_property_set_bool(OBJECT(&s->systick[M_REG_NS]), true,
--                             "realized", &err);
-+    sysbus_realize(SYS_BUS_DEVICE(&s->systick[M_REG_NS]), &err);
-     if (err != NULL) {
-         error_propagate(errp, err);
-         return;
-@@ -2735,8 +2734,8 @@ static void armv7m_nvic_instance_init(Object *obj)
-     NVICState *nvic = NVIC(obj);
-     SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
+-    macio_init_child_obj(s, "dbdma", &s->dbdma, sizeof(s->dbdma),
+-                         TYPE_MAC_DBDMA);
++    object_initialize_child(OBJECT(s), "dbdma", &s->dbdma, TYPE_MAC_DBDMA);
  
--    sysbus_init_child_obj(obj, "systick-reg-ns", &nvic->systick[M_REG_NS],
--                          sizeof(nvic->systick[M_REG_NS]), TYPE_SYSTICK);
-+    object_initialize_child(obj, "systick-reg-ns", &nvic->systick[M_REG_NS],
-+                            TYPE_SYSTICK);
-     /* We can't initialize the secure systick here, as we don't know
-      * yet if we need it.
-      */
+-    macio_init_child_obj(s, "escc", &s->escc, sizeof(s->escc), TYPE_ESCC);
++    object_initialize_child(OBJECT(s), "escc", &s->escc, TYPE_ESCC);
+ }
+ 
+ static const VMStateDescription vmstate_macio_oldworld = {
 -- 
 2.26.2
 
