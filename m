@@ -2,125 +2,89 @@ Return-Path: <SRS0=tJVC=74=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FA6CC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 20:29:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4DC5C433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 20:40:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5E85E20714
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 20:29:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7DAB5207D4
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 20:40:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=nonterra01.onmicrosoft.com header.i=@nonterra01.onmicrosoft.com header.b="skCPS/z6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E85E20714
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nonterra.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mc7VwHDi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7DAB5207D4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57328 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33084 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkvj3-0007Te-EY
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 16:29:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59256)
+	id 1jkvth-0001XL-Hc
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 16:40:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32804)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <tobias.koch@nonterra.com>)
- id 1jkviM-00070B-Jk
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 16:28:18 -0400
-Received: from mail-eopbgr150072.outbound.protection.outlook.com
- ([40.107.15.72]:44507 helo=EUR01-DB5-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <tobias.koch@nonterra.com>)
- id 1jkviK-0006vg-PF
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 16:28:18 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=VOYGXpls1mebX9Zl/esykGxUtf8o6CxmQZdwEpqHKP5cnOuxgMw9gr2cplFfF6ZBCBg1wh7THVNkGRlsBSpQVKmiAqRXvM7TkIBcwTDH3U3dGtF/jftgqgwFkA3IhYSk5FbFnqfmbQen2YnKylr9lRbul6l5LsivXnIK2B3F857+x6XVf3rsrgaSHrcJGiPEamyW1u5UBnwvqzZml0/yvVEEX3QGsTSLb6+JNOTSiH1kXshjH2HRcLxymGZgunQ1B99W3aqD+iLZqcmrFMr4PC8umv2gu51pTb2gu5W/oA+Gu71/3ssHb506eNJqaXvgFgY2BGKF+7RNj8nb6+44Qw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=14vxcH6dKhZ2Ng3IqcSL6HvR9R8X7EHfkGbbem1A5WU=;
- b=oE+khlVL39GA3ln1oIvfjGI3NYyJjsjPdLJeaGmcNHw5w/0WnUm8OxNqNfn+I7y7bOim/dclnE5p74JgVdbYCWC9kHFavg8Mj2tVGKENnjGh5ySXu3K8ODmUViNO+aEOkpUO38D0kB7Etwv2CgGhQuWD0VXvH3KnLu3bJ5SFfjE6gmwlKw0ksR7hJvTmdQF+wmw9ZqhSYMr6eQRzF48ViYXmwC+Wir3go2Ec9OdxU9LxTGjcBLETHFRgC7YORunUHI+TpcDvCSAXHlK+NbXoBxe0cpeV4/lc3TKUJPCXYASUYHZHyBPdj+4irls7PEW9gulhEImBIdPs5OGigsTibA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nonterra.com; dmarc=pass action=none header.from=nonterra.com;
- dkim=pass header.d=nonterra.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=nonterra01.onmicrosoft.com; s=selector2-nonterra01-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=14vxcH6dKhZ2Ng3IqcSL6HvR9R8X7EHfkGbbem1A5WU=;
- b=skCPS/z6NEMFTH+K2almgvP1P/1HxwHpF3D06vxkhZK8Lo27kt9Mqt+f/mSK+5xXuVsqElnrOSfCsjFM1Bwcn+RFu3qTH2uwMNvEQaXjzhZYCPFu1EB5oa/lQc52IDFkYj9XAEPXywFEJCqXNye9raoFRhDaivfxOBpEGl2S7nc=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=nonterra.com;
-Received: from AM6PR08MB3302.eurprd08.prod.outlook.com (2603:10a6:209:41::10)
- by AM6PR08MB5192.eurprd08.prod.outlook.com (2603:10a6:20b:d6::21)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3088.24; Mon, 15 Jun
- 2020 20:28:05 +0000
-Received: from AM6PR08MB3302.eurprd08.prod.outlook.com
- ([fe80::c484:b59d:1164:8055]) by AM6PR08MB3302.eurprd08.prod.outlook.com
- ([fe80::c484:b59d:1164:8055%7]) with mapi id 15.20.3088.029; Mon, 15 Jun 2020
- 20:28:05 +0000
-Subject: Re: [PATCH] linux-user: mremap fails with EFAULT if address range
- overlaps with stack guard
-From: Tobias Koch <tobias.koch@nonterra.com>
-To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
-References: <20200305210534.28392-1-tobias.koch@nonterra.com>
- <d643f0d0-d5e7-d1f3-d3e2-7d62661774e8@vivier.eu>
- <3c9dffdf-b4be-d17c-730d-5a65665b3eac@nonterra.com>
-Message-ID: <d58a375c-42a0-a1a6-8970-e4aefa5a646b@nonterra.com>
-Date: Mon, 15 Jun 2020 23:28:02 +0300
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jkvsk-0000jW-HJ
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 16:39:02 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:28862
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jkvsh-0000EQ-MJ
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 16:39:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592253537;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=GScIE0T57EzY0KODXhaabdjUxQFXnaCqRSQsDm3R8lo=;
+ b=Mc7VwHDi3n/s7+g5WysOJmJaKibTTgp0TdKK1/Oo0T/L4mjHX7Lex66odlsbF5l6oA2TfQ
+ REwSCW7TwZ2cZdz3p4nxsr63X4CIfK2U91xqmQdu6Ku30aNp5lRglG5f1xq57kZIutximg
+ jXeOeC+Ka3aEihkdM1PsQmWJzz0FHdY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-444-yQNXFTlvPHaZR_IygzOELA-1; Mon, 15 Jun 2020 16:38:41 -0400
+X-MC-Unique: yQNXFTlvPHaZR_IygzOELA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AB7241091320;
+ Mon, 15 Jun 2020 20:38:40 +0000 (UTC)
+Received: from [10.3.112.27] (ovpn-112-27.phx2.redhat.com [10.3.112.27])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 021D419C79;
+ Mon, 15 Jun 2020 20:38:39 +0000 (UTC)
+Subject: Re: [PATCH v2 1/2] nbd/server: Avoid long error message assertions
+ CVE-2020-10761
+From: Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+References: <20200610163741.3745251-1-eblake@redhat.com>
+ <20200610163741.3745251-2-eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <1b590b1f-08b8-678f-c53d-794ca3dea812@redhat.com>
+Date: Mon, 15 Jun 2020 15:38:39 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
-In-Reply-To: <3c9dffdf-b4be-d17c-730d-5a65665b3eac@nonterra.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-ClientProxiedBy: ZR0P278CA0047.CHEP278.PROD.OUTLOOK.COM
- (2603:10a6:910:1d::16) To AM6PR08MB3302.eurprd08.prod.outlook.com
- (2603:10a6:209:41::10)
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.181.119] (85.203.15.71) by
- ZR0P278CA0047.CHEP278.PROD.OUTLOOK.COM (2603:10a6:910:1d::16) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3088.19 via Frontend Transport; Mon, 15 Jun 2020 20:28:04 +0000
-X-Originating-IP: [85.203.15.71]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 911d3471-b918-4106-53ee-08d8116a9bd0
-X-MS-TrafficTypeDiagnostic: AM6PR08MB5192:
-X-Microsoft-Antispam-PRVS: <AM6PR08MB5192BD2A3166EC54ACB0203E899C0@AM6PR08MB5192.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
-X-Forefront-PRVS: 04359FAD81
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: h7yuu9DD8VGrDziS4Cc5ZQ18eU2UiVDzmBcl5COZfK7rB+Sdq2VB4CA8slHlaYLUhOHGKnCVzjqqkb9UHyyVwSD2CJaiXL0NxkN7hRoTvDvfepVXEqZ0u/dHhaDi4Je4Chyek0gk4Joj1SEAh/EQPxeKA7HrQYHyv8PFwK+cGnkLhxDvTmmXuSibKsmtkN+jZPN5z0Mh38nMPWcaEUhSSmOCt7KRc9WXYSbYy2AMAxj+hcmxJL5DIoFWDsk3xtCPTI+d9/argDHuo92xub3L77UfByAttjIo78z94EWQu7DjNleGYRpMwQqstPxCeYHZNUotdo2y8Hv/CtPNvJpAUQqWDZJwnBo/W/aRsoQ4jrxr7Vu6DuoZUuMM+/4jwT+hF9pfUwG0M/TrHuGrjphN/a3AlUezB2f2+7VYronuRJAG/C+lZnbjquVsKVtMujD9GtaeX61VYT1Dez6oMnc+ng==
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM6PR08MB3302.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(39830400003)(376002)(366004)(396003)(136003)(346002)(66574014)(36756003)(508600001)(16576012)(966005)(83380400001)(8676002)(316002)(8936002)(86362001)(956004)(2616005)(66946007)(66476007)(66556008)(6486002)(16526019)(53546011)(52116002)(55236004)(31686004)(26005)(5660300002)(31696002)(2906002)(186003)(44832011)(43740500002);
- DIR:OUT; SFP:1101; 
-X-MS-Exchange-AntiSpam-MessageData: N2Yz5x0iJlTuzEtvYooSYIQR52RhiO/RAUag1BCwPEE+/sMpZoXmVcRnRHtx50srztXGyP1QNuOSUMlUsQNz/GLaB/bc2tcZOQ2lP9B5tFE5+gI1rSlxXRyAlOzvOwt/msOi/eSeTtG5ejpVXChgJhVLPi0PoUZo15Raw2ooEafUiSmRBTIHkxhk3esxwOc1TDNYASwXycpEHMllGVdRfv4FiT7rwzo2HJQCzLibzxk0YVGUHYN1opCzLomkURMd/BxRVoczFa51ss9i7kKZ67DrI+mdsc0jDTlHJpCck3B6jyYM6A0hwXPsT4TubrNBQUdiBdR22H41QSd4lwKwQgR+uC63Jyu7pCw4CE11erwUf39mHD4ZjtvSqEJ4aS128KlHgAUTFU/k+00TrlJt0GThprNAINZT7lKMgHiFG47zWdpExvPeCgDFkNsV1jyi/CK0acugoLSkiVr84Jv5kVRMg8SKYVobKXN9FB2BwtQ=
-X-OriginatorOrg: nonterra.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 911d3471-b918-4106-53ee-08d8116a9bd0
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jun 2020 20:28:05.2821 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 76ec9478-ab84-4eac-917c-c1a3242376a3
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: QzfEp1pkxMSiPj/yJvN/rVm3csWAS1b/4vP2Rkbz9mP4L+4vS8GoBxhEoxuF9JhD5YTDkgb1tO+VwH0a0mkdDsFahpfWB0j9SouG/AdYsx4=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB5192
-Received-SPF: pass client-ip=40.107.15.72;
- envelope-from=tobias.koch@nonterra.com;
- helo=EUR01-DB5-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 16:28:14
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
+In-Reply-To: <20200610163741.3745251-2-eblake@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 15:33:00
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
 X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -133,39 +97,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
+ qemu-block@nongnu.org, xuwei@redhat.com, qemu-stable@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, ppandit@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hm, I see I need to have another look at this :)
+On 6/10/20 11:37 AM, Eric Blake wrote:
 
-On 6/15/20 10:17 AM, Tobias Koch wrote:
-> Hi Laurent,
->
-> the code in musl libc probing the stack is in
->
->     https://git.musl-libc.org/cgit/musl/plain/src/thread/pthread_getattr_np.c
->
-> The setup in elfload.c does work, but only when reserved_va is not set. In that case, any stack guard violation is
-> handled by the host kernel and thus results in the expected EFAULT.
->
-> However, in case of e.g. a 32bit target being emulated on a 64bit host, reserved_va is set and the current code in
-> mmap.c will only produce a more generic ENOMEM, deviating from the kernel's behavior.
->
->
-> On 5/7/20 5:35 PM, Laurent Vivier wrote:
->> Le 05/03/2020 à 22:05, Tobias Koch a écrit :
->>> If the address range starting at old_address overlaps with the stack guard it
->>> is invalid and mremap must fail with EFAULT. The musl c library relies on this
->>> behavior to detect the stack size, which it does by doing consecutive mremaps
->>> until it hits the stack guard. Without this patch, software (such as the Ruby
->>> interpreter) that calls pthread_getattr_np under musl will crash on 32 bit
->>> targets emulated on a 64 bit host.
->> Could you share some pointers to the code that is doing this?
->>
->> We have already this kind of code in linux-user/elfload.c,
->> setup_arg_pages(): could you check why it doesn't work?
->>
->> Thanks,
->> Laurent
+> We may later want to further sanitize the user-supplied strings we
+> place into our error messages, such as scrubbing out control
+> characters, but that is less important to the CVE fix, so it can be a
+> later patch to the new nbd_sanitize_name.
+> 
+
+> +static char *
+> +nbd_sanitize_name(const char *name)
+> +{
+> +    if (strnlen(name, 80) < 80) {
+> +        return g_strdup(name);
+> +    }
+> +    /* XXX Should we also try to sanitize any control characters? */
+> +    return g_strdup_printf("%.80s...", name);
+
+Max pointed out off-list that this can take a valid UTF-8 name from the 
+client and truncate it mid-character to make our reply NOT valid UTF-8, 
+which is a (minor) violation of the NBD protocol.  We have not yet 
+implemented strict UTF-8 enforcement in qemu (neither our client nor 
+server code takes pains to only send UTF-8, nor validates that incoming 
+strings are valid UTF-8); and while the server would previously echo 
+non-UTF-8 (where the client violated protocol first), this is now a case 
+where the server can be coerced into violating protocol first.  I guess 
+I may end up doing a followup patch that adds incoming validation and in 
+the process avoids chopping a multi-byte character, but that's just as 
+easy to fold in with my question about sanitizing control characters.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
 
