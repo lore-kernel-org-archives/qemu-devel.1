@@ -2,79 +2,76 @@ Return-Path: <SRS0=tJVC=74=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC332C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 13:18:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BD12C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 13:20:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 76BD12074D
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 13:18:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 65FDB2074D
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 13:20:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MbeNEfx8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76BD12074D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JBGDOzvw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65FDB2074D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60200 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34390 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkp0m-0005lC-Js
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 09:18:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33690)
+	id 1jkp20-0006mW-L6
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 09:20:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33960)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jkp0A-0005EO-LL
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 09:18:14 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:44442)
+ id 1jkp17-0006DB-3q
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 09:19:13 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:43969)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jkp08-0002Sf-SF
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 09:18:14 -0400
-Received: by mail-ot1-x344.google.com with SMTP id e5so13025555ote.11
- for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 06:18:12 -0700 (PDT)
+ id 1jkp15-0002gp-FP
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 09:19:12 -0400
+Received: by mail-oi1-x241.google.com with SMTP id j189so15799560oih.10
+ for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 06:19:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=C9iU4xzLDYGTz5JXVfcQMLl8F0Fm+tJzkudP0dqBOnw=;
- b=MbeNEfx8v+yWc+GRLCSHSsUJTP6X+CoJmAaxBG05trp5Kkxx52q5XBfDh7T0Ec9VM7
- 0VT/UzZS/Ds647O7LtJIl5sLi9h0ayOigyllgkAjVmAo8EQTTiDqGiIg0vGYY5roG1Yz
- jb03g/siksYQyZPAH9tgPplvSDqLi+Ki7KPWry6XldiKCCcL/znLkKQeDoi5+1HxlARH
- RhF2rQzSh69+jpLI0T9k2hbZEGqBSwXQVB1Y4sKfPENRwWFHp2QRQFZCBIYtlpGXZR0k
- /sdwPlj35LEYyAk/7GsFTjP9AbMlTuaNCV3yhBpcE1HJvl54BLqmo5IgaSnC1Wz6uEeZ
- h+TQ==
+ :cc; bh=iUa3F5rCLnPg5E82JxiMsvHOmT2nCJTCGiR/A4HOnn8=;
+ b=JBGDOzvwZCdrBBlyriBT6rAPFpDOCQRzdr2Ajqd76LW6eSRuuCq5tc6fn9KlT9Shyo
+ wpZKFd6rxIZ0pc4nmLiinIT8xSRyoq6iJcwr7oNwkuza5TgQm+rx0qEbOBWpvO/4+vdW
+ YqOXnKZJy5vmurde/sPzDYOwhIZObCkCWowxwR8fpC5zUbrZ3SZrzozg5tWod+abUWM4
+ OHaqZIW0/Ssa6WgVrLboMj85iLgtCrH4IvSiGKxO+WyKnwAyL2LNrq/8gipJqN83toWc
+ JMiqimt/8YGIscpGz0VUjNeNPH2oM53HA/TThPhCxRDuSqbEefulaJRvzOAG1Y0wprpx
+ jkrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=C9iU4xzLDYGTz5JXVfcQMLl8F0Fm+tJzkudP0dqBOnw=;
- b=PyhNR2FFCss86WqxYV6k+d4O+oga1FhjUI8M32mSWWEfzl4q6ptas/01ZV6jdgbiyV
- EB+dtKwlfAIf49ykbdUHX/dqbC8vwKSsymmZHxbZqtbt12FwfJZPnNKui7MdMasPUf/B
- US0j+mYhGiUYF9Rbzc/7zXlpGvbXJ6fAzMYX5+aQE0G0PlQ/GLwpM0h2ToXvWJXh1jrr
- Hh0gOUV9FR6C4RQAqfFRjGkwAb5XKm72QBFQbTlEwL0k+Tcsu/BUKKrwql4X2Aek0dmd
- xJuinvdo6RSOMVrcjiMGUJR3TALaLe8DH4rUWLjp/eBctvP9xpd0H6143mE1siiCknjM
- U69A==
-X-Gm-Message-State: AOAM530u6phuOb/fis0aaWO6Rr0xwpQdyyi9ixv7MItniIBnIvlXJ8UZ
- 9IsSH/pTjKG4bT1dL7inbInSFQCH3iaV5ROc2Bgfsw==
-X-Google-Smtp-Source: ABdhPJyZ/g3A3pcMGHn3ta0y0KXbBnah7TKkT3bhrVb+0N9qJX95LCQ0UyYP/+1AgTyLkIigmJRKWpST0kPobaNcBuI=
-X-Received: by 2002:a9d:67d6:: with SMTP id c22mr20428357otn.221.1592227091647; 
- Mon, 15 Jun 2020 06:18:11 -0700 (PDT)
+ :message-id:subject:to:cc;
+ bh=iUa3F5rCLnPg5E82JxiMsvHOmT2nCJTCGiR/A4HOnn8=;
+ b=isZIahUVyObn7v1BZ47abIwwH8CFyTHEzODxk+E2w7mohmFfxFDIdWvyvWwj+KsQug
+ RA2uDVSnz2bV55wKE3P2Hy5xVK8woip3UWnkDufNukZSJylcPxcoZXw4CYfw/coQW7UH
+ NORlTmac3oY1M3omgBYf4Uj9bjfD40F8+T9c/fuaRN+xMTwBTuljq1peZQgxbsATLgoU
+ F8iqX04I4i0m+oj+n58rIPh+eF0J/+dzFWmgRsEGPVQnaWzTeAuozOIdaAaKwNOhQYCu
+ MISAEkkdPoYScCRcBDm+trVXdt8v4xaGcC2peOJOnN0kJgLwbGmg0BTaqTkNIJ+gdNRe
+ 4+nQ==
+X-Gm-Message-State: AOAM531TlRW/lTxJPysH3mwwytX6X3aI2nteeqCJqkuOebPbViueHZNx
+ iMw0l9Tqu0mnTWjIGP3EgjBdCB2GYtz4rPQe5tI3yA==
+X-Google-Smtp-Source: ABdhPJwapg/fQqBV4Rtj55719RRDq2W3WW4QauftU7hlWmrVQOqDS1pAP8EaEi9dsvmxJIDwSxkISiySlxLb5s2HEms=
+X-Received: by 2002:aca:1a07:: with SMTP id a7mr8761584oia.163.1592227150304; 
+ Mon, 15 Jun 2020 06:19:10 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200603145258.195920-1-linux@roeck-us.net>
- <20200603145258.195920-3-linux@roeck-us.net>
-In-Reply-To: <20200603145258.195920-3-linux@roeck-us.net>
+In-Reply-To: <20200603145258.195920-1-linux@roeck-us.net>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 15 Jun 2020 14:18:00 +0100
-Message-ID: <CAFEAcA9HE0Be9QNfGKxp4YL-V_+khUNS4KOL43LBC9mQd75eLA@mail.gmail.com>
-Subject: Re: [PATCH v2 2/2] hw: arm: Set vendor property for IMX SDHCI
- emulations
+Date: Mon, 15 Jun 2020 14:18:59 +0100
+Message-ID: <CAFEAcA-JZhwvim9QHCn2a3OYCfpjvo8U-LjNX0g+6jB9YMVFyA@mail.gmail.com>
+Subject: Re: [PATCH v2 0/2] sd: sdhci: Implement basic vendor specific
+ register support
 To: Guenter Roeck <linux@roeck-us.net>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::344;
- envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x344.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::241;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x241.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -106,47 +103,29 @@ Sender: "Qemu-devel"
 
 On Wed, 3 Jun 2020 at 15:53, Guenter Roeck <linux@roeck-us.net> wrote:
 >
-> Set vendor property to IMX to enable IMX specific functionality
-> in sdhci code.
+> The Linux kernel's IMX code now uses vendor specific commands.
+> This results in endless warnings when booting the Linux kernel.
 >
-> Tested-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> Signed-off-by: Guenter Roeck <linux@roeck-us.net>
-> ---
-> v2: Added missing error checks
->     Added Philippe's Tested-by: tag
+> sdhci-esdhc-imx 2194000.usdhc: esdhc_wait_for_card_clock_gate_off:
+>         card clock still not gate off in 100us!.
 >
->  hw/arm/fsl-imx25.c  | 6 ++++++
->  hw/arm/fsl-imx6.c   | 6 ++++++
->  hw/arm/fsl-imx6ul.c | 2 ++
->  hw/arm/fsl-imx7.c   | 2 ++
->  4 files changed, 16 insertions(+)
+> Implement support for the vendor specific command implemented in IMX
+> SDHCI hardware to be able to avoid this warning.
 >
-> diff --git a/hw/arm/fsl-imx25.c b/hw/arm/fsl-imx25.c
-> index cdaa79c26b..a853ffcc00 100644
-> --- a/hw/arm/fsl-imx25.c
-> +++ b/hw/arm/fsl-imx25.c
-> @@ -274,6 +274,12 @@ static void fsl_imx25_realize(DeviceState *dev, Erro=
-r **errp)
->                                   &err);
->          object_property_set_uint(OBJECT(&s->esdhc[i]), IMX25_ESDHC_CAPAB=
-ILITIES,
->                                   "capareg", &err);
-> +        object_property_set_uint(OBJECT(&s->esdhc[i]), SDHCI_VENDOR_IMX,
-> +                                 "vendor", &err);
-> +        if (err) {
-> +            error_propagate(errp, err);
-> +            return;
-> +        }
+> Patch 1/2 implements vendor specific command support in the SDHCI core
+> code. At this time, only IMX vendor command support is implemented,
+> but the implementation is written with expandability in mind.
+>
+> Patch 2/2 enables IMX SDHCI vendor extensions for all affected emulations.
+>
+> v2:
+> - Added Reviewed-by: and Tested-by: tags to patch 1/2
+> - Added missing error checks to patch 2/2
+> - Added Tested-by: tag to patch 2/2
 
-The existing error handling in this function is wrong -- for multiple
-calls that take a pointer to a local Error*, the
-check-and-error_propagate() has to be done after each call, it can't
-be rolled up into a single check after all the calls. (see
-include/qapi/error.h for the patterns that are valid).
 
-On the other hand this change is correct-in-itself so I guess it
-isn't making the problem worse...
 
-thanks
+Applied to target-arm.next, thanks.
+
 -- PMM
 
