@@ -6,74 +6,75 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B781C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 12:38:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD038C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 12:38:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D50E4206D7
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 12:38:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D50E4206D7
+	by mail.kernel.org (Postfix) with ESMTPS id A571E206D7
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 12:38:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A571E206D7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36042 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36174 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkoNE-00076Y-Q3
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 08:38:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51850)
+	id 1jkoNH-00079n-U1
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 08:38:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51860)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <stefanb@linux.vnet.ibm.com>)
- id 1jkoMO-0005vQ-Ej
+ id 1jkoMO-0005vq-Qg
  for qemu-devel@nongnu.org; Mon, 15 Jun 2020 08:37:08 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37578)
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:62872)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <stefanb@linux.vnet.ibm.com>)
- id 1jkoMM-0003Wk-HK
+ id 1jkoMM-0003Wo-IA
  for qemu-devel@nongnu.org; Mon, 15 Jun 2020 08:37:08 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
  by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 05FC2ZCi073116
+ 05FC3Fa7090310
  for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 08:37:04 -0400
 Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 31p5erfb7d-1
+ by mx0a-001b2d01.pphosted.com with ESMTP id 31n301vysj-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
  for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 08:37:04 -0400
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05FC2Z7u073154
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05FCb4tk014718
  for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 08:37:04 -0400
-Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com
- [169.47.144.26])
- by mx0a-001b2d01.pphosted.com with ESMTP id 31p5erfb6t-1
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com
+ [169.62.189.11])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 31n301vyra-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 15 Jun 2020 08:37:03 -0400
-Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
- by ppma04wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05FCKDkn013359;
+ Mon, 15 Jun 2020 08:37:04 -0400
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+ by ppma03dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05FCJYno000516;
  Mon, 15 Jun 2020 12:37:02 GMT
 Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com
- [9.57.198.29]) by ppma04wdc.us.ibm.com with ESMTP id 31mpe8areb-1
+ [9.57.198.29]) by ppma03dal.us.ibm.com with ESMTP id 31nbyu11cp-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
  Mon, 15 Jun 2020 12:37:02 +0000
 Received: from b01ledav003.gho.pok.ibm.com (b01ledav003.gho.pok.ibm.com
  [9.57.199.108])
  by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 05FCb29240436008
+ 05FCb2Cx40436002
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
  Mon, 15 Jun 2020 12:37:02 GMT
 Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 4A2CDB2064;
+ by IMSVA (Postfix) with ESMTP id 15EB2B205F;
  Mon, 15 Jun 2020 12:37:02 +0000 (GMT)
 Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 318A3B2065;
- Mon, 15 Jun 2020 12:37:02 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id F1CA8B2066;
+ Mon, 15 Jun 2020 12:37:01 +0000 (GMT)
 Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
  by b01ledav003.gho.pok.ibm.com (Postfix) with ESMTP;
- Mon, 15 Jun 2020 12:37:02 +0000 (GMT)
+ Mon, 15 Jun 2020 12:37:01 +0000 (GMT)
 From: Stefan Berger <stefanb@linux.vnet.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 3/3] acpi: Enable TPM IRQ
-Date: Mon, 15 Jun 2020 08:37:00 -0400
-Message-Id: <20200615123700.242259-4-stefanb@linux.vnet.ibm.com>
+Subject: [PATCH 1/3] tpm_tis: Allow lowering of IRQ also when locality is not
+ active
+Date: Mon, 15 Jun 2020 08:36:58 -0400
+Message-Id: <20200615123700.242259-2-stefanb@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200615123700.242259-1-stefanb@linux.vnet.ibm.com>
 References: <20200615123700.242259-1-stefanb@linux.vnet.ibm.com>
@@ -84,11 +85,11 @@ X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
  definitions=2020-06-15_02:2020-06-15,
  2020-06-15 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 bulkscore=0
- mlxlogscore=871 adultscore=0 lowpriorityscore=0 mlxscore=0 malwarescore=0
- spamscore=0 impostorscore=0 suspectscore=1 clxscore=1015
- priorityscore=1501 cotscore=-2147483648 classifier=spam adjust=0
- reason=mlx scancount=1 engine=8.12.0-2004280000
+ phishscore=0
+ cotscore=-2147483648 bulkscore=0 mlxscore=0 suspectscore=1 adultscore=0
+ priorityscore=1501 malwarescore=0 clxscore=1015 spamscore=0
+ mlxlogscore=657 lowpriorityscore=0 impostorscore=0 classifier=spam
+ adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
  definitions=main-2006150098
 Received-SPF: none client-ip=148.163.156.1;
  envelope-from=stefanb@linux.vnet.ibm.com; helo=mx0a-001b2d01.pphosted.com
@@ -111,67 +112,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, eric.auger@redhat.com,
- pbonzini@redhat.com, marcandre.lureau@redhat.com, philmd@redhat.com,
- mkedzier@redhat.com, Stefan Berger <stefanb@linux.ibm.com>
+Cc: eric.auger@redhat.com, pbonzini@redhat.com, marcandre.lureau@redhat.com,
+ philmd@redhat.com, mkedzier@redhat.com, Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: Stefan Berger <stefanb@linux.ibm.com>
 
-Move the TPM TIS IRQ to unused IRQ 13, which is also accepted by Windows.
-Query for the TPM's irq number and enable the TPM IRQ if not zero.
+This patch fixes a bug that occurs when using interrupts. It
+allows to lower the IRQ also when a locality is not active.
 
 Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
-CC: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/i386/acpi-build.c  | 11 +++++------
- include/hw/acpi/tpm.h |  2 +-
- 2 files changed, 6 insertions(+), 7 deletions(-)
+ hw/tpm/tpm_tis_common.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 23c77eeb95..919cab1702 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -2199,6 +2199,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-             build_append_pci_bus_devices(scope, bus, pm->pcihp_bridge_en);
- 
-             if (TPM_IS_TIS_ISA(tpm)) {
-+                uint8_t irq = tpm_get_irqnum(tpm);
-                 if (misc->tpm_version == TPM_VERSION_2_0) {
-                     dev = aml_device("TPM");
-                     aml_append(dev, aml_name_decl("_HID",
-@@ -2213,12 +2214,10 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-                 crs = aml_resource_template();
-                 aml_append(crs, aml_memory32_fixed(TPM_TIS_ADDR_BASE,
-                            TPM_TIS_ADDR_SIZE, AML_READ_WRITE));
--                /*
--                    FIXME: TPM_TIS_IRQ=5 conflicts with PNP0C0F irqs,
--                    Rewrite to take IRQ from TPM device model and
--                    fix default IRQ value there to use some unused IRQ
--                 */
--                /* aml_append(crs, aml_irq_no_flags(TPM_TIS_IRQ)); */
-+
-+                if (irq) {
-+                    aml_append(crs, aml_irq_no_flags(irq));
-+                }
-                 aml_append(dev, aml_name_decl("_CRS", crs));
- 
-                 tpm_build_ppi_acpi(tpm, dev);
-diff --git a/include/hw/acpi/tpm.h b/include/hw/acpi/tpm.h
-index 1a2a57a21f..063a9eb42a 100644
---- a/include/hw/acpi/tpm.h
-+++ b/include/hw/acpi/tpm.h
-@@ -24,7 +24,7 @@
- #define TPM_TIS_ADDR_BASE           0xFED40000
- #define TPM_TIS_ADDR_SIZE           0x5000
- 
--#define TPM_TIS_IRQ                 5
-+#define TPM_TIS_IRQ                 13
- 
- #define TPM_TIS_NUM_LOCALITIES      5     /* per spec */
- #define TPM_TIS_LOCALITY_SHIFT      12
+diff --git a/hw/tpm/tpm_tis_common.c b/hw/tpm/tpm_tis_common.c
+index 9ce64d4836..695a10a791 100644
+--- a/hw/tpm/tpm_tis_common.c
++++ b/hw/tpm/tpm_tis_common.c
+@@ -601,10 +601,6 @@ static void tpm_tis_mmio_write(void *opaque, hwaddr addr,
+         /* hard wired -- ignore */
+         break;
+     case TPM_TIS_REG_INT_STATUS:
+-        if (s->active_locty != locty) {
+-            break;
+-        }
+-
+         /* clearing of interrupt flags */
+         if (((val & TPM_TIS_INTERRUPTS_SUPPORTED)) &&
+             (s->loc[locty].ints & TPM_TIS_INTERRUPTS_SUPPORTED)) {
 -- 
 2.24.1
 
