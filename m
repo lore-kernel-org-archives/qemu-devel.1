@@ -2,81 +2,78 @@ Return-Path: <SRS0=tJVC=74=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E574EC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 19:32:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D71DC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 19:33:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AB29120756
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 19:32:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5118220756
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 19:33:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R2pStxFW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB29120756
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aZQPBhPL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5118220756
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44196 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50762 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkuqM-0000Sw-Qn
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 15:32:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46188)
+	id 1jkurb-00039H-ET
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 15:33:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45832)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jkunD-0003cw-5E
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 15:29:15 -0400
-Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:55859)
+ (Exim 4.90_1) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1jkumN-0001uh-3Q
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 15:28:23 -0400
+Received: from mail-ej1-x62e.google.com ([2a00:1450:4864:20::62e]:38200)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jkunB-0004kW-86
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 15:29:14 -0400
-Received: by mail-wm1-x331.google.com with SMTP id c71so674292wmd.5
- for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 12:29:12 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1jkumL-0004dY-B6
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 15:28:22 -0400
+Received: by mail-ej1-x62e.google.com with SMTP id w16so18164873ejj.5
+ for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 12:28:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=m2nbueyrHVGwKPd/LsrL6c6M+H/dHAN11yVXmojlEEg=;
- b=R2pStxFWPJJ2XS1THPVOKylKaq0ldb/9+QETQorO0Sl2Jd2dW2PjxlRRESzJ3hRUmq
- G3xbYNO+erVQHFASPEwws4qfECQgIQfKcAH/vRwOQ8M9M2V5kESbypNuS6DxoInrrM82
- rVahTzp+WXZ0g9pDNxq9+LNV9beio5T00Ub6PUzl2lVbRja6Q/wpPQ2QJIlNLZDj/tRQ
- yz2BBfYAO6RnEmD2NLDdfJ384Hr3swVOCiSIivz9CCz3Qj1vQ9uZF+IkoOJykQasDAPt
- FGAtPBuVaj82RfSljOjGSS5V0W36eBhFplbCoqLEPVXn2QFdYz2OWIbibzKo5WBrL5PM
- bIdw==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=EWVx9sSSwTv5Jhbc9Yzw+I2OIv8ntdWEbnNZIj+p5yg=;
+ b=aZQPBhPLruXaUuuvjK3dLkIaOgrfBLtcfzSV+CKmO2F4GqBftoBhQ5jFH9Z5qoAXR4
+ 5117cmKLpmUMrNyzo6cpJl9Jpe0wrRm4HvAT48IYHTZx4/wMHP6WInNNL3rj4o+GR7Hd
+ etOdRG9v6vKk1mv5qWFYJTUhvsq6F4JT4htUQ44MYv+lEaBOOs7My+SzYW6vtUKjR4hC
+ 8btabS+4Ih2iNkSI+qAOUwGJ3gnPR1yj7z45vbNuIr1pv84RkvRuZOFbgx4jmW2hxmPm
+ UZ573q9gStAHDy45gKhubHmyK5aRJAjmtB38d4IekRZvGElqH6d8ezGr1cV/+C6QFcBY
+ fILw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=m2nbueyrHVGwKPd/LsrL6c6M+H/dHAN11yVXmojlEEg=;
- b=chC8LZ1PBoZBBq3Zg9p2aafZZsiruGua5F5zMd04tfkX3/hQ9ROe12szZMvIN40k0U
- 98om9DahTHOqHxMQ9Q/yjamaEMeRejF1lfyKxcqmNmWqWGVTAJvSuy4B6bqn2fOzSJNW
- Dak8AOB5kuGH4LMTKR5wK5xtzIcPoXUByt6OBJQ8lSjrK65skN0LILsfKfMlV/WIM8Ge
- 9Has2YMOfaqFDgXH35QNyFkzxqejj2sPD8g8ImZa3oNLeZeOs5JUJtGzEtVWp2C/Xhd4
- Nr2Gu0hrD3BhC4EpAupMFuAog8Ba2bVbiLdIhSqTTjJQqFs1JQP4g2It32i8+qPzCTn8
- M6sg==
-X-Gm-Message-State: AOAM5339c9hemgmQAiar2hmSmgJig1ceiDBzH1v2gVn3Fn0paHDSbu2Z
- 0S+36aY+FmcWWampwp3CdMgrB2rv
-X-Google-Smtp-Source: ABdhPJwJCdgfDGbQpaSfItvQatHYnaj/nt+cV6v/PBQCAmojTFe/FPjE8WNU6A4PGiRjCHC57mHdEA==
-X-Received: by 2002:a7b:c212:: with SMTP id x18mr814164wmi.119.1592249350881; 
- Mon, 15 Jun 2020 12:29:10 -0700 (PDT)
-Received: from rtrkw774-lin.syrmia.com ([46.240.135.226])
- by smtp.gmail.com with ESMTPSA id 138sm713098wma.23.2020.06.15.12.29.10
- (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 15 Jun 2020 12:29:10 -0700 (PDT)
-From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-To: qemu-devel@nongnu.org,
-	peter.maydell@linaro.org
-Subject: [PULL 10/18] target/mips: msa: Split helpers for DOTP_U.<H|W|D>
-Date: Mon, 15 Jun 2020 21:28:52 +0200
-Message-Id: <1592249340-8365-11-git-send-email-aleksandar.qemu.devel@gmail.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1592249340-8365-1-git-send-email-aleksandar.qemu.devel@gmail.com>
-References: <1592249340-8365-1-git-send-email-aleksandar.qemu.devel@gmail.com>
-Received-SPF: pass client-ip=2a00:1450:4864:20::331;
- envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wm1-x331.google.com
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=EWVx9sSSwTv5Jhbc9Yzw+I2OIv8ntdWEbnNZIj+p5yg=;
+ b=F/TTaOrlbQSunJwQffWZIKxGKE3VKf5ALfbshlAspLbY/bU8GkZimTq0JmNt6s03kU
+ fmrcgxAPEbdQ6Ewk4imid7xuzg71my+Sd9fIzBkMgWRp3NZ9Mg6P8RG0RIjNksOT+b3T
+ SylSB0n3Vt//ij65j6hbA5dltbpdt2iUzEwjTBLcVCSSh57SWh2evw/Y9oVsRSPaa9wE
+ 3GmrBvOz0qisMON4WCfMuVwRG9UA6NZd2WRJcQoR/RznNQs+4GPqYzK75+u/fgC8hkNI
+ VjMQ/1aQCCpnPj8iRVQIHB8qIMlXOuIOVpK2R17WjaFAo0C9V2IXsfndrXiknmlUDL6b
+ 4qMQ==
+X-Gm-Message-State: AOAM530cTJElh71dnVnpXsbdVDUtbVDT0V/GKia3+R9S+YrB08uhWFKG
+ iOGDLWRL14wDZ7Tu4yk9Ucmb3SAI28RaVCQGzoE=
+X-Google-Smtp-Source: ABdhPJwEPEr0UziD3/Kq8pauWFAXTwKAnJtVwfQmvPYGMvLMb8utX/PZsHFz/wpsjd3Y2DleeJXdhy5Sd4WrAdRb7vs=
+X-Received: by 2002:a17:906:ae14:: with SMTP id
+ le20mr26363674ejb.307.1592249299719; 
+ Mon, 15 Jun 2020 12:28:19 -0700 (PDT)
+MIME-Version: 1.0
+References: <1592248953-8162-1-git-send-email-aleksandar.qemu.devel@gmail.com>
+In-Reply-To: <1592248953-8162-1-git-send-email-aleksandar.qemu.devel@gmail.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Mon, 15 Jun 2020 21:28:09 +0200
+Message-ID: <CAL1e-=g5RCy1eJNNQdrmqGzk8Yxs4x3i8+rB_jJLZMLAmQF6Yw@mail.gmail.com>
+Subject: Re: [PULL 00/18] MIPS + misc queue for June 15th, 2020
+To: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::62e;
+ envelope-from=aleksandar.m.mail@gmail.com; helo=mail-ej1-x62e.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -98,151 +95,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: aleksandar.qemu.devel@gmail.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Achieves clearer code and slightly better performance.
+On Mon, Jun 15, 2020 at 9:22 PM Aleksandar Markovic
+<aleksandar.qemu.devel@gmail.com> wrote:
+>
+> The following changes since commit 81b53858fed8a316a4715c2f7f92cdfb4a7b4dd8:
+>
+>   target/mips: msa: Split helpers for SUBS_U.<B|H|W|D> (2020-06-15 20:50:40 +0200)
+>
 
-Reviewed-by: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
-Signed-off-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Message-Id: <20200613152133.8964-9-aleksandar.qemu.devel@gmail.com>
----
- target/mips/helper.h     |  4 ++-
- target/mips/msa_helper.c | 65 +++++++++++++++++++++++++++++++++++++++---------
- target/mips/translate.c  | 12 ++++++++-
- 3 files changed, 67 insertions(+), 14 deletions(-)
+Please discard this pull request. Wrong cover letter. Will send v2 shortly.
 
-diff --git a/target/mips/helper.h b/target/mips/helper.h
-index 06df3de..05d5533 100644
---- a/target/mips/helper.h
-+++ b/target/mips/helper.h
-@@ -1083,7 +1083,9 @@ DEF_HELPER_5(msa_mulv_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_4(msa_dotp_s_h, void, env, i32, i32, i32)
- DEF_HELPER_4(msa_dotp_s_w, void, env, i32, i32, i32)
- DEF_HELPER_4(msa_dotp_s_d, void, env, i32, i32, i32)
--DEF_HELPER_5(msa_dotp_u_df, void, env, i32, i32, i32, i32)
-+DEF_HELPER_4(msa_dotp_u_h, void, env, i32, i32, i32)
-+DEF_HELPER_4(msa_dotp_u_w, void, env, i32, i32, i32)
-+DEF_HELPER_4(msa_dotp_u_d, void, env, i32, i32, i32)
- DEF_HELPER_4(msa_dpadd_s_h, void, env, i32, i32, i32)
- DEF_HELPER_4(msa_dpadd_s_w, void, env, i32, i32, i32)
- DEF_HELPER_4(msa_dpadd_s_d, void, env, i32, i32, i32)
-diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
-index 201283f..84d0073 100644
---- a/target/mips/msa_helper.c
-+++ b/target/mips/msa_helper.c
-@@ -2290,6 +2290,59 @@ void helper_msa_dotp_s_d(CPUMIPSState *env,
- }
- 
- 
-+static inline int64_t msa_dotp_u_df(uint32_t df, int64_t arg1, int64_t arg2)
-+{
-+    int64_t even_arg1;
-+    int64_t even_arg2;
-+    int64_t odd_arg1;
-+    int64_t odd_arg2;
-+    UNSIGNED_EXTRACT(even_arg1, odd_arg1, arg1, df);
-+    UNSIGNED_EXTRACT(even_arg2, odd_arg2, arg2, df);
-+    return (even_arg1 * even_arg2) + (odd_arg1 * odd_arg2);
-+}
-+
-+void helper_msa_dotp_u_h(CPUMIPSState *env,
-+                         uint32_t wd, uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
-+
-+    pwd->h[0]  = msa_dotp_u_df(DF_HALF, pws->h[0],  pwt->h[0]);
-+    pwd->h[1]  = msa_dotp_u_df(DF_HALF, pws->h[1],  pwt->h[1]);
-+    pwd->h[2]  = msa_dotp_u_df(DF_HALF, pws->h[2],  pwt->h[2]);
-+    pwd->h[3]  = msa_dotp_u_df(DF_HALF, pws->h[3],  pwt->h[3]);
-+    pwd->h[4]  = msa_dotp_u_df(DF_HALF, pws->h[4],  pwt->h[4]);
-+    pwd->h[5]  = msa_dotp_u_df(DF_HALF, pws->h[5],  pwt->h[5]);
-+    pwd->h[6]  = msa_dotp_u_df(DF_HALF, pws->h[6],  pwt->h[6]);
-+    pwd->h[7]  = msa_dotp_u_df(DF_HALF, pws->h[7],  pwt->h[7]);
-+}
-+
-+void helper_msa_dotp_u_w(CPUMIPSState *env,
-+                         uint32_t wd, uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
-+
-+    pwd->w[0]  = msa_dotp_u_df(DF_WORD, pws->w[0],  pwt->w[0]);
-+    pwd->w[1]  = msa_dotp_u_df(DF_WORD, pws->w[1],  pwt->w[1]);
-+    pwd->w[2]  = msa_dotp_u_df(DF_WORD, pws->w[2],  pwt->w[2]);
-+    pwd->w[3]  = msa_dotp_u_df(DF_WORD, pws->w[3],  pwt->w[3]);
-+}
-+
-+void helper_msa_dotp_u_d(CPUMIPSState *env,
-+                         uint32_t wd, uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
-+
-+    pwd->d[0]  = msa_dotp_u_df(DF_DOUBLE, pws->d[0],  pwt->d[0]);
-+    pwd->d[1]  = msa_dotp_u_df(DF_DOUBLE, pws->d[1],  pwt->d[1]);
-+}
-+
-+
- static inline int64_t msa_dpadd_s_df(uint32_t df, int64_t dest, int64_t arg1,
-                                      int64_t arg2)
- {
-@@ -5064,17 +5117,6 @@ static inline int64_t msa_mulv_df(uint32_t df, int64_t arg1, int64_t arg2)
-     return arg1 * arg2;
- }
- 
--static inline int64_t msa_dotp_u_df(uint32_t df, int64_t arg1, int64_t arg2)
--{
--    int64_t even_arg1;
--    int64_t even_arg2;
--    int64_t odd_arg1;
--    int64_t odd_arg2;
--    UNSIGNED_EXTRACT(even_arg1, odd_arg1, arg1, df);
--    UNSIGNED_EXTRACT(even_arg2, odd_arg2, arg2, df);
--    return (even_arg1 * even_arg2) + (odd_arg1 * odd_arg2);
--}
--
- #define CONCATENATE_AND_SLIDE(s, k)             \
-     do {                                        \
-         for (i = 0; i < s; i++) {               \
-@@ -5198,7 +5240,6 @@ MSA_BINOP_DF(subs_u)
- MSA_BINOP_DF(subsus_u)
- MSA_BINOP_DF(subsuu_s)
- MSA_BINOP_DF(mulv)
--MSA_BINOP_DF(dotp_u)
- 
- MSA_BINOP_DF(mul_q)
- MSA_BINOP_DF(mulr_q)
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index e150454..77e2d95 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -29407,7 +29407,17 @@ static void gen_msa_3r(CPUMIPSState *env, DisasContext *ctx)
-             }
-             break;
-         case OPC_DOTP_U_df:
--            gen_helper_msa_dotp_u_df(cpu_env, tdf, twd, tws, twt);
-+            switch (df) {
-+            case DF_HALF:
-+                gen_helper_msa_dotp_u_h(cpu_env, twd, tws, twt);
-+                break;
-+            case DF_WORD:
-+                gen_helper_msa_dotp_u_w(cpu_env, twd, tws, twt);
-+                break;
-+            case DF_DOUBLE:
-+                gen_helper_msa_dotp_u_d(cpu_env, twd, tws, twt);
-+                break;
-+            }
-             break;
-         case OPC_DPADD_S_df:
-             switch (df) {
--- 
-2.7.4
-
+> are available in the git repository at:
+>
+>   https://github.com/AMarkovic/qemu tags/mips-queue-jun-15-2020
+>
+> for you to fetch changes up to 250bc43a406f7d46e319abe87c19548d4f027828:
+>
+>   translations: Add Swedish language (2020-06-15 20:51:10 +0200)
+>
+> ----------------------------------------------------------------
+>
+> MIPS + misc queue for June 15th, 2020
+>
+>   Highlights:
+>
+>     This pull request, just exceptionally, contains two non-MIPS patches:
+>
+>       - adjust sh4 maintainership
+>       - add Swedish translations
+>
+>     The rest are MIPS patches:
+>
+>       - refactor emulation of a number of MSA instructions
+>       - activate Loongson-related insn_flags
+>
+>     Notes:
+>
+>       - one checkpatch warning is benign
+>       - some of make check iotest-qcow2 tests fail on my system, both before
+>         and after applying the patches from this pull request
+>
+> ----------------------------------------------------------------
+>
+>
+> Aleksandar Markovic (15):
+>   target/mips: msa: Split helpers for MADDV.<B|H|W|D>
+>   target/mips: msa: Split helpers for MSUBV.<B|H|W|D>
+>   target/mips: msa: Split helpers for DPADD_S.<H|W|D>
+>   target/mips: msa: Split helpers for DPADD_U.<H|W|D>
+>   target/mips: msa: Split helpers for DPSUB_S.<H|W|D>
+>   target/mips: msa: Split helpers for DPSUB_U.<H|W|D>
+>   target/mips: msa: Split helpers for DOTP_S.<H|W|D>
+>   target/mips: msa: Split helpers for DOTP_U.<H|W|D>
+>   target/mips: msa: Split helpers for SUBS_S.<B|H|W|D>
+>   target/mips: msa: Split helpers for SUBS_U.<B|H|W|D>
+>   target/mips: msa: Split helpers for SUBSUS_U.<B|H|W|D>
+>   target/mips: msa: Split helpers for SUBSUU_S.<B|H|W|D>
+>   target/mips: msa: Split helpers for SUBV.<B|H|W|D>
+>   target/mips: msa: Split helpers for MULV.<B|H|W|D>
+>   MAINTAINERS: Adjust sh4 maintainership
+>
+> Jiaxun Yang (2):
+>   target/mips: Legalize Loongson insn flags
+>   target/mips: Add comments for vendor-specific ASEs
+>
+> Sebastian Rasmussen (1):
+>   translations: Add Swedish language
+>
+>  target/mips/helper.h     |   73 ++-
+>  target/mips/mips-defs.h  |    8 +-
+>  target/mips/msa_helper.c | 1296 ++++++++++++++++++++++++++++++++++++----------
+>  target/mips/translate.c  |  213 +++++++-
+>  MAINTAINERS              |    8 +-
+>  po/sv.po                 |   75 +++
+>  6 files changed, 1364 insertions(+), 309 deletions(-)
+>  create mode 100644 po/sv.po
+>
+> --
+> 2.7.4
+>
+>
 
