@@ -2,85 +2,92 @@ Return-Path: <SRS0=tJVC=74=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C9EBC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 16:26:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37C83C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 16:27:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 67F9F207DD
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 16:26:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 015C1207F5
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 16:27:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BWyl8BBn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67F9F207DD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c0LIYHKL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 015C1207F5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58544 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60484 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkrwn-0004sm-0r
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 12:26:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55672)
+	id 1jkrx9-0005fK-4u
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 12:27:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55846)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jkrvd-0003dh-G9; Mon, 15 Jun 2020 12:25:45 -0400
-Received: from mail-il1-x141.google.com ([2607:f8b0:4864:20::141]:35287)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jkrvb-0005ri-K5; Mon, 15 Jun 2020 12:25:45 -0400
-Received: by mail-il1-x141.google.com with SMTP id l6so15916144ilo.2;
- Mon, 15 Jun 2020 09:25:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=dQ5LoBJa98wS90Nxh809A9yRdP+gFz2r5u+kWj+K9M8=;
- b=BWyl8BBngJ8Ry47KgF5VZPni6B21QUjdJ/fo3xeKTvNMQ/WGZUM8K2zvmBCkMZF920
- knlVoAPoL81vsJsFqQmGZEyfHWi/ND7Q19VtOxpIDjfXVDbdz3KHeH8kLNjKHW49Yq8o
- F64L7/yCxOB0xlHFErqFQWz1qz5sSJz+Fk23Ind2fqgy5VH2sfsjwM2SoyggbTccEk+U
- 4EADLAnot88CDZD8zmfAZyR2F/TYxyt5UDyqk1Nrb/m8uD71Cd5MLja4GNSbwcb7yoGG
- 4JdlAd+Zxf67ZSxwH1RDraS5CZ0Uq0nq5+js17PhbGKVuBBfMs4sgTh7p0xJ3JDfSQrB
- RSag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=dQ5LoBJa98wS90Nxh809A9yRdP+gFz2r5u+kWj+K9M8=;
- b=lCzk8Ey1e21Kr32RHnGZ5iwwcdVy3u9zWgMp5eaH4gNZO0UpjM6u1LE/fN+pfHkq+Q
- MBDRwZatvQQivunHKp9wj4Pw6mJ7wlyi21UG2JiSPn2wj0DTvD2rVDmwMxagkhcI04Ho
- OsfVJIF/OrX6vFGURK8WvLhFPgiqPYKrDRPUb8DWm+Z0tP3MxQXSccBVw0AT/DIE3GIE
- 3ebcBHcALW77hrsa4KC0ls4TUTFqDPTVvGzFu6U9gck+R7nfKj+DqD4r2SSZLrtqRHAi
- uDkiRItUt/UCsP2BDtJbjFcvXumn7aQiz57zJHcO7M9AKh5+VYKhnzrBdz6gF4fDS+2P
- hd6Q==
-X-Gm-Message-State: AOAM531hYdJXGBTkn7GEXIXvO4p90RHquV0mLypo39OSf+DxHV4evl7Y
- yTNm94EAGgRsgGWgqeSq8KCtqMgt1yQyOUDI2ag=
-X-Google-Smtp-Source: ABdhPJxITfSUlRNk80cq2efY+iqSaunDdfDZ98JoN20EIkBp1NXxSU1K1WY9EAG6jpb1MbsdKIu7C6PNFRflIULq9Bs=
-X-Received: by 2002:a92:bb45:: with SMTP id w66mr27913427ili.131.1592238342153; 
- Mon, 15 Jun 2020 09:25:42 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jkrw3-0004Fe-J9
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 12:26:11 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:37828
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jkrw1-0005zg-Fl
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 12:26:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592238368;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=00FXCB2yidhJiULOJDZcEYz8JWa1gwYhziImrZ06J3Q=;
+ b=c0LIYHKLvT4LlCEa6rcgrweNwUcxG2ZMX5OoHnstsppVFnx4Kc5mG8x+Q7kPoiGlnteqTN
+ 83QviHiC5lePCZFbFpT9YfMi+u5phxiCAaPnlBtyciPgEZg+QeukjPWlnIbQrsyWEMTmRL
+ dB2Yl9kkAf1DBd7yaZniYWECydVNFt0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-87-2GzG0F6KOpegitOqR8HYwg-1; Mon, 15 Jun 2020 12:26:06 -0400
+X-MC-Unique: 2GzG0F6KOpegitOqR8HYwg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C17F91981086;
+ Mon, 15 Jun 2020 16:20:17 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-214.ams2.redhat.com [10.36.112.214])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 93A489034B;
+ Mon, 15 Jun 2020 16:19:57 +0000 (UTC)
+Subject: Re: [PATCH] bios-tables-test: Fix "-tpmdev: invalid option"
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
+ stefanb@linux.ibm.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
+ peter.maydell@linaro.org, mst@redhat.com, imammedo@redhat.com
+References: <20200615135051.2213-1-eric.auger@redhat.com>
+ <aa595991-7f3a-fd83-026b-1b35aaf9c49e@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <34566599-4194-f092-774e-4c60eca647a4@redhat.com>
+Date: Mon, 15 Jun 2020 18:19:55 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-References: <1591625864-31494-1-git-send-email-bmeng.cn@gmail.com>
- <1591625864-31494-7-git-send-email-bmeng.cn@gmail.com>
-In-Reply-To: <1591625864-31494-7-git-send-email-bmeng.cn@gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 15 Jun 2020 09:16:19 -0700
-Message-ID: <CAKmqyKOtfnWEABV92Ovj6wWwKwrMq0uTA797VJp7wp3ojkxgbw@mail.gmail.com>
-Subject: Re: [PATCH 06/15] hw/riscv: sifive_gpio: Add a new 'ngpio' property
-To: Bin Meng <bmeng.cn@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::141;
- envelope-from=alistair23@gmail.com; helo=mail-il1-x141.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+In-Reply-To: <aa595991-7f3a-fd83-026b-1b35aaf9c49e@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=thuth@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 01:43:27
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,134 +100,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Bin Meng <bin.meng@windriver.com>,
- "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Palmer Dabbelt <palmerdabbelt@google.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jun 8, 2020 at 7:22 AM Bin Meng <bmeng.cn@gmail.com> wrote:
->
-> From: Bin Meng <bin.meng@windriver.com>
->
-> Add a new property to represent the number of GPIO pins supported
-> by the GPIO controller.
->
-> Signed-off-by: Bin Meng <bin.meng@windriver.com>
+On 15/06/2020 16.57, Philippe Mathieu-Daudé wrote:
+> On 6/15/20 3:50 PM, Eric Auger wrote:
+>> When configure is run with "--disable-tpm", the bios-tables-test
+>> q35/tis test fails with "-tpmdev: invalid option".
+>>
+>> Skip the test if CONFIG_TPM is unset.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>> Reported-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>> ---
+>>  tests/qtest/bios-tables-test.c | 4 ++++
+>>  1 file changed, 4 insertions(+)
+>>
+>> diff --git a/tests/qtest/bios-tables-test.c b/tests/qtest/bios-tables-test.c
+>> index 53f104a9c5..b482f76c03 100644
+>> --- a/tests/qtest/bios-tables-test.c
+>> +++ b/tests/qtest/bios-tables-test.c
+>> @@ -882,6 +882,7 @@ uint64_t tpm_tis_base_addr;
+>>  static void test_acpi_tcg_tpm(const char *machine, const char *tpm_if,
+>>                                uint64_t base)
+>>  {
+>> +#ifdef CONFIG_TPM
+>>      gchar *tmp_dir_name = g_strdup_printf("qemu-test_acpi_%s_tcg_%s.XXXXXX",
+>>                                            machine, tpm_if);
+>>      char *tmp_path = g_dir_make_tmp(tmp_dir_name, NULL);
+>> @@ -924,6 +925,9 @@ static void test_acpi_tcg_tpm(const char *machine, const char *tpm_if,
+>>      g_free(tmp_path);
+>>      g_free(tmp_dir_name);
+>>      free_test_data(&data);
+>> +#else
+>> +    g_test_skip("TPM disabled");
+>> +#endif
+>>  }
+>>  
+>>  static void test_acpi_q35_tcg_tpm_tis(void)
+>>
+> 
+> This is simpler than Thomas' version.
+> 
+> Fixes: 5da7c35e25 ("bios-tables-test: Add Q35/TPM-TIS test")
+> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Your version is indeed nicer than mine, so let's use yours!
 
-Alistair
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
-> ---
->
->  hw/riscv/sifive_gpio.c         | 30 +++++++++++++++++++-----------
->  include/hw/riscv/sifive_gpio.h |  3 +++
->  2 files changed, 22 insertions(+), 11 deletions(-)
->
-> diff --git a/hw/riscv/sifive_gpio.c b/hw/riscv/sifive_gpio.c
-> index c9cffa2..0d0fd2b 100644
-> --- a/hw/riscv/sifive_gpio.c
-> +++ b/hw/riscv/sifive_gpio.c
-> @@ -14,6 +14,7 @@
->  #include "qemu/osdep.h"
->  #include "qemu/log.h"
->  #include "hw/irq.h"
-> +#include "hw/qdev-properties.h"
->  #include "hw/riscv/sifive_gpio.h"
->  #include "migration/vmstate.h"
->  #include "trace.h"
-> @@ -28,7 +29,7 @@ static void update_output_irq(SIFIVEGPIOState *s)
->      pending |= s->rise_ip & s->rise_ie;
->      pending |= s->fall_ip & s->fall_ie;
->
-> -    for (int i = 0; i < SIFIVE_GPIO_PINS; i++) {
-> +    for (int i = 0; i < s->ngpio; i++) {
->          pin = 1 << i;
->          qemu_set_irq(s->irq[i], (pending & pin) != 0);
->          trace_sifive_gpio_update_output_irq(i, (pending & pin) != 0);
-> @@ -41,7 +42,7 @@ static void update_state(SIFIVEGPIOState *s)
->      bool prev_ival, in, in_mask, port, out_xor, pull, output_en, input_en,
->          rise_ip, fall_ip, low_ip, high_ip, oval, actual_value, ival;
->
-> -    for (i = 0; i < SIFIVE_GPIO_PINS; i++) {
-> +    for (i = 0; i < s->ngpio; i++) {
->
->          prev_ival = extract32(s->value, i, 1);
->          in        = extract32(s->in, i, 1);
-> @@ -346,27 +347,35 @@ static const VMStateDescription vmstate_sifive_gpio = {
->      }
->  };
->
-> -static void sifive_gpio_init(Object *obj)
-> +static Property sifive_gpio_properties[] = {
-> +    DEFINE_PROP_UINT32("ngpio", SIFIVEGPIOState, ngpio, SIFIVE_GPIO_PINS),
-> +    DEFINE_PROP_END_OF_LIST(),
-> +};
-> +
-> +static void sifive_gpio_realize(DeviceState *dev, Error **errp)
->  {
-> -    SIFIVEGPIOState *s = SIFIVE_GPIO(obj);
-> +    SIFIVEGPIOState *s = SIFIVE_GPIO(dev);
->
-> -    memory_region_init_io(&s->mmio, obj, &gpio_ops, s,
-> +    memory_region_init_io(&s->mmio, OBJECT(dev), &gpio_ops, s,
->              TYPE_SIFIVE_GPIO, SIFIVE_GPIO_SIZE);
-> -    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->mmio);
->
-> -    for (int i = 0; i < SIFIVE_GPIO_PINS; i++) {
-> -        sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->irq[i]);
-> +    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->mmio);
-> +
-> +    for (int i = 0; i < s->ngpio; i++) {
-> +        sysbus_init_irq(SYS_BUS_DEVICE(dev), &s->irq[i]);
->      }
->
-> -    qdev_init_gpio_in(DEVICE(s), sifive_gpio_set, SIFIVE_GPIO_PINS);
-> -    qdev_init_gpio_out(DEVICE(s), s->output, SIFIVE_GPIO_PINS);
-> +    qdev_init_gpio_in(DEVICE(s), sifive_gpio_set, s->ngpio);
-> +    qdev_init_gpio_out(DEVICE(s), s->output, s->ngpio);
->  }
->
->  static void sifive_gpio_class_init(ObjectClass *klass, void *data)
->  {
->      DeviceClass *dc = DEVICE_CLASS(klass);
->
-> +    device_class_set_props(dc, sifive_gpio_properties);
->      dc->vmsd = &vmstate_sifive_gpio;
-> +    dc->realize = sifive_gpio_realize;
->      dc->reset = sifive_gpio_reset;
->      dc->desc = "SiFive GPIO";
->  }
-> @@ -375,7 +384,6 @@ static const TypeInfo sifive_gpio_info = {
->      .name = TYPE_SIFIVE_GPIO,
->      .parent = TYPE_SYS_BUS_DEVICE,
->      .instance_size = sizeof(SIFIVEGPIOState),
-> -    .instance_init = sifive_gpio_init,
->      .class_init = sifive_gpio_class_init
->  };
->
-> diff --git a/include/hw/riscv/sifive_gpio.h b/include/hw/riscv/sifive_gpio.h
-> index ad915b2..cf12fcf 100644
-> --- a/include/hw/riscv/sifive_gpio.h
-> +++ b/include/hw/riscv/sifive_gpio.h
-> @@ -68,6 +68,9 @@ typedef struct SIFIVEGPIOState {
->      uint32_t out_xor;
->      uint32_t in;
->      uint32_t in_mask;
-> +
-> +    /* config */
-> +    uint32_t ngpio;
->  } SIFIVEGPIOState;
->
->  #endif /* SIFIVE_GPIO_H */
-> --
-> 2.7.4
->
->
 
