@@ -7,77 +7,78 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08C94C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 10:14:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFC64C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 10:19:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C7F5F206B7
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 10:14:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AB1CA206B7
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 10:19:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WBisuLbY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7F5F206B7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="El0ftFrD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB1CA206B7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55728 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58286 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkm8A-0005Wu-0u
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 06:14:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47572)
+	id 1jkmCn-0006tR-U6
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 06:19:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48436)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jkm7Z-00056D-RW
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 06:13:41 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:29609
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jkmBx-0006S4-UI
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 06:18:13 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:45196
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jkm7T-0003GD-KT
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 06:13:40 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jkmBv-000433-Nq
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 06:18:13 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592216014;
+ s=mimecast20190719; t=1592216290;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=/F+fJs/IglwSy1W4jigQ/SxZk05uXn55JHXEgTyk3Q8=;
- b=WBisuLbYmNlrKCMPWCXRDyGtkZn3nSsjZNtwAssJArzqxd6DzNvt7JJD5fIMNKj5YrC6NJ
- DX/8Tue9RHI4X0ITUISDpiefz9k1+ZSawVlSKXQyBCaaNq+tbqwqywGfu6Me4nnopvKhZg
- VDV0VESSVtGI1S9mtS+WkWUL9DZymPg=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-181-nuA4iVeKMk-FuUYM1Axp_g-1; Mon, 15 Jun 2020 06:13:32 -0400
-X-MC-Unique: nuA4iVeKMk-FuUYM1Axp_g-1
-Received: by mail-wr1-f71.google.com with SMTP id e1so6881515wrm.3
- for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 03:13:32 -0700 (PDT)
+ bh=8mem7F/qE3XEnvkm1870aRjVvu58QzmTlW+wtxHm8tI=;
+ b=El0ftFrD2Dw3b3314ojiDaBUCLi8bSe565SYj2TXLia4ORRKaH4w/IQSEVCk3Jk1uiEa0K
+ QzLFhDPmaoipAS+hBgWZ8q474CInzTxzL41F2LsCC8L6Ui7SLs4BYvxTbklCaaykkTD2Fr
+ WbVRL3CVnkLru8I7MovD4eYyFK298XI=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-423-fb9kGy7GMuG2M4CFErEzxA-1; Mon, 15 Jun 2020 06:18:07 -0400
+X-MC-Unique: fb9kGy7GMuG2M4CFErEzxA-1
+Received: by mail-wm1-f71.google.com with SMTP id v24so6499381wmh.3
+ for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 03:18:07 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=/F+fJs/IglwSy1W4jigQ/SxZk05uXn55JHXEgTyk3Q8=;
- b=n+fCFdMqyIp/N+e3kzjn9XD2PkVRb9vQ/0CSipOjVTt92lIjrTPaAhhSFiMgFJQqaT
- HFAC+DayU51AiRX1enw04dQOb3cihtq52gae0ISLPztjjrWrSi6ZETCl8iBZq/MucBRO
- CJMW7bMKshR2efWsedrGJv799d4/fqhtTcIl/4AmUen+wN53sBSBRTdVOOkxsiSWdzXE
- 2OjHzSFR0exBXGddHBWIYPUdnjZRLbEp20Na8271HxwqimBYmi/vHDqF7GD9F9G9O6fW
- GtcngD0vQF3gH8kllOrkQu+pOWHWpOCGVwxAAEdqfl6my+M5pj2fj56ETr9TDrRgkT0Q
- mUUg==
-X-Gm-Message-State: AOAM530RqdqE0byC/iRPB1RwNDW98d4Bdc0Rka+E+zA9WNlj5XUUB/Hg
- qiCh26W5m+KpNub9RbyL0BOYIFyPTnfASD5RQzwhjIZv3YQ8HdAU4IX8klGlNVXLijXJ0YoPbtP
- fodGcTurHRNU0Rxg=
-X-Received: by 2002:a5d:4090:: with SMTP id o16mr27659250wrp.354.1592216011594; 
- Mon, 15 Jun 2020 03:13:31 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzP67opBMj598Qazy0GF0d+Yz6rtO3h1h0W/aimpJdX/8s7AhErmNh5AHaS4NZcorc1656GQw==
-X-Received: by 2002:a5d:4090:: with SMTP id o16mr27659231wrp.354.1592216011383; 
- Mon, 15 Jun 2020 03:13:31 -0700 (PDT)
+ bh=8mem7F/qE3XEnvkm1870aRjVvu58QzmTlW+wtxHm8tI=;
+ b=VOvUUObGCPQVyGw+CV5cqoH2yOOn9ozNDrl/OWU8qjPUb5gYROqiuS94Tk9ZlBIv8i
+ p0gSfNQKekNDaLxQu5+hP3oymQvGFAcRSxdCGfkfrhfhrwCglWBLofRcUh9K+Mfjig6O
+ PE3nsfmBr8C2wPc6v1jJpYJ/SZ+vtSBIHkusYuIZWnDdNsxQfxBDiWLsGgdnOZgwR8Vo
+ 9Q7/SlDMHzAnGoWxYAL3lHONrAeTgrY+KWA6LyZFDPTWr8aNTdQtZ1V2ViPw4UOmvTY6
+ hqAACDWE2ttSR2TMrBGkRFTLbDx4P42KFcG7Vb6928SRfussgWQdqFMwoGdm2DQ2+WT6
+ KChA==
+X-Gm-Message-State: AOAM531X8JtbJbYe7kkWJ2xkk00T29teNN4xTiYw73JJ7vJJabjvkidS
+ 4dquEqdy4JKCvhQbS6EYi9pxoVda6/r13QmSEFuG3nZV2rS+GZx50VCPqq198OlfZWZbUtzdC3h
+ xvMafloBQlz66U9g=
+X-Received: by 2002:a5d:4385:: with SMTP id i5mr27537446wrq.420.1592216286187; 
+ Mon, 15 Jun 2020 03:18:06 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzrbHO1uJcJqOH68UJ5VLe4f6M1/KHJVqvPgz//0L/pQQjFJHb0bAj/jxgOiKYg5Qc7fwcBHg==
+X-Received: by 2002:a5d:4385:: with SMTP id i5mr27537424wrq.420.1592216285840; 
+ Mon, 15 Jun 2020 03:18:05 -0700 (PDT)
 Received: from [192.168.1.40] (181.red-88-10-103.dynamicip.rima-tde.net.
  [88.10.103.181])
- by smtp.gmail.com with ESMTPSA id f2sm2665912wmj.39.2020.06.15.03.13.30
+ by smtp.gmail.com with ESMTPSA id o82sm22542167wmo.40.2020.06.15.03.18.04
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 15 Jun 2020 03:13:30 -0700 (PDT)
-Subject: Re: [PATCH v1 2/2] semihosting: don't send the trailing '\0'
-To: konrad@adacore.com, qemu-devel@nongnu.org
-References: <1592215252-26742-1-git-send-email-frederic.konrad@adacore.com>
- <1592215252-26742-2-git-send-email-frederic.konrad@adacore.com>
+ Mon, 15 Jun 2020 03:18:05 -0700 (PDT)
+Subject: Re: [PULL 082/116] target/i386: correct fix for pcmpxstrx substring
+ search
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+References: <20200612160755.9597-1-pbonzini@redhat.com>
+ <20200612160755.9597-2-pbonzini@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
@@ -102,28 +103,28 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <fff8f08b-5fbe-93ff-d0e9-c45940f649c6@redhat.com>
-Date: Mon, 15 Jun 2020 12:13:29 +0200
+Message-ID: <530b3231-0e47-80af-4bb1-17e50e231efa@redhat.com>
+Date: Mon, 15 Jun 2020 12:18:04 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <1592215252-26742-2-git-send-email-frederic.konrad@adacore.com>
+In-Reply-To: <20200612160755.9597-2-pbonzini@redhat.com>
 Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 01:43:27
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 01:17:36
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -136,40 +137,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: KONRAD Frederic <frederic.konrad@adacore.com>, alex.bennee@linaro.org
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Joseph Myers <joseph@codesourcery.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/15/20 12:00 PM, konrad@adacore.com wrote:
-> From: KONRAD Frederic <frederic.konrad@adacore.com>
+On 6/12/20 6:07 PM, Paolo Bonzini wrote:
+> From: Joseph Myers <joseph@codesourcery.com>
 > 
-> Don't send the trailing 0 from the string.
+> This corrects a bug introduced in my previous fix for SSE4.2 pcmpestri
+> / pcmpestrm / pcmpistri / pcmpistrm substring search, commit
+> ae35eea7e4a9f21dd147406dfbcd0c4c6aaf2a60.
 > 
-
-Fixes: a331c6d7741
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
-> Signed-off-by: KONRAD Frederic <frederic.konrad@adacore.com>
+> That commit fixed a bug that showed up in four GCC tests with one libc
+> implementation.  The tests in question generate random inputs to the
+> intrinsics and compare results to a C implementation, but they only
+> test 1024 possible random inputs, and when the tests use the cases of
+> those instructions that work with word rather than byte inputs, it's
+> easy to have problematic cases that show up much less frequently than
+> that.  Thus, testing with a different libc implementation, and so a
+> different random number generator, showed up a problem with the
+> previous patch.
+> 
+> When investigating the previous test failures, I found the description
+> of these instructions in the Intel manuals (starting from computing a
+> 16x16 or 8x8 set of comparison results) confusing and hard to match up
+> with the more optimized implementation in QEMU, and referred to AMD
+> manuals which described the instructions in a different way.  Those
+> AMD descriptions are very explicit that the whole of the string being
+> searched for must be found in the other operand, not running off the
+> end of that operand; they say "If the prototype and the SUT are equal
+> in length, the two strings must be identical for the comparison to be
+> TRUE.".  However, that statement is incorrect.
+> 
+> In my previous commit message, I noted:
+> 
+>   The operation in this case is a search for a string (argument d to
+>   the helper) in another string (argument s to the helper); if a copy
+>   of d at a particular position would run off the end of s, the
+>   resulting output bit should be 0 whether or not the strings match in
+>   the region where they overlap, but the QEMU implementation was
+>   wrongly comparing only up to the point where s ends and counting it
+>   as a match if an initial segment of d matched a terminal segment of
+>   s.  Here, "run off the end of s" means that some byte of d would
+>   overlap some byte outside of s; thus, if d has zero length, it is
+>   considered to match everywhere, including after the end of s.
+> 
+> The description "some byte of d would overlap some byte outside of s"
+> is accurate only when understood to refer to overlapping some byte
+> *within the 16-byte operand* but at or after the zero terminator; it
+> is valid to run over the end of s if the end of s is the end of the
+> 16-byte operand.  So the fix in the previous patch for the case of d
+> being empty was correct, but the other part of that patch was not
+> correct (as it never allowed partial matches even at the end of the
+> 16-byte operand).  Nor was the code before the previous patch correct
+> for the case of d nonempty, as it would always have allowed partial
+> matches at the end of s.
+> 
+> Fix with a partial revert of my previous change, combined with
+> inserting a check for the special case of s having maximum length to
+> determine where it is necessary to check for matches.
+> 
+> In the added test, test 1 is for the case of empty strings, which
+> failed before my 2017 patch, test 2 is for the bug introduced by my
+> 2017 patch and test 3 deals with the case where a match of an initial
+> segment at the end of the string is not valid when the string ends
+> before the end of the 16-byte operand (that is, the case that would be
+> broken by a simple revert of the non-empty-string part of my 2017
+> patch).
+> 
+> Signed-off-by: Joseph Myers <joseph@codesourcery.com>
+> Message-Id: <alpine.DEB.2.21.2006121344290.9881@digraph.polyomino.org.uk>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->  hw/semihosting/console.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
+>  target/i386/ops_sse.h                |  4 ++--
+>  tests/tcg/i386/Makefile.target       |  3 +++
+>  tests/tcg/i386/test-i386-pcmpistri.c | 33 ++++++++++++++++++++++++++++
+>  3 files changed, 38 insertions(+), 2 deletions(-)
+>  create mode 100644 tests/tcg/i386/test-i386-pcmpistri.c
 > 
-> diff --git a/hw/semihosting/console.c b/hw/semihosting/console.c
-> index 22e7827..9b4fee9 100644
-> --- a/hw/semihosting/console.c
-> +++ b/hw/semihosting/console.c
-> @@ -52,7 +52,9 @@ static GString *copy_user_string(CPUArchState *env, target_ulong addr)
+> diff --git a/target/i386/ops_sse.h b/target/i386/ops_sse.h
+> index 01d6017412..14f2b16abd 100644
+> --- a/target/i386/ops_sse.h
+> +++ b/target/i386/ops_sse.h
+> @@ -2089,10 +2089,10 @@ static inline unsigned pcmpxstrx(CPUX86State *env, Reg *d, Reg *s,
+>              res = (2 << upper) - 1;
+>              break;
+>          }
+> -        for (j = valids - validd; j >= 0; j--) {
+> +        for (j = valids == upper ? valids : valids - validd; j >= 0; j--) {
+>              res <<= 1;
+>              v = 1;
+> -            for (i = validd; i >= 0; i--) {
+> +            for (i = MIN(valids - j, validd); i >= 0; i--) {
+>                  v &= (pcmp_val(s, ctrl, i + j) == pcmp_val(d, ctrl, i));
+>              }
+>              res |= v;
+> diff --git a/tests/tcg/i386/Makefile.target b/tests/tcg/i386/Makefile.target
+> index 43ee2e181e..53efec0668 100644
+> --- a/tests/tcg/i386/Makefile.target
+> +++ b/tests/tcg/i386/Makefile.target
+> @@ -10,6 +10,9 @@ ALL_X86_TESTS=$(I386_SRCS:.c=)
+>  SKIP_I386_TESTS=test-i386-ssse3
+>  X86_64_TESTS:=$(filter test-i386-ssse3, $(ALL_X86_TESTS))
 >  
->      do {
->          if (cpu_memory_rw_debug(cpu, addr++, &c, 1, 0) == 0) {
-> -            s = g_string_append_c(s, c);
-> +            if (c) {
-> +                s = g_string_append_c(s, c);
-> +            }
->          } else {
->              qemu_log_mask(LOG_GUEST_ERROR,
->                            "%s: passed inaccessible address " TARGET_FMT_lx,
+> +test-i386-pcmpistri: CFLAGS += -msse4.2
+> +run-test-i386-pcmpistri: QEMU_OPTS += -cpu max
+
+This test fails on our CI:
+https://travis-ci.org/github/qemu/qemu/jobs/698006621#L4246
+
+> +
+>  #
+>  # hello-i386 is a barebones app
+>  #
+> diff --git a/tests/tcg/i386/test-i386-pcmpistri.c b/tests/tcg/i386/test-i386-pcmpistri.c
+> new file mode 100644
+> index 0000000000..1e81ae611a
+> --- /dev/null
+> +++ b/tests/tcg/i386/test-i386-pcmpistri.c
+> @@ -0,0 +1,33 @@
+> +/* Test pcmpistri instruction.  */
+> +
+> +#include <nmmintrin.h>
+> +#include <stdio.h>
+> +
+> +union u {
+> +    __m128i x;
+> +    unsigned char uc[16];
+> +};
+> +
+> +union u s0 = { .uc = { 0 } };
+> +union u s1 = { .uc = "abcdefghijklmnop" };
+> +union u s2 = { .uc = "bcdefghijklmnopa" };
+> +union u s3 = { .uc = "bcdefghijklmnab" };
+> +
+> +int
+> +main(void)
+> +{
+> +    int ret = 0;
+> +    if (_mm_cmpistri(s0.x, s0.x, 0x4c) != 15) {
+> +        printf("FAIL: pcmpistri test 1\n");
+> +        ret = 1;
+> +    }
+> +    if (_mm_cmpistri(s1.x, s2.x, 0x4c) != 15) {
+> +        printf("FAIL: pcmpistri test 2\n");
+> +        ret = 1;
+> +    }
+> +    if (_mm_cmpistri(s1.x, s3.x, 0x4c) != 16) {
+> +        printf("FAIL: pcmpistri test 3\n");
+> +        ret = 1;
+> +    }
+> +    return ret;
+> +}
 > 
 
 
