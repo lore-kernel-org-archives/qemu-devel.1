@@ -2,75 +2,85 @@ Return-Path: <SRS0=tJVC=74=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D9FFC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 10:43:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02843C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 10:50:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 23BCF20663
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 10:43:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C20C42068E
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 10:50:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XLXEtXa5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 23BCF20663
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h58ZqeCy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C20C42068E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44602 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48464 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkmaB-0000vt-Ch
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 06:43:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52548)
+	id 1jkmhG-0003Ih-1V
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 06:50:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55496)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jkmU8-0001I8-FR
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 06:37:00 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46222
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1jkmgX-0002pw-Qe
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 06:49:49 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:32341)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jkmU6-0007T5-6N
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 06:37:00 -0400
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1jkmgV-00017M-Oo
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 06:49:49 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592217417;
+ s=mimecast20190719; t=1592218185;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=0+3p+JNLyczyeCJ2gmwnKj1a+SQ2zoOfi5OnnPEnnG8=;
- b=XLXEtXa5dQO4u4wCw4+g8JIJW08GLbRJ8B/dKEFaqTI50Zqc8XGisJYjBNcDUUuZCUbi39
- jRsAWTy+kGtXA6uGZjqZ9zgXTo15im33rOx2WDzHP+uidYlyWdwmKjXqma7KgeszAqdVrk
- +gq7C76blAIV8MxlsqyxUdUSJfCH+zQ=
+ bh=EfybyArIQJIxBW6nhn+dS0O0AlniIc6yWc7CZDG4q6k=;
+ b=h58ZqeCylPXsr6u1yqhAIs4aV9PDS1mRpOWUtqFrwaM/6wME8YzQ15/V91JBKG3rHS1it9
+ wm2/fI/w42uWV2N+dDh9ZeyxKQTXvkpR/1NqHGIAbM29iuof1VDFLZO1F/1xesmim91/3g
+ JPtW8a0ITmGq45+Idfc8GUi9julANKk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-49-oBI3u6txNi-AeRzdBld7ig-1; Mon, 15 Jun 2020 06:36:43 -0400
-X-MC-Unique: oBI3u6txNi-AeRzdBld7ig-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-8-iEkpQxYnMJi1qSAE3SOgdQ-1; Mon, 15 Jun 2020 06:49:40 -0400
+X-MC-Unique: iEkpQxYnMJi1qSAE3SOgdQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AB94480F5CC;
- Mon, 15 Jun 2020 10:36:42 +0000 (UTC)
-Received: from localhost.localdomain.com (unknown [10.36.110.57])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9BD815D9CC;
- Mon, 15 Jun 2020 10:36:41 +0000 (UTC)
-From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 3/5] crypto/linux_keyring: add 'secret_keyring' secret object.
-Date: Mon, 15 Jun 2020 11:36:31 +0100
-Message-Id: <20200615103633.300208-4-berrange@redhat.com>
-In-Reply-To: <20200615103633.300208-1-berrange@redhat.com>
-References: <20200615103633.300208-1-berrange@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BF5B3106B242;
+ Mon, 15 Jun 2020 10:49:38 +0000 (UTC)
+Received: from localhost (ovpn-115-9.ams2.redhat.com [10.36.115.9])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A51677CAA7;
+ Mon, 15 Jun 2020 10:49:30 +0000 (UTC)
+Date: Mon, 15 Jun 2020 11:49:29 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: John G Johnson <john.g.johnson@oracle.com>
+Subject: Re: RFC: use VFIO over a UNIX domain socket to implement device
+ offloading
+Message-ID: <20200615104929.GD1491454@stefanha-x1.localdomain>
+References: <MN2PR02MB62052E54C752229C115EAD898BCF0@MN2PR02MB6205.namprd02.prod.outlook.com>
+ <20200401091712.GA221892@stefanha-x1.localdomain>
+ <MW2PR02MB372349E25A0842DE045B95F58BD40@MW2PR02MB3723.namprd02.prod.outlook.com>
+ <8101D131-3B95-4CF5-8D46-8755593AA97D@oracle.com>
+ <A0E4C51F-B41C-486B-A5CE-3C4C2C9C1A40@oracle.com>
+ <20200602090629.66f9e3f7@x1.home>
+ <E78F4C2E-4382-4C98-9606-F1ABD9753699@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=berrange@redhat.com;
+In-Reply-To: <E78F4C2E-4382-4C98-9606-F1ABD9753699@oracle.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="k4f25fnPtRuIRUb3"
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=stefanha@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 01:17:36
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 01:12:36
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -91,346 +101,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexey Krasikov <alex-krasikov@yandex-team.ru>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Cc: "Walker, Benjamin" <benjamin.walker@intel.com>,
+ Elena Ufimtseva <elena.ufimtseva@oracle.com>, Jag Raman <jag.raman@oracle.com>,
+ Swapnil Ingle <swapnil.ingle@nutanix.com>, "Harris,
+ James R" <james.r.harris@intel.com>,
+ Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Kirti Wankhede <kwankhede@nvidia.com>,
+ Raphael Norwitz <raphael.norwitz@nutanix.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Thanos Makatos <thanos.makatos@nutanix.com>,
+ Kanth Ghatraju <Kanth.Ghatraju@oracle.com>,
+ Felipe Franciosi <felipe@nutanix.com>,
+ =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, "Zhang,
+ Tina" <tina.zhang@intel.com>, "Liu, Changpeng" <changpeng.liu@intel.com>,
+ "dgilbert@redhat.com" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Alexey Krasikov <alex-krasikov@yandex-team.ru>
+--k4f25fnPtRuIRUb3
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Add the ability for the secret object to obtain secret data from the
-Linux in-kernel key managment and retention facility, as an extra option
-to the existing ones: reading from a file or passing directly as a
-string.
+On Tue, Jun 09, 2020 at 11:25:41PM -0700, John G Johnson wrote:
+> > On Jun 2, 2020, at 8:06 AM, Alex Williamson <alex.williamson@redhat.com=
+> wrote:
+> >=20
+> > On Wed, 20 May 2020 17:45:13 -0700
+> > John G Johnson <john.g.johnson@oracle.com> wrote:
+> >=20
+> >>> I'm confused by VFIO_USER_ADD_MEMORY_REGION vs VFIO_USER_IOMMU_MAP_DM=
+A.
+> >>> The former seems intended to provide the server with access to the
+> >>> entire GPA space, while the latter indicates an IOVA to GPA mapping o=
+f
+> >>> those regions.  Doesn't this break the basic isolation of a vIOMMU?
+> >>> This essentially says to me "here's all the guest memory, but please
+> >>> only access these regions for which we're providing DMA mappings".
+> >>> That invites abuse.
+> >>>=20
+> >>=20
+> >> =09The purpose behind separating QEMU into multiple processes is
+> >> to provide an additional layer protection for the infrastructure again=
+st
+> >> a malign guest, not for the guest against itself, so preventing a serv=
+er
+> >> that has been compromised by a guest from accessing all of guest memor=
+y
+> >> adds no additional benefit.  We don=E2=80=99t even have an IOMMU in ou=
+r current
+> >> guest model for this reason.
+> >=20
+> > One of the use cases we see a lot with vfio is nested assignment, ie.
+> > we assign a device to a VM where the VM includes a vIOMMU, such that
+> > the guest OS can then assign the device to userspace within the guest.
+> > This is safe to do AND provides isolation within the guest exactly
+> > because the device only has access to memory mapped to the device, not
+> > the entire guest address space.  I don't think it's just the hypervisor
+> > you're trying to protect, we can't assume there are always trusted
+> > drivers managing the device.
+> >=20
+>=20
+> =09We intend to support an IOMMU.  The question seems to be whether
+> it=E2=80=99s implemented in the server or client.  The current proposal h=
+as it
+> in the server, ala vhost-user, but we are fine with moving it.
 
-The secret is identified by the key serial number. The upper layers
-need to instantiate the key and make sure the QEMU process has access
-permissions to read it.
+It's challenging to implement a fast and secure IOMMU. The simplest
+approach is secure but not fast: add protocol messages for
+DMA_READ(iova, length) and DMA_WRITE(iova, buffer, length).
 
-Signed-off-by: Alexey Krasikov <alex-krasikov@yandex-team.ru>
+An issue with file descriptor passing is that it's hard to revoke access
+once the file descriptor has been passed. memfd supports sealing with
+fnctl(F_ADD_SEALS) it doesn't revoke mmap(MAP_WRITE) on other processes.
 
- - Fixed up detection logic default behaviour in configure
+Memory Protection Keys don't seem to be useful here either and their
+availability is limited (see pkeys(7)).
 
-Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
----
- configure                       |  45 ++++++++++
- crypto/Makefile.objs            |   1 +
- crypto/secret_keyring.c         | 148 ++++++++++++++++++++++++++++++++
- include/crypto/secret_keyring.h |  52 +++++++++++
- 4 files changed, 246 insertions(+)
- create mode 100644 crypto/secret_keyring.c
- create mode 100644 include/crypto/secret_keyring.h
+One crazy idea is to use KVM as a sandbox for running the device and let
+the vIOMMU control the page tables instead of the device (guest). That
+way the hardware MMU provides memory translation, but I think this is
+impractical because the guest environment is too different from the
+Linux userspace environment.
 
-diff --git a/configure b/configure
-index 997284e094..3fbb61905a 100755
---- a/configure
-+++ b/configure
-@@ -510,6 +510,7 @@ default_devices="yes"
- plugins="no"
- fuzzing="no"
- rng_none="no"
-+secret_keyring=""
- 
- supported_cpu="no"
- supported_os="no"
-@@ -1606,6 +1607,10 @@ for opt do
-   ;;
-   --disable-rng-none) rng_none=no
-   ;;
-+  --enable-keyring) secret_keyring="yes"
-+  ;;
-+  --disable-keyring) secret_keyring="no"
-+  ;;
-   *)
-       echo "ERROR: unknown option $opt"
-       echo "Try '$0 --help' for more information"
-@@ -6290,6 +6295,41 @@ case "$slirp" in
-     ;;
- esac
- 
-+##########################################
-+# check for usable __NR_keyctl syscall
-+
-+if test "$linux" = "yes" ; then
-+
-+    have_keyring=no
-+    cat > $TMPC << EOF
-+#include <errno.h>
-+#include <asm/unistd.h>
-+#include <linux/keyctl.h>
-+#include <unistd.h>
-+int main(void) {
-+    return syscall(__NR_keyctl, KEYCTL_READ, 0, NULL, NULL, 0);
-+}
-+EOF
-+    if compile_prog "" "" ; then
-+        have_keyring=yes
-+    fi
-+fi
-+if test "$secret_keyring" != "no"
-+then
-+    if test "$have_keyring" == "yes"
-+    then
-+	secret_keyring=yes
-+    else
-+	if test "$secret_keyring" = "yes"
-+	then
-+	    error_exit "syscall __NR_keyctl requested, \
-+but not implemented on your system"
-+	else
-+	    secret_keyring=no
-+	fi
-+    fi
-+fi
-+
- 
- ##########################################
- # End of CC checks
-@@ -6774,6 +6814,7 @@ echo "plugin support    $plugins"
- echo "fuzzing support   $fuzzing"
- echo "gdb               $gdb_bin"
- echo "rng-none          $rng_none"
-+echo "Linux keyring     $secret_keyring"
- 
- if test "$supported_cpu" = "no"; then
-     echo
-@@ -7659,6 +7700,10 @@ if test -n "$gdb_bin" ; then
-     echo "HAVE_GDB_BIN=$gdb_bin" >> $config_host_mak
- fi
- 
-+if test "$secret_keyring" = "yes" ; then
-+  echo "CONFIG_SECRET_KEYRING=y" >> $config_host_mak
-+fi
-+
- if test "$tcg_interpreter" = "yes"; then
-   QEMU_INCLUDES="-iquote \$(SRC_PATH)/tcg/tci $QEMU_INCLUDES"
- elif test "$ARCH" = "sparc64" ; then
-diff --git a/crypto/Makefile.objs b/crypto/Makefile.objs
-index 110dec1b87..707c02ad37 100644
---- a/crypto/Makefile.objs
-+++ b/crypto/Makefile.objs
-@@ -20,6 +20,7 @@ crypto-obj-y += tlscredsx509.o
- crypto-obj-y += tlssession.o
- crypto-obj-y += secret_common.o
- crypto-obj-y += secret.o
-+crypto-obj-$(CONFIG_SECRET_KEYRING) += secret_keyring.o
- crypto-obj-y += pbkdf.o
- crypto-obj-$(CONFIG_NETTLE) += pbkdf-nettle.o
- crypto-obj-$(if $(CONFIG_NETTLE),n,$(CONFIG_GCRYPT)) += pbkdf-gcrypt.o
-diff --git a/crypto/secret_keyring.c b/crypto/secret_keyring.c
-new file mode 100644
-index 0000000000..4f132d6370
---- /dev/null
-+++ b/crypto/secret_keyring.c
-@@ -0,0 +1,148 @@
-+/*
-+ * QEMU crypto secret support
-+ *
-+ * Copyright 2020 Yandex N.V.
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2.1 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+#include <asm/unistd.h>
-+#include <linux/keyctl.h>
-+#include "qapi/error.h"
-+#include "qom/object_interfaces.h"
-+#include "trace.h"
-+#include "crypto/secret_keyring.h"
-+
-+
-+static inline
-+long keyctl_read(int32_t key, uint8_t *buffer, size_t buflen)
-+{
-+    return syscall(__NR_keyctl, KEYCTL_READ, key, buffer, buflen, 0);
-+}
-+
-+
-+static void
-+qcrypto_secret_keyring_load_data(QCryptoSecretCommon *sec_common,
-+                                 uint8_t **output,
-+                                 size_t *outputlen,
-+                                 Error **errp)
-+{
-+    QCryptoSecretKeyring *secret = QCRYPTO_SECRET_KEYRING(sec_common);
-+    uint8_t *buffer = NULL;
-+    long retcode;
-+
-+    *output = NULL;
-+    *outputlen = 0;
-+
-+    if (!secret->serial) {
-+        error_setg(errp, "'serial' parameter must be provided");
-+        return;
-+    }
-+
-+    retcode = keyctl_read(secret->serial, NULL, 0);
-+    if (retcode <= 0) {
-+        goto keyctl_error;
-+    }
-+
-+    buffer = g_new0(uint8_t, retcode);
-+
-+    retcode = keyctl_read(secret->serial, buffer, retcode);
-+    if (retcode < 0) {
-+        g_free(buffer);
-+        goto keyctl_error;
-+    }
-+
-+    *outputlen = retcode;
-+    *output = buffer;
-+    return;
-+
-+keyctl_error:
-+    error_setg_errno(errp, errno,
-+                     "Unable to read serial key %08x",
-+                     secret->serial);
-+}
-+
-+
-+static void
-+qcrypto_secret_prop_set_key(Object *obj, Visitor *v,
-+                            const char *name, void *opaque,
-+                            Error **errp)
-+{
-+    QCryptoSecretKeyring *secret = QCRYPTO_SECRET_KEYRING(obj);
-+    int32_t value;
-+    visit_type_int32(v, name, &value, errp);
-+    if (!value) {
-+        error_setg(errp, "'serial' should not be equal to 0");
-+    }
-+    secret->serial = value;
-+}
-+
-+
-+static void
-+qcrypto_secret_prop_get_key(Object *obj, Visitor *v,
-+                            const char *name, void *opaque,
-+                            Error **errp)
-+{
-+    QCryptoSecretKeyring *secret = QCRYPTO_SECRET_KEYRING(obj);
-+    int32_t value = secret->serial;
-+    visit_type_int32(v, name, &value, errp);
-+}
-+
-+
-+static void
-+qcrypto_secret_keyring_complete(UserCreatable *uc, Error **errp)
-+{
-+    object_property_set_bool(OBJECT(uc), true, "loaded", errp);
-+}
-+
-+
-+static void
-+qcrypto_secret_keyring_class_init(ObjectClass *oc, void *data)
-+{
-+    QCryptoSecretCommonClass *sic = QCRYPTO_SECRET_COMMON_CLASS(oc);
-+    sic->load_data = qcrypto_secret_keyring_load_data;
-+
-+    UserCreatableClass *ucc = USER_CREATABLE_CLASS(oc);
-+    ucc->complete = qcrypto_secret_keyring_complete;
-+
-+    object_class_property_add(oc, "serial", "int32_t",
-+                                  qcrypto_secret_prop_get_key,
-+                                  qcrypto_secret_prop_set_key,
-+                                  NULL, NULL);
-+}
-+
-+
-+static const TypeInfo qcrypto_secret_info = {
-+    .parent = TYPE_QCRYPTO_SECRET_COMMON,
-+    .name = TYPE_QCRYPTO_SECRET_KEYRING,
-+    .instance_size = sizeof(QCryptoSecretKeyring),
-+    .class_size = sizeof(QCryptoSecretKeyringClass),
-+    .class_init = qcrypto_secret_keyring_class_init,
-+    .interfaces = (InterfaceInfo[]) {
-+        { TYPE_USER_CREATABLE },
-+        { }
-+    }
-+};
-+
-+
-+static void
-+qcrypto_secret_register_types(void)
-+{
-+    type_register_static(&qcrypto_secret_info);
-+}
-+
-+
-+type_init(qcrypto_secret_register_types);
-diff --git a/include/crypto/secret_keyring.h b/include/crypto/secret_keyring.h
-new file mode 100644
-index 0000000000..9f371ad251
---- /dev/null
-+++ b/include/crypto/secret_keyring.h
-@@ -0,0 +1,52 @@
-+/*
-+ * QEMU crypto secret support
-+ *
-+ * Copyright 2020 Yandex N.V.
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2.1 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-+ *
-+ */
-+
-+#ifndef QCRYPTO_SECRET_KEYRING_H
-+#define QCRYPTO_SECRET_KEYRING_H
-+
-+#include "qapi/qapi-types-crypto.h"
-+#include "qom/object.h"
-+#include "crypto/secret_common.h"
-+
-+#define TYPE_QCRYPTO_SECRET_KEYRING "secret_keyring"
-+#define QCRYPTO_SECRET_KEYRING(obj) \
-+    OBJECT_CHECK(QCryptoSecretKeyring, (obj), \
-+                 TYPE_QCRYPTO_SECRET_KEYRING)
-+#define QCRYPTO_SECRET_KEYRING_CLASS(class) \
-+    OBJECT_CLASS_CHECK(QCryptoSecretKeyringClass, \
-+                       (class), TYPE_QCRYPTO_SECRET_KEYRING)
-+#define QCRYPTO_SECRET_KEYRING_GET_CLASS(class) \
-+    OBJECT_GET_CLASS(QCryptoSecretKeyringClass, \
-+                     (class), TYPE_QCRYPTO_SECRET_KEYRING)
-+
-+typedef struct QCryptoSecretKeyring QCryptoSecretKeyring;
-+typedef struct QCryptoSecretKeyringClass QCryptoSecretKeyringClass;
-+
-+typedef struct QCryptoSecretKeyring {
-+    QCryptoSecretCommon parent;
-+    int32_t serial;
-+} QCryptoSecretKeyring;
-+
-+
-+typedef struct QCryptoSecretKeyringClass {
-+    QCryptoSecretCommonClass parent;
-+} QCryptoSecretKeyringClass;
-+
-+#endif /* QCRYPTO_SECRET_KEYRING_H */
--- 
-2.26.2
+As a starting point adding DMA_READ/DMA_WRITE messages would provide the
+functionality and security. Unfortunately it makes DMA expensive and
+performance will suffer.
+
+Stefan
+
+--k4f25fnPtRuIRUb3
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl7nUjkACgkQnKSrs4Gr
+c8iXuwgAj22v7GTE/+fxdunnmikGsDMVTC+M+B60Z05FegrSOtu749Ab281ZONHu
+n4U8SnNPshY2t7JvkBF38YwQRVRTH39Zu5avnlV1g96iKx1FGu6XS2RHerHTBOHk
+w6/TFaCGwFCC/E2qdOGFkc+eo7jooPYL2HKqGn1P3hBvxMoFjSp2hbrqQjdCtmAP
+eXVBrCxqhETdJLs+pU8NUXSaEWy7/9C6gjLTX/LcbfafIetKqcFnBtx9RxUmHU3i
+sawv0j9/M9pZUxJpONF4TxRYlvAk5O7ki17nN1li8zmVzB2MufY4Ffn0psVeeZnN
+La8Ubu63fM91CqhSlpya4HLTRspqXw==
+=R4Dq
+-----END PGP SIGNATURE-----
+
+--k4f25fnPtRuIRUb3--
 
 
