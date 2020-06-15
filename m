@@ -6,67 +6,67 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A2CDC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 21:03:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A52F8C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 21:04:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C47442071A
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 21:03:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 63E152071A
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 21:04:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ULH0MW/X"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C47442071A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GHwf3Vg/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63E152071A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35200 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36512 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkwGc-0005B2-0M
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 17:03:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33856)
+	id 1jkwHn-0005k9-D6
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 17:04:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33694)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jkvub-0003RR-VN
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 16:40:58 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35513
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jkvuS-0003H0-L2
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 16:40:48 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22516
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jkvuU-0000ew-Iy
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 16:40:57 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jkvuN-0000ak-EZ
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 16:40:48 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592253649;
+ s=mimecast20190719; t=1592253642;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=xie/mk2NJJRoGEwRrJkZdsJ3ctHk2ROaeRoha3iDDck=;
- b=ULH0MW/XbfjNzGVIBICTjayCutyxoFDBUf5DdM1kL55ZnvTbUUjGj33WLgcBLHoEOFXFSy
- Jbuz7AyAWyOgMoJbBWWpljRlMliLdztbAaIKU0MEn5fZKeK+J9R9G+ym/92zUL6f0Ifvb0
- YTTw8TGbQdVb5PRmbqlOajFECCZFlZw=
+ bh=AC5SNiXFbWI1iL/S4GoghsC4HftbQRLAzL2pn9XcazM=;
+ b=GHwf3Vg/RW92yilGS2z6M1EFQPknR2i2e8cI9j+FUjOQbVErLQKpVd4LPKbBF7dHJRF0c6
+ FeO7f7C0LC7U25VSVoSUmAybHjf36sKUkQ+o3w6lrenwCZjcZCl2/Gnxp/a5LxJH2hmULH
+ XZTJggQNYc5ZwPka2G0287MP3GlkAss=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-334-UEyC7oidM1OI3f3bYPjV_w-1; Mon, 15 Jun 2020 16:40:48 -0400
-X-MC-Unique: UEyC7oidM1OI3f3bYPjV_w-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-256-g9aIQAWlPyq4rY7owsWjBQ-1; Mon, 15 Jun 2020 16:40:41 -0400
+X-MC-Unique: g9aIQAWlPyq4rY7owsWjBQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3B6EA100CCC7
- for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 20:40:47 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 484BB87340D
+ for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 20:40:40 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
  [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 911B89033C;
- Mon, 15 Jun 2020 20:40:46 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id AA3FB7FE92;
+ Mon, 15 Jun 2020 20:40:36 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id D8DE01132DDD; Mon, 15 Jun 2020 22:40:08 +0200 (CEST)
+ id AD6511135259; Mon, 15 Jun 2020 22:40:08 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 52/84] usb: New usb_new(), usb_realize_and_unref()
-Date: Mon, 15 Jun 2020 22:39:36 +0200
-Message-Id: <20200615204008.3069956-53-armbru@redhat.com>
+Subject: [PULL 40/84] hw/ppc: Eliminate two superfluous QOM casts
+Date: Mon, 15 Jun 2020 22:39:24 +0200
+Message-Id: <20200615204008.3069956-41-armbru@redhat.com>
 In-Reply-To: <20200615204008.3069956-1-armbru@redhat.com>
 References: <20200615204008.3069956-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
@@ -96,65 +96,65 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Paolo Bonzini <pbonzini@redhat.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>
+ "Michael S . Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I'm converting from qdev_create()/qdev_init_nofail() to
-qdev_new()/qdev_realize_and_unref(); recent commit "qdev: New
-qdev_new(), qdev_realize(), etc." explains why.
-
-USB devices use qdev_create() through usb_create().
-
-Provide usb_new() and usb_realize_and_unref() for converting USB
-devices.
-
-Cc: Gerd Hoffmann <kraxel@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <20200610053247.1583243-27-armbru@redhat.com>
+Message-Id: <20200610053247.1583243-15-armbru@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- include/hw/usb.h |  2 ++
- hw/usb/bus.c     | 10 ++++++++++
- 2 files changed, 12 insertions(+)
+ hw/ppc/mac_newworld.c | 4 ++--
+ hw/ppc/mac_oldworld.c | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/include/hw/usb.h b/include/hw/usb.h
-index e2128c7c45..1cc0ba0fed 100644
---- a/include/hw/usb.h
-+++ b/include/hw/usb.h
-@@ -504,6 +504,8 @@ USBBus *usb_bus_find(int busnr);
- void usb_legacy_register(const char *typename, const char *usbdevice_name,
-                          USBDevice *(*usbdevice_init)(USBBus *bus,
-                                                       const char *params));
-+USBDevice *usb_new(const char *name);
-+bool usb_realize_and_unref(USBDevice *dev, USBBus *bus, Error **errp);
- USBDevice *usb_create(USBBus *bus, const char *name);
- USBDevice *usb_create_simple(USBBus *bus, const char *name);
- USBDevice *usbdevice_create(const char *cmdline);
-diff --git a/hw/usb/bus.c b/hw/usb/bus.c
-index d28eff1b5c..6b0d9f9e4d 100644
---- a/hw/usb/bus.c
-+++ b/hw/usb/bus.c
-@@ -314,6 +314,16 @@ void usb_legacy_register(const char *typename, const char *usbdevice_name,
-     }
- }
+diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
+index 69281d7834..2d069dcc59 100644
+--- a/hw/ppc/mac_newworld.c
++++ b/hw/ppc/mac_newworld.c
+@@ -122,7 +122,7 @@ static void ppc_core99_init(MachineState *machine)
+     long kernel_size, initrd_size;
+     UNINHostState *uninorth_pci;
+     PCIBus *pci_bus;
+-    NewWorldMacIOState *macio;
++    PCIDevice *macio;
+     bool has_pmu, has_adb;
+     MACIOIDEState *macio_ide;
+     BusState *adb_bus;
+@@ -375,7 +375,7 @@ static void ppc_core99_init(MachineState *machine)
+     pci_bus = PCI_HOST_BRIDGE(uninorth_pci)->bus;
  
-+USBDevice *usb_new(const char *name)
-+{
-+    return USB_DEVICE(qdev_new(name));
-+}
-+
-+bool usb_realize_and_unref(USBDevice *dev, USBBus *bus, Error **errp)
-+{
-+    return qdev_realize_and_unref(&dev->qdev, &bus->qbus, errp);
-+}
-+
- USBDevice *usb_create(USBBus *bus, const char *name)
- {
-     DeviceState *dev;
+     /* MacIO */
+-    macio = NEWWORLD_MACIO(pci_create(pci_bus, -1, TYPE_NEWWORLD_MACIO));
++    macio = pci_create(pci_bus, -1, TYPE_NEWWORLD_MACIO);
+     dev = DEVICE(macio);
+     qdev_prop_set_uint64(dev, "frequency", tbfreq);
+     qdev_prop_set_bit(dev, "has-pmu", has_pmu);
+diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
+index cfc2eae1d9..f73ec5f3a9 100644
+--- a/hw/ppc/mac_oldworld.c
++++ b/hw/ppc/mac_oldworld.c
+@@ -94,7 +94,7 @@ static void ppc_heathrow_init(MachineState *machine)
+     uint32_t kernel_base, initrd_base, cmdline_base = 0;
+     int32_t kernel_size, initrd_size;
+     PCIBus *pci_bus;
+-    OldWorldMacIOState *macio;
++    PCIDevice *macio;
+     MACIOIDEState *macio_ide;
+     SysBusDevice *s;
+     DeviceState *dev, *pic_dev;
+@@ -278,7 +278,7 @@ static void ppc_heathrow_init(MachineState *machine)
+     ide_drive_get(hd, ARRAY_SIZE(hd));
+ 
+     /* MacIO */
+-    macio = OLDWORLD_MACIO(pci_create(pci_bus, -1, TYPE_OLDWORLD_MACIO));
++    macio = pci_create(pci_bus, -1, TYPE_OLDWORLD_MACIO);
+     dev = DEVICE(macio);
+     qdev_prop_set_uint64(dev, "frequency", tbfreq);
+     object_property_set_link(OBJECT(macio), OBJECT(pic_dev), "pic",
 -- 
 2.26.2
 
