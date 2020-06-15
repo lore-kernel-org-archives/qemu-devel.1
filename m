@@ -2,93 +2,122 @@ Return-Path: <SRS0=tJVC=74=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DAA7C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 12:36:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 248ACC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 12:37:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 28F7F206D7
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 12:36:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E209D206D7
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 12:37:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hVJfiUQ6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28F7F206D7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="rXqrw+YM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E209D206D7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=openvz.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58886 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32784 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkoLR-0004sK-Fa
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 08:36:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51566)
+	id 1jkoMN-0005lL-8H
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 08:37:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51670)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jkoKr-0004Ma-UM
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 08:35:33 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:59024
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jkoKp-0003Hu-2C
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 08:35:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592224529;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=m7MfCuOk/toxn5XgHfIlrrYOYm3Xjk/agti4gYah52U=;
- b=hVJfiUQ6yYK79NcZ1oUAu+5650lmT9ia41nSAtWYzDivfy3E+XltJOjAqFjn3cddg2XcrA
- VUyRKWNdgMbWQMa0Pw3R7oTxGykoVMwSDqldRwb37Xc+5SvggNqp5nyfVP3rEoetQ1jVAc
- fkQPZnb3BvNqfvwTd1IG1/wD2wbKX8Q=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-170-dgNKU14mPT2rgKnUrZBZCw-1; Mon, 15 Jun 2020 08:35:27 -0400
-X-MC-Unique: dgNKU14mPT2rgKnUrZBZCw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 317CF18585AF;
- Mon, 15 Jun 2020 12:35:26 +0000 (UTC)
-Received: from [10.36.114.197] (ovpn-114-197.ams2.redhat.com [10.36.114.197])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 642135C1C5;
- Mon, 15 Jun 2020 12:35:21 +0000 (UTC)
-Subject: Re: [PULL v2 20/58] bios-tables-test: Add Q35/TPM-TIS test
-To: Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
- <philmd@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
-References: <20200612141917.9446-1-mst@redhat.com>
- <20200612141917.9446-21-mst@redhat.com>
- <CAP+75-V7YX9Kw86konzTv=urYF_hi3ht5eWUtRqALJGZ-WLEDQ@mail.gmail.com>
- <8dbb3662-25b5-ba06-10fe-e3667bb62f6c@redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <84e25c05-1b06-9f9e-e0b3-1b777d56530c@redhat.com>
-Date: Mon, 15 Jun 2020 14:35:19 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
-MIME-Version: 1.0
-In-Reply-To: <8dbb3662-25b5-ba06-10fe-e3667bb62f6c@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+ (Exim 4.90_1) (envelope-from <den@virtuozzo.com>)
+ id 1jkoLa-00055O-Ue; Mon, 15 Jun 2020 08:36:19 -0400
+Received: from mail-am6eur05on2101.outbound.protection.outlook.com
+ ([40.107.22.101]:4929 helo=EUR05-AM6-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <den@virtuozzo.com>)
+ id 1jkoLW-0003RU-Pi; Mon, 15 Jun 2020 08:36:18 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=gYA73MLhzIdqrq9gVKVaT0hJ6/I95Zy54MSuItY4RnD4ygRFJmBDE4dl+qOIo79NyVnPvlrKP+oFqA4g6bbvDJ9jfyzVdERzE+fnEf/y3o/F8SmFDkSsg5KwPzCic2fQPKej9r4UdxXDz2T3PKq0gWkbhtXwkVu1l2nn2Ckb0IoLgljv9D7siUYghP7RnMJhNKMNDg9p3JFv/VD4wv71ezxhgF77DNhIA67Apsq7RNErCHufHRc1mX1xVZGX+guHhziwo59our2k3nnTLXWcBmlNLv7NuWH9y2Iwnjr/3uuq44W9APsG55PvrNCx107NStPzSpWHvnYwgpfcTArwkA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=/bt+/xDIsPBF56jj21/CH8jt5Y/RmOUZi+L436gd+SE=;
+ b=d+vSp6pBY1UulUrYf6uyGHHaN7my6ELScSUOK0Aokf3bdqU+7SUqOOrUdzyvvebGRYbEHhvbIulrcvNRWYiFhr4XVjeuZlcrCssYle3UPKv+cLaGInYaFif5akATEWNla56VPiGj5Jdl/jUoaKOQMBTyDypSz8UbjA20S2Cco/5MF5f4ndGumIvqKLaHBziv61ySb7ae56XlW6byuz713uaArbyfyjb6JmZ14fgHEiZ4w2t5ZLt4J7G8M7UJz56QP6M9Xuw/cIA9bMFBcEML1XRVzvTlzO+gAap8z8HyyCzHVYCpu2S0i4O69Xh/j0l8NiV03KDYSq0uW9my9b1Atg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none header.from=openvz.org;
+ dkim=pass header.d=openvz.org; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=/bt+/xDIsPBF56jj21/CH8jt5Y/RmOUZi+L436gd+SE=;
+ b=rXqrw+YMhkucqnZQYNucttu9ldQxX3I/d7YEJdI7NtMrGibXSp5iPTOuzFur4tE7ZFz3vkG/Xmkns1g+V2ERDuMG7UPvhpjgI9Xj1cNHI9Tr8xIOi9rTcWxbdQmfXhiTsSg7UhMlTmyzgK0B5omHt5L92mpgNZJQtyFut0BV4Pg=
+Authentication-Results: virtuozzo.com; dkim=none (message not signed)
+ header.d=none;virtuozzo.com; dmarc=none action=none header.from=openvz.org;
+Received: from AM6PR08MB4214.eurprd08.prod.outlook.com (2603:10a6:20b:8d::30)
+ by AM6PR08MB4469.eurprd08.prod.outlook.com (2603:10a6:20b:70::20)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3088.23; Mon, 15 Jun
+ 2020 12:36:10 +0000
+Received: from AM6PR08MB4214.eurprd08.prod.outlook.com
+ ([fe80::821:7596:cf7f:68f8]) by AM6PR08MB4214.eurprd08.prod.outlook.com
+ ([fe80::821:7596:cf7f:68f8%4]) with mapi id 15.20.3088.029; Mon, 15 Jun 2020
+ 12:36:10 +0000
+Subject: Re: [PATCH v3 0/4] block: seriously improve savevm performance
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+References: <20200611171143.21589-1-den@openvz.org>
+ <20200615121714.GJ2883@work-vm>
+From: "Denis V. Lunev" <den@openvz.org>
+Message-ID: <6931b77c-73ad-010a-daf3-8c7c99c20d10@openvz.org>
+Date: Mon, 15 Jun 2020 15:36:07 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
+In-Reply-To: <20200615121714.GJ2883@work-vm>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61;
- envelope-from=eric.auger@redhat.com; helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 01:12:36
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Language: en-US
+X-ClientProxiedBy: HE1PR0502CA0019.eurprd05.prod.outlook.com
+ (2603:10a6:3:e3::29) To AM6PR08MB4214.eurprd08.prod.outlook.com
+ (2603:10a6:20b:8d::30)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.1.81] (31.148.204.195) by
+ HE1PR0502CA0019.eurprd05.prod.outlook.com (2603:10a6:3:e3::29) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3088.21 via Frontend Transport; Mon, 15 Jun 2020 12:36:09 +0000
+X-Originating-IP: [31.148.204.195]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: d485be9f-7fc4-4b88-7c7a-08d81128aecc
+X-MS-TrafficTypeDiagnostic: AM6PR08MB4469:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM6PR08MB4469E0F7CCB24DBD8601DFC3B69C0@AM6PR08MB4469.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
+X-Forefront-PRVS: 04359FAD81
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: PWuKRKoGMYq5etInqJNRQL8kKNANP9cTOkJOD7QG/C8/JKNvA9oKfjVxBVLdh+wdQgbCOFINQktc3YuioykMTsvDGgwvw8vX/KEs/5NdX4t8o7+S9L2wOjMI7au6B16EtPdHhtyXNTZftCIy+35XMTxFWp4BzH8U02/CCK11j+eJtSpy+9rrO9lTbNByyKpDhCSY5zeIv0YsF+U2Ep1ekIDrw8hiZWoW0SXRqikm+mIQrw01DcUCkkQce6iOoebZpkeoxhyw5K8SX/FSfylGn3sQ7wQ2tHu/5GitqmdTRQ79BolgxQJaDTXt4eAxeL09nI2wfFO0LHgqUs22p6+1I35Lk+OAlFlwpWEzdRg00xTGSNEn2Rr+Q0F7VD/+7hHB
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM6PR08MB4214.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(366004)(376002)(136003)(346002)(39840400004)(396003)(2616005)(31686004)(66946007)(2906002)(8676002)(6486002)(6916009)(8936002)(36756003)(83380400001)(956004)(66556008)(66476007)(5660300002)(42882007)(31696002)(316002)(52116002)(83170400001)(53546011)(16526019)(4326008)(107886003)(186003)(54906003)(26005)(16576012)(478600001)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: 1r/ye2ASyiSpL/XTY5Lj12Pj4S7zNKSJUWg9QUqEwn+Onb73uSu4rHYv1WUHgN8JgLyWpOQpE/BeX7jhrObSfBtVOPwu4UzwQh/EwkscWPIo5s/Qv8vFJ0nKEe2rmenbFTgHNkHYpCHMy+1OCm0fCYlfDmLP+BAmQF5lPr5QmNbp2LHVWu0bzXfcI2BObC11G3l+I0P0V9C9HTw5syxP0WjeD5gy6uz4Vs3RD66i43D/hM4JcjSMV4esSJdHdLp/9swJnSvMxFVkI3pjdSMSV16Vx5BeaBAn601PMY1oxAAju5rBrF9UzM0MXONfW59IqbhKpFAOxQxEfI1Crp0/C9UQItyI2DNz813CV0v6xVfiTMdIxpvg5dv8168bJghRNzEtr+0TIY0zUuF1LUadpM2eejrcp2qJa0bBERnQLOViP1KE9I0vFWqxCTs9QlL+L8YvDalgi4nVfawdc5dsZrPYLs+OqXjnyOfxkVH2WBSFkVchJMlgcv/hLHRfhHRJ
+X-OriginatorOrg: openvz.org
+X-MS-Exchange-CrossTenant-Network-Message-Id: d485be9f-7fc4-4b88-7c7a-08d81128aecc
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jun 2020 12:36:10.3445 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: K4EGLs+FlTh7bp7JXb0beY90Ox3ZhohJT5bN5HEnqFDTDz+7V5UhwJjrx16auLiPEVHytImLhsDKyN2lXnb4Ng==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4469
+Received-SPF: pass client-ip=40.107.22.101; envelope-from=den@virtuozzo.com;
+ helo=EUR05-AM6-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 08:36:11
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -26
+X-Spam_score: -2.7
+X-Spam_bar: --
+X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,100 +130,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Igor Mammedov <imammedo@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org,
+ Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Denis Plotnikov <dplotnikov@virtuozzo.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Philippe, Thomas,
-
-On 6/15/20 12:22 PM, Thomas Huth wrote:
-> On 15/06/2020 12.02, Philippe Mathieu-Daudé wrote:
->> On Fri, Jun 12, 2020 at 5:00 PM Michael S. Tsirkin <mst@redhat.com> wrote:
->>>
->>> From: Eric Auger <eric.auger@redhat.com>
->>>
->>> Test tables specific to the TPM-TIS instantiation.
->>> The TPM2 is added in the framework. Also the DSDT
->>> is updated with the TPM. The new function should be
->>> be usable for CRB as well, later one.
->>>
->>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>>
->>> Message-Id: <20200609125409.24179-5-eric.auger@redhat.com>
->>> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
->>> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->>> ---
->>>  tests/qtest/bios-tables-test.c | 58 ++++++++++++++++++++++++++++++++++
->>>  tests/qtest/Makefile.include   |  1 +
->>>  2 files changed, 59 insertions(+)
->>>
->>> diff --git a/tests/qtest/bios-tables-test.c b/tests/qtest/bios-tables-test.c
->>> index c9843829b3..53f104a9c5 100644
->>> --- a/tests/qtest/bios-tables-test.c
->>> +++ b/tests/qtest/bios-tables-test.c
->>> @@ -57,6 +57,9 @@
->>>  #include "qemu/bitmap.h"
->>>  #include "acpi-utils.h"
->>>  #include "boot-sector.h"
->>> +#include "tpm-emu.h"
->>> +#include "hw/acpi/tpm.h"
->>> +
->>>
->>>  #define MACHINE_PC "pc"
->>>  #define MACHINE_Q35 "q35"
->>> @@ -874,6 +877,60 @@ static void test_acpi_piix4_tcg_numamem(void)
->>>      free_test_data(&data);
->>>  }
->>>
->>> +uint64_t tpm_tis_base_addr;
->>> +
->>> +static void test_acpi_tcg_tpm(const char *machine, const char *tpm_if,
->>> +                              uint64_t base)
->>> +{
->>> +    gchar *tmp_dir_name = g_strdup_printf("qemu-test_acpi_%s_tcg_%s.XXXXXX",
->>> +                                          machine, tpm_if);
->>> +    char *tmp_path = g_dir_make_tmp(tmp_dir_name, NULL);
->>> +    TestState test;
->>> +    test_data data;
->>> +    GThread *thread;
->>> +    char *args, *variant = g_strdup_printf(".%s", tpm_if);
->>> +
->>> +    tpm_tis_base_addr = base;
->>> +
->>> +    module_call_init(MODULE_INIT_QOM);
->>> +
->>> +    test.addr = g_new0(SocketAddress, 1);
->>> +    test.addr->type = SOCKET_ADDRESS_TYPE_UNIX;
->>> +    test.addr->u.q_unix.path = g_build_filename(tmp_path, "sock", NULL);
->>> +    g_mutex_init(&test.data_mutex);
->>> +    g_cond_init(&test.data_cond);
->>> +    test.data_cond_signal = false;
->>> +
->>> +    thread = g_thread_new(NULL, tpm_emu_ctrl_thread, &test);
->>> +    tpm_emu_test_wait_cond(&test);
->>> +
->>> +    memset(&data, 0, sizeof(data));
->>> +    data.machine = machine;
->>> +    data.variant = variant;
->>> +
->>> +    args = g_strdup_printf(
->>> +        " -chardev socket,id=chr,path=%s"
->>> +        " -tpmdev emulator,id=dev,chardev=chr"
+On 6/15/20 3:17 PM, Dr. David Alan Gilbert wrote:
+> * Denis V. Lunev (den@openvz.org) wrote:
+>> This series do standard basic things:
+>> - it creates intermediate buffer for all writes from QEMU migration code
+>>   to QCOW2 image,
+>> - this buffer is sent to disk asynchronously, allowing several writes to
+>>   run in parallel.
 >>
->> This test makes our CI fail:
->> https://gitlab.com/qemu-project/qemu/-/jobs/593586369#L3466
-> 
-> Right. The problem seems to occur as soon as you run "configure" with
-> "--disable-tpm" ... I think you need some "#ifdef CONFIG_TPM" here?
-Thank you. I will respin asap.
+>> In general, migration code is fantastically inefficent (by observation),
+>> buffers are not aligned and sent with arbitrary pieces, a lot of time
+>> less than 100 bytes at a chunk, which results in read-modify-write
+>> operations with non-cached operations. It should also be noted that all
+>> operations are performed into unallocated image blocks, which also suffer
+>> due to partial writes to such new clusters.
+> It surprises me a little that you're not benefiting from the buffer
+> internal to qemu-file.c
+>
+> Dave
+There are a lot of problems with this buffer:
 
-Eric
-> 
->  Thomas
-> 
-> 
+Flushes to block driver state are performed in the abstract places,
+pushing
+  a) small IO
+  b) non-aligned IO both to
+       1) page size
+       2) cluster size
+It should also be noted that buffer in QEMU file is quite small and
+all IO operations with it are synchronous. IO, like ethernet, wants
+good queues.
 
+The difference is on the table.
+
+Den
 
