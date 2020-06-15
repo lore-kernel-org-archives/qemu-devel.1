@@ -6,79 +6,80 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B387C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 10:41:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 391FDC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 10:42:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2AE4520679
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 10:41:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E42BE20663
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 10:42:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jUu8Qqov"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2AE4520679
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hXOfvp8M"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E42BE20663
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40340 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43576 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkmYN-0007W6-CS
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 06:41:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52524)
+	id 1jkmZu-0000UN-3z
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 06:42:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52534)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jkmU0-0000xz-8m
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 06:36:52 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42157
- helo=us-smtp-1.mimecast.com)
+ id 1jkmU2-00013J-AC
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 06:36:54 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:23053
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jkmTy-0007SS-4o
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 06:36:51 -0400
+ id 1jkmTz-0007Sf-Be
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 06:36:53 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592217409;
+ s=mimecast20190719; t=1592217410;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=wILdVeQQePVjwaoswacZyVPQPAG30iuleWLwrAprDyM=;
- b=jUu8QqovjmfwgJi8z5zvBurlCnErpQE7V4ijhm9oPTZc41H2BcpZ1Z0fWzkTPyqvNpvE9Z
- 2QU/ZTIAVOOKXmD+77ZATcV5hB3wMgHenMDJHQBaOQd7yJ1aT7jlj7i0fweu6Y8/+9dzpg
- 0iW7l8vLt6HHBVATwJ9XLjpqCyhKPIw=
+ bh=uSy78qr6Oe6o0jCPl0NKq4EI77Wz8aKk46+Qn6KdhTY=;
+ b=hXOfvp8Ma6+RAl59/yU7D5kAeCn0sxbXw/6KLR6je/BYsNRG9Ibrtkq3fs+Cf7+RcywVau
+ ZKCZXzqDNHzUHbfR9c3H461xIF7sw1UPkO5vwcHZEfgqLJv6ZMrDBlb8wen0ABcMQ09iSj
+ hpEn+ngyOqS2vNjdVvagW/xna1uExm8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-143-o-XHveDwMa-HcPuYlgeCsg-1; Mon, 15 Jun 2020 06:36:45 -0400
-X-MC-Unique: o-XHveDwMa-HcPuYlgeCsg-1
+ us-mta-41-OzvPZbZrMJGkXzv8GPjGqg-1; Mon, 15 Jun 2020 06:36:42 -0400
+X-MC-Unique: OzvPZbZrMJGkXzv8GPjGqg-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 44001106B243;
- Mon, 15 Jun 2020 10:36:44 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3948E18585AA;
+ Mon, 15 Jun 2020 10:36:41 +0000 (UTC)
 Received: from localhost.localdomain.com (unknown [10.36.110.57])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 155135D9CC;
- Mon, 15 Jun 2020 10:36:42 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5120A5D9CC;
+ Mon, 15 Jun 2020 10:36:37 +0000 (UTC)
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 4/5] test-crypto-secret: add 'secret_keyring' object tests.
-Date: Mon, 15 Jun 2020 11:36:32 +0100
-Message-Id: <20200615103633.300208-5-berrange@redhat.com>
+Subject: [PULL 2/5] crypto/secret: move main logic from 'secret' to
+ 'secret_common'.
+Date: Mon, 15 Jun 2020 11:36:30 +0100
+Message-Id: <20200615103633.300208-3-berrange@redhat.com>
 In-Reply-To: <20200615103633.300208-1-berrange@redhat.com>
 References: <20200615103633.300208-1-berrange@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=berrange@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 01:17:36
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=berrange@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 01:43:27
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,264 +100,976 @@ Sender: "Qemu-devel"
 
 From: Alexey Krasikov <alex-krasikov@yandex-team.ru>
 
-Add tests:
-  test_secret_keyring_good;
-  test_secret_keyring_revoked_key;
-  test_secret_keyring_expired_key;
-  test_secret_keyring_bad_serial_key;
-  test_secret_keyring_bad_key_access_right;
-
-Added tests require libkeyutils. The absence of this library is not
-critical, because these tests will be skipped in this case.
+Create base class 'common secret'. Move common data and logic from
+'secret' to 'common_secret' class. This allowed adding abstraction layer
+for easier adding new 'secret' objects in future.
+Convert 'secret' class to child from basic 'secret_common' with 'data'
+and 'file' properties.
 
 Signed-off-by: Alexey Krasikov <alex-krasikov@yandex-team.ru>
 Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
 ---
- configure                  |  24 ++++++
- tests/Makefile.include     |   4 +
- tests/test-crypto-secret.c | 158 +++++++++++++++++++++++++++++++++++++
- 3 files changed, 186 insertions(+)
+ crypto/Makefile.objs           |   1 +
+ crypto/secret.c                | 347 +---------------------------
+ crypto/secret_common.c         | 403 +++++++++++++++++++++++++++++++++
+ include/crypto/secret.h        |  20 +-
+ include/crypto/secret_common.h |  68 ++++++
+ 5 files changed, 482 insertions(+), 357 deletions(-)
+ create mode 100644 crypto/secret_common.c
+ create mode 100644 include/crypto/secret_common.h
 
-diff --git a/configure b/configure
-index 3fbb61905a..07202acb9e 100755
---- a/configure
-+++ b/configure
-@@ -6330,6 +6330,27 @@ but not implemented on your system"
-     fi
- fi
+diff --git a/crypto/Makefile.objs b/crypto/Makefile.objs
+index cdee92b4e5..110dec1b87 100644
+--- a/crypto/Makefile.objs
++++ b/crypto/Makefile.objs
+@@ -18,6 +18,7 @@ crypto-obj-y += tlscredsanon.o
+ crypto-obj-y += tlscredspsk.o
+ crypto-obj-y += tlscredsx509.o
+ crypto-obj-y += tlssession.o
++crypto-obj-y += secret_common.o
+ crypto-obj-y += secret.o
+ crypto-obj-y += pbkdf.o
+ crypto-obj-$(CONFIG_NETTLE) += pbkdf-nettle.o
+diff --git a/crypto/secret.c b/crypto/secret.c
+index 3107aecb47..3447e2f64b 100644
+--- a/crypto/secret.c
++++ b/crypto/secret.c
+@@ -20,16 +20,14 @@
  
-+##########################################
-+# check for usable keyutils.h
-+
-+if test "$linux" = "yes" ; then
-+
-+    have_keyutils=no
-+    cat > $TMPC << EOF
-+#include <errno.h>
-+#include <asm/unistd.h>
-+#include <unistd.h>
-+#include <sys/types.h>
-+#include <keyutils.h>
-+int main(void) {
-+    return request_key("user", NULL, NULL, 0);
-+}
-+EOF
-+    if compile_prog "" "-lkeyutils"; then
-+        have_keyutils=yes
-+    fi
-+fi
-+
- 
- ##########################################
- # End of CC checks
-@@ -7702,6 +7723,9 @@ fi
- 
- if test "$secret_keyring" = "yes" ; then
-   echo "CONFIG_SECRET_KEYRING=y" >> $config_host_mak
-+  if test "$have_keyutils" = "yes" ; then
-+    echo "CONFIG_TEST_SECRET_KEYRING=y" >> $config_host_mak
-+  fi
- fi
- 
- if test "$tcg_interpreter" = "yes"; then
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index c2397de8ed..5607c7290d 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -540,6 +540,10 @@ tests/benchmark-crypto-cipher$(EXESUF): tests/benchmark-crypto-cipher.o $(test-c
- tests/test-crypto-secret$(EXESUF): tests/test-crypto-secret.o $(test-crypto-obj-y)
- tests/test-crypto-xts$(EXESUF): tests/test-crypto-xts.o $(test-crypto-obj-y)
- 
-+ifeq ($(CONFIG_TEST_SECRET_KEYRING),y)
-+tests/test-crypto-secret.o-libs := -lkeyutils
-+endif
-+
- tests/crypto-tls-x509-helpers.o-cflags := $(TASN1_CFLAGS)
- tests/crypto-tls-x509-helpers.o-libs := $(TASN1_LIBS)
- tests/pkix_asn1_tab.o-cflags := $(TASN1_CFLAGS)
-diff --git a/tests/test-crypto-secret.c b/tests/test-crypto-secret.c
-index 13fc6c4c75..603a093f10 100644
---- a/tests/test-crypto-secret.c
-+++ b/tests/test-crypto-secret.c
-@@ -24,6 +24,10 @@
+ #include "qemu/osdep.h"
  #include "crypto/secret.h"
+-#include "crypto/cipher.h"
  #include "qapi/error.h"
+ #include "qom/object_interfaces.h"
+-#include "qemu/base64.h"
  #include "qemu/module.h"
-+#ifdef CONFIG_TEST_SECRET_KEYRING
-+#include "crypto/secret_keyring.h"
-+#include <keyutils.h>
-+#endif
+ #include "trace.h"
  
- static void test_secret_direct(void)
- {
-@@ -124,6 +128,147 @@ static void test_secret_indirect_emptyfile(void)
-     g_free(fname);
+ 
+ static void
+-qcrypto_secret_load_data(QCryptoSecret *secret,
++qcrypto_secret_load_data(QCryptoSecretCommon *sec_common,
+                          uint8_t **output,
+                          size_t *outputlen,
+                          Error **errp)
+@@ -38,6 +36,8 @@ qcrypto_secret_load_data(QCryptoSecret *secret,
+     size_t length = 0;
+     GError *gerr = NULL;
+ 
++    QCryptoSecret *secret = QCRYPTO_SECRET(sec_common);
++
+     *output = NULL;
+     *outputlen = 0;
+ 
+@@ -65,198 +65,6 @@ qcrypto_secret_load_data(QCryptoSecret *secret,
  }
  
-+#ifdef CONFIG_TEST_SECRET_KEYRING
-+
-+#define DESCRIPTION "qemu_test_secret"
-+#define PAYLOAD "Test Payload"
-+
-+
-+static void test_secret_keyring_good(void)
-+{
-+    char key_str[16];
-+    Object *sec;
-+    int32_t key = add_key("user", DESCRIPTION, PAYLOAD,
-+                          strlen(PAYLOAD), KEY_SPEC_PROCESS_KEYRING);
-+
-+    g_assert(key >= 0);
-+
-+    snprintf(key_str, sizeof(key_str), "0x%08x", key);
-+    sec = object_new_with_props(
-+        TYPE_QCRYPTO_SECRET_KEYRING,
-+        object_get_objects_root(),
-+        "sec0",
-+        &error_abort,
-+        "serial", key_str,
-+        NULL);
-+
-+    assert(0 <= keyctl_unlink(key, KEY_SPEC_PROCESS_KEYRING));
-+    char *pw = qcrypto_secret_lookup_as_utf8("sec0",
-+                                             &error_abort);
-+    g_assert_cmpstr(pw, ==, PAYLOAD);
-+
-+    object_unparent(sec);
-+    g_free(pw);
-+}
-+
-+
-+static void test_secret_keyring_revoked_key(void)
-+{
-+    char key_str[16];
-+    Object *sec;
-+    int32_t key = add_key("user", DESCRIPTION, PAYLOAD,
-+                          strlen(PAYLOAD), KEY_SPEC_PROCESS_KEYRING);
-+    g_assert(key >= 0);
-+    g_assert_false(keyctl_revoke(key));
-+
-+    snprintf(key_str, sizeof(key_str), "0x%08x", key);
-+    sec = object_new_with_props(
-+        TYPE_QCRYPTO_SECRET_KEYRING,
-+        object_get_objects_root(),
-+        "sec0",
-+        NULL,
-+        "serial", key_str,
-+        NULL);
-+
-+    g_assert(errno == EKEYREVOKED);
-+    g_assert(sec == NULL);
-+
-+    keyctl_unlink(key, KEY_SPEC_PROCESS_KEYRING);
-+}
-+
-+
-+static void test_secret_keyring_expired_key(void)
-+{
-+    char key_str[16];
-+    Object *sec;
-+    int32_t key = add_key("user", DESCRIPTION, PAYLOAD,
-+                          strlen(PAYLOAD), KEY_SPEC_PROCESS_KEYRING);
-+    g_assert(key >= 0);
-+    g_assert_false(keyctl_set_timeout(key, 1));
-+    sleep(1);
-+
-+    snprintf(key_str, sizeof(key_str), "0x%08x", key);
-+    sec = object_new_with_props(
-+        TYPE_QCRYPTO_SECRET_KEYRING,
-+        object_get_objects_root(),
-+        "sec0",
-+        NULL,
-+        "serial", key_str,
-+        NULL);
-+
-+    g_assert(errno == EKEYEXPIRED);
-+    g_assert(sec == NULL);
-+
-+    keyctl_unlink(key, KEY_SPEC_PROCESS_KEYRING);
-+}
-+
-+
-+static void test_secret_keyring_bad_serial_key(void)
-+{
-+    Object *sec;
-+
-+    sec = object_new_with_props(
-+        TYPE_QCRYPTO_SECRET_KEYRING,
-+        object_get_objects_root(),
-+        "sec0",
-+        NULL,
-+        "serial", "1",
-+        NULL);
-+
-+    g_assert(errno == ENOKEY);
-+    g_assert(sec == NULL);
-+}
-+
+ 
+-static void qcrypto_secret_decrypt(QCryptoSecret *secret,
+-                                   const uint8_t *input,
+-                                   size_t inputlen,
+-                                   uint8_t **output,
+-                                   size_t *outputlen,
+-                                   Error **errp)
+-{
+-    g_autofree uint8_t *key = NULL;
+-    g_autofree uint8_t *ciphertext = NULL;
+-    g_autofree uint8_t *iv = NULL;
+-    size_t keylen, ciphertextlen, ivlen;
+-    g_autoptr(QCryptoCipher) aes = NULL;
+-    g_autofree uint8_t *plaintext = NULL;
+-
+-    *output = NULL;
+-    *outputlen = 0;
+-
+-    if (qcrypto_secret_lookup(secret->keyid,
+-                              &key, &keylen,
+-                              errp) < 0) {
+-        return;
+-    }
+-
+-    if (keylen != 32) {
+-        error_setg(errp, "Key should be 32 bytes in length");
+-        return;
+-    }
+-
+-    if (!secret->iv) {
+-        error_setg(errp, "IV is required to decrypt secret");
+-        return;
+-    }
+-
+-    iv = qbase64_decode(secret->iv, -1, &ivlen, errp);
+-    if (!iv) {
+-        return;
+-    }
+-    if (ivlen != 16) {
+-        error_setg(errp, "IV should be 16 bytes in length not %zu",
+-                   ivlen);
+-        return;
+-    }
+-
+-    aes = qcrypto_cipher_new(QCRYPTO_CIPHER_ALG_AES_256,
+-                             QCRYPTO_CIPHER_MODE_CBC,
+-                             key, keylen,
+-                             errp);
+-    if (!aes) {
+-        return;
+-    }
+-
+-    if (qcrypto_cipher_setiv(aes, iv, ivlen, errp) < 0) {
+-        return;
+-    }
+-
+-    if (secret->format == QCRYPTO_SECRET_FORMAT_BASE64) {
+-        ciphertext = qbase64_decode((const gchar*)input,
+-                                    inputlen,
+-                                    &ciphertextlen,
+-                                    errp);
+-        if (!ciphertext) {
+-            return;
+-        }
+-        plaintext = g_new0(uint8_t, ciphertextlen + 1);
+-    } else {
+-        ciphertextlen = inputlen;
+-        plaintext = g_new0(uint8_t, inputlen + 1);
+-    }
+-    if (qcrypto_cipher_decrypt(aes,
+-                               ciphertext ? ciphertext : input,
+-                               plaintext,
+-                               ciphertextlen,
+-                               errp) < 0) {
+-        return;
+-    }
+-
+-    if (plaintext[ciphertextlen - 1] > 16 ||
+-        plaintext[ciphertextlen - 1] > ciphertextlen) {
+-        error_setg(errp, "Incorrect number of padding bytes (%d) "
+-                   "found on decrypted data",
+-                   (int)plaintext[ciphertextlen - 1]);
+-        return;
+-    }
+-
+-    /* Even though plaintext may contain arbitrary NUL
+-     * ensure it is explicitly NUL terminated.
+-     */
+-    ciphertextlen -= plaintext[ciphertextlen - 1];
+-    plaintext[ciphertextlen] = '\0';
+-
+-    *output = g_steal_pointer(&plaintext);
+-    *outputlen = ciphertextlen;
+-}
+-
+-
+-static void qcrypto_secret_decode(const uint8_t *input,
+-                                  size_t inputlen,
+-                                  uint8_t **output,
+-                                  size_t *outputlen,
+-                                  Error **errp)
+-{
+-    *output = qbase64_decode((const gchar*)input,
+-                             inputlen,
+-                             outputlen,
+-                             errp);
+-}
+-
+-
+-static void
+-qcrypto_secret_prop_set_loaded(Object *obj,
+-                               bool value,
+-                               Error **errp)
+-{
+-    QCryptoSecret *secret = QCRYPTO_SECRET(obj);
+-
+-    if (value) {
+-        Error *local_err = NULL;
+-        uint8_t *input = NULL;
+-        size_t inputlen = 0;
+-        uint8_t *output = NULL;
+-        size_t outputlen = 0;
+-
+-        qcrypto_secret_load_data(secret, &input, &inputlen, &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
+-            return;
+-        }
+-
+-        if (secret->keyid) {
+-            qcrypto_secret_decrypt(secret, input, inputlen,
+-                                   &output, &outputlen, &local_err);
+-            g_free(input);
+-            if (local_err) {
+-                error_propagate(errp, local_err);
+-                return;
+-            }
+-            input = output;
+-            inputlen = outputlen;
+-        } else {
+-            if (secret->format == QCRYPTO_SECRET_FORMAT_BASE64) {
+-                qcrypto_secret_decode(input, inputlen,
+-                                      &output, &outputlen, &local_err);
+-                g_free(input);
+-                if (local_err) {
+-                    error_propagate(errp, local_err);
+-                    return;
+-                }
+-                input = output;
+-                inputlen = outputlen;
+-            }
+-        }
+-
+-        secret->rawdata = input;
+-        secret->rawlen = inputlen;
+-    } else {
+-        g_free(secret->rawdata);
+-        secret->rawdata = NULL;
+-        secret->rawlen = 0;
+-    }
+-}
+-
+-
+-static bool
+-qcrypto_secret_prop_get_loaded(Object *obj,
+-                               Error **errp G_GNUC_UNUSED)
+-{
+-    QCryptoSecret *secret = QCRYPTO_SECRET(obj);
+-    return secret->rawdata != NULL;
+-}
+-
+-
+-static void
+-qcrypto_secret_prop_set_format(Object *obj,
+-                               int value,
+-                               Error **errp G_GNUC_UNUSED)
+-{
+-    QCryptoSecret *creds = QCRYPTO_SECRET(obj);
+-
+-    creds->format = value;
+-}
+-
+-
+-static int
+-qcrypto_secret_prop_get_format(Object *obj,
+-                               Error **errp G_GNUC_UNUSED)
+-{
+-    QCryptoSecret *creds = QCRYPTO_SECRET(obj);
+-
+-    return creds->format;
+-}
+-
+-
+ static void
+ qcrypto_secret_prop_set_data(Object *obj,
+                              const char *value,
+@@ -299,48 +107,6 @@ qcrypto_secret_prop_get_file(Object *obj,
+ }
+ 
+ 
+-static void
+-qcrypto_secret_prop_set_iv(Object *obj,
+-                           const char *value,
+-                           Error **errp)
+-{
+-    QCryptoSecret *secret = QCRYPTO_SECRET(obj);
+-
+-    g_free(secret->iv);
+-    secret->iv = g_strdup(value);
+-}
+-
+-
+-static char *
+-qcrypto_secret_prop_get_iv(Object *obj,
+-                           Error **errp)
+-{
+-    QCryptoSecret *secret = QCRYPTO_SECRET(obj);
+-    return g_strdup(secret->iv);
+-}
+-
+-
+-static void
+-qcrypto_secret_prop_set_keyid(Object *obj,
+-                              const char *value,
+-                              Error **errp)
+-{
+-    QCryptoSecret *secret = QCRYPTO_SECRET(obj);
+-
+-    g_free(secret->keyid);
+-    secret->keyid = g_strdup(value);
+-}
+-
+-
+-static char *
+-qcrypto_secret_prop_get_keyid(Object *obj,
+-                              Error **errp)
+-{
+-    QCryptoSecret *secret = QCRYPTO_SECRET(obj);
+-    return g_strdup(secret->keyid);
+-}
+-
+-
+ static void
+ qcrypto_secret_complete(UserCreatable *uc, Error **errp)
+ {
+@@ -353,129 +119,30 @@ qcrypto_secret_finalize(Object *obj)
+ {
+     QCryptoSecret *secret = QCRYPTO_SECRET(obj);
+ 
+-    g_free(secret->iv);
+     g_free(secret->file);
+-    g_free(secret->keyid);
+-    g_free(secret->rawdata);
+     g_free(secret->data);
+ }
+ 
+ static void
+ qcrypto_secret_class_init(ObjectClass *oc, void *data)
+ {
+-    UserCreatableClass *ucc = USER_CREATABLE_CLASS(oc);
++    QCryptoSecretCommonClass *sic = QCRYPTO_SECRET_COMMON_CLASS(oc);
++    sic->load_data = qcrypto_secret_load_data;
+ 
++    UserCreatableClass *ucc = USER_CREATABLE_CLASS(oc);
+     ucc->complete = qcrypto_secret_complete;
+ 
+-    object_class_property_add_bool(oc, "loaded",
+-                                   qcrypto_secret_prop_get_loaded,
+-                                   qcrypto_secret_prop_set_loaded);
+-    object_class_property_add_enum(oc, "format",
+-                                   "QCryptoSecretFormat",
+-                                   &QCryptoSecretFormat_lookup,
+-                                   qcrypto_secret_prop_get_format,
+-                                   qcrypto_secret_prop_set_format);
+     object_class_property_add_str(oc, "data",
+                                   qcrypto_secret_prop_get_data,
+                                   qcrypto_secret_prop_set_data);
+     object_class_property_add_str(oc, "file",
+                                   qcrypto_secret_prop_get_file,
+                                   qcrypto_secret_prop_set_file);
+-    object_class_property_add_str(oc, "keyid",
+-                                  qcrypto_secret_prop_get_keyid,
+-                                  qcrypto_secret_prop_set_keyid);
+-    object_class_property_add_str(oc, "iv",
+-                                  qcrypto_secret_prop_get_iv,
+-                                  qcrypto_secret_prop_set_iv);
+-}
+-
+-
+-int qcrypto_secret_lookup(const char *secretid,
+-                          uint8_t **data,
+-                          size_t *datalen,
+-                          Error **errp)
+-{
+-    Object *obj;
+-    QCryptoSecret *secret;
+-
+-    obj = object_resolve_path_component(
+-        object_get_objects_root(), secretid);
+-    if (!obj) {
+-        error_setg(errp, "No secret with id '%s'", secretid);
+-        return -1;
+-    }
+-
+-    secret = (QCryptoSecret *)
+-        object_dynamic_cast(obj,
+-                            TYPE_QCRYPTO_SECRET);
+-    if (!secret) {
+-        error_setg(errp, "Object with id '%s' is not a secret",
+-                   secretid);
+-        return -1;
+-    }
+-
+-    if (!secret->rawdata) {
+-        error_setg(errp, "Secret with id '%s' has no data",
+-                   secretid);
+-        return -1;
+-    }
+-
+-    *data = g_new0(uint8_t, secret->rawlen + 1);
+-    memcpy(*data, secret->rawdata, secret->rawlen);
+-    (*data)[secret->rawlen] = '\0';
+-    *datalen = secret->rawlen;
+-
+-    return 0;
+-}
+-
+-
+-char *qcrypto_secret_lookup_as_utf8(const char *secretid,
+-                                    Error **errp)
+-{
+-    uint8_t *data;
+-    size_t datalen;
+-
+-    if (qcrypto_secret_lookup(secretid,
+-                              &data,
+-                              &datalen,
+-                              errp) < 0) {
+-        return NULL;
+-    }
+-
+-    if (!g_utf8_validate((const gchar*)data, datalen, NULL)) {
+-        error_setg(errp,
+-                   "Data from secret %s is not valid UTF-8",
+-                   secretid);
+-        g_free(data);
+-        return NULL;
+-    }
+-
+-    return (char *)data;
+-}
+-
+-
+-char *qcrypto_secret_lookup_as_base64(const char *secretid,
+-                                      Error **errp)
+-{
+-    uint8_t *data;
+-    size_t datalen;
+-    char *ret;
+-
+-    if (qcrypto_secret_lookup(secretid,
+-                              &data,
+-                              &datalen,
+-                              errp) < 0) {
+-        return NULL;
+-    }
+-
+-    ret = g_base64_encode(data, datalen);
+-    g_free(data);
+-    return ret;
+ }
+ 
+ 
+ static const TypeInfo qcrypto_secret_info = {
+-    .parent = TYPE_OBJECT,
++    .parent = TYPE_QCRYPTO_SECRET_COMMON,
+     .name = TYPE_QCRYPTO_SECRET,
+     .instance_size = sizeof(QCryptoSecret),
+     .instance_finalize = qcrypto_secret_finalize,
+diff --git a/crypto/secret_common.c b/crypto/secret_common.c
+new file mode 100644
+index 0000000000..b03d530867
+--- /dev/null
++++ b/crypto/secret_common.c
+@@ -0,0 +1,403 @@
 +/*
-+ * TODO
-+ * test_secret_keyring_bad_key_access_right() is not working yet.
-+ * We don't know yet if this due a bug in the Linux kernel or
-+ * whether it's normal syscall behavior.
-+ * We've requested information from kernel maintainers.
-+ * See: <https://www.spinics.net/lists/keyrings/index.html>
-+ * Thread: 'security/keys: remove possessor verify after key permission check'
++ * QEMU crypto secret support
++ *
++ * Copyright (c) 2015 Red Hat, Inc.
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
++ *
 + */
 +
-+static void test_secret_keyring_bad_key_access_right(void)
++#include "qemu/osdep.h"
++#include "crypto/secret_common.h"
++#include "crypto/cipher.h"
++#include "qapi/error.h"
++#include "qom/object_interfaces.h"
++#include "qemu/base64.h"
++#include "qemu/module.h"
++#include "trace.h"
++
++
++static void qcrypto_secret_decrypt(QCryptoSecretCommon *secret,
++                                   const uint8_t *input,
++                                   size_t inputlen,
++                                   uint8_t **output,
++                                   size_t *outputlen,
++                                   Error **errp)
 +{
-+    char key_str[16];
-+    Object *sec;
++    g_autofree uint8_t *iv = NULL;
++    g_autofree uint8_t *key = NULL;
++    g_autofree uint8_t *ciphertext = NULL;
++    size_t keylen, ciphertextlen, ivlen;
++    g_autoptr(QCryptoCipher) aes = NULL;
++    g_autofree uint8_t *plaintext = NULL;
 +
-+    g_test_skip("TODO: Need responce from Linux kernel maintainers");
-+    return;
++    *output = NULL;
++    *outputlen = 0;
 +
-+    int32_t key = add_key("user", DESCRIPTION, PAYLOAD,
-+                          strlen(PAYLOAD), KEY_SPEC_PROCESS_KEYRING);
-+    g_assert(key >= 0);
-+    g_assert_false(keyctl_setperm(key, KEY_POS_ALL & (~KEY_POS_READ)));
++    if (qcrypto_secret_lookup(secret->keyid,
++                              &key, &keylen,
++                              errp) < 0) {
++        return;
++    }
 +
-+    snprintf(key_str, sizeof(key_str), "0x%08x", key);
++    if (keylen != 32) {
++        error_setg(errp, "Key should be 32 bytes in length");
++        return;
++    }
 +
-+    sec = object_new_with_props(
-+        TYPE_QCRYPTO_SECRET_KEYRING,
-+        object_get_objects_root(),
-+        "sec0",
-+        NULL,
-+        "serial", key_str,
-+        NULL);
++    if (!secret->iv) {
++        error_setg(errp, "IV is required to decrypt secret");
++        return;
++    }
 +
-+    g_assert(errno == EACCES);
-+    g_assert(sec == NULL);
++    iv = qbase64_decode(secret->iv, -1, &ivlen, errp);
++    if (!iv) {
++        return;
++    }
++    if (ivlen != 16) {
++        error_setg(errp, "IV should be 16 bytes in length not %zu",
++                   ivlen);
++        return;
++    }
 +
-+    keyctl_unlink(key, KEY_SPEC_PROCESS_KEYRING);
++    aes = qcrypto_cipher_new(QCRYPTO_CIPHER_ALG_AES_256,
++                             QCRYPTO_CIPHER_MODE_CBC,
++                             key, keylen,
++                             errp);
++    if (!aes) {
++        return;
++    }
++
++    if (qcrypto_cipher_setiv(aes, iv, ivlen, errp) < 0) {
++        return;
++    }
++
++    if (secret->format == QCRYPTO_SECRET_FORMAT_BASE64) {
++        ciphertext = qbase64_decode((const gchar *)input,
++                                    inputlen,
++                                    &ciphertextlen,
++                                    errp);
++        if (!ciphertext) {
++            return;
++        }
++        plaintext = g_new0(uint8_t, ciphertextlen + 1);
++    } else {
++        ciphertextlen = inputlen;
++        plaintext = g_new0(uint8_t, inputlen + 1);
++    }
++    if (qcrypto_cipher_decrypt(aes,
++                               ciphertext ? ciphertext : input,
++                               plaintext,
++                               ciphertextlen,
++                               errp) < 0) {
++        return;
++    }
++
++    if (plaintext[ciphertextlen - 1] > 16 ||
++        plaintext[ciphertextlen - 1] > ciphertextlen) {
++        error_setg(errp, "Incorrect number of padding bytes (%d) "
++                   "found on decrypted data",
++                   (int)plaintext[ciphertextlen - 1]);
++        return;
++    }
++
++    /*
++     *  Even though plaintext may contain arbitrary NUL
++     * ensure it is explicitly NUL terminated.
++     */
++    ciphertextlen -= plaintext[ciphertextlen - 1];
++    plaintext[ciphertextlen] = '\0';
++
++    *output = g_steal_pointer(&plaintext);
++    *outputlen = ciphertextlen;
 +}
 +
-+#endif /* CONFIG_TEST_SECRET_KEYRING */
- 
- static void test_secret_noconv_base64_good(void)
- {
-@@ -426,6 +571,19 @@ int main(int argc, char **argv)
-     g_test_add_func("/crypto/secret/indirect/emptyfile",
-                     test_secret_indirect_emptyfile);
- 
-+#ifdef CONFIG_TEST_SECRET_KEYRING
-+    g_test_add_func("/crypto/secret/keyring/good",
-+                    test_secret_keyring_good);
-+    g_test_add_func("/crypto/secret/keyring/revoked_key",
-+                    test_secret_keyring_revoked_key);
-+    g_test_add_func("/crypto/secret/keyring/expired_key",
-+                    test_secret_keyring_expired_key);
-+    g_test_add_func("/crypto/secret/keyring/bad_serial_key",
-+                    test_secret_keyring_bad_serial_key);
-+    g_test_add_func("/crypto/secret/keyring/bad_key_access_right",
-+                    test_secret_keyring_bad_key_access_right);
-+#endif /* CONFIG_TEST_SECRET_KEYRING */
 +
-     g_test_add_func("/crypto/secret/noconv/base64/good",
-                     test_secret_noconv_base64_good);
-     g_test_add_func("/crypto/secret/noconv/base64/bad",
++static void qcrypto_secret_decode(const uint8_t *input,
++                                  size_t inputlen,
++                                  uint8_t **output,
++                                  size_t *outputlen,
++                                  Error **errp)
++{
++    *output = qbase64_decode((const gchar *)input,
++                             inputlen,
++                             outputlen,
++                             errp);
++}
++
++
++static void
++qcrypto_secret_prop_set_loaded(Object *obj,
++                               bool value,
++                               Error **errp)
++{
++    QCryptoSecretCommon *secret = QCRYPTO_SECRET_COMMON(obj);
++    QCryptoSecretCommonClass *sec_class
++                                = QCRYPTO_SECRET_COMMON_GET_CLASS(obj);
++
++    if (value) {
++        Error *local_err = NULL;
++        uint8_t *input = NULL;
++        size_t inputlen = 0;
++        uint8_t *output = NULL;
++        size_t outputlen = 0;
++
++        if (sec_class->load_data) {
++            sec_class->load_data(secret, &input, &inputlen, &local_err);
++            if (local_err) {
++                error_propagate(errp, local_err);
++                return;
++            }
++        } else {
++            error_setg(errp, "%s provides no 'load_data' method'",
++                             object_get_typename(obj));
++            return;
++        }
++
++        if (secret->keyid) {
++            qcrypto_secret_decrypt(secret, input, inputlen,
++                                   &output, &outputlen, &local_err);
++            g_free(input);
++            if (local_err) {
++                error_propagate(errp, local_err);
++                return;
++            }
++            input = output;
++            inputlen = outputlen;
++        } else {
++            if (secret->format == QCRYPTO_SECRET_FORMAT_BASE64) {
++                qcrypto_secret_decode(input, inputlen,
++                                      &output, &outputlen, &local_err);
++                g_free(input);
++                if (local_err) {
++                    error_propagate(errp, local_err);
++                    return;
++                }
++                input = output;
++                inputlen = outputlen;
++            }
++        }
++
++        secret->rawdata = input;
++        secret->rawlen = inputlen;
++    } else {
++        g_free(secret->rawdata);
++        secret->rawlen = 0;
++    }
++}
++
++
++static bool
++qcrypto_secret_prop_get_loaded(Object *obj,
++                               Error **errp G_GNUC_UNUSED)
++{
++    QCryptoSecretCommon *secret = QCRYPTO_SECRET_COMMON(obj);
++    return secret->rawdata != NULL;
++}
++
++
++static void
++qcrypto_secret_prop_set_format(Object *obj,
++                               int value,
++                               Error **errp G_GNUC_UNUSED)
++{
++    QCryptoSecretCommon *creds = QCRYPTO_SECRET_COMMON(obj);
++    creds->format = value;
++}
++
++
++static int
++qcrypto_secret_prop_get_format(Object *obj,
++                               Error **errp G_GNUC_UNUSED)
++{
++    QCryptoSecretCommon *creds = QCRYPTO_SECRET_COMMON(obj);
++    return creds->format;
++}
++
++
++static void
++qcrypto_secret_prop_set_iv(Object *obj,
++                           const char *value,
++                           Error **errp)
++{
++    QCryptoSecretCommon *secret = QCRYPTO_SECRET_COMMON(obj);
++
++    g_free(secret->iv);
++    secret->iv = g_strdup(value);
++}
++
++
++static char *
++qcrypto_secret_prop_get_iv(Object *obj,
++                           Error **errp)
++{
++    QCryptoSecretCommon *secret = QCRYPTO_SECRET_COMMON(obj);
++    return g_strdup(secret->iv);
++}
++
++
++static void
++qcrypto_secret_prop_set_keyid(Object *obj,
++                              const char *value,
++                              Error **errp)
++{
++    QCryptoSecretCommon *secret = QCRYPTO_SECRET_COMMON(obj);
++
++    g_free(secret->keyid);
++    secret->keyid = g_strdup(value);
++}
++
++
++static char *
++qcrypto_secret_prop_get_keyid(Object *obj,
++                              Error **errp)
++{
++    QCryptoSecretCommon *secret = QCRYPTO_SECRET_COMMON(obj);
++    return g_strdup(secret->keyid);
++}
++
++
++static void
++qcrypto_secret_finalize(Object *obj)
++{
++    QCryptoSecretCommon *secret = QCRYPTO_SECRET_COMMON(obj);
++
++    g_free(secret->iv);
++    g_free(secret->keyid);
++    g_free(secret->rawdata);
++}
++
++static void
++qcrypto_secret_class_init(ObjectClass *oc, void *data)
++{
++    object_class_property_add_bool(oc, "loaded",
++                                   qcrypto_secret_prop_get_loaded,
++                                   qcrypto_secret_prop_set_loaded);
++    object_class_property_add_enum(oc, "format",
++                                   "QCryptoSecretFormat",
++                                   &QCryptoSecretFormat_lookup,
++                                   qcrypto_secret_prop_get_format,
++                                   qcrypto_secret_prop_set_format);
++    object_class_property_add_str(oc, "keyid",
++                                  qcrypto_secret_prop_get_keyid,
++                                  qcrypto_secret_prop_set_keyid);
++    object_class_property_add_str(oc, "iv",
++                                  qcrypto_secret_prop_get_iv,
++                                  qcrypto_secret_prop_set_iv);
++}
++
++
++int qcrypto_secret_lookup(const char *secretid,
++                          uint8_t **data,
++                          size_t *datalen,
++                          Error **errp)
++{
++    Object *obj;
++    QCryptoSecretCommon *secret;
++
++    obj = object_resolve_path_component(
++        object_get_objects_root(), secretid);
++    if (!obj) {
++        error_setg(errp, "No secret with id '%s'", secretid);
++        return -1;
++    }
++
++    secret = (QCryptoSecretCommon *)
++        object_dynamic_cast(obj,
++                            TYPE_QCRYPTO_SECRET_COMMON);
++    if (!secret) {
++        error_setg(errp, "Object with id '%s' is not a secret",
++                   secretid);
++        return -1;
++    }
++
++    if (!secret->rawdata) {
++        error_setg(errp, "Secret with id '%s' has no data",
++                   secretid);
++        return -1;
++    }
++
++    *data = g_new0(uint8_t, secret->rawlen + 1);
++    memcpy(*data, secret->rawdata, secret->rawlen);
++    (*data)[secret->rawlen] = '\0';
++    *datalen = secret->rawlen;
++
++    return 0;
++}
++
++
++char *qcrypto_secret_lookup_as_utf8(const char *secretid,
++                                    Error **errp)
++{
++    uint8_t *data;
++    size_t datalen;
++
++    if (qcrypto_secret_lookup(secretid,
++                              &data,
++                              &datalen,
++                              errp) < 0) {
++        return NULL;
++    }
++
++    if (!g_utf8_validate((const gchar *)data, datalen, NULL)) {
++        error_setg(errp,
++                   "Data from secret %s is not valid UTF-8",
++                   secretid);
++        g_free(data);
++        return NULL;
++    }
++
++    return (char *)data;
++}
++
++
++char *qcrypto_secret_lookup_as_base64(const char *secretid,
++                                      Error **errp)
++{
++    uint8_t *data;
++    size_t datalen;
++    char *ret;
++
++    if (qcrypto_secret_lookup(secretid,
++                              &data,
++                              &datalen,
++                              errp) < 0) {
++        return NULL;
++    }
++
++    ret = g_base64_encode(data, datalen);
++    g_free(data);
++    return ret;
++}
++
++
++static const TypeInfo qcrypto_secret_info = {
++    .parent = TYPE_OBJECT,
++    .name = TYPE_QCRYPTO_SECRET_COMMON,
++    .instance_size = sizeof(QCryptoSecretCommon),
++    .instance_finalize = qcrypto_secret_finalize,
++    .class_size = sizeof(QCryptoSecretCommonClass),
++    .class_init = qcrypto_secret_class_init,
++    .abstract = true,
++};
++
++
++static void
++qcrypto_secret_register_types(void)
++{
++    type_register_static(&qcrypto_secret_info);
++}
++
++
++type_init(qcrypto_secret_register_types);
+diff --git a/include/crypto/secret.h b/include/crypto/secret.h
+index 5e07e29bae..2deb461d2f 100644
+--- a/include/crypto/secret.h
++++ b/include/crypto/secret.h
+@@ -23,6 +23,7 @@
+ 
+ #include "qapi/qapi-types-crypto.h"
+ #include "qom/object.h"
++#include "crypto/secret_common.h"
+ 
+ #define TYPE_QCRYPTO_SECRET "secret"
+ #define QCRYPTO_SECRET(obj)                  \
+@@ -119,29 +120,14 @@ typedef struct QCryptoSecretClass QCryptoSecretClass;
+  */
+ 
+ struct QCryptoSecret {
+-    Object parent_obj;
+-    uint8_t *rawdata;
+-    size_t rawlen;
+-    QCryptoSecretFormat format;
++    QCryptoSecretCommon parent_obj;
+     char *data;
+     char *file;
+-    char *keyid;
+-    char *iv;
+ };
+ 
+ 
+ struct QCryptoSecretClass {
+-    ObjectClass parent_class;
++    QCryptoSecretCommonClass parent_class;
+ };
+ 
+-
+-extern int qcrypto_secret_lookup(const char *secretid,
+-                                 uint8_t **data,
+-                                 size_t *datalen,
+-                                 Error **errp);
+-extern char *qcrypto_secret_lookup_as_utf8(const char *secretid,
+-                                           Error **errp);
+-extern char *qcrypto_secret_lookup_as_base64(const char *secretid,
+-                                             Error **errp);
+-
+ #endif /* QCRYPTO_SECRET_H */
+diff --git a/include/crypto/secret_common.h b/include/crypto/secret_common.h
+new file mode 100644
+index 0000000000..980c02ab71
+--- /dev/null
++++ b/include/crypto/secret_common.h
+@@ -0,0 +1,68 @@
++/*
++ * QEMU crypto secret support
++ *
++ * Copyright (c) 2015 Red Hat, Inc.
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
++ *
++ */
++
++#ifndef QCRYPTO_SECRET_COMMON_H
++#define QCRYPTO_SECRET_COMMON_H
++
++#include "qapi/qapi-types-crypto.h"
++#include "qom/object.h"
++
++#define TYPE_QCRYPTO_SECRET_COMMON "secret_common"
++#define QCRYPTO_SECRET_COMMON(obj) \
++    OBJECT_CHECK(QCryptoSecretCommon, (obj), TYPE_QCRYPTO_SECRET_COMMON)
++#define QCRYPTO_SECRET_COMMON_CLASS(class) \
++    OBJECT_CLASS_CHECK(QCryptoSecretCommonClass, \
++                       (class), TYPE_QCRYPTO_SECRET_COMMON)
++#define QCRYPTO_SECRET_COMMON_GET_CLASS(obj) \
++    OBJECT_GET_CLASS(QCryptoSecretCommonClass, \
++                     (obj), TYPE_QCRYPTO_SECRET_COMMON)
++
++typedef struct QCryptoSecretCommon QCryptoSecretCommon;
++typedef struct QCryptoSecretCommonClass QCryptoSecretCommonClass;
++
++struct QCryptoSecretCommon {
++    Object parent_obj;
++    uint8_t *rawdata;
++    size_t rawlen;
++    QCryptoSecretFormat format;
++    char *keyid;
++    char *iv;
++};
++
++
++struct QCryptoSecretCommonClass {
++    ObjectClass parent_class;
++    void (*load_data)(QCryptoSecretCommon *secret,
++                      uint8_t **output,
++                      size_t *outputlen,
++                      Error **errp);
++};
++
++
++extern int qcrypto_secret_lookup(const char *secretid,
++                                 uint8_t **data,
++                                 size_t *datalen,
++                                 Error **errp);
++extern char *qcrypto_secret_lookup_as_utf8(const char *secretid,
++                                           Error **errp);
++extern char *qcrypto_secret_lookup_as_base64(const char *secretid,
++                                             Error **errp);
++
++#endif /* QCRYPTO_SECRET_COMMON_H */
 -- 
 2.26.2
 
