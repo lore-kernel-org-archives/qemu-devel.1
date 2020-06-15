@@ -8,76 +8,79 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED58AC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 19:30:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05FF3C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 19:32:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AFA9820756
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 19:30:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BB7DF20756
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 19:32:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rkvxBMQ/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AFA9820756
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uk+leVYg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB7DF20756
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35668 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41446 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkuoM-0005HG-Jy
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 15:30:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46158)
+	id 1jkups-0007k7-Pu
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 15:32:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45116)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jkunA-0003XI-RR
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 15:29:12 -0400
-Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:43869)
+ id 1jkuh6-0006gE-EY
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 15:22:56 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:40266)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jkun8-0004k3-Si
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 15:29:12 -0400
-Received: by mail-wr1-x42e.google.com with SMTP id l10so18308034wrr.10
- for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 12:29:10 -0700 (PDT)
+ id 1jkuh4-0003ql-L3
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 15:22:56 -0400
+Received: by mail-wm1-x341.google.com with SMTP id r15so714380wmh.5
+ for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 12:22:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=iOT3abOF46UPXGQRfbnjC3Lo/EoFkqjLy6wJfl0otQU=;
- b=rkvxBMQ/E6tIFpHDM2SY8YJc2P3Jq0I5kP4aea5b/LVceSkP3SWvuO72OYjG3izv8H
- YMKNodQ9jz2YiEJMhQKxYzGrYRjyHfxdw/TliOVZZFJGM2G9hDvIfzGDskvKAEWkJDEM
- 1J6VwHyVZRVvjLiDBnIw+QW747qfkwuBNbkPnqjZ8ufWeapCGWIUF0+C/jB9/M1dzceT
- esaWyYQ24AQivhOsILSfoFl/zv/6tbjquAhO+R1zdKsnPj+/pNDHyxCiobpxN3jLkZVE
- ObK7D/aiyAlgxpfPGguADImv7pW4LLZtygQ4aGjv/ywLGPxbakrXfM5feZFQuTi6foiu
- lEEQ==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=tLLt/ZA/CTjspHHz2mdlknpJpMmJgI69nogAOwAORyI=;
+ b=uk+leVYgZL0liYCpOEUE4xYW6UkzTxdSxJWRQOqzdKV6MZtq/VgK4a+6FRdTffRlSu
+ nw/aBSILV20C5YxHY6J0eTZl36CqASDlX51xferSoYJiZqou8memn88VIaubjRuvAzsU
+ l+b/aG0v/NF8G9HBuet0reBRAI/gG2VdWhDspKl37Epy6afcNDBANTB9NH2aR4lb6tmd
+ waq4m9fy6WipWDeaflXK6ujPunK1h4FuvkNp1K3AYHbC32baW2FdmTMsiy0sCqQU+oij
+ rKnD9Hhqb6xnSttb2NjkNtOeu8hwCCbhd7/x4kb04HUbXaxPwAGxivi1xN0PVcc0vjlJ
+ UlxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=iOT3abOF46UPXGQRfbnjC3Lo/EoFkqjLy6wJfl0otQU=;
- b=EP6861A8wp1hNdcLAITtuUNEywcbFJc6SokYsRxHQ2AkBiPn0FYCii1DhJZAMOaTyr
- H6R57d2JxalNYiYN6PH0GYu8ktMFvQH64JNfdTvUnxDhHpLmHZ0fzRCxpETC1Gu5wFWv
- DH/Hfs4W6VJwo6Xqce0+/o9peliE/2JJyTQ+pWshCnFs0Ai42PIrjsDJhN3C0ZK/ZDGB
- Y61TAehnXZxcPI/JLw3xN5U5+cjDqpm/yCQQ58lCXAbpJHAfrm4ak3sEadh09OCWpm/s
- r+76Q80g0vCZ6xLxPD9MBWa2DaxS2aQR2LFScHviUox5czK2hP04fifrpTUTyh1/Sm46
- 7zOA==
-X-Gm-Message-State: AOAM531WXJ8Gj5RfRTubd4mdM8En+AwKxbirtDhBWNp3s8Llcsfxc68y
- 17HbmuQoO8PWUgweNPJ5G4hKRck8
-X-Google-Smtp-Source: ABdhPJyMtxGXBVJsf0fhGpP537ScVdyJaXkSkvh3/lPWMwQnaFDs4gk7NHIHMiIByaGQY/2tEZIGGg==
-X-Received: by 2002:a05:6000:120b:: with SMTP id
- e11mr30540284wrx.107.1592249349321; 
- Mon, 15 Jun 2020 12:29:09 -0700 (PDT)
+ :references:mime-version:content-transfer-encoding;
+ bh=tLLt/ZA/CTjspHHz2mdlknpJpMmJgI69nogAOwAORyI=;
+ b=E+OGs0q7iUgZ9fZ0HCp3L2i36kDdISThxHMA3WSsF2CekefXKpwny93ZPoHgqAdoee
+ MGudaX2mJmA72Fs/yv+PlhNftq2tBoidwoTDuhcH7b59jTDOfV8AxluwWEupNZWz+Oi7
+ rV1oEHb/MwbLbWLxP2lMsK6SA1zbElDU3fu2mYosgkFkRHXtF7Th0fkyUO5MbUfY0Jdp
+ YMweOBUfv8dw+QsSm+aRcu/B2ukeEXMUOlnmuzw/zJ05jNt76c4Ld2MV2k6FjEYrSwv3
+ 7SL1SkFBPtGzGtEH/VGgCGh1bob5rp6dPRHR9FM4/Mr6Q/gPhey8WWcFcy4ACJVu6sp/
+ 6uKQ==
+X-Gm-Message-State: AOAM533Iemo8NpPt3sALyum48pCRal7fEfdY2PySFR4E752rleu0oFZv
+ 6nVtpQp9+w9LbmpmDDxCPxUf5IkX
+X-Google-Smtp-Source: ABdhPJx013tKEPzyyEYX1KCw9FCp2uJvf6PX/QOIjRfRZSz/S/SmW5am7g0g204W/KLqzgDO8M8KTA==
+X-Received: by 2002:a1c:6509:: with SMTP id z9mr895970wmb.144.1592248973088;
+ Mon, 15 Jun 2020 12:22:53 -0700 (PDT)
 Received: from rtrkw774-lin.syrmia.com ([46.240.135.226])
- by smtp.gmail.com with ESMTPSA id 138sm713098wma.23.2020.06.15.12.29.08
+ by smtp.gmail.com with ESMTPSA id 50sm27823909wra.1.2020.06.15.12.22.52
  (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 15 Jun 2020 12:29:08 -0700 (PDT)
+ Mon, 15 Jun 2020 12:22:52 -0700 (PDT)
 From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
 To: qemu-devel@nongnu.org,
 	peter.maydell@linaro.org
-Subject: [PULL 08/18] target/mips: msa: Split helpers for DPSUB_U.<H|W|D>
-Date: Mon, 15 Jun 2020 21:28:50 +0200
-Message-Id: <1592249340-8365-9-git-send-email-aleksandar.qemu.devel@gmail.com>
+Subject: [PULL 17/18] MAINTAINERS: Adjust sh4 maintainership
+Date: Mon, 15 Jun 2020 21:22:32 +0200
+Message-Id: <1592248953-8162-18-git-send-email-aleksandar.qemu.devel@gmail.com>
 X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1592249340-8365-1-git-send-email-aleksandar.qemu.devel@gmail.com>
-References: <1592249340-8365-1-git-send-email-aleksandar.qemu.devel@gmail.com>
-Received-SPF: pass client-ip=2a00:1450:4864:20::42e;
- envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wr1-x42e.google.com
+In-Reply-To: <1592248953-8162-1-git-send-email-aleksandar.qemu.devel@gmail.com>
+References: <1592248953-8162-1-git-send-email-aleksandar.qemu.devel@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wm1-x341.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -104,147 +107,64 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Achieves clearer code and slightly better performance.
+This patch transfers sh4 sections to Yoshinori Sato, who is
+best positioned in the community to assume sh4 maintainership.
+He is the maintainer of the related target rx as well, which
+means that some synergy between the two targets can be expected
+in future.
 
-Reviewed-by: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
+Further adjustments, reorganizations, and improvements of sh4
+sections are left to the future maintainer to be devised and
+executed, as he deems suitable.
+
+Aurelien and Magnus are deleted as maintainers in some sections
+of the MAINTAINERS file with this patch. However, they will not
+be deleted from QEMU Hall of Fame, where their names will always
+remained carved in stone as QEMU pioneers and granddaddies.
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Acked-by: Aurelien Jarno <aurelien@aurel32.net>
+Acked-by: Magnus Damm <magnus.damm@gmail.com>
+Acked-by: Yoshinori Sato <ysato@users.sourceforge.jp>
 Signed-off-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Message-Id: <20200613152133.8964-7-aleksandar.qemu.devel@gmail.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <20200611095316.10133-2-aleksandar.qemu.devel@gmail.com>
 ---
- target/mips/helper.h     |  4 ++-
- target/mips/msa_helper.c | 67 ++++++++++++++++++++++++++++++++++++++----------
- target/mips/translate.c  | 12 ++++++++-
- 3 files changed, 68 insertions(+), 15 deletions(-)
+ MAINTAINERS | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/target/mips/helper.h b/target/mips/helper.h
-index 2de1454..575f4a5 100644
---- a/target/mips/helper.h
-+++ b/target/mips/helper.h
-@@ -1090,7 +1090,9 @@ DEF_HELPER_4(msa_dpadd_u_d, void, env, i32, i32, i32)
- DEF_HELPER_4(msa_dpsub_s_h, void, env, i32, i32, i32)
- DEF_HELPER_4(msa_dpsub_s_w, void, env, i32, i32, i32)
- DEF_HELPER_4(msa_dpsub_s_d, void, env, i32, i32, i32)
--DEF_HELPER_5(msa_dpsub_u_df, void, env, i32, i32, i32, i32)
-+DEF_HELPER_4(msa_dpsub_u_h, void, env, i32, i32, i32)
-+DEF_HELPER_4(msa_dpsub_u_w, void, env, i32, i32, i32)
-+DEF_HELPER_4(msa_dpsub_u_d, void, env, i32, i32, i32)
- DEF_HELPER_5(msa_sld_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_splat_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_vshf_df, void, env, i32, i32, i32, i32)
-diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
-index 934f705..33d5251 100644
---- a/target/mips/msa_helper.c
-+++ b/target/mips/msa_helper.c
-@@ -2398,6 +2398,60 @@ void helper_msa_dpsub_s_d(CPUMIPSState *env,
- }
+diff --git a/MAINTAINERS b/MAINTAINERS
+index a922775..d59b605 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -296,7 +296,7 @@ F: tests/tcg/s390x/
+ L: qemu-s390x@nongnu.org
  
+ SH4 TCG CPUs
+-M: Aurelien Jarno <aurelien@aurel32.net>
++M: Yoshinori Sato <ysato@users.sourceforge.jp>
+ S: Odd Fixes
+ F: target/sh4/
+ F: hw/sh4/
+@@ -1253,14 +1253,16 @@ F: include/hw/riscv/opentitan.h
+ SH4 Machines
+ ------------
+ R2D
+-M: Magnus Damm <magnus.damm@gmail.com>
++M: Yoshinori Sato <ysato@users.sourceforge.jp>
++R: Magnus Damm <magnus.damm@gmail.com>
+ S: Maintained
+ F: hw/sh4/r2d.c
+ F: hw/intc/sh_intc.c
+ F: hw/timer/sh_timer.c
  
-+static inline int64_t msa_dpsub_u_df(uint32_t df, int64_t dest, int64_t arg1,
-+                                     int64_t arg2)
-+{
-+    int64_t even_arg1;
-+    int64_t even_arg2;
-+    int64_t odd_arg1;
-+    int64_t odd_arg2;
-+    UNSIGNED_EXTRACT(even_arg1, odd_arg1, arg1, df);
-+    UNSIGNED_EXTRACT(even_arg2, odd_arg2, arg2, df);
-+    return dest - ((even_arg1 * even_arg2) + (odd_arg1 * odd_arg2));
-+}
-+
-+void helper_msa_dpsub_u_h(CPUMIPSState *env,
-+                          uint32_t wd, uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
-+
-+    pwd->h[0]  = msa_dpsub_u_df(DF_HALF, pwd->h[0],  pws->h[0],  pwt->h[0]);
-+    pwd->h[1]  = msa_dpsub_u_df(DF_HALF, pwd->h[1],  pws->h[1],  pwt->h[1]);
-+    pwd->h[2]  = msa_dpsub_u_df(DF_HALF, pwd->h[2],  pws->h[2],  pwt->h[2]);
-+    pwd->h[3]  = msa_dpsub_u_df(DF_HALF, pwd->h[3],  pws->h[3],  pwt->h[3]);
-+    pwd->h[4]  = msa_dpsub_u_df(DF_HALF, pwd->h[4],  pws->h[4],  pwt->h[4]);
-+    pwd->h[5]  = msa_dpsub_u_df(DF_HALF, pwd->h[5],  pws->h[5],  pwt->h[5]);
-+    pwd->h[6]  = msa_dpsub_u_df(DF_HALF, pwd->h[6],  pws->h[6],  pwt->h[6]);
-+    pwd->h[7]  = msa_dpsub_u_df(DF_HALF, pwd->h[7],  pws->h[7],  pwt->h[7]);
-+}
-+
-+void helper_msa_dpsub_u_w(CPUMIPSState *env,
-+                          uint32_t wd, uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
-+
-+    pwd->w[0]  = msa_dpsub_u_df(DF_WORD, pwd->w[0],  pws->w[0],  pwt->w[0]);
-+    pwd->w[1]  = msa_dpsub_u_df(DF_WORD, pwd->w[1],  pws->w[1],  pwt->w[1]);
-+    pwd->w[2]  = msa_dpsub_u_df(DF_WORD, pwd->w[2],  pws->w[2],  pwt->w[2]);
-+    pwd->w[3]  = msa_dpsub_u_df(DF_WORD, pwd->w[3],  pws->w[3],  pwt->w[3]);
-+}
-+
-+void helper_msa_dpsub_u_d(CPUMIPSState *env,
-+                          uint32_t wd, uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
-+
-+    pwd->d[0]  = msa_dpsub_u_df(DF_DOUBLE, pwd->d[0],  pws->d[0],  pwt->d[0]);
-+    pwd->d[1]  = msa_dpsub_u_df(DF_DOUBLE, pwd->d[1],  pws->d[1],  pwt->d[1]);
-+}
-+
-+
- /*
-  * Int Max Min
-  * -----------
-@@ -5117,18 +5171,6 @@ void helper_msa_sld_df(CPUMIPSState *env, uint32_t df, uint32_t wd,
-     msa_sld_df(df, pwd, pws, env->active_tc.gpr[rt]);
- }
+ Shix
+-M: Magnus Damm <magnus.damm@gmail.com>
++M: Yoshinori Sato <ysato@users.sourceforge.jp>
++R: Magnus Damm <magnus.damm@gmail.com>
+ S: Odd Fixes
+ F: hw/sh4/shix.c
  
--static inline int64_t msa_dpsub_u_df(uint32_t df, int64_t dest, int64_t arg1,
--                                     int64_t arg2)
--{
--    int64_t even_arg1;
--    int64_t even_arg2;
--    int64_t odd_arg1;
--    int64_t odd_arg2;
--    UNSIGNED_EXTRACT(even_arg1, odd_arg1, arg1, df);
--    UNSIGNED_EXTRACT(even_arg2, odd_arg2, arg2, df);
--    return dest - ((even_arg1 * even_arg2) + (odd_arg1 * odd_arg2));
--}
--
- static inline int64_t msa_madd_q_df(uint32_t df, int64_t dest, int64_t arg1,
-                                     int64_t arg2)
- {
-@@ -5255,7 +5297,6 @@ void helper_msa_ ## func ## _df(CPUMIPSState *env, uint32_t df, uint32_t wd,  \
-     }                                                                         \
- }
- 
--MSA_TEROP_DF(dpsub_u)
- MSA_TEROP_DF(binsl)
- MSA_TEROP_DF(binsr)
- MSA_TEROP_DF(madd_q)
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index caf3adf..bd6febc 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -29439,7 +29439,17 @@ static void gen_msa_3r(CPUMIPSState *env, DisasContext *ctx)
-             }
-             break;
-         case OPC_DPSUB_U_df:
--            gen_helper_msa_dpsub_u_df(cpu_env, tdf, twd, tws, twt);
-+            switch (df) {
-+            case DF_HALF:
-+                gen_helper_msa_dpsub_u_h(cpu_env, twd, tws, twt);
-+                break;
-+            case DF_WORD:
-+                gen_helper_msa_dpsub_u_w(cpu_env, twd, tws, twt);
-+                break;
-+            case DF_DOUBLE:
-+                gen_helper_msa_dpsub_u_d(cpu_env, twd, tws, twt);
-+                break;
-+            }
-             break;
-         }
-         break;
 -- 
 2.7.4
 
