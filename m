@@ -2,66 +2,60 @@ Return-Path: <SRS0=tJVC=74=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5DFDC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 17:44:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFFA4C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 18:05:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BED4320739
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 17:44:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BED4320739
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id A7EBC207DA
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 18:05:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7EBC207DA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50006 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59196 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkt9m-0000I3-31
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 13:44:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54754)
+	id 1jktU8-0005hC-S2
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 14:05:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58478)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jkt97-0008Gd-6F
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 13:43:45 -0400
-Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:12870)
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1jktSw-0004EU-F2
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 14:04:14 -0400
+Received: from mx2.suse.de ([195.135.220.15]:55264)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jkt93-000514-Um
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 13:43:44 -0400
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id D069474632B;
- Mon, 15 Jun 2020 19:43:35 +0200 (CEST)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id 4F3D5746307; Mon, 15 Jun 2020 19:43:35 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
- by zero.eik.bme.hu (Postfix) with ESMTP id 4DBCC7456F8;
- Mon, 15 Jun 2020 19:43:35 +0200 (CEST)
-Date: Mon, 15 Jun 2020 19:43:35 +0200 (CEST)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH 1/4] sm501: Fix bounds checks
-In-Reply-To: <CAFEAcA8ktxFzcj61GydqarczXWh_gkzJ4aa5ZFKqs6s2BCQaPw@mail.gmail.com>
-Message-ID: <alpine.BSF.2.22.395.2006151901070.51837@zero.eik.bme.hu>
-References: <cover.1591471056.git.balaton@eik.bme.hu>
- <acb431de2d9c7a497d54a548dfc7592eb2b9fe1c.1591471056.git.balaton@eik.bme.hu>
- <CAFEAcA_WemGUp0YTitXvChsFPzZjOts04zTp2-aPgmFxTC5NXA@mail.gmail.com>
- <alpine.BSF.2.22.395.2006151832190.51837@zero.eik.bme.hu>
- <CAFEAcA8ktxFzcj61GydqarczXWh_gkzJ4aa5ZFKqs6s2BCQaPw@mail.gmail.com>
-User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
-MIME-Version: 1.0
-Content-Type: text/plain; format=flowed; charset=US-ASCII
-Received-SPF: pass client-ip=2001:738:2001:2001::2001;
- envelope-from=balaton@eik.bme.hu; helo=zero.eik.bme.hu
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1jktSu-0008G1-F2
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 14:04:14 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+ by mx2.suse.de (Postfix) with ESMTP id 9FEBBADA3;
+ Mon, 15 Jun 2020 18:04:11 +0000 (UTC)
+From: Claudio Fontana <cfontana@suse.de>
+To: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Roman Bolshakov <r.bolshakov@yadro.com>,
+ Markus Armbruster <armbru@redhat.com>
+Subject: [RFC v5 1/4] softmmu: move softmmu only files from root
+Date: Mon, 15 Jun 2020 20:03:43 +0200
+Message-Id: <20200615180346.3992-2-cfontana@suse.de>
+X-Mailer: git-send-email 2.16.4
+In-Reply-To: <20200615180346.3992-1-cfontana@suse.de>
+References: <20200615180346.3992-1-cfontana@suse.de>
+Received-SPF: pass client-ip=195.135.220.15; envelope-from=cfontana@suse.de;
+ helo=mx2.suse.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/14 22:24:15
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -74,94 +68,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Sebastian Bauer <mail@sebastianbauer.info>,
- Magnus Damm <magnus.damm@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Aurelien Jarno <aurelien@aurel32.net>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
+ Colin Xu <colin.xu@intel.com>, Wenchao Wang <wenchao.wang@intel.com>,
+ haxm-team@intel.com, Sunil Muthuswamy <sunilmut@microsoft.com>,
+ Richard Henderson <rth@twiddle.net>, Claudio Fontana <cfontana@suse.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 15 Jun 2020, Peter Maydell wrote:
-> On Mon, 15 Jun 2020 at 17:40, BALATON Zoltan <balaton@eik.bme.hu> wrote:
->>
->> On Mon, 15 Jun 2020, Peter Maydell wrote:
->>> The calculations for sb/se/db/de all have a term which
->>> multiplies by (width + pitch), which makes me suspect
->>> they also need a similar fix ?
->>
->> Maybe. I'll have to check again. Actually is there a simpler way to check
->> if two rectangles overlap when they are given with base, x, y, w, h, pitch
->> where base is the first byte of the screen, pitch is length of one line
->> and x,y is coordinates of top left corner and w,h is dimensions of the
->> rect. Now that I think about it we also need to take into accounf the
->> bytes per pixel value (1 << format) because base is given in bytes while
->> others are in pixels so these formulae likely need some fixes. Pixman has
->> some functions for these but those assume common base so to use those we
->> would need to bring the two rectangles to common base which I could not
->> find out how to do. Probably this is really simple for someone who already
->> did a lot of these before.
->
-> I think the thing that makes it particularly awkward is that
-> the source and dest can have different pitches. That means it's
+move arch_init, balloon, cpus, ioport, memory, memory_mapping, qtest.
 
-Yes, different bases and different pitches make it difficult to compare 
-and also to transform them to a common base to be able to do rectangle 
-overlap test (I haven't checked but maybe the pitches could be relative 
-prime so it's possible there's no common pitch to transform them to a 
-single view).
+They are all specific to CONFIG_SOFTMMU.
 
-> not a simple "do two rectangles overlap" test because the dest
-> area might not be a rectangle at all when looked at from the
-> POV of the source.
->
-> Do guests usually set src and dst pitch identical? If so it
-> might be worth having a more accurate rectangle-overlap test
-> for the common case and a looser check for the hard-to-handle
-> case.
+Signed-off-by: Claudio Fontana <cfontana@suse.de>
+---
+ MAINTAINERS                                  | 12 ++++++------
+ Makefile.target                              |  7 ++-----
+ softmmu/Makefile.objs                        | 10 ++++++++++
+ arch_init.c => softmmu/arch_init.c           |  0
+ balloon.c => softmmu/balloon.c               |  0
+ cpus.c => softmmu/cpus.c                     |  0
+ ioport.c => softmmu/ioport.c                 |  0
+ memory.c => softmmu/memory.c                 |  0
+ memory_mapping.c => softmmu/memory_mapping.c |  0
+ qtest.c => softmmu/qtest.c                   |  0
+ 10 files changed, 18 insertions(+), 11 deletions(-)
+ rename arch_init.c => softmmu/arch_init.c (100%)
+ rename balloon.c => softmmu/balloon.c (100%)
+ rename cpus.c => softmmu/cpus.c (100%)
+ rename ioport.c => softmmu/ioport.c (100%)
+ rename memory.c => softmmu/memory.c (100%)
+ rename memory_mapping.c => softmmu/memory_mapping.c (100%)
+ rename qtest.c => softmmu/qtest.c (100%)
 
-Quick test (just booted AmigaOS, opened some windows and moved them around 
-a bit) shows same pitch is common but not always:
+diff --git a/MAINTAINERS b/MAINTAINERS
+index a922775e45..1b4d2e0285 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -115,7 +115,7 @@ Overall TCG CPUs
+ M: Richard Henderson <rth@twiddle.net>
+ R: Paolo Bonzini <pbonzini@redhat.com>
+ S: Maintained
+-F: cpus.c
++F: softmmu/cpus.c
+ F: cpus-common.c
+ F: exec.c
+ F: accel/tcg/
+@@ -1682,7 +1682,7 @@ M: David Hildenbrand <david@redhat.com>
+ S: Maintained
+ F: hw/virtio/virtio-balloon*.c
+ F: include/hw/virtio/virtio-balloon.h
+-F: balloon.c
++F: softmmu/balloon.c
+ F: include/sysemu/balloon.h
+ 
+ virtio-9p
+@@ -2131,12 +2131,12 @@ Memory API
+ M: Paolo Bonzini <pbonzini@redhat.com>
+ S: Supported
+ F: include/exec/ioport.h
+-F: ioport.c
+ F: include/exec/memop.h
+ F: include/exec/memory.h
+ F: include/exec/ram_addr.h
+ F: include/exec/ramblock.h
+-F: memory.c
++F: softmmu/ioport.c
++F: softmmu/memory.c
+ F: include/exec/memory-internal.h
+ F: exec.c
+ F: scripts/coccinelle/memory-region-housekeeping.cocci
+@@ -2168,13 +2168,13 @@ F: ui/cocoa.m
+ Main loop
+ M: Paolo Bonzini <pbonzini@redhat.com>
+ S: Maintained
+-F: cpus.c
+ F: include/qemu/main-loop.h
+ F: include/sysemu/runstate.h
+ F: util/main-loop.c
+ F: util/qemu-timer.c
+ F: softmmu/vl.c
+ F: softmmu/main.c
++F: softmmu/cpus.c
+ F: qapi/run-state.json
+ 
+ Human Monitor (HMP)
+@@ -2327,7 +2327,7 @@ M: Thomas Huth <thuth@redhat.com>
+ M: Laurent Vivier <lvivier@redhat.com>
+ R: Paolo Bonzini <pbonzini@redhat.com>
+ S: Maintained
+-F: qtest.c
++F: softmmu/qtest.c
+ F: accel/qtest.c
+ F: tests/qtest/
+ X: tests/qtest/bios-tables-test-allowed-diff.h
+diff --git a/Makefile.target b/Makefile.target
+index 8ed1eba95b..7fbf5d8b92 100644
+--- a/Makefile.target
++++ b/Makefile.target
+@@ -152,16 +152,13 @@ endif #CONFIG_BSD_USER
+ #########################################################
+ # System emulator target
+ ifdef CONFIG_SOFTMMU
+-obj-y += arch_init.o cpus.o gdbstub.o balloon.o ioport.o
+-obj-y += qtest.o
++obj-y += softmmu/
++obj-y += gdbstub.o
+ obj-y += dump/
+ obj-y += hw/
+ obj-y += monitor/
+ obj-y += qapi/
+-obj-y += memory.o
+-obj-y += memory_mapping.o
+ obj-y += migration/ram.o
+-obj-y += softmmu/
+ LIBS := $(libs_softmmu) $(LIBS)
+ 
+ # Hardware support
+diff --git a/softmmu/Makefile.objs b/softmmu/Makefile.objs
+index dd15c24346..a4bd9f2f52 100644
+--- a/softmmu/Makefile.objs
++++ b/softmmu/Makefile.objs
+@@ -1,3 +1,13 @@
+ softmmu-main-y = softmmu/main.o
++
++obj-y += arch_init.o
++obj-y += cpus.o
++obj-y += balloon.o
++obj-y += ioport.o
++obj-y += memory.o
++obj-y += memory_mapping.o
++
++obj-y += qtest.o
++
+ obj-y += vl.o
+ vl.o-cflags := $(GPROF_CFLAGS) $(SDL_CFLAGS)
+diff --git a/arch_init.c b/softmmu/arch_init.c
+similarity index 100%
+rename from arch_init.c
+rename to softmmu/arch_init.c
+diff --git a/balloon.c b/softmmu/balloon.c
+similarity index 100%
+rename from balloon.c
+rename to softmmu/balloon.c
+diff --git a/cpus.c b/softmmu/cpus.c
+similarity index 100%
+rename from cpus.c
+rename to softmmu/cpus.c
+diff --git a/ioport.c b/softmmu/ioport.c
+similarity index 100%
+rename from ioport.c
+rename to softmmu/ioport.c
+diff --git a/memory.c b/softmmu/memory.c
+similarity index 100%
+rename from memory.c
+rename to softmmu/memory.c
+diff --git a/memory_mapping.c b/softmmu/memory_mapping.c
+similarity index 100%
+rename from memory_mapping.c
+rename to softmmu/memory_mapping.c
+diff --git a/qtest.c b/softmmu/qtest.c
+similarity index 100%
+rename from qtest.c
+rename to softmmu/qtest.c
+-- 
+2.16.4
 
-    7610 sm501 2d engine regs : write addr=10, val=200020
-    4249 sm501 2d engine regs : write addr=10, val=4000400
-    2340 sm501 2d engine regs : write addr=10, val=4000080
-     462 sm501 2d engine regs : write addr=10, val=40000a0
-     453 sm501 2d engine regs : write addr=10, val=800080
-     434 sm501 2d engine regs : write addr=10, val=1200120
-     233 sm501 2d engine regs : write addr=10, val=4000020
-     162 sm501 2d engine regs : write addr=10, val=400040
-     144 sm501 2d engine regs : write addr=10, val=200080
-     141 sm501 2d engine regs : write addr=10, val=2000a0
-      75 sm501 2d engine regs : write addr=10, val=600060
-      62 sm501 2d engine regs : write addr=10, val=a000a0
-      62 sm501 2d engine regs : write addr=10, val=200400
-      38 sm501 2d engine regs : write addr=10, val=e000e0
-      38 sm501 2d engine regs : write addr=10, val=1000100
-      38 sm501 2d engine regs : write addr=10, val=10000a0
-      37 sm501 2d engine regs : write addr=10, val=4000040
-      36 sm501 2d engine regs : write addr=10, val=40000e0
-      34 sm501 2d engine regs : write addr=10, val=a00080
-      34 sm501 2d engine regs : write addr=10, val=4000120
-      33 sm501 2d engine regs : write addr=10, val=400080
-      25 sm501 2d engine regs : write addr=10, val=600080
-      23 sm501 2d engine regs : write addr=10, val=4000060
-      22 sm501 2d engine regs : write addr=10, val=1a001a0
-
-and may depend on what the guest is doing so not sure it's worth the 
-effort. (Probably same pitch is used when moving window and different when 
-drawing something like text or icons but different pitch likely uses 
-off-screen bitmap as source so overlap is not likely for those.)
-
-> I might have a think about this and draw some diagrams tomorrow :-)
-
-I'll wait for that to see if you can come up with something clever. I've 
-tried to find a solution but could not come up with anything simpler than 
-a loop checking lines which is probably as much effort as doing the blit 
-itself and then doing blit with a temporary is probably the same so I went 
-for just checking the obviously far apart blits (and even that seems to be 
-easy to miss). So I'm happy if we can just fix the checks we have but if 
-there are better suggestions please tell me.
-
-Regards,
-BALATON Zoltan
 
