@@ -2,121 +2,87 @@ Return-Path: <SRS0=tJVC=74=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5825C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 16:47:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BF23C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 16:49:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7ED6B2067B
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 16:47:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7ED6B2067B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 4701A2067B
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 16:49:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="p077mU2M"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4701A2067B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42588 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45878 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jksH6-0006av-PL
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 12:47:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38672)
+	id 1jksIu-000810-K9
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 12:49:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39258)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jksFq-0005n0-Iv
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 12:46:42 -0400
-Received: from mout.kundenserver.de ([217.72.192.74]:42695)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jksFn-0002pJ-Tb
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 12:46:38 -0400
-Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
- (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1M593i-1jjlmv0wwG-0019I6; Mon, 15 Jun 2020 18:46:17 +0200
-To: Fred Konrad <konrad@adacore.com>, qemu-devel@nongnu.org
-References: <1588094279-17913-1-git-send-email-frederic.konrad@adacore.com>
- <1588094279-17913-2-git-send-email-frederic.konrad@adacore.com>
- <1f4d93eb-0b89-5189-0147-3a456197cc0d@vivier.eu>
- <0cfb0348-d6db-db68-3181-85a605bfa91b@adacore.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Subject: Re: [PATCH 1/2] softfloat: m68k: infinity is a valid encoding
-Message-ID: <6224f733-3655-ff14-4fc2-8435f0f531cf@vivier.eu>
-Date: Mon, 15 Jun 2020 18:46:16 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jksHz-0007R7-Uc; Mon, 15 Jun 2020 12:48:52 -0400
+Received: from mail-il1-x143.google.com ([2607:f8b0:4864:20::143]:44565)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jksHy-00039B-EY; Mon, 15 Jun 2020 12:48:51 -0400
+Received: by mail-il1-x143.google.com with SMTP id i1so15901679ils.11;
+ Mon, 15 Jun 2020 09:48:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=yHItOiITX7pnZGV3EgK7vfMRWWkWCREC1RJ2BfBpJM0=;
+ b=p077mU2Mwimh8dngzuy/g+Ey7/Jrcq5YoyY1EfwCeXcFnl5vIiUEb/4S+3rBYVGS0A
+ C6gMSHPBDQPZ6MYAcKZ8rZg3lvbb5rAuPyl01KrjiG4EYzIfCS+UvS5AJwMRc9bSMaZK
+ BtYIerdGauOCB4n58LNwTSSoMMJiFKwEY7bkUC/3A8qdf3qLrZgc3cGsn0LMhLbvF9Un
+ VUB7Ou8m7KuteSuGBjX8Y9gaj8p06MfApp1QsbcLDqmstlcAY8YBghfDededxMy0Jhln
+ bFlKYkTF29lqBn+0qyiwkH2f1uQfS2FXwOhckCVup2E2d4ZHzIbeV4tAff1O/DNDZPIr
+ pkHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=yHItOiITX7pnZGV3EgK7vfMRWWkWCREC1RJ2BfBpJM0=;
+ b=UKFr4IMVZ8L7CyY+YteI6pTjiaonHJVP68pBoqWAcwb9HxcqsYynBBt99VFci3e3R0
+ amNKGkMPBn0VJ/tdy7xKHTCXhvon89iLWrMBzA4DwxqiewW6A+jsiqe6L10PHVpNA/VU
+ nEAt0Qu1kMor/w6eJRS6Czf6DtDstLRBOD3lBMVh24EwIzMzV5BESEoOV58/bWUJ+W2z
+ s+cXNjxfZysoWdjYe5B29x0NRlfOsSoFnkBw3Qc4OrVl6CuGOSzr/bBZsV9qrIgFf0pY
+ 0PYCS5kk0dCtOUkEUvg7eRiKF+LcxbptpB0tUtK47Jmhschi05D2A/VQIARE6T8mVRgz
+ FJtA==
+X-Gm-Message-State: AOAM532xkVsAbItQWf69NmCu0l8lfWqYYYWx3EQTiEP59I8+V5mmp//D
+ Bv4ZeCNiyUXy7UkQYrCH2Kwfemr3+5Tq2a+4lE+kjqN6
+X-Google-Smtp-Source: ABdhPJxaixL70p9q6a5LMxvLMdeXvQakkbULyPmi7aGGQkCL4NzRfIweT9VfSh8ARq5LmweILgxVwJ5i/rsNJP60kts=
+X-Received: by 2002:a92:bb45:: with SMTP id w66mr28013329ili.131.1592239729054; 
+ Mon, 15 Jun 2020 09:48:49 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <0cfb0348-d6db-db68-3181-85a605bfa91b@adacore.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:OIVBYbMFctURwBHakP4YWy3jluYXvO2MmjJeTTPEzOI9+4YKvGN
- tVDt2odOIQhR1E9pWJe9hx2COOjJCf2OqPsNkRxdk65GsO4Nk0kO96wyetaSHHgVMiCGQV7
- eJHxXutGBDetot6mHqxrFu5ziKAjah6jvybaHF/pGoVwzrxv+bXLgsh2Vys6SckteEDSpEm
- AGHkru6P7RQC5qbqi35Tg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:zu7HxR9H2Tw=:IMMz2O4F9uqIU6r+XaYXLh
- GQap9A4wy3diPHBNIyp//G/Qh5epGoZrrYu1TCKGSBD0XF2ANcTvApqSH/2mfhhH8xjreBA7M
- S4r2144sWRc80LbggW8N4Crmyrzu5LJjhZLyfqgBywyVpDDEcPJvXgcPTTIFPHYmIVVonTgZy
- 3wTeZG4sD4OqYkCyMnsgIBys6NwRIusJ5a550JVY2ueayaRxmU6WPP04BZkVWegUKOGFSU60n
- jDAs7xVnR9uZKxgc9OCgILoATg9QYoTrXY8uhvn93P4bhSY5n4DmC0mIi5yCPSweztMWWHIKB
- GJX1kZLuyekeUYOup5zgzLa/Bq8c3Iaj7KHr2E0yMfmvC/9wm73sRG9yOWGwDjMNsWVH/W0Wi
- 7F3FswRM6hv+uX/Y6QNLzaOISMeCKKK5rbUyxcUO0RxuDVCPvliQjkPYAJPvnWLDvscpnhb7n
- X7MnBl+GPhBnZuat3Q3Tszu51lwgruJOwcxn2bQ9BC+f9QJv2y2zQldXd4CPqtAFUFzPM/USC
- tHfqxQMUz6LFocn/MXxcO9CCUaEIPJnUkrF+c+K2YRymEh5Sf5oh101VVl2BGJT8WeidOO/4y
- BLyLDmKvIj0oQTOJmvlghPLU1hn5QdEMs16fRMzM/NzXVzf8n0pyOU8HZ9Yz+h6w/btOE5Tvs
- IsnQ8gew/AUbH+9DcEok4ZGwZur+kX/YPJ2yqyS3szYDfGRBoRbTNyW+Aa+2cLD58sqSogvJp
- gKt2uwB2cVp/qQun390gbYPL67qek01r95ZrA8otCYDXy6jlmXkLyLiosDMt6bwQ5eqyyQ8Mz
- W8yVBzVMi4RJdwpPSe94ZAPJKk1BJPoJStNVb4jpp99ZlyZYzwdfVGHqeN/rLc9MglpADnL
-Received-SPF: none client-ip=217.72.192.74; envelope-from=laurent@vivier.eu;
- helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 12:46:33
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -28
-X-Spam_score: -2.9
-X-Spam_bar: --
-X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001, SPF_NONE=0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+References: <1591625864-31494-1-git-send-email-bmeng.cn@gmail.com>
+ <1591625864-31494-11-git-send-email-bmeng.cn@gmail.com>
+In-Reply-To: <1591625864-31494-11-git-send-email-bmeng.cn@gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Mon, 15 Jun 2020 09:39:26 -0700
+Message-ID: <CAKmqyKNpqe6LDeTma0iaQ6yBNdjHgzKPRyepGiWcg6q2_Mu4fw@mail.gmail.com>
+Subject: Re: [PATCH 10/15] hw/riscv: sifive_u: Rename serial property get/set
+ functions to a generic name
+To: Bin Meng <bmeng.cn@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::143;
+ envelope-from=alistair23@gmail.com; helo=mail-il1-x143.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -129,88 +95,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, alex.bennee@linaro.org,
- Aurelien Jarno <aurelien@aurel32.net>, philmd@redhat.com
+Cc: Bin Meng <bin.meng@windriver.com>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Palmer Dabbelt <palmerdabbelt@google.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 15/06/2020 à 17:59, Fred Konrad a écrit :
-> Missed this one sorry.
-> 
-> Le 6/12/20 à 10:31 AM, Laurent Vivier a écrit :
->> Le 28/04/2020 à 19:17, KONRAD Frederic a écrit :
->>> The MC68881 say about infinities (3.2.4):
->>>
->>> "*For the extended precision format, the most significant bit of the
->>> mantissa (the integer bit) is a don't care."
->>>
->>> https://www.nxp.com/docs/en/reference-manual/MC68881UM.pdf
->>>
->>> The m68k extended format is implemented with the floatx80 and
->>> floatx80_invalid_encoding currently treats 0x7fff00000000000000000000 as
->>> an invalid encoding.  This patch fixes floatx80_invalid_encoding so it
->>> accepts that the most significant bit of the mantissa can be 0.
->>>
->>> This bug can be revealed with the following code which pushes extended
->>> infinity on the stack as a double and then reloads it as a double.  It
->>> should normally be converted and read back as infinity and is currently
->>> read back as nan:
->>>
->>>          .global _start
->>>          .text
->>> _start:
->>>          lea val, %a0
->>>          lea fp, %fp
->>>          fmovex (%a0), %fp0
->>>          fmoved %fp0, %fp@(-8)
->>>          fmoved %fp@(-8), %fp0
->>> end:
->>>          bra end
->>>
->>> .align 0x4
->>> val:
->>>          .fill 1, 4, 0x7fff0000
->>>          .fill 1, 4, 0x00000000
->>>          .fill 1, 4, 0x00000000
->>> .align 0x4
->>>          .fill 0x100, 1, 0
->>> fp:
->>>
-> 
-> [...]
-> 
->>
->> According to "M68000 FAMILY PROGRAMMER’S REFERENCE MANUAL" the explicit
->> integer bit is "Don't care" for signed infinite (a.high == 0x7FFF) (this
->> is the case this patch manages).
->>
->> But wit a zero exponent and a non zero mantissa, it's a denormal number,
->> and a signed zero has also a zero explicit integer bit but a zero
->> mantissa. (both cases are already managed in the existing code).
->>
->> with a non zero exponent less than the maximum value it's an unnormal
->> number.
->>
->> The denormal and unnormal numbers must be managed during the load
->> operation in the m68k TCG emulation to generate directly the FP_UNIMP
->> exception.
-> 
-> Is this already handled in the TCG code?
+On Mon, Jun 8, 2020 at 7:21 AM Bin Meng <bmeng.cn@gmail.com> wrote:
+>
+> From: Bin Meng <bin.meng@windriver.com>
+>
+> In prepration to add more properties to this machine, rename the
+> existing serial property get/set functions to a generic name.
+>
+> Signed-off-by: Bin Meng <bin.meng@windriver.com>
 
-No, I have a skeleton with a workaround but if we enable the exception
-the kernel crashes because the size of the frame saved in the stack by
-fsave is not the one expected by the kernel (we save an IDLE frame and
-not the UNIMP frame).
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-https://github.com/vivier/qemu-m68k/commit/c1297f61db283ccd592333f56907bd2961f1843c
+Alistair
 
-I've also sent a patch similar to yours but disabling totally the
-floatx80_invalid_encoding() check.
-
-https://patchew.org/QEMU/20200612140400.2130118-1-laurent@vivier.eu/
-
-Thanks,
-Laurent
-
+> ---
+>
+>  hw/riscv/sifive_u.c | 14 ++++++++------
+>  1 file changed, 8 insertions(+), 6 deletions(-)
+>
+> diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+> index ef51874..07e2ba0 100644
+> --- a/hw/riscv/sifive_u.c
+> +++ b/hw/riscv/sifive_u.c
+> @@ -481,14 +481,16 @@ static void sifive_u_machine_set_start_in_flash(Object *obj, bool value, Error *
+>      s->start_in_flash = value;
+>  }
+>
+> -static void sifive_u_machine_get_serial(Object *obj, Visitor *v, const char *name,
+> -                                void *opaque, Error **errp)
+> +static void sifive_u_machine_get_uint32_prop(Object *obj, Visitor *v,
+> +                                             const char *name, void *opaque,
+> +                                             Error **errp)
+>  {
+>      visit_type_uint32(v, name, (uint32_t *)opaque, errp);
+>  }
+>
+> -static void sifive_u_machine_set_serial(Object *obj, Visitor *v, const char *name,
+> -                                void *opaque, Error **errp)
+> +static void sifive_u_machine_set_uint32_prop(Object *obj, Visitor *v,
+> +                                             const char *name, void *opaque,
+> +                                             Error **errp)
+>  {
+>      visit_type_uint32(v, name, (uint32_t *)opaque, errp);
+>  }
+> @@ -507,8 +509,8 @@ static void sifive_u_machine_instance_init(Object *obj)
+>
+>      s->serial = OTP_SERIAL;
+>      object_property_add(obj, "serial", "uint32",
+> -                        sifive_u_machine_get_serial,
+> -                        sifive_u_machine_set_serial, NULL, &s->serial);
+> +                        sifive_u_machine_get_uint32_prop,
+> +                        sifive_u_machine_set_uint32_prop, NULL, &s->serial);
+>      object_property_set_description(obj, "serial", "Board serial number");
+>  }
+>
+> --
+> 2.7.4
+>
+>
 
