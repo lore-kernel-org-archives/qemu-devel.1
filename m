@@ -2,92 +2,88 @@ Return-Path: <SRS0=tJVC=74=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02843C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 10:50:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED4AEC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 10:56:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C20C42068E
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 10:50:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BAFF3206B7
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 10:56:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h58ZqeCy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C20C42068E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EeZAiw9H"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BAFF3206B7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48464 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50800 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkmhG-0003Ih-1V
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 06:50:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55496)
+	id 1jkmn7-0004qh-01
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 06:56:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56428)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1jkmgX-0002pw-Qe
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 06:49:49 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:32341)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jkmmX-0004PZ-7b
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 06:56:01 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:49502
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1jkmgV-00017M-Oo
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 06:49:49 -0400
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jkmmV-0002Er-D8
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 06:56:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592218185;
+ s=mimecast20190719; t=1592218557;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=EfybyArIQJIxBW6nhn+dS0O0AlniIc6yWc7CZDG4q6k=;
- b=h58ZqeCylPXsr6u1yqhAIs4aV9PDS1mRpOWUtqFrwaM/6wME8YzQ15/V91JBKG3rHS1it9
- wm2/fI/w42uWV2N+dDh9ZeyxKQTXvkpR/1NqHGIAbM29iuof1VDFLZO1F/1xesmim91/3g
- JPtW8a0ITmGq45+Idfc8GUi9julANKk=
+ bh=rhESTFqxq0pvnue1BIOiHdFsPn2o02OR2ulJyb0OSBs=;
+ b=EeZAiw9HFTTEmG3IJXK3hIcNsAwsZp/iY2AKoUSKaz45hwxOC7BSxwhw9bXWy2eTkbAP4R
+ PsTBeL88Xf9rSWqXcprMKsHir40zbhFi/O+upgPPOXu6do+xFaBNNMWj5sEXx+G+zeu0NO
+ x44cdiTsDAg/GA9VDXvf6lK5bHH0cfM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-8-iEkpQxYnMJi1qSAE3SOgdQ-1; Mon, 15 Jun 2020 06:49:40 -0400
-X-MC-Unique: iEkpQxYnMJi1qSAE3SOgdQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-293-ab01Cja0M5q8JLV4m-kElQ-1; Mon, 15 Jun 2020 06:55:54 -0400
+X-MC-Unique: ab01Cja0M5q8JLV4m-kElQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BF5B3106B242;
- Mon, 15 Jun 2020 10:49:38 +0000 (UTC)
-Received: from localhost (ovpn-115-9.ams2.redhat.com [10.36.115.9])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A51677CAA7;
- Mon, 15 Jun 2020 10:49:30 +0000 (UTC)
-Date: Mon, 15 Jun 2020 11:49:29 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: John G Johnson <john.g.johnson@oracle.com>
-Subject: Re: RFC: use VFIO over a UNIX domain socket to implement device
- offloading
-Message-ID: <20200615104929.GD1491454@stefanha-x1.localdomain>
-References: <MN2PR02MB62052E54C752229C115EAD898BCF0@MN2PR02MB6205.namprd02.prod.outlook.com>
- <20200401091712.GA221892@stefanha-x1.localdomain>
- <MW2PR02MB372349E25A0842DE045B95F58BD40@MW2PR02MB3723.namprd02.prod.outlook.com>
- <8101D131-3B95-4CF5-8D46-8755593AA97D@oracle.com>
- <A0E4C51F-B41C-486B-A5CE-3C4C2C9C1A40@oracle.com>
- <20200602090629.66f9e3f7@x1.home>
- <E78F4C2E-4382-4C98-9606-F1ABD9753699@oracle.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 81E3C18A8222;
+ Mon, 15 Jun 2020 10:55:52 +0000 (UTC)
+Received: from work-vm (ovpn-114-201.ams2.redhat.com [10.36.114.201])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id EFD1D60C80;
+ Mon, 15 Jun 2020 10:55:46 +0000 (UTC)
+Date: Mon, 15 Jun 2020 11:55:44 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Subject: Re: [RFC PATCH v2 1/5] hw/misc: Add a LED device
+Message-ID: <20200615105544.GG2883@work-vm>
+References: <20200612175440.9901-1-f4bug@amsat.org>
+ <20200612175440.9901-2-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <E78F4C2E-4382-4C98-9606-F1ABD9753699@oracle.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
+In-Reply-To: <20200612175440.9901-2-f4bug@amsat.org>
+User-Agent: Mutt/1.14.0 (2020-05-02)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="k4f25fnPtRuIRUb3"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=stefanha@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 01:12:36
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 01:43:27
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -101,112 +97,232 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Walker, Benjamin" <benjamin.walker@intel.com>,
- Elena Ufimtseva <elena.ufimtseva@oracle.com>, Jag Raman <jag.raman@oracle.com>,
- Swapnil Ingle <swapnil.ingle@nutanix.com>, "Harris,
- James R" <james.r.harris@intel.com>,
- Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Kirti Wankhede <kwankhede@nvidia.com>,
- Raphael Norwitz <raphael.norwitz@nutanix.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Thanos Makatos <thanos.makatos@nutanix.com>,
- Kanth Ghatraju <Kanth.Ghatraju@oracle.com>,
- Felipe Franciosi <felipe@nutanix.com>,
- =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, "Zhang,
- Tina" <tina.zhang@intel.com>, "Liu, Changpeng" <changpeng.liu@intel.com>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+ Esteban Bosse <estebanbosse@gmail.com>, qemu-arm@nongnu.org,
+ Gerd Hoffmann <kraxel@redhat.com>, Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---k4f25fnPtRuIRUb3
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+* Philippe Mathieu-Daudé (f4bug@amsat.org) wrote:
+> A LED device can be connected to a GPIO output.
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+>  include/hw/misc/led.h | 30 ++++++++++++++++
+>  hw/misc/led.c         | 84 +++++++++++++++++++++++++++++++++++++++++++
+>  MAINTAINERS           |  6 ++++
+>  hw/misc/Kconfig       |  3 ++
+>  hw/misc/Makefile.objs |  1 +
+>  hw/misc/trace-events  |  3 ++
+>  6 files changed, 127 insertions(+)
+>  create mode 100644 include/hw/misc/led.h
+>  create mode 100644 hw/misc/led.c
+> 
+> diff --git a/include/hw/misc/led.h b/include/hw/misc/led.h
+> new file mode 100644
+> index 0000000000..427ca1418e
+> --- /dev/null
+> +++ b/include/hw/misc/led.h
+> @@ -0,0 +1,30 @@
+> +/*
+> + * QEMU single LED device
+> + *
+> + * Copyright (C) 2020 Philippe Mathieu-Daudé <f4bug@amsat.org>
+> + *
+> + * SPDX-License-Identifier: GPL-2.0-or-later
+> + */
+> +#ifndef HW_MISC_LED_H
+> +#define HW_MISC_LED_H
+> +
+> +#include "hw/qdev-core.h"
+> +#include "hw/sysbus.h" /* FIXME remove */
+> +
+> +#define TYPE_LED "led"
+> +#define LED(obj) OBJECT_CHECK(LEDState, (obj), TYPE_LED)
+> +
+> +typedef struct LEDState {
+> +    /* Private */
+> +    SysBusDevice parent_obj; /* FIXME DeviceState */
+> +    /* Public */
+> +
+> +    qemu_irq irq;
 
-On Tue, Jun 09, 2020 at 11:25:41PM -0700, John G Johnson wrote:
-> > On Jun 2, 2020, at 8:06 AM, Alex Williamson <alex.williamson@redhat.com=
-> wrote:
-> >=20
-> > On Wed, 20 May 2020 17:45:13 -0700
-> > John G Johnson <john.g.johnson@oracle.com> wrote:
-> >=20
-> >>> I'm confused by VFIO_USER_ADD_MEMORY_REGION vs VFIO_USER_IOMMU_MAP_DM=
-A.
-> >>> The former seems intended to provide the server with access to the
-> >>> entire GPA space, while the latter indicates an IOVA to GPA mapping o=
-f
-> >>> those regions.  Doesn't this break the basic isolation of a vIOMMU?
-> >>> This essentially says to me "here's all the guest memory, but please
-> >>> only access these regions for which we're providing DMA mappings".
-> >>> That invites abuse.
-> >>>=20
-> >>=20
-> >> =09The purpose behind separating QEMU into multiple processes is
-> >> to provide an additional layer protection for the infrastructure again=
-st
-> >> a malign guest, not for the guest against itself, so preventing a serv=
-er
-> >> that has been compromised by a guest from accessing all of guest memor=
-y
-> >> adds no additional benefit.  We don=E2=80=99t even have an IOMMU in ou=
-r current
-> >> guest model for this reason.
-> >=20
-> > One of the use cases we see a lot with vfio is nested assignment, ie.
-> > we assign a device to a VM where the VM includes a vIOMMU, such that
-> > the guest OS can then assign the device to userspace within the guest.
-> > This is safe to do AND provides isolation within the guest exactly
-> > because the device only has access to memory mapped to the device, not
-> > the entire guest address space.  I don't think it's just the hypervisor
-> > you're trying to protect, we can't assume there are always trusted
-> > drivers managing the device.
-> >=20
->=20
-> =09We intend to support an IOMMU.  The question seems to be whether
-> it=E2=80=99s implemented in the server or client.  The current proposal h=
-as it
-> in the server, ala vhost-user, but we are fine with moving it.
+Why an irq?
 
-It's challenging to implement a fast and secure IOMMU. The simplest
-approach is secure but not fast: add protocol messages for
-DMA_READ(iova, length) and DMA_WRITE(iova, buffer, length).
+> +    uint8_t current_state;
 
-An issue with file descriptor passing is that it's hard to revoke access
-once the file descriptor has been passed. memfd supports sealing with
-fnctl(F_ADD_SEALS) it doesn't revoke mmap(MAP_WRITE) on other processes.
+Is the state of this device boolean or is it a 0..255 0=off, 255=full
+on, analog thing?
+Can an LED device be connected to a PWM device driving a GPIO - what
+happens?
 
-Memory Protection Keys don't seem to be useful here either and their
-availability is limited (see pkeys(7)).
+Dave
 
-One crazy idea is to use KVM as a sandbox for running the device and let
-the vIOMMU control the page tables instead of the device (guest). That
-way the hardware MMU provides memory translation, but I think this is
-impractical because the guest environment is too different from the
-Linux userspace environment.
 
-As a starting point adding DMA_READ/DMA_WRITE messages would provide the
-functionality and security. Unfortunately it makes DMA expensive and
-performance will suffer.
+> +    /* Properties */
+> +    char *name;
+> +    uint8_t reset_state; /* TODO [GPIO_ACTIVE_LOW, GPIO_ACTIVE_HIGH] */
+> +} LEDState;
+> +
+> +#endif /* HW_MISC_LED_H */
+> diff --git a/hw/misc/led.c b/hw/misc/led.c
+> new file mode 100644
+> index 0000000000..1bae1a34c0
+> --- /dev/null
+> +++ b/hw/misc/led.c
+> @@ -0,0 +1,84 @@
+> +/*
+> + * QEMU single LED device
+> + *
+> + * Copyright (C) 2020 Philippe Mathieu-Daudé <f4bug@amsat.org>
+> + *
+> + * SPDX-License-Identifier: GPL-2.0-or-later
+> + */
+> +#include "qemu/osdep.h"
+> +#include "qapi/error.h"
+> +#include "migration/vmstate.h"
+> +#include "hw/qdev-properties.h"
+> +#include "hw/misc/led.h"
+> +#include "hw/irq.h"
+> +#include "trace.h"
+> +
+> +static void led_set(void *opaque, int line, int new_state)
+> +{
+> +    LEDState *s = LED(opaque);
+> +
+> +    trace_led_set(s->name, s->current_state, new_state);
+> +
+> +    s->current_state = new_state;
+> +}
+> +
+> +static void led_reset(DeviceState *dev)
+> +{
+> +    LEDState *s = LED(dev);
+> +
+> +    led_set(dev, 0, s->reset_state);
+> +}
+> +
+> +static const VMStateDescription vmstate_led = {
+> +    .name = TYPE_LED,
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_UINT8(reset_state, LEDState),
 
-Stefan
+I'm not sure you need to migrate this - this is a property that's set on
+the device, not a dynamic state of the device
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+> +static void led_realize(DeviceState *dev, Error **errp)
+> +{
+> +    LEDState *s = LED(dev);
+> +
+> +    if (s->name == NULL) {
+> +        error_setg(errp, "property 'name' not specified");
+> +        return;
+> +    }
+> +
+> +    qdev_init_gpio_in(DEVICE(s), led_set, 1);
+> +}
+> +
+> +static Property led_properties[] = {
+> +    DEFINE_PROP_STRING("name", LEDState, name),
+> +    DEFINE_PROP_UINT8("reset_state", LEDState, reset_state, 0),
 
---k4f25fnPtRuIRUb3
-Content-Type: application/pgp-signature; name="signature.asc"
+I suggest you add a property for the notional colour; that way any UIs
+that are built can use that as a hint.
 
------BEGIN PGP SIGNATURE-----
+Dave
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl7nUjkACgkQnKSrs4Gr
-c8iXuwgAj22v7GTE/+fxdunnmikGsDMVTC+M+B60Z05FegrSOtu749Ab281ZONHu
-n4U8SnNPshY2t7JvkBF38YwQRVRTH39Zu5avnlV1g96iKx1FGu6XS2RHerHTBOHk
-w6/TFaCGwFCC/E2qdOGFkc+eo7jooPYL2HKqGn1P3hBvxMoFjSp2hbrqQjdCtmAP
-eXVBrCxqhETdJLs+pU8NUXSaEWy7/9C6gjLTX/LcbfafIetKqcFnBtx9RxUmHU3i
-sawv0j9/M9pZUxJpONF4TxRYlvAk5O7ki17nN1li8zmVzB2MufY4Ffn0psVeeZnN
-La8Ubu63fM91CqhSlpya4HLTRspqXw==
-=R4Dq
------END PGP SIGNATURE-----
-
---k4f25fnPtRuIRUb3--
+> +    DEFINE_PROP_END_OF_LIST(),
+> +};
+> +
+> +static void led_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(klass);
+> +
+> +    dc->desc = "LED";
+> +    dc->vmsd = &vmstate_led;
+> +    dc->reset = led_reset;
+> +    dc->realize = led_realize;
+> +    set_bit(DEVICE_CATEGORY_DISPLAY, dc->categories);
+> +    device_class_set_props(dc, led_properties);
+> +}
+> +
+> +static const TypeInfo led_info = {
+> +    .name = TYPE_LED,
+> +    .parent = TYPE_SYS_BUS_DEVICE, /* FIXME TYPE_DEVICE */
+> +    .instance_size = sizeof(LEDState),
+> +    .class_init = led_class_init
+> +};
+> +
+> +static void led_register_types(void)
+> +{
+> +    type_register_static(&led_info);
+> +}
+> +
+> +type_init(led_register_types)
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 3abe3faa4e..10593863dc 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -1857,6 +1857,12 @@ F: docs/specs/vmgenid.txt
+>  F: tests/qtest/vmgenid-test.c
+>  F: stubs/vmgenid.c
+>  
+> +LED
+> +M: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> +S: Maintained
+> +F: include/hw/misc/led.h
+> +F: hw/misc/led.c
+> +
+>  Unimplemented device
+>  M: Peter Maydell <peter.maydell@linaro.org>
+>  R: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> diff --git a/hw/misc/Kconfig b/hw/misc/Kconfig
+> index bdd77d8020..f60dce694d 100644
+> --- a/hw/misc/Kconfig
+> +++ b/hw/misc/Kconfig
+> @@ -126,6 +126,9 @@ config AUX
+>  config UNIMP
+>      bool
+>  
+> +config LED
+> +    bool
+> +
+>  config MAC_VIA
+>      bool
+>      select MOS6522
+> diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
+> index 5aaca8a039..9efa3c941c 100644
+> --- a/hw/misc/Makefile.objs
+> +++ b/hw/misc/Makefile.objs
+> @@ -91,3 +91,4 @@ common-obj-$(CONFIG_NRF51_SOC) += nrf51_rng.o
+>  obj-$(CONFIG_MAC_VIA) += mac_via.o
+>  
+>  common-obj-$(CONFIG_GRLIB) += grlib_ahb_apb_pnp.o
+> +common-obj-$(CONFIG_LED) += led.o
+> diff --git a/hw/misc/trace-events b/hw/misc/trace-events
+> index 5561746866..e15b7f7c81 100644
+> --- a/hw/misc/trace-events
+> +++ b/hw/misc/trace-events
+> @@ -206,3 +206,6 @@ via1_rtc_cmd_pram_sect_write(int sector, int offset, int addr, int value) "secto
+>  # grlib_ahb_apb_pnp.c
+>  grlib_ahb_pnp_read(uint64_t addr, uint32_t value) "AHB PnP read addr:0x%03"PRIx64" data:0x%08x"
+>  grlib_apb_pnp_read(uint64_t addr, uint32_t value) "APB PnP read addr:0x%03"PRIx64" data:0x%08x"
+> +
+> +# led.c
+> +led_set(const char *name, uint8_t old_state, uint8_t new_state) "led name:'%s' state %d -> %d"
+> -- 
+> 2.21.3
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
