@@ -2,78 +2,80 @@ Return-Path: <SRS0=tJVC=74=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 937DAC433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 21:07:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2874BC433E5
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 21:07:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5C048207D3
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 21:07:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E4F0D2078E
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 21:07:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MXrNzqut"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C048207D3
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="INA3Wx1H"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4F0D2078E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42574 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43556 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkwJo-0008Sg-FM
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 17:07:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33888)
+	id 1jkwK0-0000Rs-3P
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 17:07:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33870)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jkvuc-0003T5-S1
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jkvuc-0003S3-Bv
  for qemu-devel@nongnu.org; Mon, 15 Jun 2020 16:40:58 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:46726
- helo=us-smtp-delivery-1.mimecast.com)
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:56404
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jkvuV-0000fc-7G
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 16:40:58 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jkvuU-0000ej-3v
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 16:40:57 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592253650;
+ s=mimecast20190719; t=1592253649;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Pzkd2IsHBkbuVoLN1QCA+SLvKVZtg2CjhpOyVgF9ibg=;
- b=MXrNzqutGvxT+m8nH/cE8Q7aMJre1t6WZBRfVb0yyk1o7yQT/lOxYh5vibkBlhMHAWqk73
- CjYWq0CkRWKDzbC8AaxXlY6dS3JOA3AElX5wbQA2+mh2kJ0b8nCKE+ev8xWnXfLquqCdsW
- Q05U6rDWBDc332QlfuKGMTDrFOZNc+Q=
+ bh=ori/hfKZwhk2Jb8p6hTJ5j5G3h0iu33zbaJwY6qzEwU=;
+ b=INA3Wx1HIaqsoyWDjai8v+UbZ4gWWt/EDUVtF/AAZMYTy1q1GAgOghtLJ8Ka0p16UVu3RW
+ wQT3UD7xhvwbsjpbbbWUAo2pd2woh0ETs2zw6smXjVqklJT6BvPJHbY/YZzO/W4p7V3Wdz
+ +3DziSHlpRrqzyZipZmVbdg01Wrm6A8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-160-l1vQmYlCNwCk19lFgrcF-g-1; Mon, 15 Jun 2020 16:40:43 -0400
-X-MC-Unique: l1vQmYlCNwCk19lFgrcF-g-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-10-nwR6RansNRa4n_g1lUkC3Q-1; Mon, 15 Jun 2020 16:40:47 -0400
+X-MC-Unique: nwR6RansNRa4n_g1lUkC3Q-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F1BBA803312
- for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 20:40:42 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C76E7100CCC6
+ for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 20:40:46 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
  [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9A884100238E;
- Mon, 15 Jun 2020 20:40:42 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 716AC19C79;
+ Mon, 15 Jun 2020 20:40:46 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id EE2101132CC1; Mon, 15 Jun 2020 22:40:08 +0200 (CEST)
+ id 221FB1132A08; Mon, 15 Jun 2020 22:40:09 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 58/84] auxbus: New aux_bus_realize(),
- pairing with aux_bus_init()
-Date: Mon, 15 Jun 2020 22:39:42 +0200
-Message-Id: <20200615204008.3069956-59-armbru@redhat.com>
+Subject: [PULL 69/84] sysbus: Tidy up sysbus_init_child_obj()'s @childsize arg, part 2
+Date: Mon, 15 Jun 2020 22:39:53 +0200
+Message-Id: <20200615204008.3069956-70-armbru@redhat.com>
 In-Reply-To: <20200615204008.3069956-1-armbru@redhat.com>
 References: <20200615204008.3069956-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
+ helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 15:33:00
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
@@ -95,74 +97,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-aux_bus_init() encapsulates the creation of an aux-bus and its
-aux-to-i2c-bridge device.
+The callers of sysbus_init_child_obj() commonly pass either &child,
+sizeof(child), or pchild, sizeof(*pchild).  Tidy up the few that use
+something else instead, mostly to keep future commits simpler.
 
-Create aux_bus_realize() to similarly encapsulate their realization.
+Coccinelle script:
+
+    @@
+    expression parent, propname, type;
+    expression child;
+    type T;
+    T proxy;
+    @@
+    (
+         sysbus_init_child_obj(parent, propname, &child, sizeof(child), type)
+    |
+         sysbus_init_child_obj(parent, propname, child, sizeof(*child), type)
+    |
+    -    sysbus_init_child_obj(parent, propname, child, sizeof(proxy), type)
+    +    sysbus_init_child_obj(parent, propname, child, sizeof(*child), type)
+    )
+
+This script is *unsound*: for each change we need to verify the
+@childsize argument stays the same.  I did.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <20200610053247.1583243-33-armbru@redhat.com>
+Message-Id: <20200610053247.1583243-44-armbru@redhat.com>
 ---
- include/hw/misc/auxbus.h | 7 +++++++
- hw/display/xlnx_dp.c     | 2 +-
- hw/misc/auxbus.c         | 5 +++++
- 3 files changed, 13 insertions(+), 1 deletion(-)
+ hw/arm/mps2-tz.c | 15 +++++++--------
+ hw/arm/musca.c   |  7 +++----
+ 2 files changed, 10 insertions(+), 12 deletions(-)
 
-diff --git a/include/hw/misc/auxbus.h b/include/hw/misc/auxbus.h
-index 5cfd7a9284..0d849d9d89 100644
---- a/include/hw/misc/auxbus.h
-+++ b/include/hw/misc/auxbus.h
-@@ -93,6 +93,13 @@ struct AUXSlave {
-  */
- AUXBus *aux_bus_init(DeviceState *parent, const char *name);
+diff --git a/hw/arm/mps2-tz.c b/hw/arm/mps2-tz.c
+index ad0bc9365a..90f4449b9d 100644
+--- a/hw/arm/mps2-tz.c
++++ b/hw/arm/mps2-tz.c
+@@ -193,7 +193,7 @@ static MemoryRegion *make_uart(MPS2TZMachineState *mms, void *opaque,
+     SysBusDevice *s;
+     DeviceState *orgate_dev = DEVICE(&mms->uart_irq_orgate);
  
-+/**
-+ * aux_bus_realize: Realize an AUX bus.
-+ *
-+ * @bus: The AUX bus.
-+ */
-+void aux_bus_realize(AUXBus *bus);
-+
- /*
-  * aux_request: Make a request on the bus.
-  *
-diff --git a/hw/display/xlnx_dp.c b/hw/display/xlnx_dp.c
-index 31d0c5a101..a714cf8a50 100644
---- a/hw/display/xlnx_dp.c
-+++ b/hw/display/xlnx_dp.c
-@@ -1266,7 +1266,7 @@ static void xlnx_dp_realize(DeviceState *dev, Error **errp)
-     DisplaySurface *surface;
-     struct audsettings as;
+-    sysbus_init_child_obj(OBJECT(mms), name, uart, sizeof(mms->uart[0]),
++    sysbus_init_child_obj(OBJECT(mms), name, uart, sizeof(*uart),
+                           TYPE_CMSDK_APB_UART);
+     qdev_prop_set_chr(DEVICE(uart), "chardev", serial_hd(i));
+     qdev_prop_set_uint32(DEVICE(uart), "pclk-frq", SYSCLK_FRQ);
+@@ -214,8 +214,8 @@ static MemoryRegion *make_scc(MPS2TZMachineState *mms, void *opaque,
+     DeviceState *sccdev;
+     MPS2TZMachineClass *mmc = MPS2TZ_MACHINE_GET_CLASS(mms);
  
--    qdev_init_nofail(DEVICE(s->aux_bus->bridge));
-+    aux_bus_realize(s->aux_bus);
- 
-     qdev_init_nofail(DEVICE(s->dpcd));
-     aux_map_slave(AUX_SLAVE(s->dpcd), 0x0000);
-diff --git a/hw/misc/auxbus.c b/hw/misc/auxbus.c
-index e93a35dd0a..75b6de1c63 100644
---- a/hw/misc/auxbus.c
-+++ b/hw/misc/auxbus.c
-@@ -81,6 +81,11 @@ AUXBus *aux_bus_init(DeviceState *parent, const char *name)
-     return bus;
- }
- 
-+void aux_bus_realize(AUXBus *bus)
-+{
-+    qdev_init_nofail(DEVICE(bus->bridge));
-+}
-+
- void aux_map_slave(AUXSlave *aux_dev, hwaddr addr)
+-    sysbus_init_child_obj(OBJECT(mms), "scc", scc,
+-                          sizeof(mms->scc), TYPE_MPS2_SCC);
++    sysbus_init_child_obj(OBJECT(mms), "scc", scc, sizeof(*scc),
++                          TYPE_MPS2_SCC);
+     sccdev = DEVICE(scc);
+     qdev_prop_set_uint32(sccdev, "scc-cfg4", 0x2);
+     qdev_prop_set_uint32(sccdev, "scc-aid", 0x00200008);
+@@ -229,8 +229,8 @@ static MemoryRegion *make_fpgaio(MPS2TZMachineState *mms, void *opaque,
  {
-     DeviceState *dev = DEVICE(aux_dev);
+     MPS2FPGAIO *fpgaio = opaque;
+ 
+-    sysbus_init_child_obj(OBJECT(mms), "fpgaio", fpgaio,
+-                          sizeof(mms->fpgaio), TYPE_MPS2_FPGAIO);
++    sysbus_init_child_obj(OBJECT(mms), "fpgaio", fpgaio, sizeof(*fpgaio),
++                          TYPE_MPS2_FPGAIO);
+     object_property_set_bool(OBJECT(fpgaio), true, "realized", &error_fatal);
+     return sysbus_mmio_get_region(SYS_BUS_DEVICE(fpgaio), 0);
+ }
+@@ -267,7 +267,7 @@ static MemoryRegion *make_mpc(MPS2TZMachineState *mms, void *opaque,
+ 
+     memory_region_init_ram(ssram, NULL, name, ramsize[i], &error_fatal);
+ 
+-    sysbus_init_child_obj(OBJECT(mms), mpcname, mpc, sizeof(mms->ssram_mpc[0]),
++    sysbus_init_child_obj(OBJECT(mms), mpcname, mpc, sizeof(*mpc),
+                           TYPE_TZ_MPC);
+     object_property_set_link(OBJECT(mpc), OBJECT(ssram),
+                              "downstream", &error_fatal);
+@@ -363,8 +363,7 @@ static MemoryRegion *make_spi(MPS2TZMachineState *mms, void *opaque,
+     int i = spi - &mms->spi[0];
+     SysBusDevice *s;
+ 
+-    sysbus_init_child_obj(OBJECT(mms), name, spi, sizeof(mms->spi[0]),
+-                          TYPE_PL022);
++    sysbus_init_child_obj(OBJECT(mms), name, spi, sizeof(*spi), TYPE_PL022);
+     object_property_set_bool(OBJECT(spi), true, "realized", &error_fatal);
+     s = SYS_BUS_DEVICE(spi);
+     sysbus_connect_irq(s, 0, get_sse_irq_in(mms, 51 + i));
+diff --git a/hw/arm/musca.c b/hw/arm/musca.c
+index b7f1c4e128..a1a6e887ed 100644
+--- a/hw/arm/musca.c
++++ b/hw/arm/musca.c
+@@ -256,7 +256,7 @@ static MemoryRegion *make_mpc(MuscaMachineState *mms, void *opaque,
+         g_assert_not_reached();
+     }
+ 
+-    sysbus_init_child_obj(OBJECT(mms), mpcname, mpc, sizeof(mms->mpc[0]),
++    sysbus_init_child_obj(OBJECT(mms), mpcname, mpc, sizeof(*mpc),
+                           TYPE_TZ_MPC);
+     object_property_set_link(OBJECT(mpc), OBJECT(downstream),
+                              "downstream", &error_fatal);
+@@ -279,7 +279,7 @@ static MemoryRegion *make_rtc(MuscaMachineState *mms, void *opaque,
+ {
+     PL031State *rtc = opaque;
+ 
+-    sysbus_init_child_obj(OBJECT(mms), name, rtc, sizeof(mms->rtc), TYPE_PL031);
++    sysbus_init_child_obj(OBJECT(mms), name, rtc, sizeof(*rtc), TYPE_PL031);
+     object_property_set_bool(OBJECT(rtc), true, "realized", &error_fatal);
+     sysbus_connect_irq(SYS_BUS_DEVICE(rtc), 0, get_sse_irq_in(mms, 39));
+     return sysbus_mmio_get_region(SYS_BUS_DEVICE(rtc), 0);
+@@ -293,8 +293,7 @@ static MemoryRegion *make_uart(MuscaMachineState *mms, void *opaque,
+     int irqbase = 7 + i * 6;
+     SysBusDevice *s;
+ 
+-    sysbus_init_child_obj(OBJECT(mms), name, uart, sizeof(mms->uart[0]),
+-                          TYPE_PL011);
++    sysbus_init_child_obj(OBJECT(mms), name, uart, sizeof(*uart), TYPE_PL011);
+     qdev_prop_set_chr(DEVICE(uart), "chardev", serial_hd(i));
+     object_property_set_bool(OBJECT(uart), true, "realized", &error_fatal);
+     s = SYS_BUS_DEVICE(uart);
 -- 
 2.26.2
 
