@@ -2,96 +2,89 @@ Return-Path: <SRS0=tJVC=74=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 284B6C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 16:02:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94AFCC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 16:05:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E532220679
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 16:02:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 586572078A
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 16:05:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=adacore-com.20150623.gappssmtp.com header.i=@adacore-com.20150623.gappssmtp.com header.b="kj/yhVvw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E532220679
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=adacore.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="itP7RDKB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 586572078A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38968 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52040 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkrYo-0007wo-VB
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 12:02:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48808)
+	id 1jkrcJ-0004wS-Jy
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 12:05:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49196)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <konrad@adacore.com>)
- id 1jkrWJ-0006iw-Oq
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 11:59:35 -0400
-Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:55403)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jkrXk-0007mk-BF
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 12:01:05 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:32898)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <konrad@adacore.com>)
- id 1jkrWH-0000jF-Rp
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 11:59:35 -0400
-Received: by mail-wm1-x335.google.com with SMTP id c71so71485wmd.5
- for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 08:59:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=adacore-com.20150623.gappssmtp.com; s=20150623;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=9Gd2RYW2L+4BwjkBf0sPxKKfQgFuP/xOd6FSKpeq1RU=;
- b=kj/yhVvwXraYIac57Miab8FFOcYoa49v21i+hRsmB4cTAvlFtBXfYHJ3e0IxB4Cius
- eFz2xVe21/mpQ2SmoWhZYrQ8XU8cYeFk1h7Z9rVXUaCyHoP/M45mzpkgQ8v1TNNx2ksk
- cA4bpr6HtDYa7JFO1PfipGa4cNE1U8oaCDkCLpqxoN8mBwSyRrzd2R+6e3FQebPN7KV/
- pBrdcFC5u9Dn1pVW7wh2BBwp3iKwKz7M7gcXEYX50LMT/FKjnN66N/ZiPmilOyIhOUoz
- LDyuaQzdXjSpWDhQ04eZ94AWYFralX9x7sFlsewLO6yFJNhPW8jMbBBXbgAeNUEkNZPd
- a31g==
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jkrXh-000131-Nh
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 12:01:04 -0400
+Received: by mail-ot1-x344.google.com with SMTP id n6so13523819otl.0
+ for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 09:01:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=I3yae7jKC5snnNCoi9B6lvanL8+kneVq8p+MpmcY3ws=;
+ b=itP7RDKBY1KvCtFrJ0BIKHPe6o+xWSXMDcAe7+wC5hdyoEM6LMmMB08J2oXgwZ+AwC
+ v1ka6Q7SMLNop8aFbhyYboih9E5PVXfFd7h6pVLO1CMxORK6RTODqG1zvDnbSqET5DnU
+ OPZzCPm/r7BNtKrpqQ8i1DU4WhHelZrJFsXRqTP98bCcesoR28dxXcPFaZ7uh64So/DI
+ 2dXZdkFd614dOljqeQPetfmWLG7rVdErCa5xHSPrDJVgcC/JtBqq+Pb400ZyvZVZ6AeG
+ NPc1QqpCbNuiP/1LUyK7DFvlcVUmm0/hxxu+DCiaqYwNK64c9EiPtg18tVuZp9WA9keq
+ NwRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=9Gd2RYW2L+4BwjkBf0sPxKKfQgFuP/xOd6FSKpeq1RU=;
- b=H0Vjq2H65gba38shOXd1toegG97Y2JvMG/5Xm08JTDUVrxgPrQ3moKLbY5HsQdKx2O
- LSmupQdKZCsXWk5O7JYFAi5dDhIA4nYuOo3OmHUWXhYBUPLfvU3dNIryiLDFdLa2CbTa
- oIJxpzSU6gcS1eiLA00N7eAc8+Fjd9N1eZpxuvPthOglPPYwNdNxHq60qZyFoTzwnogB
- XarO3qXKvkovR8rjt4FypH6bbT1cVjBw3DE1pH4jeRWFYiq+SQ/GpTpn9X67MI981iqo
- cspU2NoLi8OvBgEtks+dLjfDbZAuE23TjSXk+OE07/X62JcvMhiibTugTsDFll8B/Zyn
- zNoA==
-X-Gm-Message-State: AOAM531zUDd0RxbNSU14bZxw4Pv+Wl6NXBUZle1mCwPP/IoAeBuZyuOh
- B+bBdktMOWLjE1O9C3Zj/q4gKQ==
-X-Google-Smtp-Source: ABdhPJy0ATMv+OVjCB3dZF4baFaiGa8h91Fg+1ko7nRe9xlK+cm44j+VVGPRL2LHY5JfZJRCgf3lNw==
-X-Received: by 2002:a1c:2d4b:: with SMTP id t72mr13445126wmt.105.1592236771615; 
- Mon, 15 Jun 2020 08:59:31 -0700 (PDT)
-Received: from linux.home ([2a01:cb19:867e:2100:7eef:23e0:9210:3e8])
- by smtp.gmail.com with ESMTPSA id z9sm22317726wmi.41.2020.06.15.08.59.30
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 15 Jun 2020 08:59:30 -0700 (PDT)
-Subject: Re: [PATCH 1/2] softfloat: m68k: infinity is a valid encoding
-To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
-References: <1588094279-17913-1-git-send-email-frederic.konrad@adacore.com>
- <1588094279-17913-2-git-send-email-frederic.konrad@adacore.com>
- <1f4d93eb-0b89-5189-0147-3a456197cc0d@vivier.eu>
-From: Fred Konrad <konrad@adacore.com>
-Message-ID: <0cfb0348-d6db-db68-3181-85a605bfa91b@adacore.com>
-Date: Mon, 15 Jun 2020 17:59:30 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=I3yae7jKC5snnNCoi9B6lvanL8+kneVq8p+MpmcY3ws=;
+ b=MAXm0gYtzhHkMIwMCZpV6ElikoakWZWl3bDPnh6w9b13NLvGKEo2p5If3876pLVi87
+ oqYBM0jgPQ4hLyRQ6a1xHyUtH94oi0FnNiUZdU8QMzv0uJC3z+wHxnn7lrFdUUKiVsQP
+ 601R2AnHEcW9PLtM6R89pUMSF5bx2ViIvGkfaytNgoF3twklezstp3fUOGKYQ89JMcWy
+ 0Cz17flw+HMLLVS9USXOEfVoOsxf4JI7KGj3pnZ+A9ctHL+GgjKrVK8WfzSNtYfmmBwE
+ n8pvzzLXYZDlJJFsRc452kNAmZMTvUW8bQKo6AVd/DMIr09D2Y2kGgFI8JEscZZvfxuv
+ jVXA==
+X-Gm-Message-State: AOAM531ypF/zRy9bLe8A9QRXhLjdbPyr3SHbEpq+aXaMUDBrCr0eOLnx
+ oudgItbRP7SfyP6wkYh88VAUNY1ljLZRjDEZoKst2w==
+X-Google-Smtp-Source: ABdhPJxxO3aROImJ4mEpwC3PEFCUd5kgyB1AuR0Lv+srXREHtac3NVWFmbw7biFTCcw38ji5DM8jZoP/GnDBR5dmawM=
+X-Received: by 2002:a05:6830:18da:: with SMTP id
+ v26mr22633420ote.135.1592236859809; 
+ Mon, 15 Jun 2020 09:00:59 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1f4d93eb-0b89-5189-0147-3a456197cc0d@vivier.eu>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::335;
- envelope-from=konrad@adacore.com; helo=mail-wm1-x335.google.com
+References: <20200612175440.9901-1-f4bug@amsat.org>
+ <20200612175440.9901-6-f4bug@amsat.org>
+In-Reply-To: <20200612175440.9901-6-f4bug@amsat.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 15 Jun 2020 17:00:48 +0100
+Message-ID: <CAFEAcA9tMd0VxEm_O1yre36kWp0U48SZj8tMna25h5M02X-_VQ@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 5/5] hw/arm/tosa: Use LED device for the Bluetooth
+ led
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::344;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x344.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -104,83 +97,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, alex.bennee@linaro.org,
- Aurelien Jarno <aurelien@aurel32.net>, philmd@redhat.com
+Cc: Markus Armbruster <armbru@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Esteban Bosse <estebanbosse@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Missed this one sorry.
+On Fri, 12 Jun 2020 at 18:54, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>=
+ wrote:
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  hw/arm/tosa.c  | 7 +++----
+>  hw/arm/Kconfig | 1 +
+>  2 files changed, 4 insertions(+), 4 deletions(-)
+>
+> diff --git a/hw/arm/tosa.c b/hw/arm/tosa.c
+> index 5dee2d76c6..86d7e0283a 100644
+> --- a/hw/arm/tosa.c
+> +++ b/hw/arm/tosa.c
+> @@ -24,6 +24,7 @@
+>  #include "hw/irq.h"
+>  #include "hw/ssi/ssi.h"
+>  #include "hw/sysbus.h"
+> +#include "hw/misc/led.h"
+>  #include "exec/address-spaces.h"
+>
+>  #define TOSA_RAM    0x04000000
+> @@ -68,9 +69,6 @@ static void tosa_microdrive_attach(PXA2xxState *cpu)
+>  static void tosa_out_switch(void *opaque, int line, int level)
+>  {
+>      switch (line) {
+> -        case 0:
+> -            fprintf(stderr, "blue LED %s.\n", level ? "on" : "off");
+> -            break;
+>          case 1:
+>              fprintf(stderr, "green LED %s.\n", level ? "on" : "off");
+>              break;
 
-Le 6/12/20 à 10:31 AM, Laurent Vivier a écrit :
-> Le 28/04/2020 à 19:17, KONRAD Frederic a écrit :
->> The MC68881 say about infinities (3.2.4):
->>
->> "*For the extended precision format, the most significant bit of the
->> mantissa (the integer bit) is a don't care."
->>
->> https://www.nxp.com/docs/en/reference-manual/MC68881UM.pdf
->>
->> The m68k extended format is implemented with the floatx80 and
->> floatx80_invalid_encoding currently treats 0x7fff00000000000000000000 as
->> an invalid encoding.  This patch fixes floatx80_invalid_encoding so it
->> accepts that the most significant bit of the mantissa can be 0.
->>
->> This bug can be revealed with the following code which pushes extended
->> infinity on the stack as a double and then reloads it as a double.  It
->> should normally be converted and read back as infinity and is currently
->> read back as nan:
->>
->>          .global _start
->>          .text
->> _start:
->>          lea val, %a0
->>          lea fp, %fp
->>          fmovex (%a0), %fp0
->>          fmoved %fp0, %fp@(-8)
->>          fmoved %fp@(-8), %fp0
->> end:
->>          bra end
->>
->> .align 0x4
->> val:
->>          .fill 1, 4, 0x7fff0000
->>          .fill 1, 4, 0x00000000
->>          .fill 1, 4, 0x00000000
->> .align 0x4
->>          .fill 0x100, 1, 0
->> fp:
->>
+Why convert the blue LED and not the green, amber or wlan LEDs ?
 
-[...]
-
-> 
-> According to "M68000 FAMILY PROGRAMMER’S REFERENCE MANUAL" the explicit
-> integer bit is "Don't care" for signed infinite (a.high == 0x7FFF) (this
-> is the case this patch manages).
-> 
-> But wit a zero exponent and a non zero mantissa, it's a denormal number,
-> and a signed zero has also a zero explicit integer bit but a zero
-> mantissa. (both cases are already managed in the existing code).
-> 
-> with a non zero exponent less than the maximum value it's an unnormal
-> number.
-> 
-> The denormal and unnormal numbers must be managed during the load
-> operation in the m68k TCG emulation to generate directly the FP_UNIMP
-> exception.
-
-Is this already handled in the TCG code?
-
-Thanks,
-Fred
-
-> 
-> So I think, in the end, we don't have invalid number at softfloat level
-> and floatx80_invalid_encoding() should always return "false" for
-> TARGET_M68K.
-> 
-> Thanks,
-> Laurent
-> 
+thanks
+-- PMM
 
