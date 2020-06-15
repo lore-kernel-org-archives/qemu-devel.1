@@ -2,93 +2,63 @@ Return-Path: <SRS0=tJVC=74=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 566D4C433E0
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41406C433DF
 	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 19:46:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1C61220714
+	by mail.kernel.org (Postfix) with ESMTPS id 0E3AD206F1
 	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 19:46:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IPSfHt/u"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C61220714
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E3AD206F1
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=tribudubois.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38524 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38564 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkv3i-0004bQ-9Q
+	id 1jkv3i-0004cQ-BI
 	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 15:46:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49424)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49490)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1jkv2b-0003Zj-TS
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 15:45:09 -0400
-Received: from mail-ej1-x644.google.com ([2a00:1450:4864:20::644]:38097)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1jkv2Z-0007Jc-VP
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 15:45:09 -0400
-Received: by mail-ej1-x644.google.com with SMTP id w16so18213721ejj.5
- for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 12:45:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=ql1T/RiO6XN1R2PDVa+85DVIUNXmDQjPaf6T3YW8dLk=;
- b=IPSfHt/uPbuDEJpUZEcS8bgZdqFh+4BFjqGEf5b22SdArIUHGfND2a9DKEfvIfS3T2
- vy5X6Zk7tlYtEHHkoPStl5b5kB/BC2cf890/fn4vvhBY3sAtglP+pOR8IdOR5lXwkN/B
- UbhSFvbQhIrONSMgbL7+mO0pxOz95zHScMN3cYRbNqQoEAiLa1SjAGlxbzhglwsd/a06
- o1zIZ0XEtKFGNVr/MlA73s4pFYFjnAzMI6VgsbkIv02YThIPPp20g/Xp7eJncqGxhSvP
- SbvZyiZ3yXXWmE/n+6pGFiUKmA4vSO1k9ll+Oa27xFuhHN/30/zlBnPoNyLVAXhoSPFw
- qeTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=ql1T/RiO6XN1R2PDVa+85DVIUNXmDQjPaf6T3YW8dLk=;
- b=L9vXsOVF5GPerSYqN6BED/kzt9XWTYA9rw/TmaCrwhfPygswgQYnzQ8kYF+qU9Twif
- u1/UyADEkbFvnKjvdC0c4OhFDMkoHRhSiGfkzn8Facb6IXJOn1mbY7590PG9MHZNi6Q3
- YD/nLbm3OMzNDKVvIvOLREO2XnJfTEJsa55H8nVg6plwjJ4rPflsOmVdJYGh1IN7x+aj
- 8J93wiFdz5ql4qP5xu8QhznliNmY0Sp+GLzrsA3yX2FcjioJHFvL+y1qtLOZ/RA6irih
- f5iAfXfpPz4wNAHbwNLabj4GpO5I6+M9UtUd/iRsCpweCKnVJ37A/RIIj61uTHX0eF+C
- zUKQ==
-X-Gm-Message-State: AOAM531fPyt35JFz7mplSrXs+7LmxvYpoHNVSxEhnwpOUcZO/aVxMpdO
- fv2CVb+xfiTPcom9/SpcNHblwcdIq1ErmwnFSAQ=
-X-Google-Smtp-Source: ABdhPJynlJMrgkvu7MHyhLLB5gumyLlavYSxWJ2f7OGiIExb/N3I1lRDCrmcDJ0nYdVI4XaKD3mz/hpUhX62cKDI02c=
-X-Received: by 2002:a17:906:fb19:: with SMTP id
- lz25mr28183085ejb.349.1592250306485; 
- Mon, 15 Jun 2020 12:45:06 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <jcd@tribudubois.net>)
+ id 1jkv2g-0003bt-Fn; Mon, 15 Jun 2020 15:45:14 -0400
+Received: from relay3-d.mail.gandi.net ([217.70.183.195]:43647)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <jcd@tribudubois.net>)
+ id 1jkv2c-0007JX-J8; Mon, 15 Jun 2020 15:45:13 -0400
+X-Originating-IP: 82.252.130.88
+Received: from [192.168.1.155] (lns-bzn-59-82-252-130-88.adsl.proxad.net
+ [82.252.130.88]) (Authenticated sender: jcd@tribudubois.net)
+ by relay3-d.mail.gandi.net (Postfix) with ESMTPSA id 2F62A60002;
+ Mon, 15 Jun 2020 19:45:00 +0000 (UTC)
+Subject: Re: [PATCH v5 2/3] hw/net/imx_fec: Allow phy not to be the first
+ device on the mii bus.
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <cover.1591272275.git.jcd@tribudubois.net>
+ <a6223b7b5c1564afc5fb3c2a9ad514bdb41be5a5.1591272275.git.jcd@tribudubois.net>
+ <CAFEAcA_b0k4m29NqU82GC2xvjQXTVkYWQei8hrG2fxjQAcgc0g@mail.gmail.com>
+From: Jean-Christophe DUBOIS <jcd@tribudubois.net>
+Message-ID: <53c48a6c-340c-d688-e935-c74ac519af84@tribudubois.net>
+Date: Mon, 15 Jun 2020 21:45:00 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-References: <1591065557-9174-1-git-send-email-chenhc@lemote.com>
- <1591065557-9174-2-git-send-email-chenhc@lemote.com>
- <CAHiYmc5o3GdzEeCm5KGM0kDJcGXbJ=syd9sFEg1AqLOirFNg-Q@mail.gmail.com>
- <CAAhV-H6KHOLDstUQvOV+8T872R_mLH-ZYHG1YaA6FSqd5meovw@mail.gmail.com>
- <653db100-34fb-6cbd-215b-e4d931cc5e07@redhat.com>
-In-Reply-To: <653db100-34fb-6cbd-215b-e4d931cc5e07@redhat.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Mon, 15 Jun 2020 21:44:55 +0200
-Message-ID: <CAL1e-=iuAbE+TF1kCZokX75uALZDTndugZVq-mGebJ0F10TLsA@mail.gmail.com>
-Subject: Re: [PATCH for-5.1 V4 1/4] hw/mips: Implement the kvm_type() hook in
- MachineClass
-To: Thomas Huth <thuth@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::644;
- envelope-from=aleksandar.m.mail@gmail.com; helo=mail-ej1-x644.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+In-Reply-To: <CAFEAcA_b0k4m29NqU82GC2xvjQXTVkYWQei8hrG2fxjQAcgc0g@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Received-SPF: pass client-ip=217.70.183.195; envelope-from=jcd@tribudubois.net;
+ helo=relay3-d.mail.gandi.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 15:45:05
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -25
+X-Spam_score: -2.6
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -102,217 +72,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Huacai Chen <zltjiangshi@gmail.com>, Huacai Chen <chenhuacai@gmail.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
+Cc: qemu-arm <qemu-arm@nongnu.org>, Peter Chubb <peter.chubb@nicta.com.au>,
  QEMU Developers <qemu-devel@nongnu.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jun 15, 2020 at 10:55 AM Thomas Huth <thuth@redhat.com> wrote:
->
-> On 15/06/2020 02.52, Huacai Chen wrote:
-> > Hi, Aleksandar,
-> >
-> > On Sun, Jun 14, 2020 at 4:07 PM Aleksandar Markovic
-> > <aleksandar.qemu.devel@gmail.com> wrote:
-> >>
-> >>
-> >>
-> >> =D1=83=D1=82=D0=BE, 2. =D1=98=D1=83=D0=BD 2020. =D1=83 04:38 Huacai Ch=
-en <zltjiangshi@gmail.com> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=
-=B0=D0=BE/=D0=BB=D0=B0:
-> >>>
-> >>> MIPS has two types of KVM: TE & VZ, and TE is the default type. Now w=
-e
-> >>> can't create a VZ guest in QEMU because it lacks the kvm_type() hook =
-in
-> >>> MachineClass. Besides, libvirt uses a null-machine to detect the kvm
-> >>> capability, so by default it will return "KVM not supported" on a VZ
-> >>> platform. Thus, null-machine also need the kvm_type() hook.
-> >>>
-> >>> Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-> >>> Signed-off-by: Huacai Chen <chenhc@lemote.com>
-> >>> Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
-> >>> ---
-> >>
-> >> Huacai,
-> >>
-> >> Please take a look at Peter's remarks at:
-> >>
-> >> https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg01878.html
-> >>
-> >> ...and refactor this patch for v5. My general advice: The simpler, the=
- batter.
-> >>
-> > OK, I will rework this patch.
->
->  Hi,
->
-> is there maybe also a way to do this without moving null-machine.o from
-> common-obj-y to obj-y, and to avoid the target-specific hacks in this
-> file ? We just moved the null-machine from obj-y to common-obj-y two
-> years ago (see commit 3858ff763985fb9e), since it's more desirable to
-> have as much code in common-obj to save compilation time and maybe to be
-> able to link a qemu with more than one target CPU in one binary one day..=
-.
->
-> ppc64 has also more than one kvm_type (kvm-hv and kvm-pr), and
-> apparently it also works without hacks to the null-machine code there
-> ... so maybe you can peek into the ppc64 code to see how it is solved the=
-re?
->
+Le 15/06/2020 à 14:23, Peter Maydell a écrit :
+> On Thu, 4 Jun 2020 at 13:39, Jean-Christophe Dubois <jcd@tribudubois.net> wrote:
+>> Up to now we were allowing only one PHY device and it had to be the
+>> first device on the bus.
+>>
+>> The i.MX6UL has 2 Ethernet devices and can therefore have several
+>> PHY devices on the bus (and not necessarilly as device 0).
+>>
+>> This patch allows for PHY devices on 2nd, 3rd or any position.
+>>
+>> Signed-off-by: Jean-Christophe Dubois <jcd@tribudubois.net>
+>> diff --git a/hw/net/imx_fec.c b/hw/net/imx_fec.c
+>> index eefedc252de..29e613699ee 100644
+>> --- a/hw/net/imx_fec.c
+>> +++ b/hw/net/imx_fec.c
+>> @@ -280,11 +280,9 @@ static void imx_phy_reset(IMXFECState *s)
+>>   static uint32_t imx_phy_read(IMXFECState *s, int reg)
+>>   {
+>>       uint32_t val;
+>> +    uint32_t phy = reg / 32;
+>>
+>> -    if (reg > 31) {
+>> -        /* we only advertise one phy */
+>> -        return 0;
+>> -    }
+>> +    reg %= 32;
+> This change means we now support multiple PHYs...
 
-Hi, Huacai,
+Yes, on the i.MX6UL there are 2 ENET devices but only one MDIO bus to 
+acess the PHYs.
 
-I think the optimal outcome for this release of QEMU would be if you
-drop support for VZ. I think your scenario could work without VZ,
-couldn't it?
+On the i.MX6UL evaluation board, PHY seems to be at offset/adress 1 and 2.
 
-This is a fairly complex thing, and, as you see, it is a little
-intrusive, it could negatively impact other targets. With enough
-development time, you can easily provide that support in 5.2. - but
-now we are close to 5.1 softfreeze.
+See linux/arch/arm/boot/dts/imx6ul-14x14-evk.dtsi for details.
 
-Even without VZ support, I would consider your contribution the most
-significant for MIPS target in last two years, at least - a giant step
-ahead!
-
-Best Regards,
-Aleksandar
-
->  Thomas
 >
+>>       switch (reg) {
+>>       case 0:     /* Basic Control */
+>> @@ -331,19 +329,18 @@ static uint32_t imx_phy_read(IMXFECState *s, int reg)
+>>           break;
+>>       }
+>>
+>> -    trace_imx_phy_read(val, reg);
+>> +    trace_imx_phy_read(val, phy, reg);
+> ...but the only change we actually make is to trace the phy number.
+> Surely if there is more than one phy then each phy needs to have
+> its own state (phy_control/phy_status/phy_advertise/etc), rather
+> than all these PHYs all sharing the same state under the hood?
+
+Well there might be several PHYs on the MDIO bus but each PHY is used 
+only by one ENET device. There is no plan for one ENET to use either 
+PHY. It can only use one.
+
+In Qemu (or at least in the FEC ethernet device emulator) the phy state 
+is embedded in the ethernet device state.
+
 >
-> >>>  hw/core/Makefile.objs  |  2 +-
-> >>>  hw/core/null-machine.c |  4 ++++
-> >>>  hw/mips/Makefile.objs  |  2 +-
-> >>>  hw/mips/common.c       | 42 ++++++++++++++++++++++++++++++++++++++++=
-++
-> >>>  include/hw/mips/mips.h |  3 +++
-> >>>  5 files changed, 51 insertions(+), 2 deletions(-)
-> >>>  create mode 100644 hw/mips/common.c
-> >>>
-> >>> diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
-> >>> index 1d540ed..b5672f4 100644
-> >>> --- a/hw/core/Makefile.objs
-> >>> +++ b/hw/core/Makefile.objs
-> >>> @@ -17,11 +17,11 @@ common-obj-$(CONFIG_SOFTMMU) +=3D vm-change-state=
--handler.o
-> >>>  common-obj-$(CONFIG_SOFTMMU) +=3D qdev-properties-system.o
-> >>>  common-obj-$(CONFIG_SOFTMMU) +=3D sysbus.o
-> >>>  common-obj-$(CONFIG_SOFTMMU) +=3D machine.o
-> >>> -common-obj-$(CONFIG_SOFTMMU) +=3D null-machine.o
-> >>>  common-obj-$(CONFIG_SOFTMMU) +=3D loader.o
-> >>>  common-obj-$(CONFIG_SOFTMMU) +=3D machine-hmp-cmds.o
-> >>>  common-obj-$(CONFIG_SOFTMMU) +=3D numa.o
-> >>>  common-obj-$(CONFIG_SOFTMMU) +=3D clock-vmstate.o
-> >>> +obj-$(CONFIG_SOFTMMU) +=3D null-machine.o
-> >>>  obj-$(CONFIG_SOFTMMU) +=3D machine-qmp-cmds.o
-> >>>
-> >>>  common-obj-$(CONFIG_EMPTY_SLOT) +=3D empty_slot.o
-> >>> diff --git a/hw/core/null-machine.c b/hw/core/null-machine.c
-> >>> index cb47d9d..94a36f9 100644
-> >>> --- a/hw/core/null-machine.c
-> >>> +++ b/hw/core/null-machine.c
-> >>> @@ -17,6 +17,7 @@
-> >>>  #include "sysemu/sysemu.h"
-> >>>  #include "exec/address-spaces.h"
-> >>>  #include "hw/core/cpu.h"
-> >>> +#include "hw/mips/mips.h"
-> >>>
-> >>>  static void machine_none_init(MachineState *mch)
-> >>>  {
-> >>> @@ -50,6 +51,9 @@ static void machine_none_machine_init(MachineClass =
-*mc)
-> >>>      mc->max_cpus =3D 1;
-> >>>      mc->default_ram_size =3D 0;
-> >>>      mc->default_ram_id =3D "ram";
-> >>> +#ifdef TARGET_MIPS
-> >>> +    mc->kvm_type =3D mips_kvm_type;
-> >>> +#endif
-> >>>  }
-> >>>
-> >>>  DEFINE_MACHINE("none", machine_none_machine_init)
-> >>> diff --git a/hw/mips/Makefile.objs b/hw/mips/Makefile.objs
-> >>> index 739e2b7..3b3e6ea 100644
-> >>> --- a/hw/mips/Makefile.objs
-> >>> +++ b/hw/mips/Makefile.objs
-> >>> @@ -1,4 +1,4 @@
-> >>> -obj-y +=3D addr.o mips_int.o
-> >>> +obj-y +=3D addr.o common.o mips_int.o
-> >>>  obj-$(CONFIG_R4K) +=3D r4k.o
-> >>>  obj-$(CONFIG_MALTA) +=3D gt64xxx_pci.o malta.o
-> >>>  obj-$(CONFIG_MIPSSIM) +=3D mipssim.o
-> >>> diff --git a/hw/mips/common.c b/hw/mips/common.c
-> >>> new file mode 100644
-> >>> index 0000000..4d8e141
-> >>> --- /dev/null
-> >>> +++ b/hw/mips/common.c
-> >>> @@ -0,0 +1,42 @@
-> >>> +/*
-> >>> + * Common MIPS routines
-> >>> + *
-> >>> + * Copyright (c) 2020 Huacai Chen (chenhc@lemote.com)
-> >>> + * This code is licensed under the GNU GPL v2.
-> >>> + */
-> >>> +
-> >>> +#include <linux/kvm.h>
-> >>> +#include "qemu/osdep.h"
-> >>> +#include "qemu-common.h"
-> >>> +#include "hw/boards.h"
-> >>> +#include "hw/mips/mips.h"
-> >>> +#include "sysemu/kvm_int.h"
-> >>> +
-> >>> +#ifndef CONFIG_KVM
-> >>> +
-> >>> +int mips_kvm_type(MachineState *machine, const char *vm_type)
-> >>> +{
-> >>> +    return 0;
-> >>> +}
-> >>> +
-> >>> +#else
-> >>> +
-> >>> +int mips_kvm_type(MachineState *machine, const char *vm_type)
-> >>> +{
-> >>> +    int r;
-> >>> +    KVMState *s =3D KVM_STATE(machine->accelerator);
-> >>> +
-> >>> +    r =3D kvm_check_extension(s, KVM_CAP_MIPS_VZ);
-> >>> +    if (r > 0) {
-> >>> +        return KVM_VM_MIPS_VZ;
-> >>> +    }
-> >>> +
-> >>> +    r =3D kvm_check_extension(s, KVM_CAP_MIPS_TE);
-> >>> +    if (r > 0) {
-> >>> +        return KVM_VM_MIPS_TE;
-> >>> +    }
-> >>> +
-> >>> +    return -1;
-> >>> +}
-> >>> +
-> >>> +#endif
-> >>> diff --git a/include/hw/mips/mips.h b/include/hw/mips/mips.h
-> >>> index 0af4c3d..2ac0580 100644
-> >>> --- a/include/hw/mips/mips.h
-> >>> +++ b/include/hw/mips/mips.h
-> >>> @@ -20,4 +20,7 @@ void rc4030_dma_write(void *dma, uint8_t *buf, int =
-len);
-> >>>
-> >>>  DeviceState *rc4030_init(rc4030_dma **dmas, IOMMUMemoryRegion **dma_=
-mr);
-> >>>
-> >>> +/* common.c */
-> >>> +int mips_kvm_type(MachineState *machine, const char *vm_type);
-> >>> +
-> >>>  #endif
-> >>> --
-> >>> 2.7.0
-> >>>
-> >
+> It also sounds from your commit message as if there isn't a
+> large number of PHYs, but only perhaps two. In that case
+> don't we need to fail attempts to access non-existent PHYs
+> and only work with the ones which actually exist on any
+> given board?
+
+As stated on the particular i.MX6UL evaluation board there are 2 phys 
+connected to the MDIO bus at adresse 1 and 2.
+
+On another board the PHYs could be at different addresses or we might 
+use only one MAC and therefore only one PHY.
+
+So in order to be able to fail on bad PHY access we need to discriminate 
+for each board which PHYs are actually present and at what address on 
+the MDIO bus. We would also need to know which PHY is connected to which 
+MAC.
+
+I might have overlook something but so far there is no clear separate 
+PHY and MAC implementation.
+
+Usually the PHY is more or less part of the MAC implementation and there 
+are no easy way to instantiate them separately then connect them with 
+the required bus (MDIO and MAC).
+
+I guess it might be feasible even if it sounds like overkill most of the 
+time (you usually get one MAC connected to one PHY).
+
+Is there such a qemu framework that would allow to connect multiple PHY 
+to a single MDIO bus and then each PHY to a specific MAC device? Could 
+you point me in the right direction ?
+
 >
->
+> thanks
+> -- PMM
+
+
 
