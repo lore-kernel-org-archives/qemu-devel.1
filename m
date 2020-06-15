@@ -2,78 +2,64 @@ Return-Path: <SRS0=tJVC=74=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3497C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 03:06:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2ACA9C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 03:19:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A7D3020739
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 03:06:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7D3020739
+	by mail.kernel.org (Postfix) with ESMTPS id EB4CF20739
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 03:19:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB4CF20739
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38176 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43032 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkfSN-0007zY-S0
-	for qemu-devel@archiver.kernel.org; Sun, 14 Jun 2020 23:06:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45608)
+	id 1jkfew-0004AC-4i
+	for qemu-devel@archiver.kernel.org; Sun, 14 Jun 2020 23:19:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48338)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhang.zhanghailiang@huawei.com>)
- id 1jkfRn-0007ZH-O1
- for qemu-devel@nongnu.org; Sun, 14 Jun 2020 23:06:07 -0400
-Received: from szxga08-in.huawei.com ([45.249.212.255]:51706 helo=huawei.com)
+ (Exim 4.90_1) (envelope-from <zhukeqian1@huawei.com>)
+ id 1jkfeE-0003cY-FG; Sun, 14 Jun 2020 23:18:58 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:41470 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhang.zhanghailiang@huawei.com>)
- id 1jkfRk-0002um-9T
- for qemu-devel@nongnu.org; Sun, 14 Jun 2020 23:06:07 -0400
-Received: from DGGEMM405-HUB.china.huawei.com (unknown [172.30.72.56])
- by Forcepoint Email with ESMTP id 6228DDE2D727F828EF69;
- Mon, 15 Jun 2020 11:05:57 +0800 (CST)
-Received: from dggeme758-chm.china.huawei.com (10.3.19.104) by
- DGGEMM405-HUB.china.huawei.com (10.3.20.213) with Microsoft SMTP Server (TLS)
- id 14.3.487.0; Mon, 15 Jun 2020 11:05:57 +0800
-Received: from dggeme756-chm.china.huawei.com (10.3.19.102) by
- dggeme758-chm.china.huawei.com (10.3.19.104) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1913.5; Mon, 15 Jun 2020 11:05:57 +0800
-Received: from dggeme756-chm.china.huawei.com ([10.6.80.68]) by
- dggeme756-chm.china.huawei.com ([10.6.80.68]) with mapi id 15.01.1913.007;
- Mon, 15 Jun 2020 11:05:56 +0800
-From: Zhanghailiang <zhang.zhanghailiang@huawei.com>
-To: Like Xu <like.xu@linux.intel.com>, "qemu-devel@nongnu.org"
- <qemu-devel@nongnu.org>
-Subject: RE: [PATCH 1/2] migration/colo: fix typo in the COLO Framework module
-Thread-Topic: [PATCH 1/2] migration/colo: fix typo in the COLO Framework module
-Thread-Index: AQHWQihESQ1QHSyBjUOMZYAPEejPW6jY5YMw//+IFwCAAI/TwA==
-Date: Mon, 15 Jun 2020 03:05:56 +0000
-Message-ID: <39e096702ae54e109ae7599525161739@huawei.com>
-References: <20200614084510.7917-1-like.xu@linux.intel.com>
- <17a0016f32fb471fa57e4f0c21ecb19d@huawei.com>
- <0d30a6ce-6641-dc82-10e5-cd748dbf104a@linux.intel.com>
-In-Reply-To: <0d30a6ce-6641-dc82-10e5-cd748dbf104a@linux.intel.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.173.220.30]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (Exim 4.90_1) (envelope-from <zhukeqian1@huawei.com>)
+ id 1jkfeC-0004sF-Ge; Sun, 14 Jun 2020 23:18:58 -0400
+Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id B9AA485A7CB47FF9F78A;
+ Mon, 15 Jun 2020 11:18:45 +0800 (CST)
+Received: from [10.173.221.230] (10.173.221.230) by
+ DGGEMS406-HUB.china.huawei.com (10.3.19.206) with Microsoft SMTP Server id
+ 14.3.487.0; Mon, 15 Jun 2020 11:18:35 +0800
+Subject: Re: [PATCH] migration: Count new_dirty instead of real_dirty
+To: <qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>, Paolo Bonzini
+ <pbonzini@redhat.com>, <jianjay.zhou@huawei.com>
+References: <20200601040250.38324-1-zhukeqian1@huawei.com>
+From: zhukeqian <zhukeqian1@huawei.com>
+Message-ID: <3205abb1-8e47-fc19-1213-ead621711291@huawei.com>
+Date: Mon, 15 Jun 2020 11:18:35 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
+In-Reply-To: <20200601040250.38324-1-zhukeqian1@huawei.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.173.221.230]
 X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.255;
- envelope-from=zhang.zhanghailiang@huawei.com; helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/14 23:05:58
+Received-SPF: pass client-ip=45.249.212.35; envelope-from=zhukeqian1@huawei.com;
+ helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/14 23:18:47
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
 X-Spam_score_int: -41
 X-Spam_score: -4.2
 X-Spam_bar: ----
 X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -86,72 +72,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: wanghaibin.wang@huawei.com, Chao Fan <fanc.fnst@cn.fujitsu.com>,
+ Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-DQpJIGhhdmUgY2hlY2tlZCB0aGlzIHBhdGNoIGluIG1haWwgYXJjaGl2ZSwgaXQgaGFzIG5vIHBy
-b2JsZW0sDQpJdCBzZWVtcyB0aGF0IG15IGVtYWlsIHNldHVwIGhhcyBzb21lIHByb2JsZW0uIEl0
-IGRpZG4ndCBzaG93IHRoZSByaWdodCBuZXdsaW5lDQpJbiB0aGlzIHBhdGNoLg0KDQoNCj4gLS0t
-LS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogTGlrZSBYdSBbbWFpbHRvOmxpa2UueHVA
-bGludXguaW50ZWwuY29tXQ0KPiBTZW50OiBNb25kYXksIEp1bmUgMTUsIDIwMjAgMTA6MjQgQU0N
-Cj4gVG86IFpoYW5naGFpbGlhbmcgPHpoYW5nLnpoYW5naGFpbGlhbmdAaHVhd2VpLmNvbT47DQo+
-IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZw0KPiBTdWJqZWN0OiBSZTogW1BBVENIIDEvMl0gbWlncmF0
-aW9uL2NvbG86IGZpeCB0eXBvIGluIHRoZSBDT0xPIEZyYW1ld29yaw0KPiBtb2R1bGUNCj4gDQo+
-IE9uIDIwMjAvNi8xNSA5OjM2LCBaaGFuZ2hhaWxpYW5nIHdyb3RlOg0KPiA+IEhpIExpa2UsDQo+
-ID4NCj4gPiBQbGVhc2UgY2hlY2sgdGhpcyBwYXRjaCwgSXQgc2VlbXMgdGhhdCB5b3UgZGlkbid0
-IHVzZSBnaXQgZm9ybWF0LXBhdGNoDQo+ID4gY29tbWFuZCB0byBnZW5lcmF0ZSB0aGlzIHBhdGNo
-LCBJdCBpcyBpbiB3cm9uZyBmb3JtYXQuDQo+IA0KPiBJIHJlYmFzZSB0aGUgcGF0Y2ggb24gdGhl
-IHRvcCBjb21taXQgb2YNCj4gN2QzNjYwZTc5ODMwYTA2OWYxODQ4YmI0ZmExY2RmOGY2NjY0MjRm
-YiwNCj4gYW5kIGhvcGUgaXQgaGVscHMgeW91Lg0KPiANCj4gPg0KPiA+IFRoYW5rcywNCj4gPiBI
-YWlsaWFuZw0KPiANCj4gIEZyb20gMTVjMTliZTliZTA3NTk4ZDQyNjRhNGE4NGI4NWQ0ZWZhNzli
-ZmY5ZCBNb24gU2VwIDE3DQo+IDAwOjAwOjAwIDIwMDENCj4gRnJvbTogTGlrZSBYdSA8bGlrZS54
-dUBsaW51eC5pbnRlbC5jb20+DQo+IERhdGU6IE1vbiwgMTUgSnVuIDIwMjAgMTA6MTA6NTcgKzA4
-MDANCj4gU3ViamVjdDogW1BBVENIIDEvMl0gbWlncmF0aW9uL2NvbG86IGZpeCB0eXBvIGluIHRo
-ZSBDT0xPIEZyYW1ld29yaw0KPiBtb2R1bGUNCj4gDQo+IENjOiBIYWlsaWFuZyBaaGFuZyA8emhh
-bmcuemhhbmdoYWlsaWFuZ0BodWF3ZWkuY29tPg0KPiBTaWduZWQtb2ZmLWJ5OiBMaWtlIFh1IDxs
-aWtlLnh1QGxpbnV4LmludGVsLmNvbT4NCj4gLS0tDQo+ICAgZG9jcy9DT0xPLUZULnR4dCB8IDgg
-KysrKy0tLS0NCj4gICBtaWdyYXRpb24vY29sby5jIHwgMiArLQ0KPiAgIDIgZmlsZXMgY2hhbmdl
-ZCwgNSBpbnNlcnRpb25zKCspLCA1IGRlbGV0aW9ucygtKQ0KPiANCj4gZGlmZiAtLWdpdCBhL2Rv
-Y3MvQ09MTy1GVC50eHQgYi9kb2NzL0NPTE8tRlQudHh0IGluZGV4DQo+IGM4ZTE3NDA5MzUuLmZk
-YzAyMDdjZmYgMTAwNjQ0DQo+IC0tLSBhL2RvY3MvQ09MTy1GVC50eHQNCj4gKysrIGIvZG9jcy9D
-T0xPLUZULnR4dA0KPiBAQCAtMTAsNyArMTAsNyBAQCBTZWUgdGhlIENPUFlJTkcgZmlsZSBpbiB0
-aGUgdG9wLWxldmVsIGRpcmVjdG9yeS4NCj4gICBUaGlzIGRvY3VtZW50IGdpdmVzIGFuIG92ZXJ2
-aWV3IG9mIENPTE8ncyBkZXNpZ24gYW5kIGhvdyB0byB1c2UgaXQuDQo+IA0KPiAgID09IEJhY2tn
-cm91bmQgPT0NCj4gLVZpcnR1YWwgbWFjaGluZSAoVk0pIHJlcGxpY2F0aW9uIGlzIGEgd2VsbCBr
-bm93biB0ZWNobmlxdWUgZm9yIHByb3ZpZGluZw0KPiArVmlydHVhbCBtYWNoaW5lIChWTSkgcmVw
-bGljYXRpb24gaXMgYSB3ZWxsLWtub3duIHRlY2huaXF1ZSBmb3INCj4gK3Byb3ZpZGluZw0KPiAg
-IGFwcGxpY2F0aW9uLWFnbm9zdGljIHNvZnR3YXJlLWltcGxlbWVudGVkIGhhcmR3YXJlIGZhdWx0
-IHRvbGVyYW5jZSwNCj4gICBhbHNvIGtub3duIGFzICJub24tc3RvcCBzZXJ2aWNlIi4NCj4gDQo+
-IEBAIC0xMDMsNyArMTAzLDcgQEAgUHJpbWFyeSBzaWRlLg0KPiANCj4gICBDT0xPIFByb3h5Og0K
-PiAgIERlbGl2ZXJzIHBhY2tldHMgdG8gUHJpbWFyeSBhbmQgU2Vjb25kYXJ5LCBhbmQgdGhlbiBj
-b21wYXJlIHRoZQ0KPiByZXNwb25zZXMgZnJvbSAtYm90aCBzaWRlLiBUaGVuIGRlY2lkZSB3aGV0
-aGVyIHRvIHN0YXJ0IGEgY2hlY2twb2ludA0KPiBhY2NvcmRpbmcgdG8gc29tZSBydWxlcy4NCj4g
-K2JvdGggc2lkZXMuIFRoZW4gZGVjaWRlIHdoZXRoZXIgdG8gc3RhcnQgYSBjaGVja3BvaW50IGFj
-Y29yZGluZyB0byBzb21lDQo+IHJ1bGVzLg0KPiAgIFBsZWFzZSByZWZlciB0byBkb2NzL2NvbG8t
-cHJveHkudHh0IGZvciBtb3JlIGluZm9ybWF0aW9uLg0KPiANCj4gICBOb3RlOg0KPiBAQCAtMTQ2
-LDEyICsxNDYsMTIgQEAgaW4gdGVzdCBwcm9jZWR1cmUuDQo+IA0KPiAgID09IFRlc3QgcHJvY2Vk
-dXJlID09DQo+ICAgTm90ZTogSGVyZSB3ZSBhcmUgcnVubmluZyBib3RoIGluc3RhbmNlcyBvbiB0
-aGUgc2FtZSBob3N0IGZvciB0ZXN0aW5nLA0KPiAtY2hhbmdlIHRoZSBJUCBBZGRyZXNzZXMgaWYg
-eW91IHdhbnQgdG8gcnVuIGl0IG9uIHR3byBob3N0cy4gSW5pdGFsbHkNCj4gK2NoYW5nZSB0aGUg
-SVAgQWRkcmVzc2VzIGlmIHlvdSB3YW50IHRvIHJ1biBpdCBvbiB0d28gaG9zdHMuIEluaXRpYWxs
-eQ0KPiAgIDEyNy4wLjAuMSBpcyB0aGUgUHJpbWFyeSBIb3N0IGFuZCAxMjcuMC4wLjIgaXMgdGhl
-IFNlY29uZGFyeSBIb3N0Lg0KPiANCj4gICA9PSBTdGFydHVwIHFlbXUgPT0NCj4gICAxLiBQcmlt
-YXJ5Og0KPiAtTm90ZTogSW5pdGFsbHksICRpbWFnZWZvbGRlci9wcmltYXJ5LnFjb3cyIG5lZWRz
-IHRvIGJlIGNvcGllZCB0byBhbGwgaG9zdHMuDQo+ICtOb3RlOiBJbml0aWFsbHksICRpbWFnZWZv
-bGRlci9wcmltYXJ5LnFjb3cyIG5lZWRzIHRvIGJlIGNvcGllZCB0byBhbGwgaG9zdHMuDQo+ICAg
-WW91IGRvbid0IG5lZWQgdG8gY2hhbmdlIGFueSBJUCdzIGhlcmUsIGJlY2F1c2UgMC4wLjAuMCBs
-aXN0ZW5zIG9uIGFueQ0KPiAgIGludGVyZmFjZS4gVGhlIGNoYXJkZXYncyB3aXRoIDEyNy4wLjAu
-MSBJUCdzIGxvb3BiYWNrIHRvIHRoZSBsb2NhbCBxZW11DQo+ICAgaW5zdGFuY2UuDQo+IGRpZmYg
-LS1naXQgYS9taWdyYXRpb24vY29sby5jIGIvbWlncmF0aW9uL2NvbG8uYyBpbmRleA0KPiBlYTdk
-MWU5ZDRlLi44MDc4OGQ0NmI1IDEwMDY0NA0KPiAtLS0gYS9taWdyYXRpb24vY29sby5jDQo+ICsr
-KyBiL21pZ3JhdGlvbi9jb2xvLmMNCj4gQEAgLTYzMiw3ICs2MzIsNyBAQCBvdXQ6DQo+ICAgICAg
-IC8qDQo+ICAgICAgICAqIEl0IGlzIHNhZmUgdG8gdW5yZWdpc3RlciBub3RpZmllciBhZnRlciBm
-YWlsb3ZlciBmaW5pc2hlZC4NCj4gICAgICAgICogQmVzaWRlcywgY29sb19kZWxheV90aW1lciBh
-bmQgY29sb19jaGVja3BvaW50X3NlbSBjYW4ndCBiZQ0KPiAtICAgICAqIHJlbGVhc2VkIGJlZm9y
-IHVucmVnaXN0ZXIgbm90aWZpZXIsIG9yIHRoZXJlIHdpbGwgYmUgdXNlLWFmdGVyLWZyZWUNCj4g
-KyAgICAgKiByZWxlYXNlZCBiZWZvcmUgdW5yZWdpc3RlciBub3RpZmllciwgb3IgdGhlcmUgd2ls
-bCBiZQ0KPiArIHVzZS1hZnRlci1mcmVlDQo+ICAgICAgICAqIGVycm9yLg0KPiAgICAgICAgKi8N
-Cj4gICAgICAgY29sb19jb21wYXJlX3VucmVnaXN0ZXJfbm90aWZpZXIoJnBhY2tldHNfY29tcGFy
-ZV9ub3RpZmllcik7DQo+IC0tDQo+IDIuMjEuMw0KPiANCg0K
+Hi Paolo and Jian Zhou,
+
+Do you have any suggestion on this patch?
+
+Thanks,
+Keqian
+
+On 2020/6/1 12:02, Keqian Zhu wrote:
+> DIRTY_LOG_INITIALLY_ALL_SET feature is on the queue. This fixs the
+> dirty rate calculation for this feature. After introducing this
+> feature, real_dirty_pages is equal to total memory size at begining.
+> This causing wrong dirty rate and false positive throttling.
+> 
+> BTW, real dirty rate is not suitable and not very accurate.
+> 
+> 1. For not suitable: We mainly concern on the relationship between
+>    dirty rate and network bandwidth. Net increasement of dirty pages
+>    makes more sense.
+> 2. For not very accurate: With manual dirty log clear, some dirty pages
+>    will be cleared during each peroid, our "real dirty rate" is less
+>    than real "real dirty rate".
+> 
+> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+> ---
+>  include/exec/ram_addr.h | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
+> 
+> diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
+> index 5e59a3d8d7..af9677e291 100644
+> --- a/include/exec/ram_addr.h
+> +++ b/include/exec/ram_addr.h
+> @@ -443,7 +443,7 @@ static inline
+>  uint64_t cpu_physical_memory_sync_dirty_bitmap(RAMBlock *rb,
+>                                                 ram_addr_t start,
+>                                                 ram_addr_t length,
+> -                                               uint64_t *real_dirty_pages)
+> +                                               uint64_t *accu_dirty_pages)
+>  {
+>      ram_addr_t addr;
+>      unsigned long word = BIT_WORD((start + rb->offset) >> TARGET_PAGE_BITS);
+> @@ -469,7 +469,6 @@ uint64_t cpu_physical_memory_sync_dirty_bitmap(RAMBlock *rb,
+>              if (src[idx][offset]) {
+>                  unsigned long bits = atomic_xchg(&src[idx][offset], 0);
+>                  unsigned long new_dirty;
+> -                *real_dirty_pages += ctpopl(bits);
+>                  new_dirty = ~dest[k];
+>                  dest[k] |= bits;
+>                  new_dirty &= bits;
+> @@ -502,7 +501,6 @@ uint64_t cpu_physical_memory_sync_dirty_bitmap(RAMBlock *rb,
+>                          start + addr + offset,
+>                          TARGET_PAGE_SIZE,
+>                          DIRTY_MEMORY_MIGRATION)) {
+> -                *real_dirty_pages += 1;
+>                  long k = (start + addr) >> TARGET_PAGE_BITS;
+>                  if (!test_and_set_bit(k, dest)) {
+>                      num_dirty++;
+> @@ -511,6 +509,7 @@ uint64_t cpu_physical_memory_sync_dirty_bitmap(RAMBlock *rb,
+>          }
+>      }
+>  
+> +    *accu_dirty_pages += num_dirty;
+>      return num_dirty;
+>  }
+>  #endif
+> 
 
