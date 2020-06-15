@@ -6,72 +6,71 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B74DC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 21:27:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 743E0C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 21:27:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E904820707
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 21:27:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3BE3220707
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 21:27:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GBg5l1Hk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E904820707
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dpY3ILIb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3BE3220707
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56818 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59184 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkwdR-0004tZ-5o
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 17:27:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35582)
+	id 1jkwe3-0005sU-F1
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 17:27:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33988)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jkw23-00075E-9m
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 16:48:39 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:21688
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jkvug-0003aQ-VJ
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 16:41:03 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:34532
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jkw1z-0001su-OH
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 16:48:38 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jkvua-0000hX-28
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 16:41:02 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592254114;
+ s=mimecast20190719; t=1592253652;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=42aldGQJLbIDZz8lGn47amolxeFmaQnn4yES0rU3IqU=;
- b=GBg5l1Hk33L7tUdcPoBkkouUSVszjvL08vqtcxu8lT1iOuxK0zxkFo1ycn6kSowOQ8PhbO
- IO12dR+CJDJL9PtjS7r8g2vmr0Fq6o5WwlTu7PuMWPVwYhn7YGTpBKzR4TvFKu8gcLHjdv
- p94V+dScNMuFlPivsu5m7H92BJY5qgY=
+ bh=ZrvfWx83UsBfJ7c/RdnrGTuCzY0mtNPg669bRVttTU4=;
+ b=dpY3ILIbVdS3AhgNk+oGqqrduB9REBzjg/M3afrHnznr5yi31jckrJAIwadwlmYUdRyKt6
+ T9ypLqBQX8YTDhLCcImFymCWebKmoODdLJ2hQ5FuIE/XNdPdEIVubA08nMO6ZAy0OE4rj8
+ PMOA0ajC60XI3zhBOieJqC8jvf9bPMY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-45--KTsiJrWNCG76rVLSzgHnw-1; Mon, 15 Jun 2020 16:48:31 -0400
-X-MC-Unique: -KTsiJrWNCG76rVLSzgHnw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-255-odmh5d0lNhmqhkZpNJF6Ig-1; Mon, 15 Jun 2020 16:40:42 -0400
+X-MC-Unique: odmh5d0lNhmqhkZpNJF6Ig-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E2DA6803328;
- Mon, 15 Jun 2020 20:48:30 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3CFA0803308;
+ Mon, 15 Jun 2020 20:40:39 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
  [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B3A7D90337;
- Mon, 15 Jun 2020 20:48:30 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5F2BD19C79;
+ Mon, 15 Jun 2020 20:40:36 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 0478D1132C15; Mon, 15 Jun 2020 22:40:09 +0200 (CEST)
+ id B80911132FDD; Mon, 15 Jun 2020 22:40:08 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 61/84] qom: Tidy up a few object_initialize_child() calls
-Date: Mon, 15 Jun 2020 22:39:45 +0200
-Message-Id: <20200615204008.3069956-62-armbru@redhat.com>
+Subject: [PULL 43/84] pci: pci_create(),
+ pci_create_multifunction() are now unused, drop
+Date: Mon, 15 Jun 2020 22:39:27 +0200
+Message-Id: <20200615204008.3069956-44-armbru@redhat.com>
 In-Reply-To: <20200615204008.3069956-1-armbru@redhat.com>
 References: <20200615204008.3069956-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
@@ -96,82 +95,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Alistair Francis <alistair.francis@wdc.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The callers of object_initialize_child() commonly  pass either
-&child, sizeof(child), or pchild, sizeof(*pchild).  Tidy up the few
-that don't, mostly to keep the next commit simpler.
-
+Cc: Michael S. Tsirkin <mst@redhat.com>
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <20200610053247.1583243-36-armbru@redhat.com>
+Message-Id: <20200610053247.1583243-18-armbru@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/arm/aspeed.c                 | 2 +-
- hw/microblaze/xlnx-zynqmp-pmu.c | 3 +--
- hw/pci-host/pnv_phb4.c          | 2 +-
- hw/riscv/riscv_hart.c           | 2 +-
- 4 files changed, 4 insertions(+), 5 deletions(-)
+ include/hw/pci/pci.h |  3 ---
+ hw/pci/pci.c         | 16 ----------------
+ 2 files changed, 19 deletions(-)
 
-diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
-index 2b96244cf5..ee50476ccb 100644
---- a/hw/arm/aspeed.c
-+++ b/hw/arm/aspeed.c
-@@ -268,7 +268,7 @@ static void aspeed_machine_init(MachineState *machine)
-     memory_region_add_subregion(&bmc->ram_container, 0, machine->ram);
+diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+index 66f8ba519b..a4e9c33416 100644
+--- a/include/hw/pci/pci.h
++++ b/include/hw/pci/pci.h
+@@ -717,12 +717,9 @@ PCIDevice *pci_new_multifunction(int devfn, bool multifunction,
+ PCIDevice *pci_new(int devfn, const char *name);
+ bool pci_realize_and_unref(PCIDevice *dev, PCIBus *bus, Error **errp);
  
-     object_initialize_child(OBJECT(machine), "soc", &bmc->soc,
--                            (sizeof(bmc->soc)), amc->soc_name, &error_abort,
-+                            sizeof(bmc->soc), amc->soc_name, &error_abort,
-                             NULL);
+-PCIDevice *pci_create_multifunction(PCIBus *bus, int devfn, bool multifunction,
+-                                    const char *name);
+ PCIDevice *pci_create_simple_multifunction(PCIBus *bus, int devfn,
+                                            bool multifunction,
+                                            const char *name);
+-PCIDevice *pci_create(PCIBus *bus, int devfn, const char *name);
+ PCIDevice *pci_create_simple(PCIBus *bus, int devfn, const char *name);
  
-     sc = ASPEED_SOC_GET_CLASS(&bmc->soc);
-diff --git a/hw/microblaze/xlnx-zynqmp-pmu.c b/hw/microblaze/xlnx-zynqmp-pmu.c
-index 028f31894d..aa90b9d1be 100644
---- a/hw/microblaze/xlnx-zynqmp-pmu.c
-+++ b/hw/microblaze/xlnx-zynqmp-pmu.c
-@@ -174,8 +174,7 @@ static void xlnx_zynqmp_pmu_init(MachineState *machine)
-                                 pmu_ram);
+ void lsi53c8xx_handle_legacy_cmdline(DeviceState *lsi_dev);
+diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+index 24f726d4cd..b22dedc88c 100644
+--- a/hw/pci/pci.c
++++ b/hw/pci/pci.c
+@@ -2184,17 +2184,6 @@ bool pci_realize_and_unref(PCIDevice *dev, PCIBus *bus, Error **errp)
+     return qdev_realize_and_unref(&dev->qdev, &bus->qbus, errp);
+ }
  
-     /* Create the PMU device */
--    object_initialize_child(OBJECT(machine), "pmu", pmu,
--                            sizeof(XlnxZynqMPPMUSoCState),
-+    object_initialize_child(OBJECT(machine), "pmu", pmu, sizeof(*pmu),
-                             TYPE_XLNX_ZYNQMP_PMU_SOC, &error_abort, NULL);
-     object_property_set_bool(OBJECT(pmu), true, "realized", &error_fatal);
+-PCIDevice *pci_create_multifunction(PCIBus *bus, int devfn, bool multifunction,
+-                                    const char *name)
+-{
+-    DeviceState *dev;
+-
+-    dev = qdev_create(&bus->qbus, name);
+-    qdev_prop_set_int32(dev, "addr", devfn);
+-    qdev_prop_set_bit(dev, "multifunction", multifunction);
+-    return PCI_DEVICE(dev);
+-}
+-
+ PCIDevice *pci_create_simple_multifunction(PCIBus *bus, int devfn,
+                                            bool multifunction,
+                                            const char *name)
+@@ -2204,11 +2193,6 @@ PCIDevice *pci_create_simple_multifunction(PCIBus *bus, int devfn,
+     return dev;
+ }
  
-diff --git a/hw/pci-host/pnv_phb4.c b/hw/pci-host/pnv_phb4.c
-index e30ae9ad5b..aba710fd1f 100644
---- a/hw/pci-host/pnv_phb4.c
-+++ b/hw/pci-host/pnv_phb4.c
-@@ -1155,7 +1155,7 @@ static void pnv_phb4_instance_init(Object *obj)
-     QLIST_INIT(&phb->dma_spaces);
- 
-     /* XIVE interrupt source object */
--    object_initialize_child(obj, "source", &phb->xsrc, sizeof(XiveSource),
-+    object_initialize_child(obj, "source", &phb->xsrc, sizeof(phb->xsrc),
-                             TYPE_XIVE_SOURCE, &error_abort, NULL);
- 
-     /* Root Port */
-diff --git a/hw/riscv/riscv_hart.c b/hw/riscv/riscv_hart.c
-index 276a9baca0..61e88e2e37 100644
---- a/hw/riscv/riscv_hart.c
-+++ b/hw/riscv/riscv_hart.c
-@@ -46,7 +46,7 @@ static void riscv_hart_realize(RISCVHartArrayState *s, int idx,
-     Error *err = NULL;
- 
-     object_initialize_child(OBJECT(s), "harts[*]", &s->harts[idx],
--                            sizeof(RISCVCPU), cpu_type,
-+                            sizeof(s->harts[idx]), cpu_type,
-                             &error_abort, NULL);
-     s->harts[idx].env.mhartid = s->hartid_base + idx;
-     qemu_register_reset(riscv_harts_cpu_reset, &s->harts[idx]);
+-PCIDevice *pci_create(PCIBus *bus, int devfn, const char *name)
+-{
+-    return pci_create_multifunction(bus, devfn, false, name);
+-}
+-
+ PCIDevice *pci_create_simple(PCIBus *bus, int devfn, const char *name)
+ {
+     return pci_create_simple_multifunction(bus, devfn, false, name);
 -- 
 2.26.2
 
