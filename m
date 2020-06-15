@@ -2,103 +2,84 @@ Return-Path: <SRS0=tJVC=74=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86D31C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 10:36:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 119F3C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 10:37:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 429DD20663
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 10:36:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D0C7420663
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 10:37:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PZKjiRNT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 429DD20663
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZslIfXtE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0C7420663
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52066 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56604 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkmU1-0000To-G0
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 06:36:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52282)
+	id 1jkmUo-0002Ok-Vx
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 06:37:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52482)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jkmSr-0007X3-5I
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 06:35:41 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:34393
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jkmTs-0000ft-Et
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 06:36:44 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57523
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jkmSo-0007Gv-JU
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 06:35:40 -0400
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jkmTq-0007Rn-HA
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 06:36:44 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592217337;
+ s=mimecast20190719; t=1592217401;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=P2//2J4H18E/Fi9e7Kie/K1mKXAE8svQXRc0XTzmRGE=;
- b=PZKjiRNTuwjBCZQcmDrLv8XshcT5bnnaeeaTsH1KOd6etCe8VLfQukgNw0fPe4tLv+ugZh
- ahFQeH9fMjV+yeFUGo/Z6limb7YBelr3wBF9XWEcVMyKDNSgPrHTezIx+dBKULVpTDEt42
- IKA2Xwx5erx2IT2wo/1Ug6xzNpmWEZo=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-213-FEsw12HoPbaY3v-HebGhWw-1; Mon, 15 Jun 2020 06:35:32 -0400
-X-MC-Unique: FEsw12HoPbaY3v-HebGhWw-1
-Received: by mail-wm1-f72.google.com with SMTP id b63so5895916wme.1
- for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 03:35:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=P2//2J4H18E/Fi9e7Kie/K1mKXAE8svQXRc0XTzmRGE=;
- b=XMAEjO/mw4HXSriAHxEpMwq1Vyqm7ICldLmSWQEozRm0PqmMqYEmcmAbMg8Xy/49Gy
- 0hGHAny4xXWwhhcJTnMKqgrl6UoNKTkafl0991o7KrNGthi4PKHM5QfQKxAR1b7cTt2h
- jhUM3wKSkG/GFoXvbZ235eqtnzU9BCmrtD3c1id+5Q0V8Zx+ej+NVumvr5LK7vvubb4R
- sNa/xOkJtgtrO6OcG5EumJRQl+nG6D5kPESQ4GzexcXdTgmBgnBqP8u2gCBp0DljT2PY
- sMIo7jw8eRW2CmThz/S3yjIGUdlG2aRwfoQkwX+WQ1SkCc9kb5B0DCXcjowjsln7UR5v
- oreA==
-X-Gm-Message-State: AOAM531tAA99gIS9pLROPvJ5TnQGYBfOue/Qrpe/fjq2qMWwdEZdEeW7
- U4XmU9QwbNCBQOXv22+2LkwC20w2XAfIj3NGBxbTEfGv1PesfYy71R304kq2woMHiCF6mkcVt9m
- UsBFdghRdmFvgVnA=
-X-Received: by 2002:adf:edc8:: with SMTP id v8mr27136185wro.176.1592217330437; 
- Mon, 15 Jun 2020 03:35:30 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz9xrdM2nDQpdmaxcd96et9ePkx1P+V6+Vkg+F8tyjz1eZVMGSI97gDbnHT/ErJEg88VB9Xwg==
-X-Received: by 2002:adf:edc8:: with SMTP id v8mr27136150wro.176.1592217329951; 
- Mon, 15 Jun 2020 03:35:29 -0700 (PDT)
-Received: from localhost.localdomain
- (181.red-88-10-103.dynamicip.rima-tde.net. [88.10.103.181])
- by smtp.gmail.com with ESMTPSA id d191sm22637198wmd.44.2020.06.15.03.35.28
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 15 Jun 2020 03:35:29 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org,
-	Gerd Hoffmann <kraxel@redhat.com>
-Subject: [PATCH v9 4/5] crypto: Add tls-cipher-suites object
-Date: Mon, 15 Jun 2020 12:34:56 +0200
-Message-Id: <20200615103457.25282-5-philmd@redhat.com>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200615103457.25282-1-philmd@redhat.com>
-References: <20200615103457.25282-1-philmd@redhat.com>
+ bh=DcbBSo5vE0YFfV2gRVV5Ik/OnmR1K71bEatWoKpYXhs=;
+ b=ZslIfXtEe10bTpsZoMPZ+oBqdDTzDgdRexVFEA1zWJs21ACuHJExLZOwUMle3cylqbvacP
+ 2FCb7d2dYFaILeDb+n1gNWtmMdVA4dOshw6EPGpEY9uSIUdLjgLcCMVPRjpWI2YlJcKv7a
+ SdylRmdsvHPoBQeIoDD0u+aGNijU+cY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-395-w3jN1ibtM3CcjVe4FauUZw-1; Mon, 15 Jun 2020 06:36:37 -0400
+X-MC-Unique: w3jN1ibtM3CcjVe4FauUZw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E29B9835B48;
+ Mon, 15 Jun 2020 10:36:36 +0000 (UTC)
+Received: from localhost.localdomain.com (unknown [10.36.110.57])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id ED8985D9CD;
+ Mon, 15 Jun 2020 10:36:35 +0000 (UTC)
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 1/5] crypto: add "none" random provider
+Date: Mon, 15 Jun 2020 11:36:29 +0100
+Message-Id: <20200615103633.300208-2-berrange@redhat.com>
+In-Reply-To: <20200615103633.300208-1-berrange@redhat.com>
+References: <20200615103633.300208-1-berrange@redhat.com>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8;
-	text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 01:43:27
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=berrange@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 01:17:36
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -112,341 +93,136 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Laszlo Ersek <lersek@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+ =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?=
+ <marmarek@invisiblethingslab.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On the host OS, various aspects of TLS operation are configurable.
-In particular it is possible for the sysadmin to control the TLS
-cipher/protocol algorithms that applications are permitted to use.
+From: Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>
 
-* Any given crypto library has a built-in default priority list
-  defined by the distro maintainer of the library package (or by
-  upstream).
+In case of not using random-number needing feature, it makes sense to
+skip RNG init too. This is especially helpful when QEMU is sandboxed in
+Stubdomain under Xen, where there is very little entropy so initial
+getrandom() call delays the startup several seconds. In that setup, no
+random bytes are needed at all.
 
-* The "crypto-policies" RPM (or equivalent host OS package)
-  provides a config file such as "/etc/crypto-policies/config",
-  where the sysadmin can set a high level (library-independent)
-  policy.
-
-  The "update-crypto-policies --set" command (or equivalent) is
-  used to translate the global policy to individual library
-  representations, producing files such as
-  "/etc/crypto-policies/back-ends/*.config". The generated files,
-  if present, are loaded by the various crypto libraries to
-  override their own built-in defaults.
-
-  For example, the GNUTLS library may read
-  "/etc/crypto-policies/back-ends/gnutls.config".
-
-* A management application (or the QEMU user) may overide the
-  system-wide crypto-policies config via their own config, if
-  they need to diverge from the former.
-
-Thus the priority order is "QEMU user config" > "crypto-policies
-system config" > "library built-in config".
-
-Introduce the "tls-cipher-suites" object for exposing the ordered
-list of permitted TLS cipher suites from the host side to the
-guest firmware, via fw_cfg. The list is represented as an array
-of IANA_TLS_CIPHER objects. The firmware uses the IANA_TLS_CIPHER
-array for configuring guest-side TLS, for example in UEFI HTTPS
-Boot.
-
-The priority at which the host-side policy is retrieved is given
-by the "priority" property of the new object type. For example,
-"priority=@SYSTEM" may be used to refer to
-"/etc/crypto-policies/back-ends/gnutls.config" (given that QEMU
-uses GNUTLS).
-
-[Description from Daniel P. Berrangé, edited by Laszlo Ersek.]
-
-Example of use to dump the cipher suites:
-
-  $ qemu-system-x86_64 -S \
-    -object tls-cipher-suites,id=mysuite,priority=@SYSTEM \
-    -trace qcrypto\*
-  1590664444.197123:qcrypto_tls_cipher_suite_priority priority: @SYSTEM
-  1590664444.197219:qcrypto_tls_cipher_suite_info data=[0x13,0x02] version=TLS1.3 name=TLS_AES_256_GCM_SHA384
-  1590664444.197228:qcrypto_tls_cipher_suite_info data=[0x13,0x03] version=TLS1.3 name=TLS_CHACHA20_POLY1305_SHA256
-  1590664444.197233:qcrypto_tls_cipher_suite_info data=[0x13,0x01] version=TLS1.3 name=TLS_AES_128_GCM_SHA256
-  1590664444.197236:qcrypto_tls_cipher_suite_info data=[0x13,0x04] version=TLS1.3 name=TLS_AES_128_CCM_SHA256
-  1590664444.197240:qcrypto_tls_cipher_suite_info data=[0xc0,0x30] version=TLS1.2 name=TLS_ECDHE_RSA_AES_256_GCM_SHA384
-  1590664444.197245:qcrypto_tls_cipher_suite_info data=[0xcc,0xa8] version=TLS1.2 name=TLS_ECDHE_RSA_CHACHA20_POLY1305
-  1590664444.197250:qcrypto_tls_cipher_suite_info data=[0xc0,0x14] version=TLS1.0 name=TLS_ECDHE_RSA_AES_256_CBC_SHA1
-  1590664444.197254:qcrypto_tls_cipher_suite_info data=[0xc0,0x2f] version=TLS1.2 name=TLS_ECDHE_RSA_AES_128_GCM_SHA256
-  1590664444.197258:qcrypto_tls_cipher_suite_info data=[0xc0,0x13] version=TLS1.0 name=TLS_ECDHE_RSA_AES_128_CBC_SHA1
-  1590664444.197261:qcrypto_tls_cipher_suite_info data=[0xc0,0x2c] version=TLS1.2 name=TLS_ECDHE_ECDSA_AES_256_GCM_SHA384
-  1590664444.197266:qcrypto_tls_cipher_suite_info data=[0xcc,0xa9] version=TLS1.2 name=TLS_ECDHE_ECDSA_CHACHA20_POLY1305
-  1590664444.197270:qcrypto_tls_cipher_suite_info data=[0xc0,0xad] version=TLS1.2 name=TLS_ECDHE_ECDSA_AES_256_CCM
-  1590664444.197274:qcrypto_tls_cipher_suite_info data=[0xc0,0x0a] version=TLS1.0 name=TLS_ECDHE_ECDSA_AES_256_CBC_SHA1
-  1590664444.197278:qcrypto_tls_cipher_suite_info data=[0xc0,0x2b] version=TLS1.2 name=TLS_ECDHE_ECDSA_AES_128_GCM_SHA256
-  1590664444.197283:qcrypto_tls_cipher_suite_info data=[0xc0,0xac] version=TLS1.2 name=TLS_ECDHE_ECDSA_AES_128_CCM
-  1590664444.197287:qcrypto_tls_cipher_suite_info data=[0xc0,0x09] version=TLS1.0 name=TLS_ECDHE_ECDSA_AES_128_CBC_SHA1
-  1590664444.197291:qcrypto_tls_cipher_suite_info data=[0x00,0x9d] version=TLS1.2 name=TLS_RSA_AES_256_GCM_SHA384
-  1590664444.197296:qcrypto_tls_cipher_suite_info data=[0xc0,0x9d] version=TLS1.2 name=TLS_RSA_AES_256_CCM
-  1590664444.197300:qcrypto_tls_cipher_suite_info data=[0x00,0x35] version=TLS1.0 name=TLS_RSA_AES_256_CBC_SHA1
-  1590664444.197304:qcrypto_tls_cipher_suite_info data=[0x00,0x9c] version=TLS1.2 name=TLS_RSA_AES_128_GCM_SHA256
-  1590664444.197308:qcrypto_tls_cipher_suite_info data=[0xc0,0x9c] version=TLS1.2 name=TLS_RSA_AES_128_CCM
-  1590664444.197312:qcrypto_tls_cipher_suite_info data=[0x00,0x2f] version=TLS1.0 name=TLS_RSA_AES_128_CBC_SHA1
-  1590664444.197316:qcrypto_tls_cipher_suite_info data=[0x00,0x9f] version=TLS1.2 name=TLS_DHE_RSA_AES_256_GCM_SHA384
-  1590664444.197320:qcrypto_tls_cipher_suite_info data=[0xcc,0xaa] version=TLS1.2 name=TLS_DHE_RSA_CHACHA20_POLY1305
-  1590664444.197325:qcrypto_tls_cipher_suite_info data=[0xc0,0x9f] version=TLS1.2 name=TLS_DHE_RSA_AES_256_CCM
-  1590664444.197329:qcrypto_tls_cipher_suite_info data=[0x00,0x39] version=TLS1.0 name=TLS_DHE_RSA_AES_256_CBC_SHA1
-  1590664444.197333:qcrypto_tls_cipher_suite_info data=[0x00,0x9e] version=TLS1.2 name=TLS_DHE_RSA_AES_128_GCM_SHA256
-  1590664444.197337:qcrypto_tls_cipher_suite_info data=[0xc0,0x9e] version=TLS1.2 name=TLS_DHE_RSA_AES_128_CCM
-  1590664444.197341:qcrypto_tls_cipher_suite_info data=[0x00,0x33] version=TLS1.0 name=TLS_DHE_RSA_AES_128_CBC_SHA1
-  1590664444.197345:qcrypto_tls_cipher_suite_count count: 29
-
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
 ---
-v9: Replaced 'backends' -> 'frontends' (lersek)
----
- include/crypto/tls-cipher-suites.h |  38 +++++++++
- crypto/tls-cipher-suites.c         | 127 +++++++++++++++++++++++++++++
- crypto/Makefile.objs               |   1 +
- crypto/trace-events                |   5 ++
- qemu-options.hx                    |  19 +++++
- 5 files changed, 190 insertions(+)
- create mode 100644 include/crypto/tls-cipher-suites.h
- create mode 100644 crypto/tls-cipher-suites.c
+ configure            | 11 +++++++++++
+ crypto/Makefile.objs |  3 ++-
+ crypto/random-none.c | 38 ++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 51 insertions(+), 1 deletion(-)
+ create mode 100644 crypto/random-none.c
 
-diff --git a/include/crypto/tls-cipher-suites.h b/include/crypto/tls-cipher-suites.h
+diff --git a/configure b/configure
+index bb7fd12612..997284e094 100755
+--- a/configure
++++ b/configure
+@@ -509,6 +509,7 @@ libpmem=""
+ default_devices="yes"
+ plugins="no"
+ fuzzing="no"
++rng_none="no"
+ 
+ supported_cpu="no"
+ supported_os="no"
+@@ -1601,6 +1602,10 @@ for opt do
+   ;;
+   --gdb=*) gdb_bin="$optarg"
+   ;;
++  --enable-rng-none) rng_none=yes
++  ;;
++  --disable-rng-none) rng_none=no
++  ;;
+   *)
+       echo "ERROR: unknown option $opt"
+       echo "Try '$0 --help' for more information"
+@@ -1898,6 +1903,7 @@ disabled with --disable-FEATURE, default is enabled if available:
+   debug-mutex     mutex debugging support
+   libpmem         libpmem support
+   xkbcommon       xkbcommon support
++  rng-none        dummy RNG, avoid using /dev/(u)random and getrandom()
+ 
+ NOTE: The object files are built at the place where configure is launched
+ EOF
+@@ -6767,6 +6773,7 @@ echo "default devices   $default_devices"
+ echo "plugin support    $plugins"
+ echo "fuzzing support   $fuzzing"
+ echo "gdb               $gdb_bin"
++echo "rng-none          $rng_none"
+ 
+ if test "$supported_cpu" = "no"; then
+     echo
+@@ -7744,6 +7751,10 @@ if test "$edk2_blobs" = "yes" ; then
+   echo "DECOMPRESS_EDK2_BLOBS=y" >> $config_host_mak
+ fi
+ 
++if test "$rng_none" = "yes"; then
++  echo "CONFIG_RNG_NONE=y" >> $config_host_mak
++fi
++
+ # use included Linux headers
+ if test "$linux" = "yes" ; then
+   mkdir -p linux-headers
+diff --git a/crypto/Makefile.objs b/crypto/Makefile.objs
+index c2a371b0b4..cdee92b4e5 100644
+--- a/crypto/Makefile.objs
++++ b/crypto/Makefile.objs
+@@ -35,5 +35,6 @@ crypto-obj-y += block-luks.o
+ 
+ util-obj-$(CONFIG_GCRYPT) += random-gcrypt.o
+ util-obj-$(if $(CONFIG_GCRYPT),n,$(CONFIG_GNUTLS)) += random-gnutls.o
+-util-obj-$(if $(CONFIG_GCRYPT),n,$(if $(CONFIG_GNUTLS),n,y)) += random-platform.o
++util-obj-$(if $(CONFIG_GCRYPT),n,$(if $(CONFIG_GNUTLS),n,$(CONFIG_RNG_NONE))) += random-none.o
++util-obj-$(if $(CONFIG_GCRYPT),n,$(if $(CONFIG_GNUTLS),n,$(if $(CONFIG_RNG_NONE),n,y))) += random-platform.o
+ util-obj-y += aes.o init.o
+diff --git a/crypto/random-none.c b/crypto/random-none.c
 new file mode 100644
-index 0000000000..3848393a20
+index 0000000000..102f8a4dce
 --- /dev/null
-+++ b/include/crypto/tls-cipher-suites.h
++++ b/crypto/random-none.c
 @@ -0,0 +1,38 @@
 +/*
-+ * QEMU TLS Cipher Suites Registry (RFC8447)
++ * QEMU Crypto "none" random number provider
 + *
-+ * Copyright (c) 2019 Red Hat, Inc.
++ * Copyright (c) 2020 Marek Marczykowski-Górecki
++ *                      <marmarek@invisiblethingslab.com>
 + *
-+ * Author: Philippe Mathieu-Daudé <philmd@redhat.com>
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
 + *
-+ * SPDX-License-Identifier: GPL-2.0-or-later
-+ */
-+
-+#ifndef QCRYPTO_TLSCIPHERSUITES_H
-+#define QCRYPTO_TLSCIPHERSUITES_H
-+
-+#include "qom/object.h"
-+#include "crypto/tlscreds.h"
-+
-+#define TYPE_QCRYPTO_TLS_CIPHER_SUITES "tls-cipher-suites"
-+#define QCRYPTO_TLS_CIPHER_SUITES(obj) \
-+    OBJECT_CHECK(QCryptoTLSCipherSuites, (obj), TYPE_QCRYPTO_TLS_CIPHER_SUITES)
-+
-+/*
-+ * IANA registered TLS ciphers:
-+ * https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-parameters-4
-+ */
-+typedef struct {
-+    uint8_t data[2];
-+} QEMU_PACKED IANA_TLS_CIPHER;
-+
-+typedef struct QCryptoTLSCipherSuites {
-+    /* <private> */
-+    QCryptoTLSCreds parent_obj;
-+
-+    /* <public> */
-+    IANA_TLS_CIPHER *cipher_list;
-+    unsigned cipher_count;
-+} QCryptoTLSCipherSuites;
-+
-+#endif /* QCRYPTO_TLSCIPHERSUITES_H */
-diff --git a/crypto/tls-cipher-suites.c b/crypto/tls-cipher-suites.c
-new file mode 100644
-index 0000000000..f02a041f9a
---- /dev/null
-+++ b/crypto/tls-cipher-suites.c
-@@ -0,0 +1,127 @@
-+/*
-+ * QEMU TLS Cipher Suites
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
 + *
-+ * Copyright (c) 2019 Red Hat, Inc.
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
 + *
-+ * Author: Philippe Mathieu-Daudé <philmd@redhat.com>
-+ *
-+ * SPDX-License-Identifier: GPL-2.0-or-later
 + */
 +
 +#include "qemu/osdep.h"
++
++#include "crypto/random.h"
 +#include "qapi/error.h"
-+#include "qom/object_interfaces.h"
-+#include "qemu/error-report.h"
-+#include "crypto/tlscreds.h"
-+#include "crypto/tls-cipher-suites.h"
-+#include "trace.h"
 +
-+static void parse_cipher_suites(QCryptoTLSCipherSuites *s,
-+                                const char *priority_name, Error **errp)
++int qcrypto_random_init(Error **errp)
 +{
-+    int ret;
-+    const char *err;
-+    gnutls_priority_t pcache;
-+    enum { M_ENUMERATE, M_GENERATE, M_DONE } mode;
-+
-+    assert(priority_name);
-+    trace_qcrypto_tls_cipher_suite_priority(priority_name);
-+    ret = gnutls_priority_init(&pcache, priority_name, &err);
-+    if (ret < 0) {
-+        error_setg(errp, "Syntax error using priority '%s': %s",
-+                   priority_name, gnutls_strerror(ret));
-+        return;
-+    }
-+
-+    for (mode = M_ENUMERATE; mode < M_DONE; mode++) {
-+        size_t i;
-+
-+        for (i = 0;; i++) {
-+            int ret;
-+            unsigned idx;
-+            const char *name;
-+            IANA_TLS_CIPHER cipher;
-+            gnutls_protocol_t protocol;
-+
-+            ret = gnutls_priority_get_cipher_suite_index(pcache, i, &idx);
-+            if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
-+                break;
-+            }
-+            if (ret == GNUTLS_E_UNKNOWN_CIPHER_SUITE) {
-+                continue;
-+            }
-+
-+            name = gnutls_cipher_suite_info(idx, (unsigned char *)&cipher,
-+                                            NULL, NULL, NULL, &protocol);
-+            if (name == NULL) {
-+                continue;
-+            }
-+
-+            if (mode == M_GENERATE) {
-+                const char *version;
-+
-+                version = gnutls_protocol_get_name(protocol);
-+                trace_qcrypto_tls_cipher_suite_info(cipher.data[0],
-+                                                    cipher.data[1],
-+                                                    version, name);
-+                s->cipher_list[s->cipher_count] = cipher;
-+            }
-+            s->cipher_count++;
-+        }
-+
-+        if (mode == M_ENUMERATE) {
-+            if (s->cipher_count == 0) {
-+                break;
-+            }
-+            s->cipher_list = g_new(IANA_TLS_CIPHER, s->cipher_count);
-+            s->cipher_count = 0;
-+        }
-+    }
-+    trace_qcrypto_tls_cipher_suite_count(s->cipher_count);
-+    gnutls_priority_deinit(pcache);
++    return 0;
 +}
 +
-+static void qcrypto_tls_cipher_suites_complete(UserCreatable *uc, Error **errp)
++int qcrypto_random_bytes(void *buf,
++                         size_t buflen,
++                         Error **errp)
 +{
-+    QCryptoTLSCreds *s = QCRYPTO_TLS_CREDS(uc);
-+
-+    if (!s->priority) {
-+        error_setg(errp, "'priority' property is not set");
-+        return;
-+    }
-+    parse_cipher_suites(QCRYPTO_TLS_CIPHER_SUITES(s), s->priority, errp);
++    error_setg(errp, "Random bytes not available with \"none\" rng");
++    return -1;
 +}
-+
-+static void qcrypto_tls_cipher_suites_finalize(Object *obj)
-+{
-+    QCryptoTLSCipherSuites *s = QCRYPTO_TLS_CIPHER_SUITES(obj);
-+
-+    g_free(s->cipher_list);
-+}
-+
-+static void qcrypto_tls_cipher_suites_class_init(ObjectClass *oc, void *data)
-+{
-+    UserCreatableClass *ucc = USER_CREATABLE_CLASS(oc);
-+
-+    ucc->complete = qcrypto_tls_cipher_suites_complete;
-+}
-+
-+static const TypeInfo qcrypto_tls_cipher_suites_info = {
-+    .parent = TYPE_QCRYPTO_TLS_CREDS,
-+    .name = TYPE_QCRYPTO_TLS_CIPHER_SUITES,
-+    .instance_size = sizeof(QCryptoTLSCipherSuites),
-+    .instance_finalize = qcrypto_tls_cipher_suites_finalize,
-+    .class_size = sizeof(QCryptoTLSCredsClass),
-+    .class_init = qcrypto_tls_cipher_suites_class_init,
-+    .interfaces = (InterfaceInfo[]) {
-+        { TYPE_USER_CREATABLE },
-+        { }
-+    }
-+};
-+
-+static void qcrypto_tls_cipher_suites_register_types(void)
-+{
-+    type_register_static(&qcrypto_tls_cipher_suites_info);
-+}
-+
-+type_init(qcrypto_tls_cipher_suites_register_types);
-diff --git a/crypto/Makefile.objs b/crypto/Makefile.objs
-index c2a371b0b4..1c1b5e21ff 100644
---- a/crypto/Makefile.objs
-+++ b/crypto/Makefile.objs
-@@ -13,6 +13,7 @@ crypto-obj-y += cipher.o
- crypto-obj-$(CONFIG_AF_ALG) += afalg.o
- crypto-obj-$(CONFIG_AF_ALG) += cipher-afalg.o
- crypto-obj-$(CONFIG_AF_ALG) += hash-afalg.o
-+crypto-obj-$(CONFIG_GNUTLS) += tls-cipher-suites.o
- crypto-obj-y += tlscreds.o
- crypto-obj-y += tlscredsanon.o
- crypto-obj-y += tlscredspsk.o
-diff --git a/crypto/trace-events b/crypto/trace-events
-index 9e594d30e8..798b6067ab 100644
---- a/crypto/trace-events
-+++ b/crypto/trace-events
-@@ -21,3 +21,8 @@ qcrypto_tls_creds_x509_load_cert_list(void *creds, const char *file) "TLS creds
- # tlssession.c
- qcrypto_tls_session_new(void *session, void *creds, const char *hostname, const char *authzid, int endpoint) "TLS session new session=%p creds=%p hostname=%s authzid=%s endpoint=%d"
- qcrypto_tls_session_check_creds(void *session, const char *status) "TLS session check creds session=%p status=%s"
-+
-+# tls-cipher-suites.c
-+qcrypto_tls_cipher_suite_priority(const char *name) "priority: %s"
-+qcrypto_tls_cipher_suite_info(uint8_t data0, uint8_t data1, const char *version, const char *name) "data=[0x%02x,0x%02x] version=%s name=%s"
-+qcrypto_tls_cipher_suite_count(unsigned count) "count: %u"
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 93bde2bbc8..4f519f35fd 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -4566,6 +4566,25 @@ SRST
-         string as described at
-         https://gnutls.org/manual/html_node/Priority-Strings.html.
- 
-+    ``-object tls-cipher-suites,id=id,priority=priority``
-+        Creates a TLS cipher suites object, which can be used to control
-+        the TLS cipher/protocol algorithms that applications are permitted
-+        to use.
-+
-+        The ``id`` parameter is a unique ID which frontends will use to
-+        access the ordered list of permitted TLS cipher suites from the
-+        host.
-+
-+        The ``priority`` parameter allows to override the global default
-+        priority used by gnutls. This can be useful if the system
-+        administrator needs to use a weaker set of crypto priorities for
-+        QEMU without potentially forcing the weakness onto all
-+        applications. Or conversely if one wants wants a stronger
-+        default for QEMU than for all other applications, they can do
-+        this through this parameter. Its format is a gnutls priority
-+        string as described at
-+        https://gnutls.org/manual/html_node/Priority-Strings.html.
-+
-     ``-object filter-buffer,id=id,netdev=netdevid,interval=t[,queue=all|rx|tx][,status=on|off][,position=head|tail|id=<id>][,insert=behind|before]``
-         Interval t can't be 0, this filter batches the packet delivery:
-         all packets arriving in a given interval on netdev netdevid are
 -- 
-2.21.3
+2.26.2
 
 
