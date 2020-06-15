@@ -1,90 +1,86 @@
-Return-Path: <SRS0=Q9tF=AE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=tJVC=74=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=0.4 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,MISSING_HEADERS,REPLYTO_WITHOUT_TO_CC,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1DAFC4345D
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 14:29:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9EF3C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 13:10:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC53E20716
-	for <qemu-devel@archiver.kernel.org>; Tue, 23 Jun 2020 14:29:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 815B42074D
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 13:10:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VvgKGs6w"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC53E20716
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mg.gitlab.com header.i=@mg.gitlab.com header.b="EqKuaMcf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 815B42074D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44346 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51204 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jnjvN-0001pM-VV
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jun 2020 10:29:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51554)
+	id 1jkosC-0001Ra-PN
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 09:10:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46438)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jnjpr-0001jA-6U
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 10:23:39 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:22500
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jnjpm-0007iq-3w
- for qemu-devel@nongnu.org; Tue, 23 Jun 2020 10:23:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592922213;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=S0ukBk+vFB/2xy408CQsPZXSLpUEV8XGE6+TsdkpUHo=;
- b=VvgKGs6wMheW3ew9eFPlrUa6GY8cqQJFxELQMo9D770DS60GOn/BSis+lwpFzH6F+ez2tN
- 2YSC7ucervjbNhPknBXjIEqJpj3IQM7BAUZlzEpaIjWyoOxQflwEhTDEZ57eBCLZkj71gY
- oZpJy23N2+SZ+4Gm7muTZcaueQkJZdA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-393-FIp5vtHJO4aFHmLB8gzEkA-1; Tue, 23 Jun 2020 10:23:29 -0400
-X-MC-Unique: FIp5vtHJO4aFHmLB8gzEkA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5A780800597
- for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 14:23:28 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
- [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CE74A5C541
- for <qemu-devel@nongnu.org>; Tue, 23 Jun 2020 14:23:27 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 42BF21138472; Tue, 23 Jun 2020 16:23:26 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 04/16] fdc: Reject clash between -drive if=floppy and -global
- isa-fdc
-Date: Tue, 23 Jun 2020 16:23:14 +0200
-Message-Id: <20200623142326.2349416-5-armbru@redhat.com>
-In-Reply-To: <20200623142326.2349416-1-armbru@redhat.com>
-References: <20200623142326.2349416-1-armbru@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/23 02:55:19
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ (Exim 4.90_1)
+ (envelope-from <bounce+2dc402.947b4-qemu-devel=nongnu.org@mg.gitlab.com>)
+ id 1jkm2Z-0003lO-Gl
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 06:08:31 -0400
+Received: from do158-143.mg.gitlab.com ([192.237.158.143]:64132)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1)
+ (envelope-from <bounce+2dc402.947b4-qemu-devel=nongnu.org@mg.gitlab.com>)
+ id 1jkm2W-0002Tx-2a
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 06:08:31 -0400
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.gitlab.com;
+ q=dns/txt; 
+ s=mailo; t=1592215707; h=List-Id: Content-Transfer-Encoding:
+ Content-Type: Mime-Version: Subject: Message-ID: Reply-To: From: Date:
+ Sender; bh=0g0IxrVVNTzkm9XnXUiZIgItBKcHv25oJJpu2IP7oSw=;
+ b=EqKuaMcfW/D6NMjnXgBKq7+r0AA/yzMOcELvf60Gs2bSLZL/eYJEVkox2h4z6NtbZpdvkk3k
+ 2HoXypv6SRtKMDToNEYXWkTRisftUvmpS7ZVMrU/utVpNpdrTcNPaKovsPXqYOcxs3OsYea3
+ 3koMOAY8BCNpPg7f8lQK1CiK7Io=
+X-Mailgun-Sending-Ip: 192.237.158.143
+X-Mailgun-Sid: WyI3MWYzYSIsICJxZW11LWRldmVsQG5vbmdudS5vcmciLCAiOTQ3YjQiXQ==
+Received: from mg.gitlab.com (64.90.74.34.bc.googleusercontent.com
+ [34.74.90.64]) by smtp-out-n11.prod.us-west-2.postgun.com with SMTP id
+ 5ee7489a6bebe35deb9fd1bd (version=TLS1.3, cipher=TLS_AES_128_GCM_SHA256);
+ Mon, 15 Jun 2020 10:08:26 GMT
+Date: Mon, 15 Jun 2020 10:08:25 +0000
+Message-ID: <5ee748999f9a0_2f733f97e4612310124632@sidekiq-catchall-07-sv-gprd.mail>
+Subject: QEMU | Pipeline #155914107 has failed for master | 7d3660e7
+Mime-Version: 1.0
+Content-Type: multipart/alternative;
+ boundary="--==_mimepart_5ee7489995cbf_2f733f97e461231012456f";
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitLab-Project: QEMU
+X-GitLab-Project-Id: 11167699
+X-GitLab-Project-Path: qemu-project/qemu
+X-GitLab-Pipeline-Id: 155914107
+X-GitLab-Pipeline-Ref: master
+X-GitLab-Pipeline-Status: failed
+Auto-Submitted: auto-generated
+X-Auto-Response-Suppress: All
+Received-SPF: pass client-ip=192.237.158.143;
+ envelope-from=bounce+2dc402.947b4-qemu-devel=nongnu.org@mg.gitlab.com;
+ helo=do158-143.mg.gitlab.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 00:36:45
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -26
+X-Spam_score: -2.7
+X-Spam_bar: --
+X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1,
+ HTML_FONT_LOW_CONTRAST=0.001, HTML_MESSAGE=0.001, MISSING_HEADERS=1.021,
+ RCVD_IN_DNSWL_MED=-2.3, REPLYTO_WITHOUT_TO_CC=1.552, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
+X-Mailman-Approved-At: Mon, 15 Jun 2020 09:08:41 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,499 +95,519 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Reply-to: GitLab <noreply@gitlab.com>, GitLab <gitlab@mg.gitlab.com>
+From: GitLab via <qemu-devel@nongnu.org>
 
-The floppy controller devices desugar their drive properties into
-floppy devices (since commit a92bd191a4 "fdc: Move qdev properties to
-FloppyDrive", v2.8.0).  This involves some bad magic in
-fdctrl_connect_drives(), and exists for backward compatibility.
 
-The functions for boards to create floppy controller devices
-fdctrl_init_isa(), fdctrl_init_sysbus(), and sun4m_fdctrl_init()
-desugar -drive if=floppy to these floppy controller drive properties.
+----==_mimepart_5ee7489995cbf_2f733f97e461231012456f
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-If you use both -drive if=floppy (or its -fda / -fdb sugar) and
--global isa-fdc for the same floppy device, -global silently loses the
-conflict, and both backends involved end up with the floppy device
-frontend attached, as demonstrated by iotest 172 (see commit before
-previous).  This is wrong.
 
-Desugar -drive if=floppy straight to floppy devices instead, with
-helper fdctrl_init_drives().  The conflict now gets rejected cleanly:
-first, fdctrl_connect_drives() creates the floppy for the controller's
-property, then fdctrl_init_drives() attempts to create the floppy for
--drive if=floppy, but fails because the unit is already in use.
 
-Output of iotest 172 changes in three ways:
+Your pipeline has failed.
 
-1. The clash gets rejected.
+Project: QEMU ( https://gitlab.com/qemu-project/qemu )
+Branch: master ( https://gitlab.com/qemu-project/qemu/-/commits/master )
 
-2. In one test case, "info qtree" has the floppy devices swapped, and
-   "info block" has their QOM paths swapped.  This is because the
-   floppy device for -fda now gets created after the one for -global
-   isa-fdc.driveB.
+Commit: 7d3660e7 ( https://gitlab.com/qemu-project/qemu/-/commit/7d3660e7=
+9830a069f1848bb4fa1cdf8f666424fb )
+Commit Message: Merge remote-tracking branch 'remotes/bonzini/t...
+Commit Author: Peter Maydell ( https://gitlab.com/pm215 )
 
-3. The error message for -global floppy.drive=floppy0 changes.  Before
-   the patch, we set isa-fdc.driveA to -fda's block backend, then
-   create the floppy device for it, then move the backend from
-   isa-fdc.driveA to floppy.drive.  Floppy creation fails when
-   applying -global floppy.drive=floppy0, because floppy0 is still
-   attached to isa-fdc.  After the patch, we create the floppy for
-   -fda, then set its drive property to floppy0.  Now floppy creation
-   succeeds, but setting the drive property fails, because -global
-   already set it.  Yes, this is exasperatingly complicated.
+Pipeline #155914107 ( https://gitlab.com/qemu-project/qemu/-/pipelines/15=
+5914107 ) triggered by Alex Benn=C3=A9e ( https://gitlab.com/stsquad )
+had 1 failed build.
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20200622094227.1271650-5-armbru@redhat.com>
----
- include/hw/block/fdc.h     |   1 +
- hw/block/fdc.c             |  51 ++++++------
- hw/isa/isa-superio.c       |  18 ++--
- hw/sparc64/sun4u.c         |   9 +-
- tests/qemu-iotests/172     |   3 +-
- tests/qemu-iotests/172.out | 164 ++++++++++---------------------------
- 6 files changed, 79 insertions(+), 167 deletions(-)
+Job #593965592 ( https://gitlab.com/qemu-project/qemu/-/jobs/593965592/ra=
+w )
 
-diff --git a/include/hw/block/fdc.h b/include/hw/block/fdc.h
-index c15ff4c623..8855d3476c 100644
---- a/include/hw/block/fdc.h
-+++ b/include/hw/block/fdc.h
-@@ -9,6 +9,7 @@
- 
- #define TYPE_ISA_FDC "isa-fdc"
- 
-+void isa_fdc_init_drives(ISADevice *fdc, DriveInfo **fds);
- ISADevice *fdctrl_init_isa(ISABus *bus, DriveInfo **fds);
- void fdctrl_init_sysbus(qemu_irq irq, int dma_chann,
-                         hwaddr mmio_base, DriveInfo **fds);
-diff --git a/hw/block/fdc.c b/hw/block/fdc.c
-index be0674e4aa..2650dcb0df 100644
---- a/hw/block/fdc.c
-+++ b/hw/block/fdc.c
-@@ -2497,6 +2497,29 @@ static void fdctrl_result_timer(void *opaque)
- }
- 
- /* Init functions */
-+
-+static void fdctrl_init_drives(FloppyBus *bus, DriveInfo **fds)
-+{
-+    DeviceState *dev;
-+    int i;
-+
-+    for (i = 0; i < MAX_FD; i++) {
-+        if (fds[i]) {
-+            dev = qdev_new("floppy");
-+            qdev_prop_set_uint32(dev, "unit", i);
-+            qdev_prop_set_enum(dev, "drive-type", FLOPPY_DRIVE_TYPE_AUTO);
-+            qdev_prop_set_drive(dev, "drive", blk_by_legacy_dinfo(fds[i]),
-+                                &error_fatal);
-+            qdev_realize_and_unref(dev, &bus->bus, &error_fatal);
-+        }
-+    }
-+}
-+
-+void isa_fdc_init_drives(ISADevice *fdc, DriveInfo **fds)
-+{
-+    fdctrl_init_drives(&ISA_FDC(fdc)->state.bus, fds);
-+}
-+
- static void fdctrl_connect_drives(FDCtrl *fdctrl, DeviceState *fdc_dev,
-                                   Error **errp)
- {
-@@ -2544,25 +2567,15 @@ static void fdctrl_connect_drives(FDCtrl *fdctrl, DeviceState *fdc_dev,
- 
- ISADevice *fdctrl_init_isa(ISABus *bus, DriveInfo **fds)
- {
--    DeviceState *dev;
-     ISADevice *isadev;
- 
-     isadev = isa_try_new(TYPE_ISA_FDC);
-     if (!isadev) {
-         return NULL;
-     }
--    dev = DEVICE(isadev);
--
--    if (fds[0]) {
--        qdev_prop_set_drive(dev, "driveA", blk_by_legacy_dinfo(fds[0]),
--                            &error_fatal);
--    }
--    if (fds[1]) {
--        qdev_prop_set_drive(dev, "driveB", blk_by_legacy_dinfo(fds[1]),
--                            &error_fatal);
--    }
-     isa_realize_and_unref(isadev, bus, &error_fatal);
- 
-+    isa_fdc_init_drives(isadev, fds);
-     return isadev;
- }
- 
-@@ -2578,18 +2591,12 @@ void fdctrl_init_sysbus(qemu_irq irq, int dma_chann,
-     sys = SYSBUS_FDC(dev);
-     fdctrl = &sys->state;
-     fdctrl->dma_chann = dma_chann; /* FIXME */
--    if (fds[0]) {
--        qdev_prop_set_drive(dev, "driveA", blk_by_legacy_dinfo(fds[0]),
--                            &error_fatal);
--    }
--    if (fds[1]) {
--        qdev_prop_set_drive(dev, "driveB", blk_by_legacy_dinfo(fds[1]),
--                            &error_fatal);
--    }
-     sbd = SYS_BUS_DEVICE(dev);
-     sysbus_realize_and_unref(sbd, &error_fatal);
-     sysbus_connect_irq(sbd, 0, irq);
-     sysbus_mmio_map(sbd, 0, mmio_base);
-+
-+    fdctrl_init_drives(&sys->state.bus, fds);
- }
- 
- void sun4m_fdctrl_init(qemu_irq irq, hwaddr io_base,
-@@ -2599,15 +2606,13 @@ void sun4m_fdctrl_init(qemu_irq irq, hwaddr io_base,
-     FDCtrlSysBus *sys;
- 
-     dev = qdev_new("SUNW,fdtwo");
--    if (fds[0]) {
--        qdev_prop_set_drive(dev, "drive", blk_by_legacy_dinfo(fds[0]),
--                            &error_fatal);
--    }
-     sysbus_realize_and_unref(SYS_BUS_DEVICE(dev), &error_fatal);
-     sys = SYSBUS_FDC(dev);
-     sysbus_connect_irq(SYS_BUS_DEVICE(sys), 0, irq);
-     sysbus_mmio_map(SYS_BUS_DEVICE(sys), 0, io_base);
-     *fdc_tc = qdev_get_gpio_in(dev, 0);
-+
-+    fdctrl_init_drives(&sys->state.bus, fds);
- }
- 
- static void fdctrl_realize_common(DeviceState *dev, FDCtrl *fdctrl,
-diff --git a/hw/isa/isa-superio.c b/hw/isa/isa-superio.c
-index d3d58f9f16..e2e47d8fd9 100644
---- a/hw/isa/isa-superio.c
-+++ b/hw/isa/isa-superio.c
-@@ -17,6 +17,7 @@
- #include "sysemu/sysemu.h"
- #include "sysemu/blockdev.h"
- #include "chardev/char.h"
-+#include "hw/block/fdc.h"
- #include "hw/isa/superio.h"
- #include "hw/qdev-properties.h"
- #include "hw/input/i8042.h"
-@@ -31,7 +32,7 @@ static void isa_superio_realize(DeviceState *dev, Error **errp)
-     ISADevice *isa;
-     DeviceState *d;
-     Chardev *chr;
--    DriveInfo *drive;
-+    DriveInfo *fd[MAX_FD];
-     char *name;
-     int i;
- 
-@@ -115,7 +116,7 @@ static void isa_superio_realize(DeviceState *dev, Error **errp)
- 
-     /* Floppy disc */
-     if (!k->floppy.is_enabled || k->floppy.is_enabled(sio, 0)) {
--        isa = isa_new("isa-fdc");
-+        isa = isa_new(TYPE_ISA_FDC);
-         d = DEVICE(isa);
-         if (k->floppy.get_iobase) {
-             qdev_prop_set_uint32(d, "iobase", k->floppy.get_iobase(sio, 0));
-@@ -124,19 +125,12 @@ static void isa_superio_realize(DeviceState *dev, Error **errp)
-             qdev_prop_set_uint32(d, "irq", k->floppy.get_irq(sio, 0));
-         }
-         /* FIXME use a qdev drive property instead of drive_get() */
--        drive = drive_get(IF_FLOPPY, 0, 0);
--        if (drive != NULL) {
--            qdev_prop_set_drive(d, "driveA", blk_by_legacy_dinfo(drive),
--                                &error_fatal);
--        }
--        /* FIXME use a qdev drive property instead of drive_get() */
--        drive = drive_get(IF_FLOPPY, 0, 1);
--        if (drive != NULL) {
--            qdev_prop_set_drive(d, "driveB", blk_by_legacy_dinfo(drive),
--                                &error_fatal);
-+        for (i = 0; i < MAX_FD; i++) {
-+            fd[i] = drive_get(IF_FLOPPY, 0, i);
-         }
-         object_property_add_child(OBJECT(sio), "isa-fdc", OBJECT(isa));
-         isa_realize_and_unref(isa, bus, &error_fatal);
-+        isa_fdc_init_drives(isa, fd);
-         sio->floppy = isa;
-         trace_superio_create_floppy(0,
-                                     k->floppy.get_iobase ?
-diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
-index 97e6d3a025..9c8655cffc 100644
---- a/hw/sparc64/sun4u.c
-+++ b/hw/sparc64/sun4u.c
-@@ -341,16 +341,9 @@ static void ebus_realize(PCIDevice *pci_dev, Error **errp)
-     }
-     isa_dev = isa_new(TYPE_ISA_FDC);
-     dev = DEVICE(isa_dev);
--    if (fd[0]) {
--        qdev_prop_set_drive(dev, "driveA", blk_by_legacy_dinfo(fd[0]),
--                            &error_abort);
--    }
--    if (fd[1]) {
--        qdev_prop_set_drive(dev, "driveB", blk_by_legacy_dinfo(fd[1]),
--                            &error_abort);
--    }
-     qdev_prop_set_uint32(dev, "dma", -1);
-     isa_realize_and_unref(isa_dev, s->isa_bus, &error_fatal);
-+    isa_fdc_init_drives(isa_dev, fd);
- 
-     /* Power */
-     dev = qdev_new(TYPE_SUN4U_POWER);
-diff --git a/tests/qemu-iotests/172 b/tests/qemu-iotests/172
-index 18056bcef7..3abfa72948 100755
---- a/tests/qemu-iotests/172
-+++ b/tests/qemu-iotests/172
-@@ -148,9 +148,10 @@ echo === Mixing -fdX and -global ===
- check_floppy_qtree -fda "$TEST_IMG" -drive if=none,file="$TEST_IMG.2" -global isa-fdc.driveB=none0
- check_floppy_qtree -fdb "$TEST_IMG" -drive if=none,file="$TEST_IMG.2" -global isa-fdc.driveA=none0
- 
--# Conflicting (-fdX wins)
-+# Conflicting
- check_floppy_qtree -fda "$TEST_IMG" -drive if=none,file="$TEST_IMG.2" -global isa-fdc.driveA=none0
- check_floppy_qtree -fdb "$TEST_IMG" -drive if=none,file="$TEST_IMG.2" -global isa-fdc.driveB=none0
-+# Conflicting, -fdX wins
- check_floppy_qtree -fda "$TEST_IMG" -drive if=none,file="$TEST_IMG.2" -global floppy.drive=none0
- 
- echo
-diff --git a/tests/qemu-iotests/172.out b/tests/qemu-iotests/172.out
-index 68e7a5ea5f..340dbd39cb 100644
---- a/tests/qemu-iotests/172.out
-+++ b/tests/qemu-iotests/172.out
-@@ -205,22 +205,22 @@ Testing: -fdb
-               dev: floppy, id ""
-                 unit = 1 (0x1)
-                 drive = "floppy1"
--                logical_block_size = 512 (0x200)
--                physical_block_size = 512 (0x200)
--                min_io_size = 0 (0x0)
--                opt_io_size = 0 (0x0)
--                discard_granularity = 4294967295 (0xffffffff)
-+                logical_block_size = 512 (512 B)
-+                physical_block_size = 512 (512 B)
-+                min_io_size = 0 (0 B)
-+                opt_io_size = 0 (0 B)
-+                discard_granularity = 4294967295 (4 GiB)
-                 write-cache = "auto"
-                 share-rw = false
-                 drive-type = "288"
-               dev: floppy, id ""
-                 unit = 0 (0x0)
-                 drive = "floppy0"
--                logical_block_size = 512 (0x200)
--                physical_block_size = 512 (0x200)
--                min_io_size = 0 (0x0)
--                opt_io_size = 0 (0x0)
--                discard_granularity = 4294967295 (0xffffffff)
-+                logical_block_size = 512 (512 B)
-+                physical_block_size = 512 (512 B)
-+                min_io_size = 0 (0 B)
-+                opt_io_size = 0 (0 B)
-+                discard_granularity = 4294967295 (4 GiB)
-                 write-cache = "auto"
-                 share-rw = false
-                 drive-type = "288"
-@@ -675,17 +675,6 @@ Testing: -fda TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global is
-             isa irq 6
-             bus: floppy-bus.0
-               type floppy-bus
--              dev: floppy, id ""
--                unit = 1 (0x1)
--                drive = "none0"
--                logical_block_size = 512 (512 B)
--                physical_block_size = 512 (512 B)
--                min_io_size = 0 (0 B)
--                opt_io_size = 0 (0 B)
--                discard_granularity = 4294967295 (4 GiB)
--                write-cache = "auto"
--                share-rw = false
--                drive-type = "144"
-               dev: floppy, id ""
-                 unit = 0 (0x0)
-                 drive = "floppy0"
-@@ -697,13 +686,24 @@ Testing: -fda TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global is
-                 write-cache = "auto"
-                 share-rw = false
-                 drive-type = "144"
-+              dev: floppy, id ""
-+                unit = 1 (0x1)
-+                drive = "none0"
-+                logical_block_size = 512 (512 B)
-+                physical_block_size = 512 (512 B)
-+                min_io_size = 0 (0 B)
-+                opt_io_size = 0 (0 B)
-+                discard_granularity = 4294967295 (4 GiB)
-+                write-cache = "auto"
-+                share-rw = false
-+                drive-type = "144"
- floppy0 (NODE_NAME): TEST_DIR/t.qcow2 (qcow2)
--    Attached to:      /machine/unattached/device[15]
-+    Attached to:      /machine/unattached/device[16]
-     Removable device: not locked, tray closed
-     Cache mode:       writeback
- 
- none0 (NODE_NAME): TEST_DIR/t.qcow2.2 (qcow2)
--    Attached to:      /machine/unattached/device[16]
-+    Attached to:      /machine/unattached/device[15]
-     Removable device: not locked, tray closed
-     Cache mode:       writeback
- 
-@@ -773,92 +773,10 @@ sd0: [not inserted]
- 
- 
- Testing: -fda TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global isa-fdc.driveA=none0
--
--          dev: isa-fdc, id ""
--            iobase = 1008 (0x3f0)
--            irq = 6 (0x6)
--            dma = 2 (0x2)
--            driveA = ""
--            driveB = ""
--            check_media_rate = true
--            fdtypeA = "auto"
--            fdtypeB = "auto"
--            fallback = "288"
--            isa irq 6
--            bus: floppy-bus.0
--              type floppy-bus
--              dev: floppy, id ""
--                unit = 0 (0x0)
--                drive = "floppy0"
--                logical_block_size = 512 (512 B)
--                physical_block_size = 512 (512 B)
--                min_io_size = 0 (0 B)
--                opt_io_size = 0 (0 B)
--                discard_granularity = 4294967295 (4 GiB)
--                write-cache = "auto"
--                share-rw = false
--                drive-type = "144"
--floppy0 (NODE_NAME): TEST_DIR/t.qcow2 (qcow2)
--    Attached to:      /machine/unattached/device[15]
--    Removable device: not locked, tray closed
--    Cache mode:       writeback
--
--none0 (NODE_NAME): TEST_DIR/t.qcow2.2 (qcow2)
--    Attached to:      /machine/unattached/device[14]
--    Cache mode:       writeback
--
--ide1-cd0: [not inserted]
--    Attached to:      /machine/unattached/device[22]
--    Removable device: not locked, tray closed
--
--sd0: [not inserted]
--    Removable device: not locked, tray closed
--(qemu) quit
--
-+QEMU_PROG: Floppy unit 0 is in use
- 
- Testing: -fdb TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global isa-fdc.driveB=none0
--
--          dev: isa-fdc, id ""
--            iobase = 1008 (0x3f0)
--            irq = 6 (0x6)
--            dma = 2 (0x2)
--            driveA = ""
--            driveB = ""
--            check_media_rate = true
--            fdtypeA = "auto"
--            fdtypeB = "auto"
--            fallback = "288"
--            isa irq 6
--            bus: floppy-bus.0
--              type floppy-bus
--              dev: floppy, id ""
--                unit = 1 (0x1)
--                drive = "floppy1"
--                logical_block_size = 512 (512 B)
--                physical_block_size = 512 (512 B)
--                min_io_size = 0 (0 B)
--                opt_io_size = 0 (0 B)
--                discard_granularity = 4294967295 (4 GiB)
--                write-cache = "auto"
--                share-rw = false
--                drive-type = "144"
--floppy1 (NODE_NAME): TEST_DIR/t.qcow2 (qcow2)
--    Attached to:      /machine/unattached/device[15]
--    Removable device: not locked, tray closed
--    Cache mode:       writeback
--
--none0 (NODE_NAME): TEST_DIR/t.qcow2.2 (qcow2)
--    Attached to:      /machine/unattached/device[14]
--    Cache mode:       writeback
--
--ide1-cd0: [not inserted]
--    Attached to:      /machine/unattached/device[22]
--    Removable device: not locked, tray closed
--
--sd0: [not inserted]
--    Removable device: not locked, tray closed
--(qemu) quit
--
-+QEMU_PROG: Floppy unit 1 is in use
- 
- Testing: -fda TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global floppy.drive=none0
- 
-@@ -878,11 +796,11 @@ Testing: -fda TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qcow2.2 -global fl
-               dev: floppy, id ""
-                 unit = 0 (0x0)
-                 drive = "floppy0"
--                logical_block_size = 512 (0x200)
--                physical_block_size = 512 (0x200)
--                min_io_size = 0 (0x0)
--                opt_io_size = 0 (0x0)
--                discard_granularity = 4294967295 (0xffffffff)
-+                logical_block_size = 512 (512 B)
-+                physical_block_size = 512 (512 B)
-+                min_io_size = 0 (0 B)
-+                opt_io_size = 0 (0 B)
-+                discard_granularity = 4294967295 (4 GiB)
-                 write-cache = "auto"
-                 share-rw = false
-                 drive-type = "144"
-@@ -1500,11 +1418,11 @@ Testing: -drive if=none,file=TEST_DIR/t.qcow2 -global floppy.drive=none0 -device
-               dev: floppy, id ""
-                 unit = 0 (0x0)
-                 drive = "none0"
--                logical_block_size = 512 (0x200)
--                physical_block_size = 512 (0x200)
--                min_io_size = 0 (0x0)
--                opt_io_size = 0 (0x0)
--                discard_granularity = 4294967295 (0xffffffff)
-+                logical_block_size = 512 (512 B)
-+                physical_block_size = 512 (512 B)
-+                min_io_size = 0 (0 B)
-+                opt_io_size = 0 (0 B)
-+                discard_granularity = 4294967295 (4 GiB)
-                 write-cache = "auto"
-                 share-rw = false
-                 drive-type = "144"
-@@ -1546,11 +1464,11 @@ Testing: -drive if=none,file=TEST_DIR/t.qcow2 -drive if=none,file=TEST_DIR/t.qco
-               dev: floppy, id ""
-                 unit = 0 (0x0)
-                 drive = "none1"
--                logical_block_size = 512 (0x200)
--                physical_block_size = 512 (0x200)
--                min_io_size = 0 (0x0)
--                opt_io_size = 0 (0x0)
--                discard_granularity = 4294967295 (0xffffffff)
-+                logical_block_size = 512 (512 B)
-+                physical_block_size = 512 (512 B)
-+                min_io_size = 0 (0 B)
-+                opt_io_size = 0 (0 B)
-+                discard_granularity = 4294967295 (4 GiB)
-                 write-cache = "auto"
-                 share-rw = false
-                 drive-type = "144"
-@@ -1585,7 +1503,7 @@ Testing: -fda  -device floppy,drive=floppy0
- QEMU_PROG: -device floppy,drive=floppy0: Drive 'floppy0' is already in use because it has been automatically connected to another device (did you need 'if=none' in the drive options?)
- 
- Testing: -fda  -global floppy.drive=floppy0
--QEMU_PROG: can't apply global floppy.drive=floppy0: Drive 'floppy0' is already in use because it has been automatically connected to another device (did you need 'if=none' in the drive options?)
-+QEMU_PROG: Drive 'floppy0' is already in use because it has been automatically connected to another device (did you need 'if=none' in the drive options?)
- 
- Testing: -device floppy,drive=floppy0
- QEMU_PROG: -device floppy,drive=floppy0: Property 'floppy.drive' can't find value 'floppy0'
--- 
-2.26.2
+Stage: test
+Name: build-disabled
+Trace:   TEST    check-qtest-ppc64: tests/qtest/usb-hcd-uhci-test
+  TEST    check-qtest-ppc64: tests/qtest/usb-hcd-xhci-test
+  TEST    check-qtest-ppc64: tests/qtest/test-filter-mirror
+  TEST    check-qtest-ppc64: tests/qtest/test-filter-redirector
+  TEST    check-qtest-ppc64: tests/qtest/display-vga-test
+  TEST    check-qtest-ppc64: tests/qtest/numa-test
+  TEST    check-qtest-ppc64: tests/qtest/ivshmem-test
+  TEST    check-qtest-ppc64: tests/qtest/cpu-plug-test
+  TEST    check-qtest-ppc64: tests/qtest/cdrom-test
+  TEST    check-qtest-ppc64: tests/qtest/device-introspect-test
+socket_accept failed: Resource temporarily unavailable
+**
+ERROR:/builds/qemu-project/qemu/tests/qtest/libqtest.c:301:qtest_init_wit=
+hout_qmp_handshake: assertion failed: (s->fd >=3D 0 && s->qmp_fd >=3D 0)
+/builds/qemu-project/qemu/tests/qtest/libqtest.c:166: kill_qemu() tried t=
+o terminate QEMU process but encountered exit status 1 (expected 0)
+ERROR - Bail out! ERROR:/builds/qemu-project/qemu/tests/qtest/libqtest.c:=
+301:qtest_init_without_qmp_handshake: assertion failed: (s->fd >=3D 0 && =
+s->qmp_fd >=3D 0)
+make: *** [/builds/qemu-project/qemu/tests/Makefile.include:639: check-qt=
+est-i386] Error 1
+make: *** Waiting for unfinished jobs....
+qemu-system-ppc64: warning: machine has no BMC device. Use '-device ipmi-=
+bmc-sim,id=3Dbmc0 -device isa-ipmi-bt,bmc=3Dbmc0,irq=3D10' to define one
+qemu-system-ppc64: warning: machine has no BMC device. Use '-device ipmi-=
+bmc-sim,id=3Dbmc0 -device isa-ipmi-bt,bmc=3Dbmc0,irq=3D10' to define one
+qemu-system-ppc64: warning: machine has no BMC device. Use '-device ipmi-=
+bmc-sim,id=3Dbmc0 -device isa-ipmi-bt,bmc=3Dbmc0,irq=3D10' to define one
+  TEST    check-qtest-ppc64: tests/qtest/machine-none-test
+  TEST    check-qtest-ppc64: tests/qtest/qmp-test
+  TEST    check-qtest-ppc64: tests/qtest/qmp-cmd-test
+  TEST    check-qtest-ppc64: tests/qtest/qom-test
+  TEST    check-qtest-ppc64: tests/qtest/test-hmp
+  TEST    check-qtest-ppc64: tests/qtest/qos-test
+section_end:1592067611:build_script
+=1B[0Ksection_start:1592067611:after_script
+=1B[0K=1B[0K=1B[36;1mRunning after_script=1B[0;m
+=1B[0;msection_end:1592067612:after_script
+=1B[0Ksection_start:1592067612:upload_artifacts_on_failure
+=1B[0K=1B[0K=1B[36;1mUploading artifacts for failed job=1B[0;m
+=1B[0;msection_end:1592067614:upload_artifacts_on_failure
+=1B[0K=1B[31;1mERROR: Job failed: exit code 1
+=1B[0;m
 
+
+-- =
+
+You're receiving this email because of your account on gitlab.com.
+
+
+
+
+----==_mimepart_5ee7489995cbf_2f733f97e461231012456f
+Content-Type: text/html;
+ charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://ww=
+w.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns=3D"http://www.w3.org/1999/xhtml" lang=3D"en" xml:lang=3D"en">=
+
+<head>
+<meta content=3D"text/html; charset=3DUTF-8" http-equiv=3D"Content-Type" =
+/>
+<meta content=3D"width=3Ddevice-width, initial-scale=3D1" name=3D"viewpor=
+t" />
+<meta content=3D"IE=3Dedge" http-equiv=3D"X-UA-Compatible" />
+<title>QEMU | Pipeline #155914107 has failed for master | 7d3660e7</title=
+>
+<style data-premailer=3D"ignore" type=3D"text/css">
+body,table,td,a{-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%}t=
+able,td{mso-table-lspace:0pt;mso-table-rspace:0pt}img{-ms-interpolation-m=
+ode:bicubic}.hidden{display:none !important;visibility:hidden !important}=
+a[x-apple-data-detectors]{color:inherit !important;text-decoration:none !=
+important;font-size:inherit !important;font-family:inherit !important;fon=
+t-weight:inherit !important;line-height:inherit !important}div[style*=3D'=
+margin: 16px 0']{margin:0 !important}@media only screen and (max-width: 6=
+39px){body,#body{min-width:320px !important}table.wrapper{width:100% !imp=
+ortant;min-width:320px !important}table.wrapper td.wrapper-cell{border-le=
+ft:0 !important;border-right:0 !important;border-radius:0 !important;padd=
+ing-left:10px !important;padding-right:10px !important}}
+
+</style>
+
+<style>body {
+margin: 0 !important; background-color: #fafafa; padding: 0; text-align: =
+center; min-width: 640px; width: 100%; height: 100%; font-family: "Helvet=
+ica Neue", Helvetica, Arial, sans-serif;
+}
+</style></head>
+<body style=3D"text-align: center; min-width: 640px; width: 100%; height:=
+ 100%; font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-se=
+rif; margin: 0; padding: 0;" bgcolor=3D"#fafafa">
+<table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" id=3D"body" style=
+=3D"text-align: center; min-width: 640px; width: 100%; margin: 0; padding=
+: 0;" bgcolor=3D"#fafafa">
+<tbody>
+<tr class=3D"line">
+<td style=3D"font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, s=
+ans-serif; height: 4px; font-size: 4px; line-height: 4px;" bgcolor=3D"#6b=
+4fbb"></td>
+</tr>
+<tr class=3D"header">
+<td style=3D"font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, s=
+ans-serif; font-size: 13px; line-height: 1.6; color: #5c5c5c; padding: 25=
+px 0;">
+
+<img alt=3D"GitLab" src=3D"https://gitlab.com/assets/mailers/gitlab_heade=
+r_logo-153749eaa7ea6fafcb995161abd3247bc4c4500f31498b0c4024f50093983ac0.g=
+if" width=3D"55" height=3D"50" />
+</td>
+</tr>
+<tr>
+<td style=3D"font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, s=
+ans-serif;">
+<table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" class=3D"wrapper"=
+ style=3D"width: 640px; border-collapse: separate; border-spacing: 0; mar=
+gin: 0 auto;">
+<tbody>
+<tr>
+<td class=3D"wrapper-cell" style=3D"font-family: &quot;Helvetica Neue&quo=
+t;, Helvetica, Arial, sans-serif; border-radius: 3px; overflow: hidden; p=
+adding: 18px 25px; border: 1px solid #ededed;" align=3D"left" bgcolor=3D"=
+#ffffff">
+<table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" class=3D"content"=
+ style=3D"width: 100%; border-collapse: separate; border-spacing: 0;">
+<tbody>
+<tr class=3D"alert">
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; bo=
+rder-radius: 3px; font-size: 14px; line-height: 1.3; overflow: hidden; co=
+lor: #ffffff; padding: 10px;" align=3D"center" bgcolor=3D"#d22f57">
+<table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" class=3D"img" sty=
+le=3D"border-collapse: collapse; margin: 0 auto;">
+<tbody>
+<tr>
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
+lor: #ffffff; padding-right: 5px; line-height: 1;" align=3D"center" valig=
+n=3D"middle">
+<img alt=3D"&#10006;" height=3D"13" src=3D"https://gitlab.com/assets/mail=
+ers/ci_pipeline_notif_v1/icon-x-red-inverted-06edddd39ba2a7f9a32f6201e420=
+175db85a4b6ac0348203fdc069001b440149.gif" style=3D"display: block;" width=
+=3D"13" />
+</td>
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
+lor: #ffffff;" align=3D"center" valign=3D"middle">
+Your pipeline has failed.
+</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+<tr class=3D"spacer">
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; he=
+ight: 18px; font-size: 18px; line-height: 18px;">
+&#160;
+</td>
+</tr>
+<tr class=3D"section">
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; bo=
+rder-radius: 3px; overflow: hidden; padding: 0 15px; border: 1px solid #e=
+deded;">
+<table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" class=3D"table-in=
+fo" style=3D"width: 100%;">
+<tbody>
+<tr>
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; fo=
+nt-size: 15px; line-height: 1.4; color: #8c8c8c; font-weight: 300; margin=
+: 0; padding: 14px 0;">Project</td>
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; fo=
+nt-size: 15px; line-height: 1.4; font-weight: 500; color: #333333; width:=
+ 75%; margin: 0; padding: 14px 0 14px 5px;">
+<a class=3D"muted" href=3D"https://gitlab.com/qemu-project" style=3D"colo=
+r: #333333; text-decoration: none;">
+QEMU
+</a>
+/
+<a class=3D"muted" href=3D"https://gitlab.com/qemu-project/qemu" style=3D=
+"color: #333333; text-decoration: none;">
+QEMU
+</a>
+</td>
+</tr>
+<tr>
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; fo=
+nt-size: 15px; line-height: 1.4; color: #8c8c8c; font-weight: 300; border=
+-top-width: 1px; border-top-color: #ededed; border-top-style: solid; marg=
+in: 0; padding: 14px 0;">Branch</td>
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; fo=
+nt-size: 15px; line-height: 1.4; font-weight: 500; color: #333333; width:=
+ 75%; border-top-width: 1px; border-top-color: #ededed; border-top-style:=
+ solid; margin: 0; padding: 14px 0 14px 5px;">
+<table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" class=3D"img" sty=
+le=3D"border-collapse: collapse;">
+<tbody>
+<tr>
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; fo=
+nt-size: 15px; line-height: 1.4; padding-right: 5px;" valign=3D"middle">
+<img alt=3D"" height=3D"13" src=3D"https://gitlab.com/assets/mailers/ci_p=
+ipeline_notif_v1/icon-branch-gray-53618a7fc19d4d32ccbabac2f6d59bebe67202a=
+9f2f1255e3f72c69756c0dd9c.gif" style=3D"display: block;" width=3D"13" />
+</td>
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; fo=
+nt-size: 15px; line-height: 1.4;" valign=3D"middle">
+<a class=3D"muted" href=3D"https://gitlab.com/qemu-project/qemu/-/commits=
+/master" style=3D"color: #333333; text-decoration: none;">
+master
+</a>
+</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+<tr>
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; fo=
+nt-size: 15px; line-height: 1.4; color: #8c8c8c; font-weight: 300; border=
+-top-width: 1px; border-top-color: #ededed; border-top-style: solid; marg=
+in: 0; padding: 14px 0;">Commit</td>
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; fo=
+nt-size: 15px; line-height: 1.4; font-weight: 400; color: #333333; width:=
+ 75%; border-top-width: 1px; border-top-color: #ededed; border-top-style:=
+ solid; margin: 0; padding: 14px 0 14px 5px;">
+<table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" class=3D"img" sty=
+le=3D"border-collapse: collapse;">
+<tbody>
+<tr>
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; fo=
+nt-size: 15px; line-height: 1.4; padding-right: 5px;" valign=3D"middle">
+<img alt=3D"" height=3D"13" src=3D"https://gitlab.com/assets/mailers/ci_p=
+ipeline_notif_v1/icon-commit-gray-c10243ac24cde64b549aec91de35e6b49c8739b=
+506b86472b54614c10d8b4aac.gif" style=3D"display: block;" width=3D"13" />
+</td>
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; fo=
+nt-size: 15px; line-height: 1.4;" valign=3D"middle">
+<a href=3D"https://gitlab.com/qemu-project/qemu/-/commit/7d3660e79830a069=
+f1848bb4fa1cdf8f666424fb" style=3D"color: #3777b0; text-decoration: none;=
+">
+7d3660e7
+</a>
+</td>
+</tr>
+</tbody>
+</table>
+<div class=3D"commit" style=3D"color: #5c5c5c; font-weight: 300;">
+Merge remote-tracking branch 'remotes/bonzini/t...
+</div>
+</td>
+</tr>
+<tr>
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; fo=
+nt-size: 15px; line-height: 1.4; color: #8c8c8c; font-weight: 300; border=
+-top-width: 1px; border-top-color: #ededed; border-top-style: solid; marg=
+in: 0; padding: 14px 0;">Commit Author</td>
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; fo=
+nt-size: 15px; line-height: 1.4; font-weight: 500; color: #333333; width:=
+ 75%; border-top-width: 1px; border-top-color: #ededed; border-top-style:=
+ solid; margin: 0; padding: 14px 0 14px 5px;">
+<table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" class=3D"img" sty=
+le=3D"border-collapse: collapse;">
+<tbody>
+<tr>
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; fo=
+nt-size: 15px; line-height: 1.4; padding-right: 5px;" valign=3D"middle">
+<img alt=3D"" class=3D"avatar" height=3D"24" src=3D"https://secure.gravat=
+ar.com/avatar/98261ce19b4e9da714d577154686723a?s=3D48&amp;d=3Didenticon" =
+style=3D"display: block; border-radius: 12px; margin: -2px 0;" width=3D"2=
+4" />
+</td>
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; fo=
+nt-size: 15px; line-height: 1.4;" valign=3D"middle">
+<a class=3D"muted" href=3D"https://gitlab.com/pm215" style=3D"color: #333=
+333; text-decoration: none;">
+Peter Maydell
+</a>
+</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+<tr class=3D"spacer">
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; he=
+ight: 18px; font-size: 18px; line-height: 18px;">
+&#160;
+</td>
+</tr>
+<tr class=3D"pre-section">
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
+lor: #333333; font-size: 15px; font-weight: 400; line-height: 1.4; paddin=
+g: 15px 5px 0;" align=3D"center">
+<table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" class=3D"img" sty=
+le=3D"border-collapse: collapse; margin: 0 auto;">
+<tbody>
+<tr>
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; fo=
+nt-size: 15px; font-weight: 500; line-height: 1.4;" valign=3D"baseline">
+Pipeline
+<a href=3D"https://gitlab.com/qemu-project/qemu/-/pipelines/155914107" st=
+yle=3D"color: #3777b0; text-decoration: none;">
+#155914107
+</a>
+triggered by
+</td>
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; fo=
+nt-size: 15px; line-height: 1.4; padding-right: 5px; padding-left: 5px;" =
+width=3D"24" valign=3D"middle">
+<img alt=3D"" class=3D"avatar" height=3D"24" src=3D"https://secure.gravat=
+ar.com/avatar/a7d7f408c0b3370bbbeb98833d6c50e4?s=3D48&amp;d=3Didenticon" =
+style=3D"display: block; border-radius: 12px; margin: -2px 0;" width=3D"2=
+4" />
+</td>
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; fo=
+nt-size: 15px; font-weight: 500; line-height: 1.4;" valign=3D"baseline">
+<a class=3D"muted" href=3D"https://gitlab.com/stsquad" style=3D"color: #3=
+33333; text-decoration: none;">
+Alex Benn&#233;e
+</a>
+</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+<tr>
+<td colspan=3D"2" style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,=
+sans-serif; color: #333333; font-size: 14px; font-weight: 400; line-heigh=
+t: 1.4; padding: 0 8px 16px;" align=3D"center">
+had
+1
+failed
+build.
+</td>
+</tr>
+<tr class=3D"table-warning">
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; bo=
+rder-radius: 4px 4px 0 0; overflow: hidden; color: #d22852; font-size: 14=
+px; line-height: 1.4; padding: 8px 16px; border-color: #ededed; border-st=
+yle: solid; border-width: 1px 1px 0;" align=3D"center" bgcolor=3D"#fdf4f6=
+">
+Logs may contain sensitive data. Please consider before forwarding this e=
+mail.
+</td>
+</tr>
+<tr class=3D"section">
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; ov=
+erflow: hidden; border-radius: 0 0 4px 4px; padding: 0 16px; border-color=
+: #ededed; border-style: solid; border-width: 0 1px 1px;">
+<table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" class=3D"builds" =
+style=3D"width: 100%; border-collapse: collapse;">
+<tbody>
+<tr class=3D"build-state">
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
+lor: #8c8c8c; font-weight: 500; font-size: 14px; padding: 16px 0;">
+<table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" class=3D"img" sty=
+le=3D"border-collapse: collapse;">
+<tbody>
+<tr>
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
+lor: #d22f57; font-weight: 500; font-size: 16px; padding-right: 8px; line=
+-height: 10px;" valign=3D"middle">
+<img alt=3D"&#10006;" height=3D"10" src=3D"https://gitlab.com/assets/mail=
+ers/ci_pipeline_notif_v1/icon-x-red-67056b7b99899e30453df79abfbe16162f6a2=
+6ed789d8236f81afcaea216ffe6.gif" style=3D"display: block;" width=3D"10" /=
+>
+</td>
+<td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; co=
+lor: #8c8c8c; font-weight: 500; font-size: 14px;" valign=3D"middle">
+test
+</td>
+</tr>
+</tbody>
+</table>
+</td>
+<td align=3D"right" style=3D"font-family: 'Helvetica Neue',Helvetica,Aria=
+l,sans-serif; color: #8c8c8c; font-weight: 500; font-size: 14px; padding:=
+ 16px 0;">
+<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/593965592" style=3D=
+"color: #3777b0; text-decoration: none;">
+build-disabled
+</a>
+
+</td>
+</tr>
+<tr class=3D"build-log">
+<td colspan=3D"2" style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,=
+sans-serif; padding: 0 0 16px;">
+<pre style=3D"font-family: Monaco,'Lucida Console','Courier New',Courier,=
+monospace; background-color: #fafafa; border-radius: 4px; overflow: hidde=
+n; white-space: pre-wrap; word-break: break-all; font-size: 13px; line-he=
+ight: 1.4; color: #333333; margin: 0; padding: 16px 8px;"><span>  TEST   =
+ check-qtest-ppc64: tests/qtest/usb-hcd-uhci-test<br />  TEST    check-qt=
+est-ppc64: tests/qtest/usb-hcd-xhci-test<br />  TEST    check-qtest-ppc64=
+: tests/qtest/test-filter-mirror<br />  TEST    check-qtest-ppc64: tests/=
+qtest/test-filter-redirector<br />  TEST    check-qtest-ppc64: tests/qtes=
+t/display-vga-test<br />  TEST    check-qtest-ppc64: tests/qtest/numa-tes=
+t<br />  TEST    check-qtest-ppc64: tests/qtest/ivshmem-test<br />  TEST =
+   check-qtest-ppc64: tests/qtest/cpu-plug-test<br />  TEST    check-qtes=
+t-ppc64: tests/qtest/cdrom-test<br />  TEST    check-qtest-ppc64: tests/q=
+test/device-introspect-test<br />socket_accept failed: Resource temporari=
+ly unavailable<br />**<br />ERROR:/builds/qemu-project/qemu/tests/qtest/l=
+ibqtest.c:301:qtest_init_without_qmp_handshake: assertion failed: (s-&gt;=
+fd &gt;=3D 0 &amp;&amp; s-&gt;qmp_fd &gt;=3D 0)<br />/builds/qemu-project=
+/qemu/tests/qtest/libqtest.c:166: kill_qemu() tried to terminate QEMU pro=
+cess but encountered exit status 1 (expected 0)<br />ERROR - Bail out! ER=
+ROR:/builds/qemu-project/qemu/tests/qtest/libqtest.c:301:qtest_init_witho=
+ut_qmp_handshake: assertion failed: (s-&gt;fd &gt;=3D 0 &amp;&amp; s-&gt;=
+qmp_fd &gt;=3D 0)<br />make: *** [/builds/qemu-project/qemu/tests/Makefil=
+e.include:639: check-qtest-i386] Error 1<br />make: *** Waiting for unfin=
+ished jobs....<br />qemu-system-ppc64: warning: machine has no BMC device=
+. Use '-device ipmi-bmc-sim,id=3Dbmc0 -device isa-ipmi-bt,bmc=3Dbmc0,irq=3D=
+10' to define one<br />qemu-system-ppc64: warning: machine has no BMC dev=
+ice. Use '-device ipmi-bmc-sim,id=3Dbmc0 -device isa-ipmi-bt,bmc=3Dbmc0,i=
+rq=3D10' to define one<br />qemu-system-ppc64: warning: machine has no BM=
+C device. Use '-device ipmi-bmc-sim,id=3Dbmc0 -device isa-ipmi-bt,bmc=3Db=
+mc0,irq=3D10' to define one<br />  TEST    check-qtest-ppc64: tests/qtest=
+/machine-none-test<br />  TEST    check-qtest-ppc64: tests/qtest/qmp-test=
+<br />  TEST    check-qtest-ppc64: tests/qtest/qmp-cmd-test<br />  TEST  =
+  check-qtest-ppc64: tests/qtest/qom-test<br />  TEST    check-qtest-ppc6=
+4: tests/qtest/test-hmp<br />  TEST    check-qtest-ppc64: tests/qtest/qos=
+-test<br /></span><div class=3D"section-start" data-timestamp=3D"15920676=
+11" data-section=3D"after-script" role=3D"button"></div><span class=3D"te=
+rm-fg-l-cyan term-bold section section-header js-s-after-script">Running =
+after_script</span><span class=3D"section section-header js-s-after-scrip=
+t"><br /></span><div class=3D"section-end" data-section=3D"after-script">=
+</div><div class=3D"section-start" data-timestamp=3D"1592067612" data-sec=
+tion=3D"upload-artifacts-on-failure" role=3D"button"></div><span class=3D=
+"term-fg-l-cyan term-bold section section-header js-s-upload-artifacts-on=
+-failure">Uploading artifacts for failed job</span><span class=3D"section=
+ section-header js-s-upload-artifacts-on-failure"><br /></span><div class=
+=3D"section-end" data-section=3D"upload-artifacts-on-failure"></div><span=
+ class=3D"term-fg-l-red term-bold">ERROR: Job failed: exit code 1<br /></=
+span></pre>
+</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+
+
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+
+<tr class=3D"footer">
+<td style=3D"font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, s=
+ans-serif; font-size: 13px; line-height: 1.6; color: #5c5c5c; padding: 25=
+px 0;">
+<img alt=3D"GitLab" height=3D"33" src=3D"https://gitlab.com/assets/mailer=
+s/gitlab_footer_logo-078860f148cc9596195e6bb3fa7db31c30538355576c5c3b569c=
+414902e3d095.gif" width=3D"90" style=3D"display: block; margin: 0 auto 1e=
+m;" />
+<div>
+You're receiving this email because of your account on gitlab.com. <a cla=
+ss=3D"mng-notif-link" href=3D"https://gitlab.com/profile/notifications" s=
+tyle=3D"color: #3777b0; text-decoration: none;">Manage all notifications<=
+/a> &#183; <a class=3D"help-link" href=3D"https://gitlab.com/help" style=3D=
+"color: #3777b0; text-decoration: none;">Help</a>
+</div>
+</td>
+</tr>
+
+<tr>
+<td class=3D"footer-message" style=3D"font-family: &quot;Helvetica Neue&q=
+uot;, Helvetica, Arial, sans-serif; font-size: 13px; line-height: 1.6; co=
+lor: #5c5c5c; padding: 25px 0;">
+
+</td>
+</tr>
+</tbody>
+</table>
+</body>
+</html>
+
+----==_mimepart_5ee7489995cbf_2f733f97e461231012456f--
 
