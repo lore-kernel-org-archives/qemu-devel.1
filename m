@@ -2,87 +2,88 @@ Return-Path: <SRS0=tJVC=74=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB57FC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 05:22:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6CD7C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 05:27:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7554A206E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 05:22:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 88959206E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 05:27:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SxpYU3Ow"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7554A206E2
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K3KzDDhs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88959206E2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38684 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41198 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkhZR-0007qG-Op
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 01:22:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46238)
+	id 1jkhe7-0000lC-PQ
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 01:26:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48080)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jkhYs-0007Nr-44
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 01:21:34 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41982
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jkhdZ-0000L4-1s
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 01:26:25 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:31993
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jkhYq-0000Ia-LE
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 01:21:33 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jkhdX-0001Rv-9P
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 01:26:24 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592198491;
+ s=mimecast20190719; t=1592198781;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=TOLcTSyAqQQu+LEbnmAy815PLwjKRhXBvQKM61rDIfM=;
- b=SxpYU3Ow8JIDCMga+cxrNlWGKBxEE3mGI9LKoJ12gpRlQM/WkK3qOuk+aSlaYEvBP5emms
- k1xf3gxn6C4TBnwvh9l+OQXysPakNc8ZQl50q5z8F24s8FdBgcsX5ox65iQbbpjAKn5x5P
- L3zrp3XlRs7ib8Cw0cnRdXvgCsLDllg=
+ bh=gP3CvJp2c4EKBjQsKHk1fsWJXCY1mSiMIf+RJSvNUXw=;
+ b=K3KzDDhs4VB0++vRxGtlDXT/1bLpKVqhCsmDuCSTGOcSGVg+mhuIOdTJa3Zf9xA1l8GFoZ
+ CSGuo+75W2vEcBFDUTIbIhLD/sdMGFWHBeC+XdfrdHPWcj1lNboo99dLVYTMc/Rp2OgfkR
+ 6Ix86hapNIItwzCBShoiDF6k9Nhs5UM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-172-bpTLcet6MtSykvWU2_4eNQ-1; Mon, 15 Jun 2020 01:21:19 -0400
-X-MC-Unique: bpTLcet6MtSykvWU2_4eNQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-30-U22ieXCcNnaS9N2_hJovXQ-1; Mon, 15 Jun 2020 01:26:18 -0400
+X-MC-Unique: U22ieXCcNnaS9N2_hJovXQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0E57C80B73B;
- Mon, 15 Jun 2020 05:21:18 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C9A09835B43;
+ Mon, 15 Jun 2020 05:26:16 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
  [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 550477B91C;
- Mon, 15 Jun 2020 05:21:05 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 67DF97FE87;
+ Mon, 15 Jun 2020 05:26:16 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id C745D1138648; Mon, 15 Jun 2020 07:21:03 +0200 (CEST)
+ id E15AE1138648; Mon, 15 Jun 2020 07:26:14 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
-To: Greg Kurz <groug@kaod.org>
-Subject: Re: [PATCH v10 1/9] error: auto propagated local_err
-References: <20200317151625.20797-1-vsementsov@virtuozzo.com>
- <20200317151625.20797-2-vsementsov@virtuozzo.com>
- <20200610163921.28d824aa@bahia.lan>
-Date: Mon, 15 Jun 2020 07:21:03 +0200
-In-Reply-To: <20200610163921.28d824aa@bahia.lan> (Greg Kurz's message of "Wed, 
- 10 Jun 2020 16:39:21 +0200")
-Message-ID: <877dw8dhvk.fsf@dusky.pond.sub.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v3 09/24] macio: Fix to realize "mos6522-cuda" and
+ "mos6522-pmu" devices
+References: <20200609122339.937862-1-armbru@redhat.com>
+ <20200609122339.937862-10-armbru@redhat.com>
+Date: Mon, 15 Jun 2020 07:26:14 +0200
+In-Reply-To: <20200609122339.937862-10-armbru@redhat.com> (Markus Armbruster's
+ message of "Tue, 9 Jun 2020 14:23:24 +0200")
+Message-ID: <871rmgdhmx.fsf@dusky.pond.sub.org>
 User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/14 22:37:26
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 01:12:36
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,47 +97,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-block@nongnu.org,
- Paul Durrant <paul@xen.org>,
- Philippe =?utf-8?Q?Mathieu-Daud?= =?utf-8?Q?=C3=A9?= <philmd@redhat.com>,
- Christian Schoenebeck <qemu_oss@crudebyte.com>, armbru@redhat.com,
- qemu-devel@nongnu.org, Stefano Stabellini <sstabellini@kernel.org>,
- Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
- Max Reitz <mreitz@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
- Stefan Berger <stefanb@linux.ibm.com>
+Cc: pbonzini@redhat.com, Laurent Vivier <laurent@vivier.eu>,
+ berrange@redhat.com, qemu-devel@nongnu.org, ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Greg Kurz <groug@kaod.org> writes:
+Peter, forgot to cc: you.  May I have your blessings for this version?
 
-> On Tue, 17 Mar 2020 18:16:17 +0300
-> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> wrote:
->
->> Introduce a new ERRP_AUTO_PROPAGATE macro, to be used at start of
->> functions with an errp OUT parameter.
->> 
->> It has three goals:
->> 
->> 1. Fix issue with error_fatal and error_prepend/error_append_hint: user
->> can't see this additional information, because exit() happens in
->> error_setg earlier than information is added. [Reported by Greg Kurz]
->> 
->
-> I have more of these coming and I'd really like to use ERRP_AUTO_PROPAGATE.
->
-> It seems we have a consensus on the macro itself but this series is gated
-> by the conversion of the existing code base.
->
-> What about merging this patch separately so that people can start using
-> it at least ?
+Markus Armbruster <armbru@redhat.com> writes:
 
-Please give me a few more days to finish the work I feel should go in
-before the conversion.  With any luck, Vladimir can then rebase /
-recreate the conversion easily, and you can finally use the macro for
-your own work.
+> cuda_init() creates a "mos6522-cuda" device, but it's never realized.
+> Affects machines mac99 with via=cuda (default) and g3beige.
+>
+> pmu_init() creates a "mos6522-pmu" device, but it's never realized.
+> Affects machine mac99 with via=pmu and via=pmu-adb,
+>
+> In theory, a device becomes real only on realize.  In practice, the
+> transition from unreal to real is a fuzzy one.  The work to make a
+> device real can be spread between realize methods (fine),
+> instance_init methods (wrong), and board code wiring up the device
+> (fine as long as it effectively happens on realize).  Depending on
+> what exactly is done where, a device can work even when we neglect
+> to realize it.
+>
+> These two appear to work.  Nevertheless, it's a clear misuse of the
+> interface.  Even when it works today (more or less by chance), it can
+> break tomorrow.
+>
+> Fix by realizing them in cuda_realize() and pmu_realize(),
+> respectively.
+>
+> Fixes: 6dca62a0000f95e0b7020aa00d0ca9b2c421f341
+> Cc: Laurent Vivier <laurent@vivier.eu>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  hw/misc/macio/cuda.c | 15 ++++++++++-----
+>  hw/misc/macio/pmu.c  | 15 ++++++++++-----
+>  2 files changed, 20 insertions(+), 10 deletions(-)
+>
+> diff --git a/hw/misc/macio/cuda.c b/hw/misc/macio/cuda.c
+> index e0cc0aac5d..3cb10c743c 100644
+> --- a/hw/misc/macio/cuda.c
+> +++ b/hw/misc/macio/cuda.c
+> @@ -33,6 +33,7 @@
+>  #include "hw/misc/macio/cuda.h"
+>  #include "qemu/timer.h"
+>  #include "sysemu/runstate.h"
+> +#include "qapi/error.h"
+>  #include "qemu/cutils.h"
+>  #include "qemu/log.h"
+>  #include "qemu/module.h"
+> @@ -522,16 +523,20 @@ static void cuda_reset(DeviceState *dev)
+>  static void cuda_realize(DeviceState *dev, Error **errp)
+>  {
+>      CUDAState *s = CUDA(dev);
+> +    Error *err = NULL;
+>      SysBusDevice *sbd;
+> -    MOS6522State *ms;
+> -    DeviceState *d;
+>      struct tm tm;
+>  
+> +    object_property_set_bool(OBJECT(&s->mos6522_cuda), true, "realized",
+> +                             &err);
+> +    if (err) {
+> +        error_propagate(errp, err);
+> +        return;
+> +    }
+> +
+>      /* Pass IRQ from 6522 */
+> -    d = DEVICE(&s->mos6522_cuda);
+> -    ms = MOS6522(d);
+>      sbd = SYS_BUS_DEVICE(s);
+> -    sysbus_pass_irq(sbd, SYS_BUS_DEVICE(ms));
+> +    sysbus_pass_irq(sbd, SYS_BUS_DEVICE(&s->mos6522_cuda));
+>  
+>      qemu_get_timedate(&tm, 0);
+>      s->tick_offset = (uint32_t)mktimegm(&tm) + RTC_OFFSET;
+> diff --git a/hw/misc/macio/pmu.c b/hw/misc/macio/pmu.c
+> index 9a9cd427e1..0895b78b59 100644
+> --- a/hw/misc/macio/pmu.c
+> +++ b/hw/misc/macio/pmu.c
+> @@ -40,6 +40,7 @@
+>  #include "hw/misc/macio/pmu.h"
+>  #include "qemu/timer.h"
+>  #include "sysemu/runstate.h"
+> +#include "qapi/error.h"
+>  #include "qemu/cutils.h"
+>  #include "qemu/log.h"
+>  #include "qemu/module.h"
+> @@ -739,16 +740,20 @@ static void pmu_reset(DeviceState *dev)
+>  static void pmu_realize(DeviceState *dev, Error **errp)
+>  {
+>      PMUState *s = VIA_PMU(dev);
+> +    Error *err = NULL;
+>      SysBusDevice *sbd;
+> -    MOS6522State *ms;
+> -    DeviceState *d;
+>      struct tm tm;
+>  
+> +    object_property_set_bool(OBJECT(&s->mos6522_pmu), true, "realized",
+> +                             &err);
+> +    if (err) {
+> +        error_propagate(errp, err);
+> +        return;
+> +    }
+> +
+>      /* Pass IRQ from 6522 */
+> -    d = DEVICE(&s->mos6522_pmu);
+> -    ms = MOS6522(d);
+>      sbd = SYS_BUS_DEVICE(s);
+> -    sysbus_pass_irq(sbd, SYS_BUS_DEVICE(ms));
+> +    sysbus_pass_irq(sbd, SYS_BUS_DEVICE(&s->mos6522_pmu));
+>  
+>      qemu_get_timedate(&tm, 0);
+>      s->tick_offset = (uint32_t)mktimegm(&tm) + RTC_OFFSET;
 
 
