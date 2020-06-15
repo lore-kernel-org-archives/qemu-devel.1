@@ -2,86 +2,95 @@ Return-Path: <SRS0=tJVC=74=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C397C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 11:22:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24CDDC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 11:45:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0AFC020663
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 11:22:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D1E772065F
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 11:45:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QjQokknK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AFC020663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YVcPDhsw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1E772065F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41106 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49360 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jknCN-0005aR-8K
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 07:22:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34186)
+	id 1jknYI-0002L3-16
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 07:45:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39550)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jknBn-00053Q-3Y
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 07:22:07 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:37776)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jknBl-0006er-0A
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 07:22:06 -0400
-Received: by mail-oi1-x244.google.com with SMTP id a3so15563781oid.4
- for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 04:22:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=oLHiHHn5wO2Tihs5EiE56VABBjq6ipTkl1nGQyWrv6o=;
- b=QjQokknKY0K8Ckya6aedOpfnXkKeIGenNyNo2gEU9AXW45ezpqfJABRbFfIsz+Cwrf
- LZE8rLEXJZQj9K0oEdg0jXqBzcnXo7RXF+Ta1nN5/DHrbrvCPW8s+BLdwy8YmQ2ae5mq
- lo/VXlkzrl/TUBG7EeVswMbDnHRXQfO/73Qt0Jr6qYsw/7nApEWctvJ2ahPdPRDhaRL/
- JiSEYXPeSzjQyBYd09THNTauUQxKJOsp1mjq9koeWVr3tRn4irYMf6FpbI4nxUAgbBfN
- jClUpKTxHp5qIh2NmiS92zllvYJsoxawqg+xEYHM6ZtVUFNin7gec33nqNsMCk62oeY1
- xFJw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=oLHiHHn5wO2Tihs5EiE56VABBjq6ipTkl1nGQyWrv6o=;
- b=PEXKBFcOQMZUYbysMCYi0/QqK0RuXpOQdsq9p+sXLnuGIZVmMCTzL5BlIFdmJZlqPB
- 0Zc6o2LmZ8PKeSOm7B926EXRiCQl8ZXIwbiHerGt9vQbO1qiA56X34zxJCVh+HIm99jq
- hbiJkRsOt5CG9zsrF8l/GoL86uGgwMB8Kqfw0Kjj39KFUnubiFAGsoGvAVKGUc7bna5L
- ibqmbOR/7t4pKKc84cP+E7a0ecHTTWthGQDeJeZbUWh1n7R2wky+8d0z91jLUSHuiV0N
- n3vz49oiLc2BnNTixSqxj1INZ6ygHyeGyItukZPLk12iygAwFJokJnHJZHvYtdqKlwOK
- lkKA==
-X-Gm-Message-State: AOAM530Gy3mEE/jvMGNvIdFoOVaPWspg7joUbWsJA9TJ8KEz89sou4gO
- TLpbdbeQZmbZunWT/DGTGyrp3/cjph/XOlFDVoZHpg==
-X-Google-Smtp-Source: ABdhPJzwWzVwQ4GwtXB2eniwtcBRm8OqdpImTSTffTOr8BAZscAa5OWXa8IaYhRV6aOTeQ9cmciLMiqiinPu0KkbT/8=
-X-Received: by 2002:aca:568c:: with SMTP id k134mr7847554oib.48.1592220123436; 
- Mon, 15 Jun 2020 04:22:03 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jknXX-0001dY-W6
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 07:44:36 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:25471
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jknXO-0002Ky-2J
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 07:44:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592221464;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=x2+Zv5CsFRDjoYi7PKWb0RhNczJgMu7H8TMzCqdV3R8=;
+ b=YVcPDhswTSd/6SJsoBb7A9dw24spJ2LiQc3clI74PHxiVv7K8hJDPpkKedpvsR2M93rLpu
+ ida7lh7QIrVJZCDFWWRPwZLdq1lC1CpmpeAQv6U3LWY2HiS3wUnRWXhN3snprNK7jP96cR
+ yV33ziuEVx6lq8AC0eRkOEh9gF6AUkk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-217-XRpSaJnCPlSIJ5kDc1njfA-1; Mon, 15 Jun 2020 07:44:19 -0400
+X-MC-Unique: XRpSaJnCPlSIJ5kDc1njfA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 19463108BD0F;
+ Mon, 15 Jun 2020 11:44:18 +0000 (UTC)
+Received: from work-vm (ovpn-114-201.ams2.redhat.com [10.36.114.201])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 70E067CABA;
+ Mon, 15 Jun 2020 11:44:13 +0000 (UTC)
+Date: Mon, 15 Jun 2020 12:44:10 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Babu Moger <babu.moger@amd.com>
+Subject: Re: [PATCH v7 07/13] hw/386: Add EPYC mode topology decoding functions
+Message-ID: <20200615114410.GA2884@work-vm>
+References: <158396702138.58170.7920458595372792959.stgit@naples-babu.amd.com>
+ <158396721426.58170.2930696192478912976.stgit@naples-babu.amd.com>
+ <20200602171838.GG577771@habkost.net>
+ <e68f8536-40fe-3c35-7d66-04f20fcabb8e@amd.com>
+ <20200602230105.GI577771@habkost.net>
+ <cc7e970a-0f03-7778-d7f9-76d528c3e260@amd.com>
+ <20200603153119.GA2366737@habkost.net>
+ <31504224-7127-8154-1d62-ef15a8cb8b39@amd.com>
+ <20200603154539.GB2366737@habkost.net>
+ <1a3bdd75-e092-1e7d-c2da-2459dd987e4b@amd.com>
 MIME-Version: 1.0
-References: <CA+MHfovYq1UAQQ341MnyGas7ScskWyjR=QE0D-RS7+zxF2mtsw@mail.gmail.com>
-In-Reply-To: <CA+MHfovYq1UAQQ341MnyGas7ScskWyjR=QE0D-RS7+zxF2mtsw@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 15 Jun 2020 12:21:52 +0100
-Message-ID: <CAFEAcA_5uUXtEfKLT9isq3jWMfoSebx4OW3XbDKXZYhSd6-TgQ@mail.gmail.com>
-Subject: Re: [PATCH v2] Implement configurable descriptor size in ftgmac100
-To: Erik Smit <erik.lucas.smit@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::244;
- envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x244.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <1a3bdd75-e092-1e7d-c2da-2459dd987e4b@amd.com>
+User-Agent: Mutt/1.14.0 (2020-05-02)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 01:17:36
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,53 +103,313 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jeffery <andrew@aj.id.au>, Jason Wang <jasowang@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
- =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
- Joel Stanley <joel@jms.id.au>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, "mst@redhat.com" <mst@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "imammedo@redhat.com" <imammedo@redhat.com>,
+ "rth@twiddle.net" <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, 6 Jun 2020 at 10:03, Erik Smit <erik.lucas.smit@gmail.com> wrote:
->
-> The hardware supports configurable descriptor sizes, configured in the DB=
-LAC
-> register.
->
-> Most drivers use the default 4 word descriptor, which is currently hardco=
-ded,
-> but Aspeed SDK configures 8 words to store extra data.
-
-Hi; I've applied this to target-arm.next, with the parenthesis
-change that C=C3=A9dric suggested; thanks for your contribution.
-
-A couple of minor patch format notes, which are only worth worrying
-about if you plan to submit more QEMU patches in future:
-
-> ---
-
-The Signed-off-by: line should go above this '---' divider, because
-it wants to go into the commit message in git; anything below '---'
-is discarded when the patch is applied.
-
+* Babu Moger (babu.moger@amd.com) wrote:
+> 
+> 
+> > -----Original Message-----
+> > From: Eduardo Habkost <ehabkost@redhat.com>
+> > Sent: Wednesday, June 3, 2020 10:46 AM
+> > To: Moger, Babu <Babu.Moger@amd.com>
+> > Cc: marcel.apfelbaum@gmail.com; pbonzini@redhat.com; rth@twiddle.net;
+> > mst@redhat.com; imammedo@redhat.com; qemu-devel@nongnu.org
+> > Subject: Re: [PATCH v7 07/13] hw/386: Add EPYC mode topology decoding
+> > functions
+> > 
+> > On Wed, Jun 03, 2020 at 10:38:46AM -0500, Babu Moger wrote:
+> > >
+> > >
+> > > On 6/3/20 10:31 AM, Eduardo Habkost wrote:
+> > > > On Wed, Jun 03, 2020 at 10:22:10AM -0500, Babu Moger wrote:
+> > > >>
+> > > >>
+> > > >>> -----Original Message-----
+> > > >>> From: Eduardo Habkost <ehabkost@redhat.com>
+> > > >>> Sent: Tuesday, June 2, 2020 6:01 PM
+> > > >>> To: Moger, Babu <Babu.Moger@amd.com>
+> > > >>> Cc: marcel.apfelbaum@gmail.com; pbonzini@redhat.com;
+> > rth@twiddle.net;
+> > > >>> mst@redhat.com; imammedo@redhat.com; qemu-devel@nongnu.org
+> > > >>> Subject: Re: [PATCH v7 07/13] hw/386: Add EPYC mode topology decoding
+> > > >>> functions
+> > > >>>
+> > > >>> On Tue, Jun 02, 2020 at 04:59:19PM -0500, Babu Moger wrote:
+> > > >>>>
+> > > >>>>
+> > > >>>>> -----Original Message-----
+> > > >>>>> From: Eduardo Habkost <ehabkost@redhat.com>
+> > > >>>>> Sent: Tuesday, June 2, 2020 12:19 PM
+> > > >>>>> To: Moger, Babu <Babu.Moger@amd.com>
+> > > >>>>> Cc: marcel.apfelbaum@gmail.com; pbonzini@redhat.com;
+> > rth@twiddle.net;
+> > > >>>>> mst@redhat.com; imammedo@redhat.com; qemu-devel@nongnu.org
+> > > >>>>> Subject: Re: [PATCH v7 07/13] hw/386: Add EPYC mode topology
+> > decoding
+> > > >>>>> functions
+> > > >>>>>
+> > > >>>>> Hi,
+> > > >>>>>
+> > > >>>>> It looks like this series breaks -device and CPU hotplug:
+> > > >>>>>
+> > > >>>>> On Wed, Mar 11, 2020 at 05:53:34PM -0500, Babu Moger wrote:
+> > > >>>>>> These functions add support for building EPYC mode topology given
+> > the
+> > > >>> smp
+> > > >>>>>> details like numa nodes, cores, threads and sockets.
+> > > >>>>>>
+> > > >>>>>> The new apic id decoding is mostly similar to current apic id decoding
+> > > >>>>>> except that it adds a new field node_id when numa configured.
+> > Removes
+> > > >>> all
+> > > >>>>>> the hardcoded values. Subsequent patches will use these functions to
+> > build
+> > > >>>>>> the topology.
+> > > >>>>>>
+> > > >>>>>> Following functions are added.
+> > > >>>>>> apicid_llc_width_epyc
+> > > >>>>>> apicid_llc_offset_epyc
+> > > >>>>>> apicid_pkg_offset_epyc
+> > > >>>>>> apicid_from_topo_ids_epyc
+> > > >>>>>> x86_topo_ids_from_idx_epyc
+> > > >>>>>> x86_topo_ids_from_apicid_epyc
+> > > >>>>>> x86_apicid_from_cpu_idx_epyc
+> > > >>>>>>
+> > > >>>>>> The topology details are available in Processor Programming
+> > Reference
+> > > >>> (PPR)
+> > > >>>>>> for AMD Family 17h Model 01h, Revision B1 Processors. The revision
+> > > >>> guides
+> > > >>>>> are
+> > > >>>>>> available from the bugzilla Link below.
+> > > >>>>>> Link:
+> > > >>>>>
+> > > >>>
+> > https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fbugzilla.
+> > > >>>>>
+> > > >>>
+> > kernel.org%2Fshow_bug.cgi%3Fid%3D206537&amp;data=02%7C01%7Cbabu.m
+> > > >>>>>
+> > > >>>
+> > oger%40amd.com%7C3487f40d37df4d59097d08d807190248%7C3dd8961fe488
+> > > >>>>>
+> > > >>>
+> > 4e608e11a82d994e183d%7C0%7C0%7C637267151289763739&amp;sdata=wE0
+> > > >>>>> ukXIVh0l5eNQWsv6VDE9UZEVJmisofaW192gcZAI%3D&amp;reserved=0
+> > > >>>>>>
+> > > >>>>>> Signed-off-by: Babu Moger <babu.moger@amd.com>
+> > > >>>>>> Acked-by: Igor Mammedov <imammedo@redhat.com>
+> > > >>>>>> Acked-by: Michael S. Tsirkin <mst@redhat.com>
+> > > >>>>>> ---
+> > > >>>>> [...]
+> > > >>>>>>  typedef struct X86CPUTopoIDs {
+> > > >>>>>>      unsigned pkg_id;
+> > > >>>>>> +    unsigned node_id;
+> > > >>>>>
+> > > >>>>> You have added a new field here.
+> > > >>>>>
+> > > >>>>>>      unsigned die_id;
+> > > >>>>>>      unsigned core_id;
+> > > >>>>>>      unsigned smt_id;
+> > > >>>>> [...]
+> > > >>>>>> +static inline apic_id_t
+> > > >>>>>> +x86_apicid_from_topo_ids_epyc(X86CPUTopoInfo *topo_info,
+> > > >>>>>> +                              const X86CPUTopoIDs *topo_ids)
+> > > >>>>>> +{
+> > > >>>>>> +    return (topo_ids->pkg_id  << apicid_pkg_offset_epyc(topo_info)) |
+> > > >>>>>> +           (topo_ids->node_id << apicid_node_offset_epyc(topo_info)) |
+> > > >>>>>
+> > > >>>>> You are using the new field here.
+> > > >>>>>
+> > > >>>>>> +           (topo_ids->die_id  << apicid_die_offset(topo_info)) |
+> > > >>>>>> +           (topo_ids->core_id << apicid_core_offset(topo_info)) |
+> > > >>>>>> +           topo_ids->smt_id;
+> > > >>>>>> +}
+> > > >>>>>
+> > > >>>>> But you are not initializing node_id in one caller of
+> > apicid_from_topo_ids():
+> > > >>>>>
+> > > >>>>> static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
+> > > >>>>>                             DeviceState *dev, Error **errp)
+> > > >>>>> {
+> > > >>>>>     [...]
+> > > >>>>>     X86CPUTopoIDs topo_ids;
+> > > >>>>>     [...]
+> > > >>>>>     if (cpu->apic_id == UNASSIGNED_APIC_ID) {
+> > > >>>>>         [...]
+> > > >>>>>         topo_ids.pkg_id = cpu->socket_id;
+> > > >>>>>         topo_ids.die_id = cpu->die_id;
+> > > >>>>>         topo_ids.core_id = cpu->core_id;
+> > > >>>>>         topo_ids.smt_id = cpu->thread_id;
+> > > >>>>>         cpu->apic_id = x86ms->apicid_from_topo_ids(&topo_info,
+> > &topo_ids);
+> > > >>>>>     }
+> > > >>>>>     [...]
+> > > >>>>> }
+> > > >>>>>
+> > > >>>>> Result: -device is broken when using -cpu EPYC:
+> > > >>>>>
+> > > >>>>>   $ qemu-system-x86_64 -machine q35,accel=kvm -smp
+> > > >>>>> 1,maxcpus=2,cores=1,threads=1,sockets=2 -cpu EPYC -device EPYC-
+> > x86_64-
+> > > >>>>> cpu,core-id=0,socket-id=1,thread-id=0
+> > > >>>
+> > > >>> [1]
+> > > >>>
+> > > >>>>>   qemu-system-x86_64: -device EPYC-x86_64-cpu,core-id=0,socket-
+> > > >>> id=1,thread-
+> > > >>>>> id=0: Invalid CPU [socket: 21855, die: 0, core: 0, thread: 0] with APIC ID
+> > > >>> 21855,
+> > > >>>>> valid index range 0:1
+> > > >>>>>
+> > > >>>>> This happens because APIC ID is calculated using uninitialized
+> > > >>>>> memory.
+> > > >>>> This patch should initialize the node_id. But I am not sure how to
+> > > >>>> reproduce the bug. Can you please send me the full command line to
+> > > >>>> reproduce the problem. Also test different options.
+> > > >>>
+> > > >>> The full command line is above[1].
+> > > >>
+> > > >> I just picked up the latest tree from
+> > > >> git clone
+> > https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fgit.qem
+> > u.org%2Fgit%2Fqemu.git&amp;data=02%7C01%7Cbabu.moger%40amd.com%7
+> > C4b409b77ff2c4c4ed90608d807d53570%7C3dd8961fe4884e608e11a82d994e1
+> > 83d%7C0%7C0%7C637267959601716206&amp;sdata=ih6bo9Wp0RbJgRpryzSa2
+> > D0v6kr3Zfww%2B1uB%2FNyngk8%3D&amp;reserved=0 qemu
+> > > >> Not seeing the problem.
+> > > >>
+> > > >> ./x86_64-softmmu/qemu-system-x86_64 -machine q35,accel=kvm -smp
+> > > >> 1,maxcpus=2,cores=1,threads=1,sockets=2 -cpu EPYC -device
+> > > >> EPYC-x86_64-cpu,core-id=0,socket-id=1,thread-id=0
+> > > >> VNC server running on ::1:5900
+> > > >>
+> > > >> It appears to run ok.
+> > >
+> > > [2]
+> > >
+> > > >>
+> > > >>>
+> > > >>>
+> > > >>>>
+> > > >>>> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> > > >>>> index 2128f3d6fe..047b4b9391 100644
+> > > >>>> --- a/hw/i386/pc.c
+> > > >>>> +++ b/hw/i386/pc.c
+> > > >>>> @@ -1539,6 +1539,9 @@ static void pc_cpu_pre_plug(HotplugHandler
+> > > >>> *hotplug_dev,
+> > > >>>>      if (cpu->apic_id == UNASSIGNED_APIC_ID) {
+> > > >>>>          int max_socket = (ms->smp.max_cpus - 1) /
+> > > >>>>                                  smp_threads / smp_cores / x86ms->smp_dies;
+> > > >>>
+> > > >>> So, here's the input you are using to calculate topo_ids.node_id:
+> > > >>>
+> > > >>>> +        unsigned nr_nodes = MAX(topo_info.nodes_per_pkg, 1);
+> > > >>>
+> > > >>> When is topo_info.nodes_per_pkg allowed to be 0?
+> > > >>
+> > > >> It will be zero if numa is not configured. Node_id will be zero for all
+> > > >> the cores.
+> > > >>
+> > > >>>
+> > > >>>> +        unsigned cores_per_node = DIV_ROUND_UP((x86ms->smp_dies *
+> > > >>> smp_cores *
+> > > >>>> +                                                smp_threads), nr_nodes);
+> > > >>>
+> > > >>> x86ms->smp_dies should be available at topo_info.dies_per_pkg,
+> > > >>> smp_cores should available at topo_info.cores_per_die,
+> > > >>> smp_threads should be available at topo_info.threads_per_core,
+> > > >>> nr_nodes should be available at topo_info.nodes_per_pkg.
+> > > >>>
+> > > >>>>
+> > > >>>>          /*
+> > > >>>>           * die-id was optional in QEMU 4.0 and older, so keep it optional
+> > > >>>> @@ -1585,6 +1588,7 @@ static void pc_cpu_pre_plug(HotplugHandler
+> > > >>> *hotplug_dev,
+> > > >>>>          topo_ids.die_id = cpu->die_id;
+> > > >>>>          topo_ids.core_id = cpu->core_id;
+> > > >>>>          topo_ids.smt_id = cpu->thread_id;
+> > > >>>> +        topo_ids.node_id = (cpu->core_id / cores_per_node) % nr_nodes;
+> > > >>>
+> > > >>> apicid_from_topo_ids() have access to topo_info and topo_ids, If
+> > > >>> all the information you need to calculate node_id is already
+> > > >>> available inside topo_info + topo_ids, we could be calculating it
+> > > >>> inside apicid_from_topo_ids().  Why don't we do it?
+> > > >>>
+> > > >>> Also, is topo_ids.core_id really allowed to be larger than
+> > > >>> cores_per_node when calling apicid_from_topo_ids()?
+> > > >>
+> > > >> Yes. It is. If we have two numa nodes and 8 cores. Then cores_per_node is
+> > > >> 4. Nr_nodes =2. Yes. Core_id can be larger than cores_per_node.
+> > > >
+> > > > I assumed core_id identified the core inside a die, and the range
+> > > > would be [0, cores_per_die).  This seems to be what
+> > > > apicid_from_topo_ids_epyc() expects.
+> > > >
+> > > > We need clearer documentation on the semantics of each *_id
+> > > > field, to avoid confusion.
+> > >
+> > > Ok. Sure. I will add that. Can you please clarify on how to repro the
+> > > issue. Marked the question at [2].
+> > 
+> > As it is usage of uninitialized memory, behavior is undefined and
+> > not guaranteed to crash.  My QEMU binary was built with
+> > --enable-debug, maybe it makes it easier to reproduce.
+> 
+> This patch works fine. Tested few combination. Will send the formal
+> version if patch looks good.
+> 
+> diff --git a/include/hw/i386/topology.h b/include/hw/i386/topology.h
+> index 07239f95f4..cb28f0a57c 100644
+> --- a/include/hw/i386/topology.h
+> +++ b/include/hw/i386/topology.h
+> @@ -140,6 +140,17 @@ static inline unsigned
+> apicid_pkg_offset_epyc(X86CPUTopoInfo *topo_info)
+>             apicid_node_width_epyc(topo_info);
+>  }
+> 
+> +static inline unsigned x86_node_id_for_epyc(X86CPUTopoInfo *topo_info,
+> +                                            const X86CPUTopoIDs *topo_ids)
+> +{
+> +    unsigned nr_nodes = MAX(topo_info->nodes_per_pkg, 1);
+> +    unsigned cores_per_node = DIV_ROUND_UP((topo_info->dies_per_pkg *
+> +                                            topo_info->cores_per_die *
+> +                                            topo_info->threads_per_core),
+> +                                            nr_nodes);
+> +
+> +    return ((topo_ids->core_id / cores_per_node) % nr_nodes);
+> +}
 >  /*
->   * PHY control register
->   */
-> @@ -553,7 +563,7 @@ static void ftgmac100_do_tx(FTGMAC100State *s,
-> uint32_t tx_ring,
+>   * Make APIC ID for the CPU based on Pkg_ID, Core_ID, SMT_ID
+>   *
+> @@ -149,8 +160,11 @@ static inline apic_id_t
+>  x86_apicid_from_topo_ids_epyc(X86CPUTopoInfo *topo_info,
+>                                const X86CPUTopoIDs *topo_ids)
+>  {
+> +    /* node_id can be uninitialized. Initialize here */
+> +    unsigned node_id = x86_node_id_for_epyc(topo_info, topo_ids);
+> +
+>      return (topo_ids->pkg_id  << apicid_pkg_offset_epyc(topo_info)) |
+> -           (topo_ids->node_id << apicid_node_offset_epyc(topo_info)) |
+> +           (node_id << apicid_node_offset_epyc(topo_info)) |
+>             (topo_ids->die_id  << apicid_die_offset(topo_info)) |
+>             (topo_ids->core_id << apicid_core_offset(topo_info)) |
+>             topo_ids->smt_id;
+> 
 
-Your email client is wrapping long lines, which corrupts patches.
-(You can see that patchew was unable to apply and CI-test it:
-https://patchew.org/QEMU/CA+MHfovYq1UAQQ341MnyGas7ScskWyjR=3DQE0D-RS7+zxF2m=
-tsw@mail.gmail.com/
-)
+What's the status of this?  It seems to fix a hotplug case our QE hit
+(RH bz 1828750)
 
-I fixed this patch up by hand, but if you're planning on sending
-more patches in future it would be worth sorting out how to send them
-in a way that doesn't wrap them. (Most long-term devs use some form
-of the 'git send-email' client.)
+Dave
 
-thanks
--- PMM
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
 
