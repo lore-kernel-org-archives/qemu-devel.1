@@ -2,80 +2,80 @@ Return-Path: <SRS0=tJVC=74=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06B9DC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 20:47:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 340DBC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 20:48:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BF71E2074D
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 20:47:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F04592074D
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 20:47:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DgspzQjm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF71E2074D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hzK7XG5K"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F04592074D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59436 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33710 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkw0q-0004eW-TM
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 16:47:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33356)
+	id 1jkw1P-0005hj-67
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 16:47:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33270)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jkvuD-0002qP-KC
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 16:40:33 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:48697
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jkvuB-0002lB-1U
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 16:40:31 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30794
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jkvuA-0000Wn-Rn
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 16:40:33 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jkvu9-0000WK-4D
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 16:40:30 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592253630;
+ s=mimecast20190719; t=1592253628;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=lzropVQqWYmgxKdoaE2bXLCONn+cqWPhYVsaTDNn/Ug=;
- b=DgspzQjmFQJodFIhQ7KGO7EdQp/ff5r0vjM0wU+ttGoTzvFQPN0mIpg4nI0fheVzvEN579
- bRU0WFtx8uHEOwbucGrAkuiuM0oJxNYGDBNaa94rvvncY5SXsliUbLLtzT9sTaIRBLnh++
- VmO/4zuwinbIzSzvEeNbS3Q63o+O7Iw=
+ bh=cXxT+Y1BlIeR9aoBSeiIfSphfi5tyAp8cTijqQDYx7g=;
+ b=hzK7XG5K0dsoj1oM9Jd5tc7Fx1jHZJPAqtWNohIhUo0ZHAaP/si2JMPBkuKM/6uPM6zXBc
+ wVvhJecQLH9JzpsVNNHR695VhNNRKTSzvEUhgGrFBdIm7xPQTivJM4vM7lFMx5z1138Jy7
+ M4ms4l/AmmqAHWBNcC2rbVQrPTxonoU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-280-_T1RaI8vNxCYl6qm8mTUuQ-1; Mon, 15 Jun 2020 16:40:28 -0400
-X-MC-Unique: _T1RaI8vNxCYl6qm8mTUuQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-41-ok2Z6i8_OiOxpl3sOAHKQg-1; Mon, 15 Jun 2020 16:40:26 -0400
+X-MC-Unique: ok2Z6i8_OiOxpl3sOAHKQg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 68BF9803304;
- Mon, 15 Jun 2020 20:40:27 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BA95C100CCC2;
+ Mon, 15 Jun 2020 20:40:24 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
  [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3B0A05C1D6;
- Mon, 15 Jun 2020 20:40:27 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5D6086ED96;
+ Mon, 15 Jun 2020 20:40:24 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 40DD411358BD; Mon, 15 Jun 2020 22:40:08 +0200 (CEST)
+ id 6904611358DF; Mon, 15 Jun 2020 22:40:08 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 11/84] macio: Fix to realize "mos6522-cuda" and "mos6522-pmu"
- devices
-Date: Mon, 15 Jun 2020 22:38:55 +0200
-Message-Id: <20200615204008.3069956-12-armbru@redhat.com>
+Subject: [PULL 22/84] riscv: Fix type of SiFive[EU]SocState, member parent_obj
+Date: Mon, 15 Jun 2020 22:39:06 +0200
+Message-Id: <20200615204008.3069956-23-armbru@redhat.com>
 In-Reply-To: <20200615204008.3069956-1-armbru@redhat.com>
 References: <20200615204008.3069956-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 15:33:00
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 16:40:20
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -96,117 +96,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <laurent@vivier.eu>
+Cc: qemu-riscv@nongnu.org, Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-cuda_init() creates a "mos6522-cuda" device, but it's never realized.
-Affects machines mac99 with via=cuda (default) and g3beige.
+Device "riscv.sifive.e.soc" is a direct subtype of TYPE_DEVICE, but
+its instance struct SiFiveESoCState's member @parent_obj is
+SysBusDevice instead of DeviceState.  Correct that.
 
-pmu_init() creates a "mos6522-pmu" device, but it's never realized.
-Affects machine mac99 with via=pmu and via=pmu-adb,
+Same for "riscv.sifive.u.soc"'s instance struct SiFiveUSoCState.
 
-In theory, a device becomes real only on realize.  In practice, the
-transition from unreal to real is a fuzzy one.  The work to make a
-device real can be spread between realize methods (fine),
-instance_init methods (wrong), and board code wiring up the device
-(fine as long as it effectively happens on realize).  Depending on
-what exactly is done where, a device can work even when we neglect
-to realize it.
-
-These two appear to work.  Nevertheless, it's a clear misuse of the
-interface.  Even when it works today (more or less by chance), it can
-break tomorrow.
-
-Fix by realizing them in cuda_realize() and pmu_realize(),
-respectively.
-
-Fixes: 6dca62a0000f95e0b7020aa00d0ca9b2c421f341
-Cc: Laurent Vivier <laurent@vivier.eu>
+Cc: Palmer Dabbelt <palmer@dabbelt.com>
+Cc: Alistair Francis <Alistair.Francis@wdc.com>
+Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
+Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Cc: qemu-riscv@nongnu.org
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20200609122339.937862-10-armbru@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Message-Id: <20200609122339.937862-21-armbru@redhat.com>
 ---
- hw/misc/macio/cuda.c | 15 ++++++++++-----
- hw/misc/macio/pmu.c  | 15 ++++++++++-----
- 2 files changed, 20 insertions(+), 10 deletions(-)
+ include/hw/riscv/sifive_e.h | 2 +-
+ include/hw/riscv/sifive_u.h | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/hw/misc/macio/cuda.c b/hw/misc/macio/cuda.c
-index e0cc0aac5d..3cb10c743c 100644
---- a/hw/misc/macio/cuda.c
-+++ b/hw/misc/macio/cuda.c
-@@ -33,6 +33,7 @@
- #include "hw/misc/macio/cuda.h"
- #include "qemu/timer.h"
- #include "sysemu/runstate.h"
-+#include "qapi/error.h"
- #include "qemu/cutils.h"
- #include "qemu/log.h"
- #include "qemu/module.h"
-@@ -522,16 +523,20 @@ static void cuda_reset(DeviceState *dev)
- static void cuda_realize(DeviceState *dev, Error **errp)
- {
-     CUDAState *s = CUDA(dev);
-+    Error *err = NULL;
-     SysBusDevice *sbd;
--    MOS6522State *ms;
--    DeviceState *d;
-     struct tm tm;
+diff --git a/include/hw/riscv/sifive_e.h b/include/hw/riscv/sifive_e.h
+index 414992119e..d386ea9223 100644
+--- a/include/hw/riscv/sifive_e.h
++++ b/include/hw/riscv/sifive_e.h
+@@ -29,7 +29,7 @@
  
-+    object_property_set_bool(OBJECT(&s->mos6522_cuda), true, "realized",
-+                             &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
-+    }
-+
-     /* Pass IRQ from 6522 */
--    d = DEVICE(&s->mos6522_cuda);
--    ms = MOS6522(d);
-     sbd = SYS_BUS_DEVICE(s);
--    sysbus_pass_irq(sbd, SYS_BUS_DEVICE(ms));
-+    sysbus_pass_irq(sbd, SYS_BUS_DEVICE(&s->mos6522_cuda));
+ typedef struct SiFiveESoCState {
+     /*< private >*/
+-    SysBusDevice parent_obj;
++    DeviceState parent_obj;
  
-     qemu_get_timedate(&tm, 0);
-     s->tick_offset = (uint32_t)mktimegm(&tm) + RTC_OFFSET;
-diff --git a/hw/misc/macio/pmu.c b/hw/misc/macio/pmu.c
-index 9a9cd427e1..0895b78b59 100644
---- a/hw/misc/macio/pmu.c
-+++ b/hw/misc/macio/pmu.c
-@@ -40,6 +40,7 @@
- #include "hw/misc/macio/pmu.h"
- #include "qemu/timer.h"
- #include "sysemu/runstate.h"
-+#include "qapi/error.h"
- #include "qemu/cutils.h"
- #include "qemu/log.h"
- #include "qemu/module.h"
-@@ -739,16 +740,20 @@ static void pmu_reset(DeviceState *dev)
- static void pmu_realize(DeviceState *dev, Error **errp)
- {
-     PMUState *s = VIA_PMU(dev);
-+    Error *err = NULL;
-     SysBusDevice *sbd;
--    MOS6522State *ms;
--    DeviceState *d;
-     struct tm tm;
+     /*< public >*/
+     RISCVHartArrayState cpus;
+diff --git a/include/hw/riscv/sifive_u.h b/include/hw/riscv/sifive_u.h
+index 16c297ec5f..5f62cf5f85 100644
+--- a/include/hw/riscv/sifive_u.h
++++ b/include/hw/riscv/sifive_u.h
+@@ -31,7 +31,7 @@
  
-+    object_property_set_bool(OBJECT(&s->mos6522_pmu), true, "realized",
-+                             &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
-+    }
-+
-     /* Pass IRQ from 6522 */
--    d = DEVICE(&s->mos6522_pmu);
--    ms = MOS6522(d);
-     sbd = SYS_BUS_DEVICE(s);
--    sysbus_pass_irq(sbd, SYS_BUS_DEVICE(ms));
-+    sysbus_pass_irq(sbd, SYS_BUS_DEVICE(&s->mos6522_pmu));
+ typedef struct SiFiveUSoCState {
+     /*< private >*/
+-    SysBusDevice parent_obj;
++    DeviceState parent_obj;
  
-     qemu_get_timedate(&tm, 0);
-     s->tick_offset = (uint32_t)mktimegm(&tm) + RTC_OFFSET;
+     /*< public >*/
+     CPUClusterState e_cluster;
 -- 
 2.26.2
 
