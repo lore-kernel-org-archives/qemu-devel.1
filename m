@@ -2,91 +2,125 @@ Return-Path: <SRS0=tJVC=74=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5575AC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 07:50:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDFA9C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 07:57:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2361B2067B
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 07:50:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A9FEF2067B
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 07:57:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VYiLY/A5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2361B2067B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="ukXfgkOW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9FEF2067B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59316 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35028 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkjt4-0001oy-Eg
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 03:50:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52468)
+	id 1jkjzj-0003zG-Vq
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 03:57:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54034)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jkjrz-00014i-3t; Mon, 15 Jun 2020 03:49:27 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:42085)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jkjrw-0008P3-0t; Mon, 15 Jun 2020 03:49:26 -0400
-Received: by mail-wr1-x443.google.com with SMTP id p5so15972312wrw.9;
- Mon, 15 Jun 2020 00:49:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=d2z0H2KquWx3HT1eYgUtC8NXl28vDPDmrrtiULiYSXk=;
- b=VYiLY/A5nJPg9qqwYZJI3LuIHz1krNcBUN7cn9Dsd0EJl7vGLu3SdZvAeJgwOcGezN
- 5BmQZWs68nv3RT/UHQC+fg86E0Hgn2ywjGUpNzO5nxqKaDoUoB9dEsv7LCwwfV3MT5lt
- knsEQE2VDGwLfFRXVsyciAl9eUFagNXbKMGYRhQzXppQaqrWuXnMAQT9aAyo+e8DjS6q
- Jm89n7/3r9H8VjFzjA66mCmX3QoINCqshbRoxoms5rhx+UIkuUnX6IUeu7Rfj/66n2Gb
- YgLRBQtff5DR/ADvWTaGCmdtHEVtCdcwjfnt8MNi5knOHYBoL9MlapAEbdtIwVgmRy2l
- ElNA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=d2z0H2KquWx3HT1eYgUtC8NXl28vDPDmrrtiULiYSXk=;
- b=VlKYd1tAie5yfVp6To49krBPZLYXdg4YrxuAMYQvuck2pcYmpoOMiqdGzpE9iHrHtY
- MOsjsnoVwSFi+5RZwWcUlZEhKC1dnOPJMDJu3TYeJ6pX7oXcLz5RMU+6Z0ccwFrfZjFs
- JiwMy6OZSSAKgizvuzyiKxXNIm6DK4QFtF878i8sdu07Zl2c7cJbCuO3i/0U7AfCCbff
- BhC2H7M+lA9Hindcri8QMArL1ZQJx0mg59d104M0+yGJZOm21iVb7gS6/MjlYx5cXkse
- gHChIvRX5xk06LCzk3tJjFzUbdQ4b7vQFs9kwRInLSU4shbgSLGgLVS1solgguM+RcNC
- bN6Q==
-X-Gm-Message-State: AOAM533J/NCMQmyvPkkxFGNZ1CXZkGlm6bE51uWcFNhQgllNZsvl3OF1
- J7JUNbPO4TgouvoQlo3uUCbFdhba
-X-Google-Smtp-Source: ABdhPJwDywemJ/V40LqaQdLHWbPUYNYr+v1t3DjUyPyVMLAp0uXakf4rfrWplHty4ayPofzz2XufLw==
-X-Received: by 2002:adf:e588:: with SMTP id l8mr29200771wrm.255.1592207361717; 
- Mon, 15 Jun 2020 00:49:21 -0700 (PDT)
-Received: from localhost.localdomain
- (181.red-88-10-103.dynamicip.rima-tde.net. [88.10.103.181])
- by smtp.gmail.com with ESMTPSA id y14sm20833121wma.25.2020.06.15.00.49.20
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 15 Jun 2020 00:49:21 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3] configure: Let SLOF be initialized by
- ./scripts/git-submodule.sh
-Date: Mon, 15 Jun 2020 09:49:19 +0200
-Message-Id: <20200615074919.12552-1-f4bug@amsat.org>
-X-Mailer: git-send-email 2.21.3
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jkjz7-0003VU-O8; Mon, 15 Jun 2020 03:56:49 -0400
+Received: from mail-eopbgr140135.outbound.protection.outlook.com
+ ([40.107.14.135]:55782 helo=EUR01-VE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jkjz5-0001Ef-1R; Mon, 15 Jun 2020 03:56:49 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Z+t8AVJV2VHOEWUKX5+O4zdIqZIlWoCBxUoTqTVrpWORIjFagsPTMd/OeBjkUWOWJTOysaSVibufBNYWijVQ6pWQcnVSPsfNq51cjScutXq9tClZMdViZFECAct7TkH9jLNcxxXb+yt5p4/4dUYvuz92cwGaaxRjgZpXBupr2xE2EWF6GS0hreZIx29skZex5R0lmPA1O7C0awN3m7gPaX6TcrHjvWKYahxvwF/d8tUWHaIL1Tx+KLOItjjfbWgwOXffZbFpJtcIzrOLAfGHidRE4IR/g1Wt4egSJPaHSVkCzsVthDVaIBJJVFgyt4vjpkKuvNHBJBIZ6JJgMEMvJg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=q+SW4vvjlBLjcffX1Gh1WGx0C1KAJnNnFyNmQ5PrGqY=;
+ b=O7v42F/2U+ISqpjS0nBzEkF/LGKUqCAMM470Q74z4FoW7H3PU7lk1gprDqaoB9QRiHuLzxSf+XlemI5v8HMRu66Obg0Rvi6DWjC2SLp7HJGrXY/BJDEhkZtMxxSVj/+cLt0L/9nXhjxxHCcPZ8kK4HedkP3nNItO8/2hDEmGlQuJyS++JwpHDPxU+PBskD36+sLVxBzC278dubELtgNc53GsvTPG+CoTccDHm7HCKpeEKO1OIjTNT392runAdJXd26qn9h6FnmmmEE91/+aOhpTYCNPYmdmfH2sxt4tXQ7ghqNaf/U/LWcxB9QSGwSViOJljcqtn2iXBY4EPnWw7Yg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=q+SW4vvjlBLjcffX1Gh1WGx0C1KAJnNnFyNmQ5PrGqY=;
+ b=ukXfgkOWRn63lS8BR8XXityL+swKFxaLJ7nFdN0GItYsxqCDuGd/JXdQBCUnqENPfIipnoebuvmc6z7dCJQp32qo/2J0CqGLRdp7eb2f7M9HiHEg/PL5BE5mBKXOnoZxASwHqiuao26yKzHjMPF8m2yc5kH9IE4+wX6nLoEx55c=
+Authentication-Results: virtuozzo.com; dkim=none (message not signed)
+ header.d=none;virtuozzo.com; dmarc=none action=none
+ header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM7PR08MB5333.eurprd08.prod.outlook.com (2603:10a6:20b:104::23)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3088.24; Mon, 15 Jun
+ 2020 07:56:42 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312%3]) with mapi id 15.20.3088.028; Mon, 15 Jun 2020
+ 07:56:42 +0000
+Subject: Re: [PATCH 3/4] block, migration: add bdrv_flush_vmstate helper
+To: "Denis V. Lunev" <den@openvz.org>, qemu-block@nongnu.org,
+ qemu-devel@nongnu.org
+References: <20200611171143.21589-1-den@openvz.org>
+ <20200611171143.21589-4-den@openvz.org>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <b68a7005-9e99-eea3-faa3-d754c33a1b4c@virtuozzo.com>
+Date: Mon, 15 Jun 2020 10:56:40 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.1
+In-Reply-To: <20200611171143.21589-4-den@openvz.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: AM4PR05CA0022.eurprd05.prod.outlook.com (2603:10a6:205::35)
+ To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.182) by
+ AM4PR05CA0022.eurprd05.prod.outlook.com (2603:10a6:205::35) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3088.19 via Frontend Transport; Mon, 15 Jun 2020 07:56:41 +0000
+X-Originating-IP: [185.215.60.182]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: f80e9ebd-63ef-4888-89d5-08d81101a46f
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5333:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM7PR08MB5333F0A9C9112D0C626D6765C19C0@AM7PR08MB5333.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-Forefront-PRVS: 04359FAD81
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Erq7RzESZgGD7GMw2LH+/ON4ttQU9vL8OZg+0ATuQfb14F6buXmWdYC5/pfgikZNBmDQxEd2BDd5i+Ggqwi37nODMFkVJDsp3VsC9EhFII+i00ZYTXK0K7JiRRaCf1eYI9TJ/AIx8YrWl1bryWX623/o4NyXQk1YEtaB2usq7hFk28D0Z6gpYv3O2DUNRLBCAGQ41DG5EUqQtVn1/PRm+tzgMR4uAnvgUf348u+/m5Cws6mww+0S9M27qhA+lgditAR56Uhjs80W/ONUCDmEP0162eadsYsS1ShDzgGw1jo9VYNwf6GL7xp/55BVKfPdRbrRQOiJCU3pq/5iYhtKIHLn+WiRj/Cct5Qc7OtIZZssDR59cqSxROooZgO3Ka3A
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(366004)(39830400003)(136003)(376002)(396003)(346002)(36756003)(478600001)(52116002)(956004)(31686004)(26005)(16526019)(186003)(16576012)(8676002)(107886003)(54906003)(316002)(2616005)(2906002)(8936002)(4326008)(5660300002)(83380400001)(6486002)(66476007)(66556008)(86362001)(31696002)(66946007)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: KeOeFbRtCow0P+yw6Bjx7lVGXT3+5Hv2ZBtfrRxxZ0OoxBD6njklUIGPSjAJWlQchtP3N2bv7MK3qY2tIjaRJQ5eUkSIwDIsQJagveLXH+zKZob0Ol32sY/SaXsIPZkvO2/rpSA1DRKlwEaO+LIWmtGO8B3Hq5OHSlCWeB4g8tGauPjVJFJOzMzV7pbmVrSA9b1q6mVRW8SNVKGkbvoMdtAnt+zQjblRd2HV9xmIGW5N6vuLD6t3h+8pFaguo78g7OZ05y2w+IvtwocXiF8hW5TCQehxRf2MfUWbwf0yO2IJpnn7ThwhxSiViv5BEOSwuDq/bntbCcu4QV2mx/uaUShbdegY41AXhBWeGjPNbydfMGDdvpadAUefncPOMgaf09+KXliOUt21Lgq1Kh0rGp9WePbxCG7E6a+g7RU6iV6EPBG2jLBm0GI6QTWv+yb+oxdFKvCUitvNl+jZn+Xn0StUF1JTZG+l6BvlPgEDXFlbqePtxe7OBt2PUTclEORD
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f80e9ebd-63ef-4888-89d5-08d81101a46f
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jun 2020 07:56:42.5632 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: YdQ3UTTnnywOS2p7T7OsohtOLFNT2eU/AfE/fJnN54lUHKIjo32BysQfR3s04UjrKMT8P4+p5zvqq65QTj7ligxEt0AzB3I2wjuWwnh48T4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5333
+Received-SPF: pass client-ip=40.107.14.135;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR01-VE1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 03:56:43
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -37
+X-Spam_score: -3.8
+X-Spam_bar: ---
+X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,76 +133,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Cornelia Huck <cohuck@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- qemu-s390x@nongnu.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Juan Quintela <quintela@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Denis Plotnikov <dplotnikov@virtuozzo.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The git-submodule.sh script is called by make and initialize the
-submodules listed in the GIT_SUBMODULES variable generated by
-./configure.
+11.06.2020 20:11, Denis V. Lunev wrote:
+> Right now bdrv_fclose() is just calling bdrv_flush().
+> 
+> The problem is that migration code is working inefficently from black
+> layer terms and are frequently called for very small pieces of not
+> properly aligned data. Block layer is capable to work this way, but
+> this is very slow.
+> 
+> This patch is a preparation for the introduction of the intermediate
+> buffer at block driver state. It would be beneficial to separate
+> conventional bdrv_flush() from closing QEMU file from migration code.
+> 
+> The patch also forces bdrv_flush_vmstate() operation inside
+> synchronous blk_save_vmstate() operation. This helper is used from
+> qemu-io only.
+> 
+> Signed-off-by: Denis V. Lunev <den@openvz.org>
+> CC: Kevin Wolf <kwolf@redhat.com>
+> CC: Max Reitz <mreitz@redhat.com>
+> CC: Stefan Hajnoczi <stefanha@redhat.com>
+> CC: Fam Zheng <fam@euphon.net>
+> CC: Juan Quintela <quintela@redhat.com>
+> CC: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> CC: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> CC: Denis Plotnikov <dplotnikov@virtuozzo.com>
+> ---
+>   block/block-backend.c |  6 +++++-
+>   block/io.c            | 39 +++++++++++++++++++++++++++++++++++++++
+>   include/block/block.h |  1 +
+>   migration/savevm.c    |  3 +++
+>   4 files changed, 48 insertions(+), 1 deletion(-)
+> 
+> diff --git a/block/block-backend.c b/block/block-backend.c
+> index 9342a475cb..2107ace699 100644
+> --- a/block/block-backend.c
+> +++ b/block/block-backend.c
+> @@ -2177,7 +2177,7 @@ int blk_truncate(BlockBackend *blk, int64_t offset, bool exact,
+>   int blk_save_vmstate(BlockBackend *blk, const uint8_t *buf,
+>                        int64_t pos, int size)
+>   {
+> -    int ret;
+> +    int ret, ret2;
+>   
+>       if (!blk_is_available(blk)) {
+>           return -ENOMEDIUM;
+> @@ -2187,6 +2187,10 @@ int blk_save_vmstate(BlockBackend *blk, const uint8_t *buf,
+>       if (ret < 0) {
+>           return ret;
+>       }
+> +    ret2 = bdrv_flush_vmstate(blk_bs(blk));
+> +    if (ret2 < 0) {
+> +        return ret;
+> +    }
+>   
+>       if (ret == size && !blk->enable_write_cache) {
+>           ret = bdrv_flush(blk_bs(blk));
+> diff --git a/block/io.c b/block/io.c
+> index 121ce17a49..fbf352f39d 100644
+> --- a/block/io.c
+> +++ b/block/io.c
+> @@ -2725,6 +2725,45 @@ int bdrv_readv_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos)
+>       return bdrv_rw_vmstate(bs, qiov, pos, true);
+>   }
+>   
+> +
+> +typedef struct FlushVMStateCo {
+> +    BlockDriverState *bs;
+> +    int ret;
+> +} FlushVMStateCo;
+> +
+> +static int coroutine_fn bdrv_co_flush_vmstate(BlockDriverState *bs)
+> +{
+> +    return 0;
+> +}
+> +
+> +static void coroutine_fn bdrv_flush_vmstate_co_entry(void *opaque)
+> +{
+> +    FlushVMStateCo *rwco = opaque;
+> +
+> +    rwco->ret = bdrv_co_flush_vmstate(rwco->bs);
+> +    aio_wait_kick();
+> +}
+> +
+> +int bdrv_flush_vmstate(BlockDriverState *bs)
+> +{
+> +    Coroutine *co;
+> +    FlushVMStateCo flush_co = {
+> +        .bs = bs,
+> +        .ret = NOT_DONE,
+> +    };
+> +
+> +    if (qemu_in_coroutine()) {
+> +        /* Fast-path if already in coroutine context */
+> +        bdrv_flush_vmstate_co_entry(&flush_co);
+> +    } else {
+> +        co = qemu_coroutine_create(bdrv_flush_vmstate_co_entry, &flush_co);
+> +        bdrv_coroutine_enter(bs, co);
+> +        BDRV_POLL_WHILE(bs, flush_co.ret == NOT_DONE);
+> +    }
+> +
+> +    return flush_co.ret;
+> +}
 
-SLOF is required for building the s390-ccw firmware on s390x, since
-it is using the libnet code from SLOF for network booting.
+In block/io.c, since 7d2410cea154bf, these coroutine wrappers are using bdrv_run_co() instead.
+I hope, it's an intermediate state, and my series with auto-generated wrappers will be applied, still, now we should use bdrv_run_co()-based approach for consistency.
 
-Add it to the GIT_SUBMODULES when buildint the s390-ccw firmware,
-to fix:
+Otherwise, patch looks OK for me, just add a new interface, doing nothing for now. Still, would be good to add a comment in block.h, that bdrv_flush_vmsate is needed after bdrv_save_vmstate.
 
-  $ ( cd ${SRC_DIR} ; git submodule update --init roms/SLOF )
-  Submodule 'roms/SLOF' (https://git.qemu.org/git/SLOF.git) registered for path 'roms/SLOF'
-  Cloning into '/home/travis/build/user/qemu/roms/SLOF'...
-  fatal: unable to access 'https://git.qemu.org/git/SLOF.git/': Could not resolve host: git.qemu.org
-  fatal: clone of 'https://git.qemu.org/git/SLOF.git' into submodule path '/home/travis/build/user/qemu/roms/SLOF' failed
-  Failed to clone 'roms/SLOF'. Retry scheduled
-  Cloning into '/home/travis/build/user/qemu/roms/SLOF'...
-  fatal: unable to access 'https://git.qemu.org/git/SLOF.git/': Could not resolve host: git.qemu.org
-  fatal: clone of 'https://git.qemu.org/git/SLOF.git' into submodule path '/home/travis/build/user/qemu/roms/SLOF' failed
-  Failed to clone 'roms/SLOF' a second time, aborting
-  The command "( cd ${SRC_DIR} ; git submodule update --init roms/SLOF )" exited with 1.
+> +
+>   /**************************************************************/
+>   /* async I/Os */
+>   
+> diff --git a/include/block/block.h b/include/block/block.h
+> index 25e299605e..024525b87d 100644
+> --- a/include/block/block.h
+> +++ b/include/block/block.h
+> @@ -572,6 +572,7 @@ int bdrv_save_vmstate(BlockDriverState *bs, const uint8_t *buf,
+>   
+>   int bdrv_load_vmstate(BlockDriverState *bs, uint8_t *buf,
+>                         int64_t pos, int size);
+> +int bdrv_flush_vmstate(BlockDriverState *bs);
+>   
+>   void bdrv_img_create(const char *filename, const char *fmt,
+>                        const char *base_filename, const char *base_fmt,
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index 0ff5bb40ed..9698c909d7 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -150,6 +150,9 @@ static ssize_t block_get_buffer(void *opaque, uint8_t *buf, int64_t pos,
+>   
+>   static int bdrv_fclose(void *opaque, Error **errp)
+>   {
+> +    int err = bdrv_flush_vmstate(opaque);
+> +    if (err < 0)
+> +        return err;
+>       return bdrv_flush(opaque);
+>   }
+>   
+> 
 
-Reported-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Suggested-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- configure   | 5 +++++
- .travis.yml | 1 -
- 2 files changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/configure b/configure
-index bb7fd12612..927e4a3d06 100755
---- a/configure
-+++ b/configure
-@@ -6533,6 +6533,11 @@ if test "$cpu" = "s390x" ; then
-   write_c_skeleton
-   if compile_prog "-march=z900" ""; then
-     roms="$roms s390-ccw"
-+    # SLOF is required for building the s390-ccw firmware on s390x,
-+    # since it is using the libnet code from SLOF for network booting.
-+    if test -e "${source_path}/.git" ; then
-+      git_submodules="${git_submodules} roms/SLOF"
-+    fi
-   fi
- fi
- 
-diff --git a/.travis.yml b/.travis.yml
-index ec6367af1f..220855c1f0 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -496,7 +496,6 @@ jobs:
-         - CONFIG="--disable-containers --target-list=${MAIN_SOFTMMU_TARGETS},s390x-linux-user"
-         - UNRELIABLE=true
-       script:
--        - ( cd ${SRC_DIR} ; git submodule update --init roms/SLOF )
-         - BUILD_RC=0 && make -j${JOBS} || BUILD_RC=$?
-         - |
-           if [ "$BUILD_RC" -eq 0 ] ; then
 -- 
-2.21.3
-
+Best regards,
+Vladimir
 
