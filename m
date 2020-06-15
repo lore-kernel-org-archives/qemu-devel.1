@@ -2,63 +2,90 @@ Return-Path: <SRS0=tJVC=74=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98394C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 05:40:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1DA1C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 05:44:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6BDFE20679
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 05:40:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6BDFE20679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
+	by mail.kernel.org (Postfix) with ESMTPS id 9AC3E20679
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 05:44:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KhFeuqCZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9AC3E20679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46366 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49550 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkhqk-0003fB-Nv
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 01:40:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50864)
+	id 1jkhv3-0005Iz-UU
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 01:44:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51746)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dovgaluk@ispras.ru>)
- id 1jkhpt-0003Ct-Np
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 01:39:09 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:45432)
- by eggs.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dovgaluk@ispras.ru>) id 1jkhpr-0003gA-IT
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 01:39:09 -0400
-Received: from [192.168.0.183] (unknown [62.118.151.149])
- by mail.ispras.ru (Postfix) with ESMTPSA id ADA59CD463;
- Mon, 15 Jun 2020 08:39:03 +0300 (MSK)
-Subject: Re: [PATCH] replay: notify the main loop when there are no
- instructions
-To: Paolo Bonzini <pbonzini@redhat.com>,
- Pavel Dovgalyuk <Pavel.Dovgaluk@gmail.com>, qemu-devel@nongnu.org
-References: <159013007895.28110.2020104406699709721.stgit@pasha-ThinkPad-X280>
- <c0867841-ae6c-5190-ab43-80b4c8e0fe43@ispras.ru>
- <d0f6ee58-39fd-e8a0-11a4-b7692183dcbb@redhat.com>
-From: Pavel Dovgalyuk <dovgaluk@ispras.ru>
-Message-ID: <44b8f06f-aa8f-33ac-175a-f3af5f9e87e5@ispras.ru>
-Date: Mon, 15 Jun 2020 08:39:03 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1jkhu7-0004Tv-FW
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 01:43:32 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:24129
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1jkhu5-0004Qh-8b
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 01:43:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592199807;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ElOugUULFNLubhyh0LeMvfcGTLq/H7Y3s9OyXO6dn/k=;
+ b=KhFeuqCZ++y+kBpvdTqgfoclvvo7+sSqpiFrWa/W7hynRh3dFHc6KJU9NwVCpp+6jh/V35
+ lUsUM6SrOtilnZMcPad/3VW0DkQPD++Na2gc5/my+ClhY6JdGMUnfUEkaDwtx0losC0HPK
+ X3jVw9JsFFYV3aPVt7uaC1AAV80n+8Y=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-381-ueZtXveXPI61TSdBbrnX1A-1; Mon, 15 Jun 2020 01:43:25 -0400
+X-MC-Unique: ueZtXveXPI61TSdBbrnX1A-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4C295800053
+ for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 05:43:24 +0000 (UTC)
+Received: from lacos-laptop-7.usersys.redhat.com (ovpn-112-132.ams2.redhat.com
+ [10.36.112.132])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 348FE5C1B2;
+ Mon, 15 Jun 2020 05:43:20 +0000 (UTC)
+Subject: Re: [PATCH v8 1/5] hw/nvram/fw_cfg: Add the FW_CFG_DATA_GENERATOR
+ interface
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+References: <20200609170727.9977-1-philmd@redhat.com>
+ <20200609170727.9977-2-philmd@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <d737209f-bb8e-ada2-f899-8b26ad9f7df2@redhat.com>
+Date: Mon, 15 Jun 2020 07:43:19 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Firefox/52.0 Thunderbird/52.9.1
 MIME-Version: 1.0
-In-Reply-To: <d0f6ee58-39fd-e8a0-11a4-b7692183dcbb@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200609170727.9977-2-philmd@redhat.com>
 Content-Language: en-US
-Received-SPF: pass client-ip=83.149.199.45; envelope-from=dovgaluk@ispras.ru;
- helo=mail.ispras.ru
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 01:39:04
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=lersek@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 01:43:27
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -71,74 +98,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alex.bennee@linaro.org, pavel.dovgaluk@ispras.ru
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 06/09/20 19:07, Philippe Mathieu-Daudé wrote:
+> The FW_CFG_DATA_GENERATOR allows any object to produce
+> blob of data consumable by the fw_cfg device.
+> 
+> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> ---
+> v8: addressed Laszlo's comments
+> - fixed copy/paste typos
+> - corrected fmt arguments order
+> - do not call fw_cfg_add_file() if get_length() returned 0
+> ---
+>  docs/specs/fw_cfg.txt     |  9 ++++++-
+>  include/hw/nvram/fw_cfg.h | 52 +++++++++++++++++++++++++++++++++++++++
+>  hw/nvram/fw_cfg.c         | 36 +++++++++++++++++++++++++++
+>  3 files changed, 96 insertions(+), 1 deletion(-)
 
-On 01.06.2020 17:01, Paolo Bonzini wrote:
-> On 01/06/20 12:35, Pavel Dovgalyuk wrote:
->> ping
->>
->> On 22.05.2020 09:47, Pavel Dovgalyuk wrote:
->>> When QEMU is executed in console mode without any external event sources,
->>> main loop may sleep for a very long time. But in case of replay
->>> there is another event source - event log.
->>> This patch adds main loop notification when the vCPU loop has nothing
->>> to do and main loop should process the inputs from the event log.
->>>
->>> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-> It's a long weekend here today but I should get a QEMU pull request
-> submitted on Wednesday.
+looks good, thanks!
 
-Thanks, but this patch and "replay: synchronize on every virtual timer 
-callback" were not included.
-
-Replay tests are succeeded only with these patches.
-
-
->
-> Paolo
->
->>>    0 files changed
->>>
->>> diff --git a/cpus.c b/cpus.c
->>> index 7ce0d569b3..b4d0d9f21b 100644
->>> --- a/cpus.c
->>> +++ b/cpus.c
->>> @@ -1362,6 +1362,13 @@ static int64_t tcg_get_icount_limit(void)
->>>        }
->>>    }
->>>    +static void notify_aio_contexts(void)
->>> +{
->>> +    /* Wake up other AioContexts.  */
->>> +    qemu_clock_notify(QEMU_CLOCK_VIRTUAL);
->>> +    qemu_clock_run_timers(QEMU_CLOCK_VIRTUAL);
->>> +}
->>> +
->>>    static void handle_icount_deadline(void)
->>>    {
->>>        assert(qemu_in_vcpu_thread());
->>> @@ -1370,9 +1377,7 @@ static void handle_icount_deadline(void)
->>>                                                         
->>> QEMU_TIMER_ATTR_ALL);
->>>              if (deadline == 0) {
->>> -            /* Wake up other AioContexts.  */
->>> -            qemu_clock_notify(QEMU_CLOCK_VIRTUAL);
->>> -            qemu_clock_run_timers(QEMU_CLOCK_VIRTUAL);
->>> +            notify_aio_contexts();
->>>            }
->>>        }
->>>    }
->>> @@ -1395,6 +1400,10 @@ static void prepare_icount_for_run(CPUState *cpu)
->>>            cpu->icount_extra = cpu->icount_budget - insns_left;
->>>              replay_mutex_lock();
->>> +
->>> +        if (cpu->icount_budget == 0 && replay_has_checkpoint()) {
->>> +            notify_aio_contexts();
->>> +        }
->>>        }
->>>    }
->>>   
 
