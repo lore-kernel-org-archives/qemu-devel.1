@@ -2,127 +2,88 @@ Return-Path: <SRS0=tJVC=74=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89D08C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 09:18:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAE10C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 09:20:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5322D2068E
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 09:18:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 94B7720663
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 09:20:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mymailcheap.com header.i=@mymailcheap.com header.b="coO/dolc";
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=flygoat.com header.i=@flygoat.com header.b="FpXSwoEb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5322D2068E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=flygoat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N/gjS9kO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 94B7720663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51318 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54606 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jklG2-0001eb-I5
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 05:18:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33840)
+	id 1jklIV-0003C4-P5
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 05:20:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34324)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jiaxun.yang@flygoat.com>)
- id 1jklEz-0001BQ-8h
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 05:17:17 -0400
-Received: from relay4.mymailcheap.com ([137.74.199.117]:56488)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jiaxun.yang@flygoat.com>)
- id 1jklEv-000224-Vn
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 05:17:16 -0400
-Received: from filter1.mymailcheap.com (filter1.mymailcheap.com
- [149.56.130.247])
- by relay4.mymailcheap.com (Postfix) with ESMTPS id 826823F1D0;
- Mon, 15 Jun 2020 11:17:09 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
- by filter1.mymailcheap.com (Postfix) with ESMTP id B635A2A0C5;
- Mon, 15 Jun 2020 05:17:08 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=mymailcheap.com;
- s=default; t=1592212628;
- bh=CmFpA3stINX5ea2dfN1HO9PO0eI88h1bbYpEX0PaGf4=;
- h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
- b=coO/dolcNytiahoCbGoe7NDQ3ROD2IacVAZHngeg8+fgIn7mVuAY81d22RvRaoySR
- lpdj/xD2scsBabRWerr2psw4TljNvxSNfW430Ra5NNeVIcBVS6GTDLgIcOfBc5+sNP
- CEHNu2JrETBe9vZhwj8cmPEojampj0g0bFUz5fi4=
-X-Virus-Scanned: Debian amavisd-new at filter1.mymailcheap.com
-Received: from filter1.mymailcheap.com ([127.0.0.1])
- by localhost (filter1.mymailcheap.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ga7_b2v7sEkE; Mon, 15 Jun 2020 05:17:07 -0400 (EDT)
-Received: from mail20.mymailcheap.com (mail20.mymailcheap.com [51.83.111.147])
- (using TLSv1.2 with cipher ADH-AES256-GCM-SHA384 (256/256 bits))
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jklHW-0002MO-0v
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 05:19:54 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:58099
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jklHT-0002L4-Jl
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 05:19:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592212789;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ScsHCVeKOSUtlUrh4OOq7nInxzd8bONOcFUmHBesw+s=;
+ b=N/gjS9kOP13iX0a+LnVq88yk2/awNQ45z71J3tePKG9tL0EfaVR5C0c+nyyE0k3N9f86hz
+ 9TI61GxoTRwiO5Jwc3QghQEuy9aJQVp2BbQrc4SAGl+O/oyyuOe55t9/mzDGrjPEV3FJYN
+ YG/EhDl3TUuSHXvCt010CA5IQQDWrYI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-42-Ml_L3VuJN1myW4l_WHZSDQ-1; Mon, 15 Jun 2020 05:19:34 -0400
+X-MC-Unique: Ml_L3VuJN1myW4l_WHZSDQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by filter1.mymailcheap.com (Postfix) with ESMTPS;
- Mon, 15 Jun 2020 05:17:07 -0400 (EDT)
-Received: from [148.251.23.173] (ml.mymailcheap.com [148.251.23.173])
- by mail20.mymailcheap.com (Postfix) with ESMTP id 3489240EB2;
- Mon, 15 Jun 2020 09:17:04 +0000 (UTC)
-Authentication-Results: mail20.mymailcheap.com; dkim=pass (1024-bit key;
- unprotected) header.d=flygoat.com header.i=@flygoat.com header.b="FpXSwoEb"; 
- dkim-atps=neutral
-AI-Spam-Status: Not processed
-Received: from [0.0.0.0] (n219078103103.netvigator.com [219.78.103.103])
- (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
- key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest
- SHA256) (No client certificate requested)
- by mail20.mymailcheap.com (Postfix) with ESMTPSA id AD82840EB2;
- Mon, 15 Jun 2020 09:16:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=flygoat.com;
- s=default; t=1592212615;
- bh=CmFpA3stINX5ea2dfN1HO9PO0eI88h1bbYpEX0PaGf4=;
- h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
- b=FpXSwoEbQPBrVsZYYMTCY4k+8Zxy87oMYYxtYPSh+duot0aP5Kppkgt6vJy90fd0C
- 35qnJy180iKR1AyGaEFcVgdLOELMm8QJykoro5gXmVgYIqhR2r2VTN1376x2rSW1lS
- tjbi30nUZ+01ABzsZiAWmbp/dK32+aae9VUKvpgQ=
-Subject: Re: [PATCH] target/mips: Fix PageMask with variable page size
-To: Peter Maydell <peter.maydell@linaro.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-References: <20200614034729.3004-1-jiaxun.yang@flygoat.com>
- <CAHiYmc5haGPCxR4Nr-WmL_4PG48F+dqeJLzvVRHjcoBZKykr8Q@mail.gmail.com>
- <CAFEAcA_dBdns09k=kxpc=OqpYK3FJH=DZCx2+FgpqnKh_6Oxkg@mail.gmail.com>
-From: Jiaxun Yang <jiaxun.yang@flygoat.com>
-Message-ID: <9a3f44fc-d279-c003-a8f6-0771e86cc3d0@flygoat.com>
-Date: Mon, 15 Jun 2020 17:16:48 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4EC801009442;
+ Mon, 15 Jun 2020 09:19:32 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.110.57])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 51FA660C47;
+ Mon, 15 Jun 2020 09:19:29 +0000 (UTC)
+Date: Mon, 15 Jun 2020 10:19:25 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Subject: Re: [PATCH v3] configure: Let SLOF be initialized by
+ ./scripts/git-submodule.sh
+Message-ID: <20200615091925.GB269638@redhat.com>
+References: <20200615074919.12552-1-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_dBdns09k=kxpc=OqpYK3FJH=DZCx2+FgpqnKh_6Oxkg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 3489240EB2
-X-Spamd-Result: default: False [1.40 / 10.00]; TO_DN_EQ_ADDR_SOME(0.00)[];
- RCVD_VIA_SMTP_AUTH(0.00)[];
- R_DKIM_ALLOW(0.00)[flygoat.com:s=default];
- MID_RHS_MATCH_FROM(0.00)[]; FROM_HAS_DN(0.00)[];
- TO_DN_SOME(0.00)[]; FREEMAIL_ENVRCPT(0.00)[gmail.com];
- TO_MATCH_ENVRCPT_ALL(0.00)[]; TAGGED_RCPT(0.00)[];
- MIME_GOOD(-0.10)[text/plain]; ARC_NA(0.00)[];
- R_SPF_SOFTFAIL(0.00)[~all]; RCPT_COUNT_FIVE(0.00)[5];
- ML_SERVERS(-3.10)[148.251.23.173];
- DKIM_TRACE(0.00)[flygoat.com:+];
- DMARC_POLICY_ALLOW(0.00)[flygoat.com,none];
- DMARC_POLICY_ALLOW_WITH_FAILURES(0.00)[];
- FREEMAIL_TO(0.00)[linaro.org,gmail.com];
- RCVD_NO_TLS_LAST(0.10)[]; FROM_EQ_ENVFROM(0.00)[];
- MIME_TRACE(0.00)[0:+];
- ASN(0.00)[asn:24940, ipnet:148.251.0.0/16, country:DE];
- RCVD_COUNT_TWO(0.00)[2]; SUSPICIOUS_RECIPS(1.50)[];
- HFILTER_HELO_BAREIP(3.00)[148.251.23.173,1]
-X-Rspamd-Server: mail20.mymailcheap.com
-Received-SPF: pass client-ip=137.74.199.117;
- envelope-from=jiaxun.yang@flygoat.com; helo=relay4.mymailcheap.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 05:17:10
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200615074919.12552-1-f4bug@amsat.org>
+User-Agent: Mutt/1.13.4 (2020-02-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=berrange@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 01:12:36
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -135,47 +96,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "aleksandar.rikalo@syrmia.com" <aleksandar.rikalo@syrmia.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "aurelien@aurel32.net" <aurelien@aurel32.net>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
+ qemu-s390x@nongnu.org, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-在 2020/6/15 17:13, Peter Maydell 写道:
-> On Sun, 14 Jun 2020 at 22:52, Aleksandar Markovic
-> <aleksandar.qemu.devel@gmail.com> wrote:
->> When you change machine.c the way you did it, you need to bump the version. Please see git log on machine.c for details.
+On Mon, Jun 15, 2020 at 09:49:19AM +0200, Philippe Mathieu-Daudé wrote:
+> The git-submodule.sh script is called by make and initialize the
+> submodules listed in the GIT_SUBMODULES variable generated by
+> ./configure.
 > 
->>> --- a/target/mips/cpu.h
->>> +++ b/target/mips/cpu.h
->>> @@ -617,7 +617,8 @@ struct CPUMIPSState {
->>>   /*
->>>    * CP0 Register 5
->>>    */
->>> -    int32_t CP0_PageMask;
->>> +    target_ulong CP0_PageMask;
->>> +#define CP0PM_MASK 13
+> SLOF is required for building the s390-ccw firmware on s390x, since
+> it is using the libnet code from SLOF for network booting.
 > 
-> Does CP0_PageMask ever actually hold a value that won't fit
-> in an int32_t? If not, it might be preferable to avoid changing
-> its type to avoid the migration compat break, even if MIPS
-> doesn't have any versioned boards where we have a strict
-> don't-break-compat promise to users.
+> Add it to the GIT_SUBMODULES when buildint the s390-ccw firmware,
+> to fix:
+> 
+>   $ ( cd ${SRC_DIR} ; git submodule update --init roms/SLOF )
+>   Submodule 'roms/SLOF' (https://git.qemu.org/git/SLOF.git) registered for path 'roms/SLOF'
+>   Cloning into '/home/travis/build/user/qemu/roms/SLOF'...
+>   fatal: unable to access 'https://git.qemu.org/git/SLOF.git/': Could not resolve host: git.qemu.org
+>   fatal: clone of 'https://git.qemu.org/git/SLOF.git' into submodule path '/home/travis/build/user/qemu/roms/SLOF' failed
+>   Failed to clone 'roms/SLOF'. Retry scheduled
+>   Cloning into '/home/travis/build/user/qemu/roms/SLOF'...
+>   fatal: unable to access 'https://git.qemu.org/git/SLOF.git/': Could not resolve host: git.qemu.org
+>   fatal: clone of 'https://git.qemu.org/git/SLOF.git' into submodule path '/home/travis/build/user/qemu/roms/SLOF' failed
+>   Failed to clone 'roms/SLOF' a second time, aborting
+>   The command "( cd ${SRC_DIR} ; git submodule update --init roms/SLOF )" exited with 1.
 
-In Release2, PageMask was extended to 64bit on MIPS64 processors.
-
-Is it necessary to follow that?
-
-Thanks.
+The "git-submodule.sh" script just invokes "git submodule". So if
+you are getting DNS failures from "git submodule", using git-submodule.sh
+instead is not going to fix the problem.
 
 > 
-> thanks
-> -- PMM
+> Reported-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> Suggested-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+>  configure   | 5 +++++
+>  .travis.yml | 1 -
+>  2 files changed, 5 insertions(+), 1 deletion(-)
 > 
+> diff --git a/configure b/configure
+> index bb7fd12612..927e4a3d06 100755
+> --- a/configure
+> +++ b/configure
+> @@ -6533,6 +6533,11 @@ if test "$cpu" = "s390x" ; then
+>    write_c_skeleton
+>    if compile_prog "-march=z900" ""; then
+>      roms="$roms s390-ccw"
+> +    # SLOF is required for building the s390-ccw firmware on s390x,
+> +    # since it is using the libnet code from SLOF for network booting.
+> +    if test -e "${source_path}/.git" ; then
+> +      git_submodules="${git_submodules} roms/SLOF"
+> +    fi
+>    fi
+>  fi
 
+This whole bit of configure looks a bit dubious.
+
+For all the other firmware images we ship as pre-built blobs, we never
+try to re-build them even if the host compiler supports it. So I don't
+think we need to make SLOF special. If someone wants to build SLOF
+they should do so explicitly. IOW, I'd just remove this code that
+automatically enables rebuilds of it, which will presumable fix the
+DNS problem by virtue of never running that code.
+
+
+Regards,
+Daniel
 -- 
-- Jiaxun
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+
 
