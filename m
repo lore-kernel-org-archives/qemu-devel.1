@@ -6,81 +6,81 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1725FC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 20:56:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90502C433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 20:56:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CBCEF2071A
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 20:56:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4AD9720768
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 20:56:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hHyG5oCk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CBCEF2071A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GjDEsBnS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4AD9720768
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37206 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38098 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkw9V-0002UC-UW
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 16:56:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33734)
+	id 1jkw9f-0002s8-DG
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 16:56:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33664)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jkvuU-0003K2-Ck
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 16:40:50 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:40673
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jkvuR-0003Dw-76
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 16:40:47 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:36170
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jkvuP-0000bB-6Y
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 16:40:49 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jkvuK-0000Za-2M
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 16:40:46 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592253644;
+ s=mimecast20190719; t=1592253639;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=3Bnkp7AdoFSFRITeS3mze8v2TxIwBQ3KEpMKWVqht5w=;
- b=hHyG5oCk7RE0zLIpCrX+6buXpn1PwRzZNt61WnGdkNQmObaOZYE2PbCQgQhDpkwernv7um
- 6ChJdgWvMRRs9cUhyjOXmrYWD4zRKTNaZnlHof7Kl46p4sBXqTnpx9f5MxOQkqH4NfW0hN
- C7EEwAbNJtr3A6DbuknchIYk2TNeBIE=
+ bh=wxoB6zjGP3IpdR4aA2Iu30y9UUtCe6nX/xPF41E2KRQ=;
+ b=GjDEsBnSXOA4iGQfBBGG+C4kVTHNizGD7sZMH95zd4KukXiZQFqzix2k01MIQbL0BKu2sN
+ 8Kv8N/RZkWJ3CddaRuA9LwNm7ppIr1phGDlwLvs4Kr+EpoTusmHQF4T1fNCve4N0AhupeL
+ N9rg9ZcL3w3Rjvv5Kr1b38iqbMM1tYg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-294-UDxMOdV2NsSVWzBOkm7zwA-1; Mon, 15 Jun 2020 16:40:42 -0400
-X-MC-Unique: UDxMOdV2NsSVWzBOkm7zwA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-223-kbSpv9n8NpikGekStSCs4w-1; Mon, 15 Jun 2020 16:40:35 -0400
+X-MC-Unique: kbSpv9n8NpikGekStSCs4w-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7CC4A100CCCD;
- Mon, 15 Jun 2020 20:40:41 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 90ADC5AEC8;
+ Mon, 15 Jun 2020 20:40:34 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
  [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 237789034B;
- Mon, 15 Jun 2020 20:40:41 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E7B8F7CAA0;
+ Mon, 15 Jun 2020 20:40:32 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id B49B31132FDA; Mon, 15 Jun 2020 22:40:08 +0200 (CEST)
+ id B10A81133023; Mon, 15 Jun 2020 22:40:08 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 42/84] pci: Convert uses of pci_create() etc. manually
-Date: Mon, 15 Jun 2020 22:39:26 +0200
-Message-Id: <20200615204008.3069956-43-armbru@redhat.com>
+Subject: [PULL 41/84] pci: Convert uses of pci_create() etc. with Coccinelle
+Date: Mon, 15 Jun 2020 22:39:25 +0200
+Message-Id: <20200615204008.3069956-42-armbru@redhat.com>
 In-Reply-To: <20200615204008.3069956-1-armbru@redhat.com>
 References: <20200615204008.3069956-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 15:33:00
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 15:33:04
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -99,56 +99,432 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Same transformation as in the previous commit.  Manual, because
-convincing Coccinelle to transform these cases is not worthwhile.
+Replace
+
+    dev = pci_create(bus, type_name);
+    ...
+    qdev_init_nofail(dev);
+
+by
+
+    dev = pci_new(type_name);
+    ...
+    pci_realize_and_unref(dev, bus, &error_fatal);
+
+and similarly for pci_create_multifunction().
+
+Recent commit "qdev: New qdev_new(), qdev_realize(), etc." explains
+why.
+
+Coccinelle script:
+
+    @@
+    expression dev, bus, expr;
+    expression list args;
+    @@
+    -    dev = pci_create(bus, args);
+    +    dev = pci_new(args);
+         ... when != dev = expr
+    -    qdev_init_nofail(&dev->qdev);
+    +    pci_realize_and_unref(dev, bus, &error_fatal);
+
+    @@
+    expression dev, bus, expr;
+    expression list args;
+    expression d;
+    @@
+    -    dev = pci_create(bus, args);
+    +    dev = pci_new(args);
+    (
+         d = &dev->qdev;
+    |
+         d = DEVICE(dev);
+    )
+         ... when != dev = expr
+    -    qdev_init_nofail(d);
+    +    pci_realize_and_unref(dev, bus, &error_fatal);
+
+    @@
+    expression dev, bus, expr;
+    expression list args;
+    @@
+    -    dev = pci_create(bus, args);
+    +    dev = pci_new(args);
+         ... when != dev = expr
+    -    qdev_init_nofail(DEVICE(dev));
+    +    pci_realize_and_unref(dev, bus, &error_fatal);
+
+    @@
+    expression dev, bus, expr;
+    expression list args;
+    @@
+    -    dev = DEVICE(pci_create(bus, args));
+    +    PCIDevice *pci_dev; // TODO move
+    +    pci_dev = pci_new(args);
+    +    dev = DEVICE(pci_dev);
+         ... when != dev = expr
+    -    qdev_init_nofail(dev);
+    +    pci_realize_and_unref(pci_dev, bus, &error_fatal);
+
+    @@
+    expression dev, bus, expr;
+    expression list args;
+    @@
+    -    dev = pci_create_multifunction(bus, args);
+    +    dev = pci_new_multifunction(args);
+         ... when != dev = expr
+    -    qdev_init_nofail(&dev->qdev);
+    +    pci_realize_and_unref(dev, bus, &error_fatal);
+
+    @@
+    expression bus, expr;
+    expression list args;
+    identifier dev;
+    @@
+    -    PCIDevice *dev = pci_create_multifunction(bus, args);
+    +    PCIDevice *dev = pci_new_multifunction(args);
+         ... when != dev = expr
+    -    qdev_init_nofail(&dev->qdev);
+    +    pci_realize_and_unref(dev, bus, &error_fatal);
+
+    @@
+    expression dev, bus, expr;
+    expression list args;
+    @@
+    -    dev = pci_create_multifunction(bus, args);
+    +    dev = pci_new_multifunction(args);
+         ... when != dev = expr
+    -    qdev_init_nofail(DEVICE(dev));
+    +    pci_realize_and_unref(dev, bus, &error_fatal);
+
+Missing #include "qapi/error.h" added manually, whitespace changes
+minimized manually, @pci_dev declarations moved manually.
 
 Cc: Michael S. Tsirkin <mst@redhat.com>
 Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <20200610053247.1583243-17-armbru@redhat.com>
+Message-Id: <20200610053247.1583243-16-armbru@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/sparc64/sun4u.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+ hw/acpi/piix4.c       |  6 ++++--
+ hw/i386/pc_q35.c      | 10 +++++-----
+ hw/isa/vt82c686.c     | 13 +++++++------
+ hw/mips/fuloong2e.c   |  6 ++++--
+ hw/pci-bridge/dec.c   |  6 +++---
+ hw/pci-host/bonito.c  |  4 ++--
+ hw/pci-host/sabre.c   | 13 +++++++------
+ hw/pci/pci.c          |  8 ++++----
+ hw/ppc/mac_newworld.c |  4 ++--
+ hw/ppc/mac_oldworld.c |  4 ++--
+ hw/sparc64/sun4u.c    |  8 ++++----
+ 11 files changed, 44 insertions(+), 38 deletions(-)
 
-diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
-index 6f29a013ca..0b898d6e3d 100644
---- a/hw/sparc64/sun4u.c
-+++ b/hw/sparc64/sun4u.c
-@@ -635,24 +635,28 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
-     memset(&macaddr, 0, sizeof(MACAddr));
-     onboard_nic = false;
-     for (i = 0; i < nb_nics; i++) {
-+        PCIBus *bus;
-         nd = &nd_table[i];
+diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
+index e27f57195a..1262abc77a 100644
+--- a/hw/acpi/piix4.c
++++ b/hw/acpi/piix4.c
+@@ -514,10 +514,12 @@ I2CBus *piix4_pm_init(PCIBus *bus, int devfn, uint32_t smb_io_base,
+                       qemu_irq sci_irq, qemu_irq smi_irq,
+                       int smm_enabled, DeviceState **piix4_pm)
+ {
++    PCIDevice *pci_dev;
+     DeviceState *dev;
+     PIIX4PMState *s;
  
-         if (!nd->model || strcmp(nd->model, "sunhme") == 0) {
-             if (!onboard_nic) {
--                pci_dev = pci_create_multifunction(pci_busA, PCI_DEVFN(1, 1),
-+                pci_dev = pci_new_multifunction(PCI_DEVFN(1, 1),
-                                                    true, "sunhme");
-+                bus = pci_busA;
-                 memcpy(&macaddr, &nd->macaddr.a, sizeof(MACAddr));
-                 onboard_nic = true;
-             } else {
--                pci_dev = pci_create(pci_busB, -1, "sunhme");
-+                pci_dev = pci_new(-1, "sunhme");
-+                bus = pci_busB;
-             }
-         } else {
--            pci_dev = pci_create(pci_busB, -1, nd->model);
-+            pci_dev = pci_new(-1, nd->model);
-+            bus = pci_busB;
-         }
- 
-         dev = &pci_dev->qdev;
-         qdev_set_nic_properties(dev, nd);
--        qdev_init_nofail(dev);
-+        pci_realize_and_unref(pci_dev, bus, &error_fatal);
+-    dev = DEVICE(pci_create(bus, devfn, TYPE_PIIX4_PM));
++    pci_dev = pci_new(devfn, TYPE_PIIX4_PM);
++    dev = DEVICE(pci_dev);
+     qdev_prop_set_uint32(dev, "smb_io_base", smb_io_base);
+     if (piix4_pm) {
+         *piix4_pm = dev;
+@@ -531,7 +533,7 @@ I2CBus *piix4_pm_init(PCIBus *bus, int devfn, uint32_t smb_io_base,
+         s->use_acpi_pci_hotplug = false;
      }
  
-     /* If we don't have an onboard NIC, grab a default MAC address so that
+-    qdev_init_nofail(dev);
++    pci_realize_and_unref(pci_dev, bus, &error_fatal);
+ 
+     return s->smb.smbus;
+ }
+diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+index 59307d91e2..a6b6add2ef 100644
+--- a/hw/i386/pc_q35.c
++++ b/hw/i386/pc_q35.c
+@@ -100,16 +100,16 @@ static int ehci_create_ich9_with_companions(PCIBus *bus, int slot)
+         return -1;
+     }
+ 
+-    ehci = pci_create_multifunction(bus, PCI_DEVFN(slot, 7), true, name);
+-    qdev_init_nofail(&ehci->qdev);
++    ehci = pci_new_multifunction(PCI_DEVFN(slot, 7), true, name);
++    pci_realize_and_unref(ehci, bus, &error_fatal);
+     usbbus = QLIST_FIRST(&ehci->qdev.child_bus);
+ 
+     for (i = 0; i < 3; i++) {
+-        uhci = pci_create_multifunction(bus, PCI_DEVFN(slot, comp[i].func),
+-                                        true, comp[i].name);
++        uhci = pci_new_multifunction(PCI_DEVFN(slot, comp[i].func), true,
++                                     comp[i].name);
+         qdev_prop_set_string(&uhci->qdev, "masterbus", usbbus->name);
+         qdev_prop_set_uint32(&uhci->qdev, "firstport", comp[i].port);
+-        qdev_init_nofail(&uhci->qdev);
++        pci_realize_and_unref(uhci, bus, &error_fatal);
+     }
+     return 0;
+ }
+diff --git a/hw/isa/vt82c686.c b/hw/isa/vt82c686.c
+index fac4e56b7d..18160ca445 100644
+--- a/hw/isa/vt82c686.c
++++ b/hw/isa/vt82c686.c
+@@ -23,6 +23,7 @@
+ #include "hw/isa/apm.h"
+ #include "hw/acpi/acpi.h"
+ #include "hw/i2c/pm_smbus.h"
++#include "qapi/error.h"
+ #include "qemu/module.h"
+ #include "qemu/timer.h"
+ #include "exec/address-spaces.h"
+@@ -276,8 +277,8 @@ void vt82c686b_ac97_init(PCIBus *bus, int devfn)
+ {
+     PCIDevice *dev;
+ 
+-    dev = pci_create(bus, devfn, TYPE_VT82C686B_AC97_DEVICE);
+-    qdev_init_nofail(&dev->qdev);
++    dev = pci_new(devfn, TYPE_VT82C686B_AC97_DEVICE);
++    pci_realize_and_unref(dev, bus, &error_fatal);
+ }
+ 
+ static void via_ac97_class_init(ObjectClass *klass, void *data)
+@@ -320,8 +321,8 @@ void vt82c686b_mc97_init(PCIBus *bus, int devfn)
+ {
+     PCIDevice *dev;
+ 
+-    dev = pci_create(bus, devfn, TYPE_VT82C686B_MC97_DEVICE);
+-    qdev_init_nofail(&dev->qdev);
++    dev = pci_new(devfn, TYPE_VT82C686B_MC97_DEVICE);
++    pci_realize_and_unref(dev, bus, &error_fatal);
+ }
+ 
+ static void via_mc97_class_init(ObjectClass *klass, void *data)
+@@ -388,12 +389,12 @@ I2CBus *vt82c686b_pm_init(PCIBus *bus, int devfn, uint32_t smb_io_base,
+     PCIDevice *dev;
+     VT686PMState *s;
+ 
+-    dev = pci_create(bus, devfn, TYPE_VT82C686B_PM_DEVICE);
++    dev = pci_new(devfn, TYPE_VT82C686B_PM_DEVICE);
+     qdev_prop_set_uint32(&dev->qdev, "smb_io_base", smb_io_base);
+ 
+     s = VT82C686B_PM_DEVICE(dev);
+ 
+-    qdev_init_nofail(&dev->qdev);
++    pci_realize_and_unref(dev, bus, &error_fatal);
+ 
+     return s->smb.smbus;
+ }
+diff --git a/hw/mips/fuloong2e.c b/hw/mips/fuloong2e.c
+index 7a65166cf0..8ca31e5162 100644
+--- a/hw/mips/fuloong2e.c
++++ b/hw/mips/fuloong2e.c
+@@ -297,6 +297,7 @@ static void mips_fuloong2e_init(MachineState *machine)
+     long bios_size;
+     uint8_t *spd_data;
+     int64_t kernel_entry;
++    PCIDevice *pci_dev;
+     PCIBus *pci_bus;
+     ISABus *isa_bus;
+     I2CBus *smbus;
+@@ -367,10 +368,11 @@ static void mips_fuloong2e_init(MachineState *machine)
+ 
+     /* GPU */
+     if (vga_interface_type != VGA_NONE) {
+-        dev = DEVICE(pci_create(pci_bus, -1, "ati-vga"));
++        pci_dev = pci_new(-1, "ati-vga");
++        dev = DEVICE(pci_dev);
+         qdev_prop_set_uint32(dev, "vgamem_mb", 16);
+         qdev_prop_set_uint16(dev, "x-device-id", 0x5159);
+-        qdev_init_nofail(dev);
++        pci_realize_and_unref(pci_dev, pci_bus, &error_fatal);
+     }
+ 
+     /* Populate SPD eeprom data */
+diff --git a/hw/pci-bridge/dec.c b/hw/pci-bridge/dec.c
+index 952bc71122..677a310b96 100644
+--- a/hw/pci-bridge/dec.c
++++ b/hw/pci-bridge/dec.c
+@@ -26,6 +26,7 @@
+ #include "qemu/osdep.h"
+ #include "dec.h"
+ #include "hw/sysbus.h"
++#include "qapi/error.h"
+ #include "qemu/module.h"
+ #include "hw/pci/pci.h"
+ #include "hw/pci/pci_host.h"
+@@ -81,11 +82,10 @@ PCIBus *pci_dec_21154_init(PCIBus *parent_bus, int devfn)
+     PCIDevice *dev;
+     PCIBridge *br;
+ 
+-    dev = pci_create_multifunction(parent_bus, devfn, false,
+-                                   "dec-21154-p2p-bridge");
++    dev = pci_new_multifunction(devfn, false, "dec-21154-p2p-bridge");
+     br = PCI_BRIDGE(dev);
+     pci_bridge_map_irq(br, "DEC 21154 PCI-PCI bridge", dec_map_irq);
+-    qdev_init_nofail(&dev->qdev);
++    pci_realize_and_unref(dev, parent_bus, &error_fatal);
+     return pci_bridge_get_sec_bus(br);
+ }
+ 
+diff --git a/hw/pci-host/bonito.c b/hw/pci-host/bonito.c
+index 546ac84cf4..7bb032f005 100644
+--- a/hw/pci-host/bonito.c
++++ b/hw/pci-host/bonito.c
+@@ -750,11 +750,11 @@ PCIBus *bonito_init(qemu_irq *pic)
+     pcihost->pic = pic;
+     qdev_realize_and_unref(dev, NULL, &error_fatal);
+ 
+-    d = pci_create(phb->bus, PCI_DEVFN(0, 0), TYPE_PCI_BONITO);
++    d = pci_new(PCI_DEVFN(0, 0), TYPE_PCI_BONITO);
+     s = PCI_BONITO(d);
+     s->pcihost = pcihost;
+     pcihost->pci_dev = s;
+-    qdev_init_nofail(DEVICE(d));
++    pci_realize_and_unref(d, phb->bus, &error_fatal);
+ 
+     return phb->bus;
+ }
+diff --git a/hw/pci-host/sabre.c b/hw/pci-host/sabre.c
+index 475bcb01d7..0cc68585f8 100644
+--- a/hw/pci-host/sabre.c
++++ b/hw/pci-host/sabre.c
+@@ -35,6 +35,7 @@
+ #include "hw/pci-bridge/simba.h"
+ #include "hw/pci-host/sabre.h"
+ #include "exec/address-spaces.h"
++#include "qapi/error.h"
+ #include "qemu/log.h"
+ #include "qemu/module.h"
+ #include "sysemu/runstate.h"
+@@ -405,17 +406,17 @@ static void sabre_realize(DeviceState *dev, Error **errp)
+     pci_setup_iommu(phb->bus, sabre_pci_dma_iommu, s->iommu);
+ 
+     /* APB secondary busses */
+-    pci_dev = pci_create_multifunction(phb->bus, PCI_DEVFN(1, 0), true,
+-                                       TYPE_SIMBA_PCI_BRIDGE);
++    pci_dev = pci_new_multifunction(PCI_DEVFN(1, 0), true,
++                                    TYPE_SIMBA_PCI_BRIDGE);
+     s->bridgeB = PCI_BRIDGE(pci_dev);
+     pci_bridge_map_irq(s->bridgeB, "pciB", pci_simbaB_map_irq);
+-    qdev_init_nofail(&pci_dev->qdev);
++    pci_realize_and_unref(pci_dev, phb->bus, &error_fatal);
+ 
+-    pci_dev = pci_create_multifunction(phb->bus, PCI_DEVFN(1, 1), true,
+-                                       TYPE_SIMBA_PCI_BRIDGE);
++    pci_dev = pci_new_multifunction(PCI_DEVFN(1, 1), true,
++                                    TYPE_SIMBA_PCI_BRIDGE);
+     s->bridgeA = PCI_BRIDGE(pci_dev);
+     pci_bridge_map_irq(s->bridgeA, "pciA", pci_simbaA_map_irq);
+-    qdev_init_nofail(&pci_dev->qdev);
++    pci_realize_and_unref(pci_dev, phb->bus, &error_fatal);
+ }
+ 
+ static void sabre_init(Object *obj)
+diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+index 7e759646cf..24f726d4cd 100644
+--- a/hw/pci/pci.c
++++ b/hw/pci/pci.c
+@@ -1953,10 +1953,10 @@ PCIDevice *pci_nic_init_nofail(NICInfo *nd, PCIBus *rootbus,
+         exit(1);
+     }
+ 
+-    pci_dev = pci_create(bus, devfn, nd->model);
++    pci_dev = pci_new(devfn, nd->model);
+     dev = &pci_dev->qdev;
+     qdev_set_nic_properties(dev, nd);
+-    qdev_init_nofail(dev);
++    pci_realize_and_unref(pci_dev, bus, &error_fatal);
+     g_ptr_array_free(pci_nic_models, true);
+     return pci_dev;
+ }
+@@ -2199,8 +2199,8 @@ PCIDevice *pci_create_simple_multifunction(PCIBus *bus, int devfn,
+                                            bool multifunction,
+                                            const char *name)
+ {
+-    PCIDevice *dev = pci_create_multifunction(bus, devfn, multifunction, name);
+-    qdev_init_nofail(&dev->qdev);
++    PCIDevice *dev = pci_new_multifunction(devfn, multifunction, name);
++    pci_realize_and_unref(dev, bus, &error_fatal);
+     return dev;
+ }
+ 
+diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
+index 2d069dcc59..baa17cdce7 100644
+--- a/hw/ppc/mac_newworld.c
++++ b/hw/ppc/mac_newworld.c
+@@ -375,14 +375,14 @@ static void ppc_core99_init(MachineState *machine)
+     pci_bus = PCI_HOST_BRIDGE(uninorth_pci)->bus;
+ 
+     /* MacIO */
+-    macio = pci_create(pci_bus, -1, TYPE_NEWWORLD_MACIO);
++    macio = pci_new(-1, TYPE_NEWWORLD_MACIO);
+     dev = DEVICE(macio);
+     qdev_prop_set_uint64(dev, "frequency", tbfreq);
+     qdev_prop_set_bit(dev, "has-pmu", has_pmu);
+     qdev_prop_set_bit(dev, "has-adb", has_adb);
+     object_property_set_link(OBJECT(macio), OBJECT(pic_dev), "pic",
+                              &error_abort);
+-    qdev_init_nofail(dev);
++    pci_realize_and_unref(macio, pci_bus, &error_fatal);
+ 
+     /* We only emulate 2 out of 3 IDE controllers for now */
+     ide_drive_get(hd, ARRAY_SIZE(hd));
+diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
+index f73ec5f3a9..903483079e 100644
+--- a/hw/ppc/mac_oldworld.c
++++ b/hw/ppc/mac_oldworld.c
+@@ -278,12 +278,12 @@ static void ppc_heathrow_init(MachineState *machine)
+     ide_drive_get(hd, ARRAY_SIZE(hd));
+ 
+     /* MacIO */
+-    macio = pci_create(pci_bus, -1, TYPE_OLDWORLD_MACIO);
++    macio = pci_new(-1, TYPE_OLDWORLD_MACIO);
+     dev = DEVICE(macio);
+     qdev_prop_set_uint64(dev, "frequency", tbfreq);
+     object_property_set_link(OBJECT(macio), OBJECT(pic_dev), "pic",
+                              &error_abort);
+-    qdev_init_nofail(dev);
++    pci_realize_and_unref(macio, pci_bus, &error_fatal);
+ 
+     macio_ide = MACIO_IDE(object_resolve_path_component(OBJECT(macio),
+                                                         "ide[0]"));
+diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
+index ade9c22825..6f29a013ca 100644
+--- a/hw/sparc64/sun4u.c
++++ b/hw/sparc64/sun4u.c
+@@ -605,10 +605,10 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
+     pci_busA->slot_reserved_mask = 0xfffffff1;
+     pci_busB->slot_reserved_mask = 0xfffffff0;
+ 
+-    ebus = pci_create_multifunction(pci_busA, PCI_DEVFN(1, 0), true, TYPE_EBUS);
++    ebus = pci_new_multifunction(PCI_DEVFN(1, 0), true, TYPE_EBUS);
+     qdev_prop_set_uint64(DEVICE(ebus), "console-serial-base",
+                          hwdef->console_serial_base);
+-    qdev_init_nofail(DEVICE(ebus));
++    pci_realize_and_unref(ebus, pci_busA, &error_fatal);
+ 
+     /* Wire up "well-known" ISA IRQs to PBM legacy obio IRQs */
+     qdev_connect_gpio_out_named(DEVICE(ebus), "isa-irq", 7,
+@@ -661,9 +661,9 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
+         qemu_macaddr_default_if_unset(&macaddr);
+     }
+ 
+-    pci_dev = pci_create(pci_busA, PCI_DEVFN(3, 0), "cmd646-ide");
++    pci_dev = pci_new(PCI_DEVFN(3, 0), "cmd646-ide");
+     qdev_prop_set_uint32(&pci_dev->qdev, "secondary", 1);
+-    qdev_init_nofail(&pci_dev->qdev);
++    pci_realize_and_unref(pci_dev, pci_busA, &error_fatal);
+     pci_ide_create_devs(pci_dev);
+ 
+     /* Map NVRAM into I/O (ebus) space */
 -- 
 2.26.2
 
