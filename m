@@ -2,95 +2,134 @@ Return-Path: <SRS0=tJVC=74=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D63B0C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 06:46:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9C79C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 06:55:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 860A32067B
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 06:46:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rvKfs/Sj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 860A32067B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id AF2F52067B
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 06:55:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF2F52067B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=maciej.szmigiero.name
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36254 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39970 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkitD-0001iU-RJ
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 02:46:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38306)
+	id 1jkj1z-00044M-VE
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 02:55:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40948)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jkis3-0001Cn-30
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 02:45:27 -0400
-Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:35122)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jkirz-00063I-1F
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 02:45:26 -0400
-Received: by mail-wr1-x434.google.com with SMTP id x14so15819500wrp.2
- for <qemu-devel@nongnu.org>; Sun, 14 Jun 2020 23:45:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=GCqrTOF84uMRndQtyq8euR4VetiGRQL2TzsP636SxqM=;
- b=rvKfs/SjkYPLDsm4DeCbx/CXJbhIWmXxB9JHLUHaHFwUtVe7DkoPzqKfzagY/wMeYo
- jBCM0YZhi8PsGJglHQ0AN+g6wGnUmLudMUbsPSCI6NGrE5oDKdutvQt/9Pg+yD5cYXKy
- Oq8zDDmJTZDLs0ziJVp2ZzEkkEv9e+6m48NbYgRqJ82zjesvHDvZiEJzcQsF+gCQlHr5
- PmtskL4bw5Mu4WBPlUbckusRNiA2ba9eKtSWgn93opJZkE/7noYVrlD3Bnsz32X5ojJp
- L81jC3AI2wiQk3n++iWiTbnzDZzJs98yAiIf1eMyp8svPpxTdv3UP8yANYTL1SJL/wmT
- 209Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=GCqrTOF84uMRndQtyq8euR4VetiGRQL2TzsP636SxqM=;
- b=st8ylQCp+nn79AXj/bMbSRlFuZvE3nm6IyOahpr3fK32HrU/dvbAIq8wCfTU8hGBj2
- urkxAaBIC1+Q9WHR92j6PZOK+3GP4t0iaAd1fVcbPuxmqz5K3XrRpdQPB+cH8TbBX1pw
- +vbEooMZUWj3PckvAUHQEBKS4Vqb03qoVDwV37++6z3QBmg36xRK2Do5rM8mfAL3ikHX
- TX53WXetDgB16T4qPeRbEo2Rzeg62Vy/+GCPb4yvRTY+rTymIsW2UqX0nMqivdMK5lLc
- HVwL5kMy1KK9pDIYoofOCeWOYB9CYYrFQI9PCiuBllmWiWsKCkBG4o1KWDcqL5U1yNXx
- qB1Q==
-X-Gm-Message-State: AOAM533N9TkE4VA/qX4b3MKoJRABI/ZSEkhj+FZWXsAvGA+wRLiZ7w0q
- aGz4MB4bRXbU7waQ0d9kuvFHo92d9pNRePXHje0=
-X-Google-Smtp-Source: ABdhPJzY6uPwkGXWat2r9FhJviiY17odZUrjG+E6WRF451oyIttGsncUVx0uGlAfslWjk9JrijQ2ePR7Rc/xePwGHJg=
-X-Received: by 2002:a5d:54c7:: with SMTP id x7mr26555816wrv.162.1592203521124; 
- Sun, 14 Jun 2020 23:45:21 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <mail@maciej.szmigiero.name>)
+ id 1jkj1Q-0003Xd-9Z
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 02:55:08 -0400
+Received: from vps-vb.mhejs.net ([37.28.154.113]:59964)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <mail@maciej.szmigiero.name>)
+ id 1jkj1N-0007gJ-T8
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 02:55:08 -0400
+Received: from MUA
+ by vps-vb.mhejs.net with esmtps (TLS1.2:ECDHE-RSA-AES128-GCM-SHA256:128)
+ (Exim 4.93.0.4) (envelope-from <mail@maciej.szmigiero.name>)
+ id 1jkj1D-0005Mp-2C; Mon, 15 Jun 2020 08:54:55 +0200
+Subject: Re: [PATCH v4 5/6] i386: Hyper-V VMBus ACPI DSDT entry
+To: Jon Doron <arilou@gmail.com>
+References: <20200505150637.7131e79b@redhat.com>
+ <20200511182121.GA1307176@rvkaganb.lan> <20200513173414.62e3cb4e@redhat.com>
+ <fb1661c0-7282-58b4-03b4-a77793cc8e97@redhat.com>
+ <20200522104053.4e7834a8@nas.mammed.net> <20200528052642.GB3071@jondnuc>
+ <20200528123700.0a364b0e@redhat.com> <20200528110247.GD3071@jondnuc>
+ <20200614141144.GA8561@jondnuc>
+ <7a3c068b-94d1-7af4-f3ea-94dadc2fad29@maciej.szmigiero.name>
+ <20200615024048.GD8561@jondnuc>
+From: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Autocrypt: addr=mail@maciej.szmigiero.name; prefer-encrypt=mutual; keydata=
+ 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 mA==
+Message-ID: <af60379b-9254-f055-915f-94e6f5800ca0@maciej.szmigiero.name>
+Date: Mon, 15 Jun 2020 08:54:49 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-References: <1591065557-9174-1-git-send-email-chenhc@lemote.com>
- <1591065557-9174-4-git-send-email-chenhc@lemote.com>
- <CAHiYmc7KLwftN2yLN3kXMdPBrNGY_rYFLrC4rRTLViSpQBwLNQ@mail.gmail.com>
- <CAAhV-H5LRLmHxKcd3m73q1PNexz7pGTD0u7352-YSkpyDQrMCQ@mail.gmail.com>
- <CAHiYmc7AatS4jV45RbqVsn8rY-j1mdD=+ApD3wcrx1+MddJ7Qw@mail.gmail.com>
- <CAAhV-H7_QSMJhiNpVeiTvc9R3K1_pnM28FrwHGnYYdTXWWZT3g@mail.gmail.com>
- <CAHiYmc48Jj2xnsqsESDNEW9iqMNFdWnwtmbaXFfnnpN=F06gHw@mail.gmail.com>
- <CAAhV-H5VrewCCphK-A8C-wVhg15dAzu4UcE1xU5gCR7BmA-bgA@mail.gmail.com>
-In-Reply-To: <CAAhV-H5VrewCCphK-A8C-wVhg15dAzu4UcE1xU5gCR7BmA-bgA@mail.gmail.com>
-From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Date: Mon, 15 Jun 2020 08:44:18 +0200
-Message-ID: <CAHiYmc7F1xaFr5enhYk-5nN3GwDBzM+PvOkxchb1+eU6uA71AQ@mail.gmail.com>
-Subject: Re: [PATCH for-5.1 V4 3/4] hw/mips: Add Loongson-3 machine support
- (with KVM)
-To: Huacai Chen <chenhuacai@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::434;
- envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wr1-x434.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+In-Reply-To: <20200615024048.GD8561@jondnuc>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=37.28.154.113;
+ envelope-from=mail@maciej.szmigiero.name; helo=vps-vb.mhejs.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 02:55:03
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -104,1338 +143,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Huacai Chen <zltjiangshi@gmail.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
- Aurelien Jarno <aurelien@aurel32.net>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: eyakovlev@virtuozzo.com, ehabkost@redhat.com, qemu-devel@nongnu.org,
+ Roman Kagan <rvkagan@yandex-team.ru>, liran.alon@oracle.com,
+ Roman Kagan <rkagan@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>, vkuznets@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-=D0=BF=D0=BE=D0=BD, 15. =D1=98=D1=83=D0=BD 2020. =D1=83 08:29 Huacai Chen <=
-chenhuacai@gmail.com> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=
-=BE/=D0=BB=D0=B0:
->
-> Hi, Aleksandar,
->
-> On Mon, Jun 15, 2020 at 2:04 PM Aleksandar Markovic
-> <aleksandar.qemu.devel@gmail.com> wrote:
-> >
-> > =D0=BF=D0=BE=D0=BD, 15. =D1=98=D1=83=D0=BD 2020. =D1=83 07:36 Huacai Ch=
-en <chenhuacai@gmail.com> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=
-=D0=BE/=D0=BB=D0=B0:
-> > >
-> > > Hi, Aleksandar,
-> > >
-> > > On Mon, Jun 15, 2020 at 12:50 PM Aleksandar Markovic
-> > > <aleksandar.qemu.devel@gmail.com> wrote:
-> > > >
-> > > > =D0=BF=D0=BE=D0=BD, 15. =D1=98=D1=83=D0=BD 2020. =D1=83 02:55 Huaca=
-i Chen <chenhuacai@gmail.com> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=
-=D0=B0=D0=BE/=D0=BB=D0=B0:
-> > > > >
-> > > > > Hi, Aleksandar,
-> > > > >
-> > > > > On Sun, Jun 14, 2020 at 3:51 PM Aleksandar Markovic
-> > > > > <aleksandar.qemu.devel@gmail.com> wrote:
-> > > > > >
-> > > > > > Hi, Huacai, this is another round of comments, that should be a=
-ddressed in v5.
-> > > > > >
-> > > > > > =D1=83=D1=82=D0=BE, 2. =D1=98=D1=83=D0=BD 2020. =D1=83 04:40 Hu=
-acai Chen <zltjiangshi@gmail.com> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=
-=81=D0=B0=D0=BE/=D0=BB=D0=B0:
-> > > > > > >
-> > > > > > > Add Loongson-3 based machine support, it use i8259 as the int=
-errupt
-> > > > > > > controler and use GPEX as the pci controller. Currently it ca=
-n only
-> > > > > > > work with KVM, but we will add TCG support in future.
-> > > > > > >
-> > > > > >
-> > > > > > Add this paragraph at this place in the commit message:
-> > > > > >
-> > > > > > "As the machine model is not based on any exiting physical hard=
-ware,
-> > > > > > the name of the machine is "loongson3-virt". It may be supersed=
-ed in
-> > > > > > future by a real machine model. If this happens, a regular depr=
-ecation
-> > > > > > procedure shall occur for "loongson3-virt" machine."
-> > > > > >
-> > > > > OK, this will be added, and I will rename to "loongson3-virt-1.0"=
-,
-> > > > > which can be updated in future.
-> > > > > But I think rename the name string is enough, file names and func=
-tion
-> > > > > names can keep their old names.
-> > > Why ARM can use version name?
-> > > virt-2.10 QEMU 2.10 ARM Virtual Machine
-> > > virt-2.11 QEMU 2.11 ARM Virtual Machine
-> > > virt-2.12 QEMU 2.12 ARM Virtual Machine
-> > > virt-2.6 QEMU 2.6 ARM Virtual Machine
-> > > virt-2.7 QEMU 2.7 ARM Virtual Machine
-> > > virt-2.8 QEMU 2.8 ARM Virtual Machine
-> > > virt-2.9 QEMU 2.9 ARM Virtual Machine
-> > > virt-3.0 QEMU 3.0 ARM Virtual Machine
-> > > virt-3.1 QEMU 3.1 ARM Virtual Machine
-> > > virt-4.0 QEMU 4.0 ARM Virtual Machine
-> > > virt-4.1 QEMU 4.1 ARM Virtual Machine
-> > > virt-4.2 QEMU 4.2 ARM Virtual Machine
-> > > virt QEMU 5.0 ARM Virtual Machine (alias of virt-5.0)
-> > >
-> > > In future will will replace i8259 with an advanced PIC, that will be
-> > > loongson3-virt-2.0.
-> > >
-> i8259 is not the best choice, but it is simple. Replacing i8259 with
-> an advanced PIC is our future plan (loongson3-virt-2.0 will not
-> replace loongson3-virt-1.0, but co-exist with it), but it need lots of
-> effort. If we can't use a version number for a machine type, what is
-> the best method?
->
+On 15.06.2020 04:40, Jon Doron wrote:
+> On 14/06/2020, Maciej S. Szmigiero wrote:
+>> Hi Jon,
+>>
+>> On 14.06.2020 16:11, Jon Doron wrote:
+>>> On 28/05/2020, Jon Doron wrote:
+>>>> On 28/05/2020, Igor Mammedov wrote:
+>>>>> On Thu, 28 May 2020 08:26:42 +0300
+>>>>> Jon Doron <arilou@gmail.com> wrote:
+>>>>>
+>>>>>> On 22/05/2020, Igor Mammedow wrote:
+>>>>>>> On Thu, 21 May 2020 18:02:07 +0200
+>>>>>>> Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>>>>>>
+>>>>>>>> On 13/05/20 17:34, Igor Mammedov wrote:
+>>>>>>>> > I'd rather avoid using random IRQ numbers (considering we are
+>>>>>>>> > dealing with black-box here). So if it's really necessary to have
+>>>>>>>> > IRQ described here, I'd suggest to implement them in device model
+>>>>>>>> > so they would be reserved and QEMU would error out in a sane way if
+>>>>>>>> > IRQ conflict is detected.
+>>>>>>>>
+>>>>>>>> We don't generally detect ISA IRQ conflicts though, do we?
+>>>>>>>
+>>>>>>> that I don't know that's why I'm not suggesting how to do it.
+>>>>>>> The point is hard-coding in AML random IRQs is not right thing to do,
+>>>>>>> (especially with the lack of 'any' spec), as minimum AML should pull
+>>>>>>> it from device model and that probably should be configurable and set
+>>>>>>> by board.
+>>>>>>>
+>>>>>>> Other thing is:
+>>>>>>> I haven't looked at VMBus device model in detail, but DSDT part aren't
+>>>>>>> matching device though (device model is not ISA device hence AML part
+>>>>>>> shouldn't be on in ISA scope), where to put it is open question.
+>>>>>>> There were other issues with AML code, I've commented on, so I was
+>>>>>>> waiting on respin with comments addressed.
+>>>>>>> I don't think that this patch is good enough for merging.
+>>>>>>>
+>>>>>>>
+>>>>>>
+>>>>>> But it seems like the current patch does match what's Microsoft HyperV
+>>>>>> is publishing in it's APCI tables.
+>>>>>>
+>>>>>> I dont think it's correct for us to "fix" Microsoft emulation even if
+>>>>>> it's wrong, since that's what Windows probably expects to see...
+>>>>>>
+>>>>>> I tried looking where Microsoft uses the ACPI tables to identify the
+>>>>>> VMBus but without much luck in order to understand how flexible a change
+>>>>>> would be for the OS to still detect the VMBus device, but in general
+>>>>>> I think "correcting" something that is emulated 1:1 because there is no
+>>>>>> spec is the right way.
+>>>>>
+>>>>> I'd agree, if removing nonsense would break VMBus detection (does it?).
+>>>>> if something is that doesn't make sense but has to stay because it is need
+>>>>> to make windows happy, that's fine , just add annotate is with comment,
+>>>>> so it won't confuse anyone why that code exists there later on.
+>>>>>
+>>>>> I suggest to:
+>>>>> 1. try dropping _PS* & _STA as it doesn't actually does anything and _PS3 is plain wrong
+>>>>> 2. drop one IRQ, newer hyper-v seems to be doing fine with only one
+>>>>> 3. it's not ISA device, I'd suggest to move into _SB scope
+>>>>> 4. I don't know much about IRQs but
+>>>>>      git grep DEFINE_PROP_ | grep -i iqr
+>>>>>   yields nothing so I'm not sure if it's acceptable. Typically it's board that assigns
+>>>>>   IRQ and not device, for Sysbus devices (see: sysbus_init_irq/sysbus_connect_irq).
+>>>>>   So I'd leave it upto Paolo or someone else to decide/comment on.
+>>>>>
+>>>>
+>>>> Sounds like a plan, I'll try to come up with the test results
+>>>> (at least for Windows 10 guest which is  what I have setup) and update
+>>>> this thread with the results.
+>>>>
+>>>> -- Jon.
+>>>>
+>>>>>>
+>>>>>>>>
+>>>>>>>> Paolo
+>>>>>>>>
+>>>>>>>
+>>>>>>
+>>>>>
+>>> Hi guys,
+>>>
+>>> Sorry for the delay...
+>>>
+>>> So first ill clarify what was the test, the test was to see the device
+>>> "Microsoft Hyper-V Virtual Machine Bus" in Windows Device Manager under
+>>> "System devices" with a state of "working properly".
+>>>
+>>> It seems like it's ok to drop all the _PS* and _STA.
+>>>
+>>> It seems to be functioning with single IRQ as well, it is worth noting that even when i dropped the entire _CRS (so no IRQs resources are required, the device was still showing that it's functioning, but I suspect this might affect the child devices like hv-net and hv-scsi).
+>>
+>> I guess you tested a single Windows version, correct?
+>> It may be that requirements differ between Windows versions, just as you
+>> say below about the required enlightenments.
+>>
+> 
+> Yes I have tested only a single version, but from the looks of it there is only a single IRQ in the HyperV APCI table that I have looked at, and I believe the one you have pasted as well in the past, so that change sounds reasonable to me.
 
-Huacai,
+I meant also other changes, like dropping of some ACPI methods.
 
-The best method is that you focus on your current proposal, without
-planing multiple Longson3 virtual machines, that I already discouraged
-you from implementing altogether. And, for future, focus on
-implementing emulation of a real Loongson3 machine, and at that moment
-we should be able to deprecate Loongson3 virtual machine, altogether
-with loongson3-virt.c file.
+> As for the enlightenments dont you prefer to have all those as mandatory for VMBus in order not to run into the issue I have encountered?
 
-Yours,
-Aleksandar
+Well, if somebody wants to run only older guests they will be content with
+just a limited set of enlightenments, right?
 
-> > > > >
-> > > >
-> > > > Loongson3 is instruction set name, not a machine name, and treating
-> > > > such name as machine name is incorrect. Renaming as I outlined in m=
-y
-> > > > comments must occur.
-> > > In future, both real machine and virtual machine models will be
-> > > implement in the same file, so I think loongson3.c is better than
-> > > loongson3-virt.c
-> > >
-> >
-> > I don't see any significant advantage of departing of existing
-> > one-main-source-file-per-machine principle.
-> In my opinion, if two machine models share more than 90% of the code,
-> they can be implemented in the same file. In hw/i386/pc.c there are
-> many machine models (GlobalProperty). Maybe it is another bad example?
->
-> I'm not insisting on my bad practice, but I need some "correct style"
-> to achieve my goal.
->
-> Huacai
-> >
-> > Regards,
-> > Aleksandar
-> >
-> > > >
-> > > > Yours,
-> > > > Aleksandar
-> > > >
-> > > > > Huacai
-> > > > > > > We already have a full functional Linux kernel (based on Linu=
-x-5.4.x LTS
-> > > > > > > but not upstream yet) here:
-> > > > > > >
-> > > > > > > https://github.com/chenhuacai/linux
-> > > > > > >
-> > > > > > > How to use QEMU/Loongson-3?
-> > > > > > > 1, Download kernel source from the above URL;
-> > > > > > > 2, Build a kernel with arch/mips/configs/loongson3_{def,hpc}c=
-onfig;
-> > > > > > > 3, Boot the a Loongson-3A4000 host with this kernel;
-> > > > > > > 4, Build QEMU-5.0.0 with this patchset;
-> > > > > > > 5, modprobe kvm;
-> > > > > > > 6, Use QEMU with TCG (available in future):
-> > > > > > >        qemu-system-mips64el -M loongson3,accel=3Dtcg -cpu Loo=
-ngson-3A1000 -kernel <path_to_kernel> -append ...
-> > > > > >
-> > > > > > Machine should be named loongson3-virt.
-> > > > > >
-> > > > > > >    Use QEMU with KVM (available at present):
-> > > > > > >        qemu-system-mips64el -M loongson3,accel=3Dkvm -cpu Loo=
-ngson-3A4000 -kernel <path_to_kernel> -append ...
-> > > > > > >
-> > > > > >
-> > > > > > Machine should be named loongson3-virt.
-> > > > > >
-> > > > > > >    The "-cpu" parameter can be omitted here and QEMU will use=
- the correct type for TCG/KVM automatically.
-> > > > > > >
-> > > > > >
-> > > > > > This is not a good approach, the cpu parameter should be requir=
-ed,
-> > > > > > and, if it is not correct for particular circumstance, an error
-> > > > > > message should be emitted to the user, and the emulation termin=
-ated.
-> > > > > >
-> > > > > > > Signed-off-by: Huacai Chen <chenhc@lemote.com>
-> > > > > > > Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
-> > > > > > > ---
-> > > > > > >  default-configs/mips64el-softmmu.mak |   1 +
-> > > > > > >  hw/mips/Kconfig                      |  10 +
-> > > > > > >  hw/mips/Makefile.objs                |   1 +
-> > > > > > >  hw/mips/loongson3.c                  | 901 +++++++++++++++++=
-++++++++++++++++++
-> > > > > >
-> > > > > > The name of the file should be loongson3-virt.c
-> > > > > >
-> > > > > > >  4 files changed, 913 insertions(+)
-> > > > > > >  create mode 100644 hw/mips/loongson3.c
-> > > > > > >
-> > > > > > > diff --git a/default-configs/mips64el-softmmu.mak b/default-c=
-onfigs/mips64el-softmmu.mak
-> > > > > > > index 9f8a3ef..2a2a3fb 100644
-> > > > > > > --- a/default-configs/mips64el-softmmu.mak
-> > > > > > > +++ b/default-configs/mips64el-softmmu.mak
-> > > > > > > @@ -3,6 +3,7 @@
-> > > > > > >  include mips-softmmu-common.mak
-> > > > > > >  CONFIG_IDE_VIA=3Dy
-> > > > > > >  CONFIG_FULOONG=3Dy
-> > > > > > > +CONFIG_LOONGSON3=3Dy
-> > > > > >
-> > > > > > CONFIG_LOONGSON3-VIRT
-> > > > > >
-> > > > > > >  CONFIG_ATI_VGA=3Dy
-> > > > > > >  CONFIG_RTL8139_PCI=3Dy
-> > > > > > >  CONFIG_JAZZ=3Dy
-> > > > > > > diff --git a/hw/mips/Kconfig b/hw/mips/Kconfig
-> > > > > > > index 67d39c5..42931fd 100644
-> > > > > > > --- a/hw/mips/Kconfig
-> > > > > > > +++ b/hw/mips/Kconfig
-> > > > > > > @@ -45,6 +45,16 @@ config FULOONG
-> > > > > > >      bool
-> > > > > > >      select PCI_BONITO
-> > > > > > >
-> > > > > > > +config LOONGSON3
-> > > > > >
-> > > > > > LOONGSON3-VIRT
-> > > > > >
-> > > > > > > +    bool
-> > > > > > > +    select PCKBD
-> > > > > > > +    select SERIAL
-> > > > > > > +    select ISA_BUS
-> > > > > > > +    select PCI_EXPRESS_GENERIC_BRIDGE
-> > > > > > > +    select VIRTIO_VGA
-> > > > > > > +    select QXL if SPICE
-> > > > > > > +    select MSI_NONBROKEN
-> > > > > > > +
-> > > > > > >  config MIPS_CPS
-> > > > > > >      bool
-> > > > > > >      select PTIMER
-> > > > > > > diff --git a/hw/mips/Makefile.objs b/hw/mips/Makefile.objs
-> > > > > > > index 3b3e6ea..31dedcb 100644
-> > > > > > > --- a/hw/mips/Makefile.objs
-> > > > > > > +++ b/hw/mips/Makefile.objs
-> > > > > > > @@ -4,5 +4,6 @@ obj-$(CONFIG_MALTA) +=3D gt64xxx_pci.o malta.=
-o
-> > > > > > >  obj-$(CONFIG_MIPSSIM) +=3D mipssim.o
-> > > > > > >  obj-$(CONFIG_JAZZ) +=3D jazz.o
-> > > > > > >  obj-$(CONFIG_FULOONG) +=3D fuloong2e.o
-> > > > > > > +obj-$(CONFIG_LOONGSON3) +=3D loongson3.o
-> > > > > >
-> > > > > > CONFIG_LOONGSON3-VIRT
-> > > > > >
-> > > > > > >  obj-$(CONFIG_MIPS_CPS) +=3D cps.o
-> > > > > > >  obj-$(CONFIG_MIPS_BOSTON) +=3D boston.o
-> > > > > > > diff --git a/hw/mips/loongson3.c b/hw/mips/loongson3.c
-> > > > > > > new file mode 100644
-> > > > > > > index 0000000..e4b9538
-> > > > > > > --- /dev/null
-> > > > > > > +++ b/hw/mips/loongson3.c
-> > > > > >
-> > > > > > The file shoul be named loongson3-virt.c
-> > > > > >
-> > > > > > > @@ -0,0 +1,901 @@
-> > > > > > > +/*
-> > > > > > > + * Generic Loongson-3 Platform support
-> > > > > >
-> > > > > > "Support for loongson3-virt platform"
-> > > > > >
-> > > > > > > + *
-> > > > > > > + * Copyright (c) 2016-2020 Huacai Chen (chenhc@lemote.com)
-> > > > > > > + * This code is licensed under the GNU GPL v2.
-> > > > > > > + *
-> > > > > > > + * Contributions are licensed under the terms of the GNU GPL=
-,
-> > > > > > > + * version 2 or (at your option) any later version.
-> > > > > >
-> > > > > > License preamble should be harmonized, as we already agreed upo=
-n.
-> > > > > >
-> > > > > > > + */
-> > > > > > > +
-> > > > > > > +/*
-> > > > > > > + * Generic PC Platform based on Loongson-3 CPU (MIPS64R2 wit=
-h extensions,
-> > > > > > > + * 800~2000MHz)
-> > > > > > > + */
-> > > > > > > +
-> > > > > > > +#include "qemu/osdep.h"
-> > > > > > > +#include "qemu-common.h"
-> > > > > > > +#include "qemu/units.h"
-> > > > > > > +#include "qapi/error.h"
-> > > > > > > +#include "cpu.h"
-> > > > > > > +#include "elf.h"
-> > > > > > > +#include "hw/boards.h"
-> > > > > > > +#include "hw/char/serial.h"
-> > > > > > > +#include "hw/mips/mips.h"
-> > > > > > > +#include "hw/mips/cpudevs.h"
-> > > > > > > +#include "hw/intc/i8259.h"
-> > > > > > > +#include "hw/loader.h"
-> > > > > > > +#include "hw/ide.h"
-> > > > > > > +#include "hw/isa/superio.h"
-> > > > > > > +#include "hw/pci/msi.h"
-> > > > > > > +#include "hw/pci/pci.h"
-> > > > > > > +#include "hw/pci/pci_host.h"
-> > > > > > > +#include "hw/pci-host/gpex.h"
-> > > > > > > +#include "hw/rtc/mc146818rtc.h"
-> > > > > > > +#include "net/net.h"
-> > > > > > > +#include "exec/address-spaces.h"
-> > > > > > > +#include "sysemu/kvm.h"
-> > > > > > > +#include "sysemu/qtest.h"
-> > > > > > > +#include "sysemu/reset.h"
-> > > > > > > +#include "sysemu/runstate.h"
-> > > > > > > +#include "qemu/log.h"
-> > > > > > > +#include "qemu/error-report.h"
-> > > > > > > +
-> > > > > > > +#define INITRD_OFFSET         0x04000000
-> > > > > > > +#define BOOTPARAM_ADDR        0x8ff00000
-> > > > > > > +#define BOOTPARAM_PHYADDR     0x0ff00000
-> > > > > > > +#define CFG_ADDR              0x0f100000
-> > > > > > > +#define FW_CONF_ADDR          0x0fff0000
-> > > > > > > +#define PM_MMIO_ADDR          0x10080000
-> > > > > > > +#define PM_MMIO_SIZE          0x100
-> > > > > > > +#define PM_CNTL_MODE          0x10
-> > > > > > > +
-> > > > > > > +#define PHYS_TO_VIRT(x) ((x) | ~(target_ulong)0x7fffffff)
-> > > > > > > +
-> > > > > > > +/* Loongson-3 has a 2MB flash rom */
-> > > > > > > +#define BIOS_SIZE               (2 * MiB)
-> > > > > > > +#define LOONGSON_MAX_VCPUS      16
-> > > > > > > +
-> > > > > > > +#define LOONGSON3_BIOSNAME "bios_loongson3.bin"
-> > > > > > > +
-> > > > > > > +#define PCIE_IRQ_BASE       3
-> > > > > > > +
-> > > > > > > +#define VIRT_PCI_IO_BASE    0x18000000ul
-> > > > > > > +#define VIRT_PCI_IO_SIZE    0x000c0000ul
-> > > > > > > +#define VIRT_PCI_MEM_BASE   0x40000000ul
-> > > > > > > +#define VIRT_PCI_MEM_SIZE   0x40000000ul
-> > > > > > > +#define VIRT_PCI_ECAM_BASE  0x1a000000ul
-> > > > > > > +#define VIRT_PCI_ECAM_SIZE  0x02000000ul
-> > > > > > > +
-> > > > > > > +#define align(x) (((x) + 63) & ~63)
-> > > > > > > +
-> > > > > > > +/* LEFI (a UEFI-like interface for BIOS-Kernel boot paramete=
-rs) data structrues
-> > > > > > > + * defined at arch/mips/include/asm/mach-loongson64/boot_par=
-am.h in Linux kernel
-> > > > > > > + */
-> > > > > > > +struct efi_memory_map_loongson {
-> > > > > > > +    uint16_t vers;               /* version of efi_memory_ma=
-p */
-> > > > > > > +    uint32_t nr_map;             /* number of memory_maps */
-> > > > > > > +    uint32_t mem_freq;           /* memory frequence */
-> > > > > > > +    struct mem_map {
-> > > > > > > +        uint32_t node_id;        /* node_id which memory att=
-ached to */
-> > > > > > > +        uint32_t mem_type;       /* system memory, pci memor=
-y, pci io, etc. */
-> > > > > > > +        uint64_t mem_start;      /* memory map start address=
- */
-> > > > > > > +        uint32_t mem_size;       /* each memory_map size, no=
-t the total size */
-> > > > > > > +    } map[128];
-> > > > > > > +} __attribute__((packed));
-> > > > > > > +
-> > > > > > > +enum loongson_cpu_type {
-> > > > > > > +    Legacy_2E =3D 0x0,
-> > > > > > > +    Legacy_2F =3D 0x1,
-> > > > > > > +    Legacy_3A =3D 0x2,
-> > > > > > > +    Legacy_3B =3D 0x3,
-> > > > > > > +    Legacy_1A =3D 0x4,
-> > > > > > > +    Legacy_1B =3D 0x5,
-> > > > > > > +    Legacy_2G =3D 0x6,
-> > > > > > > +    Legacy_2H =3D 0x7,
-> > > > > > > +    Loongson_1A =3D 0x100,
-> > > > > > > +    Loongson_1B =3D 0x101,
-> > > > > > > +    Loongson_2E =3D 0x200,
-> > > > > > > +    Loongson_2F =3D 0x201,
-> > > > > > > +    Loongson_2G =3D 0x202,
-> > > > > > > +    Loongson_2H =3D 0x203,
-> > > > > > > +    Loongson_3A =3D 0x300,
-> > > > > > > +    Loongson_3B =3D 0x301
-> > > > > > > +};
-> > > > > > > +
-> > > > > > > +/*
-> > > > > > > + * Capability and feature descriptor structure for MIPS CPU
-> > > > > > > + */
-> > > > > > > +struct efi_cpuinfo_loongson {
-> > > > > > > +    uint16_t vers;               /* version of efi_cpuinfo_l=
-oongson */
-> > > > > > > +    uint32_t processor_id;       /* PRID, e.g. 6305, 6306 */
-> > > > > > > +    uint32_t cputype;            /* Loongson_3A/3B, etc. */
-> > > > > > > +    uint32_t total_node;         /* num of total numa nodes =
-*/
-> > > > > > > +    uint16_t cpu_startup_core_id;   /* Boot core id */
-> > > > > > > +    uint16_t reserved_cores_mask;
-> > > > > > > +    uint32_t cpu_clock_freq;     /* cpu_clock */
-> > > > > > > +    uint32_t nr_cpus;
-> > > > > > > +    char cpuname[64];
-> > > > > > > +} __attribute__((packed));
-> > > > > > > +
-> > > > > > > +#define MAX_UARTS 64
-> > > > > > > +struct uart_device {
-> > > > > > > +    uint32_t iotype;
-> > > > > > > +    uint32_t uartclk;
-> > > > > > > +    uint32_t int_offset;
-> > > > > > > +    uint64_t uart_base;
-> > > > > > > +} __attribute__((packed));
-> > > > > > > +
-> > > > > > > +#define MAX_SENSORS 64
-> > > > > > > +#define SENSOR_TEMPER  0x00000001
-> > > > > > > +#define SENSOR_VOLTAGE 0x00000002
-> > > > > > > +#define SENSOR_FAN     0x00000004
-> > > > > > > +struct sensor_device {
-> > > > > > > +    char name[32];  /* a formal name */
-> > > > > > > +    char label[64]; /* a flexible description */
-> > > > > > > +    uint32_t type;       /* SENSOR_* */
-> > > > > > > +    uint32_t id;         /* instance id of a sensor-class */
-> > > > > > > +    uint32_t fan_policy; /* step speed or constant speed */
-> > > > > > > +    uint32_t fan_percent;/* only for constant speed policy *=
-/
-> > > > > > > +    uint64_t base_addr;  /* base address of device registers=
- */
-> > > > > > > +} __attribute__((packed));
-> > > > > > > +
-> > > > > > > +struct system_loongson {
-> > > > > > > +    uint16_t vers;               /* version of system_loongs=
-on */
-> > > > > > > +    uint32_t ccnuma_smp;         /* 0: no numa; 1: has numa =
-*/
-> > > > > > > +    uint32_t sing_double_channel;/* 1: single; 2: double */
-> > > > > > > +    uint32_t nr_uarts;
-> > > > > > > +    struct uart_device uarts[MAX_UARTS];
-> > > > > > > +    uint32_t nr_sensors;
-> > > > > > > +    struct sensor_device sensors[MAX_SENSORS];
-> > > > > > > +    char has_ec;
-> > > > > > > +    char ec_name[32];
-> > > > > > > +    uint64_t ec_base_addr;
-> > > > > > > +    char has_tcm;
-> > > > > > > +    char tcm_name[32];
-> > > > > > > +    uint64_t tcm_base_addr;
-> > > > > > > +    uint64_t workarounds;
-> > > > > > > +    uint64_t of_dtb_addr; /* NULL if not support */
-> > > > > > > +} __attribute__((packed));
-> > > > > > > +
-> > > > > > > +struct irq_source_routing_table {
-> > > > > > > +    uint16_t vers;
-> > > > > > > +    uint16_t size;
-> > > > > > > +    uint16_t rtr_bus;
-> > > > > > > +    uint16_t rtr_devfn;
-> > > > > > > +    uint32_t vendor;
-> > > > > > > +    uint32_t device;
-> > > > > > > +    uint32_t PIC_type;           /* conform use HT or PCI to=
- route to CPU-PIC */
-> > > > > > > +    uint64_t ht_int_bit;         /* 3A: 1<<24; 3B: 1<<16 */
-> > > > > > > +    uint64_t ht_enable;          /* irqs used in this PIC */
-> > > > > > > +    uint32_t node_id;            /* node id: 0x0-0; 0x1-1; 0=
-x10-2; 0x11-3 */
-> > > > > > > +    uint64_t pci_mem_start_addr;
-> > > > > > > +    uint64_t pci_mem_end_addr;
-> > > > > > > +    uint64_t pci_io_start_addr;
-> > > > > > > +    uint64_t pci_io_end_addr;
-> > > > > > > +    uint64_t pci_config_addr;
-> > > > > > > +    uint16_t dma_mask_bits;
-> > > > > > > +    uint16_t dma_noncoherent;
-> > > > > > > +} __attribute__((packed));
-> > > > > > > +
-> > > > > > > +struct interface_info {
-> > > > > > > +    uint16_t vers;               /* version of the specifici=
-tion */
-> > > > > > > +    uint16_t size;
-> > > > > > > +    uint8_t  flag;
-> > > > > > > +    char description[64];
-> > > > > > > +} __attribute__((packed));
-> > > > > > > +
-> > > > > > > +#define MAX_RESOURCE_NUMBER 128
-> > > > > > > +struct resource_loongson {
-> > > > > > > +    uint64_t start;              /* resource start address *=
-/
-> > > > > > > +    uint64_t end;                /* resource end address */
-> > > > > > > +    char name[64];
-> > > > > > > +    uint32_t flags;
-> > > > > > > +};
-> > > > > > > +
-> > > > > > > +struct archdev_data {};          /* arch specific additions =
-*/
-> > > > > > > +
-> > > > > > > +struct board_devices {
-> > > > > > > +    char name[64];               /* hold the device name */
-> > > > > > > +    uint32_t num_resources;      /* number of device_resourc=
-e */
-> > > > > > > +    /* for each device's resource */
-> > > > > > > +    struct resource_loongson resource[MAX_RESOURCE_NUMBER];
-> > > > > > > +    /* arch specific additions */
-> > > > > > > +    struct archdev_data archdata;
-> > > > > > > +};
-> > > > > > > +
-> > > > > > > +struct loongson_special_attribute {
-> > > > > > > +    uint16_t vers;               /* version of this special =
-*/
-> > > > > > > +    char special_name[64];       /* special_atribute_name */
-> > > > > > > +    uint32_t loongson_special_type; /* type of special devic=
-e */
-> > > > > > > +    /* for each device's resource */
-> > > > > > > +    struct resource_loongson resource[MAX_RESOURCE_NUMBER];
-> > > > > > > +};
-> > > > > > > +
-> > > > > > > +struct loongson_params {
-> > > > > > > +    uint64_t memory_offset;      /* efi_memory_map_loongson =
-struct offset */
-> > > > > > > +    uint64_t cpu_offset;         /* efi_cpuinfo_loongson str=
-uct offset */
-> > > > > > > +    uint64_t system_offset;      /* system_loongson struct o=
-ffset */
-> > > > > > > +    uint64_t irq_offset;         /* irq_source_routing_table=
- struct offset */
-> > > > > > > +    uint64_t interface_offset;   /* interface_info struct of=
-fset */
-> > > > > > > +    uint64_t special_offset;     /* loongson_special_attribu=
-te struct offset */
-> > > > > > > +    uint64_t boarddev_table_offset;  /* board_devices offset=
- */
-> > > > > > > +};
-> > > > > > > +
-> > > > > > > +struct smbios_tables {
-> > > > > > > +    uint16_t vers;               /* version of smbios */
-> > > > > > > +    uint64_t vga_bios;           /* vga_bios address */
-> > > > > > > +    struct loongson_params lp;
-> > > > > > > +};
-> > > > > > > +
-> > > > > > > +struct efi_reset_system_t {
-> > > > > > > +    uint64_t ResetCold;
-> > > > > > > +    uint64_t ResetWarm;
-> > > > > > > +    uint64_t ResetType;
-> > > > > > > +    uint64_t Shutdown;
-> > > > > > > +    uint64_t DoSuspend; /* NULL if not support */
-> > > > > > > +};
-> > > > > > > +
-> > > > > > > +struct efi_loongson {
-> > > > > > > +    uint64_t mps;                /* MPS table */
-> > > > > > > +    uint64_t acpi;               /* ACPI table (IA64 ext 0.7=
-1) */
-> > > > > > > +    uint64_t acpi20;             /* ACPI table (ACPI 2.0) */
-> > > > > > > +    struct smbios_tables smbios; /* SM BIOS table */
-> > > > > > > +    uint64_t sal_systab;         /* SAL system table */
-> > > > > > > +    uint64_t boot_info;          /* boot info table */
-> > > > > > > +};
-> > > > > > > +
-> > > > > > > +struct boot_params {
-> > > > > > > +    struct efi_loongson efi;
-> > > > > > > +    struct efi_reset_system_t reset_system;
-> > > > > > > +};
-> > > > > > > +
-> > > > > > > +static struct _fw_config {
-> > > > > > > +    unsigned long ram_size;
-> > > > > > > +    unsigned int mem_freq;
-> > > > > > > +    unsigned int nr_cpus;
-> > > > > > > +    unsigned int cpu_clock_freq;
-> > > > > > > +} fw_config;
-> > > > > > > +
-> > > > > > > +static struct _loaderparams {
-> > > > > > > +    unsigned long ram_size;
-> > > > > > > +    const char *kernel_cmdline;
-> > > > > > > +    const char *kernel_filename;
-> > > > > > > +    const char *initrd_filename;
-> > > > > > > +    int64_t kernel_entry;
-> > > > > > > +    unsigned long a0, a1, a2;
-> > > > > > > +} loaderparams;
-> > > > > > > +
-> > > > > > > +static void *boot_params_p;
-> > > > > > > +static void *boot_params_buf;
-> > > > > > > +
-> > > > > > > +static unsigned int bios_boot_code[] =3D {
-> > > > > > > +    0x40086000,   /* mfc0    t0, CP0_STATUS                 =
-                  */
-> > > > > > > +    0x240900E4,   /* li      t1, 0xe4         #set kx, sx, u=
-x, erl            */
-> > > > > > > +    0x01094025,   /* or      t0, t0, t1                     =
-                  */
-> > > > > > > +    0x3C090040,   /* lui     t1, 0x40         #set bev      =
-                  */
-> > > > > > > +    0x01094025,   /* or      t0, t0, t1                     =
-                  */
-> > > > > > > +    0x40886000,   /* mtc0    t0, CP0_STATUS                 =
-                  */
-> > > > > > > +    0x00000000,
-> > > > > > > +    0x40806800,   /* mtc0    zero, CP0_CAUSE                =
-                  */
-> > > > > > > +    0x00000000,
-> > > > > > > +    0x400A7801,   /* mfc0    t2, $15, 1                     =
-                  */
-> > > > > > > +    0x314A00FF,   /* andi    t2, 0x0ff                      =
-                  */
-> > > > > > > +    0x3C089000,   /* dli     t0, 0x900000003ff01000         =
-                  */
-> > > > > > > +    0x00084438,
-> > > > > > > +    0x35083FF0,
-> > > > > > > +    0x00084438,
-> > > > > > > +    0x35081000,
-> > > > > > > +    0x314B0003,   /* andi    t3, t2, 0x3      #local cpuid  =
-                  */
-> > > > > > > +    0x000B5A00,   /* sll     t3, 8                          =
-                  */
-> > > > > > > +    0x010B4025,   /* or      t0, t0, t3                     =
-                  */
-> > > > > > > +    0x314C000C,   /* andi    t4, t2, 0xc      #node id      =
-                  */
-> > > > > > > +    0x000C62BC,   /* dsll    t4, 42                         =
-                  */
-> > > > > > > +    0x010C4025,   /* or      t0, t0, t4                     =
-                  */
-> > > > > > > +                  /* waitforinit:                           =
-                  */
-> > > > > > > +    0xDD020020,   /* ld      v0, FN_OFF(t0)   #FN_OFF 0x020 =
-                  */
-> > > > > > > +    0x1040FFFE,   /* beqz    v0, waitforinit                =
-                  */
-> > > > > > > +    0x00000000,   /* nop                                    =
-                  */
-> > > > > > > +    0xDD1D0028,   /* ld      sp, SP_OFF(t0)   #FN_OFF 0x028 =
-                  */
-> > > > > > > +    0xDD1C0030,   /* ld      gp, GP_OFF(t0)   #FN_OFF 0x030 =
-                  */
-> > > > > > > +    0xDD050038,   /* ld      a1, A1_OFF(t0)   #FN_OFF 0x038 =
-                  */
-> > > > > > > +    0x00400008,   /* jr      v0               #byebye       =
-                  */
-> > > > > > > +    0x00000000,   /* nop                                    =
-                  */
-> > > > > > > +    0x1000FFFF,   /* 1:  b   1b                             =
-                  */
-> > > > > > > +    0x00000000,   /* nop                                    =
-                  */
-> > > > > > > +
-> > > > > > > +                  /* Reset                                  =
-                  */
-> > > > > > > +    0x3C0C9000,   /* dli     t0, 0x9000000010080010         =
-                  */
-> > > > > > > +    0x358C0000,
-> > > > > > > +    0x000C6438,
-> > > > > > > +    0x358C1008,
-> > > > > > > +    0x000C6438,
-> > > > > > > +    0x358C0010,
-> > > > > > > +    0x240D0000,   /* li      t1, 0x00                       =
-                  */
-> > > > > > > +    0xA18D0000,   /* sb      t1, (t0)                       =
-                  */
-> > > > > > > +    0x1000FFFF,   /* 1:  b   1b                             =
-                  */
-> > > > > > > +    0x00000000,   /* nop                                    =
-                  */
-> > > > > > > +
-> > > > > > > +                  /* Shutdown                               =
-                  */
-> > > > > > > +    0x3C0C9000,   /* dli     t0, 0x9000000010080010         =
-                  */
-> > > > > > > +    0x358C0000,
-> > > > > > > +    0x000C6438,
-> > > > > > > +    0x358C1008,
-> > > > > > > +    0x000C6438,
-> > > > > > > +    0x358C0010,
-> > > > > > > +    0x240D00FF,   /* li      t1, 0xff                       =
-                  */
-> > > > > > > +    0xA18D0000,   /* sb      t1, (t0)                       =
-                  */
-> > > > > > > +    0x1000FFFF,   /* 1:  b   1b                             =
-                  */
-> > > > > > > +    0x00000000    /* nop                                    =
-                  */
-> > > > > > > +};
-> > > > > > > +
-> > > > > > > +static uint64_t loongson3_pm_read(void *opaque, hwaddr addr,=
- unsigned size)
-> > > > > > > +{
-> > > > > > > +    return 0;
-> > > > > > > +}
-> > > > > > > +
-> > > > > > > +static void loongson3_pm_write(void *opaque, hwaddr addr, ui=
-nt64_t val, unsigned size)
-> > > > > > > +{
-> > > > > > > +    if (addr !=3D PM_CNTL_MODE) {
-> > > > > > > +        return;
-> > > > > > > +    }
-> > > > > > > +
-> > > > > > > +    switch (val) {
-> > > > > > > +    case 0x00:
-> > > > > > > +        qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET=
-);
-> > > > > > > +        return;
-> > > > > > > +    case 0xff:
-> > > > > > > +        qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SH=
-UTDOWN);
-> > > > > > > +        return;
-> > > > > > > +    default:
-> > > > > > > +        return;
-> > > > > > > +    }
-> > > > > > > +}
-> > > > > > > +
-> > > > > > > +static const MemoryRegionOps loongson3_pm_ops =3D {
-> > > > > > > +    .read  =3D loongson3_pm_read,
-> > > > > > > +    .write =3D loongson3_pm_write,
-> > > > > > > +    .endianness =3D DEVICE_NATIVE_ENDIAN,
-> > > > > > > +};
-> > > > > > > +
-> > > > > > > +static struct efi_memory_map_loongson *init_memory_map(void =
-*g_map)
-> > > > > > > +{
-> > > > > > > +    struct efi_memory_map_loongson *emap =3D g_map;
-> > > > > > > +
-> > > > > > > +    emap->nr_map =3D 2;
-> > > > > > > +    emap->mem_freq =3D 300000000;
-> > > > > > > +
-> > > > > > > +    emap->map[0].node_id =3D 0;
-> > > > > > > +    emap->map[0].mem_type =3D 1;
-> > > > > > > +    emap->map[0].mem_start =3D 0x0;
-> > > > > > > +    emap->map[0].mem_size =3D (loaderparams.ram_size > 0x100=
-00000
-> > > > > > > +                            ? 256 : (loaderparams.ram_size >=
-> 20)) - 16;
-> > > > > > > +
-> > > > > > > +    emap->map[1].node_id =3D 0;
-> > > > > > > +    emap->map[1].mem_type =3D 2;
-> > > > > > > +    emap->map[1].mem_start =3D 0x90000000;
-> > > > > > > +    emap->map[1].mem_size =3D (loaderparams.ram_size > 0x100=
-00000
-> > > > > > > +                            ? (loaderparams.ram_size >> 20) =
-- 256 : 0);
-> > > > > > > +
-> > > > > > > +    return emap;
-> > > > > > > +}
-> > > > > > > +
-> > > > > > > +static int get_host_cpu_freq(void)
-> > > > > > > +{
-> > > > > > > +    int fd =3D 0, freq =3D 0;
-> > > > > > > +    char buf[1024], *buf_p;
-> > > > > > > +
-> > > > > > > +    fd =3D open("/proc/cpuinfo", O_RDONLY);
-> > > > > > > +    if (fd =3D=3D -1) {
-> > > > > > > +        fprintf(stderr, "Failed to open /proc/cpuinfo!\n");
-> > > > > > > +        return 0;
-> > > > > > > +    }
-> > > > > > > +
-> > > > > > > +    if (read(fd, buf, 1024) < 0) {
-> > > > > > > +        close(fd);
-> > > > > > > +        fprintf(stderr, "Failed to read /proc/cpuinfo!\n");
-> > > > > > > +        return 0;
-> > > > > > > +    }
-> > > > > > > +    close(fd);
-> > > > > > > +
-> > > > > > > +    buf_p =3D strstr(buf, "model name");
-> > > > > > > +    while (*buf_p !=3D '@') {
-> > > > > > > +        buf_p++;
-> > > > > > > +    }
-> > > > > > > +
-> > > > > > > +    buf_p +=3D 2;
-> > > > > > > +    memcpy(buf, buf_p, 12);
-> > > > > > > +    buf_p =3D buf;
-> > > > > > > +    while ((*buf_p >=3D '0') && (*buf_p <=3D '9')) {
-> > > > > > > +        buf_p++;
-> > > > > > > +    }
-> > > > > > > +    *buf_p =3D '\0';
-> > > > > > > +
-> > > > > > > +    freq =3D atoi(buf);
-> > > > > > > +
-> > > > > > > +    return freq * 1000 * 1000;
-> > > > > > > +}
-> > > > > > > +
-> > > > > > > +static struct efi_cpuinfo_loongson *init_cpu_info(void *g_cp=
-uinfo_loongson)
-> > > > > > > +{
-> > > > > > > +    struct efi_cpuinfo_loongson *c =3D g_cpuinfo_loongson;
-> > > > > > > +
-> > > > > > > +    c->cputype  =3D Loongson_3A;
-> > > > > > > +    c->processor_id =3D 0x14C000;
-> > > > > > > +    c->cpu_clock_freq =3D get_host_cpu_freq();
-> > > > > > > +    if (!c->cpu_clock_freq) {
-> > > > > > > +        c->cpu_clock_freq =3D 500000000;
-> > > > > > > +    }
-> > > > > > > +
-> > > > > > > +    c->cpu_startup_core_id =3D 0;
-> > > > > > > +    c->nr_cpus =3D current_machine->smp.cpus;
-> > > > > > > +    c->total_node =3D (current_machine->smp.cpus + 3) / 4;
-> > > > > > > +
-> > > > > > > +    return c;
-> > > > > > > +}
-> > > > > > > +
-> > > > > > > +static struct system_loongson *init_system_loongson(void *g_=
-system)
-> > > > > > > +{
-> > > > > > > +    struct system_loongson *s =3D g_system;
-> > > > > > > +
-> > > > > > > +    s->ccnuma_smp =3D 0;
-> > > > > > > +    s->sing_double_channel =3D 1;
-> > > > > > > +    s->nr_uarts =3D 1;
-> > > > > > > +    s->uarts[0].iotype =3D 2;
-> > > > > > > +    s->uarts[0].int_offset =3D 2;
-> > > > > > > +    s->uarts[0].uartclk =3D 25000000;
-> > > > > > > +    s->uarts[0].uart_base =3D 0x1fe001e0;
-> > > > > > > +
-> > > > > > > +    return s;
-> > > > > > > +}
-> > > > > > > +
-> > > > > > > +static struct irq_source_routing_table *init_irq_source(void=
- *g_irq_source)
-> > > > > > > +{
-> > > > > > > +    struct irq_source_routing_table *irq_info =3D g_irq_sour=
-ce;
-> > > > > > > +
-> > > > > > > +    irq_info->node_id =3D 0;
-> > > > > > > +    irq_info->PIC_type =3D 0;
-> > > > > > > +    irq_info->dma_mask_bits =3D 64;
-> > > > > > > +    irq_info->pci_mem_start_addr =3D VIRT_PCI_MEM_BASE;
-> > > > > > > +    irq_info->pci_mem_end_addr   =3D VIRT_PCI_MEM_BASE + VIR=
-T_PCI_MEM_SIZE - 1;
-> > > > > > > +    irq_info->pci_io_start_addr  =3D VIRT_PCI_IO_BASE;
-> > > > > > > +
-> > > > > > > +    return irq_info;
-> > > > > > > +}
-> > > > > > > +
-> > > > > > > +static struct interface_info *init_interface_info(void *g_in=
-terface)
-> > > > > > > +{
-> > > > > > > +    struct interface_info *interface =3D g_interface;
-> > > > > > > +
-> > > > > > > +    interface->vers =3D 0x01;
-> > > > > > > +    strcpy(interface->description, "UEFI_Version_v1.0");
-> > > > > > > +
-> > > > > > > +    return interface;
-> > > > > > > +}
-> > > > > > > +
-> > > > > > > +static struct board_devices *board_devices_info(void *g_boar=
-d)
-> > > > > > > +{
-> > > > > > > +    struct board_devices *bd =3D g_board;
-> > > > > > > +
-> > > > > > > +    strcpy(bd->name, "Loongson-3A-VIRT-1w-V1.00-demo");
-> > > > > > > +
-> > > > > > > +    return bd;
-> > > > > > > +}
-> > > > > > > +
-> > > > > > > +static struct loongson_special_attribute *init_special_info(=
-void *g_special)
-> > > > > > > +{
-> > > > > > > +    struct loongson_special_attribute *special =3D g_special=
-;
-> > > > > > > +
-> > > > > > > +    strcpy(special->special_name, "2016-05-16");
-> > > > > > > +
-> > > > > > > +    return special;
-> > > > > > > +}
-> > > > > > > +
-> > > > > > > +static void init_loongson_params(struct loongson_params *lp)
-> > > > > > > +{
-> > > > > > > +    void *p =3D boot_params_p;
-> > > > > > > +
-> > > > > > > +    lp->memory_offset =3D (unsigned long long)init_memory_ma=
-p(p)
-> > > > > > > +                        - (unsigned long long)lp;
-> > > > > > > +    p +=3D align(sizeof(struct efi_memory_map_loongson));
-> > > > > > > +
-> > > > > > > +    lp->cpu_offset =3D (unsigned long long)init_cpu_info(p)
-> > > > > > > +                     - (unsigned long long)lp;
-> > > > > > > +    p +=3D align(sizeof(struct efi_cpuinfo_loongson));
-> > > > > > > +
-> > > > > > > +    lp->system_offset =3D (unsigned long long)init_system_lo=
-ongson(p)
-> > > > > > > +                        - (unsigned long long)lp;
-> > > > > > > +    p +=3D align(sizeof(struct system_loongson));
-> > > > > > > +
-> > > > > > > +    lp->irq_offset =3D (unsigned long long)init_irq_source(p=
-)
-> > > > > > > +                     - (unsigned long long)lp;
-> > > > > > > +    p +=3D align(sizeof(struct irq_source_routing_table));
-> > > > > > > +
-> > > > > > > +    lp->interface_offset =3D (unsigned long long)init_interf=
-ace_info(p)
-> > > > > > > +                           - (unsigned long long)lp;
-> > > > > > > +    p +=3D align(sizeof(struct interface_info));
-> > > > > > > +
-> > > > > > > +    lp->boarddev_table_offset =3D (unsigned long long)board_=
-devices_info(p)
-> > > > > > > +                                - (unsigned long long)lp;
-> > > > > > > +    p +=3D align(sizeof(struct board_devices));
-> > > > > > > +
-> > > > > > > +    lp->special_offset =3D (unsigned long long)init_special_=
-info(p)
-> > > > > > > +                         - (unsigned long long)lp;
-> > > > > > > +    p +=3D align(sizeof(struct loongson_special_attribute));
-> > > > > > > +
-> > > > > > > +    boot_params_p =3D p;
-> > > > > > > +}
-> > > > > > > +
-> > > > > > > +static void init_smbios(struct smbios_tables *smbios)
-> > > > > > > +{
-> > > > > > > +    smbios->vers =3D 1;
-> > > > > > > +    init_loongson_params(&(smbios->lp));
-> > > > > > > +}
-> > > > > > > +
-> > > > > > > +static void init_efi(struct efi_loongson *efi)
-> > > > > > > +{
-> > > > > > > +    init_smbios(&(efi->smbios));
-> > > > > > > +}
-> > > > > > > +
-> > > > > > > +static void init_reset_system(struct efi_reset_system_t *res=
-et)
-> > > > > > > +{
-> > > > > > > +    reset->Shutdown =3D 0xffffffffbfc000a8;
-> > > > > > > +    reset->ResetCold =3D 0xffffffffbfc00080;
-> > > > > > > +    reset->ResetWarm =3D 0xffffffffbfc00080;
-> > > > > > > +}
-> > > > > > > +
-> > > > > > > +static int init_boot_param(struct boot_params *bp)
-> > > > > > > +{
-> > > > > > > +    init_efi(&(bp->efi));
-> > > > > > > +    init_reset_system(&(bp->reset_system));
-> > > > > > > +
-> > > > > > > +    return 0;
-> > > > > > > +}
-> > > > > > > +
-> > > > > > > +static void fw_cfg_boot_set(void *opaque, const char *boot_d=
-evice,
-> > > > > > > +                            Error **errp)
-> > > > > > > +{
-> > > > > > > +    fw_cfg_modify_i16(opaque, FW_CFG_BOOT_DEVICE, boot_devic=
-e[0]);
-> > > > > > > +}
-> > > > > > > +
-> > > > > > > +static void fw_conf_init(unsigned long ram_size)
-> > > > > > > +{
-> > > > > > > +    FWCfgState *fw_cfg;
-> > > > > > > +
-> > > > > > > +    fw_cfg =3D fw_cfg_init_mem_wide(CFG_ADDR, CFG_ADDR + 8, =
-8, 0, NULL);
-> > > > > > > +    fw_cfg_add_i16(fw_cfg, FW_CFG_NB_CPUS, (uint16_t)current=
-_machine->smp.cpus);
-> > > > > > > +    fw_cfg_add_i16(fw_cfg, FW_CFG_MAX_CPUS, (uint16_t)curren=
-t_machine->smp.max_cpus);
-> > > > > > > +    fw_cfg_add_i64(fw_cfg, FW_CFG_RAM_SIZE, (uint64_t)ram_si=
-ze);
-> > > > > > > +    qemu_register_boot_set(fw_cfg_boot_set, fw_cfg);
-> > > > > > > +
-> > > > > > > +    fw_config.ram_size =3D ram_size;
-> > > > > > > +    fw_config.mem_freq =3D 300000000;
-> > > > > > > +    fw_config.nr_cpus =3D current_machine->smp.cpus;
-> > > > > > > +    fw_config.cpu_clock_freq =3D get_host_cpu_freq();
-> > > > > > > +}
-> > > > > > > +
-> > > > > > > +static int set_prom_bootparam(ram_addr_t initrd_offset, long=
- initrd_size)
-> > > > > > > +{
-> > > > > > > +    long params_size;
-> > > > > > > +    char memenv[32];
-> > > > > > > +    char highmemenv[32];
-> > > > > > > +    void *params_buf;
-> > > > > > > +    unsigned int *parg_env;
-> > > > > > > +    int ret =3D 0;
-> > > > > > > +
-> > > > > > > +    /* Allocate params_buf for command line. */
-> > > > > > > +    params_size =3D 0x100000;
-> > > > > > > +    params_buf =3D g_malloc0(params_size);
-> > > > > > > +
-> > > > > > > +    /*
-> > > > > > > +     * Layout of params_buf looks like this:
-> > > > > > > +     * argv[0], argv[1], 0, env[0], env[1], ... env[i], 0,
-> > > > > > > +     * argv[0]'s data, argv[1]'s data, env[0]'data, ..., env=
-[i]'s data, 0
-> > > > > > > +     */
-> > > > > > > +    parg_env =3D (void *)params_buf;
-> > > > > > > +
-> > > > > > > +    ret =3D (3 + 1) * 4;
-> > > > > > > +    *parg_env++ =3D (BOOTPARAM_ADDR + ret);
-> > > > > > > +    ret +=3D (1 + snprintf(params_buf + ret, 256 - ret, "g")=
-);
-> > > > > > > +
-> > > > > > > +    /* argv1 */
-> > > > > > > +    *parg_env++ =3D BOOTPARAM_ADDR + ret;
-> > > > > > > +    if (initrd_size > 0)
-> > > > > > > +        ret +=3D (1 + snprintf(params_buf + ret, 256 - ret,
-> > > > > > > +                "rd_start=3D0x" TARGET_FMT_lx " rd_size=3D%l=
-i %s",
-> > > > > > > +                PHYS_TO_VIRT((uint32_t)initrd_offset),
-> > > > > > > +                initrd_size, loaderparams.kernel_cmdline));
-> > > > > > > +    else
-> > > > > > > +        ret +=3D (1 + snprintf(params_buf + ret, 256 - ret, =
-"%s",
-> > > > > > > +                loaderparams.kernel_cmdline));
-> > > > > > > +
-> > > > > > > +    /* argv2 */
-> > > > > > > +    *parg_env++ =3D BOOTPARAM_ADDR + 4 * ret;
-> > > > > > > +
-> > > > > > > +    /* env */
-> > > > > > > +    sprintf(memenv, "%ld", loaderparams.ram_size > 0x1000000=
-0
-> > > > > > > +            ? 256 : (loaderparams.ram_size >> 20));
-> > > > > > > +    sprintf(highmemenv, "%ld", loaderparams.ram_size > 0x100=
-00000
-> > > > > > > +            ? (loaderparams.ram_size >> 20) - 256 : 0);
-> > > > > > > +
-> > > > > > > +    setenv("memsize", memenv, 1);
-> > > > > > > +    setenv("highmemsize", highmemenv, 1);
-> > > > > > > +
-> > > > > > > +    ret =3D ((ret + 32) & ~31);
-> > > > > > > +
-> > > > > > > +    boot_params_buf =3D (void *)(params_buf + ret);
-> > > > > > > +    boot_params_p =3D boot_params_buf + align(sizeof(struct =
-boot_params));
-> > > > > > > +
-> > > > > > > +    init_boot_param(boot_params_buf);
-> > > > > > > +
-> > > > > > > +    rom_add_blob_fixed("params", params_buf, params_size,
-> > > > > > > +                       BOOTPARAM_PHYADDR);
-> > > > > > > +    loaderparams.a0 =3D 2;
-> > > > > > > +    loaderparams.a1 =3D 0xffffffff80000000ULL + BOOTPARAM_PH=
-YADDR;
-> > > > > > > +    loaderparams.a2 =3D 0xffffffff80000000ULL + BOOTPARAM_PH=
-YADDR + ret;
-> > > > > > > +
-> > > > > > > +    return 0;
-> > > > > > > +}
-> > > > > > > +
-> > > > > > > +static int64_t load_kernel(CPUMIPSState *env)
-> > > > > > > +{
-> > > > > > > +    long kernel_size;
-> > > > > > > +    ram_addr_t initrd_offset;
-> > > > > > > +    int64_t kernel_entry, kernel_low, kernel_high, initrd_si=
-ze;
-> > > > > > > +
-> > > > > > > +    kernel_size =3D load_elf(loaderparams.kernel_filename, N=
-ULL,
-> > > > > > > +                           cpu_mips_kseg0_to_phys, NULL,
-> > > > > > > +                           (uint64_t *)&kernel_entry,
-> > > > > > > +                           (uint64_t *)&kernel_low, (uint64_=
-t *)&kernel_high,
-> > > > > > > +                           NULL, 0, EM_MIPS, 1, 0);
-> > > > > > > +    if (kernel_size < 0) {
-> > > > > > > +        error_report("could not load kernel '%s': %s",
-> > > > > > > +                     loaderparams.kernel_filename,
-> > > > > > > +                     load_elf_strerror(kernel_size));
-> > > > > > > +        exit(1);
-> > > > > > > +    }
-> > > > > > > +
-> > > > > > > +    /* load initrd */
-> > > > > > > +    initrd_size =3D 0;
-> > > > > > > +    initrd_offset =3D 0;
-> > > > > > > +    if (loaderparams.initrd_filename) {
-> > > > > > > +        initrd_size =3D get_image_size(loaderparams.initrd_f=
-ilename);
-> > > > > > > +        if (initrd_size > 0) {
-> > > > > > > +            initrd_offset =3D (kernel_high + ~INITRD_PAGE_MA=
-SK) &
-> > > > > > > +                            INITRD_PAGE_MASK;
-> > > > > > > +            initrd_offset =3D MAX(initrd_offset, INITRD_OFFS=
-ET);
-> > > > > > > +
-> > > > > > > +            if (initrd_offset + initrd_size > ram_size) {
-> > > > > > > +                error_report("memory too small for initial r=
-am disk '%s'",
-> > > > > > > +                             loaderparams.initrd_filename);
-> > > > > > > +                exit(1);
-> > > > > > > +            }
-> > > > > > > +
-> > > > > > > +            initrd_size =3D load_image_targphys(loaderparams=
-.initrd_filename,
-> > > > > > > +                                              initrd_offset,
-> > > > > > > +                                              ram_size - ini=
-trd_offset);
-> > > > > > > +        }
-> > > > > > > +
-> > > > > > > +        if (initrd_size =3D=3D (target_ulong) -1) {
-> > > > > > > +            error_report("could not load initial ram disk '%=
-s'",
-> > > > > > > +                         loaderparams.initrd_filename);
-> > > > > > > +            exit(1);
-> > > > > > > +        }
-> > > > > > > +    }
-> > > > > > > +
-> > > > > > > +    /* Setup prom parameters. */
-> > > > > > > +    set_prom_bootparam(initrd_offset, initrd_size);
-> > > > > > > +
-> > > > > > > +    return kernel_entry;
-> > > > > > > +}
-> > > > > > > +
-> > > > > > > +static void main_cpu_reset(void *opaque)
-> > > > > > > +{
-> > > > > > > +    MIPSCPU *cpu =3D opaque;
-> > > > > > > +    CPUMIPSState *env =3D &cpu->env;
-> > > > > > > +
-> > > > > > > +    cpu_reset(CPU(cpu));
-> > > > > > > +
-> > > > > > > +    /* Loongson-3 reset stuff */
-> > > > > > > +    if (loaderparams.kernel_filename) {
-> > > > > > > +        if (cpu =3D=3D MIPS_CPU(first_cpu)) {
-> > > > > > > +            env->active_tc.gpr[4] =3D loaderparams.a0;
-> > > > > > > +            env->active_tc.gpr[5] =3D loaderparams.a1;
-> > > > > > > +            env->active_tc.gpr[6] =3D loaderparams.a2;
-> > > > > > > +            env->active_tc.PC =3D loaderparams.kernel_entry;
-> > > > > > > +        }
-> > > > > > > +        env->CP0_Status &=3D ~((1 << CP0St_BEV) | (1 << CP0S=
-t_ERL));
-> > > > > > > +    }
-> > > > > > > +}
-> > > > > > > +
-> > > > > > > +static void loongson3_isa_init(qemu_irq intc)
-> > > > > >
-> > > > > > Rename it to loongson3-virt_isa_init.
-> > > > > >
-> > > > > > > +{
-> > > > > > > +    qemu_irq *i8259;
-> > > > > > > +    ISABus *isa_bus;
-> > > > > > > +
-> > > > > > > +    isa_bus =3D isa_bus_new(NULL, get_system_memory(), get_s=
-ystem_io(), &error_abort);
-> > > > > > > +
-> > > > > > > +    /* Interrupt controller */
-> > > > > > > +    /* The 8259 -> IP3  */
-> > > > > > > +    i8259 =3D i8259_init(isa_bus, intc);
-> > > > > > > +    isa_bus_irqs(isa_bus, i8259);
-> > > > > > > +    /* init other devices */
-> > > > > > > +    isa_create_simple(isa_bus, "i8042");
-> > > > > > > +    mc146818_rtc_init(isa_bus, 2000, NULL);
-> > > > > > > +}
-> > > > > > > +
-> > > > > > > +static inline void loongson3_pcie_init(MachineState *machine=
-, DeviceState *pic)
-> > > > > >
-> > > > > > Rename it to loongson3-virt_pcie_init.
-> > > > > >
-> > > > > > > +{
-> > > > > > > +    int i;
-> > > > > > > +    qemu_irq irq;
-> > > > > > > +    PCIBus *pci_bus;
-> > > > > > > +    DeviceState *dev;
-> > > > > > > +    MemoryRegion *pio_alias;
-> > > > > > > +    MemoryRegion *mmio_alias, *mmio_reg;
-> > > > > > > +    MemoryRegion *ecam_alias, *ecam_reg;
-> > > > > > > +
-> > > > > > > +    dev =3D qdev_create(NULL, TYPE_GPEX_HOST);
-> > > > > > > +
-> > > > > > > +    qdev_init_nofail(dev);
-> > > > > > > +    pci_bus =3D PCI_HOST_BRIDGE(dev)->bus;
-> > > > > > > +
-> > > > > > > +    ecam_alias =3D g_new0(MemoryRegion, 1);
-> > > > > > > +    ecam_reg =3D sysbus_mmio_get_region(SYS_BUS_DEVICE(dev),=
- 0);
-> > > > > > > +    memory_region_init_alias(ecam_alias, OBJECT(dev), "pcie-=
-ecam",
-> > > > > > > +                             ecam_reg, 0, VIRT_PCI_ECAM_SIZE=
-);
-> > > > > > > +    memory_region_add_subregion(get_system_memory(), VIRT_PC=
-I_ECAM_BASE, ecam_alias);
-> > > > > > > +
-> > > > > > > +    mmio_alias =3D g_new0(MemoryRegion, 1);
-> > > > > > > +    mmio_reg =3D sysbus_mmio_get_region(SYS_BUS_DEVICE(dev),=
- 1);
-> > > > > > > +    memory_region_init_alias(mmio_alias, OBJECT(dev), "pcie-=
-mmio",
-> > > > > > > +                             mmio_reg, VIRT_PCI_MEM_BASE, VI=
-RT_PCI_MEM_SIZE);
-> > > > > > > +    memory_region_add_subregion(get_system_memory(), VIRT_PC=
-I_MEM_BASE, mmio_alias);
-> > > > > > > +
-> > > > > > > +    pio_alias =3D g_new0(MemoryRegion, 1);
-> > > > > > > +    memory_region_init_alias(pio_alias, OBJECT(dev), "pcie-p=
-io",
-> > > > > > > +                             get_system_io(), 0, VIRT_PCI_IO=
-_SIZE);
-> > > > > > > +    memory_region_add_subregion(get_system_memory(), VIRT_PC=
-I_IO_BASE, pio_alias);
-> > > > > > > +    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 2, VIRT_PCI_IO_BASE=
-);
-> > > > > > > +
-> > > > > > > +    for (i =3D 0; i < GPEX_NUM_IRQS; i++) {
-> > > > > > > +        irq =3D qdev_get_gpio_in(pic, PCIE_IRQ_BASE + i);
-> > > > > > > +        sysbus_connect_irq(SYS_BUS_DEVICE(dev), i, irq);
-> > > > > > > +        gpex_set_irq_num(GPEX_HOST(dev), i, PCIE_IRQ_BASE + =
-i);
-> > > > > > > +    }
-> > > > > > > +
-> > > > > > > +    pci_vga_init(pci_bus);
-> > > > > > > +
-> > > > > > > +    for (i =3D 0; i < nb_nics; i++) {
-> > > > > > > +        NICInfo *nd =3D &nd_table[i];
-> > > > > > > +
-> > > > > > > +        if (!nd->model) {
-> > > > > > > +            nd->model =3D g_strdup("virtio");
-> > > > > > > +        }
-> > > > > > > +
-> > > > > > > +        pci_nic_init_nofail(nd, pci_bus, nd->model, NULL);
-> > > > > > > +    }
-> > > > > > > +}
-> > > > > > > +
-> > > > > > > +static void mips_loongson3_init(MachineState *machine)
-> > > > > >
-> > > > > > Rename it to loongson3-virt_init.
-> > > > > >
-> > > > > > > +{
-> > > > > > > +    int i;
-> > > > > > > +    long bios_size;
-> > > > > > > +    MIPSCPU *cpu;
-> > > > > > > +    CPUMIPSState *env;
-> > > > > > > +    char *filename;
-> > > > > > > +    const char *kernel_cmdline =3D machine->kernel_cmdline;
-> > > > > > > +    const char *kernel_filename =3D machine->kernel_filename=
-;
-> > > > > > > +    const char *initrd_filename =3D machine->initrd_filename=
-;
-> > > > > > > +    ram_addr_t ram_size =3D machine->ram_size;
-> > > > > > > +    MemoryRegion *address_space_mem =3D get_system_memory();
-> > > > > > > +    MemoryRegion *ram =3D g_new(MemoryRegion, 1);
-> > > > > > > +    MemoryRegion *bios =3D g_new(MemoryRegion, 1);
-> > > > > > > +    MemoryRegion *iomem =3D g_new(MemoryRegion, 1);
-> > > > > > > +
-> > > > > > > +    if (!kvm_enabled()) {
-> > > > > > > +        if (!machine->cpu_type) {
-> > > > > > > +            machine->cpu_type =3D MIPS_CPU_TYPE_NAME("Loongs=
-on-3A1000");
-> > > > > > > +        }
-> > > > > > > +        if (!strstr(machine->cpu_type, "Loongson-3A1000")) {
-> > > > > > > +            error_report("Loongson-3/TCG need cpu type Loong=
-son-3A1000");
-> > > > > > > +            exit(1);
-> > > > > > > +        }
-> > > > > > > +    } else {
-> > > > > > > +        if (!machine->cpu_type) {
-> > > > > > > +            machine->cpu_type =3D MIPS_CPU_TYPE_NAME("Loongs=
-on-3A4000");
-> > > > > > > +        }
-> > > > > > > +        if (!strstr(machine->cpu_type, "Loongson-3A4000")) {
-> > > > > > > +            error_report("Loongson-3/KVM need cpu type Loong=
-son-3A4000");
-> > > > > > > +            exit(1);
-> > > > > > > +        }
-> > > > > > > +    }
-> > > > > > > +
-> > > > > > > +    if (ram_size < 256 * 0x100000) {
-> > > > > > > +        error_report("Loongson-3 need at least 256MB memory"=
-);
-> > > > > > > +        exit(1);
-> > > > > > > +    }
-> > > > > > > +
-> > > > > > > +    for (i =3D 0; i < machine->smp.cpus; i++) {
-> > > > > > > +        /* init CPUs */
-> > > > > > > +        cpu =3D MIPS_CPU(cpu_create(machine->cpu_type));
-> > > > > > > +
-> > > > > > > +        /* Init internal devices */
-> > > > > > > +        cpu_mips_irq_init_cpu(cpu);
-> > > > > > > +        cpu_mips_clock_init(cpu);
-> > > > > > > +        qemu_register_reset(main_cpu_reset, cpu);
-> > > > > > > +    }
-> > > > > > > +    env =3D &MIPS_CPU(first_cpu)->env;
-> > > > > > > +
-> > > > > > > +    /* Allocate RAM/BIOS, 0x00000000~0x10000000 is alias of =
-0x80000000~0x90000000 */
-> > > > > > > +    memory_region_init_rom(bios, NULL, "loongson3.bios",
-> > > > > > > +                           BIOS_SIZE, &error_fatal);
-> > > > > > > +    memory_region_init_alias(ram, NULL, "loongson3.lowram",
-> > > > > > > +                           machine->ram, 0, 256 * 0x100000);
-> > > > > > > +    memory_region_init_io(iomem, NULL, &loongson3_pm_ops,
-> > > > > > > +                           NULL, "loongson3_pm", PM_MMIO_SIZ=
-E);
-> > > > > > > +
-> > > > > > > +    memory_region_add_subregion(address_space_mem, 0x0000000=
-0LL, ram);
-> > > > > > > +    memory_region_add_subregion(address_space_mem, 0x1fc0000=
-0LL, bios);
-> > > > > > > +    memory_region_add_subregion(address_space_mem, 0x8000000=
-0LL, machine->ram);
-> > > > > > > +    memory_region_add_subregion(address_space_mem, PM_MMIO_A=
-DDR, iomem);
-> > > > > > > +
-> > > > > > > +    /*
-> > > > > > > +     * We do not support flash operation, just loading pmon.=
-bin as raw BIOS.
-> > > > > > > +     * Please use -L to set the BIOS path and -bios to set b=
-ios name.
-> > > > > > > +     */
-> > > > > > > +
-> > > > > > > +    if (kernel_filename) {
-> > > > > > > +        loaderparams.ram_size =3D ram_size;
-> > > > > > > +        loaderparams.kernel_filename =3D kernel_filename;
-> > > > > > > +        loaderparams.kernel_cmdline =3D kernel_cmdline;
-> > > > > > > +        loaderparams.initrd_filename =3D initrd_filename;
-> > > > > > > +        loaderparams.kernel_entry =3D load_kernel(env);
-> > > > > > > +        rom_add_blob_fixed("bios",
-> > > > > > > +                         bios_boot_code, sizeof(bios_boot_co=
-de), 0x1fc00000LL);
-> > > > > > > +    } else {
-> > > > > > > +        if (bios_name =3D=3D NULL) {
-> > > > > > > +                bios_name =3D LOONGSON3_BIOSNAME;
-> > > > > > > +        }
-> > > > > > > +        filename =3D qemu_find_file(QEMU_FILE_TYPE_BIOS, bio=
-s_name);
-> > > > > > > +        if (filename) {
-> > > > > > > +            bios_size =3D load_image_targphys(filename, 0x1f=
-c00000LL,
-> > > > > > > +                                            BIOS_SIZE);
-> > > > > > > +            g_free(filename);
-> > > > > > > +        } else {
-> > > > > > > +            bios_size =3D -1;
-> > > > > > > +        }
-> > > > > > > +
-> > > > > > > +        if ((bios_size < 0 || bios_size > BIOS_SIZE) &&
-> > > > > > > +            !kernel_filename && !qtest_enabled()) {
-> > > > > > > +            error_report("Could not load MIPS bios '%s'", bi=
-os_name);
-> > > > > > > +            exit(1);
-> > > > > > > +        }
-> > > > > > > +
-> > > > > > > +        fw_conf_init(ram_size);
-> > > > > > > +        rom_add_blob_fixed("fw_conf",
-> > > > > > > +                         &fw_config, sizeof(fw_config), FW_C=
-ONF_ADDR);
-> > > > > > > +    }
-> > > > > > > +
-> > > > > > > +    msi_nonbroken =3D true;
-> > > > > > > +    loongson3_isa_init(env->irq[3]);
-> > > > > > > +    loongson3_pcie_init(machine, isa_pic);
-> > > > > >
-> > > > > > Names for two last functions should be already different.
-> > > > > >
-> > > > > > > +
-> > > > > > > +    if (serial_hd(0)) {
-> > > > > > > +        serial_mm_init(address_space_mem, 0x1fe001e0, 0, env=
-->irq[2],
-> > > > > > > +                           115200, serial_hd(0), DEVICE_NATI=
-VE_ENDIAN);
-> > > > > > > +    }
-> > > > > > > +}
-> > > > > > > +
-> > > > > > > +static void mips_loongson3_machine_init(MachineClass *mc)
-> > > > > >
-> > > > > > Rename it to loongson3-virt_machine_init.
-> > > > > >
-> > > > > > > +{
-> > > > > > > +    mc->desc =3D "Generic Loongson-3 Platform";
-> > > > > > > +    mc->init =3D mips_loongson3_init;
-> > > > > > > +    mc->block_default_type =3D IF_IDE;
-> > > > > > > +    mc->max_cpus =3D LOONGSON_MAX_VCPUS;
-> > > > > > > +    mc->default_ram_id =3D "loongson3.highram";
-> > > > > > > +    mc->default_ram_size =3D 1200 * MiB;
-> > > > > > > +    mc->kvm_type =3D mips_kvm_type;
-> > > > > > > +    mc->minimum_page_bits =3D 14;
-> > > > > > > +}
-> > > > > > > +
-> > > > > > > +DEFINE_MACHINE("loongson3", mips_loongson3_machine_init)
-> > > > > >
-> > > > > > DEFINE_MACHINE("loongson3-virt", loongson3-virt_machine_init)
-> > > > > >
-> > > > > > > --
-> > > > > > > 2.7.0
-> > > > > > >
+But I don't know what's the QEMU project policy is here.
+
+>>> With that said I did run into a small issue I set-up Win10 1903 (aka 19H1) and it seems like VMBus now requires to have the following features enabled:
+>>> HV_VP_RUNTIME_AVAILABLE
+>>> HV_TIME_REF_COUNT_AVAILABLE
+>>> HV_SYNIC_AVAILABLE
+>>> HV_SYNTIMERS_AVAILABLE
+>>> HV_APIC_ACCESS_AVAILABLE
+>>> HV_HYPERCALL_AVAILABLE
+>>> HV_VP_INDEX_AVAILABLE
+>>>
+>>> So notice that previously only SYNIC and VPINDEX was needed, now you need the whole thing so you need to run qemu with something like
+>>> -cpu host,hv-relaxed,hv_spinlocks=0x1fff,hv_time,hv-vapic,hv-vpindex,hv-synic,hv-runtime,hv-stimer
+>>>
+>>> The validation was done in winhv!WinHvpCheckPartitionPrivileges .
+>>>
+>>> Paolo I noticed you have done a PULL request, would you like to wait on it and we will submit a version with a single IRQ (selectable by user property) and go with Igor's suggestion dropping _PS* and _STA (though like I said before I prefer to mimic the original HyperV with it's bugs, but I'll leave this decision to you).
+>>
+>> The code is already in the upstream QEMU tree, it's a known-working code,
+>> so I think it is better to simply work incrementally on further improving
+>> the current version rather than backing it out and merging it again later.
+>>
+>> This way it will (hopefully) get some wider testing sooner.
+>>
+>> Not to mention that it is less likely for some other QEMU change to
+>> accidentally break it.
+>>
+> 
+> That's great I agree incrementally is the right way here, should we open another Thread to discuss all these changes or do you prefer we will keep going on this one?
+
+If that's going to be an incremental change it is probably worth its
+own email thread.
+Otherwise the existing one will grow without bounds.
+
+>>> Also today VMBus only verifies SYNIC is enabled I'm not sure how but I wonder if we want to some how exports from the CPU which other HV features are enabled so we can verify all the required ones are set, would appreciate if you have any suggestions here.
+>>>
+> 
+> Thanks,
+> -- Jon.
+
+Thanks,
+Maciej
 
