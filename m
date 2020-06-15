@@ -2,119 +2,128 @@ Return-Path: <SRS0=tJVC=74=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EB39C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 09:34:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52397C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 09:35:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 23D0C206B7
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 09:34:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 23D0C206B7
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 219B72065F
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 09:35:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="Rw4jdsFy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 219B72065F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41118 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44188 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jklW4-0001qu-8c
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 05:34:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37410)
+	id 1jklWi-00036N-Ei
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 05:35:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37624)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jklV0-00014H-65
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 05:33:50 -0400
-Received: from mout.kundenserver.de ([212.227.17.10]:48685)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jklVn-0001k4-4I; Mon, 15 Jun 2020 05:34:39 -0400
+Received: from mail-db8eur05on2106.outbound.protection.outlook.com
+ ([40.107.20.106]:29632 helo=EUR05-DB8-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jklUy-0004YF-7N
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 05:33:49 -0400
-Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
- (mreue109 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1M7JvO-1jqIKx2ugW-007oyB; Mon, 15 Jun 2020 11:33:43 +0200
-To: Filip Bozuta <filip.bozuta@syrmia.com>, qemu-devel@nongnu.org
-References: <20200612164001.27405-1-filip.bozuta@syrmia.com>
- <20200612164001.27405-2-filip.bozuta@syrmia.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Subject: Re: [PATCH 1/2] linux-user: Add thunk argument types for SIOCGSTAMP
- and SIOCGSTAMPNS
-Message-ID: <c6902958-51fc-0215-de52-6bcb11cb440a@vivier.eu>
-Date: Mon, 15 Jun 2020 11:33:42 +0200
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jklVk-0004o0-AD; Mon, 15 Jun 2020 05:34:38 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Hmcmy23fEWQvOgkqrhVK0y9FGpL8K+pZ7SF3ukGXCx/5xEGODWFD9JBzE/AKgXXPUR1mKgdJRE/ayNXOnqrQcuzKUyd0VaeA8Mi7Ri7yXoTfEag0FX4lyY2bwVwjJgnVEquIlngGzCyphvpFyiBDos46WLAte3w0fLhiQc5T/P6KUfXZ+h0YrZ8aLqVp9fkZA0nmtaoOmIIC3ytJg2+v8udn0Zt4S/C2R8F94Bzm5UgjFSqf8kaPhX8wjAxTWqPww6d/y1yWSrl2V5iLPRrG5me4V5ptjW7OQ2xqIOQJFhikchpTF/nkewd5xbNbaRpfCzChJANN6Doai4t7yfY1ag==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=78c7cgtrVIy2pwpBLqerMk5GNh9d2+RB33K+brSXS5o=;
+ b=NBgr0DKYK1eseUeSOmUyd5Lzx2Gy26uyms7UJ/LaZFyYwLU+YlMQQd5b1ZWSGBLTykwNNhLJB1Ck3QswZq7wh5x9cU9fsAPzKLKUynTfO87oqH3oPy3kP4o01M5XD5/oEBVTJP6P7jN/gWzjn+k+WclbgrYvojlrg0R/6N9rGDcVbHN1ShN4qvHsv5c8mI5vsj24wbhaV3Ecn5VWjfTZ1QJisnguGM3i4PQCfcPfnJ5QtHu/KwxUfSX4DUYQDJqI6gIjtc9hRGuypGFdzLXZy/wJXXgOeOsoniEBSWF67ojfQXQAW74apRkJm/Sf7AO4ZIJAFOMNDl8ym5xP+bS4og==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=78c7cgtrVIy2pwpBLqerMk5GNh9d2+RB33K+brSXS5o=;
+ b=Rw4jdsFyPGnORLYB6fE5K+kkAlgrb8n1/QDfE4ci6FMxI9Sy2788e3uKERDPv6W/nmXiVJFcZ2Nuv5OU5QWFVYsoaUi1vMj2BeoarseQvOL2mX2mNkzuZFOMXDrOtXZKB7TqMQc61gbz52PbtCdcbSiqkv4FjVuEmcXyAyZ42eo=
+Authentication-Results: virtuozzo.com; dkim=none (message not signed)
+ header.d=none;virtuozzo.com; dmarc=none action=none
+ header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM7PR08MB5366.eurprd08.prod.outlook.com (2603:10a6:20b:10b::11)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3088.19; Mon, 15 Jun
+ 2020 09:34:31 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312%3]) with mapi id 15.20.3088.028; Mon, 15 Jun 2020
+ 09:34:31 +0000
+Subject: Re: [PATCH 2/4] block/aio_task: allow start/wait task from any
+ coroutine
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: "Denis V. Lunev" <den@openvz.org>, qemu-block@nongnu.org,
+ qemu-devel@nongnu.org
+References: <20200611171143.21589-1-den@openvz.org>
+ <20200611171143.21589-3-den@openvz.org>
+ <46a4083e-8944-e46b-ea77-0283c0ed5069@virtuozzo.com>
+Message-ID: <93966e61-df72-8d3d-87dc-95dc25ec37d4@virtuozzo.com>
+Date: Mon, 15 Jun 2020 12:34:29 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
-MIME-Version: 1.0
-In-Reply-To: <20200612164001.27405-2-filip.bozuta@syrmia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: fr
+ Thunderbird/68.8.1
+In-Reply-To: <46a4083e-8944-e46b-ea77-0283c0ed5069@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:OYoFDpO3/uis3Cub9cqg18ace4RxA475bwgi+a2p/+SAiCk1TeP
- LaA5+fQozazsIwZ3EVm81tRvE3mvn4CnCRPVI1k/XPPVrxDfe3mfjy71aO0WpCjtlTB0urX
- oDjek2LPBD3Xk3IuabcBkkDLaflymusHUsbcjur9rKr7fQYVXHE4+w//E0T/qm53RPvQVhh
- EOQXhYFzfoqoDOnKenYDA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:Qs//D8iVnss=:zeZ03ZmAQ/q7wkaZ4Y1dPh
- boSmp3HocdMQFmzVsWFB4GiQlQInk800NTga445F/vOoyrehpdbz2WgPp9ytZQqNxPFUtcZ96
- l4Wa/xci/YCe4hM8U7wq9qmDJG12HwGEzYUKWw1Fb0JxS/zd/IjDZQrV1gG+jLu12fgIEJbZv
- raWU3Bs8Dv3KPscJuVLjLHMqFCbzWU/MCteM/APIQeQpBdg048Z5romyZsyzSHDgRtxBMmEHk
- H0iiLQJpkaEfdHj/iQ8ch2hPHgeCdR+Dt0WBPVfmoYVFmPoRB/Vt4xbzUuDofE8z8MX4Qmopx
- 6UsZfSNNRxcVT9F4aZx4jp4C4TSLvgnogG9HiLnlyYd5MVWYBHIfdJNbZMYXf9LicPGOCZjx1
- eQrremUpf7+q8EJx9ZquWxhVH95l744WYfREkJb0ubQzSZDBnzEFyeMuJW88ozhrzolks9PM1
- 8YF9EbwaiyId1AHTtlDZxiptrUvcwUbSiKeyn74T5sJm9lyAtxrQdewNFIt1U2Yd4Smy1PHEf
- 3oGPd2E64/qzZZNc5QvKl0g1eRp5JsHdQiNfekSwTnrz58AS+k4kO0Ta1jJeUZCdDR/xKcpvc
- 7LM56yxR3hVbSIYZH4hf3y7gIQMhcozvJmoAerEixW6krGAm+F411eOhyZie8S1AImOlqthPD
- i2dyCucKTbAw8tEWtOYmc2VYxDCzO22VaZX0R9FeSBsSjDVLkAxEtUHUnYUV9jYbeiXQfGGaY
- RccRmgov2DHpyHa2+6SgvatbnzlysHrym7GNCOMKu40aQsShJOoisLGFFn+xDzGnvwkTCnVVV
- nWLIuvK+pYQNBs0nunZIjHPV+fNLJ3/B6FhrLo+Kx3FD1j9hbGyEY7zHLegvWvRl1jp4SLS
-Received-SPF: none client-ip=212.227.17.10; envelope-from=laurent@vivier.eu;
- helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 05:33:45
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -28
-X-Spam_score: -2.9
-X-Spam_bar: --
-X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
+X-ClientProxiedBy: AM4PR0202CA0013.eurprd02.prod.outlook.com
+ (2603:10a6:200:89::23) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.182) by
+ AM4PR0202CA0013.eurprd02.prod.outlook.com (2603:10a6:200:89::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3088.18 via Frontend
+ Transport; Mon, 15 Jun 2020 09:34:30 +0000
+X-Originating-IP: [185.215.60.182]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 23d53acf-c9cb-4e34-5621-08d8110f4ea3
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5366:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM7PR08MB5366034B51C56B74A0379BA8C19C0@AM7PR08MB5366.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-Forefront-PRVS: 04359FAD81
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: hWiDRwOLbBQibyQhOfB1Fe+kOTNFKvfiPhtdXNL8E8aqE7djaCMXKaC+2lBDMNmiGKuy37Zv6QX2t2Edh4/KhlzA95aPyorYrjWnLVnY8iuzHJtjiH61gIztWQG9hlpXCoG3TaAMyLOLWWkiA6izObqRqNBGFgCTMb57PGrLSDyGw6rywTZ9ySZ+VHX3RY7lco1Mpxs3/GaETPyMfvS1esCg5aj2q3hPoNvV0F9MNe987RYTsujWjMt45MIKGtEPf6OXAzXjGj+z3tB8Q1msoyHq7fVzq6D8pYsQuCLnqMVPTMVcSt63/FWeS9wIpLK9wWJ4jvbQuDatHZ1q48H6sEY6bzqDlTBjKYe3YVowTat3j8rEesTpWzMbHI3yCnZp
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(346002)(136003)(366004)(376002)(396003)(39840400004)(316002)(52116002)(16576012)(107886003)(5660300002)(956004)(2616005)(54906003)(8676002)(26005)(16526019)(36756003)(478600001)(186003)(8936002)(4326008)(83380400001)(2906002)(6486002)(31696002)(31686004)(86362001)(66556008)(66946007)(66476007)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: drj19O+d3K+bcrWEPAS6AVlX+Ip3i479z3p6k2WHbcuCs7AOEg/X67u8xzxfgt+Ud2sMXZgh5gi5JNFgH9RmG7XWdkGlYgcfckESnZ7Aqpp18r6Hqp+lphRjkg402jBttBz4zLHkykvig3kAHDnEwP9mQwkLnIumUiENXVjYiDwCYiYUE7r3l1TO3+Ovcji5239VqSFSDgsjet164La8AirXKUAtU0D8eGF02hs8MY0aiYOFQEO2/Yv8pf+OWmxxWpAET8nStz/IytuOsfGEHv1YXKtV9SjApEUpRxs4awwRSfSB23UZJJsDbFu/Ked9S/7u+cCFNhUOlOgiEHJqDrwhRJBoQYid/eBbVET1m/6643DaE3IzR0sQJ8xAQovpmDdyc+e1dzzag/QWrupNP9OloE9u+pZvmfSF3UXcL7YDBUUpbvJBsVm5k2SCFP4RFWMhAba6HqWjx+4+ActTaeFmZynINM8/uMY/PHrLidfeio7odvXU3UPhqstnh6g2
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 23d53acf-c9cb-4e34-5621-08d8110f4ea3
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jun 2020 09:34:31.5743 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: s1q1Vec7KbQK6S2Vku18t8WtAW8gzGvJGjatrgQSli7YhZ/KXmjbGJbe06yw+a3L85/0q59+SN79ahfbfzKbFD5JkXC0DjcxjIDfCfly0SM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5366
+Received-SPF: pass client-ip=40.107.20.106;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR05-DB8-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 05:34:33
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -37
+X-Spam_score: -3.8
+X-Spam_bar: ---
+X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -127,105 +136,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Juan Quintela <quintela@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Denis Plotnikov <dplotnikov@virtuozzo.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 12/06/2020 à 18:40, Filip Bozuta a écrit :
-> From: Filip Bozuta <Filip.Bozuta@syrmia.com>
+15.06.2020 10:47, Vladimir Sementsov-Ogievskiy wrote:
+> 11.06.2020 20:11, Denis V. Lunev wrote:
+>> From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>>
+>> Currently, aio task pool assumes that there is a main coroutine, which
+>> creates tasks and wait for them. Let's remove the restriction by using
+>> CoQueue. Code becomes clearer, interface more obvious.
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> Signed-off-by: Denis V. Lunev <den@openvz.org>
+>> CC: Kevin Wolf <kwolf@redhat.com>
+>> CC: Max Reitz <mreitz@redhat.com>
+>> CC: Stefan Hajnoczi <stefanha@redhat.com>
+>> CC: Fam Zheng <fam@euphon.net>
+>> CC: Juan Quintela <quintela@redhat.com>
+>> CC: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>> CC: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> CC: Denis Plotnikov <dplotnikov@virtuozzo.com>
+>> ---
+>>   block/aio_task.c | 21 ++++++---------------
+>>   1 file changed, 6 insertions(+), 15 deletions(-)
+>>
+>> diff --git a/block/aio_task.c b/block/aio_task.c
+>> index 88989fa248..cf62e5c58b 100644
+>> --- a/block/aio_task.c
+>> +++ b/block/aio_task.c
+>> @@ -27,11 +27,10 @@
+>>   #include "block/aio_task.h"
+>>   struct AioTaskPool {
+>> -    Coroutine *main_co;
+>>       int status;
+>>       int max_busy_tasks;
+>>       int busy_tasks;
+>> -    bool waiting;
+>> +    CoQueue waiters;
+>>   };
+>>   static void coroutine_fn aio_task_co(void *opaque)
+>> @@ -52,31 +51,23 @@ static void coroutine_fn aio_task_co(void *opaque)
+>>       g_free(task);
+>> -    if (pool->waiting) {
+>> -        pool->waiting = false;
+>> -        aio_co_wake(pool->main_co);
+>> -    }
+>> +    qemu_co_queue_restart_all(&pool->waiters);
+>>   }
+>>   void coroutine_fn aio_task_pool_wait_one(AioTaskPool *pool)
+>>   {
+>>       assert(pool->busy_tasks > 0);
+>> -    assert(qemu_coroutine_self() == pool->main_co);
+>> -    pool->waiting = true;
+>> -    qemu_coroutine_yield();
+>> +    qemu_co_queue_wait(&pool->waiters, NULL);
+>> -    assert(!pool->waiting);
+>>       assert(pool->busy_tasks < pool->max_busy_tasks);
 > 
-> Socket ioctls SIOCGSTAMP and SIOCGSTAMPNS, used for timestamping the socket
-> connection, are defined in file "ioctls.h" differently from other ioctls.
-> The reason for this difference is explained in the comments above their definition.
-> These ioctls didn't have defined thunk argument types before changes from this
-> patch. They have special handling functions ("do_ioctl_SIOCGSTAMP" and
-> "do_ioctl_SIOCGSTAMPNS") that take care of setting values for approppriate argument
-> types (struct timeval and struct timespec) and thus no thunk argument types were
-> needed for their implementation. But this patch adds those argument type definitions
-> in file "syscall_types.h" and "ioctls.h" as it is needed for printing arguments
-> of these ioctls with strace.
+> As we wake up several coroutines now, I'm afraid this assertion may start to fire.
+> And aio_task_pool_wait_one() becomes useless as a public API (still, it's used only locally, so we can make it static).
 > 
-> Implementation notes:
-> 
->     There are two variants of these ioctls: SIOCGSTAMP_OLD/SIOCGSTAM_NEW and
->     SIOCGSTAMPNS_OLD/SIOCGSTAMPNS_NEW. One is the old existing definition and the
->     other is the 2038 safe variant used for 32-bit architectures. These variants
->     use types "struct timeval/timeval64" and "struct timespec/timespec64" respectively.
->     That is the reason why corresponding structure definitions were added in file
->     "syscall_types.h". STRUCT_timeval definition was already inside the file as
->     it is used by another implemented ioctl.
-> 
-> Signed-off-by: Filip Bozuta <Filip.Bozuta@syrmia.com>
-> ---
->  linux-user/ioctls.h        | 12 ++++++++----
->  linux-user/syscall_types.h | 12 ++++++++++++
->  2 files changed, 20 insertions(+), 4 deletions(-)
-> 
-> diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-> index 0defa1d8c1..68d43f71cc 100644
-> --- a/linux-user/ioctls.h
-> +++ b/linux-user/ioctls.h
-> @@ -279,13 +279,17 @@
->     * FIXME: create a macro to define this kind of entry
->     */
->    { TARGET_SIOCGSTAMP_OLD, TARGET_SIOCGSTAMP_OLD,
-> -    "SIOCGSTAMP_OLD", IOC_R, do_ioctl_SIOCGSTAMP },
-> +    "SIOCGSTAMP_OLD", IOC_R, do_ioctl_SIOCGSTAMP,
-> +    { MK_PTR(MK_STRUCT(STRUCT_timeval)) } },
->    { TARGET_SIOCGSTAMPNS_OLD, TARGET_SIOCGSTAMPNS_OLD,
-> -    "SIOCGSTAMPNS_OLD", IOC_R, do_ioctl_SIOCGSTAMPNS },
-> +    "SIOCGSTAMPNS_OLD", IOC_R, do_ioctl_SIOCGSTAMPNS,
-> +    { MK_PTR(MK_STRUCT(STRUCT_timespec)) } },
->    { TARGET_SIOCGSTAMP_NEW, TARGET_SIOCGSTAMP_NEW,
-> -    "SIOCGSTAMP_NEW", IOC_R, do_ioctl_SIOCGSTAMP },
-> +    "SIOCGSTAMP_NEW", IOC_R, do_ioctl_SIOCGSTAMP,
-> +    { MK_PTR(MK_STRUCT(STRUCT_timeval64)) } },
->    { TARGET_SIOCGSTAMPNS_NEW, TARGET_SIOCGSTAMPNS_NEW,
-> -    "SIOCGSTAMPNS_NEW", IOC_R, do_ioctl_SIOCGSTAMPNS },
-> +    "SIOCGSTAMPNS_NEW", IOC_R, do_ioctl_SIOCGSTAMPNS,
-> +    { MK_PTR(MK_STRUCT(STRUCT_timespec64)) } },
->  
->    IOCTL(RNDGETENTCNT, IOC_R, MK_PTR(TYPE_INT))
->    IOCTL(RNDADDTOENTCNT, IOC_W, MK_PTR(TYPE_INT))
-> diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
-> index 4e12c1661e..a5ad5a9ddc 100644
-> --- a/linux-user/syscall_types.h
-> +++ b/linux-user/syscall_types.h
-> @@ -137,10 +137,22 @@ STRUCT(snd_timer_params,
->         TYPE_INT, /* filter */
->         MK_ARRAY(TYPE_CHAR, 60)) /* reserved */
->  
-> +STRUCT(timeval,
-> +       TYPE_LONG, /* tv_sec */
-> +       TYPE_LONG) /* tv_usec */
-
-You have to manage the case when tv_usec is int.
-See linux-user/syscall_defs.h, target_timeval (and
-target__kernel_sock_timeval)
-
-> +
-> +STRUCT(timeval64,
-> +       TYPE_LONGLONG, /* tv_sec */
-> +       TYPE_LONGLONG) /* tv_usec */
-
-perhaps you could call this "target__kernel_sock_timeval" as it is in
-linux-user/syscall_defs.h.
-
-> +
->  STRUCT(timespec,
->         TYPE_LONG, /* tv_sec */
->         TYPE_LONG) /* tv_nsec */
->  
-> +STRUCT(timespec64,
-> +       TYPE_LONGLONG, /* tv_sec */
-> +       TYPE_LONGLONG) /* tv_nsec */
-> +
-
-ditto: target__kernel_timespec
-
->  STRUCT(snd_timer_status,
->         MK_STRUCT(STRUCT_timespec), /* tstamp */
->         TYPE_INT, /* resolution */
+> I'll send updated patch after reviewing the rest of the series.
 > 
 
+Hm, OK, we have two kinds of waiters: waiting for a slot and for all tasks to finish. So, either we need two queues, or do like this patch (one queue, but wake-up all waiters, for them to check does their condition satisfied or not).
+
+I'm OK with this patch with the following squashed-in:
+
+diff --git a/include/block/aio_task.h b/include/block/aio_task.h
+index 50bc1e1817..50b1c036c5 100644
+--- a/include/block/aio_task.h
++++ b/include/block/aio_task.h
+@@ -48,7 +48,6 @@ bool aio_task_pool_empty(AioTaskPool *pool);
+  void coroutine_fn aio_task_pool_start_task(AioTaskPool *pool, AioTask *task);
+  
+  void coroutine_fn aio_task_pool_wait_slot(AioTaskPool *pool);
+-void coroutine_fn aio_task_pool_wait_one(AioTaskPool *pool);
+  void coroutine_fn aio_task_pool_wait_all(AioTaskPool *pool);
+  
+  #endif /* BLOCK_AIO_TASK_H */
+diff --git a/block/aio_task.c b/block/aio_task.c
+index cf62e5c58b..7ba15ff41f 100644
+--- a/block/aio_task.c
++++ b/block/aio_task.c
+@@ -54,26 +54,17 @@ static void coroutine_fn aio_task_co(void *opaque)
+      qemu_co_queue_restart_all(&pool->waiters);
+  }
+  
+-void coroutine_fn aio_task_pool_wait_one(AioTaskPool *pool)
+-{
+-    assert(pool->busy_tasks > 0);
+-
+-    qemu_co_queue_wait(&pool->waiters, NULL);
+-
+-    assert(pool->busy_tasks < pool->max_busy_tasks);
+-}
+-
+  void coroutine_fn aio_task_pool_wait_slot(AioTaskPool *pool)
+  {
+      while (pool->busy_tasks >= pool->max_busy_tasks) {
+-        aio_task_pool_wait_one(pool);
++        qemu_co_queue_wait(&pool->waiters, NULL);
+      }
+  }
+  
+  void coroutine_fn aio_task_pool_wait_all(AioTaskPool *pool)
+  {
+      while (pool->busy_tasks > 0) {
+-        aio_task_pool_wait_one(pool);
++        qemu_co_queue_wait(&pool->waiters, NULL);
+      }
+  }
+  
+
+
+
+-- 
+Best regards,
+Vladimir
 
