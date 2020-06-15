@@ -2,84 +2,85 @@ Return-Path: <SRS0=tJVC=74=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 574E0C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 12:12:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82976C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 12:17:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2337520679
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 12:12:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1D75E206B7
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 12:17:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NhSTWWgM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2337520679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="J9Kmpis0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D75E206B7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44496 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46938 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jknyu-0005eN-AD
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 08:12:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46084)
+	id 1jko3p-00073e-5Z
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 08:17:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46842)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mtosatti@redhat.com>)
- id 1jknxh-0004zy-Ig
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 08:11:37 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:52136
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mtosatti@redhat.com>)
- id 1jknxf-0007cv-K7
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 08:11:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592223094;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type;
- bh=dEcd7Ou8Wc2IM9OEpa2krlue9KWBHBJ5MmJhN3pvDxo=;
- b=NhSTWWgM62Kf0VcJi89PWUbMs7mBDJvgl3T+qTw6cFkxUWhJrBxKZRPWLqiu/QLBuNrd+A
- wuDaJ6GSNDrx2RtL447BFyukZXA8C+ZCDRaWA4zUUQ3OgqKfHZfjFzpJDTWrqCJXKqOW2B
- R4vYa5DHNZ8CPYhMQDWZghAxYrK6Z/w=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-196-reJFroX6NsCuo-629NVw0Q-1; Mon, 15 Jun 2020 08:10:24 -0400
-X-MC-Unique: reJFroX6NsCuo-629NVw0Q-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DCEE68C23B8;
- Mon, 15 Jun 2020 12:09:52 +0000 (UTC)
-Received: from fuller.cnet (ovpn-112-3.gru2.redhat.com [10.97.112.3])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5F61C80883;
- Mon, 15 Jun 2020 12:09:52 +0000 (UTC)
-Received: by fuller.cnet (Postfix, from userid 1000)
- id 31640430716A; Mon, 15 Jun 2020 09:01:27 -0300 (-03)
-Date: Mon, 15 Jun 2020 09:01:27 -0300
-From: Marcelo Tosatti <mtosatti@redhat.com>
-To: qemu-devel <qemu-devel@nongnu.org>, kvm-devel <kvm@vger.kernel.org>
-Subject: [PATCH] kvm: i386: allow TSC to differ by NTP correction bounds
- without TSC scaling
-Message-ID: <20200615120127.GB224592@fuller.cnet>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jko21-0006Sx-OV
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 08:16:05 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:39231)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jko1z-0008IV-7q
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 08:16:05 -0400
+Received: by mail-ot1-x343.google.com with SMTP id g5so12910134otg.6
+ for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 05:16:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=jH+FVUcLyGZ8+p75rBAz48h/mZlYR0NcFtss6SMrdsg=;
+ b=J9Kmpis0bRU9anee1/c80QlEwsCdXRIvA4fsM1sAbuJmfBj+OqRsVDTI68fHpPR/Lx
+ Wo0pv7KmySacs1yNsEJdBcSLZ7TWFx6B9HjwBOERIlXxBZHuXlQjzxB68xezFqOgRoU+
+ prfYM68i5WLbOrNsSOJj8EczWu4oTJWEiSE6J8ItLSKT/bmiRTsUhfL0xMXWNX20Wq6e
+ a01l7ocgKz4WIk/73NFwmBfSDKrL5iUzIEgsi70kFASSR2khl8nHH3cDjeC22Qm2du3v
+ cr8cI6CDv7U9onCTiI79kJY74+Wj8kaKg9NSkOV28LjS3OeKjXMlXBCW9NZmR35Nr5rY
+ HfYg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=jH+FVUcLyGZ8+p75rBAz48h/mZlYR0NcFtss6SMrdsg=;
+ b=V6hKRHZx+BUTsS9lh+uq9Bsz978LiByy0zz2NsAQA8EFxjckoCClWWPyNZTHTYBWtY
+ ClZdaa4uJRuz0Eg2gswOCIRX/+N7bltA/+AO9t8e7lQsc6zaZaKGpm4Lme7ytkcnGJMn
+ KwKj7t24DYUWAM5FEp1L3NuBkasJ7JWxt2Km/7P2ovs25i6J8M4LS6Ob9biaN2sYjWsX
+ VN7l+PeFVfhBENZV41ck18Yt0ABDDJLGQHwz7ZWi5xPl3ZclrshmS69IiaN1/2XrHy+T
+ cXvZt7wnjpSQjUxf9iPt/B6+q8BJbQrEJY+AWD+Q4lHO6uUYN+oPp8tRbNAADZgwv+AB
+ G89A==
+X-Gm-Message-State: AOAM530Z2wkXOfCoe3JYFCmC6CGPL5/08E83pPsuEebGy1y9xJG8vIOr
+ 5OObbPOATPMI+kZmmLDkONTSDvEU4D/Aqr3klmuvnw==
+X-Google-Smtp-Source: ABdhPJwP1vMgYIexUy5+aDAD/Z8j7wrHxgKKADEUrtUqaayZGQu+/vBymL3boHhM4SG+ZEx+glOBa4ayYvMno80Jtu4=
+X-Received: by 2002:a05:6830:8d:: with SMTP id
+ a13mr20958370oto.91.1592223360506; 
+ Mon, 15 Jun 2020 05:16:00 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=mtosatti@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 01:12:36
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+References: <20200608121243.2076-1-fangying1@huawei.com>
+In-Reply-To: <20200608121243.2076-1-fangying1@huawei.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 15 Jun 2020 13:15:49 +0100
+Message-ID: <CAFEAcA-ez0aNE6ASFM1PXs_PaqAuBzOqRhbYVAmrEhooPzmP0A@mail.gmail.com>
+Subject: Re: [PATCH v3] target/arm/cpu: adjust virtual time for arm cpu
+To: Ying Fang <fangying1@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::343;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x343.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -92,119 +93,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: Andrew Jones <drjones@redhat.com>, qemu-arm <qemu-arm@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, wu.wubin@huawei.com,
+ zhanghailiang <zhang.zhanghailiang@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Mon, 8 Jun 2020 at 13:12, Ying Fang <fangying1@huawei.com> wrote:
+>
+> From: fangying <fangying1@huawei.com>
+>
+> Virtual time adjustment was implemented for virt-5.0 machine type,
+> but the cpu property was enabled only for host-passthrough and
+> max cpu model. Let's add it for arm cpu which has the generic timer
+> feature enabled.
+>
+> Suggested-by: Andrew Jones <drjones@redhat.com>
+> Signed-off-by: Ying Fang <fangying1@huawei.com>
 
-The Linux TSC calibration procedure is subject to small variations
-(its common to see +-1 kHz difference between reboots on a given CPU, for example).
 
-So migrating a guest between two hosts with identical processor can fail, in case 
-of a small variation in calibrated TSC between them.
 
-Allow a conservative 250ppm error between host TSC and VM TSC frequencies,
-rather than requiring an exact match. NTP daemon in the guest can
-correct this difference.
+Applied to target-arm.next, thanks (with a minor commit message
+wording tweak, and the suggested-by tag removed).
 
-Also change migration to accept this bound.
-
-Signed-off-by: Marcelo Tosatti <mtosatti@redhat.com>
-
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 34f8387..257fee4 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -739,23 +739,44 @@ static int kvm_arch_set_tsc_khz(CPUState *cs)
- {
-     X86CPU *cpu = X86_CPU(cs);
-     CPUX86State *env = &cpu->env;
--    int r;
-+    int r, cur_freq;
-+    bool set_ioctl = false;
- 
-     if (!env->tsc_khz) {
-         return 0;
-     }
- 
--    r = kvm_check_extension(cs->kvm_state, KVM_CAP_TSC_CONTROL) ?
-+    cur_freq = kvm_check_extension(cs->kvm_state, KVM_CAP_GET_TSC_KHZ) ?
-+               kvm_vcpu_ioctl(cs, KVM_GET_TSC_KHZ) : -ENOTSUP;
-+
-+    /*
-+     * If TSC scaling is supported, attempt to set TSC frequency.
-+     */
-+    if (kvm_check_extension(cs->kvm_state, KVM_CAP_TSC_CONTROL)) {
-+        set_ioctl = true;
-+    }
-+
-+    /*
-+     * If desired TSC frequency is within bounds of NTP correction,
-+     * attempt to set TSC frequency.
-+     */
-+    if (cur_freq != -ENOTSUP && freq_within_bounds(cur_freq, env->tsc_khz)) {
-+        set_ioctl = true;
-+    }
-+
-+    r = set_ioctl ?
-         kvm_vcpu_ioctl(cs, KVM_SET_TSC_KHZ, env->tsc_khz) :
-         -ENOTSUP;
-+
-     if (r < 0) {
-         /* When KVM_SET_TSC_KHZ fails, it's an error only if the current
-          * TSC frequency doesn't match the one we want.
-          */
--        int cur_freq = kvm_check_extension(cs->kvm_state, KVM_CAP_GET_TSC_KHZ) ?
--                       kvm_vcpu_ioctl(cs, KVM_GET_TSC_KHZ) :
--                       -ENOTSUP;
--        if (cur_freq <= 0 || cur_freq != env->tsc_khz) {
-+        cur_freq = kvm_check_extension(cs->kvm_state, KVM_CAP_GET_TSC_KHZ) ?
-+                   kvm_vcpu_ioctl(cs, KVM_GET_TSC_KHZ) :
-+                   -ENOTSUP;
-+        if (cur_freq <= 0 || (cur_freq != env->tsc_khz &&
-+                              !freq_within_bounds(cur_freq, env->tsc_khz))) {
-             warn_report("TSC frequency mismatch between "
-                         "VM (%" PRId64 " kHz) and host (%d kHz), "
-                         "and TSC scaling unavailable",
-diff --git a/target/i386/kvm_i386.h b/target/i386/kvm_i386.h
-index 00bde7a..ebf9a64 100644
---- a/target/i386/kvm_i386.h
-+++ b/target/i386/kvm_i386.h
-@@ -47,4 +47,20 @@ bool kvm_has_x2apic_api(void);
- 
- bool kvm_hv_vpindex_settable(void);
- 
-+/*
-+ * Check whether target_freq is within conservative
-+ * ntp correctable bounds (250ppm) of freq
-+ */
-+static inline bool freq_within_bounds(int freq, int target_freq)
-+{
-+        int max_freq = freq + (freq * 250 / 1000000);
-+        int min_freq = freq - (freq * 250 / 1000000);
-+
-+        if (target_freq >= min_freq && target_freq <= max_freq) {
-+                return true;
-+        }
-+
-+        return false;
-+}
-+
- #endif
-diff --git a/target/i386/machine.c b/target/i386/machine.c
-index 0c96531..b052654 100644
---- a/target/i386/machine.c
-+++ b/target/i386/machine.c
-@@ -300,7 +300,7 @@ static int cpu_post_load(void *opaque, int version_id)
-     int i;
- 
-     if (env->tsc_khz && env->user_tsc_khz &&
--        env->tsc_khz != env->user_tsc_khz) {
-+        !freq_within_bounds(env->tsc_khz, env->user_tsc_khz)) {
-         error_report("Mismatch between user-specified TSC frequency and "
-                      "migrated TSC frequency");
-         return -EINVAL;
-
+-- PMM
 
