@@ -2,78 +2,81 @@ Return-Path: <SRS0=tJVC=74=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC4E8C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 19:23:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33CF5C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 19:23:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AFBE420756
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 19:23:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F0EFC20756
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 19:23:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="czUi2N6z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AFBE420756
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dGxpRwG/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0EFC20756
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57246 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57554 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkuho-0007qD-U8
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 15:23:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44866)
+	id 1jkuhr-0007xd-6j
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 15:23:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44880)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jkugu-0006K5-7V
+ id 1jkugu-0006KD-Ph
  for qemu-devel@nongnu.org; Mon, 15 Jun 2020 15:22:44 -0400
-Received: from mail-wm1-x32d.google.com ([2a00:1450:4864:20::32d]:50347)
+Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:42716)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jkugs-0003oC-HN
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 15:22:43 -0400
-Received: by mail-wm1-x32d.google.com with SMTP id l17so685499wmj.0
+ id 1jkugt-0003oG-5a
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 15:22:44 -0400
+Received: by mail-wr1-x42f.google.com with SMTP id p5so18291075wrw.9
  for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 12:22:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id;
- bh=3sNxJGe6/WG8AxHJSSsAdnGlRxS3BbW/MHU3XkK3cEw=;
- b=czUi2N6zo/Hf3dHJoO99nnHpEdEXpnt4WOHffLR5Z3FvcYjTgxcNe174rYqEIFNRC9
- /zbIp5Pv6wpdGUhSnE98gKPKJv+pIwOCQuaJdCcSJU9v4vIVtR5h+7YD/7CaxOkDDSDo
- jawx9dpSWgZsrasCqgIy9lrM6kuPJkf/iqnL/JMFYxeu8CpnwybbFDwKFHSutpy/eKNE
- E9j1l82GDapZtnwuI67AGhc8HAbP/a9K+JMkUp4/iBlfIS9KL9o3Mwo/dEEN1SezsywC
- nnhCb75TD8B1kSBv7K4MB9Sb/c3ERvuwOR8M3L6WaUIY8O4IhYJcQS8eQdClltcYtQ/4
- /CaQ==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=bhNHHGAWghjftc/HKLdKGz55TUKqNK7zCNOxSxW8eWM=;
+ b=dGxpRwG/XOyRf32xWNtP7GlRA+8n7lKAJfWqof8s/+OkNe1Mx613eKql35r1mKkeOV
+ uTTXTl1kL7iKHnHG5hcOGEzchTQWOVAg2uK1NDVVUtENw/Lq47iAqoPL1Opti96TZZcS
+ lVz1OmXIZGOGDOTt+MeqcqYAavWy2cyVn5Awd3F/LofbaWo6Eh1V5hSy5US/KOcacyR0
+ xqkuwgSlIpr9ywWJ3v/2nfGMejZcVJ5GmnaQ4dk/chq8mXDxZiWX6oyWUt8gWKlAY1Q6
+ P++vZUPZzZYGZQ2kDAE5cp1yo5fSNCcqkrp53lr7xFsTeZQwYd9xpdu+ASjG05ewU87M
+ KAyw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id;
- bh=3sNxJGe6/WG8AxHJSSsAdnGlRxS3BbW/MHU3XkK3cEw=;
- b=R3Jsst6rQJATOG1HZbItdWJOBNfIt2VShOHrTw/8yPsFzTEzLwVLiLBG9Q0ogsNqwJ
- bWymuVQb90ViJEaLq2fYqHpijAdM+wN8CRbuVP7cy2eYXVhv9BdEN9zLdYf+OsTEWZRV
- jL0y/+P/N2ZmuuP2C0ujnySWpGl0hmUIclwAz1rXQQq81xwwQph+sSBcc6OGMCjY26BK
- hJZHcswyVe9FCIESfdMoEoldzzm3cPOjCf83WITgk3Z4fKJ6y596T5SOYVtFpzj1XVN0
- y6aB9Gu1ZH61MdkM4LVtFu9Gq21vst0Xz4zSGN4bQwi7mR/w0GmMTqEd7G917hYb47B8
- ePxA==
-X-Gm-Message-State: AOAM532WOYmGp56vUMa6iWK28zTvXpbvW2jPqYbmZpV2Up2jyXFfGtck
- jZNuZYLdWv3jJfk5K3lRQ9SHjGuc
-X-Google-Smtp-Source: ABdhPJyXBQFtjED7p7qhKWkOZUv85Y5rtFVZHHG9vif1PDKqaPknyCvR220EBIhYI3Z0rXtKX36ugQ==
-X-Received: by 2002:a1c:740e:: with SMTP id p14mr847683wmc.155.1592248960670; 
- Mon, 15 Jun 2020 12:22:40 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=bhNHHGAWghjftc/HKLdKGz55TUKqNK7zCNOxSxW8eWM=;
+ b=qgLL0/c20p92Fx3xLoL6AU4PjbL++ZJxvmDEodDDGoFOgbNBeICZTwKGsFpqSap1sR
+ jQIy6qnw3CcCgmJY6OvyUwgWfwLRuGCYt4IKfJH+Aa2WCSZ2iMcD6J2yMYWE0crn+9H7
+ 5N8PqGFzRSj6SvxzDmlIV3SmMPqO128dY4QN2KlL1Rtoxk3zm132H3iBoIN2OX6EMhpY
+ +L5fFqVQDJUOZia8rTOUZBgO+9dFzlhC9TdrScsrw81OOoHaXLmpp+5HpkEBDJJR2Ax/
+ 1NS7okM7IpdKVRL3BfqZtkCwx8ZBFALHhVrrr/F/avIyxFjgrtIxYOaxX7VUVKUZBoMb
+ ywrA==
+X-Gm-Message-State: AOAM530kfF/x3rxpcVBBXS9wbIIzXmUqJYVWIGkJupzcFM/Yoxyh8pb1
+ B+ajL36QBXAidu2myKdC/obhCQWH
+X-Google-Smtp-Source: ABdhPJxtPq5Hn4gQt4zArqnlOz9T3JnO63LdejL1/dOQsSxsIdw96Km5QoVMUfqqB/8+vplDLjeMDg==
+X-Received: by 2002:a5d:554a:: with SMTP id g10mr31390439wrw.334.1592248961546; 
+ Mon, 15 Jun 2020 12:22:41 -0700 (PDT)
 Received: from rtrkw774-lin.syrmia.com ([46.240.135.226])
  by smtp.gmail.com with ESMTPSA id 50sm27823909wra.1.2020.06.15.12.22.40
  (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 15 Jun 2020 12:22:40 -0700 (PDT)
+ Mon, 15 Jun 2020 12:22:41 -0700 (PDT)
 From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
 To: qemu-devel@nongnu.org,
 	peter.maydell@linaro.org
-Subject: [PULL 00/18] MIPS + misc queue for June 15th, 2020
-Date: Mon, 15 Jun 2020 21:22:15 +0200
-Message-Id: <1592248953-8162-1-git-send-email-aleksandar.qemu.devel@gmail.com>
+Subject: [PULL 01/18] target/mips: Legalize Loongson insn flags
+Date: Mon, 15 Jun 2020 21:22:16 +0200
+Message-Id: <1592248953-8162-2-git-send-email-aleksandar.qemu.devel@gmail.com>
 X-Mailer: git-send-email 2.7.4
-Received-SPF: pass client-ip=2a00:1450:4864:20::32d;
- envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wm1-x32d.google.com
+In-Reply-To: <1592248953-8162-1-git-send-email-aleksandar.qemu.devel@gmail.com>
+References: <1592248953-8162-1-git-send-email-aleksandar.qemu.devel@gmail.com>
+Received-SPF: pass client-ip=2a00:1450:4864:20::42f;
+ envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wr1-x42f.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -95,81 +98,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: aleksandar.qemu.devel@gmail.com
+Cc: aleksandar.qemu.devel@gmail.com, Jiaxun Yang <jiaxun.yang@flygoat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit 81b53858fed8a316a4715c2f7f92cdfb4a7b4dd8:
+From: Jiaxun Yang <jiaxun.yang@flygoat.com>
 
-  target/mips: msa: Split helpers for SUBS_U.<B|H|W|D> (2020-06-15 20:50:40 +0200)
+To match the actual status of Loongson insn, we split flags
+for LMMI and LEXT from INSN_LOONGSON2F.
 
-are available in the git repository at:
+As Loongson-2F only implemented interger part of LEXT, we'll
+not enable LEXT for the processor, but instead we're still using
+INSN_LOONGSON2F as switch flag of these instructions.
 
-  https://github.com/AMarkovic/qemu tags/mips-queue-jun-15-2020
+All multimedia instructions have been moved to LMMI flag. Loongson-2F
+and Loongson-3A are sharing these instructions.
 
-for you to fetch changes up to 250bc43a406f7d46e319abe87c19548d4f027828:
+Signed-off-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
+Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Signed-off-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Message-Id: <20200614080049.31134-2-jiaxun.yang@flygoat.com>
+---
+ target/mips/mips-defs.h |  4 ++--
+ target/mips/translate.c | 13 +++++++------
+ 2 files changed, 9 insertions(+), 8 deletions(-)
 
-  translations: Add Swedish language (2020-06-15 20:51:10 +0200)
-
-----------------------------------------------------------------
-
-MIPS + misc queue for June 15th, 2020
-
-  Highlights:
-
-    This pull request, just exceptionally, contains two non-MIPS patches:
-
-      - adjust sh4 maintainership
-      - add Swedish translations
-
-    The rest are MIPS patches:
-
-      - refactor emulation of a number of MSA instructions
-      - activate Loongson-related insn_flags
-
-    Notes:
-
-      - one checkpatch warning is benign
-      - some of make check iotest-qcow2 tests fail on my system, both before
-        and after applying the patches from this pull request
-
-----------------------------------------------------------------
-
-
-Aleksandar Markovic (15):
-  target/mips: msa: Split helpers for MADDV.<B|H|W|D>
-  target/mips: msa: Split helpers for MSUBV.<B|H|W|D>
-  target/mips: msa: Split helpers for DPADD_S.<H|W|D>
-  target/mips: msa: Split helpers for DPADD_U.<H|W|D>
-  target/mips: msa: Split helpers for DPSUB_S.<H|W|D>
-  target/mips: msa: Split helpers for DPSUB_U.<H|W|D>
-  target/mips: msa: Split helpers for DOTP_S.<H|W|D>
-  target/mips: msa: Split helpers for DOTP_U.<H|W|D>
-  target/mips: msa: Split helpers for SUBS_S.<B|H|W|D>
-  target/mips: msa: Split helpers for SUBS_U.<B|H|W|D>
-  target/mips: msa: Split helpers for SUBSUS_U.<B|H|W|D>
-  target/mips: msa: Split helpers for SUBSUU_S.<B|H|W|D>
-  target/mips: msa: Split helpers for SUBV.<B|H|W|D>
-  target/mips: msa: Split helpers for MULV.<B|H|W|D>
-  MAINTAINERS: Adjust sh4 maintainership
-
-Jiaxun Yang (2):
-  target/mips: Legalize Loongson insn flags
-  target/mips: Add comments for vendor-specific ASEs
-
-Sebastian Rasmussen (1):
-  translations: Add Swedish language
-
- target/mips/helper.h     |   73 ++-
- target/mips/mips-defs.h  |    8 +-
- target/mips/msa_helper.c | 1296 ++++++++++++++++++++++++++++++++++++----------
- target/mips/translate.c  |  213 +++++++-
- MAINTAINERS              |    8 +-
- po/sv.po                 |   75 +++
- 6 files changed, 1364 insertions(+), 309 deletions(-)
- create mode 100644 po/sv.po
-
+diff --git a/target/mips/mips-defs.h b/target/mips/mips-defs.h
+index 0c12910..f1b833f 100644
+--- a/target/mips/mips-defs.h
++++ b/target/mips/mips-defs.h
+@@ -70,7 +70,7 @@
+ #define CPU_VR54XX      (CPU_MIPS4 | INSN_VR54XX)
+ #define CPU_R5900       (CPU_MIPS3 | INSN_R5900)
+ #define CPU_LOONGSON2E  (CPU_MIPS3 | INSN_LOONGSON2E)
+-#define CPU_LOONGSON2F  (CPU_MIPS3 | INSN_LOONGSON2F)
++#define CPU_LOONGSON2F  (CPU_MIPS3 | INSN_LOONGSON2F | ASE_LMMI)
+ 
+ #define CPU_MIPS5       (CPU_MIPS4 | ISA_MIPS5)
+ 
+@@ -97,7 +97,7 @@
+ /* Wave Computing: "nanoMIPS" */
+ #define CPU_NANOMIPS32  (CPU_MIPS32R6 | ISA_NANOMIPS32)
+ 
+-#define CPU_LOONGSON3A  (CPU_MIPS64R2 | INSN_LOONGSON3A)
++#define CPU_LOONGSON3A  (CPU_MIPS64R2 | INSN_LOONGSON3A | ASE_LMMI | ASE_LEXT)
+ 
+ /*
+  * Strictly follow the architecture standard:
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index 2caf4cb..e49f32f 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -1046,7 +1046,7 @@ enum {
+     OPC_BC2NEZ  = (0x0D << 21) | OPC_CP2,
+ };
+ 
+-#define MASK_LMI(op)    (MASK_OP_MAJOR(op) | (op & (0x1F << 21)) | (op & 0x1F))
++#define MASK_LMMI(op)    (MASK_OP_MAJOR(op) | (op & (0x1F << 21)) | (op & 0x1F))
+ 
+ enum {
+     OPC_PADDSH      = (24 << 21) | (0x00) | OPC_CP2,
+@@ -3421,7 +3421,8 @@ static void gen_ld(DisasContext *ctx, uint32_t opc,
+     TCGv t0, t1, t2;
+     int mem_idx = ctx->mem_idx;
+ 
+-    if (rt == 0 && ctx->insn_flags & (INSN_LOONGSON2E | INSN_LOONGSON2F)) {
++    if (rt == 0 && ctx->insn_flags & (INSN_LOONGSON2E | INSN_LOONGSON2F |
++                                      INSN_LOONGSON3A)) {
+         /*
+          * Loongson CPU uses a load to zero register for prefetch.
+          * We emulate it as a NOP. On other CPU we must perform the
+@@ -5531,7 +5532,7 @@ static void gen_loongson_multimedia(DisasContext *ctx, int rd, int rs, int rt)
+     TCGv_i64 t0, t1;
+     TCGCond cond;
+ 
+-    opc = MASK_LMI(ctx->opcode);
++    opc = MASK_LMMI(ctx->opcode);
+     switch (opc) {
+     case OPC_ADD_CP2:
+     case OPC_SUB_CP2:
+@@ -27161,7 +27162,7 @@ static void decode_opc_special2_legacy(CPUMIPSState *env, DisasContext *ctx)
+     case OPC_MULTU_G_2F:
+     case OPC_MOD_G_2F:
+     case OPC_MODU_G_2F:
+-        check_insn(ctx, INSN_LOONGSON2F);
++        check_insn(ctx, INSN_LOONGSON2F | ASE_LEXT);
+         gen_loongson_integer(ctx, op1, rd, rs, rt);
+         break;
+     case OPC_CLO:
+@@ -27194,7 +27195,7 @@ static void decode_opc_special2_legacy(CPUMIPSState *env, DisasContext *ctx)
+     case OPC_DDIVU_G_2F:
+     case OPC_DMOD_G_2F:
+     case OPC_DMODU_G_2F:
+-        check_insn(ctx, INSN_LOONGSON2F);
++        check_insn(ctx, INSN_LOONGSON2F | ASE_LEXT);
+         gen_loongson_integer(ctx, op1, rd, rs, rt);
+         break;
+ #endif
+@@ -30641,7 +30642,7 @@ static void decode_opc(CPUMIPSState *env, DisasContext *ctx)
+         }
+         break;
+     case OPC_CP2:
+-        check_insn(ctx, INSN_LOONGSON2F);
++        check_insn(ctx, ASE_LMMI);
+         /* Note that these instructions use different fields.  */
+         gen_loongson_multimedia(ctx, sa, rd, rt);
+         break;
 -- 
 2.7.4
 
