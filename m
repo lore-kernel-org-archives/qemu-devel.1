@@ -2,87 +2,97 @@ Return-Path: <SRS0=tJVC=74=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE88DC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 16:18:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E706C433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 16:19:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A819F20663
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 16:18:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 58AED20663
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 16:19:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ia0/iCOs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A819F20663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CupwCTMO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58AED20663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45926 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49004 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkror-0007Ia-Pn
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 12:18:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52668)
+	id 1jkrpw-0000Bg-Kx
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 12:19:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52904)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jkrno-0005zs-Fz; Mon, 15 Jun 2020 12:17:40 -0400
-Received: from mail-il1-x143.google.com ([2607:f8b0:4864:20::143]:36651)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jkroX-0007A1-RH; Mon, 15 Jun 2020 12:18:25 -0400
+Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:40071)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jkrnm-00040h-N0; Mon, 15 Jun 2020 12:17:40 -0400
-Received: by mail-il1-x143.google.com with SMTP id a13so15875246ilh.3;
- Mon, 15 Jun 2020 09:17:37 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jkroW-0004B7-0H; Mon, 15 Jun 2020 12:18:25 -0400
+Received: by mail-ed1-x544.google.com with SMTP id p18so11956526eds.7;
+ Mon, 15 Jun 2020 09:18:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=hI9MX4ofyyUfruODIlPBhDAbqYvRiqrXJQq+F+BFs1M=;
- b=ia0/iCOsdFHjyruRBIleN6Pb1uw/SmEH79k5Z+N2SjBLEfKKjTGvwpY8/8DdhnRA2K
- Ekq6YE8mn+zk5UZX+PRB9Rb94ms6/+BKrWn0KpqoJYVXA7YqzCCdqLEnjJMOFEJvfve8
- bMd+7S61eZnwVCkxhv6PhR93od5EIKEJMa30MdT+BSR3QbCJW63lXnKTV7BNBUn7XWXy
- E071vNc1b1InZ5nVRtzFIuhD+UH7Hl5pdd8bNSjCiR+qkv0gfeubsQR9/0MKyuTs2o3X
- /ZKSP/MiiH7UNEW6wrT8BvEOHqBnIt93+5+H9otIN3kdjY61RFF3E95uaJTlAgaOiDs+
- Yfyg==
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=zC4goslGunDLLrNxY4ATSQMQcFz/lPFddQgtcjnZqng=;
+ b=CupwCTMOUfSPgQPbktUrbFB2lbOSeajPPY4L1qlAjtuHSD2rXpOfsFzT7Ck46gl832
+ aREtpQYp7HItdSj+3fauiwZKhJZeT0oOQ/L25ObpuXYAzqwMxI/VPZd101Iz4szdmNN2
+ v+cZ9FZJ9nJ3MyDgTh1hWik7BA/XCoBSJU6SS2YAbt4eYVIm51apwYmVwyTwhBbiQRim
+ AUP/P8GpXXu5G/AVVsBwL+4g3duT7ht/tEzrAbDKeVrg3Rb8s4rSqzboZ1r2Uowj/t0O
+ OlQRNLVRgGsGGdaPGEG1O6IxUblEOW8yzY/KFYoljMJPJnm7Q8CeracGw8+hREdlpFjq
+ bI2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=hI9MX4ofyyUfruODIlPBhDAbqYvRiqrXJQq+F+BFs1M=;
- b=jrylOc7qc8A5+qo3ZdFawJbNWCzeM2gn+/1sGwA6eGFB7NIyst5RZUcDFEv/U6bVYj
- rNkGpK1iRoHOIQRiU/lmScccb0WJdIvt1xdprqyXLNLhsBbbU5I/mDrjPNZg7CJPaL3j
- lMogv5n9D8f/0c7s6Eel7CGsYJ21HqhVXPY09zQPc8nS+m64Ns1kd1cwhajNzMcxGB6T
- /+i+7dRscTtqWzlUbhNS2yw9Jz7V7qMYambwEEriVuNgnroq1Eiq00E02Mxs/YQB6CbP
- nYWdFeqIWa3mo3S8aPLyyZwboDBXzDso8lveB3Qu++ozO7VhG7T9xL56kYVB13hrWCSQ
- G86A==
-X-Gm-Message-State: AOAM532/OLCt+urK8f0xTlI/KIAx2nMPR5BFtVZ+KAIkRi4xW7Qqgj/c
- hndkYPGvha6BFxovDI0awnULpkl9b46LlhQGNdo=
-X-Google-Smtp-Source: ABdhPJzhbR/oe70IMDJ3kDyqkmKMxRxOBeKbR3GkGiU+3mkXeAfNm2WewAAzaWIIWW0MY9mMTyMyttYQBZ5IWq0SnKU=
-X-Received: by 2002:a92:aa07:: with SMTP id j7mr27549997ili.40.1592237856632; 
- Mon, 15 Jun 2020 09:17:36 -0700 (PDT)
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=zC4goslGunDLLrNxY4ATSQMQcFz/lPFddQgtcjnZqng=;
+ b=Zz27/UENbbf5Sx8xew4JrZDEN+nXAhO9AGQRmHIq56iwjq5XHEA3+H3CXkuvkyqlBD
+ izEmf97wcExdGOHoE2elUGkqjo35T3uiKkQFvGzAezr59fDZUk45iC43q8m4rooYPAKF
+ 42Rgo80B6hVy/Me+4hSdqaT0Id57L3uyklYVyoN83g7XlFKLmkWWGFFbBLAN/497od5s
+ W7USbLsEwE0UG95G/t26bP7WOeRfr++qMOk3E3Uez7hYGKxFggvWFmZWICZ4ntpWMCnH
+ N3x5Xxh1WrEVqiCwzfFXHRluID879BuWV3w1BS9JYVVrpkiqPLvYut7LotNuoQST79ze
+ 4iPQ==
+X-Gm-Message-State: AOAM53065H7gZViyenEgczfEYBz3iWp37+IYv2kuRiNoj/jbICCEfU7V
+ xvndXa4L6Hajn82hdo+sFyWIEf82
+X-Google-Smtp-Source: ABdhPJyoRFAdV2eP4lLeGb9/JfwVlgRLtlGFEf3MyV3X7DmdmuGAkNQ1whkcAqOAXdrqNG9bSy7WwA==
+X-Received: by 2002:a50:a701:: with SMTP id h1mr23910970edc.170.1592237901453; 
+ Mon, 15 Jun 2020 09:18:21 -0700 (PDT)
+Received: from [192.168.1.38] (181.red-88-10-103.dynamicip.rima-tde.net.
+ [88.10.103.181])
+ by smtp.gmail.com with ESMTPSA id g22sm8676688edj.63.2020.06.15.09.18.20
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 15 Jun 2020 09:18:20 -0700 (PDT)
+Subject: Re: [RFC PATCH v2 5/5] hw/arm/tosa: Use LED device for the Bluetooth
+ led
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20200612175440.9901-1-f4bug@amsat.org>
+ <20200612175440.9901-6-f4bug@amsat.org>
+ <CAFEAcA9tMd0VxEm_O1yre36kWp0U48SZj8tMna25h5M02X-_VQ@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <d2f6adcc-a796-26bf-9463-5e9bbc143197@amsat.org>
+Date: Mon, 15 Jun 2020 18:18:19 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-References: <1591625864-31494-1-git-send-email-bmeng.cn@gmail.com>
- <1591625864-31494-5-git-send-email-bmeng.cn@gmail.com>
-In-Reply-To: <1591625864-31494-5-git-send-email-bmeng.cn@gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 15 Jun 2020 09:08:13 -0700
-Message-ID: <CAKmqyKObYVrCuYHKWKLYYcJEQJMxoCvRbYVTBObXm_crtCJSzQ@mail.gmail.com>
-Subject: Re: [PATCH 04/15] hw/riscv: sifive_u: Generate device tree node for
- OTP
-To: Bin Meng <bmeng.cn@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::143;
- envelope-from=alistair23@gmail.com; helo=mail-il1-x143.google.com
+In-Reply-To: <CAFEAcA9tMd0VxEm_O1yre36kWp0U48SZj8tMna25h5M02X-_VQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::544;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ed1-x544.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,60 +105,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Bin Meng <bin.meng@windriver.com>,
- "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Palmer Dabbelt <palmerdabbelt@google.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>
+Cc: Markus Armbruster <armbru@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Esteban Bosse <estebanbosse@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jun 8, 2020 at 7:21 AM Bin Meng <bmeng.cn@gmail.com> wrote:
->
-> From: Bin Meng <bin.meng@windriver.com>
->
-> Upstream U-Boot v2020.07 codes switch to access SiFive FU540 OTP
-> based on device tree information. Let's generate the device tree
-> node for OTP.
->
-> Signed-off-by: Bin Meng <bin.meng@windriver.com>
+On 6/15/20 6:00 PM, Peter Maydell wrote:
+> On Fri, 12 Jun 2020 at 18:54, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>>
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> ---
+>>  hw/arm/tosa.c  | 7 +++----
+>>  hw/arm/Kconfig | 1 +
+>>  2 files changed, 4 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/hw/arm/tosa.c b/hw/arm/tosa.c
+>> index 5dee2d76c6..86d7e0283a 100644
+>> --- a/hw/arm/tosa.c
+>> +++ b/hw/arm/tosa.c
+>> @@ -24,6 +24,7 @@
+>>  #include "hw/irq.h"
+>>  #include "hw/ssi/ssi.h"
+>>  #include "hw/sysbus.h"
+>> +#include "hw/misc/led.h"
+>>  #include "exec/address-spaces.h"
+>>
+>>  #define TOSA_RAM    0x04000000
+>> @@ -68,9 +69,6 @@ static void tosa_microdrive_attach(PXA2xxState *cpu)
+>>  static void tosa_out_switch(void *opaque, int line, int level)
+>>  {
+>>      switch (line) {
+>> -        case 0:
+>> -            fprintf(stderr, "blue LED %s.\n", level ? "on" : "off");
+>> -            break;
+>>          case 1:
+>>              fprintf(stderr, "green LED %s.\n", level ? "on" : "off");
+>>              break;
+> 
+> Why convert the blue LED and not the green, amber or wlan LEDs ?
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+I don't have the schematics to verify the mapping is correct:
 
-Alistair
+#define TOSA_GPIO_BT_LED		(TOSA_SCOOP_JC_GPIO_BASE + 0)
+#define TOSA_GPIO_NOTE_LED		(TOSA_SCOOP_JC_GPIO_BASE + 1)
+#define TOSA_GPIO_CHRG_ERR_LED		(TOSA_SCOOP_JC_GPIO_BASE + 2)
+#define TOSA_GPIO_TC6393XB_L3V_ON	(TOSA_SCOOP_JC_GPIO_BASE + 5)
+#define TOSA_GPIO_WLAN_LED		(TOSA_SCOOP_JC_GPIO_BASE + 7)
 
-> ---
->
->  hw/riscv/sifive_u.c | 11 +++++++++++
->  1 file changed, 11 insertions(+)
->
-> diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-> index cf7f833..8dc6842 100644
-> --- a/hw/riscv/sifive_u.c
-> +++ b/hw/riscv/sifive_u.c
-> @@ -207,6 +207,17 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
->      g_free(cells);
->      g_free(nodename);
->
-> +    nodename = g_strdup_printf("/soc/otp@%lx",
-> +        (long)memmap[SIFIVE_U_OTP].base);
-> +    qemu_fdt_add_subnode(fdt, nodename);
-> +    qemu_fdt_setprop_cell(fdt, nodename, "fuse-count", SIFIVE_U_OTP_REG_SIZE);
-> +    qemu_fdt_setprop_cells(fdt, nodename, "reg",
-> +        0x0, memmap[SIFIVE_U_OTP].base,
-> +        0x0, memmap[SIFIVE_U_OTP].size);
-> +    qemu_fdt_setprop_string(fdt, nodename, "compatible",
-> +        "sifive,fu540-c000-otp");
-> +    g_free(nodename);
-> +
->      prci_phandle = phandle++;
->      nodename = g_strdup_printf("/soc/clock-controller@%lx",
->          (long)memmap[SIFIVE_U_PRCI].base);
-> --
-> 2.7.4
->
->
+static void tosa_out_switch(void *opaque, int line, int level)
+{
+    switch (line) {
+        case 0:
+            fprintf(stderr, "blue LED %s.\n", level ? "on" : "off");
+            break;
+        case 1:
+            fprintf(stderr, "green LED %s.\n", level ? "on" : "off");
+            break;
+        case 2:
+            fprintf(stderr, "amber LED %s.\n", level ? "on" : "off");
+            break;
+        case 3:
+            fprintf(stderr, "wlan LED %s.\n", level ? "on" : "off");
+            break;
+        default:
+            fprintf(stderr, "Uhandled out event: %d = %d\n", line, level);
+            break;
+    }
+}
+
+    qdev_connect_gpio_out(scp1, TOSA_GPIO_BT_LED, outsignals[0]);
+    qdev_connect_gpio_out(scp1, TOSA_GPIO_NOTE_LED, outsignals[1]);
+    qdev_connect_gpio_out(scp1, TOSA_GPIO_CHRG_ERR_LED, outsignals[2]);
+    qdev_connect_gpio_out(scp1, TOSA_GPIO_WLAN_LED, outsignals[3]);
+
+I wanted a simple proof-of-concept I could test with a board,
+to show how easy this API can be used.
+
+Using the binaries from here:
+https://www.omegamoon.com/blog/static.php?page=ZaurusAndroid
+
+the blue LED never blinks, probably because we remove the
+bluetooth stack. Or maybe I haven't figured the correct
+command line options.
+
+For the next RFC I plan to rework to have a single LED container
+per board, to have a unique singleton object that generates QMP
+events.
+
+> 
+> thanks
+> -- PMM
+> 
 
