@@ -2,72 +2,120 @@ Return-Path: <SRS0=tJVC=74=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D57CEC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 11:52:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F229C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 11:53:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A908620714
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 11:52:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A908620714
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4885520707
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 11:53:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4885520707
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58100 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32842 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jknfP-0006bV-0P
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 07:52:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41046)
+	id 1jkngR-0007qr-Kf
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 07:53:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41468)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jianjay.zhou@huawei.com>)
- id 1jkndn-0004jc-QY; Mon, 15 Jun 2020 07:51:03 -0400
-Received: from szxga02-in.huawei.com ([45.249.212.188]:2524 helo=huawei.com)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jknfQ-0006nu-11
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 07:52:44 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:59177)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jianjay.zhou@huawei.com>)
- id 1jkndl-0003lo-B8; Mon, 15 Jun 2020 07:51:03 -0400
-Received: from DGGEMM403-HUB.china.huawei.com (unknown [172.30.72.53])
- by Forcepoint Email with ESMTP id C61B361BFF711532955C;
- Mon, 15 Jun 2020 19:50:52 +0800 (CST)
-Received: from DGGEMM423-HUB.china.huawei.com (10.1.198.40) by
- DGGEMM403-HUB.china.huawei.com (10.3.20.211) with Microsoft SMTP Server (TLS)
- id 14.3.487.0; Mon, 15 Jun 2020 19:50:52 +0800
-Received: from DGGEMM528-MBX.china.huawei.com ([169.254.8.27]) by
- dggemm423-hub.china.huawei.com ([10.1.198.40]) with mapi id 14.03.0487.000;
- Mon, 15 Jun 2020 19:50:42 +0800
-From: "Zhoujian (jay)" <jianjay.zhou@huawei.com>
-To: zhukeqian <zhukeqian1@huawei.com>, "qemu-devel@nongnu.org"
- <qemu-devel@nongnu.org>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "Paolo
- Bonzini" <pbonzini@redhat.com>
-Subject: RE: [PATCH] migration: Count new_dirty instead of real_dirty
-Thread-Topic: [PATCH] migration: Count new_dirty instead of real_dirty
-Thread-Index: AQHWQsOuGwKJH9ifCkKqqwKpHTiKVqjZiHzw
-Date: Mon, 15 Jun 2020 11:50:41 +0000
-Message-ID: <B2D15215269B544CADD246097EACE7474BD38EFD@DGGEMM528-MBX.china.huawei.com>
-References: <20200601040250.38324-1-zhukeqian1@huawei.com>
- <3205abb1-8e47-fc19-1213-ead621711291@huawei.com>
-In-Reply-To: <3205abb1-8e47-fc19-1213-ead621711291@huawei.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.174.149.93]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jknfO-0003zl-4X
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 07:52:43 -0400
+Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
+ (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1MvJwN-1itnTK23qj-00rJqJ; Mon, 15 Jun 2020 13:52:39 +0200
+To: Filip Bozuta <filip.bozuta@syrmia.com>, qemu-devel@nongnu.org
+References: <20200611155109.3648-1-filip.bozuta@syrmia.com>
+ <20200611155109.3648-4-filip.bozuta@syrmia.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Subject: Re: [PATCH v3 3/6] linux-user: Add strace support for printing
+ argument of syscalls used for extended attributes
+Message-ID: <31cda0bd-0c42-bf99-0256-007688059c4d@vivier.eu>
+Date: Mon, 15 Jun 2020 13:52:38 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.188;
- envelope-from=jianjay.zhou@huawei.com; helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 07:50:53
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200611155109.3648-4-filip.bozuta@syrmia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:7R0vE2QOmlqUeKq8CuD5fLrpCq7j0dJTmMdGgmtmZyyXdDMrihc
+ OBXfgyAELx9/5x7jBBh2wTeeDj6hJNDMSyJP0edADR3GDiaA5dA9rDFZ99fkXNzU91SqyPQ
+ ROAubRbG5vHRJculk5+16V3MEK8NkiOzJNfp1bM8FmqUjtVJYffKq4JSW93PVXq2h1VLIzN
+ bVz2tj3f5GPSfifuQ+b6A==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:MZIG682LUDE=:L1Lq7mwOU2cDMcEL/NL51W
+ TNtXoJh8aNu1/D8gRnECyiyStjseZyGa8On2njA+hMhTLFLxsJeI2AOGGQDe+GgZfOW4yTUu+
+ h6Qlx1ZAf94ZuhhHNfHCbvF6LXS8TNwEmIo8EJQzkF+DAb4xjb1CFz5Phxj0a7y3TZ92HIIUg
+ 4QBOu+ScmVPyL/v3UqroqbuO8Y2RNlkmvHD/iRqAs35M3dBVrVJwrNSQ5aZMYtfSFXKQKL1qO
+ mV74UJuq7hK5gzRNalde7OqpEomAHPKxejAAB4lV5aqFNYRzsAOegAe8WvzpzKdfGs1WEyEoK
+ 04CC5eQydBjKdEAhb2CPm2N1xu/i72lPqYte6LvAQdxlxzJMn/5CNTaMU1vzhv50WWBlyp+R1
+ yZ3JIjZog1Gqz5ZMchX0grLf6nHnz9iOicz5jLHQ9IO0DxP/u0ER2KcxyxKO+7kFTGtaf04x9
+ PMAZYyUJoQKRkaaFbrMkVJltdw/97/CnV9lv/7eC3kwT7E3ltVGSsVWGGaDpCOEaABfa5k1Ci
+ Zw1QzTAl0zjPfB+AT6odZ0CBh+NT21NCZ5Ux+gwXY26LQEW0Wj2b+ypN6k49oYEA4t1+6yEJG
+ sEvpPHXpofmrCQuo08cgpuYv1A0Elm4JiHnzN2/pg+1kYg/jaLLw8ABuYPyqdEXJsrYUCZ15c
+ ZNEVs0WPQ1nzI3FTXsP0/MBfoj9ru+hQoZK6/7Hkf8rHw/k1CNONVwg/HEahaGM+k1JjgoRa1
+ HPVIj0NjqDCat2izKNiZ/8Og90unkjojDFL2CVQZOo+dwWLXbxAP9rbyFW+CqwNc2IkkoK8FE
+ YS3TpngiDp31/YslBuQX0E/BiBcWwPfoFf/qFmbNtNkYj+ae1yaWLwyPH0tGUyy9LLcr6A4
+Received-SPF: none client-ip=217.72.192.75; envelope-from=laurent@vivier.eu;
+ helo=mout.kundenserver.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 07:52:40
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -28
+X-Spam_score: -2.9
+X-Spam_bar: --
+X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001, SPF_NONE=0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -80,74 +128,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Wanghaibin \(D\)" <wanghaibin.wang@huawei.com>,
- Chao Fan <fanc.fnst@cn.fujitsu.com>,
- "Huangweidong \(C\)" <weidong.huang@huawei.com>,
- Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-SGkgS2VxaWFuLA0KDQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IHpodWtl
-cWlhbg0KPiBTZW50OiBNb25kYXksIEp1bmUgMTUsIDIwMjAgMTE6MTkgQU0NCj4gVG86IHFlbXUt
-ZGV2ZWxAbm9uZ251Lm9yZzsgcWVtdS1hcm1Abm9uZ251Lm9yZzsgUGFvbG8gQm9uemluaQ0KPiA8
-cGJvbnppbmlAcmVkaGF0LmNvbT47IFpob3VqaWFuIChqYXkpIDxqaWFuamF5Lnpob3VAaHVhd2Vp
-LmNvbT4NCj4gQ2M6IEp1YW4gUXVpbnRlbGEgPHF1aW50ZWxhQHJlZGhhdC5jb20+OyBDaGFvIEZh
-biA8ZmFuYy5mbnN0QGNuLmZ1aml0c3UuY29tPjsNCj4gV2FuZ2hhaWJpbiAoRCkgPHdhbmdoYWli
-aW4ud2FuZ0BodWF3ZWkuY29tPg0KPiBTdWJqZWN0OiBSZTogW1BBVENIXSBtaWdyYXRpb246IENv
-dW50IG5ld19kaXJ0eSBpbnN0ZWFkIG9mIHJlYWxfZGlydHkNCj4gDQo+IEhpIFBhb2xvIGFuZCBK
-aWFuIFpob3UsDQo+IA0KPiBEbyB5b3UgaGF2ZSBhbnkgc3VnZ2VzdGlvbiBvbiB0aGlzIHBhdGNo
-Pw0KPiANCj4gVGhhbmtzLA0KPiBLZXFpYW4NCj4gDQo+IE9uIDIwMjAvNi8xIDEyOjAyLCBLZXFp
-YW4gWmh1IHdyb3RlOg0KPiA+IERJUlRZX0xPR19JTklUSUFMTFlfQUxMX1NFVCBmZWF0dXJlIGlz
-IG9uIHRoZSBxdWV1ZS4gVGhpcyBmaXhzIHRoZQ0KDQpzL2ZpeHMvZml4ZXMNCg0KPiA+IGRpcnR5
-IHJhdGUgY2FsY3VsYXRpb24gZm9yIHRoaXMgZmVhdHVyZS4gQWZ0ZXIgaW50cm9kdWNpbmcgdGhp
-cw0KPiA+IGZlYXR1cmUsIHJlYWxfZGlydHlfcGFnZXMgaXMgZXF1YWwgdG8gdG90YWwgbWVtb3J5
-IHNpemUgYXQgYmVnaW5pbmcuDQo+ID4gVGhpcyBjYXVzaW5nIHdyb25nIGRpcnR5IHJhdGUgYW5k
-IGZhbHNlIHBvc2l0aXZlIHRocm90dGxpbmcuDQoNCkkgdGhpbmsgaXQgc2hvdWxkIGJlIHRlc3Rl
-ZCB3aGV0aGVyIERJUlRZX0xPR19JTklUSUFMTFlfQUxMX1NFVCBpcyBlbmFibGVkDQppbiByYW1f
-aW5pdF9iaXRtYXBzKG1heWJlPykgaW4gb3JkZXIgdG8gYmUgY29tcGF0aWJsZSB3aXRoIHRoZSBv
-bGQgcGF0aC4NCg0KVGhhbmtzLA0KSmF5IFpob3UNCg0KPiA+DQo+ID4gQlRXLCByZWFsIGRpcnR5
-IHJhdGUgaXMgbm90IHN1aXRhYmxlIGFuZCBub3QgdmVyeSBhY2N1cmF0ZS4NCj4gPg0KPiA+IDEu
-IEZvciBub3Qgc3VpdGFibGU6IFdlIG1haW5seSBjb25jZXJuIG9uIHRoZSByZWxhdGlvbnNoaXAg
-YmV0d2Vlbg0KPiA+ICAgIGRpcnR5IHJhdGUgYW5kIG5ldHdvcmsgYmFuZHdpZHRoLiBOZXQgaW5j
-cmVhc2VtZW50IG9mIGRpcnR5IHBhZ2VzDQo+ID4gICAgbWFrZXMgbW9yZSBzZW5zZS4NCj4gPiAy
-LiBGb3Igbm90IHZlcnkgYWNjdXJhdGU6IFdpdGggbWFudWFsIGRpcnR5IGxvZyBjbGVhciwgc29t
-ZSBkaXJ0eSBwYWdlcw0KPiA+ICAgIHdpbGwgYmUgY2xlYXJlZCBkdXJpbmcgZWFjaCBwZXJvaWQs
-IG91ciAicmVhbCBkaXJ0eSByYXRlIiBpcyBsZXNzDQo+ID4gICAgdGhhbiByZWFsICJyZWFsIGRp
-cnR5IHJhdGUiLg0KDQoNCg0KPiA+DQo+ID4gU2lnbmVkLW9mZi1ieTogS2VxaWFuIFpodSA8emh1
-a2VxaWFuMUBodWF3ZWkuY29tPg0KPiA+IC0tLQ0KPiA+ICBpbmNsdWRlL2V4ZWMvcmFtX2FkZHIu
-aCB8IDUgKystLS0NCj4gPiAgMSBmaWxlIGNoYW5nZWQsIDIgaW5zZXJ0aW9ucygrKSwgMyBkZWxl
-dGlvbnMoLSkNCj4gPg0KPiA+IGRpZmYgLS1naXQgYS9pbmNsdWRlL2V4ZWMvcmFtX2FkZHIuaCBi
-L2luY2x1ZGUvZXhlYy9yYW1fYWRkci5oIGluZGV4DQo+ID4gNWU1OWEzZDhkNy4uYWY5Njc3ZTI5
-MSAxMDA2NDQNCj4gPiAtLS0gYS9pbmNsdWRlL2V4ZWMvcmFtX2FkZHIuaA0KPiA+ICsrKyBiL2lu
-Y2x1ZGUvZXhlYy9yYW1fYWRkci5oDQo+ID4gQEAgLTQ0Myw3ICs0NDMsNyBAQCBzdGF0aWMgaW5s
-aW5lDQo+ID4gIHVpbnQ2NF90IGNwdV9waHlzaWNhbF9tZW1vcnlfc3luY19kaXJ0eV9iaXRtYXAo
-UkFNQmxvY2sgKnJiLA0KPiA+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgIHJhbV9hZGRyX3Qgc3RhcnQsDQo+ID4gICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgcmFtX2FkZHJfdCBsZW5ndGgsDQo+ID4gLSAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdWludDY0X3QNCj4gKnJlYWxf
-ZGlydHlfcGFnZXMpDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgdWludDY0X3QNCj4gPiArICphY2N1X2RpcnR5X3BhZ2VzKQ0KPiA+ICB7DQo+ID4g
-ICAgICByYW1fYWRkcl90IGFkZHI7DQo+ID4gICAgICB1bnNpZ25lZCBsb25nIHdvcmQgPSBCSVRf
-V09SRCgoc3RhcnQgKyByYi0+b2Zmc2V0KSA+Pg0KPiA+IFRBUkdFVF9QQUdFX0JJVFMpOyBAQCAt
-NDY5LDcgKzQ2OSw2IEBAIHVpbnQ2NF90DQo+IGNwdV9waHlzaWNhbF9tZW1vcnlfc3luY19kaXJ0
-eV9iaXRtYXAoUkFNQmxvY2sgKnJiLA0KPiA+ICAgICAgICAgICAgICBpZiAoc3JjW2lkeF1bb2Zm
-c2V0XSkgew0KPiA+ICAgICAgICAgICAgICAgICAgdW5zaWduZWQgbG9uZyBiaXRzID0gYXRvbWlj
-X3hjaGcoJnNyY1tpZHhdW29mZnNldF0sIDApOw0KPiA+ICAgICAgICAgICAgICAgICAgdW5zaWdu
-ZWQgbG9uZyBuZXdfZGlydHk7DQo+ID4gLSAgICAgICAgICAgICAgICAqcmVhbF9kaXJ0eV9wYWdl
-cyArPSBjdHBvcGwoYml0cyk7DQo+ID4gICAgICAgICAgICAgICAgICBuZXdfZGlydHkgPSB+ZGVz
-dFtrXTsNCj4gPiAgICAgICAgICAgICAgICAgIGRlc3Rba10gfD0gYml0czsNCj4gPiAgICAgICAg
-ICAgICAgICAgIG5ld19kaXJ0eSAmPSBiaXRzOw0KPiA+IEBAIC01MDIsNyArNTAxLDYgQEAgdWlu
-dDY0X3QNCj4gY3B1X3BoeXNpY2FsX21lbW9yeV9zeW5jX2RpcnR5X2JpdG1hcChSQU1CbG9jayAq
-cmIsDQo+ID4gICAgICAgICAgICAgICAgICAgICAgICAgIHN0YXJ0ICsgYWRkciArIG9mZnNldCwN
-Cj4gPiAgICAgICAgICAgICAgICAgICAgICAgICAgVEFSR0VUX1BBR0VfU0laRSwNCj4gPiAgICAg
-ICAgICAgICAgICAgICAgICAgICAgRElSVFlfTUVNT1JZX01JR1JBVElPTikpIHsNCj4gPiAtICAg
-ICAgICAgICAgICAgICpyZWFsX2RpcnR5X3BhZ2VzICs9IDE7DQo+ID4gICAgICAgICAgICAgICAg
-ICBsb25nIGsgPSAoc3RhcnQgKyBhZGRyKSA+PiBUQVJHRVRfUEFHRV9CSVRTOw0KPiA+ICAgICAg
-ICAgICAgICAgICAgaWYgKCF0ZXN0X2FuZF9zZXRfYml0KGssIGRlc3QpKSB7DQo+ID4gICAgICAg
-ICAgICAgICAgICAgICAgbnVtX2RpcnR5Kys7DQo+ID4gQEAgLTUxMSw2ICs1MDksNyBAQCB1aW50
-NjRfdA0KPiBjcHVfcGh5c2ljYWxfbWVtb3J5X3N5bmNfZGlydHlfYml0bWFwKFJBTUJsb2NrICpy
-YiwNCj4gPiAgICAgICAgICB9DQo+ID4gICAgICB9DQo+ID4NCj4gPiArICAgICphY2N1X2RpcnR5
-X3BhZ2VzICs9IG51bV9kaXJ0eTsNCj4gPiAgICAgIHJldHVybiBudW1fZGlydHk7DQo+ID4gIH0N
-Cj4gPiAgI2VuZGlmDQo+ID4NCg==
+Le 11/06/2020 à 17:51, Filip Bozuta a écrit :
+> From: Filip Bozuta <Filip.Bozuta@syrmia.com>
+> 
+> This patch implements strace argument printing functionality for following syscalls:
+> 
+>     *getxattr, lgetxattr, fgetxattr - retrieve an extended attribute value
+> 
+>         ssize_t getxattr(const char *path, const char *name, void *value, size_t size)
+>         ssize_t lgetxattr(const char *path, const char *name, void *value, size_t size)
+>         ssize_t fgetxattr(int fd, const char *name, void *value, size_t size)
+>         man page: https://www.man7.org/linux/man-pages/man2/getxattr.2.html
+> 
+>     *listxattr, llistxattr, flistxattr - list extended attribute names
+> 
+>         ssize_t listxattr(const char *path, char *list, size_t size)
+>         ssize_t llistxattr(const char *path, char *list, size_t size)
+>         ssize_t flistxattr(int fd, char *list, size_t size)
+>         man page: https://www.man7.org/linux/man-pages/man2/listxattr.2.html
+> 
+>     *removexattr, lremovexattr, fremovexattr - remove an extended attribute
+> 
+>          int removexattr(const char *path, const char *name)
+>          int lremovexattr(const char *path, const char *name)
+>          int fremovexattr(int fd, const char *name)
+>          man page: https://www.man7.org/linux/man-pages/man2/removexattr.2.html
+
+Compared to v2, fremovexattr, removexattr and lremovexattr are missing.
+
+> 
+> Implementation notes:
+> 
+>     All of the syscalls have strings as argument types and thus a separate
+>     printing function was stated in file "strace.list" for every one of them.
+>     All of these printing functions were defined in "strace.c" using existing
+>     printing functions for appropriate argument types:
+>        "print_string()" - for (const char*) type
+>        "print_pointer()" - for (char*) and (void *) type
+>        "print_raw_param()" for (int) and (size_t) type
+>     Syscalls "getxattr()" and "lgetxattr()" have the same number and type of
+>     arguments and thus their print functions ("print_getxattr", "print_lgetxattr")
+>     share a same definition. The same statement applies to syscalls "listxattr()"
+>     and "llistxattr()".
+>     Function "print_syscall_ret_listxattr()" was added to print the returned list
+>     of extended attributes for syscalls "print_listxattr(), print_llistxattr() and
+>     print_flistxattr()".
+> 
+> Signed-off-by: Filip Bozuta <Filip.Bozuta@syrmia.com>
+> ---
+>  linux-user/strace.c    | 95 ++++++++++++++++++++++++++++++++++++++++++
+>  linux-user/strace.list | 15 ++++---
+>  2 files changed, 104 insertions(+), 6 deletions(-)
+> 
+> diff --git a/linux-user/strace.c b/linux-user/strace.c
+> index 4f85606c19..a7c3ea8df3 100644
+> --- a/linux-user/strace.c
+> +++ b/linux-user/strace.c
+> @@ -834,6 +834,41 @@ print_syscall_ret_adjtimex(const struct syscallname *name, abi_long ret,
+>  }
+>  #endif
+>  
+> +#if defined(TARGET_NR_listxattr) || defined(TARGET_NR_llistxattr) \
+> + || defined(TARGGET_NR_flistxattr)
+> +static void
+> +print_syscall_ret_listxattr(const struct syscallname *name, abi_long ret,
+> +                            abi_long arg0, abi_long arg1, abi_long arg2,
+> +                            abi_long arg3, abi_long arg4, abi_long arg5)
+> +{
+> +    const char *errstr = NULL;
+> +
+> +    SYSCALL_RET_ERR(ret, errstr);
+> +
+> +    if (ret >= 0) {
+> +        qemu_log(TARGET_ABI_FMT_ld, ret);
+> +        qemu_log(" (list = ");
+> +        if (arg1 != 0) {
+> +            abi_long attr = arg1;
+> +            while (target_strlen(attr) != 0) {
+
+You can't rely on target_strlen(), you should rely on the value returned
+by the ioctl() (ret) that is defined as the length of the returned data.
+
+Thanks,
+Laurent
 
