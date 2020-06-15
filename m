@@ -2,107 +2,89 @@ Return-Path: <SRS0=tJVC=74=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6C8BC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 14:13:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D691EC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 14:14:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 82D3A2078E
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 14:13:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9F8BB2078E
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 14:14:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bcRWv7Zj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82D3A2078E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ybVmTYrK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F8BB2078E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37578 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39910 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkprH-0006nK-QN
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 10:13:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46044)
+	id 1jkpsC-0007lQ-Pa
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 10:14:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46264)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jkpqa-0006Kn-CS
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 10:12:24 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:23213
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jkpqY-0003N4-N0
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 10:12:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592230341;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Q899REfQJ78B/4DYWo+GP9jBVCWPL0Lx3ZKNGj0pl1c=;
- b=bcRWv7ZjM0Ai+oCSZt0hHRS68DaGGsryfa9XB9PNtQ+pGM4Brre6J6MFivQgjPljd8NUN7
- NBbRW7Z6BOmoU4JrXp/Lub46CDRxI6OD1P9CecO11AorED1ViOHoce3h1a3d/by/LhtBLi
- LItUOJF1modYA+ZKWeFvfv3Hx52Ky7Y=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-175-2QoLsZYHO-afxS4h-2mU9A-1; Mon, 15 Jun 2020 10:12:12 -0400
-X-MC-Unique: 2QoLsZYHO-afxS4h-2mU9A-1
-Received: by mail-wr1-f69.google.com with SMTP id z10so7147920wrs.2
- for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 07:12:12 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jkprY-0007Al-Qj
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 10:13:25 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:41028)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jkprX-0003WE-EK
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 10:13:24 -0400
+Received: by mail-ot1-x344.google.com with SMTP id k15so13203064otp.8
+ for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 07:13:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=rIq499snR+IAxnCfa6MmA7fu8l+qzQbovoxE8Cbplbs=;
+ b=ybVmTYrKxTxrJtWl61I+UK1ouHzvhgpo5mAjKMYUPQvIvLY/0caZ5Mz9UMtAoc037h
+ 3t3qOQjpnLH160Mr5yI2L7lt4Qd8d1vs/hrmjV28IM/zywZLOeuTK634bK61lG4eeDi0
+ XRC0yJHHZs7cYKudesQPOHHgOdlkMCLGlPBR8QQfdHfgsZI9UHVq3GzcToanWuwf2feJ
+ xlUbArmyn0qVp2aX6JtL7T/efrW93zo/cvnJriQ6x9jDMYUfc0LVP7skL6VmRHS4A0uP
+ 33DcgG6BMsdvKc0Qf3e1hWj3lP+tKEeMPkahy9Ry3t00/phbDFByrA0+UxaTWf0aeSFY
+ t+XA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Q899REfQJ78B/4DYWo+GP9jBVCWPL0Lx3ZKNGj0pl1c=;
- b=AuwlgwCX0oL+LtKDq8gGkR3BSXI2ZhtTcIxg22WMBMh8XoCxSlcqOn2XrIFWau4HRE
- vCb30djZzM/btDftvrXv2FP/eNwQRJzoTwb2TwMECFR+lJkj6Jr7or6c06P3Ml2UbF/8
- bEjDQXmh21OYXt2Ms3pSFyoYWEombcpw7zSy1WAI63e4lsX/Wd6+xjX9VejTn4IWFgvG
- ha91zS0HU+lAcA6kYm0/xVQLt6TUPx+zf7hpirEX4t85x272F3ZFAVzVba6ks8xdfTeY
- TXTdumH9Aj/nu73E+3XUY0pF2xm7Mk7xORq+amKN1jLildRCjzeHkmYzf3D6A1tLcJcJ
- LmOw==
-X-Gm-Message-State: AOAM532B24CKKPALb2zsgMu1OrPAxI5BgRrMAcobZ/BEjGco4ZhE2rac
- cfe30SrZUTetCF4oQUbqSoC6WHHlpUGIDS/jjRYnr/w2je0kPZQNRkVH2R1Jmdzz9GNkWmfcykE
- UakpNZSIQVlPEV14=
-X-Received: by 2002:adf:f44b:: with SMTP id f11mr28693708wrp.165.1592230331418; 
- Mon, 15 Jun 2020 07:12:11 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx4fanbqWjYU8XzWYN/KIZ1MU6MRhN2il9TM598ejVEpsI4AttYLYWIki5o/7663zozbfJuEQ==
-X-Received: by 2002:adf:f44b:: with SMTP id f11mr28693684wrp.165.1592230331032; 
- Mon, 15 Jun 2020 07:12:11 -0700 (PDT)
-Received: from [192.168.178.58] ([151.48.99.33])
- by smtp.gmail.com with ESMTPSA id z9sm21980582wmi.41.2020.06.15.07.12.05
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 15 Jun 2020 07:12:10 -0700 (PDT)
-Subject: Re: [PATCH] hw/scsi/megasas: Fix possible out-of-bounds array access
- in tracepoints
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
- Hannes Reinecke <hare@suse.com>
-References: <20200615072629.32321-1-thuth@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f7cd0d83-d45e-86c3-7545-9649188243a8@redhat.com>
-Date: Mon, 15 Jun 2020 16:12:05 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=rIq499snR+IAxnCfa6MmA7fu8l+qzQbovoxE8Cbplbs=;
+ b=tIDq+zxWln9ppkPLGdnBEuV4I0IoPZR0ZOYcJuPwr8V81Xos9ASG7lmbpdb5PU6zmn
+ n5vf1U+b3/l0NSfj0EpAEbtBaQs9C69bbvlqMicxrMsYlTovV+BBjA3+jbORB1742N33
+ 32KmZTC4bC+XTu1gNk8vxsht4vSRm3ibksSkksbLSJTRm7OxsNpNojjAMQ4r+8E861q1
+ acsV45+xy3OEWLOitKuB3D/PKCkJTe5TnA4Os0HlBnqTAnzEfJacWmabpYL1x1aOf8Ug
+ DM9U/skwK+MH4Y4QVNwjCA4t9hUqii7q4mFuJ6qMC+49VKJweltEz8TpuXLcg6V21FTa
+ eq9Q==
+X-Gm-Message-State: AOAM533ZWQn03AibyNfhXYdBmDrKpc6SHMLTXhOkcXCf2vs+kTvn612R
+ BOd0ByGIQXW/HnhyMoPa3ZLnGhNSm4xBzwhV0l32XQ==
+X-Google-Smtp-Source: ABdhPJwFVLkkaJoZNnvC0ntfyla6UW086zT50dR21jpaBiHBPuAGdQq4UzL+7jaiFRkYiYVEU8Nqb8j21ME0GAjsq4c=
+X-Received: by 2002:a05:6830:8d:: with SMTP id
+ a13mr21395339oto.91.1592230402212; 
+ Mon, 15 Jun 2020 07:13:22 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200615072629.32321-1-thuth@redhat.com>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 01:43:27
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+References: <20200605102230.21493-1-philmd@redhat.com>
+ <20200605102230.21493-9-philmd@redhat.com>
+In-Reply-To: <20200605102230.21493-9-philmd@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 15 Jun 2020 15:13:11 +0100
+Message-ID: <CAFEAcA__1Q3YB-dbwGheVPGAU63aex208poycmRQsa3nfew8Ug@mail.gmail.com>
+Subject: Re: [PATCH v3 08/11] hw/sd/sdcard: Make iolen unsigned
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::344;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x344.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -115,133 +97,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, qemu-block@nongnu.org
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 15/06/20 09:26, Thomas Huth wrote:
-> Some tracepoints in megasas.c use a guest-controlled value as an index
-> into the mfi_frame_desc[] array. Thus a malicious guest could cause an
-> out-of-bounds error here. Fortunately, the impact is very low since this
-> can only happen when the corresponding tracepoints have been enabled
-> before, but the problem should be fixed anyway with a proper check.
-> 
-> Buglink: https://bugs.launchpad.net/qemu/+bug/1882065
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+On Fri, 5 Jun 2020 at 11:27, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com=
+> wrote:
+>
+> I/O request length can not be negative.
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 > ---
->  hw/scsi/megasas.c | 36 +++++++++++++++++++++++-------------
->  1 file changed, 23 insertions(+), 13 deletions(-)
-> 
-> diff --git a/hw/scsi/megasas.c b/hw/scsi/megasas.c
-> index af18c88b65..aa930226f8 100644
-> --- a/hw/scsi/megasas.c
-> +++ b/hw/scsi/megasas.c
-> @@ -54,10 +54,6 @@
->  #define MEGASAS_FLAG_USE_QUEUE64   1
->  #define MEGASAS_MASK_USE_QUEUE64   (1 << MEGASAS_FLAG_USE_QUEUE64)
->  
-> -static const char *mfi_frame_desc[] = {
-> -    "MFI init", "LD Read", "LD Write", "LD SCSI", "PD SCSI",
-> -    "MFI Doorbell", "MFI Abort", "MFI SMP", "MFI Stop"};
-> -
->  typedef struct MegasasCmd {
->      uint32_t index;
->      uint16_t flags;
-> @@ -183,6 +179,20 @@ static void megasas_frame_set_scsi_status(MegasasState *s,
->      stb_pci_dma(pci, frame + offsetof(struct mfi_frame_header, scsi_status), v);
->  }
->  
-> +static inline const char *mfi_frame_desc(unsigned int cmd)
-> +{
-> +    static const char *mfi_frame_descs[] = {
-> +        "MFI init", "LD Read", "LD Write", "LD SCSI", "PD SCSI",
-> +        "MFI Doorbell", "MFI Abort", "MFI SMP", "MFI Stop"
-> +    };
-> +
-> +    if (cmd < ARRAY_SIZE(mfi_frame_descs)) {
-> +        return mfi_frame_descs[cmd];
-> +    }
-> +
-> +    return "Unknown";
-> +}
-> +
->  /*
->   * Context is considered opaque, but the HBA firmware is running
->   * in little endian mode. So convert it to little endian, too.
-> @@ -1670,25 +1680,25 @@ static int megasas_handle_scsi(MegasasState *s, MegasasCmd *cmd,
->      if (is_logical) {
->          if (target_id >= MFI_MAX_LD || lun_id != 0) {
->              trace_megasas_scsi_target_not_present(
-> -                mfi_frame_desc[frame_cmd], is_logical, target_id, lun_id);
-> +                mfi_frame_desc(frame_cmd), is_logical, target_id, lun_id);
->              return MFI_STAT_DEVICE_NOT_FOUND;
->          }
->      }
->      sdev = scsi_device_find(&s->bus, 0, target_id, lun_id);
->  
->      cmd->iov_size = le32_to_cpu(cmd->frame->header.data_len);
-> -    trace_megasas_handle_scsi(mfi_frame_desc[frame_cmd], is_logical,
-> +    trace_megasas_handle_scsi(mfi_frame_desc(frame_cmd), is_logical,
->                                target_id, lun_id, sdev, cmd->iov_size);
->  
->      if (!sdev || (megasas_is_jbod(s) && is_logical)) {
->          trace_megasas_scsi_target_not_present(
-> -            mfi_frame_desc[frame_cmd], is_logical, target_id, lun_id);
-> +            mfi_frame_desc(frame_cmd), is_logical, target_id, lun_id);
->          return MFI_STAT_DEVICE_NOT_FOUND;
->      }
->  
->      if (cdb_len > 16) {
->          trace_megasas_scsi_invalid_cdb_len(
-> -                mfi_frame_desc[frame_cmd], is_logical,
-> +                mfi_frame_desc(frame_cmd), is_logical,
->                  target_id, lun_id, cdb_len);
->          megasas_write_sense(cmd, SENSE_CODE(INVALID_OPCODE));
->          cmd->frame->header.scsi_status = CHECK_CONDITION;
-> @@ -1706,7 +1716,7 @@ static int megasas_handle_scsi(MegasasState *s, MegasasCmd *cmd,
->      cmd->req = scsi_req_new(sdev, cmd->index, lun_id, cdb, cmd);
->      if (!cmd->req) {
->          trace_megasas_scsi_req_alloc_failed(
-> -                mfi_frame_desc[frame_cmd], target_id, lun_id);
-> +                mfi_frame_desc(frame_cmd), target_id, lun_id);
->          megasas_write_sense(cmd, SENSE_CODE(NO_SENSE));
->          cmd->frame->header.scsi_status = BUSY;
->          s->event_count++;
-> @@ -1751,17 +1761,17 @@ static int megasas_handle_io(MegasasState *s, MegasasCmd *cmd, int frame_cmd)
->      }
->  
->      trace_megasas_handle_io(cmd->index,
-> -                            mfi_frame_desc[frame_cmd], target_id, lun_id,
-> +                            mfi_frame_desc(frame_cmd), target_id, lun_id,
->                              (unsigned long)lba_start, (unsigned long)lba_count);
->      if (!sdev) {
->          trace_megasas_io_target_not_present(cmd->index,
-> -            mfi_frame_desc[frame_cmd], target_id, lun_id);
-> +            mfi_frame_desc(frame_cmd), target_id, lun_id);
->          return MFI_STAT_DEVICE_NOT_FOUND;
->      }
->  
->      if (cdb_len > 16) {
->          trace_megasas_scsi_invalid_cdb_len(
-> -            mfi_frame_desc[frame_cmd], 1, target_id, lun_id, cdb_len);
-> +            mfi_frame_desc(frame_cmd), 1, target_id, lun_id, cdb_len);
->          megasas_write_sense(cmd, SENSE_CODE(INVALID_OPCODE));
->          cmd->frame->header.scsi_status = CHECK_CONDITION;
->          s->event_count++;
-> @@ -1781,7 +1791,7 @@ static int megasas_handle_io(MegasasState *s, MegasasCmd *cmd, int frame_cmd)
->                              lun_id, cdb, cmd);
->      if (!cmd->req) {
->          trace_megasas_scsi_req_alloc_failed(
-> -            mfi_frame_desc[frame_cmd], target_id, lun_id);
-> +            mfi_frame_desc(frame_cmd), target_id, lun_id);
->          megasas_write_sense(cmd, SENSE_CODE(NO_SENSE));
->          cmd->frame->header.scsi_status = BUSY;
->          s->event_count++;
-> 
+>  hw/sd/sd.c         | 2 +-
+>  hw/sd/trace-events | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/hw/sd/sd.c b/hw/sd/sd.c
+> index 9d51138b11..952be36399 100644
+> --- a/hw/sd/sd.c
+> +++ b/hw/sd/sd.c
+> @@ -1950,7 +1950,7 @@ uint8_t sd_read_data(SDState *sd)
+>  {
+>      /* TODO: Append CRCs */
+>      uint8_t ret;
+> -    int io_len;
+> +    size_t io_len;
 
-Queued, thanks.
+size_t seems an odd choice -- we initialize it with
+    io_len =3D (sd->ocr & (1 << 30)) ? 512 : sd->blk_len;
 
-Paolo
+where sd->blk_len is a uint32_t, and we use it mainly with
+            BLK_READ_BLOCK(sd->data_start, io_len);
+where BLK_READ_BLOCK is a rather unnecessary macroization
+of sd_blk_read(), which takes a uint32_t.
 
+thanks
+-- PMM
 
