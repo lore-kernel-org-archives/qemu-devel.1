@@ -2,83 +2,92 @@ Return-Path: <SRS0=tJVC=74=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69CA8C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 19:43:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 566D4C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 19:46:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2EA0C20714
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 19:43:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1C61220714
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 19:46:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ukzvHSyE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2EA0C20714
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IPSfHt/u"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C61220714
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35092 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38524 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkv0t-00031o-Ey
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 15:43:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48438)
+	id 1jkv3i-0004bQ-9Q
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 15:46:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49424)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jkuyC-0008HV-M8; Mon, 15 Jun 2020 15:40:36 -0400
-Received: from mail-il1-x143.google.com ([2607:f8b0:4864:20::143]:39125)
+ (Exim 4.90_1) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1jkv2b-0003Zj-TS
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 15:45:09 -0400
+Received: from mail-ej1-x644.google.com ([2a00:1450:4864:20::644]:38097)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jkuyA-0006i0-Qa; Mon, 15 Jun 2020 15:40:36 -0400
-Received: by mail-il1-x143.google.com with SMTP id p5so147602ile.6;
- Mon, 15 Jun 2020 12:40:34 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1jkv2Z-0007Jc-VP
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 15:45:09 -0400
+Received: by mail-ej1-x644.google.com with SMTP id w16so18213721ejj.5
+ for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 12:45:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Jp42kBAUA7U2Nm7mn62S8Xlr804bOEMiFEW0kgbKwVI=;
- b=ukzvHSyE0c55e+3LGTVDlSKHcgOygIT/JJGTyjS6zmypAUcKMtEI5NIlMUUD5/9tOV
- 8m/doAXv8UGp2NQbsq5I3tEzWEhTwRtFg/pvsI3HxHb4ZoCnlGcKB5OJ/tGyyBAZGdY2
- Q/fW3VoJuin8s6+skLpayTAS9QlL3vH5wHhTcFvTEpBVwSdlku+UvHhWTO9eyN3GG5Oc
- EM1Yb7OzNyZmbbeXyRc6CyskAAzQ3Z7sHoWpuxshmdoB94SMtQ59pVkVpZphKrv8k6mI
- Ft3qjoEUpiS2C69IdlL4Jyv+LbLp+OcE/qdZxZ7FQcQ13qnU1DgIqk2fA4uFIhQf6Lsq
- H5RA==
+ :cc:content-transfer-encoding;
+ bh=ql1T/RiO6XN1R2PDVa+85DVIUNXmDQjPaf6T3YW8dLk=;
+ b=IPSfHt/uPbuDEJpUZEcS8bgZdqFh+4BFjqGEf5b22SdArIUHGfND2a9DKEfvIfS3T2
+ vy5X6Zk7tlYtEHHkoPStl5b5kB/BC2cf890/fn4vvhBY3sAtglP+pOR8IdOR5lXwkN/B
+ UbhSFvbQhIrONSMgbL7+mO0pxOz95zHScMN3cYRbNqQoEAiLa1SjAGlxbzhglwsd/a06
+ o1zIZ0XEtKFGNVr/MlA73s4pFYFjnAzMI6VgsbkIv02YThIPPp20g/Xp7eJncqGxhSvP
+ SbvZyiZ3yXXWmE/n+6pGFiUKmA4vSO1k9ll+Oa27xFuhHN/30/zlBnPoNyLVAXhoSPFw
+ qeTg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=Jp42kBAUA7U2Nm7mn62S8Xlr804bOEMiFEW0kgbKwVI=;
- b=mNtTe3rkJ+tCAc53BjERbrgvkymYXWZo2iqRCOFXU5rw7Kbrv7+UgwG9AiYPJgOhUc
- 9zFaKsCogjUtMWTvafgGqe83seFtmmyj09MxIpQxPLBf34OdH0TP4M/dnAtq4LYPVTRj
- 4H1h9jneyywHtRvKEJj4XMMEEhe9cHVKE7X0G4SMd/DW6iwp3oblPVLUdXtmqgzD00/e
- qMaCcadRWIF1zOM2587w4b1WnbGLPW6eV/0EJ+LHtPTCvlta8scDsOTh7hF9cpoCXiw9
- F/D3efKVTyK3x1nEz0E8qxktGuCXMO87RvIZz4ptzAVPmjEe6SAw1+kf9ev2zroultjj
- nTxA==
-X-Gm-Message-State: AOAM533FsJYO2QsbE5lNQE5XKku8KHR8i5kWbvXj5Ae5PjdHZLDv8b/J
- atUJkTsJbp6g368r2sPzIDIjFkYaKd6tYmYpDZA=
-X-Google-Smtp-Source: ABdhPJwzPr1BqWIrmpRv82VTDaH6puajnLzQZrlVAOmYoLH9/lk22G3C94vF3jrqYUT6vEmtToJxj3pV69BUK2mqIeo=
-X-Received: by 2002:a92:aa07:: with SMTP id j7mr28365902ili.40.1592250033326; 
- Mon, 15 Jun 2020 12:40:33 -0700 (PDT)
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=ql1T/RiO6XN1R2PDVa+85DVIUNXmDQjPaf6T3YW8dLk=;
+ b=L9vXsOVF5GPerSYqN6BED/kzt9XWTYA9rw/TmaCrwhfPygswgQYnzQ8kYF+qU9Twif
+ u1/UyADEkbFvnKjvdC0c4OhFDMkoHRhSiGfkzn8Facb6IXJOn1mbY7590PG9MHZNi6Q3
+ YD/nLbm3OMzNDKVvIvOLREO2XnJfTEJsa55H8nVg6plwjJ4rPflsOmVdJYGh1IN7x+aj
+ 8J93wiFdz5ql4qP5xu8QhznliNmY0Sp+GLzrsA3yX2FcjioJHFvL+y1qtLOZ/RA6irih
+ f5iAfXfpPz4wNAHbwNLabj4GpO5I6+M9UtUd/iRsCpweCKnVJ37A/RIIj61uTHX0eF+C
+ zUKQ==
+X-Gm-Message-State: AOAM531fPyt35JFz7mplSrXs+7LmxvYpoHNVSxEhnwpOUcZO/aVxMpdO
+ fv2CVb+xfiTPcom9/SpcNHblwcdIq1ErmwnFSAQ=
+X-Google-Smtp-Source: ABdhPJynlJMrgkvu7MHyhLLB5gumyLlavYSxWJ2f7OGiIExb/N3I1lRDCrmcDJ0nYdVI4XaKD3mz/hpUhX62cKDI02c=
+X-Received: by 2002:a17:906:fb19:: with SMTP id
+ lz25mr28183085ejb.349.1592250306485; 
+ Mon, 15 Jun 2020 12:45:06 -0700 (PDT)
 MIME-Version: 1.0
-References: <1591625864-31494-1-git-send-email-bmeng.cn@gmail.com>
-In-Reply-To: <1591625864-31494-1-git-send-email-bmeng.cn@gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 15 Jun 2020 12:31:10 -0700
-Message-ID: <CAKmqyKOtX5QpBDY_e+Z93ALqStqRKo8DF_2=ShGEFF6WDy_95w@mail.gmail.com>
-Subject: Re: [PATCH 00/15] hw/riscv: sifive_u: Add GPIO and Mode Select
- (MSEL[3:0]) support
-To: Bin Meng <bmeng.cn@gmail.com>
+References: <1591065557-9174-1-git-send-email-chenhc@lemote.com>
+ <1591065557-9174-2-git-send-email-chenhc@lemote.com>
+ <CAHiYmc5o3GdzEeCm5KGM0kDJcGXbJ=syd9sFEg1AqLOirFNg-Q@mail.gmail.com>
+ <CAAhV-H6KHOLDstUQvOV+8T872R_mLH-ZYHG1YaA6FSqd5meovw@mail.gmail.com>
+ <653db100-34fb-6cbd-215b-e4d931cc5e07@redhat.com>
+In-Reply-To: <653db100-34fb-6cbd-215b-e4d931cc5e07@redhat.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Mon, 15 Jun 2020 21:44:55 +0200
+Message-ID: <CAL1e-=iuAbE+TF1kCZokX75uALZDTndugZVq-mGebJ0F10TLsA@mail.gmail.com>
+Subject: Re: [PATCH for-5.1 V4 1/4] hw/mips: Implement the kvm_type() hook in
+ MachineClass
+To: Thomas Huth <thuth@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::143;
- envelope-from=alistair23@gmail.com; helo=mail-il1-x143.google.com
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::644;
+ envelope-from=aleksandar.m.mail@gmail.com; helo=mail-ej1-x644.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
@@ -93,81 +102,217 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Bin Meng <bin.meng@windriver.com>,
- "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Palmer Dabbelt <palmerdabbelt@google.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>
+Cc: Huacai Chen <zltjiangshi@gmail.com>, Huacai Chen <chenhuacai@gmail.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jun 8, 2020 at 7:18 AM Bin Meng <bmeng.cn@gmail.com> wrote:
+On Mon, Jun 15, 2020 at 10:55 AM Thomas Huth <thuth@redhat.com> wrote:
 >
-> From: Bin Meng <bin.meng@windriver.com>
+> On 15/06/2020 02.52, Huacai Chen wrote:
+> > Hi, Aleksandar,
+> >
+> > On Sun, Jun 14, 2020 at 4:07 PM Aleksandar Markovic
+> > <aleksandar.qemu.devel@gmail.com> wrote:
+> >>
+> >>
+> >>
+> >> =D1=83=D1=82=D0=BE, 2. =D1=98=D1=83=D0=BD 2020. =D1=83 04:38 Huacai Ch=
+en <zltjiangshi@gmail.com> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=
+=B0=D0=BE/=D0=BB=D0=B0:
+> >>>
+> >>> MIPS has two types of KVM: TE & VZ, and TE is the default type. Now w=
+e
+> >>> can't create a VZ guest in QEMU because it lacks the kvm_type() hook =
+in
+> >>> MachineClass. Besides, libvirt uses a null-machine to detect the kvm
+> >>> capability, so by default it will return "KVM not supported" on a VZ
+> >>> platform. Thus, null-machine also need the kvm_type() hook.
+> >>>
+> >>> Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+> >>> Signed-off-by: Huacai Chen <chenhc@lemote.com>
+> >>> Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
+> >>> ---
+> >>
+> >> Huacai,
+> >>
+> >> Please take a look at Peter's remarks at:
+> >>
+> >> https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg01878.html
+> >>
+> >> ...and refactor this patch for v5. My general advice: The simpler, the=
+ batter.
+> >>
+> > OK, I will rework this patch.
 >
-> This series updates the 'sifive_u' machine support:
+>  Hi,
 >
-> - Add GPIO controller support
-> - Support reboot functionality via GPIO pin#10
-> - Change SiFive E/U series CPU reset vector to 0x1004
-> - Support Mode Select (MSEL[3:0]) settings at 0x1000 via a new
->   "msel" machine property
-> - Add a dummy DDR memory controller device
+> is there maybe also a way to do this without moving null-machine.o from
+> common-obj-y to obj-y, and to avoid the target-specific hacks in this
+> file ? We just moved the null-machine from obj-y to common-obj-y two
+> years ago (see commit 3858ff763985fb9e), since it's more desirable to
+> have as much code in common-obj to save compilation time and maybe to be
+> able to link a qemu with more than one target CPU in one binary one day..=
+.
 >
-> The series also does some clean-ups to the existing codes.
+> ppc64 has also more than one kvm_type (kvm-hv and kvm-pr), and
+> apparently it also works without hacks to the null-machine code there
+> ... so maybe you can peek into the ppc64 code to see how it is solved the=
+re?
 >
-> With this series, QEMU can boot U-Boot SPL built for SiFive FU540
-> all the way up to loading U-Boot proper from MMC:
->
-> $ qemu-system-riscv64 -nographic -M sifive_u,msel=6 -m 8G -bios u-boot-spl.bin
->
-> U-Boot SPL 2020.07-rc3-00208-g88bd5b1 (Jun 08 2020 - 20:16:10 +0800)
-> Trying to boot from MMC1
-> Unhandled exception: Load access fault
-> EPC: 0000000008009be6 TVAL: 0000000010050014
->
-> The last big gap for the 'sifive_u' machine is the QSPI modeling.
->
->
-> Bin Meng (15):
->   hw/riscv: sifive_e: Remove the riscv_ prefix of the machine* and soc*
->     functions
->   hw/riscv: opentitan: Remove the riscv_ prefix of the machine* and soc*
->     functions
->   hw/riscv: sifive_u: Simplify the GEM IRQ connect code a little bit
->   hw/riscv: sifive_u: Generate device tree node for OTP
->   hw/riscv: sifive_gpio: Clean up the codes
->   hw/riscv: sifive_gpio: Add a new 'ngpio' property
->   hw/riscv: sifive_u: Hook a GPIO controller
->   hw/riscv: sifive_gpio: Do not blindly trigger output IRQs
->   hw/riscv: sifive_u: Add reset functionality
->   hw/riscv: sifive_u: Rename serial property get/set functions to a
->     generic name
->   hw/riscv: sifive_u: Add a new property msel for MSEL pin state
->   hw/riscv: sifive: Change SiFive E/U CPU reset vector to 0x1004
->   hw/riscv: sifive_u: Support different boot source per MSEL pin state
->   hw/riscv: sifive_u: Sort the SoC memmap table entries
->   hw/riscv: sifive_u: Add a dummy DDR memory controller device
 
-I have applied patches 1 to 11 to the RISC-V branch.
+Hi, Huacai,
 
-Alistair
+I think the optimal outcome for this release of QEMU would be if you
+drop support for VZ. I think your scenario could work without VZ,
+couldn't it?
 
+This is a fairly complex thing, and, as you see, it is a little
+intrusive, it could negatively impact other targets. With enough
+development time, you can easily provide that support in 5.2. - but
+now we are close to 5.1 softfreeze.
+
+Even without VZ support, I would consider your contribution the most
+significant for MIPS target in last two years, at least - a giant step
+ahead!
+
+Best Regards,
+Aleksandar
+
+>  Thomas
 >
->  hw/riscv/opentitan.c           |  29 ++++----
->  hw/riscv/sifive_e.c            |  32 +++++----
->  hw/riscv/sifive_gpio.c         |  45 +++++++-----
->  hw/riscv/sifive_u.c            | 158 ++++++++++++++++++++++++++++++++++-------
->  include/hw/riscv/sifive_gpio.h |   8 ++-
->  include/hw/riscv/sifive_u.h    |  27 +++++++
->  target/riscv/cpu.c             |   4 +-
->  7 files changed, 223 insertions(+), 80 deletions(-)
 >
-> --
-> 2.7.4
+> >>>  hw/core/Makefile.objs  |  2 +-
+> >>>  hw/core/null-machine.c |  4 ++++
+> >>>  hw/mips/Makefile.objs  |  2 +-
+> >>>  hw/mips/common.c       | 42 ++++++++++++++++++++++++++++++++++++++++=
+++
+> >>>  include/hw/mips/mips.h |  3 +++
+> >>>  5 files changed, 51 insertions(+), 2 deletions(-)
+> >>>  create mode 100644 hw/mips/common.c
+> >>>
+> >>> diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
+> >>> index 1d540ed..b5672f4 100644
+> >>> --- a/hw/core/Makefile.objs
+> >>> +++ b/hw/core/Makefile.objs
+> >>> @@ -17,11 +17,11 @@ common-obj-$(CONFIG_SOFTMMU) +=3D vm-change-state=
+-handler.o
+> >>>  common-obj-$(CONFIG_SOFTMMU) +=3D qdev-properties-system.o
+> >>>  common-obj-$(CONFIG_SOFTMMU) +=3D sysbus.o
+> >>>  common-obj-$(CONFIG_SOFTMMU) +=3D machine.o
+> >>> -common-obj-$(CONFIG_SOFTMMU) +=3D null-machine.o
+> >>>  common-obj-$(CONFIG_SOFTMMU) +=3D loader.o
+> >>>  common-obj-$(CONFIG_SOFTMMU) +=3D machine-hmp-cmds.o
+> >>>  common-obj-$(CONFIG_SOFTMMU) +=3D numa.o
+> >>>  common-obj-$(CONFIG_SOFTMMU) +=3D clock-vmstate.o
+> >>> +obj-$(CONFIG_SOFTMMU) +=3D null-machine.o
+> >>>  obj-$(CONFIG_SOFTMMU) +=3D machine-qmp-cmds.o
+> >>>
+> >>>  common-obj-$(CONFIG_EMPTY_SLOT) +=3D empty_slot.o
+> >>> diff --git a/hw/core/null-machine.c b/hw/core/null-machine.c
+> >>> index cb47d9d..94a36f9 100644
+> >>> --- a/hw/core/null-machine.c
+> >>> +++ b/hw/core/null-machine.c
+> >>> @@ -17,6 +17,7 @@
+> >>>  #include "sysemu/sysemu.h"
+> >>>  #include "exec/address-spaces.h"
+> >>>  #include "hw/core/cpu.h"
+> >>> +#include "hw/mips/mips.h"
+> >>>
+> >>>  static void machine_none_init(MachineState *mch)
+> >>>  {
+> >>> @@ -50,6 +51,9 @@ static void machine_none_machine_init(MachineClass =
+*mc)
+> >>>      mc->max_cpus =3D 1;
+> >>>      mc->default_ram_size =3D 0;
+> >>>      mc->default_ram_id =3D "ram";
+> >>> +#ifdef TARGET_MIPS
+> >>> +    mc->kvm_type =3D mips_kvm_type;
+> >>> +#endif
+> >>>  }
+> >>>
+> >>>  DEFINE_MACHINE("none", machine_none_machine_init)
+> >>> diff --git a/hw/mips/Makefile.objs b/hw/mips/Makefile.objs
+> >>> index 739e2b7..3b3e6ea 100644
+> >>> --- a/hw/mips/Makefile.objs
+> >>> +++ b/hw/mips/Makefile.objs
+> >>> @@ -1,4 +1,4 @@
+> >>> -obj-y +=3D addr.o mips_int.o
+> >>> +obj-y +=3D addr.o common.o mips_int.o
+> >>>  obj-$(CONFIG_R4K) +=3D r4k.o
+> >>>  obj-$(CONFIG_MALTA) +=3D gt64xxx_pci.o malta.o
+> >>>  obj-$(CONFIG_MIPSSIM) +=3D mipssim.o
+> >>> diff --git a/hw/mips/common.c b/hw/mips/common.c
+> >>> new file mode 100644
+> >>> index 0000000..4d8e141
+> >>> --- /dev/null
+> >>> +++ b/hw/mips/common.c
+> >>> @@ -0,0 +1,42 @@
+> >>> +/*
+> >>> + * Common MIPS routines
+> >>> + *
+> >>> + * Copyright (c) 2020 Huacai Chen (chenhc@lemote.com)
+> >>> + * This code is licensed under the GNU GPL v2.
+> >>> + */
+> >>> +
+> >>> +#include <linux/kvm.h>
+> >>> +#include "qemu/osdep.h"
+> >>> +#include "qemu-common.h"
+> >>> +#include "hw/boards.h"
+> >>> +#include "hw/mips/mips.h"
+> >>> +#include "sysemu/kvm_int.h"
+> >>> +
+> >>> +#ifndef CONFIG_KVM
+> >>> +
+> >>> +int mips_kvm_type(MachineState *machine, const char *vm_type)
+> >>> +{
+> >>> +    return 0;
+> >>> +}
+> >>> +
+> >>> +#else
+> >>> +
+> >>> +int mips_kvm_type(MachineState *machine, const char *vm_type)
+> >>> +{
+> >>> +    int r;
+> >>> +    KVMState *s =3D KVM_STATE(machine->accelerator);
+> >>> +
+> >>> +    r =3D kvm_check_extension(s, KVM_CAP_MIPS_VZ);
+> >>> +    if (r > 0) {
+> >>> +        return KVM_VM_MIPS_VZ;
+> >>> +    }
+> >>> +
+> >>> +    r =3D kvm_check_extension(s, KVM_CAP_MIPS_TE);
+> >>> +    if (r > 0) {
+> >>> +        return KVM_VM_MIPS_TE;
+> >>> +    }
+> >>> +
+> >>> +    return -1;
+> >>> +}
+> >>> +
+> >>> +#endif
+> >>> diff --git a/include/hw/mips/mips.h b/include/hw/mips/mips.h
+> >>> index 0af4c3d..2ac0580 100644
+> >>> --- a/include/hw/mips/mips.h
+> >>> +++ b/include/hw/mips/mips.h
+> >>> @@ -20,4 +20,7 @@ void rc4030_dma_write(void *dma, uint8_t *buf, int =
+len);
+> >>>
+> >>>  DeviceState *rc4030_init(rc4030_dma **dmas, IOMMUMemoryRegion **dma_=
+mr);
+> >>>
+> >>> +/* common.c */
+> >>> +int mips_kvm_type(MachineState *machine, const char *vm_type);
+> >>> +
+> >>>  #endif
+> >>> --
+> >>> 2.7.0
+> >>>
+> >
 >
 >
 
