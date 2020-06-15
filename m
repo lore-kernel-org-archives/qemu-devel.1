@@ -2,87 +2,64 @@ Return-Path: <SRS0=tJVC=74=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89DB4C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 16:41:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 502C7C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 16:43:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 58BB42067B
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 16:41:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ja9TLWo6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58BB42067B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 196342067B
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 16:43:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 196342067B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60446 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34728 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jksB8-0001w6-J3
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 12:41:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35432)
+	id 1jksCK-00033S-7A
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 12:43:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36840)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jks7N-0006iU-OT; Mon, 15 Jun 2020 12:37:53 -0400
-Received: from mail-il1-x141.google.com ([2607:f8b0:4864:20::141]:34642)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jks7D-0000hk-7P; Mon, 15 Jun 2020 12:37:53 -0400
-Received: by mail-il1-x141.google.com with SMTP id x18so15942825ilp.1;
- Mon, 15 Jun 2020 09:37:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=txXM3MgeLbWFZbvN7Of7+o1pSroCioT03fnhDcZg4Ok=;
- b=Ja9TLWo6uJ5AM5x0y5E7VYnyY2rRSFe7ND8EmQhwbsbsJj0bRlwfZ+4kxfU8EN9UrN
- hgyb70deIyhqSuABjCGggSlSxRlLpbklqbdANu4h70s3Z6Z5eJtDqfFdd7WEt8B0Kx3v
- Lup0VXHsmbblDDeAdmBDEhymDVJesQExwp7oUTiIxlxKtJ2ABDBAsK1D7dHJ8TVVvyLp
- 6Bx5fPUte1LWsjMXiJ3f9Ev0JACN23uwA31pVUwp+op75NNLY4vGSwh1CcuLeDVSV9Ve
- i5r/6L351HHaKiZZhT+n46N0oQjyvol0Nzb4trLFLVol34pDbbhfn/7GLLf0qouk47A1
- u3OA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=txXM3MgeLbWFZbvN7Of7+o1pSroCioT03fnhDcZg4Ok=;
- b=QTcMWP4z8XsagxIFzKl/6x7olLvEW2p3uQFtkLrs58dlwd1XX1ks2f/q0+RX5Tth6Z
- ggKS3X/1jI1zL3GbLR+vIE7yCCGzCrjLw+9Ix1ygdeZ3wdZCQPdstb1PkX4+B+V2V8Yg
- YmL5PLEdNQU6XKOiU/GL8bOVXsUwUxp6QNBNs7PpOZxw8xny2pCK99+iU9ASHdnMzdpm
- 3vn+/+f54Iu7XBZ4CgkbbomqfLWCWoyiEsVemjh0L3U+XQ1Sq0o3bvjscyHP1TrnfKov
- GionVgEi2klD3nLNcRVHMqBGfElfmE7l5u5teAkJ20+55G/ziU+ggXi4CNyzvTuIXLM5
- sG9A==
-X-Gm-Message-State: AOAM532Qvp9tgQe1wxPasdTjBEttugRQFusBHb+qQLpa9JoYXn1OX2ac
- Zf8Q3nsqaWMmjSXUrqc8a6nceu17NapUJdWlOnE=
-X-Google-Smtp-Source: ABdhPJy8GuxAXfr6eotHbaemPoTuZCr69J28WcS6++MbyG6KJXB6xTfAqRCbnAAXKI8DBKPuCp6IQyFDlGEzyyg6giY=
-X-Received: by 2002:a92:aa07:: with SMTP id j7mr27636180ili.40.1592239061451; 
- Mon, 15 Jun 2020 09:37:41 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
+ id 1jksAP-0001IH-Mn
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 12:41:01 -0400
+Received: from zero.eik.bme.hu ([152.66.115.2]:22950)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
+ id 1jksAM-0001h7-98
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 12:41:00 -0400
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+ by localhost (Postfix) with SMTP id CD9C4746307;
+ Mon, 15 Jun 2020 18:40:55 +0200 (CEST)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+ id AD569745702; Mon, 15 Jun 2020 18:40:55 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+ by zero.eik.bme.hu (Postfix) with ESMTP id ABB767456F8;
+ Mon, 15 Jun 2020 18:40:55 +0200 (CEST)
+Date: Mon, 15 Jun 2020 18:40:55 +0200 (CEST)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH 1/4] sm501: Fix bounds checks
+In-Reply-To: <CAFEAcA_WemGUp0YTitXvChsFPzZjOts04zTp2-aPgmFxTC5NXA@mail.gmail.com>
+Message-ID: <alpine.BSF.2.22.395.2006151832190.51837@zero.eik.bme.hu>
+References: <cover.1591471056.git.balaton@eik.bme.hu>
+ <acb431de2d9c7a497d54a548dfc7592eb2b9fe1c.1591471056.git.balaton@eik.bme.hu>
+ <CAFEAcA_WemGUp0YTitXvChsFPzZjOts04zTp2-aPgmFxTC5NXA@mail.gmail.com>
+User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
 MIME-Version: 1.0
-References: <1591625864-31494-1-git-send-email-bmeng.cn@gmail.com>
- <1591625864-31494-9-git-send-email-bmeng.cn@gmail.com>
-In-Reply-To: <1591625864-31494-9-git-send-email-bmeng.cn@gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 15 Jun 2020 09:28:18 -0700
-Message-ID: <CAKmqyKNwobjiCpQAVPhmwsf+y1w88g=P8x+pCT1JESLy8zf+ZA@mail.gmail.com>
-Subject: Re: [PATCH 08/15] hw/riscv: sifive_gpio: Do not blindly trigger
- output IRQs
-To: Bin Meng <bmeng.cn@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::141;
- envelope-from=alistair23@gmail.com; helo=mail-il1-x141.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Received-SPF: pass client-ip=152.66.115.2; envelope-from=balaton@eik.bme.hu;
+ helo=zero.eik.bme.hu
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 11:14:38
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,53 +72,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Bin Meng <bin.meng@windriver.com>,
- "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Palmer Dabbelt <palmerdabbelt@google.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>
+Cc: Sebastian Bauer <mail@sebastianbauer.info>,
+ Magnus Damm <magnus.damm@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Aurelien Jarno <aurelien@aurel32.net>, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jun 8, 2020 at 7:24 AM Bin Meng <bmeng.cn@gmail.com> wrote:
+On Mon, 15 Jun 2020, Peter Maydell wrote:
+> On Sat, 6 Jun 2020 at 20:22, BALATON Zoltan <balaton@eik.bme.hu> wrote:
+>>
+>> We don't need to add width to pitch when calculating last point, that
+>> would reject valid ops within the card's local_mem.
+>>
+>> Fixes: b15a22bbcbe6a78dc3d88fe3134985e4cdd87de4
+>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+>> ---
+>>  hw/display/sm501.c | 8 ++++----
+>>  1 file changed, 4 insertions(+), 4 deletions(-)
 >
-> From: Bin Meng <bin.meng@windriver.com>
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 >
-> At present the GPIO output IRQs are triggered each time any GPIO
-> register is written. However this is not correct. We should only
-> trigger the output IRQ when the pin is configured as output enable.
->
-> Signed-off-by: Bin Meng <bin.meng@windriver.com>
+> The calculations for sb/se/db/de all have a term which
+> multiplies by (width + pitch), which makes me suspect
+> they also need a similar fix ?
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Maybe. I'll have to check again. Actually is there a simpler way to check 
+if two rectangles overlap when they are given with base, x, y, w, h, pitch 
+where base is the first byte of the screen, pitch is length of one line 
+and x,y is coordinates of top left corner and w,h is dimensions of the 
+rect. Now that I think about it we also need to take into accounf the 
+bytes per pixel value (1 << format) because base is given in bytes while 
+others are in pixels so these formulae likely need some fixes. Pixman has 
+some functions for these but those assume common base so to use those we 
+would need to bring the two rectangles to common base which I could not 
+find out how to do. Probably this is really simple for someone who already 
+did a lot of these before.
 
-Alistair
-
-> ---
->
->  hw/riscv/sifive_gpio.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/hw/riscv/sifive_gpio.c b/hw/riscv/sifive_gpio.c
-> index 0d0fd2b..aac6b44 100644
-> --- a/hw/riscv/sifive_gpio.c
-> +++ b/hw/riscv/sifive_gpio.c
-> @@ -76,7 +76,9 @@ static void update_state(SIFIVEGPIOState *s)
->              actual_value = pull;
->          }
->
-> -        qemu_set_irq(s->output[i], actual_value);
-> +        if (output_en) {
-> +            qemu_set_irq(s->output[i], actual_value);
-> +        }
->
->          /* Input value */
->          ival = input_en && actual_value;
-> --
-> 2.7.4
->
->
+Regards,
+BALATON Zoltan
 
