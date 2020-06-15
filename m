@@ -2,86 +2,85 @@ Return-Path: <SRS0=tJVC=74=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A56C8C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 20:46:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43857C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 20:47:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6D3182074D
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 20:46:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 07DBF2074D
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 20:47:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dPWXqY0E"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D3182074D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Kr5NkvT8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07DBF2074D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57154 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58302 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkw0F-0003hR-Lo
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 16:46:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33184)
+	id 1jkw0S-0004BQ-6A
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 16:47:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33208)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jkvu4-0002Vb-Tb
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 16:40:24 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30142
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jkvu7-0002ae-5y
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 16:40:27 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:48527
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jkvu2-0000Tm-I7
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 16:40:24 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jkvu5-0000VV-DH
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 16:40:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592253621;
+ s=mimecast20190719; t=1592253624;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=2qyot6MD1T/MULaY8ZBjJdwifCWNUmHv9qq7so6uJ40=;
- b=dPWXqY0E+tEfV0ocWenZ5N5nQ3FEAqwRgH9Nj9CbsSbz9CMqSlN5ywHmfSgN8zG4N7k336
- IGoOj511tjM44bWGiLgr0n+A5LygmOVe+0dvouq83nzr1CeXKfOKRSbYKLUrZODEDVtFn0
- yg6xEcItqlN0wpT4j7suv+KX/kZsf6c=
+ bh=rd8rJibFwW2Da7IE5EPhqB8KHe53zDefvJz6ub3lYDo=;
+ b=Kr5NkvT86jMtK38YBka3wsKTiX6iBqF+33cyRQvaJu7JYabtAnSlwPLplOeBMM32XXGVOD
+ vr3faUKTkT1Zijdtfv4h9UEaNjkJdNRIFFmfWmSwY2XZ55lQc1iRwBuZ5SQrjmnyT/6Nt5
+ czfnpP+LIibDCxz+HErDNpsE4gahDkk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-225-mXgO-5PsMO-D2DXubaIPmg-1; Mon, 15 Jun 2020 16:40:17 -0400
-X-MC-Unique: mXgO-5PsMO-D2DXubaIPmg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-195-MzD0h1eWMoy56BR7jGOlfg-1; Mon, 15 Jun 2020 16:40:20 -0400
+X-MC-Unique: MzD0h1eWMoy56BR7jGOlfg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 048D0803308;
- Mon, 15 Jun 2020 20:40:16 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E6D9B1091327;
+ Mon, 15 Jun 2020 20:40:18 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
  [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A2DA55D9CD;
- Mon, 15 Jun 2020 20:40:15 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B06546ED96;
+ Mon, 15 Jun 2020 20:40:18 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 32EBC1138610; Mon, 15 Jun 2020 22:40:08 +0200 (CEST)
+ id 3D5DC1138538; Mon, 15 Jun 2020 22:40:08 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 07/84] arm/aspeed: Rework NIC attachment
-Date: Mon, 15 Jun 2020 22:38:51 +0200
-Message-Id: <20200615204008.3069956-8-armbru@redhat.com>
+Subject: [PULL 10/84] mac_via: Fix to realize "mos6522-q800-via*" devices
+Date: Mon, 15 Jun 2020 22:38:54 +0200
+Message-Id: <20200615204008.3069956-11-armbru@redhat.com>
 In-Reply-To: <20200615204008.3069956-1-armbru@redhat.com>
 References: <20200615204008.3069956-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 16:40:20
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 15:33:04
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -95,247 +94,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
- Joel Stanley <joel@jms.id.au>
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Cédric Le Goater <clg@kaod.org>
+mac_via_realize() creates a "mos6522-q800-via1" and a
+"mos6522-q800-via2" device, but neglects to realize them.  Affects
+machine q800.
 
-The number of MACs supported by an Aspeed SoC is defined by "macs_num"
-under the SoC model, that is two for the AST2400 and AST2500 and four
-for the AST2600. The model initializes the maximum number of supported
-MACs but the number of realized devices is capped by the number of
-network device back-ends defined on the command line. This can leave
-unrealized devices hanging around in the QOM composition tree.
+In theory, a device becomes real only on realize.  In practice, the
+transition from unreal to real is a fuzzy one.  The work to make a
+device real can be spread between realize methods (fine),
+instance_init methods (wrong), and board code wiring up the device
+(fine as long as it effectively happens on realize).  Depending on
+what exactly is done where, a device can work even when we neglect
+to realize it.
 
-To get virtual hardware that matches the physical hardware, you have
-to pass exactly as many -nic options as there are MACs, and some of
-them must be -nic none:
+These two appear to work.  Nevertheless, it's a clear misuse of the
+interface.  Even when it works today (more or less by chance), it can
+break tomorrow.
 
-* Machines ast2500-evb, palmetto-bmc, romulus-bmc, sonorapass-bmc,
-  swift-bmc, and witherspoon-bmc: two -nic, and the second one must be
-  -nic none.
+Fix by realizing them right away.
 
-* Machine ast2600-evb: four -nic, the first one must be -nic none.
-
-* Machine tacoma-bmc: four nic, the first two and the last one must be
-  -nic none.
-
-Modify the machine initialization to define which MACs are attached to
-a network device back-end using a bit-field property "macs-mask" and
-let the SoC realize all network devices.
-
-The default setting of "macs-mask" is "use MAC0" only, which works for
-all our AST2400 and AST2500 machines. The AST2600 machines have
-different configurations. The AST2600 EVB machine activates MAC1, MAC2
-and MAC3 and the Tacoma BMC machine activates MAC2.
-
-Incompatible CLI change: -nic options now apply to *active* MACs:
-MAC1, MAC2, MAC3 for ast2600-evb, MAC2 for tacoma-bmc, and MAC0 for
-all the others.
-
-The machines now always get all MACs as they should. Visible in "info
-qom-tree", here's the change for tacoma-bmc:
-
-     /machine (tacoma-bmc-machine)
-       /peripheral (container)
-       /peripheral-anon (container)
-       /soc (ast2600-a1)
-         [...]
-         /ftgmac100[0] (ftgmac100)
-           /ftgmac100[0] (qemu:memory-region)
-         /ftgmac100[1] (ftgmac100)
-    +      /ftgmac100[0] (qemu:memory-region)
-         /ftgmac100[2] (ftgmac100)
-    +      /ftgmac100[0] (qemu:memory-region)
-         /ftgmac100[3] (ftgmac100)
-    +      /ftgmac100[0] (qemu:memory-region)
-         [...]
-         /mii[0] (aspeed-mmi)
-           /aspeed-mmi[0] (qemu:memory-region)
-         /mii[1] (aspeed-mmi)
-    +      /aspeed-mmi[0] (qemu:memory-region)
-         /mii[2] (aspeed-mmi)
-    +      /aspeed-mmi[0] (qemu:memory-region)
-         /mii[3] (aspeed-mmi)
-    +      /aspeed-mmi[0] (qemu:memory-region)
-
-Also visible in "info qtree"; here's the change for tacoma-bmc:
-
-       dev: ftgmac100, id ""
-         gpio-out "sysbus-irq" 1
-         aspeed = true
-    -    mac = "52:54:00:12:34:56"
-    -    netdev = "hub0port0"
-    +    mac = "52:54:00:12:34:57"
-    +    netdev = ""
-         mmio 000000001e660000/0000000000002000
-       dev: ftgmac100, id ""
-    -    aspeed = false
-    -    mac = "00:00:00:00:00:00"
-    +    gpio-out "sysbus-irq" 1
-    +    aspeed = true
-    +    mac = "52:54:00:12:34:58"
-         netdev = ""
-    +    mmio 000000001e680000/0000000000002000
-       dev: ftgmac100, id ""
-    -    aspeed = false
-    -    mac = "00:00:00:00:00:00"
-    -    netdev = ""
-    +    gpio-out "sysbus-irq" 1
-    +    aspeed = true
-    +    mac = "52:54:00:12:34:56"
-    +    netdev = "hub0port0"
-    +    mmio 000000001e670000/0000000000002000
-       dev: ftgmac100, id ""
-    -    aspeed = false
-    -    mac = "00:00:00:00:00:00"
-    +    gpio-out "sysbus-irq" 1
-    +    aspeed = true
-    +    mac = "52:54:00:12:34:59"
-         netdev = ""
-    +    mmio 000000001e690000/0000000000002000
-       [...]
-       dev: aspeed-mmi, id ""
-         mmio 000000001e650000/0000000000000008
-       dev: aspeed-mmi, id ""
-    +    mmio 000000001e650008/0000000000000008
-       dev: aspeed-mmi, id ""
-    +    mmio 000000001e650010/0000000000000008
-       dev: aspeed-mmi, id ""
-    +    mmio 000000001e650018/0000000000000008
-
-Inactive MACs will have no peer and QEMU may warn the user with :
-
-    qemu-system-arm: warning: nic ftgmac100.0 has no peer
-    qemu-system-arm: warning: nic ftgmac100.1 has no peer
-    qemu-system-arm: warning: nic ftgmac100.3 has no peer
-
-Signed-off-by: Cédric Le Goater <clg@kaod.org>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Joel Stanley <joel@jms.id.au>
-[Commit message expanded]
+Fixes: 6dca62a0000f95e0b7020aa00d0ca9b2c421f341
+Cc: Laurent Vivier <laurent@vivier.eu>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20200609122339.937862-6-armbru@redhat.com>
+Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-Id: <20200609122339.937862-9-armbru@redhat.com>
+Tested-by: Laurent Vivier <laurent@vivier.eu>
+Acked-by: Laurent Vivier <laurent@vivier.eu>
 ---
- include/hw/arm/aspeed.h |  6 ++++++
- hw/arm/aspeed.c         | 13 +++++++++++++
- hw/arm/aspeed_ast2600.c |  3 +--
- hw/arm/aspeed_soc.c     |  3 +--
- 4 files changed, 21 insertions(+), 4 deletions(-)
+ hw/misc/mac_via.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/include/hw/arm/aspeed.h b/include/hw/arm/aspeed.h
-index 18521484b9..95b4daece8 100644
---- a/include/hw/arm/aspeed.h
-+++ b/include/hw/arm/aspeed.h
-@@ -23,6 +23,11 @@ typedef struct AspeedMachine {
-     bool mmio_exec;
- } AspeedMachine;
+diff --git a/hw/misc/mac_via.c b/hw/misc/mac_via.c
+index e05623d730..82614c155a 100644
+--- a/hw/misc/mac_via.c
++++ b/hw/misc/mac_via.c
+@@ -890,6 +890,11 @@ static void mac_via_realize(DeviceState *dev, Error **errp)
+     object_property_add_alias(OBJECT(dev), "irq[1]", OBJECT(ms),
+                               SYSBUS_DEVICE_GPIO_IRQ "[0]");
  
-+#define ASPEED_MAC0_ON   (1 << 0)
-+#define ASPEED_MAC1_ON   (1 << 1)
-+#define ASPEED_MAC2_ON   (1 << 2)
-+#define ASPEED_MAC3_ON   (1 << 3)
++    object_property_set_bool(OBJECT(&m->mos6522_via1), true, "realized",
++                             &error_abort);
++    object_property_set_bool(OBJECT(&m->mos6522_via2), true, "realized",
++                             &error_abort);
 +
- #define ASPEED_MACHINE_CLASS(klass) \
-      OBJECT_CLASS_CHECK(AspeedMachineClass, (klass), TYPE_ASPEED_MACHINE)
- #define ASPEED_MACHINE_GET_CLASS(obj) \
-@@ -39,6 +44,7 @@ typedef struct AspeedMachineClass {
-     const char *fmc_model;
-     const char *spi_model;
-     uint32_t num_cs;
-+    uint32_t macs_mask;
-     void (*i2c_init)(AspeedBoardState *bmc);
- } AspeedMachineClass;
- 
-diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
-index 2e7917da74..ad9f772e06 100644
---- a/hw/arm/aspeed.c
-+++ b/hw/arm/aspeed.c
-@@ -258,6 +258,7 @@ static void aspeed_machine_init(MachineState *machine)
-     DriveInfo *drive0 = drive_get(IF_MTD, 0, 0);
-     ram_addr_t max_ram_size;
-     int i;
-+    NICInfo *nd = &nd_table[0];
- 
-     bmc = g_new0(AspeedBoardState, 1);
- 
-@@ -277,6 +278,14 @@ static void aspeed_machine_init(MachineState *machine)
-     object_property_set_uint(OBJECT(&bmc->soc), ram_size, "ram-size",
-                              &error_fatal);
- 
-+    for (i = 0; i < sc->macs_num; i++) {
-+        if ((amc->macs_mask & (1 << i)) && nd->used) {
-+            qemu_check_nic_model(nd, TYPE_FTGMAC100);
-+            qdev_set_nic_properties(DEVICE(&bmc->soc.ftgmac100[i]), nd);
-+            nd++;
-+        }
-+    }
-+
-     object_property_set_int(OBJECT(&bmc->soc), amc->hw_strap1, "hw-strap1",
-                             &error_abort);
-     object_property_set_int(OBJECT(&bmc->soc), amc->hw_strap2, "hw-strap2",
-@@ -556,12 +565,14 @@ static int aspeed_soc_num_cpus(const char *soc_name)
- static void aspeed_machine_class_init(ObjectClass *oc, void *data)
- {
-     MachineClass *mc = MACHINE_CLASS(oc);
-+    AspeedMachineClass *amc = ASPEED_MACHINE_CLASS(oc);
- 
-     mc->init = aspeed_machine_init;
-     mc->no_floppy = 1;
-     mc->no_cdrom = 1;
-     mc->no_parallel = 1;
-     mc->default_ram_id = "ram";
-+    amc->macs_mask = ASPEED_MAC0_ON;
- 
-     aspeed_machine_class_props_init(oc);
- }
-@@ -680,6 +691,7 @@ static void aspeed_machine_ast2600_evb_class_init(ObjectClass *oc, void *data)
-     amc->fmc_model = "w25q512jv";
-     amc->spi_model = "mx66u51235f";
-     amc->num_cs    = 1;
-+    amc->macs_mask  = ASPEED_MAC1_ON | ASPEED_MAC2_ON | ASPEED_MAC3_ON;
-     amc->i2c_init  = ast2600_evb_i2c_init;
-     mc->default_ram_size = 1 * GiB;
-     mc->default_cpus = mc->min_cpus = mc->max_cpus =
-@@ -698,6 +710,7 @@ static void aspeed_machine_tacoma_class_init(ObjectClass *oc, void *data)
-     amc->fmc_model = "mx66l1g45g";
-     amc->spi_model = "mx66l1g45g";
-     amc->num_cs    = 2;
-+    amc->macs_mask  = ASPEED_MAC2_ON;
-     amc->i2c_init  = witherspoon_bmc_i2c_init; /* Same board layout */
-     mc->default_ram_size = 1 * GiB;
-     mc->default_cpus = mc->min_cpus = mc->max_cpus =
-diff --git a/hw/arm/aspeed_ast2600.c b/hw/arm/aspeed_ast2600.c
-index c6821b3322..b912d19f80 100644
---- a/hw/arm/aspeed_ast2600.c
-+++ b/hw/arm/aspeed_ast2600.c
-@@ -461,8 +461,7 @@ static void aspeed_soc_ast2600_realize(DeviceState *dev, Error **errp)
-     }
- 
-     /* Net */
--    for (i = 0; i < nb_nics && i < sc->macs_num; i++) {
--        qdev_set_nic_properties(DEVICE(&s->ftgmac100[i]), &nd_table[i]);
-+    for (i = 0; i < sc->macs_num; i++) {
-         object_property_set_bool(OBJECT(&s->ftgmac100[i]), true, "aspeed",
-                                  &err);
-         object_property_set_bool(OBJECT(&s->ftgmac100[i]), true, "realized",
-diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
-index e6f4b59134..3ec1257c14 100644
---- a/hw/arm/aspeed_soc.c
-+++ b/hw/arm/aspeed_soc.c
-@@ -404,8 +404,7 @@ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
-     }
- 
-     /* Net */
--    for (i = 0; i < nb_nics && i < sc->macs_num; i++) {
--        qdev_set_nic_properties(DEVICE(&s->ftgmac100[i]), &nd_table[i]);
-+    for (i = 0; i < sc->macs_num; i++) {
-         object_property_set_bool(OBJECT(&s->ftgmac100[i]), true, "aspeed",
-                                  &err);
-         object_property_set_bool(OBJECT(&s->ftgmac100[i]), true, "realized",
+     /* Pass through mos6522 input IRQs */
+     qdev_pass_gpios(DEVICE(&m->mos6522_via1), dev, "via1-irq");
+     qdev_pass_gpios(DEVICE(&m->mos6522_via2), dev, "via2-irq");
 -- 
 2.26.2
 
