@@ -2,84 +2,85 @@ Return-Path: <SRS0=tJVC=74=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91174C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 16:44:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7E9BC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 16:46:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5AEDB2067B
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 16:44:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9220E2067B
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 16:46:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WZwiGNcr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5AEDB2067B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PWSl4OeF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9220E2067B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37386 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39922 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jksDZ-0004DL-Lh
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 12:44:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37790)
+	id 1jksFf-0005Pg-S2
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 12:46:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38240)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jksCe-0003Vo-87
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 12:43:20 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:58788
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jksCb-0002D2-O5
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 12:43:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592239396;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=+glrrH0zDD4nj5i21BuLL7N1zu+uNb/lRZ2iPhQJWBY=;
- b=WZwiGNcrn82buzC4FThUKEpLRofKIVwfrmMHdlBZiZ8/aQ+3geFxFDPs5sf9oARI4HcGZa
- YH4PpHbAsHgVK86Bea55QrzAK7uNeXMxnI0Z5QxOsvuz2RUFsPR7uMmRppCA2hwIGYoGa0
- hcLzI9SF7nCZnk1owRkAd/W/xWpXcU4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-317-9NiDuFyIOEWdI6e4gt3srg-1; Mon, 15 Jun 2020 12:43:14 -0400
-X-MC-Unique: 9NiDuFyIOEWdI6e4gt3srg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 594B418FE88C;
- Mon, 15 Jun 2020 16:42:06 +0000 (UTC)
-Received: from laptop.redhat.com (ovpn-114-197.ams2.redhat.com [10.36.114.197])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C71AC7F4F9;
- Mon, 15 Jun 2020 16:41:58 +0000 (UTC)
-From: Eric Auger <eric.auger@redhat.com>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, stefanb@linux.ibm.com,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org,
- mst@redhat.com, imammedo@redhat.com
-Subject: [PATCH v2] bios-tables-test: Fix "-tpmdev: invalid option"
-Date: Mon, 15 Jun 2020 18:41:48 +0200
-Message-Id: <20200615164148.4706-1-eric.auger@redhat.com>
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jksES-0004rV-Vb; Mon, 15 Jun 2020 12:45:12 -0400
+Received: from mail-il1-x143.google.com ([2607:f8b0:4864:20::143]:33146)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jksER-0002Og-6o; Mon, 15 Jun 2020 12:45:12 -0400
+Received: by mail-il1-x143.google.com with SMTP id z2so15938129ilq.0;
+ Mon, 15 Jun 2020 09:45:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=GxNE/Ziez4cPfywLHTGMClUB/FtlfEo8Us1ntedSN6k=;
+ b=PWSl4OeFnGtgRFJeId32Nl7H1d/Xw6VkdEfIqCXr9MSHqtNy4okR0zMzQHfMhBmrJz
+ 4wFlLUkMDad1c2G+aSKW14FnYmGDj6QxvXhXxTVXa0NOv7hdSlOc0F4K/KRU6/EQkJDu
+ DXxAD7xSSsQOeeGliWwQsni7XK37Nnv3XZOGX6Ly97k56DYDsBKjnZTWghUleg99iUyb
+ KVdPVjXBjMxHahFTnx7lFxQ5YntYFSxyNq1lVfcrxeFzmHtCLOpSLX1ga9fPZJF0VGiO
+ 0wnrfI7N+HSV6YTHiVjhh0YNxUSA8Be+mk7y/1CoA3QL+nEqvJ7DVeTOuLHSvtj9kgaw
+ WYTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=GxNE/Ziez4cPfywLHTGMClUB/FtlfEo8Us1ntedSN6k=;
+ b=SPTEuGzPB0O5xIPo588DviVe+cP6T11kHfwJ6+BsJYMAgUMjPIJy6Kuf2sQqcu8X7C
+ DCmdwu6UChswMzLGJfWGAJ3ThDxwJXIQ32hO0h4Dge4oviD5HZ6Aonwjsvb6LdaWhWiZ
+ I8Qa08iWP3cqirlI4KvZUF/b3p8BIwEnmbci8KQFKd+I+EIrRl1cNb5pN31dAKL22Zb9
+ yo3huYw3TQzqCnRfLDrakCVRR7MmLXmyBIiQNJouTFkzlIHZQuV37aYuwcSeC2P48hWk
+ sQboh/kzIC2uzp0EAeAhtutAgDlctN9jnOCJmAXfs3BF51uPITcwxktda7FgXvlrzreE
+ yytw==
+X-Gm-Message-State: AOAM533ZiZrZBAvQbTjpZ4zPAlY6dX4yndZ5aIKC9dz3wxirnd8rwi9f
+ ixTd4ARoE42T4YI4KyU7owwLslG1ieRA4I8vxaY=
+X-Google-Smtp-Source: ABdhPJzMLXA4Iv+4WNuMTizolkuI41FiH7KRC5EQf0a1fky4MBrrrwxCjKZSUDOT+yNBd0KpJ5CuFOBf1Nzr1EV9HBA=
+X-Received: by 2002:a92:c94b:: with SMTP id i11mr28306635ilq.177.1592239509661; 
+ Mon, 15 Jun 2020 09:45:09 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120;
- envelope-from=eric.auger@redhat.com; helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 01:17:36
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+References: <1591625864-31494-1-git-send-email-bmeng.cn@gmail.com>
+ <1591625864-31494-10-git-send-email-bmeng.cn@gmail.com>
+In-Reply-To: <1591625864-31494-10-git-send-email-bmeng.cn@gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Mon, 15 Jun 2020 09:35:46 -0700
+Message-ID: <CAKmqyKMKzKeBECiUXDii7MdYp4gxU8zaStjXckfVEgNOqSF=4Q@mail.gmail.com>
+Subject: Re: [PATCH 09/15] hw/riscv: sifive_u: Add reset functionality
+To: Bin Meng <bmeng.cn@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::143;
+ envelope-from=alistair23@gmail.com; helo=mail-il1-x143.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -92,55 +93,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, philmd@redhat.com
+Cc: Bin Meng <bin.meng@windriver.com>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Palmer Dabbelt <palmerdabbelt@google.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When configure is run with "--disable-tpm", the bios-tables-test
-q35/tis test fails with "-tpmdev: invalid option".
+On Mon, Jun 8, 2020 at 7:23 AM Bin Meng <bmeng.cn@gmail.com> wrote:
+>
+> From: Bin Meng <bin.meng@windriver.com>
+>
+> The HiFive Unleashed board wires GPIO pin#10 to the input of the
+> system reset signal. Let's set up the GPIO pin#10 and insert a
+> "gpio-restart" device tree node so that reboot is now functional
+> with QEMU 'sifive_u' machine.
+>
+> Signed-off-by: Bin Meng <bin.meng@windriver.com>
 
-Skip the test if CONFIG_TPM is unset.
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-Fixes: 5da7c35e25 ("bios-tables-test: Add Q35/TPM-TIS test")
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Reported-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Stefan Berger <stefanb@linux.ibm.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Alistair
 
----
-
-v1 -> v2:
-- collected R-bs, T-bs and added fix tag (Phil)
----
- tests/qtest/bios-tables-test.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/tests/qtest/bios-tables-test.c b/tests/qtest/bios-tables-test.c
-index 53f104a9c5..b482f76c03 100644
---- a/tests/qtest/bios-tables-test.c
-+++ b/tests/qtest/bios-tables-test.c
-@@ -882,6 +882,7 @@ uint64_t tpm_tis_base_addr;
- static void test_acpi_tcg_tpm(const char *machine, const char *tpm_if,
-                               uint64_t base)
- {
-+#ifdef CONFIG_TPM
-     gchar *tmp_dir_name = g_strdup_printf("qemu-test_acpi_%s_tcg_%s.XXXXXX",
-                                           machine, tpm_if);
-     char *tmp_path = g_dir_make_tmp(tmp_dir_name, NULL);
-@@ -924,6 +925,9 @@ static void test_acpi_tcg_tpm(const char *machine, const char *tpm_if,
-     g_free(tmp_path);
-     g_free(tmp_dir_name);
-     free_test_data(&data);
-+#else
-+    g_test_skip("TPM disabled");
-+#endif
- }
- 
- static void test_acpi_q35_tcg_tpm_tis(void)
--- 
-2.20.1
-
+> ---
+>
+>  hw/riscv/sifive_u.c | 24 +++++++++++++++++++++++-
+>  1 file changed, 23 insertions(+), 1 deletion(-)
+>
+> diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+> index 881949b..ef51874 100644
+> --- a/hw/riscv/sifive_u.c
+> +++ b/hw/riscv/sifive_u.c
+> @@ -37,6 +37,7 @@
+>  #include "qapi/error.h"
+>  #include "qapi/visitor.h"
+>  #include "hw/boards.h"
+> +#include "hw/irq.h"
+>  #include "hw/loader.h"
+>  #include "hw/sysbus.h"
+>  #include "hw/char/serial.h"
+> @@ -53,6 +54,7 @@
+>  #include "net/eth.h"
+>  #include "sysemu/arch_init.h"
+>  #include "sysemu/device_tree.h"
+> +#include "sysemu/runstate.h"
+>  #include "sysemu/sysemu.h"
+>  #include "exec/address-spaces.h"
+>
+> @@ -96,7 +98,7 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
+>      uint32_t *cells;
+>      char *nodename;
+>      char ethclk_names[] = "pclk\0hclk";
+> -    uint32_t plic_phandle, prci_phandle, phandle = 1;
+> +    uint32_t plic_phandle, prci_phandle, gpio_phandle, phandle = 1;
+>      uint32_t hfclk_phandle, rtcclk_phandle, phy_phandle;
+>
+>      fdt = s->fdt = create_device_tree(&s->fdt_size);
+> @@ -270,9 +272,11 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
+>      g_free(cells);
+>      g_free(nodename);
+>
+> +    gpio_phandle = phandle++;
+>      nodename = g_strdup_printf("/soc/gpio@%lx",
+>          (long)memmap[SIFIVE_U_GPIO].base);
+>      qemu_fdt_add_subnode(fdt, nodename);
+> +    qemu_fdt_setprop_cell(fdt, nodename, "phandle", gpio_phandle);
+>      qemu_fdt_setprop_cells(fdt, nodename, "clocks",
+>          prci_phandle, PRCI_CLK_TLCLK);
+>      qemu_fdt_setprop_cell(fdt, nodename, "#interrupt-cells", 2);
+> @@ -292,6 +296,12 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
+>      qemu_fdt_setprop_string(fdt, nodename, "compatible", "sifive,gpio0");
+>      g_free(nodename);
+>
+> +    nodename = g_strdup_printf("/gpio-restart");
+> +    qemu_fdt_add_subnode(fdt, nodename);
+> +    qemu_fdt_setprop_cells(fdt, nodename, "gpios", gpio_phandle, 10, 1);
+> +    qemu_fdt_setprop_string(fdt, nodename, "compatible", "gpio-restart");
+> +    g_free(nodename);
+> +
+>      phy_phandle = phandle++;
+>      nodename = g_strdup_printf("/soc/ethernet@%lx",
+>          (long)memmap[SIFIVE_U_GEM].base);
+> @@ -352,6 +362,14 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
+>      g_free(nodename);
+>  }
+>
+> +static void sifive_u_machine_reset(void *opaque, int n, int level)
+> +{
+> +    /* gpio pin active low triggers reset */
+> +    if (!level) {
+> +        qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
+> +    }
+> +}
+> +
+>  static void sifive_u_machine_init(MachineState *machine)
+>  {
+>      const struct MemmapEntry *memmap = sifive_u_memmap;
+> @@ -383,6 +401,10 @@ static void sifive_u_machine_init(MachineState *machine)
+>      memory_region_add_subregion(system_memory, memmap[SIFIVE_U_FLASH0].base,
+>                                  flash0);
+>
+> +    /* register gpio-restart */
+> +    qdev_connect_gpio_out(DEVICE(&(s->soc.gpio)), 10,
+> +                          qemu_allocate_irq(sifive_u_machine_reset, NULL, 0));
+> +
+>      /* create device tree */
+>      create_fdt(s, memmap, machine->ram_size, machine->kernel_cmdline);
+>
+> --
+> 2.7.4
+>
+>
 
