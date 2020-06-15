@@ -2,86 +2,79 @@ Return-Path: <SRS0=tJVC=74=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D01F9C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 14:22:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2378C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 14:22:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9796520739
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 14:22:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A102D206B7
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 14:22:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NaUWilzA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9796520739
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="e6mdrMpz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A102D206B7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53808 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53960 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkpzw-0005bi-S8
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 10:22:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47626)
+	id 1jkpzy-0005fM-U3
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 10:22:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47704)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jkpxS-0002On-Sa
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 10:19:30 -0400
-Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:45816)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jkpyY-0003nU-OL
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 10:20:38 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:38636)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jkpxQ-0004WK-Ai
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 10:19:30 -0400
-Received: by mail-wr1-x42a.google.com with SMTP id c3so17280160wru.12
- for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 07:19:27 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jkpyW-0004mN-UN
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 10:20:38 -0400
+Received: by mail-oi1-x242.google.com with SMTP id c194so16033378oig.5
+ for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 07:20:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=K+SeFonBSOo3t0Z274huc5h9np0tWPZf1g8S9xiBi5M=;
- b=NaUWilzAVG4mTfjrG1zyAAxjJAL2UTyd/QGcxmnJ7mhlPiS4RB5y7xsSjvDaTlGwK0
- 3ZFMSGqfRBNQXYKZcQ+5dtfRe+bPDKD7jXXCP0mqLB3AzbrWVt/zqAcyx7Y8lok5SSbs
- +ouwkbONitXNWMxjbenKri18tlGOkRQkW8rV2QcYEA1zkFlBXx0xkfuhw91mz0lTTIoz
- oIE5LMDLKaQACb1sIyHqo9QDctJ5A5Q/jMYvVZjSkF+Yox2UwcU7CK/dQtzdeNlHoOx/
- SV7L2CduzN/ncq19dBJFPCRbmMbPjcf8S00SNzq5SO9Zyg6rKJ3ac1KyN8cAiGwL/aZC
- yjiA==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=puwCcQ0mQDNezcQN17uDQ3Mi2C4oGaBJT/mMaYaKUUI=;
+ b=e6mdrMpzmLJVrN/8YSfaiBZUUpDgGD1H8Y3JFjxML7TH08OVFVXG+ahUyd9yvKECF4
+ pMV1gUaxuh4gupZcLwBYNXg26DShyjqKGXPkCfnltoZYNUYAe1TYSiSliyo85/wTmExD
+ EPTN0WDPpL3yLMJamj13PiFP2URdkI82OIgy+c49OpMyn+xmQcmlro2qac9mhvbmjPJd
+ 0wyOokcT47AlYyNkVEOYsJ/r0IeaeX8lGfkfBkipK8ofl+8kV808f6cxA0za0Id+qGVS
+ F3tHXxyqtZrGV4/LxXt15Au06PK0yTAJXkZsJinprKyhQth1cLaO7Q9f/KA8umdDUMkx
+ 7zfA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=K+SeFonBSOo3t0Z274huc5h9np0tWPZf1g8S9xiBi5M=;
- b=QDc8cP/29vCtR5o/EKjWD48mFpyapyo3l0vKtaqRiU5oXDc0LEeQNLthYgzPCudsRQ
- 2T6mbvFEkUwGARpkVCY3zk+7ENGNQse0HP03Egl1EQXZOm/2zF1KhppbUIfFQkAv7RKs
- jD+9kROafgT4uHf5W3nkwqDP1jb4baUlxHtFjGa0clmBE+mc1DUBjFsEcpUxoCx6BR0K
- It0xe5tr7/GI7USRe8a/+nekPeMOgN7LOP0qCf1bEz1tyyv6lAx63Iz7koA0plcEiB/Z
- H6HO8O+Z/1P8ZMaNjyh9G0AU4sbLhLk97/9t7sEdQnzGf+SqB/F6Ob3YqbhVYPXYZN+0
- wK+g==
-X-Gm-Message-State: AOAM530po5nmCAsuV/wDQ5/BltR4lF/mm2rk/FePLF5uhevrb20T7UA/
- 6tmsN8p4ckZCnWhDkGvAdzG0Cg==
-X-Google-Smtp-Source: ABdhPJx1SFZ7GFEfBzRfbe1+t423elR4hDOHni0IAR8YOQcXqR438uVbj/Y0wqikZyyAMTwnpeSyKQ==
-X-Received: by 2002:adf:b198:: with SMTP id q24mr29107305wra.368.1592230766849; 
- Mon, 15 Jun 2020 07:19:26 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id a3sm23805858wrp.91.2020.06.15.07.19.23
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 15 Jun 2020 07:19:24 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 077F91FF8C;
- Mon, 15 Jun 2020 15:19:23 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH  v1 2/2] tests/tcg: ensure -cpu max also used for plugin run
-Date: Mon, 15 Jun 2020 15:19:22 +0100
-Message-Id: <20200615141922.18829-3-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200615141922.18829-1-alex.bennee@linaro.org>
-References: <20200615141922.18829-1-alex.bennee@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=puwCcQ0mQDNezcQN17uDQ3Mi2C4oGaBJT/mMaYaKUUI=;
+ b=UxA6kdzp4AvfKOscr42pIFfquHFqYfNC8PzQ5FSFvxv9zmJ4mDag1Fdf6QyudljuSL
+ 1GZ6IGo8AFjWwvJciEv6Blg0BhHROFmPRBbH/RsiUhJMal1r4bdw90QF7gLcqD8DTpTD
+ KbsO/uMAy7GdBSwbHQ1VwQc5dz2wfPZxRJTpKSVfU4g1yad2iwhV2mLfwe95tnWm/rzm
+ 4jvln8o7rRQo0RE2rZQDwWuVs/kRpNMoJGVwDcDk6IGYkX6nCJMVLiQxiczOdwlC7Ycf
+ GrtGNl1JkalBUfzKW8QZUgEH0KsmyLHNELBWX03LT55hvF1BFB7EcAbetV/X4cA6Ho1y
+ LnSg==
+X-Gm-Message-State: AOAM5326bKPgKVfwB0BIi6txGNu/GzZ50Xie+qO6WW0BlRDqKIHcvMHR
+ Fl9XWtVcYOy8aGiOero/pOlYKGDHB062HowtUAhggw==
+X-Google-Smtp-Source: ABdhPJxTPDyPGwiwfhHUBzTFRcWt93pLuRlQW/ANUGnKxIyh6ezth67+8T1PpHX3M6boJGeXNXG7/8mqiSUvkMoZRkE=
+X-Received: by 2002:aca:5152:: with SMTP id f79mr8757780oib.146.1592230835604; 
+ Mon, 15 Jun 2020 07:20:35 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::42a;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x42a.google.com
+References: <20200605102230.21493-1-philmd@redhat.com>
+ <20200605102230.21493-10-philmd@redhat.com>
+In-Reply-To: <20200605102230.21493-10-philmd@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 15 Jun 2020 15:20:24 +0100
+Message-ID: <CAFEAcA9J6rHqi3TVVk15BkFFqm4+gXX0-860BkQy8BKLz3amLA@mail.gmail.com>
+Subject: Re: [PATCH v3 09/11] hw/sd/sdcard: Correctly display the command name
+ in trace events
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::242;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x242.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -89,8 +82,8 @@ X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,57 +96,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, Peter Maydell <peter.maydell@linaro.org>,
- berrange@redhat.com, Eduardo Habkost <ehabkost@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- richard.henderson@linaro.org, f4bug@amsat.org, cota@braap.org,
- "open list:ARM TCG CPUs" <qemu-arm@nongnu.org>,
- Paolo Bonzini <pbonzini@redhat.com>, aurelien@aurel32.net,
- Richard Henderson <rth@twiddle.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The check-tcg plugins build was failing because some special case
-tests that needed -cpu max failed because the plugin variant hadn't
-carried across the QEMU_OPTS tweak.
+On Fri, 5 Jun 2020 at 11:25, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com=
+> wrote:
+>
+> From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>
+> Some ACMD were incorrectly displayed. Fix by remembering if we
+> are processing a ACMD (with current_cmd_is_acmd) and add the
+> sd_current_cmd_name() helper, which display to correct name
+> regardless it is a CMD or ACMD.
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  hw/sd/sd.c | 17 ++++++++++++++---
+>  1 file changed, 14 insertions(+), 3 deletions(-)
+>
+> diff --git a/hw/sd/sd.c b/hw/sd/sd.c
+> index 952be36399..fad34ab184 100644
+> --- a/hw/sd/sd.c
+> +++ b/hw/sd/sd.c
+> @@ -114,6 +114,7 @@ struct SDState {
+>      uint8_t pwd[16];
+>      uint32_t pwd_len;
+>      uint8_t function_group[6];
+> +    bool current_cmd_is_acmd;
 
-Guests which globally set QEMU_OPTS=-cpu FOO where unaffected.
+This is extra state, so strictly speaking it needs to be
+migrated (though the only thing we would get wrong is a
+possible wrong trace message after a migration load).
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- tests/tcg/aarch64/Makefile.target | 3 ++-
- tests/tcg/i386/Makefile.target    | 1 +
- 2 files changed, 3 insertions(+), 1 deletion(-)
+>      uint8_t current_cmd;
+>      /* True if we will handle the next command as an ACMD. Note that thi=
+s does
+>       * *not* track the APP_CMD status bit!
+> @@ -1687,6 +1688,8 @@ int sd_do_command(SDState *sd, SDRequest *req,
+>                        req->cmd);
+>          req->cmd &=3D 0x3f;
+>      }
+> +    sd->current_cmd =3D req->cmd;
+> +    sd->current_cmd_is_acmd =3D sd->expecting_acmd;
 
-diff --git a/tests/tcg/aarch64/Makefile.target b/tests/tcg/aarch64/Makefile.target
-index 6d60a2f2eed..b617f2ac7e0 100644
---- a/tests/tcg/aarch64/Makefile.target
-+++ b/tests/tcg/aarch64/Makefile.target
-@@ -20,8 +20,9 @@ run-fcvt: fcvt
- # Pauth Tests
- ifneq ($(DOCKER_IMAGE)$(CROSS_CC_HAS_ARMV8_3),)
- AARCH64_TESTS += pauth-1 pauth-2 pauth-4
--run-pauth-%: QEMU_OPTS += -cpu max
- pauth-%: CFLAGS += -march=armv8.3-a
-+run-pauth-%: QEMU_OPTS += -cpu max
-+run-plugin-pauth-%: QEMU_OPTS += -cpu max
- endif
- 
- # Semihosting smoke test for linux-user
-diff --git a/tests/tcg/i386/Makefile.target b/tests/tcg/i386/Makefile.target
-index 53efec06683..1a6463a7dc1 100644
---- a/tests/tcg/i386/Makefile.target
-+++ b/tests/tcg/i386/Makefile.target
-@@ -12,6 +12,7 @@ X86_64_TESTS:=$(filter test-i386-ssse3, $(ALL_X86_TESTS))
- 
- test-i386-pcmpistri: CFLAGS += -msse4.2
- run-test-i386-pcmpistri: QEMU_OPTS += -cpu max
-+run-plugin-test-i386-pcmpistri-%: QEMU_OPTS += -cpu max
- 
- #
- # hello-i386 is a barebones app
--- 
-2.20.1
+I'm not 100% sure about moving the update of sd->current_cmd
+down here -- if it's an illegal command that seems wrong.
 
+>      if (sd->card_status & CARD_IS_LOCKED) {
+>          if (!cmd_valid_while_locked(sd, req->cmd)) {
+> @@ -1714,7 +1717,6 @@ int sd_do_command(SDState *sd, SDRequest *req,
+>          /* Valid command, we can update the 'state before command' bits.
+>           * (Do this now so they appear in r1 responses.)
+>           */
+> -        sd->current_cmd =3D req->cmd;
+>          sd->card_status &=3D ~CURRENT_STATE;
+>          sd->card_status |=3D (last_state << 9);
+>      }
+> @@ -1775,6 +1777,15 @@ send_response:
+>      return rsplen;
+>  }
+
+thanks
+-- PMM
 
