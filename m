@@ -2,70 +2,91 @@ Return-Path: <SRS0=tJVC=74=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DADEC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 12:48:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97434C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 12:50:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D6D06206D7
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 12:48:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6D06206D7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=citrix.com
+	by mail.kernel.org (Postfix) with ESMTPS id 203DA206D7
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 12:50:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LU2dkgiP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 203DA206D7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49288 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52650 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkoXe-0004k6-5u
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 08:48:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54650)
+	id 1jkoYw-00068f-73
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 08:50:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54778)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <roger.pau@citrix.com>)
- id 1jkoX5-0004JR-Do
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 08:48:11 -0400
-Received: from esa5.hc3370-68.iphmx.com ([216.71.155.168]:29838)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <roger.pau@citrix.com>)
- id 1jkoX3-0005Zw-57
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 08:48:10 -0400
-Authentication-Results: esa5.hc3370-68.iphmx.com;
- dkim=none (message not signed) header.i=none
-IronPort-SDR: Nh5LXmhLtCbbZ63JR5d3tnwCEewMo1+TaSAPZ8FxYOH1Kxe8NtpniYLsiKTds5PMA0laHTNakk
- nLiIwcZDT9zM0ygdqkZkaB3yBFEf2WKDoRxHP5wMshRODN2qn1iI+LdEUIavkGJrYx0Ub9dyDE
- aI+anYMAgQlixzXO6PTXZdj/aupni6RIg9tlQQI3kN+KttoWb2gufhS2Jm+Xl1CAOlXr+i9+k2
- UxosB4mQvLqCiQtjssaxOl1tLBjKOoUYF8437gTzPoAugsUoTxPSSes8f6Vfxgkt3oz9NDi/S9
- 6PE=
-X-SBRS: 2.7
-X-MesageID: 20289285
-X-Ironport-Server: esa5.hc3370-68.iphmx.com
-X-Remote-IP: 162.221.158.21
-X-Policy: $RELAYED
-X-IronPort-AV: E=Sophos;i="5.73,514,1583211600"; d="scan'208";a="20289285"
-Date: Mon, 15 Jun 2020 14:47:58 +0200
-From: Roger Pau =?utf-8?B?TW9ubsOp?= <roger.pau@citrix.com>
-To: Grzegorz Uriasz <gorbak25@gmail.com>
-Subject: Re: [PATCH] hw/xen_pt: Don't grant opregion permissions
-Message-ID: <20200615124758.GF735@Air-de-Roger>
-References: <2157e10d63619d43151fe8b8ca913b44c54aba6e.1592176600.git.gorbak25@gmail.com>
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jkoYJ-0005UY-M4
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 08:49:27 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:34568
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jkoYH-0005h2-H2
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 08:49:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592225363;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=hfG3WVRbg7cxH2MKYIbYBTQJVxgJVT42S0QeT/YXXjw=;
+ b=LU2dkgiPWMBSK40lkdrR2S/qCELA4/EoGfRxydK0MJ1jUAcKqY2BkeVQr6wf8fB6iU78qf
+ 4TOMHfTylzj85VL1fnyipPVOub4jKjMCk01kqNAEyPfJDb12ig0sxgWKAjt2cZ4poUqTu9
+ IDFto7Y9NFrdwhqCMC2z4cXoCCaoGtI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-24-3O9BOnXTMt6wEGVuTW5hfw-1; Mon, 15 Jun 2020 08:49:22 -0400
+X-MC-Unique: 3O9BOnXTMt6wEGVuTW5hfw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D4E3280330D;
+ Mon, 15 Jun 2020 12:49:20 +0000 (UTC)
+Received: from work-vm (ovpn-114-201.ams2.redhat.com [10.36.114.201])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2075F10013D6;
+ Mon, 15 Jun 2020 12:49:15 +0000 (UTC)
+Date: Mon, 15 Jun 2020 13:49:13 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: "Denis V. Lunev" <den@openvz.org>
+Subject: Re: [PATCH v3 0/4] block: seriously improve savevm performance
+Message-ID: <20200615124913.GL2883@work-vm>
+References: <20200611171143.21589-1-den@openvz.org>
+ <20200615121714.GJ2883@work-vm>
+ <6931b77c-73ad-010a-daf3-8c7c99c20d10@openvz.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <6931b77c-73ad-010a-daf3-8c7c99c20d10@openvz.org>
+User-Agent: Mutt/1.14.0 (2020-05-02)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 Content-Disposition: inline
-In-Reply-To: <2157e10d63619d43151fe8b8ca913b44c54aba6e.1592176600.git.gorbak25@gmail.com>
-X-ClientProxiedBy: AMSPEX02CAS02.citrite.net (10.69.22.113) To
- AMSPEX02CL02.citrite.net (10.69.22.126)
-Received-SPF: pass client-ip=216.71.155.168; envelope-from=roger.pau@citrix.com;
- helo=esa5.hc3370-68.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 08:48:05
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/14 22:37:26
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -78,29 +99,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefano Stabellini <sstabellini@kernel.org>, jakub@bartmin.ski,
- qemu-devel@nongnu.org, marmarek@invisiblethingslab.com,
- Anthony Perard <anthony.perard@citrix.com>, j.nowak26@student.uw.edu.pl,
- xen-devel@lists.xenproject.org, contact@puzio.waw.pl
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org,
+ Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Denis Plotnikov <dplotnikov@virtuozzo.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, Jun 14, 2020 at 11:21:09PM +0000, Grzegorz Uriasz wrote:
-> With the upstreaming of linux based stubdomains to xen, qemu can't
-> assume it runs inside dom0 - permission assignment must be moved to
-> libxl running in dom0. This xen patch:
-> https://lists.xenproject.org/archives/html/xen-devel/2020-06/msg00973.html
-> implements granting the required permissions to the stubdomain running
-> qemu. This patch removes granting opregion permissions in qemu - this
-> should be fine as when qemu is running inside dom0 the memory mapping will
-> be successfully created without first explicitly granting the permission.
+* Denis V. Lunev (den@openvz.org) wrote:
+> On 6/15/20 3:17 PM, Dr. David Alan Gilbert wrote:
+> > * Denis V. Lunev (den@openvz.org) wrote:
+> >> This series do standard basic things:
+> >> - it creates intermediate buffer for all writes from QEMU migration code
+> >>   to QCOW2 image,
+> >> - this buffer is sent to disk asynchronously, allowing several writes to
+> >>   run in parallel.
+> >>
+> >> In general, migration code is fantastically inefficent (by observation),
+> >> buffers are not aligned and sent with arbitrary pieces, a lot of time
+> >> less than 100 bytes at a chunk, which results in read-modify-write
+> >> operations with non-cached operations. It should also be noted that all
+> >> operations are performed into unallocated image blocks, which also suffer
+> >> due to partial writes to such new clusters.
+> > It surprises me a little that you're not benefiting from the buffer
+> > internal to qemu-file.c
+> >
+> > Dave
+> There are a lot of problems with this buffer:
+> 
+> Flushes to block driver state are performed in the abstract places,
+> pushing
+>   a) small IO
+>   b) non-aligned IO both to
+>        1) page size
+>        2) cluster size
+> It should also be noted that buffer in QEMU file is quite small and
+> all IO operations with it are synchronous. IO, like ethernet, wants
+> good queues.
 
-In order to avoid breaking certain libxl - QEMU combinations, could
-you make the check below non-fatal?
+Yeh, for ethernet we immediately get the kernels buffer so it's not too
+bad; and I guess the async page writes are easier as well.
 
-So that the current code can be kept for dom0 while not throwing an
-error when used inside of a stub domain?
+Dave
 
-Thanks, Roger.
+> The difference is on the table.
+> 
+> Den
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
 
