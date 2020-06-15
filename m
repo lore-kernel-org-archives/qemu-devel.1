@@ -2,85 +2,85 @@ Return-Path: <SRS0=tJVC=74=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9535EC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 16:51:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBB05C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 16:54:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5F83620663
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 16:51:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B4ABE20663
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 16:54:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="obq9J9OM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F83620663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zm9jnbkp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4ABE20663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48284 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51936 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jksKV-0000hv-Lr
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 12:51:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39696)
+	id 1jksNf-0002S4-1L
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 12:54:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41202)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jksJq-0000Db-2Y; Mon, 15 Jun 2020 12:50:47 -0400
-Received: from mail-il1-x143.google.com ([2607:f8b0:4864:20::143]:34799)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jksN6-0001zS-AX
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 12:54:08 -0400
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:38641)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jksJn-0003RC-OF; Mon, 15 Jun 2020 12:50:45 -0400
-Received: by mail-il1-x143.google.com with SMTP id x18so15983713ilp.1;
- Mon, 15 Jun 2020 09:50:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jksN4-00044l-CT
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 12:54:07 -0400
+Received: by mail-oi1-x244.google.com with SMTP id c194so16511964oig.5
+ for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 09:54:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=09cH+KrtXqLM7fQNz+W8DeIct8hAan40sX43VBh3y6o=;
- b=obq9J9OM6rEpc/fSbxryZ2XPu3FXTkkUT+vh5JAgdENTngGI+ipkMP7EMZrukyz/QO
- IcesIs/HlC54Cj4WEwbA3vrjRHgIDdgq9pDTFNMsVLBYDrdrga7R7puX7HjhkaS8AyK+
- 0s+3xqzdM4Nv+oBwNHIw043F8LeXKf/f514EwvDS9lI+fwaRsHT41D+UARHtQmroVqSJ
- sU/7mQWCVfVo8VWyjZHJTE0Hfqs4dTWS5ZcaccZI+QhyqB8qQiwKNta4YmgbY1QKGiYS
- c2jN8MZEZcTw5JsfxCTTI9oT+YCl8u633yzFYTz5Nc1EA+odirwxsiWU6/ZuKwVEGNaT
- kc5Q==
+ :cc; bh=RhTc02SUPXCIhBoDXKpaH4nvryx0HQr1bm7mVp4QOpM=;
+ b=zm9jnbkp8IotzeH6faum2UUN9EM0GwYN128gZ1X5htNgQzvN2XobfmlwXtCEKk3FAY
+ Sai5Rn6ZIT+kp3HWYxIkof+w4yxQJ9EuN65HZFUnsu4BbFlVDic0VnJ4z2GeWoGG7rpA
+ jL4GhljxnNcJxy4Bp71vw1gl6HcZaYFHPgwPVZk7ltsACfBKXT8huq6XJ93mwUZWWqxh
+ genwQFJ1NrvAKA+bllH1DqRqX5/19WNEls32Nl5mOW9HMzsyzs/2pLVZse+BqUukIpYX
+ LOyCY3UIZAA750nzWhSJgVGC5jfiuOyr/pJxW1ZtTr4M60ByvBhaxAJpS8xpkRtd4Yc/
+ 5vaw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=09cH+KrtXqLM7fQNz+W8DeIct8hAan40sX43VBh3y6o=;
- b=IUnkbqHKqXWI5Sg/9REzeT9rRx9StgakEhNWSf6nfeaTj+Oar6WEeLShzMYaQGiNij
- iISama+pHOoL3NT/Uvuuynsn64GiOe86D+ygXSLeOZWlXyQI5hfEJikxlH4WcWwi2Ddn
- zbbBugDZgXtZfDdoD8xpDmD4QKQVi60vDNFwBTFBXWGMxxi7UlPnKZCswCqEzsUnb1kC
- CCSGlxEBsuMdRtjVuSkauIeIMUDegtrLejD89awY1DWjCZuwL7kZsBrfa9+lEUj8ySjg
- iZ3tUxNirlIw47S0yZBgE/Fy/YdH4Yk8oHz1Vy/bVX9rYFvfeyXWiBd7HRPqnMtJCKQb
- lwnw==
-X-Gm-Message-State: AOAM533dtzURq4X5AQUgSDvpcMQkv3Ko4eLOmI2PP1Q2SQr4T+MLZE1O
- Hdb6Dxnpv5Pq1qlCU1Tdme3xkq809cR86h0DToE=
-X-Google-Smtp-Source: ABdhPJy4JJDhW2UyFHfnllSrwAMDhjTgouDagK1InPCxfyFn0MgSO2cLPviI9EUpYQaiYAeTFbWQN0RTJGK5/2v/01c=
-X-Received: by 2002:a92:bb45:: with SMTP id w66mr28021106ili.131.1592239842379; 
- Mon, 15 Jun 2020 09:50:42 -0700 (PDT)
+ bh=RhTc02SUPXCIhBoDXKpaH4nvryx0HQr1bm7mVp4QOpM=;
+ b=rmC9lkDV32bXMOT1b6UZK7CjQtLK7vOM5GLaXPh7+LqvbM4tPmGfmJC/Doxzkc4NGY
+ auW0WILZe5Sivp5KcAFnDsviQCdsQZqcj05SCkth4pXkFLEhtjfc9RtKnPdOggjx+Ass
+ gEyEKXx7aTqeJieNqbxtXPBmcbuNmmcqDJ84EvSkebqNERSfDq/l9HH7o0eP0uhmj0J+
+ Qlb5uTScywvlSR5Lt1PLpkmySTSdLnnFCe/gb1pee+CKtyN1Yio1DQvY/BalhEjYzPBd
+ PEibyFN1WRlwXj63qQRde6qD03TZQjSgbxtW60Wuv/RCveqW3+5eFkTaX3V9ZgJkTPFh
+ uVIQ==
+X-Gm-Message-State: AOAM531+F4SIyvugVAuXaYD44c1ANWNU5RaJqNa7llJ3aSMwKtsTf3ya
+ pe3FSamDMuT2CuNenzjMcEVvx2yXuBEpsOQSjgBcyA==
+X-Google-Smtp-Source: ABdhPJz5Ds/o798EISRwOKvDCeGFyBeJTX7M0kDaYcSeS2gtJ7vZlyLGuFZK7tbC+Zz/XC6PnmMHu4Y9fczwGhUOGH4=
+X-Received: by 2002:aca:568c:: with SMTP id k134mr221207oib.48.1592240045268; 
+ Mon, 15 Jun 2020 09:54:05 -0700 (PDT)
 MIME-Version: 1.0
-References: <1591625864-31494-1-git-send-email-bmeng.cn@gmail.com>
- <1591625864-31494-12-git-send-email-bmeng.cn@gmail.com>
-In-Reply-To: <1591625864-31494-12-git-send-email-bmeng.cn@gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 15 Jun 2020 09:41:19 -0700
-Message-ID: <CAKmqyKMGq_zNZBwbAFbtVVp0P_YvSD98ZqHg3=TvzOS5a6Qfag@mail.gmail.com>
-Subject: Re: [PATCH 11/15] hw/riscv: sifive_u: Add a new property msel for
- MSEL pin state
-To: Bin Meng <bmeng.cn@gmail.com>
+References: <cover.1591471056.git.balaton@eik.bme.hu>
+ <acb431de2d9c7a497d54a548dfc7592eb2b9fe1c.1591471056.git.balaton@eik.bme.hu>
+ <CAFEAcA_WemGUp0YTitXvChsFPzZjOts04zTp2-aPgmFxTC5NXA@mail.gmail.com>
+ <alpine.BSF.2.22.395.2006151832190.51837@zero.eik.bme.hu>
+In-Reply-To: <alpine.BSF.2.22.395.2006151832190.51837@zero.eik.bme.hu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 15 Jun 2020 17:53:54 +0100
+Message-ID: <CAFEAcA8ktxFzcj61GydqarczXWh_gkzJ4aa5ZFKqs6s2BCQaPw@mail.gmail.com>
+Subject: Re: [PATCH 1/4] sm501: Fix bounds checks
+To: BALATON Zoltan <balaton@eik.bme.hu>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::143;
- envelope-from=alistair23@gmail.com; helo=mail-il1-x143.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::244;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x244.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
@@ -95,71 +95,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Bin Meng <bin.meng@windriver.com>,
- "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Palmer Dabbelt <palmerdabbelt@google.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>
+Cc: Sebastian Bauer <mail@sebastianbauer.info>,
+ Magnus Damm <magnus.damm@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Aurelien Jarno <aurelien@aurel32.net>, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jun 8, 2020 at 7:27 AM Bin Meng <bmeng.cn@gmail.com> wrote:
+On Mon, 15 Jun 2020 at 17:40, BALATON Zoltan <balaton@eik.bme.hu> wrote:
 >
-> From: Bin Meng <bin.meng@windriver.com>
+> On Mon, 15 Jun 2020, Peter Maydell wrote:
+> > The calculations for sb/se/db/de all have a term which
+> > multiplies by (width + pitch), which makes me suspect
+> > they also need a similar fix ?
 >
-> On SiFive FU540 SoC, the value stored at physical address 0x1000
-> stores the MSEL pin state that is used to control the next boot
-> location that ROM codes jump to.
->
-> Add a new property msel to sifive_u machine for this.
->
-> Signed-off-by: Bin Meng <bin.meng@windriver.com>
+> Maybe. I'll have to check again. Actually is there a simpler way to check
+> if two rectangles overlap when they are given with base, x, y, w, h, pitch
+> where base is the first byte of the screen, pitch is length of one line
+> and x,y is coordinates of top left corner and w,h is dimensions of the
+> rect. Now that I think about it we also need to take into accounf the
+> bytes per pixel value (1 << format) because base is given in bytes while
+> others are in pixels so these formulae likely need some fixes. Pixman has
+> some functions for these but those assume common base so to use those we
+> would need to bring the two rectangles to common base which I could not
+> find out how to do. Probably this is really simple for someone who already
+> did a lot of these before.
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+I think the thing that makes it particularly awkward is that
+the source and dest can have different pitches. That means it's
+not a simple "do two rectangles overlap" test because the dest
+area might not be a rectangle at all when looked at from the
+POV of the source.
 
-Alistair
+Do guests usually set src and dst pitch identical? If so it
+might be worth having a more accurate rectangle-overlap test
+for the common case and a looser check for the hard-to-handle
+case.
 
-> ---
->
->  hw/riscv/sifive_u.c         | 7 +++++++
->  include/hw/riscv/sifive_u.h | 1 +
->  2 files changed, 8 insertions(+)
->
-> diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-> index 07e2ba0..aaa5adb 100644
-> --- a/hw/riscv/sifive_u.c
-> +++ b/hw/riscv/sifive_u.c
-> @@ -507,6 +507,13 @@ static void sifive_u_machine_instance_init(Object *obj)
->                                      "Set on to tell QEMU's ROM to jump to "
->                                      "flash. Otherwise QEMU will jump to DRAM");
->
-> +    s->msel = 0;
-> +    object_property_add(obj, "msel", "uint32",
-> +                        sifive_u_machine_get_uint32_prop,
-> +                        sifive_u_machine_set_uint32_prop, NULL, &s->msel);
-> +    object_property_set_description(obj, "msel",
-> +                                    "Mode Select (MSEL[3:0]) pin state");
-> +
->      s->serial = OTP_SERIAL;
->      object_property_add(obj, "serial", "uint32",
->                          sifive_u_machine_get_uint32_prop,
-> diff --git a/include/hw/riscv/sifive_u.h b/include/hw/riscv/sifive_u.h
-> index dcf7f3b..d82cfe0 100644
-> --- a/include/hw/riscv/sifive_u.h
-> +++ b/include/hw/riscv/sifive_u.h
-> @@ -63,6 +63,7 @@ typedef struct SiFiveUState {
->      int fdt_size;
->
->      bool start_in_flash;
-> +    uint32_t msel;
->      uint32_t serial;
->  } SiFiveUState;
->
-> --
-> 2.7.4
->
->
+I might have a think about this and draw some diagrams tomorrow :-)
+
+thanks
+-- PMM
 
