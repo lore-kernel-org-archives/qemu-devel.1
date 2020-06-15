@@ -2,113 +2,83 @@ Return-Path: <SRS0=tJVC=74=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8192BC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 07:14:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BCE2C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 07:25:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4E1E620707
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 07:14:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U2eqv9Dx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E1E620707
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 22C682068E
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 07:25:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22C682068E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=canonical.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50250 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53148 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkjKN-00015l-AG
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 03:14:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45794)
+	id 1jkjUS-0002yC-7o
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 03:25:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47608)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jkjJZ-0000Ts-SR
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 03:13:54 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:40193
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jkjJY-0002a9-HA
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 03:13:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592205232;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=bcE1sJcTgxf9JcZw+/HYUXG5c649gABbFGq3WamqEQY=;
- b=U2eqv9Dxt/KDP1KP4ywxEwSU8Z/NVsY3V7Kal/egcTp2ZWtQo0QWiDJggnFTlfj3coyg/S
- 1Z/zdNGW59Mu8bqNLofrtGPoZPWxMgQyW52LcXKFGMjr5zKb+ddAoNnEH0bBP0aDhP9h8g
- qbqxK7ySqBSz6r28IdEJWsMa01gr9VM=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-197-hiaTONJ4PPKF1mt8osTYIQ-1; Mon, 15 Jun 2020 03:13:45 -0400
-X-MC-Unique: hiaTONJ4PPKF1mt8osTYIQ-1
-Received: by mail-wr1-f72.google.com with SMTP id a4so6654620wrp.5
- for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 00:13:45 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <christian.ehrhardt@canonical.com>)
+ id 1jkjTu-0002XJ-Rn
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 03:24:34 -0400
+Received: from youngberry.canonical.com ([91.189.89.112]:43135)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_CBC_SHA1:128)
+ (Exim 4.90_1) (envelope-from <christian.ehrhardt@canonical.com>)
+ id 1jkjTs-00046E-SH
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 03:24:34 -0400
+Received: from mail-vs1-f69.google.com ([209.85.217.69])
+ by youngberry.canonical.com with esmtps
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.86_2)
+ (envelope-from <christian.ehrhardt@canonical.com>)
+ id 1jkjTp-0004hG-Tt
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 07:24:30 +0000
+Received: by mail-vs1-f69.google.com with SMTP id b7so1704295vsh.14
+ for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 00:24:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=bcE1sJcTgxf9JcZw+/HYUXG5c649gABbFGq3WamqEQY=;
- b=tbaa+NHv4v0uCJB2mhLTgDhSJEZCm7Y7IzbMZ5u231wfT2Nzxu+nUeQbS0jwrkUO6R
- sWMRLc6l1Qe1fI4aXU9x50zWXfEnEwBxpeKraT1ph4kiZeksYVByKpOTv5DsiQs51aSw
- RSQrrpmmUp7Ux0Wz+Ib8x8IjHp2C9jj81yUftVh55Ame3bBR8EasJ42J/eYLM5f4MtGe
- RUNMPfzX+a9whdy4cCE9vFa3Yj0//j4q3pllWtic85kwcx+Jnx0qQRgRus/zNFR4bRJP
- y5tvXj8XvX1p2XiMmsPDfDLoI4/9Bdo5g/VMjX1J2r92K/mXej7oonkQ6tMDvi7YCXAv
- 2clg==
-X-Gm-Message-State: AOAM531HrU+lrDFY24n0epgvVdQx/OY9epNzLMicfqG2Qyb2sI2rxrM6
- U7wBFsY3lQ7fzrkqZkRi18C/0SKDF7y3b7kANxtl75CsxR02JUZ/AQ6o20eZ3fsCaCFgM6p1RV9
- zFrTxhlPTFt1B5zo=
-X-Received: by 2002:a1c:a5d4:: with SMTP id o203mr11530444wme.98.1592205224500; 
- Mon, 15 Jun 2020 00:13:44 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx1BgpIeEbSqzCTvIAhQqiQo2Zpw/YuqSsjDVndF85x31itNXadmtv6fqOnF0LAAwXVK8S2kw==
-X-Received: by 2002:a1c:a5d4:: with SMTP id o203mr11530423wme.98.1592205224250; 
- Mon, 15 Jun 2020 00:13:44 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c461:afc9:1:2046?
- ([2001:b07:6468:f312:c461:afc9:1:2046])
- by smtp.gmail.com with ESMTPSA id k21sm24148236wrd.24.2020.06.15.00.13.43
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 15 Jun 2020 00:13:43 -0700 (PDT)
-Subject: Re: [PATCH v2] Makefile: Remove generated files when doing
- 'distclean' (and 'clean')
-To: Thomas Huth <thuth@redhat.com>,
- Aleksandar Markovic <aleksandar.m.mail@gmail.com>,
- Peter Maydell <peter.maydell@linaro.org>
-References: <20191008082815.8267-1-thuth@redhat.com>
- <CAL1e-=gYkhM99Ee0LxZJ5dCjeEdC08G4_Tm3WCZpCSWvJ=b26Q@mail.gmail.com>
- <4bfea125-eb63-f4a2-bca0-bce462f73d89@redhat.com>
- <CAFEAcA_+V7SNsxPSgsd04s8f7PnP3qdyXMp6NvS2inHjE08pJw@mail.gmail.com>
- <CAL1e-=ijjbTG19NHnsDrcJdb7kajBdcndMT8JXymqC6UViiitQ@mail.gmail.com>
- <770c89b9-44d1-0982-34ff-1830911ac413@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <89c5b73f-2294-b58a-85e0-5ed64926fb0c@redhat.com>
-Date: Mon, 15 Jun 2020 09:13:43 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=mb5GvPq0DWHxlH1+kA1vodEW516AcRwabqpZs5YQmNs=;
+ b=d/kjpOEUfHassN/qrVtrgiaBITnToQqR4zWkyLxQ2ufbN+0yiAt5RRWPVdFpePxmTF
+ gUUvUGFTNctNRvkZnVzFwKm2vWTNnj+vffx5ydtXG5yWv/wR9Czx7iGDnjRaa3ooVd2L
+ OusrXXC/XFD2QlzLe6IW/1EjapJTgzZDksDB6b6tRqZqfuoztVhvNS1e8vIb6weXvNN3
+ GMsaR8ExOQwGfOjE7h3NU0dp2U67SqG84LVsfoHgqrFDUKh04+XkYaInopR0whCR7e6N
+ tG5Eo09Km3+yveQH8bTCRDT54GMoHTU+2bRw6qsN3WWRNrMtn1v8des5UGDHeW5+PiWK
+ XMag==
+X-Gm-Message-State: AOAM531HBi3ZXVgH4SIrEZUs0FpsgPpNg9/wKQObpO1DMPAWIgfxBklT
+ jBP7c6mlsSn1aIbgOK8TLWS7yfl/IQE1gKCvsTsafsjZolqa8TFCp0Jx/RFotwJmRYoy7fli6ho
+ VZ6wnZA0WBTFxneTHbUa1hKWmkxjfu7HA+43jnnaMeG/I2puI
+X-Received: by 2002:a1f:60d5:: with SMTP id u204mr16560986vkb.91.1592205869044; 
+ Mon, 15 Jun 2020 00:24:29 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyaXDVz6nl5Zp7ucYuuUW8xYiU3hfR5+xTYVQhj2VNGOU9vNv4JxxwQC6Bh/V2I1ScwnIVTKVZO/MMlTiWzt+U=
+X-Received: by 2002:a1f:60d5:: with SMTP id u204mr16560975vkb.91.1592205868756; 
+ Mon, 15 Jun 2020 00:24:28 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <770c89b9-44d1-0982-34ff-1830911ac413@redhat.com>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 01:43:27
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+References: <20200604094425.63020-1-marcandre.lureau@redhat.com>
+ <CAATJJ0KpmbbdojFy5uHyh01VdidBEBMBtcmqrKnMyhzASrN2hw@mail.gmail.com>
+ <CAATJJ0+zTJBqNPV8e4A827Z-Hf0is1ocBFiZ3TmRb_2PV2HqQg@mail.gmail.com>
+In-Reply-To: <CAATJJ0+zTJBqNPV8e4A827Z-Hf0is1ocBFiZ3TmRb_2PV2HqQg@mail.gmail.com>
+From: Christian Ehrhardt <christian.ehrhardt@canonical.com>
+Date: Mon, 15 Jun 2020 09:24:02 +0200
+Message-ID: <CAATJJ0KrXxGeZ2zo7eejGFh_ika-CTpBkhu+M3nqR66o8k5CRQ@mail.gmail.com>
+Subject: Re: [PATCH] qga: fix assert regression on guest-shutdown
+To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Content-Type: multipart/alternative; boundary="00000000000037915805a81a51f4"
+Received-SPF: none client-ip=91.189.89.112;
+ envelope-from=christian.ehrhardt@canonical.com; helo=youngberry.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 03:24:30
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10
+X-Spam_score_int: -68
+X-Spam_score: -6.9
+X-Spam_bar: ------
+X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, HTML_MESSAGE=0.001,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -121,22 +91,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: qemu-devel <qemu-devel@nongnu.org>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 15/06/20 07:17, Thomas Huth wrote:
-> That depends ... Marc-André, Paolo, what's the status of the meson patch
-> series? Do you think it will be merged for the next release already? If
-> so, it does not make much sense to respin my distclean patch. Otherwise
-> I could do another iteration...
+--00000000000037915805a81a51f4
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-I prefer to aim for 5.2, making it the very first series merged there
-and forcing everyone else to rebase.
+On Tue, Jun 9, 2020 at 1:15 PM Christian Ehrhardt <
+christian.ehrhardt@canonical.com> wrote:
 
-Paolo
+>
+>
+> On Thu, Jun 4, 2020 at 3:43 PM Christian Ehrhardt <
+> christian.ehrhardt@canonical.com> wrote:
+>
+>>
+>>
+>> On Thu, Jun 4, 2020 at 11:46 AM Marc-Andr=C3=A9 Lureau <
+>> marcandre.lureau@redhat.com> wrote:
+>>
+>>> Since commit 781f2b3d1e ("qga: process_event() simplification"),
+>>> send_response() is called unconditionally, but will assert when "rsp" i=
+s
+>>> NULL. This may happen with QCO_NO_SUCCESS_RESP commands, such as
+>>> "guest-shutdown".
+>>>
+>>> Fixes: 781f2b3d1e5ef389b44016a897fd55e7a780bf35
+>>> Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
+>>> Reported-by: Christian Ehrhardt <christian.ehrhardt@canonical.com>
+>>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>>> ---
+>>>  qga/main.c | 6 +++++-
+>>>  1 file changed, 5 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/qga/main.c b/qga/main.c
+>>> index f0e454f28d3..3febf3b0fdf 100644
+>>> --- a/qga/main.c
+>>> +++ b/qga/main.c
+>>> @@ -531,7 +531,11 @@ static int send_response(GAState *s, const QDict
+>>> *rsp)
+>>>      QString *payload_qstr, *response_qstr;
+>>>      GIOStatus status;
+>>>
+>>> -    g_assert(rsp && s->channel);
+>>> +    g_assert(s->channel);
+>>> +
+>>> +    if (!rsp) {
+>>> +        return 0;
+>>> +    }
+>>>
+>>>
+>>>
+>> Thanks Marc-Andr=C3=A9,
+>> LGTM and should fix the issues I was seeing.
+>>
+>> Reviewed-by: Christian Ehrhardt <christian.ehrhardt@canonical.com>
+>>
+>
+> In the meantime I also got to test this against the initially reported
+> issue, LGTM as well (ran as no-change backport onto 4.2).
+>
+> Tested-by: Christian Ehrhardt <christian.ehrhardt@canonical.com>
+>
 
+This LGTM with 2*reviews 1*tested and 11 days on the list without any
+negative feedback.
+I just wanted to re-check if there is anything else left for this to be
+committed?
+
+--00000000000037915805a81a51f4
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
+<div dir=3D"ltr" class=3D"gmail_attr">On Tue, Jun 9, 2020 at 1:15 PM Christ=
+ian Ehrhardt &lt;<a href=3D"mailto:christian.ehrhardt@canonical.com">christ=
+ian.ehrhardt@canonical.com</a>&gt; wrote:<br></div><blockquote class=3D"gma=
+il_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,2=
+04,204);padding-left:1ex"><div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><=
+div class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">On Thu, Jun=
+ 4, 2020 at 3:43 PM Christian Ehrhardt &lt;<a href=3D"mailto:christian.ehrh=
+ardt@canonical.com" target=3D"_blank">christian.ehrhardt@canonical.com</a>&=
+gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0=
+px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex"><div =
+dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote"><div =
+dir=3D"ltr" class=3D"gmail_attr">On Thu, Jun 4, 2020 at 11:46 AM Marc-Andr=
+=C3=A9 Lureau &lt;<a href=3D"mailto:marcandre.lureau@redhat.com" target=3D"=
+_blank">marcandre.lureau@redhat.com</a>&gt; wrote:<br></div><blockquote cla=
+ss=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid =
+rgb(204,204,204);padding-left:1ex">Since commit 781f2b3d1e (&quot;qga: proc=
+ess_event() simplification&quot;),<br>
+send_response() is called unconditionally, but will assert when &quot;rsp&q=
+uot; is<br>
+NULL. This may happen with QCO_NO_SUCCESS_RESP commands, such as<br>
+&quot;guest-shutdown&quot;.<br>
+<br>
+Fixes: 781f2b3d1e5ef389b44016a897fd55e7a780bf35<br>
+Cc: Michael Roth &lt;<a href=3D"mailto:mdroth@linux.vnet.ibm.com" target=3D=
+"_blank">mdroth@linux.vnet.ibm.com</a>&gt;<br>
+Reported-by: Christian Ehrhardt &lt;<a href=3D"mailto:christian.ehrhardt@ca=
+nonical.com" target=3D"_blank">christian.ehrhardt@canonical.com</a>&gt;<br>
+Signed-off-by: Marc-Andr=C3=A9 Lureau &lt;<a href=3D"mailto:marcandre.lurea=
+u@redhat.com" target=3D"_blank">marcandre.lureau@redhat.com</a>&gt;<br>
+---<br>
+=C2=A0qga/main.c | 6 +++++-<br>
+=C2=A01 file changed, 5 insertions(+), 1 deletion(-)<br>
+<br>
+diff --git a/qga/main.c b/qga/main.c<br>
+index f0e454f28d3..3febf3b0fdf 100644<br>
+--- a/qga/main.c<br>
++++ b/qga/main.c<br>
+@@ -531,7 +531,11 @@ static int send_response(GAState *s, const QDict *rsp)=
+<br>
+=C2=A0 =C2=A0 =C2=A0QString *payload_qstr, *response_qstr;<br>
+=C2=A0 =C2=A0 =C2=A0GIOStatus status;<br>
+<br>
+-=C2=A0 =C2=A0 g_assert(rsp &amp;&amp; s-&gt;channel);<br>
++=C2=A0 =C2=A0 g_assert(s-&gt;channel);<br>
++<br>
++=C2=A0 =C2=A0 if (!rsp) {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 return 0;<br>
++=C2=A0 =C2=A0 }<br>
+<br><br>
+</blockquote></div><div><br></div><div>Thanks Marc-Andr=C3=A9,</div><div>LG=
+TM and should fix the issues I was seeing.</div><br clear=3D"all"><div>Revi=
+ewed-by: Christian Ehrhardt &lt;<a href=3D"mailto:christian.ehrhardt@canoni=
+cal.com" target=3D"_blank">christian.ehrhardt@canonical.com</a>&gt;</div></=
+div></blockquote><div><br></div><div>In the meantime I also got to test thi=
+s against the initially reported issue, LGTM as well (ran as no-change back=
+port onto 4.2).</div><div><br></div><div>Tested-by: Christian Ehrhardt &lt;=
+<a href=3D"mailto:christian.ehrhardt@canonical.com" target=3D"_blank">chris=
+tian.ehrhardt@canonical.com</a>&gt;</div></div></div>
+</blockquote></div><br><div>This LGTM with 2*reviews 1*tested and 11 days o=
+n the list without any negative feedback.</div><div>I just wanted to re-che=
+ck if there is anything else left for this to be committed?</div></div>
+
+--00000000000037915805a81a51f4--
 
