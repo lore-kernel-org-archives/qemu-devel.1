@@ -2,78 +2,81 @@ Return-Path: <SRS0=tJVC=74=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90502C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 20:56:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E584C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 20:56:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4AD9720768
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 20:56:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1E13620768
+	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 20:56:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GjDEsBnS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4AD9720768
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L5MEEhKE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E13620768
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38098 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39108 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkw9f-0002s8-DG
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 16:56:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33664)
+	id 1jkw9q-0003JD-CG
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 16:56:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33562)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jkvuR-0003Dw-76
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 16:40:47 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:36170
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jkvuM-00032z-Hy
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 16:40:42 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:21921
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jkvuK-0000Za-2M
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 16:40:46 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jkvuH-0000Yc-8Q
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 16:40:42 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592253639;
+ s=mimecast20190719; t=1592253635;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=wxoB6zjGP3IpdR4aA2Iu30y9UUtCe6nX/xPF41E2KRQ=;
- b=GjDEsBnSXOA4iGQfBBGG+C4kVTHNizGD7sZMH95zd4KukXiZQFqzix2k01MIQbL0BKu2sN
- 8Kv8N/RZkWJ3CddaRuA9LwNm7ppIr1phGDlwLvs4Kr+EpoTusmHQF4T1fNCve4N0AhupeL
- N9rg9ZcL3w3Rjvv5Kr1b38iqbMM1tYg=
+ bh=wHibdf4ZH71iX+6oO/UN7+BTDCHfOn4SwkIpQGs/wMs=;
+ b=L5MEEhKEDUuURM31D8SkkWUsEkDp+uAXJ7nEoYES6BgRtQXjUQs5fPCJcP9dYTCgGoom5f
+ w7S3H/4uU+eWD9g4XtUilqR+P1Te4d16bofIDpZsar/5PLsJnkfR8MQC5TeEeF6Qcf/WSq
+ u9GWEfa8X+cRPWTWMq9FndBAhL6NVEI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-223-kbSpv9n8NpikGekStSCs4w-1; Mon, 15 Jun 2020 16:40:35 -0400
-X-MC-Unique: kbSpv9n8NpikGekStSCs4w-1
+ us-mta-14-uzqgj8k1PHOtIlNgPB0ZMw-1; Mon, 15 Jun 2020 16:40:33 -0400
+X-MC-Unique: uzqgj8k1PHOtIlNgPB0ZMw-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 90ADC5AEC8;
- Mon, 15 Jun 2020 20:40:34 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7BAF480331B
+ for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 20:40:32 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
  [10.36.112.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E7B8F7CAA0;
- Mon, 15 Jun 2020 20:40:32 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id EA9EC7CAA0;
+ Mon, 15 Jun 2020 20:40:29 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id B10A81133023; Mon, 15 Jun 2020 22:40:08 +0200 (CEST)
+ id 9E860113524B; Mon, 15 Jun 2020 22:40:08 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 41/84] pci: Convert uses of pci_create() etc. with Coccinelle
-Date: Mon, 15 Jun 2020 22:39:25 +0200
-Message-Id: <20200615204008.3069956-42-armbru@redhat.com>
+Subject: [PULL 36/84] qdev: Convert uses of qdev_create() manually
+Date: Mon, 15 Jun 2020 22:39:20 +0200
+Message-Id: <20200615204008.3069956-37-armbru@redhat.com>
 In-Reply-To: <20200615204008.3069956-1-armbru@redhat.com>
 References: <20200615204008.3069956-1-armbru@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 15:33:04
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 16:38:57
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -94,437 +97,443 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Replace
+Same transformation as in the previous commit.  Manual, because
+convincing Coccinelle to transform these cases is somewhere between
+not worthwhile and infeasible (at least for me).
 
-    dev = pci_create(bus, type_name);
-    ...
-    qdev_init_nofail(dev);
-
-by
-
-    dev = pci_new(type_name);
-    ...
-    pci_realize_and_unref(dev, bus, &error_fatal);
-
-and similarly for pci_create_multifunction().
-
-Recent commit "qdev: New qdev_new(), qdev_realize(), etc." explains
-why.
-
-Coccinelle script:
-
-    @@
-    expression dev, bus, expr;
-    expression list args;
-    @@
-    -    dev = pci_create(bus, args);
-    +    dev = pci_new(args);
-         ... when != dev = expr
-    -    qdev_init_nofail(&dev->qdev);
-    +    pci_realize_and_unref(dev, bus, &error_fatal);
-
-    @@
-    expression dev, bus, expr;
-    expression list args;
-    expression d;
-    @@
-    -    dev = pci_create(bus, args);
-    +    dev = pci_new(args);
-    (
-         d = &dev->qdev;
-    |
-         d = DEVICE(dev);
-    )
-         ... when != dev = expr
-    -    qdev_init_nofail(d);
-    +    pci_realize_and_unref(dev, bus, &error_fatal);
-
-    @@
-    expression dev, bus, expr;
-    expression list args;
-    @@
-    -    dev = pci_create(bus, args);
-    +    dev = pci_new(args);
-         ... when != dev = expr
-    -    qdev_init_nofail(DEVICE(dev));
-    +    pci_realize_and_unref(dev, bus, &error_fatal);
-
-    @@
-    expression dev, bus, expr;
-    expression list args;
-    @@
-    -    dev = DEVICE(pci_create(bus, args));
-    +    PCIDevice *pci_dev; // TODO move
-    +    pci_dev = pci_new(args);
-    +    dev = DEVICE(pci_dev);
-         ... when != dev = expr
-    -    qdev_init_nofail(dev);
-    +    pci_realize_and_unref(pci_dev, bus, &error_fatal);
-
-    @@
-    expression dev, bus, expr;
-    expression list args;
-    @@
-    -    dev = pci_create_multifunction(bus, args);
-    +    dev = pci_new_multifunction(args);
-         ... when != dev = expr
-    -    qdev_init_nofail(&dev->qdev);
-    +    pci_realize_and_unref(dev, bus, &error_fatal);
-
-    @@
-    expression bus, expr;
-    expression list args;
-    identifier dev;
-    @@
-    -    PCIDevice *dev = pci_create_multifunction(bus, args);
-    +    PCIDevice *dev = pci_new_multifunction(args);
-         ... when != dev = expr
-    -    qdev_init_nofail(&dev->qdev);
-    +    pci_realize_and_unref(dev, bus, &error_fatal);
-
-    @@
-    expression dev, bus, expr;
-    expression list args;
-    @@
-    -    dev = pci_create_multifunction(bus, args);
-    +    dev = pci_new_multifunction(args);
-         ... when != dev = expr
-    -    qdev_init_nofail(DEVICE(dev));
-    +    pci_realize_and_unref(dev, bus, &error_fatal);
-
-Missing #include "qapi/error.h" added manually, whitespace changes
-minimized manually, @pci_dev declarations moved manually.
-
-Cc: Michael S. Tsirkin <mst@redhat.com>
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <20200610053247.1583243-16-armbru@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Message-Id: <20200610053247.1583243-11-armbru@redhat.com>
 ---
- hw/acpi/piix4.c       |  6 ++++--
- hw/i386/pc_q35.c      | 10 +++++-----
- hw/isa/vt82c686.c     | 13 +++++++------
- hw/mips/fuloong2e.c   |  6 ++++--
- hw/pci-bridge/dec.c   |  6 +++---
- hw/pci-host/bonito.c  |  4 ++--
- hw/pci-host/sabre.c   | 13 +++++++------
- hw/pci/pci.c          |  8 ++++----
- hw/ppc/mac_newworld.c |  4 ++--
- hw/ppc/mac_oldworld.c |  4 ++--
- hw/sparc64/sun4u.c    |  8 ++++----
- 11 files changed, 44 insertions(+), 38 deletions(-)
+ hw/arm/highbank.c                   | 26 +++++++++++++-------------
+ hw/arm/sbsa-ref.c                   |  4 ++--
+ hw/arm/virt.c                       |  4 ++--
+ hw/block/xen-block.c                |  4 ++--
+ hw/char/serial.c                    |  4 ++--
+ hw/display/ati.c                    |  5 ++---
+ hw/display/sm501.c                  |  5 ++---
+ hw/display/xlnx_dp.c                |  5 +++--
+ hw/i386/pc.c                        |  4 ++--
+ hw/i386/pc_sysfw.c                  |  4 ++--
+ hw/pci-bridge/pci_expander_bridge.c |  4 ++--
+ hw/ppc/pnv.c                        |  4 ++--
+ hw/riscv/virt.c                     |  4 ++--
+ hw/s390x/s390-pci-bus.c             |  4 ++--
+ hw/sparc/leon3.c                    |  8 ++++----
+ hw/usb/bus.c                        |  8 ++++----
+ 16 files changed, 48 insertions(+), 49 deletions(-)
 
-diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
-index e27f57195a..1262abc77a 100644
---- a/hw/acpi/piix4.c
-+++ b/hw/acpi/piix4.c
-@@ -514,10 +514,12 @@ I2CBus *piix4_pm_init(PCIBus *bus, int devfn, uint32_t smb_io_base,
-                       qemu_irq sci_irq, qemu_irq smi_irq,
-                       int smm_enabled, DeviceState **piix4_pm)
- {
-+    PCIDevice *pci_dev;
-     DeviceState *dev;
-     PIIX4PMState *s;
+diff --git a/hw/arm/highbank.c b/hw/arm/highbank.c
+index ac9de9411e..1bed540011 100644
+--- a/hw/arm/highbank.c
++++ b/hw/arm/highbank.c
+@@ -311,20 +311,20 @@ static void calxeda_init(MachineState *machine, enum cxmachines machine_id)
  
--    dev = DEVICE(pci_create(bus, devfn, TYPE_PIIX4_PM));
-+    pci_dev = pci_new(devfn, TYPE_PIIX4_PM);
-+    dev = DEVICE(pci_dev);
-     qdev_prop_set_uint32(dev, "smb_io_base", smb_io_base);
-     if (piix4_pm) {
-         *piix4_pm = dev;
-@@ -531,7 +533,7 @@ I2CBus *piix4_pm_init(PCIBus *bus, int devfn, uint32_t smb_io_base,
-         s->use_acpi_pci_hotplug = false;
-     }
- 
--    qdev_init_nofail(dev);
-+    pci_realize_and_unref(pci_dev, bus, &error_fatal);
- 
-     return s->smb.smbus;
- }
-diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index 59307d91e2..a6b6add2ef 100644
---- a/hw/i386/pc_q35.c
-+++ b/hw/i386/pc_q35.c
-@@ -100,16 +100,16 @@ static int ehci_create_ich9_with_companions(PCIBus *bus, int slot)
-         return -1;
-     }
- 
--    ehci = pci_create_multifunction(bus, PCI_DEVFN(slot, 7), true, name);
--    qdev_init_nofail(&ehci->qdev);
-+    ehci = pci_new_multifunction(PCI_DEVFN(slot, 7), true, name);
-+    pci_realize_and_unref(ehci, bus, &error_fatal);
-     usbbus = QLIST_FIRST(&ehci->qdev.child_bus);
- 
-     for (i = 0; i < 3; i++) {
--        uhci = pci_create_multifunction(bus, PCI_DEVFN(slot, comp[i].func),
--                                        true, comp[i].name);
-+        uhci = pci_new_multifunction(PCI_DEVFN(slot, comp[i].func), true,
-+                                     comp[i].name);
-         qdev_prop_set_string(&uhci->qdev, "masterbus", usbbus->name);
-         qdev_prop_set_uint32(&uhci->qdev, "firstport", comp[i].port);
--        qdev_init_nofail(&uhci->qdev);
-+        pci_realize_and_unref(uhci, bus, &error_fatal);
-     }
-     return 0;
- }
-diff --git a/hw/isa/vt82c686.c b/hw/isa/vt82c686.c
-index fac4e56b7d..18160ca445 100644
---- a/hw/isa/vt82c686.c
-+++ b/hw/isa/vt82c686.c
-@@ -23,6 +23,7 @@
- #include "hw/isa/apm.h"
- #include "hw/acpi/acpi.h"
- #include "hw/i2c/pm_smbus.h"
-+#include "qapi/error.h"
- #include "qemu/module.h"
- #include "qemu/timer.h"
- #include "exec/address-spaces.h"
-@@ -276,8 +277,8 @@ void vt82c686b_ac97_init(PCIBus *bus, int devfn)
- {
-     PCIDevice *dev;
- 
--    dev = pci_create(bus, devfn, TYPE_VT82C686B_AC97_DEVICE);
--    qdev_init_nofail(&dev->qdev);
-+    dev = pci_new(devfn, TYPE_VT82C686B_AC97_DEVICE);
-+    pci_realize_and_unref(dev, bus, &error_fatal);
- }
- 
- static void via_ac97_class_init(ObjectClass *klass, void *data)
-@@ -320,8 +321,8 @@ void vt82c686b_mc97_init(PCIBus *bus, int devfn)
- {
-     PCIDevice *dev;
- 
--    dev = pci_create(bus, devfn, TYPE_VT82C686B_MC97_DEVICE);
--    qdev_init_nofail(&dev->qdev);
-+    dev = pci_new(devfn, TYPE_VT82C686B_MC97_DEVICE);
-+    pci_realize_and_unref(dev, bus, &error_fatal);
- }
- 
- static void via_mc97_class_init(ObjectClass *klass, void *data)
-@@ -388,12 +389,12 @@ I2CBus *vt82c686b_pm_init(PCIBus *bus, int devfn, uint32_t smb_io_base,
-     PCIDevice *dev;
-     VT686PMState *s;
- 
--    dev = pci_create(bus, devfn, TYPE_VT82C686B_PM_DEVICE);
-+    dev = pci_new(devfn, TYPE_VT82C686B_PM_DEVICE);
-     qdev_prop_set_uint32(&dev->qdev, "smb_io_base", smb_io_base);
- 
-     s = VT82C686B_PM_DEVICE(dev);
- 
--    qdev_init_nofail(&dev->qdev);
-+    pci_realize_and_unref(dev, bus, &error_fatal);
- 
-     return s->smb.smbus;
- }
-diff --git a/hw/mips/fuloong2e.c b/hw/mips/fuloong2e.c
-index 7a65166cf0..8ca31e5162 100644
---- a/hw/mips/fuloong2e.c
-+++ b/hw/mips/fuloong2e.c
-@@ -297,6 +297,7 @@ static void mips_fuloong2e_init(MachineState *machine)
-     long bios_size;
-     uint8_t *spd_data;
-     int64_t kernel_entry;
-+    PCIDevice *pci_dev;
-     PCIBus *pci_bus;
-     ISABus *isa_bus;
-     I2CBus *smbus;
-@@ -367,10 +368,11 @@ static void mips_fuloong2e_init(MachineState *machine)
- 
-     /* GPU */
-     if (vga_interface_type != VGA_NONE) {
--        dev = DEVICE(pci_create(pci_bus, -1, "ati-vga"));
-+        pci_dev = pci_new(-1, "ati-vga");
-+        dev = DEVICE(pci_dev);
-         qdev_prop_set_uint32(dev, "vgamem_mb", 16);
-         qdev_prop_set_uint16(dev, "x-device-id", 0x5159);
+     switch (machine_id) {
+     case CALXEDA_HIGHBANK:
+-        dev = qdev_create(NULL, "l2x0");
 -        qdev_init_nofail(dev);
-+        pci_realize_and_unref(pci_dev, pci_bus, &error_fatal);
++        dev = qdev_new("l2x0");
++        qdev_realize_and_unref(dev, NULL, &error_fatal);
+         busdev = SYS_BUS_DEVICE(dev);
+         sysbus_mmio_map(busdev, 0, 0xfff12000);
+ 
+-        dev = qdev_create(NULL, TYPE_A9MPCORE_PRIV);
++        dev = qdev_new(TYPE_A9MPCORE_PRIV);
+         break;
+     case CALXEDA_MIDWAY:
+-        dev = qdev_create(NULL, TYPE_A15MPCORE_PRIV);
++        dev = qdev_new(TYPE_A15MPCORE_PRIV);
+         break;
      }
- 
-     /* Populate SPD eeprom data */
-diff --git a/hw/pci-bridge/dec.c b/hw/pci-bridge/dec.c
-index 952bc71122..677a310b96 100644
---- a/hw/pci-bridge/dec.c
-+++ b/hw/pci-bridge/dec.c
-@@ -26,6 +26,7 @@
- #include "qemu/osdep.h"
- #include "dec.h"
- #include "hw/sysbus.h"
-+#include "qapi/error.h"
- #include "qemu/module.h"
- #include "hw/pci/pci.h"
- #include "hw/pci/pci_host.h"
-@@ -81,11 +82,10 @@ PCIBus *pci_dec_21154_init(PCIBus *parent_bus, int devfn)
-     PCIDevice *dev;
-     PCIBridge *br;
- 
--    dev = pci_create_multifunction(parent_bus, devfn, false,
--                                   "dec-21154-p2p-bridge");
-+    dev = pci_new_multifunction(devfn, false, "dec-21154-p2p-bridge");
-     br = PCI_BRIDGE(dev);
-     pci_bridge_map_irq(br, "DEC 21154 PCI-PCI bridge", dec_map_irq);
--    qdev_init_nofail(&dev->qdev);
-+    pci_realize_and_unref(dev, parent_bus, &error_fatal);
-     return pci_bridge_get_sec_bus(br);
- }
- 
-diff --git a/hw/pci-host/bonito.c b/hw/pci-host/bonito.c
-index 546ac84cf4..7bb032f005 100644
---- a/hw/pci-host/bonito.c
-+++ b/hw/pci-host/bonito.c
-@@ -750,11 +750,11 @@ PCIBus *bonito_init(qemu_irq *pic)
-     pcihost->pic = pic;
-     qdev_realize_and_unref(dev, NULL, &error_fatal);
- 
--    d = pci_create(phb->bus, PCI_DEVFN(0, 0), TYPE_PCI_BONITO);
-+    d = pci_new(PCI_DEVFN(0, 0), TYPE_PCI_BONITO);
-     s = PCI_BONITO(d);
-     s->pcihost = pcihost;
-     pcihost->pci_dev = s;
--    qdev_init_nofail(DEVICE(d));
-+    pci_realize_and_unref(d, phb->bus, &error_fatal);
- 
-     return phb->bus;
- }
-diff --git a/hw/pci-host/sabre.c b/hw/pci-host/sabre.c
-index 475bcb01d7..0cc68585f8 100644
---- a/hw/pci-host/sabre.c
-+++ b/hw/pci-host/sabre.c
-@@ -35,6 +35,7 @@
- #include "hw/pci-bridge/simba.h"
- #include "hw/pci-host/sabre.h"
- #include "exec/address-spaces.h"
-+#include "qapi/error.h"
- #include "qemu/log.h"
- #include "qemu/module.h"
- #include "sysemu/runstate.h"
-@@ -405,17 +406,17 @@ static void sabre_realize(DeviceState *dev, Error **errp)
-     pci_setup_iommu(phb->bus, sabre_pci_dma_iommu, s->iommu);
- 
-     /* APB secondary busses */
--    pci_dev = pci_create_multifunction(phb->bus, PCI_DEVFN(1, 0), true,
--                                       TYPE_SIMBA_PCI_BRIDGE);
-+    pci_dev = pci_new_multifunction(PCI_DEVFN(1, 0), true,
-+                                    TYPE_SIMBA_PCI_BRIDGE);
-     s->bridgeB = PCI_BRIDGE(pci_dev);
-     pci_bridge_map_irq(s->bridgeB, "pciB", pci_simbaB_map_irq);
--    qdev_init_nofail(&pci_dev->qdev);
-+    pci_realize_and_unref(pci_dev, phb->bus, &error_fatal);
- 
--    pci_dev = pci_create_multifunction(phb->bus, PCI_DEVFN(1, 1), true,
--                                       TYPE_SIMBA_PCI_BRIDGE);
-+    pci_dev = pci_new_multifunction(PCI_DEVFN(1, 1), true,
-+                                    TYPE_SIMBA_PCI_BRIDGE);
-     s->bridgeA = PCI_BRIDGE(pci_dev);
-     pci_bridge_map_irq(s->bridgeA, "pciA", pci_simbaA_map_irq);
--    qdev_init_nofail(&pci_dev->qdev);
-+    pci_realize_and_unref(pci_dev, phb->bus, &error_fatal);
- }
- 
- static void sabre_init(Object *obj)
-diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-index 7e759646cf..24f726d4cd 100644
---- a/hw/pci/pci.c
-+++ b/hw/pci/pci.c
-@@ -1953,10 +1953,10 @@ PCIDevice *pci_nic_init_nofail(NICInfo *nd, PCIBus *rootbus,
-         exit(1);
-     }
- 
--    pci_dev = pci_create(bus, devfn, nd->model);
-+    pci_dev = pci_new(devfn, nd->model);
-     dev = &pci_dev->qdev;
-     qdev_set_nic_properties(dev, nd);
+     qdev_prop_set_uint32(dev, "num-cpu", smp_cpus);
+     qdev_prop_set_uint32(dev, "num-irq", NIRQ_GIC);
 -    qdev_init_nofail(dev);
-+    pci_realize_and_unref(pci_dev, bus, &error_fatal);
-     g_ptr_array_free(pci_nic_models, true);
-     return pci_dev;
- }
-@@ -2199,8 +2199,8 @@ PCIDevice *pci_create_simple_multifunction(PCIBus *bus, int devfn,
-                                            bool multifunction,
-                                            const char *name)
++    qdev_realize_and_unref(dev, NULL, &error_fatal);
+     busdev = SYS_BUS_DEVICE(dev);
+     sysbus_mmio_map(busdev, 0, MPCORE_PERIPHBASE);
+     for (n = 0; n < smp_cpus; n++) {
+@@ -338,17 +338,17 @@ static void calxeda_init(MachineState *machine, enum cxmachines machine_id)
+         pic[n] = qdev_get_gpio_in(dev, n);
+     }
+ 
+-    dev = qdev_create(NULL, "sp804");
++    dev = qdev_new("sp804");
+     qdev_prop_set_uint32(dev, "freq0", 150000000);
+     qdev_prop_set_uint32(dev, "freq1", 150000000);
+-    qdev_init_nofail(dev);
++    qdev_realize_and_unref(dev, NULL, &error_fatal);
+     busdev = SYS_BUS_DEVICE(dev);
+     sysbus_mmio_map(busdev, 0, 0xfff34000);
+     sysbus_connect_irq(busdev, 0, pic[18]);
+     pl011_create(0xfff36000, pic[20], serial_hd(0));
+ 
+-    dev = qdev_create(NULL, TYPE_HIGHBANK_REGISTERS);
+-    qdev_init_nofail(dev);
++    dev = qdev_new(TYPE_HIGHBANK_REGISTERS);
++    qdev_realize_and_unref(dev, NULL, &error_fatal);
+     busdev = SYS_BUS_DEVICE(dev);
+     sysbus_mmio_map(busdev, 0, 0xfff3c000);
+ 
+@@ -363,18 +363,18 @@ static void calxeda_init(MachineState *machine, enum cxmachines machine_id)
+ 
+     if (nd_table[0].used) {
+         qemu_check_nic_model(&nd_table[0], "xgmac");
+-        dev = qdev_create(NULL, "xgmac");
++        dev = qdev_new("xgmac");
+         qdev_set_nic_properties(dev, &nd_table[0]);
+-        qdev_init_nofail(dev);
++        qdev_realize_and_unref(dev, NULL, &error_fatal);
+         sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, 0xfff50000);
+         sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic[77]);
+         sysbus_connect_irq(SYS_BUS_DEVICE(dev), 1, pic[78]);
+         sysbus_connect_irq(SYS_BUS_DEVICE(dev), 2, pic[79]);
+ 
+         qemu_check_nic_model(&nd_table[1], "xgmac");
+-        dev = qdev_create(NULL, "xgmac");
++        dev = qdev_new("xgmac");
+         qdev_set_nic_properties(dev, &nd_table[1]);
+-        qdev_init_nofail(dev);
++        qdev_realize_and_unref(dev, NULL, &error_fatal);
+         sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, 0xfff51000);
+         sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic[80]);
+         sysbus_connect_irq(SYS_BUS_DEVICE(dev), 1, pic[81]);
+diff --git a/hw/arm/sbsa-ref.c b/hw/arm/sbsa-ref.c
+index d68c5d87af..fe24567333 100644
+--- a/hw/arm/sbsa-ref.c
++++ b/hw/arm/sbsa-ref.c
+@@ -211,7 +211,7 @@ static PFlashCFI01 *sbsa_flash_create1(SBSAMachineState *sms,
+      * Create a single flash device.  We use the same parameters as
+      * the flash devices on the Versatile Express board.
+      */
+-    DeviceState *dev = qdev_create(NULL, TYPE_PFLASH_CFI01);
++    DeviceState *dev = qdev_new(TYPE_PFLASH_CFI01);
+ 
+     qdev_prop_set_uint64(dev, "sector-length", SBSA_FLASH_SECTOR_SIZE);
+     qdev_prop_set_uint8(dev, "width", 4);
+@@ -243,7 +243,7 @@ static void sbsa_flash_map1(PFlashCFI01 *flash,
+     assert(QEMU_IS_ALIGNED(size, SBSA_FLASH_SECTOR_SIZE));
+     assert(size / SBSA_FLASH_SECTOR_SIZE <= UINT32_MAX);
+     qdev_prop_set_uint32(dev, "num-blocks", size / SBSA_FLASH_SECTOR_SIZE);
+-    qdev_init_nofail(dev);
++    qdev_realize_and_unref(dev, NULL, &error_fatal);
+ 
+     memory_region_add_subregion(sysmem, base,
+                                 sysbus_mmio_get_region(SYS_BUS_DEVICE(dev),
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 154cd24731..ca151435ae 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -948,7 +948,7 @@ static PFlashCFI01 *virt_flash_create1(VirtMachineState *vms,
+      * Create a single flash device.  We use the same parameters as
+      * the flash devices on the Versatile Express board.
+      */
+-    DeviceState *dev = qdev_create(NULL, TYPE_PFLASH_CFI01);
++    DeviceState *dev = qdev_new(TYPE_PFLASH_CFI01);
+ 
+     qdev_prop_set_uint64(dev, "sector-length", VIRT_FLASH_SECTOR_SIZE);
+     qdev_prop_set_uint8(dev, "width", 4);
+@@ -980,7 +980,7 @@ static void virt_flash_map1(PFlashCFI01 *flash,
+     assert(QEMU_IS_ALIGNED(size, VIRT_FLASH_SECTOR_SIZE));
+     assert(size / VIRT_FLASH_SECTOR_SIZE <= UINT32_MAX);
+     qdev_prop_set_uint32(dev, "num-blocks", size / VIRT_FLASH_SECTOR_SIZE);
+-    qdev_init_nofail(dev);
++    qdev_realize_and_unref(dev, NULL, &error_fatal);
+ 
+     memory_region_add_subregion(sysmem, base,
+                                 sysbus_mmio_get_region(SYS_BUS_DEVICE(dev),
+diff --git a/hw/block/xen-block.c b/hw/block/xen-block.c
+index 570489d6d9..2827c90ac7 100644
+--- a/hw/block/xen-block.c
++++ b/hw/block/xen-block.c
+@@ -937,7 +937,7 @@ static void xen_block_device_create(XenBackendInstance *backend,
+         goto fail;
+     }
+ 
+-    xendev = XEN_DEVICE(qdev_create(BUS(xenbus), type));
++    xendev = XEN_DEVICE(qdev_new(type));
+     blockdev = XEN_BLOCK_DEVICE(xendev);
+ 
+     object_property_set_str(OBJECT(xendev), vdev, "vdev", &local_err);
+@@ -965,7 +965,7 @@ static void xen_block_device_create(XenBackendInstance *backend,
+     blockdev->iothread = iothread;
+     blockdev->drive = drive;
+ 
+-    object_property_set_bool(OBJECT(xendev), true, "realized", &local_err);
++    qdev_realize_and_unref(DEVICE(xendev), BUS(xenbus), &local_err);
+     if (local_err) {
+         error_propagate_prepend(errp, local_err,
+                                 "realization of device %s failed: ",
+diff --git a/hw/char/serial.c b/hw/char/serial.c
+index 7d74694587..a0cab38fb0 100644
+--- a/hw/char/serial.c
++++ b/hw/char/serial.c
+@@ -1127,7 +1127,7 @@ SerialMM *serial_mm_init(MemoryRegion *address_space,
+                          qemu_irq irq, int baudbase,
+                          Chardev *chr, enum device_endian end)
  {
--    PCIDevice *dev = pci_create_multifunction(bus, devfn, multifunction, name);
--    qdev_init_nofail(&dev->qdev);
-+    PCIDevice *dev = pci_new_multifunction(devfn, multifunction, name);
-+    pci_realize_and_unref(dev, bus, &error_fatal);
-     return dev;
- }
+-    SerialMM *smm = SERIAL_MM(qdev_create(NULL, TYPE_SERIAL_MM));
++    SerialMM *smm = SERIAL_MM(qdev_new(TYPE_SERIAL_MM));
+     MemoryRegion *mr;
  
-diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
-index 2d069dcc59..baa17cdce7 100644
---- a/hw/ppc/mac_newworld.c
-+++ b/hw/ppc/mac_newworld.c
-@@ -375,14 +375,14 @@ static void ppc_core99_init(MachineState *machine)
-     pci_bus = PCI_HOST_BRIDGE(uninorth_pci)->bus;
+     qdev_prop_set_uint8(DEVICE(smm), "regshift", regshift);
+@@ -1135,7 +1135,7 @@ SerialMM *serial_mm_init(MemoryRegion *address_space,
+     qdev_prop_set_chr(DEVICE(smm), "chardev", chr);
+     qdev_set_legacy_instance_id(DEVICE(smm), base, 2);
+     qdev_prop_set_uint8(DEVICE(smm), "endianness", end);
+-    qdev_init_nofail(DEVICE(smm));
++    qdev_realize_and_unref(DEVICE(smm), NULL, &error_fatal);
  
-     /* MacIO */
--    macio = pci_create(pci_bus, -1, TYPE_NEWWORLD_MACIO);
-+    macio = pci_new(-1, TYPE_NEWWORLD_MACIO);
-     dev = DEVICE(macio);
-     qdev_prop_set_uint64(dev, "frequency", tbfreq);
-     qdev_prop_set_bit(dev, "has-pmu", has_pmu);
-     qdev_prop_set_bit(dev, "has-adb", has_adb);
-     object_property_set_link(OBJECT(macio), OBJECT(pic_dev), "pic",
-                              &error_abort);
--    qdev_init_nofail(dev);
-+    pci_realize_and_unref(macio, pci_bus, &error_fatal);
+     sysbus_connect_irq(SYS_BUS_DEVICE(smm), 0, irq);
+     mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(smm), 0);
+diff --git a/hw/display/ati.c b/hw/display/ati.c
+index 1d9df92b96..7216f7e08f 100644
+--- a/hw/display/ati.c
++++ b/hw/display/ati.c
+@@ -933,10 +933,9 @@ static void ati_vga_realize(PCIDevice *dev, Error **errp)
+     /* ddc, edid */
+     I2CBus *i2cbus = i2c_init_bus(DEVICE(s), "ati-vga.ddc");
+     bitbang_i2c_init(&s->bbi2c, i2cbus);
+-    I2CSlave *i2cddc = I2C_SLAVE(qdev_create(BUS(i2cbus), TYPE_I2CDDC));
++    I2CSlave *i2cddc = I2C_SLAVE(qdev_new(TYPE_I2CDDC));
+     i2c_set_slave_address(i2cddc, 0x50);
+-    object_property_set_bool(OBJECT(i2cddc), true, "realized",
+-                             &error_abort);
++    qdev_realize_and_unref(DEVICE(i2cddc), BUS(i2cbus), &error_abort);
  
-     /* We only emulate 2 out of 3 IDE controllers for now */
-     ide_drive_get(hd, ARRAY_SIZE(hd));
-diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
-index f73ec5f3a9..903483079e 100644
---- a/hw/ppc/mac_oldworld.c
-+++ b/hw/ppc/mac_oldworld.c
-@@ -278,12 +278,12 @@ static void ppc_heathrow_init(MachineState *machine)
-     ide_drive_get(hd, ARRAY_SIZE(hd));
+     /* mmio register space */
+     memory_region_init_io(&s->mm, OBJECT(s), &ati_mm_ops, s,
+diff --git a/hw/display/sm501.c b/hw/display/sm501.c
+index 7ff14fd474..3e62eca3de 100644
+--- a/hw/display/sm501.c
++++ b/hw/display/sm501.c
+@@ -1831,10 +1831,9 @@ static void sm501_init(SM501State *s, DeviceState *dev,
+     /* i2c */
+     s->i2c_bus = i2c_init_bus(dev, "sm501.i2c");
+     /* ddc */
+-    I2CDDCState *ddc = I2CDDC(qdev_create(BUS(s->i2c_bus), TYPE_I2CDDC));
++    I2CDDCState *ddc = I2CDDC(qdev_new(TYPE_I2CDDC));
+     i2c_set_slave_address(I2C_SLAVE(ddc), 0x50);
+-    object_property_set_bool(OBJECT(ddc), true, "realized",
+-                             &error_abort);
++    qdev_realize_and_unref(DEVICE(ddc), BUS(s->i2c_bus), &error_abort);
  
-     /* MacIO */
--    macio = pci_create(pci_bus, -1, TYPE_OLDWORLD_MACIO);
-+    macio = pci_new(-1, TYPE_OLDWORLD_MACIO);
-     dev = DEVICE(macio);
-     qdev_prop_set_uint64(dev, "frequency", tbfreq);
-     object_property_set_link(OBJECT(macio), OBJECT(pic_dev), "pic",
-                              &error_abort);
--    qdev_init_nofail(dev);
-+    pci_realize_and_unref(macio, pci_bus, &error_fatal);
+     /* mmio */
+     memory_region_init(&s->mmio_region, OBJECT(dev), "sm501.mmio", MMIO_SIZE);
+diff --git a/hw/display/xlnx_dp.c b/hw/display/xlnx_dp.c
+index 5210412e55..6e9793584a 100644
+--- a/hw/display/xlnx_dp.c
++++ b/hw/display/xlnx_dp.c
+@@ -1252,7 +1252,7 @@ static void xlnx_dp_init(Object *obj)
+     s->dpcd = DPCD(aux_create_slave(s->aux_bus, "dpcd"));
+     object_property_add_child(OBJECT(s), "dpcd", OBJECT(s->dpcd));
  
-     macio_ide = MACIO_IDE(object_resolve_path_component(OBJECT(macio),
-                                                         "ide[0]"));
-diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
-index ade9c22825..6f29a013ca 100644
---- a/hw/sparc64/sun4u.c
-+++ b/hw/sparc64/sun4u.c
-@@ -605,10 +605,10 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
-     pci_busA->slot_reserved_mask = 0xfffffff1;
-     pci_busB->slot_reserved_mask = 0xfffffff0;
+-    s->edid = I2CDDC(qdev_create(BUS(aux_get_i2c_bus(s->aux_bus)), "i2c-ddc"));
++    s->edid = I2CDDC(qdev_new("i2c-ddc"));
+     i2c_set_slave_address(I2C_SLAVE(s->edid), 0x50);
+     object_property_add_child(OBJECT(s), "edid", OBJECT(s->edid));
  
--    ebus = pci_create_multifunction(pci_busA, PCI_DEVFN(1, 0), true, TYPE_EBUS);
-+    ebus = pci_new_multifunction(PCI_DEVFN(1, 0), true, TYPE_EBUS);
-     qdev_prop_set_uint64(DEVICE(ebus), "console-serial-base",
-                          hwdef->console_serial_base);
--    qdev_init_nofail(DEVICE(ebus));
-+    pci_realize_and_unref(ebus, pci_busA, &error_fatal);
+@@ -1271,7 +1271,8 @@ static void xlnx_dp_realize(DeviceState *dev, Error **errp)
+     qdev_init_nofail(DEVICE(s->dpcd));
+     aux_map_slave(AUX_SLAVE(s->dpcd), 0x0000);
  
-     /* Wire up "well-known" ISA IRQs to PBM legacy obio IRQs */
-     qdev_connect_gpio_out_named(DEVICE(ebus), "isa-irq", 7,
-@@ -661,9 +661,9 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
-         qemu_macaddr_default_if_unset(&macaddr);
+-    qdev_init_nofail(DEVICE(s->edid));
++    qdev_realize_and_unref(DEVICE(s->edid), BUS(aux_get_i2c_bus(s->aux_bus)),
++                           &error_fatal);
+ 
+     s->console = graphic_console_init(dev, 0, &xlnx_dp_gfx_ops, s);
+     surface = qemu_console_surface(s->console);
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index a5dd6252fa..ab2380c01f 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1205,7 +1205,7 @@ void pc_basic_device_init(ISABus *isa_bus, qemu_irq *gsi,
+      * when the HPET wants to take over. Thus we have to disable the latter.
+      */
+     if (!no_hpet && (!kvm_irqchip_in_kernel() || kvm_has_pit_state2())) {
+-        hpet = qdev_try_create(NULL, TYPE_HPET);
++        hpet = qdev_try_new(TYPE_HPET);
+         if (hpet) {
+             /* For pc-piix-*, hpet's intcap is always IRQ2. For pc-q35-1.7
+              * and earlier, use IRQ2 for compat. Otherwise, use IRQ16~23,
+@@ -1216,7 +1216,7 @@ void pc_basic_device_init(ISABus *isa_bus, qemu_irq *gsi,
+             if (!compat) {
+                 qdev_prop_set_uint32(hpet, HPET_INTCAP, hpet_irqs);
+             }
+-            qdev_init_nofail(hpet);
++            qdev_realize_and_unref(hpet, NULL, &error_fatal);
+             sysbus_mmio_map(SYS_BUS_DEVICE(hpet), 0, HPET_BASE);
+ 
+             for (i = 0; i < GSI_NUM_PINS; i++) {
+diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
+index b8d8ef59eb..2e414d1934 100644
+--- a/hw/i386/pc_sysfw.c
++++ b/hw/i386/pc_sysfw.c
+@@ -85,7 +85,7 @@ static PFlashCFI01 *pc_pflash_create(PCMachineState *pcms,
+                                      const char *name,
+                                      const char *alias_prop_name)
+ {
+-    DeviceState *dev = qdev_create(NULL, TYPE_PFLASH_CFI01);
++    DeviceState *dev = qdev_new(TYPE_PFLASH_CFI01);
+ 
+     qdev_prop_set_uint64(dev, "sector-length", FLASH_SECTOR_SIZE);
+     qdev_prop_set_uint8(dev, "width", 1);
+@@ -187,7 +187,7 @@ static void pc_system_flash_map(PCMachineState *pcms,
+         total_size += size;
+         qdev_prop_set_uint32(DEVICE(system_flash), "num-blocks",
+                              size / FLASH_SECTOR_SIZE);
+-        qdev_init_nofail(DEVICE(system_flash));
++        qdev_realize_and_unref(DEVICE(system_flash), NULL, &error_fatal);
+         sysbus_mmio_map(SYS_BUS_DEVICE(system_flash), 0,
+                         0x100000000ULL - total_size);
+ 
+diff --git a/hw/pci-bridge/pci_expander_bridge.c b/hw/pci-bridge/pci_expander_bridge.c
+index 5da0d21061..3a395ab2f0 100644
+--- a/hw/pci-bridge/pci_expander_bridge.c
++++ b/hw/pci-bridge/pci_expander_bridge.c
+@@ -236,7 +236,7 @@ static void pxb_dev_realize_common(PCIDevice *dev, bool pcie, Error **errp)
+         bus = pci_root_bus_new(ds, dev_name, NULL, NULL, 0, TYPE_PXB_PCIE_BUS);
+     } else {
+         bus = pci_root_bus_new(ds, "pxb-internal", NULL, NULL, 0, TYPE_PXB_BUS);
+-        bds = qdev_create(BUS(bus), "pci-bridge");
++        bds = qdev_new("pci-bridge");
+         bds->id = dev_name;
+         qdev_prop_set_uint8(bds, PCI_BRIDGE_DEV_PROP_CHASSIS_NR, pxb->bus_nr);
+         qdev_prop_set_bit(bds, PCI_BRIDGE_DEV_PROP_SHPC, false);
+@@ -257,7 +257,7 @@ static void pxb_dev_realize_common(PCIDevice *dev, bool pcie, Error **errp)
+ 
+     qdev_realize_and_unref(ds, NULL, &error_fatal);
+     if (bds) {
+-        qdev_init_nofail(bds);
++        qdev_realize_and_unref(bds, &bus->qbus, &error_fatal);
      }
  
--    pci_dev = pci_create(pci_busA, PCI_DEVFN(3, 0), "cmd646-ide");
-+    pci_dev = pci_new(PCI_DEVFN(3, 0), "cmd646-ide");
-     qdev_prop_set_uint32(&pci_dev->qdev, "secondary", 1);
--    qdev_init_nofail(&pci_dev->qdev);
-+    pci_realize_and_unref(pci_dev, pci_busA, &error_fatal);
-     pci_ide_create_devs(pci_dev);
+     pci_word_test_and_set_mask(dev->config + PCI_STATUS,
+diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+index e3b6f0b884..8562af3fe0 100644
+--- a/hw/ppc/pnv.c
++++ b/hw/ppc/pnv.c
+@@ -818,7 +818,7 @@ static void pnv_init(MachineState *machine)
+     pnv->chips = g_new0(PnvChip *, pnv->num_chips);
+     for (i = 0; i < pnv->num_chips; i++) {
+         char chip_name[32];
+-        Object *chip = OBJECT(qdev_create(NULL, chip_typename));
++        Object *chip = OBJECT(qdev_new(chip_typename));
  
-     /* Map NVRAM into I/O (ebus) space */
+         pnv->chips[i] = PNV_CHIP(chip);
+ 
+@@ -850,7 +850,7 @@ static void pnv_init(MachineState *machine)
+             object_property_set_link(chip, OBJECT(pnv), "xive-fabric",
+                                      &error_abort);
+         }
+-        object_property_set_bool(chip, true, "realized", &error_fatal);
++        qdev_realize_and_unref(DEVICE(chip), NULL, &error_fatal);
+     }
+     g_free(chip_typename);
+ 
+diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
+index fa88e9118c..4970a085ca 100644
+--- a/hw/riscv/virt.c
++++ b/hw/riscv/virt.c
+@@ -80,7 +80,7 @@ static PFlashCFI01 *virt_flash_create1(RISCVVirtState *s,
+      * Create a single flash device.  We use the same parameters as
+      * the flash devices on the ARM virt board.
+      */
+-    DeviceState *dev = qdev_create(NULL, TYPE_PFLASH_CFI01);
++    DeviceState *dev = qdev_new(TYPE_PFLASH_CFI01);
+ 
+     qdev_prop_set_uint64(dev, "sector-length", VIRT_FLASH_SECTOR_SIZE);
+     qdev_prop_set_uint8(dev, "width", 4);
+@@ -114,7 +114,7 @@ static void virt_flash_map1(PFlashCFI01 *flash,
+     assert(QEMU_IS_ALIGNED(size, VIRT_FLASH_SECTOR_SIZE));
+     assert(size / VIRT_FLASH_SECTOR_SIZE <= UINT32_MAX);
+     qdev_prop_set_uint32(dev, "num-blocks", size / VIRT_FLASH_SECTOR_SIZE);
+-    qdev_init_nofail(dev);
++    qdev_realize_and_unref(dev, NULL, &error_fatal);
+ 
+     memory_region_add_subregion(sysmem, base,
+                                 sysbus_mmio_get_region(SYS_BUS_DEVICE(dev),
+diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+index 7a4bfb7383..a13978bb37 100644
+--- a/hw/s390x/s390-pci-bus.c
++++ b/hw/s390x/s390-pci-bus.c
+@@ -824,7 +824,7 @@ static S390PCIBusDevice *s390_pci_device_new(S390pciState *s,
+     Error *local_err = NULL;
+     DeviceState *dev;
+ 
+-    dev = qdev_try_create(BUS(s->bus), TYPE_S390_PCI_DEVICE);
++    dev = qdev_try_new(TYPE_S390_PCI_DEVICE);
+     if (!dev) {
+         error_setg(errp, "zPCI device could not be created");
+         return NULL;
+@@ -837,7 +837,7 @@ static S390PCIBusDevice *s390_pci_device_new(S390pciState *s,
+                                 "zPCI device could not be created: ");
+         return NULL;
+     }
+-    object_property_set_bool(OBJECT(dev), true, "realized", &local_err);
++    qdev_realize_and_unref(dev, BUS(s->bus), &local_err);
+     if (local_err) {
+         object_unparent(OBJECT(dev));
+         error_propagate_prepend(errp, local_err,
+diff --git a/hw/sparc/leon3.c b/hw/sparc/leon3.c
+index 69fb39909d..b778a5bf80 100644
+--- a/hw/sparc/leon3.c
++++ b/hw/sparc/leon3.c
+@@ -213,15 +213,15 @@ static void leon3_generic_hw_init(MachineState *machine)
+     reset_info->sp    = LEON3_RAM_OFFSET + ram_size;
+     qemu_register_reset(main_cpu_reset, reset_info);
+ 
+-    ahb_pnp = GRLIB_AHB_PNP(qdev_create(NULL, TYPE_GRLIB_AHB_PNP));
+-    object_property_set_bool(OBJECT(ahb_pnp), true, "realized", &error_fatal);
++    ahb_pnp = GRLIB_AHB_PNP(qdev_new(TYPE_GRLIB_AHB_PNP));
++    qdev_realize_and_unref(DEVICE(ahb_pnp), NULL, &error_fatal);
+     sysbus_mmio_map(SYS_BUS_DEVICE(ahb_pnp), 0, LEON3_AHB_PNP_OFFSET);
+     grlib_ahb_pnp_add_entry(ahb_pnp, 0, 0, GRLIB_VENDOR_GAISLER,
+                             GRLIB_LEON3_DEV, GRLIB_AHB_MASTER,
+                             GRLIB_CPU_AREA);
+ 
+-    apb_pnp = GRLIB_APB_PNP(qdev_create(NULL, TYPE_GRLIB_APB_PNP));
+-    object_property_set_bool(OBJECT(apb_pnp), true, "realized", &error_fatal);
++    apb_pnp = GRLIB_APB_PNP(qdev_new(TYPE_GRLIB_APB_PNP));
++    qdev_realize_and_unref(DEVICE(apb_pnp), NULL, &error_fatal);
+     sysbus_mmio_map(SYS_BUS_DEVICE(apb_pnp), 0, LEON3_APB_PNP_OFFSET);
+     grlib_ahb_pnp_add_entry(ahb_pnp, LEON3_APB_PNP_OFFSET, 0xFFF,
+                             GRLIB_VENDOR_GAISLER, GRLIB_APBMST_DEV,
+diff --git a/hw/usb/bus.c b/hw/usb/bus.c
+index fa07df98a2..d28eff1b5c 100644
+--- a/hw/usb/bus.c
++++ b/hw/usb/bus.c
+@@ -326,21 +326,21 @@ static USBDevice *usb_try_create_simple(USBBus *bus, const char *name,
+                                         Error **errp)
+ {
+     Error *err = NULL;
+-    USBDevice *dev;
++    DeviceState *dev;
+ 
+-    dev = USB_DEVICE(qdev_try_create(&bus->qbus, name));
++    dev = qdev_try_new(name);
+     if (!dev) {
+         error_setg(errp, "Failed to create USB device '%s'", name);
+         return NULL;
+     }
+-    object_property_set_bool(OBJECT(dev), true, "realized", &err);
++    qdev_realize_and_unref(dev, &bus->qbus, &err);
+     if (err) {
+         error_propagate_prepend(errp, err,
+                                 "Failed to initialize USB device '%s': ",
+                                 name);
+         return NULL;
+     }
+-    return dev;
++    return USB_DEVICE(dev);
+ }
+ 
+ USBDevice *usb_create_simple(USBBus *bus, const char *name)
 -- 
 2.26.2
 
