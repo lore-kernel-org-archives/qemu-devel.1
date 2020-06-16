@@ -7,78 +7,75 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADE0AC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 15:05:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 223F9C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 15:05:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7391320786
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 15:05:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E561220786
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 15:05:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iQ5VvYBO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7391320786
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kNvEQ8B4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E561220786
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48940 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49374 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlD93-0003R8-Kz
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 11:05:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58300)
+	id 1jlD9B-0003cE-0l
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 11:05:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58328)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1jlCR0-0004Fp-Ui; Tue, 16 Jun 2020 10:19:30 -0400
-Received: from mail-oi1-x230.google.com ([2607:f8b0:4864:20::230]:35789)
+ id 1jlCR3-0004Mt-Va; Tue, 16 Jun 2020 10:19:33 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:36793)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1jlCQy-00071i-VS; Tue, 16 Jun 2020 10:19:30 -0400
-Received: by mail-oi1-x230.google.com with SMTP id k4so19388166oik.2;
- Tue, 16 Jun 2020 07:19:28 -0700 (PDT)
+ id 1jlCR2-00072A-EG; Tue, 16 Jun 2020 10:19:33 -0400
+Received: by mail-ot1-x344.google.com with SMTP id 97so16065216otg.3;
+ Tue, 16 Jun 2020 07:19:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=2sGZeIkn1XRAThlPtGTj22txvZ5HLiiO307uo0Zge1U=;
- b=iQ5VvYBO6W9LW3IlvybIixdsur1eSa37dAB5/CFKEtGn6HNJBveyx5vGOiOysYh7pE
- hLLEaZukUko1p9sUviyNOgSJnBkFBigZQWTKkhEON4NbEZC4j3GGrG3ASUxRHpMjYxxh
- FppU9j7Z9/4pN6OPaPbxDc+oJCtfWEEAil1/NtoPSO9itPJVmqZH76D5FqiMMh7JsE34
- 8IEifd/wpv98meAB8S/khIgHBQiIly9TzModPryrfrw03b9qBIdgX8+UfMC5mQ5VwPxt
- qvV5iCI+9jFhTLyrlwMvi4rosiRk583tVgjbyw2BS0IcLrQE0kDxrCEKq3FImV+ViRDc
- d+3g==
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=3BFt3zvBmH3599GWUmBzmTB/ubSoG/ped8JbzfOjFXw=;
+ b=kNvEQ8B4wVz1tV+sEO5jSOSA3DzQsWrbhzaNXYblj7yVmLs+VzrYpLEjlc5u6AE+KG
+ NWHIXqYgDJMDdgpizSb9rN+YLnRbT6L1ltd/6muxIdWTlyB8asuA/ue3+JauMetGZIfS
+ +c+9Dh8VDBTJFAPQRYQ439UORUrxATz2mtwfZVcBxz35ElMuMusVU6FNE9fkBkPgGrgk
+ Bwm0LN7R0XJkZkY4O4Qr/4yX2pMzwnoSP1SpU0NYIfEfBnTHSf0va5CNDrkOwf4IEnOW
+ j1c01cqO0RupiBT0aXXWoTI6J7hg5MCt84MIhV3MJKlnRay1eOvg2ozMVXqB++IluJu5
+ /lAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=2sGZeIkn1XRAThlPtGTj22txvZ5HLiiO307uo0Zge1U=;
- b=jkLB1k2/8K9T2uNlM+YpAUvpHR6Tk8jGtTIxgdyMvtRmlIADbRVt3KhP0tX2Iatim2
- vsCTDSr6IxH+MPEK+yQ1BOwnQxO5a2gBGsz9Ej4NbTTyIRwW+MCqCD89QRleJni/v881
- jponj/hCXShTQsapJfn6xBba3DR7lMpCWEUqD5SNbMHBcJiOCg0IuBFV7kJx+3fHhCmz
- Xa99WqFLUBlAaMu8Sjkw/LBr9fQvTqK694FJLMI2DRn7t6WiuEgPPqTk9Xj9TlOoYYr2
- hWrk/dQA0vW9JnPY+KE6k4ipH/wLhNfTJFRczIzW6zJFxXXYgU/MfVpUT2B+G34el/De
- wQ+g==
-X-Gm-Message-State: AOAM5304+3wlf8OKRME0gLZ7UuTsApHhM7kAOIgkwFnSW80O1LUNUoOj
- oRAQewJS3mP3b2eatgeZ+b7KJCJc6A0=
-X-Google-Smtp-Source: ABdhPJxfYOLhH8ZOcJmjUQjjean/8BmwRsenergJa5ecfZ9UWPUwhTx8hLwlMuCYuQhop2Q2xB+Rww==
-X-Received: by 2002:aca:2b1a:: with SMTP id i26mr3507705oik.45.1592317166761; 
- Tue, 16 Jun 2020 07:19:26 -0700 (PDT)
+ :in-reply-to:references;
+ bh=3BFt3zvBmH3599GWUmBzmTB/ubSoG/ped8JbzfOjFXw=;
+ b=XXYObBI0xJxekcCOSNzYEerqmhJ9ehIc8gH2Kr3m+p1vvktE3umv/AizlRZFTDebK8
+ 8hmTQuwpGGSuu9a2g8G8hvUA2ow8WdWIIZP8HzckcCUDlIDAfDDo4PeeQmEanX2Qoo8C
+ I9/CpmJgyRwCbrPNlcutx/4ssM2OxW8BQZtYPqUcdS0aHTfZIQMI1m1h/NrvgqRM34q4
+ X/4INqNzgLDPfM/Zd+8olFRLP9O0qhvos/JTx2erV1au5OijKaEZhTU2HnhlSYybxftk
+ HmL7g5tzCmrwjpXTyAG3/9fXjYbLev7XXPpb6v29Fh1U9r+fxB2WUsv/UJqpXpwOYAKR
+ 9JgA==
+X-Gm-Message-State: AOAM530LiVhd3hLnGAqMFJHhy9KK6uzCeV5Rqo/ZwOv7sjHiHsSb5Egl
+ 11hg78O8MLpIp6yXKqXReCqG7vZmS3A=
+X-Google-Smtp-Source: ABdhPJziESiRWNVMGaV/j3lpy7AuOr/WrHsfeG3MLEYDXtVIFX7qYPyTTUKq8U+3xCk7ctWg5ngnwg==
+X-Received: by 2002:a05:6830:1e61:: with SMTP id
+ m1mr2475536otr.13.1592317170646; 
+ Tue, 16 Jun 2020 07:19:30 -0700 (PDT)
 Received: from localhost (76-251-165-188.lightspeed.austtx.sbcglobal.net.
  [76.251.165.188])
- by smtp.gmail.com with ESMTPSA id c1sm4173638otn.81.2020.06.16.07.19.25
+ by smtp.gmail.com with ESMTPSA id g51sm4042298otg.17.2020.06.16.07.19.29
  (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
- Tue, 16 Jun 2020 07:19:25 -0700 (PDT)
+ Tue, 16 Jun 2020 07:19:29 -0700 (PDT)
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 68/78] target/ppc: Fix mtmsr(d) L=1 variant that loses
- interrupts
-Date: Tue, 16 Jun 2020 09:15:37 -0500
-Message-Id: <20200616141547.24664-69-mdroth@linux.vnet.ibm.com>
+Subject: [PATCH 70/78] target/arm: Clear tail in gvec_fmul_idx_*,
+ gvec_fmla_idx_*
+Date: Tue, 16 Jun 2020 09:15:39 -0500
+Message-Id: <20200616141547.24664-71-mdroth@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200616141547.24664-1-mdroth@linux.vnet.ibm.com>
 References: <20200616141547.24664-1-mdroth@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::230;
- envelope-from=flukshun@gmail.com; helo=mail-oi1-x230.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::344;
+ envelope-from=flukshun@gmail.com; helo=mail-ot1-x344.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -87,7 +84,7 @@ X-Spam_bar: /
 X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
  DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
  HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,161 +97,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-stable@nongnu.org, Nicholas Piggin <npiggin@gmail.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-stable@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Nicholas Piggin <npiggin@gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
 
-If mtmsr L=1 sets MSR[EE] while there is a maskable exception pending,
-it does not cause an interrupt. This causes the test case to hang:
+Must clear the tail for AdvSIMD when SVE is enabled.
 
-https://lists.gnu.org/archive/html/qemu-ppc/2019-10/msg00826.html
-
-More recently, Linux reduced the occurance of operations (e.g., rfi)
-which stop translation and allow pending interrupts to be processed.
-This started causing hangs in Linux boot in long-running kernel tests,
-running with '-d int' shows the decrementer stops firing despite DEC
-wrapping and MSR[EE]=1.
-
-https://lists.ozlabs.org/pipermail/linuxppc-dev/2020-April/208301.html
-
-The cause is the broken mtmsr L=1 behaviour, which is contrary to the
-architecture. From Power ISA v3.0B, p.977, Move To Machine State Register,
-Programming Note states:
-
-    If MSR[EE]=0 and an External, Decrementer, or Performance Monitor
-    exception is pending, executing an mtmsrd instruction that sets
-    MSR[EE] to 1 will cause the interrupt to occur before the next
-    instruction is executed, if no higher priority exception exists
-
-Fix this by handling L=1 exactly the same way as L=0, modulo the MSR
-bits altered.
-
-The confusion arises from L=0 being "context synchronizing" whereas L=1
-is "execution synchronizing", which is a weaker semantic. However this
-is not a relaxation of the requirement that these exceptions cause
-interrupts when MSR[EE]=1 (e.g., when mtmsr executes to completion as
-TCG is doing here), rather it specifies how a pipelined processor can
-have multiple instructions in flight where one may influence how another
-behaves.
-
+Fixes: ca40a6e6e39
 Cc: qemu-stable@nongnu.org
-Reported-by: Anton Blanchard <anton@ozlabs.org>
-Reported-by: Nathan Chancellor <natechancellor@gmail.com>
-Tested-by: Nathan Chancellor <natechancellor@gmail.com>
-Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-Message-Id: <20200414111131.465560-1-npiggin@gmail.com>
-Reviewed-by: Cédric Le Goater <clg@kaod.org>
-Tested-by: Cédric Le Goater <clg@kaod.org>
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-(cherry picked from commit 5ed195065cc6895f61b9d59bfa0a0536ed5ed51e)
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20200513163245.17915-15-richard.henderson@linaro.org
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+(cherry picked from commit 525d9b6d42844e187211d25b69be8b378785bc24)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- target/ppc/translate.c | 46 +++++++++++++++++++++++++-----------------
- 1 file changed, 27 insertions(+), 19 deletions(-)
+ target/arm/vec_helper.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index f87f6eeaf7..4f5008ed6f 100644
---- a/target/ppc/translate.c
-+++ b/target/ppc/translate.c
-@@ -4361,30 +4361,34 @@ static void gen_mtmsrd(DisasContext *ctx)
-     CHK_SV;
- 
- #if !defined(CONFIG_USER_ONLY)
-+    if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
-+        gen_io_start();
-+    }
-     if (ctx->opcode & 0x00010000) {
--        /* Special form that does not need any synchronisation */
-+        /* L=1 form only updates EE and RI */
-         TCGv t0 = tcg_temp_new();
-+        TCGv t1 = tcg_temp_new();
-         tcg_gen_andi_tl(t0, cpu_gpr[rS(ctx->opcode)],
-                         (1 << MSR_RI) | (1 << MSR_EE));
--        tcg_gen_andi_tl(cpu_msr, cpu_msr,
-+        tcg_gen_andi_tl(t1, cpu_msr,
-                         ~(target_ulong)((1 << MSR_RI) | (1 << MSR_EE)));
--        tcg_gen_or_tl(cpu_msr, cpu_msr, t0);
-+        tcg_gen_or_tl(t1, t1, t0);
-+
-+        gen_helper_store_msr(cpu_env, t1);
-         tcg_temp_free(t0);
-+        tcg_temp_free(t1);
-+
-     } else {
-         /*
-          * XXX: we need to update nip before the store if we enter
-          *      power saving mode, we will exit the loop directly from
-          *      ppc_store_msr
-          */
--        if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
--            gen_io_start();
--        }
-         gen_update_nip(ctx, ctx->base.pc_next);
-         gen_helper_store_msr(cpu_env, cpu_gpr[rS(ctx->opcode)]);
--        /* Must stop the translation as machine state (may have) changed */
--        /* Note that mtmsr is not always defined as context-synchronizing */
--        gen_stop_exception(ctx);
-     }
-+    /* Must stop the translation as machine state (may have) changed */
-+    gen_stop_exception(ctx);
- #endif /* !defined(CONFIG_USER_ONLY) */
- }
- #endif /* defined(TARGET_PPC64) */
-@@ -4394,15 +4398,23 @@ static void gen_mtmsr(DisasContext *ctx)
-     CHK_SV;
- 
- #if !defined(CONFIG_USER_ONLY)
--   if (ctx->opcode & 0x00010000) {
--        /* Special form that does not need any synchronisation */
-+    if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
-+        gen_io_start();
-+    }
-+    if (ctx->opcode & 0x00010000) {
-+        /* L=1 form only updates EE and RI */
-         TCGv t0 = tcg_temp_new();
-+        TCGv t1 = tcg_temp_new();
-         tcg_gen_andi_tl(t0, cpu_gpr[rS(ctx->opcode)],
-                         (1 << MSR_RI) | (1 << MSR_EE));
--        tcg_gen_andi_tl(cpu_msr, cpu_msr,
-+        tcg_gen_andi_tl(t1, cpu_msr,
-                         ~(target_ulong)((1 << MSR_RI) | (1 << MSR_EE)));
--        tcg_gen_or_tl(cpu_msr, cpu_msr, t0);
-+        tcg_gen_or_tl(t1, t1, t0);
-+
-+        gen_helper_store_msr(cpu_env, t1);
-         tcg_temp_free(t0);
-+        tcg_temp_free(t1);
-+
-     } else {
-         TCGv msr = tcg_temp_new();
- 
-@@ -4411,9 +4423,6 @@ static void gen_mtmsr(DisasContext *ctx)
-          *      power saving mode, we will exit the loop directly from
-          *      ppc_store_msr
-          */
--        if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
--            gen_io_start();
--        }
-         gen_update_nip(ctx, ctx->base.pc_next);
- #if defined(TARGET_PPC64)
-         tcg_gen_deposit_tl(msr, cpu_msr, cpu_gpr[rS(ctx->opcode)], 0, 32);
-@@ -4422,10 +4431,9 @@ static void gen_mtmsr(DisasContext *ctx)
- #endif
-         gen_helper_store_msr(cpu_env, msr);
-         tcg_temp_free(msr);
--        /* Must stop the translation as machine state (may have) changed */
--        /* Note that mtmsr is not always defined as context-synchronizing */
--        gen_stop_exception(ctx);
-     }
-+    /* Must stop the translation as machine state (may have) changed */
-+    gen_stop_exception(ctx);
- #endif
+diff --git a/target/arm/vec_helper.c b/target/arm/vec_helper.c
+index dedef62403..a9f40ac78a 100644
+--- a/target/arm/vec_helper.c
++++ b/target/arm/vec_helper.c
+@@ -737,6 +737,7 @@ void HELPER(NAME)(void *vd, void *vn, void *vm, void *stat, uint32_t desc) \
+             d[i + j] = TYPE##_mul(n[i + j], mm, stat);                     \
+         }                                                                  \
+     }                                                                      \
++    clear_tail(d, oprsz, simd_maxsz(desc));                                \
  }
  
+ DO_MUL_IDX(gvec_fmul_idx_h, float16, H2)
+@@ -761,6 +762,7 @@ void HELPER(NAME)(void *vd, void *vn, void *vm, void *va,                  \
+                                      mm, a[i + j], 0, stat);               \
+         }                                                                  \
+     }                                                                      \
++    clear_tail(d, oprsz, simd_maxsz(desc));                                \
+ }
+ 
+ DO_FMLA_IDX(gvec_fmla_idx_h, float16, H2)
 -- 
 2.17.1
 
