@@ -2,71 +2,77 @@ Return-Path: <SRS0=f7ls=75=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82B63C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 18:42:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19BADC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 18:51:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 52A662082F
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 18:42:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52A662082F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id D7142206F1
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 18:51:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="eO4DE7LR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7142206F1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=zx2c4.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54488 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57192 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlGXk-0002ZG-LZ
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 14:42:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39390)
+	id 1jlGfu-0005Xj-3y
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 14:51:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40694)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jlGWm-00020x-LA; Tue, 16 Jun 2020 14:41:44 -0400
-Resent-Date: Tue, 16 Jun 2020 14:41:44 -0400
-Resent-Message-Id: <E1jlGWm-00020x-LA@lists.gnu.org>
-Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21349)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jlGWk-0007CS-4N; Tue, 16 Jun 2020 14:41:44 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1592332893; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=cyf62hMRE8gl4CSEHDJXK9OKXcuyUwzeyB5U+midNclHr3prn/6b8oez8HI0aLb/NjM5plQVNSG6nNB4jFiAENxcgZYbDPTGoGkrIHE+8yehQtCLVfgE8kbS+QVdzL0bPyGZawjEk/WW4c29y77gAhicKm4Vw64skl6uxxFhA5o=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1592332893;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=B1l7Ri6Qt8nJcf9uKCUPgHBn7sXYi0GIpY6/V+7AIEA=; 
- b=BjieD9aUwTYZScNlO50nZugUA6e6CkBM6+ZYWjhId+SQEYsfN2kdqSwqj2fs/tSqMyvbcowb39f5mwbTOD6Z/o4L4fJx3Zw2jjDI4r5c+5kj7hXD7Yd/8aY5hwAqQ5Q5uMA5cvXSXuB+Xrzfpbg9bQo/ESR4pWdAqEWDHG2qTNE=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1592332890346655.8718674109479;
- Tue, 16 Jun 2020 11:41:30 -0700 (PDT)
-Message-ID: <159233288930.9045.6594106154915120964@d1fd068a5071>
-Subject: Re: [PATCH V4] util/oslib-posix : qemu_init_exec_dir implementation
- for Mac
-In-Reply-To: <CA+XhMqx6VjRhT6xBzJ-UYs7cPDXVK=PNdfNVdad3Tqhe43P=Ew@mail.gmail.com>
+ (Exim 4.90_1) (envelope-from <Jason@zx2c4.com>) id 1jlGfG-00052O-1y
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 14:50:30 -0400
+Received: from mail.zx2c4.com ([192.95.5.64]:60829)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <Jason@zx2c4.com>) id 1jlGfE-0008Iu-KW
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 14:50:29 -0400
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTP id 2b1af5d5
+ for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 18:32:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=mime-version
+ :references:in-reply-to:from:date:message-id:subject:to:cc
+ :content-type; s=mail; bh=yKG6wKH74SABWHcPXI6Wj0DXZWY=; b=eO4DE7
+ LRbsfCAZQG9btEM5xxG2ubHEcQMIvA6IThtnsE/hYJ4iDoeqnFrT+rD/TAJUbxWB
+ kevafEVcLZrNmmrxwhTDhzWhgWREh2P5FLVZRuvu0f71+VvUhajoBZTnYiTtiuQk
+ Iw+IxeQZHPEjUbrSVf9EGgv6TZtmdH/mJ/6BbZdaHC14uJ0zVzYIoKb57bKc2Ez5
+ auJrGn7W/KBlYuYffafHpwqrdCmm25abHC4tZ6fnVEa6mi1+6uPfNNg5Yj4VXPRC
+ wQhCCuJeZNjqxoJXCUr5XhckawvBbaGGSL6YuFnqZGIpEeHZF0tnGSpIzugiq7ZF
+ lmOtkUYZe9g11ITA==
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 7d53cfca
+ (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO) for <qemu-devel@nongnu.org>;
+ Tue, 16 Jun 2020 18:32:27 +0000 (UTC)
+Received: by mail-io1-f53.google.com with SMTP id w18so3127597iom.5
+ for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 11:50:27 -0700 (PDT)
+X-Gm-Message-State: AOAM530Xo2OnyhbGOOYPws48y5SOCXQ19xUWSntdCCb2L/KhMn/PulWk
+ XdwwU3UsF+4TNPWw9g6BLZ9MYSP38niOyEPhg30=
+X-Google-Smtp-Source: ABdhPJxr/DwJulqrEubaMsKuOKnmSpHZDx7cjVqmaFEVqHNmlSGrGq/seMbcc9fj4t3I1CZ79q96HkzcyvOoriWq3Lc=
+X-Received: by 2002:a05:6638:216f:: with SMTP id
+ p15mr27751758jak.86.1592333426829; 
+ Tue, 16 Jun 2020 11:50:26 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: devnexen@gmail.com
-Date: Tue, 16 Jun 2020 11:41:30 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o53.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 14:41:39
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+References: <20200616003654.1058035-1-Jason@zx2c4.com>
+ <20200616101627.74dd1542@redhat.com>
+In-Reply-To: <20200616101627.74dd1542@redhat.com>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date: Tue, 16 Jun 2020 12:50:15 -0600
+X-Gmail-Original-Message-ID: <CAHmME9ro9FeGvKjO+QLgWHFHQvChNYz=T9sAGjkAMu41-YS9mw@mail.gmail.com>
+Message-ID: <CAHmME9ro9FeGvKjO+QLgWHFHQvChNYz=T9sAGjkAMu41-YS9mw@mail.gmail.com>
+Subject: Re: [PATCH] hw/acpi: specify 64-bit acpi table
+To: Igor Mammedov <imammedo@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=192.95.5.64; envelope-from=Jason@zx2c4.com;
+ helo=mail.zx2c4.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 14:50:27
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -80,40 +86,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, kraxel@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS9DQStYaE1xeDZWalJoVDZ4QnpK
-LVVZczdjUERYVks9UE5kZk5WZGFkM1RxaGU0M1A9RXdAbWFpbC5nbWFpbC5jb20vCgoKCkhpLAoK
-VGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2Vl
-IG91dHB1dCBiZWxvdyBmb3IKbW9yZSBpbmZvcm1hdGlvbjoKClN1YmplY3Q6IFtQQVRDSCBWNF0g
-dXRpbC9vc2xpYi1wb3NpeCA6IHFlbXVfaW5pdF9leGVjX2RpciBpbXBsZW1lbnRhdGlvbiBmb3Ig
-TWFjClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiBDQStYaE1xeDZWalJoVDZ4QnpKLVVZczdjUERY
-Vks9UE5kZk5WZGFkM1RxaGU0M1A9RXdAbWFpbC5nbWFpbC5jb20KCj09PSBURVNUIFNDUklQVCBC
-RUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4
-aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1s
-b2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0g
-aGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBU
-RVNUIFNDUklQVCBFTkQgPT09CgpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjRhZThh
-MDcgdXRpbC9vc2xpYi1wb3NpeCA6IHFlbXVfaW5pdF9leGVjX2RpciBpbXBsZW1lbnRhdGlvbiBm
-b3IgTWFjCgo9PT0gT1VUUFVUIEJFR0lOID09PQpXQVJOSU5HOiBhcmNoaXRlY3R1cmUgc3BlY2lm
-aWMgZGVmaW5lcyBzaG91bGQgYmUgYXZvaWRlZAojMjU6IEZJTEU6IHV0aWwvb3NsaWItcG9zaXgu
-Yzo2MDoKKyNpZmRlZiBfX0FQUExFX18KCkVSUk9SOiBzdXNwZWN0IGNvZGUgaW5kZW50IGZvciBj
-b25kaXRpb25hbCBzdGF0ZW1lbnRzICg4LCA1KQojMzk6IEZJTEU6IHV0aWwvb3NsaWItcG9zaXgu
-YzozODU6CisgICAgICAgIGlmIChfTlNHZXRFeGVjdXRhYmxlUGF0aChidWYsICZsZW4pID09IDAp
-IHsKKyAgICAgY2hhciBmcGF0aFtQQVRIX01BWF07Cgp0b3RhbDogMSBlcnJvcnMsIDEgd2Fybmlu
-Z3MsIDI2IGxpbmVzIGNoZWNrZWQKCkNvbW1pdCA0YWU4YTA3ZWRjODAgKHV0aWwvb3NsaWItcG9z
-aXggOiBxZW11X2luaXRfZXhlY19kaXIgaW1wbGVtZW50YXRpb24gZm9yIE1hYykgaGFzIHN0eWxl
-IHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFs
-c2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRD
-SCBpbiBNQUlOVEFJTkVSUy4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVk
-IHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNo
-ZXcub3JnL2xvZ3MvQ0ErWGhNcXg2VmpSaFQ2eEJ6Si1VWXM3Y1BEWFZLPVBOZGZOVmRhZDNUcWhl
-NDNQPUV3QG1haWwuZ21haWwuY29tL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgot
-LS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRj
-aGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVk
-aGF0LmNvbQ==
+On Tue, Jun 16, 2020 at 2:16 AM Igor Mammedov <imammedo@redhat.com> wrote:
+> On Mon, 15 Jun 2020 18:36:54 -0600
+> "Jason A. Donenfeld" <Jason@zx2c4.com> wrote:
+> > SSDTs cannot address 64-bit physical addresses in 32-bit tables, so we
+> please clarify what accesses waht within tables (i.e. be more concrete).
+
+If you add an ssdt or a custom_method in, say, Linux, your additional
+methods are limited to 32-bit address space. For example, this is
+invalid in current qemu:
+
+DefinitionBlock ("blah.aml", "SSDT", 2, "", "", 0x00001001) {
+  OperationRegion (BLAH, SystemMemory, 0x1ffffffff, 1)
+
+But it becomes valid when applying this patch.
 
