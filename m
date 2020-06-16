@@ -2,60 +2,93 @@ Return-Path: <SRS0=f7ls=75=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22378C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 00:42:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 912C8C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 00:51:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EE39820734
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 00:42:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE39820734
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id 5F26A2074D
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 00:51:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="npRk3Kbs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F26A2074D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49950 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56890 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkzg5-0004oW-9U
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 20:42:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43202)
+	id 1jkzpT-0008Jk-Lk
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 20:51:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45140)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jkzZv-0004fI-7j
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 20:35:51 -0400
-Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:46226)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jkzZr-0003z0-Ic
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 20:35:50 -0400
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 218C8748DE0;
- Tue, 16 Jun 2020 02:35:41 +0200 (CEST)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id 7CA94748DCB; Tue, 16 Jun 2020 02:35:40 +0200 (CEST)
-Message-Id: <a972d774b01c3fa1b6f65eeeb35e8ff71a893deb.1592266950.git.balaton@eik.bme.hu>
-In-Reply-To: <cover.1592266950.git.balaton@eik.bme.hu>
-References: <cover.1592266950.git.balaton@eik.bme.hu>
-From: BALATON Zoltan <balaton@eik.bme.hu>
-Subject: [PATCH v2 8/8] sm501: Convert debug printfs to traces
-Date: Tue, 16 Jun 2020 02:22:30 +0200
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-To: qemu-devel@nongnu.org
-Received-SPF: pass client-ip=2001:738:2001:2001::2001;
- envelope-from=balaton@eik.bme.hu; helo=zero.eik.bme.hu
+ (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
+ id 1jkzoU-00072W-8a; Mon, 15 Jun 2020 20:50:54 -0400
+Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:54924)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
+ id 1jkzoS-0006Hz-Pi; Mon, 15 Jun 2020 20:50:53 -0400
+Received: by mail-pj1-x1042.google.com with SMTP id u8so649765pje.4;
+ Mon, 15 Jun 2020 17:50:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=Vtcx4S1GPP8c1wwhPLcdjKruiDpr1sKpV2nOfuK2xVs=;
+ b=npRk3Kbs0FMB1jK1aqAaobO2/yWJx488tYBy3NY6SeSka0UbXt3TDtsscG3ol8F0Pk
+ +7jtnyZnqWfnTL18VF6ttDdc78QLuhQptawn7W4CtRgZmxxa0pjXvMGEaNk6q+4N9GgU
+ iiDoUd2PNDTbVS+Niz3LvIwCLM8HlNZT8LA1ThgQ4HE1MjIhTAnBp3xmfB1LuC3S7Ex6
+ qB2Bk1TnRTt61/6nADBxEo6FAvmaw1zKa2yBaIeZS7uH7V62XkW27FrOce6BCpMmvziz
+ kizl8n17IleXf0S86APvRd5JCS342t91qH9BFl9zuWglaHOneP8F7eyjEK6Ps8VbG7w2
+ ztYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=Vtcx4S1GPP8c1wwhPLcdjKruiDpr1sKpV2nOfuK2xVs=;
+ b=Np0teNmsPzP2O9yB3P/DYB7u5t+ODb5lxLMtw/cf4u4BEui0O6HwBm7cJ27DKJ1V1A
+ vV03uL2L5OmFMiJXk/RMUqDZpOptaY5OwpY63jebzQe0DvJqntx5sT7wh0OVHWmpkdUy
+ 5i035k5zr/O3vMwLbF7g0r5eQbnJYo50dCQ0Yx6oRSwIqm8SYUcj1PQ62Ea54Dgb3w5G
+ y66gIcHISQcjLNsbk0hOPMdTXkm1Gv2FAavjXXNxEl4Nks7j/Es98ruCkgTP9jIYXtzA
+ GAccT1lZyRSWcWRDLz4TUc485nwxVB0XnlOrOrYt3PLIHn2XWXsgc7z+u7ja6UNyjP4g
+ pvRQ==
+X-Gm-Message-State: AOAM5314eI+HXtuqiEG5Na6skHW/292zktk0REYz8Y8tNpQoSgD1Vdol
+ a0WWJpgh2Oh7uhbiUh8n2eg=
+X-Google-Smtp-Source: ABdhPJz3caIVl/52v0C0mUIa8L83ghSlVgcl44RUSjnS9F2TvL9f4hCI0tQCylPLht9OuhT6UoEWmw==
+X-Received: by 2002:a17:90a:2683:: with SMTP id
+ m3mr305335pje.196.1592268651224; 
+ Mon, 15 Jun 2020 17:50:51 -0700 (PDT)
+Received: from localhost.localdomain (unknown-224-80.windriver.com.
+ [147.11.224.80])
+ by smtp.gmail.com with ESMTPSA id i20sm15210539pfd.81.2020.06.15.17.50.50
+ (version=TLS1 cipher=AES128-SHA bits=128/128);
+ Mon, 15 Jun 2020 17:50:50 -0700 (PDT)
+From: Bin Meng <bmeng.cn@gmail.com>
+To: Alistair Francis <Alistair.Francis@wdc.com>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Palmer Dabbelt <palmerdabbelt@google.com>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>, qemu-devel@nongnu.org,
+ qemu-riscv@nongnu.org
+Subject: [PATCH v2 1/5] target/riscv: Rename IBEX CPU init routine
+Date: Mon, 15 Jun 2020 17:50:37 -0700
+Message-Id: <1592268641-7478-2-git-send-email-bmeng.cn@gmail.com>
+X-Mailer: git-send-email 1.7.1
+In-Reply-To: <1592268641-7478-1-git-send-email-bmeng.cn@gmail.com>
+References: <1592268641-7478-1-git-send-email-bmeng.cn@gmail.com>
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1042;
+ envelope-from=bmeng.cn@gmail.com; helo=mail-pj1-x1042.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -68,224 +101,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Sebastian Bauer <mail@sebastianbauer.info>,
- Magnus Damm <magnus.damm@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: Bin Meng <bin.meng@windriver.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
----
- hw/display/sm501.c      | 50 +++++++++++------------------------------
- hw/display/trace-events | 12 ++++++++++
- 2 files changed, 25 insertions(+), 37 deletions(-)
+From: Bin Meng <bin.meng@windriver.com>
 
-diff --git a/hw/display/sm501.c b/hw/display/sm501.c
-index 583a0ff6b5..abe75f21dc 100644
---- a/hw/display/sm501.c
-+++ b/hw/display/sm501.c
-@@ -39,15 +39,7 @@
- #include "qemu/range.h"
- #include "ui/pixel_ops.h"
- #include "qemu/bswap.h"
--
--/*#define DEBUG_SM501*/
--/*#define DEBUG_BITBLT*/
--
--#ifdef DEBUG_SM501
--#define SM501_DPRINTF(fmt, ...) printf(fmt, ## __VA_ARGS__)
--#else
--#define SM501_DPRINTF(fmt, ...) do {} while (0)
--#endif
-+#include "trace.h"
+Current IBEX CPU init routine name seems to be too generic.
+Since it uses a different reset vector from the generic one,
+it merits a dedicated name.
+
+Signed-off-by: Bin Meng <bin.meng@windriver.com>
+
+---
+
+Changes in v2:
+- new patch: Rename IBEX CPU init routine
+
+ target/riscv/cpu.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+index e867766..5f03458 100644
+--- a/target/riscv/cpu.c
++++ b/target/riscv/cpu.c
+@@ -153,7 +153,7 @@ static void rvxx_imacu_nommu_cpu_init(Object *obj)
  
- #define MMIO_BASE_OFFSET 0x3e00000
- #define MMIO_SIZE 0x200000
-@@ -871,7 +863,6 @@ static uint64_t sm501_system_config_read(void *opaque, hwaddr addr,
+ #if defined(TARGET_RISCV32)
+ 
+-static void rv32_imcu_nommu_cpu_init(Object *obj)
++static void rv32_ibex_cpu_init(Object *obj)
  {
-     SM501State *s = (SM501State *)opaque;
-     uint32_t ret = 0;
--    SM501_DPRINTF("sm501 system config regs : read addr=%x\n", (int)addr);
- 
-     switch (addr) {
-     case SM501_SYSTEM_CONTROL:
-@@ -923,7 +914,7 @@ static uint64_t sm501_system_config_read(void *opaque, hwaddr addr,
-         qemu_log_mask(LOG_UNIMP, "sm501: not implemented system config"
-                       "register read. addr=%" HWADDR_PRIx "\n", addr);
-     }
--
-+    trace_sm501_system_config_read(addr, ret);
-     return ret;
- }
- 
-@@ -931,9 +922,8 @@ static void sm501_system_config_write(void *opaque, hwaddr addr,
-                                       uint64_t value, unsigned size)
- {
-     SM501State *s = (SM501State *)opaque;
--    SM501_DPRINTF("sm501 system config regs : write addr=%x, val=%x\n",
--                  (uint32_t)addr, (uint32_t)value);
- 
-+    trace_sm501_system_config_write((uint32_t)addr, (uint32_t)value);
-     switch (addr) {
-     case SM501_SYSTEM_CONTROL:
-         s->system_control &= 0x10DB0000;
-@@ -1019,9 +1009,7 @@ static uint64_t sm501_i2c_read(void *opaque, hwaddr addr, unsigned size)
-         qemu_log_mask(LOG_UNIMP, "sm501 i2c : not implemented register read."
-                       " addr=0x%" HWADDR_PRIx "\n", addr);
-     }
--
--    SM501_DPRINTF("sm501 i2c regs : read addr=%" HWADDR_PRIx " val=%x\n",
--                  addr, ret);
-+    trace_sm501_i2c_read((uint32_t)addr, ret);
-     return ret;
- }
- 
-@@ -1029,9 +1017,8 @@ static void sm501_i2c_write(void *opaque, hwaddr addr, uint64_t value,
-                             unsigned size)
- {
-     SM501State *s = (SM501State *)opaque;
--    SM501_DPRINTF("sm501 i2c regs : write addr=%" HWADDR_PRIx
--                  " val=%" PRIx64 "\n", addr, value);
- 
-+    trace_sm501_i2c_write((uint32_t)addr, (uint32_t)value);
-     switch (addr) {
-     case SM501_I2C_BYTE_COUNT:
-         s->i2c_byte_count = value & 0xf;
-@@ -1045,25 +1032,19 @@ static void sm501_i2c_write(void *opaque, hwaddr addr, uint64_t value,
-                 s->i2c_status |= (res ? SM501_I2C_STATUS_ERROR : 0);
-                 if (!res) {
-                     int i;
--                    SM501_DPRINTF("sm501 i2c : transferring %d bytes to 0x%x\n",
--                                  s->i2c_byte_count + 1, s->i2c_addr >> 1);
-                     for (i = 0; i <= s->i2c_byte_count; i++) {
-                         res = i2c_send_recv(s->i2c_bus, &s->i2c_data[i],
-                                             !(s->i2c_addr & 1));
-                         if (res) {
--                            SM501_DPRINTF("sm501 i2c : transfer failed"
--                                          " i=%d, res=%d\n", i, res);
-                             s->i2c_status |= SM501_I2C_STATUS_ERROR;
-                             return;
-                         }
-                     }
-                     if (i) {
--                        SM501_DPRINTF("sm501 i2c : transferred %d bytes\n", i);
-                         s->i2c_status = SM501_I2C_STATUS_COMPLETE;
-                     }
-                 }
-             } else {
--                SM501_DPRINTF("sm501 i2c : end transfer\n");
-                 i2c_end_transfer(s->i2c_bus);
-                 s->i2c_status &= ~SM501_I2C_STATUS_ERROR;
-             }
-@@ -1103,7 +1084,8 @@ static const MemoryRegionOps sm501_i2c_ops = {
- static uint32_t sm501_palette_read(void *opaque, hwaddr addr)
- {
-     SM501State *s = (SM501State *)opaque;
--    SM501_DPRINTF("sm501 palette read addr=%x\n", (int)addr);
-+
-+    trace_sm501_palette_read((uint32_t)addr);
- 
-     /* TODO : consider BYTE/WORD access */
-     /* TODO : consider endian */
-@@ -1116,8 +1098,8 @@ static void sm501_palette_write(void *opaque, hwaddr addr,
-                                 uint32_t value)
- {
-     SM501State *s = (SM501State *)opaque;
--    SM501_DPRINTF("sm501 palette write addr=%x, val=%x\n",
--                  (int)addr, value);
-+
-+    trace_sm501_palette_write((uint32_t)addr, value);
- 
-     /* TODO : consider BYTE/WORD access */
-     /* TODO : consider endian */
-@@ -1132,7 +1114,6 @@ static uint64_t sm501_disp_ctrl_read(void *opaque, hwaddr addr,
- {
-     SM501State *s = (SM501State *)opaque;
-     uint32_t ret = 0;
--    SM501_DPRINTF("sm501 disp ctrl regs : read addr=%x\n", (int)addr);
- 
-     switch (addr) {
- 
-@@ -1237,7 +1218,7 @@ static uint64_t sm501_disp_ctrl_read(void *opaque, hwaddr addr,
-         qemu_log_mask(LOG_UNIMP, "sm501: not implemented disp ctrl register "
-                       "read. addr=%" HWADDR_PRIx "\n", addr);
-     }
--
-+    trace_sm501_disp_ctrl_read((uint32_t)addr, ret);
-     return ret;
- }
- 
-@@ -1245,9 +1226,8 @@ static void sm501_disp_ctrl_write(void *opaque, hwaddr addr,
-                                   uint64_t value, unsigned size)
- {
-     SM501State *s = (SM501State *)opaque;
--    SM501_DPRINTF("sm501 disp ctrl regs : write addr=%x, val=%x\n",
--                  (unsigned)addr, (unsigned)value);
- 
-+    trace_sm501_disp_ctrl_write((uint32_t)addr, (uint32_t)value);
-     switch (addr) {
-     case SM501_DC_PANEL_CONTROL:
-         s->dc_panel_control = value & 0x0FFF73FF;
-@@ -1392,7 +1372,6 @@ static uint64_t sm501_2d_engine_read(void *opaque, hwaddr addr,
- {
-     SM501State *s = (SM501State *)opaque;
-     uint32_t ret = 0;
--    SM501_DPRINTF("sm501 2d engine regs : read addr=%x\n", (int)addr);
- 
-     switch (addr) {
-     case SM501_2D_SOURCE:
-@@ -1462,7 +1441,7 @@ static uint64_t sm501_2d_engine_read(void *opaque, hwaddr addr,
-         qemu_log_mask(LOG_UNIMP, "sm501: not implemented disp ctrl register "
-                       "read. addr=%" HWADDR_PRIx "\n", addr);
-     }
--
-+    trace_sm501_2d_engine_read((uint32_t)addr, ret);
-     return ret;
- }
- 
-@@ -1470,9 +1449,8 @@ static void sm501_2d_engine_write(void *opaque, hwaddr addr,
-                                   uint64_t value, unsigned size)
- {
-     SM501State *s = (SM501State *)opaque;
--    SM501_DPRINTF("sm501 2d engine regs : write addr=%x, val=%x\n",
--                  (unsigned)addr, (unsigned)value);
- 
-+    trace_sm501_2d_engine_write((uint32_t)addr, (uint32_t)value);
-     switch (addr) {
-     case SM501_2D_SOURCE:
-         s->twoD_source = value;
-@@ -1830,8 +1808,6 @@ static void sm501_init(SM501State *s, DeviceState *dev,
-                        uint32_t local_mem_bytes)
- {
-     s->local_mem_size_index = get_local_mem_size_index(local_mem_bytes);
--    SM501_DPRINTF("sm501 local mem size=%x. index=%d\n", get_local_mem_size(s),
--                  s->local_mem_size_index);
- 
-     /* local memory */
-     memory_region_init_ram(&s->local_mem_region, OBJECT(dev), "sm501.local",
-diff --git a/hw/display/trace-events b/hw/display/trace-events
-index 72d4c9812c..970d6bac5d 100644
---- a/hw/display/trace-events
-+++ b/hw/display/trace-events
-@@ -161,3 +161,15 @@ cg3_write(uint32_t addr, uint32_t val, unsigned size) "write addr:0x%06"PRIx32"
- # dpcd.c
- dpcd_read(uint32_t addr, uint8_t val) "read addr:0x%"PRIx32" val:0x%02x"
- dpcd_write(uint32_t addr, uint8_t val) "write addr:0x%"PRIx32" val:0x%02x"
-+
-+# sm501.c
-+sm501_system_config_read(uint32_t addr, uint32_t val) "addr=0x%x, val=0x%x"
-+sm501_system_config_write(uint32_t addr, uint32_t val) "addr=0x%x, val=0x%x"
-+sm501_i2c_read(uint32_t addr, uint8_t val) "addr=0x%x, val=0x%x"
-+sm501_i2c_write(uint32_t addr, uint32_t val) "addr=0x%x, val=0x%x"
-+sm501_palette_read(uint32_t addr) "addr=0x%x"
-+sm501_palette_write(uint32_t addr, uint32_t val) "addr=0x%x, val=0x%x"
-+sm501_disp_ctrl_read(uint32_t addr, uint32_t val) "addr=0x%x, val=0x%x"
-+sm501_disp_ctrl_write(uint32_t addr, uint32_t val) "addr=0x%x, val=0x%x"
-+sm501_2d_engine_read(uint32_t addr, uint32_t val) "addr=0x%x, val=0x%x"
-+sm501_2d_engine_write(uint32_t addr, uint32_t val) "addr=0x%x, val=0x%x"
+     CPURISCVState *env = &RISCV_CPU(obj)->env;
+     set_misa(env, RV32 | RVI | RVM | RVC | RVU);
+@@ -577,7 +577,7 @@ static const TypeInfo riscv_cpu_type_infos[] = {
+     DEFINE_CPU(TYPE_RISCV_CPU_ANY,              riscv_any_cpu_init),
+ #if defined(TARGET_RISCV32)
+     DEFINE_CPU(TYPE_RISCV_CPU_BASE32,           riscv_base_cpu_init),
+-    DEFINE_CPU(TYPE_RISCV_CPU_IBEX,             rv32_imcu_nommu_cpu_init),
++    DEFINE_CPU(TYPE_RISCV_CPU_IBEX,             rv32_ibex_cpu_init),
+     DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_E31,       rvxx_imacu_nommu_cpu_init),
+     DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_E34,       rv32_imafcu_nommu_cpu_init),
+     DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_U34,       rvxx_gcsu_priv1_10_0_cpu_init),
 -- 
-2.21.3
+2.7.4
 
 
