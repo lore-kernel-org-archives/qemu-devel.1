@@ -2,86 +2,106 @@ Return-Path: <SRS0=f7ls=75=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF446C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 08:44:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29723C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 08:49:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A95BB20786
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 08:44:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E89B0207BC
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 08:49:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z14XV1cN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A95BB20786
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QA3iypAm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E89B0207BC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42610 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46664 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jl7DG-00088I-Uw
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 04:44:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34944)
+	id 1jl7Hj-0001sE-76
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 04:49:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36156)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
- id 1jl7CS-0007eJ-Ha
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 04:44:08 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:42729)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
- id 1jl7CQ-0008Jp-CP
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 04:44:08 -0400
-Received: by mail-wr1-x442.google.com with SMTP id p5so19813612wrw.9
- for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 01:44:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=ByNQ/liGGy4Z830PVlmVMPKgU16UvyuMbr2+nXzH0Ic=;
- b=Z14XV1cNdBoHYhHq2WMYo1+giP4G/huwXiRh9lKY6/AOMSxZeSC2R+eq6quBwlGT7h
- 8r/LiwB51Uws3ZVvJeaZczF6xI4CVV7WGpSTPTmFNvCeDR+5fHiXTB267lPfbbsDSxJ8
- dnucDuzMt8PdJpS5JWxnHJ9iKiXoUeB9THQseyWmRfyeOMciHszmm2M5aHWtqVUez4m8
- ZBCYiL/CKHMi7G3jQQ0BBoRkDYV49yXAmF3FqJLZJYvWTDqrSanlGYKdWEZ3KS3Jy3Ot
- 0PNd8zD18D48aEEGV58vzBtlZjCgREzOs/3yavWnDlJuQ8jl08wdkaudlKIZ/tsZ/ZEL
- TM0Q==
+ (Exim 4.90_1) (envelope-from <quintela@redhat.com>)
+ id 1jl7GP-00019w-1B
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 04:48:13 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:33713
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <quintela@redhat.com>)
+ id 1jl7GM-0000fA-GE
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 04:48:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592297288;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=M8KB+cTLS7xorWY/8wkVIPQKcO1yqa/ZtcbOQCRk7fw=;
+ b=QA3iypAmaAEJurC13tHN5Dmd6DCBNwPHBww6BlyckgiWvI518DFTCyw8q8/HKb+igdbLPC
+ vwyaaY7mIQ0wNmQ9URQVjhiLytwhcnqrMkOp57GAIEhQpg/Z+UqNdP2tpXUCgdHzFf9irG
+ 0gYKn/Boe4kGEtuQBonq1vVlvuFPAxc=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-49-eZcy5y-bMHy6RFxH8VCgug-1; Tue, 16 Jun 2020 04:48:04 -0400
+X-MC-Unique: eZcy5y-bMHy6RFxH8VCgug-1
+Received: by mail-wr1-f71.google.com with SMTP id t5so7997893wro.20
+ for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 01:48:04 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=ByNQ/liGGy4Z830PVlmVMPKgU16UvyuMbr2+nXzH0Ic=;
- b=mvvaxU32cm3IqCeR8HasHzpPE/YMNlSJJzEeaE+csMVy/vrGdZH4Tek+zJDyjdVcF0
- O1YxGs+UHHEUd4ed2q/Ykqa8cBcabf4AQHB1gO6XBlwR3kRQFB6coiW/jHEFglsPgILM
- nZH1SQ6/kWKo3rsGMPvPSGr4fA9sJo++IT/4DwZBxTrprIyLG6pbrlj8REZa3OSlCmyx
- RDyNtckhRGy9AqQu6ndnprteTpXoeMx2VmxR/+3/9jCUIR2/K7lHgW9y8jiDRCHgflXE
- dzvWuHEXVg7xcKmSX/jjYClLh0L+e9T/O2IwT6wXtDD38xSZi5GJZ6zKbXJXu0bVgrPD
- IHCg==
-X-Gm-Message-State: AOAM53132GH7Y976cZKOhxdeVHy1W8uSJLmgBCiRGs6iNe3EmF9HZ5zh
- elQtB/C0KexkFeZem567EguwaYrni6wqna8U6qk=
-X-Google-Smtp-Source: ABdhPJxlvpo7AwamrUGYiWPCfGPd7jcibdeX61iLDDMvHcCDOjVrQk9efmuyNWyYBHbZ0ySxlJsf5QMnqzMxn7rlE/4=
-X-Received: by 2002:adf:9544:: with SMTP id 62mr1805767wrs.32.1592297044552;
- Tue, 16 Jun 2020 01:44:04 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:in-reply-to:references
+ :user-agent:reply-to:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=M8KB+cTLS7xorWY/8wkVIPQKcO1yqa/ZtcbOQCRk7fw=;
+ b=pZPmgkels2j2gCrHZdF7BQR0BLaKT2L3J/r+9rIDn+FM13QY/sayH2B6+f9HwxUE9g
+ nLObAcQt3JygZn3zev0NzN+n8tRmJceJDsVOimBoxYGMoaS5KHBpljr0IQN2AvEnI0LI
+ vRT22+DU0P36JU3BZkrmQJ8Gn0+BFOkxYXiiNzpaWGp5voHFVASor3LI7cVVYyqefEMK
+ t2MzuX06n/0mIITztDbdLJ3gu7M1DJbwlm49zkbkPTP33QD+ZQLnwZTrVTY6pzmJX1Bv
+ IvI3fmcz4JCJhxkkoyQPWWB1HIBHBQZ8R/5ALJnlN+zLQFXvjXI5TjvlZFFgAvaXLBiB
+ nPbA==
+X-Gm-Message-State: AOAM530Ktx8+V8FLwPLnNRNRZDx2mJkKTnoPqj79H+ZzmBHEQ/zm3ykI
+ XsC9vXFlxZrXEfLFRMtrK5xAMi3Ccv6UnyBxZ7IosOB6+qNIQKeRKCpqi1l4hTBtzW+bcPFMgwi
+ an1buf9FS+fYDVRI=
+X-Received: by 2002:a7b:c11a:: with SMTP id w26mr2029652wmi.0.1592297283225;
+ Tue, 16 Jun 2020 01:48:03 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwvZnUjAE4GDabkYeFSd57AxeyTiGDyShyzrSQHYgdOvkCCTgddGvqjYyXzr8kCLBpWD5eVJA==
+X-Received: by 2002:a7b:c11a:: with SMTP id w26mr2029638wmi.0.1592297282996;
+ Tue, 16 Jun 2020 01:48:02 -0700 (PDT)
+Received: from localhost (trasno.trasno.org. [83.165.45.250])
+ by smtp.gmail.com with ESMTPSA id f185sm3009408wmf.43.2020.06.16.01.48.02
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 16 Jun 2020 01:48:02 -0700 (PDT)
+From: Juan Quintela <quintela@redhat.com>
+To: kvm-devel <kvm@vger.kernel.org>
+Subject: Re: KVM call for 2016-06-16
+In-Reply-To: <87wo48n047.fsf@secure.mitica> (Juan Quintela's message of "Mon, 
+ 15 Jun 2020 11:34:32 +0200")
+References: <87wo48n047.fsf@secure.mitica>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+Date: Tue, 16 Jun 2020 10:48:01 +0200
+Message-ID: <87h7vbxupq.fsf@secure.mitica>
 MIME-Version: 1.0
-References: <8e73f685e10c684eb5e2c88c2185504d26f024fc.1592296355.git.mprivozn@redhat.com>
-In-Reply-To: <8e73f685e10c684eb5e2c88c2185504d26f024fc.1592296355.git.mprivozn@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 16 Jun 2020 12:43:52 +0400
-Message-ID: <CAJ+F1CKGhOjD78PduiBaLdUFGezKw23w1LKCGE6PtP9pizagMQ@mail.gmail.com>
-Subject: Re: [PATCH] qga: Use gethostname() instead of g_get_host_name()
-To: Michal Privoznik <mprivozn@redhat.com>
-Content-Type: multipart/alternative; boundary="000000000000b7afc805a82f8be5"
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=marcandre.lureau@gmail.com; helo=mail-wr1-x442.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=quintela@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=quintela@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 02:46:07
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,242 +114,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>, QEMU <qemu-devel@nongnu.org>,
- Vinzenz 'evilissimo' Feenstra <vfeenstr@redhat.com>
+Reply-To: quintela@redhat.com
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000b7afc805a82f8be5
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Juan Quintela <quintela@redhat.com> wrote:
+> Hi
 
 Hi
 
-On Tue, Jun 16, 2020 at 12:35 PM Michal Privoznik <mprivozn@redhat.com>
-wrote:
+As there are no topics, this calls gets cancelled.
 
-> Problem with g_get_host_name() is that on the first call it saves
-> the hostname into a global variable and from then on, every
-> subsequent call returns the saved hostname. Even if the hostname
-> changes. This doesn't play nicely with guest agent, because if
-> the hostname is acquired before the guest is set up (e.g. on the
-> first boot, or before DHCP) we will report old, invalid hostname.
->
-> Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=3D1845127
+Happy hacking.
 
-
-lgtm,
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
-(fwiw, I opened a glib issue:
-https://gitlab.gnome.org/GNOME/glib/-/issues/2130)
+Later, Juan.
 
 
 >
-> Signed-off-by: Michal Privoznik <mprivozn@redhat.com>
-> ---
->  qga/commands.c | 56 ++++++++++++++++++++++++++++++++++++++++++++++----
->  1 file changed, 52 insertions(+), 4 deletions(-)
+> Please, send any topic that you are interested in covering.
+> There is already a topic from last call:
 >
-> diff --git a/qga/commands.c b/qga/commands.c
-> index efc8b90281..ce3c2041a6 100644
-> --- a/qga/commands.c
-> +++ b/qga/commands.c
-> @@ -512,14 +512,62 @@ int ga_parse_whence(GuestFileWhence *whence, Error
-> **errp)
->      return -1;
->  }
+> Last minute suggestion after recent IRC chat with Alex Benn=C3=A9e and
+> Thomas Huth:
 >
-> +#ifndef HOST_NAME_MAX
-> +# ifdef _POSIX_HOST_NAME_MAX
-> +#  define HOST_NAME_MAX _POSIX_HOST_NAME_MAX
-> +# else
-> +#  define HOST_NAME_MAX 255
-> +# endif
-> +#endif
-> +
->  GuestHostName *qmp_guest_get_host_name(Error **errp)
->  {
->      GuestHostName *result =3D NULL;
-> -    gchar const *hostname =3D g_get_host_name();
-> -    if (hostname !=3D NULL) {
-> -        result =3D g_new0(GuestHostName, 1);
-> -        result->host_name =3D g_strdup(hostname);
-> +    g_autofree char *hostname =3D NULL;
-> +
-> +    /*
-> +     * We want to avoid using g_get_host_name() because that
-> +     * caches the result and we wouldn't reflect changes in the
-> +     * host name.
-> +     */
-> +
-> +#ifndef G_OS_WIN32
-> +    long len =3D -1;
-> +
-> +#ifdef _SC_HOST_NAME_MAX
-> +    len =3D sysconf(_SC_HOST_NAME_MAX);
-> +#endif /* _SC_HOST_NAME_MAX */
-> +
-> +    if (len < 0) {
-> +        len =3D HOST_NAME_MAX;
->      }
-> +
-> +    hostname =3D g_malloc0(len + 1);
-> +
-> +    if (gethostname(hostname, len) < 0) {
-> +        return NULL;
-> +    }
-> +
-> +#else /* G_OS_WIN32 */
-> +
-> +    wchar_t tmp[MAX_COMPUTERNAME_LENGTH + 1];
-> +    DWORD size =3D G_N_ELEMENTS(tmp);
-> +
-> +    if (GetComputerNameW(tmp, &size) !=3D 0) {
-> +        /*
-> +         * Indeed, on Windows retval of zero means failure
-> +         * and nonzero means success.
-> +         */
-> +        hostname =3D g_utf16_to_utf8(tmp, size, NULL, NULL, NULL);
-> +    }
-> +#endif /* G_OS_WIN32 */
-> +
-> +    if (!hostname) {
-> +        hostname =3D g_strdup("localhost");
-> +    }
-> +
-> +    result =3D g_new0(GuestHostName, 1);
-> +    result->host_name =3D g_steal_pointer(&hostname);
->      return result;
->  }
+> "Move some of the build/CI infrastructure to GitLab."
 >
-> --
-> 2.26.2
+> Pro/Con?
+>
+>  - GitLab does not offer s390x/ppc64el =3D> keep Travis for these?
+>
+> How to coordinate efforts?
+>
+> What we want to improve? Priorities?
+>
+> Who can do which task / is motivated.
+>
+> What has bugged us recently:
+> - Cross-build images (currently rebuilt all the time on Shippable)
+>
+> Long term interests:
+>
+> - Collect quality metrics
+>   . build time
+>   . test duration
+>   . performances
+>   . binary size
+>   . runtime memory used
+>
+> - Collect code coverage
+>
+> Note, this is orthogonal to the "Gating CI" task Cleber is working on:
+> https://www.mail-archive.com/qemu-devel@nongnu.org/msg688150.html
 >
 >
 >
+>
+> At the end of Monday I will send an email with the agenda or the
+> cancellation of the call, so hurry up.
+>
+> After discussions on the QEMU Summit, we are going to have always open a
+> KVM call where you can add topics.
+>
+>  Call details:
+>
+> By popular demand, a google calendar public entry with it
+>
+>   https://www.google.com/calendar/embed?src=3DdG9iMXRqcXAzN3Y4ZXZwNzRoMHE=
+4a3BqcXNAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ
+>
+> (Let me know if you have any problems with the calendar entry.  I just
+> gave up about getting right at the same time CEST, CET, EDT and DST).
+>
+> If you need phone number details,  contact me privately
+>
+> Thanks, Juan.
 
---=20
-Marc-Andr=C3=A9 Lureau
-
---000000000000b7afc805a82f8be5
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr">Hi<br></div><br><div class=3D"gmail_quote=
-"><div dir=3D"ltr" class=3D"gmail_attr">On Tue, Jun 16, 2020 at 12:35 PM Mi=
-chal Privoznik &lt;<a href=3D"mailto:mprivozn@redhat.com">mprivozn@redhat.c=
-om</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margi=
-n:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex=
-">Problem with g_get_host_name() is that on the first call it saves<br>
-the hostname into a global variable and from then on, every<br>
-subsequent call returns the saved hostname. Even if the hostname<br>
-changes. This doesn&#39;t play nicely with guest agent, because if<br>
-the hostname is acquired before the guest is set up (e.g. on the<br>
-first boot, or before DHCP) we will report old, invalid hostname.<br>
-<br>
-Fixes: <a href=3D"https://bugzilla.redhat.com/show_bug.cgi?id=3D1845127" re=
-l=3D"noreferrer" target=3D"_blank">https://bugzilla.redhat.com/show_bug.cgi=
-?id=3D1845127</a></blockquote><div><br></div><div>lgtm,</div><div>Reviewed-=
-by: Marc-Andr=C3=A9 Lureau &lt;<a href=3D"mailto:marcandre.lureau@redhat.co=
-m">marcandre.lureau@redhat.com</a>&gt;</div><div><br></div><div>(fwiw, I op=
-ened a glib issue: <a href=3D"https://gitlab.gnome.org/GNOME/glib/-/issues/=
-2130">https://gitlab.gnome.org/GNOME/glib/-/issues/2130</a>)</div><div><br>=
- </div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;=
-border-left:1px solid rgb(204,204,204);padding-left:1ex"><br>
-<br>
-Signed-off-by: Michal Privoznik &lt;<a href=3D"mailto:mprivozn@redhat.com" =
-target=3D"_blank">mprivozn@redhat.com</a>&gt;<br>
----<br>
-=C2=A0qga/commands.c | 56 ++++++++++++++++++++++++++++++++++++++++++++++---=
--<br>
-=C2=A01 file changed, 52 insertions(+), 4 deletions(-)<br>
-<br>
-diff --git a/qga/commands.c b/qga/commands.c<br>
-index efc8b90281..ce3c2041a6 100644<br>
---- a/qga/commands.c<br>
-+++ b/qga/commands.c<br>
-@@ -512,14 +512,62 @@ int ga_parse_whence(GuestFileWhence *whence, Error **=
-errp)<br>
-=C2=A0 =C2=A0 =C2=A0return -1;<br>
-=C2=A0}<br>
-<br>
-+#ifndef HOST_NAME_MAX<br>
-+# ifdef _POSIX_HOST_NAME_MAX<br>
-+#=C2=A0 define HOST_NAME_MAX _POSIX_HOST_NAME_MAX<br>
-+# else<br>
-+#=C2=A0 define HOST_NAME_MAX 255<br>
-+# endif<br>
-+#endif<br>
-+<br>
-=C2=A0GuestHostName *qmp_guest_get_host_name(Error **errp)<br>
-=C2=A0{<br>
-=C2=A0 =C2=A0 =C2=A0GuestHostName *result =3D NULL;<br>
--=C2=A0 =C2=A0 gchar const *hostname =3D g_get_host_name();<br>
--=C2=A0 =C2=A0 if (hostname !=3D NULL) {<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 result =3D g_new0(GuestHostName, 1);<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 result-&gt;host_name =3D g_strdup(hostname);<b=
-r>
-+=C2=A0 =C2=A0 g_autofree char *hostname =3D NULL;<br>
-+<br>
-+=C2=A0 =C2=A0 /*<br>
-+=C2=A0 =C2=A0 =C2=A0* We want to avoid using g_get_host_name() because tha=
-t<br>
-+=C2=A0 =C2=A0 =C2=A0* caches the result and we wouldn&#39;t reflect change=
-s in the<br>
-+=C2=A0 =C2=A0 =C2=A0* host name.<br>
-+=C2=A0 =C2=A0 =C2=A0*/<br>
-+<br>
-+#ifndef G_OS_WIN32<br>
-+=C2=A0 =C2=A0 long len =3D -1;<br>
-+<br>
-+#ifdef _SC_HOST_NAME_MAX<br>
-+=C2=A0 =C2=A0 len =3D sysconf(_SC_HOST_NAME_MAX);<br>
-+#endif /* _SC_HOST_NAME_MAX */<br>
-+<br>
-+=C2=A0 =C2=A0 if (len &lt; 0) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 len =3D HOST_NAME_MAX;<br>
-=C2=A0 =C2=A0 =C2=A0}<br>
-+<br>
-+=C2=A0 =C2=A0 hostname =3D g_malloc0(len + 1);<br>
-+<br>
-+=C2=A0 =C2=A0 if (gethostname(hostname, len) &lt; 0) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 return NULL;<br>
-+=C2=A0 =C2=A0 }<br>
-+<br>
-+#else /* G_OS_WIN32 */<br>
-+<br>
-+=C2=A0 =C2=A0 wchar_t tmp[MAX_COMPUTERNAME_LENGTH + 1];<br>
-+=C2=A0 =C2=A0 DWORD size =3D G_N_ELEMENTS(tmp);<br>
-+<br>
-+=C2=A0 =C2=A0 if (GetComputerNameW(tmp, &amp;size) !=3D 0) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 /*<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* Indeed, on Windows retval of zero mean=
-s failure<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* and nonzero means success.<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0*/<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 hostname =3D g_utf16_to_utf8(tmp, size, NULL, =
-NULL, NULL);<br>
-+=C2=A0 =C2=A0 }<br>
-+#endif /* G_OS_WIN32 */<br>
-+<br>
-+=C2=A0 =C2=A0 if (!hostname) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 hostname =3D g_strdup(&quot;localhost&quot;);<=
-br>
-+=C2=A0 =C2=A0 }<br>
-+<br>
-+=C2=A0 =C2=A0 result =3D g_new0(GuestHostName, 1);<br>
-+=C2=A0 =C2=A0 result-&gt;host_name =3D g_steal_pointer(&amp;hostname);<br>
-=C2=A0 =C2=A0 =C2=A0return result;<br>
-=C2=A0}<br>
-<br>
--- <br>
-2.26.2<br>
-<br>
-<br>
-</blockquote></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr" class=3D"g=
-mail_signature">Marc-Andr=C3=A9 Lureau<br></div></div>
-
---000000000000b7afc805a82f8be5--
 
