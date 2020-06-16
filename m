@@ -2,87 +2,94 @@ Return-Path: <SRS0=f7ls=75=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4C9CC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 10:12:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62CF5C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 10:12:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6D0FE20707
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 10:12:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 28F5420707
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 10:12:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Gr44rEW3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D0FE20707
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kPlwuwWZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28F5420707
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36118 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37320 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jl8Zd-0004Bt-KS
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 06:12:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51488)
+	id 1jl8a3-0004rv-DV
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 06:12:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51080)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jl8Ms-0002La-IY
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 05:58:58 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:38995
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jl8Mq-0004Pd-BS
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 05:58:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592301534;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=DZkRS2YKIYjTQ3m1364+zVUZcS7Kch3h1oiLa89smbI=;
- b=Gr44rEW3IwT/Z3XvZU00d6ODcyuGQ8oHa8htAurpPWL8J/6tBb3Ql3BKcnLJDPVv2Tj4Wk
- n1FHrV6AJAS4e97djCOe34HKjni2YWR5bXeF6FTp7RZj3ukb+xPGQMGi+xSh3TCIuy+zT9
- UMlnvveR877t4/Ck+Lhxe8TDfh/KoKo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-266-PspdvweGNHatQN315_VJ-g-1; Tue, 16 Jun 2020 05:58:53 -0400
-X-MC-Unique: PspdvweGNHatQN315_VJ-g-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C21C5873426;
- Tue, 16 Jun 2020 09:58:51 +0000 (UTC)
-Received: from work-vm (ovpn-112-42.ams2.redhat.com [10.36.112.42])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AD3087BA14;
- Tue, 16 Jun 2020 09:58:49 +0000 (UTC)
-Date: Tue, 16 Jun 2020 10:58:46 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: zhukeqian <zhukeqian1@huawei.com>
-Subject: Re: [PATCH v2] migration: Count new_dirty instead of real_dirty
-Message-ID: <20200616095846.GA2788@work-vm>
-References: <20200616021059.25984-1-zhukeqian1@huawei.com>
- <20200616093551.GA2790@work-vm>
- <3a45d5a0-3acf-336d-520f-523bf588b551@huawei.com>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jl8LW-0007l1-Jh
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 05:57:34 -0400
+Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:47086)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jl8LU-00044D-P9
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 05:57:34 -0400
+Received: by mail-wr1-x42b.google.com with SMTP id x6so20041870wrm.13
+ for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 02:57:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding;
+ bh=lDQ3expnbb4U9BUDOaeYoPi9En+3zAAg59F+UjXfZYI=;
+ b=kPlwuwWZGBx9W/lvkbXgad1I+DGRrLyPGztE/Hn0O85yNNQYxDsGhzyUh5QeMLoYaH
+ zb3a77wf+UZiDWqCldIJq8jCMbvvpYMJbgo3XQJZY9mKc/kAVxlzIMYoCfWeQXEdeTAE
+ gdxB181n52FzmCIE9uDDwMFaCWoCG/czpAZsCW8D6WHc2emCkwRbZlo2cVx+TwB8U+KA
+ M7Uy9zJqxw+ARmxvgrfO+JOSGy9kvVWE62vapLEhW8hKnshNk/+E3di5G9qi/poFeGNP
+ rB7sBGajikyb4K9nNsK0VXIMQITRaNOWB89zUXlCEbQofGwiC1lGgEy6xzIdlwDskkUC
+ zeBQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=lDQ3expnbb4U9BUDOaeYoPi9En+3zAAg59F+UjXfZYI=;
+ b=de2mSpAEI92KAGSMGUe2FF0ncww9me1BtgSOYkitvQknz/gPQmRriIaTjtK1+TUw9r
+ 4gdGxXhtn+yJKZd008b9jHuK+jVg7w8a+0EFsW/sS26HI8ichaXOsCL9cChfI2GnFS2N
+ lthwsSrUEyb7fAAj2oySSMPTwe1cuNg5mx68dz1vXy1dqON6iYDylEBscmR15kgqtZf3
+ o43ZQCfV21ToAvq3Z53HuOUXylnNCfuJAxKJBBhZknX+iJdiBSxGMeGU6zSCqRMDfPh6
+ j6ofVWQFzrbYx1TS+yXB90HskaHtNHXtLhbTYoHEibonCD/pxYcxeFg1RiuRmAbOGNPi
+ m5yw==
+X-Gm-Message-State: AOAM533kNxkaP/1LCnpYIPraTg/4s0Runos60tX5UMCtGMT86AuIdQTP
+ 8kQyCU2tPmo7/ICpr4TtG0uueFJYNVjZpw==
+X-Google-Smtp-Source: ABdhPJzXjvbCQ3yrvbmCv73MLWFejcdIV3dBBxnWXSFtq98u6L2bzau35OmNLtKj0hyxukk5dvymNQ==
+X-Received: by 2002:a5d:54c7:: with SMTP id x7mr2143393wrv.162.1592301450918; 
+ Tue, 16 Jun 2020 02:57:30 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id z12sm31090851wrg.9.2020.06.16.02.57.29
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 16 Jun 2020 02:57:30 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PULL 22/23] sd: sdhci: Implement basic vendor specific register
+ support
+Date: Tue, 16 Jun 2020 10:57:01 +0100
+Message-Id: <20200616095702.25848-23-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200616095702.25848-1-peter.maydell@linaro.org>
+References: <20200616095702.25848-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <3a45d5a0-3acf-336d-520f-523bf588b551@huawei.com>
-User-Agent: Mutt/1.14.0 (2020-05-02)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 02:01:17
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::42b;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x42b.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,62 +102,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: zhang.zhanghailiang@huawei.com, Paolo Bonzini <pbonzini@redhat.com>,
- Juan Quintela <quintela@redhat.com>, Chao Fan <fanc.fnst@cn.fujitsu.com>,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org, jianjay.zhou@huawei.com,
- wanghaibin.wang@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* zhukeqian (zhukeqian1@huawei.com) wrote:
-> Hi Dave,
-> 
-> On 2020/6/16 17:35, Dr. David Alan Gilbert wrote:
-> > * Keqian Zhu (zhukeqian1@huawei.com) wrote:
-> >> real_dirty_pages becomes equal to total ram size after dirty log sync
-> >> in ram_init_bitmaps, the reason is that the bitmap of ramblock is
-> >> initialized to be all set, so old path counts them as "real dirty" at
-> >> beginning.
-> >>
-> >> This causes wrong dirty rate and false positive throttling at the end
-> >> of first ram save iteration.
-> >>
-> >> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
-> > 
-> > Since this function already returns num_dirty, why not just change the
-> > caller to increment a counter based off the return value?
-> Yes, that would be better :-) .
-> 
-> > 
-> > Can you point to the code which is using this value that triggers the
-> > throttle?
-> > 
-> In migration_trigger_throttle(), rs->num_dirty_pages_period is used.
-> And it corresponds to real_dirty_pages here.
+From: Guenter Roeck <linux@roeck-us.net>
 
-OK; so is the problem not the same as the check that's in there for
-blk_mig_bulk_activate - don't we need to do the same trick for ram bulk
-migration (i.e. the first pass).
+The Linux kernel's IMX code now uses vendor specific commands.
+This results in endless warnings when booting the Linux kernel.
 
-Dave
+sdhci-esdhc-imx 2194000.usdhc: esdhc_wait_for_card_clock_gate_off:
+	card clock still not gate off in 100us!.
 
-> Thanks,
-> Keqian
-> 
-> > Dave
-> > 
-> > 
-> [...]
-> >>
-> >>
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> > 
-> > .
-> > 
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Implement support for the vendor specific command implemented in IMX hardware
+to be able to avoid this warning.
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+Message-id: 20200603145258.195920-2-linux@roeck-us.net
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ hw/sd/sdhci-internal.h |  5 +++++
+ include/hw/sd/sdhci.h  |  5 +++++
+ hw/sd/sdhci.c          | 18 +++++++++++++++++-
+ 3 files changed, 27 insertions(+), 1 deletion(-)
+
+diff --git a/hw/sd/sdhci-internal.h b/hw/sd/sdhci-internal.h
+index e7c8a523b51..e8c753d6d1e 100644
+--- a/hw/sd/sdhci-internal.h
++++ b/hw/sd/sdhci-internal.h
+@@ -75,6 +75,7 @@
+ #define SDHC_CMD_INHIBIT               0x00000001
+ #define SDHC_DATA_INHIBIT              0x00000002
+ #define SDHC_DAT_LINE_ACTIVE           0x00000004
++#define SDHC_IMX_CLOCK_GATE_OFF        0x00000080
+ #define SDHC_DOING_WRITE               0x00000100
+ #define SDHC_DOING_READ                0x00000200
+ #define SDHC_SPACE_AVAILABLE           0x00000400
+@@ -289,7 +290,10 @@ extern const VMStateDescription sdhci_vmstate;
+ 
+ 
+ #define ESDHC_MIX_CTRL                  0x48
++
+ #define ESDHC_VENDOR_SPEC               0xc0
++#define ESDHC_IMX_FRC_SDCLK_ON          (1 << 8)
++
+ #define ESDHC_DLL_CTRL                  0x60
+ 
+ #define ESDHC_TUNING_CTRL               0xcc
+@@ -326,6 +330,7 @@ extern const VMStateDescription sdhci_vmstate;
+ #define DEFINE_SDHCI_COMMON_PROPERTIES(_state) \
+     DEFINE_PROP_UINT8("sd-spec-version", _state, sd_spec_version, 2), \
+     DEFINE_PROP_UINT8("uhs", _state, uhs_mode, UHS_NOT_SUPPORTED), \
++    DEFINE_PROP_UINT8("vendor", _state, vendor, SDHCI_VENDOR_NONE), \
+     \
+     /* Capabilities registers provide information on supported
+      * features of this specific host controller implementation */ \
+diff --git a/include/hw/sd/sdhci.h b/include/hw/sd/sdhci.h
+index c6868c96994..5d9275f3d6c 100644
+--- a/include/hw/sd/sdhci.h
++++ b/include/hw/sd/sdhci.h
+@@ -74,6 +74,7 @@ typedef struct SDHCIState {
+     uint16_t acmd12errsts; /* Auto CMD12 error status register */
+     uint16_t hostctl2;     /* Host Control 2 */
+     uint64_t admasysaddr;  /* ADMA System Address Register */
++    uint16_t vendor_spec;  /* Vendor specific register */
+ 
+     /* Read-only registers */
+     uint64_t capareg;      /* Capabilities Register */
+@@ -96,8 +97,12 @@ typedef struct SDHCIState {
+     uint32_t quirks;
+     uint8_t sd_spec_version;
+     uint8_t uhs_mode;
++    uint8_t vendor;        /* For vendor specific functionality */
+ } SDHCIState;
+ 
++#define SDHCI_VENDOR_NONE       0
++#define SDHCI_VENDOR_IMX        1
++
+ /*
+  * Controller does not provide transfer-complete interrupt when not
+  * busy.
+diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
+index 1b75d7bab93..eb2be6529e9 100644
+--- a/hw/sd/sdhci.c
++++ b/hw/sd/sdhci.c
+@@ -1569,11 +1569,13 @@ static uint64_t usdhc_read(void *opaque, hwaddr offset, unsigned size)
+         }
+         break;
+ 
++    case ESDHC_VENDOR_SPEC:
++        ret = s->vendor_spec;
++        break;
+     case ESDHC_DLL_CTRL:
+     case ESDHC_TUNE_CTRL_STATUS:
+     case ESDHC_UNDOCUMENTED_REG27:
+     case ESDHC_TUNING_CTRL:
+-    case ESDHC_VENDOR_SPEC:
+     case ESDHC_MIX_CTRL:
+     case ESDHC_WTMK_LVL:
+         ret = 0;
+@@ -1596,7 +1598,21 @@ usdhc_write(void *opaque, hwaddr offset, uint64_t val, unsigned size)
+     case ESDHC_UNDOCUMENTED_REG27:
+     case ESDHC_TUNING_CTRL:
+     case ESDHC_WTMK_LVL:
++        break;
++
+     case ESDHC_VENDOR_SPEC:
++        s->vendor_spec = value;
++        switch (s->vendor) {
++        case SDHCI_VENDOR_IMX:
++            if (value & ESDHC_IMX_FRC_SDCLK_ON) {
++                s->prnsts &= ~SDHC_IMX_CLOCK_GATE_OFF;
++            } else {
++                s->prnsts |= SDHC_IMX_CLOCK_GATE_OFF;
++            }
++            break;
++        default:
++            break;
++        }
+         break;
+ 
+     case SDHC_HOSTCTL:
+-- 
+2.20.1
 
 
