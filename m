@@ -2,66 +2,66 @@ Return-Path: <SRS0=f7ls=75=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99BE5C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 16:06:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8108EC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 16:07:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7948E2071A
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 16:06:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7948E2071A
+	by mail.kernel.org (Postfix) with ESMTPS id 1B0192071A
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 16:07:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B0192071A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45368 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48402 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlE6M-0007Ht-Np
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 12:06:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56178)
+	id 1jlE75-00006V-47
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 12:07:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56522)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jlE52-0005pn-6d
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 12:04:56 -0400
-Received: from indium.canonical.com ([91.189.90.7]:59580)
+ id 1jlE5v-00074k-3J
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 12:05:51 -0400
+Received: from indium.canonical.com ([91.189.90.7]:59916)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jlE4z-00042J-ND
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 12:04:55 -0400
+ id 1jlE5r-0004EJ-Qo
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 12:05:50 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jlE4x-0004Hh-VS
- for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 16:04:51 +0000
+ id 1jlE5p-0004Vc-I3
+ for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 16:05:45 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id E68692E80BA
- for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 16:04:51 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 86EAA2E802B
+ for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 16:05:45 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 16 Jun 2020 15:54:56 -0000
-From: Bugs SysSec <1525123@bugs.launchpad.net>
+Date: Tue, 16 Jun 2020 15:56:16 -0000
+From: Bugs SysSec <1883739@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public Security
+X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: yes
-X-Launchpad-Bug-Commenters: a1xndr bugs-syssec janitor joveler th-huth
-X-Launchpad-Bug-Reporter: Hajin Jang (joveler)
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: bugs-syssec
+X-Launchpad-Bug-Reporter: Bugs SysSec (bugs-syssec)
 X-Launchpad-Bug-Modifier: Bugs SysSec (bugs-syssec)
-References: <20151211084346.25665.93589.malonedeb@gac.canonical.com>
-Message-Id: <159232289697.28606.4346250006027651405.launchpad@soybean.canonical.com>
-Subject: [Bug 1525123] Re: USB assert failure on hcd-uhci.c
+Message-Id: <159232297702.28606.15425668787325606341.malonedeb@soybean.canonical.com>
+Subject: [Bug 1883739] [NEW] ide_dma_cb: Assertion `prep_size >= 0 &&
+ prep_size <= n * 512' failed.
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="b190cebbf563f89e480a8b57f641753c8196bda0";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 3ac7f1ee2dcad0513d644b43cc30c8bfe71853e3
+X-Launchpad-Hash: 5f37e17c2c2640fa9b80bee92c1d2ce3f41a916d
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 11:30:43
@@ -83,84 +83,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1525123 <1525123@bugs.launchpad.net>
+Reply-To: Bug 1883739 <1883739@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Changed in: qemu
-       Status: Expired =3D> New
+Public bug reported:
+
+To reproduce run the QEMU with the following command line:
+```
+qemu-system-x86_64 -cdrom hypertrash.iso -nographic -m 100 -enable-kvm -net=
+ none -drive id=3Ddisk,file=3Dhda.img,if=3Dnone -device ahci,id=3Dahci -dev=
+ice ide-hd,drive=3Ddisk,bus=3Dahci.0
+```
+
+QEMU Version:
+```
+# qemu-5.0.0
+$ ./configure --target-list=3Dx86_64-softmmu --enable-sanitizers; make
+$ x86_64-softmmu/qemu-system-x86_64 --version
+QEMU emulator version 5.0.0
+Copyright (c) 2003-2020 Fabrice Bellard and the QEMU Project developers
+```
+
+To create disk image run:
+```
+dd if=3D/dev/zero of=3Dhda.img bs=3D1024 count=3D1024
+```
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+** Attachment added: "ide_bug_2.zip"
+   https://bugs.launchpad.net/bugs/1883739/+attachment/5384438/+files/ide_b=
+ug_2.zip
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1525123
+https://bugs.launchpad.net/bugs/1883739
 
 Title:
-  USB assert failure on hcd-uhci.c
+  ide_dma_cb: Assertion `prep_size >=3D 0 && prep_size <=3D n * 512' failed.
 
 Status in QEMU:
   New
 
 Bug description:
-  When inserting the attached kernel moudle in the guest OS, QEMU quits
-  with therse assert failure:
+  To reproduce run the QEMU with the following command line:
+  ```
+  qemu-system-x86_64 -cdrom hypertrash.iso -nographic -m 100 -enable-kvm -n=
+et none -drive id=3Ddisk,file=3Dhda.img,if=3Dnone -device ahci,id=3Dahci -d=
+evice ide-hd,drive=3Ddisk,bus=3Dahci.0
+  ```
 
-  [insert kernel module in guest root shell]
-  root@qemu:~# insmod mymod.ko
-  root@qemu:~#
-  Connection closed by foreign host.
+  QEMU Version:
+  ```
+  # qemu-5.0.0
+  $ ./configure --target-list=3Dx86_64-softmmu --enable-sanitizers; make
+  $ x86_64-softmmu/qemu-system-x86_64 --version
+  QEMU emulator version 5.0.0
+  Copyright (c) 2003-2020 Fabrice Bellard and the QEMU Project developers
+  ```
 
-  [host message]
-  qemu-system-x86_64: hw/usb/core.c:718: usb_ep_get: Assertion `pid =3D=3D =
-0x69 || pid =3D=3D 0xe1' failed.
-  Aborted
-
-  The direct cause of this bug is due to misimplementation of UHCI.
-  According to Intel's UHCI design guide, packet identification in transfer=
- descriptor must be one of these three values : IN (69h), OUT (E1h), and SE=
-TUP (2Dh). Any other value in this field must cause the HALT of only HOST C=
-ONTROLLER.
-
-  However, due to misimplementation in uhci_handle_td, instead of host
-  controller being halted, QEMU itself dies with assertion failure. The
-  assertion code is in usb_ep_get():718, which is called during
-  uhci_handle_td().
-
-  Another issue resides in uhci_handle_td(). This function must check
-  that transfer descriptor's pid is one of IN, OUT, SETUP before calling
-  usb_ep_get() or other functions. If it does so, usb_ep_get() only
-  needs to check if pid is not SETUP.
-
-  This kind of assert failure can be misused by malwares to avoid being
-  analyzed by terminating only in the virtual environments and still
-  execute the malicious code in real machines.
-
-  =
-
-  [How to run exploit code]
-  Prepare linux kernel's source header, then type these lines in root shell.
-  # make
-  # insmod mymod.ko
-
-  It needs uhci-hcd.h from linux kernel source.
-  I attached linux 3.18.24's uhci-hcd.h for tempory measure; You should get=
- proper version of uhci-hcd.h.
-  In the following envrionment, this exploit worked, exiting whole QEMU, no=
-t only USB.
-
-  QEMU was running on these environment :
-  [CPU model] Intel(R) Core(TM) i5-4590 CPU @ 3.30GHz
-  [qemu version] QEMU 2.5.0-rc3 (compiled from source, gcc 4.8.4)
-  [host info] Ubuntu 14.04.3, x86_64, 3.19.0-32-generic
-  [guest info] Ubuntu 14.04.3, x86_64, 3.19.0-28-generic
-  [QEMU argument]
-  x86_64-softmmu/qemu-system-x86_64 -hda /media/hdd/img/ubuntu1404.qcow2 \
-  =C2=A0-m 512 \
-  =C2=A0--usbdevice disk:format=3Dqcow2:../usb.img \
-  =C2=A0--enable-kvm
+  To create disk image run:
+  ```
+  dd if=3D/dev/zero of=3Dhda.img bs=3D1024 count=3D1024
+  ```
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1525123/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1883739/+subscriptions
 
