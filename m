@@ -2,73 +2,67 @@ Return-Path: <SRS0=f7ls=75=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D628C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 01:00:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16BA1C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 01:23:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E8770207E8
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 01:00:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8770207E8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id DA6BC206B7
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 01:23:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA6BC206B7
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41810 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46098 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkzy5-0005mN-6V
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 21:00:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46194)
+	id 1jl0Jw-0000vI-5x
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 21:23:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53132)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jkzx5-0005CI-6G
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 20:59:47 -0400
-Resent-Date: Mon, 15 Jun 2020 20:59:47 -0400
-Resent-Message-Id: <E1jkzx5-0005CI-6G@lists.gnu.org>
-Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21372)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jkzx2-0007PI-SC
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 20:59:46 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1592269176; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=dqoGt6Iq4JfZr/T4zCzaV+ZoEtFH+Bxu98O/WqBtBpqpuLQs/zRLv5e5I3cacJbkrwU9qfBD/x3CfBGWUHeCxEllpErb/H2MoUHv7rTTTREBaWW1xqN/ULP8YPMB+p2p+VJJQ8KhjosU68nTdGksVQF37wTtaDLDbmmSLO01x1g=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1592269176;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=TAPdoeHkgpmNvK0YZ0sHct32/P+hbSYXlSjjGILrjoE=; 
- b=Zo80NDOQWu78tAlQl8lcN+8qzwurLgXCz+eLm9N65JCQj/SFVMRDOv95gQGLkm1YPV9gIHh265JJq0GlzOAhVrSFUQczV8Wn7xqGOat8b2pB1ZMzBficHeLRYCo1Zb8xkf6uTkufgBwr2JV8072BbN8oG2RIX9jjxNJK55Vb8Ok=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1592269174089967.3995458498893;
- Mon, 15 Jun 2020 17:59:34 -0700 (PDT)
-Message-ID: <159226917300.3792.11111251484454225261@d1fd068a5071>
-Subject: Re: [PATCH] hw/acpi: specify 64-bit acpi table
-In-Reply-To: <20200616003654.1058035-1-Jason@zx2c4.com>
+ (Exim 4.90_1) (envelope-from <zhukeqian1@huawei.com>)
+ id 1jl0JM-0000Nn-BV; Mon, 15 Jun 2020 21:22:48 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:49526 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <zhukeqian1@huawei.com>)
+ id 1jl0JK-0003Kt-3x; Mon, 15 Jun 2020 21:22:48 -0400
+Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id E3BD2B692E6F6C204C76;
+ Tue, 16 Jun 2020 09:22:36 +0800 (CST)
+Received: from [10.173.221.230] (10.173.221.230) by
+ DGGEMS412-HUB.china.huawei.com (10.3.19.212) with Microsoft SMTP Server id
+ 14.3.487.0; Tue, 16 Jun 2020 09:22:30 +0800
+Subject: Re: [PATCH] migration: Count new_dirty instead of real_dirty
+To: "Zhoujian (jay)" <jianjay.zhou@huawei.com>, "qemu-devel@nongnu.org"
+ <qemu-devel@nongnu.org>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "Paolo
+ Bonzini" <pbonzini@redhat.com>
+References: <20200601040250.38324-1-zhukeqian1@huawei.com>
+ <3205abb1-8e47-fc19-1213-ead621711291@huawei.com>
+ <B2D15215269B544CADD246097EACE7474BD38EFD@DGGEMM528-MBX.china.huawei.com>
+From: zhukeqian <zhukeqian1@huawei.com>
+Message-ID: <33d07693-eb61-3ba1-b88b-c90bf10b8864@huawei.com>
+Date: Tue, 16 Jun 2020 09:22:29 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
+In-Reply-To: <B2D15215269B544CADD246097EACE7474BD38EFD@DGGEMM528-MBX.china.huawei.com>
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: Jason@zx2c4.com
-Date: Mon, 15 Jun 2020 17:59:34 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o53.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 20:59:42
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.173.221.230]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.35; envelope-from=zhukeqian1@huawei.com;
+ helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 21:22:37
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -81,52 +75,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: Jason@zx2c4.com, qemu-devel@nongnu.org, kraxel@redhat.com
+Cc: "Wanghaibin \(D\)" <wanghaibin.wang@huawei.com>,
+ Chao Fan <fanc.fnst@cn.fujitsu.com>,
+ "Huangweidong \(C\)" <weidong.huang@huawei.com>,
+ Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDYxNjAwMzY1NC4xMDU4
-MDM1LTEtSmFzb25AengyYzQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUgZG9j
-a2VyLXF1aWNrQGNlbnRvczcgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29t
-bWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3RhbGxl
-ZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFNDUklQ
-VCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKbWFrZSBkb2NrZXItaW1hZ2UtY2VudG9zNyBWPTEgTkVU
-V09SSz0xCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1xdWlja0BjZW50b3M3IFNIT1dfRU5WPTEgSj0x
-NCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCmFjcGktdGVzdDogV2FybmluZyEg
-RFNEVCBiaW5hcnkgZmlsZSBtaXNtYXRjaC4gQWN0dWFsIFthbWw6L3RtcC9hbWwtODJHSk0wXSwg
-RXhwZWN0ZWQgW2FtbDp0ZXN0cy9kYXRhL2FjcGkvcGMvRFNEVF0uClNlZSBzb3VyY2UgZmlsZSB0
-ZXN0cy9xdGVzdC9iaW9zLXRhYmxlcy10ZXN0LmMgZm9yIGluc3RydWN0aW9ucyBvbiBob3cgdG8g
-dXBkYXRlIGV4cGVjdGVkIGZpbGVzLgp0byBzZWUgQVNMIGRpZmYgYmV0d2VlbiBtaXNtYXRjaGVk
-IGZpbGVzIGluc3RhbGwgSUFTTCwgcmVidWlsZCBRRU1VIGZyb20gc2NyYXRjaCBhbmQgcmUtcnVu
-IHRlc3RzIHdpdGggVj0xIGVudmlyb25tZW50IHZhcmlhYmxlIHNldCoqCkVSUk9SOi90bXAvcWVt
-dS10ZXN0L3NyYy90ZXN0cy9xdGVzdC9iaW9zLXRhYmxlcy10ZXN0LmM6NDk0OnRlc3RfYWNwaV9h
-c2w6IGFzc2VydGlvbiBmYWlsZWQ6IChhbGxfdGFibGVzX21hdGNoKQpFUlJPUiAtIEJhaWwgb3V0
-ISBFUlJPUjovdG1wL3FlbXUtdGVzdC9zcmMvdGVzdHMvcXRlc3QvYmlvcy10YWJsZXMtdGVzdC5j
-OjQ5NDp0ZXN0X2FjcGlfYXNsOiBhc3NlcnRpb24gZmFpbGVkOiAoYWxsX3RhYmxlc19tYXRjaCkK
-bWFrZTogKioqIFtjaGVjay1xdGVzdC14ODZfNjRdIEVycm9yIDEKbWFrZTogKioqIFdhaXRpbmcg
-Zm9yIHVuZmluaXNoZWQgam9icy4uLi4KICBURVNUICAgIGNoZWNrLXVuaXQ6IHRlc3RzL3Rlc3Qt
-dXVpZAogIFRFU1QgICAgY2hlY2stdW5pdDogdGVzdHMvcHRpbWVyLXRlc3QKLS0tCiAgICByYWlz
-ZSBDYWxsZWRQcm9jZXNzRXJyb3IocmV0Y29kZSwgY21kKQpzdWJwcm9jZXNzLkNhbGxlZFByb2Nl
-c3NFcnJvcjogQ29tbWFuZCAnWydzdWRvJywgJy1uJywgJ2RvY2tlcicsICdydW4nLCAnLS1sYWJl
-bCcsICdjb20ucWVtdS5pbnN0YW5jZS51dWlkPTRhYjA4NDZiMTc5MzRiZmFhZjkzZDA2N2I5ZmU4
-ZjU0JywgJy11JywgJzEwMDEnLCAnLS1zZWN1cml0eS1vcHQnLCAnc2VjY29tcD11bmNvbmZpbmVk
-JywgJy0tcm0nLCAnLWUnLCAnVEFSR0VUX0xJU1Q9JywgJy1lJywgJ0VYVFJBX0NPTkZJR1VSRV9P
-UFRTPScsICctZScsICdWPScsICctZScsICdKPTE0JywgJy1lJywgJ0RFQlVHPScsICctZScsICdT
-SE9XX0VOVj0xJywgJy1lJywgJ0NDQUNIRV9ESVI9L3Zhci90bXAvY2NhY2hlJywgJy12JywgJy9o
-b21lL3BhdGNoZXcvLmNhY2hlL3FlbXUtZG9ja2VyLWNjYWNoZTovdmFyL3RtcC9jY2FjaGU6eics
-ICctdicsICcvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtNGp0a3dvamMvc3JjL2RvY2tlci1z
-cmMuMjAyMC0wNi0xNS0yMC40NC4zMC4xNTE3NjovdmFyL3RtcC9xZW11Onoscm8nLCAncWVtdTpj
-ZW50b3M3JywgJy92YXIvdG1wL3FlbXUvcnVuJywgJ3Rlc3QtcXVpY2snXScgcmV0dXJuZWQgbm9u
-LXplcm8gZXhpdCBzdGF0dXMgMi4KZmlsdGVyPS0tZmlsdGVyPWxhYmVsPWNvbS5xZW11Lmluc3Rh
-bmNlLnV1aWQ9NGFiMDg0NmIxNzkzNGJmYWFmOTNkMDY3YjlmZThmNTQKbWFrZVsxXTogKioqIFtk
-b2NrZXItcnVuXSBFcnJvciAxCm1ha2VbMV06IExlYXZpbmcgZGlyZWN0b3J5IGAvdmFyL3RtcC9w
-YXRjaGV3LXRlc3Rlci10bXAtNGp0a3dvamMvc3JjJwptYWtlOiAqKiogW2RvY2tlci1ydW4tdGVz
-dC1xdWlja0BjZW50b3M3XSBFcnJvciAyCgpyZWFsICAgIDE1bTMuMDU3cwp1c2VyICAgIDBtOC42
-ODlzCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9n
-cy8yMDIwMDYxNjAwMzY1NC4xMDU4MDM1LTEtSmFzb25AengyYzQuY29tL3Rlc3RpbmcuZG9ja2Vy
-LXF1aWNrQGNlbnRvczcvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0
-aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91
-ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+Hi Jay Zhou,
+
+On 2020/6/15 19:50, Zhoujian (jay) wrote:
+> Hi Keqian,
+> 
+>> -----Original Message-----
+>> From: zhukeqian
+>> Sent: Monday, June 15, 2020 11:19 AM
+>> To: qemu-devel@nongnu.org; qemu-arm@nongnu.org; Paolo Bonzini
+>> <pbonzini@redhat.com>; Zhoujian (jay) <jianjay.zhou@huawei.com>
+>> Cc: Juan Quintela <quintela@redhat.com>; Chao Fan <fanc.fnst@cn.fujitsu.com>;
+>> Wanghaibin (D) <wanghaibin.wang@huawei.com>
+>> Subject: Re: [PATCH] migration: Count new_dirty instead of real_dirty
+>>
+>> Hi Paolo and Jian Zhou,
+>>
+>> Do you have any suggestion on this patch?
+>>
+>> Thanks,
+>> Keqian
+>>
+>> On 2020/6/1 12:02, Keqian Zhu wrote:
+>>> DIRTY_LOG_INITIALLY_ALL_SET feature is on the queue. This fixs the
+> 
+> s/fixs/fixes
+Thanks.
+> 
+>>> dirty rate calculation for this feature. After introducing this
+>>> feature, real_dirty_pages is equal to total memory size at begining.
+>>> This causing wrong dirty rate and false positive throttling.
+> 
+> I think it should be tested whether DIRTY_LOG_INITIALLY_ALL_SET is enabled
+> in ram_init_bitmaps(maybe?) in order to be compatible with the old path.
+Yeah, you are right ;-)
+
+But after I tested old path yesterday, I found that the num_dirty_pages_period
+becomes total ram size after log sync in ram_init_bitmaps. The reason is that
+bitmap of ramblock is initialized to be all set, so old path counts them as dirty
+by mistake.
+
+This bug causes false positive throttling at the end of first ram save iteration,
+even without our DIRTY_LOG_INITIALLY_ALL_SET feature.
+> 
+> Thanks,
+> Jay Zhou
+> 
+>>>
+>>> BTW, real dirty rate is not suitable and not very accurate.
+>>>
+>>> 1. For not suitable: We mainly concern on the relationship between
+>>>    dirty rate and network bandwidth. Net increasement of dirty pages
+>>>    makes more sense.
+>>> 2. For not very accurate: With manual dirty log clear, some dirty pages
+>>>    will be cleared during each peroid, our "real dirty rate" is less
+>>>    than real "real dirty rate".
+> 
+I should correct these commit messages for reason above :-)
+> 
+> 
+>>>
+>>> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+[...]
+
+Thanks,
+Keqian
 
