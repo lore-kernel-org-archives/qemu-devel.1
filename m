@@ -2,78 +2,96 @@ Return-Path: <SRS0=f7ls=75=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19BADC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 18:51:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21310C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 19:01:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D7142206F1
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 18:51:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DE175207C4
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 19:01:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="eO4DE7LR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7142206F1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=zx2c4.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="p9seZ234"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE175207C4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57192 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35758 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlGfu-0005Xj-3y
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 14:51:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40694)
+	id 1jlGpa-0002G8-3g
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 15:01:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42488)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <Jason@zx2c4.com>) id 1jlGfG-00052O-1y
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 14:50:30 -0400
-Received: from mail.zx2c4.com ([192.95.5.64]:60829)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <Jason@zx2c4.com>) id 1jlGfE-0008Iu-KW
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 14:50:29 -0400
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTP id 2b1af5d5
- for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 18:32:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=mime-version
- :references:in-reply-to:from:date:message-id:subject:to:cc
- :content-type; s=mail; bh=yKG6wKH74SABWHcPXI6Wj0DXZWY=; b=eO4DE7
- LRbsfCAZQG9btEM5xxG2ubHEcQMIvA6IThtnsE/hYJ4iDoeqnFrT+rD/TAJUbxWB
- kevafEVcLZrNmmrxwhTDhzWhgWREh2P5FLVZRuvu0f71+VvUhajoBZTnYiTtiuQk
- Iw+IxeQZHPEjUbrSVf9EGgv6TZtmdH/mJ/6BbZdaHC14uJ0zVzYIoKb57bKc2Ez5
- auJrGn7W/KBlYuYffafHpwqrdCmm25abHC4tZ6fnVEa6mi1+6uPfNNg5Yj4VXPRC
- wQhCCuJeZNjqxoJXCUr5XhckawvBbaGGSL6YuFnqZGIpEeHZF0tnGSpIzugiq7ZF
- lmOtkUYZe9g11ITA==
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 7d53cfca
- (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO) for <qemu-devel@nongnu.org>;
- Tue, 16 Jun 2020 18:32:27 +0000 (UTC)
-Received: by mail-io1-f53.google.com with SMTP id w18so3127597iom.5
- for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 11:50:27 -0700 (PDT)
-X-Gm-Message-State: AOAM530Xo2OnyhbGOOYPws48y5SOCXQ19xUWSntdCCb2L/KhMn/PulWk
- XdwwU3UsF+4TNPWw9g6BLZ9MYSP38niOyEPhg30=
-X-Google-Smtp-Source: ABdhPJxr/DwJulqrEubaMsKuOKnmSpHZDx7cjVqmaFEVqHNmlSGrGq/seMbcc9fj4t3I1CZ79q96HkzcyvOoriWq3Lc=
-X-Received: by 2002:a05:6638:216f:: with SMTP id
- p15mr27751758jak.86.1592333426829; 
- Tue, 16 Jun 2020 11:50:26 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jlGoG-0001Gp-MJ
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 14:59:48 -0400
+Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:54245)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jlGoB-0001dE-PF
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 14:59:48 -0400
+Received: by mail-pj1-x1041.google.com with SMTP id i12so1840367pju.3
+ for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 11:59:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=o7ps3wGvKL1kZ4fCeed8jixQ/nEFktW3NRHBgvRpEDQ=;
+ b=p9seZ234ejiKxnsCIyQW2QzMxHYnAnyl7BfK9fxdLOD4bw2H+60fFIFNfNjG08yIto
+ X4Uwc5RAjUNiuaQGZwltT9SZ7oUdrECdLIy5JUTTA9OgedATppxylAUv+oFcuLZit/jP
+ HPiT74P9fk8vLeaZU1W/mmxTTtj3C0FpUxqVHm6+A+cb+MvMKp+7tvBivguLOZwtmPAj
+ K1zIYEHw8/JWfCOnUbzmnEDIR0WK2YKUv625na8T+y9CYAIrmkIK4Nktp3lsD4yxW1wG
+ RY5yG8mzsvEgu59QPF4lS02HQXQ9PvyzG6IhttvBxPoBzcdfEQvIEQG5H3nTDUeoa9SJ
+ 3PmA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=o7ps3wGvKL1kZ4fCeed8jixQ/nEFktW3NRHBgvRpEDQ=;
+ b=tp3TmQEtu+Wytvvqsf9fjTe8BFwMNiNVEVBGKPUZMV47SN1CB7mPND5etqKMoGpdM2
+ qzMoae1doJ6IezDKqCXhuZhxe6MuKvKmwrqzO6m78LoB6bmkSBu5B3yah6lUIebJW0lH
+ 5NxQo5df7QHK2UiEGzJvWTfJabV0956t+Z08NlprxBDq+RV0T/gxckoGUW/woIVNXgSZ
+ 5v+HjHEDlNowyNqMdFB1vnzoFF42xBhUK3hkBAGh3DcMDG4DZk6FQxTbQLDnrYuwQdlg
+ cNxeH2xNVG07QufaYgv0fY+3MS/xYDsjgkkAQp8wJEmnxWJp6Qak0gLeCVewEYVXMpyg
+ TyQA==
+X-Gm-Message-State: AOAM533gJI/5cYBWyX5OXcRLilgoF9JfVQvFa1JrxAYmcYg9jPao5sWG
+ wevtZ7EyeC6iIT7fgGgVmVVk0Q==
+X-Google-Smtp-Source: ABdhPJzrYf4c1XH+ZFtQaSM+VdpXL7KBhUBRNKQqqsZ1PfZkpSmtM1XdM2PJMRaYQMuxu3rXON0JnA==
+X-Received: by 2002:a17:90a:6886:: with SMTP id
+ a6mr4721617pjd.170.1592333982246; 
+ Tue, 16 Jun 2020 11:59:42 -0700 (PDT)
+Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
+ by smtp.gmail.com with ESMTPSA id m7sm18295967pfb.1.2020.06.16.11.59.40
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 16 Jun 2020 11:59:41 -0700 (PDT)
+Subject: Re: [PATCH RFC 3/3] target/arm: Implement SVE2 FCVTXNT
+To: Stephen Long <steplong@quicinc.com>, qemu-devel@nongnu.org
+References: <20200428174332.17162-1-steplong@quicinc.com>
+ <20200428174332.17162-4-steplong@quicinc.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <1760d76c-068c-4842-f5dc-5f4b3f3719cd@linaro.org>
+Date: Tue, 16 Jun 2020 11:59:39 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-References: <20200616003654.1058035-1-Jason@zx2c4.com>
- <20200616101627.74dd1542@redhat.com>
-In-Reply-To: <20200616101627.74dd1542@redhat.com>
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date: Tue, 16 Jun 2020 12:50:15 -0600
-X-Gmail-Original-Message-ID: <CAHmME9ro9FeGvKjO+QLgWHFHQvChNYz=T9sAGjkAMu41-YS9mw@mail.gmail.com>
-Message-ID: <CAHmME9ro9FeGvKjO+QLgWHFHQvChNYz=T9sAGjkAMu41-YS9mw@mail.gmail.com>
-Subject: Re: [PATCH] hw/acpi: specify 64-bit acpi table
-To: Igor Mammedov <imammedo@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=192.95.5.64; envelope-from=Jason@zx2c4.com;
- helo=mail.zx2c4.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 14:50:27
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+In-Reply-To: <20200428174332.17162-4-steplong@quicinc.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1041;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1041.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -86,24 +104,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, kraxel@redhat.com
+Cc: qemu-arm@nongnu.org, apazos@quicinc.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jun 16, 2020 at 2:16 AM Igor Mammedov <imammedo@redhat.com> wrote:
-> On Mon, 15 Jun 2020 18:36:54 -0600
-> "Jason A. Donenfeld" <Jason@zx2c4.com> wrote:
-> > SSDTs cannot address 64-bit physical addresses in 32-bit tables, so we
-> please clarify what accesses waht within tables (i.e. be more concrete).
+On 4/28/20 10:43 AM, Stephen Long wrote:
+> +void HELPER(sve2_fcvtxnt)(void *vd, void *vn, void *vg,
+> +                          void *status, uint32_t desc)
+> +{
+> +    set_float_rounding_mode(float_round_to_odd, status);
+> +    HELPER(sve2_fcvtnt_ds)(vd, vn, vg, status, desc);
+> +}
 
-If you add an ssdt or a custom_method in, say, Linux, your additional
-methods are limited to 32-bit address space. For example, this is
-invalid in current qemu:
+This is incorrect, as it leaves the rounding mode set to odd.
 
-DefinitionBlock ("blah.aml", "SSDT", 2, "", "", 0x00001001) {
-  OperationRegion (BLAH, SystemMemory, 0x1ffffffff, 1)
+I've adjusted trans_FCVTXNT to the existing do_frint_mode, which handles
+switching to and back from a fixed rounding mode.
 
-But it becomes valid when applying this patch.
+
+r~
 
