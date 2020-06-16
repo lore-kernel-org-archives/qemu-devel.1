@@ -2,62 +2,96 @@ Return-Path: <SRS0=f7ls=75=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44170C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 18:03:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB99AC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 18:07:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2100F207C4
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 18:03:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2100F207C4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
+	by mail.kernel.org (Postfix) with ESMTPS id 88DB42080D
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 18:07:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="p5JOSr31"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88DB42080D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55760 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33348 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlFvO-0000JB-B9
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 14:03:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60664)
+	id 1jlFzJ-00043H-Nj
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 14:07:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33104)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1jlFuR-0007ui-1X
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 14:02:07 -0400
-Received: from mx2.suse.de ([195.135.220.15]:55850)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1jlFuO-0000cR-I0
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 14:02:06 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
- by mx2.suse.de (Postfix) with ESMTP id 7B55FAF34;
- Tue, 16 Jun 2020 18:02:06 +0000 (UTC)
-Subject: Re: [RFC v5 4/4] cpus: extract out accel-specific code to each accel
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-References: <20200615180346.3992-1-cfontana@suse.de>
- <20200615180346.3992-5-cfontana@suse.de> <87y2onyu39.fsf@linaro.org>
- <75a85b11-6241-ebce-9fb9-ca92fdfba5de@suse.de> <87wo46yk1y.fsf@linaro.org>
-From: Claudio Fontana <cfontana@suse.de>
-Message-ID: <51d850dc-b488-e1d8-2e96-f1eb0df67f50@suse.de>
-Date: Tue, 16 Jun 2020 20:02:00 +0200
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jlFyA-0003UU-Pj; Tue, 16 Jun 2020 14:05:58 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:43423)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jlFy9-0001OL-5O; Tue, 16 Jun 2020 14:05:58 -0400
+Received: by mail-wr1-x441.google.com with SMTP id l10so21706894wrr.10;
+ Tue, 16 Jun 2020 11:05:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=eFv/74GIC90zXDmx/pN7hXJcT2/FHGZ6zxZ2uMPgNsA=;
+ b=p5JOSr31AD56J4MUIf4IQXDggj2Z/JF7EBkCO07B8u6pulrrJ+dVE0htkhUrY21ZzM
+ IrEaXfp7Pb/vmvD60L6wueyFoXSQjLEoSVlZVn2Hf/vjthzgkrwqwCB0bKUYAwb47Uf5
+ x3dsxoSpzpYhB/gB8y9ZiEmH1gJAJGXNoUoewM1LcVAE4SkdbiKpYTznDneYZnREc7vE
+ mnOo6yYINtegawDemT3r1StA9cGHH5aoSariNV72FoFbaOBpw5ByzRLsd7BHfetor3zV
+ ydX4O2NZPoNkdRCw1F5y45auCqg2Y89Qa4rOmeeUuT1x/bu1lGXGa87F51PAXQ3tAULC
+ vDrg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=eFv/74GIC90zXDmx/pN7hXJcT2/FHGZ6zxZ2uMPgNsA=;
+ b=sJbFvJ87Ne1dyl8jbOME2/zfFmfH/HD1b0m1n81AWDqTMV4efOhJ2nqnik2RuGAc/s
+ tmxR84sSdLap0dh4GtRAOgm84hefWJJdegj5kWWxcqrLl1brWC74aWLub//GUT4lPzoW
+ cr9ufcNAB+llvF++Gnuk1T2hQh82fuIpzWcrchIRRzideXApHusN0FXYi/UURgivq1lh
+ vhGgCZ9Zl7WWvD4uynF0e4DZecIF4+/ocQXJ6EWT01lMRJbE/aCdq/SZNcB9j4Xp287e
+ zqu7ixSj0hOGNiVs0gBCB15R2Oxj3d7ZEh7RcBuFDUe6R002j7dM3X2+mDVYFSdeibfk
+ OeLQ==
+X-Gm-Message-State: AOAM531qvzB2k8DAh/JigVIiQSz/2WxaFXyVz/7zbxDbo3wtRY12HqDQ
+ NIGEWW2QR1IaWJWrnzvMYvY=
+X-Google-Smtp-Source: ABdhPJztlPdit+wPQ9nMlJfxvof3DSm4cYoFGlf4LUbGZFbSqkohY3L1vACKvciWk72GZAmgp4gkOg==
+X-Received: by 2002:adf:eacc:: with SMTP id o12mr4460351wrn.139.1592330755090; 
+ Tue, 16 Jun 2020 11:05:55 -0700 (PDT)
+Received: from [192.168.1.37] (93.red-83-59-160.dynamicip.rima-tde.net.
+ [83.59.160.93])
+ by smtp.gmail.com with ESMTPSA id d16sm5021110wmd.42.2020.06.16.11.05.54
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 16 Jun 2020 11:05:54 -0700 (PDT)
+Subject: Re: [PATCH 1/2] hw/misc/pca9552: Trace LED On/Off events
+To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, qemu-devel@nongnu.org
+References: <20200616094542.25415-1-f4bug@amsat.org>
+ <20200616094542.25415-2-f4bug@amsat.org>
+ <ce02c953-073a-3843-5830-930cc194117c@kaod.org>
+ <3181da82-6dcf-9826-5747-7601204faa9f@kaod.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <55785519-20e6-9637-1bc8-d396879f4595@amsat.org>
+Date: Tue, 16 Jun 2020 20:05:53 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <87wo46yk1y.fsf@linaro.org>
+In-Reply-To: <3181da82-6dcf-9826-5747-7601204faa9f@kaod.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=195.135.220.15; envelope-from=cfontana@suse.de;
- helo=mx2.suse.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 23:07:04
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -70,251 +104,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, haxm-team@intel.com,
- Marcelo Tosatti <mtosatti@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- qemu-devel@nongnu.org, Roman Bolshakov <r.bolshakov@yadro.com>,
- Colin Xu <colin.xu@intel.com>, Wenchao Wang <wenchao.wang@intel.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Sunil Muthuswamy <sunilmut@microsoft.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jeffery <andrew@aj.id.au>,
+ Joaquin de Andres <me@xcancerberox.com.ar>,
+ Esteban Bosse <estebanbosse@gmail.com>, qemu-arm@nongnu.org,
+ Joel Stanley <joel@jms.id.au>, Guenter Roeck <linux@roeck-us.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/16/20 7:52 PM, Alex Bennée wrote:
+On 6/16/20 7:15 PM, Cédric Le Goater wrote:
+> After a closer look,
 > 
-> Claudio Fontana <cfontana@suse.de> writes:
-> 
->> Hi Alex,
->>
->> thanks for looking at this,
->>
->> On 6/16/20 4:16 PM, Alex Bennée wrote:
->>>
->>> Claudio Fontana <cfontana@suse.de> writes:
->>>
->>>> each accelerator registers a new "CpusAccel" interface
->>>> implementation on initialization, providing functions for
->>>> starting a vcpu, kicking a vcpu, and sychronizing state.
->>>>
->>>> This way the code in cpus.c is now all general softmmu code,
->>>> nothing accelerator-specific anymore.
->>>>
->>>> There is still some ifdeffery for WIN32 though.
->>>>
->>>> Signed-off-by: Claudio Fontana <cfontana@suse.de>
->>>> ---
->>>>  MAINTAINERS                   |   1 +
->>>>  accel/Makefile.objs           |   2 +-
->>>>  accel/kvm/Makefile.objs       |   2 +
->>>>  accel/kvm/kvm-all.c           |  15 +-
->>>>  accel/kvm/kvm-cpus.c          |  94 +++++
->>>>  accel/kvm/kvm-cpus.h          |  17 +
->>>>  accel/qtest/Makefile.objs     |   2 +
->>>>  accel/qtest/qtest-cpus.c      | 105 +++++
->>>>  accel/qtest/qtest-cpus.h      |  17 +
->>>>  accel/{ => qtest}/qtest.c     |   7 +
->>>>  accel/stubs/kvm-stub.c        |   3 +-
->>>>  accel/tcg/Makefile.objs       |   1 +
->>>>  accel/tcg/tcg-all.c           |  12 +-
->>>>  accel/tcg/tcg-cpus.c          | 523 ++++++++++++++++++++++++
->>>>  accel/tcg/tcg-cpus.h          |  17 +
->>>>  hw/core/cpu.c                 |   1 +
->>>>  include/sysemu/cpus.h         |  32 ++
->>>>  include/sysemu/hw_accel.h     |  57 +--
->>>>  include/sysemu/kvm.h          |   2 +-
->>>>  softmmu/cpus.c                | 911 ++++--------------------------------------
->>>>  stubs/Makefile.objs           |   1 +
->>>>  stubs/cpu-synchronize-state.c |  15 +
->>>>  target/i386/Makefile.objs     |   7 +-
->>>>  target/i386/hax-all.c         |   6 +-
->>>>  target/i386/hax-cpus.c        |  85 ++++
->>>>  target/i386/hax-cpus.h        |  17 +
->>>>  target/i386/hax-i386.h        |   2 +
->>>>  target/i386/hax-posix.c       |  12 +
->>>>  target/i386/hax-windows.c     |  20 +
->>>>  target/i386/hvf/Makefile.objs |   2 +-
->>>>  target/i386/hvf/hvf-cpus.c    | 141 +++++++
->>>>  target/i386/hvf/hvf-cpus.h    |  17 +
->>>>  target/i386/hvf/hvf.c         |   3 +
->>>>  target/i386/whpx-all.c        |   3 +
->>>>  target/i386/whpx-cpus.c       |  96 +++++
->>>>  target/i386/whpx-cpus.h       |  17 +
->>>>  36 files changed, 1362 insertions(+), 903 deletions(-)
->>>>  create mode 100644 accel/kvm/kvm-cpus.c
->>>>  create mode 100644 accel/kvm/kvm-cpus.h
->>>>  create mode 100644 accel/qtest/Makefile.objs
->>>>  create mode 100644 accel/qtest/qtest-cpus.c
->>>>  create mode 100644 accel/qtest/qtest-cpus.h
->>>>  rename accel/{ => qtest}/qtest.c (86%)
->>>>  create mode 100644 accel/tcg/tcg-cpus.c
->>>>  create mode 100644 accel/tcg/tcg-cpus.h
->>>>  create mode 100644 stubs/cpu-synchronize-state.c
->>>>  create mode 100644 target/i386/hax-cpus.c
->>>>  create mode 100644 target/i386/hax-cpus.h
->>>>  create mode 100644 target/i386/hvf/hvf-cpus.c
->>>>  create mode 100644 target/i386/hvf/hvf-cpus.h
->>>>  create mode 100644 target/i386/whpx-cpus.c
->>>>  create mode 100644 target/i386/whpx-cpus.h
->>>
->>> Predictably for such a spider patch I got a bunch of conflicts
->>> attempting to merge on my testing branch so only a few comments.
->>>
->>>>
->>>> diff --git a/MAINTAINERS b/MAINTAINERS
->>>> index f308537d42..ef8cbb2680 100644
->>>> --- a/MAINTAINERS
->>>> +++ b/MAINTAINERS
->>>> @@ -427,6 +427,7 @@ WHPX CPUs
->>>>  M: Sunil Muthuswamy <sunilmut@microsoft.com>
->>>>  S: Supported
->>>>  F: target/i386/whpx-all.c
->>>> +F: target/i386/whpx-cpus.c
->>>>  F: target/i386/whp-dispatch.h
->>>>  F: accel/stubs/whpx-stub.c
->>>>  F: include/sysemu/whpx.h
->>>> diff --git a/accel/Makefile.objs b/accel/Makefile.objs
->>>> index ff72f0d030..c5e58eb53d 100644
->>>> --- a/accel/Makefile.objs
->>>> +++ b/accel/Makefile.objs
->>>> @@ -1,5 +1,5 @@
->>>>  common-obj-$(CONFIG_SOFTMMU) += accel.o
->>>> -obj-$(call land,$(CONFIG_SOFTMMU),$(CONFIG_POSIX)) += qtest.o
->>>> +obj-$(call land,$(CONFIG_SOFTMMU),$(CONFIG_POSIX)) += qtest/
->>>
->>> This does raise the question if qtest is "just another" accelerator then
->>> should we not be creating a CONFIG_QTEST symbol for explicitness?
->>>
->>>>  obj-$(CONFIG_KVM) += kvm/
->>>>  obj-$(CONFIG_TCG) += tcg/
->>>>  obj-$(CONFIG_XEN) += xen/
->>> <snip>
->>>> +static void *qtest_cpu_thread_fn(void *arg)
->>>> +{
->>>> +#ifdef _WIN32
->>>> +    error_report("qtest is not supported under Windows");
->>>> +    exit(1);
->>>> +#else
->>>
->>> This is literally impossible to build isn't it?
->>>>  
->>>>  static int qtest_init_accel(MachineState *ms)
->>>>  {
->>>> +    cpus_register_accel(&qtest_cpus);
->>>>      return 0;
->>>>  }
->>>
->>> I wonder if these register functions could be moved to initfns like we
->>> use for our hardware models?
->>
->> The context is the configure_accelerator() in vl.c , where we loop over possible candidate accelerators
->> and try to initialize them.
->>
->> In this RFC the cpus_register_accel is triggered at accel_init_machine() time,
->> in the accelerator class init_machine() method, where we are trying to use a specific accelerator.
->>
->> This is the case for qtest like for the other AccelClass types (tcg and the hardware accelerators).
->>
->> If not in init_machine(), where would the registration best happen?
-> 
-> Ahh I see - this is once the decision about which accelerator has been
-> made. I was thinking along the lines of the init functions driven by:
-> 
->   #define type_init(function) module_init(function, MODULE_INIT_QOM)
-> 
-> which would then populate the list of available accelerators in a more
-> QOM like manner. I assume having a completely configurable set of
-> accelerators is the eventual aim of this?
+>>> @@ -45,9 +46,15 @@ static void pca9552_update_pin_input(PCA9552State *s)
+>>>          switch (config) {
+>>>          case PCA9552_LED_ON:
+>>>              s->regs[input_reg] |= 1 << input_shift;
+>>> +            if (input_shift < s->nr_leds) {
+> This seems like a superfluous test.
 
-
-Yes, in my plan the change to add target-specific modules and eventually CONFIG_TCG=m, CONFIG_KVM=m etc is basically the last step, the way I see it.
-
-tentative plan is at:
-
-https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg04628.html
-
+Indeed.
 
 > 
->>
->>>
->>> <snip>
->>>>  
->>>> +/*
->>>> + * every accelerator is supposed to register this.
->>>> + * Could be in the AccelClass instead, but ends up being too complicated
->>>> + * to access in practice, and inefficient for each call of each method.
->>>> + */
->>>> +static CpusAccel cpus_accel;
->>>> +
->>>
->>> wait what? Does an indirection cause that much trouble? I'm surprised
->>> given how often we use it elsewhere in the code. I guess others might
->>
->> CpusAccel is not used elsewhere currently in the codebase, it's new, or what do you mean?
->>
->>> argue for a full QOM-ification of the accelerator but I think we can at
->>> least have an indirection rather than a copy of the structure.
->>>
->>>
->>
->> As mentioned in v3 and v2, this is what we end up if we put CpusAccel inside the AccelClass,
->> every time we need a vcpu kick, sync state, etc:
->>
->> 1) current_accel() function call
->> 2) pointer dereference (->accelerator)
->> 3) object_class_dynamic_cast_assert function call (ACCEL_GET_CLASS -> OBJECT_CLASS_CHECK)
->> 4) pointer dereference (-> AccelCpusInterface)
->> 5) pointer dereference (-> method)
->> 6) function call ( ->synchronize_state(cpu))
->>
->> So the code then would look like this (more or less, probably I would put also an assert for non-NULL in there):
->>
->> VERSION A)
->>
->> void cpu_synchronize_state(CPUState *cpu)
->> {
->>     ACCEL_GET_CLASS(current_accel())->cpus_int->synchronize_state(cpu);
->> }
+>>> +                trace_pca9552_led_set(input_shift, true);
 > 
-> I don't think it has to be quite so extreme. I was just arguing for
-> something along the lines of:
+> This should be using 'i' and the output is not very concise : 
 > 
-> static CpuAccel *accel;
+> 564609@1592326881.815616:pca9552_led_set LED#0 state:1
+> 564609@1592326881.815660:pca9552_led_set LED#1 state:1
+> 564609@1592326881.815669:pca9552_led_set LED#2 state:1
+> 564609@1592326881.815677:pca9552_led_set LED#3 state:1
+> 564609@1592326881.815706:pca9552_led_set LED#4 state:0
+> 564609@1592326881.815715:pca9552_led_set LED#5 state:0
+> 564609@1592326881.815727:pca9552_led_set LED#6 state:0
+> 564609@1592326881.815740:pca9552_led_set LED#7 state:0
+> 564609@1592326881.815748:pca9552_led_set LED#8 state:0
+> 564609@1592326881.815759:pca9552_led_set LED#9 state:0
+> 564609@1592326881.815767:pca9552_led_set LED#10 state:0
+> 564609@1592326881.815779:pca9552_led_set LED#11 state:0
+> 564609@1592326881.815790:pca9552_led_set LED#12 state:0
+> 564609@1592326881.815802:pca9552_led_set LED#13 state:1
+> 564609@1592326881.815813:pca9552_led_set LED#14 state:1
+> 564609@1592326881.815826:pca9552_led_set LED#15 state:1
 > 
-> and
+> I would instead simply dump the contents of the PCA9552_INPUT registers : 
 > 
-> void cpu_synchronize_state(CPUState *cpu)
-> {
->    if (accel && accel->synchronize_state) {
->       accel->synchronize_state(cpu);
->    }
-> }
-> 
->> Instead with the current RFC code, this is what we end up with every
->> time we need a vcpu kick, sync state, etc:
-> 
-> I don't think a pointer de-reference alone is super critical for
-> something that happens on the outside of the main run loop. It might be
-> a different argument if this was somewhere in the hot path.
-> 
->> Are you arguing in favor of VERSION A) here?
-> 
-> Version C ;-)
+> LEDS = 1111000000000101
+> LEDS = 1111000000000111
+> ....
 
-Aha, ok I am comfortable with version C.
+Good idea, thanks!
 
 > 
+> C.
+> 
+> 
+>>> +            }
+>>>              break;
+>>>          case PCA9552_LED_OFF:
+>>>              s->regs[input_reg] &= ~(1 << input_shift);
+>>> +            if (input_shift < s->nr_leds) {
+>>> +                trace_pca9552_led_set(input_shift, false);
+>>> +            }
+>>>              break;
+>>>          case PCA9552_LED_PWM0:
+>>>          case PCA9552_LED_PWM1:
+>>> diff --git a/hw/misc/trace-events b/hw/misc/trace-events
+>>> index 5561746866..ed80d0d1be 100644
+>>> --- a/hw/misc/trace-events
+>>> +++ b/hw/misc/trace-events
+>>> @@ -206,3 +206,6 @@ via1_rtc_cmd_pram_sect_write(int sector, int offset, int addr, int value) "secto
+>>>  # grlib_ahb_apb_pnp.c
+>>>  grlib_ahb_pnp_read(uint64_t addr, uint32_t value) "AHB PnP read addr:0x%03"PRIx64" data:0x%08x"
+>>>  grlib_apb_pnp_read(uint64_t addr, uint32_t value) "APB PnP read addr:0x%03"PRIx64" data:0x%08x"
+>>> +
+>>> +# pca9552.c
+>>> +pca9552_led_set(unsigned id, bool state) "LED#%d state:%u"
+>>>
 >>
->> I would like to have an ACK from the owners of the hardware accels especially that the additional overhead in this code path
->> is of negligible importance..
->>
->>
->> Thank you for your comments,
->>
-
-Ciao,
-
-Claudio
+> 
+> 
 
