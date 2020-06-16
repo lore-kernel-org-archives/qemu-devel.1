@@ -7,69 +7,70 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E367DC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 07:54:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D21EC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 07:54:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ADBAF2074D
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 07:54:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1850E206D7
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 07:54:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NU6xdCpJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ADBAF2074D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EMXCBPQQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1850E206D7
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53976 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55606 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jl6QJ-0000PM-V0
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 03:54:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53888)
+	id 1jl6Qq-00013n-Bu
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 03:54:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53924)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jl6NV-0003eA-6z; Tue, 16 Jun 2020 03:51:29 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:34407)
+ id 1jl6NY-0003jF-SS; Tue, 16 Jun 2020 03:51:32 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:41202)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jl6NT-00084A-Jj; Tue, 16 Jun 2020 03:51:28 -0400
-Received: by mail-wr1-x443.google.com with SMTP id r7so19697962wro.1;
- Tue, 16 Jun 2020 00:51:26 -0700 (PDT)
+ id 1jl6NX-00084r-6w; Tue, 16 Jun 2020 03:51:32 -0400
+Received: by mail-wr1-x442.google.com with SMTP id j10so19659126wrw.8;
+ Tue, 16 Jun 2020 00:51:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=u02Arpcubj9mPZ8wYNHVoADOr5FJrLRUYb2irB7o4Ig=;
- b=NU6xdCpJWWMjotGt3hh8qLQaEU6IcuR807+1T9o24PWWNqD9Vogza4t5sE/67Lc+Ul
- RGfzxZSZE3DbR+GqQrdbaiR5Itv2TJ5BXlyrssUbjIyUavUjrD2sL32ipexO5Un6L8HN
- jChBwkWzR2d4Cahzr2jOrEAHMxxk3Nvvv00VClpD+StLtJp282jata4OgZXBnCyzhuHJ
- fiQtd6K4ljhhVoDkTZI+jjJkNZjozK9Q5hQMOo0FuF7f02NHidx60lb9OLa8Hq+rbBND
- c/5y0//UT6HrihapbCL3sNis3PVVmmf4Y/hXtSZpzXycZPTqZWz43ZOq67pcJlu4blwI
- cTEQ==
+ bh=nNUziTErkLgYz4tRwUDCFKibDK7Kq+2uBOuQqz7FOdE=;
+ b=EMXCBPQQiKZ0IiZlX2V9oIPUOIocKwAiFgJ87DIbemKuT55ZMwXBHSCQ0U3ocn1tWO
+ 2gUlIy2C7w+mpcRxPG0O2l85DCKvbqHEcZSRvvrKqEY8SHjcy6yi3bsPl1tX3y7GaA7Q
+ WNqFtDEQ/b/RRdF85QN3opwgKH1m0/bAdXcP520QisJFcqY341x10rcWRdFgeLNdTs7v
+ ALWaAT9iYZIhZ1mre/JCGtbuGXTxinHP3bnPjVy2bQSUJn3bHJD508/KXxjCHjKNTszo
+ GqRkYTaAhcS3ZnkpxkRFo4345EHZU/RDJT/Nbv/a2b6W0qE+aGGntMCe5s7pMi33OiY2
+ tqjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=u02Arpcubj9mPZ8wYNHVoADOr5FJrLRUYb2irB7o4Ig=;
- b=sB9i9cEqcfUFeFbX9TDjMgB1Y/1w+PyCoubmqdEbvZXndPVIHJof2MtTyIujEucH2O
- 3tCGslzDLeAJDGv/bLqh5I5KWFvJtq+eVE2gT+bS8SCKK535pXBnjnt4h9D2iqJJ7bfL
- r+T9qNCNLXR0X99sj3Hm9saUU0UCMat+LJvQXoVclGWYhwgOTsY2Tu2X6HyAUIaV916W
- zj6hkcCzTUC7X5MlTllv5MgvquBTOb47pIZ6KN12ASOhoCAiCWVWe2TYWKIoY+/yR9v7
- dR0HzCujmJnyLntEnvtF0t1SGlcYiYjtS7QRdaxoSKj90GPcNSPdiFhtdz+7YSlzQ9T0
- WM/w==
-X-Gm-Message-State: AOAM530HZnPY6nW8AXq/VGctOoOsdsFWEYsoLFQKkqOONIAOMtpAt6n+
- UA6rMSmt/e1N8BZ+8EnIONFRR7NQ
-X-Google-Smtp-Source: ABdhPJyvI98LxdXs/QaF0wr5dlrQ7y8cygnVOjolGcediY1CUVmrWxnbvLxbeYibXrGIgZMBGQIhoQ==
-X-Received: by 2002:a5d:4f09:: with SMTP id c9mr1617618wru.3.1592293885188;
- Tue, 16 Jun 2020 00:51:25 -0700 (PDT)
+ bh=nNUziTErkLgYz4tRwUDCFKibDK7Kq+2uBOuQqz7FOdE=;
+ b=lTaWxdpG5H+r10ReT/iYfp1AdZkNiRs2F3A5eqglJM6GD2SmVjixBsQLnugtXAo7AP
+ BMbY51IV3DX4gf06rAuUem9LL6OXXGjBzHyjC81WMrZf/wP3C8B3RzXlHDoA4myJt0Ba
+ udC67zOPxhIaO7vnguySLlgwxqs7d8sjb7vbJlXxfyEG3rSzpQ9b6dliEKx0EeOx9VJQ
+ w5zv9Wa55vxoc4aWDtr3G8A+sZMiJ3BwwtH/f8nqBYgkMG+sLJwLyjNqHFcD903jBVCd
+ 97OpHkPZ3LHLr+gCQZTcAQVr9FEghjH170RfMRpmpKJ6ppgSs0QeOv2DlwzNfsxkLHkD
+ /ZXQ==
+X-Gm-Message-State: AOAM533jnUhzrU7IdO+TPtbL7/fhfpq0elt8wz1QznBVX8Tz9lRJkV6U
+ yzETY/cq3d3GRM9ecrPQkPChxpJ/
+X-Google-Smtp-Source: ABdhPJyX7kxTW4XOQXjVEj5drS5upHp8ngPtIAsARqpAsxbPN7+9xQEPXiXWWQNW++v5bR9lKQRF/A==
+X-Received: by 2002:adf:e590:: with SMTP id l16mr1566679wrm.383.1592293889090; 
+ Tue, 16 Jun 2020 00:51:29 -0700 (PDT)
 Received: from localhost.localdomain
  (181.red-88-10-103.dynamicip.rima-tde.net. [88.10.103.181])
- by smtp.gmail.com with ESMTPSA id q11sm28093538wrv.67.2020.06.16.00.51.23
+ by smtp.gmail.com with ESMTPSA id q11sm28093538wrv.67.2020.06.16.00.51.27
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 16 Jun 2020 00:51:24 -0700 (PDT)
+ Tue, 16 Jun 2020 00:51:28 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 1/7] qemu-common: Briefly document qemu_timedate_diff() unit
-Date: Tue, 16 Jun 2020 09:51:15 +0200
-Message-Id: <20200616075121.12837-2-f4bug@amsat.org>
+Subject: [PATCH 4/7] hw/virtio/virtio-balloon: Rename timer field including
+ 'ms' unit
+Date: Tue, 16 Jun 2020 09:51:18 +0200
+Message-Id: <20200616075121.12837-5-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200616075121.12837-1-f4bug@amsat.org>
 References: <20200616075121.12837-1-f4bug@amsat.org>
@@ -77,8 +78,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x442.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -112,41 +113,66 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It is not obvious that the qemu_timedate_diff() and
-qemu_ref_timedate() functions return seconds. Briefly
-document it.
+To make code review easier, append the timer unit (milli-seconds)
+to its variable name.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- include/qemu-common.h | 1 +
- softmmu/vl.c          | 2 +-
- 2 files changed, 2 insertions(+), 1 deletion(-)
+ include/hw/virtio/virtio-balloon.h |  2 +-
+ hw/virtio/virtio-balloon.c         | 14 ++++++++------
+ 2 files changed, 9 insertions(+), 7 deletions(-)
 
-diff --git a/include/qemu-common.h b/include/qemu-common.h
-index d0142f29ac..e97644710c 100644
---- a/include/qemu-common.h
-+++ b/include/qemu-common.h
-@@ -27,6 +27,7 @@ int qemu_main(int argc, char **argv, char **envp);
- #endif
- 
- void qemu_get_timedate(struct tm *tm, int offset);
-+/* Returns difference with RTC reference time (in seconds) */
- int qemu_timedate_diff(struct tm *tm);
- 
- void *qemu_oom_check(void *ptr);
-diff --git a/softmmu/vl.c b/softmmu/vl.c
-index f669c06ede..215459c7b5 100644
---- a/softmmu/vl.c
-+++ b/softmmu/vl.c
-@@ -737,7 +737,7 @@ void qemu_system_vmstop_request(RunState state)
+diff --git a/include/hw/virtio/virtio-balloon.h b/include/hw/virtio/virtio-balloon.h
+index d49fef00ce..8a85fb1b88 100644
+--- a/include/hw/virtio/virtio-balloon.h
++++ b/include/hw/virtio/virtio-balloon.h
+@@ -50,7 +50,7 @@ typedef struct VirtIOBalloon {
+     uint64_t stats[VIRTIO_BALLOON_S_NR];
+     VirtQueueElement *stats_vq_elem;
+     size_t stats_vq_offset;
+-    QEMUTimer *stats_timer;
++    QEMUTimer *stats_timer_ms;
+     IOThread *iothread;
+     QEMUBH *free_page_bh;
+     /*
+diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
+index 10507b2a43..ad67cd53e4 100644
+--- a/hw/virtio/virtio-balloon.c
++++ b/hw/virtio/virtio-balloon.c
+@@ -197,16 +197,17 @@ static bool balloon_stats_enabled(const VirtIOBalloon *s)
+ static void balloon_stats_destroy_timer(VirtIOBalloon *s)
+ {
+     if (balloon_stats_enabled(s)) {
+-        timer_del(s->stats_timer);
+-        timer_free(s->stats_timer);
+-        s->stats_timer = NULL;
++        timer_del(s->stats_timer_ms);
++        timer_free(s->stats_timer_ms);
++        s->stats_timer_ms = NULL;
+         s->stats_poll_interval = 0;
+     }
  }
  
- /***********************************************************/
--/* RTC reference time/date access */
-+/* RTC reference time/date access (in seconds) */
- static time_t qemu_ref_timedate(QEMUClockType clock)
+ static void balloon_stats_change_timer(VirtIOBalloon *s, int64_t secs)
  {
-     time_t value = qemu_clock_get_ms(clock) / 1000;
+-    timer_mod(s->stats_timer, qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) + secs * 1000);
++    timer_mod(s->stats_timer_ms,
++              qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) + secs * 1000);
+ }
+ 
+ static void balloon_stats_poll_cb(void *opaque)
+@@ -315,8 +316,9 @@ static void balloon_stats_set_poll_interval(Object *obj, Visitor *v,
+     }
+ 
+     /* create a new timer */
+-    g_assert(s->stats_timer == NULL);
+-    s->stats_timer = timer_new_ms(QEMU_CLOCK_VIRTUAL, balloon_stats_poll_cb, s);
++    g_assert(s->stats_timer_ms == NULL);
++    s->stats_timer_ms = timer_new_ms(QEMU_CLOCK_VIRTUAL,
++                                     balloon_stats_poll_cb, s);
+     s->stats_poll_interval = value;
+     balloon_stats_change_timer(s, 0);
+ }
 -- 
 2.21.3
 
