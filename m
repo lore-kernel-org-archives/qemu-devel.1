@@ -7,70 +7,68 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55780C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:24:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B906C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:25:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1C644208B3
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:24:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 709F520786
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:25:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dPrqy5cm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C644208B3
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aQPaW9tA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 709F520786
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44524 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46066 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlCWF-0004PG-84
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 10:24:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57258)
+	id 1jlCWi-00050p-Me
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 10:25:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57326)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1jlCPK-0001OE-H6; Tue, 16 Jun 2020 10:17:46 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:42852)
+ id 1jlCPP-0001cD-Ag; Tue, 16 Jun 2020 10:17:51 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:41875)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1jlCPJ-0006Yf-04; Tue, 16 Jun 2020 10:17:46 -0400
-Received: by mail-ot1-x344.google.com with SMTP id t6so16019270otk.9;
- Tue, 16 Jun 2020 07:17:44 -0700 (PDT)
+ id 1jlCPN-0006Zh-Sh; Tue, 16 Jun 2020 10:17:50 -0400
+Received: by mail-ot1-x344.google.com with SMTP id k15so16041234otp.8;
+ Tue, 16 Jun 2020 07:17:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=dMAfRKU6ZrmfHJJ6NFU2O1ZIHPVnAPeYIVisRHhIKSo=;
- b=dPrqy5cmgqkFGiQG0KkGp8VfQFtMmmSou/XG7IiWa4JQbqi3uTD8uDdCE+rCNSfZkW
- My6FhS3rAKb95Xv/R+6lp1ZVNc3hHF3EHLGtB8eHOQ+Nx5YQ29ETDcNdX73B8iVhSm99
- vkoxrmEfKXpYE6MZLP4XjtC7ni96aq8xzUNtz62e9LU5g+AgIhUDv98b9Q9h5PK2tGVg
- 0s2A78Y/MCXdh2oHdZFRmK5+GfRBenT6UQ9D5eZ3jsip+vYJlqKfnToJqTrv9BpHczhW
- +dsLf+c573RiNKKVydqb1iHYxvz4qYvVXincLdRUatQLqXAW+9g3plM2L7b82B3ryyKQ
- YIHQ==
+ bh=n7B/wh3iwTtyo7VyN7RqN0zDZm9E1OhXpgfK21UOXC8=;
+ b=aQPaW9tAw2YZkeFMm0nfTS+qfP/GmG6XHwzbZvRydk61C3pGf18c7UPhBe2r443FPN
+ a0xYZATejGGsWplnd2LfjH81j6x8FSlota+LJ+jcyAfMJe3MYgzQN7Vkf8UTkRVDVKfJ
+ by+/wg+1uMd7B55JGrcP2ce+4BczPLS/wxJfb4FGBjHceMASFwSbcIRSl6CLaZ0MQqKu
+ pg2sxk3Tfa2fEioThbFLlrzHxAI6djZHxF/St0Njgyll287xEjn9jUH3cpgdheW0GIih
+ u87CReq8WhDndlC1SYBnvLTsl2zWiIZgftsSawUhtoWBG807QD7QmaYyF16SikmeK6yA
+ uOJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references;
- bh=dMAfRKU6ZrmfHJJ6NFU2O1ZIHPVnAPeYIVisRHhIKSo=;
- b=lEOzOfZt0abx18cAZWl6GbXpwpeRJyNUIa5glmSJ0rT6v38wZMu1tmHq9TnCBQofxN
- IHAZjb84UpE97OvPp3eJmjnVItdbGW2zTXraWC4dyLHDzMum4VxvrhdwjVdm1zC7CLGd
- yKTHcqt2XvSjWScOzS8mg3UhDK7twGyMGKTdjYgh4rHkY71gVGFp0KSsAfY4/HnFuPJp
- T6sK71dpQ0vPg5nn9RmylP9RgGnwy67T4TgstjSjBbY+ToHwFagVbN5C7CwRHqhZaa1s
- +/XMO3+tKYCPfNURXu/ywHmMzIFcgqPPbsJPG8ixwhZjnhJs9rIzkTY4w/TFbKcFZeOD
- QWew==
-X-Gm-Message-State: AOAM533PrKigZqSZz+wzI6BrdOuSTDgL1hLpPygiiAKEYLOKaCm7ok2o
- Sctniw/p2zkyxHfihuC/xCiEb1si
-X-Google-Smtp-Source: ABdhPJw2DgVkrr9fUCpm1xZeHfL7DxNaacR+wGpHeBreNnujfPlxmexowp4agB1Erij1vp5A+lUGsw==
-X-Received: by 2002:a05:6830:1001:: with SMTP id
- a1mr2665125otp.94.1592317063048; 
- Tue, 16 Jun 2020 07:17:43 -0700 (PDT)
+ bh=n7B/wh3iwTtyo7VyN7RqN0zDZm9E1OhXpgfK21UOXC8=;
+ b=K1M5em5ge66juXzmtcfvyBgwbRHQ1Z2h8fPA21T07L8IAZq7sK+noOAg2c8rn7OWMk
+ P5zSL8WYKehcO9+LXZmNwBpmfcFVcPaSaHiPXMnkAfNOb6l3nts3F2b3ohYj5j3QI7Z+
+ N7HLpMLtMsA0PZH5orDwzoesZEvIGJL8A1oik9EbXozVYwKNvJp8c/8aJjwl05teTm8p
+ GSuTylCuHf/drdyhFI1ou1fH5GNjrglGjfE5yz/IwHLkfC6YRuhDkjcX9JVUdiuGsdaY
+ BE46LCpmTQYDrwFMck/mXSb1TmqqBg73RG9xKd4dO5d0Ws9z944904VVEuk83GCXy0Gz
+ ReZg==
+X-Gm-Message-State: AOAM533e+7RX3AB6AuhtV/SX36jqwiPX0TKSIcmmSeUr4jSLyoLo9y5k
+ SQse75HRTV6KYiL+oMQ3edURkQZ3
+X-Google-Smtp-Source: ABdhPJwKg+xX9CQiekHgGGRXnhTipyam5hAQCYo798Q9SkgQuqngG0+2gPE8BJ9MPYnR6Vs3JBNSDg==
+X-Received: by 2002:a9d:4b90:: with SMTP id k16mr2494240otf.69.1592317068096; 
+ Tue, 16 Jun 2020 07:17:48 -0700 (PDT)
 Received: from localhost (76-251-165-188.lightspeed.austtx.sbcglobal.net.
  [76.251.165.188])
- by smtp.gmail.com with ESMTPSA id r10sm3649071ooh.20.2020.06.16.07.17.41
+ by smtp.gmail.com with ESMTPSA id 53sm4068150otv.22.2020.06.16.07.17.46
  (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
- Tue, 16 Jun 2020 07:17:41 -0700 (PDT)
+ Tue, 16 Jun 2020 07:17:47 -0700 (PDT)
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 15/78] ide: Fix incorrect handling of some PRDTs in
- ide_dma_cb()
-Date: Tue, 16 Jun 2020 09:14:44 -0500
-Message-Id: <20200616141547.24664-16-mdroth@linux.vnet.ibm.com>
+Subject: [PATCH 18/78] virtio-mmio: update queue size on guest write
+Date: Tue, 16 Jun 2020 09:14:47 -0500
+Message-Id: <20200616141547.24664-19-mdroth@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200616141547.24664-1-mdroth@linux.vnet.ibm.com>
 References: <20200616141547.24664-1-mdroth@linux.vnet.ibm.com>
@@ -97,100 +95,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: John Snow <jsnow@redhat.com>, qemu-stable@nongnu.org,
- Alexander Popov <alex.popov@linux.com>
+Cc: Denis Plotnikov <dplotnikov@virtuozzo.com>, qemu-stable@nongnu.org,
+ "Michael S . Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Alexander Popov <alex.popov@linux.com>
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
 
-The commit a718978ed58a from July 2015 introduced the assertion which
-implies that the size of successful DMA transfers handled in ide_dma_cb()
-should be multiple of 512 (the size of a sector). But guest systems can
-initiate DMA transfers that don't fit this requirement.
+Some guests read back queue size after writing it.
+Always update the on size write otherwise they might be confused.
 
-For fixing that let's check the number of bytes prepared for the transfer
-by the prepare_buf() handler. The code in ide_dma_cb() must behave
-according to the Programming Interface for Bus Master IDE Controller
-(Revision 1.0 5/16/94):
-1. If PRDs specified a smaller size than the IDE transfer
-   size, then the Interrupt and Active bits in the Controller
-   status register are not set (Error Condition).
-2. If the size of the physical memory regions was equal to
-   the IDE device transfer size, the Interrupt bit in the
-   Controller status register is set to 1, Active bit is set to 0.
-3. If PRDs specified a larger size than the IDE transfer size,
-   the Interrupt and Active bits in the Controller status register
-   are both set to 1.
-
-Signed-off-by: Alexander Popov <alex.popov@linux.com>
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
-Message-id: 20191223175117.508990-2-alex.popov@linux.com
-Signed-off-by: John Snow <jsnow@redhat.com>
-(cherry picked from commit ed78352a59ea7acf7520d4d47a96b9911bae7fc3)
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Message-Id: <20191224081446.17003-1-dplotnikov@virtuozzo.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+(cherry picked from commit 1049f4c62c4070618cc5defc9963c6a17ae7a5ae)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- hw/ide/core.c | 30 ++++++++++++++++++++++--------
- 1 file changed, 22 insertions(+), 8 deletions(-)
+ hw/virtio/virtio-mmio.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/hw/ide/core.c b/hw/ide/core.c
-index 754ff4dc34..80000eb766 100644
---- a/hw/ide/core.c
-+++ b/hw/ide/core.c
-@@ -849,6 +849,7 @@ static void ide_dma_cb(void *opaque, int ret)
-     int64_t sector_num;
-     uint64_t offset;
-     bool stay_active = false;
-+    int32_t prep_size = 0;
- 
-     if (ret == -EINVAL) {
-         ide_dma_error(s);
-@@ -863,13 +864,15 @@ static void ide_dma_cb(void *opaque, int ret)
-         }
-     }
- 
--    n = s->io_buffer_size >> 9;
--    if (n > s->nsector) {
--        /* The PRDs were longer than needed for this request. Shorten them so
--         * we don't get a negative remainder. The Active bit must remain set
--         * after the request completes. */
-+    if (s->io_buffer_size > s->nsector * 512) {
-+        /*
-+         * The PRDs were longer than needed for this request.
-+         * The Active bit must remain set after the request completes.
-+         */
-         n = s->nsector;
-         stay_active = true;
-+    } else {
-+        n = s->io_buffer_size >> 9;
-     }
- 
-     sector_num = ide_get_sector(s);
-@@ -892,9 +895,20 @@ static void ide_dma_cb(void *opaque, int ret)
-     n = s->nsector;
-     s->io_buffer_index = 0;
-     s->io_buffer_size = n * 512;
--    if (s->bus->dma->ops->prepare_buf(s->bus->dma, s->io_buffer_size) < 512) {
--        /* The PRDs were too short. Reset the Active bit, but don't raise an
--         * interrupt. */
-+    prep_size = s->bus->dma->ops->prepare_buf(s->bus->dma, s->io_buffer_size);
-+    /* prepare_buf() must succeed and respect the limit */
-+    assert(prep_size >= 0 && prep_size <= n * 512);
+diff --git a/hw/virtio/virtio-mmio.c b/hw/virtio/virtio-mmio.c
+index 94d934c44b..1e40a74869 100644
+--- a/hw/virtio/virtio-mmio.c
++++ b/hw/virtio/virtio-mmio.c
+@@ -295,8 +295,9 @@ static void virtio_mmio_write(void *opaque, hwaddr offset, uint64_t value,
+         break;
+     case VIRTIO_MMIO_QUEUE_NUM:
+         trace_virtio_mmio_queue_write(value, VIRTQUEUE_MAX_SIZE);
++        virtio_queue_set_num(vdev, vdev->queue_sel, value);
 +
-+    /*
-+     * Now prep_size stores the number of bytes in the sglist, and
-+     * s->io_buffer_size stores the number of bytes described by the PRDs.
-+     */
-+
-+    if (prep_size < n * 512) {
-+        /*
-+         * The PRDs are too short for this request. Error condition!
-+         * Reset the Active bit and don't raise the interrupt.
-+         */
-         s->status = READY_STAT | SEEK_STAT;
-         dma_buf_commit(s, 0);
-         goto eot;
+         if (proxy->legacy) {
+-            virtio_queue_set_num(vdev, vdev->queue_sel, value);
+             virtio_queue_update_rings(vdev, vdev->queue_sel);
+         } else {
+             proxy->vqs[vdev->queue_sel].num = value;
 -- 
 2.17.1
 
