@@ -2,59 +2,85 @@ Return-Path: <SRS0=f7ls=75=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FB10C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 12:33:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21352C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 12:33:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F31BB20734
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 12:33:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F31BB20734
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nutanix.com
+	by mail.kernel.org (Postfix) with ESMTPS id DECC920734
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 12:33:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RUNXXPwm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DECC920734
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42998 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44504 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlAm1-00021j-8a
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 08:33:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55718)
+	id 1jlAmf-0002nI-35
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 08:33:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56028)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ani.sinha@ani-sinha1.localdomain>)
- id 1jlAko-0000i7-51
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 08:31:50 -0400
-Received: from [192.146.154.243] (port=16981 helo=mcp01.nutanix.com)
- by eggs.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ani.sinha@ani-sinha1.localdomain>)
- id 1jlAkl-00050x-Uc
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 08:31:49 -0400
-Received: from ani-sinha1.localdomain (ani-sinha1.dev.nutanix.com
- [10.41.71.199])
- by mcp01.nutanix.com (Postfix) with ESMTP id E644D1012CF2;
- Tue, 16 Jun 2020 12:31:41 +0000 (UTC)
-Received: by ani-sinha1.localdomain (Postfix, from userid 16671)
- id E13AF220A23; Tue, 16 Jun 2020 12:31:41 +0000 (UTC)
-From: Ani Sinha <ani.sinha@nutanix.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH V3] Rename use_acpi_pci_hotplug to more appropriate
- use_acpi_hotplug_bridge
-Date: Tue, 16 Jun 2020 12:31:39 +0000
-Message-Id: <1592310699-58916-1-git-send-email-ani.sinha@nutanix.com>
-X-Mailer: git-send-email 1.8.3.1
-X-Host-Lookup-Failed: Reverse DNS lookup failed for 192.146.154.243 (deferred)
-Received-SPF: none client-ip=192.146.154.243;
- envelope-from=ani.sinha@ani-sinha1.localdomain; helo=mcp01.nutanix.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 08:31:42
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: 19
-X-Spam_score: 1.9
-X-Spam_bar: +
-X-Spam_report: (1.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- NO_DNS_FOR_FROM=0.001, RDNS_NONE=0.793, SPF_HELO_NONE=0.001, SPF_NONE=0.001,
- SUBJ_OBFU_PUNCT_FEW=1, SUBJ_OBFU_PUNCT_MANY=1 autolearn=_AUTOLEARN
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jlAlc-0001Zb-1h
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 08:32:40 -0400
+Received: from mail-oo1-xc2d.google.com ([2607:f8b0:4864:20::c2d]:43220)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jlAla-00056q-5k
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 08:32:39 -0400
+Received: by mail-oo1-xc2d.google.com with SMTP id i4so1297315ooj.10
+ for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 05:32:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=sPlLIq2GHsQqLUqC9tReo7ZRmDa6wLM9/aEI3GPriG0=;
+ b=RUNXXPwmEfi/JBZpovCCZpZb5qRZwTirpoVpDG6pSDAnDTlT6sSbR1sdiEm7239b+7
+ TLwEAY/Syba7XMtPHH/Bwitsyin+mhgn4dvXBF6Po5/3qdlPLDsUSGZjQwdd19vqbrPq
+ PnIBigeL142g3OVlycIalV81GYOdNJK/CNrhwRoEu74PiV7I+MFYT0LcVjbdY3bBi4V+
+ wxsY9XeIhf+U6syi0hW6+TAtGrA507/paRZYJ/XAK4VvEQRyW4Ote06E3gPGCr/ivjwU
+ rYh4C3/QcrIJYka9ZvpY9zmuAanAQF7yJq/tSeEQMq5f8fOOPxHjzfobIsKE54YASphy
+ cC2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=sPlLIq2GHsQqLUqC9tReo7ZRmDa6wLM9/aEI3GPriG0=;
+ b=NFjiey/wruUZGcuAi5CVPhgjx/auJ0LumiPbXSLDpxiU87eQraEGt4+4we4q8s5g8l
+ T9t68/YmQ7ydJEnJDpA5VgEJo+vf9qLwmEkcGi6DDLk93O1rCWVZeC9UUdoZ9X9fdyQQ
+ THIndai/+ClC5YveyJFVsN7GojnPflQa7rpH2h8ZgcihBzDXo4yUGMVRfvwc3qv7pCpt
+ tbgChtDonp6BkMZwdZu/wz5FVzCAZPDX/H8GpzpEQHuCDdhOXCTdXJEZ0XHibfNs1/EQ
+ imP4z1Oyud6oepWCgCqB8OimPohnQtcWVdVxkg2eumjok2JkvocC9rqNhGY6BUA4MUAK
+ SLXw==
+X-Gm-Message-State: AOAM533AcQUf0PJ70EAHvv+ZrH7Ik77ah8DPnIBB9TWYa0mMOUXuVOfX
+ Hbtp7ih0+S6a1x20a6Vp20BzBcWG/DcB0/UomCzDyc4e6QzOAQ==
+X-Google-Smtp-Source: ABdhPJyc0hX4nFsLbQck7otwhCpLATLJIThxkgWe/AiK2vlcOo4YPYcwkp8YAcQMG3YjYuATFchRRi9L48vEGfjLrVw=
+X-Received: by 2002:a4a:221a:: with SMTP id f26mr2094875ooa.69.1592310756962; 
+ Tue, 16 Jun 2020 05:32:36 -0700 (PDT)
+MIME-Version: 1.0
+References: <1592289944-13727-1-git-send-email-jasowang@redhat.com>
+In-Reply-To: <1592289944-13727-1-git-send-email-jasowang@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 16 Jun 2020 13:32:26 +0100
+Message-ID: <CAFEAcA-7sG8_oOL+f=Q8dSevX-c26GeAcrLU6Ah6mOApfzizKQ@mail.gmail.com>
+Subject: Re: [PULL 00/33] Net patches
+To: Jason Wang <jasowang@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::c2d;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oo1-xc2d.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -67,101 +93,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Ani Sinha <ani.sinha@nutanix.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, ani@anisinha.ca,
- Igor Mammedov <imammedo@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Currently, the option use_acpi_pci_hotplug is being used to control device
-hotplug capability using ACPI for slots of cold plugged bridges. Hence, we
-are renaming this option to better reflect what it actually does.
+On Tue, 16 Jun 2020 at 07:45, Jason Wang <jasowang@redhat.com> wrote:
+>
+> The following changes since commit 7d3660e79830a069f1848bb4fa1cdf8f666424fb:
+>
+>   Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2020-06-12 23:06:22 +0100)
+>
+> are available in the git repository at:
+>
+>   https://github.com/jasowang/qemu.git tags/net-pull-request
+>
+> for you to fetch changes up to 955aab203f932b8a7c23ff9c58ba036997cb3ed8:
+>
+>   net: Drop the NetLegacy structure, always use Netdev instead (2020-06-16 14:40:40 +0800)
+>
+> ----------------------------------------------------------------
+>
+> ----------------------------------------------------------------
 
-Signed-off-by: Ani Sinha <ani.sinha@nutanix.com>
----
- hw/acpi/piix4.c | 21 +++++++++++----------
- 1 file changed, 11 insertions(+), 10 deletions(-)
+Hi; I'm afraid this fails to build (all hosts):
 
-diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
-index 85c199b..7de44bc 100644
---- a/hw/acpi/piix4.c
-+++ b/hw/acpi/piix4.c
-@@ -77,7 +77,7 @@ typedef struct PIIX4PMState {
-     Notifier powerdown_notifier;
- 
-     AcpiPciHpState acpi_pci_hotplug;
--    bool use_acpi_pci_hotplug;
-+    bool use_acpi_hotplug_bridge;
- 
-     uint8_t disable_s3;
-     uint8_t disable_s4;
-@@ -204,16 +204,17 @@ static const VMStateDescription vmstate_pci_status = {
-     }
- };
- 
--static bool vmstate_test_use_acpi_pci_hotplug(void *opaque, int version_id)
-+static bool vmstate_test_use_acpi_hotplug_bridge(void *opaque, int version_id)
- {
-     PIIX4PMState *s = opaque;
--    return s->use_acpi_pci_hotplug;
-+    return s->use_acpi_hotplug_bridge;
- }
- 
--static bool vmstate_test_no_use_acpi_pci_hotplug(void *opaque, int version_id)
-+static bool vmstate_test_no_use_acpi_hotplug_bridge(void *opaque,
-+                                                    int version_id)
- {
-     PIIX4PMState *s = opaque;
--    return !s->use_acpi_pci_hotplug;
-+    return !s->use_acpi_hotplug_bridge;
- }
- 
- static bool vmstate_test_use_memhp(void *opaque)
-@@ -290,11 +291,11 @@ static const VMStateDescription vmstate_acpi = {
-         VMSTATE_STRUCT_TEST(
-             acpi_pci_hotplug.acpi_pcihp_pci_status[ACPI_PCIHP_BSEL_DEFAULT],
-             PIIX4PMState,
--            vmstate_test_no_use_acpi_pci_hotplug,
-+            vmstate_test_no_use_acpi_hotplug_bridge,
-             2, vmstate_pci_status,
-             struct AcpiPciHpPciStatus),
-         VMSTATE_PCI_HOTPLUG(acpi_pci_hotplug, PIIX4PMState,
--                            vmstate_test_use_acpi_pci_hotplug),
-+                            vmstate_test_use_acpi_hotplug_bridge),
-         VMSTATE_END_OF_LIST()
-     },
-     .subsections = (const VMStateDescription*[]) {
-@@ -528,7 +529,7 @@ I2CBus *piix4_pm_init(PCIBus *bus, int devfn, uint32_t smb_io_base,
-     s->smi_irq = smi_irq;
-     s->smm_enabled = smm_enabled;
-     if (xen_enabled()) {
--        s->use_acpi_pci_hotplug = false;
-+        s->use_acpi_hotplug_bridge = false;
-     }
- 
-     qdev_init_nofail(dev);
-@@ -593,7 +594,7 @@ static void piix4_acpi_system_hot_add_init(MemoryRegion *parent,
-     memory_region_add_subregion(parent, GPE_BASE, &s->io_gpe);
- 
-     acpi_pcihp_init(OBJECT(s), &s->acpi_pci_hotplug, bus, parent,
--                    s->use_acpi_pci_hotplug);
-+                    s->use_acpi_hotplug_bridge);
- 
-     s->cpu_hotplug_legacy = true;
-     object_property_add_bool(OBJECT(s), "cpu-hotplug-legacy",
-@@ -631,7 +632,7 @@ static Property piix4_pm_properties[] = {
-     DEFINE_PROP_UINT8(ACPI_PM_PROP_S4_DISABLED, PIIX4PMState, disable_s4, 0),
-     DEFINE_PROP_UINT8(ACPI_PM_PROP_S4_VAL, PIIX4PMState, s4_val, 2),
-     DEFINE_PROP_BOOL("acpi-pci-hotplug-with-bridge-support", PIIX4PMState,
--                     use_acpi_pci_hotplug, true),
-+                     use_acpi_hotplug_bridge, true),
-     DEFINE_PROP_BOOL("memory-hotplug-support", PIIX4PMState,
-                      acpi_memory_hotplug.is_enabled, true),
-     DEFINE_PROP_END_OF_LIST(),
--- 
-1.9.4
+hw/net/virtio-net.o: In function `virtio_net_device_realize':
+/home/pm215/qemu/hw/net/virtio-net.c:3380: undefined reference to
+`net_rx_pkt_init'
+hw/net/virtio-net.o: In function `virtio_net_device_unrealize':
+/home/pm215/qemu/hw/net/virtio-net.c:3418: undefined reference to
+`net_rx_pkt_uninit'
+hw/net/virtio-net.o: In function `virtio_net_process_rss':
+/home/pm215/qemu/hw/net/virtio-net.c:1607: undefined reference to
+`net_rx_pkt_set_protocols'
+/home/pm215/qemu/hw/net/virtio-net.c:1609: undefined reference to
+`net_rx_pkt_get_protocols'
+/home/pm215/qemu/hw/net/virtio-net.c:1625: undefined reference to
+`net_rx_pkt_calc_rss_hash'
+/home/pm215/qemu/hw/net/virtio-net.c:1613: undefined reference to
+`net_rx_pkt_get_ip6_info'
+/home/pm215/qemu/hw/net/virtio-net.c:1610: undefined reference to
+`net_rx_pkt_get_ip4_info'
+collect2: error: ld returned 1 exit status
 
+thanks
+-- PMM
 
