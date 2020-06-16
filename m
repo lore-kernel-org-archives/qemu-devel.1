@@ -2,93 +2,144 @@ Return-Path: <SRS0=f7ls=75=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1988C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 07:56:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BACAC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 07:58:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7C6412074D
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 07:56:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C8655206D7
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 07:58:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rPb8ee+w"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C6412074D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WrUohgo6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8655206D7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32962 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37120 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jl6Sb-0003QM-Ls
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 03:56:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53970)
+	id 1jl6Ty-00057o-3J
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 03:58:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54924)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jl6Nd-0003vA-G3; Tue, 16 Jun 2020 03:51:37 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:53330)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jl6Nb-00085b-QF; Tue, 16 Jun 2020 03:51:37 -0400
-Received: by mail-wm1-x341.google.com with SMTP id l26so1885756wme.3;
- Tue, 16 Jun 2020 00:51:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=X3NztLovGUVeCGZNLiGLjBwKDBV+Pcr5uGZxcvfdmrY=;
- b=rPb8ee+wygtZWv4ygAuZYdSrKydWCvSuCb2dTCvULgmJzad8a0TbldC89qG9uf4JbC
- IjcwTVD1vhTXOW8n4HN+L5iD1mGoUnb/1wUPgp2Y7k3plqS3LuSTm0Aw2mvgbNJcsL4c
- tNE/S8cNqtfmtyLbAzO4A26zkPLMNz1PMcjOyHSaib/prrJoTTAoSSBYvfpMcSzVxcHY
- wWynZU6bQnEu4NKpxHf1SqJhWyDQlKsfxidcRT6y+PSU3UxaoK9FPCQtR7iYL+RENdlJ
- jsIHMDeaCnHcwuqx/IRhM3hV72MjcUVnzEsqkiDOaLOg8rLVYoZ7BIhIYkkICVD8VD1I
- WB1w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=X3NztLovGUVeCGZNLiGLjBwKDBV+Pcr5uGZxcvfdmrY=;
- b=dJdYX+J6gbv48XzwRZKiNvf1cJWJwYC3zLOVjQFmGGPS0Njyx2MfxAXUyJ53TOtX0R
- b9wkkceGglwVbR7or2o/DwNxI2v8yr+PFyQiefCO6ifMFNTQGmftwUkvvP+wNfgllpmK
- PSW3DZb+/+Wt5KTJ178USz7EsIlFxZa51llKRYF9t4BrT2H5sOzwxWHJObML92Fn0AJN
- xtM+a2jfa8DpaLtFIVw2h5lHMFDvu8eiMj8Z/e4oqSLqyCtx5eIRPVNAh0VWwH0wYjn3
- 0qZTm9XPn2/XVpifzs67+MULO9wuuPUvh/96j21md01PYB4Fln/oW6hCRTj37srlIfy5
- GvCA==
-X-Gm-Message-State: AOAM530V9Dgp2oIVaaQYe/ehjFLHJMIlZjadhjVUlnoMq0aRnUNTrnFF
- rmOo22XBSnf8XWtDnogM/u3/g9Ms
-X-Google-Smtp-Source: ABdhPJwyjF/RrvQsrN0MqAM1aFul+xxvjuBzkYqzsi5XzjFtVcwXmUJh7yXZLz/5si/8HT4f5CLlGQ==
-X-Received: by 2002:a05:600c:21d3:: with SMTP id
- x19mr1967406wmj.137.1592293893404; 
- Tue, 16 Jun 2020 00:51:33 -0700 (PDT)
-Received: from localhost.localdomain
- (181.red-88-10-103.dynamicip.rima-tde.net. [88.10.103.181])
- by smtp.gmail.com with ESMTPSA id q11sm28093538wrv.67.2020.06.16.00.51.32
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 16 Jun 2020 00:51:32 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 7/7] hw/watchdog/wdt_aspeed: Reduce timer precision to
- micro-second
-Date: Tue, 16 Jun 2020 09:51:21 +0200
-Message-Id: <20200616075121.12837-8-f4bug@amsat.org>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200616075121.12837-1-f4bug@amsat.org>
-References: <20200616075121.12837-1-f4bug@amsat.org>
+ (Exim 4.90_1) (envelope-from <lvivier@redhat.com>)
+ id 1jl6Sn-0003w0-0m
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 03:56:57 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32106
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <lvivier@redhat.com>)
+ id 1jl6Sj-0000ZG-TE
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 03:56:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592294212;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=dCByHiVNcfEYJ/V1OIJ7TUp/YiO9rMbkfni0eUkC1W0=;
+ b=WrUohgo6Uoo25sxKSKJ42RakvnZ+kGuhQ+XCfZMDhSabOm7wB1+G353ddtdbCV2C8+PI3u
+ Bhb5+mJy34INntdBjut2HJrRXuUw92uL2/GpBDu1r6/wfE80RNbkdU5aGHRiHlHGVieVjL
+ +10baFVJyKxtwTR2ArtDS1V+mgX+RC0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-190-gBhSwgUkNG28VxEzcqEvVg-1; Tue, 16 Jun 2020 03:56:51 -0400
+X-MC-Unique: gBhSwgUkNG28VxEzcqEvVg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C849B184D17C;
+ Tue, 16 Jun 2020 07:56:48 +0000 (UTC)
+Received: from [10.36.112.71] (ovpn-112-71.ams2.redhat.com [10.36.112.71])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 24B4F5D9D5;
+ Tue, 16 Jun 2020 07:56:34 +0000 (UTC)
+Subject: Re: [RFC v3 4/8] virtio-pci: implement queue_enabled method
+To: Cindy Lu <lulu@redhat.com>, mst@redhat.com, armbru@redhat.com,
+ eblake@redhat.com, cohuck@redhat.com, jasowang@redhat.com
+References: <20200529140620.28759-1-lulu@redhat.com>
+ <20200529140620.28759-5-lulu@redhat.com>
+From: Laurent Vivier <lvivier@redhat.com>
+Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ D+Ofp0T3KOr1RUHvCZoLURfFhSQ=
+Message-ID: <1e30d047-556d-0e94-9557-8eb379826945@redhat.com>
+Date: Tue, 16 Jun 2020 09:56:33 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::341;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+In-Reply-To: <20200529140620.28759-5-lulu@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=lvivier@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 02:45:54
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -102,134 +153,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- qemu-block@nongnu.org, Corey Minyard <minyard@acm.org>,
- David Hildenbrand <david@redhat.com>, Andrew Jeffery <andrew@aj.id.au>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Max Reitz <mreitz@redhat.com>, qemu-arm@nongnu.org,
- Joel Stanley <joel@jms.id.au>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Cc: mhabets@solarflare.com, qemu-devel@nongnu.org, rob.miller@broadcom.com,
+ saugatm@xilinx.com, maxime.coquelin@redhat.com, hch@infradead.org,
+ eperezma@redhat.com, jgg@mellanox.com, shahafs@mellanox.com,
+ kevin.tian@intel.com, parav@mellanox.com, vmireyno@marvell.com,
+ cunming.liang@intel.com, gdawar@xilinx.com, jiri@mellanox.com,
+ xiao.w.wang@intel.com, stefanha@redhat.com, zhihong.wang@intel.com,
+ aadam@redhat.com, rdunlap@infradead.org, hanand@xilinx.com,
+ lingshan.zhu@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The current implementation uses nano-second precision, while
-the watchdog can not be more precise than a micro-second.
-Simplify by using a micro-second based timer.
-Rename the timer 'timer_us' to have the unit explicit.
+On 29/05/2020 16:06, Cindy Lu wrote:
+> From: Jason Wang <jasowang@redhat.com>
+> 
+> With version 1, we can detect whether a queue is enabled via
+> queue_enabled.
+> 
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
 
-Inspired-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- include/hw/watchdog/wdt_aspeed.h |  2 +-
- hw/watchdog/wdt_aspeed.c         | 24 +++++++++++++-----------
- 2 files changed, 14 insertions(+), 12 deletions(-)
+Add your S-o-b.
 
-diff --git a/include/hw/watchdog/wdt_aspeed.h b/include/hw/watchdog/wdt_aspeed.h
-index 819c22993a..e76a493788 100644
---- a/include/hw/watchdog/wdt_aspeed.h
-+++ b/include/hw/watchdog/wdt_aspeed.h
-@@ -25,7 +25,7 @@
- typedef struct AspeedWDTState {
-     /*< private >*/
-     SysBusDevice parent_obj;
--    QEMUTimer *timer;
-+    QEMUTimer *timer_us;
- 
-     /*< public >*/
-     MemoryRegion iomem;
-diff --git a/hw/watchdog/wdt_aspeed.c b/hw/watchdog/wdt_aspeed.c
-index 6352ba1b0e..3fcb20f72b 100644
---- a/hw/watchdog/wdt_aspeed.c
-+++ b/hw/watchdog/wdt_aspeed.c
-@@ -98,23 +98,24 @@ static void aspeed_wdt_reload(AspeedWDTState *s)
-     uint64_t reload;
- 
-     if (!(s->regs[WDT_CTRL] & WDT_CTRL_1MHZ_CLK)) {
--        reload = muldiv64(s->regs[WDT_RELOAD_VALUE], NANOSECONDS_PER_SECOND,
-+        reload = muldiv64(s->regs[WDT_RELOAD_VALUE],
-+                          NANOSECONDS_PER_SECOND / SCALE_US,
-                           s->pclk_freq);
-     } else {
--        reload = s->regs[WDT_RELOAD_VALUE] * 1000ULL;
-+        reload = s->regs[WDT_RELOAD_VALUE];
-     }
- 
-     if (aspeed_wdt_is_enabled(s)) {
--        timer_mod(s->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + reload);
-+        timer_mod(s->timer_us, qemu_clock_get_us(QEMU_CLOCK_VIRTUAL) + reload);
-     }
- }
- 
- static void aspeed_wdt_reload_1mhz(AspeedWDTState *s)
- {
--    uint64_t reload = s->regs[WDT_RELOAD_VALUE] * 1000ULL;
-+    uint64_t reload = s->regs[WDT_RELOAD_VALUE];
- 
-     if (aspeed_wdt_is_enabled(s)) {
--        timer_mod(s->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + reload);
-+        timer_mod(s->timer_us, qemu_clock_get_us(QEMU_CLOCK_VIRTUAL) + reload);
-     }
- }
- 
-@@ -149,7 +150,7 @@ static void aspeed_wdt_write(void *opaque, hwaddr offset, uint64_t data,
-             awc->wdt_reload(s);
-         } else if (!enable && aspeed_wdt_is_enabled(s)) {
-             s->regs[WDT_CTRL] = data;
--            timer_del(s->timer);
-+            timer_del(s->timer_us);
-         }
-         break;
-     case WDT_RESET_WIDTH:
-@@ -189,7 +190,7 @@ static const VMStateDescription vmstate_aspeed_wdt = {
-     .version_id = 0,
-     .minimum_version_id = 0,
-     .fields = (VMStateField[]) {
--        VMSTATE_TIMER_PTR(timer, AspeedWDTState),
-+        VMSTATE_TIMER_PTR(timer_us, AspeedWDTState),
-         VMSTATE_UINT32_ARRAY(regs, AspeedWDTState, ASPEED_WDT_REGS_MAX),
-         VMSTATE_END_OF_LIST()
-     }
-@@ -214,7 +215,7 @@ static void aspeed_wdt_reset(DeviceState *dev)
-     s->regs[WDT_CTRL] = 0;
-     s->regs[WDT_RESET_WIDTH] = 0xFF;
- 
--    timer_del(s->timer);
-+    timer_del(s->timer_us);
- }
- 
- static void aspeed_wdt_timer_expired(void *dev)
-@@ -224,7 +225,7 @@ static void aspeed_wdt_timer_expired(void *dev)
- 
-     /* Do not reset on SDRAM controller reset */
-     if (s->scu->regs[reset_ctrl_reg] & SCU_RESET_SDRAM) {
--        timer_del(s->timer);
-+        timer_del(s->timer_us);
-         s->regs[WDT_CTRL] = 0;
-         return;
-     }
-@@ -232,7 +233,7 @@ static void aspeed_wdt_timer_expired(void *dev)
-     qemu_log_mask(CPU_LOG_RESET, "Watchdog timer %" HWADDR_PRIx " expired.\n",
-                   s->iomem.addr);
-     watchdog_perform_action();
--    timer_del(s->timer);
-+    timer_del(s->timer_us);
- }
- 
- #define PCLK_HZ 24000000
-@@ -244,7 +245,8 @@ static void aspeed_wdt_realize(DeviceState *dev, Error **errp)
- 
-     assert(s->scu);
- 
--    s->timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, aspeed_wdt_timer_expired, dev);
-+    s->timer_us = timer_new_us(QEMU_CLOCK_VIRTUAL,
-+                               aspeed_wdt_timer_expired, dev);
- 
-     /* FIXME: This setting should be derived from the SCU hw strapping
-      * register SCU70
--- 
-2.21.3
+> ---
+>  hw/virtio/virtio-pci.c | 13 +++++++++++++
+>  1 file changed, 13 insertions(+)
+> 
+> diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+> index 4cb784389c..2c82ed5246 100644
+> --- a/hw/virtio/virtio-pci.c
+> +++ b/hw/virtio/virtio-pci.c
+> @@ -1107,6 +1107,18 @@ static AddressSpace *virtio_pci_get_dma_as(DeviceState *d)
+>      return pci_get_address_space(dev);
+>  }
+>  
+> +static bool virtio_pci_queue_enabled(DeviceState *d, int n)
+> +{
+> +    VirtIOPCIProxy *proxy = VIRTIO_PCI(d);
+> +    VirtIODevice *vdev = virtio_bus_get_device(&proxy->bus);
+> +
+> +    if (virtio_vdev_has_feature(vdev, VIRTIO_F_VERSION_1)) {
+> +        return proxy->vqs[vdev->queue_sel].enabled;
+> +    }
+> +
+> +    return virtio_queue_get_desc_addr(vdev, n) != 0;
+
+I think it would be clearer/cleaner to use here:
+
+  return virtio_queue_enabled(vdev, n);
+
+Thanks,
+Laurent
 
 
