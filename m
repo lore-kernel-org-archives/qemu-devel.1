@@ -2,71 +2,88 @@ Return-Path: <SRS0=f7ls=75=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 715C8C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 22:41:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B6B3C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 22:44:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 26B1F207E8
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 22:41:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26B1F207E8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 3423F207E8
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 22:44:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jwKTGkot"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3423F207E8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59856 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33840 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlKGL-0000TY-FW
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 18:41:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47662)
+	id 1jlKK7-00028v-HN
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 18:44:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48282)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jlKFX-0008F3-1y; Tue, 16 Jun 2020 18:40:11 -0400
-Resent-Date: Tue, 16 Jun 2020 18:40:11 -0400
-Resent-Message-Id: <E1jlKFX-0008F3-1y@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21751)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jlKFT-0001S2-VP; Tue, 16 Jun 2020 18:40:10 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1592347190; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=ec1u5pbvhEbnzaWt9U8vrAwWTKE2tXDIkF3LmEPSxWxvug3jgGKwFfwu0m2OIW3HtzBXK+4f7ZicFtj4iPsZxQuTR5fgqIzFyOpnvejxjAcr7kPO5ibXb92hsnRg1oFV9Q/Db94OqAWo0k69GSL5h03KYOn9xS5gp7GUrK9Gbw0=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1592347190;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=/L0VPkjGexpWTsYjJmnGe81yTlUXZT5v4U1Rf4DNIA8=; 
- b=W0bPCVMHWIUV/EbphKSdqEnIgfOHWTruAfZKUy8xvC/9Hixj/fuOLhb0FOajfmj2WRSSMdmS2VqDammSi17iXp+siVzKZ2+ejXf7CO2tk6ZVf4ST+U7x7k4d+RXv8gWyLlkklINnOGOPUvQMoqmpK6bvEXV0+Zn2dhvuEHruLno=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1592347187440906.0112076916726;
- Tue, 16 Jun 2020 15:39:47 -0700 (PDT)
-Message-ID: <159234718588.10897.16234427278329539391@d1fd068a5071>
-Subject: Re: [PATCH  0/3] Add OpenSBI dynamic firmware support
-In-Reply-To: <20200616192700.1900260-1-atish.patra@wdc.com>
+ (Exim 4.90_1) (envelope-from <beata.michalska@linaro.org>)
+ id 1jlKJW-0001ix-9B
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 18:44:18 -0400
+Received: from mail-il1-x141.google.com ([2607:f8b0:4864:20::141]:38986)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <beata.michalska@linaro.org>)
+ id 1jlKJU-000229-6f
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 18:44:17 -0400
+Received: by mail-il1-x141.google.com with SMTP id p5so209054ile.6
+ for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 15:44:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=rj7RCWU2TEDQylXlKwtIkp9D//dlG4LaBf/aiSxKiVc=;
+ b=jwKTGkot7wWAsWfAevCa7n4oDDIULZWG6+IvhL/aBsSUfd8xoi1CHHiQjNLbPy6Nds
+ JzjmjeLcF8+swR/XLC2A3jG0dcBSOPUzA2ZwIsmx3x6s8DiGcQMI8MaOvbKuOhGL3iYy
+ 0KumbVWOS0jshNewOy9vw25TKxRiETG0JjFw98aGQ3JcK+pWrrCyV8NDVg0fVI2Nfhg2
+ nGkdogLmLckeWxseHoQIjJdjZeGFa3Ks2awf3XLJTLM3lizA3GGFWi+FkkaZY+b6Tkan
+ xb734VFuz1YHqZpeU8IIPlD0OLN3yShVm8rLkPK2IudZOBAZ8XBOyvbGyz8qrXKvRRrz
+ YUFA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=rj7RCWU2TEDQylXlKwtIkp9D//dlG4LaBf/aiSxKiVc=;
+ b=T00KUS53eFKCcO1H5BKuRGUHbsZz2/IzsHnokL7tyhBMGtlSQtngmsQEi62Edxk/P9
+ n4xwJtbCjK8axpmMk33Pk7ZIyzalmi3XxNnDzu/692rP546xGgLym5DXpxd7MkZrnFJS
+ oTgBO+yuSVh5BQeTP+s8rLroyUSSbBzkQjQWEwcwTloSrHOqV9X2CAOCAIL7uzWCdbe3
+ kJ0jh3sWQCo1TzDtqtkICurGr7OTHCrjH+D5a45nHwbhc7gRvAKRUYAGKuNeN+isE3Pb
+ HbX98W8nUvT/A+ThXEbehmj3UZVpOlnzDoi17nO3z8nVSAZiDaPjRjWZ6SfORKypp+k3
+ gnug==
+X-Gm-Message-State: AOAM5331XfTJplUDdD/xU/dDquvM5U4aY7t3C6aa7IbocPkq6pTlFyI9
+ 0COr93JRVUR4AkoYRf2ERUYlWlviPdP6KGP7D7tQNw==
+X-Google-Smtp-Source: ABdhPJyHSf6KGlyZm3i8Rr//oem1gemzV8CkuAY8ysTcBDzQxMk28uTJD2ZJioCvlncaZT55iRuz0w3yi9d26EBUClw=
+X-Received: by 2002:a05:6e02:11a5:: with SMTP id
+ 5mr5677396ilj.108.1592347454432; 
+ Tue, 16 Jun 2020 15:44:14 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: atish.patra@wdc.com
-Date: Tue, 16 Jun 2020 15:39:47 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 16:28:59
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+References: <20200529112757.32235-1-beata.michalska@linaro.org>
+ <20200529112757.32235-2-beata.michalska@linaro.org>
+ <20200616083337.yfgc4cyad4ipaqb7@kamzik.brq.redhat.com>
+In-Reply-To: <20200616083337.yfgc4cyad4ipaqb7@kamzik.brq.redhat.com>
+From: Beata Michalska <beata.michalska@linaro.org>
+Date: Tue, 16 Jun 2020 23:44:03 +0100
+Message-ID: <CADSWDzvGSPkLgjafEg2j0oUMhj0gVEOiiB5PCusJKZHqMRV14g@mail.gmail.com>
+Subject: Re: [PATCH v5 1/2] target/arm: kvm: Handle DABT with no valid ISS
+To: Andrew Jones <drjones@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::141;
+ envelope-from=beata.michalska@linaro.org; helo=mail-il1-x141.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -79,202 +96,218 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: qemu-riscv@nongnu.org, sagark@eecs.berkeley.edu,
- kbastian@mail.uni-paderborn.de, qemu-devel@nongnu.org, atish.patra@wdc.com,
- Alistair.Francis@wdc.com, palmer@dabbelt.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Christoffer Dall <Christoffer.Dall@arm.com>, qemu-arm <qemu-arm@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDYxNjE5MjcwMC4xOTAw
-MjYwLTEtYXRpc2gucGF0cmFAd2RjLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgdGhl
-IGFzYW4gYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29tbWFuZHMgYW5kCnRo
-ZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3RhbGxlZCwgeW91IGNhbiBw
-cm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0K
-IyEvYmluL2Jhc2gKZXhwb3J0IEFSQ0g9eDg2XzY0Cm1ha2UgZG9ja2VyLWltYWdlLWZlZG9yYSBW
-PTEgTkVUV09SSz0xCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1kZWJ1Z0BmZWRvcmEgVEFSR0VUX0xJ
-U1Q9eDg2XzY0LXNvZnRtbXUgSj0xNCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0K
-CiAgQ0MgICAgICBxZ2EvY29tbWFuZHMubwogIENDICAgICAgcWdhL2d1ZXN0LWFnZW50LWNvbW1h
-bmQtc3RhdGUubwogIENDICAgICAgcWdhL21haW4ubwovdXNyL2Jpbi9sZDogL3Vzci9saWI2NC9j
-bGFuZy8xMC4wLjAvbGliL2xpbnV4L2xpYmNsYW5nX3J0LmFzYW4teDg2XzY0LmEoYXNhbl9pbnRl
-cmNlcHRvcnNfdmZvcmsuUy5vKTogd2FybmluZzogY29tbW9uIG9mIGAgIENDICAgICAgcWdhL2Nv
-bW1hbmRzLXBvc2l4Lm8KX19pbnRlcmNlcHRpb246OnJlYWxfdmZvcmsnIG92ZXJyaWRkZW4gYnkg
-ZGVmaW5pdGlvbiBmcm9tIC91c3IvbGliNjQvY2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJjbGFu
-Z19ydC5hc2FuLXg4Nl82NC5hKGFzYW5faW50ZXJjZXB0b3JzLmNwcC5vKQogIENDICAgICAgcWdh
-L2NoYW5uZWwtcG9zaXgubwogIENDICAgICAgcWdhL3FhcGktZ2VuZXJhdGVkL3FnYS1xYXBpLXR5
-cGVzLm8KLS0tCiAgR0VOICAgICBkb2NzL2ludGVyb3AvcWVtdS1nYS1yZWYuaHRtbAogIEdFTiAg
-ICAgZG9jcy9pbnRlcm9wL3FlbXUtZ2EtcmVmLnR4dAogIEdFTiAgICAgZG9jcy9pbnRlcm9wL3Fl
-bXUtZ2EtcmVmLjcKL3Vzci9iaW4vbGQ6IC91c3IvbGliNjQvY2xhbmcvMTAuMC4wL2xpYi9saW51
-eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFzYW5faW50ZXJjZXB0b3JzX3Zmb3JrLlMubyk6
-IHdhcm5pbmc6IGNvbW1vbiBvZiBgX19pbnRlcmNlcHRpb246OnJlYWxfdmZvcmsnIG92ZXJyaWRk
-ZW4gYnkgZGVmaW5pdGlvbiBmcm9tIC91c3IvbGliNjQvY2xhbmcvMTAuMC4wL2xpYi9saW51eC9s
-aWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFzYW5faW50ZXJjZXB0b3JzLmNwcC5vKQogIExJTksg
-ICAgcWVtdS1nYQogIExJTksgICAgcWVtdS1rZXltYXAKL3Vzci9iaW4vbGQ6IC91c3IvbGliNjQv
-Y2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFzYW5faW50
-ZXJjZXB0b3JzX3Zmb3JrLlMubyk6IHdhcm5pbmc6IGNvbW1vbiBvZiBgX19pbnRlcmNlcHRpb246
-OnJlYWxfdmZvcmsnIG92ZXJyaWRkZW4gYnkgZGVmaW5pdGlvbiBmcm9tIC91c3IvbGliNjQvY2xh
-bmcvMTAuMC4wL2xpYi9saW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFzYW5faW50ZXJj
-ZXB0b3JzLmNwcC5vKQogIExJTksgICAgaXZzaG1lbS1jbGllbnQKL3Vzci9iaW4vbGQ6IC91c3Iv
-bGliNjQvY2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFz
-YW5faW50ZXJjZXB0b3JzX3Zmb3JrLlMubyk6IHdhcm5pbmc6IGNvbW1vbiBvZiBgX19pbnRlcmNl
-cHRpb246OnJlYWxfdmZvcmsnIG92ZXJyaWRkZW4gYnkgZGVmaW5pdGlvbiBmcm9tIC91c3IvbGli
-NjQvY2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFzYW5f
-aW50ZXJjZXB0b3JzLmNwcC5vKQovdXNyL2Jpbi9sZDogL3Vzci9saWI2NC9jbGFuZy8xMC4wLjAv
-bGliL2xpbnV4L2xpYmNsYW5nX3J0LmFzYW4teDg2XzY0LmEoYXNhbl9pbnRlcmNlcHRvcnNfdmZv
-cmsuUy5vKTogd2FybmluZzogY29tbW9uIG9mIGBfX2ludGVyY2VwdGlvbjo6cmVhbF92Zm9yaycg
-b3ZlcnJpZGRlbiBieSBkZWZpbml0aW9uIGZyb20gL3Vzci9saWI2NC9jbGFuZy8xMC4wLjAvbGli
-L2xpbnV4L2xpYmNsYW5nX3J0LmFzYW4teDg2XzY0LmEoYXNhbl9pbnRlcmNlcHRvcnMuY3BwLm8p
-CiAgTElOSyAgICBpdnNobWVtLXNlcnZlcgogIExJTksgICAgcWVtdS1uYmQKL3Vzci9iaW4vbGQ6
-IC91c3IvbGliNjQvY2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82
-NC5hKGFzYW5faW50ZXJjZXB0b3JzX3Zmb3JrLlMubyk6IHdhcm5pbmc6IGNvbW1vbiBvZiBgX19p
-bnRlcmNlcHRpb246OnJlYWxfdmZvcmsnIG92ZXJyaWRkZW4gYnkgZGVmaW5pdGlvbiBmcm9tIC91
-c3IvbGliNjQvY2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5h
-KGFzYW5faW50ZXJjZXB0b3JzLmNwcC5vKQogIExJTksgICAgcWVtdS1zdG9yYWdlLWRhZW1vbgog
-IEFTICAgICAgcGMtYmlvcy9vcHRpb25yb20vbXVsdGlib290Lm8KICBBUyAgICAgIHBjLWJpb3Mv
-b3B0aW9ucm9tL2xpbnV4Ym9vdC5vCi91c3IvYmluL2xkOiAvdXNyL2xpYjY0L2NsYW5nLzEwLjAu
-MC9saWIvbGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2ludGVyY2VwdG9yc192
-Zm9yay5TLm8pOiB3YXJuaW5nOiBjb21tb24gb2YgYF9faW50ZXJjZXB0aW9uOjpyZWFsX3Zmb3Jr
-JyBvdmVycmlkZGVuIGJ5IGRlZmluaXRpb24gZnJvbSAvdXNyL2xpYjY0L2NsYW5nLzEwLjAuMC9s
-aWIvbGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2ludGVyY2VwdG9ycy5jcHAu
-bykKL3Vzci9iaW4vbGQ6IC91c3IvbGliNjQvY2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJjbGFu
-Z19ydC5hc2FuLXg4Nl82NC5hKGFzYW5faW50ZXJjZXB0b3JzX3Zmb3JrLlMubyk6IHdhcm5pbmc6
-IGNvbW1vbiBvZiBgX19pbnRlcmNlcHRpb246OnJlYWxfdmZvcmsnIG92ZXJyaWRkZW4gYnkgZGVm
-aW5pdGlvbiBmcm9tIC91c3IvbGliNjQvY2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJjbGFuZ19y
-dC5hc2FuLXg4Nl82NC5hKGFzYW5faW50ZXJjZXB0b3JzLmNwcC5vKQogIENDICAgICAgcGMtYmlv
-cy9vcHRpb25yb20vbGludXhib290X2RtYS5vCiAgQVMgICAgICBwYy1iaW9zL29wdGlvbnJvbS9r
-dm12YXBpYy5vCiAgQVMgICAgICBwYy1iaW9zL29wdGlvbnJvbS9wdmgubwotLS0KICBCVUlMRCAg
-IHBjLWJpb3Mvb3B0aW9ucm9tL211bHRpYm9vdC5yYXcKICBCVUlMRCAgIHBjLWJpb3Mvb3B0aW9u
-cm9tL2xpbnV4Ym9vdC5yYXcKICBCVUlMRCAgIHBjLWJpb3Mvb3B0aW9ucm9tL2t2bXZhcGljLnJh
-dwovdXNyL2Jpbi9sZDogL3Vzci9saWI2NC9jbGFuZy8xMC4wLjAvbGliL2xpbnV4L2xpYmNsYW5n
-X3J0LmFzYW4teDg2XzY0LmEoYXNhbl9pbnRlcmNlcHRvcnNfdmZvcmsuUy5vKTogd2FybmluZzog
-Y29tbW9uIG9mIGBfX2ludGVyY2VwdGlvbjo6cmVhbF92Zm9yaycgb3ZlcnJpZGRlbiBieSBkZWZp
-bml0aW9uIGZyb20gL3Vzci9saWI2NC9jbGFuZy8xMC4wLjAvbGliL2xpbnV4L2xpYmNsYW5nX3J0
-LmFzYW4teDg2XzY0LmEoYXNhbl9pbnRlcmNlcHRvcnMuY3BwLm8pCiAgU0lHTiAgICBwYy1iaW9z
-L29wdGlvbnJvbS9tdWx0aWJvb3QuYmluCiAgU0lHTiAgICBwYy1iaW9zL29wdGlvbnJvbS9saW51
-eGJvb3QuYmluCiAgU0lHTiAgICBwYy1iaW9zL29wdGlvbnJvbS9rdm12YXBpYy5iaW4KICBMSU5L
-ICAgIGZzZGV2L3ZpcnRmcy1wcm94eS1oZWxwZXIKICBMSU5LICAgIHNjc2kvcWVtdS1wci1oZWxw
-ZXIKL3Vzci9iaW4vbGQ6IC91c3IvbGliNjQvY2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJjbGFu
-Z19ydC5hc2FuLXg4Nl82NC5hKGFzYW5faW50ZXJjZXB0b3JzX3Zmb3JrLlMubyk6IHdhcm5pbmc6
-IGNvbW1vbiBvZiBgX19pbnRlcmNlcHRpb246OnJlYWxfdmZvcmsnIG92ZXJyaWRkZW4gYnkgZGVm
-aW5pdGlvbiBmcm9tIC91c3IvbGliNjQvY2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJjbGFuZ19y
-dC5hc2FuLXg4Nl82NC5hKGFzYW5faW50ZXJjZXB0b3JzLmNwcC5vKQogIEJVSUxEICAgcGMtYmlv
-cy9vcHRpb25yb20vbGludXhib290X2RtYS5pbWcKICBCVUlMRCAgIHBjLWJpb3Mvb3B0aW9ucm9t
-L2xpbnV4Ym9vdF9kbWEucmF3CiAgU0lHTiAgICBwYy1iaW9zL29wdGlvbnJvbS9saW51eGJvb3Rf
-ZG1hLmJpbgogIExJTksgICAgcWVtdS1icmlkZ2UtaGVscGVyCi91c3IvYmluL2xkOiAvdXNyL2xp
-YjY0L2NsYW5nLzEwLjAuMC9saWIvbGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2Fu
-X2ludGVyY2VwdG9yc192Zm9yay5TLm8pOiB3YXJuaW5nOiBjb21tb24gb2YgYF9faW50ZXJjZXB0
-aW9uOjpyZWFsX3Zmb3JrJyBvdmVycmlkZGVuIGJ5IGRlZmluaXRpb24gZnJvbSAvdXNyL2xpYjY0
-L2NsYW5nLzEwLjAuMC9saWIvbGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2lu
-dGVyY2VwdG9ycy5jcHAubykKL3Vzci9iaW4vbGQ6IC91c3IvbGliNjQvY2xhbmcvMTAuMC4wL2xp
-Yi9saW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFzYW5faW50ZXJjZXB0b3JzX3Zmb3Jr
-LlMubyk6IHdhcm5pbmc6IGNvbW1vbiBvZiBgX19pbnRlcmNlcHRpb246OnJlYWxfdmZvcmsnIG92
-ZXJyaWRkZW4gYnkgZGVmaW5pdGlvbiBmcm9tIC91c3IvbGliNjQvY2xhbmcvMTAuMC4wL2xpYi9s
-aW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFzYW5faW50ZXJjZXB0b3JzLmNwcC5vKQov
-dXNyL2Jpbi9sZDogL3Vzci9saWI2NC9jbGFuZy8xMC4wLjAvbGliL2xpbnV4L2xpYmNsYW5nX3J0
-LmFzYW4teDg2XzY0LmEoYXNhbl9pbnRlcmNlcHRvcnNfdmZvcmsuUy5vKTogd2FybmluZzogY29t
-bW9uIG9mIGBfX2ludGVyY2VwdGlvbjo6cmVhbF92Zm9yaycgb3ZlcnJpZGRlbiBieSBkZWZpbml0
-aW9uIGZyb20gL3Vzci9saWI2NC9jbGFuZy8xMC4wLjAvbGliL2xpbnV4L2xpYmNsYW5nX3J0LmFz
-YW4teDg2XzY0LmEoYXNhbl9pbnRlcmNlcHRvcnMuY3BwLm8pCiAgQlVJTEQgICBwYy1iaW9zL29w
-dGlvbnJvbS9wdmguaW1nCiAgTElOSyAgICB2aXJ0aW9mc2QKICBCVUlMRCAgIHBjLWJpb3Mvb3B0
-aW9ucm9tL3B2aC5yYXcKL3Vzci9iaW4vbGQ6IC91c3IvbGliNjQvY2xhbmcvMTAuMC4wL2xpYi9s
-aW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFzYW5faW50ZXJjZXB0b3JzX3Zmb3JrLlMu
-byk6IHdhcm5pbmc6IGNvbW1vbiBvZiBgX19pbnRlcmNlcHRpb246OnJlYWxfdmZvcmsnIG92ZXJy
-aWRkZW4gYnkgZGVmaW5pdGlvbiBmcm9tIC91c3IvbGliNjQvY2xhbmcvMTAuMC4wL2xpYi9saW51
-eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFzYW5faW50ZXJjZXB0b3JzLmNwcC5vKQogIFNJ
-R04gICAgcGMtYmlvcy9vcHRpb25yb20vcHZoLmJpbgogIExJTksgICAgdmhvc3QtdXNlci1pbnB1
-dAovdXNyL2Jpbi9sZDogL3Vzci9saWI2NC9jbGFuZy8xMC4wLjAvbGliL2xpbnV4L2xpYmNsYW5n
-X3J0LmFzYW4teDg2XzY0LmEoYXNhbl9pbnRlcmNlcHRvcnNfdmZvcmsuUy5vKTogd2FybmluZzog
-Y29tbW9uIG9mIGBfX2ludGVyY2VwdGlvbjo6cmVhbF92Zm9yaycgb3ZlcnJpZGRlbiBieSBkZWZp
-bml0aW9uIGZyb20gL3Vzci9saWI2NC9jbGFuZy8xMC4wLjAvbGliL2xpbnV4L2xpYmNsYW5nX3J0
-LmFzYW4teDg2XzY0LmEoYXNhbl9pbnRlcmNlcHRvcnMuY3BwLm8pCi91c3IvYmluL2xkOiAvdXNy
-L2xpYjY0L2NsYW5nLzEwLjAuMC9saWIvbGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShh
-c2FuX2ludGVyY2VwdG9yc192Zm9yay5TLm8pOiB3YXJuaW5nOiBjb21tb24gb2YgYF9faW50ZXJj
-ZXB0aW9uOjpyZWFsX3Zmb3JrJyBvdmVycmlkZGVuIGJ5IGRlZmluaXRpb24gZnJvbSAvdXNyL2xp
-YjY0L2NsYW5nLzEwLjAuMC9saWIvbGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2Fu
-X2ludGVyY2VwdG9ycy5jcHAubykKICBHRU4gICAgIHg4Nl82NC1zb2Z0bW11L2htcC1jb21tYW5k
-cy5oCiAgR0VOICAgICB4ODZfNjQtc29mdG1tdS9obXAtY29tbWFuZHMtaW5mby5oCiAgR0VOICAg
-ICB4ODZfNjQtc29mdG1tdS9jb25maWctZGV2aWNlcy5oCi0tLQogIENDICAgICAgeDg2XzY0LXNv
-ZnRtbXUvaHcvZGlzcGxheS92aXJ0aW8tZ3B1Lm8KICBDQyAgICAgIHg4Nl82NC1zb2Z0bW11L2h3
-L2Rpc3BsYXkvdmlydGlvLWdwdS0zZC5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS9ody9kaXNw
-bGF5L3Zob3N0LXVzZXItZ3B1Lm8KL3RtcC9xZW11LXRlc3Qvc3JjL2ZwdS9zb2Z0ZmxvYXQuYzoz
-MzY1OjEzOiBlcnJvcjogYml0d2lzZSBuZWdhdGlvbiBvZiBhIGJvb2xlYW4gZXhwcmVzc2lvbjsg
-ZGlkIHlvdSBtZWFuIGxvZ2ljYWwgbmVnYXRpb24/IFstV2Vycm9yLC1XYm9vbC1vcGVyYXRpb25d
-CiAgICBhYnNaICY9IH4gKCAoICggcm91bmRCaXRzIF4gMHg0MCApID09IDAgKSAmIHJvdW5kTmVh
-cmVzdEV2ZW4gKTsKICAgICAgICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+CiAgICAgICAgICAgICEKL3RtcC9xZW11LXRlc3Qvc3JjL2Zw
-dS9zb2Z0ZmxvYXQuYzozNDIzOjE4OiBlcnJvcjogYml0d2lzZSBuZWdhdGlvbiBvZiBhIGJvb2xl
-YW4gZXhwcmVzc2lvbjsgZGlkIHlvdSBtZWFuIGxvZ2ljYWwgbmVnYXRpb24/IFstV2Vycm9yLC1X
-Ym9vbC1vcGVyYXRpb25dCiAgICAgICAgYWJzWjAgJj0gfiAoICggKHVpbnQ2NF90KSAoIGFic1ox
-PDwxICkgPT0gMCApICYgcm91bmROZWFyZXN0RXZlbiApOwogICAgICAgICAgICAgICAgIF5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fgogICAg
-ICAgICAgICAgICAgICEKL3RtcC9xZW11LXRlc3Qvc3JjL2ZwdS9zb2Z0ZmxvYXQuYzozNDgzOjE4
-OiBlcnJvcjogYml0d2lzZSBuZWdhdGlvbiBvZiBhIGJvb2xlYW4gZXhwcmVzc2lvbjsgZGlkIHlv
-dSBtZWFuIGxvZ2ljYWwgbmVnYXRpb24/IFstV2Vycm9yLC1XYm9vbC1vcGVyYXRpb25dCiAgICAg
-ICAgYWJzWjAgJj0gfigoKHVpbnQ2NF90KShhYnNaMTw8MSkgPT0gMCkgJiByb3VuZE5lYXJlc3RF
-dmVuKTsKICAgICAgICAgICAgICAgICBefn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn5+CiAgICAgICAgICAgICAgICAgIQovdG1wL3FlbXUtdGVzdC9zcmMvZnB1
-L3NvZnRmbG9hdC5jOjM2MDY6MTM6IGVycm9yOiBiaXR3aXNlIG5lZ2F0aW9uIG9mIGEgYm9vbGVh
-biBleHByZXNzaW9uOyBkaWQgeW91IG1lYW4gbG9naWNhbCBuZWdhdGlvbj8gWy1XZXJyb3IsLVdi
-b29sLW9wZXJhdGlvbl0KICAgIHpTaWcgJj0gfiAoICggKCByb3VuZEJpdHMgXiAweDQwICkgPT0g
-MCApICYgcm91bmROZWFyZXN0RXZlbiApOwogICAgICAgICAgICBefn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn4KICAgICAgICAgICAgIQovdG1wL3Fl
-bXUtdGVzdC9zcmMvZnB1L3NvZnRmbG9hdC5jOjM3NjA6MTM6IGVycm9yOiBiaXR3aXNlIG5lZ2F0
-aW9uIG9mIGEgYm9vbGVhbiBleHByZXNzaW9uOyBkaWQgeW91IG1lYW4gbG9naWNhbCBuZWdhdGlv
-bj8gWy1XZXJyb3IsLVdib29sLW9wZXJhdGlvbl0KICAgIHpTaWcgJj0gfiAoICggKCByb3VuZEJp
-dHMgXiAweDIwMCApID09IDAgKSAmIHJvdW5kTmVhcmVzdEV2ZW4gKTsKICAgICAgICAgICAgXn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fgogICAg
-ICAgICAgICAhCi90bXAvcWVtdS10ZXN0L3NyYy9mcHUvc29mdGZsb2F0LmM6Mzk4NzoyMTogZXJy
-b3I6IGJpdHdpc2UgbmVnYXRpb24gb2YgYSBib29sZWFuIGV4cHJlc3Npb247IGRpZCB5b3UgbWVh
-biBsb2dpY2FsIG5lZ2F0aW9uPyBbLVdlcnJvciwtV2Jvb2wtb3BlcmF0aW9uXQogICAgICAgICAg
-ICAgICAgICAgIH4gKCAoICh1aW50NjRfdCkgKCB6U2lnMTw8MSApID09IDAgKSAmIHJvdW5kTmVh
-cmVzdEV2ZW4gKTsKICAgICAgICAgICAgICAgICAgICBefn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn4KICAgICAgICAgICAgICAgICAgICAhCi90
-bXAvcWVtdS10ZXN0L3NyYy9mcHUvc29mdGZsb2F0LmM6NDAwMzoyMjogZXJyb3I6IGJpdHdpc2Ug
-bmVnYXRpb24gb2YgYSBib29sZWFuIGV4cHJlc3Npb247IGRpZCB5b3UgbWVhbiBsb2dpY2FsIG5l
-Z2F0aW9uPyBbLVdlcnJvciwtV2Jvb2wtb3BlcmF0aW9uXQogICAgICAgICAgICB6U2lnMCAmPSB+
-ICggKCAodWludDY0X3QpICggelNpZzE8PDEgKSA9PSAwICkgJiByb3VuZE5lYXJlc3RFdmVuICk7
-CiAgICAgICAgICAgICAgICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fgogICAgICAgICAgICAgICAgICAgICAhCi90bXAvcWVtdS10
-ZXN0L3NyYy9mcHUvc29mdGZsb2F0LmM6NDI3MzoxODogZXJyb3I6IGJpdHdpc2UgbmVnYXRpb24g
-b2YgYSBib29sZWFuIGV4cHJlc3Npb247IGRpZCB5b3UgbWVhbiBsb2dpY2FsIG5lZ2F0aW9uPyBb
-LVdlcnJvciwtV2Jvb2wtb3BlcmF0aW9uXQogICAgICAgIHpTaWcxICY9IH4gKCAoIHpTaWcyICsg
-elNpZzIgPT0gMCApICYgcm91bmROZWFyZXN0RXZlbiApOwogICAgICAgICAgICAgICAgIF5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+CiAgICAgICAgICAgICAg
-ICAgIQo4IGVycm9ycyBnZW5lcmF0ZWQuCm1ha2VbMV06ICoqKiBbL3RtcC9xZW11LXRlc3Qvc3Jj
-L3J1bGVzLm1hazo2OTogZnB1L3NvZnRmbG9hdC5vXSBFcnJvciAxCm1ha2VbMV06ICoqKiBXYWl0
-aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uCi90bXAvcWVtdS10ZXN0L3NyYy9taWdyYXRpb24v
-cmFtLmM6OTE5OjQ1OiBlcnJvcjogaW1wbGljaXQgY29udmVyc2lvbiBmcm9tICd1bnNpZ25lZCBs
-b25nJyB0byAnZG91YmxlJyBjaGFuZ2VzIHZhbHVlIGZyb20gMTg0NDY3NDQwNzM3MDk1NTE2MTUg
-dG8gMTg0NDY3NDQwNzM3MDk1NTE2MTYgWy1XZXJyb3IsLVdpbXBsaWNpdC1pbnQtZmxvYXQtY29u
-dmVyc2lvbl0KICAgICAgICAgICAgeGJ6cmxlX2NvdW50ZXJzLmVuY29kaW5nX3JhdGUgPSBVSU5U
-NjRfTUFYOwogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB+IF5+fn5+
-fn5+fn4KL3Vzci9pbmNsdWRlL3N0ZGludC5oOjEzMDoyMzogbm90ZTogZXhwYW5kZWQgZnJvbSBt
-YWNybyAnVUlOVDY0X01BWCcKLS0tCjE4NDQ2NzQ0MDczNzA5NTUxNjE1VUwKXn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fgoxIGVycm9yIGdlbmVyYXRlZC4KbWFrZVsxXTogKioqIFsvdG1wL3FlbXUtdGVz
-dC9zcmMvcnVsZXMubWFrOjY5OiBtaWdyYXRpb24vcmFtLm9dIEVycm9yIDEKbWFrZTogKioqIFtN
-YWtlZmlsZTo1Mjc6IHg4Nl82NC1zb2Z0bW11L2FsbF0gRXJyb3IgMgpUcmFjZWJhY2sgKG1vc3Qg
-cmVjZW50IGNhbGwgbGFzdCk6CiAgRmlsZSAiLi90ZXN0cy9kb2NrZXIvZG9ja2VyLnB5IiwgbGlu
-ZSA2NjksIGluIDxtb2R1bGU+CiAgICBzeXMuZXhpdChtYWluKCkpCi0tLQogICAgcmFpc2UgQ2Fs
-bGVkUHJvY2Vzc0Vycm9yKHJldGNvZGUsIGNtZCkKc3VicHJvY2Vzcy5DYWxsZWRQcm9jZXNzRXJy
-b3I6IENvbW1hbmQgJ1snc3VkbycsICctbicsICdkb2NrZXInLCAncnVuJywgJy0tbGFiZWwnLCAn
-Y29tLnFlbXUuaW5zdGFuY2UudXVpZD04N2MwY2QyMWQ5NDI0ODFmOWM4YjBkZWFmOGY2MTM5OCcs
-ICctdScsICcxMDAxJywgJy0tc2VjdXJpdHktb3B0JywgJ3NlY2NvbXA9dW5jb25maW5lZCcsICct
-LXJtJywgJy1lJywgJ1RBUkdFVF9MSVNUPXg4Nl82NC1zb2Z0bW11JywgJy1lJywgJ0VYVFJBX0NP
-TkZJR1VSRV9PUFRTPScsICctZScsICdWPScsICctZScsICdKPTE0JywgJy1lJywgJ0RFQlVHPScs
-ICctZScsICdTSE9XX0VOVj0nLCAnLWUnLCAnQ0NBQ0hFX0RJUj0vdmFyL3RtcC9jY2FjaGUnLCAn
-LXYnLCAnL2hvbWUvcGF0Y2hldy8uY2FjaGUvcWVtdS1kb2NrZXItY2NhY2hlOi92YXIvdG1wL2Nj
-YWNoZTp6JywgJy12JywgJy92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC15b2NhM3RibC9zcmMv
-ZG9ja2VyLXNyYy4yMDIwLTA2LTE2LTE4LjM1LjMxLjIzOTgxOi92YXIvdG1wL3FlbXU6eixybycs
-ICdxZW11OmZlZG9yYScsICcvdmFyL3RtcC9xZW11L3J1bicsICd0ZXN0LWRlYnVnJ10nIHJldHVy
-bmVkIG5vbi16ZXJvIGV4aXQgc3RhdHVzIDIuCmZpbHRlcj0tLWZpbHRlcj1sYWJlbD1jb20ucWVt
-dS5pbnN0YW5jZS51dWlkPTg3YzBjZDIxZDk0MjQ4MWY5YzhiMGRlYWY4ZjYxMzk4Cm1ha2VbMV06
-ICoqKiBbZG9ja2VyLXJ1bl0gRXJyb3IgMQptYWtlWzFdOiBMZWF2aW5nIGRpcmVjdG9yeSBgL3Zh
-ci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLXlvY2EzdGJsL3NyYycKbWFrZTogKioqIFtkb2NrZXIt
-cnVuLXRlc3QtZGVidWdAZmVkb3JhXSBFcnJvciAyCgpyZWFsICAgIDRtMTUuNzA2cwp1c2VyICAg
-IDBtOS4wNjFzCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5v
-cmcvbG9ncy8yMDIwMDYxNjE5MjcwMC4xOTAwMjYwLTEtYXRpc2gucGF0cmFAd2RjLmNvbS90ZXN0
-aW5nLmFzYW4vP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5
-IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVk
-YmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+Hi Andrew,
+
+Thanks for the feedback.
+
+On Tue, 16 Jun 2020 at 09:33, Andrew Jones <drjones@redhat.com> wrote:
+>
+> Hi Beata,
+>
+> I see Peter just picked this up, so I'm a bit late getting to it. I do
+> have a couple comments below though.
+>
+> Thanks,
+> drew
+>
+> On Fri, May 29, 2020 at 12:27:56PM +0100, Beata Michalska wrote:
+> > On ARMv7 & ARMv8 some load/store instructions might trigger a data abort
+> > exception with no valid ISS info to be decoded. The lack of decode info
+> > makes it at least tricky to emulate those instruction which is one of the
+> > (many) reasons why KVM will not even try to do so.
+> >
+> > Add support for handling those by requesting KVM to inject external
+> > dabt into the quest.
+> >
+> > Signed-off-by: Beata Michalska <beata.michalska@linaro.org>
+> > ---
+> >  target/arm/cpu.h     |  2 ++
+> >  target/arm/kvm.c     | 64 +++++++++++++++++++++++++++++++++++++++++++++++++++-
+> >  target/arm/kvm_arm.h | 11 +++++++++
+> >  3 files changed, 76 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> > index 677584e..3702f21 100644
+> > --- a/target/arm/cpu.h
+> > +++ b/target/arm/cpu.h
+> > @@ -570,6 +570,8 @@ typedef struct CPUARMState {
+> >          uint64_t esr;
+> >      } serror;
+> >
+> > +    uint8_t ext_dabt_pending; /* Request for injecting ext DABT */
+> > +
+> >      /* State of our input IRQ/FIQ/VIRQ/VFIQ lines */
+> >      uint32_t irq_line_state;
+> >
+> > diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+> > index 4bdbe6d..bf84224 100644
+> > --- a/target/arm/kvm.c
+> > +++ b/target/arm/kvm.c
+> > @@ -39,6 +39,7 @@ const KVMCapabilityInfo kvm_arch_required_capabilities[] = {
+> >
+> >  static bool cap_has_mp_state;
+> >  static bool cap_has_inject_serror_esr;
+> > +static bool cap_has_inject_ext_dabt;
+> >
+> >  static ARMHostCPUFeatures arm_host_cpu_features;
+> >
+> > @@ -244,6 +245,16 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+> >          ret = -EINVAL;
+> >      }
+> >
+> > +    if (kvm_check_extension(s, KVM_CAP_ARM_NISV_TO_USER)) {
+> > +        if (kvm_vm_enable_cap(s, KVM_CAP_ARM_NISV_TO_USER, 0)) {
+> > +            error_report("Failed to enable KVM_CAP_ARM_NISV_TO_USER cap");
+> > +        } else {
+> > +            /* Set status for supporting the external dabt injection */
+> > +            cap_has_inject_ext_dabt = kvm_check_extension(s,
+> > +                                    KVM_CAP_ARM_INJECT_EXT_DABT);
+> > +        }
+> > +    }
+> > +
+> >      return ret;
+> >  }
+> >
+> > @@ -703,9 +714,16 @@ int kvm_put_vcpu_events(ARMCPU *cpu)
+> >          events.exception.serror_esr = env->serror.esr;
+> >      }
+> >
+> > +    if (cap_has_inject_ext_dabt) {
+> > +        events.exception.ext_dabt_pending = env->ext_dabt_pending;
+> > +    }
+> > +
+> >      ret = kvm_vcpu_ioctl(CPU(cpu), KVM_SET_VCPU_EVENTS, &events);
+> >      if (ret) {
+> >          error_report("failed to put vcpu events");
+> > +    } else {
+> > +        /* Clear instantly if the call was successful */
+> > +        env->ext_dabt_pending = 0;
+> >      }
+> >
+> >      return ret;
+> > @@ -819,7 +837,12 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
+> >              ret = EXCP_DEBUG;
+> >          } /* otherwise return to guest */
+> >          break;
+> > -    default:
+> > +    case KVM_EXIT_ARM_NISV:
+> > +        /* External DABT with no valid iss to decode */
+> > +        ret = kvm_arm_handle_dabt_nisv(cs, run->arm_nisv.esr_iss,
+> > +                                       run->arm_nisv.fault_ipa);
+> > +        break;
+> > +     default:
+> >          qemu_log_mask(LOG_UNIMP, "%s: un-handled exit reason %d\n",
+> >                        __func__, run->exit_reason);
+> >          break;
+> > @@ -955,3 +978,42 @@ int kvm_arch_msi_data_to_gsi(uint32_t data)
+> >  {
+> >      return (data - 32) & 0xffff;
+> >  }
+> > +
+> > +int kvm_arm_handle_dabt_nisv(CPUState *cs, uint64_t esr_iss,
+> > +                             uint64_t fault_ipa)
+>
+> This function could be static since it's in the same file as its one
+> and only caller.
+>
+Right. Will do.
+
+> > +{
+> > +    ARMCPU *cpu = ARM_CPU(cs);
+> > +    CPUARMState *env = &cpu->env;
+> > +
+> > +   /*
+> > +    * ISS [23:14] is invalid so there is a limited info
+> > +    * on what has just happened so the only *useful* thing that can
+> > +    * be retrieved from ISS is WnR & DFSC (though in some cases WnR
+> > +    * might be less of a value as well)
+> > +    */
+> > +
+> > +    /*
+> > +     * Request KVM to inject the external data abort into the guest
+> > +     * by setting a pending exception on the affected vcpu.
+> > +     */
+> > +    if (cap_has_inject_ext_dabt) {
+> > +        /* Set pending exception */
+> > +        env->ext_dabt_pending = 1;
+> > +        /*
+> > +         * Even though at this point, the vcpu regs are out of sync,
+> > +         * directly calling the KVM_SET_VCPU_EVENTS ioctl without
+> > +         * explicitly synchronizing those, is enough and it also avoids
+> > +         * overwriting changes done by KVM.
+> > +         * The vcpu is not being marked as 'dirty' as all the changes
+> > +         * needed to inject the abort are being handled by KVM only
+> > +         * and there is no need for syncing either way
+> > +         */
+> > +        return kvm_put_vcpu_events(cpu);
+>
+> This looks fragile. What if we change kvm_put_vcpu_events() in a way
+> that requires CPU synchronization? Or, what if we change something else
+> that results in the VCPU getting flagged as dirty before finishing this
+> run loop, and then we end up calling kvm_put_vcpu_events() twice, possibly
+> causing some other problem?
+>
+> I think I'd prefer seeing the KVM_SET_VCPU_EVENTS ioctl get called
+> directly from here with the events set to only inject the dabt, as we
+> know that will be handled immediately and doesn't require any CPU
+> synchronization.
+>
+It might be 'fragile' though I would expect any  changes to kvm_put_vcpu_events
+revisit all users, but I have no objections to calling ioctl directly
+here if that's
+the prefered way.
+
+Will try to push the changes sometime later this week.
+
+Thanks again for the review.
+
+BR
+Beata
+
+> Thanks,
+> drew
+>
+> > +    } else {
+> > +        error_report("Data abort exception triggered by guest memory access "
+> > +                     "at physical address: 0x"  TARGET_FMT_lx,
+> > +                     (target_ulong)fault_ipa);
+> > +        error_printf("KVM unable to emulate faulting instruction.\n");
+> > +        return -1;
+> > +    }
+> > +}
+> > diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
+> > index 48bf5e1..e939e51 100644
+> > --- a/target/arm/kvm_arm.h
+> > +++ b/target/arm/kvm_arm.h
+> > @@ -453,6 +453,17 @@ struct kvm_guest_debug_arch;
+> >  void kvm_arm_copy_hw_debug_data(struct kvm_guest_debug_arch *ptr);
+> >
+> >  /**
+> > + * kvm_arm_handle_dabt_nisv:
+> > + * @cs: CPUState
+> > + * @esr_iss: ISS encoding (limited) for the exception from Data Abort
+> > + *           ISV bit set to '0b0' -> no valid instruction syndrome
+> > + * @fault_ipa: faulting address for the synch data abort
+> > + *
+> > + * Returns: 0 if the exception has been handled, < 0 otherwise
+> > + */
+> > +int kvm_arm_handle_dabt_nisv(CPUState *cs, uint64_t esr_iss,
+> > +                            uint64_t fault_ipa);
+> > +/**
+> >   * its_class_name:
+> >   *
+> >   * Return the ITS class name to use depending on whether KVM acceleration
+> > --
+> > 2.7.4
+> >
+> >
+>
 
