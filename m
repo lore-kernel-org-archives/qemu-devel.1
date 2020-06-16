@@ -7,74 +7,77 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10863C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:36:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 907AAC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:36:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D2E6D20644
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:36:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5F84220644
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:36:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bmZr+fbE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2E6D20644
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z0P1fCs0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F84220644
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36002 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38574 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlCh7-0007cE-3P
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 10:36:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57580)
+	id 1jlChi-0000HW-DT
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 10:36:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57568)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1jlCPn-000254-9d; Tue, 16 Jun 2020 10:18:15 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:47057)
+ id 1jlCPi-000245-SS; Tue, 16 Jun 2020 10:18:14 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:39887)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1jlCPi-0006fF-KM; Tue, 16 Jun 2020 10:18:11 -0400
-Received: by mail-ot1-x343.google.com with SMTP id g7so16013909oti.13;
- Tue, 16 Jun 2020 07:18:09 -0700 (PDT)
+ id 1jlCPh-0006eg-DQ; Tue, 16 Jun 2020 10:18:10 -0400
+Received: by mail-ot1-x341.google.com with SMTP id g5so16041041otg.6;
+ Tue, 16 Jun 2020 07:18:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=MBxm7nuYUhmoYS/sHlImvlcd+nSnILjZSRJjgMLw/0Q=;
- b=bmZr+fbElDD0JaQE7MsKZ5sTkE3ClXno08gKztNtqB5gYQpDRMG4ZdITcXSSkPGgWq
- yibchgH84PMzmh/WqhUFb3yT2UiaFfxEcG9109c1CU3RzNarGzab9NODQWq8w+tOZmGJ
- GeXaAqTJvyYgHHwckHmkHR9xphLFNUP3fw3waM3aqju04jwvc26jdqSF2cDPbIvkJvLa
- SA1Mk8KFtwiLBhhZRkB+JKJKJ8E6LKCjAzVLLZCpF/9gNfxThnRYoKYIvOjhu1pzVOPv
- p4otV04dDskOMucWhYlBY3Tgwfe4nceU0pW+CD6hKXDSEXvqRg71c0TneNzPDWXu+GBr
- rjzQ==
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=qxAqQFVt+5Z+veIt3jtnU/iIs7pS1pZXvHm2/UIl5LA=;
+ b=Z0P1fCs0bIYARh55Bb4MF2ocZsAl8++yrxp6SZfJLGZb9VzrYtF9ZPhCSx8wwVrZ6S
+ Fz32GHDnHOtpRNU3zsWc3hCpN4S5LJdt+Pyk3t/1eEegTrRZUuS4VdXCN9e0VMMcnDmE
+ L3aGXesVd/GNqsODCJZHKKmDT/g9ttqPOG4c8B0ueZLcrAg0xFC2HUES/6euhDOvZ3rv
+ h25I0BcQ7pGdBKOyC4Ey3XQoVHIFj3X96NI8dhDQhYLTVyDMTCbRsC+loXvl/oAsVIZs
+ Vg+H2B9sox/wrMRhVjwzD3yTZHCYJRk/qBJq7ItgkYSwt8CujsJ58w8ECVPXPmGNtFV9
+ yLHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references;
- bh=MBxm7nuYUhmoYS/sHlImvlcd+nSnILjZSRJjgMLw/0Q=;
- b=oBlZaoN+8ZycsPoSmQj4zx1/IWq4yLYcluI4+aONt5JJXMYsMHoZfQDMK0J8nlelWk
- 5G02JXG/zU3NCnLb8WLMD2twjcrYPSh2MizrvhH7Jqj/FQXGflcogr4iVjSJzZfaq1mH
- 7CIvoLyktZw7F9p7ktvgjUn3JqjNnYx4jz6NMmkylmV+z08o84Xa0yCCmeyQi1zwnEpL
- pTjxSlXapX17Fg5DXNch2VFl2xe/dim/phpOMVqms7MCtIjf4pmYXNeW+H2aXB1oaeuB
- O/Pt6QvZnauwYvtkHhpNG9+zEv6KtyhcACfyZyA/oo5DQxofZONDOjr5NufrN8znj9mC
- LKBg==
-X-Gm-Message-State: AOAM533VHdx9z3vrKvNyFg933kXmAJtVxeX/kfHLpG7wKq+MA3C4PJ/3
- npxvJJ9yZ+3/e7f5afTy+HAr+YUS
-X-Google-Smtp-Source: ABdhPJz5J7aVsq1RcsYH5jKM/6pSUvaw/Lg4/70DEV1PUTMPYIynh++uEE4/0AcwopEs0g4bR9VmdQ==
-X-Received: by 2002:a05:6830:1294:: with SMTP id
- z20mr2452486otp.24.1592317088694; 
- Tue, 16 Jun 2020 07:18:08 -0700 (PDT)
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=qxAqQFVt+5Z+veIt3jtnU/iIs7pS1pZXvHm2/UIl5LA=;
+ b=kEG9mfhyyEY6J8K1FDPJkEtQtfTEn9dCSa6bzKaSy7EI9Gyp7vBJfvpYYh9dYj6Cvy
+ ASSjZJwC/VwwQw2zwrcUflN4bnOrAEbSMPfYZvVQeLLaCJacbxhX5MWRVm2PH1Grg7Es
+ Ln2C8HHMXNXY0Z2y0JD35xOgb4Rw2oe9T+cuDkOQEiRx8yGnfeJVJK7texeZBcdsIBWt
+ 1/8qsjwzWqdkZTu2QoEPt3+7SDghImIZcM0y6jR+TJJ48eLY5smN6mvfTUXkV8VGeZKK
+ lDkwv7+ONNtaEXy6mB9E0E7GQgUSyWqtPY8QL/k47RxIApMvRIlowdfh4NLM/XJ2VJTv
+ uXMg==
+X-Gm-Message-State: AOAM5323CsWVgiue+mGnnt4djBjBK0W20tmZjqNn0B1HYQI75xvRdZut
+ T/BttK5vm5rYyG1zF4rN7PeyweL0
+X-Google-Smtp-Source: ABdhPJxkRxGvh/DInT2u0J7dOJCyN/ll805IpZZ+EVAPK42EFze7d8NHgo+s4ABYqRkEmdMxv2LYBA==
+X-Received: by 2002:a9d:3a24:: with SMTP id j33mr2508220otc.271.1592317087119; 
+ Tue, 16 Jun 2020 07:18:07 -0700 (PDT)
 Received: from localhost (76-251-165-188.lightspeed.austtx.sbcglobal.net.
  [76.251.165.188])
- by smtp.gmail.com with ESMTPSA id c23sm4072614otd.7.2020.06.16.07.18.07
+ by smtp.gmail.com with ESMTPSA id t10sm154950oij.36.2020.06.16.07.18.05
  (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
- Tue, 16 Jun 2020 07:18:07 -0700 (PDT)
+ Tue, 16 Jun 2020 07:18:06 -0700 (PDT)
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 02/78] block/nbd: fix memory leak in nbd_open()
-Date: Tue, 16 Jun 2020 09:14:31 -0500
-Message-Id: <20200616141547.24664-3-mdroth@linux.vnet.ibm.com>
+Subject: [PATCH 30/78] dp8393x: Have dp8393x_receive() return the packet size
+Date: Tue, 16 Jun 2020 09:14:59 -0500
+Message-Id: <20200616141547.24664-31-mdroth@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200616141547.24664-1-mdroth@linux.vnet.ibm.com>
 References: <20200616141547.24664-1-mdroth@linux.vnet.ibm.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::343;
- envelope-from=flukshun@gmail.com; helo=mail-ot1-x343.google.com
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::341;
+ envelope-from=flukshun@gmail.com; helo=mail-ot1-x341.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -96,79 +99,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Pan Nengyuan <pannengyuan@huawei.com>, qemu-stable@nongnu.org
+Cc: Jason Wang <jasowang@redhat.com>, qemu-stable@nongnu.org,
+ Finn Thain <fthain@telegraphics.com.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Pan Nengyuan <pannengyuan@huawei.com>
+From: Finn Thain <fthain@telegraphics.com.au>
 
-In currently implementation there will be a memory leak when
-nbd_client_connect() returns error status. Here is an easy way to
-reproduce:
+This function re-uses its 'size' argument as a scratch variable.
+Instead, declare a local 'size' variable for that purpose so that the
+function result doesn't get messed up.
 
-1. run qemu-iotests as follow and check the result with asan:
-    ./check -raw 143
-
-Following is the asan output backtrack:
-Direct leak of 40 byte(s) in 1 object(s) allocated from:
-    #0 0x7f629688a560 in calloc (/usr/lib64/libasan.so.3+0xc7560)
-    #1 0x7f6295e7e015 in g_malloc0  (/usr/lib64/libglib-2.0.so.0+0x50015)
-    #2 0x56281dab4642 in qobject_input_start_struct  /mnt/sdb/qemu-4.2.0-rc0/qapi/qobject-input-visitor.c:295
-    #3 0x56281dab1a04 in visit_start_struct  /mnt/sdb/qemu-4.2.0-rc0/qapi/qapi-visit-core.c:49
-    #4 0x56281dad1827 in visit_type_SocketAddress  qapi/qapi-visit-sockets.c:386
-    #5 0x56281da8062f in nbd_config   /mnt/sdb/qemu-4.2.0-rc0/block/nbd.c:1716
-    #6 0x56281da8062f in nbd_process_options /mnt/sdb/qemu-4.2.0-rc0/block/nbd.c:1829
-    #7 0x56281da8062f in nbd_open /mnt/sdb/qemu-4.2.0-rc0/block/nbd.c:1873
-
-Direct leak of 15 byte(s) in 1 object(s) allocated from:
-    #0 0x7f629688a3a0 in malloc (/usr/lib64/libasan.so.3+0xc73a0)
-    #1 0x7f6295e7dfbd in g_malloc (/usr/lib64/libglib-2.0.so.0+0x4ffbd)
-    #2 0x7f6295e96ace in g_strdup (/usr/lib64/libglib-2.0.so.0+0x68ace)
-    #3 0x56281da804ac in nbd_process_options /mnt/sdb/qemu-4.2.0-rc0/block/nbd.c:1834
-    #4 0x56281da804ac in nbd_open /mnt/sdb/qemu-4.2.0-rc0/block/nbd.c:1873
-
-Indirect leak of 24 byte(s) in 1 object(s) allocated from:
-    #0 0x7f629688a3a0 in malloc (/usr/lib64/libasan.so.3+0xc73a0)
-    #1 0x7f6295e7dfbd in g_malloc (/usr/lib64/libglib-2.0.so.0+0x4ffbd)
-    #2 0x7f6295e96ace in g_strdup (/usr/lib64/libglib-2.0.so.0+0x68ace)
-    #3 0x56281dab41a3 in qobject_input_type_str_keyval /mnt/sdb/qemu-4.2.0-rc0/qapi/qobject-input-visitor.c:536
-    #4 0x56281dab2ee9 in visit_type_str /mnt/sdb/qemu-4.2.0-rc0/qapi/qapi-visit-core.c:297
-    #5 0x56281dad0fa1 in visit_type_UnixSocketAddress_members qapi/qapi-visit-sockets.c:141
-    #6 0x56281dad17b6 in visit_type_SocketAddress_members qapi/qapi-visit-sockets.c:366
-    #7 0x56281dad186a in visit_type_SocketAddress qapi/qapi-visit-sockets.c:393
-    #8 0x56281da8062f in nbd_config /mnt/sdb/qemu-4.2.0-rc0/block/nbd.c:1716
-    #9 0x56281da8062f in nbd_process_options /mnt/sdb/qemu-4.2.0-rc0/block/nbd.c:1829
-    #10 0x56281da8062f in nbd_open /mnt/sdb/qemu-4.2.0-rc0/block/nbd.c:1873
-
-Fixes: 8f071c9db506e03ab
-Reported-by: Euler Robot <euler.robot@huawei.com>
-Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-stable <qemu-stable@nongnu.org>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-Id: <1575517528-44312-3-git-send-email-pannengyuan@huawei.com>
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-Signed-off-by: Eric Blake <eblake@redhat.com>
-(cherry picked from commit 8198cf5ef0ef98118b4176970d1cd998d93ec849)
+Signed-off-by: Finn Thain <fthain@telegraphics.com.au>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Laurent Vivier <laurent@vivier.eu>
+Signed-off-by: Jason Wang <jasowang@redhat.com>
+(cherry picked from commit 9e3cd456d85ad45e72bdba99203302342ce29b3b)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- block/nbd.c | 1 +
- 1 file changed, 1 insertion(+)
+ hw/net/dp8393x.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/block/nbd.c b/block/nbd.c
-index 6bb6715286..3d369fc8eb 100644
---- a/block/nbd.c
-+++ b/block/nbd.c
-@@ -1900,6 +1900,7 @@ static int nbd_open(BlockDriverState *bs, QDict *options, int flags,
+diff --git a/hw/net/dp8393x.c b/hw/net/dp8393x.c
+index f89f4c7ba3..a696485a55 100644
+--- a/hw/net/dp8393x.c
++++ b/hw/net/dp8393x.c
+@@ -757,20 +757,21 @@ static int dp8393x_receive_filter(dp8393xState *s, const uint8_t * buf,
+ }
  
-     ret = nbd_client_connect(bs, errp);
-     if (ret < 0) {
-+        nbd_clear_bdrvstate(s);
-         return ret;
-     }
-     /* successfully connected */
+ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
+-                               size_t size)
++                               size_t pkt_size)
+ {
+     dp8393xState *s = qemu_get_nic_opaque(nc);
+     int packet_type;
+     uint32_t available, address;
+-    int width, rx_len = size;
++    int width, rx_len = pkt_size;
+     uint32_t checksum;
++    int size;
+ 
+     width = (s->regs[SONIC_DCR] & SONIC_DCR_DW) ? 2 : 1;
+ 
+     s->regs[SONIC_RCR] &= ~(SONIC_RCR_PRX | SONIC_RCR_LBK | SONIC_RCR_FAER |
+         SONIC_RCR_CRCR | SONIC_RCR_LPKT | SONIC_RCR_BC | SONIC_RCR_MC);
+ 
+-    packet_type = dp8393x_receive_filter(s, buf, size);
++    packet_type = dp8393x_receive_filter(s, buf, pkt_size);
+     if (packet_type < 0) {
+         DPRINTF("packet not for netcard\n");
+         return -1;
+@@ -864,7 +865,7 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
+     /* Done */
+     dp8393x_update_irq(s);
+ 
+-    return size;
++    return pkt_size;
+ }
+ 
+ static void dp8393x_reset(DeviceState *dev)
 -- 
 2.17.1
 
