@@ -2,86 +2,97 @@ Return-Path: <SRS0=f7ls=75=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE520C433E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 17:29:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBFD9C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 17:29:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 99E1F20707
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 17:29:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99E1F20707
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=canonical.com
+	by mail.kernel.org (Postfix) with ESMTPS id ABAA5208D5
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 17:29:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QiGhHVbQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ABAA5208D5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54164 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54546 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlFOp-0004iy-Sx
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 13:29:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48502)
+	id 1jlFOv-0004sT-W6
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 13:29:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51534)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <guilherme.piccoli@canonical.com>)
- id 1jlFAm-0008QV-KS
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 13:14:56 -0400
-Received: from youngberry.canonical.com ([91.189.89.112]:49233)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_CBC_SHA1:128)
- (Exim 4.90_1) (envelope-from <guilherme.piccoli@canonical.com>)
- id 1jlFAk-00004q-Vk
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 13:14:56 -0400
-Received: from mail-ed1-f72.google.com ([209.85.208.72])
- by youngberry.canonical.com with esmtps
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.86_2)
- (envelope-from <guilherme.piccoli@canonical.com>) id 1jlFAi-0000H4-4P
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 17:14:52 +0000
-Received: by mail-ed1-f72.google.com with SMTP id dn27so6370940edb.15
- for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 10:14:52 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jlFNo-0003mH-0S
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 13:28:24 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:36596)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jlFNm-0002Y7-2j
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 13:28:23 -0400
+Received: by mail-wr1-x442.google.com with SMTP id q11so21648315wrp.3
+ for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 10:28:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=CbIdcvNynIh9qgfMr2MC/xODyGTB4Twvz4Shij1PRtQ=;
+ b=QiGhHVbQ474TyxA85zcgwytGVhfU/kfl6Rcw/luYCTov3Na0oEiibq+YPQNuPC5j9k
+ OSUzln96jpiXcuLVQZaAzpXc2Co1oOAtgC4VkrIPsN9nzQrUzmw/bNAFyAQAxxfnWrKQ
+ xOux3lKHLBqM6g0RCdcytc5ZCdEj4QY/8THYkt338QUnbDx8uQZlrFrxrG0bNxEe228t
+ 2asqnh/DmUSotS5BjItEHnJui+lV8fTTa5ppl1/+ZMCByPb9b0in0MCjiJNca5eS35/h
+ MJv9R3d1RRzOXr7q6C8UgLbanqLudCeMSb3t2W4Zhq1BjCr4l9WhGmlMD7211U/rAEQu
+ KS2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=PDViOL291DGwbnt+0FCFMMRB59e44btmcQ5NQEcXP4w=;
- b=nG+qQbwf1j6w/AUlU0Go8OP7x9PHyJMAijR4LRO7ifFyiVfNCvDPv5QMMJtFLwhUIl
- UCFKU3ZvFi9ktG7AfX/4uFucvjtiMaQCt/WapipCdn/s0n0I3/+KVonZ10sYdbakTf4a
- abe46JyLT8Gk3bhBod3Kd2ddMKRqk80j6YNgJfVIDl/4pzRoBE5mUrNOKWlYDb0pwEzm
- KBC3S7jDX8yPrceokVfxM34C/C6CzA1+Jfr//vvVO1W/e+fqDmjj1Dt0KEEIUpmofMRv
- kjGki16xphh+VCqX/CzQxyXlavgEq/h5E1fJyCc+o/c3m2Rr97hvFiFkOatcC/bhP+NC
- OTHg==
-X-Gm-Message-State: AOAM530J0HtxJre0gZP3SWqXy2wSyCTD0XkGkTJVz7oEdYh7hchpreUk
- s2y1LLh7l7brklu0DRGYtElvuq6yb5kRLMnSP1ogGLJTjmu2mWkyaQWMGmeddzo5pA2sOOzDJKo
- ieOqZWQLtE5SBSnTYXH3E2ycCTBIvjATULmIcNv6FvmwpXqB/
-X-Received: by 2002:a05:6402:b13:: with SMTP id
- bm19mr3613993edb.82.1592327691789; 
- Tue, 16 Jun 2020 10:14:51 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzOdRW7u3iepFLKAs3HwF1AOaLn5KMxEAVNFBac1UHIChvFbU2hYes9oYIzQaHYiHgN8iqG4JoGDcj32ES2BM4=
-X-Received: by 2002:a05:6402:b13:: with SMTP id
- bm19mr3613974edb.82.1592327691593; 
- Tue, 16 Jun 2020 10:14:51 -0700 (PDT)
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=CbIdcvNynIh9qgfMr2MC/xODyGTB4Twvz4Shij1PRtQ=;
+ b=UHFfNLLYOOmmbDNNrLm1hQR+tvjV+HnsiqsO5mRHm0JdjNTpZkGF5qjos3EVY1bii6
+ H99djpcTTkIt0kQmSDGblsJdzc3Pa576p0tVsniVifBEskmT0SlMUIVBHO78fy5PprYg
+ QtzSw0L5yV+FY3DyZ0OYiotaVc2loE518mV2ctDjWq5QwkH5SrC1QiKeDhYZPTI3bx6r
+ SakL1qhwqOWAcQa3+u+t1OOBhOzryUO2ffBSzARumWXf4RJzbSO4r2f0cFlkbeMv6tc9
+ O/S2/lPugSSk/LTWk1nspY5UW0pWH+LxMpP27elFD6IsmOzxCraWMhDPKBnnPtzaGnJz
+ n5/A==
+X-Gm-Message-State: AOAM5338ucwFLQfwxAKGq7mCKFfLClwdwv4FPpdAZ+FL0oVM9OLPfc82
+ EeoN4DAygB3rz1v6mgEPuxrJ6A==
+X-Google-Smtp-Source: ABdhPJz3GmXEL8QCocsxQyVXgOl3jfGT4pbY7/IdFqo5baZsDA0LoqbT05SnASb+K1JB3LV8W+mqAg==
+X-Received: by 2002:adf:f789:: with SMTP id q9mr4440465wrp.251.1592328499885; 
+ Tue, 16 Jun 2020 10:28:19 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id o18sm5240128wme.19.2020.06.16.10.28.18
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 16 Jun 2020 10:28:18 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 346451FF7E;
+ Tue, 16 Jun 2020 18:28:18 +0100 (BST)
+References: <20200604085441.103087-1-kbastian@mail.uni-paderborn.de>
+ <20200604085441.103087-7-kbastian@mail.uni-paderborn.de>
+User-agent: mu4e 1.5.3; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Subject: Re: [PATCH v2 06/15] tests/tcg/tricore: Add macros to create tests
+ and first test 'abs'
+In-reply-to: <20200604085441.103087-7-kbastian@mail.uni-paderborn.de>
+Date: Tue, 16 Jun 2020 18:28:18 +0100
+Message-ID: <87366uzzrh.fsf@linaro.org>
 MIME-Version: 1.0
-References: <99779e9c-f05f-501b-b4be-ff719f140a88@canonical.com>
- <20200616165043.24y2cp53axk7uggy@sirius.home.kraxel.org>
- <20200616165746.GH2788@work-vm>
-In-Reply-To: <20200616165746.GH2788@work-vm>
-From: Guilherme Piccoli <gpiccoli@canonical.com>
-Date: Tue, 16 Jun 2020 14:14:15 -0300
-Message-ID: <CAHD1Q_zGu4Q63HjHx3aZKu3wh8NppuP6T4kgnUN3j=-ZDufVZA@mail.gmail.com>
-Subject: Re: ovmf / PCI passthrough impaired due to very limiting PCI64
- aperture
-To: Gerd Hoffmann <kraxel@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: none client-ip=91.189.89.112;
- envelope-from=guilherme.piccoli@canonical.com; helo=youngberry.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 11:16:23
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10
-X-Spam_score_int: -68
-X-Spam_score: -6.9
-X-Spam_bar: ------
-X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x442.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,33 +105,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Pedro Principeza <pedro.principeza@canonical.com>, ehabkost@redhat.com,
- Dann Frazier <dann.frazier@canonical.com>, qemu-devel@nongnu.org,
- Christian Ehrhardt <christian.ehrhardt@canonical.com>, lersek@redhat.com,
- fw@gpiccoli.net
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Thanks Gerd, Dave and Eduardo for the prompt responses!
 
-So, I understand that when we use "-host-physical-bits", we are
-passing the *real* number for the guest, correct? So, in this case we
-can trust that the guest physbits matches the true host physbits.
+Bastian Koppelmann <kbastian@mail.uni-paderborn.de> writes:
 
-What if then we have OVMF relying in the physbits *iff*
-"-host-phys-bits" is used (which is the default in RH and a possible
-machine configuration on libvirt XML in Ubuntu), and we have OVMF
-fallbacks to 36-bit otherwise?
+> This kind of tests is inspired by the riscv-tests repository. This adds
+> macros that makes it easy to create single instruction self containing
+> tests.
+>
+> It is achieved by macros that create a test sequence for an
+> instruction and check for a supplied correct value. If the value is corre=
+ct the
+> next instruction is tested. Otherwise we jump to fail handler that writes=
+ is
+> test number as a status code back to qemu that then exits on that status =
+code.
+> If all tests pass we write back 0 as a status code and exit.
+>
+> Signed-off-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+> ---
+>  tests/tcg/configure.sh                    |  7 ++-
+>  tests/tcg/tricore/Makefile.softmmu-target |  2 +
+>  tests/tcg/tricore/macros.h                | 53 +++++++++++++++++++++++
+>  tests/tcg/tricore/test_abs.S              |  8 ++++
+>  4 files changed, 69 insertions(+), 1 deletion(-)
+>  create mode 100644 tests/tcg/tricore/macros.h
+>  create mode 100644 tests/tcg/tricore/test_abs.S
+>
+> diff --git a/tests/tcg/configure.sh b/tests/tcg/configure.sh
+> index 6e8659d488..cd857433d9 100755
+> --- a/tests/tcg/configure.sh
+> +++ b/tests/tcg/configure.sh
+> @@ -85,7 +85,7 @@ for target in $target_list; do
+>      xtensa|xtensaeb)
+>        arches=3Dxtensa
+>        ;;
+> -    alpha|cris|hppa|i386|lm32|m68k|openrisc|riscv64|s390x|sh4|sparc64)
+> +    alpha|cris|hppa|i386|lm32|m68k|openrisc|riscv64|s390x|sh4|sparc64|tr=
+icore)
+>        arches=3D$target
+>        ;;
+>      *)
+> @@ -169,6 +169,11 @@ for target in $target_list; do
+>        container_image=3Ddebian-sparc64-cross
+>        container_cross_cc=3Dsparc64-linux-gnu-gcc
+>        ;;
+> +    tricore-softmmu)
+> +        container_image=3Ddebian-tricore-cross
+> +        container_cross_as=3Dtricore-as
+> +        container_cross_ld=3Dtricore-ld
+> +        ;;
+>      xtensa*-softmmu)
+>        container_image=3Ddebian-xtensa-cross
 
-Now, regarding the problem "to trust or not" in the guests' physbits,
-I think it's an orthogonal discussion to some extent. It'd be nice to
-have that check, and as Eduardo said, prevent migration in such cases.
-But it's not really preventing OVMF big PCI64 aperture if we only
-increase the aperture _when  "-host-physical-bits" is used_.
+I'd of been tempted to include this with the build infrastructure patch
+but whatever...
 
-Thanks,
+>=20=20
+> diff --git a/tests/tcg/tricore/Makefile.softmmu-target b/tests/tcg/tricor=
+e/Makefile.softmmu-target
+> index 4a2cd6f218..1b1f220c7c 100644
+> --- a/tests/tcg/tricore/Makefile.softmmu-target
+> +++ b/tests/tcg/tricore/Makefile.softmmu-target
+> @@ -7,6 +7,8 @@ ASFLAGS =3D
+>=20=20
+>  QEMU_OPTS +=3D -M tricore_testboard -nographic -kernel
+>=20=20
+> +TESTS +=3D test_abs.tst
+> +
 
+Also you could use wildcards so adding new tests is simpler but anyway:
 
-Guilherme
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+--=20
+Alex Benn=C3=A9e
 
