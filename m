@@ -2,153 +2,90 @@ Return-Path: <SRS0=f7ls=75=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 812A6C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 19:52:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67852C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 20:03:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 40992207C4
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 19:52:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2D211206F1
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 20:03:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UC73ehQG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40992207C4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D1mv8tCr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D211206F1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43514 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47130 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlHcl-0001UR-IP
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 15:51:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50972)
+	id 1jlHnT-0004sB-CU
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 16:03:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53214)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jlHc9-0000pZ-JB
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 15:51:21 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:50748
+ (Exim 4.90_1) (envelope-from <nsoffer@redhat.com>)
+ id 1jlHmN-0003rY-KN
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 16:01:55 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:47397
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jlHc7-0001Ha-2G
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 15:51:21 -0400
+ (Exim 4.90_1) (envelope-from <nsoffer@redhat.com>)
+ id 1jlHmL-0002zL-Fr
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 16:01:55 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592337078;
+ s=mimecast20190719; t=1592337711;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=JsQn/voiyvBbgTt5FFfQqq9LxFUTkO+XvahpWOWRfWo=;
- b=UC73ehQG3N/bKNwipy7ph2HfTngP+0YMbGRvzM6kJFg5jC3pdtm4CuIPqdpmB+LrCQyNV2
- g0013Rqlu1xQQSIb/wBQTCK1QlaLT23YfsKIF502JjPsoxZy6ab5D71wIWw0VKX/W5GFnL
- ozeTqIhVa2DK+gpBxasBlgD0SrsM2dk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-491-Vz3RZOwUP1mYoX4x3_lnVQ-1; Tue, 16 Jun 2020 15:51:14 -0400
-X-MC-Unique: Vz3RZOwUP1mYoX4x3_lnVQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 56D2A10AB64B;
- Tue, 16 Jun 2020 19:51:13 +0000 (UTC)
-Received: from [10.10.117.188] (ovpn-117-188.rdu2.redhat.com [10.10.117.188])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 45E485C1BD;
- Tue, 16 Jun 2020 19:51:09 +0000 (UTC)
-Subject: Re: [PATCH RFC v2 1/5] block: add bitmap-populate job
-To: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>
-References: <20200514034922.24834-1-jsnow@redhat.com>
- <20200514034922.24834-2-jsnow@redhat.com>
- <20200604090140.GB4512@linux.fritz.box>
- <bb9a31cf-99e0-ef35-3739-bb3ff270735d@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <2b3b7915-8c88-8cb5-25d7-f99a5f1832db@redhat.com>
-Date: Tue, 16 Jun 2020 15:51:08 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ in-reply-to:in-reply-to:references:references;
+ bh=mckYOLfC28iNiRsjEYm3rdb8562PPGaXxo4zfY8NykI=;
+ b=D1mv8tCrbp1TKWKBD9qYTho0zVQwiO1q5qsdGpi/eSGGpPcJ7/i0tzQneMzQ4ClLn5UskG
+ crTGbBMHCO6Tx05Hnh/J+vmvfRHogf3TO/CWsUxsHS6GfE03SllpP9ymgg/iZY3SSy7Ut4
+ S3M3lLDQ/muiw4FP75iT+M4+HTGByLs=
+Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com
+ [209.85.161.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-31-NBGwPQYYP3KUoCktbPJeUQ-1; Tue, 16 Jun 2020 16:01:50 -0400
+X-MC-Unique: NBGwPQYYP3KUoCktbPJeUQ-1
+Received: by mail-oo1-f69.google.com with SMTP id e12so10224153oob.10
+ for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 13:01:50 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=mckYOLfC28iNiRsjEYm3rdb8562PPGaXxo4zfY8NykI=;
+ b=OIkEMM9TKFz5e23ycWoVQR5g2s+NY2tg4KUYfZHbES4TwsNg2awqZ2d6YpM2qfkPNx
+ VoA1ZXRe67Ih0idbzY9bSgOmtNYCS/spt8Xnu4cTzp064YNFtGlKGmnsrMwqSwv2DkCW
+ fOoo94yzR9H5TAnXGJWrmPJpqjJ2kyJBIa/7L2Hm3zXSbq1fbGYdFgoQYQa0WZbTU7Pl
+ CWCiWUYapq68jQdKn3ZoxZ5zLAX0fqI+3yy054pLvyQsWezfT9CHN/osjHVGUXoD88M1
+ ZVUwCHcTTxzzg8s6w8QqWjD1zB4L2QW94VtwDf9gbC0rDdWD8wX4Qxaog7kWXRcqGtw8
+ uLKQ==
+X-Gm-Message-State: AOAM532IDoysUU4HLcuy3TpPt4qOUPUTNBl8TrrTG2KzGmF6J9znNDvK
+ hRcJEqVTszQ6Sg3Mg3HEuNpqjd4YilV84EmtmLhf4zSyeqMEwcobARolEknGdgC4b3cscDRqh5Y
+ TVHcy86CeQ3WghhFTkU/Ce7fhgWdX1Wc=
+X-Received: by 2002:a9d:7f06:: with SMTP id j6mr3776636otq.132.1592337708734; 
+ Tue, 16 Jun 2020 13:01:48 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzy+f9QQgvSop9T0ILYjJ7Z6Bba/WHLp2ztSmOPcuo0zWT8ct1h2XmAMpRjXFKuoBdLj6Beu5Y1JeVY0aJMlWE=
+X-Received: by 2002:a9d:7f06:: with SMTP id j6mr3776525otq.132.1592337707436; 
+ Tue, 16 Jun 2020 13:01:47 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <bb9a31cf-99e0-ef35-3739-bb3ff270735d@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+References: <20200613170826.354270-1-nsoffer@redhat.com>
+ <CAMRbyyswkaedF0dN2nPb3H8fj5+pmhLWh9GHGor4wUk_Su=b8A@mail.gmail.com>
+ <20200616153241.GF4305@linux.fritz.box>
+ <CAMRbyys3fL_vqswb72-F_vE8pBQ1SkZZmmMeUA_TuTwsew6iSw@mail.gmail.com>
+In-Reply-To: <CAMRbyys3fL_vqswb72-F_vE8pBQ1SkZZmmMeUA_TuTwsew6iSw@mail.gmail.com>
+From: Nir Soffer <nsoffer@redhat.com>
+Date: Tue, 16 Jun 2020 23:01:30 +0300
+Message-ID: <CAMRbyyvD6kRdaitm6Oc6LAnF6_e+Y9y+jTPKNVq8ENLEKYyKng@mail.gmail.com>
+Subject: Re: [PATCH] block: file-posix: Fail unmap with NO_FALLBACK on block
+ device
+To: Kevin Wolf <kwolf@redhat.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=nsoffer@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=jsnow@redhat.com;
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=nsoffer@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 02:45:57
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -171,21 +108,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pkrempa@redhat.com, Eduardo Habkost <ehabkost@redhat.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, vsementsov@virtuozzo.com,
- Cleber Rosa <crosa@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: nirsof <nirsof@gmail.com>, qemu-block <qemu-block@nongnu.org>, pl@kamp.de,
+ QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Tue, Jun 16, 2020 at 8:39 PM Nir Soffer <nsoffer@redhat.com> wrote:
+>
+> On Tue, Jun 16, 2020 at 6:32 PM Kevin Wolf <kwolf@redhat.com> wrote:
+> >
+> > Am 15.06.2020 um 21:32 hat Nir Soffer geschrieben:
+> > > We can zero 2.3 g/s:
+> > >
+> > > # time blkdiscard -z test-lv
+> > >
+> > > real 0m43.902s
+> > > user 0m0.002s
+> > > sys 0m0.130s
+> >
+> > > We can write 445m/s:
+> > >
+> > > # dd if=/dev/zero bs=2M count=51200 of=test-lv oflag=direct conv=fsync
+> > > 107374182400 bytes (107 GB, 100 GiB) copied, 241.257 s, 445 MB/s
+> >
+> > So using FALLOC_FL_PUNCH_HOLE _is_ faster after all. What might not be
+> > faster is zeroing out the whole device and then overwriting a
+> > considerable part of it again.
+> >
+> > I think this means that we shouldn't fail write_zeroes at the file-posix
+> > level even if BDRV_REQ_NO_FALLBACK is given. Instead, qemu-img convert
+> > is where I see a fix.
+> >
+> > Certainly qemu-img could be cleverer and zero out more selectively. The
+> > idea of doing a blk_make_zero() first seems to have caused some
+> > problems, though of course its introduction was also justified with
+> > performance, so improving one case might hurt another if we're not
+> > careful.
+> >
+> > However, when Peter Lieven introduced this (commit 5a37b60a61c), we
+> > didn't use write_zeroes yet during the regular copy loop (we do since
+> > commit 690c7301600). So chances are that blk_make_zero() doesn't
+> > actually help any more now.
+> >
+> > Can you run another test with the patch below?
+>
+> Sure, I can try this.
 
+Tried it, and it performs the same as expected.
 
-On 6/16/20 3:46 PM, Eric Blake wrote:
-> I'm less certain what the BLOCK_OP_TYPE_* constants are supposed to
-> block, or if this is just copy/paste from backup.c. Does BlockOpType in
-> block.h need a new entry?
+> > I think it should perform
+> > the same as yours. Eric, Peter, do you think this would have a negative
+> > effect for NBD and/or iscsi?
+> >
+> > The other option would be providing an option and making it Someone
+> > Else's Problem.
+> >
+> > Kevin
+> >
+> >
+> > diff --git a/qemu-img.c b/qemu-img.c
+> > index d7e846e607..bdb9f6aa46 100644
+> > --- a/qemu-img.c
+> > +++ b/qemu-img.c
+> > @@ -2084,15 +2084,6 @@ static int convert_do_copy(ImgConvertState *s)
+> >          s->has_zero_init = bdrv_has_zero_init(blk_bs(s->target));
+> >      }
+> >
+> > -    if (!s->has_zero_init && !s->target_has_backing &&
+> > -        bdrv_can_write_zeroes_with_unmap(blk_bs(s->target)))
+> > -    {
+> > -        ret = blk_make_zero(s->target, BDRV_REQ_MAY_UNMAP | BDRV_REQ_NO_FALLBACK);
+> > -        if (ret == 0) {
+> > -            s->has_zero_init = true;
+> > -        }
+> > -    }
+>
+> This will work of course, but now we will not do bulk zero for any target
 
-Copy paste. I wasn't sure myself.
+I would like to have a minimal change to increase the chance that we can
+consume this very soon in oVirt.
+
+> I think we never do this for regular files anyway since we truncate
+> files, and there
+> is nothing to zero, but maybe there is some case when this is useful?
+>
+> BTW, do we use BDRV_REQ_NO_FALLBACK elsewhere? maybe we can remove it.
+>
+> >      /* Allocate buffer for copied data. For compressed images, only one cluster
+> >       * can be copied at a time. */
+> >      if (s->compressed) {
+> >
 
 
