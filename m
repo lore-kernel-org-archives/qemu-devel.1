@@ -2,89 +2,92 @@ Return-Path: <SRS0=f7ls=75=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49783C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 17:20:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7C98C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 17:21:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0BD6B20707
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 17:20:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 87BCE20707
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 17:21:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="atEtkg36"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0BD6B20707
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="P4//LCdp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87BCE20707
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54296 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57242 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlFGb-0001Mt-8C
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 13:20:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49078)
+	id 1jlFHC-0002eF-R4
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 13:21:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47154)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jlFC9-0002n9-Oo
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 13:16:21 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31215
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jlFC8-0000X4-2e
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 13:16:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592327779;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=wqp9+vP9WDPWv11Aw91e2+Rmy9fgS5L478vkJsRDV0E=;
- b=atEtkg364c66/A6gpK0WJ6D6GqUNIbkPw8Z6bsphi0S4ZGuJjj45a/dxwiFhSwEkv6qTqe
- ovemJKDOIr1KHYxvObbc8JUw+i3gjnsbVUQ7F0d0+cr0mqMl2nv+SMkyfHgG2GXww6kRHB
- PXoBwryO235fM2L+RkxiruFtPZWcrfQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-214-FeuRWj2fMt2zbt3bKdMYqg-1; Tue, 16 Jun 2020 13:16:14 -0400
-X-MC-Unique: FeuRWj2fMt2zbt3bKdMYqg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A09F1EC1A2;
- Tue, 16 Jun 2020 17:16:13 +0000 (UTC)
-Received: from work-vm (ovpn-112-42.ams2.redhat.com [10.36.112.42])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CBA7B79303;
- Tue, 16 Jun 2020 17:16:08 +0000 (UTC)
-Date: Tue, 16 Jun 2020 18:16:06 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Subject: Re: ovmf / PCI passthrough impaired due to very limiting PCI64
- aperture
-Message-ID: <20200616171606.GI2788@work-vm>
-References: <99779e9c-f05f-501b-b4be-ff719f140a88@canonical.com>
- <20200616165043.24y2cp53axk7uggy@sirius.home.kraxel.org>
- <20200616165746.GH2788@work-vm>
- <20200616171026.jhlhtewp6j6vj44m@sirius.home.kraxel.org>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jlF5A-0001bc-Qk
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 13:09:08 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:41074)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jlF58-0007Vy-R9
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 13:09:08 -0400
+Received: by mail-wr1-x444.google.com with SMTP id j10so21555893wrw.8
+ for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 10:09:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=Q+0uZHHdicr4FHXDVL/N22V2qnJh66s6U25qsKc1zpA=;
+ b=P4//LCdpdE9XCKe56D5wKz06ioLvBJCQMZNlJg6Ac1VLLt7iLP7jGbEqovNw44Zi0L
+ QCfZaemXs8gYIU4IBAuxtig5RTyIdJKoAoBzxsoqCb38pBlRjAGYgqbuUivDJ9b/5lWw
+ ytmLfcVptE5Xk2PmIOvoFxJG7VRxJklD+zGGOme26i1CuP95gQJhaaRk1UX6GA2KYNKH
+ C2Bzx2dsC3vJ1xSjqjMqNnk9hkBt1T0mC9W8PLgLIXMgNxouc8uLeSnR0u0+v9mlhwXy
+ Eyi9i4BthXf50oiL/9y3YtyAPjQBfCkCQZtrcyRPLuWcdSfrLdyX8CfH5Bl6NyIDcSME
+ RPGw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=Q+0uZHHdicr4FHXDVL/N22V2qnJh66s6U25qsKc1zpA=;
+ b=tErdQdvRi65RsTqG39vBB5Ko9txfy1Ov656TVy7jVCJHIJTAT5m5r3MVh7CCtbqLWg
+ BYhprAiD9ovjq9Wcj3RNIn13BOgurnv/1T0O7jYfrbZ2UIj4v4qGzPQUyR/SI0TG1ojE
+ nHWl3aiDHzLSNSJ8Vt8dzTTjRa5WThHU5VlXx1cVs+/Q3dRBWFFKVG2z0FDtvI/fSu/c
+ 8MyfP2yQkVQ61nfVNpSWnynA2DZBz/JH9Fba6CJbEARTyAEHXW3OLesfZGS1+WjkTijv
+ yYmSoD/75XLYQj7eKFFO308HJH/upOTx6/VL48MQyuBWMHWefF4kkCtyLC+HJSnzWHQG
+ CFXw==
+X-Gm-Message-State: AOAM530ZbjDXFXML54aCtJ2ZOKQZDqqVkNl2FEjhi330hGaaubUVYts6
+ wEqo89lrdK+PxcqOOtLQZ6WXIQ==
+X-Google-Smtp-Source: ABdhPJwkBb0rKqoP9zU5qygAGrKvCGNx49KPaIhw9ZXER17JrbXAuE+i/VCboA3o8vbheD9NpTtw/Q==
+X-Received: by 2002:adf:a18b:: with SMTP id u11mr4046191wru.102.1592327345499; 
+ Tue, 16 Jun 2020 10:09:05 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id y80sm5263216wmc.34.2020.06.16.10.09.04
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 16 Jun 2020 10:09:04 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-arm@nongnu.org,
+	qemu-devel@nongnu.org
+Subject: [PATCH 14/21] target/arm: Convert Neon VQABS, VQNEG to decodetree
+Date: Tue, 16 Jun 2020 18:08:37 +0100
+Message-Id: <20200616170844.13318-15-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200616170844.13318-1-peter.maydell@linaro.org>
+References: <20200616170844.13318-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20200616171026.jhlhtewp6j6vj44m@sirius.home.kraxel.org>
-User-Agent: Mutt/1.14.0 (2020-05-02)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 02:45:54
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x444.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,49 +100,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pedro.principeza@canonical.com, ehabkost@redhat.com,
- dann.frazier@canonical.com, "Guilherme G. Piccoli" <gpiccoli@canonical.com>,
- qemu-devel@nongnu.org, christian.ehrhardt@canonical.com, lersek@redhat.com,
- fw@gpiccoli.net
+Cc: Richard Henderson <richard.henderson@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Gerd Hoffmann (kraxel@redhat.com) wrote:
->   Hi,
-> 
-> > > If we can somehow make a *trustable* physbits value available to the
-> > > guest, then yes, we can go that route.  But the guest physbits we have
-> > > today unfortunately don't cut it.
-> > 
-> > In downstream RH qemu, we run with host-physbits as default; so it's reasonably
-> > trustworthy;
-> 
-> Can the guest figure somehow whenever it is trustworthy or not?
+Convert the Neon VQABS and VQNEG insns to decodetree.
+Since these are the only ones which need cpu_env passing to
+the helper, we wrap the helper rather than creating a whole
+new do_2misc_env() function.
 
-At any one point in time there may be things that it can try and see how
-the CPU responds but I'm not 100% sure.
-I know there are some bodges in to make some MSR values 1 padded by the
-right amount when crossing sizes that generally work.
-(were those PAM registers or something - vague memories of an old
-bug)
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ target/arm/neon-dp.decode       |  3 +++
+ target/arm/translate-neon.inc.c | 35 +++++++++++++++++++++++++++++++++
+ target/arm/translate.c          | 30 ++--------------------------
+ 3 files changed, 40 insertions(+), 28 deletions(-)
 
-> > of course that doesn't help you across a migration between
-> > hosts with different sizes (e.g. an E5 Xeon to an E3).
-> 
-> Making physbits configurable for migration compatibility is fine if qemu
-> outlaws the problematic guest physbits > host physbits case and throws
-> an error in that case.
-
-I'm not sure that guest < host is entirely safe either though; although
-it seems to work.
-
-Dave
-
-> take care,
->   Gerd
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+diff --git a/target/arm/neon-dp.decode b/target/arm/neon-dp.decode
+index f947f7d09f0..f0bb34a49eb 100644
+--- a/target/arm/neon-dp.decode
++++ b/target/arm/neon-dp.decode
+@@ -465,6 +465,9 @@ Vimm_1r          1111 001 . 1 . 000 ... .... cmode:4 0 . op:1 1 .... @1reg_imm
+     VPADAL_S     1111 001 11 . 11 .. 00 .... 0 1100 . . 0 .... @2misc
+     VPADAL_U     1111 001 11 . 11 .. 00 .... 0 1101 . . 0 .... @2misc
+ 
++    VQABS        1111 001 11 . 11 .. 00 .... 0 1110 . . 0 .... @2misc
++    VQNEG        1111 001 11 . 11 .. 00 .... 0 1111 . . 0 .... @2misc
++
+     VCGT0        1111 001 11 . 11 .. 01 .... 0 0000 . . 0 .... @2misc
+     VCGE0        1111 001 11 . 11 .. 01 .... 0 0001 . . 0 .... @2misc
+     VCEQ0        1111 001 11 . 11 .. 01 .... 0 0010 . . 0 .... @2misc
+diff --git a/target/arm/translate-neon.inc.c b/target/arm/translate-neon.inc.c
+index 336c2b312eb..2b5dc86f628 100644
+--- a/target/arm/translate-neon.inc.c
++++ b/target/arm/translate-neon.inc.c
+@@ -3671,3 +3671,38 @@ static bool trans_VRSQRTE(DisasContext *s, arg_2misc *a)
+     }
+     return do_2misc(s, a, gen_helper_rsqrte_u32);
+ }
++
++#define WRAP_1OP_ENV_FN(WRAPNAME, FUNC) \
++    static void WRAPNAME(TCGv_i32 d, TCGv_i32 m)        \
++    {                                                   \
++        FUNC(d, cpu_env, m);                            \
++    }
++
++WRAP_1OP_ENV_FN(gen_VQABS_s8, gen_helper_neon_qabs_s8)
++WRAP_1OP_ENV_FN(gen_VQABS_s16, gen_helper_neon_qabs_s16)
++WRAP_1OP_ENV_FN(gen_VQABS_s32, gen_helper_neon_qabs_s32)
++WRAP_1OP_ENV_FN(gen_VQNEG_s8, gen_helper_neon_qneg_s8)
++WRAP_1OP_ENV_FN(gen_VQNEG_s16, gen_helper_neon_qneg_s16)
++WRAP_1OP_ENV_FN(gen_VQNEG_s32, gen_helper_neon_qneg_s32)
++
++static bool trans_VQABS(DisasContext *s, arg_2misc *a)
++{
++    static NeonGenOneOpFn * const fn[] = {
++        gen_VQABS_s8,
++        gen_VQABS_s16,
++        gen_VQABS_s32,
++        NULL,
++    };
++    return do_2misc(s, a, fn[a->size]);
++}
++
++static bool trans_VQNEG(DisasContext *s, arg_2misc *a)
++{
++    static NeonGenOneOpFn * const fn[] = {
++        gen_VQNEG_s8,
++        gen_VQNEG_s16,
++        gen_VQNEG_s32,
++        NULL,
++    };
++    return do_2misc(s, a, fn[a->size]);
++}
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index 17373743889..3cbd2ab0c96 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -4945,6 +4945,8 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
+                 case NEON_2RM_VNEG_F:
+                 case NEON_2RM_VRECPE:
+                 case NEON_2RM_VRSQRTE:
++                case NEON_2RM_VQABS:
++                case NEON_2RM_VQNEG:
+                     /* handled by decodetree */
+                     return 1;
+                 case NEON_2RM_VTRN:
+@@ -4966,34 +4968,6 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
+                     for (pass = 0; pass < (q ? 4 : 2); pass++) {
+                         tmp = neon_load_reg(rm, pass);
+                         switch (op) {
+-                        case NEON_2RM_VQABS:
+-                            switch (size) {
+-                            case 0:
+-                                gen_helper_neon_qabs_s8(tmp, cpu_env, tmp);
+-                                break;
+-                            case 1:
+-                                gen_helper_neon_qabs_s16(tmp, cpu_env, tmp);
+-                                break;
+-                            case 2:
+-                                gen_helper_neon_qabs_s32(tmp, cpu_env, tmp);
+-                                break;
+-                            default: abort();
+-                            }
+-                            break;
+-                        case NEON_2RM_VQNEG:
+-                            switch (size) {
+-                            case 0:
+-                                gen_helper_neon_qneg_s8(tmp, cpu_env, tmp);
+-                                break;
+-                            case 1:
+-                                gen_helper_neon_qneg_s16(tmp, cpu_env, tmp);
+-                                break;
+-                            case 2:
+-                                gen_helper_neon_qneg_s32(tmp, cpu_env, tmp);
+-                                break;
+-                            default: abort();
+-                            }
+-                            break;
+                         case NEON_2RM_VCGT0_F:
+                         {
+                             TCGv_ptr fpstatus = get_fpstatus_ptr(1);
+-- 
+2.20.1
 
 
