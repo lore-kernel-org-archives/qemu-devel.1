@@ -2,97 +2,137 @@ Return-Path: <SRS0=f7ls=75=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB280C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 12:35:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CDBBC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 12:35:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 87A3E20656
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 12:35:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3798D2071A
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 12:35:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gGgM59t3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87A3E20656
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="p5BZv2qI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3798D2071A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nutanix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48556 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50956 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlAo5-0004VC-NI
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 08:35:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56352)
+	id 1jlAon-0005YE-FR
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 08:35:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56072)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jlAmf-00035x-2e; Tue, 16 Jun 2020 08:33:45 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:39552)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jlAmd-0005D7-Bx; Tue, 16 Jun 2020 08:33:44 -0400
-Received: by mail-wr1-x443.google.com with SMTP id t18so20596657wru.6;
- Tue, 16 Jun 2020 05:33:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=47eh3HGocx2BK0pc1Z1UhwE4Gua/bYH9z9fQuBPCvh4=;
- b=gGgM59t3vr6et+ra+VyAFd+8DUJSFtyhHNrZHDpVGSv0aNDG4V1miZZ3vAhv+yzM5p
- fnEjp0hcTCP3VVLpo/5faJmXd/jYwDOrmOoSL/yZzdhpjzkoLaC+wO25/STBPgmHtvrJ
- MLgsv/p+N8A0YjG/La576P4LxD2/01Ho+acOZTK1BSep/FLF0om4oCKiLHNaeuACmU5l
- c6LC2WFw5b21f8sivOrMWH9n70Ds7EA/4GzewTrubHWGZKYgpu/reGi8w5RcOWQ+gLpO
- 88AxsriJp6htF+OET0OAhmsjR24uVQrrbz9lquz+V0Z7F0pO6mcslAauqiyYYKnEroxb
- 6OnA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=47eh3HGocx2BK0pc1Z1UhwE4Gua/bYH9z9fQuBPCvh4=;
- b=ewmkI1BTLRuUIarbeX16yyxrpyIwPAO+iVjYui4K5G8tRupteIaoiVoqgVRxgUUmn3
- PtVM+zlp1BNZjrZgaZ6+wDWzE3fu3H5oxxFG0Le18zL8lzAV/JR8Y8jKBunwHEMrHBRV
- hLoSATTOSDBBleVZvp1roayVCwz+R9PM3jYPbSaj3lYKHAXd+x1KJFSssCPpzMp71ApU
- t2DeoounujX7YhISa+cwj4XB0pGowA/v6M7+tUzO0c/TjCssD3XJKZfqqUCeuLMChZy6
- lVQ9hWYGFEhYutd+crbWNA8j3E3t6ylgBpHyMR2WCn5igxzkOdJlKKh7b3/+BUFcos1N
- 4gsA==
-X-Gm-Message-State: AOAM532zXp+g44N3P3CKPnd2mK18GWr1gTlq+7N/y84U1cr4TcEvK2+1
- 8JSOU5nSmmbUpMtJ88ginXLVakf8
-X-Google-Smtp-Source: ABdhPJyRemYpzMMzWVTZUIyH2hBSszCpbwn8rmsNLMitmTRjCx9hdCZwgZjtyb9b+DWs/z/CNvaJ0g==
-X-Received: by 2002:a5d:6b83:: with SMTP id n3mr2842496wrx.395.1592310821204; 
- Tue, 16 Jun 2020 05:33:41 -0700 (PDT)
-Received: from [192.168.1.37] (93.red-83-59-160.dynamicip.rima-tde.net.
- [83.59.160.93])
- by smtp.gmail.com with ESMTPSA id h12sm28895026wro.80.2020.06.16.05.33.40
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 16 Jun 2020 05:33:40 -0700 (PDT)
-Subject: Re: [PATCH 7/7] hw/misc/mps2-fpgaio: Implement push-buttons
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20200616063157.16389-1-f4bug@amsat.org>
- <20200616063157.16389-8-f4bug@amsat.org>
- <CAFEAcA8c3QVD=PcfMOXn720E0ExSdV+mb3qoA61AFrFVstFHHw@mail.gmail.com>
- <84c3ce87-fefd-5741-7588-7a8ca12fde4c@amsat.org>
- <CAFEAcA_GuCQRuwAgbQfHRKh732Kfzwj-zxX48tjBBnWCBjKLnQ@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <ba21ad8a-e4a3-ca61-9e31-41d9163db1b3@amsat.org>
-Date: Tue, 16 Jun 2020 14:33:39 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_GuCQRuwAgbQfHRKh732Kfzwj-zxX48tjBBnWCBjKLnQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+ (Exim 4.90_1) (envelope-from <ani.sinha@nutanix.com>)
+ id 1jlAlh-0001iO-4R
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 08:32:45 -0400
+Received: from mx0b-002c1b01.pphosted.com ([148.163.155.12]:2374)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <ani.sinha@nutanix.com>)
+ id 1jlAlf-00057V-4r
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 08:32:44 -0400
+Received: from pps.filterd (m0127843.ppops.net [127.0.0.1])
+ by mx0b-002c1b01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 05GCVnwa027831; Tue, 16 Jun 2020 05:32:24 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
+ h=from : to : cc :
+ subject : date : message-id : references : in-reply-to : content-type :
+ content-id : content-transfer-encoding : mime-version;
+ s=proofpoint20171006; bh=6BRWjfSQXKSSGMjWEhiRdyQJ8URU/bnSkWmIiiP179M=;
+ b=p5BZv2qIgTzYGEYdjiJNSwPY6NXdnggwpqeCx4paQnausXNmQ+B2re+2YLksJHWots4s
+ Gp12heD0IkbLvy6Cci2wvjTtGur9xZrXCmJzbMJl1AG1ZVo/2Te0Nim9/1TDO7NV/DIR
+ ITW9vYLvCk2NkdS3qMbJwhOl6sPXFvuHdznGa+imNFqkTzd18K0xNAXV812YDMeNkMkG
+ DfiQaAHCVnQEfxqMSmWEaqyK8006mVRoIRYXLjzjzABzeCqNh1RXCu65Qfr/7/KiDdop
+ DgHQnX1BIyjqhYWFbPWK/BwYqWUbQ2a9yXDIztr+LPK+Xt57ByPmH3i/UjWg8+oBQ/FW +g== 
+Received: from nam10-mw2-obe.outbound.protection.outlook.com
+ (mail-mw2nam10lp2107.outbound.protection.outlook.com [104.47.55.107])
+ by mx0b-002c1b01.pphosted.com with ESMTP id 31n0535pfr-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 16 Jun 2020 05:32:24 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=a/S+hFPCpX0P9N6BhYt6QhyP2pRokdCfdXe5xaErw8EUdlyvoesJyOslxAyc2IraEgMWp7XbLFbEAR+ItNzHQuw32aE9bjDoeALkIw14/DsF201bLZl8R1qkPqoJ4KOIWab3ywTgfM3kSoF34so+fyJ1BRbbfyHKDwe5+V56uE9p629VjQG3QEsc+jVFmjrIvFUKE2SC2E9KUVJCGCeePtiqDB79qngZZsfgPmoDzwOdmj3mCdKEZCzMcpQFFibaSqZEdJ97YX99nS69m7FwVKz9AZH+FNGjD3dCeX0bB1xPIJyruxK3Zl3VUGukAJjYE0XdxZmHtiRUdk5AsA77Ig==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6BRWjfSQXKSSGMjWEhiRdyQJ8URU/bnSkWmIiiP179M=;
+ b=WdYMSuohbib5nJ5Fb/dldrlsiePX87Yy0ZInQP31xjWmAH+4JllcFAvJrmvVSNS1OEX7M4MLecu7kwsDdjxMgzyb0dEh/juFfb5U1ZIPWyqSesFVFK0GTHaCuq+I4eoLiDHzH/DgxSdhFC5GzpaGKLgjg7G2R/pKAFygUhoBN0Hv07aSg+o1tTZfQWGvb5583s+efuFWMzbpPvWKH1mIhOE6xRFjhK9Rk14HYRNvdKLYr0qt/gISg/vJxe1oYQPhfFKp0TJtygFSc+qYf7ylx+uPpeqWNt/LP0gAJFSy0OI8H012ZBCl+tuLYRDfXd945IHKevqLhol5KIeHOJYS8A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
+ dkim=pass header.d=nutanix.com; arc=none
+Received: from MN2PR02MB5742.namprd02.prod.outlook.com (2603:10b6:208:10d::27)
+ by MN2PR02MB5726.namprd02.prod.outlook.com (2603:10b6:208:117::31)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3088.18; Tue, 16 Jun
+ 2020 12:32:21 +0000
+Received: from MN2PR02MB5742.namprd02.prod.outlook.com
+ ([fe80::317d:683f:b2:fa01]) by MN2PR02MB5742.namprd02.prod.outlook.com
+ ([fe80::317d:683f:b2:fa01%7]) with mapi id 15.20.3088.029; Tue, 16 Jun 2020
+ 12:32:21 +0000
+From: Ani Sinha <ani.sinha@nutanix.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Subject: Re: [PATCH V2] Rename use_acpi_pci_hotplug to more appropriate
+ use_acpi_hotplug_bridge
+Thread-Topic: [PATCH V2] Rename use_acpi_pci_hotplug to more appropriate
+ use_acpi_hotplug_bridge
+Thread-Index: AQHWPyzD7ib4h0/yQkCsyuImnO1oVKjbLNGAgAAJHoA=
+Date: Tue, 16 Jun 2020 12:32:21 +0000
+Message-ID: <3D5E800F-73FE-48C1-9222-E7FA82DDB1A9@nutanix.com>
+References: <1591796451-49987-1-git-send-email-ani.sinha@nutanix.com>
+ <20200616135927.4f2ef312@redhat.com>
+In-Reply-To: <20200616135927.4f2ef312@redhat.com>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=nutanix.com;
+x-originating-ip: [115.110.205.84]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: c67010f9-21e5-42a4-e4e8-08d811f150d1
+x-ms-traffictypediagnostic: MN2PR02MB5726:
+x-microsoft-antispam-prvs: <MN2PR02MB5726279A62C16316ABB1893AF19D0@MN2PR02MB5726.namprd02.prod.outlook.com>
+x-proofpoint-crosstenant: true
+x-ms-oob-tlc-oobclassifiers: OLM:3826;
+x-forefront-prvs: 04362AC73B
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: ebb0BH/mb9TfuVf0Do8fjGCcivo+HlOS28DC87BHLhOC/M71p+lbs7YCa8hrZxTHxDw9KEP+r+LqJeA+RuqdpXaZ5lfPkFpfTKL/mZKzWAZeJKOCUrV7HpX+rrHjFm5ExUi6oBb5VbMk2Qh+7UnVUFZWWJeYKaUdkVB8nvy7JjBsHRlC2r7qCQq9E/COE9AVCfjIEpuFXkYhkM/LbE/iaAMcBWeXPDqF1JpyzhTNNWa2qyR/4z3liReDXGZ+pIMXm5WVEYKdBogkqdIfQb66bP/4b6VF9h2FzB4b4Z66cEsrtklL5uDNIafYdXyENW0bPaXJasa9iZQyz3wTgWusJQ==
+x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:MN2PR02MB5742.namprd02.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(39860400002)(346002)(396003)(366004)(136003)(376002)(86362001)(44832011)(66946007)(4326008)(8676002)(6506007)(26005)(8936002)(6916009)(186003)(33656002)(64756008)(53546011)(66556008)(66446008)(76116006)(36756003)(2616005)(66476007)(5660300002)(54906003)(6512007)(316002)(71200400001)(2906002)(6486002)(91956017)(558084003)(478600001);
+ DIR:OUT; SFP:1102; 
+x-ms-exchange-antispam-messagedata: hP3uCRejLfB2jNslPoir2PMoXSpE44A3JYh6R2/ohi2y+9AcU0KLj9hCa1iJRX8V+h8xr3j9ccX8welX8WHPhY3xybOhoEmZWBnEcRFgPl5FP/JPHaO8B7toqsNZk5NthJXHQmTGc1m17e8Kx20KDmY+6wo9QnenMzsqWuMTsc0h1SXrl0SpA3vajsKqjZPXnx8hsTUDZH9rqdQY1SGmaKfIkzW53AAyqIIZtSu+lLEmPWetJiELZIzB0Dkysmi2iJv4vGd/Hdf9W8JHZoWNQG3soeWmDI5MmLJWq2H1K0bVENNFkxSg8/K2EV1fZzKa78o+KSmaDXmntr+q+2cNrniwRbBabt7G2CaVjOqVbUggkV7V/DJMoeFXQPKiCWReu7GhR3lSUOO9maSQWX2TQWsc8la5vcyplojxkLTB+yjF/pnc/ZhwArlY8Uwdw8Js/eN69oTZEEo8Bshs6NexUpu2+jQvH2ery41+U/PP+Exv7vMuvP+MC5IyibFEm//P
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="iso-8859-1"
+Content-ID: <54D834122483E94193394C10AD05E0EA@namprd02.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: nutanix.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c67010f9-21e5-42a4-e4e8-08d811f150d1
+X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Jun 2020 12:32:21.2489 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: bb047546-786f-4de1-bd75-24e5b6f79043
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: PSGvOhpOqPo0Km8h0Ca6+4Kujr7Tqol0y58jD8VRnfXC3GSCqetTVhPF2fC70ZycrYh6bOHhSRUc90ClvzeXVQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR02MB5726
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
+ definitions=2020-06-16_04:2020-06-16,
+ 2020-06-16 signatures=0
+X-Proofpoint-Spam-Reason: safe
+Received-SPF: pass client-ip=148.163.155.12;
+ envelope-from=ani.sinha@nutanix.com; helo=mx0b-002c1b01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 08:32:40
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-Spam_score_int: -37
+X-Spam_score: -3.8
+X-Spam_bar: ---
+X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,43 +145,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Esteban Bosse <estebanbosse@gmail.com>,
- Joaquin de Andres <me@xcancerberox.com.ar>, qemu-arm <qemu-arm@nongnu.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Ani Sinha <ani@anisinha.ca>,
+ =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/16/20 2:29 PM, Peter Maydell wrote:
-> On Tue, 16 Jun 2020 at 11:40, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
->> On 6/16/20 12:27 PM, Peter Maydell wrote:
->>> This change seems kind of pointless unless these GPIO lines are
->>> actually wired up to something.
->>
->> Yes, I should have kept it out of this series, or documented
->> better the goal in the cover.
->>
->> I'm setting the roots to motivate a team of developers to
->> work on a visualization of the MPS2 board. The push-button is
->> supported by Zephyr, so the the idea is the visualizer generates
->> QMP GPIO event to be processed such in pca9552_set_led(), and
->> interact with the guest firmware.
-> 
-> I think that having a framework so we can better model this kind
-> of push button / LED / similar thing is definitely good. I just
-> think we need to review it at the framework level first -- it
-> might turn out that actually the right way to wire up the push
-> button to the UI framework isn't with a GPIO wire at all.
-> Similarly with the other patchset that sends QMP events for
-> LEDs -- that also seems like it's half of a design and a bit
-> awkward to review without the context for what it connects to.
 
-On my side feedback are helpful, but I understand.
-I'll see if there are still any motivated soul left,
-else wait for next GSoC.
 
-> 
-> thanks
-> -- PMM
-> 
+> On Jun 16, 2020, at 5:29 PM, Igor Mammedov <imammedo@redhat.com> wrote:
+>=20
+>> Change-Id: I2a6ab47e80fa2bc9504ce88e063d710efaceb842
+> what is this id, prehaps drop it?
+
+Sent V3 with this dropped.
+
+Ani
+
 
