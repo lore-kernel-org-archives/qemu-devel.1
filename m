@@ -2,84 +2,86 @@ Return-Path: <SRS0=f7ls=75=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 449CFC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 10:57:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEA1BC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 11:00:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0578B2078E
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 10:57:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 74EC920786
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 11:00:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XFFibQ4J"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0578B2078E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fReDwNL5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74EC920786
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51894 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54344 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jl9H2-0004PU-5L
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 06:57:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34284)
+	id 1jl9Jw-0005UV-No
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 07:00:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34682)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jl9GQ-0003z7-Oc
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 06:56:22 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:52739
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1jl9JG-00055e-Sq
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 06:59:19 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:25749
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jl9GN-0005fj-UD
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 06:56:22 -0400
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1jl9JF-00066S-5H
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 06:59:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592304978;
+ s=mimecast20190719; t=1592305156;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=WJBp+ID5LXYV7cWyimQ0RHI64ObYqnX+y+V18BCeHx0=;
- b=XFFibQ4JaKQHk/C5ILvC33t7ciOUuqsYY43jyJ9Zy99hJw1jdHoBT4L98LU3V8n8WFWU4N
- Ei9sc5hAT6lXN7Bn4mulieCU8EHh78/Y1T5uzhq/YKXYXiWYj1UCnSF1un7FYd5nfYxHQa
- CkFBhkV0fv/WPXtjJ/fyFe4ogjMwai8=
+ bh=n3FowvmmaIrkAYHcCJuy/Cv1ynM5RO+ll+9kxwv1os4=;
+ b=fReDwNL5RroLY31HRNwpXP4BVO0B2cqh+8kSZR7SAfB67l5HLFVzehlQMvQRnj/uHOyaON
+ U2mHjNxsXLmbgR9300/y278bjLYIfB6qfhUmgREEC/ux6U/yTenHhdcKEBfPoBNoU1q9ej
+ MchIC7FBlexHksUnmcqUT0N6Qd2KWs4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-324-4XleZ_fRP8uoFSUuw7UURA-1; Tue, 16 Jun 2020 06:56:14 -0400
-X-MC-Unique: 4XleZ_fRP8uoFSUuw7UURA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-170-RsfhFrmtM3iT_mVw0vtZpA-1; Tue, 16 Jun 2020 06:59:12 -0400
+X-MC-Unique: RsfhFrmtM3iT_mVw0vtZpA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 50B4710AB64A;
- Tue, 16 Jun 2020 10:56:13 +0000 (UTC)
-Received: from work-vm (ovpn-112-42.ams2.redhat.com [10.36.112.42])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 73C767CAC3;
- Tue, 16 Jun 2020 10:56:05 +0000 (UTC)
-Date: Tue, 16 Jun 2020 11:56:03 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: David Hildenbrand <david@redhat.com>
-Subject: Re: [PATCH v4 05/21] virtio-balloon: Rip out qemu_balloon_inhibit()
-Message-ID: <20200616105603.GB2788@work-vm>
-References: <20200610115419.51688-1-david@redhat.com>
- <20200610115419.51688-6-david@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 95427106B3B8;
+ Tue, 16 Jun 2020 10:59:11 +0000 (UTC)
+Received: from localhost (unknown [10.40.208.22])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 86D3219C71;
+ Tue, 16 Jun 2020 10:59:06 +0000 (UTC)
+Date: Tue, 16 Jun 2020 12:59:01 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Babu Moger <babu.moger@amd.com>
+Subject: Re: [PATCH 1/2] hw/386: Fix uninitialized memory with -device and
+ CPU hotplug
+Message-ID: <20200616125901.772229a6@redhat.com>
+In-Reply-To: <159164753015.20543.7987300339811704895.stgit@naples-babu.amd.com>
+References: <159164739269.20543.3074052993891532749.stgit@naples-babu.amd.com>
+ <159164753015.20543.7987300339811704895.stgit@naples-babu.amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200610115419.51688-6-david@redhat.com>
-User-Agent: Mutt/1.14.0 (2020-05-02)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 02:01:17
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=imammedo@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 02:45:54
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -93,195 +95,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
- "Michael S . Tsirkin" <mst@redhat.com>, Juan Quintela <quintela@redhat.com>,
- qemu-devel@nongnu.org, qemu-s390x@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: ehabkost@redhat.com, mst@redhat.com, qemu-devel@nongnu.org,
+ pbonzini@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* David Hildenbrand (david@redhat.com) wrote:
-> The only remaining special case is postcopy. It cannot handle
-> concurrent discards yet, which would result in requesting already sent
-> pages from the source. Special-case it in virtio-balloon instead.
-> 
-> Introduce migration_in_incoming_postcopy(), to find out if incoming
-> postcopy is active.
-> 
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Juan Quintela <quintela@redhat.com>
-> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> Signed-off-by: David Hildenbrand <david@redhat.com>
+On Mon, 08 Jun 2020 15:18:50 -0500
+Babu Moger <babu.moger@amd.com> wrote:
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
+> Noticed the following command failure while testing CPU hotplug.
+> 
+> $ qemu-system-x86_64 -machine q35,accel=kvm -smp 1,maxcpus=2,
+>   cores=1, threads=1,sockets=2 -cpu EPYC -device EPYC-x86_64-
+>   cpu,core-id=0,socket-id=1,thread-id=0
+> 
+>   qemu-system-x86_64: -device EPYC-x86_64-cpu,core-id=0,socket-id=1,
+>   thread-id=0: Invalid CPU [socket: 21855, die: 0, core: 0, thread: 0]
+>   with APIC ID 21855, valid index range 0:1
+> 
+> This happens because APIC ID is calculated using uninitialized memory.
+> This is happening after the addition of new field node_id in X86CPUTopoIDs
+> structure. The node_id field is uninitialized while calling
+> apicid_from_topo_ids. The problem is discussed in the thread below.
+> https://lore.kernel.org/qemu-devel/20200602171838.GG577771@habkost.net/
+> 
+> Fix the problem by initializing the node_id properly.
+> 
+> Signed-off-by: Babu Moger <babu.moger@amd.com>
 > ---
->  balloon.c                  | 18 ------------------
->  hw/virtio/virtio-balloon.c |  8 +++++++-
->  include/migration/misc.h   |  2 ++
->  include/sysemu/balloon.h   |  2 --
->  migration/migration.c      |  7 +++++++
->  migration/postcopy-ram.c   | 23 -----------------------
->  6 files changed, 16 insertions(+), 44 deletions(-)
+>  hw/i386/pc.c               |    2 ++
+>  include/hw/i386/topology.h |   11 +++++++++++
+>  2 files changed, 13 insertions(+)
 > 
-> diff --git a/balloon.c b/balloon.c
-> index 5fff79523a..354408c6ea 100644
-> --- a/balloon.c
-> +++ b/balloon.c
-> @@ -36,24 +36,6 @@
->  static QEMUBalloonEvent *balloon_event_fn;
->  static QEMUBalloonStatus *balloon_stat_fn;
->  static void *balloon_opaque;
-> -static int balloon_inhibit_count;
-> -
-> -bool qemu_balloon_is_inhibited(void)
-> -{
-> -    return atomic_read(&balloon_inhibit_count) > 0 ||
-> -           ram_block_discard_is_disabled();
-> -}
-> -
-> -void qemu_balloon_inhibit(bool state)
-> -{
-> -    if (state) {
-> -        atomic_inc(&balloon_inhibit_count);
-> -    } else {
-> -        atomic_dec(&balloon_inhibit_count);
-> -    }
-> -
-> -    assert(atomic_read(&balloon_inhibit_count) >= 0);
-> -}
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index 2128f3d6fe..974cc30891 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -1585,6 +1585,8 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
+>          topo_ids.die_id = cpu->die_id;
+>          topo_ids.core_id = cpu->core_id;
+>          topo_ids.smt_id = cpu->thread_id;
+> +        topo_ids.node_id = cpu_x86_use_epyc_apic_id_encoding(ms->cpu_type) ?
+> +                           x86_node_id_for_epyc(&topo_info, &topo_ids) : 0;
+
+I'd rather not calculate some default value here,
+this is the branch where we check user provided topology info and error out asking
+to provide missing bits.
+
+I also wonder if we should force user to specify numa nodes on CLI if EPYC cpu is used.
+(i.e. I'm assuming that EPYC always requires numa)
+
+>          cpu->apic_id = x86ms->apicid_from_topo_ids(&topo_info, &topo_ids);
+>      }
 >  
->  static bool have_balloon(Error **errp)
->  {
-> diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-> index 065cd450f1..5ce2f956df 100644
-> --- a/hw/virtio/virtio-balloon.c
-> +++ b/hw/virtio/virtio-balloon.c
-> @@ -63,6 +63,12 @@ static bool virtio_balloon_pbp_matches(PartiallyBalloonedPage *pbp,
->      return pbp->base_gpa == base_gpa;
+> diff --git a/include/hw/i386/topology.h b/include/hw/i386/topology.h
+> index 07239f95f4..ee4deb84c4 100644
+> --- a/include/hw/i386/topology.h
+> +++ b/include/hw/i386/topology.h
+> @@ -140,6 +140,17 @@ static inline unsigned apicid_pkg_offset_epyc(X86CPUTopoInfo *topo_info)
+>             apicid_node_width_epyc(topo_info);
 >  }
 >  
-> +static bool virtio_balloon_inhibited(void)
+> +static inline unsigned x86_node_id_for_epyc(X86CPUTopoInfo *topo_info,
+> +                                            const X86CPUTopoIDs *topo_ids)
 > +{
-> +    /* Postcopy cannot deal with concurrent discards, so it's special. */
-> +    return ram_block_discard_is_disabled() || migration_in_incoming_postcopy();
+> +    unsigned nr_nodes = MAX(topo_info->nodes_per_pkg, 1);
+> +    unsigned cores_per_node = DIV_ROUND_UP((topo_info->dies_per_pkg *
+> +                                            topo_info->cores_per_die *
+> +                                            topo_info->threads_per_core),
+> +                                            nr_nodes);
+> +
+> +    return (topo_ids->core_id / cores_per_node) % nr_nodes;
+what if nr_nodes == 0?
+
 > +}
-> +
->  static void balloon_inflate_page(VirtIOBalloon *balloon,
->                                   MemoryRegion *mr, hwaddr mr_offset,
->                                   PartiallyBalloonedPage *pbp)
-> @@ -360,7 +366,7 @@ static void virtio_balloon_handle_output(VirtIODevice *vdev, VirtQueue *vq)
->  
->              trace_virtio_balloon_handle_output(memory_region_name(section.mr),
->                                                 pa);
-> -            if (!qemu_balloon_is_inhibited()) {
-> +            if (!virtio_balloon_inhibited()) {
->                  if (vq == s->ivq) {
->                      balloon_inflate_page(s, section.mr,
->                                           section.offset_within_region, &pbp);
-> diff --git a/include/migration/misc.h b/include/migration/misc.h
-> index d2762257aa..34e7d75713 100644
-> --- a/include/migration/misc.h
-> +++ b/include/migration/misc.h
-> @@ -69,6 +69,8 @@ bool migration_has_failed(MigrationState *);
->  /* ...and after the device transmission */
->  bool migration_in_postcopy_after_devices(MigrationState *);
->  void migration_global_dump(Monitor *mon);
-> +/* True if incomming migration entered POSTCOPY_INCOMING_DISCARD */
-> +bool migration_in_incoming_postcopy(void);
->  
->  /* migration/block-dirty-bitmap.c */
->  void dirty_bitmap_mig_init(void);
-> diff --git a/include/sysemu/balloon.h b/include/sysemu/balloon.h
-> index aea0c44985..20a2defe3a 100644
-> --- a/include/sysemu/balloon.h
-> +++ b/include/sysemu/balloon.h
-> @@ -23,7 +23,5 @@ typedef void (QEMUBalloonStatus)(void *opaque, BalloonInfo *info);
->  int qemu_add_balloon_handler(QEMUBalloonEvent *event_func,
->                               QEMUBalloonStatus *stat_func, void *opaque);
->  void qemu_remove_balloon_handler(void *opaque);
-> -bool qemu_balloon_is_inhibited(void);
-> -void qemu_balloon_inhibit(bool state);
->  
->  #endif
-> diff --git a/migration/migration.c b/migration/migration.c
-> index b63ad91d34..14856cc930 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -1772,6 +1772,13 @@ bool migration_in_postcopy_after_devices(MigrationState *s)
->      return migration_in_postcopy() && s->postcopy_after_devices;
->  }
->  
-> +bool migration_in_incoming_postcopy(void)
-> +{
-> +    PostcopyState ps = postcopy_state_get();
-> +
-> +    return ps >= POSTCOPY_INCOMING_DISCARD && ps < POSTCOPY_INCOMING_END;
-> +}
-> +
->  bool migration_is_idle(void)
->  {
->      MigrationState *s = current_migration;
-> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-> index a36402722b..b41a9fe2fd 100644
-> --- a/migration/postcopy-ram.c
-> +++ b/migration/postcopy-ram.c
-> @@ -27,7 +27,6 @@
->  #include "qemu/notify.h"
->  #include "qemu/rcu.h"
->  #include "sysemu/sysemu.h"
-> -#include "sysemu/balloon.h"
->  #include "qemu/error-report.h"
->  #include "trace.h"
->  #include "hw/boards.h"
-> @@ -520,20 +519,6 @@ int postcopy_ram_incoming_init(MigrationIncomingState *mis)
->      return 0;
->  }
->  
-> -/*
-> - * Manage a single vote to the QEMU balloon inhibitor for all postcopy usage,
-> - * last caller wins.
-> - */
-> -static void postcopy_balloon_inhibit(bool state)
-> -{
-> -    static bool cur_state = false;
-> -
-> -    if (state != cur_state) {
-> -        qemu_balloon_inhibit(state);
-> -        cur_state = state;
-> -    }
-> -}
-> -
 >  /*
->   * At the end of a migration where postcopy_ram_incoming_init was called.
->   */
-> @@ -565,8 +550,6 @@ int postcopy_ram_incoming_cleanup(MigrationIncomingState *mis)
->          mis->have_fault_thread = false;
->      }
->  
-> -    postcopy_balloon_inhibit(false);
-> -
->      if (enable_mlock) {
->          if (os_mlock() < 0) {
->              error_report("mlock: %s", strerror(errno));
-> @@ -1160,12 +1143,6 @@ int postcopy_ram_incoming_setup(MigrationIncomingState *mis)
->      }
->      memset(mis->postcopy_tmp_zero_page, '\0', mis->largest_page_size);
->  
-> -    /*
-> -     * Ballooning can mark pages as absent while we're postcopying
-> -     * that would cause false userfaults.
-> -     */
-> -    postcopy_balloon_inhibit(true);
-> -
->      trace_postcopy_ram_enable_notify();
->  
->      return 0;
-> -- 
-> 2.26.2
+>   * Make APIC ID for the CPU based on Pkg_ID, Core_ID, SMT_ID
+>   *
 > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
 
 
