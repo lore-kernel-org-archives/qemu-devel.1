@@ -6,64 +6,64 @@ X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9C82C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 16:56:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E73EC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 16:56:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8B4F5208E4
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 16:56:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B4F5208E4
+	by mail.kernel.org (Postfix) with ESMTPS id 2BB6F20C09
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 16:56:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BB6F20C09
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38586 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38748 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlEst-0008Hy-S0
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 12:56:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40924)
+	id 1jlEsw-0008M5-G8
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 12:56:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40928)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jlEsA-0006zl-G0
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 12:55:42 -0400
-Received: from indium.canonical.com ([91.189.90.7]:40912)
+ id 1jlEsB-00072B-H8
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 12:55:43 -0400
+Received: from indium.canonical.com ([91.189.90.7]:40922)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jlEs8-0004PU-PJ
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 12:55:42 -0400
+ id 1jlEs8-0004PW-K6
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 12:55:43 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jlEs6-00023s-ME
- for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 16:55:38 +0000
+ id 1jlEs7-00023n-9H
+ for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 16:55:39 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 9900A2E8109
- for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 16:55:38 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 452832E80BA
+ for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 16:55:39 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 16 Jun 2020 16:48:05 -0000
-From: =?utf-8?q?Alex_Benn=C3=A9e?= <1883593@bugs.launchpad.net>
+Date: Tue, 16 Jun 2020 16:49:50 -0000
+From: =?utf-8?q?Alex_Benn=C3=A9e?= <1883560@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: tcg
+X-Launchpad-Bug-Tags: build linux-user mips
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ajbennee randy3
-X-Launchpad-Bug-Reporter: Randy Rhoads (randy3)
+X-Launchpad-Bug-Commenters: ajbennee laurent-vivier
+X-Launchpad-Bug-Reporter: =?utf-8?q?Alex_Benn=C3=A9e_=28ajbennee=29?=
 X-Launchpad-Bug-Modifier: =?utf-8?q?Alex_Benn=C3=A9e_=28ajbennee=29?=
-References: <159225010396.5666.14857392307926027696.malonedeb@chaenomeles.canonical.com>
-Message-Id: <159232608581.10023.7810855300044765529.malone@gac.canonical.com>
-Subject: [Bug 1883593] Re: Windows XP takes much longer to boot in TCG mode
- since 5.0
+References: <159223432851.7281.13140123017230519248.malonedeb@gac.canonical.com>
+Message-Id: <159232619032.12175.2235946322273010012.malone@gac.canonical.com>
+Subject: [Bug 1883560] Re: mips linux-user builds occasionly crash randomly
+ only to be fixed by a full clean re-build
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="b190cebbf563f89e480a8b57f641753c8196bda0";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 3da98f0679749e321f9299bad9997f17498b135e
+X-Launchpad-Hash: 3397951e141fd2906cc48ec998249d99004683cc
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 11:30:43
@@ -85,42 +85,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1883593 <1883593@bugs.launchpad.net>
+Reply-To: Bug 1883560 <1883560@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Are you able to bisect between 4.2 and 5.0 and identify what introduces
-the slow down?
+OK the syscall_nr failure is a red hearing - that was affected by a
+stray generated file in my source tree (maybe I accidentally ran make in
+the top directory?).
 
-** Tags added: tcg
+However I've just run into the mips64le-linux-user crash again which
+didn't go away until I deleted all mips* directories and rebuilt.
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1883593
+https://bugs.launchpad.net/bugs/1883560
 
 Title:
-  Windows XP takes much longer to boot in TCG mode since 5.0
+  mips linux-user builds occasionly crash randomly only to be fixed by a
+  full clean re-build
 
 Status in QEMU:
   New
 
 Bug description:
-  Since upgrading from 4.2 to 5.0, a Windows XP VM takes much longer to
-  boot.
+  From time to time I find check-tcg crashes with a one of the MIPS
+  binaries. The last time it crashed was running the test:
 
-  It hangs about three minutes on "welcome" screen with the blue
-  background, while previously the total boot time was less than a
-  minute.
+    ./mips64el-linux-user/qemu-mips64el ./tests/tcg/mips64el-linux-
+  user/threadcount
 
-  The issue only happens in TCG mode (not with KVM) and also happens
-  with the current master which includes the uring patches (7d3660e7).
+  Inevitably after some time noodling around wondering what could be
+  causing this weird behaviour I wonder if it is a build issue. I wipe
+  all the mips* build directories, re-run configure and re-build and
+  voila problem goes away.
 
-  I can reproduce this issue with a clean XP install with no flags other
-  than `-m 2G`. After booting, the performance seems to be normal.
+  It seems there must be some sort of build artefact which isn't being
+  properly re-generated on a build update which causes weird problems.
+  Additional data point if I:
+
+    rm -rf mips64el-linux-user
+    ../../configure
+    make
+
+  then I see failures in mip32 builds - eg:
+
+      GEN     mipsn32el-linux-user/config-target.h
+    In file included from /home/alex/lsrc/qemu.git/linux-user/syscall_defs.=
+h:10,
+                     from /home/alex/lsrc/qemu.git/linux-user/qemu.h:16,
+                     from /home/alex/lsrc/qemu.git/linux-user/linuxload.c:5:
+    /home/alex/lsrc/qemu.git/linux-user/mips64/syscall_nr.h:1: error: unter=
+minated #ifndef
+     #ifndef LINUX_USER_MIPS64_SYSCALL_NR_H
+
+    make[1]: *** [/home/alex/lsrc/qemu.git/rules.mak:69: linux-user/linuxlo=
+ad.o] Error 1
+    make[1]: *** Waiting for unfinished jobs....
+
+  which implies there is a cross dependency between different targets
+  somewhere. If I executed:
+
+    rm -rf mips*
+
+  before re-configuring and re-building then everything works again.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1883593/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1883560/+subscriptions
 
