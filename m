@@ -2,79 +2,78 @@ Return-Path: <SRS0=f7ls=75=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F39AC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:49:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EE77C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:49:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5EE73208B3
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:49:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1F9DA208B3
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:49:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BMyCatf7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5EE73208B3
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C8k5Sm2F"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F9DA208B3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37140 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37494 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlCto-0000ZL-GU
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 10:49:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57900)
+	id 1jlCts-0000iM-CQ
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 10:49:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58012)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1jlCQK-00036B-JM; Tue, 16 Jun 2020 10:18:48 -0400
-Received: from mail-oi1-x22f.google.com ([2607:f8b0:4864:20::22f]:44003)
+ id 1jlCQW-0003RE-84; Tue, 16 Jun 2020 10:19:00 -0400
+Received: from mail-oo1-xc41.google.com ([2607:f8b0:4864:20::c41]:43355)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1jlCQI-0006u6-TZ; Tue, 16 Jun 2020 10:18:48 -0400
-Received: by mail-oi1-x22f.google.com with SMTP id j189so19335373oih.10;
- Tue, 16 Jun 2020 07:18:42 -0700 (PDT)
+ id 1jlCQU-0006x6-MV; Tue, 16 Jun 2020 10:18:59 -0400
+Received: by mail-oo1-xc41.google.com with SMTP id i4so1365716ooj.10;
+ Tue, 16 Jun 2020 07:18:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=uvyAq22LZpRLFDPeqbXH7QRTPLBpYz1NSiWqpfZpfYg=;
- b=BMyCatf75+tnK8vU/KBC59W0QgZqlGVForqrSq1Q6xc8DuCTyPFcAUWu9Jm6yonbqQ
- TExSublKlZ8iXV5mDvtTdH6UYnMCmTEVYjv1ku6Mlhpm1bjJv5h9ifEZ88CQNjI2Hv3y
- otgKAmbykqsxx1livqpeNRiVnM0UyxkHHwC8yXrxO9d34A9GaOc/moaWO6oSCSscLbR7
- 5KhH7aEnzBH3yxR2so4oLc9rjBT+Mj3nqdMUHHWs8aMM1dE9scwCnNnPmv7kGJPiV+mp
- VvgaDZPwd3rKbP72Wxl+jb99tuki+Qvsw+E1xLKlzvKG2a3EYpLpAzvBddTFf8MzobqZ
- K7Jg==
+ bh=fqsQVkHuoYwfKpLZIzOnVAvejP3nC+yxd70HJ1sYMdQ=;
+ b=C8k5Sm2F2RjzW0oEnrcXThPDMiKat+FMkkY5HdHMMjNk03H33cjQCmbF2HzU9tRuag
+ tncmRdeXpAII0z9QJ8mcIPTk42ATekVowYIkFjTHjzvcZheGeDjGA42TuI6Ptt76vTe/
+ Ezegil8e/nlvfiDhZNs/sk7k9QdZ1Pn8mAdR8TNHL6Up7XoVeAcqGZEYM5W2/x80vFWR
+ 0nczRi0E87U3hXfH4JARCnIzTanaEGXe37HDu36xDWHqppzHay0X57oNRehWl8Lm3HJD
+ NIr+kPWeUgId4fOuWGFN5DCgIk2dqVBK6xoSXL52Wve/xhcf9TdBqNDLOx79sd+aoCc3
+ uKJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references;
- bh=uvyAq22LZpRLFDPeqbXH7QRTPLBpYz1NSiWqpfZpfYg=;
- b=iRlEh5qOj1rPmagd4q1hUtqAkLKhGDP57zNGP9e7IpUzIt+qNPrhG5WRlRamseuFrE
- ku1yMfOQaidLjeluAciRs9j3bH3mplrpR4T7nSjvHaXg4Xd81ma/7Rby6WlZ1h4ecNS5
- Yh+vxf6666+B9Z04fzhYOF/hyCwtH5eh+oHDvd4NnV0X/gy01sjMhwqoGDUrIXbSOT+E
- bmzEIcHQbdUbCuZyj2ipgv2crMpz/UWjGcFH1/sfs887FXn4qHcDWy88EKF+9MAux0UQ
- AGVJumJKM1/3qPwv9Q79XjmV5tGllscqwNfq2hZcSrD6a3xU45HmKIeCnggy28ifI1pZ
- 7fBA==
-X-Gm-Message-State: AOAM533GjCLm70AoGNaedLnVxiFZ3IO1FkrbO4YzxCxliOz9NlSVGXKI
- OMp0CijOmhHgCf8PzINIK6alLdj/
-X-Google-Smtp-Source: ABdhPJzCkYT8mgvg/PpJRcol5Oad5nfYzaKSveTXknJISbylDgZ0tl5j5EEhRrxv4pLdWL+5MFuzfg==
-X-Received: by 2002:a05:6808:4b:: with SMTP id
- v11mr3387714oic.31.1592317121076; 
- Tue, 16 Jun 2020 07:18:41 -0700 (PDT)
+ bh=fqsQVkHuoYwfKpLZIzOnVAvejP3nC+yxd70HJ1sYMdQ=;
+ b=NZ245u0VoDg5OrKVBzzANrZJmQbJT+XQkwj45aUss4JgRCl6TQ3yWSOL0Sw4EgQndR
+ m4CRy4qn1h4Cnowg1evunQ5nyu1/2jdd56K2J48k3Sb3DNzj83s1DgM6NEf3bjsTgL06
+ 9DEO2VdtLGUYMt0xVr5y6S3ff/11sbJHzFMkhr84frMtcKcfgcUIJGfGYkNMX2uXIfHv
+ 2WL37cfjGApUWxDIczToQBo0RJI732Y1D9R3Ca81YjUhAew02X/755BJeFkskBfapKAy
+ GdMYQ3nZOEZ+E1dPZBZKcj9zdfEkEO5Z4cc7z//1YFV0UYZ/ukGAK3SWnCK6Pmb2UcFw
+ 5D4g==
+X-Gm-Message-State: AOAM531DjDwVcPrt9SuGTy5CQqucp7I0zpDDJwN2kl+BAIlg9H/m5s7E
+ p3/Aasssha4XcKeSKdX3K//5yLZZ
+X-Google-Smtp-Source: ABdhPJyp/e5RUMVC5IQRQwBbjMsJt0uuOQF4BSGynHM13ygCx27nFmrNaIR91jYEOBtNglQ46DAqQQ==
+X-Received: by 2002:a4a:d6c6:: with SMTP id j6mr2566220oot.26.1592317136824;
+ Tue, 16 Jun 2020 07:18:56 -0700 (PDT)
 Received: from localhost (76-251-165-188.lightspeed.austtx.sbcglobal.net.
  [76.251.165.188])
- by smtp.gmail.com with ESMTPSA id m94sm4078517otm.19.2020.06.16.07.18.39
+ by smtp.gmail.com with ESMTPSA id m94sm4078651otm.19.2020.06.16.07.18.55
  (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
- Tue, 16 Jun 2020 07:18:39 -0700 (PDT)
+ Tue, 16 Jun 2020 07:18:55 -0700 (PDT)
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 49/78] iotests/026: Test EIO on allocation in a data-file
-Date: Tue, 16 Jun 2020 09:15:18 -0500
-Message-Id: <20200616141547.24664-50-mdroth@linux.vnet.ibm.com>
+Subject: [PATCH 55/78] target/ppc: Fix rlwinm on ppc64
+Date: Tue, 16 Jun 2020 09:15:24 -0500
+Message-Id: <20200616141547.24664-56-mdroth@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200616141547.24664-1-mdroth@linux.vnet.ibm.com>
 References: <20200616141547.24664-1-mdroth@linux.vnet.ibm.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::22f;
- envelope-from=flukshun@gmail.com; helo=mail-oi1-x22f.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::c41;
+ envelope-from=flukshun@gmail.com; helo=mail-oo1-xc41.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -96,108 +95,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-stable@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Cc: Vitaly Chikunov <vt@altlinux.org>, qemu-stable@nongnu.org,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Max Reitz <mreitz@redhat.com>
+From: Vitaly Chikunov <vt@altlinux.org>
 
-Test what happens when writing data to an external data file, where the
-write requires an L2 entry to be allocated, but the data write fails.
+rlwinm cannot just AND with Mask if shift value is zero on ppc64 when
+Mask Begin is greater than Mask End and high bits are set to 1.
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Message-Id: <20200225143130.111267-4-mreitz@redhat.com>
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-(cherry picked from commit 81311255f217859413c94f2cd9cebf2684bbda94)
+Note that PowerISA 3.0B says that for `rlwinm' ROTL32 is used, and
+ROTL32 is defined (in 3.3.14) so that rotated value should have two
+copies of lower word of the source value.
+
+This seems to be another incarnation of the fix from 820724d170
+("target-ppc: Fix rlwimi, rlwinm, rlwnm again"), except I leave
+optimization when Mask value is less than 32 bits.
+
+Fixes: 7b4d326f47 ("target-ppc: Use the new deposit and extract ops")
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Vitaly Chikunov <vt@altlinux.org>
+Message-Id: <20200309204557.14836-1-vt@altlinux.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+(cherry picked from commit 94f040aaecf4e41cc68991b80204b1b6886bbdd0)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- tests/qemu-iotests/026             | 32 ++++++++++++++++++++++++++++++
- tests/qemu-iotests/026.out         |  6 ++++++
- tests/qemu-iotests/026.out.nocache |  6 ++++++
- 3 files changed, 44 insertions(+)
+ target/ppc/translate.c | 20 +++++++++++---------
+ 1 file changed, 11 insertions(+), 9 deletions(-)
 
-diff --git a/tests/qemu-iotests/026 b/tests/qemu-iotests/026
-index d89729697f..c1c96a41d9 100755
---- a/tests/qemu-iotests/026
-+++ b/tests/qemu-iotests/026
-@@ -30,6 +30,7 @@ _cleanup()
- {
- 	_cleanup_test_img
-     rm "$TEST_DIR/blkdebug.conf"
-+    rm -f "$TEST_IMG.data_file"
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
-@@ -236,6 +237,37 @@ $QEMU_IO -c "write 0 $CLUSTER_SIZE" "$BLKDBG_TEST_IMG" | _filter_qemu_io
- 
- _check_test_img
- 
-+echo
-+echo === Avoid freeing external data clusters on failure ===
-+echo
-+
-+# Similar test as the last one, except we test what happens when there
-+# is an error when writing to an external data file instead of when
-+# writing to a preallocated zero cluster
-+_make_test_img -o "data_file=$TEST_IMG.data_file" $CLUSTER_SIZE
-+
-+# Put blkdebug above the data-file, and a raw node on top of that so
-+# that blkdebug will see a write_aio event and emit an error
-+$QEMU_IO -c "write 0 $CLUSTER_SIZE" \
-+    "json:{
-+         'driver': 'qcow2',
-+         'file': { 'driver': 'file', 'filename': '$TEST_IMG' },
-+         'data-file': {
-+             'driver': 'raw',
-+             'file': {
-+                 'driver': 'blkdebug',
-+                 'config': '$TEST_DIR/blkdebug.conf',
-+                 'image': {
-+                     'driver': 'file',
-+                     'filename': '$TEST_IMG.data_file'
-+                 }
-+             }
-+         }
-+     }" \
-+    | _filter_qemu_io
-+
-+_check_test_img
-+
- # success, all done
- echo "*** done"
- rm -f $seq.full
-diff --git a/tests/qemu-iotests/026.out b/tests/qemu-iotests/026.out
-index 83989996ff..c1b3b58482 100644
---- a/tests/qemu-iotests/026.out
-+++ b/tests/qemu-iotests/026.out
-@@ -653,4 +653,10 @@ wrote 1024/1024 bytes at offset 0
- 1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- write failed: Input/output error
- No errors were found on the image.
-+
-+=== Avoid freeing external data clusters on failure ===
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1024 data_file=TEST_DIR/t.IMGFMT.data_file
-+write failed: Input/output error
-+No errors were found on the image.
- *** done
-diff --git a/tests/qemu-iotests/026.out.nocache b/tests/qemu-iotests/026.out.nocache
-index 9359d26d7e..8d5001648a 100644
---- a/tests/qemu-iotests/026.out.nocache
-+++ b/tests/qemu-iotests/026.out.nocache
-@@ -661,4 +661,10 @@ wrote 1024/1024 bytes at offset 0
- 1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- write failed: Input/output error
- No errors were found on the image.
-+
-+=== Avoid freeing external data clusters on failure ===
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1024 data_file=TEST_DIR/t.IMGFMT.data_file
-+write failed: Input/output error
-+No errors were found on the image.
- *** done
+diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+index f5fe5d0611..f87f6eeaf7 100644
+--- a/target/ppc/translate.c
++++ b/target/ppc/translate.c
+@@ -1938,15 +1938,17 @@ static void gen_rlwinm(DisasContext *ctx)
+         me += 32;
+ #endif
+         mask = MASK(mb, me);
+-        if (sh == 0) {
+-            tcg_gen_andi_tl(t_ra, t_rs, mask);
+-        } else if (mask <= 0xffffffffu) {
+-            TCGv_i32 t0 = tcg_temp_new_i32();
+-            tcg_gen_trunc_tl_i32(t0, t_rs);
+-            tcg_gen_rotli_i32(t0, t0, sh);
+-            tcg_gen_andi_i32(t0, t0, mask);
+-            tcg_gen_extu_i32_tl(t_ra, t0);
+-            tcg_temp_free_i32(t0);
++        if (mask <= 0xffffffffu) {
++            if (sh == 0) {
++                tcg_gen_andi_tl(t_ra, t_rs, mask);
++            } else {
++                TCGv_i32 t0 = tcg_temp_new_i32();
++                tcg_gen_trunc_tl_i32(t0, t_rs);
++                tcg_gen_rotli_i32(t0, t0, sh);
++                tcg_gen_andi_i32(t0, t0, mask);
++                tcg_gen_extu_i32_tl(t_ra, t0);
++                tcg_temp_free_i32(t0);
++            }
+         } else {
+ #if defined(TARGET_PPC64)
+             tcg_gen_deposit_i64(t_ra, t_rs, t_rs, 32, 32);
 -- 
 2.17.1
 
