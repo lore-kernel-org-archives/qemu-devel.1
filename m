@@ -2,78 +2,78 @@ Return-Path: <SRS0=f7ls=75=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7A60C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:55:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60EB4C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:55:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B82C420644
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:55:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3123020679
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:55:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GAnh6LxN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B82C420644
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KVNvsW7N"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3123020679
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39090 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41108 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlCzp-0004LB-14
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 10:55:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58068)
+	id 1jlD08-0005Dc-CT
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 10:55:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58354)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1jlCQh-0003Xh-Oe; Tue, 16 Jun 2020 10:19:11 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:40315)
+ id 1jlCR7-0004VW-HZ; Tue, 16 Jun 2020 10:19:37 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:36792)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1jlCQd-0006xs-9Z; Tue, 16 Jun 2020 10:19:08 -0400
-Received: by mail-oi1-x242.google.com with SMTP id t25so19384808oij.7;
- Tue, 16 Jun 2020 07:19:06 -0700 (PDT)
+ id 1jlCR6-00072c-0z; Tue, 16 Jun 2020 10:19:37 -0400
+Received: by mail-ot1-x341.google.com with SMTP id 97so16065397otg.3;
+ Tue, 16 Jun 2020 07:19:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=lEcayuvB+XGeWNX8U/Yu92PQGUAoKZ14ovL5ftbZCxY=;
- b=GAnh6LxNH6I2LyEAf7T2OHebxodipl3Wzk9PmkLXuXD/ix0miP4QPr1rilFE1Npl18
- ureW8Fp9erWINJAQT27zEMLz86HAzs665EYRwbHmPbx6UWw1VE3ZDm2NJOoFSnX43JBp
- bGfYJkfbUnR3Rha04jydqYl47DuJ9SQHNvPEas/QUSk8B3gGeFdukKSV5X6JuhJBmGAy
- +0iVaU1KG3ko3YVoY3FcEGBLAu3du80FGe4s6glKqu4JIys5rGMPbVVDZjh3JORncqMA
- 8tggU5tgGp4ZqM+W1OLTlZgLjp/D/bj90yUwVp3JCV9LZSMZWSa52+Faz/pGQzzf9Qt+
- 6rkg==
+ bh=DY0aK3a0zzQFlyBspZJZerQeFJhCLgUi3QlXt9plQig=;
+ b=KVNvsW7Nik16xiQC+aVzXxCYDyZvEo/itv2N2dmfOzRmzaKcSgai9fAJ2qR/r7J7fI
+ BRE8dsytgwvXGGGybL4szY4884avOPdFSZbjJbdUisZGYhr7fW7yS3iz1gMEFSgC56AZ
+ 7OoTpbdtao0z3WMfeHUsxhfCXpui7Auc5f+QQYx7/vOKbcAbDoZKT+8Bgv6PmI7alD5I
+ nNyktUJjsXCo+fCf1V3Zzj0cddZ9YfY6r4QIGyMSXjXpv9kMsrGAx2LDdVSAo01uNa5M
+ WMqQMryYBjiY4JJc/mVTFA2cVfXZmpo5zo5fxv0m8+gnPoqLCH/lFOBSijnDGKyYFfh6
+ G8mA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references;
- bh=lEcayuvB+XGeWNX8U/Yu92PQGUAoKZ14ovL5ftbZCxY=;
- b=sFJIDSYlqDklPGM/zRKqs3v+pMiWMSMCHFsvrHVSQeg2iKBSkkS48P6RX0SFQhz+UK
- 7aSEQ7sibYfNBSD1z4iAsuZ697e2qFAM6ScVi/8XaudfQi6NWg4WmCdP+5LuDTedJADH
- d7BYVOuUSjxI2/Jq2hfEGpb3FSnN/lCLTkMwOoonXoVuQDJKc7mxPDCeDm6jo68YX8Be
- 0feEqoZSH3BSBth8H2scWUB0y8SXW8nWz9N9SgLAypndj9iVt4omlgEs4T1EgB4LneBp
- JwkTF8h75p2kEZJcknZmm5ob9/Bb3Pp4A8XBhPR/hmqKdotUzMiChvu781fvfXSp4ajX
- x6vQ==
-X-Gm-Message-State: AOAM530DMc7ZZJoTpwb6EqVizL243rUK81COsS9pwLYKNE5G+waEldKc
- M/A+wGlnFzQrjv5qLEzh9QdCNNqN
-X-Google-Smtp-Source: ABdhPJzIg6sqCW7gxojRgIsnEhaN+ZXNtttu7aBVQ9zTzQIb4d+VffBOsqvS4QWOQRYh3vSPRoi03w==
-X-Received: by 2002:aca:fd94:: with SMTP id b142mr3610894oii.9.1592317145394; 
- Tue, 16 Jun 2020 07:19:05 -0700 (PDT)
+ bh=DY0aK3a0zzQFlyBspZJZerQeFJhCLgUi3QlXt9plQig=;
+ b=jyG6n0Xoi+1zHa6CgrflBQ+SBJeYsXxips6u0h6D66hRhdH+24ve0fcHCs12tofDxS
+ pew0xRQ3Xiq92DZ4/mY7NYOqgtbSrtPTVj+QktwRReQH2e3L4YyPtXl7r9TjhjghiWWt
+ S+rMmHzKRVFf0vYqHs3Ctqe8SUGjNub74P8aUTTPHpHGaThkxd+2E225yQENBYoCckg2
+ 6LT8pyRsXogbDirLo7J0kxmh7Jh5CS0Dhg0NwoxHkfolxKZ0cnqfkdy6NR3rc1U3tZxs
+ fzd9U6DIAPDGBOVhlH7sewYpH6c/R5DJV4xdfxP/ThimVFP32BbiiPH13TwhVBFa84XT
+ GLzA==
+X-Gm-Message-State: AOAM530wbNucBSmBpxpCCJ6qorHlmuJ+1H3I/z3b107t10Nl4gHyJxr8
+ DRbgQK7D7qXEkP2dRIq/Dj0cfTbo6Rk=
+X-Google-Smtp-Source: ABdhPJyKixcTi8UahooYXpRbzcHVsWHLZJKfOObb3tfoKRva1JJt/ovNvudTwaXRE7k2NVF3E+515Q==
+X-Received: by 2002:a9d:6c03:: with SMTP id f3mr2516702otq.291.1592317174242; 
+ Tue, 16 Jun 2020 07:19:34 -0700 (PDT)
 Received: from localhost (76-251-165-188.lightspeed.austtx.sbcglobal.net.
  [76.251.165.188])
- by smtp.gmail.com with ESMTPSA id b4sm4085033oti.3.2020.06.16.07.19.04
+ by smtp.gmail.com with ESMTPSA id y16sm4136217oot.11.2020.06.16.07.19.32
  (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
- Tue, 16 Jun 2020 07:19:04 -0700 (PDT)
+ Tue, 16 Jun 2020 07:19:33 -0700 (PDT)
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 59/78] qga-win: Handle VSS_E_PROVIDER_ALREADY_REGISTERED error
-Date: Tue, 16 Jun 2020 09:15:28 -0500
-Message-Id: <20200616141547.24664-60-mdroth@linux.vnet.ibm.com>
+Subject: [PATCH 71/78] qemu-nbd: Close inherited stderr
+Date: Tue, 16 Jun 2020 09:15:40 -0500
+Message-Id: <20200616141547.24664-72-mdroth@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200616141547.24664-1-mdroth@linux.vnet.ibm.com>
 References: <20200616141547.24664-1-mdroth@linux.vnet.ibm.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::242;
- envelope-from=flukshun@gmail.com; helo=mail-oi1-x242.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::341;
+ envelope-from=flukshun@gmail.com; helo=mail-ot1-x341.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -95,48 +95,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Sameeh Jubran <sjubran@redhat.com>, Basil Salman <basil@daynix.com>,
- qemu-stable@nongnu.org
+Cc: qemu-stable@nongnu.org, Raphael Pour <raphael.pour@hetzner.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Sameeh Jubran <sjubran@redhat.com>
+From: Raphael Pour <raphael.pour@hetzner.com>
 
-This patch handles the case where VSS Provider is already registered,
-where in such case qga uninstalls the provider and registers it again.
+Close inherited stderr of the parent if fork_process is false.
+Otherwise no one will close it. (introduced by e6df58a5)
 
-Signed-off-by: Sameeh Jubran <sjubran@redhat.com>
-Signed-off-by: Basil Salman <basil@daynix.com>
-Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-(cherry picked from commit b2413df83348acf371c03bced9a3845bba883ed5)
+This only affected 'qemu-nbd -c /dev/nbd0'.
+
+Signed-off-by: Raphael Pour <raphael.pour@hetzner.com>
+Message-Id: <d8ddc993-9816-836e-a3de-c6edab9d9c49@hetzner.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+[eblake: Enhance commit message]
+Signed-off-by: Eric Blake <eblake@redhat.com>
+(cherry picked from commit 0eaf453ebf6788885fbb5d40426b154ef8805407)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- qga/vss-win32/install.cpp | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ qemu-nbd.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/qga/vss-win32/install.cpp b/qga/vss-win32/install.cpp
-index 6713e58670..a456841360 100644
---- a/qga/vss-win32/install.cpp
-+++ b/qga/vss-win32/install.cpp
-@@ -443,6 +443,17 @@ STDAPI DllRegisterServer(void)
-                                      VSS_PROV_SOFTWARE,
-                                      const_cast<WCHAR*>(QGA_PROVIDER_VERSION),
-                                      g_gProviderVersion);
-+    if (hr == (long int) VSS_E_PROVIDER_ALREADY_REGISTERED) {
-+        DllUnregisterServer();
-+        hr = pVssAdmin->RegisterProvider(g_gProviderId, CLSID_QGAVSSProvider,
-+                                         const_cast<WCHAR * >
-+                                         (QGA_PROVIDER_LNAME),
-+                                         VSS_PROV_SOFTWARE,
-+                                         const_cast<WCHAR * >
-+                                         (QGA_PROVIDER_VERSION),
-+                                         g_gProviderVersion);
-+    }
+diff --git a/qemu-nbd.c b/qemu-nbd.c
+index 108a51f7eb..38031310af 100644
+--- a/qemu-nbd.c
++++ b/qemu-nbd.c
+@@ -1022,7 +1022,11 @@ int main(int argc, char **argv)
+         } else if (pid == 0) {
+             close(stderr_fd[0]);
+ 
+-            old_stderr = dup(STDERR_FILENO);
++            /* Remember parent's stderr if we will be restoring it. */
++            if (fork_process) {
++                old_stderr = dup(STDERR_FILENO);
++            }
 +
-     if (FAILED(hr)) {
-         errmsg_dialog(hr, "RegisterProvider failed");
-     }
+             ret = qemu_daemon(1, 0);
+ 
+             /* Temporarily redirect stderr to the parent's pipe...  */
 -- 
 2.17.1
 
