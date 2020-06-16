@@ -2,83 +2,81 @@ Return-Path: <SRS0=f7ls=75=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6BEEC433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 16:11:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23AF8C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 16:12:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AA44A2071A
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 16:11:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EBBDF208B3
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 16:12:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Rbgu/Ax+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA44A2071A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E83cMfY3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBBDF208B3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33580 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36774 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlEB6-0005nn-1F
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 12:11:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57338)
+	id 1jlEBs-00077I-8o
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 12:12:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57682)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jlE9f-0004Mi-4o
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 12:09:43 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56066
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jlE9c-0004oT-4D
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 12:09:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592323778;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=0rqSFzZq3qFEqQpqMeOjnJbYfs9zNhM4NpNV+yeVM3M=;
- b=Rbgu/Ax+mKLSIn1u/UrbC5jSkxDgmiN7SuJgMQd6j5UzQnP+AaPkdN9JiRDbIktuCm9N2i
- nY0Kn7KCJ0ABMG2oO0KMsokYwQBPTM1GIhjPXbov/jW2tK41M4LVPAf+WuCfLe4HNtXJ2t
- xDk5IZOTb6k8CxW8DoVaPK5C/SYwuIA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-355-BZsOtuhpNI-w7lHrfoBlbQ-1; Tue, 16 Jun 2020 12:09:36 -0400
-X-MC-Unique: BZsOtuhpNI-w7lHrfoBlbQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 281FE10059C0;
- Tue, 16 Jun 2020 16:09:34 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-114-66.ams2.redhat.com [10.36.114.66])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C44325D9D7;
- Tue, 16 Jun 2020 16:09:21 +0000 (UTC)
-Date: Tue, 16 Jun 2020 18:09:20 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Roman Kagan <rvkagan@yandex-team.ru>
-Subject: Re: [PATCH v8 0/8] block: enhance handling of size-related BlockConf
- properties
-Message-ID: <20200616160920.GG4305@linux.fritz.box>
-References: <20200528225516.1676602-1-rvkagan@yandex-team.ru>
+ (Exim 4.90_1) (envelope-from <devnexen@gmail.com>)
+ id 1jlEB5-00064L-Di; Tue, 16 Jun 2020 12:11:11 -0400
+Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:35157)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <devnexen@gmail.com>)
+ id 1jlEB3-00056Z-J6; Tue, 16 Jun 2020 12:11:11 -0400
+Received: by mail-ed1-x542.google.com with SMTP id e12so14700804eds.2;
+ Tue, 16 Jun 2020 09:11:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:from:date:message-id:subject:to;
+ bh=tQGTgMA17a4o6iebS1HxA6AgY6W7CBwK/BaZI98DayA=;
+ b=E83cMfY3rnxAqY8XBmXPvAc/fvzBgSODYggbL92DfEvs+SWHT/sJEJP1IXC19cc5mX
+ d324qLCxN8Bw8fmPlBxUeY9wvqi7TKYb/MGDCZEIcOOVN9pdE9oay0EfA0HLFumgb92d
+ BBKtYxYEqgYq7N4PIgCFye7pzm6EIpEsl8qqY3NrQMHUZQx9BJkmZ1PWtt2zDWlepW0O
+ RmlWaXKcVz3OIK2as1rLgwmLJ9jwNEEmhb4jbfEAyCKY8JRbJRsQmqeCXHZ5DfBswDm7
+ pmd2YRTCk3V0vlz6uQAKK+cbfLp4d/lVjK4+TxkYnrivf047zlWzt6AN6nDyO9HP67ZS
+ i0Xw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+ bh=tQGTgMA17a4o6iebS1HxA6AgY6W7CBwK/BaZI98DayA=;
+ b=XCW7K/JDpp/+X4ZKyyEnmS94BNXWmB+L/8qQJ+ySP5XLo6Q/aq++HI4KIlR5q5DyLM
+ UTsmDuOALHAPMzqOK3BWYYEBhxaE/fhYXXhrm3yLZUbMl4W419bXlnia38HcABqbO+NE
+ ruz7zigBNsXAzWp/urAz2Wn8uTcqNh4XUJYffaIzV6Th4WKhbIRh/cqu5fcTWhh09ZHb
+ F7xlUANURqjhavcIyUiAmZPSgy5QqStqErcK5I//PFKl2wNS0KZV6X50krNZQq2kG+Wz
+ rHjOh3cvAiaMyvYYZYeDKgxila3SraoUYFgRRKDwfCabLQoAA8ZMIlZwKmPVag+p1iCz
+ YYqw==
+X-Gm-Message-State: AOAM530v5dU6AQFV7OT30syVpcf5I+8OyIlJpXc9hhqnXJG6rjO3WnEZ
+ AbA2I9ld1D7LwDfwJTxF+xZ/hcd5sGda+Cg1PSm/GK7d49Q=
+X-Google-Smtp-Source: ABdhPJySHc2+PvED6EqeGjumwLlo+9qhCqZBo0PfV3LbE/jNelL7nSvuH9N72v0ShxcS0+hcscOwFfUVc2EfavjjwN4=
+X-Received: by 2002:aa7:da14:: with SMTP id r20mr3309742eds.7.1592323867344;
+ Tue, 16 Jun 2020 09:11:07 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200528225516.1676602-1-rvkagan@yandex-team.ru>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=kwolf@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 02:46:07
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+From: David CARLIER <devnexen@gmail.com>
+Date: Tue, 16 Jun 2020 17:10:56 +0100
+Message-ID: <CA+XhMqx6VjRhT6xBzJ-UYs7cPDXVK=PNdfNVdad3Tqhe43P=Ew@mail.gmail.com>
+Subject: [PATCH V4] util/oslib-posix : qemu_init_exec_dir implementation for
+ Mac
+To: QEMU Trivial <qemu-trivial@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::542;
+ envelope-from=devnexen@gmail.com; helo=mail-ed1-x542.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -91,35 +89,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Stefano Stabellini <sstabellini@kernel.org>,
- Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
- Paul Durrant <paul@xen.org>, John Snow <jsnow@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>, Keith Busch <kbusch@kernel.org>,
- Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 29.05.2020 um 00:55 hat Roman Kagan geschrieben:
-> BlockConf includes several properties counted in bytes.
-> 
-> Enhance their handling in some aspects, specifically
-> 
-> - accept common size suffixes (k, m)
-> - perform consistency checks on the values
-> - lift the upper limit on physical_block_size and logical_block_size
-> 
-> Also fix the accessor for opt_io_size in virtio-blk to make it consistent with
-> the size of the field.
+From 7eef8b803cdb0e7148fdf894d2992052695c1ff8 Mon Sep 17 00:00:00 2001
+From: David Carlier <devnexen@gmail.com>
+Date: Tue, 26 May 2020 21:35:27 +0100
+Subject: [PATCH] util/oslib-posix : qemu_init_exec_dir implementation for Mac
 
-Thanks, applied to the block branch.
+Using dyld API to get the full path of the current process.
 
-Kevin
+Signed-off-by: David Carlier <devnexen@gmail.com>
+---
+ util/oslib-posix.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
+diff --git a/util/oslib-posix.c b/util/oslib-posix.c
+index 916f1be224..3612c2c80e 100644
+--- a/util/oslib-posix.c
++++ b/util/oslib-posix.c
+@@ -57,6 +57,10 @@
+ #include <lwp.h>
+ #endif
+
++#ifdef __APPLE__
++#include <mach-o/dyld.h>
++#endif
++
+ #include "qemu/mmap-alloc.h"
+
+ #ifdef CONFIG_DEBUG_STACK_USAGE
+@@ -375,6 +379,16 @@ void qemu_init_exec_dir(const char *argv0)
+             p = buf;
+         }
+     }
++#elif defined(__APPLE__)
++    {
++        uint32_t len = sizeof(buf);
++        if (_NSGetExecutablePath(buf, &len) == 0) {
++     char fpath[PATH_MAX];
++            buf[len - 1] = 0;
++      realpath(buf, fpath);
++            p = fpath;
++        }
++    }
+ #endif
+     /* If we don't have any way of figuring out the actual executable
+        location then try argv[0].  */
+-- 
+2.27.0
 
