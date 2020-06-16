@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76C7FC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:59:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3297C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:59:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 48F4F20644
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:59:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A4AE520644
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:59:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L5h4A1jh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48F4F20644
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L5YcdSOG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4AE520644
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59246 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60428 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlD3w-00046C-Gv
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 10:59:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58228)
+	id 1jlD48-0004Zx-Oo
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 10:59:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58266)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1jlCQs-0003x6-Rt; Tue, 16 Jun 2020 10:19:22 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:35108)
+ id 1jlCQw-00045w-IQ; Tue, 16 Jun 2020 10:19:26 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:35108)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1jlCQr-00070e-0Q; Tue, 16 Jun 2020 10:19:22 -0400
-Received: by mail-ot1-x344.google.com with SMTP id d4so1647887otk.2;
- Tue, 16 Jun 2020 07:19:20 -0700 (PDT)
+ id 1jlCQu-00071L-TC; Tue, 16 Jun 2020 10:19:26 -0400
+Received: by mail-ot1-x342.google.com with SMTP id d4so1648087otk.2;
+ Tue, 16 Jun 2020 07:19:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=RMIBO3jpMOms/D4uQke8brSu1T+4gHbWwgG0M1rmYeo=;
- b=L5h4A1jhSAISjOnt4/5iYKvvgYcm5d938db0dmepSl2M9/GNnDVaU0NISXALHuae0a
- bSq5wwXIjC50EaUQHGXdKkIg+QJz4a1/dX9VuluD4sprBXNGZxxkbOGyI0mMljOOcCYu
- s1QLux4RP+t1Y7SIhm30vosfD27nrBvbgB9/uEJLEUsJ8icXtZlZ6ffrrWKzZ8melFqs
- jr0yV672mX3YeNfejFCAIVnseZsbLuOYBGz1f/B0zVPU07ux1buVVtUhmk3nC3wRK3kn
- 0BK6oEKdG58Bbe0kW1PKt0XwXrTGUabW5tYWWUE57XPUrEV1pJZPOATtYFeRR8iBhGy/
- VS/w==
+ bh=0W0U9RIkePSj9Jq4sCO7/r+zLbHnoVoeB2KaUJc1NS0=;
+ b=L5YcdSOGCBcxZXhl6BndtVQeFb0fyaoVcGj5oxw0hveK8Aq3qp2+yJyrU/QK99Zuvo
+ 3lT/4W245O8ySku38U5Lk9FILgJ1mPwADQzv0MimOqWDq/jlBV26nlJubKHmHa1hTKE4
+ /xn7I+D1aKNKGvz/NoMRyoV1jzBLYwP/BTmX0QYl+oQUiobt22OSgzfVhjnjWWeNVG5+
+ +oie0owTb7L4vbb7ETTLeR3cVryVfzVUTvk0TAIAh5+mbV+KRDoskUq0nqHgfE+tj3No
+ 9T7sF2zOQv44DsL3KXd7evUoVg2FSIY6B4NLJCqvRCg1ESkD7Mkepu0w/H188XMHVx9t
+ iBsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references;
- bh=RMIBO3jpMOms/D4uQke8brSu1T+4gHbWwgG0M1rmYeo=;
- b=gDZ5qR3uN0EAVbkCTVLrhLz3GofPp7R057vFoOGKXvWfAgeci1npc/SLsEZ2QmuAPQ
- hGlcktznb/zWO5pnnZ8Z0P1/EziLHYv+CKeify3PKXhi1Bjwl1TStspWy+Fhzn195AJh
- 0v85jpK4waoG1JQyUUMjNm4KK3AZ13HVAVJH5olEJDCwXthTry+2y5WefUS8RHL/1VVn
- y1a7goyoebkQnfaLLi+hTeZc5Cin/Jv9TuQ0Ql3tRbQJ3j053fEUnYBRCfE4W/AbB/EW
- N4BUtZFoBVs2OkRLIoa7AayG3Nds/k8YR5Jx3BFIEvOMy87FT8UPgLwwQE703UV1aZc2
- 670Q==
-X-Gm-Message-State: AOAM5339meVR9erV3qZmW+XLAbOt+CVYWcI24QOPxb3DzkecIT3CwSd3
- coWvcrCtYaCYcTtAjr7vQkCwddP6
-X-Google-Smtp-Source: ABdhPJwxvlKGC8ocNV8iNrhsx9Le6Q0jB4yXFgRwjDnGin0YOG743tznvtg6wWXny51WhkabSqECsQ==
-X-Received: by 2002:a9d:39f5:: with SMTP id y108mr2647644otb.262.1592317159005; 
- Tue, 16 Jun 2020 07:19:19 -0700 (PDT)
+ bh=0W0U9RIkePSj9Jq4sCO7/r+zLbHnoVoeB2KaUJc1NS0=;
+ b=VZCDoaGjcWcTuIDlmD1Ni3gatDJ7plZgE6hSp6esO76HaI+465tyhNcZCfugjBMj74
+ sl2KrIBJQ3QWG4oRxjC3U2CrGnhXFj+22z3C/dvZ3ClrVh8z7u8sS+NIdOEtwidz7OCj
+ 2tgDhWH/a16DEXQrpxF3p7uC0OtlydkbIyJr1vFDqSQL4lGtDpOMavx/6VANJwLp+8bE
+ 6VBAc6XU6ISpfZ+R21k/wn8Ny+9cIVp7/g67V3NRxt5t8eXTwtuwOmnK4ORx0q+RRlsc
+ p/Yqbf3ENs4T6Vuwe1kGEGY301FYnGCU709Z+T4WQjR+6su8sH55bqBHXSFEuJd3uDlj
+ UBJw==
+X-Gm-Message-State: AOAM530DbJK0nqEMnX5PTKBN9iDC6wXRwxco6HP5yUb1t2FqvXUmK/vw
+ /QjuBojqqwnw/yXVErjrU4GvtcJ1
+X-Google-Smtp-Source: ABdhPJwmbdYCQwbFIvhqzNHp68Pnep1DyDRxvz2D1FGXG+yuP/VDLWv32JPhNerC9AudUR8XlXG3KA==
+X-Received: by 2002:a9d:2d88:: with SMTP id g8mr2411808otb.149.1592317163011; 
+ Tue, 16 Jun 2020 07:19:23 -0700 (PDT)
 Received: from localhost (76-251-165-188.lightspeed.austtx.sbcglobal.net.
  [76.251.165.188])
- by smtp.gmail.com with ESMTPSA id c9sm4031760oov.35.2020.06.16.07.19.17
+ by smtp.gmail.com with ESMTPSA id f5sm4049121oou.47.2020.06.16.07.19.21
  (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
- Tue, 16 Jun 2020 07:19:17 -0700 (PDT)
+ Tue, 16 Jun 2020 07:19:21 -0700 (PDT)
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 64/78] tcg/i386: Fix INDEX_op_dup2_vec
-Date: Tue, 16 Jun 2020 09:15:33 -0500
-Message-Id: <20200616141547.24664-65-mdroth@linux.vnet.ibm.com>
+Subject: [PATCH 66/78] xen-block: Fix double qlist remove and request leak
+Date: Tue, 16 Jun 2020 09:15:35 -0500
+Message-Id: <20200616141547.24664-67-mdroth@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200616141547.24664-1-mdroth@linux.vnet.ibm.com>
 References: <20200616141547.24664-1-mdroth@linux.vnet.ibm.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::344;
- envelope-from=flukshun@gmail.com; helo=mail-ot1-x344.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::342;
+ envelope-from=flukshun@gmail.com; helo=mail-ot1-x342.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -95,45 +95,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-stable@nongnu.org
+Cc: Anthony PERARD <anthony.perard@citrix.com>, qemu-stable@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Richard Henderson <richard.henderson@linaro.org>
+From: Anthony PERARD <anthony.perard@citrix.com>
 
-We were only constructing the 64-bit element, and not
-replicating the 64-bit element across the rest of the vector.
+Commit a31ca6801c02 ("qemu/queue.h: clear linked list pointers on
+remove") revealed that a request was removed twice from a list, once
+in xen_block_finish_request() and a second time in
+xen_block_release_request() when both function are called from
+xen_block_complete_aio(). But also, the `requests_inflight' counter is
+decreased twice, and thus became negative.
 
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-(cherry picked from commit e20cb81d9c5a3d0f9c08f3642728a210a1c162c9)
+This is a bug that was introduced in bfd0d6366043 ("xen-block: improve
+response latency"), where a `finished' list was removed.
+
+That commit also introduced a leak of request in xen_block_do_aio().
+That function calls xen_block_finish_request() but the request is
+never released after that.
+
+To fix both issue, we do two changes:
+- we squash finish_request() and release_request() together as we want
+  to remove a request from 'inflight' list to add it to 'freelist'.
+- before releasing a request, we need to let the other end know the
+  result, thus we should call xen_block_send_response() before
+  releasing a request.
+
+The first change fixes the double QLIST_REMOVE() as we remove the extra
+call. The second change makes the leak go away because if we want to
+call finish_request(), we need to call a function that does all of
+finish, send response, and release.
+
+Fixes: bfd0d6366043 ("xen-block: improve response latency")
+Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
+Message-Id: <20200406140217.1441858-1-anthony.perard@citrix.com>
+Reviewed-by: Paul Durrant <paul@xen.org>
+[mreitz: Amended commit message as per Paul's suggestions]
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+(cherry picked from commit 36d883ba0de8a281072ded2b51e0a711fd002139)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- tcg/i386/tcg-target.inc.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+ hw/block/dataplane/xen-block.c | 48 ++++++++++++----------------------
+ 1 file changed, 16 insertions(+), 32 deletions(-)
 
-diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
-index 9d8ed974e0..77b78c941c 100644
---- a/tcg/i386/tcg-target.inc.c
-+++ b/tcg/i386/tcg-target.inc.c
-@@ -2855,9 +2855,13 @@ static void tcg_out_vec_op(TCGContext *s, TCGOpcode opc,
-         goto gen_simd;
- #if TCG_TARGET_REG_BITS == 32
-     case INDEX_op_dup2_vec:
--        /* Constraints have already placed both 32-bit inputs in xmm regs.  */
--        insn = OPC_PUNPCKLDQ;
--        goto gen_simd;
-+        /* First merge the two 32-bit inputs to a single 64-bit element. */
-+        tcg_out_vex_modrm(s, OPC_PUNPCKLDQ, a0, a1, a2);
-+        /* Then replicate the 64-bit elements across the rest of the vector. */
-+        if (type != TCG_TYPE_V64) {
-+            tcg_out_dup_vec(s, type, MO_64, a0, a0);
+diff --git a/hw/block/dataplane/xen-block.c b/hw/block/dataplane/xen-block.c
+index 3b9caeb2fa..c4ed2870ec 100644
+--- a/hw/block/dataplane/xen-block.c
++++ b/hw/block/dataplane/xen-block.c
+@@ -64,6 +64,8 @@ struct XenBlockDataPlane {
+     AioContext *ctx;
+ };
+ 
++static int xen_block_send_response(XenBlockRequest *request);
++
+ static void reset_request(XenBlockRequest *request)
+ {
+     memset(&request->req, 0, sizeof(request->req));
+@@ -115,23 +117,26 @@ out:
+     return request;
+ }
+ 
+-static void xen_block_finish_request(XenBlockRequest *request)
++static void xen_block_complete_request(XenBlockRequest *request)
+ {
+     XenBlockDataPlane *dataplane = request->dataplane;
+ 
+-    QLIST_REMOVE(request, list);
+-    dataplane->requests_inflight--;
+-}
++    if (xen_block_send_response(request)) {
++        Error *local_err = NULL;
+ 
+-static void xen_block_release_request(XenBlockRequest *request)
+-{
+-    XenBlockDataPlane *dataplane = request->dataplane;
++        xen_device_notify_event_channel(dataplane->xendev,
++                                        dataplane->event_channel,
++                                        &local_err);
++        if (local_err) {
++            error_report_err(local_err);
 +        }
-+        break;
- #endif
-     case INDEX_op_abs_vec:
-         insn = abs_insn[vece];
++    }
+ 
+     QLIST_REMOVE(request, list);
++    dataplane->requests_inflight--;
+     reset_request(request);
+     request->dataplane = dataplane;
+     QLIST_INSERT_HEAD(&dataplane->freelist, request, list);
+-    dataplane->requests_inflight--;
+ }
+ 
+ /*
+@@ -246,7 +251,6 @@ static int xen_block_copy_request(XenBlockRequest *request)
+ }
+ 
+ static int xen_block_do_aio(XenBlockRequest *request);
+-static int xen_block_send_response(XenBlockRequest *request);
+ 
+ static void xen_block_complete_aio(void *opaque, int ret)
+ {
+@@ -286,7 +290,6 @@ static void xen_block_complete_aio(void *opaque, int ret)
+     }
+ 
+     request->status = request->aio_errors ? BLKIF_RSP_ERROR : BLKIF_RSP_OKAY;
+-    xen_block_finish_request(request);
+ 
+     switch (request->req.operation) {
+     case BLKIF_OP_WRITE:
+@@ -306,17 +309,8 @@ static void xen_block_complete_aio(void *opaque, int ret)
+     default:
+         break;
+     }
+-    if (xen_block_send_response(request)) {
+-        Error *local_err = NULL;
+ 
+-        xen_device_notify_event_channel(dataplane->xendev,
+-                                        dataplane->event_channel,
+-                                        &local_err);
+-        if (local_err) {
+-            error_report_err(local_err);
+-        }
+-    }
+-    xen_block_release_request(request);
++    xen_block_complete_request(request);
+ 
+     if (dataplane->more_work) {
+         qemu_bh_schedule(dataplane->bh);
+@@ -420,8 +414,8 @@ static int xen_block_do_aio(XenBlockRequest *request)
+     return 0;
+ 
+ err:
+-    xen_block_finish_request(request);
+     request->status = BLKIF_RSP_ERROR;
++    xen_block_complete_request(request);
+     return -1;
+ }
+ 
+@@ -575,17 +569,7 @@ static bool xen_block_handle_requests(XenBlockDataPlane *dataplane)
+                 break;
+             };
+ 
+-            if (xen_block_send_response(request)) {
+-                Error *local_err = NULL;
+-
+-                xen_device_notify_event_channel(dataplane->xendev,
+-                                                dataplane->event_channel,
+-                                                &local_err);
+-                if (local_err) {
+-                    error_report_err(local_err);
+-                }
+-            }
+-            xen_block_release_request(request);
++            xen_block_complete_request(request);
+             continue;
+         }
+ 
 -- 
 2.17.1
 
