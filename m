@@ -2,77 +2,85 @@ Return-Path: <SRS0=f7ls=75=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A796BC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 12:36:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57EBBC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 12:46:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 71F432071A
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 12:36:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 258242080D
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 12:46:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CbkcVFyS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71F432071A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NVBIXmLY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 258242080D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53972 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57138 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlApi-00072x-N3
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 08:36:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56464)
+	id 1jlAz5-00018a-EJ
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 08:46:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59690)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1jlAms-0003Iu-Hq
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 08:33:59 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32935
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1jlAyK-0000fV-5L
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 08:45:48 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:29850
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1jlAmq-0005Fc-IZ
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 08:33:58 -0400
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1jlAyI-0007J6-1n
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 08:45:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592310835;
+ s=mimecast20190719; t=1592311544;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=N/ebmebsjLDt3TJpu8HX9oDLWKA9koiwZKXkaYKQh10=;
- b=CbkcVFySxDYJxfDyM3mkRA55p223xbYe2mVzObdpL8VAcSh3XJxgPZRHcqxyccH47NFfGM
- TncXCZTQ/DT/Iyvff3hqWdMl1REC7m9Zw0/70svYMWACHz7QUTqNs2w3+6demygXYRR+np
- DYA8y9uZNpHziXBhRduBwfUEaVcZS4o=
+ bh=zjo8yG+ZCurhZfERnbf9gRDcBaXo626Ho26XCcJmk88=;
+ b=NVBIXmLYbS2atjxQtMVMrQCSy5ovqrW2KTOj4xlP42njTZCaBjDRtyH/GUZ1wW12MYbTRo
+ RBkIYDaKZbzbe+inezA8P5yODP3kkN2yKimXhN5k8mRXYBnSdd5fqrVdh8ycV8oY7jVjqc
+ JdlMzD72jMd/OGsSiZ4xLWwO6h3pdQ0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-103-UA0NP7x_OlGBYzjanJNZbQ-1; Tue, 16 Jun 2020 08:33:53 -0400
-X-MC-Unique: UA0NP7x_OlGBYzjanJNZbQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-209-mwBd8TW8NKeJwcJ2DteukA-1; Tue, 16 Jun 2020 08:45:42 -0400
+X-MC-Unique: mwBd8TW8NKeJwcJ2DteukA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 61F8B102C812;
- Tue, 16 Jun 2020 12:33:52 +0000 (UTC)
-Received: from localhost (unknown [10.40.208.22])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 38EF919D7D;
- Tue, 16 Jun 2020 12:33:29 +0000 (UTC)
-Date: Tue, 16 Jun 2020 14:33:27 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH v4 1/5] acpi: Convert build_tpm2() to build_append* API
-Message-ID: <20200616143327.2ee38a48@redhat.com>
-In-Reply-To: <20200611135917.18300-2-eric.auger@redhat.com>
-References: <20200611135917.18300-1-eric.auger@redhat.com>
- <20200611135917.18300-2-eric.auger@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AD5F0873439;
+ Tue, 16 Jun 2020 12:45:41 +0000 (UTC)
+Received: from [10.36.114.197] (ovpn-114-197.ams2.redhat.com [10.36.114.197])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0BC887CAB9;
+ Tue, 16 Jun 2020 12:45:36 +0000 (UTC)
+Subject: Re: [PATCH v2 2/5] tpm: Extend TPMIfClass with get_irqnum() function
+To: Stefan Berger <stefanb@linux.ibm.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ Stefan Berger <stefanb@linux.vnet.ibm.com>
+References: <20200615142327.671546-1-stefanb@linux.vnet.ibm.com>
+ <20200615142327.671546-3-stefanb@linux.vnet.ibm.com>
+ <CAMxuvayUv9zpnzW93pcQXCFpFX5BZ7ZSRNvJ_XRgLPiyjfa_pQ@mail.gmail.com>
+ <9bd4cd70-1e0a-68be-fb83-9604cd7aba12@linux.ibm.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <239d60ae-8c10-68fd-036b-69ef1be3c644@redhat.com>
+Date: Tue, 16 Jun 2020 14:45:35 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <9bd4cd70-1e0a-68be-fb83-9604cd7aba12@linux.ibm.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=imammedo@redhat.com;
- helo=us-smtp-1.mimecast.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.120;
+ envelope-from=eric.auger@redhat.com; helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 02:46:07
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
@@ -94,118 +102,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, drjones@redhat.com, mst@redhat.com,
- philmd@redhat.com, qemu-devel@nongnu.org, shannon.zhaosl@gmail.com,
- qemu-arm@nongnu.org, marcandre.lureau@redhat.com, eric.auger.pro@gmail.com,
- lersek@redhat.com, ardb@kernel.org, stefanb@linux.ibm.com
+Cc: "Bonzini, Paolo" <pbonzini@redhat.com>,
+ Philippe Mathieu Daude <philmd@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Marek Kedzierski <mkedzier@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 11 Jun 2020 15:59:13 +0200
-Eric Auger <eric.auger@redhat.com> wrote:
+Hi Stefan,
 
-> In preparation of its move to the generic acpi code,
-> let's convert build_tpm2() to use build_append API. This
-> latter now is prefered in place of direct ACPI struct field
-> settings with manual endianness conversion.
+On 6/15/20 5:44 PM, Stefan Berger wrote:
+> On 6/15/20 11:11 AM, Marc-André Lureau wrote:
+>> Hi
+>>
+>> On Mon, Jun 15, 2020 at 6:23 PM Stefan Berger
+>> <stefanb@linux.vnet.ibm.com> wrote:
+>>> From: Stefan Berger <stefanb@sbct-2.pok.ibm.com>
+>>>
+>>> Implement get_irqnum() as part of the TPMIfClass to be get the assigned
+>> ^^ to get
+>>
+>>> IRQ number.
+>>>
+>> Since it is TIS ISA specific (at least for now), perhaps a dedicated
+>> tpm_tis_get_irq_num() is more appropriate?
 > 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 > 
-> ---
+> There's no caller from ARM at the moment but at least it is preparing it
+> to support getting the IRQ number since it also allows passing it in via
+> command lie. So it wouldn't have any side-effects on ARM for as long as
+> no extra code was added there. And once sysbus was to use it, it would
+> funnel through the same tpm_get_irqnum code. Other option is to drop the
+> parts for sysbus entirely.
+
+As there is no caller on ARM side, I think I would leave the ops
+undefined for the sysbus device. But as already reported it does not
+break anything on ARM side.
+
+Thanks
+
+Eric
 > 
-> v3 -> v4:
-> - Don't use Acpi20TPM2 *tpm2_ptr anymore
-> - Use variables for control area start address and start method
-> - Simplified arg values passed to bios_linker_loader_add_pointer
-> - use g_assert_not_reached()
-> ---
->  hw/i386/acpi-build.c | 49 +++++++++++++++++++++++++++++---------------
->  1 file changed, 33 insertions(+), 16 deletions(-)
 > 
-> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> index b5669d6c65..f150d95ecc 100644
-> --- a/hw/i386/acpi-build.c
-> +++ b/hw/i386/acpi-build.c
-> @@ -2298,35 +2298,52 @@ build_tpm_tcpa(GArray *table_data, BIOSLinker *linker, GArray *tcpalog)
->  static void
->  build_tpm2(GArray *table_data, BIOSLinker *linker, GArray *tcpalog)
->  {
-> -    Acpi20TPM2 *tpm2_ptr = acpi_data_push(table_data, sizeof *tpm2_ptr);
-> -    unsigned log_addr_size = sizeof(tpm2_ptr->log_area_start_address);
-> -    unsigned log_addr_offset =
-> -        (char *)&tpm2_ptr->log_area_start_address - table_data->data;
-> +    uint8_t start_method_params[12] = {};
-> +    unsigned log_addr_offset, tpm2_start;
-> +    uint64_t control_area_start_address;
-> +    uint32_t start_method;
-> +    void *tpm2_ptr;
->  
-> -    tpm2_ptr->platform_class = cpu_to_le16(TPM2_ACPI_CLASS_CLIENT);
-> +    tpm2_start = table_data->len;
-> +    tpm2_ptr = acpi_data_push(table_data, sizeof(AcpiTableHeader));
-> +
-> +    /* Platform Class */
-> +    build_append_int_noprefix(table_data, TPM2_ACPI_CLASS_CLIENT, 2);
-> +    /* Reserved */
-> +    build_append_int_noprefix(table_data, 0, 2);
->      if (TPM_IS_TIS_ISA(tpm_find())) {
-> -        tpm2_ptr->control_area_address = cpu_to_le64(0);
-> -        tpm2_ptr->start_method = cpu_to_le32(TPM2_START_METHOD_MMIO);
-> +        control_area_start_address = 0;
-> +        start_method = TPM2_START_METHOD_MMIO;
->      } else if (TPM_IS_CRB(tpm_find())) {
-> -        tpm2_ptr->control_area_address = cpu_to_le64(TPM_CRB_ADDR_CTRL);
-> -        tpm2_ptr->start_method = cpu_to_le32(TPM2_START_METHOD_CRB);
-> +        control_area_start_address = TPM_CRB_ADDR_CTRL;
-> +        start_method = TPM2_START_METHOD_CRB;
->      } else {
-> -        g_warn_if_reached();
-> +        g_assert_not_reached();
->      }
-> +    /* Address of Control Area */
-> +    build_append_int_noprefix(table_data, control_area_start_address, 8);
-> +    /* Start Method */
-> +    build_append_int_noprefix(table_data, start_method, 4);
->  
-> -    tpm2_ptr->log_area_minimum_length =
-> -        cpu_to_le32(TPM_LOG_AREA_MINIMUM_SIZE);
-> +    /* Platform Specific Parameters */
-> +    g_array_append_vals(table_data, &start_method_params,
-> +                        ARRAY_SIZE(start_method_params));
->  
-> -    acpi_data_push(tcpalog, le32_to_cpu(tpm2_ptr->log_area_minimum_length));
-> +    /* Log Area Minimum Length */
-> +    build_append_int_noprefix(table_data, TPM_LOG_AREA_MINIMUM_SIZE, 4);
-
-question not related to conversion:
-Is it a part of 'Platform Specific Parameters'?
-(as per spec table ends with it. if yes, then probably add pointer to place in spec
-wher its documented.
-
-> +
-> +    acpi_data_push(tcpalog, TPM_LOG_AREA_MINIMUM_SIZE);
->      bios_linker_loader_alloc(linker, ACPI_BUILD_TPMLOG_FILE, tcpalog, 1,
->                               false);
->  
-> -    /* log area start address to be filled by Guest linker */
-> +    log_addr_offset = table_data->len;
-> +    build_append_int_noprefix(table_data, 0, 8);
-> +    /* Log Area Start Address to be filled by Guest linker */
-move this line to where it used to be or at least above build_append_int_noprefix()
-
->      bios_linker_loader_add_pointer(linker, ACPI_BUILD_TABLE_FILE,
-> -                                   log_addr_offset, log_addr_size,
-> +                                   log_addr_offset, 8,
->                                     ACPI_BUILD_TPMLOG_FILE, 0);
->      build_header(linker, table_data,
-> -                 (void *)tpm2_ptr, "TPM2", sizeof(*tpm2_ptr), 4, NULL, NULL);
-> +                 tpm2_ptr, "TPM2", table_data->len - tpm2_start, 4, NULL, NULL);
->  }
->  
->  #define HOLE_640K_START  (640 * KiB)
-
-nevertheless looks like faithfull conversion,
-btw why you didn't drop Acpi20TPM2 structure definition?
+>>
+>>> Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
+>>> ---
+>>>   hw/tpm/tpm_tis_isa.c    |  9 +++++++++
+>>>   hw/tpm/tpm_tis_sysbus.c |  9 +++++++++
+>>>   include/sysemu/tpm.h    | 10 ++++++++++
+>>>   3 files changed, 28 insertions(+)
+>>>
+>>> diff --git a/hw/tpm/tpm_tis_isa.c b/hw/tpm/tpm_tis_isa.c
+>>> index 30ba37079d..63b62f4c21 100644
+>>> --- a/hw/tpm/tpm_tis_isa.c
+>>> +++ b/hw/tpm/tpm_tis_isa.c
+>>> @@ -80,6 +80,14 @@ static enum TPMVersion
+>>> tpm_tis_isa_get_tpm_version(TPMIf *ti)
+>>>       return tpm_tis_get_tpm_version(s);
+>>>   }
+>>>
+>>> +static uint8_t tpm_tis_isa_get_irqnum(TPMIf *ti)
+>>> +{
+>>> +    TPMStateISA *isadev = TPM_TIS_ISA(ti);
+>>> +    TPMState *s = &isadev->state;
+>>> +
+>>> +    return s->irq_num;
+>>> +}
+>>> +
+>>>   static void tpm_tis_isa_reset(DeviceState *dev)
+>>>   {
+>>>       TPMStateISA *isadev = TPM_TIS_ISA(dev);
+>>> @@ -148,6 +156,7 @@ static void tpm_tis_isa_class_init(ObjectClass
+>>> *klass, void *data)
+>>>       dc->reset = tpm_tis_isa_reset;
+>>>       tc->request_completed = tpm_tis_isa_request_completed;
+>>>       tc->get_version = tpm_tis_isa_get_tpm_version;
+>>> +    tc->get_irqnum = tpm_tis_isa_get_irqnum;
+>>>   }
+>>>
+>>>   static const TypeInfo tpm_tis_isa_info = {
+>>> diff --git a/hw/tpm/tpm_tis_sysbus.c b/hw/tpm/tpm_tis_sysbus.c
+>>> index eced1fc843..6cf45e5057 100644
+>>> --- a/hw/tpm/tpm_tis_sysbus.c
+>>> +++ b/hw/tpm/tpm_tis_sysbus.c
+>>> @@ -80,6 +80,14 @@ static enum TPMVersion
+>>> tpm_tis_sysbus_get_tpm_version(TPMIf *ti)
+>>>       return tpm_tis_get_tpm_version(s);
+>>>   }
+>>>
+>>> +static uint8_t tpm_tis_sysbus_get_irqnum(TPMIf *ti)
+>>> +{
+>>> +    TPMStateSysBus *sbdev = TPM_TIS_SYSBUS(ti);
+>>> +    TPMState *s = &sbdev->state;
+>>> +
+>>> +    return s->irq_num;
+>>> +}
+>>> +
+>>>   static void tpm_tis_sysbus_reset(DeviceState *dev)
+>>>   {
+>>>       TPMStateSysBus *sbdev = TPM_TIS_SYSBUS(dev);
+>>> @@ -137,6 +145,7 @@ static void tpm_tis_sysbus_class_init(ObjectClass
+>>> *klass, void *data)
+>>>       dc->reset = tpm_tis_sysbus_reset;
+>>>       tc->request_completed = tpm_tis_sysbus_request_completed;
+>>>       tc->get_version = tpm_tis_sysbus_get_tpm_version;
+>>> +    tc->get_irqnum = tpm_tis_sysbus_get_irqnum;
+>>>   }
+>>>
+>>>   static const TypeInfo tpm_tis_sysbus_info = {
+>>> diff --git a/include/sysemu/tpm.h b/include/sysemu/tpm.h
+>>> index 03fb25941c..b94a8a2b16 100644
+>>> --- a/include/sysemu/tpm.h
+>>> +++ b/include/sysemu/tpm.h
+>>> @@ -41,6 +41,7 @@ typedef struct TPMIfClass {
+>>>       enum TpmModel model;
+>>>       void (*request_completed)(TPMIf *obj, int ret);
+>>>       enum TPMVersion (*get_version)(TPMIf *obj);
+>>> +    uint8_t (*get_irqnum)(TPMIf *obj);
+>>>   } TPMIfClass;
+>>>
+>>>   #define TYPE_TPM_TIS_ISA            "tpm-tis"
+>>> @@ -74,4 +75,13 @@ static inline TPMVersion tpm_get_version(TPMIf *ti)
+>>>       return TPM_IF_GET_CLASS(ti)->get_version(ti);
+>>>   }
+>>>
+>>> +static inline uint8_t tpm_get_irqnum(TPMIf *ti)
+>>> +{
+>>> +    if (!ti || !TPM_IF_GET_CLASS(ti)->get_irqnum) {
+>>> +        return 0;
+>>> +    }
+>>> +
+>>> +    return TPM_IF_GET_CLASS(ti)->get_irqnum(ti);
+>>> +}
+>>> +
+>>>   #endif /* QEMU_TPM_H */
+>>> -- 
+>>> 2.24.1
+>>>
+> 
 
 
