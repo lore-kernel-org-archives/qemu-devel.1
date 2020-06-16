@@ -2,68 +2,94 @@ Return-Path: <SRS0=f7ls=75=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4904C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 15:22:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FBDBC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 15:23:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 909C22082F
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 15:22:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 909C22082F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 5BF742082F
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 15:23:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Qn6XrC9T"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BF742082F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54458 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57586 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlDQ4-00011y-R9
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 11:22:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43900)
+	id 1jlDQx-0002J6-KE
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 11:23:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43692)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jlDIf-0007er-Hf
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 11:14:57 -0400
-Received: from 9.mo1.mail-out.ovh.net ([178.32.108.172]:50200)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jlDId-0001K1-AP
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 11:14:57 -0400
-Received: from player761.ha.ovh.net (unknown [10.108.35.240])
- by mo1.mail-out.ovh.net (Postfix) with ESMTP id B320F1BFB9C
- for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 17:14:45 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player761.ha.ovh.net (Postfix) with ESMTPSA id D09BE136F4EEA;
- Tue, 16 Jun 2020 15:14:41 +0000 (UTC)
-Authentication-Results: garm.ovh; auth=pass
- (GARM-99G003d4a0efd5-a534-45b8-8147-0892b4cc63e6,6D1193CAFB0197A83E26607BB2BE83A43F9AE14F)
- smtp.auth=groug@kaod.org
-Date: Tue, 16 Jun 2020 17:14:40 +0200
-From: Greg Kurz <groug@kaod.org>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>
-Subject: Re: [PATCH 72/78] 9p: Lock directory streams with a CoMutex
-Message-ID: <20200616171440.172f1173@bahia.lan>
-In-Reply-To: <20200616141547.24664-73-mdroth@linux.vnet.ibm.com>
-References: <20200616141547.24664-1-mdroth@linux.vnet.ibm.com>
- <20200616141547.24664-73-mdroth@linux.vnet.ibm.com>
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jlDHs-0006FR-QO
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 11:14:08 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:54196)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jlDHq-0001Bx-Jp
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 11:14:08 -0400
+Received: by mail-wm1-x343.google.com with SMTP id l26so3234256wme.3
+ for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 08:14:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=iCe1PzSqwx9mubhmiiKwXSfOyHh2GSVxal1UdP7RZ3g=;
+ b=Qn6XrC9TtMyIlDsOwWh5egrW5MQ1Q2bDsKPRoICSBr1FYwpqH95VaWs7UMGtR/slRD
+ EgFSPOt2EQ2I4BnsEOY+K2AHpc6AT9D5sC/W1zdiErfjTopdSdIv8p4gYs/bQVJHafEk
+ 0za9U0RX7jl/6llPJUoqQFJO0u5caOYjq0DZSqBQr98py7fBAyzNn7LcP7gafDyxpt/r
+ 7lPPVZ9IaA2jW0w76LNWh9A36g6JNPbXHG/SfsZINROjfrZN+IsHPhYC2Ios8HeSAzp9
+ dq8Q0+RuOy6Rt9ZZjflzV1KvgYWzTg7eJp6bIs8xEJNrAqilj8RbpgTnJrX+ZaJ0M9a7
+ Oy9Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=iCe1PzSqwx9mubhmiiKwXSfOyHh2GSVxal1UdP7RZ3g=;
+ b=i57NdObnvP3CMTwftkMIcSZvVi2wEzLX8o0F2645Bcf11saA0cmWsFLbTa+Qx4nsvn
+ vWr2oV5DrVV5XNj8EJK9pwnlwAuXckzeO8y20qn6nWCkLna9urJLG3i4E+odh/wHVAud
+ sfSUrZYVCIkLHt0ldRw2L2nxEZtu8bG8vcHRisX6wRgSi2HVo/t7nkcc7u70uW8ZFB+H
+ 7iAslmiADDZsdBqbcLs3M8camQ1mNEvs6hcCjQIRrTMkVE8BcY26FJJRTTY6/UEdsMzC
+ zlQXV0FV9M3FnSst6tj6KYeMalsXg8tQtjSUfKgtnL9KHDgxvuZxhZPzlsuhkno6wVhM
+ SKug==
+X-Gm-Message-State: AOAM5320Op1FvI8/8uTvnpbnzdNCbu0qNFqVe/IvaxcoX1ufZgPoECqk
+ 6X3S7Zjs78f8zBQME2alf8CdPg==
+X-Google-Smtp-Source: ABdhPJxQgS3YpjnZx47EaU9Z/sCTFJohT52mXNHGFpeOU0lm7b5cssO+nGHyW21r56JPatlPJhHpbg==
+X-Received: by 2002:a7b:cb4c:: with SMTP id v12mr3651087wmj.43.1592320444917; 
+ Tue, 16 Jun 2020 08:14:04 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id l204sm4586673wmf.19.2020.06.16.08.14.03
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 16 Jun 2020 08:14:03 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 6FA781FF7E;
+ Tue, 16 Jun 2020 16:14:02 +0100 (BST)
+References: <1592215252-26742-1-git-send-email-frederic.konrad@adacore.com>
+ <1592215252-26742-2-git-send-email-frederic.konrad@adacore.com>
+User-agent: mu4e 1.5.3; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: konrad@adacore.com
+Subject: Re: [PATCH v1 2/2] semihosting: don't send the trailing '\0'
+In-reply-to: <1592215252-26742-2-git-send-email-frederic.konrad@adacore.com>
+Date: Tue, 16 Jun 2020 16:14:02 +0100
+Message-ID: <87r1ufyret.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 16277416429476288924
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedrudejtddgkeelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepheekhfdtheegheehjeeludefkefhvdelfedvieehhfekhfdufffhueeuvdfftdfhnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejiedurdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
-Received-SPF: pass client-ip=178.32.108.172; envelope-from=groug@kaod.org;
- helo=9.mo1.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 11:14:46
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x343.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -77,89 +103,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Christian Schoenebeck <qemu_oss@crudebyte.com>, qemu-devel@nongnu.org,
- qemu-stable@nongnu.org
+Cc: KONRAD Frederic <frederic.konrad@adacore.com>, philmd@redhat.com,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Cc'ing co-maintainer Christian Schoenebeck.
 
-Christian,
+konrad@adacore.com writes:
 
-If there are some more commits you think are worth being cherry picked
-for QEMU 4.2.1, please inform Michael before freeze on 2020-06-22.
+> From: KONRAD Frederic <frederic.konrad@adacore.com>
+>
+> Don't send the trailing 0 from the string.
+>
+> Signed-off-by: KONRAD Frederic <frederic.konrad@adacore.com>
 
-Cheers,
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
---
-Greg
-
-On Tue, 16 Jun 2020 09:15:41 -0500
-Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
-
-> From: Greg Kurz <groug@kaod.org>
-> 
-> Locking was introduced in QEMU 2.7 to address the deprecation of
-> readdir_r(3) in glibc 2.24. It turns out that the frontend code is
-> the worst place to handle a critical section with a pthread mutex:
-> the code runs in a coroutine on behalf of the QEMU mainloop and then
-> yields control, waiting for the fsdev backend to process the request
-> in a worker thread. If the client resends another readdir request for
-> the same fid before the previous one finally unlocked the mutex, we're
-> deadlocked.
-> 
-> This never bit us because the linux client serializes readdir requests
-> for the same fid, but it is quite easy to demonstrate with a custom
-> client.
-> 
-> A good solution could be to narrow the critical section in the worker
-> thread code and to return a copy of the dirent to the frontend, but
-> this causes quite some changes in both 9p.c and codir.c. So, instead
-> of that, in order for people to easily backport the fix to older QEMU
-> versions, let's simply use a CoMutex since all the users for this
-> sit in coroutines.
-> 
-> Fixes: 7cde47d4a89d ("9p: add locking to V9fsDir")
-> Reviewed-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
-> Message-Id: <158981894794.109297.3530035833368944254.stgit@bahia.lan>
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> (cherry picked from commit ed463454efd0ac3042ff772bfe1b1d846dc281a5)
-> Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-> ---
->  hw/9pfs/9p.h | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/hw/9pfs/9p.h b/hw/9pfs/9p.h
-> index 3904f82901..069c86333f 100644
-> --- a/hw/9pfs/9p.h
-> +++ b/hw/9pfs/9p.h
-> @@ -186,22 +186,22 @@ typedef struct V9fsXattr
->  
->  typedef struct V9fsDir {
->      DIR *stream;
-> -    QemuMutex readdir_mutex;
-> +    CoMutex readdir_mutex;
->  } V9fsDir;
->  
->  static inline void v9fs_readdir_lock(V9fsDir *dir)
->  {
-> -    qemu_mutex_lock(&dir->readdir_mutex);
-> +    qemu_co_mutex_lock(&dir->readdir_mutex);
->  }
->  
->  static inline void v9fs_readdir_unlock(V9fsDir *dir)
->  {
-> -    qemu_mutex_unlock(&dir->readdir_mutex);
-> +    qemu_co_mutex_unlock(&dir->readdir_mutex);
->  }
->  
->  static inline void v9fs_readdir_init(V9fsDir *dir)
->  {
-> -    qemu_mutex_init(&dir->readdir_mutex);
-> +    qemu_co_mutex_init(&dir->readdir_mutex);
->  }
->  
->  /*
-
+--=20
+Alex Benn=C3=A9e
 
