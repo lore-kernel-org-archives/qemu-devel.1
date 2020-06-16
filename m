@@ -7,71 +7,72 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0159C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 17:11:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4584BC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 17:11:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A4FB920B1F
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 17:11:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1570B20C09
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 17:11:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="B7NtDCKX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4FB920B1F
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gCbxYBdA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1570B20C09
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41722 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43698 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlF7Y-0006yO-TP
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 13:11:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46800)
+	id 1jlF7s-0007r4-BD
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 13:11:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46864)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jlF4z-00018D-KM
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 13:08:57 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:43839)
+ id 1jlF51-0001DR-M2
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 13:08:59 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:37192)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jlF4x-0007Ry-41
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 13:08:57 -0400
-Received: by mail-wr1-x442.google.com with SMTP id l10so21532175wrr.10
- for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 10:08:54 -0700 (PDT)
+ id 1jlF4z-0007Se-Qp
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 13:08:59 -0400
+Received: by mail-wr1-x442.google.com with SMTP id x13so21549221wrv.4
+ for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 10:08:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=v6P61HLrEGFwATqpE9ZgpSDARdlQ3liQ+Dl/YATMb3A=;
- b=B7NtDCKXz7UDIf765cw1aRFTpUM7F2Do82M1zuHF85oNF8rlerS3LBu1sr9TTY8PXu
- 99kc3cycko6R0EPcWYre+5z4XcwNrIb5/z4nA1b+2k7mukV/kNtxuV6yA1+0Gwa1Dq6a
- tS/GEfO3u9b4sr4SDiU8C7R5llY0hwTcQGclwVjnGa+iAImrbk5ctX5eszQHgknay9UO
- +/jnv7RUQjOfxYDKRskaBmhBAIKrxVShqYii0puJgrFEax9uXgHzzn6iqGRXigZXWlLn
- 1UOv8iRdgyxoxORHHncf7MInpONn6OtfR2CEpNuOLq75Y+0+VePcDieaBoCKlc2kUkFw
- TYOw==
+ bh=9Sp05zSviKK/vex9tstJEZpczFuX6qw9ndOqIxUFQRg=;
+ b=gCbxYBdAGWZ+mXkZAWZFO3kyxY2u0IO+FMn/5EZoKKIgUXRU0V7qgFP0MJpox7XOJq
+ BkXqe8e8FPzapEQVnVJGoujWwPVr7FkEXIpSqY8vuFB9zUxi4a9oU5MEUH3EcOYeX5df
+ xyHPWipBAvYaWKfdplxJwIoxZOjfmPAdonZEh6ku20/EMs6uXWbGe8J4dkNKz+Ce9J0Y
+ Tlm/5+WJ+eFhM/AQfJASZDoxPTENIFDStdZlC30D80tz+kERRjuVotJm1JtkXOLTchoA
+ PsQS5LVjYuRh7mtIlDaKshKaCSLr7RMcjePz1ZOWy8c+ivhaIMXXMgjjKT8lbZ9hcVJV
+ sXKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=v6P61HLrEGFwATqpE9ZgpSDARdlQ3liQ+Dl/YATMb3A=;
- b=GX9E4iDi3SYQEy6qwfQh9WpdxvrCNiufdEneT1d97WJoISsoky7khRJ8h6pV2X2rjO
- xu/9wnRDo11DTgr+fy7nwWKOfgTcf/kT2Hk4v/NDIOZ1Y1Z+7EThcQA8gMd2l6il/eWl
- N/FOUbUWwDLr2cSeZQsvo/+jSz3lZ66DO92djCoImpEQj3513EVpd2vd4d3yNRSVj6uM
- CGeTYFh25e85JqbR9MOHU+kz4aWn3OvK3GEAWBRsYpvkMS0L3Le8W9smZ/uD8md/FRLk
- /8E2VXZFtSS8F4XXAj+ibsmrhnlQ9GIJPekQxc/NIjSliPIwXfleIYjAbEVdyGp9gxc8
- K8ng==
-X-Gm-Message-State: AOAM531d9ugcY+wk/PYh/SP8lb6np29OcnhYnscEdw5IRjd49RQ9wLXX
- 2K5IwfhWaF9/znlDR4TeOZh4uA==
-X-Google-Smtp-Source: ABdhPJxs0iGnHhHT4iYFZ+qDp7WzpuGZRKOZ4u+g0GHLwzAWA9aBvaSTxTspQPSpAOv2lsyMzCRPpw==
-X-Received: by 2002:a5d:500c:: with SMTP id e12mr4101929wrt.359.1592327333725; 
- Tue, 16 Jun 2020 10:08:53 -0700 (PDT)
+ bh=9Sp05zSviKK/vex9tstJEZpczFuX6qw9ndOqIxUFQRg=;
+ b=c/EWtSzXsDx7kYwOrjeCnCyh3lK3iESLim/ZqOJPDt+Bm+RzpFeA1CC713d9D2O6od
+ gm0R5VumuKHE+Ld6a0itBU4IN4kgTNxPcO/KDMrPDe64wdVwJpovxBi3EsDshhpdg3Os
+ cw3Kb8SAo/cvEgDjzY+7dZaIVV/k47akgzc3hwSnKPEAhJKAefkLpxazHKjvVlyx2ovX
+ 9qd3IBCYgs4/oetFfRWtqRl4gRdSbwhOD+p0V7BSSevBbfjyvCjjqZM5ZwhnYy8KAaOw
+ lobTPnHQkL5cAZYRTt15FUn1F97o4KYD2rQhs07H5n/DI8sZ5eCAV3CNOKaTZiwX4bcT
+ 4K0w==
+X-Gm-Message-State: AOAM530GBbHQ8B+op9T+UDXw6T1Rnw6vphcrbIW+1saEU+YHOXfaS4+k
+ gpa6xa9OebZDL+i7c4UMFj4eO5EAhqStvQ==
+X-Google-Smtp-Source: ABdhPJzg/tqdIjApk9oeRvJ2zGNr6ihY/bxf0jIntTNO7vMhGM46ohLuQ8s0zhmHWR6SZZgHd39RHQ==
+X-Received: by 2002:a5d:5449:: with SMTP id w9mr4147375wrv.106.1592327336310; 
+ Tue, 16 Jun 2020 10:08:56 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id y80sm5263216wmc.34.2020.06.16.10.08.52
+ by smtp.gmail.com with ESMTPSA id y80sm5263216wmc.34.2020.06.16.10.08.55
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 16 Jun 2020 10:08:53 -0700 (PDT)
+ Tue, 16 Jun 2020 10:08:55 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-arm@nongnu.org,
 	qemu-devel@nongnu.org
-Subject: [PATCH 04/21] target/arm: Convert Neon narrowing moves to decodetree
-Date: Tue, 16 Jun 2020 18:08:27 +0100
-Message-Id: <20200616170844.13318-5-peter.maydell@linaro.org>
+Subject: [PATCH 06/21] target/arm: Convert Neon VCVT f16/f32 insns to
+ decodetree
+Date: Tue, 16 Jun 2020 18:08:29 +0100
+Message-Id: <20200616170844.13318-7-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200616170844.13318-1-peter.maydell@linaro.org>
 References: <20200616170844.13318-1-peter.maydell@linaro.org>
@@ -105,59 +106,46 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Convert the Neon narrowing moves VMQNV, VQMOVN, VQMOVUN in the 2-reg-misc
-group to decodetree.
+Convert the Neon insns in the 2-reg-misc group which are
+VCVT between f32 and f16 to decodetree.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/neon-dp.decode       |  9 ++++
- target/arm/translate-neon.inc.c | 59 ++++++++++++++++++++++++
- target/arm/translate.c          | 81 +--------------------------------
- 3 files changed, 70 insertions(+), 79 deletions(-)
+ target/arm/neon-dp.decode       |  3 ++
+ target/arm/translate-neon.inc.c | 96 +++++++++++++++++++++++++++++++++
+ target/arm/translate.c          | 65 ++--------------------
+ 3 files changed, 102 insertions(+), 62 deletions(-)
 
 diff --git a/target/arm/neon-dp.decode b/target/arm/neon-dp.decode
-index ad9e17fd737..2277b4c7b51 100644
+index 0102aa7254b..8174f2f92f4 100644
 --- a/target/arm/neon-dp.decode
 +++ b/target/arm/neon-dp.decode
-@@ -439,6 +439,8 @@ Vimm_1r          1111 001 . 1 . 000 ... .... cmode:4 0 . op:1 1 .... @1reg_imm
+@@ -461,6 +461,9 @@ Vimm_1r          1111 001 . 1 . 000 ... .... cmode:4 0 . op:1 1 .... @1reg_imm
+     VQMOVN_U     1111 001 11 . 11 .. 10 .... 0 0101 1 . 0 .... @2misc_q0
  
-     @2misc       .... ... .. . .. size:2 .. .... . .... q:1 . . .... \
-                  &2misc vm=%vm_dp vd=%vd_dp
-+    @2misc_q0    .... ... .. . .. size:2 .. .... . .... . . . .... \
-+                 &2misc vm=%vm_dp vd=%vd_dp q=0
- 
-     VREV64       1111 001 11 . 11 .. 00 .... 0 0000 . . 0 .... @2misc
- 
-@@ -450,6 +452,13 @@ Vimm_1r          1111 001 . 1 . 000 ... .... cmode:4 0 . op:1 1 .... @1reg_imm
- 
-     VUZP         1111 001 11 . 11 .. 10 .... 0 0010 . . 0 .... @2misc
-     VZIP         1111 001 11 . 11 .. 10 .... 0 0011 . . 0 .... @2misc
+     VSHLL        1111 001 11 . 11 .. 10 .... 0 0110 0 . 0 .... @2misc_q0
 +
-+    VMOVN        1111 001 11 . 11 .. 10 .... 0 0100 0 . 0 .... @2misc_q0
-+    # VQMOVUN: unsigned result (source is always signed)
-+    VQMOVUN      1111 001 11 . 11 .. 10 .... 0 0100 1 . 0 .... @2misc_q0
-+    # VQMOVN: signed result, source may be signed (_S) or unsigned (_U)
-+    VQMOVN_S     1111 001 11 . 11 .. 10 .... 0 0101 0 . 0 .... @2misc_q0
-+    VQMOVN_U     1111 001 11 . 11 .. 10 .... 0 0101 1 . 0 .... @2misc_q0
++    VCVT_F16_F32 1111 001 11 . 11 .. 10 .... 0 1100 0 . 0 .... @2misc_q0
++    VCVT_F32_F16 1111 001 11 . 11 .. 10 .... 0 1110 0 . 0 .... @2misc_q0
    ]
  
    # Subgroup for size != 0b11
 diff --git a/target/arm/translate-neon.inc.c b/target/arm/translate-neon.inc.c
-index f4799dd9770..b0620972854 100644
+index 78239ec1c1b..d37be597cf4 100644
 --- a/target/arm/translate-neon.inc.c
 +++ b/target/arm/translate-neon.inc.c
-@@ -3243,3 +3243,62 @@ static bool trans_VZIP(DisasContext *s, arg_2misc *a)
-     };
-     return do_zip_uzp(s, a, fn[a->q][a->size]);
+@@ -3354,3 +3354,99 @@ static bool trans_VSHLL(DisasContext *s, arg_2misc *a)
+     tcg_temp_free_i32(rm1);
+     return true;
  }
 +
-+static bool do_vmovn(DisasContext *s, arg_2misc *a,
-+                     NeonGenNarrowEnvFn *narrowfn)
++static bool trans_VCVT_F16_F32(DisasContext *s, arg_2misc *a)
 +{
-+    TCGv_i64 rm;
-+    TCGv_i32 rd0, rd1;
++    TCGv_ptr fpst;
++    TCGv_i32 ahp, tmp, tmp2, tmp3;
 +
-+    if (!arm_dc_feature(s, ARM_FEATURE_NEON)) {
++    if (!arm_dc_feature(s, ARM_FEATURE_NEON) ||
++        !dc_isar_feature(aa32_fp16_spconv, s)) {
 +        return false;
 +    }
 +
@@ -167,11 +155,7 @@ index f4799dd9770..b0620972854 100644
 +        return false;
 +    }
 +
-+    if (a->vm & 1) {
-+        return false;
-+    }
-+
-+    if (!narrowfn) {
++    if ((a->vm & 1) || (a->size != 1)) {
 +        return false;
 +    }
 +
@@ -179,155 +163,166 @@ index f4799dd9770..b0620972854 100644
 +        return true;
 +    }
 +
-+    rm = tcg_temp_new_i64();
-+    rd0 = tcg_temp_new_i32();
-+    rd1 = tcg_temp_new_i32();
++    fpst = get_fpstatus_ptr(true);
++    ahp = get_ahp_flag();
++    tmp = neon_load_reg(a->vm, 0);
++    gen_helper_vfp_fcvt_f32_to_f16(tmp, tmp, fpst, ahp);
++    tmp2 = neon_load_reg(a->vm, 1);
++    gen_helper_vfp_fcvt_f32_to_f16(tmp2, tmp2, fpst, ahp);
++    tcg_gen_shli_i32(tmp2, tmp2, 16);
++    tcg_gen_or_i32(tmp2, tmp2, tmp);
++    tcg_temp_free_i32(tmp);
++    tmp = neon_load_reg(a->vm, 2);
++    gen_helper_vfp_fcvt_f32_to_f16(tmp, tmp, fpst, ahp);
++    tmp3 = neon_load_reg(a->vm, 3);
++    neon_store_reg(a->vd, 0, tmp2);
++    gen_helper_vfp_fcvt_f32_to_f16(tmp3, tmp3, fpst, ahp);
++    tcg_gen_shli_i32(tmp3, tmp3, 16);
++    tcg_gen_or_i32(tmp3, tmp3, tmp);
++    neon_store_reg(a->vd, 1, tmp3);
++    tcg_temp_free_i32(tmp);
++    tcg_temp_free_i32(ahp);
++    tcg_temp_free_ptr(fpst);
 +
-+    neon_load_reg64(rm, a->vm);
-+    narrowfn(rd0, cpu_env, rm);
-+    neon_load_reg64(rm, a->vm + 1);
-+    narrowfn(rd1, cpu_env, rm);
-+    neon_store_reg(a->vd, 0, rd0);
-+    neon_store_reg(a->vd, 1, rd1);
-+    tcg_temp_free_i64(rm);
 +    return true;
 +}
 +
-+#define DO_VMOVN(INSN, FUNC)                                    \
-+    static bool trans_##INSN(DisasContext *s, arg_2misc *a)     \
-+    {                                                           \
-+        static NeonGenNarrowEnvFn * const narrowfn[] = {        \
-+            FUNC##8,                                            \
-+            FUNC##16,                                           \
-+            FUNC##32,                                           \
-+            NULL,                                               \
-+        };                                                      \
-+        return do_vmovn(s, a, narrowfn[a->size]);               \
++static bool trans_VCVT_F32_F16(DisasContext *s, arg_2misc *a)
++{
++    TCGv_ptr fpst;
++    TCGv_i32 ahp, tmp, tmp2, tmp3;
++
++    if (!arm_dc_feature(s, ARM_FEATURE_NEON) ||
++        !dc_isar_feature(aa32_fp16_spconv, s)) {
++        return false;
 +    }
 +
-+DO_VMOVN(VMOVN, gen_neon_narrow_u)
-+DO_VMOVN(VQMOVUN, gen_helper_neon_unarrow_sat)
-+DO_VMOVN(VQMOVN_S, gen_helper_neon_narrow_sat_s)
-+DO_VMOVN(VQMOVN_U, gen_helper_neon_narrow_sat_u)
++    /* UNDEF accesses to D16-D31 if they don't exist. */
++    if (!dc_isar_feature(aa32_simd_r32, s) &&
++        ((a->vd | a->vm) & 0x10)) {
++        return false;
++    }
++
++    if ((a->vd & 1) || (a->size != 1)) {
++        return false;
++    }
++
++    if (!vfp_access_check(s)) {
++        return true;
++    }
++
++    fpst = get_fpstatus_ptr(true);
++    ahp = get_ahp_flag();
++    tmp3 = tcg_temp_new_i32();
++    tmp = neon_load_reg(a->vm, 0);
++    tmp2 = neon_load_reg(a->vm, 1);
++    tcg_gen_ext16u_i32(tmp3, tmp);
++    gen_helper_vfp_fcvt_f16_to_f32(tmp3, tmp3, fpst, ahp);
++    neon_store_reg(a->vd, 0, tmp3);
++    tcg_gen_shri_i32(tmp, tmp, 16);
++    gen_helper_vfp_fcvt_f16_to_f32(tmp, tmp, fpst, ahp);
++    neon_store_reg(a->vd, 1, tmp);
++    tmp3 = tcg_temp_new_i32();
++    tcg_gen_ext16u_i32(tmp3, tmp2);
++    gen_helper_vfp_fcvt_f16_to_f32(tmp3, tmp3, fpst, ahp);
++    neon_store_reg(a->vd, 2, tmp3);
++    tcg_gen_shri_i32(tmp2, tmp2, 16);
++    gen_helper_vfp_fcvt_f16_to_f32(tmp2, tmp2, fpst, ahp);
++    neon_store_reg(a->vd, 3, tmp2);
++    tcg_temp_free_i32(ahp);
++    tcg_temp_free_ptr(fpst);
++
++    return true;
++}
 diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 442f287d861..8ecae264e15 100644
+index 94d5e34fff4..1ea09695546 100644
 --- a/target/arm/translate.c
 +++ b/target/arm/translate.c
-@@ -2975,46 +2975,6 @@ static void gen_neon_trn_u16(TCGv_i32 t0, TCGv_i32 t1)
-     tcg_temp_free_i32(rd);
- }
+@@ -4860,7 +4860,7 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
+     int pass;
+     int u;
+     int vec_size;
+-    TCGv_i32 tmp, tmp2, tmp3;
++    TCGv_i32 tmp, tmp2;
  
--static inline void gen_neon_narrow(int size, TCGv_i32 dest, TCGv_i64 src)
--{
--    switch (size) {
--    case 0: gen_helper_neon_narrow_u8(dest, src); break;
--    case 1: gen_helper_neon_narrow_u16(dest, src); break;
--    case 2: tcg_gen_extrl_i64_i32(dest, src); break;
--    default: abort();
--    }
--}
--
--static inline void gen_neon_narrow_sats(int size, TCGv_i32 dest, TCGv_i64 src)
--{
--    switch (size) {
--    case 0: gen_helper_neon_narrow_sat_s8(dest, cpu_env, src); break;
--    case 1: gen_helper_neon_narrow_sat_s16(dest, cpu_env, src); break;
--    case 2: gen_helper_neon_narrow_sat_s32(dest, cpu_env, src); break;
--    default: abort();
--    }
--}
--
--static inline void gen_neon_narrow_satu(int size, TCGv_i32 dest, TCGv_i64 src)
--{
--    switch (size) {
--    case 0: gen_helper_neon_narrow_sat_u8(dest, cpu_env, src); break;
--    case 1: gen_helper_neon_narrow_sat_u16(dest, cpu_env, src); break;
--    case 2: gen_helper_neon_narrow_sat_u32(dest, cpu_env, src); break;
--    default: abort();
--    }
--}
--
--static inline void gen_neon_unarrow_sats(int size, TCGv_i32 dest, TCGv_i64 src)
--{
--    switch (size) {
--    case 0: gen_helper_neon_unarrow_sat8(dest, cpu_env, src); break;
--    case 1: gen_helper_neon_unarrow_sat16(dest, cpu_env, src); break;
--    case 2: gen_helper_neon_unarrow_sat32(dest, cpu_env, src); break;
--    default: abort();
--    }
--}
--
- static inline void gen_neon_widen(TCGv_i64 dest, TCGv_i32 src, int size, int u)
- {
-     if (u) {
-@@ -3035,24 +2995,6 @@ static inline void gen_neon_widen(TCGv_i64 dest, TCGv_i32 src, int size, int u)
-     tcg_temp_free_i32(src);
- }
- 
--static void gen_neon_narrow_op(int op, int u, int size,
--                               TCGv_i32 dest, TCGv_i64 src)
--{
--    if (op) {
--        if (u) {
--            gen_neon_unarrow_sats(size, dest, src);
--        } else {
--            gen_neon_narrow(size, dest, src);
--        }
--    } else {
--        if (u) {
--            gen_neon_narrow_satu(size, dest, src);
--        } else {
--            gen_neon_narrow_sats(size, dest, src);
--        }
--    }
--}
--
- /* Symbolic constants for op fields for Neon 2-register miscellaneous.
-  * The values correspond to bits [17:16,10:7]; see the ARM ARM DDI0406B
-  * table A7-13.
-@@ -4994,8 +4936,7 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-                     !arm_dc_feature(s, ARM_FEATURE_V8)) {
-                     return 1;
-                 }
--                if ((op != NEON_2RM_VMOVN && op != NEON_2RM_VQMOVN) &&
--                    q && ((rm | rd) & 1)) {
-+                if (q && ((rm | rd) & 1)) {
-                     return 1;
-                 }
-                 switch (op) {
-@@ -5004,6 +4945,7 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-                 case NEON_2RM_VPADAL: case NEON_2RM_VPADAL_U:
-                 case NEON_2RM_VUZP:
+     if (!arm_dc_feature(s, ARM_FEATURE_NEON)) {
+         return 1;
+@@ -4927,6 +4927,8 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
                  case NEON_2RM_VZIP:
-+                case NEON_2RM_VMOVN: case NEON_2RM_VQMOVN:
+                 case NEON_2RM_VMOVN: case NEON_2RM_VQMOVN:
+                 case NEON_2RM_VSHLL:
++                case NEON_2RM_VCVT_F16_F32:
++                case NEON_2RM_VCVT_F32_F16:
                      /* handled by decodetree */
                      return 1;
                  case NEON_2RM_VTRN:
-@@ -5019,25 +4961,6 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
+@@ -4942,67 +4944,6 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
                          goto elementwise;
                      }
                      break;
--                case NEON_2RM_VMOVN: case NEON_2RM_VQMOVN:
--                    /* also VQMOVUN; op field and mnemonics don't line up */
--                    if (rm & 1) {
+-                case NEON_2RM_VCVT_F16_F32:
+-                {
+-                    TCGv_ptr fpst;
+-                    TCGv_i32 ahp;
+-
+-                    if (!dc_isar_feature(aa32_fp16_spconv, s) ||
+-                        q || (rm & 1)) {
 -                        return 1;
 -                    }
--                    tmp2 = NULL;
--                    for (pass = 0; pass < 2; pass++) {
--                        neon_load_reg64(cpu_V0, rm + pass);
--                        tmp = tcg_temp_new_i32();
--                        gen_neon_narrow_op(op == NEON_2RM_VMOVN, q, size,
--                                           tmp, cpu_V0);
--                        if (pass == 0) {
--                            tmp2 = tmp;
--                        } else {
--                            neon_store_reg(rd, 0, tmp2);
--                            neon_store_reg(rd, 1, tmp);
--                        }
--                    }
+-                    fpst = get_fpstatus_ptr(true);
+-                    ahp = get_ahp_flag();
+-                    tmp = neon_load_reg(rm, 0);
+-                    gen_helper_vfp_fcvt_f32_to_f16(tmp, tmp, fpst, ahp);
+-                    tmp2 = neon_load_reg(rm, 1);
+-                    gen_helper_vfp_fcvt_f32_to_f16(tmp2, tmp2, fpst, ahp);
+-                    tcg_gen_shli_i32(tmp2, tmp2, 16);
+-                    tcg_gen_or_i32(tmp2, tmp2, tmp);
+-                    tcg_temp_free_i32(tmp);
+-                    tmp = neon_load_reg(rm, 2);
+-                    gen_helper_vfp_fcvt_f32_to_f16(tmp, tmp, fpst, ahp);
+-                    tmp3 = neon_load_reg(rm, 3);
+-                    neon_store_reg(rd, 0, tmp2);
+-                    gen_helper_vfp_fcvt_f32_to_f16(tmp3, tmp3, fpst, ahp);
+-                    tcg_gen_shli_i32(tmp3, tmp3, 16);
+-                    tcg_gen_or_i32(tmp3, tmp3, tmp);
+-                    neon_store_reg(rd, 1, tmp3);
+-                    tcg_temp_free_i32(tmp);
+-                    tcg_temp_free_i32(ahp);
+-                    tcg_temp_free_ptr(fpst);
 -                    break;
-                 case NEON_2RM_VSHLL:
-                     if (q || (rd & 1)) {
+-                }
+-                case NEON_2RM_VCVT_F32_F16:
+-                {
+-                    TCGv_ptr fpst;
+-                    TCGv_i32 ahp;
+-                    if (!dc_isar_feature(aa32_fp16_spconv, s) ||
+-                        q || (rd & 1)) {
+-                        return 1;
+-                    }
+-                    fpst = get_fpstatus_ptr(true);
+-                    ahp = get_ahp_flag();
+-                    tmp3 = tcg_temp_new_i32();
+-                    tmp = neon_load_reg(rm, 0);
+-                    tmp2 = neon_load_reg(rm, 1);
+-                    tcg_gen_ext16u_i32(tmp3, tmp);
+-                    gen_helper_vfp_fcvt_f16_to_f32(tmp3, tmp3, fpst, ahp);
+-                    neon_store_reg(rd, 0, tmp3);
+-                    tcg_gen_shri_i32(tmp, tmp, 16);
+-                    gen_helper_vfp_fcvt_f16_to_f32(tmp, tmp, fpst, ahp);
+-                    neon_store_reg(rd, 1, tmp);
+-                    tmp3 = tcg_temp_new_i32();
+-                    tcg_gen_ext16u_i32(tmp3, tmp2);
+-                    gen_helper_vfp_fcvt_f16_to_f32(tmp3, tmp3, fpst, ahp);
+-                    neon_store_reg(rd, 2, tmp3);
+-                    tcg_gen_shri_i32(tmp2, tmp2, 16);
+-                    gen_helper_vfp_fcvt_f16_to_f32(tmp2, tmp2, fpst, ahp);
+-                    neon_store_reg(rd, 3, tmp2);
+-                    tcg_temp_free_i32(ahp);
+-                    tcg_temp_free_ptr(fpst);
+-                    break;
+-                }
+                 case NEON_2RM_AESE: case NEON_2RM_AESMC:
+                     if (!dc_isar_feature(aa32_aes, s) || ((rm | rd) & 1)) {
                          return 1;
 -- 
 2.20.1
