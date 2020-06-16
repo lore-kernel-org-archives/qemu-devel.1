@@ -2,87 +2,92 @@ Return-Path: <SRS0=f7ls=75=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46BDDC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 15:05:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 227C8C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 15:06:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 18CFE208B3
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 15:05:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DC36E20786
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 15:06:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XPvX4rIR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18CFE208B3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pZeZIXer"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC36E20786
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51770 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56454 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlD9t-00051t-AN
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 11:05:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35120)
+	id 1jlDAp-0007Cy-47
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 11:06:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58316)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jlCme-0003V7-8Z
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 10:41:52 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:27988
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jlCmc-0002GH-Gv
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 10:41:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592318509;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=wqjHu/2lHBq4QZX10aPeXKkXqqTRlUWTOJp0b4aR8IY=;
- b=XPvX4rIRLKixgmkQrJoA0ghKOBCppXq2m1ZrhYIZsBNCmmW63D88tPyihKsTE99XpFrnTl
- /PUcR+X5OmZdQSd9BtvcpZETHQmiCpF2TAIfYX3yOC2LT501weAlxyJgqeCwIfEq/78xZk
- soRG1qbkbfI05dpJ1aPrvNbQ/fHp0mw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-246-TCxR_i5NNMuocRf4ICTLkg-1; Tue, 16 Jun 2020 10:41:47 -0400
-X-MC-Unique: TCxR_i5NNMuocRf4ICTLkg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BB68394B2A;
- Tue, 16 Jun 2020 14:41:46 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.66])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id BF4965C1D2;
- Tue, 16 Jun 2020 14:41:39 +0000 (UTC)
-Date: Tue, 16 Jun 2020 15:41:35 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Lukas Straub <lukasstraub2@web.de>
-Subject: Re: [PATCH v4 3/4] chardev/char-socket.c: Add yank feature
-Message-ID: <20200616144135.GH550360@redhat.com>
-References: <cover.1590421341.git.lukasstraub2@web.de>
- <f513f9d9f329ca3a87a6e0aabe2f66f0775c1d6f.1590421341.git.lukasstraub2@web.de>
+ (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
+ id 1jlCR2-0004J5-E4; Tue, 16 Jun 2020 10:19:32 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:32780)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
+ id 1jlCR0-00071u-Q6; Tue, 16 Jun 2020 10:19:32 -0400
+Received: by mail-ot1-x342.google.com with SMTP id n6so16069938otl.0;
+ Tue, 16 Jun 2020 07:19:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=GSZfWFoXNTSGnh+M3lmAlBzkhHMx2WNUVXqbsauaOG4=;
+ b=pZeZIXermwJMrDKQ83R4TtmZScmBcqjj/CtZ1flh0tH1nm4Oc64wMkXHo2lFfK4ox7
+ q21U7Zzf/V+up3EriCmcq+Jik4zCoLoKMyOxcjH/+Zr2FkiPY8QVTKoImOyBpgedyUYQ
+ MzMlWEEqY5cy6UbWYCMNjewl56z2Qfo3WVwl0XFjfj1YuayjpQAEkDpml/B0JZcdaPPb
+ YiMwPhjBCryVmsOo1RrzI8Moo1ymoZl8ofn4mBiBNyo8suYEPdFNe/XLUJYUQeFN21FF
+ N0PuiVS0aQ/Tg6RKffpq172HzRhlP2vVwbVdpAP5TV+vq2N6wT7wJmxpr3BikMmVBDAD
+ 08ig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=GSZfWFoXNTSGnh+M3lmAlBzkhHMx2WNUVXqbsauaOG4=;
+ b=eA4fGGvLPpSzVEc3gOJPZ8E9nS/tRxwQH1CF0A9dAWxCoP+sP3rrBkfE2ehhCoARDD
+ otIRPFWXVkLH3LtrV6M444/LzTFFV1WirXSS3Me7E/pZCXK7GduGKGEH6P/ZTM4O+XZp
+ LOj8BssyDmDG5dmFEOEv9oyLs2JIf2Oxo8vR47rYNY5I9lVHfCGLEjYRZvb1dQ2Lw+FR
+ I26M+AFuQPsKge+CYSOd1/Bf0zECK8i+doveRExIGDa1WgrNHMupodWpIUmAbkUxk/X6
+ 54uctTiTil0x3SP5KP63EqA7YDy5qEBGf0LBzHvf/9wCYYx2RGOAeWPd5iO3pLrkQZKH
+ hHUg==
+X-Gm-Message-State: AOAM533aoCw/xkDYZv2fl3lG0FcaeVqt1KpcOQqvt2DObZipMiEm5AcT
+ U8B1/GOgkLLUPRbjS0OV3zX92AvHjLM=
+X-Google-Smtp-Source: ABdhPJwA8v5akFDw+7piDRGgsNddhM/t6lethh0+hfEQmDc66qTEPI/nvOftRYt/unmH8n7zB3iDlg==
+X-Received: by 2002:a05:6830:1f1b:: with SMTP id
+ u27mr2693775otg.327.1592317168834; 
+ Tue, 16 Jun 2020 07:19:28 -0700 (PDT)
+Received: from localhost (76-251-165-188.lightspeed.austtx.sbcglobal.net.
+ [76.251.165.188])
+ by smtp.gmail.com with ESMTPSA id q2sm4180208oti.36.2020.06.16.07.19.27
+ (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
+ Tue, 16 Jun 2020 07:19:27 -0700 (PDT)
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 69/78] hostmem: don't use mbind() if host-nodes is empty
+Date: Tue, 16 Jun 2020 09:15:38 -0500
+Message-Id: <20200616141547.24664-70-mdroth@linux.vnet.ibm.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200616141547.24664-1-mdroth@linux.vnet.ibm.com>
+References: <20200616141547.24664-1-mdroth@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <f513f9d9f329ca3a87a6e0aabe2f66f0775c1d6f.1590421341.git.lukasstraub2@web.de>
-User-Agent: Mutt/1.14.0 (2020-05-02)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=berrange@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 02:01:17
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=2607:f8b0:4864:20::342;
+ envelope-from=flukshun@gmail.com; helo=mail-ot1-x342.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,33 +100,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block <qemu-block@nongnu.org>,
- Juan Quintela <quintela@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
- Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, qemu-stable@nongnu.org,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, May 25, 2020 at 05:44:29PM +0200, Lukas Straub wrote:
-> Register a yank function to shutdown the socket on yank.
-> 
-> Signed-off-by: Lukas Straub <lukasstraub2@web.de>
-> ---
->  Makefile.objs         |  1 +
->  chardev/char-socket.c | 24 ++++++++++++++++++++++++
->  2 files changed, 25 insertions(+)
+From: Igor Mammedov <imammedo@redhat.com>
 
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+Since 5.0 QEMU uses hostmem backend for allocating main guest RAM.
+The backend however calls mbind() which is typically NOP
+in case of default policy/absent host-nodes bitmap.
+However when runing in container with black-listed mbind()
+syscall, QEMU fails to start with error
+ "cannot bind memory to host NUMA nodes: Operation not permitted"
+even when user hasn't provided host-nodes to pin to explictly
+(which is the case with -m option)
 
+To fix issue, call mbind() only in case when user has provided
+host-nodes explicitly (i.e. host_nodes bitmap is not empty).
+That should allow to run QEMU in containers with black-listed
+mbind() without memory pinning. If QEMU provided memory-pinning
+is required user still has to white-list mbind() in container
+configuration.
 
-Regards,
-Daniel
+Reported-by: Manuel Hohmann <mhohmann@physnet.uni-hamburg.de>
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Message-Id: <20200430154606.6421-1-imammedo@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+(cherry picked from commit 70b6d525dfb51d5e523d568d1139fc051bc223c5)
+Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+---
+ backends/hostmem.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/backends/hostmem.c b/backends/hostmem.c
+index e773bdfa6e..21b1993e49 100644
+--- a/backends/hostmem.c
++++ b/backends/hostmem.c
+@@ -363,8 +363,10 @@ host_memory_backend_memory_complete(UserCreatable *uc, Error **errp)
+         assert(sizeof(backend->host_nodes) >=
+                BITS_TO_LONGS(MAX_NODES + 1) * sizeof(unsigned long));
+         assert(maxnode <= MAX_NODES);
+-        if (mbind(ptr, sz, backend->policy,
+-                  maxnode ? backend->host_nodes : NULL, maxnode + 1, flags)) {
++
++        if (maxnode &&
++            mbind(ptr, sz, backend->policy, backend->host_nodes, maxnode + 1,
++                  flags)) {
+             if (backend->policy != MPOL_DEFAULT || errno != ENOSYS) {
+                 error_setg_errno(errp, errno,
+                                  "cannot bind memory to host NUMA nodes");
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+2.17.1
 
 
