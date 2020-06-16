@@ -2,151 +2,72 @@ Return-Path: <SRS0=f7ls=75=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA48BC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 05:59:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E33DC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 06:01:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9C5D5207E8
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 05:59:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C5D5207E8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id D3E1420734
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 06:01:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3E1420734
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59198 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33184 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jl4dJ-0000N1-QD
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 01:59:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34868)
+	id 1jl4fU-0001SN-T5
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 02:01:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35220)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <borntraeger@de.ibm.com>)
- id 1jl4ck-0008O3-1S; Tue, 16 Jun 2020 01:59:06 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:10912)
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jl4ec-000138-PR
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 02:01:02 -0400
+Received: from 17.mo3.mail-out.ovh.net ([87.98.178.58]:52256)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <borntraeger@de.ibm.com>)
- id 1jl4ch-0006Ee-Vu; Tue, 16 Jun 2020 01:59:05 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 05G5XRsB032459; Tue, 16 Jun 2020 01:59:00 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 31phf59j99-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 16 Jun 2020 01:59:00 -0400
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05G5XVJG032837;
- Tue, 16 Jun 2020 01:58:59 -0400
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com
- [149.81.74.107])
- by mx0a-001b2d01.pphosted.com with ESMTP id 31phf59j8c-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 16 Jun 2020 01:58:59 -0400
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
- by ppma03fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05G5pH4V031534;
- Tue, 16 Jun 2020 05:58:57 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com
- (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
- by ppma03fra.de.ibm.com with ESMTP id 31mpe7sx3x-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 16 Jun 2020 05:58:57 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
- [9.149.105.58])
- by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id 05G5vbqg58327382
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 16 Jun 2020 05:57:37 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id A02044C058;
- Tue, 16 Jun 2020 05:58:54 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 1F54F4C050;
- Tue, 16 Jun 2020 05:58:54 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.145.20.221])
- by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Tue, 16 Jun 2020 05:58:54 +0000 (GMT)
-Subject: Re: [PATCH 1/2] virtio-ccw: fix virtio_set_ind_atomic
-To: Halil Pasic <pasic@linux.ibm.com>, Matthew Rosato <mjrosato@linux.ibm.com>,
- Cornelia Huck <cohuck@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, qemu-s390x@nongnu.org,
- qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
-References: <20200616045035.51641-1-pasic@linux.ibm.com>
- <20200616045035.51641-2-pasic@linux.ibm.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Message-ID: <11e8278e-23cc-1e7f-4086-10ecef75b96a@de.ibm.com>
-Date: Tue, 16 Jun 2020 07:58:53 +0200
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jl4eZ-0006hh-T2
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 02:01:02 -0400
+Received: from player714.ha.ovh.net (unknown [10.110.103.76])
+ by mo3.mail-out.ovh.net (Postfix) with ESMTP id B80B12574B0
+ for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 08:00:56 +0200 (CEST)
+Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
+ (Authenticated sender: clg@kaod.org)
+ by player714.ha.ovh.net (Postfix) with ESMTPSA id 472091356BAD7;
+ Tue, 16 Jun 2020 06:00:51 +0000 (UTC)
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-106R00692477332-a448-4f8d-b5c4-b28f4a887bad,EBFB3A1CCBA6C973625B067ACEBAD7C75398389C)
+ smtp.auth=clg@kaod.org
+Subject: Re: [PATCH 0/6] Add several Power ISA 3.1 32/64-bit vector
+ instructions
+To: Lijun Pan <ljp@linux.vnet.ibm.com>
+References: <20200613042029.22321-1-ljp@linux.ibm.com>
+ <ef31bb82-607c-3fde-577b-559ff5033be6@kaod.org>
+ <4A745EBC-6605-4688-9D1A-A29773C14FE3@linux.vnet.ibm.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <27249c0e-32b1-5d02-6061-57b0bd5a9b97@kaod.org>
+Date: Tue, 16 Jun 2020 08:00:50 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200616045035.51641-2-pasic@linux.ibm.com>
+In-Reply-To: <4A745EBC-6605-4688-9D1A-A29773C14FE3@linux.vnet.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
- definitions=2020-06-15_11:2020-06-15,
- 2020-06-15 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0
- cotscore=-2147483648 impostorscore=0 lowpriorityscore=0 suspectscore=0
- clxscore=1011 mlxscore=0 spamscore=0 bulkscore=0 adultscore=0
- priorityscore=1501 mlxlogscore=999 phishscore=0 classifier=spam adjust=0
- reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2006160040
-Received-SPF: pass client-ip=148.163.158.5;
- envelope-from=borntraeger@de.ibm.com; helo=mx0b-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 00:50:51
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
-X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+X-Ovh-Tracer-Id: 6924284428551949120
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: 0
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedrudeiledguddtgecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecunecujfgurhepuffvfhfhkffffgggjggtgfesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeefffdvtddugeeifeduuefghfejgfeigeeigeeltedthefgieeiveeuiefhgeefgfenucfkpheptddrtddrtddrtddpkedvrdeigedrvdehtddrudejtdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejudegrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
+Received-SPF: pass client-ip=87.98.178.58; envelope-from=clg@kaod.org;
+ helo=17.mo3.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 02:00:57
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -160,109 +81,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>,
- Andreas Krebbel <krebbel@linux.ibm.com>, David Hildenbrand <david@redhat.com>
+Cc: qemu-ppc@nongnu.org, Lijun Pan <ljp@linux.ibm.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-On 16.06.20 06:50, Halil Pasic wrote:
-> The atomic_cmpxchg() loop is broken because we occasionally end up with
-> old and _old having different values (a legit compiler can generate code
-> that accessed *ind_addr again to pick up a value for _old instead of
-> using the value of old that was already fetched according to the
-> rules of the abstract machine). This means the underlying CS instruction
-> may use a different old (_old) than the one we intended to use if
-> atomic_cmpxchg() performed the xchg part.
+On 6/15/20 10:54 PM, Lijun Pan wrote:
 > 
-> Let us use volatile to force the rules of the abstract machine for
-> accesses to *ind_addr. Let us also rewrite the loop so, we that the
-> new old is used to compute the new desired value if the xchg part
-> is not performed.
 > 
-> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
-> Reported-by: Andre Wild <Andre.Wild1@ibm.com>
-> Fixes: 7e7494627f ("s390x/virtio-ccw: Adapter interrupt support.")
-> ---
->  hw/s390x/virtio-ccw.c | 18 ++++++++++--------
->  1 file changed, 10 insertions(+), 8 deletions(-)
+>> On Jun 15, 2020, at 12:36 PM, Cédric Le Goater <clg@kaod.org> wrote:
+>>
+>> Hello,
+>>
+>> On 6/13/20 6:20 AM, Lijun Pan wrote:
+>>> This patch series add several newly introduced 32/64-bit vector
+>>> instructions in Power ISA 3.1. The newly added instructions are
+>>> flagged as ISA300 temporarily in vmx-ops.inc.c and vmx-impl.inc.c
+>>> to make them compile and function since Power ISA 3.1, together
+>>> with next generation processor, has not been fully enabled in QEMU
+>>> yet. When Power ISA 3.1 and next generation processor are fully
+>>> supported, the flags should be changed.
+>>
+>> What do you mean ? 
+>>
+>> ISA 3.1 and POWER10 are merged in Linux and in the QEMU pseries 
+>> and PowerNV (OPAL) machines.
+>>
+>> It's very much empty but it's there.
 > 
-> diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
-> index c1f4bb1d33..3c988a000b 100644
-> --- a/hw/s390x/virtio-ccw.c
-> +++ b/hw/s390x/virtio-ccw.c
-> @@ -786,9 +786,10 @@ static inline VirtioCcwDevice *to_virtio_ccw_dev_fast(DeviceState *d)
->  static uint8_t virtio_set_ind_atomic(SubchDev *sch, uint64_t ind_loc,
->                                       uint8_t to_be_set)
->  {
-> -    uint8_t ind_old, ind_new;
-> +    uint8_t expected, actual;
->      hwaddr len = 1;
-> -    uint8_t *ind_addr;
-> +    /* avoid  multiple fetches */
-> +    uint8_t volatile *ind_addr;
->  
->      ind_addr = cpu_physical_memory_map(ind_loc, &len, true);
->      if (!ind_addr) {
-> @@ -796,14 +797,15 @@ static uint8_t virtio_set_ind_atomic(SubchDev *sch, uint64_t ind_loc,
->                       __func__, sch->cssid, sch->ssid, sch->schid);
->          return -1;
->      }
-> +    actual = *ind_addr;
->      do {
-> -        ind_old = *ind_addr;
+> I mean it does not work if you boots the guest in TCG mode, not KVM mode.
 
-to make things easier to understand. Adding a barrier in here also fixes the issue.
-Reasoning follows below:
-
-> -        ind_new = ind_old | to_be_set;
-
-with an analysis from Andreas (cc)
-
- #define atomic_cmpxchg__nocheck(ptr, old, new)    ({                    \   
- 
-     typeof_strip_qual(*ptr) _old = (old);                               \   
- 
-     (void)__atomic_compare_exchange_n(ptr, &_old, new, false,           \   
- 
-                               __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST);      \   
- 
-     _old;                                                               \   
- 
- })
- 
-ind_old is copied into _old in the macro. Instead of doing the copy from the
-register the compiler reloads the value from memory. The result is that _old
-and ind_old end up having different values. _old in r1 with the bits set
-already and ind_old in r10 with the bits cleared. _old gets updated by CS
-and matches ind_old afterwards - both with the bits being 0. So the !=
-compare is false and the loop is left without having set any bits.
-
-
-Paolo (to),
-I am asking myself if it would be safer to add a barrier or something like
-this in the macros in include/qemu/atomic.h. 
+Something is wrong in your environment. With the latest QEMU and
+Linux 5.8-rc1, here is a POWER10 pseries machine : 
+    
+    BusyBox v1.30.1 (Ubuntu 1:1.30.1-4ubuntu4) built-in shell (ash)
+    Enter 'help' for a list of built-in commands.
+    
+    (initramfs) 
+    (initramfs) cat /proc/cpuinfo 
+    processor	: 0
+    cpu		: POWER10 (architected), altivec supported
+    clock	: 1000.000000MHz
+    revision	: 1.0 (pvr 0080 0100)
+    
+    processor	: 1
+    cpu		: POWER10 (architected), altivec supported
+    clock	: 1000.000000MHz
+    revision	: 1.0 (pvr 0080 0100)
+    
+    processor	: 2
+    cpu		: POWER10 (architected), altivec supported
+    clock	: 1000.000000MHz
+    revision	: 1.0 (pvr 0080 0100)
+    
+    processor	: 3
+    cpu		: POWER10 (architected), altivec supported
+    clock	: 1000.000000MHz
+    revision	: 1.0 (pvr 0080 0100)
+    
+    timebase	: 512000000
+    platform	: pSeries
+    model	: IBM pSeries (emulated by qemu)
+    machine	: CHRP IBM pSeries (emulated by qemu)
+    MMU		: Radix
+    (initramfs) uname -a 
+    Linux (none) 5.8.0-rc1+ #199 SMP Tue Jun 16 07:54:06 CEST 2020 ppc64le GNU/Linux
 
 
 
+KVM works also but you will need to run the guest under a QEMU
+PowerNV machine using my powernv-5.1 branch. All support for
+POWER10 baremetal is not merged yet.
 
-> -    } while (atomic_cmpxchg(ind_addr, ind_old, ind_new) != ind_old);
-> -    trace_virtio_ccw_set_ind(ind_loc, ind_old, ind_new);
-> -    cpu_physical_memory_unmap(ind_addr, len, 1, len);
-> +        expected = actual;
-> +        actual = atomic_cmpxchg(ind_addr, expected, expected | to_be_set);
-> +    } while (actual != expected);
-> +    trace_virtio_ccw_set_ind(ind_loc, actual, actual | to_be_set);
-> +    cpu_physical_memory_unmap((void *)ind_addr, len, 1, len);
->  
-> -    return ind_old;
-> +    return actual;
->  }
->  
->  static void virtio_ccw_notify(DeviceState *d, uint16_t vector)
-> 
+Thanks,
 
-
+C.
 
