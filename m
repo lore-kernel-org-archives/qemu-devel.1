@@ -7,73 +7,70 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CC66C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 07:03:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02DF6C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 07:03:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0C4AF207E8
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 07:03:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BEBB5207E8
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 07:03:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gFp2bSE2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C4AF207E8
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I51eU5cp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BEBB5207E8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44676 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45506 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jl5d0-0002DX-25
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 03:03:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42106)
+	id 1jl5d8-0002XV-Va
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 03:03:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42180)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jl5Mo-0001z2-3Q
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 02:46:42 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:41899
- helo=us-smtp-delivery-1.mimecast.com)
+ id 1jl5Mw-00023J-NJ
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 02:46:51 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:55653
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jl5Mm-0005lc-Ex
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 02:46:41 -0400
+ id 1jl5Mt-0005ls-00
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 02:46:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592289999;
+ s=mimecast20190719; t=1592290002;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
- references:references; bh=9DCVqfUahatcxKFH6MvHYlG95pfvPCFHs33C502Wyd8=;
- b=gFp2bSE2dXt00f+Nl1+U/OwcTHpMsnILizrY/OAGXI3hAh6Di7DpolvVmkIAA4DOKf+3pO
- Eb1V9TIU2DHzofBbxTDpJKasv+8XFcJzMQp3xhTuJDpALwMX96ZFu4+vJvkE/s9ZWqpYyI
- hBsCO8rhuaLrFdg5FjzibPsdmaDfOgk=
+ references:references; bh=knZNVpLUEPruNNfU/OWb2xi+QKiEKywtJZm5h2oG0KI=;
+ b=I51eU5cpQogp0eWEi/eS/m7b67IMMD5gNwgHd4iX3fFmRkOl1GxU9KQv2xN8gPE2t6NYwm
+ 6TiSVk+AIkId0wGvkbeL7Qfc4WpZ2iyC0rRIDYuinTm3gDVgyuwawxinHBpXrA/IGnv308
+ 0J+pH3nQkShpLug2yZnx1GIXbg1keHk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-24-iZupXHF1M_-zwaXKGMQnKw-1; Tue, 16 Jun 2020 02:46:37 -0400
-X-MC-Unique: iZupXHF1M_-zwaXKGMQnKw-1
+ us-mta-191-dDokYR73OBGhHTsub2a11g-1; Tue, 16 Jun 2020 02:46:40 -0400
+X-MC-Unique: dDokYR73OBGhHTsub2a11g-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8EE538035E4;
- Tue, 16 Jun 2020 06:46:36 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EE35A1138300;
+ Tue, 16 Jun 2020 06:46:38 +0000 (UTC)
 Received: from jason-ThinkPad-T430s.redhat.com (ovpn-13-222.pek2.redhat.com
  [10.72.13.222])
- by smtp.corp.redhat.com (Postfix) with ESMTP id EE6A78202D;
- Tue, 16 Jun 2020 06:46:34 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 18F4D8202D;
+ Tue, 16 Jun 2020 06:46:36 +0000 (UTC)
 From: Jason Wang <jasowang@redhat.com>
 To: peter.maydell@linaro.org
-Subject: [PULL 20/33] net: cadence_gem: Update the reset value for interrupt
- mask register
-Date: Tue, 16 Jun 2020 14:45:31 +0800
-Message-Id: <1592289944-13727-21-git-send-email-jasowang@redhat.com>
+Subject: [PULL 21/33] net: cadence_gem: TX_LAST bit should be set by guest
+Date: Tue, 16 Jun 2020 14:45:32 +0800
+Message-Id: <1592289944-13727-22-git-send-email-jasowang@redhat.com>
 In-Reply-To: <1592289944-13727-1-git-send-email-jasowang@redhat.com>
 References: <1592289944-13727-1-git-send-email-jasowang@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jasowang@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=jasowang@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 02:01:17
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=jasowang@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 02:46:07
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -95,6 +92,7 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>,
  Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
@@ -102,27 +100,41 @@ Sender: "Qemu-devel"
 
 From: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
 
-Mask all interrupt on reset.
+TX_LAST bit should not be set by hardware, its set by guest to inform
+the last bd of the frame.
 
 Signed-off-by: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- hw/net/cadence_gem.c | 1 +
- 1 file changed, 1 insertion(+)
+ hw/net/cadence_gem.c | 6 ------
+ 1 file changed, 6 deletions(-)
 
 diff --git a/hw/net/cadence_gem.c b/hw/net/cadence_gem.c
-index 2211550..df6d818 100644
+index df6d818..78fb9ac 100644
 --- a/hw/net/cadence_gem.c
 +++ b/hw/net/cadence_gem.c
-@@ -1375,6 +1375,7 @@ static void gem_reset(DeviceState *d)
-     s->regs[GEM_DESCONF2] = 0x2ab10000 | s->jumbo_max_len;
-     s->regs[GEM_DESCONF5] = 0x002f2045;
-     s->regs[GEM_DESCONF6] = GEM_DESCONF6_64B_MASK;
-+    s->regs[GEM_INT_Q1_MASK] = 0x00000CE6;
-     s->regs[GEM_JUMBO_MAX_LEN] = s->jumbo_max_len;
+@@ -350,11 +350,6 @@ static inline unsigned tx_desc_get_last(uint32_t *desc)
+     return (desc[1] & DESC_1_TX_LAST) ? 1 : 0;
+ }
  
-     if (s->num_priority_queues > 1) {
+-static inline void tx_desc_set_last(uint32_t *desc)
+-{
+-    desc[1] |= DESC_1_TX_LAST;
+-}
+-
+ static inline unsigned tx_desc_get_length(uint32_t *desc)
+ {
+     return desc[1] & DESC_1_LENGTH;
+@@ -1298,7 +1293,6 @@ static void gem_transmit(CadenceGEMState *s)
+ 
+             /* read next descriptor */
+             if (tx_desc_get_wrap(desc)) {
+-                tx_desc_set_last(desc);
+ 
+                 if (s->regs[GEM_DMACFG] & GEM_DMACFG_ADDR_64B) {
+                     packet_desc_addr = s->regs[GEM_TBQPH];
 -- 
 2.5.0
 
