@@ -2,86 +2,86 @@ Return-Path: <SRS0=f7ls=75=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 303C8C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 13:05:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 217C3C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 13:05:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E18B720A8B
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 13:05:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AE5E720B80
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 13:05:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wh+Xx2FT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E18B720A8B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PE1I/Yjn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE5E720B80
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46554 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48952 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlBGw-0004jc-4O
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 09:05:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36516)
+	id 1jlBHU-0005iw-Ly
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 09:05:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33928)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jlBDj-0008Dj-VA
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 09:01:44 -0400
-Received: from mail-wm1-x32c.google.com ([2a00:1450:4864:20::32c]:34588)
+ id 1jlB61-0003xn-Pa
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 08:53:45 -0400
+Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:36399)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jlBDe-0001cW-Cy
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 09:01:43 -0400
-Received: by mail-wm1-x32c.google.com with SMTP id u26so2227377wmn.1
- for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 06:01:37 -0700 (PDT)
+ id 1jlB5z-00007t-9e
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 08:53:45 -0400
+Received: by mail-wr1-x42e.google.com with SMTP id q11so20672592wrp.3
+ for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 05:53:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=RbNElvIGkjlXKRGPXZgBVVIssKrGvTSw+jbb+dSxtd8=;
- b=wh+Xx2FTQv/Ndc3ibp1IaOIQSeojGsciSxJa8uvAQR3b+Im0UdSFYceFXUXufljQnp
- p99KO2Rgr/JiMwoCCsHrWKa4oxTpbkANIc/s32W1ZmiabDgtRBxzwUOssUoaVoky6l9T
- WmcqOJ18xjMOrs/8xjjjT70DA8KCxUiFS/hQvg1qwBoESJaFn4e1EHYIeiXJCqB7rK6Z
- lWoxCI4GpA4CtkkiY0KhpaNnmUXBC21fLzO1nGqSJbYAxE6R5yN9eESCu6cXMIkBkrQW
- r3Tv+mteK/ByNWLD96593m+4SV+5gB4ztdYZfEDhoOKVpTBVqL01Tj0xI4n/BsGk9z9w
- JNsQ==
+ bh=Itxyoaw44xcsG2G02PfO8bbyKkEnWDH8+KPdnp0/sa4=;
+ b=PE1I/Yjn8jvd9/hwuoXdDg8B1L696DIf7cbWY7BlnuTWDAfL4RdNhosFTgLC4SrRJP
+ 0hwFVTQHxdBuy9XbTRJIrb3LGiY2rIIcqjdXm8Ke+UK6XyRxZkWFRZpi7yapXWossMKz
+ LUdGcz1oNh03+Em4qEfauixVbwVoeipxnoIGdAWLb1W3VpUuUG3TUGQkbBYFPa96GmV1
+ BW1Br0lPteODGxJlGxD7ZPf0M+uqMfbPHr/2wrg6xzVlI0LMEbPWqjGtz8QDu5BRkxja
+ o6umSNpJE5FFP0UYIkKYUvpxnLzDTs9D2SyuZUwnKNlAAD30yq4RyhvUnvsJ5ShsxyQC
+ 6/jA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=RbNElvIGkjlXKRGPXZgBVVIssKrGvTSw+jbb+dSxtd8=;
- b=Dh+v+E5Obyye94t2GJ6gZhfxR/NMSR164WyGRPqLSBDcJMbWgCCQIO5A4xyqAtFcI6
- q2aHdQ8HR9297Qs8AjOwEmd7nE4WICxBSnlDJlzqAiAYU0/mKMf3cookNFpfN+HaaCq3
- IajedoHyuRnYbYYp7Dl5q+uAmrdOfjjuQlZZocD09ImBwkQZuYlm4YDOiyNfzZm7aZ/T
- 4Bkq1YXZ2LYaHldx2E8h6m2tk4hq7BxMew9acqjSOOLUjiG+ydQd2ZjidU1qKjpiWwHj
- MlX4oSl3S5OD6XrrPmvJg/qnInII9oNltTtfsNJT7NVWIYB3kXZ/49vW19KR5lxHHdKf
- B46w==
-X-Gm-Message-State: AOAM531/DYyUPuH5zW5qlZfVYgFVlDMic13WRZj7aFV0fd+hcQ6KTw6H
- VX8DjCtbyE+jS9a/gMstZSNHjQ==
-X-Google-Smtp-Source: ABdhPJz0Ij32DlYGd/URguH07tF6c/5GuDkHQbtmTKX/6RBt3IB4S0brGopnoIlox3rD0I0OepOF0Q==
-X-Received: by 2002:a7b:cb56:: with SMTP id v22mr3217325wmj.180.1592312496060; 
- Tue, 16 Jun 2020 06:01:36 -0700 (PDT)
+ bh=Itxyoaw44xcsG2G02PfO8bbyKkEnWDH8+KPdnp0/sa4=;
+ b=AkSZjkECizN6Pk+nS/8ZEOzQITxjVjgCy723XzCbYh8Xif/ra/cWPgXL8725WZTSJB
+ R+UyEzZE70h9bLJ8oKzVEx7jUMwcbKGbo0P9vKZ98xfjfbjwl8miACyO9BxfrlcwSpJ3
+ vReeuArF5oyPHZExiSN4ZQFdRFchzEpZt292OE6bxEZl/f0bgKw54Tptjt45jVMgKoL/
+ 0xDvUsp2ZZLP53l1N8fFq0nonCBDtnfS9D/AXeRIGr2jCcJjrGPFpZ9L2iXDExvIubi4
+ OZuIqRh7AWGg2peoOBbu7qG3eLqOW44TIXUUPAc62F/n2XVWSfjEgK5x6gU3Y8ifPg15
+ BzdQ==
+X-Gm-Message-State: AOAM530KamxT/NsUD4rf/wwD5x4GW2AzVMU6CifRaqjiiZnXANdguLFF
+ 5koIGGpd+xRJkL0hKD090gSKgw==
+X-Google-Smtp-Source: ABdhPJz3k6lfhPEnbkdd3hsn5kzqb3WvhSb9sfF+4T6GLOGKl9HYzAfK3rKk2hJ520zvh7WluhDjvQ==
+X-Received: by 2002:adf:e58c:: with SMTP id l12mr2969692wrm.34.1592312019758; 
+ Tue, 16 Jun 2020 05:53:39 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id c68sm3907750wmd.12.2020.06.16.06.01.30
+ by smtp.gmail.com with ESMTPSA id v66sm4123611wme.13.2020.06.16.05.53.31
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 16 Jun 2020 06:01:34 -0700 (PDT)
+ Tue, 16 Jun 2020 05:53:35 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 2F49B1FFA9;
- Tue, 16 Jun 2020 13:53:26 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id 855311FF9C;
+ Tue, 16 Jun 2020 13:53:25 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: peter.maydell@linaro.org
-Subject: [PULL 20/21] tests/tcg: ensure -cpu max also used for plugin run
-Date: Tue, 16 Jun 2020 13:53:23 +0100
-Message-Id: <20200616125324.19045-21-alex.bennee@linaro.org>
+Subject: [PULL 13/21] include/qemu: Added tsan.h for annotations.
+Date: Tue, 16 Jun 2020 13:53:16 +0100
+Message-Id: <20200616125324.19045-14-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200616125324.19045-1-alex.bennee@linaro.org>
 References: <20200616125324.19045-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::32c;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x32c.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::42e;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x42e.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -89,8 +89,8 @@ X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,51 +103,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
- "open list:ARM TCG CPUs" <qemu-arm@nongnu.org>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Richard Henderson <rth@twiddle.net>
+Cc: "Emilio G . Cota" <cota@braap.org>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
+ Robert Foley <robert.foley@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The check-tcg plugins build was failing because some special case
-tests that needed -cpu max failed because the plugin variant hadn't
-carried across the QEMU_OPTS tweak.
+From: Robert Foley <robert.foley@linaro.org>
 
-Guests which globally set QEMU_OPTS=-cpu FOO where unaffected.
+These annotations will allow us to give tsan
+additional hints.  For example, we can inform
+tsan about reads/writes to ignore to silence certain
+classes of warnings.
+We can also annotate threads so that the proper thread
+naming shows up in tsan warning results.
 
+Signed-off-by: Robert Foley <robert.foley@linaro.org>
+Reviewed-by: Emilio G. Cota <cota@braap.org>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Message-Id: <20200615141922.18829-3-alex.bennee@linaro.org>
+Message-Id: <20200609200738.445-11-robert.foley@linaro.org>
+Message-Id: <20200612190237.30436-14-alex.bennee@linaro.org>
 
-diff --git a/tests/tcg/aarch64/Makefile.target b/tests/tcg/aarch64/Makefile.target
-index 6d60a2f2eed..b617f2ac7e0 100644
---- a/tests/tcg/aarch64/Makefile.target
-+++ b/tests/tcg/aarch64/Makefile.target
-@@ -20,8 +20,9 @@ run-fcvt: fcvt
- # Pauth Tests
- ifneq ($(DOCKER_IMAGE)$(CROSS_CC_HAS_ARMV8_3),)
- AARCH64_TESTS += pauth-1 pauth-2 pauth-4
--run-pauth-%: QEMU_OPTS += -cpu max
- pauth-%: CFLAGS += -march=armv8.3-a
-+run-pauth-%: QEMU_OPTS += -cpu max
-+run-plugin-pauth-%: QEMU_OPTS += -cpu max
- endif
- 
- # Semihosting smoke test for linux-user
-diff --git a/tests/tcg/i386/Makefile.target b/tests/tcg/i386/Makefile.target
-index 53efec06683..1a6463a7dc1 100644
---- a/tests/tcg/i386/Makefile.target
-+++ b/tests/tcg/i386/Makefile.target
-@@ -12,6 +12,7 @@ X86_64_TESTS:=$(filter test-i386-ssse3, $(ALL_X86_TESTS))
- 
- test-i386-pcmpistri: CFLAGS += -msse4.2
- run-test-i386-pcmpistri: QEMU_OPTS += -cpu max
-+run-plugin-test-i386-pcmpistri-%: QEMU_OPTS += -cpu max
- 
- #
- # hello-i386 is a barebones app
+diff --git a/include/qemu/tsan.h b/include/qemu/tsan.h
+new file mode 100644
+index 00000000000..09cc665f91d
+--- /dev/null
++++ b/include/qemu/tsan.h
+@@ -0,0 +1,71 @@
++#ifndef QEMU_TSAN_H
++#define QEMU_TSAN_H
++/*
++ * tsan.h
++ *
++ * This file defines macros used to give ThreadSanitizer
++ * additional information to help suppress warnings.
++ * This is necessary since TSan does not provide a header file
++ * for these annotations.  The standard way to include these
++ * is via the below macros.
++ *
++ * Annotation examples can be found here:
++ *  https://github.com/llvm/llvm-project/tree/master/compiler-rt/test/tsan
++ * annotate_happens_before.cpp or ignore_race.cpp are good places to start.
++ *
++ * The full set of annotations can be found here in tsan_interface_ann.cpp.
++ *  https://github.com/llvm/llvm-project/blob/master/compiler-rt/lib/tsan/rtl/
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++
++#ifdef CONFIG_TSAN
++/*
++ * Informs TSan of a happens before/after relationship.
++ */
++#define QEMU_TSAN_ANNOTATE_HAPPENS_BEFORE(addr) \
++    AnnotateHappensBefore(__FILE__, __LINE__, (void *)(addr))
++#define QEMU_TSAN_ANNOTATE_HAPPENS_AFTER(addr) \
++    AnnotateHappensAfter(__FILE__, __LINE__, (void *)(addr))
++/*
++ * Gives TSan more information about thread names it can report the
++ * name of the thread in the warning report.
++ */
++#define QEMU_TSAN_ANNOTATE_THREAD_NAME(name) \
++    AnnotateThreadName(__FILE__, __LINE__, (void *)(name))
++/*
++ * Allows defining a region of code on which TSan will not record memory READS.
++ * This has the effect of disabling race detection for this section of code.
++ */
++#define QEMU_TSAN_ANNOTATE_IGNORE_READS_BEGIN() \
++    AnnotateIgnoreReadsBegin(__FILE__, __LINE__)
++#define QEMU_TSAN_ANNOTATE_IGNORE_READS_END() \
++    AnnotateIgnoreReadsEnd(__FILE__, __LINE__)
++/*
++ * Allows defining a region of code on which TSan will not record memory
++ * WRITES.  This has the effect of disabling race detection for this
++ * section of code.
++ */
++#define QEMU_TSAN_ANNOTATE_IGNORE_WRITES_BEGIN() \
++    AnnotateIgnoreWritesBegin(__FILE__, __LINE__)
++#define QEMU_TSAN_ANNOTATE_IGNORE_WRITES_END() \
++    AnnotateIgnoreWritesEnd(__FILE__, __LINE__)
++#else
++#define QEMU_TSAN_ANNOTATE_HAPPENS_BEFORE(addr)
++#define QEMU_TSAN_ANNOTATE_HAPPENS_AFTER(addr)
++#define QEMU_TSAN_ANNOTATE_THREAD_NAME(name)
++#define QEMU_TSAN_ANNOTATE_IGNORE_READS_BEGIN()
++#define QEMU_TSAN_ANNOTATE_IGNORE_READS_END()
++#define QEMU_TSAN_ANNOTATE_IGNORE_WRITES_BEGIN()
++#define QEMU_TSAN_ANNOTATE_IGNORE_WRITES_END()
++#endif
++
++void AnnotateHappensBefore(const char *f, int l, void *addr);
++void AnnotateHappensAfter(const char *f, int l, void *addr);
++void AnnotateThreadName(const char *f, int l, char *name);
++void AnnotateIgnoreReadsBegin(const char *f, int l);
++void AnnotateIgnoreReadsEnd(const char *f, int l);
++void AnnotateIgnoreWritesBegin(const char *f, int l);
++void AnnotateIgnoreWritesEnd(const char *f, int l);
++#endif
 -- 
 2.20.1
 
