@@ -2,83 +2,85 @@ Return-Path: <SRS0=f7ls=75=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2360C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 13:23:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1251BC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 13:23:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 70B3D2098B
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 13:23:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C41772098B
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 13:23:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A+HndNaW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70B3D2098B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=anisinha-ca.20150623.gappssmtp.com header.i=@anisinha-ca.20150623.gappssmtp.com header.b="YowGLFgs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C41772098B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=anisinha.ca
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48436 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48978 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlBYk-0002VY-Nb
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 09:23:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41768)
+	id 1jlBYt-0002j3-2p
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 09:23:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42256)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jlBTh-00067O-MK
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 09:18:13 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:41737
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jlBTe-0004iM-GA
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 09:18:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592313488;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=b3qQAhtLM2TtTz3BV+N8EU4RWEZs55DPQGgMSdMu5cg=;
- b=A+HndNaW0b6El/kwnNLCIjl4njN5qdAia9boXIVf1f6FZU+/5/SBiQ9BpE2zGdVm8UGAGa
- DuM0SA3VpfPX+abFvqH6lgzYU7CtYxBtJ/4siOKf8wBpjUO2Z+235yTB8xnVUjh1KL46GJ
- rgTwtB1P2dvkmqGsz3eSr3d4Ji7VAVU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-491--O-0Mc1SMcaXEkegk4Eapg-1; Tue, 16 Jun 2020 09:18:04 -0400
-X-MC-Unique: -O-0Mc1SMcaXEkegk4Eapg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 87B6F10AB64B;
- Tue, 16 Jun 2020 13:18:03 +0000 (UTC)
-Received: from localhost (ovpn-112-244.ams2.redhat.com [10.36.112.244])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id ED3296FDD1;
- Tue, 16 Jun 2020 13:18:02 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH 2/2] iotests: filter few more luks specific create options
-Date: Tue, 16 Jun 2020 15:17:56 +0200
-Message-Id: <20200616131756.1073438-3-mreitz@redhat.com>
-In-Reply-To: <20200616131756.1073438-1-mreitz@redhat.com>
-References: <20200616131756.1073438-1-mreitz@redhat.com>
+ (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1jlBVs-0007r4-DX
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 09:20:28 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:37752)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1jlBVq-00059z-B4
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 09:20:28 -0400
+Received: by mail-wr1-x443.google.com with SMTP id x13so20735120wrv.4
+ for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 06:20:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=anisinha-ca.20150623.gappssmtp.com; s=20150623;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=fKmeIt7w8WPPk6i1PHJWxdOIec66Soh/1diRqhLZsno=;
+ b=YowGLFgsNH9GJcQB4nfvooKOdd0NxFuxwliPBoS2E2IEf+FUbGkDEfIBlv+O4rudk7
+ OrHSgDrCBLq5nvx8XZsPAwcA+WhUGLvpvKF8SXYZ3m8qDJ5rwKJ3J8X/tBBY0mAdwZsV
+ 5BvFiy+hlIhS+dDxvP/nt40ptpMwjmZEsoXilpNcyAXYJlm7WShONCmMhaYwRKnlQlBy
+ FmCxhLFkGYtkFvT4npasz6TIxCWdulRD0HZgioAph6f70pxFr0WVm6/3+UEjzx+2MGCK
+ o8brVkVT9p1EIW10cnHdpNeA+JguCBHqSwmFWLKkbSV0kiTtRpqxmZP3mHT2qyvgebRE
+ ghiQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=fKmeIt7w8WPPk6i1PHJWxdOIec66Soh/1diRqhLZsno=;
+ b=sp3mj4J+IMs6xSsdUp1UdEWr/YWOA7KbbE9VpDCYEGagjls+7kibSlCqNYpDNR35uw
+ mTanWWWcjhMKJnJe1xy6/Owx54X6MBFUlktfboiJ6T+8ssUftxvuF7vK3ihhty55qeL6
+ bz4N/LAYoKyyDYZ0fu9KOYMfykUFSk5oeWBtkuQLrTtzmO2k+GgiD4qUJbp5Qat02lb9
+ DZMTcTtdKaDsIQ+nMce5VX9T8UaggbCjK0WbX9ggQuxpVJUMSlxi7T4xjGDQnHYnrOeb
+ VNP8SIqZ/8HLHdDZQ5cbCeVrM82wOMnZhVmytPUtePTEPTL1XwrQ4gQBHnRhF7nnZqHJ
+ 0N5w==
+X-Gm-Message-State: AOAM530I0Mn5ZqR9iLXcLV44ToPBOFJQGT00lfUvgFjENIOQyXhMPhpA
+ jl9ZsixR4jPOk2Sf9SIsM4oPfjui0sN8xEJIlWHL9A==
+X-Google-Smtp-Source: ABdhPJzL3+GWm67Tpurw0Vk48+Bu4nfgcabTtlb9C0RluQ2n7j/cFyDRjE/XG9wTqbLzSaPx+pPN6h7kA7MvwzfjHGk=
+X-Received: by 2002:adf:b355:: with SMTP id k21mr3033229wrd.76.1592313624310; 
+ Tue, 16 Jun 2020 06:20:24 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=mreitz@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 02:46:07
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+References: <1592310699-58916-1-git-send-email-ani.sinha@nutanix.com>
+ <20200616151735.17a84340@redhat.com>
+In-Reply-To: <20200616151735.17a84340@redhat.com>
+From: Ani Sinha <ani@anisinha.ca>
+Date: Tue, 16 Jun 2020 18:50:13 +0530
+Message-ID: <CAARzgwwKwdYW0BK4-W2=q=g3cN4BZfPN6p8QqvgAsqJ7tifHtA@mail.gmail.com>
+Subject: Re: [PATCH V3] Rename use_acpi_pci_hotplug to more appropriate
+ use_acpi_hotplug_bridge
+To: Igor Mammedov <imammedo@redhat.com>
+Content-Type: multipart/alternative; boundary="000000000000f2da2b05a8336748"
+Received-SPF: none client-ip=2a00:1450:4864:20::443;
+ envelope-from=ani@anisinha.ca; helo=mail-wr1-x443.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -91,221 +93,285 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: Ani Sinha <ani.sinha@nutanix.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ qemu-devel@nongnu.org, Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Maxim Levitsky <mlevitsk@redhat.com>
+--000000000000f2da2b05a8336748
+Content-Type: text/plain; charset="UTF-8"
 
-This allows more tests to be able to have same output on both qcow2 luks encrypted images
-and raw luks images
+On Tue, Jun 16, 2020 at 6:47 PM Igor Mammedov <imammedo@redhat.com> wrote:
 
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- tests/qemu-iotests/087.out       | 6 +++---
- tests/qemu-iotests/134.out       | 2 +-
- tests/qemu-iotests/158.out       | 4 ++--
- tests/qemu-iotests/188.out       | 2 +-
- tests/qemu-iotests/189.out       | 4 ++--
- tests/qemu-iotests/198.out       | 4 ++--
- tests/qemu-iotests/263.out       | 4 ++--
- tests/qemu-iotests/284.out       | 6 +++---
- tests/qemu-iotests/common.filter | 5 +----
- 9 files changed, 17 insertions(+), 20 deletions(-)
+> On Tue, 16 Jun 2020 12:31:39 +0000
+> Ani Sinha <ani.sinha@nutanix.com> wrote:
+>
+> > Currently, the option use_acpi_pci_hotplug is being used to control
+> device
+> > hotplug capability using ACPI for slots of cold plugged bridges. Hence,
+> we
+> > are renaming this option to better reflect what it actually does.
+> >
+> > Signed-off-by: Ani Sinha <ani.sinha@nutanix.com>
+> > ---
+>
+> what was wrong with v2?
 
-diff --git a/tests/qemu-iotests/087.out b/tests/qemu-iotests/087.out
-index 2d92ea847b..b61ba638af 100644
---- a/tests/qemu-iotests/087.out
-+++ b/tests/qemu-iotests/087.out
-@@ -34,7 +34,7 @@ QMP_VERSION
- 
- === Encrypted image QCow ===
- 
--Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 encryption=on encrypt.key-secret=sec0
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 encryption=on
- Testing:
- QMP_VERSION
- {"return": {}}
-@@ -46,7 +46,7 @@ QMP_VERSION
- 
- === Encrypted image LUKS ===
- 
--Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 encrypt.format=luks encrypt.key-secret=sec0
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
- Testing:
- QMP_VERSION
- {"return": {}}
-@@ -58,7 +58,7 @@ QMP_VERSION
- 
- === Missing driver ===
- 
--Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 encryption=on encrypt.key-secret=sec0
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 encryption=on
- Testing: -S
- QMP_VERSION
- {"return": {}}
-diff --git a/tests/qemu-iotests/134.out b/tests/qemu-iotests/134.out
-index 09d46f6b17..4abc5b5f7d 100644
---- a/tests/qemu-iotests/134.out
-+++ b/tests/qemu-iotests/134.out
-@@ -1,5 +1,5 @@
- QA output created by 134
--Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 encryption=on encrypt.key-secret=sec0
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 encryption=on
- 
- == reading whole image ==
- read 134217728/134217728 bytes at offset 0
-diff --git a/tests/qemu-iotests/158.out b/tests/qemu-iotests/158.out
-index 6def216e55..f28a17626b 100644
---- a/tests/qemu-iotests/158.out
-+++ b/tests/qemu-iotests/158.out
-@@ -1,6 +1,6 @@
- QA output created by 158
- == create base ==
--Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=134217728 encryption=on encrypt.key-secret=sec0
-+Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=134217728 encryption=on
- 
- == writing whole image ==
- wrote 134217728/134217728 bytes at offset 0
-@@ -10,7 +10,7 @@ wrote 134217728/134217728 bytes at offset 0
- read 134217728/134217728 bytes at offset 0
- 128 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- == create overlay ==
--Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 backing_file=TEST_DIR/t.IMGFMT.base encryption=on encrypt.key-secret=sec0
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 backing_file=TEST_DIR/t.IMGFMT.base encryption=on
- 
- == writing part of a cluster ==
- wrote 1024/1024 bytes at offset 0
-diff --git a/tests/qemu-iotests/188.out b/tests/qemu-iotests/188.out
-index c568ef3701..5426861b18 100644
---- a/tests/qemu-iotests/188.out
-+++ b/tests/qemu-iotests/188.out
-@@ -1,5 +1,5 @@
- QA output created by 188
--Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=16777216 encrypt.format=luks encrypt.key-secret=sec0 encrypt.iter-time=10
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=16777216
- 
- == reading whole image ==
- read 16777216/16777216 bytes at offset 0
-diff --git a/tests/qemu-iotests/189.out b/tests/qemu-iotests/189.out
-index a0b7c9c24c..bc213cbe14 100644
---- a/tests/qemu-iotests/189.out
-+++ b/tests/qemu-iotests/189.out
-@@ -1,6 +1,6 @@
- QA output created by 189
- == create base ==
--Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=16777216 encrypt.format=luks encrypt.key-secret=sec0 encrypt.iter-time=10
-+Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=16777216
- 
- == writing whole image ==
- wrote 16777216/16777216 bytes at offset 0
-@@ -10,7 +10,7 @@ wrote 16777216/16777216 bytes at offset 0
- read 16777216/16777216 bytes at offset 0
- 16 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- == create overlay ==
--Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=16777216 backing_file=TEST_DIR/t.IMGFMT.base encrypt.format=luks encrypt.key-secret=sec1 encrypt.iter-time=10
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=16777216 backing_file=TEST_DIR/t.IMGFMT.base
- 
- == writing part of a cluster ==
- wrote 1024/1024 bytes at offset 0
-diff --git a/tests/qemu-iotests/198.out b/tests/qemu-iotests/198.out
-index 6280ae6eed..4b800e70db 100644
---- a/tests/qemu-iotests/198.out
-+++ b/tests/qemu-iotests/198.out
-@@ -1,12 +1,12 @@
- QA output created by 198
- == create base ==
--Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=16777216 encrypt.format=luks encrypt.key-secret=sec0 encrypt.iter-time=10
-+Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=16777216
- 
- == writing whole image base ==
- wrote 16777216/16777216 bytes at offset 0
- 16 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- == create overlay ==
--Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=16777216 backing_file=TEST_DIR/t.IMGFMT.base encrypt.format=luks encrypt.key-secret=sec1 encrypt.iter-time=10
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=16777216 backing_file=TEST_DIR/t.IMGFMT.base
- 
- == writing whole image layer ==
- wrote 16777216/16777216 bytes at offset 0
-diff --git a/tests/qemu-iotests/263.out b/tests/qemu-iotests/263.out
-index 0c982c55cb..54bfbeeff8 100644
---- a/tests/qemu-iotests/263.out
-+++ b/tests/qemu-iotests/263.out
-@@ -2,7 +2,7 @@ QA output created by 263
- 
- testing LUKS qcow2 encryption
- 
--Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576 encrypt.format=luks encrypt.key-secret=sec0 encrypt.iter-time=10
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
- == reading the whole image ==
- read 1048576/1048576 bytes at offset 0
- 1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-@@ -21,7 +21,7 @@ read 982528/982528 bytes at offset 66048
- 
- testing legacy AES qcow2 encryption
- 
--Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576 encrypt.format=aes encrypt.key-secret=sec0
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
- == reading the whole image ==
- read 1048576/1048576 bytes at offset 0
- 1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-diff --git a/tests/qemu-iotests/284.out b/tests/qemu-iotests/284.out
-index 48216f5742..a929239302 100644
---- a/tests/qemu-iotests/284.out
-+++ b/tests/qemu-iotests/284.out
-@@ -2,7 +2,7 @@ QA output created by 284
- 
- testing LUKS qcow2 encryption
- 
--Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576 encrypt.format=luks encrypt.key-secret=sec0 encrypt.iter-time=10
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
- 
- == cluster size 512
- == checking image refcounts ==
-@@ -21,7 +21,7 @@ wrote 1/1 bytes at offset 512
- 
- == rechecking image refcounts ==
- No errors were found on the image.
--Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576 encrypt.format=luks encrypt.key-secret=sec0 encrypt.iter-time=10
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
- 
- == cluster size 2048
- == checking image refcounts ==
-@@ -40,7 +40,7 @@ wrote 1/1 bytes at offset 2048
- 
- == rechecking image refcounts ==
- No errors were found on the image.
--Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576 encrypt.format=luks encrypt.key-secret=sec0 encrypt.iter-time=10
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
- 
- == cluster size 32768
- == checking image refcounts ==
-diff --git a/tests/qemu-iotests/common.filter b/tests/qemu-iotests/common.filter
-index f104ad7a9b..9ae7ac9891 100644
---- a/tests/qemu-iotests/common.filter
-+++ b/tests/qemu-iotests/common.filter
-@@ -182,16 +182,13 @@ _filter_img_create()
-         echo "$options" \
-         | tr '\n' '\0' \
-         | sed -e 's/\x0$//' -e 's/ \([a-z0-9_.-]*\)=/\n\1=/g' \
--        | grep -ae "^\(fmt\\|size\\|backing\\|preallocation\\|encrypt$grep_data_file\\)" \
-+        | grep -ae "^\(fmt\\|size\\|backing\\|preallocation\\|encryption$grep_data_file\\)" \
-         | $SED "${filename_filters[@]}" \
-             -e 's/^\(fmt\)/0-\1/' \
-             -e 's/^\(size\)/1-\1/' \
-             -e 's/^\(backing\)/2-\1/' \
-             -e 's/^\(data_file\)/3-\1/' \
-             -e 's/^\(encryption\)/4-\1/' \
--            -e 's/^\(encrypt\.format\)/5-\1/' \
--            -e 's/^\(encrypt\.key-secret\)/6-\1/' \
--            -e 's/^\(encrypt\.iter-time\)/7-\1/' \
-             -e 's/^\(preallocation\)/8-\1/' \
-         | sort \
-         | $SED -e 's/^[0-9]-//' \
--- 
-2.26.2
 
+i removed the change-id string.
+
+
+> Also for the future,
+> can you add under --- line change log please?
+>
+> >  hw/acpi/piix4.c | 21 +++++++++++----------
+> >  1 file changed, 11 insertions(+), 10 deletions(-)
+
+
+It's already here.
+
+
+> >
+> > diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
+> > index 85c199b..7de44bc 100644
+> > --- a/hw/acpi/piix4.c
+> > +++ b/hw/acpi/piix4.c
+> > @@ -77,7 +77,7 @@ typedef struct PIIX4PMState {
+> >      Notifier powerdown_notifier;
+> >
+> >      AcpiPciHpState acpi_pci_hotplug;
+> > -    bool use_acpi_pci_hotplug;
+> > +    bool use_acpi_hotplug_bridge;
+> >
+> >      uint8_t disable_s3;
+> >      uint8_t disable_s4;
+> > @@ -204,16 +204,17 @@ static const VMStateDescription vmstate_pci_status
+> = {
+> >      }
+> >  };
+> >
+> > -static bool vmstate_test_use_acpi_pci_hotplug(void *opaque, int
+> version_id)
+> > +static bool vmstate_test_use_acpi_hotplug_bridge(void *opaque, int
+> version_id)
+> >  {
+> >      PIIX4PMState *s = opaque;
+> > -    return s->use_acpi_pci_hotplug;
+> > +    return s->use_acpi_hotplug_bridge;
+> >  }
+> >
+> > -static bool vmstate_test_no_use_acpi_pci_hotplug(void *opaque, int
+> version_id)
+> > +static bool vmstate_test_no_use_acpi_hotplug_bridge(void *opaque,
+> > +                                                    int version_id)
+> >  {
+> >      PIIX4PMState *s = opaque;
+> > -    return !s->use_acpi_pci_hotplug;
+> > +    return !s->use_acpi_hotplug_bridge;
+> >  }
+> >
+> >  static bool vmstate_test_use_memhp(void *opaque)
+> > @@ -290,11 +291,11 @@ static const VMStateDescription vmstate_acpi = {
+> >          VMSTATE_STRUCT_TEST(
+> >
+> acpi_pci_hotplug.acpi_pcihp_pci_status[ACPI_PCIHP_BSEL_DEFAULT],
+> >              PIIX4PMState,
+> > -            vmstate_test_no_use_acpi_pci_hotplug,
+> > +            vmstate_test_no_use_acpi_hotplug_bridge,
+> >              2, vmstate_pci_status,
+> >              struct AcpiPciHpPciStatus),
+> >          VMSTATE_PCI_HOTPLUG(acpi_pci_hotplug, PIIX4PMState,
+> > -                            vmstate_test_use_acpi_pci_hotplug),
+> > +                            vmstate_test_use_acpi_hotplug_bridge),
+> >          VMSTATE_END_OF_LIST()
+> >      },
+> >      .subsections = (const VMStateDescription*[]) {
+> > @@ -528,7 +529,7 @@ I2CBus *piix4_pm_init(PCIBus *bus, int devfn,
+> uint32_t smb_io_base,
+> >      s->smi_irq = smi_irq;
+> >      s->smm_enabled = smm_enabled;
+> >      if (xen_enabled()) {
+> > -        s->use_acpi_pci_hotplug = false;
+> > +        s->use_acpi_hotplug_bridge = false;
+> >      }
+> >
+> >      qdev_init_nofail(dev);
+> > @@ -593,7 +594,7 @@ static void
+> piix4_acpi_system_hot_add_init(MemoryRegion *parent,
+> >      memory_region_add_subregion(parent, GPE_BASE, &s->io_gpe);
+> >
+> >      acpi_pcihp_init(OBJECT(s), &s->acpi_pci_hotplug, bus, parent,
+> > -                    s->use_acpi_pci_hotplug);
+> > +                    s->use_acpi_hotplug_bridge);
+> >
+> >      s->cpu_hotplug_legacy = true;
+> >      object_property_add_bool(OBJECT(s), "cpu-hotplug-legacy",
+> > @@ -631,7 +632,7 @@ static Property piix4_pm_properties[] = {
+> >      DEFINE_PROP_UINT8(ACPI_PM_PROP_S4_DISABLED, PIIX4PMState,
+> disable_s4, 0),
+> >      DEFINE_PROP_UINT8(ACPI_PM_PROP_S4_VAL, PIIX4PMState, s4_val, 2),
+> >      DEFINE_PROP_BOOL("acpi-pci-hotplug-with-bridge-support",
+> PIIX4PMState,
+> > -                     use_acpi_pci_hotplug, true),
+> > +                     use_acpi_hotplug_bridge, true),
+> >      DEFINE_PROP_BOOL("memory-hotplug-support", PIIX4PMState,
+> >                       acpi_memory_hotplug.is_enabled, true),
+> >      DEFINE_PROP_END_OF_LIST(),
+>
+>
+
+--000000000000f2da2b05a8336748
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div><br></div><div><br><div class=3D"gmail_quote"><div dir=3D"ltr" class=
+=3D"gmail_attr">On Tue, Jun 16, 2020 at 6:47 PM Igor Mammedov &lt;<a href=
+=3D"mailto:imammedo@redhat.com">imammedo@redhat.com</a>&gt; wrote:<br></div=
+><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border=
+-left-width:1px;border-left-style:solid;padding-left:1ex;border-left-color:=
+rgb(204,204,204)">On Tue, 16 Jun 2020 12:31:39 +0000<br>
+Ani Sinha &lt;<a href=3D"mailto:ani.sinha@nutanix.com" target=3D"_blank">an=
+i.sinha@nutanix.com</a>&gt; wrote:<br>
+<br>
+&gt; Currently, the option use_acpi_pci_hotplug is being used to control de=
+vice<br>
+&gt; hotplug capability using ACPI for slots of cold plugged bridges. Hence=
+, we<br>
+&gt; are renaming this option to better reflect what it actually does.<br>
+&gt; <br>
+&gt; Signed-off-by: Ani Sinha &lt;<a href=3D"mailto:ani.sinha@nutanix.com" =
+target=3D"_blank">ani.sinha@nutanix.com</a>&gt;<br>
+&gt; ---<br>
+<br>
+what was wrong with v2?</blockquote><div dir=3D"auto"><br></div><blockquote=
+ class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left-width:=
+1px;border-left-style:solid;padding-left:1ex;border-left-color:rgb(204,204,=
+204)"></blockquote><div dir=3D"auto">i removed the change-id string.</div><=
+div dir=3D"auto"><br></div><blockquote class=3D"gmail_quote" style=3D"margi=
+n:0px 0px 0px 0.8ex;border-left-width:1px;border-left-style:solid;padding-l=
+eft:1ex;border-left-color:rgb(204,204,204)"><br>
+Also for the future,<br>
+can you add under --- line change log please?<br>
+<br>
+&gt;=C2=A0 hw/acpi/piix4.c | 21 +++++++++++----------<br>
+&gt;=C2=A0 1 file changed, 11 insertions(+), 10 deletions(-)</blockquote><d=
+iv dir=3D"auto"><br></div><div dir=3D"auto">It&#39;s already here.</div><di=
+v dir=3D"auto"><br></div><blockquote class=3D"gmail_quote" style=3D"margin:=
+0px 0px 0px 0.8ex;border-left-width:1px;border-left-style:solid;padding-lef=
+t:1ex;border-left-color:rgb(204,204,204)"><br>
+&gt; <br>
+&gt; diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c<br>
+&gt; index 85c199b..7de44bc 100644<br>
+&gt; --- a/hw/acpi/piix4.c<br>
+&gt; +++ b/hw/acpi/piix4.c<br>
+&gt; @@ -77,7 +77,7 @@ typedef struct PIIX4PMState {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 Notifier powerdown_notifier;<br>
+&gt;=C2=A0 <br>
+&gt;=C2=A0 =C2=A0 =C2=A0 AcpiPciHpState acpi_pci_hotplug;<br>
+&gt; -=C2=A0 =C2=A0 bool use_acpi_pci_hotplug;<br>
+&gt; +=C2=A0 =C2=A0 bool use_acpi_hotplug_bridge;<br>
+&gt;=C2=A0 <br>
+&gt;=C2=A0 =C2=A0 =C2=A0 uint8_t disable_s3;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 uint8_t disable_s4;<br>
+&gt; @@ -204,16 +204,17 @@ static const VMStateDescription vmstate_pci_stat=
+us =3D {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 }<br>
+&gt;=C2=A0 };<br>
+&gt;=C2=A0 <br>
+&gt; -static bool vmstate_test_use_acpi_pci_hotplug(void *opaque, int versi=
+on_id)<br>
+&gt; +static bool vmstate_test_use_acpi_hotplug_bridge(void *opaque, int ve=
+rsion_id)<br>
+&gt;=C2=A0 {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 PIIX4PMState *s =3D opaque;<br>
+&gt; -=C2=A0 =C2=A0 return s-&gt;use_acpi_pci_hotplug;<br>
+&gt; +=C2=A0 =C2=A0 return s-&gt;use_acpi_hotplug_bridge;<br>
+&gt;=C2=A0 }<br>
+&gt;=C2=A0 <br>
+&gt; -static bool vmstate_test_no_use_acpi_pci_hotplug(void *opaque, int ve=
+rsion_id)<br>
+&gt; +static bool vmstate_test_no_use_acpi_hotplug_bridge(void *opaque,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 int version_id)<br>
+&gt;=C2=A0 {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 PIIX4PMState *s =3D opaque;<br>
+&gt; -=C2=A0 =C2=A0 return !s-&gt;use_acpi_pci_hotplug;<br>
+&gt; +=C2=A0 =C2=A0 return !s-&gt;use_acpi_hotplug_bridge;<br>
+&gt;=C2=A0 }<br>
+&gt;=C2=A0 <br>
+&gt;=C2=A0 static bool vmstate_test_use_memhp(void *opaque)<br>
+&gt; @@ -290,11 +291,11 @@ static const VMStateDescription vmstate_acpi =3D=
+ {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 VMSTATE_STRUCT_TEST(<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 acpi_pci_hotplug.acpi_=
+pcihp_pci_status[ACPI_PCIHP_BSEL_DEFAULT],<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 PIIX4PMState,<br>
+&gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 vmstate_test_no_use_acpi_pc=
+i_hotplug,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 vmstate_test_no_use_acpi_ho=
+tplug_bridge,<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 2, vmstate_pci_status,=
+<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 struct AcpiPciHpPciSta=
+tus),<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 VMSTATE_PCI_HOTPLUG(acpi_pci_hotplug=
+, PIIX4PMState,<br>
+&gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 vmstate_test_use_acpi_pci_hotplug),<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 vmstate_test_use_acpi_hotplug_bridge),<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 VMSTATE_END_OF_LIST()<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 },<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 .subsections =3D (const VMStateDescription*[]) {<b=
+r>
+&gt; @@ -528,7 +529,7 @@ I2CBus *piix4_pm_init(PCIBus *bus, int devfn, uint=
+32_t smb_io_base,<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 s-&gt;smi_irq =3D smi_irq;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 s-&gt;smm_enabled =3D smm_enabled;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 if (xen_enabled()) {<br>
+&gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0 s-&gt;use_acpi_pci_hotplug =3D false;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 s-&gt;use_acpi_hotplug_bridge =3D false;<=
+br>
+&gt;=C2=A0 =C2=A0 =C2=A0 }<br>
+&gt;=C2=A0 <br>
+&gt;=C2=A0 =C2=A0 =C2=A0 qdev_init_nofail(dev);<br>
+&gt; @@ -593,7 +594,7 @@ static void piix4_acpi_system_hot_add_init(MemoryR=
+egion *parent,<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 memory_region_add_subregion(parent, GPE_BASE, &amp=
+;s-&gt;io_gpe);<br>
+&gt;=C2=A0 <br>
+&gt;=C2=A0 =C2=A0 =C2=A0 acpi_pcihp_init(OBJECT(s), &amp;s-&gt;acpi_pci_hot=
+plug, bus, parent,<br>
+&gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ s-&gt;use_acpi_pci_hotplug);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ s-&gt;use_acpi_hotplug_bridge);<br>
+&gt;=C2=A0 <br>
+&gt;=C2=A0 =C2=A0 =C2=A0 s-&gt;cpu_hotplug_legacy =3D true;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 object_property_add_bool(OBJECT(s), &quot;cpu-hotp=
+lug-legacy&quot;,<br>
+&gt; @@ -631,7 +632,7 @@ static Property piix4_pm_properties[] =3D {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 DEFINE_PROP_UINT8(ACPI_PM_PROP_S4_DISABLED, PIIX4P=
+MState, disable_s4, 0),<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 DEFINE_PROP_UINT8(ACPI_PM_PROP_S4_VAL, PIIX4PMStat=
+e, s4_val, 2),<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 DEFINE_PROP_BOOL(&quot;acpi-pci-hotplug-with-bridg=
+e-support&quot;, PIIX4PMState,<br>
+&gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0use_acpi_pci_hotplug, true),<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0use_acpi_hotplug_bridge, true),<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 DEFINE_PROP_BOOL(&quot;memory-hotplug-support&quot=
+;, PIIX4PMState,<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0acpi_memory_hotplug.is_enabled, true),<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 DEFINE_PROP_END_OF_LIST(),<br>
+<br>
+</blockquote></div></div>
+
+--000000000000f2da2b05a8336748--
 
