@@ -7,61 +7,62 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02DF6C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 07:03:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F51CC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 07:03:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BEBB5207E8
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 07:03:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2264C207E8
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 07:03:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I51eU5cp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BEBB5207E8
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I3NdIvb7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2264C207E8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45506 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46902 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jl5d8-0002XV-Va
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 03:03:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42180)
+	id 1jl5dO-00036T-Dq
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 03:03:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42314)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jl5Mw-00023J-NJ
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 02:46:51 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:55653
+ id 1jl5NC-0002Mv-15
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 02:47:06 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:31815
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jl5Mt-0005ls-00
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 02:46:50 -0400
+ id 1jl5NA-0005pf-8r
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 02:47:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592290002;
+ s=mimecast20190719; t=1592290023;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
- references:references; bh=knZNVpLUEPruNNfU/OWb2xi+QKiEKywtJZm5h2oG0KI=;
- b=I51eU5cpQogp0eWEi/eS/m7b67IMMD5gNwgHd4iX3fFmRkOl1GxU9KQv2xN8gPE2t6NYwm
- 6TiSVk+AIkId0wGvkbeL7Qfc4WpZ2iyC0rRIDYuinTm3gDVgyuwawxinHBpXrA/IGnv308
- 0J+pH3nQkShpLug2yZnx1GIXbg1keHk=
+ references:references; bh=qXHWXtp/gvp5jX0g2Rmsyn3tiVUUdM3O3TjCQ3fM8pM=;
+ b=I3NdIvb7SP0fQ8ArWlSRu0JlgZXICwLYFwWPla0cbiyuALxTkjcHyOwcyKjZSA9sr7x04a
+ /814XkW7I8mSvcWDbOiXK3dhRRKVuTtaHvAz3g5IMcfOfA5YVOzQ3TOK9mNVmimsEdqyoD
+ cEBdMjwSYCxYLhMIprk7LJlHlGqz1jU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-191-dDokYR73OBGhHTsub2a11g-1; Tue, 16 Jun 2020 02:46:40 -0400
-X-MC-Unique: dDokYR73OBGhHTsub2a11g-1
+ us-mta-409-xny0xugtPQSpP_KEoZErHg-1; Tue, 16 Jun 2020 02:46:59 -0400
+X-MC-Unique: xny0xugtPQSpP_KEoZErHg-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EE35A1138300;
- Tue, 16 Jun 2020 06:46:38 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 38D4A184D17D;
+ Tue, 16 Jun 2020 06:46:58 +0000 (UTC)
 Received: from jason-ThinkPad-T430s.redhat.com (ovpn-13-222.pek2.redhat.com
  [10.72.13.222])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 18F4D8202D;
- Tue, 16 Jun 2020 06:46:36 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5583790341;
+ Tue, 16 Jun 2020 06:46:56 +0000 (UTC)
 From: Jason Wang <jasowang@redhat.com>
 To: peter.maydell@linaro.org
-Subject: [PULL 21/33] net: cadence_gem: TX_LAST bit should be set by guest
-Date: Tue, 16 Jun 2020 14:45:32 +0800
-Message-Id: <1592289944-13727-22-git-send-email-jasowang@redhat.com>
+Subject: [PULL 29/33] net/colo-compare.c: Correct ordering in complete and
+ finalize
+Date: Tue, 16 Jun 2020 14:45:40 +0800
+Message-Id: <1592289944-13727-30-git-send-email-jasowang@redhat.com>
 In-Reply-To: <1592289944-13727-1-git-send-email-jasowang@redhat.com>
 References: <1592289944-13727-1-git-send-email-jasowang@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
@@ -91,50 +92,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>,
- "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>,
- Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org
+Cc: Zhang Chen <chen.zhang@intel.com>, Jason Wang <jasowang@redhat.com>,
+ Lukas Straub <lukasstraub2@web.de>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
+From: Lukas Straub <lukasstraub2@web.de>
 
-TX_LAST bit should not be set by hardware, its set by guest to inform
-the last bd of the frame.
+In colo_compare_complete, insert CompareState into net_compares
+only after everything has been initialized.
+In colo_compare_finalize, remove CompareState from net_compares
+before anything is deinitialized.
 
-Signed-off-by: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
-Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Signed-off-by: Lukas Straub <lukasstraub2@web.de>
+Reviewed-by: Zhang Chen <chen.zhang@intel.com>
+Signed-off-by: Zhang Chen <chen.zhang@intel.com>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- hw/net/cadence_gem.c | 6 ------
- 1 file changed, 6 deletions(-)
+ net/colo-compare.c | 45 +++++++++++++++++++++++----------------------
+ 1 file changed, 23 insertions(+), 22 deletions(-)
 
-diff --git a/hw/net/cadence_gem.c b/hw/net/cadence_gem.c
-index df6d818..78fb9ac 100644
---- a/hw/net/cadence_gem.c
-+++ b/hw/net/cadence_gem.c
-@@ -350,11 +350,6 @@ static inline unsigned tx_desc_get_last(uint32_t *desc)
-     return (desc[1] & DESC_1_TX_LAST) ? 1 : 0;
+diff --git a/net/colo-compare.c b/net/colo-compare.c
+index c30dbfb..ed1f3d0 100644
+--- a/net/colo-compare.c
++++ b/net/colo-compare.c
+@@ -1283,15 +1283,6 @@ static void colo_compare_complete(UserCreatable *uc, Error **errp)
+                            s->vnet_hdr);
+     }
+ 
+-    qemu_mutex_lock(&colo_compare_mutex);
+-    if (!colo_compare_active) {
+-        qemu_mutex_init(&event_mtx);
+-        qemu_cond_init(&event_complete_cond);
+-        colo_compare_active = true;
+-    }
+-    QTAILQ_INSERT_TAIL(&net_compares, s, next);
+-    qemu_mutex_unlock(&colo_compare_mutex);
+-
+     s->out_sendco.s = s;
+     s->out_sendco.chr = &s->chr_out;
+     s->out_sendco.notify_remote_frame = false;
+@@ -1314,6 +1305,16 @@ static void colo_compare_complete(UserCreatable *uc, Error **errp)
+                                                       connection_destroy);
+ 
+     colo_compare_iothread(s);
++
++    qemu_mutex_lock(&colo_compare_mutex);
++    if (!colo_compare_active) {
++        qemu_mutex_init(&event_mtx);
++        qemu_cond_init(&event_complete_cond);
++        colo_compare_active = true;
++    }
++    QTAILQ_INSERT_TAIL(&net_compares, s, next);
++    qemu_mutex_unlock(&colo_compare_mutex);
++
+     return;
  }
  
--static inline void tx_desc_set_last(uint32_t *desc)
--{
--    desc[1] |= DESC_1_TX_LAST;
--}
+@@ -1382,19 +1383,6 @@ static void colo_compare_finalize(Object *obj)
+     CompareState *s = COLO_COMPARE(obj);
+     CompareState *tmp = NULL;
+ 
+-    qemu_chr_fe_deinit(&s->chr_pri_in, false);
+-    qemu_chr_fe_deinit(&s->chr_sec_in, false);
+-    qemu_chr_fe_deinit(&s->chr_out, false);
+-    if (s->notify_dev) {
+-        qemu_chr_fe_deinit(&s->chr_notify_dev, false);
+-    }
 -
- static inline unsigned tx_desc_get_length(uint32_t *desc)
- {
-     return desc[1] & DESC_1_LENGTH;
-@@ -1298,7 +1293,6 @@ static void gem_transmit(CadenceGEMState *s)
+-    if (s->iothread) {
+-        colo_compare_timer_del(s);
+-    }
+-
+-    qemu_bh_delete(s->event_bh);
+-
+     qemu_mutex_lock(&colo_compare_mutex);
+     QTAILQ_FOREACH(tmp, &net_compares, next) {
+         if (tmp == s) {
+@@ -1409,6 +1397,19 @@ static void colo_compare_finalize(Object *obj)
+     }
+     qemu_mutex_unlock(&colo_compare_mutex);
  
-             /* read next descriptor */
-             if (tx_desc_get_wrap(desc)) {
--                tx_desc_set_last(desc);
- 
-                 if (s->regs[GEM_DMACFG] & GEM_DMACFG_ADDR_64B) {
-                     packet_desc_addr = s->regs[GEM_TBQPH];
++    qemu_chr_fe_deinit(&s->chr_pri_in, false);
++    qemu_chr_fe_deinit(&s->chr_sec_in, false);
++    qemu_chr_fe_deinit(&s->chr_out, false);
++    if (s->notify_dev) {
++        qemu_chr_fe_deinit(&s->chr_notify_dev, false);
++    }
++
++    if (s->iothread) {
++        colo_compare_timer_del(s);
++    }
++
++    qemu_bh_delete(s->event_bh);
++
+     AioContext *ctx = iothread_get_aio_context(s->iothread);
+     aio_context_acquire(ctx);
+     AIO_WAIT_WHILE(ctx, !s->out_sendco.done);
 -- 
 2.5.0
 
