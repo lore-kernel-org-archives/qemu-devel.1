@@ -2,73 +2,95 @@ Return-Path: <SRS0=f7ls=75=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34152C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:17:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3694C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:17:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AF24E20707
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:17:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF24E20707
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id A36CA20707
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:17:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jE0icwKh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A36CA20707
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46670 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47502 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlCOq-0008Rv-KU
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 10:17:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56546)
+	id 1jlCP8-0000P2-SK
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 10:17:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56664)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jlCNf-0007X4-Lf
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 10:16:03 -0400
-Resent-Date: Tue, 16 Jun 2020 10:16:03 -0400
-Resent-Message-Id: <E1jlCNf-0007X4-Lf@lists.gnu.org>
-Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21359)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jlCNd-0006Kp-1A
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 10:16:03 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1592316950; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=G2NP/Aw/iP/R3OJxPKfrkxhOZU/HGnAqvdyQATigxI6NVBcWVVoKlle4IJIDUo4iQmCD6XqnAHGb9jzGMGJ4vbEUMH0wSMG0AoP/HAzDVHkjwTuSd1wTeG1wrmvjpOdiuUe8aTdJR4VZv//xjsjeyNpZ1dHUrmQnr5es72TS8Dw=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1592316950;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=ETpzzNKgNE8BFUV7eRajzhFPAHAOc2iWt7/iAVeS2wE=; 
- b=AbthfIBTQjdgl8CnaH2SBcNPC0Q6EV6uqrSbXMBQEEdsop0gmd2FdrH5QQJbTKciGrRUrv13SspjZnzHn5RdCUXPUtRvNnPzwFTmLcoWh1SeZeaTydjVuV2t66jKFPMX+ZLf61sit7S39e1HC153StkbQmq6t9AFVzjiIwqo+us=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1592316944240351.2697079201524;
- Tue, 16 Jun 2020 07:15:44 -0700 (PDT)
-Message-ID: <159231694312.8107.3703404357184610057@d1fd068a5071>
-Subject: Re: [PULL 00/23] target-arm queue
-In-Reply-To: <20200616095702.25848-1-peter.maydell@linaro.org>
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jlCNy-0007ft-Fw
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 10:16:23 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:45454)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jlCNt-0006Mr-Pq
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 10:16:22 -0400
+Received: by mail-wr1-x441.google.com with SMTP id c3so20918914wru.12
+ for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 07:16:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=YcBLs21lASDhLo9oArtApXGLp0A5+ux1fGqtDC7hFdM=;
+ b=jE0icwKh+83nRSuXJ28WYfvx2Ca51DGOJiXzOs0zKnh/F2T9t76rUkoHCyJYnv10wB
+ wf3eFqxIjwhljiR3yzUFi2DBxlrR3Qe8jcsb7pP/+gL+S3K5Kc46+hYAARtHFLISvkXr
+ AUzGsmdCdFqwt/eM4ImQilxY6ZEbn/eoMmId1taOwCqMoCfCvnbSuVU6yA/qltvR+VHq
+ HhRLoFnz2YMgdwVQI355guADBgjiHe/Wyoot6w648fwl2xiKdD7ZhqGK7SIIgqCchrB7
+ Q5ko+49N3ZGGzNLgTLOYz5ziClDBJhtJv2PYhPup4pZ/o2X6CAy3Hcx0wR23jn4akqHn
+ JS6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=YcBLs21lASDhLo9oArtApXGLp0A5+ux1fGqtDC7hFdM=;
+ b=A9B6D/FEoR6JlEy9Am743n838xixEcPZ28rTTWou279OTUCBsyEmt4eF07jv2lOZ5V
+ oyAtpbMvEgOReCPCIKFe64IaNVvh6XOe8XCTTa6MOU8rqPq7GaOTPziHdm0NHLj0dkQ7
+ t7M6zgTWN8AOHWWEMHVjKv4gm5Y31eqkU6crRkdjImOyS8bVPFtTSYCvQYDF8CAB6sES
+ uz/uCN7dT2JlsuUeL8kxmvcxI74kNZ8rtugSw2F0O+IuipCZClfTt2MffIVMsQFy+kuF
+ 3cnktAeTs3J6/6MRZ4T3OxF+pEq1YsJr+SJ8DN3NEHrpPsul3XTBZaw3fIv8d5G+ZsBd
+ LoWA==
+X-Gm-Message-State: AOAM531ab3dyfBho505RtMjFJfno6GU1k4j3hM1gxB5Gvu361HDJ7ZKv
+ vyvab7i9qRUsxa+omt81fBY7uA==
+X-Google-Smtp-Source: ABdhPJy/evnWkB0//MqZXlwrIoZ+8HCqxQVEafTFaNMsyBjLMQ6QsA3LbEiV6eLfKeFdA/r8MeIiQg==
+X-Received: by 2002:adf:ecc2:: with SMTP id s2mr3646912wro.60.1592316972382;
+ Tue, 16 Jun 2020 07:16:12 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id p7sm29722464wro.26.2020.06.16.07.16.11
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 16 Jun 2020 07:16:11 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 742271FF7E;
+ Tue, 16 Jun 2020 15:16:10 +0100 (BST)
+References: <20200615180346.3992-1-cfontana@suse.de>
+ <20200615180346.3992-5-cfontana@suse.de>
+User-agent: mu4e 1.5.3; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Claudio Fontana <cfontana@suse.de>
+Subject: Re: [RFC v5 4/4] cpus: extract out accel-specific code to each accel
+In-reply-to: <20200615180346.3992-5-cfontana@suse.de>
+Date: Tue, 16 Jun 2020 15:16:10 +0100
+Message-ID: <87y2onyu39.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: peter.maydell@linaro.org
-Date: Tue, 16 Jun 2020 07:15:44 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o53.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 10:15:56
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x441.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -81,143 +103,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: qemu-devel@nongnu.org
+Cc: Laurent Vivier <lvivier@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, haxm-team@intel.com,
+ Marcelo Tosatti <mtosatti@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ qemu-devel@nongnu.org, Roman Bolshakov <r.bolshakov@yadro.com>,
+ Colin Xu <colin.xu@intel.com>, Wenchao Wang <wenchao.wang@intel.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Sunil Muthuswamy <sunilmut@microsoft.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud?= =?utf-8?Q?=C3=A9?= <philmd@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDYxNjA5NTcwMi4yNTg0
-OC0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0
-byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgpt
-b3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1BVTEwgMDAvMjNdIHRhcmdldC1hcm0gcXVldWUK
-VHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMjAwNjE2MDk1NzAyLjI1ODQ4LTEtcGV0ZXIubWF5
-ZGVsbEBsaW5hcm8ub3JnCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdp
-dCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2Fs
-IGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUK
-Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hl
-Y2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBk
-YXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBz
-Oi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogICA2Njc1YTY1Li5jYjgyNzhjICBt
-YXN0ZXIgICAgIC0+IG1hc3RlcgogLSBbdGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3LzE1OTIzMTA2
-OTktNTg5MTYtMS1naXQtc2VuZC1lbWFpbC1hbmkuc2luaGFAbnV0YW5peC5jb20gLT4gcGF0Y2hl
-dy8xNTkyMzEwNjk5LTU4OTE2LTEtZ2l0LXNlbmQtZW1haWwtYW5pLnNpbmhhQG51dGFuaXguY29t
-CiAtIFt0YWcgdXBkYXRlXSAgICAgIHBhdGNoZXcvMjAyMDA2MTUxODAzNDYuMzk5Mi0xLWNmb250
-YW5hQHN1c2UuZGUgLT4gcGF0Y2hldy8yMDIwMDYxNTE4MDM0Ni4zOTkyLTEtY2ZvbnRhbmFAc3Vz
-ZS5kZQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzIwMjAwNjE2MTMxNzU2LjEwNzM0Mzgt
-MS1tcmVpdHpAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMjAwNjE2MTMxNzU2LjEwNzM0MzgtMS1t
-cmVpdHpAcmVkaGF0LmNvbQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3L2NvdmVyLjE1OTIz
-MTUyMjYuZ2l0LmJhbGF0b25AZWlrLmJtZS5odSAtPiBwYXRjaGV3L2NvdmVyLjE1OTIzMTUyMjYu
-Z2l0LmJhbGF0b25AZWlrLmJtZS5odQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmIx
-MGE2NmUgaHc6IGFybTogU2V0IHZlbmRvciBwcm9wZXJ0eSBmb3IgSU1YIFNESENJIGVtdWxhdGlv
-bnMKNTQzNGE4ZiBzZDogc2RoY2k6IEltcGxlbWVudCBiYXNpYyB2ZW5kb3Igc3BlY2lmaWMgcmVn
-aXN0ZXIgc3VwcG9ydAoyM2IxMDVlIGh3L25ldC9pbXhfZmVjOiBDb252ZXJ0IGRlYnVnIGZwcmlu
-dGYoKSB0byB0cmFjZSBldmVudHMKZDRmZGNkNSB0YXJnZXQvYXJtL2NwdTogYWRqdXN0IHZpcnR1
-YWwgdGltZSBmb3IgYWxsIEtWTSBhcm0gY3B1cwpiMTIwZWNjIEltcGxlbWVudCBjb25maWd1cmFi
-bGUgZGVzY3JpcHRvciBzaXplIGluIGZ0Z21hYzEwMAozZWU5ZGI0IGh3L21pc2MvaW14NnVsX2Nj
-bTogSW1wbGVtZW50IG5vbiB3cml0YWJsZSBiaXRzIGluIENDTSByZWdpc3RlcnMKMmFiZDBmNCB0
-YXJnZXQvYXJtOiBDb252ZXJ0IE5lb24gVkRVUCAoc2NhbGFyKSB0byBkZWNvZGV0cmVlCmQyMDY1
-NjkgdGFyZ2V0L2FybTogQ29udmVydCBOZW9uIFZUQkwsIFZUQlggdG8gZGVjb2RldHJlZQpkNTM5
-NTAyIHRhcmdldC9hcm06IENvbnZlcnQgTmVvbiBWRVhUIHRvIGRlY29kZXRyZWUKZGMzZmEzMiB0
-YXJnZXQvYXJtOiBDb252ZXJ0IE5lb24gMi1yZWctc2NhbGFyIGxvbmcgbXVsdGlwbGllcyB0byBk
-ZWNvZGV0cmVlCjljNTVkYmIgdGFyZ2V0L2FybTogQ29udmVydCBOZW9uIDItcmVnLXNjYWxhciBW
-UVJETUxBSCwgVlFSRE1MU0ggdG8gZGVjb2RldHJlZQoxZmU4MDEyIHRhcmdldC9hcm06IENvbnZl
-cnQgTmVvbiAyLXJlZy1zY2FsYXIgVlFETVVMSCwgVlFSRE1VTEggdG8gZGVjb2RldHJlZQpmNjVi
-ZTFlIHRhcmdldC9hcm06IENvbnZlcnQgTmVvbiAyLXJlZy1zY2FsYXIgZmxvYXQgbXVsdGlwbGll
-cyB0byBkZWNvZGV0cmVlCjkwZjJkODkgdGFyZ2V0L2FybTogQ29udmVydCBOZW9uIDItcmVnLXNj
-YWxhciBpbnRlZ2VyIG11bHRpcGxpZXMgdG8gZGVjb2RldHJlZQpjNTU4NmUwIHRhcmdldC9hcm06
-IEFkZCBtaXNzaW5nIFRDRyB0ZW1wIGZyZWUgaW4gZG9fMnNoaWZ0X2Vudl82NCgpCjlkNDlmZDYg
-dGFyZ2V0L2FybTogQWRkICdzdGF0aWMnIGFuZCAnY29uc3QnIGFubm90YXRpb25zIHRvIFZTSExM
-IGZ1bmN0aW9uIGFycmF5cwo0NGY3YWQzIHRhcmdldC9hcm06IENvbnZlcnQgTmVvbiAzLXJlZy1k
-aWZmIHBvbHlub21pYWwgVk1VTEwKYjFkNDJmMSB0YXJnZXQvYXJtOiBDb252ZXJ0IE5lb24gMy1y
-ZWctZGlmZiBzYXR1cmF0aW5nIGRvdWJsaW5nIG11bHRpcGxpZXMKMGM1NGYzMyB0YXJnZXQvYXJt
-OiBDb252ZXJ0IE5lb24gMy1yZWctZGlmZiBsb25nIG11bHRpcGxpZXMKMmU2MzA2MCB0YXJnZXQv
-YXJtOiBDb252ZXJ0IE5lb24gMy1yZWctZGlmZiBWQUJBTCwgVkFCREwgdG8gZGVjb2RldHJlZQo0
-ODg0OWUyIHRhcmdldC9hcm06IENvbnZlcnQgTmVvbiAzLXJlZy1kaWZmIG5hcnJvd2luZyBvcHMg
-dG8gZGVjb2RldHJlZQo0MzcwMzBiIHRhcmdldC9hcm06IENvbnZlcnQgTmVvbiAzLXJlZy1kaWZm
-IHByZXdpZGVuaW5nIG9wcyB0byBkZWNvZGV0cmVlCjE3Zjc1NGUgdGFyZ2V0L2FybTogRml4IG1p
-c3NpbmcgdGVtcCBmcmVlcyBpbiBkb192c2hsbF8yc2gKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEv
-MjMgQ2hlY2tpbmcgY29tbWl0IDE3Zjc1NGUzNzViMiAodGFyZ2V0L2FybTogRml4IG1pc3Npbmcg
-dGVtcCBmcmVlcyBpbiBkb192c2hsbF8yc2gpCjIvMjMgQ2hlY2tpbmcgY29tbWl0IDQzNzAzMGJj
-M2NiMCAodGFyZ2V0L2FybTogQ29udmVydCBOZW9uIDMtcmVnLWRpZmYgcHJld2lkZW5pbmcgb3Bz
-IHRvIGRlY29kZXRyZWUpCjMvMjMgQ2hlY2tpbmcgY29tbWl0IDQ4ODQ5ZTJiZWM2MiAodGFyZ2V0
-L2FybTogQ29udmVydCBOZW9uIDMtcmVnLWRpZmYgbmFycm93aW5nIG9wcyB0byBkZWNvZGV0cmVl
-KQo0LzIzIENoZWNraW5nIGNvbW1pdCAyZTYzMDYwNWE5NDAgKHRhcmdldC9hcm06IENvbnZlcnQg
-TmVvbiAzLXJlZy1kaWZmIFZBQkFMLCBWQUJETCB0byBkZWNvZGV0cmVlKQo1LzIzIENoZWNraW5n
-IGNvbW1pdCAwYzU0ZjMzNzk4MzggKHRhcmdldC9hcm06IENvbnZlcnQgTmVvbiAzLXJlZy1kaWZm
-IGxvbmcgbXVsdGlwbGllcykKRVJST1I6IHNwYWNlIHJlcXVpcmVkIGFmdGVyIHRoYXQgJywnIChj
-dHg6VnhWKQojOTM6IEZJTEU6IHRhcmdldC9hcm0vdHJhbnNsYXRlLW5lb24uaW5jLmM6MjIwMzoK
-KyNkZWZpbmUgRE9fVk1MQUwoSU5TTixNVUxMLEFDQykgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgIFwKICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZSBy
-ZXF1aXJlZCBhZnRlciB0aGF0ICcsJyAoY3R4OlZ4VikKIzkzOiBGSUxFOiB0YXJnZXQvYXJtL3Ry
-YW5zbGF0ZS1uZW9uLmluYy5jOjIyMDM6CisjZGVmaW5lIERPX1ZNTEFMKElOU04sTVVMTCxBQ0Mp
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCiAgICAgICAgICAgICAg
-ICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZSByZXF1aXJlZCBhZnRlciB0aGF0ICcsJyAoY3R4
-OlZ4VikKIzExMTogRklMRTogdGFyZ2V0L2FybS90cmFuc2xhdGUtbmVvbi5pbmMuYzoyMjIxOgor
-RE9fVk1MQUwoVk1MQUxfUyxtdWxsX3MsYWRkKQogICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBz
-cGFjZSByZXF1aXJlZCBhZnRlciB0aGF0ICcsJyAoY3R4OlZ4VikKIzExMTogRklMRTogdGFyZ2V0
-L2FybS90cmFuc2xhdGUtbmVvbi5pbmMuYzoyMjIxOgorRE9fVk1MQUwoVk1MQUxfUyxtdWxsX3Ms
-YWRkKQogICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYWZ0
-ZXIgdGhhdCAnLCcgKGN0eDpWeFYpCiMxMTI6IEZJTEU6IHRhcmdldC9hcm0vdHJhbnNsYXRlLW5l
-b24uaW5jLmM6MjIyMjoKK0RPX1ZNTEFMKFZNTEFMX1UsbXVsbF91LGFkZCkKICAgICAgICAgICAg
-ICAgICBeCgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYWZ0ZXIgdGhhdCAnLCcgKGN0eDpWeFYpCiMx
-MTI6IEZJTEU6IHRhcmdldC9hcm0vdHJhbnNsYXRlLW5lb24uaW5jLmM6MjIyMjoKK0RPX1ZNTEFM
-KFZNTEFMX1UsbXVsbF91LGFkZCkKICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNw
-YWNlIHJlcXVpcmVkIGFmdGVyIHRoYXQgJywnIChjdHg6VnhWKQojMTEzOiBGSUxFOiB0YXJnZXQv
-YXJtL3RyYW5zbGF0ZS1uZW9uLmluYy5jOjIyMjM6CitET19WTUxBTChWTUxTTF9TLG11bGxfcyxz
-dWIpCiAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlIHJlcXVpcmVkIGFmdGVyIHRoYXQg
-JywnIChjdHg6VnhWKQojMTEzOiBGSUxFOiB0YXJnZXQvYXJtL3RyYW5zbGF0ZS1uZW9uLmluYy5j
-OjIyMjM6CitET19WTUxBTChWTUxTTF9TLG11bGxfcyxzdWIpCiAgICAgICAgICAgICAgICAgICAg
-ICAgIF4KCkVSUk9SOiBzcGFjZSByZXF1aXJlZCBhZnRlciB0aGF0ICcsJyAoY3R4OlZ4VikKIzEx
-NDogRklMRTogdGFyZ2V0L2FybS90cmFuc2xhdGUtbmVvbi5pbmMuYzoyMjI0OgorRE9fVk1MQUwo
-Vk1MU0xfVSxtdWxsX3Usc3ViKQogICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZSByZXF1
-aXJlZCBhZnRlciB0aGF0ICcsJyAoY3R4OlZ4VikKIzExNDogRklMRTogdGFyZ2V0L2FybS90cmFu
-c2xhdGUtbmVvbi5pbmMuYzoyMjI0OgorRE9fVk1MQUwoVk1MU0xfVSxtdWxsX3Usc3ViKQogICAg
-ICAgICAgICAgICAgICAgICAgICBeCgp0b3RhbDogMTAgZXJyb3JzLCAwIHdhcm5pbmdzLCAxMzgg
-bGluZXMgY2hlY2tlZAoKUGF0Y2ggNS8yMyBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZp
-ZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRo
-ZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKNi8y
-MyBDaGVja2luZyBjb21taXQgYjFkNDJmMWI2YmIwICh0YXJnZXQvYXJtOiBDb252ZXJ0IE5lb24g
-My1yZWctZGlmZiBzYXR1cmF0aW5nIGRvdWJsaW5nIG11bHRpcGxpZXMpCjcvMjMgQ2hlY2tpbmcg
-Y29tbWl0IDQ0ZjdhZDNmZjVjMiAodGFyZ2V0L2FybTogQ29udmVydCBOZW9uIDMtcmVnLWRpZmYg
-cG9seW5vbWlhbCBWTVVMTCkKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzE1Nzog
-RklMRTogdGFyZ2V0L2FybS90cmFuc2xhdGUuYzo1MjMwOgorICAgICAgICAgICAgICAgIC8qIFRo
-cmVlIHJlZ2lzdGVycyBvZiBkaWZmZXJlbnQgbGVuZ3RoczogaGFuZGxlZCBieSBkZWNvZGV0cmVl
-ICovCgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDEzMSBsaW5lcyBjaGVja2VkCgpQYXRj
-aCA3LzIzIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVz
-ZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5l
-ciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjgvMjMgQ2hlY2tpbmcgY29tbWl0IDlk
-NDlmZDYyM2YxNSAodGFyZ2V0L2FybTogQWRkICdzdGF0aWMnIGFuZCAnY29uc3QnIGFubm90YXRp
-b25zIHRvIFZTSExMIGZ1bmN0aW9uIGFycmF5cykKOS8yMyBDaGVja2luZyBjb21taXQgYzU1ODZl
-MGVkZTM1ICh0YXJnZXQvYXJtOiBBZGQgbWlzc2luZyBUQ0cgdGVtcCBmcmVlIGluIGRvXzJzaGlm
-dF9lbnZfNjQoKSkKMTAvMjMgQ2hlY2tpbmcgY29tbWl0IDkwZjJkODliYmVlYyAodGFyZ2V0L2Fy
-bTogQ29udmVydCBOZW9uIDItcmVnLXNjYWxhciBpbnRlZ2VyIG11bHRpcGxpZXMgdG8gZGVjb2Rl
-dHJlZSkKMTEvMjMgQ2hlY2tpbmcgY29tbWl0IGY2NWJlMWVmMzQ0OCAodGFyZ2V0L2FybTogQ29u
-dmVydCBOZW9uIDItcmVnLXNjYWxhciBmbG9hdCBtdWx0aXBsaWVzIHRvIGRlY29kZXRyZWUpCjEy
-LzIzIENoZWNraW5nIGNvbW1pdCAxZmU4MDEyYzZkYzYgKHRhcmdldC9hcm06IENvbnZlcnQgTmVv
-biAyLXJlZy1zY2FsYXIgVlFETVVMSCwgVlFSRE1VTEggdG8gZGVjb2RldHJlZSkKMTMvMjMgQ2hl
-Y2tpbmcgY29tbWl0IDljNTVkYmI0MmM2ZiAodGFyZ2V0L2FybTogQ29udmVydCBOZW9uIDItcmVn
-LXNjYWxhciBWUVJETUxBSCwgVlFSRE1MU0ggdG8gZGVjb2RldHJlZSkKMTQvMjMgQ2hlY2tpbmcg
-Y29tbWl0IGRjM2ZhMzIzMDdlZSAodGFyZ2V0L2FybTogQ29udmVydCBOZW9uIDItcmVnLXNjYWxh
-ciBsb25nIG11bHRpcGxpZXMgdG8gZGVjb2RldHJlZSkKMTUvMjMgQ2hlY2tpbmcgY29tbWl0IGQ1
-Mzk1MDJjYmMxNCAodGFyZ2V0L2FybTogQ29udmVydCBOZW9uIFZFWFQgdG8gZGVjb2RldHJlZSkK
-MTYvMjMgQ2hlY2tpbmcgY29tbWl0IGQyMDY1Njk3NTRjOSAodGFyZ2V0L2FybTogQ29udmVydCBO
-ZW9uIFZUQkwsIFZUQlggdG8gZGVjb2RldHJlZSkKMTcvMjMgQ2hlY2tpbmcgY29tbWl0IDJhYmQw
-ZjRlZGY2MSAodGFyZ2V0L2FybTogQ29udmVydCBOZW9uIFZEVVAgKHNjYWxhcikgdG8gZGVjb2Rl
-dHJlZSkKMTgvMjMgQ2hlY2tpbmcgY29tbWl0IDNlZTlkYjQ3Nzc2YSAoaHcvbWlzYy9pbXg2dWxf
-Y2NtOiBJbXBsZW1lbnQgbm9uIHdyaXRhYmxlIGJpdHMgaW4gQ0NNIHJlZ2lzdGVycykKMTkvMjMg
-Q2hlY2tpbmcgY29tbWl0IGIxMjBlY2NiZTM0MyAoSW1wbGVtZW50IGNvbmZpZ3VyYWJsZSBkZXNj
-cmlwdG9yIHNpemUgaW4gZnRnbWFjMTAwKQoyMC8yMyBDaGVja2luZyBjb21taXQgZDRmZGNkNTE0
-ZDU2ICh0YXJnZXQvYXJtL2NwdTogYWRqdXN0IHZpcnR1YWwgdGltZSBmb3IgYWxsIEtWTSBhcm0g
-Y3B1cykKMjEvMjMgQ2hlY2tpbmcgY29tbWl0IDIzYjEwNWUxMzIxNiAoaHcvbmV0L2lteF9mZWM6
-IENvbnZlcnQgZGVidWcgZnByaW50ZigpIHRvIHRyYWNlIGV2ZW50cykKMjIvMjMgQ2hlY2tpbmcg
-Y29tbWl0IDU0MzRhOGZkMGM5YyAoc2Q6IHNkaGNpOiBJbXBsZW1lbnQgYmFzaWMgdmVuZG9yIHNw
-ZWNpZmljIHJlZ2lzdGVyIHN1cHBvcnQpCjIzLzIzIENoZWNraW5nIGNvbW1pdCBiMTBhNjZlZTRk
-NTkgKGh3OiBhcm06IFNldCB2ZW5kb3IgcHJvcGVydHkgZm9yIElNWCBTREhDSSBlbXVsYXRpb25z
-KQo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoK
-VGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIw
-MDYxNjA5NTcwMi4yNTg0OC0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZy90ZXN0aW5nLmNoZWNr
-cGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5
-IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFj
-ayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+
+Claudio Fontana <cfontana@suse.de> writes:
+
+> each accelerator registers a new "CpusAccel" interface
+> implementation on initialization, providing functions for
+> starting a vcpu, kicking a vcpu, and sychronizing state.
+>
+> This way the code in cpus.c is now all general softmmu code,
+> nothing accelerator-specific anymore.
+>
+> There is still some ifdeffery for WIN32 though.
+>
+> Signed-off-by: Claudio Fontana <cfontana@suse.de>
+> ---
+>  MAINTAINERS                   |   1 +
+>  accel/Makefile.objs           |   2 +-
+>  accel/kvm/Makefile.objs       |   2 +
+>  accel/kvm/kvm-all.c           |  15 +-
+>  accel/kvm/kvm-cpus.c          |  94 +++++
+>  accel/kvm/kvm-cpus.h          |  17 +
+>  accel/qtest/Makefile.objs     |   2 +
+>  accel/qtest/qtest-cpus.c      | 105 +++++
+>  accel/qtest/qtest-cpus.h      |  17 +
+>  accel/{ =3D> qtest}/qtest.c     |   7 +
+>  accel/stubs/kvm-stub.c        |   3 +-
+>  accel/tcg/Makefile.objs       |   1 +
+>  accel/tcg/tcg-all.c           |  12 +-
+>  accel/tcg/tcg-cpus.c          | 523 ++++++++++++++++++++++++
+>  accel/tcg/tcg-cpus.h          |  17 +
+>  hw/core/cpu.c                 |   1 +
+>  include/sysemu/cpus.h         |  32 ++
+>  include/sysemu/hw_accel.h     |  57 +--
+>  include/sysemu/kvm.h          |   2 +-
+>  softmmu/cpus.c                | 911 ++++--------------------------------=
+------
+>  stubs/Makefile.objs           |   1 +
+>  stubs/cpu-synchronize-state.c |  15 +
+>  target/i386/Makefile.objs     |   7 +-
+>  target/i386/hax-all.c         |   6 +-
+>  target/i386/hax-cpus.c        |  85 ++++
+>  target/i386/hax-cpus.h        |  17 +
+>  target/i386/hax-i386.h        |   2 +
+>  target/i386/hax-posix.c       |  12 +
+>  target/i386/hax-windows.c     |  20 +
+>  target/i386/hvf/Makefile.objs |   2 +-
+>  target/i386/hvf/hvf-cpus.c    | 141 +++++++
+>  target/i386/hvf/hvf-cpus.h    |  17 +
+>  target/i386/hvf/hvf.c         |   3 +
+>  target/i386/whpx-all.c        |   3 +
+>  target/i386/whpx-cpus.c       |  96 +++++
+>  target/i386/whpx-cpus.h       |  17 +
+>  36 files changed, 1362 insertions(+), 903 deletions(-)
+>  create mode 100644 accel/kvm/kvm-cpus.c
+>  create mode 100644 accel/kvm/kvm-cpus.h
+>  create mode 100644 accel/qtest/Makefile.objs
+>  create mode 100644 accel/qtest/qtest-cpus.c
+>  create mode 100644 accel/qtest/qtest-cpus.h
+>  rename accel/{ =3D> qtest}/qtest.c (86%)
+>  create mode 100644 accel/tcg/tcg-cpus.c
+>  create mode 100644 accel/tcg/tcg-cpus.h
+>  create mode 100644 stubs/cpu-synchronize-state.c
+>  create mode 100644 target/i386/hax-cpus.c
+>  create mode 100644 target/i386/hax-cpus.h
+>  create mode 100644 target/i386/hvf/hvf-cpus.c
+>  create mode 100644 target/i386/hvf/hvf-cpus.h
+>  create mode 100644 target/i386/whpx-cpus.c
+>  create mode 100644 target/i386/whpx-cpus.h
+
+Predictably for such a spider patch I got a bunch of conflicts
+attempting to merge on my testing branch so only a few comments.
+
+>
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index f308537d42..ef8cbb2680 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -427,6 +427,7 @@ WHPX CPUs
+>  M: Sunil Muthuswamy <sunilmut@microsoft.com>
+>  S: Supported
+>  F: target/i386/whpx-all.c
+> +F: target/i386/whpx-cpus.c
+>  F: target/i386/whp-dispatch.h
+>  F: accel/stubs/whpx-stub.c
+>  F: include/sysemu/whpx.h
+> diff --git a/accel/Makefile.objs b/accel/Makefile.objs
+> index ff72f0d030..c5e58eb53d 100644
+> --- a/accel/Makefile.objs
+> +++ b/accel/Makefile.objs
+> @@ -1,5 +1,5 @@
+>  common-obj-$(CONFIG_SOFTMMU) +=3D accel.o
+> -obj-$(call land,$(CONFIG_SOFTMMU),$(CONFIG_POSIX)) +=3D qtest.o
+> +obj-$(call land,$(CONFIG_SOFTMMU),$(CONFIG_POSIX)) +=3D qtest/
+
+This does raise the question if qtest is "just another" accelerator then
+should we not be creating a CONFIG_QTEST symbol for explicitness?
+
+>  obj-$(CONFIG_KVM) +=3D kvm/
+>  obj-$(CONFIG_TCG) +=3D tcg/
+>  obj-$(CONFIG_XEN) +=3D xen/
+<snip>
+> +static void *qtest_cpu_thread_fn(void *arg)
+> +{
+> +#ifdef _WIN32
+> +    error_report("qtest is not supported under Windows");
+> +    exit(1);
+> +#else
+
+This is literally impossible to build isn't it?
+>=20=20
+>  static int qtest_init_accel(MachineState *ms)
+>  {
+> +    cpus_register_accel(&qtest_cpus);
+>      return 0;
+>  }
+
+I wonder if these register functions could be moved to initfns like we
+use for our hardware models?
+
+<snip>
+>=20=20
+> +/*
+> + * every accelerator is supposed to register this.
+> + * Could be in the AccelClass instead, but ends up being too complicated
+> + * to access in practice, and inefficient for each call of each method.
+> + */
+> +static CpusAccel cpus_accel;
+> +
+
+wait what? Does an indirection cause that much trouble? I'm surprised
+given how often we use it elsewhere in the code. I guess others might
+argue for a full QOM-ification of the accelerator but I think we can at
+least have an indirection rather than a copy of the structure.
+
+
+--=20
+Alex Benn=C3=A9e
 
