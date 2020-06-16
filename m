@@ -7,77 +7,78 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53999C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 15:00:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F726C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 15:02:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 26A6D20644
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 15:00:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E365F20644
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 15:02:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YfwjlYVY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26A6D20644
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OzBXBMUw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E365F20644
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33162 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39500 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlD4Q-0004xd-Ab
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 11:00:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58448)
+	id 1jlD6S-0007ik-46
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 11:02:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58252)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1jlCRH-0004rC-C2; Tue, 16 Jun 2020 10:19:47 -0400
-Received: from mail-ot1-x335.google.com ([2607:f8b0:4864:20::335]:45652)
+ id 1jlCQu-000413-Kf; Tue, 16 Jun 2020 10:19:24 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:46995)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1jlCRF-000747-PB; Tue, 16 Jun 2020 10:19:46 -0400
-Received: by mail-ot1-x335.google.com with SMTP id m2so16025702otr.12;
- Tue, 16 Jun 2020 07:19:45 -0700 (PDT)
+ id 1jlCQs-000716-WC; Tue, 16 Jun 2020 10:19:24 -0400
+Received: by mail-oi1-x241.google.com with SMTP id 25so19337111oiy.13;
+ Tue, 16 Jun 2020 07:19:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=dMB5MwLjGYUQmCwqpEn0/VvW/KiFIQ/TwNzYbII5zMw=;
- b=YfwjlYVYuCCddrGwULgmqRJnMgsrSMER3nFxJ76dM3M5aVhg7JmfxqBuIhqctDH0ry
- 5MCq2eRcPkN4iGJGPfi4kUSJPQqlavKhgW+QGTlQI0+bWb0wXpyn6V3JFDtu8jGPOUba
- 7e6mpx4cZmWjCnIU6vPqJPNjH8lGplz7O42+p2/UvK0C+XH0W788Pp5v1P47om2c5AZW
- ZmJc+SFrJ+fFaI2ncHO4+ooC1DnsdCVm0KTTooQFKXNPfyfraK41Neq6xjWPSNkhbjXF
- sj/Mw7JubY6PLboERVTTPzGjsVYSko5ue9ciIsfLR7Tpcjo4BFggKHwFG24HgNF2P+ml
- XbPg==
+ bh=noqPjXnkCbN2ZwLY+0aBhSvH8URJIHJjto2UAYCZdFY=;
+ b=OzBXBMUwVENfA+rErN79JRgTSK7Ty6MTtCvqcKXgUxY4H7BQBsH8lYGZF1p4rj/KIR
+ XUwFeD3rxWUq2UOvtZYTpEWA2AFBU9fkZM4cFU+/nQsdySVQcIjmVM/u9wCMhFBcWogv
+ WMPllz5L1uV/oLVhoWGS4a6MjgFVd6gS/NCo82WxU+oLvIvYfq/lj48zwitqnCx9PSys
+ lTA+n0FOfqvGR1agwyN4h6yyiISEGpZfOO42tZPL/bgdjo3XM6l0UmShpT0VZc7XSy7G
+ HYDFLckqnI2jN2GaW2p+eNvmlzq7GjhFcS5yXMf1p6yoPDPldEgTxe5q4rEIhg5GCmFJ
+ AQhQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=dMB5MwLjGYUQmCwqpEn0/VvW/KiFIQ/TwNzYbII5zMw=;
- b=I7qqPMvgokfU/rbjnJtb0YSRlhh/s+SGzbtJPXIW4T6Il3Cp1OQQcFOZr7b3YumF/q
- askXeTqfWZBPET2dQ1Gaz4n/ObQa3w/dVYmg49tgk0/c+8Bk7pCj1XRh+AAOmIhLP+A+
- DmywoiNPgt+5A3T7Rgx1Rqnor5vQc9f+IRCWch9whOq4MBGg8GzZXNmVQMOnexcHkBvV
- R3lY+ZrrECphmkujLgELmxKrmXqJGHax2bgQpXM0QifsRwQ50Bs5wK0UUYUkmQdIfjD8
- vpTNec6+wczA5yt769DEMuk9wb/YpEocYNY4quO+3IKy9OgrTM48LGRMQD2xGn9o+UMW
- binw==
-X-Gm-Message-State: AOAM530jBWl0FLyOhzi9hXGWatn33YThPKNWo+0i34GygvIjfpCOYp9y
- G8CnQSduhuekAN6BpODmFoprUNBhIMA=
-X-Google-Smtp-Source: ABdhPJzQtMYSb4xZ6tXVSUTBJmy3URMZch/tD66cioMMEQWMeocRL5dEeYhJx5MrMTEfNJ2jKYKaCQ==
-X-Received: by 2002:a9d:5c04:: with SMTP id o4mr2482249otk.21.1592317184076;
- Tue, 16 Jun 2020 07:19:44 -0700 (PDT)
+ bh=noqPjXnkCbN2ZwLY+0aBhSvH8URJIHJjto2UAYCZdFY=;
+ b=g59UHjwZzOolUZeZFgnffc84OndIAbimn15wjdaRsBjTm8cFxx3z/aulMHO70H/ibW
+ MzDNTxVWIQd+s7vSButTfpmDV/LQXUjVLySJ7yQL2JNeHyNMFXyc7hO3mHjVT59w7BMW
+ 0tSF55dyDRuoLn+djFYcfSHS1n+WN8VDL9T9y1Mw5wJ8ou/b+Ehm1l16a3cS0iwU2Hrm
+ JUvkrqn04iVttG1K6C2cTmsEwGBbbLpPF0oprvmc0DuXOf/aeXvpWPlL5VmpguHNpryu
+ f+vl3glXeJlKnhIJsvCrpS8Oo2ULWRA0ezDg8lxaHBtu77K9zfStFwRwLa+tIeYL4ZS0
+ P9gw==
+X-Gm-Message-State: AOAM532dub78ZP8x4x0vnk8kv5I4wHXCuiDlpUa0Jn6bx91c2kEv6a/s
+ slWsjDVTaVpY9OktyayD0ia+Z+gx
+X-Google-Smtp-Source: ABdhPJwMfZ7dN6mWcGPBpohwjTSmFg7NPODTfRaEnaLUhGxxQi9ro0SmiHv+3rSBLkp1pn18fznqLw==
+X-Received: by 2002:a05:6808:b14:: with SMTP id
+ s20mr3636322oij.155.1592317161054; 
+ Tue, 16 Jun 2020 07:19:21 -0700 (PDT)
 Received: from localhost (76-251-165-188.lightspeed.austtx.sbcglobal.net.
  [76.251.165.188])
- by smtp.gmail.com with ESMTPSA id y125sm3033947oiy.9.2020.06.16.07.19.43
+ by smtp.gmail.com with ESMTPSA id m18sm4155903ooe.12.2020.06.16.07.19.19
  (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
- Tue, 16 Jun 2020 07:19:43 -0700 (PDT)
+ Tue, 16 Jun 2020 07:19:20 -0700 (PDT)
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 77/78] virtio-balloon: unref the iothread when unrealizing
-Date: Tue, 16 Jun 2020 09:15:46 -0500
-Message-Id: <20200616141547.24664-78-mdroth@linux.vnet.ibm.com>
+Subject: [PATCH 65/78] dump: Fix writing of ELF section
+Date: Tue, 16 Jun 2020 09:15:34 -0500
+Message-Id: <20200616141547.24664-66-mdroth@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200616141547.24664-1-mdroth@linux.vnet.ibm.com>
 References: <20200616141547.24664-1-mdroth@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::335;
- envelope-from=flukshun@gmail.com; helo=mail-ot1-x335.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::241;
+ envelope-from=flukshun@gmail.com; helo=mail-oi1-x241.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -99,49 +100,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Michael S . Tsirkin" <mst@redhat.com>,
- David Hildenbrand <david@redhat.com>, qemu-stable@nongnu.org,
- Alexander Duyck <alexander.duyck@gmail.com>, Wei Wang <wei.w.wang@intel.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-stable@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: David Hildenbrand <david@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
 
-We took a reference when realizing, so let's drop that reference when
-unrealizing.
+In write_elf_section() we set the 'shdr' pointer to point to local
+structures shdr32 or shdr64, which we fill in to be written out to
+the ELF dump.  Unfortunately the address we pass to fd_write_vmcore()
+has a spurious '&' operator, so instead of writing out the section
+header we write out the literal pointer value followed by whatever is
+on the stack after the 'shdr' local variable.
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
-Fixes: c13c4153f76d ("virtio-balloon: VIRTIO_BALLOON_F_FREE_PAGE_HINT")
+Pass the correct address into fd_write_vmcore().
+
+Spotted by Coverity: CID 1421970.
+
 Cc: qemu-stable@nongnu.org
-Cc: Wei Wang <wei.w.wang@intel.com>
-Cc: Alexander Duyck <alexander.duyck@gmail.com>
-Cc: Michael S. Tsirkin <mst@redhat.com>
-Cc: Philippe Mathieu-Daudé <philmd@redhat.com>
-Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20200520100439.19872-4-david@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-(cherry picked from commit 105aef9c9479786d27c1c45c9b0b1fa03dc46be3)
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-id: 20200324173630.12221-1-peter.maydell@linaro.org
+(cherry picked from commit 174d2d6856bf435f4f58e9303ba30dd0e1279d3f)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- hw/virtio/virtio-balloon.c | 1 +
- 1 file changed, 1 insertion(+)
+ dump/dump.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-index 64fdd0e332..9762a65600 100644
---- a/hw/virtio/virtio-balloon.c
-+++ b/hw/virtio/virtio-balloon.c
-@@ -820,6 +820,7 @@ static void virtio_balloon_device_unrealize(DeviceState *dev, Error **errp)
- 
-     if (s->free_page_bh) {
-         qemu_bh_delete(s->free_page_bh);
-+        object_unref(OBJECT(s->iothread));
-         virtio_balloon_free_page_stop(s);
-         precopy_remove_notifier(&s->free_page_report_notify);
+diff --git a/dump/dump.c b/dump/dump.c
+index 6fb6e1245a..22ed1d3b0d 100644
+--- a/dump/dump.c
++++ b/dump/dump.c
+@@ -364,7 +364,7 @@ static void write_elf_section(DumpState *s, int type, Error **errp)
+         shdr = &shdr64;
      }
+ 
+-    ret = fd_write_vmcore(&shdr, shdr_size, s);
++    ret = fd_write_vmcore(shdr, shdr_size, s);
+     if (ret < 0) {
+         error_setg_errno(errp, -ret,
+                          "dump: failed to write section header table");
 -- 
 2.17.1
 
