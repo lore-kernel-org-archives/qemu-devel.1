@@ -2,137 +2,86 @@ Return-Path: <SRS0=f7ls=75=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CDBBC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 12:35:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A796BC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 12:36:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3798D2071A
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 12:35:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 71F432071A
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 12:36:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="p5BZv2qI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3798D2071A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nutanix.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CbkcVFyS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71F432071A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50956 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53972 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlAon-0005YE-FR
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 08:35:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56072)
+	id 1jlApi-00072x-N3
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 08:36:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56464)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ani.sinha@nutanix.com>)
- id 1jlAlh-0001iO-4R
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 08:32:45 -0400
-Received: from mx0b-002c1b01.pphosted.com ([148.163.155.12]:2374)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ani.sinha@nutanix.com>)
- id 1jlAlf-00057V-4r
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 08:32:44 -0400
-Received: from pps.filterd (m0127843.ppops.net [127.0.0.1])
- by mx0b-002c1b01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 05GCVnwa027831; Tue, 16 Jun 2020 05:32:24 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
- h=from : to : cc :
- subject : date : message-id : references : in-reply-to : content-type :
- content-id : content-transfer-encoding : mime-version;
- s=proofpoint20171006; bh=6BRWjfSQXKSSGMjWEhiRdyQJ8URU/bnSkWmIiiP179M=;
- b=p5BZv2qIgTzYGEYdjiJNSwPY6NXdnggwpqeCx4paQnausXNmQ+B2re+2YLksJHWots4s
- Gp12heD0IkbLvy6Cci2wvjTtGur9xZrXCmJzbMJl1AG1ZVo/2Te0Nim9/1TDO7NV/DIR
- ITW9vYLvCk2NkdS3qMbJwhOl6sPXFvuHdznGa+imNFqkTzd18K0xNAXV812YDMeNkMkG
- DfiQaAHCVnQEfxqMSmWEaqyK8006mVRoIRYXLjzjzABzeCqNh1RXCu65Qfr/7/KiDdop
- DgHQnX1BIyjqhYWFbPWK/BwYqWUbQ2a9yXDIztr+LPK+Xt57ByPmH3i/UjWg8+oBQ/FW +g== 
-Received: from nam10-mw2-obe.outbound.protection.outlook.com
- (mail-mw2nam10lp2107.outbound.protection.outlook.com [104.47.55.107])
- by mx0b-002c1b01.pphosted.com with ESMTP id 31n0535pfr-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 16 Jun 2020 05:32:24 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=a/S+hFPCpX0P9N6BhYt6QhyP2pRokdCfdXe5xaErw8EUdlyvoesJyOslxAyc2IraEgMWp7XbLFbEAR+ItNzHQuw32aE9bjDoeALkIw14/DsF201bLZl8R1qkPqoJ4KOIWab3ywTgfM3kSoF34so+fyJ1BRbbfyHKDwe5+V56uE9p629VjQG3QEsc+jVFmjrIvFUKE2SC2E9KUVJCGCeePtiqDB79qngZZsfgPmoDzwOdmj3mCdKEZCzMcpQFFibaSqZEdJ97YX99nS69m7FwVKz9AZH+FNGjD3dCeX0bB1xPIJyruxK3Zl3VUGukAJjYE0XdxZmHtiRUdk5AsA77Ig==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6BRWjfSQXKSSGMjWEhiRdyQJ8URU/bnSkWmIiiP179M=;
- b=WdYMSuohbib5nJ5Fb/dldrlsiePX87Yy0ZInQP31xjWmAH+4JllcFAvJrmvVSNS1OEX7M4MLecu7kwsDdjxMgzyb0dEh/juFfb5U1ZIPWyqSesFVFK0GTHaCuq+I4eoLiDHzH/DgxSdhFC5GzpaGKLgjg7G2R/pKAFygUhoBN0Hv07aSg+o1tTZfQWGvb5583s+efuFWMzbpPvWKH1mIhOE6xRFjhK9Rk14HYRNvdKLYr0qt/gISg/vJxe1oYQPhfFKp0TJtygFSc+qYf7ylx+uPpeqWNt/LP0gAJFSy0OI8H012ZBCl+tuLYRDfXd945IHKevqLhol5KIeHOJYS8A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
- dkim=pass header.d=nutanix.com; arc=none
-Received: from MN2PR02MB5742.namprd02.prod.outlook.com (2603:10b6:208:10d::27)
- by MN2PR02MB5726.namprd02.prod.outlook.com (2603:10b6:208:117::31)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3088.18; Tue, 16 Jun
- 2020 12:32:21 +0000
-Received: from MN2PR02MB5742.namprd02.prod.outlook.com
- ([fe80::317d:683f:b2:fa01]) by MN2PR02MB5742.namprd02.prod.outlook.com
- ([fe80::317d:683f:b2:fa01%7]) with mapi id 15.20.3088.029; Tue, 16 Jun 2020
- 12:32:21 +0000
-From: Ani Sinha <ani.sinha@nutanix.com>
-To: Igor Mammedov <imammedo@redhat.com>
-Subject: Re: [PATCH V2] Rename use_acpi_pci_hotplug to more appropriate
- use_acpi_hotplug_bridge
-Thread-Topic: [PATCH V2] Rename use_acpi_pci_hotplug to more appropriate
- use_acpi_hotplug_bridge
-Thread-Index: AQHWPyzD7ib4h0/yQkCsyuImnO1oVKjbLNGAgAAJHoA=
-Date: Tue, 16 Jun 2020 12:32:21 +0000
-Message-ID: <3D5E800F-73FE-48C1-9222-E7FA82DDB1A9@nutanix.com>
-References: <1591796451-49987-1-git-send-email-ani.sinha@nutanix.com>
- <20200616135927.4f2ef312@redhat.com>
-In-Reply-To: <20200616135927.4f2ef312@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=nutanix.com;
-x-originating-ip: [115.110.205.84]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: c67010f9-21e5-42a4-e4e8-08d811f150d1
-x-ms-traffictypediagnostic: MN2PR02MB5726:
-x-microsoft-antispam-prvs: <MN2PR02MB5726279A62C16316ABB1893AF19D0@MN2PR02MB5726.namprd02.prod.outlook.com>
-x-proofpoint-crosstenant: true
-x-ms-oob-tlc-oobclassifiers: OLM:3826;
-x-forefront-prvs: 04362AC73B
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: ebb0BH/mb9TfuVf0Do8fjGCcivo+HlOS28DC87BHLhOC/M71p+lbs7YCa8hrZxTHxDw9KEP+r+LqJeA+RuqdpXaZ5lfPkFpfTKL/mZKzWAZeJKOCUrV7HpX+rrHjFm5ExUi6oBb5VbMk2Qh+7UnVUFZWWJeYKaUdkVB8nvy7JjBsHRlC2r7qCQq9E/COE9AVCfjIEpuFXkYhkM/LbE/iaAMcBWeXPDqF1JpyzhTNNWa2qyR/4z3liReDXGZ+pIMXm5WVEYKdBogkqdIfQb66bP/4b6VF9h2FzB4b4Z66cEsrtklL5uDNIafYdXyENW0bPaXJasa9iZQyz3wTgWusJQ==
-x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:MN2PR02MB5742.namprd02.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(39860400002)(346002)(396003)(366004)(136003)(376002)(86362001)(44832011)(66946007)(4326008)(8676002)(6506007)(26005)(8936002)(6916009)(186003)(33656002)(64756008)(53546011)(66556008)(66446008)(76116006)(36756003)(2616005)(66476007)(5660300002)(54906003)(6512007)(316002)(71200400001)(2906002)(6486002)(91956017)(558084003)(478600001);
- DIR:OUT; SFP:1102; 
-x-ms-exchange-antispam-messagedata: hP3uCRejLfB2jNslPoir2PMoXSpE44A3JYh6R2/ohi2y+9AcU0KLj9hCa1iJRX8V+h8xr3j9ccX8welX8WHPhY3xybOhoEmZWBnEcRFgPl5FP/JPHaO8B7toqsNZk5NthJXHQmTGc1m17e8Kx20KDmY+6wo9QnenMzsqWuMTsc0h1SXrl0SpA3vajsKqjZPXnx8hsTUDZH9rqdQY1SGmaKfIkzW53AAyqIIZtSu+lLEmPWetJiELZIzB0Dkysmi2iJv4vGd/Hdf9W8JHZoWNQG3soeWmDI5MmLJWq2H1K0bVENNFkxSg8/K2EV1fZzKa78o+KSmaDXmntr+q+2cNrniwRbBabt7G2CaVjOqVbUggkV7V/DJMoeFXQPKiCWReu7GhR3lSUOO9maSQWX2TQWsc8la5vcyplojxkLTB+yjF/pnc/ZhwArlY8Uwdw8Js/eN69oTZEEo8Bshs6NexUpu2+jQvH2ery41+U/PP+Exv7vMuvP+MC5IyibFEm//P
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="iso-8859-1"
-Content-ID: <54D834122483E94193394C10AD05E0EA@namprd02.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1jlAms-0003Iu-Hq
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 08:33:59 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32935
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1jlAmq-0005Fc-IZ
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 08:33:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592310835;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=N/ebmebsjLDt3TJpu8HX9oDLWKA9koiwZKXkaYKQh10=;
+ b=CbkcVFySxDYJxfDyM3mkRA55p223xbYe2mVzObdpL8VAcSh3XJxgPZRHcqxyccH47NFfGM
+ TncXCZTQ/DT/Iyvff3hqWdMl1REC7m9Zw0/70svYMWACHz7QUTqNs2w3+6demygXYRR+np
+ DYA8y9uZNpHziXBhRduBwfUEaVcZS4o=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-103-UA0NP7x_OlGBYzjanJNZbQ-1; Tue, 16 Jun 2020 08:33:53 -0400
+X-MC-Unique: UA0NP7x_OlGBYzjanJNZbQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 61F8B102C812;
+ Tue, 16 Jun 2020 12:33:52 +0000 (UTC)
+Received: from localhost (unknown [10.40.208.22])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 38EF919D7D;
+ Tue, 16 Jun 2020 12:33:29 +0000 (UTC)
+Date: Tue, 16 Jun 2020 14:33:27 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Eric Auger <eric.auger@redhat.com>
+Subject: Re: [PATCH v4 1/5] acpi: Convert build_tpm2() to build_append* API
+Message-ID: <20200616143327.2ee38a48@redhat.com>
+In-Reply-To: <20200611135917.18300-2-eric.auger@redhat.com>
+References: <20200611135917.18300-1-eric.auger@redhat.com>
+ <20200611135917.18300-2-eric.auger@redhat.com>
 MIME-Version: 1.0
-X-OriginatorOrg: nutanix.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c67010f9-21e5-42a4-e4e8-08d811f150d1
-X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Jun 2020 12:32:21.2489 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: bb047546-786f-4de1-bd75-24e5b6f79043
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: PSGvOhpOqPo0Km8h0Ca6+4Kujr7Tqol0y58jD8VRnfXC3GSCqetTVhPF2fC70ZycrYh6bOHhSRUc90ClvzeXVQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR02MB5726
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
- definitions=2020-06-16_04:2020-06-16,
- 2020-06-16 signatures=0
-X-Proofpoint-Spam-Reason: safe
-Received-SPF: pass client-ip=148.163.155.12;
- envelope-from=ani.sinha@nutanix.com; helo=mx0b-002c1b01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 08:32:40
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Spam_score_int: -37
-X-Spam_score: -3.8
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=imammedo@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 02:46:07
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
 X-Spam_bar: ---
-X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -145,25 +94,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Ani Sinha <ani@anisinha.ca>,
- =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: peter.maydell@linaro.org, drjones@redhat.com, mst@redhat.com,
+ philmd@redhat.com, qemu-devel@nongnu.org, shannon.zhaosl@gmail.com,
+ qemu-arm@nongnu.org, marcandre.lureau@redhat.com, eric.auger.pro@gmail.com,
+ lersek@redhat.com, ardb@kernel.org, stefanb@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Thu, 11 Jun 2020 15:59:13 +0200
+Eric Auger <eric.auger@redhat.com> wrote:
 
+> In preparation of its move to the generic acpi code,
+> let's convert build_tpm2() to use build_append API. This
+> latter now is prefered in place of direct ACPI struct field
+> settings with manual endianness conversion.
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> 
+> ---
+> 
+> v3 -> v4:
+> - Don't use Acpi20TPM2 *tpm2_ptr anymore
+> - Use variables for control area start address and start method
+> - Simplified arg values passed to bios_linker_loader_add_pointer
+> - use g_assert_not_reached()
+> ---
+>  hw/i386/acpi-build.c | 49 +++++++++++++++++++++++++++++---------------
+>  1 file changed, 33 insertions(+), 16 deletions(-)
+> 
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index b5669d6c65..f150d95ecc 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -2298,35 +2298,52 @@ build_tpm_tcpa(GArray *table_data, BIOSLinker *linker, GArray *tcpalog)
+>  static void
+>  build_tpm2(GArray *table_data, BIOSLinker *linker, GArray *tcpalog)
+>  {
+> -    Acpi20TPM2 *tpm2_ptr = acpi_data_push(table_data, sizeof *tpm2_ptr);
+> -    unsigned log_addr_size = sizeof(tpm2_ptr->log_area_start_address);
+> -    unsigned log_addr_offset =
+> -        (char *)&tpm2_ptr->log_area_start_address - table_data->data;
+> +    uint8_t start_method_params[12] = {};
+> +    unsigned log_addr_offset, tpm2_start;
+> +    uint64_t control_area_start_address;
+> +    uint32_t start_method;
+> +    void *tpm2_ptr;
+>  
+> -    tpm2_ptr->platform_class = cpu_to_le16(TPM2_ACPI_CLASS_CLIENT);
+> +    tpm2_start = table_data->len;
+> +    tpm2_ptr = acpi_data_push(table_data, sizeof(AcpiTableHeader));
+> +
+> +    /* Platform Class */
+> +    build_append_int_noprefix(table_data, TPM2_ACPI_CLASS_CLIENT, 2);
+> +    /* Reserved */
+> +    build_append_int_noprefix(table_data, 0, 2);
+>      if (TPM_IS_TIS_ISA(tpm_find())) {
+> -        tpm2_ptr->control_area_address = cpu_to_le64(0);
+> -        tpm2_ptr->start_method = cpu_to_le32(TPM2_START_METHOD_MMIO);
+> +        control_area_start_address = 0;
+> +        start_method = TPM2_START_METHOD_MMIO;
+>      } else if (TPM_IS_CRB(tpm_find())) {
+> -        tpm2_ptr->control_area_address = cpu_to_le64(TPM_CRB_ADDR_CTRL);
+> -        tpm2_ptr->start_method = cpu_to_le32(TPM2_START_METHOD_CRB);
+> +        control_area_start_address = TPM_CRB_ADDR_CTRL;
+> +        start_method = TPM2_START_METHOD_CRB;
+>      } else {
+> -        g_warn_if_reached();
+> +        g_assert_not_reached();
+>      }
+> +    /* Address of Control Area */
+> +    build_append_int_noprefix(table_data, control_area_start_address, 8);
+> +    /* Start Method */
+> +    build_append_int_noprefix(table_data, start_method, 4);
+>  
+> -    tpm2_ptr->log_area_minimum_length =
+> -        cpu_to_le32(TPM_LOG_AREA_MINIMUM_SIZE);
+> +    /* Platform Specific Parameters */
+> +    g_array_append_vals(table_data, &start_method_params,
+> +                        ARRAY_SIZE(start_method_params));
+>  
+> -    acpi_data_push(tcpalog, le32_to_cpu(tpm2_ptr->log_area_minimum_length));
+> +    /* Log Area Minimum Length */
+> +    build_append_int_noprefix(table_data, TPM_LOG_AREA_MINIMUM_SIZE, 4);
 
-> On Jun 16, 2020, at 5:29 PM, Igor Mammedov <imammedo@redhat.com> wrote:
->=20
->> Change-Id: I2a6ab47e80fa2bc9504ce88e063d710efaceb842
-> what is this id, prehaps drop it?
+question not related to conversion:
+Is it a part of 'Platform Specific Parameters'?
+(as per spec table ends with it. if yes, then probably add pointer to place in spec
+wher its documented.
 
-Sent V3 with this dropped.
+> +
+> +    acpi_data_push(tcpalog, TPM_LOG_AREA_MINIMUM_SIZE);
+>      bios_linker_loader_alloc(linker, ACPI_BUILD_TPMLOG_FILE, tcpalog, 1,
+>                               false);
+>  
+> -    /* log area start address to be filled by Guest linker */
+> +    log_addr_offset = table_data->len;
+> +    build_append_int_noprefix(table_data, 0, 8);
+> +    /* Log Area Start Address to be filled by Guest linker */
+move this line to where it used to be or at least above build_append_int_noprefix()
 
-Ani
+>      bios_linker_loader_add_pointer(linker, ACPI_BUILD_TABLE_FILE,
+> -                                   log_addr_offset, log_addr_size,
+> +                                   log_addr_offset, 8,
+>                                     ACPI_BUILD_TPMLOG_FILE, 0);
+>      build_header(linker, table_data,
+> -                 (void *)tpm2_ptr, "TPM2", sizeof(*tpm2_ptr), 4, NULL, NULL);
+> +                 tpm2_ptr, "TPM2", table_data->len - tpm2_start, 4, NULL, NULL);
+>  }
+>  
+>  #define HOLE_640K_START  (640 * KiB)
+
+nevertheless looks like faithfull conversion,
+btw why you didn't drop Acpi20TPM2 structure definition?
 
 
