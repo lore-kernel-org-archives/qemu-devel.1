@@ -7,74 +7,70 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D021C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 06:50:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4ECCC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 06:51:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E710A2074D
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 06:50:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B36F42074D
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 06:51:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IVBa+Uu5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E710A2074D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Rss5wD6G"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B36F42074D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51936 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52846 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jl5Qu-00071u-3O
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 02:50:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41930)
+	id 1jl5R3-0007QD-VE
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 02:51:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41852)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jl5MX-0001iO-A7
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 02:46:26 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:20548
- helo=us-smtp-1.mimecast.com)
+ id 1jl5MI-0001UK-Kg
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 02:46:10 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:36449
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jl5MT-0005fL-DU
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 02:46:23 -0400
+ id 1jl5MD-0005Xp-Dq
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 02:46:09 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592289980;
+ s=mimecast20190719; t=1592289962;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=WY9uuhYcrLCiZTe+aHYizIWB/zPu8U68u5vIIhwUxgY=;
- b=IVBa+Uu53Kaspx4G3xHBrvagRosYJi/8kaDNUbe7UQErMOuX2SuhwkKvZYKhmZIBO9HBTh
- WUVnNc73Q4Z1L5vJuktP7sIEEUl8rMrz6D6I2nNqnWbWLOlHqmL5xJP32ZZkW4uikbTugE
- 970egiz2hJT/btAd8+FEFXeGkmnBFGE=
+ to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
+ references:references; bh=JFwHMkHqVUvcQ2HM5U+pSmAGlyM+UoHgsvgwXwXIIns=;
+ b=Rss5wD6G5CyDZDCFWwy/5/rUJeatboU2khMDFx7m705ZK5McOiQJqDCXlJhfVywi5D9fJo
+ R0hy+OaLa2nxCb21EFWZsSU6Jq3F12sWqy5lDsd5II/POAMVLX5UgvKSE3Ttc2ydWV9I7I
+ iuMvno73fZNL4IOwsIt6Vk5VUDktBYc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-408-oHPi5gkJPRuDAOLNOqd7XQ-1; Tue, 16 Jun 2020 02:46:16 -0400
-X-MC-Unique: oHPi5gkJPRuDAOLNOqd7XQ-1
+ us-mta-389-0mRFhSUGNzWdxSeGoDRj-Q-1; Tue, 16 Jun 2020 02:45:57 -0400
+X-MC-Unique: 0mRFhSUGNzWdxSeGoDRj-Q-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4244B100961C;
- Tue, 16 Jun 2020 06:46:15 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9B9F7835B50;
+ Tue, 16 Jun 2020 06:45:56 +0000 (UTC)
 Received: from jason-ThinkPad-T430s.redhat.com (ovpn-13-222.pek2.redhat.com
  [10.72.13.222])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A0F5F8202D;
- Tue, 16 Jun 2020 06:46:13 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 06F868202D;
+ Tue, 16 Jun 2020 06:45:54 +0000 (UTC)
 From: Jason Wang <jasowang@redhat.com>
 To: peter.maydell@linaro.org
-Subject: [PULL 10/33] hw/net/tulip: Log descriptor overflows
-Date: Tue, 16 Jun 2020 14:45:21 +0800
-Message-Id: <1592289944-13727-11-git-send-email-jasowang@redhat.com>
+Subject: [PULL 03/33] tap: allow extended virtio header with hash info
+Date: Tue, 16 Jun 2020 14:45:14 +0800
+Message-Id: <1592289944-13727-4-git-send-email-jasowang@redhat.com>
 In-Reply-To: <1592289944-13727-1-git-send-email-jasowang@redhat.com>
 References: <1592289944-13727-1-git-send-email-jasowang@redhat.com>
-MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=jasowang@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 02:45:54
+Content-Type: text/plain; charset=US-ASCII
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=jasowang@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 02:45:57
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -95,46 +91,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Yuri Benditovich <yuri.benditovich@daynix.com>,
+ Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+From: Yuri Benditovich <yuri.benditovich@daynix.com>
 
-Log with GUEST_ERROR what the guest is doing wrong.
-
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- hw/net/tulip.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ net/tap.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/hw/net/tulip.c b/hw/net/tulip.c
-index 57ecbe2..4487fd6 100644
---- a/hw/net/tulip.c
-+++ b/hw/net/tulip.c
-@@ -578,6 +578,9 @@ static int tulip_copy_tx_buffers(TULIPState *s, struct tulip_descriptor *desc)
-     int len2 = (desc->control >> TDES1_BUF2_SIZE_SHIFT) & TDES1_BUF2_SIZE_MASK;
+diff --git a/net/tap.c b/net/tap.c
+index 6207f61..ca48f2a 100644
+--- a/net/tap.c
++++ b/net/tap.c
+@@ -254,7 +254,8 @@ static void tap_set_vnet_hdr_len(NetClientState *nc, int len)
  
-     if (s->tx_frame_len + len1 > sizeof(s->tx_frame)) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "%s: descriptor overflow (ofs: %u, len:%d, size:%zu)\n",
-+                      __func__, s->tx_frame_len, len1, sizeof(s->tx_frame));
-         return -1;
-     }
-     if (len1) {
-@@ -587,6 +590,9 @@ static int tulip_copy_tx_buffers(TULIPState *s, struct tulip_descriptor *desc)
-     }
+     assert(nc->info->type == NET_CLIENT_DRIVER_TAP);
+     assert(len == sizeof(struct virtio_net_hdr_mrg_rxbuf) ||
+-           len == sizeof(struct virtio_net_hdr));
++           len == sizeof(struct virtio_net_hdr) ||
++           len == sizeof(struct virtio_net_hdr_v1_hash));
  
-     if (s->tx_frame_len + len2 > sizeof(s->tx_frame)) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "%s: descriptor overflow (ofs: %u, len:%d, size:%zu)\n",
-+                      __func__, s->tx_frame_len, len2, sizeof(s->tx_frame));
-         return -1;
-     }
-     if (len2) {
+     tap_fd_set_vnet_hdr_len(s->fd, len);
+     s->host_vnet_hdr_len = len;
 -- 
 2.5.0
 
