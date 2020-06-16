@@ -6,81 +6,77 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA920C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 06:48:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A69ACC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 06:50:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B3A0920734
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 06:48:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 701FE2074D
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 06:50:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NDMlTGlU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3A0920734
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YrA9bRGb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 701FE2074D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43454 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51258 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jl5Ou-0003Yw-V6
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 02:48:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41906)
+	id 1jl5Qb-0006l6-Mz
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 02:50:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41854)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jl5MT-0001hq-OQ
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 02:46:23 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:27306
- helo=us-smtp-delivery-1.mimecast.com)
+ id 1jl5MI-0001UR-N7
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 02:46:10 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44250
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jl5MO-0005dl-Q0
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 02:46:21 -0400
+ id 1jl5MG-0005Y5-Oy
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 02:46:10 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592289976;
+ s=mimecast20190719; t=1592289967;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Mhzcc7G741UxkgAaTzU1Ayp6ddKf1AUbfEP8m/8N7mA=;
- b=NDMlTGlUf1i6zOl3WZUJS97RrWX9VfgfYbQV3tVRWjDWWMAgUBQq0stFLlzz5an5cLJY1W
- 1tUVXqefGKLnn0OOhfoJ6fZxi4gnDacuj5WRIzHLW8QkTDKl7SxpEAPFiMuTXX9GtD348V
- mEgp6mfErgo+/U0i+4y/D1a7CBP745s=
+ to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
+ references:references; bh=Yovk4IoO6hoDxb2X3+davcKc6kyOYQ491MLiOihoQoo=;
+ b=YrA9bRGbnez1a4VA+i2GXcjBpajUrR8jZrZWjT4I/nRxe4sDNact09oquwSGDeUb5V5RM+
+ 5IjTYNiUmKf6PADdNplExFc8mkF6WoTr0OaaBHCc+1WIpkdfDhISOoXe1RUruLZz2ZyPoM
+ X6m1j+gLSIhvI9R6OHXu6vwH+PjYlPk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-467-ta63FTsQMn6kOjNrDzI9hQ-1; Tue, 16 Jun 2020 02:46:14 -0400
-X-MC-Unique: ta63FTsQMn6kOjNrDzI9hQ-1
+ us-mta-55-Vvm4ZjduMka79-9yepQWzw-1; Tue, 16 Jun 2020 02:46:05 -0400
+X-MC-Unique: Vvm4ZjduMka79-9yepQWzw-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 22AA11009613;
- Tue, 16 Jun 2020 06:46:13 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2108618585BC;
+ Tue, 16 Jun 2020 06:46:04 +0000 (UTC)
 Received: from jason-ThinkPad-T430s.redhat.com (ovpn-13-222.pek2.redhat.com
  [10.72.13.222])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 52CA18202D;
- Tue, 16 Jun 2020 06:46:11 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 473938202D;
+ Tue, 16 Jun 2020 06:45:59 +0000 (UTC)
 From: Jason Wang <jasowang@redhat.com>
 To: peter.maydell@linaro.org
-Subject: [PULL 09/33] hw/net/tulip: Fix 'Descriptor Error' definition
-Date: Tue, 16 Jun 2020 14:45:20 +0800
-Message-Id: <1592289944-13727-10-git-send-email-jasowang@redhat.com>
+Subject: [PULL 05/33] vmstate.h: provide VMSTATE_VARRAY_UINT16_ALLOC macro
+Date: Tue, 16 Jun 2020 14:45:16 +0800
+Message-Id: <1592289944-13727-6-git-send-email-jasowang@redhat.com>
 In-Reply-To: <1592289944-13727-1-git-send-email-jasowang@redhat.com>
 References: <1592289944-13727-1-git-send-email-jasowang@redhat.com>
-MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=jasowang@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 02:45:57
+Content-Type: text/plain; charset=US-ASCII
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=jasowang@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 02:46:07
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -94,41 +90,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Yuri Benditovich <yuri.benditovich@daynix.com>,
+ Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+From: Yuri Benditovich <yuri.benditovich@daynix.com>
 
-Bit #14 is "DE" for 'Descriptor Error':
+Similar to VMSTATE_VARRAY_UINT32_ALLOC, but the size is
+16-bit field.
 
-  When set, indicates a frame truncation caused by a frame
-  that does not fit within the current descriptor buffers,
-  and that the 21143 does not own the next descriptor.
-
-  [Table 4-1. RDES0 Bit Fields Description]
-
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- hw/net/tulip.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/migration/vmstate.h | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/hw/net/tulip.h b/hw/net/tulip.h
-index 97521b2..5271aad 100644
---- a/hw/net/tulip.h
-+++ b/hw/net/tulip.h
-@@ -211,7 +211,7 @@
- #define RDES0_RF         BIT(11)
- #define RDES0_DT_SHIFT   12
- #define RDES0_DT_MASK    3
--#define RDES0_LE         BIT(14)
-+#define RDES0_DE         BIT(14)
- #define RDES0_ES         BIT(15)
- #define RDES0_FL_SHIFT   16
- #define RDES0_FL_MASK    0x3fff
+diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
+index eafa39f..f68ed7d 100644
+--- a/include/migration/vmstate.h
++++ b/include/migration/vmstate.h
+@@ -432,6 +432,16 @@ extern const VMStateInfo vmstate_info_qlist;
+     .offset     = vmstate_offset_pointer(_state, _field, _type),     \
+ }
+ 
++#define VMSTATE_VARRAY_UINT16_ALLOC(_field, _state, _field_num, _version, _info, _type) {\
++    .name       = (stringify(_field)),                               \
++    .version_id = (_version),                                        \
++    .num_offset = vmstate_offset_value(_state, _field_num, uint16_t),\
++    .info       = &(_info),                                          \
++    .size       = sizeof(_type),                                     \
++    .flags      = VMS_VARRAY_UINT16 | VMS_POINTER | VMS_ALLOC,       \
++    .offset     = vmstate_offset_pointer(_state, _field, _type),     \
++}
++
+ #define VMSTATE_VARRAY_UINT16_UNSAFE(_field, _state, _field_num, _version, _info, _type) {\
+     .name       = (stringify(_field)),                               \
+     .version_id = (_version),                                        \
 -- 
 2.5.0
 
