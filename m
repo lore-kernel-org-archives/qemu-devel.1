@@ -2,81 +2,72 @@ Return-Path: <SRS0=f7ls=75=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23AF8C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 16:12:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D731C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 16:14:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EBBDF208B3
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 16:12:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E83cMfY3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBBDF208B3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7D212208D5
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 16:14:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D212208D5
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36774 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39940 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlEBs-00077I-8o
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 12:12:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57682)
+	id 1jlEEB-00005a-Mh
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 12:14:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58272)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <devnexen@gmail.com>)
- id 1jlEB5-00064L-Di; Tue, 16 Jun 2020 12:11:11 -0400
-Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:35157)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <devnexen@gmail.com>)
- id 1jlEB3-00056Z-J6; Tue, 16 Jun 2020 12:11:11 -0400
-Received: by mail-ed1-x542.google.com with SMTP id e12so14700804eds.2;
- Tue, 16 Jun 2020 09:11:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:from:date:message-id:subject:to;
- bh=tQGTgMA17a4o6iebS1HxA6AgY6W7CBwK/BaZI98DayA=;
- b=E83cMfY3rnxAqY8XBmXPvAc/fvzBgSODYggbL92DfEvs+SWHT/sJEJP1IXC19cc5mX
- d324qLCxN8Bw8fmPlBxUeY9wvqi7TKYb/MGDCZEIcOOVN9pdE9oay0EfA0HLFumgb92d
- BBKtYxYEqgYq7N4PIgCFye7pzm6EIpEsl8qqY3NrQMHUZQx9BJkmZ1PWtt2zDWlepW0O
- RmlWaXKcVz3OIK2as1rLgwmLJ9jwNEEmhb4jbfEAyCKY8JRbJRsQmqeCXHZ5DfBswDm7
- pmd2YRTCk3V0vlz6uQAKK+cbfLp4d/lVjK4+TxkYnrivf047zlWzt6AN6nDyO9HP67ZS
- i0Xw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
- bh=tQGTgMA17a4o6iebS1HxA6AgY6W7CBwK/BaZI98DayA=;
- b=XCW7K/JDpp/+X4ZKyyEnmS94BNXWmB+L/8qQJ+ySP5XLo6Q/aq++HI4KIlR5q5DyLM
- UTsmDuOALHAPMzqOK3BWYYEBhxaE/fhYXXhrm3yLZUbMl4W419bXlnia38HcABqbO+NE
- ruz7zigBNsXAzWp/urAz2Wn8uTcqNh4XUJYffaIzV6Th4WKhbIRh/cqu5fcTWhh09ZHb
- F7xlUANURqjhavcIyUiAmZPSgy5QqStqErcK5I//PFKl2wNS0KZV6X50krNZQq2kG+Wz
- rHjOh3cvAiaMyvYYZYeDKgxila3SraoUYFgRRKDwfCabLQoAA8ZMIlZwKmPVag+p1iCz
- YYqw==
-X-Gm-Message-State: AOAM530v5dU6AQFV7OT30syVpcf5I+8OyIlJpXc9hhqnXJG6rjO3WnEZ
- AbA2I9ld1D7LwDfwJTxF+xZ/hcd5sGda+Cg1PSm/GK7d49Q=
-X-Google-Smtp-Source: ABdhPJySHc2+PvED6EqeGjumwLlo+9qhCqZBo0PfV3LbE/jNelL7nSvuH9N72v0ShxcS0+hcscOwFfUVc2EfavjjwN4=
-X-Received: by 2002:aa7:da14:: with SMTP id r20mr3309742eds.7.1592323867344;
- Tue, 16 Jun 2020 09:11:07 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jlEDJ-0007n4-Ro
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 12:13:29 -0400
+Received: from 11.mo6.mail-out.ovh.net ([188.165.38.119]:51705)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jlEDG-0005Mb-6w
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 12:13:29 -0400
+Received: from player772.ha.ovh.net (unknown [10.108.57.178])
+ by mo6.mail-out.ovh.net (Postfix) with ESMTP id CBEEB21A5D8
+ for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 18:13:22 +0200 (CEST)
+Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
+ (Authenticated sender: clg@kaod.org)
+ by player772.ha.ovh.net (Postfix) with ESMTPSA id 260F6137DED0D;
+ Tue, 16 Jun 2020 16:13:09 +0000 (UTC)
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-98R0028284699e-bacd-44c9-8e8a-fb2914693776,EBFB3A1CCBA6C973625B067ACEBAD7C75398389C)
+ smtp.auth=clg@kaod.org
+Subject: Re: [PATCH 1/2] hw/misc/pca9552: Trace LED On/Off events
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org
+References: <20200616094542.25415-1-f4bug@amsat.org>
+ <20200616094542.25415-2-f4bug@amsat.org>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <ce02c953-073a-3843-5830-930cc194117c@kaod.org>
+Date: Tue, 16 Jun 2020 18:13:06 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-From: David CARLIER <devnexen@gmail.com>
-Date: Tue, 16 Jun 2020 17:10:56 +0100
-Message-ID: <CA+XhMqx6VjRhT6xBzJ-UYs7cPDXVK=PNdfNVdad3Tqhe43P=Ew@mail.gmail.com>
-Subject: [PATCH V4] util/oslib-posix : qemu_init_exec_dir implementation for
- Mac
-To: QEMU Trivial <qemu-trivial@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::542;
- envelope-from=devnexen@gmail.com; helo=mail-ed1-x542.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200616094542.25415-2-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Ovh-Tracer-Id: 17267363925485521678
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -77
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedrudejtddguddtudcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenfghrlhcuvffnffculddvfedmnecujfgurhepuffvfhfhkffffgggjggtgfesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpefhvedvheeifedtveefleelfffghedtgfdvgeetieejtedujeeguddtudduhfetkeenucffohhmrghinhepohhpvghnphhofigvrhdrgiihiienucfkpheptddrtddrtddrtddpkedvrdeigedrvdehtddrudejtdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejjedvrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
+Received-SPF: pass client-ip=188.165.38.119; envelope-from=clg@kaod.org;
+ helo=11.mo6.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 12:13:23
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -8
+X-Spam_score: -0.9
+X-Spam_bar: /
+X-Spam_report: (-0.9 / 5.0 requ) BAYES_00=-1.9, PDS_OTHER_BAD_TLD=1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -89,54 +80,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jeffery <andrew@aj.id.au>,
+ Joaquin de Andres <me@xcancerberox.com.ar>,
+ Esteban Bosse <estebanbosse@gmail.com>, qemu-arm@nongnu.org,
+ Joel Stanley <joel@jms.id.au>, Guenter Roeck <linux@roeck-us.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From 7eef8b803cdb0e7148fdf894d2992052695c1ff8 Mon Sep 17 00:00:00 2001
-From: David Carlier <devnexen@gmail.com>
-Date: Tue, 26 May 2020 21:35:27 +0100
-Subject: [PATCH] util/oslib-posix : qemu_init_exec_dir implementation for Mac
+On 6/16/20 11:45 AM, Philippe Mathieu-Daudé wrote:
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Using dyld API to get the full path of the current process.
 
-Signed-off-by: David Carlier <devnexen@gmail.com>
----
- util/oslib-posix.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+Reviewed-by: Cédric Le Goater <clg@kaod.org>
+Tested-by: Cédric Le Goater <clg@kaod.org>
 
-diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-index 916f1be224..3612c2c80e 100644
---- a/util/oslib-posix.c
-+++ b/util/oslib-posix.c
-@@ -57,6 +57,10 @@
- #include <lwp.h>
- #endif
+Download an OpenBMC witherspoon flash image : 
 
-+#ifdef __APPLE__
-+#include <mach-o/dyld.h>
-+#endif
-+
- #include "qemu/mmap-alloc.h"
+wget https://openpower.xyz/job/openbmc-build/lastSuccessfulBuild/distro=ubuntu,label=builder,target=witherspoon/artifact/deploy/images/witherspoon/obmc-phosphor-image-witherspoon.ubi.mtd
 
- #ifdef CONFIG_DEBUG_STACK_USAGE
-@@ -375,6 +379,16 @@ void qemu_init_exec_dir(const char *argv0)
-             p = buf;
-         }
-     }
-+#elif defined(__APPLE__)
-+    {
-+        uint32_t len = sizeof(buf);
-+        if (_NSGetExecutablePath(buf, &len) == 0) {
-+     char fpath[PATH_MAX];
-+            buf[len - 1] = 0;
-+      realpath(buf, fpath);
-+            p = fpath;
-+        }
-+    }
- #endif
-     /* If we don't have any way of figuring out the actual executable
-        location then try argv[0].  */
--- 
-2.27.0
+and run :
+
+qemu-system-arm -M witherspoon-bmc -nic user -drive file=obmc-phosphor-image-witherspoon.ubi.mtd,format=raw,if=mtd -nographic
+
+The system has a set of daemons controlling the status of the leds :
+
+ 1148 root      7164 S    phosphor-ledcontroller -p /sys/class/leds/cffps1/68
+ 1149 root      7164 S    phosphor-ledcontroller -p /sys/class/leds/cffps1/69
+ 1150 root      7164 S    phosphor-ledcontroller -p /sys/class/leds/fan0
+ 1151 root      7164 S    phosphor-ledcontroller -p /sys/class/leds/fan1
+ 1152 root      7164 S    phosphor-ledcontroller -p /sys/class/leds/fan2
+ 1153 root      7164 S    phosphor-ledcontroller -p /sys/class/leds/fan3
+ 1154 root      7164 S    phosphor-ledcontroller -p /sys/class/leds/front/fault
+ 1155 root      7164 S    phosphor-ledcontroller -p /sys/class/leds/front/id
+ 1156 root      7164 S    phosphor-ledcontroller -p /sys/class/leds/front/power
+ 1157 root      7164 S    phosphor-ledcontroller -p /sys/class/leds/power/button
+ 1158 root      7164 S    phosphor-ledcontroller -p /sys/class/leds/rear/fault
+ 1159 root      7164 S    phosphor-ledcontroller -p /sys/class/leds/rear/id
+ 1160 root      7164 S    phosphor-ledcontroller -p /sys/class/leds/rear/power
+
+
+If activated, the pca9552 traces will appear on the QEMU monitor.
+
+Thanks,
+
+C.
+
+> ---
+>  hw/misc/pca9552.c    | 7 +++++++
+>  hw/misc/trace-events | 3 +++
+>  2 files changed, 10 insertions(+)
+> 
+> diff --git a/hw/misc/pca9552.c b/hw/misc/pca9552.c
+> index cac729e35a..a3d0decbff 100644
+> --- a/hw/misc/pca9552.c
+> +++ b/hw/misc/pca9552.c
+> @@ -17,6 +17,7 @@
+>  #include "migration/vmstate.h"
+>  #include "qapi/error.h"
+>  #include "qapi/visitor.h"
+> +#include "trace.h"
+>  
+>  #define PCA9552_LED_ON   0x0
+>  #define PCA9552_LED_OFF  0x1
+> @@ -45,9 +46,15 @@ static void pca9552_update_pin_input(PCA9552State *s)
+>          switch (config) {
+>          case PCA9552_LED_ON:
+>              s->regs[input_reg] |= 1 << input_shift;
+> +            if (input_shift < s->nr_leds) {
+> +                trace_pca9552_led_set(input_shift, true);
+> +            }
+>              break;
+>          case PCA9552_LED_OFF:
+>              s->regs[input_reg] &= ~(1 << input_shift);
+> +            if (input_shift < s->nr_leds) {
+> +                trace_pca9552_led_set(input_shift, false);
+> +            }
+>              break;
+>          case PCA9552_LED_PWM0:
+>          case PCA9552_LED_PWM1:
+> diff --git a/hw/misc/trace-events b/hw/misc/trace-events
+> index 5561746866..ed80d0d1be 100644
+> --- a/hw/misc/trace-events
+> +++ b/hw/misc/trace-events
+> @@ -206,3 +206,6 @@ via1_rtc_cmd_pram_sect_write(int sector, int offset, int addr, int value) "secto
+>  # grlib_ahb_apb_pnp.c
+>  grlib_ahb_pnp_read(uint64_t addr, uint32_t value) "AHB PnP read addr:0x%03"PRIx64" data:0x%08x"
+>  grlib_apb_pnp_read(uint64_t addr, uint32_t value) "APB PnP read addr:0x%03"PRIx64" data:0x%08x"
+> +
+> +# pca9552.c
+> +pca9552_led_set(unsigned id, bool state) "LED#%d state:%u"
+> 
+
 
