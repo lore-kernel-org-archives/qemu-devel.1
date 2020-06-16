@@ -2,158 +2,77 @@ Return-Path: <SRS0=f7ls=75=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4792CC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 15:10:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E041C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 15:11:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 06F2520786
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 15:10:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0F026207C3
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 15:11:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C/2GhliA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06F2520786
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QkVGhgm2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F026207C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42382 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47274 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlDDt-0004tF-9I
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 11:10:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41848)
+	id 1jlDFD-0006Wf-AX
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 11:11:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34916)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jlDAs-0007t0-4S
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 11:06:54 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43751
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jlClI-0008JY-TG
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 10:40:28 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:28376
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jlDAp-0007jp-8e
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 11:06:53 -0400
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jlClF-00025R-UT
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 10:40:28 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592320009;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=waqQlIAofOMPutSEtzPlPnM9S2BBF3P5bLloFI/3u7w=;
- b=C/2GhliAwHrscCmXkUVTkIwwxCu8NnHFS23VPi3NnLjIJeyfcooh0FBUwt6RED39LmAIr0
- OwRyY8gWVOSvsQuk99w/LSLoHalaNdhKI5n99yB9SuHpmdbTvKgqrpVNUbFa/BTzxg3Ksy
- 7ndBuZJOHD8LVfE4B2cTnICK4O71NHc=
+ s=mimecast20190719; t=1592318424;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:in-reply-to:in-reply-to:  references:references;
+ bh=wQ/JTZS7R62vV0M+EGLFF0C+lD7+wND9gBuwJN9NOmE=;
+ b=QkVGhgm2gMoRoHI2f69bXONYITwYSNNQTc9itpd0nsCC7/uE2GQTfgYhVwcHsFjCxt5+FY
+ rlK55RKN4Gf9V2yVu834K06Jg1Z4vYBiye410zRuL0snoAfOS10wozzD7+GbgUBUK025N8
+ Xk7UwFZH583ujZveSM1HoTeb7mN6Xzg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-271-ImcBu7lyOOSXv9IyTAqx0Q-1; Tue, 16 Jun 2020 11:06:39 -0400
-X-MC-Unique: ImcBu7lyOOSXv9IyTAqx0Q-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-258-aq_0woVuOiKvRyUuJYHi9g-1; Tue, 16 Jun 2020 10:40:12 -0400
+X-MC-Unique: aq_0woVuOiKvRyUuJYHi9g-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 52581EC1CD
- for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 15:06:37 +0000 (UTC)
-Received: from [10.10.117.188] (ovpn-117-188.rdu2.redhat.com [10.10.117.188])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 82109100EBAC;
- Tue, 16 Jun 2020 15:06:19 +0000 (UTC)
-Subject: Re: [PATCH v3 0/3] python/machine.py: refactor shutdown
-To: Eduardo Habkost <ehabkost@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-References: <20200604195252.20739-1-jsnow@redhat.com>
- <8bd27ec8-1bb6-45e2-a43a-7e0229065414@redhat.com>
- <4012de28-5837-889a-eda1-b9957cbbbad1@redhat.com>
- <5d20012b-923c-0bf4-232d-272977087fe3@redhat.com>
- <20200615222152.GT2366737@habkost.net>
-From: John Snow <jsnow@redhat.com>
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <85b19f6a-5521-4672-b146-89be361527e6@redhat.com>
-Date: Tue, 16 Jun 2020 11:06:18 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6DC885AEC7;
+ Tue, 16 Jun 2020 14:40:11 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.110.66])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C0B305D9D7;
+ Tue, 16 Jun 2020 14:40:01 +0000 (UTC)
+Date: Tue, 16 Jun 2020 15:39:57 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Lukas Straub <lukasstraub2@web.de>
+Subject: Re: [PATCH v4 1/4] Introduce yank feature
+Message-ID: <20200616143957.GF550360@redhat.com>
+References: <cover.1590421341.git.lukasstraub2@web.de>
+ <dc2724aead900db8fb3bed0a066f7c7e2654edb0.1590421341.git.lukasstraub2@web.de>
 MIME-Version: 1.0
-In-Reply-To: <20200615222152.GT2366737@habkost.net>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=jsnow@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 02:46:07
+Content-Disposition: inline
+In-Reply-To: <dc2724aead900db8fb3bed0a066f7c7e2654edb0.1590421341.git.lukasstraub2@web.de>
+User-Agent: Mutt/1.14.0 (2020-05-02)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=berrange@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 02:01:17
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -161,8 +80,7 @@ X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001,
- WEIRD_PORT=0.001 autolearn=_AUTOLEARN
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -175,216 +93,163 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, Markus Armbruster <armbru@redhat.com>,
- qemu-devel@nongnu.org, Cleber Rosa <crosa@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block <qemu-block@nongnu.org>,
+ Juan Quintela <quintela@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Mon, May 25, 2020 at 05:44:23PM +0200, Lukas Straub wrote:
+> The yank feature allows to recover from hanging qemu by "yanking"
+> at various parts. Other qemu systems can register themselves and
+> multiple yank functions. Then all yank functions for selected
+> instances can be called by the 'yank' out-of-band qmp command.
+> Available instances can be queried by a 'query-yank' oob command.
+> 
+> Signed-off-by: Lukas Straub <lukasstraub2@web.de>
+> ---
+>  qapi/misc.json |  45 +++++++++++++
+>  yank.c         | 174 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  yank.h         |  67 +++++++++++++++++++
+>  3 files changed, 286 insertions(+)
+>  create mode 100644 yank.c
+>  create mode 100644 yank.h
+
+> +void yank_register_function(char *instance_name, YankFn *func, void *opaque)
+> +{
+> +    struct YankInstance *instance;
+> +    struct YankFuncAndParam *entry;
+> +
+> +    qemu_mutex_lock(&lock);
+> +    instance = yank_find_instance(instance_name);
+> +    assert(instance);
+> +
+> +    entry = g_slice_new(struct YankFuncAndParam);
+> +    entry->func = func;
+> +    entry->opaque = opaque;
+> +
+> +    QLIST_INSERT_HEAD(&instance->yankfns, entry, next);
+> +    qemu_mutex_unlock(&lock);
+> +}
+> +
+> +void yank_unregister_function(char *instance_name, YankFn *func, void *opaque)
+> +{
+> +    struct YankInstance *instance;
+> +    struct YankFuncAndParam *entry;
+> +
+> +    qemu_mutex_lock(&lock);
+> +    instance = yank_find_instance(instance_name);
+> +    assert(instance);
+> +
+> +    QLIST_FOREACH(entry, &instance->yankfns, next) {
+> +        if (entry->func == func && entry->opaque == opaque) {
+> +            QLIST_REMOVE(entry, next);
+> +            g_slice_free(struct YankFuncAndParam, entry);
+> +            qemu_mutex_unlock(&lock);
+> +            return;
+> +        }
+> +    }
+> +
+> +    abort();
+> +}
+
+Since the NBD impl no longer needs to register multiple different functions
+on the same insance_nane, these methods could be be simplified, to only
+accept a single function, instead of keeping a whole list. This would avoid
+need to pass a function into the unregister() method at all.
+
+I don't consider this a blocker though, so you pick whether to do this
+or not.
 
 
-On 6/15/20 6:21 PM, Eduardo Habkost wrote:
-> On Mon, Jun 15, 2020 at 05:21:18PM +0200, Philippe Mathieu-Daudé wrote:
->> On 6/9/20 11:55 PM, John Snow wrote:
->>>
->>>
->>> On 6/9/20 9:08 AM, Philippe Mathieu-Daudé wrote:
->>>> Hi John,
->>>>
->>>> On 6/4/20 9:52 PM, John Snow wrote:
->>>>> v3:
->>>>>  - Split _post_shutdown refactor into own patch (now 1/3)
->>>>>  - Re-add sigkill warning squelch (now 3/3)
->>>>>
->>>>> NOTE: I re-added the squelch in its own patch for review purposes, but
->>>>> for the purposes of avoiding temporary breakage, a maintainer may wish
->>>>> to squash patches 2 and 3 if they are accepted.
->>>>>
->>>>> v2: Philippe took patches 1, 3 and 4.
->>>>>
->>>>> This is a re-write of what was:
->>>>> [PATCH RFC 03/32] python//machine.py: remove bare except
->>>>> [PATCH 2/4] python/machine.py: remove bare except
->>>>>
->>>>> It's a bit heavier handed, but it should address some of kwolf's
->>>>> feedback from the RFC version.
->>>>>
->>>>> Applies straight to origin/master, ought to pass pylint and flake8:
->>>>>
->>>>>> cd ~/src/qemu/python/qemu
->>>>>> pylint *.py
->>>>>> flake8 *.py
->>>>>
->>>>> John Snow (3):
->>>>>   python/machine.py: consolidate _post_shutdown()
->>>>>   python/machine.py: refactor shutdown
->>>>>   python/machine.py: re-add sigkill warning suppression
->>>>>
->>>>>  python/qemu/machine.py | 100 +++++++++++++++++++++++++++++------------
->>>>>  1 file changed, 71 insertions(+), 29 deletions(-)
->>>>>
->>>>
->>>> I'm now seeing this error:
->>>>
->>>> 21:31:58 DEBUG| / # reboot
->>>> 21:32:01 DEBUG| / # reboot: Restarting system
->>>> 21:32:01 DEBUG| >>> {'execute': 'quit'}
->>>> 21:32:01 WARNI| qemu received signal 9; command:
->>>> "mips-softmmu/qemu-system-mips -display none -vga none -chardev
->>>> socket,id=mon,path=/tmp/tmp679upvrk/qemu-10292-monitor.sock -mon
->>>> chardev=mon,mode=control -machine malta -chardev
->>>> socket,id=console,path=/tmp/tmp679upvrk/qemu-10292-console.sock,server,nowait
->>>> -serial chardev:console -kernel
->>>> /tmp/avocado_b3aaagr9/avocado_job_5bj0xe1h/12-tests_acceptance_boot_linux_console.py_BootLinuxConsole.test_mips_malta_cpio/boot/vmlinux-4.5.0-2-4kc-malta
->>>> -initrd
->>>> /tmp/avocado_b3aaagr9/avocado_job_5bj0xe1h/12-tests_acceptance_boot_linux_console.py_BootLinuxConsole.test_mips_malta_cpiorootfs.cpio
->>>> -append printk.time=0 console=ttyS0 console=tty rdinit=/sbin/init
->>>> noreboot -no-reboot"
->>>> 21:32:01 ERROR|
->>>> 21:32:01 ERROR| Reproduced traceback from:
->>>> /home/travis/build/philmd/qemu/build/tests/venv/lib/python3.6/site-packages/avocado/core/test.py:886
->>>> 21:32:01 ERROR| Traceback (most recent call last):
->>>> 21:32:01 ERROR|   File
->>>> "/home/travis/build/philmd/qemu/build/tests/acceptance/avocado_qemu/__init__.py",
->>>> line 195, in tearDown
->>>> 21:32:01 ERROR|     vm.shutdown()
->>>> 21:32:01 ERROR|   File
->>>> "/home/travis/build/philmd/qemu/python/qemu/machine.py", line 449, in
->>>> shutdown
->>>> 21:32:01 ERROR|     self._do_shutdown(has_quit)
->>>> 21:32:01 ERROR|   File
->>>> "/home/travis/build/philmd/qemu/python/qemu/machine.py", line 426, in
->>>> _do_shutdown
->>>> 21:32:01 ERROR|     self._soft_shutdown(has_quit, timeout)
->>>> 21:32:01 ERROR|   File
->>>> "/home/travis/build/philmd/qemu/python/qemu/machine.py", line 413, in
->>>> _soft_shutdown
->>>> 21:32:01 ERROR|     self._qmp.cmd('quit')
->>>> 21:32:01 ERROR|   File
->>>> "/home/travis/build/philmd/qemu/python/qemu/qmp.py", line 271, in cmd
->>>> 21:32:01 ERROR|     return self.cmd_obj(qmp_cmd)
->>>> 21:32:01 ERROR|   File
->>>> "/home/travis/build/philmd/qemu/python/qemu/qmp.py", line 249, in cmd_obj
->>>> 21:32:01 ERROR|     self.__sock.sendall(json.dumps(qmp_cmd).encode('utf-8'))
->>>> 21:32:01 ERROR| BrokenPipeError: [Errno 32] Broken pipe
->>>> 21:32:01 ERROR|
->>>> 21:32:01 DEBUG| DATA (filename=output.expected) => NOT FOUND (data
->>>> sources: variant, test, file)
->>>> 21:32:01 DEBUG| DATA (filename=stdout.expected) => NOT FOUND (data
->>>> sources: variant, test, file)
->>>> 21:32:01 DEBUG| DATA (filename=stderr.expected) => NOT FOUND (data
->>>> sources: variant, test, file)
->>>> 21:32:01 DEBUG| Not logging /var/log/syslog (lack of permissions)
->>>> 21:32:01 ERROR| ERROR
->>>> 12-tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_mips_malta_cpio
->>>> -> TestSetupFail: [Errno 32] Broken pipe
->>>> 21:32:01 INFO |
->>>>
->>>> https://travis-ci.org/github/philmd/qemu/jobs/696142277#L5329
->>>>
->>>
->>> Gotcha.
->>>
->>> The problem here is that `test_mips_malta_cpio` in boot_linux_console.py
->>> does this:
->>>
->>>         self.vm.add_args('-kernel', kernel_path,
->>>                          '-initrd', initrd_path,
->>>                          '-append', kernel_command_line,
->>>                          '-no-reboot')
->>>
->>> and then:
->>>
->>> exec_command_and_wait_for_pattern(self, 'reboot',
->>>                          'reboot: Restarting system')
->>>
->>> and (in avocado_qemu/) __init__.py does this:
->>>
->>>     def tearDown(self):
->>>         for vm in self._vms.values():
->>>             vm.shutdown()
->>>
->>>
->>>
->>> What's happening here is that we are instructing QEMU to *close* when
->>> the guest reboots instead of allowing it to reboot. Then, we are issuing
->>> a reboot command to the guest, which will effectively terminate QEMU as
->>> well. Finally, we are trying to send a shutdown command to QEMU, but
->>> QEMU has already gone.
->>>
->>> Now, in the shutdown code, we do make an attempt to catch this:
->>>
->>> def is_running(self):
->>>     """Returns true if the VM is running."""
->>>     return self._popen is not None and self._popen.poll() is None
->>>
->>> But, well, race conditions.
->>>
->>> When we make it here:
->>>
->>>         if self._qmp is not None:
->>>             if not has_quit:
->>>                 self._qmp.cmd('quit')
->>>             self._qmp.close()
->>>
->>> We believe we are running and we believe we have an open QMP socket.
->>> Attempting to engage the socket by sending 'quit' causes the error.
->>>
->>> It's a tight window: if quit happens earlier, we send the command
->>> successfully and everything's OK. If quit happens later, we realize QEMU
->>> isn't running and proceed to cleanup.
->>
->> Nice debugging :)
->>
->>>
->>> Ultimately:
->>>
->>> - Avocado should not try to shut down QEMU twice, but
->>> - machine.py shouldn't enable the race condition either.
->>>
->>>
->>>
->>> for my part, how about this:
->>>
->>> diff --git a/python/qemu/machine.py b/python/qemu/machine.py
->>> index 99bcb499878..813f8e477db 100644
->>> --- a/python/qemu/machine.py
->>> +++ b/python/qemu/machine.py
->>> @@ -385,7 +385,14 @@ def _soft_shutdown(self, has_quit: bool = False,
->>> timeout: int = 3) -> None:
->>>
->>>          if self._qmp is not None:
->>>              if not has_quit:
->>> -                self._qmp.cmd('quit')
->>> +                try:
->>> +                    self._qmp.cmd('quit')
->>> +                except (BrokenPipeError, ConnectionResetError):
->>> +                    # QMP went away just before or just after sending
->>> 'quit'
->>> +                    if not self.is_running():
->>> +                        # "Mission Accomplished"
->>> +                        pass
->>> +                    raise
->>
->> Looks OK to me, Cleber/Eduardo can you Ack?
-> 
-> Looks good to me.
-> 
-> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-> 
-> 
->>
->>>              self._qmp.close()
->>>
->>>          self._popen.wait(timeout=timeout)
->>>
->>
-> 
+> diff --git a/yank.h b/yank.h
+> new file mode 100644
+> index 0000000000..f1c8743b72
+> --- /dev/null
+> +++ b/yank.h
+> @@ -0,0 +1,67 @@
+> +
 
-I'll respin with the fix squashed.
+Missing license header
 
-Thanks!
+> +#ifndef YANK_H
+> +#define YANK_H
+> +
+> +typedef void (YankFn) (void *opaque);
+> +
+> +/**
+> + * yank_register_instance: Register a new instance.
+> + *
+> + * This registers a new instance for yanking. Must be called before any yank
+> + * function is registered for this instance.
+> + *
+> + * This function is thread-safe.
+> + *
+> + * @instance_name: The globally unique name of the instance.
+> + */
+> +void yank_register_instance(char *instance_name);
+> +
+> +/**
+> + * yank_unregister_instance: Unregister a instance.
+> + *
+> + * This unregisters a instance. Must be called only after every yank function
+> + * of the instance has been unregistered.
+> + *
+> + * This function is thread-safe.
+> + *
+> + * @instance_name: The name of the instance.
+> + */
+> +void yank_unregister_instance(char *instance_name);
+> +
+> +/**
+> + * yank_register_function: Register a yank function
+> + *
+> + * This registers a yank function. All limitations of qmp oob commands apply
+> + * to the yank function as well.
+> + *
+> + * This function is thread-safe.
+> + *
+> + * @instance_name: The name of the instance
+> + * @func: The yank function
+> + * @opaque: Will be passed to the yank function
+> + */
+> +void yank_register_function(char *instance_name, YankFn *func, void *opaque);
+> +
+> +/**
+> + * yank_unregister_function: Unregister a yank function
+> + *
+> + * This unregisters a yank function.
+> + *
+> + * This function is thread-safe.
+> + *
+> + * @instance_name: The name of the instance
+> + * @func: func that was passed to yank_register_function
+> + * @opaque: opaque that was passed to yank_register_function
+> + */
+> +void yank_unregister_function(char *instance_name, YankFn *func, void *opaque);
+> +
+> +/**
+> + * yank_unregister_function: Generic yank function for iochannel
+> + *
+> + * This is a generic yank function which will call qio_channel_shutdown on the
+> + * provided QIOChannel.
+> + *
+> + * @opaque: QIOChannel to shutdown
+> + */
+> +void yank_generic_iochannel(void *opaque);
+> +#endif
 
---js
+
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
