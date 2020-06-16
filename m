@@ -2,92 +2,130 @@ Return-Path: <SRS0=f7ls=75=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 379E3C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:57:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 168BBC433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:57:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 081D020679
+	by mail.kernel.org (Postfix) with ESMTPS id D666820644
 	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:57:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nl8qW9tQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 081D020679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PdhAcjP3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D666820644
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48034 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48242 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlD1q-00081p-86
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 10:57:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58148)
+	id 1jlD1r-00086q-3V
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 10:57:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35454)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1jlCQl-0003ep-5k; Tue, 16 Jun 2020 10:19:15 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:39894)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1jlCQh-0006yP-VW; Tue, 16 Jun 2020 10:19:14 -0400
-Received: by mail-ot1-x341.google.com with SMTP id g5so16044090otg.6;
- Tue, 16 Jun 2020 07:19:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=iy2OuoLC+tcFJT1W5sFxWuwcrtbM/mLRHy96HLFDfHY=;
- b=nl8qW9tQijZMB0AmSCgV2leGmJazbrQr68rNh2j34c9dc8eoVLMZ8py990VIfzQPD9
- ZYMm1Cr4yiP6A7ZMtnfkDrK+ZRkgBcUYs5VGRpemjZfhRW258M3dyrgA/E5+KMF6BXTq
- CUgXVumSAdpKXqvfDe6a14ONlNANaKcZQ4kgXtzsMAggGZGGGVwcre6h79Zd0a6Yv6/w
- zy2IrIBqp6C182BQeBtoY07hUZGdPKiFqD0bYOYYieSqUM9u2Kmu1pi0IK+nkBx4yIAn
- /7MdjaYz0ZlFXh3VnxyhZtYc1FP5q/S96JvOFawDGUeuTCs/hyKsE1YbBQCtNUIJljmw
- /Ssg==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jlCo3-0006i5-Rt
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 10:43:20 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:42872
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jlCo1-0002VZ-GB
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 10:43:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592318596;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=MV6YcXhC3UDnQuU58Fe81XaiOeluBx75QeqeVTk4r4g=;
+ b=PdhAcjP3zuiF1xxx3M3+20I01Ha/nNv0ag048s1Kg40X3DB0QxSyMSgqC4bD6GJYe3RInk
+ H4Vm8Fu04CnsLdO1Vz5HuRS1/vQMlBlSmFLY8FkDnyMBcuMMyyIxP1x622MEUQlcinkLe4
+ ZEDUOay4aEQWZgK2Y0LRVAoKpWV0iIw=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-182-Y3Aw6_MeNhGeUk51ZSeKzw-1; Tue, 16 Jun 2020 10:43:09 -0400
+X-MC-Unique: Y3Aw6_MeNhGeUk51ZSeKzw-1
+Received: by mail-wm1-f70.google.com with SMTP id l2so1042380wmi.2
+ for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 07:43:08 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=iy2OuoLC+tcFJT1W5sFxWuwcrtbM/mLRHy96HLFDfHY=;
- b=F5QJCa1xV5fwx+U/mSp3gjYkfVVpBoJ5mjCk9LfG0SxK77uKfrAtvfzhaS9E3ERnL9
- yKXZ8HHvua+6CW+6AegEJhkW3LWtEBltMiWD6wLnnz6GgFVlFp2lX/jPCTyEB9fb4hyA
- am0Dz5InQzz0YMIuwWZmslO48s6TkQ33HncbOroruHsm+KNpFhh4tZyWaBE+muylI+mS
- zDBnJVyDafo3FRdzeSVE9JLGaNhR5lVPnFIvh+bkH9R1qm9+YImfxjMLuLW0hLhkTkQZ
- ibGLoDI+sZocAa0TgSdzuDevhsUYbSHW266W94c//lzd/ESgZUKfLI44mOm55tn5rp4O
- h6rA==
-X-Gm-Message-State: AOAM530m0EOprwgj34aDphffbnFDCQBWt0VXGCFnT+hsFfWHmamWAolz
- cwkk9IiUxnwDlNYGAUbhd1K7zKbw
-X-Google-Smtp-Source: ABdhPJwi5IsoCDqqu+xr8LHIj9U3DVOIAqAqHyOOVAiRsfBfUSjz2SJyz0hGnaSoz7XOgh+hiKeenw==
-X-Received: by 2002:a05:6830:1443:: with SMTP id
- w3mr2512025otp.142.1592317149526; 
- Tue, 16 Jun 2020 07:19:09 -0700 (PDT)
-Received: from localhost (76-251-165-188.lightspeed.austtx.sbcglobal.net.
- [76.251.165.188])
- by smtp.gmail.com with ESMTPSA id g24sm4098743otl.8.2020.06.16.07.19.07
- (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
- Tue, 16 Jun 2020 07:19:08 -0700 (PDT)
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 05/78] target/arm: ensure we use current exception state after
- SCR update
-Date: Tue, 16 Jun 2020 09:14:34 -0500
-Message-Id: <20200616141547.24664-6-mdroth@linux.vnet.ibm.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200616141547.24664-1-mdroth@linux.vnet.ibm.com>
-References: <20200616141547.24664-1-mdroth@linux.vnet.ibm.com>
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=MV6YcXhC3UDnQuU58Fe81XaiOeluBx75QeqeVTk4r4g=;
+ b=Ycxj80nFfzDg+YGnRkWtyMHmtoz+DrAaXCS8b4Ovjx2yBP7ZOg+nHI3YivkW06Oua8
+ eIYSf/SM/hbU5RhOCKbDHHdKMaSw7j1hVdXNvBBIACpKapWsFb2BUdpQxuHvRjlQ9F6P
+ WfsJkC13Ur3RxIYs2JTyNLXUmFgvYcjYEqI5EY1a90AdEQbGr2pvJkpWlCGHmn0QrLZf
+ vn1pu+ZZynf2YEZoJWQ5em19Bin0bcCO2HMI3vk+8pv0k8p4ReYZKieyRRzci2GQqJV+
+ PEE++eeGQ0j1XmpNQYe4XKoLnwPtlSp076e3rNaQ3zJXl00QW8mf/PAAcLnWnXt6AkL+
+ d8Dw==
+X-Gm-Message-State: AOAM533Pb77dqfqoipmgfyxhz4KInQgDz7TazH5gAJyzjLDVaZiJSwRG
+ ssSdGysg/oX68+n4Un8taWu8XuaZ9HCyWXrr7PHcz7okn8xdz2Sy9c7tjUALt0eBpAPRg28o3Dz
+ vgdS1uEdl7ZvwHEc=
+X-Received: by 2002:a05:600c:2218:: with SMTP id
+ z24mr3486408wml.24.1592318587892; 
+ Tue, 16 Jun 2020 07:43:07 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwSAChiy7Yz8CkMG9gU/AmnlEBzYqDzKL6kDfItd2WoAjUIyiJMTBzTo/+tlO/vy30/nETNIQ==
+X-Received: by 2002:a05:600c:2218:: with SMTP id
+ z24mr3486388wml.24.1592318587690; 
+ Tue, 16 Jun 2020 07:43:07 -0700 (PDT)
+Received: from [192.168.1.37] (93.red-83-59-160.dynamicip.rima-tde.net.
+ [83.59.160.93])
+ by smtp.gmail.com with ESMTPSA id q128sm4349126wma.38.2020.06.16.07.43.06
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 16 Jun 2020 07:43:07 -0700 (PDT)
+Subject: Re: [PULL 01/21] tests/docker: bump fedora to 32
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+References: <20200616125324.19045-1-alex.bennee@linaro.org>
+ <20200616125324.19045-2-alex.bennee@linaro.org>
+ <e08991ac-cb9f-9092-60d9-0f9e9522695e@redhat.com> <874krb15k9.fsf@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <4d18e0ac-09a8-a912-ae0d-2f551d33c4ab@redhat.com>
+Date: Tue, 16 Jun 2020 16:43:05 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <874krb15k9.fsf@linaro.org>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::341;
- envelope-from=flukshun@gmail.com; helo=mail-ot1-x341.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 02:01:17
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -101,128 +139,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- qemu-stable@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+Cc: Fam Zheng <fam@euphon.net>, peter.maydell@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Alex Bennée <alex.bennee@linaro.org>
+On 6/16/20 3:52 PM, Alex Bennée wrote:
+> 
+> Philippe Mathieu-Daudé <philmd@redhat.com> writes:
+> 
+>> On 6/16/20 2:53 PM, Alex Bennée wrote:
+>>> We should be keeping this up to date as Fedora goes out of support
+>>> quite quickly.
+>>>
+>>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+>>
+>> FWIW this one had:
+>> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> 
+> Thanks, I've issued a v2 of the tag:
+> 
+>   pull-testing-and-plugin-160620-2
 
-A write to the SCR can change the effective EL by droppping the system
-from secure to non-secure mode. However if we use a cached current_el
-from before the change we'll rebuild the flags incorrectly. To fix
-this we introduce the ARM_CP_NEWEL CP flag to indicate the new EL
-should be used when recomputing the flags.
+I didn't meant to ask you to resend a v2...
+I just wanted to notice that sometimes tags get lost in your
+workflow. Sorry for the time lost.
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20191212114734.6962-1-alex.bennee@linaro.org
-Cc: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20191209143723.6368-1-alex.bennee@linaro.org>
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-(cherry picked from commit f80741d107673f162e3b097fc76a1590036cc9d1)
-Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
----
- target/arm/cpu.h       |  8 ++++++--
- target/arm/helper.c    | 14 +++++++++++++-
- target/arm/helper.h    |  1 +
- target/arm/translate.c |  6 +++++-
- 4 files changed, 25 insertions(+), 4 deletions(-)
-
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 83a809d4ba..c3ab47d896 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -2238,6 +2238,9 @@ static inline uint64_t cpreg_to_kvm_id(uint32_t cpregid)
-  * RAISES_EXC is for when the read or write hook might raise an exception;
-  * the generated code will synchronize the CPU state before calling the hook
-  * so that it is safe for the hook to call raise_exception().
-+ * NEWEL is for writes to registers that might change the exception
-+ * level - typically on older ARM chips. For those cases we need to
-+ * re-read the new el when recomputing the translation flags.
-  */
- #define ARM_CP_SPECIAL           0x0001
- #define ARM_CP_CONST             0x0002
-@@ -2257,10 +2260,11 @@ static inline uint64_t cpreg_to_kvm_id(uint32_t cpregid)
- #define ARM_CP_SVE               0x2000
- #define ARM_CP_NO_GDB            0x4000
- #define ARM_CP_RAISES_EXC        0x8000
-+#define ARM_CP_NEWEL             0x10000
- /* Used only as a terminator for ARMCPRegInfo lists */
--#define ARM_CP_SENTINEL          0xffff
-+#define ARM_CP_SENTINEL          0xfffff
- /* Mask of only the flag bits in a type field */
--#define ARM_CP_FLAG_MASK         0xf0ff
-+#define ARM_CP_FLAG_MASK         0x1f0ff
- 
- /* Valid values for ARMCPRegInfo state field, indicating which of
-  * the AArch32 and AArch64 execution states this register is visible in.
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 0bf8f53d4b..b92ef9d190 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -5096,7 +5096,7 @@ static const ARMCPRegInfo el3_cp_reginfo[] = {
-       .opc0 = 3, .opc1 = 6, .crn = 1, .crm = 1, .opc2 = 0,
-       .access = PL3_RW, .fieldoffset = offsetof(CPUARMState, cp15.scr_el3),
-       .resetvalue = 0, .writefn = scr_write },
--    { .name = "SCR",  .type = ARM_CP_ALIAS,
-+    { .name = "SCR",  .type = ARM_CP_ALIAS | ARM_CP_NEWEL,
-       .cp = 15, .opc1 = 0, .crn = 1, .crm = 1, .opc2 = 0,
-       .access = PL1_RW, .accessfn = access_trap_aa32s_el1,
-       .fieldoffset = offsetoflow32(CPUARMState, cp15.scr_el3),
-@@ -11332,6 +11332,18 @@ void HELPER(rebuild_hflags_m32)(CPUARMState *env, int el)
-     env->hflags = rebuild_hflags_m32(env, fp_el, mmu_idx);
- }
- 
-+/*
-+ * If we have triggered a EL state change we can't rely on the
-+ * translator having passed it too us, we need to recompute.
-+ */
-+void HELPER(rebuild_hflags_a32_newel)(CPUARMState *env)
-+{
-+    int el = arm_current_el(env);
-+    int fp_el = fp_exception_el(env, el);
-+    ARMMMUIdx mmu_idx = arm_mmu_idx_el(env, el);
-+    env->hflags = rebuild_hflags_a32(env, fp_el, mmu_idx);
-+}
-+
- void HELPER(rebuild_hflags_a32)(CPUARMState *env, int el)
- {
-     int fp_el = fp_exception_el(env, el);
-diff --git a/target/arm/helper.h b/target/arm/helper.h
-index 3d4ec267a2..e345bdb726 100644
---- a/target/arm/helper.h
-+++ b/target/arm/helper.h
-@@ -91,6 +91,7 @@ DEF_HELPER_2(get_user_reg, i32, env, i32)
- DEF_HELPER_3(set_user_reg, void, env, i32, i32)
- 
- DEF_HELPER_FLAGS_2(rebuild_hflags_m32, TCG_CALL_NO_RWG, void, env, int)
-+DEF_HELPER_FLAGS_1(rebuild_hflags_a32_newel, TCG_CALL_NO_RWG, void, env)
- DEF_HELPER_FLAGS_2(rebuild_hflags_a32, TCG_CALL_NO_RWG, void, env, int)
- DEF_HELPER_FLAGS_2(rebuild_hflags_a64, TCG_CALL_NO_RWG, void, env, int)
- 
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 4d5d4bd888..83aa331b1e 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -7083,7 +7083,11 @@ static int disas_coproc_insn(DisasContext *s, uint32_t insn)
-             if (arm_dc_feature(s, ARM_FEATURE_M)) {
-                 gen_helper_rebuild_hflags_m32(cpu_env, tcg_el);
-             } else {
--                gen_helper_rebuild_hflags_a32(cpu_env, tcg_el);
-+                if (ri->type & ARM_CP_NEWEL) {
-+                    gen_helper_rebuild_hflags_a32_newel(cpu_env);
-+                } else {
-+                    gen_helper_rebuild_hflags_a32(cpu_env, tcg_el);
-+                }
-             }
-             tcg_temp_free_i32(tcg_el);
-             /*
--- 
-2.17.1
+>   
+>>
+>> https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg06556.html
+>>
+>>> Message-Id: <20200612190237.30436-2-alex.bennee@linaro.org>
+>>>
+>>> diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/dockerfiles/fedora.docker
+>>> index 92b6e11c8a8..798ddd2c3e0 100644
+>>> --- a/tests/docker/dockerfiles/fedora.docker
+>>> +++ b/tests/docker/dockerfiles/fedora.docker
+>>> @@ -1,4 +1,4 @@
+>>> -FROM fedora:30
+>>> +FROM fedora:32
+>>>  
+>>>  # Please keep this list sorted alphabetically
+>>>  ENV PACKAGES \
+>>>
+> 
+> 
 
 
