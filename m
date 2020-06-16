@@ -7,72 +7,76 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AC08C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:37:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACC4EC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:38:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5C92420882
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:37:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 73E8320644
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:38:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BQ3NVeyr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C92420882
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QYBtQb3q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73E8320644
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41888 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44218 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlCiW-0001iF-HV
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 10:37:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57748)
+	id 1jlCj2-0002kQ-Jp
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 10:38:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57604)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1jlCQ5-0002kj-Rz; Tue, 16 Jun 2020 10:18:33 -0400
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:45187)
+ id 1jlCPo-0002Ar-VJ; Tue, 16 Jun 2020 10:18:16 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:34890)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1jlCQ0-0006ld-Qu; Tue, 16 Jun 2020 10:18:30 -0400
-Received: by mail-oi1-x243.google.com with SMTP id p70so19332861oic.12;
- Tue, 16 Jun 2020 07:18:28 -0700 (PDT)
+ id 1jlCPn-0006ga-Al; Tue, 16 Jun 2020 10:18:16 -0400
+Received: by mail-oi1-x243.google.com with SMTP id k4so19384129oik.2;
+ Tue, 16 Jun 2020 07:18:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=qcWsL2KIfdI2kngmV8gNKMtUukl2dRM3BMTPN7eKsAU=;
- b=BQ3NVeyrEnHkbHQuzqwtxTqejfKBEGVs3jp/5xrgC38RoCqayw0LFR1qCXBfF0MTj9
- 0Eiw1uRbd7XFGsTcHYX6NBwjM96N4ftO44/FEv0h17eioyGDFAwIb0GZ1tMojFZ8zh2u
- Vhr5eGldO86OXNSWr1bjm1njRr2DcfvaKzVosFBNGUTvn3IkIa3ouwEmZlXsCu8EtSad
- Up8rHhzE+hpXKa9LeQnvRmtMGQnbX+R39YYLcwIUEyLxpm2XKeyLYVS5s7oca4E6VI0R
- iKf2d7M5lFlL2Eqqm7sNmJxqqDTP77DebndY5UA18gB1xul3n6pXnP3nCWWQYOqO0w5L
- ZB1w==
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=j5JadjYITwuc3PbQFYYnCy+d7Me2080KB/yC+x/1sXg=;
+ b=QYBtQb3qv5JrOYveG1CHpjtIi8E4eGda2+ymh+28Pe4Jslu6mvGNzqskv4eEQCPA8n
+ 8BR1q7abwCfSm7+y/Nf71JA6VUlMDs70/uxS7l0eqQYtRVaJKidcy23GTuzmnee3Lqa2
+ z2GMH73UHlwmQp6RhHWRx1ZdDS3fti8CZlsjnpuGpdkAGr+b1+ChTQEYk8M/9klFKu6Y
+ zUAHPmuxwWP3ll3yvabAnnlv064sNmJe+W+ywecxmfMux1eOlTHpBZx8drqdB4DR1GWY
+ jGgzQgxKQTEizIh10eT2Hama9GNje+NcTWlJ/yY5/3UWTJ1n5uoikwwqcrtji2byM74F
+ R8bA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references;
- bh=qcWsL2KIfdI2kngmV8gNKMtUukl2dRM3BMTPN7eKsAU=;
- b=qQ+0EDWrHoDroJb0lxqDdgOB6X7yR0pqNV6lMDU+GSKDYZrLUx4wDyYbFG7mt9VtVB
- uUOJr+7aLz/I1p78a+KwAXI4bAC05Ur32dXfPtd4RJroBHkSdUndIq/ldinpmZbh6sQE
- 5dKvVz/9nTyDMajCSOqArJPL2kd1Waaj/satOIv/1MxVr+COxQM+rtpeZVMwD6oUg3iG
- SXIWob5MWJUNFJq4WgJ2V72iSTc1t2P7H9uTUYVNg1+shkCuiHL4ZJFOeXaSvFPtUg6F
- 4bqG8nulBjzSEM0WXjPk71ZRZ+eiuI1PvCRj7k7e2mqA1eqyl+vuLngazkfnhCVZaPDY
- OVXw==
-X-Gm-Message-State: AOAM531hQUj4C80jgjCUFNSgzH9SGLiSbjCnT+7nCySRodszOwxaoRtu
- jIJeQ2+MS2Jzr85ZMiziy5TaxPiq
-X-Google-Smtp-Source: ABdhPJzi7HAqP3KDdSSr9uGDEKWD6BZDvywDEhGH/bMjF6HBB/TYEBWoSlC1krS35QE+05x0LRonCw==
-X-Received: by 2002:aca:48e:: with SMTP id 136mr3499569oie.18.1592317106807;
- Tue, 16 Jun 2020 07:18:26 -0700 (PDT)
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=j5JadjYITwuc3PbQFYYnCy+d7Me2080KB/yC+x/1sXg=;
+ b=ihVsnRbwK1jFN4AcpklyhyDU+i+ur6GamUNJv6F9c1I6lVUW+XIcbpVmswcg7kbakw
+ viue7mofRHqcX2q79Cj3E0rU0mgxS+NrjpxywCO5VvhW5xCnlfdhSbaTEowhW5RlGf3a
+ 4cWtnLlW/VFuISw0rjkTIuU549VtIpSb5DSYnNUUDVOT/BKR6+RkH6A8InMUh/qgYOV6
+ jbAudAlS+O8+PcjVkFoijPewDfDOqWqSAZJesC7Bz9hpX2yA7hTFUEmJujkipIx3AKk2
+ gAgD3sIRzaqM2TI4wMFNWfhDBN5Scw02yofCAmIyE/zeT1dUdhArjAfYFbcxb12RSpUZ
+ YQfA==
+X-Gm-Message-State: AOAM5323v6A3VI25TgW7TRWV+7wkEO6lEd8SVBXHG78OaVQBoJi6Y57/
+ 1zvEN9iDWEN+mRnHvI5UzV96yqU2
+X-Google-Smtp-Source: ABdhPJwZZUyt2mPpDUaiuo9qZigT3HqodRbWAqEJHNDjrz9SFLzeJIRgjXMzTuIQenvtbna1E1jwtw==
+X-Received: by 2002:aca:ec4d:: with SMTP id k74mr3364583oih.160.1592317092226; 
+ Tue, 16 Jun 2020 07:18:12 -0700 (PDT)
 Received: from localhost (76-251-165-188.lightspeed.austtx.sbcglobal.net.
  [76.251.165.188])
- by smtp.gmail.com with ESMTPSA id s69sm4062386otb.4.2020.06.16.07.18.25
+ by smtp.gmail.com with ESMTPSA id s20sm4078575otd.62.2020.06.16.07.18.11
  (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
- Tue, 16 Jun 2020 07:18:25 -0700 (PDT)
+ Tue, 16 Jun 2020 07:18:11 -0700 (PDT)
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 40/78] dp8393x: Don't stop reception upon RBE interrupt
- assertion
-Date: Tue, 16 Jun 2020 09:15:09 -0500
-Message-Id: <20200616141547.24664-41-mdroth@linux.vnet.ibm.com>
+Subject: [PATCH 32/78] dp8393x: Clear RRRA command register bit only when
+ appropriate
+Date: Tue, 16 Jun 2020 09:15:01 -0500
+Message-Id: <20200616141547.24664-33-mdroth@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200616141547.24664-1-mdroth@linux.vnet.ibm.com>
 References: <20200616141547.24664-1-mdroth@linux.vnet.ibm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=2607:f8b0:4864:20::243;
  envelope-from=flukshun@gmail.com; helo=mail-oi1-x243.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
@@ -104,130 +108,45 @@ Sender: "Qemu-devel"
 
 From: Finn Thain <fthain@telegraphics.com.au>
 
-Section 3.4.7 of the datasheet explains that,
-
-    The RBE bit in the Interrupt Status register is set when the
-    SONIC finishes using the second to last receive buffer and reads
-    the last RRA descriptor. Actually, the SONIC is not truly out of
-    resources, but gives the system an early warning of an impending
-    out of resources condition.
-
-RBE does not mean actual receive buffer exhaustion, and reception should
-not be stopped. This is important because Linux will not check and clear
-the RBE interrupt until it receives another packet. But that won't
-happen if can_receive returns false. This bug causes the SONIC to become
-deaf (until reset).
-
-Fix this with a new flag to indicate actual receive buffer exhaustion.
+It doesn't make sense to clear the command register bit unless the
+command was actually issued.
 
 Signed-off-by: Finn Thain <fthain@telegraphics.com.au>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Tested-by: Laurent Vivier <laurent@vivier.eu>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
-(cherry picked from commit c2279bd0a19b35057f2e4c3b4df9a915717d1142)
+(cherry picked from commit a3cce2825a0b12bb717a5106daaca245557cc9ae)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- hw/net/dp8393x.c | 35 ++++++++++++++++++++++-------------
- 1 file changed, 22 insertions(+), 13 deletions(-)
+ hw/net/dp8393x.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
 diff --git a/hw/net/dp8393x.c b/hw/net/dp8393x.c
-index d33f21bd0b..44f77c5d3c 100644
+index 8dd6bf032c..04f58ee4e1 100644
 --- a/hw/net/dp8393x.c
 +++ b/hw/net/dp8393x.c
-@@ -158,6 +158,7 @@ typedef struct dp8393xState {
-     /* Hardware */
-     uint8_t it_shift;
-     bool big_endian;
-+    bool last_rba_is_full;
-     qemu_irq irq;
- #ifdef DEBUG_SONIC
-     int irq_level;
-@@ -347,12 +348,15 @@ static void dp8393x_do_read_rra(dp8393xState *s)
-         s->regs[SONIC_RRP] = s->regs[SONIC_RSA];
-     }
- 
--    /* Check resource exhaustion */
-+    /* Warn the host if CRBA now has the last available resource */
-     if (s->regs[SONIC_RRP] == s->regs[SONIC_RWP])
-     {
+@@ -352,9 +352,6 @@ static void dp8393x_do_read_rra(dp8393xState *s)
          s->regs[SONIC_ISR] |= SONIC_ISR_RBE;
          dp8393x_update_irq(s);
      }
-+
-+    /* Allow packet reception */
-+    s->last_rba_is_full = false;
+-
+-    /* Done */
+-    s->regs[SONIC_CR] &= ~SONIC_CR_RRRA;
  }
  
  static void dp8393x_do_software_reset(dp8393xState *s)
-@@ -659,9 +663,6 @@ static void dp8393x_write(void *opaque, hwaddr addr, uint64_t data,
-                 dp8393x_do_read_rra(s);
-             }
-             dp8393x_update_irq(s);
--            if (dp8393x_can_receive(s->nic->ncs)) {
--                qemu_flush_queued_packets(qemu_get_queue(s->nic));
--            }
-             break;
-         /* The guest is required to store aligned pointers here */
-         case SONIC_RSA:
-@@ -721,8 +722,6 @@ static int dp8393x_can_receive(NetClientState *nc)
- 
-     if (!(s->regs[SONIC_CR] & SONIC_CR_RXEN))
-         return 0;
--    if (s->regs[SONIC_ISR] & SONIC_ISR_RBE)
--        return 0;
-     return 1;
- }
- 
-@@ -773,6 +772,10 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
-     s->regs[SONIC_RCR] &= ~(SONIC_RCR_PRX | SONIC_RCR_LBK | SONIC_RCR_FAER |
-         SONIC_RCR_CRCR | SONIC_RCR_LPKT | SONIC_RCR_BC | SONIC_RCR_MC);
- 
-+    if (s->last_rba_is_full) {
-+        return pkt_size;
+@@ -563,8 +560,10 @@ static void dp8393x_do_command(dp8393xState *s, uint16_t command)
+         dp8393x_do_start_timer(s);
+     if (command & SONIC_CR_RST)
+         dp8393x_do_software_reset(s);
+-    if (command & SONIC_CR_RRRA)
++    if (command & SONIC_CR_RRRA) {
+         dp8393x_do_read_rra(s);
++        s->regs[SONIC_CR] &= ~SONIC_CR_RRRA;
 +    }
-+
-     rx_len = pkt_size + sizeof(checksum);
-     if (s->regs[SONIC_DCR] & SONIC_DCR_DW) {
-         width = 2;
-@@ -786,8 +789,8 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
-         DPRINTF("oversize packet, pkt_size is %d\n", pkt_size);
-         s->regs[SONIC_ISR] |= SONIC_ISR_RBAE;
-         dp8393x_update_irq(s);
--        dp8393x_do_read_rra(s);
--        return pkt_size;
-+        s->regs[SONIC_RCR] |= SONIC_RCR_LPKT;
-+        goto done;
-     }
- 
-     packet_type = dp8393x_receive_filter(s, buf, pkt_size);
-@@ -899,17 +902,23 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
-         s->regs[SONIC_ISR] |= SONIC_ISR_PKTRX;
-     }
- 
-+    dp8393x_update_irq(s);
-+
-     s->regs[SONIC_RSC] = (s->regs[SONIC_RSC] & 0xff00) |
-                          ((s->regs[SONIC_RSC] + 1) & 0x00ff);
- 
-+done:
-+
-     if (s->regs[SONIC_RCR] & SONIC_RCR_LPKT) {
--        /* Read next RRA */
--        dp8393x_do_read_rra(s);
-+        if (s->regs[SONIC_RRP] == s->regs[SONIC_RWP]) {
-+            /* Stop packet reception */
-+            s->last_rba_is_full = true;
-+        } else {
-+            /* Read next resource */
-+            dp8393x_do_read_rra(s);
-+        }
-     }
- 
--    /* Done */
--    dp8393x_update_irq(s);
--
-     return pkt_size;
+     if (command & SONIC_CR_LCAM)
+         dp8393x_do_load_cam(s);
  }
- 
 -- 
 2.17.1
 
