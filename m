@@ -2,83 +2,136 @@ Return-Path: <SRS0=f7ls=75=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D993C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 07:45:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5168C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 07:49:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CC85B206F1
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 07:45:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 90384207BC
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 07:49:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dUJiZj1w"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC85B206F1
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MyG5YaAT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90384207BC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35758 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38066 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jl6I5-00015f-1E
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 03:45:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52304)
+	id 1jl6LM-0002CO-TP
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 03:49:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53360)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jl6Gm-00009b-NW
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 03:44:32 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:52248
+ (Exim 4.90_1) (envelope-from <lvivier@redhat.com>)
+ id 1jl6KT-0001lQ-OZ
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 03:48:21 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:57892
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jl6Gk-0006PC-Qa
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 03:44:32 -0400
+ (Exim 4.90_1) (envelope-from <lvivier@redhat.com>)
+ id 1jl6KS-0007Nv-4v
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 03:48:21 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592293470;
+ s=mimecast20190719; t=1592293699;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=tgfriCMWxKXhN41w6ynhCdCAP1e1TPfFRfFFftS5wWg=;
- b=dUJiZj1wpJsZNzimx9RJZUK8EYQRshtzC+sFksIqlMSbSIpsXXVYJmx8sWFTva/olZHufo
- ToiWSjZqq3Qq4kcXT9hp3gmGgc5gUA/qu5ebvOusNVPAqFgnNPew/lc3rG8FWyT0RHXAqK
- CEEILCeyOwBbgb7GbMuuH6HwfJ+g5Jg=
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=20twl59MC1L+CMr1NhPjT3cwchcGWmdRyMKn6N9TkFI=;
+ b=MyG5YaATEU9dDIBueuAb3CoJZwKitDkVo/OHEkpQPM1YG9H83ci3pt/ouPIZa6V30GHlBf
+ bJEk/UeAOR9Xp4zWib7J05OOi87cD1ubiKMvYL1bU+u91pcBFxbINrDo0bsxxEblerFyAI
+ XR2ChNLA1TuKKy44paszs2q5qV6TAqI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-372-8pe5ztFHMr2ZSdEAKY3NEg-1; Tue, 16 Jun 2020 03:44:26 -0400
-X-MC-Unique: 8pe5ztFHMr2ZSdEAKY3NEg-1
+ us-mta-382-w8FY8R7mPyC4IYwnEWrinw-1; Tue, 16 Jun 2020 03:48:17 -0400
+X-MC-Unique: w8FY8R7mPyC4IYwnEWrinw-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3E12F10506E2;
- Tue, 16 Jun 2020 07:44:25 +0000 (UTC)
-Received: from [10.36.114.197] (ovpn-114-197.ams2.redhat.com [10.36.114.197])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 895BC100164C;
- Tue, 16 Jun 2020 07:44:17 +0000 (UTC)
-Subject: Re: [PATCH v2 4/5] acpi: Enable TPM IRQ
-To: Stefan Berger <stefanb@linux.ibm.com>,
- Stefan Berger <stefanb@linux.vnet.ibm.com>
-References: <20200615142327.671546-1-stefanb@linux.vnet.ibm.com>
- <20200615142327.671546-5-stefanb@linux.vnet.ibm.com>
- <CAMxuvaxm+5Nuv2_1UTXY+-kK1CYMkxqU2pfLOxMgeDEqOjhgZA@mail.gmail.com>
- <8e11e2d6-5e02-89c0-759f-d74189421eec@linux.ibm.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <1fb3b0bc-5654-9b18-6f58-6e32fd786035@redhat.com>
-Date: Tue, 16 Jun 2020 09:44:16 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 40E85835B52;
+ Tue, 16 Jun 2020 07:48:15 +0000 (UTC)
+Received: from [10.36.112.71] (ovpn-112-71.ams2.redhat.com [10.36.112.71])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id F124E101E675;
+ Tue, 16 Jun 2020 07:47:59 +0000 (UTC)
+Subject: Re: [RFC v3 2/8] vhost_net: use the function qemu_get_peer
+To: Cindy Lu <lulu@redhat.com>, mst@redhat.com, armbru@redhat.com,
+ eblake@redhat.com, cohuck@redhat.com, jasowang@redhat.com
+References: <20200529140620.28759-1-lulu@redhat.com>
+ <20200529140620.28759-3-lulu@redhat.com>
+From: Laurent Vivier <lvivier@redhat.com>
+Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
+ mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
+ WoeuLWDmXE7A3oJoIsRecD6BXHTb0OYS20lS608anr3B0xn5g0BX7es9Mw+hV/pL+63EOCVm
+ SUVTEQwbGQN62guOKnJJJfphbbv82glIC/Ei4Ky8BwZkUuXd7d5NFJKC9/GDrbWdj75cDNQx
+ UZ9XXbXEKY9MHX83Uy7JFoiFDMOVHn55HnncflUncO0zDzY7CxFeQFwYRbsCXOUL9yBtqLer
+ Ky8/yjBskIlNrp0uQSt9LMoMsdSjYLYhvk1StsNPg74+s4u0Q6z45+l8RAsgLw5OLtTa+ePM
+ JyS7OIGNYxAX6eZk1+91a6tnqfyPcMbduxyBaYXn94HUG162BeuyBkbNoIDkB7pCByed1A7q
+ q9/FbuTDwgVGVLYthYSfTtN0Y60OgNkWCMtFwKxRaXt1WFA5ceqinN/XkgA+vf2Ch72zBkJL
+ RBIhfOPFv5f2Hkkj0MvsUXpOWaOjatiu0fpPo6Hw14UEpywke1zN4NKubApQOlNKZZC4hu6/
+ 8pv2t4HRi7s0K88jQYBRPObjrN5+owtI51xMaYzvPitHQ2053LmgsOdN9EKOqZeHAYG2SmRW
+ LOxYWKX14YkZI5j/TXfKlTpwSMvXho+efN4kgFvFmP6WT+tPnwARAQABtCNMYXVyZW50IFZp
+ dmllciA8bHZpdmllckByZWRoYXQuY29tPokCOAQTAQIAIgUCVgVQgAIbAwYLCQgHAwIGFQgC
+ CQoLBBYCAwECHgECF4AACgkQ8ww4vT8vvjwpgg//fSGy0Rs/t8cPFuzoY1cex4limJQfReLr
+ SJXCANg9NOWy/bFK5wunj+h/RCFxIFhZcyXveurkBwYikDPUrBoBRoOJY/BHK0iZo7/WQkur
+ 6H5losVZtrotmKOGnP/lJYZ3H6OWvXzdz8LL5hb3TvGOP68K8Bn8UsIaZJoeiKhaNR0sOJyI
+ YYbgFQPWMHfVwHD/U+/gqRhD7apVysxv5by/pKDln1I5v0cRRH6hd8M8oXgKhF2+rAOL7gvh
+ jEHSSWKUlMjC7YwwjSZmUkL+TQyE18e2XBk85X8Da3FznrLiHZFHQ/NzETYxRjnOzD7/kOVy
+ gKD/o7asyWQVU65mh/ECrtjfhtCBSYmIIVkopoLaVJ/kEbVJQegT2P6NgERC/31kmTF69vn8
+ uQyW11Hk8tyubicByL3/XVBrq4jZdJW3cePNJbTNaT0d/bjMg5zCWHbMErUib2Nellnbg6bc
+ 2HLDe0NLVPuRZhHUHM9hO/JNnHfvgiRQDh6loNOUnm9Iw2YiVgZNnT4soUehMZ7au8PwSl4I
+ KYE4ulJ8RRiydN7fES3IZWmOPlyskp1QMQBD/w16o+lEtY6HSFEzsK3o0vuBRBVp2WKnssVH
+ qeeV01ZHw0bvWKjxVNOksP98eJfWLfV9l9e7s6TaAeySKRRubtJ+21PRuYAxKsaueBfUE7ZT
+ 7ze0LUxhdXJlbnQgVml2aWVyIChSZWQgSGF0KSA8bHZpdmllckByZWRoYXQuY29tPokCOAQT
+ AQIAIgUCVgUmGQIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQ8ww4vT8vvjxtNBAA
+ o2xGmbXl9vJQALkj7MVlsMlgewQ1rdoZl+bZ6ythTSBsqwwtl1BUTQGA1GF2LAchRVYca5bJ
+ lw4ai5OdZ/rc5dco2XgrRFtj1np703BzNEhGU1EFxtms/Y9YOobq/GZpck5rK8jV4osEb8oc
+ 3xEgCm/xFwI/2DOe0/s2cHKzRkvdmKWEDhT1M+7UhtSCnloX776zCsrofYiHP2kasFyMa/5R
+ 9J1Rt9Ax/jEAX5vFJ8+NPf68497nBfrAtLM3Xp03YJSr/LDxer44Mevhz8dFw7IMRLhnuSfr
+ 8jP93lr6Wa8zOe3pGmFXZWpNdkV/L0HaeKwTyDKKdUDH4U7SBnE1gcDfe9x08G+oDfVhqED8
+ qStKCxPYxRUKIdUjGPF3f5oj7N56Q5zZaZkfxeLNTQ13LDt3wGbVHyZxzFc81B+qT8mkm74y
+ RbeVSuviPTYjbBQ66GsUgiZZpDUyJ6s54fWqQdJf4VFwd7M/mS8WEejbSjglGHMxMGiBeRik
+ Y0+ur5KAF7z0D1KfW1kHO9ImQ0FbEbMbTMf9u2+QOCrSWOz/rj23EwPrCQ2TSRI2fWakMJZ+
+ zQZvy+ei3D7lZ09I9BT/GfFkTIONgtNfDxwyMc4v4XyP0IvvZs/YZqt7j3atyTZM0S2HSaZ9
+ rXmQYkBt1/u691cZfvy+Tr2xZaDpFcjPkci5Ag0EVgUmGQEQALxSQRbl/QOnmssVDxWhHM5T
+ Gxl7oLNJms2zmBpcmlrIsn8nNz0rRyxT460k2niaTwowSRK8KWVDeAW6ZAaWiYjLlTunoKwv
+ F8vP3JyWpBz0diTxL5o+xpvy/Q6YU3BNefdq8Vy3rFsxgW7mMSrI/CxJ667y8ot5DVugeS2N
+ yHfmZlPGE0Nsy7hlebS4liisXOrN3jFzasKyUws3VXek4V65lHwB23BVzsnFMn/bw/rPliqX
+ Gcwl8CoJu8dSyrCcd1Ibs0/Inq9S9+t0VmWiQWfQkz4rvEeTQkp/VfgZ6z98JRW7S6l6eoph
+ oWs0/ZyRfOm+QVSqRfFZdxdP2PlGeIFMC3fXJgygXJkFPyWkVElr76JTbtSHsGWbt6xUlYHK
+ XWo+xf9WgtLeby3cfSkEchACrxDrQpj+Jt/JFP+q997dybkyZ5IoHWuPkn7uZGBrKIHmBunT
+ co1+cKSuRiSCYpBIXZMHCzPgVDjk4viPbrV9NwRkmaOxVvye0vctJeWvJ6KA7NoAURplIGCq
+ kCRwg0MmLrfoZnK/gRqVJ/f6adhU1oo6z4p2/z3PemA0C0ANatgHgBb90cd16AUxpdEQmOCm
+ dNnNJF/3Zt3inzF+NFzHoM5Vwq6rc1JPjfC3oqRLJzqAEHBDjQFlqNR3IFCIAo4SYQRBdAHB
+ CzkM4rWyRhuVABEBAAGJAh8EGAECAAkFAlYFJhkCGwwACgkQ8ww4vT8vvjwg9w//VQrcnVg3
+ TsjEybxDEUBm8dBmnKqcnTBFmxN5FFtIWlEuY8+YMiWRykd8Ln9RJ/98/ghABHz9TN8TRo2b
+ 6WimV64FmlVn17Ri6FgFU3xNt9TTEChqAcNg88eYryKsYpFwegGpwUlaUaaGh1m9OrTzcQy+
+ klVfZWaVJ9Nw0keoGRGb8j4XjVpL8+2xOhXKrM1fzzb8JtAuSbuzZSQPDwQEI5CKKxp7zf76
+ J21YeRrEW4WDznPyVcDTa+tz++q2S/BpP4W98bXCBIuQgs2m+OflERv5c3Ojldp04/S4NEjX
+ EYRWdiCxN7ca5iPml5gLtuvhJMSy36glU6IW9kn30IWuSoBpTkgV7rLUEhh9Ms82VWW/h2Tx
+ L8enfx40PrfbDtWwqRID3WY8jLrjKfTdR3LW8BnUDNkG+c4FzvvGUs8AvuqxxyHbXAfDx9o/
+ jXfPHVRmJVhSmd+hC3mcQ+4iX5bBPBPMoDqSoLt5w9GoQQ6gDVP2ZjTWqwSRMLzNr37rJjZ1
+ pt0DCMMTbiYIUcrhX8eveCJtY7NGWNyxFCRkhxRuGcpwPmRVDwOl39MB3iTsRighiMnijkbL
+ XiKoJ5CDVvX5yicNqYJPKh5MFXN1bvsBkmYiStMRbrD0HoY1kx5/VozBtc70OU0EB8Wrv9hZ
+ D+Ofp0T3KOr1RUHvCZoLURfFhSQ=
+Message-ID: <3a973a13-27e8-eb89-537e-685816804346@redhat.com>
+Date: Tue, 16 Jun 2020 09:47:58 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <8e11e2d6-5e02-89c0-759f-d74189421eec@linux.ibm.com>
+In-Reply-To: <20200529140620.28759-3-lulu@redhat.com>
 Content-Language: en-US
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61;
- envelope-from=eric.auger@redhat.com; helo=us-smtp-delivery-1.mimecast.com
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=lvivier@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 02:01:17
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
@@ -100,56 +153,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, "Bonzini,
- Paolo" <pbonzini@redhat.com>, Philippe Mathieu Daude <philmd@redhat.com>,
- Marek Kedzierski <mkedzier@redhat.com>
+Cc: mhabets@solarflare.com, qemu-devel@nongnu.org, rob.miller@broadcom.com,
+ saugatm@xilinx.com, maxime.coquelin@redhat.com, hch@infradead.org,
+ eperezma@redhat.com, jgg@mellanox.com, shahafs@mellanox.com,
+ kevin.tian@intel.com, parav@mellanox.com, vmireyno@marvell.com,
+ cunming.liang@intel.com, gdawar@xilinx.com, jiri@mellanox.com,
+ xiao.w.wang@intel.com, stefanha@redhat.com, zhihong.wang@intel.com,
+ aadam@redhat.com, rdunlap@infradead.org, hanand@xilinx.com,
+ lingshan.zhu@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Stefan,
+On 29/05/2020 16:06, Cindy Lu wrote:
+> user the qemu_get_peer to replace the old process
+> 
+> Signed-off-by: Cindy Lu <lulu@redhat.com>
+> ---
+>  hw/net/vhost_net.c | 14 +++++++++-----
+>  1 file changed, 9 insertions(+), 5 deletions(-)
+> 
+> diff --git a/hw/net/vhost_net.c b/hw/net/vhost_net.c
+> index 6b82803fa7..d1d421e3d9 100644
+> --- a/hw/net/vhost_net.c
+> +++ b/hw/net/vhost_net.c
+> @@ -306,7 +306,9 @@ int vhost_net_start(VirtIODevice *dev, NetClientState *ncs,
+>      BusState *qbus = BUS(qdev_get_parent_bus(DEVICE(dev)));
+>      VirtioBusState *vbus = VIRTIO_BUS(qbus);
+>      VirtioBusClass *k = VIRTIO_BUS_GET_CLASS(vbus);
+> +    struct vhost_net *net;
+>      int r, e, i;
+> +    NetClientState *peer;
+>  
+>      if (!k->set_guest_notifiers) {
+>          error_report("binding does not support guest notifiers");
+> @@ -314,9 +316,9 @@ int vhost_net_start(VirtIODevice *dev, NetClientState *ncs,
+>      }
+>  
+>      for (i = 0; i < total_queues; i++) {
+> -        struct vhost_net *net;
+>  
+> -        net = get_vhost_net(ncs[i].peer);
+> +        peer = qemu_get_peer(ncs, i);
+> +        net = get_vhost_net(peer);
+>          vhost_net_set_vq_index(net, i * 2);
+>  
+>          /* Suppress the masking guest notifiers on vhost user
+> @@ -335,7 +337,8 @@ int vhost_net_start(VirtIODevice *dev, NetClientState *ncs,
+>      }
+>  
+>      for (i = 0; i < total_queues; i++) {
+> -        r = vhost_net_start_one(get_vhost_net(ncs[i].peer), dev);
+> +        peer = qemu_get_peer(ncs, i);
+> +        r = vhost_net_start_one(get_vhost_net(peer), dev);
+>  
+>          if (r < 0) {
+>              goto err_start;
+> @@ -343,7 +346,7 @@ int vhost_net_start(VirtIODevice *dev, NetClientState *ncs,
+>  
+>          if (ncs[i].peer->vring_enable) {
 
-On 6/15/20 7:11 PM, Stefan Berger wrote:
-> On 6/15/20 11:13 AM, Marc-André Lureau wrote:
->>
->>> diff --git a/include/hw/acpi/tpm.h b/include/hw/acpi/tpm.h
->>> index 1a2a57a21f..063a9eb42a 100644
->>> --- a/include/hw/acpi/tpm.h
->>> +++ b/include/hw/acpi/tpm.h
->>> @@ -24,7 +24,7 @@
->>>   #define TPM_TIS_ADDR_BASE           0xFED40000
->>>   #define TPM_TIS_ADDR_SIZE           0x5000
->>>
->>> -#define TPM_TIS_IRQ                 5
->>> +#define TPM_TIS_IRQ                 13
-> 
-> 
-> Eric,
-> 
->  does this change have any negative side effects on ARM? If you prefer,
-> we can split this part here up into TPM_TIS_ISA_IRQ and TPM_TIS_SYSBUS
-> IRQ and leave the latter at '5' because we know that this is working.
+You can replace this "ncs[i].peer->vring_enable" by
+"peer->vring_enable"... and you do this later in PATCH 5/8.
 
-I just gave it a try and it does not seem to introduce any regression
-with automatic LUKS decryption. I will take more time to review the code
-though.
-
-Thanks
-
-Eric
-
-> 
->    Stefan
-> 
-> 
->>>
->>>   #define TPM_TIS_NUM_LOCALITIES      5     /* per spec */
->>>   #define TPM_TIS_LOCALITY_SHIFT      12
->>> -- 
->>> 2.24.1
->>>
-> 
-> 
+Thanks,
+Laurent
 
 
