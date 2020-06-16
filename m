@@ -2,85 +2,87 @@ Return-Path: <SRS0=f7ls=75=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 099BEC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:59:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76C7FC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:59:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CE49920644
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:59:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 48F4F20644
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:59:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Yal4w2t4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE49920644
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L5h4A1jh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48F4F20644
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56810 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59246 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlD3R-00037X-1j
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 10:59:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35750)
+	id 1jlD3w-00046C-Gv
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 10:59:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58228)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jlCpH-0001Gm-7p
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 10:44:35 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:34180
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jlCpF-0002q4-GC
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 10:44:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592318672;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:in-reply-to:in-reply-to:  references:references;
- bh=2HSSVClTbN/6CYEN6qhlS9VdcH/s7v/hFrWVyfRHp3I=;
- b=Yal4w2t4iEo/EXndBFz5uixQ1Un3KU7qvUgOn9i0OtmX0T5mSnwl/9aEu3rCkfWIfvwdku
- 3w3Xmf5Iv/MzvdO9HhpN9VjpQvFTdjsFOzdM/cGzQFT8HYjh5U6ubuUIdOvqVTzjIknP81
- t+o69bq74QB6BsSn1xDiLZfrlPKivaE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-35-sEXjh7zBPvyNO6VCfeNGmQ-1; Tue, 16 Jun 2020 10:44:23 -0400
-X-MC-Unique: sEXjh7zBPvyNO6VCfeNGmQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B6E76100CCC7;
- Tue, 16 Jun 2020 14:44:22 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.66])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8702C60BEC;
- Tue, 16 Jun 2020 14:44:09 +0000 (UTC)
-Date: Tue, 16 Jun 2020 15:44:06 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Lukas Straub <lukasstraub2@web.de>
-Subject: Re: [PATCH v4 2/4] block/nbd.c: Add yank feature
-Message-ID: <20200616144406.GJ550360@redhat.com>
-References: <cover.1590421341.git.lukasstraub2@web.de>
- <8e6a8e61b25813cdcdf385729709ef57f6255a3e.1590421341.git.lukasstraub2@web.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <8e6a8e61b25813cdcdf385729709ef57f6255a3e.1590421341.git.lukasstraub2@web.de>
-User-Agent: Mutt/1.14.0 (2020-05-02)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=berrange@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 02:46:07
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
+ id 1jlCQs-0003x6-Rt; Tue, 16 Jun 2020 10:19:22 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:35108)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
+ id 1jlCQr-00070e-0Q; Tue, 16 Jun 2020 10:19:22 -0400
+Received: by mail-ot1-x344.google.com with SMTP id d4so1647887otk.2;
+ Tue, 16 Jun 2020 07:19:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=RMIBO3jpMOms/D4uQke8brSu1T+4gHbWwgG0M1rmYeo=;
+ b=L5h4A1jhSAISjOnt4/5iYKvvgYcm5d938db0dmepSl2M9/GNnDVaU0NISXALHuae0a
+ bSq5wwXIjC50EaUQHGXdKkIg+QJz4a1/dX9VuluD4sprBXNGZxxkbOGyI0mMljOOcCYu
+ s1QLux4RP+t1Y7SIhm30vosfD27nrBvbgB9/uEJLEUsJ8icXtZlZ6ffrrWKzZ8melFqs
+ jr0yV672mX3YeNfejFCAIVnseZsbLuOYBGz1f/B0zVPU07ux1buVVtUhmk3nC3wRK3kn
+ 0BK6oEKdG58Bbe0kW1PKt0XwXrTGUabW5tYWWUE57XPUrEV1pJZPOATtYFeRR8iBhGy/
+ VS/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references;
+ bh=RMIBO3jpMOms/D4uQke8brSu1T+4gHbWwgG0M1rmYeo=;
+ b=gDZ5qR3uN0EAVbkCTVLrhLz3GofPp7R057vFoOGKXvWfAgeci1npc/SLsEZ2QmuAPQ
+ hGlcktznb/zWO5pnnZ8Z0P1/EziLHYv+CKeify3PKXhi1Bjwl1TStspWy+Fhzn195AJh
+ 0v85jpK4waoG1JQyUUMjNm4KK3AZ13HVAVJH5olEJDCwXthTry+2y5WefUS8RHL/1VVn
+ y1a7goyoebkQnfaLLi+hTeZc5Cin/Jv9TuQ0Ql3tRbQJ3j053fEUnYBRCfE4W/AbB/EW
+ N4BUtZFoBVs2OkRLIoa7AayG3Nds/k8YR5Jx3BFIEvOMy87FT8UPgLwwQE703UV1aZc2
+ 670Q==
+X-Gm-Message-State: AOAM5339meVR9erV3qZmW+XLAbOt+CVYWcI24QOPxb3DzkecIT3CwSd3
+ coWvcrCtYaCYcTtAjr7vQkCwddP6
+X-Google-Smtp-Source: ABdhPJwxvlKGC8ocNV8iNrhsx9Le6Q0jB4yXFgRwjDnGin0YOG743tznvtg6wWXny51WhkabSqECsQ==
+X-Received: by 2002:a9d:39f5:: with SMTP id y108mr2647644otb.262.1592317159005; 
+ Tue, 16 Jun 2020 07:19:19 -0700 (PDT)
+Received: from localhost (76-251-165-188.lightspeed.austtx.sbcglobal.net.
+ [76.251.165.188])
+ by smtp.gmail.com with ESMTPSA id c9sm4031760oov.35.2020.06.16.07.19.17
+ (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
+ Tue, 16 Jun 2020 07:19:17 -0700 (PDT)
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 64/78] tcg/i386: Fix INDEX_op_dup2_vec
+Date: Tue, 16 Jun 2020 09:15:33 -0500
+Message-Id: <20200616141547.24664-65-mdroth@linux.vnet.ibm.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200616141547.24664-1-mdroth@linux.vnet.ibm.com>
+References: <20200616141547.24664-1-mdroth@linux.vnet.ibm.com>
+Received-SPF: pass client-ip=2607:f8b0:4864:20::344;
+ envelope-from=flukshun@gmail.com; helo=mail-ot1-x344.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,48 +95,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block <qemu-block@nongnu.org>,
- Juan Quintela <quintela@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
- Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-stable@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, May 25, 2020 at 05:44:26PM +0200, Lukas Straub wrote:
-> Register a yank function which shuts down the socket and sets
-> s->state = NBD_CLIENT_QUIT. This is the same behaviour as if an
-> error occured.
-> 
-> Signed-off-by: Lukas Straub <lukasstraub2@web.de>
-> ---
->  Makefile.objs |   1 +
->  block/nbd.c   | 101 ++++++++++++++++++++++++++++++++------------------
->  2 files changed, 65 insertions(+), 37 deletions(-)
-> 
-> diff --git a/Makefile.objs b/Makefile.objs
-> index a7c967633a..8e403b81f3 100644
-> --- a/Makefile.objs
-> +++ b/Makefile.objs
-> @@ -18,6 +18,7 @@ block-obj-y += block.o blockjob.o job.o
->  block-obj-y += block/ scsi/
->  block-obj-y += qemu-io-cmds.o
->  block-obj-$(CONFIG_REPLICATION) += replication.o
-> +block-obj-y += yank.o
+From: Richard Henderson <richard.henderson@linaro.org>
 
-Oh, I see this is repeated for migration and chardev code too.
+We were only constructing the 64-bit element, and not
+replicating the 64-bit element across the rest of the vector.
 
-Instead of doing this and relying on linker to merge duplicates,
-I think we should put yank.c into util/ and built it into util-obj-y,
-so it gets added to everything.
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+(cherry picked from commit e20cb81d9c5a3d0f9c08f3642728a210a1c162c9)
+Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+---
+ tcg/i386/tcg-target.inc.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
-Regards,
-Daniel
+diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
+index 9d8ed974e0..77b78c941c 100644
+--- a/tcg/i386/tcg-target.inc.c
++++ b/tcg/i386/tcg-target.inc.c
+@@ -2855,9 +2855,13 @@ static void tcg_out_vec_op(TCGContext *s, TCGOpcode opc,
+         goto gen_simd;
+ #if TCG_TARGET_REG_BITS == 32
+     case INDEX_op_dup2_vec:
+-        /* Constraints have already placed both 32-bit inputs in xmm regs.  */
+-        insn = OPC_PUNPCKLDQ;
+-        goto gen_simd;
++        /* First merge the two 32-bit inputs to a single 64-bit element. */
++        tcg_out_vex_modrm(s, OPC_PUNPCKLDQ, a0, a1, a2);
++        /* Then replicate the 64-bit elements across the rest of the vector. */
++        if (type != TCG_TYPE_V64) {
++            tcg_out_dup_vec(s, type, MO_64, a0, a0);
++        }
++        break;
+ #endif
+     case INDEX_op_abs_vec:
+         insn = abs_insn[vece];
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+2.17.1
 
 
