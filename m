@@ -2,44 +2,46 @@ Return-Path: <SRS0=f7ls=75=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 847F0C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 16:23:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC1D8C433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 16:23:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6220620786
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 16:23:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6220620786
+	by mail.kernel.org (Postfix) with ESMTPS id 9B0FC20786
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 16:23:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B0FC20786
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=openvz.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59896 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59962 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlEMb-00017G-Kh
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 12:23:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59778)
+	id 1jlEMc-000191-S3
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 12:23:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59832)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <den@openvz.org>)
- id 1jlEKM-0004wF-V0; Tue, 16 Jun 2020 12:20:46 -0400
-Received: from relay.sw.ru ([185.231.240.75]:43700 helo=relay3.sw.ru)
+ id 1jlEKP-00051s-7a; Tue, 16 Jun 2020 12:20:49 -0400
+Received: from relay.sw.ru ([185.231.240.75]:43698 helo=relay3.sw.ru)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <den@openvz.org>)
- id 1jlEKJ-0006a2-5v; Tue, 16 Jun 2020 12:20:46 -0400
+ id 1jlEKJ-0006a1-7J; Tue, 16 Jun 2020 12:20:48 -0400
 Received: from [192.168.15.172] (helo=iris.lishka.ru)
  by relay3.sw.ru with esmtp (Exim 4.93)
  (envelope-from <den@openvz.org>)
- id 1jlEK0-0003Pf-Ub; Tue, 16 Jun 2020 19:20:24 +0300
+ id 1jlEK1-0003Pf-Ai; Tue, 16 Jun 2020 19:20:25 +0300
 From: "Denis V. Lunev" <den@openvz.org>
 To: qemu-block@nongnu.org,
 	qemu-devel@nongnu.org
-Subject: [PATCH v4 0/4] block: seriously improve savevm performance
-Date: Tue, 16 Jun 2020 19:20:30 +0300
-Message-Id: <20200616162035.29857-1-den@openvz.org>
+Subject: [PATCH 3/5] block/aio_task: drop aio_task_pool_wait_one() helper
+Date: Tue, 16 Jun 2020 19:20:33 +0300
+Message-Id: <20200616162035.29857-4-den@openvz.org>
 X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200616162035.29857-1-den@openvz.org>
+References: <20200616162035.29857-1-den@openvz.org>
 Received-SPF: pass client-ip=185.231.240.75; envelope-from=den@openvz.org;
  helo=relay3.sw.ru
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 12:20:39
@@ -66,54 +68,20 @@ Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
  Juan Quintela <quintela@redhat.com>,
  "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
  Denis Plotnikov <dplotnikov@virtuozzo.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, "Denis V . Lunev" <den@openvz.org>
+ Stefan Hajnoczi <stefanha@redhat.com>, "Denis V. Lunev" <den@openvz.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This series do standard basic things:
-- it creates intermediate buffer for all writes from QEMU migration code
-  to QCOW2 image,
-- this buffer is sent to disk asynchronously, allowing several writes to
-  run in parallel.
+It is not used outside the module.
 
-In general, migration code is fantastically inefficent (by observation),
-buffers are not aligned and sent with arbitrary pieces, a lot of time
-less than 100 bytes at a chunk, which results in read-modify-write
-operations with non-cached operations. It should also be noted that all
-operations are performed into unallocated image blocks, which also suffer
-due to partial writes to such new clusters.
-
-This patch series is an implementation of idea discussed in the RFC
-posted by Denis Plotnikov
-https://lists.gnu.org/archive/html/qemu-devel/2020-04/msg01925.html
-Results with this series over NVME are better than original code
-                original     rfc    this
-cached:          1.79s      2.38s   1.27s
-non-cached:      3.29s      1.31s   0.81s
-
-Changes from v3:
-- rebased to master
-- added patch 3 which removes aio_task_pool_wait_one()
-- added R-By to patch 1
-- patch 4 is rewritten via bdrv_run_co
-- error path in blk_save_vmstate() is rewritten to call bdrv_flush_vmstate
-  unconditionally
-- added some comments
-- fixes initialization in bdrv_co_vmstate_save_task_entry as suggested
-
-Changes from v2:
-- code moved from QCOW2 level to generic block level
-- created bdrv_flush_vmstate helper to fix 022, 029 tests
-- added recursive for bs->file in bdrv_co_flush_vmstate (fix 267)
-- fixed blk_save_vmstate helper
-- fixed coroutine wait as Vladimir suggested with waiting fixes from me
-
-Changes from v1:
-- patchew warning fixed
-- fixed validation that only 1 waiter is allowed in patch 1
+Actually there are 2 kind of waiters:
+- for a slot and
+- for all tasks to finish
+This patch limits external API to listed types.
 
 Signed-off-by: Denis V. Lunev <den@openvz.org>
+Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 CC: Kevin Wolf <kwolf@redhat.com>
 CC: Max Reitz <mreitz@redhat.com>
 CC: Stefan Hajnoczi <stefanha@redhat.com>
@@ -122,5 +90,57 @@ CC: Juan Quintela <quintela@redhat.com>
 CC: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 CC: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 CC: Denis Plotnikov <dplotnikov@virtuozzo.com>
+---
+ block/aio_task.c         | 13 ++-----------
+ include/block/aio_task.h |  1 -
+ 2 files changed, 2 insertions(+), 12 deletions(-)
+
+diff --git a/block/aio_task.c b/block/aio_task.c
+index cf62e5c58b..7ba15ff41f 100644
+--- a/block/aio_task.c
++++ b/block/aio_task.c
+@@ -54,26 +54,17 @@ static void coroutine_fn aio_task_co(void *opaque)
+     qemu_co_queue_restart_all(&pool->waiters);
+ }
+ 
+-void coroutine_fn aio_task_pool_wait_one(AioTaskPool *pool)
+-{
+-    assert(pool->busy_tasks > 0);
+-
+-    qemu_co_queue_wait(&pool->waiters, NULL);
+-
+-    assert(pool->busy_tasks < pool->max_busy_tasks);
+-}
+-
+ void coroutine_fn aio_task_pool_wait_slot(AioTaskPool *pool)
+ {
+     while (pool->busy_tasks >= pool->max_busy_tasks) {
+-        aio_task_pool_wait_one(pool);
++        qemu_co_queue_wait(&pool->waiters, NULL);
+     }
+ }
+ 
+ void coroutine_fn aio_task_pool_wait_all(AioTaskPool *pool)
+ {
+     while (pool->busy_tasks > 0) {
+-        aio_task_pool_wait_one(pool);
++        qemu_co_queue_wait(&pool->waiters, NULL);
+     }
+ }
+ 
+diff --git a/include/block/aio_task.h b/include/block/aio_task.h
+index 50bc1e1817..50b1c036c5 100644
+--- a/include/block/aio_task.h
++++ b/include/block/aio_task.h
+@@ -48,7 +48,6 @@ bool aio_task_pool_empty(AioTaskPool *pool);
+ void coroutine_fn aio_task_pool_start_task(AioTaskPool *pool, AioTask *task);
+ 
+ void coroutine_fn aio_task_pool_wait_slot(AioTaskPool *pool);
+-void coroutine_fn aio_task_pool_wait_one(AioTaskPool *pool);
+ void coroutine_fn aio_task_pool_wait_all(AioTaskPool *pool);
+ 
+ #endif /* BLOCK_AIO_TASK_H */
+-- 
+2.17.1
 
 
