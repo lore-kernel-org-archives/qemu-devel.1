@@ -7,74 +7,73 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57AC9C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:30:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 416E7C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:30:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 23F2720786
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:30:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0C6F420786
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:30:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EwfQstSe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 23F2720786
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hV+qhLYV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C6F420786
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38836 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41606 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlCbM-0005WO-9G
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 10:30:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57474)
+	id 1jlCbx-0006jH-5i
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 10:30:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57420)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1jlCPb-00021l-6v; Tue, 16 Jun 2020 10:18:04 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:36658)
+ id 1jlCPW-0001vP-3L; Tue, 16 Jun 2020 10:17:58 -0400
+Received: from mail-oi1-x236.google.com ([2607:f8b0:4864:20::236]:39414)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1jlCPZ-0006dO-Hq; Tue, 16 Jun 2020 10:18:02 -0400
-Received: by mail-oi1-x244.google.com with SMTP id a137so19379834oii.3;
- Tue, 16 Jun 2020 07:18:00 -0700 (PDT)
+ id 1jlCPU-0006bN-9v; Tue, 16 Jun 2020 10:17:57 -0400
+Received: by mail-oi1-x236.google.com with SMTP id d67so19349711oig.6;
+ Tue, 16 Jun 2020 07:17:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=HkqpzH1+Uo68RKYymrYdAHIPp0MZsukAdfhLDqHwjIs=;
- b=EwfQstSew8KL4NK09Z518yu8GDl9t9zmAckYTgQjXMDn7Tg+29bKOJSFBBO7bQdVoj
- jcDUwSv0AIAUuuvTPIXSKPnJgXVsva4XgRdkDGqopbROS3iM8mxDMQvZAqB94AGxngLZ
- b5oriJK/nLvFExORBjgMoaS5Sh4XU9IP2+9KLlRkHzmDBqIKR4FKJN21VKTsVUfrNepI
- R3vByrFguOwOrstR5Zgs7E5NsxixviKB3jryCgz5ynKkf8HoMNybrMWDvT762ehCO3Vb
- k8ETvhOxaKjXRNhZdEZnM8hqrdfrBFHepirSz7WKlgj+7S8hg/bK4kcdfHUC0hXtWllG
- 0Nog==
+ bh=Q95hS3J40RCSoOEE5dlvFtYnyG3elf6x2RtaTUYv91A=;
+ b=hV+qhLYVCwxGxaUe+OPMnAAyjIuQ19Rc9GGTZj7um2ONSqRRZ3eOt4hZd2XjmoXBCW
+ PyLw6f1Zqm6RgJvb3O1cMwZ4hoM0oYdNGweD30hsEoosRHpxZIBoXS29eO/xrO+1qCIW
+ PK7waDd0GnhMGhJ6B1gca9tI+u9vu0aFtxt83mWM8C05KJ1bZHWPWfmOexdZgHULBP+S
+ NbpeRpJT+U1UaN4LzdcuPYX63GqSxBAkCFnYJVBoqha5s/3n0brQNnnIyNx50XxNfJNI
+ ObkKQshNz8+uDXEg962KwnM4KEtaa4darxkiTqMRDIzPNxPpy/ohnCeaOZhWinwVKX7z
+ U0Vg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references;
- bh=HkqpzH1+Uo68RKYymrYdAHIPp0MZsukAdfhLDqHwjIs=;
- b=KLfOcyd/oGlbvbcfGcAZ5Aw4VUZDqStoqirLUCcN8MoHrRyQ4A75hd0Y8ktr4Lmq1j
- ZoUi+5zHMQA6SmCGbCbEZ7lm+9IOfRPwecAnuqhEe2V9tDrIElOlL8VeDJg7BJPi8BKg
- FZAHp0hNVsVQHPkNEArtPGmk4GgZAQAE4GZSt7fnbY2LR8aEWnQs8xBnndzCKwDRW0j3
- SMKhbVm0/ui88D+UcE4sIVsXBBrZHegPbtGUJyS3Qj7OY+5Ab9k277SDwIEEfbfb37cs
- /F5O/g2SNZf2fnSaFsxIjJ4mj3g6aRu6ui9lbwA2jsasxw0mZuDHJ6S/CQa2PWzIlXhT
- K8fA==
-X-Gm-Message-State: AOAM533vIBLSMsRVbOzP2Ho1DzYkzAYZiEa17b57NfuSAkymGPhZfviE
- qC9xInSlW9wC1NzNH2awoCq75wNG
-X-Google-Smtp-Source: ABdhPJzHTowX2UqIdPR3uRtY0MmWG8VNl69iGHoFcjzeX+eEGgahGE7uuKxAGdjE1gpQFHCWW3/MPA==
-X-Received: by 2002:aca:5dd5:: with SMTP id r204mr3635419oib.80.1592317079717; 
- Tue, 16 Jun 2020 07:17:59 -0700 (PDT)
+ bh=Q95hS3J40RCSoOEE5dlvFtYnyG3elf6x2RtaTUYv91A=;
+ b=PiXY8Z9gRUkQeN8f5CpbN/nZE2liZjeSDjxIlLLMQPxeHqty2ysACGNY/Eciz6LXaN
+ +/3r4Ll5GTUr7dRxbcSpn0mIT5Uf4qXnmwuokW7P3e/7C04oSlw6dPfqa2ifDJ0SpeVu
+ fyGQ8iFXSPWMWmQKLqYEla4TE/Sx3KLaL1GGkePD1dfBxTz/sBJsJQDxT4Yc6j0KICxz
+ rNoupncxMNEgEDnUeQVbQpZAuE3Db540PP7pmUg1ZxZpmfuBbSLAzCkMTLVaWCFjDrEj
+ No/Zc4PEthQhsC313Sg4I0KcewmFcwJaXhLhKswN3K8R81LBfi8N2SzVu3BmSduNr5cJ
+ MEGg==
+X-Gm-Message-State: AOAM5321IcGNznS7MqxbxMhhxtyhPiUXAx1+fZObL+X++lykAsk/ZXlG
+ JgaLESkeb9BKEbZeb41KRAceqs3b
+X-Google-Smtp-Source: ABdhPJyN7T3b11wfLV+3qdP/dNuteuyTMH9TXoHEvXc4mgKL7zoWrgUUNsEVn9Ezq52NieeWicQpfw==
+X-Received: by 2002:aca:df04:: with SMTP id w4mr3458946oig.27.1592317074303;
+ Tue, 16 Jun 2020 07:17:54 -0700 (PDT)
 Received: from localhost (76-251-165-188.lightspeed.austtx.sbcglobal.net.
  [76.251.165.188])
- by smtp.gmail.com with ESMTPSA id j46sm4046019ota.69.2020.06.16.07.17.58
+ by smtp.gmail.com with ESMTPSA id e188sm4349186oib.18.2020.06.16.07.17.52
  (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
- Tue, 16 Jun 2020 07:17:58 -0700 (PDT)
+ Tue, 16 Jun 2020 07:17:53 -0700 (PDT)
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 25/78] vfio/pci: Don't remove irqchip notifier if not
- registered
-Date: Tue, 16 Jun 2020 09:14:54 -0500
-Message-Id: <20200616141547.24664-26-mdroth@linux.vnet.ibm.com>
+Subject: [PATCH 21/78] virtio: reset region cache when on queue deletion
+Date: Tue, 16 Jun 2020 09:14:50 -0500
+Message-Id: <20200616141547.24664-22-mdroth@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200616141547.24664-1-mdroth@linux.vnet.ibm.com>
 References: <20200616141547.24664-1-mdroth@linux.vnet.ibm.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::244;
- envelope-from=flukshun@gmail.com; helo=mail-oi1-x244.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::236;
+ envelope-from=flukshun@gmail.com; helo=mail-oi1-x236.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -96,54 +95,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alex Williamson <alex.williamson@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>, qemu-stable@nongnu.org,
- Peter Xu <peterx@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: Yuri Benditovich <yuri.benditovich@daynix.com>, qemu-stable@nongnu.org,
+ "Michael S . Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Peter Xu <peterx@redhat.com>
+From: Yuri Benditovich <yuri.benditovich@daynix.com>
 
-The kvm irqchip notifier is only registered if the device supports
-INTx, however it's unconditionally removed.  If the assigned device
-does not support INTx, this will cause QEMU to crash when unplugging
-the device from the system.  Change it to conditionally remove the
-notifier only if the notify hook is setup.
+https://bugzilla.redhat.com/show_bug.cgi?id=1708480
+Fix leak of region reference that prevents complete
+device deletion on hot unplug.
 
-CC: Eduardo Habkost <ehabkost@redhat.com>
-CC: David Gibson <david@gibson.dropbear.id.au>
-CC: Alex Williamson <alex.williamson@redhat.com>
-Cc: qemu-stable@nongnu.org # v4.2
-Reported-by: yanghliu@redhat.com
-Debugged-by: Eduardo Habkost <ehabkost@redhat.com>
-Fixes: c5478fea27ac ("vfio/pci: Respond to KVM irqchip change notifier")
-Bugzilla: https://bugzilla.redhat.com/show_bug.cgi?id=1782678
-Signed-off-by: Peter Xu <peterx@redhat.com>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Greg Kurz <groug@kaod.org>
-Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
-(cherry picked from commit 0446f8121723b134ca1d1ed0b73e96d4a0a8689d)
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
+Message-Id: <20191226043649.14481-2-yuri.benditovich@daynix.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+(cherry picked from commit 421afd2fe8dd4603216cbf36081877c391f5a2a4)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- hw/vfio/pci.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ hw/virtio/virtio.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index 2d40b396f2..337a173ce7 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -3076,7 +3076,9 @@ static void vfio_exitfn(PCIDevice *pdev)
-     vfio_unregister_req_notifier(vdev);
-     vfio_unregister_err_notifier(vdev);
-     pci_device_set_intx_routing_notifier(&vdev->pdev, NULL);
--    kvm_irqchip_remove_change_notifier(&vdev->irqchip_change_notifier);
-+    if (vdev->irqchip_change_notifier.notify) {
-+        kvm_irqchip_remove_change_notifier(&vdev->irqchip_change_notifier);
-+    }
-     vfio_disable_interrupts(vdev);
-     if (vdev->intx.mmap_timer) {
-         timer_free(vdev->intx.mmap_timer);
+diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+index 6de3cfdc2c..344d817644 100644
+--- a/hw/virtio/virtio.c
++++ b/hw/virtio/virtio.c
+@@ -2338,6 +2338,7 @@ void virtio_delete_queue(VirtQueue *vq)
+     vq->handle_aio_output = NULL;
+     g_free(vq->used_elems);
+     vq->used_elems = NULL;
++    virtio_virtqueue_reset_region_cache(vq);
+ }
+ 
+ void virtio_del_queue(VirtIODevice *vdev, int n)
 -- 
 2.17.1
 
