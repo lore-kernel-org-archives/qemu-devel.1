@@ -7,77 +7,74 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C950C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:50:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3478C433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:51:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1C994208B3
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:50:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 97A8620679
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:51:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TxNvlH9h"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C994208B3
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="stoZDnAF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97A8620679
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41262 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48408 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlCuY-0002ER-Bh
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 10:50:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58434)
+	id 1jlCw6-0005AK-Ry
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 10:51:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58222)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1jlCRF-0004nL-St; Tue, 16 Jun 2020 10:19:45 -0400
-Received: from mail-oi1-x229.google.com ([2607:f8b0:4864:20::229]:38034)
+ id 1jlCQr-0003vG-Va; Tue, 16 Jun 2020 10:19:22 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:42866)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1jlCRE-00073x-Ab; Tue, 16 Jun 2020 10:19:45 -0400
-Received: by mail-oi1-x229.google.com with SMTP id c194so19399823oig.5;
- Tue, 16 Jun 2020 07:19:43 -0700 (PDT)
+ id 1jlCQq-00070V-Da; Tue, 16 Jun 2020 10:19:21 -0400
+Received: by mail-ot1-x343.google.com with SMTP id t6so16023672otk.9;
+ Tue, 16 Jun 2020 07:19:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=oAWQwscS3hC8ntGZh49aUc7NALi41mqvXu730WQVmJg=;
- b=TxNvlH9hXozskCo1ZGNhRFVOY+L7oacdXXqiliUi/NEx2gsmztZ/2pVbum9ABN8DUe
- nH1vFlTltQIKxaVAOPto/OzgTBAH8i+NrGNFqIzz9U5Te1HpCEOMAXpmMuCxV9sVVLJD
- GHSqSb11h0J43j6x+rYNaquvFrkkNwtwJkQcIfHLCqsnZrTRhSOOa/VDDFEuJ/sFW+BS
- mkXKp8//PyxAqMFYYD/ffhPuOWwpBBzQjlsFqnsdWcRh7lAFHJo7QN5rwAoiJXIWaCRV
- LWzqoGe9yBTAHUMbSHNJKpJtnsl5JRpr/Mg3EOCf3UyjgdrrlHIWmKHlDSunPdITLYoJ
- gdjA==
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=rOQwJDphmhaIdRqWIt/ysSZEwiemdpwpObYdcb/nTmA=;
+ b=stoZDnAFLyaVidRBFf2vh7DppTmcd++JgdNyKYUO4mPu1j4IF8owJSWXYIEHQHvvdb
+ lo2jFmPP9F9VLVt+lO0+5W8zdRWFB74hiFXbzgQHPmJYG02BCzxxYjBD3B9nFL6rrrHk
+ gNXNhW10ZRSGPzm0QFxFRzLIlQXqR73xqZhsP8lApUuGwFD9MjDeid5uzoseO8UztJe4
+ 1C93sDQG5QMPB+Ve+jj2W8ny0/gyHz1mreBJ5Z/ZF7WuA+/lebHxi7vTqLhV/jNKNmq8
+ /zR6oVPewxB0V6+Dm5klaoY2RZwk2DHdCPsMyYPvRpNhA/aS+mbeUluIWDMAWkfOqA9F
+ JLpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=oAWQwscS3hC8ntGZh49aUc7NALi41mqvXu730WQVmJg=;
- b=hw9e73tZNnVs/K5nv/k2cNeb7sTrjJQUeYm2+L8Dh0vglfJ6c8wNYCrgdxkD3qRAjU
- 63z8nK9tO9W4T1m25Jm+XvvP2CBPEoK/AO3Q8+r2xBo56Fy2dEbjKw9EJFtBUt7EVZ5/
- t+bReYLF0XwGc8PiCnc08Eyx8kplrv4fsSH+wor17RozBsw2ZVezd8NKpOMmMeQ4rljm
- EXnekUHGmIOIxqhYgZNKggZRqR3qPSbtkmbfbXCtaptf/qqWR0x83gDE1MpEZxmDjRIi
- VUOhpceuYGoh7EuLT3T0WM4GYQ0TEmx+y18Od8zNE4DJZrcf/4WJQiqnOJoJLIVT3FuF
- y9tg==
-X-Gm-Message-State: AOAM532gBTZBS6B8nxV1tNnIdtPEnmnW1CKPjig8fUYsDHHVhXPxJ3Js
- 3Eg93VNQr7V0LiQDs2Fx/Avd2pR+evU=
-X-Google-Smtp-Source: ABdhPJzNBbwoWKtR/GV0PYqsijTj+PsJw7vj4XW3lDgdesdIrpe20bkLokAnsS1Jdf1oniNY9AWASQ==
-X-Received: by 2002:aca:5a05:: with SMTP id o5mr3359110oib.138.1592317182493; 
- Tue, 16 Jun 2020 07:19:42 -0700 (PDT)
+ :in-reply-to:references;
+ bh=rOQwJDphmhaIdRqWIt/ysSZEwiemdpwpObYdcb/nTmA=;
+ b=gVCnh06poEHutEU8H/1ytJeQ32300LsJtKwaSltNiEFeM7kyBdnOAfflWefALnWfsK
+ RmJQim+8vJvAyx3J/+Eofi2cfWkgEBgymnj32X2ctaozD2USKJgOtJ6EC2t8UdbFYu9M
+ 2po6fngdsPVW08c8pFRoYpLX/gNC062Ox7nRmVLR8yrYTKff6gxEeYBKe5A8y2dkYvjJ
+ YH2zrR1Yffu8o3cQv/KOdXZqHmKbG8nZegFTyNxhPAdyYNf6jkSnGJLYs3pjjCpha55p
+ NnAZ3IUc6y0L+uNi/bBq4R0wiZTXW3kiXf9q/qumMYPFW+6XD7enf8SlkOiPBOkBfspr
+ e0Iw==
+X-Gm-Message-State: AOAM53047jDZPneaTxoLScTI2XQOm0tTWQAmiXAEOMYw10PWivQNDhzi
+ vCctm1IbAJFafPwfDULWcYpmEdTj
+X-Google-Smtp-Source: ABdhPJyjelM3INjEh+QQFzGR+0E4oJVYWFcWU40a0eR31cJi24RVIw8XthAWTcMe8jERqp5YlmOAsA==
+X-Received: by 2002:a9d:554d:: with SMTP id h13mr2342117oti.201.1592317157109; 
+ Tue, 16 Jun 2020 07:19:17 -0700 (PDT)
 Received: from localhost (76-251-165-188.lightspeed.austtx.sbcglobal.net.
  [76.251.165.188])
- by smtp.gmail.com with ESMTPSA id 53sm4069177otv.22.2020.06.16.07.19.40
+ by smtp.gmail.com with ESMTPSA id c10sm4120781ooq.30.2020.06.16.07.19.15
  (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
- Tue, 16 Jun 2020 07:19:41 -0700 (PDT)
+ Tue, 16 Jun 2020 07:19:15 -0700 (PDT)
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 76/78] virtio-balloon: fix free page hinting check on unrealize
-Date: Tue, 16 Jun 2020 09:15:45 -0500
-Message-Id: <20200616141547.24664-77-mdroth@linux.vnet.ibm.com>
+Subject: [PATCH 63/78] hw/i386/amd_iommu.c: Fix corruption of log events
+ passed to guest
+Date: Tue, 16 Jun 2020 09:15:32 -0500
+Message-Id: <20200616141547.24664-64-mdroth@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200616141547.24664-1-mdroth@linux.vnet.ibm.com>
 References: <20200616141547.24664-1-mdroth@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::229;
- envelope-from=flukshun@gmail.com; helo=mail-oi1-x229.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::343;
+ envelope-from=flukshun@gmail.com; helo=mail-ot1-x343.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -99,51 +96,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Michael S . Tsirkin" <mst@redhat.com>,
- David Hildenbrand <david@redhat.com>, qemu-stable@nongnu.org,
- Alexander Duyck <alexander.duyck@gmail.com>, Wei Wang <wei.w.wang@intel.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-stable@nongnu.org,
+ "Michael S . Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: David Hildenbrand <david@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
 
-Checking against guest features is wrong. We allocated data structures
-based on host features. We can rely on "free_page_bh" as an indicator
-whether to un-do stuff instead.
+In the function amdvi_log_event(), we write an event log buffer
+entry into guest ram, whose contents are passed to the function
+via the "uint64_t *evt" argument. Unfortunately, a spurious
+'&' in the call to dma_memory_write() meant that instead of
+writing the event to the guest we would write the literal value
+of the pointer, plus whatever was in the following 8 bytes
+on the stack. This error was spotted by Coverity.
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
-Fixes: c13c4153f76d ("virtio-balloon: VIRTIO_BALLOON_F_FREE_PAGE_HINT")
+Fix the bug by removing the '&'.
+
+Fixes: CID 1421945
 Cc: qemu-stable@nongnu.org
-Cc: Wei Wang <wei.w.wang@intel.com>
-Cc: Michael S. Tsirkin <mst@redhat.com>
-Cc: Philippe Mathieu-Daudé <philmd@redhat.com>
-Cc: Alexander Duyck <alexander.duyck@gmail.com>
-Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20200520100439.19872-3-david@redhat.com>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Message-Id: <20200326105349.24588-1-peter.maydell@linaro.org>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-(cherry picked from commit 49b01711b8eb3796c6904c7f85d2431572cfe54f)
+(cherry picked from commit 32a2d6b1f6b4405f0fc20c031e61d5d48e3d9cd1)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- hw/virtio/virtio-balloon.c | 2 +-
+ hw/i386/amd_iommu.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-index 8c6a177365..64fdd0e332 100644
---- a/hw/virtio/virtio-balloon.c
-+++ b/hw/virtio/virtio-balloon.c
-@@ -818,7 +818,7 @@ static void virtio_balloon_device_unrealize(DeviceState *dev, Error **errp)
-     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-     VirtIOBalloon *s = VIRTIO_BALLOON(dev);
+diff --git a/hw/i386/amd_iommu.c b/hw/i386/amd_iommu.c
+index d55dbf07fc..ac5f2fddc5 100644
+--- a/hw/i386/amd_iommu.c
++++ b/hw/i386/amd_iommu.c
+@@ -181,7 +181,7 @@ static void amdvi_log_event(AMDVIState *s, uint64_t *evt)
+     }
  
--    if (virtio_balloon_free_page_support(s)) {
-+    if (s->free_page_bh) {
-         qemu_bh_delete(s->free_page_bh);
-         virtio_balloon_free_page_stop(s);
-         precopy_remove_notifier(&s->free_page_report_notify);
+     if (dma_memory_write(&address_space_memory, s->evtlog + s->evtlog_tail,
+-        &evt, AMDVI_EVENT_LEN)) {
++                         evt, AMDVI_EVENT_LEN)) {
+         trace_amdvi_evntlog_fail(s->evtlog, s->evtlog_tail);
+     }
+ 
 -- 
 2.17.1
 
