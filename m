@@ -2,92 +2,94 @@ Return-Path: <SRS0=f7ls=75=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E296C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 07:08:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35CBAC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 07:08:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0ADCA2082F
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 07:08:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 00CA32082F
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 07:08:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XaOcY8iJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0ADCA2082F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CtAVrcNw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00CA32082F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39500 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40454 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jl5hb-0003NW-8q
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 03:08:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43096)
+	id 1jl5hu-0003wu-88
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 03:08:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43120)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mprivozn@redhat.com>)
- id 1jl5S9-0001Ix-UC
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 02:52:13 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:44298
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mprivozn@redhat.com>)
- id 1jl5S8-0006X4-3V
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 02:52:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592290331;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=VSHQnkty5Ij6bYsBZIFxzy52uokPml9YjdRl+QNYvZU=;
- b=XaOcY8iJgn1xMgay95m3CRkR65X/wp4VEaX2vhFDRmzdBX1vgQg9/NrhOk1BPYrHR6jzbY
- tVmSoP32q5AUzxmd5bewMXlsrOtkzo95KCee+um/8r4lw3glHQsp+ZLPjHpw3p5+E2HK4S
- drGvDo7Ng4JeYvXVMeMcXEu8T8Zzn94=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-417-IkjC-mpRM8e1y2B5iyEqrg-1; Tue, 16 Jun 2020 02:52:07 -0400
-X-MC-Unique: IkjC-mpRM8e1y2B5iyEqrg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0C56D107B467;
- Tue, 16 Jun 2020 06:52:06 +0000 (UTC)
-Received: from [10.40.193.154] (unknown [10.40.193.154])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C62865D9CD;
- Tue, 16 Jun 2020 06:52:04 +0000 (UTC)
-Subject: Re: [PATCH v2 1/2] qemu-options.hx: Mark all hmat-cache attributes
- required
-To: Markus Armbruster <armbru@redhat.com>
-References: <cover.1591794890.git.mprivozn@redhat.com>
- <b6d3bc2ac8b38a419c98fb5eb1454ffbcb4fa172.1591794890.git.mprivozn@redhat.com>
- <87a714bvy6.fsf@dusky.pond.sub.org>
-From: Michal Privoznik <mprivozn@redhat.com>
-Message-ID: <3a1c4ea2-dbca-4184-f2e1-0d94a8224811@redhat.com>
-Date: Tue, 16 Jun 2020 08:52:03 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ (Exim 4.90_1) (envelope-from <coiby.xu@gmail.com>)
+ id 1jl5SL-0001kO-3K
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 02:52:25 -0400
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:38662)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <coiby.xu@gmail.com>)
+ id 1jl5SJ-0006XN-6S
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 02:52:24 -0400
+Received: by mail-pl1-x644.google.com with SMTP id m7so7955856plt.5
+ for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 23:52:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:date:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=b6LgcOPhi8W7UE0S9DpmNMWNfQsUhx+nIS29bRv1iLE=;
+ b=CtAVrcNwASTI1xRJyk3xmZVF8qwkLpYFVtMngSx58uC6WBTcvaKGAR+PsosAcvHh6j
+ a2KLxLCPpF207MX3m47ptJFyT5vlwHZT7m9/+4riGFnnGAy6sffQHiiijvDYaFojJtnD
+ ZF6yiDvKNYdnyV9Kjp5H8D0YV731bGibKFJfdHyLnTG2qk4FyzLouy+BnZE3k2APGQPN
+ kjnopqU85WSZAo0SEgvpi9qyvLpQ4WbTiMetewDw5sLFUTRc4i6Q8yRqWu8resfhQKFP
+ kb96sa/Lcd/zDHuP1seYpWsiQG27gq/8e2bYC5C1xQ7K/OVitGIRP6FaIpTNOsliVnQa
+ o/OQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:date:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=b6LgcOPhi8W7UE0S9DpmNMWNfQsUhx+nIS29bRv1iLE=;
+ b=dI3iBqn16edRiaYQBZk9Sa684J3csWLum/3PtzEmVklPs0AQya+Y8PUoEP+Nc9VHPQ
+ yblN3tdGwb1r43WU01EVqwsCBRk3jfmS386iRtQh5LuwONwGE5vReQzc7a0cpS/Q+rti
+ 1xViCrVbTkrXlW0i5c55m0Gf3kteAO5cC0w903heqKFk4H9oqiM49Be/RZp/WGx3n6Gx
+ yjkc4w5nVBpLX/WTqxr88LRnZwfEsJaNlhAqhXXq1+rIxYf6IA0Tji9HvKjQM8xRh1yS
+ xhSl5abHlleOejto2XiRR5a12GGzleZa0BgY/R8KUoZZ/bZT0mMbaQi/X9IiCll5udNk
+ QYIg==
+X-Gm-Message-State: AOAM533f+rBQFkztQtc2Y3624seqb+/7rGAz8GYIiJ79KDGICT8jZQcD
+ 2aJDc30HtG+6hflViAPVLItMBQ9FeKkh1g==
+X-Google-Smtp-Source: ABdhPJwEYezc8s2q96LJZGaHkW7itg0QJqq1a6MBeU5CYZ4gMDKjb+TlfmVQs1/3k2ZcosEtLmhybw==
+X-Received: by 2002:a17:90a:ea05:: with SMTP id
+ w5mr1486138pjy.37.1592290341063; 
+ Mon, 15 Jun 2020 23:52:21 -0700 (PDT)
+Received: from localhost ([2001:e42:102:1532:160:16:113:140])
+ by smtp.gmail.com with ESMTPSA id c15sm13874833pgb.4.2020.06.15.23.52.19
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 15 Jun 2020 23:52:20 -0700 (PDT)
+From: Coiby Xu <coiby.xu@gmail.com>
+X-Google-Original-From: Coiby Xu <Coiby.Xu@gmail.com>
+Date: Tue, 16 Jun 2020 14:52:16 +0800
+To: qemu-devel@nongnu.org
+Subject: Re: [PATCH v9 0/5] vhost-user block device backend implementation
+Message-ID: <20200616065216.wpf2rxgwxvtqgxlk@r>
+References: <20200614183907.514282-1-coiby.xu@gmail.com>
+ <159216218770.30485.1172665077342708998@45ef0f9c86ae>
 MIME-Version: 1.0
-In-Reply-To: <87a714bvy6.fsf@dusky.pond.sub.org>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=mprivozn@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 02:45:57
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <159216218770.30485.1172665077342708998@45ef0f9c86ae>
+Received-SPF: pass client-ip=2607:f8b0:4864:20::644;
+ envelope-from=coiby.xu@gmail.com; helo=mail-pl1-x644.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,48 +102,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Igor Mammedov <imammedo@redhat.com>, Liu Jingqi <jingqi.liu@intel.com>,
- Tao Xu <tao3.xu@intel.com>, qemu-devel@nongnu.org,
- "Michael S. Tsirkin" <mst@redhat.com>
+Cc: kwolf@redhat.com, bharatlkmlkvm@gmail.com, stefanha@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/15/20 10:00 AM, Markus Armbruster wrote:
-> Cc: the people involved in commit c412a48d4d "numa: Extend CLI to
-> provide memory side cache information".
-> 
-> Michal Privoznik <mprivozn@redhat.com> writes:
-> 
->> The documentation to `-numa hmat-cache` says that @node-id, @size
->> and @level are the only required attributes. The rest
->> (@associativity, @policy and @line) is optional. Well, not quite
->> - if I try to start QEMU with only the three required attributes
->> defined the QAPI code is complaining about associativity missing.
-> 
-> Only because @associativity visited first.
-> 
->> According to QAPI all attributes are required. Make the docs
->> reflect that.
-> 
-> Correct.
-> 
->> Signed-off-by: Michal Privoznik <mprivozn@redhat.com>
->> ---
->>   qemu-options.hx | 4 ++--
->>   1 file changed, 2 insertions(+), 2 deletions(-)
->>
+On Sun, Jun 14, 2020 at 12:16:28PM -0700, no-reply@patchew.org wrote:
+>Patchew URL: https://patchew.org/QEMU/20200614183907.514282-1-coiby.xu@gmail.com/
+>
+>
+>
+>Hi,
+>
+>This series failed the asan build test. Please find the testing commands and
+>their output below. If you have Docker installed, you can probably reproduce it
+>locally.
+>
+>=== TEST SCRIPT BEGIN ===
+>#!/bin/bash
+>export ARCH=x86_64
+>make docker-image-fedora V=1 NETWORK=1
+>time make docker-test-debug@fedora TARGET_LIST=x86_64-softmmu J=14 NETWORK=1
+>=== TEST SCRIPT END ===
+>
+>  CC      stubs/vm-stop.o
+>  CC      ui/input-keymap.o
+>  CC      qemu-keymap.o
+>/tmp/qemu-test/src/util/vhost-user-server.c:142:30: error: use of undeclared identifier 'VHOST_MEMORY_MAX_NREGIONS'
+>                             VHOST_MEMORY_MAX_NREGIONS, nfds + nfds_t);
+>                             ^
+>
+>The full log is available at
+>http://patchew.org/logs/20200614183907.514282-1-coiby.xu@gmail.com/testing.asan/?type=message.
 
-> 
-> Assuming non-optional is what we want:
-> Reviewed-by: Markus Armbruster <armbru@redhat.com>
-> 
+I couldn't re-produce this error locally for both docker-test-quick@centos7
+and this docker test. And I can't see any reason for this error to occur since
+VHOST_MEMORY_MAX_NREGIONS is defined in contrib/libvhost-user/libvhost-user.h
+which has been included by util/vhost-user-server.h.
 
-Indeed, it is:
-
-https://lists.nongnu.org/archive/html/qemu-devel/2020-05/msg08411.html
-
-Thanks,
-Michal
-
+--
+Best regards,
+Coiby
 
