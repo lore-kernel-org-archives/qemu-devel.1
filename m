@@ -6,74 +6,75 @@ X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFC93C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 10:18:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7759C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 10:19:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A7AFD20707
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 10:18:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7F5D920707
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 10:19:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hhgTb9vw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7AFD20707
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="P5vQp/dd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F5D920707
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51710 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52734 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jl8g7-0002m9-SH
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 06:18:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55656)
+	id 1jl8ga-0003Cb-Q9
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 06:19:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56226)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jl8df-0000im-IA
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 06:16:19 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:39840)
+ id 1jl8fM-0002Dc-6w
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 06:18:04 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:46171)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jl8dd-0007Pe-6w
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 06:16:19 -0400
-Received: by mail-oi1-x244.google.com with SMTP id d67so18720611oig.6
- for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 03:16:16 -0700 (PDT)
+ id 1jl8fK-0007hA-OP
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 06:18:03 -0400
+Received: by mail-oi1-x243.google.com with SMTP id 25so18709393oiy.13
+ for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 03:18:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=iOwywz5A6+76u6vWYLIS/BZrh1ORr7H8LGCueT1K7Mw=;
- b=hhgTb9vwRHyWB8OzXACpruAMD/yap1hTtL+dVVAyJ2u1pW2N293LY8WocecDxdUDAO
- t+vAiG8rNKu2dxl9SqdhH61VjzMsIGvkZZ3ofmslinVi0qd3lg+2zCkooWHcHt9mlKlJ
- +8lRdpReL4idYM2PSytrVMDDRdX1xWFwLTzK3cfubpszk6LkbV9k+xwf5oj/S+zULzLS
- ADMEOBzrccmIHLHoNIi/8pe4PjTrp7KajuhwTh2q8CBd8huF0cG0N2vy3Ga1q11z49Jc
- luEaScNMVvgo0zcvjgt04s6OVX/GVCFqAiJcpXS1IuzCIWR5HqfO0pEJvQRoT0JCJmup
- fuKA==
+ bh=V90nUl0nGN3ZaSTqSpnvxDZFfC3709HrtSe5tJwmIJw=;
+ b=P5vQp/ddutgi3LHR+7Td0t2DPWhFb5tL9Tr2PLVs0W8y3WQipHMlVhc7xHDOs7efWL
+ t32bbhaypKjhijmt8x4Bc8EZU+e/umRdkqdni0neSo1nEKff0IdCd6CXdXc8Dgv+xAqQ
+ 3ed4CdJ6WJO13/vsWgQgpddnkHjsNxxajpY3kztL7PeqhneJTyNCfIQ6KzUuIhTS4W7J
+ 7siv05gt/wHz2RB0Y9b1qNfRtLbqh5tzwsuBcXgmw/FDFXLiCJvw0DNglyHnDq2lpVtP
+ 1qnxcfeZDCbkcx2MeRTeKzUN7lEFf7xIjDqWEnYtlQ4j6iiLgVWE9Squw3kNuQHqVas5
+ vddA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=iOwywz5A6+76u6vWYLIS/BZrh1ORr7H8LGCueT1K7Mw=;
- b=Jle6lfNvTrPv39qIslmUgSlEpqo+Xi+wszP/EPU9El73CwEMudi4TQMzo9vUeEbUpP
- r3PjInbtKGu9/lk0NBn9Ei2lyf/isVYXcEHdYgTPr4xmr1KCcIauwI4F/Nvxub7rkXfS
- guJx5kmjhHJ/IKccWybdfKS0Q7UxAj2dl/4CHd8RR1rCErB4kPxHngubrnYaXmcPJYd6
- SYVNDCLmmSMuvx6Sc2uhgTGSjsHaz+ZZyMicytc7tRIBCqtqiLQ7EUbKb2bZJAlUSnQY
- SkYuzKUJsqAnmLnFxN9Fopzw6rI8rkFkUSIthH5i8fp/LPhFJQY8XFbXv/L1RDmeMc+J
- A0DQ==
-X-Gm-Message-State: AOAM530/NeCRk2DzVC6ttXxWKHA+DgCiewUx6lUSwBgfDV6IfWVe/7vw
- tWCWhko/us1FWzVKPPVOQur1IOM/RRkX/2Xx+/Yx5Q==
-X-Google-Smtp-Source: ABdhPJzBFy6c6eX2hRkwuPhEZfXVsfV3bWItf2t3kUDD6vcpvEmHiaZgpXouff7vGuVS5Ryu52DEfdlIDg77/Hjai68=
-X-Received: by 2002:aca:1a07:: with SMTP id a7mr2688464oia.163.1592302575964; 
- Tue, 16 Jun 2020 03:16:15 -0700 (PDT)
+ bh=V90nUl0nGN3ZaSTqSpnvxDZFfC3709HrtSe5tJwmIJw=;
+ b=segu1diBa+kn2m74pwd+tfJvsQyAhzP73n76ZS1p00+mQ5Un1qjsFk5XESxZVrtykc
+ Eb9Xe17HqszcaLRzbQpGJ5OKEeqsIpAMYtoY6rVAjS3EvZ6u4NC7niekb2wE6UpLXqvv
+ GHIJkMfZDKXb00/CLOE/zth9wFqy+UfrEQPYYljt6Gq+CwTWxK+os5Q2G/qbhhHOs8hk
+ yotqrnfbYuP69PV4qU9u4kFkRmUFZ8es1xuHFyNfzliKlO0QdzvFFNvsQFcU3leCE5vx
+ BtUdK8CbrqxXU2PCM49pIsnm8ptHAdSwLVnTnu0LtMdOgrsuTK4fY3Z66ExEJ+z5v+W5
+ HVCA==
+X-Gm-Message-State: AOAM5305A/pivYjQMPWwUIOWXLHrX/Sazm41mxQ6ShuDnJkFTF6OUbcO
+ twkZlpZUfZZH6cWDX4oPEXDbVGM3mbKqc3DyYfwUhA==
+X-Google-Smtp-Source: ABdhPJyipYgxY25bgsz+lsVMrxqkyzW6DOMmAnKA8Dzjlkj5qsX+PDFCJOGpkaG2zY9ojiWYDMMYFs0NxEXUn5nCN2I=
+X-Received: by 2002:aca:1a07:: with SMTP id a7mr2693048oia.163.1592302681579; 
+ Tue, 16 Jun 2020 03:18:01 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200616063157.16389-1-f4bug@amsat.org>
- <20200616063157.16389-3-f4bug@amsat.org>
-In-Reply-To: <20200616063157.16389-3-f4bug@amsat.org>
+ <20200616063157.16389-4-f4bug@amsat.org>
+In-Reply-To: <20200616063157.16389-4-f4bug@amsat.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 16 Jun 2020 11:16:05 +0100
-Message-ID: <CAFEAcA99=aiO3q+c2NnaSwax-6BusH0OREr5t2DesccNUA2HvA@mail.gmail.com>
-Subject: Re: [PATCH 2/7] hw/arm/mps2: Rename dualtimer as apb-dualtimer
+Date: Tue, 16 Jun 2020 11:17:50 +0100
+Message-ID: <CAFEAcA9335-h=44X-kRMd3vSaGqeRwJnFtWkGUbzt3jeChNEmw@mail.gmail.com>
+Subject: Re: [PATCH 3/7] hw/arm/mps2: Add CMSDK APB watchdog as unimplemented
+ device
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::244;
- envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x244.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::243;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x243.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -105,10 +106,11 @@ Sender: "Qemu-devel"
 On Tue, 16 Jun 2020 at 07:32, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>=
  wrote:
 >
-> The dualtimer is connected to AMBA APB.
+> Register the watchdog peripheral as unimplemented to better
+> follow its accesses, for example booting Zephyr:
 
-True, but that doesn't mean we need to name it "apb-something".
-The AN385 TRM just calls it "Dual timer".
+We have a TYPE_CMSDK_APB_WATCHDOG device; so we could use
+that, I think ?
 
 thanks
 -- PMM
