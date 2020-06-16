@@ -2,74 +2,69 @@ Return-Path: <SRS0=f7ls=75=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A662DC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 15:19:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4904C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 15:22:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8294A208B3
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 15:19:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8294A208B3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 909C22082F
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 15:22:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 909C22082F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45412 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54458 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlDMx-0005Ya-QT
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 11:19:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40900)
+	id 1jlDQ4-00011y-R9
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 11:22:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43900)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jlD6x-0000ss-Gq
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 11:02:52 -0400
-Resent-Date: Tue, 16 Jun 2020 11:02:51 -0400
-Resent-Message-Id: <E1jlD6x-0000ss-Gq@lists.gnu.org>
-Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21302)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jlD6t-0006YQ-CC
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 11:02:51 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1592319756; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=h0XIgXAB9X4zhuW+QSpUIENl8ykqJsblnJGAkPWkzxI3ogGjl3SkQOCMMfj0JMmA1efPI0s0iTrgVb1b8encn+39XzJjWgp1t7qhCSrCTqG0gDGQd1fdcbNABovQcMqHHtSgho4lu3R5Nb7w2hdgG+yBw399k6VON1HJm0eVHlE=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1592319756;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=WTFJ0lCrrgZ+EQsCRS7VifNq1WtLP58Zg/tp/gkyi50=; 
- b=VGdHlXvdSYE060vAh7Z5sVD5xPMLJsww0lyc0vP2b4thD6GPgvaYRANDlWasdmSmCuOLAqd5Q+sB6vVen85lydzckCQewSi3DID7uYS3DwVGwYPjfULhKMCgD6Lz2LwhAk+fj/CJNhumQns7x/bsqEn2diPoXzvs+Vebib3kKLc=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1592319752260462.925225260788;
- Tue, 16 Jun 2020 08:02:32 -0700 (PDT)
-Message-ID: <159231975128.8107.705730976028764844@d1fd068a5071>
-Subject: Re: [PATCH v4 0/6] Add strace support for printing arguments of
- selected syscalls
-In-Reply-To: <20200616103927.20222-1-filip.bozuta@syrmia.com>
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jlDIf-0007er-Hf
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 11:14:57 -0400
+Received: from 9.mo1.mail-out.ovh.net ([178.32.108.172]:50200)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jlDId-0001K1-AP
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 11:14:57 -0400
+Received: from player761.ha.ovh.net (unknown [10.108.35.240])
+ by mo1.mail-out.ovh.net (Postfix) with ESMTP id B320F1BFB9C
+ for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 17:14:45 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player761.ha.ovh.net (Postfix) with ESMTPSA id D09BE136F4EEA;
+ Tue, 16 Jun 2020 15:14:41 +0000 (UTC)
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-99G003d4a0efd5-a534-45b8-8147-0892b4cc63e6,6D1193CAFB0197A83E26607BB2BE83A43F9AE14F)
+ smtp.auth=groug@kaod.org
+Date: Tue, 16 Jun 2020 17:14:40 +0200
+From: Greg Kurz <groug@kaod.org>
+To: Michael Roth <mdroth@linux.vnet.ibm.com>
+Subject: Re: [PATCH 72/78] 9p: Lock directory streams with a CoMutex
+Message-ID: <20200616171440.172f1173@bahia.lan>
+In-Reply-To: <20200616141547.24664-73-mdroth@linux.vnet.ibm.com>
+References: <20200616141547.24664-1-mdroth@linux.vnet.ibm.com>
+ <20200616141547.24664-73-mdroth@linux.vnet.ibm.com>
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: filip.bozuta@syrmia.com
-Date: Tue, 16 Jun 2020 08:02:32 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o53.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 10:15:56
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 16277416429476288924
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedrudejtddgkeelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepheekhfdtheegheehjeeludefkefhvdelfedvieehhfekhfdufffhueeuvdfftdfhnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejiedurdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
+Received-SPF: pass client-ip=178.32.108.172; envelope-from=groug@kaod.org;
+ helo=9.mo1.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 11:14:46
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
 X-Spam_score_int: -18
 X-Spam_score: -1.9
 X-Spam_bar: -
 X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -82,54 +77,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: qemu-devel@nongnu.org, laurent@vivier.eu
+Cc: Christian Schoenebeck <qemu_oss@crudebyte.com>, qemu-devel@nongnu.org,
+ qemu-stable@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDYxNjEwMzkyNy4yMDIy
-Mi0xLWZpbGlwLmJvenV0YUBzeXJtaWEuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRv
-IGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1v
-cmUgaW5mb3JtYXRpb246CgpTdWJqZWN0OiBbUEFUQ0ggdjQgMC82XSBBZGQgc3RyYWNlIHN1cHBv
-cnQgZm9yIHByaW50aW5nIGFyZ3VtZW50cyBvZiBzZWxlY3RlZCBzeXNjYWxscwpUeXBlOiBzZXJp
-ZXMKTWVzc2FnZS1pZDogMjAyMDA2MTYxMDM5MjcuMjAyMjItMS1maWxpcC5ib3p1dGFAc3lybWlh
-LmNvbQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNl
-IGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFt
-ZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcg
-LS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwg
-LS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClN3aXRjaGVkIHRvIGEg
-bmV3IGJyYW5jaCAndGVzdCcKNzU2NjA0ZSBsaW51eC11c2VyOiBBZGQgc3RyYWNlIHN1cHBvcnQg
-Zm9yIHByaW50aW5nIGFyZ3VtZW50cyBvZiBmYWxsb2NhdGUoKQoyNTY4MGQ1IGxpbnV4LXVzZXI6
-IEFkZCBzdHJhY2Ugc3VwcG9ydCBmb3IgcHJpbnRpbmcgYXJndW1lbnRzIG9mIGNob3duKCkvbGNo
-b3duKCkKY2FkZDY1ZCBsaW51eC11c2VyOiBBZGQgc3RyYWNlIHN1cHBvcnQgZm9yIHByaW50aW5n
-IGFyZ3VtZW50cyBvZiBsc2VlaygpCmViNDA2MjcgbGludXgtdXNlcjogQWRkIHN0cmFjZSBzdXBw
-b3J0IGZvciBwcmludGluZyBhcmd1bWVudCBvZiBzeXNjYWxscyB1c2VkIGZvciBleHRlbmRlZCBh
-dHRyaWJ1dGVzCjQ3MjI2ZTggbGludXgtdXNlcjogQWRkIHN0cmFjZSBzdXBwb3J0IGZvciBhIGdy
-b3VwIG9mIHN5c2NhbGxzCjNlNTMxZDAgbGludXgtdXNlcjogRXh0ZW5kIHN0cmFjZSBzdXBwb3J0
-IHRvIGVuYWJsZSBhcmd1bWVudCBwcmludGluZyBhZnRlciBzeXNjYWxsIGV4ZWN1dGlvbgoKPT09
-IE9VVFBVVCBCRUdJTiA9PT0KMS82IENoZWNraW5nIGNvbW1pdCAzZTUzMWQwNDcwZDIgKGxpbnV4
-LXVzZXI6IEV4dGVuZCBzdHJhY2Ugc3VwcG9ydCB0byBlbmFibGUgYXJndW1lbnQgcHJpbnRpbmcg
-YWZ0ZXIgc3lzY2FsbCBleGVjdXRpb24pCjIvNiBDaGVja2luZyBjb21taXQgNDcyMjZlODY3NGE3
-IChsaW51eC11c2VyOiBBZGQgc3RyYWNlIHN1cHBvcnQgZm9yIGEgZ3JvdXAgb2Ygc3lzY2FsbHMp
-CjMvNiBDaGVja2luZyBjb21taXQgZWI0MDYyN2IxMTk2IChsaW51eC11c2VyOiBBZGQgc3RyYWNl
-IHN1cHBvcnQgZm9yIHByaW50aW5nIGFyZ3VtZW50IG9mIHN5c2NhbGxzIHVzZWQgZm9yIGV4dGVu
-ZGVkIGF0dHJpYnV0ZXMpCjQvNiBDaGVja2luZyBjb21taXQgY2FkZDY1ZDlmODY2IChsaW51eC11
-c2VyOiBBZGQgc3RyYWNlIHN1cHBvcnQgZm9yIHByaW50aW5nIGFyZ3VtZW50cyBvZiBsc2Vlaygp
-KQo1LzYgQ2hlY2tpbmcgY29tbWl0IDI1NjgwZDVlMWIwMSAobGludXgtdXNlcjogQWRkIHN0cmFj
-ZSBzdXBwb3J0IGZvciBwcmludGluZyBhcmd1bWVudHMgb2YgY2hvd24oKS9sY2hvd24oKSkKNi82
-IENoZWNraW5nIGNvbW1pdCA3NTY2MDRlZWZlMDYgKGxpbnV4LXVzZXI6IEFkZCBzdHJhY2Ugc3Vw
-cG9ydCBmb3IgcHJpbnRpbmcgYXJndW1lbnRzIG9mIGZhbGxvY2F0ZSgpKQpFUlJPUjogc3RvcmFn
-ZSBjbGFzcyBzaG91bGQgYmUgYXQgdGhlIGJlZ2lubmluZyBvZiB0aGUgZGVjbGFyYXRpb24KIzY5
-OiBGSUxFOiBsaW51eC11c2VyL3N0cmFjZS5jOjExNDY6CitVTlVTRUQgc3RhdGljIHN0cnVjdCBm
-bGFncyBmYWxsb2NfZmxhZ3NbXSA9IHsKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMTA0
-IGxpbmVzIGNoZWNrZWQKClBhdGNoIDYvNiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZp
-ZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRo
-ZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09
-IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBm
-dWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAyMDA2MTYx
-MDM5MjcuMjAyMjItMS1maWxpcC5ib3p1dGFAc3lybWlhLmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gv
-P3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNo
-ZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBw
-YXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+Cc'ing co-maintainer Christian Schoenebeck.
+
+Christian,
+
+If there are some more commits you think are worth being cherry picked
+for QEMU 4.2.1, please inform Michael before freeze on 2020-06-22.
+
+Cheers,
+
+--
+Greg
+
+On Tue, 16 Jun 2020 09:15:41 -0500
+Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
+
+> From: Greg Kurz <groug@kaod.org>
+> 
+> Locking was introduced in QEMU 2.7 to address the deprecation of
+> readdir_r(3) in glibc 2.24. It turns out that the frontend code is
+> the worst place to handle a critical section with a pthread mutex:
+> the code runs in a coroutine on behalf of the QEMU mainloop and then
+> yields control, waiting for the fsdev backend to process the request
+> in a worker thread. If the client resends another readdir request for
+> the same fid before the previous one finally unlocked the mutex, we're
+> deadlocked.
+> 
+> This never bit us because the linux client serializes readdir requests
+> for the same fid, but it is quite easy to demonstrate with a custom
+> client.
+> 
+> A good solution could be to narrow the critical section in the worker
+> thread code and to return a copy of the dirent to the frontend, but
+> this causes quite some changes in both 9p.c and codir.c. So, instead
+> of that, in order for people to easily backport the fix to older QEMU
+> versions, let's simply use a CoMutex since all the users for this
+> sit in coroutines.
+> 
+> Fixes: 7cde47d4a89d ("9p: add locking to V9fsDir")
+> Reviewed-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
+> Message-Id: <158981894794.109297.3530035833368944254.stgit@bahia.lan>
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+> (cherry picked from commit ed463454efd0ac3042ff772bfe1b1d846dc281a5)
+> Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+> ---
+>  hw/9pfs/9p.h | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/hw/9pfs/9p.h b/hw/9pfs/9p.h
+> index 3904f82901..069c86333f 100644
+> --- a/hw/9pfs/9p.h
+> +++ b/hw/9pfs/9p.h
+> @@ -186,22 +186,22 @@ typedef struct V9fsXattr
+>  
+>  typedef struct V9fsDir {
+>      DIR *stream;
+> -    QemuMutex readdir_mutex;
+> +    CoMutex readdir_mutex;
+>  } V9fsDir;
+>  
+>  static inline void v9fs_readdir_lock(V9fsDir *dir)
+>  {
+> -    qemu_mutex_lock(&dir->readdir_mutex);
+> +    qemu_co_mutex_lock(&dir->readdir_mutex);
+>  }
+>  
+>  static inline void v9fs_readdir_unlock(V9fsDir *dir)
+>  {
+> -    qemu_mutex_unlock(&dir->readdir_mutex);
+> +    qemu_co_mutex_unlock(&dir->readdir_mutex);
+>  }
+>  
+>  static inline void v9fs_readdir_init(V9fsDir *dir)
+>  {
+> -    qemu_mutex_init(&dir->readdir_mutex);
+> +    qemu_co_mutex_init(&dir->readdir_mutex);
+>  }
+>  
+>  /*
+
 
