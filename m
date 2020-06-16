@@ -2,85 +2,91 @@ Return-Path: <SRS0=f7ls=75=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21352C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 12:33:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97197C433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 12:35:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DECC920734
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 12:33:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 64D0B2071A
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 12:35:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RUNXXPwm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DECC920734
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IZkspfNQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64D0B2071A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44504 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48380 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlAmf-0002nI-35
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 08:33:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56028)
+	id 1jlAo3-0004Pm-JE
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 08:35:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55886)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jlAlc-0001Zb-1h
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 08:32:40 -0400
-Received: from mail-oo1-xc2d.google.com ([2607:f8b0:4864:20::c2d]:43220)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jlAla-00056q-5k
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 08:32:39 -0400
-Received: by mail-oo1-xc2d.google.com with SMTP id i4so1297315ooj.10
- for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 05:32:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=sPlLIq2GHsQqLUqC9tReo7ZRmDa6wLM9/aEI3GPriG0=;
- b=RUNXXPwmEfi/JBZpovCCZpZb5qRZwTirpoVpDG6pSDAnDTlT6sSbR1sdiEm7239b+7
- TLwEAY/Syba7XMtPHH/Bwitsyin+mhgn4dvXBF6Po5/3qdlPLDsUSGZjQwdd19vqbrPq
- PnIBigeL142g3OVlycIalV81GYOdNJK/CNrhwRoEu74PiV7I+MFYT0LcVjbdY3bBi4V+
- wxsY9XeIhf+U6syi0hW6+TAtGrA507/paRZYJ/XAK4VvEQRyW4Ote06E3gPGCr/ivjwU
- rYh4C3/QcrIJYka9ZvpY9zmuAanAQF7yJq/tSeEQMq5f8fOOPxHjzfobIsKE54YASphy
- cC2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=sPlLIq2GHsQqLUqC9tReo7ZRmDa6wLM9/aEI3GPriG0=;
- b=NFjiey/wruUZGcuAi5CVPhgjx/auJ0LumiPbXSLDpxiU87eQraEGt4+4we4q8s5g8l
- T9t68/YmQ7ydJEnJDpA5VgEJo+vf9qLwmEkcGi6DDLk93O1rCWVZeC9UUdoZ9X9fdyQQ
- THIndai/+ClC5YveyJFVsN7GojnPflQa7rpH2h8ZgcihBzDXo4yUGMVRfvwc3qv7pCpt
- tbgChtDonp6BkMZwdZu/wz5FVzCAZPDX/H8GpzpEQHuCDdhOXCTdXJEZ0XHibfNs1/EQ
- imP4z1Oyud6oepWCgCqB8OimPohnQtcWVdVxkg2eumjok2JkvocC9rqNhGY6BUA4MUAK
- SLXw==
-X-Gm-Message-State: AOAM533AcQUf0PJ70EAHvv+ZrH7Ik77ah8DPnIBB9TWYa0mMOUXuVOfX
- Hbtp7ih0+S6a1x20a6Vp20BzBcWG/DcB0/UomCzDyc4e6QzOAQ==
-X-Google-Smtp-Source: ABdhPJyc0hX4nFsLbQck7otwhCpLATLJIThxkgWe/AiK2vlcOo4YPYcwkp8YAcQMG3YjYuATFchRRi9L48vEGfjLrVw=
-X-Received: by 2002:a4a:221a:: with SMTP id f26mr2094875ooa.69.1592310756962; 
- Tue, 16 Jun 2020 05:32:36 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1jlAl5-0000xP-OU
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 08:32:08 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23892
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1jlAkt-00052v-Nb
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 08:32:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592310713;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=m9AXSeX5xIkJ3UUPH3ig+R68TNnlcy7TUGSiJzPw30k=;
+ b=IZkspfNQZ1LaEm8nV7D9tskyMFreUHnxYLH1LlmJeXDrpJzQo640z4sMnJpspzj4Pob5SD
+ Wv6+LzGPNZG2HKaudsvVR9aGdmLwiINUuVVKDdyyRSFfhrUsJkdXiqOtzQW5eAO5W+VAYl
+ 2As3N7dLYmlW6k9i2nVfi9Xp1lEoxG8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-213-LBNHN-PzOhi6cuuav7jHOw-1; Tue, 16 Jun 2020 08:31:52 -0400
+X-MC-Unique: LBNHN-PzOhi6cuuav7jHOw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1A783835B7C;
+ Tue, 16 Jun 2020 12:31:51 +0000 (UTC)
+Received: from [10.36.114.197] (ovpn-114-197.ams2.redhat.com [10.36.114.197])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E6D08101E675;
+ Tue, 16 Jun 2020 12:31:48 +0000 (UTC)
+Subject: Re: [PATCH v2 1/5] tpm_tis: Allow lowering of IRQ also when locality
+ is not active
+To: Stefan Berger <stefanb@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+References: <20200615142327.671546-1-stefanb@linux.vnet.ibm.com>
+ <20200615142327.671546-2-stefanb@linux.vnet.ibm.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <14b3f62b-3aa0-1b18-c39e-ef2902826bb9@redhat.com>
+Date: Tue, 16 Jun 2020 14:31:46 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-References: <1592289944-13727-1-git-send-email-jasowang@redhat.com>
-In-Reply-To: <1592289944-13727-1-git-send-email-jasowang@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 16 Jun 2020 13:32:26 +0100
-Message-ID: <CAFEAcA-7sG8_oOL+f=Q8dSevX-c26GeAcrLU6Ah6mOApfzizKQ@mail.gmail.com>
-Subject: Re: [PULL 00/33] Net patches
-To: Jason Wang <jasowang@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::c2d;
- envelope-from=peter.maydell@linaro.org; helo=mail-oo1-xc2d.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200615142327.671546-2-stefanb@linux.vnet.ibm.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.120;
+ envelope-from=eric.auger@redhat.com; helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 02:46:07
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,50 +99,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: marcandre.lureau@redhat.com, Stefan Berger <stefanb@linux.ibm.com>,
+ philmd@redhat.com, mkedzier@redhat.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 16 Jun 2020 at 07:45, Jason Wang <jasowang@redhat.com> wrote:
->
-> The following changes since commit 7d3660e79830a069f1848bb4fa1cdf8f666424fb:
->
->   Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2020-06-12 23:06:22 +0100)
->
-> are available in the git repository at:
->
->   https://github.com/jasowang/qemu.git tags/net-pull-request
->
-> for you to fetch changes up to 955aab203f932b8a7c23ff9c58ba036997cb3ed8:
->
->   net: Drop the NetLegacy structure, always use Netdev instead (2020-06-16 14:40:40 +0800)
->
-> ----------------------------------------------------------------
->
-> ----------------------------------------------------------------
+Hi Stefan,
 
-Hi; I'm afraid this fails to build (all hosts):
+On 6/15/20 4:23 PM, Stefan Berger wrote:
+> From: Stefan Berger <stefanb@linux.ibm.com>
+> 
+> This patch fixes a bug that occurs when using interrupts. It
+> allows to lower the IRQ also when a locality is not active.
+> 
+> Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-hw/net/virtio-net.o: In function `virtio_net_device_realize':
-/home/pm215/qemu/hw/net/virtio-net.c:3380: undefined reference to
-`net_rx_pkt_init'
-hw/net/virtio-net.o: In function `virtio_net_device_unrealize':
-/home/pm215/qemu/hw/net/virtio-net.c:3418: undefined reference to
-`net_rx_pkt_uninit'
-hw/net/virtio-net.o: In function `virtio_net_process_rss':
-/home/pm215/qemu/hw/net/virtio-net.c:1607: undefined reference to
-`net_rx_pkt_set_protocols'
-/home/pm215/qemu/hw/net/virtio-net.c:1609: undefined reference to
-`net_rx_pkt_get_protocols'
-/home/pm215/qemu/hw/net/virtio-net.c:1625: undefined reference to
-`net_rx_pkt_calc_rss_hash'
-/home/pm215/qemu/hw/net/virtio-net.c:1613: undefined reference to
-`net_rx_pkt_get_ip6_info'
-/home/pm215/qemu/hw/net/virtio-net.c:1610: undefined reference to
-`net_rx_pkt_get_ip4_info'
-collect2: error: ld returned 1 exit status
+Thanks
 
-thanks
--- PMM
+Eric
+> ---
+
+>  hw/tpm/tpm_tis_common.c | 4 ----
+>  1 file changed, 4 deletions(-)
+> 
+> diff --git a/hw/tpm/tpm_tis_common.c b/hw/tpm/tpm_tis_common.c
+> index 1af4bce139..0f42696f1f 100644
+> --- a/hw/tpm/tpm_tis_common.c
+> +++ b/hw/tpm/tpm_tis_common.c
+> @@ -601,10 +601,6 @@ static void tpm_tis_mmio_write(void *opaque, hwaddr addr,
+>          /* hard wired -- ignore */
+>          break;
+>      case TPM_TIS_REG_INT_STATUS:
+> -        if (s->active_locty != locty) {
+> -            break;
+> -        }
+> -
+>          /* clearing of interrupt flags */
+>          if (((val & TPM_TIS_INTERRUPTS_SUPPORTED)) &&
+>              (s->loc[locty].ints & TPM_TIS_INTERRUPTS_SUPPORTED)) {
+> 
+
 
