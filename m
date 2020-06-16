@@ -2,91 +2,90 @@ Return-Path: <SRS0=f7ls=75=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 377ECC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 06:27:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFF2AC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 06:33:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EE3DE206DB
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 06:27:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B1108206DB
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 06:33:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a0fu9NwU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE3DE206DB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UuwfCX5C"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1108206DB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41812 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47476 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jl54Q-0006ko-Vo
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 02:27:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38668)
+	id 1jl5AR-00018E-SF
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 02:33:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39292)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jl53f-0006LI-I8
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 02:26:55 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:28900
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jl53d-0002Y1-7W
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 02:26:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592288810;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=gScMv/ixCRowTYN1Gm/ommUykE3DDGimSqN6zY+IDhE=;
- b=a0fu9NwUU4nzKvXlrXtKt3ohDj8UqGQ6KffrUbcKxiT/hYZx8cSAhFaeLiO8Ho6eOjNDC7
- B0PMAjllsUjj5NQGqzFBoJ8nHxTFkwkU80VgxLWmGokli3QOj/iyJFHsDdnejMwIAd7Lfy
- r5vndOv0vCfFHpZMMeYr1mJPZ9gaDm0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-56-E6W9wpbDPPar6mfEIdDBWA-1; Tue, 16 Jun 2020 02:26:47 -0400
-X-MC-Unique: E6W9wpbDPPar6mfEIdDBWA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1D500188360A
- for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 06:26:47 +0000 (UTC)
-Received: from [10.72.13.124] (ovpn-13-124.pek2.redhat.com [10.72.13.124])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 28ECF7CAA9;
- Tue, 16 Jun 2020 06:26:45 +0000 (UTC)
-Subject: Re: [PATCH v3 0/2] net: Drop legacy "name" from -net and remove
- NetLegacy
-To: Thomas Huth <thuth@redhat.com>
-References: <20200518180103.32484-1-thuth@redhat.com>
- <ccb94bbf-62f8-a15c-c7ba-5d2da724757f@redhat.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <ff5d1188-3b67-fc3f-fa47-77f5435f34bf@redhat.com>
-Date: Tue, 16 Jun 2020 14:26:44 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jl58d-0007ty-E0; Tue, 16 Jun 2020 02:32:03 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:35030)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jl58b-0003L7-SB; Tue, 16 Jun 2020 02:32:03 -0400
+Received: by mail-wr1-x443.google.com with SMTP id x14so19470515wrp.2;
+ Mon, 15 Jun 2020 23:32:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=f9zWhfeSHYsZv9FAIqlLBjo48TjWhw0wg+NWuxqj8vw=;
+ b=UuwfCX5CkOhlw3e/BftIxvfQayuTzx3I9EwR96/Q4gc+VJQqBuM5Bi9PBn7n5LI08W
+ qDBwQ7BGfTALa/vIdIiFxSjX5K9mBHhbMVECMF3VJ8P0mvRiU5DJJE4dMY6nTEQg4guA
+ GCYZx9dJBdCQkE1ZiI+sR7N4WapxJ7r4Thx0970cn10Z8egTLW6xTY5lQcPQ3XIrjIRT
+ UOAdcJwPlxWEYFHdRJmB7hdadnK+S2heEBwJxPpklDH+XCDZOMzPPgtN91x1jt2eTDYZ
+ eYnNqWfZvAJtDFICfxUvQNskSdLOCNQeP27YIZZxfMAcoovOZfeIdrCmvCxK123hzXrE
+ +sww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=f9zWhfeSHYsZv9FAIqlLBjo48TjWhw0wg+NWuxqj8vw=;
+ b=VkKERCh5xKPK18o8NV4O9mIAd4irfAWGiAWqVmjTseh2zbCgvRuBeJKJxxcUm646hI
+ qQH8QEFhmAKcMNLppD8wMVxAzEcMnAqBhkCS86d9iEvyKvMhkobzVptPRRX7D4q+Hwu7
+ MYZjC+6CKPAsd0YRif4ax+GoJlKU1w+PW8uk9XSiKpP+iY5SmC80dbh2Dv/6Jzaoaq5h
+ q8Mm2AM8EliF5P5NKP8S0ehmvXUJ8aR00SnLSK2fGJnS/ex0+I0VXx9qpKHncuHEu4tj
+ MLA6eufuxBRFQ++wc3ICHYhlnETZnof+96UzrnPSqLzIVYrt23xAYJDq8CQB6cbt9N79
+ 7XFg==
+X-Gm-Message-State: AOAM532fK873XbVEiJflyI+u0xnLaTTDA9XsWD8o299WzKU45AHaOO3T
+ uwyHiRVhrBAt9+Nf2MtPuKQbCoow
+X-Google-Smtp-Source: ABdhPJxVNuUa64NzNecRpVZiFLKHpmjTq1P2/rRqK/SPGevqFP38RXP3dXUv2rW7XhfLWHX8rKGTKg==
+X-Received: by 2002:a05:6000:1184:: with SMTP id
+ g4mr1282802wrx.46.1592289119471; 
+ Mon, 15 Jun 2020 23:31:59 -0700 (PDT)
+Received: from localhost.localdomain
+ (181.red-88-10-103.dynamicip.rima-tde.net. [88.10.103.181])
+ by smtp.gmail.com with ESMTPSA id t188sm2483250wmt.27.2020.06.15.23.31.58
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 15 Jun 2020 23:31:58 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 0/7] mps2: Add few more peripherals
+Date: Tue, 16 Jun 2020 08:31:50 +0200
+Message-Id: <20200616063157.16389-1-f4bug@amsat.org>
+X-Mailer: git-send-email 2.21.3
 MIME-Version: 1.0
-In-Reply-To: <ccb94bbf-62f8-a15c-c7ba-5d2da724757f@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=jasowang@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 02:01:17
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,49 +98,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Joaquin de Andres <me@xcancerberox.com.ar>, qemu-arm@nongnu.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Esteban Bosse <estebanbosse@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Few patches while playing with Zephyr:
 
-On 2020/6/15 下午8:06, Thomas Huth wrote:
-> On 18/05/2020 20.01, Thomas Huth wrote:
->> Since commit b4983c570c7a ("net: Remove deprecated [hub_id name] tuple of
->> 'hostfwd_add' / 'hostfwd_remove'"), the "name" parameter is not used
->> internally anymore. And it's been marked as deprecated since QEMU v3.1,
->> so it is time to remove the "name" parameter from -net now. Once this
->> has been done, we can also drop the obsolete NetLegacy structure since
->> there is no major difference between Netdev and NetLegacy anymore.
->>
->> v3:
->>   - Do not make "id" in Netdev optional, but rather assign a temporary
->>     "id" for -net before we call the options visitor function.
->>   - Changed some "void *" to "Netdev *" now
->>
->> v2:
->>   - Rebased to master (use the deprecated.rst instead of qemu-deprecated.texi)
->>
->> Thomas Huth (2):
->>    net: Drop the legacy "name" parameter from the -net option
->>    net: Drop the NetLegacy structure, always use Netdev instead
-> Ping!
->
-> Jason, do you think these patches are OK now, and if so, could you
-> please queue them for your next net pull request?
+- added i2c
+- added fpgaio
+- added gpio/wdg as unimp
 
+Unfortunately the blinkled sample app is not blinking.
 
-Queued.
+Zephyr ressources used:
+https://docs.zephyrproject.org/latest/boards/arm/mps2_an385/doc/index.html
 
-Sorry for the late.
+Philippe Mathieu-Daudé (7):
+  hw/arm/mps2: Rename CMSDK AHB peripheral region
+  hw/arm/mps2: Rename dualtimer as apb-dualtimer
+  hw/arm/mps2: Add CMSDK APB watchdog as unimplemented device
+  hw/arm/mps2: Add CMSDK AHB GPIO peripherals as unimplemented devices
+  hw/arm/mps2: Add I2C busses on FPGA APB
+  hw/arm/mps2: Map the FPGA I/O block
+  hw/misc/mps2-fpgaio: Implement push-buttons
 
-Thanks
+ include/hw/misc/mps2-fpgaio.h |  1 +
+ hw/arm/mps2.c                 | 29 +++++++++++++++++++++++++----
+ hw/misc/mps2-fpgaio.c         | 13 ++++++++++++-
+ 3 files changed, 38 insertions(+), 5 deletions(-)
 
-
->
->   Thanks,
->    Thomas
->
->
+-- 
+2.21.3
 
 
