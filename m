@@ -2,67 +2,66 @@ Return-Path: <SRS0=f7ls=75=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5168C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 07:49:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85C9FC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 07:51:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 90384207BC
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 07:49:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5035A206D7
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 07:51:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MyG5YaAT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90384207BC
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JwylSdOj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5035A206D7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38066 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40224 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jl6LM-0002CO-TP
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 03:49:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53360)
+	id 1jl6N6-0003ET-El
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 03:51:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53716)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <lvivier@redhat.com>)
- id 1jl6KT-0001lQ-OZ
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 03:48:21 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:57892
- helo=us-smtp-delivery-1.mimecast.com)
+ id 1jl6MM-0002iM-16
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 03:50:18 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:25467
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <lvivier@redhat.com>)
- id 1jl6KS-0007Nv-4v
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 03:48:21 -0400
+ id 1jl6MK-0007nX-Gd
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 03:50:17 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592293699;
+ s=mimecast20190719; t=1592293815;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=20twl59MC1L+CMr1NhPjT3cwchcGWmdRyMKn6N9TkFI=;
- b=MyG5YaATEU9dDIBueuAb3CoJZwKitDkVo/OHEkpQPM1YG9H83ci3pt/ouPIZa6V30GHlBf
- bJEk/UeAOR9Xp4zWib7J05OOi87cD1ubiKMvYL1bU+u91pcBFxbINrDo0bsxxEblerFyAI
- XR2ChNLA1TuKKy44paszs2q5qV6TAqI=
+ bh=qpHQyxUaZLKk/DajYq8h35//Vs8t5AhcFHTH44W8O0o=;
+ b=JwylSdOj99P3kO3HVhA82h9NEuppvZIqQdpDfh1CSjByQ8/57lveJp+o9XsHCdjqgIsWSj
+ bW1YnnBPsob7jRtt+Q2mSDwE2TlraU8Km0U2L4ZHHJX7MFvT5Z9thpApOSRb++S9ODR0yE
+ wuVXd3WoC8JNGVc8FljZNEUALJL2aVA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-382-w8FY8R7mPyC4IYwnEWrinw-1; Tue, 16 Jun 2020 03:48:17 -0400
-X-MC-Unique: w8FY8R7mPyC4IYwnEWrinw-1
+ us-mta-493-QQykJSdJORW6vJ9rMZehmQ-1; Tue, 16 Jun 2020 03:50:13 -0400
+X-MC-Unique: QQykJSdJORW6vJ9rMZehmQ-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 40E85835B52;
- Tue, 16 Jun 2020 07:48:15 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 166F7835B52;
+ Tue, 16 Jun 2020 07:50:11 +0000 (UTC)
 Received: from [10.36.112.71] (ovpn-112-71.ams2.redhat.com [10.36.112.71])
- by smtp.corp.redhat.com (Postfix) with ESMTP id F124E101E675;
- Tue, 16 Jun 2020 07:47:59 +0000 (UTC)
-Subject: Re: [RFC v3 2/8] vhost_net: use the function qemu_get_peer
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1FF291001B2B;
+ Tue, 16 Jun 2020 07:49:50 +0000 (UTC)
+Subject: Re: [RFC v3 3/8] virtio-bus: introduce queue_enabled method
 To: Cindy Lu <lulu@redhat.com>, mst@redhat.com, armbru@redhat.com,
  eblake@redhat.com, cohuck@redhat.com, jasowang@redhat.com
 References: <20200529140620.28759-1-lulu@redhat.com>
- <20200529140620.28759-3-lulu@redhat.com>
+ <20200529140620.28759-4-lulu@redhat.com>
 From: Laurent Vivier <lvivier@redhat.com>
 Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -118,21 +117,21 @@ Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
  pt0DCMMTbiYIUcrhX8eveCJtY7NGWNyxFCRkhxRuGcpwPmRVDwOl39MB3iTsRighiMnijkbL
  XiKoJ5CDVvX5yicNqYJPKh5MFXN1bvsBkmYiStMRbrD0HoY1kx5/VozBtc70OU0EB8Wrv9hZ
  D+Ofp0T3KOr1RUHvCZoLURfFhSQ=
-Message-ID: <3a973a13-27e8-eb89-537e-685816804346@redhat.com>
-Date: Tue, 16 Jun 2020 09:47:58 +0200
+Message-ID: <c0321600-c0ff-2269-be35-33095b443d13@redhat.com>
+Date: Tue, 16 Jun 2020 09:49:49 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200529140620.28759-3-lulu@redhat.com>
+In-Reply-To: <20200529140620.28759-4-lulu@redhat.com>
 Content-Language: en-US
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=lvivier@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 02:01:17
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=lvivier@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 02:46:07
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -166,55 +165,21 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 29/05/2020 16:06, Cindy Lu wrote:
-> user the qemu_get_peer to replace the old process
+> From: Jason Wang <jasowang@redhat.com>
 > 
-> Signed-off-by: Cindy Lu <lulu@redhat.com>
-> ---
->  hw/net/vhost_net.c | 14 +++++++++-----
->  1 file changed, 9 insertions(+), 5 deletions(-)
+> This patch introduces queue_enabled() method which allows the
+> transport to implement its own way to report whether or not a queue is
+> enabled.
 > 
-> diff --git a/hw/net/vhost_net.c b/hw/net/vhost_net.c
-> index 6b82803fa7..d1d421e3d9 100644
-> --- a/hw/net/vhost_net.c
-> +++ b/hw/net/vhost_net.c
-> @@ -306,7 +306,9 @@ int vhost_net_start(VirtIODevice *dev, NetClientState *ncs,
->      BusState *qbus = BUS(qdev_get_parent_bus(DEVICE(dev)));
->      VirtioBusState *vbus = VIRTIO_BUS(qbus);
->      VirtioBusClass *k = VIRTIO_BUS_GET_CLASS(vbus);
-> +    struct vhost_net *net;
->      int r, e, i;
-> +    NetClientState *peer;
->  
->      if (!k->set_guest_notifiers) {
->          error_report("binding does not support guest notifiers");
-> @@ -314,9 +316,9 @@ int vhost_net_start(VirtIODevice *dev, NetClientState *ncs,
->      }
->  
->      for (i = 0; i < total_queues; i++) {
-> -        struct vhost_net *net;
->  
-> -        net = get_vhost_net(ncs[i].peer);
-> +        peer = qemu_get_peer(ncs, i);
-> +        net = get_vhost_net(peer);
->          vhost_net_set_vq_index(net, i * 2);
->  
->          /* Suppress the masking guest notifiers on vhost user
-> @@ -335,7 +337,8 @@ int vhost_net_start(VirtIODevice *dev, NetClientState *ncs,
->      }
->  
->      for (i = 0; i < total_queues; i++) {
-> -        r = vhost_net_start_one(get_vhost_net(ncs[i].peer), dev);
-> +        peer = qemu_get_peer(ncs, i);
-> +        r = vhost_net_start_one(get_vhost_net(peer), dev);
->  
->          if (r < 0) {
->              goto err_start;
-> @@ -343,7 +346,7 @@ int vhost_net_start(VirtIODevice *dev, NetClientState *ncs,
->  
->          if (ncs[i].peer->vring_enable) {
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
 
-You can replace this "ncs[i].peer->vring_enable" by
-"peer->vring_enable"... and you do this later in PATCH 5/8.
+Cindy, you must add your signed-off-by on all the patch you send, after
+all the existing S-o-b.
+
+> 
+> 0005-virtio-bus-introduce-queue_enabled-method.patch
+
+bad cut&paste?
 
 Thanks,
 Laurent
