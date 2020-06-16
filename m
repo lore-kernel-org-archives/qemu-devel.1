@@ -2,139 +2,95 @@ Return-Path: <SRS0=f7ls=75=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0FF1C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 13:49:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11F81C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 13:52:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B53D520A8B
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 13:49:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D4A35207D3
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 13:52:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="Zf337Q6p"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B53D520A8B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nutanix.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GTsIpHFh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D4A35207D3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46458 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48800 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlBxm-0007Sv-VX
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 09:49:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50970)
+	id 1jlC0c-0000Cv-5Q
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 09:52:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51692)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ani.sinha@nutanix.com>)
- id 1jlBwk-0006wu-Kf
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 09:48:15 -0400
-Received: from mx0a-002c1b01.pphosted.com ([148.163.151.68]:52002)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ani.sinha@nutanix.com>)
- id 1jlBwi-0001iR-Fr
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 09:48:14 -0400
-Received: from pps.filterd (m0127839.ppops.net [127.0.0.1])
- by mx0a-002c1b01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 05GDdlMp015605; Tue, 16 Jun 2020 06:47:56 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
- h=from : to : cc :
- subject : date : message-id : references : in-reply-to : content-type :
- content-id : content-transfer-encoding : mime-version;
- s=proofpoint20171006; bh=ypyQk8j482ekX4dx6I5PPgRN0beVixXsd/w1lG0bRxo=;
- b=Zf337Q6pCf5RPlB4j2ZcWg9pIF0vp2faMDnNcUBqGNeWyhdig2TXLerFS0Mu91VPv/g+
- CoqApvRiT6RQ7+Fi7Zl2zDw8NI8HH61AbErJFhqLeysH1/jhXw41i/bA4T+4rfX+jRGI
- fr4BX7d23+UT3N44HBr2+gqzwo1XtuvwPkeqcqOqj8f/Vm0zk5ys2OdkwF4DI9oL5Bnt
- Fg8BGuu2JeXjKmBYMXwQtAKa5cKOQo50ilXk8m9w8XQQJBM5LykXCFjdPbS+3yqr1g0S
- SSFMvNnfbCzyr2ncE8dlemSOOKBFOLuOw/RBc03EII8pE2N9FBwolx00RoHVwH+erRFJ qg== 
-Received: from nam11-bn8-obe.outbound.protection.outlook.com
- (mail-bn8nam11lp2169.outbound.protection.outlook.com [104.47.58.169])
- by mx0a-002c1b01.pphosted.com with ESMTP id 31p041ukyd-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 16 Jun 2020 06:47:56 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=NdKS4hx6FNWg/MfFFvxX94OFY9/RmRPsGhru/PBVDgZixff7/RztaYG4uXHjhJ1EmJaVF/wKFgTm/H6AoTVSu8QirMUN1krOiLyAbca3pzHwrclI7I1tzDMzKXuO1x2VqhosVc67k9M1W9YsW4aABtTRQOt5wABI4POOipOyg8nBifafIlkFHTzg9HGoLG9a36qLvU7uJM2p4bW0JXGla+a20kaz82zRiOZWVpEixewO3V2IICKnCgMHm3ev+TbUGtgy18wjKhxyHeZc2qUFQWSzbFvT5SxI6eS4tyHOKzrCbO5u8C9Nd7/m2nD1bSsT+L2kODYJBOA2vTtIuhsPfQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ypyQk8j482ekX4dx6I5PPgRN0beVixXsd/w1lG0bRxo=;
- b=gkI/40JW6RTzN4+Kq09rADEljJnP+3lYV1XUNWP8WjmnI0U9XLm8LMUoGEIV78sDHPf04vLceylXXa35LKyHTvTdSPpsy9BcMAG2zddNEU1n79t6VMoaXQsYS6C9H5vPwBX3Pnv0Q0nBHEVXfgz0rXk7kOx4gbk/58/YA3hqvjuQ76RI4CNlpZXdQGqgaeJBhyZbIrclbNNgLPb1Zys8+QvBkW0DEpYFTgf//Uv26Kc0ET0htkN+yWBzN7p4xom9fWTnYzTtQNZGuxzaPOJQU7x0iQ8ZUAIyk/tJFVBQ2Xmi9RcpQog6dNgDYIzL7ZtcpLhnC3cSgbTHWYXlzxOaNg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
- dkim=pass header.d=nutanix.com; arc=none
-Received: from MN2PR02MB5742.namprd02.prod.outlook.com (2603:10b6:208:10d::27)
- by MN2PR02MB5997.namprd02.prod.outlook.com (2603:10b6:208:117::20)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3088.22; Tue, 16 Jun
- 2020 13:47:54 +0000
-Received: from MN2PR02MB5742.namprd02.prod.outlook.com
- ([fe80::317d:683f:b2:fa01]) by MN2PR02MB5742.namprd02.prod.outlook.com
- ([fe80::317d:683f:b2:fa01%7]) with mapi id 15.20.3088.029; Tue, 16 Jun 2020
- 13:47:54 +0000
-From: Ani Sinha <ani.sinha@nutanix.com>
-To: Igor Mammedov <imammedo@redhat.com>
-Subject: Re: [PATCH V3] Rename use_acpi_pci_hotplug to more appropriate
- use_acpi_hotplug_bridge
-Thread-Topic: [PATCH V3] Rename use_acpi_pci_hotplug to more appropriate
- use_acpi_hotplug_bridge
-Thread-Index: AQHWQ9oY/vhYOtq2AE2Ak/9M4Bsvz6jbOUuAgAAAvICAAAVyAIAAAjiA
-Date: Tue, 16 Jun 2020 13:47:54 +0000
-Message-ID: <C3E1DE2E-3537-4E35-B505-969FA8234533@nutanix.com>
-References: <1592310699-58916-1-git-send-email-ani.sinha@nutanix.com>
- <20200616151735.17a84340@redhat.com>
- <CAARzgwwKwdYW0BK4-W2=q=g3cN4BZfPN6p8QqvgAsqJ7tifHtA@mail.gmail.com>
- <20200616153942.79155fe8@redhat.com>
-In-Reply-To: <20200616153942.79155fe8@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=nutanix.com;
-x-originating-ip: [115.110.205.84]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: fa5459d0-68fc-4d3d-3e74-08d811fbde9e
-x-ms-traffictypediagnostic: MN2PR02MB5997:
-x-microsoft-antispam-prvs: <MN2PR02MB5997A1CB9600A20EFF0C14ADF19D0@MN2PR02MB5997.namprd02.prod.outlook.com>
-x-proofpoint-crosstenant: true
-x-ms-oob-tlc-oobclassifiers: OLM:758;
-x-forefront-prvs: 04362AC73B
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: JycsHCeG+BAAE3ZrRTfnzQzDiCl/WoMu7n9tPaO5QfFQGGhE7dUb4sCKh7fxoRBQGhxcQIih+Tl3XqmB/6FGO3fE7Z6wUuni0RdVvsYRswoR/iUdVLKsfrI4syDilVS0tvCO4PspsJuyhizEW3GJmuFjPgYUUBWAEDExJUHM3NfhCOOInr9MOel2eaHS3fMgEHtHVr+dhd0tkabWvBMcfw2X2d1tsUvygLrw80QfX2m9D/fhuDyqABRwfTgifreY/nmlxvJJppSNngKydXFh5hlaO6nLGov8IjRNDGkZLByF9VfXd42vjg1YL0uh2qO38nMPmJu7gRfO2w8rKfST7Q==
-x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:MN2PR02MB5742.namprd02.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(376002)(366004)(136003)(39860400002)(346002)(396003)(8936002)(6512007)(8676002)(33656002)(36756003)(91956017)(76116006)(6506007)(53546011)(6916009)(4326008)(6486002)(66556008)(64756008)(66946007)(86362001)(2906002)(66446008)(66476007)(558084003)(54906003)(478600001)(186003)(71200400001)(316002)(5660300002)(26005)(2616005)(44832011);
- DIR:OUT; SFP:1102; 
-x-ms-exchange-antispam-messagedata: mcRvOEtJjigDgmFEwEDDpPUGq1ngzCcJjwXTLfpcSXYwKZL8gZvvQJY8sHUpBMtRqFJZPC5Jz1rsogN5wLBwjbk9jNuY0UoZ6Z6sCAkGujfmAPjSNGm4z5wu2sJKal024KeAZdtuEkCLx2U1sinDCr2S2f+x7qEFDQsspJNSW00/R8DARQDVCZEMXa9uyCVx3cayI/EzYateUBIEkFZwcUitTOISwN3HFs79/CS/mhhqB4qOiklN8Z9Stj0fIW6IS1awat7jUr7JCQU90z5X8SFhGYV1yO4bRxxcRFJ6buWx+OcxblyvsyF+RW3j3JUvMTXOT/9O3Jth+X4e2ig97P19B3A4lswws5EjxpuKwHgXsiXsTau5jQBiv3zKGiankUqTWf7CorWjqhmrEO3E23wQxsHl8VLD+Sm+mwKIXE5osAiFGNooeJdePP+Y4X33lzCSAW3hBpLvMDikEJn1NkapG7fI9fX1fUSGtdreu1ZWiKSB4n+PpbydS+0PQiOl
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="iso-8859-1"
-Content-ID: <451A83A6B7F48B4AB154473CA3BD3FC5@namprd02.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jlBzz-0008BI-9N
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 09:51:35 -0400
+Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:45155)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jlBzw-0002H8-Pa
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 09:51:34 -0400
+Received: by mail-wr1-x42f.google.com with SMTP id c3so20824313wru.12
+ for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 06:51:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=gxz/6gm8AkZpa8TmZvFkDqHFPs//OtHrqP6lw1g1oQ0=;
+ b=GTsIpHFhifk4Hg3UM4tR/ucs5nAkDoRblcrAIjO2r9vmcx5YDLHDUXOcygTXVs0P2e
+ K67uJ5mewltpas79+wJthVntKLqXKlRrXkp9HO//VBqnBFZc1xGWvwDJBX0FOeW+leL+
+ DATIH0Uy+V5ioemGrJPkmPmyl7sKsOnQlJ0nFTnl612WC3CVuYWWKwfvTVdtYT5qAOzk
+ lFu7EEZKzM+4SnGShBFlcaTeFqg/Ap1SKKt5NvsiRjd2NNEQbivXTOrtBlxK9R4Lpw9g
+ hZiE7kZmKEX208m2szLihruZ8wmizVcqj+9f5bY8IdgQVbCvRSL8ESO1BDpbdbG3amY/
+ idsw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=gxz/6gm8AkZpa8TmZvFkDqHFPs//OtHrqP6lw1g1oQ0=;
+ b=G1n9dgEaIqI5cLZJg2gctXhy+ORJmz3C3+pKUWqr4L/0IfhBnHWrqg9mJE/nJKuGqO
+ RXT/DkfXLGryymX3dHS5Qx6ebPZisKg6BZmuJjHtwoKUw+lPRyRoO2GHSd1VJS/f+IzS
+ TjEmKJceCZzLxK/sBVgK1vNqLfsSYYpaj/R9vyipf5KJ0J9DZw/D81lGsp2UFOd+Rm3V
+ g7qBH+n8QV9YrW13hWfmmL9esMAuidOygJss40VgRrm0i1lKxPeIW5GeFRnnQ5Sel8b7
+ COs/yMhXN/8fhRWBMDg9VNDfy8LTDO0v6nTYwdBZ2wa1arycBDrA9hVVcLPbeHQzEi4N
+ HPjA==
+X-Gm-Message-State: AOAM533NMy4q+cZgNTTlflNgx5j1XvvUqd7+/oSnwP62nKvYEMhk3kKz
+ oTYgWMn4aXjAjKj0yXrV7/3AnQ==
+X-Google-Smtp-Source: ABdhPJyc+Ln0KjFHA2kLuT+UndOSUL1VdZev1hdiL+wh2nksPGVo/o1kTYPqqo5WlmiiL8dAPUeGfA==
+X-Received: by 2002:a05:6000:1192:: with SMTP id
+ g18mr3341990wrx.326.1592315491053; 
+ Tue, 16 Jun 2020 06:51:31 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id y14sm3903731wma.25.2020.06.16.06.51.29
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 16 Jun 2020 06:51:30 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 4859B1FF7E;
+ Tue, 16 Jun 2020 14:51:29 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: peter.maydell@linaro.org
+Subject: [PULL v2 00/21] testing and plugin updates (tsan,
+ pluginsm cross-builds)
+Date: Tue, 16 Jun 2020 14:51:29 +0100
+Message-Id: <20200616135129.5786-1-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-X-OriginatorOrg: nutanix.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fa5459d0-68fc-4d3d-3e74-08d811fbde9e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Jun 2020 13:47:54.0522 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: bb047546-786f-4de1-bd75-24e5b6f79043
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Q6xGputKXm3h747YwiCs3qvtR4Y/01ktwyLij1h8/R4c5SpChlfzgplDXWV3ng4nzOo2u4VGb0l2aOB4dX82dQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR02MB5997
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
- definitions=2020-06-16_04:2020-06-16,
- 2020-06-16 signatures=0
-X-Proofpoint-Spam-Reason: safe
-Received-SPF: pass client-ip=148.163.151.68;
- envelope-from=ani.sinha@nutanix.com; helo=mx0a-002c1b01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 09:48:09
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -37
-X-Spam_score: -3.8
-X-Spam_bar: ---
-X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::42f;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x42f.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -147,30 +103,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Ani Sinha <ani@anisinha.ca>,
- =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+The following changes since commit f5e34624f28f37ec3c8a93bdee348effee966a78:
 
+  Merge remote-tracking branch 'remotes/amarkovic/tags/mips-queue-jun-15-2020' into staging (2020-06-16 11:00:28 +0100)
 
-> On Jun 16, 2020, at 7:09 PM, Igor Mammedov <imammedo@redhat.com> wrote:
->=20
-> I've meant something like:
->=20
-> Signed-off-by: Ani Sinha <ani.sinha@nutanix.com>
-> ---
-> vX: - I might be blind and don't see changelog .
+are available in the Git repository at:
 
-Ah right. I was thinking you were referring to diff stat.
+  https://github.com/stsquad/qemu.git tags/pull-testing-and-plugin-160620-2
 
-I will add changeling next time.
+for you to fetch changes up to c81950a2f1923dec3f6b952ec6bb9b921be58a70:
 
-ani
+  plugins: new lockstep plugin for debugging TCG changes (2020-06-16 14:49:05 +0100)
+
+----------------------------------------------------------------
+Testing and plugin updates
+
+  - clear up dtc warnings
+  - add support for --enable-tsan builds
+  - re-enable shippable cross builds
+  - serialise cirrus check steps
+  - fix check-tcg plugin issues
+  - add lockstep plugin
+
+----------------------------------------------------------------
+Alex Bennée (6):
+      tests/docker: bump fedora to 32
+      Revert ".shippable: temporaily disable some cross builds"
+      cirrus.yml: serialise make check
+      tests/tcg: build plugin list from contents of src directory
+      tests/tcg: ensure -cpu max also used for plugin run
+      plugins: new lockstep plugin for debugging TCG changes
+
+Claudio Fontana (2):
+      Makefile: dtc: update, build the libfdt target
+      Makefile: remove old compatibility gunks
+
+Emilio G. Cota (7):
+      cpu: convert queued work to a QSIMPLEQ
+      thread: add qemu_spin_destroy
+      cputlb: destroy CPUTLB with tlb_destroy
+      qht: call qemu_spin_destroy for head buckets
+      tcg: call qemu_spin_destroy for tb->jmp_lock
+      translate-all: call qemu_spin_destroy for PageDesc
+      thread: add tsan annotations to QemuSpin
+
+Lingfeng Yang (1):
+      configure: add --enable-tsan flag + fiber annotations for coroutine-ucontext
+
+Robert Foley (5):
+      tests/docker: Added docker build support for TSan.
+      include/qemu: Added tsan.h for annotations.
+      util: Added tsan annotate for thread name.
+      docs: Added details on TSan to testing.rst
+      tests: Disable select tests under TSan, which hit TSan issue.
+
+ docs/devel/testing.rst                     | 107 +++++++++
+ configure                                  |  48 +++-
+ Makefile                                   |  16 +-
+ include/exec/exec-all.h                    |   8 +
+ include/hw/core/cpu.h                      |   6 +-
+ include/qemu/thread.h                      |  38 +++-
+ include/qemu/tsan.h                        |  71 ++++++
+ include/tcg/tcg.h                          |   1 +
+ accel/tcg/cputlb.c                         |  15 ++
+ accel/tcg/translate-all.c                  |  17 ++
+ cpus-common.c                              |  25 +--
+ cpus.c                                     |  14 +-
+ exec.c                                     |   1 +
+ hw/core/cpu.c                              |   1 +
+ tcg/tcg.c                                  |   9 +
+ tests/plugin/lockstep.c                    | 340 +++++++++++++++++++++++++++++
+ util/coroutine-ucontext.c                  |  66 +++++-
+ util/qemu-thread-posix.c                   |   2 +
+ util/qht.c                                 |   1 +
+ .cirrus.yml                                |   6 +-
+ .shippable.yml                             |  12 +-
+ dtc                                        |   2 +-
+ tests/Makefile.include                     |   9 +-
+ tests/docker/dockerfiles/fedora.docker     |   2 +-
+ tests/docker/dockerfiles/ubuntu2004.docker |  65 ++++++
+ tests/docker/test-tsan                     |  44 ++++
+ tests/plugin/Makefile                      |   1 +
+ tests/qtest/Makefile.include               |   7 +-
+ tests/tcg/Makefile.target                  |  12 +-
+ tests/tcg/aarch64/Makefile.target          |   5 +-
+ tests/tcg/arm/Makefile.target              |   2 +-
+ tests/tcg/i386/Makefile.target             |   1 +
+ tests/tsan/blacklist.tsan                  |  10 +
+ tests/tsan/suppressions.tsan               |  14 ++
+ 34 files changed, 910 insertions(+), 68 deletions(-)
+ create mode 100644 include/qemu/tsan.h
+ create mode 100644 tests/plugin/lockstep.c
+ create mode 100644 tests/docker/dockerfiles/ubuntu2004.docker
+ create mode 100755 tests/docker/test-tsan
+ create mode 100644 tests/tsan/blacklist.tsan
+ create mode 100644 tests/tsan/suppressions.tsan
+
+-- 
+2.20.1
 
 
