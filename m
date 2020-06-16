@@ -2,88 +2,71 @@ Return-Path: <SRS0=f7ls=75=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECD0FC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 21:49:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A9BDC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 21:53:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A4C9F2082E
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 21:49:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZQKKA7qL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4C9F2082E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3AA0E2082E
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 21:53:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3AA0E2082E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40472 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43508 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlJSs-0008Md-Qt
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 17:49:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41162)
+	id 1jlJVs-0001dT-Eu
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 17:53:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41622)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1jlJSF-0007h5-Eb
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 17:49:15 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51483
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jlJVB-0000zQ-Rp; Tue, 16 Jun 2020 17:52:17 -0400
+Resent-Date: Tue, 16 Jun 2020 17:52:17 -0400
+Resent-Message-Id: <E1jlJVB-0000zQ-Rp@lists.gnu.org>
+Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21313)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1jlJS9-0002Qs-Vh
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 17:49:15 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592344148;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=+U4bAwG8kqdE9/lz0OeHlyzSZXrgqJm1dLs+hjkex4k=;
- b=ZQKKA7qL0bGW0SOtg3loBDaUjdY4wOLtWruJvVQqdXWIAEwk3I4RY3AHKinpczRVGVrmW5
- HgZtoCkbZTmjrFKoHmIpRUfSmP1sFaAbxSNsSsLpSrXyAKv7I3rEXOrfwbJWUw60TQujLx
- 41P34TVvh440L5U+sZRWQSTRXViI7AE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-143-lwl2HqdAO5a1MdXUvLb-0g-1; Tue, 16 Jun 2020 17:49:04 -0400
-X-MC-Unique: lwl2HqdAO5a1MdXUvLb-0g-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7359D872FF2
- for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 21:49:03 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-112-214.rdu2.redhat.com
- [10.10.112.214])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 82EC67CAA5;
- Tue, 16 Jun 2020 21:49:02 +0000 (UTC)
-Date: Tue, 16 Jun 2020 17:49:00 -0400
-From: Cleber Rosa <crosa@redhat.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [PATCH v3 0/3] python/machine.py: refactor shutdown
-Message-ID: <20200616214900.GA347659@localhost.localdomain>
-References: <20200604195252.20739-1-jsnow@redhat.com>
- <8bd27ec8-1bb6-45e2-a43a-7e0229065414@redhat.com>
- <4012de28-5837-889a-eda1-b9957cbbbad1@redhat.com>
- <5d20012b-923c-0bf4-232d-272977087fe3@redhat.com>
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jlJV8-00038a-TH; Tue, 16 Jun 2020 17:52:17 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1592344328; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=JnKnrQd/gmxTjr4YQsFlPYU8IZN0Y92Iy366JhsNkad+qTWh+ScqHqOHF+IVWjwqfxxg1UQyxovW0os0VEB58aDtWMhyJMcezEVslO4tX7jDhDAs5MeCKqT1zmI2JgUD3/z2gaSHOqSAHRdCz8OT07wCuWKGg3fBAUb9jJqG8QQ=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1592344328;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=3FP4yUZeoHV5q75b+c0RxRqfIbmGGuJR8O82lFJIX3Q=; 
+ b=Y7yiQ7/fwZPbB9TFv4+Agj1VTvQrkXR8obtcC+w48EEYL1UTER46mDBqD5xbiQb0kWje8Y7pj7OUwBe+hO4k31Gws9PFfqOoPzXf3pWEifYMADQqXkZkrvVIQyYq/n73MdrI1k/9iMc1UzQQ30y4iWRGuXwu/qfNIqszCl2I3vU=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1592344325982477.3256590414612;
+ Tue, 16 Jun 2020 14:52:05 -0700 (PDT)
+Message-ID: <159234432481.10897.5559601084139408055@d1fd068a5071>
+Subject: Re: [PATCH 00/21] target/arm: Finish neon decodetree conversion
+In-Reply-To: <20200616170844.13318-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <5d20012b-923c-0bf4-232d-272977087fe3@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="wRRV7LY7NUeQGEoC"
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=crosa@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 02:46:07
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001,
- WEIRD_PORT=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: peter.maydell@linaro.org
+Date: Tue, 16 Jun 2020 14:52:05 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o53.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 17:38:02
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,290 +79,197 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, Markus Armbruster <armbru@redhat.com>,
- John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org,
- Eduardo Habkost <ehabkost@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: qemu-arm@nongnu.org, richard.henderson@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---wRRV7LY7NUeQGEoC
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Mon, Jun 15, 2020 at 05:21:18PM +0200, Philippe Mathieu-Daud=E9 wrote:
-> On 6/9/20 11:55 PM, John Snow wrote:
-> >=20
-> >=20
-> > On 6/9/20 9:08 AM, Philippe Mathieu-Daud=E9 wrote:
-> >> Hi John,
-> >>
-> >> On 6/4/20 9:52 PM, John Snow wrote:
-> >>> v3:
-> >>>  - Split _post_shutdown refactor into own patch (now 1/3)
-> >>>  - Re-add sigkill warning squelch (now 3/3)
-> >>>
-> >>> NOTE: I re-added the squelch in its own patch for review purposes, bu=
-t
-> >>> for the purposes of avoiding temporary breakage, a maintainer may wis=
-h
-> >>> to squash patches 2 and 3 if they are accepted.
-> >>>
-> >>> v2: Philippe took patches 1, 3 and 4.
-> >>>
-> >>> This is a re-write of what was:
-> >>> [PATCH RFC 03/32] python//machine.py: remove bare except
-> >>> [PATCH 2/4] python/machine.py: remove bare except
-> >>>
-> >>> It's a bit heavier handed, but it should address some of kwolf's
-> >>> feedback from the RFC version.
-> >>>
-> >>> Applies straight to origin/master, ought to pass pylint and flake8:
-> >>>
-> >>>> cd ~/src/qemu/python/qemu
-> >>>> pylint *.py
-> >>>> flake8 *.py
-> >>>
-> >>> John Snow (3):
-> >>>   python/machine.py: consolidate _post_shutdown()
-> >>>   python/machine.py: refactor shutdown
-> >>>   python/machine.py: re-add sigkill warning suppression
-> >>>
-> >>>  python/qemu/machine.py | 100 +++++++++++++++++++++++++++++----------=
---
-> >>>  1 file changed, 71 insertions(+), 29 deletions(-)
-> >>>
-> >>
-> >> I'm now seeing this error:
-> >>
-> >> 21:31:58 DEBUG| / # reboot
-> >> 21:32:01 DEBUG| / # reboot: Restarting system
-> >> 21:32:01 DEBUG| >>> {'execute': 'quit'}
-> >> 21:32:01 WARNI| qemu received signal 9; command:
-> >> "mips-softmmu/qemu-system-mips -display none -vga none -chardev
-> >> socket,id=3Dmon,path=3D/tmp/tmp679upvrk/qemu-10292-monitor.sock -mon
-> >> chardev=3Dmon,mode=3Dcontrol -machine malta -chardev
-> >> socket,id=3Dconsole,path=3D/tmp/tmp679upvrk/qemu-10292-console.sock,se=
-rver,nowait
-> >> -serial chardev:console -kernel
-> >> /tmp/avocado_b3aaagr9/avocado_job_5bj0xe1h/12-tests_acceptance_boot_li=
-nux_console.py_BootLinuxConsole.test_mips_malta_cpio/boot/vmlinux-4.5.0-2-4=
-kc-malta
-> >> -initrd
-> >> /tmp/avocado_b3aaagr9/avocado_job_5bj0xe1h/12-tests_acceptance_boot_li=
-nux_console.py_BootLinuxConsole.test_mips_malta_cpiorootfs.cpio
-> >> -append printk.time=3D0 console=3DttyS0 console=3Dtty rdinit=3D/sbin/i=
-nit
-> >> noreboot -no-reboot"
-> >> 21:32:01 ERROR|
-> >> 21:32:01 ERROR| Reproduced traceback from:
-> >> /home/travis/build/philmd/qemu/build/tests/venv/lib/python3.6/site-pac=
-kages/avocado/core/test.py:886
-> >> 21:32:01 ERROR| Traceback (most recent call last):
-> >> 21:32:01 ERROR|   File
-> >> "/home/travis/build/philmd/qemu/build/tests/acceptance/avocado_qemu/__=
-init__.py",
-> >> line 195, in tearDown
-> >> 21:32:01 ERROR|     vm.shutdown()
-> >> 21:32:01 ERROR|   File
-> >> "/home/travis/build/philmd/qemu/python/qemu/machine.py", line 449, in
-> >> shutdown
-> >> 21:32:01 ERROR|     self._do_shutdown(has_quit)
-> >> 21:32:01 ERROR|   File
-> >> "/home/travis/build/philmd/qemu/python/qemu/machine.py", line 426, in
-> >> _do_shutdown
-> >> 21:32:01 ERROR|     self._soft_shutdown(has_quit, timeout)
-> >> 21:32:01 ERROR|   File
-> >> "/home/travis/build/philmd/qemu/python/qemu/machine.py", line 413, in
-> >> _soft_shutdown
-> >> 21:32:01 ERROR|     self._qmp.cmd('quit')
-> >> 21:32:01 ERROR|   File
-> >> "/home/travis/build/philmd/qemu/python/qemu/qmp.py", line 271, in cmd
-> >> 21:32:01 ERROR|     return self.cmd_obj(qmp_cmd)
-> >> 21:32:01 ERROR|   File
-> >> "/home/travis/build/philmd/qemu/python/qemu/qmp.py", line 249, in cmd_=
-obj
-> >> 21:32:01 ERROR|     self.__sock.sendall(json.dumps(qmp_cmd).encode('ut=
-f-8'))
-> >> 21:32:01 ERROR| BrokenPipeError: [Errno 32] Broken pipe
-> >> 21:32:01 ERROR|
-> >> 21:32:01 DEBUG| DATA (filename=3Doutput.expected) =3D> NOT FOUND (data
-> >> sources: variant, test, file)
-> >> 21:32:01 DEBUG| DATA (filename=3Dstdout.expected) =3D> NOT FOUND (data
-> >> sources: variant, test, file)
-> >> 21:32:01 DEBUG| DATA (filename=3Dstderr.expected) =3D> NOT FOUND (data
-> >> sources: variant, test, file)
-> >> 21:32:01 DEBUG| Not logging /var/log/syslog (lack of permissions)
-> >> 21:32:01 ERROR| ERROR
-> >> 12-tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_mips_m=
-alta_cpio
-> >> -> TestSetupFail: [Errno 32] Broken pipe
-> >> 21:32:01 INFO |
-> >>
-> >> https://travis-ci.org/github/philmd/qemu/jobs/696142277#L5329
-> >>
-> >=20
-> > Gotcha.
-> >=20
-> > The problem here is that `test_mips_malta_cpio` in boot_linux_console.p=
-y
-> > does this:
-> >=20
-> >         self.vm.add_args('-kernel', kernel_path,
-> >                          '-initrd', initrd_path,
-> >                          '-append', kernel_command_line,
-> >                          '-no-reboot')
-> >=20
-> > and then:
-> >=20
-> > exec_command_and_wait_for_pattern(self, 'reboot',
-> >                          'reboot: Restarting system')
-> >=20
-> > and (in avocado_qemu/) __init__.py does this:
-> >=20
-> >     def tearDown(self):
-> >         for vm in self._vms.values():
-> >             vm.shutdown()
-> >=20
-> >=20
-> >=20
-> > What's happening here is that we are instructing QEMU to *close* when
-> > the guest reboots instead of allowing it to reboot. Then, we are issuin=
-g
-> > a reboot command to the guest, which will effectively terminate QEMU as
-> > well. Finally, we are trying to send a shutdown command to QEMU, but
-> > QEMU has already gone.
-> >=20
-> > Now, in the shutdown code, we do make an attempt to catch this:
-> >=20
-> > def is_running(self):
-> >     """Returns true if the VM is running."""
-> >     return self._popen is not None and self._popen.poll() is None
-> >=20
-> > But, well, race conditions.
-> >=20
-> > When we make it here:
-> >=20
-> >         if self._qmp is not None:
-> >             if not has_quit:
-> >                 self._qmp.cmd('quit')
-> >             self._qmp.close()
-> >=20
-> > We believe we are running and we believe we have an open QMP socket.
-> > Attempting to engage the socket by sending 'quit' causes the error.
-> >=20
-> > It's a tight window: if quit happens earlier, we send the command
-> > successfully and everything's OK. If quit happens later, we realize QEM=
-U
-> > isn't running and proceed to cleanup.
->=20
-> Nice debugging :)
->=20
-> >=20
-> > Ultimately:
-> >=20
-> > - Avocado should not try to shut down QEMU twice, but
-> > - machine.py shouldn't enable the race condition either.
-> >=20
-> >=20
-> >=20
-> > for my part, how about this:
-> >=20
-> > diff --git a/python/qemu/machine.py b/python/qemu/machine.py
-> > index 99bcb499878..813f8e477db 100644
-> > --- a/python/qemu/machine.py
-> > +++ b/python/qemu/machine.py
-> > @@ -385,7 +385,14 @@ def _soft_shutdown(self, has_quit: bool =3D False,
-> > timeout: int =3D 3) -> None:
-> >=20
-> >          if self._qmp is not None:
-> >              if not has_quit:
-> > -                self._qmp.cmd('quit')
-> > +                try:
-> > +                    self._qmp.cmd('quit')
-> > +                except (BrokenPipeError, ConnectionResetError):
-> > +                    # QMP went away just before or just after sending
-> > 'quit'
-> > +                    if not self.is_running():
-> > +                        # "Mission Accomplished"
-> > +                        pass
-> > +                    raise
->=20
-> Looks OK to me, Cleber/Eduardo can you Ack?
->
-
-John's description seems spot on, and so does the solution.  I was
-unable, though, to reproduce it given that the window is indeed tiny.
-
-Phil,
-
-In addition to this, wouldn't it make sense to:
-
-diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot=
-_linux_console.py
-index 3d02519660..e117597e3b 100644
---- a/tests/acceptance/boot_linux_console.py
-+++ b/tests/acceptance/boot_linux_console.py
-@@ -180,8 +180,8 @@ class BootLinuxConsole(LinuxKernelTest):
-                                + 'rdinit=3D/sbin/init noreboot')
-         self.vm.add_args('-kernel', kernel_path,
-                          '-initrd', initrd_path,
--                         '-append', kernel_command_line,
--                         '-no-reboot')
-+                         '-append', kernel_command_line)
-+
-         self.vm.launch()
-         self.wait_for_console_pattern('Boot successful.')
-=20
-@@ -189,8 +189,8 @@ class BootLinuxConsole(LinuxKernelTest):
-                                                 'BogoMIPS')
-         exec_command_and_wait_for_pattern(self, 'uname -a',
-                                                 'Debian')
--        exec_command_and_wait_for_pattern(self, 'reboot',
--                                                'reboot: Restarting system=
-')
-+        exec_command_and_wait_for_pattern(self, 'halt',
-+                                                'reboot: System halted')
-=20
-     @skipUnless(os.getenv('AVOCADO_ALLOW_UNTRUSTED_CODE'), 'untrusted code=
-')
-     def test_mips64el_malta_5KEc_cpio(self):
-
-Do you know of any reason to "fake halt" (reboot) instead of actually
-halting from the guests?
-
-> >              self._qmp.close()
-> >=20
-> >          self._popen.wait(timeout=3Dtimeout)
-> >=20
->=20
-
-Either way (^ with this extra block):
-
-Reviewed-by: Cleber Rosa <crosa@redhat.com>
-Tested-by: Cleber Rosa <crosa@redhat.com>
-
---wRRV7LY7NUeQGEoC
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl7pPkcACgkQZX6NM6Xy
-CfN7/BAAojONS4dM2ki+M/qVh0lWtoG6JRdk87JwGCCE2MvGrOENsdjdjoaFILcQ
-oOcEQWPKVknmec6zShyL97SzCZqT6CuqpLMhWRAEqg0O2CClaD0Vogz0t2X/XpnH
-0k3BOXuMTijdEro4EFt2p+mmrfy8HblpU2Pa7/YZ9aHyT5uOXNxtktw2nXULz3DL
-Es5UypfNaTQ80/DN24UkItPOsf9ffw/9l2PqAIJqIuf4a+w9SqUqVHsbo8gw5Tlk
-wcyFNCKX2l7r03rqs4mu3q1Gi7wOwaqzCxFd3yFfQfmwatCc5OVyMqrBxPdN3GkG
-n46kMhBSsbMtSkgHfckOlMNeQyqw6eJcyApMnsItmlaVMCuF4c359X/0t/maJOrZ
-5Bhta9TEwMRtNEdadYaL2+hb9jUyynMQSe9KwWEs/+45u1NIp+JbjwHiZEBfDK2Y
-++kEDWaJNHYpcWyRsP32wKQ44mvXQi5oBU3isTorYI8I8ZdlO+OIzga81OXlrvuI
-I82jngSsQtJ0lDRgOi6Qw1k7M/NsgCLPqKyfRU6gWmAFRRTkt0G6vPtwoR6JB4nH
-nGGA9ZrGkPCVNlrtTyw1QddZurdPZNVke1MSwREjMH9b4aexIPjeDP1PH0t6nHsl
-kWRI3BZLlnlfeLeCoDtB+v3Zx8VDd93OqizbDI1o4NExGd3aSt4=
-=pr/9
------END PGP SIGNATURE-----
-
---wRRV7LY7NUeQGEoC--
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDYxNjE3MDg0NC4xMzMx
+OC0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQg
+dGhlIGFzYW4gYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29tbWFuZHMgYW5k
+CnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3RhbGxlZCwgeW91IGNh
+biBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9
+PT0KIyEvYmluL2Jhc2gKZXhwb3J0IEFSQ0g9eDg2XzY0Cm1ha2UgZG9ja2VyLWltYWdlLWZlZG9y
+YSBWPTEgTkVUV09SSz0xCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1kZWJ1Z0BmZWRvcmEgVEFSR0VU
+X0xJU1Q9eDg2XzY0LXNvZnRtbXUgSj0xNCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9
+PT0KCiAgQ0MgICAgICBxZ2EvZ3Vlc3QtYWdlbnQtY29tbWFuZC1zdGF0ZS5vCiAgQ0MgICAgICBx
+Z2EvbWFpbi5vCiAgQ0MgICAgICBxZ2EvY29tbWFuZHMtcG9zaXgubwovdXNyL2Jpbi9sZDogL3Vz
+ci9saWI2NC9jbGFuZy8xMC4wLjAvbGliL2xpbnV4L2xpYmNsYW5nX3J0LmFzYW4teDg2XzY0LmEo
+YXNhbl9pbnRlcmNlcHRvcnNfdmZvcmsuUy5vKTogd2FybmluZzogY29tbW9uIG9mIGBfX2ludGVy
+Y2VwdGlvbjo6cmVhbF92Zm9yaycgb3ZlcnJpZGRlbiBieSBkZWZpbml0aW9uIGZyb20gL3Vzci9s
+aWI2NC9jbGFuZy8xMC4wLjAvbGliL2xpbnV4L2xpYmNsYW5nX3J0LmFzYW4teDg2XzY0LmEoYXNh
+bl9pbnRlcmNlcHRvcnMuY3BwLm8pCiAgQ0MgICAgICBxZ2EvY2hhbm5lbC1wb3NpeC5vCiAgQ0Mg
+ICAgICBxZ2EvcWFwaS1nZW5lcmF0ZWQvcWdhLXFhcGktdHlwZXMubwogIENDICAgICAgcWdhL3Fh
+cGktZ2VuZXJhdGVkL3FnYS1xYXBpLXZpc2l0Lm8KLS0tCiAgQVIgICAgICBsaWJ2aG9zdC11c2Vy
+LmEKICBHRU4gICAgIGRvY3MvaW50ZXJvcC9xZW11LWdhLXJlZi5odG1sCiAgR0VOICAgICBkb2Nz
+L2ludGVyb3AvcWVtdS1nYS1yZWYudHh0Ci91c3IvYmluL2xkOiAvdXNyL2xpYjY0L2NsYW5nLzEw
+LjAuMC9saWIvbGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2ludGVyY2VwdG9y
+c192Zm9yay5TLm8pOiB3YXJuaW5nOiBjb21tb24gb2YgYF9faW50ZXJjZXB0aW9uOjpyZWFsX3Zm
+b3JrJyBvdmVycmlkZGVuIGJ5IGRlZmluaXRpb24gZnJvbSAvdXNyL2xpYjY0L2NsYW5nLzEwLjAu
+MC9saWIvbGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2ludGVyY2VwdG9ycy5j
+cHAubykKICBHRU4gICAgIGRvY3MvaW50ZXJvcC9xZW11LWdhLXJlZi43CiAgTElOSyAgICBxZW11
+LWtleW1hcAogIExJTksgICAgaXZzaG1lbS1jbGllbnQKL3Vzci9iaW4vbGQ6IC91c3IvbGliNjQv
+Y2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFzYW5faW50
+ZXJjZXB0b3JzX3Zmb3JrLlMubyk6IHdhcm5pbmc6IGNvbW1vbiBvZiBgX19pbnRlcmNlcHRpb246
+OnJlYWxfdmZvcmsnIG92ZXJyaWRkZW4gYnkgZGVmaW5pdGlvbiBmcm9tIC91c3IvbGliNjQvY2xh
+bmcvMTAuMC4wL2xpYi9saW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFzYW5faW50ZXJj
+ZXB0b3JzLmNwcC5vKQogIExJTksgICAgaXZzaG1lbS1zZXJ2ZXIKL3Vzci9iaW4vbGQ6IC91c3Iv
+bGliNjQvY2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFz
+YW5faW50ZXJjZXB0b3JzX3Zmb3JrLlMubyk6IHdhcm5pbmc6IGNvbW1vbiBvZiBgX19pbnRlcmNl
+cHRpb246OnJlYWxfdmZvcmsnIG92ZXJyaWRkZW4gYnkgZGVmaW5pdGlvbiBmcm9tIC91c3IvbGli
+NjQvY2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFzYW5f
+aW50ZXJjZXB0b3JzLmNwcC5vKQogIExJTksgICAgcWVtdS1uYmQKL3Vzci9iaW4vbGQ6IC91c3Iv
+bGliNjQvY2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFz
+YW5faW50ZXJjZXB0b3JzX3Zmb3JrLlMubyk6IHdhcm5pbmc6IGNvbW1vbiBvZiBgX19pbnRlcmNl
+cHRpb246OnJlYWxfdmZvcmsnIG92ZXJyaWRkZW4gYnkgZGVmaW5pdGlvbiBmcm9tIC91c3IvbGli
+NjQvY2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFzYW5f
+aW50ZXJjZXB0b3JzLmNwcC5vKQogIEFTICAgICAgcGMtYmlvcy9vcHRpb25yb20vbXVsdGlib290
+Lm8KICBBUyAgICAgIHBjLWJpb3Mvb3B0aW9ucm9tL2xpbnV4Ym9vdC5vCi91c3IvYmluL2xkOiAv
+dXNyL2xpYjY0L2NsYW5nLzEwLjAuMC9saWIvbGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQu
+YShhc2FuX2ludGVyY2VwdG9yc192Zm9yay5TLm8pOiB3YXJuaW5nOiBjb21tb24gb2YgYF9faW50
+ZXJjZXB0aW9uOjpyZWFsX3Zmb3JrJyBvdmVycmlkZGVuIGJ5IGRlZmluaXRpb24gZnJvbSAvdXNy
+L2xpYjY0L2NsYW5nLzEwLjAuMC9saWIvbGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShh
+c2FuX2ludGVyY2VwdG9ycy5jcHAubykKICBMSU5LICAgIHFlbXUtc3RvcmFnZS1kYWVtb24KICBD
+QyAgICAgIHBjLWJpb3Mvb3B0aW9ucm9tL2xpbnV4Ym9vdF9kbWEubwovdXNyL2Jpbi9sZDogL3Vz
+ci9saWI2NC9jbGFuZy8xMC4wLjAvbGliL2xpbnV4L2xpYmNsYW5nX3J0LmFzYW4teDg2XzY0LmEo
+YXNhbl9pbnRlcmNlcHRvcnNfdmZvcmsuUy5vKTogd2FybmluZzogY29tbW9uIG9mIGBfX2ludGVy
+Y2VwdGlvbjo6cmVhbF92Zm9yaycgb3ZlcnJpZGRlbiBieSBkZWZpbml0aW9uIGZyb20gL3Vzci9s
+aWI2NC9jbGFuZy8xMC4wLjAvbGliL2xpbnV4L2xpYmNsYW5nX3J0LmFzYW4teDg2XzY0LmEoYXNh
+bl9pbnRlcmNlcHRvcnMuY3BwLm8pCiAgQVMgICAgICBwYy1iaW9zL29wdGlvbnJvbS9rdm12YXBp
+Yy5vCiAgQVMgICAgICBwYy1iaW9zL29wdGlvbnJvbS9wdmgubwogIENDICAgICAgcGMtYmlvcy9v
+cHRpb25yb20vcHZoX21haW4ubwotLS0KICBTSUdOICAgIHBjLWJpb3Mvb3B0aW9ucm9tL2xpbnV4
+Ym9vdC5iaW4KICBTSUdOICAgIHBjLWJpb3Mvb3B0aW9ucm9tL2xpbnV4Ym9vdF9kbWEuYmluCiAg
+U0lHTiAgICBwYy1iaW9zL29wdGlvbnJvbS9rdm12YXBpYy5iaW4KL3Vzci9iaW4vbGQ6IC91c3Iv
+bGliNjQvY2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFz
+YW5faW50ZXJjZXB0b3JzX3Zmb3JrLlMubyk6IHdhcm5pbmc6IGNvbW1vbiBvZiBgX19pbnRlcmNl
+cHRpb246OnJlYWxfdmZvcmsnIG92ZXJyaWRkZW4gYnkgZGVmaW5pdGlvbiBmcm9tIC91c3IvbGli
+NjQvY2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFzYW5f
+aW50ZXJjZXB0b3JzLmNwcC5vKQogIEJVSUxEICAgcGMtYmlvcy9vcHRpb25yb20vcHZoLnJhdwog
+IFNJR04gICAgcGMtYmlvcy9vcHRpb25yb20vcHZoLmJpbgogIExJTksgICAgcWVtdS1pbwogIExJ
+TksgICAgcWVtdS1lZGlkCi91c3IvYmluL2xkOiAvdXNyL2xpYjY0L2NsYW5nLzEwLjAuMC9saWIv
+bGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2ludGVyY2VwdG9yc192Zm9yay5T
+Lm8pOiB3YXJuaW5nOiBjb21tb24gb2YgYF9faW50ZXJjZXB0aW9uOjpyZWFsX3Zmb3JrJyBvdmVy
+cmlkZGVuIGJ5IGRlZmluaXRpb24gZnJvbSAvdXNyL2xpYjY0L2NsYW5nLzEwLjAuMC9saWIvbGlu
+dXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2ludGVyY2VwdG9ycy5jcHAubykKICBM
+SU5LICAgIGZzZGV2L3ZpcnRmcy1wcm94eS1oZWxwZXIKL3Vzci9iaW4vbGQ6IC91c3IvbGliNjQv
+Y2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFzYW5faW50
+ZXJjZXB0b3JzX3Zmb3JrLlMubyk6IHdhcm5pbmc6IGNvbW1vbiBvZiBgX19pbnRlcmNlcHRpb246
+OnJlYWxfdmZvcmsnIG92ZXJyaWRkZW4gYnkgZGVmaW5pdGlvbiBmcm9tIC91c3IvbGliNjQvY2xh
+bmcvMTAuMC4wL2xpYi9saW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFzYW5faW50ZXJj
+ZXB0b3JzLmNwcC5vKQogIExJTksgICAgc2NzaS9xZW11LXByLWhlbHBlcgovdXNyL2Jpbi9sZDog
+L3Vzci9saWI2NC9jbGFuZy8xMC4wLjAvbGliL2xpbnV4L2xpYmNsYW5nX3J0LmFzYW4teDg2XzY0
+LmEoYXNhbl9pbnRlcmNlcHRvcnNfdmZvcmsuUy5vKTogd2FybmluZzogY29tbW9uIG9mIGBfX2lu
+dGVyY2VwdGlvbjo6cmVhbF92Zm9yaycgb3ZlcnJpZGRlbiBieSBkZWZpbml0aW9uIGZyb20gL3Vz
+ci9saWI2NC9jbGFuZy8xMC4wLjAvbGliL2xpbnV4L2xpYmNsYW5nX3J0LmFzYW4teDg2XzY0LmEo
+YXNhbl9pbnRlcmNlcHRvcnMuY3BwLm8pCiAgTElOSyAgICBxZW11LWJyaWRnZS1oZWxwZXIKL3Vz
+ci9iaW4vbGQ6IC91c3IvbGliNjQvY2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJjbGFuZ19ydC5h
+c2FuLXg4Nl82NC5hKGFzYW5faW50ZXJjZXB0b3JzX3Zmb3JrLlMubyk6IHdhcm5pbmc6IGNvbW1v
+biBvZiBgX19pbnRlcmNlcHRpb246OnJlYWxfdmZvcmsnIG92ZXJyaWRkZW4gYnkgZGVmaW5pdGlv
+biBmcm9tIC91c3IvbGliNjQvY2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJjbGFuZ19ydC5hc2Fu
+LXg4Nl82NC5hKGFzYW5faW50ZXJjZXB0b3JzLmNwcC5vKQogIExJTksgICAgdmlydGlvZnNkCi91
+c3IvYmluL2xkOiAvdXNyL2xpYjY0L2NsYW5nLzEwLjAuMC9saWIvbGludXgvbGliY2xhbmdfcnQu
+YXNhbi14ODZfNjQuYShhc2FuX2ludGVyY2VwdG9yc192Zm9yay5TLm8pOiB3YXJuaW5nOiBjb21t
+b24gb2YgYF9faW50ZXJjZXB0aW9uOjpyZWFsX3Zmb3JrJyBvdmVycmlkZGVuIGJ5IGRlZmluaXRp
+b24gZnJvbSAvdXNyL2xpYjY0L2NsYW5nLzEwLjAuMC9saWIvbGludXgvbGliY2xhbmdfcnQuYXNh
+bi14ODZfNjQuYShhc2FuX2ludGVyY2VwdG9ycy5jcHAubykKL3Vzci9iaW4vbGQ6IC91c3IvbGli
+NjQvY2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFzYW5f
+aW50ZXJjZXB0b3JzX3Zmb3JrLlMubyk6IHdhcm5pbmc6IGNvbW1vbiBvZiBgX19pbnRlcmNlcHRp
+b246OnJlYWxfdmZvcmsnIG92ZXJyaWRkZW4gYnkgZGVmaW5pdGlvbiBmcm9tIC91c3IvbGliNjQv
+Y2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFzYW5faW50
+ZXJjZXB0b3JzLmNwcC5vKQogIExJTksgICAgdmhvc3QtdXNlci1pbnB1dAogIExJTksgICAgcWVt
+dS1nYQovdXNyL2Jpbi9sZDogL3Vzci9saWI2NC9jbGFuZy8xMC4wLjAvbGliL2xpbnV4L2xpYmNs
+YW5nX3J0LmFzYW4teDg2XzY0LmEoYXNhbl9pbnRlcmNlcHRvcnNfdmZvcmsuUy5vKTogd2Fybmlu
+ZzogY29tbW9uIG9mIGBfX2ludGVyY2VwdGlvbjo6cmVhbF92Zm9yaycgb3ZlcnJpZGRlbiBieSBk
+ZWZpbml0aW9uIGZyb20gL3Vzci9saWI2NC9jbGFuZy8xMC4wLjAvbGliL2xpbnV4L2xpYmNsYW5n
+X3J0LmFzYW4teDg2XzY0LmEoYXNhbl9pbnRlcmNlcHRvcnMuY3BwLm8pCi91c3IvYmluL2xkOiAv
+dXNyL2xpYjY0L2NsYW5nLzEwLjAuMC9saWIvbGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQu
+YShhc2FuX2ludGVyY2VwdG9yc192Zm9yay5TLm8pOiB3YXJuaW5nOiBjb21tb24gb2YgYF9faW50
+ZXJjZXB0aW9uOjpyZWFsX3Zmb3JrJyBvdmVycmlkZGVuIGJ5IGRlZmluaXRpb24gZnJvbSAvdXNy
+L2xpYjY0L2NsYW5nLzEwLjAuMC9saWIvbGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShh
+c2FuX2ludGVyY2VwdG9ycy5jcHAubykKICBHRU4gICAgIHg4Nl82NC1zb2Z0bW11L2htcC1jb21t
+YW5kcy5oCiAgR0VOICAgICB4ODZfNjQtc29mdG1tdS9jb25maWctdGFyZ2V0LmgKICBHRU4gICAg
+IHg4Nl82NC1zb2Z0bW11L2htcC1jb21tYW5kcy1pbmZvLmgKLS0tCiAgQ0MgICAgICB4ODZfNjQt
+c29mdG1tdS9hY2NlbC90Y2cvdHJhbnNsYXRvci5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS9h
+Y2NlbC94ZW4veGVuLWFsbC5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS9kdW1wL2R1bXAubwov
+dG1wL3FlbXUtdGVzdC9zcmMvZnB1L3NvZnRmbG9hdC5jOjMzNjU6MTM6IGVycm9yOiBiaXR3aXNl
+IG5lZ2F0aW9uIG9mIGEgYm9vbGVhbiBleHByZXNzaW9uOyBkaWQgeW91IG1lYW4gbG9naWNhbCBu
+ZWdhdGlvbj8gWy1XZXJyb3IsLVdib29sLW9wZXJhdGlvbl0KICAgIGFic1ogJj0gfiAoICggKCBy
+b3VuZEJpdHMgXiAweDQwICkgPT0gMCApICYgcm91bmROZWFyZXN0RXZlbiApOwogICAgICAgICAg
+ICBefn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn4K
+ICAgICAgICAgICAgIQovdG1wL3FlbXUtdGVzdC9zcmMvZnB1L3NvZnRmbG9hdC5jOjM0MjM6MTg6
+IGVycm9yOiBiaXR3aXNlIG5lZ2F0aW9uIG9mIGEgYm9vbGVhbiBleHByZXNzaW9uOyBkaWQgeW91
+IG1lYW4gbG9naWNhbCBuZWdhdGlvbj8gWy1XZXJyb3IsLVdib29sLW9wZXJhdGlvbl0KICAgICAg
+ICBhYnNaMCAmPSB+ICggKCAodWludDY0X3QpICggYWJzWjE8PDEgKSA9PSAwICkgJiByb3VuZE5l
+YXJlc3RFdmVuICk7CiAgICAgICAgICAgICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+CiAgICAgICAgICAgICAgICAgIQovdG1wL3Fl
+bXUtdGVzdC9zcmMvZnB1L3NvZnRmbG9hdC5jOjM0ODM6MTg6IGVycm9yOiBiaXR3aXNlIG5lZ2F0
+aW9uIG9mIGEgYm9vbGVhbiBleHByZXNzaW9uOyBkaWQgeW91IG1lYW4gbG9naWNhbCBuZWdhdGlv
+bj8gWy1XZXJyb3IsLVdib29sLW9wZXJhdGlvbl0KICAgICAgICBhYnNaMCAmPSB+KCgodWludDY0
+X3QpKGFic1oxPDwxKSA9PSAwKSAmIHJvdW5kTmVhcmVzdEV2ZW4pOwogICAgICAgICAgICAgICAg
+IF5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn4KICAgICAg
+ICAgICAgICAgICAhCi90bXAvcWVtdS10ZXN0L3NyYy9mcHUvc29mdGZsb2F0LmM6MzYwNjoxMzog
+ZXJyb3I6IGJpdHdpc2UgbmVnYXRpb24gb2YgYSBib29sZWFuIGV4cHJlc3Npb247IGRpZCB5b3Ug
+bWVhbiBsb2dpY2FsIG5lZ2F0aW9uPyBbLVdlcnJvciwtV2Jvb2wtb3BlcmF0aW9uXQogICAgelNp
+ZyAmPSB+ICggKCAoIHJvdW5kQml0cyBeIDB4NDAgKSA9PSAwICkgJiByb3VuZE5lYXJlc3RFdmVu
+ICk7CiAgICAgICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fgogICAgICAgICAgICAhCi90bXAvcWVtdS10ZXN0L3NyYy9mcHUvc29mdGZs
+b2F0LmM6Mzc2MDoxMzogZXJyb3I6IGJpdHdpc2UgbmVnYXRpb24gb2YgYSBib29sZWFuIGV4cHJl
+c3Npb247IGRpZCB5b3UgbWVhbiBsb2dpY2FsIG5lZ2F0aW9uPyBbLVdlcnJvciwtV2Jvb2wtb3Bl
+cmF0aW9uXQogICAgelNpZyAmPSB+ICggKCAoIHJvdW5kQml0cyBeIDB4MjAwICkgPT0gMCApICYg
+cm91bmROZWFyZXN0RXZlbiApOwogICAgICAgICAgICBefn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+CiAgICAgICAgICAgICEKL3RtcC9xZW11LXRl
+c3Qvc3JjL2ZwdS9zb2Z0ZmxvYXQuYzozOTg3OjIxOiBlcnJvcjogYml0d2lzZSBuZWdhdGlvbiBv
+ZiBhIGJvb2xlYW4gZXhwcmVzc2lvbjsgZGlkIHlvdSBtZWFuIGxvZ2ljYWwgbmVnYXRpb24/IFst
+V2Vycm9yLC1XYm9vbC1vcGVyYXRpb25dCiAgICAgICAgICAgICAgICAgICAgfiAoICggKHVpbnQ2
+NF90KSAoIHpTaWcxPDwxICkgPT0gMCApICYgcm91bmROZWFyZXN0RXZlbiApOwogICAgICAgICAg
+ICAgICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fgogICAgICAgICAgICAgICAgICAgICEKL3RtcC9xZW11LXRlc3Qvc3JjL2ZwdS9z
+b2Z0ZmxvYXQuYzo0MDAzOjIyOiBlcnJvcjogYml0d2lzZSBuZWdhdGlvbiBvZiBhIGJvb2xlYW4g
+ZXhwcmVzc2lvbjsgZGlkIHlvdSBtZWFuIGxvZ2ljYWwgbmVnYXRpb24/IFstV2Vycm9yLC1XYm9v
+bC1vcGVyYXRpb25dCiAgICAgICAgICAgIHpTaWcwICY9IH4gKCAoICh1aW50NjRfdCkgKCB6U2ln
+MTw8MSApID09IDAgKSAmIHJvdW5kTmVhcmVzdEV2ZW4gKTsKICAgICAgICAgICAgICAgICAgICAg
+Xn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
+CiAgICAgICAgICAgICAgICAgICAgICEKL3RtcC9xZW11LXRlc3Qvc3JjL2ZwdS9zb2Z0ZmxvYXQu
+Yzo0MjczOjE4OiBlcnJvcjogYml0d2lzZSBuZWdhdGlvbiBvZiBhIGJvb2xlYW4gZXhwcmVzc2lv
+bjsgZGlkIHlvdSBtZWFuIGxvZ2ljYWwgbmVnYXRpb24/IFstV2Vycm9yLC1XYm9vbC1vcGVyYXRp
+b25dCiAgICAgICAgelNpZzEgJj0gfiAoICggelNpZzIgKyB6U2lnMiA9PSAwICkgJiByb3VuZE5l
+YXJlc3RFdmVuICk7CiAgICAgICAgICAgICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn4KICAgICAgICAgICAgICAgICAhCjggZXJyb3JzIGdlbmVyYXRl
+ZC4KbWFrZVsxXTogKioqIFsvdG1wL3FlbXUtdGVzdC9zcmMvcnVsZXMubWFrOjY5OiBmcHUvc29m
+dGZsb2F0Lm9dIEVycm9yIDEKbWFrZVsxXTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9i
+cy4uLi4KL3RtcC9xZW11LXRlc3Qvc3JjL21pZ3JhdGlvbi9yYW0uYzo5MTk6NDU6IGVycm9yOiBp
+bXBsaWNpdCBjb252ZXJzaW9uIGZyb20gJ3Vuc2lnbmVkIGxvbmcnIHRvICdkb3VibGUnIGNoYW5n
+ZXMgdmFsdWUgZnJvbSAxODQ0Njc0NDA3MzcwOTU1MTYxNSB0byAxODQ0Njc0NDA3MzcwOTU1MTYx
+NiBbLVdlcnJvciwtV2ltcGxpY2l0LWludC1mbG9hdC1jb252ZXJzaW9uXQogICAgICAgICAgICB4
+YnpybGVfY291bnRlcnMuZW5jb2RpbmdfcmF0ZSA9IFVJTlQ2NF9NQVg7CiAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgIH4gXn5+fn5+fn5+fgovdXNyL2luY2x1ZGUvc3Rk
+aW50Lmg6MTMwOjIzOiBub3RlOiBleHBhbmRlZCBmcm9tIG1hY3JvICdVSU5UNjRfTUFYJwotLS0K
+MTg0NDY3NDQwNzM3MDk1NTE2MTVVTApefn5+fn5+fn5+fn5+fn5+fn5+fn5+CjEgZXJyb3IgZ2Vu
+ZXJhdGVkLgptYWtlWzFdOiAqKiogWy90bXAvcWVtdS10ZXN0L3NyYy9ydWxlcy5tYWs6Njk6IG1p
+Z3JhdGlvbi9yYW0ub10gRXJyb3IgMQptYWtlOiAqKiogW01ha2VmaWxlOjUyNzogeDg2XzY0LXNv
+ZnRtbXUvYWxsXSBFcnJvciAyClRyYWNlYmFjayAobW9zdCByZWNlbnQgY2FsbCBsYXN0KToKICBG
+aWxlICIuL3Rlc3RzL2RvY2tlci9kb2NrZXIucHkiLCBsaW5lIDY2OSwgaW4gPG1vZHVsZT4KICAg
+IHN5cy5leGl0KG1haW4oKSkKLS0tCiAgICByYWlzZSBDYWxsZWRQcm9jZXNzRXJyb3IocmV0Y29k
+ZSwgY21kKQpzdWJwcm9jZXNzLkNhbGxlZFByb2Nlc3NFcnJvcjogQ29tbWFuZCAnWydzdWRvJywg
+Jy1uJywgJ2RvY2tlcicsICdydW4nLCAnLS1sYWJlbCcsICdjb20ucWVtdS5pbnN0YW5jZS51dWlk
+PTYyNmQxZDVlMTIxNTQzY2E4YzNiYmRiMTk3OTdmNjAyJywgJy11JywgJzEwMDMnLCAnLS1zZWN1
+cml0eS1vcHQnLCAnc2VjY29tcD11bmNvbmZpbmVkJywgJy0tcm0nLCAnLWUnLCAnVEFSR0VUX0xJ
+U1Q9eDg2XzY0LXNvZnRtbXUnLCAnLWUnLCAnRVhUUkFfQ09ORklHVVJFX09QVFM9JywgJy1lJywg
+J1Y9JywgJy1lJywgJ0o9MTQnLCAnLWUnLCAnREVCVUc9JywgJy1lJywgJ1NIT1dfRU5WPScsICct
+ZScsICdDQ0FDSEVfRElSPS92YXIvdG1wL2NjYWNoZScsICctdicsICcvaG9tZS9wYXRjaGV3Mi8u
+Y2FjaGUvcWVtdS1kb2NrZXItY2NhY2hlOi92YXIvdG1wL2NjYWNoZTp6JywgJy12JywgJy92YXIv
+dG1wL3BhdGNoZXctdGVzdGVyLXRtcC1oZWhfNHo1dC9zcmMvZG9ja2VyLXNyYy4yMDIwLTA2LTE2
+LTE3LjQ3LjM2LjQ2NjQ6L3Zhci90bXAvcWVtdTp6LHJvJywgJ3FlbXU6ZmVkb3JhJywgJy92YXIv
+dG1wL3FlbXUvcnVuJywgJ3Rlc3QtZGVidWcnXScgcmV0dXJuZWQgbm9uLXplcm8gZXhpdCBzdGF0
+dXMgMi4KZmlsdGVyPS0tZmlsdGVyPWxhYmVsPWNvbS5xZW11Lmluc3RhbmNlLnV1aWQ9NjI2ZDFk
+NWUxMjE1NDNjYThjM2JiZGIxOTc5N2Y2MDIKbWFrZVsxXTogKioqIFtkb2NrZXItcnVuXSBFcnJv
+ciAxCm1ha2VbMV06IExlYXZpbmcgZGlyZWN0b3J5IGAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10
+bXAtaGVoXzR6NXQvc3JjJwptYWtlOiAqKiogW2RvY2tlci1ydW4tdGVzdC1kZWJ1Z0BmZWRvcmFd
+IEVycm9yIDIKCnJlYWwgICAgNG0yOS4yNTRzCnVzZXIgICAgMG03Ljg2OXMKCgpUaGUgZnVsbCBs
+b2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMjAwNjE2MTcwODQ0
+LjEzMzE4LTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnL3Rlc3RpbmcuYXNhbi8/dHlwZT1tZXNz
+YWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6
+Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2
+ZWxAcmVkaGF0LmNvbQ==
 
