@@ -2,72 +2,96 @@ Return-Path: <SRS0=f7ls=75=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D731C433E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 16:14:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F22F2C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 16:14:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7D212208D5
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 16:14:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D212208D5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id C4DF02071A
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 16:14:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dZUEmD7b"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4DF02071A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39940 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41024 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlEEB-00005a-Mh
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 12:14:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58272)
+	id 1jlEEb-0000YI-49
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 12:14:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58354)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jlEDJ-0007n4-Ro
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 12:13:29 -0400
-Received: from 11.mo6.mail-out.ovh.net ([188.165.38.119]:51705)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jlEDG-0005Mb-6w
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 12:13:29 -0400
-Received: from player772.ha.ovh.net (unknown [10.108.57.178])
- by mo6.mail-out.ovh.net (Postfix) with ESMTP id CBEEB21A5D8
- for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 18:13:22 +0200 (CEST)
-Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
- (Authenticated sender: clg@kaod.org)
- by player772.ha.ovh.net (Postfix) with ESMTPSA id 260F6137DED0D;
- Tue, 16 Jun 2020 16:13:09 +0000 (UTC)
-Authentication-Results: garm.ovh; auth=pass
- (GARM-98R0028284699e-bacd-44c9-8e8a-fb2914693776,EBFB3A1CCBA6C973625B067ACEBAD7C75398389C)
- smtp.auth=clg@kaod.org
-Subject: Re: [PATCH 1/2] hw/misc/pca9552: Trace LED On/Off events
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org
-References: <20200616094542.25415-1-f4bug@amsat.org>
- <20200616094542.25415-2-f4bug@amsat.org>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <ce02c953-073a-3843-5830-930cc194117c@kaod.org>
-Date: Tue, 16 Jun 2020 18:13:06 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jlEDj-00086G-Mb
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 12:13:55 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:40245)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jlEDh-0005OT-SF
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 12:13:55 -0400
+Received: by mail-wr1-x444.google.com with SMTP id h5so21416071wrc.7
+ for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 09:13:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=bMHkAxgNTxYKcU6kkbpAAcX3OLtP0D+/btA28zgEp34=;
+ b=dZUEmD7bB0r6ZH06gj8itcc6F03TuvWVs1NNpi+Zs/jzXZlcOkSxdQHMXcnHd8Bsnm
+ qtRSiKpF15NrwlsNV+0I4Sqj5so6vimsLha4ojwiCqC00n7pBESjpoQKp8TXFPf5DFTk
+ NsW/Rx5chNt/Op6cX963+ePk00RgUjkBnJ1SvykLMNlqViHwe+6IkDZhCb50Z9o3QekC
+ SNf98cjXuvci306gXvq3i+2p0AQ9KNZ59wCwEDQFBTNZ4KfbSODqnYHtdOdDY6gfgVaw
+ dtPWnvY2mkIrQt63nZeBbTZjdrqK+iw7pkN+uZgQ3FzNA7Fi6/nuxE5xQandcwwh6AF2
+ b4lw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=bMHkAxgNTxYKcU6kkbpAAcX3OLtP0D+/btA28zgEp34=;
+ b=MJ5/WHM5q0aYozpdgnjY6NwPRAnEAjocSDZOcoXIlYIDDBFQgAdhULAyxwlfnHZop7
+ bRbUFwZty3qRwVrPTqjYXRO8VXE3qzeXvlD2JbmuOY/B1QaAK/YMxG2/rywkd6vyPuRX
+ mIa0zumataoR1TKn+1MF7rkF1QoYZ0jQcLbAlYu2SSJuuSZJ+voq5Qg+l2/CLaFGKhgb
+ 1QVeKIalWjbIpTbuc+W7/CToCGCJNGhiDU6qSeggTTOeN+7ZfUdR4xt9vHmWFI3/GedL
+ o5gLKXJoQm/y99iP4ZnlaJeEpGUFcYHflvqtJxo0eyJG1QuwQkm9+CwkKeWY1b5jlCH1
+ rVmQ==
+X-Gm-Message-State: AOAM532ex6BcPbdGQ9ITv+RG9Klni4ML4kGDfFxVUn/CCAprmhhCuBW2
+ 2X3fYIEYxtJbVc9v/BhmfcrSNw==
+X-Google-Smtp-Source: ABdhPJyVllK4hX9aSvBRzAxU35TuM5hgS86uJJNDddkS2nRWKejK+2ByUQ5msQhHm4Xrel+Hguu0aQ==
+X-Received: by 2002:adf:e692:: with SMTP id r18mr3671884wrm.192.1592324031957; 
+ Tue, 16 Jun 2020 09:13:51 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id o10sm29218671wrj.37.2020.06.16.09.13.50
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 16 Jun 2020 09:13:50 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 2F2E61FF7E;
+ Tue, 16 Jun 2020 17:13:50 +0100 (BST)
+References: <20200604085441.103087-1-kbastian@mail.uni-paderborn.de>
+ <20200604085441.103087-3-kbastian@mail.uni-paderborn.de>
+User-agent: mu4e 1.5.3; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Subject: Re: [PATCH v2 02/15] tests/tcg: Add docker_as and docker_ld cmds
+In-reply-to: <20200604085441.103087-3-kbastian@mail.uni-paderborn.de>
+Date: Tue, 16 Jun 2020 17:13:50 +0100
+Message-ID: <87eeqfyon5.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20200616094542.25415-2-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Ovh-Tracer-Id: 17267363925485521678
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -77
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedrudejtddguddtudcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenfghrlhcuvffnffculddvfedmnecujfgurhepuffvfhfhkffffgggjggtgfesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpefhvedvheeifedtveefleelfffghedtgfdvgeetieejtedujeeguddtudduhfetkeenucffohhmrghinhepohhpvghnphhofigvrhdrgiihiienucfkpheptddrtddrtddrtddpkedvrdeigedrvdehtddrudejtdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejjedvrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
-Received-SPF: pass client-ip=188.165.38.119; envelope-from=clg@kaod.org;
- helo=11.mo6.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 12:13:23
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -8
-X-Spam_score: -0.9
-X-Spam_bar: /
-X-Spam_report: (-0.9 / 5.0 requ) BAYES_00=-1.9, PDS_OTHER_BAD_TLD=1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x444.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -80,96 +104,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jeffery <andrew@aj.id.au>,
- Joaquin de Andres <me@xcancerberox.com.ar>,
- Esteban Bosse <estebanbosse@gmail.com>, qemu-arm@nongnu.org,
- Joel Stanley <joel@jms.id.au>, Guenter Roeck <linux@roeck-us.net>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/16/20 11:45 AM, Philippe Mathieu-Daudé wrote:
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
+Bastian Koppelmann <kbastian@mail.uni-paderborn.de> writes:
 
-Reviewed-by: Cédric Le Goater <clg@kaod.org>
-Tested-by: Cédric Le Goater <clg@kaod.org>
-
-Download an OpenBMC witherspoon flash image : 
-
-wget https://openpower.xyz/job/openbmc-build/lastSuccessfulBuild/distro=ubuntu,label=builder,target=witherspoon/artifact/deploy/images/witherspoon/obmc-phosphor-image-witherspoon.ubi.mtd
-
-and run :
-
-qemu-system-arm -M witherspoon-bmc -nic user -drive file=obmc-phosphor-image-witherspoon.ubi.mtd,format=raw,if=mtd -nographic
-
-The system has a set of daemons controlling the status of the leds :
-
- 1148 root      7164 S    phosphor-ledcontroller -p /sys/class/leds/cffps1/68
- 1149 root      7164 S    phosphor-ledcontroller -p /sys/class/leds/cffps1/69
- 1150 root      7164 S    phosphor-ledcontroller -p /sys/class/leds/fan0
- 1151 root      7164 S    phosphor-ledcontroller -p /sys/class/leds/fan1
- 1152 root      7164 S    phosphor-ledcontroller -p /sys/class/leds/fan2
- 1153 root      7164 S    phosphor-ledcontroller -p /sys/class/leds/fan3
- 1154 root      7164 S    phosphor-ledcontroller -p /sys/class/leds/front/fault
- 1155 root      7164 S    phosphor-ledcontroller -p /sys/class/leds/front/id
- 1156 root      7164 S    phosphor-ledcontroller -p /sys/class/leds/front/power
- 1157 root      7164 S    phosphor-ledcontroller -p /sys/class/leds/power/button
- 1158 root      7164 S    phosphor-ledcontroller -p /sys/class/leds/rear/fault
- 1159 root      7164 S    phosphor-ledcontroller -p /sys/class/leds/rear/id
- 1160 root      7164 S    phosphor-ledcontroller -p /sys/class/leds/rear/power
-
-
-If activated, the pca9552 traces will appear on the QEMU monitor.
-
-Thanks,
-
-C.
-
+> At least for the TriCore target no easily available c compiler exists.
+> Thus we need to rely on "as" and "ld". This allows us to run them
+> through the docker image.
+>
+> Signed-off-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 > ---
->  hw/misc/pca9552.c    | 7 +++++++
->  hw/misc/trace-events | 3 +++
->  2 files changed, 10 insertions(+)
-> 
-> diff --git a/hw/misc/pca9552.c b/hw/misc/pca9552.c
-> index cac729e35a..a3d0decbff 100644
-> --- a/hw/misc/pca9552.c
-> +++ b/hw/misc/pca9552.c
-> @@ -17,6 +17,7 @@
->  #include "migration/vmstate.h"
->  #include "qapi/error.h"
->  #include "qapi/visitor.h"
-> +#include "trace.h"
->  
->  #define PCA9552_LED_ON   0x0
->  #define PCA9552_LED_OFF  0x1
-> @@ -45,9 +46,15 @@ static void pca9552_update_pin_input(PCA9552State *s)
->          switch (config) {
->          case PCA9552_LED_ON:
->              s->regs[input_reg] |= 1 << input_shift;
-> +            if (input_shift < s->nr_leds) {
-> +                trace_pca9552_led_set(input_shift, true);
-> +            }
->              break;
->          case PCA9552_LED_OFF:
->              s->regs[input_reg] &= ~(1 << input_shift);
-> +            if (input_shift < s->nr_leds) {
-> +                trace_pca9552_led_set(input_shift, false);
-> +            }
->              break;
->          case PCA9552_LED_PWM0:
->          case PCA9552_LED_PWM1:
-> diff --git a/hw/misc/trace-events b/hw/misc/trace-events
-> index 5561746866..ed80d0d1be 100644
-> --- a/hw/misc/trace-events
-> +++ b/hw/misc/trace-events
-> @@ -206,3 +206,6 @@ via1_rtc_cmd_pram_sect_write(int sector, int offset, int addr, int value) "secto
->  # grlib_ahb_apb_pnp.c
->  grlib_ahb_pnp_read(uint64_t addr, uint32_t value) "AHB PnP read addr:0x%03"PRIx64" data:0x%08x"
->  grlib_apb_pnp_read(uint64_t addr, uint32_t value) "APB PnP read addr:0x%03"PRIx64" data:0x%08x"
+>  tests/tcg/Makefile.qemu | 11 +++++++++++
+>  tests/tcg/configure.sh  |  2 ++
+>  2 files changed, 13 insertions(+)
+>
+> diff --git a/tests/tcg/Makefile.qemu b/tests/tcg/Makefile.qemu
+> index 9c23aeaa2a..e5b3a4bacc 100644
+> --- a/tests/tcg/Makefile.qemu
+> +++ b/tests/tcg/Makefile.qemu
+> @@ -50,11 +50,22 @@ DOCKER_COMPILE_CMD=3D"$(DOCKER_SCRIPT) cc \
+>  		-i qemu:$(DOCKER_IMAGE) \
+>  		-s $(SRC_PATH) -- "
+>=20=20
+> +DOCKER_AS_CMD=3D"$(DOCKER_SCRIPT) cc \
+> +		--cc $(DOCKER_CROSS_AS_GUEST) \
+> +		-i qemu:$(DOCKER_IMAGE) \
+> +		-s $(SRC_PATH) -- "
 > +
-> +# pca9552.c
-> +pca9552_led_set(unsigned id, bool state) "LED#%d state:%u"
-> 
+> +DOCKER_LD_CMD=3D"$(DOCKER_SCRIPT) cc \
+> +		--cc $(DOCKER_CROSS_LD_GUEST) \
+> +		-i qemu:$(DOCKER_IMAGE) \
+> +		-s $(SRC_PATH) -- "
+> +
+>  .PHONY: docker-build-guest-tests
+>  docker-build-guest-tests: docker-image-$(DOCKER_IMAGE)
+>  	$(call quiet-command, \
+>  	  (mkdir -p tests/tcg/$(TARGET) && cd tests/tcg/$(TARGET) && \
+>  	   $(MAKE) -f $(TCG_MAKE) TARGET=3D"$(TARGET)" CC=3D$(DOCKER_COMPILE_CM=
+D) \
+> +			AS=3D$(DOCKER_AS_CMD) LD=3D$(DOCKER_LD_CMD) \
+>  			SRC_PATH=3D"$(SRC_PATH)" BUILD_STATIC=3Dy \
+>  			EXTRA_CFLAGS=3D"$(CROSS_CC_GUEST_CFLAGS)"), \
+>  	"BUILD","$(TARGET) guest-tests with docker qemu:$(DOCKER_IMAGE)")
+> diff --git a/tests/tcg/configure.sh b/tests/tcg/configure.sh
+> index 2326f97856..6e8659d488 100755
+> --- a/tests/tcg/configure.sh
+> +++ b/tests/tcg/configure.sh
+> @@ -242,6 +242,8 @@ for target in $target_list; do
+>    if test $got_cross_cc =3D no && test "$container" !=3D no && test -n "=
+$container_image"; then
+>      echo "DOCKER_IMAGE=3D$container_image" >> $config_target_mak
+>      echo "DOCKER_CROSS_CC_GUEST=3D$container_cross_cc" >> $config_target=
+_mak
+> +    echo "DOCKER_CROSS_AS_GUEST=3D$container_cross_as" >> $config_target=
+_mak
+> +    echo "DOCKER_CROSS_LD_GUEST=3D$container_cross_ld" >> $config_target=
+_mak
+>    fi
+>  done
 
+We should keep parity with locally installed tools though. Can we emit a
+CROSS_LD_GUEST/CROSS_AS_GUEST for locally installed tools?
+
+--=20
+Alex Benn=C3=A9e
 
