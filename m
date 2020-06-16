@@ -7,73 +7,77 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 956AAC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:42:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEEBEC433E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:42:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 29D5520882
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:42:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 84C02208B8
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:42:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ysk0V+ew"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29D5520882
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g7FNTgPF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84C02208B8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35804 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36042 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlCnN-0004Ns-4c
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 10:42:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57996)
+	id 1jlCnP-0004Tr-Np
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 10:42:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57664)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1jlCQU-0003Ne-Ht; Tue, 16 Jun 2020 10:18:58 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:43689)
+ id 1jlCPv-0002UU-TW; Tue, 16 Jun 2020 10:18:23 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:39890)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1jlCQS-0006wl-RE; Tue, 16 Jun 2020 10:18:58 -0400
-Received: by mail-oi1-x244.google.com with SMTP id j189so19336198oih.10;
- Tue, 16 Jun 2020 07:18:56 -0700 (PDT)
+ id 1jlCPu-0006j9-Av; Tue, 16 Jun 2020 10:18:23 -0400
+Received: by mail-ot1-x343.google.com with SMTP id g5so16041684otg.6;
+ Tue, 16 Jun 2020 07:18:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=h429QYiD1bg+WMlm+glXw9EZ2TWraTLlcvNO6XKq5+Y=;
- b=Ysk0V+ewYqMMR0+gah7P2IQV88KYfhL3UsEqFDLtLQ5dWQqf9yajAhX0Pp4AVqvq8n
- YmMzunhImD0RI1nmthXt8nHxY0w+lJ3rPi2tpLGpWNxcR56hYaNOw5R74tKzrEGUR0dS
- dqyMrWHlolLYVOcNPTQ/9b6lL0grayg/2mpIYUOfHyzLNDZX5dZ80mm3k294WxMGFiKh
- zWEXwhCHOdesBKSAYiFHFzUxD1TAJ+jys9gjOlOE3DI9rbSrPriiqG8CWdMtR6L7gho+
- htz2cZ3Z9wwPKp5FHkQxvTFuoDYtVEGlit8PJCNpFdEbD9fHDmNAwzjPlSOMKM18ZVpd
- F4zQ==
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=2PAYIiO9sA4fG4g3Wu3Wl38xdQ9Zdsb+MLvf0b3D2Wo=;
+ b=g7FNTgPFv4/Y5UcicqvAI+fAkUZwdEIukRE3Mw0maZKBjcEpV8HSjhTmR8EOzsuD1N
+ FvgntdECt95W9F90X2+2oK1zg55kW17cIzqeR10BMHtwEVXVgG9nohSh7V/1qbsUDHEB
+ nSqduJqHGKVjziNbGCj6tpQw2vNL5rfo2UMEI+OXsOTZFw6ug08qChxYtGkc7Vc/906u
+ Wqp8w6IcHzVcUHH9rSxNKLKseRpj/hbqYU4yEAvVc0SN93HoNZltf7VaGu1IuQyAx3Pb
+ ABBloVEwJ83394tnUtAwvN6tR1/lYQ0HiRiaJ03FRvingizsgox190O1DqwBiqzlmIVB
+ wB/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references;
- bh=h429QYiD1bg+WMlm+glXw9EZ2TWraTLlcvNO6XKq5+Y=;
- b=iwOrMWXcfRoSz9hGahhaDWFvhM2siLMtjm4IxnhPwDSa9KsWJFQJixnBhKCapbYMWS
- 80agSvSROmLsaUD5lERnTK6EXSj3nnrSCRvhcv/vjBPsihqYdil37ud4tuSkIc23rks5
- s8GalNfuD1xXvWPmQ0OlCNRHa6DJKNrs3KoAB8oUoxEc4/QZf0+DMbPvvAgGmvHaTDR+
- xPNc83ALeRjR9DEkShlVLSTY6rX23m714M6XLr+2hFsL0hb29R+TXI8q1EjvbwgeYhCX
- uGN8m6OO3HzBWLiNi4XKZoSLfFwMnMbkmBOQPy5L/1reW+NfJsuoNYotGG822hzu8qHe
- bcVA==
-X-Gm-Message-State: AOAM530YEJTGadyLnISZNQeRMWaU2qo54juJko8DtvYWdajgy3PLpwx5
- zQtrHIT/qW4cvrVJX64LCQeu+uGM
-X-Google-Smtp-Source: ABdhPJzlw1ib20DQePfdRx/1qhY4BU9r9KlsF1/qWQYjM49TgKeCy0G3phnZW6xg+mqWshcKaQp1BA==
-X-Received: by 2002:aca:4b4f:: with SMTP id y76mr3695526oia.34.1592317134822; 
- Tue, 16 Jun 2020 07:18:54 -0700 (PDT)
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=2PAYIiO9sA4fG4g3Wu3Wl38xdQ9Zdsb+MLvf0b3D2Wo=;
+ b=aF+CFkTMy3O37ngIO8jXJF0QrhgiYa4XohVM0pr5xPFnJSkOgNMr2o/SSh+yGoF5ED
+ 6Hcsu5R8M9il0BpNxAV3hGoiB6P8VU7bCrqmNW1mtp90PvaOtczRha7tLAXky9zHuaRD
+ i6K2HGeDkzHqlrKd4e92YUIhBGmzsflIzFI0wHOctq7rr+Xp9m7qID9yzHwxjyBatSu8
+ miXHmQ6+q2+kc1p5+srPqxTINksi4J01VzJ+Ei4uIyN9F2iePhn7uyNUKF5cY03esh35
+ gf7UnnN895t4419DrGar+VogGkYWkyvWvGceOTf/cmtP8TtO9OjhuPV8aSrJxL5XxJyF
+ pykw==
+X-Gm-Message-State: AOAM533oG/QNwlAtK6wmCtGHn9uLZepXYLhJsYHQhBjqW8LbIdxinaun
+ wgdXPOC7zg2vW2mSKmpBC+QItu7o
+X-Google-Smtp-Source: ABdhPJwYSh11X0vLxrhUFIdVYhsAfxeWEuoto5UrLkPdRy8UgB8xEJ9RAN+s2dWwxX/f0bMJSYGQTw==
+X-Received: by 2002:a9d:6c03:: with SMTP id f3mr2511324otq.291.1592317100308; 
+ Tue, 16 Jun 2020 07:18:20 -0700 (PDT)
 Received: from localhost (76-251-165-188.lightspeed.austtx.sbcglobal.net.
  [76.251.165.188])
- by smtp.gmail.com with ESMTPSA id e26sm2952616otp.50.2020.06.16.07.18.52
+ by smtp.gmail.com with ESMTPSA id l24sm4073415otf.79.2020.06.16.07.18.18
  (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
- Tue, 16 Jun 2020 07:18:52 -0700 (PDT)
+ Tue, 16 Jun 2020 07:18:19 -0700 (PDT)
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 54/78] block/block-copy: fix progress calculation
-Date: Tue, 16 Jun 2020 09:15:23 -0500
-Message-Id: <20200616141547.24664-55-mdroth@linux.vnet.ibm.com>
+Subject: [PATCH 36/78] dp8393x: Pad frames to word or long word boundary
+Date: Tue, 16 Jun 2020 09:15:05 -0500
+Message-Id: <20200616141547.24664-37-mdroth@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200616141547.24664-1-mdroth@linux.vnet.ibm.com>
 References: <20200616141547.24664-1-mdroth@linux.vnet.ibm.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::244;
- envelope-from=flukshun@gmail.com; helo=mail-oi1-x244.google.com
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::343;
+ envelope-from=flukshun@gmail.com; helo=mail-ot1-x343.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -95,204 +99,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-stable@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, qemu-stable@nongnu.org,
+ Finn Thain <fthain@telegraphics.com.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+From: Finn Thain <fthain@telegraphics.com.au>
 
-Assume we have two regions, A and B, and region B is in-flight now,
-region A is not yet touched, but it is unallocated and should be
-skipped.
+The existing code has a bug where the Remaining Buffer Word Count (RBWC)
+is calculated with a truncating division, which gives the wrong result
+for odd-sized packets.
 
-Correspondingly, as progress we have
+Section 1.4.1 of the datasheet says,
 
-  total = A + B
-  current = 0
+    Once the end of the packet has been reached, the serializer will
+    fill out the last word (16-bit mode) or long word (32-bit mode)
+    if the last byte did not end on a word or long word boundary
+    respectively. The fill byte will be 0FFh.
 
-If we reset unallocated region A and call progress_reset_callback,
-it will calculate 0 bytes dirty in the bitmap and call
-job_progress_set_remaining, which will set
+Implement buffer padding so that buffer limits are correctly enforced.
 
-   total = current + 0 = 0 + 0 = 0
-
-So, B bytes are actually removed from total accounting. When job
-finishes we'll have
-
-   total = 0
-   current = B
-
-, which doesn't sound good.
-
-This is because we didn't considered in-flight bytes, actually when
-calculating remaining, we should have set (in_flight + dirty_bytes)
-as remaining, not only dirty_bytes.
-
-To fix it, let's refactor progress calculation, moving it to block-copy
-itself instead of fixing callback. And, of course, track in_flight
-bytes count.
-
-We still have to keep one callback, to maintain backup job bytes_read
-calculation, but it will go on soon, when we turn the whole backup
-process into one block_copy call.
-
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Message-Id: <20200311103004.7649-3-vsementsov@virtuozzo.com>
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-(cherry picked from commit d0ebeca14a585f352938062ef8ddde47fe4d39f9)
+Signed-off-by: Finn Thain <fthain@telegraphics.com.au>
+Tested-by: Laurent Vivier <laurent@vivier.eu>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Jason Wang <jasowang@redhat.com>
+(cherry picked from commit 350e7d9a77d3b9ac74d240e4b232db1ebe5c05bc)
+*drop context dependencies from b7cbebf2b9d, 1ccda935d4f, and
+ 19f70347731
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- block/backup.c             | 13 ++-----------
- block/block-copy.c         | 16 ++++++++++++----
- include/block/block-copy.h | 15 +++++----------
- 3 files changed, 19 insertions(+), 25 deletions(-)
+ hw/net/dp8393x.c | 39 ++++++++++++++++++++++++++++-----------
+ 1 file changed, 28 insertions(+), 11 deletions(-)
 
-diff --git a/block/backup.c b/block/backup.c
-index cf62b1a38c..5f3bd2415a 100644
---- a/block/backup.c
-+++ b/block/backup.c
-@@ -57,15 +57,6 @@ static void backup_progress_bytes_callback(int64_t bytes, void *opaque)
-     BackupBlockJob *s = opaque;
+diff --git a/hw/net/dp8393x.c b/hw/net/dp8393x.c
+index 40e3a029b6..0e9061d831 100644
+--- a/hw/net/dp8393x.c
++++ b/hw/net/dp8393x.c
+@@ -766,16 +766,23 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
+     dp8393xState *s = qemu_get_nic_opaque(nc);
+     int packet_type;
+     uint32_t available, address;
+-    int width, rx_len = pkt_size;
++    int width, rx_len, padded_len;
+     uint32_t checksum;
+     int size;
  
-     s->bytes_read += bytes;
--    job_progress_update(&s->common.job, bytes);
--}
+-    width = (s->regs[SONIC_DCR] & SONIC_DCR_DW) ? 2 : 1;
 -
--static void backup_progress_reset_callback(void *opaque)
--{
--    BackupBlockJob *s = opaque;
--    uint64_t estimate = bdrv_get_dirty_count(s->bcs->copy_bitmap);
--
--    job_progress_set_remaining(&s->common.job, estimate);
- }
+     s->regs[SONIC_RCR] &= ~(SONIC_RCR_PRX | SONIC_RCR_LBK | SONIC_RCR_FAER |
+         SONIC_RCR_CRCR | SONIC_RCR_LPKT | SONIC_RCR_BC | SONIC_RCR_MC);
  
- static int coroutine_fn backup_do_cow(BackupBlockJob *job,
-@@ -461,8 +452,8 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
-     job->cluster_size = cluster_size;
-     job->len = len;
- 
--    block_copy_set_callbacks(bcs, backup_progress_bytes_callback,
--                             backup_progress_reset_callback, job);
-+    block_copy_set_progress_callback(bcs, backup_progress_bytes_callback, job);
-+    block_copy_set_progress_meter(bcs, &job->common.job.progress);
- 
-     /* Required permissions are already taken by backup-top target */
-     block_job_add_bdrv(&job->common, "target", target, 0, BLK_PERM_ALL,
-diff --git a/block/block-copy.c b/block/block-copy.c
-index 79798a1567..e2d7b3b887 100644
---- a/block/block-copy.c
-+++ b/block/block-copy.c
-@@ -127,17 +127,20 @@ BlockCopyState *block_copy_state_new(BdrvChild *source, BdrvChild *target,
-     return s;
- }
- 
--void block_copy_set_callbacks(
-+void block_copy_set_progress_callback(
-         BlockCopyState *s,
-         ProgressBytesCallbackFunc progress_bytes_callback,
--        ProgressResetCallbackFunc progress_reset_callback,
-         void *progress_opaque)
- {
-     s->progress_bytes_callback = progress_bytes_callback;
--    s->progress_reset_callback = progress_reset_callback;
-     s->progress_opaque = progress_opaque;
- }
- 
-+void block_copy_set_progress_meter(BlockCopyState *s, ProgressMeter *pm)
-+{
-+    s->progress = pm;
-+}
+-    if (pkt_size + 4 > dp8393x_rbwc(s) * 2) {
++    rx_len = pkt_size + sizeof(checksum);
++    if (s->regs[SONIC_DCR] & SONIC_DCR_DW) {
++        width = 2;
++        padded_len = ((rx_len - 1) | 3) + 1;
++    } else {
++        width = 1;
++        padded_len = ((rx_len - 1) | 1) + 1;
++    }
 +
- /*
-  * block_copy_do_copy
-  *
-@@ -269,7 +272,9 @@ int64_t block_copy_reset_unallocated(BlockCopyState *s,
++    if (padded_len > dp8393x_rbwc(s) * 2) {
+         DPRINTF("oversize packet, pkt_size is %d\n", pkt_size);
+         s->regs[SONIC_ISR] |= SONIC_ISR_RBAE;
+         dp8393x_update_irq(s);
+@@ -810,22 +817,32 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
+     s->regs[SONIC_TRBA0] = s->regs[SONIC_CRBA0];
  
-     if (!ret) {
-         bdrv_reset_dirty_bitmap(s->copy_bitmap, offset, bytes);
--        s->progress_reset_callback(s->progress_opaque);
-+        progress_set_remaining(s->progress,
-+                               bdrv_get_dirty_count(s->copy_bitmap) +
-+                               s->in_flight_bytes);
-     }
+     /* Calculate the ethernet checksum */
+-    checksum = cpu_to_le32(crc32(0, buf, rx_len));
++    checksum = cpu_to_le32(crc32(0, buf, pkt_size));
  
-     *count = bytes;
-@@ -331,15 +336,18 @@ int coroutine_fn block_copy(BlockCopyState *s,
-         trace_block_copy_process(s, start);
- 
-         bdrv_reset_dirty_bitmap(s->copy_bitmap, start, chunk_end - start);
-+        s->in_flight_bytes += chunk_end - start;
- 
-         co_get_from_shres(s->mem, chunk_end - start);
-         ret = block_copy_do_copy(s, start, chunk_end, error_is_read);
-         co_put_to_shres(s->mem, chunk_end - start);
-+        s->in_flight_bytes -= chunk_end - start;
-         if (ret < 0) {
-             bdrv_set_dirty_bitmap(s->copy_bitmap, start, chunk_end - start);
-             break;
-         }
- 
-+        progress_work_done(s->progress, chunk_end - start);
-         s->progress_bytes_callback(chunk_end - start, s->progress_opaque);
-         start = chunk_end;
-         ret = 0;
-diff --git a/include/block/block-copy.h b/include/block/block-copy.h
-index 0a161724d7..9def00068c 100644
---- a/include/block/block-copy.h
-+++ b/include/block/block-copy.h
-@@ -26,7 +26,6 @@ typedef struct BlockCopyInFlightReq {
- } BlockCopyInFlightReq;
- 
- typedef void (*ProgressBytesCallbackFunc)(int64_t bytes, void *opaque);
--typedef void (*ProgressResetCallbackFunc)(void *opaque);
- typedef struct BlockCopyState {
-     /*
-      * BdrvChild objects are not owned or managed by block-copy. They are
-@@ -36,6 +35,7 @@ typedef struct BlockCopyState {
-     BdrvChild *source;
-     BdrvChild *target;
-     BdrvDirtyBitmap *copy_bitmap;
-+    int64_t in_flight_bytes;
-     int64_t cluster_size;
-     bool use_copy_range;
-     int64_t copy_size;
-@@ -60,15 +60,9 @@ typedef struct BlockCopyState {
-      */
-     bool skip_unallocated;
- 
-+    ProgressMeter *progress;
-     /* progress_bytes_callback: called when some copying progress is done. */
-     ProgressBytesCallbackFunc progress_bytes_callback;
--
--    /*
--     * progress_reset_callback: called when some bytes reset from copy_bitmap
--     * (see @skip_unallocated above). The callee is assumed to recalculate how
--     * many bytes remain based on the dirty bit count of copy_bitmap.
--     */
--    ProgressResetCallbackFunc progress_reset_callback;
-     void *progress_opaque;
- 
-     SharedResource *mem;
-@@ -79,12 +73,13 @@ BlockCopyState *block_copy_state_new(BdrvChild *source, BdrvChild *target,
-                                      BdrvRequestFlags write_flags,
-                                      Error **errp);
- 
--void block_copy_set_callbacks(
-+void block_copy_set_progress_callback(
-         BlockCopyState *s,
-         ProgressBytesCallbackFunc progress_bytes_callback,
--        ProgressResetCallbackFunc progress_reset_callback,
-         void *progress_opaque);
- 
-+void block_copy_set_progress_meter(BlockCopyState *s, ProgressMeter *pm);
+     /* Put packet into RBA */
+     DPRINTF("Receive packet at %08x\n", dp8393x_crba(s));
+     address = dp8393x_crba(s);
+     address_space_rw(&s->as, address,
+-        MEMTXATTRS_UNSPECIFIED, (uint8_t *)buf, rx_len, 1);
+-    address += rx_len;
++        MEMTXATTRS_UNSPECIFIED, (uint8_t *)buf, pkt_size, 1);
++    address += pkt_size;
 +
- void block_copy_state_free(BlockCopyState *s);
++    /* Put frame checksum into RBA */
+     address_space_rw(&s->as, address,
+-        MEMTXATTRS_UNSPECIFIED, (uint8_t *)&checksum, 4, 1);
+-    address += 4;
+-    rx_len += 4;
++        MEMTXATTRS_UNSPECIFIED, (uint8_t *)&checksum, sizeof(checksum), 1);
++    address += sizeof(checksum);
++
++    /* Pad short packets to keep pointers aligned */
++    if (rx_len < padded_len) {
++        size = padded_len - rx_len;
++        address_space_rw(&s->as, address, MEMTXATTRS_UNSPECIFIED,
++            (uint8_t *)"\xFF\xFF\xFF", size, 1);
++        address += size;
++    }
++
+     s->regs[SONIC_CRBA1] = address >> 16;
+     s->regs[SONIC_CRBA0] = address & 0xffff;
+     available = dp8393x_rbwc(s);
+-    available -= rx_len / 2;
++    available -= padded_len >> 1;
+     s->regs[SONIC_RBWC1] = available >> 16;
+     s->regs[SONIC_RBWC0] = available & 0xffff;
  
- int64_t block_copy_reset_unallocated(BlockCopyState *s,
 -- 
 2.17.1
 
