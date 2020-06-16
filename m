@@ -7,73 +7,77 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 416E7C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:30:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C6DDC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:31:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0C6F420786
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:30:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4FBC32080D
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:31:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hV+qhLYV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C6F420786
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bXZSIRPq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4FBC32080D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41606 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43414 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlCbx-0006jH-5i
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 10:30:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57420)
+	id 1jlCcV-0007SN-HR
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 10:31:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57628)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1jlCPW-0001vP-3L; Tue, 16 Jun 2020 10:17:58 -0400
-Received: from mail-oi1-x236.google.com ([2607:f8b0:4864:20::236]:39414)
+ id 1jlCPr-0002JJ-Tz; Tue, 16 Jun 2020 10:18:19 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:34889)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1jlCPU-0006bN-9v; Tue, 16 Jun 2020 10:17:57 -0400
-Received: by mail-oi1-x236.google.com with SMTP id d67so19349711oig.6;
- Tue, 16 Jun 2020 07:17:55 -0700 (PDT)
+ id 1jlCPq-0006hu-FE; Tue, 16 Jun 2020 10:18:19 -0400
+Received: by mail-oi1-x241.google.com with SMTP id k4so19384320oik.2;
+ Tue, 16 Jun 2020 07:18:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=Q95hS3J40RCSoOEE5dlvFtYnyG3elf6x2RtaTUYv91A=;
- b=hV+qhLYVCwxGxaUe+OPMnAAyjIuQ19Rc9GGTZj7um2ONSqRRZ3eOt4hZd2XjmoXBCW
- PyLw6f1Zqm6RgJvb3O1cMwZ4hoM0oYdNGweD30hsEoosRHpxZIBoXS29eO/xrO+1qCIW
- PK7waDd0GnhMGhJ6B1gca9tI+u9vu0aFtxt83mWM8C05KJ1bZHWPWfmOexdZgHULBP+S
- NbpeRpJT+U1UaN4LzdcuPYX63GqSxBAkCFnYJVBoqha5s/3n0brQNnnIyNx50XxNfJNI
- ObkKQshNz8+uDXEg962KwnM4KEtaa4darxkiTqMRDIzPNxPpy/ohnCeaOZhWinwVKX7z
- U0Vg==
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=MYqD5kUyAFJe68fqslPuojGp+B170xLbwwM5A3xgweA=;
+ b=bXZSIRPq8d7FWdJW6c9yaexTnz15i66GYNJJJgwtHgd7/A6P8slTYFX4pmIcSwaCW9
+ EpJkA2kFHt8rmCOyYZpzDsd7pcr0iZp9HVcHzNpGykaODPOdoxcxuW7HjB9RR90NXBDK
+ GjEhngJmTlwZKoaFbTfTNklY1NJgr69NzpoBjKPu3umT83tFT8E74TXOrSmHBf4XesQ8
+ PCTmQe1BmZcRkkUTMm6I2BDVMtptg5EFh59v2gSk021hzJngv+BFqpDOWYDEwl+z+lfS
+ HRAIx8PD+4ehb1nxUTbOYVLIh8G+G+fuQhB+/g2pv2W+EmvqwLuJeFVoVG40vWxRZ3gF
+ /uPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references;
- bh=Q95hS3J40RCSoOEE5dlvFtYnyG3elf6x2RtaTUYv91A=;
- b=PiXY8Z9gRUkQeN8f5CpbN/nZE2liZjeSDjxIlLLMQPxeHqty2ysACGNY/Eciz6LXaN
- +/3r4Ll5GTUr7dRxbcSpn0mIT5Uf4qXnmwuokW7P3e/7C04oSlw6dPfqa2ifDJ0SpeVu
- fyGQ8iFXSPWMWmQKLqYEla4TE/Sx3KLaL1GGkePD1dfBxTz/sBJsJQDxT4Yc6j0KICxz
- rNoupncxMNEgEDnUeQVbQpZAuE3Db540PP7pmUg1ZxZpmfuBbSLAzCkMTLVaWCFjDrEj
- No/Zc4PEthQhsC313Sg4I0KcewmFcwJaXhLhKswN3K8R81LBfi8N2SzVu3BmSduNr5cJ
- MEGg==
-X-Gm-Message-State: AOAM5321IcGNznS7MqxbxMhhxtyhPiUXAx1+fZObL+X++lykAsk/ZXlG
- JgaLESkeb9BKEbZeb41KRAceqs3b
-X-Google-Smtp-Source: ABdhPJyN7T3b11wfLV+3qdP/dNuteuyTMH9TXoHEvXc4mgKL7zoWrgUUNsEVn9Ezq52NieeWicQpfw==
-X-Received: by 2002:aca:df04:: with SMTP id w4mr3458946oig.27.1592317074303;
- Tue, 16 Jun 2020 07:17:54 -0700 (PDT)
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=MYqD5kUyAFJe68fqslPuojGp+B170xLbwwM5A3xgweA=;
+ b=YVaGmstdyKEAU9H1/aq7n1j7jc7UyWoNuaewr4wj9ClX5OllUJCRmTdc/gHUYZi02z
+ sIr6gkr/hDE+WtxxHVLDgyhFtM42TgzsJ0D1lt1gjh631VC2Hc9dBY1ISrQ8ikFaD4RP
+ zQolEB610w1NKZnv5If/wD5i/j2IrMQIifYeKfN+wP7/fJ6BGK1QWYZ4PF5C3LGTRrS2
+ 1r+oEQ3wRaVCyh2UCbw35GmJHkLUpiC11eTcgcH8L2dCLWINnjDWLBKjj/f+EsC4DZuD
+ xAW5cjp2BAUpgaX0Wld8u1GyKoV5lewbnqJULWzUZvJ/Let8Vi4IX9p9tXolEH/vA9iC
+ mo9Q==
+X-Gm-Message-State: AOAM533FuxKGYhd59Mr1kPviHRK1SswaDCZpBeCcmyexfjMBjXnqCdTJ
+ LcMN1RgoQi6cTjY2Ue/pH42c0OWx
+X-Google-Smtp-Source: ABdhPJzyBxEjEU4YsHol5tsSt9TvVUlg+UWN+/he2OZ1RB8D6sSbg0h/Kzv3bi3zLZHMl/vGtzFYkg==
+X-Received: by 2002:aca:438a:: with SMTP id q132mr3382644oia.44.1592317096410; 
+ Tue, 16 Jun 2020 07:18:16 -0700 (PDT)
 Received: from localhost (76-251-165-188.lightspeed.austtx.sbcglobal.net.
  [76.251.165.188])
- by smtp.gmail.com with ESMTPSA id e188sm4349186oib.18.2020.06.16.07.17.52
+ by smtp.gmail.com with ESMTPSA id g5sm4072195otb.20.2020.06.16.07.18.14
  (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
- Tue, 16 Jun 2020 07:17:53 -0700 (PDT)
+ Tue, 16 Jun 2020 07:18:14 -0700 (PDT)
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 21/78] virtio: reset region cache when on queue deletion
-Date: Tue, 16 Jun 2020 09:14:50 -0500
-Message-Id: <20200616141547.24664-22-mdroth@linux.vnet.ibm.com>
+Subject: [PATCH 34/78] dp8393x: Don't clobber packet checksum
+Date: Tue, 16 Jun 2020 09:15:03 -0500
+Message-Id: <20200616141547.24664-35-mdroth@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200616141547.24664-1-mdroth@linux.vnet.ibm.com>
 References: <20200616141547.24664-1-mdroth@linux.vnet.ibm.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::236;
- envelope-from=flukshun@gmail.com; helo=mail-oi1-x236.google.com
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::241;
+ envelope-from=flukshun@gmail.com; helo=mail-oi1-x241.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -95,41 +99,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yuri Benditovich <yuri.benditovich@daynix.com>, qemu-stable@nongnu.org,
- "Michael S . Tsirkin" <mst@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, qemu-stable@nongnu.org,
+ Finn Thain <fthain@telegraphics.com.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Yuri Benditovich <yuri.benditovich@daynix.com>
+From: Finn Thain <fthain@telegraphics.com.au>
 
-https://bugzilla.redhat.com/show_bug.cgi?id=1708480
-Fix leak of region reference that prevents complete
-device deletion on hot unplug.
+A received packet consumes pkt_size bytes in the buffer and the frame
+checksum that's appended to it consumes another 4 bytes. The Receive
+Buffer Address register takes the former quantity into account but
+not the latter. So the next packet written to the buffer overwrites
+the frame checksum. Fix this.
 
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
-Message-Id: <20191226043649.14481-2-yuri.benditovich@daynix.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-(cherry picked from commit 421afd2fe8dd4603216cbf36081877c391f5a2a4)
+Signed-off-by: Finn Thain <fthain@telegraphics.com.au>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Laurent Vivier <laurent@vivier.eu>
+Signed-off-by: Jason Wang <jasowang@redhat.com>
+(cherry picked from commit bae112b80c9c42cea21ee7623c283668c3451c2e)
+*drop context dep. on 19f70347731
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- hw/virtio/virtio.c | 1 +
+ hw/net/dp8393x.c | 1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index 6de3cfdc2c..344d817644 100644
---- a/hw/virtio/virtio.c
-+++ b/hw/virtio/virtio.c
-@@ -2338,6 +2338,7 @@ void virtio_delete_queue(VirtQueue *vq)
-     vq->handle_aio_output = NULL;
-     g_free(vq->used_elems);
-     vq->used_elems = NULL;
-+    virtio_virtqueue_reset_region_cache(vq);
- }
- 
- void virtio_del_queue(VirtIODevice *vdev, int n)
+diff --git a/hw/net/dp8393x.c b/hw/net/dp8393x.c
+index ca8088c839..315b4ad844 100644
+--- a/hw/net/dp8393x.c
++++ b/hw/net/dp8393x.c
+@@ -816,6 +816,7 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
+     address += rx_len;
+     address_space_rw(&s->as, address,
+         MEMTXATTRS_UNSPECIFIED, (uint8_t *)&checksum, 4, 1);
++    address += 4;
+     rx_len += 4;
+     s->regs[SONIC_CRBA1] = address >> 16;
+     s->regs[SONIC_CRBA0] = address & 0xffff;
 -- 
 2.17.1
 
