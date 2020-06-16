@@ -2,86 +2,82 @@ Return-Path: <SRS0=f7ls=75=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AEA1BC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 11:00:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2720C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 11:16:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 74EC920786
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 11:00:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7F4F82071A
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 11:16:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fReDwNL5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74EC920786
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DMB6jPY4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F4F82071A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54344 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60912 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jl9Jw-0005UV-No
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 07:00:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34682)
+	id 1jl9a6-0001u5-Q3
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 07:16:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37948)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1jl9JG-00055e-Sq
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 06:59:19 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:25749
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jl9ZA-0001AN-Ej
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 07:15:44 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32460
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1jl9JF-00066S-5H
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 06:59:18 -0400
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jl9Z7-0000cZ-Sb
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 07:15:43 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592305156;
+ s=mimecast20190719; t=1592306139;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=n3FowvmmaIrkAYHcCJuy/Cv1ynM5RO+ll+9kxwv1os4=;
- b=fReDwNL5RroLY31HRNwpXP4BVO0B2cqh+8kSZR7SAfB67l5HLFVzehlQMvQRnj/uHOyaON
- U2mHjNxsXLmbgR9300/y278bjLYIfB6qfhUmgREEC/ux6U/yTenHhdcKEBfPoBNoU1q9ej
- MchIC7FBlexHksUnmcqUT0N6Qd2KWs4=
+ bh=pYSKsXL+pnx61xyecaq/GtOTccglyqOTBFHHIKn9p34=;
+ b=DMB6jPY4IctuDkxdjD658rIQeakcr0lKszFpV9QnWhxEnESccYhWSMe77a0C0c35lEncmo
+ 0nYGX5/jKmRHuwUXGb93zUonq19mWkveAMcH0AdsN0SK2a01VGSSwUGGmvhFpKErTytoCj
+ y38lWtjmtIxPGEDS142xwznCjhF0bEQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-170-RsfhFrmtM3iT_mVw0vtZpA-1; Tue, 16 Jun 2020 06:59:12 -0400
-X-MC-Unique: RsfhFrmtM3iT_mVw0vtZpA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-469-GIrWrF5nNIy0nLIXdanXcw-1; Tue, 16 Jun 2020 07:15:36 -0400
+X-MC-Unique: GIrWrF5nNIy0nLIXdanXcw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 95427106B3B8;
- Tue, 16 Jun 2020 10:59:11 +0000 (UTC)
-Received: from localhost (unknown [10.40.208.22])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 86D3219C71;
- Tue, 16 Jun 2020 10:59:06 +0000 (UTC)
-Date: Tue, 16 Jun 2020 12:59:01 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Babu Moger <babu.moger@amd.com>
-Subject: Re: [PATCH 1/2] hw/386: Fix uninitialized memory with -device and
- CPU hotplug
-Message-ID: <20200616125901.772229a6@redhat.com>
-In-Reply-To: <159164753015.20543.7987300339811704895.stgit@naples-babu.amd.com>
-References: <159164739269.20543.3074052993891532749.stgit@naples-babu.amd.com>
- <159164753015.20543.7987300339811704895.stgit@naples-babu.amd.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4FC1C100A8F0;
+ Tue, 16 Jun 2020 11:15:34 +0000 (UTC)
+Received: from gondolin (ovpn-112-222.ams2.redhat.com [10.36.112.222])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B87C66ED96;
+ Tue, 16 Jun 2020 11:15:22 +0000 (UTC)
+Date: Tue, 16 Jun 2020 13:15:20 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Subject: Re: [PATCH v4 02/21] vfio: Convert to ram_block_discard_disable()
+Message-ID: <20200616131520.3eb92b8c.cohuck@redhat.com>
+In-Reply-To: <20200610115419.51688-3-david@redhat.com>
+References: <20200610115419.51688-1-david@redhat.com>
+ <20200610115419.51688-3-david@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=imammedo@redhat.com;
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=cohuck@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 02:45:54
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 02:46:07
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -95,85 +91,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, mst@redhat.com, qemu-devel@nongnu.org,
- pbonzini@redhat.com, rth@twiddle.net
+Cc: Tony Krowiak <akrowiak@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+ "Michael S . Tsirkin" <mst@redhat.com>, Pierre Morel <pmorel@linux.ibm.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 08 Jun 2020 15:18:50 -0500
-Babu Moger <babu.moger@amd.com> wrote:
+On Wed, 10 Jun 2020 13:54:00 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-> Noticed the following command failure while testing CPU hotplug.
+> VFIO is (except devices without a physical IOMMU or some mediated devices)
+> incompatible with discarding of RAM. The kernel will pin basically all VM
+> memory. Let's convert to ram_block_discard_disable(), which can now
+> fail, in contrast to qemu_balloon_inhibit().
 > 
-> $ qemu-system-x86_64 -machine q35,accel=kvm -smp 1,maxcpus=2,
->   cores=1, threads=1,sockets=2 -cpu EPYC -device EPYC-x86_64-
->   cpu,core-id=0,socket-id=1,thread-id=0
+> Leave "x-balloon-allowed" named as it is for now.
 > 
->   qemu-system-x86_64: -device EPYC-x86_64-cpu,core-id=0,socket-id=1,
->   thread-id=0: Invalid CPU [socket: 21855, die: 0, core: 0, thread: 0]
->   with APIC ID 21855, valid index range 0:1
-> 
-> This happens because APIC ID is calculated using uninitialized memory.
-> This is happening after the addition of new field node_id in X86CPUTopoIDs
-> structure. The node_id field is uninitialized while calling
-> apicid_from_topo_ids. The problem is discussed in the thread below.
-> https://lore.kernel.org/qemu-devel/20200602171838.GG577771@habkost.net/
-> 
-> Fix the problem by initializing the node_id properly.
-> 
-> Signed-off-by: Babu Moger <babu.moger@amd.com>
+> Cc: Cornelia Huck <cohuck@redhat.com>
+> Cc: Alex Williamson <alex.williamson@redhat.com>
+> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+> Cc: Tony Krowiak <akrowiak@linux.ibm.com>
+> Cc: Halil Pasic <pasic@linux.ibm.com>
+> Cc: Pierre Morel <pmorel@linux.ibm.com>
+> Cc: Eric Farman <farman@linux.ibm.com>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 > ---
->  hw/i386/pc.c               |    2 ++
->  include/hw/i386/topology.h |   11 +++++++++++
->  2 files changed, 13 insertions(+)
-> 
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index 2128f3d6fe..974cc30891 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -1585,6 +1585,8 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
->          topo_ids.die_id = cpu->die_id;
->          topo_ids.core_id = cpu->core_id;
->          topo_ids.smt_id = cpu->thread_id;
-> +        topo_ids.node_id = cpu_x86_use_epyc_apic_id_encoding(ms->cpu_type) ?
-> +                           x86_node_id_for_epyc(&topo_info, &topo_ids) : 0;
+>  hw/vfio/ap.c                  | 10 +++----
+>  hw/vfio/ccw.c                 | 11 ++++----
+>  hw/vfio/common.c              | 53 +++++++++++++++++++----------------
+>  hw/vfio/pci.c                 |  6 ++--
+>  include/hw/vfio/vfio-common.h |  4 +--
+>  5 files changed, 45 insertions(+), 39 deletions(-)
 
-I'd rather not calculate some default value here,
-this is the branch where we check user provided topology info and error out asking
-to provide missing bits.
+Did not have time to review in detail, but looks sane.
 
-I also wonder if we should force user to specify numa nodes on CLI if EPYC cpu is used.
-(i.e. I'm assuming that EPYC always requires numa)
-
->          cpu->apic_id = x86ms->apicid_from_topo_ids(&topo_info, &topo_ids);
->      }
->  
-> diff --git a/include/hw/i386/topology.h b/include/hw/i386/topology.h
-> index 07239f95f4..ee4deb84c4 100644
-> --- a/include/hw/i386/topology.h
-> +++ b/include/hw/i386/topology.h
-> @@ -140,6 +140,17 @@ static inline unsigned apicid_pkg_offset_epyc(X86CPUTopoInfo *topo_info)
->             apicid_node_width_epyc(topo_info);
->  }
->  
-> +static inline unsigned x86_node_id_for_epyc(X86CPUTopoInfo *topo_info,
-> +                                            const X86CPUTopoIDs *topo_ids)
-> +{
-> +    unsigned nr_nodes = MAX(topo_info->nodes_per_pkg, 1);
-> +    unsigned cores_per_node = DIV_ROUND_UP((topo_info->dies_per_pkg *
-> +                                            topo_info->cores_per_die *
-> +                                            topo_info->threads_per_core),
-> +                                            nr_nodes);
-> +
-> +    return (topo_ids->core_id / cores_per_node) % nr_nodes;
-what if nr_nodes == 0?
-
-> +}
->  /*
->   * Make APIC ID for the CPU based on Pkg_ID, Core_ID, SMT_ID
->   *
-> 
-> 
+Acked-by: Cornelia Huck <cohuck@redhat.com>
 
 
