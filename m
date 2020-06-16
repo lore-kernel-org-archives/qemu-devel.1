@@ -2,83 +2,94 @@ Return-Path: <SRS0=f7ls=75=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42032C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 06:59:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B17A3C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 06:59:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0BFD22074D
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 06:59:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 772B72074D
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 06:59:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jh5btcIl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0BFD22074D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AW/pHZ7b"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 772B72074D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58774 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34108 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jl5Yw-0004hq-6N
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 02:59:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42048)
+	id 1jl5Zc-00067z-OZ
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 02:59:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42626)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jl5Mi-0001q7-Dk
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 02:46:36 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:33091
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jl5Mf-0005kA-LW
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 02:46:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592289992;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
- references:references; bh=0vqoFtVgK7SIrhEAWWD1OBM8pgsuXNy35dko35zy3ts=;
- b=Jh5btcIlwUHlkHpN+Dt4rS3+04kR6HdEQKAms6UWtZc4atRPNzuYIR1qCo1snnazaoqdqK
- iC7apSnnSgVj27m37OtGNUUmSbzVRmfCYxynj99CS3Vm+w5HczAZsBokF7p6iZ4f4dyM4r
- OPRfLNFZTdQu8hRkaohqJ+lbQj0iBaM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-257-M_stS3hoPoeRHF4C9xdwNQ-1; Tue, 16 Jun 2020 02:46:29 -0400
-X-MC-Unique: M_stS3hoPoeRHF4C9xdwNQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0E50680F5C3;
- Tue, 16 Jun 2020 06:46:28 +0000 (UTC)
-Received: from jason-ThinkPad-T430s.redhat.com (ovpn-13-222.pek2.redhat.com
- [10.72.13.222])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6C8A18202D;
- Tue, 16 Jun 2020 06:46:26 +0000 (UTC)
-From: Jason Wang <jasowang@redhat.com>
-To: peter.maydell@linaro.org
-Subject: [PULL 16/33] net: cadence_gem: Move tx/rx packet buffert to
- CadenceGEMState
-Date: Tue, 16 Jun 2020 14:45:27 +0800
-Message-Id: <1592289944-13727-17-git-send-email-jasowang@redhat.com>
-In-Reply-To: <1592289944-13727-1-git-send-email-jasowang@redhat.com>
-References: <1592289944-13727-1-git-send-email-jasowang@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=jasowang@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 02:45:57
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jl5Os-00045V-Gr; Tue, 16 Jun 2020 02:48:50 -0400
+Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:34877)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jl5Oq-0005vv-TH; Tue, 16 Jun 2020 02:48:50 -0400
+Received: by mail-wr1-x434.google.com with SMTP id x14so19512412wrp.2;
+ Mon, 15 Jun 2020 23:48:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=IBTBkFR/YEjrp64VasvObHCtZdi9NsS/V+t+Y9ZL8J8=;
+ b=AW/pHZ7bYkh80bqb5GBrA2ot+ly5QATIYRBpLR6pFTMbO6Rn6h7fZ6bJBFcdvb00vq
+ lkIBO7NuJPdVNm5a1XOTTPMIIIv5rtwq6VNZPABi74dIl8MwebuUe7KkFeaWThx650PM
+ tjUUPLiU/blB6hqHWr2EUOWX3Wo8cceUzGfpGyRGAf7yrE9BvozkanysunHtXeTHjJpk
+ NhirUbzeQxj77C1qpu6s8Gcg/y9SuAkZzDdJ/94uBHVR4H/06IHvwCZSSrJi/34Z58jG
+ zuwOf3cXoUQa6r4Ex9xUMLdvN060c+7rEtQtPPuGG3sN9s9QmWnO0/CWshWoWa3TR7mq
+ tYfQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=IBTBkFR/YEjrp64VasvObHCtZdi9NsS/V+t+Y9ZL8J8=;
+ b=Bm/fkMjv6kFnfSxqhsg8vT4m+apFTIxCh9kiBABvQmJHuXgqeIhlb8ayz2XM+Aiaxg
+ YOdmMNsvmMD/FSHpRXMBAcT1CuBY3axWYIZEWVyerVCXnl3eqT296Ex7zCnUf+Qn+/Ig
+ bJFYXnDH59knwyswGJcibNL+XJKri/0s3uC4tGmjXRodZ1Qblg+2Loc9M/AnrgQgF+2R
+ YlYmiPDJu2zF3eGBRZtod1vcm9hNbWq8eHIDARNzu5k1+oQXJt1SeGRJkiMfu68JKRmP
+ 1Da8DhSKZvXOu7Hsml3Q7CRYAEzyxagG9L1PvuaaVYn3/cHEzQ8eGbU4CvqG0Y9uUzIN
+ Km9Q==
+X-Gm-Message-State: AOAM5333ydLEqM4wibGIgAzQgNzBsXV9OUAyrMsdPLIhO3WaQEdh4Pw0
+ cgJC3Qw/c09YJZnaB+E7GGGCVTIH
+X-Google-Smtp-Source: ABdhPJzMwXGMuX/mMzT0Jhr+VtD1lY2O5vOZqfNdkheiwpgw7eDnegHOyVpSCF0d69p5rB3JbxIuSA==
+X-Received: by 2002:adf:ef47:: with SMTP id c7mr1475858wrp.57.1592290126386;
+ Mon, 15 Jun 2020 23:48:46 -0700 (PDT)
+Received: from [192.168.1.41] (181.red-88-10-103.dynamicip.rima-tde.net.
+ [88.10.103.181])
+ by smtp.gmail.com with ESMTPSA id z16sm27719521wrm.70.2020.06.15.23.48.45
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 15 Jun 2020 23:48:45 -0700 (PDT)
+Subject: Re: [PULL 16/84] macio: Put "macio-nvram" device on the macio bus
+To: BALATON Zoltan <balaton@eik.bme.hu>, Markus Armbruster <armbru@redhat.com>
+References: <20200615204008.3069956-1-armbru@redhat.com>
+ <20200615204008.3069956-17-armbru@redhat.com>
+ <alpine.BSF.2.22.395.2006152257240.23601@zero.eik.bme.hu>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <8203f0bc-4cdb-a91d-38a4-2df48451204d@amsat.org>
+Date: Tue, 16 Jun 2020 08:48:44 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
+MIME-Version: 1.0
+In-Reply-To: <alpine.BSF.2.22.395.2006152257240.23601@zero.eik.bme.hu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::434;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x434.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -92,161 +103,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>,
- Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
+On 6/15/20 10:58 PM, BALATON Zoltan wrote:
+> On Mon, 15 Jun 2020, Markus Armbruster wrote:
+>> macio_oldworld_init() creates a "macio-nvram", sysbus device, but
+>> neglects to but it on a bus.
+> 
+> This letter   ^ is upside down :-) (but -> put).
 
-Moving this buffers to CadenceGEMState, as their size will be increased
-more when JUMBO frames support is added.
+Not sure this is the reason, but Markus is German, and I often listen
+Germans pronouncing 'B' and 'P' very similar (like 'V' and 'B' in
+Spain).
 
-Signed-off-by: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-Signed-off-by: Jason Wang <jasowang@redhat.com>
----
- hw/net/cadence_gem.c         | 38 +++++++++++++++++---------------------
- include/hw/net/cadence_gem.h |  4 ++++
- 2 files changed, 21 insertions(+), 21 deletions(-)
-
-diff --git a/hw/net/cadence_gem.c b/hw/net/cadence_gem.c
-index 2e183b5..247a52f 100644
---- a/hw/net/cadence_gem.c
-+++ b/hw/net/cadence_gem.c
-@@ -928,17 +928,14 @@ static void gem_get_rx_desc(CadenceGEMState *s, int q)
-  */
- static ssize_t gem_receive(NetClientState *nc, const uint8_t *buf, size_t size)
- {
--    CadenceGEMState *s;
-+    CadenceGEMState *s = qemu_get_nic_opaque(nc);
-     unsigned   rxbufsize, bytes_to_copy;
-     unsigned   rxbuf_offset;
--    uint8_t    rxbuf[2048];
-     uint8_t   *rxbuf_ptr;
-     bool first_desc = true;
-     int maf;
-     int q = 0;
- 
--    s = qemu_get_nic_opaque(nc);
--
-     /* Is this destination MAC address "for us" ? */
-     maf = gem_mac_address_filter(s, buf);
-     if (maf == GEM_RX_REJECT) {
-@@ -994,19 +991,19 @@ static ssize_t gem_receive(NetClientState *nc, const uint8_t *buf, size_t size)
-     } else {
-         unsigned crc_val;
- 
--        if (size > sizeof(rxbuf) - sizeof(crc_val)) {
--            size = sizeof(rxbuf) - sizeof(crc_val);
-+        if (size > MAX_FRAME_SIZE - sizeof(crc_val)) {
-+            size = MAX_FRAME_SIZE - sizeof(crc_val);
-         }
-         bytes_to_copy = size;
-         /* The application wants the FCS field, which QEMU does not provide.
-          * We must try and calculate one.
-          */
- 
--        memcpy(rxbuf, buf, size);
--        memset(rxbuf + size, 0, sizeof(rxbuf) - size);
--        rxbuf_ptr = rxbuf;
--        crc_val = cpu_to_le32(crc32(0, rxbuf, MAX(size, 60)));
--        memcpy(rxbuf + size, &crc_val, sizeof(crc_val));
-+        memcpy(s->rx_packet, buf, size);
-+        memset(s->rx_packet + size, 0, MAX_FRAME_SIZE - size);
-+        rxbuf_ptr = s->rx_packet;
-+        crc_val = cpu_to_le32(crc32(0, s->rx_packet, MAX(size, 60)));
-+        memcpy(s->rx_packet + size, &crc_val, sizeof(crc_val));
- 
-         bytes_to_copy += 4;
-         size += 4;
-@@ -1152,7 +1149,6 @@ static void gem_transmit(CadenceGEMState *s)
- {
-     uint32_t desc[DESC_MAX_NUM_WORDS];
-     hwaddr packet_desc_addr;
--    uint8_t     tx_packet[2048];
-     uint8_t     *p;
-     unsigned    total_bytes;
-     int q = 0;
-@@ -1168,7 +1164,7 @@ static void gem_transmit(CadenceGEMState *s)
-      * Packets scattered across multiple descriptors are gathered to this
-      * one contiguous buffer first.
-      */
--    p = tx_packet;
-+    p = s->tx_packet;
-     total_bytes = 0;
- 
-     for (q = s->num_priority_queues - 1; q >= 0; q--) {
-@@ -1198,12 +1194,12 @@ static void gem_transmit(CadenceGEMState *s)
-                 break;
-             }
- 
--            if (tx_desc_get_length(desc) > sizeof(tx_packet) -
--                                               (p - tx_packet)) {
-+            if (tx_desc_get_length(desc) > MAX_FRAME_SIZE -
-+                                               (p - s->tx_packet)) {
-                 DB_PRINT("TX descriptor @ 0x%" HWADDR_PRIx \
-                          " too large: size 0x%x space 0x%zx\n",
-                          packet_desc_addr, tx_desc_get_length(desc),
--                         sizeof(tx_packet) - (p - tx_packet));
-+                         MAX_FRAME_SIZE - (p - s->tx_packet));
-                 break;
-             }
- 
-@@ -1248,24 +1244,24 @@ static void gem_transmit(CadenceGEMState *s)
- 
-                 /* Is checksum offload enabled? */
-                 if (s->regs[GEM_DMACFG] & GEM_DMACFG_TXCSUM_OFFL) {
--                    net_checksum_calculate(tx_packet, total_bytes);
-+                    net_checksum_calculate(s->tx_packet, total_bytes);
-                 }
- 
-                 /* Update MAC statistics */
--                gem_transmit_updatestats(s, tx_packet, total_bytes);
-+                gem_transmit_updatestats(s, s->tx_packet, total_bytes);
- 
-                 /* Send the packet somewhere */
-                 if (s->phy_loop || (s->regs[GEM_NWCTRL] &
-                                     GEM_NWCTRL_LOCALLOOP)) {
--                    gem_receive(qemu_get_queue(s->nic), tx_packet,
-+                    gem_receive(qemu_get_queue(s->nic), s->tx_packet,
-                                 total_bytes);
-                 } else {
--                    qemu_send_packet(qemu_get_queue(s->nic), tx_packet,
-+                    qemu_send_packet(qemu_get_queue(s->nic), s->tx_packet,
-                                      total_bytes);
-                 }
- 
-                 /* Prepare for next packet */
--                p = tx_packet;
-+                p = s->tx_packet;
-                 total_bytes = 0;
-             }
- 
-diff --git a/include/hw/net/cadence_gem.h b/include/hw/net/cadence_gem.h
-index 5c83036..eddac70 100644
---- a/include/hw/net/cadence_gem.h
-+++ b/include/hw/net/cadence_gem.h
-@@ -40,6 +40,8 @@
- #define MAX_TYPE1_SCREENERS             16
- #define MAX_TYPE2_SCREENERS             16
- 
-+#define MAX_FRAME_SIZE 2048
-+
- typedef struct CadenceGEMState {
-     /*< private >*/
-     SysBusDevice parent_obj;
-@@ -80,6 +82,8 @@ typedef struct CadenceGEMState {
- 
-     uint8_t can_rx_state; /* Debug only */
- 
-+    uint8_t tx_packet[MAX_FRAME_SIZE];
-+    uint8_t rx_packet[MAX_FRAME_SIZE];
-     uint32_t rx_desc[MAX_PRIORITY_QUEUES][DESC_MAX_NUM_WORDS];
- 
-     bool sar_active[4];
--- 
-2.5.0
-
+> 
+> Regards,
+> BALATON Zoltan
 
