@@ -1,56 +1,53 @@
-Return-Path: <SRS0=tJVC=74=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=f7ls=75=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B69C8C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 23:00:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC115C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 00:36:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8AD35206B7
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 23:00:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8AD35206B7
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=windriver.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7EC8120768
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 00:36:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7EC8120768
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43826 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33378 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jky59-0007Vq-Ou
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 18:59:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56438)
+	id 1jkzav-0006ER-Ne
+	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 20:36:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43142)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <joe.slater@windriver.com>)
- id 1jky4a-00075b-FI
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 18:59:24 -0400
-Received: from mail5.windriver.com ([192.103.53.11]:40468 helo=mail5.wrs.com)
+ (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
+ id 1jkzZq-0004cg-Sh
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 20:35:46 -0400
+Received: from zero.eik.bme.hu ([152.66.115.2]:46186)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <joe.slater@windriver.com>)
- id 1jky4X-0005Ej-N6
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 18:59:23 -0400
-Received: from ALA-HCB.corp.ad.wrs.com (ala-hcb.corp.ad.wrs.com
- [147.11.189.41])
- by mail5.wrs.com (8.15.2/8.15.2) with ESMTPS id 05FMwupR006435
- (version=TLSv1 cipher=DHE-RSA-AES256-SHA bits=256 verify=FAIL)
- for <qemu-devel@nongnu.org>; Mon, 15 Jun 2020 15:59:06 -0700
-Received: from ala-lpggp3.wrs.com (147.11.105.124) by ALA-HCB.corp.ad.wrs.com
- (147.11.189.41) with Microsoft SMTP Server id 14.3.487.0;
- Mon, 15 Jun 2020 15:58:27 -0700
-From: Joe Slater <joe.slater@windriver.com>
-To: <qemu-devel@nongnu.org>
-Subject: [PATCH 1/1] os_find_datadir:  search as in version 4.2
-Date: Mon, 15 Jun 2020 15:58:27 -0700
-Message-ID: <20200615225827.183062-1-joe.slater@windriver.com>
-X-Mailer: git-send-email 2.17.1
+ (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
+ id 1jkzZn-0003te-Ms
+ for qemu-devel@nongnu.org; Mon, 15 Jun 2020 20:35:46 -0400
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+ by localhost (Postfix) with SMTP id 7476C748DCC;
+ Tue, 16 Jun 2020 02:35:40 +0200 (CEST)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+ id 59DA8745702; Tue, 16 Jun 2020 02:35:40 +0200 (CEST)
+Message-Id: <cover.1592266950.git.balaton@eik.bme.hu>
+From: BALATON Zoltan <balaton@eik.bme.hu>
+Subject: [PATCH v2 0/8] More sm501 fixes and optimisations
+Date: Tue, 16 Jun 2020 02:22:30 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Received-SPF: pass client-ip=192.103.53.11;
- envelope-from=joe.slater@windriver.com; helo=mail5.wrs.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 18:59:17
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+To: qemu-devel@nongnu.org
+Received-SPF: pass client-ip=152.66.115.2; envelope-from=balaton@eik.bme.hu;
+ helo=zero.eik.bme.hu
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 20:35:40
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
 X-Spam_score_int: -41
 X-Spam_score: -4.2
 X-Spam_bar: ----
@@ -68,47 +65,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: joe.slater@windriver.com, randy.macleod@windriver.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Sebastian Bauer <mail@sebastianbauer.info>,
+ Magnus Damm <magnus.damm@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Always look for ../share/qemu then ../pc-bios when looking for datadir.
+Version 2 with changes according to review by Peter plus some new
+patches added. Still need to verify overlap checks so likely will be
+another version but sending it now if additional comments come up.
 
-Signed-off-by: Joe Slater <joe.slater@windriver.com>
----
- os-posix.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+Regards,
+BALATON Zoltan
 
-diff --git a/os-posix.c b/os-posix.c
-index 3cd52e1e70..f77da94bf6 100644
---- a/os-posix.c
-+++ b/os-posix.c
-@@ -82,8 +82,9 @@ void os_setup_signal_handling(void)
- 
- /*
-  * Find a likely location for support files using the location of the binary.
-+ * Typically, this would be "$bindir/../share/qemu".
-  * When running from the build tree this will be "$bindir/../pc-bios".
-- * Otherwise, this is CONFIG_QEMU_DATADIR.
-+ * Otherwise, this is CONFIG_QEMU_DATADIR as constructed by configure.
-  */
- char *os_find_datadir(void)
- {
-@@ -93,6 +94,12 @@ char *os_find_datadir(void)
-     exec_dir = qemu_get_exec_dir();
-     g_return_val_if_fail(exec_dir != NULL, NULL);
- 
-+    dir = g_build_filename(exec_dir, "..", "share", "qemu", NULL);
-+    if (g_file_test(dir, G_FILE_TEST_IS_DIR)) {
-+        return g_steal_pointer(&dir);
-+    }
-+    g_free(dir);  /* no autofree this time */
-+
-     dir = g_build_filename(exec_dir, "..", "pc-bios", NULL);
-     if (g_file_test(dir, G_FILE_TEST_IS_DIR)) {
-         return g_steal_pointer(&dir);
+BALATON Zoltan (8):
+  sm501: Fix bounds checks
+  sm501: Drop unneded variable
+  sm501: Ignore no-op blits
+  sm501: Introduce variable for commonly used value for better
+    readability
+  sm501: Optimise 1 pixel 2d ops
+  sm501: Use stn_he_p/ldn_he_p instead of switch/case
+  sm501: Do not allow guest to set invalid format
+  sm501: Convert debug printfs to traces
+
+ hw/display/sm501.c      | 133 ++++++++++++++++++----------------------
+ hw/display/trace-events |  12 ++++
+ 2 files changed, 72 insertions(+), 73 deletions(-)
+
 -- 
-2.17.1
+2.21.3
 
 
