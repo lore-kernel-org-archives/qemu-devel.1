@@ -1,4 +1,4 @@
-Return-Path: <SRS0=tJVC=74=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=f7ls=75=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
@@ -7,61 +7,61 @@ X-Spam-Status: No, score=0.4 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	MENTIONS_GIT_HOSTING,MISSING_HEADERS,REPLYTO_WITHOUT_TO_CC,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9EF3C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 13:10:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C95EC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 13:13:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 815B42074D
-	for <qemu-devel@archiver.kernel.org>; Mon, 15 Jun 2020 13:10:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1996820B80
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 13:13:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mg.gitlab.com header.i=@mg.gitlab.com header.b="EqKuaMcf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 815B42074D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mg.gitlab.com header.i=@mg.gitlab.com header.b="F+0wsRxF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1996820B80
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51204 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35106 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jkosC-0001Ra-PN
-	for qemu-devel@archiver.kernel.org; Mon, 15 Jun 2020 09:10:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46438)
+	id 1jlBPP-0004SW-AK
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 09:13:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50432)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <bounce+2dc402.947b4-qemu-devel=nongnu.org@mg.gitlab.com>)
- id 1jkm2Z-0003lO-Gl
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 06:08:31 -0400
-Received: from do158-143.mg.gitlab.com ([192.237.158.143]:64132)
+ id 1jl8JX-0006i7-3A
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 05:55:31 -0400
+Received: from do158-143.mg.gitlab.com ([192.237.158.143]:29979)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1)
  (envelope-from <bounce+2dc402.947b4-qemu-devel=nongnu.org@mg.gitlab.com>)
- id 1jkm2W-0002Tx-2a
- for qemu-devel@nongnu.org; Mon, 15 Jun 2020 06:08:31 -0400
+ id 1jl8JS-0003lj-A5
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 05:55:30 -0400
 DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.gitlab.com;
  q=dns/txt; 
- s=mailo; t=1592215707; h=List-Id: Content-Transfer-Encoding:
+ s=mailo; t=1592301328; h=List-Id: Content-Transfer-Encoding:
  Content-Type: Mime-Version: Subject: Message-ID: Reply-To: From: Date:
- Sender; bh=0g0IxrVVNTzkm9XnXUiZIgItBKcHv25oJJpu2IP7oSw=;
- b=EqKuaMcfW/D6NMjnXgBKq7+r0AA/yzMOcELvf60Gs2bSLZL/eYJEVkox2h4z6NtbZpdvkk3k
- 2HoXypv6SRtKMDToNEYXWkTRisftUvmpS7ZVMrU/utVpNpdrTcNPaKovsPXqYOcxs3OsYea3
- 3koMOAY8BCNpPg7f8lQK1CiK7Io=
+ Sender; bh=k2HUDKImGoqrjfX57wm5WiB2rN/AA4Rx0Fs6HIIvbRw=;
+ b=F+0wsRxF61wS2SVWNCXKSgHHf1oBKGTWy9EubqeGxR6wt+9N75OWvavLUfUDlcO7nVAH5dED
+ Bm5NXxI/Y8zL0JcneRYQzJ0Syzbs0+UtmRFVgHPM3hU2NJpTUqDf1OmQ/D8v84NY5g0m6wKb
+ TmtcFeaziHZmLRj3jHbLzPYnlFI=
 X-Mailgun-Sending-Ip: 192.237.158.143
 X-Mailgun-Sid: WyI3MWYzYSIsICJxZW11LWRldmVsQG5vbmdudS5vcmciLCAiOTQ3YjQiXQ==
-Received: from mg.gitlab.com (64.90.74.34.bc.googleusercontent.com
- [34.74.90.64]) by smtp-out-n11.prod.us-west-2.postgun.com with SMTP id
- 5ee7489a6bebe35deb9fd1bd (version=TLS1.3, cipher=TLS_AES_128_GCM_SHA256);
- Mon, 15 Jun 2020 10:08:26 GMT
-Date: Mon, 15 Jun 2020 10:08:25 +0000
-Message-ID: <5ee748999f9a0_2f733f97e4612310124632@sidekiq-catchall-07-sv-gprd.mail>
-Subject: QEMU | Pipeline #155914107 has failed for master | 7d3660e7
+Received: from mg.gitlab.com (66.90.74.34.bc.googleusercontent.com
+ [34.74.90.66]) by smtp-out-n07.prod.us-east-1.postgun.com with SMTP id
+ 5ee89701c4bb4f886d7beba6 (version=TLS1.3, cipher=TLS_AES_128_GCM_SHA256);
+ Tue, 16 Jun 2020 09:55:13 GMT
+Date: Tue, 16 Jun 2020 09:55:13 +0000
+Message-ID: <5ee8970118c4c_52b23fa02532629869054@sidekiq-catchall-01-sv-gprd.mail>
+Subject: QEMU | Pipeline #156667089 has failed for master | 53550e81
 Mime-Version: 1.0
 Content-Type: multipart/alternative;
- boundary="--==_mimepart_5ee7489995cbf_2f733f97e461231012456f";
+ boundary="--==_mimepart_5ee89701ee3a_52b23fa02532629869044f";
  charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-GitLab-Project: QEMU
 X-GitLab-Project-Id: 11167699
 X-GitLab-Project-Path: qemu-project/qemu
-X-GitLab-Pipeline-Id: 155914107
+X-GitLab-Pipeline-Id: 156667089
 X-GitLab-Pipeline-Ref: master
 X-GitLab-Pipeline-Status: failed
 Auto-Submitted: auto-generated
@@ -69,18 +69,19 @@ X-Auto-Response-Suppress: All
 Received-SPF: pass client-ip=192.237.158.143;
  envelope-from=bounce+2dc402.947b4-qemu-devel=nongnu.org@mg.gitlab.com;
  helo=do158-143.mg.gitlab.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 00:36:45
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 02:34:43
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -26
-X-Spam_score: -2.7
-X-Spam_bar: --
-X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1,
  HTML_FONT_LOW_CONTRAST=0.001, HTML_MESSAGE=0.001, MISSING_HEADERS=1.021,
- RCVD_IN_DNSWL_MED=-2.3, REPLYTO_WITHOUT_TO_CC=1.552, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_BL=0.01, RCVD_IN_MSPIKE_L3=0.9,
+ REPLYTO_WITHOUT_TO_CC=1.552, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
-X-Mailman-Approved-At: Mon, 15 Jun 2020 09:08:41 -0400
+X-Mailman-Approved-At: Tue, 16 Jun 2020 09:12:04 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,7 +100,7 @@ Reply-to: GitLab <noreply@gitlab.com>, GitLab <gitlab@mg.gitlab.com>
 From: GitLab via <qemu-devel@nongnu.org>
 
 
-----==_mimepart_5ee7489995cbf_2f733f97e461231012456f
+----==_mimepart_5ee89701ee3a_52b23fa02532629869044f
 Content-Type: text/plain;
  charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
@@ -111,16 +112,16 @@ Your pipeline has failed.
 Project: QEMU ( https://gitlab.com/qemu-project/qemu )
 Branch: master ( https://gitlab.com/qemu-project/qemu/-/commits/master )
 
-Commit: 7d3660e7 ( https://gitlab.com/qemu-project/qemu/-/commit/7d3660e7=
-9830a069f1848bb4fa1cdf8f666424fb )
-Commit Message: Merge remote-tracking branch 'remotes/bonzini/t...
+Commit: 53550e81 ( https://gitlab.com/qemu-project/qemu/-/commit/53550e81=
+e2cafe7c03a39526b95cd21b5194d9b1 )
+Commit Message: Merge remote-tracking branch 'remotes/berrange/...
 Commit Author: Peter Maydell ( https://gitlab.com/pm215 )
 
-Pipeline #155914107 ( https://gitlab.com/qemu-project/qemu/-/pipelines/15=
-5914107 ) triggered by Alex Benn=C3=A9e ( https://gitlab.com/stsquad )
+Pipeline #156667089 ( https://gitlab.com/qemu-project/qemu/-/pipelines/15=
+6667089 ) triggered by Alex Benn=C3=A9e ( https://gitlab.com/stsquad )
 had 1 failed build.
 
-Job #593965592 ( https://gitlab.com/qemu-project/qemu/-/jobs/593965592/ra=
+Job #596963832 ( https://gitlab.com/qemu-project/qemu/-/jobs/596963832/ra=
 w )
 
 Stage: test
@@ -139,12 +140,12 @@ socket_accept failed: Resource temporarily unavailable
 **
 ERROR:/builds/qemu-project/qemu/tests/qtest/libqtest.c:301:qtest_init_wit=
 hout_qmp_handshake: assertion failed: (s->fd >=3D 0 && s->qmp_fd >=3D 0)
-/builds/qemu-project/qemu/tests/qtest/libqtest.c:166: kill_qemu() tried t=
-o terminate QEMU process but encountered exit status 1 (expected 0)
 ERROR - Bail out! ERROR:/builds/qemu-project/qemu/tests/qtest/libqtest.c:=
 301:qtest_init_without_qmp_handshake: assertion failed: (s->fd >=3D 0 && =
 s->qmp_fd >=3D 0)
-make: *** [/builds/qemu-project/qemu/tests/Makefile.include:639: check-qt=
+/builds/qemu-project/qemu/tests/qtest/libqtest.c:166: kill_qemu() tried t=
+o terminate QEMU process but encountered exit status 1 (expected 0)
+make: *** [/builds/qemu-project/qemu/tests/Makefile.include:643: check-qt=
 est-i386] Error 1
 make: *** Waiting for unfinished jobs....
 qemu-system-ppc64: warning: machine has no BMC device. Use '-device ipmi-=
@@ -159,13 +160,13 @@ bmc-sim,id=3Dbmc0 -device isa-ipmi-bt,bmc=3Dbmc0,irq=3D10' to define one
   TEST    check-qtest-ppc64: tests/qtest/qom-test
   TEST    check-qtest-ppc64: tests/qtest/test-hmp
   TEST    check-qtest-ppc64: tests/qtest/qos-test
-section_end:1592067611:build_script
-=1B[0Ksection_start:1592067611:after_script
+section_end:1592300188:build_script
+=1B[0Ksection_start:1592300188:after_script
 =1B[0K=1B[0K=1B[36;1mRunning after_script=1B[0;m
-=1B[0;msection_end:1592067612:after_script
-=1B[0Ksection_start:1592067612:upload_artifacts_on_failure
+=1B[0;msection_end:1592300189:after_script
+=1B[0Ksection_start:1592300189:upload_artifacts_on_failure
 =1B[0K=1B[0K=1B[36;1mUploading artifacts for failed job=1B[0;m
-=1B[0;msection_end:1592067614:upload_artifacts_on_failure
+=1B[0;msection_end:1592300191:upload_artifacts_on_failure
 =1B[0K=1B[31;1mERROR: Job failed: exit code 1
 =1B[0;m
 
@@ -177,7 +178,7 @@ You're receiving this email because of your account on gitlab.com.
 
 
 
-----==_mimepart_5ee7489995cbf_2f733f97e461231012456f
+----==_mimepart_5ee89701ee3a_52b23fa02532629869044f
 Content-Type: text/html;
  charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
@@ -192,7 +193,7 @@ w.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <meta content=3D"width=3Ddevice-width, initial-scale=3D1" name=3D"viewpor=
 t" />
 <meta content=3D"IE=3Dedge" http-equiv=3D"X-UA-Compatible" />
-<title>QEMU | Pipeline #155914107 has failed for master | 7d3660e7</title=
+<title>QEMU | Pipeline #156667089 has failed for master | 53550e81</title=
 >
 <style data-premailer=3D"ignore" type=3D"text/css">
 body,table,td,a{-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%}t=
@@ -360,17 +361,17 @@ ipeline_notif_v1/icon-commit-gray-c10243ac24cde64b549aec91de35e6b49c8739b=
 </td>
 <td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; fo=
 nt-size: 15px; line-height: 1.4;" valign=3D"middle">
-<a href=3D"https://gitlab.com/qemu-project/qemu/-/commit/7d3660e79830a069=
-f1848bb4fa1cdf8f666424fb" style=3D"color: #3777b0; text-decoration: none;=
+<a href=3D"https://gitlab.com/qemu-project/qemu/-/commit/53550e81e2cafe7c=
+03a39526b95cd21b5194d9b1" style=3D"color: #3777b0; text-decoration: none;=
 ">
-7d3660e7
+53550e81
 </a>
 </td>
 </tr>
 </tbody>
 </table>
 <div class=3D"commit" style=3D"color: #5c5c5c; font-weight: 300;">
-Merge remote-tracking branch 'remotes/bonzini/t...
+Merge remote-tracking branch 'remotes/berrange/...
 </div>
 </td>
 </tr>
@@ -427,9 +428,9 @@ le=3D"border-collapse: collapse; margin: 0 auto;">
 <td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; fo=
 nt-size: 15px; font-weight: 500; line-height: 1.4;" valign=3D"baseline">
 Pipeline
-<a href=3D"https://gitlab.com/qemu-project/qemu/-/pipelines/155914107" st=
+<a href=3D"https://gitlab.com/qemu-project/qemu/-/pipelines/156667089" st=
 yle=3D"color: #3777b0; text-decoration: none;">
-#155914107
+#156667089
 </a>
 triggered by
 </td>
@@ -506,7 +507,7 @@ test
 <td align=3D"right" style=3D"font-family: 'Helvetica Neue',Helvetica,Aria=
 l,sans-serif; color: #8c8c8c; font-weight: 500; font-size: 14px; padding:=
  16px 0;">
-<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/593965592" style=3D=
+<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/596963832" style=3D=
 "color: #3777b0; text-decoration: none;">
 build-disabled
 </a>
@@ -531,13 +532,13 @@ t-ppc64: tests/qtest/cdrom-test<br />  TEST    check-qtest-ppc64: tests/q=
 test/device-introspect-test<br />socket_accept failed: Resource temporari=
 ly unavailable<br />**<br />ERROR:/builds/qemu-project/qemu/tests/qtest/l=
 ibqtest.c:301:qtest_init_without_qmp_handshake: assertion failed: (s-&gt;=
-fd &gt;=3D 0 &amp;&amp; s-&gt;qmp_fd &gt;=3D 0)<br />/builds/qemu-project=
-/qemu/tests/qtest/libqtest.c:166: kill_qemu() tried to terminate QEMU pro=
-cess but encountered exit status 1 (expected 0)<br />ERROR - Bail out! ER=
+fd &gt;=3D 0 &amp;&amp; s-&gt;qmp_fd &gt;=3D 0)<br />ERROR - Bail out! ER=
 ROR:/builds/qemu-project/qemu/tests/qtest/libqtest.c:301:qtest_init_witho=
 ut_qmp_handshake: assertion failed: (s-&gt;fd &gt;=3D 0 &amp;&amp; s-&gt;=
-qmp_fd &gt;=3D 0)<br />make: *** [/builds/qemu-project/qemu/tests/Makefil=
-e.include:639: check-qtest-i386] Error 1<br />make: *** Waiting for unfin=
+qmp_fd &gt;=3D 0)<br />/builds/qemu-project/qemu/tests/qtest/libqtest.c:1=
+66: kill_qemu() tried to terminate QEMU process but encountered exit stat=
+us 1 (expected 0)<br />make: *** [/builds/qemu-project/qemu/tests/Makefil=
+e.include:643: check-qtest-i386] Error 1<br />make: *** Waiting for unfin=
 ished jobs....<br />qemu-system-ppc64: warning: machine has no BMC device=
 . Use '-device ipmi-bmc-sim,id=3Dbmc0 -device isa-ipmi-bt,bmc=3Dbmc0,irq=3D=
 10' to define one<br />qemu-system-ppc64: warning: machine has no BMC dev=
@@ -549,12 +550,12 @@ mc0,irq=3D10' to define one<br />  TEST    check-qtest-ppc64: tests/qtest=
 <br />  TEST    check-qtest-ppc64: tests/qtest/qmp-cmd-test<br />  TEST  =
   check-qtest-ppc64: tests/qtest/qom-test<br />  TEST    check-qtest-ppc6=
 4: tests/qtest/test-hmp<br />  TEST    check-qtest-ppc64: tests/qtest/qos=
--test<br /></span><div class=3D"section-start" data-timestamp=3D"15920676=
-11" data-section=3D"after-script" role=3D"button"></div><span class=3D"te=
+-test<br /></span><div class=3D"section-start" data-timestamp=3D"15923001=
+88" data-section=3D"after-script" role=3D"button"></div><span class=3D"te=
 rm-fg-l-cyan term-bold section section-header js-s-after-script">Running =
 after_script</span><span class=3D"section section-header js-s-after-scrip=
 t"><br /></span><div class=3D"section-end" data-section=3D"after-script">=
-</div><div class=3D"section-start" data-timestamp=3D"1592067612" data-sec=
+</div><div class=3D"section-start" data-timestamp=3D"1592300189" data-sec=
 tion=3D"upload-artifacts-on-failure" role=3D"button"></div><span class=3D=
 "term-fg-l-cyan term-bold section section-header js-s-upload-artifacts-on=
 -failure">Uploading artifacts for failed job</span><span class=3D"section=
@@ -609,5 +610,5 @@ lor: #5c5c5c; padding: 25px 0;">
 </body>
 </html>
 
-----==_mimepart_5ee7489995cbf_2f733f97e461231012456f--
+----==_mimepart_5ee89701ee3a_52b23fa02532629869044f--
 
