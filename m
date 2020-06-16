@@ -2,80 +2,78 @@ Return-Path: <SRS0=f7ls=75=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 644C8C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:54:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7A60C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:55:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2FAAB20679
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:54:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B82C420644
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:55:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F+3wTBEv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FAAB20679
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GAnh6LxN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B82C420644
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60562 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39090 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlCyd-0001e9-Fg
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 10:54:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58340)
+	id 1jlCzp-0004LB-14
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 10:55:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58068)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1jlCR5-0004S6-Vv; Tue, 16 Jun 2020 10:19:36 -0400
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:42135)
+ id 1jlCQh-0003Xh-Oe; Tue, 16 Jun 2020 10:19:11 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:40315)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1jlCR4-00072K-7f; Tue, 16 Jun 2020 10:19:35 -0400
-Received: by mail-oi1-x243.google.com with SMTP id s21so19372297oic.9;
- Tue, 16 Jun 2020 07:19:33 -0700 (PDT)
+ id 1jlCQd-0006xs-9Z; Tue, 16 Jun 2020 10:19:08 -0400
+Received: by mail-oi1-x242.google.com with SMTP id t25so19384808oij.7;
+ Tue, 16 Jun 2020 07:19:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=JE04LHO3R8Lv6V+Ze+GWJq1aq7ZP3I/hJjdZ+OxJue8=;
- b=F+3wTBEvoXTt/wdDR76fgrPOZScw0efLIMjPtyUnJelkf4EPiMipI86riVFa0GFrZ5
- 2uQ+PI+/oz4GgJMBloBMzXuH61sGOOd5E9uxfBS8BfFQ5Ml44y4JJ47cPybitqGyU95T
- VRa2pKn3TgS28YErJo39LAcfw2XTAuudV5GZB6E/mgh3Lh691SaOfnYSUzk4RF7ZgNLt
- T3t3DVEs4nWQFj0o15WHShJgof/z8xzyUOKXfLXwJlIYAmRT3iRHKLVhPfa2rTBWNbk1
- vyAGsg34ZzzP0bAE9VhSuTUX9opfxkuGe+pRWDymIvi0IWD2Sj46AvO8Orw87dGa9SLI
- XsKQ==
+ bh=lEcayuvB+XGeWNX8U/Yu92PQGUAoKZ14ovL5ftbZCxY=;
+ b=GAnh6LxNH6I2LyEAf7T2OHebxodipl3Wzk9PmkLXuXD/ix0miP4QPr1rilFE1Npl18
+ ureW8Fp9erWINJAQT27zEMLz86HAzs665EYRwbHmPbx6UWw1VE3ZDm2NJOoFSnX43JBp
+ bGfYJkfbUnR3Rha04jydqYl47DuJ9SQHNvPEas/QUSk8B3gGeFdukKSV5X6JuhJBmGAy
+ +0iVaU1KG3ko3YVoY3FcEGBLAu3du80FGe4s6glKqu4JIys5rGMPbVVDZjh3JORncqMA
+ 8tggU5tgGp4ZqM+W1OLTlZgLjp/D/bj90yUwVp3JCV9LZSMZWSa52+Faz/pGQzzf9Qt+
+ 6rkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references;
- bh=JE04LHO3R8Lv6V+Ze+GWJq1aq7ZP3I/hJjdZ+OxJue8=;
- b=dliDscswLghbrcRjZmaR4/bW1Zddkk1mkdLuC/n9WpxoiyuFF0JzVCN5kJLwFXTBBU
- RIDVLkqvEJ9Sm7eMc11a737/BBadSUBZxQpHTNqetJh7kLUsPvwurPOD2ydJla1lK7Zu
- kVbZgOW3gJnCaAY4NZWsHTAWxHDhfW8cu/g/2n1ICf3UPBSNeTun/zIeN3E6CDNYpu0z
- 9DpWxqM7nQUnEu576BooDmX0XDlvHXOIAWAOYGIRuAE7Ye/XJgiU/KYCZnnVBx8AAdfK
- YbNWzqZhMTqdr8elNyKbfDHDWVcifzXZE9IeqnnIAZ+j9+PVeJq/CchmkLKvoGV5LQeO
- vGlQ==
-X-Gm-Message-State: AOAM5331OtMfPztpYvHr0EVVdIVew9iEu9ZZsij1gK3uTp0thxPvvq62
- jFoMpoZ1AN6DXbNuHrWStmnlTyr/oOQ=
-X-Google-Smtp-Source: ABdhPJwEAHpHpImMWMBqmsF7fRgZqunbZfEmp+7TWHNpFDjxcC8HP9dnYADlwbf9QBoXH7sRMRXqxw==
-X-Received: by 2002:a05:6808:8e2:: with SMTP id
- d2mr3350787oic.131.1592317172226; 
- Tue, 16 Jun 2020 07:19:32 -0700 (PDT)
+ bh=lEcayuvB+XGeWNX8U/Yu92PQGUAoKZ14ovL5ftbZCxY=;
+ b=sFJIDSYlqDklPGM/zRKqs3v+pMiWMSMCHFsvrHVSQeg2iKBSkkS48P6RX0SFQhz+UK
+ 7aSEQ7sibYfNBSD1z4iAsuZ697e2qFAM6ScVi/8XaudfQi6NWg4WmCdP+5LuDTedJADH
+ d7BYVOuUSjxI2/Jq2hfEGpb3FSnN/lCLTkMwOoonXoVuQDJKc7mxPDCeDm6jo68YX8Be
+ 0feEqoZSH3BSBth8H2scWUB0y8SXW8nWz9N9SgLAypndj9iVt4omlgEs4T1EgB4LneBp
+ JwkTF8h75p2kEZJcknZmm5ob9/Bb3Pp4A8XBhPR/hmqKdotUzMiChvu781fvfXSp4ajX
+ x6vQ==
+X-Gm-Message-State: AOAM530DMc7ZZJoTpwb6EqVizL243rUK81COsS9pwLYKNE5G+waEldKc
+ M/A+wGlnFzQrjv5qLEzh9QdCNNqN
+X-Google-Smtp-Source: ABdhPJzIg6sqCW7gxojRgIsnEhaN+ZXNtttu7aBVQ9zTzQIb4d+VffBOsqvS4QWOQRYh3vSPRoi03w==
+X-Received: by 2002:aca:fd94:: with SMTP id b142mr3610894oii.9.1592317145394; 
+ Tue, 16 Jun 2020 07:19:05 -0700 (PDT)
 Received: from localhost (76-251-165-188.lightspeed.austtx.sbcglobal.net.
  [76.251.165.188])
- by smtp.gmail.com with ESMTPSA id j2sm4207324oiw.24.2020.06.16.07.19.30
+ by smtp.gmail.com with ESMTPSA id b4sm4085033oti.3.2020.06.16.07.19.04
  (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
- Tue, 16 Jun 2020 07:19:31 -0700 (PDT)
+ Tue, 16 Jun 2020 07:19:04 -0700 (PDT)
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 06/78] block: Activate recursively even for already active
- nodes
-Date: Tue, 16 Jun 2020 09:14:35 -0500
-Message-Id: <20200616141547.24664-7-mdroth@linux.vnet.ibm.com>
+Subject: [PATCH 59/78] qga-win: Handle VSS_E_PROVIDER_ALREADY_REGISTERED error
+Date: Tue, 16 Jun 2020 09:15:28 -0500
+Message-Id: <20200616141547.24664-60-mdroth@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200616141547.24664-1-mdroth@linux.vnet.ibm.com>
 References: <20200616141547.24664-1-mdroth@linux.vnet.ibm.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::243;
- envelope-from=flukshun@gmail.com; helo=mail-oi1-x243.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::242;
+ envelope-from=flukshun@gmail.com; helo=mail-oi1-x242.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -97,110 +95,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-stable@nongnu.org
+Cc: Sameeh Jubran <sjubran@redhat.com>, Basil Salman <basil@daynix.com>,
+ qemu-stable@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Kevin Wolf <kwolf@redhat.com>
+From: Sameeh Jubran <sjubran@redhat.com>
 
-bdrv_invalidate_cache_all() assumes that all nodes in a given subtree
-are either active or inactive when it starts. Therefore, as soon as it
-arrives at an already active node, it stops.
+This patch handles the case where VSS Provider is already registered,
+where in such case qga uninstalls the provider and registers it again.
 
-However, this assumption is wrong. For example, it's possible to take a
-snapshot of an inactive node, which results in an active overlay over an
-inactive backing file. The active overlay is probably also the root node
-of an inactive BlockBackend (blk->disable_perm == true).
-
-In this case, bdrv_invalidate_cache_all() does not need to do anything
-to activate the overlay node, but it still needs to recurse into the
-children and the parents to make sure that after returning success,
-really everything is activated.
-
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-(cherry picked from commit 7bb4941ace471fc7dd6ded4749b95b9622baa6ed)
+Signed-off-by: Sameeh Jubran <sjubran@redhat.com>
+Signed-off-by: Basil Salman <basil@daynix.com>
+Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+(cherry picked from commit b2413df83348acf371c03bced9a3845bba883ed5)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- block.c | 50 ++++++++++++++++++++++++--------------------------
- 1 file changed, 24 insertions(+), 26 deletions(-)
+ qga/vss-win32/install.cpp | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/block.c b/block.c
-index 473eb6eeaa..2e5e8b639a 100644
---- a/block.c
-+++ b/block.c
-@@ -5335,10 +5335,6 @@ static void coroutine_fn bdrv_co_invalidate_cache(BlockDriverState *bs,
-         return;
-     }
- 
--    if (!(bs->open_flags & BDRV_O_INACTIVE)) {
--        return;
--    }
--
-     QLIST_FOREACH(child, &bs->children, next) {
-         bdrv_co_invalidate_cache(child->bs, &local_err);
-         if (local_err) {
-@@ -5360,34 +5356,36 @@ static void coroutine_fn bdrv_co_invalidate_cache(BlockDriverState *bs,
-      * just keep the extended permissions for the next time that an activation
-      * of the image is tried.
-      */
--    bs->open_flags &= ~BDRV_O_INACTIVE;
--    bdrv_get_cumulative_perm(bs, &perm, &shared_perm);
--    ret = bdrv_check_perm(bs, NULL, perm, shared_perm, NULL, NULL, &local_err);
--    if (ret < 0) {
--        bs->open_flags |= BDRV_O_INACTIVE;
--        error_propagate(errp, local_err);
--        return;
--    }
--    bdrv_set_perm(bs, perm, shared_perm);
--
--    if (bs->drv->bdrv_co_invalidate_cache) {
--        bs->drv->bdrv_co_invalidate_cache(bs, &local_err);
--        if (local_err) {
-+    if (bs->open_flags & BDRV_O_INACTIVE) {
-+        bs->open_flags &= ~BDRV_O_INACTIVE;
-+        bdrv_get_cumulative_perm(bs, &perm, &shared_perm);
-+        ret = bdrv_check_perm(bs, NULL, perm, shared_perm, NULL, NULL, &local_err);
-+        if (ret < 0) {
-             bs->open_flags |= BDRV_O_INACTIVE;
-             error_propagate(errp, local_err);
-             return;
-         }
--    }
-+        bdrv_set_perm(bs, perm, shared_perm);
- 
--    FOR_EACH_DIRTY_BITMAP(bs, bm) {
--        bdrv_dirty_bitmap_skip_store(bm, false);
--    }
-+        if (bs->drv->bdrv_co_invalidate_cache) {
-+            bs->drv->bdrv_co_invalidate_cache(bs, &local_err);
-+            if (local_err) {
-+                bs->open_flags |= BDRV_O_INACTIVE;
-+                error_propagate(errp, local_err);
-+                return;
-+            }
-+        }
- 
--    ret = refresh_total_sectors(bs, bs->total_sectors);
--    if (ret < 0) {
--        bs->open_flags |= BDRV_O_INACTIVE;
--        error_setg_errno(errp, -ret, "Could not refresh total sector count");
--        return;
-+        FOR_EACH_DIRTY_BITMAP(bs, bm) {
-+            bdrv_dirty_bitmap_skip_store(bm, false);
-+        }
+diff --git a/qga/vss-win32/install.cpp b/qga/vss-win32/install.cpp
+index 6713e58670..a456841360 100644
+--- a/qga/vss-win32/install.cpp
++++ b/qga/vss-win32/install.cpp
+@@ -443,6 +443,17 @@ STDAPI DllRegisterServer(void)
+                                      VSS_PROV_SOFTWARE,
+                                      const_cast<WCHAR*>(QGA_PROVIDER_VERSION),
+                                      g_gProviderVersion);
++    if (hr == (long int) VSS_E_PROVIDER_ALREADY_REGISTERED) {
++        DllUnregisterServer();
++        hr = pVssAdmin->RegisterProvider(g_gProviderId, CLSID_QGAVSSProvider,
++                                         const_cast<WCHAR * >
++                                         (QGA_PROVIDER_LNAME),
++                                         VSS_PROV_SOFTWARE,
++                                         const_cast<WCHAR * >
++                                         (QGA_PROVIDER_VERSION),
++                                         g_gProviderVersion);
++    }
 +
-+        ret = refresh_total_sectors(bs, bs->total_sectors);
-+        if (ret < 0) {
-+            bs->open_flags |= BDRV_O_INACTIVE;
-+            error_setg_errno(errp, -ret, "Could not refresh total sector count");
-+            return;
-+        }
+     if (FAILED(hr)) {
+         errmsg_dialog(hr, "RegisterProvider failed");
      }
- 
-     QLIST_FOREACH(parent, &bs->parents, next_parent) {
 -- 
 2.17.1
 
