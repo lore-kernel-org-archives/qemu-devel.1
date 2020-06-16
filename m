@@ -7,61 +7,61 @@ X-Spam-Status: No, score=0.4 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	MENTIONS_GIT_HOSTING,MISSING_HEADERS,REPLYTO_WITHOUT_TO_CC,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C95EC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 13:13:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94797C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 15:16:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1996820B80
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 13:13:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 57DEA207C3
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 15:16:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mg.gitlab.com header.i=@mg.gitlab.com header.b="F+0wsRxF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1996820B80
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mg.gitlab.com header.i=@mg.gitlab.com header.b="L20YIkEN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57DEA207C3
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35106 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38708 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlBPP-0004SW-AK
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 09:13:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50432)
+	id 1jlDKN-0001aG-J5
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 11:16:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35360)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <bounce+2dc402.947b4-qemu-devel=nongnu.org@mg.gitlab.com>)
- id 1jl8JX-0006i7-3A
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 05:55:31 -0400
-Received: from do158-143.mg.gitlab.com ([192.237.158.143]:29979)
+ id 1jlCnc-0005Yx-B5
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 10:42:52 -0400
+Received: from do158-143.mg.gitlab.com ([192.237.158.143]:60786)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1)
  (envelope-from <bounce+2dc402.947b4-qemu-devel=nongnu.org@mg.gitlab.com>)
- id 1jl8JS-0003lj-A5
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 05:55:30 -0400
+ id 1jlCnY-0002SO-Af
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 10:42:51 -0400
 DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.gitlab.com;
  q=dns/txt; 
- s=mailo; t=1592301328; h=List-Id: Content-Transfer-Encoding:
+ s=mailo; t=1592318570; h=List-Id: Content-Transfer-Encoding:
  Content-Type: Mime-Version: Subject: Message-ID: Reply-To: From: Date:
- Sender; bh=k2HUDKImGoqrjfX57wm5WiB2rN/AA4Rx0Fs6HIIvbRw=;
- b=F+0wsRxF61wS2SVWNCXKSgHHf1oBKGTWy9EubqeGxR6wt+9N75OWvavLUfUDlcO7nVAH5dED
- Bm5NXxI/Y8zL0JcneRYQzJ0Syzbs0+UtmRFVgHPM3hU2NJpTUqDf1OmQ/D8v84NY5g0m6wKb
- TmtcFeaziHZmLRj3jHbLzPYnlFI=
+ Sender; bh=byP/8nOk16oiIZBkXpOShLgpHrq/+4ibYWQhuJ8H61k=;
+ b=L20YIkENf+3IFCImlrLcJMgb2ibFblyvuTnD1y4heKZd35uK4sYVlvjzdo4p8NgwqoUvii/j
+ fMasxUsDZTgKPQ4A/b+1p35FJmRG7VoCX0ykqYew21Js/CBidP87ib+9ZFWELcGah+g9uPfx
+ BAAbfBZO9BIgIcoqirXGIQD0IpI=
 X-Mailgun-Sending-Ip: 192.237.158.143
 X-Mailgun-Sid: WyI3MWYzYSIsICJxZW11LWRldmVsQG5vbmdudS5vcmciLCAiOTQ3YjQiXQ==
-Received: from mg.gitlab.com (66.90.74.34.bc.googleusercontent.com
- [34.74.90.66]) by smtp-out-n07.prod.us-east-1.postgun.com with SMTP id
- 5ee89701c4bb4f886d7beba6 (version=TLS1.3, cipher=TLS_AES_128_GCM_SHA256);
- Tue, 16 Jun 2020 09:55:13 GMT
-Date: Tue, 16 Jun 2020 09:55:13 +0000
-Message-ID: <5ee8970118c4c_52b23fa02532629869054@sidekiq-catchall-01-sv-gprd.mail>
-Subject: QEMU | Pipeline #156667089 has failed for master | 53550e81
+Received: from mg.gitlab.com (67.90.74.34.bc.googleusercontent.com
+ [34.74.90.67]) by smtp-out-n08.prod.us-east-1.postgun.com with SMTP id
+ 5ee8da59a3d8a44743326721 (version=TLS1.3, cipher=TLS_AES_128_GCM_SHA256);
+ Tue, 16 Jun 2020 14:42:33 GMT
+Date: Tue, 16 Jun 2020 14:42:33 +0000
+Message-ID: <5ee8da596685b_4c043f9d382e9a2c16316@sidekiq-catchall-02-sv-gprd.mail>
+Subject: QEMU | Pipeline #156797075 has failed for master | cb8278cd
 Mime-Version: 1.0
 Content-Type: multipart/alternative;
- boundary="--==_mimepart_5ee89701ee3a_52b23fa02532629869044f";
+ boundary="--==_mimepart_5ee8da595c26b_4c043f9d382e9a2c163017";
  charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-GitLab-Project: QEMU
 X-GitLab-Project-Id: 11167699
 X-GitLab-Project-Path: qemu-project/qemu
-X-GitLab-Pipeline-Id: 156667089
+X-GitLab-Pipeline-Id: 156797075
 X-GitLab-Pipeline-Ref: master
 X-GitLab-Pipeline-Status: failed
 Auto-Submitted: auto-generated
@@ -81,7 +81,7 @@ X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  REPLYTO_WITHOUT_TO_CC=1.552, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
-X-Mailman-Approved-At: Tue, 16 Jun 2020 09:12:04 -0400
+X-Mailman-Approved-At: Tue, 16 Jun 2020 11:15:34 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,7 +100,7 @@ Reply-to: GitLab <noreply@gitlab.com>, GitLab <gitlab@mg.gitlab.com>
 From: GitLab via <qemu-devel@nongnu.org>
 
 
-----==_mimepart_5ee89701ee3a_52b23fa02532629869044f
+----==_mimepart_5ee8da595c26b_4c043f9d382e9a2c163017
 Content-Type: text/plain;
  charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
@@ -112,61 +112,149 @@ Your pipeline has failed.
 Project: QEMU ( https://gitlab.com/qemu-project/qemu )
 Branch: master ( https://gitlab.com/qemu-project/qemu/-/commits/master )
 
-Commit: 53550e81 ( https://gitlab.com/qemu-project/qemu/-/commit/53550e81=
-e2cafe7c03a39526b95cd21b5194d9b1 )
-Commit Message: Merge remote-tracking branch 'remotes/berrange/...
+Commit: cb8278cd ( https://gitlab.com/qemu-project/qemu/-/commit/cb8278cd=
+997f4776b5a38fce7859bbe3b2d8d139 )
+Commit Message: Merge remote-tracking branch 'remotes/pmaydell/...
 Commit Author: Peter Maydell ( https://gitlab.com/pm215 )
 
-Pipeline #156667089 ( https://gitlab.com/qemu-project/qemu/-/pipelines/15=
-6667089 ) triggered by Alex Benn=C3=A9e ( https://gitlab.com/stsquad )
+Pipeline #156797075 ( https://gitlab.com/qemu-project/qemu/-/pipelines/15=
+6797075 ) triggered by Alex Benn=C3=A9e ( https://gitlab.com/stsquad )
 had 1 failed build.
 
-Job #596963832 ( https://gitlab.com/qemu-project/qemu/-/jobs/596963832/ra=
+Job #597551841 ( https://gitlab.com/qemu-project/qemu/-/jobs/597551841/ra=
 w )
 
 Stage: test
-Name: build-disabled
-Trace:   TEST    check-qtest-ppc64: tests/qtest/usb-hcd-uhci-test
-  TEST    check-qtest-ppc64: tests/qtest/usb-hcd-xhci-test
-  TEST    check-qtest-ppc64: tests/qtest/test-filter-mirror
-  TEST    check-qtest-ppc64: tests/qtest/test-filter-redirector
-  TEST    check-qtest-ppc64: tests/qtest/display-vga-test
-  TEST    check-qtest-ppc64: tests/qtest/numa-test
-  TEST    check-qtest-ppc64: tests/qtest/ivshmem-test
-  TEST    check-qtest-ppc64: tests/qtest/cpu-plug-test
-  TEST    check-qtest-ppc64: tests/qtest/cdrom-test
-  TEST    check-qtest-ppc64: tests/qtest/device-introspect-test
-socket_accept failed: Resource temporarily unavailable
-**
-ERROR:/builds/qemu-project/qemu/tests/qtest/libqtest.c:301:qtest_init_wit=
-hout_qmp_handshake: assertion failed: (s->fd >=3D 0 && s->qmp_fd >=3D 0)
-ERROR - Bail out! ERROR:/builds/qemu-project/qemu/tests/qtest/libqtest.c:=
-301:qtest_init_without_qmp_handshake: assertion failed: (s->fd >=3D 0 && =
-s->qmp_fd >=3D 0)
-/builds/qemu-project/qemu/tests/qtest/libqtest.c:166: kill_qemu() tried t=
-o terminate QEMU process but encountered exit status 1 (expected 0)
-make: *** [/builds/qemu-project/qemu/tests/Makefile.include:643: check-qt=
-est-i386] Error 1
-make: *** Waiting for unfinished jobs....
-qemu-system-ppc64: warning: machine has no BMC device. Use '-device ipmi-=
-bmc-sim,id=3Dbmc0 -device isa-ipmi-bt,bmc=3Dbmc0,irq=3D10' to define one
-qemu-system-ppc64: warning: machine has no BMC device. Use '-device ipmi-=
-bmc-sim,id=3Dbmc0 -device isa-ipmi-bt,bmc=3Dbmc0,irq=3D10' to define one
-qemu-system-ppc64: warning: machine has no BMC device. Use '-device ipmi-=
-bmc-sim,id=3Dbmc0 -device isa-ipmi-bt,bmc=3Dbmc0,irq=3D10' to define one
-  TEST    check-qtest-ppc64: tests/qtest/machine-none-test
-  TEST    check-qtest-ppc64: tests/qtest/qmp-test
-  TEST    check-qtest-ppc64: tests/qtest/qmp-cmd-test
-  TEST    check-qtest-ppc64: tests/qtest/qom-test
-  TEST    check-qtest-ppc64: tests/qtest/test-hmp
-  TEST    check-qtest-ppc64: tests/qtest/qos-test
-section_end:1592300188:build_script
-=1B[0Ksection_start:1592300188:after_script
+Name: build-tcg-disabled
+Trace: 215      ...        [14:08:03]             ...              =
+
+215      =1B[32mpass      =1B[0m [14:08:03] [14:09:28]  84s              =
+ =
+
+216      ...        [14:09:28]             ...              =
+
+216      =1B[32mpass      =1B[0m [14:09:28] [14:09:32]   4s              =
+ =
+
+218      ...        [14:09:32]             ...              =
+
+218      =1B[32mpass      =1B[0m [14:09:32] [14:09:33]   1s              =
+ =
+
+222      ...        [14:09:33]             ...              =
+
+222      =1B[32mpass      =1B[0m [14:09:33] [14:09:34]   1s              =
+ =
+
+227      ...        [14:09:34]             ...              =
+
+227      =1B[32mpass      =1B[0m [14:09:34] [14:09:34]   0s              =
+ =
+
+234      ...        [14:09:34]             ...              =
+
+234      =1B[32mpass      =1B[0m [14:09:34] [14:09:35]   1s              =
+ =
+
+246      ...        [14:09:35]             ...              =
+
+246      =1B[32mpass      =1B[0m [14:09:35] [14:09:36]   1s              =
+ =
+
+247      ...        [14:09:36]             ...              =
+
+247      =1B[32mpass      =1B[0m [14:09:36] [14:09:37]   1s              =
+ =
+
+248      ...        [14:09:37]             ...              =
+
+248      =1B[32mpass      =1B[0m [14:09:37] [14:09:37]   0s              =
+ =
+
+250      ...        [14:09:37]             ...              =
+
+250      =1B[32mpass      =1B[0m [14:09:37] [14:09:38]   1s              =
+ =
+
+254      ...        [14:09:38]             ...              =
+
+254      =1B[32mpass      =1B[0m [14:09:38] [14:09:38]   0s              =
+ =
+
+255      ...        [14:09:38]             ...              =
+
+255      =1B[32mpass      =1B[0m [14:09:38] [14:09:40]   2s              =
+ =
+
+257      ...        [14:09:40]             ...              =
+
+257      =1B[32mpass      =1B[0m [14:09:40] [14:09:51]  11s              =
+ =
+
+258      ...        [14:09:51]             ...              =
+
+258      =1B[32mpass      =1B[0m [14:09:51] [14:09:52]   1s              =
+ =
+
+260      ...        [14:09:52]             ...              =
+
+260      =1B[32mpass      =1B[0m [14:09:52] [14:09:52]   0s              =
+ =
+
+261      ...        [14:09:52]             ...              =
+
+261      =1B[32mpass      =1B[0m [14:09:52] [14:10:20]  28s              =
+ =
+
+262      ...        [14:10:20]             ...              =
+
+262      =1B[32mpass      =1B[0m [14:10:20] [14:10:21]   1s              =
+ =
+
+263      ...        [14:10:21]             ...              =
+
+263      =1B[32mpass      =1B[0m [14:10:21] [14:10:23]   2s              =
+ =
+
+264      ...        [14:10:23]             ...              =
+
+264      =1B[32mpass      =1B[0m [14:10:23] [14:10:27]   4s              =
+ =
+
+270      ...        [14:10:27]             ...              =
+
+270      =1B[32mpass      =1B[0m [14:10:27] [14:10:30]   3s              =
+ =
+
+272      ...        [14:10:30]             ...              =
+
+272      =1B[32mpass      =1B[0m [14:10:30] [14:10:30]   0s              =
+ =
+
+273      ...        [14:10:30]             ...              =
+
+273      =1B[32mpass      =1B[0m [14:10:30] [14:10:31]   1s              =
+ =
+
+277      ...        [14:10:31]             ...              =
+
+277      =1B[32mpass      =1B[0m [14:10:31] [14:10:32]   1s              =
+ =
+
+279      ...        [14:10:32]             ...              =
+
+279      =1B[32mpass      =1B[0m [14:10:32] [14:10:32]   0s              =
+ =
+
+Failures: 051
+Failed 1 of 57 iotests
+section_end:1592316644:build_script
+=1B[0Ksection_start:1592316644:after_script
 =1B[0K=1B[0K=1B[36;1mRunning after_script=1B[0;m
-=1B[0;msection_end:1592300189:after_script
-=1B[0Ksection_start:1592300189:upload_artifacts_on_failure
+=1B[0;msection_end:1592316649:after_script
+=1B[0Ksection_start:1592316649:upload_artifacts_on_failure
 =1B[0K=1B[0K=1B[36;1mUploading artifacts for failed job=1B[0;m
-=1B[0;msection_end:1592300191:upload_artifacts_on_failure
+=1B[0;msection_end:1592316652:upload_artifacts_on_failure
 =1B[0K=1B[31;1mERROR: Job failed: exit code 1
 =1B[0;m
 
@@ -178,7 +266,7 @@ You're receiving this email because of your account on gitlab.com.
 
 
 
-----==_mimepart_5ee89701ee3a_52b23fa02532629869044f
+----==_mimepart_5ee8da595c26b_4c043f9d382e9a2c163017
 Content-Type: text/html;
  charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
@@ -193,7 +281,7 @@ w.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <meta content=3D"width=3Ddevice-width, initial-scale=3D1" name=3D"viewpor=
 t" />
 <meta content=3D"IE=3Dedge" http-equiv=3D"X-UA-Compatible" />
-<title>QEMU | Pipeline #156667089 has failed for master | 53550e81</title=
+<title>QEMU | Pipeline #156797075 has failed for master | cb8278cd</title=
 >
 <style data-premailer=3D"ignore" type=3D"text/css">
 body,table,td,a{-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%}t=
@@ -361,17 +449,17 @@ ipeline_notif_v1/icon-commit-gray-c10243ac24cde64b549aec91de35e6b49c8739b=
 </td>
 <td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; fo=
 nt-size: 15px; line-height: 1.4;" valign=3D"middle">
-<a href=3D"https://gitlab.com/qemu-project/qemu/-/commit/53550e81e2cafe7c=
-03a39526b95cd21b5194d9b1" style=3D"color: #3777b0; text-decoration: none;=
+<a href=3D"https://gitlab.com/qemu-project/qemu/-/commit/cb8278cd997f4776=
+b5a38fce7859bbe3b2d8d139" style=3D"color: #3777b0; text-decoration: none;=
 ">
-53550e81
+cb8278cd
 </a>
 </td>
 </tr>
 </tbody>
 </table>
 <div class=3D"commit" style=3D"color: #5c5c5c; font-weight: 300;">
-Merge remote-tracking branch 'remotes/berrange/...
+Merge remote-tracking branch 'remotes/pmaydell/...
 </div>
 </td>
 </tr>
@@ -428,9 +516,9 @@ le=3D"border-collapse: collapse; margin: 0 auto;">
 <td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; fo=
 nt-size: 15px; font-weight: 500; line-height: 1.4;" valign=3D"baseline">
 Pipeline
-<a href=3D"https://gitlab.com/qemu-project/qemu/-/pipelines/156667089" st=
+<a href=3D"https://gitlab.com/qemu-project/qemu/-/pipelines/156797075" st=
 yle=3D"color: #3777b0; text-decoration: none;">
-#156667089
+#156797075
 </a>
 triggered by
 </td>
@@ -507,9 +595,9 @@ test
 <td align=3D"right" style=3D"font-family: 'Helvetica Neue',Helvetica,Aria=
 l,sans-serif; color: #8c8c8c; font-weight: 500; font-size: 14px; padding:=
  16px 0;">
-<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/596963832" style=3D=
+<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/597551841" style=3D=
 "color: #3777b0; text-decoration: none;">
-build-disabled
+build-tcg-disabled
 </a>
 
 </td>
@@ -520,49 +608,116 @@ sans-serif; padding: 0 0 16px;">
 <pre style=3D"font-family: Monaco,'Lucida Console','Courier New',Courier,=
 monospace; background-color: #fafafa; border-radius: 4px; overflow: hidde=
 n; white-space: pre-wrap; word-break: break-all; font-size: 13px; line-he=
-ight: 1.4; color: #333333; margin: 0; padding: 16px 8px;"><span>  TEST   =
- check-qtest-ppc64: tests/qtest/usb-hcd-uhci-test<br />  TEST    check-qt=
-est-ppc64: tests/qtest/usb-hcd-xhci-test<br />  TEST    check-qtest-ppc64=
-: tests/qtest/test-filter-mirror<br />  TEST    check-qtest-ppc64: tests/=
-qtest/test-filter-redirector<br />  TEST    check-qtest-ppc64: tests/qtes=
-t/display-vga-test<br />  TEST    check-qtest-ppc64: tests/qtest/numa-tes=
-t<br />  TEST    check-qtest-ppc64: tests/qtest/ivshmem-test<br />  TEST =
-   check-qtest-ppc64: tests/qtest/cpu-plug-test<br />  TEST    check-qtes=
-t-ppc64: tests/qtest/cdrom-test<br />  TEST    check-qtest-ppc64: tests/q=
-test/device-introspect-test<br />socket_accept failed: Resource temporari=
-ly unavailable<br />**<br />ERROR:/builds/qemu-project/qemu/tests/qtest/l=
-ibqtest.c:301:qtest_init_without_qmp_handshake: assertion failed: (s-&gt;=
-fd &gt;=3D 0 &amp;&amp; s-&gt;qmp_fd &gt;=3D 0)<br />ERROR - Bail out! ER=
-ROR:/builds/qemu-project/qemu/tests/qtest/libqtest.c:301:qtest_init_witho=
-ut_qmp_handshake: assertion failed: (s-&gt;fd &gt;=3D 0 &amp;&amp; s-&gt;=
-qmp_fd &gt;=3D 0)<br />/builds/qemu-project/qemu/tests/qtest/libqtest.c:1=
-66: kill_qemu() tried to terminate QEMU process but encountered exit stat=
-us 1 (expected 0)<br />make: *** [/builds/qemu-project/qemu/tests/Makefil=
-e.include:643: check-qtest-i386] Error 1<br />make: *** Waiting for unfin=
-ished jobs....<br />qemu-system-ppc64: warning: machine has no BMC device=
-. Use '-device ipmi-bmc-sim,id=3Dbmc0 -device isa-ipmi-bt,bmc=3Dbmc0,irq=3D=
-10' to define one<br />qemu-system-ppc64: warning: machine has no BMC dev=
-ice. Use '-device ipmi-bmc-sim,id=3Dbmc0 -device isa-ipmi-bt,bmc=3Dbmc0,i=
-rq=3D10' to define one<br />qemu-system-ppc64: warning: machine has no BM=
-C device. Use '-device ipmi-bmc-sim,id=3Dbmc0 -device isa-ipmi-bt,bmc=3Db=
-mc0,irq=3D10' to define one<br />  TEST    check-qtest-ppc64: tests/qtest=
-/machine-none-test<br />  TEST    check-qtest-ppc64: tests/qtest/qmp-test=
-<br />  TEST    check-qtest-ppc64: tests/qtest/qmp-cmd-test<br />  TEST  =
-  check-qtest-ppc64: tests/qtest/qom-test<br />  TEST    check-qtest-ppc6=
-4: tests/qtest/test-hmp<br />  TEST    check-qtest-ppc64: tests/qtest/qos=
--test<br /></span><div class=3D"section-start" data-timestamp=3D"15923001=
-88" data-section=3D"after-script" role=3D"button"></div><span class=3D"te=
-rm-fg-l-cyan term-bold section section-header js-s-after-script">Running =
-after_script</span><span class=3D"section section-header js-s-after-scrip=
-t"><br /></span><div class=3D"section-end" data-section=3D"after-script">=
-</div><div class=3D"section-start" data-timestamp=3D"1592300189" data-sec=
-tion=3D"upload-artifacts-on-failure" role=3D"button"></div><span class=3D=
-"term-fg-l-cyan term-bold section section-header js-s-upload-artifacts-on=
--failure">Uploading artifacts for failed job</span><span class=3D"section=
- section-header js-s-upload-artifacts-on-failure"><br /></span><div class=
-=3D"section-end" data-section=3D"upload-artifacts-on-failure"></div><span=
- class=3D"term-fg-l-red term-bold">ERROR: Job failed: exit code 1<br /></=
-span></pre>
+ight: 1.4; color: #333333; margin: 0; padding: 16px 8px;"><span>215      =
+...        [14:08:03]             ...              =
+
+215      </span><span class=3D"term-fg-green">pass      </span><span> [14=
+:08:03] [14:09:28]  84s               <br />216      ...        [14:09:28=
+]             ...              =
+
+216      </span><span class=3D"term-fg-green">pass      </span><span> [14=
+:09:28] [14:09:32]   4s               <br />218      ...        [14:09:32=
+]             ...              =
+
+218      </span><span class=3D"term-fg-green">pass      </span><span> [14=
+:09:32] [14:09:33]   1s               <br />222      ...        [14:09:33=
+]             ...              =
+
+222      </span><span class=3D"term-fg-green">pass      </span><span> [14=
+:09:33] [14:09:34]   1s               <br />227      ...        [14:09:34=
+]             ...              =
+
+227      </span><span class=3D"term-fg-green">pass      </span><span> [14=
+:09:34] [14:09:34]   0s               <br />234      ...        [14:09:34=
+]             ...              =
+
+234      </span><span class=3D"term-fg-green">pass      </span><span> [14=
+:09:34] [14:09:35]   1s               <br />246      ...        [14:09:35=
+]             ...              =
+
+246      </span><span class=3D"term-fg-green">pass      </span><span> [14=
+:09:35] [14:09:36]   1s               <br />247      ...        [14:09:36=
+]             ...              =
+
+247      </span><span class=3D"term-fg-green">pass      </span><span> [14=
+:09:36] [14:09:37]   1s               <br />248      ...        [14:09:37=
+]             ...              =
+
+248      </span><span class=3D"term-fg-green">pass      </span><span> [14=
+:09:37] [14:09:37]   0s               <br />250      ...        [14:09:37=
+]             ...              =
+
+250      </span><span class=3D"term-fg-green">pass      </span><span> [14=
+:09:37] [14:09:38]   1s               <br />254      ...        [14:09:38=
+]             ...              =
+
+254      </span><span class=3D"term-fg-green">pass      </span><span> [14=
+:09:38] [14:09:38]   0s               <br />255      ...        [14:09:38=
+]             ...              =
+
+255      </span><span class=3D"term-fg-green">pass      </span><span> [14=
+:09:38] [14:09:40]   2s               <br />257      ...        [14:09:40=
+]             ...              =
+
+257      </span><span class=3D"term-fg-green">pass      </span><span> [14=
+:09:40] [14:09:51]  11s               <br />258      ...        [14:09:51=
+]             ...              =
+
+258      </span><span class=3D"term-fg-green">pass      </span><span> [14=
+:09:51] [14:09:52]   1s               <br />260      ...        [14:09:52=
+]             ...              =
+
+260      </span><span class=3D"term-fg-green">pass      </span><span> [14=
+:09:52] [14:09:52]   0s               <br />261      ...        [14:09:52=
+]             ...              =
+
+261      </span><span class=3D"term-fg-green">pass      </span><span> [14=
+:09:52] [14:10:20]  28s               <br />262      ...        [14:10:20=
+]             ...              =
+
+262      </span><span class=3D"term-fg-green">pass      </span><span> [14=
+:10:20] [14:10:21]   1s               <br />263      ...        [14:10:21=
+]             ...              =
+
+263      </span><span class=3D"term-fg-green">pass      </span><span> [14=
+:10:21] [14:10:23]   2s               <br />264      ...        [14:10:23=
+]             ...              =
+
+264      </span><span class=3D"term-fg-green">pass      </span><span> [14=
+:10:23] [14:10:27]   4s               <br />270      ...        [14:10:27=
+]             ...              =
+
+270      </span><span class=3D"term-fg-green">pass      </span><span> [14=
+:10:27] [14:10:30]   3s               <br />272      ...        [14:10:30=
+]             ...              =
+
+272      </span><span class=3D"term-fg-green">pass      </span><span> [14=
+:10:30] [14:10:30]   0s               <br />273      ...        [14:10:30=
+]             ...              =
+
+273      </span><span class=3D"term-fg-green">pass      </span><span> [14=
+:10:30] [14:10:31]   1s               <br />277      ...        [14:10:31=
+]             ...              =
+
+277      </span><span class=3D"term-fg-green">pass      </span><span> [14=
+:10:31] [14:10:32]   1s               <br />279      ...        [14:10:32=
+]             ...              =
+
+279      </span><span class=3D"term-fg-green">pass      </span><span> [14=
+:10:32] [14:10:32]   0s               <br />Failures: 051<br />Failed 1 o=
+f 57 iotests<br /></span><div class=3D"section-start" data-timestamp=3D"1=
+592316644" data-section=3D"after-script" role=3D"button"></div><span clas=
+s=3D"term-fg-l-cyan term-bold section section-header js-s-after-script">R=
+unning after_script</span><span class=3D"section section-header js-s-afte=
+r-script"><br /></span><div class=3D"section-end" data-section=3D"after-s=
+cript"></div><div class=3D"section-start" data-timestamp=3D"1592316649" d=
+ata-section=3D"upload-artifacts-on-failure" role=3D"button"></div><span c=
+lass=3D"term-fg-l-cyan term-bold section section-header js-s-upload-artif=
+acts-on-failure">Uploading artifacts for failed job</span><span class=3D"=
+section section-header js-s-upload-artifacts-on-failure"><br /></span><di=
+v class=3D"section-end" data-section=3D"upload-artifacts-on-failure"></di=
+v><span class=3D"term-fg-l-red term-bold">ERROR: Job failed: exit code 1<=
+br /></span></pre>
 </td>
 </tr>
 </tbody>
@@ -610,5 +765,5 @@ lor: #5c5c5c; padding: 25px 0;">
 </body>
 </html>
 
-----==_mimepart_5ee89701ee3a_52b23fa02532629869044f--
+----==_mimepart_5ee8da595c26b_4c043f9d382e9a2c163017--
 
