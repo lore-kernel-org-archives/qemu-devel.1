@@ -2,73 +2,74 @@ Return-Path: <SRS0=f7ls=75=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9B12C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:21:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E4BBC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:22:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 772F120786
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:21:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1374620882
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 14:22:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cILtWzvP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 772F120786
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="s2Wyi+Wn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1374620882
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58772 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35908 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlCSv-0006fD-NB
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 10:21:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57172)
+	id 1jlCTu-0000VU-AM
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 10:22:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57230)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1jlCPC-00012M-9x; Tue, 16 Jun 2020 10:17:38 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:44840)
+ id 1jlCPG-0001Dn-Hk; Tue, 16 Jun 2020 10:17:42 -0400
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:38664)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1jlCP9-0006Wd-Si; Tue, 16 Jun 2020 10:17:38 -0400
-Received: by mail-oi1-x244.google.com with SMTP id x202so19359260oix.11;
- Tue, 16 Jun 2020 07:17:35 -0700 (PDT)
+ id 1jlCPF-0006Xl-1F; Tue, 16 Jun 2020 10:17:42 -0400
+Received: by mail-oi1-x244.google.com with SMTP id c194so19393110oig.5;
+ Tue, 16 Jun 2020 07:17:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=h/hE49QX8YmTKtVnyAn2SmarU/Zwjxz9HKFw4F8vB1M=;
- b=cILtWzvP4L4u8FWC7MUMCvZCpDhksJ3K9fyP7VqsGLO7SFlvecUq1G3xrhO9Q5wZs0
- zx1GtJ/plwR6yaDF1sRIdhFHQe+MLOGcb7oK72YN2yXvjxzBzY8ohiYEwzNKPPmQKNkr
- JS4Ok+3CQUfplnqsOKCKtF4L4CiEvURUXv9tdT8jvaPdfqdeSoa+ZArrvONNG5w0XYWq
- cjAcKl2Dpwt87pK2BXglW/H6CsA0jpaUIwxILeeUZNSN6YpSdgBkJn8HGylLpTuEhl2r
- TaB8HMSNq81nO9PHX2qJrI5TUt0LTkz4KG1AgVS3v+1wx8rYthUv9sFmfmkNtaql0mvz
- iLMQ==
+ bh=KqhqPuFMDL4mUgpQ50K5I58H+FHgkQzqbUQkl0uEKsM=;
+ b=s2Wyi+WnL/7Lyhbv3mTGD6zBu+dEySqCGJvwWviwomJswetrt6plaqOqz94rV6k9jS
+ gLMmT/07jJP5wdhrqFH9xadtqxWWIDl38xfLgYwfYfSaKSLQ6Ab5eQjH9nIhd1mYoZgm
+ bNWqhqNJY2cZJhATU6W0iCYWfGruxjt9HwcWF6qGwr8oI/3ljANm4AHoz6uvo7APhb5c
+ rC3sAVJ05n+xHlGwuE7mOxoCeG9/N0Wa33+fQI55Qwt3muhEZuxyWNnK/+wm2VXXwNnW
+ AqMJN9Nivjq122YF6KfMpufuAT4214qqMxwTkQu2FXVTrc2gqAbf/ibWsBFwQ6/HBMT/
+ cXNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references;
- bh=h/hE49QX8YmTKtVnyAn2SmarU/Zwjxz9HKFw4F8vB1M=;
- b=RL6lAOIVDNsQjdTuu+dhNTuY2gfKgvUuBfuXhJ4XFSIkUvs43tshIE6rXCrMKF5DGE
- gGhO1VH5Jx4tvb4gdhBWKpdmXIP7QqWFSriMLKoFyp2LZsFd0YdSGgYmR4BfD/bCaUD0
- x3dPWfbmRWMHr0WWs0wDdfLUiKodD1U1RK1dJ9fM7kqRDleJ3GMqVXg1kQSrtI5wt01e
- qKaBZe6Z0WJOp37/irVGevi14eQmRmGAiIXEDa4PcyYyrtprIJQcmQVr50/sKgyOtNrn
- gbQvKwAg3S4CT0pXp17oC70AdhNZQft9s64n72Bb8xRlL6a0cxbrWt7idVQwOyYnLW5u
- Ncjg==
-X-Gm-Message-State: AOAM533DcSckUyut4CTF5VJUGFD7xg6+6dOo/WMWvBG42iktjaxJyUjM
- P5U1fIdMlCfT6d+s+t04woeDyGkE
-X-Google-Smtp-Source: ABdhPJz73mREHdQ5EcXrsg9AovfPWhWMQdl1n3a4ntKd10hu5WRuCz8K0YAxiFleXmQFkPkZeyi7sw==
-X-Received: by 2002:aca:ba0a:: with SMTP id k10mr3361414oif.13.1592317053984; 
- Tue, 16 Jun 2020 07:17:33 -0700 (PDT)
+ bh=KqhqPuFMDL4mUgpQ50K5I58H+FHgkQzqbUQkl0uEKsM=;
+ b=bwc+EntRkiTkLKQyeTipThU/Ha4jt1xfNLp3/EJdPZJiI6Jywos/V3oVfE/EQXlnlr
+ oXA2CpcD1bnZjhtaQwEQDXh6HJrQP/lcakqvRA+l2CP4AUwsCRJ9R4/Q3nclvjgsxlbW
+ LPkCrW7z+Zk93IgwRIVD616JHHs0YZgiEUR5mPIjKyeaN/e+QBtVXz2pQfsddW8uKN7w
+ tTGWLsdialFtbWSeeaALYPjWcJdAoBZmq0O0xW9bpa52B0sFmmX4d70+D4vtii2xAB1y
+ qloH8zfaAON53H48JCqP4aWjombvfG8+F3ryZqzbsfw57zDvuOv3znU4CCwcEGMwt2KO
+ dwdg==
+X-Gm-Message-State: AOAM531s/yyaBzmhcG/pBMv6IwA6o8ZDDNJDwkdfBiJ3mYBcbnGVQkdf
+ AKlZMhHgbcmdSn1hs5hs+UHo/EDz
+X-Google-Smtp-Source: ABdhPJzWhPNIoYIBM3YwltT0TTfJLR/Y4BcCwdIi5LGieQum7sOfEV0iTaj/S1nzhllClS+RGZmLYQ==
+X-Received: by 2002:aca:2b0d:: with SMTP id i13mr3665510oik.39.1592317059203; 
+ Tue, 16 Jun 2020 07:17:39 -0700 (PDT)
 Received: from localhost (76-251-165-188.lightspeed.austtx.sbcglobal.net.
  [76.251.165.188])
- by smtp.gmail.com with ESMTPSA id g3sm4100629oov.21.2020.06.16.07.17.32
+ by smtp.gmail.com with ESMTPSA id m20sm4061387ots.13.2020.06.16.07.17.38
  (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
- Tue, 16 Jun 2020 07:17:33 -0700 (PDT)
+ Tue, 16 Jun 2020 07:17:38 -0700 (PDT)
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 10/78] backup-top: Begin drain earlier
-Date: Tue, 16 Jun 2020 09:14:39 -0500
-Message-Id: <20200616141547.24664-11-mdroth@linux.vnet.ibm.com>
+Subject: [PATCH 13/78] hw/i386/pc: fix regression in parsing vga cmdline
+ parameter
+Date: Tue, 16 Jun 2020 09:14:42 -0500
+Message-Id: <20200616141547.24664-14-mdroth@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200616141547.24664-1-mdroth@linux.vnet.ibm.com>
 References: <20200616141547.24664-1-mdroth@linux.vnet.ibm.com>
@@ -95,48 +96,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-stable@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-stable@nongnu.org,
+ Sergio Lopez <slp@redhat.com>, Peter Wu <peter@lekensteyn.nl>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Max Reitz <mreitz@redhat.com>
+From: Peter Wu <peter@lekensteyn.nl>
 
-When dropping backup-top, we need to drain the node before freeing the
-BlockCopyState.  Otherwise, requests may still be in flight and then the
-assertion in shres_destroy() will fail.
+When the 'vga=' parameter is succeeded by another parameter, QEMU 4.2.0
+would refuse to start with a rather cryptic message:
 
-(This becomes visible in intermittent failure of 056.)
+    $ qemu-system-x86_64 -kernel /boot/vmlinuz-linux -append 'vga=792 quiet'
+    qemu: can't parse 'vga' parameter: Invalid argument
 
+It was not clear whether this applied to the '-vga std' parameter or the
+'-append' one. Fix the parsing regression and clarify the error.
+
+Fixes: 133ef074bd ("hw/i386/pc: replace use of strtol with qemu_strtoui in x86_load_linux()")
+Cc: Sergio Lopez <slp@redhat.com>
+Signed-off-by: Peter Wu <peter@lekensteyn.nl>
+Message-Id: <20191221162124.1159291-1-peter@lekensteyn.nl>
 Cc: qemu-stable@nongnu.org
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20191219182638.104621-1-mreitz@redhat.com
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-(cherry picked from commit 503ca1262bab2c11c533a4816d1ff4297d4f58a6)
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+(cherry picked from commit a88c40f02ace88f09b2a85a64831b277b2ebc88c)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- block/backup-top.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/i386/x86.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/block/backup-top.c b/block/backup-top.c
-index 7cdb1f8eba..818d3f26b4 100644
---- a/block/backup-top.c
-+++ b/block/backup-top.c
-@@ -257,12 +257,12 @@ void bdrv_backup_top_drop(BlockDriverState *bs)
-     BDRVBackupTopState *s = bs->opaque;
-     AioContext *aio_context = bdrv_get_aio_context(bs);
- 
--    block_copy_state_free(s->bcs);
--
-     aio_context_acquire(aio_context);
- 
-     bdrv_drained_begin(bs);
- 
-+    block_copy_state_free(s->bcs);
-+
-     s->active = false;
-     bdrv_child_refresh_perms(bs, bs->backing, &error_abort);
-     bdrv_replace_node(bs, backing_bs(bs), &error_abort);
+diff --git a/hw/i386/x86.c b/hw/i386/x86.c
+index 394edc2f72..121650ae51 100644
+--- a/hw/i386/x86.c
++++ b/hw/i386/x86.c
+@@ -508,6 +508,7 @@ void x86_load_linux(X86MachineState *x86ms,
+     vmode = strstr(kernel_cmdline, "vga=");
+     if (vmode) {
+         unsigned int video_mode;
++        const char *end;
+         int ret;
+         /* skip "vga=" */
+         vmode += 4;
+@@ -518,10 +519,9 @@ void x86_load_linux(X86MachineState *x86ms,
+         } else if (!strncmp(vmode, "ask", 3)) {
+             video_mode = 0xfffd;
+         } else {
+-            ret = qemu_strtoui(vmode, NULL, 0, &video_mode);
+-            if (ret != 0) {
+-                fprintf(stderr, "qemu: can't parse 'vga' parameter: %s\n",
+-                        strerror(-ret));
++            ret = qemu_strtoui(vmode, &end, 0, &video_mode);
++            if (ret != 0 || (*end && *end != ' ')) {
++                fprintf(stderr, "qemu: invalid 'vga=' kernel parameter.\n");
+                 exit(1);
+             }
+         }
 -- 
 2.17.1
 
