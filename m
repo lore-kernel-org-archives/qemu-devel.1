@@ -6,53 +6,53 @@ X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F8BDC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 13:56:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FAE4C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 13:56:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0481B20810
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 13:56:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0481B20810
+	by mail.kernel.org (Postfix) with ESMTPS id 5738F207D3
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 13:56:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5738F207D3
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38326 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39084 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlC4y-0000Gp-9E
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 09:56:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51980)
+	id 1jlC55-0000fX-95
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 09:56:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51990)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jlC1n-00021G-5F; Tue, 16 Jun 2020 09:53:27 -0400
-Received: from zero.eik.bme.hu ([152.66.115.2]:36217)
+ id 1jlC1n-000234-L2; Tue, 16 Jun 2020 09:53:27 -0400
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:36215)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jlC1l-0002Pz-DZ; Tue, 16 Jun 2020 09:53:26 -0400
+ id 1jlC1l-0002QA-LZ; Tue, 16 Jun 2020 09:53:27 -0400
 Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 5CA94748DC8;
+ by localhost (Postfix) with SMTP id 296F8748DDD;
  Tue, 16 Jun 2020 15:53:18 +0200 (CEST)
 Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id C8CED748DCF; Tue, 16 Jun 2020 15:53:17 +0200 (CEST)
-Message-Id: <a0b567bf6e5b266a19de4eb6f6551270ffe2ce7b.1592315226.git.balaton@eik.bme.hu>
+ id BFD81748DC8; Tue, 16 Jun 2020 15:53:17 +0200 (CEST)
+Message-Id: <ae197fd25800011a2f5798661446f0758a2d3861.1592315226.git.balaton@eik.bme.hu>
 In-Reply-To: <cover.1592315226.git.balaton@eik.bme.hu>
 References: <cover.1592315226.git.balaton@eik.bme.hu>
 From: BALATON Zoltan <balaton@eik.bme.hu>
-Subject: [PATCH v5 07/11] mac_oldworld: Map macio to expected address at reset
+Subject: [PATCH v5 05/11] grackle: Set revision in PCI config to match hardware
 Date: Tue, 16 Jun 2020 15:47:06 +0200
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 To: qemu-devel@nongnu.org,
     qemu-ppc@nongnu.org
-Received-SPF: pass client-ip=152.66.115.2; envelope-from=balaton@eik.bme.hu;
- helo=zero.eik.bme.hu
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 09:53:23
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+Received-SPF: pass client-ip=2001:738:2001:2001::2001;
+ envelope-from=balaton@eik.bme.hu; helo=zero.eik.bme.hu
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -73,94 +73,24 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add a reset function that maps macio to the address expected by the
-firmware of the board at startup.
-
 Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 ---
- hw/ppc/mac.h          | 12 ++++++++++++
- hw/ppc/mac_oldworld.c | 15 ++++++++++++++-
- 2 files changed, 26 insertions(+), 1 deletion(-)
+ hw/pci-host/grackle.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/ppc/mac.h b/hw/ppc/mac.h
-index a0d9e47031..79ccf8775d 100644
---- a/hw/ppc/mac.h
-+++ b/hw/ppc/mac.h
-@@ -55,6 +55,18 @@
- #define OLDWORLD_IDE1_IRQ      0xe
- #define OLDWORLD_IDE1_DMA_IRQ  0x3
- 
-+/* g3beige machine */
-+#define TYPE_HEATHROW_MACHINE MACHINE_TYPE_NAME("g3beige")
-+#define HEATHROW_MACHINE(obj) OBJECT_CHECK(HeathrowMachineState, (obj), \
-+                                           TYPE_HEATHROW_MACHINE)
-+
-+typedef struct HeathrowMachineState {
-+    /*< private >*/
-+    MachineState parent;
-+
-+    PCIDevice *macio;
-+} HeathrowMachineState;
-+
- /* New World IRQs */
- #define NEWWORLD_CUDA_IRQ      0x19
- #define NEWWORLD_PMU_IRQ       0x19
-diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
-index f97f241e0c..13562e26e6 100644
---- a/hw/ppc/mac_oldworld.c
-+++ b/hw/ppc/mac_oldworld.c
-@@ -73,6 +73,15 @@ static uint64_t translate_kernel_address(void *opaque, uint64_t addr)
-     return (addr & 0x0fffffff) + KERNEL_LOAD_ADDR;
- }
- 
-+static void ppc_heathrow_reset(MachineState *machine)
-+{
-+    HeathrowMachineState *m = HEATHROW_MACHINE(machine);
-+
-+    qemu_devices_reset();
-+    pci_default_write_config(m->macio, PCI_COMMAND, PCI_COMMAND_MEMORY, 2);
-+    pci_default_write_config(m->macio, PCI_BASE_ADDRESS_0, 0xf3000000, 4);
-+}
-+
- static void ppc_heathrow_cpu_reset(void *opaque)
- {
-     PowerPCCPU *cpu = opaque;
-@@ -82,6 +91,7 @@ static void ppc_heathrow_cpu_reset(void *opaque)
- 
- static void ppc_heathrow_init(MachineState *machine)
- {
-+    HeathrowMachineState *hm = HEATHROW_MACHINE(machine);
-     ram_addr_t ram_size = machine->ram_size;
-     const char *boot_device = machine->boot_order;
-     PowerPCCPU *cpu = NULL;
-@@ -287,6 +297,7 @@ static void ppc_heathrow_init(MachineState *machine)
- 
-     /* MacIO */
-     macio = pci_new(-1, TYPE_OLDWORLD_MACIO);
-+    hm->macio = macio;
-     dev = DEVICE(macio);
-     qdev_prop_set_uint64(dev, "frequency", tbfreq);
-     object_property_set_link(OBJECT(macio), OBJECT(pic_dev), "pic",
-@@ -439,6 +450,7 @@ static void heathrow_class_init(ObjectClass *oc, void *data)
- 
-     mc->desc = "Heathrow based PowerMAC";
-     mc->init = ppc_heathrow_init;
-+    mc->reset = ppc_heathrow_reset;
-     mc->block_default_type = IF_IDE;
-     mc->max_cpus = MAX_CPUS;
- #ifndef TARGET_PPC64
-@@ -455,9 +467,10 @@ static void heathrow_class_init(ObjectClass *oc, void *data)
- }
- 
- static const TypeInfo ppc_heathrow_machine_info = {
--    .name          = MACHINE_TYPE_NAME("g3beige"),
-+    .name          = TYPE_HEATHROW_MACHINE,
-     .parent        = TYPE_MACHINE,
-     .class_init    = heathrow_class_init,
-+    .instance_size = sizeof(HeathrowMachineState),
-     .interfaces = (InterfaceInfo[]) {
-         { TYPE_FW_PATH_PROVIDER },
-         { }
+diff --git a/hw/pci-host/grackle.c b/hw/pci-host/grackle.c
+index 4b3af0c704..48d11f13ab 100644
+--- a/hw/pci-host/grackle.c
++++ b/hw/pci-host/grackle.c
+@@ -130,7 +130,7 @@ static void grackle_pci_class_init(ObjectClass *klass, void *data)
+     k->realize   = grackle_pci_realize;
+     k->vendor_id = PCI_VENDOR_ID_MOTOROLA;
+     k->device_id = PCI_DEVICE_ID_MOTOROLA_MPC106;
+-    k->revision  = 0x00;
++    k->revision  = 0x40;
+     k->class_id  = PCI_CLASS_BRIDGE_HOST;
+     /*
+      * PCI-facing part of the host bridge, not usable without the
 -- 
 2.21.3
 
