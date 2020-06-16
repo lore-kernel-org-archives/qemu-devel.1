@@ -2,88 +2,86 @@ Return-Path: <SRS0=f7ls=75=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 561ABC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 17:27:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE520C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 17:29:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B55320707
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 17:27:28 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A1sLT+9G"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B55320707
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 99E1F20707
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 17:29:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99E1F20707
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=canonical.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48498 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54164 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlFMt-0002Qa-F8
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 13:27:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48168)
+	id 1jlFOp-0004iy-Sx
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 13:29:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48502)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1jlF8R-0001US-RS
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 13:12:31 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52495
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1jlF8Q-0008Bm-1r
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 13:12:31 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592327549;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=q7rPbUNxQ/rW5U9BX3QbkTThaGfDLx5mAfAOI0uHae4=;
- b=A1sLT+9GLvaSzn4fWgABd4OIZkFX6SJWlgHK9TrVB/6QSXEw+5N4VAIvZKiy6yDxd5C+DP
- T/SCquxj94f+77hsiY0atIJnFeKsTzAhkueNd1ZQKI8vMaMgrCS1hH8ug519wsuI59LrXA
- yaUdQcTzpHKkV03Zy9/yiXzNtz/0KZE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-507-6RkPcz41NdS7n8gDRqu_Mg-1; Tue, 16 Jun 2020 13:12:26 -0400
-X-MC-Unique: 6RkPcz41NdS7n8gDRqu_Mg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2792810059B7
- for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 17:12:25 +0000 (UTC)
-Received: from localhost (ovpn-113-23.phx2.redhat.com [10.3.113.23])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6176D1002388;
- Tue, 16 Jun 2020 17:12:22 +0000 (UTC)
-Date: Tue, 16 Jun 2020 13:12:18 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [PATCH] MAINTAINERS: Add an entry to review Avocado based
- acceptance tests
-Message-ID: <20200616171218.GW2366737@habkost.net>
-References: <20200605165656.17578-1-philmd@redhat.com>
+ (Exim 4.90_1) (envelope-from <guilherme.piccoli@canonical.com>)
+ id 1jlFAm-0008QV-KS
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 13:14:56 -0400
+Received: from youngberry.canonical.com ([91.189.89.112]:49233)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_CBC_SHA1:128)
+ (Exim 4.90_1) (envelope-from <guilherme.piccoli@canonical.com>)
+ id 1jlFAk-00004q-Vk
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 13:14:56 -0400
+Received: from mail-ed1-f72.google.com ([209.85.208.72])
+ by youngberry.canonical.com with esmtps
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.86_2)
+ (envelope-from <guilherme.piccoli@canonical.com>) id 1jlFAi-0000H4-4P
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 17:14:52 +0000
+Received: by mail-ed1-f72.google.com with SMTP id dn27so6370940edb.15
+ for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 10:14:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=PDViOL291DGwbnt+0FCFMMRB59e44btmcQ5NQEcXP4w=;
+ b=nG+qQbwf1j6w/AUlU0Go8OP7x9PHyJMAijR4LRO7ifFyiVfNCvDPv5QMMJtFLwhUIl
+ UCFKU3ZvFi9ktG7AfX/4uFucvjtiMaQCt/WapipCdn/s0n0I3/+KVonZ10sYdbakTf4a
+ abe46JyLT8Gk3bhBod3Kd2ddMKRqk80j6YNgJfVIDl/4pzRoBE5mUrNOKWlYDb0pwEzm
+ KBC3S7jDX8yPrceokVfxM34C/C6CzA1+Jfr//vvVO1W/e+fqDmjj1Dt0KEEIUpmofMRv
+ kjGki16xphh+VCqX/CzQxyXlavgEq/h5E1fJyCc+o/c3m2Rr97hvFiFkOatcC/bhP+NC
+ OTHg==
+X-Gm-Message-State: AOAM530J0HtxJre0gZP3SWqXy2wSyCTD0XkGkTJVz7oEdYh7hchpreUk
+ s2y1LLh7l7brklu0DRGYtElvuq6yb5kRLMnSP1ogGLJTjmu2mWkyaQWMGmeddzo5pA2sOOzDJKo
+ ieOqZWQLtE5SBSnTYXH3E2ycCTBIvjATULmIcNv6FvmwpXqB/
+X-Received: by 2002:a05:6402:b13:: with SMTP id
+ bm19mr3613993edb.82.1592327691789; 
+ Tue, 16 Jun 2020 10:14:51 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzOdRW7u3iepFLKAs3HwF1AOaLn5KMxEAVNFBac1UHIChvFbU2hYes9oYIzQaHYiHgN8iqG4JoGDcj32ES2BM4=
+X-Received: by 2002:a05:6402:b13:: with SMTP id
+ bm19mr3613974edb.82.1592327691593; 
+ Tue, 16 Jun 2020 10:14:51 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200605165656.17578-1-philmd@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 02:46:07
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+References: <99779e9c-f05f-501b-b4be-ff719f140a88@canonical.com>
+ <20200616165043.24y2cp53axk7uggy@sirius.home.kraxel.org>
+ <20200616165746.GH2788@work-vm>
+In-Reply-To: <20200616165746.GH2788@work-vm>
+From: Guilherme Piccoli <gpiccoli@canonical.com>
+Date: Tue, 16 Jun 2020 14:14:15 -0300
+Message-ID: <CAHD1Q_zGu4Q63HjHx3aZKu3wh8NppuP6T4kgnUN3j=-ZDufVZA@mail.gmail.com>
+Subject: Re: ovmf / PCI passthrough impaired due to very limiting PCI64
+ aperture
+To: Gerd Hoffmann <kraxel@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: none client-ip=91.189.89.112;
+ envelope-from=guilherme.piccoli@canonical.com; helo=youngberry.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 11:16:23
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10
+X-Spam_score_int: -68
+X-Spam_score: -6.9
+X-Spam_bar: ------
+X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,52 +94,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Cleber Rosa <crosa@redhat.com>
+Cc: Pedro Principeza <pedro.principeza@canonical.com>, ehabkost@redhat.com,
+ Dann Frazier <dann.frazier@canonical.com>, qemu-devel@nongnu.org,
+ Christian Ehrhardt <christian.ehrhardt@canonical.com>, lersek@redhat.com,
+ fw@gpiccoli.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jun 05, 2020 at 06:56:56PM +0200, Philippe Mathieu-Daudé wrote:
-> Add an entry for to allow reviewers to be notified when acceptance /
-> integration tests are added or modified.
-> The designated reviewers are not maintainers, subsystem maintainers
-> are expected to merge their tests.
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Thanks Gerd, Dave and Eduardo for the prompt responses!
 
-Thank you very much for volunteering!
+So, I understand that when we use "-host-physical-bits", we are
+passing the *real* number for the guest, correct? So, in this case we
+can trust that the guest physbits matches the true host physbits.
 
-Acked-by: Eduardo Habkost <ehabkost@redhat.com>
+What if then we have OVMF relying in the physbits *iff*
+"-host-phys-bits" is used (which is the default in RH and a possible
+machine configuration on libvirt XML in Ubuntu), and we have OVMF
+fallbacks to 36-bit otherwise?
 
-> ---
->  MAINTAINERS | 8 ++++++++
->  1 file changed, 8 insertions(+)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 3e7d9cb0a5..c2ae2bf390 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -2923,6 +2923,14 @@ S: Maintained
->  F: tests/tcg/Makefile
->  F: tests/tcg/Makefile.include
->  
-> +Acceptance (Integration) Testing with the Avocado framework
-> +W: https://trello.com/b/6Qi1pxVn/avocado-qemu
-> +R: Cleber Rosa <crosa@redhat.com>
-> +R: Philippe Mathieu-Daudé <philmd@redhat.com>
-> +R: Wainer dos Santos Moschetta <wainersm@redhat.com>
-> +S: Odd Fixes
-> +F: tests/acceptance/
-> +
->  Documentation
->  -------------
->  Build system architecture
-> -- 
-> 2.21.3
-> 
+Now, regarding the problem "to trust or not" in the guests' physbits,
+I think it's an orthogonal discussion to some extent. It'd be nice to
+have that check, and as Eduardo said, prevent migration in such cases.
+But it's not really preventing OVMF big PCI64 aperture if we only
+increase the aperture _when  "-host-physical-bits" is used_.
 
--- 
-Eduardo
+Thanks,
 
+
+Guilherme
 
