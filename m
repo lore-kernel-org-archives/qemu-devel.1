@@ -2,79 +2,98 @@ Return-Path: <SRS0=f7ls=75=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8108EC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 16:07:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC9A8C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 16:08:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1B0192071A
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 16:07:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B0192071A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id A9DB9208D5
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 16:08:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="J4jdbik/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9DB9208D5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48402 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53482 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlE75-00006V-47
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 12:07:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56522)
+	id 1jlE8V-0002F7-0q
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 12:08:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55384)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jlE5v-00074k-3J
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 12:05:51 -0400
-Received: from indium.canonical.com ([91.189.90.7]:59916)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jlE2V-0002d4-Mu
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 12:02:21 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:40130)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jlE5r-0004EJ-Qo
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 12:05:50 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jlE5p-0004Vc-I3
- for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 16:05:45 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 86EAA2E802B
- for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 16:05:45 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jlE2N-0003Ty-0r
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 12:02:18 -0400
+Received: by mail-wr1-x441.google.com with SMTP id h5so21374746wrc.7
+ for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 09:02:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=tC342W3u8Hf+SqaVj5fo+tJgKTfB85PVplFBVKEhgfk=;
+ b=J4jdbik/2EjNxPOyx0q4J32Zb5yk+pK5Il2i0B80y/4AcdMrFtdf+ugqJiozvyjuWF
+ T3gwl71jIzeZzrnQ4j4wcPNBovygpwUuXKEi77DZLFJfdbmq6rHzwb4KwlY9IaGUSyoJ
+ 6g5wNkdsCbf+q7yhEjGeGJKiW40uNJZKvX3HVhLY35AFHWWwMxymMY6D5aw6lnZtU6bB
+ mbkDHJARXNgeA7tXHbSSVy94jhuOcYnIxPtnJE+t8H60TLmPJVgzMmjEXog/2tjdUcGl
+ qbRiQ7sRVvbcbSCgRjIiJMPJbuL86uss8lGEWi/pCSkmeDxeII5wnkQRPSjoQeu3uTI2
+ B0lw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=tC342W3u8Hf+SqaVj5fo+tJgKTfB85PVplFBVKEhgfk=;
+ b=VoU4RJJ0BMFytFkYIA3wGCm65IOaJBDQjmg4d3msPI1gBd52RyEU3mZkHXoW5kLYuW
+ OOssNS5fw6eEF7MxYOhX6HN72TgPVzSs6VLVNMmLb+35lalJe6BgZovGAg+YMTJ0oevp
+ EpdidNO6wgN/hxKWNPKhzT6hS1Vjm4ZL26OkOHL+C63UFZzzu74pd38IaF+EFubcb/Y0
+ 7Q7wGL47AP7CrkemkY5LoN00WOpK/Nyu+3cDBoeTvO910N7rAYh+gLS+pBbaoW3Prkea
+ ApNL/TKjKXushlw/H2OfGfRQSCj33kCuu2WPKn5kZrw3mjd9KIvk0IXo+QqsunnatfYy
+ vyUg==
+X-Gm-Message-State: AOAM531R5PImzexxYAQJg9XYXD5dxjLZWoOR1qW8uFHTkK2QIe1bdO3n
+ VE4Hi7gOvJDOm9VAMA8t0Lp26Q==
+X-Google-Smtp-Source: ABdhPJyiKIErfvwX38VxRwa2gYfX8d8nKodxQ0Lf7MjsImkQoMJBXV8DtBqIHTuuzHW/I9FrZaJZBg==
+X-Received: by 2002:adf:d84a:: with SMTP id k10mr3715244wrl.336.1592323328416; 
+ Tue, 16 Jun 2020 09:02:08 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id t189sm4742455wma.4.2020.06.16.09.02.06
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 16 Jun 2020 09:02:07 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 419271FF7E;
+ Tue, 16 Jun 2020 17:02:06 +0100 (BST)
+References: <20200612014606.147691-1-jkz@google.com>
+User-agent: mu4e 1.5.3; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Josh Kunz <jkz@google.com>
+Subject: Re: [PATCH 0/5] linux-user: Support extended clone(CLONE_VM)
+In-reply-to: <20200612014606.147691-1-jkz@google.com>
+Date: Tue, 16 Jun 2020 17:02:06 +0100
+Message-ID: <87k107yp6p.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 16 Jun 2020 15:56:16 -0000
-From: Bugs SysSec <1883739@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: bugs-syssec
-X-Launchpad-Bug-Reporter: Bugs SysSec (bugs-syssec)
-X-Launchpad-Bug-Modifier: Bugs SysSec (bugs-syssec)
-Message-Id: <159232297702.28606.15425668787325606341.malonedeb@soybean.canonical.com>
-Subject: [Bug 1883739] [NEW] ide_dma_cb: Assertion `prep_size >= 0 &&
- prep_size <= n * 512' failed.
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="b190cebbf563f89e480a8b57f641753c8196bda0";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 5f37e17c2c2640fa9b80bee92c1d2ce3f41a916d
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 11:30:43
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x441.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -83,76 +102,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1883739 <1883739@bugs.launchpad.net>
+Cc: riku.voipio@iki.fi, qemu-devel@nongnu.org, laurent@vivier.eu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
 
-To reproduce run the QEMU with the following command line:
-```
-qemu-system-x86_64 -cdrom hypertrash.iso -nographic -m 100 -enable-kvm -net=
- none -drive id=3Ddisk,file=3Dhda.img,if=3Dnone -device ahci,id=3Dahci -dev=
-ice ide-hd,drive=3Ddisk,bus=3Dahci.0
-```
+Josh Kunz <jkz@google.com> writes:
 
-QEMU Version:
-```
-# qemu-5.0.0
-$ ./configure --target-list=3Dx86_64-softmmu --enable-sanitizers; make
-$ x86_64-softmmu/qemu-system-x86_64 --version
-QEMU emulator version 5.0.0
-Copyright (c) 2003-2020 Fabrice Bellard and the QEMU Project developers
-```
+> This patch series implements extended support for the `clone` system
+> call. As best I can tell, any option combination including `CLONE_VM`
+> should be supported with the addition of this patch series. The
+> implementation is described in greater detail in the patches themselves.
+>
+> Testing:
+>
+>   * All targets built on x86_64.
+>   * `make check` and `make check-tcg` are passing. Additional tests have
+>     been added to `linux-test.c` to validate clone behavior.
 
-To create disk image run:
-```
-dd if=3D/dev/zero of=3Dhda.img bs=3D1024 count=3D1024
-```
+Not for me - which probably means you don't have docker/podman setup or
+cross compilers for all the various guests we have. See
+tests/tcg/configure.sh
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+>
+> Caveats:
+>
+>   * This series touches, but does not fix, several bits of code that are
+>     racey (namely the sigact table and the fd trans table).
+>   * `exit_group` does not perform the appropriate cleanup for non-thread
+>     children created with `CLONE_VM`. CPUs for such children are never
+>     cleaned up. The correct implementation of exit-group is non-trivial
+>     (since it also needs to track/handle cleanup for threads in the
+>     clone'd child process). Also, I don't fully understand the
+>     interaction between QOM<->linux-user. My naive implementation based
+>     on the current implementation `exit(2)` was regularly crashing. If
+>     maintainers have suggestions for better ways to handle exit_group,
+>     they would be greatly appreciated.=20
+>   * execve does not clean up the CPUs of clone'd children, for the same
+>     reasons as `exit_group`.
 
-** Attachment added: "ide_bug_2.zip"
-   https://bugs.launchpad.net/bugs/1883739/+attachment/5384438/+files/ide_b=
-ug_2.zip
+Apart from "a more perfect emulation" is there a particular use case
+served by the extra functionality? AIUI up until this point we've
+basically supported glibc's use of clone() which has generally been
+enough. I'm assuming you've come across stuff that needs this more fine
+grained support?
 
--- =
+>
+> Josh Kunz (5):
+>   linux-user: Refactor do_fork to use new `qemu_clone`
+>   linux-user: Make fd_trans task-specific.
+>   linux-user: Make sigact_table part of the task state.
+>   linux-user: Support CLONE_VM and extended clone options
+>   linux-user: Add PDEATHSIG test for clone process hierarchy.
+>
+>  linux-user/Makefile.objs            |   2 +-
+>  linux-user/clone.c                  | 565 ++++++++++++++++++++++++++++
+>  linux-user/clone.h                  |  27 ++
+>  linux-user/fd-trans-tbl.c           |  13 +
+>  linux-user/fd-trans-type.h          |  17 +
+>  linux-user/fd-trans.c               |   3 -
+>  linux-user/fd-trans.h               |  75 ++--
+>  linux-user/main.c                   |   1 +
+>  linux-user/qemu.h                   |  49 +++
+>  linux-user/signal.c                 |  84 ++++-
+>  linux-user/syscall.c                | 452 ++++++++++++----------
+>  tests/tcg/multiarch/Makefile.target |   3 +
+>  tests/tcg/multiarch/linux-test.c    | 227 ++++++++++-
+>  13 files changed, 1264 insertions(+), 254 deletions(-)
+>  create mode 100644 linux-user/clone.c
+>  create mode 100644 linux-user/clone.h
+>  create mode 100644 linux-user/fd-trans-tbl.c
+>  create mode 100644 linux-user/fd-trans-type.h
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1883739
 
-Title:
-  ide_dma_cb: Assertion `prep_size >=3D 0 && prep_size <=3D n * 512' failed.
-
-Status in QEMU:
-  New
-
-Bug description:
-  To reproduce run the QEMU with the following command line:
-  ```
-  qemu-system-x86_64 -cdrom hypertrash.iso -nographic -m 100 -enable-kvm -n=
-et none -drive id=3Ddisk,file=3Dhda.img,if=3Dnone -device ahci,id=3Dahci -d=
-evice ide-hd,drive=3Ddisk,bus=3Dahci.0
-  ```
-
-  QEMU Version:
-  ```
-  # qemu-5.0.0
-  $ ./configure --target-list=3Dx86_64-softmmu --enable-sanitizers; make
-  $ x86_64-softmmu/qemu-system-x86_64 --version
-  QEMU emulator version 5.0.0
-  Copyright (c) 2003-2020 Fabrice Bellard and the QEMU Project developers
-  ```
-
-  To create disk image run:
-  ```
-  dd if=3D/dev/zero of=3Dhda.img bs=3D1024 count=3D1024
-  ```
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1883739/+subscriptions
+--=20
+Alex Benn=C3=A9e
 
