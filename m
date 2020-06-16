@@ -2,126 +2,74 @@ Return-Path: <SRS0=f7ls=75=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40A59C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 15:18:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A662DC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 15:19:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0F41B207C3
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 15:18:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="SrvgSVng"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F41B207C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=openvz.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8294A208B3
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 15:19:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8294A208B3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42586 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45412 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlDMH-0004Mn-5u
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 11:18:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36636)
+	id 1jlDMx-0005Ya-QT
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 11:19:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40900)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <den@virtuozzo.com>)
- id 1jlCtv-0001Lz-82; Tue, 16 Jun 2020 10:49:23 -0400
-Received: from mail-eopbgr60105.outbound.protection.outlook.com
- ([40.107.6.105]:13430 helo=EUR04-DB3-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <den@virtuozzo.com>)
- id 1jlCtq-0003qy-PD; Tue, 16 Jun 2020 10:49:22 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=R0QxJ2TGL02QOhPTEoID3ooFJHWT07ndZSqXF7TSygElbfW6/55yPx4NT+FZO/I1Q/rIQPNm+9HKNDXVkIMc4NteBu2A4jGII8C9L+yB5NAjq5/iw/eMRdBgqlpcgADabhxki9XKHAQpnsic0n1FSnRJjF2MMVrvGCsSXFOq54d+s+Y3XL34Y6BlUUjS03W7grNsmY+gamh1Pi7TZGkJmKgLfcPD0pKeeJxR4NoCyxA5vgrwf5sARp6S+qs7pSzKJ0uWUDpzLodXdVvZMNVc3RqOs1nBTmjYnY1tE7H67br0PrL2xFyJ2ti+z2Mlz2cb+J+1tGQ0pKIRYifTXrp6PQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5Tv/pSrigrFdxuLN/zhxMCWcCl5XBxmZm3Rw9InizfE=;
- b=MjvD6yjQ3gxYhjyAZwgF9zpPSXC98gjBzg1r6JmDp1eeKeqeLMHe/UM/HmwYcyHe3xjyF/te/IW5suU01+if4Mwq/SXIL+f+zOF76VoSktcJd+QvkLrfSqJ9Qv+uVa41d2wCf/9mfSfhpYVpm8vdKWsrgfz16CcnCtVGvsZTIEECVKx584NmWYG451FgMa0k1LVAJ4h/TTmhnHEr7wB2yIDIhCSUMnphEPn76z9xyc7EDuJM6eTuuZkDOXO24W93AxrI3lrDYsZzbJ9Zetsi5gNMOEh/t3hiY+rRW+iMqt5zMt2wnUuncBcsZ3Uzl3t+RhXYarmc64X67ZoyDU3BeQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none header.from=openvz.org;
- dkim=pass header.d=openvz.org; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5Tv/pSrigrFdxuLN/zhxMCWcCl5XBxmZm3Rw9InizfE=;
- b=SrvgSVngZTqk/ubsrgioNcOHDdYQ958J1ar5lwTiz5fkRXjqv+bLOKPCmmr+MDB7cpnkCF1eY6JdHvh1zUY3wciFIeSWrXfAY7+FIp6xIkYQeW00SECFvavjqCVBAIbM6KfLFp72LhexvdQjjkd9dq6oy8Sr+jWebuADQ1r9yCI=
-Authentication-Results: virtuozzo.com; dkim=none (message not signed)
- header.d=none;virtuozzo.com; dmarc=none action=none header.from=openvz.org;
-Received: from AM6PR08MB4214.eurprd08.prod.outlook.com (2603:10a6:20b:8d::30)
- by AM6PR08MB4949.eurprd08.prod.outlook.com (2603:10a6:20b:ee::25)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3088.22; Tue, 16 Jun
- 2020 14:49:14 +0000
-Received: from AM6PR08MB4214.eurprd08.prod.outlook.com
- ([fe80::821:7596:cf7f:68f8]) by AM6PR08MB4214.eurprd08.prod.outlook.com
- ([fe80::821:7596:cf7f:68f8%4]) with mapi id 15.20.3088.029; Tue, 16 Jun 2020
- 14:49:14 +0000
-Subject: Re: [PATCH 2/4] block/aio_task: allow start/wait task from any
- coroutine
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org
-References: <20200611171143.21589-1-den@openvz.org>
- <20200611171143.21589-3-den@openvz.org>
- <46a4083e-8944-e46b-ea77-0283c0ed5069@virtuozzo.com>
- <93966e61-df72-8d3d-87dc-95dc25ec37d4@virtuozzo.com>
-From: "Denis V. Lunev" <den@openvz.org>
-Message-ID: <75e3e09a-4863-810f-80d9-734d348a7978@openvz.org>
-Date: Tue, 16 Jun 2020 17:49:12 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
-In-Reply-To: <93966e61-df72-8d3d-87dc-95dc25ec37d4@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-ClientProxiedBy: HE1PR08CA0066.eurprd08.prod.outlook.com
- (2603:10a6:7:2a::37) To AM6PR08MB4214.eurprd08.prod.outlook.com
- (2603:10a6:20b:8d::30)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jlD6x-0000ss-Gq
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 11:02:52 -0400
+Resent-Date: Tue, 16 Jun 2020 11:02:51 -0400
+Resent-Message-Id: <E1jlD6x-0000ss-Gq@lists.gnu.org>
+Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21302)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jlD6t-0006YQ-CC
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 11:02:51 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1592319756; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=h0XIgXAB9X4zhuW+QSpUIENl8ykqJsblnJGAkPWkzxI3ogGjl3SkQOCMMfj0JMmA1efPI0s0iTrgVb1b8encn+39XzJjWgp1t7qhCSrCTqG0gDGQd1fdcbNABovQcMqHHtSgho4lu3R5Nb7w2hdgG+yBw399k6VON1HJm0eVHlE=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1592319756;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=WTFJ0lCrrgZ+EQsCRS7VifNq1WtLP58Zg/tp/gkyi50=; 
+ b=VGdHlXvdSYE060vAh7Z5sVD5xPMLJsww0lyc0vP2b4thD6GPgvaYRANDlWasdmSmCuOLAqd5Q+sB6vVen85lydzckCQewSi3DID7uYS3DwVGwYPjfULhKMCgD6Lz2LwhAk+fj/CJNhumQns7x/bsqEn2diPoXzvs+Vebib3kKLc=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1592319752260462.925225260788;
+ Tue, 16 Jun 2020 08:02:32 -0700 (PDT)
+Message-ID: <159231975128.8107.705730976028764844@d1fd068a5071>
+Subject: Re: [PATCH v4 0/6] Add strace support for printing arguments of
+ selected syscalls
+In-Reply-To: <20200616103927.20222-1-filip.bozuta@syrmia.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.1.27] (31.148.204.195) by
- HE1PR08CA0066.eurprd08.prod.outlook.com (2603:10a6:7:2a::37) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3109.21 via Frontend Transport; Tue, 16 Jun 2020 14:49:13 +0000
-X-Originating-IP: [31.148.204.195]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 331386a0-caf3-42bf-aa47-08d81204700c
-X-MS-TrafficTypeDiagnostic: AM6PR08MB4949:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM6PR08MB4949C1685489DD417DE96C3DB69D0@AM6PR08MB4949.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-Forefront-PRVS: 04362AC73B
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: XQsKxkEN72jwfYTGGFhs8GQ0hSvFzwSu06qwtHaRxgHN+TVW3kTnfAXElx5NUAbw4MS1hNdDw8GRUw+nHBO4s2Obf8KZBE5wKbyCZUckDrJteoePGeH0yGHjI758WxpaylOOTUau8tGyHj20rERxxDhmkK1RcgrGJOZsY/iGpviLC+FSXNOuTkxSMVAoVxD0SDclX69vw26nPDKAivWxz7g8VN0xtVNhjiB0eJukxNE/LhgfduFvPHiASHj6tOW6Ud6nObiDi3wd63buHTcWNGXbspROc4r5SepvLDl1ayQuJPv7TbH7XhTlb3ZzPH0tlq3EbNB2MYz4L+c21LpOG5is7dAuiuOudUE9O2PUuKItiQyGIxCvuzQmo2MFJEq1
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM6PR08MB4214.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(366004)(39840400004)(396003)(136003)(376002)(346002)(36756003)(53546011)(186003)(16526019)(83170400001)(478600001)(52116002)(66556008)(42882007)(6486002)(83380400001)(2906002)(107886003)(26005)(66946007)(66476007)(31696002)(4326008)(31686004)(8936002)(316002)(16576012)(8676002)(2616005)(956004)(54906003)(5660300002)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: bb3UssV+Sf9K7Kyym8+AcUJ2LtYk4z1OGmS9olP1oL+SSKVhEC2fo5k421zpxtMwdGSEud0ibshbR5u0oPp/cxPcSj0rEgjgOIOdZmR5GUHWJQ7SS5xup8lZklHdZ3uOeISyhZlf38NiAA6sYgNzjcJL3HG1MbGxfQ3Cx1KLpGPZL9nQN/YU9Y8Ar0B66kZJ7omqVfUACilDSqhRvHuvkoaDa8F3+ncovyfw4exxD4e/uDcqE5NFIIwtVtwcehDQOymSrTK/w6G9FOBfprxC7XpoB4//xhXqdsSSalXMeosibdf6ApBK9DEAhJeoPfbJJ+DrPXO3sTK5ayVydBrzWJJAUTZ1tmxPJlvdEtH4u6UeFhVSgVy8nAyTY0fo+OJ9N0Ub+kdUo/nXwa2nFePOP7myXLl8angvDu8XoAOJsJw49wc/DU5x8uzNyTiSivRnZbGEY1vphBR/Ka7IL5extacDX106lv9BxICIeFMRHQb4TuBZg9m90MffIo7ZZ7Mp
-X-OriginatorOrg: openvz.org
-X-MS-Exchange-CrossTenant-Network-Message-Id: 331386a0-caf3-42bf-aa47-08d81204700c
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jun 2020 14:49:14.4810 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: RGneEmYZyXe0/LHaaUVKqIofa4rKnS1Y9ktNlr69kIGNW0uoEDQrR/Gxp+355HhK82hXh9R2EXhEUzZxgh6GDA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4949
-Received-SPF: pass client-ip=40.107.6.105; envelope-from=den@virtuozzo.com;
- helo=EUR04-DB3-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 10:49:15
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -26
-X-Spam_score: -2.7
-X-Spam_bar: --
-X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: filip.bozuta@syrmia.com
+Date: Tue, 16 Jun 2020 08:02:32 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o53.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 10:15:56
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -134,136 +82,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- Juan Quintela <quintela@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Denis Plotnikov <dplotnikov@virtuozzo.com>,
- Stefan Hajnoczi <stefanha@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, laurent@vivier.eu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/15/20 12:34 PM, Vladimir Sementsov-Ogievskiy wrote:
-> 15.06.2020 10:47, Vladimir Sementsov-Ogievskiy wrote:
->> 11.06.2020 20:11, Denis V. Lunev wrote:
->>> From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>>
->>> Currently, aio task pool assumes that there is a main coroutine, which
->>> creates tasks and wait for them. Let's remove the restriction by using
->>> CoQueue. Code becomes clearer, interface more obvious.
->>>
->>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>> Signed-off-by: Denis V. Lunev <den@openvz.org>
->>> CC: Kevin Wolf <kwolf@redhat.com>
->>> CC: Max Reitz <mreitz@redhat.com>
->>> CC: Stefan Hajnoczi <stefanha@redhat.com>
->>> CC: Fam Zheng <fam@euphon.net>
->>> CC: Juan Quintela <quintela@redhat.com>
->>> CC: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->>> CC: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>> CC: Denis Plotnikov <dplotnikov@virtuozzo.com>
->>> ---
->>>   block/aio_task.c | 21 ++++++---------------
->>>   1 file changed, 6 insertions(+), 15 deletions(-)
->>>
->>> diff --git a/block/aio_task.c b/block/aio_task.c
->>> index 88989fa248..cf62e5c58b 100644
->>> --- a/block/aio_task.c
->>> +++ b/block/aio_task.c
->>> @@ -27,11 +27,10 @@
->>>   #include "block/aio_task.h"
->>>   struct AioTaskPool {
->>> -    Coroutine *main_co;
->>>       int status;
->>>       int max_busy_tasks;
->>>       int busy_tasks;
->>> -    bool waiting;
->>> +    CoQueue waiters;
->>>   };
->>>   static void coroutine_fn aio_task_co(void *opaque)
->>> @@ -52,31 +51,23 @@ static void coroutine_fn aio_task_co(void *opaque)
->>>       g_free(task);
->>> -    if (pool->waiting) {
->>> -        pool->waiting = false;
->>> -        aio_co_wake(pool->main_co);
->>> -    }
->>> +    qemu_co_queue_restart_all(&pool->waiters);
->>>   }
->>>   void coroutine_fn aio_task_pool_wait_one(AioTaskPool *pool)
->>>   {
->>>       assert(pool->busy_tasks > 0);
->>> -    assert(qemu_coroutine_self() == pool->main_co);
->>> -    pool->waiting = true;
->>> -    qemu_coroutine_yield();
->>> +    qemu_co_queue_wait(&pool->waiters, NULL);
->>> -    assert(!pool->waiting);
->>>       assert(pool->busy_tasks < pool->max_busy_tasks);
->>
->> As we wake up several coroutines now, I'm afraid this assertion may
->> start to fire.
->> And aio_task_pool_wait_one() becomes useless as a public API (still,
->> it's used only locally, so we can make it static).
->>
->> I'll send updated patch after reviewing the rest of the series.
->>
->
-> Hm, OK, we have two kinds of waiters: waiting for a slot and for all
-> tasks to finish. So, either we need two queues, or do like this patch
-> (one queue, but wake-up all waiters, for them to check does their
-> condition satisfied or not).
->
-> I'm OK with this patch with the following squashed-in:
->
-> diff --git a/include/block/aio_task.h b/include/block/aio_task.h
-> index 50bc1e1817..50b1c036c5 100644
-> --- a/include/block/aio_task.h
-> +++ b/include/block/aio_task.h
-> @@ -48,7 +48,6 @@ bool aio_task_pool_empty(AioTaskPool *pool);
->  void coroutine_fn aio_task_pool_start_task(AioTaskPool *pool, AioTask
-> *task);
->  
->  void coroutine_fn aio_task_pool_wait_slot(AioTaskPool *pool);
-> -void coroutine_fn aio_task_pool_wait_one(AioTaskPool *pool);
->  void coroutine_fn aio_task_pool_wait_all(AioTaskPool *pool);
->  
->  #endif /* BLOCK_AIO_TASK_H */
-> diff --git a/block/aio_task.c b/block/aio_task.c
-> index cf62e5c58b..7ba15ff41f 100644
-> --- a/block/aio_task.c
-> +++ b/block/aio_task.c
-> @@ -54,26 +54,17 @@ static void coroutine_fn aio_task_co(void *opaque)
->      qemu_co_queue_restart_all(&pool->waiters);
->  }
->  
-> -void coroutine_fn aio_task_pool_wait_one(AioTaskPool *pool)
-> -{
-> -    assert(pool->busy_tasks > 0);
-> -
-> -    qemu_co_queue_wait(&pool->waiters, NULL);
-> -
-> -    assert(pool->busy_tasks < pool->max_busy_tasks);
-> -}
-> -
->  void coroutine_fn aio_task_pool_wait_slot(AioTaskPool *pool)
->  {
->      while (pool->busy_tasks >= pool->max_busy_tasks) {
-> -        aio_task_pool_wait_one(pool);
-> +        qemu_co_queue_wait(&pool->waiters, NULL);
->      }
->  }
->  
->  void coroutine_fn aio_task_pool_wait_all(AioTaskPool *pool)
->  {
->      while (pool->busy_tasks > 0) {
-> -        aio_task_pool_wait_one(pool);
-> +        qemu_co_queue_wait(&pool->waiters, NULL);
->      }
->  }
->  
->
->
->
-I'd better make this separate
-
-Den
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDYxNjEwMzkyNy4yMDIy
+Mi0xLWZpbGlwLmJvenV0YUBzeXJtaWEuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRv
+IGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1v
+cmUgaW5mb3JtYXRpb246CgpTdWJqZWN0OiBbUEFUQ0ggdjQgMC82XSBBZGQgc3RyYWNlIHN1cHBv
+cnQgZm9yIHByaW50aW5nIGFyZ3VtZW50cyBvZiBzZWxlY3RlZCBzeXNjYWxscwpUeXBlOiBzZXJp
+ZXMKTWVzc2FnZS1pZDogMjAyMDA2MTYxMDM5MjcuMjAyMjItMS1maWxpcC5ib3p1dGFAc3lybWlh
+LmNvbQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNl
+IGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFt
+ZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcg
+LS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwg
+LS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClN3aXRjaGVkIHRvIGEg
+bmV3IGJyYW5jaCAndGVzdCcKNzU2NjA0ZSBsaW51eC11c2VyOiBBZGQgc3RyYWNlIHN1cHBvcnQg
+Zm9yIHByaW50aW5nIGFyZ3VtZW50cyBvZiBmYWxsb2NhdGUoKQoyNTY4MGQ1IGxpbnV4LXVzZXI6
+IEFkZCBzdHJhY2Ugc3VwcG9ydCBmb3IgcHJpbnRpbmcgYXJndW1lbnRzIG9mIGNob3duKCkvbGNo
+b3duKCkKY2FkZDY1ZCBsaW51eC11c2VyOiBBZGQgc3RyYWNlIHN1cHBvcnQgZm9yIHByaW50aW5n
+IGFyZ3VtZW50cyBvZiBsc2VlaygpCmViNDA2MjcgbGludXgtdXNlcjogQWRkIHN0cmFjZSBzdXBw
+b3J0IGZvciBwcmludGluZyBhcmd1bWVudCBvZiBzeXNjYWxscyB1c2VkIGZvciBleHRlbmRlZCBh
+dHRyaWJ1dGVzCjQ3MjI2ZTggbGludXgtdXNlcjogQWRkIHN0cmFjZSBzdXBwb3J0IGZvciBhIGdy
+b3VwIG9mIHN5c2NhbGxzCjNlNTMxZDAgbGludXgtdXNlcjogRXh0ZW5kIHN0cmFjZSBzdXBwb3J0
+IHRvIGVuYWJsZSBhcmd1bWVudCBwcmludGluZyBhZnRlciBzeXNjYWxsIGV4ZWN1dGlvbgoKPT09
+IE9VVFBVVCBCRUdJTiA9PT0KMS82IENoZWNraW5nIGNvbW1pdCAzZTUzMWQwNDcwZDIgKGxpbnV4
+LXVzZXI6IEV4dGVuZCBzdHJhY2Ugc3VwcG9ydCB0byBlbmFibGUgYXJndW1lbnQgcHJpbnRpbmcg
+YWZ0ZXIgc3lzY2FsbCBleGVjdXRpb24pCjIvNiBDaGVja2luZyBjb21taXQgNDcyMjZlODY3NGE3
+IChsaW51eC11c2VyOiBBZGQgc3RyYWNlIHN1cHBvcnQgZm9yIGEgZ3JvdXAgb2Ygc3lzY2FsbHMp
+CjMvNiBDaGVja2luZyBjb21taXQgZWI0MDYyN2IxMTk2IChsaW51eC11c2VyOiBBZGQgc3RyYWNl
+IHN1cHBvcnQgZm9yIHByaW50aW5nIGFyZ3VtZW50IG9mIHN5c2NhbGxzIHVzZWQgZm9yIGV4dGVu
+ZGVkIGF0dHJpYnV0ZXMpCjQvNiBDaGVja2luZyBjb21taXQgY2FkZDY1ZDlmODY2IChsaW51eC11
+c2VyOiBBZGQgc3RyYWNlIHN1cHBvcnQgZm9yIHByaW50aW5nIGFyZ3VtZW50cyBvZiBsc2Vlaygp
+KQo1LzYgQ2hlY2tpbmcgY29tbWl0IDI1NjgwZDVlMWIwMSAobGludXgtdXNlcjogQWRkIHN0cmFj
+ZSBzdXBwb3J0IGZvciBwcmludGluZyBhcmd1bWVudHMgb2YgY2hvd24oKS9sY2hvd24oKSkKNi82
+IENoZWNraW5nIGNvbW1pdCA3NTY2MDRlZWZlMDYgKGxpbnV4LXVzZXI6IEFkZCBzdHJhY2Ugc3Vw
+cG9ydCBmb3IgcHJpbnRpbmcgYXJndW1lbnRzIG9mIGZhbGxvY2F0ZSgpKQpFUlJPUjogc3RvcmFn
+ZSBjbGFzcyBzaG91bGQgYmUgYXQgdGhlIGJlZ2lubmluZyBvZiB0aGUgZGVjbGFyYXRpb24KIzY5
+OiBGSUxFOiBsaW51eC11c2VyL3N0cmFjZS5jOjExNDY6CitVTlVTRUQgc3RhdGljIHN0cnVjdCBm
+bGFncyBmYWxsb2NfZmxhZ3NbXSA9IHsKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMTA0
+IGxpbmVzIGNoZWNrZWQKClBhdGNoIDYvNiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZp
+ZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRo
+ZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09
+IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBm
+dWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAyMDA2MTYx
+MDM5MjcuMjAyMjItMS1maWxpcC5ib3p1dGFAc3lybWlhLmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gv
+P3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNo
+ZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBw
+YXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
