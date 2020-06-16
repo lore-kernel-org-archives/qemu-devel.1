@@ -6,39 +6,39 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 439E7C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 13:54:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08588C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 13:54:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1EC1B207D3
+	by mail.kernel.org (Postfix) with ESMTPS id D723A207D3
 	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 13:54:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1EC1B207D3
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D723A207D3
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57032 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57006 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlC33-0004W4-9S
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 09:54:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51908)
+	id 1jlC34-0004VQ-1V
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 09:54:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51946)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jlC1j-0001wr-Rf; Tue, 16 Jun 2020 09:53:23 -0400
-Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:36199)
+ id 1jlC1m-0001ze-64; Tue, 16 Jun 2020 09:53:26 -0400
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:36187)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jlC1h-0002PI-4f; Tue, 16 Jun 2020 09:53:23 -0400
+ id 1jlC1i-0002PC-1U; Tue, 16 Jun 2020 09:53:25 -0400
 Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 38D74748DE0;
+ by localhost (Postfix) with SMTP id 0F6AD748DDB;
  Tue, 16 Jun 2020 15:53:18 +0200 (CEST)
 Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id B2B85748DCB; Tue, 16 Jun 2020 15:53:17 +0200 (CEST)
-Message-Id: <ef4d9dc2e9241f8bd29b727e8fa32c4768718c9a.1592315226.git.balaton@eik.bme.hu>
+ id BBB887482CE; Tue, 16 Jun 2020 15:53:17 +0200 (CEST)
+Message-Id: <de15b4f489d2277d0d11c0b652c514905ee8f875.1592315226.git.balaton@eik.bme.hu>
 In-Reply-To: <cover.1592315226.git.balaton@eik.bme.hu>
 References: <cover.1592315226.git.balaton@eik.bme.hu>
 From: BALATON Zoltan <balaton@eik.bme.hu>
-Subject: [PATCH v5 02/11] mac_newworld: Allow loading binary ROM image
+Subject: [PATCH v5 04/11] mac_oldworld: Drop some variables
 Date: Tue, 16 Jun 2020 15:47:06 +0200
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -73,99 +73,108 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Fall back to load binary ROM image if loading ELF fails. This also
-moves PROM_BASE and PROM_SIZE defines to board as these are matching
-the ROM size and address on this board.
+Values not used frequently enough may not worth putting in a local
+variable, especially with names almost as long as the original value
+because that does not improve readability, to the contrary it makes it
+harder to see what value is used. Drop a few such variables.
 
 Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 ---
-Notes:
-    Unlike mac_oldworld where the openbios-ppc image loads at end of ROM
-    region here we only check size and assume ELF image is loaded from
-    PROM_BASE, Checking the load addr here is tricky because this board is
-    also be compiled both 64 and 32 bit and load_elf seems to always
-    return 64 bit value so handling that could become a mess. If this is a
-    problem then it's a preexisting one so should be fixed in a separate
-    patch. This one just allows loading ROM binary too otherwise
-    preserving previous behaviour.
+ hw/ppc/mac_oldworld.c | 33 ++++++++++++++++-----------------
+ 1 file changed, 16 insertions(+), 17 deletions(-)
 
- hw/ppc/mac.h          |  2 --
- hw/ppc/mac_newworld.c | 22 ++++++++++++++--------
- 2 files changed, 14 insertions(+), 10 deletions(-)
-
-diff --git a/hw/ppc/mac.h b/hw/ppc/mac.h
-index 6af87d1fa0..a0d9e47031 100644
---- a/hw/ppc/mac.h
-+++ b/hw/ppc/mac.h
-@@ -38,10 +38,8 @@
- /* SMP is not enabled, for now */
- #define MAX_CPUS 1
+diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
+index d1c4244b1e..4200008851 100644
+--- a/hw/ppc/mac_oldworld.c
++++ b/hw/ppc/mac_oldworld.c
+@@ -83,14 +83,11 @@ static void ppc_heathrow_reset(void *opaque)
+ static void ppc_heathrow_init(MachineState *machine)
+ {
+     ram_addr_t ram_size = machine->ram_size;
+-    const char *kernel_filename = machine->kernel_filename;
+-    const char *kernel_cmdline = machine->kernel_cmdline;
+-    const char *initrd_filename = machine->initrd_filename;
+     const char *boot_device = machine->boot_order;
+     PowerPCCPU *cpu = NULL;
+     CPUPPCState *env = NULL;
+     char *filename;
+-    int linux_boot, i;
++    int i;
+     MemoryRegion *bios = g_new(MemoryRegion, 1);
+     uint32_t kernel_base, initrd_base, cmdline_base = 0;
+     int32_t kernel_size, initrd_size;
+@@ -108,8 +105,6 @@ static void ppc_heathrow_init(MachineState *machine)
+     void *fw_cfg;
+     uint64_t tbfreq;
  
--#define BIOS_SIZE        (1 * MiB)
- #define NVRAM_SIZE        0x2000
- #define PROM_FILENAME    "openbios-ppc"
--#define PROM_ADDR         0xfff00000
- 
- #define KERNEL_LOAD_ADDR 0x01000000
- #define KERNEL_GAP       0x00100000
-diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
-index 5f3a028e6a..eec62d1e90 100644
---- a/hw/ppc/mac_newworld.c
-+++ b/hw/ppc/mac_newworld.c
-@@ -82,6 +82,8 @@
- 
- #define NDRV_VGA_FILENAME "qemu_vga.ndrv"
- 
-+#define PROM_BASE 0xfff00000
-+#define PROM_SIZE (1 * MiB)
- 
- static void fw_cfg_boot_set(void *opaque, const char *boot_device,
-                             Error **errp)
-@@ -100,7 +102,7 @@ static void ppc_core99_reset(void *opaque)
- 
-     cpu_reset(CPU(cpu));
-     /* 970 CPUs want to get their initial IP as part of their boot protocol */
--    cpu->env.nip = PROM_ADDR + 0x100;
-+    cpu->env.nip = PROM_BASE + 0x100;
- }
- 
- /* PowerPC Mac99 hardware initialisation */
-@@ -153,25 +155,29 @@ static void ppc_core99_init(MachineState *machine)
-     /* allocate RAM */
-     memory_region_add_subregion(get_system_memory(), 0, machine->ram);
- 
--    /* allocate and load BIOS */
--    memory_region_init_rom(bios, NULL, "ppc_core99.bios", BIOS_SIZE,
-+    /* allocate and load firmware ROM */
-+    memory_region_init_rom(bios, NULL, "ppc_core99.bios", PROM_SIZE,
-                            &error_fatal);
-+    memory_region_add_subregion(get_system_memory(), PROM_BASE, bios);
- 
--    if (bios_name == NULL)
-+    if (!bios_name) {
-         bios_name = PROM_FILENAME;
-+    }
-     filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
--    memory_region_add_subregion(get_system_memory(), PROM_ADDR, bios);
+-    linux_boot = (kernel_filename != NULL);
 -
--    /* Load OpenBIOS (ELF) */
-     if (filename) {
-+        /* Load OpenBIOS (ELF) */
-         bios_size = load_elf(filename, NULL, NULL, NULL, NULL,
-                              NULL, NULL, NULL, 1, PPC_ELF_MACHINE, 0, 0);
- 
-+        if (bios_size <= 0) {
-+            /* or load binary ROM image */
-+            bios_size = load_image_targphys(filename, PROM_BASE, PROM_SIZE);
-+        }
-         g_free(filename);
-     } else {
-         bios_size = -1;
-     }
--    if (bios_size < 0 || bios_size > BIOS_SIZE) {
-+    if (bios_size < 0 || bios_size > PROM_SIZE) {
-         error_report("could not load PowerPC bios '%s'", bios_name);
+     /* init CPUs */
+     for (i = 0; i < smp_cpus; i++) {
+         cpu = POWERPC_CPU(cpu_create(machine->cpu_type));
+@@ -159,7 +154,7 @@ static void ppc_heathrow_init(MachineState *machine)
          exit(1);
+     }
+ 
+-    if (linux_boot) {
++    if (machine->kernel_filename) {
+         uint64_t lowaddr = 0;
+         int bswap_needed;
+ 
+@@ -169,30 +164,33 @@ static void ppc_heathrow_init(MachineState *machine)
+         bswap_needed = 0;
+ #endif
+         kernel_base = KERNEL_LOAD_ADDR;
+-        kernel_size = load_elf(kernel_filename, NULL,
++        kernel_size = load_elf(machine->kernel_filename, NULL,
+                                translate_kernel_address, NULL,
+                                NULL, &lowaddr, NULL, NULL, 1, PPC_ELF_MACHINE,
+                                0, 0);
+         if (kernel_size < 0)
+-            kernel_size = load_aout(kernel_filename, kernel_base,
++            kernel_size = load_aout(machine->kernel_filename, kernel_base,
+                                     ram_size - kernel_base, bswap_needed,
+                                     TARGET_PAGE_SIZE);
+         if (kernel_size < 0)
+-            kernel_size = load_image_targphys(kernel_filename,
++            kernel_size = load_image_targphys(machine->kernel_filename,
+                                               kernel_base,
+                                               ram_size - kernel_base);
+         if (kernel_size < 0) {
+-            error_report("could not load kernel '%s'", kernel_filename);
++            error_report("could not load kernel '%s'",
++                         machine->kernel_filename);
+             exit(1);
+         }
+         /* load initrd */
+-        if (initrd_filename) {
+-            initrd_base = TARGET_PAGE_ALIGN(kernel_base + kernel_size + KERNEL_GAP);
+-            initrd_size = load_image_targphys(initrd_filename, initrd_base,
++        if (machine->initrd_filename) {
++            initrd_base = TARGET_PAGE_ALIGN(kernel_base + kernel_size +
++                                            KERNEL_GAP);
++            initrd_size = load_image_targphys(machine->initrd_filename,
++                                              initrd_base,
+                                               ram_size - initrd_base);
+             if (initrd_size < 0) {
+                 error_report("could not load initial ram disk '%s'",
+-                             initrd_filename);
++                             machine->initrd_filename);
+                 exit(1);
+             }
+             cmdline_base = TARGET_PAGE_ALIGN(initrd_base + initrd_size);
+@@ -336,9 +334,10 @@ static void ppc_heathrow_init(MachineState *machine)
+     fw_cfg_add_i16(fw_cfg, FW_CFG_MACHINE_ID, ARCH_HEATHROW);
+     fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ADDR, kernel_base);
+     fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_SIZE, kernel_size);
+-    if (kernel_cmdline) {
++    if (machine->kernel_cmdline) {
+         fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_CMDLINE, cmdline_base);
+-        pstrcpy_targphys("cmdline", cmdline_base, TARGET_PAGE_SIZE, kernel_cmdline);
++        pstrcpy_targphys("cmdline", cmdline_base, TARGET_PAGE_SIZE,
++                         machine->kernel_cmdline);
+     } else {
+         fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_CMDLINE, 0);
      }
 -- 
 2.21.3
