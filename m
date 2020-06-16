@@ -2,88 +2,55 @@ Return-Path: <SRS0=f7ls=75=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEA32C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 07:05:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DA7FC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 07:06:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BA743206D8
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 07:05:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hht22yIg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA743206D8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 728512082F
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 07:06:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 728512082F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sysgo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53650 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57052 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jl5ez-0005xQ-03
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 03:05:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42338)
+	id 1jl5fY-0007Od-Kb
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 03:06:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45120)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jl5NE-0002Sf-NQ
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 02:47:08 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:34096
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jl5NC-0005pv-SI
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 02:47:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592290026;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=7+O77/1VoIy5ZmKPNfruC/I0o10kheFBwNmfaZ48ahQ=;
- b=Hht22yIgQl8z0PR1TWGERaVpdpezt6SZH9zjMGFovnrCa+AHD7vdZ63r4pVvtYN6pDkJ0u
- ci1sX7nCQgF+QDaekMGSfQRNr76qIzJ7Akh6rGZ+GKN1MRJYoipHO6qOVBkbIDwzKzrGvl
- XM1uyci7SCb5FsYKgIHSG9mm0EPwqGA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-319-BpUU166TNLGiW5zzvbSN7g-1; Tue, 16 Jun 2020 02:47:04 -0400
-X-MC-Unique: BpUU166TNLGiW5zzvbSN7g-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0F68B184D179;
- Tue, 16 Jun 2020 06:47:03 +0000 (UTC)
-Received: from jason-ThinkPad-T430s.redhat.com (ovpn-13-222.pek2.redhat.com
- [10.72.13.222])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2BD0A90345;
- Tue, 16 Jun 2020 06:47:00 +0000 (UTC)
-From: Jason Wang <jasowang@redhat.com>
-To: peter.maydell@linaro.org
-Subject: [PULL 31/33] hw/net/e1000e: Do not abort() on invalid PSRCTL register
- value
-Date: Tue, 16 Jun 2020 14:45:42 +0800
-Message-Id: <1592289944-13727-32-git-send-email-jasowang@redhat.com>
-In-Reply-To: <1592289944-13727-1-git-send-email-jasowang@redhat.com>
-References: <1592289944-13727-1-git-send-email-jasowang@redhat.com>
+ (Exim 4.90_1) (envelope-from <vav@sysgo.com>)
+ id 1jl5eb-0005ei-M8; Tue, 16 Jun 2020 03:05:05 -0400
+Received: from mail.sysgo.com ([176.9.12.79]:42146)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vav@sysgo.com>)
+ id 1jl5eX-00008r-OE; Tue, 16 Jun 2020 03:05:03 -0400
+Subject: Re: [PATCH] hw/timer/a9gtimer: Clear pending interrupt, after the
+ clear of Event flag
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20200610084551.28222-1-vav@sysgo.com>
+ <CAFEAcA9uF01LnFy6o4Yy=aeuy9ixyGWZFVGtR66ah3w1458O5g@mail.gmail.com>
+From: =?UTF-8?Q?V=c3=a1clav_Vanc?= <vav@sysgo.com>
+Message-ID: <583c6e8e-fe52-881d-1a61-f02ce7b16d23@sysgo.com>
+Date: Tue, 16 Jun 2020 09:04:57 +0200
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <CAFEAcA9uF01LnFy6o4Yy=aeuy9ixyGWZFVGtR66ah3w1458O5g@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=jasowang@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 02:45:57
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=176.9.12.79; envelope-from=vav@sysgo.com;
+ helo=mail.sysgo.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 03:04:58
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,116 +63,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>, qemu-stable@nongnu.org,
- qemu-devel@nongnu.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: "open list:ARM cores" <qemu-arm@nongnu.org>,
+ "open list:All patches CC here" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+On 6/15/20 1:04 PM, Peter Maydell wrote:
+> On Wed, 10 Jun 2020 at 09:47, Vaclav Vanc <vav@sysgo.com> wrote:
+>>
+>> A9 Global Timer is used with Edge triggered interrupts (This is true
+>> at least for Zynq and i.MX6 processors).
+>> When Event Flag is cleared in Interrupt Status Register and new interrupt
+>> was supposed to be scheduled, interrupt request is never cleared.
+>> Since interrupt in GIC is configured as Edge triggered, new interrupts
+>> are not registered (because interrupt is stuck at pending and GIC thinks
+>> it was already serviced). As a result interrupts from timer does not work
+>> anymore.
+>>
+>> Note: This happens only when interrupt was not serviced before the next
+>> interrupt is suppose to be scheduled. This happens for example during
+>> the increased load of the host system.
+>>
+>> Interrupt is now always cleared when Event Flag is cleared.
+>> This is in accordance to A9 Global Timer documentation.
+>>
+>> Signed-off-by: Vaclav Vanc <vav@sysgo.com>
+>> ---
+>>   hw/timer/a9gtimer.c | 3 +++
+>>   1 file changed, 3 insertions(+)
+>>
+>> diff --git a/hw/timer/a9gtimer.c b/hw/timer/a9gtimer.c
+>> index 7233068a37..732889105e 100644
+>> --- a/hw/timer/a9gtimer.c
+>> +++ b/hw/timer/a9gtimer.c
+>> @@ -206,6 +206,9 @@ static void a9_gtimer_write(void *opaque, hwaddr addr, uint64_t value,
+>>       case R_INTERRUPT_STATUS:
+>>           a9_gtimer_update(s, false);
+>>           gtb->status &= ~value;
+>> +        if (gtb->status == 0) {
+>> +            qemu_set_irq(gtb->irq, 0);
+>> +        }
+>>           break;
+> 
+> Hi; thanks for this patch. I can see the situation you're trying to address,
+> but I can't find anything in the docs that convinces me that this change
+> is the right way to fix it.
+> 
+Hi, thanks for reviewing the patch.
 
-libFuzzer found using 'qemu-system-i386 -M q35':
+> The problem we have is that the a9_gtimer_update() function (which is
+> going to get called after this code at the end of the a9_gtimer_write()
+> function) updates the gtb->status bit based on whether the timer has
+> currently passed the compare value. So effectively we do the "has the
+> count gone past the compare value" check not only when the timer expires
+> but also at every register write. My best guess is that the real hardware
+> only does an expiry-check when it does a counter value update. If that's
+> the case then in the situation you outline the guest clearing the event
+> flag should mean that the interrupt is not re-asserted until the counter
+> next increments past the compare value (ie not for a little while) whereas
+> with your patch it will be instantly re-asserted.
 
-qemu: hardware error: e1000e: PSRCTL.BSIZE0 cannot be zero
-CPU #0:
-EAX=00000000 EBX=00000000 ECX=00000000 EDX=00000663
-ESI=00000000 EDI=00000000 EBP=00000000 ESP=00000000
-EIP=0000fff0 EFL=00000002 [-------] CPL=0 II=0 A20=1 SMM=0 HLT=0
-ES =0000 00000000 0000ffff 00009300
-CS =f000 ffff0000 0000ffff 00009b00
-SS =0000 00000000 0000ffff 00009300
-DS =0000 00000000 0000ffff 00009300
-FS =0000 00000000 0000ffff 00009300
-GS =0000 00000000 0000ffff 00009300
-LDT=0000 00000000 0000ffff 00008200
-TR =0000 00000000 0000ffff 00008b00
-GDT=     00000000 0000ffff
-IDT=     00000000 0000ffff
-CR0=60000010 CR2=00000000 CR3=00000000 CR4=00000000
-DR0=00000000 DR1=00000000 DR2=00000000 DR3=00000000
-DR6=ffff0ff0 DR7=00000400
-EFER=0000000000000000
-FCW=037f FSW=0000 [ST=0] FTW=00 MXCSR=00001f80
-FPR0=0000000000000000 0000 FPR1=0000000000000000 0000
-FPR2=0000000000000000 0000 FPR3=0000000000000000 0000
-FPR4=0000000000000000 0000 FPR5=0000000000000000 0000
-FPR6=0000000000000000 0000 FPR7=0000000000000000 0000
-XMM00=00000000000000000000000000000000 XMM01=00000000000000000000000000000000
-XMM02=00000000000000000000000000000000 XMM03=00000000000000000000000000000000
-XMM04=00000000000000000000000000000000 XMM05=00000000000000000000000000000000
-XMM06=00000000000000000000000000000000 XMM07=00000000000000000000000000000000
-==1988== ERROR: libFuzzer: deadly signal
-    #6 0x7fae4d3ea894 in __GI_abort (/lib64/libc.so.6+0x22894)
-    #7 0x563f4cc59a1d in hw_error (qemu-fuzz-i386+0xe8ca1d)
-    #8 0x563f4d7c93f2 in e1000e_set_psrctl (qemu-fuzz-i386+0x19fc3f2)
-    #9 0x563f4d7b798f in e1000e_core_write (qemu-fuzz-i386+0x19ea98f)
-    #10 0x563f4d7afc46 in e1000e_mmio_write (qemu-fuzz-i386+0x19e2c46)
-    #11 0x563f4cc9a0a7 in memory_region_write_accessor (qemu-fuzz-i386+0xecd0a7)
-    #12 0x563f4cc99c13 in access_with_adjusted_size (qemu-fuzz-i386+0xeccc13)
-    #13 0x563f4cc987b4 in memory_region_dispatch_write (qemu-fuzz-i386+0xecb7b4)
+We must distinguish between two cases:
+1, Auto-increment is disabled.
+I just run some test on SABRE Lite (i.MX6) board.
+I had auto-increment disabled, I verified, that GIC is configured for 
+Edge interrupts. Once count went past the compare value I got the 
+interrupt. I did not touch Timer registers, just signal EOI to GIC and 
+surprisingly, I got a another interrupt. If I stopped the timer 
+interrupts stopped coming (Status was still set to 1).
 
-It simply sent the following 2 I/O command to the e1000e
-PCI BAR #2 I/O region:
+ From this behavior I assume, that every time the Timer is incremented 
+(and Timer value is past the compare value) an EDGE interrupt (that 
+means actual X->0->1 transition) is asserted. This is really interesting 
+from HW point of view. This would mean, that a9_gtimer_update function 
+should generate the pulse and not level on compare event.
 
-  writew 0x0100 0x0c00 # RCTL =   E1000_RCTL_DTYP_MASK
-  writeb 0x2170 0x00   # PSRCTL = 0
+2, Auto-increment is enabled.
+This is actually what the patch was aiming for.
+First call of a9_gtimer_update will potentially update the compare 
+value, then the interrupt and event flag is de-asserted. Second call of 
+a9_gtimer_update will just update the timer (or re-assert the interrupt 
+if the Timer hit the compare value in the meantime, which is fine).
 
-2813 static void
-2814 e1000e_set_psrctl(E1000ECore *core, int index, uint32_t val)
-2815 {
-2816     if (core->mac[RCTL] & E1000_RCTL_DTYP_MASK) {
-2817
-2818         if ((val & E1000_PSRCTL_BSIZE0_MASK) == 0) {
-2819             hw_error("e1000e: PSRCTL.BSIZE0 cannot be zero");
-2820         }
+Let me know I you want me to run some more tests.
 
-Instead of calling hw_error() which abort the process (it is
-meant for CPU fatal error condition, not for device logging),
-log the invalid request with qemu_log_mask(LOG_GUEST_ERROR)
-and return, ignoring the request.
+> 
+> (Unfortunately the A9 TRM is not clear on the behaviour here. It would
+> probably be possible to write some test code to check the real h/w
+> behaviour.)
+>  > thanks
+> -- PMM
+> 
 
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Signed-off-by: Jason Wang <jasowang@redhat.com>
----
- hw/net/e1000e_core.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+Best Regards,
+Ing. Václav Vanc
+Project Engineer
 
-diff --git a/hw/net/e1000e_core.c b/hw/net/e1000e_core.c
-index d567687..bcd186c 100644
---- a/hw/net/e1000e_core.c
-+++ b/hw/net/e1000e_core.c
-@@ -34,9 +34,9 @@
- */
- 
- #include "qemu/osdep.h"
-+#include "qemu/log.h"
- #include "net/net.h"
- #include "net/tap.h"
--#include "hw/hw.h"
- #include "hw/pci/msi.h"
- #include "hw/pci/msix.h"
- #include "sysemu/runstate.h"
-@@ -2816,11 +2816,15 @@ e1000e_set_psrctl(E1000ECore *core, int index, uint32_t val)
-     if (core->mac[RCTL] & E1000_RCTL_DTYP_MASK) {
- 
-         if ((val & E1000_PSRCTL_BSIZE0_MASK) == 0) {
--            hw_error("e1000e: PSRCTL.BSIZE0 cannot be zero");
-+            qemu_log_mask(LOG_GUEST_ERROR,
-+                          "e1000e: PSRCTL.BSIZE0 cannot be zero");
-+            return;
-         }
- 
-         if ((val & E1000_PSRCTL_BSIZE1_MASK) == 0) {
--            hw_error("e1000e: PSRCTL.BSIZE1 cannot be zero");
-+            qemu_log_mask(LOG_GUEST_ERROR,
-+                          "e1000e: PSRCTL.BSIZE1 cannot be zero");
-+            return;
-         }
-     }
- 
--- 
-2.5.0
+SYSGO s.r.o.
+Embedding Innovations
+Research and Development Center Prague
+Zeleny pruh 1560/99 I CZ-14000 Praha 4
+Phone: +420 222138 828, +49 6136 9948 828
+Fax: +420 244911174
+E-mail: vaclav.vanc@sysgo.com
+_________________________________________________________________________________
 
+Web: https://www.sysgo.com
+Blog: https://www.sysgo.com/blog
+Events: https://www.sysgo.com/events
+Newsletter: https://www.sysgo.com/newsletter
+_________________________________________________________________________________
+
+Handelsregister/Commercial Registry: HRB Mainz 90 HRB 48884
+Geschäftsführung/Managing Directors: Etienne Butery (CEO), Kai Sablotny 
+(COO)
+USt-Id-Nr./VAT-Id-No.: DE 149062328
+
+The protection of your personal data is important to us. Under the 
+following link you can see the information in accordance with article 13 
+GDPR: https://www.sysgo.com/privacy_policy
 
