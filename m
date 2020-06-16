@@ -2,167 +2,87 @@ Return-Path: <SRS0=f7ls=75=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A674EC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 18:00:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 171E2C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 18:01:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 755D4207C4
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 18:00:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CCD1C207C4
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 18:01:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hrWLfnet"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 755D4207C4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xu8+PXi4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCD1C207C4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51010 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52962 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlFsS-0005aE-Rv
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 14:00:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59620)
+	id 1jlFtj-0006Yg-1P
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 14:01:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59812)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jlFrG-0004jv-7Y
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 13:58:50 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35806
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jlFrD-0008IY-Qi
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 13:58:49 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592330326;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=PtyAwhKorjp8TMS6ajF62pBVKwSF/mUNQdflEy74UOc=;
- b=hrWLfnetyf5QbRuBbxb8x9T08DfNOA30fuQXCAwVVgH3gVqgBDssdWpJtpXp/N2uPym/+l
- kVe502eVkcdS6oAcb5P3jexGNHydAh8RKB7s4SeFolBDlhOTGC1AFngHMs3aq6pPBtwJ9C
- B/C+d/Fw7uHRJnKsmoKv/rCNFZ87mto=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-376-qtjR_RUlP4ilUlrg6co60w-1; Tue, 16 Jun 2020 13:58:42 -0400
-X-MC-Unique: qtjR_RUlP4ilUlrg6co60w-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EE2E581F493;
- Tue, 16 Jun 2020 17:58:39 +0000 (UTC)
-Received: from [10.10.117.188] (ovpn-117-188.rdu2.redhat.com [10.10.117.188])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DDF3919C79;
- Tue, 16 Jun 2020 17:58:38 +0000 (UTC)
-Subject: applying mailing list review tags (was: Re: [PATCH v3 00/16] python:
- add mypy support to python/qemu)
-To: Markus Armbruster <armbru@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-References: <20200604202236.25039-1-jsnow@redhat.com>
- <20200605092630.GE5869@linux.fritz.box>
- <502e4f4d-6770-61a7-1496-9cb244f9ddd3@redhat.com>
- <20200608153327.GD6419@linux.fritz.box>
- <130e4383-8c33-c3f2-55b2-1ec45a5214cc@redhat.com>
- <87wo4gr4yb.fsf@dusky.pond.sub.org>
-From: John Snow <jsnow@redhat.com>
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <4ee8f32a-192d-b154-f3cc-c41e7ff56c58@redhat.com>
-Date: Tue, 16 Jun 2020 13:58:38 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jlFrr-0005Lv-Ss; Tue, 16 Jun 2020 13:59:27 -0400
+Received: from mail-il1-x143.google.com ([2607:f8b0:4864:20::143]:43919)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jlFrp-0008Ot-LE; Tue, 16 Jun 2020 13:59:27 -0400
+Received: by mail-il1-x143.google.com with SMTP id g3so4551020ilq.10;
+ Tue, 16 Jun 2020 10:59:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=VONlzrICbNcGvivN/cPDivhkPJNBiMoJ8pEhmNssn7g=;
+ b=Xu8+PXi4JyDC+Ger5TkE/OclARWzr34dFk1r7L7W22lkmaJ3Q1LZ1d4yH34MzMUJZL
+ gsyStZZov7KIzh07CDhykzqivY82nJgEBk5MbeoHpgYj5wUjA++V8iH/y9wsTANiiV5A
+ 9cnJhroIJuAORnlnFV9SwJTUovL5LnmPPgOfZ122PvJpEVRNpmktkivCkaECXGFM79XH
+ SFdIfNiRHwuP2XcBqGS+UI0hnYUx9B+JeX+PoRYIrwVo/bTyNDjFdRL9tq3LTyMD0/M2
+ fCl9Sx5DVjcaKKkCCc5jyjKKXIWgutTepPEF5xOIWpCeKwb/mB/4QlLde2g9cdLAHD2N
+ b2YQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=VONlzrICbNcGvivN/cPDivhkPJNBiMoJ8pEhmNssn7g=;
+ b=eWGj19YMrJmJFRTOHSRhp8LtBpW584oFmexJKdNHq5k7lktYuea6DclR7JrGo5sEhU
+ IVjfWMqFIuH7hG6+kh3m9vmielfk5JlY88icuHnWLVPBXnD8ggHt7vF7UFTmEs/Xdj/i
+ +VzUO0+nRSajNbm7ghchSW9CsKhLqx6flZ8BUfnV1/XG2sf2qTaGC0N9fpgVMMZXMUPd
+ 3G6v3oRSFEOU9gPCcDUv3p02hRvxsU+UyVzma4+iNVhO9q1BvWDBQdYufY/KpzhW0kDJ
+ Q6iXaszktC0nwlEkcVJ66i/KZIjNd0hVFhb7WehrbhWjXmVkNaVEOrEmclBQw9/c9zKu
+ caNA==
+X-Gm-Message-State: AOAM532ac/hL4vhrQZb5JVh0Mgxfkw5k2boc7NLxIK4TlvuWYTA442iv
+ 5N2WizEgP64JzEtcNfInFkHR7ltvNTz/TjfmbnI=
+X-Google-Smtp-Source: ABdhPJxhyaz88ccLKxsrAkdggzOfF1dosUt5ZWrx7kTw8IKhiaFNzmiThqK2mfoHghMTyBReL8we9CFrmcZreTeNSzg=
+X-Received: by 2002:a05:6e02:4d:: with SMTP id
+ i13mr4615414ilr.227.1592330363708; 
+ Tue, 16 Jun 2020 10:59:23 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <87wo4gr4yb.fsf@dusky.pond.sub.org>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=jsnow@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 02:45:54
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+References: <20200616032229.766089-1-anup.patel@wdc.com>
+ <20200616032229.766089-5-anup.patel@wdc.com>
+In-Reply-To: <20200616032229.766089-5-anup.patel@wdc.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Tue, 16 Jun 2020 10:49:58 -0700
+Message-ID: <CAKmqyKNtH-eRkkW=jwHCnjf08y3sagjQZvbCAm=rfSW0-=FRnA@mail.gmail.com>
+Subject: Re: [PATCH v6 4/5] hw/riscv: spike: Allow creating multiple NUMA
+ sockets
+To: Anup Patel <anup.patel@wdc.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::143;
+ envelope-from=alistair23@gmail.com; helo=mail-il1-x143.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -175,81 +95,376 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Cleber Rosa <crosa@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>, Anup Patel <anup@brainfault.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Atish Patra <atish.patra@wdc.com>, Alistair Francis <Alistair.Francis@wdc.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Mon, Jun 15, 2020 at 8:23 PM Anup Patel <anup.patel@wdc.com> wrote:
+>
+> We extend RISC-V spike machine to allow creating a multi-socket
+> machine. Each RISC-V spike machine socket is a NUMA node having
+> a set of HARTs, a memory instance, and a CLINT instance. Other
+> devices are shared between all sockets. We also update the
+> generated device tree accordingly.
+>
+> By default, NUMA multi-socket support is disabled for RISC-V spike
+> machine. To enable it, users can use "-numa" command-line options
+> of QEMU.
+>
+> Example1: For two NUMA nodes with 2 CPUs each, append following
+> to command-line options: "-smp 4 -numa node -numa node"
+>
+> Example2: For two NUMA nodes with 1 and 3 CPUs, append following
+> to command-line options:
+> "-smp 4 -numa node -numa node -numa cpu,node-id=0,core-id=0 \
+> -numa cpu,node-id=1,core-id=1 -numa cpu,node-id=1,core-id=2 \
+> -numa cpu,node-id=1,core-id=3"
+>
+> The maximum number of sockets in a RISC-V spike machine is 8
+> but this limit can be changed in future.
+>
+> Signed-off-by: Anup Patel <anup.patel@wdc.com>
+> Reviewed-by: Atish Patra <atish.patra@wdc.com>
 
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-On 6/9/20 4:58 AM, Markus Armbruster wrote:
-> Philippe Mathieu-Daudé <philmd@redhat.com> writes:
-> 
->> On 6/8/20 5:33 PM, Kevin Wolf wrote:
->>> Am 08.06.2020 um 17:19 hat John Snow geschrieben:
->>>>
->>>>
->>>> On 6/5/20 5:26 AM, Kevin Wolf wrote:
->>>>> Am 04.06.2020 um 22:22 hat John Snow geschrieben:
->>>>>> Based-on: 20200604195252.20739-1-jsnow@redhat.com
->>>>>>
->>>>>> This series is extracted from my larger series that attempted to bundle
->>>>>> our python module as an installable module. These fixes don't require that,
->>>>>> so they are being sent first as I think there's less up for debate in here.
->>>>>>
->>>>>> This requires my "refactor shutdown" patch as a pre-requisite.
->>>>>
->>>>> You didn't like my previous R-b? Here's a new one. :-)
->>>>>
->>>>> Reviewed-by: Kevin Wolf <kwolf@redhat.com>
->>>>>
->>>>
->>>> I felt like I should address the feedback, and though I could have
->>>> applied the R-B to patches I didn't change, it was ... faster to just
->>>> re-send it.
->>>>
->>>> Serious question: How do you apply people's R-Bs to your patches? At the
->>>> moment, it's pretty manually intensive for me. I use stgit and I pop all
->>>> of the patches off (stg pop -n 100), and then one-at-a-time I `stg push;
->>>> stg edit` and copy-paste the R-B into it.
->>
->> wget https://patchew.org/QEMU/${MSG_ID}/mbox
->> git am mbox
->>
->> Where ${MSG_ID} is the Message-Id of the series cover letter.
-> 
-> Patchew's awesomeness is still under-appreciated.
-> 
+Alistair
 
-Not for lack of appreciating patchew, but the problem with this workflow
-is if I have already made modifications to my patches locally, I can't
-use this to apply tags from upstream.
-
-It looks like I will continue to do this manually for the time being;
-but scripting the ability to "merge tags" from the list would be a cool
-trick.
-
-I'm not sure how to do it with git, though. Let's say I've got 16
-patches and I've made modifications to some, but not all; so I have a
-branch with 16 patches ahead of origin/master.
-
-Does anyone have any cool tricks for being able to script:
-
-1. Correlating a mailing list patch from e.g. patchew to a commit in my
-history, even if it's changed a little bit?
-
-(git-backport-diff uses patch names, that might be sufficient... Could
-use that as a starting point, at least.)
-
-2. Obtaining the commit message of that patch?
-`git show -s --format=%B $SHA` ought to do it...
-
-3. Editing that commit message? This I'm not sure about. I'd need to
-understand the tags on the upstream and downstream versions, merge them,
-and then re-write the message. Some magic with `git rebase -i` ?
-
---js
-
+> ---
+>  hw/riscv/spike.c         | 237 ++++++++++++++++++++++++++-------------
+>  include/hw/riscv/spike.h |  11 +-
+>  2 files changed, 169 insertions(+), 79 deletions(-)
+>
+> diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
+> index a3db885ffa..29e7270035 100644
+> --- a/hw/riscv/spike.c
+> +++ b/hw/riscv/spike.c
+> @@ -36,6 +36,7 @@
+>  #include "hw/riscv/sifive_clint.h"
+>  #include "hw/riscv/spike.h"
+>  #include "hw/riscv/boot.h"
+> +#include "hw/riscv/numa.h"
+>  #include "chardev/char.h"
+>  #include "sysemu/arch_init.h"
+>  #include "sysemu/device_tree.h"
+> @@ -64,9 +65,14 @@ static void create_fdt(SpikeState *s, const struct MemmapEntry *memmap,
+>      uint64_t mem_size, const char *cmdline)
+>  {
+>      void *fdt;
+> -    int cpu;
+> -    uint32_t *cells;
+> -    char *nodename;
+> +    uint64_t addr, size;
+> +    unsigned long clint_addr;
+> +    int cpu, socket;
+> +    MachineState *mc = MACHINE(s);
+> +    uint32_t *clint_cells;
+> +    uint32_t cpu_phandle, intc_phandle, phandle = 1;
+> +    char *name, *mem_name, *clint_name, *clust_name;
+> +    char *core_name, *cpu_name, *intc_name;
+>
+>      fdt = s->fdt = create_device_tree(&s->fdt_size);
+>      if (!fdt) {
+> @@ -88,68 +94,91 @@ static void create_fdt(SpikeState *s, const struct MemmapEntry *memmap,
+>      qemu_fdt_setprop_cell(fdt, "/soc", "#size-cells", 0x2);
+>      qemu_fdt_setprop_cell(fdt, "/soc", "#address-cells", 0x2);
+>
+> -    nodename = g_strdup_printf("/memory@%lx",
+> -        (long)memmap[SPIKE_DRAM].base);
+> -    qemu_fdt_add_subnode(fdt, nodename);
+> -    qemu_fdt_setprop_cells(fdt, nodename, "reg",
+> -        memmap[SPIKE_DRAM].base >> 32, memmap[SPIKE_DRAM].base,
+> -        mem_size >> 32, mem_size);
+> -    qemu_fdt_setprop_string(fdt, nodename, "device_type", "memory");
+> -    g_free(nodename);
+> -
+>      qemu_fdt_add_subnode(fdt, "/cpus");
+>      qemu_fdt_setprop_cell(fdt, "/cpus", "timebase-frequency",
+>          SIFIVE_CLINT_TIMEBASE_FREQ);
+>      qemu_fdt_setprop_cell(fdt, "/cpus", "#size-cells", 0x0);
+>      qemu_fdt_setprop_cell(fdt, "/cpus", "#address-cells", 0x1);
+> +    qemu_fdt_add_subnode(fdt, "/cpus/cpu-map");
+> +
+> +    for (socket = (riscv_socket_count(mc) - 1); socket >= 0; socket--) {
+> +        clust_name = g_strdup_printf("/cpus/cpu-map/cluster%d", socket);
+> +        qemu_fdt_add_subnode(fdt, clust_name);
+> +
+> +        clint_cells =  g_new0(uint32_t, s->soc[socket].num_harts * 4);
+>
+> -    for (cpu = s->soc.num_harts - 1; cpu >= 0; cpu--) {
+> -        nodename = g_strdup_printf("/cpus/cpu@%d", cpu);
+> -        char *intc = g_strdup_printf("/cpus/cpu@%d/interrupt-controller", cpu);
+> -        char *isa = riscv_isa_string(&s->soc.harts[cpu]);
+> -        qemu_fdt_add_subnode(fdt, nodename);
+> +        for (cpu = s->soc[socket].num_harts - 1; cpu >= 0; cpu--) {
+> +            cpu_phandle = phandle++;
+> +
+> +            cpu_name = g_strdup_printf("/cpus/cpu@%d",
+> +                s->soc[socket].hartid_base + cpu);
+> +            qemu_fdt_add_subnode(fdt, cpu_name);
+>  #if defined(TARGET_RISCV32)
+> -        qemu_fdt_setprop_string(fdt, nodename, "mmu-type", "riscv,sv32");
+> +            qemu_fdt_setprop_string(fdt, cpu_name, "mmu-type", "riscv,sv32");
+>  #else
+> -        qemu_fdt_setprop_string(fdt, nodename, "mmu-type", "riscv,sv48");
+> +            qemu_fdt_setprop_string(fdt, cpu_name, "mmu-type", "riscv,sv48");
+>  #endif
+> -        qemu_fdt_setprop_string(fdt, nodename, "riscv,isa", isa);
+> -        qemu_fdt_setprop_string(fdt, nodename, "compatible", "riscv");
+> -        qemu_fdt_setprop_string(fdt, nodename, "status", "okay");
+> -        qemu_fdt_setprop_cell(fdt, nodename, "reg", cpu);
+> -        qemu_fdt_setprop_string(fdt, nodename, "device_type", "cpu");
+> -        qemu_fdt_add_subnode(fdt, intc);
+> -        qemu_fdt_setprop_cell(fdt, intc, "phandle", 1);
+> -        qemu_fdt_setprop_string(fdt, intc, "compatible", "riscv,cpu-intc");
+> -        qemu_fdt_setprop(fdt, intc, "interrupt-controller", NULL, 0);
+> -        qemu_fdt_setprop_cell(fdt, intc, "#interrupt-cells", 1);
+> -        g_free(isa);
+> -        g_free(intc);
+> -        g_free(nodename);
+> -    }
+> +            name = riscv_isa_string(&s->soc[socket].harts[cpu]);
+> +            qemu_fdt_setprop_string(fdt, cpu_name, "riscv,isa", name);
+> +            g_free(name);
+> +            qemu_fdt_setprop_string(fdt, cpu_name, "compatible", "riscv");
+> +            qemu_fdt_setprop_string(fdt, cpu_name, "status", "okay");
+> +            qemu_fdt_setprop_cell(fdt, cpu_name, "reg",
+> +                s->soc[socket].hartid_base + cpu);
+> +            qemu_fdt_setprop_string(fdt, cpu_name, "device_type", "cpu");
+> +            riscv_socket_fdt_write_id(mc, fdt, cpu_name, socket);
+> +            qemu_fdt_setprop_cell(fdt, cpu_name, "phandle", cpu_phandle);
+>
+> -    cells =  g_new0(uint32_t, s->soc.num_harts * 4);
+> -    for (cpu = 0; cpu < s->soc.num_harts; cpu++) {
+> -        nodename =
+> -            g_strdup_printf("/cpus/cpu@%d/interrupt-controller", cpu);
+> -        uint32_t intc_phandle = qemu_fdt_get_phandle(fdt, nodename);
+> -        cells[cpu * 4 + 0] = cpu_to_be32(intc_phandle);
+> -        cells[cpu * 4 + 1] = cpu_to_be32(IRQ_M_SOFT);
+> -        cells[cpu * 4 + 2] = cpu_to_be32(intc_phandle);
+> -        cells[cpu * 4 + 3] = cpu_to_be32(IRQ_M_TIMER);
+> -        g_free(nodename);
+> +            intc_name = g_strdup_printf("%s/interrupt-controller", cpu_name);
+> +            qemu_fdt_add_subnode(fdt, intc_name);
+> +            intc_phandle = phandle++;
+> +            qemu_fdt_setprop_cell(fdt, intc_name, "phandle", intc_phandle);
+> +            qemu_fdt_setprop_string(fdt, intc_name, "compatible",
+> +                "riscv,cpu-intc");
+> +            qemu_fdt_setprop(fdt, intc_name, "interrupt-controller", NULL, 0);
+> +            qemu_fdt_setprop_cell(fdt, intc_name, "#interrupt-cells", 1);
+> +
+> +            clint_cells[cpu * 4 + 0] = cpu_to_be32(intc_phandle);
+> +            clint_cells[cpu * 4 + 1] = cpu_to_be32(IRQ_M_SOFT);
+> +            clint_cells[cpu * 4 + 2] = cpu_to_be32(intc_phandle);
+> +            clint_cells[cpu * 4 + 3] = cpu_to_be32(IRQ_M_TIMER);
+> +
+> +            core_name = g_strdup_printf("%s/core%d", clust_name, cpu);
+> +            qemu_fdt_add_subnode(fdt, core_name);
+> +            qemu_fdt_setprop_cell(fdt, core_name, "cpu", cpu_phandle);
+> +
+> +            g_free(core_name);
+> +            g_free(intc_name);
+> +            g_free(cpu_name);
+> +        }
+> +
+> +        addr = memmap[SPIKE_DRAM].base + riscv_socket_mem_offset(mc, socket);
+> +        size = riscv_socket_mem_size(mc, socket);
+> +        mem_name = g_strdup_printf("/memory@%lx", (long)addr);
+> +        qemu_fdt_add_subnode(fdt, mem_name);
+> +        qemu_fdt_setprop_cells(fdt, mem_name, "reg",
+> +            addr >> 32, addr, size >> 32, size);
+> +        qemu_fdt_setprop_string(fdt, mem_name, "device_type", "memory");
+> +        riscv_socket_fdt_write_id(mc, fdt, mem_name, socket);
+> +        g_free(mem_name);
+> +
+> +        clint_addr = memmap[SPIKE_CLINT].base +
+> +            (memmap[SPIKE_CLINT].size * socket);
+> +        clint_name = g_strdup_printf("/soc/clint@%lx", clint_addr);
+> +        qemu_fdt_add_subnode(fdt, clint_name);
+> +        qemu_fdt_setprop_string(fdt, clint_name, "compatible", "riscv,clint0");
+> +        qemu_fdt_setprop_cells(fdt, clint_name, "reg",
+> +            0x0, clint_addr, 0x0, memmap[SPIKE_CLINT].size);
+> +        qemu_fdt_setprop(fdt, clint_name, "interrupts-extended",
+> +            clint_cells, s->soc[socket].num_harts * sizeof(uint32_t) * 4);
+> +        riscv_socket_fdt_write_id(mc, fdt, clint_name, socket);
+> +
+> +        g_free(clint_name);
+> +        g_free(clint_cells);
+> +        g_free(clust_name);
+>      }
+> -    nodename = g_strdup_printf("/soc/clint@%lx",
+> -        (long)memmap[SPIKE_CLINT].base);
+> -    qemu_fdt_add_subnode(fdt, nodename);
+> -    qemu_fdt_setprop_string(fdt, nodename, "compatible", "riscv,clint0");
+> -    qemu_fdt_setprop_cells(fdt, nodename, "reg",
+> -        0x0, memmap[SPIKE_CLINT].base,
+> -        0x0, memmap[SPIKE_CLINT].size);
+> -    qemu_fdt_setprop(fdt, nodename, "interrupts-extended",
+> -        cells, s->soc.num_harts * sizeof(uint32_t) * 4);
+> -    g_free(cells);
+> -    g_free(nodename);
+> +
+> +    riscv_socket_fdt_write_distance_matrix(mc, fdt);
+>
+>      if (cmdline) {
+>          qemu_fdt_add_subnode(fdt, "/chosen");
+> @@ -160,23 +189,58 @@ static void create_fdt(SpikeState *s, const struct MemmapEntry *memmap,
+>  static void spike_board_init(MachineState *machine)
+>  {
+>      const struct MemmapEntry *memmap = spike_memmap;
+> -
+> -    SpikeState *s = g_new0(SpikeState, 1);
+> +    SpikeState *s = SPIKE_MACHINE(machine);
+>      MemoryRegion *system_memory = get_system_memory();
+>      MemoryRegion *main_mem = g_new(MemoryRegion, 1);
+>      MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
+> -    int i;
+> -    unsigned int smp_cpus = machine->smp.cpus;
+> -
+> -    /* Initialize SOC */
+> -    object_initialize_child(OBJECT(machine), "soc", &s->soc, sizeof(s->soc),
+> -                            TYPE_RISCV_HART_ARRAY, &error_abort, NULL);
+> -    object_property_set_str(OBJECT(&s->soc), machine->cpu_type, "cpu-type",
+> -                            &error_abort);
+> -    object_property_set_int(OBJECT(&s->soc), smp_cpus, "num-harts",
+> -                            &error_abort);
+> -    object_property_set_bool(OBJECT(&s->soc), true, "realized",
+> -                            &error_abort);
+> +    char *soc_name;
+> +    int i, base_hartid, hart_count;
+> +
+> +    /* Check socket count limit */
+> +    if (SPIKE_SOCKETS_MAX < riscv_socket_count(machine)) {
+> +        error_report("number of sockets/nodes should be less than %d",
+> +            SPIKE_SOCKETS_MAX);
+> +        exit(1);
+> +    }
+> +
+> +    /* Initialize sockets */
+> +    for (i = 0; i < riscv_socket_count(machine); i++) {
+> +        if (!riscv_socket_check_hartids(machine, i)) {
+> +            error_report("discontinuous hartids in socket%d", i);
+> +            exit(1);
+> +        }
+> +
+> +        base_hartid = riscv_socket_first_hartid(machine, i);
+> +        if (base_hartid < 0) {
+> +            error_report("can't find hartid base for socket%d", i);
+> +            exit(1);
+> +        }
+> +
+> +        hart_count = riscv_socket_hart_count(machine, i);
+> +        if (hart_count < 0) {
+> +            error_report("can't find hart count for socket%d", i);
+> +            exit(1);
+> +        }
+> +
+> +        soc_name = g_strdup_printf("soc%d", i);
+> +        object_initialize_child(OBJECT(machine), soc_name, &s->soc[i],
+> +            sizeof(s->soc[i]), TYPE_RISCV_HART_ARRAY, &error_abort, NULL);
+> +        g_free(soc_name);
+> +        object_property_set_str(OBJECT(&s->soc[i]),
+> +            machine->cpu_type, "cpu-type", &error_abort);
+> +        object_property_set_int(OBJECT(&s->soc[i]),
+> +            base_hartid, "hartid-base", &error_abort);
+> +        object_property_set_int(OBJECT(&s->soc[i]),
+> +            hart_count, "num-harts", &error_abort);
+> +        object_property_set_bool(OBJECT(&s->soc[i]),
+> +            true, "realized", &error_abort);
+> +
+> +        /* Core Local Interruptor (timer and IPI) for each socket */
+> +        sifive_clint_create(
+> +            memmap[SPIKE_CLINT].base + i * memmap[SPIKE_CLINT].size,
+> +            memmap[SPIKE_CLINT].size, base_hartid, hart_count,
+> +            SIFIVE_SIP_BASE, SIFIVE_TIMECMP_BASE, SIFIVE_TIME_BASE, false);
+> +    }
+>
+>      /* register system main memory (actual RAM) */
+>      memory_region_init_ram(main_mem, NULL, "riscv.spike.ram",
+> @@ -249,21 +313,40 @@ static void spike_board_init(MachineState *machine)
+>                            &address_space_memory);
+>
+>      /* initialize HTIF using symbols found in load_kernel */
+> -    htif_mm_init(system_memory, mask_rom, &s->soc.harts[0].env, serial_hd(0));
+> +    htif_mm_init(system_memory, mask_rom,
+> +                 &s->soc[0].harts[0].env, serial_hd(0));
+> +}
+>
+> -    /* Core Local Interruptor (timer and IPI) */
+> -    sifive_clint_create(memmap[SPIKE_CLINT].base, memmap[SPIKE_CLINT].size,
+> -        0, smp_cpus, SIFIVE_SIP_BASE, SIFIVE_TIMECMP_BASE, SIFIVE_TIME_BASE,
+> -        false);
+> +static void spike_machine_instance_init(Object *obj)
+> +{
+>  }
+>
+> -static void spike_machine_init(MachineClass *mc)
+> +static void spike_machine_class_init(ObjectClass *oc, void *data)
+>  {
+> -    mc->desc = "RISC-V Spike Board";
+> +    MachineClass *mc = MACHINE_CLASS(oc);
+> +
+> +    mc->desc = "RISC-V Spike board";
+>      mc->init = spike_board_init;
+> -    mc->max_cpus = 8;
+> +    mc->max_cpus = SPIKE_CPUS_MAX;
+>      mc->is_default = true;
+>      mc->default_cpu_type = SPIKE_V1_10_0_CPU;
+> +    mc->possible_cpu_arch_ids = riscv_numa_possible_cpu_arch_ids;
+> +    mc->cpu_index_to_instance_props = riscv_numa_cpu_index_to_props;
+> +    mc->get_default_cpu_node_id = riscv_numa_get_default_cpu_node_id;
+> +    mc->numa_mem_supported = true;
+> +}
+> +
+> +static const TypeInfo spike_machine_typeinfo = {
+> +    .name       = MACHINE_TYPE_NAME("spike"),
+> +    .parent     = TYPE_MACHINE,
+> +    .class_init = spike_machine_class_init,
+> +    .instance_init = spike_machine_instance_init,
+> +    .instance_size = sizeof(SpikeState),
+> +};
+> +
+> +static void spike_machine_init_register_types(void)
+> +{
+> +    type_register_static(&spike_machine_typeinfo);
+>  }
+>
+> -DEFINE_MACHINE("spike", spike_machine_init)
+> +type_init(spike_machine_init_register_types)
+> diff --git a/include/hw/riscv/spike.h b/include/hw/riscv/spike.h
+> index 1cd72b85d6..b0a18a9c94 100644
+> --- a/include/hw/riscv/spike.h
+> +++ b/include/hw/riscv/spike.h
+> @@ -22,12 +22,19 @@
+>  #include "hw/riscv/riscv_hart.h"
+>  #include "hw/sysbus.h"
+>
+> +#define SPIKE_CPUS_MAX 8
+> +#define SPIKE_SOCKETS_MAX 8
+> +
+> +#define TYPE_SPIKE_MACHINE MACHINE_TYPE_NAME("spike")
+> +#define SPIKE_MACHINE(obj) \
+> +    OBJECT_CHECK(SpikeState, (obj), TYPE_SPIKE_MACHINE)
+> +
+>  typedef struct {
+>      /*< private >*/
+> -    SysBusDevice parent_obj;
+> +    MachineState parent;
+>
+>      /*< public >*/
+> -    RISCVHartArrayState soc;
+> +    RISCVHartArrayState soc[SPIKE_SOCKETS_MAX];
+>      void *fdt;
+>      int fdt_size;
+>  } SpikeState;
+> --
+> 2.25.1
+>
+>
 
