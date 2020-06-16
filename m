@@ -2,61 +2,128 @@ Return-Path: <SRS0=f7ls=75=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB15BC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 17:03:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE47DC433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 17:05:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8336E20B1F
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 17:03:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8336E20B1F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
+	by mail.kernel.org (Postfix) with ESMTPS id B153320882
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 17:05:20 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CQSHbaXm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B153320882
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51094 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53480 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlEzZ-0006R4-RC
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 13:03:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43950)
+	id 1jlF1U-0007We-0f
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 13:05:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44948)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1jlEyD-0005GB-Oc
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 13:01:57 -0400
-Received: from mx2.suse.de ([195.135.220.15]:55094)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1jlEyA-0005ln-Hr
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 13:01:57 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
- by mx2.suse.de (Postfix) with ESMTP id CECD0AD60;
- Tue, 16 Jun 2020 17:01:55 +0000 (UTC)
-Subject: Re: [RFC v5 4/4] cpus: extract out accel-specific code to each accel
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-References: <20200615180346.3992-1-cfontana@suse.de>
- <20200615180346.3992-5-cfontana@suse.de> <87y2onyu39.fsf@linaro.org>
-From: Claudio Fontana <cfontana@suse.de>
-Message-ID: <75a85b11-6241-ebce-9fb9-ca92fdfba5de@suse.de>
-Date: Tue, 16 Jun 2020 19:01:50 +0200
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jlF0g-00076k-2a
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 13:04:30 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:25158
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jlF0e-0006a5-93
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 13:04:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592327067;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=rxg3yOtzUwFduDAthgD6ab3fEzKmpelLiyy0cD+hriE=;
+ b=CQSHbaXmKKP5H5ksXxMSb5PgnVyOgJ0EC5hsN47MmszvL+xQPv0qaTDVVZz6w8L8ss5COo
+ GRgim/qds2+WhWJOmQYegDH0MkVRKMESF9uYjGkNOyzCNFNGiVrYX7uO7mjbwr6acYRw9S
+ uJkM/6J2kCTxITdap3EC7PcsXc7pcPI=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-173-BJsVVUkvORmuVrWZKvUf5Q-1; Tue, 16 Jun 2020 13:04:24 -0400
+X-MC-Unique: BJsVVUkvORmuVrWZKvUf5Q-1
+Received: by mail-wr1-f72.google.com with SMTP id a4so8465733wrp.5
+ for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 10:04:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=rxg3yOtzUwFduDAthgD6ab3fEzKmpelLiyy0cD+hriE=;
+ b=mtxkhE9FcwLdq9f11hpUVtIHVLVaWSN4wh25tjafjc7FLLsFQDlptWyuxokD3E+Me3
+ k4yyCWByoQqWa5RbCIw2zSDBiKFEahBuLqpONojIF3Nze4nrNz2UbTgSVSfdcAZRzSfd
+ qEVj1Q80il/cycm/dqxlF3vHPsP993AQ/82u64O3hUAgD0rtE2oKjjgdGVhE2Rxe40at
+ 3OPhE+iKtDXYma0kHqur6PiYtqB2cCZaPzMk3qpOUfHIIgnTaEywJ3KMeUUW/twCgjzl
+ +JPZJg00ke2EZXvzNZque/4cRDP4KYrPICPRItCITqXlsXndYfz4Z0cQf4WOSTTSrlSm
+ Bgqg==
+X-Gm-Message-State: AOAM532X4LlLI2+FMeufzIAmTY8gi8M0J5o7sbigOmskWf+Rzz7IR9/r
+ PSVMANzANzGtnZbKuIlollAMF6z0paFEH7gUzPlmsAusAtLnP5ixIpScCjHlUNPq01Uf/1JlNgL
+ F3suTUnLmXaACBJU=
+X-Received: by 2002:a5d:4204:: with SMTP id n4mr4302078wrq.247.1592327063283; 
+ Tue, 16 Jun 2020 10:04:23 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwS9QGaf0lfmaFJFVc0walXtSzEUqhno/PbW77+ponsNu9B7/StpxCUegFPjb1FDmSsynP67w==
+X-Received: by 2002:a5d:4204:: with SMTP id n4mr4302056wrq.247.1592327063077; 
+ Tue, 16 Jun 2020 10:04:23 -0700 (PDT)
+Received: from [192.168.1.37] (93.red-83-59-160.dynamicip.rima-tde.net.
+ [83.59.160.93])
+ by smtp.gmail.com with ESMTPSA id z9sm4551270wmi.41.2020.06.16.10.04.21
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 16 Jun 2020 10:04:22 -0700 (PDT)
+Subject: Re: [PATCH] MAINTAINERS: Add an entry to review Avocado based
+ acceptance tests
+To: qemu-devel@nongnu.org
+References: <20200605165656.17578-1-philmd@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <c102b3ea-17ee-4c82-ec3d-0b8a1f44d437@redhat.com>
+Date: Tue, 16 Jun 2020 19:04:21 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <87y2onyu39.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200605165656.17578-1-philmd@redhat.com>
 Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=195.135.220.15; envelope-from=cfontana@suse.de;
- helo=mx2.suse.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/15 23:07:04
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 02:46:07
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -69,210 +136,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, haxm-team@intel.com,
- Marcelo Tosatti <mtosatti@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- qemu-devel@nongnu.org, Roman Bolshakov <r.bolshakov@yadro.com>,
- Colin Xu <colin.xu@intel.com>, Wenchao Wang <wenchao.wang@intel.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Sunil Muthuswamy <sunilmut@microsoft.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Alex,
+On 6/5/20 6:56 PM, Philippe Mathieu-Daudé wrote:
+> Add an entry for to allow reviewers to be notified when acceptance /
+> integration tests are added or modified.
+> The designated reviewers are not maintainers, subsystem maintainers
+> are expected to merge their tests.
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> ---
+>  MAINTAINERS | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 3e7d9cb0a5..c2ae2bf390 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -2923,6 +2923,14 @@ S: Maintained
+>  F: tests/tcg/Makefile
+>  F: tests/tcg/Makefile.include
+>  
+> +Acceptance (Integration) Testing with the Avocado framework
+> +W: https://trello.com/b/6Qi1pxVn/avocado-qemu
+> +R: Cleber Rosa <crosa@redhat.com>
+> +R: Philippe Mathieu-Daudé <philmd@redhat.com>
+> +R: Wainer dos Santos Moschetta <wainersm@redhat.com>
+> +S: Odd Fixes
+> +F: tests/acceptance/
 
-thanks for looking at this,
+Ping...? Please Nack if you don't want to be included.
 
-On 6/16/20 4:16 PM, Alex Bennée wrote:
-> 
-> Claudio Fontana <cfontana@suse.de> writes:
-> 
->> each accelerator registers a new "CpusAccel" interface
->> implementation on initialization, providing functions for
->> starting a vcpu, kicking a vcpu, and sychronizing state.
->>
->> This way the code in cpus.c is now all general softmmu code,
->> nothing accelerator-specific anymore.
->>
->> There is still some ifdeffery for WIN32 though.
->>
->> Signed-off-by: Claudio Fontana <cfontana@suse.de>
->> ---
->>  MAINTAINERS                   |   1 +
->>  accel/Makefile.objs           |   2 +-
->>  accel/kvm/Makefile.objs       |   2 +
->>  accel/kvm/kvm-all.c           |  15 +-
->>  accel/kvm/kvm-cpus.c          |  94 +++++
->>  accel/kvm/kvm-cpus.h          |  17 +
->>  accel/qtest/Makefile.objs     |   2 +
->>  accel/qtest/qtest-cpus.c      | 105 +++++
->>  accel/qtest/qtest-cpus.h      |  17 +
->>  accel/{ => qtest}/qtest.c     |   7 +
->>  accel/stubs/kvm-stub.c        |   3 +-
->>  accel/tcg/Makefile.objs       |   1 +
->>  accel/tcg/tcg-all.c           |  12 +-
->>  accel/tcg/tcg-cpus.c          | 523 ++++++++++++++++++++++++
->>  accel/tcg/tcg-cpus.h          |  17 +
->>  hw/core/cpu.c                 |   1 +
->>  include/sysemu/cpus.h         |  32 ++
->>  include/sysemu/hw_accel.h     |  57 +--
->>  include/sysemu/kvm.h          |   2 +-
->>  softmmu/cpus.c                | 911 ++++--------------------------------------
->>  stubs/Makefile.objs           |   1 +
->>  stubs/cpu-synchronize-state.c |  15 +
->>  target/i386/Makefile.objs     |   7 +-
->>  target/i386/hax-all.c         |   6 +-
->>  target/i386/hax-cpus.c        |  85 ++++
->>  target/i386/hax-cpus.h        |  17 +
->>  target/i386/hax-i386.h        |   2 +
->>  target/i386/hax-posix.c       |  12 +
->>  target/i386/hax-windows.c     |  20 +
->>  target/i386/hvf/Makefile.objs |   2 +-
->>  target/i386/hvf/hvf-cpus.c    | 141 +++++++
->>  target/i386/hvf/hvf-cpus.h    |  17 +
->>  target/i386/hvf/hvf.c         |   3 +
->>  target/i386/whpx-all.c        |   3 +
->>  target/i386/whpx-cpus.c       |  96 +++++
->>  target/i386/whpx-cpus.h       |  17 +
->>  36 files changed, 1362 insertions(+), 903 deletions(-)
->>  create mode 100644 accel/kvm/kvm-cpus.c
->>  create mode 100644 accel/kvm/kvm-cpus.h
->>  create mode 100644 accel/qtest/Makefile.objs
->>  create mode 100644 accel/qtest/qtest-cpus.c
->>  create mode 100644 accel/qtest/qtest-cpus.h
->>  rename accel/{ => qtest}/qtest.c (86%)
->>  create mode 100644 accel/tcg/tcg-cpus.c
->>  create mode 100644 accel/tcg/tcg-cpus.h
->>  create mode 100644 stubs/cpu-synchronize-state.c
->>  create mode 100644 target/i386/hax-cpus.c
->>  create mode 100644 target/i386/hax-cpus.h
->>  create mode 100644 target/i386/hvf/hvf-cpus.c
->>  create mode 100644 target/i386/hvf/hvf-cpus.h
->>  create mode 100644 target/i386/whpx-cpus.c
->>  create mode 100644 target/i386/whpx-cpus.h
-> 
-> Predictably for such a spider patch I got a bunch of conflicts
-> attempting to merge on my testing branch so only a few comments.
-> 
->>
->> diff --git a/MAINTAINERS b/MAINTAINERS
->> index f308537d42..ef8cbb2680 100644
->> --- a/MAINTAINERS
->> +++ b/MAINTAINERS
->> @@ -427,6 +427,7 @@ WHPX CPUs
->>  M: Sunil Muthuswamy <sunilmut@microsoft.com>
->>  S: Supported
->>  F: target/i386/whpx-all.c
->> +F: target/i386/whpx-cpus.c
->>  F: target/i386/whp-dispatch.h
->>  F: accel/stubs/whpx-stub.c
->>  F: include/sysemu/whpx.h
->> diff --git a/accel/Makefile.objs b/accel/Makefile.objs
->> index ff72f0d030..c5e58eb53d 100644
->> --- a/accel/Makefile.objs
->> +++ b/accel/Makefile.objs
->> @@ -1,5 +1,5 @@
->>  common-obj-$(CONFIG_SOFTMMU) += accel.o
->> -obj-$(call land,$(CONFIG_SOFTMMU),$(CONFIG_POSIX)) += qtest.o
->> +obj-$(call land,$(CONFIG_SOFTMMU),$(CONFIG_POSIX)) += qtest/
-> 
-> This does raise the question if qtest is "just another" accelerator then
-> should we not be creating a CONFIG_QTEST symbol for explicitness?
-> 
->>  obj-$(CONFIG_KVM) += kvm/
->>  obj-$(CONFIG_TCG) += tcg/
->>  obj-$(CONFIG_XEN) += xen/
-> <snip>
->> +static void *qtest_cpu_thread_fn(void *arg)
->> +{
->> +#ifdef _WIN32
->> +    error_report("qtest is not supported under Windows");
->> +    exit(1);
->> +#else
-> 
-> This is literally impossible to build isn't it?
->>  
->>  static int qtest_init_accel(MachineState *ms)
->>  {
->> +    cpus_register_accel(&qtest_cpus);
->>      return 0;
->>  }
-> 
-> I wonder if these register functions could be moved to initfns like we
-> use for our hardware models?
-
-The context is the configure_accelerator() in vl.c , where we loop over possible candidate accelerators
-and try to initialize them.
-
-In this RFC the cpus_register_accel is triggered at accel_init_machine() time,
-in the accelerator class init_machine() method, where we are trying to use a specific accelerator.
-
-This is the case for qtest like for the other AccelClass types (tcg and the hardware accelerators).
-
-If not in init_machine(), where would the registration best happen?
-
-> 
-> <snip>
->>  
->> +/*
->> + * every accelerator is supposed to register this.
->> + * Could be in the AccelClass instead, but ends up being too complicated
->> + * to access in practice, and inefficient for each call of each method.
->> + */
->> +static CpusAccel cpus_accel;
->> +
-> 
-> wait what? Does an indirection cause that much trouble? I'm surprised
-> given how often we use it elsewhere in the code. I guess others might
-
-CpusAccel is not used elsewhere currently in the codebase, it's new, or what do you mean?
-
-> argue for a full QOM-ification of the accelerator but I think we can at
-> least have an indirection rather than a copy of the structure.
-> 
+> +
+>  Documentation
+>  -------------
+>  Build system architecture
 > 
 
-As mentioned in v3 and v2, this is what we end up if we put CpusAccel inside the AccelClass,
-every time we need a vcpu kick, sync state, etc:
-
-1) current_accel() function call
-2) pointer dereference (->accelerator)
-3) object_class_dynamic_cast_assert function call (ACCEL_GET_CLASS -> OBJECT_CLASS_CHECK)
-4) pointer dereference (-> AccelCpusInterface)
-5) pointer dereference (-> method)
-6) function call ( ->synchronize_state(cpu))
-
-So the code then would look like this (more or less, probably I would put also an assert for non-NULL in there):
-
-VERSION A)
-
-void cpu_synchronize_state(CPUState *cpu)
-{
-    ACCEL_GET_CLASS(current_accel())->cpus_int->synchronize_state(cpu);
-}
-
-Instead with the current RFC code, this is what we end up with every time we need a vcpu kick, sync state, etc:
-
-VERSION B)
-
-void cpu_synchronize_state(CPUState *cpu)
-{
-    cpus_accel.synchronize_state(cpu);
-}
-
-
-Are you arguing in favor of VERSION A) here?
-
-I would like to have an ACK from the owners of the hardware accels especially that the additional overhead in this code path
-is of negligible importance..
-
-
-Thank you for your comments,
-
-Ciao,
-
-Claudio
 
