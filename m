@@ -7,70 +7,75 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72D0FC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 06:53:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37EC2C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 06:54:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3FBE12074D
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 06:53:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0459D2074D
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 06:54:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IgXHJNN4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3FBE12074D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cdqJbEoC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0459D2074D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33140 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36676 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jl5TN-0002aH-AL
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 02:53:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41954)
+	id 1jl5U0-00041q-4M
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 02:54:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42290)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jl5MZ-0001jd-CD
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 02:46:28 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:28581
- helo=us-smtp-1.mimecast.com)
+ id 1jl5N7-0002Cb-Bu
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 02:47:01 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:24263
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jl5MX-0005fP-23
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 02:46:26 -0400
+ id 1jl5N4-0005or-Ar
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 02:47:01 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592289980;
+ s=mimecast20190719; t=1592290016;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
- references:references; bh=X+BZX1BaGzUe3Qvjw967m9fYyu6CebM9xadgO89zEXQ=;
- b=IgXHJNN4HHXLNpo/XY9Z3KRDtsIYG+zB6/ZjKf2iTTpRxlPUq7QAqIp6qt1e8v56rmeR4q
- VjsEwlspQsdr+jpWzWnvVsbm5Ad6d0JSyW7DqOh7uC50vi6r88Iu+9MLNQc+flTzeagbcr
- k2d/1llYMItMDhOXmfLGvhso1tVQodI=
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=/JCYQPXxv0aPlPyN+C7Yfog1V7A9i6Guix0MwTTgQQU=;
+ b=cdqJbEoCtZCbNomUgQKnMTUgIxQPzUvu7090IcxNbIOxqw2XU6QY6tAraWGcBmcDcDaKC5
+ h5gtA0W3rOAfaSmy3+wW9C/p8/fq0JA/bobugAx7surCHM7ihiwtnYPqEQXH2u5MHZTKSc
+ kZa5G5+DG0+3/rVloGf/dyqEXYCn+18=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-397-ugkcZd8eMHuvE17AWFHIeg-1; Tue, 16 Jun 2020 02:46:18 -0400
-X-MC-Unique: ugkcZd8eMHuvE17AWFHIeg-1
+ us-mta-284-UUiDzfjcMcmvjV-yiWKgIQ-1; Tue, 16 Jun 2020 02:46:54 -0400
+X-MC-Unique: UUiDzfjcMcmvjV-yiWKgIQ-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6424D18585C1;
- Tue, 16 Jun 2020 06:46:17 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 657E7184D179;
+ Tue, 16 Jun 2020 06:46:53 +0000 (UTC)
 Received: from jason-ThinkPad-T430s.redhat.com (ovpn-13-222.pek2.redhat.com
  [10.72.13.222])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BFA8290341;
- Tue, 16 Jun 2020 06:46:15 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 83C8C90341;
+ Tue, 16 Jun 2020 06:46:51 +0000 (UTC)
 From: Jason Wang <jasowang@redhat.com>
 To: peter.maydell@linaro.org
-Subject: [PULL 11/33] net: cadence_gem: Fix debug statements
-Date: Tue, 16 Jun 2020 14:45:22 +0800
-Message-Id: <1592289944-13727-12-git-send-email-jasowang@redhat.com>
+Subject: [PULL 27/33] net/colo-compare.c: Only hexdump packets if tracing is
+ enabled
+Date: Tue, 16 Jun 2020 14:45:38 +0800
+Message-Id: <1592289944-13727-28-git-send-email-jasowang@redhat.com>
 In-Reply-To: <1592289944-13727-1-git-send-email-jasowang@redhat.com>
 References: <1592289944-13727-1-git-send-email-jasowang@redhat.com>
+MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=jasowang@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 02:46:07
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=jasowang@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 02:01:17
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -91,83 +96,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>,
- Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org
+Cc: Zhang Chen <chen.zhang@intel.com>, Jason Wang <jasowang@redhat.com>,
+ Lukas Straub <lukasstraub2@web.de>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
+From: Lukas Straub <lukasstraub2@web.de>
 
-Enabling debug breaks the build, Fix them and make debug statements
-always compilable. Fix few statements to use sized integer casting.
+Else the log will be flooded if there is a lot of network
+traffic.
 
-Signed-off-by: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Signed-off-by: Lukas Straub <lukasstraub2@web.de>
+Reviewed-by: Zhang Chen <chen.zhang@intel.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Zhang Chen <chen.zhang@intel.com>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- hw/net/cadence_gem.c | 27 +++++++++++++--------------
- 1 file changed, 13 insertions(+), 14 deletions(-)
+ net/colo-compare.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/hw/net/cadence_gem.c b/hw/net/cadence_gem.c
-index e8f9cc7..2e273dca 100644
---- a/hw/net/cadence_gem.c
-+++ b/hw/net/cadence_gem.c
-@@ -35,14 +35,13 @@
- #include "sysemu/dma.h"
- #include "net/checksum.h"
+diff --git a/net/colo-compare.c b/net/colo-compare.c
+index 62ecd38..a609f49 100644
+--- a/net/colo-compare.c
++++ b/net/colo-compare.c
+@@ -483,10 +483,12 @@ sec:
+         g_queue_push_head(&conn->primary_list, ppkt);
+         g_queue_push_head(&conn->secondary_list, spkt);
  
--#ifdef CADENCE_GEM_ERR_DEBUG
--#define DB_PRINT(...) do { \
--    fprintf(stderr,  ": %s: ", __func__); \
--    fprintf(stderr, ## __VA_ARGS__); \
--    } while (0)
--#else
--    #define DB_PRINT(...)
--#endif
-+#define CADENCE_GEM_ERR_DEBUG 0
-+#define DB_PRINT(...) do {\
-+    if (CADENCE_GEM_ERR_DEBUG) {   \
-+        qemu_log(": %s: ", __func__); \
-+        qemu_log(__VA_ARGS__); \
-+    } \
-+} while (0)
+-        qemu_hexdump((char *)ppkt->data, stderr,
+-                     "colo-compare ppkt", ppkt->size);
+-        qemu_hexdump((char *)spkt->data, stderr,
+-                     "colo-compare spkt", spkt->size);
++        if (trace_event_get_state_backends(TRACE_COLO_COMPARE_MISCOMPARE)) {
++            qemu_hexdump((char *)ppkt->data, stderr,
++                        "colo-compare ppkt", ppkt->size);
++            qemu_hexdump((char *)spkt->data, stderr,
++                        "colo-compare spkt", spkt->size);
++        }
  
- #define GEM_NWCTRL        (0x00000000/4) /* Network Control reg */
- #define GEM_NWCFG         (0x00000004/4) /* Network Config reg */
-@@ -979,7 +978,7 @@ static ssize_t gem_receive(NetClientState *nc, const uint8_t *buf, size_t size)
-         size += 4;
+         colo_compare_inconsistency_notify(s);
      }
- 
--    DB_PRINT("config bufsize: %d packet size: %ld\n", rxbufsize, size);
-+    DB_PRINT("config bufsize: %u packet size: %zd\n", rxbufsize, size);
- 
-     /* Find which queue we are targeting */
-     q = get_queue_from_screen(s, rxbuf_ptr, rxbufsize);
-@@ -992,9 +991,9 @@ static ssize_t gem_receive(NetClientState *nc, const uint8_t *buf, size_t size)
-             return -1;
-         }
- 
--        DB_PRINT("copy %u bytes to 0x%" PRIx64 "\n",
--                 MIN(bytes_to_copy, rxbufsize),
--                 rx_desc_get_buffer(s, s->rx_desc[q]));
-+        DB_PRINT("copy %" PRIu32 " bytes to 0x%" PRIx64 "\n",
-+                MIN(bytes_to_copy, rxbufsize),
-+                rx_desc_get_buffer(s, s->rx_desc[q]));
- 
-         /* Copy packet data to emulated DMA buffer */
-         address_space_write(&s->dma_as, rx_desc_get_buffer(s, s->rx_desc[q]) +
-@@ -1160,8 +1159,8 @@ static void gem_transmit(CadenceGEMState *s)
-              */
-             if ((tx_desc_get_buffer(s, desc) == 0) ||
-                 (tx_desc_get_length(desc) == 0)) {
--                DB_PRINT("Invalid TX descriptor @ 0x%x\n",
--                         (unsigned)packet_desc_addr);
-+                DB_PRINT("Invalid TX descriptor @ 0x%" HWADDR_PRIx "\n",
-+                         packet_desc_addr);
-                 break;
-             }
- 
 -- 
 2.5.0
 
