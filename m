@@ -2,89 +2,87 @@ Return-Path: <SRS0=f7ls=75=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 223F9C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 15:05:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46BDDC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 15:05:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E561220786
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 15:05:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 18CFE208B3
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 15:05:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kNvEQ8B4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E561220786
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XPvX4rIR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18CFE208B3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49374 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51770 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlD9B-0003cE-0l
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 11:05:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58328)
+	id 1jlD9t-00051t-AN
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 11:05:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35120)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1jlCR3-0004Mt-Va; Tue, 16 Jun 2020 10:19:33 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:36793)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1jlCR2-00072A-EG; Tue, 16 Jun 2020 10:19:33 -0400
-Received: by mail-ot1-x344.google.com with SMTP id 97so16065216otg.3;
- Tue, 16 Jun 2020 07:19:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=3BFt3zvBmH3599GWUmBzmTB/ubSoG/ped8JbzfOjFXw=;
- b=kNvEQ8B4wVz1tV+sEO5jSOSA3DzQsWrbhzaNXYblj7yVmLs+VzrYpLEjlc5u6AE+KG
- NWHIXqYgDJMDdgpizSb9rN+YLnRbT6L1ltd/6muxIdWTlyB8asuA/ue3+JauMetGZIfS
- +c+9Dh8VDBTJFAPQRYQ439UORUrxATz2mtwfZVcBxz35ElMuMusVU6FNE9fkBkPgGrgk
- Bwm0LN7R0XJkZkY4O4Qr/4yX2pMzwnoSP1SpU0NYIfEfBnTHSf0va5CNDrkOwf4IEnOW
- j1c01cqO0RupiBT0aXXWoTI6J7hg5MCt84MIhV3MJKlnRay1eOvg2ozMVXqB++IluJu5
- /lAg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references;
- bh=3BFt3zvBmH3599GWUmBzmTB/ubSoG/ped8JbzfOjFXw=;
- b=XXYObBI0xJxekcCOSNzYEerqmhJ9ehIc8gH2Kr3m+p1vvktE3umv/AizlRZFTDebK8
- 8hmTQuwpGGSuu9a2g8G8hvUA2ow8WdWIIZP8HzckcCUDlIDAfDDo4PeeQmEanX2Qoo8C
- I9/CpmJgyRwCbrPNlcutx/4ssM2OxW8BQZtYPqUcdS0aHTfZIQMI1m1h/NrvgqRM34q4
- X/4INqNzgLDPfM/Zd+8olFRLP9O0qhvos/JTx2erV1au5OijKaEZhTU2HnhlSYybxftk
- HmL7g5tzCmrwjpXTyAG3/9fXjYbLev7XXPpb6v29Fh1U9r+fxB2WUsv/UJqpXpwOYAKR
- 9JgA==
-X-Gm-Message-State: AOAM530LiVhd3hLnGAqMFJHhy9KK6uzCeV5Rqo/ZwOv7sjHiHsSb5Egl
- 11hg78O8MLpIp6yXKqXReCqG7vZmS3A=
-X-Google-Smtp-Source: ABdhPJziESiRWNVMGaV/j3lpy7AuOr/WrHsfeG3MLEYDXtVIFX7qYPyTTUKq8U+3xCk7ctWg5ngnwg==
-X-Received: by 2002:a05:6830:1e61:: with SMTP id
- m1mr2475536otr.13.1592317170646; 
- Tue, 16 Jun 2020 07:19:30 -0700 (PDT)
-Received: from localhost (76-251-165-188.lightspeed.austtx.sbcglobal.net.
- [76.251.165.188])
- by smtp.gmail.com with ESMTPSA id g51sm4042298otg.17.2020.06.16.07.19.29
- (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
- Tue, 16 Jun 2020 07:19:29 -0700 (PDT)
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 70/78] target/arm: Clear tail in gvec_fmul_idx_*,
- gvec_fmla_idx_*
-Date: Tue, 16 Jun 2020 09:15:39 -0500
-Message-Id: <20200616141547.24664-71-mdroth@linux.vnet.ibm.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200616141547.24664-1-mdroth@linux.vnet.ibm.com>
-References: <20200616141547.24664-1-mdroth@linux.vnet.ibm.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::344;
- envelope-from=flukshun@gmail.com; helo=mail-ot1-x344.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jlCme-0003V7-8Z
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 10:41:52 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:27988
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jlCmc-0002GH-Gv
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 10:41:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592318509;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=wqjHu/2lHBq4QZX10aPeXKkXqqTRlUWTOJp0b4aR8IY=;
+ b=XPvX4rIRLKixgmkQrJoA0ghKOBCppXq2m1ZrhYIZsBNCmmW63D88tPyihKsTE99XpFrnTl
+ /PUcR+X5OmZdQSd9BtvcpZETHQmiCpF2TAIfYX3yOC2LT501weAlxyJgqeCwIfEq/78xZk
+ soRG1qbkbfI05dpJ1aPrvNbQ/fHp0mw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-246-TCxR_i5NNMuocRf4ICTLkg-1; Tue, 16 Jun 2020 10:41:47 -0400
+X-MC-Unique: TCxR_i5NNMuocRf4ICTLkg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BB68394B2A;
+ Tue, 16 Jun 2020 14:41:46 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.110.66])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id BF4965C1D2;
+ Tue, 16 Jun 2020 14:41:39 +0000 (UTC)
+Date: Tue, 16 Jun 2020 15:41:35 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Lukas Straub <lukasstraub2@web.de>
+Subject: Re: [PATCH v4 3/4] chardev/char-socket.c: Add yank feature
+Message-ID: <20200616144135.GH550360@redhat.com>
+References: <cover.1590421341.git.lukasstraub2@web.de>
+ <f513f9d9f329ca3a87a6e0aabe2f66f0775c1d6f.1590421341.git.lukasstraub2@web.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <f513f9d9f329ca3a87a6e0aabe2f66f0775c1d6f.1590421341.git.lukasstraub2@web.de>
+User-Agent: Mutt/1.14.0 (2020-05-02)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=berrange@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 02:01:17
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,49 +95,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-stable@nongnu.org
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block <qemu-block@nongnu.org>,
+ Juan Quintela <quintela@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Richard Henderson <richard.henderson@linaro.org>
+On Mon, May 25, 2020 at 05:44:29PM +0200, Lukas Straub wrote:
+> Register a yank function to shutdown the socket on yank.
+> 
+> Signed-off-by: Lukas Straub <lukasstraub2@web.de>
+> ---
+>  Makefile.objs         |  1 +
+>  chardev/char-socket.c | 24 ++++++++++++++++++++++++
+>  2 files changed, 25 insertions(+)
 
-Must clear the tail for AdvSIMD when SVE is enabled.
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
 
-Fixes: ca40a6e6e39
-Cc: qemu-stable@nongnu.org
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20200513163245.17915-15-richard.henderson@linaro.org
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-(cherry picked from commit 525d9b6d42844e187211d25b69be8b378785bc24)
-Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
----
- target/arm/vec_helper.c | 2 ++
- 1 file changed, 2 insertions(+)
 
-diff --git a/target/arm/vec_helper.c b/target/arm/vec_helper.c
-index dedef62403..a9f40ac78a 100644
---- a/target/arm/vec_helper.c
-+++ b/target/arm/vec_helper.c
-@@ -737,6 +737,7 @@ void HELPER(NAME)(void *vd, void *vn, void *vm, void *stat, uint32_t desc) \
-             d[i + j] = TYPE##_mul(n[i + j], mm, stat);                     \
-         }                                                                  \
-     }                                                                      \
-+    clear_tail(d, oprsz, simd_maxsz(desc));                                \
- }
- 
- DO_MUL_IDX(gvec_fmul_idx_h, float16, H2)
-@@ -761,6 +762,7 @@ void HELPER(NAME)(void *vd, void *vn, void *vm, void *va,                  \
-                                      mm, a[i + j], 0, stat);               \
-         }                                                                  \
-     }                                                                      \
-+    clear_tail(d, oprsz, simd_maxsz(desc));                                \
- }
- 
- DO_FMLA_IDX(gvec_fmla_idx_h, float16, H2)
+Regards,
+Daniel
 -- 
-2.17.1
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
