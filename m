@@ -2,81 +2,82 @@ Return-Path: <SRS0=f7ls=75=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCA6AC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 21:01:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03B09C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 21:01:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AD5882082E
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 21:01:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD5882082E
+	by mail.kernel.org (Postfix) with ESMTPS id CCE312082E
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 21:01:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCE312082E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34402 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34572 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlIiK-0002TC-UL
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 17:01:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33776)
+	id 1jlIiO-0002a0-2V
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 17:01:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33738)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <stefanb@linux.vnet.ibm.com>)
- id 1jlIeJ-0003nC-Gj
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 16:57:39 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:62892
- helo=mx0a-001b2d01.pphosted.com)
+ id 1jlIeD-0003fi-Ti
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 16:57:33 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:21464)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <stefanb@linux.vnet.ibm.com>)
- id 1jlIeI-0003Dk-0X
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 16:57:39 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 05GKmCvu021219
- for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 16:57:26 -0400
+ id 1jlIeB-0003E4-1q
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 16:57:33 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 05GKmM6s114772
+ for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 16:57:29 -0400
 Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 31q23sx615-1
+ by mx0a-001b2d01.pphosted.com with ESMTP id 31q0rcgnsv-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 16:57:26 -0400
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05GKmEZD021379
- for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 16:57:25 -0400
-Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com
- [169.47.144.26])
- by mx0b-001b2d01.pphosted.com with ESMTP id 31q23sx610-1
+ for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 16:57:29 -0400
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05GKmNwn114929
+ for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 16:57:29 -0400
+Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com
+ [169.55.85.253])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 31q0rcgnsc-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 16 Jun 2020 16:57:25 -0400
-Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
- by ppma04wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05GKuGbB000711;
- Tue, 16 Jun 2020 20:57:25 GMT
-Received: from b03cxnp07029.gho.boulder.ibm.com
- (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
- by ppma04wdc.us.ibm.com with ESMTP id 31mpe8jk4w-1
+ Tue, 16 Jun 2020 16:57:29 -0400
+Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
+ by ppma01wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05GKtOTO009347;
+ Tue, 16 Jun 2020 20:57:28 GMT
+Received: from b03cxnp08026.gho.boulder.ibm.com
+ (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
+ by ppma01wdc.us.ibm.com with ESMTP id 31pf70wya9-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 16 Jun 2020 20:57:25 +0000
+ Tue, 16 Jun 2020 20:57:28 +0000
 Received: from b03ledav006.gho.boulder.ibm.com
  (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
- by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 05GKvOGd55968194
+ by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 05GKvPAT25624842
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 16 Jun 2020 20:57:24 GMT
+ Tue, 16 Jun 2020 20:57:25 GMT
 Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 505A1C605B;
- Tue, 16 Jun 2020 20:57:24 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 02666C605A;
+ Tue, 16 Jun 2020 20:57:27 +0000 (GMT)
 Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 9FB23C6055;
- Tue, 16 Jun 2020 20:57:23 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 3E2E4C6059;
+ Tue, 16 Jun 2020 20:57:26 +0000 (GMT)
 Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
  by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
- Tue, 16 Jun 2020 20:57:23 +0000 (GMT)
+ Tue, 16 Jun 2020 20:57:26 +0000 (GMT)
 From: Stefan Berger <stefanb@linux.vnet.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 0/8] tpm: Enable usage of TPM TIS with interrupts
-Date: Tue, 16 Jun 2020 16:57:13 -0400
-Message-Id: <20200616205721.1191408-1-stefanb@linux.vnet.ibm.com>
+Subject: [PATCH v3 3/8] tests: Temporarily ignore DSDT table differences
+Date: Tue, 16 Jun 2020 16:57:16 -0400
+Message-Id: <20200616205721.1191408-4-stefanb@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.24.1
+In-Reply-To: <20200616205721.1191408-1-stefanb@linux.vnet.ibm.com>
+References: <20200616205721.1191408-1-stefanb@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
@@ -84,16 +85,16 @@ X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
  definitions=2020-06-16_12:2020-06-16,
  2020-06-16 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=1
- cotscore=-2147483648 bulkscore=0 adultscore=0 mlxlogscore=372
- lowpriorityscore=0 spamscore=0 malwarescore=0 mlxscore=0
- priorityscore=1501 clxscore=1015 phishscore=0 impostorscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
+ mlxscore=0 malwarescore=0
+ phishscore=0 priorityscore=1501 mlxlogscore=999 adultscore=0
+ impostorscore=0 bulkscore=0 spamscore=0 clxscore=1015 suspectscore=1
+ lowpriorityscore=0 cotscore=-2147483648 classifier=spam adjust=0
+ reason=mlx scancount=1 engine=8.12.0-2004280000
  definitions=main-2006160144
-Received-SPF: none client-ip=148.163.158.5;
+Received-SPF: none client-ip=148.163.156.1;
  envelope-from=stefanb@linux.vnet.ibm.com; helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 16:57:26
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 16:57:28
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
 X-Spam_score_int: -35
 X-Spam_score: -3.6
 X-Spam_bar: ---
@@ -111,43 +112,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Berger <stefanb@linux.vnet.ibm.com>, eric.auger@redhat.com,
+Cc: Stefan Berger <stefanb@linux.vnet.ibm.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>, eric.auger@redhat.com,
  pbonzini@redhat.com, marcandre.lureau@redhat.com, philmd@redhat.com,
- mkedzier@redhat.com
+ mkedzier@redhat.com, Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This series of patches enables the usage of the TPM TIS with interrupts.
-We use the unused IRQ 13, which is also accepted by Windows.
+Ignore DSDT table differences before enabling IRQ support for TPM.
 
-    Stefan
+Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
+CC: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+---
+ tests/qtest/bios-tables-test-allowed-diff.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-v2->v3:
- - Extended series to disable IRQ for TIS on sysbus
-
-v1->v2:
- - Added updated DSDT
-
-Stefan Berger (8):
-  tpm_tis: Allow lowering of IRQ also when locality is not active
-  tpm: Extend TPMIfClass with get_irqnum() function
-  tests: Temporarily ignore DSDT table differences
-  tpm: Split TPM_TIS_IRQ into TPM_TIS_ISA_IRQ and TPM_TIS_SYSBUS_IRQ
-  acpi: Enable TPM IRQ
-  tests: Add updated DSDT
-  tpm: Guard irq related ops in case interrupts are disabled
-  tpm: Disable interrupt support for TIS on sysbus
-
- hw/i386/acpi-build.c         |  11 +++++------
- hw/tpm/tpm_tis_common.c      |  12 +++++++++---
- hw/tpm/tpm_tis_isa.c         |  17 ++++++++++++++---
- hw/tpm/tpm_tis_sysbus.c      |  12 +++++++++++-
- include/hw/acpi/tpm.h        |   3 ++-
- include/sysemu/tpm.h         |  12 ++++++++++++
- tests/data/acpi/q35/DSDT.tis | Bin 8357 -> 8360 bytes
- 7 files changed, 53 insertions(+), 14 deletions(-)
-
+diff --git a/tests/qtest/bios-tables-test-allowed-diff.h b/tests/qtest/bios-tables-test-allowed-diff.h
+index dfb8523c8b..bb4ce8967b 100644
+--- a/tests/qtest/bios-tables-test-allowed-diff.h
++++ b/tests/qtest/bios-tables-test-allowed-diff.h
+@@ -1 +1,2 @@
+ /* List of comma-separated changed AML files to ignore */
++"tests/data/acpi/q35/DSDT.tis",
 -- 
 2.24.1
 
