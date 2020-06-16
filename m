@@ -2,79 +2,88 @@ Return-Path: <SRS0=f7ls=75=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C51DC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 15:44:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D654C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 15:46:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2C70221475
-	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 15:44:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C70221475
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 120CA214DB
+	for <qemu-devel@archiver.kernel.org>; Tue, 16 Jun 2020 15:46:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H9XXDazR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 120CA214DB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41308 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43744 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlDlP-00078x-Fo
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 11:44:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49516)
+	id 1jlDnS-0008OI-ML
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 11:46:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50668)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jlDiW-00014K-EQ
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 11:41:40 -0400
-Received: from indium.canonical.com ([91.189.90.7]:50408)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jlDiU-0008KX-Nc
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 11:41:40 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jlDiQ-0008RB-2r
- for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 15:41:34 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 09DB62E8157
- for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 15:41:30 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jlDmM-0007jb-M9
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 11:45:38 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27711
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jlDmJ-0000oX-U1
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 11:45:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592322334;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=tKPQl7/IAT68akl9Ckfp/uPWqNuXCRIbQQxygkP4gKM=;
+ b=H9XXDazRE1U7FzSaHbHGU4rufwJyMyeBe7hEufj2FEiAVSsovyjpT2aev41p1dbwgUux0U
+ UYdJEhClgNpRLJkSBFbNaQpbOqD26YSqNXy+tQHJj+CfmWu9kiTGTXWV9XDr9x3CpCynQp
+ beNrZKI4+E1YO03AtWknNq56tUe0lqk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-290-OUhh_qsDMva4zQJIjKr9sQ-1; Tue, 16 Jun 2020 11:45:31 -0400
+X-MC-Unique: OUhh_qsDMva4zQJIjKr9sQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 02EA6EC1A5;
+ Tue, 16 Jun 2020 15:45:30 +0000 (UTC)
+Received: from gondolin (ovpn-112-222.ams2.redhat.com [10.36.112.222])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id F19A319C79;
+ Tue, 16 Jun 2020 15:45:28 +0000 (UTC)
+Date: Tue, 16 Jun 2020 17:45:26 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH] hw/arm/virt: Add 5.0 HW compat props
+Message-ID: <20200616174526.36e59545.cohuck@redhat.com>
+In-Reply-To: <20200616140803.25515-1-drjones@redhat.com>
+References: <20200616140803.25515-1-drjones@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 16 Jun 2020 15:31:46 -0000
-From: Bugs SysSec <1883728@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: bugs-syssec
-X-Launchpad-Bug-Reporter: Bugs SysSec (bugs-syssec)
-X-Launchpad-Bug-Modifier: Bugs SysSec (bugs-syssec)
-Message-Id: <159232150625.30008.14587531607819527800.malonedeb@chaenomeles.canonical.com>
-Subject: [Bug 1883728] [NEW] address_space_unmap: Assertion `mr != NULL'
- failed.
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="b190cebbf563f89e480a8b57f641753c8196bda0";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 9c03fe4f71e8855e9ffa80a688a0cf3fde705dfd
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 11:30:43
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=cohuck@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 02:45:54
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -83,64 +92,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1883728 <1883728@bugs.launchpad.net>
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+On Tue, 16 Jun 2020 16:08:03 +0200
+Andrew Jones <drjones@redhat.com> wrote:
 
-To reproduce run the QEMU with the following command line:
-```
-qemu-system-x86_64 -cdrom hypertrash_os_bios_crash.iso -nographic -m 100 -e=
-nable-kvm -device virtio-gpu-pci -device nec-usb-xhci -device usb-audio
-```
+Fixes: 541aaa1df80d ("hw: add compat machines for 5.1")
 
-QEMU Version:
-```
-# qemu-5.0.0
-$ ./configure --target-list=3Dx86_64-softmmu --enable-sanitizers; make
-$ x86_64-softmmu/qemu-system-x86_64 --version
-QEMU emulator version 5.0.0
-Copyright (c) 2003-2020 Fabrice Bellard and the QEMU Project developers
-```
+> Cc: Cornelia Huck <cohuck@redhat.com>
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
+> ---
+>  hw/arm/virt.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index caceb1e4a05f..8b6e6aa7b138 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -2375,6 +2375,7 @@ DEFINE_VIRT_MACHINE_AS_LATEST(5, 1)
+>  static void virt_machine_5_0_options(MachineClass *mc)
+>  {
+>      virt_machine_5_1_options(mc);
+> +    compat_props_add(mc->compat_props, hw_compat_5_0, hw_compat_5_0_len);
+>  }
+>  DEFINE_VIRT_MACHINE(5, 0)
+>  
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
-** Attachment added: "xhci_assert1.zip"
-   https://bugs.launchpad.net/bugs/1883728/+attachment/5384431/+files/xhci_=
-assert1.zip
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1883728
-
-Title:
-  address_space_unmap: Assertion `mr !=3D NULL' failed.
-
-Status in QEMU:
-  New
-
-Bug description:
-  To reproduce run the QEMU with the following command line:
-  ```
-  qemu-system-x86_64 -cdrom hypertrash_os_bios_crash.iso -nographic -m 100 =
--enable-kvm -device virtio-gpu-pci -device nec-usb-xhci -device usb-audio
-  ```
-
-  QEMU Version:
-  ```
-  # qemu-5.0.0
-  $ ./configure --target-list=3Dx86_64-softmmu --enable-sanitizers; make
-  $ x86_64-softmmu/qemu-system-x86_64 --version
-  QEMU emulator version 5.0.0
-  Copyright (c) 2003-2020 Fabrice Bellard and the QEMU Project developers
-  ```
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1883728/+subscriptions
 
