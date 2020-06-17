@@ -2,95 +2,89 @@ Return-Path: <SRS0=bzpH=76=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=BAD_ENC_HEADER,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1F4CC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 12:57:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75535C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 13:07:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7D0F2207DD
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 12:57:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3EDB220FC3
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 13:07:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="YDhpkufA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D0F2207DD
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=verbum.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y46WyVMo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3EDB220FC3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44992 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49010 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlXd4-0005DP-Qn
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 08:57:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40002)
+	id 1jlXmS-0000ng-FG
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 09:07:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43574)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <walters@verbum.org>)
- id 1jlXbr-0004KH-B4
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 08:56:07 -0400
-Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:34981)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <walters@verbum.org>)
- id 1jlXbp-0006q3-5H
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 08:56:06 -0400
-Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
- by mailout.west.internal (Postfix) with ESMTP id B4BD849A;
- Wed, 17 Jun 2020 08:55:57 -0400 (EDT)
-Received: from imap10 ([10.202.2.60])
- by compute1.internal (MEProxy); Wed, 17 Jun 2020 08:55:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
- messagingengine.com; h=cc:content-type:date:from:in-reply-to
- :message-id:mime-version:references:subject:to:x-me-proxy
- :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=mznKTb
- CZreUSjgX5s9/vWJMEdSMlAqHtC+pyn5mmeZU=; b=YDhpkufAvSeScIaiqMRP0l
- VhY+MmyLoerKUwAUGqPsAzI/66RLZJW51i+GH6INacXtfvJiqAWsBf2p/HRTlU47
- mlCF4W3D5DdorNUwUwYLOKTaLRqT1xWu8M4IAuHi27BqspCdl6aTbfHLElOn846A
- iEOKJU+4t3PdFVR/OstvCEMoDqXDXPou2EjZDUrqOLyi3mfRJq13EaFZxQC+9ud4
- SAuoq0sG9TkmMW4+S27+64TnmRayvOwcg6uOo0BzDWkZAAW2q5wZTYouS5Y7x/eh
- l87yGxGkIO6AerXlIDPfxtg7Zeii4wri7HD2dBtnqfofCnlBFV/S277cZdPxKjDg
- ==
-X-ME-Sender: <xms:3RLqXn2LbEo5DtU1nMQ1yYV75vqbtf8adCYMkYeoF-6Tyg2dHOQreQ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduhedrudejvddgheejucetufdoteggodetrfdotf
- fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
- uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
- cujfgurhepofgfggfkjghffffhvffutgesthdtredtreerjeenucfhrhhomhepfdevohhl
- ihhnucghrghlthgvrhhsfdcuoeifrghlthgvrhhssehvvghrsghumhdrohhrgheqnecugg
- ftrfgrthhtvghrnhepgfeugfehfeefudfhteffudeukeetueekudetjeegieekffelgfef
- vdetfeettdelnecuffhomhgrihhnpehlfihnrdhnvghtnecuvehluhhsthgvrhfuihiivg
- eptdenucfrrghrrghmpehmrghilhhfrhhomhepfigrlhhtvghrshesvhgvrhgsuhhmrdho
- rhhg
-X-ME-Proxy: <xmx:3RLqXmHOu3puJNnkMvhQEr5vAEHTfkEFgXvFd4VML0KtVflYT1VceQ>
- <xmx:3RLqXn5dLlQQPel7Hv0eAaJL15ieVMU4ZUTLGZmURtr-6aHR4N_PHQ>
- <xmx:3RLqXs1uyDh31g5A9dS2nFeRy-1-lA-Zzuxl9SQwZO1fkokT-hvuuA>
- <xmx:3RLqXmEZ1ocNp6PSABHFv15cv4iDH2AM2b9KzXJ06cQTPEmDJwLU6w>
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
- id 1FF7A2035A; Wed, 17 Jun 2020 08:55:57 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.3.0-dev0-529-g3ee424a-fm-20200611.001-g3ee424a1
-Mime-Version: 1.0
-Message-Id: <add0c8d8-7214-4976-83f1-b06071682837@www.fastmail.com>
-In-Reply-To: <20200617125014.GC1728005@stefanha-x1.localdomain>
-References: <348d4774-bd5f-4832-bd7e-a21491fdac8d@www.fastmail.com>
- <20200602095547.GD9852@stefanha-x1.localdomain>
- <7b355ffb-2b96-4984-a198-ac40a07c422e@www.fastmail.com>
- <20200617125014.GC1728005@stefanha-x1.localdomain>
-Date: Wed, 17 Jun 2020 08:55:36 -0400
-From: "Colin Walters" <walters@verbum.org>
-To: "Stefan Hajnoczi" <stefanha@gmail.com>
-Subject: =?UTF-8?Q?Re:_[PATCH]_virtiofsd:_Use_clone()_and_not_unshare(),
- __support?= =?UTF-8?Q?_non-root?=
-Content-Type: text/plain
-Received-SPF: none client-ip=64.147.123.25; envelope-from=walters@verbum.org;
- helo=wout2-smtp.messagingengine.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/17 08:55:58
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1jlXlt-0000MU-Ut
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 09:06:29 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:51872
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1jlXlr-0000GS-Mf
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 09:06:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592399185;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=2zy1H0UrXbG3wWrhUjFtxzG/Gppf7p/8RfiZdiOnJPc=;
+ b=Y46WyVMoqtYIpcYisv25/3eCuM60TcvX2KOiq3dF1MqzcV3+fwsROMH2WEPuA90VzwF2vG
+ zcOCzhKvXT7JyYx2ulWnxGlImMFTPI7OVhH4ptO/wAPf/qjfMHjCaeAZ258P89Jk9uPV+l
+ uUrjg5G5hhV3qRE/3gV+r7yI74RCLJU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-21-aJP3_NuYOg6FCxPpT7cVQQ-1; Wed, 17 Jun 2020 09:06:24 -0400
+X-MC-Unique: aJP3_NuYOg6FCxPpT7cVQQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A1A1E1018481;
+ Wed, 17 Jun 2020 13:06:22 +0000 (UTC)
+Received: from x1.home (ovpn-112-195.phx2.redhat.com [10.3.112.195])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E0FA07BA1D;
+ Wed, 17 Jun 2020 13:06:21 +0000 (UTC)
+Date: Wed, 17 Jun 2020 07:06:21 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: [PATCH 0/6] Add various undefined MMIO r/w functions
+Message-ID: <20200617070621.29051d4b@x1.home>
+In-Reply-To: <20200617063956.GA12597@umbus.fritz.box>
+References: <20200617053934.122642-1-ppandit@redhat.com>
+ <20200617063956.GA12597@umbus.fritz.box>
+Organization: Red Hat
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=alex.williamson@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.81;
+ envelope-from=alex.williamson@redhat.com; helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/17 01:42:42
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -25
-X-Spam_score: -2.6
-X-Spam_bar: --
-X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H3=-0.01,
- RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_PASS=-0.001, SPF_NONE=0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,24 +97,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Prasad J Pandit <pjp@fedoraproject.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, P J P <ppandit@redhat.com>,
+ Lei Sun <slei.casper@gmail.com>,
+ =?UTF-8?B?SGVydsOp?= Poussineau <hpoussin@reactos.org>,
+ Joel Stanley <joel@jms.id.au>,
+ Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Wed, 17 Jun 2020 16:39:56 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
+> On Wed, Jun 17, 2020 at 11:09:27AM +0530, P J P wrote:
+> > From: Prasad J Pandit <pjp@fedoraproject.org>
+> > 
+> > Hello,
+> > 
+> > This series adds various undefined MMIO read/write functions
+> > to avoid potential guest crash via a NULL pointer dereference.  
+> 
+> Hrm.  If this is such a common problem, maybe we should just add a
+> NULL check in the common paths.
 
-On Wed, Jun 17, 2020, at 8:50 AM, Stefan Hajnoczi wrote:
++1, clearly the behavior is already expected.  Thanks,
 
-> Something along these lines should work. Hopefully seccomp can be
-> retained. It would also be necessary to check how not having the shared
-> directory as / in the mount namespace affects functionality. For one,
-> I'm pretty sure symlink escapes and similar path traversals outside the
-> shared directory will be possible since virtiofsd normally relies on /
-> as protection.
+Alex
 
-Yes, though two points:
-
-- As I said, I don't care about that for my use case; the operating system we're testing is going to e.g. run on bare metal hosting workloads itself, so if it's malicious we have already lost (reliability against *accidental* damage is always nice though, like a stray rm -rf in some test script walking into the host)
-- Probably the best long term fix would be to use https://lwn.net/Articles/796868/ anyways
 
