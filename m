@@ -2,87 +2,133 @@ Return-Path: <SRS0=bzpH=76=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5D8EC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 16:07:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CC2FC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 16:08:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9B4842065F
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 16:07:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B4842065F
+	by mail.kernel.org (Postfix) with ESMTPS id 12DAF2065F
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 16:08:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12DAF2065F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36300 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37640 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlabN-0005jx-TH
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 12:07:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35856)
+	id 1jlabs-0007Yt-Bf
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 12:08:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36168)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <borntraeger@de.ibm.com>)
- id 1jlaZr-0003bs-Fb; Wed, 17 Jun 2020 12:06:15 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:44544
+ id 1jlaax-00055L-Mq; Wed, 17 Jun 2020 12:07:23 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:14578
  helo=mx0a-001b2d01.pphosted.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <borntraeger@de.ibm.com>)
- id 1jlaZp-0007x4-Gm; Wed, 17 Jun 2020 12:06:15 -0400
+ id 1jlaav-00082p-Pc; Wed, 17 Jun 2020 12:07:23 -0400
 Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
  by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 05HG3J4U128160; Wed, 17 Jun 2020 12:06:10 -0400
+ 05HG3Jlh128169; Wed, 17 Jun 2020 12:07:20 -0400
 Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 31q6j5c0c1-1
+ by mx0b-001b2d01.pphosted.com with ESMTP id 31q6j5c1mp-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 17 Jun 2020 12:06:10 -0400
+ Wed, 17 Jun 2020 12:07:20 -0400
 Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05HG3STi129272;
- Wed, 17 Jun 2020 12:06:10 -0400
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com
- [159.122.73.70])
- by mx0b-001b2d01.pphosted.com with ESMTP id 31q6j5c0ay-1
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05HG3Pqo128834;
+ Wed, 17 Jun 2020 12:07:20 -0400
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com
+ [149.81.74.108])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 31q6j5c1kk-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 17 Jun 2020 12:06:10 -0400
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
- by ppma01fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05HG01fW015080;
- Wed, 17 Jun 2020 16:06:08 GMT
+ Wed, 17 Jun 2020 12:07:19 -0400
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+ by ppma05fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05HG1Jm5015134;
+ Wed, 17 Jun 2020 16:07:18 GMT
 Received: from b06cxnps3075.portsmouth.uk.ibm.com
  (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
- by ppma01fra.de.ibm.com with ESMTP id 31q6chrhmf-1
+ by ppma05fra.de.ibm.com with ESMTP id 31q6c8rhk0-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 17 Jun 2020 16:06:08 +0000
+ Wed, 17 Jun 2020 16:07:18 +0000
 Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com
  [9.149.105.232])
  by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 05HG65aI43122802
+ 05HG7Fs764159814
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 17 Jun 2020 16:06:05 GMT
+ Wed, 17 Jun 2020 16:07:15 GMT
 Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 5074D5204E;
- Wed, 17 Jun 2020 16:06:05 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
- by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTPS id 3CDCF52050;
- Wed, 17 Jun 2020 16:06:05 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 25651)
- id EFAC8E0428; Wed, 17 Jun 2020 18:06:04 +0200 (CEST)
+ by IMSVA (Postfix) with ESMTP id 386DA52052;
+ Wed, 17 Jun 2020 16:07:15 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.145.185.179])
+ by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id AD7F052054;
+ Wed, 17 Jun 2020 16:07:14 +0000 (GMT)
+Subject: Re: [PATCH 1/1] docs/s390x: fix vfio-ap device_del description
+To: Tony Krowiak <akrowiak@linux.ibm.com>
+References: <20200617160604.5593-1-borntraeger@de.ibm.com>
 From: Christian Borntraeger <borntraeger@de.ibm.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: [PATCH 1/1] docs/s390x: fix vfio-ap device_del description
-Date: Wed, 17 Jun 2020 18:06:04 +0200
-Message-Id: <20200617160604.5593-1-borntraeger@de.ibm.com>
-X-Mailer: git-send-email 2.25.4
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
+Message-ID: <1ca5b584-951b-03a1-afc9-fca1520ab905@de.ibm.com>
+Date: Wed, 17 Jun 2020 18:07:14 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200617160604.5593-1-borntraeger@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
  definitions=2020-06-17_06:2020-06-17,
  2020-06-17 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
  malwarescore=0 phishscore=0
- lowpriorityscore=0 mlxlogscore=664 bulkscore=0 impostorscore=0
- adultscore=0 mlxscore=0 suspectscore=0 clxscore=1011 priorityscore=1501
+ lowpriorityscore=0 mlxlogscore=737 bulkscore=0 impostorscore=0
+ adultscore=0 mlxscore=0 suspectscore=0 clxscore=1015 priorityscore=1501
  cotscore=-2147483648 spamscore=0 classifier=spam adjust=0 reason=mlx
  scancount=1 engine=8.12.0-2004280000 definitions=main-2006170127
 Received-SPF: pass client-ip=148.163.158.5;
@@ -107,53 +153,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ qemu-devel <qemu-devel@nongnu.org>, Halil Pasic <pasic@linux.ibm.com>,
  qemu-s390x <qemu-s390x@nongnu.org>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-device_del requires an id and not a sysfsfile.
+wrong Person on to, I wanted to send this to Tony.
 
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
----
- docs/system/s390x/vfio-ap.rst | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/docs/system/s390x/vfio-ap.rst b/docs/system/s390x/vfio-ap.rst
-index 3cd84179a2df..f441df69edde 100644
---- a/docs/system/s390x/vfio-ap.rst
-+++ b/docs/system/s390x/vfio-ap.rst
-@@ -606,10 +606,11 @@ action.
- 
- To hot plug a vfio-ap device, use the QEMU ``device_add`` command::
- 
--    (qemu) device_add vfio-ap,sysfsdev="$path-to-mdev"
-+    (qemu) device_add vfio-ap,sysfsdev="$path-to-mdev",id="$id"
- 
- Where the ``$path-to-mdev`` value specifies the absolute path to a mediated
- device to which AP resources to be used by the guest have been assigned.
-+``$id`` is the name value for the optional id parameter.
- 
- Note that on Linux guests, the AP devices will be created in the
- ``/sys/bus/ap/devices`` directory when the AP bus subsequently performs its periodic
-@@ -632,10 +633,9 @@ or a prior hot plug action.
- 
- To hot unplug a vfio-ap device, use the QEMU ``device_del`` command::
- 
--    (qemu) device_del vfio-ap,sysfsdev="$path-to-mdev"
-+    (qemu) device_del "id"
- 
--Where ``$path-to-mdev`` is the same as the path specified when the vfio-ap
--device was attached to the virtual machine's ap-bus.
-+Where ``$id`` is the same id that was specified at device creation.
- 
- On a Linux guest, the AP devices will be removed from the ``/sys/bus/ap/devices``
- directory on the guest when the AP bus subsequently performs its periodic scan,
--- 
-2.25.4
-
+On 17.06.20 18:06, Christian Borntraeger wrote:
+> device_del requires an id and not a sysfsfile.
+> 
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> ---
+>  docs/system/s390x/vfio-ap.rst | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/docs/system/s390x/vfio-ap.rst b/docs/system/s390x/vfio-ap.rst
+> index 3cd84179a2df..f441df69edde 100644
+> --- a/docs/system/s390x/vfio-ap.rst
+> +++ b/docs/system/s390x/vfio-ap.rst
+> @@ -606,10 +606,11 @@ action.
+>  
+>  To hot plug a vfio-ap device, use the QEMU ``device_add`` command::
+>  
+> -    (qemu) device_add vfio-ap,sysfsdev="$path-to-mdev"
+> +    (qemu) device_add vfio-ap,sysfsdev="$path-to-mdev",id="$id"
+>  
+>  Where the ``$path-to-mdev`` value specifies the absolute path to a mediated
+>  device to which AP resources to be used by the guest have been assigned.
+> +``$id`` is the name value for the optional id parameter.
+>  
+>  Note that on Linux guests, the AP devices will be created in the
+>  ``/sys/bus/ap/devices`` directory when the AP bus subsequently performs its periodic
+> @@ -632,10 +633,9 @@ or a prior hot plug action.
+>  
+>  To hot unplug a vfio-ap device, use the QEMU ``device_del`` command::
+>  
+> -    (qemu) device_del vfio-ap,sysfsdev="$path-to-mdev"
+> +    (qemu) device_del "id"
+>  
+> -Where ``$path-to-mdev`` is the same as the path specified when the vfio-ap
+> -device was attached to the virtual machine's ap-bus.
+> +Where ``$id`` is the same id that was specified at device creation.
+>  
+>  On a Linux guest, the AP devices will be removed from the ``/sys/bus/ap/devices``
+>  directory on the guest when the AP bus subsequently performs its periodic scan,
+> 
 
