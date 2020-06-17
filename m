@@ -2,97 +2,73 @@ Return-Path: <SRS0=bzpH=76=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.4 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84567C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 07:44:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0809C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 07:44:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4F97C21475
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 07:44:14 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BrNiMZnT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F97C21475
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B72FA21475
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 07:44:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B72FA21475
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54714 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55976 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlSk1-0004MI-Ji
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 03:44:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44420)
+	id 1jlSkG-0004sp-2F
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 03:44:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44206)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mlureau@redhat.com>)
- id 1jlSgt-0007s5-Kb
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 03:40:59 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:20426
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mlureau@redhat.com>)
- id 1jlSgr-0005LM-Oj
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 03:40:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592379656;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Zi3c1CLyzhm/hFW/MAE40l5DhuZUVhVzINXpHZciyOc=;
- b=BrNiMZnTlQDa91aOH9Tq8wfKl25qZuLN6oyPcSRefINMe8gDkqnKiY5Kcal0f705cXc/cq
- wEGDRe6UJjyFyndsncRdy/OVi8w0Jj9E16lBw6j07+5sukglqt2dTKlEFL7JFwS0veWHDK
- OXKh2xgkQMM9R9FsUT3ZCSs64qAlgf0=
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
- [209.85.166.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-259-qy3UmzXkNeaoJ6DtrxwxUQ-1; Wed, 17 Jun 2020 03:40:55 -0400
-X-MC-Unique: qy3UmzXkNeaoJ6DtrxwxUQ-1
-Received: by mail-il1-f197.google.com with SMTP id v14so910499ilo.19
- for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 00:40:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=Zi3c1CLyzhm/hFW/MAE40l5DhuZUVhVzINXpHZciyOc=;
- b=jaQjsVPorP34/M6dHW1p5phE1cq+9ypwlkGSGTu78tWIXCX5giv9u8G53nl2SbWbOz
- BR7dc5mupULjOtshJI4DXCTefCVTMprJsuO1KboYXXFX/9RrokFIxQmwkASsHLqEFSP/
- hnmdA+/nmbwcixJMUnhBhCfT4y9jSd17sc7YYYznJ4UErVmdouQtcb48KBGhLXSWIhLs
- kxBApGXHajds+gp7txYZMHumPlorgGM1+bX4lSmzR/X438kHZLGRcxIYeDNthbb03gLM
- RLebNJ8o1bJuZu+Ro6KzlC/XiPCVzBCpCH7C6ivtfesxgw5Vht7XpiONEraK8VswwX7q
- Wwxw==
-X-Gm-Message-State: AOAM531n/1SjQxxSldda0sGFdcuQdzbBkpmQjNP5dlOA24V4cfUsab7G
- SfqWOWvVC5QMfm+Nnp9lqN3XAaKTDP1YcbHQ2M+FgRRjm21hpw9vvI03XQ/n7AEzVUgM82wMwba
- JWzPaGKBCUJ000jjS2FeC+M6h4lmkfM4=
-X-Received: by 2002:a5e:de03:: with SMTP id e3mr7226786iok.0.1592379654893;
- Wed, 17 Jun 2020 00:40:54 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxmfiWcCE7JhLBNyN0pK+ZaDYn0FBQ5rOPlEczs4xvbnM6reiCxBmPI6bQ+gvZdBgE1Ieh99fdSpmFKiG5v168=
-X-Received: by 2002:a5e:de03:: with SMTP id e3mr7226773iok.0.1592379654662;
- Wed, 17 Jun 2020 00:40:54 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jlSg4-0006X5-Dc
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 03:40:09 -0400
+Received: from 10.mo5.mail-out.ovh.net ([46.105.52.148]:41338)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jlSg1-0004w0-LE
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 03:40:08 -0400
+Received: from player732.ha.ovh.net (unknown [10.108.42.145])
+ by mo5.mail-out.ovh.net (Postfix) with ESMTP id B463E284C45
+ for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 09:40:02 +0200 (CEST)
+Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
+ (Authenticated sender: clg@kaod.org)
+ by player732.ha.ovh.net (Postfix) with ESMTPSA id 0B5DB135614FC;
+ Wed, 17 Jun 2020 07:39:53 +0000 (UTC)
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-97G00226115da8-341e-42d1-a4fb-ea711af0f1cf,ABECD89738EEB0C75E5395B338997A57DB3A3EEE)
+ smtp.auth=clg@kaod.org
+Subject: Re: [PATCH v2] hw/misc/pca9552: Trace LED On/Off events
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org
+References: <20200617064734.26956-1-f4bug@amsat.org>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <46689112-c5cc-0cac-fc93-0bfb57f404fc@kaod.org>
+Date: Wed, 17 Jun 2020 09:39:51 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-References: <20200616205721.1191408-1-stefanb@linux.vnet.ibm.com>
- <20200616205721.1191408-7-stefanb@linux.vnet.ibm.com>
-In-Reply-To: <20200616205721.1191408-7-stefanb@linux.vnet.ibm.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Wed, 17 Jun 2020 11:40:43 +0400
-Message-ID: <CAMxuvawf+Nmw5v0p7r9ncMFOm+FeB=xFpEd8awqcHNj07M7FBw@mail.gmail.com>
-Subject: Re: [PATCH v3 6/8] tests: Add updated DSDT
-To: Stefan Berger <stefanb@linux.vnet.ibm.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=mlureau@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/17 01:42:42
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200617064734.26956-1-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Ovh-Tracer-Id: 14470628553968421828
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedrudejuddguddvgecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgsehtkeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepgeeihfekfeduiefhhfdvleduheduleekgedtieelgfehfffhveeikeduhfffgeehnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucfkpheptddrtddrtddrtddpkedvrdeigedrvdehtddrudejtdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejfedvrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
+Received-SPF: pass client-ip=46.105.52.148; envelope-from=clg@kaod.org;
+ helo=10.mo5.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/17 03:40:03
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,80 +81,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
- Eric Auger <eric.auger@redhat.com>, "Bonzini, Paolo" <pbonzini@redhat.com>,
- Philippe Mathieu Daude <philmd@redhat.com>,
- Marek Kedzierski <mkedzier@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jeffery <andrew@aj.id.au>,
+ Joaquin de Andres <me@xcancerberox.com.ar>,
+ Esteban Bosse <estebanbosse@gmail.com>, qemu-arm@nongnu.org,
+ Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jun 17, 2020 at 12:57 AM Stefan Berger
-<stefanb@linux.vnet.ibm.com> wrote:
->
-> Add the updated DSDT following the interrupt enablement.
->
-> @@ -5,13 +5,13 @@
->   *
->   * Disassembling to symbolic ASL+ operators
->   *
-> - * Disassembly of tests/data/acpi/q35/DSDT.tis, Mon Jun 15 09:57:05 2020
-> + * Disassembly of /tmp/aml-Y77YL0, Mon Jun 15 09:57:05 2020
->   *
->   * Original Table Header:
->   *     Signature        "DSDT"
-> - *     Length           0x000020A5 (8357)
-> + *     Length           0x000020A8 (8360)
->   *     Revision         0x01 **** 32-bit table (V1), no 64-bit math supp=
-ort
-> - *     Checksum         0xAD
-> + *     Checksum         0x77
->   *     OEM ID           "BOCHS "
->   *     OEM Table ID     "BXPCDSDT"
->   *     OEM Revision     0x00000001 (1)
-> @@ -3162,6 +3162,8 @@
->                          0xFED40000,         // Address Base
->                          0x00005000,         // Address Length
->                          )
-> +                    IRQNoFlags ()
-> +                        {13}
->                  })
->                  OperationRegion (TPP2, SystemMemory, 0xFED45100, 0x5A)
->                  Field (TPP2, AnyAcc, NoLock, Preserve)
-> **
->
-> Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
-> CC: Michael S. Tsirkin <mst@redhat.com>
+On 6/17/20 8:47 AM, Philippe Mathieu-Daudé wrote:
+> Example booting obmc-phosphor-image:
+> 
+>   $ qemu-system-arm -M witherspoon-bmc -trace pca\*
+>   26033@1592376001.873828:pca9552_led_state 0x5594a9f57560 LEDs [........ ........]
+>   26033@1592376001.874169:pca9552_led_state 0x5594a9f57560 LEDs [........ ........]
+>   26033@1592376001.874348:pca9552_led_state 0x5594a9f57560 LEDs [........ ........]
+>   26033@1592376001.874514:pca9552_led_state 0x5594a9f57560 LEDs [........ ........]
+>   26033@1592376001.879601:pca9552_led_state 0x5594a9f57560 LEDs [........ .......*]
+>   26033@1592376001.880507:pca9552_led_state 0x5594a9f57560 LEDs [........ ......**]
+>   26033@1592376001.880885:pca9552_led_state 0x5594a9f57560 LEDs [........ .....***]
+>   26033@1592376001.881228:pca9552_led_state 0x5594a9f57560 LEDs [........ ....****]
+>   26033@1592376001.881601:pca9552_led_state 0x5594a9f57560 LEDs [..*..... ....****]
+>   26033@1592376001.881952:pca9552_led_state 0x5594a9f57560 LEDs [.**..... ....****]
+>   26033@1592376001.882299:pca9552_led_state 0x5594a9f57560 LEDs [***..... ....****]
+>   26033@1592376065.090910:pca9552_led_state 0x5594a9f57560 LEDs [*.*..... ....****]
+>   26033@1592376065.600649:pca9552_led_state 0x5594a9f57560 LEDs [***..... ....****]
+>   26033@1592376066.110565:pca9552_led_state 0x5594a9f57560 LEDs [*.*..... ....****]
+>   26033@1592376066.620390:pca9552_led_state 0x5594a9f57560 LEDs [***..... ....****]
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+It looks better but the ordering is wrong.
 
+> Suggested-by: Cédric Le Goater <clg@kaod.org>
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 > ---
->  tests/data/acpi/q35/DSDT.tis                | Bin 8357 -> 8360 bytes
->  tests/qtest/bios-tables-test-allowed-diff.h |   1 -
->  2 files changed, 1 deletion(-)
->
-> diff --git a/tests/data/acpi/q35/DSDT.tis b/tests/data/acpi/q35/DSDT.tis
-> index 56b6fb0c3298517d080e38fea05a748b9f1dba54..3f9db960aa05d399fa7f8449e=
-6db688788211832 100644
-> GIT binary patch
-> delta 64
-> zcmZ4LxWbXkCD<iog#rTuWBEp|KeC)oS~2m#PVoX>llkS`nVeK7N60A%iEs(FaWXJ6
-> UFkJb^5Wv8o#GtUbT~3Y(068!Z;Q#;t
->
-> delta 61
-> zcmZ4CxYUu$CD<iosR9E7<Jyf}e`GoRHDls~o#F-DC-cj>Gx@7bj*wH}7v$n=3D<78lD
-> RV7T&+A%KBlbC;YP695=3D#58(g+
->
-> diff --git a/tests/qtest/bios-tables-test-allowed-diff.h b/tests/qtest/bi=
-os-tables-test-allowed-diff.h
-> index bb4ce8967b..dfb8523c8b 100644
-> --- a/tests/qtest/bios-tables-test-allowed-diff.h
-> +++ b/tests/qtest/bios-tables-test-allowed-diff.h
-> @@ -1,2 +1 @@
->  /* List of comma-separated changed AML files to ignore */
-> -"tests/data/acpi/q35/DSDT.tis",
-> --
-> 2.24.1
->
+>  hw/misc/pca9552.c    | 18 ++++++++++++++++++
+>  hw/misc/trace-events |  3 +++
+>  2 files changed, 21 insertions(+)
+> 
+> diff --git a/hw/misc/pca9552.c b/hw/misc/pca9552.c
+> index cac729e35a..693f6c3b24 100644
+> --- a/hw/misc/pca9552.c
+> +++ b/hw/misc/pca9552.c
+> @@ -17,6 +17,7 @@
+>  #include "migration/vmstate.h"
+>  #include "qapi/error.h"
+>  #include "qapi/visitor.h"
+> +#include "trace.h"
+>  
+>  #define PCA9552_LED_ON   0x0
+>  #define PCA9552_LED_OFF  0x1
+> @@ -95,6 +96,23 @@ static void pca9552_write(PCA9552State *s, uint8_t reg, uint8_t data)
+>      case PCA9552_LS3:
+>          s->regs[reg] = data;
+>          pca9552_update_pin_input(s);
+> +        if (trace_event_get_state_backends(TRACE_PCA9552_LED_STATE)) {
+> +            char buf[2][9];
+> +
+> +            for (int i = 0; i < 2; i++) {
+> +                uint8_t val = s->regs[PCA9552_INPUT0 + i];
+> +                sprintf(buf[i], "%c%c%c%c%c%c%c%c",
+> +                        val & 0x80 ? '*' : '.',
+> +                        val & 0x40 ? '*' : '.',
+> +                        val & 0x20 ? '*' : '.',
+> +                        val & 0x10 ? '*' : '.',
+> +                        val & 0x08 ? '*' : '.',
+> +                        val & 0x04 ? '*' : '.',
+> +                        val & 0x02 ? '*' : '.',
+> +                        val & 0x01 ? '*' : '.');
+> +            }
+> +            trace_pca9552_led_state(s, buf[1], buf[0]);
+> +        }
+>          break;
+
+or something like this : 
+
+ static void pca9552_update_pin_input(PCA9552State *s)
+ {
+     int i;
++    char state[s->nr_leds + 1];
+ 
+     for (i = 0; i < s->nr_leds; i++) {
+         uint8_t input_reg = PCA9552_INPUT0 + (i / 8);
+@@ -45,9 +47,11 @@ static void pca9552_update_pin_input(PCA
+         switch (config) {
+         case PCA9552_LED_ON:
+             s->regs[input_reg] |= 1 << input_shift;
++            state[i] = '*';
+             break;
+         case PCA9552_LED_OFF:
+             s->regs[input_reg] &= ~(1 << input_shift);
++            state[i] = '.';
+             break;
+         case PCA9552_LED_PWM0:
+         case PCA9552_LED_PWM1:
+@@ -56,6 +60,9 @@ static void pca9552_update_pin_input(PCA
+             break;
+         }
+     }
++    state[i] = 0;
++
++    trace_pca9552_led_state(s, state);
+ }
+
+
+
+The pin usage is described in the witherspoon DTS : 
+
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/arch/arm/boot/dts/aspeed-bmc-opp-witherspoon.dts?id=b1f9be9392f0#n78
+
+The front-power led is blinking. I suppose it means the BMC is on but not the host.￼
+
+
+Cheers,
+
+C. 
+
+>  
+>      case PCA9552_INPUT0:
+> diff --git a/hw/misc/trace-events b/hw/misc/trace-events
+> index 5561746866..21e52f192d 100644
+> --- a/hw/misc/trace-events
+> +++ b/hw/misc/trace-events
+> @@ -206,3 +206,6 @@ via1_rtc_cmd_pram_sect_write(int sector, int offset, int addr, int value) "secto
+>  # grlib_ahb_apb_pnp.c
+>  grlib_ahb_pnp_read(uint64_t addr, uint32_t value) "AHB PnP read addr:0x%03"PRIx64" data:0x%08x"
+>  grlib_apb_pnp_read(uint64_t addr, uint32_t value) "APB PnP read addr:0x%03"PRIx64" data:0x%08x"
+> +
+> +# pca9552.c
+> +pca9552_led_state(void *object, const char *bufhi, const char *buflo) "%p LEDs [%s %s]"
+> 
 
 
