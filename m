@@ -2,43 +2,42 @@ Return-Path: <SRS0=bzpH=76=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB24EC433E0
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B5B4C433DF
 	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 10:28:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8428920CC7
+	by mail.kernel.org (Postfix) with ESMTPS id 6F7EC208B3
 	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 10:28:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8428920CC7
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F7EC208B3
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58458 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58460 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlVIY-0006BO-Pc
+	id 1jlVIY-0006BP-IT
 	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 06:28:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54434)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54436)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <root@localhost>)
- id 1jlVGr-0004Hz-Ah; Wed, 17 Jun 2020 06:26:17 -0400
-Received: from [114.255.249.163] (port=49820 helo=localhost)
+ id 1jlVGr-0004IP-F7; Wed, 17 Jun 2020 06:26:17 -0400
+Received: from [114.255.249.163] (port=9998 helo=localhost)
  by eggs.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <root@localhost>)
- id 1jlVGo-0007Oh-G5; Wed, 17 Jun 2020 06:26:17 -0400
+ id 1jlVGo-0007Oi-E3; Wed, 17 Jun 2020 06:26:17 -0400
 Received: by localhost (Postfix, from userid 0)
- id 1939F1415E5; Wed, 17 Jun 2020 18:20:24 +0800 (CST)
+ id 0EB451415D9; Wed, 17 Jun 2020 18:20:24 +0800 (CST)
 From: Lin Ma <lma@suse.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v2 2/3] block: Add GET LBA STATUS support
-Date: Wed, 17 Jun 2020 18:20:18 +0800
-Message-Id: <20200617102019.29652-3-lma@suse.com>
+Subject: [PATCH v2 0/3] Add Support for GET LBA STATUS 16 command in scsi
+ emulation
+Date: Wed, 17 Jun 2020 18:20:16 +0800
+Message-Id: <20200617102019.29652-1-lma@suse.com>
 X-Mailer: git-send-email 2.26.0
-In-Reply-To: <20200617102019.29652-1-lma@suse.com>
-References: <20200617102019.29652-1-lma@suse.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Host-Lookup-Failed: Reverse DNS lookup failed for 114.255.249.163 (failed)
@@ -71,74 +70,45 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Lin Ma <lma@suse.com>
----
- block/block-backend.c          | 38 ++++++++++++++++++++++++++++++++++
- include/sysemu/block-backend.h |  2 ++
- 2 files changed, 40 insertions(+)
+v2->v1:
+Follow Claudio's suggestions and the docker test result, Fix the dereferencing
+'void *' pointer issues and the coding style issues.
 
-diff --git a/block/block-backend.c b/block/block-backend.c
-index 6936b25c83..6d08dd5e0d 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -1650,6 +1650,44 @@ int blk_pdiscard(BlockBackend *blk, int64_t offset, int bytes)
-     return blk_prw(blk, offset, NULL, bytes, blk_pdiscard_entry, 0);
- }
- 
-+static int coroutine_fn
-+blk_do_get_lba_status(BlockBackend *blk, int64_t offset, int bytes,
-+                      uint32_t *num_blocks, uint32_t *is_deallocated)
-+{
-+    int ret;
-+
-+    blk_wait_while_drained(blk);
-+
-+    ret = blk_check_byte_request(blk, offset, bytes);
-+    if (ret < 0) {
-+        return ret;
-+    }
-+
-+    return bdrv_co_get_lba_status(blk->root, offset, bytes, num_blocks,
-+                                  is_deallocated);
-+}
-+
-+static void blk_aio_get_lba_status_entry(void *opaque)
-+{
-+    BlkAioEmAIOCB *acb = opaque;
-+    BlkRwCo *rwco = &acb->rwco;
-+
-+    void *data = acb->common.opaque;
-+    uint32_t *num_blocks = (uint32_t *)data;
-+    uint32_t *is_deallocated = (uint32_t *)(data + sizeof(uint32_t));
-+
-+    rwco->ret = blk_do_get_lba_status(rwco->blk, rwco->offset, acb->bytes,
-+                                      num_blocks, is_deallocated);
-+    blk_aio_complete(acb);
-+}
-+
-+BlockAIOCB *blk_aio_get_lba_status(BlockBackend *blk, int64_t offset, int bytes,
-+                                   BlockCompletionFunc *cb, void *opaque)
-+{
-+    return blk_aio_prwv(blk, offset, bytes, NULL, blk_aio_get_lba_status_entry,
-+                        0, cb, opaque);
-+}
-+
- /* To be called between exactly one pair of blk_inc/dec_in_flight() */
- static int coroutine_fn blk_do_flush(BlockBackend *blk)
- {
-diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backend.h
-index 8203d7f6f9..cd527ec0c9 100644
---- a/include/sysemu/block-backend.h
-+++ b/include/sysemu/block-backend.h
-@@ -171,6 +171,8 @@ BlockAIOCB *blk_aio_flush(BlockBackend *blk,
-                           BlockCompletionFunc *cb, void *opaque);
- BlockAIOCB *blk_aio_pdiscard(BlockBackend *blk, int64_t offset, int bytes,
-                              BlockCompletionFunc *cb, void *opaque);
-+BlockAIOCB *blk_aio_get_lba_status(BlockBackend *blk, int64_t offset, int bytes,
-+                                   BlockCompletionFunc *cb, void *opaque);
- void blk_aio_cancel(BlockAIOCB *acb);
- void blk_aio_cancel_async(BlockAIOCB *acb);
- int blk_ioctl(BlockBackend *blk, unsigned long int req, void *buf);
+
+In this current design, The GET LBA STATUS parameter data only contains
+an eight-byte header + one LBA status descriptor.
+
+How to test:
+host:~ # qemu-system-x86_64 \
+...
+-drive file=/vm0/disk0.raw,format=raw,if=none,id=drive0,discard=unmap \
+-device scsi-hd,id=scsi0,drive=drive0 \
+...
+
+
+guest:~ # dd if=/dev/zero of=/dev/sda bs=512 seek=1024 count=256
+
+guest:~ # sg_unmap -l 1024 -n 32 /dev/sda
+
+guest:~ # sg_get_lba_status /dev/sda -l 1024
+No indication of the completion condition
+RTP=0
+descriptor LBA: 0x0000000000000400  blocks: 32  deallocated
+
+Lin Ma (3):
+  block: Add bdrv_co_get_lba_status
+  block: Add GET LBA STATUS support
+  scsi-disk: Add support for the GET LBA STATUS 16 command
+
+ block/block-backend.c          | 38 ++++++++++++++
+ block/io.c                     | 43 ++++++++++++++++
+ hw/scsi/scsi-disk.c            | 90 ++++++++++++++++++++++++++++++++++
+ include/block/accounting.h     |  1 +
+ include/block/block_int.h      |  5 ++
+ include/scsi/constants.h       |  1 +
+ include/sysemu/block-backend.h |  2 +
+ 7 files changed, 180 insertions(+)
+
 -- 
 2.26.0
 
