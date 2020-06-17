@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46789C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 19:24:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF682C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 19:24:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 15BF8208D5
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 19:24:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7A506208D5
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 19:24:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cKUAcdph"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15BF8208D5
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kNf06/CJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A506208D5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36040 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38082 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jldfU-0002BY-BR
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 15:24:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35672)
+	id 1jldg0-00039f-OQ
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 15:24:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35696)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jldXA-0004dE-JH
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 15:15:40 -0400
-Received: from mail-ej1-x62d.google.com ([2a00:1450:4864:20::62d]:37220)
+ id 1jldXD-0004io-3g
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 15:15:43 -0400
+Received: from mail-ej1-x641.google.com ([2a00:1450:4864:20::641]:33622)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jldX8-0006Us-L6
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 15:15:40 -0400
-Received: by mail-ej1-x62d.google.com with SMTP id mb16so3748784ejb.4
- for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 12:15:38 -0700 (PDT)
+ id 1jldXB-0006VT-5n
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 15:15:42 -0400
+Received: by mail-ej1-x641.google.com with SMTP id n24so3767167ejd.0
+ for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 12:15:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=qBnGPw/KyT6+2hMNSegs0FI40sItBZY3EqbryJUTCjg=;
- b=cKUAcdphTJGu0fJQ2XQh0fh6DnL2GAomf9cQVbhSPk+QtoBdaaSd0r0EnyACukNqL8
- NXwn7KC/dn9DEkyEoOFXqGt4dnxvfz/3Ud6GKefw7yWgD+RpkQONSlJt17wq2trml/FN
- IhkwHy4Lw7CCA1Mh9OVJnNnOOija3pAlT6TEnVNWlXmgPOFkMozpswEBsPgx78OI8q3l
- sVcIyM7zIsIBvYJk+ndKcLI+AA2xT7/5Wsn79nUUJSBUZo4W07KCpfeIdO2vzEL8ngsr
- taXZd3v3jPdiXzSFTPqzbmIWhXIw6MJY+GOuOyLp7Ly5SwFRHWuaF8PJ/i2ZsnkCKQp7
- xEHg==
+ bh=6aDhDaWkavAbWR1fBoYHMAb2qyGfHRbFH0+4zc9LJ7Y=;
+ b=kNf06/CJVz0ZPRrdTdFvC6cDyuPWQui8AVAnWlCnP2aAxlh8RdxbPnd//lI+G4ZMlE
+ S23tFn9jypR70pGbvaYdwMFy/9TuzEhamjsHjVZnDpXk2XOX/h/zhKvLcIWW13N8EM1C
+ 15yoMNYZGxga3AKubWNur7TU7mzIC5md0VzZ/rtTlxsj6Gl01DIIS5tDQ8KTZgQuTAYa
+ nmLgNpVW0UHwKAklHcxy8Y8FOh0dSvONUgg8Pbzahs5xEu5q4yStfzNPXyBftSVhWbVk
+ HnwSzzNaVfPYL4VNA/7LLaNyjbdXy3fO6QKJMwErBYVdkFkWFveMqfHmYNDVhww3n/dG
+ +B2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=qBnGPw/KyT6+2hMNSegs0FI40sItBZY3EqbryJUTCjg=;
- b=oTfYStUvCT87aaI1VzPgldujjRl7toU/WwzJILXtrySKmqbfvda5CKFbOsqxHjJtfm
- 0gcx4wyhl335qs8c5saUdNACS/tY/gpW1a55zmQoVyVLB2ca5IyjOvkRbJ9oQspWVGV4
- b/D2g51Aoh8QUXKbr8OljaCo3zr8zDnR9AoJ2SeBTfGyUaceVdZTyOfkWqv5qYRav8v4
- 6fe89dXw9Fb+sAYqtnBhErDojF2JdiT4RC27/ndVzubQ1tUp7Yht586hcW8nmKyYA84m
- Y7fnZOLkEx8ddnFcTi2YL9q+aFhmzSy2UjUBfCfYGwTtpRPNlxFxYQXXD8K/amlDkpHY
- eWzA==
-X-Gm-Message-State: AOAM533lBL9yk0O3zkThjyYsM8X6L4ZIDbHlot59aI8RxF5cfH0Hp+G/
- nkvp+Z9RAqQNS3dxi2tY+4g=
-X-Google-Smtp-Source: ABdhPJxSyjI8/8o7JF6RV9niTl8dlH2uI1dne/RZsgoivTeJvoCoTUcc4KN5UVWRn+R70uAAIuCg/A==
-X-Received: by 2002:a17:906:528b:: with SMTP id
- c11mr578874ejm.407.1592421337212; 
- Wed, 17 Jun 2020 12:15:37 -0700 (PDT)
+ bh=6aDhDaWkavAbWR1fBoYHMAb2qyGfHRbFH0+4zc9LJ7Y=;
+ b=LzFivcyImm/pex3Qm604wbjIgcUtIdeHlnbPnfhLE/2RscUNtMWiPm5FD6bXT97HO4
+ AT5bvtiMAuOcOZqji96X68Dugg+7H2YnNezA8neA6GkfOCwvpysUpJjkkgFhSx5uXlQ3
+ MYT4T4/utCA/Ol+TS2lJ8l9Rh0HU+IqVcE5r0rRI5A2QGl3crqw6VmSEIuIjtpadVkAG
+ f9vS48svQ93ap5iAsnRrWoQ3IO7Zkyl1B0sGHK9Mgzxlo3WRMh6Hewimiq1dTfZS8vLt
+ ZXYMUy8b4wMWQWbUhUdoakIKs4e+TdIOFc8z4lRov5qnknrw2oEpK10V/hX0d3HP4rTI
+ YFRA==
+X-Gm-Message-State: AOAM531yd8xvQVWz3VxHWx86rVeZnfEq5mv+XvMEki5M9xG162aRK8V7
+ OMG5anVbldR4AGT9mfTZIFw=
+X-Google-Smtp-Source: ABdhPJz8zTT4+qPvWv/2dhaLxSqCoCSeQrf2JesO0J9Z4SJxQc02dvrxOOmfXK2Gq55D/25EKtAfrw==
+X-Received: by 2002:a17:906:edaf:: with SMTP id
+ sa15mr630882ejb.175.1592421339955; 
+ Wed, 17 Jun 2020 12:15:39 -0700 (PDT)
 Received: from x1w.redhat.com (93.red-83-59-160.dynamicip.rima-tde.net.
  [83.59.160.93])
- by smtp.gmail.com with ESMTPSA id y21sm324308edl.72.2020.06.17.12.15.36
+ by smtp.gmail.com with ESMTPSA id y21sm324308edl.72.2020.06.17.12.15.38
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 17 Jun 2020 12:15:36 -0700 (PDT)
+ Wed, 17 Jun 2020 12:15:39 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: Richard Henderson <rth@twiddle.net>,
  Yoshinori Sato <ysato@users.sourceforge.jp>, qemu-devel@nongnu.org
-Subject: [PATCH rc1 12/15] hw/rx: Register R5F562N7 and R5F562N8 MCUs
-Date: Wed, 17 Jun 2020 21:15:16 +0200
-Message-Id: <20200617191519.14842-13-f4bug@amsat.org>
+Subject: [PATCH rc1 14/15] BootLinuxConsoleTest: Test the RX GDB simulator
+Date: Wed, 17 Jun 2020 21:15:18 +0200
+Message-Id: <20200617191519.14842-15-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200617191519.14842-1-f4bug@amsat.org>
 References: <20200617191519.14842-1-f4bug@amsat.org>
@@ -81,8 +81,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::62d;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ej1-x62d.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::641;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ej1-x641.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -91,7 +91,7 @@ X-Spam_bar: /
 X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
  DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
  HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -104,212 +104,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Magnus Damm <magnus.damm@gmail.com>,
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Magnus Damm <magnus.damm@gmail.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Make the current TYPE_RX62N_MCU an abstract class, and
-generate TYPE_R5F562N7_MCU and TYPE_R5F562N8_MCU models.
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
+Add two tests for the rx-gdbsim machine, based on the recommended
+test setup from Yoshinori Sato:
+https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg03586.html
+
+- U-Boot prompt
+- Linux kernel with Sash shell
+
+These are very quick tests:
+
+  $ avocado run -t arch:rx tests/acceptance/machine_rx_gdbsim.py
+  JOB ID     : 84a6ef01c0b87975ecbfcb31a920afd735753ace
+  JOB LOG    : /home/phil/avocado/job-results/job-2019-05-24T05.02-84a6ef0/job.log
+   (1/2) tests/acceptance/machine_rx_gdbsim.py:RxGdbSimMachine.test_uboot: PASS (0.11 s)
+   (2/2) tests/acceptance/machine_rx_gdbsim.py:RxGdbSimMachine.test_linux_sash: PASS (0.45 s)
+  RESULTS    : PASS 2 | ERROR 0 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT 0 | CANCEL 0
+
+Tests can also be run with:
+
+  $ avocado --show=console run -t arch:rx tests/acceptance/machine_rx_gdbsim.py
+  console: U-Boot 2016.05-rc3-23705-ga1ef3c71cb-dirty (Feb 05 2019 - 21:56:06 +0900)
+  console: Linux version 4.19.0+ (yo-satoh@yo-satoh-debian) (gcc version 9.0.0 20181105 (experimental) (GCC)) #137 Wed Feb 20 23:20:02 JST 2019
+  console: Built 1 zonelists, mobility grouping on.  Total pages: 8128
+  ...
+  console: SuperH (H)SCI(F) driver initialized
+  console: 88240.serial: ttySC0 at MMIO 0x88240 (irq = 215, base_baud = 0) is a sci
+  console: console [ttySC0] enabled
+  console: 88248.serial: ttySC1 at MMIO 0x88248 (irq = 219, base_baud = 0) is a sci
+
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+Message-Id: <20200224141923.82118-22-ysato@users.sourceforge.jp>
+[PMD: Replace obsolete set_machine() by machine tag, and rename as gdbsim]
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- include/hw/rx/rx62n.h | 17 ++++-----
- hw/rx/rx62n.c         | 87 +++++++++++++++++++++++++++++++++++--------
- 2 files changed, 80 insertions(+), 24 deletions(-)
+ MAINTAINERS                           |  1 +
+ tests/acceptance/machine_rx_gdbsim.py | 68 +++++++++++++++++++++++++++
+ 2 files changed, 69 insertions(+)
+ create mode 100644 tests/acceptance/machine_rx_gdbsim.py
 
-diff --git a/include/hw/rx/rx62n.h b/include/hw/rx/rx62n.h
-index 7c6023bcd6..0421cd6d4d 100644
---- a/include/hw/rx/rx62n.h
-+++ b/include/hw/rx/rx62n.h
-@@ -34,6 +34,9 @@
- #define TYPE_RX62N_MCU "rx62n-mcu"
- #define RX62N_MCU(obj) OBJECT_CHECK(RX62NState, (obj), TYPE_RX62N_MCU)
+diff --git a/MAINTAINERS b/MAINTAINERS
+index a16e167721..1c9b4bc8e7 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1258,6 +1258,7 @@ rx-gdbsim
+ M: Yoshinori Sato <ysato@users.sourceforge.jp>
+ S: Maintained
+ F: hw/rx/rx-gdbsim.c
++F: tests/acceptance/machine_rx_gdbsim.py
  
-+#define TYPE_R5F562N7_MCU "r5f562n7-mcu"
-+#define TYPE_R5F562N8_MCU "r5f562n8-mcu"
+ SH4 Machines
+ ------------
+diff --git a/tests/acceptance/machine_rx_gdbsim.py b/tests/acceptance/machine_rx_gdbsim.py
+new file mode 100644
+index 0000000000..a44f2c87da
+--- /dev/null
++++ b/tests/acceptance/machine_rx_gdbsim.py
+@@ -0,0 +1,68 @@
++# Functional test that boots a Linux kernel and checks the console
++#
++# Copyright (c) 2018 Red Hat, Inc.
++#
++# Author:
++#  Cleber Rosa <crosa@redhat.com>
++#
++# This work is licensed under the terms of the GNU GPL, version 2 or
++# later.  See the COPYING file in the top-level directory.
 +
- #define RX62N_NR_TMR    2
- #define RX62N_NR_CMT    2
- #define RX62N_NR_SCI    6
-@@ -59,16 +62,12 @@ typedef struct RX62NState {
-     MemoryRegion iomem3;
-     MemoryRegion c_flash;
-     qemu_irq irq[NR_IRQS];
--} RX62NState;
- 
--/*
-- * RX62N Internal Memory
-- * It is the value of R5F562N8.
-- * Please change the size for R5F562N7.
-- */
--#define RX62N_IRAM_SIZE (96 * KiB)
--#define RX62N_DFLASH_SIZE (32 * KiB)
--#define RX62N_CFLASH_SIZE (512 * KiB)
-+    /* Input Clock (XTAL) frequency */
-+    uint32_t xtal_freq_hz;
-+    /* Peripheral Module Clock frequency */
-+    uint32_t pclk_freq_hz;
-+} RX62NState;
- 
- #define RX62N_PCLK (48 * 1000 * 1000)
- 
-diff --git a/hw/rx/rx62n.c b/hw/rx/rx62n.c
-index d8f0fa4625..776445fcfb 100644
---- a/hw/rx/rx62n.c
-+++ b/hw/rx/rx62n.c
-@@ -5,6 +5,7 @@
-  * (Rev.1.40 R01UH0033EJ0140)
-  *
-  * Copyright (c) 2019 Yoshinori Sato
-+ * Copyright (c) 2020 Philippe Mathieu-Daudé
-  *
-  * This program is free software; you can redistribute it and/or modify it
-  * under the terms and conditions of the GNU General Public License,
-@@ -55,6 +56,21 @@
- #define RX62N_CMT_IRQ   28
- #define RX62N_SCI_IRQ   214
- 
-+typedef struct RX62NClass {
-+    /*< private >*/
-+    DeviceClass parent_class;
-+    /*< public >*/
-+    const char *name;
-+    uint64_t ram_size;
-+    uint64_t rom_flash_size;
-+    uint64_t data_flash_size;
-+} RX62NClass;
++from avocado_qemu import Test
++from avocado_qemu import exec_command_and_wait_for_pattern
++from avocado_qemu import wait_for_console_pattern
++from avocado.utils import archive
 +
-+#define RX62N_MCU_CLASS(klass) \
-+    OBJECT_CLASS_CHECK(RX62NClass, (klass), TYPE_RX62N_MCU)
-+#define RX62N_MCU_GET_CLASS(obj) \
-+    OBJECT_GET_CLASS(RX62NClass, (obj), TYPE_RX62N_MCU)
 +
- /*
-  * IRQ -> IPR mapping table
-  * 0x00 - 0x91: IPR no (IPR00 to IPR91)
-@@ -148,7 +164,7 @@ static void register_tmr(RX62NState *s, int unit)
-     object_initialize_child(OBJECT(s), "tmr[*]",
-                             &s->tmr[unit], TYPE_RENESAS_TMR);
-     tmr = SYS_BUS_DEVICE(&s->tmr[unit]);
--    qdev_prop_set_uint64(DEVICE(tmr), "input-freq", RX62N_PCLK);
-+    qdev_prop_set_uint64(DEVICE(tmr), "input-freq", s->pclk_freq_hz);
-     sysbus_realize(tmr, &error_abort);
- 
-     irqbase = RX62N_TMR_IRQ + TMR_NR_IRQ * unit;
-@@ -166,7 +182,7 @@ static void register_cmt(RX62NState *s, int unit)
-     object_initialize_child(OBJECT(s), "cmt[*]",
-                             &s->cmt[unit], TYPE_RENESAS_CMT);
-     cmt = SYS_BUS_DEVICE(&s->cmt[unit]);
--    qdev_prop_set_uint64(DEVICE(cmt), "input-freq", RX62N_PCLK);
-+    qdev_prop_set_uint64(DEVICE(cmt), "input-freq", s->pclk_freq_hz);
-     sysbus_realize(cmt, &error_abort);
- 
-     irqbase = RX62N_CMT_IRQ + CMT_NR_IRQ * unit;
-@@ -185,7 +201,7 @@ static void register_sci(RX62NState *s, int unit)
-                             &s->sci[unit], TYPE_RENESAS_SCI);
-     sci = SYS_BUS_DEVICE(&s->sci[unit]);
-     qdev_prop_set_chr(DEVICE(sci), "chardev", serial_hd(unit));
--    qdev_prop_set_uint64(DEVICE(sci), "input-freq", RX62N_PCLK);
-+    qdev_prop_set_uint64(DEVICE(sci), "input-freq", s->pclk_freq_hz);
-     sysbus_realize(sci, &error_abort);
- 
-     irqbase = RX62N_SCI_IRQ + SCI_NR_IRQ * unit;
-@@ -198,15 +214,30 @@ static void register_sci(RX62NState *s, int unit)
- static void rx62n_realize(DeviceState *dev, Error **errp)
- {
-     RX62NState *s = RX62N_MCU(dev);
-+    RX62NClass *rxc = RX62N_MCU_GET_CLASS(dev);
++class RxGdbSimMachine(Test):
 +
-+    if (s->xtal_freq_hz == 0) {
-+        error_setg(errp, "\"xtal-frequency-hz\" property must be provided.");
-+        return;
-+    }
-+    /* XTAL range: 8-14 MHz */
-+    if (s->xtal_freq_hz < 8e6 || s->xtal_freq_hz > 14e6) {
-+        error_setg(errp, "\"xtal-frequency-hz\" property in incorrect range.");
-+        return;
-+    }
-+    /* Use a 4x fixed multiplier */
-+    s->pclk_freq_hz = 4 * s->xtal_freq_hz;
-+    /* PCLK range: 8-50 MHz */
-+    assert(s->pclk_freq_hz <= 50e6);
- 
-     memory_region_init_ram(&s->iram, OBJECT(dev), "iram",
--                           RX62N_IRAM_SIZE, &error_abort);
-+                           rxc->ram_size, &error_abort);
-     memory_region_add_subregion(s->sysmem, RX62N_IRAM_BASE, &s->iram);
-     memory_region_init_rom(&s->d_flash, OBJECT(dev), "flash-data",
--                           RX62N_DFLASH_SIZE, &error_abort);
-+                           rxc->data_flash_size, &error_abort);
-     memory_region_add_subregion(s->sysmem, RX62N_DFLASH_BASE, &s->d_flash);
-     memory_region_init_rom(&s->c_flash, OBJECT(dev), "flash-code",
--                           RX62N_CFLASH_SIZE, &error_abort);
-+                           rxc->rom_flash_size, &error_abort);
-     memory_region_add_subregion(s->sysmem, RX62N_CFLASH_BASE, &s->c_flash);
- 
-     if (!s->kernel) {
-@@ -235,6 +266,7 @@ static Property rx62n_properties[] = {
-     DEFINE_PROP_LINK("main-bus", RX62NState, sysmem, TYPE_MEMORY_REGION,
-                      MemoryRegion *),
-     DEFINE_PROP_BOOL("load-kernel", RX62NState, kernel, false),
-+    DEFINE_PROP_UINT32("xtal-frequency-hz", RX62NState, xtal_freq_hz, 0),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-@@ -246,16 +278,41 @@ static void rx62n_class_init(ObjectClass *klass, void *data)
-     device_class_set_props(dc, rx62n_properties);
- }
- 
--static const TypeInfo rx62n_info = {
--    .name = TYPE_RX62N_MCU,
--    .parent = TYPE_DEVICE,
--    .instance_size = sizeof(RX62NState),
--    .class_init = rx62n_class_init,
-+static void r5f562n7_class_init(ObjectClass *oc, void *data)
-+{
-+    RX62NClass *rxc = RX62N_MCU_CLASS(oc);
++    timeout = 30
++    KERNEL_COMMON_COMMAND_LINE = 'printk.time=0 '
 +
-+    rxc->ram_size = 64 * KiB;
-+    rxc->rom_flash_size = 384 * KiB;
-+    rxc->data_flash_size = 32 * KiB;
- };
- 
--static void rx62n_register_types(void)
-+static void r5f562n8_class_init(ObjectClass *oc, void *data)
- {
--    type_register_static(&rx62n_info);
--}
-+    RX62NClass *rxc = RX62N_MCU_CLASS(oc);
- 
--type_init(rx62n_register_types)
-+    rxc->ram_size = 96 * KiB;
-+    rxc->rom_flash_size = 512 * KiB;
-+    rxc->data_flash_size = 32 * KiB;
-+};
++    def test_uboot(self):
++        """
++        U-Boot and checks that the console is operational.
 +
-+static const TypeInfo rx62n_types[] = {
-+    {
-+        .name           = TYPE_R5F562N7_MCU,
-+        .parent         = TYPE_RX62N_MCU,
-+        .class_init     = r5f562n7_class_init,
-+    }, {
-+        .name           = TYPE_R5F562N8_MCU,
-+        .parent         = TYPE_RX62N_MCU,
-+        .class_init     = r5f562n8_class_init,
-+    }, {
-+        .name           = TYPE_RX62N_MCU,
-+        .parent         = TYPE_DEVICE,
-+        .instance_size  = sizeof(RX62NState),
-+        .class_size     = sizeof(RX62NClass),
-+        .class_init     = rx62n_class_init,
-+        .abstract       = true,
-+     }
-+};
++        :avocado: tags=arch:rx
++        :avocado: tags=machine:gdbsim-r5f562n8
++        :avocado: tags=endian:little
++        """
++        uboot_url = ('https://acc.dl.osdn.jp/users/23/23888/u-boot.bin.gz')
++        uboot_hash = '9b78dbd43b40b2526848c0b1ce9de02c24f4dcdb'
++        uboot_path = self.fetch_asset(uboot_url, asset_hash=uboot_hash)
++        uboot_path = archive.uncompress(uboot_path, self.workdir)
 +
-+DEFINE_TYPES(rx62n_types)
++        self.vm.set_console()
++        self.vm.add_args('-bios', uboot_path,
++                         '-no-reboot')
++        self.vm.launch()
++        uboot_version = 'U-Boot 2016.05-rc3-23705-ga1ef3c71cb-dirty'
++        wait_for_console_pattern(self, uboot_version)
++        gcc_version = 'rx-unknown-linux-gcc (GCC) 9.0.0 20181105 (experimental)'
++        # FIXME limit baudrate on chardev, else we type too fast
++        #exec_command_and_wait_for_pattern(self, 'version', gcc_version)
++
++    def test_linux_sash(self):
++        """
++        Boots a Linux kernel and checks that the console is operational.
++
++        :avocado: tags=arch:rx
++        :avocado: tags=machine:gdbsim-r5f562n7
++        :avocado: tags=endian:little
++        """
++        dtb_url = ('https://acc.dl.osdn.jp/users/23/23887/rx-qemu.dtb')
++        dtb_hash = '7b4e4e2c71905da44e86ce47adee2210b026ac18'
++        dtb_path = self.fetch_asset(dtb_url, asset_hash=dtb_hash)
++        kernel_url = ('http://acc.dl.osdn.jp/users/23/23845/zImage')
++        kernel_hash = '39a81067f8d72faad90866ddfefa19165d68fc99'
++        kernel_path = self.fetch_asset(kernel_url, asset_hash=kernel_hash)
++
++        self.vm.set_console()
++        kernel_command_line = self.KERNEL_COMMON_COMMAND_LINE + 'earlycon'
++        self.vm.add_args('-kernel', kernel_path,
++                         '-dtb', dtb_path,
++                         '-no-reboot')
++        self.vm.launch()
++        wait_for_console_pattern(self, 'Sash command shell (version 1.1.1)',
++                                 failure_message='Kernel panic - not syncing')
++        exec_command_and_wait_for_pattern(self, 'printenv', 'TERM=linux')
 -- 
 2.21.3
 
