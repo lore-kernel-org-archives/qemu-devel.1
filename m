@@ -2,92 +2,89 @@ Return-Path: <SRS0=bzpH=76=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C1FFC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 21:52:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 822CDC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 21:53:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D94052168B
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 21:52:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4C36F21556
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 21:53:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="jnrs2+Gf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D94052168B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="b7NNgrZr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C36F21556
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49178 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53338 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlfzK-0002Jm-0Z
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 17:52:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46228)
+	id 1jlg00-0003z3-GY
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 17:53:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38220)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=430b82a1d=dmitry.fomichev@wdc.com>)
- id 1jlfiG-0004VA-TI; Wed, 17 Jun 2020 17:35:16 -0400
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:29885)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=430b82a1d=dmitry.fomichev@wdc.com>)
- id 1jlfiB-0005JY-Q0; Wed, 17 Jun 2020 17:35:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1592429711; x=1623965711;
- h=from:to:cc:subject:date:message-id:in-reply-to:
- references:mime-version:content-transfer-encoding;
- bh=/sSHcIhm5eWSXAnSAtJNBXblShOO29y8cAr3J7pSXMw=;
- b=jnrs2+GfZYmI1Jg0LoEXtlIs6PSGsMk/g8R/oyv7duocvlTiuSU+5+dS
- Rb0xL6h67IN9AtJCSYvR7jE1b+DfB8HUzYXIbU20l+fky2fWDPQHWZ0Ag
- TwBHZfazA2lVqj3v/4eKVKjeYTXUinmvrlUc7Uy4R8aNlNqPYqrqfTLpu
- ERRXPpLwrpSnH2ZKS57YY2ipW3e/RsiO24aShj9YAM6EmCXaRmBStd8En
- /QPT68aDf15LBMLSGJXX6rKXB6ax5Bo0LKP4Z3MImV1CO0ktpLJxMS/Dm
- DKp1i+JEeJm0aYDopTBVOdlTFmeiMU4+zETPuQR0il557frLXJOuhrnJK Q==;
-IronPort-SDR: lZl8vRBTvx66mX/iWSBQsc8GnhL4DVAgmqhwDMe7KhK+vRYrMe9s0sWxnyfc4euOOrhyB00xWo
- xAgBacLAiDh7PmDUdkjzOJ4ucAFKMQRLrv/QJwVGyGsEn6Ad2GWKbqsYCT1eB4L0k4DahQnDFM
- OPhhU4sHMAQjzfPTdJWpDWLe1wRkBEot4Hcg95I+sTtLHkvKAcEsVrOu7Ds+m3rfifPbJ6rf4B
- ONdXIF3UVAKLtvKvdP/02/miKpKcQiRiFOXtCoibBdgBRYPHFjbrRS4Vh9U/X6QvACU1FSTzjx
- nBA=
-X-IronPort-AV: E=Sophos;i="5.73,523,1583164800"; d="scan'208";a="249439830"
-Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com)
- ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 18 Jun 2020 05:34:49 +0800
-IronPort-SDR: PEa+FCbeO0tHQfV3+wJtdTLzhxcIqOViDxJUmDyOjn2KJraaRVz/q0tWwJS3JJ8q0th04awRlb
- QAm7P4vJiRECs7OCIEgRlgo0IG971j5TA=
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
- by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 17 Jun 2020 14:23:31 -0700
-IronPort-SDR: W2J6aehr5zbeKew7QrLRUZe2nEe48EBK2+8hMwbwqfb6lPxRC/ck9J+Ij+lpEW3b6nqcWRRk+I
- k5oolLvYdHbA==
-WDCIronportException: Internal
-Received: from unknown (HELO redsun50.ssa.fujisawa.hgst.com) ([10.149.66.24])
- by uls-op-cesaip02.wdc.com with ESMTP; 17 Jun 2020 14:34:48 -0700
-From: Dmitry Fomichev <dmitry.fomichev@wdc.com>
-To: Kevin Wolf <kwolf@redhat.com>, Keith Busch <kbusch@kernel.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Maxim Levitsky <mlevitsky@redhat.com>
-Subject: [PATCH v2 12/18] hw/block/nvme: Simulate Zone Active excursions
-Date: Thu, 18 Jun 2020 06:34:09 +0900
-Message-Id: <20200617213415.22417-13-dmitry.fomichev@wdc.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20200617213415.22417-1-dmitry.fomichev@wdc.com>
-References: <20200617213415.22417-1-dmitry.fomichev@wdc.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=68.232.141.245;
- envelope-from=prvs=430b82a1d=dmitry.fomichev@wdc.com; helo=esa1.hgst.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/17 17:34:28
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
-X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
+ id 1jlfEw-0004hb-0b
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 17:04:58 -0400
+Received: from mail-qk1-x743.google.com ([2607:f8b0:4864:20::743]:41381)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
+ id 1jlfEs-0000Pj-JN
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 17:04:57 -0400
+Received: by mail-qk1-x743.google.com with SMTP id n11so3491772qkn.8
+ for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 14:04:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=FcchR0Kiy3cS07PsythDlOBOqbmqT9MEDX8/TYIcoYY=;
+ b=b7NNgrZrFNuqVFOfuDQ849a9QCbO8DRNYzIhM0lVUGYEd5ZmLEzBXc9iDl2xxSdRNX
+ wyvClhDSJmiqfoawmvHf63Ivq9hJxSUryarsthN6PgF0Hj7roHiy7732Pgu2AVqtU/lk
+ vD8P9EvZtlR5KoVsJgd3YqI6z0Q+alrUH6ZazunfyvHsYdPmBtk7k6CQuMCPhFPtgBR5
+ s5Ygr9YbIarzbNs3cTe6gAMyptKJNna9j30UF3Mm6ORtQqqKGkbRYd95Q4G2jxOxJUTY
+ sElUgc1sLzdzOWctyz+lGbsc9YsLVV7/bCZ/URBv4iSO9rYAJOMRz+nfIuxbA00d6K/b
+ IWaw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=FcchR0Kiy3cS07PsythDlOBOqbmqT9MEDX8/TYIcoYY=;
+ b=THiEuTHk/drK9Xbdq6dnf4R57thrWQCC3KDn838q8h4JUlUigTn7K7JYU/fKuTYbT8
+ cXnihemOaeID1NiFmRXGhwrJolEWn5Bx+jGABibUX5yAGsKtyDTRN3nLfXisF8izR5zR
+ 2D8m29Q1HSZEQF7rQL+2dAKzIFafqiBOHoK11B/bijLhOquWqKUA+KcXtseYCRTDio8c
+ gnj7K02VDmJY33PCEfHvFfUL98O0CVilC44sIEP9GFqEbFK0swgptWeGLq96jDIDCxrr
+ Thn16YWnyWK9e/NqyARexWlQagyYs5hGGgbEJBF3TpLhE8zhikqwdESi415G6uf4tpoQ
+ ppsQ==
+X-Gm-Message-State: AOAM533fmG1MZi7GqIBsjISbnBczfdF3pbC0XxuDdbCtEkUAiqOJ5Uog
+ K6npnLfcbx0jnCixXdpC7cU1IX/aSW+qzw==
+X-Google-Smtp-Source: ABdhPJyx+9aPp6NjMgmMg2Jpy2x8+7rtzrr2M4IIVCw7aqzUu3jyOAym+42n5ip9HKdguY35gz62Dg==
+X-Received: by 2002:a37:a84c:: with SMTP id r73mr336144qke.0.1592427893463;
+ Wed, 17 Jun 2020 14:04:53 -0700 (PDT)
+Received: from Rfoley-MA01.hsd1.ma.comcast.net
+ ([2601:199:4480:60c0:fc79:714c:9711:2e9c])
+ by smtp.gmail.com with ESMTPSA id w13sm997245qkb.91.2020.06.17.14.04.52
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 17 Jun 2020 14:04:52 -0700 (PDT)
+From: Robert Foley <robert.foley@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v10 68/73] xtensa: convert to cpu_has_work_with_iothread_lock
+Date: Wed, 17 Jun 2020 17:02:26 -0400
+Message-Id: <20200617210231.4393-69-robert.foley@linaro.org>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200617210231.4393-1-robert.foley@linaro.org>
+References: <20200617210231.4393-1-robert.foley@linaro.org>
+Received-SPF: pass client-ip=2607:f8b0:4864:20::743;
+ envelope-from=robert.foley@linaro.org; helo=mail-qk1-x743.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,87 +97,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Niklas Cassel <niklas.cassel@wdc.com>,
- Damien Le Moal <damien.lemoal@wdc.com>, qemu-block@nongnu.org,
- Dmitry Fomichev <dmitry.fomichev@wdc.com>, qemu-devel@nongnu.org,
- Matias Bjorling <matias.bjorling@wdc.com>
+Cc: peter.puhov@linaro.org, cota@braap.org, alex.bennee@linaro.org,
+ robert.foley@linaro.org, Max Filippov <jcmvbkbc@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Added a Boolean flag to turn on simulation of Zone Active Excursions.
-If the flag, "active_excursions", is set to true, the driver will try
-to finish one of the currently open zone if max active zones limit is
-going to get exceeded.
+From: "Emilio G. Cota" <cota@braap.org>
 
-Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+Soon we will call cpu_has_work without the BQL.
+
+Cc: Max Filippov <jcmvbkbc@gmail.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Emilio G. Cota <cota@braap.org>
+Signed-off-by: Robert Foley <robert.foley@linaro.org>
 ---
- hw/block/nvme.c | 24 +++++++++++++++++++++++-
- hw/block/nvme.h |  1 +
- 2 files changed, 24 insertions(+), 1 deletion(-)
+ target/xtensa/cpu.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 05a7cbcfcc..a29cbfcc96 100644
---- a/hw/block/nvme.c
-+++ b/hw/block/nvme.c
-@@ -540,6 +540,26 @@ static void nvme_auto_transition_zone(NvmeCtrl *n, NvmeNamespace *ns,
- {
-     NvmeZone *zone;
+diff --git a/target/xtensa/cpu.c b/target/xtensa/cpu.c
+index fda4a73722..0f96483563 100644
+--- a/target/xtensa/cpu.c
++++ b/target/xtensa/cpu.c
+@@ -47,6 +47,8 @@ static bool xtensa_cpu_has_work(CPUState *cs)
+ #ifndef CONFIG_USER_ONLY
+     XtensaCPU *cpu = XTENSA_CPU(cs);
  
-+    if (n->params.active_excursions && adding_active &&
-+        n->params.max_active_zones &&
-+        ns->nr_active_zones == n->params.max_active_zones) {
-+        zone = nvme_peek_zone_head(ns, ns->closed_zones);
-+        if (zone) {
-+            /*
-+             * The namespace is at the limit of active zones.
-+             * Try to finish one of the currently active zones
-+             * to make the needed active zone resource available.
-+             */
-+            nvme_aor_dec_active(n, ns);
-+            nvme_assign_zone_state(n, ns, zone, NVME_ZONE_STATE_FULL);
-+            zone->d.za &= ~(NVME_ZA_FINISH_RECOMMENDED |
-+                            NVME_ZA_RESET_RECOMMENDED);
-+            zone->d.za |= NVME_ZA_FINISHED_BY_CTLR;
-+            zone->tstamp = 0;
-+            trace_pci_nvme_zone_finished_by_controller(zone->d.zslba);
-+        }
-+    }
++    g_assert(qemu_mutex_iothread_locked());
 +
-     if (implicit && n->params.max_open_zones &&
-         ns->nr_open_zones == n->params.max_open_zones) {
-         zone = nvme_remove_zone_head(n, ns, ns->imp_open_zones);
-@@ -2631,7 +2651,7 @@ static int nvme_zoned_init_ns(NvmeCtrl *n, NvmeNamespace *ns, int lba_index,
-     /* MAR/MOR are zeroes-based, 0xffffffff means no limit */
-     ns->id_ns_zoned->mar = cpu_to_le32(n->params.max_active_zones - 1);
-     ns->id_ns_zoned->mor = cpu_to_le32(n->params.max_open_zones - 1);
--    ns->id_ns_zoned->zoc = 0;
-+    ns->id_ns_zoned->zoc = cpu_to_le16(n->params.active_excursions ? 0x2 : 0);
-     ns->id_ns_zoned->ozcs = n->params.cross_zone_read ? 0x01 : 0x00;
+     return !cpu->env.runstall && cpu->env.pending_irq_level;
+ #else
+     return true;
+@@ -187,7 +189,7 @@ static void xtensa_cpu_class_init(ObjectClass *oc, void *data)
+     device_class_set_parent_reset(dc, xtensa_cpu_reset, &xcc->parent_reset);
  
-     ns->id_ns_zoned->lbafe[lba_index].zsze = cpu_to_le64(n->params.zone_size);
-@@ -2993,6 +3013,8 @@ static Property nvme_props[] = {
-     DEFINE_PROP_INT32("max_active", NvmeCtrl, params.max_active_zones, 0),
-     DEFINE_PROP_INT32("max_open", NvmeCtrl, params.max_open_zones, 0),
-     DEFINE_PROP_BOOL("cross_zone_read", NvmeCtrl, params.cross_zone_read, true),
-+    DEFINE_PROP_BOOL("active_excursions", NvmeCtrl, params.active_excursions,
-+                     false),
-     DEFINE_PROP_UINT8("fill_pattern", NvmeCtrl, params.fill_pattern, 0),
-     DEFINE_PROP_END_OF_LIST(),
- };
-diff --git a/hw/block/nvme.h b/hw/block/nvme.h
-index f5a4679702..8a0aaeb09a 100644
---- a/hw/block/nvme.h
-+++ b/hw/block/nvme.h
-@@ -15,6 +15,7 @@ typedef struct NvmeParams {
- 
-     bool        zoned;
-     bool        cross_zone_read;
-+    bool        active_excursions;
-     uint8_t     fill_pattern;
-     uint32_t    zamds_bs;
-     uint64_t    zone_size;
+     cc->class_by_name = xtensa_cpu_class_by_name;
+-    cc->has_work = xtensa_cpu_has_work;
++    cc->has_work_with_iothread_lock = xtensa_cpu_has_work;
+     cc->do_interrupt = xtensa_cpu_do_interrupt;
+     cc->cpu_exec_interrupt = xtensa_cpu_exec_interrupt;
+     cc->dump_state = xtensa_cpu_dump_state;
 -- 
-2.21.0
+2.17.1
 
 
