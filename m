@@ -2,111 +2,90 @@ Return-Path: <SRS0=bzpH=76=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68081C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 06:43:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91FE6C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 06:48:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 32793208C3
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 06:43:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5D215208C3
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 06:48:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="it/M4ShR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32793208C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nQm/bFMM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D215208C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36534 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39760 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlRn9-0004KP-H4
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 02:43:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59946)
+	id 1jlRs7-0006Lf-LO
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 02:48:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32892)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jlRmG-0003oW-Ct
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 02:42:28 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:29949
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jlRmE-00044U-AX
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 02:42:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592376145;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=S3X+VlYAAM+5Yg3n0pYe9ZP/3ak366v0s41FwlaOAf8=;
- b=it/M4ShRiq8nzB17Tn5A0PFXn7PLaBP6DyrrJUZPrE2YZ5L+y1ieszuofh2+sidG1fJ1Ip
- DtxS99nJli/QVbIfNfDKOXzjsOVbPX7RqgXgjOeHeoa50uYFYkJcje3619VAu/AflA8DRO
- PsH8CmRwc/61qbJ4AR/dJkBbgDicSmk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-442-bZzdGjAeOOuzyQSS2JHhZA-1; Wed, 17 Jun 2020 02:42:21 -0400
-X-MC-Unique: bZzdGjAeOOuzyQSS2JHhZA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A773C81EE28;
- Wed, 17 Jun 2020 06:42:20 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-113-111.ams2.redhat.com
- [10.36.113.111])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8DD1B7CACC;
- Wed, 17 Jun 2020 06:42:19 +0000 (UTC)
-Subject: Re: iotest 041 is failing with -qed
-To: Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
-References: <900ebe8c-ac9e-a355-b068-41735863dce4@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <8f918615-1666-dd8e-1815-98ab224ec610@redhat.com>
-Date: Wed, 17 Jun 2020 08:42:17 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jlRrJ-0005WU-Fr; Wed, 17 Jun 2020 02:47:41 -0400
+Received: from mail-wm1-x32e.google.com ([2a00:1450:4864:20::32e]:51308)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jlRrH-0004p9-R8; Wed, 17 Jun 2020 02:47:41 -0400
+Received: by mail-wm1-x32e.google.com with SMTP id b82so712575wmb.1;
+ Tue, 16 Jun 2020 23:47:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=CnaLNwUn8V4ZTLNAsPC6dg4DQs3YM2sT/YEQ8oA2ti4=;
+ b=nQm/bFMMIQSLLf++soFh+4IbWZYDY7wYpYc1hYshzS310O0Lsd1XU0FkgE3q1RKA+R
+ LqJlxfysU3i8K7CklZEtfmYQT6fLh7Pcbc0+vhXUpG1/tZeDilZ5QsnfnPlezbfI5DTK
+ q0W77CrA56EVBhSjng66XVqM+nyM8KrFP/Ou1DT6r0LiGfmoawpFWKdFVNKzhDJ5oaaf
+ WA8ZRD8kvUN7/G5YcB7e3MooqdIi6NU9hb2zQcua0UpOePJEBTu83JHx8MqN1J0L2NW1
+ hlN1SHzKP9YopOudWgmdSDG/tQbBCJRPiAHVgLsAWeS/OZ37ZkDbkSpRczTpi6G864Fu
+ ceQA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=CnaLNwUn8V4ZTLNAsPC6dg4DQs3YM2sT/YEQ8oA2ti4=;
+ b=Wbnr+ENlzb76khpHhsT24tdHAGmsW8EW788fuM2syGB8Pl53vveBnGYJZQdqJl+hvZ
+ a4tj7T/LssNLtJxpg2/wxJclzAxlMkKzUn9yA2uLUEWLbMHD2Spq0fX9D0hMOwp/SCGT
+ Dgw/9FN5pe276NjaW6T5Tx04q7bZws1gxcrmKV36IhpegPpbFZHozmRGP6jgbo4ObPr1
+ QuOziAxBzQhIRGZXskgUu8ExshB2L4Ll9DIqYAbL9EPlZC3tOt7Ck5Hxi4ipCPkH4vIp
+ tKrtMNTTWVmQUhkkl2vjdog9/hFUkRgWqj0N4EL5q5DH7Z9Q6rYVwf4NOgdwE5AF5pBU
+ 1PNA==
+X-Gm-Message-State: AOAM533PXkEt/DQDCe5R6scEenHTV94MG7YrsZWutBR2e+WBX5JAnnwC
+ spGDdnAleeAPWNptpmLGyp4lB0O5
+X-Google-Smtp-Source: ABdhPJyvuIXp5b41CExF6t0GhmjU9pq2GUVUKvWaoTdGOxwoLNQInbsF4c9fxOp6aEnDyZ0dUJ8mnA==
+X-Received: by 2002:a1c:66d5:: with SMTP id a204mr6762485wmc.134.1592376456937; 
+ Tue, 16 Jun 2020 23:47:36 -0700 (PDT)
+Received: from localhost.localdomain (93.red-83-59-160.dynamicip.rima-tde.net.
+ [83.59.160.93])
+ by smtp.gmail.com with ESMTPSA id u12sm32452607wrq.90.2020.06.16.23.47.35
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 16 Jun 2020 23:47:36 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2] hw/misc/pca9552: Trace LED On/Off events
+Date: Wed, 17 Jun 2020 08:47:34 +0200
+Message-Id: <20200617064734.26956-1-f4bug@amsat.org>
+X-Mailer: git-send-email 2.21.3
 MIME-Version: 1.0
-In-Reply-To: <900ebe8c-ac9e-a355-b068-41735863dce4@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="xMmYBAidFX9LJqr6nuEac9qMw8C6dJSqr"
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=mreitz@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/17 02:02:46
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::32e;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x32e.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -119,125 +98,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Qemu-block <qemu-block@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jeffery <andrew@aj.id.au>,
+ Joaquin de Andres <me@xcancerberox.com.ar>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Esteban Bosse <estebanbosse@gmail.com>, qemu-arm@nongnu.org,
+ =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+ Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---xMmYBAidFX9LJqr6nuEac9qMw8C6dJSqr
-Content-Type: multipart/mixed; boundary="iDHgkn3qRQxvW7q1YVx2wXveI5R85NbWK"
+Example booting obmc-phosphor-image:
 
---iDHgkn3qRQxvW7q1YVx2wXveI5R85NbWK
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+  $ qemu-system-arm -M witherspoon-bmc -trace pca\*
+  26033@1592376001.873828:pca9552_led_state 0x5594a9f57560 LEDs [........ ........]
+  26033@1592376001.874169:pca9552_led_state 0x5594a9f57560 LEDs [........ ........]
+  26033@1592376001.874348:pca9552_led_state 0x5594a9f57560 LEDs [........ ........]
+  26033@1592376001.874514:pca9552_led_state 0x5594a9f57560 LEDs [........ ........]
+  26033@1592376001.879601:pca9552_led_state 0x5594a9f57560 LEDs [........ .......*]
+  26033@1592376001.880507:pca9552_led_state 0x5594a9f57560 LEDs [........ ......**]
+  26033@1592376001.880885:pca9552_led_state 0x5594a9f57560 LEDs [........ .....***]
+  26033@1592376001.881228:pca9552_led_state 0x5594a9f57560 LEDs [........ ....****]
+  26033@1592376001.881601:pca9552_led_state 0x5594a9f57560 LEDs [..*..... ....****]
+  26033@1592376001.881952:pca9552_led_state 0x5594a9f57560 LEDs [.**..... ....****]
+  26033@1592376001.882299:pca9552_led_state 0x5594a9f57560 LEDs [***..... ....****]
+  26033@1592376065.090910:pca9552_led_state 0x5594a9f57560 LEDs [*.*..... ....****]
+  26033@1592376065.600649:pca9552_led_state 0x5594a9f57560 LEDs [***..... ....****]
+  26033@1592376066.110565:pca9552_led_state 0x5594a9f57560 LEDs [*.*..... ....****]
+  26033@1592376066.620390:pca9552_led_state 0x5594a9f57560 LEDs [***..... ....****]
 
-On 17.06.20 08:18, Thomas Huth wrote:
->=20
->  Hi!
->=20
-> I just noticed that iotest 041 is failing with -qed:
->=20
-> $ ./check -qed 041
-> QEMU          --
-> "tests/qemu-iotests/../../x86_64-softmmu/qemu-system-x86_64" -nodefaults
-> -display none -accel qtest
-> QEMU_IMG      -- "tests/qemu-iotests/../../qemu-img"
-> QEMU_IO       -- "tests/qemu-iotests/../../qemu-io"  --cache writeback
-> --aio threads -f qed
-> QEMU_NBD      -- "tests/qemu-iotests/../../qemu-nbd"
-> IMGFMT        -- qed
-> IMGPROTO      -- file
-> PLATFORM      -- Linux/x86_64 thuth 4.18.0-80.11.2.el8_0.x86_64
-> TEST_DIR      -- tests/qemu-iotests/scratch
-> SOCK_DIR      -- /tmp/tmp.Fgwzwl4EoG
-> SOCKET_SCM_HELPER -- tests/qemu-iotests/socket_scm_helper
->=20
-> 041      fail       [08:12:36] [08:13:09]      (last: 31s)   output
-> mismatch (see 041.out.bad)
-> --- tests/qemu-iotests/041.out=092020-06-15 14:11:05.389400610 +0200
-> +++ tests/qemu-iotests/041.out.bad=092020-06-17 08:13:09.205195987 +0200
-> @@ -1,5 +1,33 @@
-> -........................................................................=
-................................
-> +........................................F............F..................=
-................................
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> +FAIL: test_small_target (__main__.TestSingleBlockdev)
-> +----------------------------------------------------------------------
-> +Traceback (most recent call last):
-> +  File "041", line 281, in test_small_target
-> +    self.do_test_target_size(self.image_len // 2)
-> +  File "041", line 270, in do_test_target_size
-> +    self.assert_qmp(result, 'return', {})
-> +  File "tests/qemu-iotests/iotests.py", line 848, in assert_qmp
-> +    result =3D self.dictpath(d, path)
-> +  File "tests/qemu-iotests/iotests.py", line 822, in dictpath
-> +    self.fail(f'failed path traversal for "{path}" in "{d}"')
-> +AssertionError: failed path traversal for "return" in "{'error':
-> {'class': 'GenericError', 'desc': 'Shrinking images is currently not
-> supported'}}"
-> +
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> +FAIL: test_small_target (__main__.TestSingleBlockdevUnalignedLength)
-> +----------------------------------------------------------------------
-> +Traceback (most recent call last):
-> +  File "041", line 281, in test_small_target
-> +    self.do_test_target_size(self.image_len // 2)
-> +  File "041", line 270, in do_test_target_size
-> +    self.assert_qmp(result, 'return', {})
-> +  File "tests/qemu-iotests/iotests.py", line 848, in assert_qmp
-> +    result =3D self.dictpath(d, path)
-> +  File "tests/qemu-iotests/iotests.py", line 822, in dictpath
-> +    self.fail(f'failed path traversal for "{path}" in "{d}"')
-> +AssertionError: failed path traversal for "return" in "{'error':
-> {'class': 'GenericError', 'desc': 'Shrinking images is currently not
-> supported'}}"
-> +
->  ----------------------------------------------------------------------
->  Ran 104 tests
->=20
-> -OK
-> +FAILED (failures=3D2)
-> Failures: 041
-> Failed 1 of 1 iotests
->=20
-> Is it a known problem already?
+Suggested-by: Cédric Le Goater <clg@kaod.org>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ hw/misc/pca9552.c    | 18 ++++++++++++++++++
+ hw/misc/trace-events |  3 +++
+ 2 files changed, 21 insertions(+)
 
-Well, FWIW, I knew of it, but didn=E2=80=99t get around to doing anything a=
-bout
-it yet.
-
-Thanks for reporting it anyway, now I have better justification to do
-something about it. :)  (And of course in case I would have missed it.)
-
-Max
-
-
---iDHgkn3qRQxvW7q1YVx2wXveI5R85NbWK--
-
---xMmYBAidFX9LJqr6nuEac9qMw8C6dJSqr
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl7pu0kACgkQ9AfbAGHV
-z0CClggAm3GDB0DcGK0tE3UD6o7d/1zr8uyNV3N0NfMafGijPACEEdE2hjYf4oYo
-YZd9Ql57UtFj89zv+D0vJ1mZNSgeUxpk6PlCyU4QaeEF6HFvU9HAUEjK7xdmsPmO
-0EF95kv1Xw2PvcNgOXckP9sz/bPyyDzK8QlUPtMc3L2w0x0XdZdnf893RtUi73hQ
-zRKAC540R3Tl2xFrXW99H4HpscoFL6J0BBxsQa68msxmc600BNY+XVJTEMTvMgJd
-dJcxstvnRBx8JAZeiCDiCCRHF9ocKAuXm6y7KB+e6gGg+q2CFAZuRioxY47ZXn18
-leNMh7awNirhhdsYl0NH92gCOWvk3g==
-=kP9J
------END PGP SIGNATURE-----
-
---xMmYBAidFX9LJqr6nuEac9qMw8C6dJSqr--
+diff --git a/hw/misc/pca9552.c b/hw/misc/pca9552.c
+index cac729e35a..693f6c3b24 100644
+--- a/hw/misc/pca9552.c
++++ b/hw/misc/pca9552.c
+@@ -17,6 +17,7 @@
+ #include "migration/vmstate.h"
+ #include "qapi/error.h"
+ #include "qapi/visitor.h"
++#include "trace.h"
+ 
+ #define PCA9552_LED_ON   0x0
+ #define PCA9552_LED_OFF  0x1
+@@ -95,6 +96,23 @@ static void pca9552_write(PCA9552State *s, uint8_t reg, uint8_t data)
+     case PCA9552_LS3:
+         s->regs[reg] = data;
+         pca9552_update_pin_input(s);
++        if (trace_event_get_state_backends(TRACE_PCA9552_LED_STATE)) {
++            char buf[2][9];
++
++            for (int i = 0; i < 2; i++) {
++                uint8_t val = s->regs[PCA9552_INPUT0 + i];
++                sprintf(buf[i], "%c%c%c%c%c%c%c%c",
++                        val & 0x80 ? '*' : '.',
++                        val & 0x40 ? '*' : '.',
++                        val & 0x20 ? '*' : '.',
++                        val & 0x10 ? '*' : '.',
++                        val & 0x08 ? '*' : '.',
++                        val & 0x04 ? '*' : '.',
++                        val & 0x02 ? '*' : '.',
++                        val & 0x01 ? '*' : '.');
++            }
++            trace_pca9552_led_state(s, buf[1], buf[0]);
++        }
+         break;
+ 
+     case PCA9552_INPUT0:
+diff --git a/hw/misc/trace-events b/hw/misc/trace-events
+index 5561746866..21e52f192d 100644
+--- a/hw/misc/trace-events
++++ b/hw/misc/trace-events
+@@ -206,3 +206,6 @@ via1_rtc_cmd_pram_sect_write(int sector, int offset, int addr, int value) "secto
+ # grlib_ahb_apb_pnp.c
+ grlib_ahb_pnp_read(uint64_t addr, uint32_t value) "AHB PnP read addr:0x%03"PRIx64" data:0x%08x"
+ grlib_apb_pnp_read(uint64_t addr, uint32_t value) "APB PnP read addr:0x%03"PRIx64" data:0x%08x"
++
++# pca9552.c
++pca9552_led_state(void *object, const char *bufhi, const char *buflo) "%p LEDs [%s %s]"
+-- 
+2.21.3
 
 
