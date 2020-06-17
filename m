@@ -2,92 +2,89 @@ Return-Path: <SRS0=bzpH=76=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5911FC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 21:49:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D734EC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 21:49:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 22F7D2070A
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 21:49:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A625D2168B
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 21:49:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="TqT7SBJx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22F7D2070A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VaZgkRbq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A625D2168B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36202 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36482 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlfw9-0004j3-Bd
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 17:49:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45970)
+	id 1jlfwC-0004pr-Qw
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 17:49:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38098)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=430b82a1d=dmitry.fomichev@wdc.com>)
- id 1jlfhh-0003jc-02; Wed, 17 Jun 2020 17:34:41 -0400
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:29831)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=430b82a1d=dmitry.fomichev@wdc.com>)
- id 1jlfhc-0005By-QC; Wed, 17 Jun 2020 17:34:40 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1592429676; x=1623965676;
- h=from:to:cc:subject:date:message-id:in-reply-to:
- references:mime-version:content-transfer-encoding;
- bh=VW+dI6TvAaMrKKR91glOG79oHU+lmwb39OiAXEN/4fk=;
- b=TqT7SBJxVtcEqPn95bK4p3c+0RYoiKCn32X9rqKF6FubTRoZ86WARHKF
- Vn23ogHj99b73pZtu5Bmzwu+EUfNhZ58hG/S5Z0Z5xE2tC+vczhI5w68Q
- sFePvoZiwCETJ0j99tUsDS6QhDXhVxbxLgPtIimha6JMIWXy29OBVwYA0
- aUZ/kuyfiopOPyYBOSkoG57QJZ1S5p1IIwXsU2onpe9agruDC4XBHRmWE
- LazbRQ1OklmFcgnWpyf4nOkJF10ArVyvo5S916obd3woN7ScLD5okuziI
- 5TsPGi2DojEwc0SZpAj3TqXQKZuKPs1gfxzSCLK/P8PA3q1Av6QLhv75o Q==;
-IronPort-SDR: LcFcDANmQvIHdO6cRadgp9TNRkXGwY5AGL+EILAerRzou+WJJx6KpB0yaEp/5EBe5KUiywoTfc
- 7pec73PpXKWzfMQ/TzPHDCCHj9WFWF+0uTURKSV+iwgK+9MRAFKQBJUfzxBaS1ke5/bU56dfnG
- wHZSQcTxXNzQFJ6656k5NXJbSnAY0W7GWzsLhpna6IiZyWM0gkN1BYvA9Iw1iCaUaB+oluFFF9
- 0j23JY8eIrK8ih+Chje1poBnKv2MJ9IzKWcd/nseSeD3qWgXYqCzAkA1p1jxomB5IeI4f6vGC7
- uz4=
-X-IronPort-AV: E=Sophos;i="5.73,523,1583164800"; d="scan'208";a="249439792"
-Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com)
- ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 18 Jun 2020 05:34:33 +0800
-IronPort-SDR: DE3CKNVxw/HIDJZEAfRfiQzuBXgLzOBZl57R7wQNmxCjQqwFKJZiKuvQ9ioyugZ1oZT0avkfBa
- GhbbyIzhmLne0OWFLSb/o9PF3rE5mkC9o=
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
- by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 17 Jun 2020 14:23:14 -0700
-IronPort-SDR: PVyZEXqMhpOlCrTi2nPGHvEkOBSuZj5CskZFLEuomzUdCVbQXApSte5ZFlyYihDHrPjFNwsOWe
- jKJ7L1Wsbj/g==
-WDCIronportException: Internal
-Received: from unknown (HELO redsun50.ssa.fujisawa.hgst.com) ([10.149.66.24])
- by uls-op-cesaip02.wdc.com with ESMTP; 17 Jun 2020 14:34:31 -0700
-From: Dmitry Fomichev <dmitry.fomichev@wdc.com>
-To: Kevin Wolf <kwolf@redhat.com>, Keith Busch <kbusch@kernel.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Maxim Levitsky <mlevitsky@redhat.com>
-Subject: [PATCH v2 03/18] hw/block/nvme: Clean up unused AER definitions
-Date: Thu, 18 Jun 2020 06:34:00 +0900
-Message-Id: <20200617213415.22417-4-dmitry.fomichev@wdc.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20200617213415.22417-1-dmitry.fomichev@wdc.com>
-References: <20200617213415.22417-1-dmitry.fomichev@wdc.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=68.232.141.245;
- envelope-from=prvs=430b82a1d=dmitry.fomichev@wdc.com; helo=esa1.hgst.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/17 17:34:28
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
-X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
+ id 1jlfEo-0004a8-Uf
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 17:04:51 -0400
+Received: from mail-qk1-x743.google.com ([2607:f8b0:4864:20::743]:35411)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
+ id 1jlfEl-0000OE-JT
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 17:04:50 -0400
+Received: by mail-qk1-x743.google.com with SMTP id q2so3530862qkb.2
+ for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 14:04:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=Wzz0etTpNkLIVhXKsaNrdHJF+FQFmmiKYteH+ClsJ3Y=;
+ b=VaZgkRbqExWZmfHzCi1ylCk2OTlGq4vZUGFz8454JcjhQz7U8XsVLAJhEjS86oc7YI
+ aIT2qvw6nlnhOTcxuk8SVnV44NBHZzePlYGJAX5TdIbJgkpx1moTYkZcOXQDKXG9XHjC
+ L3JiZMZxBV7VBqGv/oOqwgGOYBR1xEBX6MT/PF6hpHn1Z/XJCS4JkHOGgPebZezzmg9U
+ KBk5TzEZoIvwdR54MhA0oPcnVdXjmR/MyaMitLvtcUbGlU9+4f0cRB5nMhGfQEuBFmdV
+ i2wPNQO0YBZ4IrOqlXXFaiZFjONytjH3ilx2BIXW/O2jGYmlg3dqQaxLXZXtzeDA5kJ9
+ x+qA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=Wzz0etTpNkLIVhXKsaNrdHJF+FQFmmiKYteH+ClsJ3Y=;
+ b=WFdl5v8aXNWQSwbqhMSjsopFyq8Fc8oUsYcJ3gVmg7OWdjJxon4VeXFBWDNCYozXs8
+ 2xWriMgpKrlmhr75C3V/yt73NIFw9rjJTqDxgLMluPRjFKx6Ryj3l0rgC9lY3tXdy+js
+ UcMJB/lP4sEp23LUWz2qdJIkSB6TetIvMhhaS5C1TITvMp7mlmAqmbYt5mRvmhe6q84U
+ nYP5i71l6WuxBK66GKNmJVZUcd1OFRdQszoWUZ4gqa14cNMfbKSsMZdfvTeGjBEOTRA3
+ Dwgy1yQCyP0x4TzQGFlRRr8i+1JuD3hTursbgneL7kjP01QRWIuCn88ij45XzQDx3eOL
+ PFig==
+X-Gm-Message-State: AOAM533igE9RhEvZExxQxYALLN2IOs7VgvcjTbVOvXaIw4JQKbpLaToW
+ xfG4Et5YeBD+o+dnRRgB9jgf7u5rBctUMg==
+X-Google-Smtp-Source: ABdhPJxM6QYpcRkr9Oc35nOQvHJgtBtlSj0UtIwI8rlUvBY9sV4CeFovpAHG4xq1HcNUQ6mZvlmC+A==
+X-Received: by 2002:a37:9684:: with SMTP id y126mr593877qkd.348.1592427886325; 
+ Wed, 17 Jun 2020 14:04:46 -0700 (PDT)
+Received: from Rfoley-MA01.hsd1.ma.comcast.net
+ ([2601:199:4480:60c0:fc79:714c:9711:2e9c])
+ by smtp.gmail.com with ESMTPSA id w13sm997245qkb.91.2020.06.17.14.04.45
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 17 Jun 2020 14:04:45 -0700 (PDT)
+From: Robert Foley <robert.foley@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v10 63/73] ppc: convert to cpu_has_work_with_iothread_lock
+Date: Wed, 17 Jun 2020 17:02:21 -0400
+Message-Id: <20200617210231.4393-64-robert.foley@linaro.org>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200617210231.4393-1-robert.foley@linaro.org>
+References: <20200617210231.4393-1-robert.foley@linaro.org>
+Received-SPF: pass client-ip=2607:f8b0:4864:20::743;
+ envelope-from=robert.foley@linaro.org; helo=mail-qk1-x743.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,104 +97,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Niklas Cassel <niklas.cassel@wdc.com>,
- Damien Le Moal <damien.lemoal@wdc.com>, qemu-block@nongnu.org,
- Dmitry Fomichev <dmitry.fomichev@wdc.com>, qemu-devel@nongnu.org,
- Matias Bjorling <matias.bjorling@wdc.com>
+Cc: robert.foley@linaro.org, cota@braap.org, qemu-ppc@nongnu.org,
+ peter.puhov@linaro.org, alex.bennee@linaro.org,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Removed unused struct NvmeAerResult and SMART-related async event
-codes. All other event codes are now categorized by their type.
-This avoids having to define the same values in a single enum,
-NvmeAsyncEventRequest, that is now removed.
+From: "Emilio G. Cota" <cota@braap.org>
 
-Later commits in this series will define additional values in some
-of these enums. No functional change.
+Soon we will call cpu_has_work without the BQL.
 
-Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+Cc: qemu-ppc@nongnu.org
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
+Signed-off-by: Emilio G. Cota <cota@braap.org>
+[RF: Converted new code related to POWER10]
+Signed-off-by: Robert Foley <robert.foley@linaro.org>
 ---
- hw/block/nvme.h      |  1 -
- include/block/nvme.h | 43 ++++++++++++++++++++++---------------------
- 2 files changed, 22 insertions(+), 22 deletions(-)
+ target/ppc/translate_init.inc.c | 19 ++++++++++++++-----
+ 1 file changed, 14 insertions(+), 5 deletions(-)
 
-diff --git a/hw/block/nvme.h b/hw/block/nvme.h
-index 0460cc0e62..4f0dac39ae 100644
---- a/hw/block/nvme.h
-+++ b/hw/block/nvme.h
-@@ -13,7 +13,6 @@ typedef struct NvmeParams {
+diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.inc.c
+index d06d9ff204..60ee51c105 100644
+--- a/target/ppc/translate_init.inc.c
++++ b/target/ppc/translate_init.inc.c
+@@ -8540,6 +8540,8 @@ static bool cpu_has_work_POWER7(CPUState *cs)
+     PowerPCCPU *cpu = POWERPC_CPU(cs);
+     CPUPPCState *env = &cpu->env;
  
- typedef struct NvmeAsyncEvent {
-     QSIMPLEQ_ENTRY(NvmeAsyncEvent) entry;
--    NvmeAerResult result;
- } NvmeAsyncEvent;
- 
- enum NvmeRequestFlags {
-diff --git a/include/block/nvme.h b/include/block/nvme.h
-index 9c3a04dcd7..3099df99eb 100644
---- a/include/block/nvme.h
-+++ b/include/block/nvme.h
-@@ -553,28 +553,30 @@ typedef struct NvmeDsmRange {
-     uint64_t    slba;
- } NvmeDsmRange;
- 
--enum NvmeAsyncEventRequest {
--    NVME_AER_TYPE_ERROR                     = 0,
--    NVME_AER_TYPE_SMART                     = 1,
--    NVME_AER_TYPE_IO_SPECIFIC               = 6,
--    NVME_AER_TYPE_VENDOR_SPECIFIC           = 7,
--    NVME_AER_INFO_ERR_INVALID_SQ            = 0,
--    NVME_AER_INFO_ERR_INVALID_DB            = 1,
--    NVME_AER_INFO_ERR_DIAG_FAIL             = 2,
--    NVME_AER_INFO_ERR_PERS_INTERNAL_ERR     = 3,
--    NVME_AER_INFO_ERR_TRANS_INTERNAL_ERR    = 4,
--    NVME_AER_INFO_ERR_FW_IMG_LOAD_ERR       = 5,
--    NVME_AER_INFO_SMART_RELIABILITY         = 0,
--    NVME_AER_INFO_SMART_TEMP_THRESH         = 1,
--    NVME_AER_INFO_SMART_SPARE_THRESH        = 2,
-+enum NvmeAsyncEventType {
-+    NVME_AER_TYPE_ERROR                     = 0x00,
-+    NVME_AER_TYPE_SMART                     = 0x01,
-+    NVME_AER_TYPE_NOTICE                    = 0x02,
-+    NVME_AER_TYPE_CMDSET_SPECIFIC           = 0x06,
-+    NVME_AER_TYPE_VENDOR_SPECIFIC           = 0x07,
- };
- 
--typedef struct NvmeAerResult {
--    uint8_t event_type;
--    uint8_t event_info;
--    uint8_t log_page;
--    uint8_t resv;
--} NvmeAerResult;
-+enum NvmeAsyncErrorInfo {
-+    NVME_AER_ERR_INVALID_SQ                 = 0x00,
-+    NVME_AER_ERR_INVALID_DB                 = 0x01,
-+    NVME_AER_ERR_DIAG_FAIL                  = 0x02,
-+    NVME_AER_ERR_PERS_INTERNAL_ERR          = 0x03,
-+    NVME_AER_ERR_TRANS_INTERNAL_ERR         = 0x04,
-+    NVME_AER_ERR_FW_IMG_LOAD_ERR            = 0x05,
-+};
++    g_assert(qemu_mutex_iothread_locked());
 +
-+enum NvmeAsyncNoticeInfo {
-+    NVME_AER_NOTICE_NS_CHANGED              = 0x00,
-+};
+     if (cpu_halted(cs)) {
+         if (!(cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD)) {
+             return false;
+@@ -8582,7 +8584,7 @@ POWERPC_FAMILY(POWER7)(ObjectClass *oc, void *data)
+     pcc->pcr_supported = PCR_COMPAT_2_06 | PCR_COMPAT_2_05;
+     pcc->init_proc = init_proc_POWER7;
+     pcc->check_pow = check_pow_nocheck;
+-    cc->has_work = cpu_has_work_POWER7;
++    cc->has_work_with_iothread_lock = cpu_has_work_POWER7;
+     pcc->insns_flags = PPC_INSNS_BASE | PPC_ISEL | PPC_STRING | PPC_MFTB |
+                        PPC_FLOAT | PPC_FLOAT_FSEL | PPC_FLOAT_FRES |
+                        PPC_FLOAT_FSQRT | PPC_FLOAT_FRSQRTE |
+@@ -8702,6 +8704,8 @@ static bool cpu_has_work_POWER8(CPUState *cs)
+     PowerPCCPU *cpu = POWERPC_CPU(cs);
+     CPUPPCState *env = &cpu->env;
+ 
++    g_assert(qemu_mutex_iothread_locked());
 +
-+enum NvmeAsyncEventCfg {
-+    NVME_AEN_CFG_NS_ATTR                    = 1 << 8,
-+};
+     if (cpu_halted(cs)) {
+         if (!(cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD)) {
+             return false;
+@@ -8752,7 +8756,7 @@ POWERPC_FAMILY(POWER8)(ObjectClass *oc, void *data)
+     pcc->pcr_supported = PCR_COMPAT_2_07 | PCR_COMPAT_2_06 | PCR_COMPAT_2_05;
+     pcc->init_proc = init_proc_POWER8;
+     pcc->check_pow = check_pow_nocheck;
+-    cc->has_work = cpu_has_work_POWER8;
++    cc->has_work_with_iothread_lock = cpu_has_work_POWER8;
+     pcc->insns_flags = PPC_INSNS_BASE | PPC_ISEL | PPC_STRING | PPC_MFTB |
+                        PPC_FLOAT | PPC_FLOAT_FSEL | PPC_FLOAT_FRES |
+                        PPC_FLOAT_FSQRT | PPC_FLOAT_FRSQRTE |
+@@ -8902,6 +8906,8 @@ static bool cpu_has_work_POWER9(CPUState *cs)
+     PowerPCCPU *cpu = POWERPC_CPU(cs);
+     CPUPPCState *env = &cpu->env;
  
- typedef struct NvmeCqe {
-     union {
-@@ -881,7 +883,6 @@ enum NvmeIdNsDps {
++    g_assert(qemu_mutex_iothread_locked());
++
+     if (cpu_halted(cs)) {
+         uint64_t psscr = env->spr[SPR_PSSCR];
  
- static inline void _nvme_check_size(void)
- {
--    QEMU_BUILD_BUG_ON(sizeof(NvmeAerResult) != 4);
-     QEMU_BUILD_BUG_ON(sizeof(NvmeCqe) != 16);
-     QEMU_BUILD_BUG_ON(sizeof(NvmeDsmRange) != 16);
-     QEMU_BUILD_BUG_ON(sizeof(NvmeCmd) != 64);
+@@ -8969,7 +8975,7 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *data)
+                          PCR_COMPAT_2_05;
+     pcc->init_proc = init_proc_POWER9;
+     pcc->check_pow = check_pow_nocheck;
+-    cc->has_work = cpu_has_work_POWER9;
++    cc->has_work_with_iothread_lock = cpu_has_work_POWER9;
+     pcc->insns_flags = PPC_INSNS_BASE | PPC_ISEL | PPC_STRING | PPC_MFTB |
+                        PPC_FLOAT | PPC_FLOAT_FSEL | PPC_FLOAT_FRES |
+                        PPC_FLOAT_FSQRT | PPC_FLOAT_FRSQRTE |
+@@ -9118,6 +9124,7 @@ static bool cpu_has_work_POWER10(CPUState *cs)
+     PowerPCCPU *cpu = POWERPC_CPU(cs);
+     CPUPPCState *env = &cpu->env;
+ 
++    g_assert(qemu_mutex_iothread_locked());
+     if (cpu_halted(cs)) {
+         uint64_t psscr = env->spr[SPR_PSSCR];
+ 
+@@ -9186,7 +9193,7 @@ POWERPC_FAMILY(POWER10)(ObjectClass *oc, void *data)
+                          PCR_COMPAT_2_06 | PCR_COMPAT_2_05;
+     pcc->init_proc = init_proc_POWER10;
+     pcc->check_pow = check_pow_nocheck;
+-    cc->has_work = cpu_has_work_POWER10;
++    cc->has_work_with_iothread_lock = cpu_has_work_POWER10;
+     pcc->insns_flags = PPC_INSNS_BASE | PPC_ISEL | PPC_STRING | PPC_MFTB |
+                        PPC_FLOAT | PPC_FLOAT_FSEL | PPC_FLOAT_FRES |
+                        PPC_FLOAT_FSQRT | PPC_FLOAT_FRSQRTE |
+@@ -10656,6 +10663,8 @@ static bool ppc_cpu_has_work(CPUState *cs)
+     PowerPCCPU *cpu = POWERPC_CPU(cs);
+     CPUPPCState *env = &cpu->env;
+ 
++    g_assert(qemu_mutex_iothread_locked());
++
+     return msr_ee && (cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD);
+ }
+ 
+@@ -10880,7 +10889,7 @@ static void ppc_cpu_class_init(ObjectClass *oc, void *data)
+     cc->class_by_name = ppc_cpu_class_by_name;
+     pcc->parent_parse_features = cc->parse_features;
+     cc->parse_features = ppc_cpu_parse_featurestr;
+-    cc->has_work = ppc_cpu_has_work;
++    cc->has_work_with_iothread_lock = ppc_cpu_has_work;
+     cc->do_interrupt = ppc_cpu_do_interrupt;
+     cc->cpu_exec_interrupt = ppc_cpu_exec_interrupt;
+     cc->dump_state = ppc_cpu_dump_state;
 -- 
-2.21.0
+2.17.1
 
 
