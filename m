@@ -2,92 +2,71 @@ Return-Path: <SRS0=bzpH=76=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C597C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 04:42:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BC72C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 05:11:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 25EFE2082F
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 04:42:15 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kTOYkSuU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25EFE2082F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id EB64C20679
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 05:11:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB64C20679
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44176 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48750 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlPtu-0003MA-BF
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 00:42:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36134)
+	id 1jlQM9-0003UI-6m
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 01:11:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42592)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jlPpw-0006qi-Lb
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 00:38:08 -0400
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:39291)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jlPpv-0001Tp-21
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 00:38:08 -0400
-Received: by mail-pg1-x541.google.com with SMTP id v11so651632pgb.6
- for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 21:38:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=jYIhlgGCq1UUdx/JfqZRUcnP+U2PpbQCAFcsCH7XqwQ=;
- b=kTOYkSuUXu11HGclWCRwxe8yk9zLjb/6dA69WXkVzq8xZNIM38v8qzwUTxktClD4HV
- df6A1LUGS5L3whi1S8/LX3q7wOK/b67wJYhzj18zCcozNpiUOPgN2CStJyb+qek/ztoz
- 5YSktlpXZ6Ee8tSHlSZH6K0Rie2cMVCk+VCXJOoLX9Ha5g55NpCAfh56Tt0KAfbNTDzw
- 0J6bX/jm4OOD6Juw1o06stXIYZu5zOo17tSYlR9koxNkRLhOfRNipZyQpF2RiQ1uzlgw
- kTmFSEBgL7HMAPFQM/k4z2vGzK+67XQ55RIDN5/JlBPbWUFpH7dXMEjuIDzVjO6SfV9V
- ++gw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=jYIhlgGCq1UUdx/JfqZRUcnP+U2PpbQCAFcsCH7XqwQ=;
- b=mNuQoBRISmHx4i7S21vcwRxawwhPYi1PhgvCb32+sDI4bDVBnf6LiVCwMfAlDEevRZ
- pMztnLE0o/xYy7Ox0/o80liplXNpnPVdwyThI1pfto5uwfUDV0bKp033PT//I56CGLeN
- 3JGuUXEuSUqImHZTN3eaTMnkpAZiUu0oSbSRNqi4BGniT2XfOt7o8BkT1EljHNQG6LID
- 8CCj2cLD9P4cvkvmuVoRAkm4FhFe17BcL2ha1W33y8RaWj1O6vwfUWDzyXf/xwWkxp2n
- RHKkxJBFCZHwGvjrIlO/L17Tk1G+AHFFe3sBsPI9l7E7bQ8cMOOqP7EZ1ylD+xcCcXdD
- 4qnQ==
-X-Gm-Message-State: AOAM531yMPQELYIB+/a+Q0lI/LSSQJplk+er4PS5HXmalqPWn6O/zF7n
- X10lmB41wQYXBlCjFor1RTvUEE8zOHQ=
-X-Google-Smtp-Source: ABdhPJxPYez1C36KmAlYobL7dvQyuHcIpHem7WI00m9MjQckpk3q6JLoqgg/Ja9NveEdnACjqHSRSw==
-X-Received: by 2002:a63:63c6:: with SMTP id x189mr4723224pgb.36.1592368685518; 
- Tue, 16 Jun 2020 21:38:05 -0700 (PDT)
-Received: from localhost.localdomain (174-21-143-238.tukw.qwest.net.
- [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id x3sm18585808pfi.57.2020.06.16.21.38.04
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 16 Jun 2020 21:38:04 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 5/5] configure: Add -Wno-psabi
-Date: Tue, 16 Jun 2020 21:37:57 -0700
-Message-Id: <20200617043757.1623337-6-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200617043757.1623337-1-richard.henderson@linaro.org>
-References: <20200617043757.1623337-1-richard.henderson@linaro.org>
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jlQLR-0002xM-E2
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 01:10:43 -0400
+Received: from 10.mo179.mail-out.ovh.net ([46.105.79.46]:37860)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jlQLO-0006Tj-Cb
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 01:10:41 -0400
+Received: from player698.ha.ovh.net (unknown [10.110.171.5])
+ by mo179.mail-out.ovh.net (Postfix) with ESMTP id C3207168878
+ for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 07:10:27 +0200 (CEST)
+Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
+ (Authenticated sender: clg@kaod.org)
+ by player698.ha.ovh.net (Postfix) with ESMTPSA id 5B88D136ACACF;
+ Wed, 17 Jun 2020 05:10:16 +0000 (UTC)
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-98R002cbf81f5b-57a4-4961-9d61-367f63aa2de7,ABECD89738EEB0C75E5395B338997A57DB3A3EEE)
+ smtp.auth=clg@kaod.org
+Subject: Re: [PATCH 2/2] hw/misc/pca9552: Make LEDs 13-15 also GPIOs
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org
+References: <20200616094542.25415-1-f4bug@amsat.org>
+ <20200616094542.25415-3-f4bug@amsat.org>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <84d0fee0-9711-e066-466a-836274408068@kaod.org>
+Date: Wed, 17 Jun 2020 07:10:14 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20200616094542.25415-3-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::541;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x541.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Ovh-Tracer-Id: 11944390639203552014
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedrudejuddgleegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeefffdvtddugeeifeduuefghfejgfeigeeigeeltedthefgieeiveeuiefhgeefgfenucfkpheptddrtddrtddrtddpkedvrdeigedrvdehtddrudejtdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrheileekrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
+Received-SPF: pass client-ip=46.105.79.46; envelope-from=clg@kaod.org;
+ helo=10.mo179.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/17 01:10:28
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -101,60 +80,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, alex.bennee@linaro.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jeffery <andrew@aj.id.au>,
+ Joaquin de Andres <me@xcancerberox.com.ar>,
+ Esteban Bosse <estebanbosse@gmail.com>, qemu-arm@nongnu.org,
+ Joel Stanley <joel@jms.id.au>, Guenter Roeck <linux@roeck-us.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On aarch64, gcc 9.3 is generating
+On 6/16/20 11:45 AM, Philippe Mathieu-Daudé wrote:
+> The PCA9552 has 3 GPIOs, add them.
 
-qemu/exec.c: In function ‘address_space_translate_iommu’:
-qemu/exec.c:431:28: note: parameter passing for argument of type \
-  ‘MemTxAttrs’ {aka ‘struct MemTxAttrs’} changed in GCC 9.1
+This is an example of an HW configuration. All pins can be used
+as GPIOs. 
+ 
+> See 'PCA9552 Product Datasheet Rev. 05 - 9 March 2006',
+> chapter 6.4 'Pins used as GPIOs':
+> 
+>   LED pins not used to control LEDs can be used as general
+>   purpose I/Os (GPIOs).
+>   For use as input, set LEDn to high-impedance (01) and then
+>   read the pin state via the input register.
+>   For use as output, connect external pull-up resistor to the
+>   pin and size it according to the DC recommended operating
+>   characteristics. LED output pin is HIGH when the output is
+>   programmed as high-impedance, and LOW when the output is
+>   programmed LOW through the ‘LED selector’ register. The
+>   output can be pulse-width controlled when PWM0 or PWM1 are
+>   used.
+>
+>
+> And chapter 8 'Application design-in information':
+> 
+>   LED0 to LED12 are used as LED drivers.
+>   LED13 to LED15 are used as regular GPIOs.
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+>  include/hw/misc/pca9552.h |  2 ++
+>  hw/misc/pca9552.c         | 18 ++++++++++++++++++
+>  2 files changed, 20 insertions(+)
+> 
+> diff --git a/include/hw/misc/pca9552.h b/include/hw/misc/pca9552.h
+> index ebb43c63fe..7e47ea312d 100644
+> --- a/include/hw/misc/pca9552.h
+> +++ b/include/hw/misc/pca9552.h
+> @@ -15,6 +15,7 @@
+>  #define PCA9552(obj) OBJECT_CHECK(PCA9552State, (obj), TYPE_PCA9552)
+>  
+>  #define PCA9552_NR_REGS 10
+> +#define PCA9552_NR_GPIOS 3
+>  
+>  typedef struct PCA9552State {
+>      /*< private >*/
+> @@ -27,6 +28,7 @@ typedef struct PCA9552State {
+>      uint8_t regs[PCA9552_NR_REGS];
+>      uint8_t max_reg;
+>      uint8_t nr_leds;
+> +    qemu_irq gpio[PCA9552_NR_GPIOS];
+>  } PCA9552State;
+>  
+>  #endif
+> diff --git a/hw/misc/pca9552.c b/hw/misc/pca9552.c
+> index a3d0decbff..6ca6c0dbc2 100644
+> --- a/hw/misc/pca9552.c
+> +++ b/hw/misc/pca9552.c
+> @@ -12,8 +12,10 @@
+>  #include "qemu/osdep.h"
+>  #include "qemu/log.h"
+>  #include "qemu/module.h"
+> +#include "qemu/bitops.h"
+>  #include "hw/misc/pca9552.h"
+>  #include "hw/misc/pca9552_regs.h"
+> +#include "hw/irq.h"
+>  #include "migration/vmstate.h"
+>  #include "qapi/error.h"
+>  #include "qapi/visitor.h"
+> @@ -48,12 +50,16 @@ static void pca9552_update_pin_input(PCA9552State *s)
+>              s->regs[input_reg] |= 1 << input_shift;
+>              if (input_shift < s->nr_leds) {
+>                  trace_pca9552_led_set(input_shift, true);
+> +            } else {
+> +                qemu_set_irq(s->gpio[input_shift - s->nr_leds], 1);
 
-and many other reptitions.  This structure, and the functions
-amongst which it is passed, are not part of a QEMU public API.
-Therefore we do not care how the compiler passes the argument,
-so long as the compiler is self-consistent.
+It is simpler to set the irq level in pca9552_gpio_set().
 
-The only portion of QEMU which does have a public api, and so
-must have a stable abi, is "qemu/plugin.h".  We test this by
-forcing -Wpsabi in tests/plugin/Makefile.
+>              }
+>              break;
+>          case PCA9552_LED_OFF:
+>              s->regs[input_reg] &= ~(1 << input_shift);
+>              if (input_shift < s->nr_leds) {
+>                  trace_pca9552_led_set(input_shift, false);
+> +            } else {
+> +                qemu_set_irq(s->gpio[input_shift - s->nr_leds], 0);
+>              }
+>              break;
+>          case PCA9552_LED_PWM0:
+> @@ -65,6 +71,16 @@ static void pca9552_update_pin_input(PCA9552State *s)
+>      }
+>  }
+>  
+> +static void pca9552_gpio_set(void *opaque, int n, int enable)
+> +{
+> +    PCA9552State *s = opaque;
+> +
+> +    /* LED13 to LED15 are used as regular GPIOs. */
+> +    s->regs[PCA9552_LS3] = deposit32(s->regs[PCA9552_LS3], n + 1, 1,
+> +                                     enable ? PCA9552_LED_ON : PCA9552_LED_OFF);> +    pca9552_update_pin_input(s);
 
-Cc: Alex Bennée <alex.bennee@linaro.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- configure             | 1 +
- tests/plugin/Makefile | 2 +-
- 2 files changed, 2 insertions(+), 1 deletion(-)
+I would introduce a set_pin() helper instead. See pca9552_pin_get_config().
+pca9552_gpio_set() would look like :
 
-diff --git a/configure b/configure
-index 5e27229f58..ba88fd1824 100755
---- a/configure
-+++ b/configure
-@@ -2055,6 +2055,7 @@ add_to nowarn_flags -Wno-shift-negative-value
- add_to nowarn_flags -Wno-string-plus-int
- add_to nowarn_flags -Wno-typedef-redefinition
- add_to nowarn_flags -Wno-tautological-type-limit-compare
-+add_to nowarn_flags -Wno-psabi
- 
- gcc_flags="$warn_flags $nowarn_flags"
- 
-diff --git a/tests/plugin/Makefile b/tests/plugin/Makefile
-index b3250e2504..3a50451428 100644
---- a/tests/plugin/Makefile
-+++ b/tests/plugin/Makefile
-@@ -17,7 +17,7 @@ NAMES += lockstep
- 
- SONAMES := $(addsuffix .so,$(addprefix lib,$(NAMES)))
- 
--QEMU_CFLAGS += -fPIC
-+QEMU_CFLAGS += -fPIC -Wpsabi
- QEMU_CFLAGS += -I$(SRC_PATH)/include/qemu
- 
- all: $(SONAMES)
--- 
-2.25.1
+	pca9552_set_pin(s, n, enable ? PCA9552_LED_ON : PCA9552_LED_OFF);
+	pca9552_update_pin_input(s);
+	qemu_set_irq(s->gpio[n], enable);
+
+> +}
+> +
+>  static uint8_t pca9552_read(PCA9552State *s, uint8_t reg)
+>  {
+>      switch (reg) {
+> @@ -308,6 +324,8 @@ static void pca9552_initfn(Object *obj)
+>                              NULL, NULL);
+>          g_free(name);
+>      }
+> +    qdev_init_gpio_in(DEVICE(obj), pca9552_gpio_set, PCA9552_NR_GPIOS);
+> +    qdev_init_gpio_out(DEVICE(obj), s->gpio, PCA9552_NR_GPIOS);
+>  }
+>  
+>  static void pca9552_class_init(ObjectClass *klass, void *data)
+> 
 
 
