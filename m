@@ -2,90 +2,92 @@ Return-Path: <SRS0=bzpH=76=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50F6AC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 14:41:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BC14C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 14:42:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1BF5720888
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 14:41:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DADC020888
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 14:42:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AU2CWSMh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BF5720888
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fWJOa5jG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DADC020888
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33008 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35340 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlZG5-0004eg-Dr
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 10:41:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42340)
+	id 1jlZGo-0005eb-6m
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 10:42:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42534)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <crobinso@redhat.com>)
- id 1jlZFS-00044q-Oj
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 10:41:06 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51022
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <crobinso@redhat.com>)
- id 1jlZFQ-0000Pp-3h
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 10:41:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592404861;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=GifFRq1YyWVeUgLD4qr0dDdIHq2a46eAMqJSFBJdG+o=;
- b=AU2CWSMh2CJlL2j9n7i8WNIAAZtkq53TM/V30Fxvr6IWqwY1Xl5ptLUQhFDMnt3aQhCyO+
- MP/DYOQsUEf3R8XZqzT4d3164zYT3AUu7Ms56cKA2sG1zy3bH+c288zY25TOJe5H4wGWQM
- 9tFhca8WNQlQDp73I/n8/IOmso+fGmk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-150-WZhSFOokN4OonPyj9zL_lw-1; Wed, 17 Jun 2020 10:39:43 -0400
-X-MC-Unique: WZhSFOokN4OonPyj9zL_lw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1429318A0763;
- Wed, 17 Jun 2020 14:39:42 +0000 (UTC)
-Received: from [10.10.118.17] (ovpn-118-17.rdu2.redhat.com [10.10.118.17])
- by smtp.corp.redhat.com (Postfix) with ESMTP id ABAFF6E9F3;
- Wed, 17 Jun 2020 14:39:41 +0000 (UTC)
-Subject: Re: [PATCH 00/78] Patch Round-up for stable 4.2.1, freeze on
- 2020-06-22
-To: Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-References: <20200616141547.24664-1-mdroth@linux.vnet.ibm.com>
-From: Cole Robinson <crobinso@redhat.com>
-Message-ID: <272ae6a4-c6ba-5a47-0edd-11c0f592e4fd@redhat.com>
-Date: Wed, 17 Jun 2020 10:39:41 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
+ id 1jlZG7-0004qT-CA; Wed, 17 Jun 2020 10:41:47 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:37248)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
+ id 1jlZG5-0000W3-Rp; Wed, 17 Jun 2020 10:41:47 -0400
+Received: by mail-wr1-x443.google.com with SMTP id a6so655482wrm.4;
+ Wed, 17 Jun 2020 07:41:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=yHSsY/mYJuBAJ4v9IJFk56qDIweETBolJgGoG/xtXWU=;
+ b=fWJOa5jGPdsHGyhdY40cezjHnMUlDHFFdhpIupbTEK+OXzStj/l/MmqC3SwcjziQgv
+ psDMfHW9Ioyw0AeFS5rKI70BfJ4d09Fq71B/rCxRdWjW+j3O8pG3kLRM/5gZap/YIqks
+ Np3ROi5DATpuPiHne68PhVoy6haMzgGY5M3uM0/rJYrEJL3jAMo7fbnpmZ7XWWOzqSDI
+ fPxK9rCWzMOyhZ6OL0XdBRwMbqQPBx/9UjzSGccFB8Dyr8IPPfaZOAaSD6vCeUIoRFGv
+ 0wX/j7zshyiKUt+NtLdFuyZE6Mh8QRRGbzPgrAuzTuWFi+X+Ly3xTDXffAQ6dXMrSlJI
+ DSyA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=yHSsY/mYJuBAJ4v9IJFk56qDIweETBolJgGoG/xtXWU=;
+ b=Jm9Fz1AKbZeYZzlZ1S42WQ2xBI0ZT19QaRCtTLscHUKUBd9F6IeVVNyQfMSgpuMT0Q
+ NyqvXQH3vuePofr7A8W5lt2qBMCGy9LlY8rPwVRcW6j4O7BURMoVSVAoMwZp5qOkAm4R
+ cDaCOpUCp1+ra29EIsOYCuWtGNcejvB5VpwAn4P7FlIuh8zxA/BuOLSoQ42rD9LAf23c
+ hCFZDKGan3pNJ/roTHkFt03Lp3JPRVZzirm0+B8+0PzRbuAPC/m3ZPuEd1aU8kky/Leg
+ ETP0LHNqYPdKytO00n0nZ3Jk3Ub6DyLrdnlTItwHNDEJkbptJViLjT43WKTC0HgTfoNC
+ OOdw==
+X-Gm-Message-State: AOAM532gHO+HEKwSbJoC7R74EospnitjaqbuUu9aMkZMFF22J7HdRCEu
+ lNS9UYA9Hk2mqTa9JUzcrdo=
+X-Google-Smtp-Source: ABdhPJzV8l5J+SO2pz/4ERhQrB65EYAdqGftHPUDUi3HC5ah149q6B0iB/MbILBGLd6gNtmz0twV4w==
+X-Received: by 2002:adf:ea8b:: with SMTP id s11mr9005221wrm.168.1592404903898; 
+ Wed, 17 Jun 2020 07:41:43 -0700 (PDT)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id f13sm602063wmb.33.2020.06.17.07.41.42
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 17 Jun 2020 07:41:42 -0700 (PDT)
+Date: Wed, 17 Jun 2020 15:41:41 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: Lukas Straub <lukasstraub2@web.de>
+Subject: Re: [PATCH v4 0/4] Introduce 'yank' oob qmp command to recover from
+ hanging qemu
+Message-ID: <20200617144141.GK1728005@stefanha-x1.localdomain>
+References: <cover.1590421341.git.lukasstraub2@web.de>
+ <20200606213038.43538439@luklap>
 MIME-Version: 1.0
-In-Reply-To: <20200616141547.24664-1-mdroth@linux.vnet.ibm.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=crobinso@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/17 01:42:04
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="Jtds+vpI57xq70EV"
+Content-Disposition: inline
+In-Reply-To: <20200606213038.43538439@luklap>
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=stefanha@gmail.com; helo=mail-wr1-x443.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,76 +100,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-stable@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ qemu-block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ qemu-devel <qemu-devel@nongnu.org>,
+ =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/16/20 10:14 AM, Michael Roth wrote:
-> Hi everyone,
-> 
-> The following new patches are queued for QEMU stable v4.2.1:
-> 
->   https://github.com/mdroth/qemu/commits/stable-4.2-staging
-> 
-> The release is planned for 2020-06-25:
-> 
->   https://wiki.qemu.org/Planning/4.2
-> 
-> Due to delays on my part this release is going out beyond the normal
-> ~4 month support window. v5.0.1 is scheduled to be released as normal.
-> 
-> Please respond here or CC qemu-stable@nongnu.org on any additional patches
-> you think should be included in the release.
-> 
-> Thanks!
 
-A few bug fixes we are carrying in Fedora 32:
+--Jtds+vpI57xq70EV
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-commit eca3a945234a5f0a499860dd11df64b5f1a2e0a5
-Author: Cole Robinson <crobinso@redhat.com>
-Date:   Wed Nov 13 16:09:35 2019 -0500
+On Sat, Jun 06, 2020 at 09:30:38PM +0200, Lukas Straub wrote:
+> On Mon, 25 May 2020 17:44:12 +0200
+> Lukas Straub <lukasstraub2@web.de> wrote:
+>=20
+> > Hello Everyone,
+> > In many cases, if qemu has a network connection (qmp, migration, charde=
+v, etc.)
+> > to some other server and that server dies or hangs, qemu hangs too.
+> > These patches introduce the new 'yank' out-of-band qmp command to recov=
+er from
+> > these kinds of hangs. The different subsystems register callbacks which=
+ get
+> > executed with the yank command. For example the callback can shutdown()=
+ a
+> > socket. This is intended for the colo use-case, but it can be used for =
+other
+> > things too of course.
+> >=20
+> > Regards,
+> > Lukas Straub
+>=20
+> Hello Everyone,
+> Can this be reviewed, it would be cool to have this in qemu 5.1.
 
-    tests: fix modules-test 'duplicate test case' error
+Please see my reply to a previous version. Code that executes in the oob
+environment needs to take special precautions, this needs to be
+documented so that yank API users know what the limitations are.
 
-commit 8deb8019d696c75e6ecaee7545026b62aba2f1bb
-Author: David Gibson <david@gibson.dropbear.id.au>
-Date:   Fri Oct 18 15:19:31 2019 +1100
+Stefan
 
-    spapr: Don't trigger a CAS reboot for XICS/XIVE mode changeover
+--Jtds+vpI57xq70EV
+Content-Type: application/pgp-signature; name="signature.asc"
 
-commit bb8136df698bd565ee4f6c18d26c50dee320bfe4
-Author: Pan Nengyuan <pannengyuan@huawei.com>
-Date:   Tue Dec 10 15:14:37 2019 +0800
+-----BEGIN PGP SIGNATURE-----
 
-    riscv/sifive_u: fix a memory leak in soc_realize()
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl7qK6UACgkQnKSrs4Gr
+c8gjzQf/QJ20213uQ4UoGQM1p9gVC+g+9b4q+ce92Exe2oVRPluK81YmQ2fis8lG
+CxWAREM0IiLlH3iL44R06+eewQkUSWwGZY5NM0ri2bsO4yT1uIcMBHwEsnDP8zyA
+4zcI752bWbjAY14aVNL7Ry7TaND4KMye240mEEJNeXWLHVt7lBebgoP5xNmi5pgS
+lk7LUc7NegENWGn8UfAjrAlX5eRWUeYRnztD7jeJhhNmbYqilKxqx9uy8Bs8ITu4
+6F7Ubclq8ZBVHTrvoU4hOvlTMVtK1uyhJrzPeou02EKL4q39CuD7/AUAuD44nF7n
+TkQsQvl31crdwX40hUCusnimuaCWRw==
+=G63M
+-----END PGP SIGNATURE-----
 
-commit a37f21c27d3e2342c2080aafd4cfe7e949612428
-Author: Yiting Wang <yiting.wang@windriver.com>
-Date:   Fri Jan 3 11:53:42 2020 +0800
-
-    riscv: Set xPIE to 1 after xRET
-
-commit 613fa160e19abe8e1fe44423fcfa8ec73d3d48e5
-Author: ShihPo Hung <shihpo.hung@sifive.com>
-Date:   Tue Jan 14 22:17:31 2020 -0800
-
-    target/riscv: Fix tb->flags FS status
-
-commit a59796eb6d59bbd74ce28ddbddb1b83e60674e96
-Author: ShihPo Hung <shihpo.hung@sifive.com>
-Date:   Tue Jan 14 22:17:32 2020 -0800
-
-    target/riscv: fsd/fsw doesn't dirty FP state
-
-commit 82f014671cf057de51c4a577c9e2ad637dcec6f9
-Author: ShihPo Hung <shihpo.hung@sifive.com>
-Date:   Tue Jan 14 22:17:33 2020 -0800
-
-    target/riscv: update mstatus.SD when FS is set dirty
-
-
-Thanks,
-Cole
-
+--Jtds+vpI57xq70EV--
 
