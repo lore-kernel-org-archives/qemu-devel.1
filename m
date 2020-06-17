@@ -7,72 +7,71 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EC8FC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 21:47:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5911FC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 21:49:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5C3E12070A
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 21:47:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 22F7D2070A
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 21:49:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="qBCAFHPv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C3E12070A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="TqT7SBJx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22F7D2070A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56348 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36202 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlfuE-0000om-Hz
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 17:47:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45990)
+	id 1jlfw9-0004j3-Bd
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 17:49:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45970)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=430b82a1d=dmitry.fomichev@wdc.com>)
- id 1jlfhi-0003nq-R8; Wed, 17 Jun 2020 17:34:42 -0400
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:29837)
+ id 1jlfhh-0003jc-02; Wed, 17 Jun 2020 17:34:41 -0400
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:29831)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=430b82a1d=dmitry.fomichev@wdc.com>)
- id 1jlfhg-0005DU-56; Wed, 17 Jun 2020 17:34:42 -0400
+ id 1jlfhc-0005By-QC; Wed, 17 Jun 2020 17:34:40 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1592429679; x=1623965679;
+ t=1592429676; x=1623965676;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=9XbVUSXZTerXVjhktMLUPFM/BRnSv5jdmytB77i3T/s=;
- b=qBCAFHPvN6YMzFDmH+m/n+BK7mQ+hhnHYDHWEaqLkyCh/KEOggiufpFF
- i35cg1yl7Hze0ejZBUhKPV/Mk2PFZFxA6q2O6NQjG7AQzMZAVStvgEyQe
- dSAVCe9sZCiahEpEDuO+gHCeGMsmk+ger6F9v4TgCzokWwvwrhZTYlUwt
- K5j9oV7OrsbEp/hL/A/1cIDZCikbxfqrQY72QtWcjwBB5WAnP24nlEOZw
- TRfAbJ8puhjl45LD9c2kDpm9jr3jg+PzTA0MTZVLpriXQnFrXIqCT3ADV
- YW+xg8dovIyknpZljVtosa1PTQPluqD4kd4w0a7y1cmVPaZ9ZnEFrfFT6 Q==;
-IronPort-SDR: ycs0lHR3QlI5YmA+tVyoNDpO0v7WQ/UornFfw9+3vBOEdE6V+QpCCKlFha16+2Y+KGfsfKn+jz
- RekifCeQRvWX1MdasYO010L/eecVdBJaxp9s3NRBwUFXE7iKnn/4QnxmDXmt4QYM5jysnE60Vh
- cOjEYPoQ9J+Ubgp7RoApYJ1RbhvseA72yOEhVGXMO03nCslcmUbVr6ppbWXS45pTxTnqnK161c
- dZJFcCcZB8AaWHseEY3ZgejpcMwgpTjf8CauTlUK2ffYCVQEXMPf+7ZFJTc7BhVCuuErsrWUwt
- 6KQ=
-X-IronPort-AV: E=Sophos;i="5.73,523,1583164800"; d="scan'208";a="249439803"
+ bh=VW+dI6TvAaMrKKR91glOG79oHU+lmwb39OiAXEN/4fk=;
+ b=TqT7SBJxVtcEqPn95bK4p3c+0RYoiKCn32X9rqKF6FubTRoZ86WARHKF
+ Vn23ogHj99b73pZtu5Bmzwu+EUfNhZ58hG/S5Z0Z5xE2tC+vczhI5w68Q
+ sFePvoZiwCETJ0j99tUsDS6QhDXhVxbxLgPtIimha6JMIWXy29OBVwYA0
+ aUZ/kuyfiopOPyYBOSkoG57QJZ1S5p1IIwXsU2onpe9agruDC4XBHRmWE
+ LazbRQ1OklmFcgnWpyf4nOkJF10ArVyvo5S916obd3woN7ScLD5okuziI
+ 5TsPGi2DojEwc0SZpAj3TqXQKZuKPs1gfxzSCLK/P8PA3q1Av6QLhv75o Q==;
+IronPort-SDR: LcFcDANmQvIHdO6cRadgp9TNRkXGwY5AGL+EILAerRzou+WJJx6KpB0yaEp/5EBe5KUiywoTfc
+ 7pec73PpXKWzfMQ/TzPHDCCHj9WFWF+0uTURKSV+iwgK+9MRAFKQBJUfzxBaS1ke5/bU56dfnG
+ wHZSQcTxXNzQFJ6656k5NXJbSnAY0W7GWzsLhpna6IiZyWM0gkN1BYvA9Iw1iCaUaB+oluFFF9
+ 0j23JY8eIrK8ih+Chje1poBnKv2MJ9IzKWcd/nseSeD3qWgXYqCzAkA1p1jxomB5IeI4f6vGC7
+ uz4=
+X-IronPort-AV: E=Sophos;i="5.73,523,1583164800"; d="scan'208";a="249439792"
 Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com)
  ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 18 Jun 2020 05:34:38 +0800
-IronPort-SDR: t/vhM23xocdZ+AYSLbL60kmwG4vLtFFjm7BHp/oIVsRAqPG5yfMHc47CzsGvfT91iUkU6CRATw
- DEhuwX6HbevZG2hJP3/AE3AJVmgStGmYQ=
+ by ob1.hgst.iphmx.com with ESMTP; 18 Jun 2020 05:34:33 +0800
+IronPort-SDR: DE3CKNVxw/HIDJZEAfRfiQzuBXgLzOBZl57R7wQNmxCjQqwFKJZiKuvQ9ioyugZ1oZT0avkfBa
+ GhbbyIzhmLne0OWFLSb/o9PF3rE5mkC9o=
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 17 Jun 2020 14:23:19 -0700
-IronPort-SDR: mAzXKkE5FWXGaC32XLb+fiE8vFn6bINncoGKellhfu55397vyhCgifMGJYsdN/liboIsGOwhfh
- 2NuDqBf5Fy+Q==
+ 17 Jun 2020 14:23:14 -0700
+IronPort-SDR: PVyZEXqMhpOlCrTi2nPGHvEkOBSuZj5CskZFLEuomzUdCVbQXApSte5ZFlyYihDHrPjFNwsOWe
+ jKJ7L1Wsbj/g==
 WDCIronportException: Internal
 Received: from unknown (HELO redsun50.ssa.fujisawa.hgst.com) ([10.149.66.24])
- by uls-op-cesaip02.wdc.com with ESMTP; 17 Jun 2020 14:34:37 -0700
+ by uls-op-cesaip02.wdc.com with ESMTP; 17 Jun 2020 14:34:31 -0700
 From: Dmitry Fomichev <dmitry.fomichev@wdc.com>
 To: Kevin Wolf <kwolf@redhat.com>, Keith Busch <kbusch@kernel.org>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  Maxim Levitsky <mlevitsky@redhat.com>
-Subject: [PATCH v2 06/18] hw/block/nvme: Define trace events related to NS
- Types
-Date: Thu, 18 Jun 2020 06:34:03 +0900
-Message-Id: <20200617213415.22417-7-dmitry.fomichev@wdc.com>
+Subject: [PATCH v2 03/18] hw/block/nvme: Clean up unused AER definitions
+Date: Thu, 18 Jun 2020 06:34:00 +0900
+Message-Id: <20200617213415.22417-4-dmitry.fomichev@wdc.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20200617213415.22417-1-dmitry.fomichev@wdc.com>
 References: <20200617213415.22417-1-dmitry.fomichev@wdc.com>
@@ -109,59 +108,95 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-A few trace events are defined that are relevant to implementing
-Namespace Types (NVMe TP 4056).
+Removed unused struct NvmeAerResult and SMART-related async event
+codes. All other event codes are now categorized by their type.
+This avoids having to define the same values in a single enum,
+NvmeAsyncEventRequest, that is now removed.
+
+Later commits in this series will define additional values in some
+of these enums. No functional change.
 
 Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
 ---
- hw/block/trace-events | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ hw/block/nvme.h      |  1 -
+ include/block/nvme.h | 43 ++++++++++++++++++++++---------------------
+ 2 files changed, 22 insertions(+), 22 deletions(-)
 
-diff --git a/hw/block/trace-events b/hw/block/trace-events
-index 423d491e27..3f3323fe38 100644
---- a/hw/block/trace-events
-+++ b/hw/block/trace-events
-@@ -39,8 +39,13 @@ pci_nvme_create_cq(uint64_t addr, uint16_t cqid, uint16_t vector, uint16_t size,
- pci_nvme_del_sq(uint16_t qid) "deleting submission queue sqid=%"PRIu16""
- pci_nvme_del_cq(uint16_t cqid) "deleted completion queue, cqid=%"PRIu16""
- pci_nvme_identify_ctrl(void) "identify controller"
-+pci_nvme_identify_ctrl_csi(uint8_t csi) "identify controller, csi=0x%"PRIx8""
- pci_nvme_identify_ns(uint16_t ns) "identify namespace, nsid=%"PRIu16""
-+pci_nvme_identify_ns_csi(uint16_t ns, uint8_t csi) "identify namespace, nsid=%"PRIu16", csi=0x%"PRIx8""
- pci_nvme_identify_nslist(uint16_t ns) "identify namespace list, nsid=%"PRIu16""
-+pci_nvme_identify_nslist_csi(uint16_t ns, uint8_t csi) "identify namespace list, nsid=%"PRIu16", csi=0x%"PRIx8""
-+pci_nvme_list_ns_descriptors(void) "identify namespace descriptors"
-+pci_nvme_identify_cmd_set(void) "identify i/o command set"
- pci_nvme_getfeat_vwcache(const char* result) "get feature volatile write cache, result=%s"
- pci_nvme_getfeat_numq(int result) "get feature number of queues, result=%d"
- pci_nvme_setfeat_numq(int reqcq, int reqsq, int gotcq, int gotsq) "requested cq_count=%d sq_count=%d, responding with cq_count=%d sq_count=%d"
-@@ -59,6 +64,8 @@ pci_nvme_mmio_stopped(void) "cleared controller enable bit"
- pci_nvme_mmio_shutdown_set(void) "shutdown bit set"
- pci_nvme_mmio_shutdown_cleared(void) "shutdown bit cleared"
- pci_nvme_cmd_supp_and_effects_log_read(void) "commands supported and effects log read"
-+pci_nvme_css_nvm_cset_selected_by_host(uint32_t cc) "NVM command set selected by host, bar.cc=0x%"PRIx32""
-+pci_nvme_css_all_csets_sel_by_host(uint32_t cc) "all supported command sets selected by host, bar.cc=0x%"PRIx32""
+diff --git a/hw/block/nvme.h b/hw/block/nvme.h
+index 0460cc0e62..4f0dac39ae 100644
+--- a/hw/block/nvme.h
++++ b/hw/block/nvme.h
+@@ -13,7 +13,6 @@ typedef struct NvmeParams {
  
- # nvme traces for error conditions
- pci_nvme_err_invalid_dma(void) "PRP/SGL is too small for transfer size"
-@@ -72,6 +79,9 @@ pci_nvme_err_invalid_admin_opc(uint8_t opc) "invalid admin opcode 0x%"PRIx8""
- pci_nvme_err_invalid_lba_range(uint64_t start, uint64_t len, uint64_t limit) "Invalid LBA start=%"PRIu64" len=%"PRIu64" limit=%"PRIu64""
- pci_nvme_err_invalid_effects_log_offset(uint64_t ofs) "commands supported and effects log offset must be 0, got %"PRIu64""
- pci_nvme_err_invalid_effects_log_len(uint32_t len) "commands supported and effects log size is 4096, got %"PRIu32""
-+pci_nvme_err_change_css_when_enabled(void) "changing CC.CSS while controller is enabled"
-+pci_nvme_err_only_nvm_cmd_set_avail(void) "setting 110b CC.CSS, but only NVM command set is enabled"
-+pci_nvme_err_invalid_iocsci(uint32_t idx) "unsupported command set combination index %"PRIu32""
- pci_nvme_err_invalid_del_sq(uint16_t qid) "invalid submission queue deletion, sid=%"PRIu16""
- pci_nvme_err_invalid_create_sq_cqid(uint16_t cqid) "failed creating submission queue, invalid cqid=%"PRIu16""
- pci_nvme_err_invalid_create_sq_sqid(uint16_t sqid) "failed creating submission queue, invalid sqid=%"PRIu16""
-@@ -127,6 +137,7 @@ pci_nvme_ub_db_wr_invalid_cqhead(uint32_t qid, uint16_t new_head) "completion qu
- pci_nvme_ub_db_wr_invalid_sq(uint32_t qid) "submission queue doorbell write for nonexistent queue, sqid=%"PRIu32", ignoring"
- pci_nvme_ub_db_wr_invalid_sqtail(uint32_t qid, uint16_t new_tail) "submission queue doorbell write value beyond queue size, sqid=%"PRIu32", new_head=%"PRIu16", ignoring"
- pci_nvme_unsupported_log_page(uint16_t lid) "unsupported log page 0x%"PRIx16""
-+pci_nvme_ub_unknown_css_value(void) "unknown value in cc.css field"
+ typedef struct NvmeAsyncEvent {
+     QSIMPLEQ_ENTRY(NvmeAsyncEvent) entry;
+-    NvmeAerResult result;
+ } NvmeAsyncEvent;
  
- # xen-block.c
- xen_block_realize(const char *type, uint32_t disk, uint32_t partition) "%s d%up%u"
+ enum NvmeRequestFlags {
+diff --git a/include/block/nvme.h b/include/block/nvme.h
+index 9c3a04dcd7..3099df99eb 100644
+--- a/include/block/nvme.h
++++ b/include/block/nvme.h
+@@ -553,28 +553,30 @@ typedef struct NvmeDsmRange {
+     uint64_t    slba;
+ } NvmeDsmRange;
+ 
+-enum NvmeAsyncEventRequest {
+-    NVME_AER_TYPE_ERROR                     = 0,
+-    NVME_AER_TYPE_SMART                     = 1,
+-    NVME_AER_TYPE_IO_SPECIFIC               = 6,
+-    NVME_AER_TYPE_VENDOR_SPECIFIC           = 7,
+-    NVME_AER_INFO_ERR_INVALID_SQ            = 0,
+-    NVME_AER_INFO_ERR_INVALID_DB            = 1,
+-    NVME_AER_INFO_ERR_DIAG_FAIL             = 2,
+-    NVME_AER_INFO_ERR_PERS_INTERNAL_ERR     = 3,
+-    NVME_AER_INFO_ERR_TRANS_INTERNAL_ERR    = 4,
+-    NVME_AER_INFO_ERR_FW_IMG_LOAD_ERR       = 5,
+-    NVME_AER_INFO_SMART_RELIABILITY         = 0,
+-    NVME_AER_INFO_SMART_TEMP_THRESH         = 1,
+-    NVME_AER_INFO_SMART_SPARE_THRESH        = 2,
++enum NvmeAsyncEventType {
++    NVME_AER_TYPE_ERROR                     = 0x00,
++    NVME_AER_TYPE_SMART                     = 0x01,
++    NVME_AER_TYPE_NOTICE                    = 0x02,
++    NVME_AER_TYPE_CMDSET_SPECIFIC           = 0x06,
++    NVME_AER_TYPE_VENDOR_SPECIFIC           = 0x07,
+ };
+ 
+-typedef struct NvmeAerResult {
+-    uint8_t event_type;
+-    uint8_t event_info;
+-    uint8_t log_page;
+-    uint8_t resv;
+-} NvmeAerResult;
++enum NvmeAsyncErrorInfo {
++    NVME_AER_ERR_INVALID_SQ                 = 0x00,
++    NVME_AER_ERR_INVALID_DB                 = 0x01,
++    NVME_AER_ERR_DIAG_FAIL                  = 0x02,
++    NVME_AER_ERR_PERS_INTERNAL_ERR          = 0x03,
++    NVME_AER_ERR_TRANS_INTERNAL_ERR         = 0x04,
++    NVME_AER_ERR_FW_IMG_LOAD_ERR            = 0x05,
++};
++
++enum NvmeAsyncNoticeInfo {
++    NVME_AER_NOTICE_NS_CHANGED              = 0x00,
++};
++
++enum NvmeAsyncEventCfg {
++    NVME_AEN_CFG_NS_ATTR                    = 1 << 8,
++};
+ 
+ typedef struct NvmeCqe {
+     union {
+@@ -881,7 +883,6 @@ enum NvmeIdNsDps {
+ 
+ static inline void _nvme_check_size(void)
+ {
+-    QEMU_BUILD_BUG_ON(sizeof(NvmeAerResult) != 4);
+     QEMU_BUILD_BUG_ON(sizeof(NvmeCqe) != 16);
+     QEMU_BUILD_BUG_ON(sizeof(NvmeDsmRange) != 16);
+     QEMU_BUILD_BUG_ON(sizeof(NvmeCmd) != 64);
 -- 
 2.21.0
 
