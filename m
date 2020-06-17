@@ -2,70 +2,89 @@ Return-Path: <SRS0=bzpH=76=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D96BC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 08:19:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6726EC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 08:21:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CBAAA21501
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 08:19:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CBAAA21501
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 1A2E620C09
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 08:21:23 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ws57gUhS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A2E620C09
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33788 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36944 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlTIK-0000TW-4t
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 04:19:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53132)
+	id 1jlTJy-0002ER-Cj
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 04:21:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53470)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jlTHV-00089I-8Q; Wed, 17 Jun 2020 04:18:49 -0400
-Resent-Date: Wed, 17 Jun 2020 04:18:49 -0400
-Resent-Message-Id: <E1jlTHV-00089I-8Q@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21716)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jlTHS-00036F-5f; Wed, 17 Jun 2020 04:18:48 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1592381870; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=IMaSva1YkpWVOtccinMKvP4OenVKLuUWcilcX3jtdvA/+O6yQtgiPNYXslTCSeLTeHwXxZbHnG8NuHbJ4yf5KuPB6HvSweuho0XKndHqcNwQtlsvhUXo1VwhqXOGpE01WfHEN9ypKYUMWiTrDeNUzUWHHWwGM0cM7lrCLNmku0c=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1592381870;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=mAF0BwFJapxR5YPgOEUgBdL6x5s8J93yC8dD34tJKok=; 
- b=dYvjnxDGm9pXMtjI/MNz4IL8ksEu0zHxx20fyEyA5JQOOczVJVBkGhzaGlMTfRvX64hF8Wa6tUbZz/molzvTwCQ0eS2vXjwU5tM3/SB4K3qy5H5Q7G2efTG0KZncQ1XQdRcHdCyetQrWSlk5vQyF8+UFIr0+1Vpk8OG6kzUCfc4=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1592381868957181.2939842585722;
- Wed, 17 Jun 2020 01:17:48 -0700 (PDT)
-Message-ID: <159238186747.14731.4410755346999218912@d1fd068a5071>
-Subject: Re: [PATCH v3 00/14] mps2: Add few more peripherals
-In-Reply-To: <20200617072539.32686-1-f4bug@amsat.org>
+ (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1jlTJD-0001Uj-AC
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 04:20:35 -0400
+Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:42818)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1jlTJA-0003MM-AB
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 04:20:35 -0400
+Received: by mail-wr1-x431.google.com with SMTP id p5so1304585wrw.9
+ for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 01:20:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=TzkjuuPflHv9jDOWGAm/RYPX5agguPtT5dSHD0MYV/s=;
+ b=Ws57gUhSiPkBcHl8pye2QWG7BbWrVooP5xLbDh0E0uRz4nDdB2L56weUkCncsnbKpp
+ SZSHiLWVM1mj0XFBedGUXvl4nky2ZIv61Ik5071poLM1reiGK4eX+djzJl5AF/ptWv6l
+ sI/9w3c2u7PhYiPe3G1+2Mz+NzJc2E6gdmuQH5Em+LPYBDkbOyxfrQIymp1ZQBZNSqqr
+ hoK4ndCcb+lDbicwK3sxbBNS5Sg80UKLLwbybbKd3JpcQjVuxhaoCbHYzt9p6Q+F0HLR
+ blLhlHTb+iJq/HMyeJdlJZutHTSf9KK0jBrpsyuWQ9XNf28svVdq9FMkO+LVkFCDD1B6
+ lM/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=TzkjuuPflHv9jDOWGAm/RYPX5agguPtT5dSHD0MYV/s=;
+ b=kWA1994OBnqXKUSR0gwW75ttv+FFd/6XaijqGuwVCy2M97Q3vO8iI/HVE3eVf+GIPB
+ BH/wh0B+cRcCH9z7EKKBt+3kNeipOQI5AzNI/kvBgwNmVgVqRpX+e3nz/82r+LMN/VHX
+ 1SDEYpaNeQ3C05bcObLh4CQLXOVvMNrBQnmI+bRulzj3BsO22SbwuuWisBKGURfnoVlE
+ umxjW3cY7MHpDAYr0QuDlildqe0t6X4A8jYb5S98BuVz/DysYGkASdvOjo+wBeTv2fa6
+ v4k0xayFeadGMgWT0yeMhLDYvqq/rSPjgxqNi8/AYiIQvuFpxHBP/4nvhGDgF//ymXeC
+ s6gQ==
+X-Gm-Message-State: AOAM532BI3uxLfD1Mw9bLQ2yopv7XqtZ7WLTZtB7ktk0ZFV8QjznYO3H
+ FqWaHtuJuIsroFUrFeQ48EVyma7lglNpgOBNuf0=
+X-Google-Smtp-Source: ABdhPJwTghI1CElGTorAq2s6oMQ103qanI7TfRnwbqrJSwmq5++hek/Ji112Lk9rhYTkntyFgakNsE+viMtMMbSXhnY=
+X-Received: by 2002:adf:fec8:: with SMTP id q8mr7460716wrs.2.1592382030563;
+ Wed, 17 Jun 2020 01:20:30 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: f4bug@amsat.org
-Date: Wed, 17 Jun 2020 01:17:48 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/17 02:08:17
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+References: <20200428085122.1621-1-fengli@smarx.com>
+ <20200522025554.41063-1-fengli@smartx.com>
+ <20200615084341.GA25038@dimastep-nix>
+ <CAHckoCyj9JteH0_v08mCU36P3Tz47VsWfjWbUP_NL8d7pzMGwA@mail.gmail.com>
+In-Reply-To: <CAHckoCyj9JteH0_v08mCU36P3Tz47VsWfjWbUP_NL8d7pzMGwA@mail.gmail.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Wed, 17 Jun 2020 12:20:17 +0400
+Message-ID: <CAJ+F1CJS_Zarbx-4FSAODcZKKtD1qLffuwhJX_4CYYTLb6LyCQ@mail.gmail.com>
+Subject: Re: [PATCH v5] char-socket: initialize reconnect timer only when the
+ timer doesn't start
+To: Li Feng <fengli@smartx.com>, Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: multipart/alternative; boundary="000000000000474d6805a84355f5"
+Received-SPF: pass client-ip=2a00:1450:4864:20::431;
+ envelope-from=marcandre.lureau@gmail.com; helo=mail-wr1-x431.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -79,267 +98,776 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, me@xcancerberox.com.ar, qemu-devel@nongnu.org,
- f4bug@amsat.org, estebanbosse@gmail.com, qemu-arm@nongnu.org
+Cc: Dima Stepanov <dimastep@yandex-team.ru>,
+ "open list:All patches CC here" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDYxNzA3MjUzOS4zMjY4
-Ni0xLWY0YnVnQGFtc2F0Lm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgdGhlIGFzYW4g
-YnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29tbWFuZHMgYW5kCnRoZWlyIG91
-dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3RhbGxlZCwgeW91IGNhbiBwcm9iYWJs
-eSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmlu
-L2Jhc2gKZXhwb3J0IEFSQ0g9eDg2XzY0Cm1ha2UgZG9ja2VyLWltYWdlLWZlZG9yYSBWPTEgTkVU
-V09SSz0xCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1kZWJ1Z0BmZWRvcmEgVEFSR0VUX0xJU1Q9eDg2
-XzY0LXNvZnRtbXUgSj0xNCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCiAgQ0Mg
-ICAgICBxZ2EvY29tbWFuZHMtcG9zaXgubwogIENDICAgICAgcWdhL2NoYW5uZWwtcG9zaXgubwog
-IENDICAgICAgcWdhL3FhcGktZ2VuZXJhdGVkL3FnYS1xYXBpLXR5cGVzLm8KL3Vzci9iaW4vbGQ6
-IC91c3IvbGliNjQvY2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82
-NC5hKGFzYW5faW50ZXJjZXB0b3JzX3Zmb3JrLlMubyk6IHdhcm5pbmc6IGNvbW1vbiBvZiBgX19p
-bnRlcmNlcHRpb246OnJlYWxfdmZvcmsnIG92ZXJyaWRkZW4gYnkgZGVmaW5pdGlvbiBmcm9tIC91
-c3IvbGliNjQvY2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5h
-KGFzYW5faW50ZXJjZXB0b3JzLmNwcC5vKQogIENDICAgICAgcWdhL3FhcGktZ2VuZXJhdGVkL3Fn
-YS1xYXBpLXZpc2l0Lm8KICBDQyAgICAgIHFnYS9xYXBpLWdlbmVyYXRlZC9xZ2EtcWFwaS1jb21t
-YW5kcy5vCiAgQ0MgICAgICBxZ2EvcWFwaS1nZW5lcmF0ZWQvcWdhLXFhcGktaW5pdC1jb21tYW5k
-cy5vCi0tLQogIEdFTiAgICAgZG9jcy9pbnRlcm9wL3FlbXUtZ2EtcmVmLmh0bWwKICBHRU4gICAg
-IGRvY3MvaW50ZXJvcC9xZW11LWdhLXJlZi50eHQKICBHRU4gICAgIGRvY3MvaW50ZXJvcC9xZW11
-LWdhLXJlZi43Ci91c3IvYmluL2xkOiAvdXNyL2xpYjY0L2NsYW5nLzEwLjAuMC9saWIvbGludXgv
-bGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2ludGVyY2VwdG9yc192Zm9yay5TLm8pOiB3
-YXJuaW5nOiBjb21tb24gb2YgYF9faW50ZXJjZXB0aW9uOjpyZWFsX3Zmb3JrJyBvdmVycmlkZGVu
-IGJ5IGRlZmluaXRpb24gZnJvbSAvdXNyL2xpYjY0L2NsYW5nLzEwLjAuMC9saWIvbGludXgvbGli
-Y2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2ludGVyY2VwdG9ycy5jcHAubykKICBMSU5LICAg
-IHFlbXUtZ2EKICBMSU5LICAgIHFlbXUta2V5bWFwCi91c3IvYmluL2xkOiAvdXNyL2xpYjY0L2Ns
-YW5nLzEwLjAuMC9saWIvbGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2ludGVy
-Y2VwdG9yc192Zm9yay5TLm8pOiB3YXJuaW5nOiBjb21tb24gb2YgYF9faW50ZXJjZXB0aW9uOjpy
-ZWFsX3Zmb3JrJyBvdmVycmlkZGVuIGJ5IGRlZmluaXRpb24gZnJvbSAvdXNyL2xpYjY0L2NsYW5n
-LzEwLjAuMC9saWIvbGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2ludGVyY2Vw
-dG9ycy5jcHAubykKICBMSU5LICAgIGl2c2htZW0tY2xpZW50Ci91c3IvYmluL2xkOiAvdXNyL2xp
-YjY0L2NsYW5nLzEwLjAuMC9saWIvbGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2Fu
-X2ludGVyY2VwdG9yc192Zm9yay5TLm8pOiB3YXJuaW5nOiBjb21tb24gb2YgYF9faW50ZXJjZXB0
-aW9uOjpyZWFsX3Zmb3JrJyBvdmVycmlkZGVuIGJ5IGRlZmluaXRpb24gZnJvbSAvdXNyL2xpYjY0
-L2NsYW5nLzEwLjAuMC9saWIvbGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2lu
-dGVyY2VwdG9ycy5jcHAubykKICBBUyAgICAgIHBjLWJpb3Mvb3B0aW9ucm9tL211bHRpYm9vdC5v
-CiAgQVMgICAgICBwYy1iaW9zL29wdGlvbnJvbS9saW51eGJvb3QubwogIENDICAgICAgcGMtYmlv
-cy9vcHRpb25yb20vbGludXhib290X2RtYS5vCi91c3IvYmluL2xkOiAvdXNyL2xpYjY0L2NsYW5n
-LzEwLjAuMC9saWIvbGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2ludGVyY2Vw
-dG9yc192Zm9yay5TLm8pOiB3YXJuaW5nOiBjb21tb24gb2YgYF9faW50ZXJjZXB0aW9uOjpyZWFs
-X3Zmb3JrJyBvdmVycmlkZGVuIGJ5IGRlZmluaXRpb24gZnJvbSAvdXNyL2xpYjY0L2NsYW5nLzEw
-LjAuMC9saWIvbGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2ludGVyY2VwdG9y
-cy5jcHAubykKICBBUyAgICAgIHBjLWJpb3Mvb3B0aW9ucm9tL2t2bXZhcGljLm8KICBBUyAgICAg
-IHBjLWJpb3Mvb3B0aW9ucm9tL3B2aC5vCiAgQ0MgICAgICBwYy1iaW9zL29wdGlvbnJvbS9wdmhf
-bWFpbi5vCi0tLQogIFNJR04gICAgcGMtYmlvcy9vcHRpb25yb20vbGludXhib290LmJpbgogIEJV
-SUxEICAgcGMtYmlvcy9vcHRpb25yb20vcHZoLnJhdwogIFNJR04gICAgcGMtYmlvcy9vcHRpb25y
-b20vbGludXhib290X2RtYS5iaW4KL3Vzci9iaW4vbGQ6IC91c3IvbGliNjQvY2xhbmcvMTAuMC4w
-L2xpYi9saW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFzYW5faW50ZXJjZXB0b3JzX3Zm
-b3JrLlMubyk6IHdhcm5pbmc6IGNvbW1vbiBvZiBgX19pbnRlcmNlcHRpb246OnJlYWxfdmZvcmsn
-IG92ZXJyaWRkZW4gYnkgZGVmaW5pdGlvbiBmcm9tIC91c3IvbGliNjQvY2xhbmcvMTAuMC4wL2xp
-Yi9saW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFzYW5faW50ZXJjZXB0b3JzLmNwcC5v
-KQogIEJVSUxEICAgcGMtYmlvcy9vcHRpb25yb20va3ZtdmFwaWMucmF3CiAgU0lHTiAgICBwYy1i
-aW9zL29wdGlvbnJvbS9wdmguYmluCi91c3IvYmluL2xkOiAvdXNyL2xpYjY0L2NsYW5nLzEwLjAu
-MC9saWIvbGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2ludGVyY2VwdG9yc192
-Zm9yay5TLm8pOiB3YXJuaW5nOiBjb21tb24gb2YgYF9faW50ZXJjZXB0aW9uOjpyZWFsX3Zmb3Jr
-JyBvdmVycmlkZGVuIGJ5IGRlZmluaXRpb24gZnJvbSAvdXNyL2xpYjY0L2NsYW5nLzEwLjAuMC9s
-aWIvbGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2ludGVyY2VwdG9ycy5jcHAu
-bykKICBTSUdOICAgIHBjLWJpb3Mvb3B0aW9ucm9tL2t2bXZhcGljLmJpbgogIExJTksgICAgcWVt
-dS1zdG9yYWdlLWRhZW1vbgogIExJTksgICAgcWVtdS1pbWcKL3Vzci9iaW4vbGQ6IC91c3IvbGli
-NjQvY2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFzYW5f
-aW50ZXJjZXB0b3JzX3Zmb3JrLlMubyk6IHdhcm5pbmc6IGNvbW1vbiBvZiBgX19pbnRlcmNlcHRp
-b246OnJlYWxfdmZvcmsnIG92ZXJyaWRkZW4gYnkgZGVmaW5pdGlvbiBmcm9tIC91c3IvbGliNjQv
-Y2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFzYW5faW50
-ZXJjZXB0b3JzLmNwcC5vKQogIExJTksgICAgcWVtdS1pbwovdXNyL2Jpbi9sZDogL3Vzci9saWI2
-NC9jbGFuZy8xMC4wLjAvbGliL2xpbnV4L2xpYmNsYW5nX3J0LmFzYW4teDg2XzY0LmEoYXNhbl9p
-bnRlcmNlcHRvcnNfdmZvcmsuUy5vKTogd2FybmluZzogY29tbW9uIG9mIGBfX2ludGVyY2VwdGlv
-bjo6cmVhbF92Zm9yaycgb3ZlcnJpZGRlbiBieSBkZWZpbml0aW9uIGZyb20gL3Vzci9saWI2NC9j
-bGFuZy8xMC4wLjAvbGliL2xpbnV4L2xpYmNsYW5nX3J0LmFzYW4teDg2XzY0LmEoYXNhbl9pbnRl
-cmNlcHRvcnMuY3BwLm8pCiAgTElOSyAgICBxZW11LWVkaWQKL3Vzci9iaW4vbGQ6IC91c3IvbGli
-NjQvY2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFzYW5f
-aW50ZXJjZXB0b3JzX3Zmb3JrLlMubyk6IHdhcm5pbmc6IGNvbW1vbiBvZiBgX19pbnRlcmNlcHRp
-b246OnJlYWxfdmZvcmsnIG92ZXJyaWRkZW4gYnkgZGVmaW5pdGlvbiBmcm9tIC91c3IvbGliNjQv
-Y2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFzYW5faW50
-ZXJjZXB0b3JzLmNwcC5vKQogIExJTksgICAgZnNkZXYvdmlydGZzLXByb3h5LWhlbHBlcgovdXNy
-L2Jpbi9sZDogL3Vzci9saWI2NC9jbGFuZy8xMC4wLjAvbGliL2xpbnV4L2xpYmNsYW5nX3J0LmFz
-YW4teDg2XzY0LmEoYXNhbl9pbnRlcmNlcHRvcnNfdmZvcmsuUy5vKTogd2FybmluZzogY29tbW9u
-IG9mIGBfX2ludGVyY2VwdGlvbjo6cmVhbF92Zm9yaycgb3ZlcnJpZGRlbiBieSBkZWZpbml0aW9u
-IGZyb20gL3Vzci9saWI2NC9jbGFuZy8xMC4wLjAvbGliL2xpbnV4L2xpYmNsYW5nX3J0LmFzYW4t
-eDg2XzY0LmEoYXNhbl9pbnRlcmNlcHRvcnMuY3BwLm8pCi91c3IvYmluL2xkOiAvdXNyL2xpYjY0
-L2NsYW5nLzEwLjAuMC9saWIvbGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2lu
-dGVyY2VwdG9yc192Zm9yay5TLm8pOiB3YXJuaW5nOiBjb21tb24gb2YgYF9faW50ZXJjZXB0aW9u
-OjpyZWFsX3Zmb3JrJyBvdmVycmlkZGVuIGJ5IGRlZmluaXRpb24gZnJvbSAvdXNyL2xpYjY0L2Ns
-YW5nLzEwLjAuMC9saWIvbGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2ludGVy
-Y2VwdG9ycy5jcHAubykKICBMSU5LICAgIHNjc2kvcWVtdS1wci1oZWxwZXIKICBMSU5LICAgIHFl
-bXUtYnJpZGdlLWhlbHBlcgogIExJTksgICAgdmlydGlvZnNkCi91c3IvYmluL2xkOiAvdXNyL2xp
-YjY0L2NsYW5nLzEwLjAuMC9saWIvbGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2Fu
-X2ludGVyY2VwdG9yc192Zm9yay5TLm8pOiB3YXJuaW5nOiBjb21tb24gb2YgYF9faW50ZXJjZXB0
-aW9uOjpyZWFsX3Zmb3JrJyBvdmVycmlkZGVuIGJ5IGRlZmluaXRpb24gZnJvbSAvdXNyL2xpYjY0
-L2NsYW5nLzEwLjAuMC9saWIvbGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2lu
-dGVyY2VwdG9ycy5jcHAubykKL3Vzci9iaW4vbGQ6IC91c3IvbGliNjQvY2xhbmcvMTAuMC4wL2xp
-Yi9saW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFzYW5faW50ZXJjZXB0b3JzX3Zmb3Jr
-LlMubyk6IHdhcm5pbmc6IGNvbW1vbiBvZiBgX19pbnRlcmNlcHRpb246OnJlYWxfdmZvcmsnIG92
-ZXJyaWRkZW4gYnkgZGVmaW5pdGlvbiBmcm9tIC91c3IvbGliNjQvY2xhbmcvMTAuMC4wL2xpYi9s
-aW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFzYW5faW50ZXJjZXB0b3JzLmNwcC5vKQog
-IExJTksgICAgdmhvc3QtdXNlci1pbnB1dAovdXNyL2Jpbi9sZDogL3Vzci9saWI2NC9jbGFuZy8x
-MC4wLjAvbGliL2xpbnV4L2xpYmNsYW5nX3J0LmFzYW4teDg2XzY0LmEoYXNhbl9pbnRlcmNlcHRv
-cnNfdmZvcmsuUy5vKTogd2FybmluZzogY29tbW9uIG9mIGBfX2ludGVyY2VwdGlvbjo6cmVhbF92
-Zm9yaycgb3ZlcnJpZGRlbiBieSBkZWZpbml0aW9uIGZyb20gL3Vzci9saWI2NC9jbGFuZy8xMC4w
-LjAvbGliL2xpbnV4L2xpYmNsYW5nX3J0LmFzYW4teDg2XzY0LmEoYXNhbl9pbnRlcmNlcHRvcnMu
-Y3BwLm8pCi91c3IvYmluL2xkOiAvdXNyL2xpYjY0L2NsYW5nLzEwLjAuMC9saWIvbGludXgvbGli
-Y2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2ludGVyY2VwdG9yc192Zm9yay5TLm8pOiB3YXJu
-aW5nOiBjb21tb24gb2YgYF9faW50ZXJjZXB0aW9uOjpyZWFsX3Zmb3JrJyBvdmVycmlkZGVuIGJ5
-IGRlZmluaXRpb24gZnJvbSAvdXNyL2xpYjY0L2NsYW5nLzEwLjAuMC9saWIvbGludXgvbGliY2xh
-bmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2ludGVyY2VwdG9ycy5jcHAubykKICBHRU4gICAgIHg4
-Nl82NC1zb2Z0bW11L2htcC1jb21tYW5kcy5oCiAgR0VOICAgICB4ODZfNjQtc29mdG1tdS9obXAt
-Y29tbWFuZHMtaW5mby5oCiAgR0VOICAgICB4ODZfNjQtc29mdG1tdS9jb25maWctZGV2aWNlcy5o
-Ci0tLQogIENDICAgICAgeDg2XzY0LXNvZnRtbXUvZ2Ric3R1Yi14bWwubwogIENDICAgICAgeDg2
-XzY0LXNvZnRtbXUvdHJhY2UvZ2VuZXJhdGVkLWhlbHBlcnMubwogIExJTksgICAgeDg2XzY0LXNv
-ZnRtbXUvcWVtdS1zeXN0ZW0teDg2XzY0Ci91c3IvYmluL2xkOiAvdXNyL2xpYjY0L2NsYW5nLzEw
-LjAuMC9saWIvbGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2ludGVyY2VwdG9y
-c192Zm9yay5TLm8pOiB3YXJuaW5nOiBjb21tb24gb2YgYF9faW50ZXJjZXB0aW9uOjpyZWFsX3Zm
-b3JrJyBvdmVycmlkZGVuIGJ5IGRlZmluaXRpb24gZnJvbSAvdXNyL2xpYjY0L2NsYW5nLzEwLjAu
-MC9saWIvbGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2ludGVyY2VwdG9ycy5j
-cHAubykKY29tbW9uLnJjOiBsaW5lIDUwOiB0ZXN0OiBjaGVjazogYmluYXJ5IG9wZXJhdG9yIGV4
-cGVjdGVkCihwcmludGYgJyNkZWZpbmUgUUVNVV9QS0dWRVJTSU9OICIiXG4nOyBwcmludGYgJyNk
-ZWZpbmUgUUVNVV9GVUxMX1ZFUlNJT04gIjUuMC41MCJcbic7ICkgPiBxZW11LXZlcnNpb24uaC50
-bXAKbWFrZSAtQyAvdG1wL3FlbXUtdGVzdC9zcmMvc2xpcnAgQlVJTERfRElSPSIvdG1wL3FlbXUt
-dGVzdC9idWlsZC9zbGlycCIgUEtHX0NPTkZJRz0icGtnLWNvbmZpZyIgQ0M9ImNsYW5nIiBBUj0i
-YXIiICAgICAgTEQ9ImxkIiBSQU5MSUI9InJhbmxpYiIgQ0ZMQUdTPSItSS91c3IvaW5jbHVkZS9w
-aXhtYW4tMSAgIC1XZXJyb3IgLWZzYW5pdGl6ZT11bmRlZmluZWQgLWZzYW5pdGl6ZT1hZGRyZXNz
-ICAtcHRocmVhZCAtSS91c3IvaW5jbHVkZS9nbGliLTIuMCAtSS91c3IvbGliNjQvZ2xpYi0yLjAv
-aW5jbHVkZSAgLWZQSUUgLURQSUUgLW02NCAtbWN4MTYgLURfR05VX1NPVVJDRSAtRF9GSUxFX09G
-RlNFVF9CSVRTPTY0IC1EX0xBUkdFRklMRV9TT1VSQ0UgLVdzdHJpY3QtcHJvdG90eXBlcyAtV3Jl
-ZHVuZGFudC1kZWNscyAtV2FsbCAtV3VuZGVmIC1Xd3JpdGUtc3RyaW5ncyAtV21pc3NpbmctcHJv
-dG90eXBlcyAtZm5vLXN0cmljdC1hbGlhc2luZyAtZm5vLWNvbW1vbiAtZndyYXB2IC1zdGQ9Z251
-OTkgIC1Xb2xkLXN0eWxlLWRlZmluaXRpb24gLVd0eXBlLWxpbWl0cyAtV2Zvcm1hdC1zZWN1cml0
-eSAtV2Zvcm1hdC15MmsgLVdpbml0LXNlbGYgLVdpZ25vcmVkLXF1YWxpZmllcnMgLVdlbXB0eS1i
-b2R5IC1XbmVzdGVkLWV4dGVybnMgLVdlbmRpZi1sYWJlbHMgLVdleHBhbnNpb24tdG8tZGVmaW5l
-ZCAtV25vLWluaXRpYWxpemVyLW92ZXJyaWRlcyAtV25vLW1pc3NpbmctaW5jbHVkZS1kaXJzIC1X
-bm8tc2hpZnQtbmVnYXRpdmUtdmFsdWUgLVduby1zdHJpbmctcGx1cy1pbnQgLVduby10eXBlZGVm
-LXJlZGVmaW5pdGlvbiAtV25vLXRhdXRvbG9naWNhbC10eXBlLWxpbWl0LWNvbXBhcmUgLWZzdGFj
-ay1wcm90ZWN0b3Itc3Ryb25nICAgLUkvdXNyL2luY2x1ZGUvcDExLWtpdC0xICAgLURTVFJVQ1Rf
-SU9WRUNfREVGSU5FRCAgLUkvdXNyL2luY2x1ZGUvbGlicG5nMTYgIC1JL3Vzci9pbmNsdWRlL3Nw
-aWNlLTEgLUkvdXNyL2luY2x1ZGUvc3BpY2Utc2VydmVyIC1JL3Vzci9pbmNsdWRlL2NhY2FyZCAt
-SS91c3IvaW5jbHVkZS9nbGliLTIuMCAtSS91c3IvbGliNjQvZ2xpYi0yLjAvaW5jbHVkZSAtSS91
-c3IvaW5jbHVkZS9uc3MzIC1JL3Vzci9pbmNsdWRlL25zcHI0IC1wdGhyZWFkIC1JL3Vzci9pbmNs
-dWRlL2xpYm1vdW50IC1JL3Vzci9pbmNsdWRlL2Jsa2lkIC1JL3Vzci9pbmNsdWRlL3BpeG1hbi0x
-ICAgLUkvdG1wL3FlbXUtdGVzdC9zcmMvdGVzdHMgLUkvdG1wL3FlbXUtdGVzdC9zcmMvdGVzdHMv
-cXRlc3QgLWcgIiBMREZMQUdTPSItV2wsLS13YXJuLWNvbW1vbiAtZnNhbml0aXplPXVuZGVmaW5l
-ZCAtZnNhbml0aXplPWFkZHJlc3MgLVdsLC16LHJlbHJvIC1XbCwteixub3cgLXBpZSAtbTY0ICAt
-ZnN0YWNrLXByb3RlY3Rvci1zdHJvbmciCi0tLQpjbGFuZyAtaXF1b3RlIC90bXAvcWVtdS10ZXN0
-L2J1aWxkL3Rlc3RzIC1pcXVvdGUgdGVzdHMgLWlxdW90ZSAvdG1wL3FlbXUtdGVzdC9zcmMvdGNn
-L2kzODYgLWlzeXN0ZW0gL3RtcC9xZW11LXRlc3Qvc3JjL2xpbnV4LWhlYWRlcnMgLWlzeXN0ZW0g
-L3RtcC9xZW11LXRlc3QvYnVpbGQvbGludXgtaGVhZGVycyAtaXF1b3RlIC4gLWlxdW90ZSAvdG1w
-L3FlbXUtdGVzdC9zcmMgLWlxdW90ZSAvdG1wL3FlbXUtdGVzdC9zcmMvYWNjZWwvdGNnIC1pcXVv
-dGUgL3RtcC9xZW11LXRlc3Qvc3JjL2luY2x1ZGUgLWlxdW90ZSAvdG1wL3FlbXUtdGVzdC9zcmMv
-ZGlzYXMvbGlidml4bCAtSS91c3IvaW5jbHVkZS9waXhtYW4tMSAgIC1XZXJyb3IgLWZzYW5pdGl6
-ZT11bmRlZmluZWQgLWZzYW5pdGl6ZT1hZGRyZXNzICAtcHRocmVhZCAtSS91c3IvaW5jbHVkZS9n
-bGliLTIuMCAtSS91c3IvbGliNjQvZ2xpYi0yLjAvaW5jbHVkZSAgLWZQSUUgLURQSUUgLW02NCAt
-bWN4MTYgLURfR05VX1NPVVJDRSAtRF9GSUxFX09GRlNFVF9CSVRTPTY0IC1EX0xBUkdFRklMRV9T
-T1VSQ0UgLVdzdHJpY3QtcHJvdG90eXBlcyAtV3JlZHVuZGFudC1kZWNscyAtV2FsbCAtV3VuZGVm
-IC1Xd3JpdGUtc3RyaW5ncyAtV21pc3NpbmctcHJvdG90eXBlcyAtZm5vLXN0cmljdC1hbGlhc2lu
-ZyAtZm5vLWNvbW1vbiAtZndyYXB2IC1zdGQ9Z251OTkgIC1Xb2xkLXN0eWxlLWRlZmluaXRpb24g
-LVd0eXBlLWxpbWl0cyAtV2Zvcm1hdC1zZWN1cml0eSAtV2Zvcm1hdC15MmsgLVdpbml0LXNlbGYg
-LVdpZ25vcmVkLXF1YWxpZmllcnMgLVdlbXB0eS1ib2R5IC1XbmVzdGVkLWV4dGVybnMgLVdlbmRp
-Zi1sYWJlbHMgLVdleHBhbnNpb24tdG8tZGVmaW5lZCAtV25vLWluaXRpYWxpemVyLW92ZXJyaWRl
-cyAtV25vLW1pc3NpbmctaW5jbHVkZS1kaXJzIC1Xbm8tc2hpZnQtbmVnYXRpdmUtdmFsdWUgLVdu
-by1zdHJpbmctcGx1cy1pbnQgLVduby10eXBlZGVmLXJlZGVmaW5pdGlvbiAtV25vLXRhdXRvbG9n
-aWNhbC10eXBlLWxpbWl0LWNvbXBhcmUgLWZzdGFjay1wcm90ZWN0b3Itc3Ryb25nICAgLUkvdXNy
-L2luY2x1ZGUvcDExLWtpdC0xICAgLURTVFJVQ1RfSU9WRUNfREVGSU5FRCAgLUkvdXNyL2luY2x1
-ZGUvbGlicG5nMTYgIC1JL3Vzci9pbmNsdWRlL3NwaWNlLTEgLUkvdXNyL2luY2x1ZGUvc3BpY2Ut
-c2VydmVyIC1JL3Vzci9pbmNsdWRlL2NhY2FyZCAtSS91c3IvaW5jbHVkZS9nbGliLTIuMCAtSS91
-c3IvbGliNjQvZ2xpYi0yLjAvaW5jbHVkZSAtSS91c3IvaW5jbHVkZS9uc3MzIC1JL3Vzci9pbmNs
-dWRlL25zcHI0IC1wdGhyZWFkIC1JL3Vzci9pbmNsdWRlL2xpYm1vdW50IC1JL3Vzci9pbmNsdWRl
-L2Jsa2lkIC1JL3Vzci9pbmNsdWRlL3BpeG1hbi0xICAgLUkvdG1wL3FlbXUtdGVzdC9zcmMvdGVz
-dHMgLUkvdG1wL3FlbXUtdGVzdC9zcmMvdGVzdHMvcXRlc3QgLU1NRCAtTVAgLU1UIHRlc3RzL2lv
-LWNoYW5uZWwtaGVscGVycy5vIC1NRiB0ZXN0cy9pby1jaGFubmVsLWhlbHBlcnMuZCAtZyAgIC1j
-IC1vIHRlc3RzL2lvLWNoYW5uZWwtaGVscGVycy5vIC90bXAvcWVtdS10ZXN0L3NyYy90ZXN0cy9p
-by1jaGFubmVsLWhlbHBlcnMuYwpjbGFuZyAtaXF1b3RlIC90bXAvcWVtdS10ZXN0L2J1aWxkL3Rl
-c3RzIC1pcXVvdGUgdGVzdHMgLWlxdW90ZSAvdG1wL3FlbXUtdGVzdC9zcmMvdGNnL2kzODYgLWlz
-eXN0ZW0gL3RtcC9xZW11LXRlc3Qvc3JjL2xpbnV4LWhlYWRlcnMgLWlzeXN0ZW0gL3RtcC9xZW11
-LXRlc3QvYnVpbGQvbGludXgtaGVhZGVycyAtaXF1b3RlIC4gLWlxdW90ZSAvdG1wL3FlbXUtdGVz
-dC9zcmMgLWlxdW90ZSAvdG1wL3FlbXUtdGVzdC9zcmMvYWNjZWwvdGNnIC1pcXVvdGUgL3RtcC9x
-ZW11LXRlc3Qvc3JjL2luY2x1ZGUgLWlxdW90ZSAvdG1wL3FlbXUtdGVzdC9zcmMvZGlzYXMvbGli
-dml4bCAtSS91c3IvaW5jbHVkZS9waXhtYW4tMSAgIC1XZXJyb3IgLWZzYW5pdGl6ZT11bmRlZmlu
-ZWQgLWZzYW5pdGl6ZT1hZGRyZXNzICAtcHRocmVhZCAtSS91c3IvaW5jbHVkZS9nbGliLTIuMCAt
-SS91c3IvbGliNjQvZ2xpYi0yLjAvaW5jbHVkZSAgLWZQSUUgLURQSUUgLW02NCAtbWN4MTYgLURf
-R05VX1NPVVJDRSAtRF9GSUxFX09GRlNFVF9CSVRTPTY0IC1EX0xBUkdFRklMRV9TT1VSQ0UgLVdz
-dHJpY3QtcHJvdG90eXBlcyAtV3JlZHVuZGFudC1kZWNscyAtV2FsbCAtV3VuZGVmIC1Xd3JpdGUt
-c3RyaW5ncyAtV21pc3NpbmctcHJvdG90eXBlcyAtZm5vLXN0cmljdC1hbGlhc2luZyAtZm5vLWNv
-bW1vbiAtZndyYXB2IC1zdGQ9Z251OTkgIC1Xb2xkLXN0eWxlLWRlZmluaXRpb24gLVd0eXBlLWxp
-bWl0cyAtV2Zvcm1hdC1zZWN1cml0eSAtV2Zvcm1hdC15MmsgLVdpbml0LXNlbGYgLVdpZ25vcmVk
-LXF1YWxpZmllcnMgLVdlbXB0eS1ib2R5IC1XbmVzdGVkLWV4dGVybnMgLVdlbmRpZi1sYWJlbHMg
-LVdleHBhbnNpb24tdG8tZGVmaW5lZCAtV25vLWluaXRpYWxpemVyLW92ZXJyaWRlcyAtV25vLW1p
-c3NpbmctaW5jbHVkZS1kaXJzIC1Xbm8tc2hpZnQtbmVnYXRpdmUtdmFsdWUgLVduby1zdHJpbmct
-cGx1cy1pbnQgLVduby10eXBlZGVmLXJlZGVmaW5pdGlvbiAtV25vLXRhdXRvbG9naWNhbC10eXBl
-LWxpbWl0LWNvbXBhcmUgLWZzdGFjay1wcm90ZWN0b3Itc3Ryb25nICAgLUkvdXNyL2luY2x1ZGUv
-cDExLWtpdC0xICAgLURTVFJVQ1RfSU9WRUNfREVGSU5FRCAgLUkvdXNyL2luY2x1ZGUvbGlicG5n
-MTYgIC1JL3Vzci9pbmNsdWRlL3NwaWNlLTEgLUkvdXNyL2luY2x1ZGUvc3BpY2Utc2VydmVyIC1J
-L3Vzci9pbmNsdWRlL2NhY2FyZCAtSS91c3IvaW5jbHVkZS9nbGliLTIuMCAtSS91c3IvbGliNjQv
-Z2xpYi0yLjAvaW5jbHVkZSAtSS91c3IvaW5jbHVkZS9uc3MzIC1JL3Vzci9pbmNsdWRlL25zcHI0
-IC1wdGhyZWFkIC1JL3Vzci9pbmNsdWRlL2xpYm1vdW50IC1JL3Vzci9pbmNsdWRlL2Jsa2lkIC1J
-L3Vzci9pbmNsdWRlL3BpeG1hbi0xICAgLUkvdG1wL3FlbXUtdGVzdC9zcmMvdGVzdHMgLUkvdG1w
-L3FlbXUtdGVzdC9zcmMvdGVzdHMvcXRlc3QgLU1NRCAtTVAgLU1UIHRlc3RzL3Rlc3QtaW8tY2hh
-bm5lbC1maWxlLm8gLU1GIHRlc3RzL3Rlc3QtaW8tY2hhbm5lbC1maWxlLmQgLWcgICAtYyAtbyB0
-ZXN0cy90ZXN0LWlvLWNoYW5uZWwtZmlsZS5vIC90bXAvcWVtdS10ZXN0L3NyYy90ZXN0cy90ZXN0
-LWlvLWNoYW5uZWwtZmlsZS5jCmNsYW5nIC1pcXVvdGUgL3RtcC9xZW11LXRlc3QvYnVpbGQvdGVz
-dHMgLWlxdW90ZSB0ZXN0cyAtaXF1b3RlIC90bXAvcWVtdS10ZXN0L3NyYy90Y2cvaTM4NiAtaXN5
-c3RlbSAvdG1wL3FlbXUtdGVzdC9zcmMvbGludXgtaGVhZGVycyAtaXN5c3RlbSAvdG1wL3FlbXUt
-dGVzdC9idWlsZC9saW51eC1oZWFkZXJzIC1pcXVvdGUgLiAtaXF1b3RlIC90bXAvcWVtdS10ZXN0
-L3NyYyAtaXF1b3RlIC90bXAvcWVtdS10ZXN0L3NyYy9hY2NlbC90Y2cgLWlxdW90ZSAvdG1wL3Fl
-bXUtdGVzdC9zcmMvaW5jbHVkZSAtaXF1b3RlIC90bXAvcWVtdS10ZXN0L3NyYy9kaXNhcy9saWJ2
-aXhsIC1JL3Vzci9pbmNsdWRlL3BpeG1hbi0xICAgLVdlcnJvciAtZnNhbml0aXplPXVuZGVmaW5l
-ZCAtZnNhbml0aXplPWFkZHJlc3MgIC1wdGhyZWFkIC1JL3Vzci9pbmNsdWRlL2dsaWItMi4wIC1J
-L3Vzci9saWI2NC9nbGliLTIuMC9pbmNsdWRlICAtZlBJRSAtRFBJRSAtbTY0IC1tY3gxNiAtRF9H
-TlVfU09VUkNFIC1EX0ZJTEVfT0ZGU0VUX0JJVFM9NjQgLURfTEFSR0VGSUxFX1NPVVJDRSAtV3N0
-cmljdC1wcm90b3R5cGVzIC1XcmVkdW5kYW50LWRlY2xzIC1XYWxsIC1XdW5kZWYgLVd3cml0ZS1z
-dHJpbmdzIC1XbWlzc2luZy1wcm90b3R5cGVzIC1mbm8tc3RyaWN0LWFsaWFzaW5nIC1mbm8tY29t
-bW9uIC1md3JhcHYgLXN0ZD1nbnU5OSAgLVdvbGQtc3R5bGUtZGVmaW5pdGlvbiAtV3R5cGUtbGlt
-aXRzIC1XZm9ybWF0LXNlY3VyaXR5IC1XZm9ybWF0LXkyayAtV2luaXQtc2VsZiAtV2lnbm9yZWQt
-cXVhbGlmaWVycyAtV2VtcHR5LWJvZHkgLVduZXN0ZWQtZXh0ZXJucyAtV2VuZGlmLWxhYmVscyAt
-V2V4cGFuc2lvbi10by1kZWZpbmVkIC1Xbm8taW5pdGlhbGl6ZXItb3ZlcnJpZGVzIC1Xbm8tbWlz
-c2luZy1pbmNsdWRlLWRpcnMgLVduby1zaGlmdC1uZWdhdGl2ZS12YWx1ZSAtV25vLXN0cmluZy1w
-bHVzLWludCAtV25vLXR5cGVkZWYtcmVkZWZpbml0aW9uIC1Xbm8tdGF1dG9sb2dpY2FsLXR5cGUt
-bGltaXQtY29tcGFyZSAtZnN0YWNrLXByb3RlY3Rvci1zdHJvbmcgICAtSS91c3IvaW5jbHVkZS9w
-MTEta2l0LTEgICAtRFNUUlVDVF9JT1ZFQ19ERUZJTkVEICAtSS91c3IvaW5jbHVkZS9saWJwbmcx
-NiAgLUkvdXNyL2luY2x1ZGUvc3BpY2UtMSAtSS91c3IvaW5jbHVkZS9zcGljZS1zZXJ2ZXIgLUkv
-dXNyL2luY2x1ZGUvY2FjYXJkIC1JL3Vzci9pbmNsdWRlL2dsaWItMi4wIC1JL3Vzci9saWI2NC9n
-bGliLTIuMC9pbmNsdWRlIC1JL3Vzci9pbmNsdWRlL25zczMgLUkvdXNyL2luY2x1ZGUvbnNwcjQg
-LXB0aHJlYWQgLUkvdXNyL2luY2x1ZGUvbGlibW91bnQgLUkvdXNyL2luY2x1ZGUvYmxraWQgLUkv
-dXNyL2luY2x1ZGUvcGl4bWFuLTEgICAtSS90bXAvcWVtdS10ZXN0L3NyYy90ZXN0cyAtSS90bXAv
-cWVtdS10ZXN0L3NyYy90ZXN0cy9xdGVzdCAtTU1EIC1NUCAtTVQgdGVzdHMvdGVzdC1pby1jaGFu
-bmVsLXRscy5vIC1NRiB0ZXN0cy90ZXN0LWlvLWNoYW5uZWwtdGxzLmQgLWcgICAtYyAtbyB0ZXN0
-cy90ZXN0LWlvLWNoYW5uZWwtdGxzLm8gL3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzL3Rlc3QtaW8t
-Y2hhbm5lbC10bHMuYwovdG1wL3FlbXUtdGVzdC9zcmMvdGVzdHMvcWh0LWJlbmNoLmM6Mjg3OjI5
-OiBlcnJvcjogaW1wbGljaXQgY29udmVyc2lvbiBmcm9tICd1bnNpZ25lZCBsb25nJyB0byAnZG91
-YmxlJyBjaGFuZ2VzIHZhbHVlIGZyb20gMTg0NDY3NDQwNzM3MDk1NTE2MTUgdG8gMTg0NDY3NDQw
-NzM3MDk1NTE2MTYgWy1XZXJyb3IsLVdpbXBsaWNpdC1pbnQtZmxvYXQtY29udmVyc2lvbl0KICAg
-ICAgICAqdGhyZXNob2xkID0gcmF0ZSAqIFVJTlQ2NF9NQVg7CiAgICAgICAgICAgICAgICAgICAg
-ICAgICAgfiBefn5+fn5+fn5+Ci91c3IvaW5jbHVkZS9zdGRpbnQuaDoxMzA6MjM6IG5vdGU6IGV4
-cGFuZGVkIGZyb20gbWFjcm8gJ1VJTlQ2NF9NQVgnCi0tLQoxODQ0Njc0NDA3MzcwOTU1MTYxNVVM
-Cl5+fn5+fn5+fn5+fn5+fn5+fn5+fn4KMSBlcnJvciBnZW5lcmF0ZWQuCm1ha2U6ICoqKiBbL3Rt
-cC9xZW11LXRlc3Qvc3JjL3J1bGVzLm1hazo2OTogdGVzdHMvcWh0LWJlbmNoLm9dIEVycm9yIDEK
-bWFrZTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4KVHJhY2ViYWNrIChtb3N0
-IHJlY2VudCBjYWxsIGxhc3QpOgogIEZpbGUgIi4vdGVzdHMvZG9ja2VyL2RvY2tlci5weSIsIGxp
-bmUgNjY5LCBpbiA8bW9kdWxlPgotLS0KICAgIHJhaXNlIENhbGxlZFByb2Nlc3NFcnJvcihyZXRj
-b2RlLCBjbWQpCnN1YnByb2Nlc3MuQ2FsbGVkUHJvY2Vzc0Vycm9yOiBDb21tYW5kICdbJ3N1ZG8n
-LCAnLW4nLCAnZG9ja2VyJywgJ3J1bicsICctLWxhYmVsJywgJ2NvbS5xZW11Lmluc3RhbmNlLnV1
-aWQ9MzgxN2Q1MzI4NjE5NDJkOWEwYTAwNzg3MDEyMTk3OTMnLCAnLXUnLCAnMTAwMScsICctLXNl
-Y3VyaXR5LW9wdCcsICdzZWNjb21wPXVuY29uZmluZWQnLCAnLS1ybScsICctZScsICdUQVJHRVRf
-TElTVD14ODZfNjQtc29mdG1tdScsICctZScsICdFWFRSQV9DT05GSUdVUkVfT1BUUz0nLCAnLWUn
-LCAnVj0nLCAnLWUnLCAnSj0xNCcsICctZScsICdERUJVRz0nLCAnLWUnLCAnU0hPV19FTlY9Jywg
-Jy1lJywgJ0NDQUNIRV9ESVI9L3Zhci90bXAvY2NhY2hlJywgJy12JywgJy9ob21lL3BhdGNoZXcv
-LmNhY2hlL3FlbXUtZG9ja2VyLWNjYWNoZTovdmFyL3RtcC9jY2FjaGU6eicsICctdicsICcvdmFy
-L3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtaDBfc2RuaDQvc3JjL2RvY2tlci1zcmMuMjAyMC0wNi0x
-Ny0wNC4xMi41Ni4xMDMxMzovdmFyL3RtcC9xZW11Onoscm8nLCAncWVtdTpmZWRvcmEnLCAnL3Zh
-ci90bXAvcWVtdS9ydW4nLCAndGVzdC1kZWJ1ZyddJyByZXR1cm5lZCBub24temVybyBleGl0IHN0
-YXR1cyAyLgpmaWx0ZXI9LS1maWx0ZXI9bGFiZWw9Y29tLnFlbXUuaW5zdGFuY2UudXVpZD0zODE3
-ZDUzMjg2MTk0MmQ5YTBhMDA3ODcwMTIxOTc5MwptYWtlWzFdOiAqKiogW2RvY2tlci1ydW5dIEVy
-cm9yIDEKbWFrZVsxXTogTGVhdmluZyBkaXJlY3RvcnkgYC92YXIvdG1wL3BhdGNoZXctdGVzdGVy
-LXRtcC1oMF9zZG5oNC9zcmMnCm1ha2U6ICoqKiBbZG9ja2VyLXJ1bi10ZXN0LWRlYnVnQGZlZG9y
-YV0gRXJyb3IgMgoKcmVhbCAgICA0bTUxLjQ1N3MKdXNlciAgICAwbTguOTE5cwoKClRoZSBmdWxs
-IGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAyMDA2MTcwNzI1
-MzkuMzI2ODYtMS1mNGJ1Z0BhbXNhdC5vcmcvdGVzdGluZy5hc2FuLz90eXBlPW1lc3NhZ2UuCi0t
-LQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNo
-ZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRo
-YXQuY29t
+--000000000000474d6805a84355f5
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hi
+
+On Wed, Jun 17, 2020 at 12:09 PM Li Feng <fengli@smartx.com> wrote:
+
+> Hi Lureau,
+>
+> When will this patch be merged?
+>
+>
+Paolo, can you queue it?
+thanks
+
+Thanks, Feng Li.
+>
+> ---------- Forwarded message ---------
+> =E5=8F=91=E4=BB=B6=E4=BA=BA=EF=BC=9A Dima Stepanov <dimastep@yandex-team.=
+ru>
+> Date: 2020=E5=B9=B46=E6=9C=8815=E6=97=A5=E5=91=A8=E4=B8=80 =E4=B8=8B=E5=
+=8D=884:43
+> Subject: Re: [PATCH v5] char-socket: initialize reconnect timer only
+> when the timer doesn't start
+> To: Li Feng <fengli@smartx.com>
+>
+>
+> Hi,
+>
+> I don't see this change merged to upstream. Any updates on it?
+>
+> Thanks, Dima.
+>
+>
+> On Fri, May 22, 2020 at 10:55:54AM +0800, Li Feng wrote:
+> > When the disconnect event is triggered in the connecting stage,
+> > the tcp_chr_disconnect_locked may be called twice.
+> >
+> > The first call:
+> >     #0  qemu_chr_socket_restart_timer (chr=3D0x55555582ee90) at
+> chardev/char-socket.c:120
+> >     #1  0x000055555558e38c in tcp_chr_disconnect_locked (chr=3D<optimiz=
+ed
+> out>) at chardev/char-socket.c:490
+> >     #2  0x000055555558e3cd in tcp_chr_disconnect (chr=3D0x55555582ee90)=
+ at
+> chardev/char-socket.c:497
+> >     #3  0x000055555558ea32 in tcp_chr_new_client (chr=3Dchr@entry=3D0x5=
+5555582ee90,
+> sioc=3Dsioc@entry=3D0x55555582f0b0) at chardev/char-socket.c:892
+> >     #4  0x000055555558eeb8 in qemu_chr_socket_connected
+> (task=3D0x55555582f300, opaque=3D<optimized out>) at chardev/char-socket.=
+c:1090
+> >     #5  0x0000555555574352 in qio_task_complete (task=3Dtask@entry=3D0x=
+55555582f300)
+> at io/task.c:196
+> >     #6  0x00005555555745f4 in qio_task_thread_result
+> (opaque=3D0x55555582f300) at io/task.c:111
+> >     #7  qio_task_wait_thread (task=3D0x55555582f300) at io/task.c:190
+> >     #8  0x000055555558f17e in tcp_chr_wait_connected
+> (chr=3D0x55555582ee90, errp=3D0x555555802a08 <error_abort>) at
+> chardev/char-socket.c:1013
+> >     #9  0x0000555555567cbd in char_socket_client_reconnect_test
+> (opaque=3D0x5555557fe020 <client8unix>) at tests/test-char.c:1152
+> > The second call:
+> >     #0  0x00007ffff5ac3277 in raise () from /lib64/libc.so.6
+> >     #1  0x00007ffff5ac4968 in abort () from /lib64/libc.so.6
+> >     #2  0x00007ffff5abc096 in __assert_fail_base () from /lib64/libc.so=
+.6
+> >     #3  0x00007ffff5abc142 in __assert_fail () from /lib64/libc.so.6
+> >     #4  0x000055555558d10a in qemu_chr_socket_restart_timer
+> (chr=3D0x55555582ee90) at chardev/char-socket.c:125
+> >     #5  0x000055555558df0c in tcp_chr_disconnect_locked (chr=3D<optimiz=
+ed
+> out>) at chardev/char-socket.c:490
+> >     #6  0x000055555558df4d in tcp_chr_disconnect (chr=3D0x55555582ee90)=
+ at
+> chardev/char-socket.c:497
+> >     #7  0x000055555558e5b2 in tcp_chr_new_client (chr=3Dchr@entry=3D0x5=
+5555582ee90,
+> sioc=3Dsioc@entry=3D0x55555582f0b0) at chardev/char-socket.c:892
+> >     #8  0x000055555558e93a in tcp_chr_connect_client_sync (chr=3Dchr@en=
+try=3D0x55555582ee90,
+> errp=3Derrp@entry=3D0x7fffffffd178) at chardev/char-socket.c:944
+> >     #9  0x000055555558ec78 in tcp_chr_wait_connected
+> (chr=3D0x55555582ee90, errp=3D0x555555802a08 <error_abort>) at
+> chardev/char-socket.c:1035
+> >     #10 0x000055555556804b in char_socket_client_test
+> (opaque=3D0x5555557fe020 <client8unix>) at tests/test-char.c:1023
+> >
+> > Run test/test-char to reproduce this issue.
+> >
+> > test-char: chardev/char-socket.c:125: qemu_chr_socket_restart_timer:
+> Assertion `!s->reconnect_timer' failed.
+> >
+> > Signed-off-by: Li Feng <fengli@smartx.com>
+> > ---
+> > v5:
+> > - rebase to master
+> >
+> > v4:
+> > - remove the wrong patch
+> > - fix the char_socket_ping_pong to support the reconnect exception test
+> >
+> > v3:
+> > - add a patch to fix a crash when recvmsg return 0
+> > - make the tests reproduce the two crash
+> >
+> > v2:
+> > - add unit test
+> >
+> >  chardev/char-socket.c |  2 +-
+> >  tests/test-char.c     | 73
+> +++++++++++++++++++++++++++++++++++++++------------
+> >  2 files changed, 57 insertions(+), 18 deletions(-)
+> >
+> > diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+> > index e77699db48..8af7fdce88 100644
+> > --- a/chardev/char-socket.c
+> > +++ b/chardev/char-socket.c
+> > @@ -486,7 +486,7 @@ static void tcp_chr_disconnect_locked(Chardev *chr)
+> >      if (emit_close) {
+> >          qemu_chr_be_event(chr, CHR_EVENT_CLOSED);
+> >      }
+> > -    if (s->reconnect_time) {
+> > +    if (s->reconnect_time && !s->reconnect_timer) {
+> >          qemu_chr_socket_restart_timer(chr);
+> >      }
+> >  }
+> > diff --git a/tests/test-char.c b/tests/test-char.c
+> > index 3afc9b1b8d..73ba1cf601 100644
+> > --- a/tests/test-char.c
+> > +++ b/tests/test-char.c
+> > @@ -625,12 +625,14 @@ static void char_udp_test(void)
+> >  typedef struct {
+> >      int event;
+> >      bool got_pong;
+> > +    CharBackend *be;
+> >  } CharSocketTestData;
+> >
+> >
+> >  #define SOCKET_PING "Hello"
+> >  #define SOCKET_PONG "World"
+> >
+> > +typedef void (*char_socket_cb)(void *opaque, QEMUChrEvent event);
+> >
+> >  static void
+> >  char_socket_event(void *opaque, QEMUChrEvent event)
+> > @@ -639,6 +641,27 @@ char_socket_event(void *opaque, QEMUChrEvent event=
+)
+> >      data->event =3D event;
+> >  }
+> >
+> > +static void
+> > +char_socket_event_with_error(void *opaque, QEMUChrEvent event)
+> > +{
+> > +    static bool first_error;
+> > +    CharSocketTestData *data =3D opaque;
+> > +    CharBackend *be =3D data->be;
+> > +    data->event =3D event;
+> > +    switch (event) {
+> > +    case CHR_EVENT_OPENED:
+> > +        if (!first_error) {
+> > +            first_error =3D true;
+> > +            qemu_chr_fe_disconnect(be);
+> > +        }
+> > +        return;
+> > +    case CHR_EVENT_CLOSED:
+> > +        return;
+> > +    default:
+> > +        return;
+> > +    }
+> > +}
+> > +
+> >
+> >  static void
+> >  char_socket_read(void *opaque, const uint8_t *buf, int size)
+> > @@ -699,19 +722,24 @@ char_socket_addr_to_opt_str(SocketAddress *addr,
+> bool fd_pass,
+> >  }
+> >
+> >
+> > -static void
+> > -char_socket_ping_pong(QIOChannel *ioc)
+> > +static int
+> > +char_socket_ping_pong(QIOChannel *ioc, Error **errp)
+> >  {
+> >      char greeting[sizeof(SOCKET_PING)];
+> >      const char *response =3D SOCKET_PONG;
+> >
+> > -    qio_channel_read_all(ioc, greeting, sizeof(greeting), &error_abort=
+);
+> > +    int ret;
+> > +    ret =3D qio_channel_read_all(ioc, greeting, sizeof(greeting), errp=
+);
+> > +    if (ret !=3D 0) {
+> > +        object_unref(OBJECT(ioc));
+> > +        return -1;
+> > +    }
+> >
+> >      g_assert(memcmp(greeting, SOCKET_PING, sizeof(greeting)) =3D=3D 0)=
+;
+> >
+> > -    qio_channel_write_all(ioc, response, sizeof(SOCKET_PONG),
+> &error_abort);
+> > -
+> > +    qio_channel_write_all(ioc, response, sizeof(SOCKET_PONG), errp);
+> >      object_unref(OBJECT(ioc));
+> > +    return 0;
+> >  }
+> >
+> >
+> > @@ -723,7 +751,7 @@ char_socket_server_client_thread(gpointer data)
+> >
+> >      qio_channel_socket_connect_sync(ioc, addr, &error_abort);
+> >
+> > -    char_socket_ping_pong(QIO_CHANNEL(ioc));
+> > +    char_socket_ping_pong(QIO_CHANNEL(ioc), &error_abort);
+> >
+> >      return NULL;
+> >  }
+> > @@ -783,6 +811,7 @@ static void char_socket_server_test(gconstpointer
+> opaque)
+> >
+> >   reconnect:
+> >      data.event =3D -1;
+> > +    data.be =3D &be;
+> >      qemu_chr_fe_set_handlers(&be, NULL, NULL,
+> >                               char_socket_event, NULL,
+> >                               &data, NULL, true);
+> > @@ -855,10 +884,13 @@ char_socket_client_server_thread(gpointer data)
+> >      QIOChannelSocket *ioc =3D data;
+> >      QIOChannelSocket *cioc;
+> >
+> > +retry:
+> >      cioc =3D qio_channel_socket_accept(ioc, &error_abort);
+> >      g_assert_nonnull(cioc);
+> >
+> > -    char_socket_ping_pong(QIO_CHANNEL(cioc));
+> > +    if (char_socket_ping_pong(QIO_CHANNEL(cioc), NULL) !=3D 0) {
+> > +        goto retry;
+> > +    }
+> >
+> >      return NULL;
+> >  }
+> > @@ -869,12 +901,13 @@ typedef struct {
+> >      const char *reconnect;
+> >      bool wait_connected;
+> >      bool fd_pass;
+> > +    char_socket_cb event_cb;
+> >  } CharSocketClientTestConfig;
+> >
+> > -
+> >  static void char_socket_client_test(gconstpointer opaque)
+> >  {
+> >      const CharSocketClientTestConfig *config =3D opaque;
+> > +    const char_socket_cb event_cb =3D config->event_cb;
+> >      QIOChannelSocket *ioc;
+> >      char *optstr;
+> >      Chardev *chr;
+> > @@ -938,8 +971,9 @@ static void char_socket_client_test(gconstpointer
+> opaque)
+> >
+> >   reconnect:
+> >      data.event =3D -1;
+> > +    data.be =3D &be;
+> >      qemu_chr_fe_set_handlers(&be, NULL, NULL,
+> > -                             char_socket_event, NULL,
+> > +                             event_cb, NULL,
+> >                               &data, NULL, true);
+> >      if (config->reconnect) {
+> >          g_assert(data.event =3D=3D -1);
+> > @@ -977,7 +1011,7 @@ static void char_socket_client_test(gconstpointer
+> opaque)
+> >      /* Setup a callback to receive the reply to our greeting */
+> >      qemu_chr_fe_set_handlers(&be, char_socket_can_read,
+> >                               char_socket_read,
+> > -                             char_socket_event, NULL,
+> > +                             event_cb, NULL,
+> >                               &data, NULL, true);
+> >      g_assert(data.event =3D=3D CHR_EVENT_OPENED);
+> >      data.event =3D -1;
+> > @@ -1422,17 +1456,20 @@ int main(int argc, char **argv)
+> >
+> >  #define SOCKET_CLIENT_TEST(name, addr)
+> \
+> >      static CharSocketClientTestConfig client1 ## name =3D
+>  \
+> > -        { addr, NULL, false, false };
+>  \
+> > +        { addr, NULL, false, false, char_socket_event};
+>  \
+> >      static CharSocketClientTestConfig client2 ## name =3D
+>  \
+> > -        { addr, NULL, true, false };
+> \
+> > +        { addr, NULL, true, false, char_socket_event };
+>  \
+> >      static CharSocketClientTestConfig client3 ## name =3D
+>  \
+> > -        { addr, ",reconnect=3D1", false };
+> \
+> > +        { addr, ",reconnect=3D1", false, false, char_socket_event };
+> \
+> >      static CharSocketClientTestConfig client4 ## name =3D
+>  \
+> > -        { addr, ",reconnect=3D1", true };
+>  \
+> > +        { addr, ",reconnect=3D1", true, false, char_socket_event };
+>  \
+> >      static CharSocketClientTestConfig client5 ## name =3D
+>  \
+> > -        { addr, NULL, false, true };
+> \
+> > +        { addr, NULL, false, true, char_socket_event };
+>  \
+> >      static CharSocketClientTestConfig client6 ## name =3D
+>  \
+> > -        { addr, NULL, true, true };
+>  \
+> > +        { addr, NULL, true, true, char_socket_event };
+> \
+> > +    static CharSocketClientTestConfig client7 ## name =3D
+>  \
+> > +        { addr, ",reconnect=3D1", true, false,
+> \
+> > +            char_socket_event_with_error };
+>  \
+> >      g_test_add_data_func("/char/socket/client/mainloop/" # name,
+> \
+> >                           &client1 ##name, char_socket_client_test);
+>  \
+> >      g_test_add_data_func("/char/socket/client/wait-conn/" # name,
+>  \
+> > @@ -1444,7 +1481,9 @@ int main(int argc, char **argv)
+> >      g_test_add_data_func("/char/socket/client/mainloop-fdpass/" # name=
+,
+> \
+> >                           &client5 ##name, char_socket_client_test);
+>  \
+> >      g_test_add_data_func("/char/socket/client/wait-conn-fdpass/" #
+> name, \
+> > -                         &client6 ##name, char_socket_client_test)
+> > +                         &client6 ##name, char_socket_client_test);
+>  \
+> > +    g_test_add_data_func("/char/socket/client/reconnect-error/" # name=
+,
+> \
+> > +                         &client7 ##name, char_socket_client_test)
+> >
+> >      if (has_ipv4) {
+> >          SOCKET_SERVER_TEST(tcp, &tcpaddr);
+> > --
+> > 2.11.0
+> >
+>
+>
+
+--=20
+Marc-Andr=C3=A9 Lureau
+
+--000000000000474d6805a84355f5
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div dir=3D"ltr">Hi<br></div><br><div class=3D"gmail_quote=
+"><div dir=3D"ltr" class=3D"gmail_attr">On Wed, Jun 17, 2020 at 12:09 PM Li=
+ Feng &lt;<a href=3D"mailto:fengli@smartx.com">fengli@smartx.com</a>&gt; wr=
+ote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px=
+ 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">Hi Lureau,<=
+br>
+<br>
+When will this patch be merged?<br>
+<br></blockquote><div><br></div><div>Paolo, can you queue it?</div><div>tha=
+nks</div><div><br></div><blockquote class=3D"gmail_quote" style=3D"margin:0=
+px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">
+Thanks, Feng Li.<br>
+<br>
+---------- Forwarded message ---------<br>
+=E5=8F=91=E4=BB=B6=E4=BA=BA=EF=BC=9A Dima Stepanov &lt;<a href=3D"mailto:di=
+mastep@yandex-team.ru" target=3D"_blank">dimastep@yandex-team.ru</a>&gt;<br=
+>
+Date: 2020=E5=B9=B46=E6=9C=8815=E6=97=A5=E5=91=A8=E4=B8=80 =E4=B8=8B=E5=8D=
+=884:43<br>
+Subject: Re: [PATCH v5] char-socket: initialize reconnect timer only<br>
+when the timer doesn&#39;t start<br>
+To: Li Feng &lt;<a href=3D"mailto:fengli@smartx.com" target=3D"_blank">feng=
+li@smartx.com</a>&gt;<br>
+<br>
+<br>
+Hi,<br>
+<br>
+I don&#39;t see this change merged to upstream. Any updates on it?<br>
+<br>
+Thanks, Dima.<br>
+<br>
+<br>
+On Fri, May 22, 2020 at 10:55:54AM +0800, Li Feng wrote:<br>
+&gt; When the disconnect event is triggered in the connecting stage,<br>
+&gt; the tcp_chr_disconnect_locked may be called twice.<br>
+&gt;<br>
+&gt; The first call:<br>
+&gt;=C2=A0 =C2=A0 =C2=A0#0=C2=A0 qemu_chr_socket_restart_timer (chr=3D0x555=
+55582ee90) at chardev/char-socket.c:120<br>
+&gt;=C2=A0 =C2=A0 =C2=A0#1=C2=A0 0x000055555558e38c in tcp_chr_disconnect_l=
+ocked (chr=3D&lt;optimized out&gt;) at chardev/char-socket.c:490<br>
+&gt;=C2=A0 =C2=A0 =C2=A0#2=C2=A0 0x000055555558e3cd in tcp_chr_disconnect (=
+chr=3D0x55555582ee90) at chardev/char-socket.c:497<br>
+&gt;=C2=A0 =C2=A0 =C2=A0#3=C2=A0 0x000055555558ea32 in tcp_chr_new_client (=
+chr=3Dchr@entry=3D0x55555582ee90, sioc=3Dsioc@entry=3D0x55555582f0b0) at ch=
+ardev/char-socket.c:892<br>
+&gt;=C2=A0 =C2=A0 =C2=A0#4=C2=A0 0x000055555558eeb8 in qemu_chr_socket_conn=
+ected (task=3D0x55555582f300, opaque=3D&lt;optimized out&gt;) at chardev/ch=
+ar-socket.c:1090<br>
+&gt;=C2=A0 =C2=A0 =C2=A0#5=C2=A0 0x0000555555574352 in qio_task_complete (t=
+ask=3Dtask@entry=3D0x55555582f300) at io/task.c:196<br>
+&gt;=C2=A0 =C2=A0 =C2=A0#6=C2=A0 0x00005555555745f4 in qio_task_thread_resu=
+lt (opaque=3D0x55555582f300) at io/task.c:111<br>
+&gt;=C2=A0 =C2=A0 =C2=A0#7=C2=A0 qio_task_wait_thread (task=3D0x55555582f30=
+0) at io/task.c:190<br>
+&gt;=C2=A0 =C2=A0 =C2=A0#8=C2=A0 0x000055555558f17e in tcp_chr_wait_connect=
+ed (chr=3D0x55555582ee90, errp=3D0x555555802a08 &lt;error_abort&gt;) at cha=
+rdev/char-socket.c:1013<br>
+&gt;=C2=A0 =C2=A0 =C2=A0#9=C2=A0 0x0000555555567cbd in char_socket_client_r=
+econnect_test (opaque=3D0x5555557fe020 &lt;client8unix&gt;) at tests/test-c=
+har.c:1152<br>
+&gt; The second call:<br>
+&gt;=C2=A0 =C2=A0 =C2=A0#0=C2=A0 0x00007ffff5ac3277 in raise () from /lib64=
+/libc.so.6<br>
+&gt;=C2=A0 =C2=A0 =C2=A0#1=C2=A0 0x00007ffff5ac4968 in abort () from /lib64=
+/libc.so.6<br>
+&gt;=C2=A0 =C2=A0 =C2=A0#2=C2=A0 0x00007ffff5abc096 in __assert_fail_base (=
+) from /lib64/libc.so.6<br>
+&gt;=C2=A0 =C2=A0 =C2=A0#3=C2=A0 0x00007ffff5abc142 in __assert_fail () fro=
+m /lib64/libc.so.6<br>
+&gt;=C2=A0 =C2=A0 =C2=A0#4=C2=A0 0x000055555558d10a in qemu_chr_socket_rest=
+art_timer (chr=3D0x55555582ee90) at chardev/char-socket.c:125<br>
+&gt;=C2=A0 =C2=A0 =C2=A0#5=C2=A0 0x000055555558df0c in tcp_chr_disconnect_l=
+ocked (chr=3D&lt;optimized out&gt;) at chardev/char-socket.c:490<br>
+&gt;=C2=A0 =C2=A0 =C2=A0#6=C2=A0 0x000055555558df4d in tcp_chr_disconnect (=
+chr=3D0x55555582ee90) at chardev/char-socket.c:497<br>
+&gt;=C2=A0 =C2=A0 =C2=A0#7=C2=A0 0x000055555558e5b2 in tcp_chr_new_client (=
+chr=3Dchr@entry=3D0x55555582ee90, sioc=3Dsioc@entry=3D0x55555582f0b0) at ch=
+ardev/char-socket.c:892<br>
+&gt;=C2=A0 =C2=A0 =C2=A0#8=C2=A0 0x000055555558e93a in tcp_chr_connect_clie=
+nt_sync (chr=3Dchr@entry=3D0x55555582ee90, errp=3Derrp@entry=3D0x7fffffffd1=
+78) at chardev/char-socket.c:944<br>
+&gt;=C2=A0 =C2=A0 =C2=A0#9=C2=A0 0x000055555558ec78 in tcp_chr_wait_connect=
+ed (chr=3D0x55555582ee90, errp=3D0x555555802a08 &lt;error_abort&gt;) at cha=
+rdev/char-socket.c:1035<br>
+&gt;=C2=A0 =C2=A0 =C2=A0#10 0x000055555556804b in char_socket_client_test (=
+opaque=3D0x5555557fe020 &lt;client8unix&gt;) at tests/test-char.c:1023<br>
+&gt;<br>
+&gt; Run test/test-char to reproduce this issue.<br>
+&gt;<br>
+&gt; test-char: chardev/char-socket.c:125: qemu_chr_socket_restart_timer: A=
+ssertion `!s-&gt;reconnect_timer&#39; failed.<br>
+&gt;<br>
+&gt; Signed-off-by: Li Feng &lt;<a href=3D"mailto:fengli@smartx.com" target=
+=3D"_blank">fengli@smartx.com</a>&gt;<br>
+&gt; ---<br>
+&gt; v5:<br>
+&gt; - rebase to master<br>
+&gt;<br>
+&gt; v4:<br>
+&gt; - remove the wrong patch<br>
+&gt; - fix the char_socket_ping_pong to support the reconnect exception tes=
+t<br>
+&gt;<br>
+&gt; v3:<br>
+&gt; - add a patch to fix a crash when recvmsg return 0<br>
+&gt; - make the tests reproduce the two crash<br>
+&gt;<br>
+&gt; v2:<br>
+&gt; - add unit test<br>
+&gt;<br>
+&gt;=C2=A0 chardev/char-socket.c |=C2=A0 2 +-<br>
+&gt;=C2=A0 tests/test-char.c=C2=A0 =C2=A0 =C2=A0| 73 ++++++++++++++++++++++=
++++++++++++++++++------------<br>
+&gt;=C2=A0 2 files changed, 57 insertions(+), 18 deletions(-)<br>
+&gt;<br>
+&gt; diff --git a/chardev/char-socket.c b/chardev/char-socket.c<br>
+&gt; index e77699db48..8af7fdce88 100644<br>
+&gt; --- a/chardev/char-socket.c<br>
+&gt; +++ b/chardev/char-socket.c<br>
+&gt; @@ -486,7 +486,7 @@ static void tcp_chr_disconnect_locked(Chardev *chr=
+)<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 if (emit_close) {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_chr_be_event(chr, CHR_EVENT_CLO=
+SED);<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 }<br>
+&gt; -=C2=A0 =C2=A0 if (s-&gt;reconnect_time) {<br>
+&gt; +=C2=A0 =C2=A0 if (s-&gt;reconnect_time &amp;&amp; !s-&gt;reconnect_ti=
+mer) {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_chr_socket_restart_timer(chr);<=
+br>
+&gt;=C2=A0 =C2=A0 =C2=A0 }<br>
+&gt;=C2=A0 }<br>
+&gt; diff --git a/tests/test-char.c b/tests/test-char.c<br>
+&gt; index 3afc9b1b8d..73ba1cf601 100644<br>
+&gt; --- a/tests/test-char.c<br>
+&gt; +++ b/tests/test-char.c<br>
+&gt; @@ -625,12 +625,14 @@ static void char_udp_test(void)<br>
+&gt;=C2=A0 typedef struct {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 int event;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 bool got_pong;<br>
+&gt; +=C2=A0 =C2=A0 CharBackend *be;<br>
+&gt;=C2=A0 } CharSocketTestData;<br>
+&gt;<br>
+&gt;<br>
+&gt;=C2=A0 #define SOCKET_PING &quot;Hello&quot;<br>
+&gt;=C2=A0 #define SOCKET_PONG &quot;World&quot;<br>
+&gt;<br>
+&gt; +typedef void (*char_socket_cb)(void *opaque, QEMUChrEvent event);<br>
+&gt;<br>
+&gt;=C2=A0 static void<br>
+&gt;=C2=A0 char_socket_event(void *opaque, QEMUChrEvent event)<br>
+&gt; @@ -639,6 +641,27 @@ char_socket_event(void *opaque, QEMUChrEvent even=
+t)<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 data-&gt;event =3D event;<br>
+&gt;=C2=A0 }<br>
+&gt;<br>
+&gt; +static void<br>
+&gt; +char_socket_event_with_error(void *opaque, QEMUChrEvent event)<br>
+&gt; +{<br>
+&gt; +=C2=A0 =C2=A0 static bool first_error;<br>
+&gt; +=C2=A0 =C2=A0 CharSocketTestData *data =3D opaque;<br>
+&gt; +=C2=A0 =C2=A0 CharBackend *be =3D data-&gt;be;<br>
+&gt; +=C2=A0 =C2=A0 data-&gt;event =3D event;<br>
+&gt; +=C2=A0 =C2=A0 switch (event) {<br>
+&gt; +=C2=A0 =C2=A0 case CHR_EVENT_OPENED:<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (!first_error) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 first_error =3D true;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_chr_fe_disconnect(be);=
+<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 return;<br>
+&gt; +=C2=A0 =C2=A0 case CHR_EVENT_CLOSED:<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 return;<br>
+&gt; +=C2=A0 =C2=A0 default:<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 return;<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +}<br>
+&gt; +<br>
+&gt;<br>
+&gt;=C2=A0 static void<br>
+&gt;=C2=A0 char_socket_read(void *opaque, const uint8_t *buf, int size)<br>
+&gt; @@ -699,19 +722,24 @@ char_socket_addr_to_opt_str(SocketAddress *addr,=
+ bool fd_pass,<br>
+&gt;=C2=A0 }<br>
+&gt;<br>
+&gt;<br>
+&gt; -static void<br>
+&gt; -char_socket_ping_pong(QIOChannel *ioc)<br>
+&gt; +static int<br>
+&gt; +char_socket_ping_pong(QIOChannel *ioc, Error **errp)<br>
+&gt;=C2=A0 {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 char greeting[sizeof(SOCKET_PING)];<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 const char *response =3D SOCKET_PONG;<br>
+&gt;<br>
+&gt; -=C2=A0 =C2=A0 qio_channel_read_all(ioc, greeting, sizeof(greeting), &=
+amp;error_abort);<br>
+&gt; +=C2=A0 =C2=A0 int ret;<br>
+&gt; +=C2=A0 =C2=A0 ret =3D qio_channel_read_all(ioc, greeting, sizeof(gree=
+ting), errp);<br>
+&gt; +=C2=A0 =C2=A0 if (ret !=3D 0) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 object_unref(OBJECT(ioc));<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 return -1;<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 g_assert(memcmp(greeting, SOCKET_PING, sizeof(gree=
+ting)) =3D=3D 0);<br>
+&gt;<br>
+&gt; -=C2=A0 =C2=A0 qio_channel_write_all(ioc, response, sizeof(SOCKET_PONG=
+), &amp;error_abort);<br>
+&gt; -<br>
+&gt; +=C2=A0 =C2=A0 qio_channel_write_all(ioc, response, sizeof(SOCKET_PONG=
+), errp);<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 object_unref(OBJECT(ioc));<br>
+&gt; +=C2=A0 =C2=A0 return 0;<br>
+&gt;=C2=A0 }<br>
+&gt;<br>
+&gt;<br>
+&gt; @@ -723,7 +751,7 @@ char_socket_server_client_thread(gpointer data)<br=
+>
+&gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 qio_channel_socket_connect_sync(ioc, addr, &amp;er=
+ror_abort);<br>
+&gt;<br>
+&gt; -=C2=A0 =C2=A0 char_socket_ping_pong(QIO_CHANNEL(ioc));<br>
+&gt; +=C2=A0 =C2=A0 char_socket_ping_pong(QIO_CHANNEL(ioc), &amp;error_abor=
+t);<br>
+&gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 return NULL;<br>
+&gt;=C2=A0 }<br>
+&gt; @@ -783,6 +811,7 @@ static void char_socket_server_test(gconstpointer =
+opaque)<br>
+&gt;<br>
+&gt;=C2=A0 =C2=A0reconnect:<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 data.event =3D -1;<br>
+&gt; +=C2=A0 =C2=A0 <a href=3D"http://data.be" rel=3D"noreferrer" target=3D=
+"_blank">data.be</a> =3D &amp;be;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 qemu_chr_fe_set_handlers(&amp;be, NULL, NULL,<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0char_socket_event, NULL,<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&amp;data, NULL, true);<br>
+&gt; @@ -855,10 +884,13 @@ char_socket_client_server_thread(gpointer data)<=
+br>
+&gt;=C2=A0 =C2=A0 =C2=A0 QIOChannelSocket *ioc =3D data;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 QIOChannelSocket *cioc;<br>
+&gt;<br>
+&gt; +retry:<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 cioc =3D qio_channel_socket_accept(ioc, &amp;error=
+_abort);<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 g_assert_nonnull(cioc);<br>
+&gt;<br>
+&gt; -=C2=A0 =C2=A0 char_socket_ping_pong(QIO_CHANNEL(cioc));<br>
+&gt; +=C2=A0 =C2=A0 if (char_socket_ping_pong(QIO_CHANNEL(cioc), NULL) !=3D=
+ 0) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 goto retry;<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 return NULL;<br>
+&gt;=C2=A0 }<br>
+&gt; @@ -869,12 +901,13 @@ typedef struct {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 const char *reconnect;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 bool wait_connected;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 bool fd_pass;<br>
+&gt; +=C2=A0 =C2=A0 char_socket_cb event_cb;<br>
+&gt;=C2=A0 } CharSocketClientTestConfig;<br>
+&gt;<br>
+&gt; -<br>
+&gt;=C2=A0 static void char_socket_client_test(gconstpointer opaque)<br>
+&gt;=C2=A0 {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 const CharSocketClientTestConfig *config =3D opaqu=
+e;<br>
+&gt; +=C2=A0 =C2=A0 const char_socket_cb event_cb =3D config-&gt;event_cb;<=
+br>
+&gt;=C2=A0 =C2=A0 =C2=A0 QIOChannelSocket *ioc;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 char *optstr;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 Chardev *chr;<br>
+&gt; @@ -938,8 +971,9 @@ static void char_socket_client_test(gconstpointer =
+opaque)<br>
+&gt;<br>
+&gt;=C2=A0 =C2=A0reconnect:<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 data.event =3D -1;<br>
+&gt; +=C2=A0 =C2=A0 <a href=3D"http://data.be" rel=3D"noreferrer" target=3D=
+"_blank">data.be</a> =3D &amp;be;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 qemu_chr_fe_set_handlers(&amp;be, NULL, NULL,<br>
+&gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0char_socket_event, NULL,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0event_cb, NULL,<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&amp;data, NULL, true);<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 if (config-&gt;reconnect) {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 g_assert(data.event =3D=3D -1);<br>
+&gt; @@ -977,7 +1011,7 @@ static void char_socket_client_test(gconstpointer=
+ opaque)<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 /* Setup a callback to receive the reply to our gr=
+eeting */<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 qemu_chr_fe_set_handlers(&amp;be, char_socket_can_=
+read,<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0char_socket_read,<br>
+&gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0char_socket_event, NULL,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0event_cb, NULL,<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&amp;data, NULL, true);<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 g_assert(data.event =3D=3D CHR_EVENT_OPENED);<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 data.event =3D -1;<br>
+&gt; @@ -1422,17 +1456,20 @@ int main(int argc, char **argv)<br>
+&gt;<br>
+&gt;=C2=A0 #define SOCKET_CLIENT_TEST(name, addr)=C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 \<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 static CharSocketClientTestConfig client1 ## name =
+=3D=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
+&gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0 { addr, NULL, false, false };=C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 { addr, NULL, false, false, char_socket_e=
+vent};=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 static CharSocketClientTestConfig client2 ## name =
+=3D=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
+&gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0 { addr, NULL, true, false };=C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 \<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 { addr, NULL, true, false, char_socket_ev=
+ent };=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 static CharSocketClientTestConfig client3 ## name =
+=3D=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
+&gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0 { addr, &quot;,reconnect=3D1&quot;, false=
+ };=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 \<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 { addr, &quot;,reconnect=3D1&quot;, false=
+, false, char_socket_event };=C2=A0 =C2=A0 =C2=A0 \<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 static CharSocketClientTestConfig client4 ## name =
+=3D=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
+&gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0 { addr, &quot;,reconnect=3D1&quot;, true =
+};=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 { addr, &quot;,reconnect=3D1&quot;, true,=
+ false, char_socket_event };=C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 static CharSocketClientTestConfig client5 ## name =
+=3D=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
+&gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0 { addr, NULL, false, true };=C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 \<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 { addr, NULL, false, true, char_socket_ev=
+ent };=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 static CharSocketClientTestConfig client6 ## name =
+=3D=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
+&gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0 { addr, NULL, true, true };=C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 { addr, NULL, true, true, char_socket_eve=
+nt };=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 \<br>
+&gt; +=C2=A0 =C2=A0 static CharSocketClientTestConfig client7 ## name =3D=
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 { addr, &quot;,reconnect=3D1&quot;, true,=
+ false,=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 \<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 char_socket_event_with_erro=
+r };=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 g_test_add_data_func(&quot;/char/socket/client/mai=
+nloop/&quot; # name,=C2=A0 =C2=A0 =C2=A0 =C2=A0 \<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0&amp;client1 ##name, char_socket_client_test);=
+=C2=A0 =C2=A0 =C2=A0\<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 g_test_add_data_func(&quot;/char/socket/client/wai=
+t-conn/&quot; # name,=C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
+&gt; @@ -1444,7 +1481,9 @@ int main(int argc, char **argv)<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 g_test_add_data_func(&quot;/char/socket/client/mai=
+nloop-fdpass/&quot; # name, \<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0&amp;client5 ##name, char_socket_client_test);=
+=C2=A0 =C2=A0 =C2=A0\<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 g_test_add_data_func(&quot;/char/socket/client/wai=
+t-conn-fdpass/&quot; # name, \<br>
+&gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0&amp;client6 ##name, char_socket_client_test)<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0&amp;client6 ##name, char_socket_client_test);=C2=A0 =
+=C2=A0 =C2=A0\<br>
+&gt; +=C2=A0 =C2=A0 g_test_add_data_func(&quot;/char/socket/client/reconnec=
+t-error/&quot; # name, \<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0&amp;client7 ##name, char_socket_client_test)<br>
+&gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 if (has_ipv4) {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 SOCKET_SERVER_TEST(tcp, &amp;tcpaddr=
+);<br>
+&gt; --<br>
+&gt; 2.11.0<br>
+&gt;<br>
+<br>
+</blockquote></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr" class=3D"g=
+mail_signature">Marc-Andr=C3=A9 Lureau<br></div></div>
+
+--000000000000474d6805a84355f5--
 
