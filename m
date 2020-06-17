@@ -2,89 +2,89 @@ Return-Path: <SRS0=bzpH=76=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D447C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 05:52:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C217EC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 05:53:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 47D502073E
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 05:52:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8BC752073E
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 05:53:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XcqOmvFn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47D502073E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="u8ol6Oqa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BC752073E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60086 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34658 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlR06-00036u-G6
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 01:52:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49598)
+	id 1jlR0k-0004Fg-RB
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 01:53:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49654)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jlQz9-0001sL-Bl
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 01:51:43 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:38115)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jlQzb-0002RU-VL; Wed, 17 Jun 2020 01:52:11 -0400
+Received: from mail-wm1-x32d.google.com ([2a00:1450:4864:20::32d]:37923)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jlQz7-0004O6-N3
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 01:51:43 -0400
-Received: by mail-wm1-x341.google.com with SMTP id f185so622507wmf.3
- for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 22:51:41 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jlQzZ-0004QJ-TK; Wed, 17 Jun 2020 01:52:11 -0400
+Received: by mail-wm1-x32d.google.com with SMTP id f185so623244wmf.3;
+ Tue, 16 Jun 2020 22:52:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=jxlSALHKim3gBbTJh91hfmw7yNYDqTGX6WVT3cFQzfc=;
- b=XcqOmvFn7shqprerfoWUZKc2VNMEJIzOo4ZYoivA/hR6nBR0J9bj8e9u6bZ+2Z5EQn
- DpUfXvwDDe2Lm56Slav8NhKbrtAeYIUEqSa008FPE+LR7Z79fNMNJEFzRVa20Jwfo2IN
- spdKG7F2utl9L0mFnovUm1N9GoBObKgWTW59H/hDqKZaXwl2LaZfysdqO53Il1h/m0EW
- 68u9nIkVnXN4QNBRPchYm+kFbYkTd6qVGBOqYGE7/lQvm2VZIopa2YVlYKVQISsifiKr
- iTTfIzd+pAqy1lWA8FA7fb5l3eAno5zbgyBjlMG7SX1he4N0I/KAAARkeyfpVfQLtWRF
- dTEQ==
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=F4jthcsWCc1LZ6kfAfQ/ELBbOn8lAcaBf32TtFDc06Q=;
+ b=u8ol6OqaVITte9oQ0eVUQTo+39E2ZT3Q2LDeraR+ZEU7c7T9o6RoGGZyAJ5bMlB3Uh
+ uMVFQVTAL3SF86rL2C6lb/k4FujU9/+O1dAfiW9wo+s+hS6qECuBPpVJEU4/qCDg4uEp
+ QGjLxLamO28sciwx9CVvoc/ur4J6NiTxIpi+hPXe19oLrIIcdi9mnqkYGtfAJBLRkBdK
+ ApNccln2wMp4lBqGFJ1xOaedxQl++vIebqSUdEj7BYaVzPwZ66bHs2iZkQF0uDgqPsgB
+ U67cHdEAWcZ1f021fmMOUyg9ZqjxieAVbTk5j8CMlfRB8bWpTMNApqKOd4xV/V6B3H0x
+ /Dyw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=jxlSALHKim3gBbTJh91hfmw7yNYDqTGX6WVT3cFQzfc=;
- b=ZqeF9t4W29RZpyzEFsPx0x+b1oSmr9486c4Ek6CemuOZn1ygaqh98N7aVa2uceS8Wq
- V1K2iE2ES0j/cH7VzDD1GRKp3NadP8yDUSQUoexgyZaZ4HxBCHMkH06aztcOis2FYkPG
- g+lPvEiD9C4NSEoyjHCTBsXUTSUTbI9am6XM0daYx3XWzVxry9vn8ke+vSM309WIAHfi
- neF8OYBxlBVUbWXzGWBxU9kkKtIRfGZz+749oTpVhq5oWO5KlnASmVcDxRAqyBTAbuQw
- prJ4UlDDyapIW3pVBgGj+O5dGYQQV2Si7VtEynScz5lI30Dont3yG0sLy0o8diieSyPV
- +j/Q==
-X-Gm-Message-State: AOAM532igXB+PXH09NiKOMhvRfK0s0nd6yc+zZQV6IdFszPOtd3loHfb
- I/EN/RpinKK4APQWOGBUBY+v0XnLsB15WtLcSX8=
-X-Google-Smtp-Source: ABdhPJwDbkSuzSDddWgcVf8ommYr8b35fE3gf84VnlJ7PA92wk8IkZ4H7Bgu4sfVrPSaiuvY9a9du+fmiin4/2sAXqw=
-X-Received: by 2002:a1c:4c05:: with SMTP id z5mr6367153wmf.129.1592373100142; 
- Tue, 16 Jun 2020 22:51:40 -0700 (PDT)
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=F4jthcsWCc1LZ6kfAfQ/ELBbOn8lAcaBf32TtFDc06Q=;
+ b=uTU7KemS/Gl7t1Yx8UYxg5/0aSZeHqUITyfm8gKBlx2WjJ3rU4jPpYECBQhQ5LfErQ
+ B45a3irbkG10w8F/akgUmxPx9gDzFZX5eKD3kKDeL3EsafjJfAwmsWcN7lBf3V1P43ng
+ GTmK0iX6it8woYpUAW2rhYkujj2WbCZfmJtEV4hZieUEzwooohZlFjTmts7BecYPNCMy
+ 8ZYiSLU6hAAMvxYh7KB6y4isSW88BAKFZVdW65Ap1oedac3r7RXic41+QHxIvyjnHHIR
+ w8of7I17i6nV3berSw3r/k39O8xah5LLeST6946ZjU6oKQCyspHfISB/OtT+76oV1pfD
+ f82g==
+X-Gm-Message-State: AOAM533DPQq3mEHfrB4DMphaaD9e+AylVY/LsNlf7lPNFJrtt8SenbD3
+ Qqdh8xeJ7AkhI++VT7YsL2gj6SuG
+X-Google-Smtp-Source: ABdhPJw4uYuEMPWtcRImjTEw2mfW9bPJUY2OHhBlb8Wi8U21DcRMToKLvGDBSZ0jwZTdXqbSOAlLZQ==
+X-Received: by 2002:a7b:c441:: with SMTP id l1mr6325648wmi.7.1592373128060;
+ Tue, 16 Jun 2020 22:52:08 -0700 (PDT)
+Received: from localhost.localdomain (93.red-83-59-160.dynamicip.rima-tde.net.
+ [83.59.160.93])
+ by smtp.gmail.com with ESMTPSA id d28sm3000809wrc.50.2020.06.16.22.52.07
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 16 Jun 2020 22:52:07 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 00/14] mps2: Add few more peripherals
+Date: Wed, 17 Jun 2020 07:51:51 +0200
+Message-Id: <20200617055205.3576-1-f4bug@amsat.org>
+X-Mailer: git-send-email 2.21.3
 MIME-Version: 1.0
-Received: by 2002:a1c:451:0:0:0:0:0 with HTTP;
- Tue, 16 Jun 2020 22:51:39 -0700 (PDT)
-In-Reply-To: <20200616231204.8850-2-ahmedkhaledkaraman@gmail.com>
-References: <20200616231204.8850-1-ahmedkhaledkaraman@gmail.com>
- <20200616231204.8850-2-ahmedkhaledkaraman@gmail.com>
-From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Date: Wed, 17 Jun 2020 07:51:39 +0200
-Message-ID: <CAHiYmc7b6rK8mej0vMs29iVbyzNOf4bvaPUuKPapWY6bos=m=w@mail.gmail.com>
-Subject: Re: [PATCH 1/3] MAINTAINERS: Add 'Miscellaneous' section
-To: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
-Content-Type: multipart/alternative; boundary="000000000000fbe80d05a84140b5"
-Received-SPF: pass client-ip=2a00:1450:4864:20::341;
- envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wm1-x341.google.com
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::32d;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x32d.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,112 +97,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "ldoktor@redhat.com" <ldoktor@redhat.com>,
- "ehabkost@redhat.com" <ehabkost@redhat.com>,
- "alex.bennee@linaro.org" <alex.bennee@linaro.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "crosa@redhat.com" <crosa@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Joaquin de Andres <me@xcancerberox.com.ar>, qemu-arm@nongnu.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Esteban Bosse <estebanbosse@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000fbe80d05a84140b5
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Few patches while playing with Zephyr on the MPS2:
 
-=D1=81=D1=80=D0=B5=D0=B4=D0=B0, 17. =D1=98=D1=83=D0=BD 2020., Ahmed Karaman=
- <ahmedkhaledkaraman@gmail.com> =D1=98=D0=B5
-=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+- clean 'versatile_i2c' a bit,
+- describe it as 'ARM SBCon two-wire serial bus interface'
+  which is common on the ARM documentation,
+- add watchdog
+- added fpgaio with correct prescale clk
+- added i2c and spi
+- added gpio/i2s as unimp
+- dropped the fpgaio push-button patch
 
-> This new section includes the 'Performance Tools and Tests' subsection
-> which will contain the the performance scripts and benchmarks written
-> as a part of the 'TCG Continuous Benchmarking' project.
->
-> Signed-off-by: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
-> ---
+Zephyr ressources used:
+https://docs.zephyrproject.org/latest/boards/arm/mps2_an385/doc/index.html
 
+Philippe Mathieu-Daudé (14):
+  hw/watchdog/cmsdk-apb-watchdog: Add trace event for lock status
+  hw/i2c/versatile_i2c: Add definitions for register addresses
+  hw/i2c/versatile_i2c: Add SCL/SDA definitions
+  hw/i2c: Add header for ARM SBCon two-wire serial bus interface
+  hw/arm: Use TYPE_VERSATILE_I2C instead of hardcoded string
+  hw/arm/mps2: Document CMSDK/FPGA APB subsystem sections
+  hw/arm/mps2: Rename CMSDK AHB peripheral region
+  hw/arm/mps2: Add CMSDK APB watchdog device
+  hw/arm/mps2: Add CMSDK AHB GPIO peripherals as unimplemented devices
+  hw/arm/mps2: Map the FPGA I/O block
+  hw/arm/mps2: Add SPI devices
+  hw/arm/mps2: Add I2C devices
+  hw/arm/mps2: Add audio I2S interface as unimplemented device
+  hw/arm/mps2-tz: Use the ARM SBCon two-wire serial bus interface
 
-I also think that the title of the patch should be 'Add 'Performance Tools
-and Tests' subsection', since this is the core purpose of the patch - new
-section 'Miscellaneous' is just a mean to achieve this.
+ include/hw/i2c/arm_sbcon_i2c.h   | 35 +++++++++++++++++
+ hw/arm/mps2-tz.c                 | 23 ++++++++---
+ hw/arm/mps2.c                    | 65 ++++++++++++++++++++++++++++++--
+ hw/arm/realview.c                |  3 +-
+ hw/arm/versatilepb.c             |  3 +-
+ hw/arm/vexpress.c                |  3 +-
+ hw/i2c/versatile_i2c.c           | 38 ++++++++++---------
+ hw/watchdog/cmsdk-apb-watchdog.c |  1 +
+ MAINTAINERS                      |  1 +
+ hw/arm/Kconfig                   |  1 +
+ hw/watchdog/trace-events         |  1 +
+ 11 files changed, 144 insertions(+), 30 deletions(-)
+ create mode 100644 include/hw/i2c/arm_sbcon_i2c.h
 
-Thanks,
-Aleksandar
+-- 
+2.21.3
 
-
-
-
->  MAINTAINERS | 7 +++++++
->  1 file changed, 7 insertions(+)
->
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 955cc8dd5c..68f668ae2a 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -2974,3 +2974,10 @@ M: Peter Maydell <peter.maydell@linaro.org>
->  S: Maintained
->  F: docs/conf.py
->  F: docs/*/conf.py
-> +
-> +Miscellaneous
-> +-------------
-> +Performance Tools and Tests
-> +M: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
-> +S: Maintained
-> +F: scripts/performance/
-> \ No newline at end of file
-> --
-> 2.17.1
->
->
-
---000000000000fbe80d05a84140b5
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<br><br>=D1=81=D1=80=D0=B5=D0=B4=D0=B0, 17. =D1=98=D1=83=D0=BD 2020., Ahmed=
- Karaman &lt;<a href=3D"mailto:ahmedkhaledkaraman@gmail.com">ahmedkhaledkar=
-aman@gmail.com</a>&gt; =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=
-=BE/=D0=BB=D0=B0:<br><blockquote class=3D"gmail_quote" style=3D"margin:0 0 =
-0 .8ex;border-left:1px #ccc solid;padding-left:1ex">This new section includ=
-es the &#39;Performance Tools and Tests&#39; subsection<br>
-which will contain the the performance scripts and benchmarks written<br>
-as a part of the &#39;TCG Continuous Benchmarking&#39; project.<br>
-<br>
-Signed-off-by: Ahmed Karaman &lt;<a href=3D"mailto:ahmedkhaledkaraman@gmail=
-.com">ahmedkhaledkaraman@gmail.com</a>&gt;<br>
----</blockquote><div><br></div><div>I also think that the title of the patc=
-h should be &#39;Add &#39;Performance Tools and Tests&#39; subsection&#39;,=
- since this is the core purpose of the patch - new section &#39;Miscellaneo=
-us&#39; is just a mean to achieve this.</div><div><br></div><div>Thanks,</d=
-iv><div>Aleksandar</div><div><br></div><div><br></div><div>=C2=A0</div><blo=
-ckquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #c=
-cc solid;padding-left:1ex">
-=C2=A0MAINTAINERS | 7 +++++++<br>
-=C2=A01 file changed, 7 insertions(+)<br>
-<br>
-diff --git a/MAINTAINERS b/MAINTAINERS<br>
-index 955cc8dd5c..68f668ae2a 100644<br>
---- a/MAINTAINERS<br>
-+++ b/MAINTAINERS<br>
-@@ -2974,3 +2974,10 @@ M: Peter Maydell &lt;<a href=3D"mailto:peter.maydell=
-@linaro.org">peter.maydell@linaro.org</a>&gt;<br>
-=C2=A0S: Maintained<br>
-=C2=A0F: docs/conf.py<br>
-=C2=A0F: docs/*/conf.py<br>
-+<br>
-+Miscellaneous<br>
-+-------------<br>
-+Performance Tools and Tests<br>
-+M: Ahmed Karaman &lt;<a href=3D"mailto:ahmedkhaledkaraman@gmail.com">ahmed=
-khaledkaraman@gmail.com</a>&gt;<br>
-+S: Maintained<br>
-+F: scripts/performance/<br>
-\ No newline at end of file<br>
--- <br>
-2.17.1<br>
-<br>
-</blockquote>
-
---000000000000fbe80d05a84140b5--
 
