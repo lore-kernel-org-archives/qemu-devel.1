@@ -7,80 +7,75 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9122C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 21:11:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0182FC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 21:11:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7046C2166E
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 21:11:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AE5C32166E
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 21:11:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GakJUK72"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7046C2166E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EaXicV2S"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE5C32166E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36308 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37472 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlfKq-0007Cx-LG
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 17:11:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37014)
+	id 1jlfL5-0007hl-T3
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 17:11:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37368)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1jlfDe-0002mJ-7x
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 17:03:38 -0400
-Received: from mail-qv1-xf43.google.com ([2607:f8b0:4864:20::f43]:40741)
+ id 1jlfE1-0003EU-4C
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 17:04:05 -0400
+Received: from mail-qt1-x842.google.com ([2607:f8b0:4864:20::842]:44349)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1jlfDX-0008R7-BJ
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 17:03:37 -0400
-Received: by mail-qv1-xf43.google.com with SMTP id e2so1755979qvw.7
- for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 14:03:29 -0700 (PDT)
+ id 1jlfDt-0008UW-Pi
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 17:04:00 -0400
+Received: by mail-qt1-x842.google.com with SMTP id c12so2730052qtq.11
+ for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 14:03:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=I06C2sE0s7zrdX3gLkjEgs8DOpvCtPpl7x1fQYW5h5A=;
- b=GakJUK72IOEF2gr6ZnvdYEt0Ixa+LSj089KcAo663SMsOh9Uak7fxg/4RTtL+mO/MT
- PTE7gH/2bwCTbggFfOsuC5l+tVIk4K0elPXfLB5UO5tkeVl06+gcSDDgSoFO+Zh3UBgS
- c/O5TfHPAOpU4BP+sTgs6tI+NOptFFEdJIOFYhcaRHEJ+NLN9ftoqUHNPrOE+I5dgfnW
- 5ZNP2awYQ7jhNJtlDzXDP+oVQbSZTm9hZ/JVOcVgqVqvgRBLrlftglE26Q70h7udHtCq
- NzSiiXRuNlFJRRT+5crJkVvLm77Nc87XH5veZyvfRFP3rRbjeizlhaBs6MijS0LTCG5w
- iaCw==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=YemnOlklw+URp/aLKC6SFqz2X8HrxCoaaT+NwLjZldo=;
+ b=EaXicV2SrI+jZc6jXA3EYsKOVyBml4iIwvFptjrgJSaDZTl1CxdsgLEDDrg+OTstid
+ /p0bJ/ZhZckKfDS983OAVfF+wUVE7MwWOnt9zISrGsGAI0TdgZXjmtuZAkylfJPmuJCN
+ rWV4jZmZvFyKeJ69TKoVLZO7ID9PNOqbFiQyfE7oNgXwzNxvShyC7SRsUU+wWv3dhOxC
+ yRjfgEL1vTFweXxAEIsGR4Sy6ca4YsqjFEIcU7Fb2ifqarqgxi09BpQSMBdIr1A9I8As
+ u+47cOCFkkr0RBF25khfp7+zOR4Xh0ga3ykD7odaen/IwSoFIRliyhzHsQkAhSo9Ul7J
+ 0enA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=I06C2sE0s7zrdX3gLkjEgs8DOpvCtPpl7x1fQYW5h5A=;
- b=f3iACXxGqMRJELipjCGYzGRc9K7XJa2FbmZua1av2LYTblWtygHVpW9ssPyngGmGtS
- rpQv2i23R+DhdvFxoiyR4OwtLuukVasZaC0/X4IRnNKnpSOSde+3zKk1wEw7tY+AxJaA
- meG+g3PV61LoD8CGsn0RtGLkvpIaL6OufM+stlR3MB3fneJza1zNIpofU3xt18CQqdT8
- ZwASnKv1yGw72/oA/6qIkZLOmcWRsVgWjtjrWP6EUqzaNqdyKRO9WWUPIodJSyEraTNe
- a9P3AAn5CIkyfjohQGbm8vBI4Wcn2VmMZe/Lo1a8bJ30rDMD4TsAbYZlVi6bUrbQezqC
- KlLg==
-X-Gm-Message-State: AOAM533ujACWKtlq5q3mqcz1ZGJAYh8MW8z4n1cduE8uywbTYknJSRNA
- k9O3LGwkAHie8uGm6maaB2FBDmXCJXYd0w==
-X-Google-Smtp-Source: ABdhPJy9Y3jCD5Svbcn8gi54vhh6rh2X1StsZj2/rLhK+sA/K+Go/prVJsjFv0AqRiEzC3ttlgUmBw==
-X-Received: by 2002:a05:6214:848:: with SMTP id
- dg8mr552195qvb.152.1592427809217; 
- Wed, 17 Jun 2020 14:03:29 -0700 (PDT)
+ :references;
+ bh=YemnOlklw+URp/aLKC6SFqz2X8HrxCoaaT+NwLjZldo=;
+ b=Es6jOgL5zJbCXNpPjAhS9+OrpTaUwo9ZL9YyW0sCGjN4fHnTQ1ox4J+neeMg1W0NGA
+ QhRpqksYIUH6GFeU7XlPKrr+BplvSiYVw/uIirxK2Q/exOyqJ6WB+3Qa5NRv1eW8UwHD
+ t3UOmqzrCVLtgnt+HgIL7wuPyKEZH1YCawU1mPa9L3Ru2/hPTZFNQXxVZ5p6ztXlFuYS
+ C0+s98Lfga7Eg+DelaI7ObFkpqG31sjBq2CBdcqUlpCAEvj1HBQSB/Uy3DZyWm08pZ5q
+ 0m1IeVBHBYk142+Vh/ixyI35hRjmwsTXuH3lgjV4Eg/HDtpmNb5JRxL60oQlHcptkK30
+ dd7Q==
+X-Gm-Message-State: AOAM533bHK+QKolMnwzfcxiwKEq8GAeKluGEf7pyZRa7UsVEPRFzAMpP
+ 1Nl5fJ4lhgT5SWm7ZsVca9aXRfj0BMs4xA==
+X-Google-Smtp-Source: ABdhPJxHn8AowkC/EXsVktX4pts+OqQvGVJhH/dy8X8htxveYHYznjUY7wrfF7EOpcNQSeoyRZFQdw==
+X-Received: by 2002:aed:35fa:: with SMTP id d55mr1054590qte.385.1592427830871; 
+ Wed, 17 Jun 2020 14:03:50 -0700 (PDT)
 Received: from Rfoley-MA01.hsd1.ma.comcast.net
  ([2601:199:4480:60c0:fc79:714c:9711:2e9c])
- by smtp.gmail.com with ESMTPSA id w13sm997245qkb.91.2020.06.17.14.03.28
+ by smtp.gmail.com with ESMTPSA id w13sm997245qkb.91.2020.06.17.14.03.49
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 17 Jun 2020 14:03:28 -0700 (PDT)
+ Wed, 17 Jun 2020 14:03:50 -0700 (PDT)
 From: Robert Foley <robert.foley@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v10 09/73] cris: convert to helper_cpu_halted_set
-Date: Wed, 17 Jun 2020 17:01:27 -0400
-Message-Id: <20200617210231.4393-10-robert.foley@linaro.org>
+Subject: [PATCH v10 24/73] riscv: convert to cpu_halted
+Date: Wed, 17 Jun 2020 17:01:42 -0400
+Message-Id: <20200617210231.4393-25-robert.foley@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200617210231.4393-1-robert.foley@linaro.org>
 References: <20200617210231.4393-1-robert.foley@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::f43;
- envelope-from=robert.foley@linaro.org; helo=mail-qv1-xf43.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::842;
+ envelope-from=robert.foley@linaro.org; helo=mail-qt1-x842.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -102,41 +97,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.puhov@linaro.org, cota@braap.org, alex.bennee@linaro.org,
- robert.foley@linaro.org, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Cc: Alistair Francis <Alistair.Francis@wdc.com>,
+ "open list:RISC-V TCG CPUs" <qemu-riscv@nongnu.org>, robert.foley@linaro.org,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, cota@braap.org,
+ Palmer Dabbelt <palmer@dabbelt.com>, peter.puhov@linaro.org,
+ alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: "Emilio G. Cota" <cota@braap.org>
 
-And fix the temp leak along the way.
-
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
+Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Reviewed-by: Palmer Dabbelt <palmer@dabbelt.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 Signed-off-by: Robert Foley <robert.foley@linaro.org>
 ---
- target/cris/translate.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ target/riscv/op_helper.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/target/cris/translate.c b/target/cris/translate.c
-index aaa46b5bca..6c4f091b7a 100644
---- a/target/cris/translate.c
-+++ b/target/cris/translate.c
-@@ -2823,8 +2823,9 @@ static int dec_rfe_etc(CPUCRISState *env, DisasContext *dc)
-     cris_cc_mask(dc, 0);
- 
-     if (dc->op2 == 15) {
--        tcg_gen_st_i32(tcg_const_i32(1), cpu_env,
--                       -offsetof(CRISCPU, env) + offsetof(CPUState, halted));
-+        TCGv_i32 tmp = tcg_const_i32(1);
-+        gen_helper_cpu_halted_set(cpu_env, tmp);
-+        tcg_temp_free_i32(tmp);
-         tcg_gen_movi_tl(env_pc, dc->pc + 2);
-         t_gen_raise_exception(EXCP_HLT);
-         return 2;
+diff --git a/target/riscv/op_helper.c b/target/riscv/op_helper.c
+index b0c49efc4a..fe1373a95d 100644
+--- a/target/riscv/op_helper.c
++++ b/target/riscv/op_helper.c
+@@ -176,7 +176,7 @@ void helper_wfi(CPURISCVState *env)
+         riscv_cpu_virt_enabled(env)) {
+         riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
+     } else {
+-        cs->halted = 1;
++        cpu_halted_set(cs, 1);
+         cs->exception_index = EXCP_HLT;
+         cpu_loop_exit(cs);
+     }
 -- 
 2.17.1
 
