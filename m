@@ -2,81 +2,92 @@ Return-Path: <SRS0=bzpH=76=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 134B4C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 08:32:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51CF3C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 08:41:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E1A9F20C09
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 08:32:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1A9F20C09
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 206EC212CC
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 08:41:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CCkOChrw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 206EC212CC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35726 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40764 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlTVB-0006rt-7H
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 04:32:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54814)
+	id 1jlTdW-0001an-Aa
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 04:41:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57986)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jlTOR-0007df-P8
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 04:25:59 -0400
-Received: from indium.canonical.com ([91.189.90.7]:38586)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jlTOP-0004DJ-3O
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 04:25:59 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jlTOM-0003rA-97
- for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 08:25:54 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 8F2972E8106
- for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 08:25:53 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jlTcm-0000rb-Eo
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 04:40:48 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:22346
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jlTci-0006ke-O3
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 04:40:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592383243;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=pfY4NB5w6XxrphGXxmJIvFsPPManCdRM0d4dpGR/bi8=;
+ b=CCkOChrwFZEJUm/8LT5CBTUYASVBVLGAZhaJBBxQS9Ml5Wq3UvTxQ3RXYWs26ky/T2qpOK
+ JddmfhQsMj4bSdInFDSDH5+DC8CRq33epr8V+UHH47E74t7k0GEuV964IGlN2g1sEnuh9O
+ 99bmFZA5O1ztnBuAgRlcolzFf+TqSHE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-311-3ASRbLviMq67iV9hBmJ-LQ-1; Wed, 17 Jun 2020 04:40:41 -0400
+X-MC-Unique: 3ASRbLviMq67iV9hBmJ-LQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 565348C31FA;
+ Wed, 17 Jun 2020 08:40:38 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-131.ams2.redhat.com [10.36.112.131])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0C56E5EE0E;
+ Wed, 17 Jun 2020 08:40:25 +0000 (UTC)
+Subject: Re: [PATCH v9 02/10] acpi: move aml builder code for floppy device
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+References: <20200617071138.11159-1-kraxel@redhat.com>
+ <20200617071138.11159-3-kraxel@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <62ad00f7-c7f2-ed80-01a3-8d8c6aa9fba9@redhat.com>
+Date: Wed, 17 Jun 2020 10:40:24 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 17 Jun 2020 08:19:11 -0000
-From: Laurent Vivier <1883784@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: ppc64le tcg testcase
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: laurent-vivier nemequ
-X-Launchpad-Bug-Reporter: Evan Nemerson (nemequ)
-X-Launchpad-Bug-Modifier: Laurent Vivier (laurent-vivier)
-References: <159233926606.29237.7012634601262116409.malonedeb@chaenomeles.canonical.com>
-Message-Id: <159238195176.29709.7972509528681903402.malone@chaenomeles.canonical.com>
-Subject: [Bug 1883784] Re: [ppc64le] qemu behavior differs from ppc64le
- hardware
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="b190cebbf563f89e480a8b57f641753c8196bda0";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 4e79ede54d75fed29f4c69f244cc85002036692e
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/17 04:06:03
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200617071138.11159-3-kraxel@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=thuth@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/17 01:42:04
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,43 +96,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1883784 <1883784@bugs.launchpad.net>
+Cc: Laurent Vivier <lvivier@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ "Michael S. Tsirkin" <mst@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ John Snow <jsnow@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Did you try to run it in a qemu-system-ppc64 guest?
-It would help to know if it is a tcg or a linux-user bug.
+On 17/06/2020 09.11, Gerd Hoffmann wrote:
+> DSDT change: isa device order changes in case MI1 (ipmi) is present.
+> 
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+>  hw/block/fdc.c                  |  83 ++++++++++++++++++++++++++++++++
+>  hw/i386/acpi-build.c            |  83 --------------------------------
+>  stubs/cmos.c                    |   7 +++
+>  stubs/Makefile.objs             |   1 +
+>  tests/data/acpi/pc/DSDT.ipmikcs | Bin 5086 -> 5086 bytes
+>  5 files changed, 91 insertions(+), 83 deletions(-)
+>  create mode 100644 stubs/cmos.c
 
--- =
+Hmm, not all targets that use CONFIG_FDC also have ACPI ... would it be
+possible to move the ACPI-related code into a new file, say fdc-acpi.c,
+instead and only compile that if both, CONFIG_FDC and CONFIG_ACPI are
+enabled?
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1883784
+ Thomas
 
-Title:
-  [ppc64le] qemu behavior differs from ppc64le hardware
-
-Status in QEMU:
-  New
-
-Bug description:
-  I have some code which passes my test suite on PPC64LE hardware when
-  compiled with GCC 10, but the saem binary fails with both qemu-ppc64le
-  4.2 (on Fedora 32) and qemu-ppc64le-static 5.0.0 (Debian testing).
-
-  I'm not getting any errors about illegal instructions or anything,
-  like that; the results are just silently different on qemu.
-
-  I've generated a reduced test case, which is attached along with the
-  binaries (both are the same code, one is just statically linked).
-  They should execute successufully on PPC64LE hardware, but on qemu
-  they hit a __builtin_abort (because the computed value doesn't match
-  the expected value).
-
-  Without being familiar with PPC assembly I'm not sure what else I can
-  do, but if there is anything please let me know.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1883784/+subscriptions
 
