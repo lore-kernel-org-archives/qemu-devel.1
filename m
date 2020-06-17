@@ -7,70 +7,70 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FD48C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 07:27:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F914C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 07:27:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5B16E20786
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 07:27:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F245920786
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 07:27:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YlurqRMe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B16E20786
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GPlx6IzH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F245920786
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33464 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33746 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlSUA-0008DZ-J9
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 03:27:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41080)
+	id 1jlSUD-0008KT-8M
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 03:27:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40944)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jlSSK-0004oD-Da; Wed, 17 Jun 2020 03:25:56 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:39862)
+ id 1jlSSA-0004RM-Cy; Wed, 17 Jun 2020 03:25:46 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:55175)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jlSSI-0002bg-M3; Wed, 17 Jun 2020 03:25:56 -0400
-Received: by mail-wm1-x343.google.com with SMTP id t194so839695wmt.4;
- Wed, 17 Jun 2020 00:25:53 -0700 (PDT)
+ id 1jlSS8-0002Y6-TJ; Wed, 17 Jun 2020 03:25:46 -0400
+Received: by mail-wm1-x343.google.com with SMTP id g10so794389wmh.4;
+ Wed, 17 Jun 2020 00:25:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=I3W9cifnD7DOZZ455FCgCr8VTTmTQL8v0YMmJYG05f0=;
- b=YlurqRMeJYrE+IrRZLl1SHxuiKjMJpMEh0rek+C3uYlyD21IsZ1kpLW1edrgqU9Rrz
- 2HKjeYw9Hug9FTAKNV+hB2uOlHA27rHZ4eGkxzsUpfu+4Sg5WhpEJXSYWiHFfBxxFZz4
- hTgv8kHWcusRxGyo1ILt3CN6z4KMbA2oZLyFiNtzwEsForxdsJ3ZouTEDwbRcwDYh9RY
- hqoc4TFVoofXzqrRbw1D/LdbqHYAlOT0J4W9YcLXAz5OKcslMbN/tpHJIeVfONO/mUWL
- HvE4ydVJ3ay2n59U1B07WKoo0GvHcPC1DjpWfkw1vvkHuFEgKfcg6IGvzRQUtnNS2mWP
- rHqw==
+ bh=BVuLqYtrt8uBmV3Fe5GFgsc46Ji8iMLXSf7RHd88kek=;
+ b=GPlx6IzHGYH3NeCHlM+gcHWjqm7pIIwQRisVevA6wjEEhj44wSMsiJDOnuktCyfA64
+ 7xWdBBZQyMCKMb92x1a9lPgTeHQGHNvKavsQ2LZTxygOoRy/G0WSaKlsBV82oe18Dwf5
+ GHB3gr8N5/LEH4xr5pBE0eNsrzt/C2chjn55F1naJjwhxAI3nwFAfvJ/+BaqidH7O4xZ
+ GcHC3v9uAY5phUBmIQ43SiGRij6ah0fGgtblb28ta3uqZhfSI941BymVV0OTSpD/KWD9
+ /UxNBtr5z4FOOmlJlwBTDm7RIniQGEVvF18KjvVLc2UfCrBfvAEiQY+Rw1J52/lttwv8
+ BkcA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=I3W9cifnD7DOZZ455FCgCr8VTTmTQL8v0YMmJYG05f0=;
- b=Xk2L2ruT4JEWyHlXNB4zoe9irdK/EHFFqFaaFRTsJ+QsOL5bJKOMZ7ji6pC5Q3giGu
- Bz3tgEgclxRoBNXJg9WjU7S+Ps7nmLByu9lX41UFaHff1w7S9jggK4UzqtdxOv/p9i9P
- Q2lnhQVoLEN1/+lSJg52/s18iBuzBIs5lfH+GTJlbwqM0tLMSEkspsNzlIQ6hvAEtiv8
- hyQJ3kv4PYmiS7NvTUjouKrCOc8RaJADq5Xxw4o1BHAIWvChDviJHyTO0EW3khL+sOKg
- E/34q1BEI05N4NENkDbWFUZhsq9imzOOWpUHpHXxykLmwXUJh4ohrh/OaGd5OvCzyJEc
- iP5g==
-X-Gm-Message-State: AOAM531XNRyKgBtEC6P4bvjFY99w7/YAMatM5QCa8xZPoEyuGupvoK5L
- Q4r5hTTPo3E4EzU54CH8XSxrMtsA
-X-Google-Smtp-Source: ABdhPJwK5Rnpu2WUBwpQph3AQjiurd5sJ2Or78Tpz4DcXfO8Sww/WQkbQ0y6mH+vcXqkXYO3xEvoCg==
-X-Received: by 2002:a05:600c:2313:: with SMTP id
- 19mr7433245wmo.51.1592378752782; 
- Wed, 17 Jun 2020 00:25:52 -0700 (PDT)
+ bh=BVuLqYtrt8uBmV3Fe5GFgsc46Ji8iMLXSf7RHd88kek=;
+ b=nwYl/ZPouKJjcbgiIBnUBOZh5HxLZBAKGTlrQ6bAye92bHiR2hcLnRB6KBXTYWN4Jm
+ zobIPCbqF8qhesFGyHQZZyEA0quMzth/vYUjwbfMiw9nAdD+sb29UTjwKwqG9o5402r4
+ X0uqdsvo5VeOAPFdQ0SY5N3wJLejdfm9EeZrSjgtZW/+Cnr04mgbPf0oIw20LYgzdqhn
+ y071nyjV0VIg/e622Y3ugonwOSDd/DBiO9AKeBR8T/maQ2aIcN3YjtWC+wUOgSNLlUJQ
+ XjoyRJh8WFDUXl6wHdPfF88qrjuHkpq3P8kSg/x2bO2/MUedMT666s2AsfUa25GaZZU3
+ PwtA==
+X-Gm-Message-State: AOAM532eQbIZVvPJAQmR9hecURaUEqIYW/C2i8asWtoRJBsc05o+nSZ8
+ uHKTKnaG5Z+nghehyuMulAhVC4Kn
+X-Google-Smtp-Source: ABdhPJxze/9lr4q2RaOvBpC2cU1N096/wOjR91InrmCPEz5DwKspG92uhq8c0D9nw3fBY0vsHK+A1Q==
+X-Received: by 2002:a1c:bd84:: with SMTP id n126mr6660098wmf.149.1592378743056; 
+ Wed, 17 Jun 2020 00:25:43 -0700 (PDT)
 Received: from localhost.localdomain (93.red-83-59-160.dynamicip.rima-tde.net.
  [83.59.160.93])
- by smtp.gmail.com with ESMTPSA id j5sm32894781wrq.39.2020.06.17.00.25.51
+ by smtp.gmail.com with ESMTPSA id j5sm32894781wrq.39.2020.06.17.00.25.41
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 17 Jun 2020 00:25:52 -0700 (PDT)
+ Wed, 17 Jun 2020 00:25:42 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 10/14] hw/arm/mps2: Map the FPGA I/O block
-Date: Wed, 17 Jun 2020 09:25:35 +0200
-Message-Id: <20200617072539.32686-11-f4bug@amsat.org>
+Subject: [PATCH v3 01/14] hw/watchdog/cmsdk-apb-watchdog: Add trace event for
+ lock status
+Date: Wed, 17 Jun 2020 09:25:26 +0200
+Message-Id: <20200617072539.32686-2-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200617072539.32686-1-f4bug@amsat.org>
 References: <20200617072539.32686-1-f4bug@amsat.org>
@@ -109,51 +109,35 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Add a trace event to see when a guest disable/enable the watchdog.
+
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
-v2: 25MHz prescale-clk property
----
- hw/arm/mps2.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ hw/watchdog/cmsdk-apb-watchdog.c | 1 +
+ hw/watchdog/trace-events         | 1 +
+ 2 files changed, 2 insertions(+)
 
-diff --git a/hw/arm/mps2.c b/hw/arm/mps2.c
-index c66c595d4a..e106123225 100644
---- a/hw/arm/mps2.c
-+++ b/hw/arm/mps2.c
-@@ -38,8 +38,10 @@
- #include "hw/timer/cmsdk-apb-timer.h"
- #include "hw/timer/cmsdk-apb-dualtimer.h"
- #include "hw/misc/mps2-scc.h"
-+#include "hw/misc/mps2-fpgaio.h"
- #include "hw/net/lan9118.h"
- #include "net/net.h"
-+#include "hw/watchdog/cmsdk-apb-watchdog.h"
- 
- typedef enum MPS2FPGAType {
-     FPGA_AN385,
-@@ -67,8 +69,10 @@ typedef struct {
-     MemoryRegion sram;
-     /* FPGA APB subsystem */
-     MPS2SCC scc;
-+    MPS2FPGAIO fpgaio;
-     /* CMSDK APB subsystem */
-     CMSDKAPBDualTimer dualtimer;
-+    CMSDKAPBWatchdog watchdog;
- } MPS2MachineState;
- 
- #define TYPE_MPS2_MACHINE "mps2"
-@@ -332,6 +336,11 @@ static void mps2_common_init(MachineState *machine)
-     qdev_prop_set_uint32(sccdev, "scc-id", mmc->scc_id);
-     sysbus_realize(SYS_BUS_DEVICE(&mms->scc), &error_fatal);
-     sysbus_mmio_map(SYS_BUS_DEVICE(sccdev), 0, 0x4002f000);
-+    object_initialize_child(OBJECT(mms), "fpgaio",
-+                            &mms->fpgaio, TYPE_MPS2_FPGAIO);
-+    qdev_prop_set_uint32(DEVICE(&mms->fpgaio), "prescale-clk", 25000000);
-+    sysbus_realize(SYS_BUS_DEVICE(&mms->fpgaio), &error_fatal);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&mms->fpgaio), 0, 0x40028000);
- 
-     /* In hardware this is a LAN9220; the LAN9118 is software compatible
-      * except that it doesn't support the checksum-offload feature.
+diff --git a/hw/watchdog/cmsdk-apb-watchdog.c b/hw/watchdog/cmsdk-apb-watchdog.c
+index 1541365914..5bbadadfa6 100644
+--- a/hw/watchdog/cmsdk-apb-watchdog.c
++++ b/hw/watchdog/cmsdk-apb-watchdog.c
+@@ -225,6 +225,7 @@ static void cmsdk_apb_watchdog_write(void *opaque, hwaddr offset,
+         break;
+     case A_WDOGLOCK:
+         s->lock = (value != WDOG_UNLOCK_VALUE);
++        trace_cmsdk_apb_watchdog_lock(s->lock);
+         break;
+     case A_WDOGITCR:
+         if (s->is_luminary) {
+diff --git a/hw/watchdog/trace-events b/hw/watchdog/trace-events
+index ab94d7df50..3124ca1f1b 100644
+--- a/hw/watchdog/trace-events
++++ b/hw/watchdog/trace-events
+@@ -4,3 +4,4 @@
+ cmsdk_apb_watchdog_read(uint64_t offset, uint64_t data, unsigned size) "CMSDK APB watchdog read: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u"
+ cmsdk_apb_watchdog_write(uint64_t offset, uint64_t data, unsigned size) "CMSDK APB watchdog write: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u"
+ cmsdk_apb_watchdog_reset(void) "CMSDK APB watchdog: reset"
++cmsdk_apb_watchdog_lock(uint32_t lock) "CMSDK APB watchdog: lock %" PRIu32
 -- 
 2.21.3
 
