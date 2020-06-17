@@ -2,85 +2,97 @@ Return-Path: <SRS0=bzpH=76=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0E2DC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 08:13:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 294D2C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 08:17:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7D56C20679
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 08:13:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E837820679
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 08:17:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e1/Uj8Xw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D56C20679
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jLCkKvYE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E837820679
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54552 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57380 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlTBw-0004se-CE
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 04:13:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51584)
+	id 1jlTGQ-0006dl-8I
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 04:17:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52620)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jlTBM-0004TL-As
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 04:12:28 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26026
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <cdupontd@redhat.com>)
+ id 1jlTFp-00063s-3L
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 04:17:05 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:33088
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jlTBK-0002By-0s
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 04:12:27 -0400
+ (Exim 4.90_1) (envelope-from <cdupontd@redhat.com>)
+ id 1jlTFn-0002vh-Bz
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 04:17:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592381544;
+ s=mimecast20190719; t=1592381822;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=vAapxgtMWnm8sDzN7uk68BM6d7ymtkjR6TFfmSGo/Mk=;
- b=e1/Uj8Xwx27LfLlJyHKiPDRwScyd0tUgBl8Iqgds2vZ4uES1/i90dZ/C7aQcgK90jqeX76
- q0g7YKEXSDJhc3eY4J2HhZ4YjTE+SGxyZVA/VShmIEEGWZOzyydH2FoPov7f+vBfCezSOh
- e70D10SUBtwqaohucwaAYEi8mOk6SU0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-18-NrcIidI9NEKvyPFc4WBUvw-1; Wed, 17 Jun 2020 04:12:22 -0400
-X-MC-Unique: NrcIidI9NEKvyPFc4WBUvw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E0ED2803317;
- Wed, 17 Jun 2020 08:12:21 +0000 (UTC)
-Received: from [10.36.114.197] (ovpn-114-197.ams2.redhat.com [10.36.114.197])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id ABB6A5C1BD;
- Wed, 17 Jun 2020 08:12:17 +0000 (UTC)
-Subject: Re: [PATCH v3 4/8] tpm: Split TPM_TIS_IRQ into TPM_TIS_ISA_IRQ and
- TPM_TIS_SYSBUS_IRQ
-To: Stefan Berger <stefanb@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-References: <20200616205721.1191408-1-stefanb@linux.vnet.ibm.com>
- <20200616205721.1191408-5-stefanb@linux.vnet.ibm.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <62a70526-7c3d-8342-3c23-a2751b6d508c@redhat.com>
-Date: Wed, 17 Jun 2020 10:12:15 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
-MIME-Version: 1.0
-In-Reply-To: <20200616205721.1191408-5-stefanb@linux.vnet.ibm.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eric.auger@redhat.com
+ bh=5qX7FRGOLmQPjFthRAzqhwS9iQ8b8Bw8fri0fRI6YG0=;
+ b=jLCkKvYEhJhOInWFbV3fynuRQzSlI5vtBNp34N8Sa4op4MlduW3oM7DBox3xoRwnPAy0ZC
+ EECQQ8dVSsjju7F4RpBTyqxPDJCTrDTVHn7X0zHBb9dYlyCqGBiBsmR2/JTyFPaWUew3Rl
+ S48k/1dz6QfzBzPkvRuos3ZhlJsb524=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-81-CrXKUfJNOJO5dyHVHenWZg-1; Wed, 17 Jun 2020 04:17:00 -0400
+X-MC-Unique: CrXKUfJNOJO5dyHVHenWZg-1
+Received: by mail-wm1-f71.google.com with SMTP id j128so555245wmj.6
+ for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 01:17:00 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+ :content-transfer-encoding:message-id:references:to;
+ bh=RQE3qr+i9KA9NdRERAA4oMJfUAguGYLBBuwjiMeYm80=;
+ b=CcUvx024wo2pEV1Q7ulENvg77Csl1QaQA1bP8Fw7nMrmH2haIHJZ/KOLhMN/mu/MCZ
+ uzP+DCWmruMowwbvCm+EFprSrslRg4CYRNE2LHmvCssnYZqUnlAgpvMFP7v38ADYuAld
+ KTNcx8ylnLTzRiPL7kxEpUuBFP7Z9UB8h6O9fvb4dlQ15nmE32EgC4kf5UoxZIz5eJQr
+ kOthZn18oDE9teXV9FmgZTAJk/D3JehTIpvz6qfnmYuk6fdgJAKRdyZNkWxtbwHpoXqy
+ 6rhsKVFt6teJWx7Sj1pWrGEpUZbHp5ChuNt52inAADMeeH+elHq14DQR/7vkx21GP+BD
+ tVWw==
+X-Gm-Message-State: AOAM533s1OvOefag5aJnmJTQfg5TTuekOfseAl5SPDA7QkaZmIV+S/D0
+ rADQy+suUeLM773cbk6kymtnecWLDuIm5Bxvp5GrTsP4lj3UZzYZ1NB1GrEPef4Ot+LDkMb+8Mi
+ /eewNbyL6vzbEhBk=
+X-Received: by 2002:a5d:6789:: with SMTP id v9mr7703858wru.124.1592381819219; 
+ Wed, 17 Jun 2020 01:16:59 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxTW1TgDieQJ2o+ezSlHjc7JAr6F1u0lNTBzV1a4GsOk09QpX6YyH4rbq9ymSru97L9tihqBg==
+X-Received: by 2002:a5d:6789:: with SMTP id v9mr7703831wru.124.1592381818940; 
+ Wed, 17 Jun 2020 01:16:58 -0700 (PDT)
+Received: from ?IPv6:2a01:e0a:466:71c0:703f:24ee:3c57:e184?
+ ([2a01:e0a:466:71c0:703f:24ee:3c57:e184])
+ by smtp.gmail.com with ESMTPSA id v7sm5815129wrp.45.2020.06.17.01.16.57
+ (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+ Wed, 17 Jun 2020 01:16:58 -0700 (PDT)
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
+Subject: Re: ovmf / PCI passthrough impaired due to very limiting PCI64
+ aperture
+From: Christophe de Dinechin <cdupontd@redhat.com>
+In-Reply-To: <20200616165043.24y2cp53axk7uggy@sirius.home.kraxel.org>
+Date: Wed, 17 Jun 2020 10:16:55 +0200
+Message-Id: <97D6912A-C840-4723-A32F-7B05FF827EB8@redhat.com>
+References: <99779e9c-f05f-501b-b4be-ff719f140a88@canonical.com>
+ <20200616165043.24y2cp53axk7uggy@sirius.home.kraxel.org>
+To: Gerd Hoffmann <kraxel@redhat.com>
+X-Mailer: Apple Mail (2.3608.80.23.2.2)
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.120;
- envelope-from=eric.auger@redhat.com; helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 23:30:45
+Content-Type: text/plain;
+	charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=cdupontd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/17 01:42:42
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -101,72 +113,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@redhat.com, Stefan Berger <stefanb@linux.ibm.com>,
- philmd@redhat.com, mkedzier@redhat.com, pbonzini@redhat.com
+Cc: pedro.principeza@canonical.com, ehabkost@redhat.com,
+ dann.frazier@canonical.com, "Guilherme G. Piccoli" <gpiccoli@canonical.com>,
+ qemu-devel@nongnu.org, christian.ehrhardt@canonical.com, dgilbert@redhat.com,
+ lersek@redhat.com, fw@gpiccoli.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Stefan,
 
-On 6/16/20 10:57 PM, Stefan Berger wrote:
-> Before the enablement of interrupts on PCs, split the TPM_TIS_IRQ
-> into TPM_TIS_ISA_IRQ for PCs and TPM_TIS_SYSBUS_IRQ for ARM.
-> 
-> Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
-> ---
->  hw/tpm/tpm_tis_isa.c    | 2 +-
->  hw/tpm/tpm_tis_sysbus.c | 3 ++-
->  include/hw/acpi/tpm.h   | 3 ++-
->  3 files changed, 5 insertions(+), 3 deletions(-)
-> 
-> diff --git a/hw/tpm/tpm_tis_isa.c b/hw/tpm/tpm_tis_isa.c
-> index ed6d422f05..27222a9a49 100644
-> --- a/hw/tpm/tpm_tis_isa.c
-> +++ b/hw/tpm/tpm_tis_isa.c
-> @@ -97,7 +97,7 @@ static void tpm_tis_isa_reset(DeviceState *dev)
->  }
->  
->  static Property tpm_tis_isa_properties[] = {
-> -    DEFINE_PROP_UINT32("irq", TPMStateISA, state.irq_num, TPM_TIS_IRQ),
-> +    DEFINE_PROP_UINT32("irq", TPMStateISA, state.irq_num, TPM_TIS_ISA_IRQ),
-irq_num is a uint32 prop while the default value we are going to assign
-is -1. I guess we will end up with irq_num = 255?
 
-Thanks
+> Le 16 Jun 2020 =C3=A0 18:50, Gerd Hoffmann <kraxel@redhat.com> a =C3=A9cr=
+it :
+>=20
+>  Hi,
+>=20
+>> (a) We could rely in the guest physbits to calculate the PCI64 aperture.
+>=20
+> I'd love to do that.  Move the 64-bit I/O window as high as possible and
+> use -- say -- 25% of the physical address space for it.
+>=20
+> Problem is we can't.
 
-Eric
->      DEFINE_PROP_TPMBE("tpmdev", TPMStateISA, state.be_driver),
->      DEFINE_PROP_BOOL("ppi", TPMStateISA, state.ppi_enabled, true),
->      DEFINE_PROP_END_OF_LIST(),
-> diff --git a/hw/tpm/tpm_tis_sysbus.c b/hw/tpm/tpm_tis_sysbus.c
-> index 86b3988be5..bf4583c3f6 100644
-> --- a/hw/tpm/tpm_tis_sysbus.c
-> +++ b/hw/tpm/tpm_tis_sysbus.c
-> @@ -97,7 +97,8 @@ static void tpm_tis_sysbus_reset(DeviceState *dev)
->  }
->  
->  static Property tpm_tis_sysbus_properties[] = {
-> -    DEFINE_PROP_UINT32("irq", TPMStateSysBus, state.irq_num, TPM_TIS_IRQ),
-> +    DEFINE_PROP_UINT32("irq", TPMStateSysBus, state.irq_num,
-> +                       TPM_TIS_SYSBUS_IRQ),
->      DEFINE_PROP_TPMBE("tpmdev", TPMStateSysBus, state.be_driver),
->      DEFINE_PROP_BOOL("ppi", TPMStateSysBus, state.ppi_enabled, false),
->      DEFINE_PROP_END_OF_LIST(),
-> diff --git a/include/hw/acpi/tpm.h b/include/hw/acpi/tpm.h
-> index 1a2a57a21f..d5caee9771 100644
-> --- a/include/hw/acpi/tpm.h
-> +++ b/include/hw/acpi/tpm.h
-> @@ -24,7 +24,8 @@
->  #define TPM_TIS_ADDR_BASE           0xFED40000
->  #define TPM_TIS_ADDR_SIZE           0x5000
->  
-> -#define TPM_TIS_IRQ                 5
-> +#define TPM_TIS_ISA_IRQ             5
-> +#define TPM_TIS_SYSBUS_IRQ          5
->  
->  #define TPM_TIS_NUM_LOCALITIES      5     /* per spec */
->  #define TPM_TIS_LOCALITY_SHIFT      12
-> 
+Is the only reason unreliable guest physbits?
+
+>=20
+>> failure. Also, if the users are not setting the physbits in the guest,
+>> there must be a default (seems to be 40bit according to my experiments),
+>> seems to be a good idea to rely on that.
+>=20
+> Yes, 40 is the default, and it is used *even if the host supports less
+> than that*.  Typical values I've seen for intel hardware are 36 and 39.
+> 39 is used even by recent hardware (not the xeons, but check out a
+> laptop or a nuc).
+>=20
+>> If guest physbits is 40, why to have OVMF limiting it to 36, right?
+>=20
+> Things will explode in case OVMF uses more physbits than the host
+> supports (host physbits limit applies to ept too).  In other words: OVMF
+> can't trust the guest physbits, so it is conservative to be on the safe
+> side.
+>=20
+> If we can somehow make a *trustable* physbits value available to the
+> guest, then yes, we can go that route.  But the guest physbits we have
+> today unfortunately don't cut it.
+
+What is the rationale for ever allowing guest physbits > host physbits?
+
+>=20
+> take care,
+>  Gerd
+>=20
+>=20
 
 
