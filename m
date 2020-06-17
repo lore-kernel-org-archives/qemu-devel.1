@@ -2,77 +2,73 @@ Return-Path: <SRS0=bzpH=76=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79D1BC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 10:48:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86DB4C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 10:49:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 43E84208B3
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 10:48:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4ADB3208B3
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 10:49:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eL8nk2Le"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43E84208B3
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TS2CVvFI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4ADB3208B3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33790 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37470 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlVbz-0005Oa-Fw
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 06:48:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59402)
+	id 1jlVct-0006yF-F8
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 06:49:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59592)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jlVbC-0004Uz-5w
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 06:47:18 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36185
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jlVbr-0005Vp-RQ
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 06:47:59 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:55766
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jlVbA-0002co-7s
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 06:47:17 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jlVbq-0002fj-3f
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 06:47:59 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592390835;
+ s=mimecast20190719; t=1592390877;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=BWTWT6SgDOLYZj8IHpZCjhLkNFtVGcdoHMHHxY+3Prc=;
- b=eL8nk2LeB0kGP9u4ha9t0ayyyjZDj/bNLELE8OB92NALb7VC6v/DhcyOFRITT8vb/joUON
- zs53CPYgBX3E9Bgy5AX5ardYRKXBXOQZyxJK8WC9GSBrBZPoszwbdaptDvPWlUr6L/F/aY
- PbKm8HBWnj0VRKBVe4hrZ5tic/ubdV4=
+ to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
+ references:references; bh=O9zf9n7GEiVsmXcOFimTPQREBfNNWSvJ/Vo90Qn26VE=;
+ b=TS2CVvFI9dzr5GCgQzCjPUBxuaQW+HvUbvP2UXoni9GAoDWoH8NuOH9zCuqRhSDbGXG1BS
+ R1iBOFCK3IBF4p18QfZK7XUSdioD/AbmvXKaZyxs2YGSnPZJnBnQ5qNjM4yTSwPtM/+xr1
+ ofRVlSD1DaLOzbVxiLZS2CsPiOjCkHY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-490--4S6YYXAPFqJ9TlqdeFgEw-1; Wed, 17 Jun 2020 06:47:13 -0400
-X-MC-Unique: -4S6YYXAPFqJ9TlqdeFgEw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-356-iMjN69rXNEqbuQWFCR2zWg-1; Wed, 17 Jun 2020 06:47:55 -0400
+X-MC-Unique: iMjN69rXNEqbuQWFCR2zWg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A05F594B24;
- Wed, 17 Jun 2020 10:47:12 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-114-44.ams2.redhat.com [10.36.114.44])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C7FC919C71;
- Wed, 17 Jun 2020 10:47:10 +0000 (UTC)
-Date: Wed, 17 Jun 2020 12:47:09 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Nir Soffer <nsoffer@redhat.com>
-Subject: Re: [PATCH] block: file-posix: Fail unmap with NO_FALLBACK on block
- device
-Message-ID: <20200617104709.GA5166@linux.fritz.box>
-References: <20200613170826.354270-1-nsoffer@redhat.com>
- <CAMRbyyswkaedF0dN2nPb3H8fj5+pmhLWh9GHGor4wUk_Su=b8A@mail.gmail.com>
- <20200616153241.GF4305@linux.fritz.box>
- <CAMRbyys3fL_vqswb72-F_vE8pBQ1SkZZmmMeUA_TuTwsew6iSw@mail.gmail.com>
- <CAMRbyyvD6kRdaitm6Oc6LAnF6_e+Y9y+jTPKNVq8ENLEKYyKng@mail.gmail.com>
-MIME-Version: 1.0
-In-Reply-To: <CAMRbyyvD6kRdaitm6Oc6LAnF6_e+Y9y+jTPKNVq8ENLEKYyKng@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BC9DF10A86C8
+ for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 10:47:54 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-112-67.ams2.redhat.com
+ [10.36.112.67])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BB7A45C1C3;
+ Wed, 17 Jun 2020 10:47:51 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 901E51753C; Wed, 17 Jun 2020 12:47:50 +0200 (CEST)
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 2/2] usb-host: workaround libusb bug
+Date: Wed, 17 Jun 2020 12:47:50 +0200
+Message-Id: <20200617104750.29511-3-kraxel@redhat.com>
+In-Reply-To: <20200617104750.29511-1-kraxel@redhat.com>
+References: <20200617104750.29511-1-kraxel@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=kwolf@redhat.com;
+Content-Type: text/plain; charset=US-ASCII
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=kraxel@redhat.com;
  helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 23:30:45
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -95,109 +91,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: nirsof <nirsof@gmail.com>, qemu-block <qemu-block@nongnu.org>, pl@kamp.de,
- QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 16.06.2020 um 22:01 hat Nir Soffer geschrieben:
-> On Tue, Jun 16, 2020 at 8:39 PM Nir Soffer <nsoffer@redhat.com> wrote:
-> >
-> > On Tue, Jun 16, 2020 at 6:32 PM Kevin Wolf <kwolf@redhat.com> wrote:
-> > >
-> > > Am 15.06.2020 um 21:32 hat Nir Soffer geschrieben:
-> > > > We can zero 2.3 g/s:
-> > > >
-> > > > # time blkdiscard -z test-lv
-> > > >
-> > > > real 0m43.902s
-> > > > user 0m0.002s
-> > > > sys 0m0.130s
-> > >
-> > > > We can write 445m/s:
-> > > >
-> > > > # dd if=/dev/zero bs=2M count=51200 of=test-lv oflag=direct conv=fsync
-> > > > 107374182400 bytes (107 GB, 100 GiB) copied, 241.257 s, 445 MB/s
-> > >
-> > > So using FALLOC_FL_PUNCH_HOLE _is_ faster after all. What might not be
-> > > faster is zeroing out the whole device and then overwriting a
-> > > considerable part of it again.
-> > >
-> > > I think this means that we shouldn't fail write_zeroes at the file-posix
-> > > level even if BDRV_REQ_NO_FALLBACK is given. Instead, qemu-img convert
-> > > is where I see a fix.
-> > >
-> > > Certainly qemu-img could be cleverer and zero out more selectively. The
-> > > idea of doing a blk_make_zero() first seems to have caused some
-> > > problems, though of course its introduction was also justified with
-> > > performance, so improving one case might hurt another if we're not
-> > > careful.
-> > >
-> > > However, when Peter Lieven introduced this (commit 5a37b60a61c), we
-> > > didn't use write_zeroes yet during the regular copy loop (we do since
-> > > commit 690c7301600). So chances are that blk_make_zero() doesn't
-> > > actually help any more now.
-> > >
-> > > Can you run another test with the patch below?
-> >
-> > Sure, I can try this.
-> 
-> Tried it, and it performs the same as expected.
+libusb seems to no allways call the completion callback for requests
+canceled (which it is supposed to do according to the docs).  So add
+a limit to avoid qemu waiting forever.
 
-Thanks.
+Tested-by: BALATON Zoltan <balaton@eik.bme.hu>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Message-Id: <20200529072225.3195-1-kraxel@redhat.com>
+---
+ hw/usb/host-libusb.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-> > > I think it should perform
-> > > the same as yours. Eric, Peter, do you think this would have a negative
-> > > effect for NBD and/or iscsi?
-> > >
-> > > The other option would be providing an option and making it Someone
-> > > Else's Problem.
-> > >
-> > > Kevin
-> > >
-> > >
-> > > diff --git a/qemu-img.c b/qemu-img.c
-> > > index d7e846e607..bdb9f6aa46 100644
-> > > --- a/qemu-img.c
-> > > +++ b/qemu-img.c
-> > > @@ -2084,15 +2084,6 @@ static int convert_do_copy(ImgConvertState *s)
-> > >          s->has_zero_init = bdrv_has_zero_init(blk_bs(s->target));
-> > >      }
-> > >
-> > > -    if (!s->has_zero_init && !s->target_has_backing &&
-> > > -        bdrv_can_write_zeroes_with_unmap(blk_bs(s->target)))
-> > > -    {
-> > > -        ret = blk_make_zero(s->target, BDRV_REQ_MAY_UNMAP | BDRV_REQ_NO_FALLBACK);
-> > > -        if (ret == 0) {
-> > > -            s->has_zero_init = true;
-> > > -        }
-> > > -    }
-> >
-> > This will work of course, but now we will not do bulk zero for any target
-> 
-> I would like to have a minimal change to increase the chance that we
-> can consume this very soon in oVirt.
-
-I think this one would be pretty minimal.
-
-Maybe we can later bring this code back, but with an implementation of
-blk_make_zero() that doesn't use the generic write_zeroes operation,
-but with a specific callback like Eric suggested.
-
-> > I think we never do this for regular files anyway since we truncate
-> > files, and there is nothing to zero, but maybe there is some case
-> > when this is useful?
-
-Yes, regular files have s->has_zero_init == true anyway.
-
-> > BTW, do we use BDRV_REQ_NO_FALLBACK elsewhere? maybe we can remove
-> > it.
-
-qcow2 uses it when zeroing out parts of a newly allocated cluster on
-partial writes. Though that code is questionable, too, and XFS people
-suggest that we should stop using it.
-
-Kevin
+diff --git a/hw/usb/host-libusb.c b/hw/usb/host-libusb.c
+index e88db544bc9e..ad7ed8fb0c67 100644
+--- a/hw/usb/host-libusb.c
++++ b/hw/usb/host-libusb.c
+@@ -972,6 +972,7 @@ fail:
+ static void usb_host_abort_xfers(USBHostDevice *s)
+ {
+     USBHostRequest *r, *rtmp;
++    int limit = 100;
+ 
+     QTAILQ_FOREACH_SAFE(r, &s->requests, next, rtmp) {
+         usb_host_req_abort(r);
+@@ -982,6 +983,19 @@ static void usb_host_abort_xfers(USBHostDevice *s)
+         memset(&tv, 0, sizeof(tv));
+         tv.tv_usec = 2500;
+         libusb_handle_events_timeout(ctx, &tv);
++        if (--limit == 0) {
++            /*
++             * Don't wait forever for libusb calling the complete
++             * callback (which will unlink and free the request).
++             *
++             * Leaking memory here, to make sure libusb will not
++             * access memory which we have released already.
++             */
++            QTAILQ_FOREACH_SAFE(r, &s->requests, next, rtmp) {
++                QTAILQ_REMOVE(&s->requests, r, next);
++            }
++            return;
++        }
+     }
+ }
+ 
+-- 
+2.18.4
 
 
