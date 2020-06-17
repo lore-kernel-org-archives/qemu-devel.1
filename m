@@ -2,85 +2,81 @@ Return-Path: <SRS0=bzpH=76=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6778DC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 17:14:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C96E7C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 17:16:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1D0F320810
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 17:14:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 92B29208B8
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 17:16:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I48MjwIU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D0F320810
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J6qUI/EM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92B29208B8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60468 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34900 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlbdX-0006TB-8h
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 13:14:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54054)
+	id 1jlbfx-0008Sm-0J
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 13:16:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54604)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jlbce-00061f-Gw
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 13:13:12 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48194
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jlbfE-0007kC-Nl
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 13:15:52 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31451
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jlbcb-0001mn-GB
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 13:13:11 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jlbfD-00028O-3U
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 13:15:52 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592413988;
+ s=mimecast20190719; t=1592414150;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=XeexhvL1I814/CquDenxF8dofK6x4m/zHwqNcoGrdSI=;
- b=I48MjwIUBvtO+4YcwHDvoNrTABsZxztoltvd6j0DNKMXeZlZgS+xECQb9+kdW8qNPUmMeI
- cupUkvr6urrQ+jRhapkejNWAdlWyFRlV5TWkbyGIWO2lFKh39yzA3ikx2mZ6s4Msu4lGU5
- XJ/2v1PMGCsdUwK94igM2+0EwZQSuBQ=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-373-hNnPz27RO7SutyeR8A24OQ-1; Wed, 17 Jun 2020 13:13:04 -0400
-X-MC-Unique: hNnPz27RO7SutyeR8A24OQ-1
-Received: by mail-ej1-f69.google.com with SMTP id bo19so1433909ejb.0
- for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 10:13:04 -0700 (PDT)
+ bh=Tuddeaq+IeCsL0MvGEaibHwOLVKI+fbQ6Sghs+xlEoA=;
+ b=J6qUI/EMb9LB8q71n8c2vwXVsbYVCC/r1pzSMl6lX4EZFbdi1EzkvHPA4ittka/FU1NfLJ
+ MPPn4yywgv9LThhmiNWDDkMUfEB8hO0yYk+TTlrf45SY7B9msfHMDwduhTe0cG650wkMax
+ 68vPOV34TIddwJ7HSz0/2WyOmfdDyp0=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-458-gfwVYKmqOgGWrBCecxuFBQ-1; Wed, 17 Jun 2020 13:15:48 -0400
+X-MC-Unique: gfwVYKmqOgGWrBCecxuFBQ-1
+Received: by mail-ed1-f71.google.com with SMTP id y4so1210439edo.16
+ for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 10:15:48 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=j5wYXH0kxwGOazWp1s8nxl2pVg/oEgs9W/KXWXa7Okg=;
- b=paEy/vD5oHFbaADoN0TwrKcH2+YKOMzB6nvZBWKz3X5H+qQs0A3wjvjNnN93M8p3//
- 7qQvp8FZtn+/lkfgOuw0Ggw9ISPzMl0xl+skwqMi+NF6gctSasHzDAZBGD80X1rbDiVJ
- ujlJCBehM5JkNp3+d4ZDuNzbEbazMhJnbls1QihRx1A1sb5R2Lhr9cDpR2LXtiIpO9kI
- ZjwI4c9o67HbRfTQZJf1I/TD5m9PZxNMAddEJCVwQc8rHHSseeG/RAi2zk9Skk8d4myP
- vG26/qgx/uORdW2trTjjxrCU9On+loWK24UGkCF08CLFyermuKh27eN80u+5h4HNvLdj
- QWrQ==
-X-Gm-Message-State: AOAM533MCInDe2yXg3cNp3tx5VrQFRYeG0dDq3P0x2+5RzXadIN6XvwQ
- a9w1fzF/VMuXdc7VpWkg0WD4LxBEYAACUwl2UW6yDBBJWA5SKf7s/xPS/t+3P4B3UrDP7vj9piN
- uRuZRODSgC7Sga0Y=
-X-Received: by 2002:aa7:c3d3:: with SMTP id l19mr217713edr.126.1592413982766; 
- Wed, 17 Jun 2020 10:13:02 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwJsQc+DZsvt9cItN17tMg3UC5iyENA3ckmyDgUrHs4CnMaeSOR5Tr0Ss+juLd/OXVJx0gQPw==
-X-Received: by 2002:aa7:c3d3:: with SMTP id l19mr217684edr.126.1592413982370; 
- Wed, 17 Jun 2020 10:13:02 -0700 (PDT)
+ bh=Tuddeaq+IeCsL0MvGEaibHwOLVKI+fbQ6Sghs+xlEoA=;
+ b=JSxSm+fc6y13UTDDdTC/Lr8XegBw0ZMGWU8jssy+t6KUiAp7peBGHLKHlj5uGGkFR7
+ FYj27chH9JFrM8xwVLIPEJIJXnsm/+V+2NoOMrZIdJFymoKqgznExuMA4p5kt74hnGt8
+ XbAsd7jI4vtZgCKJJ3n3Q6n69kjle1rWl8QHrx6oL11VJ0GvMT/3MReMaUdkvliAOfbq
+ DX+wNyHkHSNQI2BcZpEjXEe+9Ici/GquebzjdQja3UwmFzhn4d4hp8jKH4xb1nAKMTQH
+ 16DDqR5bsnp8/9Iy38Gx+PPr8FVua2ijL9+m5NlR3OOWkIh/Xkl/HTsHMRBP/55zxYLe
+ jWmQ==
+X-Gm-Message-State: AOAM533yDdOj+Abnevzd5XzHfFtESkzdy1JY5+rafKovUvrnw5Lw1k3c
+ VinTGgdW1K3zFgPoan9jOMeIWNs0WRuY5+xeXJtRcxe9Vx78OvKfYcT4SbyQSnyoadUaCybCVbI
+ EYP/Ans6mA0SX35I=
+X-Received: by 2002:aa7:d283:: with SMTP id w3mr206316edq.262.1592414146633;
+ Wed, 17 Jun 2020 10:15:46 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw7gy+RXw38OFIB499HQaAS3Ieot0RCvSB70CTLtLLbgUSKoKtft0eFWymTUAoUQg45b49FKg==
+X-Received: by 2002:aa7:d283:: with SMTP id w3mr206300edq.262.1592414146432;
+ Wed, 17 Jun 2020 10:15:46 -0700 (PDT)
 Received: from [192.168.1.38] (93.red-83-59-160.dynamicip.rima-tde.net.
  [83.59.160.93])
- by smtp.gmail.com with ESMTPSA id gt26sm377531ejb.107.2020.06.17.10.13.01
+ by smtp.gmail.com with ESMTPSA id o16sm398723ejg.106.2020.06.17.10.15.45
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 17 Jun 2020 10:13:01 -0700 (PDT)
+ Wed, 17 Jun 2020 10:15:45 -0700 (PDT)
 Subject: Re: [PATCH v3 0/3] python/machine.py: refactor shutdown
-To: Cleber Rosa <crosa@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
 References: <20200604195252.20739-1-jsnow@redhat.com>
- <8bd27ec8-1bb6-45e2-a43a-7e0229065414@redhat.com>
- <4012de28-5837-889a-eda1-b9957cbbbad1@redhat.com>
- <5d20012b-923c-0bf4-232d-272977087fe3@redhat.com>
- <20200616214900.GA347659@localhost.localdomain>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
@@ -105,29 +101,28 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <fd9c8f22-77fe-9689-9445-416fad9ff0fa@redhat.com>
-Date: Wed, 17 Jun 2020 19:13:00 +0200
+Message-ID: <3af15942-4097-e47d-9ba0-24059a205228@redhat.com>
+Date: Wed, 17 Jun 2020 19:15:44 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200616214900.GA347659@localhost.localdomain>
+In-Reply-To: <20200604195252.20739-1-jsnow@redhat.com>
 Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=WINDOWS-1252
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/17 01:42:04
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 23:30:45
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001,
- WEIRD_PORT=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -141,262 +136,54 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: kwolf@redhat.com, Markus Armbruster <armbru@redhat.com>,
- John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org,
- Eduardo Habkost <ehabkost@redhat.com>
+ Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/16/20 11:49 PM, Cleber Rosa wrote:
-> On Mon, Jun 15, 2020 at 05:21:18PM +0200, Philippe Mathieu-Daudé wrote:
->> On 6/9/20 11:55 PM, John Snow wrote:
->>>
->>>
->>> On 6/9/20 9:08 AM, Philippe Mathieu-Daudé wrote:
->>>> Hi John,
->>>>
->>>> On 6/4/20 9:52 PM, John Snow wrote:
->>>>> v3:
->>>>>  - Split _post_shutdown refactor into own patch (now 1/3)
->>>>>  - Re-add sigkill warning squelch (now 3/3)
->>>>>
->>>>> NOTE: I re-added the squelch in its own patch for review purposes, but
->>>>> for the purposes of avoiding temporary breakage, a maintainer may wish
->>>>> to squash patches 2 and 3 if they are accepted.
->>>>>
->>>>> v2: Philippe took patches 1, 3 and 4.
->>>>>
->>>>> This is a re-write of what was:
->>>>> [PATCH RFC 03/32] python//machine.py: remove bare except
->>>>> [PATCH 2/4] python/machine.py: remove bare except
->>>>>
->>>>> It's a bit heavier handed, but it should address some of kwolf's
->>>>> feedback from the RFC version.
->>>>>
->>>>> Applies straight to origin/master, ought to pass pylint and flake8:
->>>>>
->>>>>> cd ~/src/qemu/python/qemu
->>>>>> pylint *.py
->>>>>> flake8 *.py
->>>>>
->>>>> John Snow (3):
->>>>>   python/machine.py: consolidate _post_shutdown()
->>>>>   python/machine.py: refactor shutdown
->>>>>   python/machine.py: re-add sigkill warning suppression
->>>>>
->>>>>  python/qemu/machine.py | 100 +++++++++++++++++++++++++++++------------
->>>>>  1 file changed, 71 insertions(+), 29 deletions(-)
->>>>>
->>>>
->>>> I'm now seeing this error:
->>>>
->>>> 21:31:58 DEBUG| / # reboot
->>>> 21:32:01 DEBUG| / # reboot: Restarting system
->>>> 21:32:01 DEBUG| >>> {'execute': 'quit'}
->>>> 21:32:01 WARNI| qemu received signal 9; command:
->>>> "mips-softmmu/qemu-system-mips -display none -vga none -chardev
->>>> socket,id=mon,path=/tmp/tmp679upvrk/qemu-10292-monitor.sock -mon
->>>> chardev=mon,mode=control -machine malta -chardev
->>>> socket,id=console,path=/tmp/tmp679upvrk/qemu-10292-console.sock,server,nowait
->>>> -serial chardev:console -kernel
->>>> /tmp/avocado_b3aaagr9/avocado_job_5bj0xe1h/12-tests_acceptance_boot_linux_console.py_BootLinuxConsole.test_mips_malta_cpio/boot/vmlinux-4.5.0-2-4kc-malta
->>>> -initrd
->>>> /tmp/avocado_b3aaagr9/avocado_job_5bj0xe1h/12-tests_acceptance_boot_linux_console.py_BootLinuxConsole.test_mips_malta_cpiorootfs.cpio
->>>> -append printk.time=0 console=ttyS0 console=tty rdinit=/sbin/init
->>>> noreboot -no-reboot"
->>>> 21:32:01 ERROR|
->>>> 21:32:01 ERROR| Reproduced traceback from:
->>>> /home/travis/build/philmd/qemu/build/tests/venv/lib/python3.6/site-packages/avocado/core/test.py:886
->>>> 21:32:01 ERROR| Traceback (most recent call last):
->>>> 21:32:01 ERROR|   File
->>>> "/home/travis/build/philmd/qemu/build/tests/acceptance/avocado_qemu/__init__.py",
->>>> line 195, in tearDown
->>>> 21:32:01 ERROR|     vm.shutdown()
->>>> 21:32:01 ERROR|   File
->>>> "/home/travis/build/philmd/qemu/python/qemu/machine.py", line 449, in
->>>> shutdown
->>>> 21:32:01 ERROR|     self._do_shutdown(has_quit)
->>>> 21:32:01 ERROR|   File
->>>> "/home/travis/build/philmd/qemu/python/qemu/machine.py", line 426, in
->>>> _do_shutdown
->>>> 21:32:01 ERROR|     self._soft_shutdown(has_quit, timeout)
->>>> 21:32:01 ERROR|   File
->>>> "/home/travis/build/philmd/qemu/python/qemu/machine.py", line 413, in
->>>> _soft_shutdown
->>>> 21:32:01 ERROR|     self._qmp.cmd('quit')
->>>> 21:32:01 ERROR|   File
->>>> "/home/travis/build/philmd/qemu/python/qemu/qmp.py", line 271, in cmd
->>>> 21:32:01 ERROR|     return self.cmd_obj(qmp_cmd)
->>>> 21:32:01 ERROR|   File
->>>> "/home/travis/build/philmd/qemu/python/qemu/qmp.py", line 249, in cmd_obj
->>>> 21:32:01 ERROR|     self.__sock.sendall(json.dumps(qmp_cmd).encode('utf-8'))
->>>> 21:32:01 ERROR| BrokenPipeError: [Errno 32] Broken pipe
->>>> 21:32:01 ERROR|
->>>> 21:32:01 DEBUG| DATA (filename=output.expected) => NOT FOUND (data
->>>> sources: variant, test, file)
->>>> 21:32:01 DEBUG| DATA (filename=stdout.expected) => NOT FOUND (data
->>>> sources: variant, test, file)
->>>> 21:32:01 DEBUG| DATA (filename=stderr.expected) => NOT FOUND (data
->>>> sources: variant, test, file)
->>>> 21:32:01 DEBUG| Not logging /var/log/syslog (lack of permissions)
->>>> 21:32:01 ERROR| ERROR
->>>> 12-tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_mips_malta_cpio
->>>> -> TestSetupFail: [Errno 32] Broken pipe
->>>> 21:32:01 INFO |
->>>>
->>>> https://travis-ci.org/github/philmd/qemu/jobs/696142277#L5329
->>>>
->>>
->>> Gotcha.
->>>
->>> The problem here is that `test_mips_malta_cpio` in boot_linux_console.py
->>> does this:
->>>
->>>         self.vm.add_args('-kernel', kernel_path,
->>>                          '-initrd', initrd_path,
->>>                          '-append', kernel_command_line,
->>>                          '-no-reboot')
->>>
->>> and then:
->>>
->>> exec_command_and_wait_for_pattern(self, 'reboot',
->>>                          'reboot: Restarting system')
->>>
->>> and (in avocado_qemu/) __init__.py does this:
->>>
->>>     def tearDown(self):
->>>         for vm in self._vms.values():
->>>             vm.shutdown()
->>>
->>>
->>>
->>> What's happening here is that we are instructing QEMU to *close* when
->>> the guest reboots instead of allowing it to reboot. Then, we are issuing
->>> a reboot command to the guest, which will effectively terminate QEMU as
->>> well. Finally, we are trying to send a shutdown command to QEMU, but
->>> QEMU has already gone.
->>>
->>> Now, in the shutdown code, we do make an attempt to catch this:
->>>
->>> def is_running(self):
->>>     """Returns true if the VM is running."""
->>>     return self._popen is not None and self._popen.poll() is None
->>>
->>> But, well, race conditions.
->>>
->>> When we make it here:
->>>
->>>         if self._qmp is not None:
->>>             if not has_quit:
->>>                 self._qmp.cmd('quit')
->>>             self._qmp.close()
->>>
->>> We believe we are running and we believe we have an open QMP socket.
->>> Attempting to engage the socket by sending 'quit' causes the error.
->>>
->>> It's a tight window: if quit happens earlier, we send the command
->>> successfully and everything's OK. If quit happens later, we realize QEMU
->>> isn't running and proceed to cleanup.
->>
->> Nice debugging :)
->>
->>>
->>> Ultimately:
->>>
->>> - Avocado should not try to shut down QEMU twice, but
->>> - machine.py shouldn't enable the race condition either.
->>>
->>>
->>>
->>> for my part, how about this:
->>>
->>> diff --git a/python/qemu/machine.py b/python/qemu/machine.py
->>> index 99bcb499878..813f8e477db 100644
->>> --- a/python/qemu/machine.py
->>> +++ b/python/qemu/machine.py
->>> @@ -385,7 +385,14 @@ def _soft_shutdown(self, has_quit: bool = False,
->>> timeout: int = 3) -> None:
->>>
->>>          if self._qmp is not None:
->>>              if not has_quit:
->>> -                self._qmp.cmd('quit')
->>> +                try:
->>> +                    self._qmp.cmd('quit')
->>> +                except (BrokenPipeError, ConnectionResetError):
->>> +                    # QMP went away just before or just after sending
->>> 'quit'
->>> +                    if not self.is_running():
->>> +                        # "Mission Accomplished"
->>> +                        pass
->>> +                    raise
->>
->> Looks OK to me, Cleber/Eduardo can you Ack?
->>
+On 6/4/20 9:52 PM, John Snow wrote:
+> v3:
+>  - Split _post_shutdown refactor into own patch (now 1/3)
+>  - Re-add sigkill warning squelch (now 3/3)
 > 
-> John's description seems spot on, and so does the solution.  I was
-> unable, though, to reproduce it given that the window is indeed tiny.
+> NOTE: I re-added the squelch in its own patch for review purposes, but
+> for the purposes of avoiding temporary breakage, a maintainer may wish
+> to squash patches 2 and 3 if they are accepted.
 > 
-> Phil,
+> v2: Philippe took patches 1, 3 and 4.
 > 
-> In addition to this, wouldn't it make sense to:
+> This is a re-write of what was:
+> [PATCH RFC 03/32] python//machine.py: remove bare except
+> [PATCH 2/4] python/machine.py: remove bare except
 > 
-> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
-> index 3d02519660..e117597e3b 100644
-> --- a/tests/acceptance/boot_linux_console.py
-> +++ b/tests/acceptance/boot_linux_console.py
-> @@ -180,8 +180,8 @@ class BootLinuxConsole(LinuxKernelTest):
->                                 + 'rdinit=/sbin/init noreboot')
->          self.vm.add_args('-kernel', kernel_path,
->                           '-initrd', initrd_path,
-> -                         '-append', kernel_command_line,
-> -                         '-no-reboot')
-> +                         '-append', kernel_command_line)
+> It's a bit heavier handed, but it should address some of kwolf's
+> feedback from the RFC version.
+> 
+> Applies straight to origin/master, ought to pass pylint and flake8:
+> 
+>> cd ~/src/qemu/python/qemu
+>> pylint *.py
+>> flake8 *.py
+> 
+> John Snow (3):
+>   python/machine.py: consolidate _post_shutdown()
+>   python/machine.py: refactor shutdown
+>   python/machine.py: re-add sigkill warning suppression
+> 
+>  python/qemu/machine.py | 100 +++++++++++++++++++++++++++++------------
+>  1 file changed, 71 insertions(+), 29 deletions(-)
+> 
 
-Very few machines implement the hardware shutdown (sending
-the SHUTDOWN_CAUSE_GUEST_SHUTDOWN event). AFAIK The
-SHUTDOWN_CAUSE_GUEST_RESET is a bit more present.
-When the hardware doesn't model this, the guest loops
-infinitely. Some physical machines are not supposed to
-power off, until cutting its power. So firmware also loops
-without trying to power things off.
+I had prepared:
 
-'-no-reboot' means "if the guest tries to reboot, consider
-the emulation done".
+Thanks, applied to my python-next tree (including your
+diff in python/qemu/machine.py):
+https://gitlab.com/philmd/qemu/commits/python-next
 
-> +
->          self.vm.launch()
->          self.wait_for_console_pattern('Boot successful.')
->  
-> @@ -189,8 +189,8 @@ class BootLinuxConsole(LinuxKernelTest):
->                                                  'BogoMIPS')
->          exec_command_and_wait_for_pattern(self, 'uname -a',
->                                                  'Debian')
-> -        exec_command_and_wait_for_pattern(self, 'reboot',
-> -                                                'reboot: Restarting system')
-> +        exec_command_and_wait_for_pattern(self, 'halt',
-> +                                                'reboot: System halted')
->  
->      @skipUnless(os.getenv('AVOCADO_ALLOW_UNTRUSTED_CODE'), 'untrusted code')
->      def test_mips64el_malta_5KEc_cpio(self):
-> 
-> Do you know of any reason to "fake halt" (reboot) instead of actually
-> halting from the guests?
+But I just noticed Cleber review comment asking for more testing,
+so I'm keeping this applied, but will delay the pull request
+since I have to re-run the testing.
 
-This might be my embedded system reflex (explained earlier, some
-hardware can not power itself down). I will give your diff a try.
-
-> 
->>>              self._qmp.close()
->>>
->>>          self._popen.wait(timeout=timeout)
->>>
->>
-> 
-> Either way (^ with this extra block):
-> 
-> Reviewed-by: Cleber Rosa <crosa@redhat.com>
-> Tested-by: Cleber Rosa <crosa@redhat.com>
-
-Thanks!
+Phil.
 
 
