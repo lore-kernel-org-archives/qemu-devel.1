@@ -2,92 +2,100 @@ Return-Path: <SRS0=bzpH=76=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DDD4C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 07:38:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5C68C433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 07:38:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0E9DF21531
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 07:38:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 93F7F208B8
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 07:38:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tNUOnFOC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E9DF21531
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QBpL7ONE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93F7F208B8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34978 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35416 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlSeg-0004D4-B3
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 03:38:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41064)
+	id 1jlSeo-0004O8-Rj
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 03:38:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43542)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jlSSJ-0004lC-71; Wed, 17 Jun 2020 03:25:55 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:55176)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jlSSH-0002bQ-JE; Wed, 17 Jun 2020 03:25:54 -0400
-Received: by mail-wm1-x343.google.com with SMTP id g10so794784wmh.4;
- Wed, 17 Jun 2020 00:25:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=whMizvqXayFxbp1IF4VRvbw0c99w7Q6BaIOEKga3yHk=;
- b=tNUOnFOC0+7FZMi8/SXo/dzYWGB77bWRNEck3auxVLmP0mS0/3O4CuVLP7vb8lDwmb
- ZrFq1GNKO44sGjQ1ruzA3m7Ei7RmVWABUMUmmUadNCjbyJEhZ4laOKZEw+/HFFI5rkBa
- Mx4+7XpfBjovuae2wlDxmrAcT4UZjI0Tq3JQXUIJnYhL6kY9NvATPZKL+hVwnm1LpdDm
- OoZt37gOEs/+CGzbAmimifnMQCCTWAL+/pUheR2RJaPIJ4QyYpiU/gR3eJ3uy6fCcS/k
- dbNtf/M2Qm3PtgyCqj2TCwUstgk5+XA38SlHgXaBCuB73eb3Sb+roP58dlQvCRhE5TJT
- f69g==
+ (Exim 4.90_1) (envelope-from <mlureau@redhat.com>)
+ id 1jlSdZ-0003TD-99
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 03:37:33 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:59958
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mlureau@redhat.com>)
+ id 1jlSdX-0004j6-Hr
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 03:37:32 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592379450;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=eWLY1FB3r/Id8vLvvBQnYkX64zV38I2qeMOakhNbn/E=;
+ b=QBpL7ONEMJMwKHxZpKtBeQvCo8aTw0YFDhRNOpmleBet6rlPJ7cEZCjSO0z/fF3Khat+KG
+ w8vrIxnsHFqT9xfub2b/dOupBk6GZSAsE3UkrCdcETT9dVxstQdU8beSFP53OR8GiYxZQo
+ tTr2IWmBDwKoq1TR4vnT9JPAdL7ffUc=
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
+ [209.85.166.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-84-lbpe8V4mOwOs5RjII2IFWQ-1; Wed, 17 Jun 2020 03:37:28 -0400
+X-MC-Unique: lbpe8V4mOwOs5RjII2IFWQ-1
+Received: by mail-il1-f199.google.com with SMTP id c29so908833ilf.20
+ for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 00:37:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=whMizvqXayFxbp1IF4VRvbw0c99w7Q6BaIOEKga3yHk=;
- b=ilhAnSnrVx8SWuwL0d3Svy7n6ij3ylpjVWoOxOOu5TbhaCnnwc4itaF3/6C6YEIzKt
- ghVfS7mpSXavjH4535HcOrBIDzZnxzu/bstCV+kdGzzFMp5ogWPvb3N4oHfW2dX7RMAr
- O8KhVgJPwT9L8N7Tm0LkNUTdXQwQJUliPqOI+1AqA1wEwlzbK9ItghzaJ1aNng7cGYDX
- wL/NQjX+efwuRr1OKYBC24wkZhZm9Nb33DT0FLQwissavQg9E8MPyxvg56twL/ZF8fYq
- UuU/X5sePF68qkSvIoQ4g65RJPnrcu2HMAT3sm0ktz9ym9uPdNlDk0ZHrBSOECZb3kDy
- f5Og==
-X-Gm-Message-State: AOAM532H+w+fc4E3dw1yzv2YoSW2R/AtP4mvOVViQ26PFmFlevjwqINh
- CR+5M6yqBoyLg8+84vE6VdqcKfgh
-X-Google-Smtp-Source: ABdhPJyrHw0a4VEyx+kmtCXkPXCFtnPRyydIR0r96RVGb6Mp4LPXmJNS3AFlj3YQYXBMaIHVPEIPmw==
-X-Received: by 2002:a1c:dc44:: with SMTP id t65mr7544400wmg.128.1592378751734; 
- Wed, 17 Jun 2020 00:25:51 -0700 (PDT)
-Received: from localhost.localdomain (93.red-83-59-160.dynamicip.rima-tde.net.
- [83.59.160.93])
- by smtp.gmail.com with ESMTPSA id j5sm32894781wrq.39.2020.06.17.00.25.50
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 17 Jun 2020 00:25:51 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 09/14] hw/arm/mps2: Add CMSDK AHB GPIO peripherals as
- unimplemented devices
-Date: Wed, 17 Jun 2020 09:25:34 +0200
-Message-Id: <20200617072539.32686-10-f4bug@amsat.org>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200617072539.32686-1-f4bug@amsat.org>
-References: <20200617072539.32686-1-f4bug@amsat.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=eWLY1FB3r/Id8vLvvBQnYkX64zV38I2qeMOakhNbn/E=;
+ b=LSjc/N3MTjM08Dt+pe9f477pWuuaBW+IEnh/TEX5VK2c3ba/xZcmvWfFDY5PUpyO8k
+ TthpXC8CFXg11sNQwkMTe8OrxGcok2OIzDFI+oyxsbqiBjj8jMuM6UAlh53b7yKhQKXt
+ SrOMLLeXbE9cNBSxYeOYTo107m+kEi32bJ4jGEoaamF/fnMH2Bm4nx9OirHYxENvyXZW
+ e403bz1FhPlzu36LngfNmSQ1V48CwEQ1eDGgpSHQLWEHBZ00DW4zFpv5zfrHB2cSdRFN
+ gJ1nqwgGn9xR26XYNdq8Y/jodm0rqDjvXpsJb00xz74nbKI8jk3pyBq9mMBzxVL2/16m
+ kRGQ==
+X-Gm-Message-State: AOAM533E5r9kdd89xwhK5or2oJl/BU+yKEw2cSQkJI2uOxpEM1iTORY/
+ NcJwdvyrsPZ5S6vN1Wjex1wDFGBbvLa+6Fu23I7p3X/6GJIwrFTbYZuVra4cyrKEIprqE+O2aTK
+ 6wmV4dQz0O2RgpGLtVQx/RcGOz12u4ec=
+X-Received: by 2002:a05:6602:1616:: with SMTP id
+ x22mr7280496iow.70.1592379447540; 
+ Wed, 17 Jun 2020 00:37:27 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJx8Lsybg1bTCpPhk4AQ0gSz9tOZsp1l1NEhIxT4+/4NpZE5ie9F9YMkvGVjobBH/EehATaTA17ReQx7He0I6o0=
+X-Received: by 2002:a05:6602:1616:: with SMTP id
+ x22mr7280481iow.70.1592379447273; 
+ Wed, 17 Jun 2020 00:37:27 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+References: <20200616205721.1191408-1-stefanb@linux.vnet.ibm.com>
+ <20200616205721.1191408-2-stefanb@linux.vnet.ibm.com>
+In-Reply-To: <20200616205721.1191408-2-stefanb@linux.vnet.ibm.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Wed, 17 Jun 2020 11:37:16 +0400
+Message-ID: <CAMxuvaze8sbWfcWtcj+JJJvvjd+0Pz4u4=pVFSDcTtq5gE_45w@mail.gmail.com>
+Subject: Re: [PATCH v3 1/8] tpm_tis: Allow lowering of IRQ also when locality
+ is not active
+To: Stefan Berger <stefanb@linux.vnet.ibm.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=mlureau@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 23:30:45
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -101,81 +109,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Esteban Bosse <estebanbosse@gmail.com>,
- Joaquin de Andres <me@xcancerberox.com.ar>, qemu-arm@nongnu.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Eric Auger <eric.auger@redhat.com>,
+ "Bonzini, Paolo" <pbonzini@redhat.com>,
+ Philippe Mathieu Daude <philmd@redhat.com>,
+ Marek Kedzierski <mkedzier@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Register the GPIO peripherals as unimplemented to better
-follow their accesses, for example booting Zephyr:
+On Wed, Jun 17, 2020 at 12:57 AM Stefan Berger
+<stefanb@linux.vnet.ibm.com> wrote:
+>
+> From: Stefan Berger <stefanb@linux.ibm.com>
+>
+> This patch fixes a bug that occurs when using interrupts. It
+> allows to lower the IRQ also when a locality is not active.
+>
+> Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
+> Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-  ----------------
-  IN: arm_mps2_pinmux_init
-  0x00001160:  f64f 0231  movw     r2, #0xf831
-  0x00001164:  4b06       ldr      r3, [pc, #0x18]
-  0x00001166:  2000       movs     r0, #0
-  0x00001168:  619a       str      r2, [r3, #0x18]
-  0x0000116a:  f24c 426f  movw     r2, #0xc46f
-  0x0000116e:  f503 5380  add.w    r3, r3, #0x1000
-  0x00001172:  619a       str      r2, [r3, #0x18]
-  0x00001174:  f44f 529e  mov.w    r2, #0x13c0
-  0x00001178:  f503 5380  add.w    r3, r3, #0x1000
-  0x0000117c:  619a       str      r2, [r3, #0x18]
-  0x0000117e:  4770       bx       lr
-  cmsdk-ahb-gpio: unimplemented device write (size 4, value 0xf831, offset 0x18)
-  cmsdk-ahb-gpio: unimplemented device write (size 4, value 0xc46f, offset 0x18)
-  cmsdk-ahb-gpio: unimplemented device write (size 4, value 0x13c0, offset 0x18)
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- hw/arm/mps2.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
-
-diff --git a/hw/arm/mps2.c b/hw/arm/mps2.c
-index f7bef20b40..c66c595d4a 100644
---- a/hw/arm/mps2.c
-+++ b/hw/arm/mps2.c
-@@ -113,6 +113,7 @@ static void mps2_common_init(MachineState *machine)
-     MemoryRegion *system_memory = get_system_memory();
-     MachineClass *mc = MACHINE_GET_CLASS(machine);
-     DeviceState *armv7m, *sccdev;
-+    int i;
- 
-     if (strcmp(machine->cpu_type, mc->default_cpu_type) != 0) {
-         error_report("This board can only be used with CPU %s",
-@@ -228,7 +229,6 @@ static void mps2_common_init(MachineState *machine)
-          */
-         Object *orgate;
-         DeviceState *orgate_dev;
--        int i;
- 
-         orgate = object_new(TYPE_OR_IRQ);
-         object_property_set_int(orgate, 6, "num-lines", &error_fatal);
-@@ -265,7 +265,6 @@ static void mps2_common_init(MachineState *machine)
-          */
-         Object *orgate;
-         DeviceState *orgate_dev;
--        int i;
- 
-         orgate = object_new(TYPE_OR_IRQ);
-         object_property_set_int(orgate, 10, "num-lines", &error_fatal);
-@@ -301,6 +300,11 @@ static void mps2_common_init(MachineState *machine)
-     default:
-         g_assert_not_reached();
-     }
-+    for (i = 0; i < 4; i++) {
-+        static const hwaddr gpiobase[] = {0x40010000, 0x40011000,
-+                                          0x40012000, 0x40013000};
-+        create_unimplemented_device("cmsdk-ahb-gpio", gpiobase[i], 0x1000);
-+    }
- 
-     /* CMSDK APB subsystem */
-     cmsdk_apb_timer_create(0x40000000, qdev_get_gpio_in(armv7m, 8), SYSCLK_FRQ);
--- 
-2.21.3
+> ---
+>  hw/tpm/tpm_tis_common.c | 4 ----
+>  1 file changed, 4 deletions(-)
+>
+> diff --git a/hw/tpm/tpm_tis_common.c b/hw/tpm/tpm_tis_common.c
+> index 1af4bce139..0f42696f1f 100644
+> --- a/hw/tpm/tpm_tis_common.c
+> +++ b/hw/tpm/tpm_tis_common.c
+> @@ -601,10 +601,6 @@ static void tpm_tis_mmio_write(void *opaque, hwaddr =
+addr,
+>          /* hard wired -- ignore */
+>          break;
+>      case TPM_TIS_REG_INT_STATUS:
+> -        if (s->active_locty !=3D locty) {
+> -            break;
+> -        }
+> -
+>          /* clearing of interrupt flags */
+>          if (((val & TPM_TIS_INTERRUPTS_SUPPORTED)) &&
+>              (s->loc[locty].ints & TPM_TIS_INTERRUPTS_SUPPORTED)) {
+> --
+> 2.24.1
+>
 
 
