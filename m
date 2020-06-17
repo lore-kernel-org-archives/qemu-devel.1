@@ -2,120 +2,89 @@ Return-Path: <SRS0=bzpH=76=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C49C1C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 07:44:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84567C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 07:44:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8C56C21475
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 07:44:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4F97C21475
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 07:44:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HyJqfSGn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C56C21475
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BrNiMZnT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F97C21475
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53846 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54714 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlSjq-00040c-PV
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 03:44:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45016)
+	id 1jlSk1-0004MI-Ji
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 03:44:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44420)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jlSis-0002hf-Jj
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 03:43:02 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:38072
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <mlureau@redhat.com>)
+ id 1jlSgt-0007s5-Kb
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 03:40:59 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:20426
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jlSiq-0005YE-TI
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 03:43:02 -0400
+ (Exim 4.90_1) (envelope-from <mlureau@redhat.com>)
+ id 1jlSgr-0005LM-Oj
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 03:40:59 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592379780;
+ s=mimecast20190719; t=1592379656;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=zQTPYAXbBqsFmed9DS7BJQqkK96B+vF646opAso6mXU=;
- b=HyJqfSGnyi2OBPfroyQtKSP9NlPofWdAqL3bzycrxRfAyggIsC/mMPphYsHk8XhQ+f6Of0
- 8CE9DPbFOmNwddc4uTsp1fw/DF77EbzEHfyk8gmxqFilGXhCnetJrcRY5VfRBGGfQot+Su
- 0PEqlUJkspocbtsadxO530hP+V+X+s4=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-342-eXUtZnfNNXep_BBDuRPEjA-1; Wed, 17 Jun 2020 03:42:56 -0400
-X-MC-Unique: eXUtZnfNNXep_BBDuRPEjA-1
-Received: by mail-wm1-f71.google.com with SMTP id p24so308907wma.4
- for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 00:42:56 -0700 (PDT)
+ in-reply-to:in-reply-to:references:references;
+ bh=Zi3c1CLyzhm/hFW/MAE40l5DhuZUVhVzINXpHZciyOc=;
+ b=BrNiMZnTlQDa91aOH9Tq8wfKl25qZuLN6oyPcSRefINMe8gDkqnKiY5Kcal0f705cXc/cq
+ wEGDRe6UJjyFyndsncRdy/OVi8w0Jj9E16lBw6j07+5sukglqt2dTKlEFL7JFwS0veWHDK
+ OXKh2xgkQMM9R9FsUT3ZCSs64qAlgf0=
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
+ [209.85.166.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-259-qy3UmzXkNeaoJ6DtrxwxUQ-1; Wed, 17 Jun 2020 03:40:55 -0400
+X-MC-Unique: qy3UmzXkNeaoJ6DtrxwxUQ-1
+Received: by mail-il1-f197.google.com with SMTP id v14so910499ilo.19
+ for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 00:40:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=zQTPYAXbBqsFmed9DS7BJQqkK96B+vF646opAso6mXU=;
- b=PVxCuYmUWyl/W1V3QVAdyUyqoiKFp0ucrisWBb58tYQxNnSA4EYRARvbxdlrfuGcWY
- LvQYBevDK3QR5obk9JrKrY+R8uG3Y+DSl+3awBY11pDgqfXdFaXq7tb5XTNOXWtdt3gD
- BeuKo4wzoKznS0We7s0qHWTMUGguOzrGsKmPf6YyDQZD699IZ8OVZaT5nFFh+kqK5Tg8
- 8Ha+Ldo4RsYb3zAEKqiLO6a7ku8Hu/yAqGrYsfaExZfds7/RGZa7q3SaWVtAyeWHUDtX
- Pr4lqV851CAqLnoHmYYP63S6nkORCC7Ln6jv0tUEvGKIxeUdpEftt8+lt6RWpLGifdeZ
- c2yA==
-X-Gm-Message-State: AOAM531evED02aWivKNM9cJto/AViDRHWsJ0vu5Ijh44v1UeNGMX7c3X
- lcKlwbnT+g+mju01A110s0VIlgRaU1Xg9+I7LJpTCYn7RSIR6QIqywuEfy04NFmIhUJtElvnM4t
- UTMuMGu9hmPE7LZ4=
-X-Received: by 2002:a5d:6a89:: with SMTP id s9mr6961084wru.15.1592379775388;
- Wed, 17 Jun 2020 00:42:55 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxdlwXMKWJHcKczhUHAREEwbCb9vZDlFpyc3ZyBoj/w3Wf8l/Nw14v1mNntZfZ/HBIS0hhT+A==
-X-Received: by 2002:a5d:6a89:: with SMTP id s9mr6961054wru.15.1592379775132;
- Wed, 17 Jun 2020 00:42:55 -0700 (PDT)
-Received: from [192.168.1.37] (93.red-83-59-160.dynamicip.rima-tde.net.
- [83.59.160.93])
- by smtp.gmail.com with ESMTPSA id a126sm7172522wme.28.2020.06.17.00.42.54
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 17 Jun 2020 00:42:54 -0700 (PDT)
-Subject: Re: [PATCH 5/6] nvram: add nrf51_soc flash read method
-To: P J P <ppandit@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-References: <20200617053934.122642-1-ppandit@redhat.com>
- <20200617053934.122642-6-ppandit@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <67e5fea1-1961-5773-ed82-a441ed8ffbcc@redhat.com>
-Date: Wed, 17 Jun 2020 09:42:53 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=Zi3c1CLyzhm/hFW/MAE40l5DhuZUVhVzINXpHZciyOc=;
+ b=jaQjsVPorP34/M6dHW1p5phE1cq+9ypwlkGSGTu78tWIXCX5giv9u8G53nl2SbWbOz
+ BR7dc5mupULjOtshJI4DXCTefCVTMprJsuO1KboYXXFX/9RrokFIxQmwkASsHLqEFSP/
+ hnmdA+/nmbwcixJMUnhBhCfT4y9jSd17sc7YYYznJ4UErVmdouQtcb48KBGhLXSWIhLs
+ kxBApGXHajds+gp7txYZMHumPlorgGM1+bX4lSmzR/X438kHZLGRcxIYeDNthbb03gLM
+ RLebNJ8o1bJuZu+Ro6KzlC/XiPCVzBCpCH7C6ivtfesxgw5Vht7XpiONEraK8VswwX7q
+ Wwxw==
+X-Gm-Message-State: AOAM531n/1SjQxxSldda0sGFdcuQdzbBkpmQjNP5dlOA24V4cfUsab7G
+ SfqWOWvVC5QMfm+Nnp9lqN3XAaKTDP1YcbHQ2M+FgRRjm21hpw9vvI03XQ/n7AEzVUgM82wMwba
+ JWzPaGKBCUJ000jjS2FeC+M6h4lmkfM4=
+X-Received: by 2002:a5e:de03:: with SMTP id e3mr7226786iok.0.1592379654893;
+ Wed, 17 Jun 2020 00:40:54 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxmfiWcCE7JhLBNyN0pK+ZaDYn0FBQ5rOPlEczs4xvbnM6reiCxBmPI6bQ+gvZdBgE1Ieh99fdSpmFKiG5v168=
+X-Received: by 2002:a5e:de03:: with SMTP id e3mr7226773iok.0.1592379654662;
+ Wed, 17 Jun 2020 00:40:54 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200617053934.122642-6-ppandit@redhat.com>
-Content-Language: en-US
+References: <20200616205721.1191408-1-stefanb@linux.vnet.ibm.com>
+ <20200616205721.1191408-7-stefanb@linux.vnet.ibm.com>
+In-Reply-To: <20200616205721.1191408-7-stefanb@linux.vnet.ibm.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Wed, 17 Jun 2020 11:40:43 +0400
+Message-ID: <CAMxuvawf+Nmw5v0p7r9ncMFOm+FeB=xFpEd8awqcHNj07M7FBw@mail.gmail.com>
+Subject: Re: [PATCH v3 6/8] tests: Add updated DSDT
+To: Stefan Berger <stefanb@linux.vnet.ibm.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 23:30:45
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=mlureau@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/17 01:42:42
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -136,57 +105,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Prasad J Pandit <pjp@fedoraproject.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Lei Sun <slei.casper@gmail.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
- Joel Stanley <joel@jms.id.au>, David Gibson <david@gibson.dropbear.id.au>
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Eric Auger <eric.auger@redhat.com>, "Bonzini, Paolo" <pbonzini@redhat.com>,
+ Philippe Mathieu Daude <philmd@redhat.com>,
+ Marek Kedzierski <mkedzier@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/17/20 7:39 AM, P J P wrote:
-> From: Prasad J Pandit <pjp@fedoraproject.org>
-> 
-> Add nrf51_soc mmio read method to avoid NULL pointer dereference
-> issue.
-> 
-> Reported-by: Lei Sun <slei.casper@gmail.com>
-> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+On Wed, Jun 17, 2020 at 12:57 AM Stefan Berger
+<stefanb@linux.vnet.ibm.com> wrote:
+>
+> Add the updated DSDT following the interrupt enablement.
+>
+> @@ -5,13 +5,13 @@
+>   *
+>   * Disassembling to symbolic ASL+ operators
+>   *
+> - * Disassembly of tests/data/acpi/q35/DSDT.tis, Mon Jun 15 09:57:05 2020
+> + * Disassembly of /tmp/aml-Y77YL0, Mon Jun 15 09:57:05 2020
+>   *
+>   * Original Table Header:
+>   *     Signature        "DSDT"
+> - *     Length           0x000020A5 (8357)
+> + *     Length           0x000020A8 (8360)
+>   *     Revision         0x01 **** 32-bit table (V1), no 64-bit math supp=
+ort
+> - *     Checksum         0xAD
+> + *     Checksum         0x77
+>   *     OEM ID           "BOCHS "
+>   *     OEM Table ID     "BXPCDSDT"
+>   *     OEM Revision     0x00000001 (1)
+> @@ -3162,6 +3162,8 @@
+>                          0xFED40000,         // Address Base
+>                          0x00005000,         // Address Length
+>                          )
+> +                    IRQNoFlags ()
+> +                        {13}
+>                  })
+>                  OperationRegion (TPP2, SystemMemory, 0xFED45100, 0x5A)
+>                  Field (TPP2, AnyAcc, NoLock, Preserve)
+> **
+>
+> Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
+> CC: Michael S. Tsirkin <mst@redhat.com>
+
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
 > ---
->  hw/nvram/nrf51_nvm.c | 7 +++++++
->  1 file changed, 7 insertions(+)
-> 
-> diff --git a/hw/nvram/nrf51_nvm.c b/hw/nvram/nrf51_nvm.c
-> index f2283c1a8d..e813c7ec72 100644
-> --- a/hw/nvram/nrf51_nvm.c
-> +++ b/hw/nvram/nrf51_nvm.c
-> @@ -274,6 +274,12 @@ static const MemoryRegionOps io_ops = {
->  };
->  
->  
-> +static uint64_t flash_read(void *opaque, hwaddr addr, unsigned size)
-> +{
-> +    qemu_log_mask(LOG_UNIMP, "%s not implemented\n", __func__);
-> +    return 0;
-
-This is a ROM device, shouldn't we return this instead?
-
-        return ldl_le_p(s->storage + offset);
-
-> +}
-> +
->  static void flash_write(void *opaque, hwaddr offset, uint64_t value,
->          unsigned int size)
->  {
-> @@ -300,6 +306,7 @@ static void flash_write(void *opaque, hwaddr offset, uint64_t value,
->  
->  
->  static const MemoryRegionOps flash_ops = {
-> +    .read = flash_read,
->      .write = flash_write,
->      .valid.min_access_size = 4,
->      .valid.max_access_size = 4,
-> 
+>  tests/data/acpi/q35/DSDT.tis                | Bin 8357 -> 8360 bytes
+>  tests/qtest/bios-tables-test-allowed-diff.h |   1 -
+>  2 files changed, 1 deletion(-)
+>
+> diff --git a/tests/data/acpi/q35/DSDT.tis b/tests/data/acpi/q35/DSDT.tis
+> index 56b6fb0c3298517d080e38fea05a748b9f1dba54..3f9db960aa05d399fa7f8449e=
+6db688788211832 100644
+> GIT binary patch
+> delta 64
+> zcmZ4LxWbXkCD<iog#rTuWBEp|KeC)oS~2m#PVoX>llkS`nVeK7N60A%iEs(FaWXJ6
+> UFkJb^5Wv8o#GtUbT~3Y(068!Z;Q#;t
+>
+> delta 61
+> zcmZ4CxYUu$CD<iosR9E7<Jyf}e`GoRHDls~o#F-DC-cj>Gx@7bj*wH}7v$n=3D<78lD
+> RV7T&+A%KBlbC;YP695=3D#58(g+
+>
+> diff --git a/tests/qtest/bios-tables-test-allowed-diff.h b/tests/qtest/bi=
+os-tables-test-allowed-diff.h
+> index bb4ce8967b..dfb8523c8b 100644
+> --- a/tests/qtest/bios-tables-test-allowed-diff.h
+> +++ b/tests/qtest/bios-tables-test-allowed-diff.h
+> @@ -1,2 +1 @@
+>  /* List of comma-separated changed AML files to ignore */
+> -"tests/data/acpi/q35/DSDT.tis",
+> --
+> 2.24.1
+>
 
 
