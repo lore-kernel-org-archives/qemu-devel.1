@@ -2,91 +2,87 @@ Return-Path: <SRS0=bzpH=76=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29038C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 14:12:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1A7BC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 14:14:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E4EAD207DD
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 14:12:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A0EF121532
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 14:14:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QhC+WQSX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4EAD207DD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bIaDU0oo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0EF121532
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35462 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38772 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlYo0-0003Op-74
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 10:12:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34664)
+	id 1jlYpe-0005H8-W7
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 10:14:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34946)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1jlYnI-0002X7-HV
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 10:12:00 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:24387
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1jlYnG-0003Ya-S1
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 10:12:00 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592403115;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=tgMst5H/ME6QpPC+fOj17ndF0v8wXvNg7mOxAnBJEDE=;
- b=QhC+WQSXX8nvIM3RBRFSqPDfAs2AsqsESDgdoihK6rJUfSIwULrXHLjYGUYO5EvpBLfOCu
- eJMeRifQU9Ed/e+89rl7OSn34gFhZrN8rPBs4yvs8ujZ9gyff6jGYirEtQEp+g5WTnCaA7
- eK4uHFNDyb3LI3NrgoPoFc0KjuzWazY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-332-17XlP6B3MUCsOhad8wGLVA-1; Wed, 17 Jun 2020 10:11:51 -0400
-X-MC-Unique: 17XlP6B3MUCsOhad8wGLVA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DF02D1010888;
- Wed, 17 Jun 2020 14:11:49 +0000 (UTC)
-Received: from localhost (ovpn-113-21.phx2.redhat.com [10.3.113.21])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 309F8610AF;
- Wed, 17 Jun 2020 14:11:44 +0000 (UTC)
-Date: Wed, 17 Jun 2020 10:11:43 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Subject: Re: ovmf / PCI passthrough impaired due to very limiting PCI64
- aperture
-Message-ID: <20200617141143.GY2366737@habkost.net>
-References: <99779e9c-f05f-501b-b4be-ff719f140a88@canonical.com>
- <20200616165043.24y2cp53axk7uggy@sirius.home.kraxel.org>
- <20200616165746.GH2788@work-vm>
- <20200616171021.GV2366737@habkost.net>
- <20200617085033.GB568347@redhat.com>
+ (Exim 4.90_1) (envelope-from <yilikernel@gmail.com>)
+ id 1jlYp3-0004WO-Af; Wed, 17 Jun 2020 10:13:49 -0400
+Received: from mail-yb1-xb43.google.com ([2607:f8b0:4864:20::b43]:35182)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <yilikernel@gmail.com>)
+ id 1jlYp1-0003w1-BG; Wed, 17 Jun 2020 10:13:49 -0400
+Received: by mail-yb1-xb43.google.com with SMTP id 187so1353971ybq.2;
+ Wed, 17 Jun 2020 07:13:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+ :cc; bh=AJQ6VEUGf1MQ++ss43RRmLAIinslj07stOFzOoMnW28=;
+ b=bIaDU0oofQiEgNkfCfPiXwuwyJXaX4B7bb90cV4+cVqkagRNDY6ZwrvQomEVIY9UP+
+ ofgd7BcMi7BdF/zndGyT/oGkU/uKj3b5DVkXFIyCiFkfjOl9gdpI6YZAB6S6Hqb1TXG5
+ Zx4oOnGpMgLAriF+D4fiii7rwG9vauVelyxCRr08z53C/rN5UnmWkkW+HXBuWNguaUpV
+ dWRIP6ROfFLVZdy6e+0+N9bcpDKfTF61zgntjyIw0Yt+HhUwKcccwxbFhNerOcRCKbiu
+ XxRW9aexZm91dwch/MC1JjgOo2Hc03/zHXfLXmVgZqwflG6XTR+inFvHJxhc3PeP+ySe
+ /f7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+ :message-id:subject:to:cc;
+ bh=AJQ6VEUGf1MQ++ss43RRmLAIinslj07stOFzOoMnW28=;
+ b=XgteIemmneoJW+YiTLEsBFc+MgsgHCsNS8J8J2ZK4lgllZxbRwFWSwQh2ynrX7uP39
+ 0fxnCZPDcnhWh1F1ypTmFC4NgzZoOjU2z46ZZA1kIGM2Hy7owXJGGwZbYxuGqGyfNmE3
+ Xu5YuE9a7Q7PMaYBdNjW+GzbW7g+k8frUuOIYhBpz54Jt++WLCegsPX3+31oQsy36108
+ BqW8VvQbuBM4Yg5d6ERaT5I0DZWIi4sBESm3XULi6tET3KZaVw4xzbuq5BKVEJl98qqx
+ q6ThZfKY8qtO47qYJOL/DlMhAk35LaLCPalilB45wB4yZv7LWVUtgsp/kr5yrYa7Ib+/
+ qSEg==
+X-Gm-Message-State: AOAM530wv5/feDmtbhlXVt2th6NH8nbAV2cqmQc514kpC00/wI80Imfn
+ 73KIgWggNHGdKyyUC0ggS+xPPLZD8AYzgGr6H/A=
+X-Google-Smtp-Source: ABdhPJxmvMfmKBQOUDWT9e0P65KpjYU972aw+lxNkyZ5i7oH4Mz1Jh9Ec8qnAcvL99/inZv88IvsmB54UP8ceVohdzM=
+X-Received: by 2002:a25:324f:: with SMTP id y76mr13621189yby.207.1592403225486; 
+ Wed, 17 Jun 2020 07:13:45 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200617085033.GB568347@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/17 02:02:46
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Received: by 2002:a5b:3ca:0:0:0:0:0 with HTTP;
+ Wed, 17 Jun 2020 07:13:43 -0700 (PDT)
+In-Reply-To: <20200611153623.1415001-1-yili@winhong.com>
+References: <CAJfdMYCS7SJ66K2F7a9qyKyP9f1Tmbe9N7qvshNe6jAZZtpWBg@mail.gmail.com>
+ <20200611153623.1415001-1-yili@winhong.com>
+From: Yi Li <yilikernel@gmail.com>
+Date: Wed, 17 Jun 2020 22:13:43 +0800
+Message-ID: <CAJfdMYDGr2O9JFKxvc9VYYYdoRhsc66sPXdVQ9KTo01a-6uQyA@mail.gmail.com>
+Subject: Re: [PATCH v2] rbd: Use RBD fast-diff for querying actual allocation
+To: jdillama@redhat.com, qemu-devel@nongnu.org
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::b43;
+ envelope-from=yilikernel@gmail.com; helo=mail-yb1-xb43.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,74 +95,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pedro.principeza@canonical.com, dann.frazier@canonical.com,
- "Guilherme G. Piccoli" <gpiccoli@canonical.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- christian.ehrhardt@canonical.com, qemu-devel@nongnu.org,
- Gerd Hoffmann <kraxel@redhat.com>, lersek@redhat.com, fw@gpiccoli.net
+Cc: kwolf <kwolf@redhat.com>, qemu-block <qemu-block@nongnu.org>,
+ mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jun 17, 2020 at 09:50:33AM +0100, Daniel P. Berrangé wrote:
-> On Tue, Jun 16, 2020 at 01:10:21PM -0400, Eduardo Habkost wrote:
-> > On Tue, Jun 16, 2020 at 05:57:46PM +0100, Dr. David Alan Gilbert wrote:
-> > > * Gerd Hoffmann (kraxel@redhat.com) wrote:
-> > > >   Hi,
-> > > > 
-> > > > > (a) We could rely in the guest physbits to calculate the PCI64 aperture.
-> > > > 
-> > > > I'd love to do that.  Move the 64-bit I/O window as high as possible and
-> > > > use -- say -- 25% of the physical address space for it.
-> > > > 
-> > > > Problem is we can't.
-> > > > 
-> > > > > failure. Also, if the users are not setting the physbits in the guest,
-> > > > > there must be a default (seems to be 40bit according to my experiments),
-> > > > > seems to be a good idea to rely on that.
-> > > > 
-> > > > Yes, 40 is the default, and it is used *even if the host supports less
-> > > > than that*.  Typical values I've seen for intel hardware are 36 and 39.
-> > > > 39 is used even by recent hardware (not the xeons, but check out a
-> > > > laptop or a nuc).
-> > > > 
-> > > > > If guest physbits is 40, why to have OVMF limiting it to 36, right?
-> > > > 
-> > > > Things will explode in case OVMF uses more physbits than the host
-> > > > supports (host physbits limit applies to ept too).  In other words: OVMF
-> > > > can't trust the guest physbits, so it is conservative to be on the safe
-> > > > side.
-> > > > 
-> > > > If we can somehow make a *trustable* physbits value available to the
-> > > > guest, then yes, we can go that route.  But the guest physbits we have
-> > > > today unfortunately don't cut it.
-> > > 
-> > > In downstream RH qemu, we run with host-physbits as default; so it's reasonably
-> > > trustworthy; of course that doesn't help you across a migration between
-> > > hosts with different sizes (e.g. an E5 Xeon to an E3).
-> > > Changing upstream to do the same would seem sensible to me, but it's not
-> > > a foolproof config.
-> > 
-> > Yeah, to make it really trustworthy we would need to prevent
-> > migration to hosts with mismatching phys sizes.  We would need to
-> > communicate that to the guest somehow (with new hypervisor CPUID
-> > flags, maybe).
-> 
-> QEMU should be able to validate the hostphysbits >= guestphysbits when
-> accepting incoming migration, and abort it.
-> 
-> Meanwhile libvirt should be enhanced to report hostphysbits, so that
-> management apps can determine that they shouldn't even pick bad hosts
-> in the first place.
-> 
+ping ?
 
-Whatever policy we choose to implement on the host side, it would
-be nice to inform the guest that we are making additional
-guarantees.  Especially considering that
-guestphysbits > hostphysbits is currently allowed and works (so
-changing the requirements unconditionally would be a regression).
-
--- 
-Eduardo
-
+On 6/11/20, Yi Li <yili@winhong.com> wrote:
+> Since Ceph version Infernalis (9.2.0) the new fast-diff mechanism
+> of RBD allows for querying actual rbd image usage.
+>
+> Prior to this version there was no easy and fast way to query how
+> much allocation a RBD image had inside a Ceph cluster.
+>
+> To use the fast-diff feature it needs to be enabled per RBD image
+> and is only supported by Ceph cluster running version Infernalis
+> (9.2.0) or newer.
+>
+> The fast-diff feature disabled or fast-diff map is marked as invalid,
+> qemu-img will report an allocation identical to the image capacity.
+>
+> 'qemu-img info rbd:cepharm/liyi-rbd' might output for example:
+>
+>   image: json:{"driver": "raw", "file": {"pool": "cepharm",
+>   "image": "liyi-rbd", "driver": "rbd"}}
+>   file format: raw
+>   virtual size: 20 GiB (21474836480 bytes)
+>   disk size: 0 B
+>   cluster_size: 4194304
+>
+> Newly created rbds will have the fast-diff feature enabled.
+>
+> Signed-off-by: Yi Li <yili@winhong.com>
+> ---
+>  block/rbd.c | 103 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 103 insertions(+)
+>
+> diff --git a/block/rbd.c b/block/rbd.c
+> index 617553b022..c1e68ff7e9 100644
+> --- a/block/rbd.c
+> +++ b/block/rbd.c
+> @@ -1107,6 +1107,108 @@ static int64_t qemu_rbd_getlength(BlockDriverState
+> *bs)
+>      return info.size;
+>  }
+>
+> +#if LIBRBD_VERSION_CODE > 265
+> +static int disk_usage_callback(uint64_t offset, size_t len, int exists,
+> +                               void *arg)
+> +{
+> +  uint64_t *used_size = (uint64_t *)(arg);
+> +  if (exists) {
+> +    (*used_size) += len;
+> +  }
+> +  return 0;
+> +}
+> +
+> +static int qemu_rbd_getflags(rbd_image_t image, uint64_t *flags)
+> +{
+> +    int r;
+> +
+> +    r = rbd_get_flags(image, flags);
+> +    if (r < 0) {
+> +        return r;
+> +    }
+> +    return 0;
+> +}
+> +
+> +static bool qemu_rbd_use_fastdiff(uint64_t features, uint64_t flags)
+> +{
+> +    return (((features & RBD_FEATURE_FAST_DIFF) != 0ULL) &&
+> +            ((flags & RBD_FLAG_FAST_DIFF_INVALID) == 0ULL));
+> +}
+> +
+> +static int qemu_rbd_set_allocation(rbd_image_t image,
+> +                                   rbd_image_info_t *info,
+> +                                   uint64_t *used_size)
+> +{
+> +    int r;
+> +    /*
+> +     * RBD image fast-diff feature enabled
+> +     * Querying for actual allocation.
+> +     */
+> +    r = rbd_diff_iterate2(image, NULL, 0, info->size, 0, 1,
+> +                          &disk_usage_callback,
+> +                          used_size);
+> +    if (r < 0) {
+> +        return r;
+> +    }
+> +    return 0;
+> +}
+> +
+> +#else
+> +static int qemu_rbd_getflags(rbd_image_t image G_GNUC_UNUSED, uint64_t
+> *flags)
+> +{
+> +    *flags = 0;
+> +    return 0;
+> +}
+> +
+> +static bool qemu_rbd_use_fastdiff(uint64_t features G_GNUC_UNUSED,
+> +                                  uint64_t feature_flags G_GNUC_UNUSED)
+> +{
+> +    return false;
+> +}
+> +
+> +static int qemu_rbd_set_allocation(rbd_image_t image G_GNUC_UNUSED,
+> +                                   rbd_image_info_t *info _GNUC_UNUSED,
+> +                                   uint64_t *used_size _GNUC_UNUSED)
+> +{
+> +    return 0;
+> +}
+> +#endif
+> +
+> +static int64_t qemu_rbd_allocated_file_size(BlockDriverState *bs)
+> +{
+> +    BDRVRBDState *s = bs->opaque;
+> +    rbd_image_info_t info;
+> +    int r;
+> +    uint64_t used_size = 0;
+> +    uint64_t features = 0;
+> +    uint64_t flags = 0;
+> +
+> +    r = rbd_stat(s->image, &info, sizeof(info));
+> +    if (r < 0) {
+> +        return r;
+> +    }
+> +
+> +    r = rbd_get_features(s->image, &features);
+> +    if (r < 0) {
+> +        return r;
+> +    }
+> +
+> +    r = qemu_rbd_getflags(s->image, &flags);
+> +    if (r < 0) {
+> +        return r;
+> +    }
+> +
+> +    if (qemu_rbd_use_fastdiff(features, flags)) {
+> +        r = qemu_rbd_set_allocation(s->image, &info, &used_size);
+> +        if (r < 0) {
+> +            return r;
+> +        }
+> +    } else {
+> +        used_size = info.size;
+> +    }
+> +    return used_size;
+> +}
+> +
+>  static int coroutine_fn qemu_rbd_co_truncate(BlockDriverState *bs,
+>                                               int64_t offset,
+>                                               bool exact,
+> @@ -1316,6 +1418,7 @@ static BlockDriver bdrv_rbd = {
+>      .bdrv_get_info          = qemu_rbd_getinfo,
+>      .create_opts            = &qemu_rbd_create_opts,
+>      .bdrv_getlength         = qemu_rbd_getlength,
+> +    .bdrv_get_allocated_file_size = qemu_rbd_allocated_file_size,
+>      .bdrv_co_truncate       = qemu_rbd_co_truncate,
+>      .protocol_name          = "rbd",
+>
+> --
+> 2.25.3
+>
+>
+>
+>
 
