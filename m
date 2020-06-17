@@ -7,75 +7,79 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AFFEC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 21:06:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18A28C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 21:07:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E2EF42186A
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 21:06:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D3F3E21582
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 21:07:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TF8X0jiQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2EF42186A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Zt4xqudC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3F3E21582
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45550 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46366 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlfGl-0007pK-Qi
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 17:06:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36902)
+	id 1jlfGu-000892-0O
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 17:07:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36886)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1jlfDT-0002eg-Sr
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 17:03:29 -0400
-Received: from mail-qt1-x842.google.com ([2607:f8b0:4864:20::842]:39413)
+ id 1jlfDS-0002dT-2G
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 17:03:26 -0400
+Received: from mail-qt1-x841.google.com ([2607:f8b0:4864:20::841]:36374)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1jlfDO-0008Pk-Cr
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 17:03:27 -0400
-Received: by mail-qt1-x842.google.com with SMTP id k22so2751469qtm.6
- for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 14:03:18 -0700 (PDT)
+ id 1jlfDO-0008Pv-Co
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 17:03:25 -0400
+Received: by mail-qt1-x841.google.com with SMTP id w9so2761265qtv.3
+ for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 14:03:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=ZYteIUkqExuWadWFdiCSlI10s1/zCIoztEZoLySpuAc=;
- b=TF8X0jiQLJdX49wvJNWN2EsKmh/+c0yHko7XgtzikAtgnaI0Y4mrYSZxsWOEAUdyWG
- jq6/qkzab3HtMsOqgl31+2qgEeD+TEhQ4MSIVRo7i/JlEs6g1/FIktPLPJqw2LWR55Sx
- /MKWheQmtNhLbxe43ti56Me9dvxauU56jaPQ8/j+G2XlMGc7llAM1m9SpPWi+ST+fcMd
- wuWdLJ9qRjgqZ8tehLZ8CeuHHgr02kT4P+MpgbiAr3ZPB0ANwhKasF4s+wd0CifsXBIA
- wnXSyVrC8+2GP1e506rLR+QaAAPUA2eE1gBwDI+DzAZlwzt3J8JmdfeKGPF2eNOn6aPM
- LpcQ==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=pQeS3ErQJYe6lUMZTvW4HI5IzahbrklWfBxpVQvJbIg=;
+ b=Zt4xqudCRQ0OUAqxQ8rsAwSTaiB7Ot9EnCA+XPlHCfM1HpEPiuTaGSlQNU0nM6R9Xk
+ zsqX3HrWFtcYLMkGwt1QkSmVLIrKyj3jLzV6YHigqNioDLLu1PIlxhw7KpT7CgIQfxyC
+ gvSWI5KSo3ZoZCU3Y6d9+6H33bnrC51Wp004WhWtTQ+/tHxbajTZsk0NemVmPNI+0NLJ
+ k1cW6nIIXIHSEBbCWywd8U+Ddz9dMdtShANprE9XMWnEjUijiz0ReLu2s3oh0Cmn5vfY
+ MQRHNFPpeVdJQUBsguK3NunKDflIpP0dVdQRwmc++ZxCV65ZXISsPWrIyMLIdXn0SU8L
+ LROg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=ZYteIUkqExuWadWFdiCSlI10s1/zCIoztEZoLySpuAc=;
- b=Diw5btKJujA5Vv7YvYixVPfTfqVG54b0tRgQabKZStONKapie6rMvWyyotNIie1GT3
- SgQC2dJ2gPin7Gw1pCl/wYzOLrbLRkpS6bUPdIIaei+kPPpuVoxLSkRhmo1q673AA2fA
- kwP6uVA7lV3y6FcWFHxOM0u3QLEFK8gaerUixEl8iU9DSs+knyIctJtnyDIfAQwYBypf
- TrhGKDL5TIzgIc/mPrHrYvrxdwOeMaoI5w8y1/S7TPJU9UYZYa5suThuh4nIGFRMww3w
- b7/6sVcz+WTGKeBA+osx7yH9KBSHPkwykuBikg/Hmjx+MMrIjuPGd5yshxtMUpbIlBSv
- /QBw==
-X-Gm-Message-State: AOAM533ukJ1ssuCol39qEo3etRsjEZnkRw9/yKmIgBMZdjha51ac6wtR
- cwhl+cO8QR/XejtOsjYzf61vPOIyaiaebw==
-X-Google-Smtp-Source: ABdhPJwKNZlTuHv3C0fd2aFWR3+Sk8y+ypqyE0OxIFFkv3MU6MipIpr1UjAtxHspmxpYi5AUcJ5I9w==
-X-Received: by 2002:ac8:6f5c:: with SMTP id n28mr1097058qtv.269.1592427797718; 
- Wed, 17 Jun 2020 14:03:17 -0700 (PDT)
+ :references:mime-version:content-transfer-encoding;
+ bh=pQeS3ErQJYe6lUMZTvW4HI5IzahbrklWfBxpVQvJbIg=;
+ b=oif95DmAGlL9BX/bVxXa33TW7vjm4CEz1jL8ZfxyAdjJDaYg0LSDL2v2OSnv4CEvNt
+ /4ZPp8YKYufo1dQ/OP7+TDEaRBLDFRmLwpJmnrxa1d4h5Cw06NJh7bkEAmACXORJAmHY
+ KzkACe9PMJrtvEkmWDLc3EMHRco836gv8n4y+aiJxTCECD9JlaOqLGHsW54FesJlQEx+
+ 6qsO8Bq4MCMCLxEvlmzb2enuEZsFNjDb3j4D4mY7QPwpKae+Ucn4jfcBUUVXfUmj63Aq
+ U99yKJUj5C8TlZiN/L+9+YDVuChNlir/VdiPXcDKnXrptkkeKjXd6Q3ojVAMhCqDGNDX
+ gE6g==
+X-Gm-Message-State: AOAM532r3pmvVFL5/Y9Gajhbsfhfh4Wp1BHTyOMPoUfz+DCUweeFTHti
+ 3OW7knNN3dK949PPkm9vZkrii/1/CVU74g==
+X-Google-Smtp-Source: ABdhPJwm4Prd7s/y/OVV2BowxMoBKxWpU3jOeN1DGr3xq9PrniQQLBtETI11mggJBHQtC9Aa+9B4oA==
+X-Received: by 2002:ac8:538b:: with SMTP id x11mr1116947qtp.84.1592427799432; 
+ Wed, 17 Jun 2020 14:03:19 -0700 (PDT)
 Received: from Rfoley-MA01.hsd1.ma.comcast.net
  ([2601:199:4480:60c0:fc79:714c:9711:2e9c])
- by smtp.gmail.com with ESMTPSA id w13sm997245qkb.91.2020.06.17.14.03.16
+ by smtp.gmail.com with ESMTPSA id w13sm997245qkb.91.2020.06.17.14.03.18
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 17 Jun 2020 14:03:17 -0700 (PDT)
+ Wed, 17 Jun 2020 14:03:18 -0700 (PDT)
 From: Robert Foley <robert.foley@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v10 02/73] cpu: introduce cpu_mutex_lock/unlock
-Date: Wed, 17 Jun 2020 17:01:20 -0400
-Message-Id: <20200617210231.4393-3-robert.foley@linaro.org>
+Subject: [PATCH v10 03/73] cpu: make qemu_work_cond per-cpu
+Date: Wed, 17 Jun 2020 17:01:21 -0400
+Message-Id: <20200617210231.4393-4-robert.foley@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200617210231.4393-1-robert.foley@linaro.org>
 References: <20200617210231.4393-1-robert.foley@linaro.org>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::842;
- envelope-from=robert.foley@linaro.org; helo=mail-qt1-x842.google.com
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::841;
+ envelope-from=robert.foley@linaro.org; helo=mail-qt1-x841.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -83,8 +87,8 @@ X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -106,200 +110,224 @@ Sender: "Qemu-devel"
 
 From: "Emilio G. Cota" <cota@braap.org>
 
-The few direct users of &cpu->lock will be converted soon.
+This eliminates the need to use the BQL to queue CPU work.
 
-The per-thread bitmap introduced here might seem unnecessary,
-since a bool could just do. However, once we complete the
-conversion to per-vCPU locks, we will need to cover the use
-case where all vCPUs are locked by the same thread, which
-explains why the bitmap is introduced here.
+While at it, give the per-cpu field a generic name ("cond") since
+it will soon be used for more than just queueing CPU work.
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
-[RF: Add assert in smp_parse. Make cpu_mutex_lock stub empty]
 Signed-off-by: Robert Foley <robert.foley@linaro.org>
 ---
- cpus.c                | 45 +++++++++++++++++++++++++++++++++++++++++--
- hw/core/machine.c     |  1 +
- include/hw/core/cpu.h | 36 ++++++++++++++++++++++++++++++++++
- stubs/Makefile.objs   |  1 +
- stubs/cpu-lock.c      | 20 +++++++++++++++++++
- 5 files changed, 101 insertions(+), 2 deletions(-)
- create mode 100644 stubs/cpu-lock.c
+ cpus-common.c         | 72 ++++++++++++++++++++++++++++++++++---------
+ cpus.c                |  2 +-
+ hw/core/cpu.c         |  1 +
+ include/hw/core/cpu.h |  6 ++--
+ 4 files changed, 63 insertions(+), 18 deletions(-)
 
-diff --git a/cpus.c b/cpus.c
-index 3c011ec452..ca271411a4 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -92,6 +92,44 @@ static unsigned int throttle_percentage;
- #define CPU_THROTTLE_PCT_MAX 99
- #define CPU_THROTTLE_TIMESLICE_NS 10000000
+diff --git a/cpus-common.c b/cpus-common.c
+index 622430bd33..57d9fc6ea1 100644
+--- a/cpus-common.c
++++ b/cpus-common.c
+@@ -27,7 +27,6 @@
+ static QemuMutex qemu_cpu_list_lock;
+ static QemuCond exclusive_cond;
+ static QemuCond exclusive_resume;
+-static QemuCond qemu_work_cond;
  
-+/*
-+ * Note: we index the bitmap with cpu->cpu_index + 1 so that the logic
-+ * also works during early CPU initialization, when cpu->cpu_index is set to
-+ * UNASSIGNED_CPU_INDEX == -1.
-+ */
-+static __thread DECLARE_BITMAP(cpu_lock_bitmap, CPU_LOCK_BITMAP_SIZE);
-+
-+bool no_cpu_mutex_locked(void)
-+{
-+    return bitmap_empty(cpu_lock_bitmap, CPU_LOCK_BITMAP_SIZE);
-+}
-+
-+void cpu_mutex_lock_impl(CPUState *cpu, const char *file, int line)
-+{
-+/* coverity gets confused by the indirect function call */
-+#ifdef __COVERITY__
-+    qemu_mutex_lock_impl(&cpu->lock, file, line);
-+#else
-+    QemuMutexLockFunc f = atomic_read(&qemu_mutex_lock_func);
-+
-+    g_assert(!cpu_mutex_locked(cpu));
-+    set_bit(cpu->cpu_index + 1, cpu_lock_bitmap);
-+    f(&cpu->lock, file, line);
-+#endif
-+}
-+
-+void cpu_mutex_unlock_impl(CPUState *cpu, const char *file, int line)
-+{
-+    g_assert(cpu_mutex_locked(cpu));
-+    qemu_mutex_unlock_impl(&cpu->lock, file, line);
-+    clear_bit(cpu->cpu_index + 1, cpu_lock_bitmap);
-+}
-+
-+bool cpu_mutex_locked(const CPUState *cpu)
-+{
-+    return test_bit(cpu->cpu_index + 1, cpu_lock_bitmap);
-+}
-+
- bool cpu_is_stopped(CPUState *cpu)
- {
-     return cpu->stopped || !runstate_is_running();
-@@ -101,9 +139,9 @@ static inline bool cpu_work_list_empty(CPUState *cpu)
- {
-     bool ret;
- 
--    qemu_mutex_lock(&cpu->lock);
-+    cpu_mutex_lock(cpu);
-     ret = QSIMPLEQ_EMPTY(&cpu->work_list);
--    qemu_mutex_unlock(&cpu->lock);
-+    cpu_mutex_unlock(cpu);
-     return ret;
+ /* >= 1 if a thread is inside start_exclusive/end_exclusive.  Written
+  * under qemu_cpu_list_lock, read with atomic operations.
+@@ -43,7 +42,6 @@ void qemu_init_cpu_list(void)
+     qemu_mutex_init(&qemu_cpu_list_lock);
+     qemu_cond_init(&exclusive_cond);
+     qemu_cond_init(&exclusive_resume);
+-    qemu_cond_init(&qemu_work_cond);
  }
  
-@@ -1865,6 +1903,9 @@ void qemu_mutex_lock_iothread_impl(const char *file, int line)
+ void cpu_list_lock(void)
+@@ -103,23 +101,37 @@ struct qemu_work_item {
+     bool free, exclusive, done;
+ };
+ 
+-static void queue_work_on_cpu(CPUState *cpu, struct qemu_work_item *wi)
++/* Called with the CPU's lock held */
++static void queue_work_on_cpu_locked(CPUState *cpu, struct qemu_work_item *wi)
  {
-     QemuMutexLockFunc bql_lock = atomic_read(&qemu_bql_mutex_lock_func);
+-    qemu_mutex_lock(&cpu->lock);
+     QSIMPLEQ_INSERT_TAIL(&cpu->work_list, wi, node);
+     wi->done = false;
+-    qemu_mutex_unlock(&cpu->lock);
  
-+    /* enforce locking order */
-+    g_assert(no_cpu_mutex_locked());
+     qemu_cpu_kick(cpu);
+ }
+ 
+-void do_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data,
+-                   QemuMutex *mutex)
++static void queue_work_on_cpu(CPUState *cpu, struct qemu_work_item *wi)
++{
++    cpu_mutex_lock(cpu);
++    queue_work_on_cpu_locked(cpu, wi);
++    cpu_mutex_unlock(cpu);
++}
 +
-     g_assert(!qemu_mutex_iothread_locked());
-     bql_lock(&qemu_global_mutex, file, line);
-     iothread_locked = true;
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index 1d80ab0e1d..74edd3c86d 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -769,6 +769,7 @@ static void smp_parse(MachineState *ms, QemuOpts *opts)
-         ms->smp.threads = threads;
-         ms->smp.sockets = sockets;
-     }
-+    assert(ms->smp.max_cpus <= CPU_LOCK_BITMAP_SIZE);
++void do_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data)
+ {
+     struct qemu_work_item wi;
++    bool has_bql = qemu_mutex_iothread_locked();
++
++    g_assert(no_cpu_mutex_locked());
  
-     if (ms->smp.cpus > 1) {
-         Error *blocker = NULL;
+     if (qemu_cpu_is_self(cpu)) {
+-        func(cpu, data);
++        if (has_bql) {
++            func(cpu, data);
++        } else {
++            qemu_mutex_lock_iothread();
++            func(cpu, data);
++            qemu_mutex_unlock_iothread();
++        }
+         return;
+     }
+ 
+@@ -129,13 +141,34 @@ void do_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data,
+     wi.free = false;
+     wi.exclusive = false;
+ 
+-    queue_work_on_cpu(cpu, &wi);
++    cpu_mutex_lock(cpu);
++    queue_work_on_cpu_locked(cpu, &wi);
++
++    /*
++     * We are going to sleep on the CPU lock, so release the BQL.
++     *
++     * During the transition to per-CPU locks, we release the BQL _after_
++     * having kicked the destination CPU (from queue_work_on_cpu_locked above).
++     * This makes sure that the enqueued work will be seen by the CPU
++     * after being woken up from the kick, since the CPU sleeps on the BQL.
++     * Once we complete the transition to per-CPU locks, we will release
++     * the BQL earlier in this function.
++     */
++    if (has_bql) {
++        qemu_mutex_unlock_iothread();
++    }
++
+     while (!atomic_mb_read(&wi.done)) {
+         CPUState *self_cpu = current_cpu;
+ 
+-        qemu_cond_wait(&qemu_work_cond, mutex);
++        qemu_cond_wait(&cpu->cond, &cpu->lock);
+         current_cpu = self_cpu;
+     }
++    cpu_mutex_unlock(cpu);
++
++    if (has_bql) {
++        qemu_mutex_lock_iothread();
++    }
+ }
+ 
+ void async_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data)
+@@ -299,6 +332,7 @@ void async_safe_run_on_cpu(CPUState *cpu, run_on_cpu_func func,
+ void process_queued_cpu_work(CPUState *cpu)
+ {
+     struct qemu_work_item *wi;
++    bool has_bql = qemu_mutex_iothread_locked();
+ 
+     qemu_mutex_lock(&cpu->lock);
+     if (QSIMPLEQ_EMPTY(&cpu->work_list)) {
+@@ -316,13 +350,23 @@ void process_queued_cpu_work(CPUState *cpu)
+              * BQL, so it goes to sleep; start_exclusive() is sleeping too, so
+              * neither CPU can proceed.
+              */
+-            qemu_mutex_unlock_iothread();
++            if (has_bql) {
++                qemu_mutex_unlock_iothread();
++            }
+             start_exclusive();
+             wi->func(cpu, wi->data);
+             end_exclusive();
+-            qemu_mutex_lock_iothread();
++            if (has_bql) {
++                qemu_mutex_lock_iothread();
++            }
+         } else {
+-            wi->func(cpu, wi->data);
++            if (has_bql) {
++                wi->func(cpu, wi->data);
++            } else {
++                qemu_mutex_lock_iothread();
++                wi->func(cpu, wi->data);
++                qemu_mutex_unlock_iothread();
++            }
+         }
+         qemu_mutex_lock(&cpu->lock);
+         if (wi->free) {
+@@ -332,5 +376,5 @@ void process_queued_cpu_work(CPUState *cpu)
+         }
+     }
+     qemu_mutex_unlock(&cpu->lock);
+-    qemu_cond_broadcast(&qemu_work_cond);
++    qemu_cond_broadcast(&cpu->cond);
+ }
+diff --git a/cpus.c b/cpus.c
+index ca271411a4..035f41a997 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -1216,7 +1216,7 @@ void qemu_init_cpu_loop(void)
+ 
+ void run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data)
+ {
+-    do_run_on_cpu(cpu, func, data, &qemu_global_mutex);
++    do_run_on_cpu(cpu, func, data);
+ }
+ 
+ static void qemu_kvm_destroy_vcpu(CPUState *cpu)
+diff --git a/hw/core/cpu.c b/hw/core/cpu.c
+index 1cba5b6e69..07251d83df 100644
+--- a/hw/core/cpu.c
++++ b/hw/core/cpu.c
+@@ -370,6 +370,7 @@ static void cpu_common_initfn(Object *obj)
+     cpu->nr_threads = 1;
+ 
+     qemu_mutex_init(&cpu->lock);
++    qemu_cond_init(&cpu->cond);
+     QSIMPLEQ_INIT(&cpu->work_list);
+     QTAILQ_INIT(&cpu->breakpoints);
+     QTAILQ_INIT(&cpu->watchpoints);
 diff --git a/include/hw/core/cpu.h b/include/hw/core/cpu.h
-index afc8081ca8..4d4006f1fb 100644
+index 4d4006f1fb..ebff239ad3 100644
 --- a/include/hw/core/cpu.h
 +++ b/include/hw/core/cpu.h
-@@ -457,6 +457,39 @@ extern CPUTailQ cpus;
+@@ -333,6 +333,7 @@ struct qemu_work_item;
+  * @kvm_fd: vCPU file descriptor for KVM.
+  * @lock: Lock to prevent multiple access to per-CPU fields. Must be acquired
+  *        after the BQL.
++ * @cond: Condition variable for per-CPU events.
+  * @work_list: List of pending asynchronous work.
+  * @trace_dstate_delayed: Delayed changes to trace_dstate (includes all changes
+  *                        to @trace_dstate).
+@@ -378,6 +379,7 @@ struct CPUState {
  
- extern __thread CPUState *current_cpu;
+     QemuMutex lock;
+     /* fields below protected by @lock */
++    QemuCond cond;
+     QSIMPLEQ_HEAD(, qemu_work_item) work_list;
  
-+/**
-+ * cpu_mutex_lock - lock a CPU's mutex
-+ * @cpu: the CPU whose mutex is to be locked
-+ *
-+ * To avoid deadlock, a CPU's mutex must be acquired after the BQL.
-+ */
-+#define cpu_mutex_lock(cpu)                             \
-+    cpu_mutex_lock_impl(cpu, __FILE__, __LINE__)
-+void cpu_mutex_lock_impl(CPUState *cpu, const char *file, int line);
-+
-+/**
-+ * cpu_mutex_unlock - unlock a CPU's mutex
-+ * @cpu: the CPU whose mutex is to be unlocked
-+ */
-+#define cpu_mutex_unlock(cpu)                           \
-+    cpu_mutex_unlock_impl(cpu, __FILE__, __LINE__)
-+void cpu_mutex_unlock_impl(CPUState *cpu, const char *file, int line);
-+
-+/**
-+ * cpu_mutex_locked - check whether a CPU's mutex is locked
-+ * @cpu: the CPU of interest
-+ *
-+ * Returns true if the calling thread is currently holding the CPU's mutex.
-+ */
-+bool cpu_mutex_locked(const CPUState *cpu);
-+
-+/**
-+ * no_cpu_mutex_locked - check whether any CPU mutex is held
-+ *
-+ * Returns true if the calling thread is not holding any CPU mutex.
-+ */
-+bool no_cpu_mutex_locked(void);
-+
- static inline void cpu_tb_jmp_cache_clear(CPUState *cpu)
- {
-     unsigned int i;
-@@ -1184,4 +1217,7 @@ extern const VMStateDescription vmstate_cpu_common;
- #define UNASSIGNED_CPU_INDEX -1
- #define UNASSIGNED_CLUSTER_INDEX -1
+     CPUAddressSpace *cpu_ases;
+@@ -774,12 +776,10 @@ bool cpu_is_stopped(CPUState *cpu);
+  * @cpu: The vCPU to run on.
+  * @func: The function to be executed.
+  * @data: Data to pass to the function.
+- * @mutex: Mutex to release while waiting for @func to run.
+  *
+  * Used internally in the implementation of run_on_cpu.
+  */
+-void do_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data,
+-                   QemuMutex *mutex);
++void do_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data);
  
-+/* XXX: is this really the max number of CPUs? */
-+#define CPU_LOCK_BITMAP_SIZE 2048
-+
- #endif
-diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-index 28e48171d1..becf8f6986 100644
---- a/stubs/Makefile.objs
-+++ b/stubs/Makefile.objs
-@@ -1,6 +1,7 @@
- stub-obj-y += blk-commit-all.o
- stub-obj-y += cpu-get-clock.o
- stub-obj-y += cpu-get-icount.o
-+stub-obj-y += cpu-lock.o
- stub-obj-y += dump.o
- stub-obj-y += error-printf.o
- stub-obj-y += fdset.o
-diff --git a/stubs/cpu-lock.c b/stubs/cpu-lock.c
-new file mode 100644
-index 0000000000..1981a00fb3
---- /dev/null
-+++ b/stubs/cpu-lock.c
-@@ -0,0 +1,20 @@
-+#include "qemu/osdep.h"
-+#include "hw/core/cpu.h"
-+
-+void cpu_mutex_lock_impl(CPUState *cpu, const char *file, int line)
-+{
-+}
-+
-+void cpu_mutex_unlock_impl(CPUState *cpu, const char *file, int line)
-+{
-+}
-+
-+bool cpu_mutex_locked(const CPUState *cpu)
-+{
-+    return true;
-+}
-+
-+bool no_cpu_mutex_locked(void)
-+{
-+    return true;
-+}
+ /**
+  * run_on_cpu:
 -- 
 2.17.1
 
