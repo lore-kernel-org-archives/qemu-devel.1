@@ -2,86 +2,84 @@ Return-Path: <SRS0=bzpH=76=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44D55C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 12:31:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0613BC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 12:33:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1445F20CC7
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 12:31:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 84B352078D
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 12:33:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g6jVEYmj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1445F20CC7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Pe5u/1KN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84B352078D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45948 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51490 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlXDg-0006XX-AB
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 08:31:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60258)
+	id 1jlXFn-0000P5-Ib
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 08:33:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60266)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jlXBv-0004P6-MP
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 08:29:19 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:42616
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jlXBw-0004Qg-MT
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 08:29:20 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:21170
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jlXBu-0002Wk-3i
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 08:29:19 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jlXBv-0002Ww-2R
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 08:29:20 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592396957;
+ s=mimecast20190719; t=1592396958;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=YPFJFaMrpuHpn0jwnWZgZ+54i5WkkV9FY9G9bgKap2I=;
- b=g6jVEYmjlUSdKM9jDtEI1yFesVDkkl0i/IE8jv4HRg/yq6q5GM5V29cJ1eTNEQtw6v57Py
- HmKL0oIeNaUOO2+WgtpbWkVRIetMj2Ml1/vHJzNWxsC4x+k2G6TD3rMTh7zWmEX85wwcA+
- QHW4TIq4knpYy7c051FNAtsiuiGH388=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=njPufjQU9J06Is2FXVSy/pVf/aMSRVIW2nX5LRoWV4E=;
+ b=Pe5u/1KNBnU4/rSwGzk2KmoMdtsa2OqWP6lRqpmEx7Wr9OWXJd7KD67LMKtTCxyeTTZPdo
+ VByY1VStcofVuqsl2d5fwb9CmIKnXpKFiS9SBlecviLhFoc4yvBNTkbDBJU//zGl25IfFw
+ xYslxpfhOd4b5725/tTklF9wsAAo+q4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-427-dhvMQHhgMGCBolP3iquecA-1; Wed, 17 Jun 2020 08:29:13 -0400
-X-MC-Unique: dhvMQHhgMGCBolP3iquecA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-266-KQmlQncdOiGFUbPBAR1Qlw-1; Wed, 17 Jun 2020 08:29:16 -0400
+X-MC-Unique: KQmlQncdOiGFUbPBAR1Qlw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C31421009625;
- Wed, 17 Jun 2020 12:29:11 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 75DFE100962B;
+ Wed, 17 Jun 2020 12:29:15 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-112-67.ams2.redhat.com
  [10.36.112.67])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2CA177BA14;
- Wed, 17 Jun 2020 12:29:03 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 09EB719D7B;
+ Wed, 17 Jun 2020 12:29:06 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id AC3581753C; Wed, 17 Jun 2020 14:29:01 +0200 (CEST)
+ id 9AC9B16E16; Wed, 17 Jun 2020 14:29:01 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 2/4] microvm: drop max-ram-below-4g support
-Date: Wed, 17 Jun 2020 14:28:59 +0200
-Message-Id: <20200617122901.13327-3-kraxel@redhat.com>
-In-Reply-To: <20200617122901.13327-1-kraxel@redhat.com>
-References: <20200617122901.13327-1-kraxel@redhat.com>
+Subject: [PULL 0/4] Microvm 20200617 patches
+Date: Wed, 17 Jun 2020 14:28:57 +0200
+Message-Id: <20200617122901.13327-1-kraxel@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=kraxel@redhat.com;
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=kraxel@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/17 01:42:42
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/17 02:02:46
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -104,49 +102,40 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Not useful for microvm and allows users to shoot themself
-into the foot (make ram + mmio overlap).
+The following changes since commit 5c24bce3056ff209a1ecc50ff4b7e65b85ad8e74:
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Message-id: 20200529073957.8018-3-kraxel@redhat.com
----
- hw/i386/microvm.c | 19 -------------------
- 1 file changed, 19 deletions(-)
+  Merge remote-tracking branch 'remotes/stsquad/tags/pull-testing-and-plugin-160620-2' into staging (2020-06-16 14:57:15 +0100)
 
-diff --git a/hw/i386/microvm.c b/hw/i386/microvm.c
-index 44f940813b07..5e931975a06d 100644
---- a/hw/i386/microvm.c
-+++ b/hw/i386/microvm.c
-@@ -173,25 +173,6 @@ static void microvm_memory_init(MicrovmMachineState *mms)
-     ram_addr_t lowmem = 0xc0000000; /* 3G */
-     int i;
- 
--    /*
--     * Handle the machine opt max-ram-below-4g.  It is basically doing
--     * min(qemu limit, user limit).
--     */
--    if (!x86ms->max_ram_below_4g) {
--        x86ms->max_ram_below_4g = 4 * GiB;
--    }
--    if (lowmem > x86ms->max_ram_below_4g) {
--        lowmem = x86ms->max_ram_below_4g;
--        if (machine->ram_size - lowmem > lowmem &&
--            lowmem & (1 * GiB - 1)) {
--            warn_report("There is possibly poor performance as the ram size "
--                        " (0x%" PRIx64 ") is more then twice the size of"
--                        " max-ram-below-4g (%"PRIu64") and"
--                        " max-ram-below-4g is not a multiple of 1G.",
--                        (uint64_t)machine->ram_size, x86ms->max_ram_below_4g);
--        }
--    }
--
-     if (machine->ram_size > lowmem) {
-         x86ms->above_4g_mem_size = machine->ram_size - lowmem;
-         x86ms->below_4g_mem_size = lowmem;
+are available in the Git repository at:
+
+  git://git.kraxel.org/qemu tags/microvm-20200617-pull-request
+
+for you to fetch changes up to c8b473594b8fbba169a6ea950493a3015d15a18d:
+
+  microvm: move virtio base to 0xfeb00000 (2020-06-17 14:24:28 +0200)
+
+----------------------------------------------------------------
+microvm: memory config tweaks
+
+----------------------------------------------------------------
+
+Gerd Hoffmann (4):
+  microvm: use 3G split unconditionally
+  microvm: drop max-ram-below-4g support
+  x86: move max-ram-below-4g to pc
+  microvm: move virtio base to 0xfeb00000
+
+ include/hw/i386/microvm.h |  2 +-
+ include/hw/i386/pc.h      |  2 ++
+ include/hw/i386/x86.h     |  4 ----
+ hw/i386/microvm.c         | 35 +----------------------------
+ hw/i386/pc.c              | 46 +++++++++++++++++++++++++++++++++++++++
+ hw/i386/pc_piix.c         | 10 ++++-----
+ hw/i386/pc_q35.c          | 10 ++++-----
+ hw/i386/x86.c             | 46 ---------------------------------------
+ hw/i386/xen/xen-hvm.c     |  2 +-
+ 9 files changed, 61 insertions(+), 96 deletions(-)
+
 -- 
 2.18.4
 
