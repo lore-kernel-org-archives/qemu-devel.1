@@ -2,97 +2,110 @@ Return-Path: <SRS0=bzpH=76=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72BCBC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 17:35:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3891C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 17:38:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 375412071A
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 17:35:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AFBAF212CC
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 17:38:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iOEmhBTK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 375412071A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TYSMOlzc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AFBAF212CC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58674 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33270 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlbyY-0005bO-Fg
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 13:35:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60186)
+	id 1jlc1E-0007gD-UF
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 13:38:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60800)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jlbxu-0004zF-FT
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 13:35:10 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:52503)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jlbxs-0005XT-M1
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 13:35:10 -0400
-Received: by mail-wm1-x341.google.com with SMTP id r9so2671413wmh.2
- for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 10:35:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=0rUoKcgqEoiNF5/lDcrgF9QShYREa0ia3WvSmaKqQLM=;
- b=iOEmhBTKNKy4AfxFcFG7Es2UP6Tnn3yxm6CaaR2s4Gn7Hft4EynZ3GdHu6FNnvjMqW
- fqeBRurzXTuVO2oj6l1knt3T/PfphMED8MPB4u5x9OKCZ58w0zSJrcAdEJRkliSYW4u1
- 8x+Jqs9YSXucpb2OWmzRse7ALt7ti/hUy3UIKqNfbja3Z45BxLiqqvefJJeu1klOSrdF
- Br9gCm5Nb+KfXhnZGGKJ0aN3r7vYBuPYrzfeQM8vt1zmLm5uiooAK6Va9Otk3kyG3oFI
- Ev7E4mGK6RQq94f5mGwzJ7IQt5r1bRTF3EQuVGboTw0qh9oqn3Z6oxvO6shM+H4Wa5IN
- c9WQ==
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jlc0T-0006ke-57
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 13:37:49 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:31361
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jlc0Q-00067o-UG
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 13:37:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592415466;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=2hNrLKFzx+SU91EcmopqxtknC1GSH8vyiR3LApBQTDs=;
+ b=TYSMOlzc640Z/VnU8DRHHrMHxIAlb33ikAz3w1CFnc7NKsOX5jlSSYPlDFlLbgoFJvkzMr
+ NDeS4LLybBeEgu8GHOfDYLknPRrrARiIaK/6SPkLDwkSG90g8+NPPt0JOsPGqRy6Qi2fXr
+ HfHLIxaZGSalKWyzQoVGsU6sZ4Xr9V4=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-470-XbT4j0t3Ma2jmnIrw5V3ag-1; Wed, 17 Jun 2020 13:37:44 -0400
+X-MC-Unique: XbT4j0t3Ma2jmnIrw5V3ag-1
+Received: by mail-wm1-f72.google.com with SMTP id j128so1526061wmj.6
+ for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 10:37:44 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=0rUoKcgqEoiNF5/lDcrgF9QShYREa0ia3WvSmaKqQLM=;
- b=NSj/j4153ds8dx7HFP9aPWPTToOf1wWcr66sHvd0z0pYoOXhAl0yeUFhr1fj+alr69
- YW7qjaHHeGOOn3KtBTmwljr7GtAorg/tDsUM/NLrS+n7uOXdMwmtYMQaSUs/b8K0PosM
- 1sxC3eW52h9QM+uxJiJH/oVIdhNzXP1VHcILoyQP+OsNDPcPo6U+58GhJZo+7lKdelwT
- MXiZsxUnZTXTid8CMA2NvP5F/GPlFZQEX8trJsWRscWpRt26B0vg0vSnlqPwZQfpyeDA
- ZERggFIpY7yQMDe8Z4Tof4gMGcwN+QTPz4LlX4Y7+3IJzr56dA8pCkGA5iiICwAMf8+7
- g3fA==
-X-Gm-Message-State: AOAM5329WaqiTdC8NCmj601GHF4mzLc5F5KHqtfGjRuuHP0y4FAEWj9f
- AubErOZu1OHM54by9ZSZBob5EA==
-X-Google-Smtp-Source: ABdhPJzPV5ChbY8Ghowj+6oidqQbVij8DZri9dtXIyJURBTU6YdgUejHjEUqed28je7tPkCVd0Yc+g==
-X-Received: by 2002:a1c:e355:: with SMTP id a82mr9581539wmh.1.1592415307085;
- Wed, 17 Jun 2020 10:35:07 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id a16sm355523wrx.8.2020.06.17.10.35.05
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 17 Jun 2020 10:35:05 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id D03851FF7E;
- Wed, 17 Jun 2020 18:35:04 +0100 (BST)
-References: <20200616231204.8850-1-ahmedkhaledkaraman@gmail.com>
- <20200616231204.8850-4-ahmedkhaledkaraman@gmail.com>
- <871rmdyjbh.fsf@linaro.org>
- <CALTWKrVovkoQvNFxYac2eOV7Cf+K_RA+1-Gn=3AnL8dJLemTyQ@mail.gmail.com>
-User-agent: mu4e 1.5.3; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
-Subject: Re: [PATCH 3/3] scripts/performance: Add perf_top_25.py script
-In-reply-to: <CALTWKrVovkoQvNFxYac2eOV7Cf+K_RA+1-Gn=3AnL8dJLemTyQ@mail.gmail.com>
-Date: Wed, 17 Jun 2020 18:35:04 +0100
-Message-ID: <877dw5wq7r.fsf@linaro.org>
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=2hNrLKFzx+SU91EcmopqxtknC1GSH8vyiR3LApBQTDs=;
+ b=jbL6cRO8hVnVi7GhzKTzfBRSmI5uPiEuqMwWMFHEQ1qN94uRjs6uPNfaDvW0oD8YTZ
+ +nz3QnZLgfOTZQfWLF9kaM8/yazXUSU33n0KsbF2p0+vkPd8oXleTajtB7lhhC2bb6O6
+ E3Baet+1TqNZn/LGFRgfNhGF826bChR7PE43K7Wgm+YXMn/YZa49Mz8lR7vIL9ZdykGU
+ Qc3DKWsk2e7dcwClQXO9/fImFPENWwd3M9OMtE1XO3UmedGetAJrmozhqKpvKqWShO0r
+ 5YpuxGhMma3zGYfpdgvQzxq8FnrzUTyfq9vz0xEdZswczRh2tE8ujwktjngl4e68OtMY
+ 3P0A==
+X-Gm-Message-State: AOAM532MKmE1HvWJrewsHBrFzxB8EpWea0b3AzELp5GmmN6RjrJFudwb
+ SGIp1hIudHI1R7H2+53wuThybfA4XWvTIdKIGR+bhhoXsYzBEVCwQOQ5FZ7xuRq9lwu951vwWCq
+ Y8DHax7FQwKJeVcI=
+X-Received: by 2002:a05:600c:2317:: with SMTP id
+ 23mr9817905wmo.139.1592415463040; 
+ Wed, 17 Jun 2020 10:37:43 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJx3YciH+f5OVe46ah2MB16qI0Gn1EiHqQ45UZ3u1EYqtXDANLy3Fba09QkOgNONjBrTbeFuXw==
+X-Received: by 2002:a05:600c:2317:: with SMTP id
+ 23mr9817888wmo.139.1592415462827; 
+ Wed, 17 Jun 2020 10:37:42 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:48a4:82f8:2ffd:ec67?
+ ([2001:b07:6468:f312:48a4:82f8:2ffd:ec67])
+ by smtp.gmail.com with ESMTPSA id r4sm334822wro.32.2020.06.17.10.37.41
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 17 Jun 2020 10:37:42 -0700 (PDT)
+Subject: Re: [PATCH] target/arm/kvm: Check supported feature per accelerator
+ (not per vCPU)
+To: Andrew Jones <drjones@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+References: <20200617130800.26355-1-philmd@redhat.com>
+ <20200617152319.l77b4kdzwcftx7by@kamzik.brq.redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <69f9adc8-28ec-d949-60aa-ba760ea210a9@redhat.com>
+Date: Wed, 17 Jun 2020 19:37:42 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
+In-Reply-To: <20200617152319.l77b4kdzwcftx7by@kamzik.brq.redhat.com>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::341;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x341.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/17 02:02:46
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,58 +118,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>, ehabkost@redhat.com,
- QEMU Developers <qemu-devel@nongnu.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, crosa@redhat.com,
- Richard Henderson <rth@twiddle.net>
+Cc: Haibo Xu <haibo.xu@linaro.org>, Peter Maydell <peter.maydell@linaro.org>,
+ qemu-arm@nongnu.org, qemu-devel@nongnu.org, kvm@vger.kernel.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-Ahmed Karaman <ahmedkhaledkaraman@gmail.com> writes:
-
-> On Wed, Jun 17, 2020 at 2:21 PM Alex Benn=C3=A9e <alex.bennee@linaro.org>=
- wrote:
->
->> > +
->> > +# Run perf repcord and report
->> > +os.system('sudo perf record {} {} 2> /dev/null \
->> > +            && sudo perf report --stdio > tmp.perf.data'
->> > +          .format(qemu_path, executable))
+On 17/06/20 17:23, Andrew Jones wrote:
 >>
->> Why sudo?
->
-> This is the default requirement by perf. You can modify the
-> kernel.perf_event_paranoid setting to run without root privileges.
+>> Fix by kvm_arm_<FEATURE>_supported() functions take a AccelState
+>> argument (already realized/valid at this point) instead of a
+>> CPUState argument.
+> I'd rather not do that. IMO, a CPU feature test should operate on CPU,
+> not an "accelerator".
 
-Right - which I do as a developer. It would be rude to sudo things if
-you don't need to because then you end up running your potentially
-un-trusted application with root privileges.
+If it's a test that the feature is enabled (e.g. via -cpu) then I agree.  
+For something that ends up as a KVM_CHECK_EXTENSION or KVM_ENABLE_CAP on 
+the KVM fd, however, I think passing an AccelState is better.
+kvm_arm_pmu_supported case is clearly the latter, even the error message
+hints at that:
 
-Could we either probe for the requirement or require an explicit sudo
-flag which we can prompt for if it fails?
++        if (kvm_enabled() && !kvm_arm_pmu_supported(current_accel())) {
+             error_setg(errp, "'pmu' feature not supported by KVM on this host");
+             return;
+         }
 
->
->> Also redirecting just stderr? why?
->
-> Perf, as well as Valgrind, print their output on stderr not stdout.
+but the same is true of kvm_arm_aarch32_supported and kvm_arm_sve_supported.
 
-Right so I think a bit of splitting apart and use of subprocess can make
-this cleaner and not involve quite so much being done with shell
-redirection in one invocation.
+Applying the change to kvm_arm_pmu_supported as you suggest below would be
+a bit of a bandaid because it would not have consistent prototypes.  Sp
+for Philippe's patch
 
->
->> I think you could separate the steps (as well as use the subprocess
->> api).
->
-> Noted!
->
->> Again os.unlink()
->
-> Noted!
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 
+Thanks,
 
---=20
-Alex Benn=C3=A9e
+Paolo
+
+> How that test is implemented is another story.
+> If the CPUState isn't interesting, but it points to something that is,
+> or there's another function that uses globals to get the job done, then
+> fine, but the callers of a CPU feature test shouldn't need to know that.
+> 
+> I think we should just revert d70c996df23f and then apply the same
+> change to kvm_arm_pmu_supported() that other similar functions got
+> with 4f7f589381d5.
+
 
