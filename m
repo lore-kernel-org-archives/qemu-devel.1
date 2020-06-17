@@ -2,87 +2,101 @@ Return-Path: <SRS0=bzpH=76=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52327C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 15:15:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9577C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 15:15:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1A31920707
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 15:15:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B49BB2071A
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 15:15:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YpOQ7put"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A31920707
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q1TXVEmt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B49BB2071A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59458 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59836 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlZn1-0007Sg-6Q
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 11:15:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45678)
+	id 1jlZn5-0007cu-SR
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 11:15:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49542)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jlZO8-0003VJ-CH
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 10:50:04 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:59165
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jlZO4-0001nJ-EW
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 10:50:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592405399;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=oCwklQt9sS1bGWr0feitdiQ1QfpA9UktJx3cpW47Mko=;
- b=YpOQ7putieZC2NT9CA6sx0s4rrJQyN38+XcFaw6WAqawaky/hUN+pJlfGV3e6j0L1xO8vn
- jmFY7LmXLMf6UMfy7x+FlsiLxWAXwhF5khOR06IcKrauhpN4rYY4xGNInicQjrz6zqix6v
- d8ypJu/G/3yYdvXvXRNaG6H76f5faiY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-18-44gXWSAGPbuIIgK8LwJK8A-1; Wed, 17 Jun 2020 10:49:57 -0400
-X-MC-Unique: 44gXWSAGPbuIIgK8LwJK8A-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0D48E18A266A;
- Wed, 17 Jun 2020 14:49:56 +0000 (UTC)
-Received: from linux.fritz.box.com (ovpn-114-44.ams2.redhat.com [10.36.114.44])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 159167CAA0;
- Wed, 17 Jun 2020 14:49:54 +0000 (UTC)
-From: Kevin Wolf <kwolf@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PULL 31/43] block: consolidate blocksize properties consistency
- checks
-Date: Wed, 17 Jun 2020 16:48:57 +0200
-Message-Id: <20200617144909.192176-32-kwolf@redhat.com>
-In-Reply-To: <20200617144909.192176-1-kwolf@redhat.com>
-References: <20200617144909.192176-1-kwolf@redhat.com>
+ (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1jlZbz-0005mJ-Is; Wed, 17 Jun 2020 11:04:23 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:52981)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1jlZbx-0005GF-LS; Wed, 17 Jun 2020 11:04:23 -0400
+Received: by mail-wm1-x344.google.com with SMTP id r9so2187853wmh.2;
+ Wed, 17 Jun 2020 08:04:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=dnXhK56wzWxR6LV/1smHXrH9BiqjRK+oVXW76SWNEU8=;
+ b=Q1TXVEmtEQySJNsd56QQwC7ApqjjKOiD2zIHIKxE9VEtShp4GftaMwAtrwVTm8j2MV
+ 9++mAka7SG5C0+MnKiacmQNgVtuSzAml1yN0oSD+VF9vTjelPinhSw8J1A43IZPSv0rN
+ ogCrDnDZ67ljh5DFLHPCRN2cGgUHY82z1GXvQkTNxE6S+/CbEC6nTNmb6NLNdraAYscg
+ PuvgA9eEBGocJL5CpCC3NuOgbtz9iFLs74iumvGAP9+nOH9ScbTj3bjDwobr6YFudgyJ
+ i7wA1E3ETDFbktAOEurxNaQ/Rro3lxHrP3WRU6po+xNkxwrdhzz8/C4/mQ27jHgUUEfo
+ MwQQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=dnXhK56wzWxR6LV/1smHXrH9BiqjRK+oVXW76SWNEU8=;
+ b=YpxgseQvs2dSiyAXS9yrGsMQTRLJ00UcHeltFYT10Kr9kHQRTcXlt0k978EaEO8orQ
+ q2VGUXaYDROmfrBIv25t2GeDb1z+6Rd55lLl3t97wxiFT4u5Cqrz3IOgQMTdIceDA2QQ
+ 1dhym74aSE214C1JSqj4+WdZn8CxhlX8GWkBl6/DGn66XqbD609YdYe+MN+P6GVxqZAU
+ MTIk1VXlJLsjixuyRRM2LkBjvTONoFoJ9BRVhVraEwypFckipUsmx1vVMqqiAFrX1NaJ
+ VLa5ISs2hlHAy7zkFbpAYdGA/aa/MMk9d1asWqgJCnXuSmxRayoeWPoP0JG6uA4SXbNa
+ T1dw==
+X-Gm-Message-State: AOAM531oPCbERZszxq4WdTZsKCDLFTlfq5YK6OIi6NBdcULyw1tRWrU9
+ Rnwly14Axe5jx170fRWHp3E=
+X-Google-Smtp-Source: ABdhPJyDwRu68E0wrJddqdrXroFxwqwbzXhh1tDoL0sGRbQTDrkyD7VMwjZSzuLKaKuMhR7Lc26FuA==
+X-Received: by 2002:a1c:9ad8:: with SMTP id c207mr8494451wme.45.1592406258467; 
+ Wed, 17 Jun 2020 08:04:18 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:48a4:82f8:2ffd:ec67?
+ ([2001:b07:6468:f312:48a4:82f8:2ffd:ec67])
+ by smtp.googlemail.com with ESMTPSA id s8sm33935027wrm.96.2020.06.17.08.04.17
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 17 Jun 2020 08:04:17 -0700 (PDT)
+Subject: Re: applying mailing list review tags (was: Re: [PATCH v3 00/16]
+ python: add mypy support to python/qemu)
+To: John Snow <jsnow@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+References: <20200604202236.25039-1-jsnow@redhat.com>
+ <20200605092630.GE5869@linux.fritz.box>
+ <502e4f4d-6770-61a7-1496-9cb244f9ddd3@redhat.com>
+ <20200608153327.GD6419@linux.fritz.box>
+ <130e4383-8c33-c3f2-55b2-1ec45a5214cc@redhat.com>
+ <87wo4gr4yb.fsf@dusky.pond.sub.org>
+ <4ee8f32a-192d-b154-f3cc-c41e7ff56c58@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <ce1b566c-dd78-194d-e287-2e7117aa7ad4@redhat.com>
+Date: Wed, 17 Jun 2020 17:04:17 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <4ee8f32a-192d-b154-f3cc-c41e7ff56c58@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=kwolf@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/17 02:02:46
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=2a00:1450:4864:20::344;
+ envelope-from=paolo.bonzini@gmail.com; helo=mail-wm1-x344.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,268 +109,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Roman Kagan <rvkagan@yandex-team.ru>
+On 16/06/20 19:58, John Snow wrote:
+> 1. Correlating a mailing list patch from e.g. patchew to a commit in my
+> history, even if it's changed a little bit?
 
-Several block device properties related to blocksize configuration must
-be in certain relationship WRT each other: physical block must be no
-smaller than logical block; min_io_size, opt_io_size, and
-discard_granularity must be a multiple of a logical block.
+Use "git am --message-id"?
 
-To ensure these requirements are met, add corresponding consistency
-checks to blkconf_blocksizes, adjusting its signature to communicate
-possible error to the caller.  Also remove the now redundant consistency
-checks from the specific devices.
+> (git-backport-diff uses patch names, that might be sufficient... Could
+> use that as a starting point, at least.)
+> 
+> 2. Obtaining the commit message of that patch?
+> `git show -s --format=%B $SHA` ought to do it...
+> 
+> 3. Editing that commit message? This I'm not sure about. I'd need to
+> understand the tags on the upstream and downstream versions, merge them,
+> and then re-write the message. Some magic with `git rebase -i` ?
 
-Signed-off-by: Roman Kagan <rvkagan@yandex-team.ru>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Paul Durrant <paul@xen.org>
-Message-Id: <20200528225516.1676602-3-rvkagan@yandex-team.ru>
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- include/hw/block/block.h   |  2 +-
- hw/block/block.c           | 30 +++++++++++++++++++++++++++++-
- hw/block/fdc.c             |  5 ++++-
- hw/block/nvme.c            |  4 +++-
- hw/block/swim.c            |  5 ++++-
- hw/block/virtio-blk.c      |  7 +------
- hw/block/xen-block.c       |  6 +-----
- hw/ide/qdev.c              |  5 ++++-
- hw/scsi/scsi-disk.c        | 12 +++++-------
- hw/usb/dev-storage.c       |  5 ++++-
- tests/qemu-iotests/172.out |  2 +-
- 11 files changed, 57 insertions(+), 26 deletions(-)
+"patchew apply" actually uses "git filter-branch --msg-filter" to add the
+tags  after a successful "git am", so you can do something similar yourself.
+(Actually I have pending patches to patchew that switch it to server-side
+application of tags using the "mbox" URL that Philippe mentioned earlier, but
+they've been pending for quite some time now).
 
-diff --git a/include/hw/block/block.h b/include/hw/block/block.h
-index d7246f3862..784953a237 100644
---- a/include/hw/block/block.h
-+++ b/include/hw/block/block.h
-@@ -87,7 +87,7 @@ bool blk_check_size_and_read_all(BlockBackend *blk, void *buf, hwaddr size,
- bool blkconf_geometry(BlockConf *conf, int *trans,
-                       unsigned cyls_max, unsigned heads_max, unsigned secs_max,
-                       Error **errp);
--void blkconf_blocksizes(BlockConf *conf);
-+bool blkconf_blocksizes(BlockConf *conf, Error **errp);
- bool blkconf_apply_backend_options(BlockConf *conf, bool readonly,
-                                    bool resizable, Error **errp);
- 
-diff --git a/hw/block/block.c b/hw/block/block.c
-index bf56c7612b..b22207c921 100644
---- a/hw/block/block.c
-+++ b/hw/block/block.c
-@@ -61,7 +61,7 @@ bool blk_check_size_and_read_all(BlockBackend *blk, void *buf, hwaddr size,
-     return true;
- }
- 
--void blkconf_blocksizes(BlockConf *conf)
-+bool blkconf_blocksizes(BlockConf *conf, Error **errp)
- {
-     BlockBackend *blk = conf->blk;
-     BlockSizes blocksizes;
-@@ -83,6 +83,34 @@ void blkconf_blocksizes(BlockConf *conf)
-             conf->logical_block_size = BDRV_SECTOR_SIZE;
-         }
-     }
-+
-+    if (conf->logical_block_size > conf->physical_block_size) {
-+        error_setg(errp,
-+                   "logical_block_size > physical_block_size not supported");
-+        return false;
-+    }
-+
-+    if (!QEMU_IS_ALIGNED(conf->min_io_size, conf->logical_block_size)) {
-+        error_setg(errp,
-+                   "min_io_size must be a multiple of logical_block_size");
-+        return false;
-+    }
-+
-+    if (!QEMU_IS_ALIGNED(conf->opt_io_size, conf->logical_block_size)) {
-+        error_setg(errp,
-+                   "opt_io_size must be a multiple of logical_block_size");
-+        return false;
-+    }
-+
-+    if (conf->discard_granularity != -1 &&
-+        !QEMU_IS_ALIGNED(conf->discard_granularity,
-+                         conf->logical_block_size)) {
-+        error_setg(errp, "discard_granularity must be "
-+                   "a multiple of logical_block_size");
-+        return false;
-+    }
-+
-+    return true;
- }
- 
- bool blkconf_apply_backend_options(BlockConf *conf, bool readonly,
-diff --git a/hw/block/fdc.c b/hw/block/fdc.c
-index 8528b9a3c7..be0674e4aa 100644
---- a/hw/block/fdc.c
-+++ b/hw/block/fdc.c
-@@ -554,7 +554,10 @@ static void floppy_drive_realize(DeviceState *qdev, Error **errp)
-         read_only = !blk_bs(dev->conf.blk) || blk_is_read_only(dev->conf.blk);
-     }
- 
--    blkconf_blocksizes(&dev->conf);
-+    if (!blkconf_blocksizes(&dev->conf, errp)) {
-+        return;
-+    }
-+
-     if (dev->conf.logical_block_size != 512 ||
-         dev->conf.physical_block_size != 512)
-     {
-diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 2a2e43f681..1aee042d4c 100644
---- a/hw/block/nvme.c
-+++ b/hw/block/nvme.c
-@@ -1425,7 +1425,9 @@ static void nvme_init_state(NvmeCtrl *n)
- 
- static void nvme_init_blk(NvmeCtrl *n, Error **errp)
- {
--    blkconf_blocksizes(&n->conf);
-+    if (!blkconf_blocksizes(&n->conf, errp)) {
-+        return;
-+    }
-     blkconf_apply_backend_options(&n->conf, blk_is_read_only(n->conf.blk),
-                                   false, errp);
- }
-diff --git a/hw/block/swim.c b/hw/block/swim.c
-index 8f124782f4..74f56e8f46 100644
---- a/hw/block/swim.c
-+++ b/hw/block/swim.c
-@@ -189,7 +189,10 @@ static void swim_drive_realize(DeviceState *qdev, Error **errp)
-         assert(ret == 0);
-     }
- 
--    blkconf_blocksizes(&dev->conf);
-+    if (!blkconf_blocksizes(&dev->conf, errp)) {
-+        return;
-+    }
-+
-     if (dev->conf.logical_block_size != 512 ||
-         dev->conf.physical_block_size != 512)
-     {
-diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-index 6938a75aa5..413783693c 100644
---- a/hw/block/virtio-blk.c
-+++ b/hw/block/virtio-blk.c
-@@ -1174,12 +1174,7 @@ static void virtio_blk_device_realize(DeviceState *dev, Error **errp)
-         return;
-     }
- 
--    blkconf_blocksizes(&conf->conf);
--
--    if (conf->conf.logical_block_size >
--        conf->conf.physical_block_size) {
--        error_setg(errp,
--                   "logical_block_size > physical_block_size not supported");
-+    if (!blkconf_blocksizes(&conf->conf, errp)) {
-         return;
-     }
- 
-diff --git a/hw/block/xen-block.c b/hw/block/xen-block.c
-index 2827c90ac7..1b7bc5de08 100644
---- a/hw/block/xen-block.c
-+++ b/hw/block/xen-block.c
-@@ -239,11 +239,7 @@ static void xen_block_realize(XenDevice *xendev, Error **errp)
-         return;
-     }
- 
--    blkconf_blocksizes(conf);
--
--    if (conf->logical_block_size > conf->physical_block_size) {
--        error_setg(
--            errp, "logical_block_size > physical_block_size not supported");
-+    if (!blkconf_blocksizes(conf, errp)) {
-         return;
-     }
- 
-diff --git a/hw/ide/qdev.c b/hw/ide/qdev.c
-index caa88526f5..3ccb5e2529 100644
---- a/hw/ide/qdev.c
-+++ b/hw/ide/qdev.c
-@@ -187,7 +187,10 @@ static void ide_dev_initfn(IDEDevice *dev, IDEDriveKind kind, Error **errp)
-         return;
-     }
- 
--    blkconf_blocksizes(&dev->conf);
-+    if (!blkconf_blocksizes(&dev->conf, errp)) {
-+        return;
-+    }
-+
-     if (dev->conf.logical_block_size != 512) {
-         error_setg(errp, "logical_block_size must be 512 for IDE");
-         return;
-diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
-index 387503e11b..8ce68a9dd6 100644
---- a/hw/scsi/scsi-disk.c
-+++ b/hw/scsi/scsi-disk.c
-@@ -2346,12 +2346,7 @@ static void scsi_realize(SCSIDevice *dev, Error **errp)
-         return;
-     }
- 
--    blkconf_blocksizes(&s->qdev.conf);
--
--    if (s->qdev.conf.logical_block_size >
--        s->qdev.conf.physical_block_size) {
--        error_setg(errp,
--                   "logical_block_size > physical_block_size not supported");
-+    if (!blkconf_blocksizes(&s->qdev.conf, errp)) {
-         return;
-     }
- 
-@@ -2436,7 +2431,9 @@ static void scsi_hd_realize(SCSIDevice *dev, Error **errp)
-     if (s->qdev.conf.blk) {
-         ctx = blk_get_aio_context(s->qdev.conf.blk);
-         aio_context_acquire(ctx);
--        blkconf_blocksizes(&s->qdev.conf);
-+        if (!blkconf_blocksizes(&s->qdev.conf, errp)) {
-+            goto out;
-+        }
-     }
-     s->qdev.blocksize = s->qdev.conf.logical_block_size;
-     s->qdev.type = TYPE_DISK;
-@@ -2444,6 +2441,7 @@ static void scsi_hd_realize(SCSIDevice *dev, Error **errp)
-         s->product = g_strdup("QEMU HARDDISK");
-     }
-     scsi_realize(&s->qdev, errp);
-+out:
-     if (ctx) {
-         aio_context_release(ctx);
-     }
-diff --git a/hw/usb/dev-storage.c b/hw/usb/dev-storage.c
-index a5204b6f2a..f5977eb72e 100644
---- a/hw/usb/dev-storage.c
-+++ b/hw/usb/dev-storage.c
-@@ -612,7 +612,10 @@ static void usb_msd_storage_realize(USBDevice *dev, Error **errp)
-         return;
-     }
- 
--    blkconf_blocksizes(&s->conf);
-+    if (!blkconf_blocksizes(&s->conf, errp)) {
-+        return;
-+    }
-+
-     if (!blkconf_apply_backend_options(&s->conf, blk_is_read_only(blk), true,
-                                        errp)) {
-         return;
-diff --git a/tests/qemu-iotests/172.out b/tests/qemu-iotests/172.out
-index 7abbe82427..59cc70aebb 100644
---- a/tests/qemu-iotests/172.out
-+++ b/tests/qemu-iotests/172.out
-@@ -1204,7 +1204,7 @@ Testing: -drive if=none,file=TEST_DIR/t.qcow2 -device floppy,drive=none0,physica
-                 drive-type = "144"
- 
- Testing: -drive if=none,file=TEST_DIR/t.qcow2 -device floppy,drive=none0,logical_block_size=4096
--QEMU_PROG: -device floppy,drive=none0,logical_block_size=4096: Physical and logical block size must be 512 for floppy
-+QEMU_PROG: -device floppy,drive=none0,logical_block_size=4096: logical_block_size > physical_block_size not supported
- 
- Testing: -drive if=none,file=TEST_DIR/t.qcow2 -device floppy,drive=none0,physical_block_size=1024
- QEMU_PROG: -device floppy,drive=none0,physical_block_size=1024: Physical and logical block size must be 512 for floppy
--- 
-2.25.4
+To get the upstream tags you can use the Patchew REST API:
 
+   $ MSGID=20200521153616.307100-1-stefanha@redhat.com
+   $ curl -L https://patchew.org/api/v1/projects/by-name/QEMU/messages/$MSGID/ | jq -r '.tags[]'
+   Reported-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+   Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+So you'd have to take a commit, look for a Message-Id header, fetch the
+tags from above mentioned Patchew API URL and add the tags to the commit
+message.
+
+The commit message can be either emitted to stdout (and the script
+used with "git filter-branch)" or, for the faint of heart, the script
+could do a "git commit --amend" and you can use "git rebase -i --exec"
+to execute the script on all commits in a range.
+
+This script is for the latter option:
+
+   #! /bin/bash
+   BODY=$(git show -s --format=%B)
+   MSGID=$(git interpret-trailers --parse <<< $BODY | sed -n 's/^Message-Id: <\(.*\)>/\1/ip')
+   USER="$(git config user.name) <$(git config user.email)>"
+   BODY=$(curl -L https://patchew.org/api/v1/projects/by-name/QEMU/messages/$MSGID/ | \
+     jq -r '.tags[]' | ( \
+       args=()
+       while read x; do
+         args+=(--trailer "$x")
+       done
+       git interpret-trailers \
+         --if-exists doNothing "${args[@]}" \
+         --if-exists replace --if-missing doNothing --trailer "Signed-off-by: $USER" <<< $BODY
+   ))
+   git commit --amend -m"$BODY"
+
+The script will also move your Signed-off-by line at the end of the commit
+message, this might be a problem if there is more than one such line and
+you want to keep them all.
+
+Paolo
 
