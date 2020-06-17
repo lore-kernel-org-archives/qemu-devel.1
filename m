@@ -2,81 +2,95 @@ Return-Path: <SRS0=bzpH=76=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C329C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 10:41:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 883F3C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 10:43:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 70EC22082F
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 10:41:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70EC22082F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 160B32082F
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 10:43:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SPf6WUNG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 160B32082F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54772 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56918 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlVVk-0001OO-OS
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 06:41:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57944)
+	id 1jlVXX-0002bE-4U
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 06:43:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58278)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jlVVA-0000or-3S
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 06:41:04 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60128)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jlVV6-0001mL-6g
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 06:41:02 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jlVV4-00028P-Dn
- for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 10:40:58 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 5FA042E802E
- for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 10:40:58 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jlVWx-0002Ax-2z
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 06:42:55 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:26883
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jlVWu-0001tu-Ja
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 06:42:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592390571;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=L3E51P1F6tOTVd+pdpCEPNsEWH7FEVLZBQ64ExdzXaA=;
+ b=SPf6WUNGijn82CID9dGB9eSMP4Z8SVeYQgfU8w/jk379bQmdEV5HG7dSuK1RAdlJusIYEW
+ HLauz9wlkabJqOvKOwq96PMeBFzYjJaGO/9QbMgQJIi48Ii8ZeZyivFXOG1vD0BIr6bKPU
+ vlpD0w7OQs6SlaMntwFA+Xe0yBTQ198=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-357-2lSJNCAHPryIyr_dkDfPbQ-1; Wed, 17 Jun 2020 06:42:49 -0400
+X-MC-Unique: 2lSJNCAHPryIyr_dkDfPbQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 01D8918A8236;
+ Wed, 17 Jun 2020 10:42:48 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-131.ams2.redhat.com [10.36.112.131])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 53A9D104B4C1;
+ Wed, 17 Jun 2020 10:42:46 +0000 (UTC)
+Subject: Re: Core dump happened when starting a VM on arm64 server
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Andrew Jones <drjones@redhat.com>, Haibo Xu <haibo.xu@linaro.org>
+References: <CAJc+Z1Eb815hroFPY+9Ai_9hh=+eje+X2ENtGj9XA+_F0XUPqg@mail.gmail.com>
+ <20200611091419.e2rfcurztmlajlwr@kamzik.brq.redhat.com>
+ <a6740274-1bd7-460c-7011-244cdf2fc945@redhat.com>
+ <e47664d7-a13e-7f60-975d-97f085036067@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <5f1d1d2b-7a85-f50e-1f74-b74ab17324ac@redhat.com>
+Date: Wed, 17 Jun 2020 12:42:44 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 17 Jun 2020 10:32:06 -0000
-From: Stefan Hajnoczi <1882241@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: i82551
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: stefanha tim-tree-of-life
-X-Launchpad-Bug-Reporter: timsoft (tim-tree-of-life)
-X-Launchpad-Bug-Modifier: Stefan Hajnoczi (stefanha)
-References: <159136023930.32294.17616621945608188739.malonedeb@gac.canonical.com>
-Message-ID: <20200617103206.GA1728005@stefanha-x1.localdomain>
-Subject: Re: [Bug 1882241] [NEW] file transfer over cifs to 64bit guest
- corrupts large files
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="1cbd0aa39df153c901321817f9b57cf3f232b507";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: a1bc5039a7412011692b210df8b4a0416c216510
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/17 06:40:58
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <e47664d7-a13e-7f60-975d-97f085036067@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=thuth@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/17 01:42:04
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,132 +99,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1882241 <1882241@bugs.launchpad.net>
+Cc: Markus Armbruster <armbru@redhat.com>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20200617103206.gX4QJ0pr5J5E5IfaeYqjbavV-wVmL4hV2vuNbiqOx2s@z>
 
-On Fri, Jun 05, 2020 at 12:30:39PM -0000, timsoft wrote:
-> Public bug reported:
-> =
+On 17/06/2020 12.32, Philippe Mathieu-Daudé wrote:
+> On 6/17/20 10:23 AM, Philippe Mathieu-Daudé wrote:
+>> On 6/11/20 11:14 AM, Andrew Jones wrote:
+>>> On Thu, Jun 11, 2020 at 04:46:45PM +0800, Haibo Xu wrote:
+>>>> Hi,
+>>>>
+>>>> I met a qemu core dump issue when starting a VM with cpu feature
+>>>> "pmu=on" on an arm server.
+>>>> The commands to start the machine is:
+>>>>
+>>>>   ./qemu-system-aarch64 \
+>>>>            -cpu host,pmu=on -M virt,accel=kvm,gic-version=3 -nographic
+>>>> -m 2048M \
+>>>>            -kernel ./Image \
+>>>>            -initrd /boot/initrd.img-5.6.0-rc2+ \
+>>>>            -append "root=/dev/vda rw console=ttyAMA0" -nodefaults -serial stdio\
+>>>>            -drive if=none,file=./xenial.rootfs.ext4,id=hd0,format=raw \
+>>>>            -device virtio-blk-device,drive=hd0
+>>>>
+>>>>
+>>>> And here is the stack dump:
+>>>>
+>>>>  Core was generated by `./qemu-system-aarch64 -cpu host,pmu=on -M
+>>>> virt,accel=kvm,gic-version=3 -nograph'.
+>>>>  Program terminated with signal SIGSEGV, Segmentation fault.
+>>>>  #0  kvm_ioctl (s=0x0, type=type@entry=44547) at
+>>>
+>>> s=0x0 means cpu->kvm_state is NULL
+>>>
+>>>> The root cause is in the arm_get_pmu() operation which was introduced
+>>>> in ae502508f83.
+>>>
+>>> Actually the root cause is d70c996df23f ("target/arm/kvm: Use
+>>> CPUState::kvm_state in kvm_arm_pmu_supported()"). ae502508f83 used
+>>> the machine kvm_state, not the cpu kvm_state, and that allows pmu=on
+>>> to work. d70c996df23f changed that saying that "KVMState is already
+>>> accessible via CPUState::kvm_state, use it.", but I'm not sure why,
+>>> since kvm_init_vcpu() doesn't run until the vcpu thread is created.
+>>>
+>>> Philippe?
+>>
+>> Sorry for some reason I missed this email. I'll look at this today.
+> 
+> Quick reproducer:
+> 
+> $ qemu-system-aarch64 -cpu host,pmu=on -M virt,accel=kvm,gic-version=3
+> Segmentation fault (core dumped)
+> 
+> Eduardo, I thought we had a 'machine' qtest testing for various
+> combination of properties, but I can't find it, do you remember?
+> Or maybe it was Thomas? Or Markus? =)
 
-> qemu 4.0 compiled fom source.
-> vm called by
-> qemu-system-x86_64 -cpu qemu64 -smp 4 -m 4G -drive file=3D/data/images/sl=
-ack14.2_64bit_test.qcow2,format=3Dqcow2 -cdrom /mnt/smb1/slackware/iso/slac=
-kware64-14.2-install-dvd.iso -boot c -net nic,macaddr=3D02:00:00:11:11:17,m=
-odel=3Di82551 -net bridge,br=3Dbr0 -enable-kvm -k en-gb -display vnc=3D:3 -=
-monitor telnet:localhost:7103,server,nowait,nodelay
-> =
+You probably remember the scripts/device-crash-test script? ... that's
+a) only testing -device options as far as I know, and b) is not run
+automatically during "make check", so it certainly is not suitable to
+detect these kind of errors automatically.
 
-> copying large files eg 2.4gb or reading them on a cifs mount in the guest=
- causes corruption every time. For smaller files 40-60mb corruption is more=
- than 50% of the time. tested by md5sum on cifs server, or on host machine =
-vs. on guest vm.
-> corruption is seen only with 64bit guest using cifs with i82551 emulated =
-network device
-> ie. 32bit guest using cifs with i82551 emulated network device gives no c=
-orruption.
-> =
+ Thomas
 
-> changing the emulated device to vmxnet3 removes the data corruption (see
-> below)
-> =
-
-> qemu-system-x86_64 -cpu qemu64 -smp 4 -m 4G -drive
-> file=3D/data/images/slack14.2_64bit_test.qcow2,format=3Dqcow2 -cdrom
-> /mnt/smb1/slackware/iso/slackware64-14.2-install-dvd.iso -boot c -net
-> nic,macaddr=3D02:00:00:11:11:17,model=3Dvmxnet3 -net bridge,br=3Dbr0 -ena=
-ble-
-> kvm -k en-gb -display vnc=3D:3 -monitor
-> telnet:localhost:7103,server,nowait,nodelay
-> =
-
-> this corruption is repeatable. ie. I created new vm, call using top examp=
-le, installed 64bit linux, mounted cifs share and copied 2.4gb file to /tmp=
- then run md5sum "filecopied"
-> the md5sum is different every time. copy same file to the host, or to a 3=
-2bit guest with the same virtual network device and bridge and md5sums are =
-correct. The host pysical network adapter is
-> lspci|grep Ether
-> 1e:00.0 Ethernet controller: Realtek Semiconductor Co., Ltd. RTL8111/8168=
-/8411 PCI Express Gigabit Ethernet Controller (rev 11)
-> =
-
-> physically connected via gigabit ethernet to cifs server (via gigabit
-> switch)
-
-Not a solution but some comments:
-
-1. As a sanity-check you could try "nc <guest-ip> 1234 </path/to/file" on
-   the host and "nc -l -p 1234 >/tmp/file" in the guest. Netcat simply
-   sends/receives data over a TCP connection (it's a much simpler test
-   than CIFS). Is the checksum okay?
-
-2. I don't know the CIFS network protocol, but if Wireshark can dissect
-   it then you could compare the flows between the vmxnet3 and the
-   i82551. This is only feasible if Wireshark can produce an unencrypted
-   conversation and the CIFS protocol doesn't have many protocol header
-   fields that differ between two otherwise identical sessions.
-
-3. virtio-net is the most widely used and high-performance NIC model.
-   Other emulated NIC models are mainly there for very old guests that
-   lack virtio guest drivers.
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1882241
-
-Title:
-  file transfer over cifs to 64bit guest corrupts large files
-
-Status in QEMU:
-  New
-
-Bug description:
-  qemu 4.0 compiled fom source.
-  vm called by
-  qemu-system-x86_64 -cpu qemu64 -smp 4 -m 4G -drive file=3D/data/images/sl=
-ack14.2_64bit_test.qcow2,format=3Dqcow2 -cdrom /mnt/smb1/slackware/iso/slac=
-kware64-14.2-install-dvd.iso -boot c -net nic,macaddr=3D02:00:00:11:11:17,m=
-odel=3Di82551 -net bridge,br=3Dbr0 -enable-kvm -k en-gb -display vnc=3D:3 -=
-monitor telnet:localhost:7103,server,nowait,nodelay
-
-  copying large files eg 2.4gb or reading them on a cifs mount in the guest=
- causes corruption every time. For smaller files 40-60mb corruption is more=
- than 50% of the time. tested by md5sum on cifs server, or on host machine =
-vs. on guest vm.
-  corruption is seen only with 64bit guest using cifs with i82551 emulated =
-network device
-  ie. 32bit guest using cifs with i82551 emulated network device gives no c=
-orruption.
-
-  changing the emulated device to vmxnet3 removes the data corruption
-  (see below)
-
-  qemu-system-x86_64 -cpu qemu64 -smp 4 -m 4G -drive
-  file=3D/data/images/slack14.2_64bit_test.qcow2,format=3Dqcow2 -cdrom
-  /mnt/smb1/slackware/iso/slackware64-14.2-install-dvd.iso -boot c -net
-  nic,macaddr=3D02:00:00:11:11:17,model=3Dvmxnet3 -net bridge,br=3Dbr0
-  -enable-kvm -k en-gb -display vnc=3D:3 -monitor
-  telnet:localhost:7103,server,nowait,nodelay
-
-  this corruption is repeatable. ie. I created new vm, call using top examp=
-le, installed 64bit linux, mounted cifs share and copied 2.4gb file to /tmp=
- then run md5sum "filecopied"
-  the md5sum is different every time. copy same file to the host, or to a 3=
-2bit guest with the same virtual network device and bridge and md5sums are =
-correct. The host pysical network adapter is
-  lspci|grep Ether
-  1e:00.0 Ethernet controller: Realtek Semiconductor Co., Ltd. RTL8111/8168=
-/8411 PCI Express Gigabit Ethernet Controller (rev 11)
-
-  physically connected via gigabit ethernet to cifs server (via gigabit
-  switch)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1882241/+subscriptions
 
