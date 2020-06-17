@@ -2,91 +2,80 @@ Return-Path: <SRS0=bzpH=76=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 208B9C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 13:53:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75926C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 13:54:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E26DA214DB
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 13:53:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3D87B208C3
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 13:54:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VoN7DdJx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E26DA214DB
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fqCBerrg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D87B208C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40622 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43310 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlYV7-0007Dx-4Z
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 09:53:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56198)
+	id 1jlYWF-0000O2-H9
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 09:54:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56568)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <quintela@redhat.com>)
- id 1jlYUR-0006Kc-Tm
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 09:52:31 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:36326
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jlYVC-0007Vu-Mo
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 09:53:18 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:55457
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <quintela@redhat.com>)
- id 1jlYUP-0008LZ-Ex
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 09:52:31 -0400
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jlYVB-00005x-2t
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 09:53:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592401947;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:in-reply-to:in-reply-to:  references:references;
- bh=mZDXU7aTxy7XvV0+iL47Qkn6zzxtfkSaHrYp+NE1YGo=;
- b=VoN7DdJxPY9VVFObaTVooarCUOIfzeRWoywmTZWnIhLTN9YOBrBDHaqdm+T9jK541ueWAQ
- sVu8RdVzYuFurGFTXZG1aXYv6YRLmFmJ3Cj9cS0VSvUzyOZcm1Uebw20g3Xwkv3EYlYVVv
- A5G5pE1eckcvgw0xw6cMoO978CZ/vCo=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-52-rVioeB8dOJKkKGcAJWYpSQ-1; Wed, 17 Jun 2020 09:52:26 -0400
-X-MC-Unique: rVioeB8dOJKkKGcAJWYpSQ-1
-Received: by mail-wr1-f70.google.com with SMTP id a4so1212612wrp.5
- for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 06:52:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:in-reply-to:references
- :user-agent:reply-to:date:message-id:mime-version;
- bh=mZDXU7aTxy7XvV0+iL47Qkn6zzxtfkSaHrYp+NE1YGo=;
- b=aEGsmgt1pzMdjdSYorVcAspPf8oo5XHTSlJadw7qmo9KPxYBv9kl2qi0/8if+Tl6gF
- xICgz6+nzzL6NXffpD+q6W/Wzq0R4nGKbLslB+yEaf0egp3vocU1GoeCioaUPR6Xw4xn
- cpw8dmTW9hsrE+ein37taq8riMyuwc34p3whq3xKzQLZsoh/K1YRV2DcKC0Hdq/E+pbU
- jUuq4rzI6rMaONMHtUB6g+Z6JGhHiCBOOEoLkLSKM0gYDO+VXw7N9lEP58bAjBp9JLti
- lMGFblWK5I1JYlhci1QB98xmPcaSpy0EZ5JGndH/NOTguQR7ChpXlWEauqQ12f2pVvTw
- IfVQ==
-X-Gm-Message-State: AOAM531FmJIMHy5RIc1Z1GLDvIMCtML8FoSRlkOnRtbz2wyZTafWXxpB
- 0ykXhcVySxudN0rJBgB9sHDNR+MDEF8lqhlv4p6n3hZgXV55eeIuCMPnNvpdNQbaL/frPzSo1vG
- sraR39WccipJUe/o=
-X-Received: by 2002:a1c:7dd5:: with SMTP id y204mr8204874wmc.182.1592401944810; 
- Wed, 17 Jun 2020 06:52:24 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzwH4Rx1y1wpUblX4pFi5nJP3Pok0zu7Qh9qgSdiO0uaRfy+ME3QcrgirFBxY0AxHa2yzWIvw==
-X-Received: by 2002:a1c:7dd5:: with SMTP id y204mr8204861wmc.182.1592401944584; 
- Wed, 17 Jun 2020 06:52:24 -0700 (PDT)
-Received: from localhost (trasno.trasno.org. [83.165.45.250])
- by smtp.gmail.com with ESMTPSA id a6sm33279637wrn.38.2020.06.17.06.52.23
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 17 Jun 2020 06:52:24 -0700 (PDT)
-From: Juan Quintela <quintela@redhat.com>
-To: Laurent Vivier <lvivier@redhat.com>
-Subject: Re: [PATCH] migration: fix multifd_send_pages() next channel
-In-Reply-To: <20200617113154.593233-1-lvivier@redhat.com> (Laurent Vivier's
- message of "Wed, 17 Jun 2020 13:31:54 +0200")
-References: <20200617113154.593233-1-lvivier@redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
-Date: Wed, 17 Jun 2020 15:52:23 +0200
-Message-ID: <878sgl7qaw.fsf@secure.mitica>
+ s=mimecast20190719; t=1592401996;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=WhB55h8sw8siX8zZdzsjZFbJox7P0UEspBJ1XKKB1x4=;
+ b=fqCBerrger1KPelt0rNULp1xi+nnnDgoi0w3Ew5hXYFWzZqfH1k935pQ4P8RiaQzsxhPrs
+ FE+NviqUpRy2wxkI3L4TitgB5HkSp/VJk2h2Dlka/1/GoIgv/fTrMvd7vIPNBG5Mo64/2q
+ 6JbenVX5/kLnr/wwGU9NUMN+kOaZX78=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-382-oyFOiP9fNQipl5CyEl1U0w-1; Wed, 17 Jun 2020 09:53:14 -0400
+X-MC-Unique: oyFOiP9fNQipl5CyEl1U0w-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0EC39100CC8B;
+ Wed, 17 Jun 2020 13:53:13 +0000 (UTC)
+Received: from [10.3.112.27] (ovpn-112-27.phx2.redhat.com [10.3.112.27])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7679C512FE;
+ Wed, 17 Jun 2020 13:53:12 +0000 (UTC)
+Subject: Re: [PATCH 0/3] Add Scripts for Finding Top 25 Executed Functions
+To: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>, qemu-devel@nongnu.org,
+ rth@twiddle.net, aleksandar.qemu.devel@gmail.com, alex.bennee@linaro.org,
+ ldoktor@redhat.com, ehabkost@redhat.com, crosa@redhat.com
+References: <20200616231204.8850-1-ahmedkhaledkaraman@gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <1944be57-7253-c3d5-737c-16537e1e71ac@redhat.com>
+Date: Wed, 17 Jun 2020 08:53:11 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
+In-Reply-To: <20200616231204.8850-1-ahmedkhaledkaraman@gmail.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=quintela@redhat.com;
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=eblake@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/17 02:02:46
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -109,31 +98,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: quintela@redhat.com
-Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Laurent Vivier <lvivier@redhat.com> wrote:
-> multifd_send_pages() loops around the available channels,
-> the next channel to use between two calls to multifd_send_pages() is stored
-> inside a local static variable, next_channel.
->
-> It works well, except if the number of channels decreases between two calls
-> to multifd_send_pages(). In this case, the loop can try to access the
-> data of a channel that doesn't exist anymore.
->
-> The problem can be triggered if we start a migration with a given number of
-> channels and then we cancel the migration to restart it with a lower number.
-> This ends generally with an error like:
-> qemu-system-ppc64: .../util/qemu-thread-posix.c:77: qemu_mutex_lock_impl: Assertion `mutex->initialized' failed.
->
-> This patch fixes the error by capping next_channel with the current number
-> of channels before using it.
->
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+On 6/16/20 6:12 PM, Ahmed Karaman wrote:
+> Greetings,
+> 
+> As a part of the TCG Continous Benchmarking project for GSoC this
+> year, detailed reports discussing different performance measurement
+> methodologies and analysis results will be sent here on the mailing
+> list.
+> 
+> The project's first report is currently being revised and will be
+> posted on the mailing list in the next few days.
+> A section in this report will deal with measuring the top 25 executed
+> functions when running QEMU. It includes two Python scripts that
+> automatically perform this task.
+> 
+> This series adds these two scripts to a new performance directory
+> created under the scripts directory. It also adds a new
+> "Miscellaneous" section to the end of the MAINTAINERS file with a
+> "Performance Tools and Tests" subsection.
+> 
+> Best regards,
+> Ahmed Karaman
+> 
+> Ahmed Karaman (3):
+>    MAINTAINERS: Add 'Miscellaneous' section
+>    scripts/performance: Add callgrind_top_25.py script
+>    scripts/performance: Add perf_top_25.py script
+> 
+>   MAINTAINERS                             |  7 ++
+>   scripts/performance/callgrind_top_25.py | 95 +++++++++++++++++++++++++
+>   scripts/performance/perf_top_25.py      | 82 +++++++++++++++++++++
+>   3 files changed, 184 insertions(+)
+>   create mode 100644 scripts/performance/callgrind_top_25.py
+>   create mode 100644 scripts/performance/perf_top_25.py
 
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+Are the new scripts supposed to have executable permissions, or are they 
+always invoked as 'python path/to/script.py' where the executable bit is 
+less important?
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
