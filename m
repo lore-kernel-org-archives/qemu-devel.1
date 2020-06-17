@@ -2,100 +2,81 @@ Return-Path: <SRS0=bzpH=76=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0015C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 10:38:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C329C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 10:41:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7C61920FC3
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 10:38:38 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="eEXqnlDs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C61920FC3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 70EC22082F
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 10:41:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70EC22082F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52574 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54772 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlVSn-0008E8-QU
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 06:38:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57318)
+	id 1jlVVk-0001OO-OS
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 06:41:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57944)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jlVS9-0007nK-OB
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 06:37:57 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:53759)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jlVVA-0000or-3S
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 06:41:04 -0400
+Received: from indium.canonical.com ([91.189.90.7]:60128)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jlVS7-0001Ew-RG
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 06:37:57 -0400
-Received: by mail-wm1-x344.google.com with SMTP id l26so1359028wme.3
- for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 03:37:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=z/jXuXn+Ev4tlXgEwJWKLIpjzfZWXXJMnb+TdLTT5TQ=;
- b=eEXqnlDsz3UmkwxwepZAODoAiTF5dDC7aBsPrvH7Bt5wEFoD2QWuf2r599GWWXJe7W
- olN5exIhwWsm/OgXlaLgSLzjPQt08TlbSdKpdd6+6XjJCHLPvFLoxTwNY8tLLkYsbGwF
- EjDuOanEIgg6wnZ9sSiLnktkHvgF9+FxnrYJJKg/LJASoa1HoCavDBKzGQFx/0QAwfoD
- VzoxxTpikO/9Xzlwq4dT+bA6+X4S1M33NHgGTlpuO2vZp3HQVC/OaEhQNsZkY52mSuXf
- Vnxc32XnqzcmYMcCp9puAcbQcA2Tjux5QJlHkIy6eir5KxTT+JYEZGDBVuQVaZ/d6JOK
- 1AFg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=z/jXuXn+Ev4tlXgEwJWKLIpjzfZWXXJMnb+TdLTT5TQ=;
- b=bOOfl6pgd87gkBUO2pCJ/Oh3j7VkzFc0SOcVDYFubzegLtJ3VU1c6H09fSZIFtm4bs
- 8rxGDZ+HJtPkZBlCdD5cLdNfR2rB0qYZvYNSenXvwgX43NLgQtLsU1XIR3ePtHCPvvzY
- vvTP5BM26WsiWLmNh8BJf5oYbxcuU+smehHH2F/7y2Ss8Vq0/K66Za70UP8sbaEb0oEC
- CzmO5NapLDnK9MSJYY2/G3+prd58IBThtzRxCvTRWRnOZNgfoBofzE+33GDiK6YcDmft
- aRttugMvAjiFiN2E9xMC962NCpVUXWyQNipamUw7+7nEhi0SisSOwIiQUCJE0nNUrg56
- vOKA==
-X-Gm-Message-State: AOAM530B329eInhtEBB5IVB2SN73smkJGnEiZU7Ig4xjyMDuqDCtSYQq
- Lc1poVEVVOOMLhv1pJ+fMgDJlQ==
-X-Google-Smtp-Source: ABdhPJxQn+jEnHLvB8Sz0OMOA5rcwpU5WUY8NqeLy3apQiNwYA6NmKEDes7Rv2Ym0Twv5z9d4FS7Mg==
-X-Received: by 2002:a1c:9943:: with SMTP id b64mr7960650wme.102.1592390274096; 
- Wed, 17 Jun 2020 03:37:54 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id c70sm7548290wme.32.2020.06.17.03.37.44
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 17 Jun 2020 03:37:51 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id DE7881FF7E;
- Wed, 17 Jun 2020 11:37:43 +0100 (BST)
-References: <20200617043757.1623337-1-richard.henderson@linaro.org>
- <20200617043757.1623337-2-richard.henderson@linaro.org>
-User-agent: mu4e 1.5.3; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH v3 1/5] fpu/softfloat: Silence 'bitwise negation of
- boolean expression' warning
-In-reply-to: <20200617043757.1623337-2-richard.henderson@linaro.org>
-Date: Wed, 17 Jun 2020 11:37:43 +0100
-Message-ID: <87pn9yx9jc.fsf@linaro.org>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jlVV6-0001mL-6g
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 06:41:02 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jlVV4-00028P-Dn
+ for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 10:40:58 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 5FA042E802E
+ for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 10:40:58 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::344;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x344.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Date: Wed, 17 Jun 2020 10:32:06 -0000
+From: Stefan Hajnoczi <1882241@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: i82551
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: stefanha tim-tree-of-life
+X-Launchpad-Bug-Reporter: timsoft (tim-tree-of-life)
+X-Launchpad-Bug-Modifier: Stefan Hajnoczi (stefanha)
+References: <159136023930.32294.17616621945608188739.malonedeb@gac.canonical.com>
+Message-ID: <20200617103206.GA1728005@stefanha-x1.localdomain>
+Subject: Re: [Bug 1882241] [NEW] file transfer over cifs to 64bit guest
+ corrupts large files
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="1cbd0aa39df153c901321817f9b57cf3f232b507";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: a1bc5039a7412011692b210df8b4a0416c216510
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/17 06:40:58
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -104,53 +85,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
+Reply-To: Bug 1882241 <1882241@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Message-ID: <20200617103206.gX4QJ0pr5J5E5IfaeYqjbavV-wVmL4hV2vuNbiqOx2s@z>
 
+On Fri, Jun 05, 2020 at 12:30:39PM -0000, timsoft wrote:
+> Public bug reported:
+> =
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+> qemu 4.0 compiled fom source.
+> vm called by
+> qemu-system-x86_64 -cpu qemu64 -smp 4 -m 4G -drive file=3D/data/images/sl=
+ack14.2_64bit_test.qcow2,format=3Dqcow2 -cdrom /mnt/smb1/slackware/iso/slac=
+kware64-14.2-install-dvd.iso -boot c -net nic,macaddr=3D02:00:00:11:11:17,m=
+odel=3Di82551 -net bridge,br=3Dbr0 -enable-kvm -k en-gb -display vnc=3D:3 -=
+monitor telnet:localhost:7103,server,nowait,nodelay
+> =
 
-> From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->
-> When building with clang version 10.0.0-4ubuntu1, we get:
->
->     CC      lm32-softmmu/fpu/softfloat.o
->   fpu/softfloat.c:3365:13: error: bitwise negation of a boolean expressio=
-n; did you mean logical negation? [-Werror,-Wbool-operation]
->       absZ &=3D ~ ( ( ( roundBits ^ 0x40 ) =3D=3D 0 ) & roundNearestEven =
-);
->               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->
->   fpu/softfloat.c:3423:18: error: bitwise negation of a boolean expressio=
-n; did you mean logical negation? [-Werror,-Wbool-operation]
->           absZ0 &=3D ~ ( ( (uint64_t) ( absZ1<<1 ) =3D=3D 0 ) & roundNear=
-estEven );
->                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
-~~~
->
->   ...
->
->   fpu/softfloat.c:4273:18: error: bitwise negation of a boolean expressio=
-n; did you mean logical negation? [-Werror,-Wbool-operation]
->           zSig1 &=3D ~ ( ( zSig2 + zSig2 =3D=3D 0 ) & roundNearestEven );
->                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->
-> Fix by rewriting the fishy bitwise AND of two bools as an int.
->
-> Suggested-by: Eric Blake <eblake@redhat.com>
-> Buglink: https://bugs.launchpad.net/bugs/1881004
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Message-Id: <20200528155420.9802-1-philmd@redhat.com>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> copying large files eg 2.4gb or reading them on a cifs mount in the guest=
+ causes corruption every time. For smaller files 40-60mb corruption is more=
+ than 50% of the time. tested by md5sum on cifs server, or on host machine =
+vs. on guest vm.
+> corruption is seen only with 64bit guest using cifs with i82551 emulated =
+network device
+> ie. 32bit guest using cifs with i82551 emulated network device gives no c=
+orruption.
+> =
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> changing the emulated device to vmxnet3 removes the data corruption (see
+> below)
+> =
 
---=20
-Alex Benn=C3=A9e
+> qemu-system-x86_64 -cpu qemu64 -smp 4 -m 4G -drive
+> file=3D/data/images/slack14.2_64bit_test.qcow2,format=3Dqcow2 -cdrom
+> /mnt/smb1/slackware/iso/slackware64-14.2-install-dvd.iso -boot c -net
+> nic,macaddr=3D02:00:00:11:11:17,model=3Dvmxnet3 -net bridge,br=3Dbr0 -ena=
+ble-
+> kvm -k en-gb -display vnc=3D:3 -monitor
+> telnet:localhost:7103,server,nowait,nodelay
+> =
+
+> this corruption is repeatable. ie. I created new vm, call using top examp=
+le, installed 64bit linux, mounted cifs share and copied 2.4gb file to /tmp=
+ then run md5sum "filecopied"
+> the md5sum is different every time. copy same file to the host, or to a 3=
+2bit guest with the same virtual network device and bridge and md5sums are =
+correct. The host pysical network adapter is
+> lspci|grep Ether
+> 1e:00.0 Ethernet controller: Realtek Semiconductor Co., Ltd. RTL8111/8168=
+/8411 PCI Express Gigabit Ethernet Controller (rev 11)
+> =
+
+> physically connected via gigabit ethernet to cifs server (via gigabit
+> switch)
+
+Not a solution but some comments:
+
+1. As a sanity-check you could try "nc <guest-ip> 1234 </path/to/file" on
+   the host and "nc -l -p 1234 >/tmp/file" in the guest. Netcat simply
+   sends/receives data over a TCP connection (it's a much simpler test
+   than CIFS). Is the checksum okay?
+
+2. I don't know the CIFS network protocol, but if Wireshark can dissect
+   it then you could compare the flows between the vmxnet3 and the
+   i82551. This is only feasible if Wireshark can produce an unencrypted
+   conversation and the CIFS protocol doesn't have many protocol header
+   fields that differ between two otherwise identical sessions.
+
+3. virtio-net is the most widely used and high-performance NIC model.
+   Other emulated NIC models are mainly there for very old guests that
+   lack virtio guest drivers.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1882241
+
+Title:
+  file transfer over cifs to 64bit guest corrupts large files
+
+Status in QEMU:
+  New
+
+Bug description:
+  qemu 4.0 compiled fom source.
+  vm called by
+  qemu-system-x86_64 -cpu qemu64 -smp 4 -m 4G -drive file=3D/data/images/sl=
+ack14.2_64bit_test.qcow2,format=3Dqcow2 -cdrom /mnt/smb1/slackware/iso/slac=
+kware64-14.2-install-dvd.iso -boot c -net nic,macaddr=3D02:00:00:11:11:17,m=
+odel=3Di82551 -net bridge,br=3Dbr0 -enable-kvm -k en-gb -display vnc=3D:3 -=
+monitor telnet:localhost:7103,server,nowait,nodelay
+
+  copying large files eg 2.4gb or reading them on a cifs mount in the guest=
+ causes corruption every time. For smaller files 40-60mb corruption is more=
+ than 50% of the time. tested by md5sum on cifs server, or on host machine =
+vs. on guest vm.
+  corruption is seen only with 64bit guest using cifs with i82551 emulated =
+network device
+  ie. 32bit guest using cifs with i82551 emulated network device gives no c=
+orruption.
+
+  changing the emulated device to vmxnet3 removes the data corruption
+  (see below)
+
+  qemu-system-x86_64 -cpu qemu64 -smp 4 -m 4G -drive
+  file=3D/data/images/slack14.2_64bit_test.qcow2,format=3Dqcow2 -cdrom
+  /mnt/smb1/slackware/iso/slackware64-14.2-install-dvd.iso -boot c -net
+  nic,macaddr=3D02:00:00:11:11:17,model=3Dvmxnet3 -net bridge,br=3Dbr0
+  -enable-kvm -k en-gb -display vnc=3D:3 -monitor
+  telnet:localhost:7103,server,nowait,nodelay
+
+  this corruption is repeatable. ie. I created new vm, call using top examp=
+le, installed 64bit linux, mounted cifs share and copied 2.4gb file to /tmp=
+ then run md5sum "filecopied"
+  the md5sum is different every time. copy same file to the host, or to a 3=
+2bit guest with the same virtual network device and bridge and md5sums are =
+correct. The host pysical network adapter is
+  lspci|grep Ether
+  1e:00.0 Ethernet controller: Realtek Semiconductor Co., Ltd. RTL8111/8168=
+/8411 PCI Express Gigabit Ethernet Controller (rev 11)
+
+  physically connected via gigabit ethernet to cifs server (via gigabit
+  switch)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1882241/+subscriptions
 
