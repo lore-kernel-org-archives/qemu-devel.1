@@ -7,69 +7,70 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BABECC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 07:29:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF062C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 07:29:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8634320786
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 07:29:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8A15620786
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 07:29:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H8FTmBWP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8634320786
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RycNVVxB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A15620786
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38096 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38564 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlSVQ-0001g9-Qj
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 03:29:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41028)
+	id 1jlSVV-0001rd-Pq
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 03:29:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40958)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jlSSG-0004eR-OJ; Wed, 17 Jun 2020 03:25:52 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:50936)
+ id 1jlSSB-0004TB-Nc; Wed, 17 Jun 2020 03:25:47 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:45731)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jlSSF-0002ax-8x; Wed, 17 Jun 2020 03:25:52 -0400
-Received: by mail-wm1-x344.google.com with SMTP id l17so805589wmj.0;
- Wed, 17 Jun 2020 00:25:50 -0700 (PDT)
+ id 1jlSSA-0002Yo-4V; Wed, 17 Jun 2020 03:25:47 -0400
+Received: by mail-wr1-x444.google.com with SMTP id c3so1122972wru.12;
+ Wed, 17 Jun 2020 00:25:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=FBTuMSOiLwpA4yPchfEYPLFdnrdZHjpXEDQDsJPN5pY=;
- b=H8FTmBWPbuT0503K0fu/NHESlWV/tf1E2Bn6iZCOF8zkK+oYDEm4Thz9NxkIuC7nkc
- j5cMmDjh+TZPlB/wb4e+0Fgrz9Im4VEXu5WtXk2K7qKf2vtHEpAn7gzg64nwdPQPTQ8/
- +Uh5TUxhbAd9uuyLMmrsvYq+avoKx+Yb8cvv8F+/5amvBNQrYuawdIQutWzG96iLWlCo
- HKJnbM1+gSFojWBMzXkHwYCtwqP5jGL7x0IYWznRg22CBmbg5oAKJUDI3bVQq8Ybqfws
- 11nuV+n9UlCxExP6xcc+iTY9RZn6nPfoU7F3KlVXsBuFGbT7XNxI1qiHVdIPLKEiMx2Y
- f5ew==
+ bh=oKgx3XGZybeg/pFq9unPz0BUDJBMmdl8/2xtj0tVVxk=;
+ b=RycNVVxBa4IXNkU5fh6Qx4y3GvSNbDgS0QB+nEch9IcUB6RfgcsQCaZJ4PCzbfwAoe
+ WSn51zVf64da0w1iyYLsJ7GGIRyz5pj7WrfU0LzVIDcjB9oIMdjsU8wdjC0Lr6iIVNU5
+ e5h/xEoQBRfL7Spw2oEdEY9wjSNEk2Ht5A27nc5VM6Q+7XPqzwFfB/EFlKtuHYjahEXb
+ uRvcVN5ui9cR67AsNcRpPEKVb3lZo4Xir7SQgSu5qHkal1z4T8Wqtf/2BxPaHY3ILEWU
+ T5kRX9TYygaS3XEd2Jttti3nwt4GQwV+Mjxzp4p43UzYABvKZL/eE3L3xDlpuCQTNXl3
+ Rt/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=FBTuMSOiLwpA4yPchfEYPLFdnrdZHjpXEDQDsJPN5pY=;
- b=KQoW7MIge+FQcgTLwWpxQSwtnHohqpxDF+a/4EK4NMo0S3DfW2pjNVD3Ggoa3cjA8E
- Jc1yVvrRwKdABtijJOrtZygiWLKdYhsNsyLCDQqb7WKY1kdh0EJewZQSxPVDUwra4y3k
- C5Cn8Div/Sh6uF4qCu6ezupHn5Am8RL2fz+9v2K2SwixsU3tnF1eMuk9lgAaZPeD3i6N
- gkk5ia/pSGwyd0GU9NRR42Pb7OFruTYjqJPHNKY3R+P3G8D0CUe5ewRgsp6Ws/X3tQmb
- 7D3XtGFfySuDHONGvqQ+MsgSaPn4F9r0fLr9XagCWcIzJJrDCxyJiKpChsXZTKIuXSvS
- nfnQ==
-X-Gm-Message-State: AOAM530zCjJ6oP0G8lRfeREJ4K9w7BPmZH40tHTLrFtA7D7+9AoXV/mb
- i4cxGQRKLuXts5mAMcW9FVTt0TcU
-X-Google-Smtp-Source: ABdhPJzLKLe0Dv9AstnCvvf/J1mslVxLbjSV0F3J+2Q+02jD1dlcVRwsL4QzK2/hzEil84ctLKXoVA==
-X-Received: by 2002:a1c:e355:: with SMTP id a82mr6997164wmh.1.1592378749441;
- Wed, 17 Jun 2020 00:25:49 -0700 (PDT)
+ bh=oKgx3XGZybeg/pFq9unPz0BUDJBMmdl8/2xtj0tVVxk=;
+ b=l5ywIf2J/lO94zuugJgA8fPxvzyIlKx950jyLoBTDaZm9ohh9KO8OSqrnxGoduK2j+
+ HDM34xJznxRl816NLDUu5EainxjGDvfFTLGlqHxjseVM/t7p46yAN1Bn1o/R2JOko2G3
+ XYKNCYK42oWtrjS1fVwdAvOLkrzhU/Xj19zE5CjxiHqYWy9NAUCy9oW5/og71/w/GS/B
+ mC0q6+7hoTf5NCNmnQj9Vk6Ff6lIQtjksAnx06kCeMukr509NO07FIiNATQGDHID1rqG
+ yf9HHYB+6KvBapSsvLrLOxt+d/iaihkERQdFRiumdqyN+oLC44PqjWh2OO6tyrcZlrGw
+ qjeQ==
+X-Gm-Message-State: AOAM532dec8+/piVrWViNro/31Tjpu4vy9cbCwKRfk3DJk5d0gemVdrP
+ l974tafXRDiyhxjM+b19XMvaCXje
+X-Google-Smtp-Source: ABdhPJz0/myoakqxeLXUPx0tBtXAy5csVAndFnX9z971EOVIhdhVNobnyzW96xsxO8YAZw7B6vaajg==
+X-Received: by 2002:adf:e3c1:: with SMTP id k1mr6456674wrm.33.1592378744073;
+ Wed, 17 Jun 2020 00:25:44 -0700 (PDT)
 Received: from localhost.localdomain (93.red-83-59-160.dynamicip.rima-tde.net.
  [83.59.160.93])
- by smtp.gmail.com with ESMTPSA id j5sm32894781wrq.39.2020.06.17.00.25.48
+ by smtp.gmail.com with ESMTPSA id j5sm32894781wrq.39.2020.06.17.00.25.43
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 17 Jun 2020 00:25:48 -0700 (PDT)
+ Wed, 17 Jun 2020 00:25:43 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 07/14] hw/arm/mps2: Rename CMSDK AHB peripheral region
-Date: Wed, 17 Jun 2020 09:25:32 +0200
-Message-Id: <20200617072539.32686-8-f4bug@amsat.org>
+Subject: [PATCH v3 02/14] hw/i2c/versatile_i2c: Add definitions for register
+ addresses
+Date: Wed, 17 Jun 2020 09:25:27 +0200
+Message-Id: <20200617072539.32686-3-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200617072539.32686-1-f4bug@amsat.org>
 References: <20200617072539.32686-1-f4bug@amsat.org>
@@ -77,8 +78,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::344;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x344.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -108,32 +109,60 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-To differenciate with the CMSDK APB peripheral region,
-rename this region 'CMSDK AHB peripheral region'.
+Use self-explicit definitions instead of magic values.
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/arm/mps2.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ hw/i2c/versatile_i2c.c | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
 
-diff --git a/hw/arm/mps2.c b/hw/arm/mps2.c
-index ee555f919d..4fe5cc8622 100644
---- a/hw/arm/mps2.c
-+++ b/hw/arm/mps2.c
-@@ -212,10 +212,11 @@ static void mps2_common_init(MachineState *machine)
-      */
-     create_unimplemented_device("CMSDK APB peripheral region @0x40000000",
-                                 0x40000000, 0x00010000);
--    create_unimplemented_device("CMSDK peripheral region @0x40010000",
-+    create_unimplemented_device("CMSDK AHB peripheral region @0x40010000",
-                                 0x40010000, 0x00010000);
-     create_unimplemented_device("Extra peripheral region @0x40020000",
-                                 0x40020000, 0x00010000);
-+
-     create_unimplemented_device("RESERVED 4", 0x40030000, 0x001D0000);
-     create_unimplemented_device("VGA", 0x41000000, 0x0200000);
+diff --git a/hw/i2c/versatile_i2c.c b/hw/i2c/versatile_i2c.c
+index 1ac2a6f59a..040139d701 100644
+--- a/hw/i2c/versatile_i2c.c
++++ b/hw/i2c/versatile_i2c.c
+@@ -24,6 +24,7 @@
+ #include "qemu/osdep.h"
+ #include "hw/sysbus.h"
+ #include "hw/i2c/bitbang_i2c.h"
++#include "hw/registerfields.h"
+ #include "qemu/log.h"
+ #include "qemu/module.h"
  
+@@ -40,14 +41,19 @@ typedef struct VersatileI2CState {
+     int in;
+ } VersatileI2CState;
+ 
++REG32(CONTROL_GET, 0)
++REG32(CONTROL_SET, 0)
++REG32(CONTROL_CLR, 4)
++
+ static uint64_t versatile_i2c_read(void *opaque, hwaddr offset,
+                                    unsigned size)
+ {
+     VersatileI2CState *s = (VersatileI2CState *)opaque;
+ 
+-    if (offset == 0) {
++    switch (offset) {
++    case A_CONTROL_SET:
+         return (s->out & 1) | (s->in << 1);
+-    } else {
++    default:
+         qemu_log_mask(LOG_GUEST_ERROR,
+                       "%s: Bad offset 0x%x\n", __func__, (int)offset);
+         return -1;
+@@ -60,10 +66,10 @@ static void versatile_i2c_write(void *opaque, hwaddr offset,
+     VersatileI2CState *s = (VersatileI2CState *)opaque;
+ 
+     switch (offset) {
+-    case 0:
++    case A_CONTROL_SET:
+         s->out |= value & 3;
+         break;
+-    case 4:
++    case A_CONTROL_CLR:
+         s->out &= ~value;
+         break;
+     default:
 -- 
 2.21.3
 
