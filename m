@@ -2,73 +2,84 @@ Return-Path: <SRS0=bzpH=76=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E61FEC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 19:46:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FC31C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 19:53:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A8EA3217A0
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 19:46:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8EA3217A0
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 1EC8421548
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 19:53:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T6pFXgZc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1EC8421548
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44424 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47088 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jle1L-0002GQ-Uk
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 15:46:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44716)
+	id 1jle7p-0004RS-CR
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 15:53:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46886)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jldzx-0001U9-7f
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 15:45:25 -0400
-Resent-Date: Wed, 17 Jun 2020 15:45:25 -0400
-Resent-Message-Id: <E1jldzx-0001U9-7f@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21702)
+ (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1jle7G-00040p-1H
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 15:52:58 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:40824
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jldzt-0003Ra-Bz
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 15:45:24 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1592423095; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=iyJNbKKcbpdIcT4Iui4vrAmli9ntzmhAbASpA9lToUGcBHFgjmw4g2P6jMXMP2k3tlPK5miPOnbRt97+AbHFIFvIW0RD4MWHKwV78uuhwlY7daR6TE74UtoEt+Vu9I98zWm0vSaXr2NK+2l43CHM6UwSRF5lJ8417pU+aqa1qUM=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1592423095;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=dPoV1mUJ+5qHNyS0k1gRdiDPUdEhnfsJJEhXGYUogho=; 
- b=Q9xJV63fg062+sI0l5nLhPT1a0j0jzq4I/1F1i2qNYTqQ1z59nuEkjAyHdIsLS3+SIUQGtILQw4BEe+RUY3u1B2NP8PZkMwrMmeEk1PGi9F1fo99cRtvNjnIa+Gc4K7AA8JIpI5Kgr5lNdrqSAUeT54nxV6Tza9YYi2E8AeJgWA=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1592423092211104.89136813758171;
- Wed, 17 Jun 2020 12:44:52 -0700 (PDT)
-Message-ID: <159242309080.14731.7094358799306452342@d1fd068a5071>
-Subject: Re: [PATCH rc1 00/15] hw: Renesas patches (SH4 and RX)
-In-Reply-To: <20200617191519.14842-1-f4bug@amsat.org>
+ (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1jle7D-0004ps-HS
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 15:52:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592423573;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=pYJ9p9lKz01VML3mFoBkQ8xaifVtSw0FWwahHRvRF70=;
+ b=T6pFXgZcIwYSoYx2JDnVupehjT6b4lvtWZ9hbJIZGJBRR4TBKEssnpT6KWAXl5BYb7FMfM
+ qVNU3XGxFqYjGRK7fhE2NO4TMRZza0wliQqnGPYw5qGDLQQTotGQSWbgA4fuzJdjikpqqw
+ GRFM8YkDT0/gRnoecdmrLVwgjZOf46A=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-298-nipYgPZqMPabxXHtAjx62A-1; Wed, 17 Jun 2020 15:52:49 -0400
+X-MC-Unique: nipYgPZqMPabxXHtAjx62A-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 38B3E8035CE;
+ Wed, 17 Jun 2020 19:52:48 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-112-214.rdu2.redhat.com
+ [10.10.112.214])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8FD3719D71;
+ Wed, 17 Jun 2020 19:52:43 +0000 (UTC)
+Date: Wed, 17 Jun 2020 15:52:41 -0400
+From: Cleber Rosa <crosa@redhat.com>
+To: John Snow <jsnow@redhat.com>
+Subject: Re: [PATCH 0/7] python: create installable package
+Message-ID: <20200617195241.GA434320@localhost.localdomain>
+References: <20200603001523.18085-1-jsnow@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: f4bug@amsat.org
-Date: Wed, 17 Jun 2020 12:44:52 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/17 15:09:20
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200603001523.18085-1-jsnow@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="d6Gm4EdcadzBjdND"
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=crosa@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/17 15:42:50
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -81,199 +92,177 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: ysato@users.sourceforge.jp, magnus.damm@gmail.com, f4bug@amsat.org,
- qemu-devel@nongnu.org, aurelien@aurel32.net, rth@twiddle.net
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDYxNzE5MTUxOS4xNDg0
-Mi0xLWY0YnVnQGFtc2F0Lm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgdGhlIGFzYW4g
-YnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29tbWFuZHMgYW5kCnRoZWlyIG91
-dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3RhbGxlZCwgeW91IGNhbiBwcm9iYWJs
-eSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmlu
-L2Jhc2gKZXhwb3J0IEFSQ0g9eDg2XzY0Cm1ha2UgZG9ja2VyLWltYWdlLWZlZG9yYSBWPTEgTkVU
-V09SSz0xCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1kZWJ1Z0BmZWRvcmEgVEFSR0VUX0xJU1Q9eDg2
-XzY0LXNvZnRtbXUgSj0xNCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCiAgQ0Mg
-ICAgICBxZ2EvY29tbWFuZHMubwogIENDICAgICAgcWdhL2d1ZXN0LWFnZW50LWNvbW1hbmQtc3Rh
-dGUubwogIENDICAgICAgcWdhL21haW4ubwovdXNyL2Jpbi9sZDogL3Vzci9saWI2NC9jbGFuZy8x
-MC4wLjAvbGliL2xpbnV4L2xpYmNsYW5nX3J0LmFzYW4teDg2XzY0LmEoYXNhbl9pbnRlcmNlcHRv
-cnNfdmZvcmsuUy5vKTogd2FybmluZzogY29tbW9uIG9mIGBfX2ludGVyY2VwdGlvbjo6cmVhbF92
-Zm9yaycgb3ZlcnJpZGRlbiBieSBkZWZpbml0aW9uIGZyb20gL3Vzci9saWI2NC9jbGFuZy8xMC4w
-LjAvbGliL2xpbnV4L2xpYmNsYW5nX3J0LmFzYW4teDg2XzY0LmEoYXNhbl9pbnRlcmNlcHRvcnMu
-Y3BwLm8pCiAgQ0MgICAgICBxZ2EvY29tbWFuZHMtcG9zaXgubwogIENDICAgICAgcWdhL2NoYW5u
-ZWwtcG9zaXgubwogIENDICAgICAgcWdhL3FhcGktZ2VuZXJhdGVkL3FnYS1xYXBpLXR5cGVzLm8K
-LS0tCiAgR0VOICAgICBkb2NzL2ludGVyb3AvcWVtdS1nYS1yZWYuaHRtbAogIEdFTiAgICAgZG9j
-cy9pbnRlcm9wL3FlbXUtZ2EtcmVmLnR4dAogIEdFTiAgICAgZG9jcy9pbnRlcm9wL3FlbXUtZ2Et
-cmVmLjcKL3Vzci9iaW4vbGQ6IC91c3IvbGliNjQvY2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJj
-bGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFzYW5faW50ZXJjZXB0b3JzX3Zmb3JrLlMubyk6IHdhcm5p
-bmc6IGNvbW1vbiBvZiBgX19pbnRlcmNlcHRpb246OnJlYWxfdmZvcmsnIG92ZXJyaWRkZW4gYnkg
-ZGVmaW5pdGlvbiBmcm9tIC91c3IvbGliNjQvY2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJjbGFu
-Z19ydC5hc2FuLXg4Nl82NC5hKGFzYW5faW50ZXJjZXB0b3JzLmNwcC5vKQogIExJTksgICAgcWVt
-dS1rZXltYXAKICBMSU5LICAgIGl2c2htZW0tY2xpZW50Ci91c3IvYmluL2xkOiAvdXNyL2xpYjY0
-L2NsYW5nLzEwLjAuMC9saWIvbGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2lu
-dGVyY2VwdG9yc192Zm9yay5TLm8pOiB3YXJuaW5nOiBjb21tb24gb2YgYF9faW50ZXJjZXB0aW9u
-OjpyZWFsX3Zmb3JrJyBvdmVycmlkZGVuIGJ5IGRlZmluaXRpb24gZnJvbSAvdXNyL2xpYjY0L2Ns
-YW5nLzEwLjAuMC9saWIvbGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2ludGVy
-Y2VwdG9ycy5jcHAubykKICBMSU5LICAgIGl2c2htZW0tc2VydmVyCi91c3IvYmluL2xkOiAvdXNy
-L2xpYjY0L2NsYW5nLzEwLjAuMC9saWIvbGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShh
-c2FuX2ludGVyY2VwdG9yc192Zm9yay5TLm8pOiB3YXJuaW5nOiBjb21tb24gb2YgYF9faW50ZXJj
-ZXB0aW9uOjpyZWFsX3Zmb3JrJyBvdmVycmlkZGVuIGJ5IGRlZmluaXRpb24gZnJvbSAvdXNyL2xp
-YjY0L2NsYW5nLzEwLjAuMC9saWIvbGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2Fu
-X2ludGVyY2VwdG9ycy5jcHAubykKL3Vzci9iaW4vbGQ6IC91c3IvbGliNjQvY2xhbmcvMTAuMC4w
-L2xpYi9saW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFzYW5faW50ZXJjZXB0b3JzX3Zm
-b3JrLlMubyk6IHdhcm5pbmc6IGNvbW1vbiBvZiBgX19pbnRlcmNlcHRpb246OnJlYWxfdmZvcmsn
-IG92ZXJyaWRkZW4gYnkgZGVmaW5pdGlvbiBmcm9tIC91c3IvbGliNjQvY2xhbmcvMTAuMC4wL2xp
-Yi9saW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFzYW5faW50ZXJjZXB0b3JzLmNwcC5v
-KQogIExJTksgICAgcWVtdS1uYmQKICBMSU5LICAgIHFlbXUtc3RvcmFnZS1kYWVtb24KICBBUyAg
-ICAgIHBjLWJpb3Mvb3B0aW9ucm9tL211bHRpYm9vdC5vCi91c3IvYmluL2xkOiAvdXNyL2xpYjY0
-L2NsYW5nLzEwLjAuMC9saWIvbGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2lu
-dGVyY2VwdG9yc192Zm9yay5TLm8pOiB3YXJuaW5nOiBjb21tb24gb2YgYF9faW50ZXJjZXB0aW9u
-OjpyZWFsX3Zmb3JrJyBvdmVycmlkZGVuIGJ5IGRlZmluaXRpb24gZnJvbSAvdXNyL2xpYjY0L2Ns
-YW5nLzEwLjAuMC9saWIvbGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2ludGVy
-Y2VwdG9ycy5jcHAubykKICBMSU5LICAgIHFlbXUtaW1nCi91c3IvYmluL2xkOiAvdXNyL2xpYjY0
-L2NsYW5nLzEwLjAuMC9saWIvbGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2lu
-dGVyY2VwdG9yc192Zm9yay5TLm8pOiB3YXJuaW5nOiBjb21tb24gb2YgYF9faW50ZXJjZXB0aW9u
-OjpyZWFsX3Zmb3JrJyBvdmVycmlkZGVuIGJ5IGRlZmluaXRpb24gZnJvbSAvdXNyL2xpYjY0L2Ns
-YW5nLzEwLjAuMC9saWIvbGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2ludGVy
-Y2VwdG9ycy5jcHAubykKICBMSU5LICAgIHFlbXUtaW8KICBMSU5LICAgIHFlbXUtZWRpZAogIExJ
-TksgICAgZnNkZXYvdmlydGZzLXByb3h5LWhlbHBlcgotLS0KICBCVUlMRCAgIHBjLWJpb3Mvb3B0
-aW9ucm9tL211bHRpYm9vdC5yYXcKICBCVUlMRCAgIHBjLWJpb3Mvb3B0aW9ucm9tL2xpbnV4Ym9v
-dF9kbWEuaW1nCiAgQlVJTEQgICBwYy1iaW9zL29wdGlvbnJvbS9wdmgucmF3Ci91c3IvYmluL2xk
-OiAvdXNyL2xpYjY0L2NsYW5nLzEwLjAuMC9saWIvbGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZf
-NjQuYShhc2FuX2ludGVyY2VwdG9yc192Zm9yay5TLm8pOiB3YXJuaW5nOiBjb21tb24gb2YgYF9f
-aW50ZXJjZXB0aW9uOjpyZWFsX3Zmb3JrJyBvdmVycmlkZGVuIGJ5IGRlZmluaXRpb24gZnJvbSAv
-dXNyL2xpYjY0L2NsYW5nLzEwLjAuMC9saWIvbGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQu
-YShhc2FuX2ludGVyY2VwdG9ycy5jcHAubykKICBMSU5LICAgIHZob3N0LXVzZXItaW5wdXQKL3Vz
-ci9iaW4vbGQ6IC91c3IvbGliNjQvY2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJjbGFuZ19ydC5h
-c2FuLXg4Nl82NC5hKGFzYW5faW50ZXJjZXB0b3JzX3Zmb3JrLlMubyk6IHdhcm5pbmc6IGNvbW1v
-biBvZiBgX19pbnRlcmNlcHRpb246OnJlYWxfdmZvcmsnIG92ZXJyaWRkZW4gYnkgZGVmaW5pdGlv
-biBmcm9tIC91c3IvbGliNjQvY2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJjbGFuZ19ydC5hc2Fu
-LXg4Nl82NC5hKGFzYW5faW50ZXJjZXB0b3JzLmNwcC5vKQogIEJVSUxEICAgcGMtYmlvcy9vcHRp
-b25yb20vbGludXhib290X2RtYS5yYXcKL3Vzci9iaW4vbGQ6IC91c3IvbGliNjQvY2xhbmcvMTAu
-MC4wL2xpYi9saW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFzYW5faW50ZXJjZXB0b3Jz
-X3Zmb3JrLlMubyk6IHdhcm5pbmc6IGNvbW1vbiBvZiBgX19pbnRlcmNlcHRpb246OnJlYWxfdmZv
-cmsnIG92ZXJyaWRkZW4gYnkgZGVmaW5pdGlvbiBmcm9tIC91c3IvbGliNjQvY2xhbmcvMTAuMC4w
-L2xpYi9saW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFzYW5faW50ZXJjZXB0b3JzLmNw
-cC5vKQovdXNyL2Jpbi9sZDogL3Vzci9saWI2NC9jbGFuZy8xMC4wLjAvbGliL2xpbnV4L2xpYmNs
-YW5nX3J0LmFzYW4teDg2XzY0LmEoYXNhbl9pbnRlcmNlcHRvcnNfdmZvcmsuUy5vKTogd2Fybmlu
-ZzogY29tbW9uIG9mIGBfX2ludGVyY2VwdGlvbjo6cmVhbF92Zm9yaycgb3ZlcnJpZGRlbiBieSBk
-ZWZpbml0aW9uIGZyb20gL3Vzci9saWI2NC9jbGFuZy8xMC4wLjAvbGliL2xpbnV4L2xpYmNsYW5n
-X3J0LmFzYW4teDg2XzY0LmEoYXNhbl9pbnRlcmNlcHRvcnMuY3BwLm8pCiAgQlVJTEQgICBwYy1i
-aW9zL29wdGlvbnJvbS9rdm12YXBpYy5pbWcKL3Vzci9iaW4vbGQ6IC91c3IvbGliNjQvY2xhbmcv
-MTAuMC4wL2xpYi9saW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFzYW5faW50ZXJjZXB0
-b3JzX3Zmb3JrLlMubyk6IHdhcm5pbmc6IGNvbW1vbiBvZiBgX19pbnRlcmNlcHRpb246OnJlYWxf
-dmZvcmsnIG92ZXJyaWRkZW4gYnkgZGVmaW5pdGlvbiBmcm9tIC91c3IvbGliNjQvY2xhbmcvMTAu
-MC4wL2xpYi9saW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFzYW5faW50ZXJjZXB0b3Jz
-LmNwcC5vKS91c3IvYmluL2xkCjogL3Vzci9saWI2NC9jbGFuZy8xMC4wLjAvbGliL2xpbnV4L2xp
-YmNsYW5nX3J0LmFzYW4teDg2XzY0LmEoYXNhbl9pbnRlcmNlcHRvcnNfdmZvcmsuUy5vKTogd2Fy
-bmluZzogY29tbW9uIG9mIGBfX2ludGVyY2VwdGlvbjo6cmVhbF92Zm9yaycgb3ZlcnJpZGRlbiBi
-eSBkZWZpbml0aW9uIGZyb20gL3Vzci9saWI2NC9jbGFuZy8xMC4wLjAvbGliL2xpbnV4L2xpYmNs
-YW5nX3J0LmFzYW4teDg2XzY0LmEoYXNhbl9pbnRlcmNlcHRvcnMuY3BwLm8pCiAgU0lHTiAgICBw
-Yy1iaW9zL29wdGlvbnJvbS9tdWx0aWJvb3QuYmluCi91c3IvYmluL2xkOiAvdXNyL2xpYjY0L2Ns
-YW5nLzEwLjAuMC9saWIvbGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2ludGVy
-Y2VwdG9yc192Zm9yay5TLm8pOiB3YXJuaW5nOiBjb21tb24gb2YgYF9faW50ZXJjZXB0aW9uOjpy
-ZWFsX3Zmb3JrJyBvdmVycmlkZGVuIGJ5IGRlZmluaXRpb24gZnJvbSAvdXNyL2xpYjY0L2NsYW5n
-LzEwLjAuMC9saWIvbGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2ludGVyY2Vw
-dG9ycy5jcHAubykKICBCVUlMRCAgIHBjLWJpb3Mvb3B0aW9ucm9tL2xpbnV4Ym9vdC5pbWcKICBT
-SUdOICAgIHBjLWJpb3Mvb3B0aW9ucm9tL2xpbnV4Ym9vdF9kbWEuYmluCiAgQlVJTEQgICBwYy1i
-aW9zL29wdGlvbnJvbS9rdm12YXBpYy5yYXcKICBTSUdOICAgIHBjLWJpb3Mvb3B0aW9ucm9tL3B2
-aC5iaW4KL3Vzci9iaW4vbGQ6IC91c3IvbGliNjQvY2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJj
-bGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFzYW5faW50ZXJjZXB0b3JzX3Zmb3JrLlMubyk6IHdhcm5p
-bmc6IGNvbW1vbiBvZiBgX19pbnRlcmNlcHRpb246OnJlYWxfdmZvcmsnIG92ZXJyaWRkZW4gYnkg
-ZGVmaW5pdGlvbiBmcm9tIC91c3IvbGliNjQvY2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJjbGFu
-Z19ydC5hc2FuLXg4Nl82NC5hKGFzYW5faW50ZXJjZXB0b3JzLmNwcC5vKQogIEJVSUxEICAgcGMt
-Ymlvcy9vcHRpb25yb20vbGludXhib290LnJhdwogIFNJR04gICAgcGMtYmlvcy9vcHRpb25yb20v
-a3ZtdmFwaWMuYmluCiAgU0lHTiAgICBwYy1iaW9zL29wdGlvbnJvbS9saW51eGJvb3QuYmluCiAg
-TElOSyAgICBxZW11LWdhCi91c3IvYmluL2xkOiAvdXNyL2xpYjY0L2NsYW5nLzEwLjAuMC9saWIv
-bGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2ludGVyY2VwdG9yc192Zm9yay5T
-Lm8pOiB3YXJuaW5nOiBjb21tb24gb2YgYF9faW50ZXJjZXB0aW9uOjpyZWFsX3Zmb3JrJyBvdmVy
-cmlkZGVuIGJ5IGRlZmluaXRpb24gZnJvbSAvdXNyL2xpYjY0L2NsYW5nLzEwLjAuMC9saWIvbGlu
-dXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2ludGVyY2VwdG9ycy5jcHAubykKICBH
-RU4gICAgIHg4Nl82NC1zb2Z0bW11L2htcC1jb21tYW5kcy5oCiAgR0VOICAgICB4ODZfNjQtc29m
-dG1tdS9obXAtY29tbWFuZHMtaW5mby5oCiAgR0VOICAgICB4ODZfNjQtc29mdG1tdS9jb25maWct
-ZGV2aWNlcy5oCi0tLQogIENDICAgICAgeDg2XzY0LXNvZnRtbXUvaHcvdmlydGlvL3ZpcnRpby1j
-cnlwdG8ubwogIENDICAgICAgeDg2XzY0LXNvZnRtbXUvaHcvdmlydGlvL3Zob3N0LXVzZXItZnMu
-bwogIENDICAgICAgeDg2XzY0LXNvZnRtbXUvaHcvdmlydGlvL3ZpcnRpby1jcnlwdG8tcGNpLm8K
-L3RtcC9xZW11LXRlc3Qvc3JjL2ZwdS9zb2Z0ZmxvYXQuYzozMzY1OjEzOiBlcnJvcjogYml0d2lz
-ZSBuZWdhdGlvbiBvZiBhIGJvb2xlYW4gZXhwcmVzc2lvbjsgZGlkIHlvdSBtZWFuIGxvZ2ljYWwg
-bmVnYXRpb24/IFstV2Vycm9yLC1XYm9vbC1vcGVyYXRpb25dCiAgICBhYnNaICY9IH4gKCAoICgg
-cm91bmRCaXRzIF4gMHg0MCApID09IDAgKSAmIHJvdW5kTmVhcmVzdEV2ZW4gKTsKICAgICAgICAg
-ICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
-CiAgICAgICAgICAgICEKL3RtcC9xZW11LXRlc3Qvc3JjL2ZwdS9zb2Z0ZmxvYXQuYzozNDIzOjE4
-OiBlcnJvcjogYml0d2lzZSBuZWdhdGlvbiBvZiBhIGJvb2xlYW4gZXhwcmVzc2lvbjsgZGlkIHlv
-dSBtZWFuIGxvZ2ljYWwgbmVnYXRpb24/IFstV2Vycm9yLC1XYm9vbC1vcGVyYXRpb25dCiAgICAg
-ICAgYWJzWjAgJj0gfiAoICggKHVpbnQ2NF90KSAoIGFic1oxPDwxICkgPT0gMCApICYgcm91bmRO
-ZWFyZXN0RXZlbiApOwogICAgICAgICAgICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fgogICAgICAgICAgICAgICAgICEKL3RtcC9x
-ZW11LXRlc3Qvc3JjL2ZwdS9zb2Z0ZmxvYXQuYzozNDgzOjE4OiBlcnJvcjogYml0d2lzZSBuZWdh
-dGlvbiBvZiBhIGJvb2xlYW4gZXhwcmVzc2lvbjsgZGlkIHlvdSBtZWFuIGxvZ2ljYWwgbmVnYXRp
-b24/IFstV2Vycm9yLC1XYm9vbC1vcGVyYXRpb25dCiAgICAgICAgYWJzWjAgJj0gfigoKHVpbnQ2
-NF90KShhYnNaMTw8MSkgPT0gMCkgJiByb3VuZE5lYXJlc3RFdmVuKTsKICAgICAgICAgICAgICAg
-ICBefn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+CiAgICAg
-ICAgICAgICAgICAgIQovdG1wL3FlbXUtdGVzdC9zcmMvZnB1L3NvZnRmbG9hdC5jOjM2MDY6MTM6
-IGVycm9yOiBiaXR3aXNlIG5lZ2F0aW9uIG9mIGEgYm9vbGVhbiBleHByZXNzaW9uOyBkaWQgeW91
-IG1lYW4gbG9naWNhbCBuZWdhdGlvbj8gWy1XZXJyb3IsLVdib29sLW9wZXJhdGlvbl0KICAgIHpT
-aWcgJj0gfiAoICggKCByb3VuZEJpdHMgXiAweDQwICkgPT0gMCApICYgcm91bmROZWFyZXN0RXZl
-biApOwogICAgICAgICAgICBefn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn4KICAgICAgICAgICAgIQovdG1wL3FlbXUtdGVzdC9zcmMvZnB1L3NvZnRm
-bG9hdC5jOjM3NjA6MTM6IGVycm9yOiBiaXR3aXNlIG5lZ2F0aW9uIG9mIGEgYm9vbGVhbiBleHBy
-ZXNzaW9uOyBkaWQgeW91IG1lYW4gbG9naWNhbCBuZWdhdGlvbj8gWy1XZXJyb3IsLVdib29sLW9w
-ZXJhdGlvbl0KICAgIHpTaWcgJj0gfiAoICggKCByb3VuZEJpdHMgXiAweDIwMCApID09IDAgKSAm
-IHJvdW5kTmVhcmVzdEV2ZW4gKTsKICAgICAgICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fgogICAgICAgICAgICAhCi90bXAvcWVtdS10
-ZXN0L3NyYy9mcHUvc29mdGZsb2F0LmM6Mzk4NzoyMTogZXJyb3I6IGJpdHdpc2UgbmVnYXRpb24g
-b2YgYSBib29sZWFuIGV4cHJlc3Npb247IGRpZCB5b3UgbWVhbiBsb2dpY2FsIG5lZ2F0aW9uPyBb
-LVdlcnJvciwtV2Jvb2wtb3BlcmF0aW9uXQogICAgICAgICAgICAgICAgICAgIH4gKCAoICh1aW50
-NjRfdCkgKCB6U2lnMTw8MSApID09IDAgKSAmIHJvdW5kTmVhcmVzdEV2ZW4gKTsKICAgICAgICAg
-ICAgICAgICAgICBefn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn4KICAgICAgICAgICAgICAgICAgICAhCi90bXAvcWVtdS10ZXN0L3NyYy9mcHUv
-c29mdGZsb2F0LmM6NDAwMzoyMjogZXJyb3I6IGJpdHdpc2UgbmVnYXRpb24gb2YgYSBib29sZWFu
-IGV4cHJlc3Npb247IGRpZCB5b3UgbWVhbiBsb2dpY2FsIG5lZ2F0aW9uPyBbLVdlcnJvciwtV2Jv
-b2wtb3BlcmF0aW9uXQogICAgICAgICAgICB6U2lnMCAmPSB+ICggKCAodWludDY0X3QpICggelNp
-ZzE8PDEgKSA9PSAwICkgJiByb3VuZE5lYXJlc3RFdmVuICk7CiAgICAgICAgICAgICAgICAgICAg
-IF5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
-fgogICAgICAgICAgICAgICAgICAgICAhCi90bXAvcWVtdS10ZXN0L3NyYy9mcHUvc29mdGZsb2F0
-LmM6NDI3MzoxODogZXJyb3I6IGJpdHdpc2UgbmVnYXRpb24gb2YgYSBib29sZWFuIGV4cHJlc3Np
-b247IGRpZCB5b3UgbWVhbiBsb2dpY2FsIG5lZ2F0aW9uPyBbLVdlcnJvciwtV2Jvb2wtb3BlcmF0
-aW9uXQogICAgICAgIHpTaWcxICY9IH4gKCAoIHpTaWcyICsgelNpZzIgPT0gMCApICYgcm91bmRO
-ZWFyZXN0RXZlbiApOwogICAgICAgICAgICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+CiAgICAgICAgICAgICAgICAgIQo4IGVycm9ycyBnZW5lcmF0
-ZWQuCm1ha2VbMV06ICoqKiBbL3RtcC9xZW11LXRlc3Qvc3JjL3J1bGVzLm1hazo2OTogZnB1L3Nv
-ZnRmbG9hdC5vXSBFcnJvciAxCm1ha2VbMV06ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpv
-YnMuLi4uCi90bXAvcWVtdS10ZXN0L3NyYy9taWdyYXRpb24vcmFtLmM6OTE5OjQ1OiBlcnJvcjog
-aW1wbGljaXQgY29udmVyc2lvbiBmcm9tICd1bnNpZ25lZCBsb25nJyB0byAnZG91YmxlJyBjaGFu
-Z2VzIHZhbHVlIGZyb20gMTg0NDY3NDQwNzM3MDk1NTE2MTUgdG8gMTg0NDY3NDQwNzM3MDk1NTE2
-MTYgWy1XZXJyb3IsLVdpbXBsaWNpdC1pbnQtZmxvYXQtY29udmVyc2lvbl0KICAgICAgICAgICAg
-eGJ6cmxlX2NvdW50ZXJzLmVuY29kaW5nX3JhdGUgPSBVSU5UNjRfTUFYOwogICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICB+IF5+fn5+fn5+fn4KL3Vzci9pbmNsdWRlL3N0
-ZGludC5oOjEzMDoyMzogbm90ZTogZXhwYW5kZWQgZnJvbSBtYWNybyAnVUlOVDY0X01BWCcKLS0t
-CjE4NDQ2NzQ0MDczNzA5NTUxNjE1VUwKXn5+fn5+fn5+fn5+fn5+fn5+fn5+fgoxIGVycm9yIGdl
-bmVyYXRlZC4KbWFrZVsxXTogKioqIFsvdG1wL3FlbXUtdGVzdC9zcmMvcnVsZXMubWFrOjY5OiBt
-aWdyYXRpb24vcmFtLm9dIEVycm9yIDEKbWFrZTogKioqIFtNYWtlZmlsZTo1Mjc6IHg4Nl82NC1z
-b2Z0bW11L2FsbF0gRXJyb3IgMgpUcmFjZWJhY2sgKG1vc3QgcmVjZW50IGNhbGwgbGFzdCk6CiAg
-RmlsZSAiLi90ZXN0cy9kb2NrZXIvZG9ja2VyLnB5IiwgbGluZSA2NjksIGluIDxtb2R1bGU+CiAg
-ICBzeXMuZXhpdChtYWluKCkpCi0tLQogICAgcmFpc2UgQ2FsbGVkUHJvY2Vzc0Vycm9yKHJldGNv
-ZGUsIGNtZCkKc3VicHJvY2Vzcy5DYWxsZWRQcm9jZXNzRXJyb3I6IENvbW1hbmQgJ1snc3Vkbycs
-ICctbicsICdkb2NrZXInLCAncnVuJywgJy0tbGFiZWwnLCAnY29tLnFlbXUuaW5zdGFuY2UudXVp
-ZD0zYTc4MzFhMTI3NTk0NTU2YmZhODdmNDE3NTI4YTlhOCcsICctdScsICcxMDAxJywgJy0tc2Vj
-dXJpdHktb3B0JywgJ3NlY2NvbXA9dW5jb25maW5lZCcsICctLXJtJywgJy1lJywgJ1RBUkdFVF9M
-SVNUPXg4Nl82NC1zb2Z0bW11JywgJy1lJywgJ0VYVFJBX0NPTkZJR1VSRV9PUFRTPScsICctZScs
-ICdWPScsICctZScsICdKPTE0JywgJy1lJywgJ0RFQlVHPScsICctZScsICdTSE9XX0VOVj0nLCAn
-LWUnLCAnQ0NBQ0hFX0RJUj0vdmFyL3RtcC9jY2FjaGUnLCAnLXYnLCAnL2hvbWUvcGF0Y2hldy8u
-Y2FjaGUvcWVtdS1kb2NrZXItY2NhY2hlOi92YXIvdG1wL2NjYWNoZTp6JywgJy12JywgJy92YXIv
-dG1wL3BhdGNoZXctdGVzdGVyLXRtcC1nMGY1bjY3ZS9zcmMvZG9ja2VyLXNyYy4yMDIwLTA2LTE3
-LTE1LjQwLjQ1Ljk4Nzk6L3Zhci90bXAvcWVtdTp6LHJvJywgJ3FlbXU6ZmVkb3JhJywgJy92YXIv
-dG1wL3FlbXUvcnVuJywgJ3Rlc3QtZGVidWcnXScgcmV0dXJuZWQgbm9uLXplcm8gZXhpdCBzdGF0
-dXMgMi4KZmlsdGVyPS0tZmlsdGVyPWxhYmVsPWNvbS5xZW11Lmluc3RhbmNlLnV1aWQ9M2E3ODMx
-YTEyNzU5NDU1NmJmYTg3ZjQxNzUyOGE5YTgKbWFrZVsxXTogKioqIFtkb2NrZXItcnVuXSBFcnJv
-ciAxCm1ha2VbMV06IExlYXZpbmcgZGlyZWN0b3J5IGAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10
-bXAtZzBmNW42N2Uvc3JjJwptYWtlOiAqKiogW2RvY2tlci1ydW4tdGVzdC1kZWJ1Z0BmZWRvcmFd
-IEVycm9yIDIKCnJlYWwgICAgNG01Ljc0M3MKdXNlciAgICAwbTguNDE1cwoKClRoZSBmdWxsIGxv
-ZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAyMDA2MTcxOTE1MTku
-MTQ4NDItMS1mNGJ1Z0BhbXNhdC5vcmcvdGVzdGluZy5hc2FuLz90eXBlPW1lc3NhZ2UuCi0tLQpF
-bWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcu
-b3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQu
-Y29t
+--d6Gm4EdcadzBjdND
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, Jun 02, 2020 at 08:15:16PM -0400, John Snow wrote:
+> Based-on: 20200602214528.12107-1-jsnow@redhat.com
+>=20
+> This series factors the python/qemu directory as an installable
+> module. As a developer, you can install this to your virtual environment
+> and then always have access to the classes contained within without
+> needing to wrangle python import path problems.
+>
+
+First of all, major kudos for picking up this task.  It's so high in
+importance to so many users (myself included) that I feel like I owe
+you many truck loads of beers now. :)
+
+> When developing, you could go to qemu/python/ and invoke `pipenv shell`
+> to activate a virtual environment within which you could type `pip
+> install -e .` to install a special development version of this package
+> to your virtual environment. This package will always reflect the most
+> recent version of the source files in the tree.
+>=20
+> When not developing, you could install a version of this package to your
+> environment outright to gain access to the QMP and QEMUMachine classes
+> for lightweight scripting and testing.
+>=20
+> This package is formatted in such a way that it COULD be uploaded to
+> https://pypi.org/project/qemu and installed independently of qemu.git
+> with `pip install qemu`, but of course that button remains unpushed.
+>=20
+> There are a few major questions to answer first:
+>=20
+> - What versioning scheme should we use? See patch 2.
+>=20
+> - Should we use a namespace package or not?
+>   - Namespaced: 'qemu.machine', 'qemu.monitor' etc may be separately
+>     versioned, packaged and distributed packages. Third party authors
+>     may register 'qemu.xxx' to create plugins within the namespace as
+>     they see fit.
+>=20
+>   - Non-namespaced: 'qemu' is one giant glob package, packaged and
+>     versioned in unison. We control this package exclusively.
+>
+
+For simplicity sake, I'd suggest starting with non-namespaced
+approach.  It should be easier to move to a namespaced package if the
+need arises.  Also, there are many ways to extend Python code without
+necessarily requiring third party authors to register their packages
+according to a namespace.
+
+In the Avocado project, we have been using setuptools entrypoints with
+a reasonable level of success.  Anyone can have code under any
+namespace whatsoever extending Avocado, as long as it register their
+entrypoints.
+
+> - How do we eliminate sys.path hacks from the rest of the QEMU tree?
+>   (Background: sys.path hacks generally impede the function of static
+>   code quality analysis tools like mypy and pylint.)
+>=20
+>   - Simplest: parent scripts (or developer) needs to set PYTHONPATH.
+>=20
+>   - Harder: Python scripts should all be written to assume package form,
+>     all tests and CI that use Python should execute within a VENV.
+>
+
+Having a venv is desirable, but it's not really necessary.  As long as
+"python setup.py develop --user" is called, that user can access this
+code without sys.path hacks.  And if the user chooses to use a venv,
+it's just an extra step.
+
+In the Avocado project, we have a `make develop` rule that does that
+for the main setup.py file, and for all plugins we carry on the same
+tree, which is similar in some regards to the "not at the project root
+directory" situation here with "qemu/python/setup.py".
+
+>   In either case, we lose the ability (for many scripts) to "just run" a
+>   script out of the source tree if it depends on other QEMU Python
+>   files. This is annoying, but as the complexity of the Python lib
+>   grows, it is unavoidable.
+>
+
+Like I said before, we may introduce a "make develop"-like
+requirement, but after that, I don't think we'll loose anything.
+Also, I think this is just a sign of maturity.  We should be using
+Python as it's inteded to be used, and sys.path hacks is not among
+those.
+
+>   In the VENV case, we at least establish a simple paradigm: the scripts
+>   should work in their "installed" forms; and the rest of the build and
+>   test infrastructure should use this VENV to automatically handle
+>   dependencies and path requirements. This should allow us to move many
+>   of our existing python scripts with "hidden" dependencies into a
+>   proper python module hierarchy and test for regressions with mypy,
+>   flake8, pylint, etc.
+>=20
+>   (We could even establish e.g. Sphinx versions as a dependency for our
+>   build kit here and make sure it's installed to the VENV.)
+>=20
+>   Pros: Almost all scripts can be moved under python/qemu/* and checked
+>   with CQA tools. imports are written the same no matter where you are
+>   (Use the fully qualified names, e.g. qemu.core.qmp.QMPMessage).
+>   Regressions in scripts are caught *much* faster.
+>=20
+>   Downsides: Kind of annoying; most scripts now require you to install a
+>   devkit forwarder (pip3 install --user .) or be inside of an activated
+>   venv. Not too bad if you know python at all, but it's certainly less
+>   plug-n-play.
+>=20
+> - What's our backwards compatibility policy if we start shipping this?
+>=20
+>   Proposed: Attempt to maintain API compatibility (after stabilizing the
+>   library). Incompatible changes should probably cause a semver bump.
+>
+>   Each published release makes no attempt to support any version of QEMU
+>   other than the one it was released against. We publish this on the tin
+>   in big red letters.
+
+It may be too early to tell, but it's not clear to me how we'll keep
+both the QEMU version supported by a given release, and its API
+"level".
+
+Are you proposing that we have, say, "python-qemu" version 10, being
+the 10th API version, without any regard to the QEMU version
+supported?  Or version 10.5.3 would mean 10th API version, intended
+to support QEMU 5.3?
+
+>=20
+> TESTING THIS PACKAGE OUT:
+>=20
+> 1. You can install to your local user's environment normally by
+> navigating to qemu/python/ and typing "pip3 install --user ."
+>
+
+s/install/develop/ should be a better option here.  I mean, I'm
+not aware of any reason to user install while developing.
+
+- Cleber.
+
+--d6Gm4EdcadzBjdND
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl7qdIYACgkQZX6NM6Xy
+CfOlSg//S3pfWrP7rJ66pfefDiwdlRwz1bb/L9yK7AqBA/T65X8ilOiKwiNHVWrt
+lrCSF3sIgH8jTgIi3NkQligSrD1GgyBQV2jACjRKX9nijXu1xgTJ7gBzQTaZBw3Q
+xzqqDdKABtACzge4RhSgGkReRNFk8bz0qk6nsi1Eghe8SqtQfAgG0oJUIPXsBvnZ
+T0yA0CdUlpVAKT4y3rPQ/2CHV+gRyYhWC+MHAr1FUIFY5O7kd5QdyHO/rTT7qjsu
+LMJ2FT0phM4VyBEEX/bZXAAYc5wpdqbBSBPigKKcT9k1VpzKMkeOyHW8f3TRrmEm
+Bvd3x34FazBeiu5Mm+7k498RhmzgS9wxgOBRJBEQ2MsLFnR/U5avXFhkfFTIfVGW
+ne5o2nZXa4hI56JQxuSVatlr2vXFBzsVWVbK2TH1ABsLZ10nQln/xlvAvMBlfx+T
+m/bKt8y56lwkJWnYqAMmlYqs8ylw7AJJsITYpod/yKGKxKYnVwR6ZE9vLZM/9TpG
+H+hd/gFT3V8TQhV8YQpCN43h8y5LSspfLLGhl5C3jaCqW0+8nK4UPRb9eKEsPxyx
+zPpKsFG8seNaM3z24fqUYamqoGDkKZRzEXq5NCtoDLVgP8Kh1fUw4CVnTWTovK7W
+lFlYk05Y0WmjRKQZA8ChtLBdJzaXxJXprJGVmkDBBQldNq5LJYM=
+=qExQ
+-----END PGP SIGNATURE-----
+
+--d6Gm4EdcadzBjdND--
+
 
