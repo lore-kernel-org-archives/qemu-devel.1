@@ -2,91 +2,128 @@ Return-Path: <SRS0=bzpH=76=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4A19C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 07:34:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CE60C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 07:35:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6B7FE2082F
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 07:34:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CAC032082F
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 07:35:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FmnJML5Y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B7FE2082F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IqmP21YY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAC032082F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52636 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54050 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlSaU-000874-Nb
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 03:34:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41114)
+	id 1jlSb7-0000HC-1u
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 03:35:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42056)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jlSSM-0004uH-Rj; Wed, 17 Jun 2020 03:25:58 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:39863)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jlSSL-0002cF-80; Wed, 17 Jun 2020 03:25:58 -0400
-Received: by mail-wm1-x344.google.com with SMTP id t194so839813wmt.4;
- Wed, 17 Jun 2020 00:25:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=Xsx3rVy21mly30ECAO4zqqbSeNtihiVFwXLty9S11BE=;
- b=FmnJML5YCRErbI42yssQwWNRybu4/4kqZCImUOTsGw33xtHtQ+Rby5AY7QEucT6Y2E
- Wcf1ZxSzahKDDh++BD6N2BIPgrHk0nqjrrl9NLclCM443sepKJgHwjuXo8AGuQZ46vuc
- DTTVQZl2aiAeOK619/+Ec1J4ZjdT8pbbNmpYGxfVvi0/RJJ07DBxsSSJffeYi1/FK2rt
- xX0Lcp3CUUODyCfvAxCmA1SKetye5MILF1DiRRCV2BSue8k2sZIU3Qoop/g30zc1gZa8
- y//yq68hSHg2+jNQG8tjLPKKpxTLluRoF4xugEYp4qX7VkV0VVFiYiiXgo3CIyBwB9zj
- D44A==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jlSXZ-0005ww-PH
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 03:31:21 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:39280
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jlSXW-0003Z3-NY
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 03:31:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592379077;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=Aja4NuHhJlFz7WG3qt2uX1TgPVfWdbNdD9GnYJRHAfI=;
+ b=IqmP21YYrQg+dWD4BAxxyOmUCkF+CLr7W5bAyGcrJRozSYjsikW0rGAod/tBpnjLQx9GYz
+ XlY7hEtX/pPEmqUwnprOkXxDu9woZlcBTlgbn5YIiIbMuy86cUOCbY44dVOwO+2Ogr3ek6
+ 9JT3pxB9mI+3x2BSAkoCW35W/SWezJc=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-149-42aI74vLM5KU-veaJk9l1A-1; Wed, 17 Jun 2020 03:31:16 -0400
+X-MC-Unique: 42aI74vLM5KU-veaJk9l1A-1
+Received: by mail-wr1-f69.google.com with SMTP id p10so606071wrn.19
+ for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 00:31:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=Xsx3rVy21mly30ECAO4zqqbSeNtihiVFwXLty9S11BE=;
- b=CibrR2tvLRy8GeuOgGO/easpz1gOWlKkICibNjV6wF4eusffkIiqnYWiCx67Yo4yp0
- lXz0IuBxp5rAabGzCUm/bX42PaK5oNxPHbTicbfAs92a/bddjZq6/kNqT6gMMO1l9mUf
- CMHtKX2IfBkecQoBkokIpX5k5amMYfjuvp4h97XKFGtr+/1Ib1yYVGXVaVGJiVYzvwhS
- tPRY2AVJW2MJj/iqU2i2PP+Ppsvjjwdw94vmAlYEnG2SQB0h3fuMDJ4fYNkiJJ19xBiK
- sYUp+YWR4hM3lIrskfL0lUdSgcxAsXXDuEOX2wUWEZ5/ASnnGcVbPaf3YlrnXTksnV2b
- aW7w==
-X-Gm-Message-State: AOAM531IPcxh3Kbj1WgUDCcbDxvRXXNPsQ6oZ7Ehbu6pPQYS0iuorbvN
- ffTyUlIOH0LKchdYtcxinE46WnRp
-X-Google-Smtp-Source: ABdhPJzRV0KpfpqO2fN3+g+fRWn9aDkWPaO4SsOrMdCn3ImbHhLIlxY+RDRoJ1ATS4flteR5bn8IIg==
-X-Received: by 2002:a1c:1d49:: with SMTP id d70mr7140003wmd.49.1592378754981; 
- Wed, 17 Jun 2020 00:25:54 -0700 (PDT)
-Received: from localhost.localdomain (93.red-83-59-160.dynamicip.rima-tde.net.
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=Aja4NuHhJlFz7WG3qt2uX1TgPVfWdbNdD9GnYJRHAfI=;
+ b=hgN14Vxp2aG9FaWwf5j5WWDBfRZDaUDP06DAcuoUTr8i3ZPbLtbVPKV7lS1OrlsNek
+ eeqOLTKfHc9fVZjhWFVk1TvCdehIoBzPHHtxcaWBrS4i093leJjlyiW4XIsJ03hy1b+q
+ NeFIM5fyUtTRjZjEtPYBf3yoNS0Sv4A568Wk4lEygDnwZwsjuqIkWBsuXWGgAK4UF3QI
+ nIZCcYI2xzwd10jnV7HxhxBv0ccMOc9nAkH6UT31GWrojABqPYBtntokr2WT8KYoWQpx
+ uCtLmPgAtoUQ5BaMXQIX72WePlxd8lnSMpcQ2md8LfQDoEbupS3xMZvlgjzY7k7vFwVe
+ gzCw==
+X-Gm-Message-State: AOAM530LmMZcDCAJBeLD5uMYQfyOuRAjn4vwvG2+rlJDzEZ+IOMEU+sA
+ LE0x+i2vbzQkv2aBkSSPWCJ4aGexGFW7vONTy9mln+sQmTX4iBXUxwhN6BhlhuUs9Lo1bkQy4h+
+ ntV5hg+QfCX8M7f0=
+X-Received: by 2002:a5d:498f:: with SMTP id r15mr1213955wrq.175.1592379075065; 
+ Wed, 17 Jun 2020 00:31:15 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyGVl3PbewFzsjRvfUwl2EY/2hByG1gkMH63YQSiK/LwtRtnHYIBErA9q3uTwNUpKRBYSuBHg==
+X-Received: by 2002:a5d:498f:: with SMTP id r15mr1213924wrq.175.1592379074816; 
+ Wed, 17 Jun 2020 00:31:14 -0700 (PDT)
+Received: from [192.168.1.37] (93.red-83-59-160.dynamicip.rima-tde.net.
  [83.59.160.93])
- by smtp.gmail.com with ESMTPSA id j5sm32894781wrq.39.2020.06.17.00.25.54
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 17 Jun 2020 00:25:54 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 12/14] hw/arm/mps2: Add I2C devices
-Date: Wed, 17 Jun 2020 09:25:37 +0200
-Message-Id: <20200617072539.32686-13-f4bug@amsat.org>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200617072539.32686-1-f4bug@amsat.org>
-References: <20200617072539.32686-1-f4bug@amsat.org>
+ by smtp.gmail.com with ESMTPSA id v24sm5857660wrd.92.2020.06.17.00.31.13
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 17 Jun 2020 00:31:14 -0700 (PDT)
+Subject: Re: [PATCH v9 01/10] acpi: bios-tables-test: show more context on asl
+ diffs
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+References: <20200617071138.11159-1-kraxel@redhat.com>
+ <20200617071138.11159-2-kraxel@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <17c3a2b5-19a1-5335-eba7-f06714a41915@redhat.com>
+Date: Wed, 17 Jun 2020 09:31:12 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20200617071138.11159-2-kraxel@redhat.com>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::344;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x344.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/17 01:42:42
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -100,65 +137,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Esteban Bosse <estebanbosse@gmail.com>,
- Joaquin de Andres <me@xcancerberox.com.ar>, qemu-arm@nongnu.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Peter Maydell <peter.maydell@linaro.org>
+Cc: Laurent Vivier <lvivier@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ John Snow <jsnow@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From 'Application Note AN385', chapter 3.14:
+On 6/17/20 9:11 AM, Gerd Hoffmann wrote:
+> Makes it easier to create good commit messages from the logs.
+> 
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>  tests/qtest/bios-tables-test.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/tests/qtest/bios-tables-test.c b/tests/qtest/bios-tables-test.c
+> index b482f76c03d4..c315156858f4 100644
+> --- a/tests/qtest/bios-tables-test.c
+> +++ b/tests/qtest/bios-tables-test.c
+> @@ -469,7 +469,7 @@ static void test_acpi_asl(test_data *data)
+>                  fflush(stderr);
+>                  if (getenv("V")) {
+>                      const char *diff_env = getenv("DIFF");
+> -                    const char *diff_cmd = diff_env ? diff_env : "diff -u";
+> +                    const char *diff_cmd = diff_env ? diff_env : "diff -U 16";
+>                      char *diff = g_strdup_printf("%s %s %s", diff_cmd,
+>                                                   exp_sdt->asl_file, sdt->asl_file);
+>                      int out = dup(STDOUT_FILENO);
+> 
 
-  The SMM implements a simple SBCon interface based on I2C.
-
-There are 4 SBCon interfaces on the FPGA APB subsystem.
-
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- hw/arm/mps2.c  | 8 ++++++++
- hw/arm/Kconfig | 1 +
- 2 files changed, 9 insertions(+)
-
-diff --git a/hw/arm/mps2.c b/hw/arm/mps2.c
-index daa26f68d7..2f6acbf2c2 100644
---- a/hw/arm/mps2.c
-+++ b/hw/arm/mps2.c
-@@ -40,6 +40,7 @@
- #include "hw/misc/mps2-scc.h"
- #include "hw/misc/mps2-fpgaio.h"
- #include "hw/ssi/pl022.h"
-+#include "hw/i2c/arm_sbcon_i2c.h"
- #include "hw/net/lan9118.h"
- #include "net/net.h"
- #include "hw/watchdog/cmsdk-apb-watchdog.h"
-@@ -365,6 +366,13 @@ static void mps2_common_init(MachineState *machine)
-                                  qdev_get_gpio_in(orgate_dev, j));
-         }
-     }
-+    for (i = 0; i < 4; i++) {
-+        static const hwaddr i2cbase[] = {0x40022000,    /* Touch */
-+                                         0x40023000,    /* Audio */
-+                                         0x40029000,    /* Shield0 */
-+                                         0x4002a000};   /* Shield1 */
-+        sysbus_create_simple(TYPE_ARM_SBCON_I2C, i2cbase[i], NULL);
-+    }
- 
-     /* In hardware this is a LAN9220; the LAN9118 is software compatible
-      * except that it doesn't support the checksum-offload feature.
-diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-index 90ed584e7a..4a224a6351 100644
---- a/hw/arm/Kconfig
-+++ b/hw/arm/Kconfig
-@@ -406,6 +406,7 @@ config MPS2
-     select SPLIT_IRQ
-     select UNIMP
-     select CMSDK_APB_WATCHDOG
-+    select VERSATILE_I2C
- 
- config FSL_IMX7
-     bool
--- 
-2.21.3
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
 
