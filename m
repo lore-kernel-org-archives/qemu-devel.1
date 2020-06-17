@@ -2,93 +2,93 @@ Return-Path: <SRS0=bzpH=76=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB00BC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 21:43:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7952CC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 21:43:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 75C512166E
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 21:43:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 412212184D
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 21:43:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Eh/bHDa9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 75C512166E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nbqe93r9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 412212184D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37832 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39182 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlfqD-0001AV-LW
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 17:43:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45886)
+	id 1jlfqQ-0001iH-Fw
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 17:43:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37978)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=430b82a1d=dmitry.fomichev@wdc.com>)
- id 1jlfhc-0003aJ-HV; Wed, 17 Jun 2020 17:34:36 -0400
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:29837)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=430b82a1d=dmitry.fomichev@wdc.com>)
- id 1jlfha-0005DU-GZ; Wed, 17 Jun 2020 17:34:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1592429674; x=1623965674;
- h=from:to:cc:subject:date:message-id:in-reply-to:
- references:mime-version:content-transfer-encoding;
- bh=HX0mScZJawcN1wtB9oGEysO0x6z2NlfQ4Kuhi3c7Lc4=;
- b=Eh/bHDa9a6NU+Sel6hOZrVl4mBqP/W5eHA3oC9SzH3/Y86QDK/4eK4SR
- qyY/tOAVEtlZbcDyPdDyaOztkM2+rppgD4ljrY8hXaQwQZoJwWJbKMBrE
- rAsvmRhDuuXNFvIiQXEMoKG9n4gcoYIFLrpYv3Jd46lZbA15DaRpvvsNn
- KSYouSAr0PTNEoauXjPNH1T6mbYG65NRF7lM22zfaLLrO65/TOPA1gjTu
- o/7zWReE+d0BLkrYeMG07yKAuHvgNnauCopQsGa/c8RJNt8/isaW8fDgS
- hoHCgkw/qvGA4LykNopc2EV/4AzFQYNhrARTPY75/roNFau7mx8+6SQFk w==;
-IronPort-SDR: BrP0Rqx8XR2iFlC8/uM/E7C63R9Pdbsz1J12hQJ7mFys7H5/267NCnj3dovbF40pWnjKFyce68
- GaF3cdFiU8W+ZFp3NFDfRHFh4K5hgBEpRPWSqj0T89ZC7vrRkiZR7/tP/JBUC5ab/EvmxLHGil
- SxzQULDpn5jxLXEjH9VR/tLiiyay21OOnNX0dqiP8n3MN87o3GNArq/CCLePuprzLa6xxNT+mw
- elhsbHwSjq21bbH/ob0VtUFXBlobUciql7oDw7LFs1IdoTKaJ888dK+xmfqdHEHQDYJn94ZV5D
- wC8=
-X-IronPort-AV: E=Sophos;i="5.73,523,1583164800"; d="scan'208";a="249439785"
-Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com)
- ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 18 Jun 2020 05:34:29 +0800
-IronPort-SDR: /D740RNZ+/o95QDVBz+NtJBapa9cOrsKn3ALo0NI+Dd8rm9BriWq0fY1xkOTiXDOeg1/mVS7b8
- ql4I0V9/Goufphq3dzQhbc+5jvQazQu0A=
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
- by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 17 Jun 2020 14:23:10 -0700
-IronPort-SDR: J6Yy+/u7Zf4QYayjkB5TSGeNs1zv8i7x01rSLal/98U2I8r9u1wifM1L/2YRCvuLVQhRPFsK72
- ZVz+W+yinV6A==
-WDCIronportException: Internal
-Received: from unknown (HELO redsun50.ssa.fujisawa.hgst.com) ([10.149.66.24])
- by uls-op-cesaip02.wdc.com with ESMTP; 17 Jun 2020 14:34:28 -0700
-From: Dmitry Fomichev <dmitry.fomichev@wdc.com>
-To: Kevin Wolf <kwolf@redhat.com>, Keith Busch <kbusch@kernel.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Maxim Levitsky <mlevitsky@redhat.com>
-Subject: [PATCH v2 01/18] hw/block/nvme: Move NvmeRequest has_sg field to a
- bit flag
-Date: Thu, 18 Jun 2020 06:33:58 +0900
-Message-Id: <20200617213415.22417-2-dmitry.fomichev@wdc.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20200617213415.22417-1-dmitry.fomichev@wdc.com>
-References: <20200617213415.22417-1-dmitry.fomichev@wdc.com>
+ (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
+ id 1jlfEk-0004Oo-8w
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 17:04:46 -0400
+Received: from mail-qt1-x842.google.com ([2607:f8b0:4864:20::842]:42453)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
+ id 1jlfEd-0000Mu-F9
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 17:04:45 -0400
+Received: by mail-qt1-x842.google.com with SMTP id q14so2744727qtr.9
+ for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 14:04:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=NQ/BbjaNmbkm5KQOy7Vv4O17R/NYOg7qZF+hAsl6NgU=;
+ b=nbqe93r9K4U8lYPXg4i1bJG9LdCn/l8r2IMJNiRx8Jo2MrIeaa7KCf6eUKyjziJAUy
+ iM4JsruncRAxUF0U9DVKp0vwdwlty8EHiiMWthQVW85QP9/AtlvCe5n+SKgQlbwCLGHm
+ Ge5UPlXyvV9K6vIDCsPXRZZD//DzigbXygtmg/o2F7gKNkCvty/aInxu3r046SANPoG+
+ Jj4Cy7BEB9XK+j5E+1jd8vFEEwHc9T27+lNyhOUGkGigbrnQxM3bZiNgbmNnzAiemW4z
+ JC1nePJWOxnXi/AOZHXdZRY0cJs7BcZZzP/d/rDzhP+9HFqkAcfqR0E3g3Bo1kPxinGI
+ kvZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=NQ/BbjaNmbkm5KQOy7Vv4O17R/NYOg7qZF+hAsl6NgU=;
+ b=EEzbYXvWn2mpcPl6l5z39TjiXQv+kPfRJ+aOLiWRTyvDBygr8OKW5MaDgry9F4ujjD
+ cOBwUnsXMJGaYqrdHKnWYQaXAk+bbVcAXctWUSBTT36zgO4HiA8VW14m0kQbUVKjeevj
+ 3u83BtxWaOOmEcrkfSoHY+9BW+bPNal+31RxrlbLq3tWMCnOo+XFW24Dy1zW637TblJg
+ snRhGYibwlucull8Y6d7nicSltT0VvZUvFDGZWxRfIDMu1qRD4eM1iGZwq2FRyguxOdy
+ GAid5MYd3K/H6eOsNoIeONCO7yBVegxqfrHa7zGgsYpMaoIXTQR4HfsSqboZKQUMypKH
+ mA4g==
+X-Gm-Message-State: AOAM533LPy01p2tqibWjDe/mllC6Zkl0LQ2Y6VfuUFk5gBjPNODmDRNt
+ D7uQpydQTM6bEWaBB8jlde2O3w9qn7C1fA==
+X-Google-Smtp-Source: ABdhPJwx3BgYdlywnyjqWo0ZkR2Ounnd6fxtCLVwk8+Po16TZ3taU3TarQuhJEW97IazglhYl87rGQ==
+X-Received: by 2002:ac8:7a90:: with SMTP id x16mr1084555qtr.233.1592427878391; 
+ Wed, 17 Jun 2020 14:04:38 -0700 (PDT)
+Received: from Rfoley-MA01.hsd1.ma.comcast.net
+ ([2601:199:4480:60c0:fc79:714c:9711:2e9c])
+ by smtp.gmail.com with ESMTPSA id w13sm997245qkb.91.2020.06.17.14.04.37
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 17 Jun 2020 14:04:37 -0700 (PDT)
+From: Robert Foley <robert.foley@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v10 57/73] unicore32: convert to cpu_interrupt_request
+Date: Wed, 17 Jun 2020 17:02:15 -0400
+Message-Id: <20200617210231.4393-58-robert.foley@linaro.org>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200617210231.4393-1-robert.foley@linaro.org>
+References: <20200617210231.4393-1-robert.foley@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=68.232.141.245;
- envelope-from=prvs=430b82a1d=dmitry.fomichev@wdc.com; helo=esa1.hgst.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/17 17:34:28
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
-X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+Received-SPF: pass client-ip=2607:f8b0:4864:20::842;
+ envelope-from=robert.foley@linaro.org; helo=mail-qt1-x842.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,100 +101,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Niklas Cassel <niklas.cassel@wdc.com>,
- Damien Le Moal <damien.lemoal@wdc.com>, qemu-block@nongnu.org,
- Dmitry Fomichev <dmitry.fomichev@wdc.com>, qemu-devel@nongnu.org,
- Matias Bjorling <matias.bjorling@wdc.com>
+Cc: Guan Xuetao <gxt@mprc.pku.edu.cn>, peter.puhov@linaro.org, cota@braap.org,
+ alex.bennee@linaro.org, robert.foley@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In addition to the existing has_sg flag, a few more Boolean
-NvmeRequest flags are going to be introduced in subsequent patches.
-Convert "has_sg" variable to "flags" and define NvmeRequestFlags
-enum for individual flag values.
+From: "Emilio G. Cota" <cota@braap.org>
 
-Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+Cc: Guan Xuetao <gxt@mprc.pku.edu.cn>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Signed-off-by: Emilio G. Cota <cota@braap.org>
+Signed-off-by: Robert Foley <robert.foley@linaro.org>
 ---
- hw/block/nvme.c | 8 +++-----
- hw/block/nvme.h | 6 +++++-
- 2 files changed, 8 insertions(+), 6 deletions(-)
+ target/unicore32/cpu.c     | 2 +-
+ target/unicore32/softmmu.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 1aee042d4c..3ed9f3d321 100644
---- a/hw/block/nvme.c
-+++ b/hw/block/nvme.c
-@@ -350,7 +350,7 @@ static void nvme_rw_cb(void *opaque, int ret)
-         block_acct_failed(blk_get_stats(n->conf.blk), &req->acct);
-         req->status = NVME_INTERNAL_DEV_ERROR;
-     }
--    if (req->has_sg) {
-+    if (req->flags & NVME_REQ_FLG_HAS_SG) {
-         qemu_sglist_destroy(&req->qsg);
-     }
-     nvme_enqueue_req_completion(cq, req);
-@@ -359,7 +359,6 @@ static void nvme_rw_cb(void *opaque, int ret)
- static uint16_t nvme_flush(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd *cmd,
-     NvmeRequest *req)
+diff --git a/target/unicore32/cpu.c b/target/unicore32/cpu.c
+index b27fb9689f..06bf4b4b63 100644
+--- a/target/unicore32/cpu.c
++++ b/target/unicore32/cpu.c
+@@ -27,7 +27,7 @@ static void uc32_cpu_set_pc(CPUState *cs, vaddr value)
+ 
+ static bool uc32_cpu_has_work(CPUState *cs)
  {
--    req->has_sg = false;
-     block_acct_start(blk_get_stats(n->conf.blk), &req->acct, 0,
-          BLOCK_ACCT_FLUSH);
-     req->aiocb = blk_aio_flush(n->conf.blk, nvme_rw_cb, req);
-@@ -383,7 +382,6 @@ static uint16_t nvme_write_zeros(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd *cmd,
-         return NVME_LBA_RANGE | NVME_DNR;
-     }
+-    return cs->interrupt_request &
++    return cpu_interrupt_request(cs) &
+         (CPU_INTERRUPT_HARD | CPU_INTERRUPT_EXITTB);
+ }
  
--    req->has_sg = false;
-     block_acct_start(blk_get_stats(n->conf.blk), &req->acct, 0,
-                      BLOCK_ACCT_WRITE);
-     req->aiocb = blk_aio_pwrite_zeroes(n->conf.blk, offset, count,
-@@ -422,14 +420,13 @@ static uint16_t nvme_rw(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd *cmd,
+diff --git a/target/unicore32/softmmu.c b/target/unicore32/softmmu.c
+index cbdaa500b7..9660bd2a27 100644
+--- a/target/unicore32/softmmu.c
++++ b/target/unicore32/softmmu.c
+@@ -117,7 +117,7 @@ void uc32_cpu_do_interrupt(CPUState *cs)
+     /* The PC already points to the proper instruction.  */
+     env->regs[30] = env->regs[31];
+     env->regs[31] = addr;
+-    cs->interrupt_request |= CPU_INTERRUPT_EXITTB;
++    cpu_interrupt_request_or(cs, CPU_INTERRUPT_EXITTB);
+ }
  
-     dma_acct_start(n->conf.blk, &req->acct, &req->qsg, acct);
-     if (req->qsg.nsg > 0) {
--        req->has_sg = true;
-+        req->flags |= NVME_REQ_FLG_HAS_SG;
-         req->aiocb = is_write ?
-             dma_blk_write(n->conf.blk, &req->qsg, data_offset, BDRV_SECTOR_SIZE,
-                           nvme_rw_cb, req) :
-             dma_blk_read(n->conf.blk, &req->qsg, data_offset, BDRV_SECTOR_SIZE,
-                          nvme_rw_cb, req);
-     } else {
--        req->has_sg = false;
-         req->aiocb = is_write ?
-             blk_aio_pwritev(n->conf.blk, data_offset, &req->iov, 0, nvme_rw_cb,
-                             req) :
-@@ -917,6 +914,7 @@ static void nvme_process_sq(void *opaque)
-         QTAILQ_REMOVE(&sq->req_list, req, entry);
-         QTAILQ_INSERT_TAIL(&sq->out_req_list, req, entry);
-         memset(&req->cqe, 0, sizeof(req->cqe));
-+        req->flags = 0;
-         req->cqe.cid = cmd.cid;
- 
-         status = sq->sqid ? nvme_io_cmd(n, &cmd, req) :
-diff --git a/hw/block/nvme.h b/hw/block/nvme.h
-index 1d30c0bca2..0460cc0e62 100644
---- a/hw/block/nvme.h
-+++ b/hw/block/nvme.h
-@@ -16,11 +16,15 @@ typedef struct NvmeAsyncEvent {
-     NvmeAerResult result;
- } NvmeAsyncEvent;
- 
-+enum NvmeRequestFlags {
-+    NVME_REQ_FLG_HAS_SG   = 1 << 0,
-+};
-+
- typedef struct NvmeRequest {
-     struct NvmeSQueue       *sq;
-     BlockAIOCB              *aiocb;
-     uint16_t                status;
--    bool                    has_sg;
-+    uint16_t                flags;
-     NvmeCqe                 cqe;
-     BlockAcctCookie         acct;
-     QEMUSGList              qsg;
+ static int get_phys_addr_ucv2(CPUUniCore32State *env, uint32_t address,
 -- 
-2.21.0
+2.17.1
 
 
