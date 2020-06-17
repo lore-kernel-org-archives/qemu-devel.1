@@ -2,87 +2,74 @@ Return-Path: <SRS0=bzpH=76=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.2 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0835C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 15:59:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD0B7C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 16:04:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 78FA32088E
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 15:59:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78FA32088E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=canonical.com
+	by mail.kernel.org (Postfix) with ESMTPS id 771E0214DB
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 16:04:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 771E0214DB
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44024 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55014 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlaTF-0003YE-Pt
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 11:59:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33906)
+	id 1jlaXt-0000RA-UC
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 12:04:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34926)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <guilherme.piccoli@canonical.com>)
- id 1jlaSO-0002fN-Sw
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 11:58:32 -0400
-Received: from youngberry.canonical.com ([91.189.89.112]:59375)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_CBC_SHA1:128)
- (Exim 4.90_1) (envelope-from <guilherme.piccoli@canonical.com>)
- id 1jlaSM-0006ZY-Ra
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 11:58:32 -0400
-Received: from mail-ej1-f72.google.com ([209.85.218.72])
- by youngberry.canonical.com with esmtps
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.86_2)
- (envelope-from <guilherme.piccoli@canonical.com>) id 1jlaSK-0003rE-Ro
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 15:58:28 +0000
-Received: by mail-ej1-f72.google.com with SMTP id bg25so1314413ejb.12
- for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 08:58:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=RdHGnEjlH+Mi5ZqYwppp48TZAEiD+1F8zacrTigiN+Y=;
- b=K7bFW0ZnERYYnJWmRoFew9RByRxDzGOdcR92NI9gAwTLatEt39/aZPlk3hEZRXICAt
- lSjtxHvw4+lR9UjmF1MMA/IdUlN/iu7xgcTf9rwG7JrpR9iXPDA5EzVo1gxp35VVhXkV
- YiKfq0DVWvKJsuI7/3oigN29iWG4JkuTxb1wW1KSoGDIi32XLK6b+NMYOs3iB1emER0L
- 6G9fdsSnZg0PGzm3c400Lucr0WxMopEXaw6nl6MVHrn2sWNbzNNkV/Dl98C8ybYRkZql
- kkQZogVmNLge83g2pHctp31HFAE0uCU3JhoQAwm+rI9nBc5JlgPrTnKkbaijNf1Gm2OQ
- 2Crw==
-X-Gm-Message-State: AOAM531GAzm5hWreVteDECZKcUq/3yPwBCoQgI3Zr1yiT3XbogkaqgaV
- tOS7WijZ9mXtTth2XlIRnlaEZ5b7gOfVKXSVYtvAp9YECPuqRFqJPoHJKkkF1aT58/X7nV/s3E6
- KOCV+H9FSHNFicxR9YR5Wj1c1o15kvClnR1BmgaCEI0S9gfSE
-X-Received: by 2002:a50:ee08:: with SMTP id g8mr7574028eds.267.1592409508458; 
- Wed, 17 Jun 2020 08:58:28 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwQcRWOWbV2cVIXJITXzfVmVlX5/ggUXb9oeLo+NNx/O4Zt/YpMA1PBUYxe0pB2iKZvnjcKrx9npw8slXqdTh0=
-X-Received: by 2002:a50:ee08:: with SMTP id g8mr7574006eds.267.1592409508198; 
- Wed, 17 Jun 2020 08:58:28 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jlaVZ-00079E-8v
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 12:01:49 -0400
+Received: from 6.mo69.mail-out.ovh.net ([46.105.50.107]:42750)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jlaVV-0007Hh-Sg
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 12:01:48 -0400
+Received: from player795.ha.ovh.net (unknown [10.108.54.97])
+ by mo69.mail-out.ovh.net (Postfix) with ESMTP id EE6E495B0C
+ for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 18:01:42 +0200 (CEST)
+Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
+ (Authenticated sender: clg@kaod.org)
+ by player795.ha.ovh.net (Postfix) with ESMTPSA id C40EA1357EE11;
+ Wed, 17 Jun 2020 16:01:35 +0000 (UTC)
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-99G0034e7f565b-cbdf-4213-8b32-551d6ff33c67,ABECD89738EEB0C75E5395B338997A57DB3A3EEE)
+ smtp.auth=clg@kaod.org
+Subject: Re: [PATCH v2 07/12] hw/arm: Load -bios image as a boot ROM for
+ npcm7xx
+To: Havard Skinnemoen <hskinnemoen@google.com>, peter.maydell@linaro.org,
+ joel@jms.id.au
+References: <20200611223016.259837-1-hskinnemoen@google.com>
+ <20200611223016.259837-8-hskinnemoen@google.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <220ce5b8-ab7e-4ba5-3fb0-53855a474319@kaod.org>
+Date: Wed, 17 Jun 2020 18:01:34 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-References: <99779e9c-f05f-501b-b4be-ff719f140a88@canonical.com>
- <20200616165043.24y2cp53axk7uggy@sirius.home.kraxel.org>
- <20200616165746.GH2788@work-vm>
- <CAHD1Q_zGu4Q63HjHx3aZKu3wh8NppuP6T4kgnUN3j=-ZDufVZA@mail.gmail.com>
- <b423f4a4-2552-bdc8-7c9f-41f200aef672@redhat.com>
- <20200617134652.GE2776@work-vm>
- <20200617154959.GZ2366737@habkost.net>
-In-Reply-To: <20200617154959.GZ2366737@habkost.net>
-From: Guilherme Piccoli <gpiccoli@canonical.com>
-Date: Wed, 17 Jun 2020 12:57:52 -0300
-Message-ID: <CAHD1Q_z7E79HwCeFEg8yQOUGsOZRQuhL-zc4RXJdubT3eYp+NA@mail.gmail.com>
-Subject: Re: ovmf / PCI passthrough impaired due to very limiting PCI64
- aperture
-To: Eduardo Habkost <ehabkost@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: none client-ip=91.189.89.112;
- envelope-from=guilherme.piccoli@canonical.com; helo=youngberry.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/17 11:58:29
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10
-X-Spam_score_int: -68
-X-Spam_score: -6.9
-X-Spam_bar: ------
-X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200611223016.259837-8-hskinnemoen@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 4496281279479057321
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedrudejvddgleeiucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfesthejredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeeiheejleefudegleegudduhfeuueevteefveekudeuvdelieeuvdefteeludegvdenucffohhmrghinhepghhithhhuhgsrdgtohhmnecukfhppedtrddtrddtrddtpdekvddrieegrddvhedtrddujedtnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeelhedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
+Received-SPF: pass client-ip=46.105.50.107; envelope-from=clg@kaod.org;
+ helo=6.mo69.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/17 12:01:43
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,80 +82,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Pedro Principeza <pedro.principeza@canonical.com>,
- Dann Frazier <dann.frazier@canonical.com>, qemu-devel@nongnu.org,
- Christian Ehrhardt <christian.ehrhardt@canonical.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
- fw@gpiccoli.net
+Cc: kfting@nuvoton.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org,
+ Avi.Fishman@nuvoton.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Can't qemu reads the host physical bits and pass that as fw_cfg as
-"real_host_physbits" or something like that?
-OVMF could rely on that - if such property is available, we use it to
-extend the PCI64 aperture.
+On 6/12/20 12:30 AM, Havard Skinnemoen wrote:
+> If a -bios option is specified on the command line, load the image into
+> the internal ROM memory region, which contains the first instructions
+> run by the CPU after reset.
+> 
+> A minimal Apache-2.0-licensed boot ROM can be found at
+> 
+> https://github.com/google/vbootrom
 
-On Wed, Jun 17, 2020 at 12:50 PM Eduardo Habkost <ehabkost@redhat.com> wrote:
->
-> On Wed, Jun 17, 2020 at 02:46:52PM +0100, Dr. David Alan Gilbert wrote:
-> > * Laszlo Ersek (lersek@redhat.com) wrote:
-> > > On 06/16/20 19:14, Guilherme Piccoli wrote:
-> > > > Thanks Gerd, Dave and Eduardo for the prompt responses!
-> > > >
-> > > > So, I understand that when we use "-host-physical-bits", we are
-> > > > passing the *real* number for the guest, correct? So, in this case we
-> > > > can trust that the guest physbits matches the true host physbits.
-> > > >
-> > > > What if then we have OVMF relying in the physbits *iff*
-> > > > "-host-phys-bits" is used (which is the default in RH and a possible
-> > > > machine configuration on libvirt XML in Ubuntu), and we have OVMF
-> > > > fallbacks to 36-bit otherwise?
-> > >
-> > > I've now read the commit message on QEMU commit 258fe08bd341d, and the
-> > > complexity is simply stunning.
-> > >
-> > > Right now, OVMF calculates the guest physical address space size from
-> > > various range sizes (such as hotplug memory area end, default or
-> > > user-configured PCI64 MMIO aperture), and derives the minimum suitable
-> > > guest-phys address width from that address space size. This width is
-> > > then exposed to the rest of the firmware with the CPU HOB (hand-off
-> > > block), which in turn controls how the GCD (global coherency domain)
-> > > memory space map is sized. Etc.
-> > >
-> > > If QEMU can provide a *reliable* GPA width, in some info channel (CPUID
-> > > or even fw_cfg), then the above calculation could be reversed in OVMF.
-> > > We could take the width as a given (-> produce the CPU HOB directly),
-> > > plus calculate the *remaining* address space between the GPA space size
-> > > given by the width, and the end of the memory hotplug area end. If the
-> > > "remaining size" were negative, then obviously QEMU would have been
-> > > misconfigured, so we'd halt the boot. Otherwise, the remaining area
-> > > could be used as PCI64 MMIO aperture (PEI memory footprint of DXE page
-> > > tables be darned).
-> > >
-> > > > Now, regarding the problem "to trust or not" in the guests' physbits,
-> > > > I think it's an orthogonal discussion to some extent. It'd be nice to
-> > > > have that check, and as Eduardo said, prevent migration in such cases.
-> > > > But it's not really preventing OVMF big PCI64 aperture if we only
-> > > > increase the aperture _when  "-host-physical-bits" is used_.
-> > >
-> > > I don't know what exactly those flags do, but I doubt they are clearly
-> > > visible to OVMF in any particular way.
-> >
-> > The firmware should trust whatever it reads from the cpuid and thus gets
-> > told from qemu; if qemu is doing the wrong thing there then that's our
-> > problem and we need to fix it in qemu.
->
-> It is impossible to provide a MAXPHYADDR that the guest can trust
-> unconditionally and allow live migration to hosts with different
-> sizes at the same time.
->
-> Unless we want to drop support live migration to hosts with
-> different sizes entirely, we need additional bits to tell the
-> guest how much it can trust MAXPHYADDR.
->
-> --
-> Eduardo
->
+you might want to consider adding this rom to QEMU also.
+
+
+> 
+> It is by no means feature complete, but it is enough to launch the
+> Nuvoton bootblock[1] from offset 0 in the flash, which in turn will
+> launch u-boot and finally the Linux kernel.
+> 
+> [1] https://github.com/Nuvoton-Israel/bootblock
+> 
+> Change-Id: I41eae4fc7786d33f532c14087e930bf1b5012562
+> Reviewed-by: Tyrone Ting <kfting@nuvoton.com>
+> Signed-off-by: Havard Skinnemoen <hskinnemoen@google.com>
+> ---
+>  hw/arm/npcm7xx.c | 17 +++++++++++++++++
+>  1 file changed, 17 insertions(+)
+> 
+> diff --git a/hw/arm/npcm7xx.c b/hw/arm/npcm7xx.c
+> index a5dbf08c00..417bc16b5c 100644
+> --- a/hw/arm/npcm7xx.c
+> +++ b/hw/arm/npcm7xx.c
+> @@ -22,6 +22,7 @@
+>  #include "hw/misc/unimp.h"
+>  #include "hw/qdev-properties.h"
+>  #include "qapi/error.h"
+> +#include "qemu-common.h"
+>  #include "qemu/units.h"
+>  #include "sysemu/sysemu.h"
+>  
+> @@ -270,6 +271,22 @@ static void npcm7xx_realize(DeviceState *dev, Error **errp)
+>      }
+>      memory_region_add_subregion(get_system_memory(), NPCM7XX_ROM_BA, &s->irom);
+>  
+> +    if (bios_name) {
+> +        g_autofree char *filename = NULL;
+> +        int ret;
+> +
+> +        filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
+> +        if (!filename) {
+> +            error_setg(errp, "Could not find ROM image '%s'", bios_name);
+> +            return;
+> +        }
+> +        ret = load_image_mr(filename, &s->irom);
+> +        if (ret < 0) {
+> +            error_setg(errp, "Failed to load ROM image '%s'", filename);
+> +            return;
+> +        }
+> +    }
+> +
+
+I think this belongs to the machine init routine and not the soc.
+
+
+
+>      /* External DDR4 SDRAM */
+>      memory_region_add_subregion(get_system_memory(), NPCM7XX_DRAM_BA, s->dram);
+>  }
+> 
+
 
