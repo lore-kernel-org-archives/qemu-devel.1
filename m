@@ -2,93 +2,87 @@ Return-Path: <SRS0=bzpH=76=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MIME_BASE64_TEXT,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33108C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 13:25:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 987ABC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 13:25:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B0D6A2098B
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 13:25:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 62F5220776
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 13:25:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fzt5x5fq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0D6A2098B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F4ZOQbAw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62F5220776
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49840 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51320 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlY3o-0007Am-OP
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 09:25:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47522)
+	id 1jlY4G-0007oQ-LC
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 09:25:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47732)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1jlY1L-0002QT-FD
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 09:22:27 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:60840
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1jlY1l-0003Sk-W8
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 09:22:54 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:59608
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1jlY1J-0002mg-Mg
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 09:22:27 -0400
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1jlY1k-0002pF-75
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 09:22:53 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592400144;
+ s=mimecast20190719; t=1592400171;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=K2SBP6a1z0dUKyuD0olAqNbYLoktiboiVDHT2R1YbQU=;
- b=Fzt5x5fqe5XHfKNcuSai6sT3uSBUTkidTkU7MkLLLqJKC+QAf4nvBiqakCD6q8Fo+Na/B8
- CFVcY/m/Fd/g4Oic+0WN47DysE85HuLDZGrTIGdzFbnUXT18L3xFfQfc0+fJPN6txPHHYB
- I0Acb/hxyZ7y8gkUCEk8WXAA7+Pgx+E=
+ bh=lR/k1D/XYcyJlkFDGtC1hOQ5mxrMAx0aIUiurKD/Ar8=;
+ b=F4ZOQbAwqsmvTnOQ/WDwHwPWZebmj74wcll0Tw+nMAX6BaNtK+7J4xJhD51S/Zy+kZx17F
+ /VqV3g5VrqwsN8QQO8IR3KSkMgqIXYspvHrMd1jb8OjQEjZZ/BBHte7jz4vQnJmwM6uQ1Q
+ zSl3MXfe3N46BpDfNR9iojNpcLKezVE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-185-v55-ovlkNXmYeGHVSI4Bjg-1; Wed, 17 Jun 2020 09:22:19 -0400
-X-MC-Unique: v55-ovlkNXmYeGHVSI4Bjg-1
+ us-mta-331-3LWyjl0iOj2tRpzacgjA8g-1; Wed, 17 Jun 2020 09:22:47 -0400
+X-MC-Unique: 3LWyjl0iOj2tRpzacgjA8g-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3338C80F5DC;
- Wed, 17 Jun 2020 13:22:18 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-115-92.ams2.redhat.com
- [10.36.115.92])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9985D5D9E5;
- Wed, 17 Jun 2020 13:22:11 +0000 (UTC)
-Subject: Re: ovmf / PCI passthrough impaired due to very limiting PCI64
- aperture
-To: Guilherme Piccoli <gpiccoli@canonical.com>,
- Gerd Hoffmann <kraxel@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-References: <99779e9c-f05f-501b-b4be-ff719f140a88@canonical.com>
- <20200616165043.24y2cp53axk7uggy@sirius.home.kraxel.org>
- <20200616165746.GH2788@work-vm>
- <CAHD1Q_zGu4Q63HjHx3aZKu3wh8NppuP6T4kgnUN3j=-ZDufVZA@mail.gmail.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <b423f4a4-2552-bdc8-7c9f-41f200aef672@redhat.com>
-Date: Wed, 17 Jun 2020 15:22:10 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Firefox/52.0 Thunderbird/52.9.1
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 96A6E80F5D8;
+ Wed, 17 Jun 2020 13:22:46 +0000 (UTC)
+Received: from localhost (ovpn-114-151.ams2.redhat.com [10.36.114.151])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A3E795D9D3;
+ Wed, 17 Jun 2020 13:22:37 +0000 (UTC)
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 7/7] block/nvme: support nested aio_poll()
+Date: Wed, 17 Jun 2020 14:22:01 +0100
+Message-Id: <20200617132201.1832152-8-stefanha@redhat.com>
+In-Reply-To: <20200617132201.1832152-1-stefanha@redhat.com>
+References: <20200617132201.1832152-1-stefanha@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAHD1Q_zGu4Q63HjHx3aZKu3wh8NppuP6T4kgnUN3j=-ZDufVZA@mail.gmail.com>
-Content-Language: en-US
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=lersek@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/17 01:42:42
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: base64
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=stefanha@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/17 01:42:04
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -13
+X-Spam_score: -1.4
+X-Spam_bar: -
+X-Spam_report: (-1.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ MIME_BASE64_TEXT=1.741, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01,
+ RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,56 +95,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Pedro Principeza <pedro.principeza@canonical.com>, ehabkost@redhat.com,
- Dann Frazier <dann.frazier@canonical.com>, qemu-devel@nongnu.org,
- Christian Ehrhardt <christian.ehrhardt@canonical.com>, fw@gpiccoli.net
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Sergio Lopez <slp@redhat.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 06/16/20 19:14, Guilherme Piccoli wrote:
-> Thanks Gerd, Dave and Eduardo for the prompt responses!
-> 
-> So, I understand that when we use "-host-physical-bits", we are
-> passing the *real* number for the guest, correct? So, in this case we
-> can trust that the guest physbits matches the true host physbits.
-> 
-> What if then we have OVMF relying in the physbits *iff*
-> "-host-phys-bits" is used (which is the default in RH and a possible
-> machine configuration on libvirt XML in Ubuntu), and we have OVMF
-> fallbacks to 36-bit otherwise?
-
-I've now read the commit message on QEMU commit 258fe08bd341d, and the
-complexity is simply stunning.
-
-Right now, OVMF calculates the guest physical address space size from
-various range sizes (such as hotplug memory area end, default or
-user-configured PCI64 MMIO aperture), and derives the minimum suitable
-guest-phys address width from that address space size. This width is
-then exposed to the rest of the firmware with the CPU HOB (hand-off
-block), which in turn controls how the GCD (global coherency domain)
-memory space map is sized. Etc.
-
-If QEMU can provide a *reliable* GPA width, in some info channel (CPUID
-or even fw_cfg), then the above calculation could be reversed in OVMF.
-We could take the width as a given (-> produce the CPU HOB directly),
-plus calculate the *remaining* address space between the GPA space size
-given by the width, and the end of the memory hotplug area end. If the
-"remaining size" were negative, then obviously QEMU would have been
-misconfigured, so we'd halt the boot. Otherwise, the remaining area
-could be used as PCI64 MMIO aperture (PEI memory footprint of DXE page
-tables be darned).
-
-> Now, regarding the problem "to trust or not" in the guests' physbits,
-> I think it's an orthogonal discussion to some extent. It'd be nice to
-> have that check, and as Eduardo said, prevent migration in such cases.
-> But it's not really preventing OVMF big PCI64 aperture if we only
-> increase the aperture _when  "-host-physical-bits" is used_.
-
-I don't know what exactly those flags do, but I doubt they are clearly
-visible to OVMF in any particular way.
-
-Thanks
-Laszlo
+UUVNVSBibG9jayBkcml2ZXJzIGFyZSBzdXBwb3NlZCB0byBzdXBwb3J0IGFpb19wb2xsKCkgZnJv
+bSBJL08KY29tcGxldGlvbiBjYWxsYmFjayBmdW5jdGlvbnMuIFRoaXMgbWVhbnMgY29tcGxldGlv
+biBwcm9jZXNzaW5nIG11c3QgYmUKcmUtZW50cmFudC4KClRoZSBzdGFuZGFyZCBhcHByb2FjaCBp
+cyB0byBzY2hlZHVsZSBhIEJIIGR1cmluZyBjb21wbGV0aW9uIHByb2Nlc3NpbmcKYW5kIGNhbmNl
+bCBpdCBhdCB0aGUgZW5kIG9mIHByb2Nlc3NpbmcuIElmIGFpb19wb2xsKCkgaXMgaW52b2tlZCBi
+eSBhCmNhbGxiYWNrIGZ1bmN0aW9uIHRoZW4gdGhlIEJIIHdpbGwgcnVuLiBUaGUgQkggY29udGlu
+dWVzIHRoZSBzdXNwZW5kZWQKY29tcGxldGlvbiBwcm9jZXNzaW5nLgoKQWxsIG9mIHRoaXMgbWVh
+bnMgdGhhdCByZXF1ZXN0IEEncyBjYigpIGNhbiBzeW5jaHJvbm91c2x5IHdhaXQgZm9yCnJlcXVl
+c3QgQiB0byBjb21wbGV0ZS4gUHJldmlvdXNseSB0aGUgbnZtZSBibG9jayBkcml2ZXIgd291bGQg
+aGFuZwpiZWNhdXNlIGl0IGRpZG4ndCBwcm9jZXNzIGNvbXBsZXRpb25zIGZyb20gbmVzdGVkIGFp
+b19wb2xsKCkuCgpTaWduZWQtb2ZmLWJ5OiBTdGVmYW4gSGFqbm9jemkgPHN0ZWZhbmhhQHJlZGhh
+dC5jb20+ClJldmlld2VkLWJ5OiBTZXJnaW8gTG9wZXogPHNscEByZWRoYXQuY29tPgotLS0KIGJs
+b2NrL252bWUuYyAgICAgICB8IDY3ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKystLS0tLS0KIGJsb2NrL3RyYWNlLWV2ZW50cyB8ICAyICstCiAyIGZpbGVzIGNoYW5nZWQs
+IDYwIGluc2VydGlvbnMoKyksIDkgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvYmxvY2svbnZt
+ZS5jIGIvYmxvY2svbnZtZS5jCmluZGV4IDhkYzY4ZDNkYWEuLjM3NGUyNjg5MTUgMTAwNjQ0Ci0t
+LSBhL2Jsb2NrL252bWUuYworKysgYi9ibG9jay9udm1lLmMKQEAgLTc0LDkgKzc0LDExIEBAIHR5
+cGVkZWYgc3RydWN0IHsKICAgICBpbnQgICAgICAgICBjcV9waGFzZTsKICAgICBpbnQgICAgICAg
+ICBmcmVlX3JlcV9oZWFkOwogICAgIE5WTWVSZXF1ZXN0IHJlcXNbTlZNRV9OVU1fUkVRU107Ci0g
+ICAgYm9vbCAgICAgICAgYnVzeTsKICAgICBpbnQgICAgICAgICBuZWVkX2tpY2s7CiAgICAgaW50
+ICAgICAgICAgaW5mbGlnaHQ7CisKKyAgICAvKiBUaHJlYWQtc2FmZSwgbm8gbG9jayBuZWNlc3Nh
+cnkgKi8KKyAgICBRRU1VQkggICAgICAqY29tcGxldGlvbl9iaDsKIH0gTlZNZVF1ZXVlUGFpcjsK
+IAogLyogTWVtb3J5IG1hcHBlZCByZWdpc3RlcnMgKi8KQEAgLTE0MCw2ICsxNDIsOCBAQCBzdHJ1
+Y3QgQkRSVk5WTWVTdGF0ZSB7CiAjZGVmaW5lIE5WTUVfQkxPQ0tfT1BUX0RFVklDRSAiZGV2aWNl
+IgogI2RlZmluZSBOVk1FX0JMT0NLX09QVF9OQU1FU1BBQ0UgIm5hbWVzcGFjZSIKIAorc3RhdGlj
+IHZvaWQgbnZtZV9wcm9jZXNzX2NvbXBsZXRpb25fYmgodm9pZCAqb3BhcXVlKTsKKwogc3RhdGlj
+IFFlbXVPcHRzTGlzdCBydW50aW1lX29wdHMgPSB7CiAgICAgLm5hbWUgPSAibnZtZSIsCiAgICAg
+LmhlYWQgPSBRVEFJTFFfSEVBRF9JTklUSUFMSVpFUihydW50aW1lX29wdHMuaGVhZCksCkBAIC0x
+ODEsNiArMTg1LDkgQEAgc3RhdGljIHZvaWQgbnZtZV9pbml0X3F1ZXVlKEJsb2NrRHJpdmVyU3Rh
+dGUgKmJzLCBOVk1lUXVldWUgKnEsCiAKIHN0YXRpYyB2b2lkIG52bWVfZnJlZV9xdWV1ZV9wYWly
+KE5WTWVRdWV1ZVBhaXIgKnEpCiB7CisgICAgaWYgKHEtPmNvbXBsZXRpb25fYmgpIHsKKyAgICAg
+ICAgcWVtdV9iaF9kZWxldGUocS0+Y29tcGxldGlvbl9iaCk7CisgICAgfQogICAgIHFlbXVfdmZy
+ZWUocS0+cHJwX2xpc3RfcGFnZXMpOwogICAgIHFlbXVfdmZyZWUocS0+c3EucXVldWUpOwogICAg
+IHFlbXVfdmZyZWUocS0+Y3EucXVldWUpOwpAQCAtMjE0LDYgKzIyMSw4IEBAIHN0YXRpYyBOVk1l
+UXVldWVQYWlyICpudm1lX2NyZWF0ZV9xdWV1ZV9wYWlyKEJsb2NrRHJpdmVyU3RhdGUgKmJzLAog
+ICAgIHEtPmluZGV4ID0gaWR4OwogICAgIHFlbXVfY29fcXVldWVfaW5pdCgmcS0+ZnJlZV9yZXFf
+cXVldWUpOwogICAgIHEtPnBycF9saXN0X3BhZ2VzID0gcWVtdV9ibG9ja2FsaWduMChicywgcy0+
+cGFnZV9zaXplICogTlZNRV9OVU1fUkVRUyk7CisgICAgcS0+Y29tcGxldGlvbl9iaCA9IGFpb19i
+aF9uZXcoYmRydl9nZXRfYWlvX2NvbnRleHQoYnMpLAorICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgIG52bWVfcHJvY2Vzc19jb21wbGV0aW9uX2JoLCBxKTsKICAgICByID0gcWVtdV92
+ZmlvX2RtYV9tYXAocy0+dmZpbywgcS0+cHJwX2xpc3RfcGFnZXMsCiAgICAgICAgICAgICAgICAg
+ICAgICAgICAgIHMtPnBhZ2Vfc2l6ZSAqIE5WTUVfTlVNX1JFUVMsCiAgICAgICAgICAgICAgICAg
+ICAgICAgICAgIGZhbHNlLCAmcHJwX2xpc3RfaW92YSk7CkBAIC0zNTIsMTEgKzM2MSwyMSBAQCBz
+dGF0aWMgYm9vbCBudm1lX3Byb2Nlc3NfY29tcGxldGlvbihOVk1lUXVldWVQYWlyICpxKQogICAg
+IE52bWVDcWUgKmM7CiAKICAgICB0cmFjZV9udm1lX3Byb2Nlc3NfY29tcGxldGlvbihzLCBxLT5p
+bmRleCwgcS0+aW5mbGlnaHQpOwotICAgIGlmIChxLT5idXN5IHx8IHMtPnBsdWdnZWQpIHsKLSAg
+ICAgICAgdHJhY2VfbnZtZV9wcm9jZXNzX2NvbXBsZXRpb25fcXVldWVfYnVzeShzLCBxLT5pbmRl
+eCk7CisgICAgaWYgKHMtPnBsdWdnZWQpIHsKKyAgICAgICAgdHJhY2VfbnZtZV9wcm9jZXNzX2Nv
+bXBsZXRpb25fcXVldWVfcGx1Z2dlZChzLCBxLT5pbmRleCk7CiAgICAgICAgIHJldHVybiBmYWxz
+ZTsKICAgICB9Ci0gICAgcS0+YnVzeSA9IHRydWU7CisKKyAgICAvKgorICAgICAqIFN1cHBvcnQg
+cmUtZW50cmFuY3kgd2hlbiBhIHJlcXVlc3QgY2IoKSBmdW5jdGlvbiBpbnZva2VzIGFpb19wb2xs
+KCkuCisgICAgICogUGVuZGluZyBjb21wbGV0aW9ucyBtdXN0IGJlIHZpc2libGUgdG8gYWlvX3Bv
+bGwoKSBzbyB0aGF0IGEgY2IoKQorICAgICAqIGZ1bmN0aW9uIGNhbiB3YWl0IGZvciB0aGUgY29t
+cGxldGlvbiBvZiBhbm90aGVyIHJlcXVlc3QuCisgICAgICoKKyAgICAgKiBUaGUgYWlvX3BvbGwo
+KSBsb29wIHdpbGwgZXhlY3V0ZSBvdXIgQkggYW5kIHdlJ2xsIHJlc3VtZSBjb21wbGV0aW9uCisg
+ICAgICogcHJvY2Vzc2luZyB0aGVyZS4KKyAgICAgKi8KKyAgICBxZW11X2JoX3NjaGVkdWxlKHEt
+PmNvbXBsZXRpb25fYmgpOworCiAgICAgYXNzZXJ0KHEtPmluZmxpZ2h0ID49IDApOwogICAgIHdo
+aWxlIChxLT5pbmZsaWdodCkgewogICAgICAgICBpbnQgcmV0OwpAQCAtMzg0LDEwICs0MDMsMTAg
+QEAgc3RhdGljIGJvb2wgbnZtZV9wcm9jZXNzX2NvbXBsZXRpb24oTlZNZVF1ZXVlUGFpciAqcSkK
+ICAgICAgICAgYXNzZXJ0KHJlcS5jYik7CiAgICAgICAgIG52bWVfcHV0X2ZyZWVfcmVxX2xvY2tl
+ZChxLCBwcmVxKTsKICAgICAgICAgcHJlcS0+Y2IgPSBwcmVxLT5vcGFxdWUgPSBOVUxMOwotICAg
+ICAgICBxZW11X211dGV4X3VubG9jaygmcS0+bG9jayk7Ci0gICAgICAgIHJlcS5jYihyZXEub3Bh
+cXVlLCByZXQpOwotICAgICAgICBxZW11X211dGV4X2xvY2soJnEtPmxvY2spOwogICAgICAgICBx
+LT5pbmZsaWdodC0tOworICAgICAgICBxZW11X211dGV4X3VubG9jaygmcS0+bG9jayk7CisgICAg
+ICAgIHJlcS5jYihyZXEub3BhcXVlLCByZXQpOworICAgICAgICBxZW11X211dGV4X2xvY2soJnEt
+PmxvY2spOwogICAgICAgICBwcm9ncmVzcyA9IHRydWU7CiAgICAgfQogICAgIGlmIChwcm9ncmVz
+cykgewpAQCAtMzk2LDEwICs0MTUsMjggQEAgc3RhdGljIGJvb2wgbnZtZV9wcm9jZXNzX2NvbXBs
+ZXRpb24oTlZNZVF1ZXVlUGFpciAqcSkKICAgICAgICAgKnEtPmNxLmRvb3JiZWxsID0gY3B1X3Rv
+X2xlMzIocS0+Y3EuaGVhZCk7CiAgICAgICAgIG52bWVfd2FrZV9mcmVlX3JlcV9sb2NrZWQocSk7
+CiAgICAgfQotICAgIHEtPmJ1c3kgPSBmYWxzZTsKKworICAgIHFlbXVfYmhfY2FuY2VsKHEtPmNv
+bXBsZXRpb25fYmgpOworCiAgICAgcmV0dXJuIHByb2dyZXNzOwogfQogCitzdGF0aWMgdm9pZCBu
+dm1lX3Byb2Nlc3NfY29tcGxldGlvbl9iaCh2b2lkICpvcGFxdWUpCit7CisgICAgTlZNZVF1ZXVl
+UGFpciAqcSA9IG9wYXF1ZTsKKworICAgIC8qCisgICAgICogV2UncmUgYmVpbmcgaW52b2tlZCBi
+ZWNhdXNlIGEgbnZtZV9wcm9jZXNzX2NvbXBsZXRpb24oKSBjYigpIGZ1bmN0aW9uCisgICAgICog
+Y2FsbGVkIGFpb19wb2xsKCkuIFRoZSBjYWxsYmFjayBtYXkgYmUgd2FpdGluZyBmb3IgZnVydGhl
+ciBjb21wbGV0aW9ucworICAgICAqIHNvIG5vdGlmeSB0aGUgZGV2aWNlIHRoYXQgaXQgaGFzIHNw
+YWNlIHRvIGZpbGwgaW4gbW9yZSBjb21wbGV0aW9ucyBub3cuCisgICAgICovCisgICAgc21wX21i
+X3JlbGVhc2UoKTsKKyAgICAqcS0+Y3EuZG9vcmJlbGwgPSBjcHVfdG9fbGUzMihxLT5jcS5oZWFk
+KTsKKyAgICBudm1lX3dha2VfZnJlZV9yZXFfbG9ja2VkKHEpOworCisgICAgbnZtZV9wcm9jZXNz
+X2NvbXBsZXRpb24ocSk7Cit9CisKIHN0YXRpYyB2b2lkIG52bWVfdHJhY2VfY29tbWFuZChjb25z
+dCBOdm1lQ21kICpjbWQpCiB7CiAgICAgaW50IGk7CkBAIC0xMzA5LDYgKzEzNDYsMTMgQEAgc3Rh
+dGljIHZvaWQgbnZtZV9kZXRhY2hfYWlvX2NvbnRleHQoQmxvY2tEcml2ZXJTdGF0ZSAqYnMpCiB7
+CiAgICAgQkRSVk5WTWVTdGF0ZSAqcyA9IGJzLT5vcGFxdWU7CiAKKyAgICBmb3IgKGludCBpID0g
+MDsgaSA8IHMtPm5yX3F1ZXVlczsgaSsrKSB7CisgICAgICAgIE5WTWVRdWV1ZVBhaXIgKnEgPSBz
+LT5xdWV1ZXNbaV07CisKKyAgICAgICAgcWVtdV9iaF9kZWxldGUocS0+Y29tcGxldGlvbl9iaCk7
+CisgICAgICAgIHEtPmNvbXBsZXRpb25fYmggPSBOVUxMOworICAgIH0KKwogICAgIGFpb19zZXRf
+ZXZlbnRfbm90aWZpZXIoYmRydl9nZXRfYWlvX2NvbnRleHQoYnMpLCAmcy0+aXJxX25vdGlmaWVy
+LAogICAgICAgICAgICAgICAgICAgICAgICAgICAgZmFsc2UsIE5VTEwsIE5VTEwpOwogfQpAQCAt
+MTMyMSw2ICsxMzY1LDEzIEBAIHN0YXRpYyB2b2lkIG52bWVfYXR0YWNoX2Fpb19jb250ZXh0KEJs
+b2NrRHJpdmVyU3RhdGUgKmJzLAogICAgIHMtPmFpb19jb250ZXh0ID0gbmV3X2NvbnRleHQ7CiAg
+ICAgYWlvX3NldF9ldmVudF9ub3RpZmllcihuZXdfY29udGV4dCwgJnMtPmlycV9ub3RpZmllciwK
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgIGZhbHNlLCBudm1lX2hhbmRsZV9ldmVudCwgbnZt
+ZV9wb2xsX2NiKTsKKworICAgIGZvciAoaW50IGkgPSAwOyBpIDwgcy0+bnJfcXVldWVzOyBpKysp
+IHsKKyAgICAgICAgTlZNZVF1ZXVlUGFpciAqcSA9IHMtPnF1ZXVlc1tpXTsKKworICAgICAgICBx
+LT5jb21wbGV0aW9uX2JoID0KKyAgICAgICAgICAgIGFpb19iaF9uZXcobmV3X2NvbnRleHQsIG52
+bWVfcHJvY2Vzc19jb21wbGV0aW9uX2JoLCBxKTsKKyAgICB9CiB9CiAKIHN0YXRpYyB2b2lkIG52
+bWVfYWlvX3BsdWcoQmxvY2tEcml2ZXJTdGF0ZSAqYnMpCmRpZmYgLS1naXQgYS9ibG9jay90cmFj
+ZS1ldmVudHMgYi9ibG9jay90cmFjZS1ldmVudHMKaW5kZXggMjlkZmY4ODgxYy4uZGJlNzZhNzYx
+MyAxMDA2NDQKLS0tIGEvYmxvY2svdHJhY2UtZXZlbnRzCisrKyBiL2Jsb2NrL3RyYWNlLWV2ZW50
+cwpAQCAtMTU4LDcgKzE1OCw3IEBAIG52bWVfa2ljayh2b2lkICpzLCBpbnQgcXVldWUpICJzICVw
+IHF1ZXVlICVkIgogbnZtZV9kbWFfZmx1c2hfcXVldWVfd2FpdCh2b2lkICpzKSAicyAlcCIKIG52
+bWVfZXJyb3IoaW50IGNtZF9zcGVjaWZpYywgaW50IHNxX2hlYWQsIGludCBzcWlkLCBpbnQgY2lk
+LCBpbnQgc3RhdHVzKSAiY21kX3NwZWNpZmljICVkIHNxX2hlYWQgJWQgc3FpZCAlZCBjaWQgJWQg
+c3RhdHVzIDB4JXgiCiBudm1lX3Byb2Nlc3NfY29tcGxldGlvbih2b2lkICpzLCBpbnQgaW5kZXgs
+IGludCBpbmZsaWdodCkgInMgJXAgcXVldWUgJWQgaW5mbGlnaHQgJWQiCi1udm1lX3Byb2Nlc3Nf
+Y29tcGxldGlvbl9xdWV1ZV9idXN5KHZvaWQgKnMsIGludCBpbmRleCkgInMgJXAgcXVldWUgJWQi
+Citudm1lX3Byb2Nlc3NfY29tcGxldGlvbl9xdWV1ZV9wbHVnZ2VkKHZvaWQgKnMsIGludCBpbmRl
+eCkgInMgJXAgcXVldWUgJWQiCiBudm1lX2NvbXBsZXRlX2NvbW1hbmQodm9pZCAqcywgaW50IGlu
+ZGV4LCBpbnQgY2lkKSAicyAlcCBxdWV1ZSAlZCBjaWQgJWQiCiBudm1lX3N1Ym1pdF9jb21tYW5k
+KHZvaWQgKnMsIGludCBpbmRleCwgaW50IGNpZCkgInMgJXAgcXVldWUgJWQgY2lkICVkIgogbnZt
+ZV9zdWJtaXRfY29tbWFuZF9yYXcoaW50IGMwLCBpbnQgYzEsIGludCBjMiwgaW50IGMzLCBpbnQg
+YzQsIGludCBjNSwgaW50IGM2LCBpbnQgYzcpICIlMDJ4ICUwMnggJTAyeCAlMDJ4ICUwMnggJTAy
+eCAlMDJ4ICUwMngiCi0tIAoyLjI2LjIKCg==
 
 
