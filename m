@@ -7,79 +7,80 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D670C433E0
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5FCAC433DF
 	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 21:36:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 628662085B
+	by mail.kernel.org (Postfix) with ESMTPS id AEE3B2085B
 	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 21:36:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Z7nPbxN9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 628662085B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jsBY4oHC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AEE3B2085B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39396 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39482 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlfjO-0005bF-Ss
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 17:36:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37756)
+	id 1jlfjP-0005dK-P4
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 17:36:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38044)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1jlfEO-0003to-Ts
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 17:04:24 -0400
-Received: from mail-qv1-xf44.google.com ([2607:f8b0:4864:20::f44]:34515)
+ id 1jlfEm-0004Tx-Dr
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 17:04:48 -0400
+Received: from mail-qk1-x744.google.com ([2607:f8b0:4864:20::744]:34524)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1jlfEN-0000J1-2z
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 17:04:24 -0400
-Received: by mail-qv1-xf44.google.com with SMTP id fc4so1776123qvb.1
- for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 14:04:22 -0700 (PDT)
+ id 1jlfEk-0000Np-53
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 17:04:48 -0400
+Received: by mail-qk1-x744.google.com with SMTP id f18so3524898qkh.1
+ for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 14:04:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=cJAv+EbsefdW66yr8LjRtj+7g6Sr3jeK6hHxTVUkhJA=;
- b=Z7nPbxN9nrVvlMAqzjDNaj7kD9CZdQv9dyywyXt+Ph1BM/q33gxGtkIo2dCblV9zOU
- G+TubiU7MZCinD1HWYpJ0N0L/1R8N0wgimpk/H4fy1yW8XvPn9Ak3dUE0nCK5Hpmwb3V
- KAem1secs41VxsXUxefQL1BK/uVozQXpFefh1v3rLB1VcpNsrfo6qKACtcVbe5NoCSxD
- Qrou6/svXhi8H8xvbkKMl5XRi8b3ga6tU8OhHQ+5tPgWlEVYabuzcEFFaGoyVDGZTCd0
- zG/Ce1+Gy3nKaR8YeF77hG5ktujcKP4+w+bSzIWUpESXwB3YZ/csxKc3OJj9c1ZqqMjz
- gagg==
+ bh=2fC2p4q7EXMT22jmjpJyi2yYnEcYk9REFP3VTNIoqTk=;
+ b=jsBY4oHCFsO3VZPpm5UPbNXmnE7ZOy0NoqalWszny0h/zWNqlLNEOPiLpOw3HWaljV
+ ymmlyJ9kqHsZdj9V2W0+LPPm9Hno71HpFkxyHgmCOjoYS8t+SY3zKYK8k9bz00r7ZMVF
+ dQt+Gd+YgR4ROEUgHBJHhmAoCPNomgrHm5yDwdO2F+LKBUw+fp4Nmc1Phw+Kuucj3z/o
+ fP61PUBL91eHaQ65dXzI0fp2IGNus7maKC8eAwwSqeZ/j1PT3/XQJj1Wzq6AOlbdc5QP
+ BOdeEtfV5LtFJnEt1JQ7djZYdLKYUkOFuw/2fEBVmmhqWd4wlzqN6B0fM3GLaFkj/eTZ
+ hQhw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=cJAv+EbsefdW66yr8LjRtj+7g6Sr3jeK6hHxTVUkhJA=;
- b=IegCyd8PKhDNZVOl+JjlAuwjhj9BIvH0yUn/4pqxj++J65Nz+Mu7BdGf7rDYQ1sjw4
- brWjN2FnoS73Z0BQwMLENOR3KoRnw1igpPzQWQ2sTkky95q8xcZR5NjvQ1ykCuYQVcKo
- /Zp3xkA7yrmJPUCLSDEPh2nY501Ciw4OzwO2VS4nHdmsPaNCbkRMo3tv4TIetIHPNHab
- ba/x/PCMQSLiL3ziYAO/NxIRjgk/UuWiN1wy5voavNlA3neMDU/ogjiGOojgVJQsYhBl
- bnhWyijspdqKGFfUHlX75qBxl/OkkTDvNBW8DNJ+arAijrtf7Co+qi77NdO1h9SusfPv
- O3YQ==
-X-Gm-Message-State: AOAM531DdqLoZJiBmhzEUD7LZ7z3vruqBGCjKQUxt3GL67i8ILLPPRRh
- D2yD3IyN7is7CxEWOCLGquASom3O/pfgMQ==
-X-Google-Smtp-Source: ABdhPJxYV3yaUAovRK41PP3Qo7LV9GbVJ8hNhPHC6zuDNA5ZR/421XqHVubbGWH9FCe12abmYZraTQ==
-X-Received: by 2002:a0c:9ae2:: with SMTP id k34mr519566qvf.247.1592427861880; 
- Wed, 17 Jun 2020 14:04:21 -0700 (PDT)
+ bh=2fC2p4q7EXMT22jmjpJyi2yYnEcYk9REFP3VTNIoqTk=;
+ b=ThdhzRcf3hsKsyF556Wy9fWAUaHPVXcijuFVmink1MJfStpxz6N2awWSi6ERB6xRSa
+ jSL5sMbX4Y82TC3REv6zTruJDnT6FOtqFpJchAsmgAYdgqP2GGo2uKJRbSiFNhxnS8YH
+ SlEQWoXBN1jrJWRrr60qukp+5LT8EEYgw9Hn7IWjo2dZ3kkF9rR5FroO9i3NAr1PTAP8
+ 6jUeoYBN3imMvTn9Iw+gaUo2q4zjtsu71D/6IXe5KL1PFb7Gus8QFEVq8XGsgz65P1cQ
+ ok9X/w67DPNPKKSp8cHtyecv6/yJh2Edm15B+p33cQuz3P3Cn2Ef3FIlBEl9Z/nwswJA
+ v9hw==
+X-Gm-Message-State: AOAM532lOpeTbl318b+I1Fl5eDYVmnB22i2fFI0aB6nMR5gwFg+z/5Uw
+ D4goji25fheBYRoc1t0sM5pAK30aQVO8qw==
+X-Google-Smtp-Source: ABdhPJxchMTSZ7tuU+6x+Tf4VT1yIsiZl+CER43NGdd4pyESY7D2ChqI/yhMgqWGdSFtGSrtj1t1qg==
+X-Received: by 2002:a05:620a:1524:: with SMTP id
+ n4mr541319qkk.295.1592427884939; 
+ Wed, 17 Jun 2020 14:04:44 -0700 (PDT)
 Received: from Rfoley-MA01.hsd1.ma.comcast.net
  ([2601:199:4480:60c0:fc79:714c:9711:2e9c])
- by smtp.gmail.com with ESMTPSA id w13sm997245qkb.91.2020.06.17.14.04.20
+ by smtp.gmail.com with ESMTPSA id w13sm997245qkb.91.2020.06.17.14.04.43
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 17 Jun 2020 14:04:21 -0700 (PDT)
+ Wed, 17 Jun 2020 14:04:44 -0700 (PDT)
 From: Robert Foley <robert.foley@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v10 45/73] sh4: convert to cpu_interrupt_request
-Date: Wed, 17 Jun 2020 17:02:03 -0400
-Message-Id: <20200617210231.4393-46-robert.foley@linaro.org>
+Subject: [PATCH v10 62/73] cpu: introduce cpu_has_work_with_iothread_lock
+Date: Wed, 17 Jun 2020 17:02:20 -0400
+Message-Id: <20200617210231.4393-63-robert.foley@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200617210231.4393-1-robert.foley@linaro.org>
 References: <20200617210231.4393-1-robert.foley@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::f44;
- envelope-from=robert.foley@linaro.org; helo=mail-qv1-xf44.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::744;
+ envelope-from=robert.foley@linaro.org; helo=mail-qk1-x744.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -101,51 +102,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: robert.foley@linaro.org, Yoshinori Sato <ysato@users.sourceforge.jp>,
- cota@braap.org, peter.puhov@linaro.org, alex.bennee@linaro.org,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: robert.foley@linaro.org, cota@braap.org, peter.puhov@linaro.org,
+ alex.bennee@linaro.org, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: "Emilio G. Cota" <cota@braap.org>
 
-Cc: Aurelien Jarno <aurelien@aurel32.net>
+It will gain some users soon.
+
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 Signed-off-by: Robert Foley <robert.foley@linaro.org>
 ---
- target/sh4/cpu.c    | 2 +-
- target/sh4/helper.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ include/hw/core/cpu.h | 37 ++++++++++++++++++++++++++++++++++---
+ 1 file changed, 34 insertions(+), 3 deletions(-)
 
-diff --git a/target/sh4/cpu.c b/target/sh4/cpu.c
-index 3c68021c56..18f3448183 100644
---- a/target/sh4/cpu.c
-+++ b/target/sh4/cpu.c
-@@ -44,7 +44,7 @@ static void superh_cpu_synchronize_from_tb(CPUState *cs, TranslationBlock *tb)
+diff --git a/include/hw/core/cpu.h b/include/hw/core/cpu.h
+index 79da78cd10..720bc85a84 100644
+--- a/include/hw/core/cpu.h
++++ b/include/hw/core/cpu.h
+@@ -26,6 +26,7 @@
+ #include "exec/memattrs.h"
+ #include "qapi/qapi-types-run-state.h"
+ #include "qemu/bitmap.h"
++#include "qemu/main-loop.h"
+ #include "qemu/rcu_queue.h"
+ #include "qemu/queue.h"
+ #include "qemu/thread.h"
+@@ -82,6 +83,8 @@ struct TranslationBlock;
+  * @reset_dump_flags: #CPUDumpFlags to use for reset logging.
+  * @has_work: Callback for checking if there is work to do. Called with the
+  * CPU lock held.
++ * @has_work_with_iothread_lock: Callback for checking if there is work to do.
++ * Called with both the BQL and the CPU lock held.
+  * @do_interrupt: Callback for interrupt handling.
+  * @do_unaligned_access: Callback for unaligned access handling, if
+  * the target defines #TARGET_ALIGNED_ONLY.
+@@ -167,6 +170,7 @@ typedef struct CPUClass {
  
- static bool superh_cpu_has_work(CPUState *cs)
+     int reset_dump_flags;
+     bool (*has_work)(CPUState *cpu);
++    bool (*has_work_with_iothread_lock)(CPUState *cpu);
+     void (*do_interrupt)(CPUState *cpu);
+     void (*do_unaligned_access)(CPUState *cpu, vaddr addr,
+                                 MMUAccessType access_type,
+@@ -805,14 +809,41 @@ const char *parse_cpu_option(const char *cpu_option);
+ static inline bool cpu_has_work(CPUState *cpu)
  {
--    return cs->interrupt_request & CPU_INTERRUPT_HARD;
-+    return cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD;
+     CPUClass *cc = CPU_GET_CLASS(cpu);
++    bool has_cpu_lock = cpu_mutex_locked(cpu);
++    bool (*func)(CPUState *cpu);
+     bool ret;
+ 
++    /* some targets require us to hold the BQL when checking for work */
++    if (cc->has_work_with_iothread_lock) {
++        if (qemu_mutex_iothread_locked()) {
++            func = cc->has_work_with_iothread_lock;
++            goto call_func;
++        }
++
++        if (has_cpu_lock) {
++            /* avoid deadlock by acquiring the locks in order */
++            cpu_mutex_unlock(cpu);
++        }
++        qemu_mutex_lock_iothread();
++        cpu_mutex_lock(cpu);
++
++        ret = cc->has_work_with_iothread_lock(cpu);
++
++        qemu_mutex_unlock_iothread();
++        if (!has_cpu_lock) {
++            cpu_mutex_unlock(cpu);
++        }
++        return ret;
++    }
++
+     g_assert(cc->has_work);
+-    if (cpu_mutex_locked(cpu)) {
+-        return cc->has_work(cpu);
++    func = cc->has_work;
++ call_func:
++    if (has_cpu_lock) {
++        return func(cpu);
+     }
+     cpu_mutex_lock(cpu);
+-    ret = cc->has_work(cpu);
++    ret = func(cpu);
+     cpu_mutex_unlock(cpu);
+     return ret;
  }
- 
- static void superh_cpu_reset(DeviceState *dev)
-diff --git a/target/sh4/helper.c b/target/sh4/helper.c
-index 408478ce5d..1e32365c75 100644
---- a/target/sh4/helper.c
-+++ b/target/sh4/helper.c
-@@ -62,7 +62,7 @@ void superh_cpu_do_interrupt(CPUState *cs)
- {
-     SuperHCPU *cpu = SUPERH_CPU(cs);
-     CPUSH4State *env = &cpu->env;
--    int do_irq = cs->interrupt_request & CPU_INTERRUPT_HARD;
-+    int do_irq = cpu_interrupt_request(cs) & CPU_INTERRUPT_HARD;
-     int do_exp, irq_vector = cs->exception_index;
- 
-     /* prioritize exceptions over interrupts */
 -- 
 2.17.1
 
