@@ -2,78 +2,83 @@ Return-Path: <SRS0=bzpH=76=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EA60C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 16:25:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 727F2C433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 16:26:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0A00D2071A
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 16:25:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4273821556
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 16:26:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DRlQ4lyg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A00D2071A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N93UO6W1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4273821556
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45222 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48622 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlasN-00017V-AU
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 12:25:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40328)
+	id 1jlatt-0002i9-I5
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 12:26:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40978)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jlaqS-0007Wg-Uf
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 12:23:24 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:34653
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1jlatC-0002FR-6Q
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 12:26:14 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:22629
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jlaqR-00024w-6f
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 12:23:24 -0400
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1jlatA-0002Xz-GN
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 12:26:13 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592411002;
+ s=mimecast20190719; t=1592411171;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=XaB2Aa9uvi6TFVo3948pjxmXSbe3hSsjvBBAbNYUXtc=;
- b=DRlQ4lygU4q/XiBlKFsdrIAQccOXCvVIYWjmgxE4fVrNnp8yREf6NwUR/qJfqefSSjHB/4
- NrHT54W9S2Iqrj5nLC2ijM9TZ06celIdOPcMa94v0Cjrnu4aAAMg469l+noLNTnsVOCaSQ
- 2RYQAnd80zeHV9INcOk8/DAGLF5kYpo=
+ bh=GvXmZ9amsph62miWniNK8wUvw67b1tdT95WTVOUtGeg=;
+ b=N93UO6W1KtDl2CPQRh2KIqYOYMu1GveH7EMYAFDvTO1tyBKu/8Q3YXtOftmMz6TvWmp5jY
+ RWTPol4jFGGCkZtz4x1BYnt3kao4uqKsOlR755Kvzw8fAV0gHPkkWRfhs3AeEi9PD+3Eh2
+ 7o7qgh3h4hteb9pIelRxr2p9m5nA4kg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-254-f19A9SOPNZeMk66Ink9XeQ-1; Wed, 17 Jun 2020 12:23:19 -0400
-X-MC-Unique: f19A9SOPNZeMk66Ink9XeQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-169-xwkno9i0PZWOU-iQOojAnQ-1; Wed, 17 Jun 2020 12:26:08 -0400
+X-MC-Unique: xwkno9i0PZWOU-iQOojAnQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CD794835B40;
- Wed, 17 Jun 2020 16:23:17 +0000 (UTC)
-Received: from work-vm (ovpn-115-47.ams2.redhat.com [10.36.115.47])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4CB785C1D4;
- Wed, 17 Jun 2020 16:23:16 +0000 (UTC)
-Date: Wed, 17 Jun 2020 17:23:13 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Pan Nengyuan <pannengyuan@huawei.com>
-Subject: Re: [PATCH] qom-hmp-cmds: fix a memleak in hmp_qom_get
-Message-ID: <20200617162313.GA18975@work-vm>
-References: <20200603070338.7922-1-pannengyuan@huawei.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C7450102C817;
+ Wed, 17 Jun 2020 16:25:54 +0000 (UTC)
+Received: from localhost (ovpn-113-21.phx2.redhat.com [10.3.113.21])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E769E80885;
+ Wed, 17 Jun 2020 16:25:39 +0000 (UTC)
+Date: Wed, 17 Jun 2020 12:25:38 -0400
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Christophe de Dinechin <cdupontd@redhat.com>
+Subject: Re: ovmf / PCI passthrough impaired due to very limiting PCI64
+ aperture
+Message-ID: <20200617162538.GC2366737@habkost.net>
+References: <99779e9c-f05f-501b-b4be-ff719f140a88@canonical.com>
+ <20200616165043.24y2cp53axk7uggy@sirius.home.kraxel.org>
+ <20200616165746.GH2788@work-vm>
+ <20200616171021.GV2366737@habkost.net>
+ <56BCFEC0-DEEF-46A9-9BC4-8A75ABD158CF@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200603070338.7922-1-pannengyuan@huawei.com>
-User-Agent: Mutt/1.14.0 (2020-05-02)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <56BCFEC0-DEEF-46A9-9BC4-8A75ABD158CF@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 23:30:45
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=ehabkost@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/17 01:42:42
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -94,54 +99,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com, zhang.zhanghailiang@huawei.com, qemu-devel@nongnu.org,
- euler.robot@huawei.com, pbonzini@redhat.com, ehabkost@redhat.com
+Cc: pedro.principeza@canonical.com, dann.frazier@canonical.com,
+ "Guilherme G. Piccoli" <gpiccoli@canonical.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ christian.ehrhardt@canonical.com, qemu-devel@nongnu.org,
+ Gerd Hoffmann <kraxel@redhat.com>, lersek@redhat.com, fw@gpiccoli.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Pan Nengyuan (pannengyuan@huawei.com) wrote:
-> 'obj' forgot to free at the end of hmp_qom_get(). Fix that.
+On Wed, Jun 17, 2020 at 10:17:55AM +0200, Christophe de Dinechin wrote:
 > 
-> The leak stack:
-> Direct leak of 40 byte(s) in 1 object(s) allocated from:
->     #0 0x7f4e3a779ae8 in __interceptor_malloc (/lib64/libasan.so.5+0xefae8)
->     #1 0x7f4e398f91d5 in g_malloc (/lib64/libglib-2.0.so.0+0x531d5)
->     #2 0x55c9fd9a3999 in qstring_from_substr /build/qemu/src/qobject/qstring.c:45
->     #3 0x55c9fd894bd3 in qobject_output_type_str /build/qemu/src/qapi/qobject-output-visitor.c:175
->     #4 0x55c9fd894bd3 in qobject_output_type_str /build/qemu/src/qapi/qobject-output-visitor.c:168
->     #5 0x55c9fd88b34d in visit_type_str /build/qemu/src/qapi/qapi-visit-core.c:308
->     #6 0x55c9fd59aa6b in property_get_str /build/qemu/src/qom/object.c:2064
->     #7 0x55c9fd5adb8a in object_property_get_qobject /build/qemu/src/qom/qom-qobject.c:38
->     #8 0x55c9fd4a029d in hmp_qom_get /build/qemu/src/qom/qom-hmp-cmds.c:66
 > 
-> Fixes: 89cf4fe34f4
-> Reported-by: Euler Robot <euler.robot@huawei.com>
-> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
+> > Le 16 Jun 2020 à 19:10, Eduardo Habkost <ehabkost@redhat.com> a écrit :
+> > 
+> > On Tue, Jun 16, 2020 at 05:57:46PM +0100, Dr. David Alan Gilbert wrote:
+> >> * Gerd Hoffmann (kraxel@redhat.com) wrote:
+> >>>  Hi,
+> >>> 
+> >>>> (a) We could rely in the guest physbits to calculate the PCI64 aperture.
+> >>> 
+> >>> I'd love to do that.  Move the 64-bit I/O window as high as possible and
+> >>> use -- say -- 25% of the physical address space for it.
+> >>> 
+> >>> Problem is we can't.
+> >>> 
+> >>>> failure. Also, if the users are not setting the physbits in the guest,
+> >>>> there must be a default (seems to be 40bit according to my experiments),
+> >>>> seems to be a good idea to rely on that.
+> >>> 
+> >>> Yes, 40 is the default, and it is used *even if the host supports less
+> >>> than that*.  Typical values I've seen for intel hardware are 36 and 39.
+> >>> 39 is used even by recent hardware (not the xeons, but check out a
+> >>> laptop or a nuc).
+> >>> 
+> >>>> If guest physbits is 40, why to have OVMF limiting it to 36, right?
+> >>> 
+> >>> Things will explode in case OVMF uses more physbits than the host
+> >>> supports (host physbits limit applies to ept too).  In other words: OVMF
+> >>> can't trust the guest physbits, so it is conservative to be on the safe
+> >>> side.
+> >>> 
+> >>> If we can somehow make a *trustable* physbits value available to the
+> >>> guest, then yes, we can go that route.  But the guest physbits we have
+> >>> today unfortunately don't cut it.
+> >> 
+> >> In downstream RH qemu, we run with host-physbits as default; so it's reasonably
+> >> trustworthy; of course that doesn't help you across a migration between
+> >> hosts with different sizes (e.g. an E5 Xeon to an E3).
+> >> Changing upstream to do the same would seem sensible to me, but it's not
+> >> a foolproof config.
+> > 
+> > Yeah, to make it really trustworthy we would need to prevent
+> > migration to hosts with mismatching phys sizes.
+> 
+> Wouldn't it be sufficient to prevent guestphysbits > hostphysbits?
 
-Queued.
+It probably would, for the OVMF issue we're discussing here.
+But it's not a guarantee we give today.
 
-> ---
->  qom/qom-hmp-cmds.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/qom/qom-hmp-cmds.c b/qom/qom-hmp-cmds.c
-> index f704b6949a..3d2a23292d 100644
-> --- a/qom/qom-hmp-cmds.c
-> +++ b/qom/qom-hmp-cmds.c
-> @@ -71,6 +71,7 @@ void hmp_qom_get(Monitor *mon, const QDict *qdict)
->          qobject_unref(str);
->      }
->  
-> +    qobject_unref(obj);
->      hmp_handle_error(mon, err);
->  }
->  
-> -- 
-> 2.18.2
-> 
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+If we make additional guarantees to guest software, we need to
+communicate them unambiguously to the guest.
+
+-- 
+Eduardo
 
 
