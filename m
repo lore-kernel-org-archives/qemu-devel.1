@@ -2,94 +2,72 @@ Return-Path: <SRS0=bzpH=76=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7345C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 16:44:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FCF3C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 16:45:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7299421527
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 16:44:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XlyI3W/K"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7299421527
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 333C821527
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 16:45:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 333C821527
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49830 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52788 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlbB7-0003QG-OW
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 12:44:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45692)
+	id 1jlbC2-0004kz-Gs
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 12:45:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45680)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1jlbA7-0002BZ-Tq
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 12:43:43 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56297
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1jlbA5-0005Pb-Rq
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 12:43:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592412220;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Gdc8Jjge+uq5oI4ioVF7aL1fsQ5nH8HKrG+Y6K5DqCw=;
- b=XlyI3W/KZO0K/DsMU/voZdtiSsDxgPETzv/d67CcPBT4jZm7E7jqVh3xWufzO2EuiwoA53
- UMNazUMZD4uP9oGrpSrqnggkBPjeQwdkAhXqvUdVdljCkXkpX4BsDP1w6wimnZnqfLPbX8
- 4uUzNEdYkd9Y4wwIN3rs4wHGG0XSwOQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-389-DCoRVVnOOxi3sdVErVx5zQ-1; Wed, 17 Jun 2020 12:43:36 -0400
-X-MC-Unique: DCoRVVnOOxi3sdVErVx5zQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E29CC184D153;
- Wed, 17 Jun 2020 16:43:23 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-115-92.ams2.redhat.com
- [10.36.115.92])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D07785C1D4;
- Wed, 17 Jun 2020 16:43:21 +0000 (UTC)
-Subject: Re: ovmf / PCI passthrough impaired due to very limiting PCI64
- aperture
-From: Laszlo Ersek <lersek@redhat.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-References: <99779e9c-f05f-501b-b4be-ff719f140a88@canonical.com>
- <20200616165043.24y2cp53axk7uggy@sirius.home.kraxel.org>
- <20200616165746.GH2788@work-vm>
- <CAHD1Q_zGu4Q63HjHx3aZKu3wh8NppuP6T4kgnUN3j=-ZDufVZA@mail.gmail.com>
- <b423f4a4-2552-bdc8-7c9f-41f200aef672@redhat.com>
- <20200617134652.GE2776@work-vm>
- <37e7bbbe-6792-fdaa-0046-fb8bc5b64546@redhat.com>
-Message-ID: <74a52916-af58-6dee-f0e0-deb2954ddd90@redhat.com>
-Date: Wed, 17 Jun 2020 18:43:20 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Firefox/52.0 Thunderbird/52.9.1
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jlbA6-00029Z-Op
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 12:43:42 -0400
+Received: from 1.mo6.mail-out.ovh.net ([46.105.56.136]:47821)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jlbA4-0005PQ-5J
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 12:43:42 -0400
+Received: from player779.ha.ovh.net (unknown [10.110.103.118])
+ by mo6.mail-out.ovh.net (Postfix) with ESMTP id 5F554219A67
+ for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 18:43:38 +0200 (CEST)
+Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
+ (Authenticated sender: clg@kaod.org)
+ by player779.ha.ovh.net (Postfix) with ESMTPSA id 48A32137231AA;
+ Wed, 17 Jun 2020 16:43:29 +0000 (UTC)
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-103G005247dbfc7-cd3e-4924-9b56-6fc4f98f6ba9,ABECD89738EEB0C75E5395B338997A57DB3A3EEE)
+ smtp.auth=clg@kaod.org
+Subject: Re: [PATCH v2 12/12] docs/system: Add Nuvoton machine documentation
+To: Havard Skinnemoen <hskinnemoen@google.com>, peter.maydell@linaro.org,
+ joel@jms.id.au
+References: <20200611223016.259837-1-hskinnemoen@google.com>
+ <20200611223016.259837-13-hskinnemoen@google.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <ac8dcb91-6c91-3b1c-578d-5f9cb830bea6@kaod.org>
+Date: Wed, 17 Jun 2020 18:43:28 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <37e7bbbe-6792-fdaa-0046-fb8bc5b64546@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <20200611223016.259837-13-hskinnemoen@google.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=lersek@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/17 01:42:04
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Ovh-Tracer-Id: 5204472319721835433
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedrudejvddguddtgecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgsehtkeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepheeutdeuueeltdfghfevveeugffgvdfghfejgeejkeeigefhudehvdduledvhfffnecuffhomhgrihhnpehnuhhvohhtohhnrdgtohhmnecukfhppedtrddtrddtrddtpdekvddrieegrddvhedtrddujedtnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeejledrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
+Received-SPF: pass client-ip=46.105.56.136; envelope-from=clg@kaod.org;
+ helo=1.mo6.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/17 12:43:38
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,86 +80,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Pedro Principeza <pedro.principeza@canonical.com>, ehabkost@redhat.com,
- Dann Frazier <dann.frazier@canonical.com>,
- Guilherme Piccoli <gpiccoli@canonical.com>, qemu-devel@nongnu.org,
- Christian Ehrhardt <christian.ehrhardt@canonical.com>,
- Gerd Hoffmann <kraxel@redhat.com>, fw@gpiccoli.net
+Cc: kfting@nuvoton.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org,
+ Avi.Fishman@nuvoton.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 06/17/20 18:14, Laszlo Ersek wrote:
-> On 06/17/20 15:46, Dr. David Alan Gilbert wrote:
->> * Laszlo Ersek (lersek@redhat.com) wrote:
->>> On 06/16/20 19:14, Guilherme Piccoli wrote:
->>>> Thanks Gerd, Dave and Eduardo for the prompt responses!
->>>>
->>>> So, I understand that when we use "-host-physical-bits", we are
->>>> passing the *real* number for the guest, correct? So, in this case we
->>>> can trust that the guest physbits matches the true host physbits.
->>>>
->>>> What if then we have OVMF relying in the physbits *iff*
->>>> "-host-phys-bits" is used (which is the default in RH and a possible
->>>> machine configuration on libvirt XML in Ubuntu), and we have OVMF
->>>> fallbacks to 36-bit otherwise?
->>>
->>> I've now read the commit message on QEMU commit 258fe08bd341d, and the
->>> complexity is simply stunning.
->>>
->>> Right now, OVMF calculates the guest physical address space size from
->>> various range sizes (such as hotplug memory area end, default or
->>> user-configured PCI64 MMIO aperture), and derives the minimum suitable
->>> guest-phys address width from that address space size. This width is
->>> then exposed to the rest of the firmware with the CPU HOB (hand-off
->>> block), which in turn controls how the GCD (global coherency domain)
->>> memory space map is sized. Etc.
->>>
->>> If QEMU can provide a *reliable* GPA width, in some info channel (CPUID
->>> or even fw_cfg), then the above calculation could be reversed in OVMF.
->>> We could take the width as a given (-> produce the CPU HOB directly),
->>> plus calculate the *remaining* address space between the GPA space size
->>> given by the width, and the end of the memory hotplug area end. If the
->>> "remaining size" were negative, then obviously QEMU would have been
->>> misconfigured, so we'd halt the boot. Otherwise, the remaining area
->>> could be used as PCI64 MMIO aperture (PEI memory footprint of DXE page
->>> tables be darned).
->>>
->>>> Now, regarding the problem "to trust or not" in the guests' physbits,
->>>> I think it's an orthogonal discussion to some extent. It'd be nice to
->>>> have that check, and as Eduardo said, prevent migration in such cases.
->>>> But it's not really preventing OVMF big PCI64 aperture if we only
->>>> increase the aperture _when  "-host-physical-bits" is used_.
->>>
->>> I don't know what exactly those flags do, but I doubt they are clearly
->>> visible to OVMF in any particular way.
->>
->> The firmware should trust whatever it reads from the cpuid and thus gets
->> told from qemu; if qemu is doing the wrong thing there then that's our
->> problem and we need to fix it in qemu.
-> 
-> This sounds good in practice, but -- as Gerd too has stated, to my
-> understanding -- it has potential to break existing usage.
-> 
-> Consider assigning a single device with a 32G BAR -- right now that's
-> supposed to work, without the X-PciMmio64Mb OVMF knob, on even the "most
-> basic" hardware (36-bit host phys address width, and EPT supported). If
-> OVMF suddenly starts trusting the CPUID from QEMU, and that results in a
-> GPA width of 40 bits (i.e. new OVMF is run on old QEMU), then the big
-> BAR (and other stuff too) could be allocated from GPA space that EPT is
-> actually able to deal with. --> regression for the user.
+On 6/12/20 12:30 AM, Havard Skinnemoen wrote:
+> Change-Id: I88e437cb22a8441e0c0e672dfb57568ac81172d8
+> Signed-off-by: Havard Skinnemoen <hskinnemoen@google.com>
 
-s/able/unable/, sigh. :/
+Reviewed-by: Cédric Le Goater <clg@kaod.org>
 
+
+> ---
+>  docs/system/arm/nuvoton.rst | 89 +++++++++++++++++++++++++++++++++++++
+>  docs/system/target-arm.rst  |  1 +
+>  2 files changed, 90 insertions(+)
+>  create mode 100644 docs/system/arm/nuvoton.rst
 > 
-> Sometimes I can tell users "hey given that you're building OVMF from
-> source, or taking it from a 3rd party origin anyway, can you just run
-> upstream QEMU too", but most of the time they just want everything to
-> continue working on a 3 year old Ubuntu LTS release or whatever. :/
-> 
-> And again, this is *without* "X-PciMmio64Mb".
-> 
-> Laszlo
+> diff --git a/docs/system/arm/nuvoton.rst b/docs/system/arm/nuvoton.rst
+> new file mode 100644
+> index 0000000000..1ca34c0051
+> --- /dev/null
+> +++ b/docs/system/arm/nuvoton.rst
+> @@ -0,0 +1,89 @@
+> +Nuvoton iBMC boards (``npcm750-evb``, ``quanta-gsj``)
+> +=====================================================
+> +
+> +The `Nuvoton iBMC`_ chips (NPCM7xx) are a family of ARM-based SoCs that are
+> +designed to be used as Baseboard Management Controllers (BMCs) in various
+> +servers. They all feature one or two ARM Cortex A9 CPU cores, as well as an
+> +assortment of peripherals targeted for either Enterprise or Data Center /
+> +Hyperscale applications. The former is a superset of the latter, so NPCM750 has
+> +all the peripherals of NPCM730 and more.
+> +
+> +.. _Nuvoton iBMC: https://www.nuvoton.com/products/cloud-computing/ibmc/
+> +
+> +The NPCM750 SoC has two Cortex A9 cores and is targeted for the Enterprise
+> +segment. The following machines are based on this chip :
+> +
+> +- ``npcm750-evb``       Nuvoton NPCM750 Evaluation board
+> +
+> +The NPCM730 SoC has two Cortex A9 cores and is targeted for Data Center and
+> +Hyperscale applications. The following machines are based on this chip :
+> +
+> +- ``quanta-gsj``        Quanta GSJ server BMC
+> +
+> +There are also two more SoCs, NPCM710 and NPCM705, which are single-core
+> +variants of NPCM750 and NPCM730, respectively. These are currently not
+> +supported by QEMU.
+> +
+> +Supported devices
+> +-----------------
+> +
+> + * SMP (Dual Core Cortex-A9)
+> + * Cortex-A9MPCore built-in peripherals: SCU, GIC, Global Timer, Private Timer
+> +   and Watchdog.
+> + * SRAM, ROM and DRAM mappings
+> + * System Global Control Registers (GCR)
+> + * Clock and reset controller (CLK)
+> + * Timer controller (TIM)
+> + * Serial ports (16550-based)
+> + * DDR4 memory controller (dummy interface indicating memory training is done)
+> + * OTP controllers (no protection features)
+> + * Flash Interface Unit (FIU; no protection features)
+> +
+> +Missing devices
+> +---------------
+> +
+> + * GPIO controller
+> + * LPC/eSPI host-to-BMC interface, including
+> +
+> +   * Keyboard and mouse controller interface (KBCI)
+> +   * Keyboard Controller Style (KCS) channels
+> +   * BIOS POST code FIFO
+> +   * System Wake-up Control (SWC)
+> +   * Shared memory (SHM)
+> +   * eSPI slave interface
+> +
+> + * Ethernet controllers (GMAC and EMC)
+> + * USB host (USBH)
+> + * USB device (USBD)
+> + * SMBus controller (SMBF)
+> + * Peripheral SPI controller (PSPI)
+> + * Analog to Digital Converter (ADC)
+> + * SD/MMC host
+> + * Random Number Generator (RNG)
+> + * PECI interface
+> + * Pulse Width Modulation (PWM)
+> + * Tachometer
+> + * PCI and PCIe root complex and bridges
+> + * VDM and MCTP support
+> + * Serial I/O expansion
+> + * LPC/eSPI host
+> + * Coprocessor
+> + * Graphics
+> + * Video capture
+> + * Encoding compression engine
+> + * Security features
+> +
+> +Boot options
+> +------------
+> +
+> +The Nuvoton machines can boot from an OpenBMC firmware image, or directly into
+> +a kernel using the ``-kernel`` option.
+> +
+> +Booting a full firmware image requires a Boot ROM specified via the ``-bios``
+> +option to QEMU. The firmware image should be attached as an MTD drive. Example :
+> +
+> +.. code-block:: bash
+> +
+> +  $ qemu-system-arm -machine quanta-gsj -nographic \
+> +      -bios npcm7xx_bootrom.bin \
+> +      -drive file=image-bmc,if=mtd,bus=0,unit=0,format=raw
+> diff --git a/docs/system/target-arm.rst b/docs/system/target-arm.rst
+> index 1bd477a293..38a9daa9b9 100644
+> --- a/docs/system/target-arm.rst
+> +++ b/docs/system/target-arm.rst
+> @@ -84,6 +84,7 @@ undocumented; you can get a complete list by running
+>     arm/aspeed
+>     arm/musicpal
+>     arm/nseries
+> +   arm/nuvoton
+>     arm/orangepi
+>     arm/palm
+>     arm/xscale
 > 
 
 
