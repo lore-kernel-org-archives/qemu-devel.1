@@ -2,96 +2,166 @@ Return-Path: <SRS0=bzpH=76=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31952C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 01:30:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61515C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 02:50:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DED95207DD
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 01:30:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2A44D208E4
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 02:50:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fi+detnT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DED95207DD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FQEqBuiR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A44D208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49132 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60816 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlMuC-0002ny-39
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 21:30:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53680)
+	id 1jlOAC-0008AV-F5
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 22:50:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46346)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jlMtN-00022i-N9
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 21:29:29 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:38602)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jlMtM-0002Ec-1S
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 21:29:29 -0400
-Received: by mail-pg1-x542.google.com with SMTP id l24so460241pgb.5
- for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 18:29:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:references:from:message-id:date:user-agent:mime-version
- :in-reply-to:content-language:content-transfer-encoding;
- bh=2eY4fvguLBXT7jfPbPFCGo+bTpu8wNIpzfFJrw+pOE8=;
- b=fi+detnTXJRPxQHyQClNPkgoyyaUm8bo3qmpHXqIVfmrgdhlG43H7PYljXbw0R1JNZ
- w369+1UCVec8YYFXulUikr3ft6TUHCYUk+xztlj08o6Qc9dN7+1ZwNj6vrSmtLLUCv3d
- ok7BRD9zYt2UaRRk5y1x25RLHJf74SOdEoWYpcq7362bx7dz/OJMsJapEJg+CkzSbz+u
- QhepOZnCOaYF0apjZkbohlKux6cSYC1n9mC2vtFUKqxzh4wZHWMtBCcXf8cqNrROtEd7
- eOulLzl4TXE1pt7LKMSc7SWXDnhDzvEC7MO9lbwQqeHW0xemN9XJ6aKiiovW23A7jEGw
- 72Ow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=2eY4fvguLBXT7jfPbPFCGo+bTpu8wNIpzfFJrw+pOE8=;
- b=Q0TLTJFn/QfqINCRcjvcbuSxLTCt76w6Uvo5crYpouWFcYXIiIxuHZHpLz259BDden
- 8uvyJEJmkTJx6ka6iUh38tRTlCHJTiPjnI/2QhyCIoot/C5qQA2t74ytTEzOb+HYMEDm
- nt8KX4tC990ASWCCkR1ZoBB3wwt4m9Fj2ZpGL7RRrHKT25RvxRnRdtO0kKxIwzKQD1pY
- QYGxjaqzba3ahMAPr/F8VP6DfZrFop+GPP0GRDTbm2o1M+pEvFdTKNccusoQKlQqBt6i
- J/P0U3mkk0yg8KoQBxFnPTPZ2Zmq3SVS/bwhNjgkISB77rvwC18c62SN0jGaZBxIh4Qc
- Lz8Q==
-X-Gm-Message-State: AOAM532ruQ5Kp2nnsJ9JWU60/4c7cqHQCY4RicI8B5lONev334oOhXoU
- KPeXFamGbfqLcwQGF9HUMEULS7j0hAg=
-X-Google-Smtp-Source: ABdhPJyEXYwKzfb7P5hFHitAZLGapYg39c8R1+S13GtTIe83gfvU3eJO1nwxGOvye6e9N8cNCVkirQ==
-X-Received: by 2002:a63:4cc:: with SMTP id 195mr4290504pge.294.1592357365802; 
- Tue, 16 Jun 2020 18:29:25 -0700 (PDT)
-Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id y5sm15259087pgl.85.2020.06.16.18.29.24
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 16 Jun 2020 18:29:25 -0700 (PDT)
-Subject: Re: [PATCH v2 3/5] configure: Clean up warning flag lists
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-References: <20200610203942.887374-1-richard.henderson@linaro.org>
- <20200610203942.887374-4-richard.henderson@linaro.org>
- <61557057-f4be-9a74-1422-3dee74be7f03@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <40e3fce3-ce85-402d-bb0b-b4b00feabd5f@linaro.org>
-Date: Tue, 16 Jun 2020 18:29:23 -0700
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jlO9S-0007Dd-BC
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 22:50:10 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:25084
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jlO9Q-0007X4-0Y
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 22:50:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592362205;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=87Qd/+ceLHoQsc391dF708lZVteXcBQ2EiSDuz0gh4Y=;
+ b=FQEqBuiRdFjKFj+c+aSaSClyHvJ30NhYgYFJgMWIsyw8cRL8W60I60t6a/yqwSE5sjCQEI
+ k2SFJ2cgIJwHx/bmA0cpOL2ZFlRcFFhTj/7Vgxt+n/ei4Nul0/QqAGq9eSlpmDGlkWyiZ2
+ kb6aA0Z8efxix8SoBwlvkLoKHpvLcYU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-81-ZXEcJdcFOOyA16Q4tM_Qsw-1; Tue, 16 Jun 2020 22:50:02 -0400
+X-MC-Unique: ZXEcJdcFOOyA16Q4tM_Qsw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 798AE10AB64B;
+ Wed, 17 Jun 2020 02:50:01 +0000 (UTC)
+Received: from [10.10.117.188] (ovpn-117-188.rdu2.redhat.com [10.10.117.188])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6B9087CAA9;
+ Wed, 17 Jun 2020 02:50:00 +0000 (UTC)
+Subject: Re: [PATCH v4 1/3] qmp.py: change event_wait to use a dict
+To: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+References: <20200514022536.2568-1-jsnow@redhat.com>
+ <20200514022536.2568-2-jsnow@redhat.com>
+ <20200514144732.GJ5518@linux.fritz.box>
+ <de1026e4-9815-f89c-4cfd-6da35ac23197@redhat.com>
+ <20200514155952.GM5518@linux.fritz.box>
+ <3fda28e5-2049-1667-4da7-bbabac1fee15@redhat.com>
+ <792fa6da-bdb7-9760-0840-cc5397f97543@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <d7055912-5eb1-9b04-7e96-02561b30cc9d@redhat.com>
+Date: Tue, 16 Jun 2020 22:49:59 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <61557057-f4be-9a74-1422-3dee74be7f03@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <792fa6da-bdb7-9760-0840-cc5397f97543@redhat.com>
 Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::542;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x542.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=jsnow@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 22:15:44
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -104,33 +174,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-devel@nongnu.org, Cleber Rosa <crosa@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/11/20 7:25 AM, Eric Blake wrote:
->> +add_to warn_flags -Wold-style-declaration
-> 
-> Hmm - should we add:
-> warn_flags= nowarn_flags=
-> prior to this line, to ensure that something inherited from the environment
-> doesn't mess us up.
-> 
->> +add_to warn_flags -Wold-style-definition
->> +add_to warn_flags -Wtype-limits
->> +add_to warn_flags -Wformat-security
->> +add_to warn_flags -Wformat-y2k
->> +add_to warn_flags -Winit-self
->> +add_to warn_flags -Wignored-qualifiers
->> +add_to warn_flags -Wempty-body
->> +add_to warn_flags -Wnested-externs
->> +add_to warn_flags -Wendif-labels
->> +add_to warn_flags -Wno-initializer-overrides
-> 
-> wrong list
-
-Thanks, fixed both.
 
 
-r~
+On 6/16/20 5:41 PM, Eric Blake wrote:
+> On 5/14/20 2:31 PM, John Snow wrote:
+> 
+>>>>
+>>>> Nah, it's fine. I'll clean it up. This is pretty close to an RFC series
+>>>> anyway, so I didn't really polish it.
+>>>>
+>>>> (Or, I will try to clean it up. I probably won't work on it again in
+>>>> the
+>>>> near term. I think I just wanted to see if this seemed useful in
+>>>> general
+>>>> to people.
+>>>
+>>> Ah, there isn't much missing for this series, though. We don't have to
+>>> wait for a fix-the-world series when we can incrementally improve
+>>> things.
+>>>
+>>
+>> Alright, I'll try to hit it halfway -- I spent some time thinking about
+>> a "full" job running framework but ran into some dead-ends I wasn't too
+>> happy with, and wasn't convinced this was a simplification of any kind.
+>>
+>> Still, seeing part of the job running code get duplicated in 040 was a
+>> motivation to try and provide some universal job-running monster that
+>> would be extensible for nearly any task.
+>>
+>> Unfortunately that complexity does generally make the calling sites look
+>> worse, so I cooled off on the idea since.
+>>
+>> So I did intend this as an RFC, because I'm not really 100% happy with
+>> the design.
+> 
+> I noticed that the block-dirty-bitmap-populate series depends on this
+> one; is it going to be simpler for me to fix the few things that Kevin
+> pointed out here, or to wait for you to post a v5 of this series, or to
+> rewrite the iotest in that series to not depend on JobRunner after all?
+> 
+
+It should be pretty trivial (I think) to just rebase the bitpop job on
+top of mainline QEMU without needing this, I'd recommend doing that.
+
+I started porting the job runner to the standalone qemu package instead
+and it's going to take me longer to do that than it would be to just not
+use this patchset for the bitpop test.
+
+If you ping me on IRC tomorrow (Sorry) I can wean the dependency myself.
+
+--js
+
 
