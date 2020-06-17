@@ -2,118 +2,87 @@ Return-Path: <SRS0=bzpH=76=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BBA1C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 10:47:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79D1BC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 10:48:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 44A12208B3
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 10:47:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 43E84208B3
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 10:48:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=mysuse.onmicrosoft.com header.i=@mysuse.onmicrosoft.com header.b="hMuYChFD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 44A12208B3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eL8nk2Le"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43E84208B3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59740 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33790 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlVbK-0004SI-I9
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 06:47:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59098)
+	id 1jlVbz-0005Oa-Fw
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 06:48:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59402)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <LMa@suse.com>) id 1jlVZt-0003r5-DC
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 06:45:59 -0400
-Received: from mail-am6eur05on2073.outbound.protection.outlook.com
- ([40.107.22.73]:6168 helo=EUR05-AM6-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <LMa@suse.com>) id 1jlVZr-0002P8-Gn
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 06:45:57 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=J1w5BDugRapG47HAjmUqXGWxHDY9VuglEULK2B9owx5Ew+Y3UudHFxR/n/qGDp2RpSb3BMeIeez0jpQT+GoeVlFNocnw7o52e2+FrJcXfx7kC6WT6cPlQ2Q7pu1WkN3WZfmGUz1aYPn6X4h7DpV/N09w4fd4RQnDTANxwdKhtx+YUuczwnYXwSHGHb439+8X2SDMLags8TfbdN8TvmQSdRT5FgTyueUEaLMGC+EB8le1hsno8ErdaGE4InBBCJSeYwv//Ay6NrB7QTgJZt5H5nJcNU5q1I76aLxGoHv7K0KELcIprqIjr5PnbCkBGwPcKLhow8KvfujGrb9r9TwBTw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gmzbo8jhYhKPclHozRdra7INsokKICcPMve+ooZA5ME=;
- b=INDNw/jbEN5xFmGNXVd3GJSfTAZ9+bnaHHFd2auKonSk3wEORNHWPPYo3+ZM0ZZPC4iQuBBDDLDVUnvbxMX0leJNSgBgdIf+jscpFgtXs7pUTTpV4mVgIMsVUfdOrshQrNhCzYgJROXAni/KQtNUfUGzp1N52jbY8xvawFKfOe6DxgcXw1eWZmE2qD4wyodQmsOjLAh9uP1tLZg45kZ3r9R0eCFbnXs+q2Kr/jduwjg0GbbhzqTUggJHQ9K1NFJz3sdXHmBreFmVxcDR1qGOoTRQ6Zq/uvEcwXvZ2AA2tuplt4mzOtSuqS7UWjF6kBdshpcptnWvNMtOz6/XZTYTFw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
- dkim=pass header.d=suse.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=mysuse.onmicrosoft.com; s=selector1-mysuse-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gmzbo8jhYhKPclHozRdra7INsokKICcPMve+ooZA5ME=;
- b=hMuYChFDAn5vAbznRMEbMJoelPURTKFvmKFdQ/1CprD4F0tdzeGPDXt/SOf5Y/l6h/fOYhxSYkFFF+7om1AT6f88f6CNhPioTK2qfF47gn7+CUnOpSgLo8IhtwPSSzwZ8zAqspUHt29NS8SdM/qQCxUrIvfO3AF6L7dTLkQuMfEqGfXFMk441FMv+bmDG6t8vixceJdlYeyQ+qha+L5q14/u0UAjvaDWLql3Ww6pR7D1M47gYg6rlU8Lf7AqBa+q/BoLk7u0xtRL6YJfyKP/H+qI4eAH30Cx7Dk5WaFZ0ywX5MQt/QtWRt8vr9jorQ6HbwSobz6LRfSIl1hdAKFt4g==
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=suse.com;
-Received: from AM6PR04MB5782.eurprd04.prod.outlook.com (2603:10a6:20b:aa::17)
- by AM6PR04MB5815.eurprd04.prod.outlook.com (2603:10a6:20b:b0::29)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3109.22; Wed, 17 Jun
- 2020 10:30:44 +0000
-Received: from AM6PR04MB5782.eurprd04.prod.outlook.com
- ([fe80::d848:9dea:7742:a55]) by AM6PR04MB5782.eurprd04.prod.outlook.com
- ([fe80::d848:9dea:7742:a55%4]) with mapi id 15.20.3088.029; Wed, 17 Jun 2020
- 10:30:44 +0000
-From: Lin Ma <lma@suse.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 0/3] Add Support for GET LBA STATUS 16 command in scsi
- emulation
-Date: Wed, 17 Jun 2020 18:30:15 +0800
-Message-Id: <20200617103018.18026-1-lma@suse.com>
-X-Mailer: git-send-email 2.26.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: HK0PR03CA0107.apcprd03.prod.outlook.com
- (2603:1096:203:b0::23) To AM6PR04MB5782.eurprd04.prod.outlook.com
- (2603:10a6:20b:aa::17)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jlVbC-0004Uz-5w
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 06:47:18 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36185
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jlVbA-0002co-7s
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 06:47:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592390835;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=BWTWT6SgDOLYZj8IHpZCjhLkNFtVGcdoHMHHxY+3Prc=;
+ b=eL8nk2LeB0kGP9u4ha9t0ayyyjZDj/bNLELE8OB92NALb7VC6v/DhcyOFRITT8vb/joUON
+ zs53CPYgBX3E9Bgy5AX5ardYRKXBXOQZyxJK8WC9GSBrBZPoszwbdaptDvPWlUr6L/F/aY
+ PbKm8HBWnj0VRKBVe4hrZ5tic/ubdV4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-490--4S6YYXAPFqJ9TlqdeFgEw-1; Wed, 17 Jun 2020 06:47:13 -0400
+X-MC-Unique: -4S6YYXAPFqJ9TlqdeFgEw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A05F594B24;
+ Wed, 17 Jun 2020 10:47:12 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-114-44.ams2.redhat.com [10.36.114.44])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C7FC919C71;
+ Wed, 17 Jun 2020 10:47:10 +0000 (UTC)
+Date: Wed, 17 Jun 2020 12:47:09 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Nir Soffer <nsoffer@redhat.com>
+Subject: Re: [PATCH] block: file-posix: Fail unmap with NO_FALLBACK on block
+ device
+Message-ID: <20200617104709.GA5166@linux.fritz.box>
+References: <20200613170826.354270-1-nsoffer@redhat.com>
+ <CAMRbyyswkaedF0dN2nPb3H8fj5+pmhLWh9GHGor4wUk_Su=b8A@mail.gmail.com>
+ <20200616153241.GF4305@linux.fritz.box>
+ <CAMRbyys3fL_vqswb72-F_vE8pBQ1SkZZmmMeUA_TuTwsew6iSw@mail.gmail.com>
+ <CAMRbyyvD6kRdaitm6Oc6LAnF6_e+Y9y+jTPKNVq8ENLEKYyKng@mail.gmail.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from localhost.localdomain (114.255.249.163) by
- HK0PR03CA0107.apcprd03.prod.outlook.com (2603:1096:203:b0::23) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3109.21 via Frontend Transport; Wed, 17 Jun 2020 10:30:41 +0000
-X-Mailer: git-send-email 2.26.0
-X-Originating-IP: [114.255.249.163]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 266733d2-8794-441a-13f8-08d812a97d83
-X-MS-TrafficTypeDiagnostic: AM6PR04MB5815:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM6PR04MB581587F61D6975B0A56CE275C59A0@AM6PR04MB5815.eurprd04.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:4125;
-X-Forefront-PRVS: 04371797A5
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: dga4A+UoBf66WoXIceW4KxsHlLjczlsNZTv/aCI2ZPKgcEZdGmNhc53ka95M0cHOlejgZdHNsPbIY5dpLAx6Vv4yUdcOY7tWk9tyWdFyv/YaSMPcDpm5Ph7EoI8OjOQgcw9jSZ3EaEAzrrBN15ZKwcVu+Z5D0nrCXPgPq5klcMxyFGQOQi5nw/lLs2652vLsuhNsDyMAU3tiD5iR2le8HC6xBrtSejX5EBwLDGXmUnTl4lnZfBQoGmszTPKsq1BYbQcqMAHbkeAMt5A5eTC1yUTy1XvT7TanQAYGtqWHgCVRhfImVkKyu7589HVJTnjeFSowG+kAjKKj8zFehrwa3eMBnwJfMTgblZR+r6ybXxVN4dnsRdTGsGbWZGtCSUWe
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM6PR04MB5782.eurprd04.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(136003)(376002)(366004)(346002)(396003)(39860400002)(5660300002)(52116002)(6916009)(66556008)(478600001)(6486002)(8936002)(26005)(8676002)(2906002)(66476007)(66946007)(6506007)(4326008)(316002)(36756003)(6666004)(6512007)(86362001)(107886003)(2616005)(956004)(186003)(1076003)(16526019)(83380400001)(69590400007);
- DIR:OUT; SFP:1101; 
-X-MS-Exchange-AntiSpam-MessageData: I9t/uVjtrUT3TqoFldG8zuREefMT62YipNuFQ3EYF57zlluzTzEBvKHipGoPxqNiuf00IxE53ANt8u5Zgc3ndTci9bHi96cobIi2DTR2UP9IVGp9Hx/LjJgMFeYxvN8XDw3AFyZEA3lm7BNtkkIA5Z6xz84JFan+9X3Qc3N+/v7jzqe1gvZ78/RCb3vQ5QoNb6O5IZjAMq1gA4Fdv3xkaHodHCbHGI9bjCtzvvyM9aCb6kObR8sADV6FhNOEpGERVvEykSX7ARbu/JDdJ28FtoDWbcaAJoMoMofmEeWjgSaTPBcuLO3r12872zYiDD9jQduutJUp65S3f1eyNDVug+PBR+iB4fCoVmOK9/3jbv75lZ7GvQbUzzX/+sM3aIjrG0Cr8ZY95d8021DwMaR/Pl/nJ0Psr6WQI5fFf0UOtdfzEkr2a8uJUgvzvoVsu4WjmAeCmrbSBkISISvuk8VhQIvkr8u1E+J6C6Fbu83FAA9oOJvqu0Oy+lepGzE8uxgj
-X-OriginatorOrg: suse.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 266733d2-8794-441a-13f8-08d812a97d83
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Jun 2020 10:30:44.0878 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: bniUpfkoRwZPlsptoP7otfEu6YE1dv9pyAR+2ynwghEqn73Z/Icc10esAZaQWECv
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR04MB5815
-Received-SPF: pass client-ip=40.107.22.73; envelope-from=LMa@suse.com;
- helo=EUR05-AM6-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/17 06:45:48
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
+In-Reply-To: <CAMRbyyvD6kRdaitm6Oc6LAnF6_e+Y9y+jTPKNVq8ENLEKYyKng@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 23:30:45
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
 X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -126,52 +95,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, kwolf@redhat.com, mreitz@redhat.com, stefanha@redhat.com,
- Lin Ma <lma@suse.com>, pbonzini@redhat.com
+Cc: nirsof <nirsof@gmail.com>, qemu-block <qemu-block@nongnu.org>, pl@kamp.de,
+ QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-v2->v1:
-Follow Claudio's suggestions and the docker test result, Fix the dereferencing
-'void *' pointer issues and the coding style issues.
+Am 16.06.2020 um 22:01 hat Nir Soffer geschrieben:
+> On Tue, Jun 16, 2020 at 8:39 PM Nir Soffer <nsoffer@redhat.com> wrote:
+> >
+> > On Tue, Jun 16, 2020 at 6:32 PM Kevin Wolf <kwolf@redhat.com> wrote:
+> > >
+> > > Am 15.06.2020 um 21:32 hat Nir Soffer geschrieben:
+> > > > We can zero 2.3 g/s:
+> > > >
+> > > > # time blkdiscard -z test-lv
+> > > >
+> > > > real 0m43.902s
+> > > > user 0m0.002s
+> > > > sys 0m0.130s
+> > >
+> > > > We can write 445m/s:
+> > > >
+> > > > # dd if=/dev/zero bs=2M count=51200 of=test-lv oflag=direct conv=fsync
+> > > > 107374182400 bytes (107 GB, 100 GiB) copied, 241.257 s, 445 MB/s
+> > >
+> > > So using FALLOC_FL_PUNCH_HOLE _is_ faster after all. What might not be
+> > > faster is zeroing out the whole device and then overwriting a
+> > > considerable part of it again.
+> > >
+> > > I think this means that we shouldn't fail write_zeroes at the file-posix
+> > > level even if BDRV_REQ_NO_FALLBACK is given. Instead, qemu-img convert
+> > > is where I see a fix.
+> > >
+> > > Certainly qemu-img could be cleverer and zero out more selectively. The
+> > > idea of doing a blk_make_zero() first seems to have caused some
+> > > problems, though of course its introduction was also justified with
+> > > performance, so improving one case might hurt another if we're not
+> > > careful.
+> > >
+> > > However, when Peter Lieven introduced this (commit 5a37b60a61c), we
+> > > didn't use write_zeroes yet during the regular copy loop (we do since
+> > > commit 690c7301600). So chances are that blk_make_zero() doesn't
+> > > actually help any more now.
+> > >
+> > > Can you run another test with the patch below?
+> >
+> > Sure, I can try this.
+> 
+> Tried it, and it performs the same as expected.
 
+Thanks.
 
-In this current design, The GET LBA STATUS parameter data only contains
-an eight-byte header + one LBA status descriptor.
+> > > I think it should perform
+> > > the same as yours. Eric, Peter, do you think this would have a negative
+> > > effect for NBD and/or iscsi?
+> > >
+> > > The other option would be providing an option and making it Someone
+> > > Else's Problem.
+> > >
+> > > Kevin
+> > >
+> > >
+> > > diff --git a/qemu-img.c b/qemu-img.c
+> > > index d7e846e607..bdb9f6aa46 100644
+> > > --- a/qemu-img.c
+> > > +++ b/qemu-img.c
+> > > @@ -2084,15 +2084,6 @@ static int convert_do_copy(ImgConvertState *s)
+> > >          s->has_zero_init = bdrv_has_zero_init(blk_bs(s->target));
+> > >      }
+> > >
+> > > -    if (!s->has_zero_init && !s->target_has_backing &&
+> > > -        bdrv_can_write_zeroes_with_unmap(blk_bs(s->target)))
+> > > -    {
+> > > -        ret = blk_make_zero(s->target, BDRV_REQ_MAY_UNMAP | BDRV_REQ_NO_FALLBACK);
+> > > -        if (ret == 0) {
+> > > -            s->has_zero_init = true;
+> > > -        }
+> > > -    }
+> >
+> > This will work of course, but now we will not do bulk zero for any target
+> 
+> I would like to have a minimal change to increase the chance that we
+> can consume this very soon in oVirt.
 
-How to test:
-host:~ # qemu-system-x86_64 \
-...
--drive file=/vm0/disk0.raw,format=raw,if=none,id=drive0,discard=unmap \
--device scsi-hd,id=scsi0,drive=drive0 \
-...
+I think this one would be pretty minimal.
 
+Maybe we can later bring this code back, but with an implementation of
+blk_make_zero() that doesn't use the generic write_zeroes operation,
+but with a specific callback like Eric suggested.
 
-guest:~ # dd if=/dev/zero of=/dev/sda bs=512 seek=1024 count=256
+> > I think we never do this for regular files anyway since we truncate
+> > files, and there is nothing to zero, but maybe there is some case
+> > when this is useful?
 
-guest:~ # sg_unmap -l 1024 -n 32 /dev/sda
+Yes, regular files have s->has_zero_init == true anyway.
 
-guest:~ # sg_get_lba_status /dev/sda -l 1024
-No indication of the completion condition
-RTP=0
-descriptor LBA: 0x0000000000000400  blocks: 32  deallocated
+> > BTW, do we use BDRV_REQ_NO_FALLBACK elsewhere? maybe we can remove
+> > it.
 
-Lin Ma (3):
-  block: Add bdrv_co_get_lba_status
-  block: Add GET LBA STATUS support
-  scsi-disk: Add support for the GET LBA STATUS 16 command
+qcow2 uses it when zeroing out parts of a newly allocated cluster on
+partial writes. Though that code is questionable, too, and XFS people
+suggest that we should stop using it.
 
- block/block-backend.c          | 38 ++++++++++++++
- block/io.c                     | 43 ++++++++++++++++
- hw/scsi/scsi-disk.c            | 90 ++++++++++++++++++++++++++++++++++
- include/block/accounting.h     |  1 +
- include/block/block_int.h      |  5 ++
- include/scsi/constants.h       |  1 +
- include/sysemu/block-backend.h |  2 +
- 7 files changed, 180 insertions(+)
-
--- 
-2.26.0
+Kevin
 
 
