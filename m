@@ -2,84 +2,87 @@ Return-Path: <SRS0=bzpH=76=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B23CEC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 03:31:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C373C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 03:34:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7AFB920663
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 03:31:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5717620663
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 03:34:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZhDThCKS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7AFB920663
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YMtveokG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5717620663
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43894 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46252 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlOnP-0003uq-Nj
-	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 23:31:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53718)
+	id 1jlOqV-0005Yy-M6
+	for qemu-devel@archiver.kernel.org; Tue, 16 Jun 2020 23:34:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54304)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jlOmi-0003Qp-G7
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 23:30:44 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56437
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jlOpU-0004mH-SI
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 23:33:38 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:35969
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jlOmf-0007oI-TH
- for qemu-devel@nongnu.org; Tue, 16 Jun 2020 23:30:43 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jlOpT-0008Qg-0W
+ for qemu-devel@nongnu.org; Tue, 16 Jun 2020 23:33:36 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592364640;
+ s=mimecast20190719; t=1592364813;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=XTEs5PVK7R8o106y73W2FwDQibZdURRllpIj8FPCHns=;
- b=ZhDThCKSsc9riKPTYHi7Uf1XYEmkWxS6Edgd7qo6BwcYcQxxDur8NnCwEzJlfzv8z7bkYB
- Pv4/6v8v8s+QV4Qq3+fm02pepbFyS3J6P52V58GGYNE9kPaWA65aafPNIWyGnm+D3pusvJ
- stgqGx0yQp6CIt77oE6lvAks8MCTP9E=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-41-7UuxOl8zOpmpqXL-FRcAoA-1; Tue, 16 Jun 2020 23:30:36 -0400
-X-MC-Unique: 7UuxOl8zOpmpqXL-FRcAoA-1
-Received: by mail-wm1-f70.google.com with SMTP id j128so289616wmj.6
- for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 20:30:35 -0700 (PDT)
+ bh=5tJ9gI4kIUt6W+wnAYQfRijM4AqdJkpPzqDJSWuYP/4=;
+ b=YMtveokG5nadedegIMoawoi2GVVckYSHOxae3ArEFEUCNgZ9woaut/XKl4ecrNreVuFyM/
+ nIZDUQ9Y+eBXcgtOd9pGe1g1dsvegmd/dYn1SxtgVXX2F4W0sGV5vP0sVLTHT1rZlXK0jH
+ RjlaFCr3TBukEQ7qMgvuhaGSQaR2Xpw=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-202-rCAaN9wDNEybNFgiac_-fA-1; Tue, 16 Jun 2020 23:33:28 -0400
+X-MC-Unique: rCAaN9wDNEybNFgiac_-fA-1
+Received: by mail-wr1-f70.google.com with SMTP id s7so368972wrm.16
+ for <qemu-devel@nongnu.org>; Tue, 16 Jun 2020 20:33:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=XTEs5PVK7R8o106y73W2FwDQibZdURRllpIj8FPCHns=;
- b=cKJoP0mSW1YH0vwOuxivHPYV2SaGoivHOCoAcAJhRM7d0Qny6MDijA5RQicL9hpyYo
- awI4EeHeZMqmLFQn/OFeH5SZwcwAlL7IsGAIGWjGSHXObbJXG1w2+sk72hm8bbT/QFog
- 0Y5EhK3FpDmyO/UNmEp24Tz2L55W1cyeD7eTucmKWuVsM45gLBePR950waDuFoRgUhSH
- 0L5Sy64CEyoE5y4S8tAeA32zC+T2Pwsc8KV2zhKT/zqx7yREf2FZ7wJMURq2iFGU/pA6
- FlN38RwRtI41cC8plBvGukG/iRJrKUKGWwYAft3RwBsYyzqA2DjikAOktA0zH9tgtvEo
- 3Kcw==
-X-Gm-Message-State: AOAM532zuHYJpUMzWN8hnKVTEJDQZgH4zJegIlfwZooo9/3CQppf9IPk
- foLpRuL0LMguahYGPNVbK4lCec6J5f7T4b6+p7Pj3Cy3VWBhL/nz7v4HUUulls3G7BrNgNBDkTx
- CMVYZ0WJYBf80e6E=
-X-Received: by 2002:adf:c391:: with SMTP id p17mr5738973wrf.243.1592364634987; 
- Tue, 16 Jun 2020 20:30:34 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyNw+UTfVvJulMnOpfS8kp87UyC2Q5nou20LbAUGatk8Fs+rX3Ab9u1cszKg+09w/G6VrVq2Q==
-X-Received: by 2002:adf:c391:: with SMTP id p17mr5738945wrf.243.1592364634509; 
- Tue, 16 Jun 2020 20:30:34 -0700 (PDT)
+ bh=5tJ9gI4kIUt6W+wnAYQfRijM4AqdJkpPzqDJSWuYP/4=;
+ b=RK5GF5G5jUGrInpcOtuhiZcjxyWBJISIgvINOu4ULHX9vZRrXaAuKmccZD3UEr1v9O
+ 1xGEtGwIiAPrVwOMW45gjMWsukd9nBHbXRWzeBk1K226k4R2+DSc9tAjyA2GKd4gSxYk
+ di/+3J7gSC01J7mzwiFuUKLuP5Kk0DlTNZ9EZMVy4DNujXVw3oTtgLdyA1lgDNr34oY0
+ xSIn/MmEyospdDcwpzsIYGbGd7561FyM6HVliH5Jmmg8xAbyaxBe2tA0RX01sdTlJVCo
+ yYstBABttc1RdcHTuaPJDom53SAEPf0xkj/m6lgFGmCIfYCoZqXIP3ExZYcD03hs8j8q
+ 5f1Q==
+X-Gm-Message-State: AOAM531kgn37r7n1V8P0/JgyfeqOEwseuCO4x2MqTLPz6y1dAHqZhVpZ
+ MlBr3TMwU6cVqC6Qa/kSKTNQoi4v1b00293bqAs7LM7NduVQz2WQg19/M3aBRiMq4aa3UZ4aFMl
+ tn2mbp2iHbgUMEkQ=
+X-Received: by 2002:adf:f790:: with SMTP id q16mr6202556wrp.399.1592364807480; 
+ Tue, 16 Jun 2020 20:33:27 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxk16srYtnxhzQOQZP+oMUelp3MPYIwBvxdUiQZurPygYB/tP2e7Xs7kfkDlPJDW465i/BSCQ==
+X-Received: by 2002:adf:f790:: with SMTP id q16mr6202535wrp.399.1592364807223; 
+ Tue, 16 Jun 2020 20:33:27 -0700 (PDT)
 Received: from [192.168.1.37] (93.red-83-59-160.dynamicip.rima-tde.net.
  [83.59.160.93])
- by smtp.gmail.com with ESMTPSA id r7sm6074129wmh.46.2020.06.16.20.30.33
+ by smtp.gmail.com with ESMTPSA id h15sm29865466wrt.73.2020.06.16.20.33.26
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 16 Jun 2020 20:30:33 -0700 (PDT)
-Subject: Re: [PULL 00/84] QOM patches for 2020-06-15
-To: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, 
- Markus Armbruster <armbru@redhat.com>
-References: <20200615204008.3069956-1-armbru@redhat.com>
- <CAFEAcA8iy3qzzbcM_X_Xgzz+KOcZ+Nq4=3q=Lag6hpuwrBCb4Q@mail.gmail.com>
- <e9febd4f-97ea-7832-fae1-14cbd7c9a73d@redhat.com>
+ Tue, 16 Jun 2020 20:33:26 -0700 (PDT)
+Subject: Re: applying mailing list review tags (was: Re: [PATCH v3 00/16]
+ python: add mypy support to python/qemu)
+To: John Snow <jsnow@redhat.com>, Markus Armbruster <armbru@redhat.com>
+References: <20200604202236.25039-1-jsnow@redhat.com>
+ <20200605092630.GE5869@linux.fritz.box>
+ <502e4f4d-6770-61a7-1496-9cb244f9ddd3@redhat.com>
+ <20200608153327.GD6419@linux.fritz.box>
+ <130e4383-8c33-c3f2-55b2-1ec45a5214cc@redhat.com>
+ <87wo4gr4yb.fsf@dusky.pond.sub.org>
+ <4ee8f32a-192d-b154-f3cc-c41e7ff56c58@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
@@ -104,22 +107,20 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <01b69a4e-44f1-9d89-f92e-7b4efed0eb3d@redhat.com>
-Date: Wed, 17 Jun 2020 05:30:32 +0200
+Message-ID: <82753499-3459-e6af-6cda-501ce56dfce6@redhat.com>
+Date: Wed, 17 Jun 2020 05:33:25 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <e9febd4f-97ea-7832-fae1-14cbd7c9a73d@redhat.com>
+In-Reply-To: <4ee8f32a-192d-b154-f3cc-c41e7ff56c58@redhat.com>
 Content-Language: en-US
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 22:15:44
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 23:33:33
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -140,54 +141,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/16/20 5:26 PM, Thomas Huth wrote:
-> On 16/06/2020 14.26, Peter Maydell wrote:
->> On Mon, 15 Jun 2020 at 21:43, Markus Armbruster <armbru@redhat.com> wrote:
->>>
->>> The following changes since commit 7d3660e79830a069f1848bb4fa1cdf8f666424fb:
->>>
->>>   Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2020-06-12 23:06:22 +0100)
->>>
->>> are available in the Git repository at:
->>>
->>>   git://repo.or.cz/qemu/armbru.git tags/pull-qom-2020-06-15
->>>
->>> for you to fetch changes up to b77b5b3dc7a4730d804090d359c57d33573cf85a:
->>>
->>>   MAINTAINERS: Make section QOM cover hw/core/*bus.c as well (2020-06-15 22:06:04 +0200)
->>>
->>> ----------------------------------------------------------------
->>> QOM patches for 2020-06-15
->>>
->>> * Make "info qom-tree" show children sorted
->>> * Fixes around device realization
->>> * Rework how we plug into devices into their parent bus
->>
->>
->> Applied, thanks.
->>
->> Please update the changelog at https://wiki.qemu.org/ChangeLog/5.1
->> for any user-visible changes.
+On 6/16/20 7:58 PM, John Snow wrote:
 > 
-> This pull requests (with the patch "qdev: qdev_init_nofail() is now
-> unused, drop") apparently broke some iotests:
 > 
->  https://gitlab.com/qemu-project/qemu/-/jobs/597414772#L4376
+> On 6/9/20 4:58 AM, Markus Armbruster wrote:
+>> Philippe Mathieu-Daudé <philmd@redhat.com> writes:
+>>
+>>> On 6/8/20 5:33 PM, Kevin Wolf wrote:
+>>>> Am 08.06.2020 um 17:19 hat John Snow geschrieben:
+>>>>>
+>>>>>
+>>>>> On 6/5/20 5:26 AM, Kevin Wolf wrote:
+>>>>>> Am 04.06.2020 um 22:22 hat John Snow geschrieben:
+>>>>>>> Based-on: 20200604195252.20739-1-jsnow@redhat.com
+>>>>>>>
+>>>>>>> This series is extracted from my larger series that attempted to bundle
+>>>>>>> our python module as an installable module. These fixes don't require that,
+>>>>>>> so they are being sent first as I think there's less up for debate in here.
+>>>>>>>
+>>>>>>> This requires my "refactor shutdown" patch as a pre-requisite.
+>>>>>>
+>>>>>> You didn't like my previous R-b? Here's a new one. :-)
+>>>>>>
+>>>>>> Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+>>>>>>
+>>>>>
+>>>>> I felt like I should address the feedback, and though I could have
+>>>>> applied the R-B to patches I didn't change, it was ... faster to just
+>>>>> re-send it.
+>>>>>
+>>>>> Serious question: How do you apply people's R-Bs to your patches? At the
+>>>>> moment, it's pretty manually intensive for me. I use stgit and I pop all
+>>>>> of the patches off (stg pop -n 100), and then one-at-a-time I `stg push;
+>>>>> stg edit` and copy-paste the R-B into it.
+>>>
+>>> wget https://patchew.org/QEMU/${MSG_ID}/mbox
+>>> git am mbox
+>>>
+>>> Where ${MSG_ID} is the Message-Id of the series cover letter.
+>>
+>> Patchew's awesomeness is still under-appreciated.
+>>
 > 
-> Can you please have a look?
+> Not for lack of appreciating patchew, but the problem with this workflow
+> is if I have already made modifications to my patches locally, I can't
+> use this to apply tags from upstream.
 
-Fix sent:
-https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg04730.html
+Does that mean you want to respin this series?
+Else you can consider it applied on python-next.
 
 > 
->  Thanks,
->   Thomas
+> It looks like I will continue to do this manually for the time being;
+> but scripting the ability to "merge tags" from the list would be a cool
+> trick.
 > 
+> I'm not sure how to do it with git, though. Let's say I've got 16
+> patches and I've made modifications to some, but not all; so I have a
+> branch with 16 patches ahead of origin/master.
+> 
+> Does anyone have any cool tricks for being able to script:
+> 
+> 1. Correlating a mailing list patch from e.g. patchew to a commit in my
+> history, even if it's changed a little bit?
+> 
+> (git-backport-diff uses patch names, that might be sufficient... Could
+> use that as a starting point, at least.)
+> 
+> 2. Obtaining the commit message of that patch?
+> `git show -s --format=%B $SHA` ought to do it...
+> 
+> 3. Editing that commit message? This I'm not sure about. I'd need to
+> understand the tags on the upstream and downstream versions, merge them,
+> and then re-write the message. Some magic with `git rebase -i` ?
+> 
+> --js
 > 
 
 
