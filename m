@@ -2,90 +2,75 @@ Return-Path: <SRS0=bzpH=76=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21B85C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 18:29:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A13B8C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 18:38:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E3B8A212CC
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 18:29:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6ADF7206DB
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 18:38:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fZox2gWr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3B8A212CC
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FFw43HYZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6ADF7206DB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39932 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46050 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlcoi-0000BL-59
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 14:29:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48496)
+	id 1jlcxV-0004ft-KI
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 14:38:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51496)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ckuehl@redhat.com>) id 1jlcnk-0008Ac-Iz
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 14:28:44 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:34312
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jlcwY-0003Nn-QM
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 14:37:50 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:31717
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ckuehl@redhat.com>) id 1jlcnh-0006LB-Gh
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 14:28:43 -0400
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jlcwX-00088Q-39
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 14:37:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592418520;
+ s=mimecast20190719; t=1592419068;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding;
- bh=EonT1A6c9Rx6AQvRKMgsZ6/YashYoQt44aYHSyzBM2A=;
- b=fZox2gWr2R4/Ky+/bcX0hSDm4mANigzwgjC9Hx7rkWWnYJANDBgid5Fpj03BdoUC/uNV8f
- 5vG2HOETuiNcFw75NIDsTIJzuQBfpKy21C9BjHGIStKe1tnH1tvGq6ApTlnFfXzOlIAARH
- NFr/p+U8LL2q92Dj1XzCHySZ3XwRibk=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-342-0vUaXnZgM86eJmv1_rmXMw-1; Wed, 17 Jun 2020 14:27:29 -0400
-X-MC-Unique: 0vUaXnZgM86eJmv1_rmXMw-1
-Received: by mail-qv1-f71.google.com with SMTP id j4so2222163qvt.20
- for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 11:27:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=EonT1A6c9Rx6AQvRKMgsZ6/YashYoQt44aYHSyzBM2A=;
- b=XNHEwnqsslbSrBv0+tqNVXBYhIRUg6/rF47PO92FfsSiI7nDQMUcGTspA00YHSEKLW
- Q5E+5+op/gMGliEw3iuCG5m0SJ8wRRlRxyB3GgwQPiY/ZMyVkK5wI72kjS0tDsbIAXhn
- B7O4SDpOHfplHkNpwn11ckunjfRpcL9oho4CO+tEp1n5x01uY0TFN2EcJ4BF8GBp+c96
- Iy+ynpQCloobu+jZCb5MW4m399E3PgMeVHpFFfkHmtflSF9TFRlxhdrrgYoEEBxehzCt
- NlR3ZSlIdtnpz96fH73ZeSvS2nwo9Zszsr/gW/1G8lwxqLZxo82yJmhgu37rpyuMDSn4
- h/+A==
-X-Gm-Message-State: AOAM533zwE8b1DChUzvj94B/HuHxHu7saASPcB1UzjjBUfvulZsNfoFN
- bQJxTUsdomkYQCosXPYw2Dl4i7y6g7PdGCge2XL+EW0AB13uoAHvoKmcbwRKirMM1cuEaVBhZ52
- TZ1+c+IWwrIWLQYU=
-X-Received: by 2002:a37:5805:: with SMTP id m5mr25101781qkb.176.1592418448706; 
- Wed, 17 Jun 2020 11:27:28 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxWZOEn4LlgYPmz6QnZrYsws2iNX1n1ou20jQyzTmh6haTPuWPwq3NMtVTTljffDcQHqqbR5w==
-X-Received: by 2002:a37:5805:: with SMTP id m5mr25101749qkb.176.1592418448411; 
- Wed, 17 Jun 2020 11:27:28 -0700 (PDT)
-Received: from redhat.redhat.com (c-71-63-171-240.hsd1.or.comcast.net.
- [71.63.171.240])
- by smtp.gmail.com with ESMTPSA id a14sm704779qkn.16.2020.06.17.11.27.26
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 17 Jun 2020 11:27:27 -0700 (PDT)
-From: Connor Kuehl <ckuehl@redhat.com>
-To: kwolf@redhat.com,
-	mreitz@redhat.com
-Subject: [PATCH] block: Raise an error when backing file parameter is an empty
- string
-Date: Wed, 17 Jun 2020 11:27:25 -0700
-Message-Id: <20200617182725.951119-1-ckuehl@redhat.com>
-X-Mailer: git-send-email 2.25.4
+ bh=soeJ5WOST+0w167MLAV5NBerXrg9sHfe0jleJ/NzEy4=;
+ b=FFw43HYZba5kPrfgUZKR6Eu3frhtq8E0dfsL5uq7jkk3cLTM66o1old9h2sLbU3bTnnZmP
+ NDQtcUReIoLxI2uk3hkir7koifnx1v/CX5c2+FLfy7jwkUHCHmqIpTJkZlkVd8iXdq6aGo
+ RSJzmYJvW/TPnN6kHPVDUfIor3XuySw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-386-4YZnv29-NlmXBUEoPgVALw-1; Wed, 17 Jun 2020 14:37:43 -0400
+X-MC-Unique: 4YZnv29-NlmXBUEoPgVALw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F406B1005513;
+ Wed, 17 Jun 2020 18:37:41 +0000 (UTC)
+Received: from dgilbert-t580.localhost (ovpn-115-47.ams2.redhat.com
+ [10.36.115.47])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 366AE768B4;
+ Wed, 17 Jun 2020 18:37:34 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org, david@redhat.com, lvivier@redhat.com,
+ maozhongyi@cmss.chinamobile.com, mreitz@redhat.com, pannengyuan@huawei.com
+Subject: [PULL 00/12] migration, HMP and virtiofs queue
+Date: Wed, 17 Jun 2020 19:37:21 +0100
+Message-Id: <20200617183733.186168-1-dgilbert@redhat.com>
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=ckuehl@redhat.com;
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=dgilbert@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/17 02:02:46
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -108,126 +93,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: stefanha@redhat.com, quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Providing an empty string for the backing file parameter like so:
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-	qemu-img create -f qcow2 -b '' /tmp/foo
+The following changes since commit 26bf4a29213b432eb390726c698a1915550a9cf9:
 
-allows the flow of control to reach and subsequently fail an assert
-statement because passing an empty string to
+  Merge remote-tracking branch 'remotes/kraxel/tags/usb-20200617-pull-request' into staging (2020-06-17 16:24:24 +0100)
 
-	bdrv_get_full_backing_filename_from_filename()
+are available in the Git repository at:
 
-simply results in NULL being returned without an error being raised.
+  git://github.com/dagrh/qemu.git tags/pull-migration-20200617a
 
-To fix this, let's check for an empty string when getting the value from
-the opts list.
+for you to fetch changes up to 7e89a1401a9674c9882948f05f4d17ea7be1c4eb:
 
-Reported-by: Attila Fazekas <afazekas@redhat.com>
-Fixes: https://bugzilla.redhat.com/1809553
-Signed-off-by: Connor Kuehl <ckuehl@redhat.com>
----
- block.c                    |  4 ++++
- tests/qemu-iotests/298     | 47 ++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/298.out |  5 ++++
- tests/qemu-iotests/group   |  1 +
- 4 files changed, 57 insertions(+)
- create mode 100755 tests/qemu-iotests/298
- create mode 100644 tests/qemu-iotests/298.out
+  migration: fix multifd_send_pages() next channel (2020-06-17 17:48:39 +0100)
 
-diff --git a/block.c b/block.c
-index 6dbcb7e083..b335d6bcb2 100644
---- a/block.c
-+++ b/block.c
-@@ -6116,6 +6116,10 @@ void bdrv_img_create(const char *filename, const char *fmt,
-                              "same filename as the backing file");
-             goto out;
-         }
-+        if (backing_file[0] == '\0') {
-+            error_setg(errp, "Expected backing file name, got empty string");
-+            goto out;
-+        }
-     }
- 
-     backing_fmt = qemu_opt_get(opts, BLOCK_OPT_BACKING_FMT);
-diff --git a/tests/qemu-iotests/298 b/tests/qemu-iotests/298
-new file mode 100755
-index 0000000000..1e30caebec
---- /dev/null
-+++ b/tests/qemu-iotests/298
-@@ -0,0 +1,47 @@
-+#!/usr/bin/env python3
-+#
-+# Copyright (C) 2020 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+
-+
-+
-+# Regression test for avoiding an assertion when the 'backing file'
-+# parameter (-b) is set to an empty string for qemu-img create
-+#
-+#   qemu-img create -f qcow2 -b '' /tmp/foo
-+#
-+# This ensures the invalid parameter is handled with a user-
-+# friendly message instead of a failed assertion.
-+
-+import iotests
-+
-+class TestEmptyBackingFilename(iotests.QMPTestCase):
-+
-+
-+    def test_empty_backing_file_name(self):
-+        actual = iotests.qemu_img_pipe(
-+                'create',
-+                '-f', 'qcow2',
-+                '-b', '',
-+                '/tmp/foo'
-+        )
-+        expected = 'qemu-img: /tmp/foo: Expected backing file name,' \
-+                   ' got empty string'
-+
-+        self.assertEqual(actual.strip(), expected.strip())
-+
-+
-+if __name__ == '__main__':
-+    iotests.main(supported_fmts=['raw', 'qcow2'])
-diff --git a/tests/qemu-iotests/298.out b/tests/qemu-iotests/298.out
-new file mode 100644
-index 0000000000..ae1213e6f8
---- /dev/null
-+++ b/tests/qemu-iotests/298.out
-@@ -0,0 +1,5 @@
-+.
-+----------------------------------------------------------------------
-+Ran 1 tests
-+
-+OK
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index d886fa0cb3..4bca2d9e05 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -302,3 +302,4 @@
- 291 rw quick
- 292 rw auto quick
- 297 meta
-+298 img auto quick
--- 
-2.25.4
+----------------------------------------------------------------
+Migration (and HMP and virtiofs) pull 2020-06-17
+
+Migration:
+   HMP/migration and test changes from Mao Zhongyi
+   multifd fix from Laurent Vivier
+HMP
+   qom-set partial reversion/change from David Hildenbrand
+      now you need -j to pass json format, but it's regained the
+      old 100M type format.
+  Memory leak fix from Pan Nengyuan
+
+Virtiofs
+  fchmod seccomp fix from Max Reitz
+
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+----------------------------------------------------------------
+David Hildenbrand (1):
+      hmp: Make json format optional for qom-set
+
+Laurent Vivier (1):
+      migration: fix multifd_send_pages() next channel
+
+Mao Zhongyi (8):
+      tests/migration: mem leak fix
+      tests/migration: fix unreachable path in stress test
+      monitor/hmp-cmds: add units for migrate_parameters
+      monitor/hmp-cmds: don't silently output when running 'migrate_set_downtime' fails
+      monitor/hmp-cmds: delete redundant Error check before invoke hmp_handle_error()
+      monitor/hmp-cmds: add 'goto end' to reduce duplicate code.
+      monitor/hmp-cmds: improvements for the 'info migrate'
+      docs/xbzrle: update 'cache miss rate' and 'encoding rate' to docs
+
+Max Reitz (1):
+      virtiofsd: Whitelist fchmod
+
+Pan Nengyuan (1):
+      qom-hmp-cmds: fix a memleak in hmp_qom_get
+
+ docs/xbzrle.txt           |  8 +++++---
+ hmp-commands.hx           |  7 ++++---
+ migration/multifd.c       |  6 ++++++
+ monitor/hmp-cmds.c        | 30 ++++++++++++++++--------------
+ qom/qom-hmp-cmds.c        | 21 +++++++++++++++++----
+ tests/migration/stress.c  | 34 +++++++---------------------------
+ tools/virtiofsd/seccomp.c |  1 +
+ 7 files changed, 56 insertions(+), 51 deletions(-)
 
 
