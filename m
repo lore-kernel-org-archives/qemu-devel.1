@@ -7,71 +7,72 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B1F6C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 22:06:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9639CC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 22:07:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2F7342082F
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 22:06:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4AA0621548
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 22:07:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="O9DllsKz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F7342082F
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="QCSjRc0g"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4AA0621548
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37012 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39604 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlgCX-00062y-4s
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 18:06:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45956)
+	id 1jlgDm-0007Fd-GL
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 18:07:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46202)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=430b82a1d=dmitry.fomichev@wdc.com>)
- id 1jlfhf-0003fo-Ei; Wed, 17 Jun 2020 17:34:39 -0400
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:29837)
+ id 1jlfiF-0004U9-9L; Wed, 17 Jun 2020 17:35:16 -0400
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:29879)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=430b82a1d=dmitry.fomichev@wdc.com>)
- id 1jlfhd-0005DU-7t; Wed, 17 Jun 2020 17:34:39 -0400
+ id 1jlfiA-0005JL-Md; Wed, 17 Jun 2020 17:35:14 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1592429676; x=1623965676;
+ t=1592429710; x=1623965710;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=aqgqaLO1ZcNkybwn5HB7GQlLkwoHClg6t6ocDRLv81s=;
- b=O9DllsKzaIhb/iDuNHTyJc/2UQ/3R8m7CSVhPh+7H1VIZX/1syfvqKDd
- EqJ7IKYzjAG94qF0jMRZR+8VuVUyVInYRjZF4IasBwYbyGU5oReRy1HKj
- diRjK4VBEh8pAa/Q224FvDrkBUt9Tf/cI32IT+Od5z4wSMFbt7fbS+Mw5
- cmyGR9ueIY7OqpKzN8jzDvjDK5rMjCyeGcQDFtpFnXiv6fk77u7+OcZqY
- 7nVv/FRpDBo3pI6yiW0dGTrIcQyDbNgIh+ppzoO0iDbIvO6sDWSibX2Ri
- UkXMIFfoGxoxiLkZI7HmA/o5OGoRutauErNrguvtr/gdruk6r9JAaoswI g==;
-IronPort-SDR: gXyfMwM3GvpEDv+LKNY+ILdioz+8pgRnpWHAWRKdKkHb0vt3k5mycyA1gpP9hyVsbPCwHmyrms
- NFCqUt7vJtB4BS0sCzaSontL8cCIfxWbBOuRTm0/dMeE2iCjrZ5vnUUQHvpPDqCeO+gyAwFdfd
- CK0E7jDHj1mEsomRj6NLWgdZqQNsJTPNemyZNNtV9y/rGpXNlAGssxMygH79NGscwh19aapFEy
- B/3sBqTqrJsLdpAOAeUJdupsj7rJFBt4yOfswileXcV13HI0c38/0/qNFZB1V8HSK+hquqqKTg
- fko=
-X-IronPort-AV: E=Sophos;i="5.73,523,1583164800"; d="scan'208";a="249439796"
+ bh=kwrY53sPRnDUcfHWzyMpaug9UTWDAFQUu7bDu1cvpK0=;
+ b=QCSjRc0g6HnY3qdspy25AJBI63p59P7vvDjKURuDn13akWlxiR/zC5fW
+ mVYO7GWE922nJFJJ8ZE6TSjylBBQwQKC5zUbbmIAAfAAg9aYU6GkQ/No7
+ fYZSl5YULWL406r5u+DPPrpKGUNK3m1d541HhaazBDgEQAsl6HuXGOdUt
+ yDiRtKGxfChdGjQBA9L84oMt3aRoRf+vW73qb3sNPQLcl+G0/BsyyjJji
+ OQfVuPcw51gTDf4lcT2JKOw10UlLXURZMB3lUKBydijmX74MfpYIa2WPp
+ qbkOs4HuUEXtKF7RwIi/XYTk3wTi/cu7h70E5unuRMm4FC8+DOj+jcUKb A==;
+IronPort-SDR: CIysAxiTHJS3QV6KjevBxXOtozcyAj8qnbPYnJxdGxBGfTg/lWbahQD6bSZNQuTG+P8f0X8GoQ
+ 9tIJncR6DyZkJXQhATmi7eW+/aMAqhOEO0o5MHBm3c0Y2wzG1UpnpXbMOhli/bWHD4BUEUqTlU
+ 4RZu+deELLbweaTln/ddo5FRD/2QTmk73E4dB5bqsIv0WmgLqZOxgLiuaJKJJ06E4J6ckzxnDt
+ yWiaXhp4odeke9nJK6k83KuIQhIZG1ZQqqi8pUYS0iTy2vcn52pU9sQJPe8Iken39rW+BrFQPu
+ nqE=
+X-IronPort-AV: E=Sophos;i="5.73,523,1583164800"; d="scan'208";a="249439825"
 Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com)
  ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 18 Jun 2020 05:34:35 +0800
-IronPort-SDR: /j9pauwMqTfyxF2AJLczocKSD+4QeDzme8iweFXFXyp12Om7f4K27ymxIkjtJ8ma5q8FqM43Kg
- eGWGSXAl3xuBeKrVMmfj5eZHAXhKmLWrs=
+ by ob1.hgst.iphmx.com with ESMTP; 18 Jun 2020 05:34:48 +0800
+IronPort-SDR: hOQQwUvCp6OpV7dEghQhBy4dbKciFtJ4IVIwRzgiChOIk+exomehjGk0uLKgDzj8mETxPeWND1
+ CZuyGowuVxH0ZAraTgXRS1Elobbi8P/dU=
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 17 Jun 2020 14:23:16 -0700
-IronPort-SDR: RXZbLbNO2L+8aoDA/8kGOgeP/C1DU/k5Uosx3JCTU4VLj+0Lp1SEuTkaURo5agUru2v7DXUhpe
- KDbcCK97fIvQ==
+ 17 Jun 2020 14:23:29 -0700
+IronPort-SDR: iYeozAJ6zYhFYG2661x5fUAPbBXfUbO/tqFpYjwxiWzMYYbd1SeBDr+FzF0SWS+U8mkXLzKzrM
+ 1TyXiH021tBA==
 WDCIronportException: Internal
 Received: from unknown (HELO redsun50.ssa.fujisawa.hgst.com) ([10.149.66.24])
- by uls-op-cesaip02.wdc.com with ESMTP; 17 Jun 2020 14:34:33 -0700
+ by uls-op-cesaip02.wdc.com with ESMTP; 17 Jun 2020 14:34:46 -0700
 From: Dmitry Fomichev <dmitry.fomichev@wdc.com>
 To: Kevin Wolf <kwolf@redhat.com>, Keith Busch <kbusch@kernel.org>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  Maxim Levitsky <mlevitsky@redhat.com>
-Subject: [PATCH v2 04/18] hw/block/nvme: Add Commands Supported and Effects log
-Date: Thu, 18 Jun 2020 06:34:01 +0900
-Message-Id: <20200617213415.22417-5-dmitry.fomichev@wdc.com>
+Subject: [PATCH v2 11/18] hw/block/nvme: Introduce max active and open zone
+ limits
+Date: Thu, 18 Jun 2020 06:34:08 +0900
+Message-Id: <20200617213415.22417-12-dmitry.fomichev@wdc.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20200617213415.22417-1-dmitry.fomichev@wdc.com>
 References: <20200617213415.22417-1-dmitry.fomichev@wdc.com>
@@ -108,168 +109,340 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This log page becomes necessary to implement to allow checking for
-Zone Append command support in Zoned Namespace Command Set.
+Added two module properties, "max_active" and "max_open" to control
+the maximum number of zones that can be active or open. Once these
+variables are set to non-default values, the driver checks these
+limits during I/O and returns Too Many Active or Too Many Open
+command status if they are exceeded.
 
-This commit adds the code to report this log page for NVM Command
-Set only. The parts that are specific to zoned operation will be
-added later in the series.
-
+Signed-off-by: Hans Holmberg <hans.holmberg@wdc.com>
 Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
 ---
- hw/block/nvme.c       | 62 +++++++++++++++++++++++++++++++++++++++++++
- hw/block/trace-events |  4 +++
- include/block/nvme.h  | 18 +++++++++++++
- 3 files changed, 84 insertions(+)
+ hw/block/nvme.c | 183 +++++++++++++++++++++++++++++++++++++++++++++++-
+ hw/block/nvme.h |   4 ++
+ 2 files changed, 185 insertions(+), 2 deletions(-)
 
 diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index a1bbc9acde..03b8deee85 100644
+index 2e03b0b6ed..05a7cbcfcc 100644
 --- a/hw/block/nvme.c
 +++ b/hw/block/nvme.c
-@@ -871,6 +871,66 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
-     return NVME_SUCCESS;
+@@ -120,6 +120,87 @@ static void nvme_remove_zone(NvmeCtrl *n, NvmeNamespace *ns, NvmeZoneList *zl,
+     zone->prev = zone->next = 0;
  }
  
-+static uint16_t nvme_handle_cmd_effects(NvmeCtrl *n, NvmeCmd *cmd,
-+    uint64_t prp1, uint64_t prp2, uint64_t ofs, uint32_t len)
++/*
++ * Take the first zone out from a list, return NULL if the list is empty.
++ */
++static NvmeZone *nvme_remove_zone_head(NvmeCtrl *n, NvmeNamespace *ns,
++    NvmeZoneList *zl)
 +{
-+   NvmeEffectsLog cmd_eff_log = {};
-+   uint32_t *iocs = cmd_eff_log.iocs;
++    NvmeZone *zone = nvme_peek_zone_head(ns, zl);
 +
-+    trace_pci_nvme_cmd_supp_and_effects_log_read();
-+
-+    if (ofs != 0) {
-+        trace_pci_nvme_err_invalid_effects_log_offset(ofs);
-+        return NVME_INVALID_FIELD | NVME_DNR;
++    if (zone) {
++        --zl->size;
++        if (zl->size == 0) {
++            zl->head = NVME_ZONE_LIST_NIL;
++            zl->tail = NVME_ZONE_LIST_NIL;
++        } else {
++            zl->head = zone->next;
++            ns->zone_array[zl->head].prev = NVME_ZONE_LIST_NIL;
++        }
++        zone->prev = zone->next = 0;
 +    }
-+    if (len != sizeof(cmd_eff_log)) {
-+        trace_pci_nvme_err_invalid_effects_log_len(len);
-+        return NVME_INVALID_FIELD | NVME_DNR;
-+    }
 +
-+    iocs[NVME_ADM_CMD_DELETE_SQ] = NVME_CMD_EFFECTS_CSUPP;
-+    iocs[NVME_ADM_CMD_CREATE_SQ] = NVME_CMD_EFFECTS_CSUPP;
-+    iocs[NVME_ADM_CMD_DELETE_CQ] = NVME_CMD_EFFECTS_CSUPP;
-+    iocs[NVME_ADM_CMD_CREATE_CQ] = NVME_CMD_EFFECTS_CSUPP;
-+    iocs[NVME_ADM_CMD_IDENTIFY] = NVME_CMD_EFFECTS_CSUPP;
-+    iocs[NVME_ADM_CMD_SET_FEATURES] = NVME_CMD_EFFECTS_CSUPP;
-+    iocs[NVME_ADM_CMD_GET_FEATURES] = NVME_CMD_EFFECTS_CSUPP;
-+    iocs[NVME_ADM_CMD_GET_LOG_PAGE] = NVME_CMD_EFFECTS_CSUPP;
-+
-+    iocs[NVME_CMD_FLUSH] = NVME_CMD_EFFECTS_CSUPP | NVME_CMD_EFFECTS_LBCC;
-+    iocs[NVME_CMD_WRITE_ZEROS] = NVME_CMD_EFFECTS_CSUPP |
-+                                 NVME_CMD_EFFECTS_LBCC;
-+    iocs[NVME_CMD_WRITE] = NVME_CMD_EFFECTS_CSUPP | NVME_CMD_EFFECTS_LBCC;
-+    iocs[NVME_CMD_READ] = NVME_CMD_EFFECTS_CSUPP;
-+
-+    return nvme_dma_read_prp(n, (uint8_t *)&cmd_eff_log, len, prp1, prp2);
++    return zone;
 +}
 +
-+static uint16_t nvme_get_log_page(NvmeCtrl *n, NvmeCmd *cmd)
++/*
++ * Check if we can open a zone without exceeding open/active limits.
++ * AOR stands for "Active and Open Resources" (see TP 4053 section 2.5).
++ */
++static int nvme_aor_check(NvmeCtrl *n, NvmeNamespace *ns,
++     uint32_t act, uint32_t opn)
 +{
-+    uint64_t prp1 = le64_to_cpu(cmd->prp1);
-+    uint64_t prp2 = le64_to_cpu(cmd->prp2);
-+    uint32_t dw10 = le32_to_cpu(cmd->cdw10);
-+    uint32_t dw11 = le32_to_cpu(cmd->cdw11);
-+    uint64_t dw12 = le32_to_cpu(cmd->cdw12);
-+    uint64_t dw13 = le32_to_cpu(cmd->cdw13);
-+    uint64_t ofs = (dw13 << 32) | dw12;
-+    uint32_t numdl, numdu, len;
-+    uint16_t lid = dw10 & 0xff;
-+
-+    numdl = dw10 >> 16;
-+    numdu = dw11 & 0xffff;
-+    len = (((numdu << 16) | numdl) + 1) << 2;
-+
-+    switch (lid) {
-+    case NVME_LOG_CMD_EFFECTS:
-+        return nvme_handle_cmd_effects(n, cmd, prp1, prp2, ofs, len);
++    if (n->params.max_active_zones != 0 &&
++        ns->nr_active_zones + act > n->params.max_active_zones) {
++        trace_pci_nvme_err_insuff_active_res(n->params.max_active_zones);
++        return NVME_ZONE_TOO_MANY_ACTIVE | NVME_DNR;
++    }
++    if (n->params.max_open_zones != 0 &&
++        ns->nr_open_zones + opn > n->params.max_open_zones) {
++        trace_pci_nvme_err_insuff_open_res(n->params.max_open_zones);
++        return NVME_ZONE_TOO_MANY_OPEN | NVME_DNR;
 +    }
 +
-+    trace_pci_nvme_unsupported_log_page(lid);
-+    return NVME_INVALID_FIELD | NVME_DNR;
++    return NVME_SUCCESS;
 +}
 +
- static uint16_t nvme_admin_cmd(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
++static inline void nvme_aor_inc_open(NvmeCtrl *n, NvmeNamespace *ns)
++{
++    assert(ns->nr_open_zones >= 0);
++    if (n->params.max_open_zones) {
++        ns->nr_open_zones++;
++        assert(ns->nr_open_zones <= n->params.max_open_zones);
++    }
++}
++
++static inline void nvme_aor_dec_open(NvmeCtrl *n, NvmeNamespace *ns)
++{
++    if (n->params.max_open_zones) {
++        assert(ns->nr_open_zones > 0);
++        ns->nr_open_zones--;
++    }
++    assert(ns->nr_open_zones >= 0);
++}
++
++static inline void nvme_aor_inc_active(NvmeCtrl *n, NvmeNamespace *ns)
++{
++    assert(ns->nr_active_zones >= 0);
++    if (n->params.max_active_zones) {
++        ns->nr_active_zones++;
++        assert(ns->nr_active_zones <= n->params.max_active_zones);
++    }
++}
++
++static inline void nvme_aor_dec_active(NvmeCtrl *n, NvmeNamespace *ns)
++{
++    if (n->params.max_active_zones) {
++        assert(ns->nr_active_zones > 0);
++        ns->nr_active_zones--;
++        assert(ns->nr_active_zones >= ns->nr_open_zones);
++    }
++    assert(ns->nr_active_zones >= 0);
++}
++
+ static void nvme_assign_zone_state(NvmeCtrl *n, NvmeNamespace *ns,
+     NvmeZone *zone, uint8_t state)
  {
-     switch (cmd->opcode) {
-@@ -888,6 +948,8 @@ static uint16_t nvme_admin_cmd(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
-         return nvme_set_feature(n, cmd, req);
-     case NVME_ADM_CMD_GET_FEATURES:
-         return nvme_get_feature(n, cmd, req);
-+    case NVME_ADM_CMD_GET_LOG_PAGE:
-+        return nvme_get_log_page(n, cmd);
-     default:
-         trace_pci_nvme_err_invalid_admin_opc(cmd->opcode);
-         return NVME_INVALID_OPCODE | NVME_DNR;
-diff --git a/hw/block/trace-events b/hw/block/trace-events
-index 958fcc5508..423d491e27 100644
---- a/hw/block/trace-events
-+++ b/hw/block/trace-events
-@@ -58,6 +58,7 @@ pci_nvme_mmio_start_success(void) "setting controller enable bit succeeded"
- pci_nvme_mmio_stopped(void) "cleared controller enable bit"
- pci_nvme_mmio_shutdown_set(void) "shutdown bit set"
- pci_nvme_mmio_shutdown_cleared(void) "shutdown bit cleared"
-+pci_nvme_cmd_supp_and_effects_log_read(void) "commands supported and effects log read"
- 
- # nvme traces for error conditions
- pci_nvme_err_invalid_dma(void) "PRP/SGL is too small for transfer size"
-@@ -69,6 +70,8 @@ pci_nvme_err_invalid_ns(uint32_t ns, uint32_t limit) "invalid namespace %u not w
- pci_nvme_err_invalid_opc(uint8_t opc) "invalid opcode 0x%"PRIx8""
- pci_nvme_err_invalid_admin_opc(uint8_t opc) "invalid admin opcode 0x%"PRIx8""
- pci_nvme_err_invalid_lba_range(uint64_t start, uint64_t len, uint64_t limit) "Invalid LBA start=%"PRIu64" len=%"PRIu64" limit=%"PRIu64""
-+pci_nvme_err_invalid_effects_log_offset(uint64_t ofs) "commands supported and effects log offset must be 0, got %"PRIu64""
-+pci_nvme_err_invalid_effects_log_len(uint32_t len) "commands supported and effects log size is 4096, got %"PRIu32""
- pci_nvme_err_invalid_del_sq(uint16_t qid) "invalid submission queue deletion, sid=%"PRIu16""
- pci_nvme_err_invalid_create_sq_cqid(uint16_t cqid) "failed creating submission queue, invalid cqid=%"PRIu16""
- pci_nvme_err_invalid_create_sq_sqid(uint16_t sqid) "failed creating submission queue, invalid sqid=%"PRIu16""
-@@ -123,6 +126,7 @@ pci_nvme_ub_db_wr_invalid_cq(uint32_t qid) "completion queue doorbell write for
- pci_nvme_ub_db_wr_invalid_cqhead(uint32_t qid, uint16_t new_head) "completion queue doorbell write value beyond queue size, cqid=%"PRIu32", new_head=%"PRIu16", ignoring"
- pci_nvme_ub_db_wr_invalid_sq(uint32_t qid) "submission queue doorbell write for nonexistent queue, sqid=%"PRIu32", ignoring"
- pci_nvme_ub_db_wr_invalid_sqtail(uint32_t qid, uint16_t new_tail) "submission queue doorbell write value beyond queue size, sqid=%"PRIu32", new_head=%"PRIu16", ignoring"
-+pci_nvme_unsupported_log_page(uint16_t lid) "unsupported log page 0x%"PRIx16""
- 
- # xen-block.c
- xen_block_realize(const char *type, uint32_t disk, uint32_t partition) "%s d%up%u"
-diff --git a/include/block/nvme.h b/include/block/nvme.h
-index 3099df99eb..6a58bac0c2 100644
---- a/include/block/nvme.h
-+++ b/include/block/nvme.h
-@@ -691,10 +691,27 @@ enum NvmeSmartWarn {
-     NVME_SMART_FAILED_VOLATILE_MEDIA  = 1 << 4,
- };
- 
-+typedef struct NvmeEffectsLog {
-+  uint32_t      acs[256];
-+  uint32_t      iocs[256];
-+  uint8_t       resv[2048];
-+} NvmeEffectsLog;
-+
-+enum {
-+   NVME_CMD_EFFECTS_CSUPP             = 1 << 0,
-+   NVME_CMD_EFFECTS_LBCC              = 1 << 1,
-+   NVME_CMD_EFFECTS_NCC               = 1 << 2,
-+   NVME_CMD_EFFECTS_NIC               = 1 << 3,
-+   NVME_CMD_EFFECTS_CCC               = 1 << 4,
-+   NVME_CMD_EFFECTS_CSE_MASK          = 3 << 16,
-+   NVME_CMD_EFFECTS_UUID_SEL          = 1 << 19,
-+};
-+
- enum LogIdentifier {
-     NVME_LOG_ERROR_INFO     = 0x01,
-     NVME_LOG_SMART_INFO     = 0x02,
-     NVME_LOG_FW_SLOT_INFO   = 0x03,
-+    NVME_LOG_CMD_EFFECTS    = 0x05,
- };
- 
- typedef struct NvmePSD {
-@@ -898,5 +915,6 @@ static inline void _nvme_check_size(void)
-     QEMU_BUILD_BUG_ON(sizeof(NvmeSmartLog) != 512);
-     QEMU_BUILD_BUG_ON(sizeof(NvmeIdCtrl) != 4096);
-     QEMU_BUILD_BUG_ON(sizeof(NvmeIdNs) != 4096);
-+    QEMU_BUILD_BUG_ON(sizeof(NvmeEffectsLog) != 4096);
+@@ -454,6 +535,24 @@ static void nvme_enqueue_req_completion(NvmeCQueue *cq, NvmeRequest *req)
+     timer_mod(cq->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + 500);
  }
- #endif
+ 
++static void nvme_auto_transition_zone(NvmeCtrl *n, NvmeNamespace *ns,
++    bool implicit, bool adding_active)
++{
++    NvmeZone *zone;
++
++    if (implicit && n->params.max_open_zones &&
++        ns->nr_open_zones == n->params.max_open_zones) {
++        zone = nvme_remove_zone_head(n, ns, ns->imp_open_zones);
++        if (zone) {
++            /*
++             * Automatically close this implicitly open zone.
++             */
++            nvme_aor_dec_open(n, ns);
++            nvme_assign_zone_state(n, ns, zone, NVME_ZONE_STATE_CLOSED);
++        }
++    }
++}
++
+ static uint16_t nvme_check_zone_write(NvmeZone *zone, uint64_t slba,
+     uint32_t nlb)
+ {
+@@ -531,6 +630,23 @@ static uint16_t nvme_check_zone_read(NvmeCtrl *n, NvmeZone *zone, uint64_t slba,
+     return status;
+ }
+ 
++static uint16_t nvme_auto_open_zone(NvmeCtrl *n, NvmeNamespace *ns,
++    NvmeZone *zone)
++{
++    uint16_t status = NVME_SUCCESS;
++    uint8_t zs = nvme_get_zone_state(zone);
++
++    if (zs == NVME_ZONE_STATE_EMPTY) {
++        nvme_auto_transition_zone(n, ns, true, true);
++        status = nvme_aor_check(n, ns, 1, 1);
++    } else if (zs == NVME_ZONE_STATE_CLOSED) {
++        nvme_auto_transition_zone(n, ns, true, false);
++        status = nvme_aor_check(n, ns, 0, 1);
++    }
++
++    return status;
++}
++
+ static uint64_t nvme_finalize_zone_write(NvmeCtrl *n, NvmeNamespace *ns,
+     NvmeZone *zone, uint32_t nlb)
+ {
+@@ -543,7 +659,11 @@ static uint64_t nvme_finalize_zone_write(NvmeCtrl *n, NvmeNamespace *ns,
+         switch (zs) {
+         case NVME_ZONE_STATE_IMPLICITLY_OPEN:
+         case NVME_ZONE_STATE_EXPLICITLY_OPEN:
++            nvme_aor_dec_open(n, ns);
++            /* fall through */
+         case NVME_ZONE_STATE_CLOSED:
++            nvme_aor_dec_active(n, ns);
++            /* fall through */
+         case NVME_ZONE_STATE_EMPTY:
+             break;
+         default:
+@@ -553,7 +673,10 @@ static uint64_t nvme_finalize_zone_write(NvmeCtrl *n, NvmeNamespace *ns,
+     } else {
+         switch (zs) {
+         case NVME_ZONE_STATE_EMPTY:
++            nvme_aor_inc_active(n, ns);
++            /* fall through */
+         case NVME_ZONE_STATE_CLOSED:
++            nvme_aor_inc_open(n, ns);
+             nvme_assign_zone_state(n, ns, zone,
+                                    NVME_ZONE_STATE_IMPLICITLY_OPEN);
+         }
+@@ -636,6 +759,11 @@ static uint16_t nvme_write_zeros(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd *cmd,
+                                                zone->d.wp);
+             return NVME_ZONE_INVALID_WRITE | NVME_DNR;
+         }
++
++        status = nvme_auto_open_zone(n, ns, zone);
++        if (status != NVME_SUCCESS) {
++            return status;
++        }
+     }
+ 
+     block_acct_start(blk_get_stats(n->conf.blk), &req->acct, 0,
+@@ -709,6 +837,11 @@ static uint16_t nvme_rw(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd *cmd,
+                                                    zone->d.wp);
+                 return NVME_ZONE_INVALID_WRITE | NVME_DNR;
+             }
++
++            status = nvme_auto_open_zone(n, ns, zone);
++            if (status != NVME_SUCCESS) {
++                return status;
++            }
+         } else {
+             status = nvme_check_zone_read(n, zone, slba, nlb,
+                                           n->params.cross_zone_read);
+@@ -804,9 +937,27 @@ static uint16_t nvme_get_mgmt_zone_slba_idx(NvmeCtrl *n, NvmeNamespace *ns,
+ static uint16_t nvme_open_zone(NvmeCtrl *n, NvmeNamespace *ns,
+     NvmeZone *zone, uint8_t state)
+ {
++    uint16_t status;
++
+     switch (state) {
+     case NVME_ZONE_STATE_EMPTY:
++        nvme_auto_transition_zone(n, ns, false, true);
++        status = nvme_aor_check(n, ns, 1, 0);
++        if (status != NVME_SUCCESS) {
++            return status;
++        }
++        nvme_aor_inc_active(n, ns);
++        /* fall through */
+     case NVME_ZONE_STATE_CLOSED:
++        status = nvme_aor_check(n, ns, 0, 1);
++        if (status != NVME_SUCCESS) {
++            if (state == NVME_ZONE_STATE_EMPTY) {
++                nvme_aor_dec_active(n, ns);
++            }
++            return status;
++        }
++        nvme_aor_inc_open(n, ns);
++        /* fall through */
+     case NVME_ZONE_STATE_IMPLICITLY_OPEN:
+         nvme_assign_zone_state(n, ns, zone, NVME_ZONE_STATE_EXPLICITLY_OPEN);
+         /* fall through */
+@@ -828,6 +979,7 @@ static uint16_t nvme_close_zone(NvmeCtrl *n,  NvmeNamespace *ns,
+     switch (state) {
+     case NVME_ZONE_STATE_EXPLICITLY_OPEN:
+     case NVME_ZONE_STATE_IMPLICITLY_OPEN:
++        nvme_aor_dec_open(n, ns);
+         nvme_assign_zone_state(n, ns, zone, NVME_ZONE_STATE_CLOSED);
+         /* fall through */
+     case NVME_ZONE_STATE_CLOSED:
+@@ -849,7 +1001,11 @@ static uint16_t nvme_finish_zone(NvmeCtrl *n, NvmeNamespace *ns,
+     switch (state) {
+     case NVME_ZONE_STATE_EXPLICITLY_OPEN:
+     case NVME_ZONE_STATE_IMPLICITLY_OPEN:
++        nvme_aor_dec_open(n, ns);
++        /* fall through */
+     case NVME_ZONE_STATE_CLOSED:
++        nvme_aor_dec_active(n, ns);
++        /* fall through */
+     case NVME_ZONE_STATE_EMPTY:
+         zone->d.wp = nvme_zone_wr_boundary(zone);
+         nvme_assign_zone_state(n, ns, zone, NVME_ZONE_STATE_FULL);
+@@ -874,7 +1030,11 @@ static uint16_t nvme_reset_zone(NvmeCtrl *n, NvmeNamespace *ns,
+     switch (state) {
+     case NVME_ZONE_STATE_EXPLICITLY_OPEN:
+     case NVME_ZONE_STATE_IMPLICITLY_OPEN:
++        nvme_aor_dec_open(n, ns);
++        /* fall through */
+     case NVME_ZONE_STATE_CLOSED:
++        nvme_aor_dec_active(n, ns);
++        /* fall through */
+     case NVME_ZONE_STATE_FULL:
+         zone->d.wp = zone->d.zslba;
+         nvme_assign_zone_state(n, ns, zone, NVME_ZONE_STATE_EMPTY);
+@@ -2412,6 +2572,15 @@ static void nvme_zoned_init_ctrl(NvmeCtrl *n, Error **errp)
+     uint64_t zone_size = 0, capacity;
+     uint32_t nz;
+ 
++    if (n->params.max_open_zones < 0) {
++        error_setg(errp, "invalid max_open_zones value");
++        return;
++    }
++    if (n->params.max_active_zones < 0) {
++        error_setg(errp, "invalid max_active_zones value");
++        return;
++    }
++
+     if (n->params.zone_size) {
+         zone_size = n->params.zone_size;
+     } else {
+@@ -2435,6 +2604,14 @@ static void nvme_zoned_init_ctrl(NvmeCtrl *n, Error **errp)
+     n->num_zones = nz;
+     n->zone_array_size = sizeof(NvmeZone) * nz;
+ 
++    /* Make sure that the values of all Zoned Command Set properties are sane */
++    if (n->params.max_open_zones > nz) {
++        n->params.max_open_zones = nz;
++    }
++    if (n->params.max_active_zones > nz) {
++        n->params.max_active_zones = nz;
++    }
++
+     return;
+ }
+ 
+@@ -2452,8 +2629,8 @@ static int nvme_zoned_init_ns(NvmeCtrl *n, NvmeNamespace *ns, int lba_index,
+     ns->id_ns_zoned = g_malloc0(sizeof(*ns->id_ns_zoned));
+ 
+     /* MAR/MOR are zeroes-based, 0xffffffff means no limit */
+-    ns->id_ns_zoned->mar = 0xffffffff;
+-    ns->id_ns_zoned->mor = 0xffffffff;
++    ns->id_ns_zoned->mar = cpu_to_le32(n->params.max_active_zones - 1);
++    ns->id_ns_zoned->mor = cpu_to_le32(n->params.max_open_zones - 1);
+     ns->id_ns_zoned->zoc = 0;
+     ns->id_ns_zoned->ozcs = n->params.cross_zone_read ? 0x01 : 0x00;
+ 
+@@ -2813,6 +2990,8 @@ static Property nvme_props[] = {
+     DEFINE_PROP_UINT64("zone_size", NvmeCtrl, params.zone_size, 512),
+     DEFINE_PROP_UINT64("zone_capacity", NvmeCtrl, params.zone_capacity, 512),
+     DEFINE_PROP_UINT32("zone_append_max_size", NvmeCtrl, params.zamds_bs, 0),
++    DEFINE_PROP_INT32("max_active", NvmeCtrl, params.max_active_zones, 0),
++    DEFINE_PROP_INT32("max_open", NvmeCtrl, params.max_open_zones, 0),
+     DEFINE_PROP_BOOL("cross_zone_read", NvmeCtrl, params.cross_zone_read, true),
+     DEFINE_PROP_UINT8("fill_pattern", NvmeCtrl, params.fill_pattern, 0),
+     DEFINE_PROP_END_OF_LIST(),
+diff --git a/hw/block/nvme.h b/hw/block/nvme.h
+index 2c932b5e29..f5a4679702 100644
+--- a/hw/block/nvme.h
++++ b/hw/block/nvme.h
+@@ -19,6 +19,8 @@ typedef struct NvmeParams {
+     uint32_t    zamds_bs;
+     uint64_t    zone_size;
+     uint64_t    zone_capacity;
++    int32_t     max_active_zones;
++    int32_t     max_open_zones;
+ } NvmeParams;
+ 
+ typedef struct NvmeAsyncEvent {
+@@ -103,6 +105,8 @@ typedef struct NvmeNamespace {
+     NvmeZoneList    *imp_open_zones;
+     NvmeZoneList    *closed_zones;
+     NvmeZoneList    *full_zones;
++    int32_t         nr_open_zones;
++    int32_t         nr_active_zones;
+ } NvmeNamespace;
+ 
+ static inline NvmeLBAF *nvme_ns_lbaf(NvmeNamespace *ns)
 -- 
 2.21.0
 
