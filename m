@@ -2,92 +2,96 @@ Return-Path: <SRS0=bzpH=76=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC12BC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 07:40:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06F21C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 07:40:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 87988206DB
+	by mail.kernel.org (Postfix) with ESMTPS id CB702206DB
 	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 07:40:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wk9JJdWn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87988206DB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gQbrl/yn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB702206DB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42012 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41934 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlSgl-0007FG-Os
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 03:40:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41122)
+	id 1jlSgm-0007DM-2M
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 03:40:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43756)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jlSSN-0004wQ-Lu; Wed, 17 Jun 2020 03:25:59 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:45732)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jlSSM-0002cb-8b; Wed, 17 Jun 2020 03:25:59 -0400
-Received: by mail-wr1-x441.google.com with SMTP id c3so1123553wru.12;
- Wed, 17 Jun 2020 00:25:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=9KNJnLBp1OneKNvTmDgKiylMxA5dVLV/Msl/G9txJEk=;
- b=Wk9JJdWnn47gUikPT/UsTBJChpT1zX90gL9MYuUOJEFJ55CjRQZQQhtseGBDiO3Z9V
- jU+pdtF5Ck746xqivTRxcNhu2v0AXG1E/PHFZOACjK/VrfNSGgYKE9tt3BJsr9uQqV0m
- duG9X6y3ak9OZ3uuculJGDUB5lxKv2p9DbBvYx4qeiDfadMjuwNhquv5hyzrziybuqx0
- QYUx+wLpFPKSNSvKeC/kK6ZserYkoos8/T1X3spZB5v0A6zZy7UTv/TOQgT/HiRT7T9t
- FQfbfVCcR67nZ2Dcq50jdSgLL1NdBBXvB58tVUocK91Qmjd9mfZSDGcPfcevTBkKrv7A
- lDQA==
+ (Exim 4.90_1) (envelope-from <mlureau@redhat.com>)
+ id 1jlSeQ-00046V-Cl
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 03:38:26 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51218
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mlureau@redhat.com>)
+ id 1jlSeO-0004mv-Fb
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 03:38:26 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592379503;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=vTh7gVTBsoiOlaZTSSCPFqb66ZxmpJQkuWbOcSZwYbg=;
+ b=gQbrl/ynDypnttBv2jMb/2JbN+wsjw3YjfYGRxR8Wxcgcd7aWLLOsUTUOvYd0/fIkrT95t
+ ArgI0KMWBvLMdOdoSmZc+PJC9OZeroMJ0zO59ZBrYBLh7UI+uGpe4KHk+pIfTDltGhGWO0
+ Gj9ojS0GDQb79H7aSb6oNnUHojveAoE=
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
+ [209.85.166.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-445-ahwUGuQJMRqMh302VYUr0A-1; Wed, 17 Jun 2020 03:38:22 -0400
+X-MC-Unique: ahwUGuQJMRqMh302VYUr0A-1
+Received: by mail-io1-f72.google.com with SMTP id a16so1223133iow.9
+ for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 00:38:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=9KNJnLBp1OneKNvTmDgKiylMxA5dVLV/Msl/G9txJEk=;
- b=P4Fl6aZ4evWVKH+uEqSI4iDVDVyAqjV9xOjeEbsIvuLT/7PX6G6d2O5myEmbKBXjuq
- 7skkaYTJADGSwyida1sKQDBzjwjIqRdI50+steYZuoyxLAff8PkJbGDLBTSPdrnOQc+8
- p3HhChyullqS/QZQ9g3NYzAmv/AtqEpML7MNe94Qe4B6Gtmwu7f70M0Wsnw8wGIqFvAs
- EMA/Q+WD+DsIn4c9369plLrLVjUsbPV0uEBWdfY5X3FvUOnVpyoBGdJBCpCCuGIGmsnu
- fRB39L35QYNheJ1LzDVzYKhamUmqNC2BhDIhVtI+wd8iylFwFI2lO+V4Mg+msD57rEM0
- GVBA==
-X-Gm-Message-State: AOAM533ryvjdGshRspOw0X13RGWaBMVmKjHQiu0my/CyUNyaNqgFJpCf
- yGOJd/m2CCvjUBG5sPFcw0/pERbV
-X-Google-Smtp-Source: ABdhPJwo8N8VOJweH0Y9AYyF3O4e//pad9jP2aknn1Xwf6OxRBSY5sv84W7T8SYayUbK5S7OdKLPUA==
-X-Received: by 2002:adf:aa94:: with SMTP id h20mr6536393wrc.327.1592378756378; 
- Wed, 17 Jun 2020 00:25:56 -0700 (PDT)
-Received: from localhost.localdomain (93.red-83-59-160.dynamicip.rima-tde.net.
- [83.59.160.93])
- by smtp.gmail.com with ESMTPSA id j5sm32894781wrq.39.2020.06.17.00.25.55
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 17 Jun 2020 00:25:55 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 13/14] hw/arm/mps2: Add audio I2S interface as
- unimplemented device
-Date: Wed, 17 Jun 2020 09:25:38 +0200
-Message-Id: <20200617072539.32686-14-f4bug@amsat.org>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200617072539.32686-1-f4bug@amsat.org>
-References: <20200617072539.32686-1-f4bug@amsat.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=vTh7gVTBsoiOlaZTSSCPFqb66ZxmpJQkuWbOcSZwYbg=;
+ b=DU+jU57C/kalhefBZI1yB+ZxIb1Ap7xg8xB7GzmjwIEUvG5w0tQpxGKwrvA2qFOeFB
+ B83b+r1QuBTISucDCM2uptpUxaJJUDgZpgM+NMvrBLusdjNM2P6/JQQLl+hBNTmiZDdx
+ VpiYCeRFlvKdgkcV6inNa+BthKxz/rZYE7K0EqDF2TL71O/Gi1F6vb4OdmM8mddppdg5
+ 9IPDRMfayzBJXTowKjAMRs3U5x1zWzOLzMM2xWiIs4TMOAp8oO5ZPyooqUQV6TrgUfvs
+ 4XLHQAUkd5BZOEYLMKXmPk8zskSmPb5Pn91sjKUgZaCy7TojNdcn2qz75AUXdlNXmocy
+ 1b2w==
+X-Gm-Message-State: AOAM5330Y0b7YIudqCfW1OsxykVSe7URKcEVf0ZiQ3I4IX+ALkY10Uie
+ dqvpgp1NPUb5hy/NwJMOLhlGewcqFYrSOdr6OTEdjw6ebqVRzpztHBKit+gI0f3FA0xjtJ9vMhd
+ whyqsdVsDYJwSukXm+J9lMwxM5Df9Czw=
+X-Received: by 2002:a5e:de03:: with SMTP id e3mr7220309iok.0.1592379501675;
+ Wed, 17 Jun 2020 00:38:21 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw23rHmIcTnhGHpwcECh/2JOopvDieqt7ZE8HGdpc1+1Knm7SlrOhSHEKg6Sct4noJzP4myk97RExCnFiXVWxA=
+X-Received: by 2002:a5e:de03:: with SMTP id e3mr7220296iok.0.1592379501460;
+ Wed, 17 Jun 2020 00:38:21 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+References: <20200616205721.1191408-1-stefanb@linux.vnet.ibm.com>
+ <20200616205721.1191408-3-stefanb@linux.vnet.ibm.com>
+In-Reply-To: <20200616205721.1191408-3-stefanb@linux.vnet.ibm.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Wed, 17 Jun 2020 11:38:10 +0400
+Message-ID: <CAMxuvayz3cZh3x=RT8U1GwO_q7hZ5WdV68k=jWm2+Noys4FyyA@mail.gmail.com>
+Subject: Re: [PATCH v3 2/8] tpm: Extend TPMIfClass with get_irqnum() function
+To: Stefan Berger <stefanb@linux.vnet.ibm.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=mlureau@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/17 01:42:04
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -101,32 +105,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Esteban Bosse <estebanbosse@gmail.com>,
- Joaquin de Andres <me@xcancerberox.com.ar>, qemu-arm@nongnu.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Peter Maydell <peter.maydell@linaro.org>
+Cc: Stefan Berger <stefanb@sbct-2.pok.ibm.com>,
+ qemu-devel <qemu-devel@nongnu.org>, Eric Auger <eric.auger@redhat.com>,
+ "Bonzini, Paolo" <pbonzini@redhat.com>,
+ Philippe Mathieu Daude <philmd@redhat.com>,
+ Marek Kedzierski <mkedzier@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- hw/arm/mps2.c | 1 +
- 1 file changed, 1 insertion(+)
+On Wed, Jun 17, 2020 at 12:57 AM Stefan Berger
+<stefanb@linux.vnet.ibm.com> wrote:
+>
+> From: Stefan Berger <stefanb@sbct-2.pok.ibm.com>
+>
+> Implement get_irqnum() as part of the TPMIfClass to get the assigned IRQ
+> number or TPM_IRQ_DISABLED (-1) in case IRQs cannot be used.
+>
+> Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
 
-diff --git a/hw/arm/mps2.c b/hw/arm/mps2.c
-index 2f6acbf2c2..d1653a7e6e 100644
---- a/hw/arm/mps2.c
-+++ b/hw/arm/mps2.c
-@@ -373,6 +373,7 @@ static void mps2_common_init(MachineState *machine)
-                                          0x4002a000};   /* Shield1 */
-         sysbus_create_simple(TYPE_ARM_SBCON_I2C, i2cbase[i], NULL);
-     }
-+    create_unimplemented_device("i2s", 0x40024000, 0x400);
- 
-     /* In hardware this is a LAN9220; the LAN9118 is software compatible
-      * except that it doesn't support the checksum-offload feature.
--- 
-2.21.3
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+> ---
+>  hw/tpm/tpm_tis_isa.c    |  9 +++++++++
+>  hw/tpm/tpm_tis_sysbus.c |  9 +++++++++
+>  include/sysemu/tpm.h    | 12 ++++++++++++
+>  3 files changed, 30 insertions(+)
+>
+> diff --git a/hw/tpm/tpm_tis_isa.c b/hw/tpm/tpm_tis_isa.c
+> index 30ba37079d..ed6d422f05 100644
+> --- a/hw/tpm/tpm_tis_isa.c
+> +++ b/hw/tpm/tpm_tis_isa.c
+> @@ -80,6 +80,14 @@ static enum TPMVersion tpm_tis_isa_get_tpm_version(TPM=
+If *ti)
+>      return tpm_tis_get_tpm_version(s);
+>  }
+>
+> +static int8_t tpm_tis_isa_get_irqnum(TPMIf *ti)
+> +{
+> +    TPMStateISA *isadev =3D TPM_TIS_ISA(ti);
+> +    TPMState *s =3D &isadev->state;
+> +
+> +    return s->irq_num;
+> +}
+> +
+>  static void tpm_tis_isa_reset(DeviceState *dev)
+>  {
+>      TPMStateISA *isadev =3D TPM_TIS_ISA(dev);
+> @@ -148,6 +156,7 @@ static void tpm_tis_isa_class_init(ObjectClass *klass=
+, void *data)
+>      dc->reset =3D tpm_tis_isa_reset;
+>      tc->request_completed =3D tpm_tis_isa_request_completed;
+>      tc->get_version =3D tpm_tis_isa_get_tpm_version;
+> +    tc->get_irqnum =3D tpm_tis_isa_get_irqnum;
+>  }
+>
+>  static const TypeInfo tpm_tis_isa_info =3D {
+> diff --git a/hw/tpm/tpm_tis_sysbus.c b/hw/tpm/tpm_tis_sysbus.c
+> index eced1fc843..86b3988be5 100644
+> --- a/hw/tpm/tpm_tis_sysbus.c
+> +++ b/hw/tpm/tpm_tis_sysbus.c
+> @@ -80,6 +80,14 @@ static enum TPMVersion tpm_tis_sysbus_get_tpm_version(=
+TPMIf *ti)
+>      return tpm_tis_get_tpm_version(s);
+>  }
+>
+> +static int8_t tpm_tis_sysbus_get_irqnum(TPMIf *ti)
+> +{
+> +    TPMStateSysBus *sbdev =3D TPM_TIS_SYSBUS(ti);
+> +    TPMState *s =3D &sbdev->state;
+> +
+> +    return s->irq_num;
+> +}
+> +
+>  static void tpm_tis_sysbus_reset(DeviceState *dev)
+>  {
+>      TPMStateSysBus *sbdev =3D TPM_TIS_SYSBUS(dev);
+> @@ -137,6 +145,7 @@ static void tpm_tis_sysbus_class_init(ObjectClass *kl=
+ass, void *data)
+>      dc->reset =3D tpm_tis_sysbus_reset;
+>      tc->request_completed =3D tpm_tis_sysbus_request_completed;
+>      tc->get_version =3D tpm_tis_sysbus_get_tpm_version;
+> +    tc->get_irqnum =3D tpm_tis_sysbus_get_irqnum;
+>  }
+>
+>  static const TypeInfo tpm_tis_sysbus_info =3D {
+> diff --git a/include/sysemu/tpm.h b/include/sysemu/tpm.h
+> index 03fb25941c..a81fb4e18e 100644
+> --- a/include/sysemu/tpm.h
+> +++ b/include/sysemu/tpm.h
+> @@ -25,6 +25,8 @@ typedef enum TPMVersion {
+>      TPM_VERSION_2_0 =3D 2,
+>  } TPMVersion;
+>
+> +#define TPM_IRQ_DISABLED  -1
+> +
+>  #define TYPE_TPM_IF "tpm-if"
+>  #define TPM_IF_CLASS(klass)                                 \
+>      OBJECT_CLASS_CHECK(TPMIfClass, (klass), TYPE_TPM_IF)
+> @@ -41,6 +43,7 @@ typedef struct TPMIfClass {
+>      enum TpmModel model;
+>      void (*request_completed)(TPMIf *obj, int ret);
+>      enum TPMVersion (*get_version)(TPMIf *obj);
+> +    int8_t (*get_irqnum)(TPMIf *obj);
+>  } TPMIfClass;
+>
+>  #define TYPE_TPM_TIS_ISA            "tpm-tis"
+> @@ -74,4 +77,13 @@ static inline TPMVersion tpm_get_version(TPMIf *ti)
+>      return TPM_IF_GET_CLASS(ti)->get_version(ti);
+>  }
+>
+> +static inline int8_t tpm_get_irqnum(TPMIf *ti)
+> +{
+> +    if (!ti || !TPM_IF_GET_CLASS(ti)->get_irqnum) {
+> +        return TPM_IRQ_DISABLED;
+> +    }
+> +
+> +    return TPM_IF_GET_CLASS(ti)->get_irqnum(ti);
+> +}
+> +
+>  #endif /* QEMU_TPM_H */
+> --
+> 2.24.1
+>
 
 
