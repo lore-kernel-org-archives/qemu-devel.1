@@ -4,166 +4,151 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 573AAC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 15:27:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59E17C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 15:28:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1F8C520897
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 15:27:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 168D320897
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 15:28:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OhypVHVh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F8C520897
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NzvmBWJP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 168D320897
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34398 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37832 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlZyH-0007oa-Ce
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 11:27:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54532)
+	id 1jlZzm-0000nm-CE
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 11:28:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50666)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jlZwf-0006KP-FZ
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 11:25:46 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:21402
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jlZwX-0000y4-UY
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 11:25:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592407536;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=b0rvjMToOaJdPi1UdkrRkgfwDqtGlDL8+oF7n2YM9Ww=;
- b=OhypVHVheDt1LAvGKDd+rehGyQdzyWKYcQNd900yA6DzxreuU8Is+tVwiIdYLO/y2KGiLN
- jn4nsW8TgCOk7R2U9zJqUicEQcq6uugY6uwrppKgFKtYSC/j4bWOGfqwh6ab3rF2N7Ln2g
- SxP5s+IH9BcGfsjrVOtJtwGzJmEmCas=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-393-_2svLQqNMXypBb7JmxYz9w-1; Wed, 17 Jun 2020 11:25:35 -0400
-X-MC-Unique: _2svLQqNMXypBb7JmxYz9w-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3B3F7EC1AD;
- Wed, 17 Jun 2020 15:25:34 +0000 (UTC)
-Received: from [10.10.117.188] (ovpn-117-188.rdu2.redhat.com [10.10.117.188])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3ADBD5D9E5;
- Wed, 17 Jun 2020 15:25:33 +0000 (UTC)
-Subject: Re: [PATCH v3 00/16] python: add mypy support to python/qemu
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Markus Armbruster <armbru@redhat.com>
-References: <20200604202236.25039-1-jsnow@redhat.com>
- <20200605092630.GE5869@linux.fritz.box>
- <502e4f4d-6770-61a7-1496-9cb244f9ddd3@redhat.com>
- <20200608153327.GD6419@linux.fritz.box>
- <130e4383-8c33-c3f2-55b2-1ec45a5214cc@redhat.com>
- <87wo4gr4yb.fsf@dusky.pond.sub.org>
- <4ee8f32a-192d-b154-f3cc-c41e7ff56c58@redhat.com>
- <82753499-3459-e6af-6cda-501ce56dfce6@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <c5f1e107-e4dc-2b40-93c2-86ccc4bcfbe4@redhat.com>
-Date: Wed, 17 Jun 2020 11:25:32 -0400
+ (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1jlZh1-0005tA-NY
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 11:09:35 -0400
+Received: from mail-wm1-x32b.google.com ([2a00:1450:4864:20::32b]:36100)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1jlZgz-0006KB-Jy
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 11:09:35 -0400
+Received: by mail-wm1-x32b.google.com with SMTP id d128so2390729wmc.1
+ for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 08:09:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:subject:reply-to:to:references:autocrypt:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=iBkqAQvRxN5BSn7GG/za52BR5dOLhn8NvgdHSfNx9cE=;
+ b=NzvmBWJPd6I/wASWtQwW1czhA24kqlroaiN9rLaQz+Jz5rLjWxe6R8zVHZogxS2wW4
+ ilNF55KIyXr7IqW0ebLNUFmxq4716U4psKsqdJ9Lubr+tkeJBo50IrK8Xr4PxhKiWo9j
+ +GLkvcyzec4sluOuRypHfzwTbHZRIiltFkgzBbZQ76mCWMKDmevBh6iK+U0kuf0bdvK9
+ yFYMUIvXAql0ci/pq4NJZWKigm5k05QH6qy4S5R/GAXdWUsh1hwXieg//fTXdhhcU2qr
+ EclVxBMolLRwdBKrhdlq/mYpkhKVf/b74p9UdagMtFMYGzTKjzufBm7Y4VFGYl2Zbtk+
+ rneA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:subject:reply-to:to:references
+ :autocrypt:message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=iBkqAQvRxN5BSn7GG/za52BR5dOLhn8NvgdHSfNx9cE=;
+ b=UkFz2yQ3qZBJnkI65CKtTnH7nSnVZQTeWcEWasE/7lRdqJ7ZdJOsipQ7OCkPZtWU7S
+ bCQLBj1Gy5IKXPUDm58T/VHKjesJ2ttDPCKJB/pOz2dkt+J7JL7pgVxTIMDF8AnA/rqO
+ lWftu1JMpFNL48bzKTDQh+0fyagV2x/se1wn4sve9D+hdILPJYINNHcWTQ7RdQFUWN9t
+ PHPs1Sz9AFCftKY7mGhoiSq+pfORwA4tXUc4IDVr6khlETchzUvVb/mH9dGwui14suDZ
+ XOtQdcq0gUcb9l2P4Y9xYjXkl2S3p0e5VWf1Xjx0ZoMFhmWO7W108tQakb2HnSbZeLLy
+ z+RA==
+X-Gm-Message-State: AOAM533p/TR38Muu9SF2DmTXnd1E7+uG8d9kFNjxaMCht8K++3ROVzGl
+ HN5AEIlhBEj6dmyPMnl6CXE=
+X-Google-Smtp-Source: ABdhPJx3lMOjntnm1VqGIsOUoUKSBwEp0DKIxpPKrrF9GxtNiMdzfOwiK6J4aEFMEBxO6IlR3aDTWA==
+X-Received: by 2002:a1c:6243:: with SMTP id w64mr8904996wmb.162.1592406571859; 
+ Wed, 17 Jun 2020 08:09:31 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:48a4:82f8:2ffd:ec67?
+ ([2001:b07:6468:f312:48a4:82f8:2ffd:ec67])
+ by smtp.googlemail.com with ESMTPSA id g25sm59608wmh.18.2020.06.17.08.09.31
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 17 Jun 2020 08:09:31 -0700 (PDT)
+From: Paolo Bonzini <pbonzini@redhat.com>
+Subject: CFP: KVM Forum 2020 virtual experience
+To: qemu-devel <qemu-devel@nongnu.org>,
+ "libvir-list@redhat.com" <libvir-list@redhat.com>,
+ KVM list <kvm@vger.kernel.org>
+References: <a1d960aa-c1a0-ff95-68a8-6e471028fe1e@redhat.com>
+Autocrypt: addr=pbonzini@redhat.com; keydata=
+ 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
+ uUHgL9dKIfvpm+rNXRn9wAwGjk0X/A==
+Message-ID: <391a9edc-57e3-75a8-c762-d1606fefb4ae@redhat.com>
+Date: Wed, 17 Jun 2020 17:09:31 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <82753499-3459-e6af-6cda-501ce56dfce6@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <a1d960aa-c1a0-ff95-68a8-6e471028fe1e@redhat.com>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=jsnow@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/17 01:42:42
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=2a00:1450:4864:20::32b;
+ envelope-from=paolo.bonzini@gmail.com; helo=mail-wm1-x32b.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -176,24 +161,195 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Cleber Rosa <crosa@redhat.com>
+Reply-To: kvm-forum-2020-pc@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+KVM Forum 2020 is becoming a virtual experience this year in light of
+the COVID-19 situation and will take place online on October 28-30, as
+planned.
+
+The virtual event will continue to deliver the same content you would
+have received in-person (keynotes, conference sessions, BoFs, co-located
+events) as well as attendee collaboration, networking tools, a "hallway
+track" and much more.  And just like previous years, all content will be
+made available for free after the event.
+
+In order to allow everyone to present at KVM Forum, including people
+who might not have been able to travel to Dublin, we are extending the
+submission deadline for presentations for 6 more weeks!
+
+* CFP Closes: Sunday, August 2 at 11:59 PM PST
+* CFP Notifications: Tuesday, September 1
+* Schedule Announcement: Tuesday, September 1
+* Slide Due Date: Monday, October 26
+* Event Dates: Wednesday, October 28 – Friday, October 30
+
+We encourage you to submit and reach out to us should you have any
+questions. The program committee may be contacted as a group via email:
+kvm-forum-2020-pc@redhat.com.
+
+Thanks,
+
+-your KVM Forum 2020 Program Committee
 
 
-On 6/16/20 11:33 PM, Philippe Mathieu-Daudé wrote:
-> Does that mean you want to respin this series?
-> Else you can consider it applied on python-next.
-
-No no - you're all set. Just taking the opportunity to discuss tooling
-that I find cumbersome at the moment.
-
-Thank you Philippe :)
-
---js
+On 25/04/20 12:29, Paolo Bonzini wrote:
+> ================================================================
+> KVM Forum 2020: Call For Participation
+> October 28-30, 2020 - Convention Centre Dublin - Dublin, Ireland
+> 
+> (All submissions must be received before June 15, 2020 at 23:59 PST)
+> =================================================================
+> 
+> KVM Forum is an annual event that presents a rare opportunity for
+> developers and users to meet, discuss the state of Linux virtualization
+> technology, and plan for the challenges ahead. This highly technical
+> conference unites the developers who drive KVM development and the users
+> who depend on KVM as part of their offerings, or to power their data
+> centers and clouds.
+> 
+> Sessions include updates on the state of the KVM virtualization stack,
+> planning for the future, and many opportunities for attendees to
+> collaborate. After more than ten years in the mainline kernel, KVM
+> continues to be a critical part of the FOSS cloud infrastructure. Come
+> join us in continuing to improve the KVM ecosystem.
+> 
+> Based on these factors, we encourage you to submit and reach out to us
+> should you have any questions. The program committee may be contacted as
+> a group via email: kvm-forum-2020-pc@redhat.com.
+> 
+> 
+> SUGGESTED TOPICS
+> ----------------
+> 
+> * Scaling, latency optimizations, performance tuning
+> * Hardening and security
+> * New features
+> * Testing
+> 
+> KVM and the Linux Kernel:
+> * Nested virtualization
+> * Resource management (CPU, I/O, memory) and scheduling
+> * VFIO: IOMMU, SR-IOV, virtual GPU, etc.
+> * Networking: Open vSwitch, XDP, etc.
+> * virtio and vhost
+> * Architecture ports and new processor features
+> 
+> QEMU:
+> * Management interfaces: QOM and QMP
+> * New devices, new boards, new architectures
+> * New storage features
+> * High availability, live migration and fault tolerance
+> * Emulation and TCG
+> * Firmware: ACPI, UEFI, coreboot, U-Boot, etc.
+> 
+> Management & Infrastructure
+> * Managing KVM: Libvirt, OpenStack, oVirt, KubeVirt, etc.
+> * Storage: Ceph, Gluster, SPDK, etc.
+> * Network Function Virtualization: DPDK, OPNFV, OVN, etc.
+> * Provisioning
+> 
+> 
+> SUBMITTING YOUR PROPOSAL
+> ------------------------
+> 
+> Abstracts due: June 15, 2020
+> 
+> Please submit a short abstract (~150 words) describing your presentation
+> proposal. Slots vary in length up to 45 minutes.
+> 
+> Submit your proposal here:
+> https://events.linuxfoundation.org/kvm-forum/program/cfp/
+> 
+> Please only use the categories "presentation" and "panel discussion"
+> 
+> You will receive a notification whether or not your presentation
+> proposal was accepted by August 17, 2020.
+> 
+> Speakers will receive a complimentary pass for the event. In case your
+> submission has multiple presenters, only the primary speaker for a
+> proposal will receive a complimentary event pass. For panel discussions,
+> all panelists will receive a complimentary event pass.
+> 
+> 
+> TECHNICAL TALKS
+> 
+> A good technical talk should not just report on what has happened over
+> the last year; it should present a concrete problem and how it impacts
+> the user and/or developer community. Whenever applicable, focus on work
+> that needs to be done, difficulties that haven't yet been solved, and on
+> decisions that other developers should be aware of. Summarizing recent
+> developments is okay but it should not be more than a small portion of
+> the overall talk.
+> 
+> 
+> END-USER TALKS
+> 
+> One of the big challenges as developers is to know what, where and how
+> people actually use our software. We will reserve a few slots for end
+> users talking about their deployment challenges and achievements.
+> 
+> If you are using KVM in production you are encouraged submit a speaking
+> proposal. Simply mark it as an end-user talk. As an end user, this is a
+> unique opportunity to get your input to developers.
+> 
+> 
+> PANEL DISCUSSIONS
+> 
+> If you are proposing a panel discussion, please make sure that you list
+> all of your potential panelists in your the abstract. We will request
+> full biographies if a panel is accepted.
+> 
+> 
+> HANDS-ON / BOF SESSIONS
+> 
+> We will reserve some time for people to get together and discuss
+> strategic decisions as well as other topics that are best solved within
+> smaller groups.
+> 
+> These sessions will be announced during the event. If you are interested
+> in organizing such a session, please add it to the list at
+> 
+>   http://www.linux-kvm.org/page/KVM_Forum_2020_BOF
+> 
+> Let people you think who might be interested know about your BOF, and
+> encourage them to add their names to the wiki page as well. Please add
+> your ideas to the list before KVM Forum starts.
+> 
+> 
+> HOTEL / TRAVEL
+> --------------
+> 
+> This year's event will take place at the Conference Center Dublin. For
+> information on hotels close to the conference, please visit
+> https://events.linuxfoundation.org/kvm-forum/attend/venue-travel/.
+> Information on conference hotel blocks will be available later in
+> Spring 2020.
+> 
+> 
+> DATES TO REMEMBER
+> -----------------
+> 
+> * CFP Opens: Monday, April 27, 2020
+> * CFP Closes: Monday, June 15 at 11:59 PM PST
+> * CFP Notifications: Monday, August 17
+> * Schedule Announcement: Thursday, August 20
+> * Slide Due Date: Monday, October 26
+> * Event Dates: Wednesday, October 28 – Friday, October 30
+> 
+> 
+> 
+> Thank you for your interest in KVM. We're looking forward to your
+> submissions and, if the conditions will permit it, to seeing you at the
+> KVM Forum 2020 in October!
+> 
+> -your KVM Forum 2020 Program Committee
+> 
+> Please contact us with any questions or comments at
+> kvm-forum-2020-pc@redhat.com
+> 
+> 
 
 
