@@ -2,128 +2,95 @@ Return-Path: <SRS0=bzpH=76=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF0B1C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 17:19:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B23DC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 17:20:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC95421532
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 17:19:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CA5E32089D
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 17:20:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GBeNTs+7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC95421532
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Lt1Pt59H"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA5E32089D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38410 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42736 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlbiq-0001mP-0R
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 13:19:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55626)
+	id 1jlbk6-0003jO-2S
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 13:20:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55664)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jlbhd-0000oP-PU
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 13:18:21 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:55397
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jlbht-00010d-SH
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 13:18:37 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:24508
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jlbhb-0002ZS-Kv
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 13:18:21 -0400
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jlbhr-0002a0-HX
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 13:18:37 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592414299;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ s=mimecast20190719; t=1592414314;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=/4s+KMLjPKl04oe//sCwCoYlXg/y+lC+n2CkmOvRm34=;
- b=GBeNTs+7gK6Sgci9vBQgH1thUfYBM3EjaJnPqNBD2i0IeO4AwL3/pEvsDfBOZSUK6H6qYP
- lHSMYmj72pqlJg94RNlMjRvjHG0nBkPQD8D6N6C1nZyhquGZ3C/IQdAFSi1rlz+xrOAhM0
- a/D7Qm0zOT+4RTiekWvp7CV6VBdJCW4=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-132-lpt7BAn2MQiGlcFixWSWzQ-1; Wed, 17 Jun 2020 13:18:14 -0400
-X-MC-Unique: lpt7BAn2MQiGlcFixWSWzQ-1
-Received: by mail-ej1-f70.google.com with SMTP id z21so1426425ejl.6
- for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 10:18:12 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=/4s+KMLjPKl04oe//sCwCoYlXg/y+lC+n2CkmOvRm34=;
- b=GzUClFyjJMPwWkDJTTxZloO9eEqM9d/ORwWF2QvHs4nauIoc/KPt/ZCvi8Dpc5TmqL
- WqWkK3qoJ6on3Fv+sukTXLZ+D7KhvO3LjJhu+UG++Ox63GxQ/aZ0GdGIgzkAjfibr+FR
- zuPxFlgWaHNN6k6pNc+nQQVxTxzOAYiOFTDu9z/+jiYs5L6RM1OdKfNQbxSGXbAvJ54i
- Kv2ExSGbf19/0+UqjR8luxv0Hsh3U/6mDl46FFFJB2pDwr0C9iHIAW72dGGL+45r7BvG
- rQ1fTIO+oFEiMdpUwJZDmlsZ4wJGqz54Sagas5q0s4Q8kj+mU3WyqZbXnQSvw2qkTgOC
- tOKA==
-X-Gm-Message-State: AOAM530wfDt19HmtFTL7ZIIz3ZLXMzwCl0KkzzWZLfulGAjyqzbus60j
- OT6LOuciMR417xdtDK9VhfB3fV2Kg6m6LbdmQeq1LdUYt4xWweb+OUJnlKs/h2oXuvM05iOIQ5v
- ajHe22bp6DUEXCls=
-X-Received: by 2002:a05:6402:1d89:: with SMTP id
- dk9mr159487edb.275.1592414291612; 
- Wed, 17 Jun 2020 10:18:11 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxm9ayRReM1bxBSfS9z67Ucsqs9yZDvDR2+RYc16OAVmsE8XgJWccQXtVSM/+ib/Qul+vgZ/g==
-X-Received: by 2002:a05:6402:1d89:: with SMTP id
- dk9mr159473edb.275.1592414291428; 
- Wed, 17 Jun 2020 10:18:11 -0700 (PDT)
-Received: from [192.168.1.38] (93.red-83-59-160.dynamicip.rima-tde.net.
- [83.59.160.93])
- by smtp.gmail.com with ESMTPSA id f5sm179417edv.36.2020.06.17.10.18.10
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 17 Jun 2020 10:18:10 -0700 (PDT)
-Subject: Re: [PATCH v3 00/16] python: add mypy support to python/qemu
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-References: <20200604202236.25039-1-jsnow@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <47c9dce0-2dca-e73a-8a33-40938a4da44b@redhat.com>
-Date: Wed, 17 Jun 2020 19:18:09 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ in-reply-to:in-reply-to:references:references;
+ bh=yL24U6myHTf6oyY825yEvoaLUCH46ESRi4qteBvUO6E=;
+ b=Lt1Pt59H40cDwIrimgR5Jw5daYvedBErw2PaOjSE1M0kOSAngY0tmzH88BPRX4dskcaGq0
+ i5aRrMHnLrJzFa55Jz0HmiEvmtnQa9DLWZ6ov3X8BQBqYntP8JgKpKcpHaKgJjiBeqoVfU
+ ZEY39axhIs8qnWeP6cHl3x2Ihwm4jS0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-350-F21OM18ZNXC6ZsVCdrABQg-1; Wed, 17 Jun 2020 13:18:07 -0400
+X-MC-Unique: F21OM18ZNXC6ZsVCdrABQg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7F2B48014D4;
+ Wed, 17 Jun 2020 17:18:05 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.110.69])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 938326ED96;
+ Wed, 17 Jun 2020 17:17:58 +0000 (UTC)
+Date: Wed, 17 Jun 2020 18:17:55 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: ovmf / PCI passthrough impaired due to very limiting PCI64
+ aperture
+Message-ID: <20200617171755.GD660974@redhat.com>
+References: <20200616165043.24y2cp53axk7uggy@sirius.home.kraxel.org>
+ <20200616165746.GH2788@work-vm>
+ <CAHD1Q_zGu4Q63HjHx3aZKu3wh8NppuP6T4kgnUN3j=-ZDufVZA@mail.gmail.com>
+ <b423f4a4-2552-bdc8-7c9f-41f200aef672@redhat.com>
+ <20200617134652.GE2776@work-vm>
+ <20200617154959.GZ2366737@habkost.net>
+ <20200617160412.GG2776@work-vm>
+ <20200617161717.GC660974@redhat.com>
+ <20200617162243.GB2366737@habkost.net>
+ <20200617164141.GH2776@work-vm>
 MIME-Version: 1.0
-In-Reply-To: <20200604202236.25039-1-jsnow@redhat.com>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/17 02:02:46
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200617164141.GH2776@work-vm>
+User-Agent: Mutt/1.14.0 (2020-05-02)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=berrange@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/16 23:30:45
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -137,50 +104,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Cleber Rosa <crosa@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Liu Yi L <yi.l.liu@intel.com>,
+ Pedro Principeza <pedro.principeza@canonical.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Like Xu <like.xu@linux.intel.com>,
+ Dann Frazier <dann.frazier@canonical.com>,
+ Guilherme Piccoli <gpiccoli@canonical.com>, qemu-devel@nongnu.org,
+ Christian Ehrhardt <christian.ehrhardt@canonical.com>,
+ Robert Hoo <robert.hu@linux.intel.com>, Babu Moger <babu.moger@amd.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Chenyi Qiang <chenyi.qiang@intel.com>,
+ Laszlo Ersek <lersek@redhat.com>, fw@gpiccoli.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/4/20 10:22 PM, John Snow wrote:
-> Based-on: 20200604195252.20739-1-jsnow@redhat.com
+On Wed, Jun 17, 2020 at 05:41:41PM +0100, Dr. David Alan Gilbert wrote:
+> * Eduardo Habkost (ehabkost@redhat.com) wrote:
+> > On Wed, Jun 17, 2020 at 05:17:17PM +0100, Daniel P. BerrangÃÂ© wrote:
+> > > On Wed, Jun 17, 2020 at 05:04:12PM +0100, Dr. David Alan Gilbert wrote:
+> > > > * Eduardo Habkost (ehabkost@redhat.com) wrote:
+> > > > > On Wed, Jun 17, 2020 at 02:46:52PM +0100, Dr. David Alan Gilbert wrote:
+> > > > > > * Laszlo Ersek (lersek@redhat.com) wrote:
+> > > > > > > On 06/16/20 19:14, Guilherme Piccoli wrote:
+> > > > > > > > Thanks Gerd, Dave and Eduardo for the prompt responses!
+> > > > > > > > 
+> > > > > > > > So, I understand that when we use "-host-physical-bits", we are
+> > > > > > > > passing the *real* number for the guest, correct? So, in this case we
+> > > > > > > > can trust that the guest physbits matches the true host physbits.
+> > > > > > > > 
+> > > > > > > > What if then we have OVMF relying in the physbits *iff*
+> > > > > > > > "-host-phys-bits" is used (which is the default in RH and a possible
+> > > > > > > > machine configuration on libvirt XML in Ubuntu), and we have OVMF
+> > > > > > > > fallbacks to 36-bit otherwise?
+> > > > > > > 
+> > > > > > > I've now read the commit message on QEMU commit 258fe08bd341d, and the
+> > > > > > > complexity is simply stunning.
+> > > > > > > 
+> > > > > > > Right now, OVMF calculates the guest physical address space size from
+> > > > > > > various range sizes (such as hotplug memory area end, default or
+> > > > > > > user-configured PCI64 MMIO aperture), and derives the minimum suitable
+> > > > > > > guest-phys address width from that address space size. This width is
+> > > > > > > then exposed to the rest of the firmware with the CPU HOB (hand-off
+> > > > > > > block), which in turn controls how the GCD (global coherency domain)
+> > > > > > > memory space map is sized. Etc.
+> > > > > > > 
+> > > > > > > If QEMU can provide a *reliable* GPA width, in some info channel (CPUID
+> > > > > > > or even fw_cfg), then the above calculation could be reversed in OVMF.
+> > > > > > > We could take the width as a given (-> produce the CPU HOB directly),
+> > > > > > > plus calculate the *remaining* address space between the GPA space size
+> > > > > > > given by the width, and the end of the memory hotplug area end. If the
+> > > > > > > "remaining size" were negative, then obviously QEMU would have been
+> > > > > > > misconfigured, so we'd halt the boot. Otherwise, the remaining area
+> > > > > > > could be used as PCI64 MMIO aperture (PEI memory footprint of DXE page
+> > > > > > > tables be darned).
+> > > > > > > 
+> > > > > > > > Now, regarding the problem "to trust or not" in the guests' physbits,
+> > > > > > > > I think it's an orthogonal discussion to some extent. It'd be nice to
+> > > > > > > > have that check, and as Eduardo said, prevent migration in such cases.
+> > > > > > > > But it's not really preventing OVMF big PCI64 aperture if we only
+> > > > > > > > increase the aperture _when  "-host-physical-bits" is used_.
+> > > > > > > 
+> > > > > > > I don't know what exactly those flags do, but I doubt they are clearly
+> > > > > > > visible to OVMF in any particular way.
+> > > > > > 
+> > > > > > The firmware should trust whatever it reads from the cpuid and thus gets
+> > > > > > told from qemu; if qemu is doing the wrong thing there then that's our
+> > > > > > problem and we need to fix it in qemu.
+> > > > > 
+> > > > > It is impossible to provide a MAXPHYADDR that the guest can trust
+> > > > > unconditionally and allow live migration to hosts with different
+> > > > > sizes at the same time.
+> > > > 
+> > > > It would be nice to get to a point where we could say that the reported
+> > > > size is no bigger than the physical hardware.
+> > > > The gotcha here is that (upstream) qemu is still reporting 40 by default
+> > > > when even modern Intel desktop chips are 39.
+> > > > 
+> > > > > Unless we want to drop support live migration to hosts with
+> > > > > different sizes entirely, we need additional bits to tell the
+> > > > > guest how much it can trust MAXPHYADDR.
+> > > > 
+> > > > Could we go with host-phys-bits=true by default, that at least means the
+> > > > normal behaviour is correct; if people want to migrate between different
+> > > > hosts with different sizes they should set phys-bits (or
+> > > > host-phys-limit) to the lowest in their set of hardware.
+> > > 
+> > > Is there any sense in picking the default value based on -cpu selection ?
+> > > 
+> > > If user has asked for -cpu host, there's no downside to host-phys-bits=true,
+> > > as the user has intentionally traded off live migration portability already.
+> > 
+> > Setting host-phys-bits=true when using -cpu host makes a lot of
+> > sense, and we could start doing that immediately.
+> > 
+> > > 
+> > > If the user askes for -cpu $MODEL, then could we set phys-bits=NNN for some
+> > > NNN that is the lowest value for CPUs that are capable of running $MODEL ?
+> > > Or will that get too complicated with the wide range of SKU variants, in
+> > > particular server vs desktop CPUs.
+> > 
+> > This makes sense too.  We need some help from CPU vendors to get
+> > us this data added to our CPU model table.  I'm CCing some Intel
+> > and AMD people that could help us.
 > 
-> This series is extracted from my larger series that attempted to bundle
-> our python module as an installable module. These fixes don't require that,
-> so they are being sent first as I think there's less up for debate in here.
-> 
-[...]
-> 
-> John Snow (16):
->   python/qmp.py: Define common types
->   iotests.py: use qemu.qmp type aliases
->   python/qmp.py: re-absorb MonitorResponseError
->   python/qmp.py: Do not return None from cmd_obj
->   python/qmp.py: add casts to JSON deserialization
->   python/qmp.py: add QMPProtocolError
->   python/machine.py: Fix monitor address typing
->   python/machine.py: reorder __init__
->   python/machine.py: Don't modify state in _base_args()
->   python/machine.py: Handle None events in events_wait
->   python/machine.py: use qmp.command
->   python/machine.py: Add _qmp access shim
->   python/machine.py: fix _popen access
->   python/qemu: make 'args' style arguments immutable
->   iotests.py: Adjust HMP kwargs typing
->   python/qemu: Add mypy type annotations
-> 
->  python/qemu/accel.py          |   8 +-
->  python/qemu/machine.py        | 286 ++++++++++++++++++++--------------
->  python/qemu/qmp.py            | 111 +++++++++----
->  python/qemu/qtest.py          |  53 ++++---
->  scripts/render_block_graph.py |   7 +-
->  tests/qemu-iotests/iotests.py |  11 +-
->  6 files changed, 298 insertions(+), 178 deletions(-)
-> 
+> That bit worries me because I think I agree it's SKU dependent and has
+> been for a long time (on Intel at least) and we don't even have CPU
+> models for all Intel devices. (My laptop for example is a Kaby Lake, 39
+> bits physical).  Maybe it works on the more modern ones where we have
+> 'Icelake-Client' and 'Icelake-Server'.
 
-Thanks, applied to my python-next tree:
-https://gitlab.com/philmd/qemu/commits/python-next
+Yeah, I think introducing the Client/Server variants was a good idea
+and long overdue.
+
+For older CPUs, we have a choice of picking a lowest common denominator
+which would likely be a regression for people running on Xeon hosts,
+or we could introduce Client/Server variants for old models which currently
+lack them too.
+
+I'd tend towards the latter - the Xeon vs non-Xeon SKUs for Intel have
+always been different in various ways, and we've just been lazy using
+one model for both.
+
+With CPU versioning, that would let us "do the right thing".
+eg Broadwell-Client (physbits=36) / Broadwell-Server (physbits=46)
+Then "-cpu Broadwell" would automatically resolve to whichever of
+Broadwell-Client/Server were supported on the current host taking into
+account its phys-bits too. This would give us live migration safety and
+not limit us to the lowest common denominator.
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
