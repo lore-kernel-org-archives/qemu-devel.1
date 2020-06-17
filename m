@@ -2,98 +2,89 @@ Return-Path: <SRS0=bzpH=76=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A30B3C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 11:39:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A36CAC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 11:40:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 70CFB207DD
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 11:39:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6E5F12070A
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 11:40:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dbM0uFvi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70CFB207DD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JXBaXoTE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E5F12070A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50546 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52734 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlWPq-0001vm-Oc
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 07:39:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43272)
+	id 1jlWQs-0002qO-N7
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 07:40:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43576)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
- id 1jlWPA-0001Gz-38
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 07:38:57 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:37289)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
- id 1jlWP7-0002L6-Hq
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 07:38:55 -0400
-Received: by mail-wr1-x442.google.com with SMTP id a6so10537wrm.4
- for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 04:38:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=eKJDl/qcRCeVzc5vrbNJgr7kSv8io0a9G4yfVitCrek=;
- b=dbM0uFvix+VpWUIzy6IAjA3+lyufVihEoerPOGO6OyETIn+mOgOpfPmGHzT9et0+S+
- L0zo3YlqWV6sOcbBGW1WSMKwRj+OoeoHfhp/vM3cZUeBtfLS2QnD5qTzykvm8cSDBRog
- DU3aXbEtkou+qVz7cPEwoJqsIQD1sVA0lORhRuQAE07QPk4CjIQlRZb5Pg7WwL/sYPa/
- xeGgmK0loVY2Aroyse4GQepGKtaXlgWTmkBWH4WDQBKWr6xRxsB3N0R41ny6/V7uWvJp
- uS+zkFPYK2f4N4edZ/gy+TK3LCnfIXgQx+fc51qCrfcfOGQ+5R9X7vPgcWwWGgKLJ5Qz
- gvaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=eKJDl/qcRCeVzc5vrbNJgr7kSv8io0a9G4yfVitCrek=;
- b=aorubzRkNUHvQOyI2ILC6bUEHH7tRdLaQ647CGmc1HjnRJ7q0tO0LEbTSNjDdwzoMT
- x4vVxR05895Fu1Oz4UHrMTqVfsColepG/j28hafcNiTNtFb3axSZi71KiQXXXhgM+2oD
- 67yRBk8hEX/RT4q4MFZlO4V5Lr/7KFQwhWU71+Y3PlxFjQhyrkIC4CcrYdF0m2NaSYrl
- q96rbhuMmbYIXpTjq7TTkRCjyXvWkuPKhh0orICcVffCVoQC64+8B1SBtJ7y7a5UYTNX
- iuQto9ZzRuHbLYZYtEKOoHO2yhFLtak2s8Z9qVBi0+Y0t+Q+vySPO/hJtOX3adDbB9bg
- Vt9g==
-X-Gm-Message-State: AOAM533CjTkDRAcJ+aKrQV14TclnNRtXSayvmzPMd0HUJ9djfmJH4tfI
- FeNJfPqi0ODmsaCIV2xMwNk=
-X-Google-Smtp-Source: ABdhPJxRFrC579rQqddMx6p3WOn62gUsUjrUiucQId4YmpAGY3IlyZOS6HNzlTMh3Fy51Fskb6aX4A==
-X-Received: by 2002:a5d:5389:: with SMTP id d9mr8611065wrv.77.1592393931912;
- Wed, 17 Jun 2020 04:38:51 -0700 (PDT)
-Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id d16sm30397wmd.42.2020.06.17.04.38.50
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 17 Jun 2020 04:38:50 -0700 (PDT)
-Date: Wed, 17 Jun 2020 12:38:48 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Subject: Re: [PATCH v2] hw/virtio/vhost: re-factor vhost-section and allow
- DIRTY_MEMORY_CODE
-Message-ID: <20200617113848.GB1728005@stefanha-x1.localdomain>
-References: <20200604134022.10564-1-alex.bennee@linaro.org>
- <20200605090334.GB59930@stefanha-x1.localdomain>
- <87o8px4xxp.fsf@linaro.org>
- <20200609111044.GD92564@stefanha-x1.localdomain>
- <87v9k04he8.fsf@linaro.org>
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jlWQ5-0002Aw-BI
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 07:39:54 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36762
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jlWQ3-0002S2-PS
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 07:39:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592393991;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=+A3OzC8YqMZn3QGL8JSkuLnC6+2WWU53BGSNIa7D090=;
+ b=JXBaXoTE+prx5o5SUDbNjclabzN/fieq0XtZX0YAxL0blTIdEJig3rE6iqtHrLwnnh5uCA
+ KE9IQEDQaz21TFnE3ux3ud9hNESfmUuX1zT2FXCctzOTyLTNtGb8MoQJefbUwGOpv3fft/
+ W7non99SGqvqOxcmQeepohV2KZ1wDPE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-225-Kk4d2p3hOr2nBpUn281m1A-1; Wed, 17 Jun 2020 07:39:49 -0400
+X-MC-Unique: Kk4d2p3hOr2nBpUn281m1A-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1DD78134D3;
+ Wed, 17 Jun 2020 11:39:48 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-131.ams2.redhat.com [10.36.112.131])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3BA4E60BE2;
+ Wed, 17 Jun 2020 11:39:47 +0000 (UTC)
+Subject: Re: [PATCH 2/5] iotests/041: Skip test_small_target for qed
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+References: <20200617104822.27525-1-mreitz@redhat.com>
+ <20200617104822.27525-3-mreitz@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <c4f1cdec-6815-c059-bc66-58262bcff278@redhat.com>
+Date: Wed, 17 Jun 2020 13:39:45 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="p4qYPpj5QlsIQJ0K"
-Content-Disposition: inline
-In-Reply-To: <87v9k04he8.fsf@linaro.org>
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=stefanha@gmail.com; helo=mail-wr1-x442.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200617104822.27525-3-mreitz@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=thuth@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/17 01:42:04
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -106,168 +97,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
- Stefan Hajnoczi <stefanha@redhat.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 17/06/2020 12.48, Max Reitz wrote:
+> qed does not support shrinking images, so the test_small_target method
+> should be skipped to keep 041 passing.
+> 
+> Fixes: 16cea4ee1c8e5a69a058e76f426b2e17974d8d7d
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  tests/qemu-iotests/041 | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/tests/qemu-iotests/041 b/tests/qemu-iotests/041
+> index 601c756117..b843f88a66 100755
+> --- a/tests/qemu-iotests/041
+> +++ b/tests/qemu-iotests/041
+> @@ -277,6 +277,8 @@ class TestSingleBlockdev(TestSingleDrive):
+>          result = self.vm.run_job('job0')
+>          self.assertEqual(result, 'Source and target image have different sizes')
+>  
+> +    # qed does not support shrinking
+> +    @iotests.skip_for_formats(('qed'))
+>      def test_small_target(self):
+>          self.do_test_target_size(self.image_len // 2)
 
---p4qYPpj5QlsIQJ0K
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Great, now "check -qed 041" works fine for me again! Thanks!
 
-On Tue, Jun 09, 2020 at 12:18:07PM +0100, Alex Benn=E9e wrote:
->=20
-> Stefan Hajnoczi <stefanha@redhat.com> writes:
->=20
-> > On Fri, Jun 05, 2020 at 11:19:30AM +0100, Alex Benn=E9e wrote:
-> >>=20
-> >> Stefan Hajnoczi <stefanha@redhat.com> writes:
-> >>=20
-> >> > On Thu, Jun 04, 2020 at 02:40:22PM +0100, Alex Benn=E9e wrote:
-> >> >> The purpose of vhost_section is to identify RAM regions that need to
-> >> >> be made available to a vhost client. However when running under TCG
-> >> >> all RAM sections have DIRTY_MEMORY_CODE set which leads to problems
-> >> >> down the line.
-> >> >>=20
-> >> >> Re-factor the code so:
-> >> >>=20
-> >> >>   - steps are clearer to follow
-> >> >>   - reason for rejection is recorded in the trace point
-> >> >>   - we allow DIRTY_MEMORY_CODE when TCG is enabled
-> >> >>=20
-> >> >> We expand the comment to explain that kernel based vhost has specif=
-ic
-> >> >> support for migration tracking.
-> >> >>=20
-> >> >> Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
-> >> >> Cc: Michael S. Tsirkin <mst@redhat.com>
-> >> >> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> >> >> Cc: Stefan Hajnoczi <stefanha@redhat.com>
-> >> >>=20
-> >> >> ---
-> >> >> v2
-> >> >>   - drop enum, add trace_vhost_reject_section
-> >> >>   - return false at any fail point
-> >> >>   - unconditionally add DIRTY_MEMORY_CODE to handled cases
-> >> >>   - slightly re-word the explanatory comment and commit message
-> >> >> ---
-> >> >>  hw/virtio/vhost.c      | 55 ++++++++++++++++++++++++++++++--------=
-----
-> >> >>  hw/virtio/trace-events |  3 ++-
-> >> >>  2 files changed, 41 insertions(+), 17 deletions(-)
-> >> >>=20
-> >> >> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-> >> >> index aff98a0ede5..120c0cc747b 100644
-> >> >> --- a/hw/virtio/vhost.c
-> >> >> +++ b/hw/virtio/vhost.c
-> >> >> @@ -27,6 +27,7 @@
-> >> >>  #include "migration/blocker.h"
-> >> >>  #include "migration/qemu-file-types.h"
-> >> >>  #include "sysemu/dma.h"
-> >> >> +#include "sysemu/tcg.h"
-> >> >>  #include "trace.h"
-> >> >> =20
-> >> >>  /* enabled until disconnected backend stabilizes */
-> >> >> @@ -403,26 +404,48 @@ static int vhost_verify_ring_mappings(struct =
-vhost_dev *dev,
-> >> >>      return r;
-> >> >>  }
-> >> >> =20
-> >> >> +/*
-> >> >> + * vhost_section: identify sections needed for vhost access
-> >> >> + *
-> >> >> + * We only care about RAM sections here (where virtqueue can live)=
-=2E If
-> >> >
-> >> > It's not just the virtqueue. Arbitrary guest RAM buffers can be plac=
-ed
-> >> > into the virtqueue so we need to pass all guest RAM to the vhost dev=
-ice
-> >> > backend.
-> >> >
-> >> >> + * we find one we still allow the backend to potentially filter it=
- out
-> >> >> + * of our list.
-> >> >> + */
-> >> >>  static bool vhost_section(struct vhost_dev *dev, MemoryRegionSecti=
-on *section)
-> >> >>  {
-> >> >> -    bool result;
-> >> >> -    bool log_dirty =3D memory_region_get_dirty_log_mask(section->m=
-r) &
-> >> >> -                     ~(1 << DIRTY_MEMORY_MIGRATION);
-> >> >> -    result =3D memory_region_is_ram(section->mr) &&
-> >> >> -        !memory_region_is_rom(section->mr);
-> >> >> -
-> >> >> -    /* Vhost doesn't handle any block which is doing dirty-trackin=
-g other
-> >> >> -     * than migration; this typically fires on VGA areas.
-> >> >> -     */
-> >> >> -    result &=3D !log_dirty;
-> >> >> +    MemoryRegion *mr =3D section->mr;
-> >> >> +
-> >> >> +    if (memory_region_is_ram(mr) && !memory_region_is_rom(mr)) {
-> >> >> +        uint8_t dirty_mask =3D memory_region_get_dirty_log_mask(mr=
-);
-> >> >> +        uint8_t handled_dirty;
-> >> >> +
-> >> >> +        /*
-> >> >> +         * Kernel based vhost doesn't handle any block which is do=
-ing
-> >> >> +         * dirty-tracking other than migration for which it has
-> >> >> +         * specific logging support. However for TCG the kernel ne=
-ver
-> >> >> +         * gets involved anyway so we can also ignore it's
-> >> >> +         * self-modiying code detection flags.
-> >> >> +         */
-> >> >> +        handled_dirty =3D (1 << DIRTY_MEMORY_MIGRATION);
-> >> >> +        handled_dirty |=3D (1 << DIRTY_MEMORY_CODE);
-> >> >
-> >> > Wait, how is vhost going to support TCG self-modifying code detectio=
-n?
-> >> >
-> >> > It seems like this change will allow vhost devices to run, but now Q=
-EMU
-> >> > will miss out on self-modifying code. Do we already enable vhost dir=
-ty
-> >> > memory logging for DIRTY_MEMORY_CODE memory somehwere?
-> >>=20
-> >> Well any guest code running will still trigger the SMC detection. It's
-> >> true we currently don't have a mechanism if the vhost-user client
-> >> updates an executable page.
-> >
-> > Seems like a problem. If it didn't matter we could get rid of
-> > DIRTY_MEMORY_CODE entirely.
-> >
-> > If an exception is being made here because I/O devices aren't expected
-> > to trigger SMC in real-world guests, please document it.
->=20
-> In the comment here or somewhere in the docs?
+Tested-by: Thomas Huth <thuth@redhat.com>
 
-If it's a user-visible limitation (e.g. DMA from vhost-user devices
-bypasses TCG SMC checks and could result in behavior that differs from
-built-in virtio device models), then the docs would be a good place.
-
-Stefan
-
---p4qYPpj5QlsIQJ0K
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl7qAMgACgkQnKSrs4Gr
-c8glsAf8CUYPVpAMAd6eq+1vkBVvZeJ1wmynP82fuPm22KlK0iXO9Y/yDCYPcWJH
-gVToq+5loKDRcclRBuDXOOES4ibzel3DWbFvJUwCJviXeq2+3YqIoeSbHpCtNaRx
-1vySVhEpLYDV7uFPqhFccr32wy2j+sWDvZaraiNBqa5mbLfEXrZeF52SVVGeN7pJ
-HEeewsWNcCy/NiTf2dsijujEWd/6rONEY9h6421OmJs2mMffWGjgPK4ISjVp8cyU
-ZHAoGc+2/I1mAPfQBAEyglXeNtMI0NBsV7jYMiu8YkLKh8mlm6OaT8hV6cow5N9c
-SDdSzYG0rj/Tb9fhdwgmanDClHMhHA==
-=NNo1
------END PGP SIGNATURE-----
-
---p4qYPpj5QlsIQJ0K--
 
