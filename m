@@ -2,84 +2,75 @@ Return-Path: <SRS0=bzpH=76=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11701C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 15:25:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EF62C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 15:25:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CE8FD206FA
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 15:25:01 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Gh20qtoe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE8FD206FA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id ED46B208B3
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 15:25:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED46B208B3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56368 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57980 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlZvx-00052u-1u
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 11:25:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46000)
+	id 1jlZwK-0005iY-9q
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 11:25:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54202)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jlZOP-00041y-Hw
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 10:50:21 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24858
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jlZON-0001wo-Rj
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 10:50:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592405419;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=aCyRlcLsLgVaRXnU5SLsAruLHHDQZWjPTIPP8PG6N8w=;
- b=Gh20qtoemgV0udipwT1ig7coYYRtMOhSZpavhuHzCzXluJGTTwK6Tc93zymzZhoDhlcSHU
- 3OTJSHe9jXII1yfMzr0fTZrWXOduPdGiQzp8pwN8r4z3LBkm1AOOz43BukJSmwMEInG1t4
- 9fRgiLJiHwAE/Cez8CFkChpGFngbHcM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-463-_40xnGk-MuKe-J7Bqb9zjQ-1; Wed, 17 Jun 2020 10:50:15 -0400
-X-MC-Unique: _40xnGk-MuKe-J7Bqb9zjQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A6C28100CCCB;
- Wed, 17 Jun 2020 14:50:13 +0000 (UTC)
-Received: from linux.fritz.box.com (ovpn-114-44.ams2.redhat.com [10.36.114.44])
- by smtp.corp.redhat.com (Postfix) with ESMTP id ACAFD7CAB0;
- Wed, 17 Jun 2020 14:50:11 +0000 (UTC)
-From: Kevin Wolf <kwolf@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PULL 42/43] iotests/{190,291}: compat=0.10 is unsupported
-Date: Wed, 17 Jun 2020 16:49:08 +0200
-Message-Id: <20200617144909.192176-43-kwolf@redhat.com>
-In-Reply-To: <20200617144909.192176-1-kwolf@redhat.com>
-References: <20200617144909.192176-1-kwolf@redhat.com>
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jlZvM-0004Bn-D6
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 11:24:24 -0400
+Received: from 7.mo1.mail-out.ovh.net ([87.98.158.110]:37157)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jlZvG-0000ZE-Tx
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 11:24:21 -0400
+Received: from player787.ha.ovh.net (unknown [10.110.103.112])
+ by mo1.mail-out.ovh.net (Postfix) with ESMTP id A3AD41CB1A4
+ for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 17:24:15 +0200 (CEST)
+Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
+ (Authenticated sender: clg@kaod.org)
+ by player787.ha.ovh.net (Postfix) with ESMTPSA id CECBF13A759DF;
+ Wed, 17 Jun 2020 15:24:09 +0000 (UTC)
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-103G005e2e89b5a-4ed4-4133-982c-db340b003c72,ABECD89738EEB0C75E5395B338997A57DB3A3EEE)
+ smtp.auth=clg@kaod.org
+Subject: Re: [PATCH 5/6] hw/arm: Add NPCM730 and NPCM750 SoC models
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20200521192133.127559-1-hskinnemoen@google.com>
+ <20200521192133.127559-6-hskinnemoen@google.com>
+ <18fa4025-0a2a-4427-b74f-2b1b678e0661@kaod.org>
+ <CAFQmdRY9f6tV7VoDOFpRJ0x0hr_0EAaGqZwmXnkJpbvmbF4FVQ@mail.gmail.com>
+ <5f0864e4-5e63-4819-1f30-68a5f207e275@kaod.org>
+ <CAFEAcA86vzp7hTYzk54+Qu+WQDzB-gLbUsqbB409f9F3ONdekQ@mail.gmail.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <763b7791-c2d8-b9a8-3e2f-1ad6d3ac8c09@kaod.org>
+Date: Wed, 17 Jun 2020 17:24:07 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <CAFEAcA86vzp7hTYzk54+Qu+WQDzB-gLbUsqbB409f9F3ONdekQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=kwolf@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/17 01:42:04
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+X-Ovh-Tracer-Id: 3863807006465297321
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -77
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedrudejvddgkeejucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnegfrhhlucfvnfffucdlvdefmdenucfjughrpefuvfhfhffkffgfgggjtgfgsehtkeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhephfevvdehieeftdevfeelleffgfehtdfgvdegteeijeetudejgedutdduudfhteeknecuffhomhgrihhnpehophgvnhhpohifvghrrdighiiinecukfhppedtrddtrddtrddtpdekvddrieegrddvhedtrddujedtnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeekjedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
+Received-SPF: pass client-ip=87.98.158.110; envelope-from=clg@kaod.org;
+ helo=7.mo1.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/17 11:24:15
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -8
+X-Spam_score: -0.9
+X-Spam_bar: /
+X-Spam_report: (-0.9 / 5.0 requ) BAYES_00=-1.9, PDS_OTHER_BAD_TLD=1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -92,50 +83,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
+Cc: CS20 KFTing <kfting@nuvoton.com>, qemu-arm <qemu-arm@nongnu.org>,
+ Havard Skinnemoen <hskinnemoen@google.com>,
+ IS20 Avi Fishman <Avi.Fishman@nuvoton.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Max Reitz <mreitz@redhat.com>
+On 6/11/20 11:38 AM, Peter Maydell wrote:
+> On Thu, 11 Jun 2020 at 07:12, Cédric Le Goater <clg@kaod.org> wrote:
+>> Some don't some do. This is a bit confusing.
+> 
+> Probably the usual thing of people not noticing that they
+> need to do something for big-endian hosts and nobody testing
+> the minor platforms there.
+> 
+>> Peter, should we fix the boards not doing the tswap in the secondary
+>> bootloader ?
+> 
+> Yes, we should -- it's an actual bug as well as just not being
+> very consistent.
+> 
+>> I still have access to a PP64 BE host to test.
+> 
+> In an ideal world the bugs would cause "make check" and/or
+> "make check-acceptance" to fail on BE hosts :-)
 
-Fixes: 5d72c68b49769c927e90b78af6d90f6a384b26ac
-Fixes: cf2d1203dcfc2bf964453d83a2302231ce77f2dc
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Message-Id: <20200617104822.27525-6-mreitz@redhat.com>
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- tests/qemu-iotests/190 | 2 ++
- tests/qemu-iotests/291 | 2 ++
- 2 files changed, 4 insertions(+)
+I gave it a try manually with an Aspeed machine and the kernel fails to boot.
 
-diff --git a/tests/qemu-iotests/190 b/tests/qemu-iotests/190
-index fe630918e9..c22d8d64f9 100755
---- a/tests/qemu-iotests/190
-+++ b/tests/qemu-iotests/190
-@@ -41,6 +41,8 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
- # See 178 for more extensive tests across more formats
- _supported_fmt qcow2
- _supported_proto file
-+# compat=0.10 does not support bitmaps
-+_unsupported_imgopts 'compat=0.10'
- 
- echo "== Huge file without bitmaps =="
- echo
-diff --git a/tests/qemu-iotests/291 b/tests/qemu-iotests/291
-index 404f8521f7..28e4fb9b4d 100755
---- a/tests/qemu-iotests/291
-+++ b/tests/qemu-iotests/291
-@@ -39,6 +39,8 @@ _supported_fmt qcow2
- _supported_proto file
- _supported_os Linux
- _require_command QEMU_NBD
-+# compat=0.10 does not support bitmaps
-+_unsupported_imgopts 'compat=0.10'
- 
- echo
- echo "=== Initial image setup ==="
--- 
-2.25.4
+Download an OpenBMC witherspoon flash image : 
 
+  wget https://openpower.xyz/job/openbmc-build/lastSuccessfulBuild/distro=ubuntu,label=builder,target=witherspoon/artifact/deploy/images/witherspoon/obmc-phosphor-image-witherspoon.ubi.mtd
+
+and run :
+
+  qemu-system-arm -M witherspoon-bmc -nic user -drive file=obmc-phosphor-image-witherspoon.ubi.mtd,format=raw,if=mtd -nographic 
+
+The kernel hangs right after activating the translation :
+
+#ifdef CONFIG_MMU
+ ARM_BE8(	orr	r0, r0, #1 << 25 )	@ big-endian page tables
+		mrcne   p15, 0, r6, c2, c0, 2   @ read ttb control reg
+		orrne	r0, r0, #1		@ MMU enabled
+		movne	r1, #0xfffffffd		@ domain 0 = client
+		bic     r6, r6, #1 << 31        @ 32-bit translation system
+		bic     r6, r6, #(7 << 0) | (1 << 4)	@ use only ttbr0
+		mcrne	p15, 0, r3, c2, c0, 0	@ load page table pointer
+		mcrne	p15, 0, r1, c3, c0, 0	@ load domain access control
+		mcrne   p15, 0, r6, c2, c0, 2   @ load ttb control
+#endif
+		mcr	p15, 0, r0, c7, c5, 4	@ ISB
+ *there* -->	mcr	p15, 0, r0, c1, c0, 0	@ load control register
+		mrc	p15, 0, r0, c1, c0, 0	@ and read it back
+		mov	r0, #0
+		mcr	p15, 0, r0, c7, c5, 4	@ ISB
+		mov	pc, r12
+
+
+C.
 
