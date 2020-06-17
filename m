@@ -2,73 +2,90 @@ Return-Path: <SRS0=bzpH=76=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 931E2C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 16:09:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E8CAC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 16:09:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 68A372065F
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 16:09:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68A372065F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 07E6B2065F
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 16:09:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hO6P6F4a"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07E6B2065F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40550 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41986 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlacq-0001dJ-O8
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 12:09:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36170)
+	id 1jladF-0002kW-7E
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 12:09:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36446)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jlaay-000571-Li
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 12:07:24 -0400
-Received: from 1.mo68.mail-out.ovh.net ([46.105.41.146]:53425)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jlaau-00082c-LM
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 12:07:24 -0400
-Received: from player761.ha.ovh.net (unknown [10.110.208.62])
- by mo68.mail-out.ovh.net (Postfix) with ESMTP id 7226A17055D
- for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 18:07:17 +0200 (CEST)
-Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
- (Authenticated sender: clg@kaod.org)
- by player761.ha.ovh.net (Postfix) with ESMTPSA id AB1A1137A75BC;
- Wed, 17 Jun 2020 16:07:08 +0000 (UTC)
-Authentication-Results: garm.ovh; auth=pass
- (GARM-106R006e65d12fd-060b-4227-9e75-bb5ee351308c,ABECD89738EEB0C75E5395B338997A57DB3A3EEE)
- smtp.auth=clg@kaod.org
-Subject: Re: [PATCH v2 09/12] hw/mem: Stubbed out NPCM7xx Memory Controller
- model
-To: Havard Skinnemoen <hskinnemoen@google.com>, peter.maydell@linaro.org,
- joel@jms.id.au
-References: <20200611223016.259837-1-hskinnemoen@google.com>
- <20200611223016.259837-10-hskinnemoen@google.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <262ce675-d4d8-c78f-eee6-cfdeb09862c1@kaod.org>
-Date: Wed, 17 Jun 2020 18:07:07 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ (Exim 4.90_1) (envelope-from <ahmedkhaledkaraman@gmail.com>)
+ id 1jlacT-000107-DS
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 12:08:57 -0400
+Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:37072)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <ahmedkhaledkaraman@gmail.com>)
+ id 1jlacR-0008D2-Jg
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 12:08:57 -0400
+Received: by mail-lf1-x141.google.com with SMTP id i8so1656031lfo.4
+ for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 09:08:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=B7OpIdvwwJ6dMqe2bdNIv/fEEahLa2yMeXnF6IpXGPs=;
+ b=hO6P6F4a4aiBB19YOP9rvaFNQY2XpQ0d00+TLHGDwG0GzRmcbrF2HbPxS4+Dgkinrv
+ HBRwD1MwXuEsJ3/a+cfY1yU//1TCH3ATCUXymcPPn7pIeOyOsajAXO8+O/oOJb0Xqc+o
+ Evj6e79UY0QLxowJLEzOtnc6Zmw7K5Ez75/oPYR6GlvmXLHcMU31BkJrTxXhI4FDaLib
+ QykURsGi0UqjdST4Jl27C1+ATNfR/cKbEnx1kVgyL4zQCrILCHP4lCP522bkRZONp058
+ gBVGMoz/si0cTp45wq3dZ/3YN23FwE2hgh8I8gGPdALl4HXlPdCMVpzOOdTgzQcTOtJT
+ +p8Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=B7OpIdvwwJ6dMqe2bdNIv/fEEahLa2yMeXnF6IpXGPs=;
+ b=KSQmaTylajG/5pb/7crZdjH2R3ESRB71HpbYtKMCSPNE/LBfkZIWzXl6+UEMzNsUl2
+ vVB7mZa6zcQA8/3J6m6J/DWPpyTUQFjWm2XXUdROPX+xZrdVuvnh5OOCNjZtmm232ZaZ
+ mKVnHWCMsnmjw4vjMOP6mFb/BFovXqvBH6WLnnE35UWBpIgTmx52Q/C+Y+1tCiXBOQAb
+ x9Gd4smXZeCpTfqoVwMG5sb/djPC0Edx4syZHbb08u8RJFZHidY+CcvIkcAL4lGkFpCT
+ THEgVcEC0OwjAYpMW4Fhk6axHO7oVMJ7H1vO4gYR5IeW6a2/5LxSEYQzODI3nO4TyD27
+ u7+g==
+X-Gm-Message-State: AOAM531/0TBnuLaOT3wKl4BUkm8MYNMo4pLQaHc+xWLkx+dD2X8AQTBH
+ osnuZwM1LHT2h3t78UN+TqJXf1TubiySEfiKZZg=
+X-Google-Smtp-Source: ABdhPJwJqceq4hECuOc9YrdwwDN+Vx8mpI3tgZeTUNK8if8LX0or0xkfSkK99rZbDcQvBWDOxjDR8coldcnq+u757Zw=
+X-Received: by 2002:a05:6512:691:: with SMTP id
+ t17mr5204346lfe.85.1592410133539; 
+ Wed, 17 Jun 2020 09:08:53 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200611223016.259837-10-hskinnemoen@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Ovh-Tracer-Id: 4590575398909938601
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedrudejvddgleejucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeefffdvtddugeeifeduuefghfejgfeigeeigeeltedthefgieeiveeuiefhgeefgfenucfkpheptddrtddrtddrtddpkedvrdeigedrvdehtddrudejtdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejiedurdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
-Received-SPF: pass client-ip=46.105.41.146; envelope-from=clg@kaod.org;
- helo=1.mo68.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/17 12:07:17
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+References: <20200616231204.8850-1-ahmedkhaledkaraman@gmail.com>
+ <20200616231204.8850-3-ahmedkhaledkaraman@gmail.com>
+ <874kr9yjjc.fsf@linaro.org>
+In-Reply-To: <874kr9yjjc.fsf@linaro.org>
+From: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
+Date: Wed, 17 Jun 2020 18:08:17 +0200
+Message-ID: <CALTWKrWtK83iSUUfhtX8bBacQZ5zNWt=vE3nGqXYLw+vJ_VKng@mail.gmail.com>
+Subject: Re: [PATCH 2/3] scripts/performance: Add callgrind_top_25.py script
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::141;
+ envelope-from=ahmedkhaledkaraman@gmail.com; helo=mail-lf1-x141.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -81,257 +98,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kfting@nuvoton.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org,
- Avi.Fishman@nuvoton.com
+Cc: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>, ehabkost@redhat.com,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, crosa@redhat.com,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/12/20 12:30 AM, Havard Skinnemoen wrote:
-> This just implements the bare minimum to cause the boot block to skip
-> memory intialization.
+Thanks Mr. Alex for your suggestions. I will send a v2 of this series
+with the updates.
 
-initialization
+On Wed, Jun 17, 2020 at 2:16 PM Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
+rote:
 
-> 
-> Change-Id: I26fd5f3b2af5d07a24911e7e58789f7b52f78d71
+> You will want the script to be +x if the user is to execute it.
 
-you should drop these tags.
+Thanks for the reminder. Forgot to do this before sending the patch.
 
-> Reviewed-by: Tyrone Ting <kfting@nuvoton.com>
-> Signed-off-by: Havard Skinnemoen <hskinnemoen@google.com>
+> > +#  Print the top 25 most executed functions in QEMU using callgrind.
+> > +#  Example Usage:
+> > +#  callgrind_top_25.py <qemu-build>/x86_64-linux-user/qemu-x86_64
+> > executable
+>
+> Why limit to 25, make the name generic and maybe just default to 25
+> unless the user specifies a different option.
 
-Reviewed-by: Cédric Le Goater <clg@kaod.org>
+Very valid suggestion. Thanks!
 
-> ---
->  MAINTAINERS                 |  2 +
->  hw/arm/npcm7xx.c            | 11 +++++
->  hw/mem/Makefile.objs        |  1 +
->  hw/mem/npcm7xx_mc.c         | 83 +++++++++++++++++++++++++++++++++++++
->  include/hw/arm/npcm7xx.h    |  2 +
->  include/hw/mem/npcm7xx_mc.h | 35 ++++++++++++++++
->  6 files changed, 134 insertions(+)
->  create mode 100644 hw/mem/npcm7xx_mc.c
->  create mode 100644 include/hw/mem/npcm7xx_mc.h
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 9814e7b4c4..9a289366ba 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -727,10 +727,12 @@ M: Tyrone Ting <kfting@nuvoton.com>
->  L: qemu-arm@nongnu.org
->  S: Supported
->  F: hw/arm/npcm7xx*
-> +F: hw/mem/npcm7xx*
->  F: hw/misc/npcm7xx*
->  F: hw/nvram/npcm7xx*
->  F: hw/timer/npcm7xx*
->  F: include/hw/arm/npcm7xx*
-> +F: include/hw/mem/npcm7xx*
->  F: include/hw/misc/npcm7xx*
->  F: include/hw/nvram/npcm7xx*
->  F: include/hw/timer/npcm7xx*
+>
+> I would recommend using:
+>
+>   from argparse import ArgumentParser
+>
+> from the start as adding options with hand parsing will be a pain. I
+> would suggest a specific option for the qemu binary and then using a
+> positional argument that can be read after -- so you don't confuse
+> options.
+>
 
-maybe simplify with :
+Great, what do you think of the format below:
+topN_callgrind.py -n20 -- /path/to/qemu executable -executable - arguments
 
-  F: hw/*/npcm7xx*
-  F: include/hw/*/npcm7xx*
+> Direct os.system calls are discouraged, you tend to get weird effects
+> like:
+>
+>   ../../scripts/performance/callgrind_top_25.py ./aarch64-linux-user/qemu=
+-aarch64 ./tests/tcg/aarch64-linux-user/fcvt
+>   sh: 1: Syntax error: "&" unexpected
+>   Traceback (most recent call last):
+>     File "../../scripts/performance/callgrind_top_25.py", line 52, in <mo=
+dule>
+>       with open('tmp.callgrind.data', 'r') as data:
+>   FileNotFoundError: [Errno 2] No such file or directory: 'tmp.callgrind.=
+data'
+>
+> I would:
+>
+>   - check for valgrind in path and fail gracefully if not found
+>   - use os.subprocess API for launching (with or without the shell)
+>
 
-> diff --git a/hw/arm/npcm7xx.c b/hw/arm/npcm7xx.c
-> index f9e3b5842b..54d84bafa1 100644
-> --- a/hw/arm/npcm7xx.c
-> +++ b/hw/arm/npcm7xx.c
-> @@ -46,6 +46,7 @@
->  #define NPCM7XX_CPUP_BA         (0xF03FE000)
->  #define NPCM7XX_GCR_BA          (0xF0800000)
->  #define NPCM7XX_CLK_BA          (0xF0801000)
-> +#define NPCM7XX_MC_BA           (0xF0824000)
->  
->  /* Memory blocks at the end of the address space */
->  #define NPCM7XX_RAM2_BA         (0xFFFD0000)
-> @@ -161,6 +162,8 @@ static void npcm7xx_init(Object *obj)
->                            sizeof(s->key_storage), TYPE_NPCM7XX_KEY_STORAGE);
->      sysbus_init_child_obj(obj, "otp2", OBJECT(&s->fuse_array),
->                            sizeof(s->fuse_array), TYPE_NPCM7XX_FUSE_ARRAY);
-> +    sysbus_init_child_obj(obj, "mc", OBJECT(&s->mc), sizeof(s->mc),
-> +                          TYPE_NPCM7XX_MC);
->  
->      for (i = 0; i < ARRAY_SIZE(s->tim); i++) {
->          sysbus_init_child_obj(obj, "tim[*]", OBJECT(&s->tim[i]),
-> @@ -258,6 +261,14 @@ static void npcm7xx_realize(DeviceState *dev, Error **errp)
->      sysbus_mmio_map(SYS_BUS_DEVICE(&s->fuse_array), 0, NPCM7XX_OTP2_BA);
->      npcm7xx_init_fuses(s);
->  
-> +    /* Fake Memory Controller (MC) */
-> +    object_property_set_bool(OBJECT(&s->mc), true, "realized", &err);
-> +    if (err) {
-> +        error_propagate(errp, err);
-> +        return;
-> +    }
-> +    sysbus_mmio_map(SYS_BUS_DEVICE(&s->mc), 0, NPCM7XX_MC_BA);
-> +
->      /* Timer Modules (TIM) */
->      QEMU_BUILD_BUG_ON(ARRAY_SIZE(npcm7xx_tim_addr) != ARRAY_SIZE(s->tim));
->      for (i = 0; i < ARRAY_SIZE(s->tim); i++) {
-> diff --git a/hw/mem/Makefile.objs b/hw/mem/Makefile.objs
-> index 56345befd0..9a33ef7b35 100644
-> --- a/hw/mem/Makefile.objs
-> +++ b/hw/mem/Makefile.objs
-> @@ -1,3 +1,4 @@
->  common-obj-$(CONFIG_DIMM) += pc-dimm.o
->  common-obj-y += memory-device.o
-> +common-obj-$(CONFIG_NPCM7XX) += npcm7xx_mc.o
->  common-obj-$(CONFIG_NVDIMM) += nvdimm.o
-> diff --git a/hw/mem/npcm7xx_mc.c b/hw/mem/npcm7xx_mc.c
-> new file mode 100644
-> index 0000000000..03a7fb53dc
-> --- /dev/null
-> +++ b/hw/mem/npcm7xx_mc.c
-> @@ -0,0 +1,83 @@
-> +/*
-> + * Nuvoton NPCM7xx Memory Controller stub
-> + *
-> + * Copyright 2020 Google LLC
-> + *
-> + * This program is free software; you can redistribute it and/or
-> + * modify it under the terms of the GNU General Public License
-> + * version 2 as published by the Free Software Foundation.
-> + *
-> + * This program is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-> + * GNU General Public License for more details.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +
-> +#include "hw/mem/npcm7xx_mc.h"
-> +#include "qapi/error.h"
-> +#include "qemu/log.h"
-> +#include "qemu/module.h"
-> +#include "qemu/units.h"
-> +
-> +#define NPCM7XX_MC_REGS_SIZE (4 * KiB)
-> +
-> +static uint64_t npcm7xx_mc_read(void *opaque, hwaddr addr, unsigned int size)
-> +{
-> +    /*
-> +     * If bits 8..11 @ offset 0 are not zero, the boot block thinks the memory
-> +     * controller has already been initialized and will skip DDR training.
-> +     */
-> +    if (addr == 0) {
-> +        return 0x100;
-> +    }
-> +
-> +    qemu_log_mask(LOG_UNIMP, "%s: mostly unimplemented\n", __func__);
-> +
-> +    return 0;
-> +}
-> +
-> +static void npcm7xx_mc_write(void *opaque, hwaddr addr, uint64_t v,
-> +                             unsigned int size)
-> +{
-> +    qemu_log_mask(LOG_UNIMP, "%s: mostly unimplemented\n", __func__);
-> +}
-> +
-> +static const MemoryRegionOps npcm7xx_mc_ops = {
-> +    .read = npcm7xx_mc_read,
-> +    .write = npcm7xx_mc_write,
-> +    .endianness = DEVICE_LITTLE_ENDIAN,
-> +    .valid = {
-> +        .min_access_size = 4,
-> +        .max_access_size = 4,
-> +        .unaligned = false,
-> +    },
-> +};
-> +
-> +static void npcm7xx_mc_realize(DeviceState *dev, Error **errp)
-> +{
-> +    NPCM7xxMCState *s = NPCM7XX_MC(dev);
-> +
-> +    memory_region_init_io(&s->mmio, OBJECT(s), &npcm7xx_mc_ops, s, "regs",
-> +                          NPCM7XX_MC_REGS_SIZE);
-> +    sysbus_init_mmio(&s->parent, &s->mmio);
-> +}
-> +
-> +static void npcm7xx_mc_class_init(ObjectClass *klass, void *data)
-> +{
-> +    DeviceClass *dc = DEVICE_CLASS(klass);
-> +
-> +    dc->desc = "NPCM7xx Memory Controller stub";
-> +    dc->realize = npcm7xx_mc_realize;
-> +}
-> +
-> +static const TypeInfo npcm7xx_mc_types[] = {
-> +    {
-> +        .name = TYPE_NPCM7XX_MC,
-> +        .parent = TYPE_SYS_BUS_DEVICE,
-> +        .instance_size = sizeof(NPCM7xxMCState),
-> +        .class_init = npcm7xx_mc_class_init,
-> +    },
-> +};
-> +DEFINE_TYPES(npcm7xx_mc_types);
-> diff --git a/include/hw/arm/npcm7xx.h b/include/hw/arm/npcm7xx.h
-> index 360cd965a7..8f49f7015c 100644
-> --- a/include/hw/arm/npcm7xx.h
-> +++ b/include/hw/arm/npcm7xx.h
-> @@ -17,6 +17,7 @@
->  
->  #include "hw/boards.h"
->  #include "hw/cpu/a9mpcore.h"
-> +#include "hw/mem/npcm7xx_mc.h"
->  #include "hw/misc/npcm7xx_clk.h"
->  #include "hw/misc/npcm7xx_gcr.h"
->  #include "hw/nvram/npcm7xx_otp.h"
-> @@ -65,6 +66,7 @@ typedef struct NPCM7xxState {
->      NPCM7xxTimerCtrlState tim[3];
->      NPCM7xxOTPState     key_storage;
->      NPCM7xxOTPState     fuse_array;
-> +    NPCM7xxMCState      mc;
->  } NPCM7xxState;
->  
->  #define TYPE_NPCM7XX    "npcm7xx"
-> diff --git a/include/hw/mem/npcm7xx_mc.h b/include/hw/mem/npcm7xx_mc.h
-> new file mode 100644
-> index 0000000000..8781f5c979
-> --- /dev/null
-> +++ b/include/hw/mem/npcm7xx_mc.h
-> @@ -0,0 +1,35 @@
-> +/*
-> + * Nuvoton NPCM7xx Memory Controller stub
-> + *
-> + * Copyright 2020 Google LLC
-> + *
-> + * This program is free software; you can redistribute it and/or
-> + * modify it under the terms of the GNU General Public License
-> + * version 2 as published by the Free Software Foundation.
-> + *
-> + * This program is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-> + * GNU General Public License for more details.
-> + */
-> +#ifndef NPCM7XX_MC_H
-> +#define NPCM7XX_MC_H
-> +
-> +#include "exec/memory.h"
-> +#include "hw/sysbus.h"
-> +
-> +/**
-> + * struct NPCM7xxMCState - Device state for the memory controller.
-> + * @parent: System bus device.
-> + * @mmio: Memory region through which registers are accessed.
-> + */
-> +typedef struct NPCM7xxMCState {
-> +    SysBusDevice parent;
-> +
-> +    MemoryRegion mmio;
-> +} NPCM7xxMCState;
-> +
-> +#define TYPE_NPCM7XX_MC "npcm7xx-mc"
-> +#define NPCM7XX_MC(obj) OBJECT_CHECK(NPCM7xxMCState, (obj), TYPE_NPCM7XX_MC)
-> +
-> +#endif /* NPCM7XX_MC_H */
-> 
+This weird error was because of the space between "&&" and "2>/dev/null"
+These were inserted by the autopep8 python formatter before committing.
+When this is fixed, everything works fine, but I believe your
+suggestion of using the os.subprocess is valid so I will implement it
+and also check for valgrind as you've said.
 
+> > +
+> > +# Line number with the total number of instructions
+> > +number_of_instructions_line =3D 20
+> > +
+> > +# Line number with the top function
+> > +first_func_line =3D 25
+>
+> for example
+>
+>     parser.add_argument('-n', dest=3D"top", type=3Dint, default=3D25,
+>                         help=3D"Hottest n functions")
+
+Will also use:
+    parser.add_argument('command',  type=3Dstr, nargs=3D'+',
+                help=3D"QEMU invocation to report the top functions for")
+To parse all remaining arguments after "--".
+
+> > +# Get the total number of instructions
+> > +total_number_of_instructions =3D int(
+> > +    callgrind_data[number_of_instructions_line].split('
+> > ')[0].replace(',', ''))
+>
+> There is no harm in having your steps split out a little.
+
+Noted!
+
+> > +# Remove intermediate files
+> > +os.system('rm callgrind.data tmp.callgrind.data')
+>
+> os.unlink()
+>
+
+Noted!
 
