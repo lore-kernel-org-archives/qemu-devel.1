@@ -4,142 +4,70 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CC2FC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 16:08:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 931E2C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 16:09:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 12DAF2065F
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 16:08:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12DAF2065F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 68A372065F
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 16:09:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68A372065F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37640 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40550 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlabs-0007Yt-Bf
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 12:08:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36168)
+	id 1jlacq-0001dJ-O8
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 12:09:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36170)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <borntraeger@de.ibm.com>)
- id 1jlaax-00055L-Mq; Wed, 17 Jun 2020 12:07:23 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:14578
- helo=mx0a-001b2d01.pphosted.com)
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jlaay-000571-Li
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 12:07:24 -0400
+Received: from 1.mo68.mail-out.ovh.net ([46.105.41.146]:53425)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <borntraeger@de.ibm.com>)
- id 1jlaav-00082p-Pc; Wed, 17 Jun 2020 12:07:23 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 05HG3Jlh128169; Wed, 17 Jun 2020 12:07:20 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 31q6j5c1mp-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 17 Jun 2020 12:07:20 -0400
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05HG3Pqo128834;
- Wed, 17 Jun 2020 12:07:20 -0400
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com
- [149.81.74.108])
- by mx0b-001b2d01.pphosted.com with ESMTP id 31q6j5c1kk-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 17 Jun 2020 12:07:19 -0400
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
- by ppma05fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05HG1Jm5015134;
- Wed, 17 Jun 2020 16:07:18 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com
- (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
- by ppma05fra.de.ibm.com with ESMTP id 31q6c8rhk0-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 17 Jun 2020 16:07:18 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com
- [9.149.105.232])
- by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 05HG7Fs764159814
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 17 Jun 2020 16:07:15 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 386DA52052;
- Wed, 17 Jun 2020 16:07:15 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.145.185.179])
- by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id AD7F052054;
- Wed, 17 Jun 2020 16:07:14 +0000 (GMT)
-Subject: Re: [PATCH 1/1] docs/s390x: fix vfio-ap device_del description
-To: Tony Krowiak <akrowiak@linux.ibm.com>
-References: <20200617160604.5593-1-borntraeger@de.ibm.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Message-ID: <1ca5b584-951b-03a1-afc9-fca1520ab905@de.ibm.com>
-Date: Wed, 17 Jun 2020 18:07:14 +0200
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jlaau-00082c-LM
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 12:07:24 -0400
+Received: from player761.ha.ovh.net (unknown [10.110.208.62])
+ by mo68.mail-out.ovh.net (Postfix) with ESMTP id 7226A17055D
+ for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 18:07:17 +0200 (CEST)
+Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
+ (Authenticated sender: clg@kaod.org)
+ by player761.ha.ovh.net (Postfix) with ESMTPSA id AB1A1137A75BC;
+ Wed, 17 Jun 2020 16:07:08 +0000 (UTC)
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-106R006e65d12fd-060b-4227-9e75-bb5ee351308c,ABECD89738EEB0C75E5395B338997A57DB3A3EEE)
+ smtp.auth=clg@kaod.org
+Subject: Re: [PATCH v2 09/12] hw/mem: Stubbed out NPCM7xx Memory Controller
+ model
+To: Havard Skinnemoen <hskinnemoen@google.com>, peter.maydell@linaro.org,
+ joel@jms.id.au
+References: <20200611223016.259837-1-hskinnemoen@google.com>
+ <20200611223016.259837-10-hskinnemoen@google.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <262ce675-d4d8-c78f-eee6-cfdeb09862c1@kaod.org>
+Date: Wed, 17 Jun 2020 18:07:07 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200617160604.5593-1-borntraeger@de.ibm.com>
+In-Reply-To: <20200611223016.259837-10-hskinnemoen@google.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
- definitions=2020-06-17_06:2020-06-17,
- 2020-06-17 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 phishscore=0
- lowpriorityscore=0 mlxlogscore=737 bulkscore=0 impostorscore=0
- adultscore=0 mlxscore=0 suspectscore=0 clxscore=1015 priorityscore=1501
- cotscore=-2147483648 spamscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2006170127
-Received-SPF: pass client-ip=148.163.158.5;
- envelope-from=borntraeger@de.ibm.com; helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/17 10:23:10
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
-X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+Content-Transfer-Encoding: 8bit
+X-Ovh-Tracer-Id: 4590575398909938601
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedrudejvddgleejucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeefffdvtddugeeifeduuefghfejgfeigeeigeeltedthefgieeiveeuiefhgeefgfenucfkpheptddrtddrtddrtddpkedvrdeigedrvdehtddrudejtdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejiedurdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
+Received-SPF: pass client-ip=46.105.41.146; envelope-from=clg@kaod.org;
+ helo=1.mo68.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/17 12:07:17
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -153,54 +81,257 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>, Halil Pasic <pasic@linux.ibm.com>,
- qemu-s390x <qemu-s390x@nongnu.org>, Richard Henderson <rth@twiddle.net>
+Cc: kfting@nuvoton.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org,
+ Avi.Fishman@nuvoton.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-wrong Person on to, I wanted to send this to Tony.
+On 6/12/20 12:30 AM, Havard Skinnemoen wrote:
+> This just implements the bare minimum to cause the boot block to skip
+> memory intialization.
 
+initialization
 
-On 17.06.20 18:06, Christian Borntraeger wrote:
-> device_del requires an id and not a sysfsfile.
 > 
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> Change-Id: I26fd5f3b2af5d07a24911e7e58789f7b52f78d71
+
+you should drop these tags.
+
+> Reviewed-by: Tyrone Ting <kfting@nuvoton.com>
+> Signed-off-by: Havard Skinnemoen <hskinnemoen@google.com>
+
+Reviewed-by: Cédric Le Goater <clg@kaod.org>
+
 > ---
->  docs/system/s390x/vfio-ap.rst | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
+>  MAINTAINERS                 |  2 +
+>  hw/arm/npcm7xx.c            | 11 +++++
+>  hw/mem/Makefile.objs        |  1 +
+>  hw/mem/npcm7xx_mc.c         | 83 +++++++++++++++++++++++++++++++++++++
+>  include/hw/arm/npcm7xx.h    |  2 +
+>  include/hw/mem/npcm7xx_mc.h | 35 ++++++++++++++++
+>  6 files changed, 134 insertions(+)
+>  create mode 100644 hw/mem/npcm7xx_mc.c
+>  create mode 100644 include/hw/mem/npcm7xx_mc.h
 > 
-> diff --git a/docs/system/s390x/vfio-ap.rst b/docs/system/s390x/vfio-ap.rst
-> index 3cd84179a2df..f441df69edde 100644
-> --- a/docs/system/s390x/vfio-ap.rst
-> +++ b/docs/system/s390x/vfio-ap.rst
-> @@ -606,10 +606,11 @@ action.
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 9814e7b4c4..9a289366ba 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -727,10 +727,12 @@ M: Tyrone Ting <kfting@nuvoton.com>
+>  L: qemu-arm@nongnu.org
+>  S: Supported
+>  F: hw/arm/npcm7xx*
+> +F: hw/mem/npcm7xx*
+>  F: hw/misc/npcm7xx*
+>  F: hw/nvram/npcm7xx*
+>  F: hw/timer/npcm7xx*
+>  F: include/hw/arm/npcm7xx*
+> +F: include/hw/mem/npcm7xx*
+>  F: include/hw/misc/npcm7xx*
+>  F: include/hw/nvram/npcm7xx*
+>  F: include/hw/timer/npcm7xx*
+
+maybe simplify with :
+
+  F: hw/*/npcm7xx*
+  F: include/hw/*/npcm7xx*
+
+> diff --git a/hw/arm/npcm7xx.c b/hw/arm/npcm7xx.c
+> index f9e3b5842b..54d84bafa1 100644
+> --- a/hw/arm/npcm7xx.c
+> +++ b/hw/arm/npcm7xx.c
+> @@ -46,6 +46,7 @@
+>  #define NPCM7XX_CPUP_BA         (0xF03FE000)
+>  #define NPCM7XX_GCR_BA          (0xF0800000)
+>  #define NPCM7XX_CLK_BA          (0xF0801000)
+> +#define NPCM7XX_MC_BA           (0xF0824000)
 >  
->  To hot plug a vfio-ap device, use the QEMU ``device_add`` command::
+>  /* Memory blocks at the end of the address space */
+>  #define NPCM7XX_RAM2_BA         (0xFFFD0000)
+> @@ -161,6 +162,8 @@ static void npcm7xx_init(Object *obj)
+>                            sizeof(s->key_storage), TYPE_NPCM7XX_KEY_STORAGE);
+>      sysbus_init_child_obj(obj, "otp2", OBJECT(&s->fuse_array),
+>                            sizeof(s->fuse_array), TYPE_NPCM7XX_FUSE_ARRAY);
+> +    sysbus_init_child_obj(obj, "mc", OBJECT(&s->mc), sizeof(s->mc),
+> +                          TYPE_NPCM7XX_MC);
 >  
-> -    (qemu) device_add vfio-ap,sysfsdev="$path-to-mdev"
-> +    (qemu) device_add vfio-ap,sysfsdev="$path-to-mdev",id="$id"
+>      for (i = 0; i < ARRAY_SIZE(s->tim); i++) {
+>          sysbus_init_child_obj(obj, "tim[*]", OBJECT(&s->tim[i]),
+> @@ -258,6 +261,14 @@ static void npcm7xx_realize(DeviceState *dev, Error **errp)
+>      sysbus_mmio_map(SYS_BUS_DEVICE(&s->fuse_array), 0, NPCM7XX_OTP2_BA);
+>      npcm7xx_init_fuses(s);
 >  
->  Where the ``$path-to-mdev`` value specifies the absolute path to a mediated
->  device to which AP resources to be used by the guest have been assigned.
-> +``$id`` is the name value for the optional id parameter.
+> +    /* Fake Memory Controller (MC) */
+> +    object_property_set_bool(OBJECT(&s->mc), true, "realized", &err);
+> +    if (err) {
+> +        error_propagate(errp, err);
+> +        return;
+> +    }
+> +    sysbus_mmio_map(SYS_BUS_DEVICE(&s->mc), 0, NPCM7XX_MC_BA);
+> +
+>      /* Timer Modules (TIM) */
+>      QEMU_BUILD_BUG_ON(ARRAY_SIZE(npcm7xx_tim_addr) != ARRAY_SIZE(s->tim));
+>      for (i = 0; i < ARRAY_SIZE(s->tim); i++) {
+> diff --git a/hw/mem/Makefile.objs b/hw/mem/Makefile.objs
+> index 56345befd0..9a33ef7b35 100644
+> --- a/hw/mem/Makefile.objs
+> +++ b/hw/mem/Makefile.objs
+> @@ -1,3 +1,4 @@
+>  common-obj-$(CONFIG_DIMM) += pc-dimm.o
+>  common-obj-y += memory-device.o
+> +common-obj-$(CONFIG_NPCM7XX) += npcm7xx_mc.o
+>  common-obj-$(CONFIG_NVDIMM) += nvdimm.o
+> diff --git a/hw/mem/npcm7xx_mc.c b/hw/mem/npcm7xx_mc.c
+> new file mode 100644
+> index 0000000000..03a7fb53dc
+> --- /dev/null
+> +++ b/hw/mem/npcm7xx_mc.c
+> @@ -0,0 +1,83 @@
+> +/*
+> + * Nuvoton NPCM7xx Memory Controller stub
+> + *
+> + * Copyright 2020 Google LLC
+> + *
+> + * This program is free software; you can redistribute it and/or
+> + * modify it under the terms of the GNU General Public License
+> + * version 2 as published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+> + * GNU General Public License for more details.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +
+> +#include "hw/mem/npcm7xx_mc.h"
+> +#include "qapi/error.h"
+> +#include "qemu/log.h"
+> +#include "qemu/module.h"
+> +#include "qemu/units.h"
+> +
+> +#define NPCM7XX_MC_REGS_SIZE (4 * KiB)
+> +
+> +static uint64_t npcm7xx_mc_read(void *opaque, hwaddr addr, unsigned int size)
+> +{
+> +    /*
+> +     * If bits 8..11 @ offset 0 are not zero, the boot block thinks the memory
+> +     * controller has already been initialized and will skip DDR training.
+> +     */
+> +    if (addr == 0) {
+> +        return 0x100;
+> +    }
+> +
+> +    qemu_log_mask(LOG_UNIMP, "%s: mostly unimplemented\n", __func__);
+> +
+> +    return 0;
+> +}
+> +
+> +static void npcm7xx_mc_write(void *opaque, hwaddr addr, uint64_t v,
+> +                             unsigned int size)
+> +{
+> +    qemu_log_mask(LOG_UNIMP, "%s: mostly unimplemented\n", __func__);
+> +}
+> +
+> +static const MemoryRegionOps npcm7xx_mc_ops = {
+> +    .read = npcm7xx_mc_read,
+> +    .write = npcm7xx_mc_write,
+> +    .endianness = DEVICE_LITTLE_ENDIAN,
+> +    .valid = {
+> +        .min_access_size = 4,
+> +        .max_access_size = 4,
+> +        .unaligned = false,
+> +    },
+> +};
+> +
+> +static void npcm7xx_mc_realize(DeviceState *dev, Error **errp)
+> +{
+> +    NPCM7xxMCState *s = NPCM7XX_MC(dev);
+> +
+> +    memory_region_init_io(&s->mmio, OBJECT(s), &npcm7xx_mc_ops, s, "regs",
+> +                          NPCM7XX_MC_REGS_SIZE);
+> +    sysbus_init_mmio(&s->parent, &s->mmio);
+> +}
+> +
+> +static void npcm7xx_mc_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(klass);
+> +
+> +    dc->desc = "NPCM7xx Memory Controller stub";
+> +    dc->realize = npcm7xx_mc_realize;
+> +}
+> +
+> +static const TypeInfo npcm7xx_mc_types[] = {
+> +    {
+> +        .name = TYPE_NPCM7XX_MC,
+> +        .parent = TYPE_SYS_BUS_DEVICE,
+> +        .instance_size = sizeof(NPCM7xxMCState),
+> +        .class_init = npcm7xx_mc_class_init,
+> +    },
+> +};
+> +DEFINE_TYPES(npcm7xx_mc_types);
+> diff --git a/include/hw/arm/npcm7xx.h b/include/hw/arm/npcm7xx.h
+> index 360cd965a7..8f49f7015c 100644
+> --- a/include/hw/arm/npcm7xx.h
+> +++ b/include/hw/arm/npcm7xx.h
+> @@ -17,6 +17,7 @@
 >  
->  Note that on Linux guests, the AP devices will be created in the
->  ``/sys/bus/ap/devices`` directory when the AP bus subsequently performs its periodic
-> @@ -632,10 +633,9 @@ or a prior hot plug action.
+>  #include "hw/boards.h"
+>  #include "hw/cpu/a9mpcore.h"
+> +#include "hw/mem/npcm7xx_mc.h"
+>  #include "hw/misc/npcm7xx_clk.h"
+>  #include "hw/misc/npcm7xx_gcr.h"
+>  #include "hw/nvram/npcm7xx_otp.h"
+> @@ -65,6 +66,7 @@ typedef struct NPCM7xxState {
+>      NPCM7xxTimerCtrlState tim[3];
+>      NPCM7xxOTPState     key_storage;
+>      NPCM7xxOTPState     fuse_array;
+> +    NPCM7xxMCState      mc;
+>  } NPCM7xxState;
 >  
->  To hot unplug a vfio-ap device, use the QEMU ``device_del`` command::
->  
-> -    (qemu) device_del vfio-ap,sysfsdev="$path-to-mdev"
-> +    (qemu) device_del "id"
->  
-> -Where ``$path-to-mdev`` is the same as the path specified when the vfio-ap
-> -device was attached to the virtual machine's ap-bus.
-> +Where ``$id`` is the same id that was specified at device creation.
->  
->  On a Linux guest, the AP devices will be removed from the ``/sys/bus/ap/devices``
->  directory on the guest when the AP bus subsequently performs its periodic scan,
+>  #define TYPE_NPCM7XX    "npcm7xx"
+> diff --git a/include/hw/mem/npcm7xx_mc.h b/include/hw/mem/npcm7xx_mc.h
+> new file mode 100644
+> index 0000000000..8781f5c979
+> --- /dev/null
+> +++ b/include/hw/mem/npcm7xx_mc.h
+> @@ -0,0 +1,35 @@
+> +/*
+> + * Nuvoton NPCM7xx Memory Controller stub
+> + *
+> + * Copyright 2020 Google LLC
+> + *
+> + * This program is free software; you can redistribute it and/or
+> + * modify it under the terms of the GNU General Public License
+> + * version 2 as published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+> + * GNU General Public License for more details.
+> + */
+> +#ifndef NPCM7XX_MC_H
+> +#define NPCM7XX_MC_H
+> +
+> +#include "exec/memory.h"
+> +#include "hw/sysbus.h"
+> +
+> +/**
+> + * struct NPCM7xxMCState - Device state for the memory controller.
+> + * @parent: System bus device.
+> + * @mmio: Memory region through which registers are accessed.
+> + */
+> +typedef struct NPCM7xxMCState {
+> +    SysBusDevice parent;
+> +
+> +    MemoryRegion mmio;
+> +} NPCM7xxMCState;
+> +
+> +#define TYPE_NPCM7XX_MC "npcm7xx-mc"
+> +#define NPCM7XX_MC(obj) OBJECT_CHECK(NPCM7xxMCState, (obj), TYPE_NPCM7XX_MC)
+> +
+> +#endif /* NPCM7XX_MC_H */
 > 
+
 
