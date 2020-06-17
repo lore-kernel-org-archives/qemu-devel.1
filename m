@@ -7,79 +7,75 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29DEDC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 21:05:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AFFEC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 21:06:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E783721532
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 21:05:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E2EF42186A
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 21:06:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QtqWXwkH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E783721532
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TF8X0jiQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2EF42186A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38782 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45550 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlfFU-00053E-4U
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 17:05:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37070)
+	id 1jlfGl-0007pK-Qi
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 17:06:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36902)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1jlfDf-0002q1-Og
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 17:03:39 -0400
-Received: from mail-qv1-xf42.google.com ([2607:f8b0:4864:20::f42]:41385)
+ id 1jlfDT-0002eg-Sr
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 17:03:29 -0400
+Received: from mail-qt1-x842.google.com ([2607:f8b0:4864:20::842]:39413)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1jlfDd-0008Rp-0R
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 17:03:39 -0400
-Received: by mail-qv1-xf42.google.com with SMTP id er17so1755317qvb.8
- for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 14:03:36 -0700 (PDT)
+ id 1jlfDO-0008Pk-Cr
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 17:03:27 -0400
+Received: by mail-qt1-x842.google.com with SMTP id k22so2751469qtm.6
+ for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 14:03:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=38XOeCAg8eirTLUPmY4XSVCYcrFE+9q7Dk1aEtr2HSc=;
- b=QtqWXwkH/gGVezhhKpEW7oEkU6PGrLgNCGeRarDoft3Nbw73bQO9gWAlCHjQ+tnSjA
- gGEElf8eJJuOkr8OBu+CYGdCWGpmcXKHZ38H6o5bCRwVcoguXDME9xVmDK83DIodCZo/
- LF2uHOF2Dfkqs18U9flgZVn36PuvcEV01wNFSb7E5kdN7QRg6QmH35K1NB2hfqClGP7p
- 0rdGigepcWmzigRNdNFz8SjNz8+xQsdCV96rf7yfr3BFRVDFx5i/yj27gtIGVzGqE/+n
- rMWG4T6+OA87VReCwXhhn19Wtkh0szfEOjH3DRH2OirA6etWTxzq7H/U5NLbmUfJ/VBA
- q/Bg==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=ZYteIUkqExuWadWFdiCSlI10s1/zCIoztEZoLySpuAc=;
+ b=TF8X0jiQLJdX49wvJNWN2EsKmh/+c0yHko7XgtzikAtgnaI0Y4mrYSZxsWOEAUdyWG
+ jq6/qkzab3HtMsOqgl31+2qgEeD+TEhQ4MSIVRo7i/JlEs6g1/FIktPLPJqw2LWR55Sx
+ /MKWheQmtNhLbxe43ti56Me9dvxauU56jaPQ8/j+G2XlMGc7llAM1m9SpPWi+ST+fcMd
+ wuWdLJ9qRjgqZ8tehLZ8CeuHHgr02kT4P+MpgbiAr3ZPB0ANwhKasF4s+wd0CifsXBIA
+ wnXSyVrC8+2GP1e506rLR+QaAAPUA2eE1gBwDI+DzAZlwzt3J8JmdfeKGPF2eNOn6aPM
+ LpcQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=38XOeCAg8eirTLUPmY4XSVCYcrFE+9q7Dk1aEtr2HSc=;
- b=f9ILX8p+mTeRd+IwEcqfKKjW7Nymmvus3o2B3QRykG8YzP0qJbRIDu8Id7EL8GLqtw
- GNanjWra8xBygxqOysw0HD8U7iKzVsmzfvtg48Kc/9drmANwgw+H3XoK9LhAo2sudwGk
- NxA39C3FugkC3zlI+dbkyuKM20a+1VOuKMk2ximSZc7yFD1cP4223B4TezhYsjyTN8q4
- EjK7di8UWMoEB//jdvS5gMr1BXFXkXcWiwPYeJsVqSfgru5qqlGsASp1UXYnr02UtHBH
- IZIUpBPpWahmcY1zdbfvtGlsZ7nhXqPU+0og4onIAWlqnXKnIBBugEc82QaPfTbANUvS
- btEg==
-X-Gm-Message-State: AOAM5307tvVwUYbl3GcXtX+UQnZM9zF54KONGlQcWnUP9xDl0PDnkzG+
- wB9dKG/EYLQUazBJ4scmgW2p4Od3WlwARA==
-X-Google-Smtp-Source: ABdhPJwZlIMrHZxJo0qhbmrYDlw/V3NmWSFzOk8LXyu3rGbQDG9YxOSMZq8xcQQT0k58bAYW1IV7dg==
-X-Received: by 2002:ad4:590d:: with SMTP id ez13mr555335qvb.177.1592427815933; 
- Wed, 17 Jun 2020 14:03:35 -0700 (PDT)
+ :references;
+ bh=ZYteIUkqExuWadWFdiCSlI10s1/zCIoztEZoLySpuAc=;
+ b=Diw5btKJujA5Vv7YvYixVPfTfqVG54b0tRgQabKZStONKapie6rMvWyyotNIie1GT3
+ SgQC2dJ2gPin7Gw1pCl/wYzOLrbLRkpS6bUPdIIaei+kPPpuVoxLSkRhmo1q673AA2fA
+ kwP6uVA7lV3y6FcWFHxOM0u3QLEFK8gaerUixEl8iU9DSs+knyIctJtnyDIfAQwYBypf
+ TrhGKDL5TIzgIc/mPrHrYvrxdwOeMaoI5w8y1/S7TPJU9UYZYa5suThuh4nIGFRMww3w
+ b7/6sVcz+WTGKeBA+osx7yH9KBSHPkwykuBikg/Hmjx+MMrIjuPGd5yshxtMUpbIlBSv
+ /QBw==
+X-Gm-Message-State: AOAM533ukJ1ssuCol39qEo3etRsjEZnkRw9/yKmIgBMZdjha51ac6wtR
+ cwhl+cO8QR/XejtOsjYzf61vPOIyaiaebw==
+X-Google-Smtp-Source: ABdhPJwKNZlTuHv3C0fd2aFWR3+Sk8y+ypqyE0OxIFFkv3MU6MipIpr1UjAtxHspmxpYi5AUcJ5I9w==
+X-Received: by 2002:ac8:6f5c:: with SMTP id n28mr1097058qtv.269.1592427797718; 
+ Wed, 17 Jun 2020 14:03:17 -0700 (PDT)
 Received: from Rfoley-MA01.hsd1.ma.comcast.net
  ([2601:199:4480:60c0:fc79:714c:9711:2e9c])
- by smtp.gmail.com with ESMTPSA id w13sm997245qkb.91.2020.06.17.14.03.34
+ by smtp.gmail.com with ESMTPSA id w13sm997245qkb.91.2020.06.17.14.03.16
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 17 Jun 2020 14:03:35 -0700 (PDT)
+ Wed, 17 Jun 2020 14:03:17 -0700 (PDT)
 From: Robert Foley <robert.foley@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v10 14/73] cpu: define cpu_halted helpers
-Date: Wed, 17 Jun 2020 17:01:32 -0400
-Message-Id: <20200617210231.4393-15-robert.foley@linaro.org>
+Subject: [PATCH v10 02/73] cpu: introduce cpu_mutex_lock/unlock
+Date: Wed, 17 Jun 2020 17:01:20 -0400
+Message-Id: <20200617210231.4393-3-robert.foley@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200617210231.4393-1-robert.foley@linaro.org>
 References: <20200617210231.4393-1-robert.foley@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::f42;
- envelope-from=robert.foley@linaro.org; helo=mail-qv1-xf42.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::842;
+ envelope-from=robert.foley@linaro.org; helo=mail-qt1-x842.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -101,61 +97,209 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: robert.foley@linaro.org, cota@braap.org, peter.puhov@linaro.org,
- alex.bennee@linaro.org, Eduardo Habkost <ehabkost@redhat.com>
+Cc: robert.foley@linaro.org, Eduardo Habkost <ehabkost@redhat.com>,
+ cota@braap.org, Paolo Bonzini <pbonzini@redhat.com>, peter.puhov@linaro.org,
+ alex.bennee@linaro.org, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: "Emilio G. Cota" <cota@braap.org>
 
-cpu->halted will soon be protected by cpu->lock.
-We will use these helpers to ease the transition,
-since right now cpu->halted has many direct callers.
+The few direct users of &cpu->lock will be converted soon.
+
+The per-thread bitmap introduced here might seem unnecessary,
+since a bool could just do. However, once we complete the
+conversion to per-vCPU locks, we will need to cover the use
+case where all vCPUs are locked by the same thread, which
+explains why the bitmap is introduced here.
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
+[RF: Add assert in smp_parse. Make cpu_mutex_lock stub empty]
 Signed-off-by: Robert Foley <robert.foley@linaro.org>
 ---
- include/hw/core/cpu.h | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+ cpus.c                | 45 +++++++++++++++++++++++++++++++++++++++++--
+ hw/core/machine.c     |  1 +
+ include/hw/core/cpu.h | 36 ++++++++++++++++++++++++++++++++++
+ stubs/Makefile.objs   |  1 +
+ stubs/cpu-lock.c      | 20 +++++++++++++++++++
+ 5 files changed, 101 insertions(+), 2 deletions(-)
+ create mode 100644 stubs/cpu-lock.c
 
+diff --git a/cpus.c b/cpus.c
+index 3c011ec452..ca271411a4 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -92,6 +92,44 @@ static unsigned int throttle_percentage;
+ #define CPU_THROTTLE_PCT_MAX 99
+ #define CPU_THROTTLE_TIMESLICE_NS 10000000
+ 
++/*
++ * Note: we index the bitmap with cpu->cpu_index + 1 so that the logic
++ * also works during early CPU initialization, when cpu->cpu_index is set to
++ * UNASSIGNED_CPU_INDEX == -1.
++ */
++static __thread DECLARE_BITMAP(cpu_lock_bitmap, CPU_LOCK_BITMAP_SIZE);
++
++bool no_cpu_mutex_locked(void)
++{
++    return bitmap_empty(cpu_lock_bitmap, CPU_LOCK_BITMAP_SIZE);
++}
++
++void cpu_mutex_lock_impl(CPUState *cpu, const char *file, int line)
++{
++/* coverity gets confused by the indirect function call */
++#ifdef __COVERITY__
++    qemu_mutex_lock_impl(&cpu->lock, file, line);
++#else
++    QemuMutexLockFunc f = atomic_read(&qemu_mutex_lock_func);
++
++    g_assert(!cpu_mutex_locked(cpu));
++    set_bit(cpu->cpu_index + 1, cpu_lock_bitmap);
++    f(&cpu->lock, file, line);
++#endif
++}
++
++void cpu_mutex_unlock_impl(CPUState *cpu, const char *file, int line)
++{
++    g_assert(cpu_mutex_locked(cpu));
++    qemu_mutex_unlock_impl(&cpu->lock, file, line);
++    clear_bit(cpu->cpu_index + 1, cpu_lock_bitmap);
++}
++
++bool cpu_mutex_locked(const CPUState *cpu)
++{
++    return test_bit(cpu->cpu_index + 1, cpu_lock_bitmap);
++}
++
+ bool cpu_is_stopped(CPUState *cpu)
+ {
+     return cpu->stopped || !runstate_is_running();
+@@ -101,9 +139,9 @@ static inline bool cpu_work_list_empty(CPUState *cpu)
+ {
+     bool ret;
+ 
+-    qemu_mutex_lock(&cpu->lock);
++    cpu_mutex_lock(cpu);
+     ret = QSIMPLEQ_EMPTY(&cpu->work_list);
+-    qemu_mutex_unlock(&cpu->lock);
++    cpu_mutex_unlock(cpu);
+     return ret;
+ }
+ 
+@@ -1865,6 +1903,9 @@ void qemu_mutex_lock_iothread_impl(const char *file, int line)
+ {
+     QemuMutexLockFunc bql_lock = atomic_read(&qemu_bql_mutex_lock_func);
+ 
++    /* enforce locking order */
++    g_assert(no_cpu_mutex_locked());
++
+     g_assert(!qemu_mutex_iothread_locked());
+     bql_lock(&qemu_global_mutex, file, line);
+     iothread_locked = true;
+diff --git a/hw/core/machine.c b/hw/core/machine.c
+index 1d80ab0e1d..74edd3c86d 100644
+--- a/hw/core/machine.c
++++ b/hw/core/machine.c
+@@ -769,6 +769,7 @@ static void smp_parse(MachineState *ms, QemuOpts *opts)
+         ms->smp.threads = threads;
+         ms->smp.sockets = sockets;
+     }
++    assert(ms->smp.max_cpus <= CPU_LOCK_BITMAP_SIZE);
+ 
+     if (ms->smp.cpus > 1) {
+         Error *blocker = NULL;
 diff --git a/include/hw/core/cpu.h b/include/hw/core/cpu.h
-index 9d25fc25a2..92069ebc59 100644
+index afc8081ca8..4d4006f1fb 100644
 --- a/include/hw/core/cpu.h
 +++ b/include/hw/core/cpu.h
-@@ -498,6 +498,30 @@ void cpu_mutex_destroy(CPUState *cpu);
-  */
- bool no_cpu_mutex_locked(void);
+@@ -457,6 +457,39 @@ extern CPUTailQ cpus;
  
-+static inline uint32_t cpu_halted(CPUState *cpu)
-+{
-+    uint32_t ret;
+ extern __thread CPUState *current_cpu;
+ 
++/**
++ * cpu_mutex_lock - lock a CPU's mutex
++ * @cpu: the CPU whose mutex is to be locked
++ *
++ * To avoid deadlock, a CPU's mutex must be acquired after the BQL.
++ */
++#define cpu_mutex_lock(cpu)                             \
++    cpu_mutex_lock_impl(cpu, __FILE__, __LINE__)
++void cpu_mutex_lock_impl(CPUState *cpu, const char *file, int line);
 +
-+    if (cpu_mutex_locked(cpu)) {
-+        return cpu->halted;
-+    }
-+    cpu_mutex_lock(cpu);
-+    ret = cpu->halted;
-+    cpu_mutex_unlock(cpu);
-+    return ret;
-+}
++/**
++ * cpu_mutex_unlock - unlock a CPU's mutex
++ * @cpu: the CPU whose mutex is to be unlocked
++ */
++#define cpu_mutex_unlock(cpu)                           \
++    cpu_mutex_unlock_impl(cpu, __FILE__, __LINE__)
++void cpu_mutex_unlock_impl(CPUState *cpu, const char *file, int line);
 +
-+static inline void cpu_halted_set(CPUState *cpu, uint32_t val)
-+{
-+    if (cpu_mutex_locked(cpu)) {
-+        cpu->halted = val;
-+        return;
-+    }
-+    cpu_mutex_lock(cpu);
-+    cpu->halted = val;
-+    cpu_mutex_unlock(cpu);
-+}
++/**
++ * cpu_mutex_locked - check whether a CPU's mutex is locked
++ * @cpu: the CPU of interest
++ *
++ * Returns true if the calling thread is currently holding the CPU's mutex.
++ */
++bool cpu_mutex_locked(const CPUState *cpu);
++
++/**
++ * no_cpu_mutex_locked - check whether any CPU mutex is held
++ *
++ * Returns true if the calling thread is not holding any CPU mutex.
++ */
++bool no_cpu_mutex_locked(void);
 +
  static inline void cpu_tb_jmp_cache_clear(CPUState *cpu)
  {
      unsigned int i;
+@@ -1184,4 +1217,7 @@ extern const VMStateDescription vmstate_cpu_common;
+ #define UNASSIGNED_CPU_INDEX -1
+ #define UNASSIGNED_CLUSTER_INDEX -1
+ 
++/* XXX: is this really the max number of CPUs? */
++#define CPU_LOCK_BITMAP_SIZE 2048
++
+ #endif
+diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
+index 28e48171d1..becf8f6986 100644
+--- a/stubs/Makefile.objs
++++ b/stubs/Makefile.objs
+@@ -1,6 +1,7 @@
+ stub-obj-y += blk-commit-all.o
+ stub-obj-y += cpu-get-clock.o
+ stub-obj-y += cpu-get-icount.o
++stub-obj-y += cpu-lock.o
+ stub-obj-y += dump.o
+ stub-obj-y += error-printf.o
+ stub-obj-y += fdset.o
+diff --git a/stubs/cpu-lock.c b/stubs/cpu-lock.c
+new file mode 100644
+index 0000000000..1981a00fb3
+--- /dev/null
++++ b/stubs/cpu-lock.c
+@@ -0,0 +1,20 @@
++#include "qemu/osdep.h"
++#include "hw/core/cpu.h"
++
++void cpu_mutex_lock_impl(CPUState *cpu, const char *file, int line)
++{
++}
++
++void cpu_mutex_unlock_impl(CPUState *cpu, const char *file, int line)
++{
++}
++
++bool cpu_mutex_locked(const CPUState *cpu)
++{
++    return true;
++}
++
++bool no_cpu_mutex_locked(void)
++{
++    return true;
++}
 -- 
 2.17.1
 
