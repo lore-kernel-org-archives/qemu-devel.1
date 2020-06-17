@@ -2,87 +2,90 @@ Return-Path: <SRS0=bzpH=76=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 625C2C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 22:04:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81938C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 22:05:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 30A902082F
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 22:04:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 504AC2073E
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 22:05:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zb4bTxHA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30A902082F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="IQf7mE+m"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 504AC2073E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60676 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34796 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlgAL-00033o-9I
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 18:04:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44360)
+	id 1jlgBU-00052J-KI
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 18:05:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45878)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1jlfad-0001q9-2m
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 17:27:23 -0400
-Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:39012)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1jlfaa-0004GQ-Up
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 17:27:22 -0400
-Received: by mail-lj1-x244.google.com with SMTP id a9so4703440ljn.6
- for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 14:27:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Aa6lyRAUmGeeJFGW7pM3rKQ6CCDTGdCvUZy1FPy0/r0=;
- b=zb4bTxHAMxHbydRD6xRwO4BhYjN/2qDZtmfiH9L20moDL8Z/cQwWNyq94QCpekxxVw
- 6WoAzM8KT6Z1z9jGeBw3pd2vXQVDfvrDOIDZlx+3xQ7mUhEpOTiU3HVeLxd/FlWXic63
- JwctfO9kKto3w2KCABvmDCULg+ExPdzpQVkD063orCV6uCYQJ1M770ipedLwRQnVaRzJ
- crqR01S1QrSXjX2xMySPN6M8WwkazxZIwFga6OqkNo+c7ijIciRkviG+3YouhadT2qRe
- xIQawF0et9hIPaxweHLT8BHHCwChMHWHfTdde3+pu7tU/ddl9dCZwwjY7px2e+jdXWpa
- v6vw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=Aa6lyRAUmGeeJFGW7pM3rKQ6CCDTGdCvUZy1FPy0/r0=;
- b=K0sDoZAE3cxyuSKzL4XQHcDpsQ7+NFnL7YV3XsFZvuKXbQg5MPHw4BV4DdhOhy8oHt
- cJw8qLHSC3s4tIcC81fSg9BGSxugXJh0X5cVAyMCOOooOuWs7nVpP0cOnnvD7maX/58P
- nkRl9c/7xVfF/QX8cAHZMuTxsRA07VllsR0etSaH8XaRrzi1PuhDVVgNs+sPhbSYnuhl
- k+qXca4+JbuG/p47iurDA2riH+wS6iI2tR1OYx13IJSMqhOuwMvB10d6U4uYhAdi/2uY
- XrMFb+Icl6Q4fQ5n5MqZy6UslTOwL9cLIOBovTzOQhwZFU7ElWkHI1Jj6/sKDCOWnUR9
- 29lg==
-X-Gm-Message-State: AOAM532hdUZtaR/Kk7bKMYnJeX0IuR/C4kcz1bkeCC/cSFZTK4s9OPNs
- X3AEo5pNKHdxvDo4NBdqOQQYtiRgwLzl+lkoZirnLQ==
-X-Google-Smtp-Source: ABdhPJx3ghWSprXkYznmn/ww2VfJsBQJ9inoJNOGKhGX6zUExe5BpFkJL17JfzsDRS7Ssv3muEqsEksRssTPwQwwxYo=
-X-Received: by 2002:a2e:9cd5:: with SMTP id g21mr651908ljj.9.1592429238979;
- Wed, 17 Jun 2020 14:27:18 -0700 (PDT)
+ (Exim 4.90_1)
+ (envelope-from <prvs=430b82a1d=dmitry.fomichev@wdc.com>)
+ id 1jlfhc-0003Zc-5Q; Wed, 17 Jun 2020 17:34:36 -0400
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:29831)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1)
+ (envelope-from <prvs=430b82a1d=dmitry.fomichev@wdc.com>)
+ id 1jlfhZ-0005By-49; Wed, 17 Jun 2020 17:34:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+ t=1592429672; x=1623965672;
+ h=from:to:cc:subject:date:message-id:mime-version:
+ content-transfer-encoding;
+ bh=3nKOfRp8Li/D7irbjAbnlRYOCmKWJfaM5MN8r7hOdXc=;
+ b=IQf7mE+m5JVGzrW0DAzZNEwefFakiBYTO06ktzoEoHSIr47Jl6Tmm3wm
+ Q1/kCPOyRcX3eJPXceAa3vdirTOMEbzI/RqHWRTTxt4xozLxuic4kNL/M
+ WcJTGlTrBB80vUJj5LWxBRtf+t41GNC6hG0QL850SVD1wl5VAm9pXCKEp
+ BY8olt/5Kef56V3Fe+KPZ/JNeYVpQfKU4txAAGuF61A/dyteh0wyhJ2iT
+ yltROJQ6G25Eh7vvhIQ3XSgnMWZv2eVBIhYhA6p+OuNcugG/Nae0HVqcU
+ Ry9mZoVOn+24+4vcVOalfUm7CMLPyekJCaWwEYtEfSSQ7SiZsoSJ+XAar g==;
+IronPort-SDR: dg/5iq+K7aeUFog8R0SDrWnwM7NLsds3cl2Q2zLHQ/8BH4u9Soz0wCJKOPYr/pCPDTEvpXp3KM
+ kKFKgFDtGGI0HQ5wpvwOjCDz1Pz8Z0KQlGOFtI5jWrH7TvuHTyV+KWI223ndh7CScU68qVcVe9
+ sCvCg1rGgXXSqVJZSu3ByjIJ5YpvKqnyFznOPCBYSsbMX02IIpItSpM0HntmeU1B+z/cKr0op/
+ 9EHDycGqc541rydiMfzVRnMTnr/mjGDInb+jIRMMFAxE8U81xh+FptdA7WfvPowpwxwSqPbBux
+ R0g=
+X-IronPort-AV: E=Sophos;i="5.73,523,1583164800"; d="scan'208";a="249439782"
+Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com)
+ ([199.255.45.15])
+ by ob1.hgst.iphmx.com with ESMTP; 18 Jun 2020 05:34:28 +0800
+IronPort-SDR: luL764Fw84XdAuMS+GDwLVn0q4J/d4z1ztin2R7jEW2eHvxk4zxcRNp9JtnZYdwIp5KlfJCT9X
+ 8Lfxqln//5tdIenAsCLEtCHl9pJlT4hM4=
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+ by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 17 Jun 2020 14:23:09 -0700
+IronPort-SDR: 1gBPrfwbnUwn8vNtQoh8rS9+hSTw0llpzUVKBiHlk20uw1m4L4Du/B3GUCTR97WVuWXMzf1WWC
+ jrJ0QGTm4BPw==
+WDCIronportException: Internal
+Received: from unknown (HELO redsun50.ssa.fujisawa.hgst.com) ([10.149.66.24])
+ by uls-op-cesaip02.wdc.com with ESMTP; 17 Jun 2020 14:34:26 -0700
+From: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+To: Kevin Wolf <kwolf@redhat.com>, Keith Busch <kbusch@kernel.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Maxim Levitsky <mlevitsky@redhat.com>
+Subject: [PATCH v2 00/18] hw/block/nvme: Support Namespace Types and Zoned
+ Namespace Command Set
+Date: Thu, 18 Jun 2020 06:33:57 +0900
+Message-Id: <20200617213415.22417-1-dmitry.fomichev@wdc.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-References: <20200522160755.886-1-robert.foley@linaro.org>
- <20200522160755.886-2-robert.foley@linaro.org>
- <20200617142407.GH1728005@stefanha-x1.localdomain>
-In-Reply-To: <20200617142407.GH1728005@stefanha-x1.localdomain>
-From: Robert Foley <robert.foley@linaro.org>
-Date: Wed, 17 Jun 2020 17:27:23 -0400
-Message-ID: <CAEyhzFunvqHEGNPthRYvewqTp45Q4frZ-Y3qzsw_XZYk3wPKyQ@mail.gmail.com>
-Subject: Re: [PATCH 01/19] configure: add --enable-tsan flag + fiber
- annotations for coroutine-ucontext
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::244;
- envelope-from=robert.foley@linaro.org; helo=mail-lj1-x244.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=68.232.141.245;
+ envelope-from=prvs=430b82a1d=dmitry.fomichev@wdc.com; helo=esa1.hgst.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/17 17:34:28
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -43
+X-Spam_score: -4.4
+X-Spam_bar: ----
+X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,130 +98,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Puhov <peter.puhov@linaro.org>, "Emilio G. Cota" <cota@braap.org>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Lingfeng Yang <lfy@google.com>
+Cc: Niklas Cassel <niklas.cassel@wdc.com>,
+ Damien Le Moal <damien.lemoal@wdc.com>, qemu-block@nongnu.org,
+ Dmitry Fomichev <dmitry.fomichev@wdc.com>, qemu-devel@nongnu.org,
+ Matias Bjorling <matias.bjorling@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+v2: rebased on top of block-next/block branch
 
-On Wed, 17 Jun 2020 at 10:24, Stefan Hajnoczi <stefanha@gmail.com> wrote:
->
-> On Fri, May 22, 2020 at 12:07:37PM -0400, Robert Foley wrote:
-> > +#define UC_DEBUG 0
-> > +#if UC_DEBUG && defined(CONFIG_TSAN)
-> > +#define UC_TRACE(fmt, ...) fprintf(stderr, "%s:%d:%p " fmt "\n", \
-> > +    __func__, __LINE__, __tsan_get_current_fiber(), ##__VA_ARGS__);
-> > +#else
-> > +#define UC_TRACE(fmt, ...)
-> > +#endif
->
-> QEMU has tracing support, see docs/devel/tracing.txt. These fprintfs
-> should be trace events defined in the util/trace-events file.
+Zoned Namespace (ZNS) Command Set is a newly introduced command set
+published by the NVM Express, Inc. organization as TP 4053. The main
+design goals of ZNS are to provide hardware designers the means to
+reduce NVMe controller complexity and to allow achieving a better I/O
+latency and throughput. SSDs that implement this interface are
+commonly known as ZNS SSDs.
 
-Thanks for the details.  We removed this tracing in a later patch.
-https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg02506.html
->
-> > +
-> >  /**
-> >   * Per-thread coroutine bookkeeping
-> >   */
-> > @@ -65,7 +80,20 @@ union cc_arg {
-> >      int i[2];
-> >  };
-> >
-> > -static void finish_switch_fiber(void *fake_stack_save)
-> > +/* QEMU_ALWAYS_INLINE only does so if __OPTIMIZE__, so we cannot use it. */
-> > +static inline __attribute__((always_inline))
->
-> Please document why always_inline is necessary here and in other
-> functions. Is it for performance or because the __tsan_*() functions
-> need to be called from a the parent function?
+This command set is implementing a zoned storage model, similarly to
+ZAC/ZBC. As such, there is already support in Linux, allowing one to
+perform the majority of tasks needed for managing ZNS SSDs.
 
-We will look into this and add documentation here or (if it is no
-longer needed),
-remove the inline.
+The Zoned Namespace Command Set relies on another TP, known as
+Namespace Types (NVMe TP 4056), which introduces support for having
+multiple command sets per namespace.
 
-<snip>
-> > -static void start_switch_fiber(void **fake_stack_save,
-> > -                               const void *bottom, size_t size)
-> > +static inline __attribute__((always_inline)) void start_switch_fiber(
-> > +    CoroutineAction action, void **fake_stack_save,
-> > +    const void *bottom, size_t size, void *new_fiber)
-> >  {
-> >  #ifdef CONFIG_ASAN
-> > -    __sanitizer_start_switch_fiber(fake_stack_save, bottom, size);
-> > +    if (action == COROUTINE_TERMINATE) {
-> > +        __sanitizer_start_switch_fiber(
-> > +            action == COROUTINE_TERMINATE ? NULL : fake_stack_save,
->
-> The if statement already checks action == COROUTINE_TERMINATE, why is it
-> being checked again?
->
-> I think the old behavior can be retained by dropping the if statement
-> like this:
->
->   __sanitizer_start_switch_fiber(action == COROUTINE_TERMINATE ?
->                                  NULL : fake_stack_save,
->                                  bottom, size);
->
-> > +            bottom, size);
+Both ZNS and Namespace Types specifications can be downloaded by
+visiting the following link -
 
-Good point.  We did change this by dropping the if in a later patch.
-https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg02506.html
+https://nvmexpress.org/wp-content/uploads/NVM-Express-1.4-Ratified-TPs.zip
 
+This patch series adds Namespace Types support and zoned namespace
+emulation capability to the existing NVMe PCI driver.
 
-> > +    }
-> > +#endif
-> > +#ifdef CONFIG_TSAN
-> > +    void *curr_fiber =
-> > +        __tsan_get_current_fiber();
-> > +    __tsan_acquire(curr_fiber);
-> > +
-> > +    UC_TRACE("Current fiber: %p.", curr_fiber);
-> > +    *fake_stack_save = curr_fiber;
-> > +    UC_TRACE("Switch to fiber %p", new_fiber);
-> > +    __tsan_switch_to_fiber(new_fiber, 0);  /* 0=synchronize */
-> >  #endif
-> >  }
->
-> Please split start_switch_fiber() into two functions:
-> start_switch_fiber_asan() and start_switch_fiber_tsan(). That way the
-> asan- and tsan-specific arguments can be kept separate and the
-> co->tsan_* fields only need to be compiled in when CONFIG_TSAN is
-> defined.
->
-> For example:
->
->   static inline __attribute__((always_inline))
->   void start_switch_fiber_tsan(void **fake_stack_save,
->                                CoroutineUContext *co,
->                              bool caller)
->   {
->   #ifdef CONFIG_TSAN
->       void *new_fiber = caller ?
->                         co->tsan_caller_fiber :
->                         co->tsan_co_fiber;
->       void *curr_fiber = __tsan_get_current_fiber();
->       __tsan_acquire(curr_fiber);
->
->       UC_TRACE("Current fiber: %p.", curr_fiber);
->       *fake_stack_save = curr_fiber;
->       UC_TRACE("Switch to fiber %p", new_fiber);
->       __tsan_switch_to_fiber(new_fiber, 0);  /* 0=synchronize */
->   #endif
->   }
->
-> This does two things:
-> 1. Unrelated ASAN and TSAN code is separate and each function only
->    has arguments that are actually needed.
-> 2. The co->tsan_caller_fiber and co->tsan_co_fiber fields are only
->    access from within #ifdef CONFIG_TSAN.
+The patchset is organized as follows -
 
-Makes sense, we will make these changes and submit a cleanup patch.
+The first several patches are preparatory and are added to allow for
+an easier review of the subsequent commits. The group of patches that
+follows adds NS Types support with only NVM Command Set being
+available. Finally, the last group of commits makes definitions and
+adds new code to support Zoned Namespace Command Set.
 
-Thanks & Regards,
--Rob
+Based-on: <20200609205944.3549240-1-eblake@redhat.com>
+
+Ajay Joshi (1):
+  hw/block/nvme: Define 64 bit cqe.result
+
+Dmitry Fomichev (15):
+  hw/block/nvme: Move NvmeRequest has_sg field to a bit flag
+  hw/block/nvme: Clean up unused AER definitions
+  hw/block/nvme: Add Commands Supported and Effects log
+  hw/block/nvme: Define trace events related to NS Types
+  hw/block/nvme: Make Zoned NS Command Set definitions
+  hw/block/nvme: Define Zoned NS Command Set trace events
+  hw/block/nvme: Support Zoned Namespace Command Set
+  hw/block/nvme: Introduce max active and open zone limits
+  hw/block/nvme: Simulate Zone Active excursions
+  hw/block/nvme: Set Finish/Reset Zone Recommended attributes
+  hw/block/nvme: Generate zone AENs
+  hw/block/nvme: Support Zone Descriptor Extensions
+  hw/block/nvme: Add injection of Offline/Read-Only zones
+  hw/block/nvme: Use zone metadata file for persistence
+  hw/block/nvme: Document zoned parameters in usage text
+
+Niklas Cassel (2):
+  hw/block/nvme: Introduce the Namespace Types definitions
+  hw/block/nvme: Add support for Namespace Types
+
+ block/nvme.c          |    2 +-
+ block/trace-events    |    2 +-
+ hw/block/nvme.c       | 2316 ++++++++++++++++++++++++++++++++++++++++-
+ hw/block/nvme.h       |  228 +++-
+ hw/block/trace-events |   56 +
+ include/block/nvme.h  |  282 ++++-
+ 6 files changed, 2820 insertions(+), 66 deletions(-)
+
+-- 
+2.21.0
+
 
