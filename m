@@ -2,91 +2,86 @@ Return-Path: <SRS0=bzpH=76=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20063C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 15:22:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43FB6C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 15:23:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E317520707
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 15:22:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0E8A7206FA
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 15:23:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="o+Q6PLvz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E317520707
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TVjeUlrd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E8A7206FA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47464 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51474 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlZt3-0001BL-8T
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 11:22:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51582)
+	id 1jlZuH-0002xk-C7
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 11:23:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45906)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
- id 1jlZk7-0002P1-TY; Wed, 17 Jun 2020 11:12:47 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:37586)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
- id 1jlZk6-0007B0-D6; Wed, 17 Jun 2020 11:12:47 -0400
-Received: by mail-wr1-x442.google.com with SMTP id a6so774874wrm.4;
- Wed, 17 Jun 2020 08:12:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=VVmcwQqcqsnfwV++or82zXFkixv3Ic9j45fRPzZ1wgk=;
- b=o+Q6PLvzHrjAwhnkEn7OrdBhtz9bUiL/LcfcAkawgrqjlNgRcYw7sHisCWyriksfWd
- josM8D4qgkVSjU2h+zpHqFhRrv4MrVeEMM09vfNxZcOVXx+SregghVN4iZyi/WBtQeCc
- 6kTvwf6hGL4g5vDnpt2JgT5Qa5sxgJYv1vwQsGvYaUuEcpUp/Jx8pPOFdicNk973+DK1
- 8gCpksRHVvRwcxCf/Xxo0xcep7uOhh6r7ZHvfiejJk6SFcGpaMJTUOWd1iMuo3OOxSV0
- honsgQrVRVVfwyIP3wLQk9YY10vYAVkW2I/BUciMdAoyjQxoXWuVU55xRNmkDzbx10oE
- PpBw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=VVmcwQqcqsnfwV++or82zXFkixv3Ic9j45fRPzZ1wgk=;
- b=Nx5olbHwPWJY+Dw3supl2QKSZKUzZH0etdMhd+Usutz6eKUNYE56/xJb3uQPeJfC95
- 8DqkBN2sN02T8/RocVXo7ZU6y9/7ud2X+Ve7MDRirl/A4Gb02Ifx06xvo3Y5o7HUVLm4
- qw9hgl9ziI3ELlP6oxsYfi81nr//zsYMmVMFvHF6KuBKIOxLzoQsa/4rsVj2PraS7c/5
- gHrBixXnj02jsWeNK5mY8v6HB63vd9C89TF2kuUI+C9xz8a7gffNAnMbiWw04oUspDU5
- QHWctcjUsLVLM7r+Qw1xMpuRVg3IccTr9gQOs/zRxHmxgSAEGQwp/F/1RaK6+hTljWLp
- FwLA==
-X-Gm-Message-State: AOAM533vfjrxrksfk/TBL5HXjJdCbGwDUKI/OY+DTvB8+OcOhJV1PHpO
- TbAnwU2XcULHf34aWLjD2GE=
-X-Google-Smtp-Source: ABdhPJx6Gu8KhbRy0Cz24GeuLrGIgVbaubDna00E+kKpMt/qJKxblIfvRJ6Dem7ZW7a8nQtIYOsGFw==
-X-Received: by 2002:adf:f2c2:: with SMTP id d2mr8650242wrp.424.1592406764489; 
- Wed, 17 Jun 2020 08:12:44 -0700 (PDT)
-Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id p7sm34376447wro.26.2020.06.17.08.12.41
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 17 Jun 2020 08:12:41 -0700 (PDT)
-Date: Wed, 17 Jun 2020 16:12:40 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Lukas Straub <lukasstraub2@web.de>
-Subject: Re: [PATCH v4 1/4] Introduce yank feature
-Message-ID: <20200617151240.GM1728005@stefanha-x1.localdomain>
-References: <cover.1590421341.git.lukasstraub2@web.de>
- <dc2724aead900db8fb3bed0a066f7c7e2654edb0.1590421341.git.lukasstraub2@web.de>
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jlZOJ-0003mB-Ha
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 10:50:15 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:38884
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jlZOG-0001rP-RF
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 10:50:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592405412;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=eqQXSFyP0kuFjE3fFDQshh/+swbSOqeRdeu3TmA5zKM=;
+ b=TVjeUlrdIkY7z2wOZxrJGfBTKyxJ0UGmxIjk5BFzFkTXDDwnEkYqu9PzW9z3USbaXTtn8Y
+ j7zRuwlLYYrPWcFwd/m7kfqfxx+s05YUDLj6+/tp4U3ORRT1sv9DirCCP2uChSBxlam6Mj
+ REpaD1vHh0cY6sOHsQD0oLlMztwu20c=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-36-sVOEbP1iP4-YplTOMPAqzA-1; Wed, 17 Jun 2020 10:50:09 -0400
+X-MC-Unique: sVOEbP1iP4-YplTOMPAqzA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CC972134D7;
+ Wed, 17 Jun 2020 14:50:08 +0000 (UTC)
+Received: from linux.fritz.box.com (ovpn-114-44.ams2.redhat.com [10.36.114.44])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CED0F7CAA0;
+ Wed, 17 Jun 2020 14:50:07 +0000 (UTC)
+From: Kevin Wolf <kwolf@redhat.com>
+To: qemu-block@nongnu.org
+Subject: [PULL 39/43] iotests/041: Skip test_small_target for qed
+Date: Wed, 17 Jun 2020 16:49:05 +0200
+Message-Id: <20200617144909.192176-40-kwolf@redhat.com>
+In-Reply-To: <20200617144909.192176-1-kwolf@redhat.com>
+References: <20200617144909.192176-1-kwolf@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="lbQeYSs6J2ITmUo7"
-Content-Disposition: inline
-In-Reply-To: <dc2724aead900db8fb3bed0a066f7c7e2654edb0.1590421341.git.lukasstraub2@web.de>
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=stefanha@gmail.com; helo=mail-wr1-x442.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/17 02:02:46
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,42 +94,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- qemu-block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>,
- =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+From: Max Reitz <mreitz@redhat.com>
 
---lbQeYSs6J2ITmUo7
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+qed does not support shrinking images, so the test_small_target method
+should be skipped to keep 041 passing.
 
-On Mon, May 25, 2020 at 05:44:23PM +0200, Lukas Straub wrote:
-> +static struct YankInstance *yank_find_instance(char *name)
+Fixes: 16cea4ee1c8e5a69a058e76f426b2e17974d8d7d
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Message-Id: <20200617104822.27525-3-mreitz@redhat.com>
+Tested-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ tests/qemu-iotests/041 | 2 ++
+ 1 file changed, 2 insertions(+)
 
-There are const char * -> char * casts in later patches. Please use
-const char * where possible. Callers shouldn't need to cast away const.
+diff --git a/tests/qemu-iotests/041 b/tests/qemu-iotests/041
+index 601c756117..b843f88a66 100755
+--- a/tests/qemu-iotests/041
++++ b/tests/qemu-iotests/041
+@@ -277,6 +277,8 @@ class TestSingleBlockdev(TestSingleDrive):
+         result = self.vm.run_job('job0')
+         self.assertEqual(result, 'Source and target image have different sizes')
+ 
++    # qed does not support shrinking
++    @iotests.skip_for_formats(('qed'))
+     def test_small_target(self):
+         self.do_test_target_size(self.image_len // 2)
+ 
+-- 
+2.25.4
 
---lbQeYSs6J2ITmUo7
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl7qMugACgkQnKSrs4Gr
-c8jdaQgAieUMf4lNYjUEhSjICVFKSg0Y4mIh5zPEPM0mqtsC9TQU6lkCuE+TZxBE
-BaCw3a4ys1MKS6TSCtGBUWFnOMVR9W7zz2lLUH8NOb1iy9sN0OxfkixA8Expv3lg
-Xz1dJ0fmbbOAhshfO0fiZP331VdyWvurfrNOCD8Ghb9Y26etB7LsY1G5g8UAnZJJ
-QT1qeI+LYViWHwYN12jQdHjWU5Hx4387x6nmce/w6cM+IxAl7tnVQbQWi3g/lQSD
-qGinVy9NtSZJEslQYO4hlgggiUnvoeaFnvymmPEQOG+VRps8Jr/ujlLZx1vXOFlX
-kg2/IFZXyG5eelhtrplmcFUXKEaC4w==
-=a+dZ
------END PGP SIGNATURE-----
-
---lbQeYSs6J2ITmUo7--
 
