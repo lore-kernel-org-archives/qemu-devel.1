@@ -2,93 +2,73 @@ Return-Path: <SRS0=bzpH=76=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B8A1C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 14:33:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB55FC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 14:35:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 061F9206F1
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 14:33:13 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kgSMxs9G"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 061F9206F1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id C093C206FA
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 14:35:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C093C206FA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50314 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52504 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlZ7o-0007hD-Ad
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 10:33:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39044)
+	id 1jlZ9c-0000KL-3A
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 10:35:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40424)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
- id 1jlZ4i-0004nG-Iy
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 10:30:00 -0400
-Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:45606)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
- id 1jlZ4g-0006a2-MU
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 10:30:00 -0400
-Received: by mail-wr1-x436.google.com with SMTP id c3so2542912wru.12
- for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 07:29:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=9BeFTxtyvUHiP/foG8WuGHqMNLmBo2SS3Hn31dxcmTc=;
- b=kgSMxs9G89UHxVqlNljaF/VdQFyE+fMj+KaG3U++ZfyQXI7skJEXoP4VtE95ZLB+jM
- 5RRptvA90yV/XKJSfUg+3v7R+BYZM26VeaOBPdL73Dlr57WFzobCq0Ge/aUKQnZzyxpe
- ltb8y0kc0H2TkzkutoIhOKvg9Rvd2itiDNYg/1yB8lCeOwl9boPOoCgVEtLsmBhhiYMy
- nIZ/+2bNwCpnwlWTQ9Irwttu8NcqrqnJSXxAPun4rU49giQW+dX7pkzxxGCULUHlYera
- I/NpSgfE89w/zKswpljIaaAHwprhGlMIPknUpk3YO4unMunJoZriyV1o1IJ6PxfR16sl
- CK0Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=9BeFTxtyvUHiP/foG8WuGHqMNLmBo2SS3Hn31dxcmTc=;
- b=j5QLqdDGxsb9zKVpLsybHEbovO3Mwa0F4IJ7tp+wWpqLIoZTPoS6FYOlMLQHcHwscA
- HmWOBumsyW2nv60fAMNSpSgQ+XHCnxABAChV0J+hzb4OybigE87vg4p/Lnyu3fCB0HGf
- /BEm1O1uHxfU8Zs3olKExbm0r/rlu4RCFXDVc3remSOYhsudZD6f+B9ytOpEAXlxVs+C
- MmrDnCIaeos2rSnWNW/fbgBvfG7YWphsGqEfqMMAbItL8rYG25Ne2FlDcabmZYUiU5Ga
- pIvxD5cRhyNcQOycbXcw7dG0W9L9LFOGz7xrT4btcAS2x5rNy+DDgsr8rjzQMXl1Ff63
- hSxQ==
-X-Gm-Message-State: AOAM5324QmDUxLjPllAHR+Ns27qQAxwiYnbpjqeBc0bPHGPzrlW5kMpP
- h9ewh1Ee5VeI65YTXTopz06Z0cUxh8k=
-X-Google-Smtp-Source: ABdhPJxLenhde5zGCFmU9flfrSE3KgLbume1WA6Ukf3a9520iqwxuAB6BRTu55xuexcN4vAaaEck7g==
-X-Received: by 2002:adf:f845:: with SMTP id d5mr8695137wrq.197.1592404196851; 
- Wed, 17 Jun 2020 07:29:56 -0700 (PDT)
-Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id g187sm615828wma.17.2020.06.17.07.29.54
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 17 Jun 2020 07:29:55 -0700 (PDT)
-Date: Wed, 17 Jun 2020 15:29:53 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Bug 1880507 <1880507@bugs.launchpad.net>
-Subject: Re: [Bug 1880507] [NEW] VMM from Ubuntu 20.04 does not show the
- memory consumption
-Message-ID: <20200617142953.GI1728005@stefanha-x1.localdomain>
-References: <159038615546.7053.4830753292873479822.malonedeb@gac.canonical.com>
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jlZ8o-0008Kp-RJ
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 10:34:14 -0400
+Resent-Date: Wed, 17 Jun 2020 10:34:14 -0400
+Resent-Message-Id: <E1jlZ8o-0008Kp-RJ@lists.gnu.org>
+Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21722)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jlZ8m-0007J9-64
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 10:34:14 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1592404434; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=cIEOr/HXpuWXAmTdFpwKvr+k9JggO1pEHxxL/46r3cMC6CTD9Gbqz3QK6qgdMphPyV4lWPPicacBDAzkdXCvIhQ029kjRbAlb3UzS+3yTuZtyBdv98Yrkiu9uZqK8o/UmYHLFCYbHJq3nocCTqjgFBDIfrOUjsMEz61RJkr/tyk=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1592404434;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=N1F2qHx84k4KeX1eejK4XD20oW8TIdZiIn9h1H0pv5o=; 
+ b=NynK51yyos6uTkmzIOafAkQ6tVJJ5ct3Ml9ZUzG0aNlNdIWUYy+Uicpfszi5wBVqKc1lTd+hSEVvneC4orGeQ0zWLXutjXlfKhXq9GmLTzwBMeJjeD1+Y7gXgzAuTRLsePdarFElNgiO2ZhgH8x814X+EORP+wcesVXfjJC4n9A=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1592404433748368.35078825238065;
+ Wed, 17 Jun 2020 07:33:53 -0700 (PDT)
+Message-ID: <159240443226.14731.15935853570073325984@d1fd068a5071>
+Subject: Re: [PATCH v4 0/8] tpm: Enable usage of TPM TIS with interrupts
+In-Reply-To: <20200617142305.1198672-1-stefanb@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="/8E7gjuj425jZz9t"
-Content-Disposition: inline
-In-Reply-To: <159038615546.7053.4830753292873479822.malonedeb@gac.canonical.com>
-Received-SPF: pass client-ip=2a00:1450:4864:20::436;
- envelope-from=stefanha@gmail.com; helo=mail-wr1-x436.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: stefanb@linux.vnet.ibm.com
+Date: Wed, 17 Jun 2020 07:33:53 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o57.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/17 06:55:17
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,35 +81,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Reply-To: qemu-devel@nongnu.org
+Cc: stefanb@linux.vnet.ibm.com, qemu-devel@nongnu.org, eric.auger@redhat.com,
+ marcandre.lureau@redhat.com, pbonzini@redhat.com, philmd@redhat.com,
+ mkedzier@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
---/8E7gjuj425jZz9t
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-Does "vmm" mean Virtual Machine Manager (aka virt-manager)? If yes,
-please file this bug against the virt-manager package instead of qemu.
-
-Thanks!
-
---/8E7gjuj425jZz9t
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl7qKOEACgkQnKSrs4Gr
-c8he/Af/Zki2oZ92uDkkIsO2y3qoY1sQPo41lpsAbSr/6TWlci/ScWDvKcjJpRSb
-TkRzcMd7cKQK/DG8KC2i6PgWYrsActqGdAU8wdpef9qrzmPXFYevcvdFgxxsJ9zl
-XjBVDOSgDy1XcyXBKO9/NNm1KhfL807SJzlP1aJhy7uDbnoGUYx6Jf2Nd0mi6XzA
-Wrwfk22K8yBqHUxj6yM1fZu4Os0I/PNPXtZ1X45vRUbvXRinOYxX8byE87BOQGO4
-BS5B1LhTzCgL3neCZZPs+7gjp6VUrp3ZU4tOisYql+9fmgmVYkjxGiXnSYNXwQtG
-Zcgj3uYRNjHvdIkVnQmpasICgPQ8GQ==
-=I9mN
------END PGP SIGNATURE-----
-
---/8E7gjuj425jZz9t--
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDYxNzE0MjMwNS4xMTk4
+NjcyLTEtc3RlZmFuYkBsaW51eC52bmV0LmlibS5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2Vl
+bXMgdG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBm
+b3IKbW9yZSBpbmZvcm1hdGlvbjoKClN1YmplY3Q6IFtQQVRDSCB2NCAwLzhdIHRwbTogRW5hYmxl
+IHVzYWdlIG9mIFRQTSBUSVMgd2l0aCBpbnRlcnJ1cHRzClR5cGU6IHNlcmllcwpNZXNzYWdlLWlk
+OiAyMDIwMDYxNzE0MjMwNS4xMTk4NjcyLTEtc3RlZmFuYkBsaW51eC52bmV0LmlibS5jb20KCj09
+PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4g
+L2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAw
+CmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwg
+ZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJh
+Y2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZm
+ODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNo
+ZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMjAyMDA2MTcxNDIz
+MDUuMTE5ODY3Mi0xLXN0ZWZhbmJAbGludXgudm5ldC5pYm0uY29tIC0+IHBhdGNoZXcvMjAyMDA2
+MTcxNDIzMDUuMTE5ODY3Mi0xLXN0ZWZhbmJAbGludXgudm5ldC5pYm0uY29tClN3aXRjaGVkIHRv
+IGEgbmV3IGJyYW5jaCAndGVzdCcKNTI3ZjZhNiB0cG06IERpc2FibGUgaW50ZXJydXB0IHN1cHBv
+cnQgZm9yIFRJUyBvbiBzeXNidXMKMjQwOTY2MCB0cG06IEd1YXJkIGlycSByZWxhdGVkIG9wcyBp
+biBjYXNlIGludGVycnVwdHMgYXJlIGRpc2FibGVkCjcyN2RiNWEgdGVzdHM6IEFkZCB1cGRhdGVk
+IERTRFQKOWFlMGIwZCBhY3BpOiBFbmFibGUgVFBNIElSUQo2MmE2NTlhIHRwbTogU3BsaXQgVFBN
+X1RJU19JUlEgaW50byBUUE1fVElTX0lTQV9JUlEgYW5kIFRQTV9USVNfU1lTQlVTX0lSUQo0ZTM5
+OTRhIHRlc3RzOiBUZW1wb3JhcmlseSBpZ25vcmUgRFNEVCB0YWJsZSBkaWZmZXJlbmNlcwo2NTFk
+ZGYwIHRwbTogRXh0ZW5kIFRQTUlmQ2xhc3Mgd2l0aCBnZXRfaXJxbnVtKCkgZnVuY3Rpb24KOWZl
+MjViMSB0cG1fdGlzOiBBbGxvdyBsb3dlcmluZyBvZiBJUlEgYWxzbyB3aGVuIGxvY2FsaXR5IGlz
+IG5vdCBhY3RpdmUKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvOCBDaGVja2luZyBjb21taXQgOWZl
+MjViMTFhMjMxICh0cG1fdGlzOiBBbGxvdyBsb3dlcmluZyBvZiBJUlEgYWxzbyB3aGVuIGxvY2Fs
+aXR5IGlzIG5vdCBhY3RpdmUpCjIvOCBDaGVja2luZyBjb21taXQgNjUxZGRmMDNhNDEzICh0cG06
+IEV4dGVuZCBUUE1JZkNsYXNzIHdpdGggZ2V0X2lycW51bSgpIGZ1bmN0aW9uKQpFUlJPUjogTWFj
+cm9zIHdpdGggY29tcGxleCB2YWx1ZXMgc2hvdWxkIGJlIGVuY2xvc2VkIGluIHBhcmVudGhlc2lz
+CiM3NzogRklMRTogaW5jbHVkZS9zeXNlbXUvdHBtLmg6Mjg6CisjZGVmaW5lIFRQTV9JUlFfRElT
+QUJMRUQgIH4wCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDcwIGxpbmVzIGNoZWNrZWQK
+ClBhdGNoIDIvOCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2Yg
+dGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50
+YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKMy84IENoZWNraW5nIGNvbW1p
+dCA0ZTM5OTRhZTllNDUgKHRlc3RzOiBUZW1wb3JhcmlseSBpZ25vcmUgRFNEVCB0YWJsZSBkaWZm
+ZXJlbmNlcykKNC84IENoZWNraW5nIGNvbW1pdCA2MmE2NTlhYjVjMTIgKHRwbTogU3BsaXQgVFBN
+X1RJU19JUlEgaW50byBUUE1fVElTX0lTQV9JUlEgYW5kIFRQTV9USVNfU1lTQlVTX0lSUSkKNS84
+IENoZWNraW5nIGNvbW1pdCA5YWUwYjBkNmY3MjQgKGFjcGk6IEVuYWJsZSBUUE0gSVJRKQo2Lzgg
+Q2hlY2tpbmcgY29tbWl0IDcyN2RiNWFjNzhhYyAodGVzdHM6IEFkZCB1cGRhdGVkIERTRFQpCjcv
+OCBDaGVja2luZyBjb21taXQgMjQwOTY2MDAxYjg2ICh0cG06IEd1YXJkIGlycSByZWxhdGVkIG9w
+cyBpbiBjYXNlIGludGVycnVwdHMgYXJlIGRpc2FibGVkKQo4LzggQ2hlY2tpbmcgY29tbWl0IDUy
+N2Y2YTZmZGIxNiAodHBtOiBEaXNhYmxlIGludGVycnVwdCBzdXBwb3J0IGZvciBUSVMgb24gc3lz
+YnVzKQo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAx
+CgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8y
+MDIwMDYxNzE0MjMwNS4xMTk4NjcyLTEtc3RlZmFuYkBsaW51eC52bmV0LmlibS5jb20vdGVzdGlu
+Zy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGlj
+YWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIg
+ZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
