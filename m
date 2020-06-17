@@ -7,80 +7,79 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14F2BC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 21:05:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19B96C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 21:05:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D018C21532
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 21:05:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D6B8B21582
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 21:05:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZUm9OP/p"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D018C21532
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AA2z7orh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6B8B21582
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37712 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38064 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlfFJ-0004UD-2J
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 17:05:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36816)
+	id 1jlfFM-0004hm-Vc
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 17:05:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36926)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1jlfDO-0002bL-KJ
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 17:03:22 -0400
-Received: from mail-qk1-x742.google.com ([2607:f8b0:4864:20::742]:36356)
+ id 1jlfDV-0002fG-Sa
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 17:03:29 -0400
+Received: from mail-qt1-x842.google.com ([2607:f8b0:4864:20::842]:42436)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1jlfDJ-0008OM-A1
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 17:03:22 -0400
-Received: by mail-qk1-x742.google.com with SMTP id 205so3517535qkg.3
- for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 14:03:16 -0700 (PDT)
+ id 1jlfDO-0008Q3-Cg
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 17:03:29 -0400
+Received: by mail-qt1-x842.google.com with SMTP id q14so2741522qtr.9
+ for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 14:03:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=Dhx8kBlipihHAeKCJXfkKKAuD+dwgXnNkcughiZZtFw=;
- b=ZUm9OP/ppA5whu7a9OgxbPtF42XrPrAo3DlE/0Oi8XdHuGRkCj8ljfQu4IZ+PPMZMx
- 3SxjAS6qfhPkLmupKJY2PDyYcrZ4hiHz7DgeJEN0v96tLPAWs5SOT3tDE73CHfHAdbVX
- vGa4A+z+Z4UktE/zkKvJpPgN5+pc0dfddvQ2CuakTgZdfACZyl7VHlyZvRGjEkH/ModE
- sJ1TSSi5lA09LkKMVhqPO3KaIUzW3TqArcjbwD1DB+uGvBKowxJBDTqKoUxWzMj1jyF1
- 0zrSrdLyE7JfcAHg6f5DtlFb363BiXBJ9dnc2/GaAL2Cy0Ktrg0Pkpa/hUJbuQo/H+Kw
- I/oQ==
+ bh=QNZB54KyQChgQjAJ4p/NXb5SKwXOjBRD9J4KOgYTGDc=;
+ b=AA2z7orh/m+mwEWFgQscfE4OJA8CSw68Kuhox/bKvytcSM8YZvkftQB7TO16rvo0eM
+ fhWp068tIALYrvq/uUyZEaB2jQe5FUEKV3dbou1qpxpMhqcG0TEuOfBt36LWBQL+Akr6
+ yAlBmE+vRbhV8EaxNBElT1idS3uGuiC20f7zX/M/KjDTEcpny+v2Y1C/W4P/pI3V214S
+ XhgB94mTYZ5AwsIY4UUVo4ujR+pCw5c9PZxsahotK4zc65O7Z0wiX1V6Kl8zW06vyMlM
+ QOPWkaoFLG0UhfOhk+DkHHZeLg+wtzKhb87kjDeNzvScYgXpUzj2K8zmtYJ+qjYD7DW4
+ laOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=Dhx8kBlipihHAeKCJXfkKKAuD+dwgXnNkcughiZZtFw=;
- b=ixTWwtW6QqgbzBtqDffgnF2yFjTcLeXvF2y+CZKTlwyf2Pf6bey7KB85afhNrWMPFR
- z4J3eJoKDLkCTydK0e3O7WMtn7huoyjh9NjKCidgtrl/ZncYn7CbsdxNLNC1MYSeT7sH
- YZXGMedM3b2XCbjNjUUhHNqBQbYS/hQben32mSUb7JZUhqEuAJmenPOW2/WncJFCzxi8
- URANrZOSbTw9NDWIrVenz4CLzl1WCVHSkObTP1L8//qoma2790wz1uaDIa78crZK4WBc
- qLk19LzqyyP37zoTGKRBqbUOq7eUMG5uQiIvd/XsWj6l3ijFn+/FYlF7CI2SwDMjigmF
- /Fmw==
-X-Gm-Message-State: AOAM530bzCxr4F5JavuoOvLBt5AEQu2WMPdvAtvfoY+DVxnd8tYaKKuJ
- bPRWRKm1v9TJ3uuGHIGGnN9NxOv/GsnUxg==
-X-Google-Smtp-Source: ABdhPJxc/8ec9dUq51782MJ5+QI5GVOXnnEBtuHcz9MJ3sIgaS9ONS86do7WVTT9iYw9gFmjR4KSyA==
-X-Received: by 2002:a05:620a:164c:: with SMTP id
- c12mr500828qko.343.1592427796072; 
- Wed, 17 Jun 2020 14:03:16 -0700 (PDT)
+ bh=QNZB54KyQChgQjAJ4p/NXb5SKwXOjBRD9J4KOgYTGDc=;
+ b=HwUcYW7OjlyjdKt5qHQ8xmIN3t43/mc2DZ4l5Al8wYtwDhRubfLcemIqKUZVUUkHXB
+ l05Nps5ZNWWI9imR1uoY3Vzfag8w/Vw0zpXVWveWRW5ML0VnTJqVY/qjUYj3kiYoKq5x
+ 4WZNNX309Lx5t8OjJF8dUkIfaBOfrH2cas4KDybbVAYLE4ngkKeUvaspqnI6/VHX+1Aj
+ JVb10QS83aQiGUnX/uKqXXIwampXSRm74vBUGkgQVLZIyqJAsnpFDgRFG79Le6LAhQlU
+ KVlPLnnFI0VlkzGXnmSv7hkFw1+vNNEN2wuW3oVlS2m29Ogi2NinwhsOWM6ST9qWMIdz
+ t3Hw==
+X-Gm-Message-State: AOAM5323gq7Vk52nsNVZb9DvEJS4bbIjZwuyv961af4+3IVwjYA1gt0W
+ aEcn2uE7lTlWlxzr3jcZAK6sPyBdq2LBfA==
+X-Google-Smtp-Source: ABdhPJyXJHPLpEEuCZdP7Yc8QXLwbj/JnTLMaC8xTB/kqlmZU3ZJYneco7TC6KWaL/rh+/WiZngFqg==
+X-Received: by 2002:ac8:6edb:: with SMTP id f27mr1035447qtv.325.1592427801035; 
+ Wed, 17 Jun 2020 14:03:21 -0700 (PDT)
 Received: from Rfoley-MA01.hsd1.ma.comcast.net
  ([2601:199:4480:60c0:fc79:714c:9711:2e9c])
- by smtp.gmail.com with ESMTPSA id w13sm997245qkb.91.2020.06.17.14.03.14
+ by smtp.gmail.com with ESMTPSA id w13sm997245qkb.91.2020.06.17.14.03.19
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 17 Jun 2020 14:03:15 -0700 (PDT)
+ Wed, 17 Jun 2020 14:03:20 -0700 (PDT)
 From: Robert Foley <robert.foley@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v10 01/73] cpu: rename cpu->work_mutex to cpu->lock
-Date: Wed, 17 Jun 2020 17:01:19 -0400
-Message-Id: <20200617210231.4393-2-robert.foley@linaro.org>
+Subject: [PATCH v10 04/73] cpu: move run_on_cpu to cpus-common
+Date: Wed, 17 Jun 2020 17:01:22 -0400
+Message-Id: <20200617210231.4393-5-robert.foley@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200617210231.4393-1-robert.foley@linaro.org>
 References: <20200617210231.4393-1-robert.foley@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::742;
- envelope-from=robert.foley@linaro.org; helo=mail-qk1-x742.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::842;
+ envelope-from=robert.foley@linaro.org; helo=mail-qt1-x842.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -111,134 +110,68 @@ Sender: "Qemu-devel"
 
 From: "Emilio G. Cota" <cota@braap.org>
 
-This lock will soon protect more fields of the struct. Give
-it a more appropriate name.
+We don't pass a pointer to qemu_global_mutex anymore.
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 Signed-off-by: Robert Foley <robert.foley@linaro.org>
 ---
- cpus-common.c         | 14 +++++++-------
- cpus.c                |  4 ++--
- hw/core/cpu.c         |  4 ++--
- include/hw/core/cpu.h |  6 ++++--
- 4 files changed, 15 insertions(+), 13 deletions(-)
+ cpus-common.c         |  2 +-
+ cpus.c                |  5 -----
+ include/hw/core/cpu.h | 10 ----------
+ 3 files changed, 1 insertion(+), 16 deletions(-)
 
 diff --git a/cpus-common.c b/cpus-common.c
-index 8f5512b3d7..622430bd33 100644
+index 57d9fc6ea1..b1069193c1 100644
 --- a/cpus-common.c
 +++ b/cpus-common.c
-@@ -105,10 +105,10 @@ struct qemu_work_item {
- 
- static void queue_work_on_cpu(CPUState *cpu, struct qemu_work_item *wi)
- {
--    qemu_mutex_lock(&cpu->work_mutex);
-+    qemu_mutex_lock(&cpu->lock);
-     QSIMPLEQ_INSERT_TAIL(&cpu->work_list, wi, node);
-     wi->done = false;
--    qemu_mutex_unlock(&cpu->work_mutex);
-+    qemu_mutex_unlock(&cpu->lock);
- 
-     qemu_cpu_kick(cpu);
+@@ -117,7 +117,7 @@ static void queue_work_on_cpu(CPUState *cpu, struct qemu_work_item *wi)
+     cpu_mutex_unlock(cpu);
  }
-@@ -300,15 +300,15 @@ void process_queued_cpu_work(CPUState *cpu)
- {
-     struct qemu_work_item *wi;
  
--    qemu_mutex_lock(&cpu->work_mutex);
-+    qemu_mutex_lock(&cpu->lock);
-     if (QSIMPLEQ_EMPTY(&cpu->work_list)) {
--        qemu_mutex_unlock(&cpu->work_mutex);
-+        qemu_mutex_unlock(&cpu->lock);
-         return;
-     }
-     while (!QSIMPLEQ_EMPTY(&cpu->work_list)) {
-         wi = QSIMPLEQ_FIRST(&cpu->work_list);
-         QSIMPLEQ_REMOVE_HEAD(&cpu->work_list, node);
--        qemu_mutex_unlock(&cpu->work_mutex);
-+        qemu_mutex_unlock(&cpu->lock);
-         if (wi->exclusive) {
-             /* Running work items outside the BQL avoids the following deadlock:
-              * 1) start_exclusive() is called with the BQL taken while another
-@@ -324,13 +324,13 @@ void process_queued_cpu_work(CPUState *cpu)
-         } else {
-             wi->func(cpu, wi->data);
-         }
--        qemu_mutex_lock(&cpu->work_mutex);
-+        qemu_mutex_lock(&cpu->lock);
-         if (wi->free) {
-             g_free(wi);
-         } else {
-             atomic_mb_set(&wi->done, true);
-         }
-     }
--    qemu_mutex_unlock(&cpu->work_mutex);
-+    qemu_mutex_unlock(&cpu->lock);
-     qemu_cond_broadcast(&qemu_work_cond);
- }
+-void do_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data)
++void run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data)
+ {
+     struct qemu_work_item wi;
+     bool has_bql = qemu_mutex_iothread_locked();
 diff --git a/cpus.c b/cpus.c
-index 7317ae06b9..3c011ec452 100644
+index 035f41a997..8e54916169 100644
 --- a/cpus.c
 +++ b/cpus.c
-@@ -101,9 +101,9 @@ static inline bool cpu_work_list_empty(CPUState *cpu)
- {
-     bool ret;
- 
--    qemu_mutex_lock(&cpu->work_mutex);
-+    qemu_mutex_lock(&cpu->lock);
-     ret = QSIMPLEQ_EMPTY(&cpu->work_list);
--    qemu_mutex_unlock(&cpu->work_mutex);
-+    qemu_mutex_unlock(&cpu->lock);
-     return ret;
+@@ -1214,11 +1214,6 @@ void qemu_init_cpu_loop(void)
+     qemu_thread_get_self(&io_thread);
  }
  
-diff --git a/hw/core/cpu.c b/hw/core/cpu.c
-index 0f23409f1d..1cba5b6e69 100644
---- a/hw/core/cpu.c
-+++ b/hw/core/cpu.c
-@@ -369,7 +369,7 @@ static void cpu_common_initfn(Object *obj)
-     cpu->nr_cores = 1;
-     cpu->nr_threads = 1;
- 
--    qemu_mutex_init(&cpu->work_mutex);
-+    qemu_mutex_init(&cpu->lock);
-     QSIMPLEQ_INIT(&cpu->work_list);
-     QTAILQ_INIT(&cpu->breakpoints);
-     QTAILQ_INIT(&cpu->watchpoints);
-@@ -381,7 +381,7 @@ static void cpu_common_finalize(Object *obj)
+-void run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data)
+-{
+-    do_run_on_cpu(cpu, func, data);
+-}
+-
+ static void qemu_kvm_destroy_vcpu(CPUState *cpu)
  {
-     CPUState *cpu = CPU(obj);
- 
--    qemu_mutex_destroy(&cpu->work_mutex);
-+    qemu_mutex_destroy(&cpu->lock);
- }
- 
- static int64_t cpu_common_get_arch_id(CPUState *cpu)
+     if (kvm_destroy_vcpu(cpu) < 0) {
 diff --git a/include/hw/core/cpu.h b/include/hw/core/cpu.h
-index b3f4b79318..afc8081ca8 100644
+index ebff239ad3..e3f7ec06ff 100644
 --- a/include/hw/core/cpu.h
 +++ b/include/hw/core/cpu.h
-@@ -331,7 +331,8 @@ struct qemu_work_item;
-  * @opaque: User data.
-  * @mem_io_pc: Host Program Counter at which the memory was accessed.
-  * @kvm_fd: vCPU file descriptor for KVM.
-- * @work_mutex: Lock to prevent multiple access to @work_list.
-+ * @lock: Lock to prevent multiple access to per-CPU fields. Must be acquired
-+ *        after the BQL.
-  * @work_list: List of pending asynchronous work.
-  * @trace_dstate_delayed: Delayed changes to trace_dstate (includes all changes
-  *                        to @trace_dstate).
-@@ -375,7 +376,8 @@ struct CPUState {
-     uint64_t random_seed;
-     sigjmp_buf jmp_env;
+@@ -771,16 +771,6 @@ void qemu_cpu_kick(CPUState *cpu);
+  */
+ bool cpu_is_stopped(CPUState *cpu);
  
--    QemuMutex work_mutex;
-+    QemuMutex lock;
-+    /* fields below protected by @lock */
-     QSIMPLEQ_HEAD(, qemu_work_item) work_list;
- 
-     CPUAddressSpace *cpu_ases;
+-/**
+- * do_run_on_cpu:
+- * @cpu: The vCPU to run on.
+- * @func: The function to be executed.
+- * @data: Data to pass to the function.
+- *
+- * Used internally in the implementation of run_on_cpu.
+- */
+-void do_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data);
+-
+ /**
+  * run_on_cpu:
+  * @cpu: The vCPU to run on.
 -- 
 2.17.1
 
