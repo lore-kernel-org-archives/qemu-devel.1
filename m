@@ -2,73 +2,84 @@ Return-Path: <SRS0=bzpH=76=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48A05C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 15:11:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B94A3C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 15:11:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0B92F20734
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 15:11:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B92F20734
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8756D20734
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 15:11:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hLlBlDfG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8756D20734
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43032 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44270 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlZir-0008Vm-8e
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 11:11:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46138)
+	id 1jlZjJ-0000iY-Je
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 11:11:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45858)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jlZOj-0004Hn-Ug
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 10:50:41 -0400
-Resent-Date: Wed, 17 Jun 2020 10:50:41 -0400
-Resent-Message-Id: <E1jlZOj-0004Hn-Ug@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21777)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jlZOH-0003iE-AT
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 10:50:13 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46017
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jlZOY-0001zk-QH
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 10:50:41 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1592405419; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=cMHu/jAJMNOEFZv7ST1feysiaV5mlR8zoHH+8NX6QJJdMy8PNiTIperWubKxkU+97eAFLJxj5C52JpnrIySbIlzKJ5OuOWIba+T0nH5pt4lfnsBEFkxVSN8lW9SzvSev1JR7JxIZMGtViJqKGjkPzpEX6dqVe/9kWdUoEroF+Uk=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1592405419;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=k4+7onslI504gd/C9zI6UgmlkxY83+L6dWc5Zn5beTg=; 
- b=C4Y7KGQ7yKy5NLTOOd197sUkGFusvdX9ymfxcEfRGz/pOxHMS1TnIP+6fmXVigtfmilN3lRAKniEc9Y9iTxq72YvvsXZPYVIDUYxmVZOUkFrUdnRFJnj0ZQ2Ya/YK9175vbx0HZ3pXy7el7yHQw5rf6026fOzFXTWN5dRP4woss=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1592405416710296.4206774015786;
- Wed, 17 Jun 2020 07:50:16 -0700 (PDT)
-Message-ID: <159240541515.14731.6077681117453696080@d1fd068a5071>
-Subject: Re: [PATCH v4 0/8] tpm: Enable usage of TPM TIS with interrupts
-In-Reply-To: <20200617142305.1198672-1-stefanb@linux.vnet.ibm.com>
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jlZOF-0001r2-9B
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 10:50:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592405410;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=cxCDe5YbJ92Z6Vq7n4mmb7lS89YUzHq/6dTh//AJbho=;
+ b=hLlBlDfGJwzhT5c5nCxBtE+i2xsp4qHzRa8vFUWGZygQndTjfYaiziTyLWUSh6xX0ZnlIn
+ UnqOaBxNWu3m+4IjffvhnFQ1Cbh5d2E3kTNIbL+SjGoh/rVuBjqbDmfq5UDVfg+EIVJd6N
+ zwM4kF6qzZlzQK690Q77j92CyERMwgY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-401-5wOCv53TNAiBd7tyX5GZBQ-1; Wed, 17 Jun 2020 10:50:08 -0400
+X-MC-Unique: 5wOCv53TNAiBd7tyX5GZBQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3DC43100CCC9;
+ Wed, 17 Jun 2020 14:50:07 +0000 (UTC)
+Received: from linux.fritz.box.com (ovpn-114-44.ams2.redhat.com [10.36.114.44])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C860F7CAA0;
+ Wed, 17 Jun 2020 14:50:02 +0000 (UTC)
+From: Kevin Wolf <kwolf@redhat.com>
+To: qemu-block@nongnu.org
+Subject: [PULL 37/43] block: lift blocksize property limit to 2 MiB
+Date: Wed, 17 Jun 2020 16:49:03 +0200
+Message-Id: <20200617144909.192176-38-kwolf@redhat.com>
+In-Reply-To: <20200617144909.192176-1-kwolf@redhat.com>
+References: <20200617144909.192176-1-kwolf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: stefanb@linux.vnet.ibm.com
-Date: Wed, 17 Jun 2020 07:50:16 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/17 06:55:17
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/17 01:42:04
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -81,200 +92,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: stefanb@linux.vnet.ibm.com, qemu-devel@nongnu.org, eric.auger@redhat.com,
- marcandre.lureau@redhat.com, pbonzini@redhat.com, philmd@redhat.com,
- mkedzier@redhat.com
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDYxNzE0MjMwNS4xMTk4
-NjcyLTEtc3RlZmFuYkBsaW51eC52bmV0LmlibS5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFp
-bGVkIHRoZSBhc2FuIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNvbW1hbmRz
-IGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxsZWQsIHlv
-dSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJUFQgQkVH
-SU4gPT09CiMhL2Jpbi9iYXNoCmV4cG9ydCBBUkNIPXg4Nl82NAptYWtlIGRvY2tlci1pbWFnZS1m
-ZWRvcmEgVj0xIE5FVFdPUks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtZGVidWdAZmVkb3JhIFRB
-UkdFVF9MSVNUPXg4Nl82NC1zb2Z0bW11IEo9MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBF
-TkQgPT09CgogIEdFTiAgICAgZG9jcy9pbnRlcm9wL3FlbXUtcW1wLXJlZi5odG1sCiAgR0VOICAg
-ICBkb2NzL2ludGVyb3AvcWVtdS1xbXAtcmVmLnR4dAogIEdFTiAgICAgZG9jcy9pbnRlcm9wL3Fl
-bXUtcW1wLXJlZi43Ci91c3IvYmluL2xkOiAvdXNyL2xpYjY0L2NsYW5nLzEwLjAuMC9saWIvbGlu
-dXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2ludGVyY2VwdG9yc192Zm9yay5TLm8p
-OiB3YXJuaW5nOiBjb21tb24gb2YgYF9faW50ZXJjZXB0aW9uOjpyZWFsX3Zmb3JrJyBvdmVycmlk
-ZGVuIGJ5IGRlZmluaXRpb24gZnJvbSAvdXNyL2xpYjY0L2NsYW5nLzEwLjAuMC9saWIvbGludXgv
-bGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2ludGVyY2VwdG9ycy5jcHAubykKICBDQyAg
-ICAgIHFnYS9jb21tYW5kcy5vCiAgQ0MgICAgICBxZ2EvZ3Vlc3QtYWdlbnQtY29tbWFuZC1zdGF0
-ZS5vCiAgQ0MgICAgICBxZ2EvbWFpbi5vCi0tLQogIEFSICAgICAgbGlidmhvc3QtdXNlci5hCiAg
-R0VOICAgICBkb2NzL2ludGVyb3AvcWVtdS1nYS1yZWYudHh0CiAgR0VOICAgICBkb2NzL2ludGVy
-b3AvcWVtdS1nYS1yZWYuNwovdXNyL2Jpbi9sZDogL3Vzci9saWI2NC9jbGFuZy8xMC4wLjAvbGli
-L2xpbnV4L2xpYmNsYW5nX3J0LmFzYW4teDg2XzY0LmEoYXNhbl9pbnRlcmNlcHRvcnNfdmZvcmsu
-Uy5vKTogd2FybmluZzogY29tbW9uIG9mIGBfX2ludGVyY2VwdGlvbjo6cmVhbF92Zm9yaycgb3Zl
-cnJpZGRlbiBieSBkZWZpbml0aW9uIGZyb20gL3Vzci9saWI2NC9jbGFuZy8xMC4wLjAvbGliL2xp
-bnV4L2xpYmNsYW5nX3J0LmFzYW4teDg2XzY0LmEoYXNhbl9pbnRlcmNlcHRvcnMuY3BwLm8pCiAg
-TElOSyAgICBxZW11LWtleW1hcAovdXNyL2Jpbi9sZDogL3Vzci9saWI2NC9jbGFuZy8xMC4wLjAv
-bGliL2xpbnV4L2xpYmNsYW5nX3J0LmFzYW4teDg2XzY0LmEoYXNhbl9pbnRlcmNlcHRvcnNfdmZv
-cmsuUy5vKTogd2FybmluZzogY29tbW9uIG9mIGBfX2ludGVyY2VwdGlvbjo6cmVhbF92Zm9yaycg
-b3ZlcnJpZGRlbiBieSBkZWZpbml0aW9uIGZyb20gL3Vzci9saWI2NC9jbGFuZy8xMC4wLjAvbGli
-L2xpbnV4L2xpYmNsYW5nX3J0LmFzYW4teDg2XzY0LmEoYXNhbl9pbnRlcmNlcHRvcnMuY3BwLm8p
-CiAgTElOSyAgICBpdnNobWVtLWNsaWVudAogIExJTksgICAgaXZzaG1lbS1zZXJ2ZXIKICBBUyAg
-ICAgIHBjLWJpb3Mvb3B0aW9ucm9tL211bHRpYm9vdC5vCiAgQVMgICAgICBwYy1iaW9zL29wdGlv
-bnJvbS9saW51eGJvb3QubwovdXNyL2Jpbi9sZDogL3Vzci9saWI2NC9jbGFuZy8xMC4wLjAvbGli
-L2xpbnV4L2xpYmNsYW5nX3J0LmFzYW4teDg2XzY0LmEoYXNhbl9pbnRlcmNlcHRvcnNfdmZvcmsu
-Uy5vKTogd2FybmluZzogY29tbW9uIG9mIGBfX2ludGVyY2VwdGlvbjo6cmVhbF92Zm9yaycgb3Zl
-cnJpZGRlbiBieSBkZWZpbml0aW9uIGZyb20gL3Vzci9saWI2NC9jbGFuZy8xMC4wLjAvbGliL2xp
-bnV4L2xpYmNsYW5nX3J0LmFzYW4teDg2XzY0LmEoYXNhbl9pbnRlcmNlcHRvcnMuY3BwLm8pCi91
-c3IvYmluL2xkOiAvdXNyL2xpYjY0L2NsYW5nLzEwLjAuMC9saWIvbGludXgvbGliY2xhbmdfcnQu
-YXNhbi14ODZfNjQuYShhc2FuX2ludGVyY2VwdG9yc192Zm9yay5TLm8pOiB3YXJuaW5nOiBjb21t
-b24gb2YgYF9faW50ZXJjZXB0aW9uOjpyZWFsX3Zmb3JrJyBvdmVycmlkZGVuIGJ5IGRlZmluaXRp
-b24gZnJvbSAvdXNyL2xpYjY0L2NsYW5nLzEwLjAuMC9saWIvbGludXgvbGliY2xhbmdfcnQuYXNh
-bi14ODZfNjQuYShhc2FuX2ludGVyY2VwdG9ycy5jcHAubykKICBDQyAgICAgIHBjLWJpb3Mvb3B0
-aW9ucm9tL2xpbnV4Ym9vdF9kbWEubwogIEFTICAgICAgcGMtYmlvcy9vcHRpb25yb20vcHZoLm8K
-ICBBUyAgICAgIHBjLWJpb3Mvb3B0aW9ucm9tL2t2bXZhcGljLm8KLS0tCiAgQlVJTEQgICBwYy1i
-aW9zL29wdGlvbnJvbS9saW51eGJvb3RfZG1hLnJhdwogIEJVSUxEICAgcGMtYmlvcy9vcHRpb25y
-b20va3ZtdmFwaWMucmF3CiAgU0lHTiAgICBwYy1iaW9zL29wdGlvbnJvbS9tdWx0aWJvb3QuYmlu
-Ci91c3IvYmluL2xkOiAvdXNyL2xpYjY0L2NsYW5nLzEwLjAuMC9saWIvbGludXgvbGliY2xhbmdf
-cnQuYXNhbi14ODZfNjQuYShhc2FuX2ludGVyY2VwdG9yc192Zm9yay5TLm8pOiB3YXJuaW5nOiBj
-b21tb24gb2YgYF9faW50ZXJjZXB0aW9uOjpyZWFsX3Zmb3JrJyBvdmVycmlkZGVuIGJ5IGRlZmlu
-aXRpb24gZnJvbSAvdXNyL2xpYjY0L2NsYW5nLzEwLjAuMC9saWIvbGludXgvbGliY2xhbmdfcnQu
-YXNhbi14ODZfNjQuYShhc2FuX2ludGVyY2VwdG9ycy5jcHAubykKICBTSUdOICAgIHBjLWJpb3Mv
-b3B0aW9ucm9tL2xpbnV4Ym9vdC5iaW4KICBTSUdOICAgIHBjLWJpb3Mvb3B0aW9ucm9tL2xpbnV4
-Ym9vdF9kbWEuYmluCiAgTElOSyAgICBxZW11LXN0b3JhZ2UtZGFlbW9uCi0tLQogIEJVSUxEICAg
-cGMtYmlvcy9vcHRpb25yb20vcHZoLmltZwogIEJVSUxEICAgcGMtYmlvcy9vcHRpb25yb20vcHZo
-LnJhdwogIExJTksgICAgcWVtdS1pbWcKL3Vzci9iaW4vbGQ6IC91c3IvbGliNjQvY2xhbmcvMTAu
-MC4wL2xpYi9saW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFzYW5faW50ZXJjZXB0b3Jz
-X3Zmb3JrLlMubyk6IHdhcm5pbmc6IGNvbW1vbiBvZiBgX19pbnRlcmNlcHRpb246OnJlYWxfdmZv
-cmsnIG92ZXJyaWRkZW4gYnkgZGVmaW5pdGlvbiBmcm9tIC91c3IvbGliNjQvY2xhbmcvMTAuMC4w
-L2xpYi9saW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFzYW5faW50ZXJjZXB0b3JzLmNw
-cC5vKQogIFNJR04gICAgcGMtYmlvcy9vcHRpb25yb20vcHZoLmJpbgovdXNyL2Jpbi9sZDogL3Vz
-ci9saWI2NC9jbGFuZy8xMC4wLjAvbGliL2xpbnV4L2xpYmNsYW5nX3J0LmFzYW4teDg2XzY0LmEo
-YXNhbl9pbnRlcmNlcHRvcnNfdmZvcmsuUy5vKTogd2FybmluZzogY29tbW9uIG9mIGBfX2ludGVy
-Y2VwdGlvbjo6cmVhbF92Zm9yaycgb3ZlcnJpZGRlbiBieSBkZWZpbml0aW9uIGZyb20gL3Vzci9s
-aWI2NC9jbGFuZy8xMC4wLjAvbGliL2xpbnV4L2xpYmNsYW5nX3J0LmFzYW4teDg2XzY0LmEoYXNh
-bl9pbnRlcmNlcHRvcnMuY3BwLm8pCiAgTElOSyAgICBxZW11LWlvCiAgTElOSyAgICBxZW11LWVk
-aWQKL3Vzci9iaW4vbGQ6IC91c3IvbGliNjQvY2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJjbGFu
-Z19ydC5hc2FuLXg4Nl82NC5hKGFzYW5faW50ZXJjZXB0b3JzX3Zmb3JrLlMubyk6IHdhcm5pbmc6
-IGNvbW1vbiBvZiBgX19pbnRlcmNlcHRpb246OnJlYWxfdmZvcmsnIG92ZXJyaWRkZW4gYnkgZGVm
-aW5pdGlvbiBmcm9tIC91c3IvbGliNjQvY2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJjbGFuZ19y
-dC5hc2FuLXg4Nl82NC5hKGFzYW5faW50ZXJjZXB0b3JzLmNwcC5vKQogIExJTksgICAgZnNkZXYv
-dmlydGZzLXByb3h5LWhlbHBlcgogIExJTksgICAgc2NzaS9xZW11LXByLWhlbHBlcgovdXNyL2Jp
-bi9sZDogL3Vzci9saWI2NC9jbGFuZy8xMC4wLjAvbGliL2xpbnV4L2xpYmNsYW5nX3J0LmFzYW4t
-eDg2XzY0LmEoYXNhbl9pbnRlcmNlcHRvcnNfdmZvcmsuUy5vKTogd2FybmluZzogY29tbW9uIG9m
-IGBfX2ludGVyY2VwdGlvbjo6cmVhbF92Zm9yaycgb3ZlcnJpZGRlbiBieSBkZWZpbml0aW9uIGZy
-b20gL3Vzci9saWI2NC9jbGFuZy8xMC4wLjAvbGliL2xpbnV4L2xpYmNsYW5nX3J0LmFzYW4teDg2
-XzY0LmEoYXNhbl9pbnRlcmNlcHRvcnMuY3BwLm8pCi91c3IvYmluL2xkOiAvdXNyL2xpYjY0L2Ns
-YW5nLzEwLjAuMC9saWIvbGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2ludGVy
-Y2VwdG9yc192Zm9yay5TLm8pOiB3YXJuaW5nOiBjb21tb24gb2YgYF9faW50ZXJjZXB0aW9uOjpy
-ZWFsX3Zmb3JrJyBvdmVycmlkZGVuIGJ5IGRlZmluaXRpb24gZnJvbSAvdXNyL2xpYjY0L2NsYW5n
-LzEwLjAuMC9saWIvbGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2ludGVyY2Vw
-dG9ycy5jcHAubykKICBMSU5LICAgIHFlbXUtYnJpZGdlLWhlbHBlcgovdXNyL2Jpbi9sZDogL3Vz
-ci9saWI2NC9jbGFuZy8xMC4wLjAvbGliL2xpbnV4L2xpYmNsYW5nX3J0LmFzYW4teDg2XzY0LmEo
-YXNhbl9pbnRlcmNlcHRvcnNfdmZvcmsuUy5vKTogd2FybmluZzogY29tbW9uIG9mIGBfX2ludGVy
-Y2VwdGlvbjo6cmVhbF92Zm9yaycgb3ZlcnJpZGRlbiBieSBkZWZpbml0aW9uIGZyb20gL3Vzci9s
-aWI2NC9jbGFuZy8xMC4wLjAvbGliL2xpbnV4L2xpYmNsYW5nX3J0LmFzYW4teDg2XzY0LmEoYXNh
-bl9pbnRlcmNlcHRvcnMuY3BwLm8pCi91c3IvYmluL2xkOiAvdXNyL2xpYjY0L2NsYW5nLzEwLjAu
-MC9saWIvbGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2ludGVyY2VwdG9yc192
-Zm9yay5TLm8pOiB3YXJuaW5nOiBjb21tb24gb2YgYF9faW50ZXJjZXB0aW9uOjpyZWFsX3Zmb3Jr
-JyBvdmVycmlkZGVuIGJ5IGRlZmluaXRpb24gZnJvbSAvdXNyL2xpYjY0L2NsYW5nLzEwLjAuMC9s
-aWIvbGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2ludGVyY2VwdG9ycy5jcHAu
-bykKICBMSU5LICAgIHZpcnRpb2ZzZAovdXNyL2Jpbi9sZDogL3Vzci9saWI2NC9jbGFuZy8xMC4w
-LjAvbGliL2xpbnV4L2xpYmNsYW5nX3J0LmFzYW4teDg2XzY0LmEoYXNhbl9pbnRlcmNlcHRvcnNf
-dmZvcmsuUy5vKTogd2FybmluZzogY29tbW9uIG9mIGBfX2ludGVyY2VwdGlvbjo6cmVhbF92Zm9y
-aycgb3ZlcnJpZGRlbiBieSBkZWZpbml0aW9uIGZyb20gL3Vzci9saWI2NC9jbGFuZy8xMC4wLjAv
-bGliL2xpbnV4L2xpYmNsYW5nX3J0LmFzYW4teDg2XzY0LmEoYXNhbl9pbnRlcmNlcHRvcnMuY3Bw
-Lm8pCiAgTElOSyAgICB2aG9zdC11c2VyLWlucHV0Ci91c3IvYmluL2xkOiAvdXNyL2xpYjY0L2Ns
-YW5nLzEwLjAuMC9saWIvbGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2ludGVy
-Y2VwdG9yc192Zm9yay5TLm8pOiB3YXJuaW5nOiBjb21tb24gb2YgYF9faW50ZXJjZXB0aW9uOjpy
-ZWFsX3Zmb3JrJyBvdmVycmlkZGVuIGJ5IGRlZmluaXRpb24gZnJvbSAvdXNyL2xpYjY0L2NsYW5n
-LzEwLjAuMC9saWIvbGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2ludGVyY2Vw
-dG9ycy5jcHAubykKICBMSU5LICAgIHFlbXUtZ2EKL3Vzci9iaW4vbGQ6IC91c3IvbGliNjQvY2xh
-bmcvMTAuMC4wL2xpYi9saW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFzYW5faW50ZXJj
-ZXB0b3JzX3Zmb3JrLlMubyk6IHdhcm5pbmc6IGNvbW1vbiBvZiBgX19pbnRlcmNlcHRpb246OnJl
-YWxfdmZvcmsnIG92ZXJyaWRkZW4gYnkgZGVmaW5pdGlvbiBmcm9tIC91c3IvbGliNjQvY2xhbmcv
-MTAuMC4wL2xpYi9saW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFzYW5faW50ZXJjZXB0
-b3JzLmNwcC5vKQogIEdFTiAgICAgeDg2XzY0LXNvZnRtbXUvaG1wLWNvbW1hbmRzLmgKICBHRU4g
-ICAgIHg4Nl82NC1zb2Z0bW11L2htcC1jb21tYW5kcy1pbmZvLmgKICBHRU4gICAgIHg4Nl82NC1z
-b2Z0bW11L2NvbmZpZy1kZXZpY2VzLmgKLS0tCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS9ody9z
-Y3NpL3Zob3N0LXNjc2kubwogIENDICAgICAgeDg2XzY0LXNvZnRtbXUvaHcvc2NzaS92aG9zdC11
-c2VyLXNjc2kubwogIENDICAgICAgeDg2XzY0LXNvZnRtbXUvaHcvdHBtL3RwbV9wcGkubwovdG1w
-L3FlbXUtdGVzdC9zcmMvZnB1L3NvZnRmbG9hdC5jOjMzNjU6MTM6IGVycm9yOiBiaXR3aXNlIG5l
-Z2F0aW9uIG9mIGEgYm9vbGVhbiBleHByZXNzaW9uOyBkaWQgeW91IG1lYW4gbG9naWNhbCBuZWdh
-dGlvbj8gWy1XZXJyb3IsLVdib29sLW9wZXJhdGlvbl0KICAgIGFic1ogJj0gfiAoICggKCByb3Vu
-ZEJpdHMgXiAweDQwICkgPT0gMCApICYgcm91bmROZWFyZXN0RXZlbiApOwogICAgICAgICAgICBe
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn4KICAg
-ICAgICAgICAgIQovdG1wL3FlbXUtdGVzdC9zcmMvZnB1L3NvZnRmbG9hdC5jOjM0MjM6MTg6IGVy
-cm9yOiBiaXR3aXNlIG5lZ2F0aW9uIG9mIGEgYm9vbGVhbiBleHByZXNzaW9uOyBkaWQgeW91IG1l
-YW4gbG9naWNhbCBuZWdhdGlvbj8gWy1XZXJyb3IsLVdib29sLW9wZXJhdGlvbl0KICAgICAgICBh
-YnNaMCAmPSB+ICggKCAodWludDY0X3QpICggYWJzWjE8PDEgKSA9PSAwICkgJiByb3VuZE5lYXJl
-c3RFdmVuICk7CiAgICAgICAgICAgICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+CiAgICAgICAgICAgICAgICAgIQovdG1wL3FlbXUt
-dGVzdC9zcmMvZnB1L3NvZnRmbG9hdC5jOjM0ODM6MTg6IGVycm9yOiBiaXR3aXNlIG5lZ2F0aW9u
-IG9mIGEgYm9vbGVhbiBleHByZXNzaW9uOyBkaWQgeW91IG1lYW4gbG9naWNhbCBuZWdhdGlvbj8g
-Wy1XZXJyb3IsLVdib29sLW9wZXJhdGlvbl0KICAgICAgICBhYnNaMCAmPSB+KCgodWludDY0X3Qp
-KGFic1oxPDwxKSA9PSAwKSAmIHJvdW5kTmVhcmVzdEV2ZW4pOwogICAgICAgICAgICAgICAgIF5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn4KICAgICAgICAg
-ICAgICAgICAhCi90bXAvcWVtdS10ZXN0L3NyYy9mcHUvc29mdGZsb2F0LmM6MzYwNjoxMzogZXJy
-b3I6IGJpdHdpc2UgbmVnYXRpb24gb2YgYSBib29sZWFuIGV4cHJlc3Npb247IGRpZCB5b3UgbWVh
-biBsb2dpY2FsIG5lZ2F0aW9uPyBbLVdlcnJvciwtV2Jvb2wtb3BlcmF0aW9uXQogICAgelNpZyAm
-PSB+ICggKCAoIHJvdW5kQml0cyBeIDB4NDAgKSA9PSAwICkgJiByb3VuZE5lYXJlc3RFdmVuICk7
-CiAgICAgICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fgogICAgICAgICAgICAhCi90bXAvcWVtdS10ZXN0L3NyYy9mcHUvc29mdGZsb2F0
-LmM6Mzc2MDoxMzogZXJyb3I6IGJpdHdpc2UgbmVnYXRpb24gb2YgYSBib29sZWFuIGV4cHJlc3Np
-b247IGRpZCB5b3UgbWVhbiBsb2dpY2FsIG5lZ2F0aW9uPyBbLVdlcnJvciwtV2Jvb2wtb3BlcmF0
-aW9uXQogICAgelNpZyAmPSB+ICggKCAoIHJvdW5kQml0cyBeIDB4MjAwICkgPT0gMCApICYgcm91
-bmROZWFyZXN0RXZlbiApOwogICAgICAgICAgICBefn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+CiAgICAgICAgICAgICEKL3RtcC9xZW11LXRlc3Qv
-c3JjL2ZwdS9zb2Z0ZmxvYXQuYzozOTg3OjIxOiBlcnJvcjogYml0d2lzZSBuZWdhdGlvbiBvZiBh
-IGJvb2xlYW4gZXhwcmVzc2lvbjsgZGlkIHlvdSBtZWFuIGxvZ2ljYWwgbmVnYXRpb24/IFstV2Vy
-cm9yLC1XYm9vbC1vcGVyYXRpb25dCiAgICAgICAgICAgICAgICAgICAgfiAoICggKHVpbnQ2NF90
-KSAoIHpTaWcxPDwxICkgPT0gMCApICYgcm91bmROZWFyZXN0RXZlbiApOwogICAgICAgICAgICAg
-ICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fgogICAgICAgICAgICAgICAgICAgICEKL3RtcC9xZW11LXRlc3Qvc3JjL2ZwdS9zb2Z0
-ZmxvYXQuYzo0MDAzOjIyOiBlcnJvcjogYml0d2lzZSBuZWdhdGlvbiBvZiBhIGJvb2xlYW4gZXhw
-cmVzc2lvbjsgZGlkIHlvdSBtZWFuIGxvZ2ljYWwgbmVnYXRpb24/IFstV2Vycm9yLC1XYm9vbC1v
-cGVyYXRpb25dCiAgICAgICAgICAgIHpTaWcwICY9IH4gKCAoICh1aW50NjRfdCkgKCB6U2lnMTw8
-MSApID09IDAgKSAmIHJvdW5kTmVhcmVzdEV2ZW4gKTsKICAgICAgICAgICAgICAgICAgICAgXn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+CiAg
-ICAgICAgICAgICAgICAgICAgICEKL3RtcC9xZW11LXRlc3Qvc3JjL2ZwdS9zb2Z0ZmxvYXQuYzo0
-MjczOjE4OiBlcnJvcjogYml0d2lzZSBuZWdhdGlvbiBvZiBhIGJvb2xlYW4gZXhwcmVzc2lvbjsg
-ZGlkIHlvdSBtZWFuIGxvZ2ljYWwgbmVnYXRpb24/IFstV2Vycm9yLC1XYm9vbC1vcGVyYXRpb25d
-CiAgICAgICAgelNpZzEgJj0gfiAoICggelNpZzIgKyB6U2lnMiA9PSAwICkgJiByb3VuZE5lYXJl
-c3RFdmVuICk7CiAgICAgICAgICAgICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn4KICAgICAgICAgICAgICAgICAhCjggZXJyb3JzIGdlbmVyYXRlZC4K
-bWFrZVsxXTogKioqIFsvdG1wL3FlbXUtdGVzdC9zcmMvcnVsZXMubWFrOjY5OiBmcHUvc29mdGZs
-b2F0Lm9dIEVycm9yIDEKbWFrZVsxXTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4u
-Li4KL3RtcC9xZW11LXRlc3Qvc3JjL21pZ3JhdGlvbi9yYW0uYzo5MTk6NDU6IGVycm9yOiBpbXBs
-aWNpdCBjb252ZXJzaW9uIGZyb20gJ3Vuc2lnbmVkIGxvbmcnIHRvICdkb3VibGUnIGNoYW5nZXMg
-dmFsdWUgZnJvbSAxODQ0Njc0NDA3MzcwOTU1MTYxNSB0byAxODQ0Njc0NDA3MzcwOTU1MTYxNiBb
-LVdlcnJvciwtV2ltcGxpY2l0LWludC1mbG9hdC1jb252ZXJzaW9uXQogICAgICAgICAgICB4Ynpy
-bGVfY291bnRlcnMuZW5jb2RpbmdfcmF0ZSA9IFVJTlQ2NF9NQVg7CiAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIH4gXn5+fn5+fn5+fgovdXNyL2luY2x1ZGUvc3RkaW50
-Lmg6MTMwOjIzOiBub3RlOiBleHBhbmRlZCBmcm9tIG1hY3JvICdVSU5UNjRfTUFYJwotLS0KMTg0
-NDY3NDQwNzM3MDk1NTE2MTVVTApefn5+fn5+fn5+fn5+fn5+fn5+fn5+CjEgZXJyb3IgZ2VuZXJh
-dGVkLgptYWtlWzFdOiAqKiogWy90bXAvcWVtdS10ZXN0L3NyYy9ydWxlcy5tYWs6Njk6IG1pZ3Jh
-dGlvbi9yYW0ub10gRXJyb3IgMQptYWtlOiAqKiogW01ha2VmaWxlOjUyNzogeDg2XzY0LXNvZnRt
-bXUvYWxsXSBFcnJvciAyClRyYWNlYmFjayAobW9zdCByZWNlbnQgY2FsbCBsYXN0KToKICBGaWxl
-ICIuL3Rlc3RzL2RvY2tlci9kb2NrZXIucHkiLCBsaW5lIDY2OSwgaW4gPG1vZHVsZT4KICAgIHN5
-cy5leGl0KG1haW4oKSkKLS0tCiAgICByYWlzZSBDYWxsZWRQcm9jZXNzRXJyb3IocmV0Y29kZSwg
-Y21kKQpzdWJwcm9jZXNzLkNhbGxlZFByb2Nlc3NFcnJvcjogQ29tbWFuZCAnWydzdWRvJywgJy1u
-JywgJ2RvY2tlcicsICdydW4nLCAnLS1sYWJlbCcsICdjb20ucWVtdS5pbnN0YW5jZS51dWlkPTFl
-YjgyMTE2ZTI1NzQwYTY4ZjBmODJlODNjY2U2NmFkJywgJy11JywgJzEwMDMnLCAnLS1zZWN1cml0
-eS1vcHQnLCAnc2VjY29tcD11bmNvbmZpbmVkJywgJy0tcm0nLCAnLWUnLCAnVEFSR0VUX0xJU1Q9
-eDg2XzY0LXNvZnRtbXUnLCAnLWUnLCAnRVhUUkFfQ09ORklHVVJFX09QVFM9JywgJy1lJywgJ1Y9
-JywgJy1lJywgJ0o9MTQnLCAnLWUnLCAnREVCVUc9JywgJy1lJywgJ1NIT1dfRU5WPScsICctZScs
-ICdDQ0FDSEVfRElSPS92YXIvdG1wL2NjYWNoZScsICctdicsICcvaG9tZS9wYXRjaGV3Mi8uY2Fj
-aGUvcWVtdS1kb2NrZXItY2NhY2hlOi92YXIvdG1wL2NjYWNoZTp6JywgJy12JywgJy92YXIvdG1w
-L3BhdGNoZXctdGVzdGVyLXRtcC00Mm9qaTJtbC9zcmMvZG9ja2VyLXNyYy4yMDIwLTA2LTE3LTEw
-LjQ2LjA3LjEyNzY5Oi92YXIvdG1wL3FlbXU6eixybycsICdxZW11OmZlZG9yYScsICcvdmFyL3Rt
-cC9xZW11L3J1bicsICd0ZXN0LWRlYnVnJ10nIHJldHVybmVkIG5vbi16ZXJvIGV4aXQgc3RhdHVz
-IDIuCmZpbHRlcj0tLWZpbHRlcj1sYWJlbD1jb20ucWVtdS5pbnN0YW5jZS51dWlkPTFlYjgyMTE2
-ZTI1NzQwYTY4ZjBmODJlODNjY2U2NmFkCm1ha2VbMV06ICoqKiBbZG9ja2VyLXJ1bl0gRXJyb3Ig
-MQptYWtlWzFdOiBMZWF2aW5nIGRpcmVjdG9yeSBgL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1w
-LTQyb2ppMm1sL3NyYycKbWFrZTogKioqIFtkb2NrZXItcnVuLXRlc3QtZGVidWdAZmVkb3JhXSBF
-cnJvciAyCgpyZWFsICAgIDRtNy44MzRzCnVzZXIgICAgMG04LjE2NHMKCgpUaGUgZnVsbCBsb2cg
-aXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMjAwNjE3MTQyMzA1LjEx
-OTg2NzItMS1zdGVmYW5iQGxpbnV4LnZuZXQuaWJtLmNvbS90ZXN0aW5nLmFzYW4vP3R5cGU9bWVz
-c2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBz
-Oi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRl
-dmVsQHJlZGhhdC5jb20=
+From: Roman Kagan <rvkagan@yandex-team.ru>
+
+Logical and physical block sizes in QEMU are limited to 32 KiB.
+
+This appears unnecessarily tight, and we've seen bigger block sizes
+handy at times.
+
+Lift the limitation up to 2 MiB which appears to be good enough for
+everybody, and matches the qcow2 cluster size limit.
+
+Signed-off-by: Roman Kagan <rvkagan@yandex-team.ru>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Message-Id: <20200528225516.1676602-9-rvkagan@yandex-team.ru>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ hw/core/qdev-properties.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+index 63d48db70c..ead35d7ffd 100644
+--- a/hw/core/qdev-properties.c
++++ b/hw/core/qdev-properties.c
+@@ -784,9 +784,12 @@ const PropertyInfo qdev_prop_size32 = {
+ /* lower limit is sector size */
+ #define MIN_BLOCK_SIZE          512
+ #define MIN_BLOCK_SIZE_STR      "512 B"
+-/* upper limit is the max power of 2 that fits in uint16_t */
+-#define MAX_BLOCK_SIZE          (32 * KiB)
+-#define MAX_BLOCK_SIZE_STR      "32 KiB"
++/*
++ * upper limit is arbitrary, 2 MiB looks sufficient for all sensible uses, and
++ * matches qcow2 cluster size limit
++ */
++#define MAX_BLOCK_SIZE          (2 * MiB)
++#define MAX_BLOCK_SIZE_STR      "2 MiB"
+ 
+ static void set_blocksize(Object *obj, Visitor *v, const char *name,
+                           void *opaque, Error **errp)
+-- 
+2.25.4
+
 
