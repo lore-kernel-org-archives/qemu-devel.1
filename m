@@ -6,76 +6,76 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49996C433E1
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41076C433E0
 	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 14:27:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 15D6E2083B
+	by mail.kernel.org (Postfix) with ESMTPS id 15709207DD
 	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 14:27:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15D6E2083B
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15709207DD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36872 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36922 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlZ2c-0000TA-Bl
+	id 1jlZ2c-0000UM-Cs
 	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 10:27:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37370)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37346)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <stefanb@linux.vnet.ibm.com>)
- id 1jlYyF-0001n4-Vl
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 10:23:20 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:20080
+ id 1jlYyE-0001i9-3V
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 10:23:18 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:11876
  helo=mx0a-001b2d01.pphosted.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <stefanb@linux.vnet.ibm.com>)
- id 1jlYyE-0005MY-6P
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 10:23:19 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+ id 1jlYyC-0005ME-EC
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 10:23:17 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
  by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 05HE2tAR162904
- for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 10:23:17 -0400
+ 05HE4N2K056545
+ for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 10:23:15 -0400
 Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 31q6gtsapm-1
+ by mx0b-001b2d01.pphosted.com with ESMTP id 31q6hpy1t5-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 10:23:17 -0400
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05HE3O86165065
- for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 10:23:16 -0400
-Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com
- [169.55.85.253])
- by mx0b-001b2d01.pphosted.com with ESMTP id 31q6gtsap6-1
+ for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 10:23:15 -0400
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05HE61Vo060660
+ for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 10:23:15 -0400
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com
+ [169.62.189.11])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 31q6hpy1su-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 17 Jun 2020 10:23:16 -0400
-Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
- by ppma01wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05HEFSTG018586;
- Wed, 17 Jun 2020 14:23:16 GMT
-Received: from b03cxnp08028.gho.boulder.ibm.com
- (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
- by ppma01wdc.us.ibm.com with ESMTP id 31q6bd3xe5-1
+ Wed, 17 Jun 2020 10:23:15 -0400
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+ by ppma03dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05HEExbo029898;
+ Wed, 17 Jun 2020 14:23:14 GMT
+Received: from b03cxnp08026.gho.boulder.ibm.com
+ (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
+ by ppma03dal.us.ibm.com with ESMTP id 31q6c5kdpa-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 17 Jun 2020 14:23:16 +0000
+ Wed, 17 Jun 2020 14:23:14 +0000
 Received: from b03ledav004.gho.boulder.ibm.com
  (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
- by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 05HENFIi20644228
+ by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 05HENB9q30540204
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 17 Jun 2020 14:23:15 GMT
+ Wed, 17 Jun 2020 14:23:11 GMT
 Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 0CBD078060;
- Wed, 17 Jun 2020 14:23:15 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 490007805C;
+ Wed, 17 Jun 2020 14:23:13 +0000 (GMT)
 Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 4A7007805F;
- Wed, 17 Jun 2020 14:23:14 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 6EC1C7805F;
+ Wed, 17 Jun 2020 14:23:12 +0000 (GMT)
 Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
  by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
- Wed, 17 Jun 2020 14:23:14 +0000 (GMT)
+ Wed, 17 Jun 2020 14:23:12 +0000 (GMT)
 From: Stefan Berger <stefanb@linux.vnet.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 8/8] tpm: Disable interrupt support for TIS on sysbus
-Date: Wed, 17 Jun 2020 10:23:05 -0400
-Message-Id: <20200617142305.1198672-9-stefanb@linux.vnet.ibm.com>
+Subject: [PATCH v4 6/8] tests: Add updated DSDT
+Date: Wed, 17 Jun 2020 10:23:03 -0400
+Message-Id: <20200617142305.1198672-7-stefanb@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200617142305.1198672-1-stefanb@linux.vnet.ibm.com>
 References: <20200617142305.1198672-1-stefanb@linux.vnet.ibm.com>
@@ -87,12 +87,11 @@ X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
  definitions=2020-06-17_04:2020-06-17,
  2020-06-17 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- lowpriorityscore=0
- malwarescore=0 suspectscore=1 mlxscore=0 mlxlogscore=734 impostorscore=0
- clxscore=1015 phishscore=0 adultscore=0 spamscore=0 bulkscore=0
- priorityscore=1501 cotscore=-2147483648 classifier=spam adjust=0
- reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2006170105
+ adultscore=0 malwarescore=0
+ bulkscore=0 phishscore=0 priorityscore=1501 suspectscore=1 mlxlogscore=945
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 spamscore=0 impostorscore=0
+ cotscore=-2147483648 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2004280000 definitions=main-2006170105
 Received-SPF: none client-ip=148.163.158.5;
  envelope-from=stefanb@linux.vnet.ibm.com; helo=mx0a-001b2d01.pphosted.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/17 10:23:10
@@ -114,35 +113,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Berger <stefanb@linux.vnet.ibm.com>, eric.auger@redhat.com,
+Cc: Stefan Berger <stefanb@linux.vnet.ibm.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>, eric.auger@redhat.com,
  pbonzini@redhat.com, marcandre.lureau@redhat.com, philmd@redhat.com,
  mkedzier@redhat.com, Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Disable interrupt support for the TIS on sysbus.
+Add the updated DSDT following the interrupt enablement.
+
+@@ -5,13 +5,13 @@
+  *
+  * Disassembling to symbolic ASL+ operators
+  *
+- * Disassembly of tests/data/acpi/q35/DSDT.tis, Mon Jun 15 09:57:05 2020
++ * Disassembly of /tmp/aml-Y77YL0, Mon Jun 15 09:57:05 2020
+  *
+  * Original Table Header:
+  *     Signature        "DSDT"
+- *     Length           0x000020A5 (8357)
++ *     Length           0x000020A8 (8360)
+  *     Revision         0x01 **** 32-bit table (V1), no 64-bit math support
+- *     Checksum         0xAD
++ *     Checksum         0x77
+  *     OEM ID           "BOCHS "
+  *     OEM Table ID     "BXPCDSDT"
+  *     OEM Revision     0x00000001 (1)
+@@ -3162,6 +3162,8 @@
+                         0xFED40000,         // Address Base
+                         0x00005000,         // Address Length
+                         )
++                    IRQNoFlags ()
++                        {13}
+                 })
+                 OperationRegion (TPP2, SystemMemory, 0xFED45100, 0x5A)
+                 Field (TPP2, AnyAcc, NoLock, Preserve)
+**
 
 Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
 Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-Message-id: 20200616205721.1191408-9-stefanb@linux.vnet.ibm.com
+Message-id: 20200616205721.1191408-7-stefanb@linux.vnet.ibm.com
+CC: Michael S. Tsirkin <mst@redhat.com>
 ---
- include/hw/acpi/tpm.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tests/data/acpi/q35/DSDT.tis                | Bin 8357 -> 8360 bytes
+ tests/qtest/bios-tables-test-allowed-diff.h |   1 -
+ 2 files changed, 1 deletion(-)
 
-diff --git a/include/hw/acpi/tpm.h b/include/hw/acpi/tpm.h
-index d356f2e06e..21f81690a5 100644
---- a/include/hw/acpi/tpm.h
-+++ b/include/hw/acpi/tpm.h
-@@ -25,7 +25,7 @@
- #define TPM_TIS_ADDR_SIZE           0x5000
- 
- #define TPM_TIS_ISA_IRQ             13    /* only one possible */
--#define TPM_TIS_SYSBUS_IRQ          5
-+#define TPM_TIS_SYSBUS_IRQ          TPM_IRQ_DISABLED
- 
- #define TPM_TIS_NUM_LOCALITIES      5     /* per spec */
- #define TPM_TIS_LOCALITY_SHIFT      12
+diff --git a/tests/data/acpi/q35/DSDT.tis b/tests/data/acpi/q35/DSDT.tis
+index 56b6fb0c3298517d080e38fea05a748b9f1dba54..3f9db960aa05d399fa7f8449e6db688788211832 100644
+GIT binary patch
+delta 64
+zcmZ4LxWbXkCD<iog#rTuWBEp|KeC)oS~2m#PVoX>llkS`nVeK7N60A%iEs(FaWXJ6
+UFkJb^5Wv8o#GtUbT~3Y(068!Z;Q#;t
+
+delta 61
+zcmZ4CxYUu$CD<iosR9E7<Jyf}e`GoRHDls~o#F-DC-cj>Gx@7bj*wH}7v$n=<78lD
+RV7T&+A%KBlbC;YP695=#58(g+
+
+diff --git a/tests/qtest/bios-tables-test-allowed-diff.h b/tests/qtest/bios-tables-test-allowed-diff.h
+index bb4ce8967b..dfb8523c8b 100644
+--- a/tests/qtest/bios-tables-test-allowed-diff.h
++++ b/tests/qtest/bios-tables-test-allowed-diff.h
+@@ -1,2 +1 @@
+ /* List of comma-separated changed AML files to ignore */
+-"tests/data/acpi/q35/DSDT.tis",
 -- 
 2.24.1
 
