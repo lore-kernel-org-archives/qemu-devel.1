@@ -4,82 +4,82 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A88BBC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 21:18:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED7E2C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 21:20:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 74B7A2166E
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 21:18:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B1DCA2098B
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 21:20:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="E22g1j7g"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74B7A2166E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RQ63kTM3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1DCA2098B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34874 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41348 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlfS6-0003Qy-Kc
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 17:18:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37444)
+	id 1jlfTz-0006Vc-Sr
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 17:20:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37656)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1jlfE7-0003Gi-3A
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 17:04:07 -0400
-Received: from mail-qk1-x744.google.com ([2607:f8b0:4864:20::744]:39455)
+ id 1jlfEH-0003aT-N3
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 17:04:17 -0400
+Received: from mail-qk1-x743.google.com ([2607:f8b0:4864:20::743]:43937)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1jlfDu-0008Uh-B4
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 17:04:06 -0400
-Received: by mail-qk1-x744.google.com with SMTP id w3so3495306qkb.6
- for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 14:03:53 -0700 (PDT)
+ id 1jlfEF-00009C-J2
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 17:04:17 -0400
+Received: by mail-qk1-x743.google.com with SMTP id j68so140069qkb.10
+ for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 14:04:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=0Pwj8GypD7Z+8gMlM2oBcpPOEswoZuhb40JEwUc+M6A=;
- b=E22g1j7gZAOIPfrauv7unDiVj8oaEUe996v6ANRYFpjRygV8JeJp7JnHGJ9sQ3wzhW
- 1BsMgIeaEStlO58KPdX4myJwvz4+OYjDEkwiXK5sRS4SJsa6YFA8L/VdJezBDtw8RlpZ
- fvjSmD4anJrNztLldX54PGIahyFY2fl05q/vbwTxJCl4v57DQi1MoSewIvTjlevG8fuy
- J0ijf9qp/gjHOIKpgTQlMXs1Iem/w3hHTfW9pT9xsvLbAY4B2pPyVDMadOZQ0w6Cp6NG
- kqPK1AAq/lF6kM/DP70rwv+ytPSS9TwG1DLBvFFXoZ6Y94mlOO4QPedKMvAjgear9e92
- QYqQ==
+ bh=bMJDR0op9yYxk4Q3uQ7Lh3faQWxq/2pZw+Fv/nrXz+A=;
+ b=RQ63kTM3AKz8TNyE0qqe3WkxI4DWPU9SoW1W8pf9NzcSXpE0kY0LeFIbtftZnxkj4x
+ xZuG7uhNcOEJpQEDpXhvC4mN6Up5589I6u4feY9dRApjrGtw0jzbP/VS3RgTMf+3aBMs
+ KTTbCR481jg527+8nsl8LO+Vk/i0cl2OV8eCwCMyefErmZD3bZ1vHgf1mAxZ2ABZZCPj
+ fT0xXvOy6UqjOHQopPv8256ETNp9vw1p7oH/cVAr7hjf0NIgnlygj/9hIa6OTvoYpio8
+ yEHxkxu+nZ+YVDtvv47ypap+qoRvdvBgWhM6O73KoW/1Uk32RfTR5O74JLUdSLiGrb3n
+ Zk+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=0Pwj8GypD7Z+8gMlM2oBcpPOEswoZuhb40JEwUc+M6A=;
- b=MG/WZZNWDETqDIEDa9qKWb/osO4OtBRB0ZUJCpjf2EzZJ1fppSudIxMPwaF3mwYPrL
- 80KpcUMkOrRXxWyJVYIXi0kI77/Fd51av1qQGjaq4XLszAPBWeOMgAQasyh86hAUXzEk
- /kpyqWnsY8wHthHyvmXQ7XVBBYpFJ3jBcqssXVTtI1XpPT2grKKVoNVUWEn/W/B//GJL
- U2QVUIwN3zD44Q6CqDmFMAoy/Syrk60wvb3QP3sMdsy7w4W6Ggs0SKYJsw24xyH5NgHK
- D9XVMnAzSicc1ZX3VXq/MAzj4koOzgKBJBp+eSSnpLfadguUxlb07YQg6PYh47FHQppX
- wu3g==
-X-Gm-Message-State: AOAM5325I/BimmgTgxxK5zeAdVUHSrwQMiaBsj191Y+bIbvJSW/i1J24
- dlvJvTRw1ZrP3zjLM8lGS82lSkrYQeUYIg==
-X-Google-Smtp-Source: ABdhPJzlKRp2NDu/gUXDi9F0/HaA3mZ3hM17T4JGipI3qmbNMkwikHPTCSbzlin/KWSydx932iAmbw==
-X-Received: by 2002:a37:6813:: with SMTP id d19mr592483qkc.11.1592427832576;
- Wed, 17 Jun 2020 14:03:52 -0700 (PDT)
+ bh=bMJDR0op9yYxk4Q3uQ7Lh3faQWxq/2pZw+Fv/nrXz+A=;
+ b=q2PgbqpYXAvRDQTXAWTocHCJI2PR9vhI3SCgp+QzpYKrGiBzYRy06Wqx+wCO/VX1Oi
+ QwASCsbAK+YcofbJk4svNJCpvv1gaK+LFA27UEDjrVl280tS+6+n10iLoYUI5+MY/igU
+ uxX6SFed/C6EcImdciZJBP54bQq1XuL28330oHjakB7YPOL7oaA1SWFsKIM27THYzPFR
+ dthz5cUJXMxGY7IKt3LCJVuZ4nXmCt/l6vQHiw/JCEcSyjYk/1FV00h2yIJTFFpPLbFe
+ cOXLFfN9+drd6sDSIxNO+rV4vygvDiyHCKUyVy9EK0Ugag1pCLsgrlSH3kiHrGpmW87e
+ QrLg==
+X-Gm-Message-State: AOAM533bj7LhLy9QAj0d2P2TWCnueGw+/iKJB/JjJrCuJ1MYom1coicA
+ h1J3ZJDz7yfoHmFGG/XvED1/8Y2krRiQ2g==
+X-Google-Smtp-Source: ABdhPJznqaLvi+9naqRjgbuk4+KNhEW9buBCGiCCF3iJ7TMvCWyNwsADfAY+cpYywUMGIYMeZlcjcA==
+X-Received: by 2002:a37:5e07:: with SMTP id s7mr625733qkb.20.1592427854372;
+ Wed, 17 Jun 2020 14:04:14 -0700 (PDT)
 Received: from Rfoley-MA01.hsd1.ma.comcast.net
  ([2601:199:4480:60c0:fc79:714c:9711:2e9c])
- by smtp.gmail.com with ESMTPSA id w13sm997245qkb.91.2020.06.17.14.03.51
+ by smtp.gmail.com with ESMTPSA id w13sm997245qkb.91.2020.06.17.14.04.13
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 17 Jun 2020 14:03:51 -0700 (PDT)
+ Wed, 17 Jun 2020 14:04:13 -0700 (PDT)
 From: Robert Foley <robert.foley@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v10 25/73] s390x: convert to cpu_halted
-Date: Wed, 17 Jun 2020 17:01:43 -0400
-Message-Id: <20200617210231.4393-26-robert.foley@linaro.org>
+Subject: [PATCH v10 40/73] i386/kvm: convert to cpu_interrupt_request
+Date: Wed, 17 Jun 2020 17:01:58 -0400
+Message-Id: <20200617210231.4393-41-robert.foley@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200617210231.4393-1-robert.foley@linaro.org>
 References: <20200617210231.4393-1-robert.foley@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::744;
- envelope-from=robert.foley@linaro.org; helo=mail-qk1-x744.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::743;
+ envelope-from=robert.foley@linaro.org; helo=mail-qk1-x743.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -101,171 +101,183 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, robert.foley@linaro.org,
- David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- cota@braap.org, peter.puhov@linaro.org, alex.bennee@linaro.org,
- Richard Henderson <rth@twiddle.net>
+Cc: robert.foley@linaro.org, "open list:X86 KVM CPUs" <kvm@vger.kernel.org>,
+ Marcelo Tosatti <mtosatti@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ cota@braap.org, Paolo Bonzini <pbonzini@redhat.com>, peter.puhov@linaro.org,
+ alex.bennee@linaro.org, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: "Emilio G. Cota" <cota@braap.org>
 
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: David Hildenbrand <david@redhat.com>
-Cc: qemu-s390x@nongnu.org
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 Signed-off-by: Robert Foley <robert.foley@linaro.org>
 ---
- hw/intc/s390_flic.c        |  2 +-
- target/s390x/cpu.c         | 22 +++++++++++++++-------
- target/s390x/excp_helper.c |  2 +-
- target/s390x/kvm.c         |  2 +-
- target/s390x/sigp.c        |  8 ++++----
- 5 files changed, 22 insertions(+), 14 deletions(-)
+ target/i386/kvm.c | 58 ++++++++++++++++++++++++++++-------------------
+ 1 file changed, 35 insertions(+), 23 deletions(-)
 
-diff --git a/hw/intc/s390_flic.c b/hw/intc/s390_flic.c
-index aacdb1bbc2..46ec8272c0 100644
---- a/hw/intc/s390_flic.c
-+++ b/hw/intc/s390_flic.c
-@@ -200,7 +200,7 @@ static void qemu_s390_flic_notify(uint32_t type)
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 8628fa9111..415a6d8114 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -3653,11 +3653,14 @@ static int kvm_put_vcpu_events(X86CPU *cpu, int level)
+         events.smi.smm = !!(env->hflags & HF_SMM_MASK);
+         events.smi.smm_inside_nmi = !!(env->hflags2 & HF2_SMM_INSIDE_NMI_MASK);
+         if (kvm_irqchip_in_kernel()) {
++            uint32_t interrupt_request;
++
+             /* As soon as these are moved to the kernel, remove them
+              * from cs->interrupt_request.
+              */
+-            events.smi.pending = cs->interrupt_request & CPU_INTERRUPT_SMI;
+-            events.smi.latched_init = cs->interrupt_request & CPU_INTERRUPT_INIT;
++            interrupt_request = cpu_interrupt_request(cs);
++            events.smi.pending = interrupt_request & CPU_INTERRUPT_SMI;
++            events.smi.latched_init = interrupt_request & CPU_INTERRUPT_INIT;
+             cpu_reset_interrupt(cs, CPU_INTERRUPT_INIT | CPU_INTERRUPT_SMI);
+         } else {
+             /* Keep these in cs->interrupt_request.  */
+@@ -4015,14 +4018,14 @@ void kvm_arch_pre_run(CPUState *cpu, struct kvm_run *run)
+ {
+     X86CPU *x86_cpu = X86_CPU(cpu);
+     CPUX86State *env = &x86_cpu->env;
++    uint32_t interrupt_request;
+     int ret;
+ 
++    interrupt_request = cpu_interrupt_request(cpu);
+     /* Inject NMI */
+-    if (cpu->interrupt_request & (CPU_INTERRUPT_NMI | CPU_INTERRUPT_SMI)) {
+-        if (cpu->interrupt_request & CPU_INTERRUPT_NMI) {
+-            qemu_mutex_lock_iothread();
++    if (interrupt_request & (CPU_INTERRUPT_NMI | CPU_INTERRUPT_SMI)) {
++        if (interrupt_request & CPU_INTERRUPT_NMI) {
+             cpu_reset_interrupt(cpu, CPU_INTERRUPT_NMI);
+-            qemu_mutex_unlock_iothread();
+             DPRINTF("injected NMI\n");
+             ret = kvm_vcpu_ioctl(cpu, KVM_NMI);
+             if (ret < 0) {
+@@ -4030,10 +4033,8 @@ void kvm_arch_pre_run(CPUState *cpu, struct kvm_run *run)
+                         strerror(-ret));
+             }
          }
+-        if (cpu->interrupt_request & CPU_INTERRUPT_SMI) {
+-            qemu_mutex_lock_iothread();
++        if (interrupt_request & CPU_INTERRUPT_SMI) {
+             cpu_reset_interrupt(cpu, CPU_INTERRUPT_SMI);
+-            qemu_mutex_unlock_iothread();
+             DPRINTF("injected SMI\n");
+             ret = kvm_vcpu_ioctl(cpu, KVM_SMI);
+             if (ret < 0) {
+@@ -4047,16 +4048,22 @@ void kvm_arch_pre_run(CPUState *cpu, struct kvm_run *run)
+         qemu_mutex_lock_iothread();
+     }
  
-         /* we always kick running CPUs for now, this is tricky */
--        if (cs->halted) {
-+        if (cpu_halted(cs)) {
-             /* don't check for subclasses, CPUs double check when waking up */
-             if (type & FLIC_PENDING_SERVICE) {
-                 if (!(cpu->env.psw.mask & PSW_MASK_EXT)) {
-diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-index 08eb674d22..d7a98bd52b 100644
---- a/target/s390x/cpu.c
-+++ b/target/s390x/cpu.c
-@@ -291,7 +291,7 @@ static void s390_cpu_initfn(Object *obj)
-     S390CPU *cpu = S390_CPU(obj);
- 
-     cpu_set_cpustate_pointers(cpu);
--    cs->halted = 1;
-+    cpu_halted_set(cs, 1);
-     cs->exception_index = EXCP_HLT;
- #if !defined(CONFIG_USER_ONLY)
-     object_property_add(obj, "crash-information", "GuestPanicInformation",
-@@ -318,8 +318,8 @@ static void s390_cpu_finalize(Object *obj)
- #if !defined(CONFIG_USER_ONLY)
- static bool disabled_wait(CPUState *cpu)
- {
--    return cpu->halted && !(S390_CPU(cpu)->env.psw.mask &
--                            (PSW_MASK_IO | PSW_MASK_EXT | PSW_MASK_MCHECK));
-+    return cpu_halted(cpu) && !(S390_CPU(cpu)->env.psw.mask &
-+                                (PSW_MASK_IO | PSW_MASK_EXT | PSW_MASK_MCHECK));
- }
- 
- static unsigned s390_count_running_cpus(void)
-@@ -345,10 +345,16 @@ unsigned int s390_cpu_halt(S390CPU *cpu)
-     CPUState *cs = CPU(cpu);
-     trace_cpu_halt(cs->cpu_index);
- 
--    if (!cs->halted) {
--        cs->halted = 1;
 +    /*
-+     * cpu_halted and cpu_halted_set acquire the cpu lock if it
-+     * isn't already held, so acquire it first.
++     * We might have cleared some bits in cpu->interrupt_request since reading
++     * it; read it again.
 +     */
-+    cpu_mutex_lock(cs);
-+    if (!cpu_halted(cs)) {
-+        cpu_halted_set(cs, 1);
-         cs->exception_index = EXCP_HLT;
++    interrupt_request = cpu_interrupt_request(cpu);
++
+     /* Force the VCPU out of its inner loop to process any INIT requests
+      * or (for userspace APIC, but it is cheap to combine the checks here)
+      * pending TPR access reports.
+      */
+-    if (cpu->interrupt_request & (CPU_INTERRUPT_INIT | CPU_INTERRUPT_TPR)) {
+-        if ((cpu->interrupt_request & CPU_INTERRUPT_INIT) &&
++    if (interrupt_request & (CPU_INTERRUPT_INIT | CPU_INTERRUPT_TPR)) {
++        if ((interrupt_request & CPU_INTERRUPT_INIT) &&
+             !(env->hflags & HF_SMM_MASK)) {
+             cpu->exit_request = 1;
+         }
+-        if (cpu->interrupt_request & CPU_INTERRUPT_TPR) {
++        if (interrupt_request & CPU_INTERRUPT_TPR) {
+             cpu->exit_request = 1;
+         }
      }
-+    cpu_mutex_unlock(cs);
+@@ -4064,7 +4071,7 @@ void kvm_arch_pre_run(CPUState *cpu, struct kvm_run *run)
+     if (!kvm_pic_in_kernel()) {
+         /* Try to inject an interrupt if the guest can accept it */
+         if (run->ready_for_interrupt_injection &&
+-            (cpu->interrupt_request & CPU_INTERRUPT_HARD) &&
++            (interrupt_request & CPU_INTERRUPT_HARD) &&
+             (env->eflags & IF_MASK)) {
+             int irq;
  
-     return s390_count_running_cpus();
- }
-@@ -358,10 +364,12 @@ void s390_cpu_unhalt(S390CPU *cpu)
-     CPUState *cs = CPU(cpu);
-     trace_cpu_unhalt(cs->cpu_index);
- 
--    if (cs->halted) {
--        cs->halted = 0;
-+    cpu_mutex_lock(cs);
-+    if (cpu_halted(cs)) {
-+        cpu_halted_set(cs, 0);
-         cs->exception_index = -1;
-     }
-+    cpu_mutex_unlock(cs);
- }
- 
- unsigned int s390_cpu_set_state(uint8_t cpu_state, S390CPU *cpu)
-diff --git a/target/s390x/excp_helper.c b/target/s390x/excp_helper.c
-index 3b58d10df3..db6640ba2c 100644
---- a/target/s390x/excp_helper.c
-+++ b/target/s390x/excp_helper.c
-@@ -537,7 +537,7 @@ try_deliver:
-     if ((env->psw.mask & PSW_MASK_WAIT) || stopped) {
-         /* don't trigger a cpu_loop_exit(), use an interrupt instead */
-         cpu_interrupt(CPU(cpu), CPU_INTERRUPT_HALT);
--    } else if (cs->halted) {
-+    } else if (cpu_halted(cs)) {
-         /* unhalt if we had a WAIT PSW somehwere in our injection chain */
-         s390_cpu_unhalt(cpu);
-     }
-diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-index f2f75d2a57..f376c4a2f6 100644
---- a/target/s390x/kvm.c
-+++ b/target/s390x/kvm.c
-@@ -1094,7 +1094,7 @@ MemTxAttrs kvm_arch_post_run(CPUState *cs, struct kvm_run *run)
- 
- int kvm_arch_process_async_events(CPUState *cs)
+@@ -4088,7 +4095,7 @@ void kvm_arch_pre_run(CPUState *cpu, struct kvm_run *run)
+          * interrupt, request an interrupt window exit.  This will
+          * cause a return to userspace as soon as the guest is ready to
+          * receive interrupts. */
+-        if ((cpu->interrupt_request & CPU_INTERRUPT_HARD)) {
++        if ((cpu_interrupt_request(cpu) & CPU_INTERRUPT_HARD)) {
+             run->request_interrupt_window = 1;
+         } else {
+             run->request_interrupt_window = 0;
+@@ -4134,8 +4141,9 @@ int kvm_arch_process_async_events(CPUState *cs)
  {
--    return cs->halted;
-+    return cpu_halted(cs);
- }
+     X86CPU *cpu = X86_CPU(cs);
+     CPUX86State *env = &cpu->env;
++    uint32_t interrupt_request;
  
- static int s390_kvm_irq_to_interrupt(struct kvm_s390_irq *irq,
-diff --git a/target/s390x/sigp.c b/target/s390x/sigp.c
-index c604f17710..44d22ae3bf 100644
---- a/target/s390x/sigp.c
-+++ b/target/s390x/sigp.c
-@@ -115,7 +115,7 @@ static void sigp_stop(CPUState *cs, run_on_cpu_data arg)
+-    if (cs->interrupt_request & CPU_INTERRUPT_MCE) {
++    if (cpu_interrupt_request(cs) & CPU_INTERRUPT_MCE) {
+         /* We must not raise CPU_INTERRUPT_MCE if it's not supported. */
+         assert(env->mcg_cap);
+ 
+@@ -4158,7 +4166,7 @@ int kvm_arch_process_async_events(CPUState *cs)
+         }
      }
  
-     /* disabled wait - sleeping in user space */
--    if (cs->halted) {
-+    if (cpu_halted(cs)) {
-         s390_cpu_set_state(S390_CPU_STATE_STOPPED, cpu);
-     } else {
-         /* execute the stop function */
-@@ -131,7 +131,7 @@ static void sigp_stop_and_store_status(CPUState *cs, run_on_cpu_data arg)
-     SigpInfo *si = arg.host_ptr;
- 
-     /* disabled wait - sleeping in user space */
--    if (s390_cpu_get_state(cpu) == S390_CPU_STATE_OPERATING && cs->halted) {
-+    if (s390_cpu_get_state(cpu) == S390_CPU_STATE_OPERATING && cpu_halted(cs)) {
-         s390_cpu_set_state(S390_CPU_STATE_STOPPED, cpu);
+-    if ((cs->interrupt_request & CPU_INTERRUPT_INIT) &&
++    if ((cpu_interrupt_request(cs) & CPU_INTERRUPT_INIT) &&
+         !(env->hflags & HF_SMM_MASK)) {
+         kvm_cpu_synchronize_state(cs);
+         do_cpu_init(cpu);
+@@ -4168,20 +4176,21 @@ int kvm_arch_process_async_events(CPUState *cs)
+         return 0;
      }
  
-@@ -313,7 +313,7 @@ static void sigp_cond_emergency(S390CPU *src_cpu, S390CPU *dst_cpu,
+-    if (cs->interrupt_request & CPU_INTERRUPT_POLL) {
++    if (cpu_interrupt_request(cs) & CPU_INTERRUPT_POLL) {
+         cpu_reset_interrupt(cs, CPU_INTERRUPT_POLL);
+         apic_poll_irq(cpu->apic_state);
      }
- 
-     /* this looks racy, but these values are only used when STOPPED */
--    idle = CPU(dst_cpu)->halted;
-+    idle = cpu_halted(CPU(dst_cpu));
-     psw_addr = dst_cpu->env.psw.addr;
-     psw_mask = dst_cpu->env.psw.mask;
-     asn = si->param;
-@@ -347,7 +347,7 @@ static void sigp_sense_running(S390CPU *dst_cpu, SigpInfo *si)
+-    if (((cs->interrupt_request & CPU_INTERRUPT_HARD) &&
++    interrupt_request = cpu_interrupt_request(cs);
++    if (((interrupt_request & CPU_INTERRUPT_HARD) &&
+          (env->eflags & IF_MASK)) ||
+-        (cs->interrupt_request & CPU_INTERRUPT_NMI)) {
++        (interrupt_request & CPU_INTERRUPT_NMI)) {
+         cpu_halted_set(cs, 0);
      }
+-    if (cs->interrupt_request & CPU_INTERRUPT_SIPI) {
++    if (interrupt_request & CPU_INTERRUPT_SIPI) {
+         kvm_cpu_synchronize_state(cs);
+         do_cpu_sipi(cpu);
+     }
+-    if (cs->interrupt_request & CPU_INTERRUPT_TPR) {
++    if (cpu_interrupt_request(cs) & CPU_INTERRUPT_TPR) {
+         cpu_reset_interrupt(cs, CPU_INTERRUPT_TPR);
+         kvm_cpu_synchronize_state(cs);
+         apic_handle_tpr_access_report(cpu->apic_state, env->eip,
+@@ -4195,10 +4204,13 @@ static int kvm_handle_halt(X86CPU *cpu)
+ {
+     CPUState *cs = CPU(cpu);
+     CPUX86State *env = &cpu->env;
++    uint32_t interrupt_request;
++
++    interrupt_request = cpu_interrupt_request(cs);
  
-     /* If halted (which includes also STOPPED), it is not running */
--    if (CPU(dst_cpu)->halted) {
-+    if (cpu_halted(CPU(dst_cpu))) {
-         set_sigp_status(si, SIGP_STAT_NOT_RUNNING);
-     } else {
-         si->cc = SIGP_CC_ORDER_CODE_ACCEPTED;
+-    if (!((cs->interrupt_request & CPU_INTERRUPT_HARD) &&
++    if (!((interrupt_request & CPU_INTERRUPT_HARD) &&
+           (env->eflags & IF_MASK)) &&
+-        !(cs->interrupt_request & CPU_INTERRUPT_NMI)) {
++        !(interrupt_request & CPU_INTERRUPT_NMI)) {
+         cpu_halted_set(cs, 1);
+         return EXCP_HLT;
+     }
 -- 
 2.17.1
 
