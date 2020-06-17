@@ -2,97 +2,79 @@ Return-Path: <SRS0=bzpH=76=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3ADAC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 21:58:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F4F6C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 21:59:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6DD2621841
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 21:58:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="L7bSmZHA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DD2621841
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
+	by mail.kernel.org (Postfix) with ESMTPS id 33E6321841
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 21:59:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33E6321841
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43488 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47480 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlg4O-0003ZI-MF
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 17:58:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46368)
+	id 1jlg5Q-0005DY-FA
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 17:59:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51678)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=430b82a1d=dmitry.fomichev@wdc.com>)
- id 1jlfih-00057c-TH; Wed, 17 Jun 2020 17:35:45 -0400
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:29866)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=430b82a1d=dmitry.fomichev@wdc.com>)
- id 1jlfid-0005I4-Uc; Wed, 17 Jun 2020 17:35:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1592429739; x=1623965739;
- h=from:to:cc:subject:date:message-id:in-reply-to:
- references:mime-version:content-transfer-encoding;
- bh=hCiBihXKhrGYvmr/DCEkxrCWLvTyFSwDX1pbG2ju8+8=;
- b=L7bSmZHAreNwuUsEiJrOAiU0eGqjEOWs9OtR13YXfPgRxWwCG4jaETYh
- tIaMl79WaD4wcOXSiu4b+iOijluUyIR6Ok5MOdb4PN0gBTDKMtlXxcZTD
- Q4S1anqY2HThoXPlIC2nv9sUsjEP7v9Bvnr/2DkG2wOYv71pYibc4yjoq
- bd71Zq45L+rZoyxGqZykRZsZmoopDoqvD9IdRPHG9KFivXS4Y53k/zJ6D
- F7swZldXGOjm7xGll9nr6arLWVsBw1EplOaHS/FoosYgmkSLNIiNqeHE+
- f7hsonzrwmJ1J6Wr5PMT+c1MnCVqC6UXXJvt38QOGqUkeHXxRKyrXsRFm Q==;
-IronPort-SDR: EnTkio7aGhYn/2VW0MDwsZ0Q8wUVW1P6pOeLPKWD4CQb+lTnWzGfNV3Ts+9fFQiev8exwm8fV9
- TAIEuuLrEaF268UXar8k2i1QoGnJdiOBnlqKeuN5T00zAPnugWmFYoBNnCeWbKh8qHT3q+aMVW
- q1rN5Rx+I/s5ADpyCAyiTWgtl/JC91jvnSSlpE2ceIqsA24DaQzvTHW1hqhVindzBMUWbdnGbM
- Mwmg1jOFMSr7bnTssZ9NTRkBsdPHLftui607BJ5syW+SpliPYQsEbXJTdQ6OEZeV6f/f3OgOEj
- JIU=
-X-IronPort-AV: E=Sophos;i="5.73,523,1583164800"; d="scan'208";a="249439841"
-Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com)
- ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 18 Jun 2020 05:34:57 +0800
-IronPort-SDR: /yYqzkwZy+dnecLa3iR9Yf8FNswy/XsEeYOjDaV+84C5aoOqBlJpJicex2iZMOawqV26H/4m9K
- 7Bn455yecqINhAi4E9YBaQLmwebj2MMfo=
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
- by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 17 Jun 2020 14:23:38 -0700
-IronPort-SDR: hw51t470GWvgcY65yZZ7hglqP/N/sdjX5eGTo0rOkaB6oyTC08jTVLpdFFl31qmZGqd2TneR9A
- qPkwNMjuQvXA==
-WDCIronportException: Internal
-Received: from unknown (HELO redsun50.ssa.fujisawa.hgst.com) ([10.149.66.24])
- by uls-op-cesaip02.wdc.com with ESMTP; 17 Jun 2020 14:34:56 -0700
-From: Dmitry Fomichev <dmitry.fomichev@wdc.com>
-To: Kevin Wolf <kwolf@redhat.com>, Keith Busch <kbusch@kernel.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Maxim Levitsky <mlevitsky@redhat.com>
-Subject: [PATCH v2 16/18] hw/block/nvme: Add injection of Offline/Read-Only
- zones
-Date: Thu, 18 Jun 2020 06:34:13 +0900
-Message-Id: <20200617213415.22417-17-dmitry.fomichev@wdc.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20200617213415.22417-1-dmitry.fomichev@wdc.com>
-References: <20200617213415.22417-1-dmitry.fomichev@wdc.com>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jlg25-0000Jf-C1
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 17:55:45 -0400
+Received: from indium.canonical.com ([91.189.90.7]:47866)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jlg23-0000cQ-Di
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 17:55:45 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jlg21-0003NY-47
+ for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 21:55:41 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 1C7742E80E7
+ for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 21:55:41 +0000 (UTC)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=68.232.141.245;
- envelope-from=prvs=430b82a1d=dmitry.fomichev@wdc.com; helo=esa1.hgst.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/17 17:34:28
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
-X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 17 Jun 2020 21:50:37 -0000
+From: Nelson H F Beebe <1883984@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: nhfbeebe
+X-Launchpad-Bug-Reporter: Nelson H F Beebe (nhfbeebe)
+X-Launchpad-Bug-Modifier: Nelson H F Beebe (nhfbeebe)
+Message-Id: <159243063748.16697.11009205973276249282.malonedeb@chaenomeles.canonical.com>
+Subject: [Bug 1883984] [NEW] QEMU S/390x sqxbr (128-bit IEEE 754 square root)
+ crashes qemu-system-s390x
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="1cbd0aa39df153c901321817f9b57cf3f232b507";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 5dbfe743ba17b017304a10f52b78bf6917727df5
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/17 17:50:41
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -101,126 +83,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Niklas Cassel <niklas.cassel@wdc.com>,
- Damien Le Moal <damien.lemoal@wdc.com>, qemu-block@nongnu.org,
- Dmitry Fomichev <dmitry.fomichev@wdc.com>, qemu-devel@nongnu.org,
- Matias Bjorling <matias.bjorling@wdc.com>
+Reply-To: Bug 1883984 <1883984@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-ZNS specification defines two zone conditions for the zones that no
-longer can function properly, possibly because of flash wear or other
-internal fault. It is useful to be able to "inject" a small number of
-such zones for testing purposes.
+Public bug reported:
 
-This commit defines two optional driver properties, "offline_zones"
-and "rdonly_zones". User can assign non-zero values to these variables
-to specify the number of zones to be initialized as Offline or
-Read-Only. The actual number of injected zones may be smaller than the
-requested amount - Read-Only and Offline counts are expected to be much
-smaller than the total number of drive zones.
+In porting software to guest Ubuntu 18.04 and 20.04 VMs for S/390x, I disco=
+vered
+that some of my own numerical programs, and also a GNU configure script for=
+ at
+least one package with CC=3Dclang, would cause an instant crash of the VM, =
+sometimes
+also destroying recently opened files, and producing long strings of NUL ch=
+aracters
+in /var/log/syslog in the S/390 guest O/S.
 
-Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
----
- hw/block/nvme.c | 46 ++++++++++++++++++++++++++++++++++++++++++++++
- hw/block/nvme.h |  2 ++
- 2 files changed, 48 insertions(+)
+Further detective work narrowed the cause of the crash down to a single IBM=
+ S/390
+instruction: sqxbr (128-bit IEEE 754 square root).  Here is a one-line prog=
+ram
+that when compiled and run on a VM hosted on QEMUcc emulator version 4.2.0 =
 
-diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index eb41081627..14d5f1d155 100644
---- a/hw/block/nvme.c
-+++ b/hw/block/nvme.c
-@@ -2980,8 +2980,11 @@ static int nvme_init_zone_meta(NvmeCtrl *n, NvmeNamespace *ns,
-     uint64_t capacity)
- {
-     NvmeZone *zone;
-+    Error *err;
-     uint64_t start = 0, zone_size = n->params.zone_size;
-+    uint32_t rnd;
-     int i;
-+    uint16_t zs;
- 
-     ns->zone_array = g_malloc0(n->zone_array_size);
-     ns->exp_open_zones = g_malloc0(sizeof(NvmeZoneList));
-@@ -3011,6 +3014,37 @@ static int nvme_init_zone_meta(NvmeCtrl *n, NvmeNamespace *ns,
-         start += zone_size;
-     }
- 
-+    /* If required, make some zones Offline or Read Only */
-+
-+    for (i = 0; i < n->params.nr_offline_zones; i++) {
-+        do {
-+            qcrypto_random_bytes(&rnd, sizeof(rnd), &err);
-+            rnd %= n->num_zones;
-+        } while (rnd < n->params.max_open_zones);
-+        zone = &ns->zone_array[rnd];
-+        zs = nvme_get_zone_state(zone);
-+        if (zs != NVME_ZONE_STATE_OFFLINE) {
-+            nvme_set_zone_state(zone, NVME_ZONE_STATE_OFFLINE);
-+        } else {
-+            i--;
-+        }
-+    }
-+
-+    for (i = 0; i < n->params.nr_rdonly_zones; i++) {
-+        do {
-+            qcrypto_random_bytes(&rnd, sizeof(rnd), &err);
-+            rnd %= n->num_zones;
-+        } while (rnd < n->params.max_open_zones);
-+        zone = &ns->zone_array[rnd];
-+        zs = nvme_get_zone_state(zone);
-+        if (zs != NVME_ZONE_STATE_OFFLINE &&
-+            zs != NVME_ZONE_STATE_READ_ONLY) {
-+            nvme_set_zone_state(zone, NVME_ZONE_STATE_READ_ONLY);
-+        } else {
-+            i--;
-+        }
-+    }
-+
-     return 0;
- }
- 
-@@ -3063,6 +3097,16 @@ static void nvme_zoned_init_ctrl(NvmeCtrl *n, Error **errp)
-     if (n->params.max_active_zones > nz) {
-         n->params.max_active_zones = nz;
-     }
-+    if (n->params.max_open_zones < nz) {
-+        if (n->params.nr_offline_zones > nz - n->params.max_open_zones) {
-+            n->params.nr_offline_zones = nz - n->params.max_open_zones;
-+        }
-+        if (n->params.nr_rdonly_zones >
-+            nz - n->params.max_open_zones - n->params.nr_offline_zones) {
-+            n->params.nr_rdonly_zones =
-+                nz - n->params.max_open_zones - n->params.nr_offline_zones;
-+        }
-+    }
-     if (n->params.zd_extension_size) {
-         if (n->params.zd_extension_size & 0x3f) {
-             error_setg(errp,
-@@ -3471,6 +3515,8 @@ static Property nvme_props[] = {
-     DEFINE_PROP_UINT64("finish_rcmnd_delay", NvmeCtrl,
-                        params.fzr_delay_usec, 0),
-     DEFINE_PROP_UINT64("finish_rcmnd_limit", NvmeCtrl, params.frl_usec, 0),
-+    DEFINE_PROP_UINT32("offline_zones", NvmeCtrl, params.nr_offline_zones, 0),
-+    DEFINE_PROP_UINT32("rdonly_zones", NvmeCtrl, params.nr_rdonly_zones, 0),
-     DEFINE_PROP_BOOL("zone_async_events", NvmeCtrl, params.zone_async_events,
-                      true),
-     DEFINE_PROP_BOOL("cross_zone_read", NvmeCtrl, params.cross_zone_read, true),
-diff --git a/hw/block/nvme.h b/hw/block/nvme.h
-index 4251295917..900fc54809 100644
---- a/hw/block/nvme.h
-+++ b/hw/block/nvme.h
-@@ -24,6 +24,8 @@ typedef struct NvmeParams {
-     uint64_t    zone_capacity;
-     int32_t     max_active_zones;
-     int32_t     max_open_zones;
-+    uint32_t    nr_offline_zones;
-+    uint32_t    nr_rdonly_zones;
-     uint32_t    zd_extension_size;
-     uint64_t    rzr_delay_usec;
-     uint64_t    rrl_usec;
--- 
-2.21.0
+(Debian 1:4.2-3ubuntu6.1) [hosted on Ubuntu 20.04 on a Dell Precision 7920 =
 
+workstation with an Intel Xeon Platinum 8253 CPU],  and also on QEMU emulat=
+or =
+
+version 5.0.0, reproducibly produces a VM crash under qemu-system-s390x.
+
+% cat bug-sqrtl-one-line.c
+int main(void) { volatile long double x, r; x =3D 4.0L; __asm__ __volatile_=
+_("sqxbr %0, %1" : "=3Df" (r) : "f" (x)); return (0);}
+
+% cc bug-sqrtl-one-line.c && ./a.out
+Segmentation fault (core dumped)
+
+The problem code may be the function float128_sqrt() defined in qemu-5.0.0/=
+fpu/softfloat.c
+starting at line 7619.  I have NOT attempted to run the qemu-system-s390x e=
+xecutable
+under a debugger.  However, I observe that S/390 is the only CPU family tha=
+t I know of,
+except possibly for a Fujitsu SPARC-64, that has a 128-bit square root in h=
+ardware.
+Thus, this instruction bug may not have been seen before.
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1883984
+
+Title:
+  QEMU S/390x sqxbr (128-bit IEEE 754 square root) crashes qemu-system-
+  s390x
+
+Status in QEMU:
+  New
+
+Bug description:
+  In porting software to guest Ubuntu 18.04 and 20.04 VMs for S/390x, I dis=
+covered
+  that some of my own numerical programs, and also a GNU configure script f=
+or at
+  least one package with CC=3Dclang, would cause an instant crash of the VM=
+, sometimes
+  also destroying recently opened files, and producing long strings of NUL =
+characters
+  in /var/log/syslog in the S/390 guest O/S.
+
+  Further detective work narrowed the cause of the crash down to a single I=
+BM S/390
+  instruction: sqxbr (128-bit IEEE 754 square root).  Here is a one-line pr=
+ogram
+  that when compiled and run on a VM hosted on QEMUcc emulator version 4.2.=
+0 =
+
+  (Debian 1:4.2-3ubuntu6.1) [hosted on Ubuntu 20.04 on a Dell Precision 792=
+0 =
+
+  workstation with an Intel Xeon Platinum 8253 CPU],  and also on QEMU emul=
+ator =
+
+  version 5.0.0, reproducibly produces a VM crash under qemu-system-s390x.
+
+  % cat bug-sqrtl-one-line.c
+  int main(void) { volatile long double x, r; x =3D 4.0L; __asm__ __volatil=
+e__("sqxbr %0, %1" : "=3Df" (r) : "f" (x)); return (0);}
+
+  % cc bug-sqrtl-one-line.c && ./a.out
+  Segmentation fault (core dumped)
+
+  The problem code may be the function float128_sqrt() defined in qemu-5.0.=
+0/fpu/softfloat.c
+  starting at line 7619.  I have NOT attempted to run the qemu-system-s390x=
+ executable
+  under a debugger.  However, I observe that S/390 is the only CPU family t=
+hat I know of,
+  except possibly for a Fujitsu SPARC-64, that has a 128-bit square root in=
+ hardware.
+  Thus, this instruction bug may not have been seen before.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1883984/+subscriptions
 
