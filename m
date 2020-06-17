@@ -7,70 +7,70 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3ACEC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 05:57:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E2B6C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 05:57:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7CB87207DD
-	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 05:57:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0AF4C207DD
+	for <qemu-devel@archiver.kernel.org>; Wed, 17 Jun 2020 05:57:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MKid9/Gy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7CB87207DD
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dsbKIV4O"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AF4C207DD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51916 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52006 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlR4W-0003Pa-MT
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 01:57:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49784)
+	id 1jlR4X-0003SP-9O
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 01:57:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49748)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jlQzm-0002oG-EG; Wed, 17 Jun 2020 01:52:22 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:46275)
+ id 1jlQzi-0002f1-2T; Wed, 17 Jun 2020 01:52:18 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:33027)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jlQzj-0004TC-PE; Wed, 17 Jun 2020 01:52:22 -0400
-Received: by mail-wr1-x444.google.com with SMTP id x6so883448wrm.13;
- Tue, 16 Jun 2020 22:52:19 -0700 (PDT)
+ id 1jlQzg-0004ST-EQ; Wed, 17 Jun 2020 01:52:17 -0400
+Received: by mail-wr1-x441.google.com with SMTP id l11so954416wru.0;
+ Tue, 16 Jun 2020 22:52:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=whMizvqXayFxbp1IF4VRvbw0c99w7Q6BaIOEKga3yHk=;
- b=MKid9/GyKouaGElE0l78IKv5okkEDiqOBt2W8D3P1UN2dUzTAVEJnTnFBf71PlswyX
- H/K4ix7Q1p1PgzwKDBM4YqKPnVWNZ5YCHUZf4mvkeFLMUqiHXAIwEENcGcv33RFAQWaf
- CAN9RNC/03PzTfoQkcee9LLr2cEKjGyEwD120WEwB/6o4/w65a8bTiOvBUQcnEveqdGb
- qHt6UuB8MyJY6kC/SE1WFkEQCTkOwU+yoSVngfsFtpce2IQNbzlXEP+fDtNJObpDuB/L
- vG+Liwm0eo0fWITTrxVVENVtOIr7USFbTiUdPXHkFCATvStX5kHWa7Ey/64rhzM1gMZf
- ZnkA==
+ bh=cg5OZZgeFdkySmBsDID4sS8qarnHbFdRK4wloQNjZ2E=;
+ b=dsbKIV4O6UW9D34HPyz4x0JsQR5PpSXq7B6LRYAcivUcVNbOCBTjlJAGxsFPDg/jQ+
+ TgMgF8LGQaEo5GHaeCUKVOWYemZEaqGy6nI2NyzdBsnMLV0B+n4dBV9lWv35hIzGm3c1
+ nbrzAtHOwocUrk9yXtY3tZ0xikCf8DUQBX50LPqqhHfN0eMm6v8aPS8LER1ow7r4KOVb
+ 0rBf/RJ89ISk2aUomERaqIB/EhJaufu4VH/rDhKVPxenj94HCiQMeiUH9vWkx/Z0R2vI
+ fBhc6fYDnv7GJdnhFyuQnvszxe7pD01s2S1iD34JrTfQr1SrYd9rVkF8yu9q/xsVIqan
+ CIXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=whMizvqXayFxbp1IF4VRvbw0c99w7Q6BaIOEKga3yHk=;
- b=YFoechiAcY48mrO4Gji3FvwLz5F6GSv4QOURafGufQyGqUcb0XQRpZpgkoh6+dofGn
- q1vchZiNF7u2F1ZehPU8z+vSz+RfhG5Y/TH4lZp39p4s3jj4jJl7gfEjQbqW6PwTm3vR
- cJjeVqngqzan1xV1W28+67zmShf42LcksLODb6Zs81e5ncxFbi5cbpnaMFf9UqoRLM2V
- Qoj8K8hDgbLGpyN5qGvTZeKZzgBzuTIzhJzEVx9GraTY/NVJVmLpkNw7coEYzkyQgASK
- Ztir6QUVoW48Smu+K5uF5bPDoLHyxvZSbopPCc6K1tNKOVlP8bmQBc+qMqbPg5VJ4wVe
- O6jw==
-X-Gm-Message-State: AOAM5320kI10kMpgk44LR4fbqv1UUaqljK9Rx+8en04fgkj1XSuoq1hT
- O6LudszSuP4wf+FityPolM1Sqy8I
-X-Google-Smtp-Source: ABdhPJxmN1AwbbLb6g3ADFz6JEyrezgWerbMGjrHBhnmNvnfioemseMST1jpgQ/F1AnoAleqcz1fmw==
-X-Received: by 2002:adf:e285:: with SMTP id v5mr6420929wri.129.1592373137978; 
- Tue, 16 Jun 2020 22:52:17 -0700 (PDT)
+ bh=cg5OZZgeFdkySmBsDID4sS8qarnHbFdRK4wloQNjZ2E=;
+ b=r7g97rsRaUYOlQqI6IGqTnWznVxg012r8o6mjCc7dSnn3we6x19gOwMMyfobytvoDg
+ pBGPPrCSZDPhVbMbwHUKG1fb+nWCkjPUrAfD/z+Jh+XlVWNke5QenNakAylRBPhGJb1z
+ CXCbrAUlscBzpcRkRSFILTQWYMdRsjYNzloQi76JXoHgpbXfMDhtb9OHFvIhq9SgG9Um
+ k2Q+txomZXSu2KVTnM+ZeA7tIlBnM5qsCvCoDia1XYKkb+VC+ZgL7KWx9a+fmaOZX43m
+ ppK/1M+pQeOC9hfzHdtg7X2MF6XsOllJHZdrfPug1Sbr8AssA1S638AeRywA/aiKF3G/
+ J9NQ==
+X-Gm-Message-State: AOAM530aITYyczTdbxANmFf7jyUp+LmpYMcMiGUr53RJTtjIHbVd+BKC
+ EYpS9gjnHID0KwC0tq2S36xh+KgY
+X-Google-Smtp-Source: ABdhPJzbbzaJ+ul27/cXGDCJIqGun8Fv9v9trLwVDDTKWSWCPoUOQ8+NPg5kP/fSLbZjxHF0/lLemQ==
+X-Received: by 2002:a5d:49c5:: with SMTP id t5mr6725072wrs.18.1592373134616;
+ Tue, 16 Jun 2020 22:52:14 -0700 (PDT)
 Received: from localhost.localdomain (93.red-83-59-160.dynamicip.rima-tde.net.
  [83.59.160.93])
- by smtp.gmail.com with ESMTPSA id d28sm3000809wrc.50.2020.06.16.22.52.16
+ by smtp.gmail.com with ESMTPSA id d28sm3000809wrc.50.2020.06.16.22.52.13
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 16 Jun 2020 22:52:17 -0700 (PDT)
+ Tue, 16 Jun 2020 22:52:14 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 09/14] hw/arm/mps2: Add CMSDK AHB GPIO peripherals as
- unimplemented devices
-Date: Wed, 17 Jun 2020 07:52:00 +0200
-Message-Id: <20200617055205.3576-10-f4bug@amsat.org>
+Subject: [PATCH v2 06/14] hw/arm/mps2: Document CMSDK/FPGA APB subsystem
+ sections
+Date: Wed, 17 Jun 2020 07:51:57 +0200
+Message-Id: <20200617055205.3576-7-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200617055205.3576-1-f4bug@amsat.org>
 References: <20200617055205.3576-1-f4bug@amsat.org>
@@ -78,8 +78,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -109,72 +109,44 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Register the GPIO peripherals as unimplemented to better
-follow their accesses, for example booting Zephyr:
-
-  ----------------
-  IN: arm_mps2_pinmux_init
-  0x00001160:  f64f 0231  movw     r2, #0xf831
-  0x00001164:  4b06       ldr      r3, [pc, #0x18]
-  0x00001166:  2000       movs     r0, #0
-  0x00001168:  619a       str      r2, [r3, #0x18]
-  0x0000116a:  f24c 426f  movw     r2, #0xc46f
-  0x0000116e:  f503 5380  add.w    r3, r3, #0x1000
-  0x00001172:  619a       str      r2, [r3, #0x18]
-  0x00001174:  f44f 529e  mov.w    r2, #0x13c0
-  0x00001178:  f503 5380  add.w    r3, r3, #0x1000
-  0x0000117c:  619a       str      r2, [r3, #0x18]
-  0x0000117e:  4770       bx       lr
-  cmsdk-ahb-gpio: unimplemented device write (size 4, value 0xf831, offset 0x18)
-  cmsdk-ahb-gpio: unimplemented device write (size 4, value 0xc46f, offset 0x18)
-  cmsdk-ahb-gpio: unimplemented device write (size 4, value 0x13c0, offset 0x18)
-
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/arm/mps2.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ hw/arm/mps2.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/hw/arm/mps2.c b/hw/arm/mps2.c
-index f7bef20b40..c66c595d4a 100644
+index daa55f730b..ee555f919d 100644
 --- a/hw/arm/mps2.c
 +++ b/hw/arm/mps2.c
-@@ -113,6 +113,7 @@ static void mps2_common_init(MachineState *machine)
-     MemoryRegion *system_memory = get_system_memory();
-     MachineClass *mc = MACHINE_GET_CLASS(machine);
-     DeviceState *armv7m, *sccdev;
-+    int i;
+@@ -65,7 +65,9 @@ typedef struct {
+     MemoryRegion blockram_m2;
+     MemoryRegion blockram_m3;
+     MemoryRegion sram;
++    /* FPGA APB subsystem */
+     MPS2SCC scc;
++    /* CMSDK APB subsystem */
+     CMSDKAPBDualTimer dualtimer;
+ } MPS2MachineState;
  
-     if (strcmp(machine->cpu_type, mc->default_cpu_type) != 0) {
-         error_report("This board can only be used with CPU %s",
-@@ -228,7 +229,6 @@ static void mps2_common_init(MachineState *machine)
-          */
-         Object *orgate;
-         DeviceState *orgate_dev;
--        int i;
- 
-         orgate = object_new(TYPE_OR_IRQ);
-         object_property_set_int(orgate, 6, "num-lines", &error_fatal);
-@@ -265,7 +265,6 @@ static void mps2_common_init(MachineState *machine)
-          */
-         Object *orgate;
-         DeviceState *orgate_dev;
--        int i;
- 
-         orgate = object_new(TYPE_OR_IRQ);
-         object_property_set_int(orgate, 10, "num-lines", &error_fatal);
-@@ -301,6 +300,11 @@ static void mps2_common_init(MachineState *machine)
-     default:
+@@ -299,9 +301,9 @@ static void mps2_common_init(MachineState *machine)
          g_assert_not_reached();
      }
-+    for (i = 0; i < 4; i++) {
-+        static const hwaddr gpiobase[] = {0x40010000, 0x40011000,
-+                                          0x40012000, 0x40013000};
-+        create_unimplemented_device("cmsdk-ahb-gpio", gpiobase[i], 0x1000);
-+    }
  
-     /* CMSDK APB subsystem */
++    /* CMSDK APB subsystem */
      cmsdk_apb_timer_create(0x40000000, qdev_get_gpio_in(armv7m, 8), SYSCLK_FRQ);
+     cmsdk_apb_timer_create(0x40001000, qdev_get_gpio_in(armv7m, 9), SYSCLK_FRQ);
+-
+     object_initialize_child(OBJECT(mms), "dualtimer", &mms->dualtimer,
+                             TYPE_CMSDK_APB_DUALTIMER);
+     qdev_prop_set_uint32(DEVICE(&mms->dualtimer), "pclk-frq", SYSCLK_FRQ);
+@@ -310,6 +312,7 @@ static void mps2_common_init(MachineState *machine)
+                        qdev_get_gpio_in(armv7m, 10));
+     sysbus_mmio_map(SYS_BUS_DEVICE(&mms->dualtimer), 0, 0x40002000);
+ 
++    /* FPGA APB subsystem */
+     object_initialize_child(OBJECT(mms), "scc", &mms->scc, TYPE_MPS2_SCC);
+     sccdev = DEVICE(&mms->scc);
+     qdev_prop_set_uint32(sccdev, "scc-cfg4", 0x2);
 -- 
 2.21.3
 
