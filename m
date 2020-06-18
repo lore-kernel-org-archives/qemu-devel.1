@@ -4,72 +4,70 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52B91C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 16:39:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 462C4C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 16:40:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2248E208C7
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 16:39:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0D28C206E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 16:40:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vrV00q8P"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2248E208C7
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EzE7/Xz1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D28C206E2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38120 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41720 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlxZ9-0005ZG-BU
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 12:39:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51784)
+	id 1jlxaj-0007FG-BX
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 12:40:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52240)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jlxYI-0004qx-BP
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 12:38:10 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:45024)
+ id 1jlxZM-0005wZ-Cu
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 12:39:16 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:45301)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jlxYG-0003Vk-TK
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 12:38:10 -0400
-Received: by mail-ot1-x343.google.com with SMTP id e5so5013046ote.11
- for <qemu-devel@nongnu.org>; Thu, 18 Jun 2020 09:38:08 -0700 (PDT)
+ id 1jlxZK-0003gh-SE
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 12:39:16 -0400
+Received: by mail-ot1-x343.google.com with SMTP id m2so5005295otr.12
+ for <qemu-devel@nongnu.org>; Thu, 18 Jun 2020 09:39:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=PZonbftaCDc63VNz4v7l9NUr5JjVM0m0avU1O4pKiyg=;
- b=vrV00q8Pb45VJGvX7JMC6N278bdqIq8hGN60sJDGCSBKkQpBBP1T69yAs+c5sgZmBQ
- u2CxBBb1jDRk8WSH2dUCXoJIlsx507EDpthEFGmuK6iWRbxVEpwRpQt2ZUgSukhZGfdh
- AhN0kFClcu8ru1JFJVH+o8C1/jMP2dQ37dBuBxTDnTfkSkAXLRtNKxWbtdgoG9ZPUHb1
- 0PpDrqyLKrchgxdU/ccPdB1L5croo3PDjMugPKkLLXjXTG1vudqcBkuqK4PXG/RzyAbw
- S84RkujXj/k5CUpJa5hItYsd4OSQ/N5orLEQCHXhUGZxBvx4XgS4QsvAisQungypls7f
- 0GMA==
+ :cc; bh=9Qq3iHbr4Ebotr0tZQjE91j16O7ZoICe3YyZSauPGbo=;
+ b=EzE7/Xz1q1rzE985qQaw5knsIfZ1VQpcxtvTEo+X5eQQzz/FP8PSQRmFtO/f5mWZ0b
+ m0hHHaHjJ0wtwt6yUmRXQvY5rRiHux1QKHt5ZNVBPBgr4+nhWawqSY+pGxuLLUu0q6qI
+ Fw5zsiyBCtPryRZQZUDdGUtWMXx1pyqw6yq7j370ndfeosF/1VNd6+sXOT80AE2UJ+Cs
+ S9pO81N13WBwiToYuq258RgTgz0wqrDhraO7/Q/hhZBKFTGS8pNMRzbTTRZhplLAyW44
+ 0yqv1DKCTO4FWh2yFPSW5r3Wcfa7Eh3av3xnetBcPRZHIR9gKX6EIgmtN9CLSF8u/yyu
+ +Kpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=PZonbftaCDc63VNz4v7l9NUr5JjVM0m0avU1O4pKiyg=;
- b=AMQFKzEpwtXwF5eofnd5XmT6rare5b+56flrmjp5XbNxjDvTj33XpduAt1+KJUIpz4
- G1xGBl9kXs1y/di1JRgdpQIS8RACamerCJXq6Eu8WjlWn93tC5rGQXxp//xKcbc5uImU
- LpEO6VuyNzCShggwdKd+pADwQLjZRGwASTjFn7FZdDd7Ps6/x3VnS2/sjOMfI2VYg0sS
- NHQptEMoDcoN3z0u92E5x3Y3ThwAlLc14bDqPMX6CjvEylMQG2MK6Bk5bwfBtEG+qSnQ
- CMeZJWYj3pID2F4CHMk0b7pBblyCQUyCicFeyd5t7JZAYi8Q3lvW8J4NKYj8NiMCCO7T
- ISgA==
-X-Gm-Message-State: AOAM532RsMPDI1pCdmRXtbxgkxgSjNw0v9EI2JFisj7HjBuCLEHIOfo1
- RcnpMDlOx3UTEaoyo/PK4Op3rJSGdq/jNMOrnC6qOA==
-X-Google-Smtp-Source: ABdhPJzna3dtrg2mvfrnF00tjI41qlir9UDCAll6n4a9UpwPftwuwR5KZeWf46wkJ2yZBBBdD+QxcQKQl+DyHu34rxQ=
-X-Received: by 2002:a05:6830:8d:: with SMTP id
- a13mr4238524oto.91.1592498287591; 
- Thu, 18 Jun 2020 09:38:07 -0700 (PDT)
+ bh=9Qq3iHbr4Ebotr0tZQjE91j16O7ZoICe3YyZSauPGbo=;
+ b=NUJUkh1DzZsbD4+VVbkBfRbDnEmsqhtBtx/qzkQV1r1oB8/PrGZ441TI40AEhCJUXb
+ QCLB5dqRAg1dPk/Ae96M34JxReyF6nNcG5CVfVorFCUtv3CqFAwRz8A0tVIVfKL9Zm5f
+ YsYstoHcUeMCVXRVw/LFEEh/ivSVS88+ciNkL6xrguOhy07nkx8OZ2MtI2VGY7xQQn3Q
+ dBOkuillOqDVv+wOC/8FRjgDdDBvnXsH8BmRWohWBh66MYeERyNXS8qi9TVBlCfB2qDr
+ yx5jEwnO0ysSjbYXWsnA5UpnfHw2Wkag0iPJcpw8l8/YVf/yXu0h720OVfmWFkHmGGLJ
+ 0iuQ==
+X-Gm-Message-State: AOAM533EhsKd2rte9K+vLtwRl+YJHIr1Wi0f1xNY6+ag1C1+5fwk/0oT
+ fBKpwPci38NMcpsQBRln/jEnyWqMNf29ezbc0PK2C69CSjU=
+X-Google-Smtp-Source: ABdhPJzfkm1ddwEo7jLXs6qvX0XQtUzCV8D4zH25m8Xj5Vc9u6k4fCmAqAla1HKS3yZZ4HGtHQgF+5RH/T+I4/ylGLE=
+X-Received: by 2002:a9d:67d6:: with SMTP id c22mr4112709otn.221.1592498353737; 
+ Thu, 18 Jun 2020 09:39:13 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200603011317.473934-1-richard.henderson@linaro.org>
- <20200603011317.473934-26-richard.henderson@linaro.org>
-In-Reply-To: <20200603011317.473934-26-richard.henderson@linaro.org>
+ <20200603011317.473934-40-richard.henderson@linaro.org>
+In-Reply-To: <20200603011317.473934-40-richard.henderson@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 18 Jun 2020 17:37:56 +0100
-Message-ID: <CAFEAcA9qwXRG8R+1QCjjx8Cqs3yCaDisWcpECTszZrVjKuJdxg@mail.gmail.com>
-Subject: Re: [PATCH v7 25/42] target/arm: Implement helper_mte_check1
+Date: Thu, 18 Jun 2020 17:39:02 +0100
+Message-ID: <CAFEAcA83Tb0r11R6EUFPrqLWrXNx4+9Q13q0m8X-jwO49Wgysw@mail.gmail.com>
+Subject: Re: [PATCH v7 39/42] target/arm: Enable MTE
 To: Richard Henderson <richard.henderson@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
 Received-SPF: pass client-ip=2607:f8b0:4864:20::343;
@@ -101,47 +99,33 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 3 Jun 2020 at 02:13, Richard Henderson
+On Wed, 3 Jun 2020 at 02:14, Richard Henderson
 <richard.henderson@linaro.org> wrote:
 >
-> Fill out the stub that was added earlier.
+> We now implement all of the components of MTE, without actually
+> supporting any tagged memory.  All MTE instructions will work,
+> trivially, so we can enable support.
 >
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->  target/arm/internals.h  |  47 +++++++++++++++
->  target/arm/mte_helper.c | 126 +++++++++++++++++++++++++++++++++++++++-
->  2 files changed, 172 insertions(+), 1 deletion(-)
+> v6: Delay user-only cpu reset bits to the user-only patch set.
+> ---
+>  target/arm/cpu64.c | 1 +
+>  1 file changed, 1 insertion(+)
 >
-> diff --git a/target/arm/internals.h b/target/arm/internals.h
-> index fb92ef6b84..8ae80f3945 100644
-> --- a/target/arm/internals.h
-> +++ b/target/arm/internals.h
-> @@ -1318,6 +1318,9 @@ FIELD(MTEDESC, WRITE, 8, 1)
->  FIELD(MTEDESC, ESIZE, 9, 5)
->  FIELD(MTEDESC, TSIZE, 14, 10)  /* mte_checkN only */
+> diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+> index cbc5c3868f..e4bce55c5f 100644
+> --- a/target/arm/cpu64.c
+> +++ b/target/arm/cpu64.c
+> @@ -655,6 +655,7 @@ static void aarch64_max_initfn(Object *obj)
 >
-> +bool mte_probe1(CPUARMState *env, uint32_t desc, uint64_t ptr, uintptr_t ra);
-> +uint64_t mte_check1(CPUARMState *env, uint32_t desc, uint64_t ptr, uintptr_t ra);
-> +
->  static inline int allocation_tag_from_addr(uint64_t ptr)
->  {
->      return extract64(ptr, 56, 4);
-> @@ -1328,4 +1331,48 @@ static inline uint64_t address_with_allocation_tag(uint64_t ptr, int rtag)
->      return deposit64(ptr, 56, 4, rtag);
->  }
->
-> +/* Return true if tbi bits mean that the access is checked.  */
-> +static inline bool tbi_check(uint32_t desc, int bit55)
-> +{
-> +    return (desc >> (R_MTEDESC_TBI_SHIFT + bit55)) & 1;
-> +}
-> +
-> +/* Return true if tcma bits mean that the access is unchecked.  */
-> +static inline bool tcma_check(uint32_t desc, int bit55, int ptr_tag)
+>          t = cpu->isar.id_aa64pfr1;
+>          t = FIELD_DP64(t, ID_AA64PFR1, BT, 1);
+> +        t = FIELD_DP64(t, ID_AA64PFR1, MTE, 2);
+>          cpu->isar.id_aa64pfr1 = t;
 
-It's a bit confusing that one of these foo_check()s returns
-"true for checked access" and the other one returns "true
-for unchecked access"...
+If we don't actually have tagged memory yet should we really
+set the MTE field to 2 rather than 1 ?
 
 thanks
 -- PMM
