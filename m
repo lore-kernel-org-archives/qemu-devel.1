@@ -2,73 +2,89 @@ Return-Path: <SRS0=FaGC=77=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BCF5C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 19:17:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD4C3C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 19:18:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 51E7D208C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 19:17:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51E7D208C3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 77EA6208C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 19:18:18 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZdtwPM5o"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77EA6208C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59688 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60262 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jm02v-0005ov-E3
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 15:17:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39006)
+	id 1jm03F-00069P-Iw
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 15:18:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39026)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jm027-0004PV-Lb
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 15:17:08 -0400
-Resent-Date: Thu, 18 Jun 2020 15:17:07 -0400
-Resent-Message-Id: <E1jm027-0004PV-Lb@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21772)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jm02B-0004Tn-D4
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 15:17:11 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:28245)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jm025-0000hN-Ku
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 15:17:07 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1592507807; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=XwadisQvcUOHasNJdAyjCmNTm7LyWRYZf30vIFxEId1TpCKl3VZqDcbCkzO3zXk48B9zF69YiZLrqA56OljIAUT0Q13fbkBxk9bEQBa7IDvazVgU4vBqV/6Pw4tQQcB243QcltKbfyCGs0BQIPUN3tGDjzfMdSI6p2WHaAz8Ntc=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1592507807;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=T4LRSpbkCgjmx4Bo3yT1jbBLsvhtT4XJ1LDGYVNYzeY=; 
- b=GfBahGuLcLGxa3ashlua8CUYmHR7Lz+mZ3H7ydiEBO7GDpcPMUkIk/sKo/xMcGPLVPiS/nX2/zeldAs2yn5yGtNsLPn++2LXCyXgDRM/ee4kS+EYPeT3wPWehUybBl5dTIAWZaCkC9qVIUGO5vWOY5xnUp+p5atoV8UP8rxJMAU=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1592507805457569.1648102329214;
- Thu, 18 Jun 2020 12:16:45 -0700 (PDT)
-Message-ID: <159250780325.26237.11987481328854775265@d1fd068a5071>
-Subject: Re: [RFC v6 0/4] QEMU cpus.c refactoring
-In-Reply-To: <20200618190401.4895-1-cfontana@suse.de>
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jm029-0000hh-70
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 15:17:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592507827;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=3+2fuwaYdUbo9Lf+Fd2YZ6DhXG5dCOvxVeE6Ups1ArI=;
+ b=ZdtwPM5o1esqEHglKKhuwfyDS3KfxdRyST415psI5E45FKecKIfGxgOf3hSnjf1NNLVAv4
+ 7cgdQ+W/25Y6WsrfrUgsPbMVngESbBW2X6C2B1oomlgof17nyvKDNKRRiGAcnDL3LmkfaK
+ pViBzFjAxXIh0lR12NqylJiwHP0e3/E=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-21-OIcOXzDxPXu1bW6pIdw5eA-1; Thu, 18 Jun 2020 15:17:05 -0400
+X-MC-Unique: OIcOXzDxPXu1bW6pIdw5eA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8BB1010059A1;
+ Thu, 18 Jun 2020 19:17:04 +0000 (UTC)
+Received: from work-vm (ovpn-114-205.ams2.redhat.com [10.36.114.205])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 02E855C1D0;
+ Thu, 18 Jun 2020 19:16:57 +0000 (UTC)
+Date: Thu, 18 Jun 2020 20:16:55 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Vivek Goyal <vgoyal@redhat.com>
+Subject: Re: [Virtio-fs] [PATCH 0/2] virtiofsd: drop Linux capabilities(7)
+Message-ID: <20200618191655.GI2769@work-vm>
+References: <20200416164907.244868-1-stefanha@redhat.com>
+ <20200618190816.GD3814@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: cfontana@suse.de
-Date: Thu, 18 Jun 2020 12:16:45 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 12:45:19
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200618190816.GD3814@redhat.com>
+User-Agent: Mutt/1.14.0 (2020-05-02)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 00:57:40
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -81,55 +97,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: lvivier@redhat.com, peter.maydell@linaro.org, thuth@redhat.com,
- ehabkost@redhat.com, alex.bennee@linaro.org, mtosatti@redhat.com,
- armbru@redhat.com, qemu-devel@nongnu.org, r.bolshakov@yadro.com,
- haxm-team@intel.com, colin.xu@intel.com, pbonzini@redhat.com,
- sunilmut@microsoft.com, rth@twiddle.net, philmd@redhat.com, cfontana@suse.de,
- wenchao.wang@intel.com
+Cc: virtio-fs@redhat.com, qemu-devel@nongnu.org,
+ Stefan Hajnoczi <stefanha@redhat.com>, Miklos Szeredi <miklos@szeredi.hu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDYxODE5MDQwMS40ODk1
-LTEtY2ZvbnRhbmFAc3VzZS5kZS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgdGhlIGRvY2tl
-ci1xdWlja0BjZW50b3M3IGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNvbW1h
-bmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxsZWQs
-IHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJUFQg
-QkVHSU4gPT09CiMhL2Jpbi9iYXNoCm1ha2UgZG9ja2VyLWltYWdlLWNlbnRvczcgVj0xIE5FVFdP
-Uks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtcXVpY2tAY2VudG9zNyBTSE9XX0VOVj0xIEo9MTQg
-TkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgogIENDICAgICAgYXVkaW8vc3BpY2Vh
-dWRpby5vCiAgQ0MgICAgICBhdWRpby93YXZjYXB0dXJlLm8KL3RtcC9xZW11LXRlc3Qvc3JjL2Rt
-YS1oZWxwZXJzLmM6IEluIGZ1bmN0aW9uICdkbWFfYmxrX2NiJzoKL3RtcC9xZW11LXRlc3Qvc3Jj
-L2RtYS1oZWxwZXJzLmM6MTU0OjIwOiBlcnJvcjogJ3VzZV9pY291bnQnIHVuZGVjbGFyZWQgKGZp
-cnN0IHVzZSBpbiB0aGlzIGZ1bmN0aW9uKQogICAgICAgICBpZiAobWVtICYmIHVzZV9pY291bnQg
-JiYgZGJzLT5kaXIgPT0gRE1BX0RJUkVDVElPTl9GUk9NX0RFVklDRSkgewogICAgICAgICAgICAg
-ICAgICAgIF4KL3RtcC9xZW11LXRlc3Qvc3JjL2RtYS1oZWxwZXJzLmM6MTU0OjIwOiBub3RlOiBl
-YWNoIHVuZGVjbGFyZWQgaWRlbnRpZmllciBpcyByZXBvcnRlZCBvbmx5IG9uY2UgZm9yIGVhY2gg
-ZnVuY3Rpb24gaXQgYXBwZWFycyBpbgptYWtlOiAqKiogW2RtYS1oZWxwZXJzLm9dIEVycm9yIDEK
-bWFrZTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4KVHJhY2ViYWNrIChtb3N0
-IHJlY2VudCBjYWxsIGxhc3QpOgogIEZpbGUgIi4vdGVzdHMvZG9ja2VyL2RvY2tlci5weSIsIGxp
-bmUgNjY5LCBpbiA8bW9kdWxlPgotLS0KICAgIHJhaXNlIENhbGxlZFByb2Nlc3NFcnJvcihyZXRj
-b2RlLCBjbWQpCnN1YnByb2Nlc3MuQ2FsbGVkUHJvY2Vzc0Vycm9yOiBDb21tYW5kICdbJ3N1ZG8n
-LCAnLW4nLCAnZG9ja2VyJywgJ3J1bicsICctLWxhYmVsJywgJ2NvbS5xZW11Lmluc3RhbmNlLnV1
-aWQ9YTA1MWQ1MTgyNzdhNGM4N2IwNjkzZTU4Y2ZkNDQwOGInLCAnLXUnLCAnMTAwMScsICctLXNl
-Y3VyaXR5LW9wdCcsICdzZWNjb21wPXVuY29uZmluZWQnLCAnLS1ybScsICctZScsICdUQVJHRVRf
-TElTVD0nLCAnLWUnLCAnRVhUUkFfQ09ORklHVVJFX09QVFM9JywgJy1lJywgJ1Y9JywgJy1lJywg
-J0o9MTQnLCAnLWUnLCAnREVCVUc9JywgJy1lJywgJ1NIT1dfRU5WPTEnLCAnLWUnLCAnQ0NBQ0hF
-X0RJUj0vdmFyL3RtcC9jY2FjaGUnLCAnLXYnLCAnL2hvbWUvcGF0Y2hldy8uY2FjaGUvcWVtdS1k
-b2NrZXItY2NhY2hlOi92YXIvdG1wL2NjYWNoZTp6JywgJy12JywgJy92YXIvdG1wL3BhdGNoZXct
-dGVzdGVyLXRtcC1rMmY0MXoyZC9zcmMvZG9ja2VyLXNyYy4yMDIwLTA2LTE4LTE1LjE0LjE2LjE5
-NzQ0Oi92YXIvdG1wL3FlbXU6eixybycsICdxZW11OmNlbnRvczcnLCAnL3Zhci90bXAvcWVtdS9y
-dW4nLCAndGVzdC1xdWljayddJyByZXR1cm5lZCBub24temVybyBleGl0IHN0YXR1cyAyLgpmaWx0
-ZXI9LS1maWx0ZXI9bGFiZWw9Y29tLnFlbXUuaW5zdGFuY2UudXVpZD1hMDUxZDUxODI3N2E0Yzg3
-YjA2OTNlNThjZmQ0NDA4YgptYWtlWzFdOiAqKiogW2RvY2tlci1ydW5dIEVycm9yIDEKbWFrZVsx
-XTogTGVhdmluZyBkaXJlY3RvcnkgYC92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC1rMmY0MXoy
-ZC9zcmMnCm1ha2U6ICoqKiBbZG9ja2VyLXJ1bi10ZXN0LXF1aWNrQGNlbnRvczddIEVycm9yIDIK
-CnJlYWwgICAgMm0yNy43ODdzCnVzZXIgICAgMG04LjcwMXMKCgpUaGUgZnVsbCBsb2cgaXMgYXZh
-aWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMjAwNjE4MTkwNDAxLjQ4OTUtMS1j
-Zm9udGFuYUBzdXNlLmRlL3Rlc3RpbmcuZG9ja2VyLXF1aWNrQGNlbnRvczcvP3R5cGU9bWVzc2Fn
-ZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8v
-cGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVs
-QHJlZGhhdC5jb20=
+* Vivek Goyal (vgoyal@redhat.com) wrote:
+> On Thu, Apr 16, 2020 at 05:49:05PM +0100, Stefan Hajnoczi wrote:
+> > virtiofsd doesn't need of all Linux capabilities(7) available to root.  Keep a
+> > whitelisted set of capabilities that we require.  This improves security in
+> > case virtiofsd is compromised by making it hard for an attacker to gain further
+> > access to the system.
+> 
+> Hi Stefan,
+> 
+> I just noticed that this patch set breaks overlayfs on top of virtiofs.
+> 
+> overlayfs sets "trusted.overlay.*" and xattrs in trusted domain
+> need CAP_SYS_ADMIN.
+> 
+> man xattr says.
+> 
+>    Trusted extended attributes
+>        Trusted  extended  attributes  are  visible and accessible only to pro‐
+>        cesses that have the  CAP_SYS_ADMIN  capability.   Attributes  in  this
+>        class are used to implement mechanisms in user space (i.e., outside the
+>        kernel) which keep information in extended attributes to which ordinary
+>        processes should not have access.
+> 
+> There is a chance that overlay moves away from trusted xattr in future.
+> But for now we need to make it work. This is an important use case for
+> kata docker in docker build.
+> 
+> May be we can add an option to virtiofsd say "--add-cap <capability>" and
+> ask user to pass in "--add-cap cap_sys_admin" if they need to run daemon
+> with this capaibility.
+
+I'll admit I don't like the idea of giving it cap_sys_admin.
+Can you explain:
+  a) What overlayfs uses trusted for?
+  b) If something nasty was to write junk into the trusted attributes,
+    what would happen?
+  c) I see overlayfs has a fallback check if xattr isn't supported at
+all - what is the consequence?
+
+Dave
+
+> Thanks
+> Vivek
+> 
+> > 
+> > Stefan Hajnoczi (2):
+> >   virtiofsd: only retain file system capabilities
+> >   virtiofsd: drop all capabilities in the wait parent process
+> > 
+> >  tools/virtiofsd/passthrough_ll.c | 51 ++++++++++++++++++++++++++++++++
+> >  1 file changed, 51 insertions(+)
+> > 
+> > -- 
+> > 2.25.1
+> > 
+> > _______________________________________________
+> > Virtio-fs mailing list
+> > Virtio-fs@redhat.com
+> > https://www.redhat.com/mailman/listinfo/virtio-fs
+> 
+> _______________________________________________
+> Virtio-fs mailing list
+> Virtio-fs@redhat.com
+> https://www.redhat.com/mailman/listinfo/virtio-fs
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
 
