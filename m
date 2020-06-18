@@ -2,137 +2,130 @@ Return-Path: <SRS0=FaGC=77=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFDBAC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 12:55:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 306EAC433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 13:07:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ACB8F206F7
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 12:55:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EE3F120707
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 13:07:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EdHGFpGz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACB8F206F7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mymailcheap.com header.i=@mymailcheap.com header.b="pdgWBl5H";
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=flygoat.com header.i=@flygoat.com header.b="o95deIu9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE3F120707
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=flygoat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59810 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39492 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlu4p-0001cm-TM
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 08:55:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58096)
+	id 1jluGb-0000ib-6H
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 09:07:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34720)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jlu48-0000cz-56
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 08:54:48 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:56563
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jlu45-0008WK-Ph
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 08:54:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592484884;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=O2vd7/BqlDxEuizo8PgxNUECPDxyVdGdfE2Sbs+Rb5w=;
- b=EdHGFpGzWZS3ZT9eQO5DH7QEUcRRGF0Ddh6s3GyVr7BPTZ4lAjVTgCnGJIh0Ts7U0ArQox
- GVsToeDXQCihOY4lQTUMWja2LZUIKagmYTrEM3cP0LQ8s1xwMIWxMQCnzhCq0ayugP0EDI
- tzL2qUrkMVFVIV09Zq8XM4RroVPG4K4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-30-sx4KIf-JOKOw9to3tO5hGA-1; Thu, 18 Jun 2020 08:54:42 -0400
-X-MC-Unique: sx4KIf-JOKOw9to3tO5hGA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.90_1) (envelope-from <jiaxun.yang@flygoat.com>)
+ id 1jluG1-0000IM-0e
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 09:07:05 -0400
+Received: from relay3.mymailcheap.com ([217.182.66.161]:44634)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <jiaxun.yang@flygoat.com>)
+ id 1jluFx-0002Uy-H4
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 09:07:04 -0400
+Received: from filter2.mymailcheap.com (filter2.mymailcheap.com
+ [91.134.140.82])
+ by relay3.mymailcheap.com (Postfix) with ESMTPS id 39DB23F1CC;
+ Thu, 18 Jun 2020 15:06:57 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+ by filter2.mymailcheap.com (Postfix) with ESMTP id 1937E2A8F8;
+ Thu, 18 Jun 2020 15:06:57 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=mymailcheap.com;
+ s=default; t=1592485617;
+ bh=zi2h1C6ZxZzoD7n3cllbhfBhKtTXvyO/2y6JmuHnGvo=;
+ h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
+ b=pdgWBl5HUGLpZ7ZUuZmXAkdDCdxHGnKB1/d2miLoWnmMU2KtmAkiFr66GtSRYppcp
+ VtBWhPCgJZKEKTcmoghsbnUcmA8zuZHdE7yW8lc8tL708lxfN6RMBtFR8GDdCbFcKA
+ i4p3XGIuND4h7VtUJ+zInOBXubrXVGnUi5sg7kf8=
+X-Virus-Scanned: Debian amavisd-new at filter2.mymailcheap.com
+Received: from filter2.mymailcheap.com ([127.0.0.1])
+ by localhost (filter2.mymailcheap.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id CTOkohHc-etw; Thu, 18 Jun 2020 15:06:55 +0200 (CEST)
+Received: from mail20.mymailcheap.com (mail20.mymailcheap.com [51.83.111.147])
+ (using TLSv1.2 with cipher ADH-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 439CA10CE79D;
- Thu, 18 Jun 2020 12:54:41 +0000 (UTC)
-Received: from [10.36.114.105] (ovpn-114-105.ams2.redhat.com [10.36.114.105])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 680A91002393;
- Thu, 18 Jun 2020 12:54:37 +0000 (UTC)
-Subject: Re: [PATCH v25 QEMU 3/3] virtio-balloon: Replace free page hinting
- references to 'report' with 'hint'
-To: Alexander Duyck <alexander.duyck@gmail.com>,
- "Michael S. Tsirkin" <mst@redhat.com>
-References: <20200527041212.12700.60627.stgit@localhost.localdomain>
- <20200527041414.12700.50293.stgit@localhost.localdomain>
- <CAKgT0UdPC1s0c-wqsNc4x8DeZhtZQVMmLArWQ=Z345Mkof650Q@mail.gmail.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <4f37c184-cf62-5711-a737-925533b52d73@redhat.com>
-Date: Thu, 18 Jun 2020 14:54:36 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ by filter2.mymailcheap.com (Postfix) with ESMTPS;
+ Thu, 18 Jun 2020 15:06:55 +0200 (CEST)
+Received: from [148.251.23.173] (ml.mymailcheap.com [148.251.23.173])
+ by mail20.mymailcheap.com (Postfix) with ESMTP id 1244941A63;
+ Thu, 18 Jun 2020 13:06:55 +0000 (UTC)
+Authentication-Results: mail20.mymailcheap.com; dkim=pass (1024-bit key;
+ unprotected) header.d=flygoat.com header.i=@flygoat.com header.b="o95deIu9"; 
+ dkim-atps=neutral
+AI-Spam-Status: Not processed
+Received: from [0.0.0.0] (1-165-3-60.dynamic-ip.hinet.net [1.165.3.60])
+ (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+ key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits))
+ (No client certificate requested)
+ by mail20.mymailcheap.com (Postfix) with ESMTPSA id A0F1A40EB7;
+ Thu, 18 Jun 2020 13:04:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=flygoat.com;
+ s=default; t=1592485501;
+ bh=zi2h1C6ZxZzoD7n3cllbhfBhKtTXvyO/2y6JmuHnGvo=;
+ h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
+ b=o95deIu9Jc4rBdhC1bL1Un/5ziCEQfiLRsTofaucvjoQLtCkYfNc5E/gdEiPVFdto
+ ooUfkcRfLVkNpFClxOx4AIDk+QinfxxlkpnwemaGpoWXBO+XroddFVdAE8hElFau6z
+ TdVfhWPUjTt/K+tAHVvCXj1m5/NBg+vrqrCTPm6s=
+Subject: Re: [PATCH v2 0/2] target/mips: Add two groups of loongson-ext
+ instructions
+To: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+References: <20200616073359.2999656-1-jiaxun.yang@flygoat.com>
+ <CAHiYmc6QEU4zk=0Xa6_gs1JEV+1mGNp3oNYQ6rZoxeLF5cABBw@mail.gmail.com>
+ <46907c6f-6c0f-5918-0885-a60b0114e1d1@flygoat.com>
+ <CAHiYmc6CYez1Ur2atyFa66HvbHSpiDLGa-emJ8CUK=hV0kpqXQ@mail.gmail.com>
+ <519e6f85-4484-fb6c-67e4-a92c99aa7093@flygoat.com>
+ <CAHiYmc41rQVuv2i2r0Qgin2emtVOBi15-kx4sHjw4H5EbDeaJA@mail.gmail.com>
+From: Jiaxun Yang <jiaxun.yang@flygoat.com>
+Message-ID: <ec27e816-0ee9-7f5e-40cc-a4a9e06c1f2a@flygoat.com>
+Date: Thu, 18 Jun 2020 21:04:55 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <CAKgT0UdPC1s0c-wqsNc4x8DeZhtZQVMmLArWQ=Z345Mkof650Q@mail.gmail.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=david@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <CAHiYmc41rQVuv2i2r0Qgin2emtVOBi15-kx4sHjw4H5EbDeaJA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=david@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 01:21:16
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Rspamd-Queue-Id: 1244941A63
+X-Spamd-Result: default: False [1.40 / 10.00]; TO_DN_EQ_ADDR_SOME(0.00)[];
+ RCVD_VIA_SMTP_AUTH(0.00)[]; TO_DN_SOME(0.00)[];
+ R_SPF_SOFTFAIL(0.00)[~all:c];
+ ML_SERVERS(-3.10)[148.251.23.173];
+ DKIM_TRACE(0.00)[flygoat.com:+];
+ DMARC_POLICY_ALLOW(0.00)[flygoat.com,none];
+ DMARC_POLICY_ALLOW_WITH_FAILURES(0.00)[];
+ FREEMAIL_TO(0.00)[gmail.com]; RCVD_NO_TLS_LAST(0.10)[];
+ RECEIVED_SPAMHAUS_PBL(0.00)[1.165.3.60:received];
+ FROM_EQ_ENVFROM(0.00)[]; MIME_TRACE(0.00)[0:+];
+ ASN(0.00)[asn:24940, ipnet:148.251.0.0/16, country:DE];
+ MID_RHS_MATCH_FROM(0.00)[]; ARC_NA(0.00)[];
+ R_DKIM_ALLOW(0.00)[flygoat.com:s=default]; FROM_HAS_DN(0.00)[];
+ RCPT_COUNT_THREE(0.00)[4]; FREEMAIL_ENVRCPT(0.00)[gmail.com];
+ TO_MATCH_ENVRCPT_ALL(0.00)[]; TAGGED_RCPT(0.00)[];
+ MIME_GOOD(-0.10)[text/plain];
+ HFILTER_HELO_BAREIP(3.00)[148.251.23.173,1];
+ RCVD_COUNT_TWO(0.00)[2]; SUSPICIOUS_RECIPS(1.50)[]
+X-Rspamd-Server: mail20.mymailcheap.com
+Received-SPF: pass client-ip=217.182.66.161;
+ envelope-from=jiaxun.yang@flygoat.com; helo=relay3.mymailcheap.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 09:06:57
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -145,94 +138,175 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
+Cc: "chenhc@lemote.com" <chenhc@lemote.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "aurelien@aurel32.net" <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 13.06.20 22:07, Alexander Duyck wrote:
-> On Tue, May 26, 2020 at 9:14 PM Alexander Duyck
-> <alexander.duyck@gmail.com> wrote:
->>
->> From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
->>
->> In an upcoming patch a feature named Free Page Reporting is about to be
->> added. In order to avoid any confusion we should drop the use of the word
->> 'report' when referring to Free Page Hinting. So what this patch does is go
->> through and replace all instances of 'report' with 'hint" when we are
->> referring to free page hinting.
->>
->> Acked-by: David Hildenbrand <david@redhat.com>
->> Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
->> ---
->>  hw/virtio/virtio-balloon.c         |   78 ++++++++++++++++++------------------
->>  include/hw/virtio/virtio-balloon.h |   20 +++++----
->>  2 files changed, 49 insertions(+), 49 deletions(-)
->>
->> diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
->> index 3e2ac1104b5f..dc15409b0bb6 100644
->> --- a/hw/virtio/virtio-balloon.c
->> +++ b/hw/virtio/virtio-balloon.c
+
+
+在 2020/6/18 20:00, Aleksandar Markovic 写道:
 > 
-> ...
 > 
->> @@ -817,14 +817,14 @@ static int virtio_balloon_post_load_device(void *opaque, int version_id)
->>      return 0;
->>  }
->>
->> -static const VMStateDescription vmstate_virtio_balloon_free_page_report = {
->> +static const VMStateDescription vmstate_virtio_balloon_free_page_hint = {
->>      .name = "virtio-balloon-device/free-page-report",
->>      .version_id = 1,
->>      .minimum_version_id = 1,
->>      .needed = virtio_balloon_free_page_support,
->>      .fields = (VMStateField[]) {
->> -        VMSTATE_UINT32(free_page_report_cmd_id, VirtIOBalloon),
->> -        VMSTATE_UINT32(free_page_report_status, VirtIOBalloon),
->> +        VMSTATE_UINT32(free_page_hint_cmd_id, VirtIOBalloon),
->> +        VMSTATE_UINT32(free_page_hint_status, VirtIOBalloon),
->>          VMSTATE_END_OF_LIST()
->>      }
->>  };
+> среда, 17. јун 2020., Jiaxun Yang <jiaxun.yang@flygoat.com 
+> <mailto:jiaxun.yang@flygoat.com>> је написао/ла:
 > 
-> So I noticed this patch wasn't in the list of patches pulled, but that
-> is probably for the best since I believe the change above might have
-> broken migration as VMSTATE_UINT32 does a stringify on the first
-> parameter.
-
-Indeed, it's the name of the vmstate field. But I don't think it is
-relevant for migration. It's and indicator if a field is valid and it's
-used in traces/error messages.
-
-See git grep "field->name"
-
-I don't think renaming this is problematic. Can you rebase and resent?
-Thanks!
-
-> Any advice on how to address it, or should I just give up on renaming
-> free_page_report_cmd_id and free_page_report_status?
 > 
-> Looking at this I wonder why we even need to migrate these values? It
-> seems like if we are completing a migration the cmd_id should always
-> be "DONE" shouldn't it? It isn't as if we are going to migrate the
+> 
+>     在 2020/6/16 22:41, Aleksandar Markovic 写道:
+> 
+> 
+> 
+>         уторак, 16. јун 2020., Jiaxun Yang <jiaxun.yang@flygoat.com
+>         <mailto:jiaxun.yang@flygoat.com> <mailto:jiaxun.yang@flygoat.com
+>         <mailto:jiaxun.yang@flygoat.com>>> је написао/ла:
+> 
+> 
+> 
+>              在 2020/6/16 18:38, Aleksandar Markovic 写道:
+> 
+> 
+> 
+>                  уторак, 16. јун 2020., Jiaxun Yang
+>         <jiaxun.yang@flygoat.com <mailto:jiaxun.yang@flygoat.com>
+>                  <mailto:jiaxun.yang@flygoat.com
+>         <mailto:jiaxun.yang@flygoat.com>>
+>         <mailto:jiaxun.yang@flygoat.com <mailto:jiaxun.yang@flygoat.com>
+>                  <mailto:jiaxun.yang@flygoat.com
+>         <mailto:jiaxun.yang@flygoat.com>>>> је написао/ла:
+> 
+>                       This is the sucessor of:
+>                       "Basic TCG Loongson-3A1000 Support"
+> 
+>                       Thanks!
+> 
+> 
+>                  Hi, Jiaxun.
+> 
+>                  Thanks for providing updated version of the series.
+> 
+>                  I wonder, given so many "#if defined(TARGET_MIPS64)"
+>         lines in
+>                  this series, what would be the 32-bit processors that
+>         support
+>                  Loongson EXT ASE?
+> 
+> 
+>              Loongson GS232 core which can be found in Loongson-1A/B/C
+>         should
+>              support it.
+>              Although I have no intension to work on QEMU support of these
+>              processors.
+> 
+> 
+>         ...And, for the sake of accuracy, you nevertheless included the
+>         correct implementation (for both 32-bir and 64-bit). That is
+>         very good. I would do the same, if I were you.
+> 
+>         However, there is a problem. We can't upstream (at least not in
+>         QEMU for MIPS) anything without the proper documentation.
+> 
+>         So, please provide the links or attach the supporting files to
+>         the cover letter in v2. You already did something similar in
+>         some of your previous series and patches. I am perfectly fine
+>         with machine translation from Chinese.
+> 
+>         For example, you need to provide, among other things, docs
+>         describing EXT support in GS 232 cores. We can't just make
+>         assumptions, or trust your word. These sources of information
+>         should be repeated for all versions (v2, v3,...) of the series,
+>         in their cover letters.
+> 
+> 
+>     I'll attach necessary information about these instructions in next
+>     version, however, there is no public document avilable for GS232 core.
+>     That's why I'm not intend to upstream it for now.
+> 
+>     Should I keep these code as is? Ot just filter all Loongson EXT out
+>     for MIPS32.
+> 
+> 
+> Sorry for late response, Jiaxun, I got carried away with other things.
+> 
+> I am not sure, I simply don't have access to the appropriate info. at 
+> this moment, I'd say you can keep (for now) the "ifdef"-ed code for 
+> handling 32-bit, since it will never be actually used.
+> 
+> But, how do you know the code is correct, if there is no doc? How do you 
+> know about specifics of 32-bit ext? Is it just guessing, or more than 
+> that? Mention the source of information in commit messages, if any. Or  > say this is just a guess.
 
-The *status* should be DONE IIUC. The cmd_id might be relevant, no? It's
-always incremented until it wraps.
+By guess and experiments on real hardware....
 
-> hinting from one host to another. We will have to start over which is
-> essentially the signal that the "DONE" value provides. Same thing for
-> the status. We shouldn't be able to migrate unless both of these are
-> already in the "DONE" state so if anything I wonder if we shouldn't
-> have that as the initial state for the device and just drop the
-> migration info.
+> 
+> A short comment should be added about handling for 32-bit just before 
+> the main functions that handle Loongson EXT, just like Richard did for 
+> those instructions from LMMI that he could not find proper documentation.
 
-We'll have to glue that to a compat machine unfortunately, so we can
-just keep migrating it ... :(
+Will do.
 
+> 
+> Also, can you mention what is achieved by having EXT in QEMU? What 
+> Longson-related scenarion would work, that previously (currently) would not?
+>
+
+As most applications targeting Loongson processor including Kernel are 
+compiled -march=loongson3a CFLAG, without supoorting these instructions 
+these applications can never run properly.
+
+I'll mention them in next version of cover letter. Probably tomorrow.
+
+> Thanks for this nice series, and all valuable efforts, hopefully we will 
+> resolve documentation issue in comming days or weeks.
+
+Thanks, and wish you all health!
+
+> 
+> Aleksandar
+> 
+> 
+> 
+>     Thanks.
+> 
+> 
+>         I salute your series, but it needs much more justification.
+> 
+>         Yours,
+>         Aleksandar
+> 
+> 
+>                  Thanks,
+>                  Aleksandar
+> 
+>                       Jiaxun Yang (2):
+>                          target/mips: Add loongson-ext lsdc2 group of
+>         instructions
+>                          target/mips: Add loongson-ext lswc2 group of
+>         instrustions
+> 
+> 
+>                  Also, a spelling mistake in the second title.
+> 
+> 
+>              Ahh, My bad....
+> 
+> 
+>                         target/mips/translate.c | 437
+>                  ++++++++++++++++++++++++++++++++++++++++
+>                         1 file changed, 437 insertions(+)
+> 
+>                       --     2.27.0.rc2
+> 
+> 
+>              --     - Jiaxun
+> 
+> 
+>     -- 
+>     - Jiaxun
+> 
 
 -- 
-Thanks,
-
-David / dhildenb
-
+- Jiaxun
 
