@@ -2,75 +2,82 @@ Return-Path: <SRS0=FaGC=77=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B789C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 06:51:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68323C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 06:57:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 402D420897
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 06:51:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 402D420897
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3296620773
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 06:57:23 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N3RB2kAs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3296620773
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44594 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50578 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jloO5-0005I8-7E
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 02:51:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34022)
+	id 1jloUE-0000Te-FG
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 02:57:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35310)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhang.zhanghailiang@huawei.com>)
- id 1jloN9-0004UY-UC
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 02:50:03 -0400
-Received: from szxga02-in.huawei.com ([45.249.212.188]:2525 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhang.zhanghailiang@huawei.com>)
- id 1jloN6-0000a8-Ur
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 02:50:03 -0400
-Received: from DGGEMM405-HUB.china.huawei.com (unknown [172.30.72.54])
- by Forcepoint Email with ESMTP id 85DD3967B501EFCB0662;
- Thu, 18 Jun 2020 14:49:52 +0800 (CST)
-Received: from dggeme755-chm.china.huawei.com (10.3.19.101) by
- DGGEMM405-HUB.china.huawei.com (10.3.20.213) with Microsoft SMTP Server (TLS)
- id 14.3.487.0; Thu, 18 Jun 2020 14:49:51 +0800
-Received: from dggeme756-chm.china.huawei.com (10.3.19.102) by
- dggeme755-chm.china.huawei.com (10.3.19.101) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1913.5; Thu, 18 Jun 2020 14:49:51 +0800
-Received: from dggeme756-chm.china.huawei.com ([10.6.80.68]) by
- dggeme756-chm.china.huawei.com ([10.6.80.68]) with mapi id 15.01.1913.007;
- Thu, 18 Jun 2020 14:49:51 +0800
-From: Zhanghailiang <zhang.zhanghailiang@huawei.com>
-To: Markus Armbruster <armbru@redhat.com>
-Subject: RE: Memory leak in transfer_memory_block()?
-Thread-Topic: Memory leak in transfer_memory_block()?
-Thread-Index: AQHWRTJtqk4GroVog0qllPUMIQmMXKjd7Xrw
-Date: Thu, 18 Jun 2020 06:49:51 +0000
-Message-ID: <8562bcb768514568b14788e801aee681@huawei.com>
-References: <87h7v9szpe.fsf@dusky.pond.sub.org>
-In-Reply-To: <87h7v9szpe.fsf@dusky.pond.sub.org>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.173.220.30]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jloSy-0007t9-QF
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 02:56:04 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:57118
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jloSw-0001Zb-Hz
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 02:56:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592463360;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+ bh=eHHewTtYb69Es1LE3vZdcUbxAlv9dd3TpL89uh0f4og=;
+ b=N3RB2kAsU9JkbYFu8VIKzZ0oif0zrkDzyvtrfquMRPtL0f39FarPtIBEgYURMCCdqyUw4W
+ OoR8wC5yVc3ioDsgIR92geOtbpWqsG5qGn/xHbBcHGT9LCSug/+jT5WGpEEaXcK4DOVRc1
+ 8BAd1e1NiFAov1dQGhsd+RR+Gx0zwRA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-319-2eWAbsoeO8Kkf_xSqoXz9A-1; Thu, 18 Jun 2020 02:55:59 -0400
+X-MC-Unique: 2eWAbsoeO8Kkf_xSqoXz9A-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 32CA11083E84
+ for <qemu-devel@nongnu.org>; Thu, 18 Jun 2020 06:55:58 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-121.ams2.redhat.com
+ [10.36.112.121])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6BB5F10246F2;
+ Thu, 18 Jun 2020 06:55:55 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id CEDA11132BD7; Thu, 18 Jun 2020 08:55:53 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: David Gibson <dgibson@redhat.com>
+Subject: Memory leak in spapr_machine_init()?
+Date: Thu, 18 Jun 2020 08:55:53 +0200
+Message-ID: <874kr8uakm.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.188;
- envelope-from=zhang.zhanghailiang@huawei.com; helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 02:49:53
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 00:57:40
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -83,82 +90,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> -----Original Message-----
-> From: Markus Armbruster [mailto:armbru@redhat.com]
-> Sent: Thursday, June 18, 2020 1:36 PM
-> To: Zhanghailiang <zhang.zhanghailiang@huawei.com>
-> Cc: qemu-devel@nongnu.org; Michael Roth <mdroth@linux.vnet.ibm.com>
-> Subject: Memory leak in transfer_memory_block()?
->=20
-> We appear to leak an Error object when ga_read_sysfs_file() fails with
-> errno !=3D ENOENT unless caller passes true @sys2memblk:
->=20
->     static void transfer_memory_block(GuestMemoryBlock *mem_blk, bool
-> sys2memblk,
->                                       GuestMemoryBlockResponse
-> *result,
->                                       Error **errp)
->     {
->         [...]
->         if (local_err) {
->=20
-> We have an Error object.
->=20
->             /* treat with sysfs file that not exist in old kernel */
->             if (errno =3D=3D ENOENT) {
->=20
-> Case 1: ENOENT; we free it.  Good.
->=20
->                 error_free(local_err);
->                 if (sys2memblk) {
->                     mem_blk->online =3D true;
->                     mem_blk->can_offline =3D false;
->                 } else if (!mem_blk->online) {
->                     result->response =3D
->=20
-> GUEST_MEMORY_BLOCK_RESPONSE_TYPE_OPERATION_NOT_SUPPORTED;
->                 }
->             } else {
->=20
-> Case 2: other than ENOENT
->=20
->                 if (sys2memblk) {
->=20
-> Case 2a: sys2memblk; we pass it to the caller.  Good.
->=20
->                     error_propagate(errp, local_err);
->                 } else {
->=20
-> Case 2b: !sys2memblk; ???
->=20
+Either I'm confused (quite possible), or kvmppc_check_papr_resize_hpt()
+can leak an Error object on failure.  Please walk through the code with
+me:
 
-Good catch!  I think we should pass the error info back to the caller,
-Let's record this error for debug when it happens.
+        kvmppc_check_papr_resize_hpt(&resize_hpt_err);
 
->                     result->response =3D
->=20
-> GUEST_MEMORY_BLOCK_RESPONSE_TYPE_OPERATION_FAILED;
->                 }
->             }
->             goto out2;
->         }
->         [...]
->     out2:
->         g_free(status);
->         close(dirfd);
->     out1:
->         if (!sys2memblk) {
->             result->has_error_code =3D true;
->             result->error_code =3D errno;
->         }
->     }
->=20
-> What is supposed to be done with @local_err in case 2b?
+This sets @resize_hpt_err on failure.
+
+        if (spapr->resize_hpt == SPAPR_RESIZE_HPT_DEFAULT) {
+            /*
+             * If the user explicitly requested a mode we should either
+             * supply it, or fail completely (which we do below).  But if
+             * it's not set explicitly, we reset our mode to something
+             * that works
+             */
+            if (resize_hpt_err) {
+                spapr->resize_hpt = SPAPR_RESIZE_HPT_DISABLED;
+                error_free(resize_hpt_err);
+                resize_hpt_err = NULL;
+
+Case 1: failure and SPAPR_RESIZE_HPT_DEFAULT; we free @resize_hpt_err.
+Good.
+
+            } else {
+                spapr->resize_hpt = smc->resize_hpt_default;
+            }
+        }
+
+        assert(spapr->resize_hpt != SPAPR_RESIZE_HPT_DEFAULT);
+
+        if ((spapr->resize_hpt != SPAPR_RESIZE_HPT_DISABLED) && resize_hpt_err) {
+            /*
+             * User requested HPT resize, but this host can't supply it.  Bail out
+             */
+            error_report_err(resize_hpt_err);
+            exit(1);
+
+Case 2: failure and not SPAPR_RESIZE_HPT_DISABLED; fatal.  Good.
+
+        }
+
+What about case 3: failure and SPAPR_RESIZE_HPT_DISABLED?
+
+Good if we get here via case 1 (we freed @resize_hpt_err).
+
+Else, ???
 
 
