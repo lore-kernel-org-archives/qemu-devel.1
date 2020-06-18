@@ -2,86 +2,107 @@ Return-Path: <SRS0=FaGC=77=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9B7EC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 13:44:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7EACC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 13:45:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 82D902082F
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 13:44:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B5F6E20885
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 13:45:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="neU5bLcQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82D902082F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SvGT6SQp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5F6E20885
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60998 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35770 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jluqQ-0003tp-NH
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 09:44:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44170)
+	id 1jlur6-00059H-02
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 09:45:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45454)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jludy-0006s1-5m
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 09:31:50 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:40822)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jludv-0007iX-JP
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 09:31:49 -0400
-Received: by mail-oi1-x242.google.com with SMTP id t25so5048416oij.7
- for <qemu-devel@nongnu.org>; Thu, 18 Jun 2020 06:31:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=fkjHCDpYTARpMaa7D3EA8CbN8CCSa+lbQaizLJq9WzQ=;
- b=neU5bLcQUTRTlbiT92KjLzVjMtyn9VDgYDJtL7V7VKulrYO0RQAPd7n8bpen501Ihy
- lfz3d5OejwmMdU67R/dxKyPpMpwd0sDxIPBEDX5wA072/pUHRnFEahxFMaKq5dZITcw2
- lzX0jeGvTPaicf5WqjNleyF6ha7+UOg/JEuiusmn3A18iwL9vpCTjfxLglAGO9CcD8Q/
- Sb7fvxCAaaPQMdZKFkvD2mwDwMkFzjzM9qiZULGW2FkTV5/3lbrKDi5tYorhh7MQ+IXW
- oKtmDLVeaUn9VrlEJNuYGpFSYAEJN6Q2VqOS0sqqjcQ4fqzPRbdicF+E+BnHs+U/G6W4
- mMbw==
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jluhQ-0005cg-3d
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 09:35:24 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32518
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jluhN-0008JL-Ph
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 09:35:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592487320;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=aLfFWWN786UTNglIQiVmrgn3+v9wpuJECNM2po67mSo=;
+ b=SvGT6SQph6GVo7+ChZmCwreA38cqvnI7TydLPQc8FcB+V70+STsi1oTgOrWoD3wC/LV1nr
+ +AaUQvgKAiACVW+0ivD1mukK1Pz8YUndo+r0qMnD2rHiR7f+G4A4jmEgxAdLAGzeEgAgyW
+ 4OZ6ZGwLY7orGO+9YE9+oVuI1+BVamY=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-229-_y-85SouP3OZMj2N_sc1cA-1; Thu, 18 Jun 2020 09:35:19 -0400
+X-MC-Unique: _y-85SouP3OZMj2N_sc1cA-1
+Received: by mail-wm1-f71.google.com with SMTP id r1so2590721wmh.7
+ for <qemu-devel@nongnu.org>; Thu, 18 Jun 2020 06:35:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=fkjHCDpYTARpMaa7D3EA8CbN8CCSa+lbQaizLJq9WzQ=;
- b=Vkg6/ggiKffUTr+LUf3biJIybrNa4DySlcBJDEDHIwIOER3S+xucXiVVzkRsLKEyAj
- 1lATKWGpur2bS5Na9qZp4Wm2YihOOcbfeE2HXn6mlr3QFF2QtQIA27HkSX4lF5MI6noQ
- esR36C6wjmW9grGsZzJ8DRA7GHhQra0+ySpm/Ul174LXFfYdykTTGHugk0JVmRk9y2Mv
- gFtLtsh1uWxWKfurcXWRO6YFmKipzCa17MX9qs3mvqGfZ2N8S848M19rthIl4TzVJ+Pu
- LIfk57aniaiaRils+NBl/MqLfvkW2TpYisChbX4vHYaaRHNiRZ6tUG5uepblGqJl75wV
- OmxA==
-X-Gm-Message-State: AOAM531Msty/ie6gT9b6NheqmFk5e4jdC2V+pEQmWOnANg0FpkofxoYe
- EU0Qbt/pXavd3yF6Fmv3UyszYi6jWykHrpP9znjpFw==
-X-Google-Smtp-Source: ABdhPJxdc4vAscDrz4EpncLc883tbRX4PBNAtjKSrJW5MHLHrQpcWrKqP0A69XxTDILsrOGPWfctYS5tQM5+gcgcL98=
-X-Received: by 2002:aca:5152:: with SMTP id f79mr2780017oib.146.1592487106235; 
- Thu, 18 Jun 2020 06:31:46 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=aLfFWWN786UTNglIQiVmrgn3+v9wpuJECNM2po67mSo=;
+ b=Mmualw3LQXf23an6ODwsvkQpGCcLYAsyEBZTZl3JFsu5ymocb+9p3INp0gzy3PI4rf
+ mger0gWB5N7FwAXKhYTIj4RTicWIU5zyWMU2kHRrJXA14nZ6Hi132XIrpo9TS2wO8Mi6
+ 06x0Te6RsKAS8fGbHtOGtY9A+Nw4HxfB6J2WGmGLr/m/TLEyzCww3Zb6gw71b0jBYaVM
+ UIPtoexFq2rMHKtcVDwWfJQ5TeVioCP6LQXNVxO5Am+hVIXV3Zbt5a9KvXVC7QK+j++o
+ mCZtG5LmlZEPsxSiWTGk8+FBkkxB0jZ8dSO33BAoKqY67Pgah0Kf0bLn+puA3wxq2HEw
+ lCUw==
+X-Gm-Message-State: AOAM532CqctCu+ceFC0y3dCTi56EAvlhP4eWaD6un5IdyDIJOGbuHWAc
+ YQM3Gj5dIj2jmOW42s6Tw1LR2ayUPNP2apSX87yTgZw3Gpnolw4RW3HN5FuLMea5+o5lZ3Skz4t
+ f57etSwPLbF/M+38=
+X-Received: by 2002:adf:e782:: with SMTP id n2mr4536586wrm.417.1592487318012; 
+ Thu, 18 Jun 2020 06:35:18 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzke9/QOSpZW4+85a3TVRyoYXZmMZdPZKXwkgZ5qvG+1Ceu7D0MQvrZWgqgjV7D1PCYk/MHkA==
+X-Received: by 2002:adf:e782:: with SMTP id n2mr4536563wrm.417.1592487317780; 
+ Thu, 18 Jun 2020 06:35:17 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:e1d2:138e:4eff:42cb?
+ ([2001:b07:6468:f312:e1d2:138e:4eff:42cb])
+ by smtp.gmail.com with ESMTPSA id b187sm3633299wmd.26.2020.06.18.06.35.16
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 18 Jun 2020 06:35:16 -0700 (PDT)
+Subject: Re: [PATCH v1] memory: assert MemoryRegionOps callbacks are defined
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ P J P <ppandit@redhat.com>
+References: <20200618121218.215808-1-ppandit@redhat.com>
+ <87r1ucv7pe.fsf@linaro.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <51f137f0-89ee-e130-a43e-c82d0b3623fa@redhat.com>
+Date: Thu, 18 Jun 2020 15:35:14 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-References: <20200603011317.473934-1-richard.henderson@linaro.org>
- <20200603011317.473934-14-richard.henderson@linaro.org>
-In-Reply-To: <20200603011317.473934-14-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 18 Jun 2020 14:31:35 +0100
-Message-ID: <CAFEAcA86dH_utZzXdbvwhB_67OgVGc249tO6TOBtfw+nWi2-7g@mail.gmail.com>
-Subject: Re: [PATCH v7 13/42] target/arm: Define arm_cpu_do_unaligned_access
- for user-only
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::242;
- envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x242.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+In-Reply-To: <87r1ucv7pe.fsf@linaro.org>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 01:47:12
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,34 +115,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
- Stephen Long <steplong@quicinc.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Prasad J Pandit <pjp@fedoraproject.org>, Li Qiang <liq3ea@gmail.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Lei Sun <slei.casper@gmail.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 3 Jun 2020 at 02:13, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> We need this to raise unaligned exceptions from user mode.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
-> v6: Use EXCP_UNALIGNED for user-only and update cpu_loop.c.
+On 18/06/20 15:12, Alex Bennée wrote:
+>>
+>> @@ -1495,6 +1495,9 @@ void memory_region_init_io(MemoryRegion *mr,
+>>                             const char *name,
+>>                             uint64_t size)
+>>  {
+>> +    assert(ops);
+>> +    assert(ops->read);
+>> +    assert(ops->write);
+> 
+> If you look at memory_region_dispatch_write you can see that
+> mr->ops->write being empty is acceptable because it implies
+> mr->ops->write_with_attrs is set instead. I think the same is true for
+> read so I think you need something more like:
+> 
+>      assert(ops->read || ops->read_with_attrs);
+>      assert(ops->write || ops->write_with_attrs);
 
-Could you update the comment in cpu.h, maybe something like:
-#define EXCP_UNALIGNED      22   /* v7M UNALIGNED UsageFault; also linux-user */
+Also, !ops is acceptable since you have a couple lines below:
 
-and also update the string printed by arm_log_exception():
-#ifdef CONFIG_USER_ONLY
-            [EXCP_UNALIGNED] = "linux-user unaligned access fault",
-#else
-            [EXCP_UNALIGNED] = "v7M UNALIGNED UsageFault",
-#endif
+    mr->ops = ops ? ops : &unassigned_mem_ops;
 
-Otherwise
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-thanks
--- PMM
+>> +    assert(ops->read);
+>> +    assert(ops->write);
+> 
+> Do ROM devices need a ->write function?
+
+Yes, ROMD regions are treated as I/O regions for writes.  However they
+don't need a read function.
+
+> Also doesn't this break a load of running stuff without fixes for all
+> the various missing bits? How far does make check-acceptance get?
+
+This might actually be really close with the above assertions fixed.
+For example, commit 08565552f7 ("cputlb: Move NOTDIRTY handling from I/O
+path to TLB path", 2019-09-25) got rid of io_mem_notdirty.
+
+The only cases I found with "git grep" are:
+
+- tz_ppc_dummy_ops which is broken and should just use NULL ops
+
+- hw/nvram/nrf51_nvm.c's flash_ops which is fixed if ROMD regions are
+changed not to require a read callback.
+
+- designware_pci_host_msi_ops which is broken and should have a dummy
+read callback.
+
+Needless to say, this is something that the submitter should have done,
+not the reviewer.
+
+Paolo
+
 
