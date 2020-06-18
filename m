@@ -7,70 +7,72 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5051FC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 07:11:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FFB1C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 07:13:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1B2AB21548
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 07:11:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 02B6021532
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 07:13:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SNoeFJsb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B2AB21548
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CnARFHKi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02B6021532
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56794 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59524 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jloi6-0006xh-Bj
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 03:11:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39728)
+	id 1jlokG-00007E-B6
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 03:13:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40758)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jlohB-00066f-Ba
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 03:10:45 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20815
+ id 1jlojO-0007iH-Nl
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 03:13:02 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:53315
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jloh9-0004GZ-L8
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 03:10:45 -0400
+ id 1jlojN-0004k5-9g
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 03:13:02 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592464243;
+ s=mimecast20190719; t=1592464380;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=uiKE0ilEZSbeqVaWqbO5PW8F41W/fxpV1Bitxd7zY2E=;
- b=SNoeFJsbbK4296mqKT44MydfppwZMtIXs4dqF6yf/QFPXmrwNCVaoJ7A0o2+M3vRng7I6l
- c1DVvnmTt86zOb3OQUe6dJQqf+uzqgl6+yOCmvYtLuRHNqBG+ChR1mdew0yIsKIlAExdxk
- yfCUe4kSc5B0RelGuwzijjRZA3qpqes=
+ bh=Upu5Gr8/Z4icVxMAmz1Et4FadXxC0S5qI2dmwCzbYmg=;
+ b=CnARFHKiGPU0xiKp+eVDhPYx0jYqBfdjVBTXmyllT7+P5Q5B0RiTCV+Fj2d3Vz7/XmWb7G
+ hDmwY26QkUo8M2XpJUr9KV97EMbp9oq9vJsMD4KfQcXTLBl0zdKGKVr+qF7SqV6z4aS0/X
+ jfSDjOzUnFiqx+mklYL0zjyuH6Z2Oog=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-205-q0_VtqfFMkO98e-UZHvkHA-1; Thu, 18 Jun 2020 03:10:40 -0400
-X-MC-Unique: q0_VtqfFMkO98e-UZHvkHA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-39-A1udZRanPmujCyxIzJ7RlQ-1; Thu, 18 Jun 2020 03:12:58 -0400
+X-MC-Unique: A1udZRanPmujCyxIzJ7RlQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C4855107ACCD;
- Thu, 18 Jun 2020 07:10:39 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 86B998005AD;
+ Thu, 18 Jun 2020 07:12:57 +0000 (UTC)
 Received: from [10.36.114.197] (ovpn-114-197.ams2.redhat.com [10.36.114.197])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 559EA6E9F3;
- Thu, 18 Jun 2020 07:10:35 +0000 (UTC)
-Subject: Re: [PATCH v4 2/8] tpm: Extend TPMIfClass with get_irqnum() function
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E126619934;
+ Thu, 18 Jun 2020 07:12:49 +0000 (UTC)
+Subject: Re: [PATCH v4 5/8] acpi: Enable TPM IRQ
 To: Stefan Berger <stefanb@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 References: <20200617142305.1198672-1-stefanb@linux.vnet.ibm.com>
- <20200617142305.1198672-3-stefanb@linux.vnet.ibm.com>
+ <20200617142305.1198672-6-stefanb@linux.vnet.ibm.com>
 From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <235fd158-16b6-e864-0b66-225ab9e12a54@redhat.com>
-Date: Thu, 18 Jun 2020 09:10:33 +0200
+Message-ID: <50f6c64f-bd2b-26e3-b562-2eea22c97354@redhat.com>
+Date: Thu, 18 Jun 2020 09:12:48 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <20200617142305.1198672-3-stefanb@linux.vnet.ibm.com>
+In-Reply-To: <20200617142305.1198672-6-stefanb@linux.vnet.ibm.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eric.auger@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
@@ -98,125 +100,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@redhat.com, Stefan Berger <stefanb@linux.ibm.com>,
- philmd@redhat.com, mkedzier@redhat.com, pbonzini@redhat.com
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, pbonzini@redhat.com,
+ marcandre.lureau@redhat.com, philmd@redhat.com, mkedzier@redhat.com,
+ Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Stefan,
+Hi,
 
-On 6/17/20 4:22 PM, Stefan Berger wrote:
-> From: Stefan Berger <stefanb@sbct-2.pok.ibm.com>
+On 6/17/20 4:23 PM, Stefan Berger wrote:
+> From: Stefan Berger <stefanb@linux.ibm.com>
 > 
-> Implement get_irqnum() as part of the TPMIfClass to get the assigned IRQ
-> number or TPM_IRQ_DISABLED (~0) in case IRQs cannot be used.
+> Move the TPM TIS IRQ to unused IRQ 13, which is the only one accepted by
+> Windows. Query for the TPM's irq number and enable the TPM IRQ unless
+> TPM_IRQ_DISABLED is returned.
 > 
 > Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
 > Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-> Message-id: 20200616205721.1191408-3-stefanb@linux.vnet.ibm.com
+> Message-id: 20200616205721.1191408-6-stefanb@linux.vnet.ibm.com
+> CC: Michael S. Tsirkin <mst@redhat.com>
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-Thanks
-
 Eric
-
-
 > ---
->  hw/tpm/tpm_tis_isa.c    |  9 +++++++++
->  hw/tpm/tpm_tis_sysbus.c |  9 +++++++++
->  include/sysemu/tpm.h    | 12 ++++++++++++
->  3 files changed, 30 insertions(+)
+>  hw/i386/acpi-build.c  | 11 +++++------
+>  include/hw/acpi/tpm.h |  2 +-
+>  2 files changed, 6 insertions(+), 7 deletions(-)
 > 
-> diff --git a/hw/tpm/tpm_tis_isa.c b/hw/tpm/tpm_tis_isa.c
-> index 30ba37079d..ed6d422f05 100644
-> --- a/hw/tpm/tpm_tis_isa.c
-> +++ b/hw/tpm/tpm_tis_isa.c
-> @@ -80,6 +80,14 @@ static enum TPMVersion tpm_tis_isa_get_tpm_version(TPMIf *ti)
->      return tpm_tis_get_tpm_version(s);
->  }
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index 900f786d08..bb9a7f8497 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -2021,6 +2021,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+>              build_append_pci_bus_devices(scope, bus, pm->pcihp_bridge_en);
 >  
-> +static int8_t tpm_tis_isa_get_irqnum(TPMIf *ti)
-> +{
-> +    TPMStateISA *isadev = TPM_TIS_ISA(ti);
-> +    TPMState *s = &isadev->state;
+>              if (TPM_IS_TIS_ISA(tpm)) {
+> +                int8_t irq = tpm_get_irqnum(tpm);
+>                  if (misc->tpm_version == TPM_VERSION_2_0) {
+>                      dev = aml_device("TPM");
+>                      aml_append(dev, aml_name_decl("_HID",
+> @@ -2035,12 +2036,10 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+>                  crs = aml_resource_template();
+>                  aml_append(crs, aml_memory32_fixed(TPM_TIS_ADDR_BASE,
+>                             TPM_TIS_ADDR_SIZE, AML_READ_WRITE));
+> -                /*
+> -                    FIXME: TPM_TIS_IRQ=5 conflicts with PNP0C0F irqs,
+> -                    Rewrite to take IRQ from TPM device model and
+> -                    fix default IRQ value there to use some unused IRQ
+> -                 */
+> -                /* aml_append(crs, aml_irq_no_flags(TPM_TIS_IRQ)); */
 > +
-> +    return s->irq_num;
-> +}
-> +
->  static void tpm_tis_isa_reset(DeviceState *dev)
->  {
->      TPMStateISA *isadev = TPM_TIS_ISA(dev);
-> @@ -148,6 +156,7 @@ static void tpm_tis_isa_class_init(ObjectClass *klass, void *data)
->      dc->reset = tpm_tis_isa_reset;
->      tc->request_completed = tpm_tis_isa_request_completed;
->      tc->get_version = tpm_tis_isa_get_tpm_version;
-> +    tc->get_irqnum = tpm_tis_isa_get_irqnum;
->  }
+> +                if (irq != TPM_IRQ_DISABLED) {
+> +                    aml_append(crs, aml_irq_no_flags(irq));
+> +                }
+>                  aml_append(dev, aml_name_decl("_CRS", crs));
 >  
->  static const TypeInfo tpm_tis_isa_info = {
-> diff --git a/hw/tpm/tpm_tis_sysbus.c b/hw/tpm/tpm_tis_sysbus.c
-> index eced1fc843..86b3988be5 100644
-> --- a/hw/tpm/tpm_tis_sysbus.c
-> +++ b/hw/tpm/tpm_tis_sysbus.c
-> @@ -80,6 +80,14 @@ static enum TPMVersion tpm_tis_sysbus_get_tpm_version(TPMIf *ti)
->      return tpm_tis_get_tpm_version(s);
->  }
+>                  tpm_build_ppi_acpi(tpm, dev);
+> diff --git a/include/hw/acpi/tpm.h b/include/hw/acpi/tpm.h
+> index d5caee9771..d356f2e06e 100644
+> --- a/include/hw/acpi/tpm.h
+> +++ b/include/hw/acpi/tpm.h
+> @@ -24,7 +24,7 @@
+>  #define TPM_TIS_ADDR_BASE           0xFED40000
+>  #define TPM_TIS_ADDR_SIZE           0x5000
 >  
-> +static int8_t tpm_tis_sysbus_get_irqnum(TPMIf *ti)
-> +{
-> +    TPMStateSysBus *sbdev = TPM_TIS_SYSBUS(ti);
-> +    TPMState *s = &sbdev->state;
-> +
-> +    return s->irq_num;
-> +}
-> +
->  static void tpm_tis_sysbus_reset(DeviceState *dev)
->  {
->      TPMStateSysBus *sbdev = TPM_TIS_SYSBUS(dev);
-> @@ -137,6 +145,7 @@ static void tpm_tis_sysbus_class_init(ObjectClass *klass, void *data)
->      dc->reset = tpm_tis_sysbus_reset;
->      tc->request_completed = tpm_tis_sysbus_request_completed;
->      tc->get_version = tpm_tis_sysbus_get_tpm_version;
-> +    tc->get_irqnum = tpm_tis_sysbus_get_irqnum;
->  }
+> -#define TPM_TIS_ISA_IRQ             5
+> +#define TPM_TIS_ISA_IRQ             13    /* only one possible */
+>  #define TPM_TIS_SYSBUS_IRQ          5
 >  
->  static const TypeInfo tpm_tis_sysbus_info = {
-> diff --git a/include/sysemu/tpm.h b/include/sysemu/tpm.h
-> index 03fb25941c..7ebe9f7ef0 100644
-> --- a/include/sysemu/tpm.h
-> +++ b/include/sysemu/tpm.h
-> @@ -25,6 +25,8 @@ typedef enum TPMVersion {
->      TPM_VERSION_2_0 = 2,
->  } TPMVersion;
->  
-> +#define TPM_IRQ_DISABLED  ~0
-> +
->  #define TYPE_TPM_IF "tpm-if"
->  #define TPM_IF_CLASS(klass)                                 \
->      OBJECT_CLASS_CHECK(TPMIfClass, (klass), TYPE_TPM_IF)
-> @@ -41,6 +43,7 @@ typedef struct TPMIfClass {
->      enum TpmModel model;
->      void (*request_completed)(TPMIf *obj, int ret);
->      enum TPMVersion (*get_version)(TPMIf *obj);
-> +    int8_t (*get_irqnum)(TPMIf *obj);
->  } TPMIfClass;
->  
->  #define TYPE_TPM_TIS_ISA            "tpm-tis"
-> @@ -74,4 +77,13 @@ static inline TPMVersion tpm_get_version(TPMIf *ti)
->      return TPM_IF_GET_CLASS(ti)->get_version(ti);
->  }
->  
-> +static inline int8_t tpm_get_irqnum(TPMIf *ti)
-> +{
-> +    if (!ti || !TPM_IF_GET_CLASS(ti)->get_irqnum) {
-> +        return TPM_IRQ_DISABLED;
-> +    }
-> +
-> +    return TPM_IF_GET_CLASS(ti)->get_irqnum(ti);
-> +}
-> +
->  #endif /* QEMU_TPM_H */
+>  #define TPM_TIS_NUM_LOCALITIES      5     /* per spec */
 > 
 
 
