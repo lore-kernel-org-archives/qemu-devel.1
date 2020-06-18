@@ -2,77 +2,77 @@ Return-Path: <SRS0=FaGC=77=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3318C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 13:34:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 788A6C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 13:34:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8A9E42083B
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 13:34:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 44BB32083B
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 13:34:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZPjkbaSF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A9E42083B
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mf6eINzo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 44BB32083B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51888 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52426 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlug7-0001l9-PR
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 09:34:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40808)
+	id 1jlugE-0001yC-HV
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 09:34:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40540)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jluVh-0007XS-UY
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 09:23:17 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:35059
- helo=us-smtp-delivery-1.mimecast.com)
+ id 1jluVF-00067X-NO
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 09:22:49 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43178
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jluVg-0005rH-4u
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 09:23:17 -0400
+ id 1jluVE-0005n0-1R
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 09:22:49 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592486595;
+ s=mimecast20190719; t=1592486567;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
- references:references; bh=FTFRvKvrhsZ1FsmM7z4nNla9QKNddW17ekwJj03MREI=;
- b=ZPjkbaSFYlCFu9djavTaZ06qXfEOrnC1Y0Gt+gdHVrHqwZI55xo0DKMN+YyyKQ1yhcHvfp
- n5FMIIhqAWfUSap51dITm4rgsw0wdjSp9CdtsXCZXHDeHmY7qcRQdXCfyaegsBrZnIfqc6
- KOySai/cN5aoCfRDdDSTccpfGMOVb0k=
+ references:references; bh=Iv7v8PdWQtDExiV3Bxv+45O8mnx/h/MEgHTbFx+U8pI=;
+ b=Mf6eINzosM4HyzjXUBfoAZglBAYnh4f+56VABSua4+mSg8jpr9F8Jz+eKcp/Cc769pYXeJ
+ nmVsyuFx66iEvVZ0hAAqPXE40vBBeD+T7FMDuAYjTirXiUJ/mYRClZPlLcyHbXUubjQl8y
+ iCyi+JR1/FPOVS5vkgxtkvlnqWJ6I8M=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-440-gjeUIQvuNJOtZGfeArWe5g-1; Thu, 18 Jun 2020 09:23:11 -0400
-X-MC-Unique: gjeUIQvuNJOtZGfeArWe5g-1
+ us-mta-471-sJmX0AbOOKqJxnqU9k9MDA-1; Thu, 18 Jun 2020 09:22:45 -0400
+X-MC-Unique: sJmX0AbOOKqJxnqU9k9MDA-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B001DC744F;
- Thu, 18 Jun 2020 13:23:09 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 953841015DA6;
+ Thu, 18 Jun 2020 13:22:38 +0000 (UTC)
 Received: from jason-ThinkPad-T430s.redhat.com (ovpn-12-109.pek2.redhat.com
  [10.72.12.109])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5096C5BAC3;
- Thu, 18 Jun 2020 13:23:07 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B1ABA5BAC8;
+ Thu, 18 Jun 2020 13:22:36 +0000 (UTC)
 From: Jason Wang <jasowang@redhat.com>
 To: peter.maydell@linaro.org,
 	qemu-devel@nongnu.org
-Subject: [PULL V2 24/33] net/colo-compare.c: Create event_bh with the right
- AioContext
-Date: Thu, 18 Jun 2020 21:21:39 +0800
-Message-Id: <1592486508-6135-25-git-send-email-jasowang@redhat.com>
+Subject: [PULL V2 12/33] net: cadence_gem: Fix the queue address update during
+ wrap around
+Date: Thu, 18 Jun 2020 21:21:27 +0800
+Message-Id: <1592486508-6135-13-git-send-email-jasowang@redhat.com>
 In-Reply-To: <1592486508-6135-1-git-send-email-jasowang@redhat.com>
 References: <1592486508-6135-1-git-send-email-jasowang@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=jasowang@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 01:32:18
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=jasowang@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 01:47:12
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -93,54 +93,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhang Chen <chen.zhang@intel.com>, Jason Wang <jasowang@redhat.com>,
- Lukas Straub <lukasstraub2@web.de>
+Cc: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>,
+ Jason Wang <jasowang@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Lukas Straub <lukasstraub2@web.de>
+From: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
 
-qemu_bh_new will set the bh to be executed in the main
-loop. This causes crashes as colo_compare_handle_event assumes
-that it has exclusive access the queues, which are also
-concurrently accessed in the iothread.
+During wrap around and reset, queues are pointing to initial base
+address of queue 0, irrespective of what queue we are dealing with.
+Fix it by assigning proper base address every time.
 
-Create the bh with the AioContext of the iothread to fulfill
-these assumptions and fix the crashes. This is safe, because
-the bh already takes the appropriate locks.
-
-Signed-off-by: Lukas Straub <lukasstraub2@web.de>
-Reviewed-by: Zhang Chen <chen.zhang@intel.com>
-Reviewed-by: Derek Su <dereksu@qnap.com>
-Tested-by: Derek Su <dereksu@qnap.com>
-Signed-off-by: Zhang Chen <chen.zhang@intel.com>
+Signed-off-by: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- net/colo-compare.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ hw/net/cadence_gem.c | 37 +++++++++++++++++++++++++++++++++----
+ 1 file changed, 33 insertions(+), 4 deletions(-)
 
-diff --git a/net/colo-compare.c b/net/colo-compare.c
-index c07e7c1..e557da7 100644
---- a/net/colo-compare.c
-+++ b/net/colo-compare.c
-@@ -890,6 +890,7 @@ static void colo_compare_handle_event(void *opaque)
- 
- static void colo_compare_iothread(CompareState *s)
- {
-+    AioContext *ctx = iothread_get_aio_context(s->iothread);
-     object_ref(OBJECT(s->iothread));
-     s->worker_context = iothread_get_g_main_context(s->iothread);
- 
-@@ -906,7 +907,7 @@ static void colo_compare_iothread(CompareState *s)
-     }
- 
-     colo_compare_timer_init(s);
--    s->event_bh = qemu_bh_new(colo_compare_handle_event, s);
-+    s->event_bh = aio_bh_new(ctx, colo_compare_handle_event, s);
+diff --git a/hw/net/cadence_gem.c b/hw/net/cadence_gem.c
+index 2e273dca..fd3e4a8 100644
+--- a/hw/net/cadence_gem.c
++++ b/hw/net/cadence_gem.c
+@@ -845,6 +845,35 @@ static int get_queue_from_screen(CadenceGEMState *s, uint8_t *rxbuf_ptr,
+     return 0;
  }
  
- static char *compare_get_pri_indev(Object *obj, Error **errp)
++static uint32_t gem_get_queue_base_addr(CadenceGEMState *s, bool tx, int q)
++{
++    uint32_t base_addr = 0;
++
++    switch (q) {
++    case 0:
++        base_addr = s->regs[tx ? GEM_TXQBASE : GEM_RXQBASE];
++        break;
++    case 1 ... (MAX_PRIORITY_QUEUES - 1):
++        base_addr = s->regs[(tx ? GEM_TRANSMIT_Q1_PTR :
++                                 GEM_RECEIVE_Q1_PTR) + q - 1];
++        break;
++    default:
++        g_assert_not_reached();
++    };
++
++    return base_addr;
++}
++
++static inline uint32_t gem_get_tx_queue_base_addr(CadenceGEMState *s, int q)
++{
++    return gem_get_queue_base_addr(s, true, q);
++}
++
++static inline uint32_t gem_get_rx_queue_base_addr(CadenceGEMState *s, int q)
++{
++    return gem_get_queue_base_addr(s, false, q);
++}
++
+ static hwaddr gem_get_desc_addr(CadenceGEMState *s, bool tx, int q)
+ {
+     hwaddr desc_addr = 0;
+@@ -1043,7 +1072,7 @@ static ssize_t gem_receive(NetClientState *nc, const uint8_t *buf, size_t size)
+         /* Next descriptor */
+         if (rx_desc_get_wrap(s->rx_desc[q])) {
+             DB_PRINT("wrapping RX descriptor list\n");
+-            s->rx_desc_addr[q] = s->regs[GEM_RXQBASE];
++            s->rx_desc_addr[q] = gem_get_rx_queue_base_addr(s, q);
+         } else {
+             DB_PRINT("incrementing RX descriptor list\n");
+             s->rx_desc_addr[q] += 4 * gem_get_desc_len(s, true);
+@@ -1199,7 +1228,7 @@ static void gem_transmit(CadenceGEMState *s)
+                                     sizeof(desc_first));
+                 /* Advance the hardware current descriptor past this packet */
+                 if (tx_desc_get_wrap(desc)) {
+-                    s->tx_desc_addr[q] = s->regs[GEM_TXQBASE];
++                    s->tx_desc_addr[q] = gem_get_tx_queue_base_addr(s, q);
+                 } else {
+                     s->tx_desc_addr[q] = packet_desc_addr +
+                                          4 * gem_get_desc_len(s, false);
+@@ -1251,7 +1280,7 @@ static void gem_transmit(CadenceGEMState *s)
+                 } else {
+                     packet_desc_addr = 0;
+                 }
+-                packet_desc_addr |= s->regs[GEM_TXQBASE];
++                packet_desc_addr |= gem_get_tx_queue_base_addr(s, q);
+             } else {
+                 packet_desc_addr += 4 * gem_get_desc_len(s, false);
+             }
+@@ -1457,7 +1486,7 @@ static void gem_write(void *opaque, hwaddr offset, uint64_t val,
+         if (!(val & GEM_NWCTRL_TXENA)) {
+             /* Reset to start of Q when transmit disabled. */
+             for (i = 0; i < s->num_priority_queues; i++) {
+-                s->tx_desc_addr[i] = s->regs[GEM_TXQBASE];
++                s->tx_desc_addr[i] = gem_get_tx_queue_base_addr(s, i);
+             }
+         }
+         if (gem_can_receive(qemu_get_queue(s->nic))) {
 -- 
 2.5.0
 
