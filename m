@@ -7,78 +7,80 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACF07C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 04:34:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FEF6C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 04:34:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 76ED321852
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 04:34:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5A5F421852
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 04:34:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xD939vyX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76ED321852
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="S44Ds6b0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A5F421852
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53710 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55940 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlmFT-0007HN-M1
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 00:33:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59472)
+	id 1jlmFy-0008DB-Hq
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 00:34:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59514)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jlm9M-0003CS-OC
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 00:27:40 -0400
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:45432)
+ id 1jlm9N-0003FW-Ur
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 00:27:41 -0400
+Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:54915)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jlm9F-0002Qr-TA
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 00:27:40 -0400
-Received: by mail-pg1-x543.google.com with SMTP id l63so2314306pge.12
- for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 21:27:33 -0700 (PDT)
+ id 1jlm9K-0002Sl-Az
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 00:27:41 -0400
+Received: by mail-pj1-x1042.google.com with SMTP id u8so1956471pje.4
+ for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 21:27:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=CK2elIXOTHImMlsaoqCYUcyN3xToI2uVAuloYRoKKNU=;
- b=xD939vyXfZYH4ys3CkLFzVHUvh2tO662tbDdcZ1P4ZfLHGg+NwA1GXvP2gC/XN0B5m
- VeOTF+t98N7pEl41xhtfOOxuvX4kZFocX5iWsLAh0WfN3r7hC65uUolMocOv+qQLaD3c
- y4/8yXfqiUxD3JW0XARvcr9axxXvPt60mX9komdgg7g8jRRvfJLys1YXg9wKcCWEZj/C
- yBS9rXSv7i4TgvyqDxFWGGg4d8mZJ3f1VLPXVQlmU7+J98CeTEYKLCsny7h8e0gfdAdS
- 2v1Fgwrb0qiQNVhCQUzTLzodNunUUP/g7rIhqyR0WQnZW4yWPn9G37JVps1OPqh/+aWX
- 7Muw==
+ bh=nrIaSFnyyPMIbXqZiRuw109mXnGYvmTKpfGMlwgvLXw=;
+ b=S44Ds6b0BUwJkjjV8t3/mW55UuB5vYhdLWEWdX1ljAh7sBpxt+5anQnc1RrSqZfvJE
+ 5NmzqDEaT2RAhgb3Y08MSVdxtJ1gmDi6VsFSAF4hAnZQ/mbUU1PSCruyRgenONyGbL81
+ fzYrQD038R1zrSitOBROFu3LajMmbrOobhn+uYEDkEXVTyOlWOjEGz1u6WVnu2ztB4ri
+ nlNpPNB9cC+jAH/T++1VP/22dyYNuC2X/3InkFVvF8/0nqd2yRw0F0rAvBUiBGdfLgdA
+ BoUsWO1WqeUtf41KtzRRNUjxSq+TNg29uTya++D6qXTivUeCgYZ16gxMwlfOgY9ws9aa
+ PFzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=CK2elIXOTHImMlsaoqCYUcyN3xToI2uVAuloYRoKKNU=;
- b=Zn9OvirLXTB1pXTY19RRvmPVioF1CP+BqHWKDz9eV3TcbE9geJds+7voFbHl9B9yI6
- yp8ksPN+IN2WL8s+86pVxEQi4UjK8SGeb6V4g20U4aPxUuz5SW0j8FfVDbw9T8iZjQO+
- XBNacCaKV15dpZiAfiHiWzj8mkN0vwU/uJmiE/qzhHShGogr5njsu2OfraYSiRGdFpUo
- dt1LvEWOYGALShtK3JLBkfn4edXXTvMpZSIJCRFL3lgG7YcKDVispFpdbCjyoI4HqSmQ
- Y194giRFodv3jZpy48RvOD8z5CAWee+8JldFVrHpJxPoX9B9BLvh4zb/BC36uxJYJEIo
- P8Og==
-X-Gm-Message-State: AOAM531tSshXzflmA4GqHm0fpE0XvsvIuoxmb9YPDuQBiGoKqD0KeHiM
- tXlvt3y+CmIkPysxJvspdW6TZqtZUyw=
-X-Google-Smtp-Source: ABdhPJyDXweJZuILISI3KzkK2V6sOoUvgjOUgpRbv9k86G31krRqlKAdD76/2d4tpcVkIEOYeLajvg==
-X-Received: by 2002:a63:7c56:: with SMTP id l22mr1765420pgn.127.1592454452054; 
- Wed, 17 Jun 2020 21:27:32 -0700 (PDT)
+ bh=nrIaSFnyyPMIbXqZiRuw109mXnGYvmTKpfGMlwgvLXw=;
+ b=R6zASJZbHRIyZhjsvXKp0dUT3TOLmQsi8w0lzsoClujwb/q0ie2taFQ1/AGEnYP/tO
+ /Q7Gr4QODF/x2Qu2Zu9HRkAyl+9PVyS6luR6bQzgj8gM5Haa8IxthxJ+CODroOXECdlC
+ 1L+uPN4xuTfgMbLFybLeJwZohrthJAofY1UU5wT9MOEN/GdifFa+cM0lsw/g9iRVC0Yg
+ YJNNhnC/4/u2plgwjBmcQPtKlvr2sLDr8gRY9VwfrppXhoLUR7DBEhVMaVkmL6ZQ7pik
+ c34MpfhNdIuZsgJAbc3ECPvnhTEJZ3zs7IfX8A63AW+OrNkhbQ4oMYUyvolXe5KMBMWw
+ 9xtA==
+X-Gm-Message-State: AOAM530/L5a+8tT1oxAyOZQio7idwdt0Zow/5HY8hanF92Yjylw9MN4J
+ UjqxVpNDeuDy84JQk1Oeqso0jm5gez4=
+X-Google-Smtp-Source: ABdhPJz+Oy1PTgvHHixiNZ8S3Ptd1cOHHq2TykD5I6YRJpOlwGYWCNkIPowj0HPSQo2og1qtot3g7g==
+X-Received: by 2002:a17:902:102:: with SMTP id 2mr2122896plb.86.1592454455742; 
+ Wed, 17 Jun 2020 21:27:35 -0700 (PDT)
 Received: from localhost.localdomain (174-21-143-238.tukw.qwest.net.
  [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id u61sm964897pjb.7.2020.06.17.21.27.30
+ by smtp.gmail.com with ESMTPSA id u61sm964897pjb.7.2020.06.17.21.27.34
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 17 Jun 2020 21:27:31 -0700 (PDT)
+ Wed, 17 Jun 2020 21:27:35 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 011/100] target/arm: Split out gen_gvec_ool_zzp
-Date: Wed, 17 Jun 2020 21:25:15 -0700
-Message-Id: <20200618042644.1685561-12-richard.henderson@linaro.org>
+Subject: [PATCH v2 014/100] target/arm: Add ID_AA64ZFR0 fields and
+ isar_feature_aa64_sve2
+Date: Wed, 17 Jun 2020 21:25:18 -0700
+Message-Id: <20200618042644.1685561-15-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200618042644.1685561-1-richard.henderson@linaro.org>
 References: <20200618042644.1685561-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::543;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x543.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1042;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1042.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -100,79 +102,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm@nongnu.org, steplong@quicinc.com
+Cc: qemu-arm@nongnu.org,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, steplong@quicinc.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Model after gen_gvec_fn_zzz et al.
+Will be used for SVE2 isa subset enablement.
 
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/translate-sve.c | 29 ++++++++++++++---------------
- 1 file changed, 14 insertions(+), 15 deletions(-)
+v2: Do not read zfr0 from kvm unless sve is available.
+---
+ target/arm/cpu.h    | 16 ++++++++++++++++
+ target/arm/helper.c |  3 +--
+ target/arm/kvm64.c  | 11 +++++++++++
+ 3 files changed, 28 insertions(+), 2 deletions(-)
 
-diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-index 9687606a93..3e9bbaca94 100644
---- a/target/arm/translate-sve.c
-+++ b/target/arm/translate-sve.c
-@@ -142,6 +142,17 @@ static int pred_gvec_reg_size(DisasContext *s)
-     return size_for_gvec(pred_full_reg_size(s));
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 677584e5da..e9f56e67c7 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -907,6 +907,7 @@ struct ARMCPU {
+         uint64_t id_aa64mmfr2;
+         uint64_t id_aa64dfr0;
+         uint64_t id_aa64dfr1;
++        uint64_t id_aa64zfr0;
+     } isar;
+     uint64_t midr;
+     uint32_t revidr;
+@@ -1866,6 +1867,16 @@ FIELD(ID_AA64DFR0, PMSVER, 32, 4)
+ FIELD(ID_AA64DFR0, DOUBLELOCK, 36, 4)
+ FIELD(ID_AA64DFR0, TRACEFILT, 40, 4)
+ 
++FIELD(ID_AA64ZFR0, SVEVER, 0, 4)
++FIELD(ID_AA64ZFR0, AES, 4, 4)
++FIELD(ID_AA64ZFR0, BITPERM, 16, 4)
++FIELD(ID_AA64ZFR0, BFLOAT16, 20, 4)
++FIELD(ID_AA64ZFR0, SHA3, 32, 4)
++FIELD(ID_AA64ZFR0, SM4, 40, 4)
++FIELD(ID_AA64ZFR0, I8MM, 44, 4)
++FIELD(ID_AA64ZFR0, F32MM, 52, 4)
++FIELD(ID_AA64ZFR0, F64MM, 56, 4)
++
+ FIELD(ID_DFR0, COPDBG, 0, 4)
+ FIELD(ID_DFR0, COPSDBG, 4, 4)
+ FIELD(ID_DFR0, MMAPDBG, 8, 4)
+@@ -3846,6 +3857,11 @@ static inline bool isar_feature_aa64_tts2uxn(const ARMISARegisters *id)
+     return FIELD_EX64(id->id_aa64mmfr1, ID_AA64MMFR1, XNX) != 0;
  }
  
-+/* Invoke an out-of-line helper on 2 Zregs and a predicate. */
-+static void gen_gvec_ool_zzp(DisasContext *s, gen_helper_gvec_3 *fn,
-+                             int rd, int rn, int pg, int data)
++static inline bool isar_feature_aa64_sve2(const ARMISARegisters *id)
 +{
-+    unsigned vsz = vec_full_reg_size(s);
-+    tcg_gen_gvec_3_ool(vec_full_reg_offset(s, rd),
-+                       vec_full_reg_offset(s, rn),
-+                       pred_full_reg_offset(s, pg),
-+                       vsz, vsz, data, fn);
++    return FIELD_EX64(id->id_aa64zfr0, ID_AA64ZFR0, SVEVER) != 0;
 +}
 +
- /* Invoke an out-of-line helper on 3 Zregs and a predicate. */
- static void gen_gvec_ool_zzzp(DisasContext *s, gen_helper_gvec_4 *fn,
-                               int rd, int rn, int rm, int pg, int data)
-@@ -415,11 +426,7 @@ static bool do_zpz_ool(DisasContext *s, arg_rpr_esz *a, gen_helper_gvec_3 *fn)
-         return false;
-     }
-     if (sve_access_check(s)) {
--        unsigned vsz = vec_full_reg_size(s);
--        tcg_gen_gvec_3_ool(vec_full_reg_offset(s, a->rd),
--                           vec_full_reg_offset(s, a->rn),
--                           pred_full_reg_offset(s, a->pg),
--                           vsz, vsz, 0, fn);
-+        gen_gvec_ool_zzp(s, fn, a->rd, a->rn, a->pg, 0);
-     }
-     return true;
- }
-@@ -603,11 +610,7 @@ static bool do_movz_zpz(DisasContext *s, int rd, int rn, int pg,
-     };
+ /*
+  * Feature tests for "does this exist in either 32-bit or 64-bit?"
+  */
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 972a766730..51b97c2196 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -7232,8 +7232,7 @@ void register_cp_regs_for_features(ARMCPU *cpu)
+               .opc0 = 3, .opc1 = 0, .crn = 0, .crm = 4, .opc2 = 4,
+               .access = PL1_R, .type = ARM_CP_CONST,
+               .accessfn = access_aa64_tid3,
+-              /* At present, only SVEver == 0 is defined anyway.  */
+-              .resetvalue = 0 },
++              .resetvalue = cpu->isar.id_aa64zfr0 },
+             { .name = "ID_AA64PFR5_EL1_RESERVED", .state = ARM_CP_STATE_AA64,
+               .opc0 = 3, .opc1 = 0, .crn = 0, .crm = 4, .opc2 = 5,
+               .access = PL1_R, .type = ARM_CP_CONST,
+diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+index f09ed9f4df..ff46d8418d 100644
+--- a/target/arm/kvm64.c
++++ b/target/arm/kvm64.c
+@@ -549,6 +549,17 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
+         err |= read_sys_reg64(fdarray[2], &ahcf->isar.id_aa64mmfr2,
+                               ARM64_SYS_REG(3, 0, 0, 7, 2));
  
-     if (sve_access_check(s)) {
--        unsigned vsz = vec_full_reg_size(s);
--        tcg_gen_gvec_3_ool(vec_full_reg_offset(s, rd),
--                           vec_full_reg_offset(s, rn),
--                           pred_full_reg_offset(s, pg),
--                           vsz, vsz, invert, fns[esz]);
-+        gen_gvec_ool_zzp(s, fns[esz], rd, rn, pg, invert);
-     }
-     return true;
- }
-@@ -616,11 +619,7 @@ static bool do_zpzi_ool(DisasContext *s, arg_rpri_esz *a,
-                         gen_helper_gvec_3 *fn)
- {
-     if (sve_access_check(s)) {
--        unsigned vsz = vec_full_reg_size(s);
--        tcg_gen_gvec_3_ool(vec_full_reg_offset(s, a->rd),
--                           vec_full_reg_offset(s, a->rn),
--                           pred_full_reg_offset(s, a->pg),
--                           vsz, vsz, a->imm, fn);
-+        gen_gvec_ool_zzp(s, fn, a->rd, a->rn, a->pg, a->imm);
-     }
-     return true;
- }
++        /*
++         * Before v5.1, KVM did not support SVE and did not expose
++         * ID_AA64ZFR0_EL1 even as RAZ.  Afterward, KVM still does
++         * not expose the register to "user" requests like this
++         * unless the host supports SVE.
++         */
++        if (isar_feature_aa64_sve(&ahcf->isar)) {
++            err |= read_sys_reg64(fdarray[2], &ahcf->isar.id_aa64zfr0,
++                                  ARM64_SYS_REG(3, 0, 0, 4, 4));
++        }
++
+         /*
+          * Note that if AArch32 support is not present in the host,
+          * the AArch32 sysregs are present to be read, but will
 -- 
 2.25.1
 
