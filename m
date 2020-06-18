@@ -2,95 +2,89 @@ Return-Path: <SRS0=FaGC=77=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A159C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 02:42:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E2F7C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 03:02:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 285C621927
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 02:42:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2E9B220FC3
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 03:02:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LTOD3/+F"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 285C621927
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AzfbkXSU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E9B220FC3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60940 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41714 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlkVB-0008Gv-Cp
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 22:42:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39486)
+	id 1jlkoW-0007pH-By
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 23:02:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44014)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <hskinnemoen@google.com>)
- id 1jlkUA-0007jN-0f
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 22:41:02 -0400
-Received: from mail-ua1-x943.google.com ([2607:f8b0:4864:20::943]:41045)
+ (Exim 4.90_1) (envelope-from <arilou@gmail.com>) id 1jlknD-000656-NE
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 23:00:43 -0400
+Received: from mail-ej1-x642.google.com ([2a00:1450:4864:20::642]:46356)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <hskinnemoen@google.com>)
- id 1jlkU8-0000IE-1C
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 22:41:01 -0400
-Received: by mail-ua1-x943.google.com with SMTP id a10so1473091uan.8
- for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 19:40:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=2QGBwbLSnWJPzMhG7hmlgpEaJ1aqmaYfDLod2fS/lu4=;
- b=LTOD3/+FKlGr4xTd5eeF54DJ8/oHDZPZ2awCM+1qCswJaVb5D4aZ0XH0GJ+ixrjBT3
- 0oQzYzX3+zysVqJI5Niu7k70qAzvaSUeoWUfXUOdbXE8VVT6LYgctNqT+HtgejD0jKAU
- PjZwwV4IjRBx+zKa5o602q3tIoMBxp0d232ZLCTnuoVKxfCBu/OqvG1cQVcxuFmo8+CF
- jr0IOUkdrCvuevLbzbPqdmWPCqNliCvXOLbioVgS7m3/+QHNSsan0qErewe7vNGahPI6
- bUojgl1OXLrxF2xqEq8WWYE63IRjMpf1Hhiw0ztvpgPdfbHxnvemnuKI3L57WnIy+RH3
- NYlg==
+ (Exim 4.90_1) (envelope-from <arilou@gmail.com>) id 1jlknB-0005J1-Ke
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 23:00:43 -0400
+Received: by mail-ej1-x642.google.com with SMTP id p20so4739477ejd.13
+ for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 20:00:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=2r1tjch1br1SVb2oD5fzElgfPDBObUIKTgABF3mVlUA=;
+ b=AzfbkXSUJAQnD4+kcve+amqfpR93n7YX5PyJ/mn04nWEcDsifVb1/TSkBBGZZanPfx
+ uteMkd/nOqnWRbd1eIRZhMKmd0S9xwjlgshYSsmMzBeSiA79MqSAxqK5JssRvWx89JDB
+ JlJAVhd9/IZix/RhX4HUPDYeEERC+7k7S0SvseF7ziJRADIpt4peO59kPrpOdZlDplW+
+ fhJr1Fvr9CcQELJh/iXXcGGfViivjo1O7Rjc5pKdwqpT5kiahTOkfZ9W0UnN4suHgchJ
+ KXWu52BzaSLXgyrcGEh2SsBh9M+l5Z0jeFZK7SmgIfgjslYapOiTsBzU/CFfXV1+WEch
+ K7Cw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=2QGBwbLSnWJPzMhG7hmlgpEaJ1aqmaYfDLod2fS/lu4=;
- b=VYW4/K28lu+2O6xsAc8J/5ltdW5rfsEPK91bFmqLhkQm9AIBD7Ey1VR0ahqUqcvdnk
- niSoJ2Y/aQ5AwB3iyy4cWpzyKce8EE+G7TlBC+L9iJoXhZsdWzQKh8m0k4Y6aM7YNd2o
- D7esxPY0RX3aGVk4Q3rZt+0i473SlgZW2IQuNWSaTQOGrKrhj9xZym9LvJBZChZFrQC3
- EdYW3p8Rgl685ulaWxZAxhDXlrBxWbYZfr2y7WOMAZhAZlrJ0KQ6Z4rFdf/5DIS18o1p
- G0Z0gHQsiBCld7FQ+4M0WDMola+iw5No8Ciw4eLrOk3FqIVDnydoctTxwwpclYUfRCEq
- vI8w==
-X-Gm-Message-State: AOAM530nh+cCTeuSaILBj/n4352Mx4w9dyIFeDkz6lMzrGEKqVwIGj0z
- OValc/TpjjhnS1SLJSPpf7eFax16+Zkg29EL+FHkQQ==
-X-Google-Smtp-Source: ABdhPJwFhPq9fkEpjQo+0QJTKCmVvyvrvE690rY/dKP92QzxLWK5JZF1W+QPFTxW7+O6HyjDIGn9LSy976Y0MY6xoyk=
-X-Received: by 2002:ab0:70c9:: with SMTP id r9mr1474785ual.15.1592448057350;
- Wed, 17 Jun 2020 19:40:57 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=2r1tjch1br1SVb2oD5fzElgfPDBObUIKTgABF3mVlUA=;
+ b=BPhh0keX6AZxAE7XmjqS/C1N9K2eDzcOQGJrif5pbuunLo38rA5wCE38I9qYVg5Vfi
+ DXpCW0ztxBXagvFAn7MNtyTOsQ+PcFFP3I96SS3jcaLkmB7E++GOOxnmNotPrhwQVj2Z
+ FKbj/HIZI9R0ZNidNo8vi2Cs/eRiXjAqgdQyIVJrHVEO5t58ewG5gnaZV4q51L7RKs9L
+ ivTJAihGAon1Mj31J7MNxutP4iMvRbDVqnNWoeqZ8su5EuG/WYCcmuJqLBxN4YCJHgPc
+ xq5Hm1h+rOMrHx60sHI/+FfCg4hNkRMuQcABIQWoD31x7coc/X5OktWDf1AQlVyLzA8o
+ ziQQ==
+X-Gm-Message-State: AOAM5328kGmMOyVyn5DNi0ZkUc2DDV9wRC24Lu39bWBYxrnjXrMjOPPQ
+ LH1jsWyD6/HwOVRaPvbBhnS7EnShvCg=
+X-Google-Smtp-Source: ABdhPJzsP/mgsLj+ivadjzSwQRN0yT9cIjtgEiOq9L1iKXbZwHU70dJXIYwEg+x2l84BlUsN5VexZA==
+X-Received: by 2002:a17:906:7212:: with SMTP id
+ m18mr2009828ejk.29.1592449239674; 
+ Wed, 17 Jun 2020 20:00:39 -0700 (PDT)
+Received: from jondnuc.lan (IGLD-84-229-154-20.inter.net.il. [84.229.154.20])
+ by smtp.gmail.com with ESMTPSA id
+ l18sm1034131eds.46.2020.06.17.20.00.38
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 17 Jun 2020 20:00:39 -0700 (PDT)
+From: Jon Doron <arilou@gmail.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 0/3] hyperv: vmbus: ACPI various corrections
+Date: Thu, 18 Jun 2020 06:00:24 +0300
+Message-Id: <20200618030027.759594-1-arilou@gmail.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-References: <20200611223016.259837-1-hskinnemoen@google.com>
- <20200611223016.259837-12-hskinnemoen@google.com>
- <69a4b9c8-0ae0-96e2-8b46-cc89c9acbc9a@kaod.org>
- <CACPK8XfzgLURHct7=cOW8ABuZ72sCFb6tgVAWX=n58oP6qdUCA@mail.gmail.com>
-In-Reply-To: <CACPK8XfzgLURHct7=cOW8ABuZ72sCFb6tgVAWX=n58oP6qdUCA@mail.gmail.com>
-From: Havard Skinnemoen <hskinnemoen@google.com>
-Date: Wed, 17 Jun 2020 19:40:45 -0700
-Message-ID: <CAFQmdRaWmr_k+H-nOgBe=SphOjAn3Hy_RSP4XeAwaAV4e1j+cA@mail.gmail.com>
-Subject: Re: [PATCH v2 11/12] hw/arm: Wire up BMC boot flash for npcm750-evb
- and quanta-gsj
-To: Joel Stanley <joel@jms.id.au>
-Cc: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, 
- Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, 
- QEMU Developers <qemu-devel@nongnu.org>, Avi Fishman <Avi.Fishman@nuvoton.com>,
- CS20 KFTing <kfting@nuvoton.com>
-Content-Type: multipart/alternative; boundary="000000000000c8f88e05a852b4c7"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::943;
- envelope-from=hskinnemoen@google.com; helo=mail-ua1-x943.google.com
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::642;
+ envelope-from=arilou@gmail.com; helo=mail-ej1-x642.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -175
-X-Spam_score: -17.6
-X-Spam_bar: -----------------
-X-Spam_report: (-17.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- ENV_AND_HDR_SPF_MATCH=-0.5, HTML_MESSAGE=0.001, PDS_OTHER_BAD_TLD=1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001, USER_IN_DEF_DKIM_WL=-7.5,
- USER_IN_DEF_SPF_WL=-7.5 autolearn=_AUTOLEARN
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,103 +97,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: mail@maciej.szmigiero.name, Jon Doron <arilou@gmail.com>,
+ rvkagan@yandex-team.ru, imammedo@redhat.com, pbonzini@redhat.com,
+ vkuznets@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000c8f88e05a852b4c7
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+After doing further tests and looking at the latest HyperV ACPI DSDT.
+Do minor fix to our VMBus ACPI entry.
 
-On Wed, Jun 17, 2020 at 6:35 PM Joel Stanley <joel@jms.id.au> wrote:
+v3:
+Removed accidental change for the dct submodule head
 
-> On Wed, 17 Jun 2020 at 16:42, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
-> >
-> > On 6/12/20 12:30 AM, Havard Skinnemoen wrote:
-> > > This allows these NPCM7xx-based boards to boot from a flash image, e.=
-g.
-> > > one built with OpenBMC. For example like this:
-> > >
-> > > IMAGE=3D${OPENBMC}/build/tmp/deploy/images/gsj/image-bmc
-> >
-> > could you put the image on some site when ready ?
->
-> They are built as part of OpenBMC CI:
->
->
-> https://openpower.xyz/job/openbmc-build/distro=3Dubuntu,label=3Dbuilder,t=
-arget=3Dgsj/lastSuccessfulBuild/artifact/deploy/images/gsj/
+v2:
+Renamed irq0 to irq now that there is a single IRQ required
 
+Jon Doron (3):
+  hyperv: vmbus: Remove the 2nd IRQ
+  i386: acpi: vmbus: Add _ADR definition
+  acpi: i386: Move VMBus DSDT entry to SB
 
-Cool, I didn't know that!
+ hw/hyperv/vmbus.c                |  3 +--
+ hw/i386/acpi-build.c             | 17 +++++++++--------
+ include/hw/hyperv/vmbus-bridge.h |  3 +--
+ 3 files changed, 11 insertions(+), 12 deletions(-)
 
-Trying to boot that image reminds me of a couple of issues I ran into.
+-- 
+2.24.1
 
-1. This error:
-
-spi_master spi0: /ahb/fiu@fb000000/spi-nor@0 has no valid
-'spi-max-frequency' property (-22)
-
-should be fixed by
-https://github.com/Nuvoton-Israel/linux/commit/c9185ea65bec8ba7b617080c6278=
-eb3e36db4eb4
-but it looks like it hasn't propagated into the openbmc repo yet.
-
-2. npcm7xx_ether_probe crashes the kernel, presumably because there's no
-emac model in qemu yet. I worked around it by disabling that driver, but it
-shouldn't be necessary once the emac model is done.
-
-3. IIRC, after getting past (1) and (2), it turned out the MTD partition
-layout didn't match the device tree, so I had to adjust some offsets in the
-openbmc build. I was planning to post that to the openbmc list after making
-sure I'm cleared to contribute.
-
-Havard
-
---000000000000c8f88e05a852b4c7
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr">On Wed, Jun 17, 2020 at 6:35 PM Joel Stan=
-ley &lt;<a href=3D"mailto:joel@jms.id.au">joel@jms.id.au</a>&gt; wrote:<br>=
-</div><div class=3D"gmail_quote"><blockquote class=3D"gmail_quote" style=3D=
-"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-le=
-ft:1ex">On Wed, 17 Jun 2020 at 16:42, C=C3=A9dric Le Goater &lt;<a href=3D"=
-mailto:clg@kaod.org" target=3D"_blank" class=3D"cremed">clg@kaod.org</a>&gt=
-; wrote:<br>
-&gt;<br>
-&gt; On 6/12/20 12:30 AM, Havard Skinnemoen wrote:<br>
-&gt; &gt; This allows these NPCM7xx-based boards to boot from a flash image=
-, e.g.<br>
-&gt; &gt; one built with OpenBMC. For example like this:<br>
-&gt; &gt;<br>
-&gt; &gt; IMAGE=3D${OPENBMC}/build/tmp/deploy/images/gsj/image-bmc<br>
-&gt;<br>
-&gt; could you put the image on some site when ready ?<br>
-<br>
-They are built as part of OpenBMC CI:<br>
-<br>
-<a href=3D"https://openpower.xyz/job/openbmc-build/distro=3Dubuntu,label=3D=
-builder,target=3Dgsj/lastSuccessfulBuild/artifact/deploy/images/gsj/" rel=
-=3D"noreferrer" target=3D"_blank" class=3D"cremed">https://openpower.xyz/jo=
-b/openbmc-build/distro=3Dubuntu,label=3Dbuilder,target=3Dgsj/lastSuccessful=
-Build/artifact/deploy/images/gsj/</a></blockquote><div><br></div><div>Cool,=
- I didn&#39;t know that!</div><div><br></div><div>Trying to boot that image=
- reminds me of a couple of issues I ran into.</div><div><br></div><div>1. T=
-his error:</div><div><br></div><div>spi_master spi0: /ahb/fiu@fb000000/spi-=
-nor@0 has no valid &#39;spi-max-frequency&#39; property (-22)=C2=A0</div><d=
-iv><br></div><div>should be fixed by=C2=A0<a href=3D"https://github.com/Nuv=
-oton-Israel/linux/commit/c9185ea65bec8ba7b617080c6278eb3e36db4eb4">https://=
-github.com/Nuvoton-Israel/linux/commit/c9185ea65bec8ba7b617080c6278eb3e36db=
-4eb4</a> but it looks like it hasn&#39;t propagated into the openbmc repo y=
-et.</div><div><br></div><div>2.=C2=A0npcm7xx_ether_probe crashes the kernel=
-, presumably because there&#39;s no emac model in qemu yet. I worked around=
- it by disabling that driver, but it shouldn&#39;t be necessary once the em=
-ac model is done.</div><div><br></div><div>3. IIRC, after getting past (1) =
-and (2), it turned out the MTD partition layout didn&#39;t match the device=
- tree, so I had to adjust some offsets in the openbmc build. I was planning=
- to post that to the openbmc list after making sure I&#39;m cleared to cont=
-ribute.</div><div><br></div><div>Havard</div></div></div>
-
---000000000000c8f88e05a852b4c7--
 
