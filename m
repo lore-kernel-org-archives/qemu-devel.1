@@ -2,86 +2,90 @@ Return-Path: <SRS0=FaGC=77=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B901C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 07:32:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2C1BC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 07:35:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 674D9212CC
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 07:32:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 89065206D7
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 07:35:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CRezkqlO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 674D9212CC
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FIF/XF8e"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 89065206D7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46838 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49590 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlp2R-0003mg-NF
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 03:32:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45570)
+	id 1jlp5M-0006vz-Pg
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 03:35:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46266)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1jlp1J-0002yQ-D8
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 03:31:33 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:29959
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jlp4k-0006RS-RT
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 03:35:06 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:39016
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1jlp1H-0007iy-QD
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 03:31:33 -0400
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jlp4j-00084z-C6
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 03:35:06 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592465490;
+ s=mimecast20190719; t=1592465704;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=o3pEsWHg0HprWxm8udfht7MhGDnLJaTUpdy+k+6YDAA=;
- b=CRezkqlOsvEqrnuyUPbyEXqw7kFBNgUL9AMaN5sHYpmdeZdSTQ3sJEqvlxEyzZP1Trrdm7
- mQUp5xn9VD0OnB2Risdkn51t6uztJC3nuZ6ehyZvW7urCu6sSt8CVFiX8XZ3ZJEiq0lvzf
- 7LSMFBx9r88SE/9xgSp36gbpR/tA0EE=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=6eOlkwcqhGRkrWydzBEBlp5kyXsOcCaPVA6oXJn46ug=;
+ b=FIF/XF8exbnqgRMemHKnLkUJ1k4BvkjRVjTE1+lrflYmVJbZv+XWnXhkr0fUBbBm9CYI8o
+ 0uN5a8mvCeE2U38nedyffFUCs4lyxVh93/lYz6PONXkZjbx1FkTzgUc+Acs19EeYVVjj2b
+ wZrVqPpGtaZ4TtEsoYhhG7yDoB06K6w=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-491-2K7sxmAKPf-fBlPrC0R9Yw-1; Thu, 18 Jun 2020 03:31:27 -0400
-X-MC-Unique: 2K7sxmAKPf-fBlPrC0R9Yw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-416-cVFCwAYdNVaeL_f_oH4opA-1; Thu, 18 Jun 2020 03:35:02 -0400
+X-MC-Unique: cVFCwAYdNVaeL_f_oH4opA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6A2758005AD;
- Thu, 18 Jun 2020 07:31:26 +0000 (UTC)
-Received: from localhost (ovpn-113-212.ams2.redhat.com [10.36.113.212])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 09BFA19931;
- Thu, 18 Jun 2020 07:31:25 +0000 (UTC)
-Date: Thu, 18 Jun 2020 08:31:24 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Subject: Re: [PATCH 2/2] scripts/tracetool: Add plainlog backend
-Message-ID: <20200618073124.GA1956319@stefanha-x1.localdomain>
-References: <20200617134505.9D06E7482D3@zero.eik.bme.hu>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 762E0107B273;
+ Thu, 18 Jun 2020 07:35:01 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-114-95.ams2.redhat.com [10.36.114.95])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CF79B10246E2;
+ Thu, 18 Jun 2020 07:34:53 +0000 (UTC)
+Subject: Re: [PATCH v8 13/21] main: keep rcu_atfork callback enabled for qtest
+To: "Bulekov, Alexander" <alxndr@bu.edu>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+References: <20200129053357.27454-1-alxndr@bu.edu>
+ <20200129053357.27454-14-alxndr@bu.edu>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <199e36b2-a509-00ed-94a7-0624753eb53f@redhat.com>
+Date: Thu, 18 Jun 2020 09:34:51 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200617134505.9D06E7482D3@zero.eik.bme.hu>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <20200129053357.27454-14-alxndr@bu.edu>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="Nq2Wo0NMKNjxTN9z"
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=stefanha@redhat.com;
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=thuth@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 01:47:12
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 01:21:16
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,103 +98,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org
+Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "bsd@redhat.com" <bsd@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Nq2Wo0NMKNjxTN9z
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Jun 17, 2020 at 03:36:29PM +0200, BALATON Zoltan wrote:
-> Add a backend that is the same as the log backend but omits the
-> process id and timestamp so logs are easier to read and diff-able.
->=20
-> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+On 29/01/2020 06.34, Bulekov, Alexander wrote:
+> The qtest-based fuzzer makes use of forking to reset-state between
+> tests. Keep the callback enabled, so the call_rcu thread gets created
+> within the child process.
+> 
+> Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
 > ---
->  scripts/tracetool/backend/plainlog.py | 48 +++++++++++++++++++++++++++
->  1 file changed, 48 insertions(+)
->  create mode 100644 scripts/tracetool/backend/plainlog.py
->=20
-> diff --git a/scripts/tracetool/backend/plainlog.py b/scripts/tracetool/ba=
-ckend/plainlog.py
-> new file mode 100644
-> index 0000000000..40bbfa6d76
-> --- /dev/null
-> +++ b/scripts/tracetool/backend/plainlog.py
-> @@ -0,0 +1,48 @@
-> +# -*- coding: utf-8 -*-
+>  vl.c | 9 ++++++++-
+>  1 file changed, 8 insertions(+), 1 deletion(-)
+> 
+> diff --git a/vl.c b/vl.c
+> index bb77935f04..cf8e2d3ebb 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -3794,7 +3794,14 @@ void qemu_init(int argc, char **argv, char **envp)
+>      set_memory_options(&ram_slots, &maxram_size, machine_class);
+>  
+>      os_daemonize();
+> -    rcu_disable_atfork();
 > +
-> +"""
-> +Stderr built-in backend, plain log without proc ID and time.
-> +"""
-> +
-> +__author__     =3D "Llu????s Vilanova <vilanova@ac.upc.edu>"
-> +__copyright__  =3D "Copyright 2012-2017, Llu????s Vilanova <vilanova@ac.=
-upc.edu>"
+> +    /*
+> +     * If QTest is enabled, keep the rcu_atfork enabled, since system processes
+> +     * may be forked testing purposes (e.g. fork-server based fuzzing)
+> +     */
+> +    if (!qtest_enabled()) {
+> +        rcu_disable_atfork();
+> +    }
+>  
+>      if (pid_file && !qemu_write_pidfile(pid_file, &err)) {
+>          error_reportf_err(err, "cannot create PID file: ");
 
-There is a Unicode issue here, Llu=EDs' name is not printed correctly.
+ Hi Alexander,
 
-> +__license__    =3D "GPL version 2 or (at your option) any later version"
-> +
-> +__maintainer__ =3D "Stefan Hajnoczi"
-> +__email__      =3D "stefanha@linux.vnet.ibm.com"
-> +
-> +
-> +from tracetool import out
-> +
-> +
-> +PUBLIC =3D True
-> +
-> +
-> +def generate_h_begin(events, group):
-> +    out('#include "qemu/log-for-trace.h"',
-> +        '')
-> +
-> +
-> +def generate_h(event, group):
-> +    argnames =3D ", ".join(event.args.names())
-> +    if len(event.args) > 0:
-> +        argnames =3D ", " + argnames
-> +
-> +    if "vcpu" in event.properties:
-> +        # already checked on the generic format code
-> +        cond =3D "true"
-> +    else:
-> +        cond =3D "trace_event_get_state(%s)" % ("TRACE_" + event.name.up=
-per())
-> +
-> +    out('    if (%(cond)s && qemu_loglevel_mask(LOG_TRACE)) {',
-> +        '        qemu_log("%(name)s " %(fmt)s "\\n" %(argnames)s);',
-> +        '    }',
-> +        cond=3Dcond,
-> +        name=3Devent.name,
-> +        fmt=3Devent.fmt.rstrip("\n"),
-> +        argnames=3Dargnames)
+I think this patch might maybe not work as expected: The qtest_enabled()
+has been added before configure_accelerators() is called in main(). So
+qtest_enabled() should always return "false" and thus
+rcu_disabled_fork() is still called in any case... could you please
+double-check whether it works for you and I just made a mistake, or
+whether this is a bug indeed?
 
-It is not necessary to introduce a new backend. There could be an option
-that controls whether or not the timestamp/tid is printed. For example,
--trace timestamp=3Doff or maybe the timestmap/tid can be integrated into
-qemu_log() itself so that it's used more consistently and a -d timestamp
-option enables it.
-
---Nq2Wo0NMKNjxTN9z
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl7rGEwACgkQnKSrs4Gr
-c8gV3Qf9HZDT+7ZYUwYFkF24dw8ghpc8l6q+BV7pA0cbNTRxLOc/I4FmNrXAV8dK
-PZErfcT1hv1RyD0aew37+P9MS1Htul+Al2+e0G5E+b4eDegyyxx45PqjmXXllq2q
-40rnWGJWHEYX47EBwvGrs9BrzTK4gMGPrr4ouOQws2a/ar69GoX02+ns9TC5amfL
-p0jWbQR7eaIkFurI3sjP0c0ORykx1m0TZC6ztgJJSWu704w5h7/Jd0FzR0vET4Jm
-fo+M04uH0nhhqYDWqTCgUas2tj5RxEE+c3k06fXzKB0+4zfSL5+3+0D8ORWeN9um
-bjSEjRpsd5n7G3x7GD91SdXHgKUTVw==
-=qqIp
------END PGP SIGNATURE-----
-
---Nq2Wo0NMKNjxTN9z--
+ Thanks,
+  Thomas
 
 
