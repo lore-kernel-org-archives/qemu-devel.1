@@ -2,75 +2,79 @@ Return-Path: <SRS0=FaGC=77=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 490B6C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 22:35:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB175C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 22:36:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1E7BA20732
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 22:35:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E7BA20732
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 720BB20720
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 22:36:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 720BB20720
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37200 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40978 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jm37d-0001QN-DC
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 18:35:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57606)
+	id 1jm399-0003sV-Or
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 18:36:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58040)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jm36v-0000mm-UE; Thu, 18 Jun 2020 18:34:18 -0400
-Resent-Date: Thu, 18 Jun 2020 18:34:17 -0400
-Resent-Message-Id: <E1jm36v-0000mm-UE@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21723)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jm36t-0000Hc-B7; Thu, 18 Jun 2020 18:34:17 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1592519630; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=Ico8oLyiOM7NmZgcvE2GzyDV2ptTBc95QTBMRc/WQkCgFoVkmthbnJ7g+fFbo4bZ3pYdtC5HbgI22uN6zIjdwJUMa3BVroThkTK+oKMyPI+4+smjN6QuIjI69fofu190GyMVgdF8Qzs9ucB9AfDH5QQmh8y7KfwAW5MKM/NcbSM=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1592519630;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=MAnMsBI+JOweiAiocH3edH0NOJdfcPywtGFaHO5zcn0=; 
- b=LOGDFU0N5YlcWVJhRMLQI+n0opBXj2ZKwzmQXIgQICbmdYWGJMPsNu2UCeWrwrlPxr7RLvVC7YUiibouW+Y2tIxMcQ9pNKeehUS/EUVFkbJTbTXppV8MlDoV8kFFC6IVnSVEbsF4q+ErAgV3vBhe/XgHIOKDz1P0IuC/1j2PfCI=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1592519628585713.6663667330832;
- Thu, 18 Jun 2020 15:33:48 -0700 (PDT)
-Message-ID: <159251962664.26237.5756270018341535155@d1fd068a5071>
-Subject: Re: [PATCH v3 0/8] s390: Extended-Length SCCB & DIAGNOSE 0x318
-In-Reply-To: <20200618222258.23287-1-walling@linux.ibm.com>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jm38C-0002eB-Qc
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 18:35:37 -0400
+Received: from indium.canonical.com ([91.189.90.7]:47892)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jm389-0000UW-Pz
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 18:35:36 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jm388-0006VC-98
+ for <qemu-devel@nongnu.org>; Thu, 18 Jun 2020 22:35:32 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 429FB2E80BA
+ for <qemu-devel@nongnu.org>; Thu, 18 Jun 2020 22:35:32 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: walling@linux.ibm.com
-Date: Thu, 18 Jun 2020 15:33:48 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 12:45:19
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 18 Jun 2020 22:28:05 -0000
+From: Ronald Antony <1818075@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: berrange pmaydell rcfa ross
+X-Launchpad-Bug-Reporter: Ross Burton (ross)
+X-Launchpad-Bug-Modifier: Ronald Antony (rcfa)
+References: <155136199055.29310.6029801353341134939.malonedeb@chaenomeles.canonical.com>
+Message-Id: <159251928597.25706.11750313096832245923.malone@gac.canonical.com>
+Subject: [Bug 1818075] Re: qemu x86 TCG doesn't support AVX insns
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="1cbd0aa39df153c901321817f9b57cf3f232b507";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: b363a7bc35eb2458a2ec2a611d1bd728d6c80b21
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 18:15:38
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,70 +83,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: thuth@redhat.com, frankja@linux.ibm.com, david@redhat.com,
- cohuck@redhat.com, qemu-devel@nongnu.org, pasic@linux.ibm.com,
- borntraeger@de.ibm.com, qemu-s390x@nongnu.org, mst@redhat.com,
- svens@linux.ibm.com, pbonzini@redhat.com, mihajlov@linux.ibm.com,
- rth@twiddle.net
+Reply-To: Bug 1818075 <1818075@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDYxODIyMjI1OC4yMzI4
-Ny0xLXdhbGxpbmdAbGludXguaWJtLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBo
-YXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3Jl
-IGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1BBVENIIHYzIDAvOF0gczM5MDogRXh0ZW5kZWQtTGVu
-Z3RoIFNDQ0IgJiBESUFHTk9TRSAweDMxOApUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAyMDA2
-MTgyMjIyNTguMjMyODctMS13YWxsaW5nQGxpbnV4LmlibS5jb20KCj09PSBURVNUIFNDUklQVCBC
-RUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4
-aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1s
-b2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0g
-aGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBU
-RVNUIFNDUklQVCBFTkQgPT09CgpGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2pl
-Y3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzIwMjAwNjE4MjIyMjU4LjIzMjg3
-LTEtd2FsbGluZ0BsaW51eC5pYm0uY29tIC0+IHBhdGNoZXcvMjAyMDA2MTgyMjIyNTguMjMyODct
-MS13YWxsaW5nQGxpbnV4LmlibS5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo3
-YzA5OWUxIHMzOTA6IGd1ZXN0IHN1cHBvcnQgZm9yIGRpYWdub3NlIDB4MzE4CjExY2YxNzQgczM5
-MC9rdm06IGhlYWRlciBzeW5jIGZvciBkaWFnMzE4Cjk4NTg0MTMgczM5MC9zY2xwOiBhZGQgZXh0
-ZW5kZWQtbGVuZ3RoIHNjY2Igc3VwcG9ydCBmb3Iga3ZtIGd1ZXN0CmE4ZTYyNzQgczM5MC9zY2xw
-OiB1c2UgY3B1IG9mZnNldCB0byBsb2NhdGUgY3B1IGVudHJpZXMKYjgzOTU4NyBzMzkwL3NjbHA6
-IHJlYWQgc2NjYiBmcm9tIG1lbSBiYXNlZCBvbiBzY2NiIGxlbmd0aAoyZDc1NGZiIHMzOTAvc2Ns
-cDogcmV3b3JrIHNjbHAgYm91bmRhcnkgYW5kIGxlbmd0aCBjaGVja3MKYTdkY2U5YSBzMzkwL3Nj
-bHA6IGNoZWNrIHNjY2IgbGVuIGJlZm9yZSBmaWxsaW5nIGluIGRhdGEKZWE3MDBkNCBzMzkwL3Nj
-bHA6IGdldCBtYWNoaW5lIG9uY2UgZHVyaW5nIHJlYWQgc2NwL2NwdSBpbmZvCgo9PT0gT1VUUFVU
-IEJFR0lOID09PQoxLzggQ2hlY2tpbmcgY29tbWl0IGVhNzAwZDRkOGE0NyAoczM5MC9zY2xwOiBn
-ZXQgbWFjaGluZSBvbmNlIGR1cmluZyByZWFkIHNjcC9jcHUgaW5mbykKMi84IENoZWNraW5nIGNv
-bW1pdCBhN2RjZTlhMWJmMjkgKHMzOTAvc2NscDogY2hlY2sgc2NjYiBsZW4gYmVmb3JlIGZpbGxp
-bmcgaW4gZGF0YSkKMy84IENoZWNraW5nIGNvbW1pdCAyZDc1NGZiYjI5ZjYgKHMzOTAvc2NscDog
-cmV3b3JrIHNjbHAgYm91bmRhcnkgYW5kIGxlbmd0aCBjaGVja3MpCjQvOCBDaGVja2luZyBjb21t
-aXQgYjgzOTU4N2ZjNTJhIChzMzkwL3NjbHA6IHJlYWQgc2NjYiBmcm9tIG1lbSBiYXNlZCBvbiBz
-Y2NiIGxlbmd0aCkKNS84IENoZWNraW5nIGNvbW1pdCBhOGU2Mjc0Zjc4NmIgKHMzOTAvc2NscDog
-dXNlIGNwdSBvZmZzZXQgdG8gbG9jYXRlIGNwdSBlbnRyaWVzKQo2LzggQ2hlY2tpbmcgY29tbWl0
-IDk4NTg0MTM5MWIzNyAoczM5MC9zY2xwOiBhZGQgZXh0ZW5kZWQtbGVuZ3RoIHNjY2Igc3VwcG9y
-dCBmb3Iga3ZtIGd1ZXN0KQpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTE1OiBG
-SUxFOiB0YXJnZXQvczM5MHgvY3B1X2ZlYXR1cmVzX2RlZi5pbmMuaDoxMDA6CitERUZfRkVBVChF
-WFRFTkRFRF9MRU5HVEhfU0NDQiwgImVscyIsIFNURkwsIDE0MCwgIkV4dGVuZGVkLWxlbmd0aCBT
-Q0NCIGZhY2lsaXR5IikKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgODAgbGluZXMgY2hl
-Y2tlZAoKUGF0Y2ggNi84IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFu
-eSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUg
-bWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjcvOCBDaGVja2luZyBj
-b21taXQgMTFjZjE3NGIzNDU1IChzMzkwL2t2bTogaGVhZGVyIHN5bmMgZm9yIGRpYWczMTgpCjgv
-OCBDaGVja2luZyBjb21taXQgN2MwOTllMTFiMmJhIChzMzkwOiBndWVzdCBzdXBwb3J0IGZvciBk
-aWFnbm9zZSAweDMxOCkKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMxMDM6IEZJTEU6
-IHRhcmdldC9zMzkweC9jcHVfZmVhdHVyZXNfZGVmLmluYy5oOjEyNToKKy8qIEZlYXR1cmVzIGV4
-cG9zZWQgdmlhIFNDTFAgU0NDQiBGYWNpbGl0aWVzIGJ5dGUgMTM0IChiaXQgbnVtYmVycyByZWxh
-dGl2ZSB0byBieXRlLTEzNCkgKi8KCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMx
-MDQ6IEZJTEU6IHRhcmdldC9zMzkweC9jcHVfZmVhdHVyZXNfZGVmLmluYy5oOjEyNjoKK0RFRl9G
-RUFUKERJQUdfMzE4LCAiZGlhZzMxOCIsIFNDTFBfRkFDMTM0LCAwLCAiQ29udHJvbCBwcm9ncmFt
-IG5hbWUgYW5kIHZlcnNpb24gY29kZXMiKQoKdG90YWw6IDEgZXJyb3JzLCAxIHdhcm5pbmdzLCAx
-NjEgbGluZXMgY2hlY2tlZAoKUGF0Y2ggOC84IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJl
-dmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQg
-dGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9
-PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhl
-IGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIwMDYx
-ODIyMjI1OC4yMzI4Ny0xLXdhbGxpbmdAbGludXguaWJtLmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gv
-P3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNo
-ZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBw
-YXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+Of course it=E2=80=99s open source, I get that. When I say =E2=80=9Exyz sho=
+uld be done=E2=80=9C
+then in the sense of =E2=80=9E2+2 should be 4=E2=80=9C not in the sense of =
+=E2=80=9Eyou must
+implement xyz right now=E2=80=9C ;)
+
+Nonetheless, if you run e.g. on an ARM platform the command
+
+qemu-system-x86_64 -cpu help
+
+then it shouldn=E2=80=99t list a slew of CPUs as =E2=80=9Eavailable=E2=80=
+=9C that clearly aren=E2=80=99t
+working.
+
+It should then list fully implemented CPUs separately from partially implem=
+ented CPUs (if listing them at all), and if it does list incomplete impleme=
+ntations, it should indicate what=E2=80=99s missing.
+It=E2=80=99s just a horrible user experience, if based on such output, one =
+spends significant time trying to get some emulation running, only to then =
+discover from runtime error messages, that an =E2=80=9Eavailable=E2=80=9C C=
+PU isn=E2=80=99t actually available.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1818075
+
+Title:
+  qemu x86 TCG doesn't support AVX insns
+
+Status in QEMU:
+  New
+
+Bug description:
+  I'm trying to execute code that has been built with -march=3Dskylake
+  -mtune=3Dgeneric -mavx2 under qemu-user x86-64 with -cpu Skylake-Client.
+  However this code just hangs at 100% CPU.
+
+  Adding input tracing shows that it is likely hanging when dealing with
+  an AVX instruction:
+
+  warning: TCG doesn't support requested feature: CPUID.01H:ECX.fma [bit 12]
+  warning: TCG doesn't support requested feature: CPUID.01H:ECX.pcid [bit 1=
+7]
+  warning: TCG doesn't support requested feature: CPUID.01H:ECX.x2apic [bit=
+ 21]
+  warning: TCG doesn't support requested feature: CPUID.01H:ECX.tsc-deadlin=
+e [bit 24]
+  warning: TCG doesn't support requested feature: CPUID.01H:ECX.avx [bit 28]
+  warning: TCG doesn't support requested feature: CPUID.01H:ECX.f16c [bit 2=
+9]
+  warning: TCG doesn't support requested feature: CPUID.01H:ECX.rdrand [bit=
+ 30]
+  warning: TCG doesn't support requested feature: CPUID.07H:EBX.hle [bit 4]
+  warning: TCG doesn't support requested feature: CPUID.07H:EBX.avx2 [bit 5]
+  warning: TCG doesn't support requested feature: CPUID.07H:EBX.invpcid [bi=
+t 10]
+  warning: TCG doesn't support requested feature: CPUID.07H:EBX.rtm [bit 11]
+  warning: TCG doesn't support requested feature: CPUID.07H:EBX.rdseed [bit=
+ 18]
+  warning: TCG doesn't support requested feature: CPUID.80000001H:ECX.3dnow=
+prefetch [bit 8]
+  warning: TCG doesn't support requested feature: CPUID.0DH:EAX.xsavec [bit=
+ 1]
+
+  IN:
+  0x4000b4ef3b:  c5 fb 5c ca              vsubsd   %xmm2, %xmm0, %xmm1
+  0x4000b4ef3f:  c4 e1 fb 2c d1           vcvttsd2si %xmm1, %rdx
+  0x4000b4ef44:  4c 31 e2                 xorq     %r12, %rdx
+  0x4000b4ef47:  48 85 d2                 testq    %rdx, %rdx
+  0x4000b4ef4a:  79 9e                    jns      0x4000b4eeea
+
+  [ hangs ]
+
+  Attaching a gdb produces this stacktrace:
+
+  (gdb) bt
+  #0  canonicalize (status=3D0x55a20ff67a88, parm=3D0x55a20bb807e0 <float64=
+_params>, part=3D...)
+      at /data/poky-tmp/master/work/x86_64-linux/qemu-native/3.1.0-r0/qemu-=
+3.1.0/fpu/softfloat.c:350
+  #1  float64_unpack_canonical (s=3D0x55a20ff67a88, f=3D0)
+      at /data/poky-tmp/master/work/x86_64-linux/qemu-native/3.1.0-r0/qemu-=
+3.1.0/fpu/softfloat.c:547
+  #2  float64_sub (a=3D0, b=3D4890909195324358656, status=3D0x55a20ff67a88)
+      at /data/poky-tmp/master/work/x86_64-linux/qemu-native/3.1.0-r0/qemu-=
+3.1.0/fpu/softfloat.c:776
+  #3  0x000055a20baa1949 in helper_subsd (env=3D<optimized out>, d=3D0x55a2=
+0ff67ad8, s=3D<optimized out>)
+      at /data/poky-tmp/master/work/x86_64-linux/qemu-native/3.1.0-r0/qemu-=
+3.1.0/target/i386/ops_sse.h:623
+  #4  0x000055a20cfcfea8 in static_code_gen_buffer ()
+  #5  0x000055a20ba3f764 in cpu_tb_exec (itb=3D<optimized out>, cpu=3D0x55a=
+20cea2180 <static_code_gen_buffer+15684720>)
+      at /data/poky-tmp/master/work/x86_64-linux/qemu-native/3.1.0-r0/qemu-=
+3.1.0/accel/tcg/cpu-exec.c:171
+  #6  cpu_loop_exec_tb (tb_exit=3D<synthetic pointer>, last_tb=3D<synthetic=
+ pointer>, tb=3D<optimized out>,
+      cpu=3D0x55a20cea2180 <static_code_gen_buffer+15684720>)
+      at /data/poky-tmp/master/work/x86_64-linux/qemu-native/3.1.0-r0/qemu-=
+3.1.0/accel/tcg/cpu-exec.c:615
+  #7  cpu_exec (cpu=3Dcpu@entry=3D0x55a20ff5f4d0)
+      at /data/poky-tmp/master/work/x86_64-linux/qemu-native/3.1.0-r0/qemu-=
+3.1.0/accel/tcg/cpu-exec.c:725
+  #8  0x000055a20ba6d728 in cpu_loop (env=3D0x55a20ff67780)
+      at /data/poky-tmp/master/work/x86_64-linux/qemu-native/3.1.0-r0/qemu-=
+3.1.0/linux-user/x86_64/../i386/cpu_loop.c:93
+  #9  0x000055a20ba049ff in main (argc=3D<optimized out>, argv=3D0x7ffc5857=
+2868, envp=3D<optimized out>)
+      at /data/poky-tmp/master/work/x86_64-linux/qemu-native/3.1.0-r0/qemu-=
+3.1.0/linux-user/main.c:819
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1818075/+subscriptions
 
