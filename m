@@ -2,89 +2,98 @@ Return-Path: <SRS0=FaGC=77=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD4C3C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 19:18:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C462BC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 19:20:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 77EA6208C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 19:18:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 911A7206F7
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 19:20:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZdtwPM5o"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77EA6208C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LGbKy+eF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 911A7206F7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60262 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36572 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jm03F-00069P-Iw
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 15:18:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39026)
+	id 1jm05e-0001BI-T1
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 15:20:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39450)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jm02B-0004Tn-D4
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 15:17:11 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:28245)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jm029-0000hh-70
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 15:17:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592507827;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=3+2fuwaYdUbo9Lf+Fd2YZ6DhXG5dCOvxVeE6Ups1ArI=;
- b=ZdtwPM5o1esqEHglKKhuwfyDS3KfxdRyST415psI5E45FKecKIfGxgOf3hSnjf1NNLVAv4
- 7cgdQ+W/25Y6WsrfrUgsPbMVngESbBW2X6C2B1oomlgof17nyvKDNKRRiGAcnDL3LmkfaK
- pViBzFjAxXIh0lR12NqylJiwHP0e3/E=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-21-OIcOXzDxPXu1bW6pIdw5eA-1; Thu, 18 Jun 2020 15:17:05 -0400
-X-MC-Unique: OIcOXzDxPXu1bW6pIdw5eA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8BB1010059A1;
- Thu, 18 Jun 2020 19:17:04 +0000 (UTC)
-Received: from work-vm (ovpn-114-205.ams2.redhat.com [10.36.114.205])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 02E855C1D0;
- Thu, 18 Jun 2020 19:16:57 +0000 (UTC)
-Date: Thu, 18 Jun 2020 20:16:55 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Vivek Goyal <vgoyal@redhat.com>
-Subject: Re: [Virtio-fs] [PATCH 0/2] virtiofsd: drop Linux capabilities(7)
-Message-ID: <20200618191655.GI2769@work-vm>
-References: <20200416164907.244868-1-stefanha@redhat.com>
- <20200618190816.GD3814@redhat.com>
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jm04y-0000bq-Jn
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 15:20:04 -0400
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:44346)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jm04w-0000sQ-2s
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 15:20:04 -0400
+Received: by mail-pl1-x643.google.com with SMTP id bh7so2839112plb.11
+ for <qemu-devel@nongnu.org>; Thu, 18 Jun 2020 12:20:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=zTEpJStbwpec8+oM3y3EvE/o3v/vYYV2Kl76GPb4ZZ4=;
+ b=LGbKy+eFx3IeATyVhS/8yOZKfbNAFHpdjefWOpQibbQmeDO8j+tpRTDCSxekqT6aPh
+ TeIz31pE2gmn1EXKG6/yl/ts6P+BPoaVOd2Qw5XeGNXg+ElifByq5P3G7W4xF3MiOly4
+ KmOX1GPHNAv8y6+CFWR2gD0twuiy8FK+TA8hSkG3QNm4tX2F6gYVRN6ciE4lXMT4FDgV
+ gGTxR2LOcPyPn2KpM+AbXFJJuE03YLKPv0wLNMBns4hw7uJ9cB58HrTnbITk6X5pDIkD
+ Duv1ZXc1RmAdH+h151clogxzb9seS4/MsFsluh0/lYOTGoZ9cICXE78iku3GCCI3V4hS
+ Po1g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=zTEpJStbwpec8+oM3y3EvE/o3v/vYYV2Kl76GPb4ZZ4=;
+ b=Q2N6HL/JOfrLJcWr89PZ5zAvbg06pNBKCNSUCdF2OM3gyvejtJk2NbHxiZL1A6Es/j
+ ZGRch6olEuRbW92CHuS+1QUaqq3/ONaAc9jJPnUXj65ZN+8FzqCQO/cLFshMeVVkqO3z
+ CZUM04Cby6jT8JFrSsf7bMovM08emDSeGa+Nl3hyKCtEhrzQoXzaKXtfL0DQhGtzgvbD
+ jn5r6/vZqZL1bYn02KB+9N11TtVtLi+ypp17f1qX2PJbP+3d8v1mpyOlm3bt3LIU03jK
+ pOuKZx5rQsOxbFW6/jOjgc4AQjnOZjnLHIYHL8Tg+qgkNuELoRSHbBN7whf3W0Y3sD4Q
+ KeYw==
+X-Gm-Message-State: AOAM531Rw9QevxF+IkEBIvJSk6UZZrzB2ONR3BAwn9ytFrfCdcQHgqfk
+ +fI59bUmXz3qZ9cGi2MjYNekCw==
+X-Google-Smtp-Source: ABdhPJwinLUereq+WnMDXKoQT8n7ZYBMUeprAqRAo09qdLhd4TNXALQ0Gx/vGhejI7v6F5lt3y/MkQ==
+X-Received: by 2002:a17:90a:d3c2:: with SMTP id
+ d2mr5404142pjw.202.1592508000427; 
+ Thu, 18 Jun 2020 12:20:00 -0700 (PDT)
+Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
+ by smtp.gmail.com with ESMTPSA id k14sm3207368pgn.94.2020.06.18.12.19.59
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 18 Jun 2020 12:19:59 -0700 (PDT)
+Subject: Re: [PATCH v7 14/42] target/arm: Add helper_probe_access
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20200603011317.473934-1-richard.henderson@linaro.org>
+ <20200603011317.473934-15-richard.henderson@linaro.org>
+ <CAFEAcA9EJB8Oa5c7emh-cKMmZRUPa8rRvvvXsHUJWO51gUaDvA@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <998a01bf-fb40-f075-fc08-747669c52b70@linaro.org>
+Date: Thu, 18 Jun 2020 12:19:57 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200618190816.GD3814@redhat.com>
-User-Agent: Mutt/1.14.0 (2020-05-02)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <CAFEAcA9EJB8Oa5c7emh-cKMmZRUPa8rRvvvXsHUJWO51gUaDvA@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 00:57:40
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::643;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x643.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,77 +106,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-fs@redhat.com, qemu-devel@nongnu.org,
- Stefan Hajnoczi <stefanha@redhat.com>, Miklos Szeredi <miklos@szeredi.hu>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
+ Stephen Long <steplong@quicinc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Vivek Goyal (vgoyal@redhat.com) wrote:
-> On Thu, Apr 16, 2020 at 05:49:05PM +0100, Stefan Hajnoczi wrote:
-> > virtiofsd doesn't need of all Linux capabilities(7) available to root.  Keep a
-> > whitelisted set of capabilities that we require.  This improves security in
-> > case virtiofsd is compromised by making it hard for an attacker to gain further
-> > access to the system.
+On 6/18/20 6:33 AM, Peter Maydell wrote:
+> On Wed, 3 Jun 2020 at 02:13, Richard Henderson
+> <richard.henderson@linaro.org> wrote:
+>>
+>> Raise an exception if the given virtual memory is not accessible.
+>>
+>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>> ---
 > 
-> Hi Stefan,
+>> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+>> index 0ee2ef403e..b032829194 100644
+>> --- a/target/arm/translate-a64.c
+>> +++ b/target/arm/translate-a64.c
+>> @@ -232,6 +232,19 @@ static void gen_address_with_allocation_tag0(TCGv_i64 dst, TCGv_i64 src)
+>>      tcg_gen_andi_i64(dst, src, ~MAKE_64BIT_MASK(56, 4));
+>>  }
+>>
+>> +static void gen_probe_access(DisasContext *s, TCGv_i64 ptr,
+>> +                             MMUAccessType acc, int log2_size)
+>> +{
+>> +    TCGv_i32 t_acc = tcg_const_i32(acc);
+>> +    TCGv_i32 t_idx = tcg_const_i32(get_mem_index(s));
+>> +    TCGv_i32 t_size = tcg_const_i32(1 << log2_size);
+>> +
+>> +    gen_helper_probe_access(cpu_env, ptr, t_acc, t_idx, t_size);
+>> +    tcg_temp_free_i32(t_acc);
+>> +    tcg_temp_free_i32(t_idx);
+>> +    tcg_temp_free_i32(t_size);
+>> +}
 > 
-> I just noticed that this patch set breaks overlayfs on top of virtiofs.
-> 
-> overlayfs sets "trusted.overlay.*" and xattrs in trusted domain
-> need CAP_SYS_ADMIN.
-> 
-> man xattr says.
-> 
->    Trusted extended attributes
->        Trusted  extended  attributes  are  visible and accessible only to pro‐
->        cesses that have the  CAP_SYS_ADMIN  capability.   Attributes  in  this
->        class are used to implement mechanisms in user space (i.e., outside the
->        kernel) which keep information in extended attributes to which ordinary
->        processes should not have access.
-> 
-> There is a chance that overlay moves away from trusted xattr in future.
-> But for now we need to make it work. This is an important use case for
-> kata docker in docker build.
-> 
-> May be we can add an option to virtiofsd say "--add-cap <capability>" and
-> ask user to pass in "--add-cap cap_sys_admin" if they need to run daemon
-> with this capaibility.
+> This isn't called from anywhere -- clang is probably going to
+> complain about that.
 
-I'll admit I don't like the idea of giving it cap_sys_admin.
-Can you explain:
-  a) What overlayfs uses trusted for?
-  b) If something nasty was to write junk into the trusted attributes,
-    what would happen?
-  c) I see overlayfs has a fallback check if xattr isn't supported at
-all - what is the consequence?
+Ah, yes.  I thought it would be helpful to split this patch, but I guess not.
+I'll merge with the next patch where it's used.
 
-Dave
-
-> Thanks
-> Vivek
-> 
-> > 
-> > Stefan Hajnoczi (2):
-> >   virtiofsd: only retain file system capabilities
-> >   virtiofsd: drop all capabilities in the wait parent process
-> > 
-> >  tools/virtiofsd/passthrough_ll.c | 51 ++++++++++++++++++++++++++++++++
-> >  1 file changed, 51 insertions(+)
-> > 
-> > -- 
-> > 2.25.1
-> > 
-> > _______________________________________________
-> > Virtio-fs mailing list
-> > Virtio-fs@redhat.com
-> > https://www.redhat.com/mailman/listinfo/virtio-fs
-> 
-> _______________________________________________
-> Virtio-fs mailing list
-> Virtio-fs@redhat.com
-> https://www.redhat.com/mailman/listinfo/virtio-fs
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-
+r~
 
