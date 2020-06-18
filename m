@@ -2,102 +2,71 @@ Return-Path: <SRS0=FaGC=77=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B110C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 22:29:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 490B6C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 22:35:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2E6E020732
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 22:29:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E6E020732
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1E7BA20732
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 22:35:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E7BA20732
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34082 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37200 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jm32B-0006wn-Gu
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 18:29:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56320)
+	id 1jm37d-0001QN-DC
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 18:35:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57606)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <walling@linux.ibm.com>)
- id 1jm31F-0006Ae-20; Thu, 18 Jun 2020 18:28:25 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:63530)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <walling@linux.ibm.com>)
- id 1jm31C-0007dJ-WB; Thu, 18 Jun 2020 18:28:24 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 05IM1f72090452; Thu, 18 Jun 2020 18:28:21 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 31ra0w5uxw-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 18 Jun 2020 18:28:21 -0400
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05IMHOXu141041;
- Thu, 18 Jun 2020 18:28:21 -0400
-Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com
- [169.55.85.253])
- by mx0a-001b2d01.pphosted.com with ESMTP id 31ra0w5uxb-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 18 Jun 2020 18:28:21 -0400
-Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
- by ppma01wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05IMJQKI022271;
- Thu, 18 Jun 2020 22:23:19 GMT
-Received: from b03cxnp08028.gho.boulder.ibm.com
- (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
- by ppma01wdc.us.ibm.com with ESMTP id 31q6bdf2p4-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 18 Jun 2020 22:23:19 +0000
-Received: from b03ledav006.gho.boulder.ibm.com
- (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
- by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 05IMNHrt13107600
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 18 Jun 2020 22:23:17 GMT
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id CBADAC6055;
- Thu, 18 Jun 2020 22:23:17 +0000 (GMT)
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id D4CB8C605B;
- Thu, 18 Jun 2020 22:23:16 +0000 (GMT)
-Received: from localhost.localdomain.com (unknown [9.85.159.16])
- by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
- Thu, 18 Jun 2020 22:23:16 +0000 (GMT)
-From: Collin Walling <walling@linux.ibm.com>
-To: qemu-devel@nongnu.org, qemu-s390x@nongnu.org
-Subject: [PATCH v3 6/8] s390/sclp: add extended-length sccb support for kvm
- guest
-Date: Thu, 18 Jun 2020 18:22:56 -0400
-Message-Id: <20200618222258.23287-7-walling@linux.ibm.com>
-X-Mailer: git-send-email 2.21.3
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jm36v-0000mm-UE; Thu, 18 Jun 2020 18:34:18 -0400
+Resent-Date: Thu, 18 Jun 2020 18:34:17 -0400
+Resent-Message-Id: <E1jm36v-0000mm-UE@lists.gnu.org>
+Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21723)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jm36t-0000Hc-B7; Thu, 18 Jun 2020 18:34:17 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1592519630; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=Ico8oLyiOM7NmZgcvE2GzyDV2ptTBc95QTBMRc/WQkCgFoVkmthbnJ7g+fFbo4bZ3pYdtC5HbgI22uN6zIjdwJUMa3BVroThkTK+oKMyPI+4+smjN6QuIjI69fofu190GyMVgdF8Qzs9ucB9AfDH5QQmh8y7KfwAW5MKM/NcbSM=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1592519630;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=MAnMsBI+JOweiAiocH3edH0NOJdfcPywtGFaHO5zcn0=; 
+ b=LOGDFU0N5YlcWVJhRMLQI+n0opBXj2ZKwzmQXIgQICbmdYWGJMPsNu2UCeWrwrlPxr7RLvVC7YUiibouW+Y2tIxMcQ9pNKeehUS/EUVFkbJTbTXppV8MlDoV8kFFC6IVnSVEbsF4q+ErAgV3vBhe/XgHIOKDz1P0IuC/1j2PfCI=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1592519628585713.6663667330832;
+ Thu, 18 Jun 2020 15:33:48 -0700 (PDT)
+Message-ID: <159251962664.26237.5756270018341535155@d1fd068a5071>
+Subject: Re: [PATCH v3 0/8] s390: Extended-Length SCCB & DIAGNOSE 0x318
 In-Reply-To: <20200618222258.23287-1-walling@linux.ibm.com>
-References: <20200618222258.23287-1-walling@linux.ibm.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
- definitions=2020-06-18_21:2020-06-18,
- 2020-06-18 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- mlxlogscore=999 clxscore=1015
- impostorscore=0 bulkscore=0 cotscore=-2147483648 lowpriorityscore=0
- mlxscore=0 spamscore=0 malwarescore=0 suspectscore=0 adultscore=0
- phishscore=0 priorityscore=1501 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2006180164
-Received-SPF: pass client-ip=148.163.158.5; envelope-from=walling@linux.ibm.com;
- helo=mx0b-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 16:57:19
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
-X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: walling@linux.ibm.com
+Date: Thu, 18 Jun 2020 15:33:48 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o57.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 12:45:19
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -110,164 +79,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: qemu-devel@nongnu.org
 Cc: thuth@redhat.com, frankja@linux.ibm.com, david@redhat.com,
- cohuck@redhat.com, pasic@linux.ibm.com, borntraeger@de.ibm.com, mst@redhat.com,
+ cohuck@redhat.com, qemu-devel@nongnu.org, pasic@linux.ibm.com,
+ borntraeger@de.ibm.com, qemu-s390x@nongnu.org, mst@redhat.com,
  svens@linux.ibm.com, pbonzini@redhat.com, mihajlov@linux.ibm.com,
  rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-As more features and facilities are added to the Read SCP Info (RSCPI)
-response, more space is required to store them. The space used to store
-these new features intrudes on the space originally used to store CPU
-entries. This means as more features and facilities are added to the
-RSCPI response, less space can be used to store CPU entries.
-
-With the Extended-Length SCCB (ELS) facility, a KVM guest can execute
-the RSCPI command and determine if the SCCB is large enough to store a
-complete reponse. If it is not large enough, then the required length
-will be set in the SCCB header.
-
-The caller of the SCLP command is responsible for creating a
-large-enough SCCB to store a complete response. Proper checking should
-be in place, and the caller should execute the command once-more with
-the large-enough SCCB.
-
-This facility also enables an extended SCCB for the Read CPU Info
-(RCPUI) command.
-
-When this facility is enabled, the boundary violation response cannot
-be a result from the RSCPI, RSCPI Forced, or RCPUI commands.
-
-In order to tolerate kernels that do not yet have full support for this
-feature, a "fixed" offset to the start of the CPU Entries within the
-Read SCP Info struct is set to allow for the original 248 max entries
-when this feature is disabled.
-
-Additionally, this is introduced as a CPU feature to protect the guest
-from migrating to a machine that does not support storing an extended
-SCCB. This could otherwise hinder the VM from being able to read all
-available CPU entries after migration (such as during re-ipl).
-
-Signed-off-by: Collin Walling <walling@linux.ibm.com>
----
- hw/s390x/sclp.c                     | 21 ++++++++++++++++++++-
- include/hw/s390x/sclp.h             |  1 +
- target/s390x/cpu_features_def.inc.h |  1 +
- target/s390x/gen-features.c         |  1 +
- target/s390x/kvm.c                  |  8 ++++++++
- 5 files changed, 31 insertions(+), 1 deletion(-)
-
-diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
-index 0dfbe6e5ec..f7c49e339e 100644
---- a/hw/s390x/sclp.c
-+++ b/hw/s390x/sclp.c
-@@ -56,6 +56,18 @@ static bool sccb_has_valid_boundary(uint64_t sccb_addr, uint32_t code,
-     uint64_t sccb_boundary = (sccb_addr & PAGE_MASK) + PAGE_SIZE;
- 
-     switch (code & SCLP_CMD_CODE_MASK) {
-+    case SCLP_CMDW_READ_SCP_INFO:
-+    case SCLP_CMDW_READ_SCP_INFO_FORCED:
-+    case SCLP_CMDW_READ_CPU_INFO:
-+        /*
-+         * An extended-length SCCB is only allowed for Read SCP/CPU Info and
-+         * is allowed to exceed the 4k boundary. The respective commands will
-+         * set the length field to the required length if an insufficient
-+         * SCCB length is provided.
-+         */
-+        if (s390_has_feat(S390_FEAT_EXTENDED_LENGTH_SCCB)) {
-+            return true;
-+        }
-     default:
-         if (sccb_max_addr < sccb_boundary) {
-             return true;
-@@ -72,6 +84,10 @@ static bool sccb_sufficient_len(SCCB *sccb, int num_cpus, int data_len)
- 
-     if (be16_to_cpu(sccb->h.length) < required_len) {
-         sccb->h.response_code = cpu_to_be16(SCLP_RC_INSUFFICIENT_SCCB_LENGTH);
-+        if (s390_has_feat(S390_FEAT_EXTENDED_LENGTH_SCCB) &&
-+            sccb->h.control_mask[2] & SCLP_VARIABLE_LENGTH_RESPONSE) {
-+            sccb->h.length = required_len;
-+        }
-         return false;
-     }
-     return true;
-@@ -101,7 +117,9 @@ static void prepare_cpu_entries(MachineState *ms, CPUEntry *entry, int *count)
-  */
- static inline int get_read_scp_info_data_len(void)
- {
--    return offsetof(ReadInfo, entries);
-+    return s390_has_feat(S390_FEAT_EXTENDED_LENGTH_SCCB) ?
-+           offsetof(ReadInfo, entries) :
-+           SCLP_READ_SCP_INFO_FIXED_CPU_OFFSET;
- }
- 
- /* Provide information about the configuration, CPUs and storage */
-@@ -116,6 +134,7 @@ static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
-     CPUEntry *entries_start = (void *)sccb + data_len;
- 
-     if (!sccb_sufficient_len(sccb, machine->possible_cpus->len, data_len)) {
-+        warn_report("insufficient sccb size to store read scp info response");
-         return;
-     }
- 
-diff --git a/include/hw/s390x/sclp.h b/include/hw/s390x/sclp.h
-index 822eff4396..ef2d63eae9 100644
---- a/include/hw/s390x/sclp.h
-+++ b/include/hw/s390x/sclp.h
-@@ -110,6 +110,7 @@ typedef struct CPUEntry {
-     uint8_t reserved1;
- } QEMU_PACKED CPUEntry;
- 
-+#define SCLP_READ_SCP_INFO_FIXED_CPU_OFFSET     128
- typedef struct ReadInfo {
-     SCCBHeader h;
-     uint16_t rnmax;
-diff --git a/target/s390x/cpu_features_def.inc.h b/target/s390x/cpu_features_def.inc.h
-index 5942f81f16..1c04cc18f4 100644
---- a/target/s390x/cpu_features_def.inc.h
-+++ b/target/s390x/cpu_features_def.inc.h
-@@ -97,6 +97,7 @@ DEF_FEAT(GUARDED_STORAGE, "gs", STFL, 133, "Guarded-storage facility")
- DEF_FEAT(VECTOR_PACKED_DECIMAL, "vxpd", STFL, 134, "Vector packed decimal facility")
- DEF_FEAT(VECTOR_ENH, "vxeh", STFL, 135, "Vector enhancements facility")
- DEF_FEAT(MULTIPLE_EPOCH, "mepoch", STFL, 139, "Multiple-epoch facility")
-+DEF_FEAT(EXTENDED_LENGTH_SCCB, "els", STFL, 140, "Extended-length SCCB facility")
- DEF_FEAT(TEST_PENDING_EXT_INTERRUPTION, "tpei", STFL, 144, "Test-pending-external-interruption facility")
- DEF_FEAT(INSERT_REFERENCE_BITS_MULT, "irbm", STFL, 145, "Insert-reference-bits-multiple facility")
- DEF_FEAT(MSA_EXT_8, "msa8-base", STFL, 146, "Message-security-assist-extension-8 facility (excluding subfunctions)")
-diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
-index 8ddeebc544..6857f657fb 100644
---- a/target/s390x/gen-features.c
-+++ b/target/s390x/gen-features.c
-@@ -522,6 +522,7 @@ static uint16_t full_GEN12_GA1[] = {
-     S390_FEAT_AP_QUEUE_INTERRUPT_CONTROL,
-     S390_FEAT_AP_FACILITIES_TEST,
-     S390_FEAT_AP,
-+    S390_FEAT_EXTENDED_LENGTH_SCCB,
- };
- 
- static uint16_t full_GEN12_GA2[] = {
-diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-index f2f75d2a57..a2d5ad78f6 100644
---- a/target/s390x/kvm.c
-+++ b/target/s390x/kvm.c
-@@ -2456,6 +2456,14 @@ void kvm_s390_get_host_cpu_model(S390CPUModel *model, Error **errp)
-         KVM_S390_VM_CRYPTO_ENABLE_APIE)) {
-         set_bit(S390_FEAT_AP, model->features);
-     }
-+
-+    /*
-+     * Extended-Length SCCB is handled entirely within QEMU.
-+     * For PV guests this is completely fenced by the Ultravisor, as Service
-+     * Call error checking and STFLE interpretation are handled via SIE.
-+     */
-+    set_bit(S390_FEAT_EXTENDED_LENGTH_SCCB, model->features);
-+
-     /* strip of features that are not part of the maximum model */
-     bitmap_and(model->features, model->features, model->def->full_feat,
-                S390_FEAT_MAX);
--- 
-2.21.3
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDYxODIyMjI1OC4yMzI4
+Ny0xLXdhbGxpbmdAbGludXguaWJtLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBo
+YXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3Jl
+IGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1BBVENIIHYzIDAvOF0gczM5MDogRXh0ZW5kZWQtTGVu
+Z3RoIFNDQ0IgJiBESUFHTk9TRSAweDMxOApUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAyMDA2
+MTgyMjIyNTguMjMyODctMS13YWxsaW5nQGxpbnV4LmlibS5jb20KCj09PSBURVNUIFNDUklQVCBC
+RUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4
+aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1s
+b2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0g
+aGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBU
+RVNUIFNDUklQVCBFTkQgPT09CgpGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2pl
+Y3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzIwMjAwNjE4MjIyMjU4LjIzMjg3
+LTEtd2FsbGluZ0BsaW51eC5pYm0uY29tIC0+IHBhdGNoZXcvMjAyMDA2MTgyMjIyNTguMjMyODct
+MS13YWxsaW5nQGxpbnV4LmlibS5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo3
+YzA5OWUxIHMzOTA6IGd1ZXN0IHN1cHBvcnQgZm9yIGRpYWdub3NlIDB4MzE4CjExY2YxNzQgczM5
+MC9rdm06IGhlYWRlciBzeW5jIGZvciBkaWFnMzE4Cjk4NTg0MTMgczM5MC9zY2xwOiBhZGQgZXh0
+ZW5kZWQtbGVuZ3RoIHNjY2Igc3VwcG9ydCBmb3Iga3ZtIGd1ZXN0CmE4ZTYyNzQgczM5MC9zY2xw
+OiB1c2UgY3B1IG9mZnNldCB0byBsb2NhdGUgY3B1IGVudHJpZXMKYjgzOTU4NyBzMzkwL3NjbHA6
+IHJlYWQgc2NjYiBmcm9tIG1lbSBiYXNlZCBvbiBzY2NiIGxlbmd0aAoyZDc1NGZiIHMzOTAvc2Ns
+cDogcmV3b3JrIHNjbHAgYm91bmRhcnkgYW5kIGxlbmd0aCBjaGVja3MKYTdkY2U5YSBzMzkwL3Nj
+bHA6IGNoZWNrIHNjY2IgbGVuIGJlZm9yZSBmaWxsaW5nIGluIGRhdGEKZWE3MDBkNCBzMzkwL3Nj
+bHA6IGdldCBtYWNoaW5lIG9uY2UgZHVyaW5nIHJlYWQgc2NwL2NwdSBpbmZvCgo9PT0gT1VUUFVU
+IEJFR0lOID09PQoxLzggQ2hlY2tpbmcgY29tbWl0IGVhNzAwZDRkOGE0NyAoczM5MC9zY2xwOiBn
+ZXQgbWFjaGluZSBvbmNlIGR1cmluZyByZWFkIHNjcC9jcHUgaW5mbykKMi84IENoZWNraW5nIGNv
+bW1pdCBhN2RjZTlhMWJmMjkgKHMzOTAvc2NscDogY2hlY2sgc2NjYiBsZW4gYmVmb3JlIGZpbGxp
+bmcgaW4gZGF0YSkKMy84IENoZWNraW5nIGNvbW1pdCAyZDc1NGZiYjI5ZjYgKHMzOTAvc2NscDog
+cmV3b3JrIHNjbHAgYm91bmRhcnkgYW5kIGxlbmd0aCBjaGVja3MpCjQvOCBDaGVja2luZyBjb21t
+aXQgYjgzOTU4N2ZjNTJhIChzMzkwL3NjbHA6IHJlYWQgc2NjYiBmcm9tIG1lbSBiYXNlZCBvbiBz
+Y2NiIGxlbmd0aCkKNS84IENoZWNraW5nIGNvbW1pdCBhOGU2Mjc0Zjc4NmIgKHMzOTAvc2NscDog
+dXNlIGNwdSBvZmZzZXQgdG8gbG9jYXRlIGNwdSBlbnRyaWVzKQo2LzggQ2hlY2tpbmcgY29tbWl0
+IDk4NTg0MTM5MWIzNyAoczM5MC9zY2xwOiBhZGQgZXh0ZW5kZWQtbGVuZ3RoIHNjY2Igc3VwcG9y
+dCBmb3Iga3ZtIGd1ZXN0KQpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTE1OiBG
+SUxFOiB0YXJnZXQvczM5MHgvY3B1X2ZlYXR1cmVzX2RlZi5pbmMuaDoxMDA6CitERUZfRkVBVChF
+WFRFTkRFRF9MRU5HVEhfU0NDQiwgImVscyIsIFNURkwsIDE0MCwgIkV4dGVuZGVkLWxlbmd0aCBT
+Q0NCIGZhY2lsaXR5IikKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgODAgbGluZXMgY2hl
+Y2tlZAoKUGF0Y2ggNi84IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFu
+eSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUg
+bWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjcvOCBDaGVja2luZyBj
+b21taXQgMTFjZjE3NGIzNDU1IChzMzkwL2t2bTogaGVhZGVyIHN5bmMgZm9yIGRpYWczMTgpCjgv
+OCBDaGVja2luZyBjb21taXQgN2MwOTllMTFiMmJhIChzMzkwOiBndWVzdCBzdXBwb3J0IGZvciBk
+aWFnbm9zZSAweDMxOCkKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMxMDM6IEZJTEU6
+IHRhcmdldC9zMzkweC9jcHVfZmVhdHVyZXNfZGVmLmluYy5oOjEyNToKKy8qIEZlYXR1cmVzIGV4
+cG9zZWQgdmlhIFNDTFAgU0NDQiBGYWNpbGl0aWVzIGJ5dGUgMTM0IChiaXQgbnVtYmVycyByZWxh
+dGl2ZSB0byBieXRlLTEzNCkgKi8KCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMx
+MDQ6IEZJTEU6IHRhcmdldC9zMzkweC9jcHVfZmVhdHVyZXNfZGVmLmluYy5oOjEyNjoKK0RFRl9G
+RUFUKERJQUdfMzE4LCAiZGlhZzMxOCIsIFNDTFBfRkFDMTM0LCAwLCAiQ29udHJvbCBwcm9ncmFt
+IG5hbWUgYW5kIHZlcnNpb24gY29kZXMiKQoKdG90YWw6IDEgZXJyb3JzLCAxIHdhcm5pbmdzLCAx
+NjEgbGluZXMgY2hlY2tlZAoKUGF0Y2ggOC84IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJl
+dmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQg
+dGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9
+PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhl
+IGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIwMDYx
+ODIyMjI1OC4yMzI4Ny0xLXdhbGxpbmdAbGludXguaWJtLmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gv
+P3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNo
+ZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBw
+YXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
