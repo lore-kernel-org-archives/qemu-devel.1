@@ -6,73 +6,72 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F388C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 22:26:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18E3AC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 22:27:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EA9D420732
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 22:26:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA9D420732
+	by mail.kernel.org (Postfix) with ESMTPS id DF14220732
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 22:27:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF14220732
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52466 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57664 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jm2zD-0001vX-8N
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 18:26:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55260)
+	id 1jm30d-00050o-86
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 18:27:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55254)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <walling@linux.ibm.com>)
- id 1jm2wP-0005sQ-Aa; Thu, 18 Jun 2020 18:23:25 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:65184
- helo=mx0a-001b2d01.pphosted.com)
+ id 1jm2wO-0005qC-H0; Thu, 18 Jun 2020 18:23:24 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:48382)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <walling@linux.ibm.com>)
- id 1jm2wM-0006oL-Bi; Thu, 18 Jun 2020 18:23:24 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 05IM1nrr105156; Thu, 18 Jun 2020 18:23:21 -0400
+ id 1jm2wK-0006nf-VH; Thu, 18 Jun 2020 18:23:24 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 05IM3PlW118079; Thu, 18 Jun 2020 18:23:19 -0400
 Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 31rfyt1na5-1
+ by mx0a-001b2d01.pphosted.com with ESMTP id 31rcbb0ccj-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 18 Jun 2020 18:23:21 -0400
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05IMHxT4159200;
- Thu, 18 Jun 2020 18:23:20 -0400
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com
- [169.62.189.11])
- by mx0b-001b2d01.pphosted.com with ESMTP id 31rfyt1n9x-1
+ Thu, 18 Jun 2020 18:23:19 -0400
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05IMLpbq168834;
+ Thu, 18 Jun 2020 18:23:19 -0400
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com
+ [169.63.214.131])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 31rcbb0cca-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 18 Jun 2020 18:23:20 -0400
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
- by ppma03dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05IML5wa028594;
- Thu, 18 Jun 2020 22:23:20 GMT
-Received: from b03cxnp07029.gho.boulder.ibm.com
- (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
- by ppma03dal.us.ibm.com with ESMTP id 31q6c64wfd-1
+ Thu, 18 Jun 2020 18:23:19 -0400
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+ by ppma01dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05IMLGmQ009218;
+ Thu, 18 Jun 2020 22:23:18 GMT
+Received: from b03cxnp08027.gho.boulder.ibm.com
+ (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
+ by ppma01dal.us.ibm.com with ESMTP id 31rdtr1dw1-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 18 Jun 2020 22:23:20 +0000
+ Thu, 18 Jun 2020 22:23:18 +0000
 Received: from b03ledav006.gho.boulder.ibm.com
  (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
- by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 05IMNIV750725350
+ by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 05IMNF8B7930506
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 18 Jun 2020 22:23:19 GMT
+ Thu, 18 Jun 2020 22:23:15 GMT
 Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id D7139C605A;
- Thu, 18 Jun 2020 22:23:18 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id B0122C6059;
+ Thu, 18 Jun 2020 22:23:16 +0000 (GMT)
 Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id E4BCAC6057;
- Thu, 18 Jun 2020 22:23:17 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id DF710C6055;
+ Thu, 18 Jun 2020 22:23:15 +0000 (GMT)
 Received: from localhost.localdomain.com (unknown [9.85.159.16])
  by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
- Thu, 18 Jun 2020 22:23:17 +0000 (GMT)
+ Thu, 18 Jun 2020 22:23:15 +0000 (GMT)
 From: Collin Walling <walling@linux.ibm.com>
 To: qemu-devel@nongnu.org, qemu-s390x@nongnu.org
-Subject: [PATCH v3 7/8] s390/kvm: header sync for diag318
-Date: Thu, 18 Jun 2020 18:22:57 -0400
-Message-Id: <20200618222258.23287-8-walling@linux.ibm.com>
+Subject: [PATCH v3 5/8] s390/sclp: use cpu offset to locate cpu entries
+Date: Thu, 18 Jun 2020 18:22:55 -0400
+Message-Id: <20200618222258.23287-6-walling@linux.ibm.com>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200618222258.23287-1-walling@linux.ibm.com>
 References: <20200618222258.23287-1-walling@linux.ibm.com>
@@ -83,16 +82,16 @@ X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
  definitions=2020-06-18_21:2020-06-18,
  2020-06-18 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0
- mlxlogscore=999 clxscore=1015 lowpriorityscore=0 priorityscore=1501
- adultscore=0 bulkscore=0 malwarescore=0 suspectscore=0 phishscore=0
- cotscore=-2147483648 mlxscore=0 spamscore=0 classifier=spam adjust=0
- reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2006180164
-Received-SPF: pass client-ip=148.163.158.5; envelope-from=walling@linux.ibm.com;
+ suspectscore=0
+ lowpriorityscore=0 spamscore=0 impostorscore=0 mlxscore=0
+ cotscore=-2147483648 mlxlogscore=999 bulkscore=0 priorityscore=1501
+ malwarescore=0 phishscore=0 adultscore=0 clxscore=1015 classifier=spam
+ adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2006180168
+Received-SPF: pass client-ip=148.163.156.1; envelope-from=walling@linux.ibm.com;
  helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 16:57:19
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 18:23:16
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
 X-Spam_score_int: -35
 X-Spam_score: -3.6
 X-Spam_bar: ---
@@ -119,51 +118,43 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Collin Walling <walling@linux.ibm.com>
----
- linux-headers/asm-s390/kvm.h | 5 ++++-
- linux-headers/linux/kvm.h    | 1 +
- 2 files changed, 5 insertions(+), 1 deletion(-)
+The start of the CPU entry region in the Read SCP Info response data is
+denoted by the offset_cpu field. As such, QEMU needs to begin creating
+entries at this address. Note that the length of the Read SCP Info data
+(data_len) denotes the same value as the cpu offset.
 
-diff --git a/linux-headers/asm-s390/kvm.h b/linux-headers/asm-s390/kvm.h
-index 0138ccb0d8..98665dff19 100644
---- a/linux-headers/asm-s390/kvm.h
-+++ b/linux-headers/asm-s390/kvm.h
-@@ -231,11 +231,13 @@ struct kvm_guest_debug_arch {
- #define KVM_SYNC_GSCB   (1UL << 9)
- #define KVM_SYNC_BPBC   (1UL << 10)
- #define KVM_SYNC_ETOKEN (1UL << 11)
-+#define KVM_SYNC_DIAG318 (1UL << 12)
+This is in preparation of when Read SCP Info inevitably introduces new
+bytes that push the start of the CPUEntry field further away.
+
+Read CPU Info is unlikely to ever change, so let's not bother
+accounting for the offset there.
+
+Signed-off-by: Collin Walling <walling@linux.ibm.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+---
+ hw/s390x/sclp.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
+index 772b7b3b01..0dfbe6e5ec 100644
+--- a/hw/s390x/sclp.c
++++ b/hw/s390x/sclp.c
+@@ -113,13 +113,14 @@ static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
+     int rnsize, rnmax;
+     IplParameterBlock *ipib = s390_ipl_get_iplb();
+     int data_len = get_read_scp_info_data_len();
++    CPUEntry *entries_start = (void *)sccb + data_len;
  
- #define KVM_SYNC_S390_VALID_FIELDS \
- 	(KVM_SYNC_PREFIX | KVM_SYNC_GPRS | KVM_SYNC_ACRS | KVM_SYNC_CRS | \
- 	 KVM_SYNC_ARCH0 | KVM_SYNC_PFAULT | KVM_SYNC_VRS | KVM_SYNC_RICCB | \
--	 KVM_SYNC_FPRS | KVM_SYNC_GSCB | KVM_SYNC_BPBC | KVM_SYNC_ETOKEN)
-+	 KVM_SYNC_FPRS | KVM_SYNC_GSCB | KVM_SYNC_BPBC | KVM_SYNC_ETOKEN | \
-+	 KVM_SYNC_DIAG318)
+     if (!sccb_sufficient_len(sccb, machine->possible_cpus->len, data_len)) {
+         return;
+     }
  
- /* length and alignment of the sdnx as a power of two */
- #define SDNXC 8
-@@ -254,6 +256,7 @@ struct kvm_sync_regs {
- 	__u64 pft;	/* pfault token [PFAULT] */
- 	__u64 pfs;	/* pfault select [PFAULT] */
- 	__u64 pfc;	/* pfault compare [PFAULT] */
-+	__u64 diag318;	/* diagnose 0x318 info */
- 	union {
- 		__u64 vrs[32][2];	/* vector registers (KVM_SYNC_VRS) */
- 		__u64 fprs[16];		/* fp registers (KVM_SYNC_FPRS) */
-diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
-index 9804495a46..444fdd977f 100644
---- a/linux-headers/linux/kvm.h
-+++ b/linux-headers/linux/kvm.h
-@@ -1017,6 +1017,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_S390_VCPU_RESETS 179
- #define KVM_CAP_S390_PROTECTED 180
- #define KVM_CAP_PPC_SECURE_GUEST 181
-+#define KVM_CAP_S390_DIAG318 184
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
+     /* CPU information */
+-    prepare_cpu_entries(machine, read_info->entries, &cpu_count);
++    prepare_cpu_entries(machine, entries_start, &cpu_count);
+     read_info->entries_cpu = cpu_to_be16(cpu_count);
+     read_info->offset_cpu = cpu_to_be16(data_len);
+     read_info->highest_cpu = cpu_to_be16(machine->smp.max_cpus - 1);
 -- 
 2.21.3
 
