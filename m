@@ -2,82 +2,105 @@ Return-Path: <SRS0=FaGC=77=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04FCCC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 22:21:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A35BC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 22:24:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C9A6620732
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 22:21:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9A6620732
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id EFB3B206FA
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 22:24:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFB3B206FA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41140 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45750 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jm2uM-0004PJ-4p
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 18:21:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54544)
+	id 1jm2xL-0007G6-8G
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 18:24:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55176)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jm2tk-0003sZ-Oz
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 18:20:40 -0400
-Received: from indium.canonical.com ([91.189.90.7]:45582)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jm2ti-0006Hp-UD
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 18:20:40 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jm2th-000518-SH
- for <qemu-devel@nongnu.org>; Thu, 18 Jun 2020 22:20:37 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id B98812E8060
- for <qemu-devel@nongnu.org>; Thu, 18 Jun 2020 22:20:37 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <walling@linux.ibm.com>)
+ id 1jm2wI-0005nk-Nk; Thu, 18 Jun 2020 18:23:19 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:15390)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <walling@linux.ibm.com>)
+ id 1jm2wG-0006mb-6q; Thu, 18 Jun 2020 18:23:18 -0400
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 05IM2HSt156041; Thu, 18 Jun 2020 18:23:13 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 31r446xe1f-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 18 Jun 2020 18:23:13 -0400
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05IM3eOk160539;
+ Thu, 18 Jun 2020 18:23:13 -0400
+Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com
+ [169.47.144.27])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 31r446xe19-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 18 Jun 2020 18:23:13 -0400
+Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
+ by ppma05wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05IMJwNm030826;
+ Thu, 18 Jun 2020 22:23:12 GMT
+Received: from b03cxnp08028.gho.boulder.ibm.com
+ (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
+ by ppma05wdc.us.ibm.com with ESMTP id 31qu27rf5c-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 18 Jun 2020 22:23:12 +0000
+Received: from b03ledav006.gho.boulder.ibm.com
+ (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
+ by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 05IMNBJ011272632
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 18 Jun 2020 22:23:11 GMT
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 4E056C6055;
+ Thu, 18 Jun 2020 22:23:11 +0000 (GMT)
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 4356BC6057;
+ Thu, 18 Jun 2020 22:23:10 +0000 (GMT)
+Received: from localhost.localdomain.com (unknown [9.85.159.16])
+ by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
+ Thu, 18 Jun 2020 22:23:10 +0000 (GMT)
+From: Collin Walling <walling@linux.ibm.com>
+To: qemu-devel@nongnu.org, qemu-s390x@nongnu.org
+Subject: [PATCH v3 0/8] s390: Extended-Length SCCB & DIAGNOSE 0x318
+Date: Thu, 18 Jun 2020 18:22:50 -0400
+Message-Id: <20200618222258.23287-1-walling@linux.ibm.com>
+X-Mailer: git-send-email 2.21.3
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 18 Jun 2020 22:13:58 -0000
-From: Ronald Antony <1884095@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Invalid; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Tags: emulation incomplete tcg
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: pmaydell rcfa
-X-Launchpad-Bug-Reporter: Ronald Antony (rcfa)
-X-Launchpad-Bug-Modifier: Ronald Antony (rcfa)
-References: <159249543912.17037.1746740929144966356.malonedeb@chaenomeles.canonical.com>
-Message-Id: <159251843893.25875.12229652418127339236.malone@gac.canonical.com>
-Subject: [Bug 1884095] Re: QEMU not sufficiently focused on qEMUlation,
- with resulting holes in TCG emulation coverage
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="1cbd0aa39df153c901321817f9b57cf3f232b507";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 54fdd52c5699285fc163d38e2f0fb6c9d0a003aa
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 18:15:38
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
+ definitions=2020-06-18_21:2020-06-18,
+ 2020-06-18 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501 mlxscore=0
+ bulkscore=0 phishscore=0 suspectscore=0 impostorscore=0
+ cotscore=-2147483648 lowpriorityscore=0 spamscore=0 mlxlogscore=999
+ clxscore=1015 malwarescore=0 adultscore=0 classifier=spam adjust=0
+ reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2006180164
+Received-SPF: pass client-ip=148.163.158.5; envelope-from=walling@linux.ibm.com;
+ helo=mx0b-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 16:57:19
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10
+X-Spam_score_int: -35
+X-Spam_score: -3.6
+X-Spam_bar: ---
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -86,78 +109,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1884095 <1884095@bugs.launchpad.net>
+Cc: thuth@redhat.com, frankja@linux.ibm.com, david@redhat.com,
+ cohuck@redhat.com, pasic@linux.ibm.com, borntraeger@de.ibm.com, mst@redhat.com,
+ svens@linux.ibm.com, pbonzini@redhat.com, mihajlov@linux.ibm.com,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-BTW: just because I bracket a report with why I think a matter is worth
-fixing, shouldn=E2=80=99t make it =E2=80=9Einvalid=E2=80=9C.
+Changelog:
 
-The instructions aren=E2=80=99t implemented, yet the CPUs are listed as
-available, which is a bug in my book, as functionality is advertised
-that is unavailable.
+    v3
 
--- =
+    • Device IOCTLs removed
+        - diag 318 info is now communicated via sync_regs
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1884095
+    • Reset code removed
+        - this is now handled in KVM
+        - diag318_info is stored within the CPU reset portion of the
+            S390CPUState
 
-Title:
-  QEMU not sufficiently focused on qEMUlation, with resulting holes in
-  TCG emulation coverage
+    • Various cleanups for ELS preliminary patches
 
-Status in QEMU:
-  Invalid
+    v2
 
-Bug description:
-  It seems that QEMU has stopped emphasizing the EMU part of the name,
-  and is too much focused on virtualization.
+    • QEMU now handles the instruction call
+        - as such, the "enable diag 318" IOCTL has been removed
 
-  My interest is at running legacy operating systems, and as such, they mus=
-t run on foreign CPU platforms. m68 on intel, intel on ARM, etc.
-  Time doesn't stand still, and reliance on KVM and similar x86-on-x86 tric=
-ks, which allow the delegation of certain CPU features to the host CPU is g=
-oing to not work going forward.
+    • patch #1 now changes the read scp/cpu info functions to
+      retrieve the machine state once
+        - as such, I have not added any ack's or r-bs since this
+          patch differs from the previous version
 
-  If the rumored transition of Apple to ARM is going to take place,
-  people will want to e.g. emulate for testing or legacy purposes a
-  variety of operating systems, incl. NeXTSTEP, Windows, earlier
-  versions of MacOS on ARM Macs.
+    • patch #3 introduces a new "get_read_scp_info_data_len"
+      function in order clean-up the variable data length assignment
+      in patch #7
+        - a comment above this function should help clarify what's
+          going on to make things a bit easier to read
 
-  Testing that scenario, i.e. macOS on an ARM board with the lowest
-  possible CPU capable of running modern macOS, results in these
-  problems (and of course utter failure achieving the goal):
+    • other misc clean ups and fixes
+        - s/diag318/diag_318 in order to keep the naming scheme
+          consistent with Linux and other diag-related code
+        - s/byte_134/fac134 to align naming scheme with Linux
 
-  qemu-system-x86_64: warning: TCG doesn't support requested feature: CPUID=
-.01H:ECX.fma [bit 12]
-  qemu-system-x86_64: warning: TCG doesn't support requested feature: CPUID=
-.01H:ECX.avx [bit 28]
-  qemu-system-x86_64: warning: TCG doesn't support requested feature: CPUID=
-.07H:EBX.avx2 [bit 5]
-  qemu-system-x86_64: warning: TCG doesn't support requested feature: CPUID=
-.80000007H:EDX.invtsc [bit 8]
-  qemu-system-x86_64: warning: TCG doesn't support requested feature: CPUID=
-.0DH:EAX.xsavec [bit 1]
+-----------------------------------------------------------------------
 
-  And this is emulating a lowly Penryn CPU with the required CPU flags for =
-macOS:
-  -cpu Penryn,vendor=3DGenuineIntel,+sse3,+sse4.2,+aes,+xsave,+avx,+xsaveop=
-t,+xsavec,+xgetbv1,+avx2,+bmi2,+smep,+bmi1,+fma,+movbe,+invtsc
+This patch series introduces two features for an s390 KVM quest:
+    - Extended-Length SCCB (els) for the Read SCP/CPU Info SCLP 
+        commands
+    - DIAGNOSE 0x318 (diag_318) enabling / migration handling
 
-  Attempting to emulate a more feature laden intel CPU results in even
-  more issues.
+The diag 318 feature depends on els and KVM support.
 
-  I would propose that no CPU should be considered supported unless it
-  can be fully handled by TCG on a non-native host. KVM, native-on-
-  native etc. are nice to have, but peripheral to qEMUlation when it
-  boils down to it. At the very least, there should be a CLEAR
-  distinction which CPUs require KVM to be used, and which can be fully
-  emulated. It should not require wasting an afternoon to figure out
-  that an emulation attempt is futile because TCG lacks essential
-  functionality.
+The els feature is handled entirely with QEMU, and does not require 
+KVM support.
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1884095/+subscriptions
+Both features are made available starting with the zEC12-full model.
+
+These patches are introduced together for two main reasons:
+    - els allows diag 318 to exist while retaining the original 248 
+        VCPU max
+    - diag 318 is presented to show how els is useful
+
+Full els support is dependant on the Linux kernel, which must react
+to the SCLP response code and set an appropriate-length SCCB. 
+
+A user should take care when tuning the CPU model for a VM.
+If a user defines a VM with els support and specifies 248 CPUs, but
+the guest Linux kernel cannot react to the SCLP response code, then
+the guest will crash immediately upon kernel startup.
+
+Collin L. Walling (8):
+  s390/sclp: get machine once during read scp/cpu info
+  s390/sclp: check sccb len before filling in data
+  s390/sclp: rework sclp boundary and length checks
+  s390/sclp: read sccb from mem based on sccb length
+  s390/sclp: use cpu offset to locate cpu entries
+  s390/sclp: add extended-length sccb support for kvm guest
+  s390/kvm: header sync for diag318
+  s390: guest support for diagnose 0x318
+
+ hw/s390x/sclp.c                     | 117 ++++++++++++++++++++++------
+ include/hw/s390x/sclp.h             |   4 +
+ linux-headers/asm-s390/kvm.h        |   5 +-
+ linux-headers/linux/kvm.h           |   1 +
+ target/s390x/cpu.h                  |   3 +-
+ target/s390x/cpu_features.h         |   1 +
+ target/s390x/cpu_features_def.inc.h |   4 +
+ target/s390x/cpu_models.c           |   1 +
+ target/s390x/gen-features.c         |   2 +
+ target/s390x/kvm.c                  |  39 ++++++++++
+ target/s390x/machine.c              |  17 ++++
+ 11 files changed, 167 insertions(+), 27 deletions(-)
+
+-- 
+2.21.3
+
 
