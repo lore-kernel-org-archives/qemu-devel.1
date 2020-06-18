@@ -2,88 +2,92 @@ Return-Path: <SRS0=FaGC=77=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A247CC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 05:15:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74A13C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 05:15:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6C52A206D7
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 05:15:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 400EF206D7
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 05:15:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jJsXpdae"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C52A206D7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="B0FXXzwt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 400EF206D7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33170 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34124 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlmtq-0005Hv-L6
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 01:15:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39394)
+	id 1jlmu5-0005ka-HI
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 01:15:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34254)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jlmef-0003xU-5f
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 01:00:01 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:45811
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jlmec-00083A-HZ
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 01:00:00 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592456397;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=S+DyOews2WknL4XyeiMjP1z5pOYyG1OpuEv+DTKCIt0=;
- b=jJsXpdaexkQ6vKph80jxZQDG347bJv4FmyWpH5rddu14OxWYhJtY8ByqRlD33JLshjB1Ns
- ANJZ4lxRGonAw4EgtLoGijPCexQrAzGlxy6QTattVP0H2trKkk2uOX22iA2yugNShGCzO7
- SKFbMyi1kLo2oUBZI6re9MyZKsrMmC4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-413-FnI4KrUxPfen6E3Svtb_fg-1; Thu, 18 Jun 2020 00:59:56 -0400
-X-MC-Unique: FnI4KrUxPfen6E3Svtb_fg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E06018035D7;
- Thu, 18 Jun 2020 04:59:54 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-4.ams2.redhat.com [10.36.112.4])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2EC197CACE;
- Thu, 18 Jun 2020 04:59:49 +0000 (UTC)
-Subject: Re: [PATCH] hw/audio/gus: Fix registers 32-bit access
-To: Allan Peramaki <aperamak@pp1.inet.fi>, qemu-devel@nongnu.org
-References: <20200615201757.16868-1-aperamak@pp1.inet.fi>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <35ef8753-2469-387b-faef-ebf972081a05@redhat.com>
-Date: Thu, 18 Jun 2020 06:59:48 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jlmEx-00075Q-LX
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 00:33:27 -0400
+Received: from mail-pg1-x52b.google.com ([2607:f8b0:4864:20::52b]:32997)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jlmEv-0003f1-Rz
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 00:33:27 -0400
+Received: by mail-pg1-x52b.google.com with SMTP id s10so2359943pgm.0
+ for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 21:33:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=2AEaqRGHie4sLJAa7vfg8ZzQs441Z5qTKGSMgtm3xJ8=;
+ b=B0FXXzwt7Z/UgkgydWQKdyo7NKCXQ9Oj0eKbnvGjQbRIg2WXcZKpXiQXkE+9SLxWRL
+ 5Dl9JxhuJwyQeqOl+gj8tgxH+5fai6F116y3b97RtcctIIhP8q/G9tbyV9A0AZhfz9dh
+ R6snUYqXsa9zUnJ8ORoQn3ZTu2nGXNapxlx/IJ6uoMVocqvChl/9R+PgudDUwxiYjVV0
+ 3MTT4ZpAgn6gOEUXggqWpgv8Ztgt6dQJ/U5UCLydjAq+StrqJKUoIpItM6sBU0fmMWy8
+ ey9Y3TpWeoOf+uw57TISKB3NckIc4Sghfba/2LGTNUNakmDQCDgreD1foJDMdxJ5Kni3
+ 8JYQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=2AEaqRGHie4sLJAa7vfg8ZzQs441Z5qTKGSMgtm3xJ8=;
+ b=Dl/OLuUeagLmEeecepwU6JY7pl4iFhL1TYvSjP7o61Pn6840hUNAKGtK/5+Dk8bGCm
+ T/MlwRsW9xD095OPLf9LovAgKtRkQrk90rliXUcsg9EfrNsp+dNXLjTZkH5Ni9cCehqb
+ 91s1WPoc77zJ+3AmeQDiIdVaumRJNr7XTBZQzJtNGj5tkChccJ9XxO6Aa9Q+kjkp4mcw
+ dVQDBHjo7ZQRNwySgCWUGtC9JyzMf0Z8ZYZqdmD2xl3eVb2U5KlDpKAEcVrZENGRG7ka
+ OFI1nDhRgkdhAM9vP17Nxm2+u2zxaWoSUS1jB/V++ksG2EFoO3ujM0bMLY72Fa77jGR9
+ OHsw==
+X-Gm-Message-State: AOAM530N0cUxP9by+ETjXOi+Iai1arwUzkxgGf8lJejtTejMz9LCF2k9
+ 7f4IJ0jbxfnKiIEG8rnOYkdoVHeDjvs=
+X-Google-Smtp-Source: ABdhPJxJhxsWpJhRG2g9KMpK0M0nxaEM1BSuNaVZn1CDncxMuTM3kebCSl5wbR09NQpFxPZhlKMovA==
+X-Received: by 2002:a63:925a:: with SMTP id s26mr1835530pgn.21.1592454804200; 
+ Wed, 17 Jun 2020 21:33:24 -0700 (PDT)
+Received: from localhost.localdomain (174-21-143-238.tukw.qwest.net.
+ [174.21.143.238])
+ by smtp.gmail.com with ESMTPSA id q22sm1288212pfg.192.2020.06.17.21.33.23
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 17 Jun 2020 21:33:23 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 091/100] target/arm: Implement SVE2 FCVTLT
+Date: Wed, 17 Jun 2020 21:26:35 -0700
+Message-Id: <20200618042644.1685561-92-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200618042644.1685561-1-richard.henderson@linaro.org>
+References: <20200618042644.1685561-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20200615201757.16868-1-aperamak@pp1.inet.fi>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 00:57:40
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::52b;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x52b.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,64 +100,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, kraxel@redhat.com, qemu-stable@nongnu.org
+Cc: qemu-arm@nongnu.org, steplong@quicinc.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 15/06/2020 22.17, Allan Peramaki wrote:
-> Fix audio on software that accesses DRAM above 64k via register peek/poke
-> and some cases when more than 16 voices are used.
-> 
-> Fixes: 135f5ae1974c ("audio: GUSsample is int16_t")
-> Signed-off-by: Allan Peramaki <aperamak@pp1.inet.fi>
-> ---
->  hw/audio/gusemu_hal.c   | 6 +++---
->  hw/audio/gusemu_mixer.c | 8 ++++----
->  2 files changed, 7 insertions(+), 7 deletions(-)
-> 
-> diff --git a/hw/audio/gusemu_hal.c b/hw/audio/gusemu_hal.c
-> index ae40ca341c..e35e941926 100644
-> --- a/hw/audio/gusemu_hal.c
-> +++ b/hw/audio/gusemu_hal.c
-> @@ -30,9 +30,9 @@
->  #include "gustate.h"
->  #include "gusemu.h"
->  
-> -#define GUSregb(position) (*            (gusptr+(position)))
-> -#define GUSregw(position) (*(uint16_t *) (gusptr+(position)))
-> -#define GUSregd(position) (*(uint16_t *)(gusptr+(position)))
-> +#define GUSregb(position) (*(gusptr + (position)))
-> +#define GUSregw(position) (*(uint16_t *)(gusptr + (position)))
-> +#define GUSregd(position) (*(uint32_t *)(gusptr + (position)))
->  
->  /* size given in bytes */
->  unsigned int gus_read(GUSEmuState * state, int port, int size)
-> diff --git a/hw/audio/gusemu_mixer.c b/hw/audio/gusemu_mixer.c
-> index 00b9861b92..3b39254518 100644
-> --- a/hw/audio/gusemu_mixer.c
-> +++ b/hw/audio/gusemu_mixer.c
-> @@ -26,11 +26,11 @@
->  #include "gusemu.h"
->  #include "gustate.h"
->  
-> -#define GUSregb(position)  (*            (gusptr+(position)))
-> -#define GUSregw(position)  (*(uint16_t *) (gusptr+(position)))
-> -#define GUSregd(position)  (*(uint16_t *)(gusptr+(position)))
-> +#define GUSregb(position)  (*(gusptr + (position)))
-> +#define GUSregw(position)  (*(uint16_t *)(gusptr + (position)))
-> +#define GUSregd(position)  (*(uint32_t *)(gusptr + (position)))
->  
-> -#define GUSvoice(position) (*(uint16_t *)(voiceptr+(position)))
-> +#define GUSvoice(position) (*(uint16_t *)(voiceptr + (position)))
->  
->  /* samples are always 16bit stereo (4 bytes each, first right then left interleaved) */
->  void gus_mixvoices(GUSEmuState * state, unsigned int playback_freq, unsigned int numsamples,
-> 
+From: Stephen Long <steplong@quicinc.com>
 
-This might be a good candidate for the stable branches, too (now on the
-CC: list).
+Signed-off-by: Stephen Long <steplong@quicinc.com>
+Message-Id: <20200428174332.17162-3-steplong@quicinc.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/arm/helper-sve.h    |  5 +++++
+ target/arm/sve.decode      |  2 ++
+ target/arm/sve_helper.c    | 23 +++++++++++++++++++++++
+ target/arm/translate-sve.c | 16 ++++++++++++++++
+ 4 files changed, 46 insertions(+)
 
- Thomas
+diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
+index 252344bda6..935655d07a 100644
+--- a/target/arm/helper-sve.h
++++ b/target/arm/helper-sve.h
+@@ -2251,3 +2251,8 @@ DEF_HELPER_FLAGS_5(sve2_fcvtnt_sh, TCG_CALL_NO_RWG,
+                    void, ptr, ptr, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_5(sve2_fcvtnt_ds, TCG_CALL_NO_RWG,
+                    void, ptr, ptr, ptr, ptr, i32)
++
++DEF_HELPER_FLAGS_5(sve2_fcvtlt_hs, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_5(sve2_fcvtlt_sd, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, i32)
+diff --git a/target/arm/sve.decode b/target/arm/sve.decode
+index 9ba4bb476e..abe26f2424 100644
+--- a/target/arm/sve.decode
++++ b/target/arm/sve.decode
+@@ -1576,4 +1576,6 @@ RAX1            01000101 00 1 ..... 11110 1 ..... .....  @rd_rn_rm_e0
+ 
+ ### SVE2 floating-point convert precision odd elements
+ FCVTNT_sh       01100100 10 0010 00 101 ... ..... .....  @rd_pg_rn_e0
++FCVTLT_hs       01100100 10 0010 01 101 ... ..... .....  @rd_pg_rn_e0
+ FCVTNT_ds       01100100 11 0010 10 101 ... ..... .....  @rd_pg_rn_e0
++FCVTLT_sd       01100100 11 0010 11 101 ... ..... .....  @rd_pg_rn_e0
+diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
+index 7a5b0d37c5..8bfc9393a1 100644
+--- a/target/arm/sve_helper.c
++++ b/target/arm/sve_helper.c
+@@ -7194,3 +7194,26 @@ void HELPER(NAME)(void *vd, void *vn, void *vg, void *status, uint32_t desc)  \
+ 
+ DO_FCVTNT(sve2_fcvtnt_sh, uint32_t, uint16_t, H1_4, H1_2, sve_f32_to_f16)
+ DO_FCVTNT(sve2_fcvtnt_ds, uint64_t, uint32_t, H1_4, H1_2, float64_to_float32)
++
++#define DO_FCVTLT(NAME, TYPEW, TYPEN, HW, HN, OP)                             \
++void HELPER(NAME)(void *vd, void *vn, void *vg, void *status, uint32_t desc)  \
++{                                                                             \
++    intptr_t i = simd_oprsz(desc);                                            \
++    uint64_t *g = vg;                                                         \
++    do {                                                                      \
++        uint64_t pg = g[(i - 1) >> 6];                                        \
++        do {                                                                  \
++            i -= sizeof(TYPEW);                                               \
++            if (likely((pg >> (i & 63)) & 1)) {                               \
++                TYPEN nn = *(TYPEN *)(vn + HN(i + sizeof(TYPEN)));            \
++                *(TYPEW *)(vd + HW(i)) = OP(nn, status);                      \
++            }                                                                 \
++        } while (i & 63);                                                     \
++    } while (i != 0);                                                         \
++}
++
++DO_FCVTLT(sve2_fcvtlt_hs, uint32_t, uint16_t, H1_4, H1_2, sve_f16_to_f32)
++DO_FCVTLT(sve2_fcvtlt_sd, uint64_t, uint32_t, H1_4, H1_2, float32_to_float64)
++
++#undef DO_FCVTLT
++#undef DO_FCVTNT
+diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
+index 3c145857db..7b20c65778 100644
+--- a/target/arm/translate-sve.c
++++ b/target/arm/translate-sve.c
+@@ -7796,3 +7796,19 @@ static bool trans_FCVTNT_ds(DisasContext *s, arg_rpr_esz *a)
+     }
+     return do_zpz_ptr(s, a->rd, a->rn, a->pg, false, gen_helper_sve2_fcvtnt_ds);
+ }
++
++static bool trans_FCVTLT_hs(DisasContext *s, arg_rpr_esz *a)
++{
++    if (!dc_isar_feature(aa64_sve2, s)) {
++        return false;
++    }
++    return do_zpz_ptr(s, a->rd, a->rn, a->pg, false, gen_helper_sve2_fcvtlt_hs);
++}
++
++static bool trans_FCVTLT_sd(DisasContext *s, arg_rpr_esz *a)
++{
++    if (!dc_isar_feature(aa64_sve2, s)) {
++        return false;
++    }
++    return do_zpz_ptr(s, a->rd, a->rn, a->pg, false, gen_helper_sve2_fcvtlt_sd);
++}
+-- 
+2.25.1
 
 
