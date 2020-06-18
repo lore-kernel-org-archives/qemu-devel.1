@@ -1,88 +1,87 @@
 Return-Path: <SRS0=FaGC=77=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: **
+X-Spam-Status: No, score=2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50332C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 19:28:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DD04C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 19:29:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 14AB4208C7
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 19:28:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0A53D20890
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 19:29:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OzWNCcGB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 14AB4208C7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RdptTaN/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A53D20890
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45344 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48096 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jm0Cq-0007Ft-BX
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 15:28:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41914)
+	id 1jm0EO-0008Ow-9S
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 15:29:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42096)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vgoyal@redhat.com>) id 1jm0CC-0006ZY-SC
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 15:27:32 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:55340
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <vgoyal@redhat.com>) id 1jm0C9-0002KT-Ul
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 15:27:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592508448;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ZitNEfCO8tRQF/K15DCfx0q0lYVaz7ly6Li2zme+H1g=;
- b=OzWNCcGBwu0J91ztnoaljvzvwW3JoVL3NvdtSCpuwvOF2Q/lY6dgphUTkhyqmci1z2vN7e
- Hf05P0IAGkdm0lxIsWKvfPdVCa/thMYw+0TFxBzLRahp2aj5hSrxONjxpUqjzYzO6wnLgd
- EMLFTmSo6vyY34Qf1SxzfraFzI1bXsA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-141-uu81TS37PIOm45csfNGEQQ-1; Thu, 18 Jun 2020 15:27:25 -0400
-X-MC-Unique: uu81TS37PIOm45csfNGEQQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 31617107ACCA;
- Thu, 18 Jun 2020 19:27:24 +0000 (UTC)
-Received: from horse.redhat.com (ovpn-115-20.rdu2.redhat.com [10.10.115.20])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 18A561001901;
- Thu, 18 Jun 2020 19:27:18 +0000 (UTC)
-Received: by horse.redhat.com (Postfix, from userid 10451)
- id 52882222D7B; Thu, 18 Jun 2020 15:27:17 -0400 (EDT)
-Date: Thu, 18 Jun 2020 15:27:17 -0400
-From: Vivek Goyal <vgoyal@redhat.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Subject: Re: [Virtio-fs] [PATCH 0/2] virtiofsd: drop Linux capabilities(7)
-Message-ID: <20200618192717.GE3814@redhat.com>
-References: <20200416164907.244868-1-stefanha@redhat.com>
- <20200618190816.GD3814@redhat.com> <20200618191655.GI2769@work-vm>
+ (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
+ id 1jm0Ca-00077l-8B
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 15:27:56 -0400
+Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:54242)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
+ id 1jm0CY-0002OM-Le
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 15:27:55 -0400
+Received: by mail-wm1-x331.google.com with SMTP id l26so6286865wme.3
+ for <qemu-devel@nongnu.org>; Thu, 18 Jun 2020 12:27:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:from:date:message-id:subject:to;
+ bh=PeqDZE9gvcPT3T3aACyTek4vT6R2OJoE1sxnqWhxhe4=;
+ b=RdptTaN/g7xvMYwoKl4DTQqmgZOHWU2ohGbrOJsfDwVV7Rj2OPaU+O5BqUqsdgMOtP
+ nRtQIJCoz0e3R27UhrKVvwLLk5UkIUM4Xk9AWJToadJqOMsTRiR/Nk4inuFUpQM6v1EF
+ zhAwosfJH9TpDapB4jotu2wY1r0ay1nak7LqlMFo/l6FVEU5BDg4OsYd1hstfzBhoQxX
+ MSiESJgM7/1Ycan01ucp/lbfNA856ZKJkFhNxGgLv9wYXsV9ZlvIcboMGYp6LfDKHYRt
+ 1OP+JG/c/OgHZBjs0X0pL8v2LM5Kh6PYGq14vejg3bBSKifcRIudFozXmCueDSUJ+oFg
+ N/Nw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+ bh=PeqDZE9gvcPT3T3aACyTek4vT6R2OJoE1sxnqWhxhe4=;
+ b=lg4iFYWM9FcwGgIwfCagC5lK3PPSqFhhakTqiZJPpslgedDR22w4NDnE3Nbf2k/+q7
+ I2FW5HGrj3TkAk+el/kcqzC3W3Y28YNv+AYmiQorXciqD+i08gHyh5e9hY7S0T0F7D+I
+ RySheuLHD4m82yePmchLiECedAhappSreQesnO4w6FW0bxKtZx+FLlCGRuDi1Chl1qzD
+ NYJi2Bg7bVoxUh/9NXdDzdD8kL3D8/JFVT8IgfVLd6I4mlH6tUWn6auEDPQDC+SU9vIb
+ SEFQoChc9TLCJpMOMTTLhOdwJnRM4QFfFihGno7E1MyBx21N2iviVR3MbTiEtScnlVN3
+ AL9A==
+X-Gm-Message-State: AOAM531OwZojoLDwoujMeAoUNZDxotYnbj7DgbmzVnpQ8wszzeqI/3Sa
+ +rcx0kF2xKXoRi6gIzQkQL+9hQldoEmc0YRQXwAo58dR
+X-Google-Smtp-Source: ABdhPJyZOGrVIiLnwjrydFtMUf7++u8tbjWvs1Hg4fLUWn6XsGnG3LzRvjDDd7foA8p4uOJ/QmdpQvFV+X+lZQ7We8M=
+X-Received: by 2002:a1c:cc0d:: with SMTP id h13mr6033742wmb.168.1592508472460; 
+ Thu, 18 Jun 2020 12:27:52 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200618191655.GI2769@work-vm>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=vgoyal@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 01:47:12
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Received: by 2002:a1c:451:0:0:0:0:0 with HTTP;
+ Thu, 18 Jun 2020 12:27:52 -0700 (PDT)
+From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Date: Thu, 18 Jun 2020 21:27:52 +0200
+Message-ID: <CAHiYmc7iD4AoV3Lj5igTQMYESNHU6_-_7cwujhsgJYv5zKraDQ@mail.gmail.com>
+Subject: [DISCUSSION] GCOV support
+To: QEMU Developers <qemu-devel@nongnu.org>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, 
+ Peter Maydell <peter.maydell@linaro.org>
+Content-Type: multipart/alternative; boundary="000000000000cd89ed05a860c5c4"
+Received-SPF: pass client-ip=2a00:1450:4864:20::331;
+ envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wm1-x331.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,67 +94,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-fs@redhat.com, qemu-devel@nongnu.org,
- Stefan Hajnoczi <stefanha@redhat.com>, Miklos Szeredi <miklos@szeredi.hu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jun 18, 2020 at 08:16:55PM +0100, Dr. David Alan Gilbert wrote:
-> * Vivek Goyal (vgoyal@redhat.com) wrote:
-> > On Thu, Apr 16, 2020 at 05:49:05PM +0100, Stefan Hajnoczi wrote:
-> > > virtiofsd doesn't need of all Linux capabilities(7) available to root.  Keep a
-> > > whitelisted set of capabilities that we require.  This improves security in
-> > > case virtiofsd is compromised by making it hard for an attacker to gain further
-> > > access to the system.
-> > 
-> > Hi Stefan,
-> > 
-> > I just noticed that this patch set breaks overlayfs on top of virtiofs.
-> > 
-> > overlayfs sets "trusted.overlay.*" and xattrs in trusted domain
-> > need CAP_SYS_ADMIN.
-> > 
-> > man xattr says.
-> > 
-> >    Trusted extended attributes
-> >        Trusted  extended  attributes  are  visible and accessible only to pro‐
-> >        cesses that have the  CAP_SYS_ADMIN  capability.   Attributes  in  this
-> >        class are used to implement mechanisms in user space (i.e., outside the
-> >        kernel) which keep information in extended attributes to which ordinary
-> >        processes should not have access.
-> > 
-> > There is a chance that overlay moves away from trusted xattr in future.
-> > But for now we need to make it work. This is an important use case for
-> > kata docker in docker build.
-> > 
-> > May be we can add an option to virtiofsd say "--add-cap <capability>" and
-> > ask user to pass in "--add-cap cap_sys_admin" if they need to run daemon
-> > with this capaibility.
-> 
-> I'll admit I don't like the idea of giving it cap_sys_admin.
-> Can you explain:
->   a) What overlayfs uses trusted for?
+--000000000000cd89ed05a860c5c4
+Content-Type: text/plain; charset="UTF-8"
 
-overlayfs stores bunch of metadata and uses "trusted" xattrs for it.
+Hi, Alex, Peter.
 
->   b) If something nasty was to write junk into the trusted attributes,
->     what would happen?
+You may recall that I signalled on couple of occasions that there are some
+problems related to gcov builds in out-of-tree builds.
 
-This directory is owned by guest. So it should be able to write
-anything it wants, as long as process in guest has CAP_SYS_ADMIN, right?
+It turned out that those problems manifest on some opder Linux
+distribution, and are always related to the gcovr being older than 4.1. For
+older gcovr, the tool simply doesn't connect properly executable and its
+source files, and no coverage report is generated (or perhaps only some
+small portions, but, on any case, gcov builds are virtually unusable).
 
->   c) I see overlayfs has a fallback check if xattr isn't supported at
-> all - what is the consequence?
+I propose that we don't bother supporting systems with gcovr older than
+4.1. We could check version of gcovr in confugure, and refuse gcov builds
+if that version is older than 4.1.
 
-It falls back to I think read only mode. 
+This would remove one obstacle towards removing the support of in-tree
+builds. (I am not sure about future Mason-based builds, I hope they will
+support gcov builds, and work in almost identical way.).
 
-For a moment forget about overlayfs. Say a user process in guest with
-CAP_SYS_ADMIN is writing trusted.foo. Should that succeed? Is a
-passthrough filesystem, so it should go through. But currently it
-wont.
+If you agree with proposal on the level of design, Alex, can you perhaps
+write the corresponding patch, I gather you are more familiar with
+modifying configure than me? Or I should do it?
 
-Thanks
-Vivek
+Warmly,
+Aleksandar
 
+--000000000000cd89ed05a860c5c4
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hi, Alex, Peter.<div><br></div><div>You may recall that I signalled on coup=
+le of occasions that there are some problems related to gcov builds in out-=
+of-tree builds.</div><div><br></div><div>It turned out that those problems =
+manifest on some opder Linux distribution, and are always related to the gc=
+ovr being older than 4.1. For older gcovr, the tool simply doesn&#39;t conn=
+ect properly executable and its source files, and no coverage report is gen=
+erated (or perhaps only some small portions, but, on any case, gcov builds =
+are virtually unusable).</div><div><br></div><div>I propose that we don&#39=
+;t bother supporting systems with gcovr older than 4.1. We could check vers=
+ion of gcovr in confugure, and refuse gcov builds if that version is older =
+than 4.1.</div><div><br></div><div>This would remove one obstacle towards r=
+emoving the support of in-tree builds. (I am not sure about future Mason-ba=
+sed builds, I hope they will support gcov builds, and work in almost identi=
+cal way.).</div><div><br></div><div>If you agree with proposal on the level=
+ of design, Alex, can you perhaps write the corresponding patch, I gather y=
+ou are more familiar with modifying configure than me? Or I should do it?</=
+div><div><br></div><div>Warmly,</div><div>Aleksandar</div>
+
+--000000000000cd89ed05a860c5c4--
 
