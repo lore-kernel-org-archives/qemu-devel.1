@@ -7,80 +7,79 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4496DC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 05:00:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B2F1C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 05:01:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0FA312186A
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 05:00:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 22F712186A
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 05:01:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="h+31fxzO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FA312186A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OD8y3tLf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22F712186A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41616 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44496 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlmfT-00055W-AI
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 01:00:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33572)
+	id 1jlmgH-0006Kh-Q7
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 01:01:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33266)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jlmDY-0004xF-Rr
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 00:32:00 -0400
-Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:50190)
+ id 1jlmCs-0003FY-Gz
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 00:31:18 -0400
+Received: from mail-pl1-x62f.google.com ([2607:f8b0:4864:20::62f]:36659)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jlmDX-0003Pq-Cs
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 00:32:00 -0400
-Received: by mail-pj1-x1044.google.com with SMTP id jz3so1973289pjb.0
- for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 21:31:58 -0700 (PDT)
+ id 1jlmCn-0003J6-Om
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 00:31:18 -0400
+Received: by mail-pl1-x62f.google.com with SMTP id j4so1917335plk.3
+ for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 21:31:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=GAkIUDgO8V3oOvXo3LsF2MLgsc+DjBVXnodAscreOV0=;
- b=h+31fxzODWT3ozuK8AeBDCzL72dq4Z/NeHnB1iLzi54oBJGaHNW4RdcdUXc+0RyV2f
- gMvVQyj7RXDpfsbJ1NKuVuoWb/3sBwnTeLmHNPZu5IBcwOXnjYyKFLN+wLGIe7odgpyg
- X9eYaZaza/uuvoTVpj2XYbiv6TagfRNSfbxJ4IYiwCtksHBEFea7mExIh47B3VbJKPX8
- vsJGtQtzrUKY20Yao/qSssyI9egnIFfEaIUzmeN31rxS6zZ3dUCHr2L6cnOL0Zlnzp7V
- wFGDLpBk0BH2/GW3n4NBNQAWnhY9YEVmABuxsxKnbN4AcVZ5kMwIbKe89R3NiC7+mXL2
- BbZg==
+ bh=fB7a+/Rpb0ifGeMz+aFNVR5YF+snSFI42vlkOdTuwbw=;
+ b=OD8y3tLfGun4vR678UzxZaNCkvoRxGlO2gfTOZmf7qwDMztv+Fy2PYIJB9c7jdoOeZ
+ WJpEoGfG5Ix3xNxtAXmXr/j95Cx0KhT/IMMXHoxckES1nmfj6hkzhnn1k28SX+JsXD/S
+ uiI7/us+OwcEfjOUQkUmhkKECiHZyzw+M+YjhxGiF2CSxprBkitvkUOOU6ndPsa0vAUp
+ 1Wf0/VLFEWwAHIJxdwIdlU5bq7luEsP6PSRfp32KMENmYHAGdykYtNO9Jq/NesrcqGBb
+ 3ouRzlibkDvUOPSj39wkYAlPcwEkL6ZMSDFaMK0L8H6zaC4txvwkZrDEDjFf+X5DvHi1
+ HcDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=GAkIUDgO8V3oOvXo3LsF2MLgsc+DjBVXnodAscreOV0=;
- b=pT+iZ2GwtLyV1kZKoVefA4WGEL5fL4E8WB7yj2lkxShy766w5nlQRuX2JTLVKnceYq
- sYac1PFONpXqJY11zvGvAhr7sTM0rhe7RCsaPAP81YbPhTsypFd3lH7rrYc5JMTHevMD
- oJqPFPRMCOOfVrL+qqpAx1M16hQ1ofjq+tvfFn0SmeaTqZwzCEnHCA1WaEGmP9XY2tTa
- IomvRHIxwPmLHslXIHAKUvfwBM0gFdGQixlVH8bh4V5hB6SGjgZ1gAp6jUw2rUvLBn7W
- hsg4yVO5g+3vUa81pk6Fts1ZjhRBQYQ3a5aMYERA1iCuZUAK+NNWv0xJbxPfrdrmcDuH
- CzJg==
-X-Gm-Message-State: AOAM531gB+o2ThspGjZ5CQsa8cqkikUgrIv6dmurmiB0d1Qdci1J6KbM
- 4WK/U2Eqp2Mok4di5h/RyPBs3mmFh68=
-X-Google-Smtp-Source: ABdhPJwcxqpeF44rVx+JZQ/V9mCD8+6FU+cS1g3uF6g80lxT8EAvabY52bdYejl0ilP+okYu+pT+5g==
-X-Received: by 2002:a17:902:9f8d:: with SMTP id
- g13mr2138887plq.292.1592454717796; 
- Wed, 17 Jun 2020 21:31:57 -0700 (PDT)
+ bh=fB7a+/Rpb0ifGeMz+aFNVR5YF+snSFI42vlkOdTuwbw=;
+ b=fIcbwJxdNedgixYr/PfjwO8uxCWI7Dvjm292/Gob/MPMQkQynriH7i0KtUTczXJO55
+ lKHPDu6Uly3H+ES4iRIh5ii6TdCHdyLfk9r2rBbNPp4VGWG3mvh6i/H60ElU3g76M4dk
+ 1dFPGFekVxonv1RzjUezKjiyBtd8R1l0rnVygyBSUONmMnlPQhWkLeJ1fJyqapQLUFK/
+ n18YeETSpD3CFPOOacLOQNN92yss/9Vgh0Czz4BtpvW1LFZV7trgwanaW8wyyzpcRE2J
+ 3rR74IXAZxHt1AJcdv4aPmz57XQ1zRQqqeTbnfUoRU7cqQ4Zto2DFtvsTC458/4vu9cY
+ NCTQ==
+X-Gm-Message-State: AOAM533Peagq6M2D2R3k2w8MMAitfr2PW3D7/iP3/W4jzvOv0ARVjXjt
+ XRpDIhm+CDw6jsAogT2Q+4TXJMCVfcU=
+X-Google-Smtp-Source: ABdhPJzqDZao9vuiV3LIbzxGzMypuYd73HWN7LKGVXYCnhIS+8+zefxAM/uddvJY1Xaeog9DebgD+A==
+X-Received: by 2002:a17:902:8d87:: with SMTP id
+ v7mr2097827plo.73.1592454671918; 
+ Wed, 17 Jun 2020 21:31:11 -0700 (PDT)
 Received: from localhost.localdomain (174-21-143-238.tukw.qwest.net.
  [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id s15sm1162840pgv.5.2020.06.17.21.31.56
+ by smtp.gmail.com with ESMTPSA id o1sm974337pjf.17.2020.06.17.21.31.10
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 17 Jun 2020 21:31:57 -0700 (PDT)
+ Wed, 17 Jun 2020 21:31:11 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 072/100] target/arm: Use helper_gvec_mul_idx_* for aa64
- advsimd
-Date: Wed, 17 Jun 2020 21:26:16 -0700
-Message-Id: <20200618042644.1685561-73-richard.henderson@linaro.org>
+Subject: [PATCH v2 060/100] target/arm: Implement SVE2 scatter store insns
+Date: Wed, 17 Jun 2020 21:26:04 -0700
+Message-Id: <20200618042644.1685561-61-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200618042644.1685561-1-richard.henderson@linaro.org>
 References: <20200618042644.1685561-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1044;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1044.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::62f;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x62f.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -107,38 +106,67 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+From: Stephen Long <steplong@quicinc.com>
+
+Add decoding logic for SVE2 64-bit/32-bit scatter non-temporal
+store insns.
+
+64-bit
+* STNT1B (vector plus scalar)
+* STNT1H (vector plus scalar)
+* STNT1W (vector plus scalar)
+* STNT1D (vector plus scalar)
+
+32-bit
+* STNT1B (vector plus scalar)
+* STNT1H (vector plus scalar)
+* STNT1W (vector plus scalar)
+
+Signed-off-by: Stephen Long <steplong@quicinc.com>
+Message-Id: <20200422141553.8037-1-steplong@quicinc.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/translate-a64.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ target/arm/sve.decode      | 10 ++++++++++
+ target/arm/translate-sve.c |  8 ++++++++
+ 2 files changed, 18 insertions(+)
 
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 341b11f98d..a3135754ce 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -13037,6 +13037,22 @@ static void disas_simd_indexed(DisasContext *s, uint32_t insn)
-                                data, gen_helper_gvec_fmlal_idx_a64);
-         }
-         return;
-+
-+    case 0x08: /* MUL */
-+        if (!is_long && !is_scalar) {
-+            static gen_helper_gvec_3 * const fns[3] = {
-+                gen_helper_gvec_mul_idx_h,
-+                gen_helper_gvec_mul_idx_s,
-+                gen_helper_gvec_mul_idx_d,
-+            };
-+            tcg_gen_gvec_3_ool(vec_full_reg_offset(s, rd),
-+                               vec_full_reg_offset(s, rn),
-+                               vec_full_reg_offset(s, rm),
-+                               is_q ? 16 : 8, vec_full_reg_size(s),
-+                               index, fns[size - 1]);
-+            return;
-+        }
-+        break;
-     }
+diff --git a/target/arm/sve.decode b/target/arm/sve.decode
+index a375ce31f1..dc784dcabe 100644
+--- a/target/arm/sve.decode
++++ b/target/arm/sve.decode
+@@ -1388,3 +1388,13 @@ UMLSLT_zzzw     01000100 .. 0 ..... 010 111 ..... .....  @rda_rn_rm
  
-     if (size == 3) {
+ CMLA_zzzz       01000100 esz:2 0 rm:5 0010 rot:2 rn:5 rd:5  ra=%reg_movprfx
+ SQRDCMLAH_zzzz  01000100 esz:2 0 rm:5 0011 rot:2 rn:5 rd:5  ra=%reg_movprfx
++
++### SVE2 Memory Store Group
++
++# SVE2 64-bit scatter non-temporal store (vector plus scalar)
++STNT1_zprz      1110010 .. 00 ..... 001 ... ..... ..... \
++                @rprr_scatter_store xs=2 esz=3 scale=0
++
++# SVE2 32-bit scatter non-temporal store (vector plus scalar)
++STNT1_zprz      1110010 .. 10 ..... 001 ... ..... ..... \
++                @rprr_scatter_store xs=0 esz=2 scale=0
+diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
+index 640b109166..7fa1e0d354 100644
+--- a/target/arm/translate-sve.c
++++ b/target/arm/translate-sve.c
+@@ -5728,6 +5728,14 @@ static bool trans_ST1_zpiz(DisasContext *s, arg_ST1_zpiz *a)
+     return true;
+ }
+ 
++static bool trans_STNT1_zprz(DisasContext *s, arg_ST1_zprz *a)
++{
++    if (!dc_isar_feature(aa64_sve2, s)) {
++        return false;
++    }
++    return trans_ST1_zprz(s, a);
++}
++
+ /*
+  * Prefetches
+  */
 -- 
 2.25.1
 
