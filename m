@@ -2,116 +2,117 @@ Return-Path: <SRS0=FaGC=77=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B18AC433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 10:03:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D79CC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 10:04:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 16F10217A0
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 10:03:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C917F21548
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 10:04:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="OzfhUaNI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16F10217A0
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="KHzDq2Sq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C917F21548
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48538 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50954 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlrOS-0001S8-5w
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 06:03:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59658)
+	id 1jlrPj-0002Wu-4R
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 06:04:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59854)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jlrNn-0000wx-Bm; Thu, 18 Jun 2020 06:02:55 -0400
-Received: from mail-vi1eur05on2138.outbound.protection.outlook.com
- ([40.107.21.138]:61408 helo=EUR05-VI1-obe.outbound.protection.outlook.com)
+ id 1jlrON-0001XL-3S; Thu, 18 Jun 2020 06:03:31 -0400
+Received: from mail-eopbgr60102.outbound.protection.outlook.com
+ ([40.107.6.102]:43262 helo=EUR04-DB3-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jlrNj-0000zB-QF; Thu, 18 Jun 2020 06:02:54 -0400
+ id 1jlrOK-00014D-Us; Thu, 18 Jun 2020 06:03:30 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=K1Y9dFjJfxOpUXxzAvZI5T8Sjb3EtrHbW+vFmKiJC4zj5mtltAU3a7FBLXIFj9EKj8DQoDOzSF9lS7f0YAcC1Kfg32fWYeouZ/fnG0VJ2NC763iqrcKTB3ysMu8FDugMAC5L3DZexU3wY8T76nqe+E3nw7zRXFidCP9AZbyk9/wA8aiQ3DXuAlldAjsdJ19mIwyd7o2qsvpAzmDVmwHi9yd/GKJp6dGz3QA65es+z0TPvAgQOj4Pkw2ebqr9n2R+L1z1xmebTONJI/ndqAvRgTv9ZShhlqmPODwSUaCrNN2aQgt+wfT+OwQqvI030FofzeNcJX3/OBB2t6yBI+0/sA==
+ b=oWduh5Ggg6z0/w8nJDcOO+DQ4NmBGlQyV6pnd4pD75X0D9j1R1rRJ80+SR65Bm9exJZle0LmyxHp7v0cobqvbFKQBDEN+haP4DQoVPSHYSWOzCo1hujMV9rZodzzlUEq1GHei4agYh/iuMxh5DV9tsVLygCGzBVVoB/CsLt9kN+xFuzXh0WCBUDKMb3PQ3wJZUOoirQu3yRby9htfZliacsGm/m2SEicbt+0CWUhXRltPbfcdLxNO2vROmRKtn1yoMfU+6GCw1gmapzID/X5aenZT4CKKfSZK61bY4/yhmEWGAuV2EVHA4y5FRABXwTSKldxpptjTdmt/AIqaBCgUA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XvBn3ILcPygg2/paJjEmZPZKkd61njONiTIahwrlsvg=;
- b=ktKNzJkgsy7Yg+dyAj1hm2ZYonygD1lPmfb6SQlSAfAOHqb1CCCNCVd3ghZfPzEKW7H6dCDgq026C1AmfNSSia55wxuxBzmW+3Cy1/8/sIELP7/NK/P+iwcCzbobOIsaJmSY8oDXL5r7TY6+uH3Xs5zAz0uYV5j8g736ZMDHWmsCAAvkDmkSnaQRT3YljF6vSS61PrkQ3WG27cYZDMC10FCyel7gM2fiFVk6RntsRTJwsuS1UfnaPwnEAeMk+39ps9IxTqtNgFkGAbaCOhvfigHiIqy0OIewtR3CgRJCguWkEt9SUJJlbK3av8tonkdPrngPw3iX+4Y5wiMo9d4i+g==
+ bh=jv3PKPtGKnceEQB4xJSeBmF/5Vpj+ZRcf0lHYYYcYGY=;
+ b=MwBKEDsEfPcANy4NnYRY0fBLSDYbjW3ZLkJvbS7CDfmfgZnJJ14LcEkcIvagw/CVRiBPmH8+yRM1YnjxfYZLARrK+5/UjQswhXUfjLrW4Fgn6sHHu77uPdPf7R+qWUS6mIYsfhiqiWdHLddpA1OS68JNJ3DIWENKy4NmRAl3tyUSDukjgx+pPufQ8Zvi5cbIy1ve69co/ak0IWZ/5Jq86NJ5o4JKg3TjSUKkSIW7FpPcnqks58aVONhKmjL4gxIE2aCPzBzCVQO4owUIPs249QQa59cf98y6R1BJkOzKa/hFg8KiirFaK+sl1feVZCBkTbtODQDo2Q/5YBZuRsN0yg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
  header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XvBn3ILcPygg2/paJjEmZPZKkd61njONiTIahwrlsvg=;
- b=OzfhUaNISk/EWU1/IljOFQ0Thnoj/U1+gN0PKCJM+EnqsVluB5oE67CZON6W/nP77L/7o+k1AbCoqIbEtkU0xIBA5Ekjn+hnY+ATF2KbSpN5jz9lV8zRMkZHr6r2xPAO2NZI9X3DlV/66EDNX2UO9LUzs+5Yxims9S0sNldOjaM=
-Authentication-Results: virtuozzo.com; dkim=none (message not signed)
- header.d=none;virtuozzo.com; dmarc=none action=none
- header.from=virtuozzo.com;
+ bh=jv3PKPtGKnceEQB4xJSeBmF/5Vpj+ZRcf0lHYYYcYGY=;
+ b=KHzDq2SqR188piF8eZmc+5st5y/mA4VwdQJCL1PWeoJxqKXz2jcf/IRM70iD/H8MavmWOrg5N1WOELoUpuYDF1B8IzXxonVtFlts6oJTPxapj15GnIjimqUZ7r5Li1JFnMMjK6uDyVHiwQYEgicSjW3vo5AnHPzymK3t1YSsH8k=
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=virtuozzo.com;
 Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
  by AM7PR08MB5366.eurprd08.prod.outlook.com (2603:10a6:20b:10b::11)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3109.22; Thu, 18 Jun
- 2020 10:02:47 +0000
+ 2020 10:03:26 +0000
 Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
  ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
  ([fe80::a408:2f0f:bc6c:d312%3]) with mapi id 15.20.3109.021; Thu, 18 Jun 2020
- 10:02:47 +0000
+ 10:03:26 +0000
 Subject: Re: [PATCH 4/5] block, migration: add bdrv_flush_vmstate helper
-To: "Denis V. Lunev" <den@openvz.org>, qemu-block@nongnu.org,
- qemu-devel@nongnu.org
+To: "Denis V. Lunev" <den@openvz.org>, Eric Blake <eblake@redhat.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
 References: <20200616162035.29857-1-den@openvz.org>
  <20200616162035.29857-5-den@openvz.org>
+ <091af0f5-c8e9-8749-c329-287fb100f2b6@redhat.com>
+ <fc13f3c5-3f6b-047a-60a1-1d3a445f7db7@openvz.org>
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <daff71fb-2bb4-5682-ac5e-2efdb7b95609@virtuozzo.com>
-Date: Thu, 18 Jun 2020 13:02:46 +0300
+Message-ID: <bac0399e-12c0-ba42-3a50-9112f8b70c57@virtuozzo.com>
+Date: Thu, 18 Jun 2020 13:03:24 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.9.0
-In-Reply-To: <20200616162035.29857-5-den@openvz.org>
+In-Reply-To: <fc13f3c5-3f6b-047a-60a1-1d3a445f7db7@openvz.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AM0PR03CA0007.eurprd03.prod.outlook.com
- (2603:10a6:208:14::20) To AM7PR08MB5494.eurprd08.prod.outlook.com
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: AM0PR03CA0023.eurprd03.prod.outlook.com
+ (2603:10a6:208:14::36) To AM7PR08MB5494.eurprd08.prod.outlook.com
  (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
 Received: from [192.168.100.2] (185.215.60.145) by
- AM0PR03CA0007.eurprd03.prod.outlook.com (2603:10a6:208:14::20) with Microsoft
+ AM0PR03CA0023.eurprd03.prod.outlook.com (2603:10a6:208:14::36) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3109.22 via Frontend Transport; Thu, 18 Jun 2020 10:02:47 +0000
+ 15.20.3109.22 via Frontend Transport; Thu, 18 Jun 2020 10:03:25 +0000
 X-Originating-IP: [185.215.60.145]
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: a3c657b4-d503-4c83-c644-08d8136ec0ea
+X-MS-Office365-Filtering-Correlation-Id: 0fec67a6-9ab3-4799-aa6b-08d8136ed7fe
 X-MS-TrafficTypeDiagnostic: AM7PR08MB5366:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM7PR08MB53663E4290CD8D38A8FFC3E7C19B0@AM7PR08MB5366.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-Microsoft-Antispam-PRVS: <AM7PR08MB5366864EC21C3CD2B898DFD8C19B0@AM7PR08MB5366.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
 X-Forefront-PRVS: 0438F90F17
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 8sjqXDEGfpk6ILmQdy8Tt+CSfjaJzYWiJ1UCFqSr7pbKQFdAxK+MyZCIXciW2afGOfxPIjAKwbaOhqe7I8a1kHmhZIdpFZdXjbJVPXdLiVriQzal9suWkrQI5T/4MxNcSHvhIfr3GB7vk/ogdovpX7lULQ857J/WMZpBpHuPZJp2Y1Ylw2lfzwfiPBvYHW4X7SWT5cArPNADY8HsOPSM8WNERAMwXIas/flAMlGUkkSkfyA7nPYzdHBEZLwi+m5q1qZg102EqwYmBFHuDGqcrSUwSWbF4pd7k8XCZWnZVViiUT6IGT9fz0eAnjHgbsslzMhNKZXnbyrUDS9L2XCgLiYDgF7mijJ/k/AmXLoqxhA/913Jb6l1SpssXwKD5TIl
+X-Microsoft-Antispam-Message-Info: GhFN7iG65gNcepQhVhgrR/4n0j71+cieHU5+1Jsh4s6VbH/C0bfz7Ny2Sveo8DN6Q7s9uE8hbSrsTVkbf08yLFQUjSurBKT8uURlOJ7Qg2J+IT1EQj9inY5aA8T6yo3lwCt+B4rtcPDMJ6muMLr79BrlCJ3SUFLXQI92tWSFheQGXIQ1UKRYeZv/zZbQN5SukkyhZu6ub8Puna9veM/u2dW1Ebi3cug4oGkgm236tMfcknXO1z3z36q/TvryCegsGeMpS51HydWpgGcbT9ebyuX8QJPwIWTKcLdZoNDa457PbHK+fgqhqP1XMbfitV6irT0QYigx9Zg3Yv4lVZstJRATXU0jZvEu6UUt/Ek5vyMpjiXBxobZXrwYYErNJ5kg
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
  SFTY:;
- SFS:(4636009)(39840400004)(346002)(136003)(396003)(376002)(366004)(6486002)(956004)(2616005)(36756003)(478600001)(86362001)(31696002)(83380400001)(8676002)(8936002)(31686004)(186003)(2906002)(26005)(316002)(66556008)(107886003)(66476007)(4326008)(52116002)(16526019)(54906003)(5660300002)(16576012)(66946007)(43740500002);
+ SFS:(4636009)(346002)(136003)(396003)(39850400004)(376002)(366004)(6486002)(956004)(2616005)(36756003)(478600001)(86362001)(31696002)(83380400001)(8676002)(8936002)(31686004)(186003)(2906002)(26005)(316002)(66556008)(4744005)(66476007)(4326008)(110136005)(52116002)(16526019)(54906003)(5660300002)(16576012)(66946007)(43740500002);
  DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: 621bLEstNZ+41FQ1+QaZ6eo5yKYT6xYuODx1L9bD5RZlNJQHBYp8ohcVwtnovyOyMMNamRvcuINZy+cGJ6+CbI2OBu4S4F+fIveez/oiZJ+NQJ0NlN5f0vupg14DdVwRhUcJ18zNtRIu70IA8oP35Rr4j34Z7ZFDStH4vjOp5kDrXizwXKahm1DdQN9D/HKkLTN9xVgg5AqVHvEVRzYvUQ20dNz6DC9piY+vfM5pCr2fBRTQbMAmF+UCQkqIyLDYJsXN9u7AreH/cef8aCuiK2mdm5IxLOg6qAXRwkwWQKGwpKiucJnlqqVQ9Wgx8ZBy/kmWib71h43CQv0yVq0Yzh9J86QqS046A9cSJYFrFRvENQTwbbKVEwyfBJn6tm6d43QXsMzdLaMb+jON7VTzXYv0gnhcwNxk3JzXTTWXWoqu63YZ/laRDrnFkRva/Z5JqS5VkD9UH3it5bXDOD0ZRBbi/0AkzI7NS2d00lHXKMAqicCnVYJuXkWkXgfiSDfm
+X-MS-Exchange-AntiSpam-MessageData: QuFSUOIeO8kzOOReO+w2GHjS0ml0wuZVqBLM2YrVgTO9L8WnXWB1dbCUfpJqCcSxYPJeG5P6fAPsAe79pZHcGfYywHb5sTqmRtAUwusMbWcIM9HUOCL+DeNFEzMBMXhCTM8ltkWEM1cEpT84QjcDo7LMwQAeMxyvKg+eTYtttih56eR+4LtP5HVsuZ3gxL1v7omz+/2OCCOM6PB7QGkfI+2RZpXjSS4Yqf+X+10VRaw+9JNGomxkZUZYm+ph0x8s3wYlxyvgSaSR/TJ7njSvHMBDSJ3+5rL4w+APeZnbZ3uvQUYuklAxr3Rvooo3S/oJRdC0IJpDUNnO387/dgYEQ4AngChQ1+CNnYG/vWv3ucA5z0zOCCRzCxLD1IdKBHPvd1bi44HjtF+Dg38lef/51JezyFnsRxtFVg6BD9OrVd1+PqCwqxcjTXeEwqMo7A6hTQF8tWqMHGRHuAdlzJG6JB8r0VjP8CKsy7LgfzZcSrk=
 X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a3c657b4-d503-4c83-c644-08d8136ec0ea
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jun 2020 10:02:47.7723 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0fec67a6-9ab3-4799-aa6b-08d8136ed7fe
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jun 2020 10:03:26.5032 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: LAUH3YXm5pYMDNVyveBhGgpXtccGUigiE5394rXLYOE6f3jsYvTEJUjhlBHV7hII+egCC2h0WBS11FwQaUaY2WL8VEn61RA3WEdngJDQbWE=
+X-MS-Exchange-CrossTenant-UserPrincipalName: jaMyQZndq2ITilCvEjl+GgdIS6mBOiLqqEe3TcJMM2m8RLVqk9KODAGaTEmh9HjcSi8FMA8Hir61o0M+jIukKk78qGa0ppMyc2lVdpAXWKg=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5366
-Received-SPF: pass client-ip=40.107.21.138;
+Received-SPF: pass client-ip=40.107.6.102;
  envelope-from=vsementsov@virtuozzo.com;
- helo=EUR05-VI1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 06:02:48
+ helo=EUR04-DB3-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 06:03:27
 X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
 X-Spam_score_int: -37
 X-Spam_score: -3.8
@@ -142,125 +143,21 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-16.06.2020 19:20, Denis V. Lunev wrote:
-> Right now bdrv_fclose() is just calling bdrv_flush().
+17.06.2020 00:29, Denis V. Lunev wrote:
+>>>        if (ret < 0) {
+>>>            return ret;
+>>>        }
+>> ...attempting it here, at which point it looks like the only reason
+>> you need ret2 is to preserve ret long enough...
+> no, I would like to be sure that intermediate state is always cleared at
+> the end.
+> In the next patch I am going to put intermediate buffer to
+> BlockDriverState and thus it has to be removed in any case.
 > 
-> The problem is that migration code is working inefficently from black
-> layer terms and are frequently called for very small pieces of not
-> properly aligned data. Block layer is capable to work this way, but
-> this is very slow.
+> May be flush would be a bad name... clean or finalize?
 > 
-> This patch is a preparation for the introduction of the intermediate
-> buffer at block driver state. It would be beneficial to separate
-> conventional bdrv_flush() from closing QEMU file from migration code.
-> 
-> The patch also forces bdrv_flush_vmstate() operation inside
-> synchronous blk_save_vmstate() operation. This helper is used from
-> qemu-io only.
-> 
-> Signed-off-by: Denis V. Lunev <den@openvz.org>
-> CC: Kevin Wolf <kwolf@redhat.com>
-> CC: Max Reitz <mreitz@redhat.com>
-> CC: Stefan Hajnoczi <stefanha@redhat.com>
-> CC: Fam Zheng <fam@euphon.net>
-> CC: Juan Quintela <quintela@redhat.com>
-> CC: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> CC: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> CC: Denis Plotnikov <dplotnikov@virtuozzo.com>
-> ---
->   block/block-backend.c |  6 +++++-
->   block/io.c            | 15 +++++++++++++++
->   include/block/block.h |  3 +++
->   migration/savevm.c    |  3 +++
->   4 files changed, 26 insertions(+), 1 deletion(-)
-> 
-> diff --git a/block/block-backend.c b/block/block-backend.c
-> index 6936b25c83..3afa0ff7d5 100644
-> --- a/block/block-backend.c
-> +++ b/block/block-backend.c
-> @@ -2177,16 +2177,20 @@ int blk_truncate(BlockBackend *blk, int64_t offset, bool exact,
->   int blk_save_vmstate(BlockBackend *blk, const uint8_t *buf,
->                        int64_t pos, int size)
->   {
-> -    int ret;
-> +    int ret, ret2;
->   
->       if (!blk_is_available(blk)) {
->           return -ENOMEDIUM;
->       }
->   
->       ret = bdrv_save_vmstate(blk_bs(blk), buf, pos, size);
-> +    ret2 = bdrv_flush_vmstate(blk_bs(blk));
->       if (ret < 0) {
->           return ret;
->       }
-> +    if (ret2 < 0) {
-> +        return ret2;
-> +    }
->   
->       if (ret == size && !blk->enable_write_cache) {
->           ret = bdrv_flush(blk_bs(blk));
-> diff --git a/block/io.c b/block/io.c
-> index df8f2a98d4..8718df4ea8 100644
-> --- a/block/io.c
-> +++ b/block/io.c
-> @@ -2724,6 +2724,21 @@ int bdrv_readv_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos)
->       return bdrv_rw_vmstate(bs, qiov, pos, true);
->   }
->   
-> +static int coroutine_fn bdrv_co_flush_vmstate(BlockDriverState *bs)
-> +{
-> +    return 0;
-> +}
-> +
-> +static int coroutine_fn bdrv_flush_vmstate_co_entry(void *opaque)
-> +{
-> +    return bdrv_co_flush_vmstate(opaque);
-> +}
-> +
-> +int bdrv_flush_vmstate(BlockDriverState *bs)
-> +{
-> +    return bdrv_run_co(bs, bdrv_flush_vmstate_co_entry, bs);
-> +}
-> +
->   /**************************************************************/
->   /* async I/Os */
->   
-> diff --git a/include/block/block.h b/include/block/block.h
-> index 25e299605e..e532bcffc8 100644
-> --- a/include/block/block.h
-> +++ b/include/block/block.h
-> @@ -572,6 +572,9 @@ int bdrv_save_vmstate(BlockDriverState *bs, const uint8_t *buf,
->   
->   int bdrv_load_vmstate(BlockDriverState *bs, uint8_t *buf,
->                         int64_t pos, int size);
-> +/* bdrv_flush_vmstate() is mandatory to commit vmstate changes if
-> +   bdrv_save_vmstate() was ever called */
-> +int bdrv_flush_vmstate(BlockDriverState *bs);
->   
->   void bdrv_img_create(const char *filename, const char *fmt,
->                        const char *base_filename, const char *base_fmt,
-> diff --git a/migration/savevm.c b/migration/savevm.c
-> index da3dead4e9..d984ce7aa1 100644
-> --- a/migration/savevm.c
-> +++ b/migration/savevm.c
-> @@ -150,6 +150,9 @@ static ssize_t block_get_buffer(void *opaque, uint8_t *buf, int64_t pos,
->   
->   static int bdrv_fclose(void *opaque, Error **errp)
->   {
-> +    int err = bdrv_flush_vmstate(opaque);
-> +    if (err < 0)
-> +        return err;
 
-Qemu style wants braces anyway..
-
->       return bdrv_flush(opaque);
->   }
-
-I'm not sure, that we want this on read path, neither, why we already do normal flush on read path. Anyway, it should be no-op on read path and won't hurt.
-
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-
+finalize sounds good for me
 
 -- 
 Best regards,
