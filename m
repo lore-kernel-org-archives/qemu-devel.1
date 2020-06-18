@@ -2,88 +2,83 @@ Return-Path: <SRS0=FaGC=77=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4BA6C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 08:42:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB564C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 08:57:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 807432089D
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 08:42:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 768D520B1F
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 08:57:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IdSLS1Gx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 807432089D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tDX+f7EZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 768D520B1F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44322 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48144 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlq7u-0004Lm-Rg
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 04:42:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34636)
+	id 1jlqM6-0000e0-Pp
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 04:57:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38394)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1jlq7I-0003ot-9O
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 04:41:48 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40280
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1jlq7G-0003B3-AQ
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 04:41:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592469705;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=mqkhf2yZSExyx18ujO6HR+wAluJKSzmfs4pE98CFILA=;
- b=IdSLS1Gx9tC3GAd2FWwj6EvrBXk72U9Q8awBIv/DGkv8dPXzPAeOIC7qzL6a9Ifn9ZfuYU
- ugi0MXhqB7U6kGFG6+MNoELYQzk0lcP+OBXzAx5nh4woM3RbUCScz6VEgHZJ2Qz3Fs382b
- m/5hwC9w24Rv4uLknYEoPLMdHdw59MI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-257-fpKOShuIMBS4_6OPEO0pbA-1; Thu, 18 Jun 2020 04:41:43 -0400
-X-MC-Unique: fpKOShuIMBS4_6OPEO0pbA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B49791005513;
- Thu, 18 Jun 2020 08:41:42 +0000 (UTC)
-Received: from starship (unknown [10.35.206.205])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 602045D9D3;
- Thu, 18 Jun 2020 08:41:41 +0000 (UTC)
-Message-ID: <da1c8021441f896c2d6ec2047252f8b6f1a6b7b6.camel@redhat.com>
-Subject: Re: [PATCH v2 1/2] iotests: Make _filter_img_create more active
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Date: Thu, 18 Jun 2020 11:41:40 +0300
-In-Reply-To: <20200618083747.8474-2-mreitz@redhat.com>
-References: <20200618083747.8474-1-mreitz@redhat.com>
- <20200618083747.8474-2-mreitz@redhat.com>
-User-Agent: Evolution 3.34.4 (3.34.4-1.fc31)
+ (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
+ id 1jlqLU-00008X-RE; Thu, 18 Jun 2020 04:56:29 -0400
+Received: from mail-yb1-xb42.google.com ([2607:f8b0:4864:20::b42]:33969)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
+ id 1jlqLT-0005IL-Ax; Thu, 18 Jun 2020 04:56:28 -0400
+Received: by mail-yb1-xb42.google.com with SMTP id a80so2752077ybg.1;
+ Thu, 18 Jun 2020 01:56:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=GaaKiFRWVgX3m5d9C4sK5TZmSi+TDccHMDDNXZY9sZ8=;
+ b=tDX+f7EZvLXoVd67ZNT9A10Rb9u5Fa9VpTvqdZmkBn37baqmsjl9Z/tU0Iht+G/PX0
+ 8AIRoGrihWJt/dDYlDgCjVXfX2uNpX2CPyuLGzATKEF2t98XLba06X+9QY0KiHBC6T3s
+ NhunrFnmXqvepcdq2XCFX2IMtXLg4koDvuwO0bRQ9lQ+X3lcbryr0hVuuKmj5ujBSJkY
+ eIkzHh4cP14+5+YysdrUEIJ9z4oWFCCAmccpt92gYymtAx4vb0LB4Ne2klHGut5HRCnB
+ r0LtLUXdN87PwKtHkpSKJXudEmJMSkkzhFnMNo7Y5X77q3K3qeqEbDM2p0OZSRckXqAQ
+ aByg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=GaaKiFRWVgX3m5d9C4sK5TZmSi+TDccHMDDNXZY9sZ8=;
+ b=gUxeu3R79/bm2bpwaqJcD8e1xy8TlYgHLf+ypbxuTb/BLugB0N6kSyX3b97003tZqc
+ 1pm8c7WF000D4dNffW41qz09PkOFmR8gUMhGHh2z37N1guzJexkDX7pirPDL6iFuV77t
+ VbbfjVFPp8QmMmaUP9BDpHatT2jq8rM/vI0w3YpfNv6nX1Dsmdg9z+qCoqd1kJIdZ1fO
+ gKpZRGzKzdnDOaFpbQF7qdYIxyz6d66hl9Qjfz4YVxiqqmi6pqOjvblyL27SMBgx/Cw8
+ zKuwEaY/EZYvpdJ6SgoYmRWQjDdcUnGg4uV8TF7O+xUVqsWQsDiOfKxSlLnkSnwGNc5x
+ CBGw==
+X-Gm-Message-State: AOAM5338TLx0uMrnT6sUQ5yCeZUXD8VZsTVzNZDkL+da5t3de1ak28vL
+ evNkL2SVXVGOvKvMPNlzkvjxMTHpB3CXUdQ7c1o=
+X-Google-Smtp-Source: ABdhPJzO73BncriSdDqmCUiIpVzAKrTKGGuGhlSWy8UmeGP5Xchi9AOlHaINfMZgnAiRjXPfXY9pXtQWgVB5MI2rFYQ=
+X-Received: by 2002:a25:7a06:: with SMTP id v6mr5023524ybc.152.1592470585931; 
+ Thu, 18 Jun 2020 01:56:25 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+References: <20200616192700.1900260-1-atish.patra@wdc.com>
+In-Reply-To: <20200616192700.1900260-1-atish.patra@wdc.com>
+From: Bin Meng <bmeng.cn@gmail.com>
+Date: Thu, 18 Jun 2020 16:56:14 +0800
+Message-ID: <CAEUhbmVRN2Ze=jNqFSJbZgO0_ggyX6B-1UydPJB1sZVdAokrxQ@mail.gmail.com>
+Subject: Re: [PATCH 0/3] Add OpenSBI dynamic firmware support
+To: Atish Patra <atish.patra@wdc.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=mlevitsk@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 01:47:12
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=2607:f8b0:4864:20::b42;
+ envelope-from=bmeng.cn@gmail.com; helo=mail-yb1-xb42.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,218 +91,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 2020-06-18 at 10:37 +0200, Max Reitz wrote:
-> Right now, _filter_img_create just filters out everything that looks
-> format-dependent, and applies some filename filters.  That means that we
-> have to add another filter line every time some format gets a new
-> creation option.  This can be avoided by instead discarding everything
-> and just keeping what we know is format-independent (format, size,
-> backing file, encryption information[1], preallocation) or just
-> interesting to have in the reference output (external data file path).
-> 
-> Furthermore, we probably want to sort these options.  Format drivers are
-> not required to define them in any specific order, so the output is
-> effectively random (although this has never bothered us until now).  We
-> need a specific order for our reference outputs, though.  Unfortunately,
-> just using a plain "sort" would change a lot of existing reference
-> outputs, so we have to pre-filter the option keys to keep our existing
-> order (fmt, size, backing*, data, encryption info, preallocation).
-> 
-> Finally, this makes it difficult for _filter_img_create to automagically
-> work for QMP output.  Thus, this patch adds a separate
-> _filter_img_create_for_qmp function that echos every line verbatim that
-> does not start with "Formatting", and pipes those "Formatting" lines to
-> _filter_img_create.
-> 
-> [1] Actually, the only thing that is really important is whether
->     encryption is enabled or not.  A patch by Maxim thus removes all
->     other "encrypt.*" options from the output:
->     https://lists.nongnu.org/archive/html/qemu-block/2020-06/msg00339.html
->     But that patch needs to come later so we can get away with changing
->     as few reference outputs in this patch here as possible.
-> 
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->  tests/qemu-iotests/112.out       |  2 +-
->  tests/qemu-iotests/141           |  2 +-
->  tests/qemu-iotests/153           |  9 ++-
->  tests/qemu-iotests/common.filter | 94 ++++++++++++++++++++++++--------
->  4 files changed, 76 insertions(+), 31 deletions(-)
-> 
-> diff --git a/tests/qemu-iotests/112.out b/tests/qemu-iotests/112.out
-> index ae0318cabe..182655dbf6 100644
-> --- a/tests/qemu-iotests/112.out
-> +++ b/tests/qemu-iotests/112.out
-> @@ -5,7 +5,7 @@ QA output created by 112
->  qemu-img: TEST_DIR/t.IMGFMT: Refcount width must be a power of two and may not exceed 64 bits
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
->  qemu-img: TEST_DIR/t.IMGFMT: Refcount width must be a power of two and may not exceed 64 bits
-> -Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864 refcount_bits=-1
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
->  qemu-img: TEST_DIR/t.IMGFMT: Refcount width must be a power of two and may not exceed 64 bits
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
->  qemu-img: TEST_DIR/t.IMGFMT: Refcount width must be a power of two and may not exceed 64 bits
-> diff --git a/tests/qemu-iotests/141 b/tests/qemu-iotests/141
-> index 5192d256e3..6d1b7b0d4c 100755
-> --- a/tests/qemu-iotests/141
-> +++ b/tests/qemu-iotests/141
-> @@ -68,7 +68,7 @@ test_blockjob()
->      _send_qemu_cmd $QEMU_HANDLE \
->          "$1" \
->          "$2" \
-> -        | _filter_img_create | _filter_qmp_empty_return
-> +        | _filter_img_create_in_qmp | _filter_qmp_empty_return
-Great!
+On Wed, Jun 17, 2020 at 3:29 AM Atish Patra <atish.patra@wdc.com> wrote:
+>
+> This series adds support OpenSBI dynamic firmware support to Qemu.
+> Qemu loader passes the information about the DT and next stage (i.e. kernel
+> or U-boot) via "a2" register. It allows the user to build bigger OS images
+> without worrying about overwriting DT. It also unifies the reset vector code
 
->  
->      # We want this to return an error because the block job is still running
->      _send_qemu_cmd $QEMU_HANDLE \
-> diff --git a/tests/qemu-iotests/153 b/tests/qemu-iotests/153
-> index cf961d3609..11e3d28841 100755
-> --- a/tests/qemu-iotests/153
-> +++ b/tests/qemu-iotests/153
-> @@ -167,11 +167,10 @@ done
->  
->  echo
->  echo "== Creating ${TEST_IMG}.[abc] ==" | _filter_testdir
-> -(
-> -    $QEMU_IMG create -f qcow2 "${TEST_IMG}.a" -b "${TEST_IMG}"
-> -    $QEMU_IMG create -f qcow2 "${TEST_IMG}.b" -b "${TEST_IMG}"
-> -    $QEMU_IMG create -f qcow2 "${TEST_IMG}.c" -b "${TEST_IMG}.b"
-> -) | _filter_img_create
-> +$QEMU_IMG create -f qcow2 "${TEST_IMG}.a" -b "${TEST_IMG}" | _filter_img_create
-> +$QEMU_IMG create -f qcow2 "${TEST_IMG}.b" -b "${TEST_IMG}" | _filter_img_create
-> +$QEMU_IMG create -f qcow2 "${TEST_IMG}.c" -b "${TEST_IMG}.b" \
-> +    | _filter_img_create
->  
->  echo
->  echo "== Two devices sharing the same file in backing chain =="
-> diff --git a/tests/qemu-iotests/common.filter b/tests/qemu-iotests/common.filter
-> index 03e4f71808..bc0bd16de4 100644
-> --- a/tests/qemu-iotests/common.filter
-> +++ b/tests/qemu-iotests/common.filter
-> @@ -122,38 +122,84 @@ _filter_actual_image_size()
->  # replace driver-specific options in the "Formatting..." line
->  _filter_img_create()
->  {
-> -    data_file_filter=()
-> -    if data_file=$(_get_data_file "$TEST_IMG"); then
-> -        data_file_filter=(-e "s# data_file=$data_file##")
-> +    # Split the line into the pre-options part ($filename_part, which
-> +    # precedes ", fmt=") and the options part ($options, which starts
-> +    # with "fmt=")
-Good comment!
-> +    readarray -td '' formatting_line < <(sed -e 's/, fmt=/\x0/')
-> +
-> +    # Ignore anything that does not have a ", fmt=" in it
-Good comment as well, now it is much clearer what is going on
-> +    if [ -z "${formatting_line[1]}" ]; then
-> +        echo "${formatting_line[0]}"
-> +        return
-> +    fi
-> +
-> +    filename_part=${formatting_line[0]}
-> +    options="fmt=${formatting_line[1]}"
-> +
-> +    # Set grep_data_file to '\|data_file' to keep it; make it empty
-> +    # to drop it.
-> +    # We want to drop it if it is part of the global $IMGOPTS, and we
-> +    # want to keep it otherwise (if the test specifically wants to
-> +    # test data files).
-> +    grep_data_file='\|data_file'
-> +    if _get_data_file "$TEST_IMG" > /dev/null; then
-> +        grep_data_file=''
->      fi
->  
-> -    $SED "${data_file_filter[@]}" \
-> +    filename_filters=(
->          -e "s#$REMOTE_TEST_DIR#TEST_DIR#g" \
->          -e "s#$IMGPROTO:$TEST_DIR#TEST_DIR#g" \
->          -e "s#$TEST_DIR#TEST_DIR#g" \
->          -e "s#$SOCK_DIR#SOCK_DIR#g" \
->          -e "s#$IMGFMT#IMGFMT#g" \
->          -e 's#nbd:127.0.0.1:[0-9]\\+#TEST_DIR/t.IMGFMT#g' \
-> -        -e 's#nbd+unix:///\??socket=SOCK_DIR/nbd#TEST_DIR/t.IMGFMT#g' \
-> -        -e "s# encryption=off##g" \
-> -        -e "s# cluster_size=[0-9]\\+##g" \
-> -        -e "s# table_size=[0-9]\\+##g" \
-> -        -e "s# compat=[^ ]*##g" \
-> -        -e "s# compat6=\\(on\\|off\\)##g" \
-> -        -e "s# static=\\(on\\|off\\)##g" \
-> -        -e "s# zeroed_grain=\\(on\\|off\\)##g" \
-> -        -e "s# subformat=[^ ]*##g" \
-> -        -e "s# adapter_type=[^ ]*##g" \
-> -        -e "s# hwversion=[^ ]*##g" \
-> -        -e "s# lazy_refcounts=\\(on\\|off\\)##g" \
-> -        -e "s# block_size=[0-9]\\+##g" \
-> -        -e "s# block_state_zero=\\(on\\|off\\)##g" \
-> -        -e "s# log_size=[0-9]\\+##g" \
-> -        -e "s# refcount_bits=[0-9]\\+##g" \
-> -        -e "s# key-secret=[a-zA-Z0-9]\\+##g" \
-> -        -e "s# iter-time=[0-9]\\+##g" \
-> -        -e "s# force_size=\\(on\\|off\\)##g" \
-> -        -e "s# compression_type=[a-zA-Z0-9]\\+##g"
-> +        -e 's#nbd+unix:///\??socket=SOCK_DIR/nbd#TEST_DIR/t.IMGFMT#g'
-> +    )
-> +
-> +    filename_part=$(echo "$filename_part" | $SED "${filename_filters[@]}")
-> +
-> +    # Break the option line before each option (preserving pre-existing
-> +    # line breaks by replacing them by \0 and restoring them at the end),
-> +    # then filter out the options we want to keep and sort them according
-> +    # to some order that all block drivers used at the time of writing
-> +    # this function.
-> +    options=$(
-> +        echo "$options" \
-> +        | tr '\n' '\0' \
-> +        | $SED -e 's/\x0$//' -e 's/ \([a-z0-9_.-]*\)=/\n\1=/g' \
-> +        | grep -ae "^\(fmt\\|size\\|backing\\|preallocation\\|encrypt$grep_data_file\\)" \
-> +        | $SED "${filename_filters[@]}" \
-> +            -e 's/^\(fmt\)/0-\1/' \
-> +            -e 's/^\(size\)/1-\1/' \
-> +            -e 's/^\(backing\)/2-\1/' \
-> +            -e 's/^\(data_file\)/3-\1/' \
-> +            -e 's/^\(encryption\)/4-\1/' \
-> +            -e 's/^\(encrypt\.format\)/5-\1/' \
-> +            -e 's/^\(encrypt\.key-secret\)/6-\1/' \
-> +            -e 's/^\(encrypt\.iter-time\)/7-\1/' \
-> +            -e 's/^\(preallocation\)/8-\1/' \
-> +        | sort \
-> +        | $SED -e 's/^[0-9]-//' \
-> +        | tr '\n\0' ' \n' \
-> +        | $SED -e 's/^ *$//' -e 's/ *$//'
-> +    )
-> +
-> +    echo "$filename_part, $options"
-> +}
-> +
-> +# Filter the "Formatting..." line in QMP output (leaving the QMP output
-> +# untouched)
-> +# (In contrast to _filter_img_create(), this function does not support
-> +# multi-line Formatting output)
-> +_filter_img_create_in_qmp()
-> +{
-> +    while read -r line; do
-> +        if echo "$line" | grep -q '^Formatting'; then
-> +            echo "$line" | _filter_img_create
-> +        else
-> +            echo "$line"
-> +        fi
-> +    done
->  }
-Good as well.
->  
->  _filter_img_create_size()
+I am not sure in what situation overwriting DT could happen. Could you
+please elaborate?
 
-Looks good now,
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+> in rom and dt placement. Now, the DT is copied directly in DRAM instead of ROM.
+>
+> The changes have been verified on following qemu machines.
+>
+> 64bit:
+>  - spike, sifive_u, virt
+> 32bit:
+>  - virt
 
-Best regards,
-	Maxim Levitsky
+Any test instructions?
 
+>
+> I have also verified fw_jump on all the above platforms to ensure that this
+> series doesn't break the existing setup.
+>
+
+Regards,
+Bin
 
