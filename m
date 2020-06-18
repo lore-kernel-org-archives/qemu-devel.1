@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AEB1AC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 04:30:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1078BC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 04:30:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7E7AE21852
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 04:30:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CEF5920739
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 04:30:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CSYU8Rr4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E7AE21852
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="si6QS1bE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CEF5920739
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39250 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40618 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlmBf-00088J-Lg
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 00:30:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59122)
+	id 1jlmBu-0000by-W7
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 00:30:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59138)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jlm8i-0001zL-Q9
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 00:27:00 -0400
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:43722)
+ id 1jlm8k-00022x-57
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 00:27:02 -0400
+Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:33240)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jlm8h-0002Hv-AV
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 00:27:00 -0400
-Received: by mail-pf1-x441.google.com with SMTP id 23so2174695pfw.10
- for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 21:26:58 -0700 (PDT)
+ id 1jlm8i-0002II-IS
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 00:27:01 -0400
+Received: by mail-pj1-x1043.google.com with SMTP id b7so2990516pju.0
+ for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 21:27:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=YQT2lykC9j0XvNzXk1cacc8eLU/nCOsDG3gfH9CfOaw=;
- b=CSYU8Rr41A7Ji/+sJysXjdq6sahwavipxOLdglB/D186VXaz+DyAMdwtkYwVKfNkBe
- 9rRcuOwpICyDnk9itl1h9jr0nL1DgzFhHxEk2pLYG3VAryE0IC5BaRnbeoqjPAXjQQnR
- NzrRPDeIVUlfTPw6mA3BHr7Hjs/Do8dFrm7sDZMgRD+tvwHzlGTWpxOaGaSGGyTa61yQ
- 7+N1qfETL6IcsiOYa746jbbOrpEw5jmSMVs9VUiN6znNafRI8QziPKLokGY33DcXnnQb
- Q5oQn5AipHHwvJ5fcvmHBJCqX194enXumIlz1uokbrvrrKAnEjLnGvWlY6AA6aIpU1A5
- a2QA==
+ bh=CDc9TG70gufzBOuiRWeZCFf3ZumKEjj9+6ML7NwYukE=;
+ b=si6QS1bE9lgfVUi/MCeZJP2wmLMg4PfgZHj7FOzs5X3yRuQiA2s/ocEyIeZxsckRYJ
+ BwhDCeWISlM0boTEjjeN/IPl7ncU51lRXth1reCYEAEN/KwWDelykPGsu0dRUxwFVZUV
+ Px3b6NoEJz1NLmUlpvZ07NVeAROfhQxfZQ1HqiO6VkDEl+ju/QTUWg3qBQOKdhFgZpTB
+ 6SnrLNa7IKEwVb6eBn9nWTKu8yrWQVimM5xZJmQ4AT2pLyHZ/aEeA7QaIh6OwshalpGw
+ vj+WUeFlDbl6gJT1GwyWmSuokNS9F1z82pcwT5DilOIdEJj2No3awAk3C60MeRboMNST
+ A7QA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=YQT2lykC9j0XvNzXk1cacc8eLU/nCOsDG3gfH9CfOaw=;
- b=p4uRdeDYgwtn6pnQ828oBo/ycb+cK6zm5r1GTwCIst1qL7zu4Mbvs87zufFfE+AiCl
- SDRQBenNQ1QkYKRzyG4V+6/6MZj//cFWAKe2CchKHqFCoeK/ClVcOO9FF3MERZzpS+U0
- SrsHmBYdG/b4DgNgFz0eaDyX8uozc4ZXwfFWwwWs5ehD9FRFJFfaDs+qWZDW2UDOHOGj
- hlnG13AKjY8zC6J69NvEmVS8yMnK4DsiaiP3wDW4bsAAZIUe97qjhV4bhDUfviBuFUAb
- waH9NCHYh+1FdU8e/U2iLgmCkSWYY7wHVzQovWczr7A3YZP00zEapMwIFsYhNEXskHCa
- tRxg==
-X-Gm-Message-State: AOAM531V3hv+/LrO8crEDyDdsRH2/wcQS04SPBpvme27K7ccThX43sHk
- O30Nz3S+G46mjPSrOQJCQ2GL6nvQ5GY=
-X-Google-Smtp-Source: ABdhPJzVQoUKomvxAYH9cLkmRDd+UBXMOEJcXzLaLCsrdtVy7lbw2alono+AMJxDHdej5sywDqHHCg==
-X-Received: by 2002:a63:f711:: with SMTP id x17mr1845839pgh.79.1592454417654; 
- Wed, 17 Jun 2020 21:26:57 -0700 (PDT)
+ bh=CDc9TG70gufzBOuiRWeZCFf3ZumKEjj9+6ML7NwYukE=;
+ b=Np1akOfMyoSQ6oRJUvoEfu+R+Sh94cSQia5lvzpCvsJuaOzwJ3geHpF3TzzkMJSf6b
+ Lkx+WDBuJEQJpHuBH9EQ/hrKqczlZCgmyDgf2fCMZrWwJgocCnxamKKqHn8c9dSyEyKe
+ o0OZG0xvUldhLEYRU4wDqJaeHGLSl4qLrbPUHbbICtcH2yKIBmurnXZfzXmDQvj5WHZz
+ OP1ycfwFhD1Nux27Y6WC4pkJVaAxrimNGSw8fNRnKBwMoxzfssGTLW+8cegSgNQNw9Cm
+ eZOaVVWR6Zk/Qt0Ye4VtZi5FkNpNzTLaCpWjhRqhWtrBm13JLCK0J6mRULkHROwvyUYO
+ d6vQ==
+X-Gm-Message-State: AOAM530BzlJPAkizgtJ+BpVzqLcZuSURM4uvNobm5rj+3oJCFxW+kfSJ
+ /oY2YL+wl4AtD1vRDYQb6bT77WkxcTA=
+X-Google-Smtp-Source: ABdhPJwS9PMb/hp1Llp/iTPMsYBUsM6SUFAlYPHVjPPXU5wPFMPw/ZQiuz2gLFjJtSAEjTzHadNNbA==
+X-Received: by 2002:a17:902:7043:: with SMTP id
+ h3mr2213726plt.200.1592454418786; 
+ Wed, 17 Jun 2020 21:26:58 -0700 (PDT)
 Received: from localhost.localdomain (174-21-143-238.tukw.qwest.net.
  [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id o16sm1162035pgg.57.2020.06.17.21.26.56
+ by smtp.gmail.com with ESMTPSA id o16sm1162035pgg.57.2020.06.17.21.26.57
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 17 Jun 2020 21:26:56 -0700 (PDT)
+ Wed, 17 Jun 2020 21:26:58 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 008/100] target/arm: Use tcg_gen_gvec_bitsel for
- trans_SEL_pppp
-Date: Wed, 17 Jun 2020 21:25:12 -0700
-Message-Id: <20200618042644.1685561-9-richard.henderson@linaro.org>
+Subject: [PATCH v2 009/100] target/arm: Split out gen_gvec_ool_zzzp
+Date: Wed, 17 Jun 2020 21:25:13 -0700
+Message-Id: <20200618042644.1685561-10-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200618042644.1685561-1-richard.henderson@linaro.org>
 References: <20200618042644.1685561-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::441;
- envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x441.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1043;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1043.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -106,61 +106,85 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The gvec operation was added after the initial implementation
-of the SEL instruction and was missed in the conversion.
+Model after gen_gvec_fn_zzz et al.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/translate-sve.c | 31 ++++++++-----------------------
- 1 file changed, 8 insertions(+), 23 deletions(-)
+ target/arm/translate-sve.c | 35 ++++++++++++++++-------------------
+ 1 file changed, 16 insertions(+), 19 deletions(-)
 
 diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-index 6d1a69c365..741f4d8b32 100644
+index 741f4d8b32..5d4f572b67 100644
 --- a/target/arm/translate-sve.c
 +++ b/target/arm/translate-sve.c
-@@ -1188,34 +1188,19 @@ static bool trans_EOR_pppp(DisasContext *s, arg_rprr_s *a)
-     return do_pppp_flags(s, a, &op);
+@@ -142,8 +142,19 @@ static int pred_gvec_reg_size(DisasContext *s)
+     return size_for_gvec(pred_full_reg_size(s));
  }
  
--static void gen_sel_pg_i64(TCGv_i64 pd, TCGv_i64 pn, TCGv_i64 pm, TCGv_i64 pg)
--{
--    tcg_gen_and_i64(pn, pn, pg);
--    tcg_gen_andc_i64(pm, pm, pg);
--    tcg_gen_or_i64(pd, pn, pm);
--}
--
--static void gen_sel_pg_vec(unsigned vece, TCGv_vec pd, TCGv_vec pn,
--                           TCGv_vec pm, TCGv_vec pg)
--{
--    tcg_gen_and_vec(vece, pn, pn, pg);
--    tcg_gen_andc_vec(vece, pm, pm, pg);
--    tcg_gen_or_vec(vece, pd, pn, pm);
--}
--
- static bool trans_SEL_pppp(DisasContext *s, arg_rprr_s *a)
+-/* Invoke a vector expander on two Zregs.  */
++/* Invoke an out-of-line helper on 3 Zregs and a predicate. */
++static void gen_gvec_ool_zzzp(DisasContext *s, gen_helper_gvec_4 *fn,
++                              int rd, int rn, int rm, int pg, int data)
++{
++    unsigned vsz = vec_full_reg_size(s);
++    tcg_gen_gvec_4_ool(vec_full_reg_offset(s, rd),
++                       vec_full_reg_offset(s, rn),
++                       vec_full_reg_offset(s, rm),
++                       pred_full_reg_offset(s, pg),
++                       vsz, vsz, data, fn);
++}
+ 
++/* Invoke a vector expander on two Zregs.  */
+ static void gen_gvec_fn_zz(DisasContext *s, GVecGen2Fn *gvec_fn,
+                            int esz, int rd, int rn)
  {
--    static const GVecGen4 op = {
--        .fni8 = gen_sel_pg_i64,
--        .fniv = gen_sel_pg_vec,
--        .fno = gen_helper_sve_sel_pppp,
--        .prefer_i64 = TCG_TARGET_REG_BITS == 64,
--    };
--
-     if (a->s) {
+@@ -314,16 +325,11 @@ static bool trans_UQSUB_zzz(DisasContext *s, arg_rrr_esz *a)
+ 
+ static bool do_zpzz_ool(DisasContext *s, arg_rprr_esz *a, gen_helper_gvec_4 *fn)
+ {
+-    unsigned vsz = vec_full_reg_size(s);
+     if (fn == NULL) {
          return false;
      }
--    return do_pppp_flags(s, a, &op);
-+    if (sve_access_check(s)) {
-+        unsigned psz = pred_gvec_reg_size(s);
-+        tcg_gen_gvec_bitsel(MO_8, pred_full_reg_offset(s, a->rd),
-+                            pred_full_reg_offset(s, a->pg),
-+                            pred_full_reg_offset(s, a->rn),
-+                            pred_full_reg_offset(s, a->rm), psz, psz);
-+    }
-+    return true;
+     if (sve_access_check(s)) {
+-        tcg_gen_gvec_4_ool(vec_full_reg_offset(s, a->rd),
+-                           vec_full_reg_offset(s, a->rn),
+-                           vec_full_reg_offset(s, a->rm),
+-                           pred_full_reg_offset(s, a->pg),
+-                           vsz, vsz, 0, fn);
++        gen_gvec_ool_zzzp(s, fn, a->rd, a->rn, a->rm, a->pg, 0);
+     }
+     return true;
+ }
+@@ -337,12 +343,7 @@ static void do_sel_z(DisasContext *s, int rd, int rn, int rm, int pg, int esz)
+         gen_helper_sve_sel_zpzz_b, gen_helper_sve_sel_zpzz_h,
+         gen_helper_sve_sel_zpzz_s, gen_helper_sve_sel_zpzz_d
+     };
+-    unsigned vsz = vec_full_reg_size(s);
+-    tcg_gen_gvec_4_ool(vec_full_reg_offset(s, rd),
+-                       vec_full_reg_offset(s, rn),
+-                       vec_full_reg_offset(s, rm),
+-                       pred_full_reg_offset(s, pg),
+-                       vsz, vsz, 0, fns[esz]);
++    gen_gvec_ool_zzzp(s, fns[esz], rd, rn, rm, pg, 0);
  }
  
- static void gen_orr_pg_i64(TCGv_i64 pd, TCGv_i64 pn, TCGv_i64 pm, TCGv_i64 pg)
+ #define DO_ZPZZ(NAME, name) \
+@@ -2704,12 +2705,8 @@ static bool trans_RBIT(DisasContext *s, arg_rpr_esz *a)
+ static bool trans_SPLICE(DisasContext *s, arg_rprr_esz *a)
+ {
+     if (sve_access_check(s)) {
+-        unsigned vsz = vec_full_reg_size(s);
+-        tcg_gen_gvec_4_ool(vec_full_reg_offset(s, a->rd),
+-                           vec_full_reg_offset(s, a->rn),
+-                           vec_full_reg_offset(s, a->rm),
+-                           pred_full_reg_offset(s, a->pg),
+-                           vsz, vsz, a->esz, gen_helper_sve_splice);
++        gen_gvec_ool_zzzp(s, gen_helper_sve_splice,
++                          a->rd, a->rn, a->rm, a->pg, 0);
+     }
+     return true;
+ }
 -- 
 2.25.1
 
