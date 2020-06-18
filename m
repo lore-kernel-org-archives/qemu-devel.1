@@ -2,76 +2,85 @@ Return-Path: <SRS0=FaGC=77=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D84CAC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 11:31:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C779C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 11:31:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A38B62071A
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 11:31:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 47906206C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 11:31:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rw/ldGEJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A38B62071A
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zCqpBd7i"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47906206C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55668 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55768 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlslR-0007OK-TZ
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 07:31:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59846)
+	id 1jlslT-0007Qh-FA
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 07:31:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60042)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jlsju-0005XO-8U
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 07:29:50 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:41664)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jlskY-0006DQ-AG
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 07:30:30 -0400
+Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:39690)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jlsjs-00018S-KM
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 07:29:49 -0400
-Received: by mail-ot1-x341.google.com with SMTP id k15so4228758otp.8
- for <qemu-devel@nongnu.org>; Thu, 18 Jun 2020 04:29:48 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jlskW-0001J5-NJ
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 07:30:29 -0400
+Received: by mail-wr1-x429.google.com with SMTP id t18so5675215wru.6
+ for <qemu-devel@nongnu.org>; Thu, 18 Jun 2020 04:30:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=zk7CuJDbnYiYd0ZkXIw98BzOuhxD4Zd+aQ4kaAV749k=;
- b=rw/ldGEJvuLkhvO//5QsKFRWM6T9u8OOQI8U+ZRqmOq3X3eMlKfbcxZhrjLQBvRW19
- IvG5X3rf9ufmUHI30/p/g5fcgTw78sm7cWkXQgAC0uuZnEJ9NnIiDgVlH15zjiiyD3Ux
- kDLlzgIWt29VQHxc64GZcLHeP1DGzMcuo/8y1TFAkkk9NznPpYlVnZ9xd0X15ZHtITfQ
- vAZFcx8VfjF63fe+K50wjhuQZVZs5lUXlslycZsj4dFY/l8Dzfu0qvl6e/DradH2wHUa
- 3rsU8JPSVSrRJvtQ8mz6TTtQZxRIwGLYJEVRbujgXy/eCODmq5TP6I5cXpHI5mL8/xWh
- RYLw==
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=PJQ2DsSnuk18MugYbkWmnrj1sv/fTWU6NUII3bphy9M=;
+ b=zCqpBd7iPiinZUenHoqI/VQ9VztdpGW67rdnCbsbxDn38dtu/zax6IdTeB5HfJO3If
+ 1OgJXp0FaVHI/Qspc8j++nyN5yJQwDmsMVSAT1XtR2GfuXUttE+t1wRf+Gx4GZHpnEd+
+ 7WXBC/FN3hngUUNUDtbb+xbIeaIFwfTnKLs1Etqw4uPJOGxiFqbvcOb/R8JyNYq0QXbL
+ HRyljk9Rivs+o4SWzHZsdU3MvStrvz+FAgLoZ1OqgKWXfaNK9rRuvSOLTOXbwiFzEJGE
+ MQn930GeLMEMeYq+7rrJm+eL6vP1POX/x/rNdZkkrwBt2WCh0+k1eCqHndPoonn3xdOa
+ rLOA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=zk7CuJDbnYiYd0ZkXIw98BzOuhxD4Zd+aQ4kaAV749k=;
- b=rYqLZZ3jGETSHGbhynPppuwvr18aJhjpJaQcFPRSl4FH5C33LB7WcY/L0Kx36ep8sQ
- iZUZRc9C86d17HhH0QKOOiuFn1mE53euifEYTTdTS9VqRY0p6nn4Fhk87eDSTz+nYsXi
- jOy9ljkYATpgS4z7ZOzy+SCw/cBEwPuM3xtXQzlbXvW6d71BI57cejFLvwxPsprMmCx7
- Ucaz7tYWKh936RcXT6LfTznCLQKOdF0LSV81My+zFcfL/mbLFYStFf8FIGENhj5209JR
- 831tDZNHnaQHFFUc3SRBcdmxWWw+ntTRf+6A7jANu0x0iaqsZ84X5HPj5B6Rs/ZJ8m2G
- TcfQ==
-X-Gm-Message-State: AOAM533pUf7myOazlo7HpDeYyZXfphR5B09F8solK7t7IGfg1nQVBvyb
- 0/aOP/WP/0e+Mq5kvlMIxMSFQ7J4/b2Z/MgGxBprRw==
-X-Google-Smtp-Source: ABdhPJzMALbWPOPjCnlG+HbzITIHc6cHlr99/JAUaMymQzZRcRxgedqR0MWkXT9erzUNlUd60bLe0cYq03bEwNYrwP4=
-X-Received: by 2002:a9d:67d6:: with SMTP id c22mr2853887otn.221.1592479787329; 
- Thu, 18 Jun 2020 04:29:47 -0700 (PDT)
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=PJQ2DsSnuk18MugYbkWmnrj1sv/fTWU6NUII3bphy9M=;
+ b=mPOiHhnNVewGPI7hzQk7UlWiTHfR2d6vP9pcuvy8GJFUX9JpbzeVxvUvXB+nto2BM4
+ /tIa4+KtnohOhVbtQr1WwWwSQyP+LPsp7PfHAEQk0JMsoSP8cqh8MbMAU2KJGMcoY4xd
+ 4zfM5qNaV/QYTri+V+SXJ/G/XTsaL6ERNFH4vBk6w+J9Uf1R4dr3moIe431SdfIDWlSz
+ /v06DA18om/AzT9J8dM9XaN+yj73VdweEcEepGAr3GnoFnxJaLwXHRH+lbrSv6Sh05vQ
+ gf4B/JoYVMomivJpAyOhkkXuheob/tzK1Jkyk4oZvbsEwWwRjoWdOhCLrKhzPOTdpa7e
+ b61Q==
+X-Gm-Message-State: AOAM532dzx4hYR1vxmqWVZx8zKHylAv5OEvd8jqlPxZuEPwIo8yBb/8x
+ 1DErsNTyks4fV/Kn0tnNhxBrsycBi90=
+X-Google-Smtp-Source: ABdhPJzlN1rX5L4JR0dImyBk2kdxVvVqwAQxfNneyPeABYgt7MPuVPzpLB2JpCACdwdzUQdCvzKXpQ==
+X-Received: by 2002:a5d:6809:: with SMTP id w9mr4372339wru.182.1592479826148; 
+ Thu, 18 Jun 2020 04:30:26 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id q5sm3264635wrm.62.2020.06.18.04.30.24
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 18 Jun 2020 04:30:25 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 5E2051FF7E;
+ Thu, 18 Jun 2020 12:30:24 +0100 (BST)
+References: <1D26F746-92AA-4BA4-BF92-A498DA2C67C9@redhat.com>
+User-agent: mu4e 1.5.3; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Christophe de Dinechin <cdupontd@redhat.com>
+Subject: Re: Understanding initialization order for spice in qemu
+In-reply-to: <1D26F746-92AA-4BA4-BF92-A498DA2C67C9@redhat.com>
+Date: Thu, 18 Jun 2020 12:30:24 +0100
+Message-ID: <87v9jovcfj.fsf@linaro.org>
 MIME-Version: 1.0
-References: <20200603011317.473934-1-richard.henderson@linaro.org>
- <20200603011317.473934-8-richard.henderson@linaro.org>
-In-Reply-To: <20200603011317.473934-8-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 18 Jun 2020 12:29:35 +0100
-Message-ID: <CAFEAcA8Nwuapyq2e292P_DM0KWRvZY6nSsGwUZn5yO+K3_jLCw@mail.gmail.com>
-Subject: Re: [PATCH v7 07/42] target/arm: Add MTE system registers
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::341;
- envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x341.google.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::429;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x429.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -93,22 +102,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
- Stephen Long <steplong@quicinc.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 3 Jun 2020 at 02:13, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> This is TFSRE0_EL1, TFSR_EL1, TFSR_EL2, TFSR_EL3,
-> RGSR_EL1, GCR_EL1, GMID_EL1, and PSTATE.TCO.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Christophe de Dinechin <cdupontd@redhat.com> writes:
 
-thanks
--- PMM
+> Hi Gerd,
+>
+>
+> When I build qemu on master with moduels enabled, and run with spice, I o=
+ccasionally see:
+>
+>  qemu-system-x86_64: util/module.c:136: module_load_file: Assertion `QTAI=
+LQ_EMPTY(&dso_init_list)' failed.
+>
+> Interestingly, I seem to have seen that only on master, but not on my
+> own branch. Have you ever seen the same problem? Could there be a race
+> condition here explaining why I sometimes see it, sometimes not? Or do
+> you think it's more likely to be a missing build dependency? Asking
+> because I don't recall ever seeing that on a clean build.
+
+Have you switched the config in your build directory? This is one reason
+to have multiple build directories outside of the source tree.
+
+>
+> Command line:
+> % qemu-system-x86_64  -display spice-app /data/VMs/deb9.qcow2
+>
+>
+>
+> Thanks
+> Christophe
+
+
+--=20
+Alex Benn=C3=A9e
 
