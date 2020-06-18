@@ -2,93 +2,80 @@ Return-Path: <SRS0=FaGC=77=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8DD5C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 05:25:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AF43C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 05:26:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8B4B7217A0
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 05:25:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L+y//2Ts"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B4B7217A0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3ADC8217A0
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 05:26:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3ADC8217A0
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40524 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42452 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jln3f-0003jv-RE
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 01:25:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41344)
+	id 1jln4I-0004VO-Fh
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 01:26:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45270)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1jlmnJ-0008G7-IV; Thu, 18 Jun 2020 01:08:57 -0400
-Received: from mail-yb1-xb42.google.com ([2607:f8b0:4864:20::b42]:39588)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jln3S-0003hf-GN
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 01:25:38 -0400
+Received: from indium.canonical.com ([91.189.90.7]:38366)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1jlmnH-00015L-Nd; Thu, 18 Jun 2020 01:08:57 -0400
-Received: by mail-yb1-xb42.google.com with SMTP id j202so2470653ybg.6;
- Wed, 17 Jun 2020 22:08:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=JPDf4eoDyKL1psbgQbjHSwKw7oBnRPJcA7RCYCoyfxY=;
- b=L+y//2Tse4sEzmaymM8/8jWID76ifRx2Xc9dkTYyq2bxCZfzdKYNkum2kkJGubLkkw
- IPZNiikkvhottT9uf3+fVyJjMCxlCjxrZTcPXvVpJnu5dmvL+jJ66d+MEtqdkBN7L3Gu
- W3Ss8OX62Sj9LkVsjaswijI3py5ercV4VNswJ87VW5LT5gWL/LPs+84mZmwYBq3KRvvB
- 3c5vWXGNUqBg5BiHefaN/sTGr5LTA0Kzym0SwiHWp7GfVMd3ewm8vfh1OYGtp3+u82Zl
- 1rX22wmTQIEaYp9sI2GdFktaUkURItBDCzbYgCtSBbo9afylL2ezB3yGr+U/oFiHYis3
- dx9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=JPDf4eoDyKL1psbgQbjHSwKw7oBnRPJcA7RCYCoyfxY=;
- b=Od04TLwSk+LFoIjQaoM8lpIyV8diCia93dEDNVOJbnZvhGTJsAUlAWIa31kkvthaOc
- 4NhaemqNUGZDj33gzaH2uwmPdolg2LNu0sqn3DuzO/e/8l3fk+GEXk62IIv+LeZYs/wt
- PTtijUY7dzjEK5oOLNk9Ha70b959kh+m2GA5dR8bm3x554u0ZSamr5spgwjYkIRcV/H3
- vprVmRQCzqjSPED9FQQjiMLOeaLMzFPE6Nya3zYrbS3cJ+XbrOR8V5419o5bilv9/f4M
- ALtOb6w6uefEi/cZvoyGqxTrIGSgK+piuakQK5Xk9dpcG6n5QVJ8pQ+vDNJqFCTBX1Q6
- 3djQ==
-X-Gm-Message-State: AOAM530E/ALPWRpNKxEM6DJsxxEaw6i6QQfr1LpgG/BzNfPb2Gl/Uxiu
- 45vKmcsNfsLUGTkQrDiqrLFF7Q2tyyvN5SfpZIM=
-X-Google-Smtp-Source: ABdhPJw883OpWJWqncDOhqRPfSYehelqmSD+ykSs2uqUKNfwxV0PlmDfvPvfi5mGKOfKdKRKj8sbQ5AxGF0IhEmfNVI=
-X-Received: by 2002:a05:6902:532:: with SMTP id
- y18mr3577804ybs.122.1592456934393; 
- Wed, 17 Jun 2020 22:08:54 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jln3Q-00048u-0y
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 01:25:38 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jln3O-00086o-9K
+ for <qemu-devel@nongnu.org>; Thu, 18 Jun 2020 05:25:34 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 4031B2E8105
+ for <qemu-devel@nongnu.org>; Thu, 18 Jun 2020 05:25:34 +0000 (UTC)
 MIME-Version: 1.0
-References: <1592268641-7478-1-git-send-email-bmeng.cn@gmail.com>
- <1592268641-7478-3-git-send-email-bmeng.cn@gmail.com>
- <CAKmqyKNovTf3F+t9WFCWXvAgT_CRa5dbDuQExzbqxkM-z3ufqw@mail.gmail.com>
- <CAEUhbmVq8kVfZRQSF-LT_bDib9e1xBL-7zifmHpQgdvehcNzFA@mail.gmail.com>
-In-Reply-To: <CAEUhbmVq8kVfZRQSF-LT_bDib9e1xBL-7zifmHpQgdvehcNzFA@mail.gmail.com>
-From: Bin Meng <bmeng.cn@gmail.com>
-Date: Thu, 18 Jun 2020 13:08:43 +0800
-Message-ID: <CAEUhbmU3ouNn=PfXLwZx_Pu49zmWY1ddsSqKONdh6X5atXcncg@mail.gmail.com>
-Subject: Re: [PATCH v2 2/5] hw/riscv: sifive: Change SiFive E/U CPU reset
- vector to 0x1004
-To: Alistair Francis <alistair23@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::b42;
- envelope-from=bmeng.cn@gmail.com; helo=mail-yb1-xb42.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 18 Jun 2020 05:15:59 -0000
+From: David Glover <1884017@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: qemu-system-i386
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: me-davidglover
+X-Launchpad-Bug-Reporter: David Glover (me-davidglover)
+X-Launchpad-Bug-Modifier: David Glover (me-davidglover)
+References: <159245607293.6124.18309162054825340522.malonedeb@soybean.canonical.com>
+Message-Id: <159245735913.5758.10235677308402575340.malone@soybean.canonical.com>
+Subject: [Bug 1884017] Re: Intermittently erratic mouse under Windows 95
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="1cbd0aa39df153c901321817f9b57cf3f232b507";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 58f0a881c33c7fabeb88b820d07c392de0f75fa1
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 01:00:52
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -97,57 +84,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Bin Meng <bin.meng@windriver.com>,
- "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Palmer Dabbelt <palmerdabbelt@google.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>
+Reply-To: Bug 1884017 <1884017@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Alistair,
+Weirdly, this problem doesn't occur when running qemu on macOS
+(10.15.5). It only happens on my PC running openSUSE Tumbleweed.
 
-On Thu, Jun 18, 2020 at 8:41 AM Bin Meng <bmeng.cn@gmail.com> wrote:
->
-> Hi Alistair,
->
-> On Thu, Jun 18, 2020 at 12:40 AM Alistair Francis <alistair23@gmail.com> wrote:
-> >
-> > On Mon, Jun 15, 2020 at 5:51 PM Bin Meng <bmeng.cn@gmail.com> wrote:
-> > >
-> > > From: Bin Meng <bin.meng@windriver.com>
-> > >
-> > > Per the SiFive manual, all E/U series CPU cores' reset vector is
-> > > at 0x1004. Update our codes to match the hardware.
-> > >
-> > > Signed-off-by: Bin Meng <bin.meng@windriver.com>
-> >
-> > This commit breaks my Oreboot test.
-> >
-> > Oreboot starts in flash and we run the command with the
-> > `sifive_u,start-in-flash=true` machine.
->
-> Could you please post an Oreboot binary for testing somewhere, or some
-> instructions so that I can test this?
->
+However, even on that PC, it only affects Windows 95, and not Windows
+98, or other operating systems.
 
-I have figured out where the issue is. The issue is inside the Oreboot
-codes that its QEMU detecting logic should be updated to match this
-change.
+-- =
 
-I've sent pull request to Oreboot to fix this:
-https://github.com/oreboot/oreboot/pull/264
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1884017
 
-> >
-> > I have removed this and the later patches from the RISC-V branch. I
-> > want to send a PR today. After that I'll look into this.
->
+Title:
+  Intermittently erratic mouse under Windows 95
 
-I don't think we should drop this patch and later ones in this series.
+Status in QEMU:
+  New
 
-Regards,
-Bin
+Bug description:
+  The mouse works fine maybe 75-80% of the time, but intermittently
+  (every 20-30 seconds or so), moving the mouse will cause the pointer
+  to fly around the screen at high speed, usually colliding with the
+  edges, and much more problematically, click all the mouse buttons at
+  random, even if you are not clicking. This causes random objects on
+  the screen to be clicked and dragged around, rendering the system
+  generally unusable.
+
+  I don't know if this is related to #1785485 - it happens even if you
+  never use the scroll wheel.
+
+  qemu version: 5.0.0 (openSUSE Tumbleweed)
+
+  Launch command line: qemu-system-i386 -hda win95.qcow2 -cpu pentium2
+  -m 16 -vga cirrus -soundhw sb16 -nic user,model=3Dpcnet -rtc
+  base=3Dlocaltime
+
+  OS version: Windows 95 4.00.950 C
+
+  I have made the disk image available here:
+  https://home.gloveraoki.me/share/win95.qcow2.lz
+
+  Setup notes: In order to make Windows 95 detect the system devices
+  correctly, after first install you must change the driver for "Plug
+  and Play BIOS" to "PCI bus". I have already done this in the above
+  image.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1884017/+subscriptions
 
