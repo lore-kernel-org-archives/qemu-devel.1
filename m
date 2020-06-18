@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09BBEC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 09:52:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2EF3C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 09:52:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D439A21548
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 09:52:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D439A21548
+	by mail.kernel.org (Postfix) with ESMTPS id 99BD821548
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 09:52:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99BD821548
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39650 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39828 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlrDc-0004L4-4X
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 05:52:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55894)
+	id 1jlrDe-0004PX-Ud
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 05:52:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55962)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jlrCY-0002zb-0Z
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 05:51:18 -0400
-Received: from indium.canonical.com ([91.189.90.7]:52828)
+ id 1jlrCb-000374-KB
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 05:51:21 -0400
+Received: from indium.canonical.com ([91.189.90.7]:53016)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jlrCV-00070s-Iv
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 05:51:17 -0400
+ id 1jlrCZ-00071d-HI
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 05:51:21 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jlrCT-0004R1-Ab
- for <qemu-devel@nongnu.org>; Thu, 18 Jun 2020 09:51:13 +0000
+ id 1jlrCX-0004ZM-Ms
+ for <qemu-devel@nongnu.org>; Thu, 18 Jun 2020 09:51:17 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 4E2782E80BA
- for <qemu-devel@nongnu.org>; Thu, 18 Jun 2020 09:51:13 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id A9D992E8107
+ for <qemu-devel@nongnu.org>; Thu, 18 Jun 2020 09:51:17 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 18 Jun 2020 09:38:29 -0000
+Date: Thu, 18 Jun 2020 09:39:05 -0000
 From: Launchpad Bug Tracker <1805256@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -80,7 +80,7 @@ X-Launchpad-Bug-Commenters: andrew-cloke brian-murray dannf ikepanhc iveskim
 X-Launchpad-Bug-Reporter: dann frazier (dannf)
 X-Launchpad-Bug-Modifier: Launchpad Janitor (janitor)
 References: <154327283728.15443.11625169757714443608.malonedeb@soybean.canonical.com>
-Message-Id: <159247311146.15688.17951471364956322054.malone@ackee.canonical.com>
+Message-Id: <159247314860.15688.14059823350601845475.malone@ackee.canonical.com>
 Subject: [Bug 1805256] Re: qemu-img hangs on rcu_call_ready_event logic in
  Aarch64 when converting images
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
@@ -89,7 +89,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="1cbd0aa39df153c901321817f9b57cf3f232b507";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 62459fcf3e7ebe0374ebb96d0e974f38331b9708
+X-Launchpad-Hash: fd4922986edc5dcbe407e1424d798555a5ab70ff
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 03:41:11
@@ -116,23 +116,21 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This bug was fixed in the package qemu - 1:4.0+dfsg-0ubuntu9.7
+This bug was fixed in the package qemu - 1:2.11+dfsg-1ubuntu7.27
 
 ---------------
-qemu (1:4.0+dfsg-0ubuntu9.7) eoan; urgency=3Dmedium
+qemu (1:2.11+dfsg-1ubuntu7.27) bionic; urgency=3Dmedium
 
   * d/p/ubuntu/lp-1805256*: Fixes for QEMU on aarch64 ARM hosts
+    - aio: rename aio_context_in_iothread() to in_aio_context_home_thread()
+    - aio: Do aio_notify_accept only during blocking aio_poll
+    - aio-posix: Assert that aio_poll() is always called in home thread
     - async: use explicit memory barriers (LP: #1805256)
     - aio-wait: delegate polling of main AioContext if BQL not held
+    - aio-posix: Don't count ctx->notifier as progress when polling
 
- -- Rafael David Tinoco <rafaeldtinoco@ubuntu.com>  Wed, 27 May 2020
-20:07:57 +0000
-
-** Changed in: qemu (Ubuntu Eoan)
-       Status: Fix Committed =3D> Fix Released
-
-** Changed in: qemu (Ubuntu Bionic)
-       Status: Fix Committed =3D> Fix Released
+ -- Rafael David Tinoco <rafaeldtinoco@ubuntu.com>  Tue, 26 May 2020
+17:39:21 +0000
 
 -- =
 
