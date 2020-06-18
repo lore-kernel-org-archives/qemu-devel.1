@@ -4,76 +4,71 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56BF4C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 15:36:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 983D6C4345B
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 15:40:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 20A72206FA
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 15:36:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 67334206FA
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 15:40:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SrbD/gyS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20A72206FA
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QFJZtDqz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67334206FA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38900 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46118 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlwaN-00073d-9p
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 11:36:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59488)
+	id 1jlwef-0002cg-FD
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 11:40:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60634)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1jlwZc-0006SL-1k
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 11:35:28 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38864
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jlwdG-0000tL-Fd
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 11:39:14 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57944
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1jlwZZ-0007bt-6q
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 11:35:27 -0400
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jlwdE-0008S2-1r
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 11:39:14 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592494524;
+ s=mimecast20190719; t=1592494751;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ttfQhqAJ59sT4RarvibgBtYM0IyzQZUtgmArPyKa6q4=;
- b=SrbD/gySGBr7pw85aFMgnH6bUeM8gR0qVvx/7MieL6d+d59IU/2aSbWFzzneVZnqqmvtz6
- V0WYAilHulOeZR1UB0UQ1Ds/uwl99wXo+Od6fo2l5SuVsHR4cNPrMolkXmvdH4BOiLndii
- VOCHoaz3Q2gctF3gMfi+9SpT0gg3DrI=
+ bh=8SKwsg7fjhgUuUg0jcYJc5w5X/OZ14mQSnvNpy01/2M=;
+ b=QFJZtDqzb8uFkmG9VKkxTKVZPe4t7pA+kTpF6gqXWN0zUeuFtODqRy5aDNCz1Pl6tHOpHO
+ XAKQ5skeWRJS/IC7UqGhSQGxCyEMN0Z0L36/ovDupmWLrtEU/Tllk3ZSh1/d7wXboAlFBQ
+ BCQ5dQWvxT+wacdWgogncuFAignTEhI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-227-_5JReB47PlGEE02BNutWhA-1; Thu, 18 Jun 2020 11:35:20 -0400
-X-MC-Unique: _5JReB47PlGEE02BNutWhA-1
+ us-mta-187-BhulzFeEOzChB2N4WftpyA-1; Thu, 18 Jun 2020 11:39:07 -0400
+X-MC-Unique: BhulzFeEOzChB2N4WftpyA-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3205310CE782;
- Thu, 18 Jun 2020 15:35:19 +0000 (UTC)
-Received: from localhost (ovpn-113-212.ams2.redhat.com [10.36.113.212])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D526F1E2267;
- Thu, 18 Jun 2020 15:35:17 +0000 (UTC)
-Date: Thu, 18 Jun 2020 16:35:16 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Subject: Re: [PATCH 2/2] scripts/tracetool: Add plainlog backend
-Message-ID: <20200618153516.GE1956319@stefanha-x1.localdomain>
-References: <20200617134505.9D06E7482D3@zero.eik.bme.hu>
- <20200618073124.GA1956319@stefanha-x1.localdomain>
- <20200618090741.GC671599@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9DAE0107ACCA;
+ Thu, 18 Jun 2020 15:39:05 +0000 (UTC)
+Received: from localhost (ovpn-113-9.ams2.redhat.com [10.36.113.9])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 19C3F1E226B;
+ Thu, 18 Jun 2020 15:39:04 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: [PULL 3/7] vfio-ccw: Add support for the schib region
+Date: Thu, 18 Jun 2020 17:38:50 +0200
+Message-Id: <20200618153854.271723-4-cohuck@redhat.com>
+In-Reply-To: <20200618153854.271723-1-cohuck@redhat.com>
+References: <20200618153854.271723-1-cohuck@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200618090741.GC671599@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="pY3vCvL1qV+PayAL"
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=stefanha@redhat.com;
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=cohuck@redhat.com;
  helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 01:47:12
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -83,7 +78,7 @@ X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,123 +91,248 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org
+Cc: Eric Farman <farman@linux.ibm.com>, qemu-s390x@nongnu.org,
+ Farhan Ali <alifm@linux.ibm.com>, qemu-devel@nongnu.org,
+ Cornelia Huck <cohuck@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---pY3vCvL1qV+PayAL
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+From: Farhan Ali <alifm@linux.ibm.com>
 
-On Thu, Jun 18, 2020 at 10:07:41AM +0100, Daniel P. Berrang=E9 wrote:
-> On Thu, Jun 18, 2020 at 08:31:24AM +0100, Stefan Hajnoczi wrote:
-> > On Wed, Jun 17, 2020 at 03:36:29PM +0200, BALATON Zoltan wrote:
-> > > Add a backend that is the same as the log backend but omits the
-> > > process id and timestamp so logs are easier to read and diff-able.
-> > >=20
-> > > Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-> > > ---
-> > >  scripts/tracetool/backend/plainlog.py | 48 +++++++++++++++++++++++++=
-++
-> > >  1 file changed, 48 insertions(+)
-> > >  create mode 100644 scripts/tracetool/backend/plainlog.py
-> > >=20
-> > > diff --git a/scripts/tracetool/backend/plainlog.py b/scripts/tracetoo=
-l/backend/plainlog.py
-> > > new file mode 100644
-> > > index 0000000000..40bbfa6d76
-> > > --- /dev/null
-> > > +++ b/scripts/tracetool/backend/plainlog.py
-> > > @@ -0,0 +1,48 @@
-> > > +# -*- coding: utf-8 -*-
-> > > +
-> > > +"""
-> > > +Stderr built-in backend, plain log without proc ID and time.
-> > > +"""
-> > > +
-> > > +__author__     =3D "Llu????s Vilanova <vilanova@ac.upc.edu>"
-> > > +__copyright__  =3D "Copyright 2012-2017, Llu????s Vilanova <vilanova=
-@ac.upc.edu>"
-> >=20
-> > There is a Unicode issue here, Llu=EDs' name is not printed correctly.
-> >=20
-> > > +__license__    =3D "GPL version 2 or (at your option) any later vers=
-ion"
-> > > +
-> > > +__maintainer__ =3D "Stefan Hajnoczi"
-> > > +__email__      =3D "stefanha@linux.vnet.ibm.com"
-> > > +
-> > > +
-> > > +from tracetool import out
-> > > +
-> > > +
-> > > +PUBLIC =3D True
-> > > +
-> > > +
-> > > +def generate_h_begin(events, group):
-> > > +    out('#include "qemu/log-for-trace.h"',
-> > > +        '')
-> > > +
-> > > +
-> > > +def generate_h(event, group):
-> > > +    argnames =3D ", ".join(event.args.names())
-> > > +    if len(event.args) > 0:
-> > > +        argnames =3D ", " + argnames
-> > > +
-> > > +    if "vcpu" in event.properties:
-> > > +        # already checked on the generic format code
-> > > +        cond =3D "true"
-> > > +    else:
-> > > +        cond =3D "trace_event_get_state(%s)" % ("TRACE_" + event.nam=
-e.upper())
-> > > +
-> > > +    out('    if (%(cond)s && qemu_loglevel_mask(LOG_TRACE)) {',
-> > > +        '        qemu_log("%(name)s " %(fmt)s "\\n" %(argnames)s);',
-> > > +        '    }',
-> > > +        cond=3Dcond,
-> > > +        name=3Devent.name,
-> > > +        fmt=3Devent.fmt.rstrip("\n"),
-> > > +        argnames=3Dargnames)
-> >=20
-> > It is not necessary to introduce a new backend. There could be an optio=
-n
-> > that controls whether or not the timestamp/tid is printed. For example,
-> > -trace timestamp=3Doff or maybe the timestmap/tid can be integrated int=
-o
-> > qemu_log() itself so that it's used more consistently and a -d timestam=
-p
-> > option enables it.
->=20
-> QEMU already has a "-msg timestamp=3Don|off" option that controls whether
-> error reports on stderr get a timestamp. I think it is probably reasonabl=
-e
-> for this existing option to apply to anything QEMU prints to stdout/err,
-> and thus we could wire it up for qemu_log().
+The schib region can be used to obtain the latest SCHIB from the host
+passthrough subchannel. Since the guest SCHIB is virtualized,
+we currently only update the path related information so that the
+guest is aware of any path related changes when it issues the
+'stsch' instruction.
 
-I thought about that but the features are somewhat unrelated.
+Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
+Signed-off-by: Eric Farman <farman@linux.ibm.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Message-Id: <20200505125757.98209-4-farman@linux.ibm.com>
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+---
+ hw/s390x/css.c              | 13 ++++++--
+ hw/s390x/s390-ccw.c         | 21 +++++++++++++
+ hw/vfio/ccw.c               | 63 +++++++++++++++++++++++++++++++++++++
+ include/hw/s390x/css.h      |  3 +-
+ include/hw/s390x/s390-ccw.h |  1 +
+ target/s390x/ioinst.c       |  3 +-
+ 6 files changed, 99 insertions(+), 5 deletions(-)
 
-If we unify them, how about making the timestamp/tid apply to *all*
-qemu_log() output, not just tracing?
-
-Stefan
-
---pY3vCvL1qV+PayAL
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl7ribQACgkQnKSrs4Gr
-c8g4cQf/VYK88ehewD7DAsjXVw8yKpuzMYol1yA4u6pJWh0qhUqpD05/p6W66kzG
-POD8hIDNMaY9C9gKFSX7yWr25NAV/ZAZin6R4WxVRYE+VQImw9pV386MhP/m1GuX
-t/lc9S1GRZ3X1drfG5n3Pd0PmxyrSh1KCidhyTKCWY3u/mEsVtONqRqgHbR66x6k
-aaGhY+uq7k7AtS76Bz4QG+bRQjvMayu1pXVw+uSY/XwJW1pBXdLGr8IDjVcnkwPk
-gp68i7dgSV2dzCVsWGnw6OadotFrF/nDA89D0tkKdI8bYCcMA4SckI4ttWMq3WW5
-oV39IpLpmCnI2fGhGxPCIk+UVm02FA==
-=8tsd
------END PGP SIGNATURE-----
-
---pY3vCvL1qV+PayAL--
+diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+index 5d8e08667e6f..a44faa3549b4 100644
+--- a/hw/s390x/css.c
++++ b/hw/s390x/css.c
+@@ -1335,11 +1335,20 @@ static void copy_schib_to_guest(SCHIB *dest, const SCHIB *src)
+     }
+ }
+ 
+-int css_do_stsch(SubchDev *sch, SCHIB *schib)
++IOInstEnding css_do_stsch(SubchDev *sch, SCHIB *schib)
+ {
++    int ret;
++
++    /*
++     * For some subchannels, we may want to update parts of
++     * the schib (e.g., update path masks from the host device
++     * for passthrough subchannels).
++     */
++    ret = s390_ccw_store(sch);
++
+     /* Use current status. */
+     copy_schib_to_guest(schib, &sch->curr_status);
+-    return 0;
++    return ret;
+ }
+ 
+ static void copy_pmcw_from_guest(PMCW *dest, const PMCW *src)
+diff --git a/hw/s390x/s390-ccw.c b/hw/s390x/s390-ccw.c
+index c48510f9e543..b497571863f6 100644
+--- a/hw/s390x/s390-ccw.c
++++ b/hw/s390x/s390-ccw.c
+@@ -51,6 +51,27 @@ int s390_ccw_clear(SubchDev *sch)
+     return cdc->handle_clear(sch);
+ }
+ 
++IOInstEnding s390_ccw_store(SubchDev *sch)
++{
++    S390CCWDeviceClass *cdc = NULL;
++    int ret = IOINST_CC_EXPECTED;
++
++    /*
++     * This code is called for both virtual and passthrough devices,
++     * but only applies to to the latter.  This ugly check makes that
++     * distinction for us.
++     */
++    if (object_dynamic_cast(OBJECT(sch->driver_data), TYPE_S390_CCW)) {
++        cdc = S390_CCW_DEVICE_GET_CLASS(sch->driver_data);
++    }
++
++    if (cdc && cdc->handle_store) {
++        ret = cdc->handle_store(sch);
++    }
++
++    return ret;
++}
++
+ static void s390_ccw_get_dev_info(S390CCWDevice *cdev,
+                                   char *sysfsdev,
+                                   Error **errp)
+diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
+index ca06213d0375..f5a5e038aa45 100644
+--- a/hw/vfio/ccw.c
++++ b/hw/vfio/ccw.c
+@@ -41,6 +41,9 @@ struct VFIOCCWDevice {
+     uint64_t async_cmd_region_size;
+     uint64_t async_cmd_region_offset;
+     struct ccw_cmd_region *async_cmd_region;
++    uint64_t schib_region_size;
++    uint64_t schib_region_offset;
++    struct ccw_schib_region *schib_region;
+     EventNotifier io_notifier;
+     bool force_orb_pfch;
+     bool warned_orb_pfch;
+@@ -116,6 +119,51 @@ again:
+     }
+ }
+ 
++static IOInstEnding vfio_ccw_handle_store(SubchDev *sch)
++{
++    S390CCWDevice *cdev = sch->driver_data;
++    VFIOCCWDevice *vcdev = DO_UPCAST(VFIOCCWDevice, cdev, cdev);
++    SCHIB *schib = &sch->curr_status;
++    struct ccw_schib_region *region = vcdev->schib_region;
++    SCHIB *s;
++    int ret;
++
++    /* schib region not available so nothing else to do */
++    if (!region) {
++        return IOINST_CC_EXPECTED;
++    }
++
++    memset(region, 0, sizeof(*region));
++    ret = pread(vcdev->vdev.fd, region, vcdev->schib_region_size,
++                vcdev->schib_region_offset);
++
++    if (ret == -1) {
++        /*
++         * Device is probably damaged, but store subchannel does not
++         * have a nonzero cc defined for this scenario.  Log an error,
++         * and presume things are otherwise fine.
++         */
++        error_report("vfio-ccw: store region read failed with errno=%d", errno);
++        return IOINST_CC_EXPECTED;
++    }
++
++    /*
++     * Selectively copy path-related bits of the SCHIB,
++     * rather than copying the entire struct.
++     */
++    s = (SCHIB *)region->schib_area;
++    schib->pmcw.pnom = s->pmcw.pnom;
++    schib->pmcw.lpum = s->pmcw.lpum;
++    schib->pmcw.pam = s->pmcw.pam;
++    schib->pmcw.pom = s->pmcw.pom;
++
++    if (s->scsw.flags & SCSW_FLAGS_MASK_PNO) {
++        schib->scsw.flags |= SCSW_FLAGS_MASK_PNO;
++    }
++
++    return IOINST_CC_EXPECTED;
++}
++
+ static int vfio_ccw_handle_clear(SubchDev *sch)
+ {
+     S390CCWDevice *cdev = sch->driver_data;
+@@ -382,10 +430,23 @@ static void vfio_ccw_get_region(VFIOCCWDevice *vcdev, Error **errp)
+         vcdev->async_cmd_region = g_malloc0(info->size);
+     }
+ 
++    ret = vfio_get_dev_region_info(vdev, VFIO_REGION_TYPE_CCW,
++                                   VFIO_REGION_SUBTYPE_CCW_SCHIB, &info);
++    if (!ret) {
++        vcdev->schib_region_size = info->size;
++        if (sizeof(*vcdev->schib_region) != vcdev->schib_region_size) {
++            error_setg(errp, "vfio: Unexpected size of the schib region");
++            goto out_err;
++        }
++        vcdev->schib_region_offset = info->offset;
++        vcdev->schib_region = g_malloc(info->size);
++    }
++
+     g_free(info);
+     return;
+ 
+ out_err:
++    g_free(vcdev->schib_region);
+     g_free(vcdev->async_cmd_region);
+     g_free(vcdev->io_region);
+     g_free(info);
+@@ -394,6 +455,7 @@ out_err:
+ 
+ static void vfio_ccw_put_region(VFIOCCWDevice *vcdev)
+ {
++    g_free(vcdev->schib_region);
+     g_free(vcdev->async_cmd_region);
+     g_free(vcdev->io_region);
+ }
+@@ -569,6 +631,7 @@ static void vfio_ccw_class_init(ObjectClass *klass, void *data)
+     cdc->handle_request = vfio_ccw_handle_request;
+     cdc->handle_halt = vfio_ccw_handle_halt;
+     cdc->handle_clear = vfio_ccw_handle_clear;
++    cdc->handle_store = vfio_ccw_handle_store;
+ }
+ 
+ static const TypeInfo vfio_ccw_info = {
+diff --git a/include/hw/s390x/css.h b/include/hw/s390x/css.h
+index f46bcafb16c3..7e3a5e743314 100644
+--- a/include/hw/s390x/css.h
++++ b/include/hw/s390x/css.h
+@@ -218,6 +218,7 @@ IOInstEnding do_subchannel_work_passthrough(SubchDev *sub);
+ 
+ int s390_ccw_halt(SubchDev *sch);
+ int s390_ccw_clear(SubchDev *sch);
++IOInstEnding s390_ccw_store(SubchDev *sch);
+ 
+ typedef enum {
+     CSS_IO_ADAPTER_VIRTIO = 0,
+@@ -242,7 +243,7 @@ SubchDev *css_find_subch(uint8_t m, uint8_t cssid, uint8_t ssid,
+                          uint16_t schid);
+ bool css_subch_visible(SubchDev *sch);
+ void css_conditional_io_interrupt(SubchDev *sch);
+-int css_do_stsch(SubchDev *sch, SCHIB *schib);
++IOInstEnding css_do_stsch(SubchDev *sch, SCHIB *schib);
+ bool css_schid_final(int m, uint8_t cssid, uint8_t ssid, uint16_t schid);
+ IOInstEnding css_do_msch(SubchDev *sch, const SCHIB *schib);
+ IOInstEnding css_do_xsch(SubchDev *sch);
+diff --git a/include/hw/s390x/s390-ccw.h b/include/hw/s390x/s390-ccw.h
+index 7f27bc2f5314..d8e08b5f4cd9 100644
+--- a/include/hw/s390x/s390-ccw.h
++++ b/include/hw/s390x/s390-ccw.h
+@@ -37,6 +37,7 @@ typedef struct S390CCWDeviceClass {
+     IOInstEnding (*handle_request) (SubchDev *sch);
+     int (*handle_halt) (SubchDev *sch);
+     int (*handle_clear) (SubchDev *sch);
++    IOInstEnding (*handle_store) (SubchDev *sch);
+ } S390CCWDeviceClass;
+ 
+ #endif
+diff --git a/target/s390x/ioinst.c b/target/s390x/ioinst.c
+index 7a14c52c123b..a412926d2780 100644
+--- a/target/s390x/ioinst.c
++++ b/target/s390x/ioinst.c
+@@ -292,8 +292,7 @@ void ioinst_handle_stsch(S390CPU *cpu, uint64_t reg1, uint32_t ipb,
+     sch = css_find_subch(m, cssid, ssid, schid);
+     if (sch) {
+         if (css_subch_visible(sch)) {
+-            css_do_stsch(sch, &schib);
+-            cc = 0;
++            cc = css_do_stsch(sch, &schib);
+         } else {
+             /* Indicate no more subchannels in this css/ss */
+             cc = 3;
+-- 
+2.25.4
 
 
