@@ -2,83 +2,84 @@ Return-Path: <SRS0=FaGC=77=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B273C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 13:36:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C088CC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 13:36:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 57E4F207D8
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 13:36:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8B7C4207D8
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 13:36:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Je00Zy1K"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57E4F207D8
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qh3tlPTR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B7C4207D8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60120 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60666 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlui7-0006a1-UI
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 09:36:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40836)
+	id 1jluiH-0006sh-PN
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 09:36:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40614)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jluVn-0007nv-7S
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 09:23:23 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:29709
+ id 1jluVR-0006hF-1g
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 09:23:01 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:59721
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jluVl-0005sO-4J
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 09:23:22 -0400
+ id 1jluVP-0005nw-3o
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 09:23:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592486600;
+ s=mimecast20190719; t=1592486578;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
- references:references; bh=cyQeNqIxnO+V8kgMoh6CmEf2K7MyHQFKaX0InhJMRGU=;
- b=Je00Zy1KvyT+rzpPxquJ/lJFhz6UpuGy7sRGN+7E2TEjDTeOcG/KE5PuTu2Zb7bzjU+GaE
- IZe/XCzMx9Viok71jotu0gdGWn/UK1ESNEvuQ3fcGrVsfilvtVnSAbyXYYz+cPXzYN57fi
- A4OqcvsFQNqtwbQIlYrY+V4wTJR0rpw=
+ references:references; bh=0vqoFtVgK7SIrhEAWWD1OBM8pgsuXNy35dko35zy3ts=;
+ b=Qh3tlPTRXcJJ3xeP35obMwf0SUzBbTpM4eHGR1lNTcN0O/ekETSTX9U2ro+0Ax/aiUe90S
+ oEqGEAM9c7pd9xIbpN7Y3WgAdvT/35cSTFyB57mtkElqkYHHsRGo0gcJ4ZLeN6fwwPo7yI
+ goBsdxu1+pTtpts1RSfGu490a3CvnLk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-294-_lN67WvSNn-1cZ5M8j_V0Q-1; Thu, 18 Jun 2020 09:23:18 -0400
-X-MC-Unique: _lN67WvSNn-1cZ5M8j_V0Q-1
+ us-mta-475-uf3ruA8MPQmQoIsJ6Y33yQ-1; Thu, 18 Jun 2020 09:22:56 -0400
+X-MC-Unique: uf3ruA8MPQmQoIsJ6Y33yQ-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 53190EC1A3;
- Thu, 18 Jun 2020 13:23:17 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7287B102C859;
+ Thu, 18 Jun 2020 13:22:49 +0000 (UTC)
 Received: from jason-ThinkPad-T430s.redhat.com (ovpn-12-109.pek2.redhat.com
  [10.72.12.109])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6A0045BAC1;
- Thu, 18 Jun 2020 13:23:15 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CE8FA5BAC0;
+ Thu, 18 Jun 2020 13:22:47 +0000 (UTC)
 From: Jason Wang <jasowang@redhat.com>
 To: peter.maydell@linaro.org,
 	qemu-devel@nongnu.org
-Subject: [PULL V2 26/33] net/colo-compare.c: Fix deadlock in compare_chr_send
-Date: Thu, 18 Jun 2020 21:21:41 +0800
-Message-Id: <1592486508-6135-27-git-send-email-jasowang@redhat.com>
+Subject: [PULL V2 16/33] net: cadence_gem: Move tx/rx packet buffert to
+ CadenceGEMState
+Date: Thu, 18 Jun 2020 21:21:31 +0800
+Message-Id: <1592486508-6135-17-git-send-email-jasowang@redhat.com>
 In-Reply-To: <1592486508-6135-1-git-send-email-jasowang@redhat.com>
 References: <1592486508-6135-1-git-send-email-jasowang@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=jasowang@redhat.com;
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=jasowang@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 01:32:18
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 00:57:40
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -92,378 +93,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhang Chen <chen.zhang@intel.com>, Jason Wang <jasowang@redhat.com>,
- Lukas Straub <lukasstraub2@web.de>
+Cc: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>,
+ Jason Wang <jasowang@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Lukas Straub <lukasstraub2@web.de>
+From: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
 
-The chr_out chardev is connected to a filter-redirector
-running in the main loop. qemu_chr_fe_write_all might block
-here in compare_chr_send if the (socket-)buffer is full.
-If another filter-redirector in the main loop want's to
-send data to chr_pri_in it might also block if the buffer
-is full. This leads to a deadlock because both event loops
-get blocked.
+Moving this buffers to CadenceGEMState, as their size will be increased
+more when JUMBO frames support is added.
 
-Fix this by converting compare_chr_send to a coroutine and
-putting the packets in a send queue.
-
-Signed-off-by: Lukas Straub <lukasstraub2@web.de>
-Reviewed-by: Zhang Chen <chen.zhang@intel.com>
-Tested-by: Zhang Chen <chen.zhang@intel.com>
-Signed-off-by: Zhang Chen <chen.zhang@intel.com>
+Signed-off-by: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- net/colo-compare.c | 193 ++++++++++++++++++++++++++++++++++++++++-------------
- net/colo.c         |   7 ++
- net/colo.h         |   1 +
- 3 files changed, 156 insertions(+), 45 deletions(-)
+ hw/net/cadence_gem.c         | 38 +++++++++++++++++---------------------
+ include/hw/net/cadence_gem.h |  4 ++++
+ 2 files changed, 21 insertions(+), 21 deletions(-)
 
-diff --git a/net/colo-compare.c b/net/colo-compare.c
-index e557da7..62ecd38 100644
---- a/net/colo-compare.c
-+++ b/net/colo-compare.c
-@@ -32,6 +32,9 @@
- #include "migration/migration.h"
- #include "util.h"
- 
-+#include "block/aio-wait.h"
-+#include "qemu/coroutine.h"
-+
- #define TYPE_COLO_COMPARE "colo-compare"
- #define COLO_COMPARE(obj) \
-     OBJECT_CHECK(CompareState, (obj), TYPE_COLO_COMPARE)
-@@ -77,6 +80,23 @@ static int event_unhandled_count;
-  *                    |packet  |  |packet  +    |packet  | |packet  +
-  *                    +--------+  +--------+    +--------+ +--------+
+diff --git a/hw/net/cadence_gem.c b/hw/net/cadence_gem.c
+index 2e183b5..247a52f 100644
+--- a/hw/net/cadence_gem.c
++++ b/hw/net/cadence_gem.c
+@@ -928,17 +928,14 @@ static void gem_get_rx_desc(CadenceGEMState *s, int q)
   */
-+
-+typedef struct SendCo {
-+    Coroutine *co;
-+    struct CompareState *s;
-+    CharBackend *chr;
-+    GQueue send_list;
-+    bool notify_remote_frame;
-+    bool done;
-+    int ret;
-+} SendCo;
-+
-+typedef struct SendEntry {
-+    uint32_t size;
-+    uint32_t vnet_hdr_len;
-+    uint8_t *buf;
-+} SendEntry;
-+
- typedef struct CompareState {
-     Object parent;
- 
-@@ -91,6 +111,8 @@ typedef struct CompareState {
-     SocketReadState pri_rs;
-     SocketReadState sec_rs;
-     SocketReadState notify_rs;
-+    SendCo out_sendco;
-+    SendCo notify_sendco;
-     bool vnet_hdr;
-     uint32_t compare_timeout;
-     uint32_t expired_scan_cycle;
-@@ -124,10 +146,11 @@ enum {
- 
- 
- static int compare_chr_send(CompareState *s,
--                            const uint8_t *buf,
-+                            uint8_t *buf,
-                             uint32_t size,
-                             uint32_t vnet_hdr_len,
--                            bool notify_remote_frame);
-+                            bool notify_remote_frame,
-+                            bool zero_copy);
- 
- static bool packet_matches_str(const char *str,
-                                const uint8_t *buf,
-@@ -145,7 +168,7 @@ static void notify_remote_frame(CompareState *s)
-     char msg[] = "DO_CHECKPOINT";
-     int ret = 0;
- 
--    ret = compare_chr_send(s, (uint8_t *)msg, strlen(msg), 0, true);
-+    ret = compare_chr_send(s, (uint8_t *)msg, strlen(msg), 0, true, false);
-     if (ret < 0) {
-         error_report("Notify Xen COLO-frame failed");
-     }
-@@ -272,12 +295,13 @@ static void colo_release_primary_pkt(CompareState *s, Packet *pkt)
-                            pkt->data,
-                            pkt->size,
-                            pkt->vnet_hdr_len,
--                           false);
-+                           false,
-+                           true);
-     if (ret < 0) {
-         error_report("colo send primary packet failed");
-     }
-     trace_colo_compare_main("packet same and release packet");
--    packet_destroy(pkt, NULL);
-+    packet_destroy_partial(pkt, NULL);
- }
- 
- /*
-@@ -699,65 +723,115 @@ static void colo_compare_connection(void *opaque, void *user_data)
-     }
- }
- 
--static int compare_chr_send(CompareState *s,
--                            const uint8_t *buf,
--                            uint32_t size,
--                            uint32_t vnet_hdr_len,
--                            bool notify_remote_frame)
-+static void coroutine_fn _compare_chr_send(void *opaque)
+ static ssize_t gem_receive(NetClientState *nc, const uint8_t *buf, size_t size)
  {
-+    SendCo *sendco = opaque;
-+    CompareState *s = sendco->s;
-     int ret = 0;
--    uint32_t len = htonl(size);
+-    CadenceGEMState *s;
++    CadenceGEMState *s = qemu_get_nic_opaque(nc);
+     unsigned   rxbufsize, bytes_to_copy;
+     unsigned   rxbuf_offset;
+-    uint8_t    rxbuf[2048];
+     uint8_t   *rxbuf_ptr;
+     bool first_desc = true;
+     int maf;
+     int q = 0;
  
--    if (!size) {
--        return 0;
--    }
-+    while (!g_queue_is_empty(&sendco->send_list)) {
-+        SendEntry *entry = g_queue_pop_tail(&sendco->send_list);
-+        uint32_t len = htonl(entry->size);
- 
--    if (notify_remote_frame) {
--        ret = qemu_chr_fe_write_all(&s->chr_notify_dev,
--                                    (uint8_t *)&len,
--                                    sizeof(len));
--    } else {
--        ret = qemu_chr_fe_write_all(&s->chr_out, (uint8_t *)&len, sizeof(len));
--    }
-+        ret = qemu_chr_fe_write_all(sendco->chr, (uint8_t *)&len, sizeof(len));
- 
--    if (ret != sizeof(len)) {
--        goto err;
--    }
-+        if (ret != sizeof(len)) {
-+            g_free(entry->buf);
-+            g_slice_free(SendEntry, entry);
-+            goto err;
-+        }
- 
--    if (s->vnet_hdr) {
--        /*
--         * We send vnet header len make other module(like filter-redirector)
--         * know how to parse net packet correctly.
--         */
--        len = htonl(vnet_hdr_len);
-+        if (!sendco->notify_remote_frame && s->vnet_hdr) {
-+            /*
-+             * We send vnet header len make other module(like filter-redirector)
-+             * know how to parse net packet correctly.
-+             */
-+            len = htonl(entry->vnet_hdr_len);
- 
--        if (!notify_remote_frame) {
--            ret = qemu_chr_fe_write_all(&s->chr_out,
-+            ret = qemu_chr_fe_write_all(sendco->chr,
-                                         (uint8_t *)&len,
-                                         sizeof(len));
-+
-+            if (ret != sizeof(len)) {
-+                g_free(entry->buf);
-+                g_slice_free(SendEntry, entry);
-+                goto err;
-+            }
-         }
- 
--        if (ret != sizeof(len)) {
-+        ret = qemu_chr_fe_write_all(sendco->chr,
-+                                    (uint8_t *)entry->buf,
-+                                    entry->size);
-+
-+        if (ret != entry->size) {
-+            g_free(entry->buf);
-+            g_slice_free(SendEntry, entry);
-             goto err;
-         }
-+
-+        g_free(entry->buf);
-+        g_slice_free(SendEntry, entry);
-     }
- 
-+    sendco->ret = 0;
-+    goto out;
-+
-+err:
-+    while (!g_queue_is_empty(&sendco->send_list)) {
-+        SendEntry *entry = g_queue_pop_tail(&sendco->send_list);
-+        g_free(entry->buf);
-+        g_slice_free(SendEntry, entry);
-+    }
-+    sendco->ret = ret < 0 ? ret : -EIO;
-+out:
-+    sendco->co = NULL;
-+    sendco->done = true;
-+    aio_wait_kick();
-+}
-+
-+static int compare_chr_send(CompareState *s,
-+                            uint8_t *buf,
-+                            uint32_t size,
-+                            uint32_t vnet_hdr_len,
-+                            bool notify_remote_frame,
-+                            bool zero_copy)
-+{
-+    SendCo *sendco;
-+    SendEntry *entry;
-+
-     if (notify_remote_frame) {
--        ret = qemu_chr_fe_write_all(&s->chr_notify_dev,
--                                    (uint8_t *)buf,
--                                    size);
-+        sendco = &s->notify_sendco;
+-    s = qemu_get_nic_opaque(nc);
+-
+     /* Is this destination MAC address "for us" ? */
+     maf = gem_mac_address_filter(s, buf);
+     if (maf == GEM_RX_REJECT) {
+@@ -994,19 +991,19 @@ static ssize_t gem_receive(NetClientState *nc, const uint8_t *buf, size_t size)
      } else {
--        ret = qemu_chr_fe_write_all(&s->chr_out, (uint8_t *)buf, size);
-+        sendco = &s->out_sendco;
-     }
+         unsigned crc_val;
  
--    if (ret != size) {
--        goto err;
-+    if (!size) {
-+        return 0;
-     }
- 
--    return 0;
-+    entry = g_slice_new(SendEntry);
-+    entry->size = size;
-+    entry->vnet_hdr_len = vnet_hdr_len;
-+    if (zero_copy) {
-+        entry->buf = buf;
-+    } else {
-+        entry->buf = g_malloc(size);
-+        memcpy(entry->buf, buf, size);
-+    }
-+    g_queue_push_head(&sendco->send_list, entry);
-+
-+    if (sendco->done) {
-+        sendco->co = qemu_coroutine_create(_compare_chr_send, sendco);
-+        sendco->done = false;
-+        qemu_coroutine_enter(sendco->co);
-+        if (sendco->done) {
-+            /* report early errors */
-+            return sendco->ret;
-+        }
-+    }
- 
--err:
--    return ret < 0 ? ret : -EIO;
-+    /* assume success */
-+    return 0;
- }
- 
- static int compare_chr_can_read(void *opaque)
-@@ -1063,6 +1137,7 @@ static void compare_pri_rs_finalize(SocketReadState *pri_rs)
-                          pri_rs->buf,
-                          pri_rs->packet_len,
-                          pri_rs->vnet_hdr_len,
-+                         false,
-                          false);
-     } else {
-         /* compare packet in the specified connection */
-@@ -1093,7 +1168,7 @@ static void compare_notify_rs_finalize(SocketReadState *notify_rs)
-     if (packet_matches_str("COLO_USERSPACE_PROXY_INIT",
-                            notify_rs->buf,
-                            notify_rs->packet_len)) {
--        ret = compare_chr_send(s, (uint8_t *)msg, strlen(msg), 0, true);
-+        ret = compare_chr_send(s, (uint8_t *)msg, strlen(msg), 0, true, false);
-         if (ret < 0) {
-             error_report("Notify Xen COLO-frame INIT failed");
+-        if (size > sizeof(rxbuf) - sizeof(crc_val)) {
+-            size = sizeof(rxbuf) - sizeof(crc_val);
++        if (size > MAX_FRAME_SIZE - sizeof(crc_val)) {
++            size = MAX_FRAME_SIZE - sizeof(crc_val);
          }
-@@ -1199,6 +1274,20 @@ static void colo_compare_complete(UserCreatable *uc, Error **errp)
+         bytes_to_copy = size;
+         /* The application wants the FCS field, which QEMU does not provide.
+          * We must try and calculate one.
+          */
  
-     QTAILQ_INSERT_TAIL(&net_compares, s, next);
+-        memcpy(rxbuf, buf, size);
+-        memset(rxbuf + size, 0, sizeof(rxbuf) - size);
+-        rxbuf_ptr = rxbuf;
+-        crc_val = cpu_to_le32(crc32(0, rxbuf, MAX(size, 60)));
+-        memcpy(rxbuf + size, &crc_val, sizeof(crc_val));
++        memcpy(s->rx_packet, buf, size);
++        memset(s->rx_packet + size, 0, MAX_FRAME_SIZE - size);
++        rxbuf_ptr = s->rx_packet;
++        crc_val = cpu_to_le32(crc32(0, s->rx_packet, MAX(size, 60)));
++        memcpy(s->rx_packet + size, &crc_val, sizeof(crc_val));
  
-+    s->out_sendco.s = s;
-+    s->out_sendco.chr = &s->chr_out;
-+    s->out_sendco.notify_remote_frame = false;
-+    s->out_sendco.done = true;
-+    g_queue_init(&s->out_sendco.send_list);
+         bytes_to_copy += 4;
+         size += 4;
+@@ -1152,7 +1149,6 @@ static void gem_transmit(CadenceGEMState *s)
+ {
+     uint32_t desc[DESC_MAX_NUM_WORDS];
+     hwaddr packet_desc_addr;
+-    uint8_t     tx_packet[2048];
+     uint8_t     *p;
+     unsigned    total_bytes;
+     int q = 0;
+@@ -1168,7 +1164,7 @@ static void gem_transmit(CadenceGEMState *s)
+      * Packets scattered across multiple descriptors are gathered to this
+      * one contiguous buffer first.
+      */
+-    p = tx_packet;
++    p = s->tx_packet;
+     total_bytes = 0;
+ 
+     for (q = s->num_priority_queues - 1; q >= 0; q--) {
+@@ -1198,12 +1194,12 @@ static void gem_transmit(CadenceGEMState *s)
+                 break;
+             }
+ 
+-            if (tx_desc_get_length(desc) > sizeof(tx_packet) -
+-                                               (p - tx_packet)) {
++            if (tx_desc_get_length(desc) > MAX_FRAME_SIZE -
++                                               (p - s->tx_packet)) {
+                 DB_PRINT("TX descriptor @ 0x%" HWADDR_PRIx \
+                          " too large: size 0x%x space 0x%zx\n",
+                          packet_desc_addr, tx_desc_get_length(desc),
+-                         sizeof(tx_packet) - (p - tx_packet));
++                         MAX_FRAME_SIZE - (p - s->tx_packet));
+                 break;
+             }
+ 
+@@ -1248,24 +1244,24 @@ static void gem_transmit(CadenceGEMState *s)
+ 
+                 /* Is checksum offload enabled? */
+                 if (s->regs[GEM_DMACFG] & GEM_DMACFG_TXCSUM_OFFL) {
+-                    net_checksum_calculate(tx_packet, total_bytes);
++                    net_checksum_calculate(s->tx_packet, total_bytes);
+                 }
+ 
+                 /* Update MAC statistics */
+-                gem_transmit_updatestats(s, tx_packet, total_bytes);
++                gem_transmit_updatestats(s, s->tx_packet, total_bytes);
+ 
+                 /* Send the packet somewhere */
+                 if (s->phy_loop || (s->regs[GEM_NWCTRL] &
+                                     GEM_NWCTRL_LOCALLOOP)) {
+-                    gem_receive(qemu_get_queue(s->nic), tx_packet,
++                    gem_receive(qemu_get_queue(s->nic), s->tx_packet,
+                                 total_bytes);
+                 } else {
+-                    qemu_send_packet(qemu_get_queue(s->nic), tx_packet,
++                    qemu_send_packet(qemu_get_queue(s->nic), s->tx_packet,
+                                      total_bytes);
+                 }
+ 
+                 /* Prepare for next packet */
+-                p = tx_packet;
++                p = s->tx_packet;
+                 total_bytes = 0;
+             }
+ 
+diff --git a/include/hw/net/cadence_gem.h b/include/hw/net/cadence_gem.h
+index 5c83036..eddac70 100644
+--- a/include/hw/net/cadence_gem.h
++++ b/include/hw/net/cadence_gem.h
+@@ -40,6 +40,8 @@
+ #define MAX_TYPE1_SCREENERS             16
+ #define MAX_TYPE2_SCREENERS             16
+ 
++#define MAX_FRAME_SIZE 2048
 +
-+    if (s->notify_dev) {
-+        s->notify_sendco.s = s;
-+        s->notify_sendco.chr = &s->chr_notify_dev;
-+        s->notify_sendco.notify_remote_frame = true;
-+        s->notify_sendco.done = true;
-+        g_queue_init(&s->notify_sendco.send_list);
-+    }
-+
-     g_queue_init(&s->conn_list);
+ typedef struct CadenceGEMState {
+     /*< private >*/
+     SysBusDevice parent_obj;
+@@ -80,6 +82,8 @@ typedef struct CadenceGEMState {
  
-     qemu_mutex_init(&event_mtx);
-@@ -1225,8 +1314,9 @@ static void colo_flush_packets(void *opaque, void *user_data)
-                          pkt->data,
-                          pkt->size,
-                          pkt->vnet_hdr_len,
--                         false);
--        packet_destroy(pkt, NULL);
-+                         false,
-+                         true);
-+        packet_destroy_partial(pkt, NULL);
-     }
-     while (!g_queue_is_empty(&conn->secondary_list)) {
-         pkt = g_queue_pop_head(&conn->secondary_list);
-@@ -1297,10 +1387,23 @@ static void colo_compare_finalize(Object *obj)
-         }
-     }
+     uint8_t can_rx_state; /* Debug only */
  
-+    AioContext *ctx = iothread_get_aio_context(s->iothread);
-+    aio_context_acquire(ctx);
-+    AIO_WAIT_WHILE(ctx, !s->out_sendco.done);
-+    if (s->notify_dev) {
-+        AIO_WAIT_WHILE(ctx, !s->notify_sendco.done);
-+    }
-+    aio_context_release(ctx);
-+
-     /* Release all unhandled packets after compare thead exited */
-     g_queue_foreach(&s->conn_list, colo_flush_packets, s);
-+    AIO_WAIT_WHILE(NULL, !s->out_sendco.done);
++    uint8_t tx_packet[MAX_FRAME_SIZE];
++    uint8_t rx_packet[MAX_FRAME_SIZE];
+     uint32_t rx_desc[MAX_PRIORITY_QUEUES][DESC_MAX_NUM_WORDS];
  
-     g_queue_clear(&s->conn_list);
-+    g_queue_clear(&s->out_sendco.send_list);
-+    if (s->notify_dev) {
-+        g_queue_clear(&s->notify_sendco.send_list);
-+    }
- 
-     if (s->connection_track_table) {
-         g_hash_table_destroy(s->connection_track_table);
-diff --git a/net/colo.c b/net/colo.c
-index 8196b35..a6c66d8 100644
---- a/net/colo.c
-+++ b/net/colo.c
-@@ -185,6 +185,13 @@ void packet_destroy(void *opaque, void *user_data)
-     g_slice_free(Packet, pkt);
- }
- 
-+void packet_destroy_partial(void *opaque, void *user_data)
-+{
-+    Packet *pkt = opaque;
-+
-+    g_slice_free(Packet, pkt);
-+}
-+
- /*
-  * Clear hashtable, stop this hash growing really huge
-  */
-diff --git a/net/colo.h b/net/colo.h
-index 679314b..573ab91 100644
---- a/net/colo.h
-+++ b/net/colo.h
-@@ -102,5 +102,6 @@ bool connection_has_tracked(GHashTable *connection_track_table,
- void connection_hashtable_reset(GHashTable *connection_track_table);
- Packet *packet_new(const void *data, int size, int vnet_hdr_len);
- void packet_destroy(void *opaque, void *user_data);
-+void packet_destroy_partial(void *opaque, void *user_data);
- 
- #endif /* NET_COLO_H */
+     bool sar_active[4];
 -- 
 2.5.0
 
