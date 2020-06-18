@@ -2,86 +2,87 @@ Return-Path: <SRS0=FaGC=77=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4F0BC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 11:49:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BF95C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 11:54:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 70AE720884
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 11:49:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 03CBA20706
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 11:54:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bdKSbcPu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70AE720884
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q9JuuBeR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03CBA20706
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42814 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47310 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlt2o-0002yt-Mn
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 07:49:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36656)
+	id 1jlt7X-0006KI-7J
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 07:54:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38750)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jlt1w-0002Ll-Kf
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 07:48:28 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:43091)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jlt1v-0004dx-1g
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 07:48:28 -0400
-Received: by mail-ot1-x342.google.com with SMTP id u23so4259408otq.10
- for <qemu-devel@nongnu.org>; Thu, 18 Jun 2020 04:48:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=D22VcfyRjlQuALjFU0ECZnILjd/N66CzW7Qs8JAQl+I=;
- b=bdKSbcPujoI86voW0veg6fvB6cwyUYUn1icJB4A/TEa9GlUrWJ6/tG/fZIrj+or0Xh
- v9VGalXTiXrpH/v3SZ5MdnRei/MXxpRPapvzIHF79q3Z+kTeI52sUMtxqYY4uBKfqBTJ
- bF+9tHs4nzu02UFMDzfLSTTYqpHfUwW0U5ynt0Uoedv4jwtdrCcZA55Z6V9m38jm8DVo
- 7gtzgO2hiOPhst5DXlK1b3giKqp+DxlOJ4XYAyKk6QTEW+ADAvM8srfiu8Z6JBaMRZcg
- LjjLW8MkjXTTE0zWtqJEfXWzU+7XFsZBlPaJy6OZQUvgyFlmmbAxKeaR2NXV9jH91Dx1
- 8OSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=D22VcfyRjlQuALjFU0ECZnILjd/N66CzW7Qs8JAQl+I=;
- b=XGfO1BzgfYog9t3JH8x/ZBAdZZIYG6YCYXRE9YbMHDGuskSrdiPxrlYuZ2j+uGsJgw
- gODmPdtbGZ84LOkVR+wet8pfFL37g81ZKb5oX3hSKwgXtjNcp4U6JJCpay512UK0vpSl
- WxzBe6meqYeSD2IAKBm7aRUrED4VyanBozrn6WYtO3xoJqF587xNKWmQQYWBFYKbi0Vg
- Rtn2Bew6by+IM/pEgSdf8VN49OpO24p8WlGob10Xv6potfZckP7IMXrE21AlZGhRIt/N
- 8UOoHYg4IZMG85vPlW3dqkESztfUWzq7Dxx3UrWsIVS59PiY+mcRc2Bto4bLPuLOMUiX
- cR7w==
-X-Gm-Message-State: AOAM530oCR+VxvWjyKg7mKLATBwbp4tJWCngxPdYr2pE6fFBJpSdVxeH
- 0R2YVO5dqCFcC8Wk7o2gKyG/QI/cEtZ8/+GOitiXQA==
-X-Google-Smtp-Source: ABdhPJzhWm+BIvMXj3WN+D/womX5V2+YmxlLLVsmdGfXzLAN51pEP3+o11sgJrMBRnVpfk0bLpTTVTRFKHFS6pHWt1Q=
-X-Received: by 2002:a05:6830:18da:: with SMTP id
- v26mr3120733ote.135.1592480905704; 
- Thu, 18 Jun 2020 04:48:25 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jlt6y-0005sC-8p
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 07:53:40 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:39364
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jlt6w-0005rQ-Ei
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 07:53:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592481217;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=tFLF00rRehPIcpGNVDVjwWY/6faiQhz1ieyG3mhytKY=;
+ b=Q9JuuBeRnaEY+pJV8I+hCrVJYmTdd5Fw1U0FIehtJ+naaUBQpLuMghQz2mUCPiK+DpBT4w
+ aWyLJkGOA5ev+eVOJyWDO7fOa8OAhaKmH7hf+qw/xqWSPZaruA+qJipgDa+b38oLHTtmsK
+ ogdL0DYo+RfGvwloLwnvP7zIjt8iBEw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-24-_u3t2qDfPJiQMgeZcduvXg-1; Thu, 18 Jun 2020 07:53:35 -0400
+X-MC-Unique: _u3t2qDfPJiQMgeZcduvXg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 05E18107BA6D;
+ Thu, 18 Jun 2020 11:53:35 +0000 (UTC)
+Received: from gondolin (ovpn-113-9.ams2.redhat.com [10.36.113.9])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3773010021B3;
+ Thu, 18 Jun 2020 11:53:33 +0000 (UTC)
+Date: Thu, 18 Jun 2020 13:53:31 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Alex =?UTF-8?B?QmVubsOpZQ==?= <1883560@bugs.launchpad.net>
+Subject: Re: [Bug 1883560] [NEW] mips linux-user builds occasionly crash
+ randomly only to be fixed by a full clean re-build
+Message-ID: <20200618135331.7ec861e9.cohuck@redhat.com>
+In-Reply-To: <159223432851.7281.13140123017230519248.malonedeb@gac.canonical.com>
+References: <159223432851.7281.13140123017230519248.malonedeb@gac.canonical.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-References: <20200603011317.473934-1-richard.henderson@linaro.org>
- <20200603011317.473934-10-richard.henderson@linaro.org>
-In-Reply-To: <20200603011317.473934-10-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 18 Jun 2020 12:48:15 +0100
-Message-ID: <CAFEAcA9pgcfCrTXX6_9_ULhdiBDXhwdZw0Mv3prCcf_Po6H=wA@mail.gmail.com>
-Subject: Re: [PATCH v7 09/42] target/arm: Implement the IRG instruction
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::342;
- envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x342.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=cohuck@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 01:32:18
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,46 +95,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
- Stephen Long <steplong@quicinc.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 3 Jun 2020 at 02:13, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
-> v2: Update to 00eac5.
->     Merge choose_random_nonexcluded_tag into helper_irg since
->     that pseudo function no longer exists separately.
-> v6: Remove obsolete logical/physical tag distinction;
->     implement inline for !ATA.
-> ---
+On Mon, 15 Jun 2020 15:18:48 -0000
+Alex Benn=C3=A9e <1883560@bugs.launchpad.net> wrote:
 
-> +static int choose_nonexcluded_tag(int tag, int offset, uint16_t exclude)
-> +{
-> +    if (exclude == 0xffff) {
-> +        return 0;
-> +    }
-> +    if (offset == 0) {
-> +        while (exclude & (1 << tag)) {
-> +            tag = (tag + 1) & 15;
-> +        }
-> +    } else {
-> +        do {
-> +            do {
-> +                tag = (tag + 1) & 15;
-> +            } while (exclude & (1 << tag));
-> +        } while (--offset > 0);
-> +    }
+> Public bug reported:
+>=20
+> >From time to time I find check-tcg crashes with a one of the MIPS =20
+> binaries. The last time it crashed was running the test:
+>=20
+>   ./mips64el-linux-user/qemu-mips64el ./tests/tcg/mips64el-linux-
+> user/threadcount
+>=20
+> Inevitably after some time noodling around wondering what could be
+> causing this weird behaviour I wonder if it is a build issue. I wipe all
+> the mips* build directories, re-run configure and re-build and voila
+> problem goes away.
+>=20
+> It seems there must be some sort of build artefact which isn't being
+> properly re-generated on a build update which causes weird problems.
+> Additional data point if I:
+>=20
+>   rm -rf mips64el-linux-user
+>   ../../configure
+>   make
+>=20
+> then I see failures in mip32 builds - eg:
+>=20
+>     GEN     mipsn32el-linux-user/config-target.h
+>   In file included from /home/alex/lsrc/qemu.git/linux-user/syscall_defs.=
+h:10,
+>                    from /home/alex/lsrc/qemu.git/linux-user/qemu.h:16,
+>                    from /home/alex/lsrc/qemu.git/linux-user/linuxload.c:5=
+:
+>   /home/alex/lsrc/qemu.git/linux-user/mips64/syscall_nr.h:1: error: unter=
+minated #ifndef
+>    #ifndef LINUX_USER_MIPS64_SYSCALL_NR_H
+>=20
+>   make[1]: *** [/home/alex/lsrc/qemu.git/rules.mak:69: linux-user/linuxlo=
+ad.o] Error 1
+>   make[1]: *** Waiting for unfinished jobs....
+>=20
+> which implies there is a cross dependency between different targets
+> somewhere. If I executed:
+>=20
+>   rm -rf mips*
+>=20
+> before re-configuring and re-building then everything works again.
+>=20
+> ** Affects: qemu
+>      Importance: Undecided
+>          Status: New
+>=20
+>=20
+> ** Tags: build linux-user mips
+>=20
 
-Not the way the pseudocode is phrased, but the effect seems to
-be the same.
+FWIW, this does not seem to be a mips-only issue: I'm seeing the
+threadcount test fail with s390x-linux-user as well, and it also goes
+away (only) if I purge the build directory, re-configure, and re-build.
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-
-thanks
--- PMM
 
