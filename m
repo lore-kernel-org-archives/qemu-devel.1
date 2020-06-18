@@ -2,79 +2,100 @@ Return-Path: <SRS0=FaGC=77=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC7E8C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 16:12:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3453C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 16:13:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 91B5E20776
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 16:12:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91B5E20776
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 8ECF62080D
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 16:13:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sOpBM3ix"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8ECF62080D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33670 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36128 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlx9S-0008Ld-Ta
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 12:12:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44218)
+	id 1jlxAe-00011U-Pt
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 12:13:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44768)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jlx7w-000714-Of
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 12:10:56 -0400
-Received: from indium.canonical.com ([91.189.90.7]:33592)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jlx9k-0000KG-Lb
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 12:12:49 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:35652)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jlx7t-0006w2-CK
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 12:10:56 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jlx7s-0008U3-9G
- for <qemu-devel@nongnu.org>; Thu, 18 Jun 2020 16:10:52 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 446252E80BA
- for <qemu-devel@nongnu.org>; Thu, 18 Jun 2020 16:10:52 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jlx9h-0007Kd-Q0
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 12:12:48 -0400
+Received: by mail-pf1-x444.google.com with SMTP id h185so3004092pfg.2
+ for <qemu-devel@nongnu.org>; Thu, 18 Jun 2020 09:12:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=w8f6R9ASZrt/RtlltLDdWpOWT0IDLH/5n6K11WS2PRg=;
+ b=sOpBM3ixtF3o+lHqUyO+JOrLGJ59F5P2s1WNYg+o8ozhf4MKWRvQxeOobFUvI+V95q
+ u7jb9bLl6u4Zan9DUI17SeT+yy5VAiRRG5Ng/XPGZITfkzaTS+QUAOWGc3LiiEeBPQ22
+ I+V28GNMeg3asHNOTG//5+twPY+Ab1QEW5S/TKSBzsICpeuRujK2XiKqnwhvswkeVtQB
+ z3Cmd8OoYpK4hkNx5xIqwdM/DFjcjAXo99mF9zmoanbRAOOyZ+j3CgVrJK1WQRrHlgmE
+ I1H+jSFePhc9LfmUnXnh3gw7YqUHqjD5notcOe+C1J0/gIVimvZyW+aMnqSj2P8P9Iy9
+ 0DdQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=w8f6R9ASZrt/RtlltLDdWpOWT0IDLH/5n6K11WS2PRg=;
+ b=ZVA2x6t6VyoclG+UJfluH9koKKn7dPDqYpobyy7RXx0+8FGBFKjvHatt2S5cUVaA4Z
+ v/WXeg9YolWuOpJ9GllBGvmqAfG4NAN8QWvATNbbQE+Lb//Zlnk06zDEh3XC1o6qW+Wo
+ QociZJEaCrn3b/OXOIEcBmtxvZmLsCCvvNcWlfwXuvcQwFnLxTccuMC6DEVz4tsN5fDx
+ 6uBR/Yv91/7dh6qWafhtEBpD0CPHuwzz48L9/6KEohxozGI0u3q20Ja7zKeYf9tA1LAU
+ OSa247S0NJkE29Te260ibwrQW3C4IUnt+9woMacyxmZD4Lwq4atA2SAo954KrfxJztoF
+ rcyA==
+X-Gm-Message-State: AOAM533XhWgtVMtDEOzTU1euRZ6w/jmuS9odyuHDh+YvKotem/zJx/+8
+ tNymvYRVIDUJ+pjwi4ubjf+V2A==
+X-Google-Smtp-Source: ABdhPJxRoACp/IGBS922BqWSX/dqiNIWCtcp+25QiJx7Q3wUivov515PgYoxjiiiKLqyUrhVE6PMvw==
+X-Received: by 2002:a62:7bcd:: with SMTP id w196mr4116737pfc.73.1592496764044; 
+ Thu, 18 Jun 2020 09:12:44 -0700 (PDT)
+Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
+ by smtp.gmail.com with ESMTPSA id x77sm3468469pfc.4.2020.06.18.09.12.41
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 18 Jun 2020 09:12:43 -0700 (PDT)
+Subject: Re: [PATCH v7 10/42] target/arm: Implement the ADDG, SUBG instructions
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20200603011317.473934-1-richard.henderson@linaro.org>
+ <20200603011317.473934-11-richard.henderson@linaro.org>
+ <CAFEAcA-QZ_D1tQMv785xsxWwcEKmM76dK4Mvgx=y7eyb_mUqEg@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <3b1b50b8-061e-8422-2df0-e8df6f856941@linaro.org>
+Date: Thu, 18 Jun 2020 09:12:40 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 18 Jun 2020 16:04:49 -0000
-From: Daniel Berrange <1818075@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: berrange pmaydell rcfa ross
-X-Launchpad-Bug-Reporter: Ross Burton (ross)
-X-Launchpad-Bug-Modifier: Daniel Berrange (berrange)
-References: <155136199055.29310.6029801353341134939.malonedeb@chaenomeles.canonical.com>
-Message-Id: <159249628986.26203.13077132449520479380.malone@gac.canonical.com>
-Subject: [Bug 1818075] Re: qemu x86 TCG doesn't support AVX insns
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="1cbd0aa39df153c901321817f9b57cf3f232b507";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 35fd0b3773f30c389fe69e9ae2b42a4170589f3c
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 11:20:43
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <CAFEAcA-QZ_D1tQMv785xsxWwcEKmM76dK4Mvgx=y7eyb_mUqEg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::444;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x444.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -83,118 +104,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1818075 <1818075@bugs.launchpad.net>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
+ Stephen Long <steplong@quicinc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-QEMU, like most open source projects, relies on contributors who have
-motivation, skills and available time to work on implementing particular
-features. They naturally tend to focus on features that result in the
-greatest benefit to their own use cases. Thus simply declaring that an
-open source project, must support something won't magically make it
-happen.
+On 6/18/20 6:17 AM, Peter Maydell wrote:
+>> +        imm = (imm >> 6) << LOG2_TAG_GRANULE;
+...
+>> +            TCGv_i32 tag_offset = tcg_const_i32(imm & 15);
+...
+> Given that we don't really share any of the codegen with the
+> existing disas_add_sub_imm() insns, and the insn format isn't
+> the same (uimm6/op3/uimm4 rather than an imm12), I'm tempted
+> to suggest we should structure this the same way the Arm ARM
+> decode tables do, where "Add/subtract (immediate, with tags)"
+> is a separate subtable from "Add/subtract (immediate)": so
+> instead of disas_data_proc_imm() sending both case
+> 0x22 and 0x23 to disas_add_sub_imm(), it would send 0x23
+> to a new disas_add_sub_tag().
 
-IOW, the lack of coverage of newer x86 instructions is largely a
-reflection of the relative priorities of the current pool of
-contributors and where/what they feel are the best places/features to
-spend their time on.
+I'll do that, because...
 
-If any person does want to work on improving x86 TCG though, the project
-would happily receive patches, and existing contributors can offer
-guidance & advice along the way to help get to a successful outcome.
+> But this patch is functionally correct...
 
--- =
+... I've just noticed that it isn't correct.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1818075
+I drop the low 6 bits of the 12-bit "imm" on the first line, and then try to
+read the low 4 bits on the second line.
 
-Title:
-  qemu x86 TCG doesn't support AVX insns
+Oops.
 
-Status in QEMU:
-  New
-
-Bug description:
-  I'm trying to execute code that has been built with -march=3Dskylake
-  -mtune=3Dgeneric -mavx2 under qemu-user x86-64 with -cpu Skylake-Client.
-  However this code just hangs at 100% CPU.
-
-  Adding input tracing shows that it is likely hanging when dealing with
-  an AVX instruction:
-
-  warning: TCG doesn't support requested feature: CPUID.01H:ECX.fma [bit 12]
-  warning: TCG doesn't support requested feature: CPUID.01H:ECX.pcid [bit 1=
-7]
-  warning: TCG doesn't support requested feature: CPUID.01H:ECX.x2apic [bit=
- 21]
-  warning: TCG doesn't support requested feature: CPUID.01H:ECX.tsc-deadlin=
-e [bit 24]
-  warning: TCG doesn't support requested feature: CPUID.01H:ECX.avx [bit 28]
-  warning: TCG doesn't support requested feature: CPUID.01H:ECX.f16c [bit 2=
-9]
-  warning: TCG doesn't support requested feature: CPUID.01H:ECX.rdrand [bit=
- 30]
-  warning: TCG doesn't support requested feature: CPUID.07H:EBX.hle [bit 4]
-  warning: TCG doesn't support requested feature: CPUID.07H:EBX.avx2 [bit 5]
-  warning: TCG doesn't support requested feature: CPUID.07H:EBX.invpcid [bi=
-t 10]
-  warning: TCG doesn't support requested feature: CPUID.07H:EBX.rtm [bit 11]
-  warning: TCG doesn't support requested feature: CPUID.07H:EBX.rdseed [bit=
- 18]
-  warning: TCG doesn't support requested feature: CPUID.80000001H:ECX.3dnow=
-prefetch [bit 8]
-  warning: TCG doesn't support requested feature: CPUID.0DH:EAX.xsavec [bit=
- 1]
-
-  IN:
-  0x4000b4ef3b:  c5 fb 5c ca              vsubsd   %xmm2, %xmm0, %xmm1
-  0x4000b4ef3f:  c4 e1 fb 2c d1           vcvttsd2si %xmm1, %rdx
-  0x4000b4ef44:  4c 31 e2                 xorq     %r12, %rdx
-  0x4000b4ef47:  48 85 d2                 testq    %rdx, %rdx
-  0x4000b4ef4a:  79 9e                    jns      0x4000b4eeea
-
-  [ hangs ]
-
-  Attaching a gdb produces this stacktrace:
-
-  (gdb) bt
-  #0  canonicalize (status=3D0x55a20ff67a88, parm=3D0x55a20bb807e0 <float64=
-_params>, part=3D...)
-      at /data/poky-tmp/master/work/x86_64-linux/qemu-native/3.1.0-r0/qemu-=
-3.1.0/fpu/softfloat.c:350
-  #1  float64_unpack_canonical (s=3D0x55a20ff67a88, f=3D0)
-      at /data/poky-tmp/master/work/x86_64-linux/qemu-native/3.1.0-r0/qemu-=
-3.1.0/fpu/softfloat.c:547
-  #2  float64_sub (a=3D0, b=3D4890909195324358656, status=3D0x55a20ff67a88)
-      at /data/poky-tmp/master/work/x86_64-linux/qemu-native/3.1.0-r0/qemu-=
-3.1.0/fpu/softfloat.c:776
-  #3  0x000055a20baa1949 in helper_subsd (env=3D<optimized out>, d=3D0x55a2=
-0ff67ad8, s=3D<optimized out>)
-      at /data/poky-tmp/master/work/x86_64-linux/qemu-native/3.1.0-r0/qemu-=
-3.1.0/target/i386/ops_sse.h:623
-  #4  0x000055a20cfcfea8 in static_code_gen_buffer ()
-  #5  0x000055a20ba3f764 in cpu_tb_exec (itb=3D<optimized out>, cpu=3D0x55a=
-20cea2180 <static_code_gen_buffer+15684720>)
-      at /data/poky-tmp/master/work/x86_64-linux/qemu-native/3.1.0-r0/qemu-=
-3.1.0/accel/tcg/cpu-exec.c:171
-  #6  cpu_loop_exec_tb (tb_exit=3D<synthetic pointer>, last_tb=3D<synthetic=
- pointer>, tb=3D<optimized out>,
-      cpu=3D0x55a20cea2180 <static_code_gen_buffer+15684720>)
-      at /data/poky-tmp/master/work/x86_64-linux/qemu-native/3.1.0-r0/qemu-=
-3.1.0/accel/tcg/cpu-exec.c:615
-  #7  cpu_exec (cpu=3Dcpu@entry=3D0x55a20ff5f4d0)
-      at /data/poky-tmp/master/work/x86_64-linux/qemu-native/3.1.0-r0/qemu-=
-3.1.0/accel/tcg/cpu-exec.c:725
-  #8  0x000055a20ba6d728 in cpu_loop (env=3D0x55a20ff67780)
-      at /data/poky-tmp/master/work/x86_64-linux/qemu-native/3.1.0-r0/qemu-=
-3.1.0/linux-user/x86_64/../i386/cpu_loop.c:93
-  #9  0x000055a20ba049ff in main (argc=3D<optimized out>, argv=3D0x7ffc5857=
-2868, envp=3D<optimized out>)
-      at /data/poky-tmp/master/work/x86_64-linux/qemu-native/3.1.0-r0/qemu-=
-3.1.0/linux-user/main.c:819
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1818075/+subscriptions
+r~
 
