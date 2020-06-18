@@ -2,89 +2,95 @@ Return-Path: <SRS0=FaGC=77=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9B1FC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 20:10:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 101DDC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 20:13:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 70BA6206DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 20:10:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D0EC7208D5
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 20:13:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nbtbj0y7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70BA6206DB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cP1r61v3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0EC7208D5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38112 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40328 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jm0rV-0006YG-Mb
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 16:10:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51742)
+	id 1jm0uR-0007fg-W1
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 16:13:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52716)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jm0qk-0005vb-EM
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 16:09:26 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:25244
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jm0tX-0007Di-0d
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 16:12:19 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37646
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jm0qi-00013w-62
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 16:09:26 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jm0tV-0001UV-6H
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 16:12:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592510963;
+ s=mimecast20190719; t=1592511134;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=E5pZVdyZwhhGmeGHvt7TFD+6N1YhmZwE+YEciLSUig0=;
- b=Nbtbj0y7R8tooBvkHOcjM76PZ8qndOd5SvorMyGW7Dfdg7Y2Id3AnSG/djhfr4/b6KNFpO
- JZKPE156bWy7/fHSMxcAXmIwHNkUfDej2gEBp3gb9qi9T0rkSslYFUUzO4Bk3pqyHLKDVT
- HJsa1Yni3DmcBDjuELa7+qxsMKQj510=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-254-W__0emZTPmy-Xazqc0ZR5A-1; Thu, 18 Jun 2020 16:09:21 -0400
-X-MC-Unique: W__0emZTPmy-Xazqc0ZR5A-1
-Received: by mail-wm1-f69.google.com with SMTP id h6so2076220wmb.7
- for <qemu-devel@nongnu.org>; Thu, 18 Jun 2020 13:09:21 -0700 (PDT)
+ bh=l7mzCPrxi0qhZSsnwATnLQThTmUXOxqjCZOy8xps5/w=;
+ b=cP1r61v3I+GRoTGYbhtQuA0L18E6ZftYLul/AqEWt5VEu7YQnVzuWpFkBLc1/fcnq+0MNl
+ fhFHSWaaACQiZC+lQ7NKsOIIUsCVJDZ3q3+WN3hmPZnROng6+rZKGrXyy6B/erjxnPZtsy
+ 8VmRuORmudODwu6Z088AlcG+boAoJcY=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-199-X5PR9FvgNQWpKajIZmsFDw-1; Thu, 18 Jun 2020 16:12:12 -0400
+X-MC-Unique: X5PR9FvgNQWpKajIZmsFDw-1
+Received: by mail-wr1-f70.google.com with SMTP id b14so2939951wrp.0
+ for <qemu-devel@nongnu.org>; Thu, 18 Jun 2020 13:12:12 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=E5pZVdyZwhhGmeGHvt7TFD+6N1YhmZwE+YEciLSUig0=;
- b=B8CfeFugqctE7cE8iRz+nMNct8OvQXte94yPVofMyK6H5k+xZQ9MDZ6rN53niibRwB
- 0EIchKJSmQaixTvXcJGbpzGP6Z79iOpn1Gc16YkwMFysMfHEGbHKRpJ1HVxB4WRhgekN
- NCbfLicjmVViuaXiuxVo+uBqpPwLP71hFa3adyjDGqS+WeD+wW6a46lH2XFLTWe6geBV
- TaKZoTs0mVTVcUdD99cVDq2H0CcZsbeRMATYyxSEFk3e6HpYYstX2nx4rdZyh2d4o5q3
- VsRO5WKnjw78tBFNYKKxjXikAKFDexLTC9qQflawPAzCGym+xw9ZJ1iZfvni/tj2poru
- CK2A==
-X-Gm-Message-State: AOAM532CCjwccukNMmbVlVPC5R0pxk53m08qqs4AFYeKZ9jZ0PfG1Gb0
- 4ou/qvYa/dp6/D69f+67a23KLkpQZ3EQpQvnRf/Uiqk/vJtMU6MIO8V8EHJLz8EamClekVg87T/
- JvKiyHK0DEq4zWZM=
-X-Received: by 2002:a05:600c:21c2:: with SMTP id x2mr29478wmj.33.1592510960563; 
- Thu, 18 Jun 2020 13:09:20 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwR+7V9vt7kkdmB0EtAa4Iiht+0T6KurLF7yBkOSGVDYPZnU8gr1kRurxs1VC9Uphixl3QhMQ==
-X-Received: by 2002:a05:600c:21c2:: with SMTP id x2mr29460wmj.33.1592510960344; 
- Thu, 18 Jun 2020 13:09:20 -0700 (PDT)
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=8nReIp/L/gbgwGe8czOjHjnqwXghAM4mM9FC2eAftRo=;
+ b=YcphcYxM7q5E4orF0X135k27DkPa+LhJCzscDBZr/++raeRk5PriNAJlipjVPcNhDR
+ p+yxF6oHKY0YVrz3pf1OumfgAbPPvBbPTeUKdXa/HbJBoYTe/yhYVYwecHcgymAtG41R
+ JJapyfyBkT2x10dY+foAG5h8zXEy7hiUPLFMYMSbMzPrDQbvynJlX1dO8CphG+2Xn+IM
+ sJ8H+FTSA0iBPxg4rdiHLbvHCmGSX9dg7AsXGp+LDt7K8YHTlp5HNJDDlQ3e5EVvyZJo
+ 4apcKGn5CXYTVa4ikQFDq/PkdoO//pcbduCk2ucM4Yyjtz/Ll3zR1YLVNN6WRgl0/9Wd
+ qlcw==
+X-Gm-Message-State: AOAM530KTlGmS0bdivPVujk9NpiGcZsaTlpEuPN75J2S1VXeWV4Tx36p
+ 4VqfXbY2TwkGsgZS3Q3EwHISB8HnUQFyqX87XluBEJGi4rt9+yy3r5Y0dQoYZu423LBu6TbC8Ny
+ qFnx1TDfdJ6fPtXE=
+X-Received: by 2002:a5d:4385:: with SMTP id i5mr201608wrq.420.1592511131519;
+ Thu, 18 Jun 2020 13:12:11 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxo9aYmkB7ydsAWi4OgscsHhmBRiPzQUJI71f926KZHQGRJ18x2drTjc75yvXx+MHvKGyA24A==
+X-Received: by 2002:a5d:4385:: with SMTP id i5mr201590wrq.420.1592511131269;
+ Thu, 18 Jun 2020 13:12:11 -0700 (PDT)
 Received: from redhat.com (bzq-79-178-18-124.red.bezeqint.net. [79.178.18.124])
- by smtp.gmail.com with ESMTPSA id b187sm4706368wmd.26.2020.06.18.13.09.18
+ by smtp.gmail.com with ESMTPSA id z12sm5247077wrg.9.2020.06.18.13.12.10
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 18 Jun 2020 13:09:19 -0700 (PDT)
-Date: Thu, 18 Jun 2020 16:09:17 -0400
+ Thu, 18 Jun 2020 13:12:10 -0700 (PDT)
+Date: Thu, 18 Jun 2020 16:12:08 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Subject: Re: [PATCH v9 00/10] acpi: i386 tweaks
-Message-ID: <20200618160818-mutt-send-email-mst@kernel.org>
-References: <20200617071138.11159-1-kraxel@redhat.com>
+To: Stefan Berger <stefanb@linux.ibm.com>
+Subject: Re: [PATCH v3 5/8] acpi: Enable TPM IRQ
+Message-ID: <20200618161045-mutt-send-email-mst@kernel.org>
+References: <20200616205721.1191408-1-stefanb@linux.vnet.ibm.com>
+ <20200616205721.1191408-6-stefanb@linux.vnet.ibm.com>
+ <6b3b7b49-02e6-9d2d-91ad-65a5ea6d2244@redhat.com>
+ <0069a66e-474e-21b9-84ce-36a552cc7b98@linux.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20200617071138.11159-1-kraxel@redhat.com>
+In-Reply-To: <0069a66e-474e-21b9-84ce-36a552cc7b98@linux.ibm.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=mst@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 15:08:26
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=mst@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 01:47:12
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -105,113 +111,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- John Snow <jsnow@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Stefan Berger <stefanb@linux.vnet.ibm.com>, qemu-devel@nongnu.org,
+ Auger Eric <eric.auger@redhat.com>, marcandre.lureau@redhat.com,
+ pbonzini@redhat.com, philmd@redhat.com, mkedzier@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jun 17, 2020 at 09:11:28AM +0200, Gerd Hoffmann wrote:
-> First batch of microvm patches, some generic acpi stuff.
-> Split the acpi-build.c monster, specifically split the
-> pc and q35 and pci bits into a separate file which we
-> can skip building at some point in the future.
+On Wed, Jun 17, 2020 at 07:59:51AM -0400, Stefan Berger wrote:
+> On 6/17/20 4:22 AM, Auger Eric wrote:
+> > Hi Stefan,
+> > 
+> > On 6/16/20 10:57 PM, Stefan Berger wrote:
+> > > From: Stefan Berger <stefanb@linux.ibm.com>
+> > > 
+> > > Move the TPM TIS IRQ to unused IRQ 13, which is the only one accepted by
+> > > Windows. Query for the TPM's irq number and enable the TPM IRQ unless
+> > > TPM_IRQ_DISABLED is returned.
+> > > 
+> > > Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
+> > > CC: Michael S. Tsirkin <mst@redhat.com>
+> > > ---
+> > >   hw/i386/acpi-build.c  | 11 +++++------
+> > >   include/hw/acpi/tpm.h |  2 +-
+> > >   2 files changed, 6 insertions(+), 7 deletions(-)
+> > > 
+> > > diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> > > index 900f786d08..bb9a7f8497 100644
+> > > --- a/hw/i386/acpi-build.c
+> > > +++ b/hw/i386/acpi-build.c
+> > > @@ -2021,6 +2021,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+> > >               build_append_pci_bus_devices(scope, bus, pm->pcihp_bridge_en);
+> > >               if (TPM_IS_TIS_ISA(tpm)) {
+> > > +                int8_t irq = tpm_get_irqnum(tpm);
+> > >                   if (misc->tpm_version == TPM_VERSION_2_0) {
+> > >                       dev = aml_device("TPM");
+> > >                       aml_append(dev, aml_name_decl("_HID",
+> > > @@ -2035,12 +2036,10 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+> > >                   crs = aml_resource_template();
+> > >                   aml_append(crs, aml_memory32_fixed(TPM_TIS_ADDR_BASE,
+> > >                              TPM_TIS_ADDR_SIZE, AML_READ_WRITE));
+> > > -                /*
+> > > -                    FIXME: TPM_TIS_IRQ=5 conflicts with PNP0C0F irqs,
+> > > -                    Rewrite to take IRQ from TPM device model and
+> > > -                    fix default IRQ value there to use some unused IRQ
+> > > -                 */
+> > > -                /* aml_append(crs, aml_irq_no_flags(TPM_TIS_IRQ)); */
+> > > +
+> > > +                if (irq != TPM_IRQ_DISABLED) {
+> > Out of curiosity what is the goal to expose the irq num as a property
+> > settable by the end-user if only 13 is known to work in all cases. At
+> > least shouldn't we warn the end-user in case he attempts to change the
+> > default value?
+> 
+> For Windows only IRQ 13 works (and I am not sure whether this has always
+> been like this), Linux accepts several other ones. As for exposing it to the
+> end-user, I may have taken this from soundblaster (sb16.c), which also
+> exposes it. If someone plays around with the irq numbers I would say they
+> must have some more Pc knowledge than  just trying random numbers.
+> 
+> 
+>    Stefan
 
-Thanks for the patches!
-Pls take a look at tests/qtest/bios-tables-test.c, the comment
-at top of this file outlines the process to use for
-changing expected test files.
-As it is, the patches won't be easily rebaseable or backportable.
-
-
-> v2 changes: leave acpi-build.c largely as-is, move useful
-> bits to other places to allow them being reused, specifically:
-> 
->  * move isa device generator functions to individual isa devices.
->  * move fw_cfg generator function to fw_cfg.c
-> 
-> v3 changes: fix rtc, support multiple lpt devices.
-> 
-> v4 changes:
->  * drop merged patches.
->  * split rtc crs change to separata patch.
->  * added two cleanup patches.
->  * picked up ack & review tags.
-> 
-> v5 changes:
->  * add comment for rtc crs update.
->  * add even more cleanup patches.
->  * picked up ack & review tags.
-> 
-> v6 changes:
->  * floppy: move cmos_get_fd_drive_type.
->  * picked up ack & review tags.
-> 
-> v7 changes:
->  * rebased to mst/pci branch, resolved stubs conflict.
->  * dropped patches already queued up in mst/pci.
->  * added missing sign-off.
->  * picked up ack & review tags.
-> 
-> v8 changes:
->  * (re-)add patch to allow acpi table changes
-> 
-> v9 changes:
->  * add asl changes to commit messages.
->  * update acpi test data.
-> 
-> take care,
->   Gerd
-> 
-> Gerd Hoffmann (10):
->   acpi: bios-tables-test: show more context on asl diffs
->   acpi: move aml builder code for floppy device
->   floppy: make isa_fdc_get_drive_max_chs static
->   floppy: move cmos_get_fd_drive_type() from pc
->   acpi: move aml builder code for i8042 (kbd+mouse) device
->   acpi: factor out fw_cfg_add_acpi_dsdt()
->   acpi: simplify build_isa_devices_aml()
->   acpi: drop serial/parallel enable bits from dsdt
->   acpi: drop build_piix4_pm()
->   acpi: q35: drop _SB.PCI0.ISA.LPCD opregion.
-> 
->  hw/i386/fw_cfg.h                  |   1 +
->  include/hw/block/fdc.h            |   3 +-
->  include/hw/i386/pc.h              |   1 -
->  hw/block/fdc.c                    | 111 +++++++++++++++-
->  hw/i386/acpi-build.c              | 210 +-----------------------------
->  hw/i386/fw_cfg.c                  |  28 ++++
->  hw/i386/pc.c                      |  25 ----
->  hw/input/pckbd.c                  |  31 +++++
->  stubs/cmos.c                      |   7 +
->  tests/qtest/bios-tables-test.c    |   2 +-
->  stubs/Makefile.objs               |   1 +
->  tests/data/acpi/pc/DSDT           | Bin 5014 -> 4934 bytes
->  tests/data/acpi/pc/DSDT.acpihmat  | Bin 6338 -> 6258 bytes
->  tests/data/acpi/pc/DSDT.bridge    | Bin 6873 -> 6793 bytes
->  tests/data/acpi/pc/DSDT.cphp      | Bin 5477 -> 5397 bytes
->  tests/data/acpi/pc/DSDT.dimmpxm   | Bin 6667 -> 6587 bytes
->  tests/data/acpi/pc/DSDT.ipmikcs   | Bin 5086 -> 5006 bytes
->  tests/data/acpi/pc/DSDT.memhp     | Bin 6373 -> 6293 bytes
->  tests/data/acpi/pc/DSDT.numamem   | Bin 5020 -> 4940 bytes
->  tests/data/acpi/q35/DSDT          | Bin 7752 -> 7678 bytes
->  tests/data/acpi/q35/DSDT.acpihmat | Bin 9076 -> 9002 bytes
->  tests/data/acpi/q35/DSDT.bridge   | Bin 7769 -> 7695 bytes
->  tests/data/acpi/q35/DSDT.cphp     | Bin 8215 -> 8141 bytes
->  tests/data/acpi/q35/DSDT.dimmpxm  | Bin 9405 -> 9331 bytes
->  tests/data/acpi/q35/DSDT.ipmibt   | Bin 7827 -> 7753 bytes
->  tests/data/acpi/q35/DSDT.memhp    | Bin 9111 -> 9037 bytes
->  tests/data/acpi/q35/DSDT.mmio64   | Bin 8882 -> 8808 bytes
->  tests/data/acpi/q35/DSDT.numamem  | Bin 7758 -> 7684 bytes
->  tests/data/acpi/q35/DSDT.tis      | Bin 8357 -> 8283 bytes
->  29 files changed, 185 insertions(+), 235 deletions(-)
->  create mode 100644 stubs/cmos.c
-> 
-> -- 
-> 2.18.4
+So is this useful to anyone? If no I'd say drop it.
+I'm guessing sb16 has it since it is useful for running extremely old OSes which might
+have weird quirks for a specific hardware.
 
 
