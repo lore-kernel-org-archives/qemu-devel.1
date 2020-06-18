@@ -7,71 +7,78 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7520CC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 13:32:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0700DC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 13:33:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 412E82083B
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 13:32:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C090A2083B
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 13:33:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MneoIR2+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 412E82083B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WXCrNnfv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C090A2083B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45108 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50650 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlueu-0007BW-Hq
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 09:32:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40736)
+	id 1jlufv-0001Fd-0a
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 09:33:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40988)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jluVc-0007Fg-1m
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 09:23:12 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30835
- helo=us-smtp-1.mimecast.com)
+ id 1jluW2-00005p-Bq
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 09:23:38 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:53001
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jluVa-0005qA-4Z
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 09:23:11 -0400
+ id 1jluW0-0005u8-FN
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 09:23:38 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592486589;
+ s=mimecast20190719; t=1592486615;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
- references:references; bh=jEPW/ssjzOcwLYx17f9xfUp+I7p7BI72NlpDYT4bQh8=;
- b=MneoIR2+24y4wXWlkbTQanOSkFM1SVUQFVaUA2XNiE7GdJib6XNm9ZJ1409yX6qUOT33PF
- pigy+7DWm6/g9+f9e5KE+g6P6ERfz1+82j+HKOxmHoPKumkcLqKXP/T9y6wB2cvu0ZSXzv
- mrw0ayqEtbzoyZFECgt9wC2D6Qrtavs=
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=7+O77/1VoIy5ZmKPNfruC/I0o10kheFBwNmfaZ48ahQ=;
+ b=WXCrNnfvwOFtjL7zGdr9s55LGxYHjAYn5loNTkCS+ssBMHbDOwDVoCP9V95iEuOg8imapG
+ QdToizC4Ie8XJCIKl9p8dkPKfWSidRYJ19sBDvGUALaR1yw6+d8lhP07c/K8nsWlcct98W
+ 0Hfvmstcz37HtGXPht5b1G8FMan6uFQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-435-XQeGJ_EuMHytQ6KNzWJsDA-1; Thu, 18 Jun 2020 09:23:05 -0400
-X-MC-Unique: XQeGJ_EuMHytQ6KNzWJsDA-1
+ us-mta-44-G4xE9hiGO4q87iNx3N9cTg-1; Thu, 18 Jun 2020 09:23:31 -0400
+X-MC-Unique: G4xE9hiGO4q87iNx3N9cTg-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E3733184D17E;
- Thu, 18 Jun 2020 13:23:03 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DE4B1107ACCD;
+ Thu, 18 Jun 2020 13:23:29 +0000 (UTC)
 Received: from jason-ThinkPad-T430s.redhat.com (ovpn-12-109.pek2.redhat.com
  [10.72.12.109])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A7F805BAC2;
- Thu, 18 Jun 2020 13:23:01 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 918645BAC1;
+ Thu, 18 Jun 2020 13:23:27 +0000 (UTC)
 From: Jason Wang <jasowang@redhat.com>
 To: peter.maydell@linaro.org,
 	qemu-devel@nongnu.org
-Subject: [PULL V2 22/33] net: cadence_gem: Fix RX address filtering
-Date: Thu, 18 Jun 2020 21:21:37 +0800
-Message-Id: <1592486508-6135-23-git-send-email-jasowang@redhat.com>
+Subject: [PULL V2 31/33] hw/net/e1000e: Do not abort() on invalid PSRCTL
+ register value
+Date: Thu, 18 Jun 2020 21:21:46 +0800
+Message-Id: <1592486508-6135-32-git-send-email-jasowang@redhat.com>
 In-Reply-To: <1592486508-6135-1-git-send-email-jasowang@redhat.com>
 References: <1592486508-6135-1-git-send-email-jasowang@redhat.com>
+MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jasowang@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=jasowang@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 01:47:12
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=jasowang@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 01:32:18
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -92,90 +99,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>,
- Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>, Jason Wang <jasowang@redhat.com>,
- Tong Ho <tong.ho@xilinx.com>
+Cc: Jason Wang <jasowang@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ qemu-stable@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Tong Ho <tong.ho@xilinx.com>
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Two defects are fixed:
+libFuzzer found using 'qemu-system-i386 -M q35':
 
-1/ Detection of multicast frames
-2/ Treating drop of mis-addressed frames as non-error
+qemu: hardware error: e1000e: PSRCTL.BSIZE0 cannot be zero
+CPU #0:
+EAX=00000000 EBX=00000000 ECX=00000000 EDX=00000663
+ESI=00000000 EDI=00000000 EBP=00000000 ESP=00000000
+EIP=0000fff0 EFL=00000002 [-------] CPL=0 II=0 A20=1 SMM=0 HLT=0
+ES =0000 00000000 0000ffff 00009300
+CS =f000 ffff0000 0000ffff 00009b00
+SS =0000 00000000 0000ffff 00009300
+DS =0000 00000000 0000ffff 00009300
+FS =0000 00000000 0000ffff 00009300
+GS =0000 00000000 0000ffff 00009300
+LDT=0000 00000000 0000ffff 00008200
+TR =0000 00000000 0000ffff 00008b00
+GDT=     00000000 0000ffff
+IDT=     00000000 0000ffff
+CR0=60000010 CR2=00000000 CR3=00000000 CR4=00000000
+DR0=00000000 DR1=00000000 DR2=00000000 DR3=00000000
+DR6=ffff0ff0 DR7=00000400
+EFER=0000000000000000
+FCW=037f FSW=0000 [ST=0] FTW=00 MXCSR=00001f80
+FPR0=0000000000000000 0000 FPR1=0000000000000000 0000
+FPR2=0000000000000000 0000 FPR3=0000000000000000 0000
+FPR4=0000000000000000 0000 FPR5=0000000000000000 0000
+FPR6=0000000000000000 0000 FPR7=0000000000000000 0000
+XMM00=00000000000000000000000000000000 XMM01=00000000000000000000000000000000
+XMM02=00000000000000000000000000000000 XMM03=00000000000000000000000000000000
+XMM04=00000000000000000000000000000000 XMM05=00000000000000000000000000000000
+XMM06=00000000000000000000000000000000 XMM07=00000000000000000000000000000000
+==1988== ERROR: libFuzzer: deadly signal
+    #6 0x7fae4d3ea894 in __GI_abort (/lib64/libc.so.6+0x22894)
+    #7 0x563f4cc59a1d in hw_error (qemu-fuzz-i386+0xe8ca1d)
+    #8 0x563f4d7c93f2 in e1000e_set_psrctl (qemu-fuzz-i386+0x19fc3f2)
+    #9 0x563f4d7b798f in e1000e_core_write (qemu-fuzz-i386+0x19ea98f)
+    #10 0x563f4d7afc46 in e1000e_mmio_write (qemu-fuzz-i386+0x19e2c46)
+    #11 0x563f4cc9a0a7 in memory_region_write_accessor (qemu-fuzz-i386+0xecd0a7)
+    #12 0x563f4cc99c13 in access_with_adjusted_size (qemu-fuzz-i386+0xeccc13)
+    #13 0x563f4cc987b4 in memory_region_dispatch_write (qemu-fuzz-i386+0xecb7b4)
 
-Signed-off-by: Tong Ho <tong.ho@xilinx.com>
-Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-Signed-off-by: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+It simply sent the following 2 I/O command to the e1000e
+PCI BAR #2 I/O region:
+
+  writew 0x0100 0x0c00 # RCTL =   E1000_RCTL_DTYP_MASK
+  writeb 0x2170 0x00   # PSRCTL = 0
+
+2813 static void
+2814 e1000e_set_psrctl(E1000ECore *core, int index, uint32_t val)
+2815 {
+2816     if (core->mac[RCTL] & E1000_RCTL_DTYP_MASK) {
+2817
+2818         if ((val & E1000_PSRCTL_BSIZE0_MASK) == 0) {
+2819             hw_error("e1000e: PSRCTL.BSIZE0 cannot be zero");
+2820         }
+
+Instead of calling hw_error() which abort the process (it is
+meant for CPU fatal error condition, not for device logging),
+log the invalid request with qemu_log_mask(LOG_GUEST_ERROR)
+and return, ignoring the request.
+
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- hw/net/cadence_gem.c | 26 +++++++++++---------------
- 1 file changed, 11 insertions(+), 15 deletions(-)
+ hw/net/e1000e_core.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
-diff --git a/hw/net/cadence_gem.c b/hw/net/cadence_gem.c
-index 78fb9ac..a93b5c0 100644
---- a/hw/net/cadence_gem.c
-+++ b/hw/net/cadence_gem.c
-@@ -34,6 +34,7 @@
- #include "qemu/module.h"
- #include "sysemu/dma.h"
- #include "net/checksum.h"
-+#include "net/eth.h"
+diff --git a/hw/net/e1000e_core.c b/hw/net/e1000e_core.c
+index d567687..bcd186c 100644
+--- a/hw/net/e1000e_core.c
++++ b/hw/net/e1000e_core.c
+@@ -34,9 +34,9 @@
+ */
  
- #define CADENCE_GEM_ERR_DEBUG 0
- #define DB_PRINT(...) do {\
-@@ -702,7 +703,7 @@ static unsigned calc_mac_hash(const uint8_t *mac)
- static int gem_mac_address_filter(CadenceGEMState *s, const uint8_t *packet)
- {
-     uint8_t *gem_spaddr;
--    int i;
-+    int i, is_mc;
+ #include "qemu/osdep.h"
++#include "qemu/log.h"
+ #include "net/net.h"
+ #include "net/tap.h"
+-#include "hw/hw.h"
+ #include "hw/pci/msi.h"
+ #include "hw/pci/msix.h"
+ #include "sysemu/runstate.h"
+@@ -2816,11 +2816,15 @@ e1000e_set_psrctl(E1000ECore *core, int index, uint32_t val)
+     if (core->mac[RCTL] & E1000_RCTL_DTYP_MASK) {
  
-     /* Promiscuous mode? */
-     if (s->regs[GEM_NWCFG] & GEM_NWCFG_PROMISC) {
-@@ -718,22 +719,17 @@ static int gem_mac_address_filter(CadenceGEMState *s, const uint8_t *packet)
-     }
+         if ((val & E1000_PSRCTL_BSIZE0_MASK) == 0) {
+-            hw_error("e1000e: PSRCTL.BSIZE0 cannot be zero");
++            qemu_log_mask(LOG_GUEST_ERROR,
++                          "e1000e: PSRCTL.BSIZE0 cannot be zero");
++            return;
+         }
  
-     /* Accept packets -w- hash match? */
--    if ((packet[0] == 0x01 && (s->regs[GEM_NWCFG] & GEM_NWCFG_MCAST_HASH)) ||
--        (packet[0] != 0x01 && (s->regs[GEM_NWCFG] & GEM_NWCFG_UCAST_HASH))) {
-+    is_mc = is_multicast_ether_addr(packet);
-+    if ((is_mc && (s->regs[GEM_NWCFG] & GEM_NWCFG_MCAST_HASH)) ||
-+        (!is_mc && (s->regs[GEM_NWCFG] & GEM_NWCFG_UCAST_HASH))) {
-+        uint64_t buckets;
-         unsigned hash_index;
- 
-         hash_index = calc_mac_hash(packet);
--        if (hash_index < 32) {
--            if (s->regs[GEM_HASHLO] & (1<<hash_index)) {
--                return packet[0] == 0x01 ? GEM_RX_MULTICAST_HASH_ACCEPT :
--                                           GEM_RX_UNICAST_HASH_ACCEPT;
--            }
--        } else {
--            hash_index -= 32;
--            if (s->regs[GEM_HASHHI] & (1<<hash_index)) {
--                return packet[0] == 0x01 ? GEM_RX_MULTICAST_HASH_ACCEPT :
--                                           GEM_RX_UNICAST_HASH_ACCEPT;
--            }
-+        buckets = ((uint64_t)s->regs[GEM_HASHHI] << 32) | s->regs[GEM_HASHLO];
-+        if ((buckets >> hash_index) & 1) {
-+            return is_mc ? GEM_RX_MULTICAST_HASH_ACCEPT
-+                         : GEM_RX_UNICAST_HASH_ACCEPT;
+         if ((val & E1000_PSRCTL_BSIZE1_MASK) == 0) {
+-            hw_error("e1000e: PSRCTL.BSIZE1 cannot be zero");
++            qemu_log_mask(LOG_GUEST_ERROR,
++                          "e1000e: PSRCTL.BSIZE1 cannot be zero");
++            return;
          }
      }
  
-@@ -958,7 +954,7 @@ static ssize_t gem_receive(NetClientState *nc, const uint8_t *buf, size_t size)
-     /* Is this destination MAC address "for us" ? */
-     maf = gem_mac_address_filter(s, buf);
-     if (maf == GEM_RX_REJECT) {
--        return -1;
-+        return size;  /* no, drop siliently b/c it's not an error */
-     }
- 
-     /* Discard packets with receive length error enabled ? */
 -- 
 2.5.0
 
