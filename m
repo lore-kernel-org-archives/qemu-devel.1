@@ -1,93 +1,116 @@
 Return-Path: <SRS0=FaGC=77=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: **
-X-Spam-Status: No, score=2.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98EFBC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 15:10:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43CC2C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 15:11:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 638CE20656
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 15:10:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0E37F20656
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 15:11:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GyTmc21d"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 638CE20656
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UOHXCP/k"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E37F20656
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41426 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43564 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlwBM-0003bV-MZ
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 11:10:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48908)
+	id 1jlwCF-0004kX-3B
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 11:11:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49790)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jlw8D-0008LG-Hn
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 11:07:10 -0400
-Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:40217)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jlw8B-0000vF-2Q
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 11:07:08 -0400
-Received: by mail-wr1-x433.google.com with SMTP id h5so6447271wrc.7
- for <qemu-devel@nongnu.org>; Thu, 18 Jun 2020 08:07:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=VE45IjbDxvu3358vkYjshA4lYZnR9j7ohge4rzRsW/s=;
- b=GyTmc21djPYpLkp9ExME4oGKbFnSLUwCdu2tRFICDDOiCQYC+kboiwjUxB7QiAa+87
- 4xvbyREFYE/DqMB+/glCB2549mB88pua43lGR9GLjceAzfyH1cwJkqqijP1tvSe6zwSr
- o15z3EmhjcCIHKn7gHTcyqdU46L8d3akh13cnfwC742kH7CHPsLwZ2D1U954VHkCTszs
- h/3EJe14SbeadftLsXJq0YS4B0DW4Enrq5oE6u/qwTNkQDKHhUUrFkWS/iBhkcb0ASbu
- xfY0GdKhJunh1Lipy6+Cr2GXWbjLZ/IT55eNbweI+XSMm37wvABck15HUyeGuYAZtMbm
- UOkA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=VE45IjbDxvu3358vkYjshA4lYZnR9j7ohge4rzRsW/s=;
- b=ODVvRY5i7wUsm8NKvPDidhRjLFl2OV8xgCpEDYPM5ysHKHfNkO0zGhy6A9WShnELT7
- 4UjOlBhBtXWT8nZQjTb11mzTKNNNcZ9OiVNddoAgGSTaDLxXySicdL5o/BtIZhjyP44n
- IqbNXKIKBaAutl/6nDeTR3c3e5VIY4v8XThxAXg6EoEblfj3YfxverJdgvDaM6jK2DRk
- +62dEAj/S2LBHfL6NHdUQ0s+aWtWd6Pw8W29XTPKDFwwjRHFIjBr1LpWSYU5D246jpfB
- 2yoW4i+dvc7BlLJerkIOqCJxQD0JziOX9D2ktN04oCWmSRq1oJoydG8QNe9N9X829T8f
- S3LA==
-X-Gm-Message-State: AOAM5331KzQucSkFK0TnzGmF46vg6R/qhm0ShTyVM8yZaTcsBbCMke5Z
- f3P9Xsnqf4K8J5f1SCuv2ISOgVZjbm/NTfr7bUI=
-X-Google-Smtp-Source: ABdhPJxXQbOZp7x81ZYKLvergILhxcQwqtFgLZXUIm1At8BlE0lob9YUdg0lWOUjWO3U+5DRfBypUqsU/Arj1EvZymQ=
-X-Received: by 2002:adf:a283:: with SMTP id s3mr4761852wra.147.1592492825145; 
- Thu, 18 Jun 2020 08:07:05 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jlwB2-0003Uo-J5
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 11:10:04 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:52010
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jlwB0-0001Qi-9R
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 11:10:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592493001;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=HLTUtn+GjA1cxMH9YFaPp8odCwUUfP1SXkXmT2PkozU=;
+ b=UOHXCP/kodn5hjGFIycRDmbCpyokh2SHBcOji41ANsC0WI3dLww3iuVCNlYsTvCe+BrMHn
+ eqxhFHcXSZTQvImhyq4HgrHQhofmxmGK9rohX6BY2I0QmfHSBXcOT2dtWcT+k2tTD18Ynk
+ q/lb6A1cL8YaqcP9hQeeAZnQaYbcT2c=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-479-ZXr3uaAmMi-h2VcBHEwI0Q-1; Thu, 18 Jun 2020 11:09:45 -0400
+X-MC-Unique: ZXr3uaAmMi-h2VcBHEwI0Q-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B3FAB835B44;
+ Thu, 18 Jun 2020 15:09:43 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-112-185.ams2.redhat.com
+ [10.36.112.185])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2D6E25BAC2;
+ Thu, 18 Jun 2020 15:09:41 +0000 (UTC)
+Subject: Re: [PULL 14/15] qcow2_format.py: dump bitmaps header extension
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+References: <20200609205245.3548257-1-eblake@redhat.com>
+ <20200609205245.3548257-15-eblake@redhat.com>
+ <81ba0181-3dfc-1c1e-7c19-278569e65c60@redhat.com>
+ <64c3084a-8bda-14d9-907c-da0af67cf9c3@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <d29f030e-ce33-d5c1-7f65-3a08c6f6cf9a@redhat.com>
+Date: Thu, 18 Jun 2020 17:09:39 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Received: by 2002:a1c:451:0:0:0:0:0 with HTTP;
- Thu, 18 Jun 2020 08:07:04 -0700 (PDT)
-In-Reply-To: <CALTWKrXmYVtxeAjMjD0UYKzYeuBUXxNeMYVVNLfbL-iKknAN4Q@mail.gmail.com>
-References: <20200616231204.8850-1-ahmedkhaledkaraman@gmail.com>
- <20200616231204.8850-4-ahmedkhaledkaraman@gmail.com>
- <871rmdyjbh.fsf@linaro.org>
- <CALTWKrVovkoQvNFxYac2eOV7Cf+K_RA+1-Gn=3AnL8dJLemTyQ@mail.gmail.com>
- <877dw5wq7r.fsf@linaro.org>
- <CALTWKrXmYVtxeAjMjD0UYKzYeuBUXxNeMYVVNLfbL-iKknAN4Q@mail.gmail.com>
-From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Date: Thu, 18 Jun 2020 17:07:04 +0200
-Message-ID: <CAHiYmc6Cg+FQrJZJ4nzoDs9sgoxrbOZ2hL3k9rAAb9T23PVxrw@mail.gmail.com>
-Subject: Re: [PATCH 3/3] scripts/performance: Add perf_top_25.py script
-To: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
-Content-Type: multipart/alternative; boundary="00000000000026732305a85d21e7"
-Received-SPF: pass client-ip=2a00:1450:4864:20::433;
- envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wr1-x433.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+In-Reply-To: <64c3084a-8bda-14d9-907c-da0af67cf9c3@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="PpfuW3SfiMzJKtp6WPuOhJFONBNYaz8l5"
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 00:57:40
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,137 +123,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>,
- "ehabkost@redhat.com" <ehabkost@redhat.com>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, "crosa@redhat.com" <crosa@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
+ "open list:Block layer core" <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000026732305a85d21e7
-Content-Type: text/plain; charset="UTF-8"
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--PpfuW3SfiMzJKtp6WPuOhJFONBNYaz8l5
+Content-Type: multipart/mixed; boundary="tpndFCRtUloVPW0ZKbaWvxlhOf1xFKBRV"
+
+--tpndFCRtUloVPW0ZKbaWvxlhOf1xFKBRV
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-=D1=81=D1=80=D0=B5=D0=B4=D0=B0, 17. =D1=98=D1=83=D0=BD 2020., Ahmed Karaman=
- <ahmedkhaledkaraman@gmail.com> =D1=98=D0=B5
-=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+On 18.06.20 15:28, Vladimir Sementsov-Ogievskiy wrote:
+> 18.06.2020 16:13, Max Reitz wrote:
+>> On 09.06.20 22:52, Eric Blake wrote:
+>>> From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>>>
+>>> Add class for bitmap extension and dump its fields. Further work is to
+>>> dump bitmap directory.
+>>>
+>>> Test new functionality inside 291 iotest.
+>>
+>> Unfortunately, it also breaks 291 with an external data file, which
+>> worked before.=C2=A0 (The problems being that an external data file give=
+s you
+>> an additional header extension, and that the bitmap directory offset
+>> changes.)
+>>
+>> I think if we want to test testing tools, we have to do that in a
+>> controlled environment where we exactly know what the image is.=C2=A0 It
+>> looks to me now as if 291 is not such an environment.=C2=A0 Or phrased
+>> differently, we probably shouldn=E2=80=99t test some testing tool in nor=
+mal
+>> tests that test qemu itself.
+>>
+>> If we only test qcow2.py in normal tests, then I don=E2=80=99t think we =
+have to
+>> explicitly test it at all.=C2=A0 (Because if you test qcow2.py in a norm=
+al
+>> test, and the test breaks, it=E2=80=99s unclear what=E2=80=99s broken.=
+=C2=A0 So I think you
+>> might as well forego the qcow2.py test altogether, because if it breaks,
+>> that=E2=80=99ll probably show up in some other test case that uses it.)
+>>
+>> In this case here, I can see three things we could do:
+>>
+>> First, could just filter out the data file header extension and the
+>> bitmap_directory_offset.=C2=A0 But I=E2=80=99m not sure whether that=E2=
+=80=99s the best thing
+>> to do, because it might break with some other obscure IMGOPTS that I
+>> personally never use for the iotests.
+>>
+>> I think that if we want a real qcow2.py test somewhere, it should be its
+>> own test.=C2=A0 No custom IMGOPTS allowed.=C2=A0 So the second idea woul=
+d be to
+>> move it there, and drop the qcow2.py usage from here.
+>>
+>> Or, third, maybe we actually don=E2=80=99t care that much about a real q=
+cow2.py
+>> test, and really want to just *use* (as opposed to =E2=80=9Ctest=E2=80=
+=9D) qcow2.py
+>> here.=C2=A0 Then we should filter what we really need from its output in=
+stead
+>> of dropping what we don=E2=80=99t need.
+>>
+>>
+>> (We could also disable 291 for external data files, but I don=E2=80=99t =
+really
+>> see why, if the only justification for this addition to it is to test
+>> qcow2.py =E2=80=93 which 291 isn=E2=80=99t for.)
+>>
+> I see your point, agree that the most correct thing is to drop qcow2.py
+> testing from 291, reverting test chunks from this commit. I can send a
+> patch.
 
-> On Wed, Jun 17, 2020 at 7:35 PM Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> wrote:
-> >
-> > Right - which I do as a developer. It would be rude to sudo things if
-> > you don't need to because then you end up running your potentially
-> > un-trusted application with root privileges.
-> >
-> > Could we either probe for the requirement or require an explicit sudo
-> > flag which we can prompt for if it fails?
-> >
-> To make sure I got it right. You mean I should specify in the script
-> comment on the top that the user should modify the
-> kernel.perf_event_paranoid setting in order to run the script, otherwise,
-> they should add a --sudo flag when running the Python script to invoke
-> perf as sudo?
->
->
-I think Alex meant that everything related to super user access should be
-examined by the script. You could:
+OK, thanks!
 
-A. Establish if the user that execute the script is already super user. If
-yes, you can proceed with command lines containing "perf. (see hints how to
-do this here:
-https://stackoverflow.com/questions/2806897/what-is-the-best-way-for-checki=
-ng-if-the-user-of-a-script-has-root-like-privileg
-)
+> I do think, that we'll need some testing for qcow2.py, as we are going
+> to improve it a lot, to be used as separate debugging tool. And we just
+> need a separate iotest for it.
 
-B. Establish if "perf" can be executed successfully with current user
-privelages. If yes, you can also proceed with command lines containing
-"perf" (a primitive but simple way for establishing this is to run "perf
-stat ls /" and see what happens, success or error)
+Great.
 
-C. If neither A nor B are satisfied, you cold emit error message
-instructing the user what he needs to/could do.
-
-Just my 2 c. Not sure if this is compatible with Alex' thoughts.
-
-Aleksandar
+Max
 
 
-> > >
-> > >> Also redirecting just stderr? why?
-> > >
-> > > Perf, as well as Valgrind, print their output on stderr not stdout.
-> >
-> > Right so I think a bit of splitting apart and use of subprocess can mak=
-e
-> > this cleaner and not involve quite so much being done with shell
-> > redirection in one invocation.
-> >
->
-> Noted!
->
+--tpndFCRtUloVPW0ZKbaWvxlhOf1xFKBRV--
 
---00000000000026732305a85d21e7
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+--PpfuW3SfiMzJKtp6WPuOhJFONBNYaz8l5
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-<br><br>=D1=81=D1=80=D0=B5=D0=B4=D0=B0, 17. =D1=98=D1=83=D0=BD 2020., Ahmed=
- Karaman &lt;<a href=3D"mailto:ahmedkhaledkaraman@gmail.com">ahmedkhaledkar=
-aman@gmail.com</a>&gt; =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=
-=BE/=D0=BB=D0=B0:<br><blockquote class=3D"gmail_quote" style=3D"margin:0 0 =
-0 .8ex;border-left:1px #ccc solid;padding-left:1ex">On Wed, Jun 17, 2020 at=
- 7:35 PM Alex Benn=C3=A9e &lt;<a href=3D"mailto:alex.bennee@linaro.org">ale=
-x.bennee@linaro.org</a>&gt; wrote:<br>
-&gt;<br>
-&gt; Right - which I do as a developer. It would be rude to sudo things if<=
-br>
-&gt; you don&#39;t need to because then you end up running your potentially=
-<br>
-&gt; un-trusted application with root privileges.<br>
-&gt;<br>
-&gt; Could we either probe for the requirement or require an explicit sudo<=
-br>
-&gt; flag which we can prompt for if it fails?<br>
-&gt;<br>
-To make sure I got it right. You mean I should specify in the script<br>
-comment on the top that the user should modify the<br>
-kernel.perf_event_paranoid setting in order to run the script, otherwise,<b=
-r>
-they should add a --sudo flag when running the Python script to invoke<br>
-perf as sudo?<br>
-<br></blockquote><div><br></div><div>I think Alex meant that everything rel=
-ated to super user access should be examined by the script. You could:</div=
-><div><br></div><div>A. Establish if the user that execute the script is al=
-ready super user. If yes, you can proceed with command lines containing &qu=
-ot;perf. (see hints how to do this here: <a href=3D"https://stackoverflow.c=
-om/questions/2806897/what-is-the-best-way-for-checking-if-the-user-of-a-scr=
-ipt-has-root-like-privileg">https://stackoverflow.com/questions/2806897/wha=
-t-is-the-best-way-for-checking-if-the-user-of-a-script-has-root-like-privil=
-eg</a> )</div><div><br></div><div>B. Establish if &quot;perf&quot; can be e=
-xecuted successfully with current user privelages. If yes,=C2=A0you can als=
-o proceed with command lines containing &quot;perf&quot;=C2=A0(a primitive =
-but simple way for establishing this is to run &quot;perf stat ls /&quot; a=
-nd see what happens, success or error)</div><div><br></div><div>C. If neith=
-er A nor B are satisfied, you cold emit error message instructing the user =
-what he needs to/could do.</div><div><br></div><div>Just my 2 c. Not sure i=
-f this is compatible with Alex&#39; thoughts.</div><div><br></div><div>Alek=
-sandar</div><div>=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"mar=
-gin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">
-&gt; &gt;<br>
-&gt; &gt;&gt; Also redirecting just stderr? why?<br>
-&gt; &gt;<br>
-&gt; &gt; Perf, as well as Valgrind, print their output on stderr not stdou=
-t.<br>
-&gt;<br>
-&gt; Right so I think a bit of splitting apart and use of subprocess can ma=
-ke<br>
-&gt; this cleaner and not involve quite so much being done with shell<br>
-&gt; redirection in one invocation.<br>
-&gt;<br>
-<br>
-Noted!<br>
-</blockquote>
+-----BEGIN PGP SIGNATURE-----
 
---00000000000026732305a85d21e7--
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl7rg7MACgkQ9AfbAGHV
+z0BNgwf9Ef3gsHW9SvxsOXqhnfz5uFncabNJ5OzSfhKrllPF5RV6B9472zWF6f9u
+ZyJQot2DQC1DE/M4SVm/v7g1hl7FoGKR+Vdd7EhuRbPbnal/vCP7aV733aDFxJFq
+ohcCmIBSma1/1rd0HFaUoNS4IkyKcGBc3nTvBfWGgRX0fo5Ku+3iPq1lo0mfIEip
+kFiJamT8oLV7XJ/lVX+2J6HQlAnN3BxA+qcMhsoW7R8rZ86O+7vQUicWCuYQOrCU
+wnvuVbVdS6cH8PXWTjiDEVIhxojpgbpvYWR+u9ZA4YyEHH6KTf9Kgi/zUtzoC86b
+y4VgX1LjtvlivXM6u1Vt4FiobzQDVA==
+=bXvk
+-----END PGP SIGNATURE-----
+
+--PpfuW3SfiMzJKtp6WPuOhJFONBNYaz8l5--
+
 
