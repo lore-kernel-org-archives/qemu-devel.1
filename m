@@ -2,83 +2,119 @@ Return-Path: <SRS0=FaGC=77=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31CE6C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 14:49:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85F4FC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 14:52:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EB10720888
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 14:49:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 504E320739
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 14:52:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XHmPJUNZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB10720888
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GJxXhlYB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 504E320739
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52028 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54272 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlvrP-0003zX-5Y
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 10:49:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43976)
+	id 1jlvuU-0007x8-Jz
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 10:52:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44828)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jlvqf-0002fS-MM
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 10:49:01 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:57794
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jlvto-0007Vk-3A
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 10:52:16 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:27610
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jlvqe-0005KK-75
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 10:49:01 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jlvtm-00064q-AV
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 10:52:15 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592491738;
+ s=mimecast20190719; t=1592491933;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=wa9ofjsgBTB46nJUGptcVFKHtsfILsSf/2QWeSMefAo=;
- b=XHmPJUNZYMH3KMbllKlGRMGrFIGqLWq/Ix+8ScfgRl/bJPwtCPwn6xqq9OEegvMB3vWrBp
- 1degMqmQBxoGQ65dTImNHC3JRW/3x0mtsguZxo6bEi+ax4CX+rBz5iMuTGcinK2To3JJPP
- /nsqfDlgXa8nHGBCWpHNOfY1dexbxL4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-64-mIX2__G2N4OHNRbmZNaYLw-1; Thu, 18 Jun 2020 10:48:49 -0400
-X-MC-Unique: mIX2__G2N4OHNRbmZNaYLw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8F49619241BE;
- Thu, 18 Jun 2020 14:47:55 +0000 (UTC)
-Received: from [10.3.112.27] (ovpn-112-27.phx2.redhat.com [10.3.112.27])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id F06A25BAC4;
- Thu, 18 Jun 2020 14:47:36 +0000 (UTC)
-Subject: Re: [PATCH v3 08/17] block/io: support int64_t bytes in
- bdrv_aligned_preadv()
-To: Alberto Garcia <berto@igalia.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20200430111033.29980-1-vsementsov@virtuozzo.com>
- <20200430111033.29980-9-vsementsov@virtuozzo.com>
- <9143ff10-cba2-bcc2-c48c-eac73446b159@redhat.com>
- <w51lfkktpaz.fsf@maestria.local.igalia.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <7f16039b-d361-8645-7805-100c1ef5314a@redhat.com>
-Date: Thu, 18 Jun 2020 09:47:36 -0500
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=Rb0MA2TldaH/naZwkA0QefrBI/v6W5MVIej3zG8l9Hc=;
+ b=GJxXhlYBsxSpOdf2l6aoFNaGO6FhWYKkRcy9mOv+xG/6t/cvdI9zcORi8w0Nt8Qk5UJbxS
+ LbWmJIbsgOTd0bhTw9/Y+qk7VVKHDo4Bt9QYXxHvk/FI/JrYDRwvb8DObeo8A2xI79Ten4
+ AEuCVzWh4YToxjHCDwtu9VW9gkmTF38=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-434-5PTJ__TNOomQexvA0zhi9w-1; Thu, 18 Jun 2020 10:52:06 -0400
+X-MC-Unique: 5PTJ__TNOomQexvA0zhi9w-1
+Received: by mail-wr1-f69.google.com with SMTP id f5so2882998wrv.22
+ for <qemu-devel@nongnu.org>; Thu, 18 Jun 2020 07:52:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=Rb0MA2TldaH/naZwkA0QefrBI/v6W5MVIej3zG8l9Hc=;
+ b=X/s1wD2PMop3o3nWAfEf/MhMoVwJrdOHZkmpzfGbzQRPvW4pAgRQxfhiJuOKLpPlWd
+ Tgd4M6PNlEEiKjXvNy6u2tQXIGyO3Z2BYRfsUapRs7qCx0g40L17KKhvQ0estwbe1s1R
+ XIX++fADXklx521lKpSvbEAJVHgI1bOlccljBZ+peO/5fZRa8+poYM0DPanePPwkw5+N
+ z3BjZY+78CTHUNLvSA7ZxHmlRkK+AkJg2ik3XOwhqXNG41mWQrfhO8Gen815EcFczN7k
+ 00vasFGD3UEHquOQwBhezGKnc/l6RqkzXtfN0EAML6Dj//jbWzlfyq4Z+5J7VQfI1JSp
+ fHyw==
+X-Gm-Message-State: AOAM531mh77YJzbm3FewtbVNSY4y3DQVIYLPuUoWxs+dWFbrCbhlQotG
+ gtj3+aG/A6Ne7b8+m3NyKXOj32t+F0j/OaQwZx7jiKawExZoOo/FQxElJytsvCxftAUkWTH5WH/
+ duEd60ixn+hX9k04=
+X-Received: by 2002:adf:e850:: with SMTP id d16mr5189931wrn.426.1592491925400; 
+ Thu, 18 Jun 2020 07:52:05 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxHRsWPcOgnugi/JcJj5Vf60Xh1gOVwOOgjiteXKRpcSfJdzNA3OjNE6DJCfRjkxvBGHEKw5w==
+X-Received: by 2002:adf:e850:: with SMTP id d16mr5189912wrn.426.1592491925173; 
+ Thu, 18 Jun 2020 07:52:05 -0700 (PDT)
+Received: from [192.168.1.38] (93.red-83-59-160.dynamicip.rima-tde.net.
+ [83.59.160.93])
+ by smtp.gmail.com with ESMTPSA id e25sm4384138wrc.69.2020.06.18.07.52.03
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 18 Jun 2020 07:52:04 -0700 (PDT)
+Subject: Re: [PATCH v1] memory: assert MemoryRegionOps callbacks are defined
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ P J P <ppandit@redhat.com>
+References: <20200618121218.215808-1-ppandit@redhat.com>
+ <87r1ucv7pe.fsf@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <cdaa70a5-5112-85ab-fe10-89f1394925d0@redhat.com>
+Date: Thu, 18 Jun 2020 16:52:03 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <w51lfkktpaz.fsf@maestria.local.igalia.com>
+In-Reply-To: <87r1ucv7pe.fsf@linaro.org>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=eblake@redhat.com;
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 01:32:18
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -101,53 +137,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, fam@euphon.net, integration@gluster.org,
- sheepdog@lists.wpkg.org, pavel.dovgaluk@ispras.ru, dillaman@redhat.com,
- qemu-devel@nongnu.org, sw@weilnetz.de, pl@kamp.de, ronniesahlberg@gmail.com,
- mreitz@redhat.com, den@openvz.org, stefanha@redhat.com, namei.unix@gmail.com,
- pbonzini@redhat.com, jsnow@redhat.com, ari@tuxera.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Prasad J Pandit <pjp@fedoraproject.org>, Li Qiang <liq3ea@gmail.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Lei Sun <slei.casper@gmail.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/18/20 9:35 AM, Alberto Garcia wrote:
-> On Fri 22 May 2020 05:14:36 PM CEST, Eric Blake wrote:
->>>    static int coroutine_fn bdrv_aligned_preadv(BdrvChild *child,
->>> -    BdrvTrackedRequest *req, int64_t offset, unsigned int bytes,
->>> +    BdrvTrackedRequest *req, int64_t offset, int64_t bytes,
->>>        int64_t align, QEMUIOVector *qiov, size_t qiov_offset, int flags)
->   [...]
->>>        BlockDriverState *bs = child->bs;
->>>        int64_t total_bytes, max_bytes;
->>>        int ret = 0;
->>> -    uint64_t bytes_remaining = bytes;
->>> +    int64_t bytes_remaining = bytes;
->>>        int max_transfer;
->>>    
->>>        assert(is_power_of_2(align));
->>> +    assert(offset >= 0 && bytes >= 0);
->>
->> Use within the function:
->>
->> the new assertion added here does not check for whether offset+bytes is
->> positive; I would suggest we strengthen it to instead be:
->> assert(offset >= 0 && (uint64_t) bytes <= INT64_MAX - offset);
+On 6/18/20 3:12 PM, Alex Bennée wrote:
 > 
-> But here you would be making 'bytes' unsigned without asserting that
-> it's not negative.
+> P J P <ppandit@redhat.com> writes:
+> 
+>> From: Prasad J Pandit <pjp@fedoraproject.org>
+>>
+>> When registering a MemoryRegionOps object, assert that its
+>> read/write callback methods are defined. This avoids potential
+>> guest crash via a NULL pointer dereference.
+>>
+>> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+>> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+>> ---
+>>  memory.c | 5 +++++
+>>  1 file changed, 5 insertions(+)
+>>
+>> Update v1: add assert while registering MemoryRegionOps
+>>   -> https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg05187.html
+>>
+>> diff --git a/memory.c b/memory.c
+>> index 91ceaf9fcf..6e94fd5958 100644
+>> --- a/memory.c
+>> +++ b/memory.c
+>> @@ -1495,6 +1495,9 @@ void memory_region_init_io(MemoryRegion *mr,
+>>                             const char *name,
+>>                             uint64_t size)
+>>  {
+>> +    assert(ops);
+>> +    assert(ops->read);
+>> +    assert(ops->write);
+> 
+> If you look at memory_region_dispatch_write you can see that
+> mr->ops->write being empty is acceptable because it implies
+> mr->ops->write_with_attrs is set instead. I think the same is true for
+> read so I think you need something more like:
+> 
+>      assert(ops->read || ops->read_with_attrs);
+>      assert(ops->write || ops->write_with_attrs);
+>      
+> 
+>>      memory_region_init(mr, owner, name, size);
+>>      mr->ops = ops ? ops : &unassigned_mem_ops;
+>>      mr->opaque = opaque;
+>> @@ -1674,6 +1677,8 @@ void memory_region_init_rom_device_nomigrate(MemoryRegion *mr,
+>>  {
+>>      Error *err = NULL;
+>>      assert(ops);
+>> +    assert(ops->read);
+>> +    assert(ops->write);
+> 
+> Do ROM devices need a ->write function?
 
-'offset >= 0' proves that offset is nonnegative.  'INT64_MAX - offset' 
-is still a signed integer, and is also necessarily non-negative (the 
-maximum positive integer minus any other positive integer cannot go 
-negative).  We then coerce that into an unsigned comparison, which means 
-if bytes was negative, the coercion will result in something larger than 
-(unsigned)INT64_MAX, and the overall assert() will fail.  Thus, as 
-written, the assertion works just fine at proving both bytes and offset 
-were non-negative, and that bytes+offset did not overflow a signed integer.
+This is how you put the device in I/O mode, isn't it?
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+> 
+> Also doesn't this break a load of running stuff without fixes for all
+> the various missing bits? How far does make check-acceptance get?
+> 
+>>      memory_region_init(mr, owner, name, size);
+>>      mr->ops = ops;
+>>      mr->opaque = opaque;
+> 
+> 
 
 
