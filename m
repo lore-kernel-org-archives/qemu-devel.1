@@ -2,125 +2,84 @@ Return-Path: <SRS0=FaGC=77=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7370DC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 13:36:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B273C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 13:36:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3F463207D8
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 13:36:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 57E4F207D8
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 13:36:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="uuJGbXFd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F463207D8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Je00Zy1K"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57E4F207D8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59862 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60120 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlui2-0006Ql-1f
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 09:36:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42698)
+	id 1jlui7-0006a1-UI
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 09:36:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40836)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jluaW-0000Lr-FL; Thu, 18 Jun 2020 09:28:16 -0400
-Received: from mail-vi1eur05on2104.outbound.protection.outlook.com
- ([40.107.21.104]:13640 helo=EUR05-VI1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jluaT-0006uU-83; Thu, 18 Jun 2020 09:28:15 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=GON2NoR8iwCMJ1cslWdS/qZa8t1r/0X5brWVtlclB9MjKsR2BkPorq76qoPrkY3iUDCb1lw8TgeCIi8yuCz7F03wpwtY2AQm9I/AHFNvYGQbQ2SMB6DIN2x/o5KRltY/ThcRxd4hiE5ahi2ni2kvmPNrvn0WJVzYHUxKtLY0HUps9etNMqo9F9VgI22vwU9viSck+/4aS+NsOcJxIQGj0Z+LQRqX+evjWM1eMF6xALfPus/LU6jlOZgovl3LEgkMPVM6tlT6osgI/Ev+V/Ax5cK42h9Y0LzdFdljLxJp+f7Kj/9EsB+LTvZsJhZP44QNECGUaJB4qrwiF6b2YedwrQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=X9oIVWCT4lRLUJ94tT1tqeSBKL8Q1M78n4l9MWIhd2k=;
- b=cgSeRko4qEmOpSHyr/U4o2SFktW0vHzLmJDSj4wYOsCk9rJP1+hd/DzB1rKFbKTkQHdylmvfKjj1YMm5lilPBDCQB5PjV92iqcTGCnPRL7Sx2pYBikbUVctGrk8BcZAadJgBpmlK5Wem7H/ONqljDxT/53EB39tZidNWOhYIvMni5KXj6jdw4dXDRBWeFCv+/3Xdg7TvgwsqobEghvqsc+X0aTJEkhhVJptiZFYdnYJpPMzjqIf+/cD9alX64NyrjtlNfOMBWSgW6V5epF7sTfdih0INmRkDxa/631S5OumtOerQE3xc5aftaxnxA+uE7D6YdofmrFx02wjHAzRqoQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=X9oIVWCT4lRLUJ94tT1tqeSBKL8Q1M78n4l9MWIhd2k=;
- b=uuJGbXFdgHJRoDtwl+lxqsaoRLzzppldOwAoh26n3e3ooUFCsMgRGySPaqrPVF0xVaOC90T+TFe635dR3NExO+qzx2PMi0U/Gf9O5be60kBOES7gC9+nQFLPasTRPgAwjIIzXX5JKgjxK5jh8DXbjNoUbInjmiHQCBd5QOhphDA=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM7PR08MB5511.eurprd08.prod.outlook.com (2603:10a6:20b:10d::12)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3109.22; Thu, 18 Jun
- 2020 13:28:10 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::a408:2f0f:bc6c:d312%3]) with mapi id 15.20.3109.021; Thu, 18 Jun 2020
- 13:28:10 +0000
-Subject: Re: [PULL 14/15] qcow2_format.py: dump bitmaps header extension
-To: Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200609205245.3548257-1-eblake@redhat.com>
- <20200609205245.3548257-15-eblake@redhat.com>
- <81ba0181-3dfc-1c1e-7c19-278569e65c60@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <64c3084a-8bda-14d9-907c-da0af67cf9c3@virtuozzo.com>
-Date: Thu, 18 Jun 2020 16:28:08 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
-In-Reply-To: <81ba0181-3dfc-1c1e-7c19-278569e65c60@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: AM0PR04CA0073.eurprd04.prod.outlook.com
- (2603:10a6:208:be::14) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
-MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.2] (185.215.60.159) by
- AM0PR04CA0073.eurprd04.prod.outlook.com (2603:10a6:208:be::14) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3109.21 via Frontend Transport; Thu, 18 Jun 2020 13:28:09 +0000
-X-Originating-IP: [185.215.60.159]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 24ddf213-0c6c-4f57-6012-08d8138b719d
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5511:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM7PR08MB5511B1C2F2F9358666D60843C19B0@AM7PR08MB5511.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
-X-Forefront-PRVS: 0438F90F17
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Dz4ACl2o3jWDoxoo4ySoQ6OYtg2HUE91G1DSM/jUPaXpj9IzcLVHjOe383DlqD5sELIpq1xnnB7nZpFaPm6Bp6iDQYciGRA7YTxVMVQsdx9dJofen3xG8G8CD9UEgNZD9A8/Odd8/AetICEVaKgcXiY4TpX+jBoCSmijhMiTwbZloZHaod3XgJBH8GF8evF6oPXXpHoXRpUXMHB3ttV2Q7OWCUREU/U3mC8iLOe6c0ukCRvuR6ZryfzEZHBZjhLde6lS8mR5krtsHIQw27SeaXl8aaUqKKXXSc+G+zQlq9leyV0qHbdHkAPinLOLTa3iVAmmseAfvx1g130mzIzhNG+SQJkEIXxiD4TPTwYo7X2I1f5ftfcwcw0Xrb8hxxXn
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(346002)(396003)(376002)(136003)(39840400004)(366004)(31686004)(478600001)(66556008)(66476007)(66946007)(956004)(2616005)(8676002)(36756003)(86362001)(8936002)(31696002)(26005)(316002)(186003)(53546011)(2906002)(52116002)(5660300002)(16576012)(4326008)(54906003)(16526019)(6486002)(110136005)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: KR+HsNddpyKsjOcss/LdlTbFNbXrNKUsV+hsyHQP2cOc7z0E3fBiSwKYgQ1n6sYxQYrqQ4sF0h7cG7FFCNu++Frpl50SumDYMQ6l7RWqCMVTMt2Qfn+3xuiTYv6WRMxNrT2uPCBKQ6sIU2sWVKLwVOlDYQeK/h7DmmlLbYDDntWjtlOStmTRlmT+592q3XUJo1ycpFf34nEZ9VgPIzRg6apVkCIJNu8etCZTyCCvZQujs80fXLtU9y0mNjcuIftm9HP5CwOO1cwf1j1VAU3bbHp44rH/FaqBigwR5Kc0V+rSqCDsnu3hvU/gmsVjgoWkZPXIPVAueSaK32PUUUGDV7Q1Wr2OggZUNyuYn14dAOlpXygUMx7kPPKJpGaMDTvluPGuuUiAaNjncTVCTm3yBdTSBiUJRbW1xc7wPshOvO45VT/XtKlIe/PB0fHl4dr/8CDKDOuvh+b4sSNyyQkoGGpjTHWl9KrTbHfxqTyA76iixQu/5XJmigy8oDKB32ye
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 24ddf213-0c6c-4f57-6012-08d8138b719d
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jun 2020 13:28:10.1770 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Tuog4spqjpWql6x6RukRORpsrt1e44aHdZ9pJrpqqh7SbO9jwbLjLwlg9ppdsKowe1lcqlJmsaVj/cEBM7Dv189Xor2dNpZYJ6b8SziRR7M=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5511
-Received-SPF: pass client-ip=40.107.21.104;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR05-VI1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 09:28:10
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -37
-X-Spam_score: -3.8
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1jluVn-0007nv-7S
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 09:23:23 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:29709
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1jluVl-0005sO-4J
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 09:23:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592486600;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
+ references:references; bh=cyQeNqIxnO+V8kgMoh6CmEf2K7MyHQFKaX0InhJMRGU=;
+ b=Je00Zy1KvyT+rzpPxquJ/lJFhz6UpuGy7sRGN+7E2TEjDTeOcG/KE5PuTu2Zb7bzjU+GaE
+ IZe/XCzMx9Viok71jotu0gdGWn/UK1ESNEvuQ3fcGrVsfilvtVnSAbyXYYz+cPXzYN57fi
+ A4OqcvsFQNqtwbQIlYrY+V4wTJR0rpw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-294-_lN67WvSNn-1cZ5M8j_V0Q-1; Thu, 18 Jun 2020 09:23:18 -0400
+X-MC-Unique: _lN67WvSNn-1cZ5M8j_V0Q-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 53190EC1A3;
+ Thu, 18 Jun 2020 13:23:17 +0000 (UTC)
+Received: from jason-ThinkPad-T430s.redhat.com (ovpn-12-109.pek2.redhat.com
+ [10.72.12.109])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6A0045BAC1;
+ Thu, 18 Jun 2020 13:23:15 +0000 (UTC)
+From: Jason Wang <jasowang@redhat.com>
+To: peter.maydell@linaro.org,
+	qemu-devel@nongnu.org
+Subject: [PULL V2 26/33] net/colo-compare.c: Fix deadlock in compare_chr_send
+Date: Thu, 18 Jun 2020 21:21:41 +0800
+Message-Id: <1592486508-6135-27-git-send-email-jasowang@redhat.com>
+In-Reply-To: <1592486508-6135-1-git-send-email-jasowang@redhat.com>
+References: <1592486508-6135-1-git-send-email-jasowang@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=jasowang@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 01:32:18
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
 X-Spam_bar: ---
-X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -133,65 +92,379 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
- "open list:Block layer core" <qemu-block@nongnu.org>
+Cc: Zhang Chen <chen.zhang@intel.com>, Jason Wang <jasowang@redhat.com>,
+ Lukas Straub <lukasstraub2@web.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-18.06.2020 16:13, Max Reitz wrote:
-> On 09.06.20 22:52, Eric Blake wrote:
->> From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>
->> Add class for bitmap extension and dump its fields. Further work is to
->> dump bitmap directory.
->>
->> Test new functionality inside 291 iotest.
-> 
-> Unfortunately, it also breaks 291 with an external data file, which
-> worked before.  (The problems being that an external data file gives you
-> an additional header extension, and that the bitmap directory offset
-> changes.)
-> 
-> I think if we want to test testing tools, we have to do that in a
-> controlled environment where we exactly know what the image is.  It
-> looks to me now as if 291 is not such an environment.  Or phrased
-> differently, we probably shouldn’t test some testing tool in normal
-> tests that test qemu itself.
-> 
-> If we only test qcow2.py in normal tests, then I don’t think we have to
-> explicitly test it at all.  (Because if you test qcow2.py in a normal
-> test, and the test breaks, it’s unclear what’s broken.  So I think you
-> might as well forego the qcow2.py test altogether, because if it breaks,
-> that’ll probably show up in some other test case that uses it.)
-> 
-> In this case here, I can see three things we could do:
-> 
-> First, could just filter out the data file header extension and the
-> bitmap_directory_offset.  But I’m not sure whether that’s the best thing
-> to do, because it might break with some other obscure IMGOPTS that I
-> personally never use for the iotests.
-> 
-> I think that if we want a real qcow2.py test somewhere, it should be its
-> own test.  No custom IMGOPTS allowed.  So the second idea would be to
-> move it there, and drop the qcow2.py usage from here.
-> 
-> Or, third, maybe we actually don’t care that much about a real qcow2.py
-> test, and really want to just *use* (as opposed to “test”) qcow2.py
-> here.  Then we should filter what we really need from its output instead
-> of dropping what we don’t need.
-> 
-> 
-> (We could also disable 291 for external data files, but I don’t really
-> see why, if the only justification for this addition to it is to test
-> qcow2.py – which 291 isn’t for.)
-> 
-I see your point, agree that the most correct thing is to drop qcow2.py testing from 291, reverting test chunks from this commit. I can send a patch.
+From: Lukas Straub <lukasstraub2@web.de>
 
-I do think, that we'll need some testing for qcow2.py, as we are going to improve it a lot, to be used as separate debugging tool. And we just need a separate iotest for it. Andrey, could you please introduce one, as part of your series?
+The chr_out chardev is connected to a filter-redirector
+running in the main loop. qemu_chr_fe_write_all might block
+here in compare_chr_send if the (socket-)buffer is full.
+If another filter-redirector in the main loop want's to
+send data to chr_pri_in it might also block if the buffer
+is full. This leads to a deadlock because both event loops
+get blocked.
 
+Fix this by converting compare_chr_send to a coroutine and
+putting the packets in a send queue.
+
+Signed-off-by: Lukas Straub <lukasstraub2@web.de>
+Reviewed-by: Zhang Chen <chen.zhang@intel.com>
+Tested-by: Zhang Chen <chen.zhang@intel.com>
+Signed-off-by: Zhang Chen <chen.zhang@intel.com>
+Signed-off-by: Jason Wang <jasowang@redhat.com>
+---
+ net/colo-compare.c | 193 ++++++++++++++++++++++++++++++++++++++++-------------
+ net/colo.c         |   7 ++
+ net/colo.h         |   1 +
+ 3 files changed, 156 insertions(+), 45 deletions(-)
+
+diff --git a/net/colo-compare.c b/net/colo-compare.c
+index e557da7..62ecd38 100644
+--- a/net/colo-compare.c
++++ b/net/colo-compare.c
+@@ -32,6 +32,9 @@
+ #include "migration/migration.h"
+ #include "util.h"
+ 
++#include "block/aio-wait.h"
++#include "qemu/coroutine.h"
++
+ #define TYPE_COLO_COMPARE "colo-compare"
+ #define COLO_COMPARE(obj) \
+     OBJECT_CHECK(CompareState, (obj), TYPE_COLO_COMPARE)
+@@ -77,6 +80,23 @@ static int event_unhandled_count;
+  *                    |packet  |  |packet  +    |packet  | |packet  +
+  *                    +--------+  +--------+    +--------+ +--------+
+  */
++
++typedef struct SendCo {
++    Coroutine *co;
++    struct CompareState *s;
++    CharBackend *chr;
++    GQueue send_list;
++    bool notify_remote_frame;
++    bool done;
++    int ret;
++} SendCo;
++
++typedef struct SendEntry {
++    uint32_t size;
++    uint32_t vnet_hdr_len;
++    uint8_t *buf;
++} SendEntry;
++
+ typedef struct CompareState {
+     Object parent;
+ 
+@@ -91,6 +111,8 @@ typedef struct CompareState {
+     SocketReadState pri_rs;
+     SocketReadState sec_rs;
+     SocketReadState notify_rs;
++    SendCo out_sendco;
++    SendCo notify_sendco;
+     bool vnet_hdr;
+     uint32_t compare_timeout;
+     uint32_t expired_scan_cycle;
+@@ -124,10 +146,11 @@ enum {
+ 
+ 
+ static int compare_chr_send(CompareState *s,
+-                            const uint8_t *buf,
++                            uint8_t *buf,
+                             uint32_t size,
+                             uint32_t vnet_hdr_len,
+-                            bool notify_remote_frame);
++                            bool notify_remote_frame,
++                            bool zero_copy);
+ 
+ static bool packet_matches_str(const char *str,
+                                const uint8_t *buf,
+@@ -145,7 +168,7 @@ static void notify_remote_frame(CompareState *s)
+     char msg[] = "DO_CHECKPOINT";
+     int ret = 0;
+ 
+-    ret = compare_chr_send(s, (uint8_t *)msg, strlen(msg), 0, true);
++    ret = compare_chr_send(s, (uint8_t *)msg, strlen(msg), 0, true, false);
+     if (ret < 0) {
+         error_report("Notify Xen COLO-frame failed");
+     }
+@@ -272,12 +295,13 @@ static void colo_release_primary_pkt(CompareState *s, Packet *pkt)
+                            pkt->data,
+                            pkt->size,
+                            pkt->vnet_hdr_len,
+-                           false);
++                           false,
++                           true);
+     if (ret < 0) {
+         error_report("colo send primary packet failed");
+     }
+     trace_colo_compare_main("packet same and release packet");
+-    packet_destroy(pkt, NULL);
++    packet_destroy_partial(pkt, NULL);
+ }
+ 
+ /*
+@@ -699,65 +723,115 @@ static void colo_compare_connection(void *opaque, void *user_data)
+     }
+ }
+ 
+-static int compare_chr_send(CompareState *s,
+-                            const uint8_t *buf,
+-                            uint32_t size,
+-                            uint32_t vnet_hdr_len,
+-                            bool notify_remote_frame)
++static void coroutine_fn _compare_chr_send(void *opaque)
+ {
++    SendCo *sendco = opaque;
++    CompareState *s = sendco->s;
+     int ret = 0;
+-    uint32_t len = htonl(size);
+ 
+-    if (!size) {
+-        return 0;
+-    }
++    while (!g_queue_is_empty(&sendco->send_list)) {
++        SendEntry *entry = g_queue_pop_tail(&sendco->send_list);
++        uint32_t len = htonl(entry->size);
+ 
+-    if (notify_remote_frame) {
+-        ret = qemu_chr_fe_write_all(&s->chr_notify_dev,
+-                                    (uint8_t *)&len,
+-                                    sizeof(len));
+-    } else {
+-        ret = qemu_chr_fe_write_all(&s->chr_out, (uint8_t *)&len, sizeof(len));
+-    }
++        ret = qemu_chr_fe_write_all(sendco->chr, (uint8_t *)&len, sizeof(len));
+ 
+-    if (ret != sizeof(len)) {
+-        goto err;
+-    }
++        if (ret != sizeof(len)) {
++            g_free(entry->buf);
++            g_slice_free(SendEntry, entry);
++            goto err;
++        }
+ 
+-    if (s->vnet_hdr) {
+-        /*
+-         * We send vnet header len make other module(like filter-redirector)
+-         * know how to parse net packet correctly.
+-         */
+-        len = htonl(vnet_hdr_len);
++        if (!sendco->notify_remote_frame && s->vnet_hdr) {
++            /*
++             * We send vnet header len make other module(like filter-redirector)
++             * know how to parse net packet correctly.
++             */
++            len = htonl(entry->vnet_hdr_len);
+ 
+-        if (!notify_remote_frame) {
+-            ret = qemu_chr_fe_write_all(&s->chr_out,
++            ret = qemu_chr_fe_write_all(sendco->chr,
+                                         (uint8_t *)&len,
+                                         sizeof(len));
++
++            if (ret != sizeof(len)) {
++                g_free(entry->buf);
++                g_slice_free(SendEntry, entry);
++                goto err;
++            }
+         }
+ 
+-        if (ret != sizeof(len)) {
++        ret = qemu_chr_fe_write_all(sendco->chr,
++                                    (uint8_t *)entry->buf,
++                                    entry->size);
++
++        if (ret != entry->size) {
++            g_free(entry->buf);
++            g_slice_free(SendEntry, entry);
+             goto err;
+         }
++
++        g_free(entry->buf);
++        g_slice_free(SendEntry, entry);
+     }
+ 
++    sendco->ret = 0;
++    goto out;
++
++err:
++    while (!g_queue_is_empty(&sendco->send_list)) {
++        SendEntry *entry = g_queue_pop_tail(&sendco->send_list);
++        g_free(entry->buf);
++        g_slice_free(SendEntry, entry);
++    }
++    sendco->ret = ret < 0 ? ret : -EIO;
++out:
++    sendco->co = NULL;
++    sendco->done = true;
++    aio_wait_kick();
++}
++
++static int compare_chr_send(CompareState *s,
++                            uint8_t *buf,
++                            uint32_t size,
++                            uint32_t vnet_hdr_len,
++                            bool notify_remote_frame,
++                            bool zero_copy)
++{
++    SendCo *sendco;
++    SendEntry *entry;
++
+     if (notify_remote_frame) {
+-        ret = qemu_chr_fe_write_all(&s->chr_notify_dev,
+-                                    (uint8_t *)buf,
+-                                    size);
++        sendco = &s->notify_sendco;
+     } else {
+-        ret = qemu_chr_fe_write_all(&s->chr_out, (uint8_t *)buf, size);
++        sendco = &s->out_sendco;
+     }
+ 
+-    if (ret != size) {
+-        goto err;
++    if (!size) {
++        return 0;
+     }
+ 
+-    return 0;
++    entry = g_slice_new(SendEntry);
++    entry->size = size;
++    entry->vnet_hdr_len = vnet_hdr_len;
++    if (zero_copy) {
++        entry->buf = buf;
++    } else {
++        entry->buf = g_malloc(size);
++        memcpy(entry->buf, buf, size);
++    }
++    g_queue_push_head(&sendco->send_list, entry);
++
++    if (sendco->done) {
++        sendco->co = qemu_coroutine_create(_compare_chr_send, sendco);
++        sendco->done = false;
++        qemu_coroutine_enter(sendco->co);
++        if (sendco->done) {
++            /* report early errors */
++            return sendco->ret;
++        }
++    }
+ 
+-err:
+-    return ret < 0 ? ret : -EIO;
++    /* assume success */
++    return 0;
+ }
+ 
+ static int compare_chr_can_read(void *opaque)
+@@ -1063,6 +1137,7 @@ static void compare_pri_rs_finalize(SocketReadState *pri_rs)
+                          pri_rs->buf,
+                          pri_rs->packet_len,
+                          pri_rs->vnet_hdr_len,
++                         false,
+                          false);
+     } else {
+         /* compare packet in the specified connection */
+@@ -1093,7 +1168,7 @@ static void compare_notify_rs_finalize(SocketReadState *notify_rs)
+     if (packet_matches_str("COLO_USERSPACE_PROXY_INIT",
+                            notify_rs->buf,
+                            notify_rs->packet_len)) {
+-        ret = compare_chr_send(s, (uint8_t *)msg, strlen(msg), 0, true);
++        ret = compare_chr_send(s, (uint8_t *)msg, strlen(msg), 0, true, false);
+         if (ret < 0) {
+             error_report("Notify Xen COLO-frame INIT failed");
+         }
+@@ -1199,6 +1274,20 @@ static void colo_compare_complete(UserCreatable *uc, Error **errp)
+ 
+     QTAILQ_INSERT_TAIL(&net_compares, s, next);
+ 
++    s->out_sendco.s = s;
++    s->out_sendco.chr = &s->chr_out;
++    s->out_sendco.notify_remote_frame = false;
++    s->out_sendco.done = true;
++    g_queue_init(&s->out_sendco.send_list);
++
++    if (s->notify_dev) {
++        s->notify_sendco.s = s;
++        s->notify_sendco.chr = &s->chr_notify_dev;
++        s->notify_sendco.notify_remote_frame = true;
++        s->notify_sendco.done = true;
++        g_queue_init(&s->notify_sendco.send_list);
++    }
++
+     g_queue_init(&s->conn_list);
+ 
+     qemu_mutex_init(&event_mtx);
+@@ -1225,8 +1314,9 @@ static void colo_flush_packets(void *opaque, void *user_data)
+                          pkt->data,
+                          pkt->size,
+                          pkt->vnet_hdr_len,
+-                         false);
+-        packet_destroy(pkt, NULL);
++                         false,
++                         true);
++        packet_destroy_partial(pkt, NULL);
+     }
+     while (!g_queue_is_empty(&conn->secondary_list)) {
+         pkt = g_queue_pop_head(&conn->secondary_list);
+@@ -1297,10 +1387,23 @@ static void colo_compare_finalize(Object *obj)
+         }
+     }
+ 
++    AioContext *ctx = iothread_get_aio_context(s->iothread);
++    aio_context_acquire(ctx);
++    AIO_WAIT_WHILE(ctx, !s->out_sendco.done);
++    if (s->notify_dev) {
++        AIO_WAIT_WHILE(ctx, !s->notify_sendco.done);
++    }
++    aio_context_release(ctx);
++
+     /* Release all unhandled packets after compare thead exited */
+     g_queue_foreach(&s->conn_list, colo_flush_packets, s);
++    AIO_WAIT_WHILE(NULL, !s->out_sendco.done);
+ 
+     g_queue_clear(&s->conn_list);
++    g_queue_clear(&s->out_sendco.send_list);
++    if (s->notify_dev) {
++        g_queue_clear(&s->notify_sendco.send_list);
++    }
+ 
+     if (s->connection_track_table) {
+         g_hash_table_destroy(s->connection_track_table);
+diff --git a/net/colo.c b/net/colo.c
+index 8196b35..a6c66d8 100644
+--- a/net/colo.c
++++ b/net/colo.c
+@@ -185,6 +185,13 @@ void packet_destroy(void *opaque, void *user_data)
+     g_slice_free(Packet, pkt);
+ }
+ 
++void packet_destroy_partial(void *opaque, void *user_data)
++{
++    Packet *pkt = opaque;
++
++    g_slice_free(Packet, pkt);
++}
++
+ /*
+  * Clear hashtable, stop this hash growing really huge
+  */
+diff --git a/net/colo.h b/net/colo.h
+index 679314b..573ab91 100644
+--- a/net/colo.h
++++ b/net/colo.h
+@@ -102,5 +102,6 @@ bool connection_has_tracked(GHashTable *connection_track_table,
+ void connection_hashtable_reset(GHashTable *connection_track_table);
+ Packet *packet_new(const void *data, int size, int vnet_hdr_len);
+ void packet_destroy(void *opaque, void *user_data);
++void packet_destroy_partial(void *opaque, void *user_data);
+ 
+ #endif /* NET_COLO_H */
 -- 
-Best regards,
-Vladimir
+2.5.0
+
 
