@@ -2,41 +2,41 @@ Return-Path: <SRS0=FaGC=77=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CAE4C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 14:38:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E05F6C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 14:41:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E688D20773
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 14:38:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E688D20773
+	by mail.kernel.org (Postfix) with ESMTPS id B76CA20773
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 14:41:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B76CA20773
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37998 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40244 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlvg7-0001kb-8w
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 10:38:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40658)
+	id 1jlvjq-0003oT-2c
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 10:41:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41638)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jlvfF-000175-GC
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 10:37:13 -0400
-Received: from mout.kundenserver.de ([212.227.17.13]:51321)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jlvj4-0003Ju-SF
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 10:41:10 -0400
+Received: from mout.kundenserver.de ([212.227.17.24]:54493)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jlvfD-0003m8-HF
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 10:37:13 -0400
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jlvj2-0004RH-PM
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 10:41:10 -0400
 Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
- (mreue109 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1Mwwhx-1iwYQg0WM7-00yP8M; Thu, 18 Jun 2020 16:37:09 +0200
-Subject: Re: [PATCH v4 6/6] linux-user: Add strace support for printing
- arguments of fallocate()
+ (mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1MpDa5-1j6Tz437mR-00qiME; Thu, 18 Jun 2020 16:41:05 +0200
+Subject: Re: [PATCH v4 3/6] linux-user: Add strace support for printing
+ argument of syscalls used for extended attributes
 To: Filip Bozuta <filip.bozuta@syrmia.com>, qemu-devel@nongnu.org
 References: <20200616103927.20222-1-filip.bozuta@syrmia.com>
- <20200616103927.20222-7-filip.bozuta@syrmia.com>
+ <20200616103927.20222-4-filip.bozuta@syrmia.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -80,35 +80,35 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <0005acf0-4936-628d-543c-53c539126c1b@vivier.eu>
-Date: Thu, 18 Jun 2020 16:37:08 +0200
+Message-ID: <7efa1f07-c4d3-fe51-a198-73064115d987@vivier.eu>
+Date: Thu, 18 Jun 2020 16:41:04 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200616103927.20222-7-filip.bozuta@syrmia.com>
+In-Reply-To: <20200616103927.20222-4-filip.bozuta@syrmia.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:6aa6NSPj+bTdaC8p51GhGVtbPbFrnMnN2oya4uqakB8rcrAGAeZ
- hun1SB8VzUQ7a7cqYahkiwRAvrr8Up3vYCLoI/UPJ6ZwIDAPRn3Di48YCQyVTGbw2Mhl8U5
- Xg5oLxR66N+FEu/YQ/0H0CsxWpWlaCPefhJf8t+/tQh7ZJew1101cWvbc/Hz2Q+U9YbwaV3
- bLphw9HKeGO37519jiA+w==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:jnXanlWxQBQ=:c8vKobakurc4s8Cjsq6Y4w
- lvt4C4pmrOi8qKcGC9GP0Lf6FaS1y8WHpJvKbt5nyOwm4IkQ0w/lR3Xq9uimI06zMB/PVDomc
- XIQs+JLGyelzfCJxXt2yLcwHi599VjTQSGHNov7idcTE1BxgMKjDsNFvwyZAkQYtMQY0kz317
- /fIMxUThpXXZexkvVAvEKgnwwkRljfI8st6f5fKE0+GcojFhWBi+cnXA9V1ZRYRKoQDhBsb5a
- CdqmzPcAQnMwUyyQtkrXXymLO3WuAAvbSgUPod7o++06BEq9ZmJD48sYLZJe35DGSXWYP/SBY
- W40FAR5QcetuAGZDEy3XBiTJBEMb59Hcoc8k9Cb9kP1C3p4f16pdjn/OeSz5lmM/efM6PKsAQ
- 0Xz5y0ZTSlGc38dfTGqH11iepQZ/LlWyP7uIP7SJ/XeKaoxVMaduCSP+Dp+ZyFAobcg/Yz/tX
- 07RnrkGAE8RdYjwebfE9ptq0cVGYO/o8+nyJJ1ZOfctip8cqDumNHbzeALju+pkhmgH/vnRzS
- sUgw9yhdB4rwRkOlMrUAqk8LSAD1RGx7Es5ssh2rgJR3VK6A0T5sb8rFjGKPePoHiDhfWHYue
- mB0cS5D9bGf/0tN86o69bD3S0JxDaG5yVn1eOAP16nI703Xb0zP+ZTb+VWLadTlAx89ZGG6XL
- aaiZxlsD5HTviLMDVrmQ+8rMltbzG4AeNskZJ/EIz07RNS06CvMcIl0BVIAOcnBz60/wvuPZH
- U26iZbwpTj5ecdthOsovvHfm3NXcQNMgzTd5j59OjGLmXsOq7w4ke4BCX24N9SSLnaPPHW2ok
- 6I9H841PJ9dsh5t0BjZ/jCHZ7BbgxEv5QWtv3SHhlOo+tx3f1k=
-Received-SPF: none client-ip=212.227.17.13; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:JIA/lm15bwiGKMRQMOy9ud5NqbiT8ZRDf6nAXcx8LUrLOIMyJz5
+ an2QIMlisk/RqRIyHZbfq3oV63aQRJxdHKnIYoh4+PW8P76we4wQkpYYKCibwlTLUi3Y+fS
+ doyEWHe+JgFKvhzy1ZL8lkwraHLOMdQ90KTVJexFl/6b2PGOv63MBdMliE5ZVieEfVt8hrh
+ a5FJBhykq7WKmz+7a7QBg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:1iQidS9+8aM=:SM4p3GR4ziZ8XPfIaSYidY
+ AN4e+oIUuUwQERZMteXlGAp3GlvW7pzqWKvfNv3VmIu5SWXTGGa3ky+Sticb0j/KPWRd+FoAS
+ rFCgQZq2GF8XwwZreHNMfAvVXwXk4oKNeogb3taLRJoMnYjRZXCpn+F1rfOo0Ka+W/bJK1wlO
+ /o7e9zm8WAOfrQFDlEiDrXD65Qx5NUE8BwUBVxr6Q4P/gBNj4I4bpLBd8mIBi0m1jLeNwHogv
+ /8z1cJVhR5Oo+LLWDo54iDCEojFodJM3ZEQk33I4IV+A69BdHf9AwkDeN6DlfLjiZrWTkQYcA
+ ApEelosQTLeZGMkBmt5+Bmt7Ber4xlT928c0Dpg0+zQivHBaRhA+zaVo5CGmMRGu7j5ooaZTu
+ V0WDj4zVjeXAE/ZkOvg/6lYzYhpJoZeZc7OVGrQvob3C0RvnbWgz2sVSV92ZrDKixPGhT59QX
+ NIgFrYRs7c9r4rnzFmdXSaulkW+RGHnQPRnU0y+zSdV1YnbmT0pZZ/OnD7wtyJBlJKykA7ked
+ ohiQqBHJtzDwM2n4v0GIijCSlDR+YdN9cPBeRriZOPk6/ldNnPOqE7td8V+9J85SADmVA6dD0
+ CAuo8+3MvtZAAPAJk2JU9IKhhpx2Mo/uWdQwpOzBULVBlkri8MvUrr0pmvzEJAuN9f09uoGvi
+ QtBqByW8S5JlHlI+htqvn7qEKANBiEashVqXW/lg2IPmiTqdNHfXJsAKTlxCVc7IXYsoJkTUn
+ 6WPbViqsoyd2wrMUhXV66Rw3pRB5AvUSt6PMhdiyHVqqDj9lwC0DozH/lVCJr2QU+2J6zPpcR
+ pzqQSngKHgnfC27Oxn/RAoOpSQ0TuTOJhGEwNpsu/zuWBIC9u0=
+Received-SPF: none client-ip=212.227.17.24; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 10:37:10
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 10:41:07
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -28
 X-Spam_score: -2.9
@@ -135,42 +135,108 @@ Sender: "Qemu-devel"
 Le 16/06/2020 à 12:39, Filip Bozuta a écrit :
 > From: Filip Bozuta <Filip.Bozuta@syrmia.com>
 > 
-> This patch implements strace argument printing functionality for following syscall:
+> This patch implements strace argument printing functionality for following syscalls:
 > 
->     *fallocate - manipulate file space
+>     *getxattr, lgetxattr, fgetxattr - retrieve an extended attribute value
 > 
->         int fallocate(int fd, int mode, off_t offset, off_t len)
->         man page: https://www.man7.org/linux/man-pages/man2/fallocate.2.html
+>         ssize_t getxattr(const char *path, const char *name, void *value, size_t size)
+>         ssize_t lgetxattr(const char *path, const char *name, void *value, size_t size)
+>         ssize_t fgetxattr(int fd, const char *name, void *value, size_t size)
+>         man page: https://www.man7.org/linux/man-pages/man2/getxattr.2.html
+> 
+>     *listxattr, llistxattr, flistxattr - list extended attribute names
+> 
+>         ssize_t listxattr(const char *path, char *list, size_t size)
+>         ssize_t llistxattr(const char *path, char *list, size_t size)
+>         ssize_t flistxattr(int fd, char *list, size_t size)
+>         man page: https://www.man7.org/linux/man-pages/man2/listxattr.2.html
+> 
+>     *removexattr, lremovexattr, fremovexattr - remove an extended attribute
+> 
+>          int removexattr(const char *path, const char *name)
+>          int lremovexattr(const char *path, const char *name)
+>          int fremovexattr(int fd, const char *name)
+>          man page: https://www.man7.org/linux/man-pages/man2/removexattr.2.html
 > 
 > Implementation notes:
 > 
->     This syscall's second argument "mode" is composed of predefined values
->     which represent flags that determine the type of operation that is
->     to be performed on the file space. For that reason, a printing
->     function "print_fallocate" was stated in file "strace.list". This printing
->     function uses an already existing function "print_flags()" to print flags of
->     the "mode" argument. These flags are stated inside an array "falloc_flags"
->     that contains values of type "struct flags". These values are instantiated
->     using an existing macro "FLAG_GENERIC()". Most of these flags are defined
->     after kernel version 3.0 which is why they are enwrapped in an #ifdef
->     directive.
->     The syscall's third ant fourth argument are of type "off_t" which can
->     cause variations between 32/64-bit architectures. To handle this variation,
->     function "target_offset64()" was copied from file "strace.c" and used in
->     "print_fallocate" to print "off_t" arguments for 32-bit architectures.
+>     All of the syscalls have strings as argument types and thus a separate
+>     printing function was stated in file "strace.list" for every one of them.
+>     All of these printing functions were defined in "strace.c" using existing
+>     printing functions for appropriate argument types:
+>        "print_string()" - for (const char*) type
+>        "print_pointer()" - for (char*) and (void *) type
+>        "print_raw_param()" for (int) and (size_t) type
+>     Syscalls "getxattr()" and "lgetxattr()" have the same number and type of
+>     arguments and thus their print functions ("print_getxattr", "print_lgetxattr")
+>     share a same definition. The same statement applies to syscalls "listxattr()"
+>     and "llistxattr()".
+>     Function "print_syscall_ret_listxattr()" was added to print the returned list
+>     of extended attributes for syscalls "print_listxattr(), print_llistxattr() and
+>     print_flistxattr()".
 > 
 > Signed-off-by: Filip Bozuta <Filip.Bozuta@syrmia.com>
 > ---
->  linux-user/qemu.h      | 16 ++++++++++++++++
->  linux-user/strace.c    | 40 ++++++++++++++++++++++++++++++++++++++++
->  linux-user/strace.list |  2 +-
->  linux-user/syscall.c   | 16 ----------------
->  4 files changed, 57 insertions(+), 17 deletions(-)
+>  linux-user/strace.c    | 122 +++++++++++++++++++++++++++++++++++++++++
+>  linux-user/strace.list |  21 ++++---
+>  2 files changed, 134 insertions(+), 9 deletions(-)
 > 
+> diff --git a/linux-user/strace.c b/linux-user/strace.c
+> index 6d7accaa4c..f76bbbc1ff 100644
+> --- a/linux-user/strace.c
+> +++ b/linux-user/strace.c
+> @@ -833,6 +833,41 @@ print_syscall_ret_adjtimex(const struct syscallname *name, abi_long ret,
+>  }
+>  #endif
+>  
+> +#if defined(TARGET_NR_listxattr) || defined(TARGET_NR_llistxattr) \
+> + || defined(TARGGET_NR_flistxattr)
+> +static void
+> +print_syscall_ret_listxattr(const struct syscallname *name, abi_long ret,
+> +                            abi_long arg0, abi_long arg1, abi_long arg2,
+> +                            abi_long arg3, abi_long arg4, abi_long arg5)
+> +{
+> +    print_syscall_err(ret);
+> +
+> +    if (ret >= 0) {
+> +        qemu_log(TARGET_ABI_FMT_ld, ret);
+> +        qemu_log(" (list = ");
+> +        if (arg1 != 0) {
+> +            abi_long bts_printed = 0;
+> +            abi_long attr = arg1;
+> +            while (bts_printed < ret) {
 
-Match v2, so
+I don't think you need a new variable, you can do
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+               while (ret) {
 
+> +                if (attr != arg1) {
+> +                    qemu_log(",");
+> +                }
+> +                print_string(attr, 1);
+> +                bts_printed += target_strlen(attr) + 1;
 
+and
+                   ret -= target_strlen(attr) + 1;
+
+> +                attr += target_strlen(attr) + 1;
+> +            }
+> +        } else {
+> +            qemu_log("NULL");
+> +        }
+> +        qemu_log(")");
+> +    }
+> +
+> +    qemu_log("\n");
+> +}
+> +#define print_syscall_ret_llistxattr     print_syscall_ret_listxattr
+> +#define print_syscall_ret_flistxattr     print_syscall_ret_listxattr
+> +#endif
+> +
+>  UNUSED static struct flags access_flags[] = {
+>      FLAG_GENERIC(F_OK),
+>      FLAG_GENERIC(R_OK),
+
+Thanks,
+Laurent
 
