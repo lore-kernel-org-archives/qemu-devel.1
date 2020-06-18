@@ -2,89 +2,58 @@ Return-Path: <SRS0=FaGC=77=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FC18C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 19:01:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C95FC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 19:05:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5BE10207DD
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 19:01:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Yn2++cOG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BE10207DD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3C4852053B
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 19:05:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C4852053B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39190 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43166 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlzn3-000199-JM
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 15:01:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35706)
+	id 1jlzqk-00049U-Fc
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 15:05:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36476)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jlzmL-0000Fg-V5
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 15:00:50 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35675
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jlzmJ-0006Ic-5s
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 15:00:49 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592506845;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=z9Up5KvxUZIXYZH5iKnQPZ9WUdFJDxaGOOrgo+PuAwo=;
- b=Yn2++cOG05uT2jBlCn+ltUQEaQ8XLF8OiX+CIkcFAqq4IzOCwiGIXD06hWysXOHaNLZ5Vn
- j/iQpbSIVjUaPwym7PgHR4774DJJxjCi8v8z4kT25DJMGmpiMqKfNaQOFRBzkHygdxOdkT
- 8tK+qYGGnBl5n0XmcIBZJSS1XujAm94=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-369-YwNJNLf1NDKAyplnmjozsg-1; Thu, 18 Jun 2020 15:00:43 -0400
-X-MC-Unique: YwNJNLf1NDKAyplnmjozsg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 379A81005512;
- Thu, 18 Jun 2020 19:00:42 +0000 (UTC)
-Received: from work-vm (ovpn-114-205.ams2.redhat.com [10.36.114.205])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4F13360BF4;
- Thu, 18 Jun 2020 19:00:35 +0000 (UTC)
-Date: Thu, 18 Jun 2020 20:00:32 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Alexander Duyck <alexander.duyck@gmail.com>
-Subject: Re: [virtio-dev] Re: [PATCH v25 QEMU 3/3] virtio-balloon: Replace
- free page hinting references to 'report' with 'hint'
-Message-ID: <20200618190032.GH2769@work-vm>
-References: <20200527041212.12700.60627.stgit@localhost.localdomain>
- <20200527041414.12700.50293.stgit@localhost.localdomain>
- <CAKgT0UdPC1s0c-wqsNc4x8DeZhtZQVMmLArWQ=Z345Mkof650Q@mail.gmail.com>
-MIME-Version: 1.0
-In-Reply-To: <CAKgT0UdPC1s0c-wqsNc4x8DeZhtZQVMmLArWQ=Z345Mkof650Q@mail.gmail.com>
-User-Agent: Mutt/1.14.0 (2020-05-02)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 01:47:12
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1jlzpc-0002xt-2s
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 15:04:12 -0400
+Received: from mx2.suse.de ([195.135.220.15]:33716)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1jlzpY-0006pK-Rd
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 15:04:11 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+ by mx2.suse.de (Postfix) with ESMTP id 818DFAD33;
+ Thu, 18 Jun 2020 19:04:04 +0000 (UTC)
+From: Claudio Fontana <cfontana@suse.de>
+To: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Roman Bolshakov <r.bolshakov@yadro.com>,
+ Markus Armbruster <armbru@redhat.com>
+Subject: [RFC v6 0/4] QEMU cpus.c refactoring
+Date: Thu, 18 Jun 2020 21:03:57 +0200
+Message-Id: <20200618190401.4895-1-cfontana@suse.de>
+X-Mailer: git-send-email 2.16.4
+Received-SPF: pass client-ip=195.135.220.15; envelope-from=cfontana@suse.de;
+ helo=mx2.suse.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 00:12:04
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,95 +66,276 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-dev@lists.oasis-open.org, "Michael S. Tsirkin" <mst@redhat.com>,
- qemu-devel@nongnu.org, David Hildenbrand <david@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
+ Colin Xu <colin.xu@intel.com>, Wenchao Wang <wenchao.wang@intel.com>,
+ haxm-team@intel.com, Sunil Muthuswamy <sunilmut@microsoft.com>,
+ Richard Henderson <rth@twiddle.net>, Claudio Fontana <cfontana@suse.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Alexander Duyck (alexander.duyck@gmail.com) wrote:
-> On Tue, May 26, 2020 at 9:14 PM Alexander Duyck
-> <alexander.duyck@gmail.com> wrote:
-> >
-> > From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
-> >
-> > In an upcoming patch a feature named Free Page Reporting is about to be
-> > added. In order to avoid any confusion we should drop the use of the word
-> > 'report' when referring to Free Page Hinting. So what this patch does is go
-> > through and replace all instances of 'report' with 'hint" when we are
-> > referring to free page hinting.
-> >
-> > Acked-by: David Hildenbrand <david@redhat.com>
-> > Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
-> > ---
-> >  hw/virtio/virtio-balloon.c         |   78 ++++++++++++++++++------------------
-> >  include/hw/virtio/virtio-balloon.h |   20 +++++----
-> >  2 files changed, 49 insertions(+), 49 deletions(-)
-> >
-> > diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-> > index 3e2ac1104b5f..dc15409b0bb6 100644
-> > --- a/hw/virtio/virtio-balloon.c
-> > +++ b/hw/virtio/virtio-balloon.c
-> 
-> ...
-> 
-> > @@ -817,14 +817,14 @@ static int virtio_balloon_post_load_device(void *opaque, int version_id)
-> >      return 0;
-> >  }
-> >
-> > -static const VMStateDescription vmstate_virtio_balloon_free_page_report = {
-> > +static const VMStateDescription vmstate_virtio_balloon_free_page_hint = {
-> >      .name = "virtio-balloon-device/free-page-report",
-> >      .version_id = 1,
-> >      .minimum_version_id = 1,
-> >      .needed = virtio_balloon_free_page_support,
-> >      .fields = (VMStateField[]) {
-> > -        VMSTATE_UINT32(free_page_report_cmd_id, VirtIOBalloon),
-> > -        VMSTATE_UINT32(free_page_report_status, VirtIOBalloon),
-> > +        VMSTATE_UINT32(free_page_hint_cmd_id, VirtIOBalloon),
-> > +        VMSTATE_UINT32(free_page_hint_status, VirtIOBalloon),
-> >          VMSTATE_END_OF_LIST()
-> >      }
-> >  };
-> 
-> So I noticed this patch wasn't in the list of patches pulled, but that
-> is probably for the best since I believe the change above might have
-> broken migration as VMSTATE_UINT32 does a stringify on the first
-> parameter.
-> Any advice on how to address it, or should I just give up on renaming
-> free_page_report_cmd_id and free_page_report_status?
+Motivation and higher level steps:
 
-The filed names never hit the wire; the migration format is trivial
-binary, especially of things like integers - that lands as just 4 bytes
-on the wire [ hopefully in the place where the destination expects to
-receive them ].
-You need to be careful of the names of top level vmstate devices, and
-the names of subsections; I don't think any other naming is in the
-stream.
-(We've even done hacks in the past of converting a VMSTATE_UINT32 to a
-pair of UINT16 )
+https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg04628.html
 
-Dave
+MAIN OPEN POINTS:
 
-> Looking at this I wonder why we even need to migrate these values? It
-> seems like if we are completing a migration the cmd_id should always
-> be "DONE" shouldn't it? It isn't as if we are going to migrate the
-> hinting from one host to another. We will have to start over which is
-> essentially the signal that the "DONE" value provides. Same thing for
-> the status. We shouldn't be able to migrate unless both of these are
-> already in the "DONE" state so if anything I wonder if we shouldn't
-> have that as the initial state for the device and just drop the
-> migration info.
-> 
-> Thanks.
-> 
-> - Alex
-> 
-> ---------------------------------------------------------------------
-> To unsubscribe, e-mail: virtio-dev-unsubscribe@lists.oasis-open.org
-> For additional commands, e-mail: virtio-dev-help@lists.oasis-open.org
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+* confirmation on hvf state (Roman)
+
+* naming of "cpus.c" and functions, more cpus_ prefix use? (Roman)
+
+* should we accept the addional clunkyness and overhead for each call of
+  the kick and CPU sync state for all archs/accels of putting CpusAccel
+  inside AccelClass? I would tend towards no here, but welcome further
+  opinions or data if any. (Roman)
+
+* should we reorder patches or moves inside patches to avoid code going
+  from cpus.c to softmmu/cpus.c and then again to softmmu/somethingelse.c ?
+  (Philippe)
+
+* some questions about headers in include/softmmu (Philippe)
+
+----
+
+v5 -> v6:
+
+* rebased changes on top of Emilio G. Cota changes to cpus.c
+  "cpu: convert queued work to a QSIMPLEQ"
+
+* keep a pointer in cpus.c instead of a copy of CpusAccel
+  (Alex)
+
+----
+
+
+v4 -> v5: rebase on latest master
+
+* rebased changes on top of roman series to remove one of the extra states for hvf.
+  (Is the result now functional for HVF?)
+
+* rebased changes on top of icount changes and fixes to icount_configure and
+  the new shift vmstate. (Markus)
+
+v3 -> v4:
+
+* overall: added copyright headers to all files that were missing them
+  (used copyright and license of the module the stuff was extracted from).
+  For the new interface files, added SUSE LLC.
+
+* 1/4 (move softmmu only files from root):
+
+  MAINTAINERS: moved softmmu/cpus.c to its final location (from patch 2)
+
+* 2/4 (cpu-throttle):
+
+  MAINTAINERS (to patch 1),
+  copyright Fabrice Bellard and license from cpus.c
+
+* 3/4 (cpu-timers, icount):
+
+  - MAINTAINERS: add cpu-timers.c and icount.c to Paolo
+
+  - break very long lines (patchew)
+
+  - add copyright SUSE LLC, GPLv2 to cpu-timers.h
+
+  - add copyright Fabrice Bellard and license from cpus.c to timers-state.h
+    as it is lifted from cpus.c
+
+  - vl.c: in configure_accelerators bail out if icount_enabled()
+    and !tcg_enabled() as qtest does not enable icount anymore.
+
+* 4/4 (accel stuff to accel):
+
+  - add copyright SUSE LLC to files that mostly only consist of the
+    new interface. Add whatever copyright was in the accelerator code
+    if instead they mostly consist of accelerator code.
+
+  - change a comment to mention the result of the AccelClass experiment
+
+  - moved qtest accelerator into accel/qtest/ , make it like the others.
+
+  - rename xxx-cpus-interface to xxx-cpus (remove "interface" from names)
+
+  - rename accel_int to cpus_accel
+
+  - rename CpusAccel functions from cpu_synchronize_* to synchronize_*
+
+
+--------
+
+v2 -> v3:
+
+* turned into a 4 patch series, adding a first patch moving
+  softmmu code currently in top_srcdir to softmmu/
+
+* cpu-throttle: moved to softmmu/
+
+* cpu-timers, icount:
+
+  - moved to softmmu/
+
+  - fixed assumption of qtest_enabled() => icount_enabled()
+  causing the failure of check-qtest-arm goal, in test-arm-mptimer.c
+
+  Fix is in hw/core/ptimer.c,
+
+  where the artificial timeout rate limit should not be applied
+  under qtest_enabled(), in a similar way to how it is not applied
+  for icount_enabled().
+
+* CpuAccelInterface: no change.
+
+
+--------
+
+
+v1 -> v2:
+
+* 1/3 (cpu-throttle): provide a description in the commit message
+
+* 2/3 (cpu-timers, icount): in this v2 separate icount from cpu-timers,
+  as icount is actually TCG-specific. Only build it under CONFIG_TCG.
+
+  To do this, qtest had to be detached from icount. To this end, a
+  trivial global counter for qtest has been introduced.
+
+* 3/3 (CpuAccelInterface): provided a description.
+
+This is point 8) in that plan. The idea is to extract the unrelated parts
+in cpus, and register interfaces from each single accelerator to the main
+cpus module (cpus.c).
+
+While doing this RFC, I noticed some assumptions about Windows being
+either TCG or HAX (not considering WHPX) that might need to be revisited.
+I added a comment there.
+
+The thing builds successfully based on Linux cross-compilations for
+windows/hax, windows/whpx, and I got a good build on Darwin/hvf.
+
+Tests run successully for tcg and kvm configurations, but did not test on
+windows or darwin.
+
+Welcome your feedback and help on this,
+
+Claudio
+
+Claudio Fontana (4):
+  softmmu: move softmmu only files from root
+  cpu-throttle: new module, extracted from cpus.c
+  cpu-timers, icount: new modules
+  cpus: extract out accel-specific code to each accel
+
+ MAINTAINERS                                  |   14 +-
+ Makefile.target                              |    7 +-
+ accel/kvm/Makefile.objs                      |    2 +
+ accel/kvm/kvm-all.c                          |   15 +-
+ accel/kvm/kvm-cpus-interface.c               |   94 ++
+ accel/kvm/kvm-cpus-interface.h               |    8 +
+ accel/qtest.c                                |   88 +-
+ accel/stubs/kvm-stub.c                       |    3 +-
+ accel/tcg/Makefile.objs                      |    1 +
+ accel/tcg/cpu-exec.c                         |   43 +-
+ accel/tcg/tcg-all.c                          |   19 +-
+ accel/tcg/tcg-cpus-interface.c               |  523 ++++++
+ accel/tcg/tcg-cpus-interface.h               |    8 +
+ accel/tcg/translate-all.c                    |    3 +-
+ cpus.c                                       | 2290 --------------------------
+ docs/replay.txt                              |    6 +-
+ exec.c                                       |    4 -
+ hw/core/cpu.c                                |    1 +
+ hw/core/ptimer.c                             |    6 +-
+ hw/i386/x86.c                                |    1 +
+ include/exec/cpu-all.h                       |    4 +
+ include/exec/exec-all.h                      |    4 +-
+ include/hw/core/cpu.h                        |   37 -
+ include/qemu/main-loop.h                     |    5 +
+ include/qemu/timer.h                         |   22 +-
+ include/sysemu/cpu-throttle.h                |   50 +
+ include/sysemu/cpu-timers.h                  |   72 +
+ include/sysemu/cpus.h                        |   44 +-
+ include/sysemu/hvf.h                         |    1 -
+ include/sysemu/hw_accel.h                    |   57 +-
+ include/sysemu/kvm.h                         |    2 +-
+ include/sysemu/qtest.h                       |    2 +
+ include/sysemu/replay.h                      |    4 +-
+ migration/migration.c                        |    1 +
+ migration/ram.c                              |    1 +
+ replay/replay.c                              |    6 +-
+ softmmu/Makefile.objs                        |   13 +
+ arch_init.c => softmmu/arch_init.c           |    0
+ balloon.c => softmmu/balloon.c               |    0
+ softmmu/cpu-throttle.c                       |  122 ++
+ softmmu/cpu-timers.c                         |  267 +++
+ softmmu/cpus.c                               |  741 +++++++++
+ softmmu/icount.c                             |  496 ++++++
+ ioport.c => softmmu/ioport.c                 |    0
+ memory.c => softmmu/memory.c                 |    0
+ memory_mapping.c => softmmu/memory_mapping.c |    0
+ qtest.c => softmmu/qtest.c                   |   34 +-
+ softmmu/timers-state.h                       |   45 +
+ softmmu/vl.c                                 |    8 +-
+ stubs/Makefile.objs                          |    4 +-
+ stubs/clock-warp.c                           |    4 +-
+ stubs/cpu-get-clock.c                        |    3 +-
+ stubs/cpu-get-icount.c                       |   21 -
+ stubs/cpu-synchronize-state.c                |   15 +
+ stubs/icount.c                               |   22 +
+ stubs/qemu-timer-notify-cb.c                 |    8 +
+ stubs/qtest.c                                |    5 +
+ target/alpha/translate.c                     |    3 +-
+ target/arm/helper.c                          |    7 +-
+ target/i386/Makefile.objs                    |    7 +-
+ target/i386/hax-all.c                        |    6 +-
+ target/i386/hax-cpus-interface.c             |   85 +
+ target/i386/hax-cpus-interface.h             |    8 +
+ target/i386/hax-i386.h                       |    2 +
+ target/i386/hax-posix.c                      |   12 +
+ target/i386/hax-windows.c                    |   20 +
+ target/i386/hvf/Makefile.objs                |    2 +-
+ target/i386/hvf/hvf-cpus-interface.c         |   92 ++
+ target/i386/hvf/hvf-cpus-interface.h         |    8 +
+ target/i386/hvf/hvf.c                        |    5 +-
+ target/i386/whpx-all.c                       |    3 +
+ target/i386/whpx-cpus-interface.c            |   96 ++
+ target/i386/whpx-cpus-interface.h            |    8 +
+ target/riscv/csr.c                           |    8 +-
+ tests/ptimer-test-stubs.c                    |    7 +-
+ tests/test-timed-average.c                   |    2 +-
+ util/main-loop.c                             |    4 +-
+ util/qemu-timer.c                            |   12 +-
+ 78 files changed, 3136 insertions(+), 2517 deletions(-)
+ create mode 100644 accel/kvm/kvm-cpus-interface.c
+ create mode 100644 accel/kvm/kvm-cpus-interface.h
+ create mode 100644 accel/tcg/tcg-cpus-interface.c
+ create mode 100644 accel/tcg/tcg-cpus-interface.h
+ delete mode 100644 cpus.c
+ create mode 100644 include/sysemu/cpu-throttle.h
+ create mode 100644 include/sysemu/cpu-timers.h
+ rename arch_init.c => softmmu/arch_init.c (100%)
+ rename balloon.c => softmmu/balloon.c (100%)
+ create mode 100644 softmmu/cpu-throttle.c
+ create mode 100644 softmmu/cpu-timers.c
+ create mode 100644 softmmu/cpus.c
+ create mode 100644 softmmu/icount.c
+ rename ioport.c => softmmu/ioport.c (100%)
+ rename memory.c => softmmu/memory.c (100%)
+ rename memory_mapping.c => softmmu/memory_mapping.c (100%)
+ rename qtest.c => softmmu/qtest.c (95%)
+ create mode 100644 softmmu/timers-state.h
+ delete mode 100644 stubs/cpu-get-icount.c
+ create mode 100644 stubs/cpu-synchronize-state.c
+ create mode 100644 stubs/icount.c
+ create mode 100644 stubs/qemu-timer-notify-cb.c
+ create mode 100644 target/i386/hax-cpus-interface.c
+ create mode 100644 target/i386/hax-cpus-interface.h
+ create mode 100644 target/i386/hvf/hvf-cpus-interface.c
+ create mode 100644 target/i386/hvf/hvf-cpus-interface.h
+ create mode 100644 target/i386/whpx-cpus-interface.c
+ create mode 100644 target/i386/whpx-cpus-interface.h
+
+-- 
+2.16.4
 
 
