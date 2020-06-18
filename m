@@ -2,88 +2,73 @@ Return-Path: <SRS0=FaGC=77=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C65AAC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 03:22:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD43AC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 03:24:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8037420773
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 03:22:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=brainfault-org.20150623.gappssmtp.com header.i=@brainfault-org.20150623.gappssmtp.com header.b="gG0P9p7s"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8037420773
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9E57120773
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 03:24:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E57120773
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57024 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59282 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jll8Z-0002dU-Jk
-	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 23:22:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47702)
+	id 1jllAK-0004FQ-V7
+	for qemu-devel@archiver.kernel.org; Wed, 17 Jun 2020 23:24:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48044)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <anup@brainfault.org>)
- id 1jll7q-0001o2-4J
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 23:22:02 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:53434)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <anup@brainfault.org>)
- id 1jll7m-0008Rb-S7
- for qemu-devel@nongnu.org; Wed, 17 Jun 2020 23:22:01 -0400
-Received: by mail-wm1-x343.google.com with SMTP id l26so3727359wme.3
- for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 20:21:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=brainfault-org.20150623.gappssmtp.com; s=20150623;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=QSSyXf+4fWm4lAoCDKrE3AdRuscpl6MpUeDgz/U83Bk=;
- b=gG0P9p7s9EOrelN9ZlPA18tTcOoDW5vFcqzmRkbYLk+BzvQ1QMkoTsZ5MO3yVRd6eO
- BkHVwjpxajs3wyZj3B9J3t/FsombvdiJxOlGFCVM0d+2Yoz0ZVpHeMmqfohpqYYGXAox
- G9nka0vRhByNlnMs42sCGDP4ndXPv7IYT+rf2comCchicxbxz1Qam9Mzdx486KqZ2zj5
- nKUS5Ll69ZSBH52YFhJP1Rzj9/BVy/v7lEK+KFLbXycMKBe8q13w9quvXhjQJ3gwptS8
- uMPhWXdw8x6EkemRF9gUWBTFnByRLydksvh2FuCLc6TG4p/2SoVjX0ttc97NBHNFWp9G
- T1fQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=QSSyXf+4fWm4lAoCDKrE3AdRuscpl6MpUeDgz/U83Bk=;
- b=TprEfIqqFno2v9tyN24j5Bh/t9FWuCgeMBoBUq1Ift17x0zUQdJXu/t8RMhRrFQQdU
- ficD7QIpInowTYNed6bmzyWY2YritDYAk0zPEs1Oy/QrpsOB257qBdnnXU0GztR/Q1of
- 8HZnKt9K2VtdnTDQ+P3yj65QBXdI9LXHwj6GV1o8EeQlwHi3Yo4UhGwW0MD61O+q7z1a
- cvokau0T8+kj5Kr+J6yPot2/JfwLnuq8J1mlk+5WZw4B7BOfV5yMnLu/iJ6q+ZLOEuPu
- fbfGGkJJe2Lq/LSHO1VW9iCVjSrXFXphi+OlV+FAUxqct41NChnxal+eXiEqQfBgTOqt
- Pvlg==
-X-Gm-Message-State: AOAM533ZfBjcQem39bwYD60J63cZTvepwNP/p78G8CuVdJijq1crG3iq
- LY1403Mle/oABFsCFce0FBCvaIXDhdBce3zAP+3Ngg==
-X-Google-Smtp-Source: ABdhPJwRRs5sO3MlXp9BHY3dF9ybJDTzL61Bk9RYglZjo3v+5s47j+MPqYMxDxO6uVreYcM4Vlfj8n4O/uTjN/0g+vA=
-X-Received: by 2002:a1c:b443:: with SMTP id d64mr1633505wmf.157.1592450516016; 
- Wed, 17 Jun 2020 20:21:56 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jll9m-0003pt-V8
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 23:24:02 -0400
+Resent-Date: Wed, 17 Jun 2020 23:24:02 -0400
+Resent-Message-Id: <E1jll9m-0003pt-V8@lists.gnu.org>
+Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21794)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jll9j-0000Ou-TA
+ for qemu-devel@nongnu.org; Wed, 17 Jun 2020 23:24:02 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1592450625; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=QV0v6I0m7CXR34mRy3b3YVMxJ+tlZBR9hz1wzw8te5Ct9FRgng3Sogo4HI1JtASu1NbOAaosuvxyJ9XjhwURrKbcojjRZkwX6GxiY26Rzdi/cpe58YLWraXs2lld9B7TAUTYHsIoG/kvH3oNEhgR4QR577/OBt6IC4YluTdqfKQ=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1592450625;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=cB1F/9xyOvIOGMCkUveAVbMmqlvInt5iQnccyAps5Qg=; 
+ b=kr6XYken71HlgvCdz/e0c2x2Js6qG0dwmsIykIvnmuhWDXAj690idzLRQQ7Van5FaEcRl44Luq4/Z2sQgymZBgh+aVHy8dK0o+y9G5/f1MwV1hxj7x2SYr8mLWSM4e6CwQXSfR6fRCrJ7tWD1+wyoB8lCHQnH78jMOudWkOtKjI=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1592450623436691.2025444216293;
+ Wed, 17 Jun 2020 20:23:43 -0700 (PDT)
+Message-ID: <159245062185.14731.10416357581737984659@d1fd068a5071>
+Subject: Re: [PATCH v3 0/3] hyperv: vmbus: ACPI various corrections
+In-Reply-To: <20200618030027.759594-1-arilou@gmail.com>
 MIME-Version: 1.0
-References: <20200616032229.766089-1-anup.patel@wdc.com>
- <20200616032229.766089-6-anup.patel@wdc.com>
- <CAKmqyKNr5wuYXBOR8DHxze9RSko2GmoL4873hkHN4i2DHE-v8Q@mail.gmail.com>
-In-Reply-To: <CAKmqyKNr5wuYXBOR8DHxze9RSko2GmoL4873hkHN4i2DHE-v8Q@mail.gmail.com>
-From: Anup Patel <anup@brainfault.org>
-Date: Thu, 18 Jun 2020 08:51:44 +0530
-Message-ID: <CAAhSdy1nHBkp-39bhRvomrP6O=XTtGmcPDEfoCZ1qn5J2N-u9Q@mail.gmail.com>
-Subject: Re: [PATCH v6 5/5] hw/riscv: virt: Allow creating multiple NUMA
- sockets
-To: Alistair Francis <alistair23@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: none client-ip=2a00:1450:4864:20::343;
- envelope-from=anup@brainfault.org; helo=mail-wm1-x343.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: arilou@gmail.com
+Date: Wed, 17 Jun 2020 20:23:43 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o57.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/17 23:23:57
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
 X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,760 +81,200 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>, Anup Patel <anup.patel@wdc.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Atish Patra <atish.patra@wdc.com>, Alistair Francis <Alistair.Francis@wdc.com>,
- Palmer Dabbelt <palmer@dabbelt.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: mail@maciej.szmigiero.name, arilou@gmail.com, qemu-devel@nongnu.org,
+ rvkagan@yandex-team.ru, pbonzini@redhat.com, imammedo@redhat.com,
+ vkuznets@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jun 18, 2020 at 7:15 AM Alistair Francis <alistair23@gmail.com> wrote:
->
-> On Mon, Jun 15, 2020 at 8:24 PM Anup Patel <anup.patel@wdc.com> wrote:
-> >
-> > We extend RISC-V virt machine to allow creating a multi-socket
-> > machine. Each RISC-V virt machine socket is a NUMA node having
-> > a set of HARTs, a memory instance, a CLINT instance, and a PLIC
-> > instance. Other devices are shared between all sockets. We also
-> > update the generated device tree accordingly.
-> >
-> > By default, NUMA multi-socket support is disabled for RISC-V virt
-> > machine. To enable it, users can use "-numa" command-line options
-> > of QEMU.
-> >
-> > Example1: For two NUMA nodes with 2 CPUs each, append following
-> > to command-line options: "-smp 4 -numa node -numa node"
-> >
-> > Example2: For two NUMA nodes with 1 and 3 CPUs, append following
-> > to command-line options:
-> > "-smp 4 -numa node -numa node -numa cpu,node-id=0,core-id=0 \
-> > -numa cpu,node-id=1,core-id=1 -numa cpu,node-id=1,core-id=2 \
-> > -numa cpu,node-id=1,core-id=3"
-> >
-> > The maximum number of sockets in a RISC-V virt machine is 8
-> > but this limit can be changed in future.
-> >
-> > Signed-off-by: Anup Patel <anup.patel@wdc.com>
-> > Reviewed-by: Atish Patra <atish.patra@wdc.com>
->
-> This patch breaks OpenSBI v0.6 -> Xvisor v0.3.0-63-gdd3338d6 booting
-> on the Virt machine.
->
-> I have dropped it from my PR.
-
-Xvisor hypervisor support is still work-in-progress. I don't see the
-point in dropping this series because it breaks work-in-progress Xvisor.
-
-Also, the PLIC driver Xvisor does not support multiple PLIC instances.
-
-Regards,
-Anup
-
->
-> Alistair
->
-> > ---
-> >  hw/riscv/virt.c         | 530 +++++++++++++++++++++++-----------------
-> >  include/hw/riscv/virt.h |   9 +-
-> >  2 files changed, 308 insertions(+), 231 deletions(-)
-> >
-> > diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-> > index 35dc43d620..e01925ff3d 100644
-> > --- a/hw/riscv/virt.c
-> > +++ b/hw/riscv/virt.c
-> > @@ -35,6 +35,7 @@
-> >  #include "hw/riscv/sifive_test.h"
-> >  #include "hw/riscv/virt.h"
-> >  #include "hw/riscv/boot.h"
-> > +#include "hw/riscv/numa.h"
-> >  #include "chardev/char.h"
-> >  #include "sysemu/arch_init.h"
-> >  #include "sysemu/device_tree.h"
-> > @@ -60,7 +61,7 @@ static const struct MemmapEntry {
-> >      [VIRT_TEST] =        {   0x100000,        0x1000 },
-> >      [VIRT_RTC] =         {   0x101000,        0x1000 },
-> >      [VIRT_CLINT] =       {  0x2000000,       0x10000 },
-> > -    [VIRT_PLIC] =        {  0xc000000,     0x4000000 },
-> > +    [VIRT_PLIC] =        {  0xc000000, VIRT_PLIC_SIZE(VIRT_CPUS_MAX * 2) },
-> >      [VIRT_UART0] =       { 0x10000000,         0x100 },
-> >      [VIRT_VIRTIO] =      { 0x10001000,        0x1000 },
-> >      [VIRT_FLASH] =       { 0x20000000,     0x4000000 },
-> > @@ -182,10 +183,17 @@ static void create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
-> >      uint64_t mem_size, const char *cmdline)
-> >  {
-> >      void *fdt;
-> > -    int cpu, i;
-> > -    uint32_t *cells;
-> > -    char *nodename;
-> > -    uint32_t plic_phandle, test_phandle, phandle = 1;
-> > +    int i, cpu, socket;
-> > +    MachineState *mc = MACHINE(s);
-> > +    uint64_t addr, size;
-> > +    uint32_t *clint_cells, *plic_cells;
-> > +    unsigned long clint_addr, plic_addr;
-> > +    uint32_t plic_phandle[MAX_NODES];
-> > +    uint32_t cpu_phandle, intc_phandle, test_phandle;
-> > +    uint32_t phandle = 1, plic_mmio_phandle = 1;
-> > +    uint32_t plic_pcie_phandle = 1, plic_virtio_phandle = 1;
-> > +    char *mem_name, *cpu_name, *core_name, *intc_name;
-> > +    char *name, *clint_name, *plic_name, *clust_name;
-> >      hwaddr flashsize = virt_memmap[VIRT_FLASH].size / 2;
-> >      hwaddr flashbase = virt_memmap[VIRT_FLASH].base;
-> >
-> > @@ -206,231 +214,238 @@ static void create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
-> >      qemu_fdt_setprop_cell(fdt, "/soc", "#size-cells", 0x2);
-> >      qemu_fdt_setprop_cell(fdt, "/soc", "#address-cells", 0x2);
-> >
-> > -    nodename = g_strdup_printf("/memory@%lx",
-> > -        (long)memmap[VIRT_DRAM].base);
-> > -    qemu_fdt_add_subnode(fdt, nodename);
-> > -    qemu_fdt_setprop_cells(fdt, nodename, "reg",
-> > -        memmap[VIRT_DRAM].base >> 32, memmap[VIRT_DRAM].base,
-> > -        mem_size >> 32, mem_size);
-> > -    qemu_fdt_setprop_string(fdt, nodename, "device_type", "memory");
-> > -    g_free(nodename);
-> > -
-> >      qemu_fdt_add_subnode(fdt, "/cpus");
-> >      qemu_fdt_setprop_cell(fdt, "/cpus", "timebase-frequency",
-> >                            SIFIVE_CLINT_TIMEBASE_FREQ);
-> >      qemu_fdt_setprop_cell(fdt, "/cpus", "#size-cells", 0x0);
-> >      qemu_fdt_setprop_cell(fdt, "/cpus", "#address-cells", 0x1);
-> > +    qemu_fdt_add_subnode(fdt, "/cpus/cpu-map");
-> > +
-> > +    for (socket = (riscv_socket_count(mc) - 1); socket >= 0; socket--) {
-> > +        clust_name = g_strdup_printf("/cpus/cpu-map/cluster%d", socket);
-> > +        qemu_fdt_add_subnode(fdt, clust_name);
-> > +
-> > +        plic_cells = g_new0(uint32_t, s->soc[socket].num_harts * 4);
-> > +        clint_cells = g_new0(uint32_t, s->soc[socket].num_harts * 4);
-> > +
-> > +        for (cpu = s->soc[socket].num_harts - 1; cpu >= 0; cpu--) {
-> > +            cpu_phandle = phandle++;
-> >
-> > -    for (cpu = s->soc.num_harts - 1; cpu >= 0; cpu--) {
-> > -        int cpu_phandle = phandle++;
-> > -        int intc_phandle;
-> > -        nodename = g_strdup_printf("/cpus/cpu@%d", cpu);
-> > -        char *intc = g_strdup_printf("/cpus/cpu@%d/interrupt-controller", cpu);
-> > -        char *isa = riscv_isa_string(&s->soc.harts[cpu]);
-> > -        qemu_fdt_add_subnode(fdt, nodename);
-> > +            cpu_name = g_strdup_printf("/cpus/cpu@%d",
-> > +                s->soc[socket].hartid_base + cpu);
-> > +            qemu_fdt_add_subnode(fdt, cpu_name);
-> >  #if defined(TARGET_RISCV32)
-> > -        qemu_fdt_setprop_string(fdt, nodename, "mmu-type", "riscv,sv32");
-> > +            qemu_fdt_setprop_string(fdt, cpu_name, "mmu-type", "riscv,sv32");
-> >  #else
-> > -        qemu_fdt_setprop_string(fdt, nodename, "mmu-type", "riscv,sv48");
-> > +            qemu_fdt_setprop_string(fdt, cpu_name, "mmu-type", "riscv,sv48");
-> >  #endif
-> > -        qemu_fdt_setprop_string(fdt, nodename, "riscv,isa", isa);
-> > -        qemu_fdt_setprop_string(fdt, nodename, "compatible", "riscv");
-> > -        qemu_fdt_setprop_string(fdt, nodename, "status", "okay");
-> > -        qemu_fdt_setprop_cell(fdt, nodename, "reg", cpu);
-> > -        qemu_fdt_setprop_string(fdt, nodename, "device_type", "cpu");
-> > -        qemu_fdt_setprop_cell(fdt, nodename, "phandle", cpu_phandle);
-> > -        intc_phandle = phandle++;
-> > -        qemu_fdt_add_subnode(fdt, intc);
-> > -        qemu_fdt_setprop_cell(fdt, intc, "phandle", intc_phandle);
-> > -        qemu_fdt_setprop_string(fdt, intc, "compatible", "riscv,cpu-intc");
-> > -        qemu_fdt_setprop(fdt, intc, "interrupt-controller", NULL, 0);
-> > -        qemu_fdt_setprop_cell(fdt, intc, "#interrupt-cells", 1);
-> > -        g_free(isa);
-> > -        g_free(intc);
-> > -        g_free(nodename);
-> > -    }
-> > +            name = riscv_isa_string(&s->soc[socket].harts[cpu]);
-> > +            qemu_fdt_setprop_string(fdt, cpu_name, "riscv,isa", name);
-> > +            g_free(name);
-> > +            qemu_fdt_setprop_string(fdt, cpu_name, "compatible", "riscv");
-> > +            qemu_fdt_setprop_string(fdt, cpu_name, "status", "okay");
-> > +            qemu_fdt_setprop_cell(fdt, cpu_name, "reg",
-> > +                s->soc[socket].hartid_base + cpu);
-> > +            qemu_fdt_setprop_string(fdt, cpu_name, "device_type", "cpu");
-> > +            riscv_socket_fdt_write_id(mc, fdt, cpu_name, socket);
-> > +            qemu_fdt_setprop_cell(fdt, cpu_name, "phandle", cpu_phandle);
-> > +
-> > +            intc_name = g_strdup_printf("%s/interrupt-controller", cpu_name);
-> > +            qemu_fdt_add_subnode(fdt, intc_name);
-> > +            intc_phandle = phandle++;
-> > +            qemu_fdt_setprop_cell(fdt, intc_name, "phandle", intc_phandle);
-> > +            qemu_fdt_setprop_string(fdt, intc_name, "compatible",
-> > +                "riscv,cpu-intc");
-> > +            qemu_fdt_setprop(fdt, intc_name, "interrupt-controller", NULL, 0);
-> > +            qemu_fdt_setprop_cell(fdt, intc_name, "#interrupt-cells", 1);
-> > +
-> > +            clint_cells[cpu * 4 + 0] = cpu_to_be32(intc_phandle);
-> > +            clint_cells[cpu * 4 + 1] = cpu_to_be32(IRQ_M_SOFT);
-> > +            clint_cells[cpu * 4 + 2] = cpu_to_be32(intc_phandle);
-> > +            clint_cells[cpu * 4 + 3] = cpu_to_be32(IRQ_M_TIMER);
-> > +
-> > +            plic_cells[cpu * 4 + 0] = cpu_to_be32(intc_phandle);
-> > +            plic_cells[cpu * 4 + 1] = cpu_to_be32(IRQ_M_EXT);
-> > +            plic_cells[cpu * 4 + 2] = cpu_to_be32(intc_phandle);
-> > +            plic_cells[cpu * 4 + 3] = cpu_to_be32(IRQ_S_EXT);
-> > +
-> > +            core_name = g_strdup_printf("%s/core%d", clust_name, cpu);
-> > +            qemu_fdt_add_subnode(fdt, core_name);
-> > +            qemu_fdt_setprop_cell(fdt, core_name, "cpu", cpu_phandle);
-> > +
-> > +            g_free(core_name);
-> > +            g_free(intc_name);
-> > +            g_free(cpu_name);
-> > +        }
-> >
-> > -    /* Add cpu-topology node */
-> > -    qemu_fdt_add_subnode(fdt, "/cpus/cpu-map");
-> > -    qemu_fdt_add_subnode(fdt, "/cpus/cpu-map/cluster0");
-> > -    for (cpu = s->soc.num_harts - 1; cpu >= 0; cpu--) {
-> > -        char *core_nodename = g_strdup_printf("/cpus/cpu-map/cluster0/core%d",
-> > -                                              cpu);
-> > -        char *cpu_nodename = g_strdup_printf("/cpus/cpu@%d", cpu);
-> > -        uint32_t intc_phandle = qemu_fdt_get_phandle(fdt, cpu_nodename);
-> > -        qemu_fdt_add_subnode(fdt, core_nodename);
-> > -        qemu_fdt_setprop_cell(fdt, core_nodename, "cpu", intc_phandle);
-> > -        g_free(core_nodename);
-> > -        g_free(cpu_nodename);
-> > +        addr = memmap[VIRT_DRAM].base + riscv_socket_mem_offset(mc, socket);
-> > +        size = riscv_socket_mem_size(mc, socket);
-> > +        mem_name = g_strdup_printf("/memory@%lx", (long)addr);
-> > +        qemu_fdt_add_subnode(fdt, mem_name);
-> > +        qemu_fdt_setprop_cells(fdt, mem_name, "reg",
-> > +            addr >> 32, addr, size >> 32, size);
-> > +        qemu_fdt_setprop_string(fdt, mem_name, "device_type", "memory");
-> > +        riscv_socket_fdt_write_id(mc, fdt, mem_name, socket);
-> > +        g_free(mem_name);
-> > +
-> > +        clint_addr = memmap[VIRT_CLINT].base +
-> > +            (memmap[VIRT_CLINT].size * socket);
-> > +        clint_name = g_strdup_printf("/soc/clint@%lx", clint_addr);
-> > +        qemu_fdt_add_subnode(fdt, clint_name);
-> > +        qemu_fdt_setprop_string(fdt, clint_name, "compatible", "riscv,clint0");
-> > +        qemu_fdt_setprop_cells(fdt, clint_name, "reg",
-> > +            0x0, clint_addr, 0x0, memmap[VIRT_CLINT].size);
-> > +        qemu_fdt_setprop(fdt, clint_name, "interrupts-extended",
-> > +            clint_cells, s->soc[socket].num_harts * sizeof(uint32_t) * 4);
-> > +        riscv_socket_fdt_write_id(mc, fdt, clint_name, socket);
-> > +        g_free(clint_name);
-> > +
-> > +        plic_phandle[socket] = phandle++;
-> > +        plic_addr = memmap[VIRT_PLIC].base + (memmap[VIRT_PLIC].size * socket);
-> > +        plic_name = g_strdup_printf("/soc/plic@%lx", plic_addr);
-> > +        qemu_fdt_add_subnode(fdt, plic_name);
-> > +        qemu_fdt_setprop_cell(fdt, plic_name,
-> > +            "#address-cells", FDT_PLIC_ADDR_CELLS);
-> > +        qemu_fdt_setprop_cell(fdt, plic_name,
-> > +            "#interrupt-cells", FDT_PLIC_INT_CELLS);
-> > +        qemu_fdt_setprop_string(fdt, plic_name, "compatible", "riscv,plic0");
-> > +        qemu_fdt_setprop(fdt, plic_name, "interrupt-controller", NULL, 0);
-> > +        qemu_fdt_setprop(fdt, plic_name, "interrupts-extended",
-> > +            plic_cells, s->soc[socket].num_harts * sizeof(uint32_t) * 4);
-> > +        qemu_fdt_setprop_cells(fdt, plic_name, "reg",
-> > +            0x0, plic_addr, 0x0, memmap[VIRT_PLIC].size);
-> > +        qemu_fdt_setprop_cell(fdt, plic_name, "riscv,ndev", VIRTIO_NDEV);
-> > +        riscv_socket_fdt_write_id(mc, fdt, plic_name, socket);
-> > +        qemu_fdt_setprop_cell(fdt, plic_name, "phandle", plic_phandle[socket]);
-> > +        g_free(plic_name);
-> > +
-> > +        g_free(clint_cells);
-> > +        g_free(plic_cells);
-> > +        g_free(clust_name);
-> >      }
-> >
-> > -    cells =  g_new0(uint32_t, s->soc.num_harts * 4);
-> > -    for (cpu = 0; cpu < s->soc.num_harts; cpu++) {
-> > -        nodename =
-> > -            g_strdup_printf("/cpus/cpu@%d/interrupt-controller", cpu);
-> > -        uint32_t intc_phandle = qemu_fdt_get_phandle(fdt, nodename);
-> > -        cells[cpu * 4 + 0] = cpu_to_be32(intc_phandle);
-> > -        cells[cpu * 4 + 1] = cpu_to_be32(IRQ_M_SOFT);
-> > -        cells[cpu * 4 + 2] = cpu_to_be32(intc_phandle);
-> > -        cells[cpu * 4 + 3] = cpu_to_be32(IRQ_M_TIMER);
-> > -        g_free(nodename);
-> > -    }
-> > -    nodename = g_strdup_printf("/soc/clint@%lx",
-> > -        (long)memmap[VIRT_CLINT].base);
-> > -    qemu_fdt_add_subnode(fdt, nodename);
-> > -    qemu_fdt_setprop_string(fdt, nodename, "compatible", "riscv,clint0");
-> > -    qemu_fdt_setprop_cells(fdt, nodename, "reg",
-> > -        0x0, memmap[VIRT_CLINT].base,
-> > -        0x0, memmap[VIRT_CLINT].size);
-> > -    qemu_fdt_setprop(fdt, nodename, "interrupts-extended",
-> > -        cells, s->soc.num_harts * sizeof(uint32_t) * 4);
-> > -    g_free(cells);
-> > -    g_free(nodename);
-> > -
-> > -    plic_phandle = phandle++;
-> > -    cells =  g_new0(uint32_t, s->soc.num_harts * 4);
-> > -    for (cpu = 0; cpu < s->soc.num_harts; cpu++) {
-> > -        nodename =
-> > -            g_strdup_printf("/cpus/cpu@%d/interrupt-controller", cpu);
-> > -        uint32_t intc_phandle = qemu_fdt_get_phandle(fdt, nodename);
-> > -        cells[cpu * 4 + 0] = cpu_to_be32(intc_phandle);
-> > -        cells[cpu * 4 + 1] = cpu_to_be32(IRQ_M_EXT);
-> > -        cells[cpu * 4 + 2] = cpu_to_be32(intc_phandle);
-> > -        cells[cpu * 4 + 3] = cpu_to_be32(IRQ_S_EXT);
-> > -        g_free(nodename);
-> > +    for (socket = 0; socket < riscv_socket_count(mc); socket++) {
-> > +        if (socket == 0) {
-> > +            plic_mmio_phandle = plic_phandle[socket];
-> > +            plic_virtio_phandle = plic_phandle[socket];
-> > +            plic_pcie_phandle = plic_phandle[socket];
-> > +        }
-> > +        if (socket == 1) {
-> > +            plic_virtio_phandle = plic_phandle[socket];
-> > +            plic_pcie_phandle = plic_phandle[socket];
-> > +        }
-> > +        if (socket == 2) {
-> > +            plic_pcie_phandle = plic_phandle[socket];
-> > +        }
-> >      }
-> > -    nodename = g_strdup_printf("/soc/interrupt-controller@%lx",
-> > -        (long)memmap[VIRT_PLIC].base);
-> > -    qemu_fdt_add_subnode(fdt, nodename);
-> > -    qemu_fdt_setprop_cell(fdt, nodename, "#address-cells",
-> > -                          FDT_PLIC_ADDR_CELLS);
-> > -    qemu_fdt_setprop_cell(fdt, nodename, "#interrupt-cells",
-> > -                          FDT_PLIC_INT_CELLS);
-> > -    qemu_fdt_setprop_string(fdt, nodename, "compatible", "riscv,plic0");
-> > -    qemu_fdt_setprop(fdt, nodename, "interrupt-controller", NULL, 0);
-> > -    qemu_fdt_setprop(fdt, nodename, "interrupts-extended",
-> > -        cells, s->soc.num_harts * sizeof(uint32_t) * 4);
-> > -    qemu_fdt_setprop_cells(fdt, nodename, "reg",
-> > -        0x0, memmap[VIRT_PLIC].base,
-> > -        0x0, memmap[VIRT_PLIC].size);
-> > -    qemu_fdt_setprop_cell(fdt, nodename, "riscv,ndev", VIRTIO_NDEV);
-> > -    qemu_fdt_setprop_cell(fdt, nodename, "phandle", plic_phandle);
-> > -    plic_phandle = qemu_fdt_get_phandle(fdt, nodename);
-> > -    g_free(cells);
-> > -    g_free(nodename);
-> > +
-> > +    riscv_socket_fdt_write_distance_matrix(mc, fdt);
-> >
-> >      for (i = 0; i < VIRTIO_COUNT; i++) {
-> > -        nodename = g_strdup_printf("/virtio_mmio@%lx",
-> > +        name = g_strdup_printf("/soc/virtio_mmio@%lx",
-> >              (long)(memmap[VIRT_VIRTIO].base + i * memmap[VIRT_VIRTIO].size));
-> > -        qemu_fdt_add_subnode(fdt, nodename);
-> > -        qemu_fdt_setprop_string(fdt, nodename, "compatible", "virtio,mmio");
-> > -        qemu_fdt_setprop_cells(fdt, nodename, "reg",
-> > +        qemu_fdt_add_subnode(fdt, name);
-> > +        qemu_fdt_setprop_string(fdt, name, "compatible", "virtio,mmio");
-> > +        qemu_fdt_setprop_cells(fdt, name, "reg",
-> >              0x0, memmap[VIRT_VIRTIO].base + i * memmap[VIRT_VIRTIO].size,
-> >              0x0, memmap[VIRT_VIRTIO].size);
-> > -        qemu_fdt_setprop_cell(fdt, nodename, "interrupt-parent", plic_phandle);
-> > -        qemu_fdt_setprop_cell(fdt, nodename, "interrupts", VIRTIO_IRQ + i);
-> > -        g_free(nodename);
-> > +        qemu_fdt_setprop_cell(fdt, name, "interrupt-parent",
-> > +            plic_virtio_phandle);
-> > +        qemu_fdt_setprop_cell(fdt, name, "interrupts", VIRTIO_IRQ + i);
-> > +        g_free(name);
-> >      }
-> >
-> > -    nodename = g_strdup_printf("/soc/pci@%lx",
-> > +    name = g_strdup_printf("/soc/pci@%lx",
-> >          (long) memmap[VIRT_PCIE_ECAM].base);
-> > -    qemu_fdt_add_subnode(fdt, nodename);
-> > -    qemu_fdt_setprop_cell(fdt, nodename, "#address-cells",
-> > -                          FDT_PCI_ADDR_CELLS);
-> > -    qemu_fdt_setprop_cell(fdt, nodename, "#interrupt-cells",
-> > -                          FDT_PCI_INT_CELLS);
-> > -    qemu_fdt_setprop_cell(fdt, nodename, "#size-cells", 0x2);
-> > -    qemu_fdt_setprop_string(fdt, nodename, "compatible",
-> > -                            "pci-host-ecam-generic");
-> > -    qemu_fdt_setprop_string(fdt, nodename, "device_type", "pci");
-> > -    qemu_fdt_setprop_cell(fdt, nodename, "linux,pci-domain", 0);
-> > -    qemu_fdt_setprop_cells(fdt, nodename, "bus-range", 0,
-> > -                           memmap[VIRT_PCIE_ECAM].size /
-> > -                               PCIE_MMCFG_SIZE_MIN - 1);
-> > -    qemu_fdt_setprop(fdt, nodename, "dma-coherent", NULL, 0);
-> > -    qemu_fdt_setprop_cells(fdt, nodename, "reg", 0, memmap[VIRT_PCIE_ECAM].base,
-> > -                           0, memmap[VIRT_PCIE_ECAM].size);
-> > -    qemu_fdt_setprop_sized_cells(fdt, nodename, "ranges",
-> > +    qemu_fdt_add_subnode(fdt, name);
-> > +    qemu_fdt_setprop_cell(fdt, name, "#address-cells", FDT_PCI_ADDR_CELLS);
-> > +    qemu_fdt_setprop_cell(fdt, name, "#interrupt-cells", FDT_PCI_INT_CELLS);
-> > +    qemu_fdt_setprop_cell(fdt, name, "#size-cells", 0x2);
-> > +    qemu_fdt_setprop_string(fdt, name, "compatible", "pci-host-ecam-generic");
-> > +    qemu_fdt_setprop_string(fdt, name, "device_type", "pci");
-> > +    qemu_fdt_setprop_cell(fdt, name, "linux,pci-domain", 0);
-> > +    qemu_fdt_setprop_cells(fdt, name, "bus-range", 0,
-> > +        memmap[VIRT_PCIE_ECAM].size / PCIE_MMCFG_SIZE_MIN - 1);
-> > +    qemu_fdt_setprop(fdt, name, "dma-coherent", NULL, 0);
-> > +    qemu_fdt_setprop_cells(fdt, name, "reg", 0,
-> > +        memmap[VIRT_PCIE_ECAM].base, 0, memmap[VIRT_PCIE_ECAM].size);
-> > +    qemu_fdt_setprop_sized_cells(fdt, name, "ranges",
-> >          1, FDT_PCI_RANGE_IOPORT, 2, 0,
-> >          2, memmap[VIRT_PCIE_PIO].base, 2, memmap[VIRT_PCIE_PIO].size,
-> >          1, FDT_PCI_RANGE_MMIO,
-> >          2, memmap[VIRT_PCIE_MMIO].base,
-> >          2, memmap[VIRT_PCIE_MMIO].base, 2, memmap[VIRT_PCIE_MMIO].size);
-> > -    create_pcie_irq_map(fdt, nodename, plic_phandle);
-> > -    g_free(nodename);
-> > +    create_pcie_irq_map(fdt, name, plic_pcie_phandle);
-> > +    g_free(name);
-> >
-> >      test_phandle = phandle++;
-> > -    nodename = g_strdup_printf("/test@%lx",
-> > +    name = g_strdup_printf("/soc/test@%lx",
-> >          (long)memmap[VIRT_TEST].base);
-> > -    qemu_fdt_add_subnode(fdt, nodename);
-> > +    qemu_fdt_add_subnode(fdt, name);
-> >      {
-> >          const char compat[] = "sifive,test1\0sifive,test0\0syscon";
-> > -        qemu_fdt_setprop(fdt, nodename, "compatible", compat, sizeof(compat));
-> > +        qemu_fdt_setprop(fdt, name, "compatible", compat, sizeof(compat));
-> >      }
-> > -    qemu_fdt_setprop_cells(fdt, nodename, "reg",
-> > +    qemu_fdt_setprop_cells(fdt, name, "reg",
-> >          0x0, memmap[VIRT_TEST].base,
-> >          0x0, memmap[VIRT_TEST].size);
-> > -    qemu_fdt_setprop_cell(fdt, nodename, "phandle", test_phandle);
-> > -    test_phandle = qemu_fdt_get_phandle(fdt, nodename);
-> > -    g_free(nodename);
-> > -
-> > -    nodename = g_strdup_printf("/reboot");
-> > -    qemu_fdt_add_subnode(fdt, nodename);
-> > -    qemu_fdt_setprop_string(fdt, nodename, "compatible", "syscon-reboot");
-> > -    qemu_fdt_setprop_cell(fdt, nodename, "regmap", test_phandle);
-> > -    qemu_fdt_setprop_cell(fdt, nodename, "offset", 0x0);
-> > -    qemu_fdt_setprop_cell(fdt, nodename, "value", FINISHER_RESET);
-> > -    g_free(nodename);
-> > -
-> > -    nodename = g_strdup_printf("/poweroff");
-> > -    qemu_fdt_add_subnode(fdt, nodename);
-> > -    qemu_fdt_setprop_string(fdt, nodename, "compatible", "syscon-poweroff");
-> > -    qemu_fdt_setprop_cell(fdt, nodename, "regmap", test_phandle);
-> > -    qemu_fdt_setprop_cell(fdt, nodename, "offset", 0x0);
-> > -    qemu_fdt_setprop_cell(fdt, nodename, "value", FINISHER_PASS);
-> > -    g_free(nodename);
-> > -
-> > -    nodename = g_strdup_printf("/uart@%lx",
-> > -        (long)memmap[VIRT_UART0].base);
-> > -    qemu_fdt_add_subnode(fdt, nodename);
-> > -    qemu_fdt_setprop_string(fdt, nodename, "compatible", "ns16550a");
-> > -    qemu_fdt_setprop_cells(fdt, nodename, "reg",
-> > +    qemu_fdt_setprop_cell(fdt, name, "phandle", test_phandle);
-> > +    test_phandle = qemu_fdt_get_phandle(fdt, name);
-> > +    g_free(name);
-> > +
-> > +    name = g_strdup_printf("/soc/reboot");
-> > +    qemu_fdt_add_subnode(fdt, name);
-> > +    qemu_fdt_setprop_string(fdt, name, "compatible", "syscon-reboot");
-> > +    qemu_fdt_setprop_cell(fdt, name, "regmap", test_phandle);
-> > +    qemu_fdt_setprop_cell(fdt, name, "offset", 0x0);
-> > +    qemu_fdt_setprop_cell(fdt, name, "value", FINISHER_RESET);
-> > +    g_free(name);
-> > +
-> > +    name = g_strdup_printf("/soc/poweroff");
-> > +    qemu_fdt_add_subnode(fdt, name);
-> > +    qemu_fdt_setprop_string(fdt, name, "compatible", "syscon-poweroff");
-> > +    qemu_fdt_setprop_cell(fdt, name, "regmap", test_phandle);
-> > +    qemu_fdt_setprop_cell(fdt, name, "offset", 0x0);
-> > +    qemu_fdt_setprop_cell(fdt, name, "value", FINISHER_PASS);
-> > +    g_free(name);
-> > +
-> > +    name = g_strdup_printf("/soc/uart@%lx", (long)memmap[VIRT_UART0].base);
-> > +    qemu_fdt_add_subnode(fdt, name);
-> > +    qemu_fdt_setprop_string(fdt, name, "compatible", "ns16550a");
-> > +    qemu_fdt_setprop_cells(fdt, name, "reg",
-> >          0x0, memmap[VIRT_UART0].base,
-> >          0x0, memmap[VIRT_UART0].size);
-> > -    qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency", 3686400);
-> > -    qemu_fdt_setprop_cell(fdt, nodename, "interrupt-parent", plic_phandle);
-> > -    qemu_fdt_setprop_cell(fdt, nodename, "interrupts", UART0_IRQ);
-> > +    qemu_fdt_setprop_cell(fdt, name, "clock-frequency", 3686400);
-> > +    qemu_fdt_setprop_cell(fdt, name, "interrupt-parent", plic_mmio_phandle);
-> > +    qemu_fdt_setprop_cell(fdt, name, "interrupts", UART0_IRQ);
-> >
-> >      qemu_fdt_add_subnode(fdt, "/chosen");
-> > -    qemu_fdt_setprop_string(fdt, "/chosen", "stdout-path", nodename);
-> > +    qemu_fdt_setprop_string(fdt, "/chosen", "stdout-path", name);
-> >      if (cmdline) {
-> >          qemu_fdt_setprop_string(fdt, "/chosen", "bootargs", cmdline);
-> >      }
-> > -    g_free(nodename);
-> > -
-> > -    nodename = g_strdup_printf("/rtc@%lx",
-> > -        (long)memmap[VIRT_RTC].base);
-> > -    qemu_fdt_add_subnode(fdt, nodename);
-> > -    qemu_fdt_setprop_string(fdt, nodename, "compatible",
-> > -        "google,goldfish-rtc");
-> > -    qemu_fdt_setprop_cells(fdt, nodename, "reg",
-> > +    g_free(name);
-> > +
-> > +    name = g_strdup_printf("/soc/rtc@%lx", (long)memmap[VIRT_RTC].base);
-> > +    qemu_fdt_add_subnode(fdt, name);
-> > +    qemu_fdt_setprop_string(fdt, name, "compatible", "google,goldfish-rtc");
-> > +    qemu_fdt_setprop_cells(fdt, name, "reg",
-> >          0x0, memmap[VIRT_RTC].base,
-> >          0x0, memmap[VIRT_RTC].size);
-> > -    qemu_fdt_setprop_cell(fdt, nodename, "interrupt-parent", plic_phandle);
-> > -    qemu_fdt_setprop_cell(fdt, nodename, "interrupts", RTC_IRQ);
-> > -    g_free(nodename);
-> > -
-> > -    nodename = g_strdup_printf("/flash@%" PRIx64, flashbase);
-> > -    qemu_fdt_add_subnode(s->fdt, nodename);
-> > -    qemu_fdt_setprop_string(s->fdt, nodename, "compatible", "cfi-flash");
-> > -    qemu_fdt_setprop_sized_cells(s->fdt, nodename, "reg",
-> > +    qemu_fdt_setprop_cell(fdt, name, "interrupt-parent", plic_mmio_phandle);
-> > +    qemu_fdt_setprop_cell(fdt, name, "interrupts", RTC_IRQ);
-> > +    g_free(name);
-> > +
-> > +    name = g_strdup_printf("/soc/flash@%" PRIx64, flashbase);
-> > +    qemu_fdt_add_subnode(s->fdt, name);
-> > +    qemu_fdt_setprop_string(s->fdt, name, "compatible", "cfi-flash");
-> > +    qemu_fdt_setprop_sized_cells(s->fdt, name, "reg",
-> >                                   2, flashbase, 2, flashsize,
-> >                                   2, flashbase + flashsize, 2, flashsize);
-> > -    qemu_fdt_setprop_cell(s->fdt, nodename, "bank-width", 4);
-> > -    g_free(nodename);
-> > +    qemu_fdt_setprop_cell(s->fdt, name, "bank-width", 4);
-> > +    g_free(name);
-> >  }
-> >
-> > -
-> >  static inline DeviceState *gpex_pcie_init(MemoryRegion *sys_mem,
-> >                                            hwaddr ecam_base, hwaddr ecam_size,
-> >                                            hwaddr mmio_base, hwaddr mmio_size,
-> > @@ -478,21 +493,100 @@ static void riscv_virt_board_init(MachineState *machine)
-> >      MemoryRegion *system_memory = get_system_memory();
-> >      MemoryRegion *main_mem = g_new(MemoryRegion, 1);
-> >      MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
-> > -    char *plic_hart_config;
-> > +    char *plic_hart_config, *soc_name;
-> >      size_t plic_hart_config_len;
-> >      target_ulong start_addr = memmap[VIRT_DRAM].base;
-> > -    int i;
-> > -    unsigned int smp_cpus = machine->smp.cpus;
-> > -
-> > -    /* Initialize SOC */
-> > -    object_initialize_child(OBJECT(machine), "soc", &s->soc, sizeof(s->soc),
-> > -                            TYPE_RISCV_HART_ARRAY, &error_abort, NULL);
-> > -    object_property_set_str(OBJECT(&s->soc), machine->cpu_type, "cpu-type",
-> > -                            &error_abort);
-> > -    object_property_set_int(OBJECT(&s->soc), smp_cpus, "num-harts",
-> > -                            &error_abort);
-> > -    object_property_set_bool(OBJECT(&s->soc), true, "realized",
-> > -                            &error_abort);
-> > +    DeviceState *mmio_plic, *virtio_plic, *pcie_plic;
-> > +    int i, j, base_hartid, hart_count;
-> > +
-> > +    /* Check socket count limit */
-> > +    if (VIRT_SOCKETS_MAX < riscv_socket_count(machine)) {
-> > +        error_report("number of sockets/nodes should be less than %d",
-> > +            VIRT_SOCKETS_MAX);
-> > +        exit(1);
-> > +    }
-> > +
-> > +    /* Initialize sockets */
-> > +    mmio_plic = virtio_plic = pcie_plic = NULL;
-> > +    for (i = 0; i < riscv_socket_count(machine); i++) {
-> > +        if (!riscv_socket_check_hartids(machine, i)) {
-> > +            error_report("discontinuous hartids in socket%d", i);
-> > +            exit(1);
-> > +        }
-> > +
-> > +        base_hartid = riscv_socket_first_hartid(machine, i);
-> > +        if (base_hartid < 0) {
-> > +            error_report("can't find hartid base for socket%d", i);
-> > +            exit(1);
-> > +        }
-> > +
-> > +        hart_count = riscv_socket_hart_count(machine, i);
-> > +        if (hart_count < 0) {
-> > +            error_report("can't find hart count for socket%d", i);
-> > +            exit(1);
-> > +        }
-> > +
-> > +        soc_name = g_strdup_printf("soc%d", i);
-> > +        object_initialize_child(OBJECT(machine), soc_name, &s->soc[i],
-> > +            sizeof(s->soc[i]), TYPE_RISCV_HART_ARRAY, &error_abort, NULL);
-> > +        g_free(soc_name);
-> > +        object_property_set_str(OBJECT(&s->soc[i]),
-> > +            machine->cpu_type, "cpu-type", &error_abort);
-> > +        object_property_set_int(OBJECT(&s->soc[i]),
-> > +            base_hartid, "hartid-base", &error_abort);
-> > +        object_property_set_int(OBJECT(&s->soc[i]),
-> > +            hart_count, "num-harts", &error_abort);
-> > +        object_property_set_bool(OBJECT(&s->soc[i]),
-> > +            true, "realized", &error_abort);
-> > +
-> > +        /* Per-socket CLINT */
-> > +        sifive_clint_create(
-> > +            memmap[VIRT_CLINT].base + i * memmap[VIRT_CLINT].size,
-> > +            memmap[VIRT_CLINT].size, base_hartid, hart_count,
-> > +            SIFIVE_SIP_BASE, SIFIVE_TIMECMP_BASE, SIFIVE_TIME_BASE, true);
-> > +
-> > +        /* Per-socket PLIC hart topology configuration string */
-> > +        plic_hart_config_len =
-> > +            (strlen(VIRT_PLIC_HART_CONFIG) + 1) * hart_count;
-> > +        plic_hart_config = g_malloc0(plic_hart_config_len);
-> > +        for (j = 0; j < hart_count; j++) {
-> > +            if (j != 0) {
-> > +                strncat(plic_hart_config, ",", plic_hart_config_len);
-> > +            }
-> > +            strncat(plic_hart_config, VIRT_PLIC_HART_CONFIG,
-> > +                plic_hart_config_len);
-> > +            plic_hart_config_len -= (strlen(VIRT_PLIC_HART_CONFIG) + 1);
-> > +        }
-> > +
-> > +        /* Per-socket PLIC */
-> > +        s->plic[i] = sifive_plic_create(
-> > +            memmap[VIRT_PLIC].base + i * memmap[VIRT_PLIC].size,
-> > +            plic_hart_config, base_hartid,
-> > +            VIRT_PLIC_NUM_SOURCES,
-> > +            VIRT_PLIC_NUM_PRIORITIES,
-> > +            VIRT_PLIC_PRIORITY_BASE,
-> > +            VIRT_PLIC_PENDING_BASE,
-> > +            VIRT_PLIC_ENABLE_BASE,
-> > +            VIRT_PLIC_ENABLE_STRIDE,
-> > +            VIRT_PLIC_CONTEXT_BASE,
-> > +            VIRT_PLIC_CONTEXT_STRIDE,
-> > +            memmap[VIRT_PLIC].size);
-> > +        g_free(plic_hart_config);
-> > +
-> > +        /* Try to use different PLIC instance based device type */
-> > +        if (i == 0) {
-> > +            mmio_plic = s->plic[i];
-> > +            virtio_plic = s->plic[i];
-> > +            pcie_plic = s->plic[i];
-> > +        }
-> > +        if (i == 1) {
-> > +            virtio_plic = s->plic[i];
-> > +            pcie_plic = s->plic[i];
-> > +        }
-> > +        if (i == 2) {
-> > +            pcie_plic = s->plic[i];
-> > +        }
-> > +    }
-> >
-> >      /* register system main memory (actual RAM) */
-> >      memory_region_init_ram(main_mem, NULL, "riscv_virt_board.ram",
-> > @@ -571,38 +665,14 @@ static void riscv_virt_board_init(MachineState *machine)
-> >                            memmap[VIRT_MROM].base + sizeof(reset_vec),
-> >                            &address_space_memory);
-> >
-> > -    /* create PLIC hart topology configuration string */
-> > -    plic_hart_config_len = (strlen(VIRT_PLIC_HART_CONFIG) + 1) * smp_cpus;
-> > -    plic_hart_config = g_malloc0(plic_hart_config_len);
-> > -    for (i = 0; i < smp_cpus; i++) {
-> > -        if (i != 0) {
-> > -            strncat(plic_hart_config, ",", plic_hart_config_len);
-> > -        }
-> > -        strncat(plic_hart_config, VIRT_PLIC_HART_CONFIG, plic_hart_config_len);
-> > -        plic_hart_config_len -= (strlen(VIRT_PLIC_HART_CONFIG) + 1);
-> > -    }
-> > -
-> > -    /* MMIO */
-> > -    s->plic = sifive_plic_create(memmap[VIRT_PLIC].base,
-> > -        plic_hart_config, 0,
-> > -        VIRT_PLIC_NUM_SOURCES,
-> > -        VIRT_PLIC_NUM_PRIORITIES,
-> > -        VIRT_PLIC_PRIORITY_BASE,
-> > -        VIRT_PLIC_PENDING_BASE,
-> > -        VIRT_PLIC_ENABLE_BASE,
-> > -        VIRT_PLIC_ENABLE_STRIDE,
-> > -        VIRT_PLIC_CONTEXT_BASE,
-> > -        VIRT_PLIC_CONTEXT_STRIDE,
-> > -        memmap[VIRT_PLIC].size);
-> > -    sifive_clint_create(memmap[VIRT_CLINT].base,
-> > -        memmap[VIRT_CLINT].size, 0, smp_cpus,
-> > -        SIFIVE_SIP_BASE, SIFIVE_TIMECMP_BASE, SIFIVE_TIME_BASE, true);
-> > +    /* SiFive Test MMIO device */
-> >      sifive_test_create(memmap[VIRT_TEST].base);
-> >
-> > +    /* VirtIO MMIO devices */
-> >      for (i = 0; i < VIRTIO_COUNT; i++) {
-> >          sysbus_create_simple("virtio-mmio",
-> >              memmap[VIRT_VIRTIO].base + i * memmap[VIRT_VIRTIO].size,
-> > -            qdev_get_gpio_in(DEVICE(s->plic), VIRTIO_IRQ + i));
-> > +            qdev_get_gpio_in(DEVICE(virtio_plic), VIRTIO_IRQ + i));
-> >      }
-> >
-> >      gpex_pcie_init(system_memory,
-> > @@ -611,14 +681,14 @@ static void riscv_virt_board_init(MachineState *machine)
-> >                           memmap[VIRT_PCIE_MMIO].base,
-> >                           memmap[VIRT_PCIE_MMIO].size,
-> >                           memmap[VIRT_PCIE_PIO].base,
-> > -                         DEVICE(s->plic), true);
-> > +                         DEVICE(pcie_plic), true);
-> >
-> >      serial_mm_init(system_memory, memmap[VIRT_UART0].base,
-> > -        0, qdev_get_gpio_in(DEVICE(s->plic), UART0_IRQ), 399193,
-> > +        0, qdev_get_gpio_in(DEVICE(mmio_plic), UART0_IRQ), 399193,
-> >          serial_hd(0), DEVICE_LITTLE_ENDIAN);
-> >
-> >      sysbus_create_simple("goldfish_rtc", memmap[VIRT_RTC].base,
-> > -        qdev_get_gpio_in(DEVICE(s->plic), RTC_IRQ));
-> > +        qdev_get_gpio_in(DEVICE(mmio_plic), RTC_IRQ));
-> >
-> >      virt_flash_create(s);
-> >
-> > @@ -628,8 +698,6 @@ static void riscv_virt_board_init(MachineState *machine)
-> >                                    drive_get(IF_PFLASH, 0, i));
-> >      }
-> >      virt_flash_map(s, system_memory);
-> > -
-> > -    g_free(plic_hart_config);
-> >  }
-> >
-> >  static void riscv_virt_machine_instance_init(Object *obj)
-> > @@ -642,9 +710,13 @@ static void riscv_virt_machine_class_init(ObjectClass *oc, void *data)
-> >
-> >      mc->desc = "RISC-V VirtIO board";
-> >      mc->init = riscv_virt_board_init;
-> > -    mc->max_cpus = 8;
-> > +    mc->max_cpus = VIRT_CPUS_MAX;
-> >      mc->default_cpu_type = VIRT_CPU;
-> >      mc->pci_allow_0_address = true;
-> > +    mc->possible_cpu_arch_ids = riscv_numa_possible_cpu_arch_ids;
-> > +    mc->cpu_index_to_instance_props = riscv_numa_cpu_index_to_props;
-> > +    mc->get_default_cpu_node_id = riscv_numa_get_default_cpu_node_id;
-> > +    mc->numa_mem_supported = true;
-> >  }
-> >
-> >  static const TypeInfo riscv_virt_machine_typeinfo = {
-> > diff --git a/include/hw/riscv/virt.h b/include/hw/riscv/virt.h
-> > index e69355efaf..1beacd7666 100644
-> > --- a/include/hw/riscv/virt.h
-> > +++ b/include/hw/riscv/virt.h
-> > @@ -23,6 +23,9 @@
-> >  #include "hw/sysbus.h"
-> >  #include "hw/block/flash.h"
-> >
-> > +#define VIRT_CPUS_MAX 8
-> > +#define VIRT_SOCKETS_MAX 8
-> > +
-> >  #define TYPE_RISCV_VIRT_MACHINE MACHINE_TYPE_NAME("virt")
-> >  #define RISCV_VIRT_MACHINE(obj) \
-> >      OBJECT_CHECK(RISCVVirtState, (obj), TYPE_RISCV_VIRT_MACHINE)
-> > @@ -32,8 +35,8 @@ typedef struct {
-> >      MachineState parent;
-> >
-> >      /*< public >*/
-> > -    RISCVHartArrayState soc;
-> > -    DeviceState *plic;
-> > +    RISCVHartArrayState soc[VIRT_SOCKETS_MAX];
-> > +    DeviceState *plic[VIRT_SOCKETS_MAX];
-> >      PFlashCFI01 *flash[2];
-> >
-> >      void *fdt;
-> > @@ -74,6 +77,8 @@ enum {
-> >  #define VIRT_PLIC_ENABLE_STRIDE 0x80
-> >  #define VIRT_PLIC_CONTEXT_BASE 0x200000
-> >  #define VIRT_PLIC_CONTEXT_STRIDE 0x1000
-> > +#define VIRT_PLIC_SIZE(__num_context) \
-> > +    (VIRT_PLIC_CONTEXT_BASE + (__num_context) * VIRT_PLIC_CONTEXT_STRIDE)
-> >
-> >  #define FDT_PCI_ADDR_CELLS    3
-> >  #define FDT_PCI_INT_CELLS     1
-> > --
-> > 2.25.1
-> >
-> >
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDYxODAzMDAyNy43NTk1
+OTQtMS1hcmlsb3VAZ21haWwuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUgYXNh
+biBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21tYW5kcyBhbmQKdGhlaXIg
+b3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVkLCB5b3UgY2FuIHByb2Jh
+Ymx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9i
+aW4vYmFzaApleHBvcnQgQVJDSD14ODZfNjQKbWFrZSBkb2NrZXItaW1hZ2UtZmVkb3JhIFY9MSBO
+RVRXT1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LWRlYnVnQGZlZG9yYSBUQVJHRVRfTElTVD14
+ODZfNjQtc29mdG1tdSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKICBD
+QyAgICAgIHFnYS9tYWluLm8KICBDQyAgICAgIHFnYS9jb21tYW5kcy1wb3NpeC5vCiAgQ0MgICAg
+ICBxZ2EvY2hhbm5lbC1wb3NpeC5vCi91c3IvYmluL2xkOiAvdXNyL2xpYjY0L2NsYW5nLzEwLjAu
+MC9saWIvbGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2ludGVyY2VwdG9yc192
+Zm9yay5TLm8pOiB3YXJuaW5nOiBjb21tb24gb2YgYF9faW50ZXJjZXB0aW9uOjpyZWFsX3Zmb3Jr
+JyBvdmVycmlkZGVuIGJ5IGRlZmluaXRpb24gZnJvbSAvdXNyL2xpYjY0L2NsYW5nLzEwLjAuMC9s
+aWIvbGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2ludGVyY2VwdG9ycy5jcHAu
+bykKICBDQyAgICAgIHFnYS9xYXBpLWdlbmVyYXRlZC9xZ2EtcWFwaS10eXBlcy5vCiAgQ0MgICAg
+ICBxZ2EvcWFwaS1nZW5lcmF0ZWQvcWdhLXFhcGktdmlzaXQubwogIENDICAgICAgcWdhL3FhcGkt
+Z2VuZXJhdGVkL3FnYS1xYXBpLWNvbW1hbmRzLm8KLS0tCiAgR0VOICAgICBkb2NzL2ludGVyb3Av
+cWVtdS1nYS1yZWYuaHRtbAogIEdFTiAgICAgZG9jcy9pbnRlcm9wL3FlbXUtZ2EtcmVmLnR4dAog
+IEdFTiAgICAgZG9jcy9pbnRlcm9wL3FlbXUtZ2EtcmVmLjcKL3Vzci9iaW4vbGQ6IC91c3IvbGli
+NjQvY2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFzYW5f
+aW50ZXJjZXB0b3JzX3Zmb3JrLlMubyk6IHdhcm5pbmc6IGNvbW1vbiBvZiBgX19pbnRlcmNlcHRp
+b246OnJlYWxfdmZvcmsnIG92ZXJyaWRkZW4gYnkgZGVmaW5pdGlvbiBmcm9tIC91c3IvbGliNjQv
+Y2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFzYW5faW50
+ZXJjZXB0b3JzLmNwcC5vKQogIExJTksgICAgcWVtdS1rZXltYXAKICBMSU5LICAgIGl2c2htZW0t
+Y2xpZW50Ci91c3IvYmluL2xkOiAvdXNyL2xpYjY0L2NsYW5nLzEwLjAuMC9saWIvbGludXgvbGli
+Y2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2ludGVyY2VwdG9yc192Zm9yay5TLm8pOiB3YXJu
+aW5nOiBjb21tb24gb2YgYF9faW50ZXJjZXB0aW9uOjpyZWFsX3Zmb3JrJyBvdmVycmlkZGVuIGJ5
+IGRlZmluaXRpb24gZnJvbSAvdXNyL2xpYjY0L2NsYW5nLzEwLjAuMC9saWIvbGludXgvbGliY2xh
+bmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2ludGVyY2VwdG9ycy5jcHAubykKICBMSU5LICAgIGl2
+c2htZW0tc2VydmVyCi91c3IvYmluL2xkOiAvdXNyL2xpYjY0L2NsYW5nLzEwLjAuMC9saWIvbGlu
+dXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2ludGVyY2VwdG9yc192Zm9yay5TLm8p
+OiB3YXJuaW5nOiBjb21tb24gb2YgYF9faW50ZXJjZXB0aW9uOjpyZWFsX3Zmb3JrJyBvdmVycmlk
+ZGVuIGJ5IGRlZmluaXRpb24gZnJvbSAvdXNyL2xpYjY0L2NsYW5nLzEwLjAuMC9saWIvbGludXgv
+bGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2ludGVyY2VwdG9ycy5jcHAubykKICBBUyAg
+ICAgIHBjLWJpb3Mvb3B0aW9ucm9tL2xpbnV4Ym9vdC5vCiAgQVMgICAgICBwYy1iaW9zL29wdGlv
+bnJvbS9tdWx0aWJvb3QubwovdXNyL2Jpbi9sZDogL3Vzci9saWI2NC9jbGFuZy8xMC4wLjAvbGli
+L2xpbnV4L2xpYmNsYW5nX3J0LmFzYW4teDg2XzY0LmEoYXNhbl9pbnRlcmNlcHRvcnNfdmZvcmsu
+Uy5vKTogd2FybmluZzogY29tbW9uIG9mIGBfX2ludGVyY2VwdGlvbjo6cmVhbF92Zm9yaycgb3Zl
+cnJpZGRlbiBieSBkZWZpbml0aW9uIGZyb20gL3Vzci9saWI2NC9jbGFuZy8xMC4wLjAvbGliL2xp
+bnV4L2xpYmNsYW5nX3J0LmFzYW4teDg2XzY0LmEoYXNhbl9pbnRlcmNlcHRvcnMuY3BwLm8pCiAg
+TElOSyAgICBxZW11LW5iZAogIENDICAgICAgcGMtYmlvcy9vcHRpb25yb20vbGludXhib290X2Rt
+YS5vCi91c3IvYmluL2xkOiAvdXNyL2xpYjY0L2NsYW5nLzEwLjAuMC9saWIvbGludXgvbGliY2xh
+bmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2ludGVyY2VwdG9yc192Zm9yay5TLm8pOiB3YXJuaW5n
+OiBjb21tb24gb2YgYF9faW50ZXJjZXB0aW9uOjpyZWFsX3Zmb3JrJyBvdmVycmlkZGVuIGJ5IGRl
+ZmluaXRpb24gZnJvbSAvdXNyL2xpYjY0L2NsYW5nLzEwLjAuMC9saWIvbGludXgvbGliY2xhbmdf
+cnQuYXNhbi14ODZfNjQuYShhc2FuX2ludGVyY2VwdG9ycy5jcHAubykKICBBUyAgICAgIHBjLWJp
+b3Mvb3B0aW9ucm9tL2t2bXZhcGljLm8KICBBUyAgICAgIHBjLWJpb3Mvb3B0aW9ucm9tL3B2aC5v
+CiAgQ0MgICAgICBwYy1iaW9zL29wdGlvbnJvbS9wdmhfbWFpbi5vCi0tLQogIEJVSUxEICAgcGMt
+Ymlvcy9vcHRpb25yb20va3ZtdmFwaWMucmF3CiAgU0lHTiAgICBwYy1iaW9zL29wdGlvbnJvbS9t
+dWx0aWJvb3QuYmluCiAgU0lHTiAgICBwYy1iaW9zL29wdGlvbnJvbS9saW51eGJvb3QuYmluCi91
+c3IvYmluL2xkOiAvdXNyL2xpYjY0L2NsYW5nLzEwLjAuMC9saWIvbGludXgvbGliY2xhbmdfcnQu
+YXNhbi14ODZfNjQuYShhc2FuX2ludGVyY2VwdG9yc192Zm9yay5TLm8pOiB3YXJuaW5nOiBjb21t
+b24gb2YgYF9faW50ZXJjZXB0aW9uOjpyZWFsX3Zmb3JrJyBvdmVycmlkZGVuIGJ5IGRlZmluaXRp
+b24gZnJvbSAvdXNyL2xpYjY0L2NsYW5nLzEwLjAuMC9saWIvbGludXgvbGliY2xhbmdfcnQuYXNh
+bi14ODZfNjQuYShhc2FuX2ludGVyY2VwdG9ycy5jcHAubykKICBMSU5LICAgIHFlbXUtaW1nCiAg
+U0lHTiAgICBwYy1iaW9zL29wdGlvbnJvbS9saW51eGJvb3RfZG1hLmJpbgogIFNJR04gICAgcGMt
+Ymlvcy9vcHRpb25yb20va3ZtdmFwaWMuYmluCi91c3IvYmluL2xkOiAvdXNyL2xpYjY0L2NsYW5n
+LzEwLjAuMC9saWIvbGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2ludGVyY2Vw
+dG9yc192Zm9yay5TLm8pOiB3YXJuaW5nOiBjb21tb24gb2YgYF9faW50ZXJjZXB0aW9uOjpyZWFs
+X3Zmb3JrJyBvdmVycmlkZGVuIGJ5IGRlZmluaXRpb24gZnJvbSAvdXNyL2xpYjY0L2NsYW5nLzEw
+LjAuMC9saWIvbGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2ludGVyY2VwdG9y
+cy5jcHAubykKICBCVUlMRCAgIHBjLWJpb3Mvb3B0aW9ucm9tL3B2aC5pbWcKICBCVUlMRCAgIHBj
+LWJpb3Mvb3B0aW9ucm9tL3B2aC5yYXcKICBTSUdOICAgIHBjLWJpb3Mvb3B0aW9ucm9tL3B2aC5i
+aW4KLS0tCiAgTElOSyAgICBxZW11LWVkaWQKICBMSU5LICAgIGZzZGV2L3ZpcnRmcy1wcm94eS1o
+ZWxwZXIKICBMSU5LICAgIHNjc2kvcWVtdS1wci1oZWxwZXIKL3Vzci9iaW4vbGQ6IC91c3IvbGli
+NjQvY2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFzYW5f
+aW50ZXJjZXB0b3JzX3Zmb3JrLlMubyk6IHdhcm5pbmc6IGNvbW1vbiBvZiBgX19pbnRlcmNlcHRp
+b246OnJlYWxfdmZvcmsnIG92ZXJyaWRkZW4gYnkgZGVmaW5pdGlvbiBmcm9tIC91c3IvbGliNjQv
+Y2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFzYW5faW50
+ZXJjZXB0b3JzLmNwcC5vKQogIExJTksgICAgcWVtdS1icmlkZ2UtaGVscGVyCi91c3IvYmluL2xk
+OiAvdXNyL2xpYjY0L2NsYW5nLzEwLjAuMC9saWIvbGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZf
+NjQuYShhc2FuX2ludGVyY2VwdG9yc192Zm9yay5TLm8pOiB3YXJuaW5nOiBjb21tb24gb2YgYF9f
+aW50ZXJjZXB0aW9uOjpyZWFsX3Zmb3JrJyBvdmVycmlkZGVuIGJ5IGRlZmluaXRpb24gZnJvbSAv
+dXNyL2xpYjY0L2NsYW5nLzEwLjAuMC9saWIvbGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQu
+YShhc2FuX2ludGVyY2VwdG9ycy5jcHAubykKL3Vzci9iaW4vbGQ6IC91c3IvbGliNjQvY2xhbmcv
+MTAuMC4wL2xpYi9saW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFzYW5faW50ZXJjZXB0
+b3JzX3Zmb3JrLlMubyk6IHdhcm5pbmc6IGNvbW1vbiBvZiBgX19pbnRlcmNlcHRpb246OnJlYWxf
+dmZvcmsnIG92ZXJyaWRkZW4gYnkgZGVmaW5pdGlvbiBmcm9tIC91c3IvbGliNjQvY2xhbmcvMTAu
+MC4wL2xpYi9saW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFzYW5faW50ZXJjZXB0b3Jz
+LmNwcC5vKQovdXNyL2Jpbi9sZDogL3Vzci9saWI2NC9jbGFuZy8xMC4wLjAvbGliL2xpbnV4L2xp
+YmNsYW5nX3J0LmFzYW4teDg2XzY0LmEoYXNhbl9pbnRlcmNlcHRvcnNfdmZvcmsuUy5vKTogd2Fy
+bmluZzogY29tbW9uIG9mIGBfX2ludGVyY2VwdGlvbjo6cmVhbF92Zm9yaycgb3ZlcnJpZGRlbiBi
+eSBkZWZpbml0aW9uIGZyb20gL3Vzci9saWI2NC9jbGFuZy8xMC4wLjAvbGliL2xpbnV4L2xpYmNs
+YW5nX3J0LmFzYW4teDg2XzY0LmEoYXNhbl9pbnRlcmNlcHRvcnMuY3BwLm8pCiAgTElOSyAgICB2
+aXJ0aW9mc2QKL3Vzci9iaW4vbGQ6IC91c3IvbGliNjQvY2xhbmcvMTAuMC4wL2xpYi9saW51eC9s
+aWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFzYW5faW50ZXJjZXB0b3JzX3Zmb3JrLlMubyk6IHdh
+cm5pbmc6IGNvbW1vbiBvZiBgX19pbnRlcmNlcHRpb246OnJlYWxfdmZvcmsnIG92ZXJyaWRkZW4g
+YnkgZGVmaW5pdGlvbiBmcm9tIC91c3IvbGliNjQvY2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJj
+bGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFzYW5faW50ZXJjZXB0b3JzLmNwcC5vKQogIExJTksgICAg
+dmhvc3QtdXNlci1pbnB1dAogIExJTksgICAgcWVtdS1nYQovdXNyL2Jpbi9sZDogL3Vzci9saWI2
+NC9jbGFuZy8xMC4wLjAvbGliL2xpbnV4L2xpYmNsYW5nX3J0LmFzYW4teDg2XzY0LmEoYXNhbl9p
+bnRlcmNlcHRvcnNfdmZvcmsuUy5vKTogd2FybmluZzogY29tbW9uIG9mIGBfX2ludGVyY2VwdGlv
+bjo6cmVhbF92Zm9yaycgb3ZlcnJpZGRlbiBieSBkZWZpbml0aW9uIGZyb20gL3Vzci9saWI2NC9j
+bGFuZy8xMC4wLjAvbGliL2xpbnV4L2xpYmNsYW5nX3J0LmFzYW4teDg2XzY0LmEoYXNhbl9pbnRl
+cmNlcHRvcnMuY3BwLm8pCi91c3IvYmluL2xkOiAvdXNyL2xpYjY0L2NsYW5nLzEwLjAuMC9saWIv
+bGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2ludGVyY2VwdG9yc192Zm9yay5T
+Lm8pOiB3YXJuaW5nOiBjb21tb24gb2YgYF9faW50ZXJjZXB0aW9uOjpyZWFsX3Zmb3JrJyBvdmVy
+cmlkZGVuIGJ5IGRlZmluaXRpb24gZnJvbSAvdXNyL2xpYjY0L2NsYW5nLzEwLjAuMC9saWIvbGlu
+dXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2ludGVyY2VwdG9ycy5jcHAubykKL3Vz
+ci9iaW4vbGQ6IC91c3IvbGliNjQvY2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJjbGFuZ19ydC5h
+c2FuLXg4Nl82NC5hKGFzYW5faW50ZXJjZXB0b3JzX3Zmb3JrLlMubyk6IHdhcm5pbmc6IGNvbW1v
+biBvZiBgX19pbnRlcmNlcHRpb246OnJlYWxfdmZvcmsnIG92ZXJyaWRkZW4gYnkgZGVmaW5pdGlv
+biBmcm9tIC91c3IvbGliNjQvY2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJjbGFuZ19ydC5hc2Fu
+LXg4Nl82NC5hKGFzYW5faW50ZXJjZXB0b3JzLmNwcC5vKQogIEdFTiAgICAgeDg2XzY0LXNvZnRt
+bXUvaG1wLWNvbW1hbmRzLmgKICBHRU4gICAgIHg4Nl82NC1zb2Z0bW11L2htcC1jb21tYW5kcy1p
+bmZvLmgKICBHRU4gICAgIHg4Nl82NC1zb2Z0bW11L2NvbmZpZy1kZXZpY2VzLmgKLS0tCiAgQ0Mg
+ICAgICB4ODZfNjQtc29mdG1tdS9ody92aXJ0aW8vdmhvc3QtdXNlci12c29jay5vCiAgQ0MgICAg
+ICB4ODZfNjQtc29mdG1tdS9ody92aXJ0aW8vdmhvc3QtdnNvY2stcGNpLm8KICBDQyAgICAgIHg4
+Nl82NC1zb2Z0bW11L2h3L3ZpcnRpby92aG9zdC11c2VyLXZzb2NrLXBjaS5vCi90bXAvcWVtdS10
+ZXN0L3NyYy9taWdyYXRpb24vcmFtLmM6OTE5OjQ1OiBlcnJvcjogaW1wbGljaXQgY29udmVyc2lv
+biBmcm9tICd1bnNpZ25lZCBsb25nJyB0byAnZG91YmxlJyBjaGFuZ2VzIHZhbHVlIGZyb20gMTg0
+NDY3NDQwNzM3MDk1NTE2MTUgdG8gMTg0NDY3NDQwNzM3MDk1NTE2MTYgWy1XZXJyb3IsLVdpbXBs
+aWNpdC1pbnQtZmxvYXQtY29udmVyc2lvbl0KICAgICAgICAgICAgeGJ6cmxlX2NvdW50ZXJzLmVu
+Y29kaW5nX3JhdGUgPSBVSU5UNjRfTUFYOwogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICB+IF5+fn5+fn5+fn4KL3Vzci9pbmNsdWRlL3N0ZGludC5oOjEzMDoyMzogbm90
+ZTogZXhwYW5kZWQgZnJvbSBtYWNybyAnVUlOVDY0X01BWCcKLS0tCjE4NDQ2NzQ0MDczNzA5NTUx
+NjE1VUwKXn5+fn5+fn5+fn5+fn5+fn5+fn5+fgoxIGVycm9yIGdlbmVyYXRlZC4KbWFrZVsxXTog
+KioqIFsvdG1wL3FlbXUtdGVzdC9zcmMvcnVsZXMubWFrOjY5OiBtaWdyYXRpb24vcmFtLm9dIEVy
+cm9yIDEKbWFrZVsxXTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4KL3RtcC9x
+ZW11LXRlc3Qvc3JjL2ZwdS9zb2Z0ZmxvYXQuYzozMzY1OjEzOiBlcnJvcjogYml0d2lzZSBuZWdh
+dGlvbiBvZiBhIGJvb2xlYW4gZXhwcmVzc2lvbjsgZGlkIHlvdSBtZWFuIGxvZ2ljYWwgbmVnYXRp
+b24/IFstV2Vycm9yLC1XYm9vbC1vcGVyYXRpb25dCiAgICBhYnNaICY9IH4gKCAoICggcm91bmRC
+aXRzIF4gMHg0MCApID09IDAgKSAmIHJvdW5kTmVhcmVzdEV2ZW4gKTsKICAgICAgICAgICAgXn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+CiAgICAg
+ICAgICAgICEKL3RtcC9xZW11LXRlc3Qvc3JjL2ZwdS9zb2Z0ZmxvYXQuYzozNDIzOjE4OiBlcnJv
+cjogYml0d2lzZSBuZWdhdGlvbiBvZiBhIGJvb2xlYW4gZXhwcmVzc2lvbjsgZGlkIHlvdSBtZWFu
+IGxvZ2ljYWwgbmVnYXRpb24/IFstV2Vycm9yLC1XYm9vbC1vcGVyYXRpb25dCiAgICAgICAgYWJz
+WjAgJj0gfiAoICggKHVpbnQ2NF90KSAoIGFic1oxPDwxICkgPT0gMCApICYgcm91bmROZWFyZXN0
+RXZlbiApOwogICAgICAgICAgICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fgogICAgICAgICAgICAgICAgICEKL3RtcC9xZW11LXRl
+c3Qvc3JjL2ZwdS9zb2Z0ZmxvYXQuYzozNDgzOjE4OiBlcnJvcjogYml0d2lzZSBuZWdhdGlvbiBv
+ZiBhIGJvb2xlYW4gZXhwcmVzc2lvbjsgZGlkIHlvdSBtZWFuIGxvZ2ljYWwgbmVnYXRpb24/IFst
+V2Vycm9yLC1XYm9vbC1vcGVyYXRpb25dCiAgICAgICAgYWJzWjAgJj0gfigoKHVpbnQ2NF90KShh
+YnNaMTw8MSkgPT0gMCkgJiByb3VuZE5lYXJlc3RFdmVuKTsKICAgICAgICAgICAgICAgICBefn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+CiAgICAgICAgICAg
+ICAgICAgIQovdG1wL3FlbXUtdGVzdC9zcmMvZnB1L3NvZnRmbG9hdC5jOjM2MDY6MTM6IGVycm9y
+OiBiaXR3aXNlIG5lZ2F0aW9uIG9mIGEgYm9vbGVhbiBleHByZXNzaW9uOyBkaWQgeW91IG1lYW4g
+bG9naWNhbCBuZWdhdGlvbj8gWy1XZXJyb3IsLVdib29sLW9wZXJhdGlvbl0KICAgIHpTaWcgJj0g
+fiAoICggKCByb3VuZEJpdHMgXiAweDQwICkgPT0gMCApICYgcm91bmROZWFyZXN0RXZlbiApOwog
+ICAgICAgICAgICBefn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn4KICAgICAgICAgICAgIQovdG1wL3FlbXUtdGVzdC9zcmMvZnB1L3NvZnRmbG9hdC5j
+OjM3NjA6MTM6IGVycm9yOiBiaXR3aXNlIG5lZ2F0aW9uIG9mIGEgYm9vbGVhbiBleHByZXNzaW9u
+OyBkaWQgeW91IG1lYW4gbG9naWNhbCBuZWdhdGlvbj8gWy1XZXJyb3IsLVdib29sLW9wZXJhdGlv
+bl0KICAgIHpTaWcgJj0gfiAoICggKCByb3VuZEJpdHMgXiAweDIwMCApID09IDAgKSAmIHJvdW5k
+TmVhcmVzdEV2ZW4gKTsKICAgICAgICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fgogICAgICAgICAgICAhCi90bXAvcWVtdS10ZXN0L3Ny
+Yy9mcHUvc29mdGZsb2F0LmM6Mzk4NzoyMTogZXJyb3I6IGJpdHdpc2UgbmVnYXRpb24gb2YgYSBi
+b29sZWFuIGV4cHJlc3Npb247IGRpZCB5b3UgbWVhbiBsb2dpY2FsIG5lZ2F0aW9uPyBbLVdlcnJv
+ciwtV2Jvb2wtb3BlcmF0aW9uXQogICAgICAgICAgICAgICAgICAgIH4gKCAoICh1aW50NjRfdCkg
+KCB6U2lnMTw8MSApID09IDAgKSAmIHJvdW5kTmVhcmVzdEV2ZW4gKTsKICAgICAgICAgICAgICAg
+ICAgICBefn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn4KICAgICAgICAgICAgICAgICAgICAhCi90bXAvcWVtdS10ZXN0L3NyYy9mcHUvc29mdGZs
+b2F0LmM6NDAwMzoyMjogZXJyb3I6IGJpdHdpc2UgbmVnYXRpb24gb2YgYSBib29sZWFuIGV4cHJl
+c3Npb247IGRpZCB5b3UgbWVhbiBsb2dpY2FsIG5lZ2F0aW9uPyBbLVdlcnJvciwtV2Jvb2wtb3Bl
+cmF0aW9uXQogICAgICAgICAgICB6U2lnMCAmPSB+ICggKCAodWludDY0X3QpICggelNpZzE8PDEg
+KSA9PSAwICkgJiByb3VuZE5lYXJlc3RFdmVuICk7CiAgICAgICAgICAgICAgICAgICAgIF5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fgogICAg
+ICAgICAgICAgICAgICAgICAhCi90bXAvcWVtdS10ZXN0L3NyYy9mcHUvc29mdGZsb2F0LmM6NDI3
+MzoxODogZXJyb3I6IGJpdHdpc2UgbmVnYXRpb24gb2YgYSBib29sZWFuIGV4cHJlc3Npb247IGRp
+ZCB5b3UgbWVhbiBsb2dpY2FsIG5lZ2F0aW9uPyBbLVdlcnJvciwtV2Jvb2wtb3BlcmF0aW9uXQog
+ICAgICAgIHpTaWcxICY9IH4gKCAoIHpTaWcyICsgelNpZzIgPT0gMCApICYgcm91bmROZWFyZXN0
+RXZlbiApOwogICAgICAgICAgICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+CiAgICAgICAgICAgICAgICAgIQo4IGVycm9ycyBnZW5lcmF0ZWQuCm1h
+a2VbMV06ICoqKiBbL3RtcC9xZW11LXRlc3Qvc3JjL3J1bGVzLm1hazo2OTogZnB1L3NvZnRmbG9h
+dC5vXSBFcnJvciAxCm1ha2U6ICoqKiBbTWFrZWZpbGU6NTI3OiB4ODZfNjQtc29mdG1tdS9hbGxd
+IEVycm9yIDIKVHJhY2ViYWNrIChtb3N0IHJlY2VudCBjYWxsIGxhc3QpOgogIEZpbGUgIi4vdGVz
+dHMvZG9ja2VyL2RvY2tlci5weSIsIGxpbmUgNjY5LCBpbiA8bW9kdWxlPgogICAgc3lzLmV4aXQo
+bWFpbigpKQotLS0KICAgIHJhaXNlIENhbGxlZFByb2Nlc3NFcnJvcihyZXRjb2RlLCBjbWQpCnN1
+YnByb2Nlc3MuQ2FsbGVkUHJvY2Vzc0Vycm9yOiBDb21tYW5kICdbJ3N1ZG8nLCAnLW4nLCAnZG9j
+a2VyJywgJ3J1bicsICctLWxhYmVsJywgJ2NvbS5xZW11Lmluc3RhbmNlLnV1aWQ9YWEzMmQ2OGJl
+Y2VmNDI4ZTk0Y2FhNDAzZjljZTU2MTgnLCAnLXUnLCAnMTAwMycsICctLXNlY3VyaXR5LW9wdCcs
+ICdzZWNjb21wPXVuY29uZmluZWQnLCAnLS1ybScsICctZScsICdUQVJHRVRfTElTVD14ODZfNjQt
+c29mdG1tdScsICctZScsICdFWFRSQV9DT05GSUdVUkVfT1BUUz0nLCAnLWUnLCAnVj0nLCAnLWUn
+LCAnSj0xNCcsICctZScsICdERUJVRz0nLCAnLWUnLCAnU0hPV19FTlY9JywgJy1lJywgJ0NDQUNI
+RV9ESVI9L3Zhci90bXAvY2NhY2hlJywgJy12JywgJy9ob21lL3BhdGNoZXcyLy5jYWNoZS9xZW11
+LWRvY2tlci1jY2FjaGU6L3Zhci90bXAvY2NhY2hlOnonLCAnLXYnLCAnL3Zhci90bXAvcGF0Y2hl
+dy10ZXN0ZXItdG1wLXp4MnN4anpuL3NyYy9kb2NrZXItc3JjLjIwMjAtMDYtMTctMjMuMTkuNTEu
+MjM4NDM6L3Zhci90bXAvcWVtdTp6LHJvJywgJ3FlbXU6ZmVkb3JhJywgJy92YXIvdG1wL3FlbXUv
+cnVuJywgJ3Rlc3QtZGVidWcnXScgcmV0dXJuZWQgbm9uLXplcm8gZXhpdCBzdGF0dXMgMi4KZmls
+dGVyPS0tZmlsdGVyPWxhYmVsPWNvbS5xZW11Lmluc3RhbmNlLnV1aWQ9YWEzMmQ2OGJlY2VmNDI4
+ZTk0Y2FhNDAzZjljZTU2MTgKbWFrZVsxXTogKioqIFtkb2NrZXItcnVuXSBFcnJvciAxCm1ha2Vb
+MV06IExlYXZpbmcgZGlyZWN0b3J5IGAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtengyc3hq
+em4vc3JjJwptYWtlOiAqKiogW2RvY2tlci1ydW4tdGVzdC1kZWJ1Z0BmZWRvcmFdIEVycm9yIDIK
+CnJlYWwgICAgM201MS4xODFzCnVzZXIgICAgMG04LjQwOXMKCgpUaGUgZnVsbCBsb2cgaXMgYXZh
+aWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMjAwNjE4MDMwMDI3Ljc1OTU5NC0x
+LWFyaWxvdUBnbWFpbC5jb20vdGVzdGluZy5hc2FuLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBn
+ZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10u
+ClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
