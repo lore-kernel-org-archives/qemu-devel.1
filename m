@@ -2,79 +2,97 @@ Return-Path: <SRS0=FaGC=77=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20EBBC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 05:18:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EEE2C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 05:19:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DEBC0206F7
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 05:18:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DEBC0206F7
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 18F67206F7
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 05:19:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bjudeb6N"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18F67206F7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43498 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51196 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlmwL-0001AZ-4u
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 01:18:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39662)
+	id 1jlmxt-0004IP-DB
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 01:19:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34106)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jlmfa-0005px-KU
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 01:00:58 -0400
-Received: from indium.canonical.com ([91.189.90.7]:35616)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jlmEP-0006Dc-Ng
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 00:32:55 -0400
+Received: from mail-pl1-x629.google.com ([2607:f8b0:4864:20::629]:36656)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jlmfW-0008Pz-SC
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 01:00:58 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jlmfU-0005qo-HW
- for <qemu-devel@nongnu.org>; Thu, 18 Jun 2020 05:00:52 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 7EE492E8060
- for <qemu-devel@nongnu.org>; Thu, 18 Jun 2020 05:00:52 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 18 Jun 2020 04:54:32 -0000
-From: David Glover <1884017@bugs.launchpad.net>
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jlmEM-0003cN-3s
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 00:32:53 -0400
+Received: by mail-pl1-x629.google.com with SMTP id j4so1918828plk.3
+ for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 21:32:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=goCEuAkdLVUC4u1fLVEAfW8QjjUtS9gz8iEgnW8LE80=;
+ b=bjudeb6NlxVEtSJ6/QyQ52hu4M0bfyFGIee/5LvUlTte5TN45JFy5E72/sQsav7wmF
+ 3iTEdUimTErk/iZjJs7FSGPwV5WxRx/ko6Fl2rA1OreJ87wnhXNtthuFXjkTJ5b7k79D
+ eqFHefV4UWmjx8EsnwtfkzQlXrnOIWfv97tb1tbGSVsUvrjew+zzOiQ6bSjuyenUb31+
+ ZilruYHxouuGT+qIJ3AHsEwON9lRro2xrFUYW/1Zh08XThOikQE9cPzhS8mJOH6nVVLx
+ H/G187hPb3Bv7MKANHtvghM4SsxEVm5xHVT7nCL8bozY2JB+8hR/Q9iwtzi7UOeOk/Fd
+ JGiQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=goCEuAkdLVUC4u1fLVEAfW8QjjUtS9gz8iEgnW8LE80=;
+ b=UUO78zoyX70/DPNVMO1V1wEmfzkXeJ8ebF4NacenGG8n2B+BfBKiABTSW8nObarXxR
+ KCO57p9/5QLEjz74Exn7qf8yKG6I9iP+VNyijOqGSLkwnf7b4Yqo04pxYktIVP+cTP/q
+ mgK0HF+syJ3ST6q/cIXAEvOao+Upah7EDn48R6xsB/RTzct2LkZ7u5V6HX8rzJNjgZBG
+ dnxoHsjWP0tgqFAYIaB3Z9s2MUo9hOj/edmCxEpYZAFgBytlDBW4/BsIuikeqZMwWpiG
+ xp2ti9cEXyArRynmUYfzzH6gIMtmj8joxedG5TlLT/Efd2ZJu1a8T7Dq4WMzc3oS//iL
+ 4CzQ==
+X-Gm-Message-State: AOAM532RCn/gPqxdcWmmIlBjW+paNGjdEZQlVYs0YeRTfbCGSgEP6YKn
+ aq7pwlV4QmQynjmFJlvIi6RsrwvHw2E=
+X-Google-Smtp-Source: ABdhPJzs++I7lBqMMJdsjk2AGlZwR70Rs+ljSMBJhyKpQjxxOkOq7RV0J+wltYYWc5YKMWCE6f8Gvg==
+X-Received: by 2002:a17:90a:20a3:: with SMTP id
+ f32mr2373887pjg.171.1592454767389; 
+ Wed, 17 Jun 2020 21:32:47 -0700 (PDT)
+Received: from localhost.localdomain (174-21-143-238.tukw.qwest.net.
+ [174.21.143.238])
+ by smtp.gmail.com with ESMTPSA id d2sm1165766pgp.56.2020.06.17.21.32.46
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 17 Jun 2020 21:32:46 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: qemu-system-i386
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: me-davidglover
-X-Launchpad-Bug-Reporter: David Glover (me-davidglover)
-X-Launchpad-Bug-Modifier: David Glover (me-davidglover)
-Message-Id: <159245607293.6124.18309162054825340522.malonedeb@soybean.canonical.com>
-Subject: [Bug 1884017] [NEW] Intermittently erratic mouse under Windows 95
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="1cbd0aa39df153c901321817f9b57cf3f232b507";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 3261ae1108fc1b475cf911e8f6834e18896107dc
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 01:00:52
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Subject: [PATCH v2 086/100] target/arm: Implement SVE2 crypto unary operations
+Date: Wed, 17 Jun 2020 21:26:30 -0700
+Message-Id: <20200618042644.1685561-87-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200618042644.1685561-1-richard.henderson@linaro.org>
+References: <20200618042644.1685561-1-richard.henderson@linaro.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::629;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x629.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -83,84 +101,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1884017 <1884017@bugs.launchpad.net>
+Cc: qemu-arm@nongnu.org, steplong@quicinc.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/arm/sve.decode      |  6 ++++++
+ target/arm/translate-sve.c | 11 +++++++++++
+ 2 files changed, 17 insertions(+)
 
-The mouse works fine maybe 75-80% of the time, but intermittently (every
-20-30 seconds or so), moving the mouse will cause the pointer to fly
-around the screen at high speed, usually colliding with the edges, and
-much more problematically, click all the mouse buttons at random, even
-if you are not clicking. This causes random objects on the screen to be
-clicked and dragged around, rendering the system generally unusable.
+diff --git a/target/arm/sve.decode b/target/arm/sve.decode
+index 0be8a020f6..9b0d0f3a5d 100644
+--- a/target/arm/sve.decode
++++ b/target/arm/sve.decode
+@@ -1551,3 +1551,9 @@ STNT1_zprz      1110010 .. 00 ..... 001 ... ..... ..... \
+ # SVE2 32-bit scatter non-temporal store (vector plus scalar)
+ STNT1_zprz      1110010 .. 10 ..... 001 ... ..... ..... \
+                 @rprr_scatter_store xs=0 esz=2 scale=0
++
++### SVE2 Crypto Extensions
++
++# SVE2 crypto unary operations
++# AESMC and AESIMC
++AESMC           01000101 00 10000011100 decrypt:1 00000 rd:5
+diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
+index 152b0b605d..bc65b3e367 100644
+--- a/target/arm/translate-sve.c
++++ b/target/arm/translate-sve.c
+@@ -7682,3 +7682,14 @@ static bool trans_USDOT_zzzz(DisasContext *s, arg_USDOT_zzzz *a)
+     }
+     return true;
+ }
++
++static bool trans_AESMC(DisasContext *s, arg_AESMC *a)
++{
++    if (!dc_isar_feature(aa64_sve2_aes, s)) {
++        return false;
++    }
++    if (sve_access_check(s)) {
++        gen_gvec_ool_zz(s, gen_helper_crypto_aesmc, a->rd, a->rd, a->decrypt);
++    }
++    return true;
++}
+-- 
+2.25.1
 
-I don't know if this is related to #1785485 - it happens even if you
-never use the scroll wheel.
-
-qemu version: 5.0.0 (openSUSE Tumbleweed)
-
-Launch command line: qemu-system-i386 -hda win95.qcow2 -cpu pentium2 -m
-16 -vga cirrus -soundhw sb16 -nic user,model=3Dpcnet -rtc base=3Dlocaltime
-
-OS version: Windows 95 4.00.950 C
-
-I have made the disk image available here:
-https://home.gloveraoki.me/share/win95.qcow2.lz
-
-Setup notes: In order to make Windows 95 detect the system devices
-correctly, after first install you must change the driver for "Plug and
-Play BIOS" to "PCI bus". I have already done this in the above image.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-
-** Tags: qemu-system-i386
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1884017
-
-Title:
-  Intermittently erratic mouse under Windows 95
-
-Status in QEMU:
-  New
-
-Bug description:
-  The mouse works fine maybe 75-80% of the time, but intermittently
-  (every 20-30 seconds or so), moving the mouse will cause the pointer
-  to fly around the screen at high speed, usually colliding with the
-  edges, and much more problematically, click all the mouse buttons at
-  random, even if you are not clicking. This causes random objects on
-  the screen to be clicked and dragged around, rendering the system
-  generally unusable.
-
-  I don't know if this is related to #1785485 - it happens even if you
-  never use the scroll wheel.
-
-  qemu version: 5.0.0 (openSUSE Tumbleweed)
-
-  Launch command line: qemu-system-i386 -hda win95.qcow2 -cpu pentium2
-  -m 16 -vga cirrus -soundhw sb16 -nic user,model=3Dpcnet -rtc
-  base=3Dlocaltime
-
-  OS version: Windows 95 4.00.950 C
-
-  I have made the disk image available here:
-  https://home.gloveraoki.me/share/win95.qcow2.lz
-
-  Setup notes: In order to make Windows 95 detect the system devices
-  correctly, after first install you must change the driver for "Plug
-  and Play BIOS" to "PCI bus". I have already done this in the above
-  image.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1884017/+subscriptions
 
