@@ -2,81 +2,92 @@ Return-Path: <SRS0=FaGC=77=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62EB5C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 17:41:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97715C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 17:46:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3686220706
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 17:41:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3686220706
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 60577207E8
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 17:46:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GzNpA1yw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60577207E8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51596 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57310 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlyXc-0006vO-ET
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 13:41:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43078)
+	id 1jlyby-0002JZ-IT
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 13:46:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44580)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jlyWy-0006Ui-Mt
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 13:40:52 -0400
-Received: from indium.canonical.com ([91.189.90.7]:52364)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jlybC-0001aD-E2
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 13:45:14 -0400
+Received: from mail-oo1-xc43.google.com ([2607:f8b0:4864:20::c43]:34692)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jlyWv-0007ty-RJ
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 13:40:52 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jlyWt-0004EB-OP
- for <qemu-devel@nongnu.org>; Thu, 18 Jun 2020 17:40:47 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id A9ADA2E8025
- for <qemu-devel@nongnu.org>; Thu, 18 Jun 2020 17:40:47 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jlybA-0000Oe-Im
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 13:45:14 -0400
+Received: by mail-oo1-xc43.google.com with SMTP id v3so1349320oot.1
+ for <qemu-devel@nongnu.org>; Thu, 18 Jun 2020 10:45:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=2qmwHswApVSYrMfm287st1BzO5wGu9YBA4IZqnJpVZI=;
+ b=GzNpA1ywjj5iIWvKUlHtqaglO7uu+YcsmVlipzpwO56t9su+AB1uFtH85mapw5rrth
+ V33qp875P7Sssz95xCivpFuOJG7l/Llaqu9HDkoOjwEmhvQalNhkieoi/iW+ZYro1joX
+ vj1NtOaHD7EYLeWOBfS2xhfMoI2JviiwnCZDnZ30s6ArwPKI7Ye+VjKiQhzepqCO1vbO
+ 9Sh+NJLRYZyqmi28YsDQk75raPK9n+CUIjciweCE6wJq6ZPnwbIsui3aV6vLYvKzYLbr
+ nJyKV3SovYeqxJqNrQ5DYJ3xzg/beo3FUp3jfSe7Q3UPtnXO9pmuJL7gHFRrM0HC0/Gv
+ 30Gw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=2qmwHswApVSYrMfm287st1BzO5wGu9YBA4IZqnJpVZI=;
+ b=AEjyJbb+9z+XSFOVcMxhwAGw+pErz7m4VMzQeEcG5t6NcI08DOrLC98/JJIkAoFwXQ
+ VAXDdDDT70pNNcha47tbPKOdcwtkzC7ao6rpBxKHMudns9lcMLzg11bxUQFmFUpaIihg
+ xUJHtISMbMOW0rFPCLCCyE2IxvO8KcxbwIAjK5YtOjKhMhIEh+OX+xOJ+NfAbVaNyXSm
+ lYDkDpW4z1hSfAb5nevZMMjoDhVEzZZoMX6BOV4x2SU1obdJh/zuQM12/XHcI7SKacjg
+ gDTWrGNCVd5E5sdn4YtmHNAFNjjVkczDia2TMEBzntWjwUh/evUN2WxYpaVVyZ+RVpGf
+ 4sIA==
+X-Gm-Message-State: AOAM5306tZc8uN+VY5X2c60kiQ3E/hFk7hgS+neG2Fdh9KpA53fGj/NT
+ L8ihckc0UfdzIu0rA8dz5dBYB67crY4ryriMeUtnkA==
+X-Google-Smtp-Source: ABdhPJwFtNhjRxK8/11Q23ml0ex8eHRaFXjrhLg0NQbDgJMQzMxM1VNF93Y3db+M2PI8Qgu1Pxr3dQOqXF/96tvmkHM=
+X-Received: by 2002:a4a:9528:: with SMTP id m37mr5149530ooi.85.1592502311500; 
+ Thu, 18 Jun 2020 10:45:11 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 18 Jun 2020 17:34:23 -0000
-From: Laurent Vivier <1883560@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: build linux-user mips
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ajbennee aleksandar-markovic laurent-vivier
-X-Launchpad-Bug-Reporter: =?utf-8?q?Alex_Benn=C3=A9e_=28ajbennee=29?=
-X-Launchpad-Bug-Modifier: Laurent Vivier (laurent-vivier)
-References: <159223432851.7281.13140123017230519248.malonedeb@gac.canonical.com>
-Message-Id: <159250166322.17037.18380452229136771897.malone@chaenomeles.canonical.com>
-Subject: [Bug 1883560] Re: mips linux-user builds occasionly crash randomly
- only to be fixed by a full clean re-build
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="1cbd0aa39df153c901321817f9b57cf3f232b507";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 0f5517d0340cd37618b587901cf2cda6365096dc
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 11:20:43
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+References: <20200603011317.473934-1-richard.henderson@linaro.org>
+ <20200603011317.473934-14-richard.henderson@linaro.org>
+ <CAFEAcA86dH_utZzXdbvwhB_67OgVGc249tO6TOBtfw+nWi2-7g@mail.gmail.com>
+ <bc120bc8-a08a-3b8e-cc31-e7c09e06a3a0@linaro.org>
+In-Reply-To: <bc120bc8-a08a-3b8e-cc31-e7c09e06a3a0@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 18 Jun 2020 18:45:00 +0100
+Message-ID: <CAFEAcA-v7uTL=j_78gkESbTiV8Q2JgRBoVz4spNekSyvSC0fUw@mail.gmail.com>
+Subject: Re: [PATCH v7 13/42] target/arm: Define arm_cpu_do_unaligned_access
+ for user-only
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::c43;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oo1-xc43.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,78 +96,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1883560 <1883560@bugs.launchpad.net>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
+ Stephen Long <steplong@quicinc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Aleksandar, Alex, see comment #1.
+On Thu, 18 Jun 2020 at 18:04, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> First, this could definitely be delayed to the follow-on linux-user patch set.
+>
+> Second, in the linux-user patch set, I decode the syndrome data to determine
+> what kind of segv to deliver for MTE synchronous faults.  It would be easy to
+> extend that just a little to notice the usual syndrome for unaligned accesses.
+>  Which may be less confusing than abusing the v7m exception code?
 
-I think the problem happens because I moved the syscall_nr.h from source
-directory to build directory. If source directory is not cleaned up
-correctly, the build will not generate the new header in the build
-directory but in source directory and some targets that need 32bit,
-64bit or a new API will only use the first one generated (as in this
-case they are all at the same place).
+Yeah, if we're going to look at syndrome data anyway that might
+be clearer.
 
-See the following PR:
-https://patchew.org/QEMU/20200316161550.336150-1-laurent@vivier.eu/
+The other thing that really it would be nice if we were able
+to feed through (via syndrome info or otherwise) is the difference
+between SIGSEGV with si_code == SEGV_ACCERR vs SEGV_MAPERR.
+At the moment handle_cpu_signal() knows the difference, but it
+doesn't have a way to pass this through to tlb_fill, and then
+cpu_loop() has to make up a si_code when it gets the EXCP_DATA_ABORT.
+I mention this mostly in case it affects how you want to design
+how you treat alignment and MTE faults -- it might be that the
+si_code stuff is better dealt with entirely differently.
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1883560
-
-Title:
-  mips linux-user builds occasionly crash randomly only to be fixed by a
-  full clean re-build
-
-Status in QEMU:
-  New
-
-Bug description:
-  From time to time I find check-tcg crashes with a one of the MIPS
-  binaries. The last time it crashed was running the test:
-
-    ./mips64el-linux-user/qemu-mips64el ./tests/tcg/mips64el-linux-
-  user/threadcount
-
-  Inevitably after some time noodling around wondering what could be
-  causing this weird behaviour I wonder if it is a build issue. I wipe
-  all the mips* build directories, re-run configure and re-build and
-  voila problem goes away.
-
-  It seems there must be some sort of build artefact which isn't being
-  properly re-generated on a build update which causes weird problems.
-  Additional data point if I:
-
-    rm -rf mips64el-linux-user
-    ../../configure
-    make
-
-  then I see failures in mip32 builds - eg:
-
-      GEN     mipsn32el-linux-user/config-target.h
-    In file included from /home/alex/lsrc/qemu.git/linux-user/syscall_defs.=
-h:10,
-                     from /home/alex/lsrc/qemu.git/linux-user/qemu.h:16,
-                     from /home/alex/lsrc/qemu.git/linux-user/linuxload.c:5:
-    /home/alex/lsrc/qemu.git/linux-user/mips64/syscall_nr.h:1: error: unter=
-minated #ifndef
-     #ifndef LINUX_USER_MIPS64_SYSCALL_NR_H
-
-    make[1]: *** [/home/alex/lsrc/qemu.git/rules.mak:69: linux-user/linuxlo=
-ad.o] Error 1
-    make[1]: *** Waiting for unfinished jobs....
-
-  which implies there is a cross dependency between different targets
-  somewhere. If I executed:
-
-    rm -rf mips*
-
-  before re-configuring and re-building then everything works again.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1883560/+subscriptions
+thanks
+-- PMM
 
