@@ -2,96 +2,84 @@ Return-Path: <SRS0=FaGC=77=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3D14C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 08:01:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DE5AC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 08:03:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 92728208D5
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 08:01:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DB8B9208D5
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 08:03:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jPMu4beg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92728208D5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kL7rxiYH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB8B9208D5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43152 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45324 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlpUc-0005uc-RS
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 04:01:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53148)
+	id 1jlpWC-00078F-52
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 04:03:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53656)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1jlpTv-0005KR-P7
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 04:01:07 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:58867
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1jlpTt-0004eY-Vm
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 04:01:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592467265;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=HuQIDvdNY2hZP3LQ1FVNQKHXXWwgVfXmUeGug9owRaM=;
- b=jPMu4begsm78xnytsPM7I9gDuoCv+ClFRCoQLhy0I5do3E5e3xjQEQ1OauhRciwQLkiz/X
- 0KS8AN72WiD2ZesrueTerPKa3qaiTwP6tfCwttdxHFqCnXyXs2jzsiRZffNTV7oWI1YXNC
- LwylqglPTDM7nLr7CtLHMGTWytwmQAQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-500-0SM6kwkhOruvuRbQQG2Y8A-1; Thu, 18 Jun 2020 04:01:03 -0400
-X-MC-Unique: 0SM6kwkhOruvuRbQQG2Y8A-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D1072108C311;
- Thu, 18 Jun 2020 08:01:01 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-113-60.ams2.redhat.com
- [10.36.113.60])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 37A9F60BF3;
- Thu, 18 Jun 2020 08:00:57 +0000 (UTC)
-Subject: Re: ovmf / PCI passthrough impaired due to very limiting PCI64
- aperture
-To: Eduardo Habkost <ehabkost@redhat.com>,
- Guilherme Piccoli <gpiccoli@canonical.com>
-References: <99779e9c-f05f-501b-b4be-ff719f140a88@canonical.com>
- <20200616165043.24y2cp53axk7uggy@sirius.home.kraxel.org>
- <20200616165746.GH2788@work-vm>
- <CAHD1Q_zGu4Q63HjHx3aZKu3wh8NppuP6T4kgnUN3j=-ZDufVZA@mail.gmail.com>
- <b423f4a4-2552-bdc8-7c9f-41f200aef672@redhat.com>
- <20200617134652.GE2776@work-vm> <20200617154959.GZ2366737@habkost.net>
- <CAHD1Q_z7E79HwCeFEg8yQOUGsOZRQuhL-zc4RXJdubT3eYp+NA@mail.gmail.com>
- <20200617163308.GE2366737@habkost.net>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <9710e2b4-7c56-df86-0c7c-6d2cb4ab95f4@redhat.com>
-Date: Thu, 18 Jun 2020 10:00:56 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Firefox/52.0 Thunderbird/52.9.1
+ (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
+ id 1jlpVY-0006hH-7j; Thu, 18 Jun 2020 04:02:48 -0400
+Received: from mail-yb1-xb42.google.com ([2607:f8b0:4864:20::b42]:36295)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
+ id 1jlpVW-0004oE-Hr; Thu, 18 Jun 2020 04:02:47 -0400
+Received: by mail-yb1-xb42.google.com with SMTP id h39so2674139ybj.3;
+ Thu, 18 Jun 2020 01:02:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=c9iqjcZ3HUrr6j9CFZB2S3aFqgvAuCKHw4HxWnY1pZ0=;
+ b=kL7rxiYHqgCQTTzrYU5d3PHW30nBfmQo8ybzObcn2oha1HFaiALQY/fr3di+GiplyJ
+ +c/dP0aj1jMbLz7+2tVkLc5pvvwS6HJwYpgZrMm4/JYDVmsWJIxInWB2wTEVYXRej1CU
+ EWpzQAo+2f2FuxKcciczhF7roCcZcWwAXlRGfcbLU2bqam9Bn+WoMtwd+qUy/NYFh6z4
+ cIEZyf934gg2sPLTnCx9e50JI3x3oKZE9iIuWkuzsCPcaos75HyDfgY1/tNcV4xg4G5N
+ 9lsALU4tBJ9hs6aTBxTxDKn5sIsHVlPGHfM4FEqYQjeGGvCc5avjt4PGVYbO/GvCxGwl
+ TClg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=c9iqjcZ3HUrr6j9CFZB2S3aFqgvAuCKHw4HxWnY1pZ0=;
+ b=P55ILnrgJEThCSmW1bH3QQHa/EXhq+xgFm3vo3E82d4YQMrR74mnzJPl/zJlGIJXTX
+ H/5UT8cTKFzPE0ydjgI1IkINrjv8cNGrKIweUuRN5KPyvJmi46KJ3WZE96TLDcVHrUul
+ wk+hEK0oLamaZn7jIWxP74ddTQfz3TyPqzuttVIzQXi48Awyk2htHXxYXSkyYGRQS/Wu
+ QwPwLPY9lirBoy/SM5Lg5q9meY/oLVgv2aEAGdiGuU0BJJsoijcfAupXrUE1vhPWVpMf
+ CtHs/p2rorJHLQFWRD0AVoxvlWyyI6jbVCBg+glcs/7NzG5if21du+/ctvJnWVnbPE0R
+ G98g==
+X-Gm-Message-State: AOAM531Pk54MeubqJBDZVqHvQ2dqf7Q7cJb4bjPHsB3M1XlHE1d9BLc6
+ wT91yTHeWEj0By5q7FtrdNwM6V/BtfixUE5IyGg=
+X-Google-Smtp-Source: ABdhPJxl+l999DDT0fY5I9up1rKuKEGKVkchT7LRugTq08Ee7THi3r0GwfAFcbGac0GPtywOizZZUBoAYKPqdK4bxv0=
+X-Received: by 2002:a25:38c5:: with SMTP id f188mr4667974yba.332.1592467365154; 
+ Thu, 18 Jun 2020 01:02:45 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200617163308.GE2366737@habkost.net>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=lersek@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 01:32:18
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+References: <20200616192700.1900260-1-atish.patra@wdc.com>
+ <20200616192700.1900260-2-atish.patra@wdc.com>
+In-Reply-To: <20200616192700.1900260-2-atish.patra@wdc.com>
+From: Bin Meng <bmeng.cn@gmail.com>
+Date: Thu, 18 Jun 2020 16:02:33 +0800
+Message-ID: <CAEUhbmV6jtFZuC=OeYn6GWijf-Q9Zzbj=YG6EDBTZoJy0QTC4g@mail.gmail.com>
+Subject: Re: [PATCH 1/3] riscv: Unify Qemu's reset vector code path
+To: Atish Patra <atish.patra@wdc.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::b42;
+ envelope-from=bmeng.cn@gmail.com; helo=mail-yb1-xb42.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -104,33 +92,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Pedro Principeza <pedro.principeza@canonical.com>,
- Dann Frazier <dann.frazier@canonical.com>, qemu-devel@nongnu.org,
- Christian Ehrhardt <christian.ehrhardt@canonical.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, fw@gpiccoli.net
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 06/17/20 18:33, Eduardo Habkost wrote:
-> On Wed, Jun 17, 2020 at 12:57:52PM -0300, Guilherme Piccoli wrote:
->> Can't qemu reads the host physical bits and pass that as fw_cfg as
->> "real_host_physbits" or something like that?
->> OVMF could rely on that - if such property is available, we use it to
->> extend the PCI64 aperture.
-> 
-> Giving a exact "real host physbits" value would be too limiting
-> if we still want to allow migration to smaller hosts.  But we can
-> provide extra information on CPUID or fw_cfg, yes.
-> 
-> I will try to write down a proposal to extend the KVM CPUID leaf
-> to provide extra information about MAXPHYADDR guarantees.
+On Wed, Jun 17, 2020 at 3:30 AM Atish Patra <atish.patra@wdc.com> wrote:
+>
+> Currently, all riscv machines have identical reset vector code
+> implementations with memory addresses being different for all machines.
+> They can be easily combined into a single function in common code.
+>
+> Move it to common function and let all the machines use the common function.
+>
+> Signed-off-by: Atish Patra <atish.patra@wdc.com>
+> ---
+>  hw/riscv/boot.c         | 46 +++++++++++++++++++++++++++++++++++++++++
+>  hw/riscv/sifive_u.c     | 38 +++-------------------------------
 
-Thank you -- if this can be detected in the guest via CPUID, then I
-prefer that to fw_cfg. We need to keep an eye on x-file-slots for fw_cfg.
+sifive_u's reset vector has to be different to emulate the real
+hardware MSEL pin state.
+Please rebase this on top of the following series:
+http://patchwork.ozlabs.org/project/qemu-devel/list/?series=183567
 
-Thanks
-Laszlo
+>  hw/riscv/spike.c        | 38 +++-------------------------------
+>  hw/riscv/virt.c         | 37 +++------------------------------
+>  include/hw/riscv/boot.h |  2 ++
+>  5 files changed, 57 insertions(+), 104 deletions(-)
+>
 
+Regards,
+Bin
 
