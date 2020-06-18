@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FB83C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 22:17:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04FCCC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 22:21:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C8BDC2083B
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 22:17:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8BDC2083B
+	by mail.kernel.org (Postfix) with ESMTPS id C9A6620732
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 22:21:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9A6620732
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38438 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41140 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jm2qG-0000KE-U1
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 18:17:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53276)
+	id 1jm2uM-0004PJ-4p
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 18:21:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54544)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jm2ox-0008Iu-6s
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 18:15:43 -0400
-Received: from indium.canonical.com ([91.189.90.7]:44606)
+ id 1jm2tk-0003sZ-Oz
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 18:20:40 -0400
+Received: from indium.canonical.com ([91.189.90.7]:45582)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jm2ou-0005XT-V5
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 18:15:42 -0400
+ id 1jm2ti-0006Hp-UD
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 18:20:40 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jm2or-0004PC-Ty
- for <qemu-devel@nongnu.org>; Thu, 18 Jun 2020 22:15:37 +0000
+ id 1jm2th-000518-SH
+ for <qemu-devel@nongnu.org>; Thu, 18 Jun 2020 22:20:37 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id DF59D2E80BA
- for <qemu-devel@nongnu.org>; Thu, 18 Jun 2020 22:15:37 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id B98812E8060
+ for <qemu-devel@nongnu.org>; Thu, 18 Jun 2020 22:20:37 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 18 Jun 2020 22:08:40 -0000
+Date: Thu, 18 Jun 2020 22:13:58 -0000
 From: Ronald Antony <1884095@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -55,7 +55,7 @@ X-Launchpad-Bug-Commenters: pmaydell rcfa
 X-Launchpad-Bug-Reporter: Ronald Antony (rcfa)
 X-Launchpad-Bug-Modifier: Ronald Antony (rcfa)
 References: <159249543912.17037.1746740929144966356.malonedeb@chaenomeles.canonical.com>
-Message-Id: <159251812080.6566.12393646335844106563.malone@soybean.canonical.com>
+Message-Id: <159251843893.25875.12229652418127339236.malone@gac.canonical.com>
 Subject: [Bug 1884095] Re: QEMU not sufficiently focused on qEMUlation,
  with resulting holes in TCG emulation coverage
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
@@ -64,7 +64,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="1cbd0aa39df153c901321817f9b57cf3f232b507";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: eff608bb47017a1d3b8b6b7b985d0e4d2867c498
+X-Launchpad-Hash: 54fdd52c5699285fc163d38e2f0fb6c9d0a003aa
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 18:15:38
@@ -91,48 +91,12 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The comments with the other reports were just in support of getting them
-fixed, and providing a reason as to why that matters. Someone looking at
-those reports may not read this one, and as the issues are symptoms of
-the same larger issue, this report was filed as an overarching report,
-as AVX is just one aspect. Depending on the CPU model picked, an entire
-slew of error messages are generated.
+BTW: just because I bracket a report with why I think a matter is worth
+fixing, shouldn=E2=80=99t make it =E2=80=9Einvalid=E2=80=9C.
 
-Fact is, an emulator that claims it emulates a CPU has a bug, if that
-CPU cannot be properly emulated. Hence this report.
-
-For the emulator not to have to be considered buggy, =
-
-EITHER =
-
-the CPU type has to be delisted as supported =
-
-OR
-the missing instructions must be implemented.
-
-But it=E2=80=99s not proper to say QEMU can emulate an x86_64 Penryn system,
-when trying to do so fails miserably because of instructions
-unimplemented in TGC.
-
-At the very least the documentation and online help would have to
-distinguish between KVM-only CPU types and TGC CPU types.
-
-Downloading and compiling QEMU 5 sources and compiling them on an ARM64
-platform results in
-
-qemu-system-x86_64 -cpu help
-
-listing all sorts of CPUs as =E2=80=9Eavailable=E2=80=9C even though these =
-have
-significant gaps in the covered instruction set. If that=E2=80=99s not a bu=
-g, I
-don=E2=80=99t know.
-
-How you go about fixing it, is a different matter. You could remove the CPU=
-s, mark them as incompletely implemented, or add support for the missing fe=
-atures.
-Maybe it might even be possible to interest intel to contribute code from t=
-heir SDE project to TCG
+The instructions aren=E2=80=99t implemented, yet the CPUs are listed as
+available, which is a bug in my book, as functionality is advertised
+that is unavailable.
 
 -- =
 
