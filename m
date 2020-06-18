@@ -2,130 +2,82 @@ Return-Path: <SRS0=FaGC=77=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3143C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 07:51:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA9DEC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 07:52:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8600120899
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 07:51:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="OUJx6f/Z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8600120899
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id BE2E820899
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 07:52:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE2E820899
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60860 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36076 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlpK7-00071S-O2
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 03:50:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50054)
+	id 1jlpLD-00009a-VH
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 03:52:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50512)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jlpIv-0005b7-Cv; Thu, 18 Jun 2020 03:49:45 -0400
-Received: from mail-db8eur05on2120.outbound.protection.outlook.com
- ([40.107.20.120]:23904 helo=EUR05-DB8-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jlpIr-0002Oz-7i; Thu, 18 Jun 2020 03:49:44 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=BODuFU9Fs14arPgOHepF72YRnc0ZalW/PFvYZxTkXW4yKJb7+vBjOxRSiqDNcInv6e12QQ8e1jEaZc/bemhidgonmupd6BEkbaJ9HI6ekYyGbf2nOQ6uhbbUx/d92hdrNE3M3yTKueoqSv4gyBqZCURBKLEYo2xVEn49gD4GRPxtZZ86xLKFIB+9cAo6G7EFQoWyEAYIoAmKrRpav4qrG5vhxA/ItC8zXsaC6nDWYAcrVU/2avD9D0S7jZZyLwDZ0BpGypiDZdyz22jY0CwJ5TiX90fd35J8uxian7awTIrJmq4uNCYmhVJfyQcyuQO0Om32j+7qwfdo9Ogyeg0f0Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=2ZfDQG9IH2wfy8H3yqf3YsRzP8kfnW8Oj97LnwP9ZPk=;
- b=PIab+8GmGY/te6V7uLq6NQemJdvI0IiVp3V4xdEZrFcmEwMrbZFFBS01Ph8GKA512tbzDQXay8KICHpmPpYHfUjzH68EPhsjGEwqBsDsfzx5HRYi83W+2HImSXQxU6pgv2BpBv9yaRbbhMuZyG0IN0dRQqnygTCPmbc/EeIf8n7jkdx3/3nFONV37uGA8wzZlfrL4yc5W3y6AGSdLrP4pMN32/R+CivRVMGCYPho4ptj3hWdkKNjNCmoHLlJNFnu/z6Xrm5XCDfcgTUf+Lt7s95lkxEMc9Hs47AbxfEEBRdq7+58JJYXcI06vSjiEj2GCXsTQoytCtOZWHLcsRd6CQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=2ZfDQG9IH2wfy8H3yqf3YsRzP8kfnW8Oj97LnwP9ZPk=;
- b=OUJx6f/Z/697skvZr4QBKA2zrHoZNUXSmWMTTTUOFQxPZOdBrsEixbdbk+oDUKe+Pm0IIoU0UD/YKfc4+N6eJH22k4Ku/beWU9I2MHN3WJyemQr8xdSeqQApNrTDQC5Ah+DOeoyXDFx/0TRw9bSo+9cqW4L0cpvx0eC8pT5o9PQ=
-Authentication-Results: openvz.org; dkim=none (message not signed)
- header.d=none;openvz.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM7PR08MB5383.eurprd08.prod.outlook.com (2603:10a6:20b:102::7)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3109.22; Thu, 18 Jun
- 2020 07:49:36 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::a408:2f0f:bc6c:d312%3]) with mapi id 15.20.3109.021; Thu, 18 Jun 2020
- 07:49:36 +0000
-Subject: Re: [PATCH v3] block: Factor out bdrv_run_co()
-To: Stefan Hajnoczi <stefanha@gmail.com>
-References: <20200520144901.16589-1-vsementsov@virtuozzo.com>
- <20200528151707.GH158218@stefanha-x1.localdomain>
- <99f13039-ae61-fc5e-43fa-8cbc3f3e1bab@virtuozzo.com>
- <20200617134645.GE1728005@stefanha-x1.localdomain>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <edd62b97-3b56-5964-b784-ee6969e8b55a@virtuozzo.com>
-Date: Thu, 18 Jun 2020 10:49:34 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
-In-Reply-To: <20200617134645.GE1728005@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AM3PR05CA0136.eurprd05.prod.outlook.com
- (2603:10a6:207:3::14) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jlpKK-0007jf-QL
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 03:51:12 -0400
+Received: from indium.canonical.com ([91.189.90.7]:57184)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jlpKI-0002m4-56
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 03:51:12 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jlpKG-0005Up-8M
+ for <qemu-devel@nongnu.org>; Thu, 18 Jun 2020 07:51:08 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 345E02E810B
+ for <qemu-devel@nongnu.org>; Thu, 18 Jun 2020 07:51:08 +0000 (UTC)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.2] (185.215.60.145) by
- AM3PR05CA0136.eurprd05.prod.outlook.com (2603:10a6:207:3::14) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3109.22 via Frontend Transport; Thu, 18 Jun 2020 07:49:35 +0000
-X-Originating-IP: [185.215.60.145]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: a0d673a3-1cd8-49f3-0ca5-08d8135c25a7
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5383:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM7PR08MB5383E36C863E9D7ACE4CAAD0C19B0@AM7PR08MB5383.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
-X-Forefront-PRVS: 0438F90F17
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: FVduGzWsLQSHG4obPHGJUo7Y5dsgXkC7NUyVSCiGMBXaHXz0FyjsVUWcSWhUXnHqf5fpyncGHz0O/eDMFq47iHDePmOvyFofVDcLVpvmfkB3HYkR6Y4G3n7/A8ROaXv9PvpRrTT4qo9AwKakqIWfaIk+E2cX+cUCj33BsfDe68wRaw+Avh/4+N+E4gRlS3ZbMCeOJfLF3qfkfCyeDNC+TffY0Ngzs2GWkXF08UHpJUeDGYCShcnQsf6+PaQ3noOQKSfJqKe254i5N9bY2ZNfWWO9acaBWXgjWrE/21oRlbz8LW0MlletaR09aU4+hwjLKfeVAUgLHmqOOmhLOwSKBGITgvcj4072wdcvJh8UoKwvbiJJBAuJKtpRxGm8iNkrz05I64yMYx+NKP50Vp/iizVkLCG5VScK7SzP+et2LPyxopnQkEkREmlv1NLklF67TCbO2jbMLEu6vkrlsl2hgw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(396003)(366004)(346002)(376002)(39840400004)(136003)(956004)(2616005)(186003)(16526019)(83380400001)(86362001)(31696002)(107886003)(478600001)(66556008)(26005)(8676002)(2906002)(66476007)(8936002)(66946007)(31686004)(6486002)(5660300002)(966005)(6916009)(52116002)(4326008)(36756003)(16576012)(316002)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: FaYIDA+ko9QloQGTurNQe/X2MLXLXpNeyf7lE6GurYUtljYrCf6f49vCA/4NOmZJLB0wSmFar9xZXaQW1HJUwgfd2vAN/iA4kSMdB8k6eZK7jIiIfmYISGnKG7OZDnpGwV/j8760lezYG8vzwmFqlOU/Z7TfNWCCYJGrgPFhw6yyxZ8320bnJaCkD4X6hL2/wzA1vGyf1B2oKAc/0vstp9iZV2NMLc0WE9PjX/rXmkU6CKPRMic+P9iRauefMFZGe6a9IoV6TD16lD0YVq3sHiILZnZLJEpXmX4emLA+ls2RiE+tIj3v+VwgtcxJfeHftwir8p4vmgoTF85makdM5MVaV4p7SV89/0365OibcpiLcKB4nR/G4+x8jgrgQee9iRGFGudDFWtVS4cUvqmsYNwUGlM65c9mn++DSYPjnBxkQc+2a+pun0LOaaec390bX3Q6LkloGDnLGFGfcdjJdms0ahtmxjvV6Q6w9io3Vao=
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a0d673a3-1cd8-49f3-0ca5-08d8135c25a7
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jun 2020 07:49:36.3574 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: EB+tuvmx33uMcRl4YH+dK87jdDUUddm3Kzrl1OKMCJO/U9y6GRx9muCY2jTZj5STIcKPDcSUt5mpfILM8Id4vlLi3h/fhNLpQfbcZjlnt60=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5383
-Received-SPF: pass client-ip=40.107.20.120;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR05-DB8-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 03:49:37
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -37
-X-Spam_score: -3.8
-X-Spam_bar: ---
-X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 18 Jun 2020 07:36:24 -0000
+From: Greg Kurz <1829682@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Tags: ppc64
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: gkurz ivmn kennethsalerno
+X-Launchpad-Bug-Reporter: Ivan Warren (ivmn)
+X-Launchpad-Bug-Modifier: Greg Kurz (gkurz)
+References: <155831074982.26912.13291059176555697592.malonedeb@soybean.canonical.com>
+Message-Id: <159246578495.5604.9140040014386205041.malone@soybean.canonical.com>
+Subject: [Bug 1829682] Re: QEMU PPC SYSTEM regression - 3.1.0 and GIT - Fail
+ to boot AIX
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="1cbd0aa39df153c901321817f9b57cf3f232b507";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 96b1748d279a51fe05cb73e6c8b9618da27eb5a0
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 03:41:11
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -134,51 +86,199 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, fam@euphon.net, qemu-block@nongnu.org,
- qemu-devel@nongnu.org, mreitz@redhat.com,
- Stefan Hajnoczi <stefanha@redhat.com>, den@openvz.org, philmd@redhat.com
+Reply-To: Bug 1829682 <1829682@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-17.06.2020 16:46, Stefan Hajnoczi wrote:
-> On Thu, May 28, 2020 at 08:38:04PM +0300, Vladimir Sementsov-Ogievskiy wrote:
->> 28.05.2020 18:17, Stefan Hajnoczi wrote:
->>> On Wed, May 20, 2020 at 05:49:01PM +0300, Vladimir Sementsov-Ogievskiy wrote:
->>>> We have a few bdrv_*() functions that can either spawn a new coroutine
->>>> and wait for it with BDRV_POLL_WHILE() or use a fastpath if they are
->>>> alreeady running in a coroutine. All of them duplicate basically the
->>>> same code.
->>>>
->>>> Factor the common code into a new function bdrv_run_co().
->>>>
->>>> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
->>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>>>      [Factor out bdrv_run_co_entry too]
->>>> ---
->>>>
->>>> v3: keep created coroutine in BdrvRunCo struct for debugging [Kevin]
->>>>
->>>>    block/io.c | 193 ++++++++++++++++++++---------------------------------
->>>>    1 file changed, 72 insertions(+), 121 deletions(-)
->>>
->>> Thanks, applied to my block tree:
->>> https://github.com/stefanha/qemu/commits/block
->>>
->>> Stefan
->>>
->>
->> Actually, [PATCH v5 0/7] coroutines: generate wrapper code
->> substites this patch.. What do you think of it, could we take it instead?
-> 
-> This patch has already been merged but the "coroutines: generate wrapper
-> code" series can be reviewed and merged separately.
-> 
+I'm no longer working at IBM.
 
-Yes, thanks. "[PATCH v7 0/7] coroutines: generate wrapper code" is already based on master with bdrv_run_co().
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1829682
 
--- 
-Best regards,
-Vladimir
+Title:
+  QEMU PPC SYSTEM regression - 3.1.0 and GIT - Fail to boot AIX
+
+Status in QEMU:
+  Confirmed
+
+Bug description:
+  Built from source on a debian system
+
+  Linux db08 4.9.0-8-amd64 #1 SMP Debian 4.9.130-2 (2018-10-27) x86_64 GNU/=
+Linux
+  gcc version 6.3.0 20170516 (Debian 6.3.0-18+deb9u1)
+
+  Last git commit (from queued gdibson repository)
+
+  starting AIX 7.2 TL 2 SP 2 with the following : (the install was done
+  under qemu 3.1.0)
+
+  qemu-system-ppc64 -M pseries \
+      -cpu power7 \
+      -cdrom AIX_v7.2_Install_7200-02-02-1806_DVD_1_of_2_32018.iso \
+      -net nic \
+      -net tap,ifname=3Dtap2,script=3Dno \
+      -drive file=3DDISK1.IMG,if=3Dnone,id=3Ddrive-virtio-disk0 \
+      -device virtio-scsi-pci,id=3Dscsi -device scsi-hd,drive=3Ddrive-virti=
+o-disk0 \
+      -m 4G \
+      -serial stdio \
+      -monitor unix:ms,server,nowait \
+      -accel tcg \
+      -k fr \
+      -nographic \
+      -prom-env input-device=3D/vdevice/vty@71000000 \
+      -prom-env output-device=3D/vdevice/vty@71000000 \
+      -prom-env diag-switch?=3Dfalse \
+      -prom-env boot-command=3D"boot /pci@800000020000000/scsi@2/disk@10000=
+0000000000 -s verbose"
+
+  Yields this :
+
+  =
+
+  ^M
+  SLOF^[[0m^[[?25l ********************************************************=
+**************^M
+  ^[[1mQEMU Starting^M
+  ^[[0m Build Date =3D Jan 14 2019 18:00:39^M
+   FW Version =3D git-a5b428e1c1eae703^M
+   Press "s" to enter Open Firmware.^M^M
+  ^M^M
+  ^[[0m^[[?25hC0000^MC0100^MC0120^MC0140^MC0200^MC0240^MC0260^MC02E0^MC0300=
+^MC0320^MC0340^MC0360^MC0370^MC0380^MC0371^MC0372^MC0373^MC0374^MC03F0^MC04=
+00^MC0480^MC04C0^MC04D0^MC0500^MPopulating /vdevice methods^M
+  Populating /vdevice/vty@71000000^M
+  Populating /vdevice/nvram@71000001^M
+  Populating /vdevice/l-lan@71000002^M
+  Populating /vdevice/v-scsi@71000003^M
+         SCSI: Looking for devices^M
+            8200000000000000 CD-ROM   : "QEMU     QEMU CD-ROM      2.5+"^M
+  C05A0^MPopulating /pci@800000020000000^M
+                       00 0000 (D) : 1234 1111    qemu vga^M
+                       00 0800 (D) : 1033 0194    serial bus [ usb-xhci ]^M
+                       00 1000 (D) : 1af4 1004    virtio [ scsi ]^M
+  Populating /pci@800000020000000/scsi@2^M
+         SCSI: Looking for devices^M
+            100000000000000 DISK     : "QEMU     QEMU HARDDISK    2.5+"^M
+  C0600^MC06C0^MC0700^MC0800^MC0880^MC0890^MC08A0^MC08A8^MInstalling QEMU f=
+b^M
+  ^M
+  ^M
+  ^M
+  C08B0^MScanning USB ^M
+    XHCI: Initializing^M
+      USB Keyboard ^M
+      USB mouse ^M
+  C08C0^MC08D0^MNo console specified using screen & keyboard^M
+  User selected input-device console: /vdevice/vty@71000000^M
+  User selected output-device console: /vdevice/vty@71000000^M
+  C08E0^MC08E8^MC08FF^M     ^M
+    Welcome to Open Firmware^M
+  ^M
+    Copyright (c) 2004, 2017 IBM Corporation All rights reserved.^M
+    This program and the accompanying materials are made available^M
+    under the terms of the BSD License available at^M
+    http://www.opensource.org/licenses/bsd-license.php^M
+  ^M
+  ^M
+  Trying to load: -s verbose from: /pci@800000020000000/scsi@2/disk@1000000=
+00000000 ...   Successfully loaded^M
+  ^M
+                          ---> qemu,pseries detected <---^M
+  ^M
+  ^M
+  ^M
+  ^M
+  ^M
+  ^M
+  ^M
+  -------------------------------------------------------------------------=
+------^M
+                                  Welcome to AIX.^M
+                     boot image timestamp: 05:56:13 04/20/2019^M
+          processor count: 1;  memory size: 4096MB;  kernel size: 38426884^M
+           boot device: /pci@800000020000000/scsi@2/disk@100000000000000^M
+  ^M
+  8000FFEC bytes of free memory remain at address 7FFF0014^M
+  load address: 0x00004000   aixmon size: 0x000D2C00   boot image size: 0x0=
+1A6B430^M
+  ^LAIX vm,uuid property contains invalid data^Mload address: 0x00004000   =
+aixmon size: 0x000D2C00   boot image size: 0x01A6B430^M
+  ^LAIX vm,uuid property contains invalid data^M
+  get_ppp return code: 0xFFFFFFFE^M
+  ^M
+  AKVM: hcall-multi-tce detected but overridden, allow with "multce" boot a=
+rgument^M
+  The temporary memory region list is at 1 percent capacity.^M
+  The temporary IPLCB is at 1 percent capacity.^M
+  The IPLCB address is 0x0FFF9000^M
+  name                 offset           size^M
+  ipl_cb_and_bit_map 00000000 ......00005958^M
+  bit_map........... 00000790 ......00000006^M
+  ipl_info.......... 000001C8 ......00000024^M
+  splpar_info....... 000001EC ......00000048^M
+  system_info....... 00000234 ......000000C4^M
+  processor_info.... 000002F8 ......00000148^M
+  lpar_id_info...... 00000440 ......00000088^M
+  dr_proc_info...... 000004C8 ......00000008^M
+  dr_mem_info....... 000004D0 ......00000028^M
+  lpar_info......... 000004F8 ......00000014^M
+  segment page...... 00000518 ......00000028^M
+  processor page.... 00000540 ......00000010^M
+  res_asso_id....... 00000550 ......00000050^M
+  res_asso_group.... 000005A0 ......00000048^M
+  asso_ref_pnt...... 000005E8 ......00000010^M
+  residual.......... 00000820 ......00005138^M
+  fwad_info......... 000005F8 ......00000040^M
+  contig mem rsv.... 00000738 ......00000058^M
+      region address      region length       attr  label^M
+  0   0x0000000000000000  0x000000000FFF7000  0x01  0x01^M
+  1   0x000000000FFF7000  0x0000000000002000  0x01  0x03^M
+  2   0x000000000FFF9000  0x0000000000006000  0x01  0x02^M
+  3   0x000000000FFFF000  0x0000000000000014  0x00  0x05^M
+  4   0x000000000FFFF014  0x00000000F0000FEC  0x01  0x01^M
+  5   0x0000000100000000  0xFFFFFFFF00000000  0x00  0x07^M
+  ----------------------------^M
+  ^M
+  0000012C bytes of free memory remain at address 00004000^M
+  compressed kernel addr: D6C00;  sz: 98CE33;  uncompressed kernel addr:  1=
+DB59600^M
+           name     source       dest       size   flags^M
+   0      .data   1e6f9840    2000000    12bdd20     1^M
+   1    basecfg    1b04000    fff5000       15d9     1^M
+   2      ramfs     a63a30    efe9000    100b82a     1^M
+   3      .text   1db59840      d6c00     ba0000     1^M
+   4       .ldr   1f9b7560     c77000      a9523     1^M
+   5     symtab   1fe0aaf4     d21000     1f4410     1^M
+   6  kern. hdr   1db59600          0        240     1^M
+   7       .bss          0    32bdd20    27222e0     2^M
+  free space between BSS and RAM filesystem: 09609000^M
+  ^M
+  entry_point: 0x000D6C28^M
+                         kernel debugger setting: enabled^M
+  -------------------------------------------------------------------------=
+------^M
+  ^LStarLED{A20}^M
+  Data Storage Interrupt - PROC^M
+  .dispatch+000098              lwz    r0,1830(r6)         r0=3D0,1830(r6)=
+=3DF00000002FF48E30^M
+  KDB(0)>
+
+  (apologies for all the ^M - they are emitted by qemu or AIX - not
+  sure)
+
+  Using the same command to boot AIX from 3.1.0 works (no DSI
+  Interrupt). - Other problems occur later, but no Kernel interrupt,
+  only user space problems - and that's another problem - but one at a
+  time !
+
+  --Ivan
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1829682/+subscriptions
 
