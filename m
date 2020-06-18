@@ -2,95 +2,112 @@ Return-Path: <SRS0=FaGC=77=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F936C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 13:13:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E24A2C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 13:14:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EE6DF20706
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 13:13:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A9BFE20706
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 13:14:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="l351va/G"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE6DF20706
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dDHSTryI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9BFE20706
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45718 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47868 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jluLu-0004Se-73
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 09:13:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36456)
+	id 1jluN6-0005OE-Uz
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 09:14:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36872)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jluLL-000422-CZ
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 09:12:35 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:32781)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jluLJ-0003Xk-BF
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 09:12:34 -0400
-Received: by mail-wr1-x441.google.com with SMTP id l11so6031035wru.0
- for <qemu-devel@nongnu.org>; Thu, 18 Jun 2020 06:12:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=Rx+Zz89+U5dQcNnr8WKQFtigGuHfef4A4dQcJoI2M+4=;
- b=l351va/G106tfOeYuMHIm4vdR87Bmy9bzJbohc9vYnYQjHi0tjwG4hoE3bUojj6ruq
- QZEvvwKkPQS1IQgHu5CxN6Ph0kelvR+0iUpnx67NEFcN/Lg/x51rQZ5p01z/8jgyGzCu
- aJL2foXimiRhqkNatIEHBzVK2tzzi98RvaQx5QQQkQMo5Tz6LQmkYkbJWGo8ZUvs3Jiy
- FaJTyhnZph/SHPRQWEzO1Ki+qwB99r80bJG/xc3IM15U6bp5dq/fAC6uE6bBT5JRzaTs
- HWMx13EH2y7VYBgaAqEjDCdpdMwLPm2dupDSog2KQVKgWzfQ5U9nPHjLmDCBykROuGbq
- DDHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=Rx+Zz89+U5dQcNnr8WKQFtigGuHfef4A4dQcJoI2M+4=;
- b=Nfl7idpzBpNET7GjBeEN5KGneDji/WfefHoQGRUX8tFkLu62RmhjRGQRxrrUWotiO8
- 8MT+Wb5AcAaU5kpRAXILc0V11YsPnb66+3kQ/BDcSkOfufDSp6kkK44pmF0dYBPCLkW2
- 6+xHwce1EusKNtRMq4Y75bdZBGvgurJ+847N3qVufWwUueTu9dCzpWl6uVyNEWAIhy0i
- hx9Q2ikXcMjSeh+D0FVw7oFWZchuvyXvcwp6KQX8oXAkrsbgizTg5Bfh9x7ipyEgsIx0
- /9rouUcI39EV75VTvI2xIpU148p2UgEuvWhyfG4Dsy6egQP9G1IhwyY6BTIRbQCgqAvZ
- PbOg==
-X-Gm-Message-State: AOAM532JxuJeiSgxzVYICHfFNm87LA/V0R7eNSu2YcTXs6e1gWMQEAuv
- 4BsJ5XWSE0/j1UIHJ/2HEQEv4A==
-X-Google-Smtp-Source: ABdhPJyXzDVMLPpAmpjRGblJorL48sgw5Un1vKTZttmKLBxdl7tlOprgb/EGv04jppcbGZn1oCN0hQ==
-X-Received: by 2002:adf:9c12:: with SMTP id f18mr4937877wrc.105.1592485951894; 
- Thu, 18 Jun 2020 06:12:31 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id x18sm3468139wmi.35.2020.06.18.06.12.30
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 18 Jun 2020 06:12:30 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id B244B1FF7E;
- Thu, 18 Jun 2020 14:12:29 +0100 (BST)
-References: <20200618121218.215808-1-ppandit@redhat.com>
-User-agent: mu4e 1.5.3; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: P J P <ppandit@redhat.com>
-Subject: Re: [PATCH v1] memory: assert MemoryRegionOps callbacks are defined
-In-reply-to: <20200618121218.215808-1-ppandit@redhat.com>
-Date: Thu, 18 Jun 2020 14:12:29 +0100
-Message-ID: <87r1ucv7pe.fsf@linaro.org>
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jluMX-0004yY-4g
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 09:13:49 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:59141
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jluMU-0003tK-Dc
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 09:13:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592486025;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=JioRVU2LZ1L7pHDf35NIkQkvSlkOKi3sYhUYWAxi/No=;
+ b=dDHSTryIyH5h3Ix1JPHrtgVghMAlOH2qiJRHRSywmyGJsk0BSvT0KJWp9fJr+3AndUJNBG
+ kmv4pjt1DhBCrf7dzLOMfucA089TdceAlcpbsxOH/21r0Ga9avl0S5vS6bIAlUq8vIabsJ
+ kD442BwSgkK9NlrQlUJivxUpMqNyP58=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-460-C3bv3yUiPtWgOcFid_pWxw-1; Thu, 18 Jun 2020 09:13:40 -0400
+X-MC-Unique: C3bv3yUiPtWgOcFid_pWxw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9068D8035C6;
+ Thu, 18 Jun 2020 13:13:39 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-112-185.ams2.redhat.com
+ [10.36.112.185])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 244DF5BAC0;
+ Thu, 18 Jun 2020 13:13:37 +0000 (UTC)
+Subject: Re: [PULL 14/15] qcow2_format.py: dump bitmaps header extension
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+References: <20200609205245.3548257-1-eblake@redhat.com>
+ <20200609205245.3548257-15-eblake@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <81ba0181-3dfc-1c1e-7c19-278569e65c60@redhat.com>
+Date: Thu, 18 Jun 2020 15:13:36 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x441.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200609205245.3548257-15-eblake@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="zyNhhQNT9YmW5x2kbpHKK19iNtCSFXAOy"
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 01:21:16
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,77 +120,183 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Prasad J Pandit <pjp@fedoraproject.org>, Li Qiang <liq3ea@gmail.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Lei Sun <slei.casper@gmail.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "open list:Block layer core" <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--zyNhhQNT9YmW5x2kbpHKK19iNtCSFXAOy
+Content-Type: multipart/mixed; boundary="CMqivegjsNyqOjJuQrooZNMj4BOjiKTJ4"
 
-P J P <ppandit@redhat.com> writes:
+--CMqivegjsNyqOjJuQrooZNMj4BOjiKTJ4
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-> From: Prasad J Pandit <pjp@fedoraproject.org>
->
-> When registering a MemoryRegionOps object, assert that its
-> read/write callback methods are defined. This avoids potential
-> guest crash via a NULL pointer dereference.
->
-> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+On 09.06.20 22:52, Eric Blake wrote:
+> From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>=20
+> Add class for bitmap extension and dump its fields. Further work is to
+> dump bitmap directory.
+>=20
+> Test new functionality inside 291 iotest.
+
+Unfortunately, it also breaks 291 with an external data file, which
+worked before.  (The problems being that an external data file gives you
+an additional header extension, and that the bitmap directory offset
+changes.)
+
+I think if we want to test testing tools, we have to do that in a
+controlled environment where we exactly know what the image is.  It
+looks to me now as if 291 is not such an environment.  Or phrased
+differently, we probably shouldn=E2=80=99t test some testing tool in normal
+tests that test qemu itself.
+
+If we only test qcow2.py in normal tests, then I don=E2=80=99t think we hav=
+e to
+explicitly test it at all.  (Because if you test qcow2.py in a normal
+test, and the test breaks, it=E2=80=99s unclear what=E2=80=99s broken.  So =
+I think you
+might as well forego the qcow2.py test altogether, because if it breaks,
+that=E2=80=99ll probably show up in some other test case that uses it.)
+
+In this case here, I can see three things we could do:
+
+First, could just filter out the data file header extension and the
+bitmap_directory_offset.  But I=E2=80=99m not sure whether that=E2=80=99s t=
+he best thing
+to do, because it might break with some other obscure IMGOPTS that I
+personally never use for the iotests.
+
+I think that if we want a real qcow2.py test somewhere, it should be its
+own test.  No custom IMGOPTS allowed.  So the second idea would be to
+move it there, and drop the qcow2.py usage from here.
+
+Or, third, maybe we actually don=E2=80=99t care that much about a real qcow=
+2.py
+test, and really want to just *use* (as opposed to =E2=80=9Ctest=E2=80=9D) =
+qcow2.py
+here.  Then we should filter what we really need from its output instead
+of dropping what we don=E2=80=99t need.
+
+
+(We could also disable 291 for external data files, but I don=E2=80=99t rea=
+lly
+see why, if the only justification for this addition to it is to test
+qcow2.py =E2=80=93 which 291 isn=E2=80=99t for.)
+
+Max
+
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+> Message-Id: <20200606081806.23897-14-vsementsov@virtuozzo.com>
+> [eblake: fix iotest output]
+> Signed-off-by: Eric Blake <eblake@redhat.com>
 > ---
->  memory.c | 5 +++++
->  1 file changed, 5 insertions(+)
->
-> Update v1: add assert while registering MemoryRegionOps
->   -> https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg05187.html
->
-> diff --git a/memory.c b/memory.c
-> index 91ceaf9fcf..6e94fd5958 100644
-> --- a/memory.c
-> +++ b/memory.c
-> @@ -1495,6 +1495,9 @@ void memory_region_init_io(MemoryRegion *mr,
->                             const char *name,
->                             uint64_t size)
->  {
-> +    assert(ops);
-> +    assert(ops->read);
-> +    assert(ops->write);
+>  tests/qemu-iotests/291             |  4 +++
+>  tests/qemu-iotests/291.out         | 33 +++++++++++++++++++++++
+>  tests/qemu-iotests/qcow2_format.py | 42 +++++++++++++++++++++++-------
+>  3 files changed, 70 insertions(+), 9 deletions(-)
+>=20
+> diff --git a/tests/qemu-iotests/291 b/tests/qemu-iotests/291
+> index 3ca83b9cd1f7..e0cffc7cb119 100755
+> --- a/tests/qemu-iotests/291
+> +++ b/tests/qemu-iotests/291
+> @@ -62,6 +62,8 @@ $QEMU_IO -c 'w 1M 1M' -f $IMGFMT "$TEST_IMG" | _filter_=
+qemu_io
+>  $QEMU_IMG bitmap --disable -f $IMGFMT "$TEST_IMG" b1
+>  $QEMU_IMG bitmap --enable -f $IMGFMT "$TEST_IMG" b2
+>  $QEMU_IO -c 'w 2M 1M' -f $IMGFMT "$TEST_IMG" | _filter_qemu_io
+> +echo "Check resulting qcow2 header extensions:"
+> +$PYTHON qcow2.py "$TEST_IMG" dump-header-exts
+>=20
+>  echo
+>  echo "=3D=3D=3D Bitmap preservation not possible to non-qcow2 =3D=3D=3D"
+> @@ -88,6 +90,8 @@ $QEMU_IMG bitmap --merge tmp -f $IMGFMT "$TEST_IMG" b0
+>  $QEMU_IMG bitmap --remove --image-opts \
+>      driver=3D$IMGFMT,file.driver=3Dfile,file.filename=3D"$TEST_IMG" tmp
+>  $QEMU_IMG info "$TEST_IMG" | _filter_img_info --format-specific
+> +echo "Check resulting qcow2 header extensions:"
+> +$PYTHON qcow2.py "$TEST_IMG" dump-header-exts
+>=20
+>  echo
+>  echo "=3D=3D=3D Check bitmap contents =3D=3D=3D"
+> diff --git a/tests/qemu-iotests/291.out b/tests/qemu-iotests/291.out
+> index 8c62017567e9..ccfcdc5e35ce 100644
+> --- a/tests/qemu-iotests/291.out
+> +++ b/tests/qemu-iotests/291.out
+> @@ -14,6 +14,25 @@ wrote 1048576/1048576 bytes at offset 1048576
+>  1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+>  wrote 1048576/1048576 bytes at offset 2097152
+>  1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+> +Check resulting qcow2 header extensions:
+> +Header extension:
+> +magic                     0xe2792aca (Backing format)
+> +length                    5
+> +data                      'qcow2'
+> +
+> +Header extension:
+> +magic                     0x6803f857 (Feature table)
+> +length                    336
+> +data                      <binary>
+> +
+> +Header extension:
+> +magic                     0x23852875 (Bitmaps)
+> +length                    24
+> +nb_bitmaps                2
+> +reserved32                0
+> +bitmap_directory_size     0x40
+> +bitmap_directory_offset   0x510000
+> +
+>=20
+>  =3D=3D=3D Bitmap preservation not possible to non-qcow2 =3D=3D=3D
+>=20
+> @@ -65,6 +84,20 @@ Format specific information:
+>              granularity: 65536
+>      refcount bits: 16
+>      corrupt: false
+> +Check resulting qcow2 header extensions:
+> +Header extension:
+> +magic                     0x6803f857 (Feature table)
+> +length                    336
+> +data                      <binary>
+> +
+> +Header extension:
+> +magic                     0x23852875 (Bitmaps)
+> +length                    24
+> +nb_bitmaps                3
+> +reserved32                0
+> +bitmap_directory_size     0x60
+> +bitmap_directory_offset   0x520000
+> +
+>=20
+>  =3D=3D=3D Check bitmap contents =3D=3D=3D
+>=20
 
-If you look at memory_region_dispatch_write you can see that
-mr->ops->write being empty is acceptable because it implies
-mr->ops->write_with_attrs is set instead. I think the same is true for
-read so I think you need something more like:
 
-     assert(ops->read || ops->read_with_attrs);
-     assert(ops->write || ops->write_with_attrs);
-=20=20=20=20=20
+--CMqivegjsNyqOjJuQrooZNMj4BOjiKTJ4--
 
->      memory_region_init(mr, owner, name, size);
->      mr->ops =3D ops ? ops : &unassigned_mem_ops;
->      mr->opaque =3D opaque;
-> @@ -1674,6 +1677,8 @@ void memory_region_init_rom_device_nomigrate(Memory=
-Region *mr,
->  {
->      Error *err =3D NULL;
->      assert(ops);
-> +    assert(ops->read);
-> +    assert(ops->write);
+--zyNhhQNT9YmW5x2kbpHKK19iNtCSFXAOy
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Do ROM devices need a ->write function?
+-----BEGIN PGP SIGNATURE-----
 
-Also doesn't this break a load of running stuff without fixes for all
-the various missing bits? How far does make check-acceptance get?
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl7raIAACgkQ9AfbAGHV
+z0CBcwgApWs7EaE4WYIVNgNC12NQb8rT13hAacSi4zBC0Ox3+/iGW8OyKEAHv6pX
+rJTfag+qpDKC/D2dhK6B1OyF/f7zQUDSwvCLrIcoNKQHIbcknQMQ0w4pJE7UIx0C
+2GhjDSLpi4eYh1F5ZCizwstiz090Lms2l7RhlDbeun7yHNsjK2mOi9lgtw0Zq2MC
+mllDDwxRelPrBdelcNGYWzUMuvaJmV6mH8g18Flvwsk0KAhJ2EiElmB65NZS4vQU
+CYGO747jS50OW7dxoPEyvFfySa/8lJaaW4aKc1rN9OQo+SHGnaFbx/nzHNX+GfB2
+5rh0tBW6xr75S94JsmUGRCwYWCvKZw==
+=wrqf
+-----END PGP SIGNATURE-----
 
->      memory_region_init(mr, owner, name, size);
->      mr->ops =3D ops;
->      mr->opaque =3D opaque;
+--zyNhhQNT9YmW5x2kbpHKK19iNtCSFXAOy--
 
-
---=20
-Alex Benn=C3=A9e
 
