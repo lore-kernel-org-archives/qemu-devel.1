@@ -2,79 +2,88 @@ Return-Path: <SRS0=FaGC=77=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97715C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 17:46:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7EB2C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 18:08:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 60577207E8
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 17:46:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8F3D3208C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 18:08:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GzNpA1yw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60577207E8
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QyDR/TmG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F3D3208C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57310 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42326 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlyby-0002JZ-IT
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 13:46:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44580)
+	id 1jlyxw-0007UL-SJ
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 14:08:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51958)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jlybC-0001aD-E2
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 13:45:14 -0400
-Received: from mail-oo1-xc43.google.com ([2607:f8b0:4864:20::c43]:34692)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jlyxM-00074g-7H
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 14:08:08 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:33855)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jlybA-0000Oe-Im
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 13:45:14 -0400
-Received: by mail-oo1-xc43.google.com with SMTP id v3so1349320oot.1
- for <qemu-devel@nongnu.org>; Thu, 18 Jun 2020 10:45:12 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jlyxK-0004jA-Kp
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 14:08:07 -0400
+Received: by mail-pl1-x642.google.com with SMTP id n9so2769724plk.1
+ for <qemu-devel@nongnu.org>; Thu, 18 Jun 2020 11:08:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=2qmwHswApVSYrMfm287st1BzO5wGu9YBA4IZqnJpVZI=;
- b=GzNpA1ywjj5iIWvKUlHtqaglO7uu+YcsmVlipzpwO56t9su+AB1uFtH85mapw5rrth
- V33qp875P7Sssz95xCivpFuOJG7l/Llaqu9HDkoOjwEmhvQalNhkieoi/iW+ZYro1joX
- vj1NtOaHD7EYLeWOBfS2xhfMoI2JviiwnCZDnZ30s6ArwPKI7Ye+VjKiQhzepqCO1vbO
- 9Sh+NJLRYZyqmi28YsDQk75raPK9n+CUIjciweCE6wJq6ZPnwbIsui3aV6vLYvKzYLbr
- nJyKV3SovYeqxJqNrQ5DYJ3xzg/beo3FUp3jfSe7Q3UPtnXO9pmuJL7gHFRrM0HC0/Gv
- 30Gw==
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=Z3+kvQldQpd8Zn3aWmFzLh5TijCBEHEmhWjVeMlFYz0=;
+ b=QyDR/TmGcb9+x6c1RUsAXHwnMoCsoD75LoamB5TvMMfzgp/Yinn9ItRtfiuUUOMPEP
+ 8hepNuMOWrni/hAoUKo/V9/EeDTTN2V/H6nkh6rHa0t6OMgDa/HZudr7Dnz+2mjHHMOM
+ 2PmNMzToKA/C0EMXciBTJSLBMfLMzvpzXjEb1cdV0j5iQJlhwbLXJazwO86tGkiVkgBR
+ UT/YLX92hV1DxOUWPNQWdmV5+cPyQEYfNPkZyE3icxuxtaQOh8/LuzvpY2VJ+tvpuybm
+ aLv4JAARLIH2ZG65z87eynZiL5b6JbeXB6qxopi7/gnMFyNKGphTyvj/IF81vNhqzKwd
+ jjEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=2qmwHswApVSYrMfm287st1BzO5wGu9YBA4IZqnJpVZI=;
- b=AEjyJbb+9z+XSFOVcMxhwAGw+pErz7m4VMzQeEcG5t6NcI08DOrLC98/JJIkAoFwXQ
- VAXDdDDT70pNNcha47tbPKOdcwtkzC7ao6rpBxKHMudns9lcMLzg11bxUQFmFUpaIihg
- xUJHtISMbMOW0rFPCLCCyE2IxvO8KcxbwIAjK5YtOjKhMhIEh+OX+xOJ+NfAbVaNyXSm
- lYDkDpW4z1hSfAb5nevZMMjoDhVEzZZoMX6BOV4x2SU1obdJh/zuQM12/XHcI7SKacjg
- gDTWrGNCVd5E5sdn4YtmHNAFNjjVkczDia2TMEBzntWjwUh/evUN2WxYpaVVyZ+RVpGf
- 4sIA==
-X-Gm-Message-State: AOAM5306tZc8uN+VY5X2c60kiQ3E/hFk7hgS+neG2Fdh9KpA53fGj/NT
- L8ihckc0UfdzIu0rA8dz5dBYB67crY4ryriMeUtnkA==
-X-Google-Smtp-Source: ABdhPJwFtNhjRxK8/11Q23ml0ex8eHRaFXjrhLg0NQbDgJMQzMxM1VNF93Y3db+M2PI8Qgu1Pxr3dQOqXF/96tvmkHM=
-X-Received: by 2002:a4a:9528:: with SMTP id m37mr5149530ooi.85.1592502311500; 
- Thu, 18 Jun 2020 10:45:11 -0700 (PDT)
-MIME-Version: 1.0
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Z3+kvQldQpd8Zn3aWmFzLh5TijCBEHEmhWjVeMlFYz0=;
+ b=tWn6XZlsEnlvoxZ6m/owFEl6jPRRQ/rHjXBMn6HjNIG9eEiNDfchG9X9g0oao3514e
+ YPN3MC4RM4OM7UvlldqWxUZkuWoQiXON9azHHx4cJNffdxQSodguQhf2n9N+zZZ6xFqL
+ GBm++mj0yc+pDAENLJ6i7Xs32j7KtvDVjapg9qJQUhqtrjXOu446V8vJhAQK477iQewX
+ E9vo2XzRomJJnS1OZZqPekFgc/1T/DOJVOHSPIl6YaoArNCbIVOtgxRw+Om3xHEXkHRi
+ riBpne84B11DxOFUqp3tek86Fq9TuzKe0uENd1p7dGvfkb7N8B1zC5ZFNd91cLX2ke7a
+ UXaQ==
+X-Gm-Message-State: AOAM530cSIm3FLA3r/lo5qQbrQjxk0QpMt5bcSDjY5XSXc91GpT7gep8
+ Yl/TPUa1P6RN5DNFRuWcNZY4Gw==
+X-Google-Smtp-Source: ABdhPJwDu8GrEQHBLjfF/nkPpWAsOHyBaKACfMiCbhca9XCtIeGjj0O42oHwCEr0yUK6vcyr8PzdFg==
+X-Received: by 2002:a17:90a:bd09:: with SMTP id
+ y9mr5305510pjr.233.1592503684892; 
+ Thu, 18 Jun 2020 11:08:04 -0700 (PDT)
+Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
+ by smtp.gmail.com with ESMTPSA id j6sm3551339pfi.183.2020.06.18.11.08.03
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 18 Jun 2020 11:08:04 -0700 (PDT)
+Subject: Re: [PATCH v7 03/42] target/arm: Add support for MTE to SCTLR_ELx
+To: Peter Maydell <peter.maydell@linaro.org>
 References: <20200603011317.473934-1-richard.henderson@linaro.org>
- <20200603011317.473934-14-richard.henderson@linaro.org>
- <CAFEAcA86dH_utZzXdbvwhB_67OgVGc249tO6TOBtfw+nWi2-7g@mail.gmail.com>
- <bc120bc8-a08a-3b8e-cc31-e7c09e06a3a0@linaro.org>
-In-Reply-To: <bc120bc8-a08a-3b8e-cc31-e7c09e06a3a0@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 18 Jun 2020 18:45:00 +0100
-Message-ID: <CAFEAcA-v7uTL=j_78gkESbTiV8Q2JgRBoVz4spNekSyvSC0fUw@mail.gmail.com>
-Subject: Re: [PATCH v7 13/42] target/arm: Define arm_cpu_do_unaligned_access
- for user-only
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::c43;
- envelope-from=peter.maydell@linaro.org; helo=mail-oo1-xc43.google.com
+ <20200603011317.473934-4-richard.henderson@linaro.org>
+ <CAFEAcA9bAt=cG9nSWP6JaVyx4jf2UGmYLKzvaJ7rVCdLVpw2ig@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <f2b5b9fc-0586-1716-e5bf-c04db454f745@linaro.org>
+Date: Thu, 18 Jun 2020 11:08:02 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA9bAt=cG9nSWP6JaVyx4jf2UGmYLKzvaJ7rVCdLVpw2ig@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::642;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x642.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -102,28 +111,20 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 18 Jun 2020 at 18:04, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> First, this could definitely be delayed to the follow-on linux-user patch set.
->
-> Second, in the linux-user patch set, I decode the syndrome data to determine
-> what kind of segv to deliver for MTE synchronous faults.  It would be easy to
-> extend that just a little to notice the usual syndrome for unaligned accesses.
->  Which may be less confusing than abusing the v7m exception code?
+On 6/18/20 3:52 AM, Peter Maydell wrote:
+>> +    if (ri->state == ARM_CP_STATE_AA64 && !cpu_isar_feature(aa64_mte, cpu)) {
+>> +        if (ri->opc1 == 6) { /* SCTLR_EL3 */
+>> +            value &= ~(SCTLR_ITFSB | SCTLR_TCF | SCTLR_ATA);
+>> +        } else {
+>> +            value &= ~(SCTLR_ITFSB | SCTLR_TCF0 | SCTLR_TCF |
+>> +                       SCTLR_ATA0 | SCTLR_ATA);
+>> +        }
+> 
+> Doesn't SCTLR_EL2 have the same "no ATA0 and no TCF0" that
+> SCTLR_EL3 does?
 
-Yeah, if we're going to look at syndrome data anyway that might
-be clearer.
+No.  With HCR.{E2H,TGE} = '11', those fields are present.
 
-The other thing that really it would be nice if we were able
-to feed through (via syndrome info or otherwise) is the difference
-between SIGSEGV with si_code == SEGV_ACCERR vs SEGV_MAPERR.
-At the moment handle_cpu_signal() knows the difference, but it
-doesn't have a way to pass this through to tlb_fill, and then
-cpu_loop() has to make up a si_code when it gets the EXCP_DATA_ABORT.
-I mention this mostly in case it affects how you want to design
-how you treat alignment and MTE faults -- it might be that the
-si_code stuff is better dealt with entirely differently.
 
-thanks
--- PMM
+r~
 
