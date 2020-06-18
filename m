@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38E48C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 16:21:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77469C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 16:21:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DEB3F20656
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 16:21:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DEB3F20656
+	by mail.kernel.org (Postfix) with ESMTPS id 47E7F20656
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 16:21:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47E7F20656
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44310 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44532 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlxI7-0000Dd-72
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 12:21:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47180)
+	id 1jlxIA-0000JL-IQ
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 12:21:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47182)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jlxHN-0007rY-RW
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 12:20:41 -0400
-Received: from indium.canonical.com ([91.189.90.7]:36016)
+ id 1jlxHP-0007sm-DB
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 12:20:43 -0400
+Received: from indium.canonical.com ([91.189.90.7]:36012)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jlxHL-0000NN-KN
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 12:20:41 -0400
+ id 1jlxHL-0000NL-K8
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 12:20:43 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jlxHK-0001eh-4y
- for <qemu-devel@nongnu.org>; Thu, 18 Jun 2020 16:20:38 +0000
+ id 1jlxHJ-0001ee-LT
+ for <qemu-devel@nongnu.org>; Thu, 18 Jun 2020 16:20:37 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 23DCF2E8023
- for <qemu-devel@nongnu.org>; Thu, 18 Jun 2020 16:20:38 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 9E3692E8109
+ for <qemu-devel@nongnu.org>; Thu, 18 Jun 2020 16:20:37 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 18 Jun 2020 16:12:11 -0000
+Date: Thu, 18 Jun 2020 16:08:22 -0000
 From: Peter Maydell <1884095@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -55,7 +55,7 @@ X-Launchpad-Bug-Commenters: pmaydell rcfa
 X-Launchpad-Bug-Reporter: Ronald Antony (rcfa)
 X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
 References: <159249543912.17037.1746740929144966356.malonedeb@chaenomeles.canonical.com>
-Message-Id: <159249673205.6940.4861100437886811334.malone@soybean.canonical.com>
+Message-Id: <159249650285.17414.17150314098667904145.malone@chaenomeles.canonical.com>
 Subject: [Bug 1884095] Re: QEMU not sufficiently focused on qEMUlation,
  with resulting holes in TCG emulation coverage
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
@@ -64,7 +64,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="1cbd0aa39df153c901321817f9b57cf3f232b507";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 515e94fe546f7e6eeb032282b34580f2e9ab3fd4
+X-Launchpad-Hash: ce1a41d21345b567694477b5a050c77cb1632067
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 11:20:43
@@ -91,8 +91,14 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Oh, and cut-and-pasting the same long comment into multiple bug reports
-is not a good idea, so please don't do that.
+You made this point already in comments in LP:1818075 (and got some
+responses there). This isn't a bug report, it's just a suggestion about
+what the project ought to prioritize. If you'd like to have that kind of
+discussion you can probably do better just starting a qemu-devel thread.
+
+
+** Changed in: qemu
+       Status: New =3D> Invalid
 
 -- =
 
