@@ -2,95 +2,96 @@ Return-Path: <SRS0=FaGC=77=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A35BC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 22:24:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9DD6C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 22:24:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EFB3B206FA
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 22:24:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFB3B206FA
+	by mail.kernel.org (Postfix) with ESMTPS id A1C54206FA
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 22:24:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1C54206FA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45750 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45906 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jm2xL-0007G6-8G
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 18:24:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55176)
+	id 1jm2xM-0007LB-Ua
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 18:24:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55206)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <walling@linux.ibm.com>)
- id 1jm2wI-0005nk-Nk; Thu, 18 Jun 2020 18:23:19 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:15390)
+ id 1jm2wK-0005nw-3W; Thu, 18 Jun 2020 18:23:20 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44440)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <walling@linux.ibm.com>)
- id 1jm2wG-0006mb-6q; Thu, 18 Jun 2020 18:23:18 -0400
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+ id 1jm2wH-0006n1-Jf; Thu, 18 Jun 2020 18:23:19 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
  by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 05IM2HSt156041; Thu, 18 Jun 2020 18:23:13 -0400
+ 05IM2nfL103264; Thu, 18 Jun 2020 18:23:16 -0400
 Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 31r446xe1f-1
+ by mx0a-001b2d01.pphosted.com with ESMTP id 31rdh3p4x6-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 18 Jun 2020 18:23:13 -0400
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05IM3eOk160539;
- Thu, 18 Jun 2020 18:23:13 -0400
-Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com
- [169.47.144.27])
- by mx0a-001b2d01.pphosted.com with ESMTP id 31r446xe19-1
+ Thu, 18 Jun 2020 18:23:15 -0400
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05IM689u118835;
+ Thu, 18 Jun 2020 18:23:15 -0400
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com
+ [169.62.189.11])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 31rdh3p4wv-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 18 Jun 2020 18:23:13 -0400
-Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
- by ppma05wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05IMJwNm030826;
- Thu, 18 Jun 2020 22:23:12 GMT
-Received: from b03cxnp08028.gho.boulder.ibm.com
- (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
- by ppma05wdc.us.ibm.com with ESMTP id 31qu27rf5c-1
+ Thu, 18 Jun 2020 18:23:15 -0400
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+ by ppma03dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05IML627028735;
+ Thu, 18 Jun 2020 22:23:14 GMT
+Received: from b03cxnp08025.gho.boulder.ibm.com
+ (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
+ by ppma03dal.us.ibm.com with ESMTP id 31q6c64wf2-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 18 Jun 2020 22:23:12 +0000
+ Thu, 18 Jun 2020 22:23:14 +0000
 Received: from b03ledav006.gho.boulder.ibm.com
  (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
- by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 05IMNBJ011272632
+ by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 05IMNC8913500802
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 18 Jun 2020 22:23:11 GMT
+ Thu, 18 Jun 2020 22:23:12 GMT
 Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 4E056C6055;
- Thu, 18 Jun 2020 22:23:11 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 9B017C605A;
+ Thu, 18 Jun 2020 22:23:13 +0000 (GMT)
 Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 4356BC6057;
- Thu, 18 Jun 2020 22:23:10 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 988F0C6055;
+ Thu, 18 Jun 2020 22:23:12 +0000 (GMT)
 Received: from localhost.localdomain.com (unknown [9.85.159.16])
  by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
- Thu, 18 Jun 2020 22:23:10 +0000 (GMT)
+ Thu, 18 Jun 2020 22:23:12 +0000 (GMT)
 From: Collin Walling <walling@linux.ibm.com>
 To: qemu-devel@nongnu.org, qemu-s390x@nongnu.org
-Subject: [PATCH v3 0/8] s390: Extended-Length SCCB & DIAGNOSE 0x318
-Date: Thu, 18 Jun 2020 18:22:50 -0400
-Message-Id: <20200618222258.23287-1-walling@linux.ibm.com>
+Subject: [PATCH v3 2/8] s390/sclp: check sccb len before filling in data
+Date: Thu, 18 Jun 2020 18:22:52 -0400
+Message-Id: <20200618222258.23287-3-walling@linux.ibm.com>
 X-Mailer: git-send-email 2.21.3
+In-Reply-To: <20200618222258.23287-1-walling@linux.ibm.com>
+References: <20200618222258.23287-1-walling@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
  definitions=2020-06-18_21:2020-06-18,
  2020-06-18 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 mlxscore=0
- bulkscore=0 phishscore=0 suspectscore=0 impostorscore=0
- cotscore=-2147483648 lowpriorityscore=0 spamscore=0 mlxlogscore=999
- clxscore=1015 malwarescore=0 adultscore=0 classifier=spam adjust=0
+ adultscore=0
+ priorityscore=1501 spamscore=0 bulkscore=0 mlxscore=0 malwarescore=0
+ impostorscore=0 mlxlogscore=999 cotscore=-2147483648 suspectscore=0
+ lowpriorityscore=0 clxscore=1015 phishscore=0 classifier=spam adjust=0
  reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2006180164
-Received-SPF: pass client-ip=148.163.158.5; envelope-from=walling@linux.ibm.com;
- helo=mx0b-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 16:57:19
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10
+ definitions=main-2006180168
+Received-SPF: pass client-ip=148.163.156.1; envelope-from=walling@linux.ibm.com;
+ helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 18:23:16
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
 X-Spam_score_int: -35
 X-Spam_score: -3.6
 X-Spam_bar: ---
@@ -117,91 +118,71 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Changelog:
+The SCCB must be checked for a sufficient length before it is filled
+with any data. If the length is insufficient, then the SCLP command
+is suppressed and the proper response code is set in the SCCB header.
 
-    v3
+Fixes: 832be0d8a3bb ("s390x: sclp: Report insufficient SCCB length")
+Signed-off-by: Collin Walling <walling@linux.ibm.com>
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+---
+ hw/s390x/sclp.c | 24 ++++++++++++------------
+ 1 file changed, 12 insertions(+), 12 deletions(-)
 
-    • Device IOCTLs removed
-        - diag 318 info is now communicated via sync_regs
-
-    • Reset code removed
-        - this is now handled in KVM
-        - diag318_info is stored within the CPU reset portion of the
-            S390CPUState
-
-    • Various cleanups for ELS preliminary patches
-
-    v2
-
-    • QEMU now handles the instruction call
-        - as such, the "enable diag 318" IOCTL has been removed
-
-    • patch #1 now changes the read scp/cpu info functions to
-      retrieve the machine state once
-        - as such, I have not added any ack's or r-bs since this
-          patch differs from the previous version
-
-    • patch #3 introduces a new "get_read_scp_info_data_len"
-      function in order clean-up the variable data length assignment
-      in patch #7
-        - a comment above this function should help clarify what's
-          going on to make things a bit easier to read
-
-    • other misc clean ups and fixes
-        - s/diag318/diag_318 in order to keep the naming scheme
-          consistent with Linux and other diag-related code
-        - s/byte_134/fac134 to align naming scheme with Linux
-
------------------------------------------------------------------------
-
-This patch series introduces two features for an s390 KVM quest:
-    - Extended-Length SCCB (els) for the Read SCP/CPU Info SCLP 
-        commands
-    - DIAGNOSE 0x318 (diag_318) enabling / migration handling
-
-The diag 318 feature depends on els and KVM support.
-
-The els feature is handled entirely with QEMU, and does not require 
-KVM support.
-
-Both features are made available starting with the zEC12-full model.
-
-These patches are introduced together for two main reasons:
-    - els allows diag 318 to exist while retaining the original 248 
-        VCPU max
-    - diag 318 is presented to show how els is useful
-
-Full els support is dependant on the Linux kernel, which must react
-to the SCLP response code and set an appropriate-length SCCB. 
-
-A user should take care when tuning the CPU model for a VM.
-If a user defines a VM with els support and specifies 248 CPUs, but
-the guest Linux kernel cannot react to the SCLP response code, then
-the guest will crash immediately upon kernel startup.
-
-Collin L. Walling (8):
-  s390/sclp: get machine once during read scp/cpu info
-  s390/sclp: check sccb len before filling in data
-  s390/sclp: rework sclp boundary and length checks
-  s390/sclp: read sccb from mem based on sccb length
-  s390/sclp: use cpu offset to locate cpu entries
-  s390/sclp: add extended-length sccb support for kvm guest
-  s390/kvm: header sync for diag318
-  s390: guest support for diagnose 0x318
-
- hw/s390x/sclp.c                     | 117 ++++++++++++++++++++++------
- include/hw/s390x/sclp.h             |   4 +
- linux-headers/asm-s390/kvm.h        |   5 +-
- linux-headers/linux/kvm.h           |   1 +
- target/s390x/cpu.h                  |   3 +-
- target/s390x/cpu_features.h         |   1 +
- target/s390x/cpu_features_def.inc.h |   4 +
- target/s390x/cpu_models.c           |   1 +
- target/s390x/gen-features.c         |   2 +
- target/s390x/kvm.c                  |  39 ++++++++++
- target/s390x/machine.c              |  17 ++++
- 11 files changed, 167 insertions(+), 27 deletions(-)
-
+diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
+index 7875334037..181ce04007 100644
+--- a/hw/s390x/sclp.c
++++ b/hw/s390x/sclp.c
+@@ -75,6 +75,12 @@ static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
+     int rnsize, rnmax;
+     IplParameterBlock *ipib = s390_ipl_get_iplb();
+ 
++    if (be16_to_cpu(sccb->h.length) <
++          (sizeof(ReadInfo) + machine->possible_cpus->len * sizeof(CPUEntry))) {
++        sccb->h.response_code = cpu_to_be16(SCLP_RC_INSUFFICIENT_SCCB_LENGTH);
++        return;
++    }
++
+     /* CPU information */
+     prepare_cpu_entries(machine, read_info->entries, &cpu_count);
+     read_info->entries_cpu = cpu_to_be16(cpu_count);
+@@ -83,12 +89,6 @@ static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
+ 
+     read_info->ibc_val = cpu_to_be32(s390_get_ibc_val());
+ 
+-    if (be16_to_cpu(sccb->h.length) <
+-            (sizeof(ReadInfo) + cpu_count * sizeof(CPUEntry))) {
+-        sccb->h.response_code = cpu_to_be16(SCLP_RC_INSUFFICIENT_SCCB_LENGTH);
+-        return;
+-    }
+-
+     /* Configuration Characteristic (Extension) */
+     s390_get_feat_block(S390_FEAT_TYPE_SCLP_CONF_CHAR,
+                          read_info->conf_char);
+@@ -135,17 +135,17 @@ static void sclp_read_cpu_info(SCLPDevice *sclp, SCCB *sccb)
+     ReadCpuInfo *cpu_info = (ReadCpuInfo *) sccb;
+     int cpu_count;
+ 
+-    prepare_cpu_entries(machine, cpu_info->entries, &cpu_count);
+-    cpu_info->nr_configured = cpu_to_be16(cpu_count);
+-    cpu_info->offset_configured = cpu_to_be16(offsetof(ReadCpuInfo, entries));
+-    cpu_info->nr_standby = cpu_to_be16(0);
+-
+     if (be16_to_cpu(sccb->h.length) <
+-            (sizeof(ReadCpuInfo) + cpu_count * sizeof(CPUEntry))) {
++          (sizeof(ReadInfo) + machine->possible_cpus->len * sizeof(CPUEntry))) {
+         sccb->h.response_code = cpu_to_be16(SCLP_RC_INSUFFICIENT_SCCB_LENGTH);
+         return;
+     }
+ 
++    prepare_cpu_entries(machine, cpu_info->entries, &cpu_count);
++    cpu_info->nr_configured = cpu_to_be16(cpu_count);
++    cpu_info->offset_configured = cpu_to_be16(offsetof(ReadCpuInfo, entries));
++    cpu_info->nr_standby = cpu_to_be16(0);
++
+     /* The standby offset is 16-byte for each CPU */
+     cpu_info->offset_standby = cpu_to_be16(cpu_info->offset_configured
+         + cpu_info->nr_configured*sizeof(CPUEntry));
 -- 
 2.21.3
 
