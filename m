@@ -7,79 +7,78 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB734C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 05:02:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C054DC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 05:03:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8777E2186A
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 05:02:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8CC192186A
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 05:03:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aQU7b8EL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8777E2186A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sGflO3zf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8CC192186A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50266 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54156 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlmhQ-0000X1-O3
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 01:02:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33616)
+	id 1jlmi4-0002Lb-Ow
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 01:03:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33320)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jlmDa-00051G-Jh
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 00:32:02 -0400
-Received: from mail-pg1-x52f.google.com ([2607:f8b0:4864:20::52f]:39869)
+ id 1jlmCu-0003LJ-EF
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 00:31:20 -0400
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:33926)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jlmDY-0003QB-S3
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 00:32:02 -0400
-Received: by mail-pg1-x52f.google.com with SMTP id v11so2335877pgb.6
- for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 21:32:00 -0700 (PDT)
+ id 1jlmCs-0003KG-FI
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 00:31:20 -0400
+Received: by mail-pf1-x441.google.com with SMTP id z63so2207961pfb.1
+ for <qemu-devel@nongnu.org>; Wed, 17 Jun 2020 21:31:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=uh25IryyBgTydEavQvVCQKXEdVtE18t2Gvuw5xD4xd8=;
- b=aQU7b8ELJs18n8cu9YFaO+3gqUGpTqbWZBXNT/Vt0D0Km0NeFEYKg/WslnRkva95+z
- 4omIDXBvHvqNOa9DjHVpnjcLxpyYQDU/rGfKVuL5e19f4dR0x8+0/y9ASC0syaJ+DhWX
- hat5dmXRQsalz5LlTf3Joar6GzWIRvktEDhNwhqlxe5ZNL/APGf8f+ryP2PPwjosdBFZ
- CzRRebLRqurxtssRZcLJGsVXCm8GcVKZnHf8WLwnvwtkUm+DQ9dj8WRPihrr9tsHTQE6
- 4K4ejVZ9fcVQNXcJy24p72vThps9N9HbMN2PkTtYyg1zYxFhuudB3uxzelcYxU3VnKvV
- EXcQ==
+ bh=sUjpYX85gvRbXx7OLAC50qSvAFYBPvgDJch2qLP0/gY=;
+ b=sGflO3zfvBANaU5bLcNPfwo8SNckoZ/9/+VWaJ8Fscf1YHVvFHYtVclMWsvPNuLODv
+ MJbi/XSG11GUYaWtC26gkiy+kau9HPW8tYlIUFdCbs2vNweFJ5SYCWwi3Bi7coFi9HLJ
+ 1ytid1qMQIfs6b7F+iMfyvFHZRSytMxRW7MbHS3229sDNpfX9DVYqaU5a3555jJTWptZ
+ aclXFGQO4zTWQHFQAtEOaIdwamvd5tfo9js6rNLOkafOLl86IYiitZKYzzVwhUcVuXQ1
+ Pu/gOcvuUELveiJ/0xyC+D/CsieO3kevhlmJ8MvyHsk9KnKsLQcfS25aa/DFTBMY9eBW
+ lCIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=uh25IryyBgTydEavQvVCQKXEdVtE18t2Gvuw5xD4xd8=;
- b=Qk4hj5TRV7SjkIjVZ7AXThrUkadwg13e2D8fWWJHCuFgdWRrN0svr5SXjYZ6Fn+m7z
- jKwb9z1qcrbRbkKUpYP2r4sj3TNAYP2GJdyRLo+1GiB7YBuHhmWmZ8ScGvBR0rawCBKl
- KUtUSZm5lfR6Q6fakpoOLIMztkeKBk2E6I5DIU8bghAU1ciLWQ93G14ICFxyaD4yljAu
- l5WuFLI20qt3lFu4NFxKfSnjfqIFmjpKdAEkz7QuZFwuQ63jwHzL4DBXVzF8GGV8ipAr
- rruGNt6sNuJ4D1ALJpV1GZoOK6+wRFnVjrOrP5TzlxwM0Vw8zGGpLECoZnJ+hOdTkb3N
- msGQ==
-X-Gm-Message-State: AOAM532iX+3cyx8J1gZhF/oK95HpGMVBGpZSxvxRsXIJrd8ReL8ffiXx
- BgMkCjuLPEe7vHcVLc9e4NHBuUyn4rg=
-X-Google-Smtp-Source: ABdhPJwpiRxO6s7pDlvDgBEQZQmServHvgXpLr8OadqdX0QKOV1Q/Nn1hbOVtP2lrNNp12vwga878A==
-X-Received: by 2002:a63:5a58:: with SMTP id k24mr1720931pgm.1.1592454719058;
- Wed, 17 Jun 2020 21:31:59 -0700 (PDT)
+ bh=sUjpYX85gvRbXx7OLAC50qSvAFYBPvgDJch2qLP0/gY=;
+ b=oVRgVXCb7EzmnowI/pvrh9w/MenC2h5N9YWp8HlOVr3NpyC2S5tR1BLyqG6fr4wVJ3
+ jTp/hMiJ5Fax+idmxNOfGP3heG4sJYEvQyD+GVKNCjw6GuysfttGNUhod2Qa6NfjYvFr
+ vbJBYfvoPIXysossypBcOsv7VN4hsoYST4IQH+n1r8c0HVjfVunh5V0QEsCi+clnl5DF
+ 6meOny73FFMMq4HaBwVNvws328FqpSNKF/Ub17FH2dZ2qy6jQ9hSG/1nn2zE3XG9VPbv
+ 8ZCGlZwVDXZpFpR7DteSWEOGn/VBK3QBq6E0q+Fxh0zwSr13hT0YkuuPP2pIQMABTmD/
+ AhHg==
+X-Gm-Message-State: AOAM531JHPqDSzaPnM4VGyNLOPHT8VnN7r84x8TMrRgdA5gBDT3cIhqB
+ FubQUoQaPwUXtH7WvgLPINy9TEsvoVE=
+X-Google-Smtp-Source: ABdhPJxA0TXeBEWgxpB+izctGP3IAwLMvSplFlvIT10m+HibjdygCr7UgncmYh64bBDijZCgRLcHxg==
+X-Received: by 2002:a63:495c:: with SMTP id y28mr1882590pgk.30.1592454676833; 
+ Wed, 17 Jun 2020 21:31:16 -0700 (PDT)
 Received: from localhost.localdomain (174-21-143-238.tukw.qwest.net.
  [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id s15sm1162840pgv.5.2020.06.17.21.31.58
+ by smtp.gmail.com with ESMTPSA id o1sm974337pjf.17.2020.06.17.21.31.15
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 17 Jun 2020 21:31:58 -0700 (PDT)
+ Wed, 17 Jun 2020 21:31:16 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 073/100] target/arm: Implement SVE2 integer multiply-add
- (indexed)
-Date: Wed, 17 Jun 2020 21:26:17 -0700
-Message-Id: <20200618042644.1685561-74-richard.henderson@linaro.org>
+Subject: [PATCH v2 064/100] target/arm: Fix sve_uzp_p vs odd vector lengths
+Date: Wed, 17 Jun 2020 21:26:08 -0700
+Message-Id: <20200618042644.1685561-65-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200618042644.1685561-1-richard.henderson@linaro.org>
 References: <20200618042644.1685561-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::52f;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x52f.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::441;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x441.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -101,133 +100,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm@nongnu.org, steplong@quicinc.com
+Cc: Laurent Desnogues <laurent.desnogues@gmail.com>, qemu-arm@nongnu.org,
+ steplong@quicinc.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Missed out on compressing the second half of a predicate
+with length vl % 512 > 256.
+
+Adjust all of the x + (y << s) to x | (y << s) as a
+general style fix.
+
+Reported-by: Laurent Desnogues <laurent.desnogues@gmail.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/helper.h        | 14 ++++++++++++++
- target/arm/sve.decode      |  8 ++++++++
- target/arm/translate-sve.c | 23 +++++++++++++++++++++++
- target/arm/vec_helper.c    | 25 +++++++++++++++++++++++++
- 4 files changed, 70 insertions(+)
+ target/arm/sve_helper.c | 30 +++++++++++++++++++++---------
+ 1 file changed, 21 insertions(+), 9 deletions(-)
 
-diff --git a/target/arm/helper.h b/target/arm/helper.h
-index ce81a16a58..7964d299f6 100644
---- a/target/arm/helper.h
-+++ b/target/arm/helper.h
-@@ -793,6 +793,20 @@ DEF_HELPER_FLAGS_4(gvec_mul_idx_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_4(gvec_mul_idx_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_4(gvec_mul_idx_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
+diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
+index b1bb2300f8..f0601bf25b 100644
+--- a/target/arm/sve_helper.c
++++ b/target/arm/sve_helper.c
+@@ -2971,7 +2971,7 @@ void HELPER(sve_uzp_p)(void *vd, void *vn, void *vm, uint32_t pred_desc)
+     if (oprsz <= 8) {
+         l = compress_bits(n[0] >> odd, esz);
+         h = compress_bits(m[0] >> odd, esz);
+-        d[0] = extract64(l + (h << (4 * oprsz)), 0, 8 * oprsz);
++        d[0] = l | (h << (4 * oprsz));
+     } else {
+         ARMPredicateReg tmp_m;
+         intptr_t oprsz_16 = oprsz / 16;
+@@ -2985,23 +2985,35 @@ void HELPER(sve_uzp_p)(void *vd, void *vn, void *vm, uint32_t pred_desc)
+             h = n[2 * i + 1];
+             l = compress_bits(l >> odd, esz);
+             h = compress_bits(h >> odd, esz);
+-            d[i] = l + (h << 32);
++            d[i] = l | (h << 32);
+         }
  
-+DEF_HELPER_FLAGS_5(gvec_mla_idx_h, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(gvec_mla_idx_s, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(gvec_mla_idx_d, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
+-        /* For VL which is not a power of 2, the results from M do not
+-           align nicely with the uint64_t for D.  Put the aligned results
+-           from M into TMP_M and then copy it into place afterward.  */
++        /*
++         * For VL which is not a multiple of 512, the results from M do not
++         * align nicely with the uint64_t for D.  Put the aligned results
++         * from M into TMP_M and then copy it into place afterward.
++         */
+         if (oprsz & 15) {
+-            d[i] = compress_bits(n[2 * i] >> odd, esz);
++            int final_shift = (oprsz & 15) * 2;
 +
-+DEF_HELPER_FLAGS_5(gvec_mls_idx_h, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(gvec_mls_idx_s, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(gvec_mls_idx_d, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+
- #ifdef TARGET_AARCH64
- #include "helper-a64.h"
- #include "helper-sve.h"
-diff --git a/target/arm/sve.decode b/target/arm/sve.decode
-index fa0a572da6..467a93052f 100644
---- a/target/arm/sve.decode
-+++ b/target/arm/sve.decode
-@@ -785,6 +785,14 @@ SDOT_zzxw_d     01000100 .. 1 ..... 000000 ..... .....          @rrxr_d
- UDOT_zzxw_s     01000100 .. 1 ..... 000001 ..... .....          @rrxr_s
- UDOT_zzxw_d     01000100 .. 1 ..... 000001 ..... .....          @rrxr_d
++            l = n[2 * i + 0];
++            h = n[2 * i + 1];
++            l = compress_bits(l >> odd, esz);
++            h = compress_bits(h >> odd, esz);
++            d[i] = l | (h << final_shift);
  
-+# SVE2 integer multiply-add (indexed)
-+MLA_zzxz_h      01000100 .. 1 ..... 000010 ..... .....          @rrxr_h
-+MLA_zzxz_s      01000100 .. 1 ..... 000010 ..... .....          @rrxr_s
-+MLA_zzxz_d      01000100 .. 1 ..... 000010 ..... .....          @rrxr_d
-+MLS_zzxz_h      01000100 .. 1 ..... 000011 ..... .....          @rrxr_h
-+MLS_zzxz_s      01000100 .. 1 ..... 000011 ..... .....          @rrxr_s
-+MLS_zzxz_d      01000100 .. 1 ..... 000011 ..... .....          @rrxr_d
-+
- # SVE2 integer multiply (indexed)
- MUL_zzx_h       01000100 .. 1 ..... 111110 ..... .....          @rrx_h
- MUL_zzx_s       01000100 .. 1 ..... 111110 ..... .....          @rrx_s
-diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-index dd2cd22061..0fb88f4aa5 100644
---- a/target/arm/translate-sve.c
-+++ b/target/arm/translate-sve.c
-@@ -3870,6 +3870,29 @@ DO_SVE2_RRX(trans_MUL_zzx_d, gen_helper_gvec_mul_idx_d)
+             for (i = 0; i < oprsz_16; i++) {
+                 l = m[2 * i + 0];
+                 h = m[2 * i + 1];
+                 l = compress_bits(l >> odd, esz);
+                 h = compress_bits(h >> odd, esz);
+-                tmp_m.p[i] = l + (h << 32);
++                tmp_m.p[i] = l | (h << 32);
+             }
+-            tmp_m.p[i] = compress_bits(m[2 * i] >> odd, esz);
++            l = m[2 * i + 0];
++            h = m[2 * i + 1];
++            l = compress_bits(l >> odd, esz);
++            h = compress_bits(h >> odd, esz);
++            tmp_m.p[i] = l | (h << final_shift);
  
- #undef DO_SVE2_RRX
- 
-+static bool do_sve2_zzxz_ool(DisasContext *s, arg_rrxr_esz *a,
-+                             gen_helper_gvec_4 *fn)
-+{
-+    if (!dc_isar_feature(aa64_sve2, s)) {
-+        return false;
-+    }
-+    return do_zzxz_ool(s, a, fn);
-+}
-+
-+#define DO_SVE2_RRXR(NAME, FUNC) \
-+    static bool NAME(DisasContext *s, arg_rrxr_esz *a)  \
-+    { return do_sve2_zzxz_ool(s, a, FUNC); }
-+
-+DO_SVE2_RRXR(trans_MLA_zzxz_h, gen_helper_gvec_mla_idx_h)
-+DO_SVE2_RRXR(trans_MLA_zzxz_s, gen_helper_gvec_mla_idx_s)
-+DO_SVE2_RRXR(trans_MLA_zzxz_d, gen_helper_gvec_mla_idx_d)
-+
-+DO_SVE2_RRXR(trans_MLS_zzxz_h, gen_helper_gvec_mls_idx_h)
-+DO_SVE2_RRXR(trans_MLS_zzxz_s, gen_helper_gvec_mls_idx_s)
-+DO_SVE2_RRXR(trans_MLS_zzxz_d, gen_helper_gvec_mls_idx_d)
-+
-+#undef DO_SVE2_RRXR
-+
- /*
-  *** SVE Floating Point Multiply-Add Indexed Group
-  */
-diff --git a/target/arm/vec_helper.c b/target/arm/vec_helper.c
-index 08eadf06fc..fb8596c1fd 100644
---- a/target/arm/vec_helper.c
-+++ b/target/arm/vec_helper.c
-@@ -883,6 +883,31 @@ DO_MUL_IDX(gvec_mul_idx_d, uint64_t, )
- 
- #undef DO_MUL_IDX
- 
-+#define DO_MLA_IDX(NAME, TYPE, OP, H) \
-+void HELPER(NAME)(void *vd, void *vn, void *vm, void *va, uint32_t desc)   \
-+{                                                                          \
-+    intptr_t i, j, oprsz = simd_oprsz(desc), segment = 16 / sizeof(TYPE);  \
-+    intptr_t idx = simd_data(desc);                                        \
-+    TYPE *d = vd, *n = vn, *m = vm, *a = va;                               \
-+    for (i = 0; i < oprsz / sizeof(TYPE); i += segment) {                  \
-+        TYPE mm = m[H(i + idx)];                                           \
-+        for (j = 0; j < segment; j++) {                                    \
-+            d[i + j] = a[i + j] OP n[i + j] * mm;                          \
-+        }                                                                  \
-+    }                                                                      \
-+    clear_tail(d, oprsz, simd_maxsz(desc));                                \
-+}
-+
-+DO_MLA_IDX(gvec_mla_idx_h, uint16_t, +, H2)
-+DO_MLA_IDX(gvec_mla_idx_s, uint32_t, +, H4)
-+DO_MLA_IDX(gvec_mla_idx_d, uint64_t, +,   )
-+
-+DO_MLA_IDX(gvec_mls_idx_h, uint16_t, -, H2)
-+DO_MLA_IDX(gvec_mls_idx_s, uint32_t, -, H4)
-+DO_MLA_IDX(gvec_mls_idx_d, uint64_t, -,   )
-+
-+#undef DO_MLA_IDX
-+
- #define DO_FMUL_IDX(NAME, TYPE, H) \
- void HELPER(NAME)(void *vd, void *vn, void *vm, void *stat, uint32_t desc) \
- {                                                                          \
+             swap_memmove(vd + oprsz / 2, &tmp_m, oprsz / 2);
+         } else {
+@@ -3010,7 +3022,7 @@ void HELPER(sve_uzp_p)(void *vd, void *vn, void *vm, uint32_t pred_desc)
+                 h = m[2 * i + 1];
+                 l = compress_bits(l >> odd, esz);
+                 h = compress_bits(h >> odd, esz);
+-                d[oprsz_16 + i] = l + (h << 32);
++                d[oprsz_16 + i] = l | (h << 32);
+             }
+         }
+     }
 -- 
 2.25.1
 
