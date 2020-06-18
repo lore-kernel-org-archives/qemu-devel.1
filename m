@@ -2,79 +2,80 @@ Return-Path: <SRS0=FaGC=77=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AD3DC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 16:03:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F427C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 16:05:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7008020776
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 16:03:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7008020776
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id D42BC20776
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 16:05:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D42BC20776
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40794 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48854 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlx0T-0006Q5-5n
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 12:03:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39386)
+	id 1jlx2b-00021I-4o
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 12:05:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40186)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1jlwwT-0001dV-MS; Thu, 18 Jun 2020 11:59:05 -0400
-Received: from szxga03-in.huawei.com ([45.249.212.189]:2093 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1jlwwQ-0004Hd-GM; Thu, 18 Jun 2020 11:59:05 -0400
-Received: from DGGEMM403-HUB.china.huawei.com (unknown [172.30.72.56])
- by Forcepoint Email with ESMTP id 24307617F3057400E939;
- Thu, 18 Jun 2020 23:58:57 +0800 (CST)
-Received: from dggeme705-chm.china.huawei.com (10.1.199.101) by
- DGGEMM403-HUB.china.huawei.com (10.3.20.211) with Microsoft SMTP Server (TLS)
- id 14.3.487.0; Thu, 18 Jun 2020 23:58:56 +0800
-Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- dggeme705-chm.china.huawei.com (10.1.199.101) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1913.5; Thu, 18 Jun 2020 23:58:54 +0800
-Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
- lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
- 15.01.1913.007; Thu, 18 Jun 2020 16:58:52 +0100
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To: Auger Eric <eric.auger@redhat.com>, "qemu-devel@nongnu.org"
- <qemu-devel@nongnu.org>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>
-Subject: RE: [PATCH v3] arm/virt: Add memory hot remove support
-Thread-Topic: [PATCH v3] arm/virt: Add memory hot remove support
-Thread-Index: AQHWRWv5+RaRjBhqVEi8k1SXaFiYCqjeYa6AgAAc84A=
-Date: Thu, 18 Jun 2020 15:58:52 +0000
-Message-ID: <bd6add265f6d4739b2790321eb866cac@huawei.com>
-References: <20200618122129.7704-1-shameerali.kolothum.thodi@huawei.com>
- <75497c1a-0dd0-0398-dec9-b9105afe33a0@redhat.com>
-In-Reply-To: <75497c1a-0dd0-0398-dec9-b9105afe33a0@redhat.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.47.83.241]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jlwyI-000469-13
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 12:00:58 -0400
+Received: from indium.canonical.com ([91.189.90.7]:58262)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jlwyE-0004lG-Jq
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 12:00:56 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jlwyC-0006GW-TP
+ for <qemu-devel@nongnu.org>; Thu, 18 Jun 2020 16:00:52 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id DCD842E8106
+ for <qemu-devel@nongnu.org>; Thu, 18 Jun 2020 16:00:52 +0000 (UTC)
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.189;
- envelope-from=shameerali.kolothum.thodi@huawei.com; helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 11:58:57
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 18 Jun 2020 15:50:39 -0000
+From: Ronald Antony <1884095@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: emulation incomplete tcg
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: rcfa
+X-Launchpad-Bug-Reporter: Ronald Antony (rcfa)
+X-Launchpad-Bug-Modifier: Ronald Antony (rcfa)
+Message-Id: <159249543912.17037.1746740929144966356.malonedeb@chaenomeles.canonical.com>
+Subject: [Bug 1884095] [NEW] QEMU not sufficiently focused on qEMUlation,
+ with resulting holes in TCG emulation coverage
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="1cbd0aa39df153c901321817f9b57cf3f232b507";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: d979000a6e75e4fc5bf66fd46d80315a32d17926
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 11:20:43
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -83,138 +84,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- "xuwei \(O\)" <xuwei5@huawei.com>, "mst@redhat.com" <mst@redhat.com>,
- Linuxarm <linuxarm@huawei.com>, "Zengtao \(B\)" <prime.zeng@hisilicon.com>,
- "imammedo@redhat.com" <imammedo@redhat.com>
+Reply-To: Bug 1884095 <1884095@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-SGkgRXJpYywNCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBBdWdlciBF
-cmljIFttYWlsdG86ZXJpYy5hdWdlckByZWRoYXQuY29tXQ0KPiBTZW50OiAxOCBKdW5lIDIwMjAg
-MTU6NDINCj4gVG86IFNoYW1lZXJhbGkgS29sb3RodW0gVGhvZGkgPHNoYW1lZXJhbGkua29sb3Ro
-dW0udGhvZGlAaHVhd2VpLmNvbT47DQo+IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZzsgcWVtdS1hcm1A
-bm9uZ251Lm9yZw0KPiBDYzogcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnOyBtc3RAcmVkaGF0LmNv
-bTsgTGludXhhcm0NCj4gPGxpbnV4YXJtQGh1YXdlaS5jb20+OyB4dXdlaSAoTykgPHh1d2VpNUBo
-dWF3ZWkuY29tPjsgWmVuZ3RhbyAoQikNCj4gPHByaW1lLnplbmdAaGlzaWxpY29uLmNvbT47IGlt
-YW1tZWRvQHJlZGhhdC5jb20NCj4gU3ViamVjdDogUmU6IFtQQVRDSCB2M10gYXJtL3ZpcnQ6IEFk
-ZCBtZW1vcnkgaG90IHJlbW92ZSBzdXBwb3J0DQo+IA0KPiBIaSBTaGFtZWVyLA0KPiANCj4gT24g
-Ni8xOC8yMCAyOjIxIFBNLCBTaGFtZWVyIEtvbG90aHVtIHdyb3RlOg0KPiA+IFRoaXMgYWRkcyBz
-dXBwb3J0IGZvciBtZW1vcnkocGMtZGltbSkgaG90IHJlbW92ZSBvbiBhcm0vdmlydCB0aGF0IHVz
-ZXMNCj4gPiBhY3BpIGdlZCBkZXZpY2UuDQo+ID4NCj4gPiBOVkRJTU0gaG90IHJlbW92YWwgaXMg
-bm90IHlldCBzdXBwb3J0ZWQuDQo+ID4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBTaGFtZWVyIEtvbG90
-aHVtIDxzaGFtZWVyYWxpLmtvbG90aHVtLnRob2RpQGh1YXdlaS5jb20+DQo+ID4gLS0tDQo+ID4g
-VjIgLS0+IHYzDQo+ID4gICAtQWRkcmVzc2VkIEVyaWMncyByZXZpZXcgY29tbWVudCBhbmQgYWRk
-ZWQgY2hlY2sgZm9yIE5WRElNTS4NCj4gPiBSRkMgdjEgLS0+IHYyDQo+ID4gICAtUmViYXNlZCBv
-biB0b3Agb2YgbGF0ZXN0IFFlbXUgbWFzdGVyLg0KPiA+ICAgLURyb3BwZWQgIlJGQyIgYW5kIHRl
-c3RlZCB3aXRoIGtlcm5lbCA1LjctcmM2DQo+ID4gLS0tDQo+ID4gIGh3L2FjcGkvZ2VuZXJpY19l
-dmVudF9kZXZpY2UuYyB8IDI5ICsrKysrKysrKysrKysrKysNCj4gPiAgaHcvYXJtL3ZpcnQuYyAg
-ICAgICAgICAgICAgICAgIHwgNjINCj4gKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKyst
-LQ0KPiA+ICAyIGZpbGVzIGNoYW5nZWQsIDg5IGluc2VydGlvbnMoKyksIDIgZGVsZXRpb25zKC0p
-DQo+ID4NCj4gPiBkaWZmIC0tZ2l0IGEvaHcvYWNwaS9nZW5lcmljX2V2ZW50X2RldmljZS5jDQo+
-ID4gYi9ody9hY3BpL2dlbmVyaWNfZXZlbnRfZGV2aWNlLmMgaW5kZXggMWNiMzQxMTFlNS4uYjhh
-YmRlZmExYyAxMDA2NDQNCj4gPiAtLS0gYS9ody9hY3BpL2dlbmVyaWNfZXZlbnRfZGV2aWNlLmMN
-Cj4gPiArKysgYi9ody9hY3BpL2dlbmVyaWNfZXZlbnRfZGV2aWNlLmMNCj4gPiBAQCAtMTkzLDYg
-KzE5MywzMyBAQCBzdGF0aWMgdm9pZA0KPiBhY3BpX2dlZF9kZXZpY2VfcGx1Z19jYihIb3RwbHVn
-SGFuZGxlciAqaG90cGx1Z19kZXYsDQo+ID4gICAgICB9DQo+ID4gIH0NCj4gPg0KPiA+ICtzdGF0
-aWMgdm9pZCBhY3BpX2dlZF91bnBsdWdfcmVxdWVzdF9jYihIb3RwbHVnSGFuZGxlciAqaG90cGx1
-Z19kZXYsDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIERldmlj
-ZVN0YXRlICpkZXYsIEVycm9yDQo+ID4gKyoqZXJycCkgew0KPiA+ICsgICAgQWNwaUdlZFN0YXRl
-ICpzID0gQUNQSV9HRUQoaG90cGx1Z19kZXYpOw0KPiA+ICsNCj4gPiArICAgIGlmICgob2JqZWN0
-X2R5bmFtaWNfY2FzdChPQkpFQ1QoZGV2KSwgVFlQRV9QQ19ESU1NKSAmJg0KPiA+ICsgICAgICAg
-ICAgICAgICAgICAgICAgICEob2JqZWN0X2R5bmFtaWNfY2FzdChPQkpFQ1QoZGV2KSwNCj4gVFlQ
-RV9OVkRJTU0pKSkpIHsNCj4gPiArICAgICAgICBhY3BpX21lbW9yeV91bnBsdWdfcmVxdWVzdF9j
-Yihob3RwbHVnX2RldiwNCj4gJnMtPm1lbWhwX3N0YXRlLCBkZXYsIGVycnApOw0KPiA+ICsgICAg
-fSBlbHNlIHsNCj4gPiArICAgICAgICBlcnJvcl9zZXRnKGVycnAsICJhY3BpOiBkZXZpY2UgdW5w
-bHVnIHJlcXVlc3QgZm9yIHVuc3VwcG9ydGVkDQo+IGRldmljZSINCj4gPiArICAgICAgICAgICAg
-ICAgICAgICIgdHlwZTogJXMiLCBvYmplY3RfZ2V0X3R5cGVuYW1lKE9CSkVDVChkZXYpKSk7DQo+
-ID4gKyAgICB9DQo+ID4gK30NCj4gPiArDQo+ID4gK3N0YXRpYyB2b2lkIGFjcGlfZ2VkX3VucGx1
-Z19jYihIb3RwbHVnSGFuZGxlciAqaG90cGx1Z19kZXYsDQo+ID4gKyAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICBEZXZpY2VTdGF0ZSAqZGV2LCBFcnJvciAqKmVycnApIHsNCj4gPiArICAg
-IEFjcGlHZWRTdGF0ZSAqcyA9IEFDUElfR0VEKGhvdHBsdWdfZGV2KTsNCj4gPiArDQo+ID4gKyAg
-ICBpZiAob2JqZWN0X2R5bmFtaWNfY2FzdChPQkpFQ1QoZGV2KSwgVFlQRV9QQ19ESU1NKSkgew0K
-PiA+ICsgICAgICAgIGFjcGlfbWVtb3J5X3VucGx1Z19jYigmcy0+bWVtaHBfc3RhdGUsIGRldiwg
-ZXJycCk7DQo+ID4gKyAgICB9IGVsc2Ugew0KPiA+ICsgICAgICAgIGVycm9yX3NldGcoZXJycCwg
-ImFjcGk6IGRldmljZSB1bnBsdWcgZm9yIHVuc3VwcG9ydGVkIGRldmljZSINCj4gPiArICAgICAg
-ICAgICAgICAgICAgICIgdHlwZTogJXMiLCBvYmplY3RfZ2V0X3R5cGVuYW1lKE9CSkVDVChkZXYp
-KSk7DQo+ID4gKyAgICB9DQo+ID4gK30NCj4gPiArDQo+ID4gIHN0YXRpYyB2b2lkIGFjcGlfZ2Vk
-X3NlbmRfZXZlbnQoQWNwaURldmljZUlmICphZGV2LA0KPiA+IEFjcGlFdmVudFN0YXR1c0JpdHMg
-ZXYpICB7DQo+ID4gICAgICBBY3BpR2VkU3RhdGUgKnMgPSBBQ1BJX0dFRChhZGV2KTsgQEAgLTMx
-OCw2ICszNDUsOCBAQCBzdGF0aWMNCj4gdm9pZA0KPiA+IGFjcGlfZ2VkX2NsYXNzX2luaXQoT2Jq
-ZWN0Q2xhc3MgKmNsYXNzLCB2b2lkICpkYXRhKQ0KPiA+ICAgICAgZGMtPnZtc2QgPSAmdm1zdGF0
-ZV9hY3BpX2dlZDsNCj4gPg0KPiA+ICAgICAgaGMtPnBsdWcgPSBhY3BpX2dlZF9kZXZpY2VfcGx1
-Z19jYjsNCj4gPiArICAgIGhjLT51bnBsdWdfcmVxdWVzdCA9IGFjcGlfZ2VkX3VucGx1Z19yZXF1
-ZXN0X2NiOw0KPiA+ICsgICAgaGMtPnVucGx1ZyA9IGFjcGlfZ2VkX3VucGx1Z19jYjsNCj4gPg0K
-PiA+ICAgICAgYWRldmMtPnNlbmRfZXZlbnQgPSBhY3BpX2dlZF9zZW5kX2V2ZW50OyAgfSBkaWZm
-IC0tZ2l0DQo+ID4gYS9ody9hcm0vdmlydC5jIGIvaHcvYXJtL3ZpcnQuYyBpbmRleCBjYWNlYjFl
-NGEwLi5hOTgxZGM5ZjFjIDEwMDY0NA0KPiA+IC0tLSBhL2h3L2FybS92aXJ0LmMNCj4gPiArKysg
-Yi9ody9hcm0vdmlydC5jDQo+ID4gQEAgLTIxNzcsMTEgKzIxNzcsNjggQEAgc3RhdGljIHZvaWQN
-Cj4gdmlydF9tYWNoaW5lX2RldmljZV9wbHVnX2NiKEhvdHBsdWdIYW5kbGVyICpob3RwbHVnX2Rl
-diwNCj4gPiAgICAgIH0NCj4gPiAgfQ0KPiA+DQo+ID4gK3N0YXRpYyB2b2lkIHZpcnRfZGltbV91
-bnBsdWdfcmVxdWVzdChIb3RwbHVnSGFuZGxlciAqaG90cGx1Z19kZXYsDQo+ID4gKyAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBEZXZpY2VTdGF0ZSAqZGV2LCBFcnJvcg0KPiAq
-KmVycnApDQo+ID4gK3sNCj4gPiArICAgIFZpcnRNYWNoaW5lU3RhdGUgKnZtcyA9IFZJUlRfTUFD
-SElORShob3RwbHVnX2Rldik7DQo+ID4gKyAgICBFcnJvciAqbG9jYWxfZXJyID0gTlVMTDsNCj4g
-PiArDQo+ID4gKyAgICBpZiAoIXZtcy0+YWNwaV9kZXYpIHsNCj4gPiArICAgICAgICBlcnJvcl9z
-ZXRnKGVycnAsDQo+IGxvY2FsX2Vycj8gb3RoZXJ3aXNlIG5vIG5lZWQgdG8gcHJvcGFnYXRlPw0K
-DQpUaGF04oCZcyByaWdodC4gSSB3aWxsIGNoYW5nZSB0aGF0LiBCdXQgc2luY2Ugd2UgZG8gY2hl
-Y2sgZm9yIHZtcy0+YWNwaV9kZXYgaW4NCnZpcnRfbWVtb3J5X3ByZV9wbHVnKCksIGRvIHdlIHJl
-YWxseSBuZWVkIHRvIGNoZWNrIHRoaXMgaGVyZT8gSSBjYW4ndCB0aGluayBvZg0KZ2V0dGluZyBo
-ZXJlIHdpdGhvdXQgZmlyc3QgaGl0dGluZyBfcHJlX3BsdWcoKS4gQW55d2F5IGh3L2kzODYvcGMu
-YyBoYXMgZ290DQpjaGVja3MgaW4gYm90aCB0aGUgcGxhY2VzLCBzbyBJIHdpbGwga2VlcCBpdC4N
-Cg0KPiA+ICsgICAgICAgICAgICAgICAgICAgIm1lbW9yeSBob3RwbHVnIGlzIG5vdCBlbmFibGVk
-OiBtaXNzaW5nIGFjcGktZ2VkDQo+IGRldmljZSIpOw0KPiA+ICsgICAgICAgIGdvdG8gb3V0Ow0K
-PiA+ICsgICAgfQ0KPiA+ICsNCj4gPiArICAgIGlmIChvYmplY3RfZHluYW1pY19jYXN0KE9CSkVD
-VChkZXYpLCBUWVBFX05WRElNTSkpIHsNCj4gPiArICAgICAgICBlcnJvcl9zZXRnKCZsb2NhbF9l
-cnIsDQo+ID4gKyAgICAgICAgICAgICAgICAgICAibnZkaW1tIGRldmljZSBob3QgdW5wbHVnIGlz
-IG5vdCBzdXBwb3J0ZWQgeWV0LiIpOw0KPiA+ICsgICAgICAgIGdvdG8gb3V0Ow0KPiA+ICsgICAg
-fQ0KPiA+ICsNCj4gPiArICAgIGhvdHBsdWdfaGFuZGxlcl91bnBsdWdfcmVxdWVzdChIT1RQTFVH
-X0hBTkRMRVIodm1zLT5hY3BpX2RldiksDQo+IGRldiwNCj4gPiArICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAmbG9jYWxfZXJyKTsNCj4gPiArb3V0Og0KPiA+ICsgICAgZXJyb3Jf
-cHJvcGFnYXRlKGVycnAsIGxvY2FsX2Vycik7IH0NCj4gPiArDQo+ID4gK3N0YXRpYyB2b2lkIHZp
-cnRfZGltbV91bnBsdWcoSG90cGx1Z0hhbmRsZXIgKmhvdHBsdWdfZGV2LA0KPiA+ICsgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgIERldmljZVN0YXRlICpkZXYsIEVycm9yICoqZXJycCkgew0K
-PiA+ICsgICAgVmlydE1hY2hpbmVTdGF0ZSAqdm1zID0gVklSVF9NQUNISU5FKGhvdHBsdWdfZGV2
-KTsNCj4gPiArICAgIEVycm9yICpsb2NhbF9lcnIgPSBOVUxMOw0KPiA+ICsNCj4gPiArICAgIGhv
-dHBsdWdfaGFuZGxlcl91bnBsdWcoSE9UUExVR19IQU5ETEVSKHZtcy0+YWNwaV9kZXYpLCBkZXYs
-DQo+ICZsb2NhbF9lcnIpOw0KPiA+ICsgICAgaWYgKGxvY2FsX2Vycikgew0KPiA+ICsgICAgICAg
-IGdvdG8gb3V0Ow0KPiA+ICsgICAgfQ0KPiA+ICsNCj4gPiArICAgIHBjX2RpbW1fdW5wbHVnKFBD
-X0RJTU0oZGV2KSwgTUFDSElORSh2bXMpKTsNCj4gPiArICAgIG9iamVjdF9wcm9wZXJ0eV9zZXRf
-Ym9vbChPQkpFQ1QoZGV2KSwgZmFsc2UsICJyZWFsaXplZCIsIE5VTEwpOw0KPiBBbnkgcmVhc29u
-IHdoeSB5b3UgZGlkIG5vdCB1c2UgcWRldl91bnJlYWxpemUoZGV2KSBhcyBpbiBwY19kaW1tX3Vu
-cGx1ZygpPw0KDQpOb3QgcmVhbGx5LiBMb29rcyBsaWtlIHRoYXQgaXMgYSByZWNlbnQgY2hhbmdl
-IGluIHBjX2RpbW1fdW5wbHVnKCkuIEkgd2lsbCBmb2xsb3cuDQoNClRoYW5rcywNClNoYW1lZXIN
-Cg0KPiANCj4gPiArDQo+ID4gKyBvdXQ6DQo+ID4gKyAgICBlcnJvcl9wcm9wYWdhdGUoZXJycCwg
-bG9jYWxfZXJyKTsgfQ0KPiA+ICsNCj4gPiAgc3RhdGljIHZvaWQgdmlydF9tYWNoaW5lX2Rldmlj
-ZV91bnBsdWdfcmVxdWVzdF9jYihIb3RwbHVnSGFuZGxlcg0KPiAqaG90cGx1Z19kZXYsDQo+ID4g
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIERldmljZVN0YXRlICpk
-ZXYsIEVycm9yDQo+ID4gKiplcnJwKSAgew0KPiA+IC0gICAgZXJyb3Jfc2V0ZyhlcnJwLCAiZGV2
-aWNlIHVucGx1ZyByZXF1ZXN0IGZvciB1bnN1cHBvcnRlZCBkZXZpY2UiDQo+ID4gLSAgICAgICAg
-ICAgICAgICIgdHlwZTogJXMiLCBvYmplY3RfZ2V0X3R5cGVuYW1lKE9CSkVDVChkZXYpKSk7DQo+
-ID4gKyAgICBpZiAob2JqZWN0X2R5bmFtaWNfY2FzdChPQkpFQ1QoZGV2KSwgVFlQRV9QQ19ESU1N
-KSkgew0KPiA+ICsgICAgICAgIHZpcnRfZGltbV91bnBsdWdfcmVxdWVzdChob3RwbHVnX2Rldiwg
-ZGV2LCBlcnJwKTsNCj4gPiArICAgIH0gZWxzZSB7DQo+ID4gKyAgICAgICAgZXJyb3Jfc2V0Zyhl
-cnJwLCAiZGV2aWNlIHVucGx1ZyByZXF1ZXN0IGZvciB1bnN1cHBvcnRlZCBkZXZpY2UiDQo+ID4g
-KyAgICAgICAgICAgICAgICAgICAiIHR5cGU6ICVzIiwgb2JqZWN0X2dldF90eXBlbmFtZShPQkpF
-Q1QoZGV2KSkpOw0KPiA+ICsgICAgfQ0KPiA+ICt9DQo+ID4gKw0KPiA+ICtzdGF0aWMgdm9pZCB2
-aXJ0X21hY2hpbmVfZGV2aWNlX3VucGx1Z19jYihIb3RwbHVnSGFuZGxlciAqaG90cGx1Z19kZXYs
-DQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIERldmljZVN0
-YXRlICpkZXYsIEVycm9yDQo+ID4gKyoqZXJycCkgew0KPiA+ICsgICAgaWYgKG9iamVjdF9keW5h
-bWljX2Nhc3QoT0JKRUNUKGRldiksIFRZUEVfUENfRElNTSkpIHsNCj4gPiArICAgICAgICB2aXJ0
-X2RpbW1fdW5wbHVnKGhvdHBsdWdfZGV2LCBkZXYsIGVycnApOw0KPiA+ICsgICAgfSBlbHNlIHsN
-Cj4gPiArICAgICAgICBlcnJvcl9zZXRnKGVycnAsICJ2aXJ0OiBkZXZpY2UgdW5wbHVnIGZvciB1
-bnN1cHBvcnRlZCBkZXZpY2UiDQo+ID4gKyAgICAgICAgICAgICAgICAgICAiIHR5cGU6ICVzIiwg
-b2JqZWN0X2dldF90eXBlbmFtZShPQkpFQ1QoZGV2KSkpOw0KPiA+ICsgICAgfQ0KPiA+ICB9DQo+
-ID4NCj4gPiAgc3RhdGljIEhvdHBsdWdIYW5kbGVyICp2aXJ0X21hY2hpbmVfZ2V0X2hvdHBsdWdf
-aGFuZGxlcihNYWNoaW5lU3RhdGUNCj4gPiAqbWFjaGluZSwgQEAgLTIyNjIsNiArMjMxOSw3IEBA
-IHN0YXRpYyB2b2lkDQo+IHZpcnRfbWFjaGluZV9jbGFzc19pbml0KE9iamVjdENsYXNzICpvYywg
-dm9pZCAqZGF0YSkNCj4gPiAgICAgIGhjLT5wcmVfcGx1ZyA9IHZpcnRfbWFjaGluZV9kZXZpY2Vf
-cHJlX3BsdWdfY2I7DQo+ID4gICAgICBoYy0+cGx1ZyA9IHZpcnRfbWFjaGluZV9kZXZpY2VfcGx1
-Z19jYjsNCj4gPiAgICAgIGhjLT51bnBsdWdfcmVxdWVzdCA9IHZpcnRfbWFjaGluZV9kZXZpY2Vf
-dW5wbHVnX3JlcXVlc3RfY2I7DQo+ID4gKyAgICBoYy0+dW5wbHVnID0gdmlydF9tYWNoaW5lX2Rl
-dmljZV91bnBsdWdfY2I7DQo+ID4gICAgICBtYy0+bnVtYV9tZW1fc3VwcG9ydGVkID0gdHJ1ZTsN
-Cj4gPiAgICAgIG1jLT5udmRpbW1fc3VwcG9ydGVkID0gdHJ1ZTsNCj4gPiAgICAgIG1jLT5hdXRv
-X2VuYWJsZV9udW1hX3dpdGhfbWVtaHAgPSB0cnVlOw0KPiA+DQo+IFRoYW5rcw0KPiANCj4gRXJp
-Yw0KDQo=
+Public bug reported:
+
+It seems that QEMU has stopped emphasizing the EMU part of the name, and
+is too much focused on virtualization.
+
+My interest is at running legacy operating systems, and as such, they must =
+run on foreign CPU platforms. m68 on intel, intel on ARM, etc.
+Time doesn't stand still, and reliance on KVM and similar x86-on-x86 tricks=
+, which allow the delegation of certain CPU features to the host CPU is goi=
+ng to not work going forward.
+
+If the rumored transition of Apple to ARM is going to take place, people
+will want to e.g. emulate for testing or legacy purposes a variety of
+operating systems, incl. NeXTSTEP, Windows, earlier versions of MacOS on
+ARM Macs.
+
+Testing that scenario, i.e. macOS on an ARM board with the lowest
+possible CPU capable of running modern macOS, results in these problems
+(and of course utter failure achieving the goal):
+
+qemu-system-x86_64: warning: TCG doesn't support requested feature: CPUID.0=
+1H:ECX.fma [bit 12]
+qemu-system-x86_64: warning: TCG doesn't support requested feature: CPUID.0=
+1H:ECX.avx [bit 28]
+qemu-system-x86_64: warning: TCG doesn't support requested feature: CPUID.0=
+7H:EBX.avx2 [bit 5]
+qemu-system-x86_64: warning: TCG doesn't support requested feature: CPUID.8=
+0000007H:EDX.invtsc [bit 8]
+qemu-system-x86_64: warning: TCG doesn't support requested feature: CPUID.0=
+DH:EAX.xsavec [bit 1]
+
+And this is emulating a lowly Penryn CPU with the required CPU flags for ma=
+cOS:
+-cpu Penryn,vendor=3DGenuineIntel,+sse3,+sse4.2,+aes,+xsave,+avx,+xsaveopt,=
++xsavec,+xgetbv1,+avx2,+bmi2,+smep,+bmi1,+fma,+movbe,+invtsc
+
+Attempting to emulate a more feature laden intel CPU results in even
+more issues.
+
+I would propose that no CPU should be considered supported unless it can
+be fully handled by TCG on a non-native host. KVM, native-on-native etc.
+are nice to have, but peripheral to qEMUlation when it boils down to it.
+At the very least, there should be a CLEAR distinction which CPUs
+require KVM to be used, and which can be fully emulated. It should not
+require wasting an afternoon to figure out that an emulation attempt is
+futile because TCG lacks essential functionality.
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+
+** Tags: emulation incomplete tcg
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1884095
+
+Title:
+  QEMU not sufficiently focused on qEMUlation, with resulting holes in
+  TCG emulation coverage
+
+Status in QEMU:
+  New
+
+Bug description:
+  It seems that QEMU has stopped emphasizing the EMU part of the name,
+  and is too much focused on virtualization.
+
+  My interest is at running legacy operating systems, and as such, they mus=
+t run on foreign CPU platforms. m68 on intel, intel on ARM, etc.
+  Time doesn't stand still, and reliance on KVM and similar x86-on-x86 tric=
+ks, which allow the delegation of certain CPU features to the host CPU is g=
+oing to not work going forward.
+
+  If the rumored transition of Apple to ARM is going to take place,
+  people will want to e.g. emulate for testing or legacy purposes a
+  variety of operating systems, incl. NeXTSTEP, Windows, earlier
+  versions of MacOS on ARM Macs.
+
+  Testing that scenario, i.e. macOS on an ARM board with the lowest
+  possible CPU capable of running modern macOS, results in these
+  problems (and of course utter failure achieving the goal):
+
+  qemu-system-x86_64: warning: TCG doesn't support requested feature: CPUID=
+.01H:ECX.fma [bit 12]
+  qemu-system-x86_64: warning: TCG doesn't support requested feature: CPUID=
+.01H:ECX.avx [bit 28]
+  qemu-system-x86_64: warning: TCG doesn't support requested feature: CPUID=
+.07H:EBX.avx2 [bit 5]
+  qemu-system-x86_64: warning: TCG doesn't support requested feature: CPUID=
+.80000007H:EDX.invtsc [bit 8]
+  qemu-system-x86_64: warning: TCG doesn't support requested feature: CPUID=
+.0DH:EAX.xsavec [bit 1]
+
+  And this is emulating a lowly Penryn CPU with the required CPU flags for =
+macOS:
+  -cpu Penryn,vendor=3DGenuineIntel,+sse3,+sse4.2,+aes,+xsave,+avx,+xsaveop=
+t,+xsavec,+xgetbv1,+avx2,+bmi2,+smep,+bmi1,+fma,+movbe,+invtsc
+
+  Attempting to emulate a more feature laden intel CPU results in even
+  more issues.
+
+  I would propose that no CPU should be considered supported unless it
+  can be fully handled by TCG on a non-native host. KVM, native-on-
+  native etc. are nice to have, but peripheral to qEMUlation when it
+  boils down to it. At the very least, there should be a CLEAR
+  distinction which CPUs require KVM to be used, and which can be fully
+  emulated. It should not require wasting an afternoon to figure out
+  that an emulation attempt is futile because TCG lacks essential
+  functionality.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1884095/+subscriptions
 
