@@ -2,68 +2,68 @@ Return-Path: <SRS0=FaGC=77=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68F9EC433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 13:40:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26EA5C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 13:41:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 379D5207E8
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 13:40:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E3CCA207D8
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 13:41:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cxd+qwTA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 379D5207E8
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A4ZG+iaY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3CCA207D8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45536 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48366 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlulv-0004hL-8v
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 09:40:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40788)
+	id 1jlumt-0006UG-1Z
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 09:41:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41028)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jluVe-0007MP-5n
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 09:23:14 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:39758
+ id 1jluW7-0000II-6z
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 09:23:43 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:55252
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jluVb-0005qW-Vt
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 09:23:13 -0400
+ id 1jluW3-0005uw-QT
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 09:23:42 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592486591;
+ s=mimecast20190719; t=1592486619;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
- references:references; bh=5Gi6cBzf5l3uKd3fW93e7qFjVJl3npUVGDjlWniZTbQ=;
- b=cxd+qwTAIfZCy8ODTOV6i7KoboUxVyyXYLMmp9vp37FkCMqs/vyz/jg60GbltZ0Ii7k6xJ
- LGxXl9NWNIrpTCSb3d7B2zRE2loJ+7RNASxVvsljLM9qwzQDYk4F8Ny0T00pAtjQ3Ty9hI
- jttVhPG9AZNlDA6/TLqhI72uCgBAW/o=
+ references:references; bh=IDvJc4lUGQTwqv7uiU+Gab1nKluMeqbegsioSAJZHC0=;
+ b=A4ZG+iaYT5k/V7RqTBeb5w/vVvNTZ1rJzTaYy66JvSjiwBr7WXTWZyoKJR+yWXHyFWuaFi
+ UnKJbw4P5cJqWkxR1y6UiNYz979wl28li2INA6R4cHvhNJVrbO3Cyd5zgk2LcPBvQCcr2C
+ L8eZTa0LXRD7JfQsVzVcO8hkWKpmIME=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-349-rSCrm84SOOC7eQQJa8KuAg-1; Thu, 18 Jun 2020 09:23:07 -0400
-X-MC-Unique: rSCrm84SOOC7eQQJa8KuAg-1
+ us-mta-317-FLvyrPm0NdaFLScGP-TJvA-1; Thu, 18 Jun 2020 09:23:37 -0400
+X-MC-Unique: FLvyrPm0NdaFLScGP-TJvA-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B87D480F5C1;
- Thu, 18 Jun 2020 13:23:06 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F33451005512;
+ Thu, 18 Jun 2020 13:23:35 +0000 (UTC)
 Received: from jason-ThinkPad-T430s.redhat.com (ovpn-12-109.pek2.redhat.com
  [10.72.12.109])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 81C9F5BAC2;
- Thu, 18 Jun 2020 13:23:04 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A9CF45BAC2;
+ Thu, 18 Jun 2020 13:23:33 +0000 (UTC)
 From: Jason Wang <jasowang@redhat.com>
 To: peter.maydell@linaro.org,
 	qemu-devel@nongnu.org
-Subject: [PULL V2 23/33] net: use peer when purging queue in
- qemu_flush_or_purge_queue_packets()
-Date: Thu, 18 Jun 2020 21:21:38 +0800
-Message-Id: <1592486508-6135-24-git-send-email-jasowang@redhat.com>
+Subject: [PULL V2 33/33] net: Drop the NetLegacy structure,
+ always use Netdev instead
+Date: Thu, 18 Jun 2020 21:21:48 +0800
+Message-Id: <1592486508-6135-34-git-send-email-jasowang@redhat.com>
 In-Reply-To: <1592486508-6135-1-git-send-email-jasowang@redhat.com>
 References: <1592486508-6135-1-git-send-email-jasowang@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
@@ -93,54 +93,220 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>, qemu-stable@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>, Jason Wang <jasowang@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The sender of packet will be checked in the qemu_net_queue_purge() but
-we use NetClientState not its peer when trying to purge the incoming
-queue in qemu_flush_or_purge_packets(). This will trigger the assert
-in virtio_net_reset since we can't pass the sender check:
+From: Thomas Huth <thuth@redhat.com>
 
-hw/net/virtio-net.c:533: void virtio_net_reset(VirtIODevice *): Assertion
-`!virtio_net_get_subqueue(nc)->async_tx.elem' failed.
-#9 0x55a33fa31b78 in virtio_net_reset hw/net/virtio-net.c:533:13
-#10 0x55a33fc88412 in virtio_reset hw/virtio/virtio.c:1919:9
-#11 0x55a341d82764 in virtio_bus_reset hw/virtio/virtio-bus.c:95:9
-#12 0x55a341dba2de in virtio_pci_reset hw/virtio/virtio-pci.c:1824:5
-#13 0x55a341db3e02 in virtio_pci_common_write hw/virtio/virtio-pci.c:1252:13
-#14 0x55a33f62117b in memory_region_write_accessor memory.c:496:5
-#15 0x55a33f6205e4 in access_with_adjusted_size memory.c:557:18
-#16 0x55a33f61e177 in memory_region_dispatch_write memory.c:1488:16
+Now that the "name" parameter is gone, there is hardly any difference
+between NetLegacy and Netdev anymore, so we can drop NetLegacy and always
+use Netdev to simplify the code quite a bit.
 
-Reproducer:
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg701914.html
+The only two differences that were really left between Netdev and NetLegacy:
 
-Fix by using the peer.
+1) NetLegacy does not allow a "hubport" type. We can continue to block
+   this with a simple check in net_client_init1() for this type.
 
-Reported-by: "Alexander Bulekov" <alxndr@bu.edu>
-Acked-by: Alexander Bulekov <alxndr@bu.edu>
-Fixes: ca77d85e1dbf9 ("net: complete all queued packets on VM stop")
-Cc: qemu-stable@nongnu.org
+2) The "id" parameter was optional in NetLegacy (and an internal id
+   was chosen via assign_name() during initialization), but it is mandatory
+   for Netdev. To avoid that the visitor code bails out here, we have to
+   add an internal id to the QemuOpts already earlier now.
+
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- net/net.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/net.c     | 77 ++++++++++-------------------------------------------------
+ qapi/net.json | 46 -----------------------------------
+ 2 files changed, 13 insertions(+), 110 deletions(-)
 
 diff --git a/net/net.c b/net/net.c
-index cbeeead..4c62b10 100644
+index e55d357..d113029 100644
 --- a/net/net.c
 +++ b/net/net.c
-@@ -610,7 +610,7 @@ void qemu_flush_or_purge_queued_packets(NetClientState *nc, bool purge)
-         qemu_notify_event();
-     } else if (purge) {
-         /* Unable to empty the queue, purge remaining packets */
--        qemu_net_queue_purge(nc->incoming_queue, nc);
-+        qemu_net_queue_purge(nc->incoming_queue, nc->peer);
-     }
- }
+@@ -965,15 +965,11 @@ static int (* const net_client_init_fun[NET_CLIENT_DRIVER__MAX])(
+ };
  
+ 
+-static int net_client_init1(const void *object, bool is_netdev, Error **errp)
++static int net_client_init1(const Netdev *netdev, bool is_netdev, Error **errp)
+ {
+-    Netdev legacy = {0};
+-    const Netdev *netdev;
+     NetClientState *peer = NULL;
+ 
+     if (is_netdev) {
+-        netdev = object;
+-
+         if (netdev->type == NET_CLIENT_DRIVER_NIC ||
+             !net_client_init_fun[netdev->type]) {
+             error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "type",
+@@ -981,56 +977,11 @@ static int net_client_init1(const void *object, bool is_netdev, Error **errp)
+             return -1;
+         }
+     } else {
+-        const NetLegacy *net = object;
+-        const NetLegacyOptions *opts = net->opts;
+-        legacy.id = net->id;
+-        netdev = &legacy;
+-
+-        /* Map the old options to the new flat type */
+-        switch (opts->type) {
+-        case NET_LEGACY_OPTIONS_TYPE_NONE:
++        if (netdev->type == NET_CLIENT_DRIVER_NONE) {
+             return 0; /* nothing to do */
+-        case NET_LEGACY_OPTIONS_TYPE_NIC:
+-            legacy.type = NET_CLIENT_DRIVER_NIC;
+-            legacy.u.nic = opts->u.nic;
+-            break;
+-        case NET_LEGACY_OPTIONS_TYPE_USER:
+-            legacy.type = NET_CLIENT_DRIVER_USER;
+-            legacy.u.user = opts->u.user;
+-            break;
+-        case NET_LEGACY_OPTIONS_TYPE_TAP:
+-            legacy.type = NET_CLIENT_DRIVER_TAP;
+-            legacy.u.tap = opts->u.tap;
+-            break;
+-        case NET_LEGACY_OPTIONS_TYPE_L2TPV3:
+-            legacy.type = NET_CLIENT_DRIVER_L2TPV3;
+-            legacy.u.l2tpv3 = opts->u.l2tpv3;
+-            break;
+-        case NET_LEGACY_OPTIONS_TYPE_SOCKET:
+-            legacy.type = NET_CLIENT_DRIVER_SOCKET;
+-            legacy.u.socket = opts->u.socket;
+-            break;
+-        case NET_LEGACY_OPTIONS_TYPE_VDE:
+-            legacy.type = NET_CLIENT_DRIVER_VDE;
+-            legacy.u.vde = opts->u.vde;
+-            break;
+-        case NET_LEGACY_OPTIONS_TYPE_BRIDGE:
+-            legacy.type = NET_CLIENT_DRIVER_BRIDGE;
+-            legacy.u.bridge = opts->u.bridge;
+-            break;
+-        case NET_LEGACY_OPTIONS_TYPE_NETMAP:
+-            legacy.type = NET_CLIENT_DRIVER_NETMAP;
+-            legacy.u.netmap = opts->u.netmap;
+-            break;
+-        case NET_LEGACY_OPTIONS_TYPE_VHOST_USER:
+-            legacy.type = NET_CLIENT_DRIVER_VHOST_USER;
+-            legacy.u.vhost_user = opts->u.vhost_user;
+-            break;
+-        default:
+-            abort();
+         }
+-
+-        if (!net_client_init_fun[netdev->type]) {
++        if (netdev->type == NET_CLIENT_DRIVER_HUBPORT ||
++            !net_client_init_fun[netdev->type]) {
+             error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "type",
+                        "a net backend type (maybe it is not compiled "
+                        "into this binary)");
+@@ -1039,7 +990,7 @@ static int net_client_init1(const void *object, bool is_netdev, Error **errp)
+ 
+         /* Do not add to a hub if it's a nic with a netdev= parameter. */
+         if (netdev->type != NET_CLIENT_DRIVER_NIC ||
+-            !opts->u.nic.has_netdev) {
++            !netdev->u.nic.has_netdev) {
+             peer = net_hub_add_port(0, NULL, NULL);
+         }
+     }
+@@ -1100,7 +1051,7 @@ static void show_netdevs(void)
+ static int net_client_init(QemuOpts *opts, bool is_netdev, Error **errp)
+ {
+     gchar **substrings = NULL;
+-    void *object = NULL;
++    Netdev *object = NULL;
+     Error *err = NULL;
+     int ret = -1;
+     Visitor *v = opts_visitor_new(opts);
+@@ -1143,21 +1094,19 @@ static int net_client_init(QemuOpts *opts, bool is_netdev, Error **errp)
+         }
+     }
+ 
+-    if (is_netdev) {
+-        visit_type_Netdev(v, NULL, (Netdev **)&object, &err);
+-    } else {
+-        visit_type_NetLegacy(v, NULL, (NetLegacy **)&object, &err);
++    /* Create an ID for -net if the user did not specify one */
++    if (!is_netdev && !qemu_opts_id(opts)) {
++        static int idx;
++        qemu_opts_set_id(opts, g_strdup_printf("__org.qemu.net%i", idx++));
+     }
+ 
++    visit_type_Netdev(v, NULL, &object, &err);
++
+     if (!err) {
+         ret = net_client_init1(object, is_netdev, &err);
+     }
+ 
+-    if (is_netdev) {
+-        qapi_free_Netdev(object);
+-    } else {
+-        qapi_free_NetLegacy(object);
+-    }
++    qapi_free_Netdev(object);
+ 
+ out:
+     error_propagate(errp, err);
+diff --git a/qapi/net.json b/qapi/net.json
+index fc7c95f..9244c9a 100644
+--- a/qapi/net.json
++++ b/qapi/net.json
+@@ -468,52 +468,6 @@
+     'vhost-user': 'NetdevVhostUserOptions' } }
+ 
+ ##
+-# @NetLegacy:
+-#
+-# Captures the configuration of a network device; legacy.
+-#
+-# @id: identifier for monitor commands
+-#
+-# @opts: device type specific properties (legacy)
+-#
+-# Since: 1.2
+-##
+-{ 'struct': 'NetLegacy',
+-  'data': {
+-    '*id':   'str',
+-    'opts':  'NetLegacyOptions' } }
+-
+-##
+-# @NetLegacyOptionsType:
+-#
+-# Since: 1.2
+-##
+-{ 'enum': 'NetLegacyOptionsType',
+-  'data': ['none', 'nic', 'user', 'tap', 'l2tpv3', 'socket', 'vde',
+-           'bridge', 'netmap', 'vhost-user'] }
+-
+-##
+-# @NetLegacyOptions:
+-#
+-# Like Netdev, but for use only by the legacy command line options
+-#
+-# Since: 1.2
+-##
+-{ 'union': 'NetLegacyOptions',
+-  'base': { 'type': 'NetLegacyOptionsType' },
+-  'discriminator': 'type',
+-  'data': {
+-    'nic':      'NetLegacyNicOptions',
+-    'user':     'NetdevUserOptions',
+-    'tap':      'NetdevTapOptions',
+-    'l2tpv3':   'NetdevL2TPv3Options',
+-    'socket':   'NetdevSocketOptions',
+-    'vde':      'NetdevVdeOptions',
+-    'bridge':   'NetdevBridgeOptions',
+-    'netmap':   'NetdevNetmapOptions',
+-    'vhost-user': 'NetdevVhostUserOptions' } }
+-
+-##
+ # @NetFilterDirection:
+ #
+ # Indicates whether a netfilter is attached to a netdev's transmit queue or
 -- 
 2.5.0
 
