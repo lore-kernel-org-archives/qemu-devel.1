@@ -2,99 +2,78 @@ Return-Path: <SRS0=FaGC=77=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7EACC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 13:45:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC796C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 13:46:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B5F6E20885
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 13:45:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B4B8A2082F
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 13:46:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SvGT6SQp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5F6E20885
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BCS9oXZO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4B8A2082F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35770 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40728 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlur6-00059H-02
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 09:45:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45454)
+	id 1jlus7-0007Hw-VL
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 09:46:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49072)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jluhQ-0005cg-3d
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 09:35:24 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32518
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <maxime.coquelin@redhat.com>)
+ id 1jlur2-0005Sz-0B
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 09:45:20 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:25306
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jluhN-0008JL-Ph
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 09:35:23 -0400
+ (Exim 4.90_1) (envelope-from <maxime.coquelin@redhat.com>)
+ id 1jlur0-00024U-5g
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 09:45:19 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592487320;
+ s=mimecast20190719; t=1592487917;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=aLfFWWN786UTNglIQiVmrgn3+v9wpuJECNM2po67mSo=;
- b=SvGT6SQph6GVo7+ChZmCwreA38cqvnI7TydLPQc8FcB+V70+STsi1oTgOrWoD3wC/LV1nr
- +AaUQvgKAiACVW+0ivD1mukK1Pz8YUndo+r0qMnD2rHiR7f+G4A4jmEgxAdLAGzeEgAgyW
- 4OZ6ZGwLY7orGO+9YE9+oVuI1+BVamY=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-229-_y-85SouP3OZMj2N_sc1cA-1; Thu, 18 Jun 2020 09:35:19 -0400
-X-MC-Unique: _y-85SouP3OZMj2N_sc1cA-1
-Received: by mail-wm1-f71.google.com with SMTP id r1so2590721wmh.7
- for <qemu-devel@nongnu.org>; Thu, 18 Jun 2020 06:35:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=aLfFWWN786UTNglIQiVmrgn3+v9wpuJECNM2po67mSo=;
- b=Mmualw3LQXf23an6ODwsvkQpGCcLYAsyEBZTZl3JFsu5ymocb+9p3INp0gzy3PI4rf
- mger0gWB5N7FwAXKhYTIj4RTicWIU5zyWMU2kHRrJXA14nZ6Hi132XIrpo9TS2wO8Mi6
- 06x0Te6RsKAS8fGbHtOGtY9A+Nw4HxfB6J2WGmGLr/m/TLEyzCww3Zb6gw71b0jBYaVM
- UIPtoexFq2rMHKtcVDwWfJQ5TeVioCP6LQXNVxO5Am+hVIXV3Zbt5a9KvXVC7QK+j++o
- mCZtG5LmlZEPsxSiWTGk8+FBkkxB0jZ8dSO33BAoKqY67Pgah0Kf0bLn+puA3wxq2HEw
- lCUw==
-X-Gm-Message-State: AOAM532CqctCu+ceFC0y3dCTi56EAvlhP4eWaD6un5IdyDIJOGbuHWAc
- YQM3Gj5dIj2jmOW42s6Tw1LR2ayUPNP2apSX87yTgZw3Gpnolw4RW3HN5FuLMea5+o5lZ3Skz4t
- f57etSwPLbF/M+38=
-X-Received: by 2002:adf:e782:: with SMTP id n2mr4536586wrm.417.1592487318012; 
- Thu, 18 Jun 2020 06:35:18 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzke9/QOSpZW4+85a3TVRyoYXZmMZdPZKXwkgZ5qvG+1Ceu7D0MQvrZWgqgjV7D1PCYk/MHkA==
-X-Received: by 2002:adf:e782:: with SMTP id n2mr4536563wrm.417.1592487317780; 
- Thu, 18 Jun 2020 06:35:17 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:e1d2:138e:4eff:42cb?
- ([2001:b07:6468:f312:e1d2:138e:4eff:42cb])
- by smtp.gmail.com with ESMTPSA id b187sm3633299wmd.26.2020.06.18.06.35.16
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 18 Jun 2020 06:35:16 -0700 (PDT)
-Subject: Re: [PATCH v1] memory: assert MemoryRegionOps callbacks are defined
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- P J P <ppandit@redhat.com>
-References: <20200618121218.215808-1-ppandit@redhat.com>
- <87r1ucv7pe.fsf@linaro.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <51f137f0-89ee-e130-a43e-c82d0b3623fa@redhat.com>
-Date: Thu, 18 Jun 2020 15:35:14 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ content-transfer-encoding:content-transfer-encoding;
+ bh=5iOXy87a3V3x2Y3WPRqq6iILEy+SafEqiF8HiiGrD6s=;
+ b=BCS9oXZOCvHlDskAZK479NR/9Z5fdkC0KA6Fb4L4V++9ovBQvjLtzBIYrctdShnANFJ57q
+ 30witlhQzXVsKtfmJfbJ0mvYT6w5SBkF9kZrGN5pQbYXzWgFXEbjSscgQXSyPfko1Qnbe2
+ bab5e2ioELndarRFINh/hyk8h6T0voo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-28-NvePuTkJMn61PZu8I-PwBw-1; Thu, 18 Jun 2020 09:45:15 -0400
+X-MC-Unique: NvePuTkJMn61PZu8I-PwBw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B65BC107ACCD
+ for <qemu-devel@nongnu.org>; Thu, 18 Jun 2020 13:45:14 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.36.110.7])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 968B45C220;
+ Thu, 18 Jun 2020 13:45:06 +0000 (UTC)
+From: Maxime Coquelin <maxime.coquelin@redhat.com>
+To: mst@redhat.com, jasowang@redhat.com, lulu@redhat.com, amorenoz@redhat.com,
+ qemu-devel@nongnu.org
+Subject: [PATCH v3] docs: vhost-user: add Virtio status protocol feature
+Date: Thu, 18 Jun 2020 15:45:01 +0200
+Message-Id: <20200618134501.145747-1-maxime.coquelin@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <87r1ucv7pe.fsf@linaro.org>
-Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=maxime.coquelin@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 01:47:12
+Received-SPF: pass client-ip=205.139.110.61;
+ envelope-from=maxime.coquelin@redhat.com; helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 01:32:18
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -115,67 +94,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Prasad J Pandit <pjp@fedoraproject.org>, Li Qiang <liq3ea@gmail.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Lei Sun <slei.casper@gmail.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Maxime Coquelin <maxime.coquelin@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 18/06/20 15:12, Alex Bennée wrote:
->>
->> @@ -1495,6 +1495,9 @@ void memory_region_init_io(MemoryRegion *mr,
->>                             const char *name,
->>                             uint64_t size)
->>  {
->> +    assert(ops);
->> +    assert(ops->read);
->> +    assert(ops->write);
-> 
-> If you look at memory_region_dispatch_write you can see that
-> mr->ops->write being empty is acceptable because it implies
-> mr->ops->write_with_attrs is set instead. I think the same is true for
-> read so I think you need something more like:
-> 
->      assert(ops->read || ops->read_with_attrs);
->      assert(ops->write || ops->write_with_attrs);
+This patch specifies the VHOST_USER_SET_STATUS and
+VHOST_USER_GET_STATUS requests, which are sent by
+the master to update and query the Virtio status
+in the backend.
 
-Also, !ops is acceptable since you have a couple lines below:
+Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
+---
+Changes since v2:
+=================
+- Typo: fix missing # (Jason)
 
-    mr->ops = ops ? ops : &unassigned_mem_ops;
+Changes since v1:
+=================
+- Only keep the spec part in this patch, the implementation will
+  be part of Cindy's Vhost vDPA series it depends on. The goal is
+  to be able to implement it in next DPDK release even if Qemu part
+  is not merged.
+- Add GET_STATUS after discussions with Michael and Jason. It can
+  be used by the master to ensure FEATURES_OK bit set is
+  acknowledged by the backend.
 
+ docs/interop/vhost-user.rst | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
->> +    assert(ops->read);
->> +    assert(ops->write);
-> 
-> Do ROM devices need a ->write function?
-
-Yes, ROMD regions are treated as I/O regions for writes.  However they
-don't need a read function.
-
-> Also doesn't this break a load of running stuff without fixes for all
-> the various missing bits? How far does make check-acceptance get?
-
-This might actually be really close with the above assertions fixed.
-For example, commit 08565552f7 ("cputlb: Move NOTDIRTY handling from I/O
-path to TLB path", 2019-09-25) got rid of io_mem_notdirty.
-
-The only cases I found with "git grep" are:
-
-- tz_ppc_dummy_ops which is broken and should just use NULL ops
-
-- hw/nvram/nrf51_nvm.c's flash_ops which is fixed if ROMD regions are
-changed not to require a read callback.
-
-- designware_pci_host_msi_ops which is broken and should have a dummy
-read callback.
-
-Needless to say, this is something that the submitter should have done,
-not the reviewer.
-
-Paolo
+diff --git a/docs/interop/vhost-user.rst b/docs/interop/vhost-user.rst
+index 688b7c6900..10e3e3475e 100644
+--- a/docs/interop/vhost-user.rst
++++ b/docs/interop/vhost-user.rst
+@@ -816,6 +816,7 @@ Protocol features
+   #define VHOST_USER_PROTOCOL_F_RESET_DEVICE         13
+   #define VHOST_USER_PROTOCOL_F_INBAND_NOTIFICATIONS 14
+   #define VHOST_USER_PROTOCOL_F_CONFIGURE_MEM_SLOTS  15
++  #define VHOST_USER_PROTOCOL_F_STATUS               16
+ 
+ Master message types
+ --------------------
+@@ -1307,6 +1308,29 @@ Master message types
+   ``VHOST_USER_ADD_MEM_REG`` message, this message is used to set and
+   update the memory tables of the slave device.
+ 
++``VHOST_USER_SET_STATUS``
++  :id: 39
++  :equivalent ioctl: VHOST_VDPA_SET_STATUS
++  :slave payload: N/A
++  :master payload: ``u64``
++
++  When the ``VHOST_USER_PROTOCOL_F_STATUS`` protocol feature has been
++  successfully negotiated, this message is submitted by the master to
++  notify the backend with updated device status as defined in the Virtio
++  specification.
++
++``VHOST_USER_GET_STATUS``
++  :id: 40
++  :equivalent ioctl: VHOST_VDPA_GET_STATUS
++  :slave payload: ``u64``
++  :master payload: N/A
++
++  When the ``VHOST_USER_PROTOCOL_F_STATUS`` protocol feature has been
++  successfully negotiated, this message is submitted by the master to
++  query the backend for its device status as defined in the Virtio
++  specification.
++
++
+ Slave message types
+ -------------------
+ 
+-- 
+2.26.2
 
 
