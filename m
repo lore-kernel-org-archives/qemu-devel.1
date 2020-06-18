@@ -2,86 +2,62 @@ Return-Path: <SRS0=FaGC=77=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4232EC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 20:51:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50C06C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 20:54:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 06DF320739
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 20:51:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lUDZqEkb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06DF320739
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 24E1020890
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 20:54:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24E1020890
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=tribudubois.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57242 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59804 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jm1VK-00029q-5Q
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 16:51:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33638)
+	id 1jm1YH-0003g5-CO
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 16:54:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34324)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jm1Ui-0001jG-TZ
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 16:50:44 -0400
-Received: from mail-oi1-x22d.google.com ([2607:f8b0:4864:20::22d]:39235)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jm1Ug-000899-Nd
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 16:50:44 -0400
-Received: by mail-oi1-x22d.google.com with SMTP id d67so6370041oig.6
- for <qemu-devel@nongnu.org>; Thu, 18 Jun 2020 13:50:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=SjuTceJmTEsgSONoBi/0cjWmkJVrr4lHVjc12FFdBiw=;
- b=lUDZqEkbpKE6IyJTsM7gPp/0DXXFLSghhGxY6sLbMDKi1Owc1AEMNebMLAzFp4JsdA
- C4kErzWzD6RmPu1yQ6aAO1gV9VPFWfQxFFlSEb+E+3ceOFl+D+NhYg5y1uDWxu/Rbndf
- W54DkeERzC3zduJUhWxmR063nvdYELIDvysx18MrfKTCnNwdGlPVUsSFzGjLgIqh/y6u
- /8OYV0IAet2xZcYKMLGY++j7RXsMek3byoIdQe4OtwgWsXRAq6za4dHhfUg3UlVxhBqC
- HZpJlTIIo5qh9q4Y1G7z+infbbUP8AeTjncswoRh8PQ2+wJTlvf1cwA6fzw5yucSUCzN
- DZOg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=SjuTceJmTEsgSONoBi/0cjWmkJVrr4lHVjc12FFdBiw=;
- b=PfedMnYMIcFlHlrP31P4oeuLL7AwaUbd5bwJmrKZnPOEwzGnOik7/hMmFpMU1YFqZw
- PVYxP6y8v7z2eqh+VYtyMwrGY+a9VAMeCC5eu+s7U0aQfNKtkVnEIeaen4ujKwt9kxps
- sVkSP080j9M/B4j6E5xSt13uPzBJVkM3kyuhlTr0riFB+2tmMeij7N5Jyj1OGZtWTw0d
- J2lMRJE7K0JQM9FKIXdfzf6h2BUYfYQ1owNoqvgBKw4cSw7OU7P5BYA3OUEHKfldz6SV
- P3wAqDlbDCRzJLjDbTxOT2WwvUe9rcCdSsoENE1nbo72IHM+O+xzXX3mhC2LYKgLYCJe
- Ze4A==
-X-Gm-Message-State: AOAM533+V7EMntlnroQ72IdAsmmdPLRBiC+eWY6EmePnOsE6pXOqe1tK
- q5UClVKIJcaKC2wVw5+G4+/P0WT0KZ98MSbPTI0CQA==
-X-Google-Smtp-Source: ABdhPJzRDssWB+eBY6MEIGQzvlhcI8HENrGuhiNLd+HxSvaff388lvvhDWQ5y68AKqhkO5KM7Z8X5yKqGeYoae7339g=
-X-Received: by 2002:aca:1a07:: with SMTP id a7mr544388oia.163.1592513441319;
- Thu, 18 Jun 2020 13:50:41 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <jcd@tribudubois.net>)
+ id 1jm1XY-0002mH-VA; Thu, 18 Jun 2020 16:53:40 -0400
+Received: from relay5-d.mail.gandi.net ([217.70.183.197]:52907)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <jcd@tribudubois.net>)
+ id 1jm1XW-0008PM-DQ; Thu, 18 Jun 2020 16:53:40 -0400
+X-Originating-IP: 82.252.130.88
+Received: from [192.168.1.155] (lns-bzn-59-82-252-130-88.adsl.proxad.net
+ [82.252.130.88]) (Authenticated sender: jcd@tribudubois.net)
+ by relay5-d.mail.gandi.net (Postfix) with ESMTPSA id 5DCE51C0008;
+ Thu, 18 Jun 2020 20:53:31 +0000 (UTC)
+Subject: Re: [PATCH v5 3/3] hw/net/imx_fec: improve PHY implementation.
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <cover.1591272275.git.jcd@tribudubois.net>
+ <cbafa49a59659051387e43b7b35d8f280e59f1a3.1591272275.git.jcd@tribudubois.net>
+ <CAFEAcA-ivCjAcK=mVBktdN_ms09M096WF=9zoKM+11=HzgmwSA@mail.gmail.com>
+From: Jean-Christophe DUBOIS <jcd@tribudubois.net>
+Message-ID: <a1e6519c-4e8a-9557-f3f5-4088904ba7d7@tribudubois.net>
+Date: Thu, 18 Jun 2020 22:53:30 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-References: <CAHiYmc7iD4AoV3Lj5igTQMYESNHU6_-_7cwujhsgJYv5zKraDQ@mail.gmail.com>
- <CAHiYmc4TmQ+67GNQJY3Mm0BSFuipUBFPpBLuNxBfhArCn823CQ@mail.gmail.com>
-In-Reply-To: <CAHiYmc4TmQ+67GNQJY3Mm0BSFuipUBFPpBLuNxBfhArCn823CQ@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 18 Jun 2020 21:50:30 +0100
-Message-ID: <CAFEAcA_TJnzUd-++OeSda0hQdYUahcy-Ba7RH03o20aEqsGjig@mail.gmail.com>
-Subject: Re: [DISCUSSION] GCOV support
-To: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::22d;
- envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x22d.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+In-Reply-To: <CAFEAcA-ivCjAcK=mVBktdN_ms09M096WF=9zoKM+11=HzgmwSA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Received-SPF: pass client-ip=217.70.183.197; envelope-from=jcd@tribudubois.net;
+ helo=relay5-d.mail.gandi.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/18 16:53:34
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -35
+X-Spam_score: -3.6
+X-Spam_bar: ---
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -95,53 +71,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, Peter Chubb <peter.chubb@nicta.com.au>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 18 Jun 2020 at 20:41, Aleksandar Markovic
-<aleksandar.qemu.devel@gmail.com> wrote:
-> =D1=87=D0=B5=D1=82=D0=B2=D1=80=D1=82=D0=B0=D0=BA, 18. =D1=98=D1=83=D0=BD =
-2020., Aleksandar Markovic <aleksandar.qemu.devel@gmail.com> =D1=98=D0=B5 =
-=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
->> You may recall that I signalled on couple of occasions that there are so=
-me problems related to gcov builds in out-of-tree builds.
+Le 15/06/2020 à 15:03, Peter Maydell a écrit :
+> On Thu, 4 Jun 2020 at 13:39, Jean-Christophe Dubois <jcd@tribudubois.net> wrote:
+>> improve the PHY implementation with more generic code.
 >>
->> It turned out that those problems manifest on some opder Linux distribut=
-ion, and are always related to the gcovr being older than 4.1. For older gc=
-ovr, the tool simply doesn't connect properly executable and its source fil=
-es, and no coverage report is generated (or perhaps only some small portion=
-s, but, on any case, gcov builds are virtually unusable).
+>> This patch remove a lot of harcoded values to replace them with
+>> generic symbols from header files.
+>>
+>> Signed-off-by: Jean-Christophe Dubois <jcd@tribudubois.net>
+>> ---
+>>   v2: Not present
+>>   v3: Not present
+>>   v4: Not present
+>>   v5: improve PHY implementation.
+>>
+>>   hw/net/imx_fec.c     | 76 +++++++++++++++++++++++++++-----------------
+>>   include/hw/net/mii.h |  4 +++
+>>   2 files changed, 50 insertions(+), 30 deletions(-)
+>
+>> -    case 5:     /* Auto-neg Link Partner Ability */
+>> -        val = 0x0f71;
+>> +    case MII_ANLPAR:     /* Auto-neg Link Partner Ability */
+>> +        val = / | MII_ANLPAR_10 | MII_ANLPAR_10FD |
+>> +              MII_ANLPAR_TX | MII_ANLPAR_TXFD | MII_ANLPAR_PAUSE |
+>> +              MII_ANLPAR_PAUSEASY;
+> The old value is 0x0f71, but the new one with the constants
+> is 0x0de1.
 
-Ah. Thanks for tracking this down.
+First of I should say that this PHY, first borrowed by the mfc_fec.c 
+(coldfire ethernet device) from lan9118 (and now by imx_fec.c) is not 
+one used on any real i.MX (i.MX6, i.MX7, i.MX31, i.MX25, ...) based 
+board that I know of (this particular PHY is embedded n the lan9118 
+ethernet device)
 
->> I propose that we don't bother supporting systems with gcovr older than =
-4.1. We could check version of gcovr in confugure, and refuse gcov builds i=
-f that version is older than 4.1.
+It is there because we were in need of a PHY and this PHY needs to be 
+simple and more or less standard.
 
-Seems potentially reasonable. We don't actually check for gcovr at all in
-configure right now...
+I might have missed something but I am not really aware of way in Qemu 
+to swap PHYs for a given ethernet emulator depending on the emulated board.
 
-It looks like we only use gcovr in creating the coverage-report.html --
-I guess in theory if you wanted to use gcov directly and didn't care
-about the coverage report you could still do that without a new gcovr
-(ie if you were just using the facilities we provided before commit
-fe8bf5f62972 in 2018). But then we'd have to make the handling of the
-coverage report conditional on "do we have gcovr". I don't use gcov
-so I don't have any idea whether "use gcov data but don't bother with
-the gcovr coverage report" is a useful thing for anybody to be doing
-or if it's silly and not worth the effort to try to support.
+So here this PHY was just a blind cut and paste of the lan9118.c PHY 
+part to get a reasonable working PHY for the FEC/ENET device.
 
-https://repology.org/project/gcovr/versions has the distro
-coverage of gcovr versions. I note that Ubuntu Bionic only
-has 3.4 still. But for a developer-use-only tool we can
-be a bit less strict about our supported-distros policy I think.
+So here the previous value of this register is not really meaningful. It 
+is a mix of standard MII defined bits and LAN911X specific bits (for 
+which I don't necessarily have definition ).
 
-Side note: the coverage-report.html targets probably ought
-to be only allowed if we have gcov/gcovr enabled.
+Here I decided to restrict the implementation of this rather "virtual" 
+PHY to only standard defined bits
 
-thanks
--- PMM
+actually I think, I should have removed a lot more lan911x specific 
+bits/registers to get to a really simple/trivial standard PHY.
+
+>> -    case 30:    /* Interrupt mask */
+>> +    case MII_SMC911X_IM:    /* Interrupt mask */
+>>           val = s->phy_int_mask;
+>>           break;
+>> -    case 17:
+>> -    case 18:
+>> +    case MII_NSR:
+>> +        val = 1 << 6;
+>> +        break;
+> The old code didn't have a case for MII_NSR (16).
+
+I am not sure anymore why I added MII_NSR register. It is not present on 
+lan9118 ethernet device but it is a standard defined register.
+
+>> +    case MII_LBREMR:
+>> +    case MII_REC:
+>>       case 27:
+>>       case 31:
+>
+>> -    case 4:     /* Auto-neg advertisement */
+>> -        s->phy_advertise = (val & 0x2d7f) | 0x80;
+>> +    case MII_ANAR:     /* Auto-neg advertisement */
+>> +        s->phy_advertise = (val & (MII_ANAR_PAUSE_ASYM | MII_ANAR_PAUSE |
+>> +                                   MII_ANAR_TXFD | MII_ANAR_TX |
+>> +                                   MII_ANAR_10FD | MII_ANAR_10 | 0x1f)) |
+>> +                                   MII_ANAR_TX;
+> The old code does & 0x2d7f; the new code is & 0xdff.
+Same reason as the ANLPAR register.
+>>           break;
+> If some of these are bug fixes, please can you put them in a separate
+> patch, so that the "use symbolic constants" change can be reviewed
+> as making no functional changes?
+>
+> thanks
+> -- PMM
+>
+
 
