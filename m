@@ -2,68 +2,68 @@ Return-Path: <SRS0=FaGC=77=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91619C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 13:38:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8C19C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 13:38:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5A3202082F
-	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 13:38:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AEFEF207D8
+	for <qemu-devel@archiver.kernel.org>; Thu, 18 Jun 2020 13:38:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g08TkrnM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A3202082F
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bm3Gksjf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AEFEF207D8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39448 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42144 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jlujv-0001Qt-K9
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 09:37:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40686)
+	id 1jlukm-0002ZL-1L
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 09:38:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41014)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jluVY-00075V-Tf
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 09:23:08 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35023
+ id 1jluW5-0000CL-Bg
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 09:23:41 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:50515
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jluVV-0005pI-PP
- for qemu-devel@nongnu.org; Thu, 18 Jun 2020 09:23:08 -0400
+ id 1jluW2-0005uj-F2
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 09:23:41 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592486585;
+ s=mimecast20190719; t=1592486617;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
- references:references; bh=9DCVqfUahatcxKFH6MvHYlG95pfvPCFHs33C502Wyd8=;
- b=g08TkrnMRT5iQFhOe/KU3FM2N5CImOW2UpknyYxPLoBG2TCX9Qkp4AUk19E2I09tctDGNB
- 1VBzSFF1iNIbLwZXkfUN9gu5kQtJ9nq/4e8aeMn0Es72Dir8pGDg6zUCEKbnfASBEGjO7Q
- F71dnQlz4QgQ5k6ADQAIqcHKenTd/iY=
+ references:references; bh=vG0s1oHZ1P8zXtguCxiLEMRTZ70YOVVV1rooYTo+RUA=;
+ b=Bm3GksjfGzVeSNHhzfLp3W075YsqlhiwjLBYzELyylMy4jJZmkmKzWaNS3d4T+69On7nlQ
+ OdXyecbeHtBkuKgFynU/JQopJgVmjZ0U5trjOWQqlWrknZBFL+lGzOyJ1uCDkQmO2iSi4y
+ dl8bowdqtnYgfGqUy6YzAsztpBUmkWI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-418-CkT1--WMO066iMo5jLmh5Q-1; Thu, 18 Jun 2020 09:23:03 -0400
-X-MC-Unique: CkT1--WMO066iMo5jLmh5Q-1
+ us-mta-132-nEMH0YUDORmK_qOUT7HGqw-1; Thu, 18 Jun 2020 09:23:34 -0400
+X-MC-Unique: nEMH0YUDORmK_qOUT7HGqw-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7BF57107ACF8;
- Thu, 18 Jun 2020 13:22:58 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 28F8110CE780;
+ Thu, 18 Jun 2020 13:23:33 +0000 (UTC)
 Received: from jason-ThinkPad-T430s.redhat.com (ovpn-12-109.pek2.redhat.com
  [10.72.12.109])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6F0375BAC1;
- Thu, 18 Jun 2020 13:22:56 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6A19E5BAC1;
+ Thu, 18 Jun 2020 13:23:30 +0000 (UTC)
 From: Jason Wang <jasowang@redhat.com>
 To: peter.maydell@linaro.org,
 	qemu-devel@nongnu.org
-Subject: [PULL V2 20/33] net: cadence_gem: Update the reset value for
- interrupt mask register
-Date: Thu, 18 Jun 2020 21:21:35 +0800
-Message-Id: <1592486508-6135-21-git-send-email-jasowang@redhat.com>
+Subject: [PULL V2 32/33] net: Drop the legacy "name" parameter from the -net
+ option
+Date: Thu, 18 Jun 2020 21:21:47 +0800
+Message-Id: <1592486508-6135-33-git-send-email-jasowang@redhat.com>
 In-Reply-To: <1592486508-6135-1-git-send-email-jasowang@redhat.com>
 References: <1592486508-6135-1-git-send-email-jasowang@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
@@ -80,7 +80,7 @@ X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,35 +93,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>,
- Jason Wang <jasowang@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Jason Wang <jasowang@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
+From: Thomas Huth <thuth@redhat.com>
 
-Mask all interrupt on reset.
+It's been deprecated since QEMU v3.1, so it's time to finally
+remove it. The "id" parameter can simply be used instead.
 
-Signed-off-by: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- hw/net/cadence_gem.c | 1 +
- 1 file changed, 1 insertion(+)
+ docs/system/deprecated.rst | 15 +++++++++------
+ net/net.c                  | 10 +---------
+ qapi/net.json              |  3 ---
+ 3 files changed, 10 insertions(+), 18 deletions(-)
 
-diff --git a/hw/net/cadence_gem.c b/hw/net/cadence_gem.c
-index 2211550..df6d818 100644
---- a/hw/net/cadence_gem.c
-+++ b/hw/net/cadence_gem.c
-@@ -1375,6 +1375,7 @@ static void gem_reset(DeviceState *d)
-     s->regs[GEM_DESCONF2] = 0x2ab10000 | s->jumbo_max_len;
-     s->regs[GEM_DESCONF5] = 0x002f2045;
-     s->regs[GEM_DESCONF6] = GEM_DESCONF6_64B_MASK;
-+    s->regs[GEM_INT_Q1_MASK] = 0x00000CE6;
-     s->regs[GEM_JUMBO_MAX_LEN] = s->jumbo_max_len;
+diff --git a/docs/system/deprecated.rst b/docs/system/deprecated.rst
+index 544ece0..3a25559 100644
+--- a/docs/system/deprecated.rst
++++ b/docs/system/deprecated.rst
+@@ -47,12 +47,6 @@ The 'file' driver for drives is no longer appropriate for character or host
+ devices and will only accept regular files (S_IFREG). The correct driver
+ for these file types is 'host_cdrom' or 'host_device' as appropriate.
  
-     if (s->num_priority_queues > 1) {
+-``-net ...,name=``\ *name* (since 3.1)
+-''''''''''''''''''''''''''''''''''''''
+-
+-The ``name`` parameter of the ``-net`` option is a synonym
+-for the ``id`` parameter, which should now be used instead.
+-
+ ``-smp`` (invalid topologies) (since 3.1)
+ '''''''''''''''''''''''''''''''''''''''''
+ 
+@@ -441,6 +435,15 @@ What follows is a record of recently removed, formerly deprecated
+ features that serves as a record for users who have encountered
+ trouble after a recent upgrade.
+ 
++System emulator command line arguments
++--------------------------------------
++
++``-net ...,name=``\ *name* (removed in 5.1)
++'''''''''''''''''''''''''''''''''''''''''''
++
++The ``name`` parameter of the ``-net`` option was a synonym
++for the ``id`` parameter, which should now be used instead.
++
+ QEMU Machine Protocol (QMP) commands
+ ------------------------------------
+ 
+diff --git a/net/net.c b/net/net.c
+index 4c62b10..e55d357 100644
+--- a/net/net.c
++++ b/net/net.c
+@@ -969,12 +969,10 @@ static int net_client_init1(const void *object, bool is_netdev, Error **errp)
+ {
+     Netdev legacy = {0};
+     const Netdev *netdev;
+-    const char *name;
+     NetClientState *peer = NULL;
+ 
+     if (is_netdev) {
+         netdev = object;
+-        name = netdev->id;
+ 
+         if (netdev->type == NET_CLIENT_DRIVER_NIC ||
+             !net_client_init_fun[netdev->type]) {
+@@ -987,12 +985,6 @@ static int net_client_init1(const void *object, bool is_netdev, Error **errp)
+         const NetLegacyOptions *opts = net->opts;
+         legacy.id = net->id;
+         netdev = &legacy;
+-        /* missing optional values have been initialized to "all bits zero" */
+-        name = net->has_id ? net->id : net->name;
+-
+-        if (net->has_name) {
+-            warn_report("The 'name' parameter is deprecated, use 'id' instead");
+-        }
+ 
+         /* Map the old options to the new flat type */
+         switch (opts->type) {
+@@ -1052,7 +1044,7 @@ static int net_client_init1(const void *object, bool is_netdev, Error **errp)
+         }
+     }
+ 
+-    if (net_client_init_fun[netdev->type](netdev, name, peer, errp) < 0) {
++    if (net_client_init_fun[netdev->type](netdev, netdev->id, peer, errp) < 0) {
+         /* FIXME drop when all init functions store an Error */
+         if (errp && !*errp) {
+             error_setg(errp, QERR_DEVICE_INIT_FAILED,
+diff --git a/qapi/net.json b/qapi/net.json
+index cebb1b5..fc7c95f 100644
+--- a/qapi/net.json
++++ b/qapi/net.json
+@@ -474,8 +474,6 @@
+ #
+ # @id: identifier for monitor commands
+ #
+-# @name: identifier for monitor commands, ignored if @id is present
+-#
+ # @opts: device type specific properties (legacy)
+ #
+ # Since: 1.2
+@@ -483,7 +481,6 @@
+ { 'struct': 'NetLegacy',
+   'data': {
+     '*id':   'str',
+-    '*name': 'str',
+     'opts':  'NetLegacyOptions' } }
+ 
+ ##
 -- 
 2.5.0
 
