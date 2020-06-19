@@ -2,89 +2,87 @@ Return-Path: <SRS0=Yszf=AA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D94BCC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 14:54:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59C8EC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 14:56:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A6B88217D8
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 14:54:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2377A21852
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 14:56:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NUqnMPMA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6B88217D8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GlC96rCH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2377A21852
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50446 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54216 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmIPq-00025I-Ur
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 10:54:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45628)
+	id 1jmIRD-0005wb-Fo
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 10:56:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46760)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jmIMO-000441-5h; Fri, 19 Jun 2020 10:51:16 -0400
-Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:33953)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jmIQ9-0003cg-L9
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 10:55:09 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:34340)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jmIMF-0003fn-JK; Fri, 19 Jun 2020 10:51:12 -0400
-Received: by mail-wr1-x432.google.com with SMTP id v3so2477308wrc.1;
- Fri, 19 Jun 2020 07:51:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=hlW8G4yJ34f0vynTy4tG90YnknQAoEqpm5MZOqmTBCQ=;
- b=NUqnMPMAqDOv5fMbVb6JNPuJiIMTEFmJ5QZ7ywbAd6XpOgCVudatv2rgGyxfIeH0EO
- k191b1SwL4K4t04+L2LyHtlFdQV6cxecV1CooXVH0Mk6QLMK2JLbaDAKdTHF0v/guk1z
- VbFs2E93kbfsNCyv8LugsbOT8PQkLPySMi2MuzOoOtok55x5v4qvDMmTm6AkKOgQmAHZ
- qTSF6kPTTYmU2OEoInlrgmC++46ojn4Rv5KkWNyOwrYDMdcfFMow3X+qrRul9qtVYk4L
- +KW913GINz4kuQpDP5OVnsKYh5p2EGC422pHEYetv35qYSmaVTuhndzvJRQpisO14ox2
- JKtg==
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jmIQ4-0004F4-I9
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 10:55:09 -0400
+Received: by mail-ot1-x343.google.com with SMTP id n5so7509119otj.1
+ for <qemu-devel@nongnu.org>; Fri, 19 Jun 2020 07:55:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=+AVsDmzl/KPwBklkOCeD+E70faxKMAYgjL0ynrUExwk=;
+ b=GlC96rCHuYx0paUwo84104eR+Xe5SpId3azTJIyvaYyiCqVw8hqJuOK8SFkAjHaSZj
+ B3vRDyYkdCtD7cDazn2XSj577ZSwLoScl5M6OWudoglTxQ09Ydrs9O5RZvHxVEweXOKV
+ IvHWprEK7I1wgeN7BoIMxC49wWfPSNH2+EsIlDCitEuNtbGTlXdLKBPdFmcYH1yssPvr
+ LA4xHROLmTTNWfDOJD6Z+snhvH6ryztcHACMwBC9MYxbho6QFPEvXitJ2XdIcFu2TBIs
+ Pii+inY7PTbY/0Vq93GXcX6+Q4I1RRCfRDW7CSMDYa+NBBHHGf0HXvsJpxzA13iMrKnl
+ rgUA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=hlW8G4yJ34f0vynTy4tG90YnknQAoEqpm5MZOqmTBCQ=;
- b=QwCTK1P2fOd26f7q0Q6EiwhsS44LT9PaRqxg9VNW/2YqD40oufIei7DdHbOoGFKfwU
- cUiZSKhKWbAAa6F+o9sOXM1MiwXDLJuqL25pgGI75+kFY41EjLRLjP1s3aDhmjMVMvTA
- 5zeDxw96/8UroG3esWK5RSFkhgibsjvlhAMyrRhCw/WXKUgo26eibq59Tx1ckDROr5Ow
- 9wtcd7djpmfYIJDFOV/xMUD7nb/MztuJdvjv5gXAn++TJjFN0RK59HZPcdkPdF1n2gNk
- Zeo10hjHp9gp9sp1Q/uRhlIlM0w76em3amvxZW4cTrs6jJ54chJoZ341wUrfPReAh1XN
- CpPg==
-X-Gm-Message-State: AOAM530yqIBQaqISTOH4We1UDJkgvVeVXKfdalMNa+jYnruStstbphnt
- EAG07TqTHvbQPXygRaPNe2nCCMNx
-X-Google-Smtp-Source: ABdhPJyFfifSsx0nUIcixf15KJdYf0V/BK9bg2mrXczBKMvQGx5TC8UJeKrShfDK1rCyWAZv02eqbw==
-X-Received: by 2002:adf:ff8c:: with SMTP id j12mr4472155wrr.230.1592578264046; 
- Fri, 19 Jun 2020 07:51:04 -0700 (PDT)
-Received: from localhost.localdomain (93.red-83-59-160.dynamicip.rima-tde.net.
- [83.59.160.93])
- by smtp.gmail.com with ESMTPSA id e12sm7512548wro.52.2020.06.19.07.51.02
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 19 Jun 2020 07:51:03 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 0/4] hw/misc/pca9552: Trace LED On/Off events
-Date: Fri, 19 Jun 2020 16:50:57 +0200
-Message-Id: <20200619145101.1637-1-f4bug@amsat.org>
-X-Mailer: git-send-email 2.21.3
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=+AVsDmzl/KPwBklkOCeD+E70faxKMAYgjL0ynrUExwk=;
+ b=NvcymBrYmFHtg5Au6wrkgERcJL3HTZrlH+XQqVTW3IbjeABHRbn58XMUSpc1JMkyzN
+ OF1HauXD4cjTm627yUBK9zIqOar6GPE8Krax63o9aYCtUXONxNJ9SfKBqijJi/l54TRA
+ iGIMtpkKZ52ESarHokPKqLxVYbsTEMFiVrMeOa808ZgW37UNoeI3fokGN+TzOEPlQtEc
+ oa69nSnawQcep2yOX5bFwkO2njJq2Umwjc/Jd5sHjsKRfrmBfpMLbrXiIdjuk6XyKHxS
+ 2eMaHSip/ySIyNhfSybtmvDVkEo//lWTMQ3vVLA2yNQNjNfSBA7qS7kpF4fT2nxo2zVO
+ BMXQ==
+X-Gm-Message-State: AOAM531Sv1WhLXR2Df/2F7R8X3zwgrN200/P/4lU2+TSisfN8F1aVbom
+ 15DKQo82YxIQ09t98BueAu0gLww1Fmfs6KJ+nuUb1g==
+X-Google-Smtp-Source: ABdhPJyV7enVCm/5TAjEydQ0b5xYn3sNUc1AxELQmm1H5a2XCeqgYGMS9MX0R6GODjRH9OIHjgUa0PBS+PtIIpI1Sj4=
+X-Received: by 2002:a9d:67d6:: with SMTP id c22mr3163742otn.221.1592578503237; 
+ Fri, 19 Jun 2020 07:55:03 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::432;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x432.google.com
+References: <20200619135844.23307-1-alex.bennee@linaro.org>
+In-Reply-To: <20200619135844.23307-1-alex.bennee@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 19 Jun 2020 15:54:52 +0100
+Message-ID: <CAFEAcA-KX-2zjktg9A8dPdo6RkxtafM7YnahKaP=uftCO-7=GQ@mail.gmail.com>
+Subject: Re: [RFC PATCH] docs/devel: add some notes on tcg-icount for
+ developers
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::343;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x343.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,73 +95,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jeffery <andrew@aj.id.au>,
- Joaquin de Andres <me@xcancerberox.com.ar>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Esteban Bosse <estebanbosse@gmail.com>, qemu-arm@nongnu.org,
- =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
- Joel Stanley <joel@jms.id.au>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Pavel Dovgalyuk <dovgaluk@ispras.ru>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This series add trace events to better display LEDs changes.
-This helps me to work on a generic LED device, see:
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg711917.html
+On Fri, 19 Jun 2020 at 14:58, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
+te:
+>
+> This attempts to bring together my understanding of the requirements
+> for icount behaviour into one reference document for our developer
+> notes. It currently make one piece of conjecture which I think is true
+> that we don't need gen_io_start/end statements for non-MMIO related
+> I/O operations.
 
-Example when booting an obmc-phosphor-image, we can see the LED #14
-(front-power LED) starting to blink.
+> +Other I/O operations
+> +--------------------
+> +
+> +MMIO isn't the only type of operation for which we might need a
+> +correct and accurate clock. IO port instructions and accesses to
+> +system registers are the common examples here. For the clock to be
+> +accurate you end a translation block on these instructions.
+> +
+> +.. warning:: (CONJECTURE) instructions that won't get trapped in the
+> +             io_read/writex shouldn't need gen_io_start/end blocks
+> +             around them.
 
-- ASCII LED bar view:
+I think this is backwards -- instructions where icount is handled
+by io_readx/io_writex are the ones that don't need to be marked
+with gen_io_start. It's the i/o instructions that don't go through
+io_readx/io_writex that need gen_io_start.
 
-  $ qemu-system-arm -M witherspoon-bmc -trace pca9552_leds_status
-  19286@1592574170.202791:pca9552_leds_status 0x55dde47807c0 LEDs 0-15 [*...............]
-  19286@1592574170.203609:pca9552_leds_status 0x55dde47807c0 LEDs 0-15 [**..............]
-  19286@1592574170.204102:pca9552_leds_status 0x55dde47807c0 LEDs 0-15 [***.............]
-  19286@1592574170.204415:pca9552_leds_status 0x55dde47807c0 LEDs 0-15 [****............]
-  19286@1592574170.204758:pca9552_leds_status 0x55dde47807c0 LEDs 0-15 [****.........*..]
-  19286@1592574170.205070:pca9552_leds_status 0x55dde47807c0 LEDs 0-15 [****.........**.]
-  19286@1592574170.205380:pca9552_leds_status 0x55dde47807c0 LEDs 0-15 [****.........***]
-  19286@1592574235.384845:pca9552_leds_status 0x55dde47807c0 LEDs 0-15 [****.........*.*]
-  19286@1592574235.894049:pca9552_leds_status 0x55dde47807c0 LEDs 0-15 [****.........***]
-  19286@1592574236.404277:pca9552_leds_status 0x55dde47807c0 LEDs 0-15 [****.........*.*]
-  19286@1592574236.914644:pca9552_leds_status 0x55dde47807c0 LEDs 0-15 [****.........***]
-  19286@1592574237.424558:pca9552_leds_status 0x55dde47807c0 LEDs 0-15 [****.........*.*]
-  19286@1592574237.934580:pca9552_leds_status 0x55dde47807c0 LEDs 0-15 [****.........***]
-  19286@1592574238.444688:pca9552_leds_status 0x55dde47807c0 LEDs 0-15 [****.........*.*]
-
-- Only display LEDs which status changes:
-
-  $ qemu-system-arm -M witherspoon-bmc -trace pca9552_led_change
-  23367@1592575218.896117:pca9552_led_change 0x557cb6896d80 LED id:0 status: 0 -> 1
-  23367@1592575218.897072:pca9552_led_change 0x557cb6896d80 LED id:1 status: 0 -> 1
-  23367@1592575218.897487:pca9552_led_change 0x557cb6896d80 LED id:2 status: 0 -> 1
-  23367@1592575218.897855:pca9552_led_change 0x557cb6896d80 LED id:3 status: 0 -> 1
-  23367@1592575218.898256:pca9552_led_change 0x557cb6896d80 LED id:13 status: 0 -> 1
-  23367@1592575218.898663:pca9552_led_change 0x557cb6896d80 LED id:14 status: 0 -> 1
-  23367@1592575218.899138:pca9552_led_change 0x557cb6896d80 LED id:15 status: 0 -> 1
-  23367@1592575281.593379:pca9552_led_change 0x557cb6896d80 LED id:14 status: 1 -> 0
-  23367@1592575282.102994:pca9552_led_change 0x557cb6896d80 LED id:14 status: 0 -> 1
-  23367@1592575282.613558:pca9552_led_change 0x557cb6896d80 LED id:14 status: 1 -> 0
-  23367@1592575283.122774:pca9552_led_change 0x557cb6896d80 LED id:14 status: 0 -> 1
-
-For information about how to test the obmc-phosphor-image, see:
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg712911.html
-
-Supersedes: <20200617064734.26956-1-f4bug@amsat.org>
-
-Philippe Mathieu-Daudé (4):
-  hw/misc/pca9552: Replace magic value by PCA9552_LED_COUNT definition
-  hw/misc/pca9552: Add a PCA955X_LED_MAX definition
-  hw/misc/pca9552: Trace LED On/Off events
-  hw/misc/pca9552: Trace LED change events
-
- include/hw/misc/pca9552.h |  2 ++
- hw/misc/pca9552.c         | 60 ++++++++++++++++++++++++++++++++++++++-
- hw/misc/trace-events      |  4 +++
- 3 files changed, 65 insertions(+), 1 deletion(-)
-
--- 
-2.21.3
-
+thanks
+-- PMM
 
