@@ -2,87 +2,99 @@ Return-Path: <SRS0=Yszf=AA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 615E5C433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 19:16:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BEE35C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 19:26:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2C71620809
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 19:16:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8B9CA21532
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 19:26:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AzS/16qd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C71620809
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GXIfl0JH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B9CA21532
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34104 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38596 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmMVA-0004yi-Dd
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 15:16:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33568)
+	id 1jmMf9-0004hi-PY
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 15:26:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36364)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vgoyal@redhat.com>) id 1jmMUT-0004RN-Jc
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 15:15:53 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:50127
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <vgoyal@redhat.com>) id 1jmMUR-00010z-Uz
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 15:15:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592594150;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=t21k1U6S7U9WKM5QqQkL3iAtt4A8qkLHkkfB0i72AsI=;
- b=AzS/16qde7dBVsTNPl6xxYJkW1OfpEYSOFnej4Du4wKgNWkuCqPQOe8sey3oWodX5wzl5/
- 8mXZ8INNvBpmw4xClQR/EvCRhIbv+SoacPlk6/WG+pNOJYl+hwa6TtxyelV2/WYxgzFntC
- TE/qRyePXZnLKngPHyDwtRbwWy0JjCU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-98-4nsCQTVRNBaYgLem4TwigQ-1; Fri, 19 Jun 2020 15:15:47 -0400
-X-MC-Unique: 4nsCQTVRNBaYgLem4TwigQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9D32DBFC3;
- Fri, 19 Jun 2020 19:15:41 +0000 (UTC)
-Received: from horse.redhat.com (ovpn-114-35.rdu2.redhat.com [10.10.114.35])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 319D32AF4D;
- Fri, 19 Jun 2020 19:15:41 +0000 (UTC)
-Received: by horse.redhat.com (Postfix, from userid 10451)
- id AC260220390; Fri, 19 Jun 2020 15:15:40 -0400 (EDT)
-Date: Fri, 19 Jun 2020 15:15:40 -0400
-From: Vivek Goyal <vgoyal@redhat.com>
-To: Chirantan Ekbote <chirantan@chromium.org>
-Subject: Re: [Virtio-fs] [PATCH 0/2] virtiofsd: drop Linux capabilities(7)
-Message-ID: <20200619191540.GI3154@redhat.com>
-References: <20200416164907.244868-1-stefanha@redhat.com>
- <20200618190816.GD3814@redhat.com> <20200618191655.GI2769@work-vm>
- <20200618192717.GE3814@redhat.com>
- <CAJFHJrrJzPLatNvw2xC3WYLbzCW0+DB+4UczQHGPBF9p+WGYQA@mail.gmail.com>
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jmMeQ-0004AL-53
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 15:26:10 -0400
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:36739)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jmMeO-0002io-6v
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 15:26:09 -0400
+Received: by mail-pl1-x644.google.com with SMTP id j4so4299406plk.3
+ for <qemu-devel@nongnu.org>; Fri, 19 Jun 2020 12:26:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=TJlps8KoSmjaLf7uOiyh88B4yeRZgq7XCqlG0Om+4HM=;
+ b=GXIfl0JHnGc2oYD5fIwZFaqgNmBG0iKsIBIMECayK4Tp2ke1rO+DKwYweGhT6Vax9g
+ Vv+wMp2cDit5VK/f6DbS0MqZCidRpJV8uuRJV9jDRo7JyhWM1sQ37xBXPDx4DTliVDxg
+ NedcAL7ZNOKPlFiMI7rLRJD2cGz7R5Vd/VfK3otnn1o10QeQiV1zKde5+/Ynxb9vx3zB
+ yRSbB6s7hghK3+2uKP5zN2WvlmVxNax18VGUZITus3rxaV5uxIy3C5d1gnueVmwDPMCZ
+ TZCB8G6dPjnly+KbEZL46s5M7wIGmfg2I87kxt7xQvY1HPVJa7sBSII+O1k9yCp1MsTf
+ O43w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=TJlps8KoSmjaLf7uOiyh88B4yeRZgq7XCqlG0Om+4HM=;
+ b=M5QYGHwYIhL84HNcMASXjy1aEekFjZv47oyQr+LAS+B8xsph33As49fepLJj1LQu3b
+ cv18aZMOi857THNvV8oCjTv7WUdYiWzLJXXd5qhJyuSluvwU/OYuSnEtFZcvWaZ3ghro
+ lorYi2J+P+xB7tyP2ZrGBMA7HBr0WGgKNrNizeh7/YOI8hLH42OMw1SELz/xpzkS5/qw
+ RAn3Rz5EvU6xiFsoJI0jCRMSeOnloxuHRG2nPe0ibezDk4Axumw1J+dqKBMB8lZAgXxI
+ ENVsesMj5bGZXOu1lzq4IgHJqgnE76cqtuARvtx4xA7Ej82jrpfGGg9XCAkdGlz2aBIJ
+ QJDA==
+X-Gm-Message-State: AOAM532aoN/iTGoGNNRIW+bjB4OY2+W2rG9PILZH1eAkdpRyYotF/QWs
+ DiVf9BCJye+g4HV9EslB8v1n6A==
+X-Google-Smtp-Source: ABdhPJy0fAYC94KFy9xX0XJE9YFQVtn38eE1lA9H2uSYwd8ure66lD9JBkoHBcbEd6Wn2I+NL+xnQw==
+X-Received: by 2002:a17:902:968b:: with SMTP id
+ n11mr9140381plp.331.1592594766507; 
+ Fri, 19 Jun 2020 12:26:06 -0700 (PDT)
+Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
+ by smtp.gmail.com with ESMTPSA id 84sm5901012pfu.167.2020.06.19.12.26.05
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 19 Jun 2020 12:26:05 -0700 (PDT)
+Subject: Re: [PATCH v7 28/42] target/arm: Use mte_checkN for sve unpredicated
+ loads
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20200603011317.473934-1-richard.henderson@linaro.org>
+ <20200603011317.473934-29-richard.henderson@linaro.org>
+ <CAFEAcA8ZYhqbO-A=FkVzgKkcTm1tVVZSB0C9HOFAnYG7jaFPpA@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <e2ad7bf4-7972-5640-244f-e25ef29c6ec7@linaro.org>
+Date: Fri, 19 Jun 2020 12:26:03 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <CAJFHJrrJzPLatNvw2xC3WYLbzCW0+DB+4UczQHGPBF9p+WGYQA@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=vgoyal@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/19 02:45:39
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+In-Reply-To: <CAFEAcA8ZYhqbO-A=FkVzgKkcTm1tVVZSB0C9HOFAnYG7jaFPpA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::644;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x644.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,52 +107,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-fs-list <virtio-fs@redhat.com>, Miklos Szeredi <miklos@szeredi.hu>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
+ Stephen Long <steplong@quicinc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jun 19, 2020 at 01:46:20PM +0900, Chirantan Ekbote wrote:
-> On Fri, Jun 19, 2020 at 4:27 AM Vivek Goyal <vgoyal@redhat.com> wrote:
-> >
-> > On Thu, Jun 18, 2020 at 08:16:55PM +0100, Dr. David Alan Gilbert wrote:
-> > > * Vivek Goyal (vgoyal@redhat.com) wrote:
-> > > > On Thu, Apr 16, 2020 at 05:49:05PM +0100, Stefan Hajnoczi wrote:
-> > > > > virtiofsd doesn't need of all Linux capabilities(7) available to root.  Keep a
-> > > > > whitelisted set of capabilities that we require.  This improves security in
-> > > > > case virtiofsd is compromised by making it hard for an attacker to gain further
-> > > > > access to the system.
-> > > >
-> > > > Hi Stefan,
-> > > >
-> > > > I just noticed that this patch set breaks overlayfs on top of virtiofs.
-> > > >
-> > > > overlayfs sets "trusted.overlay.*" and xattrs in trusted domain
-> > > > need CAP_SYS_ADMIN.
-> > > >
+On 6/19/20 6:58 AM, Peter Maydell wrote:
+> On Wed, 3 Jun 2020 at 02:13, Richard Henderson
+> <richard.henderson@linaro.org> wrote:
+>>
+>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > 
-> Not just that but it needs CAP_SYS_ADMIN in the init namespace[1].  We
-> have the same problem.  Our virtiofs process has CAP_SYS_ADMIN in a
-> user namespace and it cannot set any trusted or security xattrs.  The
-> security xattrs check is at least namespace aware so you only need
-> CAP_SYS_ADMIN in the namespace that mounted the fs but that doesn't
-> help us much.
-> 
-> We ended up working around it by prefixing "user.virtiofs." to the
-> xattr name[2], which has its own problems but there was pretty much no
-> chance that we would be able to give the fs device CAP_SYS_ADMIN in
-> the init namespace.
+> Commit message suggests we should be just adding an MTE check
+> but patch contents appear to be moving insn implementation from
+> inline codegen to a helper function? If you want to do that
+> it would probably be easier to review done separately from
+> adding the MTE check.
 
-Chirantan, 
+I don't recall why I did that.  I've made a more minimal change for both of these.
 
-So you ended up renaming all "trusted", "security" and "system" xattrs?
-Only "user" xattrs are complete passthrough?
 
-IOW, security.selinux will be renamed to user.virtiofs.security.selinux
-on host?
-
-Thanks
-Vivek
-
+r~
 
