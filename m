@@ -2,73 +2,84 @@ Return-Path: <SRS0=Yszf=AA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A459DC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 20:33:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4A48C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 20:35:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7507020890
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 20:33:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7507020890
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 6CEBE20C09
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 20:35:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=atishpatra.org header.i=@atishpatra.org header.b="OJ6OK/lF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6CEBE20C09
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=atishpatra.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60726 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34908 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmNhp-0001QG-Ks
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 16:33:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50650)
+	id 1jmNjn-0002ng-C3
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 16:35:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51018)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jmNh9-0000Ey-27
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 16:33:03 -0400
-Resent-Date: Fri, 19 Jun 2020 16:33:03 -0400
-Resent-Message-Id: <E1jmNh9-0000Ey-27@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21738)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jmNh6-0005Nt-LN
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 16:33:02 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1592598771; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=F5H+U1fJGWgcFU/VT6j7fH8x9hP6NgOhDL4B5zuo47//Qa1xo/CHF9cqtYz951S035G5tiQWTuUhUwnsNlBHRbiHb3z2+AUloMLlbiJWlYZUIMF3wI6h8D4z8JogUBwPiQh8W6iyQEOCEmnrkb2XHSwh4ikmlB1M8dBdgOq1in4=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1592598771;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=qb50pamAelWrdSmk7jj6TGxW+4NRt8DpHdqL7YLFBNQ=; 
- b=cqNffHaxk6/p5zk31hBAkGykS7rl/sHurar1rhK1Hqp9C4EwIeakAFFWMeJIagXszlRv3ZaiwEV4kkgxQiesjKKKR2SUP98cFzd3+cwPsmlCN2yBgPFMLkb+fj+6+wOMeNZDgnOefsUUY/9Mhj1qSjhgq021V1itwzM4WS8gfU4=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1592598770637406.7488253225998;
- Fri, 19 Jun 2020 13:32:50 -0700 (PDT)
-Message-ID: <159259876942.4885.17898619638944453918@d1fd068a5071>
-Subject: Re: [PATCH] target/i386: reimplement fpatan using floatx80 operations
-In-Reply-To: <alpine.DEB.2.21.2006192003370.30302@digraph.polyomino.org.uk>
+ (Exim 4.90_1) (envelope-from <atishp@atishpatra.org>)
+ id 1jmNiO-0002JR-J6
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 16:34:20 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:51811)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <atishp@atishpatra.org>)
+ id 1jmNiL-0005Ve-II
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 16:34:20 -0400
+Received: by mail-wm1-x341.google.com with SMTP id x16so440348wmj.1
+ for <qemu-devel@nongnu.org>; Fri, 19 Jun 2020 13:34:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=atishpatra.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=atX4GcyBsxPsCBx6uD7/gdUJoTBXJqpSzHLj2rWdkUo=;
+ b=OJ6OK/lF3z0kKhTGWp/fpCWOFUxVOyL+YeB25SdAJqLWRupzZtUA8RchLoLdbcF6nQ
+ ZJ/FPmpH48ps2RDWQNH0gsjsMdbuNlY0MfBsqoDmRqZdCLipQEyOKUUrpuWPSGMMbI+H
+ FKGaj7OeTsOTLzTHf8ZAxRtdQ4YBcPCK4zU4k=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=atX4GcyBsxPsCBx6uD7/gdUJoTBXJqpSzHLj2rWdkUo=;
+ b=OCrY4862Ny0iftG3nM2ovSf3IOjZY+zESV8MbJ9Y0ZDcc28+kwMgiRFxaedo1JRDwY
+ VdzFPYWI8h5POex4jJhlAtbt1/z3hwPiaZeRFeCjCPcT2jmizEIPRTGIKip26VOVrNpK
+ qY3rhSgDLguGwClgMfiG9JKoErOnSSvHCyVWQ4N9z2oqgCKYfYVGyBDLxsd2nhngVTBq
+ 2xG7Ukje/BaKBXeXrPRddxsjKlbhR5NVPIij32/RuHV7PyYRMVLuvJaC4opLcmQ/Tl9P
+ qHKNXCvoAuJuogipC8M9hFLcLtYgBft5iwsTzanUx2uyybLVkTstGqwTqZEx+sBXN8L9
+ 0qVw==
+X-Gm-Message-State: AOAM531E152TviGpgNCSIkS7h+sTiyjJSf7GAc+a2ohg5RabVoXbGZ8q
+ cabhkfNWt1QwcQIq0CjPdZ4OQGw3rrPPLPtovnIZ
+X-Google-Smtp-Source: ABdhPJw9zUP8vMR2dNRxqBeWwSekQ5xgi9Iv/GNEIPbbbhTWA/uLG9Y6i9ivNrHLHRXkJG+JkKlyL+XpLQHp3Y6gb1g=
+X-Received: by 2002:a1c:23d2:: with SMTP id j201mr5406692wmj.186.1592598854561; 
+ Fri, 19 Jun 2020 13:34:14 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: joseph@codesourcery.com
-Date: Fri, 19 Jun 2020 13:32:50 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/19 10:14:48
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+References: <20200616192700.1900260-1-atish.patra@wdc.com>
+ <20200616192700.1900260-2-atish.patra@wdc.com>
+ <CAEeofcjkjBHwQx_pRPG1GSfkg5KHc6UqfEEmu_14sJmgVfqG7w@mail.gmail.com>
+In-Reply-To: <CAEeofcjkjBHwQx_pRPG1GSfkg5KHc6UqfEEmu_14sJmgVfqG7w@mail.gmail.com>
+From: Atish Patra <atishp@atishpatra.org>
+Date: Fri, 19 Jun 2020 13:34:03 -0700
+Message-ID: <CAOnJCUKHXrK2LPu996UcG8Hc2o-DDARtzsqUrK0QodWgjgCqLA@mail.gmail.com>
+Subject: Re: [PATCH 1/3] riscv: Unify Qemu's reset vector code path
+To: Alexander Richardson <Alexander.Richardson@cl.cam.ac.uk>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=atishp@atishpatra.org; helo=mail-wm1-x341.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -81,119 +92,288 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, qemu-devel@nongnu.org, ehabkost@redhat.com,
- rth@twiddle.net
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Atish Patra <atish.patra@wdc.com>, Alistair Francis <Alistair.Francis@wdc.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS9hbHBpbmUuREVCLjIuMjEuMjAw
-NjE5MjAwMzM3MC4zMDMwMkBkaWdyYXBoLnBvbHlvbWluby5vcmcudWsvCgoKCkhpLAoKVGhpcyBz
-ZXJpZXMgZmFpbGVkIHRoZSBkb2NrZXItcXVpY2tAY2VudG9zNyBidWlsZCB0ZXN0LiBQbGVhc2Ug
-ZmluZCB0aGUgdGVzdGluZyBjb21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3Ug
-aGF2ZSBEb2NrZXIgaW5zdGFsbGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2Nh
-bGx5LgoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAptYWtlIGRvY2tlci1p
-bWFnZS1jZW50b3M3IFY9MSBORVRXT1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LXF1aWNrQGNl
-bnRvczcgU0hPV19FTlY9MSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoK
-ICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9xYXBpL3FhcGktY29tbWFuZHMubwogIENDICAgICAg
-YWFyY2g2NC1zb2Z0bW11L3FhcGkvcWFwaS1pbml0LWNvbW1hbmRzLm8KL3RtcC9xZW11LXRlc3Qv
-c3JjL3RhcmdldC9pMzg2L2ZwdV9oZWxwZXIuYzogSW4gZnVuY3Rpb24gJ2hlbHBlcl9mcGF0YW4n
-OgovdG1wL3FlbXUtdGVzdC9zcmMvdGFyZ2V0L2kzODYvZnB1X2hlbHBlci5jOjEwNzI6MTc6IGVy
-cm9yOiBpbXBsaWNpdCBkZWNsYXJhdGlvbiBvZiBmdW5jdGlvbiAnc2hpZnQxMjhSaWdodCcgWy1X
-ZXJyb3I9aW1wbGljaXQtZnVuY3Rpb24tZGVjbGFyYXRpb25dCiAgICAgICAgICAgICAgICAgc2hp
-ZnQxMjhSaWdodChyZW1zaWcwLCByZW1zaWcxLCAxLCAmcmVtc2lnMCwgJnJlbXNpZzEpOwogICAg
-ICAgICAgICAgICAgIF4KL3RtcC9xZW11LXRlc3Qvc3JjL3RhcmdldC9pMzg2L2ZwdV9oZWxwZXIu
-YzoxMDcyOjE3OiBlcnJvcjogbmVzdGVkIGV4dGVybiBkZWNsYXJhdGlvbiBvZiAnc2hpZnQxMjhS
-aWdodCcgWy1XZXJyb3I9bmVzdGVkLWV4dGVybnNdCi90bXAvcWVtdS10ZXN0L3NyYy90YXJnZXQv
-aTM4Ni9mcHVfaGVscGVyLmM6MTA3NToxMzogZXJyb3I6IGltcGxpY2l0IGRlY2xhcmF0aW9uIG9m
-IGZ1bmN0aW9uICdlc3RpbWF0ZURpdjEyOFRvNjQnIFstV2Vycm9yPWltcGxpY2l0LWZ1bmN0aW9u
-LWRlY2xhcmF0aW9uXQogICAgICAgICAgICAgeHNpZzAgPSBlc3RpbWF0ZURpdjEyOFRvNjQocmVt
-c2lnMCwgcmVtc2lnMSwgZGVuX3NpZyk7CiAgICAgICAgICAgICBeCi90bXAvcWVtdS10ZXN0L3Ny
-Yy90YXJnZXQvaTM4Ni9mcHVfaGVscGVyLmM6MTA3NToxMzogZXJyb3I6IG5lc3RlZCBleHRlcm4g
-ZGVjbGFyYXRpb24gb2YgJ2VzdGltYXRlRGl2MTI4VG82NCcgWy1XZXJyb3I9bmVzdGVkLWV4dGVy
-bnNdCi90bXAvcWVtdS10ZXN0L3NyYy90YXJnZXQvaTM4Ni9mcHVfaGVscGVyLmM6MTA3NjoxMzog
-ZXJyb3I6IGltcGxpY2l0IGRlY2xhcmF0aW9uIG9mIGZ1bmN0aW9uICdtdWw2NFRvMTI4JyBbLVdl
-cnJvcj1pbXBsaWNpdC1mdW5jdGlvbi1kZWNsYXJhdGlvbl0KICAgICAgICAgICAgIG11bDY0VG8x
-MjgoZGVuX3NpZywgeHNpZzAsICZtc2lnMCwgJm1zaWcxKTsKICAgICAgICAgICAgIF4KL3RtcC9x
-ZW11LXRlc3Qvc3JjL3RhcmdldC9pMzg2L2ZwdV9oZWxwZXIuYzoxMDc2OjEzOiBlcnJvcjogbmVz
-dGVkIGV4dGVybiBkZWNsYXJhdGlvbiBvZiAnbXVsNjRUbzEyOCcgWy1XZXJyb3I9bmVzdGVkLWV4
-dGVybnNdCi90bXAvcWVtdS10ZXN0L3NyYy90YXJnZXQvaTM4Ni9mcHVfaGVscGVyLmM6MTA3Nzox
-MzogZXJyb3I6IGltcGxpY2l0IGRlY2xhcmF0aW9uIG9mIGZ1bmN0aW9uICdzdWIxMjgnIFstV2Vy
-cm9yPWltcGxpY2l0LWZ1bmN0aW9uLWRlY2xhcmF0aW9uXQogICAgICAgICAgICAgc3ViMTI4KHJl
-bXNpZzAsIHJlbXNpZzEsIG1zaWcwLCBtc2lnMSwgJnJlbXNpZzAsICZyZW1zaWcxKTsKICAgICAg
-ICAgICAgIF4KL3RtcC9xZW11LXRlc3Qvc3JjL3RhcmdldC9pMzg2L2ZwdV9oZWxwZXIuYzoxMDc3
-OjEzOiBlcnJvcjogbmVzdGVkIGV4dGVybiBkZWNsYXJhdGlvbiBvZiAnc3ViMTI4JyBbLVdlcnJv
-cj1uZXN0ZWQtZXh0ZXJuc10KL3RtcC9xZW11LXRlc3Qvc3JjL3RhcmdldC9pMzg2L2ZwdV9oZWxw
-ZXIuYzoxMDgwOjE3OiBlcnJvcjogaW1wbGljaXQgZGVjbGFyYXRpb24gb2YgZnVuY3Rpb24gJ2Fk
-ZDEyOCcgWy1XZXJyb3I9aW1wbGljaXQtZnVuY3Rpb24tZGVjbGFyYXRpb25dCiAgICAgICAgICAg
-ICAgICAgYWRkMTI4KHJlbXNpZzAsIHJlbXNpZzEsIDAsIGRlbl9zaWcsICZyZW1zaWcwLCAmcmVt
-c2lnMSk7CiAgICAgICAgICAgICAgICAgXgovdG1wL3FlbXUtdGVzdC9zcmMvdGFyZ2V0L2kzODYv
-ZnB1X2hlbHBlci5jOjEwODA6MTc6IGVycm9yOiBuZXN0ZWQgZXh0ZXJuIGRlY2xhcmF0aW9uIG9m
-ICdhZGQxMjgnIFstV2Vycm9yPW5lc3RlZC1leHRlcm5zXQovdG1wL3FlbXUtdGVzdC9zcmMvdGFy
-Z2V0L2kzODYvZnB1X2hlbHBlci5jOjExMTc6MzM6IGVycm9yOiBpbXBsaWNpdCBkZWNsYXJhdGlv
-biBvZiBmdW5jdGlvbiAnc2hpZnQxMjhMZWZ0JyBbLVdlcnJvcj1pbXBsaWNpdC1mdW5jdGlvbi1k
-ZWNsYXJhdGlvbl0KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgc2hpZnQxMjhMZWZ0
-KHlzaWcwLCB5c2lnMSwgc2hpZnQsCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4K
-L3RtcC9xZW11LXRlc3Qvc3JjL3RhcmdldC9pMzg2L2ZwdV9oZWxwZXIuYzoxMTE3OjMzOiBlcnJv
-cjogbmVzdGVkIGV4dGVybiBkZWNsYXJhdGlvbiBvZiAnc2hpZnQxMjhMZWZ0JyBbLVdlcnJvcj1u
-ZXN0ZWQtZXh0ZXJuc10KL3RtcC9xZW11LXRlc3Qvc3JjL3RhcmdldC9pMzg2L2ZwdV9oZWxwZXIu
-YzoxMTQ1OjIxOiBlcnJvcjogaW1wbGljaXQgZGVjbGFyYXRpb24gb2YgZnVuY3Rpb24gJ3NoaWZ0
-MTI4UmlnaHRKYW1taW5nJyBbLVdlcnJvcj1pbXBsaWNpdC1mdW5jdGlvbi1kZWNsYXJhdGlvbl0K
-ICAgICAgICAgICAgICAgICAgICAgc2hpZnQxMjhSaWdodEphbW1pbmcoeHNpZzAsIHhzaWcxLCB0
-ZXhwIC0geGV4cCwKICAgICAgICAgICAgICAgICAgICAgXgovdG1wL3FlbXUtdGVzdC9zcmMvdGFy
-Z2V0L2kzODYvZnB1X2hlbHBlci5jOjExNDU6MjE6IGVycm9yOiBuZXN0ZWQgZXh0ZXJuIGRlY2xh
-cmF0aW9uIG9mICdzaGlmdDEyOFJpZ2h0SmFtbWluZycgWy1XZXJyb3I9bmVzdGVkLWV4dGVybnNd
-Ci90bXAvcWVtdS10ZXN0L3NyYy90YXJnZXQvaTM4Ni9mcHVfaGVscGVyLmM6MTE3NDoxNzogZXJy
-b3I6IGltcGxpY2l0IGRlY2xhcmF0aW9uIG9mIGZ1bmN0aW9uICdtdWwxMjhCeTY0VG8xOTInIFst
-V2Vycm9yPWltcGxpY2l0LWZ1bmN0aW9uLWRlY2xhcmF0aW9uXQogICAgICAgICAgICAgICAgIG11
-bDEyOEJ5NjRUbzE5Mih4c2lnMCwgeHNpZzEsIHRzaWcsICZkc2lnMCwgJmRzaWcxLCAmZHNpZzIp
-OwogICAgICAgICAgICAgICAgIF4KL3RtcC9xZW11LXRlc3Qvc3JjL3RhcmdldC9pMzg2L2ZwdV9o
-ZWxwZXIuYzoxMTc0OjE3OiBlcnJvcjogbmVzdGVkIGV4dGVybiBkZWNsYXJhdGlvbiBvZiAnbXVs
-MTI4Qnk2NFRvMTkyJyBbLVdlcnJvcj1uZXN0ZWQtZXh0ZXJuc10KL3RtcC9xZW11LXRlc3Qvc3Jj
-L3RhcmdldC9pMzg2L2ZwdV9oZWxwZXIuYzoxMTkyOjE3OiBlcnJvcjogaW1wbGljaXQgZGVjbGFy
-YXRpb24gb2YgZnVuY3Rpb24gJ3N1YjE5MicgWy1XZXJyb3I9aW1wbGljaXQtZnVuY3Rpb24tZGVj
-bGFyYXRpb25dCiAgICAgICAgICAgICAgICAgc3ViMTkyKHJlbXNpZzAsIHJlbXNpZzEsIHJlbXNp
-ZzIsIG1zaWcwLCBtc2lnMSwgbXNpZzIsCiAgICAgICAgICAgICAgICAgXgovdG1wL3FlbXUtdGVz
-dC9zcmMvdGFyZ2V0L2kzODYvZnB1X2hlbHBlci5jOjExOTI6MTc6IGVycm9yOiBuZXN0ZWQgZXh0
-ZXJuIGRlY2xhcmF0aW9uIG9mICdzdWIxOTInIFstV2Vycm9yPW5lc3RlZC1leHRlcm5zXQovdG1w
-L3FlbXUtdGVzdC9zcmMvdGFyZ2V0L2kzODYvZnB1X2hlbHBlci5jOjExOTY6MjE6IGVycm9yOiBp
-bXBsaWNpdCBkZWNsYXJhdGlvbiBvZiBmdW5jdGlvbiAnYWRkMTkyJyBbLVdlcnJvcj1pbXBsaWNp
-dC1mdW5jdGlvbi1kZWNsYXJhdGlvbl0KICAgICAgICAgICAgICAgICAgICAgYWRkMTkyKHJlbXNp
-ZzAsIHJlbXNpZzEsIHJlbXNpZzIsIDAsIGRzaWcwLCBkc2lnMSwKICAgICAgICAgICAgICAgICAg
-ICAgXgovdG1wL3FlbXUtdGVzdC9zcmMvdGFyZ2V0L2kzODYvZnB1X2hlbHBlci5jOjExOTY6MjE6
-IGVycm9yOiBuZXN0ZWQgZXh0ZXJuIGRlY2xhcmF0aW9uIG9mICdhZGQxOTInIFstV2Vycm9yPW5l
-c3RlZC1leHRlcm5zXQovdG1wL3FlbXUtdGVzdC9zcmMvdGFyZ2V0L2kzODYvZnB1X2hlbHBlci5j
-OjEyMTE6MTc6IGVycm9yOiBpbXBsaWNpdCBkZWNsYXJhdGlvbiBvZiBmdW5jdGlvbiAnbXVsMTI4
-VG8yNTYnIFstV2Vycm9yPWltcGxpY2l0LWZ1bmN0aW9uLWRlY2xhcmF0aW9uXQogICAgICAgICAg
-ICAgICAgIG11bDEyOFRvMjU2KHpzaWcwLCB6c2lnMSwgenNpZzAsIHpzaWcxLAogICAgICAgICAg
-ICAgICAgIF4KL3RtcC9xZW11LXRlc3Qvc3JjL3RhcmdldC9pMzg2L2ZwdV9oZWxwZXIuYzoxMjEx
-OjE3OiBlcnJvcjogbmVzdGVkIGV4dGVybiBkZWNsYXJhdGlvbiBvZiAnbXVsMTI4VG8yNTYnIFst
-V2Vycm9yPW5lc3RlZC1leHRlcm5zXQpjYzE6IGFsbCB3YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFz
-IGVycm9ycwptYWtlWzFdOiAqKiogW3RhcmdldC9pMzg2L2ZwdV9oZWxwZXIub10gRXJyb3IgMQpt
-YWtlOiAqKiogW3g4Nl82NC1zb2Z0bW11L2FsbF0gRXJyb3IgMgptYWtlOiAqKiogV2FpdGluZyBm
-b3IgdW5maW5pc2hlZCBqb2JzLi4uLgogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L3NvZnRtbXUv
-dmwubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L3RhcmdldC9hcm0vYXJtLXNlbWkubwotLS0K
-ICAgIHJhaXNlIENhbGxlZFByb2Nlc3NFcnJvcihyZXRjb2RlLCBjbWQpCnN1YnByb2Nlc3MuQ2Fs
-bGVkUHJvY2Vzc0Vycm9yOiBDb21tYW5kICdbJ3N1ZG8nLCAnLW4nLCAnZG9ja2VyJywgJ3J1bics
-ICctLWxhYmVsJywgJ2NvbS5xZW11Lmluc3RhbmNlLnV1aWQ9OWQzMDdmNzQwY2U5NDFkMmIxZTYz
-YzdiODlhMTM3M2InLCAnLXUnLCAnMTAwMycsICctLXNlY3VyaXR5LW9wdCcsICdzZWNjb21wPXVu
-Y29uZmluZWQnLCAnLS1ybScsICctZScsICdUQVJHRVRfTElTVD0nLCAnLWUnLCAnRVhUUkFfQ09O
-RklHVVJFX09QVFM9JywgJy1lJywgJ1Y9JywgJy1lJywgJ0o9MTQnLCAnLWUnLCAnREVCVUc9Jywg
-Jy1lJywgJ1NIT1dfRU5WPTEnLCAnLWUnLCAnQ0NBQ0hFX0RJUj0vdmFyL3RtcC9jY2FjaGUnLCAn
-LXYnLCAnL2hvbWUvcGF0Y2hldzIvLmNhY2hlL3FlbXUtZG9ja2VyLWNjYWNoZTovdmFyL3RtcC9j
-Y2FjaGU6eicsICctdicsICcvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtaDNuNmVudjIvc3Jj
-L2RvY2tlci1zcmMuMjAyMC0wNi0xOS0xNi4zMC4yNC4yMjY5ODovdmFyL3RtcC9xZW11Onoscm8n
-LCAncWVtdTpjZW50b3M3JywgJy92YXIvdG1wL3FlbXUvcnVuJywgJ3Rlc3QtcXVpY2snXScgcmV0
-dXJuZWQgbm9uLXplcm8gZXhpdCBzdGF0dXMgMi4KZmlsdGVyPS0tZmlsdGVyPWxhYmVsPWNvbS5x
-ZW11Lmluc3RhbmNlLnV1aWQ9OWQzMDdmNzQwY2U5NDFkMmIxZTYzYzdiODlhMTM3M2IKbWFrZVsx
-XTogKioqIFtkb2NrZXItcnVuXSBFcnJvciAxCm1ha2VbMV06IExlYXZpbmcgZGlyZWN0b3J5IGAv
-dmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtaDNuNmVudjIvc3JjJwptYWtlOiAqKiogW2RvY2tl
-ci1ydW4tdGVzdC1xdWlja0BjZW50b3M3XSBFcnJvciAyCgpyZWFsICAgIDJtMjYuMDUxcwp1c2Vy
-ICAgIDBtOC4yMTFzCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hl
-dy5vcmcvbG9ncy9hbHBpbmUuREVCLjIuMjEuMjAwNjE5MjAwMzM3MC4zMDMwMkBkaWdyYXBoLnBv
-bHlvbWluby5vcmcudWsvdGVzdGluZy5kb2NrZXItcXVpY2tAY2VudG9zNy8/dHlwZT1tZXNzYWdl
-LgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9w
-YXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxA
-cmVkaGF0LmNvbQ==
+On Fri, Jun 19, 2020 at 10:11 AM Alexander Richardson
+<Alexander.Richardson@cl.cam.ac.uk> wrote:
+>
+> On Tue, 16 Jun 2020 at 20:30, Atish Patra <atish.patra@wdc.com> wrote:
+> >
+> > Currently, all riscv machines have identical reset vector code
+> > implementations with memory addresses being different for all machines.
+> > They can be easily combined into a single function in common code.
+> >
+> > Move it to common function and let all the machines use the common function.
+> >
+> > Signed-off-by: Atish Patra <atish.patra@wdc.com>
+> > ---
+> >  hw/riscv/boot.c         | 46 +++++++++++++++++++++++++++++++++++++++++
+> >  hw/riscv/sifive_u.c     | 38 +++-------------------------------
+> >  hw/riscv/spike.c        | 38 +++-------------------------------
+> >  hw/riscv/virt.c         | 37 +++------------------------------
+> >  include/hw/riscv/boot.h |  2 ++
+> >  5 files changed, 57 insertions(+), 104 deletions(-)
+> >
+> > diff --git a/hw/riscv/boot.c b/hw/riscv/boot.c
+> > index adb421b91b68..8ed96da600c9 100644
+> > --- a/hw/riscv/boot.c
+> > +++ b/hw/riscv/boot.c
+> > @@ -22,12 +22,16 @@
+> >  #include "qemu/units.h"
+> >  #include "qemu/error-report.h"
+> >  #include "exec/cpu-defs.h"
+> > +#include "exec/address-spaces.h"
+> >  #include "hw/boards.h"
+> >  #include "hw/loader.h"
+> >  #include "hw/riscv/boot.h"
+> >  #include "elf.h"
+> > +#include "sysemu/device_tree.h"
+> >  #include "sysemu/qtest.h"
+> >
+> > +#include <libfdt.h>
+> > +
+> >  #if defined(TARGET_RISCV32)
+> >  # define KERNEL_BOOT_ADDRESS 0x80400000
+> >  #else
+> > @@ -155,3 +159,45 @@ hwaddr riscv_load_initrd(const char *filename, uint64_t mem_size,
+> >
+> >      return *start + size;
+> >  }
+> > +
+> > +void riscv_setup_rom_reset_vec(hwaddr start_addr, hwaddr rom_base,
+> > +                               hwaddr rom_size, void *fdt)
+> > +{
+> > +    int i;
+> > +    /* reset vector */
+> > +    uint32_t reset_vec[8] = {
+> > +        0x00000297,                  /* 1:  auipc  t0, %pcrel_hi(dtb) */
+> > +        0x02028593,                  /*     addi   a1, t0, %pcrel_lo(1b) */
+> > +        0xf1402573,                  /*     csrr   a0, mhartid  */
+> > +#if defined(TARGET_RISCV32)
+> > +        0x0182a283,                  /*     lw     t0, 24(t0) */
+> > +#elif defined(TARGET_RISCV64)
+> > +        0x0182b283,                  /*     ld     t0, 24(t0) */
+> > +#endif
+> > +        0x00028067,                  /*     jr     t0 */
+> > +        0x00000000,
+> > +        start_addr,                  /* start: .dword */
+> > +        0x00000000,
+> > +                                     /* dtb: */
+> > +    };
+> > +
+> > +    /* copy in the reset vector in little_endian byte order */
+> > +    for (i = 0; i < sizeof(reset_vec) >> 2; i++) {
+> > +        reset_vec[i] = cpu_to_le32(reset_vec[i]);
+> > +    }
+> Maybe use ARRAY_SIZE(reset_vec) instead of sizeof(reset_vec) >> 2 ?
+>
+
+Yeah. That's better. Thanks.
+
+> > +    rom_add_blob_fixed_as("mrom.reset", reset_vec, sizeof(reset_vec),
+> > +                          rom_base, &address_space_memory);
+> > +
+> > +    /* copy in the device tree */
+> > +    if (fdt_pack(fdt) || fdt_totalsize(fdt) >
+> > +        rom_size - sizeof(reset_vec)) {
+> > +        error_report("not enough space to store device-tree");
+> > +        exit(1);
+> > +    }
+> > +    qemu_fdt_dumpdtb(fdt, fdt_totalsize(fdt));
+> > +    rom_add_blob_fixed_as("mrom.fdt", fdt, fdt_totalsize(fdt),
+> > +                           rom_base + sizeof(reset_vec),
+> > +                           &address_space_memory);
+> > +
+> > +    return;
+> > +}
+> > diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+> > index f9fef2be9170..c2712570e0d9 100644
+> > --- a/hw/riscv/sifive_u.c
+> > +++ b/hw/riscv/sifive_u.c
+> > @@ -325,7 +325,6 @@ static void sifive_u_machine_init(MachineState *machine)
+> >      MemoryRegion *main_mem = g_new(MemoryRegion, 1);
+> >      MemoryRegion *flash0 = g_new(MemoryRegion, 1);
+> >      target_ulong start_addr = memmap[SIFIVE_U_DRAM].base;
+> > -    int i;
+> >
+> >      /* Initialize SoC */
+> >      object_initialize_child(OBJECT(machine), "soc", &s->soc,
+> > @@ -374,40 +373,9 @@ static void sifive_u_machine_init(MachineState *machine)
+> >          start_addr = memmap[SIFIVE_U_FLASH0].base;
+> >      }
+> >
+> > -    /* reset vector */
+> > -    uint32_t reset_vec[8] = {
+> > -        0x00000297,                    /* 1:  auipc  t0, %pcrel_hi(dtb) */
+> > -        0x02028593,                    /*     addi   a1, t0, %pcrel_lo(1b) */
+> > -        0xf1402573,                    /*     csrr   a0, mhartid  */
+> > -#if defined(TARGET_RISCV32)
+> > -        0x0182a283,                    /*     lw     t0, 24(t0) */
+> > -#elif defined(TARGET_RISCV64)
+> > -        0x0182b283,                    /*     ld     t0, 24(t0) */
+> > -#endif
+> > -        0x00028067,                    /*     jr     t0 */
+> > -        0x00000000,
+> > -        start_addr,                    /* start: .dword */
+> > -        0x00000000,
+> > -                                       /* dtb: */
+> > -    };
+> > -
+> > -    /* copy in the reset vector in little_endian byte order */
+> > -    for (i = 0; i < sizeof(reset_vec) >> 2; i++) {
+> > -        reset_vec[i] = cpu_to_le32(reset_vec[i]);
+> > -    }
+> > -    rom_add_blob_fixed_as("mrom.reset", reset_vec, sizeof(reset_vec),
+> > -                          memmap[SIFIVE_U_MROM].base, &address_space_memory);
+> > -
+> > -    /* copy in the device tree */
+> > -    if (fdt_pack(s->fdt) || fdt_totalsize(s->fdt) >
+> > -            memmap[SIFIVE_U_MROM].size - sizeof(reset_vec)) {
+> > -        error_report("not enough space to store device-tree");
+> > -        exit(1);
+> > -    }
+> > -    qemu_fdt_dumpdtb(s->fdt, fdt_totalsize(s->fdt));
+> > -    rom_add_blob_fixed_as("mrom.fdt", s->fdt, fdt_totalsize(s->fdt),
+> > -                          memmap[SIFIVE_U_MROM].base + sizeof(reset_vec),
+> > -                          &address_space_memory);
+> > +    /* load the reset vector */
+> > +    riscv_setup_rom_reset_vec(start_addr, memmap[SIFIVE_U_MROM].base,
+> > +                              memmap[SIFIVE_U_MROM].size, s->fdt);
+> >  }
+> >
+> >  static bool sifive_u_machine_get_start_in_flash(Object *obj, Error **errp)
+> > diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
+> > index 7bbbdb50363d..238eae48716a 100644
+> > --- a/hw/riscv/spike.c
+> > +++ b/hw/riscv/spike.c
+> > @@ -165,7 +165,6 @@ static void spike_board_init(MachineState *machine)
+> >      MemoryRegion *system_memory = get_system_memory();
+> >      MemoryRegion *main_mem = g_new(MemoryRegion, 1);
+> >      MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
+> > -    int i;
+> >      unsigned int smp_cpus = machine->smp.cpus;
+> >
+> >      /* Initialize SOC */
+> > @@ -213,40 +212,9 @@ static void spike_board_init(MachineState *machine)
+> >          }
+> >      }
+> >
+> > -    /* reset vector */
+> > -    uint32_t reset_vec[8] = {
+> > -        0x00000297,                  /* 1:  auipc  t0, %pcrel_hi(dtb) */
+> > -        0x02028593,                  /*     addi   a1, t0, %pcrel_lo(1b) */
+> > -        0xf1402573,                  /*     csrr   a0, mhartid  */
+> > -#if defined(TARGET_RISCV32)
+> > -        0x0182a283,                  /*     lw     t0, 24(t0) */
+> > -#elif defined(TARGET_RISCV64)
+> > -        0x0182b283,                  /*     ld     t0, 24(t0) */
+> > -#endif
+> > -        0x00028067,                  /*     jr     t0 */
+> > -        0x00000000,
+> > -        memmap[SPIKE_DRAM].base,     /* start: .dword DRAM_BASE */
+> > -        0x00000000,
+> > -                                     /* dtb: */
+> > -    };
+> > -
+> > -    /* copy in the reset vector in little_endian byte order */
+> > -    for (i = 0; i < sizeof(reset_vec) >> 2; i++) {
+> > -        reset_vec[i] = cpu_to_le32(reset_vec[i]);
+> > -    }
+> > -    rom_add_blob_fixed_as("mrom.reset", reset_vec, sizeof(reset_vec),
+> > -                          memmap[SPIKE_MROM].base, &address_space_memory);
+> > -
+> > -    /* copy in the device tree */
+> > -    if (fdt_pack(s->fdt) || fdt_totalsize(s->fdt) >
+> > -            memmap[SPIKE_MROM].size - sizeof(reset_vec)) {
+> > -        error_report("not enough space to store device-tree");
+> > -        exit(1);
+> > -    }
+> > -    qemu_fdt_dumpdtb(s->fdt, fdt_totalsize(s->fdt));
+> > -    rom_add_blob_fixed_as("mrom.fdt", s->fdt, fdt_totalsize(s->fdt),
+> > -                          memmap[SPIKE_MROM].base + sizeof(reset_vec),
+> > -                          &address_space_memory);
+> > +    /* load the reset vector */
+> > +    riscv_setup_rom_reset_vec(memmap[SPIKE_DRAM].base, memmap[SPIKE_MROM].base,
+> > +                              memmap[SPIKE_MROM].size, s->fdt);
+> >
+> >      /* initialize HTIF using symbols found in load_kernel */
+> >      htif_mm_init(system_memory, mask_rom, &s->soc.harts[0].env, serial_hd(0));
+> > diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
+> > index 4e4c494a7050..a8e2d58cc067 100644
+> > --- a/hw/riscv/virt.c
+> > +++ b/hw/riscv/virt.c
+> > @@ -536,40 +536,9 @@ static void virt_machine_init(MachineState *machine)
+> >          start_addr = virt_memmap[VIRT_FLASH].base;
+> >      }
+> >
+> > -    /* reset vector */
+> > -    uint32_t reset_vec[8] = {
+> > -        0x00000297,                  /* 1:  auipc  t0, %pcrel_hi(dtb) */
+> > -        0x02028593,                  /*     addi   a1, t0, %pcrel_lo(1b) */
+> > -        0xf1402573,                  /*     csrr   a0, mhartid  */
+> > -#if defined(TARGET_RISCV32)
+> > -        0x0182a283,                  /*     lw     t0, 24(t0) */
+> > -#elif defined(TARGET_RISCV64)
+> > -        0x0182b283,                  /*     ld     t0, 24(t0) */
+> > -#endif
+> > -        0x00028067,                  /*     jr     t0 */
+> > -        0x00000000,
+> > -        start_addr,                  /* start: .dword */
+> > -        0x00000000,
+> > -                                     /* dtb: */
+> > -    };
+> > -
+> > -    /* copy in the reset vector in little_endian byte order */
+> > -    for (i = 0; i < sizeof(reset_vec) >> 2; i++) {
+> > -        reset_vec[i] = cpu_to_le32(reset_vec[i]);
+> > -    }
+> > -    rom_add_blob_fixed_as("mrom.reset", reset_vec, sizeof(reset_vec),
+> > -                          memmap[VIRT_MROM].base, &address_space_memory);
+> > -
+> > -    /* copy in the device tree */
+> > -    if (fdt_pack(s->fdt) || fdt_totalsize(s->fdt) >
+> > -            memmap[VIRT_MROM].size - sizeof(reset_vec)) {
+> > -        error_report("not enough space to store device-tree");
+> > -        exit(1);
+> > -    }
+> > -    qemu_fdt_dumpdtb(s->fdt, fdt_totalsize(s->fdt));
+> > -    rom_add_blob_fixed_as("mrom.fdt", s->fdt, fdt_totalsize(s->fdt),
+> > -                          memmap[VIRT_MROM].base + sizeof(reset_vec),
+> > -                          &address_space_memory);
+> > +    /* load the reset vector */
+> > +    riscv_setup_rom_reset_vec(start_addr, virt_memmap[VIRT_MROM].base,
+> > +                              virt_memmap[VIRT_MROM].size, s->fdt);
+> >
+> >      /* create PLIC hart topology configuration string */
+> >      plic_hart_config_len = (strlen(VIRT_PLIC_HART_CONFIG) + 1) * smp_cpus;
+> > diff --git a/include/hw/riscv/boot.h b/include/hw/riscv/boot.h
+> > index 9daa98da08d7..3e9759c89aa2 100644
+> > --- a/include/hw/riscv/boot.h
+> > +++ b/include/hw/riscv/boot.h
+> > @@ -35,5 +35,7 @@ target_ulong riscv_load_kernel(const char *kernel_filename,
+> >                                 symbol_fn_t sym_cb);
+> >  hwaddr riscv_load_initrd(const char *filename, uint64_t mem_size,
+> >                           uint64_t kernel_entry, hwaddr *start);
+> > +void riscv_setup_rom_reset_vec(hwaddr saddr, hwaddr rom_base,
+> > +                               hwaddr rom_size, void *fdt);
+> >
+> >  #endif /* RISCV_BOOT_H */
+> > --
+> > 2.26.2
+> >
+> >
+>
+
+
+-- 
+Regards,
+Atish
 
