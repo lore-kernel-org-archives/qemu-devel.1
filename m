@@ -7,82 +7,82 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C344AC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 17:15:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89FACC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 17:15:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D97720757
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 17:15:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5483B20DD4
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 17:15:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="IZ/SvfJo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D97720757
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="AHwvbOvH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5483B20DD4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35710 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36288 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmKbx-0003wC-FH
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 13:15:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58432)
+	id 1jmKcG-0004AE-GH
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 13:15:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58614)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=4324eb4de=alistair.francis@wdc.com>)
- id 1jmKUU-00014n-U2
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 13:07:46 -0400
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:19141)
+ id 1jmKUq-0001r8-CV
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 13:08:08 -0400
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:24435)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=4324eb4de=alistair.francis@wdc.com>)
- id 1jmKUS-0004Pg-GX
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 13:07:46 -0400
+ id 1jmKUn-0004Ps-ET
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 13:08:07 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1592586464; x=1624122464;
+ t=1592586507; x=1624122507;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=iMetX1AG2MztuekpTz0Vq0px5OhOLtHAmGALKic8XNY=;
- b=IZ/SvfJozdZxfvFZkBqgCnWsM5rMHHUWUIyB38/0MwXpIaPqUr85hsFc
- 8PaDzXjcD+2gw5Q5Ygc4ptZJxYstBSDBNNJTxA6qtumLfvVryqcc4LGKa
- Qs97cS4kfVl5Ak87gMEQz8/SK7YEbRJUJStbb2TxF8WEODj1uTfzrgKYe
- PXIplDkV9r10eFzsGcSxq1bVW6C6xis1MtBHWa5p11bt/Nx8PKBeM0bps
- WNe6aiunp/6tp3vcDr5yLyvPclQDd0unSPiDIJKgJNEDzPyyzIBzxfwtH
- C485AFnWm7m7MwF9VEPuRSW/2NtQc9VD8Boh897HdsotIlkxyWoKxBZLQ w==;
-IronPort-SDR: vjL4C5KfdG0f5x5pS78Yedp62UPCQ1k5B9f6JHEJdbPSC+SM762C73W4Jeb43ksouHcqNy15dA
- OzWsg1J0OKo6/j6e2L/ek+TSR/0AoaN8tcWHqe61CUSO7nLX7EEADAQ17RnkUVt1wEj5NZX5bC
- 0gz2c1+aj7XnyGp4Hl4gWjUuK6LrO0/aGhYVGbUv3e+dYfz5bhoEtJCGL2aL5fZ91GWFvwlf8S
- cMKcZ3EFIMrZwR+rxWDVH/rVv4RF57q6z2nu3qBgZxTpEehOVhuhsphioGTNLjrZS8UbYBsL2v
- mvs=
-X-IronPort-AV: E=Sophos;i="5.75,256,1589212800"; d="scan'208";a="144763324"
+ bh=l12nKCebLDNm8crHR5U10P9+ehRAVHXDgPahy6nhwdg=;
+ b=AHwvbOvHip1sMEh5IDe705+CiIE/3H+lD4UTTifofTep4Op29tvTW+Ul
+ OEKHbykuwXknEwmW1JPXHQzHra9x1lXLGVAXkhr6fosvS87b5lef1A0fq
+ 3eRb1N/2cL9QjKv9ZloYlLAMd9vv7+0b/gxyO00i81LXGfHHHQ6fgQ6Wn
+ ltFW1FO5z8NAbQYm2rcuF21iIiV4kepKbOvnu+CkhYaQglCkxXSWxXc3w
+ xApFBEhG7ODthhHHTA63jfIf749niYM2Asb5U3qa6MpLwF+lomBJlvqzc
+ PVQVpDGFdAZmFGWSb8slmJRaHoFdGZmJj2P3FbpvDTBjcjBGqOjGu6fvf A==;
+IronPort-SDR: +uNRTvNFAOKqISOJs6+VK3BxJHwBEVBSGEsqnY8onyA9+xvw1oEv0OR/FWH6H9NXZeSeXwzWvM
+ K/5cEnKwXsju5W8MyQqpP2xtLzLWB8xEjs9jf+dPtuEuqzqvG7TW7zFhB8WFtypn7HRe/ssGM9
+ aF6IVwX+aaQ0xsvurW6Z6jbj1wvX2anTynv6vW52OZszP/GS8N0eKYBsvZ4ld2vIYUYAUftoBp
+ U2w71jXfPXVE3bxYYl+AOYQifUPxCQkEnnOaHdjFh5BrLG6dvNl7wE6j1S21u1vbZzfLzuXeq3
+ WCg=
+X-IronPort-AV: E=Sophos;i="5.75,256,1589212800"; d="scan'208";a="243417020"
 Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com)
  ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 20 Jun 2020 01:07:23 +0800
-IronPort-SDR: k/e2Fo1zYhOfmYYXZ/u6nPpTsflTbQKoKNAKgLdw1YtNy3+oCanjotWjM5ubiuNYRFzhqgACNn
- O0oUg6nHi5guVCh5WlO0GDxb1Tjv280sw=
+ by ob1.hgst.iphmx.com with ESMTP; 20 Jun 2020 01:07:31 +0800
+IronPort-SDR: CgRQBp62ptm6LjyKv9H1inJJIeJHm6c503LVyF37+Glu6dAV1PeZ1QHB+L1HONWut+G5znHlVb
+ F3gXqBWc8APurm8VdLyaGZzqAXLDS17pI=
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 19 Jun 2020 09:56:00 -0700
-IronPort-SDR: Ix1sDtiV53FPXYJwDGIvUmb/V9i0v67T11Ew2TmBf5iqKoHHrJvjxwtMTutiGdZtddXzGAfKDd
- E02lbLEhVN0A==
+ 19 Jun 2020 09:56:05 -0700
+IronPort-SDR: BP7TMIBBijXalVdU7P2rM0X9oBeAWiLNiuvGeWLshLrDBdjWI19FGlZ/lTaPQMQnnhiSWCvRxX
+ Rr0jnEHuYdAA==
 WDCIronportException: Internal
 Received: from unknown (HELO risc6-mainframe.hgst.com) ([10.86.58.142])
- by uls-op-cesaip02.wdc.com with ESMTP; 19 Jun 2020 10:07:23 -0700
+ by uls-op-cesaip02.wdc.com with ESMTP; 19 Jun 2020 10:07:29 -0700
 From: Alistair Francis <alistair.francis@wdc.com>
 To: peter.maydell@linaro.org,
 	qemu-devel@nongnu.org
-Subject: [PULL v2 09/32] target/riscv: Move the hfence instructions to the rvh
- decode
-Date: Fri, 19 Jun 2020 09:57:54 -0700
-Message-Id: <20200619165817.4144200-10-alistair.francis@wdc.com>
+Subject: [PULL v2 30/32] hw/riscv: sifive_u: Support different boot source per
+ MSEL pin state
+Date: Fri, 19 Jun 2020 09:58:15 -0700
+Message-Id: <20200619165817.4144200-31-alistair.francis@wdc.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200619165817.4144200-1-alistair.francis@wdc.com>
 References: <20200619165817.4144200-1-alistair.francis@wdc.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.71.153.141;
+Received-SPF: pass client-ip=68.232.143.124;
  envelope-from=prvs=4324eb4de=alistair.francis@wdc.com;
- helo=esa3.hgst.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/19 13:07:21
+ helo=esa2.hgst.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/19 13:07:24
 X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
 X-Spam_score_int: -43
 X-Spam_score: -4.4
@@ -103,175 +103,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alistair23@gmail.com, Richard Henderson <richard.henderson@linaro.org>,
+Cc: alistair23@gmail.com, Bin Meng <bin.meng@windriver.com>,
  Alistair Francis <alistair.francis@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Also correct the name of the VVMA instruction.
+From: Bin Meng <bin.meng@windriver.com>
 
+SiFive FU540 SoC supports booting from several sources, which are
+controlled using the Mode Select (MSEL[3:0]) pins on the chip.
+Typically, the boot process runs through several stages before it
+begins execution of user-provided programs.
+
+The SoC supports booting from memory-mapped QSPI flash, which is
+how start_in_flash property is used for at present. This matches
+MSEL = 1 configuration (QSPI0).
+
+Typical booting flows involve the Zeroth Stage Boot Loader (ZSBL).
+It's not necessary for QEMU to implement the full ZSBL ROM codes,
+because we know ZSBL downloads the next stage program into the L2
+LIM at address 0x8000000 and executes from there. We can bypass
+the whole ZSBL execution and use "-bios" to load the next stage
+program directly if MSEL indicates a ZSBL booting flow.
+
+Signed-off-by: Bin Meng <bin.meng@windriver.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Message-id: 1592268641-7478-4-git-send-email-bmeng.cn@gmail.com
+Message-Id: <1592268641-7478-4-git-send-email-bmeng.cn@gmail.com>
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/riscv/insn32.decode                    |  8 ++-
- .../riscv/insn_trans/trans_privileged.inc.c   | 38 -------------
- target/riscv/insn_trans/trans_rvh.inc.c       | 57 +++++++++++++++++++
- target/riscv/translate.c                      |  1 +
- 4 files changed, 63 insertions(+), 41 deletions(-)
- create mode 100644 target/riscv/insn_trans/trans_rvh.inc.c
+ include/hw/riscv/sifive_u.h |  6 ++++++
+ hw/riscv/sifive_u.c         | 39 +++++++++++++++++++++++++++++--------
+ 2 files changed, 37 insertions(+), 8 deletions(-)
 
-diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index b883672e63..4c8d1215ce 100644
---- a/target/riscv/insn32.decode
-+++ b/target/riscv/insn32.decode
-@@ -64,7 +64,7 @@
- @r2      .......   ..... ..... ... ..... ....... %rs1 %rd
+diff --git a/include/hw/riscv/sifive_u.h b/include/hw/riscv/sifive_u.h
+index f6d10ebfb6..27dc35e0a3 100644
+--- a/include/hw/riscv/sifive_u.h
++++ b/include/hw/riscv/sifive_u.h
+@@ -111,6 +111,12 @@ enum {
+     SIFIVE_U_RTCCLK_FREQ = 1000000
+ };
  
- @hfence_gvma ....... ..... .....   ... ..... ....... %rs2 %rs1
--@hfence_bvma ....... ..... .....   ... ..... ....... %rs2 %rs1
-+@hfence_vvma ....... ..... .....   ... ..... ....... %rs2 %rs1
- 
- @sfence_vma ....... ..... .....   ... ..... ....... %rs2 %rs1
- @sfence_vm  ....... ..... .....   ... ..... ....... %rs1
-@@ -77,8 +77,6 @@ uret        0000000    00010 00000 000 00000 1110011
- sret        0001000    00010 00000 000 00000 1110011
- mret        0011000    00010 00000 000 00000 1110011
- wfi         0001000    00101 00000 000 00000 1110011
--hfence_gvma 0110001    ..... ..... 000 00000 1110011 @hfence_gvma
--hfence_bvma 0010001    ..... ..... 000 00000 1110011 @hfence_bvma
- sfence_vma  0001001    ..... ..... 000 00000 1110011 @sfence_vma
- sfence_vm   0001000    00100 ..... 000 00000 1110011 @sfence_vm
- 
-@@ -207,3 +205,7 @@ fcvt_w_d   1100001  00000 ..... ... ..... 1010011 @r2_rm
- fcvt_wu_d  1100001  00001 ..... ... ..... 1010011 @r2_rm
- fcvt_d_w   1101001  00000 ..... ... ..... 1010011 @r2_rm
- fcvt_d_wu  1101001  00001 ..... ... ..... 1010011 @r2_rm
++enum {
++    MSEL_MEMMAP_QSPI0_FLASH = 1,
++    MSEL_L2LIM_QSPI0_FLASH = 6,
++    MSEL_L2LIM_QSPI2_SD = 11
++};
 +
-+# *** RV32H Base Instruction Set ***
-+hfence_gvma 0110001  .....  ..... 000 00000 1110011 @hfence_gvma
-+hfence_vvma 0010001  .....  ..... 000 00000 1110011 @hfence_vvma
-diff --git a/target/riscv/insn_trans/trans_privileged.inc.c b/target/riscv/insn_trans/trans_privileged.inc.c
-index 5f26e0f5ea..2a61a853bf 100644
---- a/target/riscv/insn_trans/trans_privileged.inc.c
-+++ b/target/riscv/insn_trans/trans_privileged.inc.c
-@@ -95,41 +95,3 @@ static bool trans_sfence_vm(DisasContext *ctx, arg_sfence_vm *a)
- {
-     return false;
- }
--
--static bool trans_hfence_gvma(DisasContext *ctx, arg_sfence_vma *a)
--{
--#ifndef CONFIG_USER_ONLY
--    if (has_ext(ctx, RVH)) {
--        /* Hpervisor extensions exist */
--        /*
--         * if (env->priv == PRV_M ||
--         *   (env->priv == PRV_S &&
--         *    !riscv_cpu_virt_enabled(env) &&
--         *    get_field(ctx->mstatus_fs, MSTATUS_TVM))) {
--         */
--            gen_helper_tlb_flush(cpu_env);
--            return true;
--        /* } */
--    }
--#endif
--    return false;
--}
--
--static bool trans_hfence_bvma(DisasContext *ctx, arg_sfence_vma *a)
--{
--#ifndef CONFIG_USER_ONLY
--    if (has_ext(ctx, RVH)) {
--        /* Hpervisor extensions exist */
--        /*
--         * if (env->priv == PRV_M ||
--         *   (env->priv == PRV_S &&
--         *    !riscv_cpu_virt_enabled(env) &&
--         *    get_field(ctx->mstatus_fs, MSTATUS_TVM))) {
--         */
--            gen_helper_tlb_flush(cpu_env);
--            return true;
--        /* } */
--    }
--#endif
--    return false;
--}
-diff --git a/target/riscv/insn_trans/trans_rvh.inc.c b/target/riscv/insn_trans/trans_rvh.inc.c
-new file mode 100644
-index 0000000000..2c0359819d
---- /dev/null
-+++ b/target/riscv/insn_trans/trans_rvh.inc.c
-@@ -0,0 +1,57 @@
-+/*
-+ * RISC-V translation routines for the RVXI Base Integer Instruction Set.
-+ *
-+ * Copyright (c) 2020 Western Digital
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2 or later, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along with
-+ * this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+static bool trans_hfence_gvma(DisasContext *ctx, arg_sfence_vma *a)
-+{
-+#ifndef CONFIG_USER_ONLY
-+    if (ctx->priv_ver >= PRIV_VERSION_1_10_0 &&
-+        has_ext(ctx, RVH)) {
-+        /* Hpervisor extensions exist */
+ #define SIFIVE_U_MANAGEMENT_CPU_COUNT   1
+ #define SIFIVE_U_COMPUTE_CPU_COUNT      4
+ 
+diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+index ed13bc043c..eb767aa863 100644
+--- a/hw/riscv/sifive_u.c
++++ b/hw/riscv/sifive_u.c
+@@ -405,8 +405,34 @@ static void sifive_u_machine_init(MachineState *machine)
+     /* create device tree */
+     create_fdt(s, memmap, machine->ram_size, machine->kernel_cmdline);
+ 
+-    riscv_find_and_load_firmware(machine, BIOS_FILENAME,
+-                                 memmap[SIFIVE_U_DRAM].base, NULL);
++    if (s->start_in_flash) {
 +        /*
-+         * if (env->priv == PRV_M ||
-+         *   (env->priv == PRV_S &&
-+         *    !riscv_cpu_virt_enabled(env) &&
-+         *    get_field(ctx->mstatus_fs, MSTATUS_TVM))) {
++         * If start_in_flash property is given, assign s->msel to a value
++         * that representing booting from QSPI0 memory-mapped flash.
++         *
++         * This also means that when both start_in_flash and msel properties
++         * are given, start_in_flash takes the precedence over msel.
++         *
++         * Note this is to keep backward compatibility not to break existing
++         * users that use start_in_flash property.
 +         */
-+            gen_helper_tlb_flush(cpu_env);
-+            return true;
-+        /* } */
++        s->msel = MSEL_MEMMAP_QSPI0_FLASH;
 +    }
-+#endif
-+    return false;
-+}
 +
-+static bool trans_hfence_vvma(DisasContext *ctx, arg_sfence_vma *a)
-+{
-+#ifndef CONFIG_USER_ONLY
-+    if (ctx->priv_ver >= PRIV_VERSION_1_10_0 &&
-+        has_ext(ctx, RVH)) {
-+        /* Hpervisor extensions exist */
-+        /*
-+         * if (env->priv == PRV_M ||
-+         *   (env->priv == PRV_S &&
-+         *    !riscv_cpu_virt_enabled(env) &&
-+         *    get_field(ctx->mstatus_fs, MSTATUS_TVM))) {
-+         */
-+            gen_helper_tlb_flush(cpu_env);
-+            return true;
-+        /* } */
++    switch (s->msel) {
++    case MSEL_MEMMAP_QSPI0_FLASH:
++        start_addr = memmap[SIFIVE_U_FLASH0].base;
++        break;
++    case MSEL_L2LIM_QSPI0_FLASH:
++    case MSEL_L2LIM_QSPI2_SD:
++        start_addr = memmap[SIFIVE_U_L2LIM].base;
++        break;
++    default:
++        start_addr = memmap[SIFIVE_U_DRAM].base;
++        break;
 +    }
-+#endif
-+    return false;
-+}
-diff --git a/target/riscv/translate.c b/target/riscv/translate.c
-index 43bf7e39a6..ce71ca7a92 100644
---- a/target/riscv/translate.c
-+++ b/target/riscv/translate.c
-@@ -711,6 +711,7 @@ static bool gen_shift(DisasContext *ctx, arg_r *a,
- #include "insn_trans/trans_rva.inc.c"
- #include "insn_trans/trans_rvf.inc.c"
- #include "insn_trans/trans_rvd.inc.c"
-+#include "insn_trans/trans_rvh.inc.c"
- #include "insn_trans/trans_privileged.inc.c"
++
++    riscv_find_and_load_firmware(machine, BIOS_FILENAME, start_addr, NULL);
  
- /* Include the auto-generated decoder for 16 bit insn */
+     if (machine->kernel_filename) {
+         uint64_t kernel_entry = riscv_load_kernel(machine->kernel_filename,
+@@ -424,13 +450,9 @@ static void sifive_u_machine_init(MachineState *machine)
+         }
+     }
+ 
+-    if (s->start_in_flash) {
+-        start_addr = memmap[SIFIVE_U_FLASH0].base;
+-    }
+-
+     /* reset vector */
+     uint32_t reset_vec[8] = {
+-        0x00000000,
++        s->msel,                       /* MSEL pin state */
+         0x00000297,                    /* 1:  auipc  t0, %pcrel_hi(dtb) */
+         0x01c28593,                    /*     addi   a1, t0, %pcrel_lo(1b) */
+         0xf1402573,                    /*     csrr   a0, mhartid  */
+@@ -502,7 +524,8 @@ static void sifive_u_machine_instance_init(Object *obj)
+                              sifive_u_machine_set_start_in_flash);
+     object_property_set_description(obj, "start-in-flash",
+                                     "Set on to tell QEMU's ROM to jump to "
+-                                    "flash. Otherwise QEMU will jump to DRAM");
++                                    "flash. Otherwise QEMU will jump to DRAM "
++                                    "or L2LIM depending on the msel value");
+ 
+     s->msel = 0;
+     object_property_add(obj, "msel", "uint32",
 -- 
 2.27.0
 
