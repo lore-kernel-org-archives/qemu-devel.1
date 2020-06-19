@@ -2,95 +2,89 @@ Return-Path: <SRS0=Yszf=AA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29255C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 17:03:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19AC1C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 17:04:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EBCDC20734
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 17:03:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D857820734
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 17:04:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="Y32t8rWQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBCDC20734
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xn6VMQhX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D857820734
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47354 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49116 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmKQE-0005ao-1e
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 13:03:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55846)
+	id 1jmKR1-0006Qx-68
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 13:04:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56954)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
- id 1jmKMn-0004PV-K0; Fri, 19 Jun 2020 12:59:49 -0400
-Received: from mout.web.de ([212.227.17.12]:51337)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
- id 1jmKMl-0002uF-Pr; Fri, 19 Jun 2020 12:59:49 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
- s=dbaedf251592; t=1592585980;
- bh=EK8bUs7cX7l7gntRfnub0oQ24EKFk1cmaQ+bgmkDc3E=;
- h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
- b=Y32t8rWQOW1SRp8xtXlSZPcoU+KIAkFpiYbfRUqTHeDjwjF9W7cHE6iBgYMyptdKy
- RAN2bTP2XIvemNUKdcLzQ6OkY6s3/VXyTonyZA/zuW+5pC02pK+fUusqITk+ZJjtfV
- vPWhyrsDDe+KMvIQkv+25GLiG8RMcwf+OsI+KOcw=
-X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from luklap ([94.134.180.165]) by smtp.web.de (mrweb102
- [213.165.67.124]) with ESMTPSA (Nemesis) id 0MLxs8-1jnQoq1Se4-007p3z; Fri, 19
- Jun 2020 18:59:40 +0200
-Date: Fri, 19 Jun 2020 18:59:28 +0200
-From: Lukas Straub <lukasstraub2@web.de>
-To: "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>
-Subject: Re: [PATCH v4 1/4] Introduce yank feature
-Message-ID: <20200619185928.348ee60c@luklap>
-In-Reply-To: <20200619165240.GB700896@redhat.com>
-References: <cover.1590421341.git.lukasstraub2@web.de>
- <dc2724aead900db8fb3bed0a066f7c7e2654edb0.1590421341.git.lukasstraub2@web.de>
- <20200617151240.GM1728005@stefanha-x1.localdomain>
- <20200619182924.7898035e@luklap>
- <20200619165240.GB700896@redhat.com>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jmKQM-0005qE-Or
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 13:03:30 -0400
+Received: from mail-wm1-x32d.google.com ([2a00:1450:4864:20::32d]:50591)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jmKQL-0003iZ-0r
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 13:03:30 -0400
+Received: by mail-wm1-x32d.google.com with SMTP id l17so9082742wmj.0
+ for <qemu-devel@nongnu.org>; Fri, 19 Jun 2020 10:03:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=GYiZ1xEPMJbBnQLRCPAHG6+ogJ1s4ydI9hrrJEU1OmY=;
+ b=xn6VMQhXt+eLYKC+z4+ojovsahLJShdYj7IqpOBt061U6E36FkmQNSEIpvlWgpR/Fx
+ sghGplLT+XIpjBstjlNKmY6eWA1WuOjDyYhDIELuZnW7xbVqCrj4aIE+Qg9cN+kLV7n+
+ +pWOQHEACN8TOqe1Qvo9hJmIxb+2VDLAIJF6Bog3IGsn+wBGdjuaH1eLuV31sFYhZUXD
+ qXQ3RnNFuoKSZ87aOFcimu4j56/P9S1XAMExRCPqR5P7TBv3jFy/PSLZccDufVxP9LMe
+ J1XzBERhhNo/sI+KDAKHdsKsJhEW+UShLeUX8PtUIARxAMkO8mKSopLSCP04XSfvauc+
+ 6b+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=GYiZ1xEPMJbBnQLRCPAHG6+ogJ1s4ydI9hrrJEU1OmY=;
+ b=SD8mJo2L6UlDK9YK3g5+jsDPHRO1C/mZDvxOHwfkGO6i6NhIlovBXCc9U6UTJldJhW
+ kYrVnxh5QFCWX8je34wv1cRENIxbj9COYCaTqjQxpfkGyIEeS61SmNzKH/iWPgYJWJvj
+ tjjXwjF9qe9m5bgkohwaSCL15XY3ecwMOaR/m69nRHuGTybheOKguwfwMLz2pvW0Uuh9
+ t7y4vMyFliu9Z1X/NxV7upBIJV+84DrU7mEa1nNPnWq1YvBBKV40HZGjckSNntZjEl3C
+ co6MBrkyHYdbpN5bVTxO9BL+IM8kaKm+KH6trqawBVCG6yYMKPJf0jX0MRkx8IQdCoXc
+ r6vg==
+X-Gm-Message-State: AOAM531aekneed87EvpyCIhAdovNJqTbVgJ/P8vB6m+IjyaF1UhecHCf
+ u+6hNmHvVqPWA4xg43juJ7tJIg==
+X-Google-Smtp-Source: ABdhPJzwNFjqUxBaVqvNXzKvzvydti1oKGLGHJm2WelH8mGrg665RTNTAWp/dznGLQJNeZObcorMEQ==
+X-Received: by 2002:a1c:98cc:: with SMTP id a195mr4646798wme.89.1592586207324; 
+ Fri, 19 Jun 2020 10:03:27 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id c16sm7982936wrx.4.2020.06.19.10.03.25
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 19 Jun 2020 10:03:26 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-arm@nongnu.org,
+	qemu-devel@nongnu.org
+Subject: [PATCH] target/arm: Remove unnecessary gen_io_end() calls
+Date: Fri, 19 Jun 2020 18:03:24 +0100
+Message-Id: <20200619170324.12093-1-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/FSsE7ai7lQpOEE22oj+qpNi";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Provags-ID: V03:K1:zHaU64oo/QjgIyD9AVgKP8ucpQbsQwc2H+FSS2prLeZq23KAgEP
- OglrHnbeCVSHvMmj0w6Z+L2krO2GQTQibJfPfSVCxoZYvl/uwXiXE0lPbqNx3bVMS02mfDX
- 39Y4V3ApxPaUkxcCkTxiyLjAZ+VE1z67OYL/wpmFshOM+GILqN8WB5u9IC7yxhFc6EE1Bvx
- d8fevxLPq+7SDMO5WhDQA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:hOXptRNcQhg=:ILs+OrDU4Vk1+bSoKjRKS2
- JGLOoHvhVN3K7DK1DndlNMQvPgJDZlMJv0jvwLdydXu+frXmfjSy8TITbYZWy65ZK2lJ+1ixe
- ro0GoKFa5yNoobGdXN9ympkhOUTjF1MoQW8r9aXxXlMg7SFwLnpbPKpMffVBmucNmxkbJ5aTj
- FyfI+nnl0owGg29TPBceS+/+jIRoP6daO3jzH4WAHUknRz25AGcMuOrfI0tc2Ye8UxJAADlCE
- jMKyuiTnIbvB9+3arjxUo5zcMje3SwoikwG1XCGkGAmNaYl1RY++xnVqaGGbwdZ76ZmWf0T9X
- 8wxchmyW56ykBb92yv5KfGnV/Tf2AZu5seKvFpnLh/ht6qo399mB/ZeSPxfXnLhgabHwCpxqy
- 4iONu88p4S5xYlQcX9RdtSVgqD/Ha1nrIbX6ZnmLl1iMx+dvtcX3eeiVJbthQF05P1xFmN0nZ
- GNsCGMl6RBamRDPnoKrwlI/6GqQE0U/Rne3YkhWuF/bllDOsdLxwoqqfovaxP8lf/z47H+sJG
- J1GlGFmMlL/jEmGCkHROn8FfN9WQrhnP7DVIgpylFc7NHSGVxm4q4jBsISj5Xr49jTSMe6TL6
- yJwSq8Sf4YjG/JS34qLIj48hIrjmO8OcDjN7mit7snpyiDKldraMvo9slGC27yeYk5Cjfrch6
- 1F+hKE8JqAiAjc4oFbjX3lmWAg6WV9Ah5kkwXdzD5ygbV+bzFXDtm7Rpgwdw3GuePcAG0kaR0
- C5tzEqsc01aGO0pgPSV+nQAlsqbageK5WWyJU1T5WFsif8+1v7p7OQ+m+0FVGWrLFRc/rzuUJ
- ewzrLekwhOsZPdvvTLSNFBcTJAdgGJbCs1sBDSOko96s8lcy9TKt/OvCIYzs4MMnMbxMhK2at
- IGoFEro59mFnKI7YwcdkJnsZZWM2t9SO644esqqq7z7694eWpMZxC5n8MC/94rDqGNRLn01bh
- +jAYLL6TD5001X79Ye9FV2gr/mi+0DLu+tikzbr88GbTDaHRucZuOMVI3DtnCxiSybDqMHMxL
- b3kSS+vElspcAy3jJ6XpIIRnJvLPPFSC7mjvEaZJcdtFNTwsmHn+P+wfAdti/uIkcrKJUQvy5
- l6rtZiaBx8qzlGFEWGJOa8XwlQTI69TKxbL9PoFIjJAKlOKKx2I0kM/smOjiLwHn2mtJ2uESA
- 9BHofcA05o4PBR/vu7mbCelUC2q+PJYNp/wqGElLqojzzUt9HoZGLeJdGJw8fUKkr3pvXTbGk
- gNiWHsO0OWDQzbN1v
-Received-SPF: pass client-ip=212.227.17.12; envelope-from=lukasstraub2@web.de;
- helo=mout.web.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/19 12:24:12
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -25
-X-Spam_score: -2.6
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::32d;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x32d.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -104,78 +98,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block <qemu-block@nongnu.org>,
- Juan Quintela <quintela@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>,
- qemu-devel <qemu-devel@nongnu.org>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>,
- Max Reitz <mreitz@redhat.com>
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Pavel Dovgalyuk <dovgaluk@ispras.ru>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/FSsE7ai7lQpOEE22oj+qpNi
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Since commit ba3e7926691ed3 it has been unnecessary for target code
+to call gen_io_end() after an IO instruction in icount mode; it is
+sufficient to call gen_io_start() before it and to force the end of
+the TB.
 
-On Fri, 19 Jun 2020 17:52:40 +0100
-Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
+Many now-unnecessary calls to gen_io_end() were removed in commit
+9e9b10c6491153b, but some were missed or accidentally added later.
+Remove unneeded calls from the arm target:
 
-> On Fri, Jun 19, 2020 at 06:29:24PM +0200, Lukas Straub wrote:
-> > On Wed, 17 Jun 2020 16:12:40 +0100
-> > Stefan Hajnoczi <stefanha@gmail.com> wrote:
-> >  =20
-> > > On Mon, May 25, 2020 at 05:44:23PM +0200, Lukas Straub wrote: =20
-> > > > +static struct YankInstance *yank_find_instance(char *name)   =20
-> > >=20
-> > > There are const char * -> char * casts in later patches. Please use
-> > > const char * where possible. Callers shouldn't need to cast away cons=
-t. =20
-> >=20
-> > nbd and chardev generate the instance name dynamically so it
-> > needs to be char *, but in migration it's hardcoded. =20
->=20
-> I think you're looking at it from the wrong perspective.
->=20
-> The yank_find_instance() method never modifies the 'name' paramater
-> that it receives. Therefore it should be "const char *". Likewise
-> for the other yank_*()  methods in fact.
->=20
-> The caller can have a char *, or a const char * as suits its needs.
-> Either can be passed into the yank_* methods and will gain const-ness
-> from the POV of yank code.
+ * the call in the handling of exception-return-via-LDM is
+   unnecessary, and the code is already forcing end-of-TB
+ * the call in the VFP access check code is more complicated:
+   we weren't ending the TB, so we need to add the code to
+   force that by setting DISAS_UPDATE
+ * the doc comment for ARM_CP_IO doesn't need to mention
+   gen_io_end() any more
 
-Makes sense, I will change it in the next version.
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ target/arm/cpu.h               | 2 +-
+ target/arm/translate-vfp.inc.c | 7 +++----
+ target/arm/translate.c         | 3 ---
+ 3 files changed, 4 insertions(+), 8 deletions(-)
 
-Thanks,
-Lukas Straub
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 677584e5da0..cf66b8c7fb0 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -2334,7 +2334,7 @@ static inline uint64_t cpreg_to_kvm_id(uint32_t cpregid)
+  * migration or KVM state synchronization. (Typically this is for "registers"
+  * which are actually used as instructions for cache maintenance and so on.)
+  * IO indicates that this register does I/O and therefore its accesses
+- * need to be surrounded by gen_io_start()/gen_io_end(). In particular,
++ * need to be marked with gen_io_start() and also end the TB. In particular,
+  * registers which implement clocks or timers require this.
+  * RAISES_EXC is for when the read or write hook might raise an exception;
+  * the generated code will synchronize the CPU state before calling the hook
+diff --git a/target/arm/translate-vfp.inc.c b/target/arm/translate-vfp.inc.c
+index e1a90175983..bf31b186578 100644
+--- a/target/arm/translate-vfp.inc.c
++++ b/target/arm/translate-vfp.inc.c
+@@ -119,15 +119,14 @@ static bool full_vfp_access_check(DisasContext *s, bool ignore_vfp_enabled)
+         if (s->v7m_lspact) {
+             /*
+              * Lazy state saving affects external memory and also the NVIC,
+-             * so we must mark it as an IO operation for icount.
++             * so we must mark it as an IO operation for icount (and cause
++             * this to be the last insn in the TB).
+              */
+             if (tb_cflags(s->base.tb) & CF_USE_ICOUNT) {
++                s->base.is_jmp = DISAS_UPDATE;
+                 gen_io_start();
+             }
+             gen_helper_v7m_preserve_fp_state(cpu_env);
+-            if (tb_cflags(s->base.tb) & CF_USE_ICOUNT) {
+-                gen_io_end();
+-            }
+             /*
+              * If the preserve_fp_state helper doesn't throw an exception
+              * then it will clear LSPACT; we don't need to repeat this for
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index 6d18892adee..2677eaeb1e1 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -8824,9 +8824,6 @@ static bool do_ldm(DisasContext *s, arg_ldst_block *a, int min_n)
+             gen_io_start();
+         }
+         gen_helper_cpsr_write_eret(cpu_env, tmp);
+-        if (tb_cflags(s->base.tb) & CF_USE_ICOUNT) {
+-            gen_io_end();
+-        }
+         tcg_temp_free_i32(tmp);
+         /* Must exit loop to check un-masked IRQs */
+         s->base.is_jmp = DISAS_EXIT;
+-- 
+2.20.1
 
->=20
-> Regards,
-> Daniel
-
-
---Sig_/FSsE7ai7lQpOEE22oj+qpNi
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl7s7vAACgkQNasLKJxd
-sliSLA/+JtiXBpIl5iZUT0/3vxALtSyTvaT+dFMYPtIs93bHd6smEFx0o0qwWqfn
-jWRQE/0qZB5BjrgAPfaksyZALP/R3Bv17YT5y53k80IKkRypQ/MzlgUJFD3+btP/
-mV3p6hCFHoHrRWhLqdItBaTfw2GNx+WTuMKADb+tzFf+ro0e7oqc1wO84vBt5vBA
-Mc3KRAh33RFI7AUuY3FKeX6EYU3TPy3BlvgccjOmxW7E84W3Fs1gxfvztMcqiluO
-aw81ShaxQu8/aPPcYn/MfCkNmwPjmAKDYz4GmCtLvQNmPeyjOCi60w3L/9Kz56tz
-TrFSuyf48RJV9n5NVzB0+n/OW4lHaOEmayFzpcvRmwVOrQAOLAkH4tX8UDLQUZxx
-AjFDWlnMSvNAo4FO/ElMHvn3tV2b+8ZO1PUztBbKnapnW7xmwXhWam+Xrm/jqt9t
-jy5rLiC7t84guPWqXFtXzMPK7Yl+okMrODN+J3bJvWy2jnCT36fehZSfhkplpr5f
-1OO6cfBQYyjXUihJHn34VfcJXg4uSIDs9Qmz0Ipc2Sgxai8D6ojmFKvRPixxw2qA
-/dmJi93sPs+kPJZPvBhvq1WaXrrVe6cl9QpOR08hIlSGZo92UB4328gju9p+6TU/
-zyNbE8l5tdpLulabO7OtlA/2KcPxdOQYy062gbNhmIoXO+sDU50=
-=4flk
------END PGP SIGNATURE-----
-
---Sig_/FSsE7ai7lQpOEE22oj+qpNi--
 
