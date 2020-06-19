@@ -2,80 +2,84 @@ Return-Path: <SRS0=Yszf=AA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CFF9C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 12:14:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A3B6C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 12:16:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 285F8206F1
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 12:14:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 61485207E8
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 12:16:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J1PjN5fq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 285F8206F1
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Gw+ffzJt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61485207E8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53278 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57584 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmFuL-0007lq-EY
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 08:14:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56494)
+	id 1jmFwB-0002xM-Mo
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 08:16:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52518)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1jmFtO-00063F-Ko
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 08:13:10 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37708
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jmFmV-0003sV-Rm
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 08:06:03 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:60013
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1jmFtM-0000Y9-6k
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 08:13:10 -0400
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jmFmT-0007Lp-F4
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 08:06:03 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592568787;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ s=mimecast20190719; t=1592568360;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Q3aXHyom7wb+5ESHwBbR2J4lFDqHDbKov4JAIw/RDqk=;
- b=J1PjN5fqvR8WV7q1/nUeWKlSGMoHsWzOEzD/NzxI89lxXigyIq9xdehlSqfDHaEi5jdXZW
- kaaOKQEOm2pxlnxgg3MlbHS8jUwurCkUgU/IW4PLvi7w2QiAlgNd4EgM93FKjKuTlC8cpf
- 7gYow2IvrFT/Hjbq/JURKH9F1cSDod0=
+ bh=ns0sQi66H5tQJYjilErQyQndfXBHpF/talTzP6LJuNQ=;
+ b=Gw+ffzJtVj3at3HTp9ofO+D4lkRZ59M7j5zorgZ9AbIzHQoeLwKhSXPCWIbD5s5FqzDbzj
+ xNC/iachkQ2GRENd4Z7ZlFPu+Zst2QrbbfbgmOPgjADUSWV5VIzpac5GdnGu5GvrU1tBnn
+ MzX/8e1kRq44XC35ibiHKZSsYLvptpo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-51-Rlrelv42NoOWX5cPMzIgMg-1; Fri, 19 Jun 2020 08:13:04 -0400
-X-MC-Unique: Rlrelv42NoOWX5cPMzIgMg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-436-UVwaVWJOPCm3CQSUg249gw-1; Fri, 19 Jun 2020 08:05:58 -0400
+X-MC-Unique: UVwaVWJOPCm3CQSUg249gw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DF6198015CB;
- Fri, 19 Jun 2020 12:13:03 +0000 (UTC)
-Received: from localhost (ovpn-113-212.ams2.redhat.com [10.36.113.212])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7649C5BAD4;
- Fri, 19 Jun 2020 12:13:03 +0000 (UTC)
-Date: Fri, 19 Jun 2020 13:13:00 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Coiby Xu <coiby.xu@gmail.com>
-Subject: Re: [PATCH v9 2/5] generic vhost user server
-Message-ID: <20200619121300.GB2422025@stefanha-x1.localdomain>
-References: <20200614183907.514282-1-coiby.xu@gmail.com>
- <20200614183907.514282-3-coiby.xu@gmail.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D8044835B40;
+ Fri, 19 Jun 2020 12:05:57 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.110.65])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2EAEC709D7;
+ Fri, 19 Jun 2020 12:05:49 +0000 (UTC)
+Date: Fri, 19 Jun 2020 13:05:47 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: [Virtio-fs] [PATCH 0/2] virtiofsd: drop Linux capabilities(7)
+Message-ID: <20200619120547.GJ700896@redhat.com>
+References: <20200416164907.244868-1-stefanha@redhat.com>
+ <20200618190816.GD3814@redhat.com> <20200618191655.GI2769@work-vm>
+ <20200618192717.GE3814@redhat.com> <20200619082746.GA2690@work-vm>
+ <20200619113914.GI700896@redhat.com>
+ <20200619114957.GG2690@work-vm>
 MIME-Version: 1.0
-In-Reply-To: <20200614183907.514282-3-coiby.xu@gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
+In-Reply-To: <20200619114957.GG2690@work-vm>
+User-Agent: Mutt/1.14.0 (2020-05-02)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="ZfOjI3PrQbgiZnxM"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=stefanha@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/19 03:15:03
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=berrange@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/19 02:45:39
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -83,7 +87,7 @@ X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,72 +100,188 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, bharatlkmlkvm@gmail.com, qemu-devel@nongnu.org
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: virtio-fs@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>,
+ qemu-devel@nongnu.org, Vivek Goyal <vgoyal@redhat.com>,
+ Miklos Szeredi <miklos@szeredi.hu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---ZfOjI3PrQbgiZnxM
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+On Fri, Jun 19, 2020 at 12:49:57PM +0100, Dr. David Alan Gilbert wrote:
+> * Daniel P. Berrangé (berrange@redhat.com) wrote:
+> > On Fri, Jun 19, 2020 at 09:27:46AM +0100, Dr. David Alan Gilbert wrote:
+> > > * Vivek Goyal (vgoyal@redhat.com) wrote:
+> > > > On Thu, Jun 18, 2020 at 08:16:55PM +0100, Dr. David Alan Gilbert wrote:
+> > > > > * Vivek Goyal (vgoyal@redhat.com) wrote:
+> > > > > > On Thu, Apr 16, 2020 at 05:49:05PM +0100, Stefan Hajnoczi wrote:
+> > > > > > > virtiofsd doesn't need of all Linux capabilities(7) available to root.  Keep a
+> > > > > > > whitelisted set of capabilities that we require.  This improves security in
+> > > > > > > case virtiofsd is compromised by making it hard for an attacker to gain further
+> > > > > > > access to the system.
+> > > > > > 
+> > > > > > Hi Stefan,
+> > > > > > 
+> > > > > > I just noticed that this patch set breaks overlayfs on top of virtiofs.
+> > > > > > 
+> > > > > > overlayfs sets "trusted.overlay.*" and xattrs in trusted domain
+> > > > > > need CAP_SYS_ADMIN.
+> > > > > > 
+> > > > > > man xattr says.
+> > > > > > 
+> > > > > >    Trusted extended attributes
+> > > > > >        Trusted  extended  attributes  are  visible and accessible only to pro‐
+> > > > > >        cesses that have the  CAP_SYS_ADMIN  capability.   Attributes  in  this
+> > > > > >        class are used to implement mechanisms in user space (i.e., outside the
+> > > > > >        kernel) which keep information in extended attributes to which ordinary
+> > > > > >        processes should not have access.
+> > > > > > 
+> > > > > > There is a chance that overlay moves away from trusted xattr in future.
+> > > > > > But for now we need to make it work. This is an important use case for
+> > > > > > kata docker in docker build.
+> > > > > > 
+> > > > > > May be we can add an option to virtiofsd say "--add-cap <capability>" and
+> > > > > > ask user to pass in "--add-cap cap_sys_admin" if they need to run daemon
+> > > > > > with this capaibility.
+> > > > > 
+> > > > > I'll admit I don't like the idea of giving it cap_sys_admin.
+> > > > > Can you explain:
+> > > > >   a) What overlayfs uses trusted for?
+> > > > 
+> > > > overlayfs stores bunch of metadata and uses "trusted" xattrs for it.
+> > > 
+> > > Tell me more about this metadata.
+> > > Taking a juicy looking one, what does OVL_XATTR_REDIRECT do?
+> > > Or what happens if I was to write random numbers into OVL_XATTR_NLINK?
+> > > 
+> > > > >   b) If something nasty was to write junk into the trusted attributes,
+> > > > >     what would happen?
+> > > > 
+> > > > This directory is owned by guest. So it should be able to write
+> > > > anything it wants, as long as process in guest has CAP_SYS_ADMIN, right?
+> > > 
+> > > Well, we shouldn't be able to break/crash/escape into the host; how
+> > > much does overlayfs validate trusted.* it uses?
+> > > 
+> > > > >   c) I see overlayfs has a fallback check if xattr isn't supported at
+> > > > > all - what is the consequence?
+> > > > 
+> > > > It falls back to I think read only mode. 
+> > > 
+> > > It looks like the fallback is more subtle to me:
+> > >         /*
+> > >          * Check if upper/work fs supports trusted.overlay.* xattr
+> > >          */
+> > >         err = ovl_do_setxattr(ofs->workdir, OVL_XATTR_OPAQUE, "0", 1, 0);
+> > >         if (err) {
+> > >                 ofs->noxattr = true;
+> > >                 ofs->config.index = false;
+> > >                 ofs->config.metacopy = false;
+> > >                 pr_warn("upper fs does not support xattr, falling back to index=off and metacopy=off.\n");
+> > > 
+> > > but I don't know what index and metacopy are.
+> > > 
+> > > > For a moment forget about overlayfs. Say a user process in guest with
+> > > > CAP_SYS_ADMIN is writing trusted.foo. Should that succeed? Is a
+> > > > passthrough filesystem, so it should go through. But currently it
+> > > > wont.
+> > > 
+> > > As long as any effects of what it writes are contained to the area of
+> > > the filesystem exposed to the guest, yes - however it worries me what
+> > > the consequences of broken trusted metadata is.  If it's delicate enough
+> > > that it's guarded by CAP_SYS_ADMIN someone must have worried about it.
+> > 
+> > The CAP_SYS_ADMIN requirement for 'trusted.' xattrs is simply a useful
+> > mechanism for applications to control access. The host kernel doesn'
+> > tuse this namespace itself. Linux has four namespaces for xattrs:
+> > 
+> >  -  user - for userspace apps. accessible based on read/write permissions
+> >  -  trusted - for userspace apps. accessible by CAP_SYS_ADMIN processes only
+> >  -  system - for kernel only. used by ACLs
+> >  -  security - for kernel only. used by SELinux
+> > 
+> > The use case for "trusted" xattrs is thus where a privileged management
+> > application or service wants to store metadata against the file, but
+> > also needs to grant an unprivileged process access to write to this file
+> > while not allowing that unprivileged process the ability to change the
+> > metadata. This is mentioned in the man page:
+> > 
+> > [man xattr(7)]
+> >    Trusted extended attributes
+> >        Trusted  extended attributes are visible and accessible only to pro‐
+> >        cesses that have the CAP_SYS_ADMIN capability.  Attributes  in  this
+> >        class  are used to implement mechanisms in user space (i.e., outside
+> >        the kernel) which keep information in extended attributes  to  which
+> >        ordinary processes should not have access.
+> 
+> overlayfs inside the kernel is using trusted though which is the case
+> Vivek ran into.
 
-On Mon, Jun 15, 2020 at 02:39:04AM +0800, Coiby Xu wrote:
-> +/*
-> + * a wrapper for vu_kick_cb
-> + *
-> + * since aio_dispatch can only pass one user data pointer to the
-> + * callback function, pack VuDev and pvt into a struct. Then unpack it
-> + * and pass them to vu_kick_cb
-> + */
-> +static void kick_handler(void *opaque)
-> +{
-> +    KickInfo *kick_info = opaque;
-> +    kick_info->cb(kick_info->vu_dev, 0, (void *) kick_info->index);
+IIUC, this is need on the lower-layer FS. If you're running overlayfs on the
+host, then virtiofsd is exposing the upper layer FS, so guest use of "trusted."
+on the upper layer won't clash with overlayfs in the host.
 
-Where is kick_info->index assigned? It appears to be NULL in all cases.
+If you're running overlayfs in the guest, then virtiofs is the lower layer
+so needs to support the "trusted." on the FS its exposing. Again this should
+not clash with anything on the host.
 
-> +}
-> +
-> +
-> +static void
-> +set_watch(VuDev *vu_dev, int fd, int vu_evt,
-> +          vu_watch_cb cb, void *pvt)
-> +{
-> +
-> +    VuServer *server = container_of(vu_dev, VuServer, vu_dev);
-> +    g_assert(vu_dev);
-> +    g_assert(fd >= 0);
-> +    long index = (intptr_t) pvt;
+> >    User extended attributes
+> >        User  extended  attributes  may be assigned to files and directories
+> >        for storing arbitrary additional information such as the mime  type,
+> >        character  set  or  encoding  of a file.  The access permissions for
+> >        user attributes are defined by the file permission bits:  read  per‐
+> >        mission is required to retrieve the attribute value, and writer per‐
+> >        mission is required to change it.
+> > [/man]
+> > 
+> > Libvirtd uses the "trusted." xattr namespace to record information against
+> > disk images for QEMU, because we need to grant QEMU access to read/write
+> > the disk iamges, but don't want QEMU to be able to alter our xattrs.
+> > 
+> > It is unfortunate that this namespace is tied to the CAP_SYS_ADMIN cap.
+> > It really ought to have had its own dedicated capability :-( Such is
+> > life with anything that uses CAP_SYS_ADMIN...
+> > 
+> > With this in mind we really should have both trusted. & user. xattrs
+> > allowed to the guest by default.
+> > 
+> > Conversely, we'll need to block usage of the security. and system.
+> > namespaces.
+> > 
+> > Unfortuntely this implies allowing CAP_SYS_ADMIN by default. We could
+> > have a "--trusted-xattrs=on|off" flag to allow people to run in a more
+> > locked down state if they knowingly want to block trusted xattrs.
+> 
+> Does the trick described by Chirantan work for you, where the clients
+> 'trusted' view is different from the host?
 
-The meaning of the pvt argument is not defined in the library interface.
-set_watch() callbacks shouldn't interpret pvt.
+That works as long as you don't require any interoperability with
+processes that have setup the exposed file tree on the host, or
+might need to concurrently access it.
 
-You could modify libvhost-user to explicitly pass the virtqueue index
-(or -1 if the fd is not associated with a virtqueue), but it's nice to
-avoid libvhost-user API changes so that existing libvhost-user
-applications don't require modifications.
+This probably suggests a need various modes of exposing xattrs
 
-What I would do here is to change the ->kick_info[] data struct. How
-about a linked list of VuFdWatch objects? That way the code can handle
-any number of fd watches and doesn't make assumptions about virtqueues.
-set_watch() is a generic fd monitoring interface and doesn't need to be
-tied to virtqueues.
+ - "passthrough"  - run CAP_SYS_ADMIN and pass directly
+ - "mapped"       - no capabilities, rewrite everything into user. namespace
+ - "disable"      - don't allow xattr
 
---ZfOjI3PrQbgiZnxM
-Content-Type: application/pgp-signature; name="signature.asc"
+As mentioned in the other thread though, CAP_SYS_ADMIN needs to be present
+in the initial namespace, so to support "passthrough" we'd have to NOT
+use user namespace too. Something to be aware of when we accept the
+user namespace patches.
 
------BEGIN PGP SIGNATURE-----
+Such "mapping" of attributes could also be used if virtiofs was running
+as an unprivileged user account, to expose a full range of file owner,
+group and permissions to the guest, while having everything be owned
+by the normal user on the host.   QEMU's current 9p filesystem has
+this kind of mapping support for owner/permissions, so guest view can
+be distinct from the host view.
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl7sq8wACgkQnKSrs4Gr
-c8g7zQf9Gy5CDeAhWmGcI6lXy6oGWqFWwOY1dHBMLNPFSzU7UxE9wP5SNY+PeiJx
-yHy0neGtytH/PJ9hnRQAC8IUpRKvP8KFlb7UPjVVv9oX9/s4XZhArEfbluYxfyUJ
-3dE2OeqAkaBKbX7hWG68HHoMgUG5qt/6zZ8H0T5FUzdNqwlF/Nx+AT+ckZ4vmI2W
-z7C2NX4pIiF66A+4JoqGyf95Il+Sh811m0GiwMxx7j9Z5UvhgiicmtsS5hFUdktI
-leUFtXhR6RfTPHbha8APjKunN5Bs7eUBndr4AwgSIVpUVPiHLlqrHfQRKEiYjaCc
-sGJzM35DkDSA2uEp/h3ng00Q9YAAvA==
-=8dZD
------END PGP SIGNATURE-----
-
---ZfOjI3PrQbgiZnxM--
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
