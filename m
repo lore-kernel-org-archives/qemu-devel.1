@@ -7,77 +7,77 @@ X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 967B5C433E0
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CCCDC433DF
 	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 06:41:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 61D2E207DD
+	by mail.kernel.org (Postfix) with ESMTPS id 6D0CC2080C
 	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 06:41:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="moJ41rSj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61D2E207DD
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="PqT8Ju23"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D0CC2080C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58828 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58790 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmAiJ-00077i-Jj
+	id 1jmAiJ-00076H-KE
 	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 02:41:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56704)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56792)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=4324eb4de=alistair.francis@wdc.com>)
- id 1jmAbj-0005V9-JI
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 02:34:35 -0400
+ id 1jmAbl-0005Yv-P1
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 02:34:37 -0400
 Received: from esa6.hgst.iphmx.com ([216.71.154.45]:13000)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=4324eb4de=alistair.francis@wdc.com>)
- id 1jmAbf-00028a-Jt
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 02:34:35 -0400
+ id 1jmAbj-00028a-QS
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 02:34:37 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1592548472; x=1624084472;
+ t=1592548476; x=1624084476;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=ZyHGfLXMoD/vQlrAS/c+SUX96vz+cOHa3/TUMLtyVWc=;
- b=moJ41rSj4F2AavHRcfwG1ry7s2zbG6UtgPVTpWAHM/ju5lxah+Qb3kCQ
- sisCrZkVQejvY77NLPjqgwt+tx5+OgCfvgP6Q3woeTR00BDoWJCZX+RuC
- UQiMHuYos8IHtWOpoMIxc79JGMp27CNGxu/lzzIB3Z6Y1ADVQDEOrR/+b
- Nr51+hSbSjRaL+0hUGALLtFeknNUzLDsXVWfl0AOziK8DQ5OmwdQkRE5T
- FDJioK6TluWbK+wg6CtXgtuoSoy/BMM7yACdvwRFwU9Q0ElZEqKX7un2g
- 24XIa67P4bcsfU7M6Na1OUjBHgfo3T6++oklwAExEQucYYKevMOuNHRwR A==;
-IronPort-SDR: OvNG3cmyKU/0Ikc1sy5fIqqphJHQeBGTgF82t07ko8S8HDsIUhJvrGS1SCO/7xD+2FS12/mrkT
- TtfhpJ6CEbK8J8jJzHnsZNEY9Uhd0OCSB8YnWwkSgmApWoJDhg40n3UnfILZ60foHRAgIdg82R
- 2rkTDTn9Nbwwylrt3U4f4yTmrJHlZBOa78vXppNFRT3uHSLDo5quBy9ifRfytAgNE4IW1N00Mc
- XQr7Di4/2uziai8sYG04SuDFxD2QR/vv9iqlhLBIq2+QkvSurj4HN3EGRobCWnmBCKj/sxXxHb
- 2js=
-X-IronPort-AV: E=Sophos;i="5.75,253,1589212800"; d="scan'208";a="141781918"
+ bh=XRyEFMliFOazvxi0uiuNB7H49JK+CbFims83EBUndek=;
+ b=PqT8Ju23w8FEdilHkc6O9k0f2NywYAk6pvCvruYPUBSMOWiq4DDZ2pgo
+ 95shq9nBHc0aRu28aZtBulVd5Y7OcGdL9Bxvv51zAYI0RfzQo5sdrQcME
+ tDNWyTyDzQ4vP13U2PmZYhYV2REDGxJE/62OLSpNC5JNiNz93TQapCo2C
+ cotANKMMhSEzrWzXAvNPc2JjPjdlHmZrg5nSyGRwMw01rqcVFBfufDL55
+ F4d74o485YibZctwqPYUFbcN0RM9JeSO1M3zcS7yyrVB/+XO0i+r6ns9p
+ oF3+wQUWKVGTNmO0D4yUd+XvOSKMLxjhIMTsw/DWqd4kNpG8mo5HZhZUa g==;
+IronPort-SDR: ml059JHQV89tWHLK/7jLyDZTNP9zfXFVGml5zzCFXZZ9IUZwiOF+DbCXkJGQeEihspz52WBooN
+ J9OP+xDOpgwCHySwblIRhvIS6Bao3EBryUrdzM5Q7izxTMVG9RprWW/4QdYy4QBncnYlIfNwi/
+ VMJ3PnSt+f2uZQMDyzpIYqDSS59mDc0XYKWiKNEM7JaSrPXTiHjdM7/RmcglYhLl/DrGhuXROc
+ oq/qzoMSTEjpo59DJHHBWWtW+KgZjY9IaQlr3KJXz+w98Ufl886wB5gOVIQOfpYoECB//tzEo9
+ 7Ow=
+X-IronPort-AV: E=Sophos;i="5.75,253,1589212800"; d="scan'208";a="141781927"
 Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com)
  ([199.255.45.14])
- by ob1.hgst.iphmx.com with ESMTP; 19 Jun 2020 14:34:29 +0800
-IronPort-SDR: wWfMvIvRaxFwtfoNihxJaWe6ntWRnAK64qRTnpUELl3uAJG6xcrEqp0oR+mPoKpKqkZAAujb6W
- v0QYqGF842Yadk7/90LM3+drwpZ+wOHf0=
+ by ob1.hgst.iphmx.com with ESMTP; 19 Jun 2020 14:34:30 +0800
+IronPort-SDR: Ar5NPiGdEylPFjIK04um8DRuA9mg5aajXbDjnIKMwINI4ywpx7Lw0Cug5kgudUHT7AAanNlwOq
+ qnB6xCYztYqzipOSjz5B7+B9LVFR+FJPQ=
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 18 Jun 2020 23:23:40 -0700
-IronPort-SDR: Ozl0bhm2srlwFF5IV+VWSnzy3ypADeIA7ZHQG38tgopUsupjTC0KHyi1v1YgReTu43adbBDr1V
- kreWRa+hG24g==
+ 18 Jun 2020 23:23:41 -0700
+IronPort-SDR: ykj/lQesEaB1q5SnDaWZ6LwrxjrrF7kflizWMIe3DwRZEuhdeu0HUqR91gQsXzWAN0T3iQcXie
+ wBb9Ydi5FcSg==
 WDCIronportException: Internal
 Received: from unknown (HELO risc6-mainframe.hgst.com) ([10.86.58.142])
- by uls-op-cesaip02.wdc.com with ESMTP; 18 Jun 2020 23:34:29 -0700
+ by uls-op-cesaip02.wdc.com with ESMTP; 18 Jun 2020 23:34:30 -0700
 From: Alistair Francis <alistair.francis@wdc.com>
 To: peter.maydell@linaro.org,
 	qemu-devel@nongnu.org
-Subject: [PULL 14/32] riscv/opentitan: Connect the PLIC device
-Date: Thu, 18 Jun 2020 23:25:00 -0700
-Message-Id: <20200619062518.1718523-15-alistair.francis@wdc.com>
+Subject: [PULL 18/32] hw/riscv: opentitan: Remove the riscv_ prefix of the
+ machine* and soc* functions
+Date: Thu, 18 Jun 2020 23:25:04 -0700
+Message-Id: <20200619062518.1718523-19-alistair.francis@wdc.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200619062518.1718523-1-alistair.francis@wdc.com>
 References: <20200619062518.1718523-1-alistair.francis@wdc.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=216.71.154.45;
  envelope-from=prvs=4324eb4de=alistair.francis@wdc.com;
@@ -104,94 +104,112 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: alistair23@gmail.com, Bin Meng <bin.meng@windriver.com>,
- Alistair Francis <alistair.francis@wdc.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+ Alistair Francis <alistair.francis@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Bin Meng <bin.meng@windriver.com>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- include/hw/riscv/opentitan.h |  3 +++
- hw/riscv/opentitan.c         | 14 ++++++++++++--
- 2 files changed, 15 insertions(+), 2 deletions(-)
+From: Bin Meng <bin.meng@windriver.com>
 
-diff --git a/include/hw/riscv/opentitan.h b/include/hw/riscv/opentitan.h
-index a4b6499444..76f72905a8 100644
---- a/include/hw/riscv/opentitan.h
-+++ b/include/hw/riscv/opentitan.h
-@@ -20,6 +20,7 @@
- #define HW_OPENTITAN_H
- 
- #include "hw/riscv/riscv_hart.h"
-+#include "hw/intc/ibex_plic.h"
- 
- #define TYPE_RISCV_IBEX_SOC "riscv.lowrisc.ibex.soc"
- #define RISCV_IBEX_SOC(obj) \
-@@ -31,6 +32,8 @@ typedef struct LowRISCIbexSoCState {
- 
-     /*< public >*/
-     RISCVHartArrayState cpus;
-+    IbexPlicState plic;
-+
-     MemoryRegion flash_mem;
-     MemoryRegion rom;
- } LowRISCIbexSoCState;
+This was done in the virt & sifive_u codes, but opentitan codes were
+missed. Remove the riscv_ prefix of the machine* and soc* functions.
+
+Signed-off-by: Bin Meng <bin.meng@windriver.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Message-id: 1591625864-31494-3-git-send-email-bmeng.cn@gmail.com
+Message-Id: <1591625864-31494-3-git-send-email-bmeng.cn@gmail.com>
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+---
+ hw/riscv/opentitan.c | 29 ++++++++++++++---------------
+ 1 file changed, 14 insertions(+), 15 deletions(-)
+
 diff --git a/hw/riscv/opentitan.c b/hw/riscv/opentitan.c
-index 011e4f7ee2..835b2c503f 100644
+index 675ce900bd..19223e4c29 100644
 --- a/hw/riscv/opentitan.c
 +++ b/hw/riscv/opentitan.c
-@@ -26,6 +26,7 @@
- #include "hw/riscv/boot.h"
- #include "exec/address-spaces.h"
- #include "qemu/units.h"
-+#include "sysemu/sysemu.h"
+@@ -53,7 +53,7 @@ static const struct MemmapEntry {
+     [IBEX_PADCTRL] =        {  0x40160000,  0x10000 }
+ };
  
- static const struct MemmapEntry {
-     hwaddr base;
-@@ -94,6 +95,8 @@ static void riscv_lowrisc_ibex_soc_init(Object *obj)
-     LowRISCIbexSoCState *s = RISCV_IBEX_SOC(obj);
+-static void riscv_opentitan_init(MachineState *machine)
++static void opentitan_board_init(MachineState *machine)
+ {
+     const struct MemmapEntry *memmap = ibex_memmap;
+     OpenTitanState *s = g_new0(OpenTitanState, 1);
+@@ -70,7 +70,6 @@ static void riscv_opentitan_init(MachineState *machine)
+     memory_region_add_subregion(sys_mem,
+         memmap[IBEX_RAM].base, main_mem);
  
-     object_initialize_child(obj, "cpus", &s->cpus, TYPE_RISCV_HART_ARRAY);
-+
-+    object_initialize_child(obj, "plic", &s->plic, TYPE_IBEX_PLIC);
+-
+     if (machine->firmware) {
+         riscv_load_firmware(machine->firmware, memmap[IBEX_RAM].base, NULL);
+     }
+@@ -80,17 +79,17 @@ static void riscv_opentitan_init(MachineState *machine)
+     }
  }
  
- static void riscv_lowrisc_ibex_soc_realize(DeviceState *dev_soc, Error **errp)
-@@ -102,6 +105,7 @@ static void riscv_lowrisc_ibex_soc_realize(DeviceState *dev_soc, Error **errp)
+-static void riscv_opentitan_machine_init(MachineClass *mc)
++static void opentitan_machine_init(MachineClass *mc)
+ {
+     mc->desc = "RISC-V Board compatible with OpenTitan";
+-    mc->init = riscv_opentitan_init;
++    mc->init = opentitan_board_init;
+     mc->max_cpus = 1;
+     mc->default_cpu_type = TYPE_RISCV_CPU_IBEX;
+ }
+ 
+-DEFINE_MACHINE("opentitan", riscv_opentitan_machine_init)
++DEFINE_MACHINE("opentitan", opentitan_machine_init)
+ 
+-static void riscv_lowrisc_ibex_soc_init(Object *obj)
++static void lowrisc_ibex_soc_init(Object *obj)
+ {
+     LowRISCIbexSoCState *s = RISCV_IBEX_SOC(obj);
+ 
+@@ -101,7 +100,7 @@ static void riscv_lowrisc_ibex_soc_init(Object *obj)
+     object_initialize_child(obj, "uart", &s->uart, TYPE_IBEX_UART);
+ }
+ 
+-static void riscv_lowrisc_ibex_soc_realize(DeviceState *dev_soc, Error **errp)
++static void lowrisc_ibex_soc_realize(DeviceState *dev_soc, Error **errp)
+ {
+     const struct MemmapEntry *memmap = ibex_memmap;
      MachineState *ms = MACHINE(qdev_get_machine());
-     LowRISCIbexSoCState *s = RISCV_IBEX_SOC(dev_soc);
-     MemoryRegion *sys_mem = get_system_memory();
-+    Error *err = NULL;
+@@ -186,26 +185,26 @@ static void riscv_lowrisc_ibex_soc_realize(DeviceState *dev_soc, Error **errp)
+         memmap[IBEX_PADCTRL].base, memmap[IBEX_PADCTRL].size);
+ }
  
-     object_property_set_str(OBJECT(&s->cpus), ms->cpu_type, "cpu-type",
-                             &error_abort);
-@@ -121,6 +125,14 @@ static void riscv_lowrisc_ibex_soc_realize(DeviceState *dev_soc, Error **errp)
-     memory_region_add_subregion(sys_mem, memmap[IBEX_FLASH].base,
-                                 &s->flash_mem);
+-static void riscv_lowrisc_ibex_soc_class_init(ObjectClass *oc, void *data)
++static void lowrisc_ibex_soc_class_init(ObjectClass *oc, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(oc);
  
-+    /* PLIC */
-+    sysbus_realize(SYS_BUS_DEVICE(&s->plic), &err);
-+    if (err != NULL) {
-+        error_propagate(errp, err);
-+        return;
-+    }
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->plic), 0, memmap[IBEX_PLIC].base);
-+
-     create_unimplemented_device("riscv.lowrisc.ibex.uart",
-         memmap[IBEX_UART].base, memmap[IBEX_UART].size);
-     create_unimplemented_device("riscv.lowrisc.ibex.gpio",
-@@ -141,8 +153,6 @@ static void riscv_lowrisc_ibex_soc_realize(DeviceState *dev_soc, Error **errp)
-         memmap[IBEX_AES].base, memmap[IBEX_AES].size);
-     create_unimplemented_device("riscv.lowrisc.ibex.hmac",
-         memmap[IBEX_HMAC].base, memmap[IBEX_HMAC].size);
--    create_unimplemented_device("riscv.lowrisc.ibex.plic",
--        memmap[IBEX_PLIC].base, memmap[IBEX_PLIC].size);
-     create_unimplemented_device("riscv.lowrisc.ibex.pinmux",
-         memmap[IBEX_PINMUX].base, memmap[IBEX_PINMUX].size);
-     create_unimplemented_device("riscv.lowrisc.ibex.alert_handler",
+-    dc->realize = riscv_lowrisc_ibex_soc_realize;
++    dc->realize = lowrisc_ibex_soc_realize;
+     /* Reason: Uses serial_hds in realize function, thus can't be used twice */
+     dc->user_creatable = false;
+ }
+ 
+-static const TypeInfo riscv_lowrisc_ibex_soc_type_info = {
++static const TypeInfo lowrisc_ibex_soc_type_info = {
+     .name = TYPE_RISCV_IBEX_SOC,
+     .parent = TYPE_DEVICE,
+     .instance_size = sizeof(LowRISCIbexSoCState),
+-    .instance_init = riscv_lowrisc_ibex_soc_init,
+-    .class_init = riscv_lowrisc_ibex_soc_class_init,
++    .instance_init = lowrisc_ibex_soc_init,
++    .class_init = lowrisc_ibex_soc_class_init,
+ };
+ 
+-static void riscv_lowrisc_ibex_soc_register_types(void)
++static void lowrisc_ibex_soc_register_types(void)
+ {
+-    type_register_static(&riscv_lowrisc_ibex_soc_type_info);
++    type_register_static(&lowrisc_ibex_soc_type_info);
+ }
+ 
+-type_init(riscv_lowrisc_ibex_soc_register_types)
++type_init(lowrisc_ibex_soc_register_types)
 -- 
 2.27.0
 
