@@ -2,91 +2,106 @@ Return-Path: <SRS0=Yszf=AA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8AB8C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 15:07:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F641C433E2
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 15:08:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9529421835
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 15:07:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QDin4CVc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9529421835
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 35D9220776
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 15:08:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35D9220776
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45178 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47502 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmIbw-0008P6-Sk
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 11:07:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50932)
+	id 1jmIcf-0000zv-Hg
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 11:08:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51100)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jmIbG-0007qs-HL
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 11:06:38 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:25043
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jmIbE-00078E-FN
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 11:06:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592579195;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=lr+LUOaLSBgm41JBpkX79KrfQBxFPphNoXJMk//1n6g=;
- b=QDin4CVcsJJJdBtZq2eplsfDddL4xRcLBlgZncvWyr/gia9Ce+PeN2HgUKkCwNe3uzSbzi
- Ot16K09eFS4f8TYNtAunbPMioji4WCbmUl4CU9atjuptGem1vf75u9bLznHhFz08wfWPAb
- gPGAY17GodO0Dnd2N0LObr39WOBpWKw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-112-Nn_I5OnqOAaEp7tXeJv0cQ-1; Fri, 19 Jun 2020 11:06:07 -0400
-X-MC-Unique: Nn_I5OnqOAaEp7tXeJv0cQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 178EF106C01C;
- Fri, 19 Jun 2020 15:06:05 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.65])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 13C135C1D0;
- Fri, 19 Jun 2020 15:05:59 +0000 (UTC)
-Date: Fri, 19 Jun 2020 16:05:56 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [PATCH v3 9/9] host trust limitation: Alter virtio default
- properties for protected guests
-Message-ID: <20200619150556.GW700896@redhat.com>
-References: <20200619020602.118306-1-david@gibson.dropbear.id.au>
- <20200619020602.118306-10-david@gibson.dropbear.id.au>
- <20200619101245.GC700896@redhat.com>
- <20200619144541.GM17085@umbus.fritz.box>
+ (Exim 4.90_1) (envelope-from <stefanb@linux.ibm.com>)
+ id 1jmIbz-0000A4-Pa; Fri, 19 Jun 2020 11:07:23 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:16256
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <stefanb@linux.ibm.com>)
+ id 1jmIbx-0007Cb-M5; Fri, 19 Jun 2020 11:07:23 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 05JF2Skb131603; Fri, 19 Jun 2020 11:07:18 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 31rthaa5w9-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 19 Jun 2020 11:07:18 -0400
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05JF2YIf132218;
+ Fri, 19 Jun 2020 11:07:18 -0400
+Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com
+ [169.55.85.253])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 31rthaa5vb-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 19 Jun 2020 11:07:18 -0400
+Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
+ by ppma01wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05JF5Wda012113;
+ Fri, 19 Jun 2020 15:07:16 GMT
+Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com
+ [9.57.198.26]) by ppma01wdc.us.ibm.com with ESMTP id 31q6bdmcwp-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 19 Jun 2020 15:07:16 +0000
+Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com
+ [9.57.199.111])
+ by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 05JF7G5Q37880118
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 19 Jun 2020 15:07:16 GMT
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 6307CAC05B;
+ Fri, 19 Jun 2020 15:07:16 +0000 (GMT)
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id ADBC9AC059;
+ Fri, 19 Jun 2020 15:07:15 +0000 (GMT)
+Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
+ by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
+ Fri, 19 Jun 2020 15:07:15 +0000 (GMT)
+Subject: Re: [PATCH v6 1/3] acpi: Some build_tpm2() code reshape
+To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org,
+ mst@redhat.com, imammedo@redhat.com
+References: <20200619141851.16272-1-eric.auger@redhat.com>
+ <20200619141851.16272-2-eric.auger@redhat.com>
+From: Stefan Berger <stefanb@linux.ibm.com>
+Message-ID: <cd32ba20-a52d-4ff3-6f01-f03241dfc50d@linux.ibm.com>
+Date: Fri, 19 Jun 2020 11:07:15 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200619144541.GM17085@umbus.fritz.box>
-User-Agent: Mutt/1.14.0 (2020-05-02)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=berrange@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/19 05:19:18
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200619141851.16272-2-eric.auger@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
+ definitions=2020-06-19_16:2020-06-19,
+ 2020-06-19 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ lowpriorityscore=0
+ phishscore=0 clxscore=1015 priorityscore=1501 adultscore=0 malwarescore=0
+ mlxscore=0 mlxlogscore=999 spamscore=0 impostorscore=0 suspectscore=0
+ bulkscore=0 cotscore=-2147483648 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2004280000 definitions=main-2006190107
+Received-SPF: pass client-ip=148.163.158.5; envelope-from=stefanb@linux.ibm.com;
+ helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/19 11:07:20
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-Spam_score_int: -25
+X-Spam_score: -2.6
+X-Spam_bar: --
+X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,80 +114,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: pair@us.ibm.com, brijesh.singh@amd.com, frankja@linux.ibm.com,
- kvm@vger.kernel.org, mst@redhat.com, cohuck@redhat.com, david@redhat.com,
- qemu-devel@nongnu.org, dgilbert@redhat.com, pasic@linux.ibm.com,
- qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, pbonzini@redhat.com,
- Richard Henderson <rth@twiddle.net>, mdroth@linux.vnet.ibm.com,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: thuth@redhat.com, lersek@redhat.com, drjones@redhat.com,
+ shannon.zhaosl@gmail.com, marcandre.lureau@redhat.com, philmd@redhat.com,
+ ardb@kernel.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, Jun 20, 2020 at 12:45:41AM +1000, David Gibson wrote:
-> On Fri, Jun 19, 2020 at 11:12:45AM +0100, Daniel P. Berrangé wrote:
-> > On Fri, Jun 19, 2020 at 12:06:02PM +1000, David Gibson wrote:
-> > > The default behaviour for virtio devices is not to use the platforms normal
-> > > DMA paths, but instead to use the fact that it's running in a hypervisor
-> > > to directly access guest memory.  That doesn't work if the guest's memory
-> > > is protected from hypervisor access, such as with AMD's SEV or POWER's PEF.
-> > > 
-> > > So, if a host trust limitation mechanism is enabled, then apply the
-> > > iommu_platform=on option so it will go through normal DMA mechanisms.
-> > > Those will presumably have some way of marking memory as shared with the
-> > > hypervisor or hardware so that DMA will work.
-> > > 
-> > > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > > ---
-> > >  hw/core/machine.c | 11 +++++++++++
-> > >  1 file changed, 11 insertions(+)
-> > > 
-> > > diff --git a/hw/core/machine.c b/hw/core/machine.c
-> > > index a71792bc16..8dfc1bb3f8 100644
-> > > --- a/hw/core/machine.c
-> > > +++ b/hw/core/machine.c
-> > > @@ -28,6 +28,8 @@
-> > >  #include "hw/mem/nvdimm.h"
-> > >  #include "migration/vmstate.h"
-> > >  #include "exec/host-trust-limitation.h"
-> > > +#include "hw/virtio/virtio.h"
-> > > +#include "hw/virtio/virtio-pci.h"
-> > >  
-> > >  GlobalProperty hw_compat_5_0[] = {
-> > >      { "virtio-balloon-device", "page-poison", "false" },
-> > > @@ -1165,6 +1167,15 @@ void machine_run_board_init(MachineState *machine)
-> > >           * areas.
-> > >           */
-> > >          machine_set_mem_merge(OBJECT(machine), false, &error_abort);
-> > > +
-> > > +        /*
-> > > +         * Virtio devices can't count on directly accessing guest
-> > > +         * memory, so they need iommu_platform=on to use normal DMA
-> > > +         * mechanisms.  That requires disabling legacy virtio support
-> > > +         * for virtio pci devices
-> > > +         */
-> > > +        object_register_sugar_prop(TYPE_VIRTIO_PCI, "disable-legacy", "on");
-> > > +        object_register_sugar_prop(TYPE_VIRTIO_DEVICE, "iommu_platform", "on");
-> > >      }
-> > 
-> > Silently changing the user's request configuration like this
-> 
-> It doesn't, though.  register_sugar_prop() effectively registers a
-> default, so if the user has explicitly specified something, that will
-> take precedence.
+On 6/19/20 10:18 AM, Eric Auger wrote:
+> Remove any reference to Acpi20TPM2 and adopt an implementation
+> similar to build_ghes_v2().
+>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> Suggested-by: Igor Mammedov <imammedo@redhat.com>
+>
+> ---
+>
+> v5 -> v6:
+> - add reference to the spec + comment about LAML and LASA fields
+> - also moved LASA intro comment above build_append_int_noprefix()
+>    as requested by Igor
+> ---
+>   hw/acpi/aml-build.c | 54 +++++++++++++++++++++++++++++----------------
+>   1 file changed, 35 insertions(+), 19 deletions(-)
+>
+> diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
+> index 2cb7b991ef..1cc08a3eb9 100644
+> --- a/hw/acpi/aml-build.c
+> +++ b/hw/acpi/aml-build.c
+> @@ -1878,48 +1878,64 @@ build_hdr:
+>                    "FACP", tbl->len - fadt_start, f->rev, oem_id, oem_table_id);
+>   }
+>   
+> +/*
+> + * build_tpm2 - Build the TPM2 table as specified in table 7 of
+> + * "TCG ACPI Specification; Family 1.2 and 2.0;
+> + * Level 00 Revision 00.37, December 19, 2014"
+> + * Note: the LASA and LAML fields are optional for TPM-2.0 (the above
+> + * table does not mention them) but are needed at least for SeaBIOS.
+> + * See the Acpi20TPM2 struct for the corresponding layout.
+> + */
+>   void build_tpm2(GArray *table_data, BIOSLinker *linker, GArray *tcpalog)
+>   {
+> -    Acpi20TPM2 *tpm2_ptr = acpi_data_push(table_data, sizeof(AcpiTableHeader));
+> -    unsigned log_addr_size = sizeof(tpm2_ptr->log_area_start_address);
+> -    unsigned log_addr_offset =
+> -        (char *)&tpm2_ptr->log_area_start_address - table_data->data;
+>       uint8_t start_method_params[12] = {};
+> +    unsigned log_addr_offset, tpm2_start;
+> +    uint64_t control_area_start_address;
+>       TPMIf *tpmif = tpm_find();
+> +    uint32_t start_method;
+> +    void *tpm2_ptr;
+>   
+> -    /* platform class */
+> +    tpm2_start = table_data->len;
+> +    tpm2_ptr = acpi_data_push(table_data, sizeof(AcpiTableHeader));
+> +
+> +    /* Platform Class */
+>       build_append_int_noprefix(table_data, TPM2_ACPI_CLASS_CLIENT, 2);
+> -    /* reserved */
+> +    /* Reserved */
+>       build_append_int_noprefix(table_data, 0, 2);
+>       if (TPM_IS_TIS_ISA(tpmif) || TPM_IS_TIS_SYSBUS(tpmif)) {
+> -        /* address of control area */
+> -        build_append_int_noprefix(table_data, 0, 8);
+> -        /* start method */
+> -        build_append_int_noprefix(table_data, TPM2_START_METHOD_MMIO, 4);
+> +        control_area_start_address = 0;
+> +        start_method = TPM2_START_METHOD_MMIO;
+>       } else if (TPM_IS_CRB(tpmif)) {
+> -        build_append_int_noprefix(table_data, TPM_CRB_ADDR_CTRL, 8);
+> -        build_append_int_noprefix(table_data, TPM2_START_METHOD_CRB, 4);
+> +        control_area_start_address = TPM_CRB_ADDR_CTRL;
+> +        start_method = TPM2_START_METHOD_CRB;
+>       } else {
+> -        g_warn_if_reached();
+> +        g_assert_not_reached();
+>       }
+> +    /* Address of Control Area */
+> +    build_append_int_noprefix(table_data, control_area_start_address, 8);
+> +    /* Start Method */
+> +    build_append_int_noprefix(table_data, start_method, 4);
+>   
+> -    /* platform specific parameters */
+> -    g_array_append_vals(table_data, &start_method_params, 12);
+> +    /* Platform Specific Parameters */
+> +    g_array_append_vals(table_data, &start_method_params,
+> +                        ARRAY_SIZE(start_method_params));
+>   
+> -    /* log area minimum length */
+> +    /* Log Area Minimum Length */
+>       build_append_int_noprefix(table_data, TPM_LOG_AREA_MINIMUM_SIZE, 4);
+>   
+>       acpi_data_push(tcpalog, TPM_LOG_AREA_MINIMUM_SIZE);
+>       bios_linker_loader_alloc(linker, ACPI_BUILD_TPMLOG_FILE, tcpalog, 1,
+>                                false);
+>   
+> -    /* log area start address to be filled by Guest linker */
+> +    log_addr_offset = table_data->len;
+> +
 
-Don't assume that the user has set "disable-legacy=off". People who want to
-have a transtional device are almost certainly pasing "-device virtio-blk-pci",
-because historical behaviour is that this is sufficient to give you a
-transitional device. Changing the default of disable-legacy=on has not
-honoured the users' requested config.
+Don't have to subtract tpm2_start from it ?
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+
+> +    /* Log Area Start Address to be filled by Guest linker */
+>       build_append_int_noprefix(table_data, 0, 8);
+>       bios_linker_loader_add_pointer(linker, ACPI_BUILD_TABLE_FILE,
+> -                                   log_addr_offset, log_addr_size,
+> +                                   log_addr_offset, 8,
+>                                      ACPI_BUILD_TPMLOG_FILE, 0);
+>       build_header(linker, table_data,
+> -                 (void *)tpm2_ptr, "TPM2", sizeof(*tpm2_ptr), 4, NULL, NULL);
+> +                 tpm2_ptr, "TPM2", table_data->len - tpm2_start, 4, NULL, NULL);
+>   }
+>   
+>   /* ACPI 5.0: 6.4.3.8.2 Serial Bus Connection Descriptors */
+
 
 
