@@ -2,73 +2,93 @@ Return-Path: <SRS0=Yszf=AA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB230C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 13:57:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41066C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 13:59:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 80F2C21527
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 13:57:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80F2C21527
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 09C6B207FC
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 13:59:57 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TzcFeOSh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09C6B207FC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48966 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52952 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmHW5-0003u3-Ql
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 09:57:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55592)
+	id 1jmHYi-0006Mw-Av
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 09:59:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56248)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jmHVM-0003LJ-Db
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 09:56:28 -0400
-Resent-Date: Fri, 19 Jun 2020 09:56:28 -0400
-Resent-Message-Id: <E1jmHVM-0003LJ-Db@lists.gnu.org>
-Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21318)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jmHVK-0001Z6-0x
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 09:56:28 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1592574978; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=iKi6Wt9IxIBR8zkeNRXBHEzWVXS9AEJocfw60d6inQlmx0qUgRgnmUu0vctFjzbJWy5JD9K4mrF6q8jatM+vgGds9T2ZBAyRsxbPpH6So/6zUcaGvGOaYDw4UH2Uv3QKeio+7D8DjifgmqPBMt8dfmrnm6XITDQcn7GpVnsS6fA=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1592574978;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=PLOd68uZXolx/LizxOR24NNzC6+TY40e16xPdxHykYk=; 
- b=Ldw6JHgEcR40uI1Vm5eFoJJ08dc8MTO895+pMr6JbQiX/L24eICkaV/AjInW/8NiPgFNsGbCtoswvQrBcoZLNNJL3YBCi0b7VhjdHtneq1G/YloqtyWc7q5lbqz0XmzP5o59AbTeNhiyq5M+wZUzNAK+yoBwh2d3qErP5eyO5k8=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1592574976412474.9790726364729;
- Fri, 19 Jun 2020 06:56:16 -0700 (PDT)
-Message-ID: <159257497532.2529.17652457882745894379@d1fd068a5071>
-Subject: Re: [PULL 0/7] Audio 20200619 patches
-In-Reply-To: <20200619131741.10857-1-kraxel@redhat.com>
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jmHXj-0005G1-5R
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 09:58:55 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:40203)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jmHXh-0001xi-9k
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 09:58:54 -0400
+Received: by mail-wr1-x442.google.com with SMTP id h5so9815493wrc.7
+ for <qemu-devel@nongnu.org>; Fri, 19 Jun 2020 06:58:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=56swg9m7x4afL9ERav2fhFo7u7ycjKdoOMzkEstl03E=;
+ b=TzcFeOShSYaYLoEdRvUZLmwFaz69TDE9dFXjjyDCP9nUwRqWoD+BQokg92yHnWY6YP
+ kE0fTacM3F6WMTwbAN0GFHf9Ud2XSYKuP6Ezok4oql8QyIB6/OBrlxjaiOLCPy6LL3ef
+ Y5DYIfGdsxbN2FOgRF4duaeCvzPrB/nskptrbvA6FlBc4OqSOJFWunmd/roWRjMee5YC
+ 5xTylnik0XYokU7kNwPf8ozeYccSMuGPGuT3ZnnznCLtLhK7VEV9eE03QgzEKLhEXOvi
+ 9Fu8GBOdtmnpQFVC80PmAHkjKfxUxgUeljw4WBLlv3ECMMXwCi93vPQRcSepAuysz3DS
+ a6Mw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=56swg9m7x4afL9ERav2fhFo7u7ycjKdoOMzkEstl03E=;
+ b=nH2tM5W7p7dQFONKirQQQtWwV6tP0YdLHd3mOnkq/YQiwIQJPMa1GQbWFQXIwMWEDF
+ ty9NViVwbU2n9geNjnHvJOYcQSd0vTHCFosOc2qh1hhnoIbulx6/O84sI1hgvaOtiTb7
+ aYSP05J1ti0H+xGpa8t6ZBjEKZkaRhQ8w3u642DQbuLb4pwpZdohlG1uhjwc16ts9SuV
+ zOfXOmk/n6Npa8KWELd3OMHj2BeVJO1pyACvbYEBHbwppA1ggyPFOiBlweq5hLV6Nh5q
+ Xr2LklzsctZ8Petr6NdzFSWOYuuLMLrrHzsDj8knY1S+/FoJraF+p4Mp43dJWcsEwm5p
+ 0u2A==
+X-Gm-Message-State: AOAM531455YMny91NanzqFe9VzX2MJptA6RaNqLEvEH+1wVnt3749pVM
+ EfyR6ssudcmatkEP61xK01jtXg==
+X-Google-Smtp-Source: ABdhPJzgU1Jo+fwJv6r0ncrHFdT5g+7/Zw4jSw6Kktb7SE+MpLakSSlFwZQDK7jl/up3U9BlzUuIpg==
+X-Received: by 2002:a5d:6884:: with SMTP id h4mr4635578wru.198.1592575131529; 
+ Fri, 19 Jun 2020 06:58:51 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id b185sm16229336wmd.3.2020.06.19.06.58.50
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 19 Jun 2020 06:58:50 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 9588F1FF7E;
+ Fri, 19 Jun 2020 14:58:49 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [RFC PATCH] docs/devel: add some notes on tcg-icount for developers
+Date: Fri, 19 Jun 2020 14:58:44 +0100
+Message-Id: <20200619135844.23307-1-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: kraxel@redhat.com
-Date: Fri, 19 Jun 2020 06:56:16 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o53.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/19 07:15:10
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x442.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -81,53 +101,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: qemu-devel@nongnu.org, kraxel@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Pavel Dovgalyuk <dovgaluk@ispras.ru>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDYxOTEzMTc0MS4xMDg1
-Ny0xLWtyYXhlbEByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
-c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
-b3JtYXRpb246CgpTdWJqZWN0OiBbUFVMTCAwLzddIEF1ZGlvIDIwMjAwNjE5IHBhdGNoZXMKVHlw
-ZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMjAwNjE5MTMxNzQxLjEwODU3LTEta3JheGVsQHJlZGhh
-dC5jb20KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJz
-ZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5h
-bWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmln
-IC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBs
-IC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhj
-ZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIu
-Y29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAtIFt0YWcgdXBkYXRlXSAgICAgIHBhdGNoZXcvMjAy
-MDA2MTkxMjMzMzEuMTczODctMS1maWxpcC5ib3p1dGFAc3lybWlhLmNvbSAtPiBwYXRjaGV3LzIw
-MjAwNjE5MTIzMzMxLjE3Mzg3LTEtZmlsaXAuYm96dXRhQHN5cm1pYS5jb20KU3dpdGNoZWQgdG8g
-YSBuZXcgYnJhbmNoICd0ZXN0Jwo0MjZlODQzIGh3L2F1ZGlvL2d1czogRml4IHJlZ2lzdGVycyAz
-Mi1iaXQgYWNjZXNzCmZmYWQ5NDMgYXVkaW8vamFjazogc2ltcGxpZnkgdGhlIHJlLWluaXQgY29k
-ZSBwYXRoCjhlYzQ4ZWYgYXVkaW8vamFjazogaG9ub3VyIHRoZSBlbmFibGUgc3RhdGUgb2YgdGhl
-IGF1ZGlvIGRldmljZQpmNDA3M2Y1IGF1ZGlvL2phY2s6IGRvIG5vdCByZW1vdmUgcG9ydHMgd2hl
-biBmaW5pc2hpbmcKZmMzMTRhNiBhdWRpby9qYWNrOiByZW1vdmUgaW52YWxpZCBzZXQgb2YgaW5w
-dXQgc3VwcG9ydCBib29sCjY5YzVmM2YgYXVkaW8vamFjazogcmVtb3ZlIHVudXNlZCBzdG9wcGVk
-IHN0YXRlCmY2NTg2ZWYgYXVkaW8vamFjazogZml4IGludmFsaWQgbWluaW11bSBidWZmZXIgc2l6
-ZSBjaGVjawoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS83IENoZWNraW5nIGNvbW1pdCBmNjU4NmVm
-OTBiN2UgKGF1ZGlvL2phY2s6IGZpeCBpbnZhbGlkIG1pbmltdW0gYnVmZmVyIHNpemUgY2hlY2sp
-CjIvNyBDaGVja2luZyBjb21taXQgNjljNWYzZmUwYTE3IChhdWRpby9qYWNrOiByZW1vdmUgdW51
-c2VkIHN0b3BwZWQgc3RhdGUpCjMvNyBDaGVja2luZyBjb21taXQgZmMzMTRhNmI4YWEzIChhdWRp
-by9qYWNrOiByZW1vdmUgaW52YWxpZCBzZXQgb2YgaW5wdXQgc3VwcG9ydCBib29sKQo0LzcgQ2hl
-Y2tpbmcgY29tbWl0IGY0MDczZjVjYjA1NCAoYXVkaW8vamFjazogZG8gbm90IHJlbW92ZSBwb3J0
-cyB3aGVuIGZpbmlzaGluZykKNS83IENoZWNraW5nIGNvbW1pdCA4ZWM0OGVmYjFiMjEgKGF1ZGlv
-L2phY2s6IGhvbm91ciB0aGUgZW5hYmxlIHN0YXRlIG9mIHRoZSBhdWRpbyBkZXZpY2UpCkVSUk9S
-OiBzcGFjZSByZXF1aXJlZCBiZWZvcmUgdGhlIG9wZW4gcGFyZW50aGVzaXMgJygnCiM0NDogRklM
-RTogYXVkaW8vamFja2F1ZGlvLmM6Mjc3OgorICAgICAgICAgICAgZm9yKGludCBpID0gMDsgaSA8
-IGMtPm5jaGFubmVsczsgKytpKSB7Cgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDkxIGxp
-bmVzIGNoZWNrZWQKClBhdGNoIDUvNyBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
-ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
-dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKNi83IENo
-ZWNraW5nIGNvbW1pdCBmZmFkOTQzYmNjYmMgKGF1ZGlvL2phY2s6IHNpbXBsaWZ5IHRoZSByZS1p
-bml0IGNvZGUgcGF0aCkKNy83IENoZWNraW5nIGNvbW1pdCA0MjZlODQzZTc2OGMgKGh3L2F1ZGlv
-L2d1czogRml4IHJlZ2lzdGVycyAzMi1iaXQgYWNjZXNzKQo9PT0gT1VUUFVUIEVORCA9PT0KClRl
-c3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJs
-ZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIwMDYxOTEzMTc0MS4xMDg1Ny0xLWtyYXhl
-bEByZWRoYXQuY29tL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwg
-Z2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9d
-LgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+This attempts to bring together my understanding of the requirements
+for icount behaviour into one reference document for our developer
+notes. It currently make one piece of conjecture which I think is true
+that we don't need gen_io_start/end statements for non-MMIO related
+I/O operations.
+
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Pavel Dovgalyuk <dovgaluk@ispras.ru>
+Cc: Richard Henderson <richard.henderson@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>
+---
+ docs/devel/tcg-icount.rst | 86 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 86 insertions(+)
+ create mode 100644 docs/devel/tcg-icount.rst
+
+diff --git a/docs/devel/tcg-icount.rst b/docs/devel/tcg-icount.rst
+new file mode 100644
+index 00000000000..53d08ce9282
+--- /dev/null
++++ b/docs/devel/tcg-icount.rst
+@@ -0,0 +1,86 @@
++..
++   Copyright (c) 2019, Linaro Limited
++   Written by Alex Bennée
++
++
++========================
++TCG Instruction Counting
++========================
++
++TCG has long supported a feature known as icount which allows for
++instruction counting during execution. This should be confused with
++cycle accurate emulation - QEMU does not attempt to emulate how long
++an instruction would take on real hardware. That is a job for other
++more detailed (and slower) tools that simulate the rest of a
++micro-architecture.
++
++This feature is only available for system emulation and is
++incompatible with multi-threaded TCG. It can be used to better align
++execution time with wall-clock time so a "slow" device doesn't run too
++fast on modern hardware. It can also provides for a degree of
++deterministic execution and is an essential part of the record/replay
++support in QEMU.
++
++Core Concepts
++=============
++
++At it's heart icount is simply a count of executed instructions which
++is stored in the TimersState of QEMU's timer sub-system. The number of
++executed instructions can then be used to calculate QEMU_CLOCK_VIRTUAL
++which represents the amount of elapsed time in the system since
++execution started. Depending on the icount mode this may either be a
++fixed number of ns per instructions or adjusted as execution continues
++to keep real time and virtual time in sync.
++
++To be able to calculate the number of executed instructions the
++translator starts by allocating a budget of instructions to be
++executed. The budget of instructions is limited by how long it will be
++until the next timer will expire. We store this budget as part of a
++CPUs icount_decr field which shared with the machinery for handling
++cpu_exit(). The whole field is checked at the start of every
++translated block and will cause us to return to the outer loop to deal
++with whatever caused the exit.
++
++In the case of icount before the flag is checked we subtract the
++number of instructions the translation block would execute. If this
++would cause the instruction budget to got negative we exit the main
++loop and regenerate a new translation block with exactly the right
++number of instructions to take the budget to 0 meaning whatever timer
++was due to expire will expire exactly when we exit the main run loop.
++
++Dealing with MMIO
++-----------------
++
++While we can adjust the instruction budget for known events like timer
++expiry we can not do the same for MMIO. Every load/store we execute
++might potentially trigger an I/O event at which point we will need an
++up to date and accurate reading of the icount number.
++
++To deal with this case when an I/O access is made we:
++
++  - restore un-executed instructions to the icount budget
++  - re-compile a single [1]_ instruction block for the current PC
++  - exit the cpu loop and execute the re-compiled block
++
++The new block is created with the CF_LAST_IO compile flag which
++ensures the final instruction is wrapped with a
++gen_io_start()/gen_io_end() pair so we don't enter a perpetual loop
++constantly recompiling a single instruction block. For translators
++using the common translator_loop this is done automatically.
++  
++.. [1] sometimes two instructions if dealing with delay slots  
++
++Other I/O operations
++--------------------
++
++MMIO isn't the only type of operation for which we might need a
++correct and accurate clock. IO port instructions and accesses to
++system registers are the common examples here. For the clock to be
++accurate you end a translation block on these instructions.
++
++.. warning:: (CONJECTURE) instructions that won't get trapped in the
++             io_read/writex shouldn't need gen_io_start/end blocks
++             around them.
++
++
++
+-- 
+2.20.1
+
 
