@@ -2,82 +2,88 @@ Return-Path: <SRS0=Yszf=AA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8C7DC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 14:19:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 748D7C433E3
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 14:20:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 932CB20776
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 14:19:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 45B2021556
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 14:20:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=szeredi.hu header.i=@szeredi.hu header.b="fZacZoMW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 932CB20776
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=szeredi.hu
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JhdPs3H3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45B2021556
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56922 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60566 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmHrm-0000gm-QU
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 10:19:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34626)
+	id 1jmHso-0002GF-Hn
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 10:20:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35608)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <miklos@szeredi.hu>) id 1jmHp1-00081r-1R
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 10:16:47 -0400
-Received: from mail-ej1-x643.google.com ([2a00:1450:4864:20::643]:46924)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <miklos@szeredi.hu>) id 1jmHoy-0005Yh-VO
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 10:16:46 -0400
-Received: by mail-ej1-x643.google.com with SMTP id p20so10316894ejd.13
- for <qemu-devel@nongnu.org>; Fri, 19 Jun 2020 07:16:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=szeredi.hu; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=892xWMh1+vvidwxM0vd7W+Apqra00tDOkRAFYadbIlM=;
- b=fZacZoMW2LFP/V8rnrhWNwJ6hIRlvXIg3L1qB/qdpUZlDhCgAJZSPu9FQ6y3pLRPuY
- F7VFs/HPH35BRHVOW44BSIpLkfMqNI71xNb1UZhYDzjsYbgGlyiSqH0MCs8zoAEhDY4z
- F7uSWYZ8G3QWakRZpGSb2oEDXF+z3nhVveJ48=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=892xWMh1+vvidwxM0vd7W+Apqra00tDOkRAFYadbIlM=;
- b=XwT4o3tZWtoaP9v9g3YljyFe/sBgvNCjFySjVb4Q89TWacw/SnLyA6yo8PS5PDf05Z
- 6PMI4AS7DcwsPPjPvsdcxYsPuAcu52E4+71TNCI8gxjhugTtMEvvEmUo4a7D0cxD+A+u
- TRPAzD4DavBKrn7MDVDR5wlzULd37C5x7J18befM9jsz00BdM3wT9YrticxHAC6qFFlK
- 7IC5XVTElKD+Qkqhkh0q9NQq44CmbUS4ZYvvFR9cj6gc87Zk8z0GZSexzrShy6FLZ+U6
- YzzF0/Sk1GNM7uFyDweq8bYzn+ZyDZq9Asoth+F0F0levviojdkL15dAypNBbKB47kyP
- wo3A==
-X-Gm-Message-State: AOAM533iIwzZ+PZz6s2e6ARX41pQu7xR9bDIpg1+1485O3xEBZ4MIq9G
- jpPMX7ykbcHEOFXeYjiJEdXOahpzWWg9wa8ZHbVOLA==
-X-Google-Smtp-Source: ABdhPJzZ0eAD3k13iuMYKoiggiOmPLE3XH6AeIwXWJGJtKkrN66t7WJqUzZqSd1gVl6f7wwKeOs3hG1iUP990Ph0DQI=
-X-Received: by 2002:a17:906:1947:: with SMTP id
- b7mr3746510eje.320.1592576201612; 
- Fri, 19 Jun 2020 07:16:41 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1jmHre-0000uc-Dz
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 10:19:30 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36132
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1jmHrc-00061W-QZ
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 10:19:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592576368;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=qDNBig6IWQiFeyOxhMViPcQxZlm7fNfvrCXicg2128w=;
+ b=JhdPs3H3MEKFE2SOFEyieOR3Ww+hbXaCFEOf6vdsPOWbZEw11mwLnisZeOm6KfQ0DLv3pM
+ 2l7PtFhA4s/VRYLTCOKYSYgn3PH0AR0nCLlm8E+1rmlHCIWjvd2JKlvDkFbNqPIERRfpn7
+ lqw9b/b9q6i6h4ZMfEOAH/jVjxvxC0k=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-381-8XCUtQRjPmGbnHIYfLtBew-1; Fri, 19 Jun 2020 10:19:26 -0400
+X-MC-Unique: 8XCUtQRjPmGbnHIYfLtBew-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 60CD6464;
+ Fri, 19 Jun 2020 14:19:24 +0000 (UTC)
+Received: from laptop.redhat.com (ovpn-114-197.ams2.redhat.com [10.36.114.197])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D503319D7B;
+ Fri, 19 Jun 2020 14:19:12 +0000 (UTC)
+From: Eric Auger <eric.auger@redhat.com>
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, stefanb@linux.ibm.com,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org,
+ mst@redhat.com, imammedo@redhat.com
+Subject: [PATCH v6 3/3] docs/specs/tpm: ACPI boot now supported for TPM/ARM
+Date: Fri, 19 Jun 2020 16:18:51 +0200
+Message-Id: <20200619141851.16272-4-eric.auger@redhat.com>
+In-Reply-To: <20200619141851.16272-1-eric.auger@redhat.com>
+References: <20200619141851.16272-1-eric.auger@redhat.com>
 MIME-Version: 1.0
-References: <20200416164907.244868-1-stefanha@redhat.com>
- <20200618190816.GD3814@redhat.com>
-In-Reply-To: <20200618190816.GD3814@redhat.com>
-From: Miklos Szeredi <miklos@szeredi.hu>
-Date: Fri, 19 Jun 2020 16:16:30 +0200
-Message-ID: <CAJfpegsfqADmK6foDyuQQnvMDh_jE0rNUCBRuxPchSSirrb04Q@mail.gmail.com>
-Subject: Re: [Virtio-fs] [PATCH 0/2] virtiofsd: drop Linux capabilities(7)
-To: Vivek Goyal <vgoyal@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::643;
- envelope-from=miklos@szeredi.hu; helo=mail-ej1-x643.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -16
-X-Spam_score: -1.7
-X-Spam_bar: -
-X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_INVALID=0.1,
- DKIM_SIGNED=0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.120;
+ envelope-from=eric.auger@redhat.com; helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/19 03:15:03
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
-X-Mailman-Approved-At: Fri, 19 Jun 2020 10:18:19 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,27 +95,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-fs-list <virtio-fs@redhat.com>, qemu-devel@nongnu.org,
- Stefan Hajnoczi <stefanha@redhat.com>
+Cc: thuth@redhat.com, lersek@redhat.com, drjones@redhat.com,
+ shannon.zhaosl@gmail.com, marcandre.lureau@redhat.com, philmd@redhat.com,
+ ardb@kernel.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jun 18, 2020 at 9:08 PM Vivek Goyal <vgoyal@redhat.com> wrote:
->
-> On Thu, Apr 16, 2020 at 05:49:05PM +0100, Stefan Hajnoczi wrote:
-> > virtiofsd doesn't need of all Linux capabilities(7) available to root.  Keep a
-> > whitelisted set of capabilities that we require.  This improves security in
-> > case virtiofsd is compromised by making it hard for an attacker to gain further
-> > access to the system.
->
-> Hi Stefan,
->
-> I just noticed that this patch set breaks overlayfs on top of virtiofs.
+ACPI boot now is supported. Let's remove the comment
+saying it is not.
 
-How so?  Virtiofs isn't mounting overlayfs, is it?  Only the mounter
-requires CAP_SYS_ADMIN, not the accessor.
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+---
+ docs/specs/tpm.rst | 2 --
+ 1 file changed, 2 deletions(-)
 
-Thanks,
-Miklos
+diff --git a/docs/specs/tpm.rst b/docs/specs/tpm.rst
+index 5e61238bc5..eeeb93730a 100644
+--- a/docs/specs/tpm.rst
++++ b/docs/specs/tpm.rst
+@@ -346,8 +346,6 @@ In case an Arm virt machine is emulated, use the following command line:
+     -drive if=pflash,format=raw,file=flash0.img,readonly \
+     -drive if=pflash,format=raw,file=flash1.img
+ 
+-  On Arm, ACPI boot with TPM is not yet supported.
+-
+ In case SeaBIOS is used as firmware, it should show the TPM menu item
+ after entering the menu with 'ESC'.
+ 
+-- 
+2.20.1
+
 
