@@ -2,86 +2,95 @@ Return-Path: <SRS0=Yszf=AA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC7B4C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 17:09:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9295C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 17:09:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 852DB20771
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 17:09:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B446F20771
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 17:09:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=cam.ac.uk header.i=@cam.ac.uk header.b="k4r3m+iz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 852DB20771
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=cl.cam.ac.uk
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Mxw6YUox"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B446F20771
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59632 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37420 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmKVk-0002gy-LA
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 13:09:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48470)
+	id 1jmKWc-0005Mi-VW
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 13:09:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58042)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alr48@hermes.cam.ac.uk>)
- id 1jmJwR-00054J-NQ; Fri, 19 Jun 2020 12:32:35 -0400
-Received: from ppsw-43.csi.cam.ac.uk ([131.111.8.143]:43630)
+ (Exim 4.90_1)
+ (envelope-from <prvs=4324eb4de=alistair.francis@wdc.com>)
+ id 1jmKUC-0000dI-2h
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 13:07:28 -0400
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:19131)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alr48@hermes.cam.ac.uk>)
- id 1jmJwP-0006FD-7z; Fri, 19 Jun 2020 12:32:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=cam.ac.uk; 
- s=20180806.ppsw;
- h=Sender:Content-Type:Cc:To:Subject:Message-ID:Date:From:
- In-Reply-To:References:MIME-Version:Reply-To:Content-Transfer-Encoding:
- Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
- Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
- List-Subscribe:List-Post:List-Owner:List-Archive;
- bh=NAb26gyr/K5h/Ph6R4AoRAP5xysoGB7s9rr1Hlxe1Hw=; b=k4r3m+iz1ycurBv/Sx0Dss425O
- 19J4+2C2kHbAuOJ1Q/S30Ni//458ND/FX0Eq8WE+ssUURmOlp7a3OWa1U0MuLFfA/WjkdyYoNmJ5N
- GTEITB2HnjP6Yql/7g1fv68PDW0KLiI6e/prBAYF2wghZqlMEKM4V5qm0T6i1kMiHIlA=;
-X-Cam-AntiVirus: no malware found
-X-Cam-ScannerInfo: http://help.uis.cam.ac.uk/email-scanner-virus
-Received: from mail-il1-f170.google.com ([209.85.166.170]:37782)
- by ppsw-43.csi.cam.ac.uk (smtp.hermes.cam.ac.uk [131.111.8.159]:587)
- with esmtpsa (PLAIN:alr48) (TLSv1.2:ECDHE-RSA-AES128-GCM-SHA256:128)
- id 1jmJwK-000QFA-pW (Exim 4.92.3)
- (return-path <alr48@hermes.cam.ac.uk>); Fri, 19 Jun 2020 17:32:29 +0100
-Received: by mail-il1-f170.google.com with SMTP id e11so9786766ilr.4;
- Fri, 19 Jun 2020 09:32:28 -0700 (PDT)
-X-Gm-Message-State: AOAM531WCFBHGlhJdizzYmXV2T27aQJ4KmmAOjVfjKFHmwjDTN7uEtpK
- MJVgo+m59AMb8RE7phCMMr+DKnFRpoqK37mVaIA=
-X-Google-Smtp-Source: ABdhPJx9Zk66FxsJ0ZauBl0VQTJaeC/B/5T6o1tlXoEkCIFyaKfSxjW2Q0RyO9qqqMF6wj+is4A/YqQwO+G4RVs+MNY=
-X-Received: by 2002:a05:6e02:13f4:: with SMTP id
- w20mr4501867ilj.294.1592584347920; 
- Fri, 19 Jun 2020 09:32:27 -0700 (PDT)
+ (Exim 4.90_1)
+ (envelope-from <prvs=4324eb4de=alistair.francis@wdc.com>)
+ id 1jmKU9-0004PZ-3V
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 13:07:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+ t=1592586445; x=1624122445;
+ h=from:to:cc:subject:date:message-id:in-reply-to:
+ references:mime-version:content-transfer-encoding;
+ bh=XRlfmAxnNO+uf1echkK6NudzAPtFUGkmvCQ9SmWv+Zg=;
+ b=Mxw6YUoxCzsUT30KqqdLF8NFP282/TfyNpzmldDIjzc71FbdE/l+AGfu
+ /OGjSzOO99ZX4HOY1jwe7XMSUiGxMki89Psg7uBj4MwtiatCPj9Va5H0Z
+ IqZB8sVPz5KpJkHap0/c+IjVskviBa64GgEFuBfTld8TDLIorpOaCkJsn
+ HknK8kT/NZ8qrzfzOZNbggER41i/RpNCxjfAh0N9rX+2PfyfseCTKtWq+
+ 47cIrhHr/f6ldmuPwS6A1W8VEZSXGUV4Ky1eFipPDAW6veFU2XDkd17pw
+ FTIqDS45RGInFBKhQ9acmcr1JD+/qR6Iu5LtN7tF/9roIf+R/R+xpdJRm g==;
+IronPort-SDR: zvPQ5lQqkE9Jp5JINanqI+xo/HUFMIs7K+tY9o3GT72OtI3b191iMRKxYOKJzIBB4uPIEjCLNB
+ J6jNTT2LRTwzx29wCVG6rTtLCgCt0mVtjc3Rm1vwq6a8LaoWKpaJzL1RNQWB08YJhPyGC4JvHT
+ ZHi8nC1APm9q04sT4lfKiEPg08/qL7+djzZI4J3ZGbkHR676BHSeIzWqNPLA0rzHNsybGYLeml
+ LzIx2kZVhkN9tFp1w+3jJ10SDMvVYsNSutuSM7lJIoeWiQ2W14Sgvob8s90YBE/8rk8F6Gf1ZO
+ VQc=
+X-IronPort-AV: E=Sophos;i="5.75,256,1589212800"; d="scan'208";a="144763295"
+Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com)
+ ([199.255.45.15])
+ by ob1.hgst.iphmx.com with ESMTP; 20 Jun 2020 01:07:21 +0800
+IronPort-SDR: 36Yx6u1MFk392HGrnJdJUt2DMR7n5TejB6KVLeXb8DUjBZxqSLYqtzACjkBFC3wrLJn0IyRVNU
+ 2m+Qo3olGxu68tbDHiNmjRqvGpdtzZzPo=
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+ by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 19 Jun 2020 09:55:58 -0700
+IronPort-SDR: 2KntkliM+aXblpaEUylXwA5cqhqlUeCI/qc8K2/Ppi2FYGxsdHtQqY5ejIcwm/pdeSxseFsUiE
+ RaRzKM37+5AA==
+WDCIronportException: Internal
+Received: from unknown (HELO risc6-mainframe.hgst.com) ([10.86.58.142])
+ by uls-op-cesaip02.wdc.com with ESMTP; 19 Jun 2020 10:07:21 -0700
+From: Alistair Francis <alistair.francis@wdc.com>
+To: peter.maydell@linaro.org,
+	qemu-devel@nongnu.org
+Subject: [PULL v2 01/32] riscv: Add helper to make NaN-boxing for FP register
+Date: Fri, 19 Jun 2020 09:57:46 -0700
+Message-Id: <20200619165817.4144200-2-alistair.francis@wdc.com>
+X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20200619165817.4144200-1-alistair.francis@wdc.com>
+References: <20200619165817.4144200-1-alistair.francis@wdc.com>
 MIME-Version: 1.0
-References: <20200616192700.1900260-1-atish.patra@wdc.com>
- <CAEUhbmVRN2Ze=jNqFSJbZgO0_ggyX6B-1UydPJB1sZVdAokrxQ@mail.gmail.com>
- <CAOnJCUKN=L+eqMsp5X_6HG3j85Gzf6jtZMdNhCZ+cwROpJOTCQ@mail.gmail.com>
-In-Reply-To: <CAOnJCUKN=L+eqMsp5X_6HG3j85Gzf6jtZMdNhCZ+cwROpJOTCQ@mail.gmail.com>
-From: Alexander Richardson <Alexander.Richardson@cl.cam.ac.uk>
-Date: Fri, 19 Jun 2020 17:32:11 +0100
-X-Gmail-Original-Message-ID: <CAEeofcg7Rvu-=AxZJKwQxHJX1pq_P6sfZJ3Vn_JGcSw5C2aF4A@mail.gmail.com>
-Message-ID: <CAEeofcg7Rvu-=AxZJKwQxHJX1pq_P6sfZJ3Vn_JGcSw5C2aF4A@mail.gmail.com>
-Subject: Re: [PATCH 0/3] Add OpenSBI dynamic firmware support
-To: Atish Patra <atishp@atishpatra.org>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=131.111.8.143;
- envelope-from=alr48@hermes.cam.ac.uk; helo=ppsw-43.csi.cam.ac.uk
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/19 12:32:29
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -52
-X-Spam_score: -5.3
-X-Spam_bar: -----
-X-Spam_report: (-5.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, RCVD_IN_DNSWL_MED=-2.3,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.71.153.141;
+ envelope-from=prvs=4324eb4de=alistair.francis@wdc.com;
+ helo=esa3.hgst.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/19 13:07:21
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -43
+X-Spam_score: -4.4
+X-Spam_bar: ----
+X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
-X-Mailman-Approved-At: Fri, 19 Jun 2020 13:07:04 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,51 +102,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Atish Patra <atish.patra@wdc.com>, Alistair Francis <Alistair.Francis@wdc.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, Bin Meng <bmeng.cn@gmail.com>
+Cc: alistair23@gmail.com, Richard Henderson <richard.henderson@linaro.org>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ Ian Jiang <ianjiang.ict@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 18 Jun 2020 at 19:22, Atish Patra <atishp@atishpatra.org> wrote:
->
-> On Thu, Jun 18, 2020 at 1:56 AM Bin Meng <bmeng.cn@gmail.com> wrote:
-> >
-> > On Wed, Jun 17, 2020 at 3:29 AM Atish Patra <atish.patra@wdc.com> wrote:
-> > >
-> > > This series adds support OpenSBI dynamic firmware support to Qemu.
-> > > Qemu loader passes the information about the DT and next stage (i.e. kernel
-> > > or U-boot) via "a2" register. It allows the user to build bigger OS images
-> > > without worrying about overwriting DT. It also unifies the reset vector code
-> >
-> > I am not sure in what situation overwriting DT could happen. Could you
-> > please elaborate?
-> >
->
-> Currently, the DT is loaded 0x82200000 (34MB offset) for fw_jump.
-> Thus, a bigger kernel image
-> would overwrite the DT. In fact, it was reported by FreeBSD folks.
-> https://github.com/riscv/opensbi/issues/169
->
-The problem is that the DT overwrites the kernel image. Usually this
-is not noticeable since it's so small and rarely overwrites something
-useful, but in my case it was overwriting program memory which
-resulted in invalid instruction crashes.
-Since this is quite awkward to debug, I added a kernel assertion to
-FreeBSD to abort boot in that case.
+From: Ian Jiang <ianjiang.ict@gmail.com>
 
-> There are temporary solutions that can put DT a little bit further or
-> put it within 2MB offset. But that's
-> just delaying the inevitable.
->
-I've changed OpenSBI locally to use a 1MB offset (i.e. place the DT
-between OpenSBI and the kernel), but I think the fw_dynamic approach
-is much nicer.
+The function that makes NaN-boxing when a 32-bit value is assigned
+to a 64-bit FP register is split out to a helper gen_nanbox_fpr().
+Then it is applied in translating of the FLW instruction.
 
-Thanks,
-Alex
+Signed-off-by: Ian Jiang <ianjiang.ict@gmail.com>
+Message-Id: <20200128003707.17028-1-ianjiang.ict@gmail.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+---
+ target/riscv/insn_trans/trans_rvf.inc.c | 17 +++++++++++++++--
+ 1 file changed, 15 insertions(+), 2 deletions(-)
+
+diff --git a/target/riscv/insn_trans/trans_rvf.inc.c b/target/riscv/insn_trans/trans_rvf.inc.c
+index e23cd639a6..3bfd8881e7 100644
+--- a/target/riscv/insn_trans/trans_rvf.inc.c
++++ b/target/riscv/insn_trans/trans_rvf.inc.c
+@@ -23,6 +23,20 @@
+         return false;                       \
+ } while (0)
+ 
++/*
++ * RISC-V requires NaN-boxing of narrower width floating
++ * point values.  This applies when a 32-bit value is
++ * assigned to a 64-bit FP register.  Thus this does not
++ * apply when the RVD extension is not present.
++ */
++static void gen_nanbox_fpr(DisasContext *ctx, int regno)
++{
++    if (has_ext(ctx, RVD)) {
++        tcg_gen_ori_i64(cpu_fpr[regno], cpu_fpr[regno],
++                        MAKE_64BIT_MASK(32, 32));
++    }
++}
++
+ static bool trans_flw(DisasContext *ctx, arg_flw *a)
+ {
+     TCGv t0 = tcg_temp_new();
+@@ -32,8 +46,7 @@ static bool trans_flw(DisasContext *ctx, arg_flw *a)
+     tcg_gen_addi_tl(t0, t0, a->imm);
+ 
+     tcg_gen_qemu_ld_i64(cpu_fpr[a->rd], t0, ctx->mem_idx, MO_TEUL);
+-    /* RISC-V requires NaN-boxing of narrower width floating point values */
+-    tcg_gen_ori_i64(cpu_fpr[a->rd], cpu_fpr[a->rd], 0xffffffff00000000ULL);
++    gen_nanbox_fpr(ctx, a->rd);
+ 
+     tcg_temp_free(t0);
+     mark_fs_dirty(ctx);
+-- 
+2.27.0
+
 
