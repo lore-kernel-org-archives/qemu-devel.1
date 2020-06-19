@@ -2,106 +2,131 @@ Return-Path: <SRS0=Yszf=AA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F641C433E2
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 15:08:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FB42C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 15:10:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 35D9220776
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 15:08:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35D9220776
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4C60821852
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 15:10:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AXxlKqlg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C60821852
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47502 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49758 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmIcf-0000zv-Hg
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 11:08:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51100)
+	id 1jmIeV-00021R-KO
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 11:09:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51834)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanb@linux.ibm.com>)
- id 1jmIbz-0000A4-Pa; Fri, 19 Jun 2020 11:07:23 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:16256
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanb@linux.ibm.com>)
- id 1jmIbx-0007Cb-M5; Fri, 19 Jun 2020 11:07:23 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 05JF2Skb131603; Fri, 19 Jun 2020 11:07:18 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 31rthaa5w9-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 19 Jun 2020 11:07:18 -0400
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05JF2YIf132218;
- Fri, 19 Jun 2020 11:07:18 -0400
-Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com
- [169.55.85.253])
- by mx0b-001b2d01.pphosted.com with ESMTP id 31rthaa5vb-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 19 Jun 2020 11:07:18 -0400
-Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
- by ppma01wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05JF5Wda012113;
- Fri, 19 Jun 2020 15:07:16 GMT
-Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com
- [9.57.198.26]) by ppma01wdc.us.ibm.com with ESMTP id 31q6bdmcwp-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 19 Jun 2020 15:07:16 +0000
-Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com
- [9.57.199.111])
- by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 05JF7G5Q37880118
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 19 Jun 2020 15:07:16 GMT
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 6307CAC05B;
- Fri, 19 Jun 2020 15:07:16 +0000 (GMT)
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id ADBC9AC059;
- Fri, 19 Jun 2020 15:07:15 +0000 (GMT)
-Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
- by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
- Fri, 19 Jun 2020 15:07:15 +0000 (GMT)
-Subject: Re: [PATCH v6 1/3] acpi: Some build_tpm2() code reshape
-To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org,
- mst@redhat.com, imammedo@redhat.com
-References: <20200619141851.16272-1-eric.auger@redhat.com>
- <20200619141851.16272-2-eric.auger@redhat.com>
-From: Stefan Berger <stefanb@linux.ibm.com>
-Message-ID: <cd32ba20-a52d-4ff3-6f01-f03241dfc50d@linux.ibm.com>
-Date: Fri, 19 Jun 2020 11:07:15 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jmIdv-0001XE-N1
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 11:09:23 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37709
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jmIdt-0007Y5-U9
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 11:09:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592579361;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=vcYoFh2EYlkKZTJtdihxj62sogQ/N0J7k/b86uhRPiQ=;
+ b=AXxlKqlgEaf1IJvaDl7lLLjOyqS6t/jP83J0ylo52ro7khQNwz0Mpxrw2OUKAfRyTRG/Hc
+ LzlbQkM2827r2YD5z/XGYYM22/GmIFC1qFljawHKqL12wlf8qimoUMr48J5SjFnc7wWHFa
+ 3wJbzwNAov4/nwQ3+KIh0Iqr8C5rSHs=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-33-4khPhDY9OsyNWBfCAbChwQ-1; Fri, 19 Jun 2020 11:09:19 -0400
+X-MC-Unique: 4khPhDY9OsyNWBfCAbChwQ-1
+Received: by mail-wr1-f69.google.com with SMTP id w4so4409354wrl.13
+ for <qemu-devel@nongnu.org>; Fri, 19 Jun 2020 08:09:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=vcYoFh2EYlkKZTJtdihxj62sogQ/N0J7k/b86uhRPiQ=;
+ b=pXHLioGx0ZJ01Cpiv5NcGZ33ZsC34ZULU1+V5Pbe5WU9VRSjFZh5qQn4RppLl/da8U
+ YjkFEW70ENiWFYrEGKeT8ywy9qETdNK2TORPRGoKsa7Vuyz/liONVNtel0PBXjKcAAfW
+ 1Sf70j/Oi6254jpFjioFZf1DscQG61BBQFf8ztbAvcgrSBpdseedGBGK/XQbZa7hzCnW
+ gUKiW9ZaUjQgcSXr86PVjBymKlssYpT9OTxbmeRTkqcALfEcNYRrWkRTwEzp/8DYOGwH
+ RGPkOVPvFv8F9OITMTjcEiqKpzHhAL+imMpQLitONpi7k3Av0BPSUvRNS1rnU5jNTbvU
+ zp6g==
+X-Gm-Message-State: AOAM533n7QEcyOyfbGdtsL2mhCGQKuLN+dQn5YhtIMhLSbYbkPeIeg2P
+ 4frwVw5xUQkSYKjDwI8CKDcmCCTsXnd2O0lGrO0o+J7HLHtIIdx/w/GX4Eyo5OTolzeHzg0b5fC
+ wT/CzWseE64hAp+M=
+X-Received: by 2002:a5d:6749:: with SMTP id l9mr4522366wrw.63.1592579358212;
+ Fri, 19 Jun 2020 08:09:18 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwbxq8S/9dIl6J1KaQ+hR3p4cQUpdCSd3IGF418LdM0/bxbwrpHuIS22cnD5+BqwIdNhw1ugg==
+X-Received: by 2002:a5d:6749:: with SMTP id l9mr4522341wrw.63.1592579357878;
+ Fri, 19 Jun 2020 08:09:17 -0700 (PDT)
+Received: from [192.168.1.37] (93.red-83-59-160.dynamicip.rima-tde.net.
+ [83.59.160.93])
+ by smtp.gmail.com with ESMTPSA id t8sm6868822wmi.46.2020.06.19.08.09.16
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 19 Jun 2020 08:09:17 -0700 (PDT)
+Subject: Re: [PATCH 0/7] python: create installable package
+To: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>
+References: <20200603001523.18085-1-jsnow@redhat.com>
+ <20200617195241.GA434320@localhost.localdomain>
+ <32791435-4aa4-7eaa-e2c6-b53165f2e28d@redhat.com>
+ <20200618092319.GA6012@linux.fritz.box>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <95eb7bb7-577e-045f-3285-ae41194ff0bc@redhat.com>
+Date: Fri, 19 Jun 2020 17:09:16 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200619141851.16272-2-eric.auger@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20200618092319.GA6012@linux.fritz.box>
 Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
- definitions=2020-06-19_16:2020-06-19,
- 2020-06-19 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- lowpriorityscore=0
- phishscore=0 clxscore=1015 priorityscore=1501 adultscore=0 malwarescore=0
- mlxscore=0 mlxlogscore=999 spamscore=0 impostorscore=0 suspectscore=0
- bulkscore=0 cotscore=-2147483648 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2006190107
-Received-SPF: pass client-ip=148.163.158.5; envelope-from=stefanb@linux.ibm.com;
- helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/19 11:07:20
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Spam_score_int: -25
-X-Spam_score: -2.6
-X-Spam_bar: --
-X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/19 03:15:03
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -114,122 +139,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, lersek@redhat.com, drjones@redhat.com,
- shannon.zhaosl@gmail.com, marcandre.lureau@redhat.com, philmd@redhat.com,
- ardb@kernel.org
+Cc: Fam Zheng <fam@euphon.net>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
+ Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>,
+ Max Reitz <mreitz@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/19/20 10:18 AM, Eric Auger wrote:
-> Remove any reference to Acpi20TPM2 and adopt an implementation
-> similar to build_ghes_v2().
->
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> Suggested-by: Igor Mammedov <imammedo@redhat.com>
->
-> ---
->
-> v5 -> v6:
-> - add reference to the spec + comment about LAML and LASA fields
-> - also moved LASA intro comment above build_append_int_noprefix()
->    as requested by Igor
-> ---
->   hw/acpi/aml-build.c | 54 +++++++++++++++++++++++++++++----------------
->   1 file changed, 35 insertions(+), 19 deletions(-)
->
-> diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
-> index 2cb7b991ef..1cc08a3eb9 100644
-> --- a/hw/acpi/aml-build.c
-> +++ b/hw/acpi/aml-build.c
-> @@ -1878,48 +1878,64 @@ build_hdr:
->                    "FACP", tbl->len - fadt_start, f->rev, oem_id, oem_table_id);
->   }
->   
-> +/*
-> + * build_tpm2 - Build the TPM2 table as specified in table 7 of
-> + * "TCG ACPI Specification; Family 1.2 and 2.0;
-> + * Level 00 Revision 00.37, December 19, 2014"
-> + * Note: the LASA and LAML fields are optional for TPM-2.0 (the above
-> + * table does not mention them) but are needed at least for SeaBIOS.
-> + * See the Acpi20TPM2 struct for the corresponding layout.
-> + */
->   void build_tpm2(GArray *table_data, BIOSLinker *linker, GArray *tcpalog)
->   {
-> -    Acpi20TPM2 *tpm2_ptr = acpi_data_push(table_data, sizeof(AcpiTableHeader));
-> -    unsigned log_addr_size = sizeof(tpm2_ptr->log_area_start_address);
-> -    unsigned log_addr_offset =
-> -        (char *)&tpm2_ptr->log_area_start_address - table_data->data;
->       uint8_t start_method_params[12] = {};
-> +    unsigned log_addr_offset, tpm2_start;
-> +    uint64_t control_area_start_address;
->       TPMIf *tpmif = tpm_find();
-> +    uint32_t start_method;
-> +    void *tpm2_ptr;
->   
-> -    /* platform class */
-> +    tpm2_start = table_data->len;
-> +    tpm2_ptr = acpi_data_push(table_data, sizeof(AcpiTableHeader));
-> +
-> +    /* Platform Class */
->       build_append_int_noprefix(table_data, TPM2_ACPI_CLASS_CLIENT, 2);
-> -    /* reserved */
-> +    /* Reserved */
->       build_append_int_noprefix(table_data, 0, 2);
->       if (TPM_IS_TIS_ISA(tpmif) || TPM_IS_TIS_SYSBUS(tpmif)) {
-> -        /* address of control area */
-> -        build_append_int_noprefix(table_data, 0, 8);
-> -        /* start method */
-> -        build_append_int_noprefix(table_data, TPM2_START_METHOD_MMIO, 4);
-> +        control_area_start_address = 0;
-> +        start_method = TPM2_START_METHOD_MMIO;
->       } else if (TPM_IS_CRB(tpmif)) {
-> -        build_append_int_noprefix(table_data, TPM_CRB_ADDR_CTRL, 8);
-> -        build_append_int_noprefix(table_data, TPM2_START_METHOD_CRB, 4);
-> +        control_area_start_address = TPM_CRB_ADDR_CTRL;
-> +        start_method = TPM2_START_METHOD_CRB;
->       } else {
-> -        g_warn_if_reached();
-> +        g_assert_not_reached();
->       }
-> +    /* Address of Control Area */
-> +    build_append_int_noprefix(table_data, control_area_start_address, 8);
-> +    /* Start Method */
-> +    build_append_int_noprefix(table_data, start_method, 4);
->   
-> -    /* platform specific parameters */
-> -    g_array_append_vals(table_data, &start_method_params, 12);
-> +    /* Platform Specific Parameters */
-> +    g_array_append_vals(table_data, &start_method_params,
-> +                        ARRAY_SIZE(start_method_params));
->   
-> -    /* log area minimum length */
-> +    /* Log Area Minimum Length */
->       build_append_int_noprefix(table_data, TPM_LOG_AREA_MINIMUM_SIZE, 4);
->   
->       acpi_data_push(tcpalog, TPM_LOG_AREA_MINIMUM_SIZE);
->       bios_linker_loader_alloc(linker, ACPI_BUILD_TPMLOG_FILE, tcpalog, 1,
->                                false);
->   
-> -    /* log area start address to be filled by Guest linker */
-> +    log_addr_offset = table_data->len;
-> +
+On 6/18/20 11:23 AM, Kevin Wolf wrote:
+> Am 17.06.2020 um 22:27 hat John Snow geschrieben:
+>>> In the Avocado project, we have a `make develop` rule that does that
+>>> for the main setup.py file, and for all plugins we carry on the same
+>>> tree, which is similar in some regards to the "not at the project root
+>>> directory" situation here with "qemu/python/setup.py".
+>>>
+>>
+>> Ah, yeah. If we're going this far, I'd prefer using a VENV over
+>> modifying the user's environment. That way you can blast it all away
+>> with a `make distclean`.
+>>
+>> Maybe the "make develop" target could even use the presence of a .venv
+>> directory to know when it needs to make the environment or not ...
+> [..]
+>> For QEMU developers, installing with develop is going to be the smart
+>> way to go. When your git tree is updated, your package will be updated
+>> along with it. You can do it once and then probably forget about it.
+> 
+> I don't think we can make this a manual step at all. Building QEMU
+> requires running some Python scripts (e.g. the QAPI generator), so the
+> setup needs to be done either in configure or in a Makefile target that
+> is specified as a dependency of any rule that would run a Python script.
+> Building QEMU once would then be enough.
+> 
+> Doing it automatically also means that we have to keep things local to
+> the QEMU directory rather than installing them globally into the user
+> directory. This is desirable anyway: Most of us deal with more than one
+> QEMU source tree, so conflicts would be inevitable.
 
-Don't have to subtract tpm2_start from it ?
+Indeed. Each of the source tree I use has its own virtual environment.
+I personally stopped using the distribution packages, they don't make
+sense when you develop, the tree changes too quickly.
 
-
-> +    /* Log Area Start Address to be filled by Guest linker */
->       build_append_int_noprefix(table_data, 0, 8);
->       bios_linker_loader_add_pointer(linker, ACPI_BUILD_TABLE_FILE,
-> -                                   log_addr_offset, log_addr_size,
-> +                                   log_addr_offset, 8,
->                                      ACPI_BUILD_TPMLOG_FILE, 0);
->       build_header(linker, table_data,
-> -                 (void *)tpm2_ptr, "TPM2", sizeof(*tpm2_ptr), 4, NULL, NULL);
-> +                 tpm2_ptr, "TPM2", table_data->len - tpm2_start, 4, NULL, NULL);
->   }
->   
->   /* ACPI 5.0: 6.4.3.8.2 Serial Bus Connection Descriptors */
-
+Distributions use stable releases, so IMO it only makes sense to
+generate a package along with releases. Else use venv.
 
 
