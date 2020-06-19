@@ -2,109 +2,111 @@ Return-Path: <SRS0=Yszf=AA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 064E6C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 11:18:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C942C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 11:20:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C57AC2080C
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 11:18:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VjhQe9Vh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C57AC2080C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6EB09207FC
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 11:20:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6EB09207FC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58866 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33164 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmF22-0006MF-1c
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 07:18:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38852)
+	id 1jmF4f-0000Mm-MH
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 07:20:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39600)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jmF0z-0005um-OC
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 07:16:57 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:39038
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jmF0x-0007C1-SZ
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 07:16:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592565414;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=osd5pFx+U2eevLVAgSmSrOZdWTvcs74sNafhhajY6f4=;
- b=VjhQe9VhdXDOg+HtckLoOfwuq/woZgYN1f3G1tW/j39FC5gmy+PtNnaniVl10mAkEWiv5t
- ieIrnefGj0k/ONBhl5LP2O2cSy/1uQi3FkUjur3DGPfyTVAVwbD1nMTj9cs+2uT++6YL+Y
- nJzx6DMe0DKM2WBxwznncksOP0gEO9g=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-339-wos40eidMhmWFApgMiK4AQ-1; Fri, 19 Jun 2020 07:16:52 -0400
-X-MC-Unique: wos40eidMhmWFApgMiK4AQ-1
-Received: by mail-wm1-f71.google.com with SMTP id a18so2568918wmm.3
- for <qemu-devel@nongnu.org>; Fri, 19 Jun 2020 04:16:52 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=osd5pFx+U2eevLVAgSmSrOZdWTvcs74sNafhhajY6f4=;
- b=BlzuHKVzQqbr1U9T/5AboMG/U81CaXU+gupo4ztcx0+xjxHl/aiAlbgiCKIKRUmUSD
- XYU90v0IRNhxqg0izBksrG55qT7LZjnMLaNNRH7BTq6ZnsiUu8ln5KhYIyurUKdWMIQ1
- uOmi4MDXCkPmK0EkMDppdIOdceEDaRTk5v5MdUyNWcIMJ7MgdSK06aSHIFo1cTHC6nrw
- 4HXsQWQ+D8FJA+ZmwNrB1CP6K63qDeMd1q77PfZXlmILH5LEtq7PHMJ9+2PKO9fW15XY
- rBuhSa54GLHElCbND6GG5p83r3tqmE3W+sL7P1HnJ9Xf/RH7UBJRxnf19OG+WDK92Ia5
- aaxg==
-X-Gm-Message-State: AOAM532sjbWeLp1WbnYp9ZzpVQpgByfax4n4R0+mdLiv+H6UZM1mAhnI
- 8VgYJEEJcummr33y9+mcmuFtQ/qdBlUN2aBVveGGs7yOvB/pwG8q23/W8L/Ba/W1CAXb/I1yRYH
- t9tuiMU460zx7fks=
-X-Received: by 2002:a5d:6a90:: with SMTP id s16mr3488322wru.8.1592565411855;
- Fri, 19 Jun 2020 04:16:51 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxbu5sD72jPCS6qn0fRW8Pu/lix+Kp7hS+0RIs0rvYoQzAHg9djB0dOAnV0XD5hb2z6W6UZCA==
-X-Received: by 2002:a5d:6a90:: with SMTP id s16mr3488309wru.8.1592565411658;
- Fri, 19 Jun 2020 04:16:51 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:e1d2:138e:4eff:42cb?
- ([2001:b07:6468:f312:e1d2:138e:4eff:42cb])
- by smtp.gmail.com with ESMTPSA id 5sm8402155wrr.5.2020.06.19.04.16.50
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 19 Jun 2020 04:16:51 -0700 (PDT)
-Subject: Re: what are the requirements on target/ code for -icount to work
- correctly?
-To: Pavel Dovgalyuk <dovgaluk@ispras.ru>,
- Peter Maydell <peter.maydell@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>
-References: <CAFEAcA_HOxdK5rgKVnww6Bum3vGb=TrhDEp7oqDwsd=UbHmC_g@mail.gmail.com>
- <c47e9e4e-49eb-88c5-fdc7-8ebec121c165@ispras.ru>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f4fc4a1b-4054-cffd-0272-22c28d656aba@redhat.com>
-Date: Fri, 19 Jun 2020 13:16:34 +0200
+ (Exim 4.90_1) (envelope-from <stefanb@linux.ibm.com>)
+ id 1jmF3t-0008B8-So; Fri, 19 Jun 2020 07:19:57 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45774
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <stefanb@linux.ibm.com>)
+ id 1jmF3s-0007Td-0N; Fri, 19 Jun 2020 07:19:57 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 05JB3rBU129952; Fri, 19 Jun 2020 07:19:53 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 31rkh06gd3-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 19 Jun 2020 07:19:52 -0400
+Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05JB414W131019;
+ Fri, 19 Jun 2020 07:19:52 -0400
+Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com
+ [169.55.85.253])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 31rkh06gcr-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 19 Jun 2020 07:19:52 -0400
+Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
+ by ppma01wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05JBJT5J018374;
+ Fri, 19 Jun 2020 11:19:51 GMT
+Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com
+ [9.57.198.25]) by ppma01wdc.us.ibm.com with ESMTP id 31q6bdk4j6-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 19 Jun 2020 11:19:51 +0000
+Received: from b01ledav003.gho.pok.ibm.com (b01ledav003.gho.pok.ibm.com
+ [9.57.199.108])
+ by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 05JBJpkH49611140
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 19 Jun 2020 11:19:51 GMT
+Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 784B2B2064;
+ Fri, 19 Jun 2020 11:19:51 +0000 (GMT)
+Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 64577B205F;
+ Fri, 19 Jun 2020 11:19:51 +0000 (GMT)
+Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
+ by b01ledav003.gho.pok.ibm.com (Postfix) with ESMTP;
+ Fri, 19 Jun 2020 11:19:51 +0000 (GMT)
+Subject: Re: [PATCH v4 1/5] acpi: Convert build_tpm2() to build_append* API
+To: Auger Eric <eric.auger@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>
+References: <20200611135917.18300-1-eric.auger@redhat.com>
+ <20200611135917.18300-2-eric.auger@redhat.com>
+ <20200616143327.2ee38a48@redhat.com>
+ <3c3b466a-c965-e3f6-9bd6-74fce9c424c8@linux.ibm.com>
+ <ed1b453d-2568-2134-3e86-c268e82a90f8@redhat.com>
+ <ded58c6b-dcea-67ef-4f3c-b8af9f149ae8@redhat.com>
+ <44663542-8352-2398-a297-3e1fe7f4bfd5@redhat.com>
+From: Stefan Berger <stefanb@linux.ibm.com>
+Message-ID: <ce60f439-fd2a-a72b-f004-44a01f4c5bdf@linux.ibm.com>
+Date: Fri, 19 Jun 2020 07:19:51 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <c47e9e4e-49eb-88c5-fdc7-8ebec121c165@ispras.ru>
+In-Reply-To: <44663542-8352-2398-a297-3e1fe7f4bfd5@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/19 01:50:04
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
+ definitions=2020-06-19_08:2020-06-19,
+ 2020-06-19 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ mlxscore=0 malwarescore=0
+ adultscore=0 bulkscore=0 impostorscore=0 lowpriorityscore=0
+ mlxlogscore=999 cotscore=-2147483648 phishscore=0 spamscore=0
+ suspectscore=0 priorityscore=1501 clxscore=1015 classifier=spam adjust=0
+ reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2006190080
+Received-SPF: pass client-ip=148.163.158.5; envelope-from=stefanb@linux.ibm.com;
+ helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/19 06:50:18
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-Spam_score_int: -25
+X-Spam_score: -2.6
+X-Spam_bar: --
+X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -117,38 +119,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Richard Henderson <richard.henderson@linaro.org>
+Cc: peter.maydell@linaro.org, drjones@redhat.com, mst@redhat.com,
+ qemu-devel@nongnu.org, shannon.zhaosl@gmail.com, qemu-arm@nongnu.org,
+ marcandre.lureau@redhat.com, philmd@redhat.com, ardb@kernel.org,
+ eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 19/06/20 07:46, Pavel Dovgalyuk wrote:
-> I think, that we need some efforts from target maintainers to remove all such calls. 
+On 6/19/20 5:43 AM, Auger Eric wrote:
+> Hi Laszlo,
+>
+> On 6/19/20 11:38 AM, Laszlo Ersek wrote:
+>> On 06/18/20 09:50, Auger Eric wrote:
+>>> Hi Stefan, Igor,
+>>>
+>>> On 6/16/20 4:11 PM, Stefan Berger wrote:
+>>>> On 6/16/20 8:33 AM, Igor Mammedov wrote:
+>>>>> nevertheless looks like faithfull conversion,
+>>>>> btw why you didn't drop Acpi20TPM2 structure definition?
+>>>>>
+>>>> If we get rid of the table we should keep a reference to this document,
+>>>> table 7: "TCG ACPI Specification; Family 1.2 and 2.0; Level 00 Revision
+>>>> 00.37, December 19, 2014"
+>>>>
+>>>> https://trustedcomputinggroup.org/wp-content/uploads/TCG_ACPIGeneralSpecification_1-10_0-37-Published.pdf
+>>>>
+>>>>
+>>>>
+>>> Further looking at this spec, the log_area_minimum_length and
+>>> log_area_start_address only are described in
+>>> - Table 2 (TCG Hardware InterfaceDescription Table Format for TPM 1.2
+>>> Clients)
+>>> - Table 4 (TCG Hardware Interface Description Table Format for TPM 1.2
+>>> Servers)
+>>> but not in Table 7, ie. not for TPM 2.0.
+>>>
+>>> Are they really needed for TPM2 or what do I miss?
+>> (side comment:
+>>
+>> LASA and LAML are optional with TPM-2.0. From the discussion at
+>> <https://bugzilla.tianocore.org/show_bug.cgi?id=978>.
 
-I'll take care of target/i386 (which does need one of the three
-gen_io_end calls that are left).
 
->> Q2: is it a requirement that after an insn which is a "known
->> to be an I/O insn" one (like x86 in/out) and which is marked
->> up with gen_io_start()/gen_io_end() that we also end the TB?
-> 
-> It is a requirement for instructions that access virtual clock/icount
-> value (directly or not).
-> 
-> There is also an assertion that can_do_io is enabled while generating an
-> interrupt. I believe, that it doesn't affect RR, but is useful for
-> deterministic icount mode.
+They are needed for (x86) BIOS, such as SeaBIOS, not for UEFI, though. I 
+do not know about ARM.
 
-As I understand it, the definition of "I/O insn" is anything that can
-either:
 
-- affect the icount deadline (e.g. by setting or removing a
-QEMU_CLOCK_VIRTUAL timer)
+> Thank you for the pointer and info. I failed to find this info in the
+> spec. Given the risk of confusion, I would personally keep struct
+> Acpi20TPM2 and maybe add a comment. Stefan?
 
-- interrupt the current translation block with cpu_loop_exit,
-cpu_restore_state or similar.
+Either way is fine with me for as long as we know where to find the 
+layout of the structure.
 
-Paolo
+   Stefan
+
+>
+> Thanks
+>
+> Eric
+>> )
+>>
+>> Thanks
+>> Laszlo
+>>
 
 
