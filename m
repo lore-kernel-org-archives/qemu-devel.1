@@ -2,98 +2,148 @@ Return-Path: <SRS0=Yszf=AA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 550AAC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 08:22:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 944EEC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 08:23:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2016F20885
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 08:22:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="o4+WMPXw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2016F20885
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 65F4D20885
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 08:23:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65F4D20885
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44864 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47006 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmCIN-0005x7-F4
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 04:22:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50782)
+	id 1jmCJM-0007V1-NH
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 04:23:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50810)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jmCHh-0004mx-CM
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 04:22:01 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:40717)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jmCHf-0002Si-HF
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 04:22:01 -0400
-Received: by mail-wr1-x442.google.com with SMTP id h5so8808893wrc.7
- for <qemu-devel@nongnu.org>; Fri, 19 Jun 2020 01:21:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=GxAKAldlN7+RDgdFHkfohEPRC2IBDDPG0yuhgZJGpB4=;
- b=o4+WMPXwVGwwQWa86zF4+aR2l5VDtWGEHU1TKpV9iPWE8/vCfZErV9k2zeCgRIilr4
- 9que748o2wNSQN8s5l5pVdiwbWa2R24Hq7+F2ihwBPAztvPzA5kZ1DdSGk//wpZnUAW3
- wzKDcZPyHku8nT/XUAdxi7c+JJMWwRxI5mYYYp04sze5U6P2/K3TWpxrC4/xdA92KZLW
- ScnpQJem+bYpKDGS/5ruUtwHqFvSG/dBbKQyvQ//82Uv4GKN0n1vtDO2OHSH3NSputvh
- RJCnKSj0QZWYl+M1wnef6MwssSRot7sm9rFaf3KSGwP+4gLc5OQBoISXwvlOWpWuaREU
- E01Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=GxAKAldlN7+RDgdFHkfohEPRC2IBDDPG0yuhgZJGpB4=;
- b=pkl2ujNlniOabETOE0iII612zwKEgIG41gf7J3fYTxqDc+cZKHGur4SQbvAOHpyjty
- sAisW6VHpJAxhd7pXus7G8eiYSM7oSxSRZibTddqylws8A0QEIbT3D5N+cetwSrMIjfJ
- abvWzq2PGFJ1J4PbXMb64CrMd3jjyxIBq5yYWTStnqId+vyWTR8rq1OigAdP9L/d4XvC
- Q4+KM+os5K++OmjFAAqLQP3DaSJEB82SdnXUS0UIj2NG5Ix+uneYNIY25jNvdm26n3K5
- Mr9zyDT/PU9wTAuhYTzFOB0EsI5oaugQfn1UhNVEAp2jNXRQX+RXetnP5bOFiYIJxpVT
- LfPw==
-X-Gm-Message-State: AOAM531O2rhyOLI+GtQD3aQBYW3GGpU4xhKzVUq04E+L/WQaoLDCpVuC
- rrFZXMnJDEwo0N/vNx9cnT3Haw==
-X-Google-Smtp-Source: ABdhPJxZiC3Bb6lak90mpG3qlydOjuoDCz6M/gbvCqNOxj7UgZ6umGFLikENG/VW92cwmoFCt90ujw==
-X-Received: by 2002:a5d:508e:: with SMTP id a14mr2630568wrt.335.1592554917085; 
- Fri, 19 Jun 2020 01:21:57 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id c2sm6430644wrv.47.2020.06.19.01.21.55
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 19 Jun 2020 01:21:55 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 493961FF7E;
- Fri, 19 Jun 2020 09:21:55 +0100 (BST)
-References: <159223432851.7281.13140123017230519248.malonedeb@gac.canonical.com>
- <20200618135331.7ec861e9.cohuck@redhat.com>
- <CAHiYmc5eJDN-FmBZOtRCM9446mxLZW_JtWdZw7TmSYMsk8iz8Q@mail.gmail.com>
- <20200619081723.10594336.cohuck@redhat.com>
-User-agent: mu4e 1.5.3; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Cornelia Huck <cohuck@redhat.com>
-Subject: Re: [Bug 1883560] [NEW] mips linux-user builds occasionly crash
- randomly only to be fixed by a full clean re-build
-In-reply-to: <20200619081723.10594336.cohuck@redhat.com>
-Date: Fri, 19 Jun 2020 09:21:55 +0100
-Message-ID: <87h7v7v524.fsf@linaro.org>
+ (Exim 4.90_1) (envelope-from <frankja@linux.ibm.com>)
+ id 1jmCHm-0004uR-Mz; Fri, 19 Jun 2020 04:22:06 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58722
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <frankja@linux.ibm.com>)
+ id 1jmCHl-0002TB-4Q; Fri, 19 Jun 2020 04:22:06 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 05J820oE094688; Fri, 19 Jun 2020 04:22:04 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 31ra909vg7-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 19 Jun 2020 04:22:03 -0400
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05J8EBsx172125;
+ Fri, 19 Jun 2020 04:22:03 -0400
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com
+ [169.51.49.99])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 31ra909vfj-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 19 Jun 2020 04:22:03 -0400
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+ by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05J8K7Ek001666;
+ Fri, 19 Jun 2020 08:22:01 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com
+ (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+ by ppma04ams.nl.ibm.com with ESMTP id 31qur62ej8-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 19 Jun 2020 08:22:01 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com
+ (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+ by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id 05J8KfRp55116070
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 19 Jun 2020 08:20:41 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id C3FC8A4060;
+ Fri, 19 Jun 2020 08:21:58 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 2A238A405F;
+ Fri, 19 Jun 2020 08:21:58 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.7.233])
+ by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Fri, 19 Jun 2020 08:21:58 +0000 (GMT)
+Subject: Re: [PATCH v3 5/8] s390/sclp: use cpu offset to locate cpu entries
+To: Collin Walling <walling@linux.ibm.com>, qemu-devel@nongnu.org,
+ qemu-s390x@nongnu.org
+References: <20200618222258.23287-1-walling@linux.ibm.com>
+ <20200618222258.23287-6-walling@linux.ibm.com>
+From: Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <586902cb-3c66-aeab-e30b-c63a905057fb@linux.ibm.com>
+Date: Fri, 19 Jun 2020 10:21:57 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x442.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+In-Reply-To: <20200618222258.23287-6-walling@linux.ibm.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="fF49H9YHQdzjj0iMA9KDej50dSRqQd0fT"
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
+ definitions=2020-06-19_04:2020-06-18,
+ 2020-06-19 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ adultscore=0 suspectscore=0
+ lowpriorityscore=0 bulkscore=0 priorityscore=1501 mlxlogscore=999
+ malwarescore=0 mlxscore=0 phishscore=0 spamscore=0 clxscore=1015
+ impostorscore=0 cotscore=-2147483648 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2004280000 definitions=main-2006190054
+Received-SPF: pass client-ip=148.163.158.5; envelope-from=frankja@linux.ibm.com;
+ helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/19 04:13:05
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-Spam_score_int: -25
+X-Spam_score: -2.6
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -106,102 +156,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Alex =?utf-8?Q?Benn=C3=A9e?= <1883560@bugs.launchpad.net>,
- Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+Cc: thuth@redhat.com, mst@redhat.com, cohuck@redhat.com, david@redhat.com,
+ pasic@linux.ibm.com, borntraeger@de.ibm.com, svens@linux.ibm.com,
+ pbonzini@redhat.com, mihajlov@linux.ibm.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--fF49H9YHQdzjj0iMA9KDej50dSRqQd0fT
+Content-Type: multipart/mixed; boundary="VRNT3tIR3Q5swC2l7kxvXGvnjhpXslmiG"
 
-Cornelia Huck <cohuck@redhat.com> writes:
+--VRNT3tIR3Q5swC2l7kxvXGvnjhpXslmiG
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-> On Thu, 18 Jun 2020 19:00:34 +0200
-> Aleksandar Markovic <aleksandar.qemu.devel@gmail.com> wrote:
->
->> =D1=87=D0=B5=D1=82=D0=B2=D1=80=D1=82=D0=B0=D0=BA, 18. =D1=98=D1=83=D0=BD=
- 2020., Cornelia Huck <cohuck@redhat.com> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=
-=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
->>=20
->> > On Mon, 15 Jun 2020 15:18:48 -0000
->> > Alex Benn=C3=A9e <1883560@bugs.launchpad.net> wrote:
->> >=20=20
->> > > Public bug reported:
->> > >=20=20
->> > > >From time to time I find check-tcg crashes with a one of the MIPS=
-=20=20
->> > > binaries. The last time it crashed was running the test:
->> > >
->> > >   ./mips64el-linux-user/qemu-mips64el ./tests/tcg/mips64el-linux-
->> > > user/threadcount
->> > >
->> > > Inevitably after some time noodling around wondering what could be
->> > > causing this weird behaviour I wonder if it is a build issue. I wipe=
- all
->> > > the mips* build directories, re-run configure and re-build and voila
->> > > problem goes away.
->> > >
->> > > It seems there must be some sort of build artefact which isn't being
->> > > properly re-generated on a build update which causes weird problems.
->> > > Additional data point if I:
->> > >
->> > >   rm -rf mips64el-linux-user
->> > >   ../../configure
->> > >   make
->> > >
->> > > then I see failures in mip32 builds - eg:
->> > >
->> > >     GEN     mipsn32el-linux-user/config-target.h
->> > >   In file included from /home/alex/lsrc/qemu.git/=20=20
->> > linux-user/syscall_defs.h:10,=20=20
->> > >                    from /home/alex/lsrc/qemu.git/linux-user/qemu.h:1=
-6,
->> > >                    from /home/alex/lsrc/qemu.git/=20=20
->> > linux-user/linuxload.c:5:=20=20
->> > >   /home/alex/lsrc/qemu.git/linux-user/mips64/syscall_nr.h:1: error:=
-=20=20
->> > unterminated #ifndef=20=20
->> > >    #ifndef LINUX_USER_MIPS64_SYSCALL_NR_H
->> > >
->> > >   make[1]: *** [/home/alex/lsrc/qemu.git/rules.mak:69:=20=20
->> > linux-user/linuxload.o] Error 1=20=20
->> > >   make[1]: *** Waiting for unfinished jobs....
->> > >
->> > > which implies there is a cross dependency between different targets
->> > > somewhere. If I executed:
->> > >
->> > >   rm -rf mips*
->> > >
->> > > before re-configuring and re-building then everything works again.
->> > >
->> > > ** Affects: qemu
->> > >      Importance: Undecided
->> > >          Status: New
->> > >
->> > >
->> > > ** Tags: build linux-user mips
->> > >=20=20
->> >
->> > FWIW, this does not seem to be a mips-only issue: I'm seeing the
->> > threadcount test fail with s390x-linux-user as well, and it also goes
->> > away (only) if I purge the build directory, re-configure, and re-build.
->> >
->> >
->> >=20=20
->> Alex, Cornelia,
->>=20
->> Do you perhaps recall how did you obtain the original binaries (those wi=
-th
->> the problem)? What would be your typical workflow? Perhaps "git-pull +
->> make" on existing, but not latest source tree?
->
-> Just a bog-standard "pull some stuff, do make, create a branch and put
-> some patches on it, do make, switch to another branch, do make, etc". No
-> advanced fiddling with git history, doing make on a subtree, etc.
+On 6/19/20 12:22 AM, Collin Walling wrote:
+> The start of the CPU entry region in the Read SCP Info response data is=
 
-Same here. As I say the syscall_nr breakage was a different one. I'll
-regularly just advance my tree and find this sort of breakage.
+> denoted by the offset_cpu field. As such, QEMU needs to begin creating
+> entries at this address. Note that the length of the Read SCP Info data=
 
---=20
-Alex Benn=C3=A9e
+> (data_len) denotes the same value as the cpu offset.
+>=20
+> This is in preparation of when Read SCP Info inevitably introduces new
+> bytes that push the start of the CPUEntry field further away.
+>=20
+> Read CPU Info is unlikely to ever change, so let's not bother
+> accounting for the offset there.
+>=20
+> Signed-off-by: Collin Walling <walling@linux.ibm.com>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+
+> ---
+>  hw/s390x/sclp.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
+> index 772b7b3b01..0dfbe6e5ec 100644
+> --- a/hw/s390x/sclp.c
+> +++ b/hw/s390x/sclp.c
+> @@ -113,13 +113,14 @@ static void read_SCP_info(SCLPDevice *sclp, SCCB =
+*sccb)
+>      int rnsize, rnmax;
+>      IplParameterBlock *ipib =3D s390_ipl_get_iplb();
+>      int data_len =3D get_read_scp_info_data_len();
+> +    CPUEntry *entries_start =3D (void *)sccb + data_len;
+> =20
+>      if (!sccb_sufficient_len(sccb, machine->possible_cpus->len, data_l=
+en)) {
+>          return;
+>      }
+> =20
+>      /* CPU information */
+> -    prepare_cpu_entries(machine, read_info->entries, &cpu_count);
+> +    prepare_cpu_entries(machine, entries_start, &cpu_count);
+>      read_info->entries_cpu =3D cpu_to_be16(cpu_count);
+>      read_info->offset_cpu =3D cpu_to_be16(data_len);
+>      read_info->highest_cpu =3D cpu_to_be16(machine->smp.max_cpus - 1);=
+
+>=20
+
+
+
+--VRNT3tIR3Q5swC2l7kxvXGvnjhpXslmiG--
+
+--fF49H9YHQdzjj0iMA9KDej50dSRqQd0fT
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl7sdaUACgkQ41TmuOI4
+ufjGMhAArDDwnB3tyzu/B5Uc8GO7LN1URPmmHx0n7pKJ9bvoX1fhRkpEFynZMIra
+Pk1tLFijU3Zalahopw9WHMZOW8EXrvZic20aPB3IF1x2wnEQmvU0x7vuQ0BRqLWn
+WoZhuFY4OX0M8opJJamaZCMt+UV6DoJtrXTHT5OL6KR5z4V3Zzfg9FzTxTAoCGor
+2SxTDI/NfM9pFV00RCKQ2MoPRTeT9v50IAkZ9p0AVHALbTuubwZSEVeYxzbs51fz
+p7N8rYfMC/KeznkK05qsrhffVoBIhpCeoLziPH8g6WW+3E7khVcJl2EPbp9/GmXf
+XL1pgUkkdmS+Vj0jrVA9jDhSw7KoFGNF/xWAC7hV8Qgjdw8+0cHtBN1QzUwOE9f9
+Ndq8tc8ttz6ySPEvNBmFjG6k1GUb4wGS0CLrBLbUNWXqMpAB9d6WuGgYg/b5Q3jB
+s+XnWXex9ru4SARMYSaxXdghyx4m6FNHDpU0mppDq/CP/YwPbA7wJFQhRRn923n0
+VUv4sJoYCm8lSUYahywPuNsKgGTvEO+ZN5Qv2oompXYw56ZWL5pwU6JTJB5DvPJj
+1ziwA31tODYfegHnlE/bh7ZFYvi4mO/hGv4Nu7xyxqxx9O4riYkdKrP2tKI/vHLL
+UmvF8cYOX8KgXO+mCKmWQ8+T8pldKnmKyJ5T/ABIU1b1oeAXncA=
+=98Bt
+-----END PGP SIGNATURE-----
+
+--fF49H9YHQdzjj0iMA9KDej50dSRqQd0fT--
+
 
