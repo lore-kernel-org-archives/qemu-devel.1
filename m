@@ -2,93 +2,90 @@ Return-Path: <SRS0=Yszf=AA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 083EFC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 05:55:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C938C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 06:15:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BD270207DD
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 05:55:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6680020786
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 06:15:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gJYoSvwM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD270207DD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lvdKQOVm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6680020786
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52498 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58956 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jm9zm-0004Nq-Sk
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 01:55:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48244)
+	id 1jmAIn-00051V-L8
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 02:15:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53238)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jm9z7-0003um-LS
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 01:54:41 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:47042
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jm9z5-0004JO-NZ
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 01:54:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592546079;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=Rz6au7tJFYCX+MvEeobUfi7nRGNtBn67k7m44fVYLTM=;
- b=gJYoSvwM/yTfUgv5+wfx5FOr4CmUDgmI9DkMLtfBQJBmKg9ws6xt1SIQa0hz7JnJv6DPbz
- lULEadCeQkVIhxFNdxytwedwwh08pTA9RPsNtZTefon87D0IJ+Equ30zY3WYgAXQx2pvUB
- jIhG6cjP0BrOfkKIRhNCqOCpS8Rso3w=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-271-WpD9cgayNRud9esbc80dEQ-1; Fri, 19 Jun 2020 01:54:37 -0400
-X-MC-Unique: WpD9cgayNRud9esbc80dEQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 976CB800053;
- Fri, 19 Jun 2020 05:54:35 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-152.ams2.redhat.com [10.36.112.152])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DD9B81002394;
- Fri, 19 Jun 2020 05:54:31 +0000 (UTC)
-Subject: Re: [RFC v6 3/4] cpu-timers, icount: new modules
-To: Claudio Fontana <cfontana@suse.de>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Roman Bolshakov <r.bolshakov@yadro.com>,
- Markus Armbruster <armbru@redhat.com>
-References: <20200618190401.4895-1-cfontana@suse.de>
- <20200618190401.4895-4-cfontana@suse.de>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <3c15cb29-d78a-effd-d1b9-3f3c61e2fd27@redhat.com>
-Date: Fri, 19 Jun 2020 07:54:30 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jmAIF-0004K9-9G; Fri, 19 Jun 2020 02:14:27 -0400
+Received: from mail-il1-x141.google.com ([2607:f8b0:4864:20::141]:36748)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jmAID-0007Uy-I9; Fri, 19 Jun 2020 02:14:27 -0400
+Received: by mail-il1-x141.google.com with SMTP id a13so8261807ilh.3;
+ Thu, 18 Jun 2020 23:14:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=8eebD7N5iZMNvpDSTRHabX8tggHEe3JXaxwj/8p+1Dw=;
+ b=lvdKQOVmQ3A8+k2jEXA1OzFs8k4UsI8TasG/9Vn3EE1S+KWd9DSwZcuW7dtIj/wNLG
+ zY65lNwXbREb5OWmUMyXDkxPa+GIwgHNpQOhpy4vLEDivCyk0g0UqL94v+HQgAa9VekA
+ gqOyRGV8L9dPgyzFhQM1YJKGaMZNJECVTC8Iv92ZLOcK/WjUF2hQsJtDpo+hd7+nwLKm
+ nDqpNiTOs7WMAAOUMqAFXmyjKWiE4DBBjLWX/ppsKALAVAScVJwlxaAB0BjO+NtOwCg9
+ QRwjePp0IXQks0NOHXuPlIuTdAYBAgFsgTPotCStKNk/Cdrwsyjkt22+DCRvWpc6pfUO
+ 9Egw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=8eebD7N5iZMNvpDSTRHabX8tggHEe3JXaxwj/8p+1Dw=;
+ b=ZFdJJLjSD9sG+pg8lMiKB/oVEz6r2eq41f/7v3BWYlUupSyE5O2Zs7AqG+b6fXMAbJ
+ HA+mEN+8lX1jgrPMMQui9hqtXeAORBDyLVr8aXIXrLzJGlhobvN+QGdqOWvuWrv/hpyC
+ Qn6Ar7ABo6VgpyuSdGWtVkTfsshH4X/2VNy7+KAjgaeOYZs2lZRJ5J04vozm+i2jp0VV
+ 4uPJAIsO1TYNRt5vwCOne23tB3LRriU07RW5ER7cEupYTHNzzxaQrIetNBipl86Y5Q8m
+ LPRIVgXJMU1yA+eGnp1rLvUuLmNAF95WP1FS0/Pt3WDDVtUaMkFXPb+2EgOocr5T8tXm
+ zUDw==
+X-Gm-Message-State: AOAM533MQ2lXS+pwvnsKkANnS0XIWlkfc0n13LvV689VoJfg4eJHpF5u
+ iqqWRUAlm6JHV8cXYsqNuEU81430vLHIqrGnjEE=
+X-Google-Smtp-Source: ABdhPJz4lC21EcdKd3OMrB/N9cUXHCfcBeMxbrZhhawF7RW64BlzShXWKYFAudWwRo7C4Odd1IqYxryoiSRSIfo5Glw=
+X-Received: by 2002:a92:d647:: with SMTP id x7mr2165462ilp.267.1592547263870; 
+ Thu, 18 Jun 2020 23:14:23 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200618190401.4895-4-cfontana@suse.de>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/19 01:50:04
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+References: <1592268641-7478-1-git-send-email-bmeng.cn@gmail.com>
+ <1592268641-7478-3-git-send-email-bmeng.cn@gmail.com>
+ <CAKmqyKNovTf3F+t9WFCWXvAgT_CRa5dbDuQExzbqxkM-z3ufqw@mail.gmail.com>
+ <CAEUhbmVq8kVfZRQSF-LT_bDib9e1xBL-7zifmHpQgdvehcNzFA@mail.gmail.com>
+ <CAEUhbmU3ouNn=PfXLwZx_Pu49zmWY1ddsSqKONdh6X5atXcncg@mail.gmail.com>
+In-Reply-To: <CAEUhbmU3ouNn=PfXLwZx_Pu49zmWY1ddsSqKONdh6X5atXcncg@mail.gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Thu, 18 Jun 2020 23:04:57 -0700
+Message-ID: <CAKmqyKN+QjohXJQ81Tpu9+VDzgAHVbyOKs-vxC3d7wGvZKMWvw@mail.gmail.com>
+Subject: Re: [PATCH v2 2/5] hw/riscv: sifive: Change SiFive E/U CPU reset
+ vector to 0x1004
+To: Bin Meng <bmeng.cn@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::141;
+ envelope-from=alistair23@gmail.com; helo=mail-il1-x141.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,86 +98,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
- haxm-team@intel.com, Wenchao Wang <wenchao.wang@intel.com>,
- Sunil Muthuswamy <sunilmut@microsoft.com>, Richard Henderson <rth@twiddle.net>,
- Colin Xu <colin.xu@intel.com>
+Cc: Bin Meng <bin.meng@windriver.com>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Palmer Dabbelt <palmerdabbelt@google.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 18/06/2020 21.04, Claudio Fontana wrote:
-> refactoring of cpus.c continues with cpu timer state extraction.
-> 
-> cpu-timers: responsible for the cpu timers state, and for access to
-> cpu clocks and ticks.
-> 
-> icount: counts the TCG instructions executed. As such it is specific to
-> the TCG accelerator. Therefore, it is built only under CONFIG_TCG.
-> 
-> One complication is due to qtest, which misuses icount to warp time
-> (qtest_clock_warp). In order to solve this problem, detach instead qtest
-> from icount, and use a trivial separate counter for it.
-> 
-> This requires fixing assumptions scattered in the code that
-> qtest_enabled() implies icount_enabled().
-> 
-> No functionality change.
-> 
-> Signed-off-by: Claudio Fontana <cfontana@suse.de>
-> Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-> ---
->  MAINTAINERS                  |   2 +
->  accel/qtest.c                |   6 +-
->  accel/tcg/cpu-exec.c         |  43 ++-
->  accel/tcg/tcg-all.c          |   7 +-
->  accel/tcg/translate-all.c    |   3 +-
->  docs/replay.txt              |   6 +-
->  exec.c                       |   4 -
->  hw/core/ptimer.c             |   8 +-
->  hw/i386/x86.c                |   1 +
->  include/exec/cpu-all.h       |   4 +
->  include/exec/exec-all.h      |   4 +-
->  include/qemu/timer.h         |  22 +-
->  include/sysemu/cpu-timers.h  |  81 +++++
->  include/sysemu/cpus.h        |  12 +-
->  include/sysemu/qtest.h       |   2 +
->  include/sysemu/replay.h      |   4 +-
->  replay/replay.c              |   6 +-
->  softmmu/Makefile.objs        |   2 +
->  softmmu/cpu-timers.c         | 284 ++++++++++++++++
->  softmmu/cpus.c               | 750 +------------------------------------------
->  softmmu/icount.c             | 499 ++++++++++++++++++++++++++++
->  softmmu/qtest.c              |  34 +-
->  softmmu/timers-state.h       |  69 ++++
->  softmmu/vl.c                 |   8 +-
->  stubs/Makefile.objs          |   3 +-
->  stubs/clock-warp.c           |   4 +-
->  stubs/cpu-get-clock.c        |   3 +-
->  stubs/cpu-get-icount.c       |  21 --
->  stubs/icount.c               |  22 ++
->  stubs/qemu-timer-notify-cb.c |   8 +
->  stubs/qtest.c                |   5 +
->  target/alpha/translate.c     |   3 +-
->  target/arm/helper.c          |   7 +-
->  target/riscv/csr.c           |   8 +-
->  tests/ptimer-test-stubs.c    |   7 +-
->  tests/test-timed-average.c   |   2 +-
->  util/main-loop.c             |   4 +-
->  util/qemu-timer.c            |  12 +-
->  38 files changed, 1119 insertions(+), 851 deletions(-)
->  create mode 100644 include/sysemu/cpu-timers.h
->  create mode 100644 softmmu/cpu-timers.c
->  create mode 100644 softmmu/icount.c
->  create mode 100644 softmmu/timers-state.h
->  delete mode 100644 stubs/cpu-get-icount.c
->  create mode 100644 stubs/icount.c
->  create mode 100644 stubs/qemu-timer-notify-cb.c
+On Wed, Jun 17, 2020 at 10:08 PM Bin Meng <bmeng.cn@gmail.com> wrote:
+>
+> Hi Alistair,
+>
+> On Thu, Jun 18, 2020 at 8:41 AM Bin Meng <bmeng.cn@gmail.com> wrote:
+> >
+> > Hi Alistair,
+> >
+> > On Thu, Jun 18, 2020 at 12:40 AM Alistair Francis <alistair23@gmail.com> wrote:
+> > >
+> > > On Mon, Jun 15, 2020 at 5:51 PM Bin Meng <bmeng.cn@gmail.com> wrote:
+> > > >
+> > > > From: Bin Meng <bin.meng@windriver.com>
+> > > >
+> > > > Per the SiFive manual, all E/U series CPU cores' reset vector is
+> > > > at 0x1004. Update our codes to match the hardware.
+> > > >
+> > > > Signed-off-by: Bin Meng <bin.meng@windriver.com>
+> > >
+> > > This commit breaks my Oreboot test.
+> > >
+> > > Oreboot starts in flash and we run the command with the
+> > > `sifive_u,start-in-flash=true` machine.
+> >
+> > Could you please post an Oreboot binary for testing somewhere, or some
+> > instructions so that I can test this?
+> >
+>
+> I have figured out where the issue is. The issue is inside the Oreboot
+> codes that its QEMU detecting logic should be updated to match this
+> change.
+>
+> I've sent pull request to Oreboot to fix this:
+> https://github.com/oreboot/oreboot/pull/264
 
-This is missing a modification to dma-helpers.c that also uses
-use_icount (see the mail from patchew).
+Thanks for that.
 
- Thomas
+>
+> > >
+> > > I have removed this and the later patches from the RISC-V branch. I
+> > > want to send a PR today. After that I'll look into this.
+> >
+>
+> I don't think we should drop this patch and later ones in this series.
 
+Applied again then.
+
+Alistair
+
+>
+> Regards,
+> Bin
 
