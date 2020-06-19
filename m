@@ -6,80 +6,80 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE722C433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 16:12:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77480C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 16:13:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9488D2168B
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 16:12:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9488D2168B
+	by mail.kernel.org (Postfix) with ESMTPS id 49C6D21707
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 16:13:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49C6D21707
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46896 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48966 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmJcr-0005VD-TY
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 12:12:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41344)
+	id 1jmJdn-0006Pi-IM
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 12:13:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41424)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <stefanb@linux.ibm.com>)
- id 1jmJak-000352-2u; Fri, 19 Jun 2020 12:10:10 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42364)
+ id 1jmJav-0003Jk-LS; Fri, 19 Jun 2020 12:10:21 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:7048)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <stefanb@linux.ibm.com>)
- id 1jmJag-0002O2-7g; Fri, 19 Jun 2020 12:10:09 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+ id 1jmJat-0002P2-SG; Fri, 19 Jun 2020 12:10:21 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
  by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 05JG2B9N185975; Fri, 19 Jun 2020 12:10:02 -0400
+ 05JG3XRC118561; Fri, 19 Jun 2020 12:10:17 -0400
 Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 31rthf3yxq-1
+ by mx0a-001b2d01.pphosted.com with ESMTP id 31s0f40dk8-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 19 Jun 2020 12:10:00 -0400
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05JG2NFE186921;
- Fri, 19 Jun 2020 12:10:00 -0400
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com
- [169.63.214.131])
- by mx0a-001b2d01.pphosted.com with ESMTP id 31rthf3yx2-1
+ Fri, 19 Jun 2020 12:10:16 -0400
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05JG48ps121398;
+ Fri, 19 Jun 2020 12:10:16 -0400
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com
+ [169.62.189.11])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 31s0f40djf-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 19 Jun 2020 12:10:00 -0400
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
- by ppma01dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05JG5IFc021913;
- Fri, 19 Jun 2020 16:09:58 GMT
-Received: from b03cxnp07029.gho.boulder.ibm.com
- (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
- by ppma01dal.us.ibm.com with ESMTP id 31rdtr8gwg-1
+ Fri, 19 Jun 2020 12:10:16 -0400
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+ by ppma03dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05JG5Ask025270;
+ Fri, 19 Jun 2020 16:10:15 GMT
+Received: from b03cxnp08027.gho.boulder.ibm.com
+ (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
+ by ppma03dal.us.ibm.com with ESMTP id 31q6c6c05n-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 19 Jun 2020 16:09:58 +0000
+ Fri, 19 Jun 2020 16:10:14 +0000
 Received: from b03ledav003.gho.boulder.ibm.com
  (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
- by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 05JG9vxp57671948
+ by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 05JGABwk14418238
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 19 Jun 2020 16:09:57 GMT
+ Fri, 19 Jun 2020 16:10:12 GMT
 Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 59AE96A04F;
- Fri, 19 Jun 2020 16:09:57 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 6D4766A05A;
+ Fri, 19 Jun 2020 16:10:13 +0000 (GMT)
 Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 544776A047;
- Fri, 19 Jun 2020 16:09:56 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 668446A04F;
+ Fri, 19 Jun 2020 16:10:12 +0000 (GMT)
 Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
  by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
- Fri, 19 Jun 2020 16:09:56 +0000 (GMT)
-Subject: Re: [PATCH v6 1/3] acpi: Some build_tpm2() code reshape
+ Fri, 19 Jun 2020 16:10:12 +0000 (GMT)
+Subject: Re: [PATCH v6 3/3] docs/specs/tpm: ACPI boot now supported for TPM/ARM
 To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
  qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org,
  mst@redhat.com, imammedo@redhat.com
 References: <20200619141851.16272-1-eric.auger@redhat.com>
- <20200619141851.16272-2-eric.auger@redhat.com>
+ <20200619141851.16272-4-eric.auger@redhat.com>
 From: Stefan Berger <stefanb@linux.ibm.com>
-Message-ID: <bfd5813b-12ef-04c8-0f21-4a3934fa0035@linux.ibm.com>
-Date: Fri, 19 Jun 2020 12:09:55 -0400
+Message-ID: <d33923df-8f53-1c71-ceb8-a4741d5af7ab@linux.ibm.com>
+Date: Fri, 19 Jun 2020 12:10:11 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200619141851.16272-2-eric.auger@redhat.com>
+In-Reply-To: <20200619141851.16272-4-eric.auger@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
@@ -88,12 +88,11 @@ X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
  definitions=2020-06-19_16:2020-06-19,
  2020-06-19 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 clxscore=1015
- impostorscore=0 cotscore=-2147483648 bulkscore=0 adultscore=0
- lowpriorityscore=0 spamscore=0 mlxlogscore=999 suspectscore=0
- malwarescore=0 mlxscore=0 priorityscore=1501 classifier=spam adjust=0
- reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2006190114
+ impostorscore=0 spamscore=0
+ priorityscore=1501 suspectscore=0 bulkscore=0 lowpriorityscore=0
+ cotscore=-2147483648 clxscore=1015 phishscore=0 adultscore=0 mlxscore=0
+ mlxlogscore=999 malwarescore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2004280000 definitions=main-2006190114
 Received-SPF: pass client-ip=148.163.156.1; envelope-from=stefanb@linux.ibm.com;
  helo=mx0a-001b2d01.pphosted.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/19 12:10:04
@@ -123,116 +122,31 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 6/19/20 10:18 AM, Eric Auger wrote:
-> Remove any reference to Acpi20TPM2 and adopt an implementation
-> similar to build_ghes_v2().
+> ACPI boot now is supported. Let's remove the comment
+> saying it is not.
 >
 > Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> Suggested-by: Igor Mammedov <imammedo@redhat.com>
 
 Reviewed-by: Stefan Berger <stefanb@linux.ibm.com>
 
-Tested-by: Stefan Berger <stefanb@linux.ibm.com>
 
-
->
 > ---
+>   docs/specs/tpm.rst | 2 --
+>   1 file changed, 2 deletions(-)
 >
-> v5 -> v6:
-> - add reference to the spec + comment about LAML and LASA fields
-> - also moved LASA intro comment above build_append_int_noprefix()
->    as requested by Igor
-> ---
->   hw/acpi/aml-build.c | 54 +++++++++++++++++++++++++++++----------------
->   1 file changed, 35 insertions(+), 19 deletions(-)
->
-> diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
-> index 2cb7b991ef..1cc08a3eb9 100644
-> --- a/hw/acpi/aml-build.c
-> +++ b/hw/acpi/aml-build.c
-> @@ -1878,48 +1878,64 @@ build_hdr:
->                    "FACP", tbl->len - fadt_start, f->rev, oem_id, oem_table_id);
->   }
+> diff --git a/docs/specs/tpm.rst b/docs/specs/tpm.rst
+> index 5e61238bc5..eeeb93730a 100644
+> --- a/docs/specs/tpm.rst
+> +++ b/docs/specs/tpm.rst
+> @@ -346,8 +346,6 @@ In case an Arm virt machine is emulated, use the following command line:
+>       -drive if=pflash,format=raw,file=flash0.img,readonly \
+>       -drive if=pflash,format=raw,file=flash1.img
 >   
-> +/*
-> + * build_tpm2 - Build the TPM2 table as specified in table 7 of
-> + * "TCG ACPI Specification; Family 1.2 and 2.0;
-> + * Level 00 Revision 00.37, December 19, 2014"
-> + * Note: the LASA and LAML fields are optional for TPM-2.0 (the above
-> + * table does not mention them) but are needed at least for SeaBIOS.
-> + * See the Acpi20TPM2 struct for the corresponding layout.
-> + */
->   void build_tpm2(GArray *table_data, BIOSLinker *linker, GArray *tcpalog)
->   {
-> -    Acpi20TPM2 *tpm2_ptr = acpi_data_push(table_data, sizeof(AcpiTableHeader));
-> -    unsigned log_addr_size = sizeof(tpm2_ptr->log_area_start_address);
-> -    unsigned log_addr_offset =
-> -        (char *)&tpm2_ptr->log_area_start_address - table_data->data;
->       uint8_t start_method_params[12] = {};
-> +    unsigned log_addr_offset, tpm2_start;
-> +    uint64_t control_area_start_address;
->       TPMIf *tpmif = tpm_find();
-> +    uint32_t start_method;
-> +    void *tpm2_ptr;
+> -  On Arm, ACPI boot with TPM is not yet supported.
+> -
+>   In case SeaBIOS is used as firmware, it should show the TPM menu item
+>   after entering the menu with 'ESC'.
 >   
-> -    /* platform class */
-> +    tpm2_start = table_data->len;
-> +    tpm2_ptr = acpi_data_push(table_data, sizeof(AcpiTableHeader));
-> +
-> +    /* Platform Class */
->       build_append_int_noprefix(table_data, TPM2_ACPI_CLASS_CLIENT, 2);
-> -    /* reserved */
-> +    /* Reserved */
->       build_append_int_noprefix(table_data, 0, 2);
->       if (TPM_IS_TIS_ISA(tpmif) || TPM_IS_TIS_SYSBUS(tpmif)) {
-> -        /* address of control area */
-> -        build_append_int_noprefix(table_data, 0, 8);
-> -        /* start method */
-> -        build_append_int_noprefix(table_data, TPM2_START_METHOD_MMIO, 4);
-> +        control_area_start_address = 0;
-> +        start_method = TPM2_START_METHOD_MMIO;
->       } else if (TPM_IS_CRB(tpmif)) {
-> -        build_append_int_noprefix(table_data, TPM_CRB_ADDR_CTRL, 8);
-> -        build_append_int_noprefix(table_data, TPM2_START_METHOD_CRB, 4);
-> +        control_area_start_address = TPM_CRB_ADDR_CTRL;
-> +        start_method = TPM2_START_METHOD_CRB;
->       } else {
-> -        g_warn_if_reached();
-> +        g_assert_not_reached();
->       }
-> +    /* Address of Control Area */
-> +    build_append_int_noprefix(table_data, control_area_start_address, 8);
-> +    /* Start Method */
-> +    build_append_int_noprefix(table_data, start_method, 4);
->   
-> -    /* platform specific parameters */
-> -    g_array_append_vals(table_data, &start_method_params, 12);
-> +    /* Platform Specific Parameters */
-> +    g_array_append_vals(table_data, &start_method_params,
-> +                        ARRAY_SIZE(start_method_params));
->   
-> -    /* log area minimum length */
-> +    /* Log Area Minimum Length */
->       build_append_int_noprefix(table_data, TPM_LOG_AREA_MINIMUM_SIZE, 4);
->   
->       acpi_data_push(tcpalog, TPM_LOG_AREA_MINIMUM_SIZE);
->       bios_linker_loader_alloc(linker, ACPI_BUILD_TPMLOG_FILE, tcpalog, 1,
->                                false);
->   
-> -    /* log area start address to be filled by Guest linker */
-> +    log_addr_offset = table_data->len;
-> +
-> +    /* Log Area Start Address to be filled by Guest linker */
->       build_append_int_noprefix(table_data, 0, 8);
->       bios_linker_loader_add_pointer(linker, ACPI_BUILD_TABLE_FILE,
-> -                                   log_addr_offset, log_addr_size,
-> +                                   log_addr_offset, 8,
->                                      ACPI_BUILD_TPMLOG_FILE, 0);
->       build_header(linker, table_data,
-> -                 (void *)tpm2_ptr, "TPM2", sizeof(*tpm2_ptr), 4, NULL, NULL);
-> +                 tpm2_ptr, "TPM2", table_data->len - tpm2_start, 4, NULL, NULL);
->   }
->   
->   /* ACPI 5.0: 6.4.3.8.2 Serial Bus Connection Descriptors */
 
 
 
