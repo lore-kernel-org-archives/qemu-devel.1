@@ -2,95 +2,87 @@ Return-Path: <SRS0=Yszf=AA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF1F9C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 17:24:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CED23C433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 17:24:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B8E24208D5
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 17:24:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9D74A208D5
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 17:24:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Wiud7yBr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8E24208D5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HEBaOEAC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D74A208D5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43058 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44288 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmKkI-0004XF-0M
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 13:24:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58356)
+	id 1jmKka-00053m-RX
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 13:24:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33716)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=4324eb4de=alistair.francis@wdc.com>)
- id 1jmKUQ-0000ui-TH
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 13:07:42 -0400
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:24435)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=4324eb4de=alistair.francis@wdc.com>)
- id 1jmKUN-0004Ps-Qc
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 13:07:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1592586468; x=1624122468;
- h=from:to:cc:subject:date:message-id:in-reply-to:
- references:mime-version:content-transfer-encoding;
- bh=awiPom2MLm4GSUph2K8Os6CU9vKiSvuIpuRuIMNfHzs=;
- b=Wiud7yBrj4QtFNn/8QFcuvHgrvWbXa+gJaZOcnSD1wc7Bi/GXQNXMswx
- D2Bp5HLzGzbpmxUFPLK7hdbgxw3UAHwPq5Ikn93pduB6WjwaNPEdd3n+t
- pm2A52iQtwgvl3gl1QCbNh9IVSA1Y6H+iQ4mv1Frt3CEZVlWuevpwv4gz
- g+inFV+b4S9O2EAH11htCNDzWo5QEfue5pEljpLyPkN9FnlyiBrSe/m8Q
- z1lHqdBQ8Z7kjGhZ6XyGG+GpS7pePFE1MStvOueV+ODZ6A/Zr6pWeXXlt
- G8+ecpzRF7HjU5DBMofWZwVMm1zyKvi/5Vfhln9p8wBL+kL68f2LfHrUK A==;
-IronPort-SDR: D3SzsxhkntV8jQMxiKGY2xwPVcc147raH2PNC3Oig7cLD1QsNi50/Zc56xaUk5WYLL/y1xXttO
- l1IMx6DtEABAeLVQm/2rFPxxOBPDu6dnOrWUMUtau0ygmtQ+sV/Zyz/OdES+HQiR/NCML2MOzp
- I+N5wjgrvXNT5cyF9nySHRyLzgxnVw/6cRvZMR86BvVqrXWykXiARcZ7HzTz/1bkTAwZlTlciO
- HDdg4gdKexaTgkaUKYH5cTmR27wBiF0tc7EA8x/RbtomHFAR+t6KB8BJPZn3fp+g1/FyodSqN1
- 3Mo=
-X-IronPort-AV: E=Sophos;i="5.75,256,1589212800"; d="scan'208";a="243417012"
-Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com)
- ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 20 Jun 2020 01:07:29 +0800
-IronPort-SDR: Gbdt2w1RBiaEWpwP1wFdrJG1TL9g74AE4viYJsDnMh42xm3odZ6vSmiFvwG0J6cB/7WKJvhPqg
- eDF8VhNTYUUFOGCNFKsQHp1D59HuwbUfM=
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
- by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 19 Jun 2020 09:56:04 -0700
-IronPort-SDR: bWhma3ycjeD7EZVFJguWugMJAPaMigYkcXp1FcLRv74xmyzecFlKIC/Jt7BbdQ8qUTCc+v2/cj
- iGEo1SbJY/bA==
-WDCIronportException: Internal
-Received: from unknown (HELO risc6-mainframe.hgst.com) ([10.86.58.142])
- by uls-op-cesaip02.wdc.com with ESMTP; 19 Jun 2020 10:07:27 -0700
-From: Alistair Francis <alistair.francis@wdc.com>
-To: peter.maydell@linaro.org,
-	qemu-devel@nongnu.org
-Subject: [PULL v2 24/32] hw/riscv: sifive_gpio: Do not blindly trigger output
- IRQs
-Date: Fri, 19 Jun 2020 09:58:09 -0700
-Message-Id: <20200619165817.4144200-25-alistair.francis@wdc.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20200619165817.4144200-1-alistair.francis@wdc.com>
-References: <20200619165817.4144200-1-alistair.francis@wdc.com>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jmKiT-0000he-Ij
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 13:22:13 -0400
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:34080)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jmKiR-0006uW-JD
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 13:22:13 -0400
+Received: by mail-oi1-x244.google.com with SMTP id b8so9128069oic.1
+ for <qemu-devel@nongnu.org>; Fri, 19 Jun 2020 10:22:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=snliSYd+mulJizjEpl5Dl69ntnWcBXIk9+iTvlRC7E4=;
+ b=HEBaOEAC8kev5ZPD5UiFF9cqi4d2t3RqPSqOs76mwNw3wJjGzq5DCeZzwgn97nKYWB
+ 1z3SC4DvudWLqIb4VX5W+jBXuQ+pbjU1YVIvY2KA6PKFk2kce4kJTm6tCRea914T/R3v
+ 3K3grTcUYNp3uSnLVbKJTc/k/v/McqREO3VXPLOeRKASJ31g3J9svUtKn7ltHpKXGR+n
+ vB323qJn59sD3ghw94Y5niO/bJYPZ66uQFwJgIQkWO07ZiVro0H4ipvUQCcUoC88YrT9
+ iNvkyQvM6181zHKqZDaJ8jjE4mz9mLeHWqcp3Tyh1JeY8bVlh6ahC11aYGqk4S4xYrrF
+ DKlg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=snliSYd+mulJizjEpl5Dl69ntnWcBXIk9+iTvlRC7E4=;
+ b=tm3+XOZAdR8YB8lorgIKP5tZxd8EG22SMK41L5YLQLOwNyvKoG+1d+gF2r9av88fhJ
+ AR32OF8EVvsmtGmQvHVRH2DzD+EwZ1JRL08FrrphVemrxcn1Eb5RyHHd2FG3MClo4yS1
+ 1lhfcLm6hej26F2S2Yr8P8IOUwI1tA0wY4YY2WtzBPn4aEOFJkGkyqqgKOvtCMu+hfL9
+ OW5TGUDrPU9YBU8jNw+325JYJ7dUQ2sKWMBS3R2iKVdWO2BGN/FsD4/khPGnQB7kJqZ+
+ jxJ6FnjLTjCRxfH6DJ4S6mMbCzw2vYC+7G5c4Zog+0jWLS92WtzHi/s311u0tbV4FXRF
+ O4ew==
+X-Gm-Message-State: AOAM531K+0ZgBFYWXrAY0mAMcd/z8u9tEjX9wm73WV5Kted2Rh9Qms2P
+ O0l9G917ZfwKPqLCAlaMiAglLv/fj7p65ep3mQrdXA==
+X-Google-Smtp-Source: ABdhPJyhLzSs5cnuvnV6JzOrwU/mrxPMIHdjd3s3fqM0Basrvp35yvid7mm6SDHN/nMs8dW0fLMPu+dSc8RZ8HpussE=
+X-Received: by 2002:aca:5152:: with SMTP id f79mr3748675oib.146.1592587330245; 
+ Fri, 19 Jun 2020 10:22:10 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=68.232.143.124;
- envelope-from=prvs=4324eb4de=alistair.francis@wdc.com;
- helo=esa2.hgst.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/19 13:07:24
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
-X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+References: <20200514142138.20875-1-peter.maydell@linaro.org>
+ <20200514142138.20875-27-peter.maydell@linaro.org>
+ <CAFEAcA_a4yiE9UZx=MAFUM+f0LSiNvjQ=X1+dObELRzfnTyUHQ@mail.gmail.com>
+ <20200521113048-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20200521113048-mutt-send-email-mst@kernel.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 19 Jun 2020 18:21:59 +0100
+Message-ID: <CAFEAcA-PTtLvouxo5XZmgSbeRWa4WCwH7_cC5xrg3Dnr8UyZxg@mail.gmail.com>
+Subject: Re: [PULL 26/45] ACPI: Record Generic Error Status Block(GESB) table
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::244;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x244.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,43 +95,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alistair23@gmail.com, Bin Meng <bin.meng@windriver.com>,
- Alistair Francis <alistair.francis@wdc.com>
+Cc: Igor Mammedov <imammedo@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Dongjiu Geng <gengdongjiu@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Bin Meng <bin.meng@windriver.com>
+On Thu, 21 May 2020 at 16:31, Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> On Thu, May 21, 2020 at 02:03:36PM +0100, Peter Maydell wrote:
+> > On Thu, 14 May 2020 at 15:22, Peter Maydell <peter.maydell@linaro.org> wrote:
+> > >
+> > > From: Dongjiu Geng <gengdongjiu@huawei.com>
+> > >
+> > > kvm_arch_on_sigbus_vcpu() error injection uses source_id as
+> > > index in etc/hardware_errors to find out Error Status Data
+> > > Block entry corresponding to error source. So supported source_id
+> > > values should be assigned here and not be changed afterwards to
+> > > make sure that guest will write error into expected Error Status
+> > > Data Block.
+> > >
+> > > Before QEMU writes a new error to ACPI table, it will check whether
+> > > previous error has been acknowledged. If not acknowledged, the new
+> > > errors will be ignored and not be recorded. For the errors section
+> > > type, QEMU simulate it to memory section error.
+> >
+> > Hi; Coverity points out (CID 1428962) that there is
+> > unreachable code in this function:
+> >
+> > > +static int acpi_ghes_record_mem_error(uint64_t error_block_address,
+> > > +                                      uint64_t error_physical_addr)
+> > > +{
+> > > +    GArray *block;
+> > > +
+> > > +    /* Memory Error Section Type */
+> > > +    const uint8_t uefi_cper_mem_sec[] =
+> > > +          UUID_LE(0xA5BC1114, 0x6F64, 0x4EDE, 0xB8, 0x63, 0x3E, 0x83, \
+> > > +                  0xED, 0x7C, 0x83, 0xB1);
+> > > +
+> > > +    /* invalid fru id: ACPI 4.0: 17.3.2.6.1 Generic Error Data,
+> > > +     * Table 17-13 Generic Error Data Entry
+> > > +     */
+> > > +    QemuUUID fru_id = {};
+> > > +    uint32_t data_length;
+> > > +
+> > > +    block = g_array_new(false, true /* clear */, 1);
+> > > +
+> > > +    /* This is the length if adding a new generic error data entry*/
+> > > +    data_length = ACPI_GHES_DATA_LENGTH + ACPI_GHES_MEM_CPER_LENGTH;
+> >
+> > Here data_length has a constant value...
+> >
+> > > +
+> > > +    /*
+> > > +     * Check whether it will run out of the preallocated memory if adding a new
+> > > +     * generic error data entry
+> > > +     */
+> > > +    if ((data_length + ACPI_GHES_GESB_SIZE) > ACPI_GHES_MAX_RAW_DATA_LENGTH) {
+> >
+> > ...but here we immediately have a runtime check which can't possibly
+> > fail because of the values of the constants involved, so this
+> > if() block is dead code.
+> >
+> > > +        error_report("Not enough memory to record new CPER!!!");
+> > > +        g_array_free(block, true);
+> > > +        return -1;
+> > > +    }
+> >
+> > What was this code trying to do? Is the initial value of
+> > data_length incorrect, or is the if() condition wrong, or
+> > should this simply have been an assert() ?
 
-At present the GPIO output IRQs are triggered each time any GPIO
-register is written. However this is not correct. We should only
-trigger the output IRQ when the pin is configured as output enable.
+> It's just a validity check. assert will do just as well.
 
-Signed-off-by: Bin Meng <bin.meng@windriver.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Message-id: 1591625864-31494-9-git-send-email-bmeng.cn@gmail.com
-Message-Id: <1591625864-31494-9-git-send-email-bmeng.cn@gmail.com>
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
----
- hw/riscv/sifive_gpio.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Would somebody like to write a patch to make it assert instead, then,
+please? That should keep Coverity happy.
 
-diff --git a/hw/riscv/sifive_gpio.c b/hw/riscv/sifive_gpio.c
-index 0d0fd2ba5e..aac6b44cac 100644
---- a/hw/riscv/sifive_gpio.c
-+++ b/hw/riscv/sifive_gpio.c
-@@ -76,7 +76,9 @@ static void update_state(SIFIVEGPIOState *s)
-             actual_value = pull;
-         }
- 
--        qemu_set_irq(s->output[i], actual_value);
-+        if (output_en) {
-+            qemu_set_irq(s->output[i], actual_value);
-+        }
- 
-         /* Input value */
-         ival = input_en && actual_value;
--- 
-2.27.0
-
+thanks
+-- PMM
 
