@@ -2,94 +2,93 @@ Return-Path: <SRS0=Yszf=AA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C46F3C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 17:19:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFE69C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 17:19:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8F7D3214DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 17:19:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9748C21531
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 17:19:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="WDJrDpta"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F7D3214DB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Fd76l9IT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9748C21531
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49950 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53092 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmKfO-0001pa-KU
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 13:19:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58286)
+	id 1jmKg8-0003LP-Pe
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 13:19:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58996)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=4324eb4de=alistair.francis@wdc.com>)
- id 1jmKUL-0000pi-Mp
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 13:07:38 -0400
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:19125)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=4324eb4de=alistair.francis@wdc.com>)
- id 1jmKUG-0004PR-3M
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 13:07:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1592586452; x=1624122452;
- h=from:to:cc:subject:date:message-id:in-reply-to:
- references:mime-version:content-transfer-encoding;
- bh=melHyBNyq+GBsmbi68L0crjn+k4ZDNG0okkKwoQJd1E=;
- b=WDJrDptaXabXE60fGKqvHWkSaLIZVwVAF09vb/6YHOf4Vox6xnMsdqh+
- 06deDkso/fcM53Y+W3JKiuY0FfRoHTuAhh2sHFyjfn0fW42wgGnOpOTnf
- aIYeGF+0U3JD03ShxNbbcxRXvOzeCFrXi0GZfr4zXwprVriic7elo4NoN
- mZPTgwJ+LnU6CCdDvzVJXfxZCZ8rztXD0Ve6saYTNI9DYfJAOg6QeTa1K
- C4H/Ci1B+PUYUMsJS+n29S3Y05dIA7Mey9+trQVWJH0xk2oPz8tac3BFx
- uxWQqw4Kg3mfIhHlpNwR8QrEdFyFL4oTk5TbpVAzn5znAkNgzagYPIkOO w==;
-IronPort-SDR: 2f2e9DrkxKt0TvInIYK+8XLU55FlPFCIZOc6LBxBCnQJ4b7JGuHa7eLBEZjdJsGBZmRnABU/lx
- pt30hgmTL37pX6q7s+T/8sg3RB1669HaeYmSxyPiX0SzneDKz3C9ICSlYFJsvVl6WZnQ9d60xV
- 9jFLSuTSjlp0uTdiDVLp43nTcPQiN9puWaHIQHyCJ9++g85tRbUDuEgF3NJ/zAqUEz7r2ZCTeH
- laSpWvOv8iXCj4+8hXCAcMt7loAZg2O1vvVNQbdqSDGl6OMjsE+QqtwoDTp5scpzHzx1stRxzm
- as0=
-X-IronPort-AV: E=Sophos;i="5.75,256,1589212800"; d="scan'208";a="144763327"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com)
- ([199.255.45.14])
- by ob1.hgst.iphmx.com with ESMTP; 20 Jun 2020 01:07:23 +0800
-IronPort-SDR: 6xwowBLhNMZu9tJKEt1fWW8OFsgB067nmoS/k2xZG4Aw5tg0Ywwag3KORIpLbnyot5hUwf8qaK
- +HpGonOZzaiDx5ze78x+nEE9K8MhaYuAk=
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
- by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 19 Jun 2020 09:56:33 -0700
-IronPort-SDR: tX4WVnppWyeEaM/LdRYn1c9CUUefhDT+KGF6VXtu4JxYNd/6Fe68k+lerR/HdZmM1XNMQ1441N
- Kgjpd5r4rLPw==
-WDCIronportException: Internal
-Received: from unknown (HELO risc6-mainframe.hgst.com) ([10.86.58.142])
- by uls-op-cesaip02.wdc.com with ESMTP; 19 Jun 2020 10:07:24 -0700
-From: Alistair Francis <alistair.francis@wdc.com>
-To: peter.maydell@linaro.org,
-	qemu-devel@nongnu.org
-Subject: [PULL v2 10/32] target/riscv: Implement checks for hfence
-Date: Fri, 19 Jun 2020 09:57:55 -0700
-Message-Id: <20200619165817.4144200-11-alistair.francis@wdc.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20200619165817.4144200-1-alistair.francis@wdc.com>
-References: <20200619165817.4144200-1-alistair.francis@wdc.com>
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jmKWM-0005En-NC
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 13:09:42 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:44505)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jmKWK-0004qg-Pz
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 13:09:42 -0400
+Received: by mail-wr1-x443.google.com with SMTP id b6so10373579wrs.11
+ for <qemu-devel@nongnu.org>; Fri, 19 Jun 2020 10:09:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=33jMxZwxgXxmUOJv94id4+UgOjK1tI0YM/XIzTe9z9I=;
+ b=Fd76l9ITXyakjw9v81IxZymwW4n0b8J0g96xgYGoz0qVG7RaWrAf8ukyIn1OZr6bqw
+ UXDxu7vGVogcw7lMsPkbE5fK4LkDnraoDNocaagn4FSLsq6i5fiEm2uN1lvMEb8Teas5
+ uxIoklGg24B64cMBYO9SvQ1YxPbjjtWhLErUAi1WzLnPiKcy7hkY23ndM7kc45v92a56
+ fdIwNsN0EzCnu9GhcIAt/+f6scVojMZKwZHQMAlu+btJbEAE9LKndsiPGETDwPHwZziU
+ f7qE3ItAUtD/uqsb/As7lFQkMrQNfDqW5MJ8zHeWYR5a0fBPOmVIL13EG5C93s+cIRPE
+ 9LZw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=33jMxZwxgXxmUOJv94id4+UgOjK1tI0YM/XIzTe9z9I=;
+ b=CTtvMMOvNWGlJX7c1XYjAz0YrI3ypAd0ThXs4SCXM9hgZ5HZRRX/LLlVxxR9YtEQdS
+ QrX7z2pk8h8CAUNo5hpr1GPC/FfetWwcy5lM/UFGmgLFXho++MeYxBNc0A3ZRjFnwkpn
+ vkc/WgAEThcNF979gXtbfSwgOpWygSGNysffVZmfcMWxukMG/7RAHiUYCSnzKMglL265
+ 4PueJLa5wDMnY2UKVtkoxIJTgWuVHiZLo148uWS9Zb37jq4Rj0CvxyLgh7ZF5FTP3D/6
+ +jbeoHwKxETy9bVG8ODqAKlJxz8ShnIFlDx24kKBN77s3WwDgWqNgJ0e5XuU+4nobdFk
+ LYQg==
+X-Gm-Message-State: AOAM531IZo7sUSvfiXPHa7DG1SrE0MUwKhA6j9718VFL8UwiDhSVPjCL
+ 7CCdPnlUze7gcqrqvFSkhOBynQ==
+X-Google-Smtp-Source: ABdhPJx/z8A/8cdrrjLUocEEnQSsi/bmncDgr5svVp/r8fYByOfCh6JBQ9F85gn+silPHEwwZbPLSQ==
+X-Received: by 2002:a5d:56c7:: with SMTP id m7mr5063694wrw.223.1592586579159; 
+ Fri, 19 Jun 2020 10:09:39 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id h13sm3827610wrp.77.2020.06.19.10.09.37
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 19 Jun 2020 10:09:37 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id CF09D1FF7E;
+ Fri, 19 Jun 2020 18:09:36 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2] docs/devel: add some notes on tcg-icount for developers
+Date: Fri, 19 Jun 2020 18:09:30 +0100
+Message-Id: <20200619170930.11704-1-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.71.153.141;
- envelope-from=prvs=4324eb4de=alistair.francis@wdc.com;
- helo=esa3.hgst.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/19 13:07:21
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
-X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x443.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,111 +101,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alistair23@gmail.com, Richard Henderson <richard.henderson@linaro.org>,
- Alistair Francis <alistair.francis@wdc.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Pavel Dovgalyuk <dovgaluk@ispras.ru>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Call the helper_hyp_tlb_flush() function on hfence instructions which
-will generate an illegal insruction execption if we don't have
-permission to flush the Hypervisor level TLBs.
+This attempts to bring together my understanding of the requirements
+for icount behaviour into one reference document for our developer
+notes. It currently make one piece of conjecture which I think is true
+that we don't need gen_io_start/end statements for non-MMIO related
+I/O operations.
 
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Pavel Dovgalyuk <dovgaluk@ispras.ru>
+Cc: Richard Henderson <richard.henderson@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Message-Id: <20200619135844.23307-1-alex.bennee@linaro.org>
+
 ---
- target/riscv/helper.h                   |  5 ++++
- target/riscv/insn_trans/trans_rvh.inc.c | 32 +++++--------------------
- target/riscv/op_helper.c                | 13 ++++++++++
- 3 files changed, 24 insertions(+), 26 deletions(-)
+v2
+  - fix copyright date
+  - it's -> its
+  - drop mentioned of gen_io_end()
+  - remove and correct original conjecture
+---
+ docs/devel/tcg-icount.rst | 89 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 89 insertions(+)
+ create mode 100644 docs/devel/tcg-icount.rst
 
-diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index debb22a480..b36be978d5 100644
---- a/target/riscv/helper.h
-+++ b/target/riscv/helper.h
-@@ -76,3 +76,8 @@ DEF_HELPER_2(mret, tl, env, tl)
- DEF_HELPER_1(wfi, void, env)
- DEF_HELPER_1(tlb_flush, void, env)
- #endif
+diff --git a/docs/devel/tcg-icount.rst b/docs/devel/tcg-icount.rst
+new file mode 100644
+index 00000000000..cb51cb34dde
+--- /dev/null
++++ b/docs/devel/tcg-icount.rst
+@@ -0,0 +1,89 @@
++..
++   Copyright (c) 2020, Linaro Limited
++   Written by Alex Bennée
 +
-+/* Hypervisor functions */
-+#ifndef CONFIG_USER_ONLY
-+DEF_HELPER_1(hyp_tlb_flush, void, env)
-+#endif
-diff --git a/target/riscv/insn_trans/trans_rvh.inc.c b/target/riscv/insn_trans/trans_rvh.inc.c
-index 2c0359819d..263b652d90 100644
---- a/target/riscv/insn_trans/trans_rvh.inc.c
-+++ b/target/riscv/insn_trans/trans_rvh.inc.c
-@@ -18,40 +18,20 @@
- 
- static bool trans_hfence_gvma(DisasContext *ctx, arg_sfence_vma *a)
- {
-+    REQUIRE_EXT(ctx, RVH);
- #ifndef CONFIG_USER_ONLY
--    if (ctx->priv_ver >= PRIV_VERSION_1_10_0 &&
--        has_ext(ctx, RVH)) {
--        /* Hpervisor extensions exist */
--        /*
--         * if (env->priv == PRV_M ||
--         *   (env->priv == PRV_S &&
--         *    !riscv_cpu_virt_enabled(env) &&
--         *    get_field(ctx->mstatus_fs, MSTATUS_TVM))) {
--         */
--            gen_helper_tlb_flush(cpu_env);
--            return true;
--        /* } */
--    }
-+    gen_helper_hyp_tlb_flush(cpu_env);
-+    return true;
- #endif
-     return false;
- }
- 
- static bool trans_hfence_vvma(DisasContext *ctx, arg_sfence_vma *a)
- {
-+    REQUIRE_EXT(ctx, RVH);
- #ifndef CONFIG_USER_ONLY
--    if (ctx->priv_ver >= PRIV_VERSION_1_10_0 &&
--        has_ext(ctx, RVH)) {
--        /* Hpervisor extensions exist */
--        /*
--         * if (env->priv == PRV_M ||
--         *   (env->priv == PRV_S &&
--         *    !riscv_cpu_virt_enabled(env) &&
--         *    get_field(ctx->mstatus_fs, MSTATUS_TVM))) {
--         */
--            gen_helper_tlb_flush(cpu_env);
--            return true;
--        /* } */
--    }
-+    gen_helper_hyp_tlb_flush(cpu_env);
-+    return true;
- #endif
-     return false;
- }
-diff --git a/target/riscv/op_helper.c b/target/riscv/op_helper.c
-index b0c49efc4a..7cccd42a1e 100644
---- a/target/riscv/op_helper.c
-+++ b/target/riscv/op_helper.c
-@@ -194,4 +194,17 @@ void helper_tlb_flush(CPURISCVState *env)
-     }
- }
- 
-+void helper_hyp_tlb_flush(CPURISCVState *env)
-+{
-+    CPUState *cs = env_cpu(env);
 +
-+    if (env->priv == PRV_M ||
-+        (env->priv == PRV_S && !riscv_cpu_virt_enabled(env))) {
-+        tlb_flush(cs);
-+        return;
-+    }
++========================
++TCG Instruction Counting
++========================
 +
-+    riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+}
++TCG has long supported a feature known as icount which allows for
++instruction counting during execution. This should be confused with
++cycle accurate emulation - QEMU does not attempt to emulate how long
++an instruction would take on real hardware. That is a job for other
++more detailed (and slower) tools that simulate the rest of a
++micro-architecture.
 +
- #endif /* !CONFIG_USER_ONLY */
++This feature is only available for system emulation and is
++incompatible with multi-threaded TCG. It can be used to better align
++execution time with wall-clock time so a "slow" device doesn't run too
++fast on modern hardware. It can also provides for a degree of
++deterministic execution and is an essential part of the record/replay
++support in QEMU.
++
++Core Concepts
++=============
++
++At its heart icount is simply a count of executed instructions which
++is stored in the TimersState of QEMU's timer sub-system. The number of
++executed instructions can then be used to calculate QEMU_CLOCK_VIRTUAL
++which represents the amount of elapsed time in the system since
++execution started. Depending on the icount mode this may either be a
++fixed number of ns per instructions or adjusted as execution continues
++to keep wall clock time and virtual time in sync.
++
++To be able to calculate the number of executed instructions the
++translator starts by allocating a budget of instructions to be
++executed. The budget of instructions is limited by how long it will be
++until the next timer will expire. We store this budget as part of a
++vCPU icount_decr field which shared with the machinery for handling
++cpu_exit(). The whole field is checked at the start of every
++translated block and will cause a return to the outer loop to deal
++with whatever caused the exit.
++
++In the case of icount before the flag is checked we subtract the
++number of instructions the translation block would execute. If this
++would cause the instruction budget to got negative we exit the main
++loop and regenerate a new translation block with exactly the right
++number of instructions to take the budget to 0 meaning whatever timer
++was due to expire will expire exactly when we exit the main run loop.
++
++Dealing with MMIO
++-----------------
++
++While we can adjust the instruction budget for known events like timer
++expiry we can not do the same for MMIO. Every load/store we execute
++might potentially trigger an I/O event at which point we will need an
++up to date and accurate reading of the icount number.
++
++To deal with this case when an I/O access is made we:
++
++  - restore un-executed instructions to the icount budget
++  - re-compile a single [1]_ instruction block for the current PC
++  - exit the cpu loop and execute the re-compiled block
++
++The new block is created with the CF_LAST_IO compile flag which
++ensures the final instruction translation starts with a call to
++gen_io_start() so we don't enter a perpetual loop constantly
++recompiling a single instruction block. For translators using the
++common translator_loop this is done automatically.
++  
++.. [1] sometimes two instructions if dealing with delay slots  
++
++Other I/O operations
++--------------------
++
++MMIO isn't the only type of operation for which we might need a
++correct and accurate clock. IO port instructions and accesses to
++system registers are the common examples here. These instructions have
++to be handled by the individual translators which have the knowledge
++of which operations are I/O operations.
++
++.. warning:: Any instruction that eventually causes an access to
++             QEMU_CLOCK_VIRTUAL needs to be preceded by a
++             gen_io_start() and must also be the last instruction
++             translated in the block.
++   
++
++
++
 -- 
-2.27.0
+2.20.1
 
 
