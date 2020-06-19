@@ -2,92 +2,87 @@ Return-Path: <SRS0=Yszf=AA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73FF1C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 12:19:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2D4CC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 12:20:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 39C6320776
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 12:19:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7E5DF20809
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 12:20:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y51L3lev"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39C6320776
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tLb9sv46"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E5DF20809
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36088 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38806 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmFzP-0006hu-FP
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 08:19:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58226)
+	id 1jmG0W-0008D7-QI
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 08:20:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58384)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jmFxi-0004d6-BX
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 08:17:38 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:33069
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jmFxf-0001Yz-I8
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 08:17:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592569053;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=+cPpAvOw2w1v2s0fjI4PThylStBiw99zHKfe9LanrA8=;
- b=Y51L3levSHU33bj1l8Lr7uOaEHhy7ftmWvc6g7+K2xWgCQ35yEOODOjvk9MLbRYvfjZXuJ
- 599eZffFGlBLl6IaaSq+GDJbDarG22lz5LMwrv/W/GKkpZ4iCwFWPikL3b3lIm11irvguW
- x52zQIJiWDQdlSxpStNAU19PlOBgeK0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-153-1r8e4UCyMqqQ0gXg73t-jQ-1; Fri, 19 Jun 2020 08:17:09 -0400
-X-MC-Unique: 1r8e4UCyMqqQ0gXg73t-jQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3D38C464;
- Fri, 19 Jun 2020 12:17:07 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.65])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 06CC190324;
- Fri, 19 Jun 2020 12:16:40 +0000 (UTC)
-Date: Fri, 19 Jun 2020 13:16:38 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH v3 9/9] host trust limitation: Alter virtio default
- properties for protected guests
-Message-ID: <20200619121638.GK700896@redhat.com>
-References: <20200619020602.118306-1-david@gibson.dropbear.id.au>
- <20200619020602.118306-10-david@gibson.dropbear.id.au>
- <20200619101245.GC700896@redhat.com>
- <20200619074432-mutt-send-email-mst@kernel.org>
- <20200619074630-mutt-send-email-mst@kernel.org>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jmFyK-00059h-9v
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 08:18:16 -0400
+Received: from mail-oi1-x232.google.com ([2607:f8b0:4864:20::232]:39391)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jmFyH-0001bq-GZ
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 08:18:15 -0400
+Received: by mail-oi1-x232.google.com with SMTP id d67so8252064oig.6
+ for <qemu-devel@nongnu.org>; Fri, 19 Jun 2020 05:18:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=ruAogPAI5hhodelLxaMrVvdQh06qfaDcqOpLU4bnDhI=;
+ b=tLb9sv46vJFHGoCKM4v0BXZI4LVIIg2wjiqFyhm4YjU6nL0lHkhPmTWrRKRanK49gJ
+ dmSzCVWR5JizqI+Ry5HbcL25Ql5fC2fIieAqxVig8yhQQdTnzMmAYcNnbhxLGHxEc8bS
+ sTg85qjkiyUP2fJx8VcHXYSi2dSLGjepY9I8Hb/HDLo+oX9Ey8R1EXxltobuZ/KGM117
+ tCylnY/nV7PimAFxuFw3+cWXdSRXBITE9OjC7IAqKRd4FjSOe7aXgFYj5rU1GqiMBv2X
+ g81Ckcj/2+srh7JOZiWMH1G67aZRNy66uCbnTFLQWV9z3qub05J83bAacALytGZ5VFVd
+ UFHQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=ruAogPAI5hhodelLxaMrVvdQh06qfaDcqOpLU4bnDhI=;
+ b=iTk5G4FCfEBXUcRbNrtlsASbTPlg0Q5zRma/wBe1hIhmEbfpe7nKdpm5IG2c8rfIAL
+ NQgtxN/Hik4jshz8GFCm3YCPUaDSSKJJybpF2pOF0xQszJwpb1sLKjW8YxbOMIFmqtEt
+ PeBjt9aiXvbsxec7kxdWJwbdj01ECvwEKE5T/gWzc3wZS4rb+RT32TRYua+DoZDGDLbj
+ BIK82caC8BkXEHkiAEPZ8PdmLqil881womFZaq1ZGAUaVDe8Jal0MMwEAOFikqiShx/J
+ XS/G07hvTY03eHcsUxmCr2wu+Srtf6FlpzUEi+MNTxqYVQXB3QakCeXI04uemlWoevtH
+ EIiQ==
+X-Gm-Message-State: AOAM532nD0Yh0TUG7wEm+IIMbZS+VTmHrvaAMKz+MFR1s39dyz3WxkjO
+ TOOPFo/SIZ3kKOIhpjvy09W5VuhX30J8eO6PSZ4+wsjlvRU=
+X-Google-Smtp-Source: ABdhPJwI9N1hEqx0ad3/1IJ2uqe2iz3gMd9KVoZnpWAEwHHy19gAaXLptduvm6HKiQQuwryjwMk3OaHv2PY1HeDRdJg=
+X-Received: by 2002:aca:5152:: with SMTP id f79mr2705659oib.146.1592569092091; 
+ Fri, 19 Jun 2020 05:18:12 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200619074630-mutt-send-email-mst@kernel.org>
-User-Agent: Mutt/1.14.0 (2020-05-02)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=berrange@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/19 03:15:03
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+References: <CAFEAcA_HOxdK5rgKVnww6Bum3vGb=TrhDEp7oqDwsd=UbHmC_g@mail.gmail.com>
+ <c47e9e4e-49eb-88c5-fdc7-8ebec121c165@ispras.ru>
+ <f4fc4a1b-4054-cffd-0272-22c28d656aba@redhat.com>
+In-Reply-To: <f4fc4a1b-4054-cffd-0272-22c28d656aba@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 19 Jun 2020 13:18:01 +0100
+Message-ID: <CAFEAcA-=igrJfoiga7b7rcwZDj46nTNMiT2VEj11DKO7OiJpNA@mail.gmail.com>
+Subject: Re: what are the requirements on target/ code for -icount to work
+ correctly?
+To: Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::232;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x232.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,89 +95,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: pair@us.ibm.com, brijesh.singh@amd.com, frankja@linux.ibm.com,
- kvm@vger.kernel.org, david@redhat.com, cohuck@redhat.com,
- qemu-devel@nongnu.org, dgilbert@redhat.com, pasic@linux.ibm.com,
- qemu-s390x@nongnu.org, qemu-ppc@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>, pbonzini@redhat.com,
- Richard Henderson <rth@twiddle.net>, mdroth@linux.vnet.ibm.com,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Pavel Dovgalyuk <dovgaluk@ispras.ru>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jun 19, 2020 at 07:47:20AM -0400, Michael S. Tsirkin wrote:
-> On Fri, Jun 19, 2020 at 07:46:14AM -0400, Michael S. Tsirkin wrote:
-> > On Fri, Jun 19, 2020 at 11:12:45AM +0100, Daniel P. BerrangÃÂ© wrote:
-> > > On Fri, Jun 19, 2020 at 12:06:02PM +1000, David Gibson wrote:
-> > > > The default behaviour for virtio devices is not to use the platforms normal
-> > > > DMA paths, but instead to use the fact that it's running in a hypervisor
-> > > > to directly access guest memory.  That doesn't work if the guest's memory
-> > > > is protected from hypervisor access, such as with AMD's SEV or POWER's PEF.
-> > > > 
-> > > > So, if a host trust limitation mechanism is enabled, then apply the
-> > > > iommu_platform=on option so it will go through normal DMA mechanisms.
-> > > > Those will presumably have some way of marking memory as shared with the
-> > > > hypervisor or hardware so that DMA will work.
-> > > > 
-> > > > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > > > ---
-> > > >  hw/core/machine.c | 11 +++++++++++
-> > > >  1 file changed, 11 insertions(+)
-> > > > 
-> > > > diff --git a/hw/core/machine.c b/hw/core/machine.c
-> > > > index a71792bc16..8dfc1bb3f8 100644
-> > > > --- a/hw/core/machine.c
-> > > > +++ b/hw/core/machine.c
-> > > > @@ -28,6 +28,8 @@
-> > > >  #include "hw/mem/nvdimm.h"
-> > > >  #include "migration/vmstate.h"
-> > > >  #include "exec/host-trust-limitation.h"
-> > > > +#include "hw/virtio/virtio.h"
-> > > > +#include "hw/virtio/virtio-pci.h"
-> > > >  
-> > > >  GlobalProperty hw_compat_5_0[] = {
-> > > >      { "virtio-balloon-device", "page-poison", "false" },
-> > > > @@ -1165,6 +1167,15 @@ void machine_run_board_init(MachineState *machine)
-> > > >           * areas.
-> > > >           */
-> > > >          machine_set_mem_merge(OBJECT(machine), false, &error_abort);
-> > > > +
-> > > > +        /*
-> > > > +         * Virtio devices can't count on directly accessing guest
-> > > > +         * memory, so they need iommu_platform=on to use normal DMA
-> > > > +         * mechanisms.  That requires disabling legacy virtio support
-> > > > +         * for virtio pci devices
-> > > > +         */
-> > > > +        object_register_sugar_prop(TYPE_VIRTIO_PCI, "disable-legacy", "on");
-> > > > +        object_register_sugar_prop(TYPE_VIRTIO_DEVICE, "iommu_platform", "on");
-> > > >      }
-> > > 
-> > > Silently changing the user's request configuration like this is a bad idea.
-> > > The "disable-legacy" option in particular is undesirable as that switches
-> > > the device to virtio-1.0 only mode, which exposes a different PCI ID to
-> > > the guest.
-> > > 
-> > > If some options are incompatible with encryption, then we should raise a
-> > > fatal error at startup, so applications/admins are aware that their requested
-> > > config is broken.
+On Fri, 19 Jun 2020 at 12:16, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 19/06/20 07:46, Pavel Dovgalyuk wrote:
+> > I think, that we need some efforts from target maintainers to remove all such calls.
+>
+> I'll take care of target/i386 (which does need one of the three
+> gen_io_end calls that are left).
+
+So why does it need it ? Why can't it just rely on "TB going to
+end anyway which will clear the can_do_io flag" ?
+
+> >> Q2: is it a requirement that after an insn which is a "known
+> >> to be an I/O insn" one (like x86 in/out) and which is marked
+> >> up with gen_io_start()/gen_io_end() that we also end the TB?
 > >
-> > Agreed - my suggestion is an on/off/auto property, auto value
-> > changes automatically, on/off is validated.
-> 
-> In fact should we extend all bit properties to allow an auto value?
+> > It is a requirement for instructions that access virtual clock/icount
+> > value (directly or not).
+> >
+> > There is also an assertion that can_do_io is enabled while generating an
+> > interrupt. I believe, that it doesn't affect RR, but is useful for
+> > deterministic icount mode.
+>
+> As I understand it, the definition of "I/O insn" is anything that can
+> either:
+>
+> - affect the icount deadline (e.g. by setting or removing a
+> QEMU_CLOCK_VIRTUAL timer)
+>
+> - interrupt the current translation block with cpu_loop_exit,
+> cpu_restore_state or similar.
 
-If "auto" was made the default that creates a similar headache, as to
-preserve existing configuration semantics we expose to apps, libvirt
-would need to find all the properties changed to use "auto" and manually
-set them back to on/off explicitly.
+Right, but really what I'm interested in is what the
+requirements are on translate.c code that emits one of these
+insns. The exact definition of what an I/O insn seems
+more straightforward (and you can always err on the safe side).
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
-
+thanks
+-- PMM
 
