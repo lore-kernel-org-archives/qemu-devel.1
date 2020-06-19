@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51E50C433E2
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 06:43:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 479F8C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 06:44:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 21CA9207DD
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 06:43:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 11FBC207DD
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 06:44:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="ovj9nv8o"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21CA9207DD
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="PLJHq7Vu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11FBC207DD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39336 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42344 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmAkj-0003Y7-An
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 02:43:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56872)
+	id 1jmAlO-0004ln-9a
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 02:44:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56934)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=4324eb4de=alistair.francis@wdc.com>)
- id 1jmAbt-0005cR-84
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 02:34:46 -0400
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:61617)
+ id 1jmAbz-0005hA-W4
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 02:34:52 -0400
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:61615)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=4324eb4de=alistair.francis@wdc.com>)
- id 1jmAbl-00028J-Tq
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 02:34:44 -0400
+ id 1jmAbv-00028E-JI
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 02:34:51 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1592548478; x=1624084478;
+ t=1592548488; x=1624084488;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=wjfXyN3NWwu3m0SqemYRz9ib0aF+Yfq0vhP7wPn1ngY=;
- b=ovj9nv8oaHi7uiIyak/JwPdJu1a1iU9/OHZ/csgnD47hXhdj1MLmz+Pm
- agtNtSUaNWHlt7rBc+NJ7daOawkuB8cljjcWkJLqGOEZhyqhPo9VtcBSX
- uRNdrcqW6QtLSOXFi20vGqIu+cu7H1unPxoI/JMriACh41/dh1Oyymd5o
- 87NHsu1PqQXXRJ8Bywtn8e2Bzt5DaYpyZchWAZx102jqZapzHbmEw39m/
- p0yDePgQgksLKtzAUQF/LbqqRLtwhgNa3/Qtv6cDWJspkSb8NV0sak5TJ
- QYYUjCr4SF2kS2Bnd712Rp2yrONIL6mMd5Vh4Lpm3kfWtHELmt6bKwRD5 g==;
-IronPort-SDR: kSY3812w0xCb+s8D2nX19RM1qdtE4OI71MH6b8OUzL738t216NdTuX3pZNwFQBrP+J6QDwrv6P
- C5KgDw6S9o+cd/K8iriZ/pK9HVfq+GLz8U4edaBGSvZdtPJVzBQH+Umd1RwZ1/lImnMnkuGcVb
- lFTrb+Gutd/YraMQQsoi09JrIoZloX2vNaD0nlret1+J5QDRBJwcKp1I5tuEPM6aEHjE9vxelA
- 5QTUl4i8XAiSXcsd7Yb+J2sAuhFDebYn1VDM+2797FMomG159USe/bviPqWKUIqCMMXgeuEERD
- kgg=
-X-IronPort-AV: E=Sophos;i="5.75,253,1589212800"; d="scan'208";a="144724288"
+ bh=LYV/HV2oePnGMNLANWSHYTsEansGO/O7noO72QkqJrU=;
+ b=PLJHq7Vuv6NS1ZawfhrecgtWIX49fz0W+zr9DUSKvK2Y8ypS0WglRg5K
+ sFlyU+l3jckClJzfLC8YfGZ4kTL7Q7TTARiwKgh1b6Jq/wnF7dMGX5iM/
+ tT4dtlfGYpN9IwKGNjrDwK9fIHHxc5txrehjZyVGTlY1dpXZQFgXn1E2j
+ cc+uxFQcohoqSL9bUfdbke8mh/pFP7AlaxRm0ZPJ+BJ2uKXKw2+xjzvmi
+ Nr3K54yNiHWQVq9CkO9gPKWEPEqu5ah7qxNLvZUaY5oUGi5Ed6WFdmuJ3
+ 3oojY2FjKpgY0NieSfiChdTHMAQudOpYdAhDZllAVWWXXwqYvxKUoGzP8 g==;
+IronPort-SDR: xxEsy2pSeeTOQrljmUGSJiZdCsh0m8qSahPKms0hJn1YCOVfyA1eA/c1QksGf0uQySuFH5a+UU
+ DihYXLm0OmrrtzSYp7nCDAyFMdWia/OoNfF7A4jZoD2VvtNJQwGCtAJuWYt7npNcO/usI3x3dW
+ 212KWDQpYTWg4pF9o8WZ9+7vxwDzXBPRwAcsCrYgWUYJ2/dE2M5IyXnRetHexLgLpy1kijXV4W
+ 1ibOzeJfVj8lpm45Q4puv22ZQ+ZW+h6/i5pOJzB1fMvFb3lkmC8S5WvBfLqhgN0fv5enJu/lam
+ SL0=
+X-IronPort-AV: E=Sophos;i="5.75,253,1589212800"; d="scan'208";a="144724294"
 Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com)
  ([199.255.45.14])
- by ob1.hgst.iphmx.com with ESMTP; 19 Jun 2020 14:34:28 +0800
-IronPort-SDR: pXNiBjF1KeZRw1aOAfhQe+tNH+Zd93TJvYfORz9ha+kddfMWSNjNP2W3Sf5vx8qKLciVlwfVly
- plJx1GJPXFN6ongIr1uM7/lkdwt+p5FS4=
+ by ob1.hgst.iphmx.com with ESMTP; 19 Jun 2020 14:34:29 +0800
+IronPort-SDR: KEzOHV/pEAMIl7W6zYvjfgMmvBPHEFmpzzGu3CyUpL/blfqsqzcAuLPDdBifyVRkDpq3o5OnHP
+ XaCWbC55HsbEoUUft4UeAZxyQ1zOIxSAA=
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
  18 Jun 2020 23:23:39 -0700
-IronPort-SDR: AwAwKaPLHJ19qp369xe1LfpJ3BSCjnvwI/5dpASpcMbOOgjYjPDSE6y7KGp4vDZxDHJToxDkvP
- 2gYcYXKj6cvQ==
+IronPort-SDR: NmXVdURzOhc793feji8UHhM+LkGMc/kUhnPxH2RZRdLSE7Aqd+CVnAWlea6rYoBKNoWemfORui
+ en/n74Y/8PJA==
 WDCIronportException: Internal
 Received: from unknown (HELO risc6-mainframe.hgst.com) ([10.86.58.142])
- by uls-op-cesaip02.wdc.com with ESMTP; 18 Jun 2020 23:34:27 -0700
+ by uls-op-cesaip02.wdc.com with ESMTP; 18 Jun 2020 23:34:28 -0700
 From: Alistair Francis <alistair.francis@wdc.com>
 To: peter.maydell@linaro.org,
 	qemu-devel@nongnu.org
-Subject: [PULL 08/32] target/riscv: Report errors validating 2nd-stage PTEs
-Date: Thu, 18 Jun 2020 23:24:54 -0700
-Message-Id: <20200619062518.1718523-9-alistair.francis@wdc.com>
+Subject: [PULL 11/32] riscv/opentitan: Fix the ROM size
+Date: Thu, 18 Jun 2020 23:24:57 -0700
+Message-Id: <20200619062518.1718523-12-alistair.francis@wdc.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200619062518.1718523-1-alistair.francis@wdc.com>
 References: <20200619062518.1718523-1-alistair.francis@wdc.com>
@@ -102,38 +102,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alistair23@gmail.com, Richard Henderson <richard.henderson@linaro.org>,
+Cc: Damien Hedde <damien.hedde@greensocs.com>, alistair23@gmail.com,
  Alistair Francis <alistair.francis@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reported-by: Damien Hedde <damien.hedde@greensocs.com>
 ---
- target/riscv/cpu_helper.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ hw/riscv/opentitan.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-index eda7057663..75d2ae3434 100644
---- a/target/riscv/cpu_helper.c
-+++ b/target/riscv/cpu_helper.c
-@@ -435,8 +435,13 @@ restart:
-             hwaddr vbase;
+diff --git a/hw/riscv/opentitan.c b/hw/riscv/opentitan.c
+index f6776da8e9..011e4f7ee2 100644
+--- a/hw/riscv/opentitan.c
++++ b/hw/riscv/opentitan.c
+@@ -25,12 +25,13 @@
+ #include "hw/misc/unimp.h"
+ #include "hw/riscv/boot.h"
+ #include "exec/address-spaces.h"
++#include "qemu/units.h"
  
-             /* Do the second stage translation on the base PTE address. */
--            get_physical_address(env, &vbase, &vbase_prot, base, MMU_DATA_LOAD,
--                                 mmu_idx, false, true);
-+            int vbase_ret = get_physical_address(env, &vbase, &vbase_prot,
-+                                                 base, MMU_DATA_LOAD,
-+                                                 mmu_idx, false, true);
-+
-+            if (vbase_ret != TRANSLATE_SUCCESS) {
-+                return vbase_ret;
-+            }
- 
-             pte_addr = vbase + idx * ptesize;
-         } else {
+ static const struct MemmapEntry {
+     hwaddr base;
+     hwaddr size;
+ } ibex_memmap[] = {
+-    [IBEX_ROM] =            {  0x00008000,   0xc000 },
++    [IBEX_ROM] =            {  0x00008000, 16 * KiB },
+     [IBEX_RAM] =            {  0x10000000,  0x10000 },
+     [IBEX_FLASH] =          {  0x20000000,  0x80000 },
+     [IBEX_UART] =           {  0x40000000,  0x10000 },
 -- 
 2.27.0
 
