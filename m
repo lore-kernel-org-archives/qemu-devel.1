@@ -2,52 +2,51 @@ Return-Path: <SRS0=Yszf=AA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EE44C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 02:09:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0519C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 02:09:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1A18620888
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 02:09:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7715C20773
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 02:09:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="nJSanPg8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A18620888
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Dh6czTEK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7715C20773
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48802 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49934 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jm6T4-0000as-Be
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 22:09:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41858)
+	id 1jm6TF-00013O-Ov
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 22:09:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41938)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jm6Q6-0002wG-6O; Thu, 18 Jun 2020 22:06:18 -0400
-Received: from ozlabs.org ([203.11.71.1]:57297)
+ id 1jm6QC-0003BD-7B; Thu, 18 Jun 2020 22:06:24 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:47045 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jm6Q2-0000nP-W2; Thu, 18 Jun 2020 22:06:17 -0400
+ id 1jm6Q9-0000os-9Z; Thu, 18 Jun 2020 22:06:23 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 49p2GS1dYgz9sNR; Fri, 19 Jun 2020 12:06:08 +1000 (AEST)
+ id 49p2GT2LD1z9sT2; Fri, 19 Jun 2020 12:06:08 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1592532368;
- bh=gLWD9Joj8IIB/tTWGt6QwLtKruFK1pcFHrhx6E7+hAA=;
+ d=gibson.dropbear.id.au; s=201602; t=1592532369;
+ bh=qMsc309NrDU+kjkrkNdXuQ5jS6081SEdRvf2Ra68+0k=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=nJSanPg8NeKsUcm7P+zX/JVyECFc0xANus0zN7ZXcMfswdMa7g4E9Y+wA81Bpfj3y
- +KrsONmNKbqxLTMakO/mYVlUf+9y/pUO96TnOtTv140aKrE7ioEdjqWS8fUOPnj4rj
- AAWfHyWIaUknWsxeYZWj/0V9n9jwPbvL5JTJx9BI=
+ b=Dh6czTEKkpC3AwFZDUZjJ8VQHRUr7RcuJheAzLqBP5kPURdYs+0yGjCA/XT1zxs7D
+ s1fb+ETwTqir/AVT8/Fg42F1EGeA4vLI/0GtfCdmqaPQ+UY6gkl6xNDVkQ5NE1MxKj
+ c0LeubLAdqYb7kxaejnrpYAIiqHooNIW4j31udso=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: qemu-devel@nongnu.org, brijesh.singh@amd.com, pair@us.ibm.com,
  pbonzini@redhat.com, dgilbert@redhat.com, frankja@linux.ibm.com
-Subject: [PATCH v3 1/9] host trust limitation: Introduce new host trust
- limitation interface
-Date: Fri, 19 Jun 2020 12:05:54 +1000
-Message-Id: <20200619020602.118306-2-david@gibson.dropbear.id.au>
+Subject: [PATCH v3 7/9] spapr: Add PEF based host trust limitation
+Date: Fri, 19 Jun 2020 12:06:00 +1000
+Message-Id: <20200619020602.118306-8-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200619020602.118306-1-david@gibson.dropbear.id.au>
 References: <20200619020602.118306-1-david@gibson.dropbear.id.au>
@@ -77,130 +76,146 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org, mst@redhat.com,
- cohuck@redhat.com, david@redhat.com, mdroth@linux.vnet.ibm.com,
- pasic@linux.ibm.com, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>,
+ Ram Pai <linuxram@us.ibm.com>, cohuck@redhat.com, david@redhat.com,
+ mdroth@linux.vnet.ibm.com, pasic@linux.ibm.com, qemu-s390x@nongnu.org,
+ qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>,
  Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Several architectures have mechanisms which are designed to protect guest
-memory from interference or eavesdropping by a compromised hypervisor.  AMD
-SEV does this with in-chip memory encryption and Intel has a similar
-mechanism.  POWER's Protected Execution Framework (PEF) accomplishes a
-similar goal using an ultravisor and new memory protection features,
-instead of encryption.
+Some upcoming POWER machines have a system called PEF (Protected
+Execution Facility) which uses a small ultravisor to allow guests to
+run in a way that they can't be eavesdropped by the hypervisor.  The
+effect is roughly similar to AMD SEV, although the mechanisms are
+quite different.
 
-To (partially) unify handling for these, this introduces a new
-HostTrustLimitation QOM interface.
+Most of the work of this is done between the guest, KVM and the
+ultravisor, with little need for involvement by qemu.  However qemu
+does need to tell KVM to allow secure VMs.
+
+Because the availability of secure mode is a guest visible difference
+which depends on having the right hardware and firmware, we don't
+enable this by default.  In order to run a secure guest you need to
+create a "pef-guest" object and set the host-trust-limitation machine
+property to point to it.
+
+Note that this just *allows* secure guests, the architecture of PEF is
+such that the guest still needs to talk to the ultravisor to enter
+secure mode.  Qemu has no directly way of knowing if the guest is in
+secure mode, and certainly can't know until well after machine
+creation time.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Acked-by: Ram Pai <linuxram@us.ibm.com>
 ---
- backends/Makefile.objs               |  2 ++
- backends/host-trust-limitation.c     | 29 ++++++++++++++++++++++++
- include/exec/host-trust-limitation.h | 33 ++++++++++++++++++++++++++++
- include/qemu/typedefs.h              |  1 +
- 4 files changed, 65 insertions(+)
- create mode 100644 backends/host-trust-limitation.c
- create mode 100644 include/exec/host-trust-limitation.h
+ target/ppc/Makefile.objs |  2 +-
+ target/ppc/pef.c         | 83 ++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 84 insertions(+), 1 deletion(-)
+ create mode 100644 target/ppc/pef.c
 
-diff --git a/backends/Makefile.objs b/backends/Makefile.objs
-index 28a847cd57..af761c9ab1 100644
---- a/backends/Makefile.objs
-+++ b/backends/Makefile.objs
-@@ -21,3 +21,5 @@ common-obj-$(CONFIG_LINUX) += hostmem-memfd.o
- common-obj-$(CONFIG_GIO) += dbus-vmstate.o
- dbus-vmstate.o-cflags = $(GIO_CFLAGS)
- dbus-vmstate.o-libs = $(GIO_LIBS)
-+
-+common-obj-y += host-trust-limitation.o
-diff --git a/backends/host-trust-limitation.c b/backends/host-trust-limitation.c
+diff --git a/target/ppc/Makefile.objs b/target/ppc/Makefile.objs
+index e8fa18ce13..ac93b9700e 100644
+--- a/target/ppc/Makefile.objs
++++ b/target/ppc/Makefile.objs
+@@ -6,7 +6,7 @@ obj-y += machine.o mmu_helper.o mmu-hash32.o monitor.o arch_dump.o
+ obj-$(TARGET_PPC64) += mmu-hash64.o mmu-book3s-v3.o compat.o
+ obj-$(TARGET_PPC64) += mmu-radix64.o
+ endif
+-obj-$(CONFIG_KVM) += kvm.o
++obj-$(CONFIG_KVM) += kvm.o pef.o
+ obj-$(call lnot,$(CONFIG_KVM)) += kvm-stub.o
+ obj-y += dfp_helper.o
+ obj-y += excp_helper.o
+diff --git a/target/ppc/pef.c b/target/ppc/pef.c
 new file mode 100644
-index 0000000000..96a381cd8a
+index 0000000000..53a6af0347
 --- /dev/null
-+++ b/backends/host-trust-limitation.c
-@@ -0,0 +1,29 @@
++++ b/target/ppc/pef.c
+@@ -0,0 +1,83 @@
 +/*
-+ * QEMU Host Trust Limitation interface
++ * PEF (Protected Execution Facility) for POWER support
 + *
-+ * Copyright: David Gibson, Red Hat Inc. 2020
++ * Copyright David Gibson, Redhat Inc. 2020
 + *
-+ * Authors:
-+ *  David Gibson <david@gibson.dropbear.id.au>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or
-+ * later.  See the COPYING file in the top-level directory.
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
 + *
 + */
 +
 +#include "qemu/osdep.h"
 +
++#include "qapi/error.h"
++#include "qom/object_interfaces.h"
++#include "sysemu/kvm.h"
++#include "migration/blocker.h"
 +#include "exec/host-trust-limitation.h"
 +
-+static const TypeInfo host_trust_limitation_info = {
-+    .name = TYPE_HOST_TRUST_LIMITATION,
-+    .parent = TYPE_INTERFACE,
-+    .class_size = sizeof(HostTrustLimitationClass),
++#define TYPE_PEF_GUEST "pef-guest"
++#define PEF_GUEST(obj)                                  \
++    OBJECT_CHECK(PefGuestState, (obj), TYPE_PEF_GUEST)
++
++typedef struct PefGuestState PefGuestState;
++
++/**
++ * PefGuestState:
++ *
++ * The PefGuestState object is used for creating and managing a PEF
++ * guest.
++ *
++ * # $QEMU \
++ *         -object pef-guest,id=pef0 \
++ *         -machine ...,host-trust-limitation=pef0
++ */
++struct PefGuestState {
++    Object parent_obj;
 +};
 +
-+static void host_trust_limitation_register_types(void)
++static int pef_kvm_init(HostTrustLimitation *gmpo, Error **errp)
 +{
-+    type_register_static(&host_trust_limitation_info);
++    if (!kvm_check_extension(kvm_state, KVM_CAP_PPC_SECURE_GUEST)) {
++        error_setg(errp,
++                   "KVM implementation does not support Secure VMs (is an ultravisor running?)");
++        return -1;
++    } else {
++        int ret = kvm_vm_enable_cap(kvm_state, KVM_CAP_PPC_SECURE_GUEST, 0, 1);
++
++        if (ret < 0) {
++            error_setg(errp,
++                       "Error enabling PEF with KVM");
++            return -1;
++        }
++    }
++
++    return 0;
 +}
 +
-+type_init(host_trust_limitation_register_types)
-diff --git a/include/exec/host-trust-limitation.h b/include/exec/host-trust-limitation.h
-new file mode 100644
-index 0000000000..03887b1be1
---- /dev/null
-+++ b/include/exec/host-trust-limitation.h
-@@ -0,0 +1,33 @@
-+/*
-+ * QEMU Host Trust Limitation interface
-+ *
-+ * Copyright: David Gibson, Red Hat Inc. 2020
-+ *
-+ * Authors:
-+ *  David Gibson <david@gibson.dropbear.id.au>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or
-+ * later.  See the COPYING file in the top-level directory.
-+ *
-+ */
-+#ifndef QEMU_HOST_TRUST_LIMITATION_H
-+#define QEMU_HOST_TRUST_LIMITATION_H
++static void pef_guest_class_init(ObjectClass *oc, void *data)
++{
++    HostTrustLimitationClass *gmpc = HOST_TRUST_LIMITATION_CLASS(oc);
 +
-+#include "qom/object.h"
++    gmpc->kvm_init = pef_kvm_init;
++}
 +
-+#define TYPE_HOST_TRUST_LIMITATION "host-trust-limitation"
-+#define HOST_TRUST_LIMITATION(obj)                                    \
-+    INTERFACE_CHECK(HostTrustLimitation, (obj),                       \
-+                    TYPE_HOST_TRUST_LIMITATION)
-+#define HOST_TRUST_LIMITATION_CLASS(klass)                            \
-+    OBJECT_CLASS_CHECK(HostTrustLimitationClass, (klass),             \
-+                       TYPE_HOST_TRUST_LIMITATION)
-+#define HOST_TRUST_LIMITATION_GET_CLASS(obj)                          \
-+    OBJECT_GET_CLASS(HostTrustLimitationClass, (obj),                 \
-+                     TYPE_HOST_TRUST_LIMITATION)
++static const TypeInfo pef_guest_info = {
++    .parent = TYPE_OBJECT,
++    .name = TYPE_PEF_GUEST,
++    .instance_size = sizeof(PefGuestState),
++    .class_init = pef_guest_class_init,
++    .interfaces = (InterfaceInfo[]) {
++        { TYPE_HOST_TRUST_LIMITATION },
++        { TYPE_USER_CREATABLE },
++        { }
++    }
++};
 +
-+typedef struct HostTrustLimitationClass {
-+    InterfaceClass parent;
-+} HostTrustLimitationClass;
++static void
++pef_register_types(void)
++{
++    type_register_static(&pef_guest_info);
++}
 +
-+#endif /* QEMU_HOST_TRUST_LIMITATION_H */
-diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
-index ce4a78b687..f75c7eb2f2 100644
---- a/include/qemu/typedefs.h
-+++ b/include/qemu/typedefs.h
-@@ -51,6 +51,7 @@ typedef struct FWCfgIoState FWCfgIoState;
- typedef struct FWCfgMemState FWCfgMemState;
- typedef struct FWCfgState FWCfgState;
- typedef struct HostMemoryBackend HostMemoryBackend;
-+typedef struct HostTrustLimitation HostTrustLimitation;
- typedef struct I2CBus I2CBus;
- typedef struct I2SCodec I2SCodec;
- typedef struct IOMMUMemoryRegion IOMMUMemoryRegion;
++type_init(pef_register_types);
 -- 
 2.26.2
 
