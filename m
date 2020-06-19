@@ -2,66 +2,88 @@ Return-Path: <SRS0=Yszf=AA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MIME_BASE64_TEXT,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF464C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 11:58:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88F76C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 12:02:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C541C2083B
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 11:58:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C541C2083B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=efs-auto.de
+	by mail.kernel.org (Postfix) with ESMTPS id 5838B2083B
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 12:02:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CStXFMTM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5838B2083B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39590 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44340 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmFfD-0002hm-42
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 07:58:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49924)
+	id 1jmFjB-00068s-HD
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 08:02:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51076)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andreas.konopik@efs-auto.de>)
- id 1jmFeL-0001iy-VC
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 07:57:37 -0400
-Received: from mailin4.audi.de ([143.164.102.18]:59020)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andreas.konopik@efs-auto.de>)
- id 1jmFeJ-0005sc-BN
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 07:57:37 -0400
-From: "Konopik, Andreas (EFS-GH2)" <andreas.konopik@efs-auto.de>
-To: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Subject: AW: [PATCH v2 1/1] tricore: added triboard with tc27x_soc
-Thread-Topic: [PATCH v2 1/1] tricore: added triboard with tc27x_soc
-Thread-Index: AQHWPnJTk/M+hfxWgka2fp6RI9393ajRaVoAgABUMICADiPqIA==
-Date: Fri, 19 Jun 2020 11:57:03 +0000
-Message-ID: <F5B10EA5F04CF44F81B685A0E281578724EB1D39@AUDIINSX0385.audi.vwg>
-References: <20200609152553.4376-1-david.brenken@efs-auto.org>
- <20200609152553.4376-2-david.brenken@efs-auto.org>
- <20200610084818.yrzxqm6466w2wpiz@schnipp-desktop>
- <69A9BBE82CEA98469F7BA51850C5B89CF2FEA8F8@AUDIINSX0364.audi.vwg>
-In-Reply-To: <69A9BBE82CEA98469F7BA51850C5B89CF2FEA8F8@AUDIINSX0364.audi.vwg>
-Accept-Language: de-DE, en-US
-Content-Language: de-DE
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.250.44.65]
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1jmFhs-0004gJ-2E
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 08:01:17 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:30009
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1jmFhp-0006bO-9L
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 08:01:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592568071;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Vu/e2YN0cWmt3Ppx+qvnIOK08pnjIL49S8tGrixieWk=;
+ b=CStXFMTMvmjU2jdRVNm8WlGPQwYmayXwEp5m+BwS8cXYBtLO9qfN6CiBozlSQh5b/HDnX8
+ 8SS4AANgzKHbDFdITs9lZaJ35hicrpnegM89h2n4GzvUQPiBy8DRDpO4JMqet61z7GryOS
+ xoV4mPSjWGi7cd560IbeivinnuqxLes=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-265-5L9uBSPcP-ukJUL_16CGig-1; Fri, 19 Jun 2020 08:01:08 -0400
+X-MC-Unique: 5L9uBSPcP-ukJUL_16CGig-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E30A38035D2;
+ Fri, 19 Jun 2020 12:01:07 +0000 (UTC)
+Received: from localhost (ovpn-113-212.ams2.redhat.com [10.36.113.212])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4BDCA7C1EE;
+ Fri, 19 Jun 2020 12:01:04 +0000 (UTC)
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Coiby Xu <coiby.xu@gmail.com>
+Subject: [PATCH 1/6] vhost-user-server: fix VHOST_MEMORY_MAX_REGIONS compiler
+ error
+Date: Fri, 19 Jun 2020 13:00:41 +0100
+Message-Id: <20200619120046.2422205-1-stefanha@redhat.com>
+In-Reply-To: <20200614183907.514282-3-coiby.xu@gmail.com>
+References: <20200614183907.514282-3-coiby.xu@gmail.com>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-Received-SPF: none client-ip=143.164.102.18;
- envelope-from=andreas.konopik@efs-auto.de; helo=mailin4.audi.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/19 07:57:30
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_PASS=-0.001,
- SPF_NONE=0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: base64
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=stefanha@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/19 01:50:04
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -13
+X-Spam_score: -1.4
+X-Spam_bar: -
+X-Spam_report: (-1.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MIME_BASE64_TEXT=1.741, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01,
+ RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -74,215 +96,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Hofstetter, Georg \(EFS-GH2\)" <Georg.Hofstetter@efs-auto.de>, "Brenken,
- David \(EFS-GH5\)" <david.brenken@efs-auto.de>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Konopik, Andreas
- \(EFS-GH2\)" <andreas.konopik@efs-auto.de>
+Cc: kwolf@redhat.com, bharatlkmlkvm@gmail.com, qemu-devel@nongnu.org,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hello Bastian,
+Q29tbWl0IGI2NTBkNWY0YjFjZDNmOWY4YzRmZGIzMTk4MzhjNWMxZTA2OTVlNDEgKCJMaWZ0IG1h
+eCByYW0gc2xvdHMKbGltaXQgaW4gbGlidmhvc3QtdXNlciIpIHJlbmFtZWQgdGhpcyBjb25zdGFu
+dC4gVXNlIHRoZSBhcnJheSBzaXplCmluc3RlYWQgb2YgaGFyZC1jb2RpbmcgYSBwYXJ0aWN1bGFy
+IGNvbnN0YW50IGluIHRoZSBlcnJvciBtZXNzYWdlLgoKU2lnbmVkLW9mZi1ieTogU3RlZmFuIEhh
+am5vY3ppIDxzdGVmYW5oYUByZWRoYXQuY29tPgotLS0KIHV0aWwvdmhvc3QtdXNlci1zZXJ2ZXIu
+YyB8IDQgKystLQogMSBmaWxlIGNoYW5nZWQsIDIgaW5zZXJ0aW9ucygrKSwgMiBkZWxldGlvbnMo
+LSkKCmRpZmYgLS1naXQgYS91dGlsL3Zob3N0LXVzZXItc2VydmVyLmMgYi91dGlsL3Zob3N0LXVz
+ZXItc2VydmVyLmMKaW5kZXggMzkzYmVlYjZiOS4uZTk0YThkOGE4MyAxMDA2NDQKLS0tIGEvdXRp
+bC92aG9zdC11c2VyLXNlcnZlci5jCisrKyBiL3V0aWwvdmhvc3QtdXNlci1zZXJ2ZXIuYwpAQCAt
+MTM3LDkgKzEzNyw5IEBAIHZ1X21lc3NhZ2VfcmVhZChWdURldiAqdnVfZGV2LCBpbnQgY29ubl9m
+ZCwgVmhvc3RVc2VyTXNnICp2bXNnKQogICAgICAgICByZWFkX2J5dGVzICs9IHJjOwogICAgICAg
+ICBpZiAobmZkc190ID4gMCkgewogICAgICAgICAgICAgaWYgKG5mZHMgKyBuZmRzX3QgPiBHX05f
+RUxFTUVOVFModm1zZy0+ZmRzKSkgewotICAgICAgICAgICAgICAgIGVycm9yX3JlcG9ydCgiQSBt
+YXhpbXVtIG9mICVkIGZkcyBhcmUgYWxsb3dlZCwgIgorICAgICAgICAgICAgICAgIGVycm9yX3Jl
+cG9ydCgiQSBtYXhpbXVtIG9mICV6dSBmZHMgYXJlIGFsbG93ZWQsICIKICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgImhvd2V2ZXIgZ290ICVsdSBmZHMgbm93IiwKLSAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgVkhPU1RfTUVNT1JZX01BWF9OUkVHSU9OUywgbmZkcyArIG5mZHNfdCk7
+CisgICAgICAgICAgICAgICAgICAgICAgICAgICAgIEdfTl9FTEVNRU5UUyh2bXNnLT5mZHMpLCBu
+ZmRzICsgbmZkc190KTsKICAgICAgICAgICAgICAgICBnb3RvIGZhaWw7CiAgICAgICAgICAgICB9
+CiAgICAgICAgICAgICBtZW1jcHkodm1zZy0+ZmRzICsgbmZkcywgZmRzX3QsCi0tIAoyLjI2LjIK
+Cg==
 
-I assume that your review comments, which Georg has answered, are solved. I=
- will implement the remaining suggestions in a new version of the patch.
-
-Regards,
-
-Andreas
-
-> -----Urspr=FCngliche Nachricht-----
-> Von: Hofstetter, Georg (EFS-GH2) <Georg.Hofstetter@efs-auto.de>
-> Gesendet: Mittwoch, 10. Juni 2020 15:50
-> An: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-> Cc: qemu-devel@nongnu.org; Konopik, Andreas (EFS-GH2)
-> <andreas.konopik@efs-auto.de>; Brenken, David (EFS-GH5)
-> <david.brenken@efs-auto.de>
-> Betreff: AW: [PATCH v2 1/1] tricore: added triboard with tc27x_soc
->=20
-> Hello Bastian,
->=20
-> Thanks for your feedback, I like your proposals.
->=20
-> > Also what do the _U and _C suffixes mean? I could not find them in the =
-user
-> manual [1].
->=20
-> See TC27X UM chapter 3.2 "Contents of the Segments"
-> "CPUx default attributes for these segments: non-cached" vs "cached"
-> These regions are the same memory, just with address bit 29 set, which wi=
-ll
-> bypass the DMI/PMI cache.
-> The regions are reflected here with _C (cached) and _U (uncached) suffixe=
-s.
->=20
-> > These aliases point to reserved memory in the user manual [1].
->=20
-> See TC27X UM chapter 5.7.2 "Local and Global Addressing"
-> "The local PSPR memory is always located at C0000000H. The local DSPR is
-> always located at D0000000H."
-> Those addresses are not visible on the SRI crossbar, but are core-locally=
- mapped
-> onto the current core memories.
-> As we emulate only one core (yet?), the "local DSPR" is being mapped to "=
-CPU0
-> DSPR", same for PSPR.
->=20
->=20
-> Regards,
-> Georg
->=20
->=20
-> -----Urspr=FCngliche Nachricht-----
-> Von: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-> Gesendet: Mittwoch, 10. Juni 2020 10:49
-> An: David Brenken <david.brenken@efs-auto.org>
-> Cc: qemu-devel@nongnu.org; Konopik, Andreas (EFS-GH2)
-> <andreas.konopik@efs-auto.de>; Brenken, David (EFS-GH5)
-> <david.brenken@efs-auto.de>; Hofstetter, Georg (EFS-GH2)
-> <Georg.Hofstetter@efs-auto.de>; Rasche, Robert (EFS-GH2)
-> <robert.rasche@efs-auto.de>; Biermanski, Lars (EFS-GH3)
-> <lars.biermanski@efs-auto.de>
-> Betreff: Re: [PATCH v2 1/1] tricore: added triboard with tc27x_soc
->=20
-> Hi,
->=20
-> thanks for the patch. In general this looks good to me. However, a have a=
- few
-> nitpicks.
->=20
-> On Tue, Jun 09, 2020 at 05:25:53PM +0200, David Brenken wrote:
-> > From: Andreas Konopik <andreas.konopik@efs-auto.de>
-> > +static const int tc27x_soc_irqmap[] =3D { };
->=20
-> Since this is empty, it's best to just remove it.
->=20
-> > +
-> > +static const hwaddr tc27x_soc_memmap[] =3D {
-> > +    [TC27XD_DSPR2]     =3D 0x50000000,
-> > +    [TC27XD_DCACHE2]   =3D 0x5001E000,
-> > +    [TC27XD_DTAG2]     =3D 0x500C0000,
-> > +    [TC27XD_PSPR2]     =3D 0x50100000,
-> > +    [TC27XD_PCACHE2]   =3D 0x50108000,
-> > +    [TC27XD_PTAG2]     =3D 0x501C0000,
-> > +    [TC27XD_DSPR1]     =3D 0x60000000,
-> > +    [TC27XD_DCACHE1]   =3D 0x6001E000,
-> > +    [TC27XD_DTAG1]     =3D 0x600C0000,
-> > +    [TC27XD_PSPR1]     =3D 0x60100000,
-> > +    [TC27XD_PCACHE1]   =3D 0x60108000,
-> > +    [TC27XD_PTAG1]     =3D 0x601C0000,
-> > +    [TC27XD_DSPR0]     =3D 0x70000000,
-> > +    [TC27XD_PSPR0]     =3D 0x70100000,
-> > +    [TC27XD_PCACHE0]   =3D 0x70106000,
-> > +    [TC27XD_PTAG0]     =3D 0x701C0000,
-> > +    [TC27XD_PFLASH0_C] =3D 0x80000000,
-> > +    [TC27XD_PFLASH1_C] =3D 0x80200000,
-> > +    [TC27XD_OLDA_C]    =3D 0x8FE70000,
-> > +    [TC27XD_BROM_C]    =3D 0x8FFF8000,
-> > +    [TC27XD_LMURAM_C]  =3D 0x90000000,
-> > +    [TC27XD_EMEM_C]    =3D 0x9F000000,
-> > +    [TC27XD_PFLASH0_U] =3D 0xA0000000,
-> > +    [TC27XD_PFLASH1_U] =3D 0xA0200000,
-> > +    [TC27XD_DFLASH0]   =3D 0xAF000000,
-> > +    [TC27XD_DFLASH1]   =3D 0xAF110000,
-> > +    [TC27XD_OLDA_U]    =3D 0xAFE70000,
-> > +    [TC27XD_BROM_U]    =3D 0xAFFF8000,
-> > +    [TC27XD_LMURAM_U]  =3D 0xB0000000,
-> > +    [TC27XD_EMEM_U]    =3D 0xBF000000,
-> > +    [TC27XD_PSPRX]     =3D 0xC0000000,
-> > +    [TC27XD_DSPRX]     =3D 0xD0000000,
-> > +};
->=20
-> Can we add the sizes here as well? That make it much easier to read. See
-> hw/riscv/sifive_e.c
->=20
-> Also what do the _U and _C suffixes mean? I could not find them in the us=
-er
-> manual [1].
->=20
-> > +
-> > +/*
-> > + * Initialize the auxiliary ROM region @mr and map it into
-> > + * the memory map at @base.
-> > + */
-> > +static void make_rom(MemoryRegion *mr, const char *name,
-> > +                     hwaddr base, hwaddr size) {
-> > +    memory_region_init_rom(mr, NULL, name, size, &error_fatal);
-> > +    memory_region_add_subregion(get_system_memory(), base, mr); }
-> > +
-> > +/*
-> > + * Initialize the auxiliary RAM region @mr and map it into
-> > + * the memory map at @base.
-> > + */
-> > +static void make_ram(MemoryRegion *mr, const char *name,
-> > +                     hwaddr base, hwaddr size) {
-> > +    memory_region_init_ram(mr, NULL, name, size, &error_fatal);
-> > +    memory_region_add_subregion(get_system_memory(), base, mr); }
-> > +
-> > +/*
-> > + * Create an alias of an entire original MemoryRegion @orig
-> > + * located at @base in the memory map.
-> > + */
-> > +static void make_alias(MemoryRegion *mr, const char *name,
-> > +                           MemoryRegion *orig, hwaddr base)
-> > +{
-> > +    memory_region_init_alias(mr, NULL, name, orig, 0,
-> > +                             memory_region_size(orig));
-> > +    memory_region_add_subregion(get_system_memory(), base, mr);
-> > +}
->=20
-> These seem like very common idioms. It might be worth while to make this =
-a
-> generic QEMU API. However this is out of scope for this patchset.
->=20
-> > +    /*
-> > +     * TriCore QEMU executes CPU0 only, thus it is sufficient to map
-> > +     * LOCAL.PSPR/LOCAL.DSPR exclusively onto PSPR0/DSPR0.
-> > +     */
-> > +    make_alias(&s->psprX, "LOCAL.PSPR", &s->cpu0mem.pspr,
-> > +            sc->memmap[TC27XD_PSPRX]);
-> > +    make_alias(&s->dsprX, "LOCAL.DSPR", &s->cpu0mem.dspr,
-> > +            sc->memmap[TC27XD_DSPRX]);
->=20
-> These aliases point to reserved memory in the user manual [1].
->=20
-> > +static void tc27x_soc_init(Object *obj)
-> > +{
-> > +    TC27XSoCState *s =3D TC27X_SOC(obj);
-> > +    TC27XSoCClass *sc =3D TC27X_SOC_GET_CLASS(s);
-> > +
-> > +    sysbus_init_child_obj(OBJECT(s), "tc27x", OBJECT(&s->cpu), sizeof(=
-s->cpu),
-> > +                        sc->cpu_type);
->=20
-> Unnecessary cast. Just use sysbus_init_child_obj(obj,...)
->=20
-> > +static void tricore_load_kernel(const char *kernel_filename)
-> > +{
-> > +    uint64_t entry;
-> > +    long kernel_size;
-> > +    TriCoreCPU *cpu;
-> > +    CPUTriCoreState *env;
-> > +
-> > +    kernel_size =3D load_elf(kernel_filename, NULL,
-> > +                           NULL, NULL, &entry, NULL,
-> > +                           NULL, NULL, 0,
-> > +                           EM_TRICORE, 1, 0);
-> > +    if (kernel_size <=3D 0) {
-> > +        error_report("no kernel file '%s'", kernel_filename);
-> > +        exit(1);
-> > +    }
-> > +    cpu =3D TRICORE_CPU(first_cpu);
-> > +    env =3D &cpu->env;
-> > +    env->PC =3D entry;
-> > +}
->=20
-> Just a note for the future. This seems like a function that ought to be
-> generalized for all TriCore boards.
->=20
-> Cheers,
-> Bastian
->=20
-> [1] https://hitex.co.uk/fileadmin/uk-
-> files/downloads/ShieldBuddy/tc27xD_um_v2.2.pdf
 
