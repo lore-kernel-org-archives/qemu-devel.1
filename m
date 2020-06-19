@@ -2,75 +2,83 @@ Return-Path: <SRS0=Yszf=AA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87321C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 01:02:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90505C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 01:55:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5317220771
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 01:02:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 49D8F20776
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 01:55:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="HOncGrgS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5317220771
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=atishpatra.org header.i=@atishpatra.org header.b="uW6V2FvH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49D8F20776
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=atishpatra.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53470 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59592 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jm5QZ-0003VL-KC
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 21:02:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58540)
+	id 1jm6FV-0005lh-EH
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 21:55:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39254)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jm5Pa-0002JV-7W; Thu, 18 Jun 2020 21:01:42 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:35617)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jm5PW-0007hO-B9; Thu, 18 Jun 2020 21:01:41 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 49p0qv0X1tz9sR4; Fri, 19 Jun 2020 11:01:30 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1592528491;
- bh=0+jSeCoiuy/+UjDaDaJIABDhYyK0PGMqi04PwiwV++I=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=HOncGrgSCwTGQWC8cRK4Pzex0GOlqIs5Zyi5PWc7UHnpDl4DUhgdsfz5Fk8gH19em
- ho1VOtlp2myA7UvP6L6FHAwhw6pvmAaejaCfaf+yZPyWHCfDyVPgc6cqOQouc2u5Ku
- JT1P+IYIhQnN+ib7q8LnMhmnj4sAm+P3iBR32zdU=
-Date: Fri, 19 Jun 2020 10:59:10 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Halil Pasic <pasic@linux.ibm.com>
-Subject: Re: [PATCH v2 1/1] virtio-ccw: auto-manage VIRTIO_F_IOMMU_PLATFORM
- if PV
-Message-ID: <20200619005910.GG17085@umbus.fritz.box>
-References: <20200520121507-mutt-send-email-mst@kernel.org>
- <20200606013217.2cffa3ed.pasic@linux.ibm.com>
- <20200608181428.3c6f127c.cohuck@redhat.com>
- <20200608190045.319dd68b.pasic@linux.ibm.com>
- <20200609084402.35d317ec.cohuck@redhat.com>
- <20200609114130.0ca9190b.pasic@linux.ibm.com>
- <20200609174747.4e300818@ibm-vm>
- <20200609182839.7ac80938.pasic@linux.ibm.com>
- <20200610042929.GE494336@umbus.fritz.box>
- <20200610155703.661aca83.pasic@linux.ibm.com>
+ (Exim 4.90_1) (envelope-from <atishp@atishpatra.org>)
+ id 1jm6Db-0004tf-BO
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 21:53:23 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:43928)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <atishp@atishpatra.org>)
+ id 1jm6DY-00076w-6y
+ for qemu-devel@nongnu.org; Thu, 18 Jun 2020 21:53:23 -0400
+Received: by mail-wr1-x441.google.com with SMTP id l10so8071674wrr.10
+ for <qemu-devel@nongnu.org>; Thu, 18 Jun 2020 18:53:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=atishpatra.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=5UNRIxxaCwPB6Qj9Awjd7+NylhIl3+bxNdId/TR+si4=;
+ b=uW6V2FvH5vuVA1n6xMu06PLEy/x+U02Jb/E7NOpxK4U1OzxEmNDHpSlA4Mri+In2At
+ P7rRj9j1T8uHeHaTAAMOiLM23MyDxQH3R4oAbjXqDA43OQ/fi8FBglYDOmG8ASz8VBqn
+ z8jiSIHN/IY5Rnux5YSk95Q0YzpVm389mmmV4=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=5UNRIxxaCwPB6Qj9Awjd7+NylhIl3+bxNdId/TR+si4=;
+ b=CAyqyWBDKTJ28QItmXV3NYuJidM1KCHeJVMTNEbBMe3Yc8bPb13UB8Y+U4rtbiYE4c
+ fC2MVF/cG7xPAc4cntzveLSjANYV7OSDssqanb4Nz/ZbsINGNtmrMcUTmi3HNyNbi6pt
+ qJx2fYOsGJHfftAekuPEdA6uMhjGDc6ta+u+N0LpEvLRfFeEYDMcZZr462hVeUV+PYTZ
+ B93Vdjzk7TW7TJNkppDybcYYlsHd9+mMpq3EqzrMA7eiyKToJbSYgLPgOlm7BYlJ28GC
+ prwlw1+AieCa+71gH6t/27nIBSzdX9NPlrax75KN50/KwtGj0Cqv72Ja6lqn1scXLDmf
+ bVSA==
+X-Gm-Message-State: AOAM532xiSZkIrW2oxOSJwXH16IM546f8FXj+JGxkEplH5rjtoTujzZe
+ InX3INxQn6t8B5g0R1ZQ038ze3gkOz8aAzahzabQ
+X-Google-Smtp-Source: ABdhPJyayRCeCDizVnfpEfmMb8doJ8vLJmy2BajVY6P9DlAAnsXiJy/qw/Jf129Nmajzp7VZBOpUdgph6lP850kJf1c=
+X-Received: by 2002:a5d:62d1:: with SMTP id o17mr1327762wrv.162.1592531598358; 
+ Thu, 18 Jun 2020 18:53:18 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="uc35eWnScqDcQrv5"
-Content-Disposition: inline
-In-Reply-To: <20200610155703.661aca83.pasic@linux.ibm.com>
-Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
- helo=ozlabs.org
+References: <20200616192700.1900260-1-atish.patra@wdc.com>
+ <20200616192700.1900260-3-atish.patra@wdc.com>
+ <CAEUhbmXfo6PusamsDkhqAWX=dta3t3qCiS0SUpEz7DKheosPAg@mail.gmail.com>
+In-Reply-To: <CAEUhbmXfo6PusamsDkhqAWX=dta3t3qCiS0SUpEz7DKheosPAg@mail.gmail.com>
+From: Atish Patra <atishp@atishpatra.org>
+Date: Thu, 18 Jun 2020 18:53:07 -0700
+Message-ID: <CAOnJCUJxNzes=6xHHhAafV=RZX4Zi1COcNwFpG1=bbFLLsUMSg@mail.gmail.com>
+Subject: Re: [PATCH 2/3] RISC-V: Copy the fdt in dram instead of ROM
+To: Bin Meng <bmeng.cn@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=atishp@atishpatra.org; helo=mail-wr1-x441.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -9
-X-Spam_score: -1.0
-X-Spam_bar: -
-X-Spam_report: (-1.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -84,171 +92,262 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Boris Fiuczynski <fiuczy@linux.ibm.com>,
- Janosch Frank <frankja@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>,
- David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Viktor Mihajlovski <mihajlov@linux.ibm.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Atish Patra <atish.patra@wdc.com>, Alistair Francis <Alistair.Francis@wdc.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Thu, Jun 18, 2020 at 1:26 AM Bin Meng <bmeng.cn@gmail.com> wrote:
+>
+> On Wed, Jun 17, 2020 at 3:29 AM Atish Patra <atish.patra@wdc.com> wrote:
+> >
+> > Currently, the fdt is copied to the ROM after the reset vector. The firmware
+> > has to copy it to DRAM. Instead of this, directly copy the device tree to a
+> > pre-computed dram address. The device tree load address should be as far as
+> > possible from kernel and initrd images. That's why it is kept at the end of
+> > the DRAM or 4GB whichever is lesser.
+> >
+> > Signed-off-by: Atish Patra <atish.patra@wdc.com>
+> > ---
+> >  hw/riscv/boot.c         | 45 ++++++++++++++++++++++++++++++-----------
+> >  hw/riscv/sifive_u.c     | 14 ++++++++++++-
+> >  hw/riscv/spike.c        | 14 ++++++++++++-
+> >  hw/riscv/virt.c         | 13 +++++++++++-
+> >  include/hw/riscv/boot.h |  5 ++++-
+> >  5 files changed, 75 insertions(+), 16 deletions(-)
+> >
+> > diff --git a/hw/riscv/boot.c b/hw/riscv/boot.c
+> > index 8ed96da600c9..0378b7f1bd58 100644
+> > --- a/hw/riscv/boot.c
+> > +++ b/hw/riscv/boot.c
+> > @@ -160,25 +160,51 @@ hwaddr riscv_load_initrd(const char *filename, uint64_t mem_size,
+> >      return *start + size;
+> >  }
+> >
+> > +hwaddr riscv_calc_fdt_load_addr(hwaddr dram_base, uint64_t mem_size, void *fdt)
+> > +{
+> > +    hwaddr temp, fdt_addr;
+> > +    hwaddr dram_end = dram_base + mem_size;
+> > +    int fdtsize = fdt_totalsize(fdt);
+> > +
+> > +    if (fdtsize <= 0) {
+> > +        error_report("invalid device-tree");
+> > +        exit(1);
+> > +    }
+> > +    /*
+> > +     * We should put fdt as far as possible to avoid kernel/initrd overwriting
+> > +     * its content. But it should be addressable by 32 bit system as well.
+> > +     * Thus, put it at an aligned address that less than fdt size from end of
+> > +     * dram or 4GB whichever is lesser.
+> > +     */
+> > +    temp = MIN(dram_end, 4096 * MiB);
+> > +    fdt_addr = QEMU_ALIGN_DOWN(temp - fdtsize, 2 * MiB);
+> > +
+> > +    return fdt_addr;
+> > +}
+> > +
+> >  void riscv_setup_rom_reset_vec(hwaddr start_addr, hwaddr rom_base,
+> > -                               hwaddr rom_size, void *fdt)
+> > +                               hwaddr rom_size,
+> > +                               hwaddr fdt_load_addr, void *fdt)
+> >  {
+> >      int i;
+> >      /* reset vector */
+> > -    uint32_t reset_vec[8] = {
+> > -        0x00000297,                  /* 1:  auipc  t0, %pcrel_hi(dtb) */
+> > -        0x02028593,                  /*     addi   a1, t0, %pcrel_lo(1b) */
+> > +    uint32_t reset_vec[10] = {
+> > +        0x00000297,                  /* 1:  auipc  t0, %pcrel_hi(fw_dyn) */
+> >          0xf1402573,                  /*     csrr   a0, mhartid  */
+> >  #if defined(TARGET_RISCV32)
+> > +        0x0202a583,                  /*     lw     a1, 32(t0) */
+> >          0x0182a283,                  /*     lw     t0, 24(t0) */
+> >  #elif defined(TARGET_RISCV64)
+> > +        0x0202b583,                  /*     ld     a1, 32(t0) */
+> >          0x0182b283,                  /*     ld     t0, 24(t0) */
+> >  #endif
+> >          0x00028067,                  /*     jr     t0 */
+> >          0x00000000,
+> >          start_addr,                  /* start: .dword */
+> >          0x00000000,
+> > -                                     /* dtb: */
+> > +        fdt_load_addr,               /* fdt_laddr: .dword */
+> > +        0x00000000,
+> > +                                     /* fw_dyn: */
+> >      };
+> >
+> >      /* copy in the reset vector in little_endian byte order */
+> > @@ -189,14 +215,9 @@ void riscv_setup_rom_reset_vec(hwaddr start_addr, hwaddr rom_base,
+> >                            rom_base, &address_space_memory);
+> >
+> >      /* copy in the device tree */
+> > -    if (fdt_pack(fdt) || fdt_totalsize(fdt) >
+> > -        rom_size - sizeof(reset_vec)) {
+> > -        error_report("not enough space to store device-tree");
+> > -        exit(1);
+> > -    }
+> >      qemu_fdt_dumpdtb(fdt, fdt_totalsize(fdt));
+> > -    rom_add_blob_fixed_as("mrom.fdt", fdt, fdt_totalsize(fdt),
+> > -                           rom_base + sizeof(reset_vec),
+> > +
+> > +    rom_add_blob_fixed_as("fdt", fdt, fdt_totalsize(fdt), fdt_load_addr,
+> >                             &address_space_memory);
+> >
+> >      return;
+> > diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+> > index c2712570e0d9..1a1540c7f98d 100644
+> > --- a/hw/riscv/sifive_u.c
+> > +++ b/hw/riscv/sifive_u.c
+> > @@ -31,6 +31,7 @@
+> >   */
+> >
+> >  #include "qemu/osdep.h"
+> > +#include "qemu/units.h"
+> >  #include "qemu/log.h"
+> >  #include "qemu/error-report.h"
+> >  #include "qapi/error.h"
+> > @@ -325,6 +326,7 @@ static void sifive_u_machine_init(MachineState *machine)
+> >      MemoryRegion *main_mem = g_new(MemoryRegion, 1);
+> >      MemoryRegion *flash0 = g_new(MemoryRegion, 1);
+> >      target_ulong start_addr = memmap[SIFIVE_U_DRAM].base;
+> > +    hwaddr fdt_load_addr;
+> >
+> >      /* Initialize SoC */
+> >      object_initialize_child(OBJECT(machine), "soc", &s->soc,
+> > @@ -369,13 +371,23 @@ static void sifive_u_machine_init(MachineState *machine)
+> >          }
+> >      }
+> >
+> > +    /* Compute the fdt load address in dram */
+> > +    fdt_load_addr = riscv_calc_fdt_load_addr(memmap[SIFIVE_U_DRAM].base,
+> > +                                             machine->ram_size, s->fdt);
+> > +
+> > +    if (fdt_load_addr >= (memmap[SIFIVE_U_DRAM].base + machine->ram_size)) {
+>
+> This check is unnecessary as the parameter passed to
+> riscv_calc_fdt_load_addr() guarantees that this won't happen.
+>
 
---uc35eWnScqDcQrv5
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Sure. I will remove that.
 
-On Wed, Jun 10, 2020 at 03:57:03PM +0200, Halil Pasic wrote:
-> On Wed, 10 Jun 2020 14:29:29 +1000
-> David Gibson <david@gibson.dropbear.id.au> wrote:
->=20
-> > On Tue, Jun 09, 2020 at 06:28:39PM +0200, Halil Pasic wrote:
-> > > On Tue, 9 Jun 2020 17:47:47 +0200
-> > > Claudio Imbrenda <imbrenda@linux.ibm.com> wrote:
-> > >=20
-> > > > On Tue, 9 Jun 2020 11:41:30 +0200
-> > > > Halil Pasic <pasic@linux.ibm.com> wrote:
-> > > >=20
-> > > > [...]
-> > > >=20
-> > > > > I don't know. Janosch could answer that, but he is on vacation. A=
-dding
-> > > > > Claudio maybe he can answer. My understanding is, that while it m=
-ight
-> > > > > be possible, it is ugly at best. The ability to do a transition is
-> > > > > indicated by a CPU model feature. Indicating the feature to the g=
-uest
-> > > > > and then failing the transition sounds wrong to me.
-> > > >=20
-> > > > I agree. If the feature is advertised, then it has to work. I don't
-> > > > think we even have an architected way to fail the transition for th=
-at
-> > > > reason.
-> > > >=20
-> > > > What __could__ be done is to prevent qemu from even starting if an
-> > > > incompatible device is specified together with PV.
-> > >=20
-> > > AFAIU, the "specified together with PV" is the problem here. Currently
-> > > we don't "specify PV" but PV is just a capability that is managed by =
-the
-> > > CPU model (like so many other). I.e. the fact that the
-> > > visualization environment is capable providing PV (unpack facility
-> > > available), and the fact, that the end user didn't fence the unpack
-> > > facility, does not mean, the user is dead set to use PV.
-> > >=20
-> > > My understanding is, that we want PV to just work, without having to
-> > > put together a peculiar VM definition that says: this is going to be
-> > > used as a PV VM.
-> >=20
-> > Having had a similar discussion for POWER, I no longer think this is a
-> > wise model.  I think we want to have an explicit "allow PV" option -
-> > but we do want it to be a *single* option, rather than having to
-> > change configuration of a whole bunch of places.
-> >=20
-> > My intention is for my 'host-trust-limitation' series to accomplish
-> > that.
->=20
-> Dave, many thanks for your input. I would be interested to read up that
-> discussion you hand for POWER to try to catch the train of thought. Can
-> you give me a pointer?
+> > +        error_report("Not enough space for FDT after kernel + initrd");
+> > +        exit(1);
+> > +     }
+> > +
+> >      if (s->start_in_flash) {
+> >          start_addr = memmap[SIFIVE_U_FLASH0].base;
+> >      }
+> >
+> >      /* load the reset vector */
+> >      riscv_setup_rom_reset_vec(start_addr, memmap[SIFIVE_U_MROM].base,
+> > -                              memmap[SIFIVE_U_MROM].size, s->fdt);
+> > +                              memmap[SIFIVE_U_MROM].size,
+> > +                              fdt_load_addr, s->fdt);
+> >  }
+> >
+> >  static bool sifive_u_machine_get_start_in_flash(Object *obj, Error **errp)
+> > diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
+> > index 238eae48716a..2a34a1382487 100644
+> > --- a/hw/riscv/spike.c
+> > +++ b/hw/riscv/spike.c
+> > @@ -24,6 +24,7 @@
+> >   */
+> >
+> >  #include "qemu/osdep.h"
+> > +#include "qemu/units.h"
+> >  #include "qemu/log.h"
+> >  #include "qemu/error-report.h"
+> >  #include "qapi/error.h"
+> > @@ -166,6 +167,7 @@ static void spike_board_init(MachineState *machine)
+> >      MemoryRegion *main_mem = g_new(MemoryRegion, 1);
+> >      MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
+> >      unsigned int smp_cpus = machine->smp.cpus;
+> > +    hwaddr fdt_load_addr;
+> >
+> >      /* Initialize SOC */
+> >      object_initialize_child(OBJECT(machine), "soc", &s->soc, sizeof(s->soc),
+> > @@ -212,9 +214,19 @@ static void spike_board_init(MachineState *machine)
+> >          }
+> >      }
+> >
+> > +    /* Compute the fdt load address in dram */
+> > +    fdt_load_addr = riscv_calc_fdt_load_addr(memmap[SPIKE_DRAM].base,
+> > +                                             machine->ram_size, s->fdt);
+> > +
+> > +    if (fdt_load_addr >= (memmap[SPIKE_DRAM].base + machine->ram_size)) {
+> > +        error_report("Not enough space for FDT after kernel + initrd");
+> > +        exit(1);
+> > +     }
+> > +
+> >      /* load the reset vector */
+> >      riscv_setup_rom_reset_vec(memmap[SPIKE_DRAM].base, memmap[SPIKE_MROM].base,
+> > -                              memmap[SPIKE_MROM].size, s->fdt);
+> > +                              memmap[SPIKE_MROM].size,
+> > +                              fdt_load_addr, s->fdt);
+> >
+> >      /* initialize HTIF using symbols found in load_kernel */
+> >      htif_mm_init(system_memory, mask_rom, &s->soc.harts[0].env, serial_hd(0));
+> > diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
+> > index a8e2d58cc067..ebb5dd5c8c1c 100644
+> > --- a/hw/riscv/virt.c
+> > +++ b/hw/riscv/virt.c
+> > @@ -481,6 +481,7 @@ static void virt_machine_init(MachineState *machine)
+> >      char *plic_hart_config;
+> >      size_t plic_hart_config_len;
+> >      target_ulong start_addr = memmap[VIRT_DRAM].base;
+> > +    hwaddr fdt_load_addr;
+> >      int i;
+> >      unsigned int smp_cpus = machine->smp.cpus;
+> >
+> > @@ -536,9 +537,19 @@ static void virt_machine_init(MachineState *machine)
+> >          start_addr = virt_memmap[VIRT_FLASH].base;
+> >      }
+> >
+> > +    /* Compute the fdt load address in dram */
+> > +    fdt_load_addr = riscv_calc_fdt_load_addr(memmap[VIRT_DRAM].base,
+> > +                                             machine->ram_size, s->fdt);
+> > +    if (fdt_load_addr >= (memmap[VIRT_DRAM].base + machine->ram_size)) {
+> > +        error_report("Not enough space for FDT after kernel + initrd");
+> > +        exit(1);
+> > +     }
+> > +
+> > +
+> >      /* load the reset vector */
+> >      riscv_setup_rom_reset_vec(start_addr, virt_memmap[VIRT_MROM].base,
+> > -                              virt_memmap[VIRT_MROM].size, s->fdt);
+> > +                              virt_memmap[VIRT_MROM].size,
+> > +                              fdt_load_addr, s->fdt);
+> >
+> >      /* create PLIC hart topology configuration string */
+> >      plic_hart_config_len = (strlen(VIRT_PLIC_HART_CONFIG) + 1) * smp_cpus;
+> > diff --git a/include/hw/riscv/boot.h b/include/hw/riscv/boot.h
+> > index 3e9759c89aa2..b6289a05d952 100644
+> > --- a/include/hw/riscv/boot.h
+> > +++ b/include/hw/riscv/boot.h
+> > @@ -35,7 +35,10 @@ target_ulong riscv_load_kernel(const char *kernel_filename,
+> >                                 symbol_fn_t sym_cb);
+> >  hwaddr riscv_load_initrd(const char *filename, uint64_t mem_size,
+> >                           uint64_t kernel_entry, hwaddr *start);
+> > +hwaddr riscv_calc_fdt_load_addr(hwaddr dram_start, uint64_t dram_size,
+> > +                                void *fdt);
+> >  void riscv_setup_rom_reset_vec(hwaddr saddr, hwaddr rom_base,
+> > -                               hwaddr rom_size, void *fdt);
+> > +                               hwaddr rom_size,
+> > +                               hwaddr fdt_load_addr, void *fdt);
+> >
+> >  #endif /* RISCV_BOOT_H */
+>
+> Regards,
+> Bin
+>
 
-Urgh.. not really.. it was spread out over several discussions, some
-of which were on IRC or Slack, rather than email.
 
-> My current understanding is that s390x already has the "allow PV" option,
-> which is the CPU model feature. But its dynamics is just like the
-> dynamics of other CPU model features, in a sense that you may have to
-> disable it explicitly.
->=20
-> Our problem is, that iommu_platform=3Don comes at a price point for us,
-> and we don't want to enforce it when it is not needed. And if the guest
-> does not decide to do the transition to protected, it is not needed.
->=20
-> Thus any scheme were we pessimise based on the sheer possibility of
-> protected virtualization seems wrong to me.
-
-Hrm, I see your point.  So... I guess my thinking is that although the
-strict meaning of the proposed host-trust-limitation option is just
-that "protection _can_ be used, at the guest/platform's option", it is
-a strong hint that we're expecting protection to be used.
-
-So would this work for s390:
-  * The cpu feature remains, as now, enabled by default
-  * The host-trust-limitation option would apply the protection
-    necessary virtio options (and any other changes to defaults we
-    discover we need), just as it does for SEV and POWER PEF
-  * Optionally, the s390 machine type code could error out if
-    host-trust-limitation is specified, but the cpu option is
-    explicitly disabled
-
-> The sad thing is that QEMU has every information it needs to do what is
-> best: for paravirtualized devices
-> * use F_ACCESS_PLATFORM when needed, to make the guest work harder and
-> work around the access restrictions imposed by memory protection, and=20
-> * don't use F_ACCESS_PLATFORM when when not needed, and allow for
->   optimization based on the fact that no such access restrictions exist.
-
-Right.. IIUC you're suggesting delaying finalization of the device's
-featureset until the guest driver actually starts probing it
-
-> Sure we can burden up the user, to tell us if the VM is intended to be
-> used with memory protection or not. But what does it buy us? The
-> opportunity to create dodgy configurations?
-
-So, I don't know what the situation is with z, but for POWER machines
-with the ultravisor running are rare (read, not actually available
-outside IBM yet), and not directly tied to a cpu version (obviously
-you need a cpu with support, but you also need to actually be running
-under an ultravisor, which is optional).  So what are our options:
-
-1) Require explicitly enabling PEF support - this is burdening the
-   user, as you say, but..
-
-2) Allow by default - but fail if the host doesn't have support.  That
-   means explicitly *disabling* on non-ultravisor machines, a much
-   bigger imposition on the user
-
-3) Enable conditionally depending on host support.  Seems nice, but
-   it's badly broken, as we've found with previous times we've tried
-   to automatically do things based on host capabilities.  The problem
-   is that once you have this, it's not obvious without knowing a
-   bunch about the hosts which ones it will be safe to migrate
-   between.  That horribly breaks things like RHV that want to do load
-   balancing migrations within a cluster
-
-Basically having different guest-visible features depending on host
-properties is just unworkable, which brings us back to (1) being the
-least bad option.
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---uc35eWnScqDcQrv5
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl7sDdwACgkQbDjKyiDZ
-s5L1VxAAzHq5X0XQIIny0bQLXASlTiH0H5fmspZDt+/1tyU3hfJFdZv8ftPM9v1n
-2ITVM0TeEW2Sc6MjM5BuxF4t+MAKN4D7PEGrZN9wCugt/nm3sCU/DHcqyQ0t55Z+
-cSxCMWNyyL5sLM2X7nljVQfoPxJBNLvgBf/ZwGWhKGFThPBIBdeAQDbD6fY1PNwt
-ph9MJYoNlmf/n0Pa0XYS33EfFKFFcMq4mf3dMJ5FXaGW87UhNWRixXn322YF5lNb
-rgiaICYqKhGndukY7rMLp4w5mA7h1bbNihkA+6Sx3kiT1NJrHJKA4jR2NXAYDwbB
-EYwkM88OpADF7TLZ6kh+Z37KGZv4PQpvIqGUr6Y9g+mveVW+OcC2/Sfxx8B8wIZv
-4FpHPgtjQxRlGaHI4+CZHCA3txRtWRNG6kTkqEdtWuoteDO6+Udptv0XWegsU3Zz
-3lWc6Xb0GK1/USdjZFUF8E9jGBa3XpHKvyCKETEuVPRsmKkqPUl7viX3BDjolU3T
-0FXPl475GrtI0to+s7nW6QuOBh/0KMZjURz5QmgjLyQtCJlRdA73LrEq4sQRg6Ag
-qp2zmunUCtibW5jprNoqRUZxzAIy5ofihOosDJjows3hqxGF+Rfi5Nb87upG19Km
-r7DhiuHIqQes1ZtvGwCV6fnnXM5+ZLh7MMYn0hC7iVKoPQusoOs=
-=D595
------END PGP SIGNATURE-----
-
---uc35eWnScqDcQrv5--
+-- 
+Regards,
+Atish
 
