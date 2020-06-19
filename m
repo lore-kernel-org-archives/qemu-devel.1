@@ -7,84 +7,83 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 868C8C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 23:41:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D235BC433E3
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 23:43:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 41DD12242E
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 23:41:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A0E312242E
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 23:43:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UnHzpdYa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41DD12242E
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tbI103WT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0E312242E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42834 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46794 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmQdx-0005lP-IE
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 19:41:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57214)
+	id 1jmQfX-0008AO-VM
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 19:43:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57532)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jmQdG-0004oP-7S
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 19:41:14 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:43780)
+ id 1jmQee-000700-9L
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 19:42:40 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:41023)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jmQdD-0001tn-5C
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 19:41:13 -0400
-Received: by mail-pg1-x544.google.com with SMTP id h10so5163323pgq.10
- for <qemu-devel@nongnu.org>; Fri, 19 Jun 2020 16:41:10 -0700 (PDT)
+ id 1jmQeb-00022r-Kc
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 19:42:39 -0400
+Received: by mail-pg1-x542.google.com with SMTP id b5so5171672pgm.8
+ for <qemu-devel@nongnu.org>; Fri, 19 Jun 2020 16:42:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:references:from:message-id:date:user-agent:mime-version
  :in-reply-to:content-language:content-transfer-encoding;
- bh=reABxjRR8Y81NuGMGmYFxj0MMegGnfcMQCByrhaY8Ts=;
- b=UnHzpdYaV6YRDgZJB1EltBVhVis9AZRHbTJvbIll4+rkm88ZuHqCR9TWl5CSOw1iwj
- L8+szEjc8dnkvQ7XFRXEDEJmHmsIN+NzNyl/h+IWsjzW/o6pj+nMt5WOYshfXbq48z4X
- 1fDhgbhoodBBjPibleyBjqj0G4D2ZcJhsQzy/sMwv03++wkkM90KiQr2q+EHeGqhwsfU
- ShW2sqbBIxiHkN3VquTrtI/Lks/eookKRNZ/pQecwhCWqNXQtszhTV/KfhM1+2a/R7X9
- lvZFD4ano0hnIW+vBpyhVMaf+3JjfN8LiXvt+bpW+Waupdlre2OUqTUTOTXO9Wk4GGw6
- WHKg==
+ bh=XOI2kwt29wClvWAuk3lMsH7YdUKqoH+8D28hALbRyJ8=;
+ b=tbI103WTz4wy2HBK5Oh4U8uWcc38C5YsX2XPE37rxZH2M0SXOjEMrqJ89M8O+Ef5rT
+ WRFiWCqszMCUG2GzbC0AFHoXZoy9TDXYDUBQMba9t9Y95mEs/1Mv+tVGrouYn2b1vBTV
+ MVJCeztokZZZrd8zIjPXC3eVIo4WpCn91zwdIZWzfxSKRKK3//3bwCS42YlkR6C8asEq
+ N+vBGJ9fjdLDllSoATZTDnRPvLwTRp3vWmZGnnqfgHIKWu8ynqfGb0364piiIgUDxW5v
+ BDMMPrSPpO6Vz4HFOmtqCh0SAPUydOSivQ0bmmvEFQufLvD6KpKpcAYqHXEo6MMQvlQy
+ i68w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=reABxjRR8Y81NuGMGmYFxj0MMegGnfcMQCByrhaY8Ts=;
- b=FJgHgjEDS1EpCI25+2g1XqDPmpsy9Kx3J3In+XyGFl8VsfO8m0jp/mEP0iWct1OTVj
- zcvUjQReFJS8Dqsa0iKklXbKNTAYR7v7oglwpey+M9usAsDnKIIytbVKSIhdZycCl1vu
- vgXc+0JcMInBrQ+r6hFTlIPz0nyz71TyoDPc1xj4y92NE5hFP0up+fDIrcKW0irwEWXc
- 3HhZ3EphQ3NOnDwjxURKC5Boul0ujg9vhcBXbAG/yOn6zW0b9z2mji7PbJ2giH+NTmuY
- D7YzO3ofT4wcC4wbyQA/0BhFZ4qFMQ/J+8+bjLD/BxibUeqczWkUJLQaYGtHvTiuHzWV
- o19Q==
-X-Gm-Message-State: AOAM530RHBerbKH+X2zXyR8lm8AvnjF3dmgg8lr6sb4luJVAPsp9wycX
- CvtIm8b8oVBUIcM8OuUmDodJaDCHG7o=
-X-Google-Smtp-Source: ABdhPJxtTYLKtxa0aBQLU5vq/I48lq0Fcp//qpBsgkNWOsNlJaaGZQ+Kai50KMyFuGVoUZWe0Bc0yw==
-X-Received: by 2002:a63:6643:: with SMTP id a64mr1881598pgc.246.1592610069616; 
- Fri, 19 Jun 2020 16:41:09 -0700 (PDT)
+ bh=XOI2kwt29wClvWAuk3lMsH7YdUKqoH+8D28hALbRyJ8=;
+ b=BJfrDjhdLYo//BbFj34ZHvTBTV5lF03NgE2kSA767dGlWWdpMHLZ6CajTB5e9NQYaQ
+ 383zK58ZSZXbjJ/tNIM5vtpSwOyRvsvQSabdpM9sqK/34og++m4ZbG22zhEisVmTrQ1H
+ UMlfpDA0cPpCp8/fmbRpDPUmwEA5llNfv6/CwJi8jsxYxyAj1qDSwb5/sKKaz4PWbOFQ
+ 0xfuBGUrURl5rayKP+BjaT7bTsL5s+cOduqAyp7XUnxBRQ7hyNqzMpsNVgG6y78cNgwB
+ nwVuBXA6/YuW8aZRvy/w/T+Lbe/jde6a6ezGy7zAvqXX5PzCZzwQIHuRPMfzM/DCX8nm
+ bmZw==
+X-Gm-Message-State: AOAM530/LwfeF09Wp4HljSoolbf77t2+AHbska5K9k3RP+76SS4iHIiv
+ JMfzb6Tr8N8P4jG6w9KyXJwU6c3ADKI=
+X-Google-Smtp-Source: ABdhPJzbpA+Y5w+HUXEHRp7jDQcfJLpOFNaj9KTeHch3azURLI6fjQfnkTQkclZpgXzLlHnjSP44MQ==
+X-Received: by 2002:aa7:82c8:: with SMTP id f8mr10778001pfn.165.1592610156076; 
+ Fri, 19 Jun 2020 16:42:36 -0700 (PDT)
 Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id k7sm6771606pfp.84.2020.06.19.16.41.08
+ by smtp.gmail.com with ESMTPSA id p11sm7008657pfq.10.2020.06.19.16.42.35
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 19 Jun 2020 16:41:08 -0700 (PDT)
-Subject: Re: [PATCH 13/21] target/arm: Convert remaining simple 2-reg-misc
- Neon ops
+ Fri, 19 Jun 2020 16:42:35 -0700 (PDT)
+Subject: Re: [PATCH 14/21] target/arm: Convert Neon VQABS, VQNEG to decodetree
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
  qemu-devel@nongnu.org
 References: <20200616170844.13318-1-peter.maydell@linaro.org>
- <20200616170844.13318-14-peter.maydell@linaro.org>
+ <20200616170844.13318-15-peter.maydell@linaro.org>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <3ea70fd8-2b15-8335-27ac-0b8948de43fd@linaro.org>
-Date: Fri, 19 Jun 2020 16:41:06 -0700
+Message-ID: <50a94495-17cc-f56a-351f-4c0a9e58be42@linaro.org>
+Date: Fri, 19 Jun 2020 16:42:33 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200616170844.13318-14-peter.maydell@linaro.org>
+In-Reply-To: <20200616170844.13318-15-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::544;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x544.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::542;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x542.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -111,15 +110,17 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 6/16/20 10:08 AM, Peter Maydell wrote:
-> Convert the remaining ops in the Neon 2-reg-misc group which
-> can be implemented simply with our do_2misc() helper.
+> Convert the Neon VQABS and VQNEG insns to decodetree.
+> Since these are the only ones which need cpu_env passing to
+> the helper, we wrap the helper rather than creating a whole
+> new do_2misc_env() function.
 > 
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->  target/arm/neon-dp.decode       | 10 +++++
->  target/arm/translate-neon.inc.c | 69 +++++++++++++++++++++++++++++++++
->  target/arm/translate.c          | 38 ++++--------------
->  3 files changed, 86 insertions(+), 31 deletions(-)
+>  target/arm/neon-dp.decode       |  3 +++
+>  target/arm/translate-neon.inc.c | 35 +++++++++++++++++++++++++++++++++
+>  target/arm/translate.c          | 30 ++--------------------------
+>  3 files changed, 40 insertions(+), 28 deletions(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
