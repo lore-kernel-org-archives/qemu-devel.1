@@ -6,37 +6,37 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C178C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 13:01:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B3CDC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 13:03:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 711292080C
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 13:01:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 711292080C
+	by mail.kernel.org (Postfix) with ESMTPS id D9D1B2080C
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 13:03:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9D1B2080C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43584 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45632 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmGeb-0005de-MT
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 09:01:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39818)
+	id 1jmGfl-00073v-53
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 09:03:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40048)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jmGdK-0004iE-Ta
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 09:00:38 -0400
-Received: from mout.kundenserver.de ([212.227.17.10]:44209)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jmGe5-0005ST-TZ
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 09:01:25 -0400
+Received: from mout.kundenserver.de ([212.227.17.24]:35409)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jmGdI-0000A6-Fz
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 09:00:38 -0400
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jmGe0-0000Qe-9g
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 09:01:25 -0400
 Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
  (mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1MStOy-1jJ9gU1rNG-00UMHa; Fri, 19 Jun 2020 15:00:24 +0200
-Subject: Re: [PATCH v5 3/6] linux-user: Add strace support for printing
- argument of syscalls used for extended attributes
+ 1MF418-1jfcoG1ky0-00FSCK; Fri, 19 Jun 2020 15:01:08 +0200
+Subject: Re: [PATCH v5 1/6] linux-user: Extend strace support to enable
+ argument printing after syscall execution
 To: Filip Bozuta <filip.bozuta@syrmia.com>, qemu-devel@nongnu.org
 References: <20200619123331.17387-1-filip.bozuta@syrmia.com>
- <20200619123331.17387-4-filip.bozuta@syrmia.com>
+ <20200619123331.17387-2-filip.bozuta@syrmia.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -80,42 +80,41 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <dd859b3e-56fb-7c28-ea74-5059c7110a8b@vivier.eu>
-Date: Fri, 19 Jun 2020 15:00:22 +0200
+Message-ID: <987c00ad-9182-80b5-e433-6c8d578b007d@vivier.eu>
+Date: Fri, 19 Jun 2020 15:01:07 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200619123331.17387-4-filip.bozuta@syrmia.com>
+In-Reply-To: <20200619123331.17387-2-filip.bozuta@syrmia.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:9x/j0OnSoOPqyTTFDd7bvHFr+sp6IyZNprD2rHKZ0sipAETvqGb
- /7ynPkvvrpn2+44DPOm5ZWGzKl8wZI7tb1J/eKal1Dz/QoZm1PukCqtzHitAyJ7quCP9lum
- e2+3ZPFDN9CUW7u9XH4YiJ+am2TLh39PQCYoPGn0Tk9ftsFUI5Ri9tyG5TN8GVE0iNnyckw
- X+cd5vT/xGBs1TG1x/zZQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:0loujdjQSbQ=:61T+SwjGS4Gh7r35R/SlTy
- 3q5b4caEFW+zsfKwPV7656qq6DF3WaOblhRSrWzCJHrvPbMvDFNZ1ki/9wCHGiSg8M/JDFGPH
- 4OPrZlM/0VBd6D6IVx69w3N9RVIf1A1nep6H6SRJlLHIs2kIAgIE/Ru3nE2efLiFGKX1bS5QO
- WMp5V5x1YQRBiJviMcvcQvbmQOKALAhNjzjpVi42CKYDWYeA/g9IG57iUPQvEv+iP30K2XDph
- qeoLyXnFneVFizq2CEICZeNUGO09QWWBTUyc1nyUg7OaTxWAoDy1En4SpTp29LYw5idOy55BF
- nuxq/wRBn+qOfo2dWieHibOlLHQdjl4D4Tgtxc5EmV4ulvbPrYFhDedrhAUPytEnftAy2xjUN
- 52gNf8k/0ngr/7CiKpgO4C78QPWIEcwH82dkNdSaBYp4ptepNu8MpPJ+nvzoYXti1AZI8UbyT
- olNEYTNgqogEEUaTTrP/dXVKZYOOCWpqr797n2lgX9jWWIqRMtEbN/bgDw4iuu+MIPXOqAk3+
- 3q8YRIhefj62C2tPPpO0AckaCeewCYsl2SgXw/TGmSJORSz8tXHzQ13nMXPVXS6qhb7QAeUY2
- 7tDwwJQpxReBDtf4raHvQrYP0i7EBTgM0stjTQKzaMaE751ofXajLa7AddTBV5kJJjzly+r+q
- +VlPeIcIvhpPeFOjUHaVH2xU+k3JVNE4EjzGnmQC9vmQ8ciawg7OxOTeIboxfLqS6oTCMZpjq
- MfrRg+/+iMEiggVznDmx+/OtE8lhy2TOHKn7qtUIHiOhJv8IUih48X10Op8x24Ej3b/DsX8bI
- QBuPbLJouemxfu+k8KF+axBLVBLM94h1Wx4J/+oyGNEEaw8PH8=
-Received-SPF: none client-ip=212.227.17.10; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:X/l3DcRT6NkdkhFVJkDH4nbqGSKnR9/cmQH8DBKFJ+Me5ePL+pH
+ NwZdTI6vLovheE3bZX8q57Iq8D6eo3RUldaX8uCMqSJ5tJRAqM2D8DfwGrIkbydPYNU4ZiC
+ 1n1UHeXVFFwdHlPy6yM9gkjZyvsCRo4fYDhwj+YCeK0ZladDyKtbmZLY087pmyLg2ssE0xk
+ FPjh/fjP6v1yNVGRGX17A==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:i/OsCTeAEFg=:cyhj5cOzBQdyWEOm652UeD
+ y7LNQoNvBe0cJI7ubaYE+EDt44H/numRM8aL06IvjzJ/6XJTgkinSWyAEyPTOUPsAc5Wlgo1F
+ vFzYQlyM+BaPnvZbW7+///jdD9yODa8Jqkxqngj1jQZtugwqHIM/iZe9n4bKx2I3Ko1isBP9T
+ raVY7IBEy08OXFwJ/br12tbFpy7sbTZylI8QOsvLIU3yffwJM+bjAYu0UhE0WwvsdkeXt4UIv
+ GiMopwALyDn/UXKB8V/d7OwuqB/tjNXC/2TK+gAu05Tn6EqYyu77Ihh5CpD5VgSIkISDAYByd
+ cBKBcbGg22FkTOFv/lk1U53phNXoSjRmuWWacaJjdnJY8C63aEfKkkG+z/UM7DJQACv+BZZIS
+ zGcuaaXJt76Od4WLza+VTTQb12YeP6TNLr/UbDUAHlIHW8QjJqDulAaOKzDvCa0WMJex+wFuJ
+ mA9PsRzaja1FvY3SEEewoNfn0Nq1AOIauWVG9t6N200AYDl3RZGU00erPrdMie7Cy4aUQ8YiB
+ XTcfuCSngNyPeRsyVMzUAyI+EnBlYxw0TL3AmmSL5lCerP3HT4+yFA4TxNYBcVeHrK5+C+X87
+ 9kJCnG9DSEcegDcOu+HKUDajVW5rp2meRNmq7+X1vJ691GxuLFOAiJ9D4K11DQHlYTqGkzScq
+ qiS1Aocqn+b1ynFBNUEESMq4G/BQxYHAU6bhpmZvDnTWSWDL2hIdVdYP+XFuPR+dc7NUWXRHE
+ wKqF7YM6H8nPiskepkNvVOCG/tmekNUt6JpbyTNNWIvls0/5ApS10bx2w4HMzpt1boKF2acm9
+ YMnQOAiGfSAkTy2gxQhuXbSr+s2lVqQa+2H7IgrZYjauuweQcA=
+Received-SPF: none client-ip=212.227.17.24; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/19 09:00:34
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/19 09:01:19
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -28
 X-Spam_score: -2.9
 X-Spam_bar: --
 X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001, SPF_NONE=0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -136,51 +135,37 @@ Sender: "Qemu-devel"
 Le 19/06/2020 à 14:33, Filip Bozuta a écrit :
 > From: Filip Bozuta <Filip.Bozuta@syrmia.com>
 > 
-> This patch implements strace argument printing functionality for following syscalls:
-> 
->     *getxattr, lgetxattr, fgetxattr - retrieve an extended attribute value
-> 
->         ssize_t getxattr(const char *path, const char *name, void *value, size_t size)
->         ssize_t lgetxattr(const char *path, const char *name, void *value, size_t size)
->         ssize_t fgetxattr(int fd, const char *name, void *value, size_t size)
->         man page: https://www.man7.org/linux/man-pages/man2/getxattr.2.html
-> 
->     *listxattr, llistxattr, flistxattr - list extended attribute names
-> 
->         ssize_t listxattr(const char *path, char *list, size_t size)
->         ssize_t llistxattr(const char *path, char *list, size_t size)
->         ssize_t flistxattr(int fd, char *list, size_t size)
->         man page: https://www.man7.org/linux/man-pages/man2/listxattr.2.html
-> 
->     *removexattr, lremovexattr, fremovexattr - remove an extended attribute
-> 
->          int removexattr(const char *path, const char *name)
->          int lremovexattr(const char *path, const char *name)
->          int fremovexattr(int fd, const char *name)
->          man page: https://www.man7.org/linux/man-pages/man2/removexattr.2.html
+>     Structure "struct syscallname" in file "strace.c" is used for "-strace"
+>     to print arguments and return values of syscalls. The last field of
+>     this structure "result" represents the calling function that prints the
+>     return values. This field was extended in this patch so that this function
+>     takes all syscalls arguments beside the return value. In this way, it enables
+>     "-strace" to print arguments of syscalls that have changed after the syscall
+>     execution. This extension will be useful as there are many syscalls that
+>     return values inside their arguments (i.e. listxattr() that returns the list
+>     of extended attributes inside the "list" argument).
 > 
 > Implementation notes:
 > 
->     All of the syscalls have strings as argument types and thus a separate
->     printing function was stated in file "strace.list" for every one of them.
->     All of these printing functions were defined in "strace.c" using existing
->     printing functions for appropriate argument types:
->        "print_string()" - for (const char*) type
->        "print_pointer()" - for (char*) and (void *) type
->        "print_raw_param()" for (int) and (size_t) type
->     Syscalls "getxattr()" and "lgetxattr()" have the same number and type of
->     arguments and thus their print functions ("print_getxattr", "print_lgetxattr")
->     share a same definition. The same statement applies to syscalls "listxattr()"
->     and "llistxattr()".
->     Function "print_syscall_ret_listxattr()" was added to print the returned list
->     of extended attributes for syscalls "print_listxattr(), print_llistxattr() and
->     print_flistxattr()".
+>     Since there are already three existing "print_syscall_ret*" functions inside
+>     "strace.c" ("print_syscall_ret_addr()", "print_syscall_ret_adjtimex()",
+>     "print_syscall_ret_newselect()"), they were changed to have all syscall arguments
+>     beside the return value. This was done so that these functions don't cause build
+>     errors (even though syscall arguments are not used in these functions).
+>     There is code repetition in these functions for checking the return value
+>     and printing the approppriate error message (this code is also located in
+>     print_syscall_ret() at the end of "strace.c"). That is the reason why a
+>     function "syscall_print_err()" was added for this code and put inside these
+>     functions. Functions "print_newselect()" and "print_syscall_ret_newselect()"
+>     were changed to use this new implemented functionality and not store the syscall
+>     argument values in separate static variables.
 > 
 > Signed-off-by: Filip Bozuta <Filip.Bozuta@syrmia.com>
 > ---
->  linux-user/strace.c    | 121 +++++++++++++++++++++++++++++++++++++++++
->  linux-user/strace.list |  21 ++++---
->  2 files changed, 133 insertions(+), 9 deletions(-)
+>  linux-user/qemu.h    |   4 +-
+>  linux-user/strace.c  | 110 ++++++++++++++++++++++---------------------
+>  linux-user/syscall.c |   2 +-
+>  3 files changed, 61 insertions(+), 55 deletions(-)
 > 
 
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
