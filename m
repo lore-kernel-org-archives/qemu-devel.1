@@ -2,99 +2,92 @@ Return-Path: <SRS0=Yszf=AA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7DD1C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 22:37:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31FF5C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 22:41:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9FC98222C3
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 22:37:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EE806222D5
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 22:41:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Vx9Rkoyj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9FC98222C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HCTC6C+0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE806222D5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36482 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38636 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmPdT-00073h-Um
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 18:37:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47626)
+	id 1jmPhg-0000ve-9b
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 18:41:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48086)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jmPcs-0006L9-Qz
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 18:36:46 -0400
-Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:53427)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jmPcq-0000hp-Uh
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 18:36:46 -0400
-Received: by mail-pj1-x1043.google.com with SMTP id i12so4676446pju.3
- for <qemu-devel@nongnu.org>; Fri, 19 Jun 2020 15:36:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:references:from:message-id:date:user-agent:mime-version
- :in-reply-to:content-language:content-transfer-encoding;
- bh=hLVqqCghvfYDRZyz8EhKaK9PowVzIvkh+wHhcQzhoN4=;
- b=Vx9RkoyjkNsgy8/IldfA047BkVum74atk5KM6+rh69Ot+bbG/sKsNbGC318hcR2IVu
- VyApcSksBWyO3WkDyyehDpsOXL8FtrHXYTeNUZjzUaKSiNROMv5pDMBDI9QRJqBlkYDU
- y+MgUfpmDF2VxU08j+QliJ4dnFpoWWtnJul4HKBBh/3O3jieaNyvGFFt1nf9UaMVpvf7
- AzbMZk3HQjojbAthj41ZfwX6RzwuH7p8iwiWkJqrIsAD8PtvOq6pl/LQZ/Z/UW+yZFLF
- A+exLw544TWq2Xdj443w1j9FbpfLp4MKZY+YuAhocCPKMh2cQVBqX3TNhwr1B932x5T3
- 1KUQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=hLVqqCghvfYDRZyz8EhKaK9PowVzIvkh+wHhcQzhoN4=;
- b=mueJ/2adi0gn4wvhtFKZFpQoCtnrhoxdLhDWO4DPyIhA4T0cXIY+jFe2jkyabVDyAj
- IoaBfqy5QMV4JoQzdZQhgZMZbdZ8flZ86wPee0aAlLbizsKUf/KHWY/n/+EE0/KsMVrh
- jmyRtAJO+En2ImuSNByGcSc0mrYxa4I1rzfH/2K32qeCl2GI7tzYYFpMPO326567g2wE
- 7aU4QEtqigvkb25Sf4OYFdc8OqJ8NpqYdNPlybwXclo9vsi32hGMOvPv/Yi+T5/sdKpJ
- i0A8c9hTbHdjFEuQwqirYkb7WCAIkO438bMrgwN9T/zlwpBjCiCoYa2C9SWMCVfgX05L
- avxA==
-X-Gm-Message-State: AOAM532iijI84fc3X0/45hR1k9l4w63sb9hM7pTYpb3a299NOoe3M2bT
- 6SQ1XTe7yrY+3ELt2kLs567cUrfrikI=
-X-Google-Smtp-Source: ABdhPJxrni23f3NIBJBOn/TYlzu3RO2tp0wQr8TOLFlgSnMGDKz6WZQg7M6b/5gSYD5iM7tBbl3Cig==
-X-Received: by 2002:a17:90a:d0c1:: with SMTP id
- y1mr5542811pjw.164.1592606203022; 
- Fri, 19 Jun 2020 15:36:43 -0700 (PDT)
-Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id x20sm5953687pjr.44.2020.06.19.15.36.41
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 19 Jun 2020 15:36:42 -0700 (PDT)
-Subject: Re: [PATCH 01/21] target/arm: Convert Neon 2-reg-misc VREV64 to
- decodetree
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org
-References: <20200616170844.13318-1-peter.maydell@linaro.org>
- <20200616170844.13318-2-peter.maydell@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <893f9cc5-b20d-04c6-a720-fdf89b72e851@linaro.org>
-Date: Fri, 19 Jun 2020 15:36:40 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1jmPh7-0000WX-5p
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 18:41:09 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:21492
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1jmPh4-0001Gm-JY
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 18:41:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592606464;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=UMsOgxP9lGGOhQCGlKHx/69wCyoXIvsdOFNr+Mexqs0=;
+ b=HCTC6C+0eLRT7w3E7L3PbwmtbPDv1REM8uAmQVfPfexpiKJh6M1UuSYBiDVsZhF28C5/Vl
+ nadOghy1USjlrAkZ4xgXT2VhXo2MOMMBAGacx0UB7/S+zCfsltVQvEAdBPjZ7Y3yn2msbN
+ GeDr6dgZ4Dzn2xc7rRZqLW+SyWzcT64=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-371-FATCeYgYPKi-9wPQ7Ay1mA-1; Fri, 19 Jun 2020 18:41:01 -0400
+X-MC-Unique: FATCeYgYPKi-9wPQ7Ay1mA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A86B0107ACCA;
+ Fri, 19 Jun 2020 22:40:57 +0000 (UTC)
+Received: from w520.home (ovpn-112-195.phx2.redhat.com [10.3.112.195])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C625A1001E91;
+ Fri, 19 Jun 2020 22:40:46 +0000 (UTC)
+Date: Fri, 19 Jun 2020 16:40:46 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Subject: Re: [PATCH v5 0/4] introduction of migration_version attribute for
+ VFIO live migration
+Message-ID: <20200619164046.2bdc2f67@w520.home>
+In-Reply-To: <20200610003731.GA13961@joy-OptiPlex-7040>
+References: <20200429094844.GE2834@work-vm>
+ <20200430003949.GN12879@joy-OptiPlex-7040>
+ <20200602165527.34137955@x1.home>
+ <20200603031948.GB12300@joy-OptiPlex-7040>
+ <20200602215528.7a1008f0@x1.home>
+ <20200603052443.GC12300@joy-OptiPlex-7040>
+ <20200603102628.017e2896@x1.home> <20200605102224.GB2936@work-vm>
+ <20200605083149.1809e783@x1.home> <20200605143950.GG2897@work-vm>
+ <20200610003731.GA13961@joy-OptiPlex-7040>
 MIME-Version: 1.0
-In-Reply-To: <20200616170844.13318-2-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1043;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1043.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Received-SPF: pass client-ip=207.211.31.120;
+ envelope-from=alex.williamson@redhat.com; helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/19 18:41:04
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,22 +100,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Cornelia Huck <cohuck@redhat.com>, "cjia@nvidia.com" <cjia@nvidia.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+ "libvir-list@redhat.com" <libvir-list@redhat.com>,
+ "Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>,
+ "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+ "eauger@redhat.com" <eauger@redhat.com>, "Liu, Yi
+ L" <yi.l.liu@intel.com>, "corbet@lwn.net" <corbet@lwn.net>, "Yang,
+ Ziye" <ziye.yang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+ "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
+ "felipe@nutanix.com" <felipe@nutanix.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
+ "Tian, Kevin" <kevin.tian@intel.com>, "Zeng, Xin" <xin.zeng@intel.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
+ "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
+ "intel-gvt-dev@lists.freedesktop.org" <intel-gvt-dev@lists.freedesktop.org>,
+ "Liu, Changpeng" <changpeng.liu@intel.com>,
+ "berrange@redhat.com" <berrange@redhat.com>,
+ "eskultet@redhat.com" <eskultet@redhat.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Wang,
+ Zhi A" <zhi.a.wang@intel.com>, "dinechin@redhat.com" <dinechin@redhat.com>,
+ "He, Shaopeng" <shaopeng.he@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/16/20 10:08 AM, Peter Maydell wrote:
-> Convert the Neon VREV64 insn from the 2-reg-misc grouping to decodetree.
+On Tue, 9 Jun 2020 20:37:31 -0400
+Yan Zhao <yan.y.zhao@intel.com> wrote:
+
+> On Fri, Jun 05, 2020 at 03:39:50PM +0100, Dr. David Alan Gilbert wrote:
+> > > > > I tried to simplify the problem a bit, but we keep going backwards.  If
+> > > > > the requirement is that potentially any source device can migrate to any
+> > > > > target device and we cannot provide any means other than writing an
+> > > > > opaque source string into a version attribute on the target and
+> > > > > evaluating the result to determine compatibility, then we're requiring
+> > > > > userspace to do an exhaustive search to find a potential match.  That
+> > > > > sucks.     
+> > > >  
+> hi Alex and Dave,
+> do you think it's good for us to put aside physical devices and mdev aggregation
+> for the moment, and use Alex's original idea that
 > 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  target/arm/neon-dp.decode       | 12 ++++++++
->  target/arm/translate-neon.inc.c | 50 +++++++++++++++++++++++++++++++++
->  target/arm/translate.c          | 24 ++--------------
->  3 files changed, 64 insertions(+), 22 deletions(-)
+> +  Userspace should regard two mdev devices compatible when ALL of below
+> +  conditions are met:
+> +  (0) The mdev devices are of the same type
+> +  (1) success when reading from migration_version attribute of one mdev device.
+> +  (2) success when writing migration_version string of one mdev device to
+> +  migration_version attribute of the other mdev device.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+I think Pandora's box is already opened, if we can't articulate how
+this solution would evolve to support features that we know are coming,
+why should we proceed with this approach?  We've already seen interest
+in breaking rule (0) in this thread, so we can't focus the solution on
+mdev devices.
 
+Maybe the best we can do is to compare one instance of a device to
+another instance of a device, without any capability to predict
+compatibility prior to creating devices, in the case on mdev.  The
+string would need to include not only the device and vendor driver
+compatibility, but also anything that has modified the state of the
+device, such as creation time or post-creation time configuration.  The
+user is left on their own for creating a compatible device, or
+filtering devices to determine which might be, or which might generate,
+compatible devices.  It's not much of a solution, I wonder if anyone
+would even use it.
 
-r~
+> and what about adding another sysfs attribute for vendors to put
+> recommended migration compatible device type. e.g.
+> #cat /sys/bus/pci/devices/0000:00:02.0/mdev_supported_types/i915-GVTg_V5_8/migration_compatible_devices
+> parent id: 8086 591d
+> mdev_type: i915-GVTg_V5_8
+> 
+> vendors are free to define the format and conent of this migration_compatible_devices
+> and it's even not to be a full list.
+> 
+> before libvirt or user to do live migration, they have to read and test
+> migration_version attributes of src/target devices to check migration compatibility.
+
+AFAICT, free-form, vendor defined attributes are useless to libvirt.
+Vendors could already put this information in the description attribute
+and have it ignored by userspace tools due to the lack of defined
+format.  It's also not clear what value this provides when it's
+necessarily incomplete, a driver written today cannot know what future
+drivers might be compatible with its migration data.  Thanks,
+
+Alex
+
 
