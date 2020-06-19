@@ -2,85 +2,94 @@ Return-Path: <SRS0=Yszf=AA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6666AC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 17:22:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03D84C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 17:23:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2FDEA208D5
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 17:22:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C0B14208D5
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 17:23:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eiYrxtPX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FDEA208D5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="J+s8JWS4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0B14208D5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37300 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39096 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmKiw-0001Ck-AR
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 13:22:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32966)
+	id 1jmKjE-00024M-1X
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 13:23:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58336)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jmKel-00011e-1I
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 13:18:23 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:51507
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jmKej-0006H7-0o
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 13:18:22 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592587100;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=39LY6zwHpBop9k1GBKeTNcptDY6I2N59MV1dShpsMwA=;
- b=eiYrxtPX51b3SWVWdFjIuecYKSxsFqvKM8GTJkZFxpRzTh4W1bRpvPTtgNOGHA4F4HOJ5N
- BcUWcLgYUnLBmtMhpqxlF9zNIDIzPLSdf5GhCGiDjIM5QgxgwYCBfSCydOYdG9XwTrlZ/3
- KLiF6/YBOM8ioG2KzU+AeLeny5ZcsYs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-199-izLRoqZ9NcSO5RlkEZwoww-1; Fri, 19 Jun 2020 13:18:18 -0400
-X-MC-Unique: izLRoqZ9NcSO5RlkEZwoww-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 72C0D107ACCA
- for <qemu-devel@nongnu.org>; Fri, 19 Jun 2020 17:18:17 +0000 (UTC)
-Received: from dgilbert-t580.localhost (ovpn-114-215.ams2.redhat.com
- [10.36.114.215])
- by smtp.corp.redhat.com (Postfix) with ESMTP id EB91119D7B;
- Fri, 19 Jun 2020 17:18:10 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-To: qemu-devel@nongnu.org, virtio-fs@redhat.com, stefanha@redhat.com,
- vgoyal@redhat.com
-Subject: [PATCH] virtiofsd: Allow capability restriction to be turned off
-Date: Fri, 19 Jun 2020 18:18:09 +0100
-Message-Id: <20200619171809.30984-1-dgilbert@redhat.com>
+ (Exim 4.90_1)
+ (envelope-from <prvs=4324eb4de=alistair.francis@wdc.com>)
+ id 1jmKUQ-0000sx-74
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 13:07:42 -0400
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:24431)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1)
+ (envelope-from <prvs=4324eb4de=alistair.francis@wdc.com>)
+ id 1jmKUM-0004Pk-UO
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 13:07:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+ t=1592586467; x=1624122467;
+ h=from:to:cc:subject:date:message-id:in-reply-to:
+ references:mime-version:content-transfer-encoding;
+ bh=OkbSeEt8d4QhxTt7wrMb8feZC4BTffnkVC2ibOszsG4=;
+ b=J+s8JWS4X9ovmbQqQgqOt4952dwCZglA4p/zL3+NJ2KtAFe0+Ok1p/Wx
+ m0ybNmMMJkwOAe+qjM+8n+o5zNQT+t/m8nFOqFI8Z+rTkIY2T2zRj/dt2
+ EgWpMw+DBSnyHctxsvCUB8YM80ExMuZpQUaq1zIzaa2SofFuFa0W+sdTT
+ dhZhcTZIO4FySks0YEnIiP5KgMjcMx5Tzy8ZzW7FqkZQTZJCahaG9jjki
+ UUFsyeR+Ngd5OopMiMfUmLScqOY3dEuFozxGLSu6sABfVj3bpJmzfvGeU
+ UJA90F9CYjdi9/E1MY0ONYmwZc7w5N2HTeAWLwBrM4VfaWyvR6IGMGWn5 Q==;
+IronPort-SDR: yDtaU66bVJydsFjeXjrRSk+/exb17VdFvxQmr3YItG7TCLMH7aqQj/kIcRXzBcMbxHg+Tdop19
+ Szauclo6u1mRKwE2cqKJALhpCatXfulljzCviz/3Q2xSNnv026EVrVxk5Nki3ZID+QltTRsxxQ
+ SH1WL9zRSujvyF9Kmqbw2BfKI7nNlaY7XBTKASslFTMg0MyPl3WEpnqlyqhKQYTs78V04qiJkS
+ cmCL428QPuQpIrnQUui0wSBSBaZWrzpIkgt1sC9efc6WiIDDvlsP3VIEq+NqiQR9tpoaRj9xlB
+ aa4=
+X-IronPort-AV: E=Sophos;i="5.75,256,1589212800"; d="scan'208";a="243417009"
+Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com)
+ ([199.255.45.15])
+ by ob1.hgst.iphmx.com with ESMTP; 20 Jun 2020 01:07:28 +0800
+IronPort-SDR: PSZPz3K7H8uALh8i2rQHDTI1/rYaBj0ct9PpRmS96RxFLNs9Nz+dQkemdJ1n9gXx3P3PHcDU6i
+ zbqxYBw9ys5LmtQLOl2Dgdq5U9oQuutgI=
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+ by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 19 Jun 2020 09:56:04 -0700
+IronPort-SDR: 7wKwWrh92ZdJ4OOW8T2ycI/DnDvHP0SUWZy70E31VIeO6qxTWG556g5vIBAC6H0gewXgROZKdb
+ 5wTXhgFxx+GQ==
+WDCIronportException: Internal
+Received: from unknown (HELO risc6-mainframe.hgst.com) ([10.86.58.142])
+ by uls-op-cesaip02.wdc.com with ESMTP; 19 Jun 2020 10:07:27 -0700
+From: Alistair Francis <alistair.francis@wdc.com>
+To: peter.maydell@linaro.org,
+	qemu-devel@nongnu.org
+Subject: [PULL v2 23/32] hw/riscv: sifive_u: Hook a GPIO controller
+Date: Fri, 19 Jun 2020 09:58:08 -0700
+Message-Id: <20200619165817.4144200-24-alistair.francis@wdc.com>
+X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20200619165817.4144200-1-alistair.francis@wdc.com>
+References: <20200619165817.4144200-1-alistair.francis@wdc.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/19 01:50:04
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=68.232.143.124;
+ envelope-from=prvs=4324eb4de=alistair.francis@wdc.com;
+ helo=esa2.hgst.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/19 13:07:24
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -43
+X-Spam_score: -4.4
+X-Spam_bar: ----
+X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,100 +102,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: alistair23@gmail.com, Bin Meng <bin.meng@windriver.com>,
+ Alistair Francis <alistair.francis@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+From: Bin Meng <bin.meng@windriver.com>
 
-Commit a59feb483b8fae24d043 dropped most capabilities at startup,
-since in most cases virtiofsd doesn't need them.  Unfortunately we found
-a case that needs CAP_SYS_ADMIN - setting trusted extended attributes.
-It's rare to need it, and the clean fix for it is going to be more
-complicated, but as a way for existing users to continue, allow the
-capability restriction to be turned off by adding
+SiFive FU540 SoC integrates a GPIO controller with 16 GPIO lines.
+This hooks the exsiting SiFive GPIO model to the SoC, and adds its
+device tree data as well.
 
-  -o no_restrictcaps
-
-We still drop the capabilities by default since this seems much safer;
-even if we don't have an explicit problem to fix.
-
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Bin Meng <bin.meng@windriver.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Message-id: 1591625864-31494-8-git-send-email-bmeng.cn@gmail.com
+Message-Id: <1591625864-31494-8-git-send-email-bmeng.cn@gmail.com>
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- docs/tools/virtiofsd.rst         | 3 +++
- tools/virtiofsd/helper.c         | 3 +++
- tools/virtiofsd/passthrough_ll.c | 8 +++++++-
- 3 files changed, 13 insertions(+), 1 deletion(-)
+ include/hw/riscv/sifive_u.h | 19 ++++++++++++++++
+ hw/riscv/sifive_u.c         | 43 +++++++++++++++++++++++++++++++++++--
+ 2 files changed, 60 insertions(+), 2 deletions(-)
 
-diff --git a/docs/tools/virtiofsd.rst b/docs/tools/virtiofsd.rst
-index 378594c422..8819d7d19e 100644
---- a/docs/tools/virtiofsd.rst
-+++ b/docs/tools/virtiofsd.rst
-@@ -81,6 +81,9 @@ Options
-     Enable/disable extended attributes (xattr) on files and directories.  The
-     default is ``no_xattr``.
+diff --git a/include/hw/riscv/sifive_u.h b/include/hw/riscv/sifive_u.h
+index 5f62cf5f85..b1399a90a6 100644
+--- a/include/hw/riscv/sifive_u.h
++++ b/include/hw/riscv/sifive_u.h
+@@ -22,6 +22,7 @@
+ #include "hw/net/cadence_gem.h"
+ #include "hw/riscv/riscv_hart.h"
+ #include "hw/riscv/sifive_cpu.h"
++#include "hw/riscv/sifive_gpio.h"
+ #include "hw/riscv/sifive_u_prci.h"
+ #include "hw/riscv/sifive_u_otp.h"
  
-+  * restrictcaps|no_restrictcaps\n"
-+    Restrict capabilities at startup.  The default is ``restrictcaps``.
+@@ -40,6 +41,7 @@ typedef struct SiFiveUSoCState {
+     RISCVHartArrayState u_cpus;
+     DeviceState *plic;
+     SiFiveUPRCIState prci;
++    SIFIVEGPIOState gpio;
+     SiFiveUOTPState otp;
+     CadenceGEMState gem;
+ 
+@@ -73,6 +75,7 @@ enum {
+     SIFIVE_U_PRCI,
+     SIFIVE_U_UART0,
+     SIFIVE_U_UART1,
++    SIFIVE_U_GPIO,
+     SIFIVE_U_OTP,
+     SIFIVE_U_FLASH0,
+     SIFIVE_U_DRAM,
+@@ -83,6 +86,22 @@ enum {
+ enum {
+     SIFIVE_U_UART0_IRQ = 4,
+     SIFIVE_U_UART1_IRQ = 5,
++    SIFIVE_U_GPIO_IRQ0 = 7,
++    SIFIVE_U_GPIO_IRQ1 = 8,
++    SIFIVE_U_GPIO_IRQ2 = 9,
++    SIFIVE_U_GPIO_IRQ3 = 10,
++    SIFIVE_U_GPIO_IRQ4 = 11,
++    SIFIVE_U_GPIO_IRQ5 = 12,
++    SIFIVE_U_GPIO_IRQ6 = 13,
++    SIFIVE_U_GPIO_IRQ7 = 14,
++    SIFIVE_U_GPIO_IRQ8 = 15,
++    SIFIVE_U_GPIO_IRQ9 = 16,
++    SIFIVE_U_GPIO_IRQ10 = 17,
++    SIFIVE_U_GPIO_IRQ11 = 18,
++    SIFIVE_U_GPIO_IRQ12 = 19,
++    SIFIVE_U_GPIO_IRQ13 = 20,
++    SIFIVE_U_GPIO_IRQ14 = 21,
++    SIFIVE_U_GPIO_IRQ15 = 22,
+     SIFIVE_U_GEM_IRQ = 0x35
+ };
+ 
+diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+index a6dfce4273..f6976a0d09 100644
+--- a/hw/riscv/sifive_u.c
++++ b/hw/riscv/sifive_u.c
+@@ -11,8 +11,9 @@
+  * 1) CLINT (Core Level Interruptor)
+  * 2) PLIC (Platform Level Interrupt Controller)
+  * 3) PRCI (Power, Reset, Clock, Interrupt)
+- * 4) OTP (One-Time Programmable) memory with stored serial number
+- * 5) GEM (Gigabit Ethernet Controller) and management block
++ * 4) GPIO (General Purpose Input/Output Controller)
++ * 5) OTP (One-Time Programmable) memory with stored serial number
++ * 6) GEM (Gigabit Ethernet Controller) and management block
+  *
+  * This board currently generates devicetree dynamically that indicates at least
+  * two harts and up to five harts.
+@@ -75,6 +76,7 @@ static const struct MemmapEntry {
+     [SIFIVE_U_PRCI] =     { 0x10000000,     0x1000 },
+     [SIFIVE_U_UART0] =    { 0x10010000,     0x1000 },
+     [SIFIVE_U_UART1] =    { 0x10011000,     0x1000 },
++    [SIFIVE_U_GPIO] =     { 0x10060000,     0x1000 },
+     [SIFIVE_U_OTP] =      { 0x10070000,     0x1000 },
+     [SIFIVE_U_FLASH0] =   { 0x20000000, 0x10000000 },
+     [SIFIVE_U_DRAM] =     { 0x80000000,        0x0 },
+@@ -268,6 +270,28 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
+     g_free(cells);
+     g_free(nodename);
+ 
++    nodename = g_strdup_printf("/soc/gpio@%lx",
++        (long)memmap[SIFIVE_U_GPIO].base);
++    qemu_fdt_add_subnode(fdt, nodename);
++    qemu_fdt_setprop_cells(fdt, nodename, "clocks",
++        prci_phandle, PRCI_CLK_TLCLK);
++    qemu_fdt_setprop_cell(fdt, nodename, "#interrupt-cells", 2);
++    qemu_fdt_setprop(fdt, nodename, "interrupt-controller", NULL, 0);
++    qemu_fdt_setprop_cell(fdt, nodename, "#gpio-cells", 2);
++    qemu_fdt_setprop(fdt, nodename, "gpio-controller", NULL, 0);
++    qemu_fdt_setprop_cells(fdt, nodename, "reg",
++        0x0, memmap[SIFIVE_U_GPIO].base,
++        0x0, memmap[SIFIVE_U_GPIO].size);
++    qemu_fdt_setprop_cells(fdt, nodename, "interrupts", SIFIVE_U_GPIO_IRQ0,
++        SIFIVE_U_GPIO_IRQ1, SIFIVE_U_GPIO_IRQ2, SIFIVE_U_GPIO_IRQ3,
++        SIFIVE_U_GPIO_IRQ4, SIFIVE_U_GPIO_IRQ5, SIFIVE_U_GPIO_IRQ6,
++        SIFIVE_U_GPIO_IRQ7, SIFIVE_U_GPIO_IRQ8, SIFIVE_U_GPIO_IRQ9,
++        SIFIVE_U_GPIO_IRQ10, SIFIVE_U_GPIO_IRQ11, SIFIVE_U_GPIO_IRQ12,
++        SIFIVE_U_GPIO_IRQ13, SIFIVE_U_GPIO_IRQ14, SIFIVE_U_GPIO_IRQ15);
++    qemu_fdt_setprop_cell(fdt, nodename, "interrupt-parent", plic_phandle);
++    qemu_fdt_setprop_string(fdt, nodename, "compatible", "sifive,gpio0");
++    g_free(nodename);
 +
- .. option:: --socket-path=PATH
- 
-   Listen on vhost-user UNIX domain socket at PATH.
-diff --git a/tools/virtiofsd/helper.c b/tools/virtiofsd/helper.c
-index 00a1ef666a..51ed9fbed0 100644
---- a/tools/virtiofsd/helper.c
-+++ b/tools/virtiofsd/helper.c
-@@ -174,6 +174,9 @@ void fuse_cmdline_help(void)
-            "                               default: no_writeback\n"
-            "    -o xattr|no_xattr          enable/disable xattr\n"
-            "                               default: no_xattr\n"
-+           "    -o restrictcaps|no_restrictcaps\n"
-+           "                               restrict capabilities at startup\n"
-+           "                               default: restrictcaps\n"
-            "    --rlimit-nofile=<num>      set maximum number of file descriptors\n"
-            "                               (0 leaves rlimit unchanged)\n"
-            "                               default: min(1000000, fs.file-max - 16384)\n"
-diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough_ll.c
-index 2ce7c96085..8dee657b19 100644
---- a/tools/virtiofsd/passthrough_ll.c
-+++ b/tools/virtiofsd/passthrough_ll.c
-@@ -144,6 +144,7 @@ struct lo_data {
-     int flock;
-     int posix_lock;
-     int xattr;
-+    int restrictcaps;
-     char *source;
-     double timeout;
-     int cache;
-@@ -170,6 +171,8 @@ static const struct fuse_opt lo_opts[] = {
-     { "no_posix_lock", offsetof(struct lo_data, posix_lock), 0 },
-     { "xattr", offsetof(struct lo_data, xattr), 1 },
-     { "no_xattr", offsetof(struct lo_data, xattr), 0 },
-+    { "restrictcaps", offsetof(struct lo_data, restrictcaps), 1 },
-+    { "no_restrictcaps", offsetof(struct lo_data, restrictcaps), 0 },
-     { "timeout=%lf", offsetof(struct lo_data, timeout), 0 },
-     { "timeout=", offsetof(struct lo_data, timeout_set), 1 },
-     { "cache=none", offsetof(struct lo_data, cache), CACHE_NONE },
-@@ -2615,7 +2618,9 @@ static void setup_sandbox(struct lo_data *lo, struct fuse_session *se,
-     setup_namespaces(lo, se);
-     setup_mounts(lo->source);
-     setup_seccomp(enable_syslog);
--    setup_capabilities();
-+    if (lo->restrictcaps) {
-+        setup_capabilities();
-+    }
+     phy_phandle = phandle++;
+     nodename = g_strdup_printf("/soc/ethernet@%lx",
+         (long)memmap[SIFIVE_U_GEM].base);
+@@ -515,6 +539,7 @@ static void sifive_u_soc_instance_init(Object *obj)
+     object_initialize_child(obj, "prci", &s->prci, TYPE_SIFIVE_U_PRCI);
+     object_initialize_child(obj, "otp", &s->otp, TYPE_SIFIVE_U_OTP);
+     object_initialize_child(obj, "gem", &s->gem, TYPE_CADENCE_GEM);
++    object_initialize_child(obj, "gpio", &s->gpio, TYPE_SIFIVE_GPIO);
  }
  
- /* Set the maximum number of open file descriptors */
-@@ -2764,6 +2769,7 @@ int main(int argc, char *argv[])
-         .writeback = 0,
-         .posix_lock = 1,
-         .proc_self_fd = -1,
-+        .restrictcaps = 1,
-     };
-     struct lo_map_elem *root_elem;
-     int ret = -1;
+ static void sifive_u_soc_realize(DeviceState *dev, Error **errp)
+@@ -600,6 +625,20 @@ static void sifive_u_soc_realize(DeviceState *dev, Error **errp)
+     sysbus_realize(SYS_BUS_DEVICE(&s->prci), &err);
+     sysbus_mmio_map(SYS_BUS_DEVICE(&s->prci), 0, memmap[SIFIVE_U_PRCI].base);
+ 
++    qdev_prop_set_uint32(DEVICE(&s->gpio), "ngpio", 16);
++    sysbus_realize(SYS_BUS_DEVICE(&s->gpio), &err);
++    sysbus_mmio_map(SYS_BUS_DEVICE(&s->gpio), 0, memmap[SIFIVE_U_GPIO].base);
++
++    /* Pass all GPIOs to the SOC layer so they are available to the board */
++    qdev_pass_gpios(DEVICE(&s->gpio), dev, NULL);
++
++    /* Connect GPIO interrupts to the PLIC */
++    for (i = 0; i < 16; i++) {
++        sysbus_connect_irq(SYS_BUS_DEVICE(&s->gpio), i,
++                           qdev_get_gpio_in(DEVICE(s->plic),
++                                            SIFIVE_U_GPIO_IRQ0 + i));
++    }
++
+     qdev_prop_set_uint32(DEVICE(&s->otp), "serial", s->serial);
+     sysbus_realize(SYS_BUS_DEVICE(&s->otp), &err);
+     sysbus_mmio_map(SYS_BUS_DEVICE(&s->otp), 0, memmap[SIFIVE_U_OTP].base);
 -- 
-2.26.2
+2.27.0
 
 
