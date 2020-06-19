@@ -2,82 +2,78 @@ Return-Path: <SRS0=Yszf=AA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89588C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 09:25:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C04AC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 09:27:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 51A65206F7
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 09:25:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 68A77206F7
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 09:27:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hlmyni37"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51A65206F7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="egPrmtoU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68A77206F7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40008 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45834 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmDH7-0006Gh-Ki
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 05:25:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38258)
+	id 1jmDIh-0000ev-Nt
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 05:27:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37526)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jmDDY-0007vG-ON
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 05:21:48 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:60711
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jmDBH-00034e-PU
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 05:19:27 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:32290
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jmDDW-0004Ha-Vz
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 05:21:48 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jmDBF-0003go-RZ
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 05:19:27 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592558506;
+ s=mimecast20190719; t=1592558365;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Y5+2ds8JLMOgBUqbhO1NAcCMafBHDLnfz6bxPBNBrLg=;
- b=Hlmyni37Vcgx6LJHuPbOhVx1odsby7kKY+9hOwEuMS97XymJDjJxU0bwuK+MjPwXjE12Xs
- zExdym7UM8cYaZ/lfGMXvDg7mdfOGLPGRYkwidi8KSe5lFUDHPcCNL4KQRcjHu13C+WPMC
- ynQcjn9mGpWUi2OWSYSobmakwHJzOPo=
+ bh=7jJRJzMVjc00f03VSOp0Q/Xhw2CEnNo4d7UxYrF29xE=;
+ b=egPrmtoUpF0XKumNSXdZ0GWSI7+DDUvQaIDfEMh0rI8CxpYnItrLRPyqtYEKKS7Glhac4f
+ 3fT3Rk6m0KnBJjs63A5emXEB3sHxl9/N3x0FHUB3CLbSzMp4MEvZTs6GWfsG0RCvHUweIs
+ Jb3tBwA7Bve+oBrcPbTMQ3cxf17aZvI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-244-jJnZv0F8PrKFxWrf6RVs4A-1; Fri, 19 Jun 2020 05:21:44 -0400
-X-MC-Unique: jJnZv0F8PrKFxWrf6RVs4A-1
+ us-mta-231-UsVz6E1oPu-hLHx8Hz87Rw-1; Fri, 19 Jun 2020 05:19:21 -0400
+X-MC-Unique: UsVz6E1oPu-hLHx8Hz87Rw-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DADDE872FE0
- for <qemu-devel@nongnu.org>; Fri, 19 Jun 2020 09:21:43 +0000 (UTC)
-Received: from [10.72.13.155] (ovpn-13-155.pek2.redhat.com [10.72.13.155])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 94C5819C4F;
- Fri, 19 Jun 2020 09:21:36 +0000 (UTC)
-Subject: Re: [PATCH v3] docs: vhost-user: add Virtio status protocol feature
-To: Maxime Coquelin <maxime.coquelin@redhat.com>, mst@redhat.com,
- lulu@redhat.com, amorenoz@redhat.com, qemu-devel@nongnu.org
-References: <20200618134501.145747-1-maxime.coquelin@redhat.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <0bfbabc8-37dc-e91a-3126-f87e853172ad@redhat.com>
-Date: Fri, 19 Jun 2020 17:21:34 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9FE0F10524FF;
+ Fri, 19 Jun 2020 09:19:20 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-112-67.ams2.redhat.com
+ [10.36.112.67])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2F3A719C4F;
+ Fri, 19 Jun 2020 09:19:14 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 313BA9D92; Fri, 19 Jun 2020 11:19:06 +0200 (CEST)
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v10 05/12] floppy: move cmos_get_fd_drive_type() from pc
+Date: Fri, 19 Jun 2020 11:18:58 +0200
+Message-Id: <20200619091905.21676-6-kraxel@redhat.com>
+In-Reply-To: <20200619091905.21676-1-kraxel@redhat.com>
+References: <20200619091905.21676-1-kraxel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200618134501.145747-1-maxime.coquelin@redhat.com>
-Content-Language: en-US
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=jasowang@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/19 05:19:18
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/19 01:50:04
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -98,81 +94,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Laurent Vivier <lvivier@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ John Snow <jsnow@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Acked-by: John Snow <jsnow@redhat.com>
+---
+ include/hw/block/fdc.h |  1 +
+ include/hw/i386/pc.h   |  1 -
+ hw/block/fdc.c         | 26 +++++++++++++++++++++++++-
+ hw/i386/pc.c           | 25 -------------------------
+ 4 files changed, 26 insertions(+), 27 deletions(-)
 
-On 2020/6/18 下午9:45, Maxime Coquelin wrote:
-> This patch specifies the VHOST_USER_SET_STATUS and
-> VHOST_USER_GET_STATUS requests, which are sent by
-> the master to update and query the Virtio status
-> in the backend.
->
-> Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
-> ---
-> Changes since v2:
-> =================
-> - Typo: fix missing # (Jason)
->
-> Changes since v1:
-> =================
-> - Only keep the spec part in this patch, the implementation will
->    be part of Cindy's Vhost vDPA series it depends on. The goal is
->    to be able to implement it in next DPDK release even if Qemu part
->    is not merged.
-> - Add GET_STATUS after discussions with Michael and Jason. It can
->    be used by the master to ensure FEATURES_OK bit set is
->    acknowledged by the backend.
->
->   docs/interop/vhost-user.rst | 24 ++++++++++++++++++++++++
->   1 file changed, 24 insertions(+)
->
-> diff --git a/docs/interop/vhost-user.rst b/docs/interop/vhost-user.rst
-> index 688b7c6900..10e3e3475e 100644
-> --- a/docs/interop/vhost-user.rst
-> +++ b/docs/interop/vhost-user.rst
-> @@ -816,6 +816,7 @@ Protocol features
->     #define VHOST_USER_PROTOCOL_F_RESET_DEVICE         13
->     #define VHOST_USER_PROTOCOL_F_INBAND_NOTIFICATIONS 14
->     #define VHOST_USER_PROTOCOL_F_CONFIGURE_MEM_SLOTS  15
-> +  #define VHOST_USER_PROTOCOL_F_STATUS               16
->   
->   Master message types
->   --------------------
-> @@ -1307,6 +1308,29 @@ Master message types
->     ``VHOST_USER_ADD_MEM_REG`` message, this message is used to set and
->     update the memory tables of the slave device.
->   
-> +``VHOST_USER_SET_STATUS``
-> +  :id: 39
-> +  :equivalent ioctl: VHOST_VDPA_SET_STATUS
-> +  :slave payload: N/A
-> +  :master payload: ``u64``
-> +
-> +  When the ``VHOST_USER_PROTOCOL_F_STATUS`` protocol feature has been
-> +  successfully negotiated, this message is submitted by the master to
-> +  notify the backend with updated device status as defined in the Virtio
-> +  specification.
-> +
-> +``VHOST_USER_GET_STATUS``
-> +  :id: 40
-> +  :equivalent ioctl: VHOST_VDPA_GET_STATUS
-> +  :slave payload: ``u64``
-> +  :master payload: N/A
-> +
-> +  When the ``VHOST_USER_PROTOCOL_F_STATUS`` protocol feature has been
-> +  successfully negotiated, this message is submitted by the master to
-> +  query the backend for its device status as defined in the Virtio
-> +  specification.
-> +
-> +
->   Slave message types
->   -------------------
->   
-
-
-Acked-by: Jason Wang <jasowang@redhat.com>
-
+diff --git a/include/hw/block/fdc.h b/include/hw/block/fdc.h
+index 5d71cf972268..479cebc0a330 100644
+--- a/include/hw/block/fdc.h
++++ b/include/hw/block/fdc.h
+@@ -16,5 +16,6 @@ void sun4m_fdctrl_init(qemu_irq irq, hwaddr io_base,
+                        DriveInfo **fds, qemu_irq *fdc_tc);
+ 
+ FloppyDriveType isa_fdc_get_drive_type(ISADevice *fdc, int i);
++int cmos_get_fd_drive_type(FloppyDriveType fd0);
+ 
+ #endif
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index 8d764f965cd3..5e3b19ab78fc 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -176,7 +176,6 @@ typedef void (*cpu_set_smm_t)(int smm, void *arg);
+ void pc_i8259_create(ISABus *isa_bus, qemu_irq *i8259_irqs);
+ 
+ ISADevice *pc_find_fdc0(void);
+-int cmos_get_fd_drive_type(FloppyDriveType fd0);
+ 
+ /* port92.c */
+ #define PORT92_A20_LINE "a20"
+diff --git a/hw/block/fdc.c b/hw/block/fdc.c
+index 5a634ab46302..ffe650b17cd5 100644
+--- a/hw/block/fdc.c
++++ b/hw/block/fdc.c
+@@ -32,7 +32,6 @@
+ #include "qapi/error.h"
+ #include "qemu/error-report.h"
+ #include "qemu/timer.h"
+-#include "hw/i386/pc.h"
+ #include "hw/acpi/aml-build.h"
+ #include "hw/irq.h"
+ #include "hw/isa/isa.h"
+@@ -2809,6 +2808,31 @@ static Aml *build_fdinfo_aml(int idx, FloppyDriveType type)
+     return dev;
+ }
+ 
++int cmos_get_fd_drive_type(FloppyDriveType fd0)
++{
++    int val;
++
++    switch (fd0) {
++    case FLOPPY_DRIVE_TYPE_144:
++        /* 1.44 Mb 3"5 drive */
++        val = 4;
++        break;
++    case FLOPPY_DRIVE_TYPE_288:
++        /* 2.88 Mb 3"5 drive */
++        val = 5;
++        break;
++    case FLOPPY_DRIVE_TYPE_120:
++        /* 1.2 Mb 5"5 drive */
++        val = 2;
++        break;
++    case FLOPPY_DRIVE_TYPE_NONE:
++    default:
++        val = 0;
++        break;
++    }
++    return val;
++}
++
+ static void fdc_isa_build_aml(ISADevice *isadev, Aml *scope)
+ {
+     Aml *dev;
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index ec39741c87ac..7e0ed987b164 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -386,31 +386,6 @@ static uint64_t ioportF0_read(void *opaque, hwaddr addr, unsigned size)
+ 
+ #define REG_EQUIPMENT_BYTE          0x14
+ 
+-int cmos_get_fd_drive_type(FloppyDriveType fd0)
+-{
+-    int val;
+-
+-    switch (fd0) {
+-    case FLOPPY_DRIVE_TYPE_144:
+-        /* 1.44 Mb 3"5 drive */
+-        val = 4;
+-        break;
+-    case FLOPPY_DRIVE_TYPE_288:
+-        /* 2.88 Mb 3"5 drive */
+-        val = 5;
+-        break;
+-    case FLOPPY_DRIVE_TYPE_120:
+-        /* 1.2 Mb 5"5 drive */
+-        val = 2;
+-        break;
+-    case FLOPPY_DRIVE_TYPE_NONE:
+-    default:
+-        val = 0;
+-        break;
+-    }
+-    return val;
+-}
+-
+ static void cmos_init_hd(ISADevice *s, int type_ofs, int info_ofs,
+                          int16_t cylinders, int8_t heads, int8_t sectors)
+ {
+-- 
+2.18.4
 
 
