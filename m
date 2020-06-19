@@ -2,74 +2,70 @@ Return-Path: <SRS0=Yszf=AA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89D95C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 15:01:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F86FC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 15:02:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 63C4A217BA
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 15:01:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63C4A217BA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 503BB2193E
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 15:02:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="C6DS+ar7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 503BB2193E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34784 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35268 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmIWg-0002Q0-JG
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 11:01:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48224)
+	id 1jmIWs-0002cA-H6
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 11:02:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48368)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jmIV4-00014Q-Ob
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 11:00:14 -0400
-Resent-Date: Fri, 19 Jun 2020 11:00:14 -0400
-Resent-Message-Id: <E1jmIV4-00014Q-Ob@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21719)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jmIV1-000567-LB
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 11:00:14 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1592578640; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=Ccj9OUZRoDpXYPV9+8GR1N3P/ErYg+XJ/flSteBTY2qGvD7YAAK2YeUGyZNINXkBZDJQWDWH/POhO0lu9YcVbkvS3a6u8NMqaSwyJawVEpIiNPySlREaS6s+1vH7RgBPAPsNCOJhzqtOJBN5UEPQfd4/QBo3dCnoFTJAs87l2gc=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1592578640;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=l/R6IOxGXGVxwIn5xJaxl1IqJlsOrI2OxttfjTQsFXM=; 
- b=MBzIzxxsmkJVNHnbCwlL6AabTR3cN3NWUK7XTGtEFPYzMMepFyT8/EAVKu3j6DGQT3uDGEC5lCZkN7ZP2YJv/wKVHO5bUmwpXq9004zWHCIYgr+IfxIurLKJSLODXHC5qu1xiGlMDsaRkYC6xzbnX66Nw67o3I4ihPcNfmcAZuI=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 15925785489525.102460055368397;
- Fri, 19 Jun 2020 07:55:48 -0700 (PDT)
-Message-ID: <159257854765.2784.16350997545735677944@d1fd068a5071>
-Subject: Re: [RFC PATCH] docs/devel: add some notes on tcg-icount for
- developers
-In-Reply-To: <20200619135844.23307-1-alex.bennee@linaro.org>
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1jmIVL-0001F2-12; Fri, 19 Jun 2020 11:00:31 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:36079)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1jmIVF-00058t-7P; Fri, 19 Jun 2020 11:00:30 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 49pMRh15XWz9sjF; Sat, 20 Jun 2020 01:00:15 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1592578816;
+ bh=i09Pzm3J+sHg0qnWmU6RuDXb6mWa9G7DYcrmVm6UoBs=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=C6DS+ar7jPslhN9O0WwbEn1ayt+r6wlNcnguyJVycjvA5RqxBcPyHXrPAmuv283x2
+ HMcCuAogsKUMm1OQef7TBRlAzqp1jMAX1H0enKcgbCEt9Nnq3gvhza6kiuJxSYeEV7
+ 8tRtC/a22PQL23JdgPLKG8qPZoppbekkiRRRz1vg=
+Date: Sat, 20 Jun 2020 00:45:41 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Subject: Re: [PATCH v3 9/9] host trust limitation: Alter virtio default
+ properties for protected guests
+Message-ID: <20200619144541.GM17085@umbus.fritz.box>
+References: <20200619020602.118306-1-david@gibson.dropbear.id.au>
+ <20200619020602.118306-10-david@gibson.dropbear.id.au>
+ <20200619101245.GC700896@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: alex.bennee@linaro.org
-Date: Fri, 19 Jun 2020 07:55:48 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/19 10:14:48
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="AQYPrgrEUc/1pSX1"
+Content-Disposition: inline
+In-Reply-To: <20200619101245.GC700896@redhat.com>
+Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
+ helo=ozlabs.org
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -9
+X-Spam_score: -1.0
 X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-1.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -82,50 +78,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, richard.henderson@linaro.org,
- qemu-devel@nongnu.org, dovgaluk@ispras.ru, pbonzini@redhat.com,
- alex.bennee@linaro.org
+Cc: pair@us.ibm.com, brijesh.singh@amd.com, frankja@linux.ibm.com,
+ kvm@vger.kernel.org, mst@redhat.com, cohuck@redhat.com, david@redhat.com,
+ qemu-devel@nongnu.org, dgilbert@redhat.com, pasic@linux.ibm.com,
+ qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, pbonzini@redhat.com,
+ Richard Henderson <rth@twiddle.net>, mdroth@linux.vnet.ibm.com,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDYxOTEzNTg0NC4yMzMw
-Ny0xLWFsZXguYmVubmVlQGxpbmFyby5vcmcvCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRo
-ZSBhc2FuIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNvbW1hbmRzIGFuZAp0
-aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxsZWQsIHlvdSBjYW4g
-cHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09
-CiMhL2Jpbi9iYXNoCmV4cG9ydCBBUkNIPXg4Nl82NAptYWtlIGRvY2tlci1pbWFnZS1mZWRvcmEg
-Vj0xIE5FVFdPUks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtZGVidWdAZmVkb3JhIFRBUkdFVF9M
-SVNUPXg4Nl82NC1zb2Z0bW11IEo9MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09
-CgogIENDICAgICAgdWkvdHJhY2UubwogIENDICAgICAgaHcvY29yZS90cmFjZS5vCgpXYXJuaW5n
-LCB0cmVhdGVkIGFzIGVycm9yOgovdG1wL3FlbXUtdGVzdC9zcmMvZG9jcy9kZXZlbC90Y2ctaWNv
-dW50LnJzdDpkb2N1bWVudCBpc24ndCBpbmNsdWRlZCBpbiBhbnkgdG9jdHJlZQogIENDICAgICAg
-aHcvZGlzcGxheS90cmFjZS5vCiAgQ0MgICAgICBxYXBpL3RyYWNlLm8KLS0tCiAgQ0MgICAgICBz
-dHVicy9ydW5zdGF0ZS1jaGVjay5vCiAgQ0MgICAgICBzdHVicy9zZW1paG9zdC5vCiAgQ0MgICAg
-ICBzdHVicy9zZXQtZmQtaGFuZGxlci5vCm1ha2U6ICoqKiBbTWFrZWZpbGU6MTA4ODogZG9jcy9k
-ZXZlbC9pbmRleC5odG1sXSBFcnJvciAyCm1ha2U6ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVk
-IGpvYnMuLi4uClRyYWNlYmFjayAobW9zdCByZWNlbnQgY2FsbCBsYXN0KToKICBGaWxlICIuL3Rl
-c3RzL2RvY2tlci9kb2NrZXIucHkiLCBsaW5lIDY2OSwgaW4gPG1vZHVsZT4KLS0tCiAgICByYWlz
-ZSBDYWxsZWRQcm9jZXNzRXJyb3IocmV0Y29kZSwgY21kKQpzdWJwcm9jZXNzLkNhbGxlZFByb2Nl
-c3NFcnJvcjogQ29tbWFuZCAnWydzdWRvJywgJy1uJywgJ2RvY2tlcicsICdydW4nLCAnLS1sYWJl
-bCcsICdjb20ucWVtdS5pbnN0YW5jZS51dWlkPTRiNzExNjQ1NmQ4NDQxMjY4ZDUyMmU4NDM0ODcy
-NjA0JywgJy11JywgJzEwMDMnLCAnLS1zZWN1cml0eS1vcHQnLCAnc2VjY29tcD11bmNvbmZpbmVk
-JywgJy0tcm0nLCAnLWUnLCAnVEFSR0VUX0xJU1Q9eDg2XzY0LXNvZnRtbXUnLCAnLWUnLCAnRVhU
-UkFfQ09ORklHVVJFX09QVFM9JywgJy1lJywgJ1Y9JywgJy1lJywgJ0o9MTQnLCAnLWUnLCAnREVC
-VUc9JywgJy1lJywgJ1NIT1dfRU5WPScsICctZScsICdDQ0FDSEVfRElSPS92YXIvdG1wL2NjYWNo
-ZScsICctdicsICcvaG9tZS9wYXRjaGV3Mi8uY2FjaGUvcWVtdS1kb2NrZXItY2NhY2hlOi92YXIv
-dG1wL2NjYWNoZTp6JywgJy12JywgJy92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC13Z3JpZjhn
-Yy9zcmMvZG9ja2VyLXNyYy4yMDIwLTA2LTE5LTEwLjUxLjM0Ljg1MTE6L3Zhci90bXAvcWVtdTp6
-LHJvJywgJ3FlbXU6ZmVkb3JhJywgJy92YXIvdG1wL3FlbXUvcnVuJywgJ3Rlc3QtZGVidWcnXScg
-cmV0dXJuZWQgbm9uLXplcm8gZXhpdCBzdGF0dXMgMi4KZmlsdGVyPS0tZmlsdGVyPWxhYmVsPWNv
-bS5xZW11Lmluc3RhbmNlLnV1aWQ9NGI3MTE2NDU2ZDg0NDEyNjhkNTIyZTg0MzQ4NzI2MDQKbWFr
-ZVsxXTogKioqIFtkb2NrZXItcnVuXSBFcnJvciAxCm1ha2VbMV06IExlYXZpbmcgZGlyZWN0b3J5
-IGAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtd2dyaWY4Z2Mvc3JjJwptYWtlOiAqKiogW2Rv
-Y2tlci1ydW4tdGVzdC1kZWJ1Z0BmZWRvcmFdIEVycm9yIDIKCnJlYWwgICAgNG0xNC41ODdzCnVz
-ZXIgICAgMG04LjExOHMKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRj
-aGV3Lm9yZy9sb2dzLzIwMjAwNjE5MTM1ODQ0LjIzMzA3LTEtYWxleC5iZW5uZWVAbGluYXJvLm9y
-Zy90ZXN0aW5nLmFzYW4vP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0
-aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91
-ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+
+--AQYPrgrEUc/1pSX1
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, Jun 19, 2020 at 11:12:45AM +0100, Daniel P. Berrang=E9 wrote:
+> On Fri, Jun 19, 2020 at 12:06:02PM +1000, David Gibson wrote:
+> > The default behaviour for virtio devices is not to use the platforms no=
+rmal
+> > DMA paths, but instead to use the fact that it's running in a hypervisor
+> > to directly access guest memory.  That doesn't work if the guest's memo=
+ry
+> > is protected from hypervisor access, such as with AMD's SEV or POWER's =
+PEF.
+> >=20
+> > So, if a host trust limitation mechanism is enabled, then apply the
+> > iommu_platform=3Don option so it will go through normal DMA mechanisms.
+> > Those will presumably have some way of marking memory as shared with the
+> > hypervisor or hardware so that DMA will work.
+> >=20
+> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> > ---
+> >  hw/core/machine.c | 11 +++++++++++
+> >  1 file changed, 11 insertions(+)
+> >=20
+> > diff --git a/hw/core/machine.c b/hw/core/machine.c
+> > index a71792bc16..8dfc1bb3f8 100644
+> > --- a/hw/core/machine.c
+> > +++ b/hw/core/machine.c
+> > @@ -28,6 +28,8 @@
+> >  #include "hw/mem/nvdimm.h"
+> >  #include "migration/vmstate.h"
+> >  #include "exec/host-trust-limitation.h"
+> > +#include "hw/virtio/virtio.h"
+> > +#include "hw/virtio/virtio-pci.h"
+> > =20
+> >  GlobalProperty hw_compat_5_0[] =3D {
+> >      { "virtio-balloon-device", "page-poison", "false" },
+> > @@ -1165,6 +1167,15 @@ void machine_run_board_init(MachineState *machin=
+e)
+> >           * areas.
+> >           */
+> >          machine_set_mem_merge(OBJECT(machine), false, &error_abort);
+> > +
+> > +        /*
+> > +         * Virtio devices can't count on directly accessing guest
+> > +         * memory, so they need iommu_platform=3Don to use normal DMA
+> > +         * mechanisms.  That requires disabling legacy virtio support
+> > +         * for virtio pci devices
+> > +         */
+> > +        object_register_sugar_prop(TYPE_VIRTIO_PCI, "disable-legacy", =
+"on");
+> > +        object_register_sugar_prop(TYPE_VIRTIO_DEVICE, "iommu_platform=
+", "on");
+> >      }
+>=20
+> Silently changing the user's request configuration like this
+
+It doesn't, though.  register_sugar_prop() effectively registers a
+default, so if the user has explicitly specified something, that will
+take precedence.
+
+> is a bad idea.
+> The "disable-legacy" option in particular is undesirable as that switches
+> the device to virtio-1.0 only mode, which exposes a different PCI ID to
+> the guest.
+>=20
+> If some options are incompatible with encryption, then we should raise a
+> fatal error at startup, so applications/admins are aware that their reque=
+sted
+> config is broken.
+>=20
+> Regards,
+> Daniel
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--AQYPrgrEUc/1pSX1
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl7sz5IACgkQbDjKyiDZ
+s5J+8w/+JJK7plk6WUNFDCN0inRibIaHRp7R6OpBirGdfBHRI1bEAYrmm7cOnjhR
+LQ67An6wmLV4QB7P+Kt7Ud1ppfskhG5Uz9xEmuFGS/fNycr3KXZ4q4OddDW7mI2/
+PADqa5j+AaqWFh+hnw/Zux6jYUGi52aqFJfh6iluGZ2Be3sD17YFKpA/yytBecWH
+dU8rFFovc4YOSHyjJEsMENtQ80qKTTObootZeTRqKQavrBQnfQ8W7GejOanVI5k9
+xez40IKMLN1FNzKt0HwBIJVClQrOYXDhoY1ia3gATv1GJ/IT+3ARH3I+qfp9rPLm
+8JyPaBgMzVv2sbRguF7nGblW58pnv4RqK9XuSpWMKfmIMtV0fm1B4R1cTwcDeaDW
+R9aGfdUIolZKUIRwlbkPhjialYbOBgJ13BgIZrlvHl4PGR6ZSvoHHyjdrtfk2aYD
+Uz/sq915JnDTHt2T1Y/I9I38Xu7HR7RAGUhSyG08kihRxBBVYqoeUldHmoOnyt3S
+br6yo5JX9LjceRJR2VaGnY8yuKXMyXNEKLLQJF1qBqzzJfrpNH4UkzDFlaj8X9IA
+/VCoiB2npTzwRCgTqNgxnCl//60s7oLx/KaEHvuB6iE4b9IZKrvWUcZADxXctxMn
+lWwvRa5r5rMiB1sx0cBJS/MeqhDlB0BX4EXlEerznh86A3KMQrg=
+=LRIe
+-----END PGP SIGNATURE-----
+
+--AQYPrgrEUc/1pSX1--
 
