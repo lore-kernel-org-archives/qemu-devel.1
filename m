@@ -2,105 +2,92 @@ Return-Path: <SRS0=Yszf=AA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77480C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 16:13:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5187CC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 16:14:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 49C6D21707
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 16:13:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49C6D21707
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 209702168B
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 16:14:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EnT6qexg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 209702168B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48966 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51400 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmJdn-0006Pi-IM
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 12:13:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41424)
+	id 1jmJex-0007ZN-Dm
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 12:14:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42368)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanb@linux.ibm.com>)
- id 1jmJav-0003Jk-LS; Fri, 19 Jun 2020 12:10:21 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:7048)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanb@linux.ibm.com>)
- id 1jmJat-0002P2-SG; Fri, 19 Jun 2020 12:10:21 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 05JG3XRC118561; Fri, 19 Jun 2020 12:10:17 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 31s0f40dk8-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 19 Jun 2020 12:10:16 -0400
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05JG48ps121398;
- Fri, 19 Jun 2020 12:10:16 -0400
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com
- [169.62.189.11])
- by mx0a-001b2d01.pphosted.com with ESMTP id 31s0f40djf-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 19 Jun 2020 12:10:16 -0400
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
- by ppma03dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05JG5Ask025270;
- Fri, 19 Jun 2020 16:10:15 GMT
-Received: from b03cxnp08027.gho.boulder.ibm.com
- (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
- by ppma03dal.us.ibm.com with ESMTP id 31q6c6c05n-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 19 Jun 2020 16:10:14 +0000
-Received: from b03ledav003.gho.boulder.ibm.com
- (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
- by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 05JGABwk14418238
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 19 Jun 2020 16:10:12 GMT
-Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 6D4766A05A;
- Fri, 19 Jun 2020 16:10:13 +0000 (GMT)
-Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 668446A04F;
- Fri, 19 Jun 2020 16:10:12 +0000 (GMT)
-Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
- by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
- Fri, 19 Jun 2020 16:10:12 +0000 (GMT)
-Subject: Re: [PATCH v6 3/3] docs/specs/tpm: ACPI boot now supported for TPM/ARM
-To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org,
- mst@redhat.com, imammedo@redhat.com
-References: <20200619141851.16272-1-eric.auger@redhat.com>
- <20200619141851.16272-4-eric.auger@redhat.com>
-From: Stefan Berger <stefanb@linux.ibm.com>
-Message-ID: <d33923df-8f53-1c71-ceb8-a4741d5af7ab@linux.ibm.com>
-Date: Fri, 19 Jun 2020 12:10:11 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jmJeF-0006xj-LT
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 12:13:47 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60400
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jmJeE-000337-2w
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 12:13:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592583225;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=/pSjNwLdacB/r4+NCb/IGg/qnFoqGjRjuU/KV8D/HRo=;
+ b=EnT6qexgIXKWCt/wVS62dQst+Vs5AAdIfcSbdvdYem4ewSIDffwlrZSN6QaqwA8dqzwn2r
+ EbeGr/DTDGOBS2DDNMFJdYr+jeWEpqkF+6PXq9+vbxVIe6HVJ7dvWIs2cQHyCy0jh0JTHk
+ U6cNKPuoVRdZ2FWVm7Ufck7PR9R8Y1c=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-127-C7G9BnJkNJKXFe8MBzlGuA-1; Fri, 19 Jun 2020 12:13:41 -0400
+X-MC-Unique: C7G9BnJkNJKXFe8MBzlGuA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AB7A91054FA8;
+ Fri, 19 Jun 2020 16:13:39 +0000 (UTC)
+Received: from work-vm (ovpn-114-215.ams2.redhat.com [10.36.114.215])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 209315D9F3;
+ Fri, 19 Jun 2020 16:13:34 +0000 (UTC)
+Date: Fri, 19 Jun 2020 17:13:32 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Subject: Re: ovmf / PCI passthrough impaired due to very limiting PCI64
+ aperture
+Message-ID: <20200619161332.GB2729@work-vm>
+References: <99779e9c-f05f-501b-b4be-ff719f140a88@canonical.com>
+ <20200616165043.24y2cp53axk7uggy@sirius.home.kraxel.org>
+ <20200616165746.GH2788@work-vm>
+ <CAHD1Q_zGu4Q63HjHx3aZKu3wh8NppuP6T4kgnUN3j=-ZDufVZA@mail.gmail.com>
+ <b423f4a4-2552-bdc8-7c9f-41f200aef672@redhat.com>
+ <20200617134652.GE2776@work-vm>
+ <20200617154959.GZ2366737@habkost.net>
+ <20200617160412.GG2776@work-vm>
 MIME-Version: 1.0
-In-Reply-To: <20200619141851.16272-4-eric.auger@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
- definitions=2020-06-19_16:2020-06-19,
- 2020-06-19 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 spamscore=0
- priorityscore=1501 suspectscore=0 bulkscore=0 lowpriorityscore=0
- cotscore=-2147483648 clxscore=1015 phishscore=0 adultscore=0 mlxscore=0
- mlxlogscore=999 malwarescore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2006190114
-Received-SPF: pass client-ip=148.163.156.1; envelope-from=stefanb@linux.ibm.com;
- helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/19 12:10:04
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -25
-X-Spam_score: -2.6
-X-Spam_bar: --
-X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
+In-Reply-To: <20200617160412.GG2776@work-vm>
+User-Agent: Mutt/1.14.0 (2020-05-02)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/19 03:15:03
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -114,39 +101,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, lersek@redhat.com, drjones@redhat.com,
- shannon.zhaosl@gmail.com, marcandre.lureau@redhat.com, philmd@redhat.com,
- ardb@kernel.org
+Cc: Pedro Principeza <pedro.principeza@canonical.com>,
+ Dann Frazier <dann.frazier@canonical.com>,
+ Guilherme Piccoli <gpiccoli@canonical.com>, qemu-devel@nongnu.org,
+ Christian Ehrhardt <christian.ehrhardt@canonical.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
+ fw@gpiccoli.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/19/20 10:18 AM, Eric Auger wrote:
-> ACPI boot now is supported. Let's remove the comment
-> saying it is not.
->
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+I noticed that Mohammed Gamal just posted a series for better
+KVM behaviour in cases where the guest size is smaller than the host:
 
-Reviewed-by: Stefan Berger <stefanb@linux.ibm.com>
+https://lore.kernel.org/lkml/20200619153925.79106-1-mgamal@redhat.com/
 
-
-> ---
->   docs/specs/tpm.rst | 2 --
->   1 file changed, 2 deletions(-)
->
-> diff --git a/docs/specs/tpm.rst b/docs/specs/tpm.rst
-> index 5e61238bc5..eeeb93730a 100644
-> --- a/docs/specs/tpm.rst
-> +++ b/docs/specs/tpm.rst
-> @@ -346,8 +346,6 @@ In case an Arm virt machine is emulated, use the following command line:
->       -drive if=pflash,format=raw,file=flash0.img,readonly \
->       -drive if=pflash,format=raw,file=flash1.img
->   
-> -  On Arm, ACPI boot with TPM is not yet supported.
-> -
->   In case SeaBIOS is used as firmware, it should show the TPM menu item
->   after entering the menu with 'ESC'.
->   
-
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
