@@ -6,77 +6,75 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C993DC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 19:13:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 615E5C433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 19:16:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 93B9321527
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 19:13:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2C71620809
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 19:16:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ay5aLixo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93B9321527
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AzS/16qd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C71620809
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59456 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34104 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmMSb-0003ZS-T5
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 15:13:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32800)
+	id 1jmMVA-0004yi-Dd
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 15:16:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33568)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vgoyal@redhat.com>) id 1jmMRp-0002ps-W6
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 15:13:10 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:59257
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <vgoyal@redhat.com>) id 1jmMUT-0004RN-Jc
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 15:15:53 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:50127
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <vgoyal@redhat.com>) id 1jmMRl-0000fl-Jc
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 15:13:09 -0400
+ (Exim 4.90_1) (envelope-from <vgoyal@redhat.com>) id 1jmMUR-00010z-Uz
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 15:15:53 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592593983;
+ s=mimecast20190719; t=1592594150;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=385nODIH37xQrMKjL6PFgIeww8ShpBfvGybyOp/6DWI=;
- b=Ay5aLixoknck3Sepxffw12WlWTtPYaiZJW0W8AsxlSPBxaAEn4X0DPoIthUgfjactSnWcK
- w4ZM7ld85z8usqT1zBbdnqbYVQu+eXpRIzGKYwesMVqWs3/UKq3dDvEKFGhqh0Qn0bkUYr
- fggGIBLbF2wmDs6lTvH/5YaZxjpyxrw=
+ bh=t21k1U6S7U9WKM5QqQkL3iAtt4A8qkLHkkfB0i72AsI=;
+ b=AzS/16qde7dBVsTNPl6xxYJkW1OfpEYSOFnej4Du4wKgNWkuCqPQOe8sey3oWodX5wzl5/
+ 8mXZ8INNvBpmw4xClQR/EvCRhIbv+SoacPlk6/WG+pNOJYl+hwa6TtxyelV2/WYxgzFntC
+ TE/qRyePXZnLKngPHyDwtRbwWy0JjCU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-439-Ql44sma_MtStIaqMDwW05Q-1; Fri, 19 Jun 2020 15:13:01 -0400
-X-MC-Unique: Ql44sma_MtStIaqMDwW05Q-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-98-4nsCQTVRNBaYgLem4TwigQ-1; Fri, 19 Jun 2020 15:15:47 -0400
+X-MC-Unique: 4nsCQTVRNBaYgLem4TwigQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7889A72EA1;
- Fri, 19 Jun 2020 19:13:00 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9D32DBFC3;
+ Fri, 19 Jun 2020 19:15:41 +0000 (UTC)
 Received: from horse.redhat.com (ovpn-114-35.rdu2.redhat.com [10.10.114.35])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 179317C1EF;
- Fri, 19 Jun 2020 19:12:55 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 319D32AF4D;
+ Fri, 19 Jun 2020 19:15:41 +0000 (UTC)
 Received: by horse.redhat.com (Postfix, from userid 10451)
- id 8CA9E220390; Fri, 19 Jun 2020 15:12:54 -0400 (EDT)
-Date: Fri, 19 Jun 2020 15:12:54 -0400
+ id AC260220390; Fri, 19 Jun 2020 15:15:40 -0400 (EDT)
+Date: Fri, 19 Jun 2020 15:15:40 -0400
 From: Vivek Goyal <vgoyal@redhat.com>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+To: Chirantan Ekbote <chirantan@chromium.org>
 Subject: Re: [Virtio-fs] [PATCH 0/2] virtiofsd: drop Linux capabilities(7)
-Message-ID: <20200619191254.GH3154@redhat.com>
+Message-ID: <20200619191540.GI3154@redhat.com>
 References: <20200416164907.244868-1-stefanha@redhat.com>
  <20200618190816.GD3814@redhat.com> <20200618191655.GI2769@work-vm>
- <20200618192717.GE3814@redhat.com> <20200619082746.GA2690@work-vm>
- <20200619113914.GI700896@redhat.com>
+ <20200618192717.GE3814@redhat.com>
+ <CAJFHJrrJzPLatNvw2xC3WYLbzCW0+DB+4UczQHGPBF9p+WGYQA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20200619113914.GI700896@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <CAJFHJrrJzPLatNvw2xC3WYLbzCW0+DB+4UczQHGPBF9p+WGYQA@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=vgoyal@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/19 03:15:03
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=vgoyal@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/19 02:45:39
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -97,68 +95,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-fs@redhat.com, Miklos Szeredi <miklos@szeredi.hu>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: virtio-fs-list <virtio-fs@redhat.com>, Miklos Szeredi <miklos@szeredi.hu>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jun 19, 2020 at 12:39:14PM +0100, Daniel P. Berrangé wrote:
-[..]
-> The CAP_SYS_ADMIN requirement for 'trusted.' xattrs is simply a useful
-> mechanism for applications to control access. The host kernel doesn'
-> tuse this namespace itself. Linux has four namespaces for xattrs:
+On Fri, Jun 19, 2020 at 01:46:20PM +0900, Chirantan Ekbote wrote:
+> On Fri, Jun 19, 2020 at 4:27 AM Vivek Goyal <vgoyal@redhat.com> wrote:
+> >
+> > On Thu, Jun 18, 2020 at 08:16:55PM +0100, Dr. David Alan Gilbert wrote:
+> > > * Vivek Goyal (vgoyal@redhat.com) wrote:
+> > > > On Thu, Apr 16, 2020 at 05:49:05PM +0100, Stefan Hajnoczi wrote:
+> > > > > virtiofsd doesn't need of all Linux capabilities(7) available to root.  Keep a
+> > > > > whitelisted set of capabilities that we require.  This improves security in
+> > > > > case virtiofsd is compromised by making it hard for an attacker to gain further
+> > > > > access to the system.
+> > > >
+> > > > Hi Stefan,
+> > > >
+> > > > I just noticed that this patch set breaks overlayfs on top of virtiofs.
+> > > >
+> > > > overlayfs sets "trusted.overlay.*" and xattrs in trusted domain
+> > > > need CAP_SYS_ADMIN.
+> > > >
 > 
->  -  user - for userspace apps. accessible based on read/write permissions
->  -  trusted - for userspace apps. accessible by CAP_SYS_ADMIN processes only
->  -  system - for kernel only. used by ACLs
->  -  security - for kernel only. used by SELinux
+> Not just that but it needs CAP_SYS_ADMIN in the init namespace[1].  We
+> have the same problem.  Our virtiofs process has CAP_SYS_ADMIN in a
+> user namespace and it cannot set any trusted or security xattrs.  The
+> security xattrs check is at least namespace aware so you only need
+> CAP_SYS_ADMIN in the namespace that mounted the fs but that doesn't
+> help us much.
 > 
-> The use case for "trusted" xattrs is thus where a privileged management
-> application or service wants to store metadata against the file, but
-> also needs to grant an unprivileged process access to write to this file
-> while not allowing that unprivileged process the ability to change the
-> metadata. This is mentioned in the man page:
-> 
-> [man xattr(7)]
->    Trusted extended attributes
->        Trusted  extended attributes are visible and accessible only to pro‐
->        cesses that have the CAP_SYS_ADMIN capability.  Attributes  in  this
->        class  are used to implement mechanisms in user space (i.e., outside
->        the kernel) which keep information in extended attributes  to  which
->        ordinary processes should not have access.
-> 
->    User extended attributes
->        User  extended  attributes  may be assigned to files and directories
->        for storing arbitrary additional information such as the mime  type,
->        character  set  or  encoding  of a file.  The access permissions for
->        user attributes are defined by the file permission bits:  read  per‐
->        mission is required to retrieve the attribute value, and writer per‐
->        mission is required to change it.
-> [/man]
-> 
-> Libvirtd uses the "trusted." xattr namespace to record information against
-> disk images for QEMU, because we need to grant QEMU access to read/write
-> the disk iamges, but don't want QEMU to be able to alter our xattrs.
-> 
-> It is unfortunate that this namespace is tied to the CAP_SYS_ADMIN cap.
-> It really ought to have had its own dedicated capability :-( Such is
-> life with anything that uses CAP_SYS_ADMIN...
-> 
-> With this in mind we really should have both trusted. & user. xattrs
-> allowed to the guest by default.
-> 
-> Conversely, we'll need to block usage of the security. and system.
-> namespaces.
+> We ended up working around it by prefixing "user.virtiofs." to the
+> xattr name[2], which has its own problems but there was pretty much no
+> chance that we would be able to give the fs device CAP_SYS_ADMIN in
+> the init namespace.
 
-I am wondering can we block usage of "system" and "security"?  What
-about guest setting acls over virtiofs files. These will have to
-go through and that means we need to allow system xattrs.
+Chirantan, 
 
-Similarly setting file capabilities inside should trigger
-setxattr(security.capability) and that means we need to allow security
-xattr as well.
+So you ended up renaming all "trusted", "security" and "system" xattrs?
+Only "user" xattrs are complete passthrough?
+
+IOW, security.selinux will be renamed to user.virtiofs.security.selinux
+on host?
 
 Thanks
 Vivek
