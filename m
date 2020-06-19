@@ -2,74 +2,92 @@ Return-Path: <SRS0=Yszf=AA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB1C4C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 14:51:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AAF23C433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 14:52:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8F97D21924
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 14:51:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F97D21924
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 76493217D8
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 14:52:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pmAI8Co2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76493217D8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37552 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40536 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmIMz-0004YA-O9
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 10:51:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45340)
+	id 1jmINa-00068C-Ou
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 10:52:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45632)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jmILe-0002yl-S5
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 10:50:30 -0400
-Resent-Date: Fri, 19 Jun 2020 10:50:30 -0400
-Resent-Message-Id: <E1jmILe-0002yl-S5@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21737)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jmILc-0003W7-7x
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 10:50:30 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1592578215; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=cHKH22aUNRSTi+0SFjsQvjK1PdjyWdDmrxw4rkGk08xFCy4qcycERi9mUPtcEcquHhw0t8xbCPCQ4inrJX6v3V2h0WQX57wWW6/tPu94Zhj2lxoX8680UbHgAE8/1y2Xk/e0u6eJS68DNhMqkQakn74rnl5ZxGeEsUKUPhiY9Zk=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1592578215;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=3aE2Ff/049rR25KW5R2mEQGkzcdD0SJQxP2A9cQCFEU=; 
- b=VPGxUQzxlhln0sC0p4GBBgWriMDxK/hFV8Fba+xanpaDAkrUNM590WEPK8cks1vM2c+XTmBUleCAJ+v1L3Rj3KLiXBfxAseFhXPZlV9PSfGGEgfo1e/ka0q6SDk8VZd38/A4VXbYo7ktjj9Cfkyjz2pOR1cQkGgSG57vRLsvcoM=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 159257821272282.35505608739754;
- Fri, 19 Jun 2020 07:50:12 -0700 (PDT)
-Message-ID: <159257821134.2784.18219083983698800306@d1fd068a5071>
-Subject: Re: [RFC PATCH] docs/devel: add some notes on tcg-icount for
- developers
-In-Reply-To: <20200619135844.23307-1-alex.bennee@linaro.org>
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jmIMO-000445-7y; Fri, 19 Jun 2020 10:51:16 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:46243)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jmIMG-0003g0-Gc; Fri, 19 Jun 2020 10:51:12 -0400
+Received: by mail-wr1-x442.google.com with SMTP id x6so9934445wrm.13;
+ Fri, 19 Jun 2020 07:51:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=wgoNLzG3Ol7QUrQ8g37Gepx90Z5CEvbQwQpJANTL2T8=;
+ b=pmAI8Co2QxWxmKECSS9W26vsaeTcf+n55WABZ4+RWvJz2xnYuoep2Bk/9e3Y6baP86
+ 8KyeqcHsQM1/zoLo0dQO8GlB2z9CtVv04nSj2dIFzO1JxGPEpfcIRFAXija9iad2Pkjn
+ kVSo/rCDig+jT0K1jHzY+sLvJ07QAKp+bXfYes+hKNsREmIjqAN01VmdKC19UkSNodsa
+ Z/O8Dq4q9C+646o3SKDV2c1pm34SuKwK2b0VS6ImcioDtZ9McvMwQEOv9NJ+YxO6dWWO
+ 9eYAreeWE91FrdZcCsrQHAElSif/q+RqyD9hSzjRZEohc4fmVR5NlcejulIUpwRMPOcC
+ Icaw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=wgoNLzG3Ol7QUrQ8g37Gepx90Z5CEvbQwQpJANTL2T8=;
+ b=S11Dhsgcd4c3nPpC1rwUSSvYwtxEG/JivU/2rq9KuDoqRBVaHfKEYQsn/habAHNTF3
+ Z9odM91zrIhLnkMEZlxrHTDqYq8ZKFaFm5zcYyH4NErwQYb2QhNI3jXWSG2PL16t/cnz
+ 8LbuLhRFd0Yf3fgZy9ltwXwCKj8qJRzrnVNF3k5Hv+o/58wXzvalZkb5BYsnzF/rl1dc
+ SFLsLjThZBb6IVDAma2jBO0WzsKwZ1WJzI2YMYLM41ITAqG8AK/20bV4MtTFlSDamSAd
+ r0Wu6hvyDO4WQT2TSd64ySALnZLNi6om7Jm1n5wQ0KA0AIwVTQcQYAvDji82wfl9txh+
+ hbqA==
+X-Gm-Message-State: AOAM530DKmOz5DSCeLHBYtM6cypSJjRMtJm7lsAQ+vLjTDtvtBp9JiLH
+ T2tMwI9hH/FmHmGvVDu8xsPnzprf
+X-Google-Smtp-Source: ABdhPJxyV344rnv7Lr69+btk2PUIWQDs0WssAlM/yxiHfCRigKvK8sQhNu0Dk/aoMuuQ1vfSofbtXQ==
+X-Received: by 2002:adf:e587:: with SMTP id l7mr4556399wrm.352.1592578266239; 
+ Fri, 19 Jun 2020 07:51:06 -0700 (PDT)
+Received: from localhost.localdomain (93.red-83-59-160.dynamicip.rima-tde.net.
+ [83.59.160.93])
+ by smtp.gmail.com with ESMTPSA id e12sm7512548wro.52.2020.06.19.07.51.05
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 19 Jun 2020 07:51:05 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 2/4] hw/misc/pca9552: Add a PCA955X_LED_MAX definition
+Date: Fri, 19 Jun 2020 16:50:59 +0200
+Message-Id: <20200619145101.1637-3-f4bug@amsat.org>
+X-Mailer: git-send-email 2.21.3
+In-Reply-To: <20200619145101.1637-1-f4bug@amsat.org>
+References: <20200619145101.1637-1-f4bug@amsat.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: alex.bennee@linaro.org
-Date: Fri, 19 Jun 2020 07:50:12 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/19 10:14:48
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x442.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -82,50 +100,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, richard.henderson@linaro.org,
- qemu-devel@nongnu.org, dovgaluk@ispras.ru, pbonzini@redhat.com,
- alex.bennee@linaro.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jeffery <andrew@aj.id.au>,
+ Joaquin de Andres <me@xcancerberox.com.ar>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Esteban Bosse <estebanbosse@gmail.com>, qemu-arm@nongnu.org,
+ =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+ Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDYxOTEzNTg0NC4yMzMw
-Ny0xLWFsZXguYmVubmVlQGxpbmFyby5vcmcvCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRo
-ZSBkb2NrZXItbWluZ3dAZmVkb3JhIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5n
-IGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0
-YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBT
-Q1JJUFQgQkVHSU4gPT09CiMhIC9iaW4vYmFzaApleHBvcnQgQVJDSD14ODZfNjQKbWFrZSBkb2Nr
-ZXItaW1hZ2UtZmVkb3JhIFY9MSBORVRXT1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LW1pbmd3
-QGZlZG9yYSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKICBDQyAgICAg
-IGNyeXB0by90bHNjcmVkc3g1MDkubwogIENDICAgICAgY3J5cHRvL3Rsc3Nlc3Npb24ubwoKV2Fy
-bmluZywgdHJlYXRlZCBhcyBlcnJvcjoKL3RtcC9xZW11LXRlc3Qvc3JjL2RvY3MvZGV2ZWwvdGNn
-LWljb3VudC5yc3Q6ZG9jdW1lbnQgaXNuJ3QgaW5jbHVkZWQgaW4gYW55IHRvY3RyZWUKICBDQyAg
-ICAgIGNyeXB0by9zZWNyZXRfY29tbW9uLm8KICBDQyAgICAgIGNyeXB0by9zZWNyZXQubwotLS0K
-ICBDQyAgICAgIHFvbS9xb20tcW9iamVjdC5vCiAgQ0MgICAgICBxb20vb2JqZWN0X2ludGVyZmFj
-ZXMubwogIENDICAgICAgcWVtdS1pby5vCm1ha2U6ICoqKiBbTWFrZWZpbGU6MTA4ODogZG9jcy9k
-ZXZlbC9pbmRleC5odG1sXSBFcnJvciAyCm1ha2U6ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVk
-IGpvYnMuLi4uClRyYWNlYmFjayAobW9zdCByZWNlbnQgY2FsbCBsYXN0KToKICBGaWxlICIuL3Rl
-c3RzL2RvY2tlci9kb2NrZXIucHkiLCBsaW5lIDY2OSwgaW4gPG1vZHVsZT4KLS0tCiAgICByYWlz
-ZSBDYWxsZWRQcm9jZXNzRXJyb3IocmV0Y29kZSwgY21kKQpzdWJwcm9jZXNzLkNhbGxlZFByb2Nl
-c3NFcnJvcjogQ29tbWFuZCAnWydzdWRvJywgJy1uJywgJ2RvY2tlcicsICdydW4nLCAnLS1sYWJl
-bCcsICdjb20ucWVtdS5pbnN0YW5jZS51dWlkPTIyZDVhNTFjNDk3MzRmMGZiZmNhODM3YTliYTIw
-MzY4JywgJy11JywgJzEwMDMnLCAnLS1zZWN1cml0eS1vcHQnLCAnc2VjY29tcD11bmNvbmZpbmVk
-JywgJy0tcm0nLCAnLWUnLCAnVEFSR0VUX0xJU1Q9JywgJy1lJywgJ0VYVFJBX0NPTkZJR1VSRV9P
-UFRTPScsICctZScsICdWPScsICctZScsICdKPTE0JywgJy1lJywgJ0RFQlVHPScsICctZScsICdT
-SE9XX0VOVj0nLCAnLWUnLCAnQ0NBQ0hFX0RJUj0vdmFyL3RtcC9jY2FjaGUnLCAnLXYnLCAnL2hv
-bWUvcGF0Y2hldzIvLmNhY2hlL3FlbXUtZG9ja2VyLWNjYWNoZTovdmFyL3RtcC9jY2FjaGU6eics
-ICctdicsICcvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtcl9kOGRjOWovc3JjL2RvY2tlci1z
-cmMuMjAyMC0wNi0xOS0xMC40Ny4yNi4zMTIyMDovdmFyL3RtcC9xZW11Onoscm8nLCAncWVtdTpm
-ZWRvcmEnLCAnL3Zhci90bXAvcWVtdS9ydW4nLCAndGVzdC1taW5ndyddJyByZXR1cm5lZCBub24t
-emVybyBleGl0IHN0YXR1cyAyLgpmaWx0ZXI9LS1maWx0ZXI9bGFiZWw9Y29tLnFlbXUuaW5zdGFu
-Y2UudXVpZD0yMmQ1YTUxYzQ5NzM0ZjBmYmZjYTgzN2E5YmEyMDM2OAptYWtlWzFdOiAqKiogW2Rv
-Y2tlci1ydW5dIEVycm9yIDEKbWFrZVsxXTogTGVhdmluZyBkaXJlY3RvcnkgYC92YXIvdG1wL3Bh
-dGNoZXctdGVzdGVyLXRtcC1yX2Q4ZGM5ai9zcmMnCm1ha2U6ICoqKiBbZG9ja2VyLXJ1bi10ZXN0
-LW1pbmd3QGZlZG9yYV0gRXJyb3IgMgoKcmVhbCAgICAybTQ0LjM3OHMKdXNlciAgICAwbTguNDIy
-cwoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3Mv
-MjAyMDA2MTkxMzU4NDQuMjMzMDctMS1hbGV4LmJlbm5lZUBsaW5hcm8ub3JnL3Rlc3RpbmcuZG9j
-a2VyLW1pbmd3QGZlZG9yYS8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9t
-YXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5
-b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+The current code models the PCA9552, but there are comments
+saying the code could be easily adapted for the rest of the
+PCA955x family.
+Since we assume we have at most 16 LEDs (for the PCA9552),
+add a definition and check the instance doesn't use more than
+this number. This makes the code a bit safer in case other
+PCA955x devices are added.
+
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ hw/misc/pca9552.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/hw/misc/pca9552.c b/hw/misc/pca9552.c
+index e015ef0e5d..00fa91b7f4 100644
+--- a/hw/misc/pca9552.c
++++ b/hw/misc/pca9552.c
+@@ -18,6 +18,8 @@
+ #include "qapi/error.h"
+ #include "qapi/visitor.h"
+ 
++#define PCA955X_LED_MAX 16
++
+ #define PCA9552_LED_ON   0x0
+ #define PCA9552_LED_OFF  0x1
+ #define PCA9552_LED_PWM0 0x2
+@@ -303,6 +305,17 @@ static void pca9552_initfn(Object *obj)
+     }
+ }
+ 
++static void pca9552_realize(DeviceState *dev, Error **errp)
++{
++    PCA9552State *s = PCA9552(dev);
++
++    if (s->nr_leds > PCA955X_LED_MAX) {
++        error_setg(errp, "%s invalid led count %u (max: %u)",
++                   __func__, s->nr_leds, PCA955X_LED_MAX);
++        return;
++    }
++}
++
+ static void pca9552_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
+@@ -311,6 +324,7 @@ static void pca9552_class_init(ObjectClass *klass, void *data)
+     k->event = pca9552_event;
+     k->recv = pca9552_recv;
+     k->send = pca9552_send;
++    dc->realize = pca9552_realize;
+     dc->reset = pca9552_reset;
+     dc->vmsd = &pca9552_vmstate;
+ }
+-- 
+2.21.3
+
 
