@@ -7,73 +7,72 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FCB8C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 06:51:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA797C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 06:53:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C893D2080C
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 06:51:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AAF2520809
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 06:53:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="fKkRzlkW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C893D2080C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="MGEwSx9T"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AAF2520809
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42542 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46718 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmAsW-0001xT-4E
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 02:51:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57046)
+	id 1jmAtu-0003oP-V7
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 02:53:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57074)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=4324eb4de=alistair.francis@wdc.com>)
- id 1jmAcI-0006JE-OT
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 02:35:11 -0400
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:13000)
+ id 1jmAcM-0006Ku-Am
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 02:35:14 -0400
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:13005)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=4324eb4de=alistair.francis@wdc.com>)
- id 1jmAcH-00028a-3o
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 02:35:10 -0400
+ id 1jmAcJ-00028f-5I
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 02:35:14 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1592548509; x=1624084509;
+ t=1592548511; x=1624084511;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=8hSwtxjUfxldsdMd7WDTe487tEnsxgJ6ThhQBiT5NEM=;
- b=fKkRzlkWQ4a7tJrVbuD+45zrRbIzvHfaavrIYP7CGUn3gAlUPjCiS0GO
- 3bS7LTrljI2gyfu1aNqmfSobtOj+yyDn1WySWGes1V4RO0v2gUliQENXG
- s7lhEZIn1sI+DotwrvRgspzQtGAqSEDWEUW6aaVuh2dSgW4mkywhQrWE8
- tRBIfiygaxnqn1CbHrx85NyoagJ11L4LnbcbpnZt3MitYSLtv/tDNQh94
- b0Wyy1jxujWJQogzPsDyG/MFyyFbtWG1DEAjmDYnWFD2NNUe/KCIpgpCG
- MGs5yK6A0XnkZOy/ngf0cAIDjOELdVxf163cVvpCFcSC5Cjl9dAc1vTQe g==;
-IronPort-SDR: Qv5yt+Q5bds9KyDrWMR5ioe4BiN1KfXqWZYu7dXNgEOdjogwWKCpnM9BTcF6a/wqyTUb4aoh/n
- PrucKjkxEK6brP5LR88rMIj5xOJLwwo2bJVc9/3j+/HygIgCE1JCyG4Ma5Bx1ztqkGRV+jsjz3
- pkYmFumIpM8qY/ua9slxSuc8s1WZ0VbkU5TlBlTwqO30U/RMkdpj/pYq6jwzrEYjEfZq9xa1XH
- fuN0+NX30R+uxFd9HU9cldhGSzLUz2ZhN8XvEEO7dQFVCjBPFShLShbGAmqraELuyIqRYqwEAr
- BIs=
-X-IronPort-AV: E=Sophos;i="5.75,253,1589212800"; d="scan'208";a="141781946"
+ bh=mNUxJaBqscecrc5iYSnB5gf7mz+p8sMw9gNqAnpXd2M=;
+ b=MGEwSx9TQfGrl4xm5mANYwhYGYAHlnNjBYCTo1sL6ihrDphernIGSef4
+ GpDhmWTdlUmMjj+IvTGklKWlDWmueHHpoh8LB3eqMvL8AhrcsreLfrEIK
+ DFkfH90hPMpBMdahpFOU8csUyas53SHCGKgtlwKhsjDl1BHpNUe+cA0+2
+ QiWTgIf09b/5UQlzk2rVB7toe03xSiSLzZajFxCf6IX5ib6m+6V/kNd+Q
+ opR8Q4VudZcVdgUKZ3mc37RFuNlTaHyNSmcOoZQoDi9BT8BeSQ6jt7/UW
+ oyNkBXJVmRJftHPyeLUMVhiDB/btDARHU+Wr4XDK1/q6vnBSv2ousd9I1 g==;
+IronPort-SDR: Sp98swjj5eVLYTENTT25pN71LwXI40ohEIDDrSn4MNDq8E3qT8iiFFlUfXzn4IkO0tbzbk+9we
+ 2iYi/tz4JekykiX9DfpISLbAQSVap1ncC+9V7d1JMMjVk1qUHqUjheUNtyqbljezgLxZffCvTe
+ im1SunYKBQmOPez295mSQeS3I0VIt5rTbetYIqzee5WDDp8K/pql9R06jsAlNNPicHmm3hZzEc
+ tF12KmA9J4MlBuZINx9YzCx7hkF9j9s2NZczK4WNh4dQ+TqrMgnWVCUsHf6hZnsMFdDUqP+7+o
+ Xp4=
+X-IronPort-AV: E=Sophos;i="5.75,253,1589212800"; d="scan'208";a="141781947"
 Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com)
  ([199.255.45.14])
  by ob1.hgst.iphmx.com with ESMTP; 19 Jun 2020 14:34:33 +0800
-IronPort-SDR: rVCf9MVokfUGowOKi88mFvCktwx+A0k42Y7GZQe0NAacAM7sjoZ2prE0HkX2r4SDEly2S4I4JB
- Se9GtyHjazuGSziP9J5p4CvvoLOuwBYYI=
+IronPort-SDR: YKySp1aCmFJIDYRhxKLlWgEqAsK+TMnxRgLvdWzwMF1OYqGN3zRUaLtceAnS5yy9qcgih4i8UZ
+ FgtMQJ6ccGW9cN8FawpN779Z3GhD6HaUM=
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 18 Jun 2020 23:23:43 -0700
-IronPort-SDR: gkalnGBE5xJSh3ybs1tdFHBA79PFaNPEyCJbnZz+1zRHQ27iGTxM4yUubeIotLdxE8JAd/aw+T
- Oo6LvkTw6zOw==
+ 18 Jun 2020 23:23:44 -0700
+IronPort-SDR: 4v06iKN630AJ502nj13OniQbGUEzpjS5Ngip1egPRoZuOwLrSpslIhb/d8z954AoOOjxEBg3Q6
+ Ix0C5mnGEDsw==
 WDCIronportException: Internal
 Received: from unknown (HELO risc6-mainframe.hgst.com) ([10.86.58.142])
  by uls-op-cesaip02.wdc.com with ESMTP; 18 Jun 2020 23:34:32 -0700
 From: Alistair Francis <alistair.francis@wdc.com>
 To: peter.maydell@linaro.org,
 	qemu-devel@nongnu.org
-Subject: [PULL 27/32] hw/riscv: sifive_u: Add a new property msel for MSEL pin
- state
-Date: Thu, 18 Jun 2020 23:25:13 -0700
-Message-Id: <20200619062518.1718523-28-alistair.francis@wdc.com>
+Subject: [PULL 28/32] target/riscv: Rename IBEX CPU init routine
+Date: Thu, 18 Jun 2020 23:25:14 -0700
+Message-Id: <20200619062518.1718523-29-alistair.francis@wdc.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200619062518.1718523-1-alistair.francis@wdc.com>
 References: <20200619062518.1718523-1-alistair.francis@wdc.com>
@@ -111,52 +110,41 @@ Sender: "Qemu-devel"
 
 From: Bin Meng <bin.meng@windriver.com>
 
-On SiFive FU540 SoC, the value stored at physical address 0x1000
-stores the MSEL pin state that is used to control the next boot
-location that ROM codes jump to.
-
-Add a new property msel to sifive_u machine for this.
+Current IBEX CPU init routine name seems to be too generic.
+Since it uses a different reset vector from the generic one,
+it merits a dedicated name.
 
 Signed-off-by: Bin Meng <bin.meng@windriver.com>
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Message-id: 1591625864-31494-12-git-send-email-bmeng.cn@gmail.com
-Message-Id: <1591625864-31494-12-git-send-email-bmeng.cn@gmail.com>
+Message-id: 1592268641-7478-2-git-send-email-bmeng.cn@gmail.com
+Message-Id: <1592268641-7478-2-git-send-email-bmeng.cn@gmail.com>
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- include/hw/riscv/sifive_u.h | 1 +
- hw/riscv/sifive_u.c         | 7 +++++++
- 2 files changed, 8 insertions(+)
+ target/riscv/cpu.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/include/hw/riscv/sifive_u.h b/include/hw/riscv/sifive_u.h
-index b1399a90a6..f6d10ebfb6 100644
---- a/include/hw/riscv/sifive_u.h
-+++ b/include/hw/riscv/sifive_u.h
-@@ -63,6 +63,7 @@ typedef struct SiFiveUState {
-     int fdt_size;
+diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+index e867766cf0..5f034588ec 100644
+--- a/target/riscv/cpu.c
++++ b/target/riscv/cpu.c
+@@ -153,7 +153,7 @@ static void rvxx_imacu_nommu_cpu_init(Object *obj)
  
-     bool start_in_flash;
-+    uint32_t msel;
-     uint32_t serial;
- } SiFiveUState;
+ #if defined(TARGET_RISCV32)
  
-diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-index 2f9fbb6aa7..ec5cfdae62 100644
---- a/hw/riscv/sifive_u.c
-+++ b/hw/riscv/sifive_u.c
-@@ -504,6 +504,13 @@ static void sifive_u_machine_instance_init(Object *obj)
-                                     "Set on to tell QEMU's ROM to jump to "
-                                     "flash. Otherwise QEMU will jump to DRAM");
- 
-+    s->msel = 0;
-+    object_property_add(obj, "msel", "uint32",
-+                        sifive_u_machine_get_uint32_prop,
-+                        sifive_u_machine_set_uint32_prop, NULL, &s->msel);
-+    object_property_set_description(obj, "msel",
-+                                    "Mode Select (MSEL[3:0]) pin state");
-+
-     s->serial = OTP_SERIAL;
-     object_property_add(obj, "serial", "uint32",
-                         sifive_u_machine_get_uint32_prop,
+-static void rv32_imcu_nommu_cpu_init(Object *obj)
++static void rv32_ibex_cpu_init(Object *obj)
+ {
+     CPURISCVState *env = &RISCV_CPU(obj)->env;
+     set_misa(env, RV32 | RVI | RVM | RVC | RVU);
+@@ -577,7 +577,7 @@ static const TypeInfo riscv_cpu_type_infos[] = {
+     DEFINE_CPU(TYPE_RISCV_CPU_ANY,              riscv_any_cpu_init),
+ #if defined(TARGET_RISCV32)
+     DEFINE_CPU(TYPE_RISCV_CPU_BASE32,           riscv_base_cpu_init),
+-    DEFINE_CPU(TYPE_RISCV_CPU_IBEX,             rv32_imcu_nommu_cpu_init),
++    DEFINE_CPU(TYPE_RISCV_CPU_IBEX,             rv32_ibex_cpu_init),
+     DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_E31,       rvxx_imacu_nommu_cpu_init),
+     DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_E34,       rv32_imafcu_nommu_cpu_init),
+     DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_U34,       rvxx_gcsu_priv1_10_0_cpu_init),
 -- 
 2.27.0
 
