@@ -2,165 +2,106 @@ Return-Path: <SRS0=Yszf=AA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10912C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 16:11:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE722C433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 16:12:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BE7392168B
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 16:11:31 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dgVQaV3M"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE7392168B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9488D2168B
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 16:12:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9488D2168B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44624 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46896 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmJc2-0004WQ-Up
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 12:11:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41494)
+	id 1jmJcr-0005VD-TY
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 12:12:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41344)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jmJb3-0003Xe-R7
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 12:10:29 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:40055
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jmJb0-0002Se-Pl
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 12:10:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592583025;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=zbL1jcdeOm3MTeZKmqqR3/ZXADxKHOz/i0op4VealOM=;
- b=dgVQaV3MvwdkGLfzmhwcrSn/eDaxfkrPEGZk1XuKRKlBUci3rk+xYdRLmbvb9BRT1KFZ/I
- F+rlkTzBR0r524JwCMaK6UjzBE3reO3tmuSkvcBGU/raTznMK0UxssAgZz4YvuGm9+oWde
- Lg9pQD1SI9upV1H9qP1h9CDAWzSeXIE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-12-dqvdbjpwMD-E4lvIzLxAcA-1; Fri, 19 Jun 2020 12:10:22 -0400
-X-MC-Unique: dqvdbjpwMD-E4lvIzLxAcA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 672D41005512;
- Fri, 19 Jun 2020 16:10:21 +0000 (UTC)
-Received: from [10.10.117.188] (ovpn-117-188.rdu2.redhat.com [10.10.117.188])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1688D5D9E8;
- Fri, 19 Jun 2020 16:10:13 +0000 (UTC)
-Subject: Re: [PATCH 0/7] python: create installable package
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Cleber Rosa <crosa@redhat.com>
-References: <20200603001523.18085-1-jsnow@redhat.com>
- <20200617195241.GA434320@localhost.localdomain>
- <32791435-4aa4-7eaa-e2c6-b53165f2e28d@redhat.com>
- <8e91bf40-34a2-91c2-6cd2-4dbf58dec8cf@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
- IYzhgrPEe7ZmPxbCSe4iMykjhwMh5byIHDoPGDU+FsQty2KXuoxto+ZdrP9gymAgmyqdk3aV
- vzzmCa3cOppcqKvA0Kqr10UeX/z4OMVV390V+DVWUvzXpda45/Sxup57pk+hyY52wxxjIqef
- rj8u5BN93s5uCVTus0oiVA6W+iXYzTvVDStMFVqnTxSxlpZoH5RGKvmoWV3uutByQyBPHW2U
- 1Y6n6iEZ9MlP3hcDqlo0S8jeP03HaD4gOqCuqLceWF5+2WyHzNfylpNMFVi+Hp0H/nSDtCvQ
- ua7j+6Pt7q5rvqgHvRipkDDVsjqwasuNc3wyoHexrBeLU/iJBuDld5iLy+dHXoYMB3HmjMxj
- 3K5/8XhGrDx6BDFeO3HIpi3u2z1jniB7RtyVEtdupED6lqsDj0oSz9NxaOFZrS3Jf6z/kHIf
- h42mM9Sx7+s4c07N2LieUxcfqhFTaa/voRibF4cmkBVUhOD1AKXNfhEsTvmcz9NbUchCkcvA
- T9119CrsxfVsE7bXiGvdXnzyGLXdsoosjzwacKdOrVaDmN3Uy+SHiQXo6TlkSdV0XH2PUxTM
- LsBFIO9qXO43Ai6J6iPAP/01l8fuZfpJE0/L/c25yyaND7xA3wARAQABtCpKb2huIFNub3cg
- KEpvaG4gSHVzdG9uKSA8anNub3dAcmVkaGF0LmNvbT6JAlQEEwECAD4CGwMCHgECF4AFCwkI
- BwMFFQoJCAsFFgIDAQAWIQT665cRoSz0dYEvGPKIqQZNGDVh6wUCXF392gUJC1Xq3gAKCRCI
- qQZNGDVh6558D/9pM4pu4njX5aT6uUW3vAmbWLF1jfPxiTQgSHAnm9EBMZED/fsvkzj97clo
- LN7JKmbYZNgJmR01A7flG45V4iOR/249qAfaVuD+ZzZi1R4jFzr13WS+IEdn0hYp9ITndb7R
- ezW+HGu6/rP2PnfmDnNowgJu6Dp6IUEabq8SXXwGHXZPuMIrsXJxUdKJdGnh1o2u7271yNO7
- J9PEMuMDsgjsdnaGtv7aQ9CECtXvBleAc06pLW2HU10r5wQyBMZGITemJdBhhdzGmbHAL0M6
- vKi/bafHRWqfMqOAdDkv3Jg4arl2NCG/uNateR1z5e529+UlB4XVAQT+f5T/YyI65DFTY940
- il3aZhA8u788jZEPMXmt94u7uPZbEYp7V0jt68SrTaOgO7NaXsboXFjwEa42Ug5lB5d5/Qdp
- 1AITUv0NJ51kKwhHL1dEagGeloIsGVQILmpS0MLdtitBHqZLsnJkRvtMaxo47giyBlv2ewmq
- tIGTlVLxHx9xkc9aVepOuiGlZaZB72c9AvZs9rKaAjgU2UfJHlB/Hr4uSk/1EY0IgMv4vnsG
- 1sA5gvS7A4T4euu0PqHtn2sZEWDrk5RDbw0yIb53JYdXboLFmFXKzVASfKh2ZVeXRBlQQSJi
- 3PBR1GzzqORlfryby7mkY857xzCI2NkIkD2eq+HhzFTfFOTdGrkCDQRUynn8ARAAwbhP45BE
- d/zAMBPV2dk2WwIwKRSKULElP3kXpcuiDWYQob3UODUUqClO+3aXVRndaNmZX9WbzGYexVo3
- 5j+CVBCGr3DlU8AL9pp3KQ3SJihWcDed1LSmUf8tS+10d6mdGxDqgnd/OWU214isvhgWZtZG
- MM/Xj7cx5pERIiP+jqu7PT1cibcfcEKhPjYdyV1QnLtKNGrTg/UMKaL+qkWBUI/8uBoa0HLs
- NH63bXsRtNAG8w6qG7iiueYZUIXKc4IHINUguqYQJVdSe+u8b2N5XNhDSEUhdlqFYraJvX6d
- TjxMTW5lzVG2KjztfErRNSUmu2gezbw1/CV0ztniOKDA7mkQi6UIUDRh4LxRm5mflfKiCyDQ
- L6P/jxHBxFv+sIgjuLrfNhIC1p3z9rvCh+idAVJgtHtYl8p6GAVrF+4xQV2zZH45tgmHo2+S
- JsLPjXZtWVsWANpepXnesyabWtNAV4qQB7/SfC77zZwsVX0OOY2Qc+iohmXo8U7DgXVDgl/R
- /5Qgfnlv0/3rOdMt6ZPy5LJr8D9LJmcP0RvX98jyoBOf06Q9QtEwJsNLCOCo2LKNL71DNjZr
- nXEwjUH66CXiRXDbDKprt71BiSTitkFhGGU88XCtrp8R9yArXPf4MN+wNYBjfT7K29gWTzxt
- 9DYQIvEf69oZD5Z5qHYGp031E90AEQEAAYkCPAQYAQIAJgIbDBYhBPrrlxGhLPR1gS8Y8oip
- Bk0YNWHrBQJcXf3JBQkLVerNAAoJEIipBk0YNWHrU1AP/1FOK2SBGbyhHa5vDHuf47fgLipC
- e0/h1E0vdSonzlhPxuZoQ47FjzG9uOhqqQG6/PqtWs/FJIyz8aGG4aV+pSA/9Ko3/2ND8MSY
- ZflWs7Y8Peg08Ro01GTHFITjEUgHpTpHiT6TNcZB5aZNJ8jqCtW5UlqvXXbVeSTmO70ZiVtc
- vUJbpvSxYmzhFfZWaXIPcNcKWL1rnmnzs67lDhMLdkYVf91aml/XtyMUlfB8Iaejzud9Ht3r
- C0pA9MG57pLblX7okEshxAC0+tUdY2vANWFeX0mgqRt1GSuG9XM9H/cKP1czfUV/FgaWo/Ya
- fM4eMhUAlL/y+/AJxxumPhBXftM4yuiktp2JMezoIMJI9fmhjfWDw7+2jVrx9ze1joLakFD1
- rVAoHxVJ7ORfQ4Ni/qWbQm3T6qQkSMt4N/scNsMczibdTPxU7qtwQwIeFOOc3wEwmJ9Qe3ox
- TODQ0agXiWVj0OXYCHJ6MxTDswtyTGQW+nUHpKBgHGwUaR6d1kr/LK9+5LpOfRlK9VRfEu7D
- PGNiRkr8Abp8jHsrBqQWfUS1bAf62bq6XUel0kUCtb7qCq024aOczXYWPFpJFX+nhp4d7NeH
- Edq+wlC13sBSiSHC7T5yssJ+7JPa2ATLlSKhEvBsLe2TsSTTtFlA0nBclqhfJXzimiuge9qU
- E40lvMWBuQINBFTKimUBEADDbJ+pQ5M4QBMWkaWImRj7c598xIZ37oKM6rGaSnuB1SVb7YCr
- Ci2MTwQcrQscA2jm80O8VFqWk+/XsEp62dty47GVwSfdGje/3zv3VTH2KhOCKOq3oPP5ZXWY
- rz2d2WnTvx++o6lU7HLHDEC3NGLYNLkL1lyVxLhnhvcMxkf1EGA1DboEcMgnJrNB1pGP27ww
- cSfvdyPGseV+qZZa8kuViDga1oxmnYDxFKMGLxrClqHrRt8geQL1Wj5KFM5hFtGTK4da5lPn
- wGNd6/CINMeCT2AWZY5ySz7/tSZe5F22vPvVZGoPgQicYWdNc3ap7+7IKP86JNjmec/9RJcz
- jvrYjJdiqBVldXou72CtDydKVLVSKv8c2wBDJghYZitfYIaL8cTvQfUHRYTfo0n5KKSec8Vo
- vjDuxmdbOUBA+SkRxqmneP5OxGoZ92VusrwWCjry8HRsNdR+2T+ClDCO6Wpihu4V3CPkQwTy
- eCuMHPAT0ka5paTwLrnZIxsdfnjUa96T10vzmQgAxpbbiaLvgKJ8+76OPdDnhddyxd2ldYfw
- RkF5PEGg3mqZnYKNNBtwjvX49SAvgETQvLzQ8IKVgZS0m4z9qHHvtc1BsQnFfe+LJOFjzZr7
- CrDNJMqk1JTHYsSi2JcN3vY32WMezXSQ0TzeMK4kdnclSQyp/h23GWod5QARAQABiQRbBBgB
- AgAmAhsCFiEE+uuXEaEs9HWBLxjyiKkGTRg1YesFAlxd/coFCQtV2mQCKcFdIAQZAQIABgUC
- VMqKZQAKCRB974EGqvw5DiJoEACLmuiRq9ifvOh5DyBFwRS7gvA14DsGQngmC57EzV0EFcfM
- XVi1jX5OtwUyUe0Az5r6lHyyHDsDsIpLKBlWrYCeLpUhRR3oy181T7UNxvujGFeTkzvLAOo6
- Hs3b8Wv9ARg+7acRYkQRNY7k0GIJ6YZz149tRyRKAy/vSjsaB9Lt0NOd1wf2EQMKwRVELwJD
- y0AazGn+0PRP7Bua2YbtxaBmhBBDb2tPpwn8U9xdckB4Vlft9lcWNsC/18Gi9bpjd9FSbdH/
- sOUI+3ToWYENeoT4IP09wn6EkgWaJS3nAUN/MOycNej2i4Yhy2wDDSKyTAnVkSSSoXk+tK91
- HfqtokbDanB8daP+K5LgoiWHzjfWzsxA2jKisI4YCGjrYQzTyGOT6P6u6SEeoEx10865B/zc
- 8/vN50kncdjYz2naacIDEKQNZlnGLsGkpCbfmfdi3Zg4vuWKNdWr0wGUzDUcpqW0y/lUXna+
- 6uyQShX5e4JD2UPuf9WAQ9HtgSAkaDd4O1I2J41sleePzZOVB3DmYgy+ECRJJ5nw3ihdxpgc
- y/v3lfcJaqiyCv0PF+K/gSOvwhH7CbVqARmptT7yhhxqFdaYWo2Z2ksuKyoKSRMFCXQY5oac
- uTmyPIT4STFyUQFeqSCWDum/NFNoSKhmItw2Td+4VSJHShRVbg39KNFPZ7mXYAkQiKkGTRg1
- YesWJA/+PV3qDUtPNEGwjVvjQqHSbrBy94tu6gJvPHgGPtRDYvxnCaJsmgiC0pGB2KFRsnfl
- 2zBNBEWF/XwsI081jQE5UO60GKmHTputChLXpVobyuc+lroG2YhknXRBAV969SLnZR4BS/1s
- Gi046gOXfaKYatve8BiZr5it5Foq3FMPDNgZMit1H9Dk8rkKFfDMRf8EGS/Z+TmyEsIf99H7
- TH3n7lco8qO81fSFwkh4pvo2kWRFYTC5vsIVQ+GqVUp+W1DZJHxX8LwWuF1AzUt4MUTtNAvy
- TXl5EgsmoY9mpNNL7ZnW65oG63nEP5KNiybvuQJzXVxR8eqzOh2Mod4nHg3PE7UCd3DvLNsn
- GXFRo44WyT/G2lArBtjpkut7bDm0i1nENABy2UgS+1QvdmgNu6aEZxdNthwRjUhuuvCCDMA4
- rCDQYyakH2tJNQgkXkeLodBKF4bHiBbuwj0E39S9wmGgg+q4OTnAO/yhQGknle7a7G5xHBwE
- i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
- RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
- glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <15387e9c-bbda-dc7f-ecc4-2e2159283b65@redhat.com>
-Date: Fri, 19 Jun 2020 12:10:13 -0400
+ (Exim 4.90_1) (envelope-from <stefanb@linux.ibm.com>)
+ id 1jmJak-000352-2u; Fri, 19 Jun 2020 12:10:10 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42364)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <stefanb@linux.ibm.com>)
+ id 1jmJag-0002O2-7g; Fri, 19 Jun 2020 12:10:09 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 05JG2B9N185975; Fri, 19 Jun 2020 12:10:02 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 31rthf3yxq-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 19 Jun 2020 12:10:00 -0400
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05JG2NFE186921;
+ Fri, 19 Jun 2020 12:10:00 -0400
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com
+ [169.63.214.131])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 31rthf3yx2-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 19 Jun 2020 12:10:00 -0400
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+ by ppma01dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05JG5IFc021913;
+ Fri, 19 Jun 2020 16:09:58 GMT
+Received: from b03cxnp07029.gho.boulder.ibm.com
+ (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
+ by ppma01dal.us.ibm.com with ESMTP id 31rdtr8gwg-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 19 Jun 2020 16:09:58 +0000
+Received: from b03ledav003.gho.boulder.ibm.com
+ (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
+ by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 05JG9vxp57671948
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 19 Jun 2020 16:09:57 GMT
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 59AE96A04F;
+ Fri, 19 Jun 2020 16:09:57 +0000 (GMT)
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 544776A047;
+ Fri, 19 Jun 2020 16:09:56 +0000 (GMT)
+Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
+ by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
+ Fri, 19 Jun 2020 16:09:56 +0000 (GMT)
+Subject: Re: [PATCH v6 1/3] acpi: Some build_tpm2() code reshape
+To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org,
+ mst@redhat.com, imammedo@redhat.com
+References: <20200619141851.16272-1-eric.auger@redhat.com>
+ <20200619141851.16272-2-eric.auger@redhat.com>
+From: Stefan Berger <stefanb@linux.ibm.com>
+Message-ID: <bfd5813b-12ef-04c8-0f21-4a3934fa0035@linux.ibm.com>
+Date: Fri, 19 Jun 2020 12:09:55 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <8e91bf40-34a2-91c2-6cd2-4dbf58dec8cf@redhat.com>
+In-Reply-To: <20200619141851.16272-2-eric.auger@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=jsnow@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/19 05:19:18
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
+ definitions=2020-06-19_16:2020-06-19,
+ 2020-06-19 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 clxscore=1015
+ impostorscore=0 cotscore=-2147483648 bulkscore=0 adultscore=0
+ lowpriorityscore=0 spamscore=0 mlxlogscore=999 suspectscore=0
+ malwarescore=0 mlxscore=0 priorityscore=1501 classifier=spam adjust=0
+ reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2006190114
+Received-SPF: pass client-ip=148.163.156.1; envelope-from=stefanb@linux.ibm.com;
+ helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/19 12:10:04
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -25
+X-Spam_score: -2.6
+X-Spam_bar: --
+X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -174,127 +115,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
- qemu-devel@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Cleber Rosa <crosa@redhat.com>, Max Reitz <mreitz@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: thuth@redhat.com, lersek@redhat.com, drjones@redhat.com,
+ shannon.zhaosl@gmail.com, marcandre.lureau@redhat.com, philmd@redhat.com,
+ ardb@kernel.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 6/19/20 10:18 AM, Eric Auger wrote:
+> Remove any reference to Acpi20TPM2 and adopt an implementation
+> similar to build_ghes_v2().
+>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> Suggested-by: Igor Mammedov <imammedo@redhat.com>
+
+Reviewed-by: Stefan Berger <stefanb@linux.ibm.com>
+
+Tested-by: Stefan Berger <stefanb@linux.ibm.com>
 
 
-On 6/19/20 11:15 AM, Philippe Mathieu-Daudé wrote:
-> On 6/17/20 10:27 PM, John Snow wrote:
->>
->>
->> On 6/17/20 3:52 PM, Cleber Rosa wrote:
->>> On Tue, Jun 02, 2020 at 08:15:16PM -0400, John Snow wrote:
-> [...]
->>> Are you proposing that we have, say, "python-qemu" version 10, being
->>> the 10th API version, without any regard to the QEMU version
->>> supported?  Or version 10.5.3 would mean 10th API version, intended
->>> to support QEMU 5.3?
->>>
->>
->> I am proposing only that we use semver to track the API version of the
->> SDK itself.
->>
->> So that could be:
->>
->> A) 1.x, 2.x, 3.x (etc) with absolutely no connection to the intended
->> QEMU support version. It either works or it doesn't. It might not work
->> very spectacularly. Major semver bumps indicate a breaking change to the
->> library API.
-> 
-> Major changes occurs between QEMU releases. If there is no QEMU release,
-> it is pointless to release the python-qemu package, right?
-> 
+>
+> ---
+>
+> v5 -> v6:
+> - add reference to the spec + comment about LAML and LASA fields
+> - also moved LASA intro comment above build_append_int_noprefix()
+>    as requested by Igor
+> ---
+>   hw/acpi/aml-build.c | 54 +++++++++++++++++++++++++++++----------------
+>   1 file changed, 35 insertions(+), 19 deletions(-)
+>
+> diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
+> index 2cb7b991ef..1cc08a3eb9 100644
+> --- a/hw/acpi/aml-build.c
+> +++ b/hw/acpi/aml-build.c
+> @@ -1878,48 +1878,64 @@ build_hdr:
+>                    "FACP", tbl->len - fadt_start, f->rev, oem_id, oem_table_id);
+>   }
+>   
+> +/*
+> + * build_tpm2 - Build the TPM2 table as specified in table 7 of
+> + * "TCG ACPI Specification; Family 1.2 and 2.0;
+> + * Level 00 Revision 00.37, December 19, 2014"
+> + * Note: the LASA and LAML fields are optional for TPM-2.0 (the above
+> + * table does not mention them) but are needed at least for SeaBIOS.
+> + * See the Acpi20TPM2 struct for the corresponding layout.
+> + */
+>   void build_tpm2(GArray *table_data, BIOSLinker *linker, GArray *tcpalog)
+>   {
+> -    Acpi20TPM2 *tpm2_ptr = acpi_data_push(table_data, sizeof(AcpiTableHeader));
+> -    unsigned log_addr_size = sizeof(tpm2_ptr->log_area_start_address);
+> -    unsigned log_addr_offset =
+> -        (char *)&tpm2_ptr->log_area_start_address - table_data->data;
+>       uint8_t start_method_params[12] = {};
+> +    unsigned log_addr_offset, tpm2_start;
+> +    uint64_t control_area_start_address;
+>       TPMIf *tpmif = tpm_find();
+> +    uint32_t start_method;
+> +    void *tpm2_ptr;
+>   
+> -    /* platform class */
+> +    tpm2_start = table_data->len;
+> +    tpm2_ptr = acpi_data_push(table_data, sizeof(AcpiTableHeader));
+> +
+> +    /* Platform Class */
+>       build_append_int_noprefix(table_data, TPM2_ACPI_CLASS_CLIENT, 2);
+> -    /* reserved */
+> +    /* Reserved */
+>       build_append_int_noprefix(table_data, 0, 2);
+>       if (TPM_IS_TIS_ISA(tpmif) || TPM_IS_TIS_SYSBUS(tpmif)) {
+> -        /* address of control area */
+> -        build_append_int_noprefix(table_data, 0, 8);
+> -        /* start method */
+> -        build_append_int_noprefix(table_data, TPM2_START_METHOD_MMIO, 4);
+> +        control_area_start_address = 0;
+> +        start_method = TPM2_START_METHOD_MMIO;
+>       } else if (TPM_IS_CRB(tpmif)) {
+> -        build_append_int_noprefix(table_data, TPM_CRB_ADDR_CTRL, 8);
+> -        build_append_int_noprefix(table_data, TPM2_START_METHOD_CRB, 4);
+> +        control_area_start_address = TPM_CRB_ADDR_CTRL;
+> +        start_method = TPM2_START_METHOD_CRB;
+>       } else {
+> -        g_warn_if_reached();
+> +        g_assert_not_reached();
+>       }
+> +    /* Address of Control Area */
+> +    build_append_int_noprefix(table_data, control_area_start_address, 8);
+> +    /* Start Method */
+> +    build_append_int_noprefix(table_data, start_method, 4);
+>   
+> -    /* platform specific parameters */
+> -    g_array_append_vals(table_data, &start_method_params, 12);
+> +    /* Platform Specific Parameters */
+> +    g_array_append_vals(table_data, &start_method_params,
+> +                        ARRAY_SIZE(start_method_params));
+>   
+> -    /* log area minimum length */
+> +    /* Log Area Minimum Length */
+>       build_append_int_noprefix(table_data, TPM_LOG_AREA_MINIMUM_SIZE, 4);
+>   
+>       acpi_data_push(tcpalog, TPM_LOG_AREA_MINIMUM_SIZE);
+>       bios_linker_loader_alloc(linker, ACPI_BUILD_TPMLOG_FILE, tcpalog, 1,
+>                                false);
+>   
+> -    /* log area start address to be filled by Guest linker */
+> +    log_addr_offset = table_data->len;
+> +
+> +    /* Log Area Start Address to be filled by Guest linker */
+>       build_append_int_noprefix(table_data, 0, 8);
+>       bios_linker_loader_add_pointer(linker, ACPI_BUILD_TABLE_FILE,
+> -                                   log_addr_offset, log_addr_size,
+> +                                   log_addr_offset, 8,
+>                                      ACPI_BUILD_TPMLOG_FILE, 0);
+>       build_header(linker, table_data,
+> -                 (void *)tpm2_ptr, "TPM2", sizeof(*tpm2_ptr), 4, NULL, NULL);
+> +                 tpm2_ptr, "TPM2", table_data->len - tpm2_start, 4, NULL, NULL);
+>   }
+>   
+>   /* ACPI 5.0: 6.4.3.8.2 Serial Bus Connection Descriptors */
 
-There might be fixes to the package that might be worth releasing
-out-of-band as point fixes. I don't intend to do this if I can help it,
-but I wanted to consider the possibility that unforeseen circumstances
-might force our hand.
-
->>
->> B) 1.5.0.0, 1.5.1.0, 1.5.2.0 (etc) where the major version still
->> describes the API, but the remainder of the version describes the
->> intended target QEMU.
->>
->> Or, we could do:
->>
->> C) 5.0.0, 5.1.0, 5.2.0, etc. where it tracks the QEMU version verbatim,
->> end of story.
-> 
-> At least it KISS.
-> 
-
-Simple at a glance.
-
-I have some concerns about how Python packages are normally specified in
-e.g. requirements.txt where there's a habit of saying:
-
-package>=3.0.0, <4.0.0
-
-There is a fairly common belief in the ecosystem that semver is being
-used. QEMU does not use semver.
-
-This leads us to a strange development paradigm in-tree where the Python
-package can have breaking changes from 5.x to 6.x, which are not
-otherwise special releases for QEMU itself.
-
-Combined with our deprecation policy, it means that we start adopting a
-policy like:
-
-- Features get deprecated for at least two releases
-- But can only be changed for a new "major" release.
-
-That mismatch against the QEMU versioning paradigm does not sound like
-KISS to me.
-
->>
->> I don't like (C) very much, because it violates some prevailing idioms
->> about python package versioning. A or B seem better, but do run us into
->> potential trouble with people having mismatched versions.
-> 
-> Which is why I prefer (C).
-> 
-
-Keep in mind that even though it looks more obvious, it still doesn't
-enforce the pairing. Problems with mismatched versions are just as
-likely to occur because of misconfigurations with requirements.txt.
-
-I guess my big concerns here are:
-
-1. Using 1:1 QEMU versions (starting at 5.x) might imply API stability
-for the package, and I would like to avoid committing to that. We *can*
-declare the package as Alpha/Beta in PyPI, but in practice I am not sure
-that information is consulted as readily as version numbers are.
-
-2. Python world (Citation Needed?) expects semver. We can ignore that if
-we choose; there aren't semver police. What are the consequences of
-doing that?
-
-3. No matter what we do, the relationship between the Python package and
-the QEMU version is only superficial and isn't enforced anywhere. (And,
-I think, shouldn't be enforced.)
-
->>
->> I'd take A or B. (B) is a little chatty but gives some good information
->> and allows you to pin versions effectively, so I think I'm leaning
->> towards that one right now.
->>
->> Well, whatever we do right now, I think I do really want to make sure we
->> are publishing under 0.x to really give the illustration that we are NOT
->> promising even the illusion of stability right now.
-> 
-
-It sounds like Avocado might be one of the biggest users of this, so I'd
-like to get some more feedback from Cleber, Wainer, et al.
-
---js
 
 
