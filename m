@@ -6,67 +6,71 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC912C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 09:20:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDCD8C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 09:20:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7507320789
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 09:20:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 885FF207FC
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 09:20:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aV0zzPWn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7507320789
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wo/zb62H"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 885FF207FC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46400 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46858 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmDCR-0004kn-IU
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 05:20:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37298)
+	id 1jmDCX-0004yV-QL
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 05:20:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37382)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jmDBA-0002k1-3y
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 05:19:20 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20305
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jmDBD-0002qK-1G
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 05:19:23 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:45479
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jmDB7-0003eG-CI
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 05:19:19 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jmDB8-0003eX-NG
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 05:19:22 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592558356;
+ s=mimecast20190719; t=1592558358;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
- references:references; bh=65AK+l0ayf/jAEUQwA/bth6AW44uX8Nq0gpboHYXMLM=;
- b=aV0zzPWnfuW3GWR20hsYkBOB10ei4/Q4WJGar39EuYw8/BLFZzEcb+3ZdL1UIwaAHh+52H
- YPFtI3IWqUCiLNkfPIGFFGOj/LvX+TKsTpJHiAnjoWC6YppIfHhhAgXgoK/BIUp5Fa27CL
- fP4q3FMrlmV7eZqUo+DoqX2BITFOgKY=
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=DzVjiGHlgwyOc7h8SJ/YIQqZjyI/YoNSwdoAtCxO0Xg=;
+ b=Wo/zb62HbaSzeKqRwyMNlbwaAguzO/4arnWfxcCQI4GyLU0hSWVtQBFaWV2tzx7lmVOwbW
+ D0Lv5BtiY86bt42YqNbVcNebBIFSrfbQy3qJe+HzfbJiHJ4aSTjlZfmeys3AO2smO/l6YN
+ H4gTm2LDF0YboDnyoC+BRuoqAfgcnoQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-339-EN1EFMrlPAGQnGahblKZrQ-1; Fri, 19 Jun 2020 05:19:14 -0400
-X-MC-Unique: EN1EFMrlPAGQnGahblKZrQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-163-feoCnPhUNGeFkAfCcH8O3Q-1; Fri, 19 Jun 2020 05:19:13 -0400
+X-MC-Unique: feoCnPhUNGeFkAfCcH8O3Q-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A237E1B2C983;
- Fri, 19 Jun 2020 09:19:13 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BE183107ACCA;
+ Fri, 19 Jun 2020 09:19:12 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-112-67.ams2.redhat.com
  [10.36.112.67])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E98B3100164C;
- Fri, 19 Jun 2020 09:19:06 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 05D8B71673;
+ Fri, 19 Jun 2020 09:19:07 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id EEECB1750C; Fri, 19 Jun 2020 11:19:05 +0200 (CEST)
+ id 235BA9D8F; Fri, 19 Jun 2020 11:19:06 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v10 01/12] qtest: allow DSDT acpi table changes
-Date: Fri, 19 Jun 2020 11:18:54 +0200
-Message-Id: <20200619091905.21676-2-kraxel@redhat.com>
+Subject: [PATCH v10 04/12] floppy: make isa_fdc_get_drive_max_chs static
+Date: Fri, 19 Jun 2020 11:18:57 +0200
+Message-Id: <20200619091905.21676-5-kraxel@redhat.com>
 In-Reply-To: <20200619091905.21676-1-kraxel@redhat.com>
 References: <20200619091905.21676-1-kraxel@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=207.211.31.120; envelope-from=kraxel@redhat.com;
  helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/19 03:15:03
@@ -100,35 +104,45 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- tests/qtest/bios-tables-test-allowed-diff.h | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+acpi aml generator needs this, but it is in floppy code now
+so we can make the function static.
 
-diff --git a/tests/qtest/bios-tables-test-allowed-diff.h b/tests/qtest/bios-tables-test-allowed-diff.h
-index dfb8523c8bf4..8992f1f12b77 100644
---- a/tests/qtest/bios-tables-test-allowed-diff.h
-+++ b/tests/qtest/bios-tables-test-allowed-diff.h
-@@ -1 +1,19 @@
- /* List of comma-separated changed AML files to ignore */
-+"tests/data/acpi/pc/DSDT",
-+"tests/data/acpi/pc/DSDT.acpihmat",
-+"tests/data/acpi/pc/DSDT.bridge",
-+"tests/data/acpi/pc/DSDT.cphp",
-+"tests/data/acpi/pc/DSDT.dimmpxm",
-+"tests/data/acpi/pc/DSDT.ipmikcs",
-+"tests/data/acpi/pc/DSDT.memhp",
-+"tests/data/acpi/pc/DSDT.numamem",
-+"tests/data/acpi/q35/DSDT",
-+"tests/data/acpi/q35/DSDT.acpihmat",
-+"tests/data/acpi/q35/DSDT.bridge",
-+"tests/data/acpi/q35/DSDT.cphp",
-+"tests/data/acpi/q35/DSDT.dimmpxm",
-+"tests/data/acpi/q35/DSDT.ipmibt",
-+"tests/data/acpi/q35/DSDT.memhp",
-+"tests/data/acpi/q35/DSDT.mmio64",
-+"tests/data/acpi/q35/DSDT.numamem",
-+"tests/data/acpi/q35/DSDT.tis",
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Acked-by: John Snow <jsnow@redhat.com>
+---
+ include/hw/block/fdc.h | 2 --
+ hw/block/fdc.c         | 4 ++--
+ 2 files changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/include/hw/block/fdc.h b/include/hw/block/fdc.h
+index c15ff4c62315..5d71cf972268 100644
+--- a/include/hw/block/fdc.h
++++ b/include/hw/block/fdc.h
+@@ -16,7 +16,5 @@ void sun4m_fdctrl_init(qemu_irq irq, hwaddr io_base,
+                        DriveInfo **fds, qemu_irq *fdc_tc);
+ 
+ FloppyDriveType isa_fdc_get_drive_type(ISADevice *fdc, int i);
+-void isa_fdc_get_drive_max_chs(FloppyDriveType type,
+-                               uint8_t *maxc, uint8_t *maxh, uint8_t *maxs);
+ 
+ #endif
+diff --git a/hw/block/fdc.c b/hw/block/fdc.c
+index c92436772292..5a634ab46302 100644
+--- a/hw/block/fdc.c
++++ b/hw/block/fdc.c
+@@ -2744,8 +2744,8 @@ FloppyDriveType isa_fdc_get_drive_type(ISADevice *fdc, int i)
+     return isa->state.drives[i].drive;
+ }
+ 
+-void isa_fdc_get_drive_max_chs(FloppyDriveType type,
+-                               uint8_t *maxc, uint8_t *maxh, uint8_t *maxs)
++static void isa_fdc_get_drive_max_chs(FloppyDriveType type, uint8_t *maxc,
++                                      uint8_t *maxh, uint8_t *maxs)
+ {
+     const FDFormat *fdf;
+ 
 -- 
 2.18.4
 
