@@ -2,80 +2,86 @@ Return-Path: <SRS0=Yszf=AA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C76BFC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 10:43:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53D64C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 10:44:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9620F207FC
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 10:43:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 20045207FC
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 10:44:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dSUp27Pw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9620F207FC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZcGGHMVG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20045207FC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48574 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51422 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmEUz-0004IY-U6
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 06:43:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58326)
+	id 1jmEW0-0005TE-DL
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 06:44:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59044)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jmERe-0008GG-GD
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 06:40:26 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47791
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jmERZ-0000vg-Mp
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 06:40:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592563220;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=vNJIJslwuBdOw5lnuy/oZWkG95NKn7PGIf3WsTPg6p4=;
- b=dSUp27PwXJyxB+8ix8RjOGugtIuv4GDp/ezxIdwY/C5QOVA/Ae8UKBuzO5KtO5bxUeuPFh
- NyB+UnxfTKlZetzcLw0d8DHKvoT5jQ0yRbdkz2vQr3C0sDDxOmWanFHF+sF3rSB60FBPTf
- ZyRpzNIzLaMDJ5mpTEZutZODgFtRXL4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-322-iaYQuNijPMa_32hNAwgdzQ-1; Fri, 19 Jun 2020 06:40:15 -0400
-X-MC-Unique: iaYQuNijPMa_32hNAwgdzQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B8882801503;
- Fri, 19 Jun 2020 10:40:14 +0000 (UTC)
-Received: from localhost (ovpn-113-28.ams2.redhat.com [10.36.113.28])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1CFC25D9CA;
- Fri, 19 Jun 2020 10:40:13 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH 0/2] qcow2: Force preallocation with data-file-raw
-Date: Fri, 19 Jun 2020 12:40:10 +0200
-Message-Id: <20200619104012.235977-1-mreitz@redhat.com>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jmEVA-0004dt-MA
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 06:44:04 -0400
+Received: from mail-ot1-x32f.google.com ([2607:f8b0:4864:20::32f]:41514)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jmEV8-0001br-Om
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 06:44:04 -0400
+Received: by mail-ot1-x32f.google.com with SMTP id k15so6923401otp.8
+ for <qemu-devel@nongnu.org>; Fri, 19 Jun 2020 03:44:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=J/evnrWg3IeTDWY/D23DOwlpV3zddDpvX5N6ONh88JY=;
+ b=ZcGGHMVGOzvFDgcXNPInnHG//0ZKDo/+8o5ziWYWK9bjPIbRVHMlQaE9LQmAAY0ciT
+ MUBUfOfnCX7Qpsbf0tnS95eFzDC+RrkwF6cQ00Br1Dsubo1I4wIq6EugaRbgdSixIXHZ
+ ISHciNyUwlr78Zr/yA1z4htORO2MHzONGDGN3yL17gyXcJ0NzAaEVf1+VoG9FggeBIgq
+ G5KQUXGYnB8EFw6BC/VfaimvIK8I1hTSjnsh51l8Y6t9oKdH7uVecTIIb+mO9N3qYG6D
+ OjvOK6xXFU8lXg3n30CTQCwmxJTe90SavyRWlJmkvH2T/RYCiZX38p0f712UwIvcwB0p
+ lt3A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=J/evnrWg3IeTDWY/D23DOwlpV3zddDpvX5N6ONh88JY=;
+ b=XzEaKbunLgEpPgQTHtiGLySFauz5NIbaEE8v2P5TC4si7iz6pPTa08a+B8iIihejcm
+ p6CiFXE3omxzgQZpt6Io2k6nBtxR+FC0VSWpfakQs90gioAF4gM6d/tw/ZL/VkKFph//
+ aDlONxBQr1FiL5Vwrqudj0FU0U4T5UfAwLnj8+V9lx7979fY1CpJXA/o+68ohlZ4h0E4
+ LHw2xYCe+XNHocijNeoyK03C/iR7BouqhWZ6T3cWf+b6OjrOeiEWStDRZfz9lAojrn5T
+ Usguq0o0lL7UfyqVt7cmP28UQvbJZpb0beQqqrK7BNV+ihNg8HVX01lFof8cZliro9PE
+ rA0A==
+X-Gm-Message-State: AOAM533kX+rY8HNQzHTIER4avsF0d1U1pYYIbNQ5OgcXIGrFSsO32rwj
+ 0iSm2NDxThR9qz8AWiNl+oSTLexlwbY9VQlPBLrEtg==
+X-Google-Smtp-Source: ABdhPJydV9YmV7PnbfQOOvXAVWCFr+PutDtwpJeXMbOKS429H/TpYiaxF7JA67U3BFKqKGDGttzhEE7WDHIgZQAz7s8=
+X-Received: by 2002:a05:6830:8d:: with SMTP id
+ a13mr2426540oto.91.1592563441309; 
+ Fri, 19 Jun 2020 03:44:01 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=mreitz@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/19 05:19:18
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+References: <1592486508-6135-1-git-send-email-jasowang@redhat.com>
+In-Reply-To: <1592486508-6135-1-git-send-email-jasowang@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 19 Jun 2020 11:43:50 +0100
+Message-ID: <CAFEAcA9QRqUdZqdQNhwMyHyfBXscQ8cBZ=Jut7Y+-f-FKS-iRw@mail.gmail.com>
+Subject: Re: [PULL V2 00/33] Net patches
+To: Jason Wang <jasowang@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::32f;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x32f.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -88,37 +94,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+On Thu, 18 Jun 2020 at 14:21, Jason Wang <jasowang@redhat.com> wrote:
+>
+> The following changes since commit 3f429a3400822141651486193d6af625eeab05a5:
+>
+>   Merge remote-tracking branch 'remotes/kraxel/tags/microvm-20200617-pull-request' into staging (2020-06-18 11:23:15 +0100)
+>
+> are available in the git repository at:
+>
+>   https://github.com/jasowang/qemu.git tags/net-pull-request
+>
+> for you to fetch changes up to 71830d8430e65dd20aec4765d87e60336148e1a6:
+>
+>   net: Drop the NetLegacy structure, always use Netdev instead (2020-06-18 21:05:52 +0800)
+>
+> ----------------------------------------------------------------
+>
+> Changes from V1:
+> - Fix build failure for virtio-net
 
-As discussed here:
 
-https://lists.nongnu.org/archive/html/qemu-block/2020-02/msg00644.html
-https://lists.nongnu.org/archive/html/qemu-block/2020-04/msg00329.html
-https://lists.nongnu.org/archive/html/qemu-block/2020-06/msg00240.html
+Applied, thanks.
 
-I think that qcow2 images with data-file-raw should always have
-preallocated 1:1 L1/L2 tables, so that the image always looks the same
-whether you respect or ignore the qcow2 metadata.  The easiest way to
-achieve that is to enforce at least metadata preallocation whenever
-data-file-raw is given.
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.1
+for any user-visible changes.
 
-
-Max Reitz (2):
-  qcow2: Force preallocation with data-file-raw
-  iotests/244: Test preallocation for data-file-raw
-
- block/qcow2.c              | 22 +++++++++++++
- tests/qemu-iotests/244     | 65 ++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/244.out | 32 ++++++++++++++++---
- 3 files changed, 114 insertions(+), 5 deletions(-)
-
--- 
-2.26.2
-
+-- PMM
 
