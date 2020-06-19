@@ -2,67 +2,98 @@ Return-Path: <SRS0=Yszf=AA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5D46C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 04:15:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D04CBC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 05:10:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 913F820890
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 04:15:08 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Ty7HzoUx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 913F820890
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id A61FA206E2
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 05:10:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A61FA206E2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49788 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57422 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jm8Ql-0007td-Px
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 00:15:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33144)
+	id 1jm9In-0005jq-RX
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 01:10:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41770)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jm8Q8-0007Ik-AV
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 00:14:28 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:54043 helo=ozlabs.org)
+ (Exim 4.90_1) (envelope-from <ljp@linux.vnet.ibm.com>)
+ id 1jm9I8-0004Vw-9k; Fri, 19 Jun 2020 01:10:16 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:29274)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jm8Q4-0005WR-KZ
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 00:14:28 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 49p56L6769z9sRk; Fri, 19 Jun 2020 14:14:18 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1592540058;
- bh=LfEePlG/mcY9taFnPF//9oIvIWUP6ntYIzNZfysCYpI=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=Ty7HzoUxSoyy3A7Ek5I2ds6rVA/t8ejuWv1eQ9ilXKQrAKECgX6I2QJZQnV8OWypX
- MoLCgSFqM9Xxa/Vxdb7EPfcT7B9MaYecffMgMSORYpcoRH9c+BnTe/8huCV1Upkqd7
- f0zZ9Y+rx6ens6Vt5znX7epRwlYH14w2yg6zqleI=
-Date: Fri, 19 Jun 2020 14:13:34 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Markus Armbruster <armbru@redhat.com>
-Subject: Re: Memory leak in spapr_machine_init()?
-Message-ID: <20200619041334.GI17085@umbus.fritz.box>
-References: <874kr8uakm.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="byLs0wutDcxFdwtm"
-Content-Disposition: inline
-In-Reply-To: <874kr8uakm.fsf@dusky.pond.sub.org>
-Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
- helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/19 00:14:20
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -9
-X-Spam_score: -1.0
-X-Spam_bar: -
-X-Spam_report: (-1.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ (Exim 4.90_1) (envelope-from <ljp@linux.vnet.ibm.com>)
+ id 1jm9I6-000677-84; Fri, 19 Jun 2020 01:10:16 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 05J52TwH140650; Fri, 19 Jun 2020 01:10:10 -0400
+Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com
+ [169.55.85.253])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 31rkgjcjtc-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 19 Jun 2020 01:10:10 -0400
+Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
+ by ppma01wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05J59XKP014692;
+ Fri, 19 Jun 2020 05:10:09 GMT
+Received: from b03cxnp07029.gho.boulder.ibm.com
+ (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
+ by ppma01wdc.us.ibm.com with ESMTP id 31q6bdh41t-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 19 Jun 2020 05:10:09 +0000
+Received: from b03ledav002.gho.boulder.ibm.com
+ (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
+ by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 05J5A8JM59048400
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 19 Jun 2020 05:10:08 GMT
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 3AE3113605D;
+ Fri, 19 Jun 2020 05:10:08 +0000 (GMT)
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 8D4DA136059;
+ Fri, 19 Jun 2020 05:10:07 +0000 (GMT)
+Received: from [9.160.87.86] (unknown [9.160.87.86])
+ by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTPS;
+ Fri, 19 Jun 2020 05:10:07 +0000 (GMT)
+Content-Type: text/plain;
+	charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
+Subject: Re: [PATCH v2] target/ppc: add vmsumudm vmsumcud instructions
+From: Lijun Pan <ljp@linux.vnet.ibm.com>
+In-Reply-To: <13dac383-7d04-faf2-7a87-c4e92e693148@linaro.org>
+Date: Fri, 19 Jun 2020 00:10:06 -0500
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <772D8DFD-8784-435A-AB9B-E0A78B12A7E4@linux.vnet.ibm.com>
+References: <20200613035546.22041-1-ljp@linux.ibm.com>
+ <4f0e24af-5043-98d3-0f7b-e8d460bac617@linaro.org>
+ <73404995-1D90-4E2B-A328-CA5C47C933D5@linux.vnet.ibm.com>
+ <13dac383-7d04-faf2-7a87-c4e92e693148@linaro.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+X-Mailer: Apple Mail (2.3608.80.23.2.2)
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
+ definitions=2020-06-19_01:2020-06-18,
+ 2020-06-19 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ mlxscore=0 suspectscore=0
+ clxscore=1015 priorityscore=1501 bulkscore=0 adultscore=0 mlxlogscore=815
+ impostorscore=0 phishscore=0 cotscore=-2147483648 lowpriorityscore=0
+ spamscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2004280000 definitions=main-2006190029
+Received-SPF: none client-ip=148.163.156.1;
+ envelope-from=ljp@linux.vnet.ibm.com; helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/19 01:10:12
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
+X-Spam_bar: ---
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001, SPF_NONE=0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -76,99 +107,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: David Gibson <dgibson@redhat.com>, qemu-devel@nongnu.org
+Cc: Lijun Pan <ljp@linux.ibm.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---byLs0wutDcxFdwtm
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jun 18, 2020 at 08:55:53AM +0200, Markus Armbruster wrote:
-> Either I'm confused (quite possible), or kvmppc_check_papr_resize_hpt()
-> can leak an Error object on failure.  Please walk through the code with
-> me:
+> On Jun 18, 2020, at 6:09 PM, Richard Henderson =
+<richard.henderson@linaro.org> wrote:
 >=20
->         kvmppc_check_papr_resize_hpt(&resize_hpt_err);
+> On 6/15/20 1:53 PM, Lijun Pan wrote:
+>>>> +static inline void uint128_add(uint64_t ah, uint64_t al, uint64_t =
+bh,
+>>>> +		uint64_t bl, uint64_t *rh, uint64_t *rl, uint64_t *ca)
+>>>> +{
+>>>> +	__uint128_t a =3D (__uint128_t)ah << 64 | (__uint128_t)al;
+>>>> +	__uint128_t b =3D (__uint128_t)bh << 64 | (__uint128_t)bl;
+>>>> +	__uint128_t r =3D a + b;
+>>>> +
+>>>> +	*rh =3D (uint64_t)(r >> 64);
+>>>> +	*rl =3D (uint64_t)r;
+>>>> +	*ca =3D (~a < b);
+>>>> +}
+>>>=20
+>>> This is *not* what I had in mind at all.
+>>>=20
+>>> int128.h should be operating on Int128, and *not* component uint64_t =
+values.
+>>=20
+>> Should uint128_add() be included in a new file called uint128.h? or =
+still at host-utils.h?
 >=20
-> This sets @resize_hpt_err on failure.
+> If you want this sort of specific operation, you should leave it in =
+target/ppc/.
 >=20
->         if (spapr->resize_hpt =3D=3D SPAPR_RESIZE_HPT_DEFAULT) {
->             /*
->              * If the user explicitly requested a mode we should either
->              * supply it, or fail completely (which we do below).  But if
->              * it's not set explicitly, we reset our mode to something
->              * that works
->              */
->             if (resize_hpt_err) {
->                 spapr->resize_hpt =3D SPAPR_RESIZE_HPT_DISABLED;
->                 error_free(resize_hpt_err);
->                 resize_hpt_err =3D NULL;
+> I had been hoping that you could make use of Int128 as-is, or with =
+minimal
+> adjustment in the same style.
 >=20
-> Case 1: failure and SPAPR_RESIZE_HPT_DEFAULT; we free @resize_hpt_err.
-> Good.
->=20
->             } else {
->                 spapr->resize_hpt =3D smc->resize_hpt_default;
->             }
->         }
->=20
->         assert(spapr->resize_hpt !=3D SPAPR_RESIZE_HPT_DEFAULT);
->=20
->         if ((spapr->resize_hpt !=3D SPAPR_RESIZE_HPT_DISABLED) && resize_=
-hpt_err) {
->             /*
->              * User requested HPT resize, but this host can't supply it. =
- Bail out
->              */
->             error_report_err(resize_hpt_err);
->             exit(1);
->=20
-> Case 2: failure and not SPAPR_RESIZE_HPT_DISABLED; fatal.  Good.
->=20
->         }
->=20
-> What about case 3: failure and SPAPR_RESIZE_HPT_DISABLED?
->=20
-> Good if we get here via case 1 (we freed @resize_hpt_err).
->=20
-> Else, ???
+>> vmsumudm/vmsumcud operate as follows:
+>> 1. 128-bit prod1 =3D (high 64 bits of a) * (high 64 bits of b), // I =
+reuse mulu64()
 
-I think you're right, and we leak it in this case - I think I forgot
-that in the DISABLED case we still (unnecessarily) ask the kernel if
-it can do it.
+This is an implementation not relying on 128 bit compiler support (not =
+defined CONFIG_INT128),=20
+hence using mulu64().
 
-Of course, it will only happen once per run, so it's not like it's a
-particularly noticeable leak.
+>> 2. 128-bit prod2 =3D (high 64 bits of b) * (high 64 bits of b), // I =
+reuse mulu64()
+>> 3. 128-bit result =3D prod1 + prod2 + c; // I added addu128() in v1, =
+renamed it to uint128_add() in v2
+>=20
+> Really?  That seems a very odd computation.  Your code,
+>=20
+>> +	prod1 =3D (__uint128_t)ah * (__uint128_t)bh;
+>> +	prod2 =3D (__uint128_t)al * (__uint128_t)bl;
+>> +	r =3D prod1 + prod2 + c;
+>=20
+> is slightly different, but still very odd.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Above 3 lines of code are using 128 bit compiler suppor (#ifdef =
+CONFIG_INT128).=20
 
---byLs0wutDcxFdwtm
-Content-Type: application/pgp-signature; name="signature.asc"
+>=20
+> Why would we be adding the intermediate 128th bit of the 256-bit =
+product
+> (prod1, bit 0) with the 0th bit of the 256-bit product (prod2, bit 0).
+>=20
+> Unfortunately, I can't find the v3.1 spec online yet, so I can't look =
+at this
+> myself.  What is the instruction supposed to produce?
 
------BEGIN PGP SIGNATURE-----
+https://ibm.ent.box.com/s/hhjfw0x0lrbtyzmiaffnbxh2fuo0fog0
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl7sO2sACgkQbDjKyiDZ
-s5JxwA//ZPOZIn+BPG64G0z7MGMbI4Fdf6FIUB4R43jXdeS0OwCyvxlKeGuW8xoS
-JET+EjpdewJpQb9KSm689Yb3vJ2DFqit2al7/rFPCRRUBjNmI68I4MsFNsZAE2tt
-Hj/KtqPwLvzB9DW+KCerWwDE/aZfaQDDTzLaTHiWRTSQgSGhIvRssr50o37N7BN6
-5THzY37P7FQOknkVtff82GjtrbhX+Y9xewedtzWcMKWwAE/ujwqF2JVFfSmEot33
-CanDqPyYbCPoIoKhVBFb67bIMg7YTkjbhwCf8lRQActHqffJroyfdyEgt2MVgqkm
-vMgEu3YcjSmi/4uhyykdkrRlHJSXOG2YIjYTyg2XudZVfRq2SflpO7pvSb7wL75T
-Hj0i5tQKqfEAO77zvyJVz6V8kk6ncBJywCRy9X0yNQBt9DXTEvrw/4eTyrkk1On8
-9HnJAMtMZlA8Wuzf3GW+USebAz/o9wuSLbG6P/a9+Xjck9IwKNeZfsjFftbZ0WEm
-DQrb6/1BE/w3xZ8xTouqn5eVRq6CXx0d/C7gryEz9fhnCZIP4I9e8b5oaunDR6FU
-+HtlTprrI1hp7dE/aBv9QBiXMlQkzJ5cGCniKxo7jsjNnd1XK+3WwOT405wKsWxP
-YErPtJtd8ZTvHaLr/lR3FmjpRI76jwgShhxEYS7OMIkXNu7jIp0=
-=cjNq
------END PGP SIGNATURE-----
+>=20
+>> To better understand your request, may I ask you several questions:
+>> 1. keep mulsum() in target/ppc/int_helper.c?
+>=20
+> Probably.
+>=20
+>> If so, it will inevitably have  #ifdef CONFIG_INT128 #else #endif in =
+that function. =20
+>=20
+> No, you don't have to ifdef.  You can use uint64_t alone and not rely =
+on
+> compiler support for __uint128_t at all.
+>=20
+>=20
+> r~
+>=20
 
---byLs0wutDcxFdwtm--
 
