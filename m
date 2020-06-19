@@ -2,51 +2,52 @@ Return-Path: <SRS0=Yszf=AA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0519C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 02:09:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0D49C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 02:09:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7715C20773
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 02:09:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BA3D820888
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 02:09:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Dh6czTEK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7715C20773
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="cBvMriuf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA3D820888
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49934 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50720 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jm6TF-00013O-Ov
-	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 22:09:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41938)
+	id 1jm6TU-0001Mt-V2
+	for qemu-devel@archiver.kernel.org; Thu, 18 Jun 2020 22:09:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41942)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jm6QC-0003BD-7B; Thu, 18 Jun 2020 22:06:24 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:47045 helo=ozlabs.org)
+ id 1jm6QC-0003BF-7a; Thu, 18 Jun 2020 22:06:24 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:51091 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jm6Q9-0000os-9Z; Thu, 18 Jun 2020 22:06:23 -0400
+ id 1jm6Q9-0000or-BF; Thu, 18 Jun 2020 22:06:23 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 49p2GT2LD1z9sT2; Fri, 19 Jun 2020 12:06:08 +1000 (AEST)
+ id 49p2GT1nx6z9sSg; Fri, 19 Jun 2020 12:06:08 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1592532369;
- bh=qMsc309NrDU+kjkrkNdXuQ5jS6081SEdRvf2Ra68+0k=;
+ bh=T8XqkWK5JYfur3/pmkkptr+wA0TMGxmdlb99ZrpmXZk=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=Dh6czTEKkpC3AwFZDUZjJ8VQHRUr7RcuJheAzLqBP5kPURdYs+0yGjCA/XT1zxs7D
- s1fb+ETwTqir/AVT8/Fg42F1EGeA4vLI/0GtfCdmqaPQ+UY6gkl6xNDVkQ5NE1MxKj
- c0LeubLAdqYb7kxaejnrpYAIiqHooNIW4j31udso=
+ b=cBvMriufB9iG+tUu4tP1QPH2DHnINBGfgG58DZp8rqgZKdt7GFlHSdgv2cbCxtmxY
+ 64vPS+bMDu4WjEraFgPx/XClkpfn2dYIukR9dAIGrInHf3xTwu3qOmrgZTJ4qjpqjK
+ 2KZR9fPhMiGpVYa/el8HATHhqCc3ofYY+tgMm7Pk=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: qemu-devel@nongnu.org, brijesh.singh@amd.com, pair@us.ibm.com,
  pbonzini@redhat.com, dgilbert@redhat.com, frankja@linux.ibm.com
-Subject: [PATCH v3 7/9] spapr: Add PEF based host trust limitation
-Date: Fri, 19 Jun 2020 12:06:00 +1000
-Message-Id: <20200619020602.118306-8-david@gibson.dropbear.id.au>
+Subject: [PATCH v3 5/9] host trust limitation: Decouple kvm_memcrypt_*()
+ helpers from KVM
+Date: Fri, 19 Jun 2020 12:05:58 +1000
+Message-Id: <20200619020602.118306-6-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200619020602.118306-1-david@gibson.dropbear.id.au>
 References: <20200619020602.118306-1-david@gibson.dropbear.id.au>
@@ -76,146 +77,215 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org, mst@redhat.com,
- Ram Pai <linuxram@us.ibm.com>, cohuck@redhat.com, david@redhat.com,
- mdroth@linux.vnet.ibm.com, pasic@linux.ibm.com, qemu-s390x@nongnu.org,
- qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>,
+ Richard Henderson <richard.henderson@linaro.org>, cohuck@redhat.com,
+ david@redhat.com, mdroth@linux.vnet.ibm.com, pasic@linux.ibm.com,
+ qemu-s390x@nongnu.org, qemu-ppc@nongnu.org,
+ David Gibson <david@gibson.dropbear.id.au>,
  Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Some upcoming POWER machines have a system called PEF (Protected
-Execution Facility) which uses a small ultravisor to allow guests to
-run in a way that they can't be eavesdropped by the hypervisor.  The
-effect is roughly similar to AMD SEV, although the mechanisms are
-quite different.
+The kvm_memcrypt_enabled() and kvm_memcrypt_encrypt_data() helper functions
+don't conceptually have any connection to KVM (although it's not possible
+in practice to use them without it).
 
-Most of the work of this is done between the guest, KVM and the
-ultravisor, with little need for involvement by qemu.  However qemu
-does need to tell KVM to allow secure VMs.
+They also rely on looking at the global KVMState.  But the same information
+is available from the machine, and the only existing callers have natural
+access to the machine state.
 
-Because the availability of secure mode is a guest visible difference
-which depends on having the right hardware and firmware, we don't
-enable this by default.  In order to run a secure guest you need to
-create a "pef-guest" object and set the host-trust-limitation machine
-property to point to it.
-
-Note that this just *allows* secure guests, the architecture of PEF is
-such that the guest still needs to talk to the ultravisor to enter
-secure mode.  Qemu has no directly way of knowing if the guest is in
-secure mode, and certainly can't know until well after machine
-creation time.
+Therefore, move and rename them to helpers in host-trust-limitation.h,
+taking an explicit machine parameter.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Acked-by: Ram Pai <linuxram@us.ibm.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/ppc/Makefile.objs |  2 +-
- target/ppc/pef.c         | 83 ++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 84 insertions(+), 1 deletion(-)
- create mode 100644 target/ppc/pef.c
+ accel/kvm/kvm-all.c                  | 27 ---------------------
+ accel/stubs/kvm-stub.c               | 10 --------
+ hw/i386/pc_sysfw.c                   |  6 +++--
+ include/exec/host-trust-limitation.h | 36 ++++++++++++++++++++++++++++
+ include/sysemu/kvm.h                 | 17 -------------
+ 5 files changed, 40 insertions(+), 56 deletions(-)
 
-diff --git a/target/ppc/Makefile.objs b/target/ppc/Makefile.objs
-index e8fa18ce13..ac93b9700e 100644
---- a/target/ppc/Makefile.objs
-+++ b/target/ppc/Makefile.objs
-@@ -6,7 +6,7 @@ obj-y += machine.o mmu_helper.o mmu-hash32.o monitor.o arch_dump.o
- obj-$(TARGET_PPC64) += mmu-hash64.o mmu-book3s-v3.o compat.o
- obj-$(TARGET_PPC64) += mmu-radix64.o
- endif
--obj-$(CONFIG_KVM) += kvm.o
-+obj-$(CONFIG_KVM) += kvm.o pef.o
- obj-$(call lnot,$(CONFIG_KVM)) += kvm-stub.o
- obj-y += dfp_helper.o
- obj-y += excp_helper.o
-diff --git a/target/ppc/pef.c b/target/ppc/pef.c
-new file mode 100644
-index 0000000000..53a6af0347
---- /dev/null
-+++ b/target/ppc/pef.c
-@@ -0,0 +1,83 @@
-+/*
-+ * PEF (Protected Execution Facility) for POWER support
-+ *
-+ * Copyright David Gibson, Redhat Inc. 2020
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+
-+#include "qapi/error.h"
-+#include "qom/object_interfaces.h"
-+#include "sysemu/kvm.h"
-+#include "migration/blocker.h"
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index d8e8fa345e..9645271ca5 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -118,9 +118,6 @@ struct KVMState
+     KVMMemoryListener memory_listener;
+     QLIST_HEAD(, KVMParkedVcpu) kvm_parked_vcpus;
+ 
+-    /* host trust limitation (e.g. by guest memory encryption) */
+-    HostTrustLimitation *htl;
+-
+     /* For "info mtree -f" to tell if an MR is registered in KVM */
+     int nr_as;
+     struct KVMAs {
+@@ -219,28 +216,6 @@ int kvm_get_max_memslots(void)
+     return s->nr_slots;
+ }
+ 
+-bool kvm_memcrypt_enabled(void)
+-{
+-    if (kvm_state && kvm_state->htl) {
+-        return true;
+-    }
+-
+-    return false;
+-}
+-
+-int kvm_memcrypt_encrypt_data(uint8_t *ptr, uint64_t len)
+-{
+-    HostTrustLimitation *htl = kvm_state->htl;
+-
+-    if (htl) {
+-        HostTrustLimitationClass *htlc = HOST_TRUST_LIMITATION_GET_CLASS(htl);
+-
+-        return htlc->encrypt_data(htl, ptr, len);
+-    }
+-
+-    return 1;
+-}
+-
+ /* Called with KVMMemoryListener.slots_lock held */
+ static KVMSlot *kvm_get_free_slot(KVMMemoryListener *kml)
+ {
+@@ -2188,8 +2163,6 @@ static int kvm_init(MachineState *ms)
+         if (ret < 0) {
+             goto err;
+         }
+-
+-        kvm_state->htl = ms->htl;
+     }
+ 
+     ret = kvm_arch_init(ms, s);
+diff --git a/accel/stubs/kvm-stub.c b/accel/stubs/kvm-stub.c
+index 82f118d2df..78b3eef117 100644
+--- a/accel/stubs/kvm-stub.c
++++ b/accel/stubs/kvm-stub.c
+@@ -104,16 +104,6 @@ int kvm_on_sigbus(int code, void *addr)
+     return 1;
+ }
+ 
+-bool kvm_memcrypt_enabled(void)
+-{
+-    return false;
+-}
+-
+-int kvm_memcrypt_encrypt_data(uint8_t *ptr, uint64_t len)
+-{
+-  return 1;
+-}
+-
+ #ifndef CONFIG_USER_ONLY
+ int kvm_irqchip_add_msi_route(KVMState *s, int vector, PCIDevice *dev)
+ {
+diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
+index ec2a3b3e7e..cab5ac5695 100644
+--- a/hw/i386/pc_sysfw.c
++++ b/hw/i386/pc_sysfw.c
+@@ -38,6 +38,7 @@
+ #include "sysemu/sysemu.h"
+ #include "hw/block/flash.h"
+ #include "sysemu/kvm.h"
 +#include "exec/host-trust-limitation.h"
-+
-+#define TYPE_PEF_GUEST "pef-guest"
-+#define PEF_GUEST(obj)                                  \
-+    OBJECT_CHECK(PefGuestState, (obj), TYPE_PEF_GUEST)
-+
-+typedef struct PefGuestState PefGuestState;
+ 
+ /*
+  * We don't have a theoretically justifiable exact lower bound on the base
+@@ -196,10 +197,11 @@ static void pc_system_flash_map(PCMachineState *pcms,
+             pc_isa_bios_init(rom_memory, flash_mem, size);
+ 
+             /* Encrypt the pflash boot ROM */
+-            if (kvm_memcrypt_enabled()) {
++            if (host_trust_limitation_enabled(MACHINE(pcms))) {
+                 flash_ptr = memory_region_get_ram_ptr(flash_mem);
+                 flash_size = memory_region_size(flash_mem);
+-                ret = kvm_memcrypt_encrypt_data(flash_ptr, flash_size);
++                ret = host_trust_limitation_encrypt(MACHINE(pcms),
++                                                    flash_ptr, flash_size);
+                 if (ret) {
+                     error_report("failed to encrypt pflash rom");
+                     exit(1);
+diff --git a/include/exec/host-trust-limitation.h b/include/exec/host-trust-limitation.h
+index a19f12ae14..fc30ea3f78 100644
+--- a/include/exec/host-trust-limitation.h
++++ b/include/exec/host-trust-limitation.h
+@@ -14,6 +14,7 @@
+ #define QEMU_HOST_TRUST_LIMITATION_H
+ 
+ #include "qom/object.h"
++#include "hw/boards.h"
+ 
+ #define TYPE_HOST_TRUST_LIMITATION "host-trust-limitation"
+ #define HOST_TRUST_LIMITATION(obj)                                    \
+@@ -33,4 +34,39 @@ typedef struct HostTrustLimitationClass {
+     int (*encrypt_data)(HostTrustLimitation *, uint8_t *, uint64_t);
+ } HostTrustLimitationClass;
+ 
++/**
++ * host_trust_limitation_enabled - return whether guest memory is protected
++ *                                 from hypervisor access (with memory
++ *                                 encryption or otherwise)
++ * Returns: true guest memory is not directly accessible to qemu
++ *          false guest memory is directly accessible to qemu
++ */
++static inline bool host_trust_limitation_enabled(MachineState *machine)
++{
++    return !!machine->htl;
++}
 +
 +/**
-+ * PefGuestState:
++ * host_trust_limitation_encrypt: encrypt the memory range to make
++ *                                it guest accessible
 + *
-+ * The PefGuestState object is used for creating and managing a PEF
-+ * guest.
-+ *
-+ * # $QEMU \
-+ *         -object pef-guest,id=pef0 \
-+ *         -machine ...,host-trust-limitation=pef0
++ * Return: 1 failed to encrypt the range
++ *         0 succesfully encrypted memory region
 + */
-+struct PefGuestState {
-+    Object parent_obj;
-+};
-+
-+static int pef_kvm_init(HostTrustLimitation *gmpo, Error **errp)
++static inline int host_trust_limitation_encrypt(MachineState *machine,
++                                                uint8_t *ptr, uint64_t len)
 +{
-+    if (!kvm_check_extension(kvm_state, KVM_CAP_PPC_SECURE_GUEST)) {
-+        error_setg(errp,
-+                   "KVM implementation does not support Secure VMs (is an ultravisor running?)");
-+        return -1;
-+    } else {
-+        int ret = kvm_vm_enable_cap(kvm_state, KVM_CAP_PPC_SECURE_GUEST, 0, 1);
++    HostTrustLimitation *htl = machine->htl;
 +
-+        if (ret < 0) {
-+            error_setg(errp,
-+                       "Error enabling PEF with KVM");
-+            return -1;
++    if (htl) {
++        HostTrustLimitationClass *htlc = HOST_TRUST_LIMITATION_GET_CLASS(htl);
++
++        if (htlc->encrypt_data) {
++            return htlc->encrypt_data(htl, ptr, len);
 +        }
 +    }
 +
-+    return 0;
++    return 1;
 +}
 +
-+static void pef_guest_class_init(ObjectClass *oc, void *data)
-+{
-+    HostTrustLimitationClass *gmpc = HOST_TRUST_LIMITATION_CLASS(oc);
-+
-+    gmpc->kvm_init = pef_kvm_init;
-+}
-+
-+static const TypeInfo pef_guest_info = {
-+    .parent = TYPE_OBJECT,
-+    .name = TYPE_PEF_GUEST,
-+    .instance_size = sizeof(PefGuestState),
-+    .class_init = pef_guest_class_init,
-+    .interfaces = (InterfaceInfo[]) {
-+        { TYPE_HOST_TRUST_LIMITATION },
-+        { TYPE_USER_CREATABLE },
-+        { }
-+    }
-+};
-+
-+static void
-+pef_register_types(void)
-+{
-+    type_register_static(&pef_guest_info);
-+}
-+
-+type_init(pef_register_types);
+ #endif /* QEMU_HOST_TRUST_LIMITATION_H */
+diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+index b4174d941c..c7b9739609 100644
+--- a/include/sysemu/kvm.h
++++ b/include/sysemu/kvm.h
+@@ -231,23 +231,6 @@ int kvm_destroy_vcpu(CPUState *cpu);
+  */
+ bool kvm_arm_supports_user_irq(void);
+ 
+-/**
+- * kvm_memcrypt_enabled - return boolean indicating whether memory encryption
+- *                        is enabled
+- * Returns: 1 memory encryption is enabled
+- *          0 memory encryption is disabled
+- */
+-bool kvm_memcrypt_enabled(void);
+-
+-/**
+- * kvm_memcrypt_encrypt_data: encrypt the memory range
+- *
+- * Return: 1 failed to encrypt the range
+- *         0 succesfully encrypted memory region
+- */
+-int kvm_memcrypt_encrypt_data(uint8_t *ptr, uint64_t len);
+-
+-
+ #ifdef NEED_CPU_H
+ #include "cpu.h"
+ 
 -- 
 2.26.2
 
