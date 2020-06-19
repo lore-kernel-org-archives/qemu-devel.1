@@ -2,112 +2,149 @@ Return-Path: <SRS0=Yszf=AA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C23AAC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 07:58:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4248FC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 08:13:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D6A0207DD
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 07:58:24 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EiHJ631B"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D6A0207DD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 14777207FC
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 08:13:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 14777207FC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59656 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37168 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmBup-0000TR-Rc
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 03:58:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46172)
+	id 1jmC9k-00085H-A2
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 04:13:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49084)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jmBu6-0007ur-F7
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 03:57:38 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:26299
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jmBu4-00077k-Mx
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 03:57:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1592553455;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=iUpKXL7nxt5mBmSOzmRLIkfYsjG182Bi7oPrRr98QJo=;
- b=EiHJ631B+367aFYf+d1EiuY/3G/CdmcVdabVjck0p6MgjfKRQRduw1OQ3pJHfZS7KYkMHP
- W/hUCHOIGJr3v8+BVmoul7jEEO0h7PBJwXqhZxfn3pbep1RAm/SbpRN277VTYzIyN2TZw9
- fDM1PX8WNCdeD7QkTMOZJlhEs6CMlOI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-143-2MxpW4IDNkKGP31bepLijg-1; Fri, 19 Jun 2020 03:57:33 -0400
-X-MC-Unique: 2MxpW4IDNkKGP31bepLijg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 67DBF1005512;
- Fri, 19 Jun 2020 07:57:32 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-113-28.ams2.redhat.com
- [10.36.113.28])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3ACAD10013C4;
- Fri, 19 Jun 2020 07:57:30 +0000 (UTC)
-Subject: Re: [PATCH for-5.1] qcow2: Don't open images with a backing file and
- the data-file-raw bit
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-References: <20200415190207.21118-1-berto@igalia.com>
- <b0202150-5a43-18d5-3716-b758ab7e5824@redhat.com>
- <w51r1uctwc2.fsf@maestria.local.igalia.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <80d5af9c-0b8b-472a-fba2-cace33be6053@redhat.com>
-Date: Fri, 19 Jun 2020 09:57:27 +0200
+ (Exim 4.90_1) (envelope-from <frankja@linux.ibm.com>)
+ id 1jmC98-0007f4-7B; Fri, 19 Jun 2020 04:13:10 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:12204
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <frankja@linux.ibm.com>)
+ id 1jmC96-0001Cy-6W; Fri, 19 Jun 2020 04:13:09 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 05J83M0o185246; Fri, 19 Jun 2020 04:13:05 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 31rr2k2uu7-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 19 Jun 2020 04:13:04 -0400
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05J83W6j185879;
+ Fri, 19 Jun 2020 04:13:04 -0400
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com
+ [149.81.74.107])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 31rr2k2utr-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 19 Jun 2020 04:13:04 -0400
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+ by ppma03fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05J8B0KJ029255;
+ Fri, 19 Jun 2020 08:13:02 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com
+ (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+ by ppma03fra.de.ibm.com with ESMTP id 31r0u9gt87-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 19 Jun 2020 08:13:02 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com
+ (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+ by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id 05J8BfAr12517802
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 19 Jun 2020 08:11:41 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id B035BA4068;
+ Fri, 19 Jun 2020 08:12:59 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 1504CA405F;
+ Fri, 19 Jun 2020 08:12:59 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.7.233])
+ by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Fri, 19 Jun 2020 08:12:59 +0000 (GMT)
+Subject: Re: [PATCH v3 1/8] s390/sclp: get machine once during read scp/cpu
+ info
+To: Collin Walling <walling@linux.ibm.com>, qemu-devel@nongnu.org,
+ qemu-s390x@nongnu.org
+References: <20200618222258.23287-1-walling@linux.ibm.com>
+ <20200618222258.23287-2-walling@linux.ibm.com>
+From: Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <31efc0f1-c8dd-028f-237b-1fb09f3f6ab5@linux.ibm.com>
+Date: Fri, 19 Jun 2020 10:12:58 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <w51r1uctwc2.fsf@maestria.local.igalia.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <20200618222258.23287-2-walling@linux.ibm.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="5jxoDAsnco8fPQZCHiW0NglSH6p27nGzu"
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=mreitz@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/19 01:50:04
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ boundary="6m9XUncMH09oHAAurL72h4B5WvLOuPFIG"
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.687
+ definitions=2020-06-19_04:2020-06-18,
+ 2020-06-19 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ cotscore=-2147483648
+ spamscore=0 phishscore=0 lowpriorityscore=0 malwarescore=0 bulkscore=0
+ mlxlogscore=999 mlxscore=0 suspectscore=0 priorityscore=1501
+ impostorscore=0 adultscore=0 clxscore=1015 classifier=spam adjust=0
+ reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2006190054
+Received-SPF: pass client-ip=148.163.158.5; envelope-from=frankja@linux.ibm.com;
+ helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/19 04:13:05
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-Spam_score_int: -25
+X-Spam_score: -2.6
+X-Spam_bar: --
+X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -121,108 +158,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: thuth@redhat.com, mst@redhat.com, cohuck@redhat.com, david@redhat.com,
+ pasic@linux.ibm.com, borntraeger@de.ibm.com, svens@linux.ibm.com,
+ pbonzini@redhat.com, mihajlov@linux.ibm.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---5jxoDAsnco8fPQZCHiW0NglSH6p27nGzu
-Content-Type: multipart/mixed; boundary="33qzK0gy6wKKoJSDpZRMCRnASyY6hPqmu"
+--6m9XUncMH09oHAAurL72h4B5WvLOuPFIG
+Content-Type: multipart/mixed; boundary="Cdx3O2s6tvgna9ljjDO1d39GfgXyGvLRp"
 
---33qzK0gy6wKKoJSDpZRMCRnASyY6hPqmu
+--Cdx3O2s6tvgna9ljjDO1d39GfgXyGvLRp
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 18.06.20 14:03, Alberto Garcia wrote:
-> On Wed 03 Jun 2020 03:53:03 PM CEST, Max Reitz wrote:
->> Sorry for the long delay. :/
+On 6/19/20 12:22 AM, Collin Walling wrote:
+> Functions within read scp/cpu info will need access to the machine
+> state. Let's make a call to retrieve the machine state once and
+> pass the appropriate data to the respective functions.
 >=20
-> And sorry for my long delay as well.
+> Signed-off-by: Collin Walling <walling@linux.ibm.com>
+> Reviewed-by: David Hildenbrand <david@redhat.com>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+
+> ---
+>  hw/s390x/sclp.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
 >=20
->> The patch itself looks good, but I=E2=80=99m not sure whether it is exte=
-nsive
->> enough.  Let me just jump straight to the problem:
->>
->> $ ./qemu-img create -f qcow2 \
->>     -o data_file=3Dfoo.qcow2.raw,data_file_raw=3Don \
->>     foo.qcow2 64M
->> (Create some file empty foo.qcow2 with external data file that=E2=80=99s=
- raw)
->>
->> $ ./qemu-img create -f qcow2 backing.qcow2 64M
->> $ ./qemu-io -c 'write -P 42 0 64M' backing.qcow2
->> (Create some file filled with 42s)
->>
->> $ ./qemu-img compare foo.qcow2 foo.qcow2.raw
->> Images are identical.
->> (As expected, foo.qcow2 is identical to its raw data file)
->>
->> $ ./qemu-img compare --image-opts \
->>     file.filename=3Dfoo.qcow2,backing.file.filename=3Dbacking.qcow2 \
->>     file.filename=3Dfoo.qcow2.raw
->> Content mismatch at offset 0!
->> (Oops.)
+> diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
+> index 20aca30ac4..7875334037 100644
+> --- a/hw/s390x/sclp.c
+> +++ b/hw/s390x/sclp.c
+> @@ -49,9 +49,8 @@ static inline bool sclp_command_code_valid(uint32_t c=
+ode)
+>      return false;
+>  }
+> =20
+> -static void prepare_cpu_entries(SCLPDevice *sclp, CPUEntry *entry, int=
+ *count)
+> +static void prepare_cpu_entries(MachineState *ms, CPUEntry *entry, int=
+ *count)
+>  {
+> -    MachineState *ms =3D MACHINE(qdev_get_machine());
+>      uint8_t features[SCCB_CPU_FEATURE_LEN] =3D { 0 };
+>      int i;
+> =20
+> @@ -77,7 +76,7 @@ static void read_SCP_info(SCLPDevice *sclp, SCCB *scc=
+b)
+>      IplParameterBlock *ipib =3D s390_ipl_get_iplb();
+> =20
+>      /* CPU information */
+> -    prepare_cpu_entries(sclp, read_info->entries, &cpu_count);
+> +    prepare_cpu_entries(machine, read_info->entries, &cpu_count);
+>      read_info->entries_cpu =3D cpu_to_be16(cpu_count);
+>      read_info->offset_cpu =3D cpu_to_be16(offsetof(ReadInfo, entries))=
+;
+>      read_info->highest_cpu =3D cpu_to_be16(machine->smp.max_cpus - 1);=
+
+> @@ -132,10 +131,11 @@ static void read_SCP_info(SCLPDevice *sclp, SCCB =
+*sccb)
+>  /* Provide information about the CPU */
+>  static void sclp_read_cpu_info(SCLPDevice *sclp, SCCB *sccb)
+>  {
+> +    MachineState *machine =3D MACHINE(qdev_get_machine());
+>      ReadCpuInfo *cpu_info =3D (ReadCpuInfo *) sccb;
+>      int cpu_count;
+> =20
+> -    prepare_cpu_entries(sclp, cpu_info->entries, &cpu_count);
+> +    prepare_cpu_entries(machine, cpu_info->entries, &cpu_count);
+>      cpu_info->nr_configured =3D cpu_to_be16(cpu_count);
+>      cpu_info->offset_configured =3D cpu_to_be16(offsetof(ReadCpuInfo, =
+entries));
+>      cpu_info->nr_standby =3D cpu_to_be16(0);
 >=20
-> If two images have the same contents but then you compare them changing
-> the backing file of one of them you can also get a content mismatch. How
-> is this different?
-
-It=E2=80=99s different in that files with data-file-raw can=E2=80=99t have =
-backing files
-at all.  So maybe users shouldn=E2=80=99t be allowed to give them backing f=
-iles
-at runtime either.
-
-Or at least, if we have data-file-raw, *all* data visible on such an
-image should be taken from the raw data file, never from any backing file.
-
-> Regardless of how we should ideally handle bs->backing and data-file-raw
-> (and yes I agree that it would be nice that QEMU would say "you cannot
-> have a backing file and an external raw file" in all cases) I think that
-> if the problem is that the user can override the backing file name and
-> get different contents, then that's not a problem that we should be
-> worried about.
-
-Well, not really be worried about, but I do think it=E2=80=99s indicative o=
-f
-some problem, though I=E2=80=99m not sure whether the problem is error
-reporting.  I think it=E2=80=99s rather the fact that data-file-raw should =
-imply
-metadata preallocation.
-
-With preallocation, we=E2=80=99d ensure that we always take all data from t=
-he
-raw data file.  So we=E2=80=99d always ignore any potential backing file.
-
-(It makes sense to guard users against giving images with data-file-raw
-a backing file, and to consider such images corrupt, as done by this
-patch.  But if users can force a backing file at runtime, I think
-showing its contents is another bug.)
-
-Max
 
 
---33qzK0gy6wKKoJSDpZRMCRnASyY6hPqmu--
 
---5jxoDAsnco8fPQZCHiW0NglSH6p27nGzu
+--Cdx3O2s6tvgna9ljjDO1d39GfgXyGvLRp--
+
+--6m9XUncMH09oHAAurL72h4B5WvLOuPFIG
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl7sb+gACgkQ9AfbAGHV
-z0CSVwf9E6CIbYc7bH4zwTpIawNA8OlrWcTw0Lx8XIrpjVYqLFkxhPuHpW5fLcWB
-vOpUOqV74142+Otp3UiNDUusKTksWHEEiqsG8QXx/N7NPGx72dQiQqbOdPCwOCPz
-I9yD8xkQHINiaFv+r2tLtbCIdL9/3KwJ9i5P6al4CNxcAWuHI8C1hFwSx29vKgLK
-1l1/T+/U2S2DV1Emv7B8EkmcLza6krSlB9mGSc7Qf6qYc8X2zuauGCrMYddtsl+C
-M4CwU4CJFsdj/LMJ639DFGP9AJgZzjg3hTxuCU/qu4lRj6T6wTISrSM6iYjNEUPu
-EbXw4tgaJcFrnh6amSJx8zfnAeN/nw==
-=I/1F
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl7sc4oACgkQ41TmuOI4
+ufi6aBAAy7w57/dRc0XYM2HjOnc+Xqtc1NsDVYhRufLR/VyBISAvPbNf7aN7uWak
+dcP9eUu+Q37uIlN2spSrcXIZcWSem3Q71cSEWCn1Y6t/bZf/slZioQDNKIQSCY5L
+EvRQpVGbUDlE5bVDYpbEeRbzOdV5MCUnpZEnHtnF5JDP2FzQrSHR9k9NZRaOa4PA
+EzP9YIW+7lZR1dRtr4grPWqe2op5Xv0tNiNJnXSZOYmJrEQEHkI3WIeOxbgGiA1h
+ZB0vTuG6nknAT2d/Pz3Cc7jxFuC1JI6pq43wnINmmh3oFaGo/CvDV4eaHX7POoyM
+lcWcEqV49/FqpoF75npsbms7HOqSJuTE1GAR/hYOQX0duUXU9eCyMQQGFn01C5K/
+/EqK26WjjxmzciIcINgfSnyXML9xrX+mQ68Q0HKVwtIn3edUSmh1KgVlSZx0FSYB
+30tQdqCj+yOTwEBsb7o2ujAPxriUKMuz0L6LMETiInlDa6ScEBRugl98zH2VYo7q
+88PexIL9YK2HdHGN6TRu7s58jrOSdd7I2rsf2spq+IyN688bKiG1ynBkhw85Gh2K
+zdOkENifhUfZ3tbHZHq5P09Gs0yPZhhlwZalNNv27gbqAjGC45ebrAV+O1O+dfh7
+ySw3nLqr8PAuExyS7P1sC0F+59pmohzBgZ6l/XjjY47OEWp68L4=
+=XDMJ
 -----END PGP SIGNATURE-----
 
---5jxoDAsnco8fPQZCHiW0NglSH6p27nGzu--
+--6m9XUncMH09oHAAurL72h4B5WvLOuPFIG--
 
 
