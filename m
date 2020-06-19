@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A789DC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 18:56:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30825C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 18:57:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7F3D420EDD
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 18:56:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F3D420EDD
+	by mail.kernel.org (Postfix) with ESMTPS id 06D0620EDD
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 18:57:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06D0620EDD
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32926 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35044 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmMBW-0001bp-QZ
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 14:56:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56378)
+	id 1jmMCL-0002Tr-BI
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 14:57:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56380)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jmMAu-00014n-GW
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 14:55:40 -0400
-Received: from indium.canonical.com ([91.189.90.7]:40840)
+ id 1jmMAv-00015E-R9
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 14:55:41 -0400
+Received: from indium.canonical.com ([91.189.90.7]:40850)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jmMAs-0005wb-OJ
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 14:55:40 -0400
+ id 1jmMAs-0005wf-OG
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 14:55:41 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jmMAp-0004Jk-Oy
- for <qemu-devel@nongnu.org>; Fri, 19 Jun 2020 18:55:35 +0000
+ id 1jmMAq-0004Jq-Ik
+ for <qemu-devel@nongnu.org>; Fri, 19 Jun 2020 18:55:36 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id B49642E806B
- for <qemu-devel@nongnu.org>; Fri, 19 Jun 2020 18:55:35 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 8CC3E2E8072
+ for <qemu-devel@nongnu.org>; Fri, 19 Jun 2020 18:55:36 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 19 Jun 2020 18:47:54 -0000
+Date: Fri, 19 Jun 2020 18:49:12 -0000
 From: Francesco Turco <1884302@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -52,15 +52,16 @@ X-Launchpad-Bug-Security-Vulnerability: no
 X-Launchpad-Bug-Commenters: fturco
 X-Launchpad-Bug-Reporter: Francesco Turco (fturco)
 X-Launchpad-Bug-Modifier: Francesco Turco (fturco)
-Message-Id: <159259247450.25654.11249497243330169394.malonedeb@gac.canonical.com>
-Subject: [Bug 1884302] [NEW] disable automatic mouse grabbing
+References: <159259247450.25654.11249497243330169394.malonedeb@gac.canonical.com>
+Message-Id: <159259255266.25602.5866468778790223912.malone@gac.canonical.com>
+Subject: [Bug 1884302] Re: disable automatic mouse grabbing
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="1cbd0aa39df153c901321817f9b57cf3f232b507";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 3bab1ed37e2c0153871b4fbcbc5ee22b5d212bad
+X-Launchpad-Hash: 53a6827e36b297c38d1b96c5a1005a64cdcb310c
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/19 14:55:36
@@ -87,40 +88,7 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
-
-I'm using QEMU 5.0.0 on a Gentoo Linux host system. Guest is an Arch
-Linux system.
-
-I'd like to disable automatic mouse grabbing when the QEMU window is focuse=
-d.
-I would prefer for QEMU to grab the mouse only after a click.
-
-I use the i3 window manager on my host system.
-Suppose I'm in workspace 1, while the QEMU window is in workspace 2.
-In order to switch to workspace 2, I need to press the "Win+2" key combinat=
-ion ("Win" is the Windows key).
-The problem is that the character "2" (from "Win+2") will get transferred t=
-o the guest system.
-For example, if I have a text editor opened under the guest system, the cha=
-racter "2" will be pasted inside the document I'm working on, which is pret=
-ty annoying.
-
-I would like instead to press the "Win+2" key combination and then
-explicitely click on the QEMU window with the mouse before grabbing it.
-
-Command line:
-
-qemu-system-x86_64 -drive
-file=3D/home/fturco/qemu/arch.img,media=3Ddisk,index=3D0,if=3Dvirtio,format=
-=3Draw,cache=3Dnone
--cpu host -m 2G -k it -enable-kvm -net nic,model=3Dvirtio -net user -vga
-virtio -display sdl -usb -rtc base=3Dutc -soundhw ac97 -monitor stdio -no-
-quit
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+Possibly similar bug: https://bugs.launchpad.net/qemu/+bug/906864
 
 -- =
 
