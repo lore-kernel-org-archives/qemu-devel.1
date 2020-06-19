@@ -2,99 +2,80 @@ Return-Path: <SRS0=Yszf=AA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90FE9C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 19:46:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DD6FC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 19:57:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5BDF1206C3
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 19:46:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2A94E20C09
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 19:57:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KGzl57pm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BDF1206C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="COBwYd/u"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A94E20C09
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48452 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53248 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmMxj-0006QS-Lp
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 15:46:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41014)
+	id 1jmN8c-0005VU-Dw
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 15:57:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42834)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jmMwv-0005UM-8q
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 15:45:17 -0400
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:36831)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jmMws-00066C-Jf
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 15:45:16 -0400
-Received: by mail-pl1-x643.google.com with SMTP id j4so4318464plk.3
- for <qemu-devel@nongnu.org>; Fri, 19 Jun 2020 12:45:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=Lo+f81iqbjMelgFVu9zSInVEJjPZTe6mOs11ccnBRuQ=;
- b=KGzl57pm2iA6vG3M+8YqVviH4kcpmdfxU/Ipy0sMwMsupdbsdGxfX+WQpWUkf6TaGS
- GcjPQQrnqYex87M/EQLB+UdWTwOird/C3Qpenbw/jAKlgj4VWQxxD6/U2GXlPJo/EXmp
- kstK5XOUHau/8CZSZ51RdhXxQqliz8A74Krzv2V8+b7s57v3BfnUtWf9VALOcFWhA8ZH
- 5sEMgpFeQ3sJUkTcaAe6CjoH1nUFDa3JI56yYPpx9Ev9DwU/f8LDT59623OKFJ4+Frsv
- SVq2ksHSG9aP2rzAxvZtTWvJlEzltM7lMW3CfRrhk837jGnCwI9lCQHdZzRgED7QxwDj
- a6CQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Lo+f81iqbjMelgFVu9zSInVEJjPZTe6mOs11ccnBRuQ=;
- b=sh4SHXzVShmkDoGWq8dzdXd67Ssmh8z6KwPFnYvu8K46croLdVhO1QL838wK66ydw0
- /VLrbAGqp6EFYb+urZeV0Jd2cYuehx1zlSSqNB8GqUnVaXIPoEohQzZHQpoKbayLShcR
- G7RML+ni5Jck0l4acWRMOAzqed/+yIq3+XMReTNLqSDkNU3HDykLZAIZPNIWsl2x1G8f
- Kmfbr7cvtaLalpOWKBxaooH8Jha4YMn0JB38mj/arDoNGgU1VbkpqKCCY2aElEAUcaD3
- hp0BVBbuSGyDo/LQPxl3fw1O7YbTFUtNvAF6i2xcxc61ycvDkqxnBol8BF9oI6kTQZp9
- mxXQ==
-X-Gm-Message-State: AOAM5304vIml2kpYni/lSAjAuLlqy2H89XfLBYZ0k1zYFFA1qW2UBWWt
- hhvvopE1pgDOAYPVSWA663xHMw==
-X-Google-Smtp-Source: ABdhPJw1OLWKQBQlhSScvoeZJLc2mix96i+TL1hvSklLvp48CVM3NMnH5Kd3BcDhKgA3GFPpl5zL4A==
-X-Received: by 2002:a17:90b:3d1:: with SMTP id
- go17mr4869952pjb.114.1592595913123; 
- Fri, 19 Jun 2020 12:45:13 -0700 (PDT)
-Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id o207sm6720190pfd.56.2020.06.19.12.45.12
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 19 Jun 2020 12:45:12 -0700 (PDT)
-Subject: Re: [PATCH v7 31/42] target/arm: Add mte helpers for sve scalar + int
- loads
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20200603011317.473934-1-richard.henderson@linaro.org>
- <20200603011317.473934-32-richard.henderson@linaro.org>
- <CAFEAcA8870uLGsGW+A5_QC4PPFnwMfywyvF5KV4yCkqbT6==Qw@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <0dff6f5e-72a5-8061-2688-fa408cf4b2ef@linaro.org>
-Date: Fri, 19 Jun 2020 12:45:10 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jmN7k-0004BU-4X
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 15:56:28 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36415
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jmN7i-0007cb-Dm
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 15:56:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592596585;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=p5mtZP/hx5YXv0cvBgbDwE6rgsFhTf80FSer8uCLjus=;
+ b=COBwYd/uyoomlE1Ibq6+2CNuLTDkr5clP8IQbXABz3V7dX7JhTdJonmJhCdfdkgRZePeBb
+ XRRsO2srQI3Vo94gHiFUh0QD77z7wCJZJaoDxaM0y3PEFbezijgBhUwvxYcJwH2YsgeRur
+ uJXV+K12wslZai6f1RvyCVBGncGLX7s=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-194-Vg9LxtNiOLCtFCxEjAZ9Fg-1; Fri, 19 Jun 2020 15:56:23 -0400
+X-MC-Unique: Vg9LxtNiOLCtFCxEjAZ9Fg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4340056B9C;
+ Fri, 19 Jun 2020 19:56:22 +0000 (UTC)
+Received: from blue.redhat.com (ovpn-114-4.phx2.redhat.com [10.3.114.4])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9A6CB7166C;
+ Fri, 19 Jun 2020 19:56:21 +0000 (UTC)
+From: Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 0/6] block: add block-dirty-bitmap-populate job
+Date: Fri, 19 Jun 2020 14:56:15 -0500
+Message-Id: <20200619195621.58740-1-eblake@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8870uLGsGW+A5_QC4PPFnwMfywyvF5KV4yCkqbT6==Qw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::643;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x643.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=eblake@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/06/19 15:56:25
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,39 +88,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
- Stephen Long <steplong@quicinc.com>
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org,
+ armbru@redhat.com, mreitz@redhat.com, pkrempa@redhat.com, jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/19/20 7:06 AM, Peter Maydell wrote:
-> On Wed, 3 Jun 2020 at 02:14, Richard Henderson
-> <richard.henderson@linaro.org> wrote:
->>
->> Because the elements are sequential, we can eliminate many tests all
->> at once when the tag hits TCMA, or if the page(s) are not Tagged.
->>
->> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> 
->> +static inline QEMU_ALWAYS_INLINE
->> +void sve_cont_ldst_mte_check_int(SVEContLdSt *info, CPUARMState *env,
->> +                                 uint64_t *vg, target_ulong addr, int esize,
->> +                                 int msize, uint32_t mtedesc, uintptr_t ra,
->> +                                 mte_check_fn *check)
->> +{
->> +    intptr_t mem_off, reg_off, reg_last;
->> +
->> +    /* Process the page only if MemAttr == Tagged. */
->> +    if (info->page[0].attrs.target_tlb_bit1) {
-> 
-> It's a bit odd to use this bit here when you don't define what
-> it is until patch 40. (Similarly for the next few patches.)
+[From John's original cover letter:]
+This is a new (very small) block job that writes a pattern into a
+bitmap. The only pattern implemented is the top allocation information.
 
-Perhaps.  What do you suggest to resolve this?
-Moving the system patches earlier?
-Just defining some inline functions for self-documentation?
+This can be used to "recover" an incremental bitmap chain if an external
+snapshot was taken without creating a new bitmap first: any writes made
+to the image will be reflected by the allocation status and can be
+written back into a bitmap.
 
+This is useful for e.g. libvirt managing backup chains if a user creates
+an external snapshot outside of libvirt.
 
-r~
+v3:
+ - Addressed a bit more feedback
+ - Make it easier to decide if we want an x- prefix if we think there
+ are more tweaks to be made to the interface
+ - Drop dependency on John's JobRunner iotest series
+ - Renumber the new iotest
+
+I know there was a lot of discussion about whether there are
+optimizations to be made with populating directly into the target
+bitmap rather than into a temporary that then gets merged in at the
+completion of the job, but the QMP aspect seems fairly stable.  Even
+so, we may still want to consider using an x- prefix until we know for
+sure whether libvirt can make decent use of the interface.
+
+Eric Blake (1):
+  bitmaps: Use x- prefix for block-dirty-bitmap-popluate
+
+John Snow (5):
+  block: add bitmap-populate job
+  blockdev: combine DriveBackupState and BlockdevBackupState
+  qmp: expose block-dirty-bitmap-populate
+  iotests: move bitmap helpers into their own file
+  iotests: add 298 for block-dirty-bitmap-populate
+
+ qapi/block-core.json          |   66 +
+ qapi/job.json                 |    6 +-
+ qapi/transaction.json         |    2 +
+ include/block/block_int.h     |   21 +
+ block/bitmap-populate.c       |  207 ++
+ blockdev.c                    |  104 +-
+ blockjob.c                    |    3 +-
+ MAINTAINERS                   |    1 +
+ block/Makefile.objs           |    1 +
+ tests/qemu-iotests/257        |  110 +-
+ tests/qemu-iotests/298        |  232 ++
+ tests/qemu-iotests/298.out    | 4544 +++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/bitmaps.py |  131 +
+ tests/qemu-iotests/group      |    1 +
+ 14 files changed, 5300 insertions(+), 129 deletions(-)
+ create mode 100644 block/bitmap-populate.c
+ create mode 100755 tests/qemu-iotests/298
+ create mode 100644 tests/qemu-iotests/298.out
+ create mode 100644 tests/qemu-iotests/bitmaps.py
+
+-- 
+2.27.0
+
 
