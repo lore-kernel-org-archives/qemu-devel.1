@@ -2,88 +2,78 @@ Return-Path: <SRS0=Yszf=AA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05352C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 13:30:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84B91C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 13:31:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C3EDE20771
-	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 13:30:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5149E20771
+	for <qemu-devel@archiver.kernel.org>; Fri, 19 Jun 2020 13:31:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="L4QnhZBO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3EDE20771
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=chromium.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mail.uni-paderborn.de header.i=@mail.uni-paderborn.de header.b="he5F1TXC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5149E20771
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=mail.uni-paderborn.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33912 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36790 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jmH5n-0001Eg-WF
-	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 09:30:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36964)
+	id 1jmH6x-00035g-Jp
+	for qemu-devel@archiver.kernel.org; Fri, 19 Jun 2020 09:31:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47612)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <chirantan@google.com>)
- id 1jmD9k-0001EB-3V
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 05:17:52 -0400
-Received: from mail-yb1-xb42.google.com ([2607:f8b0:4864:20::b42]:35217)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <chirantan@google.com>)
- id 1jmD9i-0003YL-4t
- for qemu-devel@nongnu.org; Fri, 19 Jun 2020 05:17:51 -0400
-Received: by mail-yb1-xb42.google.com with SMTP id 187so4616442ybq.2
- for <qemu-devel@nongnu.org>; Fri, 19 Jun 2020 02:17:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chromium.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=UTwzdRLymtwVn6UdnQK3PAdosv+ScKHHT1hAWduxwCc=;
- b=L4QnhZBOOHsZmIMqufwOZgXrl4NY0eN2CNPI+x/uHrT8+AvcEUYs7J1LsklMJyp+0J
- gqT9e0HC5bH0RGdKz0NOEAIIp6s+z2ZVXSH27z5F0HWDmvRLWAJzLe+rw5ZqKd1t+mip
- 4WrWlfxktrmnumPevn/EeufvOzW82Q2u1X248=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=UTwzdRLymtwVn6UdnQK3PAdosv+ScKHHT1hAWduxwCc=;
- b=m+btd3lfjGLrxe7nAYsbvkL4LfehOr+nrJBTdfZwM0qHrGHYniilKlbt3xQQD/Isc8
- Doa6c+f4+pTVQ61l0A08zknAhEJoKBu0qWRwY8C4s9iZztOGZz6qDPPsuIXl7PJhz7u1
- z68kzXQKm1SF677MuKnBAZkm3gVBimFnqtoF2qlFsq0Ef6IT9F6SCWBOOp/HFZBHRzxv
- dZRNhqEZLhhCR/5+cyzJax+ZqBQKw+kSQFsFMXy9WPdYFieObGWGtlnNyeRFqkQckT1q
- NXUE37ivbYbtVsC/cfj0qVhZg/STtjYAZ/mN62zy0iU8S0r9zFQZgkCL6ZHs1AuCYKm+
- OrKw==
-X-Gm-Message-State: AOAM532/w70ABukdCkSePS0Ptv3ijtByiv7qSXkRoxsqAxzhK+k575bY
- mS14DQE0QfywpcAOM0FY+kuUiQJl9eoMSFnSlrGuXA==
-X-Google-Smtp-Source: ABdhPJyF1hiGeFpX2FCa74q4gWj4hxw/oXzj6BBxFPQes7XAGsbIEoXyYtUNPzqL+7GovNMc/smSNdXUcYXYO+9NycM=
-X-Received: by 2002:a25:ccd5:: with SMTP id l204mr4365141ybf.51.1592558268848; 
- Fri, 19 Jun 2020 02:17:48 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <kbastian@mail.uni-paderborn.de>)
+ id 1jmH4E-0008Ll-Pe
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 09:28:26 -0400
+Received: from nylar.uni-paderborn.de ([2001:638:502:c003::18]:49966)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <kbastian@mail.uni-paderborn.de>)
+ id 1jmH4C-0004ss-5a
+ for qemu-devel@nongnu.org; Fri, 19 Jun 2020 09:28:26 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=mail.uni-paderborn.de; s=20170601; h=In-Reply-To:Content-Type:MIME-Version:
+ References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+ Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+ Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+ List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+ bh=uZv4noQSj0xfDjr21tbwhsC3ToybmXI/nv2HYipuC1Y=; b=he5F1TXC9w6ade45MStKcdRKu
+ sx+OZIiJZTEGfuMDskAAjg7t5bNNfl4RtjWX+wX3P69uAIxh6NhviWrb3lQmR7k6Hm8L87u8NIqhc
+ maROXIdFrpGz2kaMGD4YZQ/lfcl8XlGjJ8UpwRAAoA0BlDxxUbKy3y4zrUaSi4eSEjO3E=;
+Date: Fri, 19 Jun 2020 15:28:16 +0200
+From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+To: "Konopik, Andreas (EFS-GH2)" <andreas.konopik@efs-auto.de>
+Subject: Re: [PATCH v2 1/1] tricore: added triboard with tc27x_soc
+Message-ID: <20200619132816.ir53gqafnmrfjyb3@schnipp-desktop>
+References: <20200609152553.4376-1-david.brenken@efs-auto.org>
+ <20200609152553.4376-2-david.brenken@efs-auto.org>
+ <20200610084818.yrzxqm6466w2wpiz@schnipp-desktop>
+ <69A9BBE82CEA98469F7BA51850C5B89CF2FEA8F8@AUDIINSX0364.audi.vwg>
+ <F5B10EA5F04CF44F81B685A0E281578724EB1D39@AUDIINSX0385.audi.vwg>
 MIME-Version: 1.0
-References: <20200416164907.244868-1-stefanha@redhat.com>
- <20200618190816.GD3814@redhat.com>
- <20200618191655.GI2769@work-vm> <20200618192717.GE3814@redhat.com>
- <CAJFHJrrJzPLatNvw2xC3WYLbzCW0+DB+4UczQHGPBF9p+WGYQA@mail.gmail.com>
- <20200619083953.GB2690@work-vm>
-In-Reply-To: <20200619083953.GB2690@work-vm>
-From: Chirantan Ekbote <chirantan@chromium.org>
-Date: Fri, 19 Jun 2020 18:17:37 +0900
-Message-ID: <CAJFHJrpRGJ=myQzJtxjgQhHdbyhGXhz_N24=xJTKM4JqhhZG2g@mail.gmail.com>
-Subject: Re: [Virtio-fs] [PATCH 0/2] virtiofsd: drop Linux capabilities(7)
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::b42;
- envelope-from=chirantan@google.com; helo=mail-yb1-xb42.google.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <F5B10EA5F04CF44F81B685A0E281578724EB1D39@AUDIINSX0385.audi.vwg>
+X-IMT-Spam-Score: 0.0 ()
+X-Sophos-SenderHistory: ip=2a02:908:2214:e5bc::95d, fs=8210681, da=80182362,
+ mc=201, sc=3, hc=198, sp=1, fso=8210681, re=0, sd=0, hd=0
+X-PMX-Version: 6.4.9.2830568, Antispam-Engine: 2.7.2.2107409,
+ Antispam-Data: 2020.6.19.132116, AntiVirus-Engine: 5.74.0,
+ AntiVirus-Data: 2020.6.19.5740001
+X-IMT-Authenticated-Sender: kbastian@UNI-PADERBORN.DE
+Received-SPF: pass client-ip=2001:638:502:c003::18;
+ envelope-from=kbastian@mail.uni-paderborn.de; helo=nylar.uni-paderborn.de
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -94
-X-Spam_score: -9.5
-X-Spam_bar: ---------
-X-Spam_report: (-9.5 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001,
- USER_IN_DEF_SPF_WL=-7.5 autolearn=_AUTOLEARN
+X-Spam_score_int: -19
+X-Spam_score: -2.0
+X-Spam_bar: --
+X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
-X-Mailman-Approved-At: Fri, 19 Jun 2020 09:29:13 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,47 +85,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-fs-list <virtio-fs@redhat.com>, qemu-devel@nongnu.org,
- Vivek Goyal <vgoyal@redhat.com>, Miklos Szeredi <miklos@szeredi.hu>
+Cc: "Brenken, David \(EFS-GH5\)" <david.brenken@efs-auto.de>, "Hofstetter,
+ Georg \(EFS-GH2\)" <Georg.Hofstetter@efs-auto.de>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jun 19, 2020 at 5:40 PM Dr. David Alan Gilbert
-<dgilbert@redhat.com> wrote:
->
-> * Chirantan Ekbote (chirantan@chromium.org) wrote:
->
-> > We ended up working around it by prefixing "user.virtiofs." to the
-> > xattr name[2], which has its own problems but there was pretty much no
-> > chance that we would be able to give the fs device CAP_SYS_ADMIN in
-> > the init namespace.
->
->
-> What problems did you hit with that?  We should standardise the renaming
-> so we make an on-disc format that's compatible.
->
+Hi Andreas,
 
-I guess what I meant by problems is that it made what was previously a
-simple and straightforward implementation into something more complex
-and added some limitations.  For example, we now need to parse the
-result of the listxattr system call and strip out the prefix from any
-name in the list.  It also means that we cannot allow the guest to
-directly set or remove any "user.virtiofs." xattr as this would allow
-an unprivileged process in the vm to modify an xattr that it wouldn't
-otherwise be allowed to modify.  On top of being a somewhat arbitrary
-restriction this also means that you can't have stacked virtiofs
-instances as the lower instance would reject attempts by the upper one
-to set those xattrs.  These limitations aren't really a problem for us
-but I can see how they might be a problem for others.
+On Fri, Jun 19, 2020 at 11:57:03AM +0000, Konopik, Andreas (EFS-GH2) wrote:
+> Hello Bastian,
+> 
+> I assume that your review comments, which Georg has answered, are solved. I will implement the remaining suggestions in a new version of the patch.
 
-The change was also merged just yesterday so there may be other
-problems with it that haven't surfaced yet.
+yes. After the suggestions are implemented it should be good to go.
 
-I didn't mention it before because I figured this was something that
-we brought upon ourselves as chrome os is a bit extreme about
-sandboxing.  If we can come up with a standardized way to handle this
-I think we'll gladly switch the chrome os implementation to use it.
-
-Chirantan
+Cheers,
+Bastian
 
